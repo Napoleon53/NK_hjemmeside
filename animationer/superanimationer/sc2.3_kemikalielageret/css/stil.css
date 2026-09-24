@@ -862,3 +862,49 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
+   sted som knappen, der springer den over (js/praesentation.js) */
+.tilbud {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(20, 20, 28, 0.94);
+    border: 1px solid #4a4a58;
+    border-radius: 999px;
+    padding: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.tilbud button {
+    font-family: inherit;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    padding: 9px 18px;
+    font-size: 0.98rem;
+}
+
+.tilbud-start {
+    background-color: var(--blaa-mork);
+    border: 2px solid var(--gul);
+    color: #ffffff;
+    animation: bank 1.7s ease-out infinite;
+}
+
+.tilbud-start span { color: var(--gul); margin-left: 4px; }
+.tilbud-start:hover { background-color: var(--blaa); }
+
+.tilbud-nej {
+    background-color: transparent;
+    border: 1px solid #5e5e70;
+    color: var(--tekst-svag);
+}
+
+.tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }

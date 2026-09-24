@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reaktionshastighed</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⏱</span> Reaktionshastighed</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="kurve" role="tab" aria-selected="true" title="Kurven (1)"><span class="nr">1</span>Kurven</button>
+        <button class="faneknap" data-fane="sammenstoed" role="tab" aria-selected="false" title="Sammenstød (2)"><span class="nr">2</span>Sammenstød</button>
+        <button class="faneknap" data-fane="udtryk" role="tab" aria-selected="false" title="Hastighedsudtryk (3)"><span class="nr">3</span>Hastighedsudtryk</button>
+    </div>
+
+    <button class="teoriknap" id="teoriknap" type="button" title="Teori om reaktionshastighed">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: KURVEN. Glas og graf tegnes af js/sim_kurve.js            -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-kurve" role="tabpanel" aria-label="Kurven">
+    <div class="scene">
+        <canvas id="kurve-laerred" aria-label="Bægerglas og kurver for Br₂ og BrO₃⁻"></canvas>
+        <div class="tilbud" id="kurve-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="kurve-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="kurve-reaktion">
+            <h2>Reaktionen</h2>
+            <div class="ligning lille">5 Br⁻ + BrO₃⁻ + 6 H⁺ → 3 Br₂ + 3 H₂O</div>
+            <div class="knaprad">
+                <button class="knap groen" id="kurve-afspil" type="button"><span>Afspil</span><span class="tegn">▶</span></button>
+                <button class="knap" id="kurve-forfra" type="button" title="Forfra (R)"><span>Forfra</span><span class="tegn">↺</span></button>
+            </div>
+        </div>
+
+        <div class="kort" id="kurve-vaerktoej">
+            <h2>Værktøj</h2>
+            <div class="segment tre">
+                <button type="button" data-vaerktoej="aflaes" class="aktiv">Aflæs</button>
+                <button type="button" data-vaerktoej="sekant">Sekant</button>
+                <button type="button" data-vaerktoej="tangent">Tangent</button>
+            </div>
+            <div class="stofvalg" id="kurve-stofvalg" hidden>
+                <span class="vt-etiket">Mål på</span>
+                <div class="segment">
+                    <button type="button" data-stof="br2" class="aktiv">Br₂</button>
+                    <button type="button" data-stof="bro3">BrO₃⁻</button>
+                </div>
+            </div>
+            <div class="aflaesning" id="kurve-aflaesning"></div>
+            <button class="knap lille" id="kurve-tangentknap" type="button" hidden><span>Læg linealen som tangent</span><span class="tegn">⟋</span></button>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Start opgave -> Giv hint -> Vis svaret -> Ny opgave -->
+        <div class="kort opgavekort" id="kurve-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="kurve-loest">0</b></span><button class="afslut" id="kurve-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="kurve-opgavetekst" data-start="Afspil reaktionen, og start så en opgave."></p>
+            <div class="valg" id="kurve-valg"></div>
+            <p class="besked hint" id="kurve-hint"></p>
+            <p class="besked" id="kurve-besked" aria-live="polite"></p>
+            <button class="knap stor blaa" id="kurve-opgaveknap" type="button">Start opgave</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SAMMENSTØD. Kassen og kurven tegnes af sim_sammenstoed.js -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-sammenstoed" role="tabpanel" aria-label="Sammenstød">
+    <div class="scene">
+        <canvas id="sam-laerred" aria-label="Partikler, der støder sammen, og en kurve over produktet"></canvas>
+        <div class="tilbud" id="sam-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="sam-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="sam-opstilling">
+            <h2>Opstilling</h2>
+            <div class="segment">
+                <button type="button" data-opst="opl" class="aktiv">To opløste stoffer</button>
+                <button type="button" data-opst="metal">Metal i syre</button>
+            </div>
+            <div id="sam-opl">
+                <div class="vaelger-raekke"><span class="vaelger-navn">Antal A</span>
+                    <div class="segment"><button type="button" data-na="6">6</button><button type="button" data-na="12" class="aktiv">12</button><button type="button" data-na="24">24</button></div>
+                </div>
+                <div class="vaelger-raekke"><span class="vaelger-navn">Antal B</span>
+                    <div class="segment"><button type="button" data-nb="6">6</button><button type="button" data-nb="12" class="aktiv">12</button><button type="button" data-nb="24">24</button></div>
+                </div>
+            </div>
+            <div id="sam-metal" hidden>
+                <div class="vaelger-raekke"><span class="vaelger-navn">36 Mg-atomer</span>
+                    <div class="segment"><button type="button" data-metal="klump" class="aktiv">Klump</button><button type="button" data-metal="stykker">Stykker</button><button type="button" data-metal="pulver">Pulver</button></div>
+                </div>
+            </div>
+            <button class="knap lille" id="sam-forfra" type="button" title="Forfra (R)"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort maaling" id="sam-maaling">
+            <h2>Måling <span class="taeller">t = <b id="sam-tid">0 s</b></span></h2>
+            <div class="storttal" id="sam-hits">…</div>
+            <div class="storttal-navn" id="sam-hits-navn">Sammenstød mellem A og B pr. sekund</div>
+            <div class="raekke"><span id="sam-reageret-navn">Dannet C</span><b id="sam-reageret">0</b></div>
+        </div>
+
+        <div class="kort opgavekort" id="sam-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="sam-loest">0</b></span><button class="afslut" id="sam-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="sam-opgavetekst" data-start="Skru på opstillingen, og start så en opgave."></p>
+            <div class="valg" id="sam-valg"></div>
+            <p class="besked hint" id="sam-hint"></p>
+            <p class="besked" id="sam-besked" aria-live="polite"></p>
+            <button class="knap stor blaa" id="sam-opgaveknap" type="button">Start opgave</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: HASTIGHEDSUDTRYK. Kurverne tegnes af sim_udtryk.js,       -->
+<!-- tabellen og udtrykket bygges af den samme fil.                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-udtryk" role="tabpanel" aria-label="Hastighedsudtryk">
+    <div class="scene soejle">
+        <div class="graf-omraade">
+            <canvas id="udtryk-laerred" aria-label="Kurver for forsøgene med tangenten i t = 0"></canvas>
+            <div class="tilbud" id="udtryk-tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+            <button class="spring-over" id="udtryk-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        </div>
+
+        <div class="arbejdsbord" id="udtryk-bord">
+            <table class="forsoegstabel" id="udtryk-tabel"></table>
+            <div class="udtryk" id="udtryk-udtryk">
+                <div class="formel" id="udtryk-formel"></div>
+                <button class="knap blaa tjekknap" id="udtryk-tjek" type="button">Tjek</button>
+            </div>
+            <p class="besked" id="udtryk-besked" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="udtryk-opgavekort">
+            <h2><span>Opgave <span class="taeller" id="udtryk-nr">1/8</span></span><span class="taeller">løst: <b id="udtryk-loest">0</b></span></h2>
+            <p class="opgavetekst">Find hastighedsudtrykket for reaktionen.</p>
+            <div class="ligning" id="udtryk-ligning"></div>
+            <p class="besked hint" id="udtryk-hint"></p>
+            <button class="knap stor" id="udtryk-opgaveknap" type="button">Giv hint</button>
+        </div>
+
+        <div class="kort" id="udtryk-forsoeg">
+            <h2>Nyt forsøg</h2>
+            <div id="udtryk-vaelgere"></div>
+            <button class="knap stor groen" id="udtryk-maal" type="button"><span>Mål starthastigheden</span><span class="tegn">▶</span></button>
+            <button class="knap lille" id="udtryk-ryd" type="button" title="Ryd tabellen (R)"><span>Ryd tabellen</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Reaktionshastighed</h2>
+        <p>Reaktionshastigheden er, hvor hurtigt koncentrationen af et stof ændrer sig. For et produkt:</p>
+        <div class="ligning">v(Br₂) = Δ[Br₂] / Δt</div>
+        <p>For en reaktant falder koncentrationen, så der sættes minus foran: v(BrO₃⁻) = −Δ[BrO₃⁻] / Δt. Hastigheden er altid positiv, og enheden er M/s.</p>
+
+        <h3>Koefficienterne</h3>
+        <div class="ligning">5 Br⁻ + BrO₃⁻ + 6 H⁺ → 3 Br₂ + 3 H₂O</div>
+        <p>Der dannes 3 Br₂, hver gang én BrO₃⁻ bruges. Derfor er v(Br₂) = 3 · v(BrO₃⁻).</p>
+
+        <h3>Gennemsnit og øjeblik</h3>
+        <p>Gennemsnitshastigheden fra t₁ til t₂ er hældningen af <b>sekanten</b> gennem de to punkter. Hastigheden i ét øjeblik er hældningen af <b>tangenten</b> i punktet. Starthastigheden v₀ er tangentens hældning i t = 0.</p>
+
+        <h3>Sammenstød</h3>
+        <p>Partiklerne skal støde sammen for at reagere. Højere koncentration og større overflade giver flere sammenstød pr. sekund og dermed større hastighed. Efterhånden som reaktanterne bruges, bliver der færre sammenstød, og kurven flader ud.</p>
+
+        <h3>Hastighedsudtryk</h3>
+        <div class="ligning">v = k · [A]<sup>m</sup> · [B]<sup>n</sup></div>
+        <p>Eksponenterne m og n findes ved forsøg, ikke ud fra reaktionsskemaet. Ganges [A] med 2, ganges v med 2<sup>m</sup>: 1 gang ved m = 0, 2 gange ved m = 1 og 4 gange ved m = 2.</p>
+
+        <h3>Temperatur og katalysator</h3>
+        <p>Temperatur og katalysator ændrer også hastigheden. De hører til 1.2 Energidiagram og 1.3 Katalyse.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Mellemrum</kbd> afspil &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/model.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/sim_kurve.js"></script>
+<script src="js/sim_sammenstoed.js"></script>
+<script src="js/sim_udtryk.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

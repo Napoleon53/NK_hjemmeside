@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 58 72" width="58" height="72">
+<!-- Emblemet paa de groenne fliser: en benzenring med paerer, egen tegning -->
+<g fill="none" stroke="#e9fff1" stroke-linejoin="round" opacity="0.55">
+  <polygon points="29,20 42,27.5 42,42.5 29,50 16,42.5 16,27.5" stroke-width="2.4"/>
+  <circle cx="29" cy="35" r="8.5" stroke-width="1.8"/>
+</g>
+<g fill="#e9fff1" opacity="0.6">
+  <circle cx="29" cy="20" r="2.2"/><circle cx="42" cy="27.5" r="2.2"/><circle cx="42" cy="42.5" r="2.2"/>
+  <circle cx="29" cy="50" r="2.2"/><circle cx="16" cy="42.5" r="2.2"/><circle cx="16" cy="27.5" r="2.2"/>
+</g>
+</svg>

@@ -28,24 +28,27 @@
                  "-ion" bagpaa, naar de staar alene (natriumion), negative
                  ikke (sulfat).
        variabel: metallet kan have flere ladninger, saa ladningen skal
-                 staa i navnet med romertal. grund er navnet uden. */
+                 staa i navnet med romertal. grund er navnet uden.
+       gruppe:   hovedgruppen 1-8, som i bogen og i sc2.3, for de ioner,
+                 hvis ladning kan udledes af den (fane 3). Nummeret er
+                 antallet af elektroner i yderste skal. */
     D.IONER = [
-        { id: "Na",   formel: "Na",   q: 1,  navn: "natrium" },
-        { id: "K",    formel: "K",    q: 1,  navn: "kalium" },
+        { id: "Na",   formel: "Na",   q: 1,  navn: "natrium", grundstof: "natrium", gruppe: 1 },
+        { id: "K",    formel: "K",    q: 1,  navn: "kalium", grundstof: "kalium", gruppe: 1 },
         { id: "Ag",   formel: "Ag",   q: 1,  navn: "sølv" },
         { id: "NH4",  formel: "NH₄",  q: 1,  navn: "ammonium", sammensat: true,
           atomer: [["N", 0, 0], ["H", -0.64, -0.64, 0], ["H", 0.64, -0.64, 0], ["H", 0.64, 0.64, 0], ["H", -0.64, 0.64, 0]] },
-        { id: "Mg",   formel: "Mg",   q: 2,  navn: "magnesium" },
-        { id: "Ca",   formel: "Ca",   q: 2,  navn: "calcium" },
-        { id: "Ba",   formel: "Ba",   q: 2,  navn: "barium" },
+        { id: "Mg",   formel: "Mg",   q: 2,  navn: "magnesium", grundstof: "magnesium", gruppe: 2 },
+        { id: "Ca",   formel: "Ca",   q: 2,  navn: "calcium", grundstof: "calcium", gruppe: 2 },
+        { id: "Ba",   formel: "Ba",   q: 2,  navn: "barium", grundstof: "barium", gruppe: 2 },
         { id: "Cu",   formel: "Cu",   q: 2,  navn: "kobber(II)", grund: "kobber", variabel: true },
         { id: "Fe2",  formel: "Fe",   q: 2,  navn: "jern(II)", grund: "jern", variabel: true },
-        { id: "Al",   formel: "Al",   q: 3,  navn: "aluminium" },
+        { id: "Al",   formel: "Al",   q: 3,  navn: "aluminium", grundstof: "aluminium", gruppe: 3 },
         { id: "Fe3",  formel: "Fe",   q: 3,  navn: "jern(III)", grund: "jern", variabel: true },
 
-        { id: "Cl",   formel: "Cl",   q: -1, navn: "chlorid" },
-        { id: "O",    formel: "O",    q: -2, navn: "oxid" },
-        { id: "S",    formel: "S",    q: -2, navn: "sulfid" },
+        { id: "Cl",   formel: "Cl",   q: -1, navn: "chlorid", grundstof: "chlor", gruppe: 7 },
+        { id: "O",    formel: "O",    q: -2, navn: "oxid", grundstof: "oxygen", gruppe: 6 },
+        { id: "S",    formel: "S",    q: -2, navn: "sulfid", grundstof: "svovl", gruppe: 6 },
         { id: "OH",   formel: "OH",   q: -1, navn: "hydroxid", sammensat: true,
           atomer: [["O", 0, 0], ["H", 0.66, -0.36, 0]] },
         { id: "NO3",  formel: "NO₃",  q: -1, navn: "nitrat", sammensat: true, atomer: trekant("N", "O") },
@@ -56,11 +59,93 @@
         { id: "PO4",  formel: "PO₄",  q: -3, navn: "phosphat", sammensat: true, atomer: kryds("P", "O") }
     ];
 
+    /* Fane 3: ioner, der ikke ligger paa hylden. Eleven finder deres
+       ladning ud fra formlen. Metallerne kan have flere ladninger, saa
+       ladningen staar i navnet med romertal. */
+    D.UKENDTE = [
+        { id: "Cr3",  formel: "Cr",   q: 3,  navn: "chrom(III)",   grund: "chrom",   variabel: true },
+        { id: "Sn2",  formel: "Sn",   q: 2,  navn: "tin(II)",      grund: "tin",     variabel: true },
+        { id: "Sn4",  formel: "Sn",   q: 4,  navn: "tin(IV)",      grund: "tin",     variabel: true },
+        { id: "Pb2",  formel: "Pb",   q: 2,  navn: "bly(II)",      grund: "bly",     variabel: true },
+        { id: "Pb4",  formel: "Pb",   q: 4,  navn: "bly(IV)",      grund: "bly",     variabel: true },
+        { id: "Mn2",  formel: "Mn",   q: 2,  navn: "mangan(II)",   grund: "mangan",  variabel: true },
+        { id: "Mn4",  formel: "Mn",   q: 4,  navn: "mangan(IV)",   grund: "mangan",  variabel: true },
+        { id: "Co2",  formel: "Co",   q: 2,  navn: "cobalt(II)",   grund: "cobalt",  variabel: true },
+        { id: "Ni2",  formel: "Ni",   q: 2,  navn: "nikkel(II)",   grund: "nikkel",  variabel: true },
+        { id: "Cu1",  formel: "Cu",   q: 1,  navn: "kobber(I)",    grund: "kobber",  variabel: true },
+        { id: "Ti4",  formel: "Ti",   q: 4,  navn: "titan(IV)",    grund: "titan",   variabel: true },
+
+        { id: "CrO4", formel: "CrO₄", q: -2, navn: "chromat", sammensat: true, atomer: kryds("Cr", "O") },
+        { id: "MnO4", formel: "MnO₄", q: -1, navn: "permanganat", sammensat: true, atomer: kryds("Mn", "O") },
+        { id: "S2O3", formel: "S₂O₃", q: -2, navn: "thiosulfat", sammensat: true,
+          atomer: [["S", 0, 0], ["S", -K, -K, 0], ["O", K, -K, 0], ["O", K, K, 0], ["O", -K, K, 0]] },
+        { id: "ClO",  formel: "ClO",  q: -1, navn: "hypochlorit", sammensat: true, atomer: [["Cl", 0, 0], ["O", 1, 0, 0]] },
+        { id: "ClO3", formel: "ClO₃", q: -1, navn: "chlorat", sammensat: true, atomer: trekant("Cl", "O") },
+        { id: "NO2",  formel: "NO₂",  q: -1, navn: "nitrit", sammensat: true,
+          atomer: [["N", 0, 0], ["O", -0.87, 0.5, 0], ["O", 0.87, 0.5, 0]] },
+        { id: "SO3",  formel: "SO₃",  q: -2, navn: "sulfit", sammensat: true, atomer: trekant("S", "O") },
+        { id: "C2O4", formel: "C₂O₄", q: -2, navn: "oxalat", sammensat: true,
+          atomer: [["C", -0.5, 0], ["C", 0.5, 0, 0], ["O", -1.0, -0.85, 0], ["O", -1.0, 0.85, 0], ["O", 1.0, -0.85, 1], ["O", 1.0, 0.85, 1]] },
+        { id: "AsO4", formel: "AsO₄", q: -3, navn: "arsenat", sammensat: true, atomer: kryds("As", "O") }
+    ];
+    D.UKENDTE.forEach(function (ion) { ion.ukendt = true; });
+
     var efterId = {};
-    D.IONER.forEach(function (ion) { efterId[ion.id] = ion; });
+    D.IONER.concat(D.UKENDTE).forEach(function (ion) { efterId[ion.id] = ion; });
     D.ion = function (id) { return efterId[id] || null; };
     D.KATIONER = D.IONER.filter(function (i) { return i.q > 0; });
     D.ANIONER = D.IONER.filter(function (i) { return i.q < 0; });
+
+    /* ----- Det periodiske system, periode 1-6 (uden lanthaniderne) -----
+       Samme tabel som i sc2.3. [symbol, dansk navn, periode, soejle 1-18,
+       slags]; slags: m metal, i ikke-metal, h halvmetal, a aedelgas */
+    var PT = [
+        ["H", "hydrogen", 1, 1, "i"], ["He", "helium", 1, 18, "a"],
+        ["Li", "lithium", 2, 1, "m"], ["Be", "beryllium", 2, 2, "m"], ["B", "bor", 2, 13, "h"], ["C", "carbon", 2, 14, "i"],
+        ["N", "nitrogen", 2, 15, "i"], ["O", "oxygen", 2, 16, "i"], ["F", "fluor", 2, 17, "i"], ["Ne", "neon", 2, 18, "a"],
+        ["Na", "natrium", 3, 1, "m"], ["Mg", "magnesium", 3, 2, "m"], ["Al", "aluminium", 3, 13, "m"], ["Si", "silicium", 3, 14, "h"],
+        ["P", "phosphor", 3, 15, "i"], ["S", "svovl", 3, 16, "i"], ["Cl", "chlor", 3, 17, "i"], ["Ar", "argon", 3, 18, "a"],
+        ["K", "kalium", 4, 1, "m"], ["Ca", "calcium", 4, 2, "m"], ["Sc", "scandium", 4, 3, "m"], ["Ti", "titan", 4, 4, "m"],
+        ["V", "vanadium", 4, 5, "m"], ["Cr", "chrom", 4, 6, "m"], ["Mn", "mangan", 4, 7, "m"], ["Fe", "jern", 4, 8, "m"],
+        ["Co", "cobalt", 4, 9, "m"], ["Ni", "nikkel", 4, 10, "m"], ["Cu", "kobber", 4, 11, "m"], ["Zn", "zink", 4, 12, "m"],
+        ["Ga", "gallium", 4, 13, "m"], ["Ge", "germanium", 4, 14, "h"], ["As", "arsen", 4, 15, "h"], ["Se", "selen", 4, 16, "i"],
+        ["Br", "brom", 4, 17, "i"], ["Kr", "krypton", 4, 18, "a"],
+        ["Rb", "rubidium", 5, 1, "m"], ["Sr", "strontium", 5, 2, "m"], ["Y", "yttrium", 5, 3, "m"], ["Zr", "zirconium", 5, 4, "m"],
+        ["Nb", "niobium", 5, 5, "m"], ["Mo", "molybdæn", 5, 6, "m"], ["Tc", "technetium", 5, 7, "m"], ["Ru", "ruthenium", 5, 8, "m"],
+        ["Rh", "rhodium", 5, 9, "m"], ["Pd", "palladium", 5, 10, "m"], ["Ag", "sølv", 5, 11, "m"], ["Cd", "cadmium", 5, 12, "m"],
+        ["In", "indium", 5, 13, "m"], ["Sn", "tin", 5, 14, "m"], ["Sb", "antimon", 5, 15, "h"], ["Te", "tellur", 5, 16, "h"],
+        ["I", "iod", 5, 17, "i"], ["Xe", "xenon", 5, 18, "a"],
+        ["Cs", "cæsium", 6, 1, "m"], ["Ba", "barium", 6, 2, "m"], ["La", "lanthan", 6, 3, "m"], ["Hf", "hafnium", 6, 4, "m"],
+        ["Ta", "tantal", 6, 5, "m"], ["W", "wolfram", 6, 6, "m"], ["Re", "rhenium", 6, 7, "m"], ["Os", "osmium", 6, 8, "m"],
+        ["Ir", "iridium", 6, 9, "m"], ["Pt", "platin", 6, 10, "m"], ["Au", "guld", 6, 11, "m"], ["Hg", "kviksølv", 6, 12, "m"],
+        ["Tl", "thallium", 6, 13, "m"], ["Pb", "bly", 6, 14, "m"], ["Bi", "bismuth", 6, 15, "m"], ["Po", "polonium", 6, 16, "m"],
+        ["At", "astat", 6, 17, "i"], ["Rn", "radon", 6, 18, "a"]
+    ];
+
+    D.GRUNDSTOFFER = PT.map(function (r) {
+        return { s: r[0], navn: r[1], periode: r[2], soejle: r[3], slags: r[4] };
+    });
+
+    var efterSymbol = {};
+    D.GRUNDSTOFFER.forEach(function (g) { efterSymbol[g.s] = g; });
+    D.grundstof = function (s) { return efterSymbol[s] || null; };
+
+    /* Hovedgruppenummeret 1-8, som det staar i bogen. Soejle 3-12 er
+       overgangsmetallerne, som ikke har et hovedgruppenummer. */
+    D.hovedgruppe = function (s) {
+        var g = efterSymbol[s];
+        if (!g) return null;
+        if (g.soejle <= 2) return g.soejle;
+        if (g.soejle >= 13) return g.soejle - 10;
+        return null;
+    };
+
+    /* Metaller, der kan danne ioner med forskellig ladning. Samme liste
+       som i sc2.3 plus de ukendte metaller paa fane 3. */
+    D.FLERE_LADNINGER = ["Ti", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Sn", "Pb", "Hg"];
+
+    /* De sammensatte ioner paa plakaten, samme som paa hylden. */
+    D.PLAKAT_IONER = ["NH4", "OH", "NO3", "HCO3", "CO3", "SO4", "PO4"];
 
     /* SO₄²⁻ */
     D.ionTekst = function (ion) { return ion.formel + NK.ladningHaevet(ion.q); };
@@ -139,13 +224,13 @@
     var FINDES_IKKE = {
         "Al-CO3": 1, "Fe3-CO3": 1, "Al-HCO3": 1, "Fe3-HCO3": 1, "Cu-HCO3": 1, "Ag-HCO3": 1,
         "Ag-OH": 1, "NH4-O": 1,
-        "NH4-OH": "Ammoniumhydroxid findes ikke som fast stof — det er ammoniak opløst i vand."
+        "NH4-OH": "Ammoniumhydroxid findes ikke som fast stof. Det er ammoniak opløst i vand."
     };
 
     D.findesIkke = function (kat, an) {
         var v = FINDES_IKKE[kat.id + "-" + an.id];
         if (!v) return "";
-        return typeof v === "string" ? v : "Findes ikke som fast stof i virkeligheden — men formlen er rigtigt skrevet.";
+        return typeof v === "string" ? v : "Stoffet findes ikke som fast stof, men formlen er rigtigt skrevet.";
     };
 
     /* "let" | "tung" | "findes-ikke" | "reagerer" (oxider og sulfider)
@@ -177,7 +262,7 @@
         return par.map(function (x) { return { kat: x[0], an: x[1], trin: x[2] || 1 }; });
     }
 
-    /* Fane 2. trin 1: én af hver, 2: to af den ene, 3: tre af den ene
+    /* Byggefanen, navn -> formel. trin 1: én af hver, 2: to af den ene, 3: tre af den ene
        eller 2 : 3. Opgaverne bliver svaerere, efterhaanden som eleven
        loeser dem. Alle stofferne findes. */
     D.NAVN_OPGAVER = liste([
@@ -192,7 +277,7 @@
         ["Fe3", "SO4", 3], ["Cu", "PO4", 3], ["Fe2", "PO4", 3]
     ]);
 
-    /* Fane 3. Mange med jern og kobber, fordi det er dér, formlen skal
+    /* Byggefanen, formel -> navn. Mange med jern og kobber, fordi det er dér, formlen skal
        bruges til at finde ladningen. */
     D.FORMEL_OPGAVER = liste([
         ["Fe3", "SO4"], ["Fe2", "SO4"], ["Fe3", "OH"], ["Fe2", "OH"], ["Fe3", "NO3"], ["Fe2", "NO3"],
@@ -202,7 +287,7 @@
         ["K", "CO3"], ["Na", "PO4"], ["Ag", "NO3"], ["Ag", "SO4"], ["Ba", "SO4"], ["Al", "OH"], ["Mg", "NO3"]
     ]);
 
-    /* Fane 4. Kun letopløselige salte - de andre bliver liggende. */
+    /* Vandfanen. Kun letopløselige salte, de andre bliver liggende. */
     D.VAND_OPGAVER = liste([
         ["Na", "NO3"], ["K", "NO3"], ["NH4", "NO3"], ["Na", "SO4"], ["K", "SO4"], ["NH4", "SO4"],
         ["Na", "CO3"], ["K", "CO3"], ["NH4", "CO3"], ["Na", "PO4"], ["K", "PO4"], ["NH4", "PO4"],
@@ -215,6 +300,33 @@
        sulfid er udeladt: de reagerer med vandet i stedet for bare at
        gaa i opløsning. */
     D.VAND_ANIONER = ["Cl", "OH", "NO3", "HCO3", "CO3", "SO4", "PO4"];
+
+    /* Fane 3: den ukendte ion. Den ene ion i saltet ligger ikke paa
+       hylden, og eleven finder dens ladning ud fra formlen. Med et
+       ukendt metal skal saltet saa navngives med romertal. Med en ukendt
+       sammensat ion skal den bruges i et nyt salt med partneren (partner
+       er en positiv ion fra hylden). Alle stofferne findes. Oxiderne
+       SnO₂, PbO₂, MnO₂ og TiO₂ er med, fordi det lille tal ved O dér er
+       forkortet vaek: tin har ikke ladningen 2+ i SnO₂. */
+    D.UKENDT_OPGAVER = [
+        { kat: "Cr3", an: "Cl" }, { kat: "Cr3", an: "SO4" }, { kat: "Cr3", an: "O" },
+        { kat: "Sn2", an: "Cl" }, { kat: "Sn4", an: "O" }, { kat: "Sn2", an: "O" },
+        { kat: "Pb2", an: "NO3" }, { kat: "Pb2", an: "O" }, { kat: "Pb4", an: "O" },
+        { kat: "Mn2", an: "SO4" }, { kat: "Mn4", an: "O" }, { kat: "Co2", an: "Cl" },
+        { kat: "Ni2", an: "OH" }, { kat: "Cu1", an: "Cl" }, { kat: "Cu1", an: "O" }, { kat: "Ti4", an: "O" },
+
+        { kat: "K", an: "CrO4", partner: "Ba" }, { kat: "Mg", an: "CrO4", partner: "K" },
+        { kat: "K", an: "MnO4", partner: "Ca" }, { kat: "Na", an: "S2O3", partner: "Ba" },
+        { kat: "Na", an: "ClO", partner: "Ca" }, { kat: "Ca", an: "ClO", partner: "Na" },
+        { kat: "K", an: "ClO3", partner: "Ba" }, { kat: "Na", an: "NO2", partner: "Ca" },
+        { kat: "Na", an: "SO3", partner: "Ca" }, { kat: "Ca", an: "C2O4", partner: "Na" },
+        { kat: "Na", an: "AsO4", partner: "Ca" }
+    ];
+    D.UKENDT_OPGAVER.forEach(function (o) { o.side = D.ion(o.kat).ukendt ? "kat" : "an"; });
+
+    /* Hvilke ladninger kan eleven indstille paa den ukendte ion? */
+    D.UKENDT_MIN = 1;
+    D.UKENDT_MAKS = 4;
 
     /* ----- Svarmuligheder ------------------------------------------------ */
     /* Hver forkert mulighed er en typisk fejl, og den har sin egen
@@ -252,11 +364,11 @@
             return "Ladningen går op, men " + p + " : " + n + " kan forkortes til " + (p / g) + " : " + (n / g)
                 + ". Formlen viser det mindste forhold.";
         }
-        return p + " " + D.ionTekst(kat) + " og " + n + " " + D.ionTekst(an) + " giver " + plus + "+ og " + minus
-            + "−. Ladningen går ikke op.";
+        return p + " " + D.ionTekst(kat) + " og " + n + " " + D.ionTekst(an) + " giver " + NK.fortegn(plus) + " og "
+            + NK.fortegn(-minus) + ". Ladningen går ikke op.";
     }
 
-    /* Fane 2: hvordan skrives formlen? */
+    /* Byggefanen: hvordan skrives formlen? */
     D.formelValg = function (kat, an) {
         var f = D.forhold(kat, an), p = f.p, n = f.n;
         var rigtig = D.formel(kat, an, p, n);
@@ -272,7 +384,7 @@
         if (p !== n) s.laeg(D.formel(kat, an, n, p), "Tallene er byttet om. " + ladningstjek(kat, an, n, p));
         if (kat.sammensat || an.sammensat) {
             s.laeg(atomformel(kat, p, an, n), "Atomerne er talt rigtigt, men så kan man ikke se ionerne. "
-                + "En sammensat ion skrives samlet — med parentes, hvis der er flere af den.");
+                + "En sammensat ion skrives samlet og i parentes, hvis der er flere af den.");
         }
         if (p !== 1 || n !== 1) s.laeg(D.formel(kat, an, 1, 1), ladningstjek(kat, an, 1, 1));
         s.laeg(D.formel(kat, an, 2 * p, 2 * n), ladningstjek(kat, an, 2 * p, 2 * n));
@@ -284,32 +396,32 @@
         var hvorfor;
         if (grp) hvorfor = "Parentesen viser, at hele " + grp.formel + " er med " + grpAntal + " gange.";
         else if (p === 1 && n === 1) hvorfor = "Én af hver, fordi ladningerne er lige store.";
-        else hvorfor = p + " " + D.ionTekst(kat) + " giver " + (p * kat.q) + "+, og " + n + " " + D.ionTekst(an)
-            + " giver " + (n * -an.q) + "−.";
+        else hvorfor = p + " " + D.ionTekst(kat) + " giver " + NK.fortegn(p * kat.q) + ", og " + n + " " + D.ionTekst(an)
+            + " giver " + NK.fortegn(n * an.q) + ".";
         return afslut(s, { tekst: rigtig, rigtig: true, forklaring: hvorfor });
     };
 
     /* Navne, der let forveksles med det rigtige. */
     var FORVEKSLING = {
-        sulfat:   [["sulfid", "Sulfid er S²⁻ — uden oxygen. SO₄²⁻ hedder sulfat."],
-                   ["sulfit", "Sulfit er SO₃²⁻ — ét oxygen mindre. SO₄²⁻ hedder sulfat."]],
-        nitrat:   [["nitrid", "Nitrid er N³⁻ — uden oxygen. NO₃⁻ hedder nitrat."],
-                   ["nitrit", "Nitrit er NO₂⁻ — ét oxygen mindre. NO₃⁻ hedder nitrat."]],
-        phosphat: [["phosphid", "Phosphid er P³⁻ — uden oxygen. PO₄³⁻ hedder phosphat."],
-                   ["phosphit", "Phosphit er PO₃³⁻ — ét oxygen mindre. PO₄³⁻ hedder phosphat."]],
-        carbonat: [["hydrogencarbonat", "Hydrogencarbonat er HCO₃⁻ — med et H. CO₃²⁻ hedder carbonat."]],
+        sulfat:   [["sulfid", "Sulfid er S²⁻ uden oxygen. SO₄²⁻ hedder sulfat."],
+                   ["sulfit", "Sulfit er SO₃²⁻ med ét oxygen mindre. SO₄²⁻ hedder sulfat."]],
+        nitrat:   [["nitrid", "Nitrid er N³⁻ uden oxygen. NO₃⁻ hedder nitrat."],
+                   ["nitrit", "Nitrit er NO₂⁻ med ét oxygen mindre. NO₃⁻ hedder nitrat."]],
+        phosphat: [["phosphid", "Phosphid er P³⁻ uden oxygen. PO₄³⁻ hedder phosphat."],
+                   ["phosphit", "Phosphit er PO₃³⁻ med ét oxygen mindre. PO₄³⁻ hedder phosphat."]],
+        carbonat: [["hydrogencarbonat", "Hydrogencarbonat er HCO₃⁻ med et H. CO₃²⁻ hedder carbonat."]],
         hydrogencarbonat: [["carbonat", "Carbonat er CO₃²⁻. Med H'et hedder HCO₃⁻ hydrogencarbonat."]],
         hydroxid: [["oxid", "Oxid er O²⁻. OH⁻ hedder hydroxid."]],
         oxid:     [["hydroxid", "Hydroxid er OH⁻. O²⁻ hedder oxid."]],
-        chlorid:  [["chlorat", "Chlorat er ClO₃⁻ — med oxygen. Cl⁻ hedder chlorid."]],
-        sulfid:   [["sulfat", "Sulfat er SO₄²⁻ — med oxygen. S²⁻ hedder sulfid."]]
+        chlorid:  [["chlorat", "Chlorat er ClO₃⁻ med oxygen. Cl⁻ hedder chlorid."]],
+        sulfid:   [["sulfat", "Sulfat er SO₄²⁻ med oxygen. S²⁻ hedder sulfid."]]
     };
     var PRAEFIKS = ["", "", "di", "tri", "tetra", "penta", "hexa"];
-    var ROMERTAL = ["", "I", "II", "III", "IV"];
+    var ROMERTAL = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 
     function stort(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-    /* Fane 3: hvad hedder stoffet? */
+    /* Byggefanen: hvad hedder stoffet? */
     D.navneValg = function (kat, an) {
         var f = D.forhold(kat, an), p = f.p, n = f.n;
         var rigtig = D.saltnavn(kat, an);
@@ -319,14 +431,14 @@
             var anden = null;
             D.KATIONER.forEach(function (k) { if (k.grund === kat.grund && k !== kat) anden = k; });
             s.laeg((anden ? anden.navn : kat.grund + "(" + ROMERTAL[kat.q - 1] + ")") + an.navn,
-                "Tjek ladningen: " + n + " " + D.ionTekst(an) + " giver " + (n * -an.q) + "−, så "
+                "Tjek ladningen: " + n + " " + D.ionTekst(an) + " giver " + NK.fortegn(n * an.q) + ", så "
                 + (p > 1 ? "hver af de " + p + " " + kat.grund + "ioner har" : kat.grund + "ionen har")
                 + " ladningen " + kat.q + "+.");
             s.laeg(kat.grund + an.navn, stort(kat.grund)
                 + " kan have flere forskellige ladninger, så ladningen skal stå i navnet med romertal.");
         }
         (FORVEKSLING[an.navn] || []).forEach(function (x) { s.laeg(kat.navn + x[0], x[1]); });
-        if (kat.id === "NH4") s.laeg("ammoniak" + an.navn, "Ammoniak er NH₃ — et molekyle. Ionen NH₄⁺ hedder ammonium.");
+        if (kat.id === "NH4") s.laeg("ammoniak" + an.navn, "Ammoniak er NH₃, et molekyle. Ionen NH₄⁺ hedder ammonium.");
         if ((p > 1 || n > 1) && !(kat.q === 1 && an.id === "PO4")) {
             s.laeg(PRAEFIKS[p] + kat.navn + PRAEFIKS[n] + an.navn,
                 "I navnet på et salt står antallet ikke. Det er givet af ionernes ladninger.");
@@ -339,7 +451,83 @@
         return afslut(s, { tekst: rigtig, rigtig: true, forklaring: hvorfor });
     };
 
-    /* Fane 4: hvad kommer der ud i vandet? Kun hoejresiden - venstre-
+    /* Fane 3, trin 1: hvilken ladning har den kendte ion? For et
+       grundstof i en hovedgruppe kan den udledes af gruppen: metaller
+       afgiver elektronerne i yderste skal, ikke-metaller optager dem, der
+       mangler i at have 8. Fejlene er fortegnet byttet om og antallet af
+       elektroner i yderste skal brugt som ladning. En sammensat ions
+       ladning skal man kende fra oversigten. */
+    function elektroner(n) { return n + (n === 1 ? " elektron" : " elektroner"); }
+
+    D.kendtValg = function (ion) {
+        var rigtig = D.ionTekst(ion);
+        var s = samler(rigtig);
+        function med(q) { return ion.formel + NK.ladningHaevet(q); }
+        var hvorfor;
+        if (ion.gruppe) {
+            var v = ion.gruppe;              /* hovedgruppen = elektroner i yderste skal */
+            var navn = stort(ion.grundstof), m = 8 - v;
+            if (ion.q > 0) {
+                s.laeg(med(-v), navn + " er et metal. Metaller afgiver elektroner og bliver positive.");
+                s.laeg(med(-m), navn + " har " + elektroner(v) + " i yderste skal. Det er lettere at afgive "
+                    + v + " end at optage " + m + ".");
+                s.laeg(med(v + 1), navn + " har kun " + elektroner(v) + " i yderste skal, så den kan kun afgive " + v + ".");
+                hvorfor = navn + " står i hovedgruppe " + ion.gruppe + " og har " + elektroner(v) + " i yderste skal. "
+                    + "Den afgiver " + (v === 1 ? "den" : "dem") + " og bliver " + rigtig + ".";
+            } else {
+                s.laeg(med(v), navn + " har " + elektroner(v) + " i yderste skal. Det er lettere at optage "
+                    + m + " end at afgive " + v + ".");
+                s.laeg(med(m), navn + " er et ikke-metal. Ikke-metaller optager elektroner og bliver negative.");
+                s.laeg(med(-v), navn + " optager kun " + m + ". Så har den 8 elektroner i yderste skal.");
+                hvorfor = navn + " står i hovedgruppe " + ion.gruppe + " og har " + elektroner(v) + " i yderste skal. "
+                    + "Den optager " + m + " og bliver " + rigtig + ".";
+            }
+        } else {
+            var a = Math.abs(ion.q), fortegn = ion.q > 0 ? 1 : -1;
+            [a + 1, a - 1, a + 2].forEach(function (x) {
+                if (x >= 1 && x <= 4) s.laeg(med(fortegn * x), "Ladningen på en sammensat ion skal man kende. "
+                    + stort(ion.navn) + " er " + rigtig + ".");
+            });
+            s.laeg(med(-ion.q), stort(ion.navn) + " er en " + (ion.q > 0 ? "positiv" : "negativ") + " ion.");
+            hvorfor = rigtig + " står i oversigten over sammensatte ioner.";
+        }
+        return afslut(s, { tekst: rigtig, rigtig: true, forklaring: hvorfor });
+    };
+
+    /* Fane 3: hvad hedder saltet med det ukendte metal? Fejlene er dem,
+       man laver, naar man laeser formlen forkert: romertallet som den
+       samlede ladning, som det lille tal ved den negative ion (i SnO₂
+       er 2 antallet af O²⁻, ikke tins ladning) eller som antallet af
+       metalioner. Og romertallet glemt. */
+    D.romertalValg = function (kat, an) {
+        var f = D.forhold(kat, an), p = f.p, n = f.n, q = kat.q;
+        var rigtig = D.saltnavn(kat, an);
+        var s = samler(rigtig);
+        var minus = NK.fortegn(n * an.q);
+        function navn(r) { return kat.grund + "(" + ROMERTAL[r] + ")" + an.navn; }
+        var regnskab = n + " " + D.ionTekst(an) + " giver " + minus + (p > 1 ? ", fordelt på " + p + " " + kat.formel : "")
+            + ", så " + (p > 1 ? "hver " : "") + kat.formel + " er " + D.ionTekst(kat) + ".";
+
+        if (p > 1) {
+            s.laeg(navn(p * q), "Romertallet er ladningen på én " + kat.grund + "ion. " + p + " " + kat.formel
+                + " har tilsammen " + NK.fortegn(p * q) + ", så hver er " + D.ionTekst(kat) + ".");
+        }
+        if (n !== q) {
+            s.laeg(navn(n), "Det lille tal ved " + an.formel + " er antallet af " + D.ionTekst(an) + ", ikke ladningen. " + regnskab);
+        }
+        if (p > 1 && p !== q) {
+            s.laeg(navn(p), "Det lille tal ved " + kat.formel + " er antallet af " + kat.grund + "ioner, ikke ladningen. " + regnskab);
+        }
+        s.laeg(kat.grund + an.navn, stort(kat.grund) + " kan have flere ladninger, så ladningen skal stå i navnet med romertal.");
+        if (q < D.UKENDT_MAKS) s.laeg(navn(q + 1), regnskab);
+        if (q > 1) s.laeg(navn(q - 1), regnskab);
+        s.laeg(kat.navn + "ion" + an.navn, "Når ionen står i et saltnavn, mister den endelsen -ion.");
+
+        var hvorfor = regnskab + " Romertallet (" + ROMERTAL[q] + ") viser ladningen.";
+        return afslut(s, { tekst: rigtig, rigtig: true, forklaring: hvorfor });
+    };
+
+    /* Vandfanen: hvad kommer der ud i vandet? Kun hoejresiden - venstre-
        siden (saltet) staar i spoergsmaalet. */
     D.oploesValg = function (salt) {
         var kat = salt.kat, an = salt.an, p = salt.p, n = salt.n;
@@ -362,7 +550,7 @@
         var brud = an.sammensat ? an : (kat.sammensat ? kat : null);
         if (brud) {
             s.laeg(brud === an ? D.ionLed(kat, p) + " + " + atomer(an, n) : atomer(kat, p) + " + " + D.ionLed(an, n),
-                "Den sammensatte ion går ikke i stykker i vand. " + D.ionTekst(brud) + " er stadig én ion — ligesom i krystallen.");
+                "Den sammensatte ion går ikke i stykker i vand. " + D.ionTekst(brud) + " er stadig én ion, ligesom i krystallen.");
         }
         s.laeg(salt.formel + "(aq)", "Et salt er ikke et molekyle. Når det opløses, går ionerne fra hinanden.");
         if (p > 1 || n > 1) {
@@ -383,7 +571,7 @@
         return afslut(s, { tekst: rigtig, rigtig: true, forklaring: hvorfor });
     };
 
-    /* Fane 4, anden opgavetype: ionerne svoemmer i glasset - hvilket
+    /* Vandfanen, anden opgavetype: ionerne svoemmer i glasset - hvilket
        salt er det? k er antallet af formelenheder i glasset. */
     D.saltValg = function (salt, k) {
         var kat = salt.kat, an = salt.an;
@@ -395,5 +583,27 @@
         D.formelValg(kat, an).forEach(function (v) { if (!v.rigtig) s.laeg(v.tekst, v.forklaring); });
         var hvorfor = "Der er " + salt.p + " " + D.ionTekst(kat) + " for hver " + (salt.n > 1 ? salt.n + " " : "") + D.ionTekst(an) + ".";
         return afslut(s, { tekst: salt.formel, rigtig: true, forklaring: hvorfor });
+    };
+
+    /* ----- Kemichaels praesentation af fanerne --------------------------
+       Foerste gang en fane aabnes (js/laerer.js). Hoejst ca. 60 tegn pr.
+       replik: hvor man er, hvad man goer, og en toer bemaerkning. Ingen
+       teori. peg er den replik, han peger under. */
+    D.INTRO = {
+        "fane-bord": { peg: 1, linjer: [
+            "Saltbyggeren. Her bygger man salte af ioner.",
+            "Træk ionerne ned på bordet, til lynlåsen lukker.",
+            "Går plus og minus op, er det et salt. Resten er detaljer."
+        ] },
+        "fane-vand": { peg: 1, linjer: [
+            "Vandet. Her går saltene i opløsning.",
+            "Vælg et salt til højre, og læg det i glasset.",
+            "Glasset er vasket op. Denne gang."
+        ] },
+        "fane-ukendt": { peg: 2, linjer: [
+            "Ukendte ioner. Formlen ved mere, end man tror.",
+            "Tryk Start opgave, så viser jeg, hvor du begynder.",
+            "Plakaterne på væggen er gratis at kigge på."
+        ] }
     };
 }());

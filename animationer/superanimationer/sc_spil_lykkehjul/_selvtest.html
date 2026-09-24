@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Kemi-Lykkehjulet</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1366px; height:768px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i spillet og kan slettes.
+
+   Aabner index.html i en iframe (1366 x 768) og kontrollerer det, man
+   ikke kan se paa et skaermbillede: at de indbyggede quizzer kan laeses
+   og staar paa tavlen, at tekstformatet kan skrives og laeses igen og
+   giver gode fejl, at reglerne og pointene er rigtige og kan fortrydes,
+   at knapperne foerer gennem en toss-up, en runde og finalen, at
+   podierne og bogstaverne kan vaere der, og at sproget overholder
+   reglerne. Skal koeres gennem en lokal server og i rigtig tid; spillet
+   koerer 25 gange hurtigere under testen (NK.tempo).
+   ?stop=N stopper efter afsnit N.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+var STOP = +(new URLSearchParams(location.search).get("stop") || 0);
+function overskrift(t) {
+    if (STOP && parseInt(t, 10) > STOP) throw new Error("stoppet før " + t);
+    skriv("\n" + t, "h");
+    vis(true);
+}
+function vis(undervejs) {
+    document.getElementById("ud").innerHTML = linjer.join("\n")
+        + (undervejs ? "\n\nKører …" : "\n\n" + (fejl ? '<span class="fejl">' + fejl + " FEJL</span>" : '<span class="ok">ALT OK</span>'));
+}
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+/* Venter, til betingelsen er sand (hoejst ms) */
+async function til(f, ms) {
+    var t0 = Date.now();
+    while (Date.now() - t0 < (ms || 4000)) { if (f()) return true; await vent(25); }
+    return !!f();
+}
+
+window.addEventListener("load", function () {
+    setTimeout(function () {
+        koer().then(function () { vis(false); }, function (e) {
+            skriv("  FEJL  testen stoppede: " + e.message, "fejl"); fejl++; vis(false);
+            if (window.console) console.log("selvtest: " + e.stack);
+        });
+    }, 1200);
+});
+
+async function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, S = NK.Spil, A = NK.app, F = NK.Tekstformat, Tv = NK.Tavle, B = NK.Bibliotek, V = NK.Visning;
+    paastand("tavle, tekstformat, spil, hjul, visning, editor og app er indlæst",
+        !!(Tv && F && S && NK.Hjul && V && NK.Editor && B && A));
+    paastand("Kemichael er med", !!NK.laerer);
+    if (NK.laerer) NK.laerer.stopIntro();
+
+    /* Alt, spillet gemmer i browseren, saettes tilbage til sidst */
+    var gemt = {};
+    for (var gi = 0; gi < w.localStorage.length; gi++) {
+        var gn = w.localStorage.key(gi);
+        if (/^nk-lykkehjul/.test(gn)) gemt[gn] = w.localStorage.getItem(gn);
+    }
+    Object.keys(gemt).forEach(function (k) { w.localStorage.removeItem(k); });
+    var varSlukket = NK.Lydbank.slukket();
+    NK.Lydbank.saetSlukket(true);
+    w.NK.tempo = 0.04;
+
+    function tast(key, code, ekstra) {
+        var o = { key: key, code: code || "", bubbles: true };
+        if (ekstra) Object.keys(ekstra).forEach(function (k) { o[k] = ekstra[k]; });
+        d.dispatchEvent(new w.KeyboardEvent("keydown", o));
+    }
+    function tekst(id) { return d.getElementById(id).textContent; }
+    function tavleTekst() {
+        var G = S.aktuel(), ud = ["", "", "", ""];
+        for (var r = 0; r < 4; r++) ud[r] = new Array(15).join(".").split("");
+        var fl = d.querySelectorAll(".flise[data-i]");
+        for (var i = 0; i < fl.length; i++) {
+            var c = G.celler[+fl[i].getAttribute("data-i")];
+            ud[c.r][c.k] = fl[i].textContent || "_";
+        }
+        return ud.map(function (r) { return r.join(""); });
+    }
+
+    try {
+    /* ----------------------------------------------------------------- */
+    overskrift("2. Tavlen");
+    var o = Tv.opstil("Substitutions-reaktion");
+    paastand("et langt ord deles ved bindestregen", !o.fejl && o.linjer.join("|") === "SUBSTITUTIONS-|REAKTION", o.fejl || o.linjer.join("|"));
+    o = Tv.opstil("Le Chateliers princip");
+    paastand("ordene fyldes på linjerne: LE CHATELIERS | PRINCIP", !o.fejl && o.linjer.join("|") === "LE CHATELIERS|PRINCIP", o.linjer.join("|"));
+    paastand("én og to linjer står i række 2 og 3", o.celler.every(function (c) { return c.r === 1 || c.r === 2; }));
+    paastand("hver linje er centreret", o.celler.filter(function (c) { return c.r === 2; })[0].k === 3);
+    o = Tv.opstil("Elektronegativitet");
+    paastand("et ord over 14 tegn uden bindestreg giver en fejl med et forslag", !!o.fejl && /14/.test(o.fejl) && /bindestreg/.test(o.fejl), o.fejl);
+    o = Tv.opstil("En buffer holder pH næsten konstant");
+    paastand("fire linjer bruger hele tavlen, og række 1 og 4 har højst 12", !o.fejl && o.linjer.length === 4
+        && o.linjer[0].length <= 12 && o.linjer[3].length <= 12, o.fejl || o.linjer.join("|"));
+    paastand("alle felter står på tavlen", o.celler.every(function (c) { return Tv.findes(c.r, c.k); }));
+    o = Tv.opstil("Oxidation / er afgivelse");
+    paastand("/ tvinger et linjeskift", !o.fejl && o.linjer[0] === "OXIDATION", o.linjer.join("|"));
+    o = Tv.opstil("Hess' lov, 1840");
+    paastand("tegn og tal står fremme, kun bogstaver skal gættes",
+        o.celler.filter(function (c) { return !c.bogstav; }).map(function (c) { return c.tegn; }).join("") === "',1840");
+    o = Tv.opstil("Ædelgas på ø");
+    paastand("Æ, Ø og Å tælles som bogstaver", o.antal["Æ"] === 1 && o.antal["Ø"] === 1 && o.antal["Å"] === 1);
+    paastand("accenter fjernes og sænkede tal bliver almindelige", Tv.normaliser("Café CO₂") === "CAFE CO2");
+    o = Tv.opstil("Den korresponderende syre og den korresponderende base er et par");
+    paastand("en for lang løsning giver en fejl", !!o.fejl);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("3. Tekstformatet og quizzerne");
+    D.INDBYGGEDE.forEach(function (x) {
+        var r = F.fraTekst(x.tekst);
+        paastand("#" + x.noegle + " " + (r.udkast.navn) + ": ingen fejl (" + r.oversigt + ")", !!r.quiz, r.fejl.join(" | "));
+        if (!r.quiz) return;
+        var r2 = F.fraTekst(F.tilTekst(r.quiz));
+        paastand("#" + x.noegle + ": skrevet som tekst og læst igen giver samme quiz", r2.quiz && r2.quiz.id === r.quiz.id);
+        var alle = r.quiz.gaader.concat(r.quiz.final ? [r.quiz.final] : []);
+        var loesn = alle.map(function (g) { return Tv.normaliser(g.loesning); });
+        var dobbelt = loesn.filter(function (l, i) { return loesn.indexOf(l) !== i; });
+        paastand("#" + x.noegle + ": ingen løsning går igen", !dobbelt.length, dobbelt.join(", "));
+        paastand("#" + x.noegle + ": finalen har mindst ét bogstav, der ikke er R, S, T, L, N eller E",
+            !r.quiz.final || Object.keys(r.quiz.final.antal).some(function (b) { return D.FINAL_BOGSTAVER.indexOf(b) < 0; }));
+        paastand("#" + x.noegle + ": hver runde har en konsonant at dreje efter",
+            r.quiz.gaader.every(function (g) { return g.type !== "runde" || Object.keys(g.antal).some(S.erKonsonant); }));
+    });
+    paastand("Kemi B er standard", D.STANDARD === "b" && B.valgt() === "i:b");
+    var r = F.fraTekst("Titel: Test\nRunde: Syre-base ; Buffer\nToss-up 2.000 kr.: Redox ; Oxidation\n// kommentar\nFinal: Natur ; Koffein");
+    paastand("toss-up med beløb, runde, kommentar og final læses", !!r.quiz && r.quiz.gaader.length === 2
+        && r.quiz.gaader[1].vaerdi === 2000 && r.quiz.final && r.quiz.final.loesning === "Koffein", r.fejl.join(" | "));
+    r = F.fraTekst("Runde: [Syre-base] ; [Buffer]");
+    paastand("[ ] fra skabelonen fjernes", !!r.quiz && r.quiz.gaader[0].kategori === "Syre-base");
+    r = F.fraTekst("Titel: X\nRunde: Syre-base Buffer\nQuiz: a ; b\nFinal: a ; Koffein\nFinal: b ; Koffein\nRunde: Organisk ; Elektronegativitet");
+    paastand("fejl får linjenummer: semikolon mangler (2), ukendt type (3), to finaler (5), for langt ord (6)",
+        !r.quiz && r.linjefejl[2] && /semikolon/.test(r.linjefejl[2]) && r.linjefejl[3] && r.linjefejl[5] && /én Final/.test(r.linjefejl[5])
+        && r.linjefejl[6] && /14/.test(r.linjefejl[6]), JSON.stringify(r.linjefejl));
+    paastand("en tom tekst giver en fejl", !F.fraTekst("").quiz);
+    var lang = "Titel: Æble, ø og å\nRunde: Kemi ; Ædelgasser";
+    paastand("et link med quizzen kan læses igen, også med æ, ø og å", F.fraLink(F.tilLink(lang)) === lang);
+    paastand("vejledningen til AI har formatet og tavlens mål", /Toss-up: kategori ; løsning/.test(F.aiVejledning()) && /12, 14, 14 og 12/.test(F.aiVejledning()));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("4. Biblioteket");
+    var egenTekst = "Titel: Selvtest-quiz\nToss-up: A ; Syre\nRunde: B ; Base og syre\nFinal: C ; Koffein";
+    var n1 = B.gem(egenTekst);
+    paastand("en egen quiz gemmes og kan læses", /^e:/.test(n1) && !!B.quiz(n1) && B.quiz(n1).navn === "Selvtest-quiz");
+    paastand("den samme tekst gemmes ikke to gange", B.gem(egenTekst) === n1);
+    paastand("den står i listen", B.liste().some(function (x) { return x.noegle === n1 && !x.indbygget; }));
+    paastand("en indbygget tekst genkendes", B.somIndbygget(D.INDBYGGEDE[1].tekst) === "i:a");
+    var lnk = B.link(egenTekst);
+    paastand("linket peger på spillet og har quizzen efter #quiz=", /sc_spil_lykkehjul\/index\.html#quiz=/.test(lnk));
+    paastand("et link med #quiz= giver den gemte quiz", B.fraHash(lnk.replace(/^[^#]*/, "")) === n1);
+    paastand("#a og #nf vælger de indbyggede", B.fraHash("#a") === "i:a" && B.fraHash("#NF") === "i:nf");
+    B.slet(n1);
+    paastand("en egen quiz kan slettes", !B.findes(n1));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("5. Reglerne i en runde");
+    A.skiftQuiz("i:b");
+    var Q = S.Q();
+    var rNr = Q.gaader.map(function (g) { return g.type; }).indexOf("runde");
+    S.nyt(["Alfa", "Beta", "Gamma"]);
+    S.start(rNr);
+    var T = S.T(), g = T.g, G = S.aktuel();
+    function felt(type, v) {
+        for (var i = 0; i < D.HJUL.length; i++) if (D.HJUL[i].type === type && (v === undefined || D.HJUL[i].v === v)) return i;
+        return -1;
+    }
+    var kons = Object.keys(G.antal).filter(S.erKonsonant);
+    var mest = kons.sort(function (a, b) { return G.antal[b] - G.antal[a]; })[0];
+    paastand("hjulet har 24 felter med én Fallit og én Mist tur", D.HJUL.length === 24 && D.HJUL.filter(function (f) { return f.type === "fallit"; }).length === 1
+        && D.HJUL.filter(function (f) { return f.type === "mist"; }).length === 1);
+    paastand("man kan ikke købe en vokal uden 250 kr.", !S.kanKoebeVokal());
+    paastand("man kan dreje", S.kanDreje() && g.tur === 0);
+    S.drejet(felt("vaerdi", 500));
+    paastand("hjulet giver 500 kr., og holdet skal sige en konsonant", T.g.fase === "konsonant" && T.g.drej.vaerdi === 500);
+    paastand("en vokal kan ikke vælges nu", !S.kanVaelge("E") && S.kanVaelge(mest));
+    var res = S.vaelg(mest);
+    paastand("rigtig konsonant: " + mest + " giver " + G.antal[mest] + " × 500 kr.", res.antal === G.antal[mest] && T.g.runde[0] === 500 * G.antal[mest]);
+    paastand("holdet beholder turen", T.g.tur === 0 && T.g.fase === "tur");
+    paastand("bogstavet står nu på tavlen", S.feltMed(mest).every(function (i) { return S.synlig(i); }));
+    var ikke = D.KONSONANTER.split("").filter(function (b) { return !G.antal[b]; })[0];
+    S.drejet(felt("vaerdi", 900));
+    S.vaelg(ikke);
+    paastand("forkert konsonant (" + ikke + ") giver ingen point, og turen går videre", T.g.runde[0] === 500 * G.antal[mest] && T.g.tur === 1);
+    S.fortryd();
+    paastand("Fortryd giver turen tilbage", T.g.tur === 0 && T.g.fase === "konsonant" && T.g.gaettet.indexOf(ikke) < 0);
+    S.fortryd();
+    paastand("Fortryd en gang til: før drejet", T.g.fase === "tur" && T.g.drej === null);
+    var vok = Object.keys(G.antal).filter(S.erVokal)[0];
+    paastand("nu kan holdet købe en vokal", S.kanKoebeVokal());
+    var foer = T.g.runde[0];
+    S.koebVokal();
+    paastand("en vokal koster 250 kr.", T.g.runde[0] === foer - 250 && T.g.fase === "vokal");
+    paastand("en konsonant kan ikke vælges, når der er købt en vokal", !S.kanVaelge(mest === "N" ? "T" : "N"));
+    S.vaelg(vok);
+    paastand("en rigtig vokal giver ingen point, men holdet beholder turen", T.g.runde[0] === foer - 250 && T.g.tur === 0);
+    S.naesteHold();
+    S.drejet(felt("vaerdi", 300));
+    var k2 = Object.keys(G.antal).filter(function (b) { return S.erKonsonant(b) && T.g.gaettet.indexOf(b) < 0; })[0];
+    S.vaelg(k2);
+    paastand("hold 2 tjener sine egne point", T.g.runde[1] === 300 * G.antal[k2]);
+    S.drejet(felt("fallit"));
+    paastand("Fallit sletter rundens point og giver turen videre", T.g.runde[1] === 0 && T.g.tur === 2);
+    S.drejet(felt("mist"));
+    paastand("Mist tur giver turen videre uden at røre pointene", T.g.tur === 0 && T.g.runde[0] === foer - 250);
+    S.loes();
+    S.loesSvar(false);
+    paastand("en forkert løsning giver turen videre", T.g.tur === 1 && T.g.fase === "tur");
+    S.giveTur(0);
+    paastand("læreren kan give et hold turen", T.g.tur === 0);
+    var rundePoint = T.g.runde[0];
+    S.loes();
+    S.loesSvar(true);
+    paastand("den rigtige løsning lægger rundens point til holdets samlede", T.hold[0].total === Math.max(rundePoint, D.MINDSTE_GEVINST) && T.g.loest);
+    paastand("de andre hold får intet fra runden", T.hold[1].total === 0 && T.hold[2].total === 0);
+    paastand("hele løsningen står på tavlen", G.celler.every(function (c, i) { return S.synlig(i); }));
+    S.start(rNr);
+    S.drejet(felt("vaerdi", 300));
+    S.vaelg(Object.keys(S.aktuel().antal).filter(S.erKonsonant)[0]);
+    var lille = T.g.runde[T.g.tur];
+    S.loes();
+    var tur = T.g.tur, totalFoer = T.hold[tur].total;
+    S.loesSvar(true);
+    paastand("under 1.000 kr. i runden giver 1.000 kr. for at løse den", lille < 1000 && T.hold[tur].total - totalFoer === 1000, lille);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Toss-up og finalen");
+    var tNr = Q.gaader.map(function (g) { return g.type; }).indexOf("tossup");
+    S.nyt(["Alfa", "Beta", "Gamma"]);
+    S.start(tNr);
+    T = S.T();
+    S.tossupStart();
+    var aabnet = [S.tossupAfslor(), S.tossupAfslor(), S.tossupAfslor()];
+    paastand("toss-uppen viser ét bogstav ad gangen", aabnet.every(function (i) { return i >= 0 && S.synlig(i); }) && T.g.aabne.length === 3);
+    S.tossupSvarer(1);
+    S.tossupSvar(false);
+    paastand("et forkert svar sender holdet ud", T.g.ude.indexOf(1) >= 0 && !S.tossupKanSvare(1) && T.g.fase === "koerer");
+    S.tossupSvarer(2);
+    S.tossupSvar(true);
+    paastand("et rigtigt svar giver beløbet med det samme", T.hold[2].total === S.aktuel().vaerdi && T.g.loest);
+    paastand("og holdet begynder næste runde", T.starter === 2);
+    S.start(Q.gaader.length);
+    paastand("finalen spilles af holdet med flest point", T.g.type === "final" && T.g.final.hold === 2);
+    S.finalPraemie(10000);
+    var rstlne = S.finalRSTLNE();
+    paastand("R, S, T, L, N og E vises", T.g.fase === "valg" && "RSTLNE".split("").every(function (b) { return T.g.gaettet.indexOf(b) >= 0; })
+        && rstlne.every(function (i) { return S.synlig(i); }));
+    paastand("R, S, T, L, N og E kan ikke vælges igen", !S.kanVaelge("R") && !S.kanVaelge("E"));
+    ["B", "C", "D"].forEach(function (b) { S.vaelg(b); });
+    paastand("en fjerde konsonant kan ikke vælges", !S.kanVaelge("G") && S.kanVaelge("A"));
+    S.vaelg("D");
+    paastand("et klik mere fjerner et bogstav igen", T.g.final.valgt.join("") === "BC" && S.kanVaelge("G"));
+    S.vaelg("G");
+    S.vaelg("O");
+    paastand("3 konsonanter og 1 vokal er klar", S.finalValgKlar() && !S.kanVaelge("A"));
+    S.finalVisValg();
+    S.finalSvar(true);
+    paastand("en løst finale giver kuvertens beløb", T.hold[2].total === S.gaade(tNr).vaerdi + 10000 && T.g.final.vundet);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("7. Knapperne gennem et spil");
+    S.glem();
+    A.visTitel();
+    if (NK.laerer) NK.laerer.stopIntro();
+    A.startSpil();
+    T = S.T();
+    paastand("Start åbner den første gåde", !A.ui.titel && T.g && T.g.nr === 0);
+    await til(function () { return !A.ui.laast; });
+    paastand("tavlen er tændt med hvide felter", d.querySelectorAll(".flise.felt").length === S.aktuel().celler.length);
+    if (T.g.type === "tossup") {
+        tast(" ", "Space");
+        paastand("Mellemrum starter toss-uppen", T.g.fase === "koerer");
+        await til(function () { return T.g.aabne.length >= 2; }, 3000);
+        paastand("bogstaverne dukker op af sig selv", T.g.aabne.length >= 2);
+        tast("2", "Digit2");
+        paastand("tasten 2 lader hold 2 svare", T.g.fase === "svarer" && T.g.svarer === 1);
+        var knap = d.querySelector('.podie[data-h="1"] [data-podie="rigtigt"]');
+        paastand("holdets podie har Rigtigt og Forkert", !!knap && !!d.querySelector('.podie[data-h="1"] [data-podie="forkert"]'));
+        knap.click();
+        paastand("Rigtigt giver hold 2 beløbet", T.hold[1].total === S.aktuel().vaerdi && T.g.loest);
+        await til(function () { return tavleTekst().join("").indexOf("_") < 0; }, 2000);
+        paastand("løsningen står på tavlen", tavleTekst().join("").indexOf("_") < 0, tavleTekst().join("|"));
+        paastand("podiet viser pointene", /1\.000 kr\./.test(d.querySelector('.podie[data-h="1"] .podie-stor').textContent));
+    }
+    var nr = Q.gaader.map(function (g) { return g.type; }).indexOf("runde");
+    A.startGaade(nr);
+    await til(function () { return !A.ui.laast; });
+    var tur0 = T.g.tur;
+    paastand("runden: holdet med lyset har turen", d.querySelectorAll(".podie.tur").length === 1
+        && d.querySelector(".podie.tur").getAttribute("data-h") === String(tur0));
+    A.ui.tvungetFelt = felt("vaerdi", 600);
+    tast(" ", "Space");
+    paastand("Mellemrum drejer hjulet", !d.getElementById("hjulscene").hidden && A.ui.laast);
+    await til(function () { return d.getElementById("hjulscene").hidden && !A.ui.laast; }, 6000);
+    paastand("hjulet stopper på 600 kr. og lukker igen", T.g.fase === "konsonant" && T.g.drej.vaerdi === 600, JSON.stringify(T.g.drej));
+    paastand("displayet viser 600 kr.", tekst("drejet") === "600 kr.");
+    paastand("kun konsonanterne kan vælges", d.querySelector('.bogstav[data-b="N"]').disabled === !S.kanVaelge("N")
+        && d.querySelector('.bogstav[data-b="A"]').disabled);
+    G = S.aktuel();
+    var kb = Object.keys(G.antal).filter(S.erKonsonant).sort(function (a, b) { return G.antal[b] - G.antal[a]; })[0];
+    tast(kb.toLowerCase(), "Key" + kb);
+    paastand("tasten " + kb + " vælger bogstavet", T.g.gaettet.indexOf(kb) >= 0 && A.ui.laast);
+    var lyser = await til(function () { return d.querySelectorAll(".flise.lyser").length > 0; }, 1500);
+    paastand("felterne lyser blåt, før de vendes", lyser);
+    await til(function () { return !A.ui.laast; }, 3000);
+    var viste = tavleTekst().join("").split(kb).length - 1;
+    paastand("bogstavet står " + G.antal[kb] + " gange på tavlen", viste === G.antal[kb], tavleTekst().join("|"));
+    paastand("podiet viser rundens point", d.querySelector('.podie[data-h="' + tur0 + '"] .podie-stor').textContent === NK.beloeb(600 * G.antal[kb], "kr."));
+    paastand("bogstavet er brugt og fundet", d.querySelector('.bogstav[data-b="' + kb + '"]').classList.contains("fundet"));
+    d.getElementById("k-vokal").click();
+    paastand("Køb vokal virker med knappen", T.g.fase === "vokal");
+    tast("z", "KeyZ", { ctrlKey: true });
+    paastand("Ctrl+Z fortryder købet", T.g.fase === "tur" && T.g.runde[tur0] === 600 * G.antal[kb]);
+    d.getElementById("k-loes").click();
+    paastand("Løs gåden giver Rigtigt og Forkert", !!d.getElementById("k-rigtigt") && !!d.getElementById("k-forkert"));
+    tast(" ", "Space");
+    await til(function () { return !A.ui.laast; }, 2000);
+    paastand("Mellemrum er Rigtigt, og gåden er løst", T.g.loest && T.g.vinder === tur0);
+    paastand("den gule knap går videre", /→/.test(d.getElementById("k-videre").textContent));
+
+    /* Finalen med knapperne */
+    A.startGaade(Q.gaader.length);
+    paastand("finalen begynder med holdvalget", !d.getElementById("plakat").hidden && d.querySelectorAll("[data-finalhold]").length === 3);
+    d.querySelector('[data-finalhold="0"]').click();
+    paastand("læreren kan vælge et andet hold", T.g.final.hold === 0);
+    tast(" ", "Space");
+    await til(function () { return T.g.fase === "rstlne" && !A.ui.laast; }, 6000);
+    paastand("præmiehjulet vælger en kuvert, og beløbet er skjult", D.PRAEMIER.indexOf(T.g.final.praemie) >= 0
+        && d.body.textContent.indexOf(NK.beloeb(T.g.final.praemie, "kr.")) < 0);
+    tast(" ", "Space");
+    await til(function () { return T.g.fase === "valg" && !A.ui.laast; }, 4000);
+    paastand("R, S, T, L, N og E er vist", T.g.fase === "valg");
+    ["b", "c", "d", "a"].forEach(function (b) { tast(b, "Key" + b.toUpperCase()); });
+    paastand("fire bogstaver vælges med tastaturet", T.g.final.valgt.join("") === "BCDA" && !d.getElementById("k-vis-valg").disabled);
+    tast(" ", "Space");
+    await til(function () { return T.g.fase === "ur" && !A.ui.laast; }, 4000);
+    tast(" ", "Space");
+    paastand("uret går", !!A.ui.ur && !d.getElementById("ur").hidden);
+    await til(function () { return A.ui.ur && A.ui.ur.slut; }, 3000);
+    paastand("uret løber ud", A.ui.ur && A.ui.ur.slut);
+    tast("x", "KeyX");
+    await til(function () { return !A.ui.laast; }, 2000);
+    paastand("X er Forkert: finalen er tabt", T.g.loest && T.g.final.vundet === false);
+    tast(" ", "Space");
+    paastand("kuverten åbnes og viser beløbet", !d.getElementById("plakat").hidden
+        && d.getElementById("plakat").textContent.indexOf(NK.beloeb(T.g.final.praemie, "kr.")) >= 0);
+    tast(" ", "Space");
+    paastand("Resultatet viser holdene", T.slut && d.querySelectorAll(".rangliste li").length === 3);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("8. Layout ved 1366 × 768");
+    A.startGaade(tNr);
+    await til(function () { return !A.ui.laast; });
+    function passer(e) { return e.scrollHeight <= e.clientHeight + 1 && e.scrollWidth <= e.clientWidth + 1; }
+    var podier = d.querySelectorAll(".podie");
+    paastand("podierne kan være der, også med knapperne i en toss-up", Array.prototype.every.call(podier, function (p) {
+        var r = p.getBoundingClientRect(), k = p.querySelector(".podie-knapper");
+        return !k || k.getBoundingClientRect().bottom <= r.bottom + 1;
+    }));
+    paastand("siden flyder ikke ud til siden", d.documentElement.scrollWidth <= w.innerWidth + 1);
+    var bog = d.querySelectorAll(".bogstav"), foersteTop = bog[0].getBoundingClientRect().top;
+    paastand("alle 29 bogstaver står på én række", bog.length === 29 && Array.prototype.every.call(bog, function (b) { return Math.abs(b.getBoundingClientRect().top - foersteTop) < 8; }));
+    paastand("bogstavernes skrift er mindst 14 px", parseFloat(w.getComputedStyle(bog[0]).fontSize) >= 14);
+    var fl = d.querySelector(".flise.felt").getBoundingClientRect();
+    paastand("tavlens felter er store nok til at læse fra bagerste række (mindst 40 px høje)", fl.height >= 40, Math.round(fl.height));
+    var tavleR = d.getElementById("tavle").getBoundingClientRect(), sceneR = d.getElementById("scene").getBoundingClientRect();
+    paastand("tavlen står inde i scenen", tavleR.top >= sceneR.top - 1 && tavleR.bottom <= sceneR.bottom + 1);
+    paastand("kategorien kan være der", passer(d.getElementById("kategori")));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("9. Sproget");
+    var alleTekster = [d.body.innerText, d.getElementById("regler").textContent, d.getElementById("egne").textContent,
+        F.aiVejledning()].concat(D.INDBYGGEDE.map(function (x) { return x.tekst; }))
+        .concat(D.INTRO.titel);
+    var samlet = alleTekster.join("\n");
+    paastand("ingen tankestreger", !/[\u2013\u2014]/.test(samlet), (samlet.match(/.{0,20}[\u2013\u2014].{0,20}/) || [""])[0]);
+    paastand("ingen 1+ eller 1− i ladninger", !/¹[⁺⁻]/.test(samlet));
+    paastand("Kemichaels replikker er højst 60 tegn", D.INTRO.titel.every(function (l) { return l.length <= 60; }));
+    paastand("ingen engelske ord fra skabelonen", !/\b(BANKRUPT|LOSE A TURN|SPIN|SOLVE|TOSS UP)\b/.test(d.body.innerText));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("10. Kemichaels præsentation");
+    var L = NK.laerer;
+    if (L) {
+        NK.glem("nk-lykkehjul-intro");
+        A.visTitel();
+        paastand("første gang står Start præsentation og Nej tak, og han kommer ikke af sig selv",
+            !d.getElementById("tilbud").hidden && !L.laererIIntro());
+        tast("Escape", "Escape");
+        paastand("Esc er Nej tak, og valget huskes", d.getElementById("tilbud").hidden && !!NK.hent("nk-lykkehjul-intro", {}).titel);
+        A.visTitel();
+        paastand("næste gang kommer tilbuddet ikke igen", d.getElementById("tilbud").hidden);
+        tast("k", "KeyK");
+        paastand("K viser præsentationen uden at spørge", await til(function () { return L.laererIIntro(); }, 3000));
+        paastand("knappen Spring præsentationen over står der", await til(function () { return !d.getElementById("spring-over").hidden; }, 1500));
+        L.stopIntro();
+        NK.glem("nk-lykkehjul-intro");
+        A.visTitel();
+        d.querySelector("#tilbud .tilbud-start").click();
+        paastand("Start præsentation sender ham ind", await til(function () { return L.laererIIntro(); }, 3000) && d.getElementById("tilbud").hidden);
+        L.stopIntro();
+        NK.glem("nk-lykkehjul-intro");
+        A.visTitel();
+        A.startSpil();
+        if (A.ui.titel) A.startSpil();
+        paastand("tilbuddet forsvinder og huskes, når spillet går i gang", d.getElementById("tilbud").hidden && !!NK.hent("nk-lykkehjul-intro", {}).titel);
+    }
+    } finally {
+        /* Ryd op: gemt spil og indstillinger tilbage */
+        S.glem();
+        for (var i = w.localStorage.length - 1; i >= 0; i--) {
+            var k = w.localStorage.key(i);
+            if (/^nk-lykkehjul/.test(k)) w.localStorage.removeItem(k);
+        }
+        Object.keys(gemt).forEach(function (k) { w.localStorage.setItem(k, gemt[k]); });
+        NK.Lydbank.saetSlukket(varSlukket);
+    }
+}
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@
 > En ny sc3.4 bygges tæt på den gamle `c3.4_molekyler_blandbarhed.html`: scenen
 > i næsten hele billedet, tre stoffer, ryst, temperatur og quiz.
 > Se "Bestillingen, før der skrives kode" i `../README.md`.
+> Den nye er bygget i `../sc3.4_blandbarhed/` (september 2026).
 
 En superanimation: i modsætning til de gamle animationer, som er én HTML-fil,
 ligger den i sin egen mappe med adskilt CSS, JavaScript og tegnekode.

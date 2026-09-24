@@ -186,6 +186,15 @@ bagefter.
 * Kalium, natrium og de andre metaller i hovedgrupperne har kun den ladning,
   hovedgruppen giver. Sn og Pb er markeret som metaller med flere ladninger.
 
+## Tilbuddet om præsentationen
+
+Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
+åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
+sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
+spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
+`js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).
+Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".
+
 ## I menuen
 
 Siden 23. september 2026 er den c2.3 i `animationer/kemi-c-filer/samling_c2.html`

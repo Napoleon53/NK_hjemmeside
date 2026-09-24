@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="150" viewBox="0 0 100 150">
+  <!-- Reagensflaske med glasprop. Animationen tegner stoffet BAG filen i
+       det indre x 13-87, y 56-143 (hjoerner r 9) og etiketten OVENPAA i
+       omraadet x 18-82, y 78-128. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e6f3fb" stop-opacity="0.3"/>
+      <stop offset="0.18" stop-color="#e6f3fb" stop-opacity="0.07"/>
+      <stop offset="0.82" stop-color="#e6f3fb" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#e6f3fb" stop-opacity="0.24"/>
+    </linearGradient>
+  </defs>
+  <path d="M38 36 L38 42 Q38 48 30 50 Q10 54 10 70 L10 136 Q10 146 20 146 L80 146 Q90 146 90 136 L90 70 Q90 54 70 50 Q62 48 62 42 L62 36 Z"
+        fill="url(#glas)" stroke="#e1eef8" stroke-opacity="0.8" stroke-width="1.5"/>
+  <rect x="36" y="30" width="28" height="8" rx="2" fill="#e6f3fb" fill-opacity="0.16" stroke="#e1eef8" stroke-opacity="0.7" stroke-width="1.2"/>
+  <path d="M42 30 L42 20 Q42 14 36 12 Q30 9 34 5 Q40 1 50 1 Q60 1 66 5 Q70 9 64 12 Q58 14 58 20 L58 30 Z"
+        fill="#e6f3fb" fill-opacity="0.2" stroke="#e1eef8" stroke-opacity="0.75" stroke-width="1.2"/>
+  <path d="M40 5 Q50 3 60 5" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.2" fill="none"/>
+  <path d="M14 72 L14 132" stroke="#ffffff" stroke-opacity="0.26" stroke-width="3" stroke-linecap="round"/>
+  <path d="M85 76 L85 124" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2" stroke-linecap="round"/>
+</svg>

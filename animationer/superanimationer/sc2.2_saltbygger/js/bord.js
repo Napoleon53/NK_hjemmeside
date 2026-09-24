@@ -41,10 +41,20 @@
         this.kortTraek = null;    /* kort, der traekkes rundt paa bordet */
         this.maerkeX = NaN;
         this.g = null;
+        /* Fane 3: ukendt = { side, q, fundet }. Ionerne er givet af
+           formlen og kan ikke flyttes; eleven indstiller kun ladningen q
+           paa den ukendte ion, og kortene bliver bredere eller smallere. */
+        this.ukendt = null;
+        this.top = opt.top || 0;         /* luft over bordet, naar der ikke er hylder */
 
-        this.bygHylder();
+        if (opt.hylder !== false) this.bygHylder();
+        else this.chips = {};
         this.bygStyr();
         this.koblMus();
+        /* Browserens eget traek (en markeret tekst eller et billede, der
+           kan traekkes) maa ikke tage over: saa slaebes hele hylden med
+           som et spoegelsesbillede i stedet for ionen. */
+        scene.addEventListener("dragstart", function (e) { e.preventDefault(); });
         this.saetNavne(opt.navne !== false);
         this.opdaterKnapper();
     };
@@ -57,6 +67,7 @@
         function chip(ion) {
             var b = document.createElement("button");
             b.type = "button";
+            b.draggable = false;
             b.className = "chip " + (ion.q > 0 ? "kat" : "an") + (ion.sammensat ? " sammensat" : "");
             b.innerHTML = '<span class="cformel">' + D.ionTekst(ion) + '</span><span class="cnavn">' + D.ionNavn(ion) + "</span>";
             b.addEventListener("click", function () {
@@ -102,8 +113,13 @@
                 + '<span class="styr-antal">1 ×</span>'
                 + '<button type="button" class="talknap plus" aria-label="Én ion mere">+</button>';
             var k = s.querySelectorAll("button");
-            k[0].addEventListener("click", function () { mig.fjern(side); });
-            k[1].addEventListener("click", function () { mig.tilfoej(side); });
+            /* Paa fane 3 styrer knapperne ladningen paa den ukendte ion. */
+            k[0].addEventListener("click", function () {
+                if (mig.ukendt) mig.saetGaet(mig.ukendt.q - 1); else mig.fjern(side);
+            });
+            k[1].addEventListener("click", function () {
+                if (mig.ukendt) mig.saetGaet(mig.ukendt.q + 1); else mig.tilfoej(side);
+            });
             mig.scene.appendChild(s);
             return { el: s, minus: k[0], plus: k[1], antal: s.querySelector(".styr-antal") };
         }
@@ -121,6 +137,18 @@
         this.canvas.addEventListener("pointerdown", function (e) {
             if (mig.laast || e.button > 0) return;
             var p = pos(e);
+            if (mig.ukendt) {
+                /* Fane 3: traek i et ukendt kort for at goere det bredere
+                   eller smallere. Kortene staar ellers fast, og foerst
+                   skal den kendte ions ladning vaere fundet. */
+                if (!mig.ukendt.kendtFundet) return;
+                var u = mig.ukendtKortVed(p);
+                if (!u) return;
+                e.preventDefault();
+                mig.kantTraek = { x0: p.x, q0: mig.ukendt.q, faktor: u.faktor };
+                try { mig.canvas.setPointerCapture(e.pointerId); } catch (fejl) {}
+                return;
+            }
             var k = mig.kortVed(p);
             if (!k) return;
             mig.kortTraek = { kort: k, dx: k.x - p.x, dy: k.y - p.y, x0: p.x, y0: p.y, flyttet: false };
@@ -130,6 +158,17 @@
         this.canvas.addEventListener("pointermove", function (e) {
             var p = pos(e);
             mig.mus = p;
+            var kt = mig.kantTraek;
+            if (kt) {
+                var U = mig.g ? mig.g.U : 60;
+                mig.saetGaet(kt.q0 + Math.round((p.x - kt.x0) / (U * kt.faktor)));
+                mig.canvas.style.cursor = "ew-resize";
+                return;
+            }
+            if (mig.ukendt) {
+                mig.canvas.style.cursor = (!mig.laast && mig.ukendt.kendtFundet && mig.ukendtKortVed(p)) ? "ew-resize" : "default";
+                return;
+            }
             var t = mig.kortTraek;
             if (t) {
                 if (Math.abs(p.x - t.x0) + Math.abs(p.y - t.y0) > 5) t.flyttet = true;
@@ -141,6 +180,11 @@
             mig.canvas.style.cursor = (!mig.laast && mig.kortVed(p)) ? "grab" : "default";
         });
         function slipKort(e) {
+            if (mig.kantTraek) {
+                mig.kantTraek = null;
+                mig.canvas.style.cursor = "default";
+                return;
+            }
             var t = mig.kortTraek;
             if (!t) return;
             mig.kortTraek = null;
@@ -169,11 +213,70 @@
         return null;
     };
 
+    /* Et ukendt kort under musen, og hvor mange ukendte kort der er til
+       og med det: traekker man i det andet kort, flytter dets kant sig
+       to felter for hver ladning, fordi det foerste ogsaa vokser. */
+    NK.Bord.prototype.ukendtKortVed = function (p) {
+        if (!this.ukendt) return null;
+        var nr = 0;
+        for (var i = 0; i < this.kort.length; i++) {
+            var k = this.kort[i];
+            if (k.doer || k.side !== this.ukendt.side) continue;
+            nr++;
+            if (p.x >= k.x && p.x <= k.x + k.b + 10 && p.y >= k.y && p.y <= k.y + k.h) return { kort: k, faktor: nr };
+        }
+        return null;
+    };
+
     /* ----- Tilstanden ------------------------------------------------------ */
     NK.Bord.prototype.antal = function (side) { return side === "kat" ? this.nKat : this.nAn; };
     NK.Bord.prototype.saetAntal = function (side, n) { if (side === "kat") this.nKat = n; else this.nAn = n; };
-    NK.Bord.prototype.plus = function () { return this.kat ? this.nKat * this.kat.q : 0; };
-    NK.Bord.prototype.minus = function () { return this.an ? this.nAn * -this.an.q : 0; };
+    /* Ladningens stoerrelse paa en side: den rigtige, eller elevens gaet
+       paa den ukendte ion. */
+    NK.Bord.prototype.qPaa = function (side) {
+        if (this.ukendt && this.ukendt.side === side) return this.ukendt.q;
+        return this[side] ? Math.abs(this[side].q) : 0;
+    };
+    NK.Bord.prototype.plus = function () { return this.kat ? this.nKat * this.qPaa("kat") : 0; };
+    NK.Bord.prototype.minus = function () { return this.an ? this.nAn * this.qPaa("an") : 0; };
+
+    /* Fane 3: laeg saltet fra formlen paa bordet med én ukendt ion. Den
+       ukendte ion starter uden ladning (q = 0), og den kendte ion er
+       foldet sammen, til eleven har fundet dens ladning (visKendt). */
+    NK.Bord.prototype.saetUkendt = function (kat, nKat, an, nAn, side) {
+        this.ukendt = { side: side, q: 0, fundet: false, kendtFundet: false };
+        this.saet(kat, nKat, an, nAn);
+    };
+
+    NK.Bord.prototype.visKendt = function () {
+        if (!this.ukendt || this.ukendt.kendtFundet) return;
+        this.ukendt.kendtFundet = true;
+        this.aendret("kendt");
+    };
+
+    /* Den kendte ions kort lyser, mens eleven skal finde dens ladning. */
+    NK.Bord.prototype.markerKendt = function (til) {
+        if (this.ukendt) this.ukendt.marker = !!til;
+    };
+
+    /* Midten af det foerste kort paa en side, i laerredets pixels. */
+    NK.Bord.prototype.kortMidt = function (side) {
+        for (var i = 0; i < this.kort.length; i++) {
+            var k = this.kort[i];
+            if (k.side === side && !k.doer && !isNaN(k.x)) return { x: k.x + k.b / 2, y: k.y + k.h / 2 };
+        }
+        var g = this.g;
+        if (!g) return { x: 200, y: 300 };
+        return { x: g.x0 + g.U / 2, y: side === "kat" ? g.zy - g.gab - g.hc / 2 : g.zy + g.gab + g.hc / 2 };
+    };
+
+    NK.Bord.prototype.saetGaet = function (q) {
+        if (!this.ukendt || this.laast) return;
+        q = NK.klamp(q, D.UKENDT_MIN, D.UKENDT_MAKS);
+        if (q === this.ukendt.q) return;
+        this.ukendt.q = q;
+        this.aendret("gaet", this.ukendt.side);
+    };
     NK.Bord.prototype.neutral = function () { return !!(this.kat && this.an) && this.plus() === this.minus(); };
     NK.Bord.prototype.forkortet = function () { return this.neutral() && NK.gcd(this.nKat, this.nAn) === 1; };
 
@@ -229,7 +332,7 @@
         if (this.laast) return;
         this.demo = null;
         if (!this.tilfoejIntern(side, fra)) {
-            if (this[side]) this.besked = { tekst: "Der er ikke plads til flere " + D.ionTekst(this[side]) + " på bordet.", t: 2.4 };
+            if (this[side]) this.besked = { tekst: "Der er højst plads til " + MAKS + " " + D.ionTekst(this[side]) + " på bordet.", t: 2.4 };
             return;
         }
         this.aendret("mere", side);
@@ -272,7 +375,7 @@
         this.demo = null;
         while (this.nKat > 1) this.fjernIntern("kat", null);
         while (this.nAn > 1) this.fjernIntern("an", null);
-        this.demo = { t: 1.0, tekst: "Vi starter med én af hver: <b>" + this.plus() + "+</b> mod <b>" + this.minus() + "−</b>." };
+        this.demo = { t: 1.0, tekst: "Én af hver: <b>" + NK.fortegn(this.plus()) + "</b> og <b>" + NK.fortegn(-this.minus()) + "</b>." };
         this.aendret("demo");
         return true;
     };
@@ -280,15 +383,16 @@
     NK.Bord.prototype.demoTrin = function () {
         var p = this.plus(), m = this.minus();
         if (p === m) {
-            this.demo = null;
+            this.demo = { t: 1.6, tekst: "<b>" + NK.fortegn(p) + "</b> og <b>" + NK.fortegn(-m) + "</b>. Lynlåsen er lukket." };
+            this.demo.slut = true;
             this.aendret("afstemt");
             return;
         }
         var side = p < m ? "kat" : "an";
         this.tilfoejIntern(side);
         this.demo.t = 0.9;
-        this.demo.tekst = "<b>" + p + "+</b> mod <b>" + m + "−</b>: der mangler " + (side === "kat" ? "plus" : "minus")
-            + " → én " + D.ionTekst(this[side]) + " mere.";
+        this.demo.tekst = "<b>" + NK.fortegn(p) + "</b> og <b>" + NK.fortegn(-m) + "</b>: der mangler " + (side === "kat" ? "plus" : "minus")
+            + ". Én " + D.ionTekst(this[side]) + " mere.";
         this.aendret("demo");
     };
 
@@ -327,6 +431,23 @@
         var sider = ["kat", "an"];
         for (var i = 0; i < sider.length; i++) {
             var side = sider[i], s = this.styr[side], n = this.antal(side);
+            if (this.ukendt) {
+                /* Fane 3: kun den ukendte ion har knapper, og de styrer
+                   ladningen, ikke antallet. */
+                var u = this.ukendt, denne = u.side === side;
+                s.el.classList.toggle("ladning", denne);
+                /* Ionen med den ladning, eleven proever: Sn²⁺, ClO⁻.
+                   Knapperne kommer foerst, naar den kendte ion er klar. */
+                s.antal.textContent = !(denne && this[side]) ? ""
+                    : this[side].formel + (u.q ? NK.ladningHaevet(side === "kat" ? u.q : -u.q) : " ?");
+                s.minus.disabled = this.laast || u.q <= D.UKENDT_MIN;
+                s.plus.disabled = this.laast || u.q >= D.UKENDT_MAKS;
+                s.minus.setAttribute("aria-label", "Mindre ladning");
+                s.plus.setAttribute("aria-label", "Større ladning");
+                s.el.style.display = denne && this[side] && u.kendtFundet ? "" : "none";
+                continue;
+            }
+            s.el.classList.remove("ladning");
             s.antal.textContent = n + " ×";
             s.minus.disabled = this.laast || n <= 0;
             s.plus.disabled = this.laast || n >= MAKS || !this[side];
@@ -334,23 +455,16 @@
         }
     };
 
-    /* Én saetning om, hvad der mangler lige nu. */
-    NK.Bord.prototype.beskriv = function () {
+    /* En kort note i scenen, kun naar der er noget at sige, som
+       lynlaasen ikke selv viser: "Afstem for mig" undervejs, et fuldt
+       bord, flere ens enheder, eller et stof, der ikke findes. */
+    NK.Bord.prototype.note = function () {
         if (this.besked) return this.besked.tekst;
         if (this.demo) return this.demo.tekst;
-        if (!this.kat && !this.an) return "Træk en <b>positiv ion</b> ned fra hylden øverst og en <b>negativ ion</b> op fra hylden nederst — eller klik på dem.";
-        if (!this.an) return "Træk nu en <b>negativ ion</b> op fra hylden nederst.";
-        if (!this.kat) return "Træk nu en <b>positiv ion</b> ned fra hylden øverst.";
-        var p = this.plus(), m = this.minus();
-        var regn = "<b>" + p + "+</b> mod <b>" + m + "−</b>";
-        if (p > m) return regn + ": der mangler minus. Læg en negativ ion mere.";
-        if (m > p) return regn + ": der mangler plus. Læg en positiv ion mere.";
+        if (!this.neutral() || this.land.kat !== this.plus() || this.land.an !== this.minus()) return "";
         var g = NK.gcd(this.nKat, this.nAn);
-        if (g > 1) {
-            return "Neutral — men der ligger <b>" + g + " ens enheder</b> på bordet (de gule streger). "
-                + "Formlen viser den mindste: " + (this.nKat / g) + " : " + (this.nAn / g) + ".";
-        }
-        return "<b>" + p + "+</b> og <b>" + m + "−</b> går lige op. Forbindelsen er neutral.";
+        if (g > 1) return "<b>" + g + " ens enheder</b> på bordet. Formlen viser kun én.";
+        return this.visFormel ? D.findesIkke(this.kat, this.an) : "";
     };
 
     /* ----- Placering og bevaegelse --------------------------------------- */
@@ -359,10 +473,16 @@
     NK.Bord.prototype.layout = function () {
         var l = this.l, W = l.b, H = l.h;
         var cr = this.canvas.getBoundingClientRect();
-        var tr = this.hyldeTop.getBoundingClientRect();
-        var br = this.hyldeBund.getBoundingClientRect();
-        var y0 = tr.bottom - cr.top + 16;
-        var y1 = Math.min(br.top - cr.top, H) - 16;
+        var y0, y1;
+        if (this.hyldeTop) {
+            var tr = this.hyldeTop.getBoundingClientRect();
+            var br = this.hyldeBund.getBoundingClientRect();
+            y0 = tr.bottom - cr.top + 16;
+            y1 = Math.min(br.top - cr.top, H) - 16;
+        } else {
+            y0 = this.top + 16;
+            y1 = H - 24;
+        }
         if (y1 - y0 < 180) { var midt = (y0 + y1) / 2; y0 = midt - 90; y1 = midt + 90; }
         var felter = Math.max(this.plus(), this.minus(), 6);
         var smal = W < 640;
@@ -388,10 +508,32 @@
         k.x = fx - 12; k.y = fy - 12; k.b = 24; k.h = 24; k.a = 0;
     };
 
+    /* Hvor mange plusser eller minusser kortet har: ionens ladning, eller
+       paa fane 3 gaettet paa den ukendte ion (0, til eleven har sat den)
+       og 0 paa den kendte ion, til dens ladning er fundet. */
+    NK.Bord.prototype.tandKort = function (k) {
+        var u = this.ukendt;
+        if (u && !k.doer) {
+            if (k.side === u.side) return u.q;
+            if (!u.kendtFundet) return 0;
+        }
+        return Math.abs(k.ion.q);
+    };
+
+    /* Hvor mange felter kortet fylder. Et kort uden ladning er foldet
+       sammen til ét felt. */
+    NK.Bord.prototype.feltKort = function (k) { return Math.max(1, this.tandKort(k)); };
+
     NK.Bord.prototype.opdater = function (dt) {
         this.ur += dt;
         if (this.besked) { this.besked.t -= dt; if (this.besked.t <= 0) this.besked = null; }
-        if (this.demo) { this.demo.t -= dt; if (this.demo.t <= 0) this.demoTrin(); }
+        if (this.demo) {
+            this.demo.t -= dt;
+            if (this.demo.t <= 0) {
+                if (this.demo.slut) this.demo = null;
+                else this.demoTrin();
+            }
+        }
 
         var g = this.g = this.layout();
         var felt = { kat: 0, an: 0 };
@@ -399,7 +541,7 @@
         var i, k;
         for (i = 0; i < this.kort.length; i++) {
             k = this.kort[i];
-            var q = Math.abs(k.ion.q);
+            var q = this.feltKort(k), taender = this.tandKort(k);
             if (!k.doer) {
                 k.felt = felt[k.side];
                 felt[k.side] += q;
@@ -426,7 +568,7 @@
             k.b = NK.mod(k.b, k.mb, 11, dt);
             k.h = NK.mod(k.h, k.mh, 11, dt);
             k.a = NK.mod(k.a, k.ma, k.doer ? 7 : 9, dt);
-            if (!k.doer && k.a > 0.75) land[k.side] += q;
+            if (!k.doer && k.a > 0.75) land[k.side] += taender;
         }
         this.kort = this.kort.filter(function (kk) { return !(kk.doer && kk.a < 0.03); });
         this.land = land;
@@ -488,8 +630,8 @@
         for (i = 0; i < this.kort.length; i++) {
             k = this.kort[i];
             if (k.vent > 0 || k.a < 0.05) continue;
-            var q = Math.abs(k.ion.q);
-            var enhed = (k.b + 6) / q;
+            var q = this.tandKort(k);
+            var enhed = (k.b + 6) / this.feltKort(k);
             var my = k.side === "kat" ? k.y + k.h : k.y;
             for (j = 0; j < q; j++) {
                 var uu = k.felt + j;
@@ -519,15 +661,25 @@
             var enheder = NK.gcd(this.nKat, this.nAn);
             if (enheder > 1) this.tegnEnheder(c, g, enheder);
             /* Formlen staar under bordet, saa man ser den blive til:
-               antallet af kort bliver til de smaa tal i formlen. */
+               antallet af kort bliver til de smaa tal i formlen. Navnet
+               staar under den. */
             var plads = g.y1 - (g.zy + g.gab + g.hc);
             if (this.visFormel && plads > 46) {
+                var fs = NK.klamp(plads * 0.4, 20, 32);
+                var fy = g.zy + g.gab + g.hc + Math.min(12, plads * 0.1) + fs * 0.6;
+                var fx = g.x0 + p * g.U / 2;
                 NK.tekstDele(c, [
                     { t: D.formeldel(this.kat, this.nKat / enheder), farve: "#f7a79d" },
                     { t: D.formeldel(this.an, this.nAn / enheder), farve: "#97cff5" }
-                ], g.x0 + p * g.U / 2, g.zy + g.gab + g.hc + Math.min(34, plads * 0.5), {
-                    font: "600 " + NK.klamp(plads * 0.5, 20, 32).toFixed(0) + "px 'Segoe UI', sans-serif", kant: true
+                ], fx, fy, {
+                    font: "600 " + fs.toFixed(0) + "px 'Segoe UI', sans-serif", kant: true
                 });
+                if (plads > fs * 1.25 + 26) {
+                    NK.tekst(c, D.saltnavn(this.kat, this.an), fx, fy + fs * 0.6 + 6, {
+                        font: "600 15px 'Segoe UI', sans-serif", justering: "center", linje: "top",
+                        farve: "#7ee0a8", kant: true
+                    });
+                }
             }
             if (this.laast) {
                 c.save();
@@ -597,7 +749,14 @@
     NK.Bord.prototype.tegnKort = function (c, g, k) {
         var kat = k.side === "kat";
         var f = kat ? NK.FARVE.kat : NK.FARVE.an;
-        var over = !k.doer && !this.laast && this.mus &&
+        /* Fane 3: den ukendte ion har "?" som ladning, til den er fundet,
+           og et gult greb i hoejre kant, man kan traekke i. De kendte kort
+           reagerer ikke paa musen, for de kan ikke flyttes. */
+        var u = this.ukendt;
+        var ukendt = !!u && k.side === u.side && !k.doer;
+        var skjult = !!u && !k.doer && (ukendt ? !u.fundet : !u.kendtFundet);
+        var greb = ukendt && !u.fundet && u.kendtFundet && !this.laast;
+        var over = !k.doer && !this.laast && this.mus && (!u || greb) &&
             this.mus.x >= k.x && this.mus.x <= k.x + k.b && this.mus.y >= k.y && this.mus.y <= k.y + k.h;
 
         c.save();
@@ -608,14 +767,41 @@
         c.lineWidth = 1.5;
         c.strokeStyle = "rgba(" + f.glorie + ", " + (over ? 1 : 0.7) + ")";
         c.stroke();
+        if (u && u.marker && !u.kendtFundet && !ukendt && !k.doer) {
+            /* Fane 3: "start med den her". En gul, stille bankende ramme. */
+            c.lineWidth = 2.5;
+            c.strokeStyle = "rgba(242, 197, 61, " + (0.55 + 0.35 * Math.sin(this.ur * 4)).toFixed(3) + ")";
+            NK.rundtRekt(c, k.x - 4, k.y - 4, k.b + 8, k.h + 8, 13);
+            c.stroke();
+        }
 
         var fs = NK.klamp(g.U * 0.19, 11, 16);
-        NK.tekst(c, D.ionTekst(k.ion), k.x + k.b / 2, kat ? k.y + 7 : k.y + k.h - 6, {
-            font: "600 " + fs.toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center",
-            linje: kat ? "top" : "bottom", farve: kat ? "#ffd2cc" : "#d2ecff"
-        });
+        var ty = kat ? k.y + 7 : k.y + k.h - 6;
+        var tFont = "600 " + fs.toFixed(1) + "px 'Segoe UI', sans-serif";
+        if (skjult) {
+            NK.tekstDele(c, [
+                { t: k.ion.formel, farve: kat ? "#ffd2cc" : "#d2ecff" },
+                { t: " ?", farve: "#f2c53d" }
+            ], k.x + k.b / 2, ty, { font: tFont, linje: kat ? "top" : "bottom" });
+        } else {
+            NK.tekst(c, D.ionTekst(k.ion), k.x + k.b / 2, ty, {
+                font: tFont, justering: "center", linje: kat ? "top" : "bottom", farve: kat ? "#ffd2cc" : "#d2ecff"
+            });
+        }
 
-        if (over) {
+        if (greb) {
+            /* Grebet: to smaa lodrette streger i hoejre kant. */
+            var gx = k.x + k.b - 7, gy = k.y + k.h / 2;
+            c.strokeStyle = "rgba(242, 197, 61, " + (over ? 1 : 0.75) + ")";
+            c.lineWidth = 2;
+            c.lineCap = "round";
+            c.beginPath();
+            c.moveTo(gx - 3, gy - 9); c.lineTo(gx - 3, gy + 9);
+            c.moveTo(gx + 2, gy - 9); c.lineTo(gx + 2, gy + 9);
+            c.stroke();
+        }
+
+        if (over && !this.ukendt) {
             /* Et lille kryds i yderhjoernet: klik fjerner ionen. */
             var kx = k.x + k.b - 9, ky = kat ? k.y + 9 : k.y + k.h - 9;
             c.fillStyle = "rgba(20, 20, 26, 0.9)";
@@ -651,6 +837,8 @@
             c.beginPath(); c.moveTo(x, top); c.lineTo(x, bund); c.stroke();
         }
         c.restore();
+        /* Under en opgave ville formlen over enhederne roebe svaret. */
+        if (!this.visFormel) return;
         for (i = 0; i < antal; i++) {
             NK.tekst(c, navn, g.x0 + (i + 0.5) * bredde, top - 1, {
                 font: "700 12px 'Segoe UI', sans-serif", justering: "center", linje: "bottom", farve: "#f2c53d", kant: true
@@ -661,7 +849,30 @@
     /* Den samlede ladning for enden af lynlaasen. */
     NK.Bord.prototype.tegnMaerke = function (c, g, p, m, begge) {
         if (!this.kat && !this.an) return;
+        /* Fane 3: intet regnskab, foer den kendte ions ladning er fundet -
+           det ville roebe den. Derefter siger maerket tydeligt, naar det
+           ikke gaar op. */
+        if (this.ukendt && !this.ukendt.kendtFundet) return;
         var sum = p - m;
+        if (this.ukendt && sum !== 0) {
+            c.save();
+            c.beginPath();
+            c.arc(this.maerkeX, g.zy, 20, 0, Math.PI * 2);
+            c.fillStyle = "#1b1b21";
+            c.fill();
+            c.lineWidth = 2.5;
+            c.strokeStyle = "#e05446";
+            c.stroke();
+            c.restore();
+            NK.tekst(c, NK.fortegn(sum), this.maerkeX, g.zy + 1, {
+                font: "700 15px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+                farve: sum > 0 ? "#f39a8f" : "#8fcaf0"
+            });
+            NK.tekst(c, "går ikke op", this.maerkeX, g.zy + 33, {
+                font: "700 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f0918a"
+            });
+            return;
+        }
         var x = this.maerkeX, y = g.zy;
         var kant = sum > 0 ? "#e05446" : (sum < 0 ? "#3d9ee0" : "#3fae72");
         var tekst = sum > 0 ? "#f39a8f" : (sum < 0 ? "#8fcaf0" : "#7ee0a8");
@@ -689,6 +900,10 @@
        lander i, lyser op undervejs. */
     NK.Bord.prototype.startTraek = function (ion, chip, e) {
         if (this.laast || e.button > 0) return;
+        /* Ingen tekstmarkering: den er det, browseren ellers ville
+           traekke. Et klik paa chippen virker stadig. */
+        e.preventDefault();
+        try { if (window.getSelection) window.getSelection().removeAllRanges(); } catch (fejl) {}
         var mig = this;
         var startX = e.clientX, startY = e.clientY;
         var aktiv = false;

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blandbarhed</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Blandbarhed</h1>
+    <button class="teoriknap" id="quizknap" type="button" title="Quiz (Q)">Quiz</button>
+    <button class="teoriknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane" id="fane" aria-label="Bassinet">
+    <div class="scene" id="scene">
+        <canvas id="laerred" aria-label="Molekylerne i bassinet og glasset, som øjet ser det"></canvas>
+        <!-- Pladser, rundvisningen peger paa. js/scene.js flytter dem efter tegningen. -->
+        <div class="anker" id="anker-bassin"></div>
+        <div class="anker" id="anker-glas"></div>
+        <div class="tilbud" id="tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="haeld-kort">
+            <h2>Hæld i</h2>
+            <div class="stofknapper">
+                <button class="stofknap" type="button" data-stof="vand" title="Hæld vand i (V)"><span class="sn">Vand</span><span class="sf">H₂O</span><span class="sp">polær</span></button>
+                <button class="stofknap" type="button" data-stof="ethanol" title="Hæld ethanol i (E)"><span class="sn">Ethanol</span><span class="sf">C₂H₅OH</span><span class="sp">polær</span></button>
+                <button class="stofknap" type="button" data-stof="olie" title="Hæld olie i (O)"><span class="sn">Olie</span><span class="sf">fedtstof</span><span class="sp">upolær</span></button>
+            </div>
+            <p class="maengde" id="maengde"></p>
+        </div>
+
+        <div class="kort" id="energi-kort">
+            <h2>Ryst og varm</h2>
+            <button class="knap ryst" id="ryst" type="button" title="Ryst bassinet (mellemrum)">Ryst bassinet</button>
+            <div class="temperatur" id="temperatur">
+                <div class="temp-hoved"><span>Temperatur</span><span class="temp-tal" id="temp-tal">20 °C</span></div>
+                <input type="range" id="temp" min="20" max="120" step="1" value="20" aria-label="Temperatur">
+                <div class="kp-skala">
+                    <span class="kant-v">20 °C</span>
+                    <span class="kp-ethanol" style="left: 58%;" title="Ethanol koger">78 °C</span>
+                    <span class="kp-vand" style="left: 80%;" title="Vand koger">100 °C</span>
+                    <span class="kant-h">120 °C</span>
+                </div>
+            </div>
+            <button class="knap lille" id="toem" type="button" title="Tøm bassinet (R)">Tøm bassinet</button>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Start opgave -> Giv hint -> Vis svaret -> Ny opgave -->
+        <div class="kort opgavekort" id="opgavekort">
+            <h2>Opgave <span class="taeller">løst <b id="opg-loest">0</b>/6</span></h2>
+            <p class="opgavetekst" id="opg-tekst"></p>
+            <div class="valg" id="opg-valg"></div>
+            <p class="besked" id="opg-hint"></p>
+            <p class="besked" id="opg-svar" aria-live="polite"></p>
+            <button class="knap stor blaa" id="opg-knap" type="button">Start opgave</button>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Blandbarhed</h2>
+        <p>To væsker kan blandes, når deres molekyler holder lige så godt fast i hinanden som i sig selv. Så bliver der ét lag. Ellers bliver der to.</p>
+
+        <h3>Polær og upolær</h3>
+        <p>Vand og ethanol har en OH-gruppe. Bindingen mellem O og H er polær, og molekylerne danner hydrogenbindinger til hinanden. Olie er lange kæder af C og H og er upolær: der er kun svage London-kræfter.</p>
+        <p>Polære væsker blandes med polære, og upolære med upolære. Et upolært molekyle har intet at byde vandets hydrogenbindinger. Vandmolekylerne holder fast i hinanden og skubber olien ud.</p>
+
+        <h3>Tætheden bestemmer rækkefølgen</h3>
+        <p>Bliver der to lag, ligger det letteste øverst. Det er ikke altid olien.</p>
+        <table class="tabel">
+            <tr><th>Stof</th><th>Polaritet</th><th class="tal">Tæthed</th><th class="tal">Kogepunkt</th></tr>
+            <tr><td><span class="prik" style="background: var(--vand);"></span>vand</td><td>polær</td><td class="tal">1,00 g/mL</td><td class="tal">100 °C</td></tr>
+            <tr><td><span class="prik" style="background: var(--ethanol);"></span>ethanol</td><td>polær</td><td class="tal">0,79 g/mL</td><td class="tal">78 °C</td></tr>
+            <tr><td><span class="prik" style="background: var(--olie);"></span>olie</td><td>upolær</td><td class="tal">0,92 g/mL</td><td class="tal">koger ikke</td></tr>
+        </table>
+        <p>En blanding af vand og ethanol har en tæthed mellem de to. Med lidt over halvdelen ethanol er den lettere end olie.</p>
+
+        <h3>Rystning og varme</h3>
+        <p>En rystning deler olien i små dråber, og det ser uklart ud: en emulsion. Dråberne finder sammen igen, fordi molekylerne er de samme. Varme får molekylerne til at bevæge sig hurtigere, men ændrer heller ikke på, hvad der kan blandes.</p>
+        <p>Ethanol koger ved 78 °C og vand ved 100 °C. I en blanding er molekylerne stadig to stoffer, og ethanol koger først. Olie koger ikke; den brydes ned over 300 °C.</p>
+
+        <h3>Modellen</h3>
+        <p>Hver kugle er et molekyle. Farverne er kun til at kende dem fra hinanden: i glasset er vand og ethanol klare, og olien er lysegul. Kuglerne er lige store, men et oliemolekyle er i virkeligheden omkring 50 gange så stort som et vandmolekyle.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>V</kbd> <kbd>E</kbd> <kbd>O</kbd> hæld i &nbsp;·&nbsp; <kbd>mellemrum</kbd> ryst &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperatur &nbsp;·&nbsp; <kbd>R</kbd> tøm &nbsp;·&nbsp; <kbd>Q</kbd> quiz &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper">
+            <button class="knap blaa" type="button" data-luk>Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="quiz">
+    <div class="overlay-boks smal">
+        <div class="quiz-tal" id="quiz-tal">Spørgsmål 1/5</div>
+        <p class="quiz-spm" id="quiz-spm"></p>
+        <div class="quiz-svar" id="quiz-svar"></div>
+        <p class="besked quiz-forklaring" id="quiz-forklaring"></p>
+        <div class="knapper">
+            <button class="knap" type="button" data-luk>Luk</button>
+            <button class="knap blaa" type="button" id="quiz-naeste" hidden>Næste</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tekster.js"></script>
+<script src="js/model.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/opgaver.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

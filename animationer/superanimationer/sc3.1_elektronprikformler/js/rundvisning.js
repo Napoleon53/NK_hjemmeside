@@ -9,10 +9,16 @@
 
     var NK = window.NK;
 
+    /* fane: trinnet vises kun paa den fane. Uden fane vises det paa
+       begge, hvis elementet kan ses. */
     var TRIN_KANDIDATER = [
+        { sel: ".faneknapper", tekst: "På Byg bygger du selv prikformlerne. På Find fejlen retter du Kemichaels tegninger." },
         { sel: "#opgave-menu", tekst: "Vælg molekylet her. Det blå felt er den opgave, du er i gang med, og grøn skrift betyder, at opgaven er løst." },
         { sel: "#opsaetning-overlay", tekst: "Find atomet i det periodiske system, og klik på den firkant, der viser antallet af elektroner i dets yderste skal (valenselektroner)." },
-        { sel: "footer", tekst: "Træk atomerne sammen for at danne bindinger. Klik på de fælles elektroner mellem to atomer for at skifte mellem enkelt-, dobbelt- og tripelbinding. Sidder du fast, kan du bede om et hint. Tryk \"Tjek svar\", når alle atomer opfylder oktetreglen." }
+        { sel: "#byg-bund", tekst: "Træk atomerne sammen for at danne bindinger. Klik på de fælles elektroner mellem to atomer for at skifte mellem enkelt-, dobbelt- og tripelbinding. Tæl selv elektronerne om hvert atom, og tryk Tjek svar. Sidder du fast, giver den lilla knap hjælp ét trin ad gangen." },
+        { sel: "#fejl-menu", tekst: "Vælg en af Kemichaels tegninger. Grøn skrift betyder, at du har fundet fejlen selv." },
+        { sel: "#laerred", fane: "fejl", tekst: "Klik på det atom, der er tegnet forkert. Klikker du på et atom, der passer, tæller animationen elektronerne om det for dig." },
+        { sel: "#fejl-bund", tekst: "Her står spørgsmålet. Er tegningen rigtig, så tryk Ingen fejl. Sidder du fast, giver den lilla knap et hint og derefter svaret." }
     ];
 
     var trin = [], trinIdx = 0, baggrund = null, boble = null;
@@ -25,7 +31,9 @@
     }
 
     NK.startRundvisning = function () {
-        trin = TRIN_KANDIDATER.filter(function (t) { return elementErSynligt(t.sel); });
+        var fane = document.body.getAttribute("data-fane");
+        afslutRundvisning();
+        trin = TRIN_KANDIDATER.filter(function (t) { return (!t.fane || t.fane === fane) && elementErSynligt(t.sel); });
         if (!trin.length) return;
         if (!baggrund) {
             baggrund = document.createElement("div");
@@ -84,6 +92,8 @@
         if (baggrund) { baggrund.remove(); baggrund = null; }
         if (boble) { boble.remove(); boble = null; }
     }
+
+    NK.lukRundvisning = afslutRundvisning;
 
     document.addEventListener("keydown", function (e) {
         if (!baggrund) return;

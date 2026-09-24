@@ -39,6 +39,10 @@
         <div class="anker" id="lager-anker-reol"></div>
         <div class="anker" id="lager-anker-bord"></div>
         <div class="anker" id="lager-anker-plakater"></div>
+        <div class="tilbud" id="lager-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
         <button class="spring-over" id="lager-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
         <div class="scene-mrk" id="lager-status"></div>
     </div>
@@ -75,6 +79,10 @@
                    aria-label="Skriv den halvdel af etiketten, der mangler">
         </div>
         <div class="baand-besked tom" id="baand-besked" aria-live="polite"></div>
+        <div class="tilbud" id="baand-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
         <button class="spring-over" id="baand-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
         <div class="anker" id="baand-anker-baand"></div>
         <div class="anker" id="baand-anker-plakater"></div>
@@ -168,6 +176,7 @@
 <script src="js/sim_baand.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

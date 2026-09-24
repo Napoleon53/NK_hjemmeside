@@ -16,8 +16,9 @@ i dem ud af commit'en igen. Synkroniser committer alt, så mapperne skal
 holdes urørte.
 
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
-`superlab/` og to superanimationer (`sc2.1_salt_i_vand` og
-`sc3.4_blandbarhed_inaktiv`, som henter `../../v2/kemichael/kemichael.js`)
+`superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
+(bl.a. `sc2.1_salt_i_vand`, `sc2.2_saltbygger`, `sc2.3`, `sc2.4`, `sc3.1`, `sc3.4_blandbarhed`,
+`sc3.4_blandbarhed_inaktiv` og `sc4.1_molarmasse`),
 indlæser filer fra `laboratoriet/` og `kemichael/`. Fjernes de, går
 animationerne i sort på kemiformler.dk.
 
@@ -62,12 +63,14 @@ sync; denne er færdig.
 - Skal en superanimation bygges eller rettes, så læs
   `animationer/superanimationer/README.md` først. Afsnittet "Bestillingen, før
   der skrives kode" er bindende.
-- Kemichael præsenterer hver fane (hvert rum) i en superanimation første gang,
-  den åbnes: to eller tre korte replikker, der ikke låser fanen. Han går kun, når
-  eleven vil det: den store knap "Spring præsentationen over", to klik direkte
-  på ham eller Esc, aldrig ved et tilfældigt klik eller tastetryk. Reglen står i
-  superanimationernes README under "Kemichael præsenterer hvert rum"; mønster
-  `sc2.3_kemikalielageret`.
+- Kemichael præsenterer hver fane (hvert rum) i en superanimation, men kommer
+  ikke af sig selv: første gang fanen åbnes, står der to knapper midt foroven,
+  "Start præsentation" og "Nej tak". Præsentationen er to eller tre korte
+  replikker, der ikke låser fanen. Han går kun, når eleven vil det: den store
+  knap "Spring præsentationen over", to klik direkte på ham eller Esc, aldrig ved
+  et tilfældigt klik eller tastetryk. Reglen står i superanimationernes README
+  under "Kemichael præsenterer hvert rum"; mønster `sc1.2_grundstofudstilling`
+  (`js/praesentation.js`).
 - Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
   gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).
   Punkterne om superanimationer gælder som hidtil og arbejdes i

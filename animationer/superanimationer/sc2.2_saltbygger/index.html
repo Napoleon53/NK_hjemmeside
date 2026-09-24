@@ -14,85 +14,54 @@
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-bord" role="tab" aria-selected="true"><span class="nr">1</span>Byg salte</button>
         <button class="faneknap" data-fane="fane-vand" role="tab" aria-selected="false"><span class="nr">2</span>Opløs i vand</button>
+        <button class="faneknap" data-fane="fane-ukendt" role="tab" aria-selected="false"><span class="nr">3</span>Ukendt ion</button>
     </div>
 
-    <button class="ikonknap" id="hjaelpknap" type="button" title="Hjælp og genveje" aria-label="Hjælp">?</button>
+    <button class="teoriknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
 </header>
 
 <main>
 
 <!-- ================================================================= -->
-<!-- FANE 1: BYG SALTE - sandkasse og opgaver paa det samme bord        -->
-<!-- Hylderne og knapperne ud for raekkerne bygges af bord.js           -->
+<!-- FANE 1: BYG SALTE. Hylderne og knapperne ud for raekkerne bygges   -->
+<!-- af bord.js.                                                        -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-bord" role="tabpanel" aria-label="Byg salte">
-    <div class="scene medtekst" id="bord-scene">
-        <canvas id="bord-laerred"></canvas>
-        <div class="scene-mrk" id="bord-status"></div>
+    <div class="scene" id="bord-scene">
+        <canvas id="bord-laerred" aria-label="Arbejdsbordet med lynlåsen"></canvas>
+        <div class="scene-note" id="bord-note" hidden></div>
+        <div class="tilbud" id="bord-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="bord-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
     </div>
 
     <aside class="panel">
-        <div class="tilstandsvalg" role="group" aria-label="Vælg tilstand">
-            <button class="tilstandsknap aktiv" id="tilstand-frit" type="button">🧪 Byg frit</button>
-            <button class="tilstandsknap" id="tilstand-opgave" type="button">🎯 Opgaver</button>
-        </div>
-
-        <div class="sv-valg" id="svaerhed-valg" role="group" aria-label="Vælg sværhedsgrad" hidden>
-            <button class="svknap aktiv" id="svaerhed-let" type="button">Let</button>
-            <button class="svknap" id="svaerhed-svaer" type="button">Svær</button>
-        </div>
-
-        <!-- Byg frit -->
-        <div class="kort maaling" id="frit-formelkort">
-            <h2>Formlen</h2>
-            <div class="formelvis" id="byg-formelvis">
-                <span class="fformel" id="byg-formel"></span>
-                <span class="fnavn" id="byg-navn"></span>
-            </div>
-            <p class="note" id="byg-atomer"></p>
-            <p class="besked gul" id="byg-note" hidden></p>
-        </div>
-
-        <div class="kort" id="frit-regnskab">
-            <h2>Ladningsregnskab</h2>
-            <div class="talraekke"><span id="byg-l-kat"></span><span class="tal roed" id="byg-q-kat">0</span></div>
-            <div class="talraekke"><span id="byg-l-an"></span><span class="tal blaa" id="byg-q-an">0</span></div>
-            <div class="talraekke sum"><span>I alt</span><span class="tal" id="byg-q-sum">0</span></div>
-        </div>
-
-        <div class="kort" id="frit-knapper">
+        <div class="kort knapper" id="byg-knapper">
             <button class="knap stor blaa" id="byg-afstem" type="button"><span>Afstem for mig</span><span class="tegn">⚖</span></button>
-            <button class="knap stor" id="byg-vand" type="button" style="margin-top:7px;"><span>Opløs det i vand</span><span class="tegn">→</span></button>
+            <button class="knap stor" id="byg-vand" type="button"><span>Opløs det i vand</span><span class="tegn">→</span></button>
         </div>
 
-        <!-- Opgaver -->
-        <div class="kort opgavekort" id="opgave-kort" hidden>
-            <h2><span id="opgave-overskrift">Byg stoffet</span> <span class="taeller">løst: <b id="opgave-loest">0</b></span></h2>
-            <div class="opgave-prompt" id="opgave-prompt"></div>
-            <ol class="trin">
+        <div class="kort opgavekort" id="bord-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="bord-loest">0</b></span><button class="afslut" id="bord-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="bord-opgavetekst">Byg et stof ud fra navnet eller formlen.</p>
+            <div class="opgave-prompt" id="bord-prompt" hidden></div>
+            <ol class="trin" id="bord-trin" hidden>
                 <li class="trin-punkt" id="opgave-t1"></li>
                 <li class="trin-punkt" id="opgave-t2"></li>
                 <li class="trin-punkt" id="opgave-t3"></li>
             </ol>
-        </div>
-
-        <div class="kort" id="opgave-valgkort" hidden>
-            <h2 id="opgave-valg-overskrift">Hvordan skrives formlen?</h2>
             <div class="valg" id="opgave-valg"></div>
-            <p class="besked" id="opgave-svar"></p>
+            <p class="besked hint" id="bord-hint"></p>
+            <p class="besked" id="bord-besked" aria-live="polite"></p>
+            <button class="knap stor blaa" id="bord-opgaveknap" type="button">Start opgave</button>
         </div>
 
-        <div class="kort" id="opgave-knapper" hidden>
-            <div class="knaprad taet">
-                <button class="knap" id="opgave-vis" type="button">Vis svaret</button>
-                <button class="knap blaa" id="opgave-ny" type="button">Ny opgave</button>
-            </div>
-        </div>
-
-        <!-- Fælles -->
-        <div class="kort">
-            <label class="tjek" id="byg-navne-label" style="margin-top:0;"><input type="checkbox" id="byg-navne" checked> Vis navne på ionerne</label>
-            <button class="knap nulstil" id="byg-ryd" type="button"><span>Ryd bordet</span><span class="tegn">↺</span></button>
+        <div class="kort bundlinje">
+            <label class="tjek"><input type="checkbox" id="byg-navne" checked> Vis navne på ionerne</label>
+            <button class="knap lille" id="byg-ryd" type="button" title="Ryd bordet (R)">Ryd <span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -102,79 +71,176 @@
 <!-- ================================================================= -->
 <section class="fane" id="fane-vand" role="tabpanel" aria-label="Opløs i vand">
     <div class="scene" id="vand-scene">
-        <canvas id="vand-laerred"></canvas>
-
-        <!-- Opgaven ligger ovenpå billedet i venstre side, adskilt fra
-             "Vælg selv et salt" i panelet til højre, så det er tydeligt,
-             at de to ting ikke hænger sammen. -->
-        <div class="kort opgavekort opgave-boks" id="vand-opgave-boks">
-            <h2><span id="vand-overskrift">Hvad kommer der ud i vandet?</span> <span class="taeller">løst: <b id="vand-loest">0</b></span></h2>
-            <p class="opgave-spm" id="vand-spm"></p>
-            <div class="valg en-spalte" id="vand-valg"></div>
-            <p class="besked" id="vand-svar"></p>
-            <div class="knaprad">
-                <button class="knap" id="vand-vis" type="button">Vis svaret</button>
-                <button class="knap blaa" id="vand-ny" type="button">Ny opgave</button>
-            </div>
+        <canvas id="vand-laerred" aria-label="Bægerglas med vand"></canvas>
+        <div class="tilbud" id="vand-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
+        <button class="spring-over" id="vand-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
     </div>
 
     <aside class="panel">
-        <div class="kort">
-            <h2>Vælg selv et salt</h2>
-            <p class="note" style="margin-top:0;">Vælg saltets positive ion og negative ion, og se hvad der sker, når du lægger det i vand.</p>
+        <div class="kort" id="vand-saltkort">
+            <h2>Vælg et salt</h2>
             <select id="vand-kat" class="vaelger" aria-label="Positiv ion"></select>
-            <select id="vand-an" class="vaelger" aria-label="Negativ ion" style="margin-top:6px;"></select>
-            <button class="knap stor groen" id="vand-haeld" type="button" style="margin-top:9px;"><span>Hæld det i vandet</span><span class="tegn">↓</span></button>
+            <select id="vand-an" class="vaelger" aria-label="Negativ ion"></select>
+            <button class="knap stor groen" id="vand-haeld" type="button"><span>Læg det i vandet</span><span class="tegn">↓</span></button>
+            <p class="besked" id="vand-note"></p>
+        </div>
+
+        <div class="kort opgavekort" id="vand-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="vand-loest">0</b></span><button class="afslut" id="vand-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="vand-opgavetekst">Forudsig, hvad der kommer ud i vandet.</p>
+            <div class="opgave-spm" id="vand-spm"></div>
+            <div class="valg en-spalte" id="vand-valg"></div>
+            <p class="besked hint" id="vand-hint"></p>
+            <p class="besked" id="vand-besked" aria-live="polite"></p>
+            <button class="knap stor blaa" id="vand-opgaveknap" type="button">Start opgave</button>
         </div>
     </aside>
 </section>
 
+<!-- ================================================================= -->
+<!-- FANE 3: UKENDT ION. Formlen er givet, og ladningen paa den ene ion -->
+<!-- er ukendt. Bordet uden hylder bygges af bord.js.                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ukendt" role="tabpanel" aria-label="Ukendt ion">
+    <div class="scene" id="ukendt-scene">
+        <canvas id="ukendt-laerred" aria-label="Bordet med den ukendte ion"></canvas>
+        <div class="ukendt-formel" id="ukendt-formel"><div class="uf" id="ukendt-uf"></div><div class="un" id="ukendt-un"></div></div>
+        <div class="scene-note" id="ukendt-note" hidden></div>
+        <div class="anker" id="ukendt-anker-plakater"></div>
+        <div class="tilbud" id="ukendt-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="ukendt-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="ukendt-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="ukendt-loest">0</b></span></span></h2>
+            <p class="opgavetekst" id="ukendt-opgavetekst"></p>
+            <ol class="trin">
+                <li class="trin-punkt" id="ukendt-t1"></li>
+                <li class="trin-punkt" id="ukendt-t2"></li>
+                <li class="trin-punkt" id="ukendt-t3"></li>
+                <li class="trin-punkt" id="ukendt-t4"></li>
+            </ol>
+            <p class="opgave-spm" id="ukendt-spm"></p>
+            <div class="valg" id="ukendt-valg"></div>
+            <p class="besked hint" id="ukendt-hint"></p>
+            <p class="besked" id="ukendt-besked" aria-live="polite"></p>
+            <button class="knap stor" id="ukendt-opgaveknap" type="button">Giv hint</button>
+        </div>
+    </aside>
+</section>
+
+
 </main>
 
+<!-- Plakaterne i stort format (samme som i sc2.3). Aabnes fra plakaterne
+     paa vaeggen paa fane 3 og fra hintene. Fyldes af js/opslag.js. -->
+<div class="overlay" id="opslag-pt">
+    <div class="overlay-boks bred">
+        <h2>Det periodiske system</h2>
+        <div class="pt-gitter" id="pt-gitter"></div>
+        <p class="pt-info" id="pt-info"></p>
+        <div class="pnoegle">
+            <span class="m">metal</span>
+            <span class="i">ikke-metal</span>
+            <span class="h">halvmetal</span>
+            <span class="a">ædelgas</span>
+            <span class="flere">flere mulige ladninger</span>
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="opslag-ioner">
+    <div class="overlay-boks smal">
+        <h2>Sammensatte ioner</h2>
+        <div class="ion-tabel" id="ion-tabel"></div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
 <!-- ================================================================= -->
-<div class="overlay" id="hjaelp">
+<div class="overlay" id="teori">
     <div class="overlay-boks">
-        <h2>Saltbyggeren</h2>
-        <p>Et salt er bygget af positive og negative ioner, og det er altid <b>neutralt</b>: der er lige så meget plus som minus. Begge faner handler om den regel.</p>
+        <h2>Salte</h2>
+        <p>Et salt er bygget af positive og negative ioner. Saltet er <b>neutralt</b>: der er lige så meget plus som minus.</p>
 
         <h3>Lynlåsen</h3>
-        <p>Træk en ion fra hylden ned på bordet — eller klik på den. Hvert kort er lige så bredt, som ionen har ladning, og plusserne og minusserne mødes på midten som tænderne i en lynlås. Lukker den hele vejen, er saltet neutralt. Mangler der noget, så giv den korteste række én ion mere. En ion fjernes ved at klikke på den eller trække den væk fra bordet.</p>
+        <p>Hvert kort er lige så bredt, som ionen har ladning. Al³⁺ fylder tre felter, NO₃⁻ ét. Plus og minus mødes på midten. Lukker lynlåsen hele vejen, er saltet neutralt. Mangler der noget, får den korteste række én ion mere.</p>
+        <div class="ligning">2 Al³⁺ + 3 SO₄²⁻: +6 og −6</div>
 
-        <h3>De to faner</h3>
+        <h3>Formlen</h3>
         <ul>
-            <li><b>Byg salte</b> — <i>Byg frit</i> viser formlen, navnet og regnskabet, mens du bygger. <i>Opgaver</i> stiller to slags: byg stoffet ud fra navnet og vælg den rigtige skrivemåde — eller find ionerne i en formel og navngiv stoffet.</li>
-            <li><b>Opløs i vand</b> — hvad bliver der af ionerne, når saltet opløses? Her kan du også hælde et hvilket som helst salt i vandet.</li>
+            <li>Formlen viser det <b>mindste</b> antal, hvor ladningerne går op. 2 Mg²⁺ og 2 SO₄²⁻ er to ens enheder, så formlen er MgSO₄.</li>
+            <li>Det lille tal er antallet af ionen: Na₂SO₄ har 2 Na⁺.</li>
+            <li>En sammensat ion sættes i parentes, når der er flere af den: Al₂(SO₄)₃ har 3 SO₄²⁻.</li>
         </ul>
 
-        <h3>Prøv det her</h3>
-        <ul>
-            <li>Træk Al³⁺ og SO₄²⁻ ned på bordet. Hvorfor bliver det Al₂(SO₄)₃?</li>
-            <li>Byg 2 Mg²⁺ og 2 SO₄²⁻. Lynlåsen lukker — men hvorfor hedder formlen MgSO₄?</li>
-            <li>Hæld calciumphosphat i vandet på fane 2. Hvad sker der?</li>
-        </ul>
+        <h3>Navnet</h3>
+        <p>Den positive ion først, så den negative: natrium + sulfat giver natriumsulfat. Antallet står ikke i navnet. Jern og kobber kan have flere ladninger, så ladningen står med romertal: jern(III)sulfat.</p>
+
+        <h3>I vand</h3>
+        <p>I krystallen sidder hver ion op ad ioner med modsat ladning. Når saltet opløses, går ionerne fra hinanden og svømmer rundt hver for sig. En sammensat ion går ikke i stykker.</p>
+        <div class="ligning">Al₂(SO₄)₃(s) → 2 Al³⁺(aq) + 3 SO₄²⁻(aq)</div>
+        <p>Tungtopløselige salte bliver liggende som bundfald.</p>
+
+        <h3>Den ukendte ion</h3>
+        <p>Først skal ladningen på den kendte ion findes. For et grundstof i en hovedgruppe kan den udledes af gruppen: metaller afgiver elektronerne i yderste skal, og ikke-metaller optager dem, der mangler i at have 8. Oxygen står i gruppe 16, har 6 elektroner i yderste skal og bliver O²⁻. En sammensat ions ladning skal man kende.</p>
+        <p>Formlen afslører ladningen, fordi saltet er neutralt. I SnO₂ giver 2 O²⁻ tilsammen −4, så tin må være Sn⁴⁺. Det lille tal er antallet af ioner, ikke ladningen. Kan metallet have flere ladninger, står ladningen i navnet med romertal: tin(IV)oxid.</p>
+        <div class="ligning">SnO₂: 1 Sn⁴⁺ + 2 O²⁻, +4 og −4</div>
 
         <h3>Genveje</h3>
-        <p>
-            <kbd>1</kbd> <kbd>2</kbd> skift fane &nbsp;·&nbsp;
-            <kbd>R</kbd> start forfra &nbsp;·&nbsp;
-            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
-            <kbd>Esc</kbd> luk
-        </p>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> ryd eller start opgaven forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>K</kbd> Kemichael præsenterer fanen igen &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
 
         <div class="knapper" style="margin-top:18px;">
-            <button class="knap blaa" id="hjaelp-luk" type="button" style="justify-content:center;">Luk og kom i gang</button>
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen, se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
         </div>
     </div>
 </div>
 
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
 <script src="js/tegning.js"></script>
+<script src="js/gitter.js"></script>
+<script src="js/opslag.js"></script>
 <script src="js/opgave.js"></script>
 <script src="js/bord.js"></script>
 <script src="js/sim_bord.js"></script>
 <script src="js/sim_vand.js"></script>
+<script src="js/sim_ukendt.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

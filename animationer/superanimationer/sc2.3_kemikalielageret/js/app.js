@@ -10,6 +10,20 @@
 
     var NK = window.NK;
 
+    /* Kemichael kommer ikke af sig selv: første gang står der Start
+       præsentation og Nej tak (js/praesentation.js). Esc og Start på
+       samlebåndet er det samme som Nej tak. */
+    function tilbud(P, noegle, id) {
+        NK.Praesentation.pakInd(P, {
+            tilbud: id,
+            set: function () { return NK.hent(noegle, false); },
+            husk: function () { NK.gem(noegle, true); },
+            esc: "springIntro"
+        });
+    }
+    tilbud(NK.SimLager.prototype, "nk-sc2.3-intro", "lager-tilbud");
+    tilbud(NK.SimBaand.prototype, "nk-sc2.3-intro2", "baand-tilbud");
+
     var sims = {};
     var faner = ["fane-lager", "fane-baand"];
     var aktivFane = faner[0];

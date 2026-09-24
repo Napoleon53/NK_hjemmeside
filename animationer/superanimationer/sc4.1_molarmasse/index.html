@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molarmasse</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚖</span> Molarmasse</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-vaegt" role="tab" aria-selected="true"><span class="nr">1</span>Vægten</button>
+        <button class="faneknap" data-fane="fane-skaal" role="tab" aria-selected="false"><span class="nr">2</span>Skålvægten</button>
+        <button class="faneknap" data-fane="fane-ukendt" role="tab" aria-selected="false"><span class="nr">3</span>Ukendt stof</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: VAEGTEN                                                    -->
+<!-- Raekkerne i opgavekortet bygges af sim_vaegt.js                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-vaegt" role="tabpanel" aria-label="Vægten">
+    <div class="scene medtekst">
+        <canvas id="vaegt-laerred"></canvas>
+        <div class="anker" id="vaegt-anker-plakat"></div>
+        <div class="anker" id="vaegt-anker-felt"></div>
+        <div class="anker" id="vaegt-anker-vaegt"></div>
+        <div class="anker" id="vaegt-anker-molekyle"></div>
+        <div class="tilbud" id="vaegt-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="vaegt-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="vaegt-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste stof -->
+        <div class="kort opgavekort" id="vaegt-kort">
+            <h2><span id="vaegt-niveau"></span><span class="taeller">stof <b id="vaegt-nr">1</b>/<span id="vaegt-antal-i-niveau">4</span></span></h2>
+            <div class="opgave-prompt formel" id="vaegt-prompt"></div>
+            <p class="opgave-spm" id="vaegt-spm"></p>
+            <div class="raekker" id="vaegt-raekker"></div>
+            <p class="besked" id="vaegt-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="vaegt-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="vaegt-fremskridt">
+            <h2>Stofferne <span class="taeller">vejet <b id="vaegt-loest">0</b>/12</span></h2>
+            <div class="hyldeliste" id="vaegt-niveauer"></div>
+            <button class="knap nulstil" id="vaegt-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SKAALVAEGTEN                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-skaal" role="tabpanel" aria-label="Skålvægten">
+    <div class="scene medtekst">
+        <canvas id="skaal-laerred"></canvas>
+        <div class="anker" id="skaal-anker-vaegt"></div>
+        <div class="anker" id="skaal-anker-kort"></div>
+        <div class="anker" id="skaal-anker-plakat"></div>
+        <div class="tilbud" id="skaal-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="skaal-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="skaal-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="skaal-kort">
+            <h2>Hvilken side synker? <span class="taeller">par <b id="skaal-nr">1</b>/<span id="skaal-antal">9</span></span></h2>
+            <p class="opgave-spm">1 mol i hver skål. Gæt, før låsen slippes.</p>
+            <div class="valgrad" id="skaal-valg">
+                <button class="valgknap" type="button" data-svar="v"><span class="pil">←</span>Venstre</button>
+                <button class="valgknap" type="button" data-svar="l"><span class="pil">↓</span>Lige</button>
+                <button class="valgknap" type="button" data-svar="h"><span class="pil">→</span>Højre</button>
+            </div>
+            <p class="besked" id="skaal-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="skaal-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling">
+            <h2>Runden <span class="taeller">rekord <b id="skaal-rekord">0</b></span></h2>
+            <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="skaal-point">0</span></div>
+            <div class="talraekke"><span>I træk</span><span class="tal" id="skaal-stime">0</span></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: UKENDT STOF                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ukendt" role="tabpanel" aria-label="Ukendt stof">
+    <div class="scene medtekst">
+        <canvas id="ukendt-laerred"></canvas>
+        <div class="anker" id="ukendt-anker-flaske"></div>
+        <div class="anker" id="ukendt-anker-maerke"></div>
+        <div class="anker" id="ukendt-anker-tavle"></div>
+        <div class="anker" id="ukendt-anker-plakat"></div>
+        <div class="tilbud" id="ukendt-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="ukendt-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="ukendt-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="ukendt-kort">
+            <h2><span id="ukendt-niveau"></span><span class="taeller">flaske <b id="ukendt-nr">1</b>/<span id="ukendt-antal-i-niveau">4</span></span></h2>
+            <div class="opgave-prompt" id="ukendt-prompt"></div>
+            <p class="opgave-spm" id="ukendt-spm"></p>
+            <p class="besked" id="ukendt-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="ukendt-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="ukendt-fremskridt">
+            <h2>Flaskerne <span class="taeller">med etiket <b id="ukendt-loest">0</b>/12</span></h2>
+            <div class="hyldeliste" id="ukendt-niveauer"></div>
+            <button class="knap nulstil" id="ukendt-nulstil" type="button"><span>Tag etiketterne af igen</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Molarmasse</h2>
+        <p>Molarmassen <i>M</i> er massen af 1 mol af et stof. Enheden er g/mol.</p>
+        <p>Atommassen i det periodiske system er massen af ét atom i enheden u. Molarmassen for grundstoffet har samme tal i g/mol: M(C) = 12,01 g/mol.</p>
+        <p>For et stof lægges atommasserne sammen for alle atomerne i formlen. Hvert grundstofs atommasse ganges med antallet af atomer.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: CO₂</span>
+            M(CO₂) = 12,01 g/mol + 2 · 16,00 g/mol = 44,01 g/mol
+        </div>
+        <p>Atomnummeret er ikke atommassen. Oxygen har atomnummer 8 og atommasse 16,00.</p>
+        <p>Mange lette atomer kan veje mindre end få tunge: M(CH₄) = 16,05 g/mol, men M(O₂) = 32,00 g/mol.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/sim_vaegt.js"></script>
+<script src="js/sim_skaal.js"></script>
+<script src="js/sim_ukendt.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

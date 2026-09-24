@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kemi-Jeopardy</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-skaerm="titel">
+
+<header class="top">
+    <h1><span class="ikon">▦</span> Kemi-Jeopardy</h1>
+    <span class="status" id="status"></span>
+    <div class="topknapper">
+        <button class="teoriknap" id="finalknap" type="button" title="Gå til Final" hidden>Final</button>
+        <button class="teoriknap" id="nytknap" type="button" title="Holdene og et nyt spil">Nyt spil</button>
+        <button class="teoriknap" id="regelknap" type="button" title="Reglerne og genvejene">Regler</button>
+        <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra">🔊</button>
+        <button class="ikonknap" id="fuldknap" type="button" title="Fuld skærm" aria-label="Fuld skærm" hidden>⛶</button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main id="studie">
+    <section class="scene" id="scene">
+        <img class="soejle venstre" src="sprites/soejle.svg" alt="">
+        <div class="skaerm-plads">
+            <div class="skaerm" id="skaerm">
+                <div class="braet" id="braet"></div>
+                <div class="kort" id="kort" hidden>
+                    <div class="kort-hoved" id="kort-hoved"></div>
+                    <div class="kort-tekst" id="kort-tekst"></div>
+                    <div class="ur" id="ur" hidden></div>
+                </div>
+                <div class="plakat" id="plakat" hidden></div>
+            </div>
+        </div>
+        <img class="soejle hoejre" src="sprites/soejle.svg" alt="">
+        <div class="skaermknapper" id="knapper"></div>
+    </section>
+
+    <section class="podier" id="podier" aria-label="Holdene"></section>
+
+    <!-- Titelskaermen daekker hele studiet, ogsaa podierne -->
+    <section class="titel" id="titel">
+        <img class="titel-logo" src="sprites/titel.svg" alt="Kemi-Jeopardy">
+        <div class="titel-quiz" id="titel-quiz"></div>
+        <div class="opsaetning" id="opsaetning">
+            <div class="opsaetning-hoved">
+                <span class="etiket">Hold</span>
+                <div class="holdantal">
+                    <button type="button" id="hold-minus" aria-label="Færre hold">−</button>
+                    <b id="hold-antal">4</b>
+                    <button type="button" id="hold-plus" aria-label="Flere hold">+</button>
+                </div>
+                <span class="etiket">Ur</span>
+                <div class="urvalg" id="urvalg">
+                    <button type="button" data-s="5">5 s</button>
+                    <button type="button" data-s="10">10 s</button>
+                    <button type="button" data-s="20">20 s</button>
+                    <button type="button" data-s="30">30 s</button>
+                </div>
+            </div>
+            <div class="holdnavne" id="holdnavne"></div>
+            <div class="titel-knapper">
+                <button type="button" class="pille graa" id="egneknap" title="Upload, ret og eksportér spørgsmålene">Egne spørgsmål</button>
+                <button type="button" class="pille" id="fortsaet" hidden>Fortsæt spillet</button>
+                <button type="button" class="pille gul" id="start">Start spillet</button>
+            </div>
+            <p class="lydkilde" id="lydkilde"></p>
+        </div>
+    </section>
+
+    <!-- Kemichael tegnes her, oven paa det hele -->
+    <canvas id="laerred" aria-hidden="true"></canvas>
+    <div class="tilbud" id="tilbud" hidden>
+        <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+        <button class="tilbud-nej" type="button">Nej tak</button>
+    </div>
+    <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="regler">
+    <div class="overlay-boks">
+        <h2>Reglerne</h2>
+        <h3>Spillet</h3>
+        <ul>
+            <li>Holdet med det gule lys vælger en kategori og et beløb. I starten vælger læreren.</li>
+            <li>Når ledetråden er læst op, rækker holdene hånden op. Det første hold svarer.</li>
+            <li>Svaret skal stilles som et spørgsmål: <i>Hvad er …?</i> eller <i>Hvem er …?</i></li>
+            <li>Et rigtigt svar giver beløbet, og holdet vælger næste felt. Et forkert svar trækker beløbet fra, og de andre hold må prøve.</li>
+        </ul>
+        <h3>Daily Double</h3>
+        <p>Ét felt er en Daily Double. Kun holdet, der valgte det, svarer. Holdet må satse sine egne point eller op til brættets største beløb, hvis det har færre.</p>
+        <h3>Final</h3>
+        <p>Hold med over 0 kr. satser en del af deres point. Alle hold skriver svaret ned i tænketiden. Et rigtigt svar giver indsatsen, et forkert trækker den fra.</p>
+        <h3>Til læreren</h3>
+        <p>+ og − under holdene giver og trækker beløbet. Et klik mere fortryder. Klik på pointene eller navnet for at rette dem. Et brugt felt åbnes igen med dobbeltklik. Spillet huskes, også hvis siden lukkes.</p>
+        <h3>Genveje</h3>
+        <p><kbd>Mellemrum</kbd> næste &nbsp;·&nbsp; <kbd>U</kbd> ur &nbsp;·&nbsp; <kbd>1</kbd> til <kbd>6</kbd> + til holdet &nbsp;·&nbsp; <kbd>Skift</kbd> + <kbd>1</kbd> til <kbd>6</kbd> − til holdet &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichael &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper">
+            <button class="knap blaa" id="regler-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Egne spoergsmaal: quizzen som tekst - se js/tekstformat.js. -->
+<div class="overlay" id="egne">
+    <div class="overlay-boks bred">
+        <h2>Egne spørgsmål</h2>
+        <p>Skriv, indsæt eller upload en quiz i formatet herunder. Feltet viser den quiz, der er i brug nu. En egen quiz gemmes i denne browser og gælder kun dette niveau.</p>
+        <textarea id="egne-tekst" spellcheck="false" aria-label="Quizzen som tekst"></textarea>
+        <p class="egne-status" id="egne-status" aria-live="polite"></p>
+        <div class="egne-knapper">
+            <button class="knap" id="egne-upload" type="button">Upload fil</button>
+            <button class="knap" id="egne-eksport" type="button">Eksportér</button>
+            <button class="knap" id="egne-ai" type="button">Kopiér vejledning til AI</button>
+            <span class="mellemrum"></span>
+            <button class="knap" id="egne-standard" type="button">Standardquiz</button>
+            <button class="knap" id="egne-luk" type="button">Luk</button>
+            <button class="knap blaa" id="egne-brug" type="button">Brug quizzen</button>
+        </div>
+        <input type="file" id="egne-fil" accept=".txt,.md,text/plain" hidden>
+        <h3>Formatet</h3>
+        <pre class="egne-format">Titel: quizzens navn
+Beløb: 100, 200, 300, 400, 500
+
+Emne:
+ledetråd ; svar          (én linje pr. beløb, fra det mindste)
+
+Final: emne
+ledetråd ; svar</pre>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/tekstformat.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/visning.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

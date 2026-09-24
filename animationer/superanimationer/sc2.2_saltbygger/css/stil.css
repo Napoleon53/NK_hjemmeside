@@ -163,26 +163,31 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .scene > canvas { display: block; width: 100%; height: 100%; }
-.scene.medtekst { padding-bottom: 58px; }
 
-.scene-mrk {
+/* Ingen tekstmarkering i scenen. Et traek skal flytte en ion, ikke
+   markere hylden (saa slaeber browseren hele linjen med). */
+.scene { -webkit-user-select: none; user-select: none; }
+
+/* En kort note i scenen, kun naar der er noget at sige. Placeres af
+   sim_bord.js lige over den nederste hylde. */
+.scene-note {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    min-height: 58px;
-    display: block;
-    padding: 19px 20px 12px;
-    background: linear-gradient(to top, rgba(8, 8, 13, 0.96) 55%, rgba(8, 8, 13, 0));
-    font-size: 0.88rem;
-    line-height: 1.45;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    max-width: calc(100% - 40px);
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    background-color: rgba(20, 20, 26, 0.92);
+    border: 1px solid #3f3f4d;
+    font-size: 0.86rem;
+    line-height: 1.4;
     color: #dde3ea;
     text-align: center;
     pointer-events: none;
     z-index: 4;
 }
 
-.scene-mrk b { color: #ffffff; }
+.scene-note b { color: #ffffff; }
 
 /* ---------------------------------------------------------------------
    IONHYLDERNE - positive oeverst, negative nederst, taet paa den
@@ -209,7 +214,7 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .hylde.bund {
-    bottom: 58px;
+    bottom: 0;
     align-items: flex-start;
     background: linear-gradient(to top, rgba(61, 158, 224, 0.1), rgba(61, 158, 224, 0.02));
     border-top: 1px solid rgba(61, 158, 224, 0.2);
@@ -302,6 +307,186 @@ main { flex: 1; position: relative; min-height: 0; }
 .styr.an .styr-antal  { color: var(--minus-lys); }
 .styr.kat .talknap.plus { background-color: var(--roed-mork); border-color: var(--roed); }
 .styr.kat .talknap.plus:hover:not(:disabled) { background-color: var(--roed); }
+/* Fane 3: knapperne styrer ladningen paa den ukendte ion (gul som "?"). */
+.styr.ladning .styr-antal { color: var(--gul); font-family: "Segoe UI", sans-serif; font-size: 1.05rem; }
+
+/* Fane 3: saltets formel over bordet. */
+.ukendt-formel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 18px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.ukendt-formel .uf { font-size: 2.2rem; font-weight: 600; line-height: 1.1; }
+.ukendt-formel .uf .fk { color: #f7a79d; }
+.ukendt-formel .uf .fa { color: #97cff5; }
+.ukendt-formel .un { font-size: 0.95rem; color: var(--tekst-svag); margin-top: 3px; }
+.ukendt-formel .un:empty { display: none; }
+
+/* Plakaterne i stort format (samme som i sc2.3): det periodiske system med
+   hovedgrupperne 1-8 og de sammensatte ioner. */
+.overlay-boks.bred { max-width: 900px; }
+.overlay-boks.smal { max-width: 420px; }
+
+.pt-gitter {
+    display: grid;
+    grid-template-columns: repeat(18, minmax(0, 1fr));
+    gap: 3px;
+}
+
+.pt-hoved {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gul);
+    padding-bottom: 2px;
+}
+
+.pt-overgang {
+    align-self: end;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--tekst-mat);
+    border-bottom: 1px solid #4a4a58;
+    padding-bottom: 3px;
+    margin-bottom: 2px;
+}
+
+.pt-celle {
+    position: relative;
+    aspect-ratio: 1;
+    min-width: 0;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f232b;
+    cursor: pointer;
+    padding: 0;
+}
+
+.pt-celle.m { background-color: #9fb8d8; }
+.pt-celle.i { background-color: #9fd8a9; }
+.pt-celle.h { background-color: #d8d39f; }
+.pt-celle.a { background-color: #c7a9dd; }
+.pt-celle.ovg { filter: saturate(0.55) brightness(0.88); }
+.pt-celle:hover, .pt-celle:focus-visible { outline: 2px solid var(--tekst); outline-offset: 1px; z-index: 1; }
+.pt-celle.fremhaev { background-color: var(--gul); filter: none; outline: 2px solid #ffffff; z-index: 1; }
+
+.pt-celle.flere::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #b8402f;
+}
+
+.pt-info { margin: 12px 0 0 !important; min-height: 1.4em; font-size: 0.95rem !important; color: #dde3ea !important; }
+.pt-info b { color: var(--gul); font-size: 1.05rem; }
+
+.pnoegle { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 0.8rem; color: var(--tekst-svag); }
+.pnoegle span { display: inline-flex; align-items: center; gap: 6px; }
+.pnoegle span::before { content: ""; width: 13px; height: 13px; border-radius: 3px; }
+.pnoegle .m::before { background-color: #9fb8d8; }
+.pnoegle .i::before { background-color: #9fd8a9; }
+.pnoegle .h::before { background-color: #d8d39f; }
+.pnoegle .a::before { background-color: #c7a9dd; }
+.pnoegle .flere::before { width: 7px; height: 7px; border-radius: 50%; background-color: #b8402f; }
+
+.ion-tabel { display: flex; flex-direction: column; gap: 5px; }
+
+.ionraekke {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    border-radius: var(--radius-lil);
+    padding: 7px 12px;
+}
+
+.ionraekke.fremhaev { border-color: var(--gul); background-color: rgba(242, 197, 61, 0.14); }
+.ion-f { font-size: 1.15rem; font-weight: 700; }
+.ion-f.plus { color: var(--plus-lys); }
+.ion-f.minus { color: var(--minus-lys); }
+.ion-n { font-size: 0.95rem; color: #dde3ea; }
+
+/* Et lille link i hintet, der aabner plakaten igen. */
+.linkknap {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: var(--gul);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Fane 3: et loest trin viser svaret ude til hoejre og en kort
+   forklaring under sig, saa beskeden forneden kun handler om det trin,
+   man er i gang med. */
+.trin-punkt { flex-wrap: wrap; }
+.trin-svar { margin-left: auto; font-weight: 700; color: #7ee0a8; white-space: nowrap; }
+.trin-forkl {
+    flex-basis: 100%;
+    padding: 2px 0 2px 29px;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #9fd9b8;
+}
+
+/* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
+.anker { position: absolute; pointer-events: none; }
+
+/* Den store knap, der sender Kemichael ud under praesentationen (som i
+   sc2.3). Midt foroven i scenen, saa den ikke kan overses. */
+.spring-over {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(20, 20, 28, 0.94);
+    color: #ffffff;
+    border: 2px solid var(--gul);
+    border-radius: 999px;
+    padding: 11px 22px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.spring-over:hover { background-color: var(--panel-3); }
+.spring-over span { color: var(--gul); font-size: 1.1rem; }
+
+/* Fane 1: under hylden, saa ionerne kan tages under praesentationen.
+   Fane 3: under formlen, mellem plakaterne. */
+#bord-spring { top: 92px; }
+#ukendt-spring { top: 104px; }
+
+/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
+@keyframes puf {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
+    40%  { transform: translateX(-50%) scale(1.08); }
+    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
+}
+
+.spring-over.puf { animation: puf 0.7s ease-out 2; }
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -343,24 +528,28 @@ main { flex: 1; position: relative; min-height: 0; }
     gap: 8px;
 }
 
-.kort.maaling { border-left: 3px solid var(--groen); }
 .kort.opgavekort { border-left: 3px solid var(--lilla); }
 
-/* Opgaven som et overlay ovenpå scenen (fane 2) - i venstre side, saa
-   den holdes adskilt fra det uafhaengige "Vælg selv et salt" i panelet. */
-.opgave-boks {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    width: 320px;
-    max-width: calc(100% - 36px);
-    max-height: calc(100% - 36px);
-    overflow-y: auto;
-    background-color: rgba(43, 43, 54, 0.94);
-    backdrop-filter: blur(2px);
-    box-shadow: var(--skygge);
-    z-index: 5;
+.kort > h2 .hoved-hoejre { display: flex; align-items: baseline; gap: 10px; }
+
+/* Afslut: tilbage til sandkassen. */
+.afslut {
+    background: transparent;
+    border: 1px solid #4a4a58;
+    border-radius: 4px;
+    color: var(--tekst-svag);
+    font-family: inherit;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    padding: 2px 7px;
+    cursor: pointer;
 }
+
+.afslut:hover { color: var(--tekst); border-color: #5e5e70; }
+
+.opgavetekst { margin: 0 0 10px; font-size: 0.86rem; line-height: 1.45; color: #c8ced6; }
 
 .kort > h2 .taeller {
     font-size: 0.68rem;
@@ -375,66 +564,14 @@ main { flex: 1; position: relative; min-height: 0; }
 .note { margin: 8px 0 0 0; font-size: 0.76rem; line-height: 1.45; color: var(--tekst-mat); }
 .note:empty { display: none; }
 
-.besked { margin: 0; font-size: 0.82rem; line-height: 1.5; color: #c8ced6; }
+.besked { margin: 0 0 9px; font-size: 0.84rem; line-height: 1.5; color: #c8ced6; }
 .besked:empty { display: none; }
 .besked.god   { color: #7ee0a8; }
 .besked.skidt { color: #f0918a; }
 .besked.gul   { color: #f0d77a; }
+.besked.hint  { color: #f0d77a; }
 .besked b { color: inherit; }
-
-/* ----- Formlen ------------------------------------------------------- */
-.formelvis {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    background-color: #0e1a14;
-    border: 1px solid #21402f;
-    border-radius: var(--radius-lil);
-    padding: 10px 12px;
-}
-
-.fformel { font-size: 2rem; font-weight: 600; line-height: 1.15; letter-spacing: 0.01em; }
-.fformel .fk { color: #f7a79d; }
-.fformel .fa { color: #97cff5; }
-.fformel .ukendt { color: var(--tekst-mat); }
-.fnavn { font-size: 0.86rem; color: #7ee0a8; }
-
-/* Et glimt, naar formlen lige er blevet gyldig. */
-@keyframes formelglimt {
-    0%   { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0.55); }
-    70%  { box-shadow: 0 0 0 12px rgba(63, 174, 114, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0); }
-}
-
-.formelvis.ny { animation: formelglimt 0.9s ease-out 1; }
-
-/* ----- Talraekker ---------------------------------------------------- */
-.talraekke {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 10px;
-    background-color: rgba(255, 255, 255, 0.045);
-    border-radius: var(--radius-lil);
-    padding: 6px 10px;
-    font-size: 0.84rem;
-    color: #c8ced6;
-}
-
-.talraekke + .talraekke { margin-top: 5px; }
-.talraekke.sum { background-color: rgba(255, 255, 255, 0.09); font-weight: 600; }
-
-.talraekke .tal {
-    font-weight: 700;
-    color: var(--tekst);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-}
-
-.tal.blaa  { color: var(--minus-lys); }
-.tal.groen { color: #7ee0a8; }
-.tal.roed  { color: var(--plus-lys); }
+#vand-note { margin: 9px 0 0; }
 
 /* ----- Opgaverne ------------------------------------------------------ */
 .opgave-prompt {
@@ -446,9 +583,10 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .opgave-spm { margin: 0 0 8px; font-size: 0.86rem; line-height: 1.45; color: #c8ced6; }
+.opgave-spm:empty { display: none; }
 .lign-v { font-size: 1.3rem; font-weight: 600; color: var(--tekst); white-space: nowrap; }
 
-.trin { list-style: none; margin: 0; padding: 0; counter-reset: trin; }
+.trin { list-style: none; margin: 0 0 9px; padding: 0; counter-reset: trin; }
 
 .trin-punkt {
     counter-increment: trin;
@@ -603,19 +741,13 @@ main { flex: 1; position: relative; min-height: 0; }
 .knap.groen { background-color: var(--groen-mork); border-color: var(--groen); }
 .knap.groen:hover:not(:disabled) { background-color: var(--groen); }
 
-.knap.nulstil {
-    background-color: transparent;
-    border-color: #5b3b39;
-    color: #e08b81;
-    margin-top: 10px;
-    width: 100%;
-}
+.knap.lille { padding: 6px 11px; font-size: 0.8rem; flex-shrink: 0; }
 
-.knap.nulstil:hover:not(:disabled) { background-color: rgba(224, 84, 70, 0.16); border-color: var(--roed); }
+.bundlinje { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.bundlinje .tjek { margin-top: 0; }
 
-.knaprad { display: flex; gap: 6px; margin-top: 9px; }
-.knaprad.taet { margin-top: 0; }
-.knaprad .knap { flex: 1; justify-content: center; padding: 8px 6px; }
+.vaelger + .vaelger { margin-top: 6px; }
+#vand-haeld { margin-top: 9px; }
 
 /* Den knap, der er det naturlige naeste skridt, banker stille. */
 @keyframes bank {
@@ -625,9 +757,25 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .knap.banker { animation: bank 1.7s ease-out infinite; }
+.opgavekort .knap.stor { justify-content: center; }
+
+.teoriknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.teoriknap:hover { background-color: var(--panel-3); color: var(--tekst); }
 
 /* ---------------------------------------------------------------------
-   HJAELPE-OVERLAY
+   TEORIEN
    --------------------------------------------------------------------- */
 .overlay {
     position: fixed;
@@ -647,7 +795,7 @@ main { flex: 1; position: relative; min-height: 0; }
     border: 1px solid var(--linje);
     border-radius: 14px;
     box-shadow: var(--skygge);
-    max-width: 620px;
+    max-width: 640px;
     width: 100%;
     max-height: 100%;
     overflow-y: auto;
@@ -665,13 +813,25 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .overlay-boks p, .overlay-boks li {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     line-height: 1.55;
     color: #c8ced6;
     margin: 0 0 8px 0;
 }
 
 .overlay-boks ul { margin: 0; padding-left: 20px; }
+
+.ligning {
+    background-color: #111117;
+    border: 1px solid #3f3f4d;
+    border-radius: var(--radius-lil);
+    color: #7ee0a8;
+    text-align: center;
+    padding: 9px 6px;
+    margin: 4px 0 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
 
 kbd {
     background-color: #14141a;
@@ -683,6 +843,78 @@ kbd {
     font-size: 0.8rem;
     color: var(--tekst);
 }
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som sc1.1 og sc2.4)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning[hidden] { display: none; }
+
+.rundvisning-baggrund {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.rundvisning-tal {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--tekst-mat);
+}
+
+.rundvisning-luk {
+    background: transparent;
+    border: none;
+    color: var(--tekst-svag);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.rundvisning-luk:hover { color: var(--tekst); }
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.86rem; line-height: 1.5; color: #c8ced6; }
+
+.rundvisning-knapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
 
 /* ---------------------------------------------------------------------
    TILGAENGELIGHED OG SMALLE SKAERME
@@ -723,67 +955,11 @@ select:focus-visible {
     .fane.aktiv { display: grid; }
     .scene { height: 70vh; min-height: 460px; }
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
-    .opgave-boks { top: 12px; left: 12px; width: calc(100% - 24px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
-
-/* ---------------------------------------------------------------------
-   TILSTANDSVALG: byg frit eller opgaver - samme bord, to maader
-   --------------------------------------------------------------------- */
-.tilstandsvalg {
-    display: flex;
-    gap: 4px;
-    background-color: rgba(0, 0, 0, 0.22);
-    border: 1px solid #3a3a47;
-    border-radius: var(--radius);
-    padding: 4px;
-}
-
-.tilstandsknap {
-    flex: 1;
-    background: transparent;
-    color: var(--tekst-svag);
-    border: none;
-    border-radius: var(--radius-lil);
-    padding: 9px 6px;
-    font-family: inherit;
-    font-size: 0.86rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.16s ease, color 0.16s ease;
-}
-
-.tilstandsknap:hover { color: var(--tekst); background-color: var(--panel-2); }
-.tilstandsknap.aktiv { background-color: var(--blaa); color: #ffffff; }
-
-/* Sværhedsgrad - kun synlig i Opgaver-tilstanden, lige under knapperne
-   ovenfor. Lilla, saa den ikke forveksles med blaa (tilstand) eller
-   groen/roed (rigtig/forkert svar). */
-.sv-valg {
-    display: flex;
-    gap: 4px;
-    margin-top: 6px;
-}
-
-.svknap {
-    flex: 1;
-    background-color: var(--panel-2);
-    color: var(--tekst-svag);
-    border: 1px solid #4a4a58;
-    border-radius: var(--radius-lil);
-    padding: 6px 6px;
-    font-family: inherit;
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
-}
-
-.svknap:hover { color: var(--tekst); border-color: #5e5e70; }
-.svknap.aktiv { background-color: var(--lilla); color: #ffffff; border-color: var(--lilla); }
 
 /* ---------------------------------------------------------------------
    TRAEK OG SLIP
@@ -794,3 +970,50 @@ select:focus-visible {
 .chip { cursor: grab; }
 .chip:active:not(:disabled) { cursor: grabbing; }
 .traekker .chip { cursor: grabbing; }
+#vand-laerred { touch-action: manipulation; }
+
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
+   sted som knappen, der springer den over (js/praesentation.js) */
+.tilbud {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(20, 20, 28, 0.94);
+    border: 1px solid #4a4a58;
+    border-radius: 999px;
+    padding: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.tilbud button {
+    font-family: inherit;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    padding: 9px 18px;
+    font-size: 0.98rem;
+}
+
+.tilbud-start {
+    background-color: var(--blaa-mork);
+    border: 2px solid var(--gul);
+    color: #ffffff;
+    animation: bank 1.7s ease-out infinite;
+}
+
+.tilbud-start span { color: var(--gul); margin-left: 4px; }
+.tilbud-start:hover { background-color: var(--blaa); }
+
+.tilbud-nej {
+    background-color: transparent;
+    border: 1px solid #5e5e70;
+    color: var(--tekst-svag);
+}
+
+.tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }

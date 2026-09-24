@@ -1,10 +1,16 @@
 /* =====================================================================
-   sim_byg.js - selve spillet: vaelg valenselektroner, traek atomer
+   sim_byg.js - fanen Byg: vaelg valenselektroner, traek atomer
    sammen, byg bindinger, tjek mod oktetreglen.
 
+   Eleven taeller selv. Der staar intet elektrontal ved atomerne, og
+   symbolerne skifter ikke farve undervejs. Foerst "Tjek svar" viser,
+   hvilke atomer der ikke passer (roed ring og "for faa"/"for mange").
+   Hjaelpen kommer i trin paa én knap: Giv hint, Tael for mig (nu staar
+   elektrontallet ved hvert atom) og Vis svaret (facit i hintboksen).
+
    Objektet foelger samme moenster som resten af superanimationerne:
-   tilpas(), opdater(dt), tegn() og nulstil(). Fordi der kun er én
-   "fane" her, kaldes de altid - se js/app.js.
+   tilpas(), opdater(dt), tegn() og nulstil(). Kun den aktive fane
+   tegnes; musen virker kun, naar aktiv er sat - se js/app.js.
    ===================================================================== */
 (function () {
     "use strict";
@@ -16,23 +22,25 @@
     var SNAP_AFSTAND = 105;
     var BRYD_AFSTAND = 200;
 
+    /* Knappens tekst foer hvert trin i hjaelpen */
+    var HJAELP_KNAP = ["Giv hint", "Tæl for mig", "Vis svaret"];
+
     function loadFremskridt() {
-        var v = parseInt(localStorage.getItem(GEM_FREMSKRIDT), 10);
+        var v = parseInt(NK.hent(GEM_FREMSKRIDT, 0), 10);
         return (isNaN(v) || v < 0 || v >= NK.OPGAVER.length) ? 0 : v;
     }
 
     function loadLoeste() {
-        try {
-            var arr = JSON.parse(localStorage.getItem(GEM_LOEST));
-            if (Array.isArray(arr)) return NK.OPGAVER.map(function (_, i) { return !!arr[i]; });
-        } catch (e) { /* ignoreres - starter forfra */ }
+        var arr = NK.hent(GEM_LOEST, null);
+        if (Array.isArray(arr)) return NK.OPGAVER.map(function (_, i) { return !!arr[i]; });
         return NK.OPGAVER.map(function () { return false; });
     }
 
-    NK.SimByg = function () {
-        this.laerred = new NK.Laerred(NK.el("laerred"));
+    NK.SimByg = function (laerred) {
+        this.laerred = laerred;
         this.linjeLaerred = new NK.Laerred(NK.el("stregformel-laerred"));
         this.loeste = loadLoeste();
+        this.aktiv = true;
 
         this.state = {
             niveau: 0,
@@ -41,7 +49,10 @@
             unikkeAtomer: [],
             atomer: [],
             bindinger: [],
-            partikler: []
+            partikler: [],
+            hjaelp: 0,          /* 0: ingen, 1: hint, 2: elektrontal, 3: svaret */
+            markering: {},      /* { atom-id: "faa" | "mange" } efter Tjek svar */
+            fejlTjek: 0
         };
 
         this.traekAtom = null;
@@ -67,7 +78,6 @@
             knap.addEventListener("click", function () { self.initNiveau(i); });
             menu.appendChild(knap);
         });
-        NK.el("niveau-total").textContent = NK.OPGAVER.length;
     };
 
     NK.SimByg.prototype._opdaterOpgaveMenu = function () {
@@ -76,6 +86,10 @@
             knapper[i].classList.toggle("loest", this.loeste[i]);
             knapper[i].classList.toggle("aktiv", i === this.state.niveau);
         }
+    };
+
+    NK.SimByg.prototype.opdaterTaeller = function () {
+        NK.el("taeller-tekst").textContent = "Opgave " + (this.state.niveau + 1) + "/" + NK.OPGAVER.length;
     };
 
     /* ----- Niveaustyring ------------------------------------------------ */
@@ -89,15 +103,19 @@
         s.atomer = [];
         s.bindinger = [];
         s.partikler = [];
-        localStorage.setItem(GEM_FREMSKRIDT, idx);
+        s.hjaelp = 0;
+        s.markering = {};
+        s.fejlTjek = 0;
+        NK.gem(GEM_FREMSKRIDT, idx);
 
-        NK.el("niveau-nu").textContent = idx + 1;
+        if (this.aktiv) this.opdaterTaeller();
         NK.el("sejr-overlay").classList.add("skjult");
         NK.el("tjek-knap").classList.add("skjult");
         NK.el("nulstil-knap").classList.add("skjult");
+        NK.el("byg-knap").classList.add("skjult");
         NK.el("opsaetning-overlay").classList.remove("skjult");
         NK.el("stregformel-panel").classList.add("skjult");
-        this._skjulHint();
+        NK.skjulHint("byg");
 
         this._opdaterOpgaveMenu();
         this._opsaetningsFase();
@@ -112,7 +130,7 @@
             NK.el("tjek-knap").classList.remove("skjult");
             NK.el("nulstil-knap").classList.remove("skjult");
             NK.el("stregformel-panel").classList.remove("skjult");
-            NK.el("hint-knap").classList.remove("skjult");
+            this._opdaterHjaelpKnap();
             this._spawnAtomer();
             return;
         }
@@ -125,6 +143,7 @@
         NK.el("opsaetning-overskrift").innerHTML = s.delfase === 0
             ? "Før vi kan lave elektronprikformlen for " + opg.f + " (" + opg.navn + "), skal vi først betragte " + atomLabel
             : "Lad os nu se nærmere på " + atomLabel;
+        NK.el("valens-besked").textContent = "";
 
         var pt = NK.el("periodisk-system");
         pt.innerHTML = "";
@@ -148,18 +167,28 @@
             (function (tal) {
                 var knap = document.createElement("button");
                 knap.className = "valens-knap";
+                knap.type = "button";
                 knap.textContent = tal;
-                knap.addEventListener("click", function () {
-                    if (tal === NK.ELEMENTER[z].v) {
-                        self.state.delfase++;
-                        self._opsaetningsFase();
-                    } else {
-                        knap.classList.add("forkert");
-                        setTimeout(function () { knap.classList.remove("forkert"); }, 400);
-                    }
-                });
+                knap.addEventListener("click", function () { self.svarValens(tal, knap); });
                 knapper.appendChild(knap);
             }(i));
+        }
+    };
+
+    /* Et forkert tal blinker og giver et hint, der passer til fejlen. */
+    NK.SimByg.prototype.svarValens = function (tal, knap) {
+        var s = this.state;
+        if (s.fase !== "opsaetning") return;
+        var z = s.unikkeAtomer[s.delfase];
+        if (tal === NK.ELEMENTER[z].v) {
+            s.delfase++;
+            this._opsaetningsFase();
+            return;
+        }
+        NK.el("valens-besked").textContent = NK.valensHint(z, tal);
+        if (knap) {
+            knap.classList.add("forkert");
+            setTimeout(function () { knap.classList.remove("forkert"); }, 400);
         }
     };
 
@@ -168,11 +197,12 @@
         this.state.atomer = [];
         this.state.bindinger = [];
         this.state.partikler = [];
+        this.state.markering = {};
         this._spawnAtomer();
     };
 
     NK.SimByg.prototype._spawnAtomer = function () {
-        this.tilpas();
+        this.laerred.tilpas();
         var s = this.state;
         s.fase = "aktion";
         var liste = NK.OPGAVER[s.niveau].atomer;
@@ -190,43 +220,75 @@
         });
     };
 
+    /* Haenger alle atomerne sammen gennem bindingerne? */
+    NK.SimByg.prototype._sammenhaengende = function () {
+        var s = this.state;
+        if (!s.atomer.length) return true;
+        var set = {}, koe = [s.atomer[0]];
+        set[s.atomer[0].id] = true;
+        while (koe.length) {
+            var a = koe.shift();
+            s.bindinger.forEach(function (b) {
+                var n = b.s === a ? b.t : b.t === a ? b.s : null;
+                if (n && !set[n.id]) { set[n.id] = true; koe.push(n); }
+            });
+        }
+        return s.atomer.every(function (a) { return set[a.id]; });
+    };
+
     NK.SimByg.prototype.tjekSvar = function () {
         var s = this.state;
         if (s.fase !== "aktion") return;
+        s.markering = {};
 
-        if (s.atomer.length > 1 && s.bindinger.length < s.atomer.length - 1) {
-            this._visToast("Atomerne hænger ikke sammen!");
+        if (!this._sammenhaengende()) {
+            this._fejlTjek("Atomerne hænger ikke sammen.");
             return;
         }
 
-        var fejlAtom = null;
-        for (var i = 0; i < s.atomer.length; i++) {
-            if (!NK.atomStatus(s, s.atomer[i]).stabil) { fejlAtom = s.atomer[i]; break; }
-        }
+        var forkerte = [];
+        s.atomer.forEach(function (a) {
+            var st = NK.atomStatus(s, a);
+            if (st.stabil) return;
+            forkerte.push({ a: a, st: st });
+            s.markering[a.id] = st.nu < st.maal ? "faa" : "mange";
+        });
 
-        if (!fejlAtom) {
+        if (!forkerte.length) {
             s.fase = "sejr";
             NK.el("sejr-sprite").src = "sprites/" + NK.OPGAVER[s.niveau].sprite;
             NK.el("sejr-overlay").classList.remove("skjult");
             NK.el("tjek-knap").classList.add("skjult");
             NK.el("nulstil-knap").classList.add("skjult");
+            NK.el("byg-knap").classList.add("skjult");
+            NK.skjulHint("byg");
             this.loeste[s.niveau] = true;
-            localStorage.setItem(GEM_LOEST, JSON.stringify(this.loeste));
+            NK.gem(GEM_LOEST, this.loeste);
             this._opdaterOpgaveMenu();
             this._spawnKonfetti();
+            return;
+        }
+
+        if (forkerte.length === 1) {
+            var f = forkerte[0];
+            this._fejlTjek("Prøv igen: " + NK.ELEMENTER[f.a.z].n.toLowerCase() + " har for " +
+                (f.st.nu < f.st.maal ? "få" : "mange") + " elektroner.");
         } else {
-            var navn = NK.ELEMENTER[fejlAtom.z].n;
-            var st = NK.atomStatus(s, fejlAtom);
-            this._visToast(st.nu < st.maal ? "Prøv igen: " + navn + " mangler elektroner." : "Prøv igen: " + navn + " har for mange elektroner!");
+            this._fejlTjek("Prøv igen: de røde atomer passer ikke med oktetreglen.");
         }
     };
 
-    NK.SimByg.prototype._visToast = function (tekst) {
-        var t = NK.el("toast");
-        t.textContent = tekst;
-        t.classList.add("vis");
-        clearTimeout(this._toastTimer);
-        this._toastTimer = setTimeout(function () { t.classList.remove("vis"); }, 3000);
+    /* Efter tre forkerte tjek i træk minder hjaelpeknappen om sig selv. */
+    NK.SimByg.prototype._fejlTjek = function (tekst) {
+        var s = this.state;
+        NK.visToast(tekst);
+        s.fejlTjek++;
+        if (s.fejlTjek >= 3 && s.hjaelp < HJAELP_KNAP.length) {
+            var k = NK.el("byg-knap");
+            k.classList.remove("puf");
+            void k.offsetWidth;
+            k.classList.add("puf");
+        }
     };
 
     NK.SimByg.prototype._spawnKonfetti = function () {
@@ -246,17 +308,24 @@
         this.initNiveau(this.state.niveau + 1);
     };
 
-    /* ----- Hint: skjult indtil eleven selv beder om den ----------------- */
-    NK.SimByg.prototype.skiftHint = function () {
-        var boks = NK.el("hint-boks");
-        var vis = !boks.classList.contains("vis");
-        if (vis) NK.el("hint-tekst").textContent = NK.OPGAVER[this.state.niveau].hint;
-        boks.classList.toggle("vis", vis);
+    /* ----- Hjaelpen: én knap, ét trin ad gangen ------------------------- */
+    NK.SimByg.prototype.hjaelp = function () {
+        var s = this.state;
+        if (s.fase !== "aktion" || s.hjaelp >= HJAELP_KNAP.length) return;
+        s.hjaelp++;
+        var opg = NK.OPGAVER[s.niveau];
+        if (s.hjaelp === 1) NK.visHint("byg", "Hint", opg.hint);
+        else if (s.hjaelp === 2) NK.visHint("byg", "Hint", opg.hint + " Nu står elektrontallet ved hvert atom.");
+        else NK.visHint("byg", "Svaret", "Byg den, og tryk Tjek svar.", "sprites/" + opg.sprite);
+        this._opdaterHjaelpKnap();
     };
 
-    NK.SimByg.prototype._skjulHint = function () {
-        NK.el("hint-boks").classList.remove("vis");
-        NK.el("hint-knap").classList.add("skjult");
+    NK.SimByg.prototype._opdaterHjaelpKnap = function () {
+        var k = NK.el("byg-knap");
+        var s = this.state;
+        k.classList.remove("puf");
+        k.classList.toggle("skjult", s.fase !== "aktion" || s.hjaelp >= HJAELP_KNAP.length);
+        if (s.hjaelp < HJAELP_KNAP.length) k.textContent = HJAELP_KNAP[s.hjaelp];
     };
 
     /* ----- Traek og slip ------------------------------------------------- */
@@ -296,12 +365,13 @@
 
         cvs.addEventListener("mousedown", function (e) {
             var s = self.state;
-            if (s.fase !== "aktion") return;
+            if (!self.aktiv || s.fase !== "aktion") return;
             var p = self._musPunkt(e);
             var i = self._bindingVed(p);
             if (i >= 0) {
                 if (s.bindinger[i].orden >= 3) s.bindinger.splice(i, 1);
                 else s.bindinger[i].orden++;
+                s.markering = {};
                 return;
             }
             self.traekAtom = self._atomVed(p);
@@ -309,6 +379,7 @@
         });
 
         window.addEventListener("mousemove", function (e) {
+            if (!self.aktiv) return;
             var p = self._musPunkt(e);
             var t = self.traekAtom;
             if (!t) {
@@ -333,6 +404,7 @@
             var t = self.traekAtom;
             if (t) {
                 var s = self.state;
+                var foer = s.bindinger.length;
                 s.bindinger = s.bindinger.filter(function (b) {
                     if (b.s !== t && b.t !== t) return true;
                     var modpart = (b.s === t) ? b.t : b.s;
@@ -351,6 +423,7 @@
                     var mine = s.bindinger.filter(function (b) { return b.s === t || b.t === t; });
                     if (mine.length === 1) self._placerVed(t, mine[0].s === t ? mine[0].t : mine[0].s);
                 }
+                if (s.bindinger.length !== foer) s.markering = {};
                 cvs.style.cursor = "grab";
             }
             self.traekAtom = null;
@@ -360,7 +433,6 @@
 
     /* ----- Faelles grænseflade: tilpas / opdater / tegn / nulstil ------- */
     NK.SimByg.prototype.tilpas = function () {
-        this.laerred.tilpas();
         this.linjeLaerred.tilpas();
     };
 
@@ -369,16 +441,31 @@
            kun for at foelge samme grænseflade som de andre superanimationer. */
     };
 
+    NK.SimByg.prototype.nulstil = function () {
+        this.nulstilNiveau();
+    };
+
     NK.SimByg.prototype.tegn = function () {
         var ctx = this.laerred.ctx;
+        var s = this.state;
         ctx.fillStyle = "#14141a";
         ctx.fillRect(0, 0, this.laerred.b, this.laerred.h);
 
-        var opg = NK.OPGAVER[this.state.niveau];
-        var geo = NK.OPGAVE_GEOMETRI[this.state.niveau];
-        if (this.state.fase === "aktion" || this.state.fase === "sejr") {
-            NK.tegnStregformel(this.linjeLaerred.ctx, this.linjeLaerred.b, this.linjeLaerred.h, opg, geo, this.state);
-            NK.tegnSpil(ctx, this.state, { snap: this.snapMaal, hover: this.hoverAtom, traek: this.traekAtom });
-        }
+        var opg = NK.OPGAVER[s.niveau];
+        var geo = NK.OPGAVE_GEOMETRI[s.niveau];
+        if (s.fase !== "aktion" && s.fase !== "sejr") return;
+
+        var vis = {
+            snap: this.snapMaal, hover: this.hoverAtom, traek: this.traekAtom,
+            taeller: s.hjaelp >= 2,
+            stabilGroen: s.fase === "sejr",
+            ringe: {}, etiketter: {}
+        };
+        Object.keys(s.markering).forEach(function (id) {
+            vis.ringe[id] = "roed";
+            if (!vis.taeller) vis.etiketter[id] = { tekst: s.markering[id] === "faa" ? "for få" : "for mange", farve: "roed" };
+        });
+        NK.tegnStregformel(this.linjeLaerred.ctx, this.linjeLaerred.b, this.linjeLaerred.h, opg, geo, s);
+        NK.tegnSpil(ctx, s, vis);
     };
 }());

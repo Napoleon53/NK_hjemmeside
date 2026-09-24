@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, sc2.4 Fældningsreaktioner</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at tabellen og opgaverne stemmer, at alle
+   skemaer er afstemt, at svarmulighederne har praecis ét rigtigt svar,
+   at skrivefelterne goer det rigtige med det, eleven taster, at de
+   typiske fejl bliver genkendt, at alle tre niveauer kan gennemfoeres,
+   at baegerglassene ender med det rigtige bundfald, og at sproget
+   overholder reglerne. Skal koeres gennem en lokal server (Chrome
+   maa ikke kigge ind i en iframe paa file://).
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1200); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    var D = NK.Data, F = NK.Formel;
+    paastand("tre niveauer er bygget", !!(NK.niveauer && NK.niveauer.tabel && NK.niveauer.vaelg && NK.niveauer.skriv));
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    var i, j, o, par, fejlliste;
+
+    overskrift("2. Fældningstabellen");
+    paastand("alle " + D.OPLOESNINGER.length + " opløsninger er L i tabellen",
+        D.OPLOESNINGER.every(function (s) { return D.opl(s.kat.id, s.an.id) === "L"; }));
+    var xCeller = [];
+    D.KAT_ORDEN.forEach(function (k) { D.AN_ORDEN.forEach(function (a) { if (D.opl(k, a) === "x") xCeller.push(k + "-" + a); }); });
+    paastand("hvert ÷ har en forklaring, og hver forklaring et ÷ (" + xCeller.length + ")",
+        xCeller.every(function (k) { return !!D.FINDES_IKKE[k]; }) && Object.keys(D.FINDES_IKKE).length === xCeller.length);
+    paastand("nitrater og alle salte med Na⁺, K⁺ er L",
+        D.KAT_ORDEN.every(function (k) { return D.opl(k, "NO3") === "L"; })
+        && D.AN_ORDEN.every(function (a) { return D.opl("Na", a) === "L" && D.opl("K", a) === "L"; }));
+    var kendte = { "Ag-Cl": "T", "Ba-SO4": "T", "Pb-I": "T", "Ca-CO3": "T", "Ba-OH": "L", "Mg-SO4": "L", "Cu-OH": "T", "Ca-SO4": "T", "Ag-SO4": "T" };
+    paastand("stikprøver: AgCl, BaSO₄, PbI₂, CaCO₃ T, Ba(OH)₂ og MgSO₄ L",
+        Object.keys(kendte).every(function (k) { var x = k.split("-"); return D.opl(x[0], x[1]) === kendte[k]; }));
+
+    overskrift("3. Opgaverne");
+    var antal = { en: 0, ingen: 0, begge: 0 }, trin = { 1: 0, 2: 0, 3: 0 };
+    fejlliste = [];
+    D.PAR.forEach(function (p) {
+        antal[p.udfald]++;
+        if (p.udfald === "en") trin[p.trin]++;
+        var o = D.lavOpgave(p, false), m = o.maengde;
+        if (!m || m.ioner > D.MAKS_IONER || m.glasA > D.MAKS_GLAS || m.glasB > D.MAKS_GLAS) fejlliste.push(p.noegle + " maengde");
+        var t = o.nye.filter(function (n) { return n.kode === "T"; }).length;
+        if ((p.udfald === "en") !== (t === 1) || (p.udfald === "ingen") !== (t === 0)) fejlliste.push(p.noegle + " udfald");
+        if (o.nye.some(function (n) { return n.kode === "x"; })) fejlliste.push(p.noegle + " ÷");
+        if (p.udfald !== "ingen") {
+            var f = D.fuldtSkema(o.A, o.B);
+            var ok = f && f.cA * o.A.p === f.c0 * o.nye[0].salt.p && f.cB * o.B.n === f.c0 * o.nye[0].salt.n
+                && f.cB * o.B.p === f.c1 * o.nye[1].salt.p && f.cA * o.A.n === f.c1 * o.nye[1].salt.n;
+            if (!ok) fejlliste.push(p.noegle + " fuldt skema");
+        }
+    });
+    paastand(D.PAR.length + " par: " + antal.en + " med ét bundfald, " + antal.ingen + " uden, " + antal.begge + " med to",
+        antal.en > 60 && antal.ingen > 20 && antal.begge > 3);
+    paastand("ét bundfald fordelt på trin 1, 2, 3: " + trin[1] + ", " + trin[2] + ", " + trin[3], trin[1] >= 5 && trin[2] >= 10 && trin[3] >= 10);
+    paastand("alle par: rigtigt udfald, ingen ÷, afstemt fuldt skema, højst 20 ioner og 12 pr. glas",
+        fejlliste.length === 0, fejlliste.slice(0, 4).join(", "));
+    fejlliste = [];
+    D.PAR.forEach(function (p) {
+        var o = D.lavOpgave(p, false);
+        o.faeld.forEach(function (S) {
+            if (S.p * S.kat.q + S.n * S.an.q !== 0 || NK.gcd(S.p, S.n) !== 1) fejlliste.push(S.formel);
+            var sk = D.ionskema(S);
+            if (sk.indexOf(S.formel + "(s)") < 0 || sk.indexOf("(aq)") < 0) fejlliste.push(sk);
+        });
+    });
+    paastand("alle bundfald er neutrale i mindste forhold, og ionskemaet slutter med (s)", fejlliste.length === 0, fejlliste.slice(0, 3).join(", "));
+
+    overskrift("4. Svarmuligheder på niveau 2");
+    var fejlIon = [], fejlFormel = [];
+    D.PAR.filter(function (p) { return p.udfald === "en"; }).forEach(function (p) {
+        var o = D.lavOpgave(p, false);
+        var rigtige = o.ioner.map(D.ionTekst), at = D.ionAtrapper(o), set = {};
+        at.forEach(function (a) { set[a.tekst] = 1; });
+        if (at.length !== 4 || Object.keys(set).length !== 4 || at.some(function (a) { return rigtige.indexOf(a.tekst) >= 0 || !a.forklaring; })) {
+            fejlIon.push(p.noegle);
+        }
+        var fv = D.formelVarianter(o.P).slice(0, 3), fs = {};
+        fv.forEach(function (v) { fs[v.ascii] = 1; });
+        if (fv.length !== 3 || Object.keys(fs).length !== 3 || fv.some(function (v) { return v.ascii === o.P.ascii || !v.forklaring; })) fejlFormel.push(p.noegle);
+    });
+    paastand("fire forskellige forkerte ioner med forklaring i hver opgave", fejlIon.length === 0, fejlIon.slice(0, 3).join(", "));
+    paastand("tre forskellige forkerte formler med forklaring i hver opgave", fejlFormel.length === 0, fejlFormel.slice(0, 3).join(", "));
+    o = D.lavOpgave(D.PAR.filter(function (p) { return p.noegle === "Ba-Cl+K-CO3"; })[0], false);
+    var atTekst = D.ionAtrapper(o).map(function (a) { return a.tekst; }).join(" ");
+    paastand("BaCl₂ + K₂CO₃ giver de typiske fejl Ba⁺, Cl₂⁻, K₂⁺ og O²⁻: " + atTekst,
+        ["Ba⁺", "Cl₂⁻", "K₂⁺", "O²⁻"].every(function (t) { return atTekst.indexOf(t) >= 0; }));
+
+    overskrift("5. Skrivefeltet formaterer, mens der tastes");
+    var TAST = [["Ag3PO4", "Ag₃PO₄"], ["PO43-", "PO₄³⁻"], ["NO3-", "NO₃⁻"], ["Fe3+", "Fe³⁺"], ["NH4+", "NH₄⁺"],
+        ["CO32-", "CO₃²⁻"], ["SO42-", "SO₄²⁻"], ["OH-", "OH⁻"], ["Ca3(PO4)2", "Ca₃(PO₄)₂"], ["3 Ag+", "3 Ag⁺"],
+        ["PO4-", "PO₄⁻"], ["Cl-", "Cl⁻"], ["Ba2+", "Ba²⁺"], ["Al3+", "Al³⁺"], ["HCO3-", "HCO₃⁻"], ["Fe(OH)3", "Fe(OH)₃"],
+        ["no3-", "NO₃⁻"], ["po43-", "PO₄³⁻"], ["co32-", "CO₃²⁻"], ["so42-", "SO₄²⁻"], ["fe3+", "Fe³⁺"], ["nh4+", "NH₄⁺"],
+        ["hco3-", "HCO₃⁻"], ["CL-", "Cl⁻"], ["ag3po4", "Ag₃PO₄"], ["ca3(po4)2", "Ca₃(PO₄)₂"], ["feoh3", "Fe(OH)₃"], ["2i-", "2I⁻"], ["pbi2", "PbI₂"],
+        ["ca3po42", "Ca₃(PO₄)₂"], ["Ca3PO42", "Ca₃(PO₄)₂"], ["nh42so4", "(NH₄)₂SO₄"], ["al2so43", "Al₂(SO₄)₃"], ["bano32", "Ba(NO₃)₂"], ["caoh2", "Ca(OH)₂"]];
+    TAST.forEach(function (x) {
+        /* Tegn for tegn, som naar eleven taster. */
+        var s = "";
+        x[0].split("").forEach(function (c) { s = F.formater(s + c); });
+        paastand(x[0] + " bliver til " + x[1], s === x[1], "fik " + s);
+    });
+    var LAD = [["Fe₃", 3, "Fe³⁺"], ["NO₃", -1, "NO₃⁻"], ["PO₄₃", -3, "PO₄³⁻"], ["PO₄", -3, "PO₄³⁻"], ["Ag⁺", 2, "Ag²⁺"], ["SO₄", -2, "SO₄²⁻"]];
+    LAD.forEach(function (x) {
+        var s = F.saetLadning(x[0], x[1]);
+        paastand("ladningsknap " + NK.ladningstekst(x[1]) + " på " + x[0] + " giver " + x[2], s === x[2], "fik " + s);
+    });
+    fejlliste = [];
+    D.IONER.forEach(function (ion) {
+        var tast = D.ascii(ion.formel) + (Math.abs(ion.q) > 1 ? Math.abs(ion.q) : "") + (ion.q > 0 ? "+" : "-"), s = "";
+        tast.split("").forEach(function (c) { s = F.formater(s + c); });
+        if (s !== D.ionTekst(ion)) fejlliste.push(tast + " -> " + s);
+    });
+    paastand("alle " + D.IONER.length + " ioner tastet på den korte måde bliver rigtige", fejlliste.length === 0, fejlliste.join(", "));
+
+    overskrift("6. Typiske fejl bliver genkendt");
+    function find(noegle) { return D.lavOpgave(D.PAR.filter(function (p) { return p.noegle === noegle; })[0], false); }
+    o = find("Ag-NO3+Na-PO4");
+    var ktxB = { o: o, salt: o.B, forventet: [o.B.kat, o.B.an], brugt: [], andre: [o.A.kat, o.A.an] };
+    function ion(t) { return F.vurderIon(F.formater(t), ktxB); }
+    function salt(t, oo) { return F.vurderSalt(F.formater(t), (oo || o).P, { o: oo || o }); }
+    [["Na+", true, ""], ["PO43-", true, ""], ["Na3+", false, "3-tal"], ["Na", false, "ladning"], ["Na-", false, "Fortegnet"],
+     ["P3-", false, "samlet ion"], ["O2-", false, "samlet ion"], ["Ag+", false, "anden opløsning"], ["na+", true, ""], ["po43-", true, ""],
+     ["Na3PO4", false, "hele saltet"], ["Na1+", false, "uden tal"], ["Na+2", false, "før fortegnet"]].forEach(function (x) {
+        var v = ion(x[0]);
+        paastand("ion i Na₃PO₄: " + x[0] + (x[1] ? " godkendes" : " giver '" + x[2] + "'"),
+            v.ok === x[1] && (x[1] || v.tekst.indexOf(x[2]) >= 0), v.tekst);
+    });
+    [["Ag3PO4", true, ""], ["AgPO4", false, "går ikke op"], ["PO4Ag3", false, "positive ion"], ["Ag6(PO4)2", false, "forkortes"],
+     ["NaNO3", false, "letopløseligt"], ["Na3PO4", false, "ingen Na"], ["ag3po4", true, ""], ["Ag3(PO4)", false, "Parentes"],
+     ["3Ag3PO4", false, "uden tal foran"]].forEach(function (x) {
+        var v = salt(x[0]);
+        paastand("formel for Ag₃PO₄: " + x[0] + (x[1] ? " godkendes" : " giver '" + x[2] + "'"),
+            v.ok === x[1] && (x[1] || v.tekst.indexOf(x[2]) >= 0), v.tekst);
+    });
+    var o2 = find("Ca-Cl+Na-PO4");
+    [["Ca3(PO4)2", true, ""], ["Ca3PO42", true, ""], ["ca3po42", true, ""], ["Ca3P2O8", false, "samlet"], ["Ca2(PO4)3", false, "byttet om"],
+     ["CaPO4", false, "går ikke op"]].forEach(function (x) {
+        var v = salt(x[0], o2);
+        paastand("formel for Ca₃(PO₄)₂: " + x[0] + (x[1] ? " godkendes" : " giver '" + x[2] + "'"),
+            v.ok === x[1] && (x[1] || v.tekst.indexOf(x[2]) >= 0), v.tekst);
+    });
+    function skema(l) {
+        return F.vurderSkema(l.map(function (x) { return { koef: x[0], tekst: F.formater(x[1]), tilst: x[2] }; }), o);
+    }
+    [[[["3", "Ag+", "aq"], ["", "PO43-", "aq"], ["", "Ag3PO4", "s"]], true, ""],
+     [[["", "PO43-", "aq"], ["3", "Ag+", "aq"], ["", "Ag3PO4", "s"]], true, ""],
+     [[["3", "Ag+", "aq"], ["", "Na+", "aq"], ["", "Ag3PO4", "s"]], false, "tilskuerion"],
+     [[["", "Ag+", "aq"], ["", "PO43-", "aq"], ["", "Ag3PO4", "s"]], false, "indeholder"],
+     [[["6", "Ag+", "aq"], ["2", "PO43-", "aq"], ["2", "Ag3PO4", "s"]], false, "forkortes"],
+     [[["3", "Ag+", "aq"], ["", "PO43-", "aq"], ["", "Ag3PO4", "aq"]], false, "fast stof"],
+     [[["3", "Ag+", "aq"], ["", "PO43-", ""], ["", "Ag3PO4", "s"]], false, "tilstandsform"],
+     [[["3", "AgNO3", "aq"], ["", "Na3PO4", "aq"], ["", "Ag3PO4", "s"]], false, "hver for sig"],
+     [[["3", "Ag+", "aq"], ["3", "Ag+", "aq"], ["", "Ag3PO4", "s"]], false, "to gange"]].forEach(function (x, n) {
+        var v = skema(x[0]);
+        paastand("ionskema " + (n + 1) + (x[1] ? " godkendes" : " giver '" + x[2] + "'"),
+            v.ok === x[1] && (x[1] || v.tekst.indexOf(x[2]) >= 0), v.tekst);
+    });
+
+    overskrift("7. Det rigtige svar godkendes i alle opgaver");
+    fejlliste = [];
+    D.PAR.filter(function (p) { return p.udfald === "en"; }).forEach(function (p) {
+        [false, true].forEach(function (byt) {
+            var o = D.lavOpgave(p, byt), P = o.P;
+            [o.A, o.B].forEach(function (S) {
+                var T = S === o.A ? o.B : o.A;
+                [S.kat, S.an].forEach(function (i) {
+                    var tast = D.ascii(i.formel) + (Math.abs(i.q) > 1 ? Math.abs(i.q) : "") + (i.q > 0 ? "+" : "-"), s = "";
+                    tast.split("").forEach(function (c) { s = F.formater(s + c); });
+                    var v = F.vurderIon(s, { o: o, salt: S, forventet: [S.kat, S.an], brugt: [], andre: [T.kat, T.an] });
+                    if (!v.ok) fejlliste.push(p.noegle + ": " + s + " " + v.tekst);
+                });
+            });
+            var sv = "";
+            D.ascii(P.formel).split("").forEach(function (c) { sv = F.formater(sv + c); });
+            if (!F.vurderSalt(sv, P, { o: o }).ok) fejlliste.push(p.noegle + ": " + sv);
+            var led = [{ koef: P.p > 1 ? String(P.p) : "", tekst: D.ionTekst(P.kat), tilst: "aq" },
+                       { koef: P.n > 1 ? String(P.n) : "", tekst: D.ionTekst(P.an), tilst: "aq" },
+                       { koef: "", tekst: P.formel, tilst: "s" }];
+            var vs = F.vurderSkema(led, o);
+            if (!vs.ok) fejlliste.push(p.noegle + ": skema " + vs.tekst);
+            var a = F.vurderAfstemning(P, P.p, P.n, 1, ["aq", "aq", "s"]);
+            if (!a.ok) fejlliste.push(p.noegle + ": afstemning");
+        });
+    });
+    paastand("ioner, formel og ionskema godkendes i begge rækkefølger", fejlliste.length === 0, fejlliste.slice(0, 3).join(" | "));
+
+    overskrift("8. Alle tre niveauer kan gennemføres");
+    function kor(niv, sek) { for (var t = 0; t < sek * 60; t++) niv.baeger.opdater(1 / 60, 900, 520); }
+    function parAf(n) { return D.PAR.filter(function (p) { return p.noegle === n; })[0]; }
+    NK.visNiveau("tabel");
+    var nt = NK.niveauer.tabel, f0 = nt.loest;
+    nt.nyOpgave(parAf("Ag-NO3+Na-PO4"), false);
+    paastand("niveau 1 (Let): samme fire trin, ionerne er givet, og man starter på trin 2",
+        nt.def.trin.map(function (t) { return t.navn; }).join(",") === NK.NIVEAUER.skriv.trin.map(function (t) { return t.navn; }).join(",")
+        && nt.status[0] === "givet" && nt.trin === 1);
+    nt.tabelKlik("Ag", "NO3");
+    paastand("niveau 1: klik på det gamle par giver en forklaring", /flasken/.test(nt.besked.tekst) && nt.trin === 1, nt.besked.tekst);
+    nt.tabelKlik("Ag", "PO4"); nt.tabelKlik("Na", "NO3");
+    paastand("niveau 1: begge nye par fundet, anden del af trin 2", nt.trin === 1 && nt.s.fase === "b");
+    nt.valgKlik(1);
+    paastand("niveau 1: NaNO₃ falder ud er forkert med forklaring", nt.trin === 1 && /letopløseligt/.test(nt.besked.tekst), nt.besked.tekst);
+    nt.valgKlik(0);
+    paastand("niveau 1: løst, formel og ionskema vises, tælleren går op", nt.faerdig && nt.loest === f0 + 1
+        && nt.status[2] === "givet" && nt.status[3] === "givet" && d.getElementById("tavle").textContent.indexOf("3 Ag⁺(aq) + PO₄³⁻(aq) → Ag₃PO₄(s)") >= 0);
+    kor(nt, 7);
+    var b = nt.baeger, iBunke = b.ioner.filter(function (p) { return p.bunke; }), P1 = nt.o.P;
+    var enh = nt.o.maengde.nA / 3;
+    paastand("niveau 1: bundfaldet i glasset er " + iBunke.length + " ioner = " + enh + " Ag₃PO₄, alle landet",
+        iBunke.length === enh * 4 && iBunke.every(function (p) { return p.fast; }));
+    paastand("niveau 1: tilskuerionerne svømmer stadig (" + (b.ioner.length - iBunke.length) + ")",
+        b.ioner.filter(function (p) { return !p.bunke; }).every(function (p) { return p.ion.id === "Na" || p.ion.id === "NO3"; }));
+    paastand("niveau 1: ionerne er inde i glasset", b.ioner.every(function (p) { return p.u >= -0.01 && p.u <= 1.01 && p.v >= -0.01 && p.v <= 1.01; }));
+
+    nt.nyOpgave(parAf("K-NO3+Na-Cl"), false);
+    nt.knap(); nt.knap();
+    nt.valgKlik(3);
+    paastand("niveau 1: intet bundfald, svaret vist, tælleren står stille", nt.faerdig && nt.vist && nt.loest === f0 + 1);
+    kor(nt, 6);
+    paastand("niveau 1: intet bundfald i glasset", nt.baeger.ioner.every(function (p) { return !p.bunke; }) && nt.baeger.fase === "blandet");
+
+    NK.visNiveau("vaelg");
+    var nv = NK.niveauer.vaelg;
+    nv.nyOpgave(parAf("Fe3-Cl+Na-OH"), false);
+    var fejlKlik = -1;
+    nv.s.chips.forEach(function (c, i) { if (!c.ion && fejlKlik < 0) fejlKlik = i; });
+    nv.valgKlik(fejlKlik);
+    paastand("niveau 2: forkert ion giver forklaring", nv.trin === 0 && nv.besked.klasse === "skidt");
+    nv.s.chips.forEach(function (c, i) { if (c.ion === nv.o.A.kat) nv.valgKlik(i); });
+    var synlige = function (g) { return nv.baeger.ioner.filter(function (p) { return p.glas === g; }).every(function (p) { return p.maalAlfa === 1; }); };
+    paastand("niveau 2: én ion fra et salt fundet, glassene er stadig tomme", !synlige("A") && !synlige("B"));
+    nv.s.chips.forEach(function (c, i) { if (c.ion === nv.o.A.an) nv.valgKlik(i); });
+    paastand("niveau 2: begge ioner fra " + nv.o.A.formel + " fundet, de dukker op i dets glas", synlige("A") && !synlige("B"));
+    nv.s.chips.forEach(function (c, i) { if (c.ion && !nv.s.fundneIoner[c.ion.id]) nv.valgKlik(i); });
+    paastand("niveau 2: fire ioner fundet, trin 2", nv.trin === 1);
+    nv.tabelKlik("Na", "Cl");
+    paastand("niveau 2: det letopløselige par giver L-forklaring", nv.trin === 1 && /letopløseligt/.test(nv.besked.tekst));
+    nv.tabelKlik("Fe3", "OH");
+    paastand("niveau 2: Fe(OH)₃ fundet, tilskuerionerne streget ud", nv.trin === 2 && d.querySelectorAll("#tavle .ion.tilskuer").length === 2);
+    nv.s.formelValg.forEach(function (v, i) { if (v.rigtig) nv.valgKlik(i); });
+    paastand("niveau 2: formlen valgt, trin 4", nv.trin === 3);
+    nv.s.k = [1, 3, 1]; nv.s.t = ["aq", "aq", "s"]; nv.tjek();
+    paastand("niveau 2: ionskemaet afstemt, løst", nv.faerdig && !nv.vist && nv.loest === 1);
+    paastand("niveau 2: tavlen viser Fe³⁺(aq) + 3 OH⁻(aq) → Fe(OH)₃(s)",
+        d.getElementById("tavle").textContent.indexOf("Fe³⁺(aq) + 3 OH⁻(aq) → Fe(OH)₃(s)") >= 0);
+
+    NK.visNiveau("skriv");
+    var ns = NK.niveauer.skriv;
+    ns.nyOpgave(parAf("Pb-NO3+K-I"), false);
+    function tast(t) { var s = ""; t.split("").forEach(function (c) { s = F.formater(s + c); }); return s; }
+    ns.s.felt.A0 = tast("Pb2+"); ns.s.felt.A1 = tast("NO3-"); ns.s.felt.B0 = tast("K+"); ns.s.felt.B1 = tast("I");
+    ns.tjek();
+    paastand("niveau 3: tre rigtige felter låses, I uden ladning giver besked", ns.trin === 0 && ns.s.ok.A0 && ns.s.ok.B0 && !ns.s.ok.B1
+        && /ladning/.test(ns.besked.tekst), ns.besked.tekst);
+    paastand("niveau 3: ionerne i Pb(NO₃)₂ er i glasset, KI's er ikke",
+        ns.baeger.ioner.every(function (p) { return (p.glas === "A") === (p.maalAlfa === 1); }));
+    ns.s.felt.B1 = tast("I-"); ns.tjek();
+    paastand("niveau 3: ionerne godkendt, trin 2", ns.trin === 1);
+    ns.tabelKlik("Pb", "I");
+    ns.s.felt.P = tast("PbI2"); ns.tjek();
+    paastand("niveau 3: PbI₂ godkendt, trin 4 med formlen skrevet i forvejen", ns.trin === 3 && ns.s.felt.f2 === "PbI₂");
+    ns.s.felt.k0 = ""; ns.s.felt.f0 = tast("Pb2+"); ns.s.felt.t0 = "aq";
+    ns.s.felt.k1 = ""; ns.s.felt.f1 = tast("2I-"); ns.s.felt.t1 = "aq"; ns.s.felt.t2 = "s";
+    ns.tjek();
+    paastand("niveau 3: 2 skrevet foran I⁻ flyttes over i talfeltet, løst", ns.faerdig && ns.s.felt.k1 === "2" && ns.loest === 1, ns.besked.tekst);
+    kor(ns, 7);
+    var bs = ns.baeger.ioner.filter(function (p) { return p.bunke; });
+    paastand("niveau 3: bundfaldet er PbI₂ i forholdet 1 : 2",
+        bs.length > 0 && bs.filter(function (p) { return p.ion.id === "I"; }).length === 2 * bs.filter(function (p) { return p.ion.id === "Pb"; }).length);
+
+    /* Tastning i et rigtigt felt paa siden, som naar eleven skriver. */
+    ns.nyOpgave(parAf("Ag-NO3+Na-PO4"), true);
+    var felt = d.querySelector('#tavle .skrivefelt[data-felt="A1"]');
+    felt.focus();
+    felt.value = "PO43-";
+    felt.setSelectionRange(5, 5);
+    felt.dispatchEvent(new w.Event("input", { bubbles: true }));
+    paastand("niveau 3: PO43- tastet i feltet står som PO₄³⁻ og gemmes", felt.value === "PO₄³⁻" && ns.s.felt.A1 === "PO₄³⁻", felt.value);
+    var felt2 = d.querySelector('#tavle .skrivefelt[data-felt="B0"]');
+    felt2.focus();
+    felt2.value = "Ag";
+    felt2.dispatchEvent(new w.Event("input", { bubbles: true }));
+    d.querySelector('#ab-valg [data-q="1"]').click();
+    paastand("niveau 3: ladningsknappen + sætter Ag⁺ i det felt, man står i", felt2.value === "Ag⁺" && ns.s.felt.B0 === "Ag⁺", felt2.value);
+    felt2.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("niveau 3: Enter tjekker", ns.besked.klasse === "skidt" && ns.s.ok.B0 === "Ag", ns.besked.tekst);
+
+    ns.nyOpgave();
+    for (i = 0; i < 8 && !ns.faerdig; i++) ns.knap();
+    paastand("niveau 3: kun hjælpeknappen gennemfører opgaven, tælleren står stille", ns.faerdig && ns.vist && ns.loest === 1);
+    paastand("niveau 3: hjælpeknappen hedder Ny opgave til sidst", d.getElementById("opgaveknap").textContent === "Ny opgave");
+
+    overskrift("9. Mange tilfældige opgaver i glassene");
+    fejlliste = [];
+    var nb = new NK.Baeger();
+    D.PAR.filter(function (p, n) { return n % 7 === 0; }).forEach(function (p) {
+        var o = D.lavOpgave(p);
+        nb.saetOpgave(o, true);
+        for (var t = 0; t < 30; t++) nb.opdater(1 / 60, 900, 520);
+        nb.bland(o.faeld);
+        for (t = 0; t < 8 * 60; t++) nb.opdater(1 / 60, 900, 520);
+        var forvent = 0;
+        o.faeld.forEach(function (S) {
+            var nKat = 0, nAn = 0;
+            nb.ioner.forEach(function (q) { if (q.ion === S.kat) nKat++; if (q.ion === S.an) nAn++; });
+            forvent += Math.min(Math.floor(nKat / S.p), Math.floor(nAn / S.n)) * (S.p + S.n);
+        });
+        var iB = nb.ioner.filter(function (q) { return q.bunke; });
+        if (iB.length !== forvent || !iB.every(function (q) { return q.fast; }) || nb.fase !== "blandet") fejlliste.push(p.noegle);
+        if (!nb.ioner.every(function (q) { return q.glas === "M" && q.u > -0.02 && q.u < 1.02 && q.v > -0.02 && q.v < 1.02; })) fejlliste.push(p.noegle + " uden for");
+    });
+    paastand("glassene blandes, og bundfaldet lander helt i " + Math.ceil(D.PAR.length / 7) + " opgaver", fejlliste.length === 0, fejlliste.slice(0, 3).join(", "));
+
+    overskrift("10. Kemichael præsenterer");
+    var K = NK.Kemichael, lr = NK.laerer;
+    paastand("Kemichael er indlæst fra den fælles mappe", !!(K && lr && lr.laerer));
+    if (lr) {
+        var korL = function (sek) { for (var t = 0; t < sek * 60; t++) lr.opdater(1 / 60); };
+        lr.stopIntro(); korL(3);
+        w.localStorage.removeItem("nk-sc2.4-intro");
+        NK.visNiveau("vaelg");
+        korL(1.2);
+        var tilbud = d.getElementById("tilbud");
+        paastand("første gang Middel åbnes, står der Start præsentation og Nej tak, og han kommer ikke af sig selv",
+            !tilbud.hidden && !lr.laererIIntro() && !(lr.introVent > 0));
+        tilbud.querySelector(".tilbud-start").click();
+        korL(1.2);
+        paastand("Start præsentation: han går ind og præsenterer Middel", tilbud.hidden && lr.laererIIntro() && lr.introId === "vaelg");
+        paastand("knappen Spring præsentationen over står fremme", !d.getElementById("spring-over").hidden);
+        var pegede = false;
+        for (var t = 0; t < 30 * 60 && lr.laererIIntro(); t++) {
+            lr.opdater(1 / 60);
+            if (d.getElementById("opgavekort").classList.contains("peg")) pegede = true;
+        }
+        paastand("han peger på opgavekortet, mens han taler om trinene", pegede);
+        paastand("han går igen af sig selv, og knappen forsvinder", !lr.laererIIntro() && d.getElementById("spring-over").hidden
+            && !d.getElementById("opgavekort").classList.contains("peg"));
+        NK.visNiveau("tabel"); korL(0.5); NK.visNiveau("vaelg"); korL(1.5);
+        paastand("anden gang Middel åbnes, præsenterer han ikke igen", !lr.laererIIntro());
+        lr.startIntro("vaelg", true); korL(1);
+        paastand("K viser præsentationen igen", lr.laererIIntro());
+        d.getElementById("spring-over").click(); korL(0.2);
+        paastand("Spring over sender ham ud", !lr.laererIIntro());
+        NK.visNiveau("skriv"); korL(1.2);
+        var visteTilbud = !tilbud.hidden;
+        d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); korL(0.2);
+        paastand("Svær: tilbuddet står fremme, og Esc er Nej tak (huskes)", visteTilbud && tilbud.hidden && !lr.laererIIntro() &&
+            !!(JSON.parse(w.localStorage.getItem("nk-sc2.4-intro")) || {}).skriv);
+        NK.visNiveau("vaelg"); korL(0.3);
+        paastand("et niveau, der er set, viser ikke tilbuddet", tilbud.hidden);
+        lr.startIntro("skriv", true); korL(1);
+        d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); korL(0.2);
+        paastand("Esc under præsentationen sender ham ud", !lr.laererIIntro());
+        var lange = [];
+        Object.keys(D.INTRO).forEach(function (id) {
+            D.INTRO[id].forEach(function (l) { if (l.length > 60) lange.push(l); });
+        });
+        paastand("tre præsentationer à tre replikker på højst 60 tegn",
+            Object.keys(D.INTRO).length === 3 && lange.length === 0 && D.INTRO.tabel.length === 3, lange.join(" | "));
+    }
+
+    overskrift("11. Sproget");
+    var tekster = [d.body.innerText];
+    D.PAR.forEach(function (p) {
+        var o = D.lavOpgave(p);
+        D.ionAtrapper(o).forEach(function (a) { tekster.push(a.tekst + " " + a.forklaring); });
+        if (o.P) {
+            D.formelVarianter(o.P).forEach(function (v) { tekster.push(v.tekst + " " + v.forklaring); });
+            var k = D.formelKatalog(o.P);
+            Object.keys(k).forEach(function (x) { tekster.push(k[x]); });
+            tekster.push(D.ionskema(o.P), D.hvorforFormel(o.P));
+        }
+    });
+    Object.keys(D.FINDES_IKKE).forEach(function (k) { tekster.push(D.FINDES_IKKE[k]); });
+    Object.keys(D.INTRO).forEach(function (k) { tekster = tekster.concat(D.INTRO[k]); });
+    ["tabel", "vaelg", "skriv"].forEach(function (id) {
+        NK.NIVEAUER[id].trin.forEach(function (t) { tekster.push(typeof t.spm === "string" ? t.spm : "", t.navn); });
+    });
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−])1[+−]|¹[⁺⁻]/.test(alt), (alt.match(/.{0,20}(1[+−]|¹[⁺⁻]).{0,20}/) || [""])[0]);
+    var ingenSmaa = [];
+    Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+        if (!e.offsetWidth || !e.childNodes.length) return;
+        var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+        if (!harTekst) return;
+        var fs = parseFloat(w.getComputedStyle(e).fontSize);
+        if (fs < 11.5) ingenSmaa.push(e.tagName + "." + e.className + " " + fs + "px");
+    });
+    paastand("ingen synlig tekst under 12 px", ingenSmaa.length === 0, ingenSmaa.slice(0, 4).join(", "));
+
+    vis();
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

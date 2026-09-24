@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kemi-Lykkehjulet</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-skaerm="titel">
+
+<header class="top">
+    <h1><span class="ikon">✺</span> Kemi-Lykkehjulet</h1>
+    <span class="status" id="status"></span>
+    <div class="topknapper">
+        <button class="teoriknap" id="gaadeknap" type="button" title="Alle gåder, finalen og resultatet" hidden>Gåder</button>
+        <button class="teoriknap" id="nytknap" type="button" title="Holdene, quizzen og et nyt spil">Nyt spil</button>
+        <button class="teoriknap" id="regelknap" type="button" title="Reglerne og genvejene">Regler</button>
+        <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra">🔊</button>
+        <button class="ikonknap" id="fuldknap" type="button" title="Fuld skærm" aria-label="Fuld skærm" hidden>⛶</button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main id="studie">
+    <section class="scene" id="scene">
+        <div class="tavle-plads">
+            <div class="tavle" id="tavle">
+                <img class="tavle-ramme" src="sprites/tavle.svg" alt="">
+                <div class="fliser" id="fliser"></div>
+            </div>
+        </div>
+        <div class="kategori-raekke">
+            <div class="kategori" id="kategori"></div>
+            <div class="kategori-lille" id="kategori-lille"></div>
+            <div class="ur" id="ur" hidden></div>
+        </div>
+        <p class="besked" id="besked" aria-live="polite"></p>
+        <div class="plakat" id="plakat" hidden></div>
+    </section>
+
+    <section class="styring" aria-label="Styring">
+        <div class="bogstaver" id="bogstaver">
+            <div class="bogstavgruppe" id="konsonanter" aria-label="Konsonanter"></div>
+            <div class="bogstavgruppe vokaler" id="vokaler" aria-label="Vokaler"></div>
+        </div>
+        <div class="knaprad">
+            <div class="drejet" id="drejet"></div>
+            <div class="skaermknapper" id="knapper"></div>
+        </div>
+    </section>
+
+    <section class="podier" id="podier" aria-label="Holdene"></section>
+
+    <!-- Hjulet daekker scenen og styringen, men ikke podierne -->
+    <section class="hjulscene" id="hjulscene" hidden>
+        <div class="hjul-navn" id="hjul-navn"></div>
+        <div class="hjul-plads" id="hjul-plads"></div>
+        <div class="hjul-besked" id="hjul-besked" hidden></div>
+    </section>
+
+    <!-- Titelskaermen daekker hele studiet, ogsaa podierne -->
+    <section class="titel" id="titel">
+        <img class="titel-logo" src="sprites/titel.svg" alt="Kemi-Lykkehjulet">
+        <div class="opsaetning" id="opsaetning">
+            <div class="opsaetning-raekke">
+                <span class="etiket">Quiz</span>
+                <select id="quizvalg" aria-label="Quiz"></select>
+                <button type="button" class="pille graa lille-pille" id="egneknap" title="Skriv, upload eller eksportér quizzer som tekst">Quizzer som tekst</button>
+            </div>
+            <div class="titel-quiz" id="titel-quiz"></div>
+            <div class="opsaetning-raekke">
+                <span class="etiket">Hold</span>
+                <div class="holdantal">
+                    <button type="button" id="hold-minus" aria-label="Færre hold">−</button>
+                    <b id="hold-antal">3</b>
+                    <button type="button" id="hold-plus" aria-label="Flere hold">+</button>
+                </div>
+            </div>
+            <div class="holdnavne" id="holdnavne"></div>
+            <div class="titel-knapper">
+                <p class="lydkilde" id="lydkilde"></p>
+                <button type="button" class="pille" id="fortsaet" hidden>Fortsæt spillet</button>
+                <button type="button" class="pille gul" id="start">Start spillet</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kemichael tegnes her, oven paa det hele -->
+    <canvas id="laerred" aria-hidden="true"></canvas>
+    <div class="tilbud" id="tilbud" hidden>
+        <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+        <button class="tilbud-nej" type="button">Nej tak</button>
+    </div>
+    <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="regler">
+    <div class="overlay-boks">
+        <h2>Reglerne</h2>
+        <h3>Toss-up</h3>
+        <p>Bogstaverne dukker op ét ad gangen. Holdet, der først rækker hånden op, svarer. Et rigtigt svar giver beløbet med det samme, og holdet begynder den næste runde. Et forkert svar sender holdet ud af denne toss-up.</p>
+        <h3>En runde</h3>
+        <ul>
+            <li>Holdet med lyset drejer hjulet og siger en konsonant. Hvert felt med konsonanten giver det beløb, hjulet viser.</li>
+            <li>En vokal koster 250 kr. af rundens point. Y er en vokal, og Æ, Ø og Å er med.</li>
+            <li>Holdet beholder turen, så længe bogstaverne er der. Ellers går turen videre.</li>
+            <li>Fallit sletter holdets point i runden. Mist tur giver turen videre.</li>
+            <li>Holdet, der løser gåden, får rundens point lagt til sine samlede, dog mindst 1.000 kr. De andre hold får intet fra runden.</li>
+        </ul>
+        <h3>Finalen</h3>
+        <p>Holdet med flest point drejer præmiehjulet og får en kuvert. R, S, T, L, N og E vises. Holdet vælger 3 konsonanter og 1 vokal og har så 10 sekunder til at løse gåden. Kuvertens beløb vises til sidst.</p>
+        <h3>Til læreren</h3>
+        <p>Klik på lampen over et hold for at give det turen. Klik på navnet eller pointene for at rette dem. Fortryd træder et skridt tilbage. Spillet huskes, også hvis siden lukkes.</p>
+        <h3>Genveje</h3>
+        <p><kbd>Mellemrum</kbd> den gule knap &nbsp;·&nbsp; <kbd>A</kbd> til <kbd>Å</kbd> bogstav &nbsp;·&nbsp; <kbd>1</kbd> til <kbd>4</kbd> svarer i toss-up &nbsp;·&nbsp; <kbd>X</kbd> forkert &nbsp;·&nbsp; <kbd>Ctrl</kbd> + <kbd>Z</kbd> fortryd &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichael &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper">
+            <button class="knap blaa" id="regler-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="gaader">
+    <div class="overlay-boks">
+        <h2>Gåderne</h2>
+        <p>Klik på en gåde for at spille den. Pointene fra en gåde, der er spillet, bliver stående.</p>
+        <ol class="gaade-liste" id="gaade-liste"></ol>
+        <div class="knapper vandret">
+            <button class="knap" id="gaade-resultat" type="button">Resultat</button>
+            <button class="knap blaa" id="gaader-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="egne">
+    <div class="overlay-boks bredest">
+        <h2>Quizzer som tekst</h2>
+        <p class="egne-kilde" id="egne-kilde"></p>
+        <div class="egne-grid">
+            <div class="egne-venstre">
+                <textarea id="egne-tekst" spellcheck="false" aria-label="Quizzen som tekst"></textarea>
+                <p class="egne-status" id="egne-status"></p>
+            </div>
+            <div class="egne-hoejre">
+                <div class="egne-preview" id="egne-preview"></div>
+            </div>
+        </div>
+        <details class="egne-format">
+            <summary>Formatet</summary>
+            <pre>Titel: Kemi B, grundbegreber
+
+Toss-up: Organisk kemi ; Substitutions-reaktion
+Runde: Ligevægte ; Le Chateliers princip
+Toss-up 2000: Begreb ved reaktionsskemaer ; Tilstandsform
+Final: I naturen ; Koffein</pre>
+            <p>Én gåde pr. linje. Typen står før kolon, og kategori og løsning er delt af semikolon. En toss-up giver 1.000 kr., hvis der ikke står et andet beløb. Tavlen har fire rækker med 12, 14, 14 og 12 felter; et ord over 14 bogstaver deles med bindestreg, og / tvinger et linjeskift. // begynder en kommentar.</p>
+        </details>
+        <div class="egne-knapper">
+            <button class="knap" id="egne-upload" type="button" title="Hent en .txt-fil. Du kan også trække filen ind i tekstfeltet.">Upload fil</button>
+            <button class="knap" id="egne-eksport" type="button" title="Gem teksten som .txt-fil">Eksportér fil</button>
+            <button class="knap" id="egne-link" type="button" title="Et link med quizzen i. Den, der åbner linket, får quizzen.">Kopiér link</button>
+            <button class="knap" id="egne-ai" type="button" title="En vejledning, du kan give en AI sammen med dit emne">Kopiér vejledning til AI</button>
+            <button class="knap" id="egne-ny" type="button">Ny quiz</button>
+            <button class="knap advarsel" id="egne-slet" type="button" hidden>Slet quizzen</button>
+            <span class="mellemrum"></span>
+            <button class="knap" id="egne-luk" type="button">Luk</button>
+            <button class="knap blaa" id="egne-brug" type="button">Gem og brug</button>
+        </div>
+        <input type="file" id="egne-fil" accept=".txt,text/plain" hidden>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tavle.js"></script>
+<script src="js/tekstformat.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/hjul.js"></script>
+<script src="js/visning.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

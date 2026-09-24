@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<title>Selvtest — sc2.2 Saltbyggeren</title>
+<title>Selvtest, sc2.2 Saltbyggeren</title>
 <style>
     body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
     pre { margin:0; line-height:1.45; white-space:pre-wrap; }
@@ -21,7 +21,9 @@
    se på et skærmbillede: at kemien i data.js stemmer (formler, navne,
    atomtal, ladningsbalance, opløselighed), at ingen opgave kan stilles
    med et stof, der ikke findes, at hvert sæt svarmuligheder har præcis
-   ét rigtigt svar — og at fanernes egen logik reagerer rigtigt.
+   ét rigtigt svar, at krystalgitteret holder reglerne for alle salte,
+   at den ene opgaveknap virker på begge faner, og at sproget overholder
+   reglerne.
 
    Åbn den gennem en lokal server (eller i Firefox). Chrome nægter en
    side på file:// at kigge ind i sin egen iframe.
@@ -35,7 +37,11 @@ function paastand(navn, sand, note) {
 }
 function overskrift(t) { skriv("\n" + t, "h"); }
 
-window.addEventListener("load", function () { setTimeout(koer, 1400); });
+window.addEventListener("load", function () {
+    setTimeout(function () {
+        try { koer(); } catch (e) { fejl++; skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl"); vis(); }
+    }, 1400);
+});
 
 function koer() {
     var ramme = document.getElementById("ramme");
@@ -50,8 +56,7 @@ function koer() {
     paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-bord"] && NK.sims["fane-vand"]));
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
-    var skalHaveTekst = ["byg-formel", "byg-navn", "byg-l-kat", "byg-q-kat", "byg-q-sum", "bord-status",
-        "vand-spm", "vand-overskrift"];
+    var skalHaveTekst = ["bord-opgavetekst", "bord-opgaveknap", "vand-opgavetekst", "vand-opgaveknap", "vand-note"];
     var tomme = [];
     for (i = 0; i < skalHaveTekst.length; i++) {
         var e = d.getElementById(skalHaveTekst[i]);
@@ -59,8 +64,8 @@ function koer() {
     }
     paastand(skalHaveTekst.length + " udlæsninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
 
-    overskrift("3. Faneskift — præcis én aktiv ad gangen");
-    var faner = ["fane-bord", "fane-vand", "fane-bord"];
+    overskrift("3. Faneskift: præcis én aktiv ad gangen");
+    var faner = ["fane-bord", "fane-vand", "fane-ukendt", "fane-bord"];
     for (i = 0; i < faner.length; i++) {
         var knap = d.querySelector('.faneknap[data-fane="' + faner[i] + '"]');
         knap.click();
@@ -173,8 +178,9 @@ function koer() {
 
     overskrift("10. Tegningen passer med formlen");
     var uenige = [];
-    for (i = 0; i < D.IONER.length; i++) {
-        var ion = D.IONER[i];
+    var alleIoner = D.IONER.concat(D.UKENDTE);
+    for (i = 0; i < alleIoner.length; i++) {
+        var ion = alleIoner[i];
         if (!ion.sammensat) continue;
         var tegnet = {};
         ion.atomer.forEach(function (at) { tegnet[at[0]] = (tegnet[at[0]] || 0) + 1; });
@@ -186,13 +192,14 @@ function koer() {
     paastand("alle sammensatte ioner er tegnet med de rigtige atomer", uenige.length === 0, uenige.join(" | "));
 
     overskrift("11. Bordet");
-    var b = NK.sims["fane-bord"].bord;
-    b.laas(false);
+    var fb = NK.sims["fane-bord"];
+    var b = fb.bord;
+    fb.visFrit();
     b.ryd();
     b.vaelg(D.ion("Al"));
     b.vaelg(D.ion("SO4"));
-    paastand("Al³⁺ + SO₄²⁻ giver 3+ mod 2−", b.plus() === 3 && b.minus() === 2 && !b.neutral(),
-        b.plus() + "+ / " + b.minus() + "−");
+    paastand("Al³⁺ + SO₄²⁻ giver +3 mod −2", b.plus() === 3 && b.minus() === 2 && !b.neutral(),
+        b.plus() + " / " + b.minus());
     b.tilfoej("kat");
     b.tilfoej("an");
     b.tilfoej("an");
@@ -200,7 +207,7 @@ function koer() {
     b.tilfoej("kat");
     b.tilfoej("an");
     paastand("én mere af hver bryder balancen igen", b.plus() === 9 && b.minus() === 8 && !b.neutral(),
-        b.plus() + "+ / " + b.minus() + "−");
+        b.plus() + " / " + b.minus());
     b.tilfoej("kat");
     b.tilfoej("an");
     b.tilfoej("an");
@@ -211,125 +218,482 @@ function koer() {
     b.ryd();
     paastand("Ryd bordet tømmer begge rækker", !b.kat && !b.an && b.nKat === 0 && b.nAn === 0);
 
-    overskrift("12. Opgave: fra navn til formel");
-    var f2 = NK.sims["fane-bord"];
-    f2.saetTilstand("opgave");
-    f2.startOpgave(D.salt("Al", "SO4"), "navn");
-    paastand("opgaven starter i byggefasen", f2.fase === "byg" && d.getElementById("opgave-valgkort").hidden);
-    f2.bord.vaelg(D.ion("S"));
-    paastand("sulfid i stedet for sulfat giver en besked om forskellen", /sulfid/.test(f2.status || ""), f2.status);
-    f2.bord.saet(D.ion("Al"), 2, D.ion("SO4"), 3);
-    paastand("de rigtige ioner åbner formelvalget", f2.fase === "valg" && !d.getElementById("opgave-valgkort").hidden);
+    /* Træk fra hylden: browseren må hverken markere hylden som tekst
+       eller slæbe den med som et billede, og ionen skal lande. */
+    var cw = ramme.contentWindow, chip = b.chips["Ca"];
+    var cs = cw.getComputedStyle(chip);
+    paastand("hylden kan ikke markeres som tekst", (cs.userSelect || cs.webkitUserSelect) === "none",
+        cs.userSelect || cs.webkitUserSelect);
+    var dragEv = new cw.Event("dragstart", { bubbles: true, cancelable: true });
+    chip.dispatchEvent(dragEv);
+    paastand("browserens eget træk er slået fra på hylden", dragEv.defaultPrevented);
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
+    b.opdater(1 / 60);
+    var cr = b.canvas.getBoundingClientRect(), chr = chip.getBoundingClientRect();
+    function pe(type, x, y) {
+        return new cw.PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 7, button: 0,
+            clientX: x, clientY: y, pointerType: "mouse", isPrimary: true });
+    }
+    var ned = pe("pointerdown", chr.left + 10, chr.top + 10);
+    chip.dispatchEvent(ned);
+    chip.dispatchEvent(pe("pointermove", chr.left + 40, chr.top + 80));
+    chip.dispatchEvent(pe("pointermove", cr.left + cr.width / 2, cr.top + b.g.zy - 40));
+    chip.dispatchEvent(pe("pointerup", cr.left + cr.width / 2, cr.top + b.g.zy - 40));
+    paastand("pointerdown på en ion starter ikke en tekstmarkering", ned.defaultPrevented);
+    paastand("en Ca²⁺ trukket ned på bordet lander dér", b.kat && b.kat.id === "Ca" && b.nKat === 1,
+        b.kat ? b.kat.id + " × " + b.nKat : "ingen");
+    b.ryd();
+    b.slugKlik = false;
+    b.saet(D.ion("Mg"), 2, D.ion("SO4"), 2);
+    for (i = 0; i < 90; i++) b.opdater(1 / 60);
+    paastand("2 Mg²⁺ og 2 SO₄²⁻ giver en note om ens enheder", /2 ens enheder/.test(b.note()), b.note());
+    b.saet(D.ion("Al"), 2, D.ion("CO3"), 3);
+    for (i = 0; i < 90; i++) b.opdater(1 / 60);
+    paastand("Al₂(CO₃)₃ giver en note om, at stoffet ikke findes", /findes ikke/.test(b.note()), b.note());
+    b.ryd();
+    b.vaelg(D.ion("Ca"));
+    b.vaelg(D.ion("PO4"));
+    b.afstem();
+    for (i = 0; i < 900 && b.demo; i++) b.opdater(1 / 60);
+    paastand("Afstem for mig ender i Ca₃(PO₄)₂", b.nKat === 3 && b.nAn === 2 && !b.demo, b.nKat + " : " + b.nAn);
+    b.ryd();
+
+    overskrift("12. Byggefanen: den ene opgaveknap");
+    var knap = d.getElementById("bord-opgaveknap");
+    fb.visFrit();
+    paastand("sandkassen viser Start opgave og knapperne til bordet",
+        knap.textContent === "Start opgave" && !d.getElementById("byg-knapper").hidden && d.getElementById("bord-afslut").hidden);
+    knap.click();
+    paastand("Start opgave giver en opgave og knappen Giv hint",
+        !!fb.opgave && fb.fase === "byg" && knap.textContent === "Giv hint" && d.getElementById("byg-knapper").hidden,
+        knap.textContent);
+    knap.click();
+    paastand("Giv hint viser et hint og knappen Vis svaret",
+        d.getElementById("bord-hint").textContent.length > 10 && knap.textContent === "Vis svaret", knap.textContent);
+    var loestFoer = fb.loeste;
+    knap.click();
+    paastand("Vis svaret løser opgaven uden at tælle med", fb.fase === "faerdig" && fb.loeste === loestFoer
+        && knap.textContent === "Ny opgave");
+    knap.click();
+    paastand("Ny opgave giver en ny opgave i den anden retning", fb.fase === "byg" && knap.textContent === "Giv hint"
+        && fb.retning === "formel", fb.retning);
+    d.getElementById("bord-afslut").click();
+    paastand("Afslut fører tilbage til sandkassen", !fb.opgave && knap.textContent === "Start opgave"
+        && !d.getElementById("byg-knapper").hidden);
+
+    overskrift("13. Opgave: fra navn til formel");
+    fb.startOpgave(D.salt("Al", "SO4"), "navn");
+    paastand("formlen under bordet er slået fra under opgaven", !fb.bord.visFormel);
+    fb.bord.vaelg(D.ion("S"));
+    var besked = d.getElementById("bord-besked").textContent;
+    paastand("sulfid i stedet for sulfat giver en besked om forskellen", /sulfid/.test(besked) && /sulfat/.test(besked), besked);
+    fb.bord.saet(D.ion("Al"), 4, D.ion("SO4"), 6);
+    paastand("4 : 6 åbner ikke formelvalget", fb.fase === "byg");
+    fb.bord.saet(D.ion("Al"), 2, D.ion("SO4"), 3);
+    paastand("de rigtige ioner åbner formelvalget", fb.fase === "valg" && fb.svar.knapper.length === 4);
     var rigtig2 = -1;
-    for (i = 0; i < f2.svar.valg.length; i++) if (f2.svar.valg[i].rigtig) rigtig2 = i;
-    f2.svar.knapper[rigtig2].click();
-    paastand("rigtigt svar tæller med", f2.fase === "faerdig" && f2.loeste === 1, "løst: " + f2.loeste);
+    for (i = 0; i < fb.svar.valg.length; i++) if (fb.svar.valg[i].rigtig) rigtig2 = i;
+    loestFoer = fb.loeste;
+    fb.svar.knapper[rigtig2].click();
+    paastand("rigtigt svar tæller med, og knappen bliver Ny opgave",
+        fb.fase === "faerdig" && fb.loeste === loestFoer + 1 && knap.textContent === "Ny opgave", "løst: " + fb.loeste);
 
-    overskrift("13. Opgave: fra formel til navn");
-    var f3 = NK.sims["fane-bord"];
-    f3.startOpgave(D.salt("Fe3", "SO4"), "formel");
-    f3.bord.saet(D.ion("Fe2"), 2, D.ion("SO4"), 3);
-    paastand("Fe²⁺ med formlens tal giver besked om ladningen", f3.fase === "byg" && /jern/i.test(f3.status || ""), f3.status);
-    f3.bord.saet(D.ion("Fe3"), 2, D.ion("SO4"), 3);
-    paastand("Fe³⁺ åbner navnevalget", f3.fase === "valg");
+    overskrift("13b. Opgave: fra formel til navn");
+    fb.startOpgave(D.salt("Fe3", "SO4"), "formel");
+    fb.bord.saet(D.ion("Fe2"), 2, D.ion("SO4"), 3);
+    besked = d.getElementById("bord-besked").textContent;
+    paastand("Fe²⁺ med formlens tal giver besked om ladningen", fb.fase === "byg" && /Jern findes/.test(besked), besked);
+    paastand("hintet spørger efter ladningen", /ladning/.test(fb.hint()), fb.hint());
+    fb.bord.saet(D.ion("Fe3"), 2, D.ion("SO4"), 3);
+    paastand("Fe³⁺ åbner navnevalget", fb.fase === "valg");
     var rigtig3 = -1;
-    for (i = 0; i < f3.svar.valg.length; i++) if (f3.svar.valg[i].rigtig) rigtig3 = i;
-    paastand("det rigtige navn er jern(III)sulfat", f3.svar.valg[rigtig3].tekst === "jern(III)sulfat",
-        f3.svar.valg[rigtig3].tekst);
+    for (i = 0; i < fb.svar.valg.length; i++) if (fb.svar.valg[i].rigtig) rigtig3 = i;
+    paastand("det rigtige navn er jern(III)sulfat", fb.svar.valg[rigtig3].tekst === "jern(III)sulfat",
+        fb.svar.valg[rigtig3].tekst);
+    fb.visFrit();
 
-    overskrift("14. Fane 2: opløsning i vand");
+    overskrift("13c. Hints findes for alle opgaver og alle trin");
+    var tommeHints = [];
+    D.NAVN_OPGAVER.forEach(function (o) {
+        var s = D.salt(o.kat, o.an);
+        fb.startOpgave(s, "navn");
+        if (!fb.hint()) tommeHints.push(s.formel + " byg");
+        fb.bord.saet(s.kat, s.p, s.an, s.n);
+        if (fb.fase !== "valg" || !fb.hint()) tommeHints.push(s.formel + " valg");
+    });
+    D.FORMEL_OPGAVER.forEach(function (o) {
+        var s = D.salt(o.kat, o.an);
+        fb.startOpgave(s, "formel");
+        if (!fb.hint()) tommeHints.push(s.formel + " byg");
+        fb.bord.saet(s.kat, s.p, s.an, s.n);
+        if (fb.fase !== "valg" || !fb.hint()) tommeHints.push(s.formel + " valg");
+    });
+    paastand("hint og formel- eller navnevalg for " + (D.NAVN_OPGAVER.length + D.FORMEL_OPGAVER.length) + " opgaver",
+        tommeHints.length === 0, tommeHints.slice(0, 4).join(", "));
+    fb.visFrit();
+
+    overskrift("14. Skjul navnene, ogsaa i tooltip og beskeder");
+    var navneBoks = d.getElementById("byg-navne");
+    navneBoks.checked = false;
+    navneBoks.dispatchEvent(new ramme.contentWindow.Event("change"));
+    paastand("hylden skjuler navnene", d.getElementById("bord-scene").classList.contains("skjul-navne"));
+    paastand("en ions tooltip viser kun formlen", fb.bord.chips["Na"].title === "Na⁺", fb.bord.chips["Na"].title);
+    fb.startOpgave(D.salt("Na", "Cl"), "navn");
+    fb.bord.vaelg(D.ion("O"));
+    besked = d.getElementById("bord-besked").textContent;
+    paastand("fejlbeskeden nævner ikke ionernes navne", !!besked && besked.indexOf("oxid") < 0 && besked.indexOf("chlorid") < 0, besked);
+    navneBoks.checked = true;
+    navneBoks.dispatchEvent(new ramme.contentWindow.Event("change"));
+    paastand("navnene vises igen", fb.bord.chips["Na"].title === "natriumion  Na⁺", fb.bord.chips["Na"].title);
+    fb.visFrit();
+
+    overskrift("15. Vandfanen: sandkassen");
     var f4 = NK.sims["fane-vand"];
-    f4.startOpgave(D.salt("Na", "SO4"), "forudsig");
+    d.querySelector('.faneknap[data-fane="fane-vand"]').click();
+    f4.tilpas();
+    function koerVand(sek) { for (var t = 0; t < sek * 60; t++) { f4.tilpas(); f4.opdater(1 / 60); } }
+    paastand("lærredet har fået en rigtig størrelse", f4.l.b > 50, "l.b=" + f4.l.b);
+    f4.haeldSalt("Na", "SO4");
     var antal = { kat: 0, an: 0 };
     f4.ioner.forEach(function (o) { antal[o.ion.q > 0 ? "kat" : "an"]++; });
     paastand("krystallen har 2 Na⁺ pr. SO₄²⁻", antal.kat === 2 * antal.an, antal.kat + " Na⁺ / " + antal.an + " SO₄²⁻");
+    koerVand(9);
+    paastand("natriumsulfat går i opløsning, og ligningen står", f4.fase === "oploest" && f4.ligning, f4.fase);
     f4.haeldSalt("Ba", "SO4");
-    paastand("bariumsulfat bliver liggende", f4.art === "tung");
+    koerVand(2);
+    paastand("bariumsulfat bliver liggende", f4.art === "tung" && f4.fase === "tung" && !f4.ligning, f4.fase);
     f4.haeldSalt("NH4", "OH");
     paastand("ammoniumhydroxid findes ikke", f4.fase === "tom" && f4.ioner.length === 0);
     f4.haeldSalt("Na", "O");
-    paastand("natriumoxid reagerer med vandet", f4.fase === "tom");
+    paastand("natriumoxid reagerer med vandet", f4.fase === "tom" && /reagerer/.test(d.getElementById("vand-note").textContent));
     f4.haeldSalt("K", "NO3");
-    paastand("kaliumnitrat går i opløsning", f4.art === "let" && f4.ioner.length > 0);
+    koerVand(1.5);
+    f4.klik(f4.G.cx, f4.G.vb - 20);
+    paastand("et klik i vandet rører rundt", f4.roer > 0.9);
+    koerVand(6);
+    paastand("kaliumnitrat går i opløsning, også når der røres", f4.fase === "oploest");
 
-    overskrift("14b. Krystalgitteret: ioner med samme fortegn rører aldrig hinanden");
-    var par = [["Na", "Cl"], ["Mg", "Cl"], ["Na", "O"], ["Al", "Cl"], ["Na", "PO4"], ["Al", "SO4"], ["Ca", "PO4"]];
-    /* Lærredet faar kun en rigtig størrelse, naar fanen rent faktisk er
-       synlig (display:none giver 0×0) - skift dertil foerst. */
-    d.querySelector('.faneknap[data-fane="fane-vand"]').click();
-    f4.tilpas();
-    paastand("lærredet i fane-vand har fået en rigtig størrelse", f4.l.b > 50, "l.b=" + f4.l.b);
-    var fejlPar = [];
-    for (i = 0; i < par.length; i++) {
-        var salt5 = D.salt(par[i][0], par[i][1]);
-        f4.startOpgave(salt5, "forudsig");
-        f4.opdater(0.05);
-        f4.opdater(0.05);
-        var samlingFejl = false;
-        for (var a5 = 0; a5 < f4.ioner.length && !samlingFejl; a5++) {
-            for (var b5 = a5 + 1; b5 < f4.ioner.length; b5++) {
-                var ia = f4.ioner[a5], ib = f4.ioner[b5];
-                if ((ia.ion.q > 0) !== (ib.ion.q > 0)) continue;   /* forskelligt fortegn - maa gerne røre */
-                var dx5 = ia.mx - ib.mx, dy5 = ia.my - ib.my;
-                var d5 = Math.sqrt(dx5 * dx5 + dy5 * dy5);
-                var min5 = NK.ionGeo(ia.ion).R * f4.G.s + NK.ionGeo(ib.ion).R * f4.G.s;
-                if (d5 < min5 - 0.5) samlingFejl = true;
+    overskrift("15b. Vandfanen: den ene opgaveknap");
+    var vknap = d.getElementById("vand-opgaveknap");
+    f4.visFrit();
+    vknap.click();
+    paastand("Start opgave giver en forudsig-opgave i et tomt glas",
+        !!f4.opgave && f4.opgave.type === "forudsig" && f4.niveau === 0 && vknap.textContent === "Giv hint"
+        && d.getElementById("vand-saltkort").hidden, f4.opgave ? f4.opgave.type : "ingen");
+    koerVand(2);
+    paastand("krystallen ligger og venter på svaret", f4.fase === "krystal", f4.fase);
+    vknap.click();
+    paastand("Giv hint viser et hint", d.getElementById("vand-hint").textContent.length > 10 && vknap.textContent === "Vis svaret");
+    vknap.click();
+    koerVand(10);
+    paastand("Vis svaret fylder glasset, og saltet opløses", f4.niveau > 0.98 && f4.fase === "oploest" && f4.ligning,
+        f4.fase + " / " + f4.niveau.toFixed(2));
+    vknap.click();
+    paastand("Ny opgave giver en hvilket-opgave med frie ioner", f4.opgave.type === "hvilket"
+        && f4.ioner.every(function (o) { return o.fri; }) && !f4.ligning);
+    var rv = -1;
+    for (i = 0; i < f4.svar.valg.length; i++) if (f4.svar.valg[i].rigtig) rv = i;
+    loestFoer = f4.loeste;
+    f4.svar.knapper[rv].click();
+    koerVand(6);
+    paastand("rigtigt svar tæller, og vandet fordamper til en krystal", f4.loeste === loestFoer + 1 && f4.fase === "inddampet"
+        && f4.niveau < 0.02 && vknap.textContent === "Ny opgave", f4.fase);
+    d.getElementById("vand-afslut").click();
+    paastand("Afslut fører tilbage til sandkassen", !f4.opgave && !d.getElementById("vand-saltkort").hidden
+        && vknap.textContent === "Start opgave");
+
+    overskrift("16. Krystalgitteret for alle salte i vælgeren");
+    var gitterFejl = [], ikkeRoer = [], forhold = [];
+    D.KATIONER.forEach(function (kat) {
+        D.VAND_ANIONER.forEach(function (anId) {
+            var s = D.salt(kat.id, anId), L = NK.lavGitter(s), P = L.punkter;
+            var nK = P.filter(function (o) { return o.side === "kat"; }).length, nA = P.length - nK;
+            if (nK * s.n !== nA * s.p || L.k !== Math.round(L.k)) forhold.push(s.formel + " " + nK + ":" + nA);
+            for (var a = 0; a < P.length; a++) {
+                var naermest = Infinity;
+                for (var c = 0; c < P.length; c++) {
+                    if (a === c) continue;
+                    var dd = Math.sqrt((P[a].x - P[c].x) * (P[a].x - P[c].x) + (P[a].y - P[c].y) * (P[a].y - P[c].y));
+                    var kontakt = P[a].r + P[c].r;
+                    if (P[a].side === P[c].side && dd < kontakt + 0.01) gitterFejl.push(s.formel);
+                    if (P[a].side !== P[c].side) {
+                        if (dd < kontakt - 0.001) gitterFejl.push(s.formel + " overlap");
+                        naermest = Math.min(naermest, dd / kontakt);
+                    }
+                }
+                if (naermest > 1.02) ikkeRoer.push(s.formel);
             }
-        }
-        if (samlingFejl) fejlPar.push(salt5.formel + " (" + salt5.p + ":" + salt5.n + ")");
-    }
-    paastand("ingen to ioner med samme fortegn rører hinanden i " + par.length + " gittertyper",
-        fejlPar.length === 0, fejlPar.join(", "));
+        });
+    });
+    var antalSalte = D.KATIONER.length * D.VAND_ANIONER.length;
+    paastand(antalSalte + " salte: forholdet i krystallen er formlens", forhold.length === 0, forhold.slice(0, 4).join(", "));
+    paastand("ingen to ioner med samme ladning rører hinanden, og intet overlapper", gitterFejl.length === 0,
+        gitterFejl.slice(0, 4).join(", "));
+    paastand("hver ion rører mindst én ion med modsat ladning", ikkeRoer.length === 0, ikkeRoer.slice(0, 4).join(", "));
     d.querySelector('.faneknap[data-fane="fane-bord"]').click();
 
-    overskrift("14c. Svær skjuler navnene helt - ogsaa i tooltip og beskeder");
-    var fb0 = NK.sims["fane-bord"];
-    fb0.saetTilstand("opgave");
-    fb0.saetSvaerhed("svaer");
-    paastand("en ions chip-tooltip viser kun formlen i svær",
-        fb0.bord.chips["Na"].title === "Na⁺", "fik \"" + fb0.bord.chips["Na"].title + "\"");
-    fb0.startOpgave(D.salt("Na", "Cl"), "navn");                 /* garanteret "navn"-retning */
-    fb0.bord.vaelg(D.ion("O"));                                   /* helt sikkert den forkerte anion */
-    var laekker = fb0.status && (fb0.status.indexOf(D.ionNavn(D.ion("O"))) >= 0
-        || fb0.status.indexOf(D.ionNavn(D.ion("Cl"))) >= 0);
-    paastand("fejlbeskeden i svær nævner ikke ionernes navne", !laekker, fb0.status);
-    fb0.saetSvaerhed("let");
-    paastand("i let viser tooltippen navnet igen",
-        fb0.bord.chips["Na"].title === "natriumion  Na⁺", "fik \"" + fb0.bord.chips["Na"].title + "\"");
-    fb0.saetTilstand("frit");
+    overskrift("16b. Fane 3: den ukendte ion");
+    var fu = NK.sims["fane-ukendt"];
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    /* Gå gennem trin 1 (den kendte ion) ved at vælge det rigtige svar. */
+    function vaelgRigtig(sim) {
+        for (var ii = 0; ii < sim.svar.valg.length; ii++) if (sim.svar.valg[ii].rigtig) { sim.svar.knapper[ii].click(); return true; }
+        return false;
+    }
+    var entydig = [], iHylden = [], daarligValg = [], daarligKendt = [], tommeHint3 = [];
+    D.UKENDT_OPGAVER.forEach(function (o) {
+        var s = D.salt(o.kat, o.an), ukendtIon = D.ion(o.side === "kat" ? o.kat : o.an);
+        var kendtIon = D.ion(o.side === "kat" ? o.an : o.kat);
+        if (!ukendtIon.ukendt) iHylden.push(s.formel);
+        if (NK.gcd(s.p, s.n) !== 1 || s.p * s.kat.q + s.n * s.an.q !== 0) entydig.push(s.formel + " ikke neutral/forkortet");
+        /* Præcis én ladning mellem MIN og MAKS lukker lynlåsen. */
+        var loesninger = 0;
+        for (var q = D.UKENDT_MIN; q <= D.UKENDT_MAKS; q++) {
+            var plus = s.p * (o.side === "kat" ? q : s.kat.q), minus = s.n * (o.side === "an" ? q : -s.an.q);
+            if (plus === minus) loesninger++;
+        }
+        if (loesninger !== 1) entydig.push(s.formel + " (" + loesninger + " løsninger)");
+        var fejlK = tjekValg(kendtIon.formel, D.kendtValg(kendtIon), D.ionTekst(kendtIon));
+        if (fejlK) daarligKendt.push(fejlK);
+        var valg = o.side === "kat" ? D.romertalValg(s.kat, s.an) : D.formelValg(D.ion(o.partner), s.an);
+        var ventet = o.side === "kat" ? s.navn : D.formel(D.ion(o.partner), s.an);
+        var fejlV = tjekValg(s.formel, valg, ventet);
+        if (fejlV) daarligValg.push(fejlV);
+        fu.startOpgave(o);
+        if (fu.fase !== "intro" || fu.svar.knapper.length) tommeHint3.push(s.formel + " intro");
+        fu.begynd();
+        if (fu.fase !== "kendt" || !fu.hint()) tommeHint3.push(s.formel + " trin 1");
+        vaelgRigtig(fu);
+        if (fu.fase !== "ladning" || !fu.hint()) tommeHint3.push(s.formel + " trin 2");
+        fu.bord.saetGaet(Math.abs(fu.ion.q));
+        if (o.side === "an") {
+            var fejlP = tjekValg(D.ion(o.partner).formel, D.kendtValg(D.ion(o.partner)), D.ionTekst(D.ion(o.partner)));
+            if (fejlP) daarligKendt.push(fejlP);
+            if (fu.fase !== "partner" || !/periodiske/.test(fu.hint())) tommeHint3.push(s.formel + " partner");
+            vaelgRigtig(fu);
+        }
+        if (fu.fase !== "valg" || !fu.hint()) tommeHint3.push(s.formel + " sidste trin");
+        if (o.side === "kat" ? !/Romertallet/.test(fu.hint()) : !/lige op/.test(fu.hint())) tommeHint3.push(s.formel + " sidste hint");
+    });
+    NK.Opslag.luk();
+    paastand(D.UKENDT_OPGAVER.length + " opgaver: den ukendte ion ligger ikke på hylden", iHylden.length === 0, iHylden.join(", "));
+    paastand("præcis én ladning lukker lynlåsen i hver opgave", entydig.length === 0, entydig.slice(0, 4).join(", "));
+    paastand("den kendte ion og partneren: fire forskellige ladninger og én rigtig", daarligKendt.length === 0, daarligKendt.slice(0, 3).join(" | "));
+    paastand("navne- og formelvalg har fire forskellige svar og ét rigtigt", daarligValg.length === 0, daarligValg.slice(0, 3).join(" | "));
+    paastand("hint til alle trin i alle opgaver, og det sidste hint forklarer romertal eller forhold", tommeHint3.length === 0,
+        tommeHint3.slice(0, 4).join(", "));
+    var oValg = D.kendtValg(D.ion("O")).map(function (v) { return v.tekst; });
+    paastand("O: O⁶⁺ og O²⁺ er med som de typiske fejl", oValg.indexOf("O⁶⁺") >= 0 && oValg.indexOf("O²⁺") >= 0, oValg.join(", "));
+    var snO2 = D.romertalValg(D.ion("Sn4"), D.ion("O")).map(function (v) { return v.tekst; });
+    paastand("SnO₂: tin(II)oxid er med som fejlen, hvor 2-tallet læses som ladning", snO2.indexOf("tin(II)oxid") >= 0, snO2.join(", "));
+    var cr = D.romertalValg(D.ion("Cr3"), D.ion("SO4")).map(function (v) { return v.tekst; });
+    paastand("Cr₂(SO₄)₃: chrom(VI)sulfat er med som fejlen med den samlede ladning", cr.indexOf("chrom(VI)sulfat") >= 0, cr.join(", "));
+    paastand("hovedgruppen er 1-8: O står i hovedgruppe 6", D.ion("O").gruppe === 6 && D.hovedgruppe("O") === 6
+        && /hovedgruppe 6/.test(D.kendtValg(D.ion("O")).filter(function (v) { return v.rigtig; })[0].forklaring));
 
-    overskrift("15. De to tilstande på byggefanen");
-    var fb = NK.sims["fane-bord"];
-    fb.saetTilstand("frit");
-    paastand("Byg frit viser formel og regnskab, ikke opgaven",
-        !d.getElementById("frit-formelkort").hidden && !d.getElementById("frit-regnskab").hidden
-        && d.getElementById("opgave-kort").hidden);
-    paastand("bordet er låst op i Byg frit", !fb.bord.laast);
-    fb.saetTilstand("opgave");
-    paastand("Opgaver viser opgavekortet, ikke formlen",
-        d.getElementById("frit-formelkort").hidden && !d.getElementById("opgave-kort").hidden);
-    paastand("der står en opgave klar", !!fb.opgave && fb.fase === "byg",
-        fb.opgave ? fb.opgave.formel + " / " + fb.fase : "ingen");
-    var retninger = {};
-    for (i = 0; i < 6; i++) { fb.nyOpgave(); retninger[fb.retning] = (retninger[fb.retning] || 0) + 1; }
-    paastand("begge opgaveretninger kommer på skift", retninger.navn === 3 && retninger.formel === 3,
-        JSON.stringify(retninger));
-    fb.saetTilstand("frit");
+    d.querySelector('.faneknap[data-fane="fane-ukendt"]').click();
+    fu.springIntro();
+    var ukn = d.getElementById("ukendt-opgaveknap");
+    function koerU(sek) { for (var t = 0; t < sek * 60; t++) { fu.tilpas(); fu.opdater(1 / 60); } }
+    function trinSvar(n) { var e = d.querySelector("#ukendt-t" + n + " .trin-svar"); return e ? e.textContent : ""; }
+    function trinForkl(n) { var e = d.querySelector("#ukendt-t" + n + " .trin-forkl"); return e ? e.textContent : ""; }
+    function tomt(id) { return !d.getElementById(id).textContent.replace(/\s/g, ""); }
+    koerU(0.5);
+    var snOpg = D.UKENDT_OPGAVER.filter(function (o) { return o.kat === "Sn4"; })[0];
+    fu.startOpgave(snOpg);
+    koerU(1);
+    paastand("opgaven præsenteres først: SnO₂, Start opgave og ingen svarmuligheder endnu", fu.fase === "intro"
+        && ukn.textContent === "Start opgave" && fu.svar.knapper.length === 0
+        && /SnO₂/.test(d.getElementById("ukendt-opgavetekst").textContent), d.getElementById("ukendt-opgavetekst").textContent);
+    paastand("alle kort er foldet sammen uden plus og minus, og der er ingen knapper",
+        fu.bord.plus() === 0 && fu.bord.kort.every(function (k) { return fu.bord.tandKort(k) === 0; })
+        && fu.bord.styr.kat.el.style.display === "none" && fu.bord.styr.an.el.style.display === "none");
+    paastand("metalopgaven har tre trin", !d.getElementById("ukendt-t3").hidden && d.getElementById("ukendt-t4").hidden);
+    /* Plakaterne paa vaeggen kan altid klikkes op. */
+    var pl = fu.plakater, ucr = fu.bord.canvas.getBoundingClientRect();
+    function klikLaerred(x, y) {
+        fu.L.canvas.dispatchEvent(new cw.MouseEvent("click", { bubbles: true, cancelable: true, clientX: ucr.left + x, clientY: ucr.top + y }));
+    }
+    paastand("to plakater på væggen over bordet", !!(pl && pl.pt && pl.ioner) && pl.pt.y + pl.pt.h < fu.bord.g.y0
+        && pl.ioner.y + pl.ioner.h < fu.bord.g.y0 && pl.pt.x + pl.pt.b < pl.ioner.x, JSON.stringify(pl));
+    klikLaerred(pl.ioner.x + pl.ioner.b / 2, pl.ioner.y + pl.ioner.h / 2);
+    var ionerAaben = d.getElementById("opslag-ioner").classList.contains("vis");
+    NK.Opslag.luk();
+    klikLaerred(pl.pt.x + pl.pt.b / 2, pl.pt.y + pl.pt.h / 2);
+    paastand("et klik på en plakat åbner den stort, også før opgaven er startet", ionerAaben
+        && d.getElementById("opslag-pt").classList.contains("vis") && d.querySelectorAll("#pt-gitter .pt-hoved").length === 8);
+    d.querySelector("#opslag-pt [data-luk]").click();
+    ukn.click();
+    koerU(0.5);
+    paastand("Start opgave: trin 1 om O låses op, O-kortene lyser, og Kemichael kommer", fu.fase === "kendt"
+        && fu.svar.knapper.length === 4 && ukn.textContent === "Giv hint" && fu.bord.ukendt.marker
+        && /Start med/.test(d.getElementById("ukendt-opgavetekst").textContent)
+        && !!(fu.laerer && fu.laerer.scene && fu.laerer.scene.navn === "visStart"),
+        fu.laerer && fu.laerer.scene && fu.laerer.scene.navn);
+    paastand("ingen plakat er fremme, før der bedes om et hint", !NK.Opslag.aaben());
+    ukn.click();
+    paastand("Giv hint: det periodiske system kommer frem med O fremhævet, og plakaten lyser",
+        d.getElementById("opslag-pt").classList.contains("vis") && !!d.querySelector('.pt-celle.fremhaev[data-s="O"]')
+        && /hovedgruppe 6/.test(d.getElementById("pt-info").textContent)
+        && !!fu.plakatPuls && fu.plakatPuls.slags === "pt" && ukn.textContent === "Vis svaret", d.getElementById("pt-info").textContent);
+    d.querySelector("#opslag-pt [data-luk]").click();
+    paastand("Luk lukker plakaten, og linket i hintet åbner den igen", !NK.Opslag.aaben()
+        && (function () { d.querySelector("#ukendt-hint [data-opslag]").click(); return d.getElementById("opslag-pt").classList.contains("vis"); }()));
+    d.querySelector("#opslag-pt [data-luk]").click();
+    var forkertK = -1;
+    for (i = 0; i < fu.svar.valg.length; i++) if (fu.svar.valg[i].tekst === "O⁶⁺") forkertK = i;
+    fu.svar.knapper[forkertK].click();
+    paastand("O⁶⁺ giver en forklaring og bliver på trin 1", fu.fase === "kendt"
+        && /lettere at optage 2/.test(d.getElementById("ukendt-besked").textContent), d.getElementById("ukendt-besked").textContent);
+    vaelgRigtig(fu);
+    koerU(1);
+    paastand("O²⁻: kortene folder sig ud, og Sn starter uden ladning", fu.fase === "ladning" && fu.bord.ukendt.q === 0
+        && fu.bord.minus() === 4 && fu.bord.plus() === 0 && !NK.Opslag.aaben());
+    paastand("trin 1 viser svaret O²⁻ og forklaringen i listen, og hint og besked er ryddet",
+        trinSvar(1) === "O²⁻" && /hovedgruppe 6/.test(trinForkl(1)) && tomt("ukendt-hint") && tomt("ukendt-besked")
+        && ukn.textContent === "Giv hint" && /aktiv/.test(d.getElementById("ukendt-t2").className),
+        trinSvar(1) + " / " + trinForkl(1) + " / " + d.getElementById("ukendt-hint").textContent);
+    paastand("knappen ved Sn viser Sn ?, og beskeden siger, hvad Sn skal opveje",
+        fu.bord.styr.kat.el.style.display === "" && fu.bord.styr.kat.antal.textContent === "Sn ?"
+        && /skal opveje/.test(d.getElementById("ukendt-note").textContent), d.getElementById("ukendt-note").textContent);
+    fu.bord.saetGaet(2);
+    paastand("Sn²⁺: beskeden siger, at der mangler plus", /mangler plus/.test(d.getElementById("ukendt-note").textContent)
+        && fu.fase === "ladning", d.getElementById("ukendt-note").textContent);
+    fu.bord.saetGaet(1);
+    koerU(0.5);
+    /* Træk i kortets kant: tre felter til højre giver ladningen 4. */
+    var uk = fu.bord.ukendtKortVed({ x: fu.bord.kort.filter(function (k) { return k.side === "kat" && !k.doer; })[0].x + 5,
+        y: fu.bord.g.zy - fu.bord.g.gab - fu.bord.g.hc / 2 });
+    paastand("det ukendte kort kan gribes", !!uk);
+    var kx = uk.kort.x + uk.kort.b - 4, ky = uk.kort.y + uk.kort.h / 2;
+    function upe(type, x, y) {
+        return new cw.PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 9, button: 0,
+            clientX: ucr.left + x, clientY: ucr.top + y, pointerType: "mouse", isPrimary: true });
+    }
+    fu.bord.canvas.dispatchEvent(upe("pointerdown", kx, ky));
+    fu.bord.canvas.dispatchEvent(upe("pointermove", kx + fu.bord.g.U * 3, ky));
+    fu.bord.canvas.dispatchEvent(upe("pointerup", kx + fu.bord.g.U * 3, ky));
+    paastand("et træk på tre felter giver Sn⁴⁺, og lynlåsen lukker", fu.bord.ukendt.q === 4 && fu.fase === "valg"
+        && fu.svar.knapper.length === 4 && d.getElementById("ukendt-note").hidden, "q=" + fu.bord.ukendt.q + " / " + fu.fase);
+    paastand("kortet viser nu ladningen i stedet for ?", fu.bord.ukendt.fundet && fu.bord.laast);
+    paastand("trin 2 viser Sn⁴⁺ med regnskabet, og kun det seneste trin har en forklaring",
+        trinSvar(2) === "Sn⁴⁺" && /2 O²⁻ giver −4/.test(trinForkl(2)) && trinSvar(1) === "O²⁻" && !trinForkl(1),
+        trinSvar(2) + " / " + trinForkl(2) + " / " + trinForkl(1));
+    ukn.click();
+    paastand("hintet til navnet forklarer romertallet", /Romertallet er ladningen på én tinion/.test(d.getElementById("ukendt-hint").textContent)
+        && /IV = 4/.test(d.getElementById("ukendt-hint").textContent), d.getElementById("ukendt-hint").textContent);
+    var rigtigU = -1;
+    for (i = 0; i < fu.svar.valg.length; i++) if (fu.svar.valg[i].rigtig) rigtigU = i;
+    loestFoer = fu.loeste;
+    fu.svar.knapper[rigtigU].click();
+    paastand("tin(IV)oxid tæller med, og navnet vises over bordet", fu.loeste === loestFoer + 1
+        && d.getElementById("ukendt-un").textContent === "tin(IV)oxid" && ukn.textContent === "Ny opgave");
+    paastand("efter det rigtige svar: hintet er væk, beskeden siger Rigtigt, og trin 3 viser navnet",
+        tomt("ukendt-hint") && /Rigtigt/.test(d.getElementById("ukendt-besked").textContent) && trinSvar(3) === "tin(IV)oxid",
+        d.getElementById("ukendt-hint").textContent);
+    ukn.click();
+    paastand("Ny opgave skifter til en ukendt sammensat ion og præsenterer den først", fu.o.side === "an"
+        && fu.fase === "intro" && ukn.textContent === "Start opgave" && !trinSvar(1) && tomt("ukendt-besked"), fu.o.an);
+    paastand("opgaven med den sammensatte ion har fire trin", !d.getElementById("ukendt-t4").hidden
+        && new RegExp(fu.partner.formel).test(d.getElementById("ukendt-t3").textContent), d.getElementById("ukendt-t3").textContent);
+    /* Start, og saa hint og svar ét trin ad gangen. */
+    ukn.click(); ukn.click(); ukn.click();
+    paastand("trin 1: Vis svaret viser den kendte ions ladning og går videre", fu.fase === "ladning" && ukn.textContent === "Giv hint"
+        && !NK.Opslag.aaben());
+    ukn.click(); ukn.click();
+    var pa = fu.partner;
+    paastand("trin 2: lynlåsen lukker, og så skal ladningen på " + pa.formel + " slås op først", fu.fase === "partner"
+        && fu.bord.neutral() && ukn.textContent === "Giv hint" && fu.svar.knapper.length === 4
+        && /Slå først ladningen op/.test(d.getElementById("ukendt-opgavetekst").textContent)
+        && /aktiv/.test(d.getElementById("ukendt-t3").className), d.getElementById("ukendt-opgavetekst").textContent);
+    ukn.click();
+    paastand("hintet til " + pa.formel + " åbner det periodiske system med " + pa.formel + " fremhævet",
+        d.getElementById("opslag-pt").classList.contains("vis") && !!d.querySelector('.pt-celle.fremhaev[data-s="' + pa.formel + '"]')
+        && new RegExp(pa.formel).test(d.getElementById("ukendt-hint").textContent));
+    ukn.click();
+    paastand("trin 3: Vis svaret viser " + D.ionTekst(pa) + " og går videre til formlen", fu.fase === "valg" && trinSvar(3) === D.ionTekst(pa)
+        && !NK.Opslag.aaben() && tomt("ukendt-hint") && /formlen/.test(d.getElementById("ukendt-spm").textContent), trinSvar(3));
+    ukn.click();
+    var sidsteHint = d.getElementById("ukendt-hint").textContent;
+    paastand("hintet til formlen nævner begge ladninger og at plus og minus skal gå lige op",
+        sidsteHint.indexOf(D.ionTekst(pa)) >= 0 && sidsteHint.indexOf(D.ionTekst(fu.ion)) >= 0 && /lige op/.test(sidsteHint), sidsteHint);
+    ukn.click();
+    paastand("trin 4: Vis svaret afslutter uden at tælle med og rydder hintet", fu.fase === "faerdig" && fu.loeste === loestFoer + 1
+        && ukn.textContent === "Ny opgave" && tomt("ukendt-hint") && trinSvar(4) === D.formel(pa, fu.ion));
+    fu.startOpgave(D.UKENDT_OPGAVER.filter(function (o) { return o.an === "ClO" && o.kat === "Na"; })[0]);
+    fu.begynd();
+    vaelgRigtig(fu);
+    fu.bord.saetGaet(1);
+    paastand("ladningen 1 vises som ClO⁻, ikke som et løst minus", fu.bord.styr.an.antal.textContent === "ClO⁻",
+        fu.bord.styr.an.antal.textContent);
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
 
-    overskrift("16. Sværhedsgrad i Opgaver");
-    fb.saetTilstand("opgave");
-    paastand("Let er valgt fra start, og navnene vises",
-        fb.svaerhedsgrad === "let" && !d.getElementById("bord-scene").classList.contains("skjul-navne"));
-    paastand("sværhedsknapperne er synlige, den almindelige navne-boks er skjult",
-        !d.getElementById("svaerhed-valg").hidden && d.getElementById("byg-navne-label").hidden);
-    d.getElementById("svaerhed-svaer").click();
-    paastand("Svær skjuler alle navnene",
-        fb.svaerhedsgrad === "svaer" && d.getElementById("bord-scene").classList.contains("skjul-navne"));
-    d.getElementById("svaerhed-let").click();
-    paastand("Let viser navnene igen", !d.getElementById("bord-scene").classList.contains("skjul-navne"));
-    fb.saetTilstand("frit");
-    paastand("i Byg frit er sværhedsknapperne skjulte, og den almindelige navne-boks vises",
-        d.getElementById("svaerhed-valg").hidden && !d.getElementById("byg-navne-label").hidden);
+    overskrift("16c. Kemichael præsenterer hver fane første gang");
+    var fb2 = NK.sims["fane-bord"];
+    function koerB(sek) { for (var t = 0; t < sek * 60; t++) { fb2.tilpas(); fb2.opdater(1 / 60); } }
+    function tast(k) { d.dispatchEvent(new cw.KeyboardEvent("keydown", { key: k, bubbles: true })); }
+    function klikB(x, y) {
+        var r = fb2.L.canvas.getBoundingClientRect();
+        fb2.L.canvas.dispatchEvent(new cw.MouseEvent("click", { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y }));
+    }
+    fb2.springIntro();
+    koerB(1);
+    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) { cw.localStorage.removeItem("nk-sc2.2-intro-" + f); });
+    fb2.startIntro(false);
+    koerB(1.5);
+    var tilbudB = d.getElementById("bord-tilbud");
+    paastand("første gang: der står Start præsentation og Nej tak, og han kommer ikke af sig selv",
+        !tilbudB.hidden && !fb2.laererIIntro() && !(fb2.introVent > 0));
+    tilbudB.querySelector(".tilbud-start").click();
+    koerB(4);
+    var spring = d.getElementById("bord-spring");
+    paastand("Start præsentation: han går ind og præsenterer, og knappen Spring præsentationen over står der",
+        fb2.laererIIntro() && !spring.hidden && fb2.introTrin >= 1 && cw.localStorage.getItem("nk-sc2.2-intro-fane-bord") === "true",
+        fb2.laererIIntro() + " / " + spring.hidden + " / " + fb2.introTrin + " / " + cw.localStorage.getItem("nk-sc2.2-intro-fane-bord"));
+    var opgaveFoer = fb2.opgave;
+    d.getElementById("bord-opgaveknap").click();
+    paastand("præsentationen låser ikke: opgaven kan startes, og han bliver", !opgaveFoer && !!fb2.opgave && fb2.laererIIntro());
+    fb2.visFrit();
+    klikB(fb2.L.b - 5, fb2.L.h - 5);
+    paastand("et klik ved siden af ham sender ham ikke ud", fb2.laererIIntro());
+    var s2 = fb2.laererLaerredSkala(), Lb = fb2.laerer;
+    var hx = Lb.x * s2, hy = (Lb.y + 60) * s2;
+    klikB(hx, hy);
+    paastand("første klik på ham: han bliver, og knappen blinker", fb2.laererIIntro() && spring.classList.contains("puf"));
+    klikB(hx, hy);
+    koerB(0.2);
+    paastand("andet klik på ham sender ham ud", !fb2.laererIIntro() && spring.hidden);
+    fb2.startIntro(false);
+    koerB(1.5);
+    paastand("anden gang i samme browser præsenterer han ikke", !fb2.laererIIntro());
+    tast("k");
+    koerB(0.5);
+    paastand("K får ham til at præsentere igen", fb2.laererIIntro() && !spring.hidden);
+    tast("Escape");
+    koerB(0.2);
+    paastand("Esc sender ham ud", !fb2.laererIIntro() && spring.hidden);
+    tast("k");
+    koerB(0.5);
+    spring.click();
+    koerB(0.2);
+    paastand("knappen sender ham ud", !fb2.laererIIntro() && spring.hidden);
+    paastand("replikkerne er to eller tre pr. fane og korte", ["fane-bord", "fane-vand", "fane-ukendt"].every(function (f) {
+        var l = D.INTRO[f].linjer;
+        return l.length >= 2 && l.length <= 3 && l.every(function (x) { return x.length <= 70; });
+    }));
+    var skala = fb2.laererLaerredSkala();
+    paastand("Kemichael tegnes i samme størrelse som i sc2.3, og kitlen stopper ved lærredets bund",
+        Math.abs(skala - NK.klamp(fb2.L.h / 600 * 0.92, 0.45, 1.25)) < 1e-9
+        && Math.abs(NK.Scene.GULV - fb2.L.h / skala) < 1e-6, skala + " / " + NK.Scene.GULV);
+    ["fane-vand", "fane-ukendt"].forEach(function (f) {
+        var sim = NK.sims[f];
+        sim.startIntro(true);
+        for (var t = 0; t < 60; t++) { sim.tilpas(); sim.opdater(1 / 60); }
+        var ok = sim.laererIIntro() && !d.getElementById(f === "fane-vand" ? "vand-spring" : "ukendt-spring").hidden;
+        sim.springIntro();
+        for (t = 0; t < 12; t++) { sim.tilpas(); sim.opdater(1 / 60); }
+        paastand(f + ": præsentationen kan startes og stoppes", ok && !sim.laererIIntro());
+    });
 
     overskrift("17. Ioner med ladningen 1 hedder + eller −, ikke 1+ eller 1−");
     var ladn = [[1, "+"], [-1, "−"], [2, "2+"], [-3, "3−"], [0, "0"]];
@@ -338,13 +702,74 @@ function koer() {
             NK.ladningstekst(ladn[i][0]) === ladn[i][1], "fik \"" + NK.ladningstekst(ladn[i][0]) + "\"");
     }
     paastand("Na⁺ er skrevet uden 1-tal", D.ionTekst(D.ion("Na")) === "Na⁺", D.ionTekst(D.ion("Na")));
-    paastand("Cl⁻ er skrevet uden 1-tal", D.ionTekst(D.ion("Cl")) === "Cl⁻", D.ionTekst(D.ion("Cl")));
 
-    overskrift("18. Boksen om \"i glasset\" er væk");
-    paastand("vand-talkort findes ikke længere", !d.getElementById("vand-talkort"));
-    paastand("vand-status (kommentaren under glasset) findes ikke længere", !d.getElementById("vand-status"));
-    paastand("opgaven på fane 2 ligger som et overlay i scenen, ikke i panelet",
-        !!d.querySelector("#fane-vand .scene .opgave-boks#vand-opgave-boks"));
+    overskrift("18. Sproget: ingen tankestreger og ingen 1+ eller 1−");
+    var tekster = [];
+    function saml(t, hvor) { if (t) tekster.push([String(t), hvor]); }
+    var kopi = d.body.cloneNode(true);
+    Array.prototype.forEach.call(kopi.querySelectorAll("script"), function (sc) { sc.parentNode.removeChild(sc); });
+    saml(kopi.textContent, "index.html");
+    D.NAVN_OPGAVER.concat(D.FORMEL_OPGAVER).forEach(function (o) {
+        var s = D.salt(o.kat, o.an);
+        D.formelValg(s.kat, s.an).concat(D.navneValg(s.kat, s.an)).forEach(function (v) { saml(v.tekst + " " + v.forklaring, s.formel); });
+    });
+    D.VAND_OPGAVER.forEach(function (o) {
+        var s = D.salt(o.kat, o.an);
+        D.oploesValg(s).concat(D.saltValg(s, 3)).forEach(function (v) { saml(v.tekst + " " + v.forklaring, s.formel + " vand"); });
+    });
+    D.KATIONER.forEach(function (k) { D.ANIONER.forEach(function (a) { saml(D.findesIkke(k, a), k.id + a.id); }); });
+    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) {
+        NK.Rundvisning.ture[f].forEach(function (t) { saml(t.titel + " " + t.tekst, "rundvisning"); });
+    });
+    var fu3 = NK.sims["fane-ukendt"];
+    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) { D.INTRO[f].linjer.forEach(function (l) { saml(l, "præsentation " + f); }); });
+    NK.Opslag.aabn("pt", "O");
+    saml(d.getElementById("opslag-pt").textContent + " " + d.getElementById("opslag-ioner").textContent, "plakaterne");
+    NK.Opslag.luk();
+    D.UKENDT_OPGAVER.forEach(function (o) {
+        var s = D.salt(o.kat, o.an);
+        var valg = o.side === "kat" ? D.romertalValg(s.kat, s.an) : D.formelValg(D.ion(o.partner), s.an);
+        valg.forEach(function (v) { saml(v.tekst + " " + v.forklaring, s.formel + " ukendt"); });
+        var kendtIon = D.ion(o.side === "kat" ? o.an : o.kat);
+        D.kendtValg(kendtIon).forEach(function (v) { saml(v.tekst + " " + v.forklaring, kendtIon.formel + " kendt"); });
+        if (o.partner) D.kendtValg(D.ion(o.partner)).forEach(function (v) { saml(v.tekst + " " + v.forklaring, o.partner + " partner"); });
+        fu3.startOpgave(o);
+        saml(d.getElementById("ukendt-opgavetekst").textContent + " " + d.querySelector("#ukendt-opgavekort .trin").textContent, s.formel + " intro");
+        fu3.begynd();
+        saml(fu3.hint() + " " + d.getElementById("ukendt-opgavetekst").textContent, s.formel + " trin 1");
+        vaelgRigtig(fu3);
+        saml(fu3.hint() + " " + fu3.regnskab() + " " + d.getElementById("ukendt-note").textContent + " "
+            + d.getElementById("ukendt-besked").textContent + " " + d.getElementById("ukendt-opgavetekst").textContent, s.formel + " trin 2");
+        for (var gq = 1; gq <= D.UKENDT_MAKS; gq++) {
+            if (fu3.fase !== "ladning") break;
+            fu3.bord.saetGaet(gq);
+            saml(d.getElementById("ukendt-note").textContent, s.formel + " skub " + gq);
+        }
+        if (fu3.fase === "partner") {
+            saml(fu3.hint() + " " + d.getElementById("ukendt-opgavetekst").textContent + " "
+                + d.getElementById("ukendt-spm").textContent, s.formel + " partner");
+            vaelgRigtig(fu3);
+        }
+        saml(fu3.hint() + " " + d.getElementById("ukendt-besked").textContent + " "
+            + d.getElementById("ukendt-spm").textContent + " " + d.getElementById("ukendt-opgavetekst").textContent + " "
+            + d.querySelector("#ukendt-opgavekort .trin").textContent, s.formel + " sidste trin");
+        vaelgRigtig(fu3);
+        saml(d.getElementById("ukendt-besked").textContent, s.formel + " løst");
+    });
+    NK.Opslag.luk();
+    var sprogFejl = [];
+    tekster.forEach(function (t) {
+        if (/[—–]/.test(t[0])) sprogFejl.push(t[1] + ": tankestreg");
+        if (/(^|[^0-9,.])1[+−-](?![0-9])|¹[⁺⁻]/.test(t[0])) sprogFejl.push(t[1] + ": 1+ eller 1−");
+    });
+    paastand(tekster.length + " tekster er uden tankestreger og 1+ eller 1−", sprogFejl.length === 0, sprogFejl.slice(0, 4).join(" | "));
+
+    overskrift("19. Rundvisningen peger på noget, der findes");
+    var mangler = [];
+    ["fane-bord", "fane-vand", "fane-ukendt"].forEach(function (f) {
+        NK.Rundvisning.ture[f].forEach(function (t) { if (!d.querySelector(t.sel)) mangler.push(t.sel); });
+    });
+    paastand("alle trin i rundvisningen har et mål", mangler.length === 0, mangler.join(", "));
 
     vis();
 }

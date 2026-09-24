@@ -54,6 +54,55 @@ window.NK = NK;
         return a;
     };
 
+    /* ----- Til Kemichael (../../v2/kemichael/kemichael.js) ------------- */
+    /* S-kurve paa tallet 0-1: glidende start og stop. */
+    NK.blod = function (t) {
+        t = NK.klamp(t, 0, 1);
+        return t * t * (3 - 2 * t);
+    };
+
+    NK.r = function (a, b) {
+        return a + Math.random() * (b - a);
+    };
+
+    /* En positur er { x, y, v }: hvor ankerpunktet staar, og hvor meget
+       genstanden er drejet om det. */
+    NK.tilVerden = function (p, anker, lx, ly) {
+        var c = Math.cos(p.v), s = Math.sin(p.v);
+        var dx = lx - anker.x, dy = ly - anker.y;
+        return { x: p.x + dx * c - dy * s, y: p.y + dx * s + dy * c };
+    };
+
+    /* ----- Hukommelse i browseren -------------------------------------
+       Kun til bekvemmeligheder (om Kemichael har praesenteret fanen).
+       Kan localStorage ikke bruges, virker alt andet stadig. */
+    NK.hent = function (noegle, standard) {
+        try {
+            var s = window.localStorage.getItem(noegle);
+            return s ? JSON.parse(s) : standard;
+        } catch (e) {
+            return standard;
+        }
+    };
+
+    NK.gem = function (noegle, vaerdi) {
+        try { window.localStorage.setItem(noegle, JSON.stringify(vaerdi)); } catch (e) { /* ingen hukommelse */ }
+    };
+
+    /* Den stoerste skrift mellem stoerst og mindst, hvor teksten kan
+       vaere i bredden b. Saetter ctx.font og giver stoerrelsen. */
+    NK.passendeSkrift = function (ctx, tekst, b, stoerst, mindst, vaegt) {
+        var s = stoerst;
+        vaegt = vaegt || "600";
+        while (s > mindst) {
+            ctx.font = vaegt + " " + s + "px 'Segoe UI', sans-serif";
+            if (ctx.measureText(tekst).width <= b) break;
+            s -= 0.5;
+        }
+        ctx.font = vaegt + " " + s + "px 'Segoe UI', sans-serif";
+        return s;
+    };
+
     /* ----- Haevet og saenket skrift ---------------------------------- */
     var HAEVET = {
         "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",

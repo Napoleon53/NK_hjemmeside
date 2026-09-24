@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, sc3.1 Elektron-prikformler</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script>
+/* Samme udgangspunkt hver gang: intet er loest, og ingen fane er praesenteret. */
+["sc3_1_fremskridt", "sc3_1_loeste", "sc3_1_fejl_nr", "sc3_1_fejl_loeste", "nk-sc3.1-intro"].forEach(function (k) {
+    try { localStorage.removeItem(k); } catch (e) { /* ingen hukommelse */ }
+});
+</script>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at facit for de ni molekyler opfylder
+   oktetreglen, at optaellingen af prikker stemmer med modellen, at
+   Kemichaels tegninger har hoejst én fejl og en rettet udgave, der
+   passer, at begge faner kan gennemfoeres, at der ikke staar et
+   elektrontal ved atomerne, foer eleven beder om det, at de typiske
+   fejl giver hver sit hint, at Kemichael praesenterer begge faner, og
+   at sproget overholder reglerne. Skal koeres gennem en lokal server
+   (Chrome maa ikke kigge ind i en iframe paa file://).
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+/* Facit: [atomindeks, atomindeks, bindingsorden], indekseret som OPGAVER[].atomer
+   (samme som i _lav_sprites.js) */
+var FACIT = [
+    [[1, 0, 1], [1, 2, 1]],
+    [[1, 0, 1], [1, 2, 1], [1, 3, 1]],
+    [[0, 1, 1]],
+    [[0, 1, 2], [1, 2, 2]],
+    [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]],
+    [[0, 1, 1], [1, 2, 3]],
+    [[0, 1, 3]],
+    [[1, 0, 2], [1, 2, 1], [1, 3, 1]],
+    [[0, 1, 1], [1, 2, 3], [2, 3, 1]]
+];
+
+window.addEventListener("load", function () { setTimeout(koer, 1200); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    paastand("to faner er bygget", !!(NK.faner && NK.faner.byg && NK.faner.fejl));
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    var lr = NK.laerer;
+    function korL(sek) { if (lr) for (var t = 0; t < sek * 60; t++) lr.opdater(1 / 60); }
+    if (lr) { lr.stopIntro(); korL(3); }
+    var byg = NK.faner.byg, fj = NK.faner.fejl;
+
+    /* En tegning ud fra atomer og bindinger, som modellen ser den */
+    function lav(zListe, bindinger, frie) {
+        var atomer = zListe.map(function (z, i) {
+            var a = { id: i, z: z, x: i * 80, y: (i % 2) * 30, r: 30 };
+            if (frie && frie[i] !== undefined) a.frie = frie[i];
+            return a;
+        });
+        return { atomer: atomer, bindinger: bindinger.map(function (b) { return { s: atomer[b[0]], t: atomer[b[1]], orden: b[2] }; }) };
+    }
+    function antalPrikker(tegning) {
+        var lay = NK.prikLayout(tegning), n = 0;
+        lay.bindinger.forEach(function (p) { n += p.length; });
+        Object.keys(lay.atomer).forEach(function (k) { n += lay.atomer[k].length; });
+        return n;
+    }
+    function valensSum(zListe) { return zListe.reduce(function (s, z) { return s + NK.ELEMENTER[z].v; }, 0); }
+
+    overskrift("2. Modellen");
+    var fl = [];
+    NK.OPGAVER.forEach(function (o, i) {
+        var t = lav(o.atomer, FACIT[i]);
+        if (!t.atomer.every(function (a) { return NK.atomStatus(t, a).stabil; })) fl.push(o.f + " oktet");
+        if (antalPrikker(t) !== valensSum(o.atomer)) fl.push(o.f + " " + antalPrikker(t) + " prikker");
+        t.atomer.forEach(function (a) {
+            if (NK.atometsPrikker(t, a).length !== NK.atomStatus(t, a).nu) fl.push(o.f + " optælling ved " + NK.ELEMENTER[a.z].s);
+        });
+    });
+    paastand("facit for alle " + NK.OPGAVER.length + " molekyler opfylder oktet- og duetreglen", fl.filter(function (x) { return /oktet/.test(x); }).length === 0, fl.join(", "));
+    paastand("facit bruger præcis valenselektronerne, hverken flere eller færre", fl.filter(function (x) { return /prikker/.test(x); }).length === 0, fl.join(", "));
+    paastand("optællingen om hvert atom giver modellens elektrontal", fl.filter(function (x) { return /optælling/.test(x); }).length === 0, fl.join(", "));
+    var ilt = lav([8], []);
+    paastand("et frit O har 6 elektroner, 2 af dem uparrede", NK.atomStatus(ilt, ilt.atomer[0]).nu === 6 && NK.frieElektroner(8, 0).enlige === 2);
+
+    overskrift("3. Byg: eleven tæller selv");
+    NK.visFane("byg");
+    byg.initNiveau(0);
+    var s = byg.state;
+    paastand("H₂O begynder med valenselektronerne for H", s.fase === "opsaetning" && s.unikkeAtomer[s.delfase] === 1);
+    byg.svarValens(1);
+    byg.svarValens(8);
+    var h1 = d.getElementById("valens-besked").textContent;
+    byg.svarValens(2);
+    var h2 = d.getElementById("valens-besked").textContent;
+    byg.svarValens(3);
+    var h3 = d.getElementById("valens-besked").textContent;
+    paastand("8 for O giver hint om atomnummeret", /atomnummer/.test(h1), h1);
+    paastand("2 for O giver hint om det, oxygen mangler", /mangler/.test(h2), h2);
+    paastand("et andet forkert tal peger på hovedgruppen", /hovedgruppe/.test(h3), h3);
+    var hintFejl = [];
+    Object.keys(NK.ELEMENTER).forEach(function (z) {
+        z = +z;
+        for (var tal = 1; tal <= 8; tal++) {
+            if (tal === NK.ELEMENTER[z].v) continue;
+            var t = NK.valensHint(z, tal);
+            if (!t || new RegExp("\\b" + NK.ELEMENTER[z].v + "\\b").test(t.replace(/periode \d|atomnummer \d+/g, ""))) hintFejl.push(z + ":" + tal);
+        }
+    });
+    paastand("valenshintet findes for alle forkerte tal og røber ikke tallet", hintFejl.length === 0, hintFejl.join(", "));
+    byg.svarValens(6);
+    paastand("rigtigt tal for O starter byggeriet", s.fase === "aktion" && s.atomer.length === 3);
+    paastand("ingen tæller ved atomerne, før eleven beder om det", s.hjaelp === 0);
+    var a = s.atomer;
+    s.bindinger.push({ s: a[1], t: a[0], orden: 1 });
+    byg.tjekSvar();
+    paastand("tjek med et løst H: atomerne hænger ikke sammen", s.fase === "aktion" && !Object.keys(s.markering).length
+        && /hænger ikke sammen/.test(d.getElementById("toast").textContent), JSON.stringify(s.markering));
+    s.bindinger.push({ s: a[1], t: a[2], orden: 1 });
+    s.bindinger[0].orden = 2;
+    s.markering = {};
+    byg.tjekSvar();
+    paastand("O med en dobbeltbinding til H har for mange", s.markering[1] === "mange" && s.markering[0] === "mange",
+        JSON.stringify(s.markering) + " " + d.getElementById("toast").textContent);
+    byg.tjekSvar();
+    paastand("tredje forkerte tjek får hjælpeknappen til at blinke", d.getElementById("byg-knap").classList.contains("puf"));
+    var knap = d.getElementById("byg-knap");
+    var tekster = [knap.textContent];
+    knap.click(); tekster.push(knap.textContent);
+    var hintVist = d.getElementById("hint-boks").classList.contains("vis");
+    knap.click(); tekster.push(knap.textContent);
+    var taeller = s.hjaelp >= 2;
+    knap.click();
+    var sprite = d.getElementById("hint-sprite");
+    paastand("hjælpeknappen går Giv hint → Tæl for mig → Vis svaret", tekster.join("|") === "Giv hint|Tæl for mig|Vis svaret", tekster.join("|"));
+    paastand("hintet vises, tælleren kommer på andet trin, facit på tredje",
+        hintVist && taeller && !sprite.hidden && /molekyle_h2o/.test(sprite.src) && knap.classList.contains("skjult"));
+    s.bindinger[0].orden = 1;
+    byg.tjekSvar();
+    paastand("rigtig H₂O giver sejr, og opgaven er løst", s.fase === "sejr" && byg.loeste[0]
+        && !d.getElementById("sejr-overlay").classList.contains("skjult"));
+    paastand("hintboksen lukker ved sejr", !d.getElementById("hint-boks").classList.contains("vis"));
+    byg.initNiveau(3);
+    s = byg.state;
+    s.unikkeAtomer.forEach(function (z) { byg.svarValens(NK.ELEMENTER[z].v); });
+    a = s.atomer;
+    s.bindinger.push({ s: a[0], t: a[1], orden: 1 }, { s: a[1], t: a[2], orden: 1 });
+    byg.tjekSvar();
+    paastand("CO₂ med enkeltbindinger: alle tre har for få og bliver røde",
+        Object.keys(s.markering).sort().join() === "0,1,2" && s.markering[1] === "faa" && s.markering[0] === "faa"
+        && /de røde atomer/.test(d.getElementById("toast").textContent), JSON.stringify(s.markering));
+    s.bindinger[0].orden = 2;
+    s.bindinger[1].orden = 2;
+    a[2].frie = 2;
+    s.markering = {};
+    byg.tjekSvar();
+    paastand("ét forkert atom: beskeden siger hvilket og hvad",
+        Object.keys(s.markering).join() === "2" && /oxygen har for få/.test(d.getElementById("toast").textContent),
+        d.getElementById("toast").textContent);
+    byg.initNiveau(0);
+
+    overskrift("4. Kemichaels tegninger");
+    var ingen = 0, fl4 = [];
+    NK.FEJL.forEach(function (o, i) {
+        var t = NK.fejlTegning(i);
+        var forkerte = NK.fejlAtomer(t.tegning);
+        if (forkerte.length > 1) fl4.push((i + 1) + " har " + forkerte.length + " fejl");
+        if (!forkerte.length) ingen++;
+        if (o.frie && !forkerte.length) fl4.push((i + 1) + " har frie, men ingen fejl");
+        if (!o.frie && forkerte.length) fl4.push((i + 1) + " har fejl uden frie");
+        forkerte.forEach(function (a) {
+            var nu = NK.atomStatus(t.tegning, a).nu;
+            if (nu < 1 || nu > 12) fl4.push((i + 1) + " tal " + nu);
+        });
+        if (!t.rettet.atomer.every(function (a) { return NK.atomStatus(t.rettet, a).stabil; })) fl4.push((i + 1) + " rettet passer ikke");
+        var zRet = (o.ret && o.ret.atomer) || o.atomer;
+        if (antalPrikker(t.rettet) !== valensSum(zRet)) fl4.push((i + 1) + " rettet har forkert antal elektroner");
+        if (zRet.slice().sort().join() !== o.atomer.slice().sort().join()) fl4.push((i + 1) + " rettet har andre atomer");
+        t.tegning.atomer.forEach(function (a) {
+            if (NK.atometsPrikker(t.tegning, a).length !== NK.atomStatus(t.tegning, a).nu) fl4.push((i + 1) + " optælling");
+        });
+        if (!o.hint || !o.forklaring) fl4.push((i + 1) + " mangler tekst");
+    });
+    paastand(NK.FEJL.length + " tegninger, hver med højst én fejl, og fejlen er den tegnede", fl4.length === 0, fl4.join(", "));
+    paastand("tre tegninger er rigtige", ingen === 3, ingen);
+    paastand("mindst 12 tegninger", NK.FEJL.length >= 12);
+    var st = { frie: 0, bindingssum: 2, nu: 4, maal: 8 };
+    var th = [NK.taelleHint(st, 2), NK.taelleHint(st, 0), NK.taelleHint(st, 8), NK.taelleHint(st, 5)];
+    paastand("de typiske tællefejl giver hver sit hint",
+        /[Bb]egge elektroner/.test(th[0]) && /bindingerne/.test(th[1]) && /skal være/.test(th[2]) && /Tæl igen/.test(th[3]), th.join(" | "));
+    paastand("glemte frie elektroner giver sit eget hint", /frie/.test(NK.taelleHint({ frie: 2, bindingssum: 3, nu: 8, maal: 8 }, 6)));
+
+    overskrift("5. Find fejlen: forløbet");
+    NK.visFane("fejl");
+    if (lr) { lr.stopIntro(); korL(3); }
+    paastand("fanen skifter: bundlinje og menu for Find fejlen",
+        d.getElementById("fejl-bund").offsetWidth > 0 && d.getElementById("byg-bund").offsetWidth === 0
+        && d.getElementById("fejl-menu").children.length === NK.FEJL.length && /Tegning/.test(d.getElementById("taeller-tekst").textContent));
+    fj.nyTegning(0);
+    var t0 = fj.tegning;
+    var O = t0.atomer.filter(function (a) { return a.z === 8; })[0], H = t0.atomer[0];
+    paastand("H₂O uden frie par: oxygen er det forkerte atom", fj.forkert === O);
+    fj.klikAtom(H);
+    for (var k = 0; k < 120; k++) fj.opdater(1 / 60);
+    paastand("klik på H, der passer: animationen tæller 2 og bliver på trin 1",
+        fj.trin === "find" && fj.taelling && fj.taelling.faerdig && fj.taelling.n === 2 && /passer/.test(d.getElementById("fejl-besked").textContent));
+    d.getElementById("ingen-fejl-knap").click();
+    paastand("Ingen fejl, når der er en fejl, giver en besked", /Der er en fejl/.test(d.getElementById("fejl-besked").textContent));
+    fj.klikAtom(O);
+    paastand("klik på O: trin 2 med tolv talknapper", fj.trin === "taal" && d.querySelectorAll("#fejl-svar .tal-knap").length === 12);
+    d.querySelectorAll("#fejl-svar .tal-knap")[1].click();
+    paastand("svaret 2 (bindingerne talt én gang) giver hintet om bindingerne", /[Bb]egge elektroner/.test(d.getElementById("fejl-besked").textContent),
+        d.getElementById("fejl-besked").textContent);
+    d.querySelectorAll("#fejl-svar .tal-knap")[3].click();
+    paastand("svaret 4 afslutter tegningen, og den er løst", fj.trin === "faerdig" && fj.loeste[0]
+        && d.getElementById("fejl-knap").textContent === "Næste tegning");
+    for (k = 0; k < 240; k++) fj.opdater(1 / 60);
+    paastand("den rettede tegning kommer frem, efter oxygen er talt", fj.retAlfa === 1 && fj.taelling.faerdig);
+    fj.tegn();
+    d.getElementById("fejl-knap").click();
+    paastand("Næste tegning går videre", fj.nr === 1 && fj.trin === "find");
+    fj.nyTegning(2);
+    d.getElementById("ingen-fejl-knap").click();
+    paastand("den rigtige H₂O: Ingen fejl er rigtigt", fj.trin === "faerdig" && fj.loeste[2] && !fj.forkert);
+    fj.nyTegning(3);
+    d.getElementById("fejl-knap").click();
+    var hint = d.getElementById("hint-boks").classList.contains("vis") && d.getElementById("fejl-knap").textContent === "Vis svaret";
+    d.getElementById("fejl-knap").click();
+    paastand("Giv hint → Vis svaret; med svaret er tegningen ikke løst", hint && fj.trin === "faerdig" && !fj.loeste[3]);
+    paastand("hintboksen husker fanen: Byg viser ikke Find fejlens hint", (function () {
+        fj.nyTegning(4);
+        d.getElementById("fejl-knap").click();
+        NK.visFane("byg");
+        var bygSkjult = !d.getElementById("hint-boks").classList.contains("vis");
+        NK.visFane("fejl");
+        var fejlVis = d.getElementById("hint-boks").classList.contains("vis");
+        return bygSkjult && fejlVis;
+    }()));
+    var fl5 = [];
+    NK.FEJL.forEach(function (o, i) {
+        fj.nyTegning(i);
+        if (fj.forkert) {
+            fj.klikAtom(fj.forkert);
+            fj.svarTal(NK.atomStatus(fj.tegning, fj.forkert).nu);
+        } else {
+            fj.ingenFejl();
+        }
+        for (var k = 0; k < 300; k++) fj.opdater(1 / 60);
+        fj.tegn();
+        if (fj.trin !== "faerdig" || (fj.forkert && fj.retAlfa !== 1)) fl5.push(i + 1);
+    });
+    paastand("alle tegninger kan gennemføres og tegnes", fl5.length === 0, fl5.join(", "));
+
+    overskrift("6. Kemichael præsenterer");
+    var K = NK.Kemichael;
+    paastand("Kemichael er indlæst fra den fælles mappe", !!(K && lr && lr.laerer));
+    if (lr) {
+        lr.stopIntro(); korL(3);
+        w.localStorage.removeItem("nk-sc3.1-intro");
+        NK.visFane("byg");
+        byg.initNiveau(0);
+        korL(1.2);
+        var tilbud = d.getElementById("tilbud");
+        paastand("første gang Byg åbnes, står der Start præsentation og Nej tak, og han kommer ikke af sig selv",
+            !tilbud.hidden && !lr.laererIIntro() && !(lr.introVent > 0));
+        tilbud.querySelector(".tilbud-start").click();
+        korL(1.2);
+        paastand("Start præsentation: han går ind og præsenterer Byg", tilbud.hidden && lr.laererIIntro() && lr.introId === "byg");
+        paastand("knappen Spring præsentationen over står fremme", !d.getElementById("spring-over").hidden);
+        /* Uden overgange, saa vinduets plads kan maales med det samme */
+        var udenOvergang = d.createElement("style");
+        udenOvergang.textContent = "*{transition:none!important}";
+        d.head.appendChild(udenOvergang);
+        var pegede = false, plads = null, vindue = null, taler = false;
+        for (var t = 0; t < 30 * 60 && lr.laererIIntro(); t++) {
+            lr.opdater(1 / 60);
+            if (d.getElementById("opsaetning-overlay").classList.contains("peg")) pegede = true;
+            if (lr.laerer.scene && plads === null && lr.introTrin === 1) {
+                plads = lr.laerer.x * lr.laererLaerredSkala();
+                vindue = d.getElementById("opsaetning-overlay").getBoundingClientRect();
+                taler = d.body.classList.contains("laerer-taler");
+            }
+        }
+        udenOvergang.remove();
+        paastand("han peger på vinduet med det periodiske system", pegede);
+        paastand("vinduet giver plads, mens han taler, og han står til venstre for det",
+            taler && plads + 110 < vindue.left, plads + " + 110 < " + (vindue && vindue.left));
+        paastand("vinduet går tilbage, når han er gået", !d.body.classList.contains("laerer-taler"));
+        paastand("han går igen af sig selv, og knappen forsvinder", !lr.laererIIntro() && d.getElementById("spring-over").hidden
+            && !d.getElementById("opsaetning-overlay").classList.contains("peg"));
+        NK.visFane("fejl"); korL(1.2);
+        paastand("første gang Find fejlen åbnes, står tilbuddet fremme", !tilbud.hidden && !lr.laererIIntro());
+        tilbud.querySelector(".tilbud-start").click(); korL(1.2);
+        paastand("Start præsentation: han præsenterer Find fejlen", lr.laererIIntro() && lr.introId === "fejl");
+        d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); korL(0.2);
+        paastand("Esc sender ham ud", !lr.laererIIntro());
+        NK.visFane("byg"); korL(0.5); NK.visFane("fejl"); korL(1.5);
+        paastand("anden gang præsenterer han ikke igen", !lr.laererIIntro());
+        lr.startIntro("fejl", true); korL(1);
+        paastand("K viser præsentationen igen", lr.laererIIntro());
+        d.getElementById("spring-over").click(); korL(0.2);
+        paastand("Spring over sender ham ud", !lr.laererIIntro());
+        var lange = [];
+        Object.keys(NK.INTRO).forEach(function (id) {
+            NK.INTRO[id].forEach(function (l) { if (l.length > 60) lange.push(l); });
+        });
+        paastand("to præsentationer à tre replikker på højst 60 tegn",
+            Object.keys(NK.INTRO).length === 2 && lange.length === 0 && NK.INTRO.byg.length === 3 && NK.INTRO.fejl.length === 3, lange.join(" | "));
+    }
+
+    overskrift("7. Sproget");
+    var tekster = [d.body.innerText];
+    NK.OPGAVER.forEach(function (o) { tekster.push(o.hint); });
+    NK.FEJL.forEach(function (o) { tekster.push(o.hint, o.forklaring); });
+    Object.keys(NK.INTRO).forEach(function (k) { tekster = tekster.concat(NK.INTRO[k]); });
+    Object.keys(NK.ELEMENTER).forEach(function (z) { for (var tal = 1; tal <= 8; tal++) tekster.push(NK.valensHint(+z, tal)); });
+    [0, 2, 4, 8, 5].forEach(function (tal) { tekster.push(NK.taelleHint({ frie: 4, bindingssum: 2, nu: 8, maal: 8 }, tal)); });
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−])1[+−]|¹[⁺⁻]/.test(alt), (alt.match(/.{0,20}(1[+−]|¹[⁺⁻]).{0,20}/) || [""])[0]);
+    var ingenSmaa = [];
+    NK.visFane("fejl"); fj.nyTegning(0); fj.klikAtom(fj.forkert);
+    [["fejl"], ["byg"]].forEach(function (f) {
+        NK.visFane(f[0]);
+        Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+            if (!e.offsetWidth || !e.childNodes.length) return;
+            var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+            if (!harTekst) return;
+            var fs = parseFloat(w.getComputedStyle(e).fontSize);
+            if (fs < 11.5) ingenSmaa.push(e.tagName + "." + e.className + " " + fs + "px");
+        });
+    });
+    paastand("ingen synlig tekst under 12 px", ingenSmaa.length === 0, ingenSmaa.slice(0, 4).join(", "));
+
+    vis();
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

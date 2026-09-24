@@ -1,11 +1,32 @@
 /* =====================================================================
-   opgave.js - det, fane 2-4 har til faelles: svarknapperne, trinlisten
-   og valget af naeste opgave.
+   opgave.js - det, de to fanes opgaver har til faelles: den ene
+   opgaveknap, svarknapperne, trinlisten og valget af naeste opgave.
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
+
+    /* Der er kun ÉN knap i opgavekortet, og den viser det naeste skridt:
+
+         start -> Start opgave   traekker en opgave
+         hint  -> Giv hint       et hint, der passer til opgaven
+         svar  -> Vis svaret     loeser den og forklarer hvorfor
+         ny    -> Ny opgave      traekker en ny
+
+       Loeser eleven selv opgaven undervejs, springer knappen direkte til
+       "Ny opgave". Man faar aldrig mere hjaelp, end man selv har bedt om. */
+    var KNAPTRIN = {
+        start: { tekst: "Start opgave", klasse: "knap stor blaa" },
+        hint:  { tekst: "Giv hint",     klasse: "knap stor" },
+        svar:  { tekst: "Vis svaret",   klasse: "knap stor" },
+        ny:    { tekst: "Ny opgave",    klasse: "knap stor blaa banker" }
+    };
+
+    NK.saetKnaptrin = function (id, trin) {
+        NK.saetTekst(id, KNAPTRIN[trin].tekst);
+        NK.saetKlasse(id, KNAPTRIN[trin].klasse);
+    };
 
     /* Fire svarknapper. vedSvar(valgmulighed, rigtig) kaldes ved hvert
        klik. En forkert knap bliver roed og kan ikke vaelges igen - en

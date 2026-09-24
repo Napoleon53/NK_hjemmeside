@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fældningsreaktioner</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-niveau="tabel">
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Fældningsreaktioner</h1>
+
+    <!-- Samme opgave i tre sværhedsgrader. Maaleren (1-3 streger) og
+         den lille tekst siger, hvad eleven selv skal goere. -->
+    <div class="niveauvalg">
+        <span class="niveau-etiket">Sværhedsgrad</span>
+        <div class="faneknapper" role="tablist" aria-label="Sværhedsgrad">
+            <button class="faneknap aktiv" data-niveau="tabel" role="tab" aria-selected="true" title="Let (1)"><span class="maaler"><i class="fyldt"></i><i></i><i></i></span><span class="fn"><b>Let</b><small>slå op i tabellen</small></span></button>
+            <button class="faneknap" data-niveau="vaelg" role="tab" aria-selected="false" title="Middel (2)"><span class="maaler"><i class="fyldt"></i><i class="fyldt"></i><i></i></span><span class="fn"><b>Middel</b><small>vælg svarene</small></span></button>
+            <button class="faneknap" data-niveau="skriv" role="tab" aria-selected="false" title="Svær (3)"><span class="maaler"><i class="fyldt"></i><i class="fyldt"></i><i class="fyldt"></i></span><span class="fn"><b>Svær</b><small>skriv selv</small></span></button>
+        </div>
+    </div>
+
+    <button class="teoriknap" id="teoriknap" type="button" title="Teori om fældningsreaktioner">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane aktiv" id="fane" role="tabpanel" aria-label="Opgave">
+    <div class="scene">
+        <div class="baeger-omraade" id="baeger-omraade">
+            <canvas id="laerred" aria-label="To opløsninger, der blandes"></canvas>
+            <div class="tilbud" id="tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+            <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        </div>
+
+        <div class="arbejdsbord" id="arbejdsbord">
+            <div class="ab-hoved">
+                <span class="ab-trin" id="ab-trin">Trin 1</span>
+                <span class="ab-spm" id="ab-spm"></span>
+            </div>
+            <div class="tavle" id="tavle"></div>
+            <div class="ab-valg" id="ab-valg"></div>
+            <div class="ab-bund">
+                <p class="besked" id="besked" aria-live="polite"></p>
+                <button class="knap blaa tjekknap" id="tjek" type="button" hidden>Tjek</button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="opgavekort">
+            <h2>Opgave <span class="taeller">løst: <b id="loest">0</b></span></h2>
+            <p class="opgavetekst" id="opgavetekst"></p>
+            <ol class="trinliste" id="trinliste"></ol>
+            <button class="knap stor blaa" id="opgaveknap" type="button">Giv hint</button>
+        </div>
+
+        <div class="kort tabelkort" id="tabelkort">
+            <h2>Fældningstabel</h2>
+            <div id="tabel"></div>
+            <p class="tabelinfo" id="tabelinfo"></p>
+            <p class="tabelnoegle"><span><b>L</b> letopløseligt</span><span><b>T</b> tungtopløseligt</span><span><b>÷</b> findes ikke</span></p>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Fældningsreaktioner</h2>
+        <p>Når to opløsninger af salte blandes, svømmer alle ionerne rundt mellem hinanden. Kan en positiv og en negativ ion danne et tungtopløseligt salt, falder saltet ud som et fast stof: et <b>bundfald</b>.</p>
+
+        <h3>De fire trin</h3>
+        <p>Opgaven er den samme på alle tre sværhedsgrader. På <b>Let</b> finder du bundfaldet i tabellen, og resten vises. På <b>Middel</b> vælger du svarene, og på <b>Svær</b> skriver du dem selv.</p>
+        <ol>
+            <li><b>Ionerne.</b> Del hvert salt op i den positive og den negative ion.</li>
+            <li><b>Bundfaldet.</b> Byt partnere, og slå de nye par op i fældningstabellen. Et par med T falder ud.</li>
+            <li><b>Formlen.</b> Tag så mange af hver ion, at ladningerne går lige op.</li>
+            <li><b>Ionskemaet.</b> Skriv kun de ioner, der danner bundfaldet. Afstem, og skriv (aq) ved ionerne og (s) ved bundfaldet.</li>
+        </ol>
+        <div class="ligning">3 Ag⁺(aq) + PO₄³⁻(aq) → Ag₃PO₄(s)</div>
+
+        <h3>Tilskuerioner</h3>
+        <p>De ioner, der bliver i opløsning, er med i blandingen, men ikke i reaktionen. De kaldes tilskuerioner og skrives ikke i ionskemaet.</p>
+
+        <h3>Fældningstabellen</h3>
+        <p><b>L</b> betyder letopløseligt og <b>T</b> tungtopløseligt: der kan opløses under 1 g af saltet i 100 mL vand ved 20 °C. <b>÷</b> betyder, at saltet ikke findes, fordi ionerne reagerer på en anden måde. Hold musen over feltet for at se hvordan.</p>
+
+        <h3>Svær: skriv selv</h3>
+        <p>Tal efter et symbol bliver sænket af sig selv, og store og små bogstaver rettes: ag3po4 bliver til Ag₃PO₄. Skriv + eller − til sidst for ladningen: fe3+ bliver til Fe³⁺ og no3- til NO₃⁻. Parenteserne kommer også af sig selv: ca3po42 bliver til Ca₃(PO₄)₂. Ladningsknapperne sætter ladningen på.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sværhedsgrad &nbsp;·&nbsp; <kbd>R</kbd> ny opgave &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk &nbsp;·&nbsp; <kbd>Enter</kbd> tjek</p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/formel.js"></script>
+<script src="js/tabel.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/baeger.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/niveauer.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

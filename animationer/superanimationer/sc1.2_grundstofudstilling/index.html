@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grundstofudstillingen</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚛</span> Grundstofudstillingen</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-montre" role="tab" aria-selected="true"><span class="nr">1</span>Udstillingen</button>
+        <button class="faneknap" data-fane="fane-formler" role="tab" aria-selected="false"><span class="nr">2</span>Formlerne</button>
+        <button class="faneknap" data-fane="fane-opraab" role="tab" aria-selected="false"><span class="nr">3</span>Opråbet</button>
+    </div>
+
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: MONTREN                                                    -->
+<!-- Raekkerne i opgavekortet bygges af sim_montre.js                   -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-montre" role="tabpanel" aria-label="Udstillingen">
+    <div class="scene medtekst">
+        <canvas id="montre-laerred"></canvas>
+        <div class="anker" id="montre-anker-montre"></div>
+        <div class="anker" id="montre-anker-kasse"></div>
+        <div class="anker" id="montre-anker-tavle"></div>
+        <div class="anker" id="montre-anker-navne"></div>
+        <div class="tilbud" id="montre-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="montre-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="montre-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste proeve -->
+        <div class="kort opgavekort" id="montre-kort">
+            <h2><span id="montre-hoved">Prøve fra kassen</span><span class="taeller">på plads <b id="montre-loest">0</b>/36</span></h2>
+            <div class="opgave-prompt" id="montre-prompt"></div>
+            <p class="opgave-spm" id="montre-spm"></p>
+            <div class="raekker" id="montre-raekker"></div>
+            <p class="besked" id="montre-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="montre-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="montre-fremskridt">
+            <h2>Perioderne</h2>
+            <div class="hyldeliste" id="montre-perioder"></div>
+            <button class="knap nulstil" id="montre-nulstil" type="button"><span>Tøm udstillingen</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FORMLERNE                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-formler" role="tabpanel" aria-label="Formlerne">
+    <div class="scene medtekst">
+        <canvas id="formler-laerred"></canvas>
+        <div class="anker" id="formler-anker-montre"></div>
+        <div class="anker" id="formler-anker-flaske"></div>
+        <div class="anker" id="formler-anker-tavle"></div>
+        <div class="anker" id="formler-anker-raekke"></div>
+        <div class="tilbud" id="formler-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="formler-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="formler-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="formler-kort">
+            <h2><span id="formler-niveau"></span><span class="taeller">flaske <b id="formler-nr">1</b>/<span id="formler-antal-i-niveau">4</span></span></h2>
+            <div class="opgave-prompt formel" id="formler-prompt"></div>
+            <p class="opgave-spm" id="formler-spm"></p>
+            <div class="raekker" id="formler-raekker"></div>
+            <p class="besked" id="formler-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="formler-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="formler-fremskridt">
+            <h2>Flaskerne <span class="taeller">løst <b id="formler-loest">0</b>/12</span></h2>
+            <div class="hyldeliste" id="formler-niveauer"></div>
+            <button class="knap nulstil" id="formler-nulstil" type="button"><span>Stil flaskerne tilbage</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: OPRAABET                                                   -->
+<!-- De fire svar ligger oven paa tavlen (js/sim_opraab.js)             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-opraab" role="tabpanel" aria-label="Opråbet">
+    <div class="scene">
+        <canvas id="opraab-laerred"></canvas>
+        <div class="valg" id="opraab-valg" hidden></div>
+        <div class="anker" id="opraab-anker-montre"></div>
+        <div class="anker" id="opraab-anker-tavle"></div>
+        <div class="tilbud" id="opraab-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="opraab-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="opraab-kort">
+            <h2>Point <span class="taeller">rekord <b id="opraab-rekord">0</b></span></h2>
+            <div class="storttal" id="opraab-point">0</div>
+            <div class="talraekke"><span>Niveau</span><span class="tal" id="opraab-niveau">1</span></div>
+            <div class="talraekke"><span>Stime</span><span class="tal gul" id="opraab-stime">×1</span></div>
+            <div class="talraekke"><span>Liv</span><span class="tal roed" id="opraab-liv">♥♥♥</span></div>
+            <button class="knap stor blaa banker" id="opraab-knap" type="button" style="margin-top:10px;"><span>Start opråbet</span><span class="tegn">▶</span></button>
+        </div>
+
+        <div class="kort">
+            <h2>Sådan</h2>
+            <p class="note" style="margin-top:0;">Tavlen siger et grundstof. Klik på det i udstillingen, før kridtstregen er væk. Blinker et rum, vælger du navnet på tavlen. En fejl koster et liv.</p>
+        </div>
+
+        <div class="kort" id="opraab-log-kort" hidden>
+            <h2>Øv dem her</h2>
+            <ul class="kasseliste" id="opraab-log"></ul>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- NAVNETAVLEN I STORT FORMAT (js/opslag.js)                          -->
+<!-- ================================================================= -->
+<div class="overlay" id="opslag-pt">
+    <div class="overlay-boks bred">
+        <h2>Grundstoffernes navne</h2>
+        <div class="pt-gitter" id="pt-gitter"></div>
+        <p class="pt-info" id="pt-info"></p>
+        <div class="navne-liste" id="navne-liste"></div>
+        <div class="pnoegle">
+            <span class="m">metal</span>
+            <span class="i">ikke-metal</span>
+            <span class="h">halvmetal</span>
+            <span class="a">ædelgas</span>
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/opslag.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_montre.js"></script>
+<script src="js/sim_formler.js"></script>
+<script src="js/sim_opraab.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

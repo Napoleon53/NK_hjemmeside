@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" width="1000" height="440">
+<!-- Titlen: egen tegning (et halvt hjul med LYKKEHJULET paa en bue og KEMI i navet),
+     ikke tv-programmets logo. Genereret af lav_titel.js i scratchpad; ret her eller i generatoren. -->
+<defs>
+  <linearGradient id="guld" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fffbe0"/><stop offset="0.45" stop-color="#ffe45c"/><stop offset="1" stop-color="#f0a412"/>
+  </linearGradient>
+  <radialGradient id="nav" cx="0.45" cy="0.35" r="0.8">
+    <stop offset="0" stop-color="#fff3a8"/><stop offset="0.55" stop-color="#f2b705"/><stop offset="1" stop-color="#9a6a00"/>
+  </radialGradient>
+  <radialGradient id="glans" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.3"/>
+  </radialGradient>
+  <filter id="skygge" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000" flood-opacity="0.55"/></filter>
+  <path id="bue" d="M 235.1 329.2 A 300 300 0 0 1 764.9 329.2"/>
+</defs>
+<circle cx="500" cy="470" r="450" fill="#161a44" stroke="#0a0c24" stroke-width="6"/>
+<g><circle cx="500.0" cy="34.0" r="5.5" fill="#ffd21f"/><circle cx="556.9" cy="37.7" r="5.5" fill="#fff6c2"/><circle cx="612.8" cy="48.9" r="5.5" fill="#ffd21f"/><circle cx="666.8" cy="67.2" r="5.5" fill="#fff6c2"/><circle cx="718.0" cy="92.4" r="5.5" fill="#ffd21f"/><circle cx="765.4" cy="124.1" r="5.5" fill="#fff6c2"/><circle cx="808.3" cy="161.7" r="5.5" fill="#ffd21f"/><circle cx="845.9" cy="204.6" r="5.5" fill="#fff6c2"/><circle cx="877.6" cy="252.0" r="5.5" fill="#ffd21f"/><circle cx="902.8" cy="303.2" r="5.5" fill="#fff6c2"/><circle cx="921.1" cy="357.2" r="5.5" fill="#ffd21f"/><circle cx="932.3" cy="413.1" r="5.5" fill="#fff6c2"/><circle cx="936.0" cy="470.0" r="5.5" fill="#ffd21f"/><circle cx="932.3" cy="526.9" r="5.5" fill="#fff6c2"/><circle cx="921.1" cy="582.8" r="5.5" fill="#ffd21f"/><circle cx="902.8" cy="636.8" r="5.5" fill="#fff6c2"/><circle cx="877.6" cy="688.0" r="5.5" fill="#ffd21f"/><circle cx="845.9" cy="735.4" r="5.5" fill="#fff6c2"/><circle cx="808.3" cy="778.3" r="5.5" fill="#ffd21f"/><circle cx="765.4" cy="815.9" r="5.5" fill="#fff6c2"/><circle cx="718.0" cy="847.6" r="5.5" fill="#ffd21f"/><circle cx="666.8" cy="872.8" r="5.5" fill="#fff6c2"/><circle cx="612.8" cy="891.1" r="5.5" fill="#ffd21f"/><circle cx="556.9" cy="902.3" r="5.5" fill="#fff6c2"/><circle cx="500.0" cy="906.0" r="5.5" fill="#ffd21f"/><circle cx="443.1" cy="902.3" r="5.5" fill="#fff6c2"/><circle cx="387.2" cy="891.1" r="5.5" fill="#ffd21f"/><circle cx="333.2" cy="872.8" r="5.5" fill="#fff6c2"/><circle cx="282.0" cy="847.6" r="5.5" fill="#ffd21f"/><circle cx="234.6" cy="815.9" r="5.5" fill="#fff6c2"/><circle cx="191.7" cy="778.3" r="5.5" fill="#ffd21f"/><circle cx="154.1" cy="735.4" r="5.5" fill="#fff6c2"/><circle cx="122.4" cy="688.0" r="5.5" fill="#ffd21f"/><circle cx="97.2" cy="636.8" r="5.5" fill="#fff6c2"/><circle cx="78.9" cy="582.8" r="5.5" fill="#ffd21f"/><circle cx="67.7" cy="526.9" r="5.5" fill="#fff6c2"/><circle cx="64.0" cy="470.0" r="5.5" fill="#ffd21f"/><circle cx="67.7" cy="413.1" r="5.5" fill="#fff6c2"/><circle cx="78.9" cy="357.2" r="5.5" fill="#ffd21f"/><circle cx="97.2" cy="303.2" r="5.5" fill="#fff6c2"/><circle cx="122.4" cy="252.0" r="5.5" fill="#ffd21f"/><circle cx="154.1" cy="204.6" r="5.5" fill="#fff6c2"/><circle cx="191.7" cy="161.7" r="5.5" fill="#ffd21f"/><circle cx="234.6" cy="124.1" r="5.5" fill="#fff6c2"/><circle cx="282.0" cy="92.4" r="5.5" fill="#ffd21f"/><circle cx="333.2" cy="67.2" r="5.5" fill="#fff6c2"/><circle cx="387.2" cy="48.9" r="5.5" fill="#ffd21f"/><circle cx="443.1" cy="37.7" r="5.5" fill="#fff6c2"/></g>
+<path d="M 500 470 L 445.2 53.6 A 420 420 0 0 1 554.8 53.6 Z" fill="#e8262a" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 554.8 53.6 A 420 420 0 0 1 660.7 82.0 Z" fill="#ffd21f" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 660.7 82.0 A 420 420 0 0 1 755.7 136.8 Z" fill="#1fb4ef" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 755.7 136.8 A 420 420 0 0 1 833.2 214.3 Z" fill="#ff9a1f" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 833.2 214.3 A 420 420 0 0 1 888.0 309.3 Z" fill="#b77cf2" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 888.0 309.3 A 420 420 0 0 1 916.4 415.2 Z" fill="#ff72c8" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 916.4 415.2 A 420 420 0 0 1 916.4 524.8 Z" fill="#28c35c" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 916.4 524.8 A 420 420 0 0 1 888.0 630.7 Z" fill="#e8262a" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 888.0 630.7 A 420 420 0 0 1 833.2 725.7 Z" fill="#ffd21f" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 833.2 725.7 A 420 420 0 0 1 755.7 803.2 Z" fill="#1fb4ef" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 755.7 803.2 A 420 420 0 0 1 660.7 858.0 Z" fill="#ff9a1f" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 660.7 858.0 A 420 420 0 0 1 554.8 886.4 Z" fill="#b77cf2" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 554.8 886.4 A 420 420 0 0 1 445.2 886.4 Z" fill="#ff72c8" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 445.2 886.4 A 420 420 0 0 1 339.3 858.0 Z" fill="#28c35c" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 339.3 858.0 A 420 420 0 0 1 244.3 803.2 Z" fill="#e8262a" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 244.3 803.2 A 420 420 0 0 1 166.8 725.7 Z" fill="#ffd21f" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 166.8 725.7 A 420 420 0 0 1 112.0 630.7 Z" fill="#1fb4ef" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 112.0 630.7 A 420 420 0 0 1 83.6 524.8 Z" fill="#ff9a1f" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 83.6 524.8 A 420 420 0 0 1 83.6 415.2 Z" fill="#b77cf2" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 83.6 415.2 A 420 420 0 0 1 112.0 309.3 Z" fill="#ff72c8" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 112.0 309.3 A 420 420 0 0 1 166.8 214.3 Z" fill="#28c35c" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 166.8 214.3 A 420 420 0 0 1 244.3 136.8 Z" fill="#e8262a" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 244.3 136.8 A 420 420 0 0 1 339.3 82.0 Z" fill="#ffd21f" stroke="#1d2030" stroke-width="3"/>
+<path d="M 500 470 L 339.3 82.0 A 420 420 0 0 1 445.2 53.6 Z" fill="#1fb4ef" stroke="#1d2030" stroke-width="3"/>
+<circle cx="500" cy="470" r="420" fill="url(#glans)"/>
+<path d="M 235.1 329.2 A 300 300 0 0 1 764.9 329.2" fill="none" stroke="#f2c53d" stroke-width="146" stroke-linecap="round" filter="url(#skygge)"/>
+<path d="M 235.1 329.2 A 300 300 0 0 1 764.9 329.2" fill="none" stroke="#0d1b5e" stroke-width="132" stroke-linecap="round"/>
+<path d="M 235.1 329.2 A 300 300 0 0 1 764.9 329.2" fill="none" stroke="#1b3aa8" stroke-width="96" stroke-linecap="round" opacity="0.5"/>
+<text font-family="'Arial Black', 'Segoe UI Black', Impact, sans-serif" font-weight="900" font-size="104" fill="url(#guld)" stroke="#3a1d00" stroke-width="12" stroke-linejoin="round" paint-order="stroke" letter-spacing="2">
+  <textPath href="#bue" startOffset="50%" text-anchor="middle" dy="0" textLength="590" lengthAdjust="spacingAndGlyphs"><tspan dy="36">LYKKEHJULET</tspan></textPath>
+</text>
+<circle cx="500" cy="470" r="192" fill="#0e1a52" stroke="#f2c53d" stroke-width="10" filter="url(#skygge)"/>
+<circle cx="500" cy="470" r="162" fill="url(#nav)"/>
+<rect x="40" y="404" width="920" height="34" rx="17" fill="#0e1a52" stroke="#f2c53d" stroke-width="6"/>
+<text x="500" y="392" text-anchor="middle" font-family="'Arial Black', 'Segoe UI Black', Impact, sans-serif" font-weight="900" font-size="66" fill="#0e1a52" letter-spacing="5">KEMI</text>
+</svg>

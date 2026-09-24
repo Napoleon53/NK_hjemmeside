@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc4.1 Molarmasse</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at atommasserne passer med IUPAC's tabel, at
+   molarmasserne er regnet rigtigt, at formlerne tælles rigtigt, at
+   strukturerne har de rigtige atomer uden at kuglerne falder oven i
+   hinanden, at tjekket godkender de rigtige svar og giver den rigtige
+   besked ved de typiske fejl, at parrene og gåderne er, hvad de siger,
+   at sproget overholder reglerne, at alle tre faner kan gennemføres,
+   og at layoutet holder fra 520 × 380 til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function note(t) { skriv("        " + t, "note"); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc4.1-vaegt", "nk-sc4.1-skaal", "nk-sc4.1-ukendt",
+    "nk-sc4.1-intro-vaegt", "nk-sc4.1-intro-skaal", "nk-sc4.1-intro-ukendt"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* IUPAC's standardatommasser (2021), rundet til to decimaler, og atomnumrene */
+var TABEL = {
+    H: [1, 1.01], He: [2, 4.00], Li: [3, 6.94], Be: [4, 9.01], B: [5, 10.81], C: [6, 12.01], N: [7, 14.01], O: [8, 16.00],
+    F: [9, 19.00], Ne: [10, 20.18], Na: [11, 22.99], Mg: [12, 24.31], Al: [13, 26.98], Si: [14, 28.09], P: [15, 30.97],
+    S: [16, 32.06], Cl: [17, 35.45], Ar: [18, 39.95], K: [19, 39.10], Ca: [20, 40.08], Fe: [26, 55.85], Cu: [29, 63.55],
+    Zn: [30, 65.38], Ga: [31, 69.72], Ge: [32, 72.63], As: [33, 74.92], Se: [34, 78.97], Br: [35, 79.90], Kr: [36, 83.80]
+};
+
+/* Molarmasserne regnet i hånden med tabellens tal */
+var MOLAR = {
+    "H2O": 18.02, "O2": 32.00, "CO2": 44.01, "SO2": 64.06, "CH4": 16.05, "C2H5OH": 46.08, "C6H14": 86.20,
+    "C6H12O6": 180.18, "NaCl": 58.44, "CaCO3": 100.09, "Ca(OH)2": 74.10, "Al2(SO4)3": 342.14,
+    "H2": 2.02, "He": 4.00, "NH3": 17.04, "Cl2": 70.90, "CO": 28.01, "N2": 28.02, "C2H4": 28.06, "Fe": 55.85,
+    "C4H10": 58.14, "Cu": 63.55, "C3H8": 44.11, "NO2": 46.01, "H2SO4": 98.08, "H3PO4": 98.00, "Ar": 39.95,
+    "K": 39.10, "O3": 48.00, "KCl": 74.55, "CaCl2": 110.98, "NaOH": 40.00, "CH3COOH": 60.06, "C12H22O11": 342.34,
+    "HF": 20.01, "C2H3Cl": 62.50, "Zn": 65.38, "Mg(OH)2": 58.33, "C3H8O": 60.11, "Cu(OH)2": 97.57, "K2O": 94.20,
+    "CuS": 95.61, "N2O": 44.02, "C2H4O": 44.06, "HCOOH": 46.03, "CH3NO": 45.05, "Si": 28.09, "C7H14": 98.21
+};
+
+/* Den side, der synker, i hvert par (a mod b) */
+var PAR_FACIT = {
+    "H2O/CO2": "b", "CH4/O2": "b", "H2/He": "b", "C6H14/Cl2": "a", "NH3/H2O": "b", "CH4/NH3": "b",
+    "Fe/C4H10": "b", "Ar/K": "a", "O3/CO2": "a", "CO/N2": "lige", "Cu/SO2": "b", "CO2/C3H8": "b",
+    "H2SO4/H3PO4": "a", "C2H5OH/NO2": "a"
+};
+
+function klik(sel) {
+    var e = document.getElementById("ramme").contentWindow.document.querySelector(sel);
+    if (e) e.click();
+    return !!e;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, T = NK.Tjek;
+    paastand("data.js og tjek.js er kørt", !!(D && D.GRUNDSTOFFER && T && T.atommasse && T.molarmasse));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-vaegt"] && NK.sims["fane-skaal"] && NK.sims["fane-ukendt"]));
+    var sprites = ["vaegt", "skaal_fod", "skaal_arm", "skaal_skaal", "vejebaad", "baegerglas", "flaske", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var V = NK.sims["fane-vaegt"], S = NK.sims["fane-skaal"], U = NK.sims["fane-ukendt"];
+    paastand("Kemichael er koblet på alle tre faner", !!(V.laerer && S.laerer && U.laerer));
+
+    overskrift("2. Atommasserne på plakaten");
+    paastand("der er 29 grundstoffer", D.GRUNDSTOFFER.length === 29);
+    var forkerte = [];
+    Object.keys(TABEL).forEach(function (s) {
+        var g = D.grundstof(s), r = TABEL[s];
+        if (!g || g.z !== r[0] || g.m !== Math.round(r[1] * 100)) forkerte.push(s);
+    });
+    paastand("atomnummer og atommasse passer med IUPAC", forkerte.length === 0, forkerte.join(", "));
+    var runding = D.GRUNDSTOFFER.filter(function (g) { return Math.abs(g.praecis * 100 - g.m) > 0.51; });
+    paastand("de to decimaler er den præcise atommasse rundet", runding.length === 0, runding.map(function (g) { return g.s; }).join(", "));
+    var pladser = {};
+    var dobbelt = D.GRUNDSTOFFER.filter(function (g) {
+        var k = g.periode + "/" + g.kol;
+        if (pladser[k]) return true;
+        pladser[k] = true;
+        return false;
+    });
+    paastand("hvert grundstof har sin egen plads på plakaten", dobbelt.length === 0);
+    var hg = D.GRUNDSTOFFER.filter(function (g) {
+        var h = D.HOVEDGRUPPE[g.kol];
+        var ventet = { H: 1, Li: 1, Na: 1, K: 1, Be: 2, Mg: 2, Ca: 2, B: 3, Al: 3, Ga: 3, C: 4, Si: 4, Ge: 4, N: 5, P: 5, As: 5,
+            O: 6, S: 6, Se: 6, F: 7, Cl: 7, Br: 7, He: 8, Ne: 8, Ar: 8, Kr: 8, Fe: 0, Cu: 0, Zn: 0 }[g.s];
+        return h !== ventet;
+    });
+    paastand("hovedgrupperne står rigtigt", hg.length === 0, hg.map(function (g) { return g.s; }).join(", "));
+    paastand("K har større atomnummer end Ar, men mindre atommasse", D.grundstof("K").z > D.grundstof("Ar").z && D.grundstof("K").m < D.grundstof("Ar").m);
+
+    overskrift("3. Formler og molarmasser");
+    function taeltekst(f) { var t = D.taelling(f); return t.orden.map(function (s) { return s + t.antal[s]; }).join(" "); }
+    paastand("Al2(SO4)3 tælles Al2 S3 O12", taeltekst("Al2(SO4)3") === "Al2 S3 O12");
+    paastand("C2H5OH tælles C2 H6 O1", taeltekst("C2H5OH") === "C2 H6 O1");
+    paastand("CH3COOH tælles C2 H4 O2", taeltekst("CH3COOH") === "C2 H4 O2");
+    paastand("HCOOH tælles H2 C1 O2 i formlens rækkefølge", taeltekst("HCOOH") === "H2 C1 O2");
+    paastand("Ca(OH)2 tælles Ca1 O2 H2", taeltekst("Ca(OH)2") === "Ca1 O2 H2");
+    var mForkert = [];
+    D.STOFFER.forEach(function (st) {
+        if (MOLAR[st.f] === undefined) { mForkert.push(st.f + " (ingen facit)"); return; }
+        if (st.M !== Math.round(MOLAR[st.f] * 100)) mForkert.push(st.f + " " + st.M);
+    });
+    paastand("alle " + D.STOFFER.length + " molarmasser passer med håndregningen", mForkert.length === 0, mForkert.join(", "));
+    var afvig = D.STOFFER.filter(function (st) { return Math.abs(D.praecisMolarmasse(st.f) - st.M / 100) > 0.05; });
+    paastand("afrundingen flytter ingen molarmasse mere end 0,05 g/mol", afvig.length === 0, afvig.map(function (s) { return s.f; }).join(", "));
+    paastand("NK.komma skriver 18,02, 0,05 og 342,14", NK.komma(1802) === "18,02" && NK.komma(5) === "0,05" && NK.komma(34214) === "342,14");
+    paastand("1 mol vand er 18 mL, ethanol 58 mL og hexan 132 mL",
+        D.enMol(D.stof("H2O")).indexOf("18 mL") > 0 && D.enMol(D.stof("C2H5OH")).indexOf("58 mL") > 0 && D.enMol(D.stof("C6H14")).indexOf("132 mL") > 0);
+
+    overskrift("4. Strukturerne");
+    var brugt = {};
+    D.VAEGT.forEach(function (o) { brugt[o.st.f] = true; });
+    D.PAR.forEach(function (p) { brugt[p.a.f] = true; brugt[p.b.f] = true; });
+    var uden = Object.keys(brugt).filter(function (f) { return !D.stof(f).struktur; });
+    paastand("alle stoffer på fane 1 og 2 har en struktur", uden.length === 0, uden.join(", "));
+    var tal = [], klump = [], bind = [];
+    Object.keys(brugt).forEach(function (f) {
+        var st = D.stof(f), s = st.struktur;
+        if (!s) return;
+        var t = {};
+        s.atomer.forEach(function (a) { t[a[0]] = (t[a[0]] || 0) + 1; });
+        var ens = st.orden.every(function (x) { return t[x] === st.antal[x]; }) && Object.keys(t).length === st.orden.length;
+        if (!ens) tal.push(f);
+        var bundet = {};
+        s.bindinger.forEach(function (b) {
+            bundet[b[0] + "-" + b[1]] = bundet[b[1] + "-" + b[0]] = true;
+            var p = s.atomer[b[0]], q = s.atomer[b[1]];
+            var l = Math.sqrt(Math.pow(p[1] - q[1], 2) + Math.pow(p[2] - q[2], 2));
+            if (l < 0.6 || l > 1.2) bind.push(f + " " + p[0] + "-" + q[0] + " " + l.toFixed(2));
+        });
+        for (var i = 0; i < s.atomer.length; i++) {
+            for (var j = i + 1; j < s.atomer.length; j++) {
+                if (bundet[i + "-" + j]) continue;
+                var a = s.atomer[i], b2 = s.atomer[j];
+                var afst = Math.sqrt(Math.pow(a[1] - b2[1], 2) + Math.pow(a[2] - b2[2], 2));
+                if (afst < 0.9 * (D.radius(a[0]) + D.radius(b2[0]))) klump.push(f + " " + a[0] + i + "/" + b2[0] + j);
+            }
+        }
+    });
+    paastand("strukturerne har formlens atomer", tal.length === 0, tal.join(", "));
+    paastand("bindingerne har en rimelig længde", bind.length === 0, bind.slice(0, 4).join("; "));
+    paastand("atomer uden binding falder ikke oven i hinanden", klump.length === 0, klump.slice(0, 4).join("; "));
+
+    overskrift("5. Tjek af atommassen");
+    function am(raa, s, n) { return T.atommasse(raa, s, n); }
+    paastand("16,00, 16 og 16.00 godkendes for O", am("16,00", "O", 1).ok && am("16", "O", 1).ok && am("16.00", "O", 1).ok);
+    paastand("1,01 g/mol godkendes for H", am("1,01 g/mol", "H", 2).ok);
+    var pr = am("15,999", "O", 1);
+    paastand("den præcise 15,999 godkendes med en bemærkning", pr.ok && /to decimaler/.test(pr.note || ""));
+    var FEJL_AM = [
+        ["8", "O", 1, /atomnummeret for O/], ["20", "Ca", 1, /atomnummeret for Ca/], ["32", "O", 2, /alle 2 O-atomer/],
+        ["12", "C", 1, /decimalerne/], ["35,5", "Cl", 1, /decimalerne/], ["23", "Na", 1, /decimalerne/],
+        ["14,01", "O", 1, /atommassen for N/], ["12,01", "H", 4, /atommassen for C/], ["160", "O", 1, /kommaet/i],
+        ["1,201", "C", 1, /kommaet/i], ["abc", "O", 1, /Skriv et tal/], ["3", "O", 1, /Find O/]
+    ];
+    var amFejl = FEJL_AM.filter(function (f) { var r = am(f[0], f[1], f[2]); return r.ok || !f[3].test(r.besked || ""); });
+    paastand(FEJL_AM.length + " typiske fejl i atommassen giver den rigtige besked", amFejl.length === 0,
+        amFejl.map(function (f) { return f[0] + "→" + (am(f[0], f[1], f[2]).besked || "ok"); }).join("; "));
+    paastand("et tomt felt er ikke en fejl", am("", "O", 1).tom === true);
+
+    overskrift("6. Tjek af molarmassen");
+    function mm(raa, f) { return T.molarmasse(raa, D.stof(f)); }
+    paastand("de rigtige molarmasser godkendes", D.VAEGT.every(function (o) { return mm(NK.komma(o.st.M), o.st.f).ok; }));
+    var FEJL_MM = [
+        ["17,01", "H2O", /ganget H med 2/], ["16,00", "H2O", /Bidraget fra H/], ["18", "H2O", /to decimaler/],
+        ["18,0", "H2O", /to decimaler/], ["180,2", "H2O", /kommaet/i], ["10", "H2O", /atomnumrene/],
+        ["18,03", "H2O", /Tæt på/], ["16,00", "O2", /ganget O med 2/], ["28,01", "CO2", /ganget O med 2/],
+        ["12,01", "CO2", /Bidraget fra O/], ["13,02", "CH4", /ganget H med 4/], ["100", "CaCO3", /to decimaler/],
+        ["58,1", "NaCl", /Læg rækkerne sammen|to decimaler/], ["x", "H2O", /Skriv et tal/]
+    ];
+    var mmFejl = FEJL_MM.filter(function (f) { var r = mm(f[0], f[1]); return r.ok || !f[2].test(r.besked || ""); });
+    paastand(FEJL_MM.length + " typiske fejl i molarmassen giver den rigtige besked", mmFejl.length === 0,
+        mmFejl.map(function (f) { return f[1] + " " + f[0] + "→" + (mm(f[0], f[1]).besked || "ok"); }).join("; "));
+
+    overskrift("7. Parrene på skålvægten");
+    var parFejl = [];
+    D.PAR.forEach(function (p) {
+        var noegle = p.a.f + "/" + p.b.f, dM = p.b.M - p.a.M;
+        var side = Math.abs(dM) < D.FOELSOMHED ? "lige" : (dM > 0 ? "b" : "a");
+        if (PAR_FACIT[noegle] !== side) parFejl.push(noegle + " " + side);
+    });
+    paastand("hvert par synker til den side, der står i facit", parFejl.length === 0, parFejl.join(", "));
+    var taet = D.PAR.filter(function (p) { var dM = Math.abs(p.b.M - p.a.M); return dM >= D.FOELSOMHED && dM < 7; });
+    paastand("intet par ligger lige ved grænsen på 0,05 g", taet.length === 0, taet.map(function (p) { return p.a.f + "/" + p.b.f; }).join(", "));
+    var flere = D.PAR.filter(function (p) {
+        var n = function (st) { return st.orden.reduce(function (a, s) { return a + st.antal[s]; }, 0); };
+        var tungest = p.b.M > p.a.M ? p.b : p.a, lettest = tungest === p.b ? p.a : p.b;
+        return Math.abs(p.b.M - p.a.M) >= D.FOELSOMHED && n(lettest) > n(tungest);
+    });
+    paastand("mindst fire par, hvor stoffet med flest atomer er lettest", flere.length >= 4, flere.length + " par");
+    paastand("hvert niveau har mindst tre par", [0, 1, 2].every(function (n) { return D.PAR.filter(function (p) { return p.niveau === n; }).length >= D.RUNDE[n]; }));
+
+    overskrift("8. Gåderne på fane 3");
+    var gFejl = [];
+    D.GAADER.forEach(function (g) {
+        var M = g.kort.map(function (st) { return st.M; });
+        var forskellige = M.filter(function (m, i) { return M.indexOf(m) === i; }).length === 4;
+        if (g.kort.length !== 4 || g.kort[0] !== g.st || !forskellige) gFejl.push(g.st.f);
+        var naermest = Math.min.apply(null, g.kort.slice(1).map(function (st) { return Math.abs(st.M - g.st.M); }));
+        if (g.niveau === 0 && naermest < 500) gFejl.push(g.st.f + " for tæt til niveau 1");
+        if (g.niveau === 1 && (naermest < 30 || naermest > 300)) gFejl.push(g.st.f + " passer ikke til niveau 2 (" + naermest + ")");
+        if (g.niveau === 2 && naermest > 10) gFejl.push(g.st.f + " for let til niveau 3 (" + naermest + ")");
+    });
+    paastand("12 gåder med fire forskellige etiketter, og afstanden passer til niveauet", D.GAADER.length === 12 && gFejl.length === 0, gFejl.join(", "));
+
+    overskrift("9. Sproget");
+    var tekster = [].concat(D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT, D.NIVEAU_ROS, D.GAADE_ROS,
+        [D.VAEGT_FAERDIG, D.GAADER_FAERDIG, D.REKORD_REPLIK],
+        D.RUNDE_REPLIK.map(function (r) { return r[1]; }),
+        D.PAR.map(function (p) { return p.hvorfor; }),
+        D.GAADE_NIVEAUER.map(function (n) { return n.hint; }),
+        D.STOFFER.map(function (s) { return s.fakta; }),
+        D.VAEGT.map(function (o) { return D.hintByg(o.st) + " " + D.svarByg(o.st) + " " + D.enMol(o.st); }));
+    var krop = d.body.innerText;
+    var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
+    paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
+    paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
+    var lange = [].concat(D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT, D.NIVEAU_ROS, D.GAADE_ROS,
+        [D.VAEGT_FAERDIG, D.GAADER_FAERDIG, D.REKORD_REPLIK], D.RUNDE_REPLIK.map(function (r) { return r[1]; }))
+        .filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("hver præsentation har to eller tre replikker", [D.INTRO_VAEGT, D.INTRO_SKAAL, D.INTRO_UKENDT].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    var teori = d.getElementById("teori");
+    paastand("teorien er lukket fra start", !teori.classList.contains("vis"));
+
+    overskrift("10. Vægten kan gennemføres");
+    klik('[data-fane="fane-vaegt"]');
+    V.tilpas();
+    V.nulstilAlt();
+    function atommasseTekst(s) { return NK.komma(Math.round(TABEL[s][1] * 100)); }
+    function loesVaegt(i) {
+        V.vaelg(i);
+        var st = V.opg.st;
+        st.orden.forEach(function (s) { for (var n = 0; n < st.antal[s]; n++) V.tilfoej(s, true); });
+        for (var k = 0; k < 60; k++) V.opdater(1 / 60);
+        st.orden.forEach(function (s) { V.aktivtFelt().input.value = atommasseTekst(s); V.tjek(); });
+        V.aktivtFelt().input.value = NK.komma(MOLAR[st.f] * 100); V.tjek();
+    }
+    var ikkeLoest = [];
+    D.VAEGT.forEach(function (o, i) {
+        loesVaegt(i);
+        if (!V.status[i].loest || !V.status[i].stjerne) ikkeLoest.push(o.st.f);
+    });
+    paastand("alle 12 stoffer kan vejes med tabellens tal og får en stjerne", ikkeLoest.length === 0, ikkeLoest.join(", "));
+    V.nulstilAlt();
+    V.vaelg(0);
+    V.tilfoej("H", true); V.tilfoej("N", true);
+    paastand("et forkert atom giver beskeden om, at vand ingen N har", /ingen N/.test(V.el.besked.textContent));
+    var n = V.atomer.filter(function (a) { return a.s === "N"; })[0];
+    V.fjern(n);
+    for (var i = 0; i < 60; i++) V.opdater(1 / 60);
+    paastand("et klik på kuglen fjerner den igen", V.atomer.every(function (a) { return a.s !== "N"; }));
+    V.tilfoej("H", true); V.tilfoej("O", true);
+    paastand("med 2 H og 1 O samler molekylet sig", V.dannet && V.opg.felter[0].status === "ok");
+    paastand("vægten viser 0,00 g for ét molekyle", V.displayTekst().t === "0,00 g");
+    V.aktivtFelt().input.value = "1,01"; V.tjek();
+    V.aktivtFelt().input.value = "8"; V.tjek();
+    paastand("8 for O giver beskeden om atomnummeret", /atomnummeret/.test(V.el.besked.textContent) && V.aktivtFelt().s === "O");
+    V.aktivtFelt().input.value = "16,00"; V.tjek();
+    V.aktivtFelt().input.value = "18,02"; V.tjek();
+    for (i = 0; i < 60 * 3; i++) V.opdater(1 / 60);
+    paastand("bagefter viser vægten 18,02 g for 1 mol", V.displayTekst().t === "18,02 g" && V.displayTekst().etiket === "1 mol");
+    paastand("statuslinjen siger, hvad 1 mol vand er", /18 mL/.test(d.getElementById("vaegt-status").textContent));
+    V.vaelg(2);
+    V.knap(); V.knap();
+    for (i = 0; i < 60; i++) V.opdater(1 / 60);
+    paastand("Vis svaret bygger molekylet", V.dannet && V.opg.felter[0].status === "svar");
+    while (V.aktivtFelt()) { V.knap(); V.knap(); }
+    paastand("med svarene vist er stoffet løst, men uden stjerne", V.status[2].loest && !V.status[2].stjerne);
+    V.vaelg(1); V.knap();
+    paastand("hintet til O₂ handler om tallet efter symbolet", /Tallet efter et symbol/.test(V.el.besked.textContent));
+    loesVaegt(1); loesVaegt(3);
+    for (i = 0; i < 200; i++) V.opdater(1 / 60);
+    paastand("fire stoffer i niveau 1: Kemichael roser", V.rost[0] === true && !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "niveau"));
+    V.vaelg(0);
+    paastand("et løst stof vises med 1 mol på vægten", V.opg.gennemsyn && V.opg.faerdig && V.el.knap.textContent === "Vej stoffet igen");
+    V.nulstilAlt();
+    paastand("Start forfra nulstiller alt", V.antalLoest() === 0);
+
+    overskrift("11. Skålvægten kan spilles");
+    klik('[data-fane="fane-skaal"]');
+    S.tilpas();
+    S.nyRunde();
+    paastand("en runde er ni par, tre fra hvert niveau",
+        S.runde.length === 9 && [0, 1, 2].every(function (nv) { return S.runde.filter(function (p) { return p.niveau === nv; }).length === 3; }));
+    paastand("vægten er låst fra start", S.laast && S.vinkel === 0);
+    var rv = S.regnestykke(D.stof("H2O"), 2), ro = S.regnestykke(D.stof("O2"), 1), rf = S.regnestykke(D.stof("Fe"), 2);
+    paastand("kortet skriver m = 1 mol · (2 · 1,01 + 16,00) g/mol = 18,02 g",
+        rv.venstre === "m = 1 mol · (2 · 1,01 + 16,00) g/mol" && rv.resultat === "= 18,02 g", rv.venstre + " " + rv.resultat);
+    paastand("uden plus ingen parentes: m = 1 mol · 2 · 16,00 g/mol og 55,85 g/mol for Fe",
+        ro.venstre === "m = 1 mol · 2 · 16,00 g/mol" && ro.resultat === "" && rf.venstre === "m = 1 mol · 55,85 g/mol");
+    paastand("før hintet står kun m = 1 mol · M(H₂O)", S.regnestykke(D.stof("H2O"), 0).venstre === "m = 1 mol · M(H₂O)");
+    S.vaelgSvar(S.facit());
+    paastand("et rigtigt svar giver et point", S.point === 1 && S.stime === 1);
+    for (i = 0; i < 60 * 4; i++) S.opdater(1 / 60);
+    var mv = S.maalVinkel();
+    paastand("armen falder til ro på den rigtige side", Math.abs(S.vinkel - mv) < 0.01 && (S.facit() === "l" ? mv === 0 : (S.facit() === "h") === (mv > 0)));
+    S.knap();
+    var forkert = S.facit() === "v" ? "h" : "v";
+    S.vaelgSvar(forkert);
+    paastand("et forkert svar nulstiller stimen og giver en forklaring", S.point === 1 && S.stime === 0 && S.el.besked.textContent.length > 20);
+    S.knap();
+    S.knap(); S.knap();
+    paastand("Vis svaret giver intet point", S.point === 1 && S.visteSvar);
+    while (!S.slut) { if (!S.svar) S.vaelgSvar(S.facit()); S.knap(); }
+    paastand("runden kan spilles til ende", S.slut && S.point === 7);
+    paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc4.1-skaal")) || {}).rekord >= 7);
+    S.runde = [{ v: D.stof("CO"), h: D.stof("N2"), niveau: 2, hvorfor: "" }];
+    S.nr = 0; S.slut = false; S.nytPar();
+    S.vaelgSvar("l");
+    for (i = 0; i < 60 * 3; i++) S.opdater(1 / 60);
+    paastand("CO mod N₂ står lige", S.facit() === "l" && Math.abs(S.vinkel) < 0.001 && S.rigtigt);
+    S.nyRunde();
+
+    overskrift("12. Ukendt stof kan løses");
+    klik('[data-fane="fane-ukendt"]');
+    U.tilpas();
+    U.nulstilAlt();
+    U.vaelg(8);
+    var g = U.opg.g;
+    paastand("gåden C₂H₄ har mærket 28,06 g/mol", g.st.f === "C2H4" && d.getElementById("ukendt-prompt").textContent === "M = 28,06 g/mol");
+    var fk = U.opg.kort.filter(function (k) { return k.st.f === "N2"; })[0];
+    U.send(fk);
+    for (i = 0; i < 90; i++) U.opdater(1 / 60);
+    paastand("en forkert etiket falder af og bliver streget ud", fk.kryds && !fk.paaFlasken && U.opg.forsoeg === 1 && !U.flyv);
+    paastand("beskeden siger, hvor langt den er fra", /28,02 g\/mol\. Det er 0,04 g\/mol for lidt/.test(U.el.besked.textContent));
+    U.send(fk);
+    paastand("en streget etiket kan ikke sendes igen", !U.flyv);
+    var rk = U.opg.kort.filter(function (k) { return k.st === g.st; })[0];
+    U.send(rk);
+    for (i = 0; i < 60; i++) U.opdater(1 / 60);
+    paastand("den rigtige etiket bliver siddende, men uden stjerne efter en fejl", rk.paaFlasken && U.status[8].loest && !U.status[8].stjerne);
+    U.vaelg(9);
+    U.send(U.opg.kort.filter(function (k) { return k.st === U.opg.g.st; })[0]);
+    for (i = 0; i < 60; i++) U.opdater(1 / 60);
+    paastand("løst i første forsøg giver en stjerne", U.status[9].loest && U.status[9].stjerne);
+    U.vaelg(10); U.knap(); U.knap();
+    for (i = 0; i < 60; i++) U.opdater(1 / 60);
+    paastand("Vis svaret sætter den rigtige etiket på, uden stjerne", U.status[10].loest && !U.status[10].stjerne);
+    U.vaelg(11);
+    U.send(U.opg.kort.filter(function (k) { return k.st === U.opg.g.st; })[0]);
+    for (i = 0; i < 200; i++) U.opdater(1 / 60);
+    paastand("fire flasker i niveau 3: Kemichael roser", U.rost[2] === true && !!(U.laerer && U.laerer.scene && U.laerer.scene.navn === "niveau"));
+    U.nulstilAlt();
+    paastand("Tag etiketterne af igen nulstiller alt", U.antalLoest() === 0);
+
+    overskrift("13. Kemichaels præsentation");
+    klik('[data-fane="fane-vaegt"]');
+    V.startIntro(true);
+    for (i = 0; i < 60; i++) V.opdater(1 / 60);
+    paastand("K viser præsentationen igen", !!(V.laerer.scene && V.laerer.scene.navn === "intro") && !d.getElementById("vaegt-spring").hidden);
+    V.tilfoej("O", true);
+    paastand("man kan bygge, mens han taler", V.atomer.length === 1 && V.laerer.scene.navn === "intro");
+    V.springIntro();
+    paastand("Spring over sender ham ud", V.laerer.scene && V.laerer.scene.navn === "introUd");
+    V.nulstilAlt();
+
+    overskrift("14. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-vaegt", "fane-skaal", "fane-ukendt"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H, p = lay.p;
+            function inde(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            inde(p, "plakaten");
+            if (p.cb < 34) problemer.push(id + ": felterne er kun " + Math.round(p.cb) + " px brede");
+            if (p.ch < 26) problemer.push(id + ": felterne er kun " + Math.round(p.ch) + " px høje");
+            if (id === "fane-vaegt") {
+                var vh = NK.Tegn.vaegtHoejde(lay.vaegtB);
+                var vr = { x: lay.vaegt.x - lay.vaegtB / 2, y: lay.bordY - vh, b: lay.vaegtB, h: vh };
+                inde(vr, "vægten");
+                over(vr, p, "vægten over plakaten");
+                if (lay.boks.y < p.y + p.h) problemer.push(id + ": molekylet går op i plakaten");
+                ["Al2(SO4)3", "C6H12O6", "C6H14"].forEach(function (f) {
+                    sim.vaelg(D.VAEGT.map(function (o) { return o.st.f; }).indexOf(f));
+                    var u = sim.enhed(), m = NK.Tegn.strukturMaal(D.stof(f).struktur);
+                    if (m.b * u > lay.boks.b + 1 || m.h * u > lay.boks.h + 1) problemer.push(id + ": " + f + " er for stort");
+                    if (u < 12) problemer.push(id + ": " + f + " er for lille (" + u.toFixed(1) + ")");
+                });
+            }
+            if (id === "fane-skaal") {
+                var v = lay.v, grad = 14.5 * Math.PI / 180;
+                var fl = NK.Tegn.skaalFlader(v, grad);
+                var laveste = Math.max(fl[0].y, fl[1].y) + 22 * v.sk;
+                if (laveste > lay.bordY - 2) problemer.push(id + ": skålen rammer bordet");
+                var hoejeste = Math.min(fl[0].krogY, fl[1].krogY) - 6;
+                if (hoejeste < p.y + p.h) problemer.push(id + ": armen går op i plakaten");
+                if (v.x - v.L - 80 * v.sk < 0 || v.x + v.L + 80 * v.sk > Wc) problemer.push(id + ": skålene går ud af billedet");
+                inde(lay.skilt, "skiltet");
+                /* Det længste par i hver retning, med resultatet på */
+                var mindst = 99, hvem = "";
+                D.PAR.forEach(function (pr) {
+                    [{ v: pr.a, h: pr.b }, { v: pr.b, h: pr.a }].forEach(function (par) {
+                        var pl = sim.skiltPlan(sim.L.ctx, 2, par);
+                        if (pl.px < mindst) { mindst = pl.px; hvem = par.v.f + "/" + par.h.f; }
+                        if (pl.i_alt > lay.skilt.b + 1) problemer.push(id + ": " + par.v.f + "/" + par.h.f + " kan ikke være på skiltet");
+                    });
+                });
+                if (mindst < 11) problemer.push(id + ": beregningen på skiltet er kun " + mindst + " px (" + hvem + ")");
+            }
+            if (id === "fane-ukendt") {
+                var fb = NK.Tegn.flaskeBredde(lay.flaskeH);
+                var fr = { x: lay.flaske.x - fb / 2, y: lay.bordY - lay.flaskeH, b: fb, h: lay.flaskeH };
+                inde(fr, "flasken");
+                inde(lay.tavle, "tavlen");
+                inde(lay.maerke, "mærket");
+                over(fr, lay.tavle, "flasken over tavlen");
+                over(lay.maerke, lay.tavle, "mærket over tavlen");
+                over(lay.maerke, fr, "mærket over flasken");
+                if (lay.tavle.y < p.y + p.h) problemer.push(id + ": tavlen går op i plakaten");
+                if (lay.kortH < 34) problemer.push(id + ": etiketterne er kun " + Math.round(lay.kortH) + " px høje");
+            }
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-vaegt"]');
+    V.nulstilAlt();
+}
+</script>
+</body>
+</html>

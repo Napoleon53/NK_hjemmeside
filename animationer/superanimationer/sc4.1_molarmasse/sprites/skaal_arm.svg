@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="40" viewBox="0 0 400 40">
+  <!-- Skaalvaegtens arm. Den drejer om midten (200, 20). Skaalene
+       haenger i krogene (12, 20) og (388, 20). -->
+  <defs>
+    <linearGradient id="arm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8c97f"/>
+      <stop offset="0.5" stop-color="#c49a45"/>
+      <stop offset="1" stop-color="#7d5d22"/>
+    </linearGradient>
+  </defs>
+  <path d="M10 17 L186 11 Q200 9 214 11 L390 17 L390 23 L214 29 Q200 31 186 29 L10 23 Z"
+        fill="url(#arm)" stroke="#5e4619" stroke-width="1"/>
+  <path d="M16 18 L190 13" stroke="#fff4d6" stroke-opacity="0.5" stroke-width="1"/>
+  <path d="M210 13 L384 18" stroke="#fff4d6" stroke-opacity="0.5" stroke-width="1"/>
+  <circle cx="200" cy="20" r="11" fill="url(#arm)" stroke="#5e4619" stroke-width="1"/>
+  <circle cx="200" cy="20" r="3.5" fill="#3d2f16"/>
+  <circle cx="12" cy="20" r="5" fill="none" stroke="#5e4619" stroke-width="2.4"/>
+  <circle cx="388" cy="20" r="5" fill="none" stroke="#5e4619" stroke-width="2.4"/>
+</svg>

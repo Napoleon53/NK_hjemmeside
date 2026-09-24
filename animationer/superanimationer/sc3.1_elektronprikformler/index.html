@@ -6,33 +6,43 @@
 <title>Elektron-prikformler</title>
 <link rel="stylesheet" href="css/stil.css">
 </head>
-<body>
+<body data-fane="byg">
 
 <header class="top">
-    <div>
-        <span class="opgave-taeller">Opgave <span id="niveau-nu">1</span>/<span id="niveau-total">9</span></span>
+    <div class="titel">
+        <span class="opgave-taeller" id="taeller-tekst">Opgave 1/9</span>
         <h1>Elektron-prikformler</h1>
     </div>
 
-    <div class="opgave-menu" id="opgave-menu"></div>
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="byg" type="button" role="tab" aria-selected="true" title="Byg (1)"><span class="nr">1</span>Byg</button>
+        <button class="faneknap" data-fane="fejl" type="button" role="tab" aria-selected="false" title="Find fejlen (2)"><span class="nr">2</span>Find fejlen</button>
+    </div>
 
-    <button class="ikonknap" id="rundvisning-knap" type="button" title="Rundvisning" aria-label="Rundvisning">?</button>
+    <div class="opgave-menu kun-byg" id="opgave-menu"></div>
+    <div class="opgave-menu kun-fejl" id="fejl-menu"></div>
+
+    <button class="ikonknap" id="rundvisning-knap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
 </header>
 
 <main id="scene">
     <canvas id="laerred"></canvas>
 
-    <div id="stregformel-panel">
+    <div id="stregformel-panel" class="kun-byg">
         <div id="stregformel-titel">Stregformel</div>
         <canvas id="stregformel-laerred" width="224" height="180"></canvas>
     </div>
 
     <div id="hint-boks">
-        <div id="hint-boks-titel">Hint</div>
+        <div class="hint-hoved">
+            <span id="hint-boks-titel">Hint</span>
+            <button id="hint-luk" type="button" aria-label="Luk hintet">✕</button>
+        </div>
         <p id="hint-tekst"></p>
+        <img id="hint-sprite" alt="Den rigtige elektronprikformel" hidden>
     </div>
 
-    <div id="opsaetning-overlay" class="overlay-boks">
+    <div id="opsaetning-overlay" class="overlay-boks kun-byg">
         <div id="opsaetning-molekyle"></div>
         <h2 id="opsaetning-overskrift"></h2>
         <p class="opsaetning-sp">Hvor mange elektroner er der i yderste skal?</p>
@@ -42,9 +52,10 @@
         </div>
         <div id="periodisk-system" class="pt-grid"></div>
         <div id="valens-knapper"></div>
+        <p class="valens-besked" id="valens-besked" aria-live="polite"></p>
     </div>
 
-    <div id="sejr-overlay" class="sejr-kort skjult">
+    <div id="sejr-overlay" class="sejr-kort skjult kun-byg">
         <img id="sejr-sprite" alt="">
         <div>
             <h2>Korrekt elektronprikformel</h2>
@@ -54,25 +65,49 @@
     </div>
 
     <div id="toast"></div>
+
+    <!-- Kemichael tegnes paa sit eget lag oven over vinduerne - se js/laerer.js -->
+    <canvas id="laerer-lag" aria-hidden="true"></canvas>
+    <div class="tilbud" id="tilbud" hidden>
+        <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+        <button class="tilbud-nej" type="button">Nej tak</button>
+    </div>
+    <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
 </main>
 
 <footer>
-    <p class="vejledning">
-        <b>Vejledning:</b> Træk atomer sammen for at binde dem. Klik på de fælles elektroner for at skifte
-        enkelt → dobbelt → tripel → fjern. Træk atomer fra hinanden for at bryde bindingen.
-    </p>
-    <div class="knaprad">
-        <button class="knap lilla skjult" id="hint-knap" type="button">Hint</button>
-        <button class="knap skjult" id="nulstil-knap" type="button">Nulstil</button>
-        <button class="knap blaa skjult" id="tjek-knap" type="button">Tjek svar</button>
+    <div class="bund kun-byg" id="byg-bund">
+        <p class="vejledning">
+            <b>Vejledning:</b> Træk atomer sammen for at binde dem. Klik på de fælles elektroner for at skifte
+            enkelt → dobbelt → tripel → fjern. Tæl selv elektronerne om hvert atom, og tryk Tjek svar.
+        </p>
+        <div class="knaprad">
+            <button class="knap lilla skjult" id="byg-knap" type="button">Giv hint</button>
+            <button class="knap skjult" id="nulstil-knap" type="button">Nulstil</button>
+            <button class="knap blaa skjult" id="tjek-knap" type="button">Tjek svar</button>
+        </div>
+    </div>
+
+    <div class="bund kun-fejl" id="fejl-bund">
+        <div class="fejl-tekst">
+            <p class="fejl-spm" id="fejl-spm"></p>
+            <p class="fejl-besked" id="fejl-besked" aria-live="polite"></p>
+        </div>
+        <div class="fejl-svar" id="fejl-svar"></div>
+        <button class="knap lilla" id="fejl-knap" type="button">Giv hint</button>
     </div>
 </footer>
 
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/tegning.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
 <script src="js/sim_byg.js"></script>
+<script src="js/sim_fejl.js"></script>
+<script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

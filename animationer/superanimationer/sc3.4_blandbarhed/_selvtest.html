@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, sc3.4 Blandbarhed</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at tallene stemmer med tabellerne, at modellen
+   giver ét lag eller to de rigtige steder og med det letteste oeverst,
+   at vaesken altid er taet, at en emulsion skiller sig ad igen, at
+   ethanol koger foer vand, at intet forsvinder, at alle seks opgaver kan
+   loeses, og at sproget overholder reglerne. Koeres gennem en lokal
+   server eller med Chrome og --allow-file-access-from-files.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function naer(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+/* Reproducerbar tilfaeldighed, saa modellens forsoeg giver det samme hver gang */
+function rng(seed) { var s = seed >>> 0; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+window.addEventListener("load", function () { setTimeout(koer, 1200); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    var D = NK.Data;
+    paastand("bassin, opgaver og quiz er bygget", !!(NK.bassin && NK.opgaver && NK.quiz));
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    if (NK.laerer) NK.laerer.stopIntro();
+    var iv = D.nr("vand"), ie = D.nr("ethanol"), io = D.nr("olie");
+
+    function model(seed) { return new NK.Model(D, { tilfaeldig: rng(seed) }); }
+    function trin(m, sek) { for (var t = 0; t < sek; t += 1 / 60) m.opdater(1 / 60); }
+    function fyld(m, liste, blandet) { m.fyldStraks(liste, blandet); }
+    function lagAf(a, fase) { return a.lag.filter(function (l) { return l.fase === fase; }).sort(function (x, y) { return y.n - x.n; })[0]; }
+    function midt(l) { return (l.fra + l.til) / 2; }
+    function hulFri(m) {
+        var top = m.top();
+        for (var r = 0; r < top; r++) {
+            for (var c = 0; c < m.C; c++) {
+                var k = r * m.C + c;
+                if (m.plads[k] < 0 && !m.boble[k]) return false;
+            }
+        }
+        return true;
+    }
+
+    overskrift("2. Stofferne (Databogen og CRC)");
+    paastand("tætheder: vand 0,998, ethanol 0,789, olie 0,92 g/mL",
+        D.STOFFER[iv].taethed === 0.998 && D.STOFFER[ie].taethed === 0.789 && D.STOFFER[io].taethed === 0.92);
+    paastand("kogepunkter: vand 100 °C, ethanol 78,3 °C, olie koger ikke",
+        D.STOFFER[iv].kp === 100 && D.STOFFER[ie].kp === 78.3 && D.STOFFER[io].kp === null);
+    paastand("damptrykket er 1 atm ved kogepunktet",
+        naer(D.damptryk(D.STOFFER[iv], 100), 1, 0.001) && naer(D.damptryk(D.STOFFER[ie], 78.3), 1, 0.001) && D.damptryk(D.STOFFER[io], 120) === 0);
+    paastand("ved 90 °C er ethanol over 1 atm og vand under",
+        D.damptryk(D.STOFFER[ie], 90) > 1 && D.damptryk(D.STOFFER[iv], 90) < 1);
+    var t11 = D.faseTaethed([3, 3, 0]), t23 = D.faseTaethed([2, 3, 0]);
+    paastand("lige dele vand og ethanol vejer 0,926 g/mL (tabellen: 44 % ethanol)", naer(t11, 0.926, 0.002), t11.toFixed(4));
+    paastand("2 dele vand og 3 dele ethanol vejer 0,904 g/mL, lettere end olie", naer(t23, 0.904, 0.002) && t23 < 0.92, t23.toFixed(4));
+    paastand("ren vand og ren ethanol giver tabelværdien", naer(D.faseTaethed([1, 0, 0]), 0.998, 1e-6) && naer(D.faseTaethed([0, 1, 0]), 0.789, 1e-6));
+    paastand("olien svæver kun i lige dele (under 0,008 g/mL fra olie)",
+        Math.abs(t11 - 0.92) < NK.Model.PARAM.svaeve && Math.abs(t23 - 0.92) > NK.Model.PARAM.svaeve);
+
+    overskrift("3. Blandbarheden følger af kræfterne mellem molekylerne");
+    paastand("vand og ethanol kan blandes", D.blandbar(iv, ie));
+    paastand("vand og olie kan ikke", !D.blandbar(iv, io));
+    paastand("ethanol og olie kan ikke", !D.blandbar(ie, io));
+    var m0 = model(1);
+    paastand("modellen lægger vand og ethanol i samme fase og olie for sig",
+        m0.fase[iv] === m0.fase[ie] && m0.fase[io] !== m0.fase[iv]);
+
+    overskrift("4. Bassinet er altid tæt");
+    var m = model(2);
+    fyld(m, [iv, iv, iv]);
+    paastand("tre portioner fylder præcis ni rækker", m.top() === 8 && m.raekkeAntal[8] === m.C);
+    m = model(3);
+    fyld(m, [iv, iv, iv, iv, iv, iv, iv, iv, iv]);
+    paastand("ni portioner fylder bassinet helt (" + m.C * m.R + " kugler)", m.top() === m.R - 1 && m.raekkeAntal[m.R - 1] === m.C && m.spildt === 0);
+    m = model(4);
+    fyld(m, [iv, iv]);
+    for (var i = 0; i < 8; i++) m.haeldI(i % 2 ? io : iv);
+    trin(m, 12);
+    var o4 = m.opgoer();
+    paastand("ti portioner: det, der er for meget, løber over", m.spildt >= 96 && o4.alt[iv] + o4.alt[io] === m.C * m.R, "spildt " + m.spildt);
+    paastand("ingen huller under overfladen efter hældning og overløb", hulFri(m));
+    m = model(5);
+    fyld(m, [iv, iv, iv, io]);
+    m.ryst(1.2);
+    trin(m, 0.6);
+    paastand("ingen huller midt i en rystning", hulFri(m));
+
+    overskrift("5. Ét lag eller to");
+    m = model(6);
+    fyld(m, [iv, iv, iv]);
+    m.haeldI(ie);
+    trin(m, 10);
+    var a = m.analyse();
+    paastand("vand + ethanol: én fase og ét lag", a.faser === 1 && a.lag.length === 1 && !a.uklart);
+    var bl = blanding(m, iv, ie);
+    paastand("vand + ethanol: kuglerne ligger mellem hinanden (blandingsgrad " + bl.toFixed(2) + ")", bl > 0.85);
+
+    m = model(7);
+    fyld(m, [iv, iv, iv]);
+    m.haeldI(io);
+    trin(m, 12);
+    a = m.analyse();
+    var lo = lagAf(a, m.fase[io]), lv = lagAf(a, m.fase[iv]);
+    paastand("vand + olie: to lag", a.faser === 2 && !!lo && !!lv && !a.uklart);
+    paastand("vand + olie: olien øverst", !!lo && !!lv && midt(lo) > midt(lv) && lo.til === m.top());
+
+    m = model(8);
+    fyld(m, [ie, ie, ie]);
+    m.haeldI(io);
+    trin(m, 12);
+    a = m.analyse();
+    lo = lagAf(a, m.fase[io]);
+    var le = lagAf(a, m.fase[ie]);
+    paastand("ethanol + olie: to lag med olien nederst", !!lo && !!le && lo.fra === 0 && midt(lo) < midt(le) && !a.uklart);
+
+    overskrift("6. Rystning og varme ændrer ikke på det");
+    m = model(9);
+    fyld(m, [iv, iv, iv, io]);
+    trin(m, 1);
+    m.ryst(1.2);
+    trin(m, 1.5);
+    paastand("olie + vand rystet: uklart lige efter", m.analyse().uklart);
+    trin(m, 12);
+    a = m.analyse();
+    lo = lagAf(a, m.fase[io]);
+    paastand("olie + vand rystet: to lag igen efter 12 s, olien øverst", !a.uklart && !!lo && lo.til === m.top() && lo.n >= 90);
+    m = model(10);
+    fyld(m, [iv, iv, ie, ie], true);
+    m.ryst(1.2);
+    trin(m, 5);
+    a = m.analyse();
+    paastand("vand + ethanol rystet: stadig ét lag", a.faser === 1 && !a.uklart);
+
+    m = model(11);
+    fyld(m, [iv, iv, ie, ie], true);
+    var foer = m.opgoer().alt.slice();
+    m.saetT(90);
+    trin(m, 6);
+    var o = m.opgoer();
+    paastand("ved 90 °C koger ethanol (" + o.damp[ie] + " i dampen), vandet næsten ikke (" + o.damp[iv] + ")", o.damp[ie] >= 10 && o.damp[iv] <= 6);
+    m.saetT(110);
+    trin(m, 5);
+    o = m.opgoer();
+    paastand("ved 110 °C koger vandet også (" + o.damp[iv] + " i dampen)", o.damp[iv] >= 10);
+    m.saetT(20);
+    trin(m, 10);
+    o = m.opgoer();
+    paastand("afkølet til 20 °C falder dampen tilbage (" + (o.damp[iv] + o.damp[ie]) + " tilbage)", o.damp[iv] + o.damp[ie] <= 2);
+    paastand("intet er forsvundet undervejs", o.alt[iv] === foer[iv] && o.alt[ie] === foer[ie]);
+    paastand("ét lag igen efter afkøling", m.analyse().faser === 1);
+    m = model(12);
+    fyld(m, [iv, iv, iv, io]);
+    m.saetT(95);
+    trin(m, 6);
+    a = m.analyse();
+    lo = lagAf(a, m.fase[io]);
+    paastand("olie + vand ved 95 °C: stadig to lag, olien øverst", a.faser === 2 && !!lo && lo.til >= m.top() - 1);
+
+    overskrift("7. Tætheden afgør rækkefølgen, også når den skifter");
+    m = model(13);
+    fyld(m, [iv, iv, io]);
+    m.haeldI(ie); m.haeldI(ie); m.haeldI(ie);
+    trin(m, 4);
+    m.ryst(1.2);
+    var tid = 0;
+    while (tid < 40 && !NK.Opgaver.TJEK.olieNederst(m.analyse(), m)) { trin(m, 1); tid++; }
+    paastand("2 vand + olie + 3 ethanol, rystet: olien ender nederst (" + tid + " s)", tid < 40);
+    m = model(14);
+    fyld(m, [iv, iv, iv, ie, ie, ie], true);
+    m.haeldI(io);
+    trin(m, 1.5);
+    m.ryst(1.2);
+    trin(m, 25);
+    a = m.analyse();
+    lo = lagAf(a, m.fase[io]);
+    paastand("lige dele vand og ethanol: olien samler sig hverken i bunden eller i toppen",
+        !lo || !(lo.fra === 0 && lo.n > 80) && !(lo.til === m.top() && lo.n > 80 && !lo.svaever));
+
+    overskrift("8. Opgaverne");
+    var OP = D.OPGAVER;
+    paastand("seks opgaver", OP.length === 6);
+    paastand("hver opgave med valg har præcis ét rigtigt svar, og hvert forkert har sin forklaring",
+        OP.every(function (x) {
+            if (!x.valg) return true;
+            return x.valg.filter(function (v) { return v.rigtig; }).length === 1 && x.valg.every(function (v) { return v.rigtig || (v.fejl && v.fejl.length > 20); });
+        }));
+    paastand("hver opgave har hint og svar", OP.every(function (x) { return x.hint && x.svar; }));
+    var G = NK.opgaver, loest = 0;
+    function klasse(id) { return d.getElementById(id).className; }
+    for (i = 0; i < OP.length; i++) {
+        G.knap();
+        if (OP[i].valg) {
+            var rigtig = OP[i].valg.findIndex(function (v) { return v.rigtig; });
+            var forkert = OP[i].valg.findIndex(function (v) { return !v.rigtig; });
+            if (i === 0) {
+                G.vaelg(forkert);
+                paastand("opgave 1: et forkert svar giver forklaringen til fejlen",
+                    d.getElementById("opg-hint").textContent === OP[0].valg[forkert].fejl && /skidt/.test(klasse("opg-hint")));
+                paastand("opgave 1: knappen er nu Ny opgave", d.getElementById("opg-knap").textContent === "Ny opgave");
+                G.nr--; G.knap();
+            }
+            G.vaelg(rigtig);
+            paastand("opgave " + (i + 1) + ": det rigtige svar giver grøn forklaring", /god/.test(klasse("opg-svar")));
+        } else {
+            NK.bassin.haeld("ethanol"); NK.bassin.haeld("ethanol"); NK.bassin.haeld("ethanol");
+            for (var s = 0; s < 4 * 60; s++) { NK.bassin.opdater(1 / 60); G.opdater(1 / 60); }
+            NK.bassin.ryst(1.2);
+            for (s = 0; s < 45 * 60 && !G.o.afsluttet; s++) { NK.bassin.opdater(1 / 60); G.opdater(1 / 60); }
+            paastand("opgave " + (i + 1) + " (byg): løst ved at hælde ethanol i og ryste", /god/.test(klasse("opg-svar")), (s / 60).toFixed(0) + " s");
+        }
+    }
+    paastand("tælleren viser 6 løste", d.getElementById("opg-loest").textContent === "6");
+    paastand("opgave 6 satte temperaturen til 90 °C", NK.bassin.m.T === 90 && d.getElementById("temp").value === "90");
+    G.knap();
+    paastand("efter sidste opgave: Start forfra", d.getElementById("opg-knap").textContent === "Start forfra");
+
+    overskrift("9. Quizzen");
+    paastand("fem spørgsmål", D.QUIZ.length === 5);
+    paastand("hvert spørgsmål har præcis ét rigtigt svar, og hvert forkert har sin forklaring",
+        D.QUIZ.every(function (q) {
+            return q.svar.filter(function (v) { return v.rigtig; }).length === 1 && q.svar.every(function (v) { return v.rigtig || (v.fejl && v.fejl.length > 20); }) && q.forklaring;
+        }));
+    var Q = NK.quiz;
+    Q.aabn();
+    for (i = 0; i < D.QUIZ.length; i++) {
+        var r = D.QUIZ[i].svar.findIndex(function (v) { return v.rigtig; });
+        Q.svar(r);
+        Q.naeste();
+    }
+    paastand("quizzen kan gennemføres med 5/5", Q.slut && Q.point === 5 && /5 ud af 5/.test(d.getElementById("quiz-spm").textContent));
+
+    overskrift("10. Kemichael");
+    paastand("præsentationen har to eller tre linjer på højst 60 tegn",
+        D.INTRO.length >= 2 && D.INTRO.length <= 3 && D.INTRO.every(function (l) { return l.length <= 60; }));
+    paastand("hans replikker er højst 60 tegn",
+        Object.keys(D.REPLIK).every(function (k) { return D.REPLIK[k].every(function (l) { return l.length <= 60; }); }));
+
+    overskrift("11. Sproget");
+    d.getElementById("teori").classList.add("vis");
+    var tekster = [d.body.innerText];
+    OP.forEach(function (x) {
+        tekster.push(x.tekst, x.hint, x.svar);
+        (x.valg || []).forEach(function (v) { tekster.push(v.tekst, v.fejl || ""); });
+    });
+    D.QUIZ.forEach(function (q) {
+        tekster.push(q.spm, q.forklaring);
+        q.svar.forEach(function (v) { tekster.push(v.tekst, v.fejl || ""); });
+    });
+    tekster = tekster.concat(D.INTRO);
+    Object.keys(D.REPLIK).forEach(function (k) { tekster = tekster.concat(D.REPLIK[k]); });
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−])1[+−]|¹[⁺⁻]/.test(alt));
+    var smaa = [];
+    Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+        if (!e.offsetWidth || !e.childNodes.length) return;
+        var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+        if (!harTekst) return;
+        var fs = parseFloat(w.getComputedStyle(e).fontSize);
+        if (fs < 11.5) smaa.push(e.tagName + "." + e.className + " " + fs + "px");
+    });
+    paastand("ingen synlig tekst under 12 px (teorien åben)", smaa.length === 0, smaa.slice(0, 4).join(", "));
+    d.getElementById("teori").classList.remove("vis");
+
+    vis();
+}
+
+/* Andelen af naboskaber mellem to stoffer i forhold til en tilfaeldig blanding */
+function blanding(m, a, b) {
+    var ens = 0, fors = 0, na = 0, nb = 0;
+    for (var k = 0; k < m.plads.length; k++) {
+        var x = m.plads[k];
+        if (x < 0) continue;
+        var ax = m.kugler[x].art;
+        if (ax === a) na++;
+        if (ax === b) nb++;
+        for (var dd = 0; dd < 6; dd++) {
+            var j = m.NB[k * 6 + dd];
+            if (j < 0 || m.plads[j] < 0) continue;
+            var aj = m.kugler[m.plads[j]].art;
+            if ((ax === a && aj === b) || (ax === b && aj === a)) fors++;
+            else if ((ax === a || ax === b) && (aj === a || aj === b)) ens++;
+        }
+    }
+    var p = na / (na + nb);
+    return (fors / (fors + ens)) / (2 * p * (1 - p));
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

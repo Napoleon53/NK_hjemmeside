@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Kemi-Jeopardy</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i spillet og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at quizzen er hel og uden dobbelte spoergsmaal,
+   at pointene regnes rigtigt og kan fortrydes, reglerne for Daily Double
+   og Final, at spillet kan gemmes og hentes, at knapperne og tastaturet
+   foerer gennem et felt, at Kemichael praesenterer, at spillets egne lyde
+   kan laves uden at klippe, og at sproget overholder reglerne. Skal
+   koeres gennem en lokal server (Chrome maa ikke kigge ind i en iframe
+   paa file://) og i rigtig tid: med headless Chromes virtuelle tid
+   bliver lydene aldrig regnet faerdige, og afsnit 10 venter for evigt.
+   ?stop=N stopper efter afsnit N.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+/* ?stop=N stopper foer afsnit N+1, til fejlsoegning */
+var STOP = +(new URLSearchParams(location.search).get("stop") || 0);
+function overskrift(t) {
+    if (STOP && parseInt(t, 10) > STOP) throw new Error("stoppet før " + t);
+    skriv("\n" + t, "h");
+}
+
+window.addEventListener("load", function () {
+    setTimeout(function () {
+        try { koer(); } catch (e) { skriv("  FEJL  testen stoppede: " + e.message, "fejl"); fejl++; vis(); if (window.console) console.log("selvtest: " + e.stack); }
+    }, 1200);
+});
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    var D = NK.Data, S = NK.Spil, A = NK.app, F = NK.Tekstformat;
+    paastand("spil, tekstformat, visning, lyd og app er indlæst", !!(S && F && NK.Visning && NK.Lydbank && A));
+    paastand("Kemichael er med", !!NK.laerer);
+
+    /* Alt, spillet gemmer i browseren, saettes tilbage til sidst */
+    var gemt = {};
+    for (var gi = 0; gi < w.localStorage.length; gi++) {
+        var gn = w.localStorage.key(gi);
+        if (/^nk-jeopardy/.test(gn)) gemt[gn] = w.localStorage.getItem(gn);
+    }
+    Object.keys(gemt).forEach(function (k) { if (/^nk-jeopardy-egen/.test(k)) w.localStorage.removeItem(k); });
+    A.skiftNiveau("c");
+    var Q = S.Q();
+    var varSlukket = NK.Lydbank.slukket();
+    NK.Lydbank.saetSlukket(true);
+
+    function tast(key, code, shift) {
+        d.dispatchEvent(new w.KeyboardEvent("keydown", { key: key, code: code || "", shiftKey: !!shift, bubbles: true }));
+    }
+    function ren(html) { return NK.renTekst(html); }
+    function synligTekst(id) { return d.getElementById(id).textContent.replace(/­/g, ""); }
+
+    /* ----------------------------------------------------------------- */
+    overskrift("2. Quizzerne");
+    paastand("C er standard, B vælges med #b", Q.id === D.QUIZZER.c.id && D.STANDARD_NIVEAU === "c" && !!D.QUIZZER.b);
+    Object.keys(D.QUIZZER).forEach(function (niv) {
+        var QZ = D.QUIZZER[niv], nv = ren(QZ.navn) + ": ";
+        var alleLed = [], alleSvar = [], hulFelter = [], daarligeSvar = [];
+        QZ.runder.forEach(function (R) {
+            paastand(nv + "beløbene stiger, og hvert emne har et felt pr. beløb (" + R.kategorier.length + " × " + R.vaerdier.length + ")",
+                R.vaerdier.every(function (v, i) { return i === 0 || v > R.vaerdier[i - 1]; })
+                && R.kategorier.every(function (K) { return K.felter.length === R.vaerdier.length; }));
+            var navne = R.kategorier.map(function (K) { return ren(K.navn).toLowerCase(); });
+            paastand(nv + "emnerne har forskellige navne", navne.every(function (x, i) { return navne.indexOf(x) === i; }));
+            R.kategorier.forEach(function (K) {
+                K.felter.forEach(function (f, i) {
+                    if (!f.ledetraad || !f.svar) hulFelter.push(ren(K.navn) + " " + R.vaerdier[i]);
+                    alleLed.push(ren(f.ledetraad).toLowerCase());
+                    alleSvar.push(ren(f.svar).toLowerCase());
+                    if (!/^(Hvad|Hvem) er .+\?/.test(ren(f.svar))) daarligeSvar.push(ren(f.svar));
+                });
+            });
+        });
+        paastand(nv + "ingen tomme felter", hulFelter.length === 0, hulFelter.join(", "));
+        var dobbeltLed = alleLed.filter(function (t, i) { return alleLed.indexOf(t) !== i; });
+        paastand(nv + "ingen ledetråd går igen (" + alleLed.length + ")", dobbeltLed.length === 0, dobbeltLed.join(" | "));
+        var dobbeltSvar = alleSvar.filter(function (t, i) { return alleSvar.indexOf(t) !== i; });
+        paastand(nv + "intet svar går igen", dobbeltSvar.length === 0, dobbeltSvar.join(" | "));
+        paastand(nv + "alle svar er et spørgsmål: Hvad er …? eller Hvem er …?", daarligeSvar.length === 0, daarligeSvar.slice(0, 3).join(" | "));
+        paastand(nv + "Final har emne, ledetråd og et svar som spørgsmål",
+            !!(QZ.final && QZ.final.kategori && QZ.final.ledetraad && /^(Hvad|Hvem) er .+\?/.test(ren(QZ.final.svar))));
+    });
+
+    /* ----------------------------------------------------------------- */
+    overskrift("3. Point og fortryd");
+    S.nyt(["Alfa", "Beta", "Gamma"], 10);
+    S.tilBraettet();
+    A.ui.titel = false;
+    var T = S.T();
+    T.dobbelt = ["0.3.4"];
+    var n = "0.0.0";
+    S.aabn(n);
+    S.bedoem(n, 0, 1);
+    paastand("+ giver beløbet (100)", S.point(0) === 100);
+    paastand("og holdet får brættet", T.kontrol === 0);
+    S.bedoem(n, 0, 1);
+    paastand("+ igen fortryder", S.point(0) === 0);
+    S.bedoem(n, 1, -1);
+    paastand("− trækker beløbet fra", S.point(1) === -100);
+    S.bedoem(n, 1, 1);
+    paastand("+ efter − skifter til rigtigt (+100, ikke 0)", S.point(1) === 100 && T.kontrol === 1);
+    S.luk();
+    paastand("feltet er brugt, 29 tilbage", S.brugt(n) && S.tilbage() === 29);
+    S.saetPoint(2, 750);
+    paastand("læreren retter Gamma til 750", S.point(2) === 750);
+    S.aabn("0.1.1"); S.bedoem("0.1.1", 2, 1); S.luk();
+    paastand("og derefter tæller pointene videre (950)", S.point(2) === 950);
+    S.aabn(n);
+    paastand("et brugt felt åbnet igen husker udfaldet", S.udfald(n, 1) === 1);
+    S.luk();
+
+    /* ----------------------------------------------------------------- */
+    overskrift("4. Daily Double");
+    var dd = "0.3.4";
+    var f = S.aabn(dd);
+    paastand("feltet er en Daily Double og venter på en indsats", !!(f.dd && !f.dd.klar && f.dd.indsats === null));
+    paastand("holdet med brættet er valgt", f.dd.hold === T.kontrol);
+    paastand("før indsatsen kan ingen få point", S.bedoem(dd, T.kontrol, 1) === false);
+    S.ddHold(dd, 0);
+    paastand("hold med 0 kr. må satse op til 500", S.maksIndsats(0, dd) === 500);
+    S.ddHold(dd, 2);
+    paastand("hold med 950 kr. må satse op til 950", S.maksIndsats(2, dd) === 950);
+    paastand("for stor indsats sættes ned til grænsen", S.ddIndsats(dd, 5000) === 950);
+    paastand("et tomt felt er ingen indsats", S.ddIndsats(dd, "") === null && S.ddKlar(dd) === false);
+    S.ddIndsats(dd, 300);
+    paastand("med en indsats kan ledetråden vises", S.ddKlar(dd) === true);
+    paastand("kun holdet, der satsede, kan svare", S.bedoem(dd, 0, 1) === false);
+    S.bedoem(dd, 2, 1);
+    paastand("rigtigt svar giver indsatsen (950 + 300)", S.point(2) === 1250);
+    S.bedoem(dd, 2, -1);
+    paastand("forkert svar trækker indsatsen fra (950 − 300)", S.point(2) === 650);
+    S.luk();
+
+    /* ----------------------------------------------------------------- */
+    overskrift("5. Brættet slutter, Final og resultatet");
+    for (var k = 0; k < 6; k++) for (var i = 0; i < 5; i++) {
+        var m = "0." + k + "." + i;
+        if (!S.brugt(m)) { S.aabn(m); if (S.felt(m).dd) S.ddIndsats(m, 0), S.ddKlar(m); S.luk(); }
+    }
+    paastand("alle 30 felter brugt", S.rundeFaerdig() && S.tilbage() === 0);
+    paastand("pointene er uændrede af tomme felter", S.point(0) === 0 && S.point(1) === 100 && S.point(2) === 650);
+    A.render();
+    paastand("plakaten siger, at brættet er tomt, og den gule knap er Final",
+        !d.getElementById("plakat").hidden && !!d.querySelector("#k-final.gul"));
+    A.tilFinal();
+    paastand("Final: hold med 0 kr. deltager ikke", !S.deltager(0) && S.deltager(1) && S.deltager(2));
+    paastand("indsatsen kan ikke overstige holdets point", S.finalIndsats(1, 400) === 100 && S.finalIndsats(2, 500) === 500);
+    paastand("et hold, der ikke deltager, kan ikke bedømmes", S.bedoemFinal(0, 1) === false);
+    S.bedoemFinal(1, -1); S.bedoemFinal(2, 1);
+    paastand("rigtigt og forkert i Final (0 og 1150)", S.point(1) === 0 && S.point(2) === 1150);
+    S.bedoemFinal(2, 1);
+    paastand("et klik mere fortryder også i Final", S.point(2) === 650);
+    S.bedoemFinal(2, 1);
+    A.tilResultat();
+    paastand("ranglisten: Gamma, Alfa, Beta (lige point efter nummer)", S.rangliste().join() === "2,0,1");
+    paastand("vinderen er Gamma, og resultatet står på plakaten",
+        S.vindere().join() === "2" && /Gamma/.test(d.getElementById("plakat").textContent));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Gem og hent");
+    var foer = [S.point(0), S.point(1), S.point(2)].join();
+    S.init(Q);
+    paastand("spillet hentes igen med samme point og fase",
+        [S.point(0), S.point(1), S.point(2)].join() === foer && S.T().fase === "slut");
+    w.localStorage.setItem("nk-jeopardy-" + Q.id, "{ødelagt");
+    paastand("et ødelagt gemt spil ignoreres", S.init(Q) === null);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("7. Knapper og tastatur");
+    A.visTitel();
+    paastand("titelskærmen med fire hold som standard", !d.getElementById("titel").hidden && d.querySelectorAll("#holdnavne input").length === 4);
+    d.getElementById("hold-plus").click();
+    d.querySelectorAll("#holdnavne input")[4].value = "Epsilon";
+    d.querySelectorAll("#holdnavne input")[4].dispatchEvent(new w.Event("input", { bubbles: true }));
+    A.startSpil();
+    NK.Visning.stopFyld(); A.ui.fylder = false; A.render();
+    paastand("start: fem hold, 30 felter og 6 kategorier",
+        S.T().hold.length === 5 && S.T().hold[4].navn === "Epsilon" && d.querySelectorAll("#braet .felt").length === 30 && d.querySelectorAll("#braet .kategori").length === 6);
+    paastand("kategorierne er skjult, til de vises", d.querySelectorAll("#braet .kategori.skjult").length === 6);
+    tast(" ", "Space");
+    paastand("Mellemrum viser første emne (" + ren(Q.runder[0].kategorier[0].navn) + ")",
+        S.T().vist === 1 && synligTekst("plakat").indexOf(ren(Q.runder[0].kategorier[0].navn)) >= 0);
+    d.getElementById("k-alle").click();
+    paastand("Vis alle går til brættet", S.T().fase === "braet" && d.getElementById("plakat").hidden && d.querySelectorAll("#braet .kategori.skjult").length === 0);
+    S.T().dobbelt = ["0.5.4"];
+    var felt = d.querySelector('[data-n="0.2.1"]');
+    felt.click();
+    paastand("et klik på 200 kr. i " + ren(Q.runder[0].kategorier[2].navn) + " åbner ledetråden",
+        !d.getElementById("kort").hidden && ren(d.getElementById("kort-tekst").innerHTML) === ren(Q.runder[0].kategorier[2].felter[1].ledetraad));
+    paastand("podierne viser + 200 og − 200", d.querySelectorAll("#podier .plus").length === 5 && /\+ 200/.test(d.querySelector("#podier .plus").textContent));
+    tast("u", "KeyU");
+    paastand("U starter uret med ni lamper", !!A.ui.ur && d.querySelectorAll("#ur i").length === 9 && !d.getElementById("ur").hidden);
+    tast(" ", "Space");
+    paastand("Mellemrum viser svaret og stopper uret",
+        S.T().visning === "svar" && !A.ui.ur && ren(d.getElementById("kort-tekst").innerHTML) === ren(Q.runder[0].kategorier[2].felter[1].svar));
+    tast("1", "Digit1");
+    tast("\"", "Digit2", true);
+    paastand("1 giver hold 1 +200, Skift+2 giver hold 2 −200", S.point(0) === 200 && S.point(1) === -200);
+    paastand("knapperne på podiet lyser", !!d.querySelector('#podier .plus.valgt[data-h="0"]') && !!d.querySelector('#podier .minus.valgt[data-h="1"]'));
+    d.querySelector('#podier .plus[data-h="0"]').click();
+    paastand("klik på + igen fortryder", S.point(0) === 0);
+    tast(" ", "Space");
+    paastand("Mellemrum igen lukker feltet", !S.T().aabent && d.getElementById("kort").hidden && felt.classList.contains("brugt"));
+    felt.dispatchEvent(new w.MouseEvent("dblclick", { bubbles: true }));
+    paastand("dobbeltklik åbner det brugte felt igen", S.T().aabent === "0.2.1");
+    d.getElementById("k-luk").click();
+    var ddFelt = d.querySelector('[data-n="0.5.4"]');
+    ddFelt.click();
+    paastand("Daily Double viser plakaten, og knappen venter på en indsats",
+        !d.getElementById("plakat").hidden && !!d.querySelector(".dd-titel") && d.getElementById("k-vis").disabled);
+    var inp = d.getElementById("dd-indsats");
+    inp.value = "400";
+    inp.dispatchEvent(new w.Event("input", { bubbles: true }));
+    paastand("med en indsats kan ledetråden vises", !d.getElementById("k-vis").disabled);
+    d.getElementById("k-vis").click();
+    paastand("ledetråden vises, og kun ét hold har knapper",
+        !d.getElementById("kort").hidden && d.querySelectorAll("#podier .plus").length === 1 && /satser 400/i.test(d.getElementById("kort-hoved").textContent));
+    d.getElementById("k-luk").click();
+
+    var ingenSmaa = [];
+    function smaa() {
+        Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+            if (!e.offsetWidth || !e.childNodes.length) return;
+            var harTekst = Array.prototype.some.call(e.childNodes, function (x) { return x.nodeType === 3 && x.textContent.trim(); });
+            if (!harTekst) return;
+            if (e.closest("sub, sup")) return;
+            var fs = parseFloat(w.getComputedStyle(e).fontSize);
+            if (fs < 11.5) ingenSmaa.push(e.tagName + "." + e.className + " " + fs + "px");
+        });
+    }
+    smaa();
+    felt = d.querySelector('[data-n="0.4.4"]'); felt.click(); smaa(); d.getElementById("k-luk").click();
+    A.visTitel(); smaa(); A.fortsaet();
+    paastand("ingen synlig tekst under 12 px (bræt, felt og titel)", ingenSmaa.length === 0, ingenSmaa.slice(0, 4).join(", "));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("8. Kemichael");
+    var lr = NK.laerer;
+    function korL(s) { for (var j = 0; j < s * 60; j++) lr.opdater(1 / 60); }
+    if (lr) {
+        w.localStorage.removeItem("nk-jeopardy-intro");
+        A.visTitel();
+        korL(1.5);
+        var tilbud = d.getElementById("tilbud");
+        paastand("første gang titelskærmen vises, står der Start præsentation og Nej tak, og han kommer ikke af sig selv",
+            !tilbud.hidden && !lr.laererIIntro() && !(lr.introVent > 0));
+        tilbud.querySelector(".tilbud-start").click();
+        korL(1.5);
+        paastand("Start præsentation: han går ind, og knappen Spring over kommer frem",
+            lr.laererIIntro() && !d.getElementById("spring-over").hidden);
+        korL(6);
+        paastand("han peger på opsætningen, som lyser op", d.getElementById("opsaetning").classList.contains("peg") || lr.introTrin >= 2);
+        korL(14);
+        paastand("han går af sig selv, og knappen forsvinder", !lr.laererIIntro() && d.getElementById("spring-over").hidden
+            && !d.getElementById("opsaetning").classList.contains("peg"));
+        A.fortsaet(); A.visTitel(); korL(1.5);
+        paastand("anden gang præsenterer han ikke igen", !lr.laererIIntro());
+        tast("k", "KeyK"); korL(1);
+        paastand("K viser præsentationen igen", lr.laererIIntro());
+        tast("Escape", "Escape"); korL(0.2);
+        paastand("Esc sender ham ud", !lr.laererIIntro());
+        lr.startIntro("titel", true); korL(1);
+        d.getElementById("spring-over").click(); korL(0.2);
+        paastand("Spring over sender ham ud", !lr.laererIIntro());
+        var lange = D.INTRO.titel.filter(function (l) { return l.length > 60; });
+        paastand("tre replikker på højst 60 tegn", D.INTRO.titel.length === 3 && lange.length === 0, lange.join(" | "));
+        A.fortsaet();
+    }
+
+    /* ----------------------------------------------------------------- */
+    overskrift("9. Sproget");
+    var tekster = [d.body.innerText, d.getElementById("regler").textContent, d.getElementById("egne").textContent, F.aiVejledning(Q)];
+    Object.keys(D.QUIZZER).forEach(function (niv) {
+        var QZ = D.QUIZZER[niv];
+        QZ.runder.forEach(function (R) { R.kategorier.forEach(function (K) { tekster.push(ren(K.navn)); K.felter.forEach(function (x) { tekster.push(ren(x.ledetraad), ren(x.svar)); }); }); });
+        tekster.push(QZ.final.kategori, QZ.final.ledetraad, QZ.final.svar);
+    });
+    tekster = tekster.concat(D.INTRO.titel);
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−,])1[+−]|¹[⁺⁻]/.test(alt), (alt.match(/.{0,20}(1[+−]|¹[⁺⁻]).{0,20}/) || [""])[0]);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("10. Niveauer og egne spørgsmål");
+    paastand("linket vælger niveauet: #b og #kemi-b er B, intet og ukendt er C",
+        A.niveauFraHash("#b") === "b" && A.niveauFraHash("#kemi-b") === "b" && A.niveauFraHash("") === "c" && A.niveauFraHash("#x") === "c");
+    A.skiftNiveau("b");
+    paastand("B-niveau giver B-quizzen", S.Q().id === D.QUIZZER.b.id && /Kemi B/.test(synligTekst("titel-quiz")));
+    A.skiftNiveau("c");
+    paastand("C-niveau giver 1.g-quizzen", S.Q().id === D.QUIZZER.c.id && /1\.g/.test(synligTekst("titel-quiz")));
+
+    Object.keys(D.QUIZZER).forEach(function (niv) {
+        var QZ = D.QUIZZER[niv], r = F.fraTekst(F.tilTekst(QZ), "t");
+        var ens = !!r.quiz && ren(r.quiz.navn) === ren(QZ.navn) && r.quiz.runder[0].vaerdier.join() === QZ.runder[0].vaerdier.join()
+            && JSON.stringify(r.quiz.runder[0].kategorier).replace(/&shy;/g, "") === JSON.stringify(QZ.runder[0].kategorier).replace(/&shy;/g, "")
+            && JSON.stringify(r.quiz.final) === JSON.stringify(QZ.final);
+        paastand(ren(QZ.navn) + ": som tekst og tilbage giver samme quiz", ens, r.fejl.join(" "));
+    });
+
+    var skabelon = "Emne1:\n[spørgsmål1.1] ; [svar1.1]\n[spørgsmål1.2] ; [svar1.2]\n\nEmne2:\n[spørgsmål2.1] ; [svar2.1]\n[spørgsmål2.2] ; [svar2.2]\n";
+    var rs = F.fraTekst(skabelon);
+    paastand("brugerens skabelon (Emne1: og [ ] ; [ ]) virker, med beløbene 100 og 200",
+        !!rs.quiz && rs.quiz.runder[0].kategorier.length === 2 && rs.quiz.runder[0].kategorier[1].navn === "Emne2"
+        && rs.quiz.runder[0].kategorier[0].felter[1].svar === "svar1.2" && rs.quiz.runder[0].vaerdier.join() === "100,200" && !rs.quiz.final);
+    var rm = F.fraTekst("# Min quiz\n## Emne A\nen ; Hvad er a?\n## Emne B\nto ; Hvad er b?\nFinal\ntre ; Hvad er c?");
+    paastand("markdown-overskrifter og Final uden kolon virker",
+        !!rm.quiz && ren(rm.quiz.navn) === "Min quiz" && rm.quiz.runder[0].kategorier.length === 2 && rm.quiz.final && rm.quiz.final.svar === "Hvad er c?");
+    var rf = F.fraTekst("Titel: X\nBeløb: 100, 200\nA:\nen ; a\nB:\nen ; a\nto ; b");
+    paastand("et emne med for få ledetråde giver en fejl med emnets navn", !rf.quiz && /Emnet A har 1 ledetråd, men der er 2 beløb/.test(rf.fejl.join(" ")));
+    paastand("en ledetråd før første emne giver en fejl", !F.fraTekst("løs ; linje\nA:\nen ; a").quiz);
+    var syv = "";
+    for (var ei = 1; ei <= 7; ei++) syv += "E" + ei + ":\nen ; a\n";
+    paastand("syv emner er for mange", /højst 6/.test(F.fraTekst(syv).fejl.join(" ")));
+    var rh = F.fraTekst("A:\n<img src=x onerror=alert(1)> H<sub>2</sub>O ; Hvad er <b>vand</b>?");
+    paastand("HTML vises som tekst, men <sub> og <sup> virker",
+        !!rh.quiz && rh.quiz.runder[0].kategorier[0].felter[0].ledetraad.indexOf("<img") < 0
+        && /H<sub>2<\/sub>O/.test(rh.quiz.runder[0].kategorier[0].felter[0].ledetraad) && /&lt;b&gt;/.test(rh.quiz.runder[0].kategorier[0].felter[0].svar));
+    paastand("forskellige quizzer får forskellige id'er", F.fraTekst(skabelon, "egen-c").quiz.id !== F.fraTekst(skabelon + "\nE3:\nx ; y\nz ; v", "egen-c").quiz.id);
+
+    A.visTitel();
+    A.aabnEgne();
+    var ta = d.getElementById("egne-tekst");
+    paastand("vinduet åbner med den nuværende quiz som tekst", !d.getElementById("egne").hidden && d.getElementById("egne").classList.contains("vis")
+        && /^Titel: Kemi C, 1\.g/.test(ta.value) && !d.getElementById("egne-brug").disabled);
+    ta.value = "A:\nen ; a\nB:\nen ; a\nto ; b";
+    ta.dispatchEvent(new w.Event("input", { bubbles: true }));
+    paastand("en tekst med fejl kan ikke bruges, og fejlen står under feltet",
+        d.getElementById("egne-brug").disabled && /Emnet B har 2 ledetråde/.test(synligTekst("egne-status")));
+    ta.value = "Titel: Testquiz\nBeløb: 100, 200, 300\n\nGrundstoffer:\nH ; Hvad er hydrogen?\nHe ; Hvad er helium?\nLi ; Hvad er lithium?\n\nIoner:\nNa⁺ ; Hvad er natriumion?\nCl⁻ ; Hvad er chloridion?\nSO₄²⁻ ; Hvad er sulfation?\n";
+    ta.dispatchEvent(new w.Event("input", { bubbles: true }));
+    d.getElementById("egne-brug").click();
+    paastand("Brug quizzen skifter til den egne quiz og gemmer den",
+        ren(S.Q().navn) === "Testquiz" && A.egen() && !d.getElementById("egne").classList.contains("vis")
+        && /Testquiz · egne spørgsmål/.test(synligTekst("titel-quiz")) && !!w.localStorage.getItem("nk-jeopardy-egen-c"));
+    A.startSpil();
+    NK.Visning.stopFyld(); A.ui.fylder = false; A.render();
+    paastand("brættet får 2 emner × 3 beløb", d.querySelectorAll("#braet .felt").length === 6 && d.querySelectorAll("#braet .kategori").length === 2);
+    A.skiftNiveau("b");
+    paastand("den egne quiz gælder kun C; B har stadig sin egen", S.Q().id === D.QUIZZER.b.id && !A.egen());
+    A.skiftNiveau("c");
+    paastand("tilbage på C er den egne quiz der igen", ren(S.Q().navn) === "Testquiz");
+    A.aabnEgne();
+    paastand("vinduet viser den egne tekst", /^Titel: Testquiz/.test(ta.value));
+    d.getElementById("egne-standard").click();
+    d.getElementById("egne-brug").click();
+    paastand("Standardquiz og Brug giver 1.g-quizzen igen og sletter den egne",
+        S.Q().id === D.QUIZZER.c.id && !A.egen() && !w.localStorage.getItem("nk-jeopardy-egen-c"));
+    paastand("vejledningen til AI beskriver formatet og har et eksempel",
+        /Titel:/.test(F.aiVejledning(Q)) && /ledetråd ; svar/.test(F.aiVejledning(Q)) && F.aiVejledning(Q).indexOf("Atomer:") >= 0);
+
+    /* Eksport: klikket paa det usynlige link fanges */
+    A.aabnEgne();
+    var hentet = null, klik = w.HTMLAnchorElement.prototype.click;
+    w.HTMLAnchorElement.prototype.click = function () { hentet = this.download; };
+    d.getElementById("egne-eksport").click();
+    w.HTMLAnchorElement.prototype.click = klik;
+    paastand("Eksportér henter en tekstfil med quizzens navn", hentet === "jeopardy-kemi-c-1-g.txt", String(hentet));
+    /* Upload: en fil med BOM laeses ind i feltet (tjekkes, naar lydene er faerdige) */
+    var dt = new w.DataTransfer();
+    dt.items.add(new w.File(["﻿Titel: Fra fil\nA:\nen ; Hvad er a?\n"], "quiz.txt", { type: "text/plain" }));
+    d.getElementById("egne-fil").files = dt.files;
+    d.getElementById("egne-fil").dispatchEvent(new w.Event("change", { bubbles: true }));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("11. Lydene");
+    var L = NK.Lydbank;
+    paastand("alle seks lyde har en egen udgave", L.NAVNE.every(function (x) { return typeof L.SYNTESE[x] === "function"; }));
+    paastand("over http bruges spillets egne lyde", L.kilde() === "egne");
+    var OAC = w.OfflineAudioContext || w.webkitOfflineAudioContext;
+    if (!OAC) { paastand("OfflineAudioContext findes", false); afslut(); return; }
+    var ventende = L.NAVNE.length, resultat = {};
+    skriv("  …     venter på lydene");
+    vis(true);
+    linjer.pop();
+    L.NAVNE.forEach(function (navn) {
+        var sek = navn === "taenk" ? 32 : 5;
+        var c = new OAC(1, 16000 * sek, 16000);
+        try { L.SYNTESE[navn](c, c.destination, [], 0.01); } catch (e) { resultat[navn] = "fejl: " + e.message; }
+        c.startRendering().then(function (buf) {
+            var data = buf.getChannelData(0), top = 0;
+            for (var j = 0; j < data.length; j++) { var a = Math.abs(data[j]); if (a > top) top = a; }
+            if (!resultat[navn]) resultat[navn] = top;
+            if (--ventende === 0) lydFaerdig();
+        }, function () { resultat[navn] = "fejl"; if (--ventende === 0) lydFaerdig(); });
+    });
+
+    function lydFaerdig() {
+        var ta2 = d.getElementById("egne-tekst");
+        paastand("Upload fil lægger filen i feltet uden BOM, og den kan bruges",
+            ta2.value.indexOf("Titel: Fra fil") === 0 && !d.getElementById("egne-brug").disabled, ta2.value.slice(0, 30));
+        d.getElementById("egne-luk").click();
+        L.NAVNE.forEach(function (navn) {
+            var r = resultat[navn];
+            paastand("egen lyd " + navn + " kan høres og klipper ikke" + (typeof r === "number" ? " (top " + r.toFixed(2) + ")" : ""),
+                typeof r === "number" && r > 0.05 && r < 1, String(r));
+        });
+        afslut();
+    }
+
+    function afslut() {
+        NK.Lydbank.saetSlukket(varSlukket);
+        var nu = [];
+        for (var i = 0; i < w.localStorage.length; i++) if (/^nk-jeopardy/.test(w.localStorage.key(i))) nu.push(w.localStorage.key(i));
+        nu.forEach(function (k) { w.localStorage.removeItem(k); });
+        Object.keys(gemt).forEach(function (k) { w.localStorage.setItem(k, gemt[k]); });
+        vis();
+    }
+}
+
+function vis(undervejs) {
+    if (undervejs) { document.getElementById("ud").innerHTML = linjer.join("\n"); return; }
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

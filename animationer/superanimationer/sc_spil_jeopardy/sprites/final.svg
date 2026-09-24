@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" width="1000" height="440">
+<!-- Final-titlen til Kemi-Jeopardy. Egen tegning. -->
+<defs>
+  <linearGradient id="krom" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="0.42" stop-color="#e4e9ff"/>
+    <stop offset="0.5" stop-color="#a3aeea"/>
+    <stop offset="0.62" stop-color="#c9d0fb"/>
+    <stop offset="1" stop-color="#fbf6ff"/>
+  </linearGradient>
+  <linearGradient id="guld" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fff8d0"/>
+    <stop offset="0.5" stop-color="#ffd23a"/>
+    <stop offset="1" stop-color="#d98200"/>
+  </linearGradient>
+  <radialGradient id="gloed" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#ffc070" stop-opacity="0.85"/>
+    <stop offset="0.45" stop-color="#ff7a30" stop-opacity="0.3"/>
+    <stop offset="1" stop-color="#ff7a30" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<ellipse cx="500" cy="220" rx="480" ry="200" fill="url(#gloed)"/>
+<g font-family="Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif" font-size="180" text-anchor="middle">
+  <text x="509" y="200" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">FINAL</text>
+  <text x="508.1" y="199" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">FINAL</text>
+  <text x="507.2" y="198" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">FINAL</text>
+  <text x="506.3" y="197" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">FINAL</text>
+  <text x="505.4" y="196" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#1b2266">FINAL</text>
+  <text x="504.5" y="195" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#1b2266">FINAL</text>
+  <text x="503.6" y="194" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#1b2266">FINAL</text>
+  <text x="502.7" y="193" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#1b2266">FINAL</text>
+  <text x="501.8" y="192" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#1b2266">FINAL</text>
+  <text x="500.9" y="191" textLength="520" lengthAdjust="spacingAndGlyphs" fill="#1b2266">FINAL</text>
+  <text x="500" y="190" textLength="520" lengthAdjust="spacingAndGlyphs" fill="none" stroke="#070a24" stroke-width="10" stroke-linejoin="round">FINAL</text>
+  <text x="500" y="190" textLength="520" lengthAdjust="spacingAndGlyphs" fill="url(#guld)" stroke="#7a4300" stroke-width="2.5" stroke-linejoin="round">FINAL</text>
+</g>
+<g font-family="Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif" font-size="180" text-anchor="middle">
+  <text x="510.8" y="402" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">JEOPARDY!</text>
+  <text x="509.9" y="401" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">JEOPARDY!</text>
+  <text x="509" y="400" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">JEOPARDY!</text>
+  <text x="508.1" y="399" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">JEOPARDY!</text>
+  <text x="507.2" y="398" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#0a0d2c">JEOPARDY!</text>
+  <text x="506.3" y="397" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#1b2266">JEOPARDY!</text>
+  <text x="505.4" y="396" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#1b2266">JEOPARDY!</text>
+  <text x="504.5" y="395" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#1b2266">JEOPARDY!</text>
+  <text x="503.6" y="394" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#1b2266">JEOPARDY!</text>
+  <text x="502.7" y="393" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#1b2266">JEOPARDY!</text>
+  <text x="501.8" y="392" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#1b2266">JEOPARDY!</text>
+  <text x="500.9" y="391" textLength="880" lengthAdjust="spacingAndGlyphs" fill="#1b2266">JEOPARDY!</text>
+  <text x="500" y="390" textLength="880" lengthAdjust="spacingAndGlyphs" fill="none" stroke="#070a24" stroke-width="10" stroke-linejoin="round">JEOPARDY!</text>
+  <text x="500" y="390" textLength="880" lengthAdjust="spacingAndGlyphs" fill="url(#krom)" stroke="#3a418f" stroke-width="2.5" stroke-linejoin="round">JEOPARDY!</text>
+</g>
+</svg>

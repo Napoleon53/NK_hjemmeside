@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 900" width="140" height="900">
+<!-- Lyssoejle til Kemi-Jeopardy. Forsiden har lyse felter mellem sorte bjaelker,
+     og en smal side vender ind mod braettet. Hoejre soejle er den samme, spejlet i CSS. -->
+<defs>
+  <linearGradient id="forside" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f7f9ff"/>
+    <stop offset="0.5" stop-color="#d3dcff"/>
+    <stop offset="1" stop-color="#a9b9f4"/>
+  </linearGradient>
+  <linearGradient id="side" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#9aabf0"/>
+    <stop offset="1" stop-color="#4e62b8"/>
+  </linearGradient>
+  <linearGradient id="yderside" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#3a4a94"/>
+    <stop offset="1" stop-color="#7f93e0"/>
+  </linearGradient>
+  <filter id="gloed" x="-30%" y="-10%" width="160%" height="120%">
+    <feGaussianBlur stdDeviation="5"/>
+  </filter>
+</defs>
+<rect x="34" y="0" width="80" height="900" fill="#9fb4ff" opacity="0.35" filter="url(#gloed)"/>
+<rect x="24" y="0" width="116" height="900" fill="#050508"/>
+<rect x="44" y="7" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="9" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,12 136,7 136,57.2 117,61.2" fill="url(#side)"/>
+<polygon points="27,7 39,10 39,63.2 27,60.2" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="76.2" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="78.2" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,81.2 136,76.2 136,126.5 117,130.5" fill="url(#side)"/>
+<polygon points="27,76.2 39,79.2 39,132.5 27,129.5" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="145.5" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="147.5" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,150.5 136,145.5 136,195.7 117,199.7" fill="url(#side)"/>
+<polygon points="27,145.5 39,148.5 39,201.7 27,198.7" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="214.7" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="216.7" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,219.7 136,214.7 136,264.9 117,268.9" fill="url(#side)"/>
+<polygon points="27,214.7 39,217.7 39,270.9 27,267.9" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="283.9" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="285.9" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,288.9 136,283.9 136,334.2 117,338.2" fill="url(#side)"/>
+<polygon points="27,283.9 39,286.9 39,340.2 27,337.2" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="353.2" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="355.2" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,358.2 136,353.2 136,403.4 117,407.4" fill="url(#side)"/>
+<polygon points="27,353.2 39,356.2 39,409.4 27,406.4" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="422.4" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="424.4" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,427.4 136,422.4 136,472.6 117,476.6" fill="url(#side)"/>
+<polygon points="27,422.4 39,425.4 39,478.6 27,475.6" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="491.6" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="493.6" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,496.6 136,491.6 136,541.8 117,545.8" fill="url(#side)"/>
+<polygon points="27,491.6 39,494.6 39,547.8 27,544.8" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="560.8" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="562.8" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,565.8 136,560.8 136,611.1 117,615.1" fill="url(#side)"/>
+<polygon points="27,560.8 39,563.8 39,617.1 27,614.1" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="630.1" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="632.1" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,635.1 136,630.1 136,680.3 117,684.3" fill="url(#side)"/>
+<polygon points="27,630.1 39,633.1 39,686.3 27,683.3" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="699.3" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="701.3" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,704.3 136,699.3 136,749.5 117,753.5" fill="url(#side)"/>
+<polygon points="27,699.3 39,702.3 39,755.5 27,752.5" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="768.5" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="770.5" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,773.5 136,768.5 136,818.8 117,822.8" fill="url(#side)"/>
+<polygon points="27,768.5 39,771.5 39,824.8 27,821.8" fill="url(#yderside)" opacity="0.8"/>
+<rect x="44" y="837.8" width="64" height="56.2" rx="1.5" fill="url(#forside)"/>
+<rect x="46" y="839.8" width="60" height="3" fill="#ffffff" opacity="0.7"/>
+<polygon points="117,842.8 136,837.8 136,888 117,892" fill="url(#side)"/>
+<polygon points="27,837.8 39,840.8 39,894 27,891" fill="url(#yderside)" opacity="0.8"/>
+</svg>

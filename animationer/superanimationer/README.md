@@ -107,15 +107,22 @@ animation kommer først i menuen, når brugeren siger til.
 
 | Mappe | I menuen | Note |
 |-------|----------|------|
+| `sb1.1_reaktionshastighed` | nej | ny, sept. 2026, afløser b1.1; menuen viser stadig den gamle b1.1 |
 | `sb2.0_ligevaegt_intro` | nej | den første superanimation, bygget fra bunden |
 | `sb3.2_titreringssimulator` | ja | `samling_b3.html` |
 | `sc1.1_atombygger` | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
+| `sc1.2_grundstofudstilling` | ja | `samling_c1.html` og `samling_NV.html`; den gamle c1.2 ligger i `arkiv/`; den første med tilbuddet om præsentationen |
 | `sc2.1_salt_i_vand` | nej | menuen viser stadig den gamle c2.1 |
-| `sc2.2_saltbygger` | nej | menuen viser stadig den gamle c2.2 |
+| `sc2.2_saltbygger` | nej | bygget om sept. 2026 (mindre tekst, nyt krystalgitter, fane 3 med den ukendte ion og plakaterne fra sc2.3, Kemichael præsenterer hver fane); menuen viser stadig den gamle c2.2 |
 | `sc2.3_kemikalielageret` | ja | `samling_c2.html`; den gamle c2.3 ligger i `arkiv/` |
-| `sc3.1_elektronprikformler` | ja | `samling_c3.html` og `samling_NV.html` |
+| `sc2.4_faeldningsreaktioner` | ja | `samling_c2.html`; den gamle c2.4 ligger i `arkiv/` |
+| `sc3.1_elektronprikformler` | ja | `samling_c3.html` og `samling_NV.html`; sept. 2026: eleven tæller selv, fane 2 Find fejlen, Kemichael præsenterer |
 | `sc3.2_rumlig_opbygning` | nej | inaktiv: rettes ikke, før brugeren siger til |
-| `sc3.4_blandbarhed_inaktiv` | nej | ny, sept. 2026; menuen viser stadig den gamle c3.4 |
+| `sc3.4_blandbarhed` | nej | ny, sept. 2026, afløser c3.4 efter bestillingen; menuen viser stadig den gamle c3.4 |
+| `sc3.4_blandbarhed_inaktiv` | nej | kasseret sept. 2026, reservedele; afløst af `sc3.4_blandbarhed` |
+| `sc4.1_molarmasse` | nej | ny, sept. 2026, afløser c4.1 (vægten, skålvægten, ukendt stof); menuen viser stadig den gamle c4.1 |
+| `sc_spil_jeopardy` | nej | ny, sept. 2026, kategorien Spil (`samling_c_spil.html`); Kemi-Jeopardy til tavlen, afløser PowerPoint-skabelonen; C (1.g) som standard, B med `#b`; egne spørgsmål som tekst; de originale lyde ligger kun i NK_Undervisning |
+| `sc_spil_lykkehjul` | nej | ny, sept. 2026, kategorien Spil (`samling_c_spil.html`); Kemi-Lykkehjulet til tavlen, afløser PowerPoint-skabelonen; Kemi B som standard, A og NF med `#a` og `#nf`; quizzer som tekst med tavlerne vist undervejs, upload, eksport og link; de originale lyde ligger kun i NK_Undervisning |
 
 ## Fælles krav
 
@@ -178,10 +185,13 @@ den må aldrig stå i vejen for pointen.
 
 ## Kemichael præsenterer hvert rum
 
-Hver fane (hvert rum) har en kort præsentation ved Kemichael. Første gang fanen
-åbnes i en browser, går han ind, siger, hvor man er, og hvad man skal, og går
-igen. Mønster: `sc2.3_kemikalielageret` (`laererIntro` og `introVaek` i
-`js/laerer.js`, `startIntro` og `opdaterIntro` i fanerne).
+Hver fane (hvert rum) har en kort præsentation ved Kemichael. Han kommer ikke af
+sig selv: første gang fanen åbnes i en browser, står der to knapper midt foroven
+i scenen, **Start præsentation** og **Nej tak**. Så kan eleven kigge sig omkring
+først og selv vælge, hvornår han skal tale, eller sige nej. Trykker eleven Start,
+går han ind, siger, hvor man er, og hvad man skal, og går igen. Mønster:
+`sc1.2_grundstofudstilling` (`js/praesentation.js` med tilbuddet,
+`laererIntro` og `introVaek` i `js/laerer.js`).
 
 * To eller tre replikker på højst ca. 60 tegn: hvor man er, hvad man gør, og
   gerne en tør bemærkning til sidst. Han forklarer ikke teori.
@@ -191,12 +201,18 @@ igen. Mønster: `sc2.3_kemikalielageret` (`laererIntro` og `introVaek` i
 * Han går kun, når eleven vil det: den store knap "Spring præsentationen over"
   midt foroven i scenen, to klik direkte på ham eller Esc. Det første klik på ham
   får knappen til at blinke. Et klik andre steder og tastetryk sender ham ikke ud.
-* Den kommer af sig selv én gang pr. fane pr. browser (huskes i `localStorage`),
-  og <kbd>K</kbd> viser den igen, fx når læreren vil vise den for klassen.
+* Tilbuddet kommer én gang pr. fane pr. browser. Valget huskes i `localStorage`.
+  Starter eleven et spil, er det det samme som Nej tak, og tilbuddet må gerne
+  også forsvinde, når den første opgave er løst (det gør det i sc1.2). <kbd>Esc</kbd> er det samme som Nej tak. <kbd>K</kbd> viser
+  præsentationen igen uden at spørge, fx når læreren vil vise den for klassen.
 * Replikkerne står som data (`D.INTRO` i `js/data.js`), ikke inde i scenen.
 
-Reglen kom til med `sc2.3` i september 2026. De ældre superanimationer har den
-ikke endnu og får den, næste gang de bygges om.
+Reglen kom til med `sc2.3` i september 2026. Tilbuddet med de to knapper kom til
+med `sc1.2` den 24. september 2026 efter brugerens ønske: det var svært at følge
+med i præsentationen, når den startede, mens man selv kiggede sig omkring. Samme dag fik
+alle superanimationer med en præsentation tilbuddet. De ældre beholder deres
+egen `startIntro`, og `NK.Praesentation.pakInd` i `js/app.js` pakker den ind;
+nye bruger `NK.Praesentation.kobl` som sc1.2.
 
 ## Fælles opbygning
 
@@ -231,7 +247,7 @@ ikke endnu og får den, næste gang de bygges om.
 - [ ] Quizzens forkerte svar er de fejl, elever faktisk laver.
 - [ ] Sproget er kort og uden tankestreger, talesprog og 1+/1−.
 - [ ] Humoren rammer handlingen, aldrig eleven.
-- [ ] Kemichael præsenterer hver fane første gang og går kun, når eleven vil det.
+- [ ] Kemichael tilbyder at præsentere hver fane (Start præsentation / Nej tak) og går kun, når eleven vil det.
 - [ ] `_selvtest.html` er grøn, og siden virker fra harddisken.
 - [ ] Brugeren har sagt, at den skal i menuen.
 

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc1.2 Grundstofmontren</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at grundstofferne står rigtigt, at
+   elektronstrukturerne passer med tabellen og med pladsen, at
+   formlerne tælles rigtigt, at svartjekket godkender de rigtige svar og
+   giver den rigtige besked ved de typiske fejl, at sproget overholder
+   reglerne, at alle tre faner kan gennemføres, og at layoutet holder
+   fra 520 × 380 til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function note(t) { skriv("        " + t, "note"); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc1.2-montre", "nk-sc1.2-formler", "nk-sc1.2-opraab",
+    "nk-sc1.2-intro-montre", "nk-sc1.2-intro-formler", "nk-sc1.2-intro-opraab"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Grundstof 1-36 som i Databogen: symbol, dansk navn, periode, søjle */
+var TABEL = [
+    ["H", "hydrogen", 1, 1], ["He", "helium", 1, 18], ["Li", "lithium", 2, 1], ["Be", "beryllium", 2, 2],
+    ["B", "bor", 2, 13], ["C", "carbon", 2, 14], ["N", "nitrogen", 2, 15], ["O", "oxygen", 2, 16],
+    ["F", "fluor", 2, 17], ["Ne", "neon", 2, 18], ["Na", "natrium", 3, 1], ["Mg", "magnesium", 3, 2],
+    ["Al", "aluminium", 3, 13], ["Si", "silicium", 3, 14], ["P", "phosphor", 3, 15], ["S", "svovl", 3, 16],
+    ["Cl", "chlor", 3, 17], ["Ar", "argon", 3, 18], ["K", "kalium", 4, 1], ["Ca", "calcium", 4, 2],
+    ["Sc", "scandium", 4, 3], ["Ti", "titan", 4, 4], ["V", "vanadium", 4, 5], ["Cr", "chrom", 4, 6],
+    ["Mn", "mangan", 4, 7], ["Fe", "jern", 4, 8], ["Co", "cobalt", 4, 9], ["Ni", "nikkel", 4, 10],
+    ["Cu", "kobber", 4, 11], ["Zn", "zink", 4, 12], ["Ga", "gallium", 4, 13], ["Ge", "germanium", 4, 14],
+    ["As", "arsen", 4, 15], ["Se", "selen", 4, 16], ["Br", "brom", 4, 17], ["Kr", "krypton", 4, 18]
+];
+
+/* Elektronstrukturen i skalmodellen, som i kompendiet (hovedgrupperne) */
+var STRUKTUR = {
+    H: "1", He: "2", Li: "2,1", Be: "2,2", B: "2,3", C: "2,4", N: "2,5", O: "2,6", F: "2,7", Ne: "2,8",
+    Na: "2,8,1", Mg: "2,8,2", Al: "2,8,3", Si: "2,8,4", P: "2,8,5", S: "2,8,6", Cl: "2,8,7", Ar: "2,8,8",
+    K: "2,8,8,1", Ca: "2,8,8,2", Ga: "2,8,18,3", Ge: "2,8,18,4", As: "2,8,18,5", Se: "2,8,18,6",
+    Br: "2,8,18,7", Kr: "2,8,18,8"
+};
+
+/* Atomerne i de tolv formler, i den rækkefølge de står */
+var ATOMER = {
+    "H2O": [["H", 2], ["O", 1], 3],
+    "HNO3": [["H", 1], ["N", 1], ["O", 3], 5],
+    "H2SO4": [["H", 2], ["S", 1], ["O", 4], 7],
+    "C6H12O6": [["C", 6], ["H", 12], ["O", 6], 24],
+    "C2H5OH": [["C", 2], ["H", 6], ["O", 1], 9],
+    "CH3COOH": [["C", 2], ["H", 4], ["O", 2], 8],
+    "HCOOH": [["H", 2], ["C", 1], ["O", 2], 5],
+    "NH4NO3": [["N", 2], ["H", 4], ["O", 3], 9],
+    "Ca(OH)2": [["Ca", 1], ["O", 2], ["H", 2], 5],
+    "Al2(SO4)3": [["Al", 2], ["S", 3], ["O", 12], 17],
+    "(NH4)2SO4": [["N", 2], ["H", 8], ["S", 1], ["O", 4], 15],
+    "NO2": [["N", 1], ["O", 2], 3]
+};
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, T = NK.Tjek;
+    paastand("data.js og tjek.js er kørt", !!(D && D.GRUNDSTOFFER && T && T.struktur));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-montre"] && NK.sims["fane-formler"] && NK.sims["fane-opraab"]));
+    var sprites = ["kube", "ampul", "olie", "flaske", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var M = NK.sims["fane-montre"], F = NK.sims["fane-formler"], O = NK.sims["fane-opraab"];
+    paastand("Kemichael er koblet på alle tre faner", !!(M.laerer && F.laerer && O.laerer));
+
+    overskrift("2. De 36 grundstoffer");
+    paastand("der er 36", D.GRUNDSTOFFER.length === 36);
+    var forkerte = [];
+    TABEL.forEach(function (r, i) {
+        var g = D.GRUNDSTOFFER[i];
+        if (!g || g.z !== i + 1 || g.s !== r[0] || g.navn !== r[1] || g.periode !== r[2] || g.soejle !== r[3]) forkerte.push(r[0]);
+    });
+    paastand("symbol, navn, periode og søjle passer med tabellen", forkerte.length === 0, forkerte.join(", "));
+    var hg = D.GRUNDSTOFFER.filter(function (g) {
+        var ventet = g.soejle <= 2 ? g.soejle : (g.soejle >= 13 ? g.soejle - 10 : 0);
+        return g.hg !== ventet;
+    });
+    paastand("hovedgrupperne er 1-8, overgangsmetallerne 0", hg.length === 0);
+    paastand("perioderne har 2, 8, 8 og 18 grundstoffer", D.PERIODER.map(function (p) { return p.antal; }).join(",") === "2,8,8,18");
+    paastand("halvmetallerne er B, Si, Ge og As", D.GRUNDSTOFFER.filter(function (g) { return g.slags === "h"; }).map(function (g) { return g.s; }).join(",") === "B,Si,Ge,As");
+    paastand("ædelgasserne er He, Ne, Ar og Kr", D.GRUNDSTOFFER.filter(function (g) { return g.slags === "a"; }).map(function (g) { return g.s; }).join(",") === "He,Ne,Ar,Kr");
+    var gamle22 = "H O C Na He Cl N Mg F Al Ne S Li K Si Ca P Fe Ar Cu Br Zn".split(" ");
+    var gamleRet = { H: "navn", C: "navn", He: "navn", N: "navn", F: "navn", Ne: "navn", Li: "navn", Si: "navn", P: "navn", Ar: "navn", Br: "navn",
+        O: "symbol", Na: "symbol", Cl: "symbol", Mg: "symbol", Al: "symbol", S: "symbol", K: "symbol", Ca: "symbol", Fe: "symbol", Cu: "symbol", Zn: "symbol" };
+    paastand("de 22 navneopgaver fra den gamle er med i samme retning",
+        gamle22.every(function (s) { var g = D.grundstof(s); return g && g.mangler === gamleRet[s]; }));
+    var navne = D.GRUNDSTOFFER.filter(function (g) { return g.mangler === "navn"; }).length;
+    note(navne + " prøver mangler navnet, " + (36 - navne) + " mangler symbolet");
+    paastand("alle prøver har en beholder, en farve og en linje om stoffet",
+        D.GRUNDSTOFFER.every(function (g) { return g.proeve && g.proeve.b && /^#[0-9a-f]{6}$/i.test(g.proeve.farve) && g.fakta.length > 10; }));
+    paastand("gasserne står i en ampul, og de farveløse er klare (ikke farvede)",
+        "H He N O F Ne Cl Ar Kr".split(" ").every(function (s) { return D.grundstof(s).proeve.b === "ampul"; }) &&
+        "H He N O Ne Ar Kr".split(" ").every(function (s) { return D.grundstof(s).proeve.fyld === "klar"; }) &&
+        D.grundstof("F").proeve.fyld === "gas" && D.grundstof("Cl").proeve.fyld === "gas" && D.grundstof("Br").proeve.fyld === "vaeske");
+    paastand("Li, Na og K ligger i olie", ["Li", "Na", "K"].every(function (s) { return D.grundstof(s).proeve.b === "olie"; }));
+
+    overskrift("3. Elektronstrukturen, og at pladsen giver den");
+    var afvig = [];
+    Object.keys(STRUKTUR).forEach(function (s) { if (D.grundstof(s).struktur !== STRUKTUR[s]) afvig.push(s + " " + D.grundstof(s).struktur); });
+    paastand("de 26 i hovedgrupperne passer med kompendiet", afvig.length === 0, afvig.join("; "));
+    paastand("summen af elektronerne er atomnummeret for alle 36",
+        D.GRUNDSTOFFER.every(function (g) { return g.skaller.reduce(function (a, b) { return a + b; }, 0) === g.z; }));
+    var hoved = D.GRUNDSTOFFER.filter(function (g) { return !g.ovg; });
+    paastand("antal skaller er perioden (alle i hovedgrupperne)", hoved.every(function (g) { return g.skaller.length === g.periode; }));
+    paastand("elektroner i yderste skal er hovedgruppen (He har 2)", hoved.every(function (g) {
+        var y = g.skaller[g.skaller.length - 1];
+        return g.s === "He" ? y === 2 : y === g.hg;
+    }));
+    paastand("ingen skal overskrider pladsen i modellen", D.GRUNDSTOFFER.every(function (g) {
+        return g.skaller.every(function (n, i) { return n <= D.skalLoft(i, g.z); });
+    }));
+    paastand("Cr og Cu har én elektron i yderste skal, de andre overgangsmetaller to",
+        D.GRUNDSTOFFER.filter(function (g) { return g.ovg; }).every(function (g) {
+            return g.skaller.length === 4 && g.skaller[3] === (g.s === "Cr" || g.s === "Cu" ? 1 : 2);
+        }));
+
+    overskrift("4. De 12 formler");
+    paastand("der er 12, og de seks fra den gamle er med", D.FORMLER.length === 12 &&
+        ["H2O", "H2SO4", "Al2(SO4)3", "NH4NO3", "HNO3", "NO2"].every(function (f) { return D.FORMLER.some(function (fo) { return fo.f === f; }); }));
+    var talFejl = [];
+    D.FORMLER.forEach(function (fo) {
+        var a = ATOMER[fo.f];
+        if (!a) { talFejl.push(fo.f + " mangler i testen"); return; }
+        var orden = a.slice(0, -1).map(function (p) { return p[0]; }).join(",");
+        var ok = fo.orden.join(",") === orden && fo.ialt === a[a.length - 1] &&
+            a.slice(0, -1).every(function (p) { return fo.antal[p[0]] === p[1]; });
+        if (!ok) talFejl.push(fo.f + ": " + JSON.stringify(fo.antal) + " i alt " + fo.ialt);
+    });
+    paastand("atomtallene og rækkefølgen passer", talFejl.length === 0, talFejl.join("; "));
+    paastand("nitrit har ladningen −1 og vises som NO₂⁻", D.FORMLER[11].q === -1 && D.FORMLER[11].formelTekst === "NO₂⁻");
+    paastand("formlerne vises med sænkede tal", D.FORMLER[9].formelTekst === "Al₂(SO₄)₃" && D.FORMLER[10].formelTekst === "(NH₄)₂SO₄");
+    paastand("hvert niveau har fire flasker", [0, 1, 2].every(function (n) { return D.FORMLER.filter(function (fo) { return fo.niveau === n; }).length === 4; }));
+    var kugleFejl = [];
+    D.FORMLER.forEach(function (fo) {
+        var n = F.blokke(fo).reduce(function (a, b) { return a + b.atomer.length; }, 0);
+        if (n !== fo.ialt) kugleFejl.push(fo.f + ": " + n);
+    });
+    paastand("tavlen får lige så mange kugler, som der er atomer", kugleFejl.length === 0, kugleFejl.join(", "));
+    paastand("Al₂(SO₄)₃ bliver til 2 Al og tre rammer med SO₄", (function () {
+        var b = F.blokke(D.FORMLER[9]);
+        return b.length === 4 && !b[0].ramme && b[0].atomer.join("") === "AlAl" &&
+            b.slice(1).every(function (x) { return x.ramme && x.atomer.join("") === "SOOOO"; });
+    }()));
+
+    overskrift("5. Svartjekket godkender de rigtige svar");
+    var afvist = [];
+    D.GRUNDSTOFFER.forEach(function (g) {
+        [g.navn, g.navn.toUpperCase(), " " + g.Navn + " "].concat(g.alt).forEach(function (n) {
+            if (!T.navn(n, g).ok) afvist.push("navn " + g.s + ": " + n);
+        });
+        if (!T.symbol(g.s, g).ok) afvist.push("symbol " + g.s);
+        if (!T.symbol(" " + g.s + " ", g).ok) afvist.push("symbol med mellemrum " + g.s);
+        if (!g.ovg) {
+            [g.struktur, g.skaller.join(" "), g.skaller.join(". "), g.skaller.join(", "), g.skaller.join(";")].forEach(function (s) {
+                if (!T.struktur(s, g).ok) afvist.push("struktur " + g.s + ": " + s);
+            });
+        }
+    });
+    D.FORMLER.forEach(function (fo) {
+        fo.orden.forEach(function (s) { if (!T.antal(String(fo.antal[s]), fo, s).ok) afvist.push(fo.f + " " + s); });
+        if (!T.antal(" " + fo.ialt + " ", fo, "ialt").ok) afvist.push(fo.f + " i alt");
+        if (!T.antal(NK.saenket(fo.ialt), fo, "ialt").ok) afvist.push(fo.f + " i alt med sænket tal");
+    });
+    paastand("alle navne, symboler, strukturer og antal godkendes", afvist.length === 0, afvist.slice(0, 6).join("; "));
+    paastand("tomme felter afvises uden at tælle som fejl", T.navn("  ", D.grundstof("Na")).tom && T.symbol("", D.grundstof("Na")).tom &&
+        T.struktur("", D.grundstof("Na")).tom && T.antal("", D.FORMLER[0], "H").tom);
+
+    overskrift("6. De typiske fejl giver den rigtige besked");
+    function g(s) { return D.grundstof(s); }
+    function fo(f) { for (var i = 0; i < D.FORMLER.length; i++) if (D.FORMLER[i].f === f) return D.FORMLER[i]; return null; }
+    var tilfaelde = [
+        ["symbol", "Na", "NA", "stort første bogstav"],
+        ["symbol", "O", "o", "stort bogstav"],
+        ["symbol", "O", "0", "nul"],
+        ["symbol", "K", "Ka", "ikke et grundstofsymbol"],
+        ["symbol", "K", "C", "C er carbon"],
+        ["symbol", "Fe", "F", "ferrum"],
+        ["symbol", "Fe", "J", "ferrum"],
+        ["symbol", "Cu", "Co", "Co er cobalt"],
+        ["symbol", "Cu", "Ko", "cuprum"],
+        ["symbol", "S", "Sv", "sulfur"],
+        ["symbol", "Ca", "C", "C er carbon"],
+        ["symbol", "Cl", "Kl", "ikke et grundstofsymbol"],
+        ["symbol", "Mg", "Mn", "Mn er mangan"],
+        ["symbol", "Mn", "Mg", "Mg er magnesium"],
+        ["symbol", "Na", "natrium", "Det er navnet"],
+        ["symbol", "Zn", "Zi", "Første bogstav er rigtigt"],
+        ["symbol", "Al", "Ag", "Ag er sølv"],
+        ["symbol", "Na", "Nat", "ét eller to bogstaver"],
+        ["navn", "H", "helium", "Helium har symbolet He"],
+        ["navn", "N", "natrium", "Natrium har symbolet Na"],
+        ["navn", "Ti", "tin", "Sn og står længere nede"],
+        ["navn", "C", "calcium", "Calcium har symbolet Ca"],
+        ["navn", "Si", "silicon", "engelsk"],
+        ["navn", "Si", "svovl", "Svovl har symbolet S"],
+        ["navn", "He", "He", "Det er symbolet"],
+        ["navn", "Ne", "N", "ikke et symbol"],
+        ["navn", "Br", "bromid", "navnet på en ion"],
+        ["navn", "B", "bar", "ikke navnet på B"],
+        ["navn", "Li", "7", "med bogstaver"],
+        ["navn", "Kr", "kalium", "Kalium har symbolet K"],
+        ["struktur", "Na", "11", "alle elektronerne"],
+        ["struktur", "Na", "1", "yderste skal"],
+        ["struktur", "Na", "2,8", "fordelt 10 elektroner"],
+        ["struktur", "Na", "2,8,2", "har kun 11"],
+        ["struktur", "Na", "1,8,2", "indefra"],
+        ["struktur", "Na", "3,8", "1. skal kan højst"],
+        ["struktur", "Na", "2,9", "2. skal kan højst"],
+        ["struktur", "Na", "2,7,2", "skal være fuld"],
+        ["struktur", "Na", "2,8,0,1", "uden elektroner"],
+        ["struktur", "Na", "to, otte, en", "kun tal"],
+        ["struktur", "K", "2,8,9", "yderste skal kan højst"],
+        ["struktur", "Ca", "2,8,10", "yderste skal kan højst"],
+        ["struktur", "Ga", "2,8,8,13", "yderste skal kan højst"],
+        ["struktur", "Ga", "2,8,8,8,5", "4. periode"],
+        ["struktur", "Ga", "2,8,17,4", "skal være fuld"],
+        ["struktur", "He", "1,1", "1. periode"],
+        ["struktur", "H", "2", "har kun 1"]
+    ];
+    var hvilke = { symbol: T.symbol, navn: T.navn, struktur: T.struktur };
+    tilfaelde.forEach(function (t) {
+        var r = hvilke[t[0]](t[2], g(t[1]));
+        paastand(t[0] + " " + t[1] + ": \"" + t[2] + "\" → " + t[3], !r.ok && !r.tom && r.besked.indexOf(t[3]) >= 0, r.besked);
+    });
+    var godkendtMedNote = [
+        ["F", "flour", "mel"], ["Si", "silisium", "Staves silicium"], ["Kr", "krypto", "Staves krypton"],
+        ["C", "kulstof", "Navnet i kemi er carbon"], ["N", "kvælstof", "nitrogen"], ["Ti", "titanium", "titan"],
+        ["Zn", "zinc", "zink"], ["Ni", "nickel", "nikkel"]
+    ];
+    godkendtMedNote.forEach(function (t) {
+        var r = T.navn(t[1], g(t[0]));
+        paastand("navn " + t[0] + ": \"" + t[1] + "\" godkendes med bemærkningen " + t[2], r.ok && r.note.indexOf(t[2]) >= 0, r.note);
+    });
+    var formelTilfaelde = [
+        ["H2SO4", "S", "2", "står efter H"],
+        ["H2SO4", "O", "8", "ganges ikke"],
+        ["HNO3", "N", "3", "står efter O"],
+        ["Al2(SO4)3", "O", "4", "én parentes"],
+        ["Al2(SO4)3", "S", "1", "én parentes"],
+        ["Al2(SO4)3", "Al", "6", "står uden for"],
+        ["Ca(OH)2", "Ca", "2", "står uden for"],
+        ["(NH4)2SO4", "S", "2", "står uden for"],
+        ["(NH4)2SO4", "H", "4", "én parentes"],
+        ["CH3COOH", "C", "1", "2 steder"],
+        ["C2H5OH", "H", "5", "2 steder"],
+        ["NH4NO3", "N", "1", "2 steder"],
+        ["H2O", "O", "0", "mindst ét"],
+        ["H2O", "H", "to", "helt tal"],
+        ["NO2", "ialt", "4", "Ladningen"],
+        ["C6H12O6", "ialt", "3", "antallet af grundstoffer"],
+        ["Al2(SO4)3", "ialt", "7", "gange"],
+        ["H2SO4", "ialt", "6", "Læg tallene sammen"]
+    ];
+    formelTilfaelde.forEach(function (t) {
+        var r = T.antal(t[2], fo(t[0]), t[1]);
+        paastand(t[0] + " " + t[1] + ": \"" + t[2] + "\" → " + t[3], !r.ok && !r.tom && r.besked.indexOf(t[3]) >= 0, r.besked);
+    });
+    note((tilfaelde.length + godkendtMedNote.length + formelTilfaelde.length) + " typiske fejl og stavemåder");
+
+    overskrift("7. Hint og svar til alle felter");
+    var hjaelpFejl = [];
+    D.GRUNDSTOFFER.forEach(function (gg) {
+        var slags = [gg.mangler, "plads"].concat(gg.ovg ? [] : ["struktur"]);
+        slags.forEach(function (sl) {
+            var h = D.hjaelp(gg, sl);
+            if (!h || !h.hint || !h.svar) { hjaelpFejl.push(gg.s + " " + sl); return; }
+            if (sl === "navn" && h.hint.toLowerCase().indexOf(gg.navn) >= 0) hjaelpFejl.push(gg.s + ": hintet siger navnet");
+            if (sl === "symbol" && new RegExp("\\b" + gg.s + "\\b").test(h.hint)) hjaelpFejl.push(gg.s + ": hintet siger symbolet");
+            if (sl === "struktur" && h.hint.indexOf(gg.struktur) >= 0 && gg.z > 2) hjaelpFejl.push(gg.s + ": hintet siger strukturen");
+        });
+    });
+    D.FORMLER.forEach(function (f) {
+        f.orden.concat(["ialt"]).forEach(function (felt) {
+            var h = D.hjaelpFormel(f, felt);
+            if (!h || !h.hint || !h.svar) hjaelpFejl.push(f.f + " " + felt);
+        });
+    });
+    var antalFelter = D.GRUNDSTOFFER.reduce(function (a, gg) { return a + (gg.ovg ? 2 : 3); }, 0) +
+        D.FORMLER.reduce(function (a, f) { return a + f.orden.length + 1; }, 0);
+    paastand("der er hint og svar til alle " + antalFelter + " felter, og hintet siger ikke svaret", hjaelpFejl.length === 0, hjaelpFejl.slice(0, 5).join("; "));
+    paastand("hintet til Al₂(SO₄)₃ O nævner parentesen", D.hjaelpFormel(fo("Al2(SO4)3"), "O").hint.indexOf("parentes") >= 0);
+    paastand("svaret til Al₂(SO₄)₃ O regner 3 × 4 = 12", D.hjaelpFormel(fo("Al2(SO4)3"), "O").svar.indexOf("3 × 4 = <b>12</b>") >= 0);
+    paastand("svaret til CH₃COOH H lægger 3 + 1 sammen", D.hjaelpFormel(fo("CH3COOH"), "H").svar.indexOf("3 + 1 = <b>4</b>") >= 0);
+
+    overskrift("8. Opråbet");
+    var alleNavne = {};
+    D.GRUNDSTOFFER.forEach(function (gg) { alleNavne[gg.navn] = 1; gg.alt.forEach(function (a) { alleNavne[a] = 1; }); });
+    D.UDENFOR.forEach(function (u) { alleNavne[u.navn] = 1; });
+    alleNavne.guld = 1; alleNavne["sølv"] = 1; alleNavne.tin = 1;
+    var forvFejl = [];
+    D.GRUNDSTOFFER.forEach(function (gg) {
+        var v = D.FORVEKSLING[gg.s];
+        if (!v || v.length !== 3) { forvFejl.push(gg.s + " har ikke tre"); return; }
+        if (v.indexOf(gg.navn) >= 0 || gg.alt.some(function (a) { return v.indexOf(a) >= 0; })) forvFejl.push(gg.s + " har sit eget navn som forkert svar");
+        if (v[0] === v[1] || v[1] === v[2] || v[0] === v[2]) forvFejl.push(gg.s + " har to ens");
+        v.forEach(function (n) { if (!alleNavne[n]) forvFejl.push(gg.s + ": " + n + " er ikke et grundstof"); });
+    });
+    paastand("alle 36 har tre forskellige forkerte navne, der er rigtige grundstoffer", forvFejl.length === 0, forvFejl.slice(0, 4).join("; "));
+    paastand("K kan forveksles med kulstof, Ti med tin og Na med nitrogen",
+        D.FORVEKSLING.K.indexOf("kulstof") >= 0 && D.FORVEKSLING.Ti.indexOf("tin") >= 0 && D.FORVEKSLING.Na.indexOf("nitrogen") >= 0);
+    var runder = 0, runderFejl = 0;
+    for (var nv = 0; nv < 6; nv++) {
+        O.nulstilSpil();
+        O.nivNr = nv;
+        for (var r = 0; r < 60; r++) {
+            O.nytOpraab();
+            var op = O.opraab;
+            runder++;
+            if (op.slags === "symbol") {
+                var ens = op.valg.filter(function (x, i) { return op.valg.indexOf(x) === i; }).length === 4;
+                if (!ens || op.valg[op.rigtig] !== op.g.navn || op.valg.filter(function (x) { return x === op.g.navn; }).length !== 1) runderFejl++;
+            }
+            if (op.slags === "struktur" && op.g.ovg) runderFejl++;
+            if (nv < 3 && op.g.z > 30) runderFejl++;
+        }
+    }
+    paastand(runder + " opråb: fire forskellige svar med ét rigtigt, ingen overgangsmetaller i strukturopråb", runderFejl === 0, runderFejl + " fejl");
+    paastand("strukturerne i opråbet er entydige", (function () {
+        var set = {};
+        return D.GRUNDSTOFFER.filter(function (gg) { return !gg.ovg; }).every(function (gg) {
+            if (set[gg.struktur]) return false;
+            set[gg.struktur] = 1;
+            return true;
+        });
+    }()));
+
+    overskrift("9. Sproget");
+    var tekster = [];
+    D.GRUNDSTOFFER.forEach(function (gg) {
+        tekster.push(gg.fakta);
+        [gg.mangler, "plads"].concat(gg.ovg ? [] : ["struktur"]).forEach(function (sl) {
+            var h = D.hjaelp(gg, sl);
+            tekster.push(h.hint, h.svar);
+        });
+    });
+    D.FORMLER.forEach(function (f) {
+        tekster.push(f.fakta);
+        f.orden.concat(["ialt"]).forEach(function (felt) { var h = D.hjaelpFormel(f, felt); tekster.push(h.hint, h.svar); });
+    });
+    var replikker = [].concat(D.INTRO_MONTRE, D.INTRO_FORMLER, D.INTRO_OPRAAB, D.PERIODE_ROS, D.NIVEAU_ROS,
+        [D.MONTRE_FULD, D.FORMLER_FAERDIG], Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; }));
+    tekster = tekster.concat(replikker);
+    tilfaelde.forEach(function (t) { tekster.push(hvilke[t[0]](t[2], g(t[1])).besked); });
+    formelTilfaelde.forEach(function (t) { tekster.push(T.antal(t[2], fo(t[0]), t[1]).besked); });
+    tekster.push(d.body.innerText);
+    var streger = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger", streger.length === 0, streger.slice(0, 2).join(" | "));
+    var enPlus = tekster.filter(function (t) { return /(^|[^0-9])1[+−-](?![0-9])|¹⁺|¹⁻/.test(t.replace(/\d+\s*[+−-]\s*\d+/g, "")); });
+    paastand("ingen ladning skrevet som 1+ eller 1−", enPlus.length === 0, enPlus.slice(0, 2).join(" | "));
+    var lange = replikker.filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("præsentationerne har to eller tre replikker", [D.INTRO_MONTRE, D.INTRO_FORMLER, D.INTRO_OPRAAB].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+
+    /* Alle tests herefter starter fra en tom browser */
+    NOEGLER.forEach(function (n) { W.localStorage.removeItem(n); W.localStorage.setItem(n, n.indexOf("intro") >= 0 ? "true" : "{}"); });
+
+    overskrift("10. Udstillingen kan gennemføres");
+    function klik(sel) { d.querySelector(sel).click(); }
+    klik('[data-fane="fane-montre"]');
+    M.tilpas();
+    M.nulstilAlt();
+    paastand("den tomme udstilling starter med hydrogen, og alle 35 andre er i kassen", M.valgt === 1 && M.iKassen().length === 35 && M.antalLoest() === 0);
+    M.vaelg(11);
+    var o = M.opg;
+    paastand("natrium: tre felter, symbolet først", o.felter.map(function (x) { return x.slags; }).join(",") === "symbol,plads,struktur");
+    o.felter[0].input.value = "NA";
+    M.tjek();
+    paastand("et forkert symbol giver en rød besked, og feltet bliver", /skidt/.test(M.el.besked.className) && M.aktivtFelt().slags === "symbol");
+    M.aktivtFelt().input.value = "Na";
+    M.tjek();
+    paastand("det rigtige symbol åbner pladsen", M.aktivtFelt().slags === "plads");
+    M.klikPlads(19);
+    paastand("et klik på K giver en besked om skiltet", M.el.besked.textContent.indexOf("Skiltet siger K") >= 0 && M.aktivtFelt().slags === "plads");
+    M.klikPlads(11);
+    paastand("klik på Na sætter prøven på plads", M.opg.placeret && M.aktivtFelt().slags === "struktur");
+    for (var i = 0; i < 60; i++) M.opdater(1 / 60);
+    paastand("prøven står i montren efter flyveturen", M.inde(11));
+    M.aktivtFelt().input.value = "2,8,1";
+    M.tjek();
+    paastand("rigtig struktur løser prøven med stjerne", M.opg.faerdig && M.status[11].loest && M.status[11].stjerne);
+    paastand("fremskridtet huskes i browseren", (JSON.parse(W.localStorage.getItem("nk-sc1.2-montre")) || {})["11"] !== undefined);
+    M.knap();
+    paastand("Næste prøve tager den næste uløste, magnesium", M.valgt === 12);
+    M.knap();
+    paastand("første klik på knappen giver et hint", /gul/.test(M.el.besked.className) && M.el.knap.textContent === "Vis svaret");
+    M.knap();
+    paastand("andet klik viser svaret og går videre til pladsen", M.opg.felter[0].status === "svar" && M.aktivtFelt().slags === "plads");
+    M.knap(); M.knap();
+    M.knap(); M.knap();
+    paastand("med svarene vist er prøven løst, men uden stjerne", M.status[12].loest && !M.status[12].stjerne);
+    M.vaelg(1);
+    M.aktivtFelt().input.value = "brint"; M.tjek();
+    M.klikPlads(1);
+    M.aktivtFelt().input.value = "1"; M.tjek();
+    paastand("hydrogen kan løses med navnet brint", M.status[1].loest);
+    M.vaelg(26);
+    paastand("jern er et overgangsmetal: kun symbol og plads", M.opg.felter.length === 2);
+    M.aktivtFelt().input.value = "Fe"; M.tjek();
+    M.klikPlads(26);
+    paastand("jern kan løses", M.status[26].loest);
+    M.vaelg(2);
+    M.aktivtFelt().input.value = "helium"; M.tjek();
+    M.klikPlads(2);
+    M.aktivtFelt().input.value = "2"; M.tjek();
+    for (i = 0; i < 200; i++) M.opdater(1 / 60);
+    paastand("første periode fuld: Kemichael roser", M.rost[1] === true && !!(M.laerer && M.laerer.scene && M.laerer.scene.navn === "periode"));
+    M.vaelg(11);
+    paastand("en løst prøve vises med facit", M.opg.gennemsyn && M.opg.faerdig && M.el.knap.textContent === "Øv prøven igen");
+    M.knap();
+    paastand("Øv prøven igen tager den ned på bordet, og den er stadig løst", !M.opg.placeret && M.status[11].loest);
+    var kasseFoer = M.iKassen().length;
+    M.vaelg(3);
+    for (i = 0; i < 60; i++) M.opdater(1 / 60);
+    paastand("skiftes der væk, går den løste prøve tilbage i montren", M.inde(11) && M.iKassen().length === kasseFoer - 1);
+    M.vaelg(17);
+    paastand("chlor: pladsfeltet er åbent, mens symbolet er det aktive felt", M.aktivtFelt().slags === "symbol" && M.pladsFelt().status === "aaben" && M.kanPlaceres());
+    M.klikPlads(35);
+    paastand("forkert rum før symbolet: beskeden beder om symbolet først", M.el.besked.textContent.indexOf("Find symbolet for chlor først") >= 0 && !M.opg.placeret);
+    var bp = M.bordPos(D.grundstof("Cl"));
+    M.proevPlads(35, { x: bp.x, y: bp.y - 150, h: bp.h * 0.6 });
+    paastand("sluppet i et forkert rum flyver prøven tilbage på bordet", M.flyverTil(17, "bord") && !M.opg.placeret);
+    for (i = 0; i < 60; i++) M.opdater(1 / 60);
+    M.proevPlads(17, { x: bp.x, y: bp.y - 150, h: bp.h * 0.6 });
+    paastand("sluppet i det rigtige rum sættes den på plads, før symbolet er skrevet", M.opg.placeret && M.aktivtFelt().slags === "symbol");
+    paastand("elektronstrukturen venter, til symbolet er skrevet", M.opg.felter[2].status === "laast");
+    M.aktivtFelt().input.value = "Cl"; M.tjek();
+    paastand("så er elektronstrukturen det aktive felt", M.aktivtFelt().slags === "struktur");
+    M.aktivtFelt().input.value = "2 8 7"; M.tjek();
+    paastand("chlor er løst i den rækkefølge", M.status[17].loest && M.status[17].stjerne);
+    M.vaelg(18);
+    paastand("linjen under scenen siger, hvad der skal ske", d.getElementById("montre-status").textContent.indexOf("træk prøven op på sin plads") >= 0);
+    M.nulstilAlt();
+    paastand("Tøm udstillingen nulstiller alt", M.antalLoest() === 0);
+
+    overskrift("10b. Tilbuddet om præsentationen");
+    W.localStorage.removeItem("nk-sc1.2-intro-montre");
+    M.startIntro(false);
+    var tilbud = d.getElementById("montre-tilbud");
+    paastand("første gang står der Start præsentation og Nej tak, og Kemichael kommer ikke af sig selv", !tilbud.hidden && !(M.introVent > 0) && !M.laererIIntro());
+    tilbud.querySelector(".tilbud-nej").click();
+    paastand("Nej tak lukker tilbuddet og huskes", tilbud.hidden && W.localStorage.getItem("nk-sc1.2-intro-montre") === "true");
+    M.startIntro(false);
+    paastand("næste gang kommer tilbuddet ikke igen", tilbud.hidden);
+    W.localStorage.removeItem("nk-sc1.2-intro-montre");
+    M.startIntro(false);
+    tilbud.querySelector(".tilbud-start").click();
+    for (i = 0; i < 30; i++) M.opdater(1 / 60);
+    paastand("Start præsentation sender Kemichael ind", tilbud.hidden && M.laererIIntro());
+    M.springIntro();
+    paastand("Esc under præsentationen sender ham ud", !M.laererIIntro());
+    W.localStorage.removeItem("nk-sc1.2-intro-montre");
+    M.startIntro(false);
+    M.springIntro();
+    paastand("Esc afviser tilbuddet", tilbud.hidden);
+    M.startIntro(true);
+    for (i = 0; i < 30; i++) M.opdater(1 / 60);
+    paastand("K viser præsentationen uden at spørge", M.laererIIntro());
+    M.springIntro();
+    for (i = 0; i < 200; i++) M.opdater(1 / 60);
+
+    overskrift("11. Formlerne kan gennemføres");
+    klik('[data-fane="fane-formler"]');
+    F.tilpas();
+    F.nulstilAlt();
+    F.vaelg(9);
+    var fr = F.opg;
+    paastand("Al₂(SO₄)₃: fire felter", fr.felter.length === 4);
+    F.aktivtFelt().input.value = "2"; F.tjek();
+    F.aktivtFelt().input.value = "1"; F.tjek();
+    paastand("S = 1 giver beskeden om parentesen", F.el.besked.textContent.indexOf("parentes") >= 0);
+    F.aktivtFelt().input.value = "3"; F.tjek();
+    F.aktivtFelt().input.value = "12"; F.tjek();
+    F.aktivtFelt().input.value = "17"; F.tjek();
+    for (i = 0; i < 120; i++) F.opdater(1 / 60);
+    paastand("flasken er løst med stjerne", F.opg.faerdig && F.status[9].loest && F.status[9].stjerne);
+    paastand("17 kugler står på tavlen", F.kugler.length === 17 && F.kugler.every(function (k) { return k.synlig && k.t >= 1; }));
+    paastand("tre stiplede rammer om SO₄", F.rammer.length === 3);
+    F.knap();
+    paastand("Næste flaske tager en uløst", F.valgt !== 9 && !F.status[F.valgt].loest);
+    F.nulstilAlt();
+
+    overskrift("12. Opråbet kan spilles");
+    klik('[data-fane="fane-opraab"]');
+    O.tilpas();
+    O.nulstil();
+    O.startKnap();
+    for (i = 0; i < 100; i++) O.opdater(1 / 60);
+    paastand("spillet går i gang med et opråb", O.tilstand === "koerer" && !!O.opraab);
+    var p0 = O.point;
+    if (O.opraab.slags === "symbol") O.vaelgSvar(O.opraab.rigtig); else O.klikRum(O.opraab.g.z);
+    paastand("et rigtigt svar giver point", O.point > p0 && O.stime === 1);
+    for (i = 0; i < 80; i++) O.opdater(1 / 60);
+    var forkertZ = O.opraab.g.z === 1 ? 2 : 1;
+    if (O.opraab.slags === "symbol") O.vaelgSvar((O.opraab.rigtig + 1) % 4); else O.klikRum(forkertZ);
+    paastand("et forkert svar koster et liv og stimen", O.liv === 2 && O.stime === 0);
+    for (i = 0; i < 200; i++) O.opdater(1 / 60);
+    var start = O.opraab;
+    for (i = 0; i < 60 * 20; i++) { O.opdater(1 / 60); if (O.liv < 2) break; }
+    paastand("når tiden løber ud, koster det et liv", O.liv === 1);
+    for (i = 0; i < 60 * 40 && O.tilstand === "koerer"; i++) O.opdater(1 / 60);
+    paastand("efter tre fejl er spillet slut", O.tilstand === "slut" && O.liv === 0);
+    paastand("fejlene står i listen bagefter", d.getElementById("opraab-log").children.length === 3 && !d.getElementById("opraab-log-kort").hidden);
+    paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc1.2-opraab")) || {}).rekord === O.point);
+    O.nulstil();
+    O.nivNr = 0; O.rigtigeINiveau = 4; O.tilstand = "koerer"; O.nytOpraab();
+    if (O.opraab.slags === "symbol") O.vaelgSvar(O.opraab.rigtig); else O.klikRum(O.opraab.g.z);
+    for (i = 0; i < 70; i++) O.opdater(1 / 60);
+    paastand("fem rigtige giver niveau 2", O.nivNr === 1);
+    O.nulstil();
+
+    overskrift("13. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-montre", "fane-formler", "fane-opraab"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H, m = lay.m;
+            function inde(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            inde(m, "montren");
+            if (m.cb < 18) problemer.push(id + ": rummene er kun " + Math.round(m.cb) + " px");
+            if (lay.tavle) { inde(lay.tavle, "tavlen"); over(lay.tavle, m, "tavlen over montren"); }
+            if (id === "fane-montre") {
+                inde(lay.kasse, "kassen");
+                over(lay.kasse, lay.tavle, "kassen over tavlen");
+                var gs = D.efterZ(35), bp = sim.bordPos(gs);
+                var proeveB = NK.Tegn.proeveBredde(gs, bp.h);
+                var hoejre = bp.x + proeveB / 2 + 16 + lay.maerke.b;
+                if (hoejre > lay.tavle.x + 2) problemer.push(id + ": mærket går ind over tavlen");
+                if (bp.x - proeveB / 2 < lay.kasse.x + lay.kasse.b - 2) problemer.push(id + ": prøven står i kassen");
+                if (bp.y - bp.h < m.y + m.h) problemer.push(id + ": prøven går op i montren");
+            }
+            if (id === "fane-formler") {
+                var fb = NK.Tegn.flaskeBredde(lay.storH);
+                var flaske = { x: lay.flaske.x - fb / 2, y: lay.bordY - lay.storH, b: fb, h: lay.storH };
+                inde(flaske, "flasken");
+                over(flaske, lay.tavle, "flasken over tavlen");
+                if (lay.pladser[0].x - 10 < lay.tavle.x - 20 || lay.pladser[11].x > Wc) problemer.push(id + ": de små flasker");
+            }
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-montre"]');
+}
+</script>
+</body>
+</html>

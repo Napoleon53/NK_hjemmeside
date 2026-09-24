@@ -45,13 +45,15 @@
     };
 
     /* Hvor mange elektroner ses omkring atomet lige nu, og hvor mange
-       skal der til for oktet- (eller duet-) reglen. */
+       skal der til for oktet- (eller duet-) reglen. Har atomet a.frie,
+       er det tegnet med netop saa mange frie elektroner (Kemichaels
+       tegninger paa fanen Find fejlen); ellers regnes de ud. */
     NK.atomStatus = function (state, a) {
         var bindingssum = 0;
         state.bindinger.forEach(function (b) {
             if (b.s === a || b.t === a) bindingssum += b.orden;
         });
-        var frie = NK.frieElektroner(a.z, bindingssum).frie;
+        var frie = a.frie !== undefined ? a.frie : NK.frieElektroner(a.z, bindingssum).frie;
         var nu = frie + 2 * bindingssum;
         var maal = (a.z === 1) ? 2 : 8;
         return { nu: nu, maal: maal, stabil: nu === maal, frie: frie, bindingssum: bindingssum };
@@ -171,8 +173,12 @@
         return domaener;
     }
 
-    NK.elektronDomaener = function (z, bindingsvinkler, bindingssum) {
-        var fe = NK.frieElektroner(z, bindingssum);
+    /* frie (frivillig): tegn netop saa mange frie elektroner, parret
+       saa vidt muligt, i stedet for dem, atomet selv har tilbage. */
+    NK.elektronDomaener = function (z, bindingsvinkler, bindingssum, frie) {
+        var fe = frie !== undefined
+            ? { par: Math.floor(frie / 2), enlige: frie % 2 }
+            : NK.frieElektroner(z, bindingssum);
         if (fe.par + fe.enlige === 0) return [];
         var kryds = tilpasKryds(bindingsvinkler);
         return (kryds && fordelIKryds(kryds, fe.par, fe.enlige)) ||
@@ -236,8 +242,104 @@
         ctx.fill();
     }
 
-    /* ----- Hovedlaerredet ------------------------------------------------ */
-    NK.tegnSpil = function (ctx, state, fremhaev) {
+    /* ----- Hvor hver prik sidder ------------------------------------------
+       Bindingernes elektronpar og hvert atoms frie elektroner. Bruges baade
+       til tegningen og til at taelle med, saa de to aldrig er uenige. */
+    NK.prikLayout = function (state) {
+        var ud = { bindinger: [], atomer: {}, info: {} };
+        state.bindinger.forEach(function (b, i) {
+            var dx = b.t.x - b.s.x, dy = b.t.y - b.s.y;
+            var len = Math.hypot(dx, dy) || 1;
+            var ux = dx / len, uy = dy / len;
+            var mx = (b.s.x + b.t.x) / 2, my = (b.s.y + b.t.y) / 2;
+            ud.bindinger[i] = NK.bindingsprikker(b.orden).map(function (p) {
+                return { x: mx + ux * p.l - uy * p.p, y: my + uy * p.l + ux * p.p };
+            });
+        });
+        state.atomer.forEach(function (a) {
+            var st = NK.atomStatus(state, a);
+            var vinkler = [];
+            state.bindinger.forEach(function (b) {
+                if (b.s === a) vinkler.push(Math.atan2(b.t.y - a.y, b.t.x - a.x));
+                else if (b.t === a) vinkler.push(Math.atan2(b.s.y - a.y, b.s.x - a.x));
+            });
+            var symbol = NK.ELEMENTER[a.z].s;
+            var domaener = NK.elektronDomaener(a.z, vinkler, st.bindingssum, a.frie);
+            ud.atomer[a.id] = NK.prikkerOmAtom(symbol, domaener).map(function (p) {
+                return { x: a.x + p.x, y: a.y + p.y };
+            });
+            ud.info[a.id] = { st: st, vinkler: vinkler, domaener: domaener, symbol: symbol };
+        });
+        return ud;
+    };
+
+    /* Alle prikker, der taeller med hos atomet: dets egne frie elektroner
+       og begge elektroner i hver af dets bindinger. Raekkefoelgen gaar med
+       uret rundt om atomet fra toppen, saa en optaelling kan foelges. */
+    NK.atometsPrikker = function (state, a, layout) {
+        layout = layout || NK.prikLayout(state);
+        var alle = layout.atomer[a.id].slice();
+        state.bindinger.forEach(function (b, i) {
+            if (b.s === a || b.t === a) alle = alle.concat(layout.bindinger[i]);
+        });
+        function vinkel(p) {
+            var v = Math.atan2(p.y - a.y, p.x - a.x) + KVART;
+            return ((v % HEL) + HEL) % HEL;
+        }
+        return alle.sort(function (p, q) { return vinkel(p) - vinkel(q); });
+    };
+
+    /* Samme ellipse om symbolet som prikkerne, bare laengere ude. */
+    function etiketPunkt(a, info) {
+        var retning = pladsTilTaeller(info.vinkler, info.domaener);
+        var halv = NK.symbolHalvdel(info.symbol);
+        var c = Math.cos(retning), sn = Math.sin(retning);
+        var rx = halv.b + 44, ry = halv.h + 33;
+        var r = 1 / Math.sqrt((c / rx) * (c / rx) + (sn / ry) * (sn / ry));
+        return { x: a.x + c * r, y: a.y + sn * r };
+    }
+
+    var RING = { roed: "#e05446", groen: "#3fae72", gul: "#f2c53d", blaa: "#3d9ee0" };
+    var ETIKET = { roed: "#f0918a", groen: "#7ee0a8", gul: "#f2c53d", hvid: "#f2f3f5" };
+
+    function ring(ctx, a, farve, gloed) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.r + 4, 0, HEL);
+        ctx.strokeStyle = farve;
+        ctx.lineWidth = 3;
+        if (gloed) { ctx.shadowColor = farve; ctx.shadowBlur = 16; }
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function etiket(ctx, tekst, p, farve) {
+        ctx.save();
+        ctx.font = "600 14px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "#14141a";
+        ctx.strokeText(tekst, p.x, p.y);
+        ctx.fillStyle = farve;
+        ctx.fillText(tekst, p.x, p.y);
+        ctx.restore();
+    }
+
+    /* ----- Hovedlaerredet ------------------------------------------------
+       vis styrer det, der ligger oven paa selve prikformlen:
+         snap, hover, traek  atomer, der er ramt af musen (byggefanen)
+         taeller             elektrontallet ved hvert atom (kun paa bestilling)
+         stabilGroen         symbolet bliver groent, naar atomet har oktet
+         ringe               { id: "roed" | "groen" | "gul" | "blaa" }
+         etiketter           { id: { tekst, farve } } ved siden af atomet
+         taelling            { id, n, faerdig }: de foerste n prikker om
+                             atomet lyser op, og tallet staar ved siden af */
+    NK.tegnSpil = function (ctx, state, vis) {
+        vis = vis || {};
+        var layout = NK.prikLayout(state);
+
         state.bindinger.forEach(function (b) {
             var dx = b.t.x - b.s.x, dy = b.t.y - b.s.y;
             var len = Math.hypot(dx, dy) || 1;
@@ -256,34 +358,15 @@
                 ctx.stroke();
                 ctx.restore();
             }
-
-            var mx = (b.s.x + b.t.x) / 2, my = (b.s.y + b.t.y) / 2;
-            ctx.fillStyle = "#f2c53d";
-            NK.bindingsprikker(b.orden).forEach(function (p) {
-                prik(ctx, mx + ux * p.l - uy * p.p, my + uy * p.l + ux * p.p);
-            });
         });
 
         state.atomer.forEach(function (a) {
-            var st = NK.atomStatus(state, a);
-            var symbol = NK.ELEMENTER[a.z].s;
-            var vinkler = [];
-            state.bindinger.forEach(function (b) {
-                if (b.s === a) vinkler.push(Math.atan2(b.t.y - a.y, b.t.x - a.x));
-                else if (b.t === a) vinkler.push(Math.atan2(b.s.y - a.y, b.s.x - a.x));
-            });
-
-            if (a === fremhaev.snap) {
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(a.x, a.y, a.r + 4, 0, HEL);
-                ctx.strokeStyle = "#3d9ee0";
-                ctx.lineWidth = 3;
-                ctx.shadowColor = "#3d9ee0";
-                ctx.shadowBlur = 16;
-                ctx.stroke();
-                ctx.restore();
-            } else if (a === fremhaev.hover || a === fremhaev.traek) {
+            var farve = vis.ringe && vis.ringe[a.id];
+            if (a === vis.snap) {
+                ring(ctx, a, RING.blaa, true);
+            } else if (farve) {
+                ring(ctx, a, RING[farve], farve !== "groen");
+            } else if (a === vis.hover || a === vis.traek) {
                 ctx.beginPath();
                 ctx.arc(a.x, a.y, a.r + 4, 0, HEL);
                 ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
@@ -292,38 +375,69 @@
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
             }
+        });
 
+        ctx.fillStyle = "#f2c53d";
+        layout.bindinger.forEach(function (prikker) {
+            prikker.forEach(function (p) { prik(ctx, p.x, p.y); });
+        });
+
+        state.atomer.forEach(function (a) {
+            var info = layout.info[a.id];
             ctx.font = "700 " + FONT_PX + "px 'Segoe UI', sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillStyle = st.stabil ? "#7ee0a8" : "#f2f3f5";
-            ctx.fillText(symbol, a.x, a.y + 1);
+            ctx.fillStyle = vis.stabilGroen && info.st.stabil ? "#7ee0a8" : "#f2f3f5";
+            ctx.fillText(info.symbol, a.x, a.y + 1);
 
-            var domaener = NK.elektronDomaener(a.z, vinkler, st.bindingssum);
             ctx.fillStyle = "#f2c53d";
-            NK.prikkerOmAtom(symbol, domaener).forEach(function (p) {
-                prik(ctx, a.x + p.x, a.y + p.y);
-            });
-
-            /* Samme ellipse om symbolet som prikkerne, bare laengere ude. */
-            var retning = pladsTilTaeller(vinkler, domaener);
-            var halv = NK.symbolHalvdel(symbol);
-            var c = Math.cos(retning), sn = Math.sin(retning);
-            var rx = halv.b + 36, ry = halv.h + 26;
-            var r = 1 / Math.sqrt((c / rx) * (c / rx) + (sn / ry) * (sn / ry));
-            ctx.font = "600 11px 'Cascadia Mono', Consolas, monospace";
-            ctx.fillStyle = st.stabil ? "#7ee0a8" : "#f0918a";
-            ctx.fillText(st.nu + "/" + st.maal + "e" + NK.haevet("-"), a.x + c * r, a.y + sn * r);
+            layout.atomer[a.id].forEach(function (p) { prik(ctx, p.x, p.y); });
         });
 
-        for (var k = state.partikler.length - 1; k >= 0; k--) {
-            var p = state.partikler[k];
+        /* Optaellingen: de talte prikker lyser op én ad gangen. */
+        var t = vis.taelling;
+        var talt = t && state.atomer.filter(function (a) { return a.id === t.id; })[0];
+        if (talt) {
+            var prikker = NK.atometsPrikker(state, talt, layout);
+            var n = Math.min(prikker.length, Math.floor(t.n));
+            ctx.save();
+            ctx.fillStyle = "#ffffff";
+            ctx.shadowColor = "#9fd8ff";
+            ctx.shadowBlur = 10;
+            for (var i = 0; i < n; i++) {
+                ctx.beginPath();
+                ctx.arc(prikker[i].x, prikker[i].y, PRIK_R + 1.3, 0, HEL);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        state.atomer.forEach(function (a) {
+            var info = layout.info[a.id];
+            var tekst = null, farve = null;
+            if (talt === a) {
+                var st = info.st;
+                tekst = Math.min(st.nu, Math.floor(t.n)) + " e" + NK.haevet("-");
+                farve = !t.faerdig ? ETIKET.hvid : (st.stabil ? ETIKET.groen : ETIKET.roed);
+            } else if (vis.etiketter && vis.etiketter[a.id]) {
+                tekst = vis.etiketter[a.id].tekst;
+                farve = ETIKET[vis.etiketter[a.id].farve] || ETIKET.hvid;
+            } else if (vis.taeller) {
+                tekst = info.st.nu + "/" + info.st.maal + " e" + NK.haevet("-");
+                farve = info.st.stabil ? ETIKET.groen : ETIKET.roed;
+            }
+            if (tekst) etiket(ctx, tekst, etiketPunkt(a, info), farve);
+        });
+
+        var partikler = state.partikler || [];
+        for (var k = partikler.length - 1; k >= 0; k--) {
+            var p = partikler[k];
             p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.liv -= 0.02;
             ctx.globalAlpha = Math.max(0, p.liv);
             ctx.fillStyle = p.farve;
             ctx.beginPath(); ctx.arc(p.x, p.y, p.stoerrelse, 0, HEL); ctx.fill();
             ctx.globalAlpha = 1;
-            if (p.liv <= 0) state.partikler.splice(k, 1);
+            if (p.liv <= 0) partikler.splice(k, 1);
         }
     };
 

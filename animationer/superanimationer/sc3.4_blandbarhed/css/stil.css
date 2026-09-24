@@ -1,0 +1,637 @@
+/* =====================================================================
+   sc3.4 - Blandbarhed
+   Stilark. Grundreglerne (toplinje, panel, kort, knapper, pop op og
+   rundvisning) er de samme som i sc2.4.
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
+   dansk komma.
+   ===================================================================== */
+
+:root {
+    --bund:        #1b1b21;
+    --scene-bund:  #14141a;
+    --panel:       #2b2b36;
+    --panel-2:     #333340;
+    --panel-3:     #3d3d4b;
+    --linje:       #464655;
+    --tekst:       #f2f3f5;
+    --tekst-svag:  #c8ced6;
+    --tekst-mat:   #9fa6af;
+
+    --blaa:        #3d9ee0;
+    --blaa-mork:   #2a76ac;
+    --groen:       #3fae72;
+    --groen-mork:  #2b7d51;
+    --roed:        #e05446;
+    --roed-mork:   #a33529;
+    --gul:         #f2c53d;
+    --lilla:       #9b6bd6;
+
+    /* Stofferne: de samme farver som kuglerne (js/data.js) */
+    --vand:        #3b82f6;
+    --ethanol:     #d946ef;
+    --olie:        #fbbf24;
+
+    --radius:      10px;
+    --radius-lil:  6px;
+    --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
+    --panel-bredde: 430px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bund);
+    color: var(--tekst);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+   TOPLINJE
+   --------------------------------------------------------------------- */
+.top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background-color: #15151b;
+    border-bottom: 1px solid #33333f;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    flex-shrink: 0;
+}
+
+/* I en samling i fuld skaerm staar knappen, der gendanner panelet, i hjoernet */
+.samling-fuld .top { padding-left: 56px; }
+
+.top h1 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.top h1 .ikon { font-size: 1.15rem; margin-right: 3px; color: var(--gul); }
+
+.teoriknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.teoriknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+.ikonknap {
+    background: transparent;
+    border: 1px solid #4a4a58;
+    color: var(--tekst-svag);
+    border-radius: 4px;
+    width: 30px;
+    height: 28px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+#hjaelpknap {
+    width: 38px;
+    height: 36px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background-color: var(--roed-mork);
+    border-color: var(--roed);
+    color: #d9dde3;
+}
+
+#hjaelpknap:hover { background-color: var(--roed); color: #ffffff; }
+
+/* ---------------------------------------------------------------------
+   HOVEDLAYOUT
+   --------------------------------------------------------------------- */
+main { flex: 1; position: relative; min-height: 0; }
+
+.fane {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
+}
+
+.scene {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    background-color: var(--scene-bund);
+    overflow: hidden;
+}
+
+.scene > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+
+/* Pladsholdere, som rundvisningen kan pege paa. js/scene.js saetter
+   deres placering efter tegningen. */
+.anker { position: absolute; pointer-events: none; }
+
+/* Den store knap, der sender Kemichael ud under praesentationen.
+   Samme som i sc2.3 og sc2.4. */
+.spring-over {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(20, 20, 28, 0.94);
+    color: #ffffff;
+    border: 2px solid var(--gul);
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.spring-over[hidden] { display: none; }
+.spring-over:hover { background-color: var(--panel-3); }
+.spring-over span { color: var(--gul); font-size: 1.1rem; }
+
+@keyframes puf {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
+    40%  { transform: translateX(-50%) scale(1.08); }
+    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
+}
+
+.spring-over.puf { animation: puf 0.7s ease-out 2; }
+
+/* Det, Kemichael peger paa, mens han taler om det */
+@keyframes peg {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
+    70%  { box-shadow: 0 0 0 12px rgba(242, 197, 61, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
+
+.peg { outline: 2px solid var(--gul); outline-offset: 2px; animation: peg 1.2s ease-out infinite; }
+
+/* ---------------------------------------------------------------------
+   HOEJRE SPALTE
+   --------------------------------------------------------------------- */
+.panel {
+    background-color: var(--panel);
+    border-left: 1px solid #1f1f27;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d5c var(--panel);
+}
+
+.panel::-webkit-scrollbar { width: 9px; }
+.panel::-webkit-scrollbar-track { background: var(--panel); }
+.panel::-webkit-scrollbar-thumb { background: #4d4d5c; border-radius: 5px; }
+
+.kort {
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 11px;
+}
+
+.kort > h2 {
+    margin: 0 0 9px 0;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.kort > h2 .taeller {
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    color: var(--tekst-mat);
+    font-weight: 600;
+    text-transform: none;
+}
+
+.kort > h2 .taeller b { color: var(--tekst); }
+
+/* ----- Haeld i -------------------------------------------------------- */
+.stofknapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+
+.stofknap {
+    --farve: var(--vand);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 8px 10px 9px;
+    border-radius: var(--radius-lil);
+    border: 1px solid var(--farve);
+    border-left-width: 5px;
+    background-color: rgba(255, 255, 255, 0.04);
+    color: var(--tekst);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.08s ease;
+}
+
+.stofknap[data-stof="ethanol"] { --farve: var(--ethanol); }
+.stofknap[data-stof="olie"] { --farve: var(--olie); }
+.stofknap:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.1); }
+.stofknap:active:not(:disabled) { transform: scale(0.97); }
+.stofknap:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.stofknap .sn { font-size: 0.95rem; font-weight: 700; }
+.stofknap .sn::before { content: "+ "; color: var(--farve); }
+.stofknap .sf { font-size: 0.82rem; color: var(--tekst-svag); }
+.stofknap .sp { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; color: var(--farve); }
+
+.maengde {
+    margin: 9px 0 0;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--tekst-mat);
+}
+
+.maengde b { color: var(--tekst-svag); font-weight: 600; }
+
+/* ----- Ryst og varm ---------------------------------------------------- */
+.knap.ryst {
+    width: 100%;
+    justify-content: center;
+    padding: 11px 13px;
+    font-size: 0.95rem;
+    background-color: var(--roed-mork);
+    border-color: var(--roed);
+    box-shadow: 0 4px 0 #6f2019;
+}
+
+.knap.ryst:hover:not(:disabled) { background-color: var(--roed); }
+.knap.ryst:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #6f2019; }
+
+.temperatur { margin-top: 12px; }
+
+.temp-hoved {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.temp-hoved span { font-size: 0.82rem; color: var(--tekst-svag); }
+
+.temp-tal {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ff8a7a;
+}
+
+.temperatur input[type=range] {
+    width: 100%;
+    margin: 6px 0 2px;
+    accent-color: var(--roed);
+    cursor: pointer;
+}
+
+/* Kogepunkterne under skyderen, placeret efter temperaturen (20-120 °C) */
+.kp-skala { position: relative; height: 18px; font-size: 0.75rem; color: var(--tekst-mat); }
+.kp-skala span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; font-weight: 600; }
+.kp-skala .kp-ethanol { color: var(--ethanol); }
+.kp-skala .kp-vand { color: #6ea8ff; }
+.kp-skala .kant-v { transform: none; left: 0; }
+.kp-skala .kant-h { transform: none; right: 0; left: auto; }
+
+/* ----- Knapper --------------------------------------------------------- */
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.knap:active:not(:disabled) { transform: scale(0.985); }
+.knap:disabled { opacity: 0.4; cursor: not-allowed; }
+.knap[hidden] { display: none; }
+.knap.stor { padding: 11px 13px; font-size: 0.92rem; width: 100%; justify-content: center; }
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+.knap.groen { background-color: var(--groen-mork); border-color: var(--groen); }
+.knap.groen:hover:not(:disabled) { background-color: var(--groen); }
+.knap.lille { width: 100%; justify-content: center; margin-top: 9px; font-size: 0.8rem; padding: 6px 10px; }
+
+@keyframes bank {
+    0%   { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(63, 174, 114, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0); }
+}
+
+.knap.banker { animation: bank 1.7s ease-out infinite; }
+
+/* ----- Opgavekortet ---------------------------------------------------- */
+.kort.opgavekort { border-left: 3px solid var(--lilla); }
+
+.opgavetekst { margin: 0 0 10px; font-size: 0.92rem; line-height: 1.45; color: var(--tekst); }
+.opgavetekst:empty { display: none; }
+
+.valg { display: grid; gap: 7px; margin-bottom: 10px; }
+.valg:empty { display: none; }
+
+.valgknap {
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 9px 11px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    line-height: 1.35;
+}
+
+.valgknap:hover:not(:disabled) { background-color: var(--panel-3); border-color: var(--blaa); }
+.valgknap:disabled { cursor: default; }
+.valgknap.rigtig { border-color: var(--groen); background-color: rgba(63, 174, 114, 0.14); color: #b9f0cf; }
+.valgknap.forkert { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.12); color: #f7b9b2; }
+.valgknap.mat { opacity: 0.45; }
+
+.besked { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.5; color: var(--tekst-svag); }
+.besked:empty { display: none; }
+.besked.god   { color: #7ee0a8; }
+.besked.skidt { color: #f0918a; }
+.besked.gul   { color: #f0d77a; }
+
+/* ---------------------------------------------------------------------
+   POP OP (teori og quiz)
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 8, 12, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 660px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 24px 26px;
+}
+
+.overlay-boks.smal { max-width: 520px; }
+
+.overlay-boks h2 { margin: 0 0 6px 0; font-size: 1.15rem; color: var(--blaa); }
+
+.overlay-boks h3 {
+    margin: 18px 0 6px 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+}
+
+.overlay-boks p, .overlay-boks li {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: #c8ced6;
+    margin: 0 0 8px 0;
+}
+
+.overlay-boks ul { margin: 0; padding-left: 20px; }
+
+.knapper { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.knapper .knap { justify-content: center; min-width: 110px; }
+
+.tabel {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 4px 0 8px;
+}
+
+.tabel th, .tabel td { padding: 5px 8px; text-align: left; border-bottom: 1px solid #3a3a47; color: #c8ced6; }
+.tabel th { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tekst-mat); font-weight: 700; }
+.tabel td.tal { text-align: right; font-variant-numeric: tabular-nums; }
+.tabel .prik { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+
+kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid #55556a;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background-color: #1f1f28;
+    font-family: inherit;
+    font-size: 0.78rem;
+    color: var(--tekst);
+}
+
+/* ----- Quizzen -------------------------------------------------------- */
+.quiz-tal {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--blaa);
+    margin-bottom: 8px;
+}
+
+.quiz-spm { font-size: 1.02rem; font-weight: 600; line-height: 1.45; margin: 0 0 14px; color: var(--tekst); }
+.quiz-svar { display: grid; gap: 8px; }
+.quiz-forklaring { margin-top: 12px; }
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som sc2.4)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning[hidden] { display: none; }
+
+.rundvisning-baggrund {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.rundvisning-tal {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--tekst-mat);
+}
+
+.rundvisning-luk {
+    background: transparent;
+    border: none;
+    color: var(--tekst-svag);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.rundvisning-luk:hover { color: var(--tekst); }
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.86rem; line-height: 1.5; color: #c8ced6; }
+
+.rundvisning-knapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
+
+/* ---------------------------------------------------------------------
+   TILGAENGELIGHED OG SMALLE SKAERME
+   --------------------------------------------------------------------- */
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--gul);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1320px) {
+    :root { --panel-bredde: 380px; }
+}
+
+@media (max-width: 860px) {
+    body { overflow: auto; }
+    .top { flex-wrap: wrap; gap: 10px; }
+    main { overflow: visible; }
+    .fane { position: static; grid-template-columns: minmax(0, 1fr); }
+    .scene { height: 62vh; min-height: 340px; }
+    .panel { border-left: none; border-top: 1px solid #1f1f27; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
+   sted som knappen, der springer den over (js/praesentation.js) */
+.tilbud {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(20, 20, 28, 0.94);
+    border: 1px solid #4a4a58;
+    border-radius: 999px;
+    padding: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.tilbud button {
+    font-family: inherit;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    padding: 9px 18px;
+    font-size: 0.98rem;
+}
+
+.tilbud-start {
+    background-color: var(--blaa-mork);
+    border: 2px solid var(--gul);
+    color: #ffffff;
+    animation: bank 1.7s ease-out infinite;
+}
+
+.tilbud-start span { color: var(--gul); margin-left: 4px; }
+.tilbud-start:hover { background-color: var(--blaa); }
+
+.tilbud-nej {
+    background-color: transparent;
+    border: 1px solid #5e5e70;
+    color: var(--tekst-svag);
+}
+
+.tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }

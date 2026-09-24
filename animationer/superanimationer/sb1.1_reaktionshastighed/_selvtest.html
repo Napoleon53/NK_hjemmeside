@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, sb1.1 Reaktionshastighed</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at modellen rammer tallene, at opgaverne har
+   praecis ét rigtigt svar med forklaring, at linealen godkendes som
+   tangent, naar den er det, at partiklerne giver flere sammenstoed ved
+   hoejere koncentration og stoerre overflade, at hastighedsudtrykkene
+   har litteraturens form, at tjek og hint svarer paa fejlen, og at
+   sproget overholder reglerne. Skal koeres gennem en lokal server
+   (Chrome maa ikke kigge ind i en iframe paa file://).
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function naer(a, b, rel) { return Math.abs(a - b) <= (rel || 1e-6) * Math.max(Math.abs(a), Math.abs(b), 1e-30); }
+
+/* Fast talraekke i stedet for Math.random (mulberry32) */
+function froe(s) {
+    return function () {
+        s |= 0; s = s + 0x6D2B79F5 | 0;
+        var t = Math.imul(s ^ s >>> 15, 1 | s);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1200); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    try { w.localStorage.setItem("nk-sb1.1-intro", JSON.stringify({ kurve: true, sammenstoed: true, udtryk: true })); } catch (e) {}
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    var D = NK.Data, B = NK.Model.bromat, M = NK.Model.udtryk, S = NK.sims;
+    paastand("tre faner er bygget", !!(S && S.kurve && S.sammenstoed && S.udtryk));
+    paastand("Kemichael er indlæst", !!(NK.Kemichael && NK.laerer));
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    try { afsnit(); } catch (e) { paastand("ingen undtagelse undervejs", false, e.message + " " + (e.stack || "").split("\n")[1]); }
+    vis();
+
+    function afsnit() {
+    var i, t, o, liste;
+
+    overskrift("2. Modellen på fane 1");
+    paastand("[Br₂] = 0 og [BrO₃⁻] = 1,00·10⁻³ M ved t = 0", B.br2(0) === 0 && naer(B.bro3(0), 1e-3));
+    var alleTre = true, alleAfl = true;
+    for (t = 0; t <= 500; t += 25) {
+        if (!naer(B.v("br2", t), 3 * B.v("bro3", t))) alleTre = false;
+        ["br2", "bro3"].forEach(function (s) {
+            var h = 1e-3, num = (B.konc(s, t + h) - B.konc(s, t - h)) / (2 * h);
+            if (!naer(num, B.haeldning(s, t), 1e-4)) alleAfl = false;
+        });
+        if (!naer(B.br2(t) + 3 * B.bro3(t), 3e-3)) alleTre = false;
+    }
+    paastand("v(Br₂) = 3·v(BrO₃⁻) og [Br₂] + 3·[BrO₃⁻] = 3,00·10⁻³ M hele vejen", alleTre);
+    paastand("hældningen passer med kurven (differenskvotient)", alleAfl);
+    paastand("gennemsnit 80-120 s er 1,1·10⁻⁵ M/s: " + NK.sci(B.gennemsnit("br2", 80, 120), 3), naer(B.gennemsnit("br2", 80, 120), 1.10e-5, 0.01));
+    paastand("hastigheden falder hele tiden", B.v("br2", 0) > B.v("br2", 100) && B.v("br2", 100) > B.v("br2", 400));
+    paastand("aksen rummer kurven", B.Y_MAKS > B.BR2_SLUT && B.br2(500) > 0.99 * B.BR2_SLUT);
+    paastand("talformat: 1,1·10⁻⁵, 0,20, −3,7·10⁻⁶", NK.sci(1.1e-5, 2) === "1,1·10⁻⁵" && NK.sci(0.2, 2) === "0,20" && NK.sci(-3.66e-6, 2) === "−3,7·10⁻⁶",
+        NK.sci(1.1e-5, 2) + " " + NK.sci(0.2, 2) + " " + NK.sci(-3.66e-6, 2));
+
+    overskrift("3. Opgaverne på fane 1 og 2");
+    D.KURVE_OPGAVER.concat(D.SAM_OPGAVER).forEach(function (def) {
+        var ok = true, note = "";
+        for (var n = 0; n < 8; n++) {
+            var o = def.lav();
+            if (!o.tekst || !o.hint || !o.opsaet) { ok = false; note = "mangler tekst, hint eller opsaet"; }
+            if (o.valg) {
+                var rigtige = o.valg.filter(function (v) { return v.rigtig; }).length;
+                var tekster = {};
+                o.valg.forEach(function (v) { tekster[v.tekst] = 1; if (!v.forklaring) { ok = false; note = "forklaring mangler"; } });
+                if (rigtige !== 1) { ok = false; note = rigtige + " rigtige"; }
+                if (Object.keys(tekster).length !== o.valg.length) { ok = false; note = "ens svar: " + o.valg.map(function (v) { return v.tekst; }).join(" | "); }
+            } else if (!o.tangent || !o.rigtigTekst) { ok = false; note = "hverken svar eller tangent"; }
+        }
+        paastand(def.id + ": ét rigtigt svar, forskellige svar, forklaring og hint", ok, note);
+    });
+    D.KURVE_OPGAVER.forEach(function (d) { if (d.nr !== undefined) d.nr = 0; });
+    o = D.KURVE_OPGAVER.filter(function (d) { return d.id === "gennemsnit"; })[0].lav();
+    var rig = o.valg.filter(function (v) { return v.rigtig; })[0].tekst;
+    paastand("gennemsnit 80-120 s: det rigtige svar er " + rig, rig === NK.sci(B.gennemsnit("br2", 80, 120), 2) + " M/s");
+    o = D.KURVE_OPGAVER.filter(function (d) { return d.id === "koefficient"; })[0].lav();
+    rig = o.valg.filter(function (v) { return v.rigtig; })[0].tekst;
+    paastand("koefficienten: det rigtige svar er v(Br₂)/3 (" + rig + ")", rig === "v(BrO₃⁻) = " + NK.sci(B.v("br2", 100) / 3, 2) + " M/s");
+
+    overskrift("4. Opgavekortet og værktøjet på fane 1");
+    NK.visFane("kurve");
+    var K1 = S.kurve, kort = K1.kort;
+    kort.naesteNr = 0;
+    paastand("knappen starter som Start opgave", d.getElementById("kurve-opgaveknap").textContent === "Start opgave");
+    kort.tryk();
+    paastand("første opgave er 'hurtigst' med fire svar", kort.opgave.id === "hurtigst" && d.querySelectorAll("#kurve-valg .valgknap").length === 4);
+    paastand("knappen er nu Giv hint", d.getElementById("kurve-opgaveknap").textContent === "Giv hint");
+    var forkert = kort.opgave.valg.map(function (v, i) { return v.rigtig ? -1 : i; }).filter(function (i) { return i >= 0; })[0];
+    kort.knapper[forkert].click();
+    paastand("et forkert svar giver forklaringen på fejlen og kan ikke vælges igen",
+        d.getElementById("kurve-besked").className.indexOf("skidt") >= 0 && kort.knapper[forkert].disabled
+        && d.getElementById("kurve-besked").textContent === kort.opgave.valg[forkert].forklaring);
+    var loestFoer = kort.antalLoest;
+    kort.knapper[kort.opgave.valg.map(function (v) { return v.rigtig; }).indexOf(true)].click();
+    paastand("et rigtigt svar tæller og giver Ny opgave", kort.antalLoest === loestFoer + 1 && d.getElementById("kurve-opgaveknap").textContent === "Ny opgave");
+    kort.tryk();
+    paastand("anden opgave er gennemsnittet, og værktøjet er låst", kort.opgave.id === "gennemsnit" && K1.laas && K1.vaerktoej === "sekant"
+        && d.querySelector("#kurve-vaerktoej [data-vaerktoej='aflaes']").disabled && d.getElementById("kurve-afspil").disabled);
+    paastand("facit er skjult i aflæsningen", d.getElementById("kurve-aflaesning").textContent.indexOf("?") >= 0
+        && d.getElementById("kurve-aflaesning").textContent.indexOf("Δt") < 0);
+    kort.tryk(); kort.tryk();
+    paastand("Giv hint og Vis svaret: det rigtige svar lyser, og det tæller ikke",
+        kort.opgave.vist && d.querySelector("#kurve-valg .rigtig") && kort.antalLoest === loestFoer + 1 && d.getElementById("kurve-hint").textContent.indexOf("Hint:") === 0);
+    kort.tryk();
+    paastand("tredje opgave er tangenten", kort.opgave.id === "tangent" && K1.vaerktoej === "tangent" && K1.lineal === 0);
+    var sand = B.haeldning("br2", K1.tT);
+    K1.lineal = sand * 1.3; K1.tjekLineal();
+    paastand("for stejl lineal: ikke godkendt, besked om det", !kort.opgave.loest && d.getElementById("kurve-besked").textContent.indexOf("For stejl") === 0);
+    K1.lineal = sand * 0.7; K1.tjekLineal();
+    paastand("for flad lineal: besked om det", !kort.opgave.loest && d.getElementById("kurve-besked").textContent.indexOf("For flad") === 0);
+    /* Traek i linealens ende langs den rigtige tangent, som eleven ville */
+    K1.tilpas();
+    K1.lineal = 0;
+    var e = K1.linealEnder(), r = K1.L.canvas.getBoundingClientRect(), lay = K1.lay;
+    var m = -sand * lay.sy / lay.sx, maalX = e.p.x + 120, maalY = e.p.y + 120 * m;
+    function pil(type, x, y) {
+        K1.L.canvas.dispatchEvent(new w.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 1, bubbles: true, isPrimary: true }));
+    }
+    pil("pointerdown", e.b.x, e.b.y); pil("pointermove", maalX, maalY); pil("pointerup", maalX, maalY);
+    paastand("træk linealen på plads med musen: godkendt som tangent (" + NK.sci(K1.lineal, 3) + " mod " + NK.sci(sand, 3) + ")",
+        kort.opgave.loest && Math.abs(K1.lineal / sand - 1) < 0.02);
+    kort.afslut();
+    paastand("Afslut låser værktøjet op", !K1.laas && !d.querySelector("#kurve-vaerktoej [data-vaerktoej='aflaes']").disabled);
+    K1.saetVaerktoej("tangent"); K1.stof = "bro3"; K1.lineal = B.haeldning("bro3", K1.tT); K1.visPanel();
+    paastand("tangent på BrO₃⁻: v = −hældningen, positiv", d.getElementById("kurve-aflaesning").textContent.indexOf("−hældningen") >= 0
+        && d.querySelector("#kurve-aflaesning .resultat b").textContent.charAt(0) !== "−");
+    K1.stof = "br2"; K1.forfra();
+    K1.afspil(); K1.opdater(1);
+    paastand("Afspil: 42 s pr. sekund, kurven tegnes med", naer(K1.t, 42, 1e-6) && naer(K1.vist, 42, 1e-6) && K1.spiller);
+    for (i = 0; i < 20; i++) K1.opdater(1);
+    paastand("reaktionen stopper ved 500 s", K1.t === 500 && !K1.spiller && d.getElementById("kurve-afspil").textContent.indexOf("igen") >= 0);
+    K1.forfra();
+
+    overskrift("5. Partiklerne på fane 2");
+    NK.visFane("sammenstoed");
+    var S2 = S.sammenstoed;
+    function hitsVedStart(nA, nB, froet) {
+        var sum = 0;
+        for (var k = 0; k < 4; k++) {
+            NK.tilf = froe(froet + k);
+            S2.opst = "opl"; S2.nA = nA; S2.nB = nB; S2.start(false);
+            S2.koer(2.5);
+            sum += S2.antalHits;
+        }
+        return sum / 4;
+    }
+    var h12 = hitsVedStart(12, 12, 100), h24 = hitsVedStart(24, 12, 200), h2424 = hitsVedStart(24, 24, 300), h6 = hitsVedStart(6, 12, 400);
+    paastand("sammenstød de første 2,5 s: 6+12 " + h6 + ", 12+12 " + h12 + ", 24+12 " + h24 + ", 24+24 " + h2424, h6 < h12 && h12 < h24 && h24 < h2424);
+    paastand("dobbelt så mange A giver ca. dobbelt så mange sammenstød (" + NK.tal(h24 / h12, 2) + ")", h24 / h12 > 1.55 && h24 / h12 < 2.6);
+    paastand("dobbelt så mange af begge giver ca. fire gange så mange (" + NK.tal(h2424 / h12, 2) + ")", h2424 / h12 > 3 && h2424 / h12 < 5.2);
+    NK.tilf = froe(7);
+    S2.opst = "opl"; S2.nA = 12; S2.nB = 12; S2.start(false);
+    S2.koer(15); var efter15 = S2.dannet;
+    S2.koer(30); var efter45 = S2.dannet;
+    S2.koer(15); var efter60 = S2.dannet;
+    var antal = { A: 0, B: 0, C: 0 };
+    S2.partikler.forEach(function (p) { antal[p.type]++; });
+    paastand("A + C = 12 og B + C = 12 (intet forsvinder)", antal.A + antal.C === 12 && antal.B + antal.C === 12 && antal.C === S2.dannet);
+    paastand("kurven flader ud: " + efter15 + " de første 15 s, " + (efter60 - efter45) + " de sidste 15 s", efter15 > (efter60 - efter45) && efter60 >= 8);
+    paastand("kurven er gemt til grafen hvert kvarte sekund", S2.kurve.length > 200 && S2.kurve[S2.kurve.length - 1].t <= 60.5);
+    var forrigeNavn = S2.koersEtiket;
+    S2.nA = 24; S2.start();
+    paastand("den forrige kurve beholder sit eget navn (" + (S2.forrige && S2.forrige.etiket) + ")", S2.forrige && S2.forrige.etiket === forrigeNavn && forrigeNavn === "12 A + 12 B");
+    function h2Efter(metal, sek) {
+        var sum = 0, hits = 0;
+        for (var k = 0; k < 3; k++) {
+            NK.tilf = froe(50 + k);
+            S2.opst = "metal"; S2.metal = metal; S2.start(false);
+            S2.koer(sek);
+            sum += S2.dannet; hits += S2.antalHits;
+        }
+        return { h2: sum / 3, hits: hits / 3 / sek };
+    }
+    var klump = h2Efter("klump", 15), stykker = h2Efter("stykker", 15), pulver = h2Efter("pulver", 15);
+    paastand("H₂ efter 15 s: klump " + NK.tal(klump.h2, 1) + ", stykker " + NK.tal(stykker.h2, 1) + ", pulver " + NK.tal(pulver.h2, 1),
+        klump.h2 < stykker.h2 && stykker.h2 < pulver.h2 && pulver.h2 > 1.8 * klump.h2);
+    paastand("H⁺ mod metallet pr. sekund: klump " + Math.round(klump.hits) + ", pulver " + Math.round(pulver.hits), pulver.hits > 2 * klump.hits);
+    var ladning = 0, ioner = 0;
+    S2.atomer.forEach(function (a) { ladning += a.ladning; });
+    S2.partikler.forEach(function (p) { if (p.type === "Mg2") ioner++; });
+    var hRest = S2.partikler.filter(function (p) { return p.type === "H"; }).length;
+    paastand("Mg og H⁺ går op: atomer + Mg²⁺ = 36, brugt H⁺ = 2·H₂ + halvt ramte atomer",
+        S2.atomer.length + ioner === 36 && ioner === S2.dannet && 90 - hRest === 2 * S2.dannet + ladning);
+    NK.tilf = function () { return Math.random(); };
+    S2.opst = "opl"; S2.nA = 12; S2.nB = 12; S2.forrige = null; S2.start(false);
+
+    overskrift("6. Hastighedsudtrykkene på fane 3");
+    var LITTERATUR = {
+        no_h2: { NO: 2, H2: 1 }, h2_i2: { H2: 1, I2: 1 }, n2o5: { N2O5: 1 }, no2_co: { NO2: 2, CO: 0 },
+        etbr: { EtBr: 1, OH: 1 }, tbubr: { tBuBr: 1, OH: 0 }, no_o2: { NO: 2, O2: 1 }, bromat: { Br: 1, BrO3: 1, H: 2 }
+    };
+    paastand(D.REAKTIONER.length + " reaktioner, hver med litteraturens hastighedsudtryk",
+        D.REAKTIONER.length === 8 && D.REAKTIONER.every(function (R) { return JSON.stringify(R.orden) === JSON.stringify(LITTERATUR[R.id]); }));
+    liste = [];
+    D.REAKTIONER.forEach(function (R) {
+        var grund = {};
+        R.reaktanter.forEach(function (x) { grund[x.id] = 0.10; });
+        var v0 = M.starthastighed(R, grund);
+        R.reaktanter.forEach(function (x) {
+            var dobbelt = JSON.parse(JSON.stringify(grund));
+            dobbelt[x.id] = 0.20;
+            if (!naer(M.starthastighed(R, dobbelt) / v0, Math.pow(2, R.orden[x.id]), 1e-9)) liste.push(R.id + " " + x.id);
+        });
+        var T = M.tidsakse(R, grund), f = M.forloeb(R, grund, T, 200);
+        var stiger = f.every(function (q, i) { return i === 0 || q.c >= f[i - 1].c - 1e-15; });
+        var start = (f[1].c - f[0].c) / (f[1].t - f[0].t);
+        if (!(T > 0) || f[0].c !== 0 || !stiger || !naer(start, v0, 0.05)) liste.push(R.id + " forløb");
+        if (f[f.length - 1].c < 0.1 * 0.1 * R.produkt.koef / 10) liste.push(R.id + " for lidt på aksen");
+    });
+    paastand("dobbelt koncentration ganger v₀ med 2 opløftet til ordenen, forløbet starter med hældningen v₀", liste.length === 0, liste.join(", "));
+    paastand("2 NO + 2 H₂: kompendiets tal 1,2 mM/s ved 0,10 M og 0,10 M",
+        naer(M.starthastighed(D.REAKTIONER[0], { NO: 0.1, H2: 0.1 }), 1.2e-3, 1e-9) && naer(M.starthastighed(D.REAKTIONER[0], { NO: 0.2, H2: 0.1 }), 4.8e-3, 1e-9));
+    paastand("udtrykket som tekst: " + D.udtrykTekst(D.REAKTIONER[0], D.REAKTIONER[0].orden) + " og " + D.udtrykTekst(D.REAKTIONER[3], D.REAKTIONER[3].orden),
+        D.udtrykTekst(D.REAKTIONER[0], D.REAKTIONER[0].orden) === "v(N₂) = k·[NO]²·[H₂]" && D.udtrykTekst(D.REAKTIONER[3], D.REAKTIONER[3].orden) === "v(CO₂) = k·[NO₂]²");
+
+    NK.visFane("udtryk");
+    var U = S.udtryk;
+    U.nyOpgave(0);
+    paastand("uden forsøg siger hintet: lav to forsøg", U.hint().indexOf("Lav to forsøg") === 0);
+    U.tjek();
+    paastand("tjek uden eksponenter beder om dem", d.getElementById("udtryk-besked").textContent.indexOf("Vælg en eksponent") === 0);
+    U.eksp.NO = 2; U.eksp.H2 = 2;
+    paastand("koefficienterne fra skemaet genkendes som fejlen", U.tjek().grund === "skema");
+    U.maal({ NO: 0.1, H2: 0.1 }); U.maal({ NO: 0.1, H2: 0.2 });
+    U.eksp.NO = 2; U.eksp.H2 = 0;
+    var svar = U.tjek(), besked = d.getElementById("udtryk-besked").textContent;
+    paastand("forkert eksponent for H₂ med et par forsøg: peger på forsøg 1 og 2 (" + besked + ")",
+        svar.id === "H2" && besked.indexOf("forsøg 1 og 2") >= 0 && besked.indexOf("ganget med 2, og v₀ blev ganget med 2") >= 0);
+    paastand("hintet peger på det par", U.hint().indexOf("Sammenlign forsøg 1 og 2") === 0);
+    U.eksp.NO = 1; U.eksp.H2 = 1;
+    paastand("forkert eksponent for NO uden et par: bed om forsøget", U.tjek().id === "NO" && d.getElementById("udtryk-besked").textContent.indexOf("Lav to forsøg") >= 0);
+    U.eksp.NO = 2;
+    var loest = U.antalLoest;
+    paastand("det rigtige svar godkendes og tæller", U.tjek().rigtig && U.antalLoest === loest + 1 && d.getElementById("udtryk-opgaveknap").textContent === "Ny opgave");
+    U.tryk();
+    paastand("Ny opgave giver næste reaktion med tom tabel", U.R.id === "h2_i2" && U.forsoeg.length === 0 && U.eksp.H2 === null);
+    U.tryk(); U.tryk();
+    paastand("Giv hint og Vis svaret fylder eksponenterne ud uden at tælle", U.vist && U.eksp.H2 === 1 && U.eksp.I2 === 1 && U.antalLoest === loest + 1);
+    U.nyOpgave(3);
+    U.eksp.NO2 = 2; U.eksp.CO = 0;
+    paastand("en eksponent på 0 nævnes i svaret", U.tjek().rigtig && d.getElementById("udtryk-besked").textContent.indexOf("[CO] er ikke med") >= 0);
+    U.nyOpgave(0);
+    for (i = 0; i < 8; i++) U.maal({ NO: 0.1, H2: 0.1 });
+    paastand("højst " + D.MAKS_FORSOEG + " forsøg i tabellen", U.forsoeg.length === D.MAKS_FORSOEG && d.querySelectorAll("#udtryk-tabel tbody tr").length === D.MAKS_FORSOEG);
+    U.nyOpgave(0);
+
+    overskrift("7. Kemichael og fanerne");
+    var intro = true;
+    Object.keys(D.INTRO).forEach(function (k) {
+        if (D.INTRO[k].length < 2 || D.INTRO[k].length > 3) intro = false;
+        D.INTRO[k].forEach(function (l) { if (l.length > 62) intro = false; });
+        if (!d.getElementById(D.PEG[k])) intro = false;
+    });
+    paastand("to eller tre replikker pr. fane, højst ca. 60 tegn, og det, han peger på, findes", intro);
+    var L = NK.laerer;
+    NK.visFane("sammenstoed");
+    L.startIntro("sammenstoed", true);
+    for (i = 0; i < 180; i++) L.opdater(1 / 60);
+    paastand("K viser præsentationen igen, og knappen Spring over vises", L.laererIIntro() && !d.getElementById("sam-spring").hidden);
+    d.getElementById("sam-spring").click();
+    for (i = 0; i < 120; i++) L.opdater(1 / 60);
+    paastand("Spring over sender ham ud", !L.laererIIntro() && d.getElementById("sam-spring").hidden);
+    ["kurve", "sammenstoed", "udtryk"].forEach(function (id) {
+        NK.visFane(id);
+        paastand("fanen " + id + " vises alene", d.getElementById("fane-" + id).classList.contains("aktiv")
+            && d.querySelectorAll(".fane.aktiv").length === 1);
+    });
+
+    overskrift("8. Sproget");
+    var tekster = [d.getElementById("teori").innerText];
+    ["kurve", "sammenstoed", "udtryk"].forEach(function (id) {
+        NK.visFane(id);
+        tekster.push(d.getElementById("fane-" + id).innerText);
+    });
+    D.KURVE_OPGAVER.concat(D.SAM_OPGAVER).forEach(function (def) {
+        var o = def.lav();
+        tekster.push(o.tekst, o.hint, o.rigtigTekst || "");
+        (o.valg || []).forEach(function (v) { tekster.push(v.tekst + " " + v.forklaring); });
+    });
+    Object.keys(D.INTRO).forEach(function (k) { tekster = tekster.concat(D.INTRO[k]); });
+    D.REAKTIONER.forEach(function (R) { tekster.push(R.ligning, D.udtrykTekst(R, R.orden)); });
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−,])1[+−]|¹[⁺⁻]/.test(alt), (alt.match(/.{0,20}(1[+−]|¹[⁺⁻]).{0,20}/) || [""])[0]);
+    var smaa = [];
+    ["kurve", "sammenstoed", "udtryk"].forEach(function (id) {
+        NK.visFane(id);
+        Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+            if (!e.offsetWidth || !e.childNodes.length) return;
+            var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+            if (!harTekst) return;
+            var fs = parseFloat(w.getComputedStyle(e).fontSize);
+            if (fs < 11.9) smaa.push(e.tagName + "." + e.className + " " + fs + "px");
+        });
+    });
+    paastand("ingen synlig tekst under 12 px", smaa.length === 0, smaa.slice(0, 4).join(", "));
+    NK.visFane("kurve");
+    }
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>
