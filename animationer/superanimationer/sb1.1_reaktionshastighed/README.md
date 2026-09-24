@@ -4,8 +4,10 @@ Superanimation om reaktionshastighed (Basiskemi B s. 7-13). Åbn `index.html`.
 Mappen henter kun filer inde fra sig selv og fra Kemichael, og den virker
 også, når den åbnes direkte fra harddisken.
 
-Den afløser den gamle b1.1, `animationer/kemi-b-filer/b1.1_reaktionshastighed.html`,
-når brugeren siger til. Indtil da viser menuen den gamle.
+Den afløser den gamle b1.1, som nu ligger i
+`animationer/kemi-c-filer/arkiv/b1.1_reaktionshastighed_oldversion.html`. Knappen i
+`samling_b1.html` peger direkte på denne `index.html` (24. sept. 2026). Delte
+links går via `samling_alt_b.html?emne=b1.1` og brækker ikke.
 
 ## Bestillingen
 
@@ -167,16 +169,13 @@ Replikkerne står i `D.INTRO` i `js/data.js`, og hvad der er vist, huskes under
 `nk-sb1.1-intro` i browseren. Figuren kommer fra `../../v2/kemichael/kemichael.js`;
 koblingen står i `js/laerer.js`.
 
-## Til menuen
+## I menuen
 
-Når brugeren siger til: knappen med `data-emne="b1.1"` i
-`animationer/kemi-b-filer/samling_b1.html` skal pege på
-`../superanimationer/sb1.1_reaktionshastighed/index.html`, den gamle flyttes
-med `git mv` til arkivet med `_oldversion` i navnet (de gamle C-animationer
-ligger i `kemi-c-filer/arkiv/`; der er endnu intet arkiv for B), og kolonnen
-"I menuen" i superanimationernes README rettes. Navnet i
-`FEEDBACK_EMNER` i `animationer/samling_alt_b.html` er allerede
-'Reaktionshastighed'.
+Knappen med `data-emne="b1.1"` i `animationer/kemi-b-filer/samling_b1.html`
+peger på `../superanimationer/sb1.1_reaktionshastighed/index.html`, og
+`FEEDBACK_EMNER` i `animationer/samling_alt_b.html` har navnet
+'Reaktionshastighed'. Den gamle ligger i det fælles arkiv
+`kemi-c-filer/arkiv/` sammen med de afløste C-animationer.
 
 ## Tilbuddet om præsentationen
 

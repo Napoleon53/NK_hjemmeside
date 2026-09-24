@@ -107,7 +107,7 @@ animation kommer først i menuen, når brugeren siger til.
 
 | Mappe | I menuen | Note |
 |-------|----------|------|
-| `sb1.1_reaktionshastighed` | nej | ny, sept. 2026, afløser b1.1; menuen viser stadig den gamle b1.1 |
+| `sb1.1_reaktionshastighed` | ja | `samling_b1.html`; den gamle b1.1 ligger i `kemi-c-filer/arkiv/` |
 | `sb2.0_ligevaegt_intro` | nej | den første superanimation, bygget fra bunden |
 | `sb3.2_titreringssimulator` | ja | `samling_b3.html` |
 | `sc1.1_atombygger` | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
