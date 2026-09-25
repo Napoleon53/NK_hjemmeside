@@ -20,18 +20,20 @@
     var D = {};
 
     /* ----- Kemichael ----------------------------------------------------
-       To eller tre replikker pr. fane, hoejst ca. 60 tegn. Under linjen
-       INTRO_PEG peger han paa elementet i PEG, og det lyser op. */
+       To eller tre replikker pr. fane, hoejst ca. 60 tegn: hvor man er,
+       hvad man goer, og en toer bemaerkning. Ikke det, eleven selv kan se
+       paa scenen. Under linjen INTRO_PEG peger han paa elementet i PEG,
+       og det lyser op. */
     D.INTRO = {
         kurve: [
-            "Bogens reaktion. Der dannes brom, og glasset bliver gult.",
-            "Tryk Afspil herovre, og løs opgaverne nedenunder.",
-            "Glasset klarer det selv. Du skal bare måle."
+            "Her måler du, hvor hurtigt en reaktion går.",
+            "Afspil den herovre, og læg så sekant og tangent på kurven.",
+            "Pas på linealen. Den er lånt fra matematik."
         ],
         sammenstoed: [
-            "Her er partiklerne. De reagerer kun, når de støder sammen.",
-            "Skru på antallet herovre, og tæl sammenstødene.",
-            "De farer rundt sådan hele dagen. Det kalder vi kemi."
+            "Her er partiklerne bag kurven.",
+            "Skru på antallet herovre, og hold øje med tælleren.",
+            "Det ligner gangen i frikvarteret. Bare mere ordentligt."
         ],
         udtryk: [
             "En ukendt reaktion. Du laver forsøgene, jeg holder kaffen.",

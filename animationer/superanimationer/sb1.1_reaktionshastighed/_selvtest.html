@@ -291,6 +291,19 @@ function koer() {
     d.getElementById("sam-spring").click();
     for (i = 0; i < 120; i++) L.opdater(1 / 60);
     paastand("Spring over sender ham ud", !L.laererIIntro() && d.getElementById("sam-spring").hidden);
+    /* Tilbuddet skal ogsaa vaere vaek paa skaermen, ikke kun have hidden:
+       .tilbud har display: flex, som ellers overtrumfer hidden */
+    function ses(id) { var e = d.getElementById(id); return w.getComputedStyle(e).display !== "none" && e.offsetWidth > 0; }
+    w.localStorage.setItem("nk-sb1.1-intro", JSON.stringify({ kurve: true, sammenstoed: true }));
+    NK.visFane("udtryk");
+    paastand("første gang på en fane står Start præsentation og Nej tak", ses("udtryk-tilbud"));
+    d.querySelector("#udtryk-tilbud .tilbud-start").click();
+    for (i = 0; i < 180; i++) L.opdater(1 / 60);
+    paastand("efter Start er tilbuddet væk, og han taler", !ses("udtryk-tilbud") && L.laererIIntro() && ses("udtryk-spring"));
+    for (i = 0; i < 1800; i++) L.opdater(1 / 60);
+    paastand("når han er færdig, er både tilbuddet og Spring over væk", !L.laererIIntro() && !ses("udtryk-tilbud") && !ses("udtryk-spring"));
+    NK.visFane("kurve"); NK.visFane("udtryk");
+    paastand("tilbuddet kommer ikke igen på samme fane", !ses("udtryk-tilbud"));
     ["kurve", "sammenstoed", "udtryk"].forEach(function (id) {
         NK.visFane(id);
         paastand("fanen " + id + " vises alene", d.getElementById("fane-" + id).classList.contains("aktiv")
