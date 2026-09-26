@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Kan du løse opgaven?</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i siden og kan slettes.
+
+   Åbner index.html i en iframe og tjekker: at kasser, pile og
+   udfordringer hænger sammen, at et forkert svar altid kan sendes
+   tilbage ad en pil, at alle veje ender i GODT ARBEJDE, at sproget
+   overholder reglerne, at teksten kan være i kasserne, at Ja/Nej og
+   brikken ikke dækker en kasse, og at en hel tur kan klikkes igennem.
+   Kør gennem en lokal server eller Chrome med --allow-file-access-from-files.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK") + " (" + antal + " påstande)", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 800); });
+
+function koer() {
+    try { koerAlt(); } catch (e) { fejl++; skriv("  FEJL  undtagelse: " + e + "\n" + (e.stack || ""), "fejl"); }
+    vis();
+}
+
+/* Fast rækkefølge af "tilfældige" tal, så kørslen kan gentages */
+function frø(n) {
+    var x = n || 1;
+    return function () { x = (x * 16807) % 2147483647; return (x - 1) / 2147483646; };
+}
+
+function koerAlt() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+
+    overskrift("1. Indlæsning");
+    paastand("NK.D, NK.Kerne, NK.Tegning og NK.app findes", !!(NK && NK.D && NK.Kerne && NK.Tegning && NK.app));
+    if (!NK || !NK.app) return;
+    var D = NK.D;
+    var ider = Object.keys(D.KASSER);
+    paastand("16 kasser som i Word-filen", ider.length === 16, ider.length);
+    paastand("24 pile som i Word-filen", D.PILE.length === 24, D.PILE.length);
+    paastand("16 kasser er tegnet", d.querySelectorAll("#diagram .kasse").length === 16);
+    paastand("24 pile er tegnet", d.querySelectorAll("#diagram .pil").length === 24);
+
+    /* ----- 2. Data hænger sammen -------------------------------------- */
+    overskrift("2. Kasser, pile og udfordringer");
+    var pilefejl = D.PILE.filter(function (p) { return !D.KASSER[p.fra] || !D.KASSER[p.til]; });
+    paastand("alle pile går mellem kasser, der findes", pilefejl.length === 0, pilefejl.map(function (p) { return p.id; }).join(", "));
+
+    var spmFejl = [], handFejl = [];
+    ider.forEach(function (id) {
+        var k = D.KASSER[id];
+        var ud = D.PILE.filter(function (p) { return p.fra === id; });
+        if (k.slags === "spm") {
+            var ord = ud.map(function (p) { return p.ord; }).sort().join(",");
+            if (ord !== "Ja,Nej") spmFejl.push(id + ":" + ord);
+        }
+        if (k.slags === "handling" && (ud.length !== 1 || ud[0].ord || !D.HANDLINGER[id])) handFejl.push(id);
+    });
+    paastand("hver spørgsmålskasse har præcis et Ja og et Nej", spmFejl.length === 0, spmFejl.join(" "));
+    paastand("hver Gør det-kasse har én pil uden ord og en tekst", handFejl.length === 0, handFejl.join(" "));
+    paastand("GODT ARBEJDE har ingen pile ud", D.PILE.filter(function (p) { return p.fra === D.SLUT; }).length === 0);
+
+    var udfFejl = [];
+    D.PILE.forEach(function (p) { if (p.ord && !D.UDFORDRINGER[p.id]) udfFejl.push(p.id); });
+    paastand("hvert Ja og Nej har en udfordring", udfFejl.length === 0, udfFejl.join(", "));
+
+    var vFejl = [], okFejl = [], tilFejl = [], vejFejl = [];
+    var K0 = NK.Kerne(D, frø(3));
+    Object.keys(D.UDFORDRINGER).forEach(function (n) {
+        var u = D.UDFORDRINGER[n];
+        var fra = n.split("-")[0];
+        if (u.varianter.length < 1 || u.varianter.length > 2) vFejl.push(n + " varianter=" + u.varianter.length);
+        u.varianter.forEach(function (v, i) {
+            if (v.svar.length < 3 || v.svar.length > 4) vFejl.push(n + "/" + i + " svar=" + v.svar.length);
+            if (!u.undskyldning) {
+                var ok = v.svar.filter(function (s) { return s.ok; }).length;
+                if (ok < 1 || ok === v.svar.length) okFejl.push(n + "/" + i);
+            }
+            v.svar.forEach(function (s) {
+                if (!s.t || !s.r) vFejl.push(n + "/" + i + " mangler tekst");
+                if (u.undskyldning || s.ok) return;
+                var til = s.til || u.fejlTil;
+                if (!D.KASSER[til]) { tilFejl.push(n + " -> " + til); return; }
+                if (til !== fra && !K0.pilMellem(fra, til)) vejFejl.push(n + " -> " + til);
+            });
+        });
+    });
+    paastand("1 eller 2 varianter, hver med 3 eller 4 svar", vFejl.length === 0, vFejl.join("; "));
+    paastand("hver rigtig udfordring har mindst ét svar, der holder, og ét, der sender tilbage", okFejl.length === 0, okFejl.join(", "));
+    paastand("alle forkerte svar sender til en kasse, der findes", tilFejl.length === 0, tilFejl.join(", "));
+    paastand("brikken kan altid sendes tilbage ad en pil (eller blive, hvor den er)", vejFejl.length === 0, vejFejl.join(", "));
+    var undsk = Object.keys(D.UDFORDRINGER).filter(function (n) { return D.UDFORDRINGER[n].undskyldning; });
+    var undskFejl = undsk.filter(function (n) {
+        var p = D.PILE.filter(function (x) { return x.id === n; })[0];
+        return !p || D.KASSER[p.til].slags !== "handling";
+    });
+    paastand("undskyldninger kun ved et ærligt Nej, der fører til en Gør det-kasse", undskFejl.length === 0 && undsk.length === 5, undsk.join(", "));
+
+    /* ----- 3. Alle veje ender i GODT ARBEJDE -------------------------- */
+    overskrift("3. Kernen");
+    var r = frø(7);
+    var naaet = 0, maksSkridt = 0, set = {}, tilbageSet = 0;
+    for (var run = 0; run < 400; run++) {
+        var K = NK.Kerne(D, r);
+        var skridt = 0;
+        while (K.s.fase !== "slut" && skridt < 400) {
+            var s = K.s;
+            var k = D.KASSER[s.node];
+            if (s.fase === "spm") {
+                if (k.slags === "spm") K.vaelg(r() < 0.5 ? "Ja" : "Nej");
+                else K.goer();
+            }
+            if (K.s.fase === "udfordring") {
+                /* Tre af fire gange vælges et svar, der holder */
+                var sv = K.s.udf.svar;
+                var gode = []; sv.forEach(function (x, i) { if (x.ok || K.s.udf.undskyldning) gode.push(i); });
+                var i = r() < 0.75 && gode.length ? gode[Math.floor(r() * gode.length)] : Math.floor(r() * sv.length);
+                var res = K.svar(i);
+                if (res && res.flyt.tilbage) tilbageSet++;
+            }
+            if (K.s.fase === "flytter") K.ankom();
+            set[K.s.node] = true;
+            skridt++;
+        }
+        if (K.s.fase === "slut") naaet++;
+        maksSkridt = Math.max(maksSkridt, skridt);
+    }
+    paastand("400 tilfældige ture ender alle i GODT ARBEJDE", naaet === 400, naaet + " af 400, længste tur " + maksSkridt + " skridt");
+    paastand("alle 16 kasser bliver nået", Object.keys(set).length === 16, Object.keys(set).sort().join(""));
+    paastand("forkerte svar sender tilbage undervejs", tilbageSet > 50, tilbageSet);
+
+    var K2 = NK.Kerne(D, frø(11));
+    K2.vaelg("Ja");
+    var i2 = K2.s.udf.svar.findIndex(function (x) { return !x.ok; });
+    var r2 = K2.svar(i2);
+    paastand("Ja til Kan du løse opgaven, forkert svar: tilbage til Gør dig umage ad pilen, baglæns", r2.flyt.tilbage && r2.flyt.til === "C" && r2.flyt.pil === "C-A" && r2.flyt.baglaens);
+    K2.ankom();
+    paastand("tæller én gang sendt tilbage, og pilen bliver rød", K2.s.tilbage === 1 && K2.s.pile["C-A"] === "tilbage");
+    paastand("Gør dig umage: knappen fører tilbage til start", K2.goer().flyt.til === "A");
+    K2.ankom();
+
+    var K3 = NK.Kerne(D, frø(5));
+    /* Til F via bogen og via sidemanden */
+    K3.s.node = "G"; K3.vaelg("Nej"); K3.svar(0); K3.ankom();
+    paastand("Gør det efter bogen handler om bogen", K3.s.node === "F" && K3.handling().knap === "Vi har slået op");
+    K3.s.node = "D"; K3.s.fase = "spm"; K3.vaelg("Nej"); K3.svar(0); K3.ankom();
+    paastand("Gør det efter sidemanden handler om sidemanden", K3.s.node === "F" && K3.handling().knap === "Vi har snakket");
+    K3.s.node = "L"; K3.s.fase = "spm"; K3.goer(); K3.ankom();
+    paastand("hånden i vejret giver et nummer i køen fra 2 til 6", K3.s.haand && K3.s.koe >= 2 && K3.s.koe <= 6, K3.s.koe);
+    var brugt = {};
+    var K4 = NK.Kerne(D, frø(2));
+    for (var g = 0; g < 6; g++) { K4.s.fase = "spm"; K4.s.node = "B"; K4.vaelg("Ja"); brugt[K4.s.udf.variant + ":" + g % 2] = true; }
+    var skifter = true; var forrige = null;
+    for (var g2 = 0; g2 < 8; g2++) { K4.s.fase = "spm"; K4.s.node = "B"; K4.vaelg("Ja"); if (K4.s.udf.variant === forrige) skifter = false; forrige = K4.s.udf.variant; }
+    paastand("samme udfordring kommer ikke to gange i træk", skifter);
+
+    paastand("slutteksten findes for alle kasser, der fører til GODT ARBEJDE",
+        D.PILE.filter(function (p) { return p.til === D.SLUT; }).every(function (p) { return !!D.SLUTTEKST[p.fra]; }));
+
+    /* ----- 4. Sproget ------------------------------------------------- */
+    overskrift("4. Sproget");
+    var tekster = [];
+    function saml(t, hvor) { if (typeof t === "string") tekster.push({ t: t, hvor: hvor }); }
+    ider.forEach(function (id) {
+        var k = D.KASSER[id];
+        k.linjer.forEach(function (l) { saml(l, id); });
+        (k.lille || []).forEach(function (l) { saml(l, id); });
+    });
+    Object.keys(D.UDFORDRINGER).forEach(function (n) {
+        D.UDFORDRINGER[n].varianter.forEach(function (v) {
+            saml(v.spm, n);
+            v.svar.forEach(function (s) { saml(s.t, n); saml(s.r, n); });
+        });
+    });
+    Object.keys(D.HANDLINGER).forEach(function (n) {
+        var h = D.HANDLINGER[n];
+        [h, h.sidemand, h.bog].forEach(function (x) {
+            if (!x || !x.trin) return;
+            x.trin.forEach(function (t) { saml(t, n); });
+            saml(x.knap, n);
+        });
+    });
+    Object.keys(D.TEKST).forEach(function (n) { saml(D.TEKST[n], n); });
+    Object.keys(D.SLUTTEKST).forEach(function (n) { saml(D.SLUTTEKST[n], n); });
+    D.OMVEJE.forEach(function (o) { saml(o.t, "omveje"); });
+
+    var streg = tekster.filter(function (x) { return /[–—]| - /.test(x.t); });
+    paastand("ingen tankestreger", streg.length === 0, streg.map(function (x) { return x.hvor + ": " + x.t; }).join(" | "));
+    var dobbelt = tekster.filter(function (x) { return /  |\s$|^\s/.test(x.t); });
+    paastand("ingen dobbelte mellemrum eller mellemrum i enderne", dobbelt.length === 0, dobbelt.map(function (x) { return x.hvor + ": " + x.t; }).join(" | "));
+    var lange = [];
+    Object.keys(D.UDFORDRINGER).forEach(function (n) {
+        D.UDFORDRINGER[n].varianter.forEach(function (v) {
+            if (v.spm.length > 60) lange.push(n + " spm " + v.spm.length);
+            v.svar.forEach(function (s) {
+                if (s.t.length > 60) lange.push(n + " svar " + s.t.length);
+                if (s.r.length > 90) lange.push(n + " kommentar " + s.r.length);
+            });
+        });
+    });
+    paastand("korte tekster (spørgsmål og svar højst 60 tegn, kommentarer højst 90)", lange.length === 0, lange.join(", "));
+    paastand("\"venter\" er rettet (Word-filen har \"veter\")", !tekster.some(function (x) { return /\bveter\b/.test(x.t); }));
+    var slutpunktum = tekster.filter(function (x) { return /^[A-ZÆØÅ]/.test(x.t) && x.t.length > 25 && /[a-zæøå]$/.test(x.t) && ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "Z"].indexOf(x.hvor) < 0; });
+    paastand("sætninger slutter med tegn", slutpunktum.length === 0, slutpunktum.map(function (x) { return x.t; }).join(" | "));
+
+    /* ----- 5. Tegningen ----------------------------------------------- */
+    overskrift("5. Tegningen");
+    var tekstUd = [];
+    ider.forEach(function (id) {
+        var k = D.KASSER[id];
+        var t = d.querySelector('.kasse[data-id="' + id + '"] .kassetekst');
+        var b = t.getBBox();
+        if (b.x < k.x + 4 || b.x + b.width > k.x + k.w - 4 || b.y < k.y + 2 || b.y + b.height > k.y + k.h - 2) {
+            tekstUd.push(id + " (" + Math.round(b.x) + "," + Math.round(b.y) + "," + Math.round(b.width) + "x" + Math.round(b.height) + ")");
+        }
+    });
+    paastand("teksten kan være i alle kasser", tekstUd.length === 0, tekstUd.join(", "));
+
+    function overlap(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+    var kassefelter = ider.map(function (id) { var k = D.KASSER[id]; return { id: id, x: k.x, y: k.y, w: k.w, h: k.h }; });
+    var kasseOverlap = [];
+    kassefelter.forEach(function (a, i) { kassefelter.slice(i + 1).forEach(function (b) { if (overlap(a, b)) kasseOverlap.push(a.id + b.id); }); });
+    paastand("kasserne overlapper ikke hinanden", kasseOverlap.length === 0, kasseOverlap.join(", "));
+
+    var pilleOverlap = [];
+    Array.prototype.forEach.call(d.querySelectorAll(".ord"), function (g) {
+        var p = D.PILE.filter(function (x) { return x.id === g.dataset.pil; })[0];
+        var bredde = p.ord === "Ja" ? 46 : 56;
+        var felt = { x: p.ov[0] - bredde / 2, y: p.ov[1] - 21, w: bredde, h: 29 };
+        kassefelter.forEach(function (k) { if (overlap(felt, k)) pilleOverlap.push(p.id + "/" + k.id); });
+    });
+    paastand("Ja og Nej dækker ingen kasse", pilleOverlap.length === 0, pilleOverlap.join(", "));
+
+    var brikOverlap = [];
+    ider.forEach(function (id) {
+        var h = NK.app.tegning.hvile(id);
+        var felt = { x: h[0] - 16, y: h[1] - 46, w: 32, h: 45 };
+        kassefelter.forEach(function (k) { if (k.id !== id && overlap(felt, k)) brikOverlap.push(id + "/" + k.id); });
+    });
+    paastand("brikken dækker ingen anden kasse, når den står stille", brikOverlap.length === 0, brikOverlap.join(", "));
+
+    /* ----- 6. En hel tur i siden -------------------------------------- */
+    overskrift("6. En tur gennem siden");
+    NK.app.hurtig = true;
+    NK.app.forfra();
+    var K5 = NK.app.kerne;
+    function klikSvar(ok) {
+        var u = K5.s.udf;
+        var i = u.svar.findIndex(function (x) { return ok ? (x.ok || u.undskyldning) : !x.ok; });
+        NK.app.svar(i);
+        NK.app.spol();
+    }
+    var p0 = NK.app.panel();
+    paastand("start: panelet viser Kan du løse opgaven? med Ja og Nej", p0.titel === "Kan du løse opgaven?" && p0.knapper.join(",") === "Ja,Nej", p0.titel + " / " + p0.knapper.join(","));
+    paastand("start: Ja og Nej ved pilene er knapper", d.querySelectorAll(".ord.aktiv").length === 2);
+    NK.app.vaelg("Nej");
+    var p1 = NK.app.panel();
+    paastand("Nej giver en udfordring med 3 eller 4 svar", p1.kicker === "Udfordring" && p1.knapper.length >= 3, p1.kicker + " " + p1.knapper.length);
+    paastand("under udfordringen kan man ikke skifte til Ja", d.querySelectorAll(".ord.aktiv").length === 0 && NK.app.kerne.vaelg("Ja") === null);
+    klikSvar(true);
+    paastand("rigtigt svar: brikken står i Har du prøvet ordentligt?", K5.s.node === "B");
+    paastand("kommentaren står i panelet", NK.app.panel().kommentar.length > 5);
+    NK.app.vaelg("Ja");
+    klikSvar(false);
+    paastand("forkert svar: sendt tilbage til Gør dig umage!", K5.s.node === "C" && K5.s.tilbage === 1);
+    paastand("tælleren viser 1 gang", d.getElementById("antal-tilbage").textContent === "1 gang");
+    paastand("pilen er rød", d.querySelector('.pil[data-pil="B-nej"]').classList.contains("tilbage"));
+    paastand("Gør det: panelet viser trinene og én knap", NK.app.panel().kicker === "Gør det" && NK.app.panel().knapper.length === 1 && d.querySelectorAll("#trin li").length === 3);
+    NK.app.goer(); NK.app.spol();
+    paastand("tilbage ved start", K5.s.node === "A");
+    NK.app.vaelg("Nej"); klikSvar(true);
+    NK.app.vaelg("Ja"); klikSvar(true);
+    paastand("videre til sidemanden", K5.s.node === "D");
+    NK.app.vaelg("Nej");
+    paastand("ærligt Nej: vælg en undskyldning", NK.app.panel().kicker === "Vælg en undskyldning");
+    klikSvar(true);
+    paastand("undskyldning afvist, men brikken går videre til Gør det!", K5.s.node === "F" && d.getElementById("kommentar").classList.contains("undskyldning"));
+    NK.app.goer(); NK.app.spol();
+    NK.app.vaelg("Nej"); klikSvar(true);           // E -> G
+    NK.app.vaelg("Ja"); klikSvar(true);            // G -> H
+    NK.app.vaelg("Nej"); klikSvar(true);           // H -> I
+    NK.app.vaelg("Ja"); klikSvar(true);            // I -> J
+    NK.app.vaelg("Nej"); klikSvar(true);           // J -> L
+    paastand("hånden i vejret", K5.s.node === "L");
+    NK.app.goer(); NK.app.spol();
+    paastand("brikken har hånden oppe, og køen står i kommentaren", K5.s.haand && d.querySelector(".haand").style.display !== "none" && /nummer \d i køen/.test(NK.app.panel().kommentar));
+    NK.app.vaelg("Nej"); klikSvar(true);           // M -> O
+    paastand("Kig på de næste opgaver", K5.s.node === "O");
+    NK.app.goer();
+    var pO = NK.app.panel();
+    paastand("O kræver et konkret spørgsmål", pO.kicker === "Udfordring" && pO.knapper.indexOf("Jeg kan ikke finde ud af det.") >= 0, pO.knapper.join(" | "));
+    var iO = K5.s.udf.svar.findIndex(function (x) { return x.t === "Jeg kan ikke finde ud af det."; });
+    NK.app.svar(iO); NK.app.spol();
+    paastand("\"Jeg kan ikke finde ud af det.\" sender tilbage til samme kasse", K5.s.node === "O" && K5.s.tilbage === 2);
+    NK.app.goer(); klikSvar(true);
+    paastand("GODT ARBEJDE er nået", K5.s.fase === "slut" && K5.s.node === "Z");
+    var pZ = NK.app.panel();
+    paastand("slutkortet: slut, tekst efter vejen, én knap Forfra", pZ.kicker === "Slut" && d.querySelectorAll("#trin li").length === 3 && pZ.knapper.join() === "Forfra", pZ.knapper.join());
+    paastand("præcis tre stykker konfetti", d.querySelectorAll(".konfetti").length === 3);
+    NK.app.forfra();
+    paastand("Forfra nulstiller", K5.s.node === "A" && K5.s.tilbage === 0 && d.querySelectorAll(".pil.tilbage, .pil.frem, .konfetti").length === 0);
+
+    /* Påskeægget */
+    d.querySelector('.kasse[data-id="Z"]').dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    paastand("påskeæg: klik på GODT ARBEJDE før tid", NK.app.panel().kommentar === D.TEKST.paaskeaeg && K5.s.node === "A");
+    NK.app.forfra();
+    NK.app.hurtig = false;
+}
+</script>
+</body>
+</html>

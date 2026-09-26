@@ -409,40 +409,10 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .talraekke + .talraekke { margin-top: 5px; }
-.talraekke.sum { background-color: rgba(255, 255, 255, 0.09); font-weight: 600; margin-top: 6px; align-items: center; }
 .talraekke .tal { font-weight: 700; color: var(--tekst); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tal.gul { color: var(--gul); }
 
-.bindingsraekke {
-    display: grid;
-    grid-template-columns: 62px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 8px;
-    background-color: rgba(255, 255, 255, 0.045);
-    border-radius: var(--radius-lil);
-    padding: 5px 10px;
-    font-size: 0.88rem;
-}
-
-.bindingsraekke + .bindingsraekke { margin-top: 5px; }
 .bnavn { font-weight: 700; color: var(--tekst); }
-.bregning { color: var(--tekst-svag); font-variant-numeric: tabular-nums; }
-.bregning b { color: var(--tekst); }
-
-.maerke {
-    display: inline-block;
-    padding: 2px 9px;
-    border-radius: 999px;
-    font-size: 0.76rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.maerke.groen  { background-color: rgba(63, 174, 114, 0.22); color: #7ee0a8; border: 1px solid rgba(63, 174, 114, 0.5); }
-.maerke.orange { background-color: rgba(230, 137, 42, 0.2); color: #f2b06a; border: 1px solid rgba(230, 137, 42, 0.5); }
-.maerke.graa   { background-color: rgba(255, 255, 255, 0.06); color: var(--tekst-mat); border: 1px solid #4a4a58; }
 
 /* ----- Opgaverne --------------------------------------------------------- */
 .opgave-spm { margin: 0; font-size: 0.92rem; line-height: 1.45; color: var(--tekst); }
@@ -660,72 +630,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .bindingsvalg button:hover:not(:disabled) { background-color: var(--panel-3); }
 .bindingsvalg button.aktiv { background-color: var(--blaa-mork); border-color: var(--blaa); }
 .bindingsvalg button:disabled { opacity: 0.28; cursor: not-allowed; }
-
-/* ---------------------------------------------------------------------
-   FANE 4: FORLOEB, HINT OG TEGNESERIE (som sc6.8)
-   --------------------------------------------------------------------- */
-.kort.fremhaev { border-left: 3px solid var(--blaa); }
-
-.trinliste { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-
-.trinliste li {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 8px 4px 5px;
-    border-radius: var(--radius-lil);
-    font-size: 0.9rem;
-    line-height: 1.3;
-    color: var(--tekst-mat);
-}
-
-.trinliste .nr {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 21px;
-    height: 21px;
-    border-radius: 50%;
-    background-color: var(--panel-3);
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: var(--tekst-svag);
-}
-
-.trinliste li.gjort { color: var(--tekst-svag); }
-.trinliste li.gjort .nr { background-color: var(--groen-mork); color: #ffffff; }
-.trinliste li.aktiv { background-color: rgba(42, 118, 172, 0.3); color: #ffffff; font-weight: 600; }
-.trinliste li.aktiv .nr { background-color: var(--blaa); color: #ffffff; }
-
-.hint {
-    margin: 9px 0 0 0;
-    padding: 8px 10px;
-    border-radius: var(--radius-lil);
-    background-color: rgba(242, 197, 61, 0.1);
-    border: 1px solid rgba(242, 197, 61, 0.35);
-    color: #f0d77a;
-    font-size: 0.88rem;
-    line-height: 1.45;
-}
-
-.knap.stor { width: 100%; padding: 10px 13px; margin-top: 10px; }
-
-.overlay-boks.bred { max-width: 1000px; }
-.serie { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-.rude { background-color: #16161c; border: 1px solid #3f3f4d; border-radius: var(--radius-lil); padding: 8px; }
-.rude canvas { display: block; width: 100%; border-radius: 5px; }
-.rude p { margin: 7px 0 0 0; font-size: 0.88rem; line-height: 1.45; color: var(--tekst-svag); }
-.rude > p:first-child { margin: 2px 0 8px 0; }
-.rude .nr { color: var(--gul); font-weight: 700; margin-right: 6px; }
-
-.resultater { width: 100%; border-collapse: collapse; font-size: 0.86rem; table-layout: fixed; }
-.resultater th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 6px 4px 6px 0; }
-.resultater tr:first-child th { text-align: center; color: var(--gul); font-size: 0.76rem; letter-spacing: 0.04em; text-transform: uppercase; }
-.resultater tr:first-child th:first-child { width: 26%; }
-.resultater td { text-align: center; font-weight: 700; color: var(--tekst); padding: 6px 2px; line-height: 1.3; }
-.resultater td.ikke { color: var(--tekst-mat); font-weight: 400; }
-.resultater tr + tr th, .resultater tr + tr td { border-top: 1px solid #3a3a47; }
 
 /* ---------------------------------------------------------------------
    TILGAENGELIGHED OG SMALLE SKAERME

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="70" height="150" viewBox="0 0 70 150">
+  <!-- Flaske med husholdningseddike. Etikettens tekst skrives af
+       animationen OVENPAA filen i omraadet x 10-60, y 78-112 (mellem de
+       to roede baand). Bunden er
+       y 148. -->
+  <defs>
+    <linearGradient id="plast" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e6f1f8" stop-opacity="0.55"/>
+      <stop offset="0.3" stop-color="#f7fbfe" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#cfe0ec" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+  <!-- Vaesken -->
+  <path d="M10 50 Q10 44 18 42 L52 42 Q60 44 60 50 L60 140 Q60 146 54 146 L16 146 Q10 146 10 140 Z" fill="#f3efd8" fill-opacity="0.35"/>
+  <!-- Flasken -->
+  <path d="M28 14 L42 14 L42 24 Q42 30 52 34 Q62 38 62 50 L62 140 Q62 148 54 148 L16 148 Q8 148 8 140 L8 50 Q8 38 18 34 Q28 30 28 24 Z"
+        fill="url(#plast)" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="1.5"/>
+  <!-- Laaget -->
+  <rect x="25" y="2" width="20" height="14" rx="2.5" fill="#c9412f" stroke="#8e2a1e" stroke-width="1"/>
+  <path d="M28 5 v8 M32 5 v8 M36 5 v8 M40 5 v8" stroke="#8e2a1e" stroke-opacity="0.5" stroke-width="1"/>
+  <!-- Etiketten -->
+  <rect x="9" y="68" width="52" height="54" rx="3" fill="#fbf6e4" stroke="#b9b09a" stroke-width="1"/>
+  <rect x="9" y="68" width="52" height="9" rx="3" fill="#c9412f"/>
+  <rect x="9" y="113" width="52" height="9" rx="3" fill="#c9412f"/>
+  <!-- Genskin -->
+  <rect x="53" y="46" width="3" height="90" rx="1.5" fill="#ffffff" fill-opacity="0.3"/>
+</svg>

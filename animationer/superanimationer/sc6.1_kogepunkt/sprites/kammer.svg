@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300">
+  <!-- Temperaturkammer, set forfra. Rammen har et hul til ruden, saa det,
+       der tegnes BAG filen, ses gennem ruden:
+         rummet bag ruden: x 30-210, y 46-222 (hjoerneradius 8)
+         hullet i loftet, som glasset stikker op gennem: x 98-142, y 22-46
+         displayet: x 60-180, y 238-268 (animationen skriver temperaturen)
+         varmelegemet i bunden af rummet: y 206-216
+       Kammeret staar paa bordet med bunden i y 296. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#56607a"/>
+      <stop offset="1" stop-color="#2c3240"/>
+    </linearGradient>
+    <linearGradient id="kant" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.18"/>
+    </linearGradient>
+    <linearGradient id="rude" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f4ff" stop-opacity="0.16"/>
+      <stop offset="0.35" stop-color="#e8f4ff" stop-opacity="0.02"/>
+      <stop offset="0.65" stop-color="#e8f4ff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#e8f4ff" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Kroppen med hul til ruden og til glasset i loftet -->
+  <path fill="url(#krop)" fill-rule="evenodd" stroke="#6b7690" stroke-width="1.5"
+        d="M14 22 H98 V46 H142 V22 H226 Q234 22 234 30 V288 Q234 296 226 296 H14 Q6 296 6 288 V30 Q6 22 14 22 Z
+           M38 46 Q30 46 30 54 V214 Q30 222 38 222 H202 Q210 222 210 214 V54 Q210 46 202 46 Z"/>
+  <path fill="url(#kant)" fill-rule="evenodd"
+        d="M14 22 H98 V46 H142 V22 H226 Q234 22 234 30 V288 Q234 296 226 296 H14 Q6 296 6 288 V30 Q6 22 14 22 Z
+           M38 46 Q30 46 30 54 V214 Q30 222 38 222 H202 Q210 222 210 214 V54 Q210 46 202 46 Z"/>
+
+  <!-- Kanten om hullet i loftet -->
+  <path d="M98 22 V46 M142 22 V46" stroke="#20242e" stroke-width="2"/>
+  <rect x="94" y="18" width="52" height="6" rx="2" fill="#3a4152" stroke="#6b7690" stroke-width="1"/>
+
+  <!-- Ruden og dens ramme -->
+  <rect x="30" y="46" width="180" height="176" rx="8" fill="url(#rude)"/>
+  <rect x="30" y="46" width="180" height="176" rx="8" fill="none" stroke="#1d212a" stroke-width="3"/>
+  <rect x="27" y="43" width="186" height="182" rx="10" fill="none" stroke="#7d88a3" stroke-opacity="0.6" stroke-width="1"/>
+  <path d="M46 60 L86 60 L52 118 Z" fill="#ffffff" fill-opacity="0.05"/>
+
+  <!-- Displayet -->
+  <rect x="58" y="236" width="124" height="34" rx="5" fill="#0c0f14" stroke="#1d212a" stroke-width="2"/>
+
+  <!-- Skruer og ventilationsriller -->
+  <g fill="#1d212a">
+    <circle cx="18" cy="34" r="2.5"/><circle cx="222" cy="34" r="2.5"/>
+    <circle cx="18" cy="284" r="2.5"/><circle cx="222" cy="284" r="2.5"/>
+  </g>
+  <g stroke="#1d212a" stroke-width="2.5" stroke-linecap="round">
+    <path d="M196 244 H218 M196 252 H218 M196 260 H218"/>
+    <path d="M22 244 H44 M22 252 H44 M22 260 H44"/>
+  </g>
+</svg>

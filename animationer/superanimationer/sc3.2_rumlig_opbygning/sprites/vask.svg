@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="84" viewBox="0 0 440 84">
+  <!-- Vask af rustfrit staal. Tegnes med oeverste venstre hjoerne i
+       (180, 456) paa scenen. Aabningen, hvor straalen forsvinder, er
+       x 16-424 og y 2-14 (scenens x 196-604 og y 458-470). -->
+  <defs>
+    <linearGradient id="aabning" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2129"/>
+      <stop offset="1" stop-color="#0c0e12"/>
+    </linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9d0d8"/>
+      <stop offset="0.35" stop-color="#9aa2ac"/>
+      <stop offset="1" stop-color="#5f666f"/>
+    </linearGradient>
+    <linearGradient id="kant" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f1f4f7"/>
+      <stop offset="1" stop-color="#9aa2ab"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Aabningen set lidt oppefra, med bagkanten -->
+  <path d="M12 2 H428 L436 15 H4 Z" fill="url(#aabning)"/>
+  <path d="M12 2 H428" stroke="#aab2bc" stroke-width="2" stroke-linecap="round"/>
+  <path d="M12 2 L4 15 M428 2 L436 15" stroke="#7d858f" stroke-width="1.5"/>
+
+  <!-- Forvaeggen med den rullede kant -->
+  <rect x="4" y="16" width="432" height="68" fill="url(#front)"/>
+  <rect x="1" y="12" width="438" height="9" rx="4" fill="url(#kant)" stroke="#6d747d" stroke-width="1"/>
+  <g stroke="#ffffff" stroke-opacity="0.07" stroke-width="1">
+    <path d="M8 34 H432 M8 48 H432 M8 62 H432"/>
+  </g>
+  <rect x="4" y="80" width="432" height="4" fill="#2a2f37"/>
+</svg>

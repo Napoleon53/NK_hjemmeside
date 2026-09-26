@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="44" viewBox="0 0 80 44">
+  <!-- Taendstikaeske, lidt aaben, set skraat forfra. Taendstikkerne
+       stikker op af skuffen ved x 50-72, y 4-12. Strygefladen er
+       den brune side til venstre. Bunden staar i y 42. -->
+  <defs>
+    <linearGradient id="aeske" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e2c07a"/>
+      <stop offset="1" stop-color="#b8904a"/>
+    </linearGradient>
+  </defs>
+  <!-- Skuffen, trukket lidt ud til hoejre -->
+  <path d="M44 10 L76 10 L76 20 L44 20 Z" fill="#d9c9a8" stroke="#7a6444" stroke-width="1"/>
+  <!-- Taendstikkerne i skuffen -->
+  <g stroke="#e8d3a6" stroke-width="2.2" stroke-linecap="round">
+    <path d="M52 16 L50 8"/><path d="M57 16 L56 7"/><path d="M62 16 L62 8"/><path d="M67 16 L68 7"/><path d="M71 16 L73 9"/>
+  </g>
+  <g fill="#b3302a">
+    <circle cx="50" cy="7" r="2.3"/><circle cx="56" cy="6" r="2.3"/><circle cx="62" cy="7" r="2.3"/>
+    <circle cx="68" cy="6" r="2.3"/><circle cx="73" cy="8" r="2.3"/>
+  </g>
+  <!-- Hylsteret -->
+  <path d="M4 16 L66 16 L66 42 L4 42 Z" fill="url(#aeske)" stroke="#7a6444" stroke-width="1.2"/>
+  <path d="M4 16 L10 10 L44 10 L44 16" fill="#cfae6a" stroke="#7a6444" stroke-width="1"/>
+  <!-- Strygefladen og etiketten -->
+  <rect x="4" y="16" width="7" height="26" fill="#5a3b24"/>
+  <rect x="16" y="21" width="44" height="16" rx="2" fill="#f4ecd8" stroke="#a88a55" stroke-width="0.8"/>
+  <path d="M38 34 q-6 -5 -2 -10 q1 4 4 5 q1 -4 -1 -7 q6 3 5 8 q-1 4 -6 4 z" fill="#e0662e"/>
+  <path d="M22 26 h10 M22 30 h8" stroke="#a88a55" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

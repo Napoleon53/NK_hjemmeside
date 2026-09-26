@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc4.11 Kalk i muslingeskaller</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at molarmasserne og 2,27 passer, at kolben
+   ender på det, vægten skal vise, for alle prøver, at det sprøjter, når
+   det hele kommer i på én gang, at de seks fejlkilder går den rigtige
+   vej, at formlerne og tallene genkendes med de typiske fejl, at facit
+   i alle opgaver og begge veje er pænt og kan skrives som svar, at alle
+   tre faner kan gennemføres med musen og ved at skrive, at omskifteren
+   skifter vej, at Kemichael kun taler ved hint og svar og kan sendes
+   ud, at sproget holder reglerne, og at layoutet holder fra 520 × 380
+   til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc4.11-forsoeg", "nk-sc4.11-beregning", "nk-sc4.11-fejl", "nk-sc4.11-kemichael-ude", "nk-sc4.11-maalinger",
+    "nk-sc4.11-niveau", "nk-kemichael"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Ord, der er skrevet uden æ, ø og å, og som derfor ikke må nå eleven */
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|haeld\w*|gaa|staa|paa|foerst|hoejre|hoejere|proeve\w*|vaegt\w*|Vaegt\w*|laerer\w*|forsoeg\w*|maaling\w*|Maaling\w*|baad\w*|fejlkild\w*)\b/;
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    function enter(inp) { inp.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true })); }
+    function mus(sim, type, x, y) {
+        var r = sim.L.canvas.getBoundingClientRect();
+        sim.L.canvas.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, bubbles: true, pointerId: 1, button: 0, isPrimary: true }));
+    }
+    function klik(sim, x, y) { mus(sim, "pointerdown", x, y); mus(sim, "pointerup", x, y); }
+    function traek(sim, x0, y0, x1, y1) {
+        mus(sim, "pointerdown", x0, y0);
+        for (var i = 1; i <= 8; i++) { mus(sim, "pointermove", x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * i / 8); tik(sim, 0.02); }
+        mus(sim, "pointerup", x1, y1);
+    }
+    function skrivI(sim, tekst) {
+        var f = sim.regning.aktivt();
+        if (!f || !f.input) return false;
+        f.input.value = tekst;
+        enter(f.input);
+        return true;
+    }
+    function felt(r, hvad, tekst) {
+        var e = d.getElementById("forsoeg-" + hvad + r);
+        e.value = tekst;
+        enter(e);
+    }
+    function besked(sim) { return sim.beskedTekst(); }
+    function komma(v) { return NK.tal2(v); }
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, K = NK.Kemi, T = NK.Tjek;
+    paastand("data.js, kemi.js, tjek.js, regning.js og laerer.js er kørt", !!(D && D.FEJL && K && K.Kolbe && K.Forloeb && T && T.formel && NK.Regning && NK.RoligLaerer));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-forsoeg"] && NK.sims["fane-beregning"] && NK.sims["fane-fejl"]));
+    var sprites = ["kolbe", "morter", "muslingeskal", "vaegt", "vejebaad", "spatel", "lup", "kateder", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var A = NK.sims["fane-forsoeg"], B = NK.sims["fane-beregning"], C = NK.sims["fane-fejl"];
+    paastand("Kemichael sidder ved katederet på alle tre faner", [A, B, C].every(function (s) { return s.k instanceof NK.RoligLaerer; }));
+    paastand("der er ingen tilbudsknapper (den rolige Kemichael)", !d.querySelector(".tilbud") && !d.querySelector(".spring-over"));
+    if (!A.k.inde()) { A.k.hentInd(); tik(A, 4); B.k.opdater(4); C.k.opdater(4); }
+    paastand("hver fane har knappen Send Kemichael ud", [A, B, C].every(function (s) { return s.k.knap && s.k.knap.textContent === "Send Kemichael ud"; }));
+    paastand("omskifteren står på Med mol uden link og hukommelse", NK.niveau === "mol" &&
+        d.querySelector('.niveauknap[data-niveau="mol"]').classList.contains("aktiv"));
+
+    overskrift("2. Kemien");
+    paastand("M(CaCO₃) = 100,09 g/mol og M(CO₂) = 44,01 g/mol", K.Mtekst("CaCO3") === "100,09" && K.Mtekst("CO2") === "44,01", K.Mtekst("CaCO3") + " " + K.Mtekst("CO2"));
+    paastand("100,09 / 44,01 afrundet er vejledningens 2,27", NK.tal2(K.M_KALK / K.M_CO2) === "2,27", K.M_KALK / K.M_CO2);
+    /* Hver prøve: fire spatelfulde med tre sekunders mellemrum ender på slutvisningen, uden sprøjt */
+    var skaeve = [];
+    D.PROEVER.forEach(function (m) {
+        var k = new K.Kolbe(), rest = m, t = 0;
+        while (rest > 1e-9) {
+            var s = Math.min(D.SPATEL, rest); if (rest - s < 0.05) s = rest;
+            k.tilsaet(s); rest -= s;
+            k.opdater(3); t += 3;
+        }
+        var n = 0;
+        while (!k.stille() && n++ < 2000) k.opdater(0.1);
+        if (k.visning() !== K.slutVisning(m) || k.sprojt > 1e-9) skaeve.push(m + ": " + k.visning() + " / " + K.slutVisning(m) + " sprøjt " + k.sprojt.toFixed(4));
+        /* Et mellemtrin, hvor vægten er stille, skal være den endelige visning */
+        var slut100 = (m - m * D.SKAL.andel * K.CO2_PR_KALK) * 100;
+        if (Math.abs(slut100 - Math.floor(slut100) - 0.5) < 0.1) skaeve.push(m + " ender tæt på midt mellem to hundrededele");
+    });
+    paastand("alle " + D.PROEVER.length + " prøver ender på den rigtige visning uden sprøjt", skaeve.length === 0, skaeve.join("; "));
+    var k102 = new K.Kolbe();
+    k102.tilsaet(1.02);
+    paastand("1,02 g på én gang: vægten ender under 0,59 g, fordi det sprøjter", (function () { var n = 0; while (!k102.stille() && n++ < 3000) k102.opdater(0.05); return k102.visning() < 0.59 && k102.sprojt > 0.02; }()),
+        k102.visning() + " sprøjt " + k102.sprojt.toFixed(3));
+    paastand("syren er i overskud: over halvdelen er tilbage", k102.hcl / k102.hcl0 > 0.5, (k102.hcl / k102.hcl0).toFixed(2));
+    var kR = new K.Kolbe();
+    kR.tilsaet(0.26);
+    kR.opdater(1);
+    paastand("mens det bruser, står vægten ikke stille", !kR.stille() && kR.rate > 0);
+    paastand("eksemplet på fane 2 er det, modellen giver: 1,02 → 0,59 og 0,98 → 0,57",
+        K.slutVisning(1.02) === 0.59 && K.slutVisning(0.98) === 0.57 && D.EKSEMPEL[0].me === 0.59 && D.EKSEMPEL[1].me === 0.57);
+    /* De seks fejlkilder går den vej, D.FEJL siger */
+    var fA = new K.Forloeb({}), rA = fA.koerFaerdig();
+    paastand("gruppe A: 1,00 g → 0,58 g, 95,3 %", rA.me === 0.58 && K.pct1(rA.pct) === "95,3", rA.me + " " + K.pct1(rA.pct));
+    var skaeveF = [];
+    D.FEJL.forEach(function (o) {
+        var fB = new K.Forloeb(o.B), rB = fB.koerFaerdig();
+        var vej = rB.pct > rA.pct + 0.5 ? "hoejere" : (rB.pct < rA.pct - 0.5 ? "lavere" : "samme");
+        if (vej !== o.rigtig) skaeveF.push(o.id + ": " + K.pct1(rB.pct) + " % er " + vej);
+        if (o.id === "grov" && !(fB.t > 2 * fA.t)) skaeveF.push("grov tager kun " + fB.t.toFixed(0) + " s mod " + fA.t.toFixed(0) + " s");
+        if (o.id === "sproejt" && !(rB.pct > 100)) skaeveF.push("alt på én gang giver kun " + K.pct1(rB.pct) + " %");
+    });
+    paastand("alle seks fejlkilder går den vej, opgaven siger", skaeveF.length === 0, skaeveF.join("; "));
+
+    overskrift("3. Formlerne");
+    function f(id, s) { return T.formel(id, s); }
+    function ok(id, liste) { return liste.filter(function (s) { return !f(id, s).ok; }); }
+    var ikke = ok("dm", ["m(CO2) = m(før) - m(efter)", "mfør-mefter", "m1 - m2", "m(musling, før) − m(musling, efter)", "m = m(før) − m(efter)", "m_{før}-m_{efter}"]);
+    paastand("m(CO₂): seks skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
+    paastand("m(efter) − m(før): omvendt", /Omvendt/.test(f("dm", "m(efter) - m(før)").besked || ""));
+    paastand("m(før) + m(efter): træk fra", /Træk/.test(f("dm", "m(før)+m(efter)").besked || ""));
+    ikke = ok("mk_f", ["m(CaCO3) = m(CO₂) · 2,27", "m·2,27", "2,27*m(CO2)", "(m(før)-m(efter))*2,27", "m(CO₂)·100,09/44,01", "mkalk = mco2 * 2,27"]);
+    paastand("m(CaCO₃) uden mol: seks skrivemåder godkendes (også 100,09 / 44,01)", ikke.length === 0, ikke.join(" | "));
+    paastand("m(CO₂) / 2,27: gang med 2,27", /Gang med 2,27/.test(f("mk_f", "m(CO2)/2,27").besked || ""));
+    paastand("m(før) · 2,27: brug massen af CO₂", /massen af CO₂/.test(f("mk_f", "m(før)*2,27").besked || ""));
+    ikke = ok("pct", ["m(CaCO3)/m(før)*100%", "Kalkindhold = m(CaCO₃) / m(før) · 100 %", "100*m(kalk)/m(prøve)", "kalkindholdet = mCaCO3/mfør*100"]);
+    paastand("kalkindholdet: fire skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
+    paastand("uden · 100 %: brøkdelen", /brøkdelen/.test(f("pct", "m(CaCO3)/m(før)").besked || ""));
+    paastand("m(før) / m(CaCO₃): vendt om", /vendt/.test(f("pct", "m(før)/m(CaCO3)*100").besked || ""));
+    paastand("m(CO₂) / m(før): CO₂'s andel", /CO₂'s andel/.test(f("pct", "m(CO2)/m(før)*100").besked || ""));
+    ikke = ok("n_co2", ["n = m/M", "n(CO2) = m(CO2)/M(CO2)", "nCO2 = mCO2 / MCO2"]);
+    paastand("n(CO₂): tre skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
+    paastand("m(CO₂) / 44,01: skriv M(CO₂)", /Skriv molarmassen/.test(f("n_co2", "m(CO2)/44,01").besked || ""));
+    paastand("m · M: ikke ganget", /ikke ganget/.test(f("n_co2", "m*M").besked || ""));
+    paastand("m(CO₂) / M(CaCO₃): molarmassen for CO₂", /molarmassen for CO₂/.test(f("n_co2", "m(CO2)/M(CaCO3)").besked || ""));
+    paastand("n(CaCO₃) = n(CO₂) og n = n(CO₂) godkendes", f("n_kalk", "n(CaCO3) = n(CO2)").ok && f("n_kalk", "n = n(CO2)").ok);
+    paastand("2 · n(CO₂): forholdet er 1 : 1", /1 : 1/.test(f("n_kalk", "2·n(CO2)").besked || ""));
+    paastand("n(CaCO₃) = n: skriv hvilken stofmængde", /hvilken stofmængde/.test(f("n_kalk", "n(CaCO3) = n").besked || ""));
+    paastand("m = n · M godkendes med mol", f("mk_n", "m = n·M").ok && f("mk_n", "m(CaCO3) = n(CaCO3) * M(CaCO3)").ok);
+    paastand("m(CO₂) · 2,27 med mol: det er genvejen", /genvejen/.test(f("mk_n", "m(CO2)*2,27").besked || ""));
+    paastand("n(CaCO₃) · M(CO₂): molarmassen for CaCO₃", /molarmassen for CaCO₃/.test(f("mk_n", "n(CaCO3)*M(CO2)").besked || ""));
+    paastand("baglæns: kalkindhold / 100 · m(prøve) godkendes", f("mk_p", "m(CaCO3) = kalkindhold/100 · m(prøve)").ok && f("mk_p", "m = p·m/100").ok);
+    paastand("kalkindhold · m(prøve): del med 100 %", /Del med 100/.test(f("mk_p", "kalkindhold*m(prøve)").besked || ""));
+    paastand("baglæns: m(CaCO₃) / 2,27 godkendes, · 2,27 er en fejl", f("mc_f", "m(CO2) = m(CaCO3)/2,27").ok && /Del med 2,27/.test(f("mc_f", "m(CaCO3)*2,27").besked || ""));
+    paastand("baglæns med mol: n = m/M, n(CO₂) = n(CaCO₃), m = n · M", f("nk_m", "n = m/M").ok && f("nc_k", "n(CO2) = n(CaCO3)").ok && f("mc_n", "m = n*M").ok);
+    paastand("m(CO₂) = n(CO₂) · M(CaCO₃): molarmassen for CO₂", /molarmassen for CO₂/.test(f("mc_n", "n(CO2)*M(CaCO3)").besked || ""));
+    paastand("x/y kan ikke læses", /kan jeg ikke læse/.test(f("dm", "x/y").besked || ""));
+    paastand("tal i formlen: skriv den med symboler", /symboler/.test(f("mk_f", "0,43*2,27").besked || ""));
+    paastand("et tomt felt tæller ikke som et svar", f("dm", "  ").tom && T.trin("dm", "", { tal: { mf: 1, me: 0.5 }, facit: { dm: 0.5 } }).tom);
+
+    overskrift("4. Tallene og de pæne beregninger");
+    function opg(spec, tal, niveau) {
+        var o = { id: spec.id, tal: tal, niveau: niveau, baglaens: !!spec.baglaens, kunTal: !!spec.kunTal, maaling: spec.maaling,
+                  trin: D.VEJE[niveau][spec.baglaens ? "bag" : "maaling"] };
+        o.facit = K.facit(o);
+        return o;
+    }
+    var ikkeOk = [], grimme = [], talsaet = [];
+    D.PROEVER.forEach(function (m) { talsaet.push({ mf: m, me: K.slutVisning(m) }); });
+    ["nf", "mol"].forEach(function (niveau) {
+        talsaet.forEach(function (tal) {
+            var o = opg(D.BEREGNING[0], tal, niveau);
+            o.trin.forEach(function (id) {
+                var ft = T.facitTekst(id, o).replace(/ (mol|g|%)$/, "");
+                if (!T.trin(id, ft, o).ok) ikkeOk.push(niveau + "/" + id + " " + ft);
+                var r = T.regning(id, o).join(" ");
+                if (!/=.*=/.test(r) || /NaN|undefined|Infinity/.test(r)) grimme.push(niveau + "/" + id + ": " + r);
+            });
+        });
+        D.BEREGNING[2].tal.forEach(function (tal) {
+            var o = opg(D.BEREGNING[2], tal, niveau);
+            o.trin.forEach(function (id) {
+                var ft = T.facitTekst(id, o).replace(/ (mol|g|%)$/, "");
+                if (!T.trin(id, ft, o).ok) ikkeOk.push(niveau + "/" + id + " " + ft);
+                var r = T.regning(id, o).join(" ");
+                if (!/=.*=/.test(r) || /NaN|undefined|Infinity/.test(r)) grimme.push(niveau + "/" + id + ": " + r);
+            });
+        });
+    });
+    paastand("facit i alle opgaver, begge veje og alle tal godkendes, når det skrives som i feltet", ikkeOk.length === 0, ikkeOk.join("; "));
+    paastand("alle beregninger har formel, tal og resultat", grimme.length === 0, grimme.join("; "));
+    var oNF = opg(D.BEREGNING[0], { mf: 1.02, me: 0.59 }, "nf"), oMol = opg(D.BEREGNING[0], { mf: 1.02, me: 0.59 }, "mol");
+    paastand("uden mol: m(CaCO₃) = m(CO₂) · 2,27 = 0,43 g · 2,27 = 0,976 g", T.regning("mk_f", oNF).join(" ") === "m(CaCO₃) = m(CO₂) · 2,27 = 0,43 g · 2,27 = 0,976 g", T.regning("mk_f", oNF).join(" "));
+    paastand("uden mol: kalkindholdet er 95,7 %", T.facitTekst("pct", oNF) === "95,7 %", T.facitTekst("pct", oNF));
+    paastand("med mol: n(CO₂) = m(CO₂) / M(CO₂) = 0,43 g / 44,01 g/mol = 0,00977 mol", T.regning("n_co2", oMol).join(" ") === "n(CO₂) = m(CO₂) / M(CO₂) = 0,43 g / 44,01 g/mol = 0,00977 mol", T.regning("n_co2", oMol).join(" "));
+    paastand("med mol: m(CaCO₃) = 0,00977 mol · 100,09 g/mol = 0,978 g, kalkindhold 95,9 %", T.facitTekst("mk_n", oMol) === "0,978 g" && T.facitTekst("pct", oMol) === "95,9 %", T.facitTekst("mk_n", oMol) + " " + T.facitTekst("pct", oMol));
+    paastand("uden mol godkender også 95,9 %, med mol også 95,7 % (1 %)", T.trin("pct", "95,9", oNF).ok && T.trin("pct", "95,7", oMol).ok);
+    paastand("0,957 som kalkindhold: brøkdelen", /brøkdelen/.test(T.trin("pct", "0,957", oNF).besked || ""));
+    paastand("−0,43 g CO₂: omvendt", /Omvendt/.test(T.trin("dm", "-0,43", oNF).besked || ""));
+    paastand("0,19 g kalk (divideret med 2,27): gang med 2,27", /gang med 2,27/.test(T.trin("mk_f", "0,189", oNF).besked || ""));
+    paastand("0,0043 mol (ganget med 44,01 og kommaet flyttet): tjek kommaet eller ganget", !T.trin("n_co2", "0,0977", oMol).ok);
+    var oBag = opg(D.BEREGNING[2], D.BEREGNING[2].tal[0], "nf");
+    paastand("baglæns: 97 % af 2,00 g = 1,94 g kalk, 1,94 g / 2,27 = 0,855 g CO₂", T.facitTekst("mk_p", oBag) === "1,94 g" && T.facitTekst("mc_f", oBag) === "0,855 g",
+        T.facitTekst("mk_p", oBag) + " " + T.facitTekst("mc_f", oBag));
+    paastand("baglæns: 194 g (glemt at dele med 100): del med 100 %", /Del med 100/.test(T.trin("mk_p", "194", oBag).besked || ""));
+
+    overskrift("5. Sproget");
+    var tekster = [];
+    D.FORSOEG.forEach(function (o) {
+        tekster.push(o.titel, o.tekst, o.efter);
+        if (o.valg) { tekster.push(o.valg.spm, o.valg.hint); o.valg.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); }); }
+    });
+    ["LINJE", "HINT", "SVAR", "INTRO", "FAERDIG"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
+    D.BEREGNING.forEach(function (o) { tekster.push(o.titel); });
+    Object.keys(D.TRIN).forEach(function (id) { tekster.push(D.TRIN[id].navn, D.TRIN[id].formel, D.TRIN[id].formelHint); });
+    Object.keys(T.REGLER).forEach(function (id) { T.REGLER[id].fejl.forEach(function (x) { tekster.push(x[1]); }); });
+    D.FEJL.forEach(function (o) { tekster.push(o.titel, o.kort, o.tekst, o.hint, o.forkl); Object.keys(o.fejl).forEach(function (k) { tekster.push(o.fejl[k]); }); });
+    tekster = tekster.concat(D.ROS, D.ROS_OPGAVE, D.KAFFE, D.MUSLING, [D.MORTER, D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST, D.FEJL_SPM, D.FEJL_A]);
+    tekster.push(d.body.innerText);
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger", !/[–—]/.test(alt), (alt.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
+    paastand("ingen 1+ eller 1−", !/(^|[^0-9,])1[+−-](\s|$)/.test(alt));
+    paastand("ingen ord uden æ, ø og å", !ASCII_ORD.test(alt), (alt.match(ASCII_ORD) || [""])[0]);
+    paastand("natriumhydroxid, ikke natronlud", !/natronlud/i.test(alt));
+
+    overskrift("6. Fane 1: forsøget med musen");
+    NK.visFane("fane-forsoeg");
+    A.tilpas(); A.layout();
+    A.vaelg(0, false);
+    var lay = A.lay, b = lay.baad;
+    function pulver() { klik(A, b.x, b.y - 10); }
+    paastand("opgave 1 starter med et gæt", A.fase() === "valg" && d.querySelectorAll("#forsoeg-valg .knap").length === 3);
+    pulver();
+    paastand("før gættet kommer der intet pulver i kolben", A.kolbe.ind === 0 && A.baad === A.proeve, besked(A));
+    [].filter.call(d.querySelectorAll("#forsoeg-valg .knap"), function (k) { return k.textContent === "Det samme som pulveret vejede"; })[0].click();
+    tik(A, 0.1);
+    paastand("efter gættet: linjen siger, at m(før) skal aflæses", /Dit gæt/.test(besked(A)) && /m\(før\)/.test(besked(A)), besked(A));
+    felt(0, "f", "0,00");
+    paastand("et forkert tal for m(før) afvises", A.noteret.mf === null && /vejebåden/.test(besked(A)), besked(A));
+    felt(0, "f", komma(A.proeve));
+    tik(A, 0.1);
+    paastand("m(før) aflæst rigtigt, og linjen siger: træk en spatelfuld over", A.noteret.mf === A.proeve && /spatelfuld/.test(besked(A)), besked(A));
+    paastand("m(efter) er lukket, mens der er pulver i vejebåden", d.getElementById("forsoeg-e0").disabled);
+    var foer = A.baad;
+    traek(A, b.x, b.y - 10, lay.kolbe.mund.x, lay.kolbe.mund.y - 20);
+    tik(A, 1);
+    paastand("en spatelfuld trukket over i kolben: vejebåden er " + D.SPATEL.toFixed(2) + " g lettere, og det bruser",
+        Math.abs(foer - A.baad - D.SPATEL) < 1e-9 && A.kolbe.ind > 0 && A.kolbe.rate > 0, A.baad + " " + A.kolbe.rate);
+    paastand("vægten under kolben falder under det, der kom i", A.kolbe.visning() < A.kolbe.ind);
+    traek(A, b.x, b.y - 10, b.x - 5, lay.bordY - 4);
+    paastand("en spatelfuld sluppet ved siden af kommer tilbage i vejebåden", Math.abs(foer - A.baad - D.SPATEL) < 1e-9 && /Slip spatlen over kolben/.test(besked(A)), besked(A));
+    while (A.baad > 1e-6) { pulver(); tik(A, 4); }
+    tik(A, 0.5);
+    paastand("alt pulveret er i, og det bruser stadig", A.fase() === "vent", A.fase());
+    felt(0, "e", komma(A.kolbe.visning()));
+    paastand("m(efter), mens det bruser: vent, til vægten står stille", A.noteret.me === null && /falder stadig/.test(besked(A)), besked(A));
+    tik(A, 25);
+    paastand("vægten står stille, og linjen siger: aflæs m(efter)", A.fase() === "efter" && /m\(efter\)/.test(besked(A)), A.fase() + " " + besked(A));
+    paastand("vægten står på det, modellen siger", A.kolbe.visning() === K.slutVisning(A.proeve), A.kolbe.visning() + " " + K.slutVisning(A.proeve));
+    felt(0, "e", komma(A.proeve));
+    paastand("m(før) i m(efter)-feltet afvises", A.noteret.me === null && /Det er m\(før\)/.test(besked(A)), besked(A));
+    felt(0, "e", komma(A.kolbe.visning()));
+    paastand("måling 1 er løst, gættet forklares, og målingen er gemt", A.faerdig && /Du gættede/.test(besked(A)) &&
+        NK.maalinger[0] && NK.maalinger[0].me === A.kolbe.visning(), besked(A));
+    paastand("skemaet viser kolbens tab", /Kolben tabte/.test(d.getElementById("forsoeg-note").textContent), d.getElementById("forsoeg-note").textContent);
+    paastand("fane 2 regner nu på den egen måling", B.opg.id !== "m1" || (B.opg.tal.egen && B.opg.tal.mf === NK.maalinger[0].mf));
+
+    /* Måling 2 med hint og svar hele vejen */
+    A.knap();
+    paastand("Næste opgave: måling 2 uden gæt og med en anden prøve", A.nr === 1 && A.fase() === "foer" && A.proeve !== NK.maalinger[0].mf, A.fase());
+    var svar = 0, set = {};
+    while (!A.faerdig && svar++ < 60) {
+        if (A.auto) { paastand("mens Vis svaret virker, kan knappen ikke trykkes", A.el.knap.disabled); tik(A, 2); continue; }
+        var fa = A.fase();
+        A.knap();
+        if (!set[fa]) paastand("Giv hint i fasen " + fa + ": Kemichael siger hintet", A.k.taler() && /Hint/.test(A.k.tekst()), A.k.tekst());
+        set[fa] = true;
+        A.knap();
+        tik(A, 1);
+    }
+    paastand("Vis svaret hele vejen løser måling 2 uden stjerne", A.faerdig && !A.status[1].stjerne && NK.maalinger[1] !== null, besked(A));
+
+    /* Det hele på én gang: det sprøjter, og kalkindholdet bliver over 100 % */
+    A.forfra();
+    paastand("Start forfra: ny kolbe, samme prøve, tomt m(efter)", !A.faerdig && A.kolbe.ind === 0 && A.noteret.mf === null);
+    felt(1, "f", komma(A.proeve));
+    for (var i = 0; i < 5 && A.baad > 1e-6; i++) pulver();
+    tik(A, 30);
+    paastand("alle spatelfulde på én gang: det sprøjter", A.kolbe.sprojt > 0.005, A.kolbe.sprojt.toFixed(3));
+    paastand("vægten ender lavere end uden sprøjt", A.kolbe.visning() < K.slutVisning(A.proeve), A.kolbe.visning() + " " + K.slutVisning(A.proeve));
+    felt(1, "e", komma(A.kolbe.visning()));
+    var mk = K.r2(A.noteret.mf - A.noteret.me) * D.FAKTOR;
+    paastand("måling 2 er løst; over 100 % får en forklaring", A.faerdig && (mk / A.noteret.mf <= 1 || /sprøjtede/.test(besked(A))), besked(A));
+    klik(A, lay.musling ? lay.musling.x + lay.musling.b / 2 : -99, lay.musling ? lay.musling.y + lay.musling.h / 2 : -99);
+    paastand("påskeægget: et klik på hjertemuslingen får Kemichael til at sige noget om den", !lay.musling || D.MUSLING.indexOf(A.k.tekst()) >= 0, A.k.tekst());
+
+    overskrift("7. Fane 2: beregningen");
+    NK.visFane("fane-beregning");
+    B.tilpas(); B.layout();
+    NK.saetNiveau("mol");
+    function loesB(i, formler) {
+        B.vaelg(i, false);
+        var o = B.opg, n = 0, t;
+        while ((t = B.regning.aktivt()) && n++ < 20) {
+            if (t.fase === "formel") skrivI(B, formler[t.id]);
+            else skrivI(B, T.facitTekst(t.id, o).replace(/ (mol|g|%)$/, ""));
+        }
+        tik(B, 1);
+        return B.faerdig;
+    }
+    var FORMLER = { dm: "m(CO2) = m(før) − m(efter)", mk_f: "m(CaCO3) = m(CO2) · 2,27", pct: "kalkindhold = m(CaCO3)/m(før) · 100",
+        n_co2: "n(CO2) = m(CO2)/M(CO2)", n_kalk: "n(CaCO3) = n(CO2)", mk_n: "m(CaCO3) = n(CaCO3)·M(CaCO3)",
+        mk_p: "m(CaCO3) = kalkindhold/100 · m(prøve)", mc_f: "m(CO2) = m(CaCO3)/2,27", nk_m: "n(CaCO3) = m(CaCO3)/M(CaCO3)",
+        nc_k: "n(CO2) = n(CaCO3)", mc_n: "m(CO2) = n(CO2)·M(CO2)" };
+    B.vaelg(0, false);
+    paastand("med mol har måling 1 fem trin", B.regning.felter.length === 5, B.regning.felter.length);
+    paastand("måling 1 med mol kan løses ved at skrive formlen og tallet", loesB(0, FORMLER), besked(B));
+    paastand("opsummeringen har måling 1", d.getElementById("beregning-o-pct-0").textContent === T.facitTekst("pct", B.opg), d.getElementById("beregning-o-pct-0").textContent);
+    paastand("slutlinjen nævner genvejen 2,27", /2,27/.test(besked(B)), besked(B));
+    paastand("kæden viser CO₂, kalken og kalkindholdet", B.s.co2.length === 2 && B.s.kalk.length === 2 && B.s.pct !== null, JSON.stringify(B.s.co2));
+    d.querySelector('.niveauknap[data-niveau="nf"]').click();
+    paastand("omskifteren: uden mol har måling 1 tre trin, og opgaven starter forfra", NK.niveau === "nf" && B.regning.felter.length === 3 && B.regning.k === 0);
+    paastand("måling 1 uden mol kan løses", loesB(0, FORMLER), besked(B));
+    B.vaelg(1, false);
+    paastand("måling 2: formlerne står der, kun tallene skal skrives", B.regning.felter.every(function (x) { return x.fase === "tal"; }) &&
+        /Formlerne er de samme/.test(d.getElementById("beregning-prompt").textContent));
+    paastand("måling 2 kan løses med tallene alene", loesB(1, FORMLER), besked(B));
+    paastand("opsummeringen har begge målinger", d.getElementById("beregning-o-pct-1").textContent !== "" && d.getElementById("beregning-o-co2-1").textContent !== "");
+    paastand("baglæns uden mol kan løses (to trin)", loesB(2, FORMLER) && B.regning.felter.length === 2 && /Vægten falder/.test(besked(B)), besked(B));
+    NK.saetNiveau("mol");
+    paastand("baglæns med mol kan løses (fire trin)", loesB(2, FORMLER) && B.regning.felter.length === 4, besked(B));
+    var skalFoer = B.opg.tal.skal;
+    d.getElementById("beregning-nye").click();
+    paastand("Nye tal giver en anden skal", B.opg.id === "bag" && B.opg.tal.skal !== skalFoer, B.opg.tal.skal);
+    B.vaelg(0, false);
+    B.knap();
+    paastand("Giv hint i formeltrinnet siger, hvad man kender", /Kolben tabte masse/.test(B.k.tekst()), B.k.tekst());
+    B.knap();
+    paastand("Vis svaret viser formlen, og feltet er nu til tallet", /Formlen/.test(B.k.tekst()) && B.regning.aktivt().fase === "tal", B.k.tekst());
+    skrivI(B, T.facitTekst("dm", B.opg).replace(/ g$/, ""));
+    paastand("når tallet er rigtigt, tier Kemichael", !B.k.taler() && B.regning.k === 1);
+    skrivI(B, "m(CO2)/44,01");
+    paastand("molarmassen som tal i formlen: skriv M(CO₂)", /Skriv molarmassen/.test(besked(B)), besked(B));
+
+    overskrift("8. Fane 3: fejlkilderne");
+    NK.visFane("fane-fejl");
+    C.tilpas(); C.layout();
+    var retning = [];
+    D.FEJL.forEach(function (o, i) {
+        C.vaelg(i, false);
+        var j = D.FEJL_SVAR.map(function (s) { return s.id; }).indexOf(o.rigtig);
+        d.querySelectorAll("#fejl-valg .knap")[j].click();
+        var n = 0;
+        while (!C.faerdig && n++ < 100) tik(C, 1);
+        var r = C.res;
+        if (!C.faerdig || !r) { retning.push(o.id + " blev ikke færdig"); return; }
+        var vej = r.B.pct > r.A.pct + 0.5 ? "hoejere" : (r.B.pct < r.A.pct - 0.5 ? "lavere" : "samme");
+        if (vej !== o.rigtig) retning.push(o.id + ": B gav " + K.pct1(r.B.pct) + " %");
+        if (!C.status[i].stjerne) retning.push(o.id + " fik ingen stjerne");
+        if (!/Dit gæt holdt/.test(besked(C))) retning.push(o.id + ": " + besked(C));
+    });
+    paastand("alle seks kan løses med det rigtige gæt, og B går den rigtige vej", retning.length === 0, retning.join("; "));
+    paastand("tabellen viser begge grupper", d.getElementById("fejl-t-pct-b").textContent !== "" && d.getElementById("fejl-t-pct-a").textContent === "95,3 %",
+        d.getElementById("fejl-t-pct-a").textContent);
+    C.vaelg(4, false);
+    d.querySelectorAll("#fejl-valg .knap")[1].click();
+    for (i = 0; i < 100 && C.koerer; i++) tik(C, 1);
+    paastand("spildt pulver, gættet lavere: forklaringen tager fat i gættet, og stjernen bliver", /Du gættede: lavere/.test(besked(C)) && C.status[4].stjerne, besked(C));
+    paastand("Kør igen kører de samme to forsøg", (function () { d.getElementById("fejl-forfra").click(); var ok = C.koerer; for (var q = 0; q < 100 && C.koerer; q++) tik(C, 1); return ok && !C.koerer && C.res; }()));
+
+    overskrift("9. Kemichael");
+    NK.visFane("fane-beregning");
+    B.vaelg(0, false);
+    paastand("han siger intet, når opgaven vælges", !B.k.taler());
+    skrivI(B, "m(efter) - m(før)");
+    paastand("heller ikke ved en forkert formel (den står i kortet)", !B.k.taler() && /Omvendt/.test(besked(B)));
+    B.k.sendUd();
+    tik(B, 3);
+    paastand("sendt ud: knappen hedder Hent Kemichael på alle faner", [A, B, C].every(function (s) { return s.k.knap.textContent === "Hent Kemichael"; }));
+    B.knap();
+    paastand("hintet står i kortet, når han er ude", /Hint:/.test(besked(B)) && !B.k.taler(), besked(B));
+    B.k.hentInd();
+    tik(B, 4);
+    paastand("hentet ind igen", B.k.inde() && B.k.knap.textContent === "Send Kemichael ud");
+
+    overskrift("10. Layout");
+    var ramme = window.document.getElementById("ramme");
+    var str = [[520, 380], [800, 600], [1100, 700], [1300, 820], [1500, 900]];
+    var problemer = [];
+    str.forEach(function (s) {
+        ramme.style.width = s[0] + "px";
+        ramme.style.height = s[1] + "px";
+        ["fane-forsoeg", "fane-beregning", "fane-fejl"].forEach(function (id) {
+            NK.visFane(id);
+            var sim = NK.sims[id];
+            sim.tilpas(); sim.layout();
+            var L = sim.lay, Wc = sim.L.b, Hc = sim.L.h;
+            var navn = s[0] + "×" + s[1] + " " + id;
+            if (id === "fane-forsoeg") {
+                if (L.zoom.x + L.zoom.r > Wc + 1) problemer.push(navn + " luppen");
+                if (L.kolbe.x0 + L.kolbe.b > L.zoom.x - L.zoom.r + 4) problemer.push(navn + " kolben rammer luppen");
+                if (L.kolbe.y0 < 0) problemer.push(navn + " kolben");
+                if (L.v1.x - L.v1.b / 2 < 0) problemer.push(navn + " vejebåden");
+            } else if (id === "fane-beregning") {
+                if (L.tavle.x + L.tavle.b > Wc || L.tavle.h < 120) problemer.push(navn + " tavlen " + Math.round(L.tavle.h));
+            } else {
+                if (L.st[1].x + L.st[1].b / 2 > Wc + 1 || L.st[0].x - L.st[0].b / 2 < 0) problemer.push(navn + " vægtene");
+                if (L.st[0].x + L.st[0].b / 2 > L.st[1].x - L.st[1].b / 2) problemer.push(navn + " vægtene overlapper");
+            }
+            try { sim.tegn(); } catch (e) { problemer.push(navn + " tegn: " + e.message); }
+            if (!(Hc > 100)) problemer.push(navn + " højde " + Hc);
+        });
+    });
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+    paastand("layoutet holder fra 520 × 380 til 1500 × 900", problemer.length === 0, problemer.join("; "));
+}
+</script>
+</body>
+</html>

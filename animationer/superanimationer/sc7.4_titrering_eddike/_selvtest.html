@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc7.4 Titrering af eddike</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen rammer tabelværdierne (pH ved
+   start, i halvtitrerpunktet og ved ækvivalenspunktet, omslaget på én
+   dråbe), at tjekket af aflæsningen og de fire regnetrin giver den
+   rigtige besked ved de typiske fejl, at sproget overholder reglerne, at
+   alle tre faner kan gennemføres (fane 1 også med musen), at Kemichael
+   kan vises og sendes ud, og at layoutet holder fra 520 × 380 til
+   1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens valg og lægger dem tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc7.4-intro-titrering", "nk-sc7.4-intro-beregning", "nk-sc7.4-intro-forbrug",
+    "nk-sc7.4-ros-titrering", "nk-sc7.4-ros-beregning", "nk-sc7.4-ros-forbrug"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function naer(a, b, tol) { return Math.abs(a - b) <= (tol || 1e-9); }
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, K = NK.Kemi, T = NK.Tjek, Tg = NK.Tegn;
+    paastand("data.js, kemi.js, tjek.js, tegning.js, lup.js og graf.js er kørt",
+        !!(D && D.SITUATIONER && K && K.ph && T && T.trin && Tg && Tg.opstilling && NK.Lup && NK.Kurve && NK.Aflaes));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-titrering"] && NK.sims["fane-beregning"] && NK.sims["fane-forbrug"]));
+    var sprites = ["buret", "kolbe", "omroerer", "eddike", "sproejteflaske", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var S1 = NK.sims["fane-titrering"], S2 = NK.sims["fane-beregning"], S3 = NK.sims["fane-forbrug"];
+    paastand("Kemichael er koblet på alle tre faner", !!(S1.laerer && S2.laerer && S3.laerer));
+
+    overskrift("2. Modellen");
+    var pr = { m: 2.00, p: 4.50, vand: 20, c: 0.100 };
+    var vA = K.vAek(pr);
+    paastand("2,00 g eddike med 4,50 %: n = 1,499 · 10⁻³ mol og V = 14,99 mL", naer(K.nSyre(pr), 1.4988e-3, 2e-7) && naer(vA, 14.988, 0.01), vA);
+    paastand("masseprocenten regnet tilbage af forbruget giver 4,50 %", naer(K.procent(vA, 0.1, 2.0), 4.50, 1e-9));
+    var ph0 = K.ph(pr, 0);
+    paastand("pH ved start er ca. 2,96 (eddikesyre, 0,068 M)", naer(ph0, 2.96, 0.03), ph0.toFixed(3));
+    var phH = K.ph(pr, vA / 2);
+    paastand("pH i halvtitrerpunktet er pKs = 4,76", naer(phH, 4.76, 0.03), phH.toFixed(3));
+    var phA = K.ph(pr, vA);
+    paastand("pH ved ækvivalenspunktet er mellem 8,5 og 8,9", phA > 8.5 && phA < 8.9, phA.toFixed(3));
+    var foer = K.ph(pr, vA - 0.05), efter = K.ph(pr, vA + 0.05);
+    paastand("én dråbe før: pH under 8,2 og farveløs", foer < 8.2 && K.farveStyrke(foer) < 0.04, foer.toFixed(2));
+    paastand("én dråbe efter: pH over 9,8 og tydeligt lyserød", efter > 9.8 && K.farveStyrke(efter) > 0.6, efter.toFixed(2));
+    paastand("0,02 mL før ækvivalenspunktet er kolben stadig farveløs", K.farveStyrke(K.ph(pr, vA - 0.02)) < 0.04);
+    paastand("2 mL efter er den mørk lyserød", K.farveOrd(K.farveStyrke(K.ph(pr, vA + 2))) === "mørk lyserød");
+    var stiger = true, sidste = 0;
+    for (var v = 0; v <= 25; v += 0.05) { var ph = K.ph(pr, v); if (ph < sidste - 1e-9) stiger = false; sidste = ph; }
+    paastand("kurven stiger hele vejen fra 0 til 25 mL", stiger);
+    paastand("mere vand ændrer ikke forbruget", naer(K.vAek({ m: 2, p: 4.5, vand: 60, c: 0.1 }), vA, 1e-12));
+    paastand("mere vand ændrer pH lidt ved start, men ikke springet", K.ph({ m: 2, p: 4.5, vand: 60, c: 0.1 }, 0) > ph0 &&
+        K.ph({ m: 2, p: 4.5, vand: 60, c: 0.1 }, vA + 0.05) > 9.5);
+    var mange = 0, ok = 0;
+    for (var i = 0; i < 40; i++) { var q = K.nyProeve(); mange++; if (q.p >= 4.0 && q.p <= 5.5 && K.vAek(q) < 25) ok++; }
+    paastand("nye prøver har 4,0 til 5,5 % og et forbrug under 25 mL", ok === mange);
+    paastand("koncentrationer skrives med tre decimaler: 0,100 og 0,090", K.c(0.1) === "0,100" && K.c(0.09) === "0,090" && K.c(0.2) === "0,200");
+    paastand("stofmængder i potensform: 1,499 · 10⁻³", K.mol(1.4988e-3) === "1,499 · 10⁻³", K.mol(1.4988e-3));
+
+    overskrift("3. Tjekket af tallene");
+    var skrivemaader = [["14,15", 14.15], ["14.15", 14.15], ["14,15 mL", 14.15], [" 14,15 ", 14.15], ["1,415e-3", 1.415e-3],
+        ["1,415·10^-3", 1.415e-3], ["1,415 * 10^-3", 1.415e-3], ["1,415 x 10⁻³", 1.415e-3], ["1,415·10⁻³ mol", 1.415e-3],
+        ["1,415 mmol", 1.415e-3], ["0,001415", 1.415e-3], ["4,72 %", 4.72], [",5", 0.5]];
+    var ikkeLaest = skrivemaader.filter(function (x) { var t = T.tal(x[0]); return !t || !naer(t.v, x[1], Math.abs(x[1]) * 1e-9); });
+    paastand(skrivemaader.length + " skrivemåder læses som tal", ikkeLaest.length === 0, ikkeLaest.map(function (x) { return x[0]; }).join(", "));
+    paastand("bogstaver er ikke et tal", T.tal("abc") === null && T.tal("mL") === null);
+
+    var AF = [["14,15", true], ["14,2", true], ["14,1", true], ["14,21", false], ["0,01415", /liter/], ["10,85", /oppefra/],
+        ["14,35", /Tæt på/], ["15,15", /hele mL/], ["20", /Aflæs tallet/]];
+    var afFejl = AF.filter(function (x) {
+        var r = T.aflaesning(x[0], 14.15, 0.05);
+        if (x[1] === true) return !r.ok;
+        if (x[1] === false) return r.ok;
+        return r.ok || !x[1].test(r.besked || "");
+    });
+    paastand("aflæsningen: ±0,05 mL er rigtigt, og " + (AF.length - 4) + " typiske fejl får den rigtige besked", afFejl.length === 0,
+        afFejl.map(function (x) { var r = T.aflaesning(x[0], 14.15, 0.05); return x[0] + "→" + (r.ok ? "ok" : r.besked); }).join("; "));
+    paastand("et tomt felt er ikke en fejl", T.aflaesning("", 14.15).tom === true && T.trin("nb", " ", { facit: {} }).tom === true);
+
+    var o = { V: 14.15, c: 0.100, m: 2.00 };
+    var nb = 0.1 * 0.01415;
+    o.facit = { nb: nb, ns: nb, ms: nb * 60.05, pct: nb * 60.05 / 2 * 100 };
+    function t(id, s) { return T.trin(id, s, o); }
+    var TRIN = [
+        ["nb", "1,415·10^-3", true], ["nb", "0,00142", true], ["nb", "1,4 mmol", /flere cifre|Tæt på|Tjek/],
+        ["nb", "1,415", /liter/], ["nb", "141,5", /divideret/], ["nb", "0,01415", /rumfanget/], ["nb", "0,1", /koncentrationen/],
+        ["nb", "1,415e-5", /mL til L/],
+        ["ns", "1,415e-3", true], ["ns", "7,075e-4", /1 : 1/], ["ns", "0,08497", /masse/],
+        ["ms", "0,08497", true], ["ms", "0,085", true], ["ms", "0,0566", /NaOH/], ["ms", "2,356e-5", /divideret/], ["ms", "2", /hele prøvens/],
+        ["ms", "0,8497", /kommaet/],
+        ["pct", "4,25", true], ["pct", "4,2", /Tæt på/], ["pct", "0,0425", /100 %/], ["pct", "2354", /forkerte vej/], ["pct", "8,50", /prøvens masse/],
+        ["pct", "42,5", /kommaet/], ["pct", "x", /Skriv et tal/]
+    ];
+    var trinFejl = TRIN.filter(function (x) {
+        var r = t(x[0], x[1]);
+        if (x[2] === true) return !r.ok;
+        return r.ok || !x[2].test(r.besked || "");
+    });
+    paastand("de fire regnetrin: " + TRIN.length + " svar og typiske fejl får den rigtige besked", trinFejl.length === 0,
+        trinFejl.map(function (x) { var r = t(x[0], x[1]); return x[0] + " " + x[1] + "→" + (r.ok ? "ok" : r.besked); }).join("; "));
+
+    var FORMLER = [
+        ["nb", "c · V", true], ["nb", "n = c*V", true], ["nb", "V·c", true], ["nb", "n(NaOH) = c(NaOH) · V(NaOH)", true],
+        ["nb", "c×V", true], ["nb", "cV", true], ["nb", "c · V / 1000", true], ["nb", "c = n / V", /Isoleret/],
+        ["nb", "c/V", /gange/], ["nb", "m/M", /massen/], ["nb", "0,100 · 0,01415", /symboler/], ["nb", "n = c + V", /passer ikke/],
+        ["ns", "n(NaOH)", true], ["ns", "n(syre) = n(base)", true], ["ns", "n(CH₃COOH) = n(NaOH)", true], ["ns", "c(NaOH)·V(NaOH)", true],
+        ["ns", "n", /hvilken stofmængde/], ["ns", "2·n(NaOH)", /1 : 1/], ["ns", "n(NaOH)/2", /1 : 1/],
+        ["ms", "n · M", true], ["ms", "m = n*M", true], ["ms", "M·n", true], ["ms", "m(CH3COOH) = n(CH3COOH) · M(CH3COOH)", true],
+        ["ms", "n = m/M", /Isoleret/], ["ms", "n/M", /divideret/], ["ms", "m = M/n", /divideret/],
+        ["pct", "m(CH₃COOH)/m(prøve) · 100 %", true], ["pct", "m(syre)/m(prøve)*100", true], ["pct", "100 · m / m(prøve)", true],
+        ["pct", "m% = m/mprøve · 100%", true], ["pct", "m(syre)/m(prøve)", /100 %/], ["pct", "m(prøve)/m(syre)·100", /øverst/]
+    ];
+    var formelFejl = FORMLER.filter(function (x) {
+        var r = T.formel(x[0], x[1]);
+        if (x[2] === true) return !r.ok || !!r.note;
+        if (x[2].source === "Isoleret") return !r.ok || !x[2].test(r.note || "");
+        return r.ok || !x[2].test(r.besked || "");
+    });
+    paastand("formlerne: " + FORMLER.length + " skrivemåder og typiske fejl får den rigtige besked", formelFejl.length === 0,
+        formelFejl.map(function (x) { var r = T.formel(x[0], x[1]); return x[0] + " " + x[1] + "→" + (r.ok ? "ok " + (r.note || "") : r.besked); }).join("; "));
+    paastand("et tomt formelfelt er ikke en fejl", T.formel("nb", "  ").tom === true);
+
+    overskrift("4. Sproget");
+    var replikker = [].concat(D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG,
+        [D.ROS_TITRERING, D.ROS_BEREGNING, D.ROS_FORBRUG, D.BEM_MORK, D.BEM_TOM, D.AEG_PRAECIS]);
+    var tekster = replikker.concat([D.TITRER_HINT, D.AFLAES_HINT],
+        D.TRIN.map(function (x) { return x.navn + " " + x.hint; }),
+        D.SITUATIONER.map(function (s) { return s.tekst + " " + s.hint + " " + s.efter + " " + s.forkert.join(" ") + " " + s.valg.join(" ") + " " + s.aendring; }));
+    var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
+    var streg = tekster.filter(function (x) { return /[–—]/.test(x); });
+    paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
+    paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
+    paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (x) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(x); }));
+    var lange = replikker.filter(function (x) { return x.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("hver præsentation har to eller tre replikker", [D.INTRO_TITRERING, D.INTRO_BEREGNING, D.INTRO_FORBRUG].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    paastand("hver situation har en forklaring til hvert forkert svar", D.SITUATIONER.every(function (s) {
+        return s.valg.length === 3 && s.forkert.every(function (f, i) { return i === s.rigtig ? f === "" : f.length > 10; });
+    }));
+    paastand("ordet natronlud bruges ikke (natriumhydroxid eller NaOH)", !tekster.concat([krop]).some(function (x) { return /natronlud/i.test(x); }));
+    paastand("teorien og tabellen er lukket fra start", !d.getElementById("teori").classList.contains("vis") && !d.getElementById("tabel").classList.contains("vis"));
+
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    function mus(canvas, type, x, y) {
+        var r = canvas.getBoundingClientRect();
+        canvas.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 7, bubbles: true, isPrimary: true }));
+    }
+    var tur = ["#tit-anker-buret", "#tit-anker-hane", "#tit-anker-kolbe", "#tit-anker-lup", "#tit-kort", "#tit-buretkort", "#tit-kurvekort",
+        "#ber-data", "#ber-kort", "#ber-anker-tavle", "#for-anker-a", "#for-anker-b", "#for-kort", "#for-tabelkort"];
+    paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
+
+    overskrift("5. Titreringen kan gennemføres med musen");
+    klik('[data-fane="fane-titrering"]');
+    S1.tilpas();
+    S1.afvisTilbud();
+    S1.nyProeve(4.50);
+    var c1 = S1.L.canvas, sk = S1.lay.skyder;
+    mus(c1, "pointerdown", sk.x0, sk.y);
+    mus(c1, "pointermove", sk.x0 + (sk.x1 - sk.x0) * 0.9, sk.y);
+    mus(c1, "pointerup", sk.x0 + (sk.x1 - sk.x0) * 0.9, sk.y);
+    paastand("skyderen åbner hanen", S1.a > 0.8, S1.a);
+    for (i = 0; i < 6000 && S1.vUd() < S1.vAek - 1; i++) S1.opdater(1 / 60);
+    tik(S1, 0.5);
+    paastand("NaOH løber: buretten falder, og kolben får det samme", S1.vUd() > 13 && Math.abs(S1.vUd() - S1.vInd()) < 0.5);
+    paastand("kolben er farveløs, og luppen har syre tilbage", !S1.lyserod() && S1.lup.syreTilbage() >= 1);
+    paastand("kurven har et punkt for hver dråbe", S1.kurve.punkter.length === S1.nInd + 1);
+    var g1 = S1.lay.g;
+    mus(c1, "pointerup", g1.hane.x + 8 * g1.s, g1.hane.y);
+    paastand("et klik på hanen lukker den", S1.a === 0);
+    tik(S1, 1);
+    var dk = S1.lay.draabe, nFoer = S1.nUd;
+    mus(c1, "pointerup", dk.x + dk.b / 2, dk.y + dk.h / 2);
+    paastand("knappen 1 dråbe giver præcis én dråbe", S1.nUd === nFoer + 1);
+    for (i = 0; i < 400 && !S1.lyserod(); i++) { S1.enDraabe(); tik(S1, 0.4); }
+    tik(S1, 3);
+    paastand("dråbe for dråbe bliver kolben lyserød på den første dråbe efter ækvivalenspunktet",
+        S1.lyserod() && S1.forbi() >= 0 && S1.forbi() < 0.05 + 1e-9, S1.forbi().toFixed(3));
+    paastand("luppen: al syren er brugt", S1.lup.syreTilbage() === 0);
+    paastand("feltet til aflæsningen kommer frem", S1.fase === "aflaes" && !!d.querySelector("#tit-felt input"));
+    var inp = d.querySelector("#tit-felt input");
+    inp.value = "3"; S1.tjekAflaesning();
+    paastand("en forkert aflæsning giver en besked og ikke et flueben", S1.fase === "aflaes" && /skidt/.test(d.getElementById("tit-besked").className));
+    inp = d.querySelector("#tit-felt input");
+    inp.value = String(S1.vUd()).replace(".", ","); S1.tjekAflaesning();
+    paastand("den rigtige aflæsning godkendes", S1.fase === "faerdig" && !!NK.maaling && NK.maaling.egen && naer(NK.maaling.V, S1.vUd(), 1e-9));
+    paastand("præcis titrering står i beskeden", /sidste dråbe/.test(d.getElementById("tit-besked").textContent));
+    paastand("knappen går videre til beregningen", d.getElementById("tit-knap").textContent.indexOf("beregningen") >= 0);
+    paastand("datatabellen har rækker for hver 0,5 mL", S1.kurve.tabel(0.5).length >= Math.floor(S1.vUd() / 0.5));
+    S1.aabnTabel();
+    paastand("tabellen åbner og viser tallene", d.getElementById("tabel").classList.contains("vis") && d.querySelectorAll("#tabel-krop tr").length > 10);
+    d.getElementById("tabel").classList.remove("vis");
+    var maalingEt = NK.maaling;
+
+    overskrift("6. Vis svaret, overtitrering og en tom burette");
+    S1.nyProeve(5.20);
+    S1.knap(); S1.knap();
+    for (i = 0; i < 6000 && S1.fase !== "aflaes"; i++) S1.opdater(1 / 60);
+    paastand("Vis svaret titrerer selv til omslaget", S1.fase === "aflaes" && S1.forbi() >= 0 && S1.forbi() < 0.05 + 1e-9, S1.forbi());
+    S1.knap(); S1.knap();
+    paastand("Vis svaret på aflæsningen godkender forbruget", S1.fase === "faerdig" && naer(S1.aflaest, S1.vUd(), 0.006));
+    S1.nyProeve(4.00);
+    S1.saetHane(1);
+    for (i = 0; i < 6000 && S1.vUd() < S1.vAek + 2; i++) S1.opdater(1 / 60);
+    S1.saetHane(0); tik(S1, 1);
+    paastand("2 mL for langt: mørk lyserød og luppen har fri OH⁻", K.farveOrd(S1.styrke()) === "mørk lyserød" && S1.lup.friOH() >= 1);
+    inp = d.querySelector("#tit-felt input");
+    inp.value = String(S1.vUd()).replace(".", ","); S1.tjekAflaesning();
+    paastand("beskeden siger, at forbruget er for stort", /for stort/.test(d.getElementById("tit-besked").textContent));
+    S1.nyProeve(4.00);
+    S1.saetHane(1);
+    tik(S1, 40);
+    paastand("buretten løber tom og lukker ved 26,5 mL", naer(S1.vUd(), 26.5, 0.051) && S1.a === 0, S1.vUd());
+    S1.nyProeve();
+    paastand("Ny prøve fylder buretten og tømmer luppen for OH⁻", S1.vUd() === 0 && S1.lup.syreTilbage() === 8 && S1.kurve.punkter.length === 1);
+    NK.maaling = maalingEt; NK.maaling.brugt = false;
+
+    overskrift("7. Beregningen kan gennemføres");
+    klik('[data-fane="fane-beregning"]');
+    S2.tilpas();
+    S2.afvisTilbud();
+    paastand("fanen tager den egne måling", S2.opg.egen && naer(S2.opg.V, maalingEt.V, 1e-9));
+    var fa = S2.opg.facit;
+    paastand("første felt beder om formlen, ikke tallet", S2.aktivtFelt().fase === "formel" && S2.aktivtFelt().input.getAttribute("placeholder") === "skriv formlen");
+    S2.aktivtFelt().input.value = NK.betydende(fa.nb, 4); S2.tjek();
+    paastand("et tal i formelfeltet giver besked om at skrive formlen", S2.aktivtFelt().fase === "formel" && /symboler/.test(d.getElementById("ber-besked").textContent));
+    var skriv = ["n = c · V", "n(CH3COOH) = n(NaOH)", "m = n · M", "m% = m(CH₃COOH) / m(prøve) · 100 %"];
+    [fa.nb, fa.ns, fa.ms, fa.pct].forEach(function (x, k) {
+        var f = S2.aktivtFelt();
+        f.input.value = skriv[k]; S2.tjek();
+        f = S2.aktivtFelt();
+        f.input.value = NK.betydende(x, 4); S2.tjek();
+    });
+    paastand("fire formler og fire rigtige tal løser opgaven", S2.opg.faerdig && S2.opg.felter.every(function (f) { return f.status === "ok"; }));
+    paastand("resultatet sammenlignes med eddikens masseprocent", /Eddiken havde 4,50 %/.test(d.getElementById("ber-besked").textContent),
+        d.getElementById("ber-besked").textContent);
+    S2.tegn();
+    var gl = S2.opg;
+    S2.knap();
+    paastand("Ny opgave giver en klassekammerats måling med andre tal", !S2.opg.egen && !S2.opg.faerdig &&
+        (S2.opg.V !== gl.V || S2.opg.m !== gl.m || S2.opg.c !== gl.c));
+    S2.knap();
+    paastand("det første hint hjælper med formlen uden at give den", /koncentrationen og rumfanget/.test(d.getElementById("ber-besked").textContent) &&
+        !/c · V/.test(d.getElementById("ber-besked").textContent));
+    for (i = 0; i < 15; i++) S2.knap();
+    paastand("Giv hint og Vis svaret til formel og tal i alle fire trin løser den også", S2.opg.faerdig && S2.opg.felter.every(function (f) { return f.status === "svar"; }));
+    S2.tegn();
+    paastand("tavlen tegnes uden fejl", true);
+
+    overskrift("8. To kolber kan gennemføres");
+    klik('[data-fane="fane-forbrug"]');
+    S3.tilpas();
+    S3.afvisTilbud();
+    S3.nulstil();
+    var V = {};
+    D.SITUATIONER.forEach(function (s, n) {
+        S3.vaelg(s.rigtig);
+        tik(S3, 5);
+        V[s.id] = { A: S3.A, B: S3.B, fase: S3.fase };
+        if (n < D.SITUATIONER.length - 1) S3.knap();
+    });
+    paastand("alle seks situationer kan gennemføres, og alle gæt var rigtige", S3.fase === "vist" && S3.rigtige === 6, S3.rigtige);
+    paastand("mere vand: samme forbrug", naer(V.vand.A.v, V.vand.B.v, 1e-9));
+    paastand("halvt så meget eddike: halvt forbrug, samme masseprocent", naer(V.halv.B.v, V.halv.A.v / 2, 0.051) && naer(V.halvProcent.B.procent, V.halvProcent.A.procent, 0.05));
+    paastand("0,200 M: halvt forbrug og samme masseprocent", naer(V.base.B.v, V.base.A.v / 2, 0.051) && naer(V.base.B.procent, V.base.A.procent, 0.03));
+    paastand("burette skyllet med vand: større forbrug og for høj masseprocent", V.skyllet.B.v > V.skyllet.A.v && V.skyllet.B.procent > V.skyllet.A.procent + 0.3);
+    paastand("spildt eddike: mindre forbrug og for lav masseprocent", V.spild.B.v < V.spild.A.v && V.spild.B.procent < V.spild.A.procent - 0.3);
+    paastand("alle forbrug er under 25 mL", D.SITUATIONER.every(function (s) { return V[s.id].B.v < 25 && V[s.id].A.v < 25; }));
+    S3.nulstil();
+    S3.vaelg(2);
+    tik(S3, 5);
+    paastand("et forkert gæt giver forklaringen til netop det svar", /lige så mange syremolekyler/.test(d.getElementById("for-besked").textContent) && S3.rigtige === 0);
+    paastand("det rigtige svar er markeret grønt og det valgte rødt", !!d.querySelector("#for-valg .vaelger.rigtig") && !!d.querySelector("#for-valg .vaelger.forkert"));
+    S3.nulstil();
+
+    overskrift("9. Kemichael");
+    ["fane-titrering", "fane-beregning", "fane-forbrug"].forEach(function (id) {
+        klik('[data-fane="' + id + '"]');
+        var sim = NK.sims[id];
+        sim.tilpas();
+        sim.startIntro(true);
+        tik(sim, 2);
+        var inde = sim.laererIIntro();
+        var spring = !d.getElementById(sim.springId).hidden;
+        sim.springIntro();
+        tik(sim, 4);
+        paastand(id + ": præsentationen kan vises og sendes ud med Esc", inde && spring && !sim.laererIIntro() && d.getElementById(sim.springId).hidden);
+    });
+    try { W.localStorage.removeItem("nk-sc7.4-intro-titrering"); } catch (e) { /* ingen hukommelse */ }
+    S1.startIntro(false);
+    var tilbud = d.getElementById("tit-tilbud");
+    paastand("tilbuddet om præsentationen står der første gang", !tilbud.hidden && W.getComputedStyle(tilbud).display !== "none");
+    klik("#tit-tilbud .tilbud-nej");
+    paastand("Nej tak fjerner tilbuddet (også med display)", tilbud.hidden && W.getComputedStyle(tilbud).display === "none");
+
+    overskrift("10. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-titrering", "fane-beregning", "fane-forbrug"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H;
+            function inde(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            function opst(g, navn) {
+                inde({ x: g.stang.x - 44 * g.s, y: g.buret.y, b: g.cx - g.stang.x + 110 * g.s, h: g.bordY - g.buret.y }, navn);
+                if (g.s < 0.3) problemer.push(id + ": " + navn + " er for lille");
+            }
+            if (id === "fane-titrering") {
+                opst(lay.g, "opstillingen");
+                var L = lay.lup, lr = { x: L.cx - L.R, y: L.cy - L.R - 24, b: 2 * L.R, h: 2 * L.R + 48 };
+                inde(lr, "luppen");
+                var skr = { x: lay.skyder.x0 - 14, y: lay.skyder.y - 14, b: lay.skyder.x1 - lay.skyder.x0 + 28, h: 34 };
+                inde(skr, "skyderen");
+                inde(lay.draabe, "knappen 1 dråbe");
+                over({ x: L.cx - L.R, y: L.cy - L.R, b: 2 * L.R, h: 2 * L.R }, skr, "luppen over skyderen");
+                over({ x: L.cx - L.R, y: L.cy - L.R, b: 2 * L.R, h: 2 * L.R }, lay.draabe, "luppen over knappen");
+                if (L.R < 60) problemer.push(id + ": luppen er for lille");
+            }
+            if (id === "fane-beregning") {
+                inde({ x: lay.tavle.x, y: lay.tavle.y, b: lay.tavle.b, h: lay.tavle.h }, "tavlen");
+                if (lay.tavle.h < 200) problemer.push(id + ": tavlen er for lav");
+            }
+            if (id === "fane-forbrug") {
+                opst(lay.gA, "A"); opst(lay.gB, "B");
+                if (lay.gB.stang.x - 44 * lay.gB.s < lay.gA.cx + 60 * lay.gA.s) problemer.push(id + ": A og B rører hinanden");
+                if (lay.skiltY + (lay.px + 12) / 2 > Hc) problemer.push(id + ": skiltene går under kanten");
+            }
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-titrering"]');
+    S1.nyProeve();
+}
+</script>
+</body>
+</html>

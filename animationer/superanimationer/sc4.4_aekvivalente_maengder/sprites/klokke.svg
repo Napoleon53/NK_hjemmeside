@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 64" width="80" height="64">
+<!-- Serveringsklokken paa disken. Knappen er y 2-13, bunden staar i y 62. -->
+<defs>
+  <radialGradient id="kuppel" cx="0.35" cy="0.3" r="0.8">
+    <stop offset="0" stop-color="#fff6cf"/>
+    <stop offset="0.35" stop-color="#e9c451"/>
+    <stop offset="1" stop-color="#8f6b12"/>
+  </radialGradient>
+</defs>
+<ellipse cx="40" cy="58" rx="36" ry="5" fill="#2b2f37"/>
+<rect x="4" y="50" width="72" height="8" rx="4" fill="#3c424d" stroke="#1f232a" stroke-width="1"/>
+<rect x="37" y="8" width="6" height="10" fill="#8f6b12"/>
+<ellipse cx="40" cy="7" rx="7" ry="4" fill="#c9a23a" stroke="#6e510c" stroke-width="1"/>
+<path d="M8 51 Q8 16 40 16 Q72 16 72 51 Z" fill="url(#kuppel)" stroke="#6e510c" stroke-width="1.5"/>
+<path d="M20 40 Q22 26 34 22" stroke="#ffffff" stroke-width="3" opacity="0.55" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="520" viewBox="0 0 220 520">
+<!-- Koeleskab med fryser, doerene aabne (sc6.6).
+     Maal (bruges i js/sprites.js, MAAL.koeleskab):
+       b 220, h 520
+       fryseren:  rum x 24-196, top 30, gulv 196 (hylden, glassene staar paa)
+       koeleskab: rum x 24-196, top 226, gulv 402 (glashylden)
+       bund 516 (skabets fod) -->
+<defs>
+  <linearGradient id="skab" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#cfd6de"/>
+    <stop offset="0.12" stop-color="#eef2f6"/>
+    <stop offset="0.85" stop-color="#e3e8ee"/>
+    <stop offset="1" stop-color="#b9c2cc"/>
+  </linearGradient>
+  <linearGradient id="frys" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#20364a"/>
+    <stop offset="1" stop-color="#2d4a63"/>
+  </linearGradient>
+  <linearGradient id="koel" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fdfbef"/>
+    <stop offset="0.35" stop-color="#e9eef2"/>
+    <stop offset="1" stop-color="#cdd6de"/>
+  </linearGradient>
+  <linearGradient id="hylde" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+    <stop offset="1" stop-color="#b8d4e6" stop-opacity="0.55"/>
+  </linearGradient>
+</defs>
+
+<!-- Skabet -->
+<rect x="4" y="6" width="212" height="506" rx="14" fill="url(#skab)" stroke="#8d99a6" stroke-width="2"/>
+<rect x="10" y="498" width="200" height="18" rx="4" fill="#5b6572"/>
+
+<!-- Fryseren: moerk og kold, med rim i hjoernerne -->
+<rect x="24" y="30" width="172" height="176" rx="6" fill="url(#frys)" stroke="#8d99a6" stroke-width="2"/>
+<path d="M24 36 q10 6 22 0 q8 -4 16 2 q10 6 20 0 q12 -6 22 1 q10 5 20 -1 q12 -6 22 0 q12 6 22 -1 q12 -6 24 0 L196 30 L24 30 Z" fill="#e8f4fb" opacity="0.9"/>
+<path d="M24 60 q7 -8 5 -18 M196 70 q-8 -10 -4 -22" stroke="#d6ecf7" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>
+<circle cx="44" cy="80" r="1.6" fill="#e8f4fb"/>
+<circle cx="170" cy="96" r="1.4" fill="#e8f4fb"/>
+<circle cx="120" cy="70" r="1.2" fill="#e8f4fb"/>
+<circle cx="80" cy="120" r="1.3" fill="#e8f4fb"/>
+<!-- Frysehylden (glassene staar paa den) -->
+<rect x="24" y="196" width="172" height="10" fill="#9fb3c4"/>
+<rect x="24" y="196" width="172" height="2.5" fill="#e8f4fb"/>
+
+<!-- Mellem de to rum -->
+<rect x="24" y="206" width="172" height="20" fill="#dfe5eb"/>
+
+<!-- Koeleskabet: lyst, med lampen oeverst -->
+<rect x="24" y="226" width="172" height="262" rx="6" fill="url(#koel)" stroke="#8d99a6" stroke-width="2"/>
+<rect x="92" y="230" width="36" height="7" rx="3" fill="#fff6c9" stroke="#d9cf9a" stroke-width="1"/>
+<!-- Glashylden, glassene staar paa den -->
+<rect x="26" y="402" width="168" height="7" fill="url(#hylde)" stroke="#9fb6c8" stroke-width="1"/>
+<!-- Groentskuffen -->
+<rect x="32" y="420" width="156" height="60" rx="6" fill="#cfe3d8" fill-opacity="0.55" stroke="#9fb6a8" stroke-width="1.5"/>
+<path d="M60 468 q8 -18 20 -6 q10 -14 22 -2 q12 -14 22 -2 q10 -12 22 0" stroke="#7fb28c" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+<rect x="90" y="424" width="40" height="5" rx="2.5" fill="#9fb6a8"/>
+
+<!-- Haengslerne i venstre side og greb paa kanten -->
+<rect x="6" y="40" width="6" height="16" rx="2" fill="#98a3ae"/>
+<rect x="6" y="176" width="6" height="16" rx="2" fill="#98a3ae"/>
+<rect x="6" y="236" width="6" height="16" rx="2" fill="#98a3ae"/>
+<rect x="6" y="466" width="6" height="16" rx="2" fill="#98a3ae"/>
+<rect x="203" y="96" width="6" height="44" rx="3" fill="#aab4be"/>
+<rect x="203" y="300" width="6" height="60" rx="3" fill="#aab4be"/>
+</svg>

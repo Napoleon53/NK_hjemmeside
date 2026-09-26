@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="220" viewBox="0 0 200 220">
+  <!-- Baegerglas, 100 mL (lav form). Indholdet tegnes af animationen
+       BAG denne fil, saa glasset ligger ovenpaa.
+       Inderside: x 21-179, bund y 209 (hjoerneradius 7).
+       Rumfang: y = 209 - 1,6 * mL. 20 mL ved y 177, 50 mL ved y 129,
+       100 mL ved y 49. Randen ved y 10, haeldetud til hoejre. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe6f7" stop-opacity="0.18"/>
+      <stop offset="0.14" stop-color="#cfe6f7" stop-opacity="0.03"/>
+      <stop offset="0.86" stop-color="#cfe6f7" stop-opacity="0.03"/>
+      <stop offset="1" stop-color="#cfe6f7" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M20 12 L20 202 Q20 210 28 210 L172 210 Q180 210 180 202 L180 14 Z" fill="url(#glas)"/>
+
+  <!-- Vaeg og bund -->
+  <path d="M13 8 Q18 9 20 13 L20 202 Q20 210 28 210 L172 210 Q180 210 180 202 L180 16 Q180 9 190 4"
+        fill="none" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 206 L176 206" stroke="#d6eaf8" stroke-opacity="0.2" stroke-width="1"/>
+
+  <!-- Genskin -->
+  <rect x="163" y="26" width="5" height="170" rx="2.5" fill="#ffffff" fill-opacity="0.14"/>
+  <rect x="27" y="26" width="2.5" height="170" rx="1.2" fill="#ffffff" fill-opacity="0.09"/>
+
+  <!-- Inddeling: hver 20 mL lang, hver 10 mL kort -->
+  <g stroke="#eef6fc" stroke-opacity="0.6" stroke-width="1.2" stroke-linecap="round">
+    <path d="M22 177 h20 M22 145 h20 M22 113 h20 M22 81 h20 M22 49 h20"/>
+  </g>
+  <g stroke="#eef6fc" stroke-opacity="0.35" stroke-width="0.9" stroke-linecap="round">
+    <path d="M22 193 h10 M22 161 h10 M22 129 h10 M22 97 h10 M22 65 h10"/>
+  </g>
+</svg>

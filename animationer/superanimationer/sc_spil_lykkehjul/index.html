@@ -38,7 +38,11 @@
         <div class="plakat" id="plakat" hidden></div>
     </section>
 
-    <section class="styring" aria-label="Styring">
+    <section class="styring" id="styring" aria-label="Styring">
+        <!-- Alene: her skriver spilleren løsningen -->
+        <div class="svarfelt" id="svarfelt" hidden>
+            <input type="text" id="svar-input" autocomplete="off" spellcheck="false" maxlength="80" placeholder="Skriv løsningen" aria-label="Løsningen">
+        </div>
         <div class="bogstaver" id="bogstaver">
             <div class="bogstavgruppe" id="konsonanter" aria-label="Konsonanter"></div>
             <div class="bogstavgruppe vokaler" id="vokaler" aria-label="Vokaler"></div>
@@ -62,13 +66,17 @@
     <section class="titel" id="titel">
         <img class="titel-logo" src="sprites/titel.svg" alt="Kemi-Lykkehjulet">
         <div class="opsaetning" id="opsaetning">
+            <div class="tilstand" id="tilstand" role="group" aria-label="Hvem spiller">
+                <button type="button" data-tilstand="hold" id="tilstand-hold"><b>Hold på tavlen</b><small>Klassen spiller, læreren styrer</small></button>
+                <button type="button" data-tilstand="alene" id="tilstand-alene"><b>Alene</b><small>Én spiller ved sin egen computer</small></button>
+            </div>
             <div class="opsaetning-raekke">
                 <span class="etiket">Quiz</span>
                 <select id="quizvalg" aria-label="Quiz"></select>
                 <button type="button" class="pille graa lille-pille" id="egneknap" title="Skriv, upload eller eksportér quizzer som tekst">Quizzer som tekst</button>
             </div>
             <div class="titel-quiz" id="titel-quiz"></div>
-            <div class="opsaetning-raekke">
+            <div class="opsaetning-raekke kun-hold">
                 <span class="etiket">Hold</span>
                 <div class="holdantal">
                     <button type="button" id="hold-minus" aria-label="Færre hold">−</button>
@@ -76,7 +84,13 @@
                     <button type="button" id="hold-plus" aria-label="Flere hold">+</button>
                 </div>
             </div>
-            <div class="holdnavne" id="holdnavne"></div>
+            <div class="holdnavne kun-hold" id="holdnavne"></div>
+            <div class="opsaetning-raekke kun-alene">
+                <span class="etiket">Navn</span>
+                <input type="text" id="alene-navn" class="alene-navn" maxlength="22" spellcheck="false" aria-label="Dit navn">
+                <span class="rekord" id="rekord"></span>
+            </div>
+            <p class="alene-regler kun-alene">Du har 3 liv i hver runde. Et bogstav, der ikke er der, Fallit, Mist tur og en forkert løsning koster et liv. Du skriver selv løsningen, og en toss-up er mere værd, jo hurtigere du løser den.</p>
             <div class="titel-knapper">
                 <p class="lydkilde" id="lydkilde"></p>
                 <button type="button" class="pille" id="fortsaet" hidden>Fortsæt spillet</button>
@@ -110,6 +124,13 @@
         </ul>
         <h3>Finalen</h3>
         <p>Holdet med flest point drejer præmiehjulet og får en kuvert. R, S, T, L, N og E vises. Holdet vælger 3 konsonanter og 1 vokal og har så 10 sekunder til at løse gåden. Kuvertens beløb vises til sidst.</p>
+        <h3>Alene ved computeren</h3>
+        <ul>
+            <li>Du skriver selv løsningen, og spillet tjekker den. Store og små bogstaver, mellemrum og bindestreger er ligegyldige, og ae, oe og aa gælder for æ, ø og å.</li>
+            <li>Du har 3 liv i hver runde. Alt, der ville give turen videre, koster et liv: et bogstav, der ikke er der, Fallit, Mist tur og en forkert løsning. Uden liv er runden tabt, og du får intet fra den.</li>
+            <li>En toss-up er mindre værd, jo flere bogstaver der er vist. Et forkert svar viser 2 bogstaver mere.</li>
+            <li>I finalen har du 20 sekunder til at skrive løsningen. Din rekord gemmes i browseren.</li>
+        </ul>
         <h3>Til læreren</h3>
         <p>Klik på lampen over et hold for at give det turen. Klik på navnet eller pointene for at rette dem. Fortryd træder et skridt tilbage. Spillet huskes, også hvis siden lukkes.</p>
         <h3>Genveje</h3>
@@ -199,6 +220,7 @@ Final: I naturen ; Koffein</pre>
 <script src="js/editor.js"></script>
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/praesentation.js"></script>

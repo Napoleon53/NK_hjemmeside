@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stofmængdeberegning</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚖</span> Stofmængdeberegning</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-formel" role="tab" aria-selected="true"><span class="nr">1</span>Formlen</button>
+        <button class="faneknap" data-fane="fane-vaegt" role="tab" aria-selected="false"><span class="nr">2</span>Vægten</button>
+        <button class="faneknap" data-fane="fane-hurtig" role="tab" aria-selected="false"><span class="nr">3</span>Hurtigrunden</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FORMLEN                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-formel" role="tabpanel" aria-label="Formlen">
+    <div class="scene">
+        <canvas id="formel-laerred"></canvas>
+        <div class="anker" id="formel-anker-formel"></div>
+        <div class="anker" id="formel-anker-skema"></div>
+        <div class="anker" id="formel-anker-bunke"></div>
+        <div class="anker" id="formel-anker-laerer"></div>
+        <div class="kboble" id="formel-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="formel-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> (Vis trekanten ->) Vis svaret -> Naeste runde -->
+        <div class="kort opgavekort" id="formel-kort">
+            <h2><span id="formel-titel">Runde</span><span class="taeller">runde <b id="formel-nr">1</b>/<span id="formel-antal">6</span></span></h2>
+            <div id="formel-prompt"></div>
+            <div class="raekker" id="formel-raekker" hidden></div>
+            <p class="besked" id="formel-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="formel-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="formel-opgaver">
+            <h2>Runderne <span class="taeller">løst <b id="formel-loest">0</b>/6</span></h2>
+            <div class="hyldeliste" id="formel-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: VAEGTEN                                                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-vaegt" role="tabpanel" aria-label="Vægten">
+    <div class="scene">
+        <canvas id="vaegt-laerred"></canvas>
+        <div class="anker" id="vaegt-anker-tavle"></div>
+        <div class="anker" id="vaegt-anker-bord"></div>
+        <div class="anker" id="vaegt-anker-poser"></div>
+        <div class="anker" id="vaegt-anker-laerer"></div>
+        <div class="kboble" id="vaegt-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="vaegt-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="vaegt-kort">
+            <h2><span id="vaegt-titel">Opgave</span><span class="taeller">opgave <b id="vaegt-nr">1</b>/<span id="vaegt-antal">6</span></span></h2>
+            <div id="vaegt-prompt"></div>
+            <div class="raekker" id="vaegt-raekker"></div>
+            <p class="besked" id="vaegt-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="vaegt-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="vaegt-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="vaegt-loest">0</b>/6</span></h2>
+            <div class="hyldeliste" id="vaegt-liste"></div>
+            <button class="knap nye" id="vaegt-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: HURTIGRUNDEN                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-hurtig" role="tabpanel" aria-label="Hurtigrunden">
+    <div class="scene">
+        <canvas id="hurtig-laerred"></canvas>
+        <div class="anker" id="hurtig-anker-tavle"></div>
+        <div class="anker" id="hurtig-anker-svar"></div>
+        <div class="anker" id="hurtig-anker-laerer"></div>
+        <div class="kboble" id="hurtig-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="hurtig-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="hurtig-kort">
+            <h2><span>Hurtigrunden</span></h2>
+            <p class="maal-tekst">Svar så hurtigt, du kan. Formlen skal sidde uden at tænke over den.</p>
+            <p class="besked" id="hurtig-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap blaa banker" id="hurtig-knap" type="button">Start runden</button></div>
+        </div>
+
+        <div class="kort maaling" id="hurtig-data">
+            <h2>Runden</h2>
+            <div class="talraekke"><span>Tid med straf</span><span class="tal gul" id="hurtig-tid">0 s</span></div>
+            <div class="talraekke"><span>Rigtige første gang</span><span class="tal" id="hurtig-rigtige">0/12</span></div>
+            <div class="talraekke"><span>Fejl</span><span class="tal" id="hurtig-fejl">0</span></div>
+            <div class="talraekke"><span>Din rekord</span><span class="tal" id="hurtig-rekord">ingen endnu</span></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Stofmængde, masse og molarmasse</h2>
+        <p>Stofmængden n tæller portioner af 1 mol. Molarmassen M er massen af 1 mol. Massen m er det, vægten viser.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Formlen</span>
+            n = <span class="broek"><span>m</span><span>M</span></span>&nbsp;&nbsp;&nbsp;&nbsp;m = n · M&nbsp;&nbsp;&nbsp;&nbsp;M = <span class="broek"><span>m</span><span>n</span></span>
+        </div>
+        <table class="teoritabel">
+            <thead><tr><th>Størrelse</th><th>Symbol</th><th>Enhed</th></tr></thead>
+            <tbody>
+                <tr><td>stofmængde</td><td><i>n</i></td><td>mol</td></tr>
+                <tr><td>masse</td><td><i>m</i></td><td>g</td></tr>
+                <tr><td>molarmasse</td><td><i>M</i></td><td>g/mol</td></tr>
+            </tbody>
+        </table>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Enhederne</span>
+            <span class="broek"><span>g</span><span>g/mol</span></span> = g · <span class="broek"><span>mol</span><span>g</span></span> = mol
+        </div>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            116,88 g natriumchlorid, M(NaCl) = 58,44 g/mol<br>
+            n(NaCl) = <span class="broek"><span>m</span><span>M</span></span> = <span class="broek"><span>116,88 g</span><span>58,44 g/mol</span></span> = 2,00 mol
+        </div>
+        <p>Molarmassen står i en tabel eller regnes ud af atommasserne.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/regning.js"></script>
+<script src="js/sim_formel.js"></script>
+<script src="js/sim_vaegt.js"></script>
+<script src="js/sim_hurtig.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

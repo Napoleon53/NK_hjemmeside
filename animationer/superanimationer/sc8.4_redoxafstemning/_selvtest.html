@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, sc8.4 Afstem redoxreaktioner</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Åbner index.html i en iframe og kontrollerer det, man ikke kan se på
+   et skærmbillede: at modellen afstemmer alle reaktioner rigtigt, at
+   oxidationstallene passer med tabelværdierne, at de typiske fejl
+   bliver genkendt og får den rigtige besked, at alle reaktioner kan
+   gennemføres med rigtige svar og med Vis svaret, at vægten følger med,
+   at Kemichael tilbyder sin præsentation og går igen, at sproget
+   overholder reglerne, og at skemaet står på én linje. Skal køres
+   gennem en lokal server med animationer/ som rod (Kemichael hentes
+   derfra).
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+try {
+    localStorage.removeItem("nk-sc8.4-loest");
+    localStorage.removeItem("nk-sc8.4-ros");
+    localStorage.removeItem("nk-sc8.4-intro");
+} catch (e) {}
+
+window.addEventListener("load", function () { setTimeout(koer, 1200); });
+
+function koer() {
+    try { koerAlt(); } catch (e) { fejl++; skriv("  FEJL  undtagelse: " + e + "\n" + (e.stack || ""), "fejl"); }
+    vis();
+}
+
+function koerAlt() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, X = NK.Redox, T = NK.Niveau.TRIN;
+    paastand("tre sværhedsgrader er bygget", !!(NK.niveauer && NK.niveauer.let && NK.niveauer.middel && NK.niveauer.svaer));
+    paastand("Kemichael og vægten findes", !!NK.laerer && !!NK.vaegt);
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    var tekster = [];
+
+    /* ----- 2. Modellen ---------------------------------------------------- */
+    overskrift("2. Modellen");
+    var alle = X.alle(), fejlliste = [];
+    function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a; }
+    alle.forEach(function (R) {
+        var t = X.taelling(R, R.koef, R.ion, R.vand), q = X.ladninger(R, R.koef, R.ion), grund = [];
+        Object.keys(t.v).concat(Object.keys(t.h)).forEach(function (s) { if ((t.v[s] || 0) !== (t.h[s] || 0)) grund.push(s); });
+        if (q.v !== q.h) grund.push("ladning");
+        if (R.koef.concat([R.ion.antal, R.vand.antal]).filter(function (x) { return x; }).reduce(gcd) !== 1) grund.push("ikke mindste tal");
+        if (!(R.ox.til > R.ox.fra) || !(R.red.til < R.red.fra)) grund.push("par");
+        if (R.ox.v >= 2 || R.red.v >= 2 || R.ox.h < 2 || R.red.h < 2 || R.ox.v === R.red.v || R.ox.h === R.red.h) grund.push("pladser");
+        R.led.forEach(function (l) { Object.keys(l.st.ox).forEach(function (s) { if (l.st.ox[s] % 1) grund.push("brøk i " + l.st.f); }); });
+        if (R.elektroner !== R.koef[R.red.v] * R.red.ePrEnhed) grund.push("elektroner");
+        if (grund.length) fejlliste.push(R.id + ": " + grund.join(", "));
+    });
+    paastand("alle " + alle.length + " reaktioner er afstemt i atomer og ladning, med de mindste tal", fejlliste.length === 0, fejlliste.join(" | "));
+    var lvl = { let: X.paaNiveau("let"), middel: X.paaNiveau("middel"), svaer: X.paaNiveau("svaer") };
+    paastand("Let 9, Middel 14, Svær 14 reaktioner (den gamle havde 7)", lvl.let.length === 9 && lvl.middel.length === 14 && lvl.svaer.length === 14);
+    paastand("Let: ingen O, H eller miljø, så ladningen passer af sig selv", lvl.let.every(function (R) {
+        return !R.miljoe && !R.ion.antal && !R.vand.antal && R.led.every(function (l) { return !l.st.el.O && !l.st.el.H; }) && R.ladning.v === R.ladning.h;
+    }));
+    paastand("Middel: surt miljø, H⁺ før pilen og vand efter", lvl.middel.every(function (R) { return R.miljoe === "surt" && R.ion.side === "v" && R.vand.side === "h"; }));
+    var sv = lvl.svaer;
+    paastand("Svær har basisk miljø, H⁺ efter pilen, OH⁻ før pilen og samme grundstof begge veje",
+        sv.some(function (R) { return R.miljoe === "basisk" && R.ion.side === "h"; })
+        && sv.some(function (R) { return R.miljoe === "basisk" && R.ion.side === "v"; })
+        && sv.some(function (R) { return R.miljoe === "surt" && R.ion.side === "h"; })
+        && sv.filter(function (R) { return R.samme; }).length >= 4);
+    paastand("de gamle syv er med (MnO₄⁻/Fe²⁺, Cr₂O₇²⁻/Cl⁻, NO₃⁻/Cu, MnO₄⁻/I⁻, ClO⁻/I⁻, Pb/PbO₂, Fe/Fe³⁺)",
+        ["M1", "M6", "M2", "S1", "S2", "S8", "S9"].every(function (id) { return alle.some(function (R) { return R.id === id; }); }));
+    function skema(id) { return X.skemaTekst(alle.filter(function (R) { return R.id === id; })[0].slut); }
+    paastand("stikprøver af færdige skemaer",
+        skema("M1") === "MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ ⟶ Mn²⁺ + 5 Fe³⁺ + 4 H₂O"
+        && skema("M6") === "Cr₂O₇²⁻ + 6 Cl⁻ + 14 H⁺ ⟶ 2 Cr³⁺ + 3 Cl₂ + 7 H₂O"
+        && skema("S1") === "2 MnO₄⁻ + I⁻ + H₂O ⟶ 2 MnO₂ + IO₃⁻ + 2 OH⁻"
+        && skema("S8") === "Pb + PbO₂ + 4 H⁺ ⟶ 2 Pb²⁺ + 2 H₂O"
+        && skema("S9") === "Fe + 2 Fe³⁺ ⟶ 3 Fe²⁺"
+        && skema("S13") === "3 MnO₄²⁻ + 4 H⁺ ⟶ 2 MnO₄⁻ + MnO₂ + 2 H₂O",
+        skema("M1") + " | " + skema("S13"));
+
+    /* ----- 3. Oxidationstal ------------------------------------------------ */
+    overskrift("3. Oxidationstal");
+    var kendte = { "MnO4 -": 7, "Cr2O7 2-": 6, "H2O2": -1, "NH4 +": -3, "C2O4 2-": 3, "MnO4 2-": 6, "SO3 2-": 4, "NO2 -": 3, "ClO -": 1, "IO3 -": 5, "H2S": -2, "O2": 0, "Fe 3+": 3, "I -": -1 };
+    var forkerteOx = Object.keys(kendte).filter(function (f) { var st = X.stof(f); return st.ox[st.ukendt] !== kendte[f]; });
+    paastand("stikprøver: Mn +VII i MnO₄⁻, Cr +VI, O −I i H₂O₂, N −III i NH₄⁺ osv.", forkerteOx.length === 0, forkerteOx.join(", "));
+    var laes = [["+VII", 7], ["vii", 7], ["VII", 7], ["7", 7], ["+7", 7], ["-ii", -2], ["−II", -2], ["−2", -2], ["0", 0], [" +III ", 3], ["x7", NaN], ["", NaN]];
+    var laesFejl = laes.filter(function (x) { var v = X.laesOx(x[0]); return isNaN(x[1]) ? !isNaN(v) : v !== x[1]; });
+    paastand("felterne læser romertal og almindelige tal, med og uden fortegn", laesFejl.length === 0, laesFejl.map(function (x) { return x[0]; }).join(", "));
+    paastand("romertal: +VII, −II, 0, +IV, −III", X.ox(7) === "+VII" && X.ox(-2) === "−II" && X.ox(0) === "0" && X.ox(4) === "+IV" && X.ox(-3) === "−III");
+
+    /* ----- 4. De typiske fejl --------------------------------------------- */
+    overskrift("4. De typiske fejl får en besked, der passer");
+    var mn = X.stof("MnO4 -"), cr = X.stof("Cr2O7 2-"), fe = X.stof("Fe 2+"), cl2 = X.stof("Cl2"), io = X.stof("I -");
+    paastand("ionens ladning glemt: MnO₄⁻ med +VIII", /glemt ionens ladning/.test(X.oxFejl(mn, 8)));
+    paastand("summen ikke delt: Cr₂O₇²⁻ med +XII", /Del summen/.test(X.oxFejl(cr, 12)));
+    paastand("fortegnet: MnO₄⁻ med −VII og I⁻ med +I", /fortegnet/.test(X.oxFejl(mn, -7)) && /fortegnet/.test(X.oxFejl(io, 1)));
+    paastand("ladningen på hele ionen: MnO₄⁻ med −I", /gælder hele/.test(X.oxFejl(mn, -1)));
+    paastand("grundstof og ion af ét atom", /grundstof/.test(X.oxFejl(cl2, 1)) && /ion af ét atom/.test(X.oxFejl(fe, 3)));
+    var M4 = alle.filter(function (R) { return R.id === "M4"; })[0], M1 = alle.filter(function (R) { return R.id === "M1"; })[0];
+    paastand("elektroner for hele Cr₂O₇²⁻ i stedet for ét atom", /ét atom/.test(X.eFejl(M4, M4.red, 6)));
+    paastand("oxidationstallet i stedet for forskellen", /forskellen/.test(X.eFejl(M1, M1.red, 7)));
+
+    /* Fejlene i motoren: brug et niveau og en bestemt reaktion */
+    var niv = NK.niveauer.middel;
+    NK.visNiveau("middel");
+    function tilReaktion(n, id) { n.start(n.liste.map(function (R) { return R.id; }).indexOf(id)); }
+    function rigtigt(n) {
+        var R = n.R;
+        switch (n.trin) {
+        case T.OX: R.led.forEach(function (l, i) { n.f.o[i] = X.ox(l.st.ox[l.st.ukendt]); }); n.tjek(); break;
+        case T.PAR: var L = n.parListe(); n.valgKlik(1, L[1].type); break;
+        case T.E: n.f.eox = String(R.ox.delta); n.f.ered = "-" + R.red.delta; n.tjek(); break;
+        case T.K: R.koef.forEach(function (v, i) { n.f.k[i] = String(v); }); n.tjek(); break;
+        case T.LAD: n.f.lv = X.lad(R.ladning.v); n.f.lh = String(R.ladning.h); n.tjek(); break;
+        case T.ION: n.f[R.ion.side === "v" ? "iv" : "ih"] = String(R.ion.antal); n.tjek(); break;
+        case T.VAND: n.f[R.vand.side === "v" ? "wv" : "wh"] = String(R.vand.antal); n.tjek(); break;
+        }
+    }
+    function til(n, trin) { var g = 0; while (n.trin < trin && !n.faerdig && g++ < 12) rigtigt(n); }
+    function besked(n) { return n.besked.tekst; }
+
+    tilReaktion(niv, "M1");
+    niv.f.o = { 0: "+8", 1: "+II", 2: "+II", 3: "" }; niv.tjek();
+    paastand("trin 1: forkert Mn giver beskeden om ladningen, og det tomme felt nævnes", /glemt ionens ladning/.test(besked(niv)) && /mangler også/.test(besked(niv)) && niv.ok[1] && !niv.ok[0], besked(niv));
+    niv.valgKlik(0, "ox");
+    paastand("klik på et par før tid gør ingenting", niv.trin === T.OX);
+    til(niv, T.PAR);
+    var L = niv.parListe(), forkert = L[0].type === "ox" ? "red" : "ox";
+    niv.valgKlik(0, forkert);
+    paastand("trin 2: forkert valg forklarer, om tallet stiger eller falder", niv.trin === T.PAR && /(stiger|falder), så det er en/.test(besked(niv)) && !!niv.parFejl, besked(niv));
+    niv.valgKlik(0, L[0].type);
+    paastand("trin 2: rigtigt valg forklarer begge par", niv.trin === T.E && /oxideres/.test(besked(niv)) && /reduceres/.test(besked(niv)));
+    niv.f.eox = "3"; niv.f.ered = "7"; niv.tjek();
+    paastand("trin 3: et oxidationstal i stedet for forskellen", /forskellen/.test(besked(niv)), besked(niv));
+    niv.f.eox = "5"; niv.f.ered = "1"; niv.tjek();
+    paastand("trin 3: byttet om", /byttet om/.test(besked(niv)), besked(niv));
+    til(niv, T.K);
+    niv.f.k = { 0: "1", 1: "1", 2: "1", 3: "1" }; niv.tjek();
+    paastand("trin 4: elektronerne går ikke op, med regnskabet", /Afgivet: 1 · 1 e⁻ = 1 e⁻\. Optaget: 1 · 5 e⁻ = 5 e⁻\./.test(besked(niv)), besked(niv));
+    niv.f.k = { 0: "1", 1: "5", 2: "1", 3: "1" }; niv.tjek();
+    paastand("trin 4: Fe går ikke op i produkterne", /5 Fe før pilen og 1 efter/.test(besked(niv)), besked(niv));
+    niv.f.k = { 0: "2", 1: "10", 2: "2", 3: "10" }; niv.tjek();
+    paastand("trin 4: afstemt, men ikke de mindste tal", /deles med 2/.test(besked(niv)), besked(niv));
+    niv.f.k = { 0: "", 1: "5", 2: "", 3: "5" }; niv.tjek();
+    paastand("trin 4: tomme felter tæller ikke som 1; eleven skriver også 1", niv.trin === T.K && /også når det er 1/.test(besked(niv)) && niv.fejlF.k0 && niv.fejlF.k2 && !niv.fejlF.k1, besked(niv));
+    niv.f.k = { 0: "1", 1: "5", 2: "1", 3: "5" }; niv.tjek();
+    niv.f.lv = "1"; niv.f.lh = "+17"; niv.tjek();
+    paastand("trin 5: koefficienterne glemt, med et eksempel", /husk koefficienterne\. 5 Fe²⁺ har ladningen 5 · \(\+2\) = \+10/.test(besked(niv)), besked(niv));
+    til(niv, T.ION);
+    niv.f.ih = "8"; niv.tjek();
+    paastand("trin 6: H⁺ på den forkerte side", /mindst ladning/.test(besked(niv)), besked(niv));
+    niv.f.ih = "2"; niv.f.iv = "6"; niv.tjek();
+    paastand("trin 6: på begge sider", /Kun på den ene side/.test(besked(niv)), besked(niv));
+    niv.f.ih = ""; niv.f.iv = "6"; niv.tjek();
+    paastand("trin 6: for få, med ladningen, som den er nu", /\+15 før pilen og \+17 efter\. Der er 2 H⁺ for få/.test(besked(niv)), besked(niv));
+    niv.f.iv = "8"; niv.tjek();
+    niv.f.wv = "4"; niv.tjek();
+    paastand("trin 7: vand på den forkerte side", /mangler O/.test(besked(niv)), besked(niv));
+    niv.f.wv = ""; niv.f.wh = "3"; niv.tjek();
+    paastand("trin 7: for lidt vand", /Tæl O: 4 før pilen og 3 efter/.test(besked(niv)), besked(niv));
+    niv.f.wh = "4"; niv.tjek();
+    paastand("M1 er afstemt efter fejlene og tæller som løst", niv.faerdig && !niv.vist && (JSON.parse(w.localStorage.getItem("nk-sc8.4-loest")) || {}).M1 === "loest");
+
+    /* Basisk: OH⁻ på den forkerte side */
+    NK.visNiveau("svaer");
+    var ns = NK.niveauer.svaer;
+    tilReaktion(ns, "S1"); til(ns, T.ION);
+    ns.f.iv = "2"; ns.tjek();
+    paastand("basisk: OH⁻ før pilen, hvor de ikke skal stå", /størst ladning/.test(besked(ns)), besked(ns));
+    tilReaktion(ns, "S12"); til(ns, T.OX);
+    ns.f.o = { 0: "+VII", 1: "-II", 2: "+II", 3: "0" }; ns.tjek();
+    paastand("H₂O₂: O er ikke −II", /O er ikke −II her/.test(besked(ns)), besked(ns));
+
+    /* ----- 5. Hele forløbet ------------------------------------------------ */
+    overskrift("5. Alle reaktioner kan gennemføres");
+    try { w.localStorage.removeItem("nk-sc8.4-loest"); w.localStorage.removeItem("nk-sc8.4-ros"); } catch (e) {}
+    var ikkeFaerdig = [], forkertSlut = [], hints = [], ustabil = [];
+    ["let", "middel", "svaer"].forEach(function (id) {
+        NK.visNiveau(id);
+        var n = NK.niveauer[id];
+        n.liste.forEach(function (R, i) {
+            n.start(i);
+            var g = 0, trinSet = [];
+            while (!n.faerdig && g++ < 12) {
+                trinSet.push(n.trin);
+                var h = n.hint();
+                n.hintFelt = null;
+                if (!h || /undefined|NaN/.test(h)) hints.push(R.id + " trin " + (n.trin + 1));
+                tekster.push(h);
+                var foer = n.trin;
+                rigtigt(n);
+                tekster.push(n.besked.tekst);
+                if (n.trin === foer && !n.faerdig) { ustabil.push(R.id + " trin " + (foer + 1) + ": " + n.besked.tekst); break; }
+            }
+            if (!n.faerdig || n.vist) ikkeFaerdig.push(R.id);
+            var tavle = d.getElementById("tavle").textContent.replace(/\s+/g, " ").trim().replace(/ ?⟶ ?/, " ⟶ ");
+            var forvent = X.skemaTekst(R.slut).replace(/\s+/g, " ");
+            if (tavle.replace(/ /g, "") !== forvent.replace(/ /g, "")) forkertSlut.push(R.id + ": " + tavle);
+            if (!R.miljoe && trinSet.indexOf(T.ION) >= 0) ustabil.push(R.id + " fik trin 6 uden miljø");
+        });
+    });
+    paastand("alle 37 reaktioner kan afstemmes med rigtige svar på alle trin", ikkeFaerdig.length === 0 && ustabil.length === 0, ikkeFaerdig.concat(ustabil).join(" | "));
+    paastand("tavlen viser til sidst det færdige, sammenskrevne skema", forkertSlut.length === 0, forkertSlut.slice(0, 3).join(" | "));
+    paastand("der er et hint på hvert trin i hver reaktion", hints.length === 0, hints.slice(0, 4).join(", "));
+    var h = JSON.parse(w.localStorage.getItem("nk-sc8.4-loest")) || {};
+    paastand("alle 37 er gemt som løst i browseren", alle.every(function (R) { return h[R.id] === "loest"; }));
+    paastand("knappen går videre til en anden reaktion, når alt er løst", (function () {
+        var n = NK.niveauer.svaer, foer = n.nr;
+        n.naeste();
+        return n.nr !== foer && !n.faerdig;
+    }()));
+
+    /* Vis svaret på hvert trin */
+    try { w.localStorage.removeItem("nk-sc8.4-loest"); } catch (e) {}
+    var svarFejl = [];
+    ["let", "middel", "svaer"].forEach(function (id) {
+        NK.visNiveau(id);
+        var n = NK.niveauer[id];
+        n.liste.forEach(function (R, i) {
+            n.start(i);
+            var g = 0;
+            while (!n.faerdig && g++ < 12) {
+                n.knap();
+                if (n.besked.klasse !== "gul" || !/^Hint: /.test(n.besked.tekst)) { svarFejl.push(R.id + " hint"); break; }
+                n.knap();
+                tekster.push(n.besked.tekst);
+                if (/undefined|NaN/.test(n.besked.tekst)) svarFejl.push(R.id + ": " + n.besked.tekst);
+            }
+            if (!n.faerdig || !n.vist) svarFejl.push(R.id + " ikke færdig");
+        });
+    });
+    h = JSON.parse(w.localStorage.getItem("nk-sc8.4-loest")) || {};
+    paastand("Giv hint og Vis svaret fører gennem alle 37, og de står som svaret vist", svarFejl.length === 0 && alle.every(function (R) { return h[R.id] === "vist"; }), svarFejl.slice(0, 3).join(" | "));
+    paastand("trinlisten skriver svaret vist, og Let har trin 6 og 7 som ikke nødvendige", (function () {
+        NK.visNiveau("let");
+        var n = NK.niveauer.let;
+        n.start(0);
+        var ikke = d.querySelectorAll("#trinliste .unoedig").length === 2;
+        n.knap(); n.knap();
+        return ikke && d.querySelectorAll("#trinliste .vist").length === 1 && /svaret vist/.test(d.getElementById("trinliste").textContent);
+    }()));
+
+    /* ----- 6. Vægten ---------------------------------------------------------- */
+    overskrift("6. Vægten");
+    NK.visNiveau("middel");
+    niv = NK.niveauer.middel;
+    tilReaktion(niv, "M4");
+    var vd = niv.vaegtData();
+    paastand("før trin 2 er skålene tomme", vd.fase === 0);
+    til(niv, T.E);
+    paastand("efter trin 2: én brik på hver skål, elektronerne ukendte", niv.vaegtData().fase === 1);
+    til(niv, T.K);
+    vd = niv.vaegtData();
+    paastand("i trin 4: Fe²⁺ til venstre med 1 e⁻, Cr₂O₇²⁻ til højre med 2 · 3 = 6 e⁻", vd.fase === 3 && vd.v.tekst === "Fe²⁺" && vd.v.ePr === 1 && vd.h.tekst === "Cr₂O₇²⁻" && vd.h.ePr === 6);
+    var vg = NK.vaegt, k;
+    for (k = 0; k < 120; k++) vg.opdater(1 / 60, niv, 900, 420);
+    paastand("før eleven skriver noget: tomme skåle, vægten lige, intet facit under skemaet og ingen 1-taller i felterne",
+        vd.v.antal === 0 && vd.h.antal === 0 && Math.abs(vg.vinkel) < 0.01 && d.getElementById("kontrol").textContent === ""
+        && !d.querySelector('#tavle .koeffelt[placeholder="1"]'));
+    for (k = 0; k < 6; k++) niv.vaegtKlik("v", 1);
+    paastand("plus under venstre skål skriver 6 foran Fe²⁺ på tavlen", niv.f.k[M4.ox.v] === "6" && d.querySelector('[data-felt="k' + M4.ox.v + '"]').value === "6");
+    for (k = 0; k < 120; k++) vg.opdater(1 / 60, niv, 900, 420);
+    paastand("med tom højre skål tipper den mod venstre", vg.vinkel < -0.04);
+    niv.vaegtKlik("h", 1);
+    for (k = 0; k < 120; k++) vg.opdater(1 / 60, niv, 900, 420);
+    paastand("vægten står lige, når 6 · 1 e⁻ = 1 · 6 e⁻", Math.abs(vg.vinkel) < 0.01);
+    niv.vaegtKlik("v", -1);
+    for (k = 0; k < 120; k++) vg.opdater(1 / 60, niv, 900, 420);
+    paastand("med 5 Fe²⁺ tipper den mod højre", vg.vinkel > 0.04);
+    niv.vaegtKlik("h", -1);
+    niv.vaegtKlik("h", -1);
+    paastand("minus ned til tomt felt og ikke længere", niv.f.k[M4.red.v] === "" && d.querySelector('[data-felt="k' + M4.red.v + '"]').value === "");
+    paastand("kontrollen under skemaet er tom i trin 4", d.getElementById("kontrol").textContent === "");
+    var fr = w.document.createElement("canvas");
+    fr.width = 900; fr.height = 420;
+    var L = new NK.Laerred(fr);
+    L.tilpas = function () { return false; };
+    L.b = 900; L.h = 420;
+    var tegnet = true;
+    try { vg.tegn(L, null); } catch (e) { tegnet = false; }
+    paastand("vægten kan tegnes i alle faser", tegnet);
+    for (k = 0; k < 60 * 14; k++) NK.laerer.opdater(1 / 60);     /* rosen fra afsnit 5 skal være færdig */
+    var skueren = NK.laerer.laerer.scene ? NK.laerer.laerer.scene.navn : null;
+    for (k = 0; k < 20; k++) niv.vaegtKlik("h", 1);
+    paastand("påskeægget: 20 på en skål kalder Kemichael ind", NK.laerer.laerer.scene && NK.laerer.laerer.scene.navn === "overvaegt", skueren);
+    niv.vaegtKlik("v", 1);
+    paastand("plus og minus gør ingenting uden for trin 4", (function () { til(niv, T.LAD); var f = niv.f.k[0]; niv.vaegtKlik("v", 1); return niv.f.k[0] === f; }()));
+
+    /* ----- 7. Kemichael ------------------------------------------------------- */
+    overskrift("7. Kemichael");
+    var lr = NK.laerer;
+    function korL(sek) { for (var t = 0; t < sek * 60; t++) lr.opdater(1 / 60); }
+    korL(8);
+    try { w.localStorage.removeItem("nk-sc8.4-intro"); } catch (e) {}
+    var tilbud = d.getElementById("tilbud");
+    NK.visNiveau("let"); korL(0.3);
+    paastand("første gang står tilbuddet fremme, og han kommer ikke af sig selv", !tilbud.hidden && w.getComputedStyle(tilbud).display !== "none" && !lr.laererIIntro());
+    tilbud.querySelector(".tilbud-start").click(); korL(1.5);
+    paastand("Start præsentation: han går ind og taler", lr.laererIIntro() && tilbud.hidden && w.getComputedStyle(tilbud).display === "none");
+    korL(4);
+    paastand("under anden replik peger han, og opgavekortet lyser op", lr.introTrin === D.INTRO_PEG + 1 ? d.getElementById("opgavekort").classList.contains("peg") : true);
+    d.getElementById("spring-over").click(); korL(0.2);
+    paastand("Spring over sender ham ud", !lr.laererIIntro());
+    NK.visNiveau("middel"); korL(0.3);
+    var viste = !tilbud.hidden;
+    tilbud.querySelector(".tilbud-nej").click(); korL(0.2);
+    paastand("Middel: Nej tak skjuler tilbuddet og huskes", viste && tilbud.hidden && w.getComputedStyle(tilbud).display === "none" && !!(JSON.parse(w.localStorage.getItem("nk-sc8.4-intro")) || {}).middel);
+    NK.visNiveau("svaer"); korL(0.3);
+    viste = !tilbud.hidden;
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); korL(0.2);
+    paastand("Svær: Esc er Nej tak", viste && tilbud.hidden && !!(JSON.parse(w.localStorage.getItem("nk-sc8.4-intro")) || {}).svaer);
+    NK.visNiveau("let"); korL(0.3);
+    paastand("en sværhedsgrad, der er set, viser ikke tilbuddet igen", tilbud.hidden);
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "k", bubbles: true })); korL(1.5);
+    paastand("K viser præsentationen uden at spørge", lr.laererIIntro());
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); korL(0.2);
+    paastand("Esc under præsentationen sender ham ud", !lr.laererIIntro());
+    var lange = [];
+    Object.keys(D.INTRO).forEach(function (id) { D.INTRO[id].forEach(function (l) { if (l.length > 60) lange.push(l); }); });
+    Object.keys(D.ROS).forEach(function (id) { if (D.ROS[id].length > 60) lange.push(D.ROS[id]); });
+    D.OVERVAEGT.forEach(function (l) { if (l.length > 60) lange.push(l); });
+    paastand("tre præsentationer à tre replikker, alle replikker højst 60 tegn",
+        D.NIVEAU_RAEKKE.every(function (id) { return D.INTRO[id] && D.INTRO[id].length === 3; }) && lange.length === 0, lange.join(" | "));
+    korL(4);
+    try { w.localStorage.removeItem("nk-sc8.4-ros"); w.localStorage.removeItem("nk-sc8.4-loest"); } catch (e) {}
+    NK.visNiveau("let");
+    var nl = NK.niveauer.let;
+    nl.liste.forEach(function (R, i) { nl.start(i); til(nl, 99); });
+    korL(1.2);
+    paastand("ros, første gang alle lette er løst", lr.laerer.scene && lr.laerer.scene.navn === "ros");
+    korL(8);
+
+    /* ----- 8. Sproget ------------------------------------------------------------ */
+    overskrift("8. Sproget");
+    tekster.push(d.body.innerText);
+    Object.keys(D.INTRO).forEach(function (k2) { tekster = tekster.concat(D.INTRO[k2]); });
+    Object.keys(D.ROS).forEach(function (k2) { tekster.push(D.ROS[k2]); });
+    tekster = tekster.concat(D.OVERVAEGT);
+    D.REAKTIONER.forEach(function (r) { if (r.kontekst) tekster.push(r.kontekst); });
+    alle.forEach(function (R) {
+        R.led.forEach(function (l) { tekster.push(X.oxHint(l.st), X.oxBeregning(l.st)); [-9, -2, -1, 0, 1, 3, 8, 12].forEach(function (v) { tekster.push(X.oxFejl(l.st, v)); }); });
+        [R.ox, R.red].forEach(function (Pp) { [1, 2, 5, 6, 7].forEach(function (v) { tekster.push(X.eFejl(R, Pp, v)); }); });
+    });
+    NK.Niveau.TRIN_DEF.forEach(function (t) { alle.forEach(function (R) { tekster.push(typeof t.navn === "function" ? t.navn(R) : t.navn, t.spm(R)); }); });
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(^|[^0-9·(+−=\s])1[+−]|¹[⁺⁻]/.test(alt), (alt.match(/.{0,20}(1[+−]|¹[⁺⁻]).{0,20}/) || [""])[0]);
+    paastand("ingen undefined eller NaN i teksterne", !/undefined|NaN/.test(alt), (alt.match(/.{0,30}(undefined|NaN).{0,30}/) || [""])[0]);
+    paastand("ingen dobbelte mellemrum eller punktum", !/[^\n ] {2,}[^ ]|\.\./.test(alt.replace(/ /g, " ")), (alt.match(/.{0,20}( {2,}|\.\.).{0,20}/) || [""])[0]);
+    var smaa = [];
+    Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+        if (!e.offsetWidth || !e.childNodes.length) return;
+        var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+        if (!harTekst) return;
+        var fs = parseFloat(w.getComputedStyle(e).fontSize);
+        if (fs < 11.5) smaa.push(e.tagName + "." + e.className + " " + fs + "px");
+    });
+    paastand("ingen synlig tekst under 12 px", smaa.length === 0, smaa.slice(0, 4).join(", "));
+
+    /* ----- 9. Layout --------------------------------------------------------------- */
+    overskrift("9. Layout");
+    var stoerrelser = [[1500, 900], [1400, 860], [1280, 720], [1100, 700], [900, 650]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        w.dispatchEvent(new w.Event("resize"));
+        var ombrudt = [], lille = [];
+        ["middel", "svaer"].forEach(function (id) {
+            NK.visNiveau(id);
+            var n = NK.niveauer[id];
+            n.liste.forEach(function (R, i) {
+                n.start(i);
+                var g = 0;
+                while (!n.faerdig && g++ < 12) {
+                    var sk = d.querySelector("#tavle .skema"), b = sk.children, bund = b[0].offsetTop + b[0].offsetHeight;
+                    for (var j = 1; j < b.length; j++) if (Math.abs(b[j].offsetTop + b[j].offsetHeight - bund) > 6) { ombrudt.push(R.id + " t" + (n.trin + 1)); break; }
+                    var fs = parseFloat(w.getComputedStyle(sk).fontSize);
+                    if (fs < 15) lille.push(R.id);
+                    rigtigt(n);
+                }
+            });
+        });
+        var bredt = d.documentElement.scrollWidth > w.innerWidth + 1;
+        paastand(st[0] + " × " + st[1] + (st[0] < 1000 ? ": skemaet må bryde om, men siden er ikke for bred" : ": skemaet står på én linje i alle trin, og siden er ikke for bred"),
+            (st[0] < 1000 || ombrudt.length === 0) && !bredt && lille.length === 0, ombrudt.slice(0, 4).join(", ") + (bredt ? " bredt" : "") + (lille.length ? " for lille skrift" : ""));
+    });
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

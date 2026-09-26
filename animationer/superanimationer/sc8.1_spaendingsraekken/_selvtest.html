@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc8.1 Spændingsrækken</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at spændingsrækken følger E°, at skemaet på
+   fane 1 har de rigtige reaktioner, at koefficienterne er de mindste og
+   giver lige mange elektroner begge veje for alle opgaver, at tjekket
+   giver den rigtige besked ved de typiske fejl, at luppen afgiver lige
+   så mange elektroner, som den optager, at sproget overholder reglerne,
+   at alle tre faner kan gennemføres (fane 1 og 2 også med musen), at
+   Kemichael kan vises og sendes ud, og at layoutet holder fra 520 × 380
+   til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens valg og lægger dem tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc8.1-intro-forsoeg", "nk-sc8.1-intro-raekken", "nk-sc8.1-intro-forudsig",
+    "nk-sc8.1-ros-forsoeg", "nk-sc8.1-ros-raekken", "nk-sc8.1-ros-forudsig"];
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+async function koer() {
+    var ramme = document.getElementById("ramme");
+    var W = ramme.contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { await koerTest(W, ramme); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Fanens model koeres frem i tiden */
+function koerTid(sim, sek) {
+    for (var t = 0; t < sek; t += 1 / 30) sim.opdater(1 / 30);
+}
+
+function mus(W, sim, type, x, y) {
+    var c = sim.L.canvas, r = c.getBoundingClientRect();
+    var e = new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 1, bubbles: true, button: 0, buttons: type === "pointerup" ? 0 : 1 });
+    c.dispatchEvent(e);
+}
+
+function traek(W, sim, x0, y0, x1, y1) {
+    mus(W, sim, "pointerdown", x0, y0);
+    for (var n = 1; n <= 8; n++) mus(W, sim, "pointermove", x0 + (x1 - x0) * n / 8, y0 + (y1 - y0) * n / 8);
+    mus(W, sim, "pointerup", x1, y1);
+}
+
+async function koerTest(W, ramme) {
+    var NK = W.NK, K = NK.Kemi, D = NK.Data;
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Modellen: rækken og reaktionerne");
+    var sorteret = K.RAEKKE.slice().sort(function (a, b) { return K.STOF[a].E - K.STOF[b].E; });
+    paastand("spændingsrækken står efter E°", sorteret.join() === K.RAEKKE.join(), K.RAEKKE.join(" "));
+    paastand("rækken er bogens: K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au",
+        K.RAEKKE.join(" ") === "K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au");
+    var tal = {};
+    D.STAENGER.forEach(function (m) { tal[m] = D.GLAS.filter(function (i) { return K.reagerer(m, i); }).length; });
+    paastand("fane 1: Mg reagerer med 5, Zn 4, Fe 3, Cu 1, Ag 0", tal.Mg === 5 && tal.Zn === 4 && tal.Fe === 3 && tal.Cu === 1 && tal.Ag === 0, JSON.stringify(tal));
+    paastand("fane 1 har 25 forsøg (5 × 6 uden de 5 med samme metal)", NK.Skema.ialt === 25, NK.Skema.ialt);
+    paastand("et metal reagerer ikke med sine egne ioner", !K.reagerer("Zn", "Zn") && !K.reagerer("Cu", "Cu"));
+    paastand("Cu reagerer ikke med saltsyre, Zn gør", !K.reagerer("Cu", "H") && K.reagerer("Zn", "H"));
+
+    var FACIT = { "Zn/Cu": [1, 1, 1, 1], "Cu/Ag": [1, 2, 1, 2], "Al/Cu": [2, 3, 2, 3], "Mg/H": [1, 2, 1, 1],
+        "Al/H": [2, 6, 2, 3], "Cu/Au": [3, 2, 3, 2], "Pb/Ag": [1, 2, 1, 2], "Fe/Sn": [1, 1, 1, 1], "Zn/Au": [3, 2, 3, 2] };
+    Object.keys(FACIT).forEach(function (n) {
+        var p = n.split("/"), r = K.reaktion(p[0], p[1]);
+        paastand("koefficienterne for " + K.skemaTekst(r), r.koef.join() === FACIT[n].join(), r.koef.join());
+    });
+    paastand("skemaet skrives som i sc8.4: Cu(s) + 2 Ag⁺(aq) ⟶ Cu²⁺(aq) + 2 Ag(s)",
+        K.skemaTekst(K.reaktion("Cu", "Ag")) === "Cu(s) + 2 Ag⁺(aq) ⟶ Cu²⁺(aq) + 2 Ag(s)", K.skemaTekst(K.reaktion("Cu", "Ag")));
+    paastand("H₂ som produkt: Mg(s) + 2 H⁺(aq) ⟶ Mg²⁺(aq) + H₂(g)",
+        K.skemaTekst(K.reaktion("Mg", "H")) === "Mg(s) + 2 H⁺(aq) ⟶ Mg²⁺(aq) + H₂(g)");
+
+    var alle = K.alleOpgaver(), gode = 0, smaa = 0;
+    alle.forEach(function (p) {
+        if (Math.abs(K.forskel(p[0], p[1])) < K.MINDSTE_FORSKEL || p[0] === p[1]) smaa++;
+        if (!K.reagerer(p[0], p[1])) { gode++; return; }
+        var r = K.reaktion(p[0], p[1]);
+        var e1 = r.koef[0] * r.a, e2 = r.koef[1] * r.b;
+        var g = NK.gcd(NK.gcd(r.koef[0], r.koef[1]), NK.gcd(r.koef[2], r.koef[3]));
+        if (e1 === r.e && e2 === r.e && g === 1 && K.tjekKoef(r, r.koef).ok) gode++;
+    });
+    paastand("alle " + alle.length + " opgaver: lige mange e⁻ begge veje, mindste tal, og facit godkendes", gode === alle.length, gode + "/" + alle.length);
+    paastand("ingen opgave med samme metal eller under " + K.MINDSTE_FORSKEL + " V fra hinanden", smaa === 0, smaa);
+    var ok12 = D.OPGAVER.every(function (p) {
+        return K.STAENGER.indexOf(p[0]) >= 0 && K.OPLOESNINGER.indexOf(p[1]) >= 0 && Math.abs(K.forskel(p[0], p[1])) >= K.MINDSTE_FORSKEL;
+    });
+    paastand("de 12 første opgaver er gyldige par", ok12 && D.OPGAVER.length === 12);
+    var nej = D.OPGAVER.filter(function (p) { return !K.reagerer(p[0], p[1]); }).length;
+    paastand("de 12 første: både ja og nej (4 nej)", nej === 4, nej);
+    paastand("første opgave er ikke én, hvor intet skal afstemmes (ikke kun et nej)", K.reagerer(D.OPGAVER[0][0], D.OPGAVER[0][1]));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Tjekket af koefficienterne");
+    var rCA = K.reaktion("Cu", "Ag"), rMH = K.reaktion("Mg", "H"), rAC = K.reaktion("Al", "Cu");
+    function kode(r, t) { return K.tjekKoef(r, t).kode; }
+    paastand("tomt felt tæller som ikke besvaret", kode(rCA, [1, NaN, 1, 2]) === "tom");
+    paastand("0 tæller som ikke besvaret", kode(rCA, [1, 0, 1, 2]) === "tom");
+    paastand("1, 1, 1, 1 for Cu og Ag⁺: ladningen passer ikke", kode(rCA, [1, 1, 1, 1]) === "ladning");
+    paastand("2, 4, 2, 4 for Cu og Ag⁺: kan forkortes", kode(rCA, [2, 4, 2, 4]) === "forkort");
+    paastand("1, 2, 1, 1 for Cu og Ag⁺: Ag passer ikke", kode(rCA, [1, 2, 1, 1]) === "atomI");
+    paastand("2, 2, 1, 2 for Cu og Ag⁺: Cu passer ikke", kode(rCA, [2, 2, 1, 2]) === "atomM");
+    paastand("1, 2, 1, 2 for Mg og H⁺: H₂ har to H", kode(rMH, [1, 2, 1, 2]) === "atomI");
+    paastand("1, 2, 1, 1 for Mg og H⁺ er rigtigt", K.tjekKoef(rMH, [1, 2, 1, 1]).ok);
+    paastand("2, 3, 2, 3 for Al og Cu²⁺ er rigtigt", K.tjekKoef(rAC, [2, 3, 2, 3]).ok);
+    var b1 = D.koefBesked(rAC, K.tjekKoef(rAC, [1, 1, 1, 1]));
+    paastand("beskeden om ladningen nævner +2 og +3", /\+2/.test(b1) && /\+3/.test(b1), b1);
+    paastand("beskeden ved rigtigt svar tæller elektronerne: 2 Al afgiver 6 e⁻, og 3 Cu²⁺ optager 6 e⁻",
+        D.elektronTekst(rAC) === "2 Al afgiver 6 e⁻, og 3 Cu²⁺ optager 6 e⁻.", D.elektronTekst(rAC));
+    paastand("forkert produkt: stangen selv", /stangen/.test(D.produktForkert(rCA, "m")));
+    paastand("forkert produkt: H som atomer", /to atomer/.test(D.produktForkert(rMH, "h")));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Luppen: lige mange elektroner afgivet og optaget");
+    ["Zn/Cu", "Cu/Ag", "Al/Cu", "Mg/H", "Al/H", "Cu/Au"].forEach(function (n) {
+        var p = n.split("/"), lup = new NK.Lup();
+        lup.saet(p[0], p[1]);
+        lup.springFrem(4);
+        var r = K.reaktion(p[0], p[1]);
+        paastand(n + ": 4 hændelser, " + (4 * r.e) + " e⁻ afgivet og optaget",
+            lup.antal === 4 && lup.afgivet === 4 * r.e && lup.optaget === 4 * r.e, lup.antal + " / " + lup.afgivet + " / " + lup.optaget);
+    });
+    var lupN = new NK.Lup();
+    lupN.saet("Ag", "Cu");
+    for (var t = 0; t < 10; t += 0.05) lupN.opdater(0.05);
+    paastand("Ag i Cu²⁺: ingen elektroner flytter sig på 10 s", lupN.afgivet === 0 && lupN.antal === 0);
+    var besoegt = lupN.dele.some(function (q) { return q.besoeg !== undefined; });
+    paastand("Ag i Cu²⁺: ionerne besøger stangen og svømmer videre", besoegt);
+    var lupH = new NK.Lup();
+    lupH.saet("Mg", "H");
+    lupH.springFrem(2);
+    paastand("Mg i H⁺: der kommer bobler med H₂", lupH.bobler.length > 0 || lupH.antal === 2);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Sproget");
+    var tekster = [];
+    function saml(v) {
+        if (typeof v === "string") tekster.push(v);
+        else if (Array.isArray(v)) v.forEach(saml);
+        else if (v && typeof v === "object") Object.keys(v).forEach(function (k) { saml(v[k]); });
+    }
+    saml(D.MAAL); saml(D.INTRO_FORSOEG); saml(D.INTRO_RAEKKEN); saml(D.INTRO_FORUDSIG);
+    [D.ROS_FORSOEG, D.ROS_RAEKKEN, D.ROS_FORUDSIG, D.AEG_KAFFE, D.RK_PROMPT, D.RK_HINT, D.RK_FAERDIG, D.PRODUKT_SPM, D.KOEF_SPM, D.FU_SPM].forEach(saml);
+    alle.concat([["Fe", "H"], ["H", "Cu"]]).forEach(function (p) {
+        var m = p[0], i = p[1];
+        if (m === "H") { tekster.push(D.rkForkert("Cu", "H", true)); return; }
+        tekster.push(D.iagttagelse(m, i), D.fuSvar(m, i, true), D.fuSvar(m, i, false), D.fuHint(m, i), D.opgaveTekst(m, i));
+        if (K.reagerer(m, i)) {
+            var r = K.reaktion(m, i);
+            tekster.push(D.produktHint(r), D.produktForkert(r, "m"), D.produktForkert(r, "i"), D.koefHint(r), D.elektronTekst(r));
+            ["atomM", "atomI", "ladning", "forkort"].forEach(function (k) { tekster.push(D.koefBesked(r, { kode: k, v: 1, h: 2, g: 2 })); });
+        }
+    });
+    tekster.push(D.rkForkert("H", "Zn", false), D.rkForkert("Fe", "Zn", true));
+    var doc = ramme.contentDocument;
+    tekster.push(doc.getElementById("teori").textContent);
+    var tankestreg = tekster.filter(function (s) { return /—/.test(s) || /\s–\s/.test(s); });
+    paastand("ingen tankestreger i " + tekster.length + " tekster", tankestreg.length === 0, tankestreg[0]);
+    var enPlus = tekster.filter(function (s) { return /¹⁺|¹⁻|1\+|1−/.test(s); });
+    paastand("ladning 1 skrives som + og −, aldrig 1+ og 1−", enPlus.length === 0, enPlus[0]);
+    var lange = D.INTRO_FORSOEG.concat(D.INTRO_RAEKKEN, D.INTRO_FORUDSIG).filter(function (s) { return s.length > 60; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange[0]);
+    paastand("ingen 'natronlud'", tekster.every(function (s) { return !/natronlud/i.test(s); }));
+    paastand("ingen 'undefined' eller 'NaN' i teksterne", tekster.every(function (s) { return !/undefined|NaN/.test(s); }),
+        tekster.filter(function (s) { return /undefined|NaN/.test(s); })[0]);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 1: forsøget med musen");
+    NK.visFane("fane-forsoeg");
+    var f = NK.sims["fane-forsoeg"];
+    await vent(200);
+    var tilbud = doc.getElementById("fs-tilbud");
+    paastand("tilbuddet om præsentationen vises første gang", !tilbud.hidden && W.getComputedStyle(tilbud).display !== "none");
+    f.afvisTilbud();
+    paastand("Nej tak skjuler tilbuddet (også i stilarket)", W.getComputedStyle(tilbud).display === "none");
+    f.nulstil();
+    koerTid(f, 1.5);
+    var zn = f.staenger[1], cuG = f.lay.glas[3];
+    traek(W, f, zn.x, zn.top + 30, cuG.cx, cuG.y - 10);
+    paastand("zinkstangen trukket hen over Cu²⁺-glasset havner i det", zn.glas === 3, zn.glas);
+    koerTid(f, 2.5);
+    paastand("stangen står i glasset", zn.fase === "i");
+    paastand("skemaet: Zn i Cu²⁺ er en reaktion", NK.Skema.get("Zn", "Cu") === true);
+    paastand("mål 1 er nået, og spørgsmålet er fremme", f.maalFase === "spm");
+    paastand("zinkstangen har fået et lag", f.stangTegning(zn).belaeg && f.stangTegning(zn).belaeg.x > 0.1);
+    paastand("scenelinjen siger det, man ser", /stangen bliver brun/.test(doc.getElementById("fs-status").textContent), doc.getElementById("fs-status").textContent);
+    f.vaelgSvar(1);
+    paastand("forkert svar (Rust) giver en forklaring", /Rust/.test(doc.getElementById("fs-besked").textContent));
+    f.vaelgSvar(0);
+    paastand("rigtigt svar: Kobber", f.maalFase === "svar" && /optager elektroner/.test(doc.getElementById("fs-besked").textContent));
+    f.knap();
+    paastand("Næste: mål 2", f.maalNr === 1 && f.maalFase === "goer");
+    /* Et klik paa kobberstangen og saa paa Ag-glasset */
+    var cu = f.staenger[3];
+    mus(W, f, "pointerdown", cu.x, cu.top + 30);
+    mus(W, f, "pointerup", cu.x, cu.top + 30);
+    paastand("klik på en stang vælger den", f.valgt === 3);
+    var agG = f.lay.glas[4];
+    mus(W, f, "pointerup", agG.cx, agG.y + agG.h * 0.6);
+    paastand("klik på et glas bagefter sætter stangen i", cu.glas === 4);
+    koerTid(f, 2.5);
+    paastand("mål 2: spørgsmålet om den blå farve", f.maalFase === "spm" && /blå/.test(D.MAAL[1].spm));
+    f.knap(); f.knap();
+    paastand("Giv hint og Vis svaret: det rigtige svar", f.maalFase === "svar");
+    f.knap();
+    /* Maal 3: soelv i Cu²⁺. Zinken skal foerst ud af glasset. */
+    f.saetI(4, 3);
+    paastand("en ny stang i et glas sender den gamle hjem", zn.glas === -1 && f.glas[3].stang === f.staenger[4]);
+    koerTid(f, 2.5);
+    paastand("skemaet: Ag i Cu²⁺ er ingen reaktion", NK.Skema.get("Ag", "Cu") === false);
+    paastand("scenelinjen: intet sker", /intet sker/.test(doc.getElementById("fs-status").textContent));
+    f.vaelgSvar(0);
+    f.knap();
+    /* Maal 4: syren */
+    f.saetI(3, 5);
+    koerTid(f, 2.5);
+    paastand("Cu i saltsyre: ingen bobler, målet er ikke nået", f.maalFase === "goer" && NK.Skema.get("Cu", "H") === false);
+    f.saetI(1, 5);
+    koerTid(f, 2.5);
+    paastand("Zn i saltsyre: bobler", f.glas[5].bobler.length > 0);
+    paastand("mål 4 nået", f.maalFase === "spm");
+    f.vaelgSvar(0);
+    f.knap();
+    paastand("mål 5: resten af skemaet", D.MAAL[f.maalNr].id === "skema");
+    /* Paaskeaegget: en stang over kaffen */
+    var ag = f.staenger[4];
+    koerTid(f, 1);
+    traek(W, f, ag.x, ag.top + 30, f.lay.kop.x, f.lay.kop.y - 20);
+    paastand("påskeæg: stangen over kaffen sendes hjem, og Kemichael siger noget", ag.glas === -1 && f.aegVist && !!f.laerer.scene);
+    koerTid(f, 6);
+    f.knap(); f.knap();
+    paastand("Vis svaret fylder skemaet ud", NK.Skema.fuldt() && f.maalFase === "faerdig");
+    paastand("knappen går videre til rækken", /rækken/.test(doc.getElementById("fs-knap").textContent));
+    var celler = doc.querySelectorAll("#fs-skema td.ja").length;
+    paastand("skemaet viser 13 flueben", celler === 13, celler);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 2: rækken");
+    NK.visFane("fane-raekken");
+    var rk = NK.sims["fane-raekken"];
+    rk.afvisTilbud();
+    rk.nulstil();
+    koerTid(rk, 1);
+    paastand("kortene ligger ikke i den rigtige rækkefølge fra start", rk.kort.map(function (k) { return k.sym; }).join() !== rk.facit().join());
+    var mg = rk.kort.filter(function (k) { return k.sym === "Mg"; })[0];
+    var p0 = rk.lay.pladser[0];
+    traek(W, rk, mg.x + rk.lay.kb / 2, mg.y + rk.lay.kh / 2, p0.x, p0.y + p0.h / 2);
+    paastand("Mg trukket op på plads 1", mg.plads === 0, mg.plads);
+    ["Fe", "Zn", "H", "Cu", "Ag"].forEach(function (s, n) {
+        rk.saetPaa(rk.kort.filter(function (k) { return k.sym === s; })[0], n + 1);
+    });
+    paastand("forkert rækkefølge: Fe og Zn bliver røde", rk.fejlPar && rk.fejlPar.join() === "Fe,Zn", JSON.stringify(rk.fejlPar));
+    paastand("beskeden bruger skemaet: zink reagerede med jernionerne", /Zink står til højre for jern\. Men zink reagerede med jernionerne/.test(doc.getElementById("rk-besked").textContent),
+        doc.getElementById("rk-besked").textContent);
+    rk.saetPaa(rk.kort.filter(function (k) { return k.sym === "Zn"; })[0], 1);
+    paastand("byt: Zn og Fe bytter plads", rk.pladser[1].sym === "Zn" && rk.pladser[2].sym === "Fe");
+    paastand("rigtig rækkefølge: færdig", rk.fase === "faerdig");
+    koerTid(rk, 3);
+    paastand("bogens række er kommet frem", rk.afsloer === 1);
+    paastand("Kemichael roser første gang", W.localStorage.getItem("nk-sc8.1-ros-raekken") === "true");
+    rk.nulstil();
+    rk.saetPaa(rk.kort.filter(function (k) { return k.sym === "Cu"; })[0], 0);
+    rk.saetPaa(rk.kort.filter(function (k) { return k.sym === "H"; })[0], 1);
+    ["Mg", "Zn", "Fe", "Ag"].forEach(function (s, n) { rk.saetPaa(rk.kort.filter(function (k) { return k.sym === s; })[0], n + 2); });
+    paastand("H til højre for Cu: beskeden om bobler i saltsyren", /kobber giver ingen bobler i saltsyren/.test(doc.getElementById("rk-besked").textContent),
+        doc.getElementById("rk-besked").textContent);
+    rk.knap();
+    paastand("hintet viser en kolonne med antallet af flueben", doc.querySelectorAll("#rk-skema td.ialt").length === 5);
+    rk.knap();
+    paastand("Vis svaret stiller kortene rigtigt", rk.fase === "faerdig" && rk.pladser.map(function (k) { return k.sym; }).join() === "Mg,Zn,Fe,H,Cu,Ag");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 3: forudsig");
+    NK.visFane("fane-forudsig");
+    var fu = NK.sims["fane-forudsig"];
+    fu.afvisTilbud();
+    fu.nulstil();
+    var loeste = 0, fejlOpg = [];
+    for (var n = 0; n < 12; n++) {
+        var m = fu.par[0], i = fu.par[1], reag = K.reagerer(m, i);
+        fu.gaet(reag ? 0 : 1);
+        koerTid(fu, 3.2);
+        if (reag) {
+            if (fu.fase !== "produkt") fejlOpg.push(m + "/" + i + " fase " + fu.fase);
+            fu.chips.forEach(function (c, k) { if (c.rigtig !== undefined) fu.vaelgChip(k); });
+            var felter = doc.querySelectorAll("#fu-skema input");
+            fu.r.koef.forEach(function (v, k) { felter[k].value = String(v); });
+            fu.tjekKoef();
+        }
+        if (fu.fase === "faerdig") loeste++;
+        else fejlOpg.push(m + "/" + i + " " + fu.fase);
+        if (n < 11) fu.knap();
+    }
+    paastand("de 12 opgaver kan gennemføres", loeste === 12, fejlOpg.join("; "));
+    paastand("12 af 12 gættet rigtigt", fu.rigtige === 12 && fu.besvarede === 12, fu.rigtige + "/" + fu.besvarede);
+    paastand("listen viser højst 6 svar", doc.querySelectorAll("#fu-log .logrk").length === 6);
+    paastand("Kemichael roser efter den tolvte", W.localStorage.getItem("nk-sc8.1-ros-forudsig") === "true");
+    fu.knap();
+    paastand("opgave 13 er et tilfældigt, gyldigt par", fu.nr === 12 && Math.abs(K.forskel(fu.par[0], fu.par[1])) >= K.MINDSTE_FORSKEL, fu.par.join("/"));
+    /* Forkerte svar paa en opgave med Al og Cu²⁺ */
+    fu.nr = 6; fu.nyOpgave();
+    paastand("opgave 8 er Al i kobber(II)sulfat", fu.par.join("/") === "Al/Cu");
+    fu.gaet(1);
+    koerTid(fu, 3.2);
+    paastand("forkert gæt: rød besked, der forklarer med rækken", /står til venstre for kobber/.test(doc.getElementById("fu-svar").textContent));
+    paastand("pilen med e⁻ vises på rækken", fu.markeret);
+    var mChip = fu.chips.findIndex(function (c) { return c.slags === "m"; });
+    fu.vaelgChip(mChip);
+    paastand("forkert stof: besked om stangen", /stangen/.test(doc.getElementById("fu-besked").textContent));
+    fu.chips.forEach(function (c, k) { if (c.rigtig !== undefined) fu.vaelgChip(k); });
+    paastand("to rigtige stoffer: videre til afstemningen", fu.fase === "koef");
+    var fl = doc.querySelectorAll("#fu-skema input");
+    paastand("felterne er tomme (intet facit før tid)", Array.prototype.every.call(fl, function (x) { return x.value === ""; }));
+    fu.tjekKoef();
+    paastand("tomme felter: skriv et tal", /alle fire felter/.test(doc.getElementById("fu-besked").textContent));
+    [1, 1, 1, 1].forEach(function (v, k) { fl[k].value = v; });
+    fu.tjekKoef();
+    paastand("1, 1, 1, 1: ladningen", /ladningen gør ikke/.test(doc.getElementById("fu-besked").textContent));
+    fu.knap(); fu.knap();
+    paastand("Giv hint og Vis svaret afstemmer", fu.fase === "faerdig" && /2 Al afgiver 6 e⁻/.test(doc.getElementById("fu-besked").textContent));
+    fu.nr = 0; fu.nyOpgave();
+    fu.tast({ key: "n" });
+    paastand("tasten N svarer nej", fu.valgt === 1);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Kemichael på alle tre faner");
+    var navne = { "fane-forsoeg": "fs-spring", "fane-raekken": "rk-spring", "fane-forudsig": "fu-spring" };
+    for (var fane in navne) {
+        NK.visFane(fane);
+        var sim = NK.sims[fane];
+        sim.startIntro(true);
+        koerTid(sim, 1.5);
+        var inde = sim.laererIIntro();
+        var knapVist = !doc.getElementById(navne[fane]).hidden;
+        sim.springIntro();
+        koerTid(sim, 3);
+        paastand(fane + ": præsentationen starter med K og kan springes over", inde && knapVist && !sim.laererIIntro());
+    }
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Layoutet");
+    var STR = [[520, 380], [800, 560], [1100, 700], [1300, 820], [1500, 900]];
+    for (var s = 0; s < STR.length; s++) {
+        ramme.style.width = STR[s][0] + "px";
+        ramme.style.height = STR[s][1] + "px";
+        await vent(250);
+        var ok = true, note = "";
+        ["fane-forsoeg", "fane-raekken", "fane-forudsig"].forEach(function (fn) {
+            NK.visFane(fn);
+            var sm = NK.sims[fn];
+            try { sm.tilpas(); sm.opdater(0.02); sm.tegn(); } catch (e) { ok = false; note = fn + ": " + e.message; return; }
+            var lay = sm.lay;
+            if (fn === "fane-forsoeg") {
+                var sidst = lay.glas[5];
+                if (sidst.x + sidst.b > lay.W + 1) { ok = false; note = "glas uden for: " + lay.W; }
+                if (lay.lup.cy + lay.lup.R > lay.holder.y + lay.stang.inde - lay.stang.l) { ok = false; note = "luppen over stængerne"; }
+                if (lay.holder.x + lay.holder.b > lay.glas[0].x + 6) { ok = false; note = "holderen i glassene"; }
+            }
+            if (fn === "fane-raekken") {
+                if (lay.pladser[5].x + lay.kb / 2 > lay.W) { ok = false; note = "hylden uden for"; }
+                if (lay.hylde.y + 50 > lay.bordY - lay.kh) { ok = false; note = "kortene under hylden"; }
+            }
+            if (fn === "fane-forudsig") {
+                if (lay.glas.x + lay.glas.b > lay.lup.cx - lay.lup.R + 4) { ok = false; note = "glasset i luppen"; }
+            }
+        });
+        paastand("layoutet holder ved " + STR[s][0] + " × " + STR[s][1], ok, note);
+    }
+    ramme.style.width = "";
+    ramme.style.height = "";
+}
+</script>
+</body>
+</html>

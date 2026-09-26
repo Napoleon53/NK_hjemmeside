@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalk i muslingeskaller</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Kalk i muslingeskaller</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-forsoeg" role="tab" aria-selected="true"><span class="nr">1</span>Forsøget</button>
+        <button class="faneknap" data-fane="fane-beregning" role="tab" aria-selected="false"><span class="nr">2</span>Beregningen</button>
+        <button class="faneknap" data-fane="fane-fejl" role="tab" aria-selected="false"><span class="nr">3</span>Fejlkilder</button>
+    </div>
+
+    <div class="niveau" role="group" aria-label="Hvordan kalken regnes" title="Hvordan kalken regnes på fanen Beregningen (M)">
+        <button class="niveauknap" type="button" data-niveau="nf" aria-pressed="false">Uden mol</button>
+        <button class="niveauknap" type="button" data-niveau="mol" aria-pressed="true">Med mol</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FORSOEGET                                                  -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
+    <div class="scene">
+        <canvas id="forsoeg-laerred"></canvas>
+        <div class="anker" id="forsoeg-anker-baad"></div>
+        <div class="anker" id="forsoeg-anker-kolbe"></div>
+        <div class="anker" id="forsoeg-anker-zoom"></div>
+        <div class="anker" id="forsoeg-anker-laerer"></div>
+        <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny kolbe med syre og den samme prøve (R)">Start forfra ↺</button>
+        <div class="kboble" id="forsoeg-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="forsoeg-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="forsoeg-kort">
+            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">opgave <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">2</span></span></h2>
+            <div id="forsoeg-prompt"></div>
+            <div class="knaprad valgrad" id="forsoeg-valg" hidden></div>
+            <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="forsoeg-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="forsoeg-skema">
+            <h2>Skemaet</h2>
+            <table class="skema">
+                <thead><tr><th></th><th>m(før)</th><th>m(efter)</th></tr></thead>
+                <tbody>
+                    <tr id="forsoeg-r0"><th>Måling 1</th>
+                        <td><div class="felt lille"><input id="forsoeg-f0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før), måling 1"><span class="felt-efter">g</span></div></td>
+                        <td><div class="felt lille"><input id="forsoeg-e0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(efter), måling 1"><span class="felt-efter">g</span></div></td></tr>
+                    <tr id="forsoeg-r1"><th>Måling 2</th>
+                        <td><div class="felt lille"><input id="forsoeg-f1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før), måling 2"><span class="felt-efter">g</span></div></td>
+                        <td><div class="felt lille"><input id="forsoeg-e1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(efter), måling 2"><span class="felt-efter">g</span></div></td></tr>
+                </tbody>
+            </table>
+            <p class="note" id="forsoeg-note"></p>
+        </div>
+
+        <div class="kort" id="forsoeg-opgaver">
+            <h2>Målingerne <span class="taeller">løst <b id="forsoeg-loest">0</b>/2</span></h2>
+            <div class="hyldeliste" id="forsoeg-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: BEREGNINGEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-beregning" role="tabpanel" aria-label="Beregningen">
+    <div class="scene">
+        <canvas id="beregning-laerred"></canvas>
+        <div class="anker" id="beregning-anker-tavle"></div>
+        <div class="anker" id="beregning-anker-kaede"></div>
+        <div class="anker" id="beregning-anker-laerer"></div>
+        <div class="kboble" id="beregning-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="beregning-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="beregning-kort">
+            <h2><span id="beregning-titel">Opgave</span><span class="taeller">opgave <b id="beregning-nr">1</b>/<span id="beregning-antal">3</span></span></h2>
+            <div id="beregning-prompt"></div>
+            <div class="raekker" id="beregning-raekker"></div>
+            <p class="besked" id="beregning-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="beregning-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="beregning-opsum">
+            <h2>Opsummering</h2>
+            <table class="skema tal">
+                <thead><tr><th></th><th>Måling 1</th><th>Måling 2</th></tr></thead>
+                <tbody>
+                    <tr><th>Masse af CO₂</th><td id="beregning-o-co2-0"></td><td id="beregning-o-co2-1"></td></tr>
+                    <tr><th>Masse af CaCO₃</th><td id="beregning-o-kalk-0"></td><td id="beregning-o-kalk-1"></td></tr>
+                    <tr><th>Kalkindhold</th><td id="beregning-o-pct-0"></td><td id="beregning-o-pct-1"></td></tr>
+                </tbody>
+            </table>
+            <p class="note">Muslingeskaller har typisk 95-99 % kalk.</p>
+        </div>
+
+        <div class="kort" id="beregning-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="beregning-loest">0</b>/3</span></h2>
+            <div class="hyldeliste" id="beregning-liste"></div>
+            <button class="knap nye" id="beregning-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FEJLKILDER                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fejl" role="tabpanel" aria-label="Fejlkilder">
+    <div class="scene">
+        <canvas id="fejl-laerred"></canvas>
+        <div class="anker" id="fejl-anker-a"></div>
+        <div class="anker" id="fejl-anker-b"></div>
+        <div class="anker" id="fejl-anker-laerer"></div>
+        <button class="forfraknap" id="fejl-forfra" type="button" title="De samme to forsøg en gang til (R)">Kør igen ↺</button>
+        <div class="kboble" id="fejl-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="fejl-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="fejl-kort">
+            <h2><span id="fejl-titel">Opgave</span><span class="taeller">opgave <b id="fejl-nr">1</b>/<span id="fejl-antal">6</span></span></h2>
+            <div id="fejl-prompt"></div>
+            <div class="knaprad valgrad" id="fejl-valg" hidden></div>
+            <p class="besked" id="fejl-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fejl-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="fejl-resultat">
+            <h2>Resultaterne</h2>
+            <table class="skema tal" id="fejl-tabel">
+                <thead><tr><th></th><th>Gruppe A</th><th>Gruppe B</th></tr></thead>
+                <tbody>
+                    <tr><th>m(før)</th><td id="fejl-t-mf-a"></td><td id="fejl-t-mf-b"></td></tr>
+                    <tr><th>m(efter)</th><td id="fejl-t-me-a"></td><td id="fejl-t-me-b"></td></tr>
+                    <tr><th>m(CO₂)</th><td id="fejl-t-dm-a"></td><td id="fejl-t-dm-b"></td></tr>
+                    <tr class="kalk"><th>Kalkindhold</th><td id="fejl-t-pct-a"></td><td id="fejl-t-pct-b"></td></tr>
+                </tbody>
+            </table>
+            <p class="note">Begge grupper regner med 2,27 som i vejledningen.</p>
+        </div>
+
+        <div class="kort" id="fejl-opgaver">
+            <h2>Fejlkilderne <span class="taeller">løst <b id="fejl-loest">0</b>/6</span></h2>
+            <div class="hyldeliste" id="fejl-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Kalk i muslingeskaller</h2>
+        <p>Skallerne er mest kalk, calciumcarbonat. Saltsyre opløser kalken, og der dannes gassen CO₂.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Reaktionen</span>
+            CaCO₃(s) + 2 HCl(aq) → CaCl₂(aq) + CO₂(g) + H₂O(l)
+        </div>
+        <p>Det er en syre-base-reaktion. Carbonat-ionen er en base, der optager to hydroner fra syren: CO₃²⁻ + 2 H₃O⁺ → CO₂ + 3 H₂O.</p>
+        <p>CO₂ forlader kolben. Vægten falder derfor med massen af CO₂: m(CO₂) = m(før) − m(efter).</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Uden mol</span>
+            m(CaCO₃) = m(CO₂) · 2,27<br>
+            Kalkindhold = <span class="broek"><span>m(CaCO₃)</span><span>m(før)</span></span> · 100 %
+        </div>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Med mol</span>
+            n(CO₂) = <span class="broek"><span>m(CO₂)</span><span>M(CO₂)</span></span>&nbsp;&nbsp;&nbsp;
+            n(CaCO₃) = n(CO₂)&nbsp;&nbsp;&nbsp;
+            m(CaCO₃) = n(CaCO₃) · M(CaCO₃)
+        </div>
+        <p>Forholdet er 1 : 1, fordi der står 1 foran både CaCO₃ og CO₂ i skemaet. Tallet 2,27 er de to molarmasser divideret: 100,09 g/mol / 44,01 g/mol = 2,27.</p>
+        <p>Havet optager CO₂ fra luften og bliver lidt surere. Så bliver det sværere for muslinger og koraller at bygge og holde på deres kalk.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/regning.js"></script>
+<script src="js/sim_forsoeg.js"></script>
+<script src="js/sim_beregning.js"></script>
+<script src="js/sim_fejl.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

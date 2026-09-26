@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polære molekyler</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1>Polære molekyler</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-en" role="tab" aria-selected="true" title="Elektronegativitet (1)"><span class="nr">1</span>Elektronegativitet</button>
+        <button class="faneknap" data-fane="fane-polaritet" role="tab" aria-selected="false" title="Polær eller upolær? (2)"><span class="nr">2</span>Polær eller upolær?</button>
+        <button class="faneknap" data-fane="fane-vand" role="tab" aria-selected="false" title="Forsøg: vandstrålen (3)"><span class="nr">3</span>Forsøg: vandstrålen</button>
+    </div>
+
+    <button class="topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: ELEKTRONEGATIVITET                                         -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-en" role="tabpanel" aria-label="Elektronegativitet">
+    <div class="scene">
+        <canvas id="en-laerred" aria-label="To atomer, der deler et elektronpar, og en skala for forskellen i elektronegativitet"></canvas>
+        <div class="scenebesked" id="en-besked" aria-live="polite"></div>
+
+        <!-- Kemichael tegnes paa sit eget lag. app.js flytter laget og
+             knapperne ind i den aktive fanes scene. -->
+        <canvas id="laerer-lag" aria-hidden="true"></canvas>
+        <div class="tilbud" id="tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="en-tabel-kort">
+            <h2>Vælg atomer <span class="taeller">elektronegativitet</span></h2>
+            <div class="pt" id="en-tabel"></div>
+            <p class="note">Et klik sætter atomet ind i stedet for det med den gule ring.</p>
+        </div>
+
+        <div class="kort maaling" id="en-binding">
+            <h2>Bindingen</h2>
+            <div class="formelvis">
+                <span class="fformel" id="en-formel"></span>
+                <span class="fnavn" id="en-navn"></span>
+            </div>
+            <div class="talraekke"><span>ΔEN</span><span class="tal" id="en-regning"></span></div>
+            <div class="talraekke sum"><span>Bindingen er</span><span class="maerke" id="en-type"></span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Visning</h2>
+            <div class="tjekraekke">
+                <label class="tjek"><input type="checkbox" id="en-sky" checked> Elektronsky</label>
+                <label class="tjek"><input type="checkbox" id="en-delta" checked> δ+ og δ−</label>
+            </div>
+        </div>
+
+        <!-- Én knap: Start opgave -> Giv hint -> Vis svaret -> Ny opgave (js/opgave.js) -->
+        <div class="kort opgavekort">
+            <h2>Opgave <span class="taeller">løst: <b id="en-opg-loest">0</b></span></h2>
+            <p class="opgave-spm" id="en-opg-tekst"></p>
+            <div class="valg" id="en-opg-valg" hidden></div>
+            <p class="besked" id="en-opg-hint"></p>
+            <p class="besked" id="en-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="en-opg-knap" type="button">Start opgave</button></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: POLAER ELLER UPOLAER?                                      -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-polaritet" role="tabpanel" aria-label="Polær eller upolær?">
+    <div class="scene">
+        <canvas id="pol-laerred" aria-label="Det valgte molekyle med træk i de polære bindinger"></canvas>
+        <div class="prikpanel" id="pol-prikpanel">
+            <div class="prik-titel">Prikformel</div>
+            <canvas id="pol-prik"></canvas>
+        </div>
+        <div class="scenebesked" id="pol-besked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg molekyle</h2>
+            <div class="molvalg" id="pol-menu"></div>
+        </div>
+
+        <div class="kort">
+            <h2>Visning</h2>
+            <div class="tjekraekke">
+                <label class="tjek"><input type="checkbox" id="pol-delta" checked> δ+ og δ−</label>
+                <label class="tjek"><input type="checkbox" id="pol-traek" checked> Træk i bindingerne</label>
+                <label class="tjek"><input type="checkbox" id="pol-samlet"> Samlet træk</label>
+                <label class="tjek"><input type="checkbox" id="pol-drej" checked> Drej langsomt</label>
+            </div>
+        </div>
+
+        <div class="kort maaling" id="pol-en">
+            <h2>Bindingerne <span class="taeller">elektronegativitet</span></h2>
+            <div id="pol-en-tabel"></div>
+            <div class="talraekke sum"><span id="pol-formel">Molekylet</span><span class="maerke" id="pol-polaer"></span></div>
+        </div>
+
+        <div class="kort opgavekort">
+            <h2>Opgave <span class="taeller">løst: <b id="pol-opg-loest">0</b></span></h2>
+            <p class="opgave-spm" id="pol-opg-tekst"></p>
+            <div class="valg" id="pol-opg-valg" hidden></div>
+            <p class="besked" id="pol-opg-hint"></p>
+            <p class="besked" id="pol-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="pol-opg-knap" type="button">Start opgave</button></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FORSOEG MED VANDSTRAALEN                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-vand" role="tabpanel" aria-label="Forsøg: vandstrålen">
+    <div class="scene">
+        <canvas id="vand-laerred" aria-label="Laboratoriebord med tre haner over en vask, en plastikstav, en glasstav og en uldklud"></canvas>
+        <div class="scenebesked" id="vand-besked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev" id="vand-forloeb">
+            <h2>Resultater <span class="taeller" id="vand-taeller"></span></h2>
+            <p class="naeste" id="vand-naeste" aria-live="polite"></p>
+            <div id="vand-skema"></div>
+            <div class="knaprad">
+                <button class="knap nulstil" id="vand-forfra" type="button">Start forfra <span class="tegn">↺</span></button>
+            </div>
+        </div>
+
+        <div class="kort" id="vand-serie">
+            <h2>Tegneserie</h2>
+            <p class="besked" id="vand-serie-tekst">Låses op, når skemaet er udfyldt.</p>
+            <button class="knap blaa stor" id="vand-serieknap" type="button" hidden>Se forsøget som tegneserie <span class="tegn">→</span></button>
+        </div>
+
+        <div class="kort opgavekort" id="vand-opgave">
+            <h2>Opgave <span class="taeller">løst: <b id="vand-opg-loest">0</b></span></h2>
+            <p class="opgave-spm" id="vand-opg-tekst"></p>
+            <div class="valg" id="vand-opg-valg" hidden></div>
+            <p class="besked" id="vand-opg-hint"></p>
+            <p class="besked" id="vand-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="vand-opg-knap" type="button">Start opgave</button></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIBOKSEN: valgfri, aabnes med knappen eller T                    -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Teori: polære molekyler</h2>
+        <div class="teoriliste" id="teori-liste"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- TEGNESERIEN: aabnes fra fane 3, naar forsoeget er slut              -->
+<!-- ================================================================= -->
+<div class="overlay" id="tegneserie">
+    <div class="overlay-boks bred">
+        <h2>Forsøget som tegneserie</h2>
+        <div class="serie" id="serie-ruder"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/1</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/frastoedning.js"></script>
+<script src="js/model3d.js"></script>
+<script src="js/prikformel.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/valg.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/sim_en.js"></script>
+<script src="js/molsim.js"></script>
+<script src="js/sim_polaritet.js"></script>
+<script src="js/vand_tegning.js"></script>
+<script src="js/sim_vandstraale.js"></script>
+<script src="js/tegneserie.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

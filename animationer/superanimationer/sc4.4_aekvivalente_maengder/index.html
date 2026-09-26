@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ækvivalente mængder</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⟶</span> Ækvivalente mængder</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-hotdog" role="tab" aria-selected="true"><span class="nr">1</span>Pølsevognen</button>
+        <button class="faneknap" data-fane="fane-molekyler" role="tab" aria-selected="false"><span class="nr">2</span>Molekylerne</button>
+        <button class="faneknap" data-fane="fane-regn" role="tab" aria-selected="false"><span class="nr">3</span>Tavlen</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: POELSEVOGNEN                                               -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-hotdog" role="tabpanel" aria-label="Pølsevognen">
+    <div class="scene medtekst">
+        <canvas id="hotdog-laerred"></canvas>
+        <div class="anker" id="hotdog-anker-skilt"></div>
+        <div class="anker" id="hotdog-anker-bon"></div>
+        <div class="anker" id="hotdog-anker-beholdere"></div>
+        <div class="anker" id="hotdog-anker-braet"></div>
+        <div class="anker" id="hotdog-anker-klokke"></div>
+        <div class="anker" id="hotdog-anker-bakke"></div>
+        <div class="tilbud" id="hotdog-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="hotdog-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="hotdog-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste ordre -->
+        <div class="kort opgavekort" id="hotdog-kort">
+            <h2><span id="hotdog-titel">Ordre</span><span class="taeller" id="hotdog-taeller">ordre <b id="hotdog-nr">1</b>/<span id="hotdog-antal">10</span></span></h2>
+            <p class="maal-tekst" id="hotdog-prompt"></p>
+            <div class="vaelgerrad" id="hotdog-opskrifter" role="group" aria-label="Opskrift" hidden></div>
+            <div class="raekker" id="hotdog-raekker"></div>
+            <p class="besked" id="hotdog-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="hotdog-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="hotdog-disken">
+            <h2>På brættet</h2>
+            <div class="talraekke"><span id="hotdog-l-0">Pølser</span><span class="tal" id="hotdog-n-0">0</span></div>
+            <div class="talraekke"><span id="hotdog-l-1">Brød</span><span class="tal" id="hotdog-n-1">0</span></div>
+            <div class="talraekke"><span id="hotdog-l-2">Agurkeskiver</span><span class="tal" id="hotdog-n-2">0</span></div>
+            <div id="hotdog-serveret" hidden>
+                <div class="talraekke"><span id="hotdog-l-produkt">Hotdogs sidst</span><span class="tal gul" id="hotdog-n-produkt"></span></div>
+                <div class="talraekke"><span>Overskud</span><span class="tal" id="hotdog-n-rest"></span></div>
+            </div>
+        </div>
+
+        <div class="kort" id="hotdog-ordrer">
+            <h2>Ordrerne</h2>
+            <div class="hyldeliste" id="hotdog-grupper"></div>
+            <button class="knap nulstil" id="hotdog-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: MOLEKYLERNE                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-molekyler" role="tabpanel" aria-label="Molekylerne">
+    <div class="scene medtekst">
+        <canvas id="molekyler-laerred"></canvas>
+        <div class="anker" id="molekyler-anker-skilt"></div>
+        <div class="anker" id="molekyler-anker-plakat"></div>
+        <div class="anker" id="molekyler-anker-kasser"></div>
+        <div class="anker" id="molekyler-anker-kammer"></div>
+        <div class="tilbud" id="molekyler-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="molekyler-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="molekyler-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="molekyler-kort">
+            <h2><span id="molekyler-titel">Mål</span><span class="taeller" id="molekyler-taeller">mål <b id="molekyler-nr">1</b>/5</span></h2>
+            <p class="maal-tekst" id="molekyler-prompt"></p>
+            <p class="besked" id="molekyler-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="molekyler-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="molekyler-maaling">
+            <h2>I kammeret <span class="taeller" id="molekyler-enhedstekst">antal molekyler</span></h2>
+            <div class="tabel" id="molekyler-tabel"></div>
+            <div class="talraekke forhold"><span>Forholdet i skemaet</span><span class="tal gul" id="molekyler-forhold"></span></div>
+        </div>
+
+        <div class="kort" id="molekyler-frit" hidden>
+            <h2>Frit valg</h2>
+            <div class="vaelgerrad" id="molekyler-reaktioner" role="group" aria-label="Reaktion"></div>
+            <div class="vaelgerrad" id="molekyler-enhed" role="group" aria-label="Hvad én figur er">
+                <button class="vaelger" type="button" data-enhed="stk">1 figur = 1 molekyle</button>
+                <button class="vaelger" type="button" data-enhed="mol">1 figur = 1 mol</button>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: AEKVIVALENTE MAENGDER                                      -->
+<!-- Felterne under formlerne bygges af sim_regn.js                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-regn" role="tabpanel" aria-label="Tavlen">
+    <div class="scene medtekst">
+        <canvas id="regn-laerred"></canvas>
+        <div class="anker" id="regn-anker-skema"></div>
+        <div class="anker" id="regn-anker-soejler"></div>
+        <div class="tavle-felter" id="regn-felter"></div>
+        <div class="tilbud" id="regn-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="regn-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="regn-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="regn-kort">
+            <h2><span id="regn-niveau"></span><span class="taeller">opgave <b id="regn-nr">1</b>/<span id="regn-antal">4</span></span></h2>
+            <div class="opgave-prompt" id="regn-prompt"></div>
+            <p class="opgave-spm" id="regn-spm"></p>
+            <p class="besked" id="regn-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="regn-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="regn-beregninger">
+            <h2>Beregningerne</h2>
+            <div class="regn-linjer" id="regn-linjer"></div>
+        </div>
+
+        <div class="kort" id="regn-fremskridt">
+            <h2>Opgaverne <span class="taeller">løst <b id="regn-loest">0</b>/12</span></h2>
+            <div class="hyldeliste" id="regn-niveauer"></div>
+            <button class="knap nulstil" id="regn-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Ækvivalente mængder</h2>
+        <p>Et afstemt reaktionsskema er en opskrift. Koefficienterne siger, i hvilket forhold stofferne reagerer og dannes.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            2 H₂ + O₂ ⟶ 2 H₂O &nbsp;&nbsp;forholdet er 2 : 1 : 2
+        </div>
+        <p>Forholdet gælder for molekyler, og derfor også for mol, fordi 1 mol bare er et antal: 6,02 · 10²³ molekyler. Stofmængder, der passer sammen efter skemaet, kaldes ækvivalente.</p>
+        <p>Kender man stofmængden af ét stof, finder man de andre ved at gange med forholdet mellem koefficienterne:</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">3,0 mol H₂ reagerer</span>
+            n(O₂) = <span class="broek"><span>1</span><span>2</span></span> · n(H₂) = <span class="broek"><span>1</span><span>2</span></span> · 3,0 mol = 1,5 mol
+        </div>
+        <p>Koefficienten for det stof, man leder efter, står øverst i brøken, og koefficienten for det kendte stof nederst.</p>
+        <p>Passer mængderne ikke til skemaet, slipper ét stof op først. Det er det begrænsende, og det bestemmer, hvor meget der dannes. Resten er i overskud. Man finder det begrænsende ved at regne ud, hvor langt hvert stof rækker: mængden delt med koefficienten.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">9 pølser, 6 brød og 14 agurkeskiver</span>
+            rækker til 9 / 1 = 9, 6 / 1 = 6 og 14 / 2 = 7 hotdogs. Brødene er begrænsende.
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_hotdog.js"></script>
+<script src="js/sim_molekyler.js"></script>
+<script src="js/sim_regn.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

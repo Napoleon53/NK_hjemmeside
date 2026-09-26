@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idealgasligningen</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇕</span> Idealgasligningen</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-stempel" role="tab" aria-selected="true"><span class="nr">1</span>Stemplet</button>
+        <button class="faneknap" data-fane="fane-regn" role="tab" aria-selected="false"><span class="nr">2</span>Beregningen</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: STEMPLET                                                   -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-stempel" role="tabpanel" aria-label="Stemplet">
+    <div class="scene">
+        <canvas id="stempel-laerred"></canvas>
+        <div class="anker" id="stempel-anker-cylinder"></div>
+        <div class="anker" id="stempel-anker-manometer"></div>
+        <div class="anker" id="stempel-anker-plade"></div>
+        <div class="anker" id="stempel-anker-flaske"></div>
+        <div class="anker" id="stempel-anker-hylde"></div>
+        <div class="anker" id="stempel-anker-graf"></div>
+        <div class="anker" id="stempel-anker-laerer"></div>
+        <div class="kboble" id="stempel-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="stempel-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="stempel-kort">
+            <h2><span id="stempel-titel">Forudsig</span><span class="taeller">opgave <b id="stempel-nr">1</b>/7</span></h2>
+            <p class="maal-tekst" id="stempel-spm"></p>
+            <div class="valgliste" id="stempel-valg"></div>
+            <p class="besked" id="stempel-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="stempel-knap" type="button">Giv hint</button></div>
+            <div class="prikrad" id="stempel-prikker" aria-label="Opgaverne"></div>
+        </div>
+
+        <div class="kort styr" id="stempel-styr">
+            <h2>Gassen</h2>
+            <div class="styr-raekke">
+                <label for="stempel-T">Temperatur</label>
+                <input type="range" id="stempel-T" min="150" max="500" step="1" value="293">
+                <span class="styr-tal" id="stempel-T-tal">293 K (20 °C)</span>
+            </div>
+            <div class="styr-raekke">
+                <span class="styr-navn">Lodder</span>
+                <button class="knap lille" id="stempel-lod-minus" type="button" aria-label="Et lod af">−</button>
+                <span class="styr-tal kort-tal" id="stempel-lod-tal">0</span>
+                <button class="knap lille" id="stempel-lod-plus" type="button" aria-label="Et lod på">+</button>
+                <span class="styr-note">udefra <b id="stempel-pydre">1,013 bar</b></span>
+            </div>
+            <div class="styr-raekke">
+                <span class="styr-navn">Gas</span>
+                <button class="knap lille" id="stempel-n-minus" type="button" aria-label="0,25 mol gas ud">−</button>
+                <span class="styr-tal kort-tal" id="stempel-n-tal">1,00 mol</span>
+                <button class="knap lille" id="stempel-n-plus" type="button" aria-label="0,25 mol gas ind">+</button>
+            </div>
+            <div class="styr-raekke">
+                <span class="styr-navn">Stemplet</span>
+                <div class="vaelgerrad" role="group" aria-label="Frit eller låst stempel">
+                    <button class="vaelger" id="stempel-frit" type="button">Frit</button>
+                    <button class="vaelger" id="stempel-laast" type="button">Låst</button>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: BEREGNINGEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-regn" role="tabpanel" aria-label="Beregningen">
+    <div class="scene">
+        <canvas id="regn-laerred"></canvas>
+        <div class="anker" id="regn-anker-cylinder"></div>
+        <div class="anker" id="regn-anker-tavle"></div>
+        <div class="anker" id="regn-anker-laerer"></div>
+        <div class="tavle-tekst" id="regn-tavle"></div>
+        <div class="kboble" id="regn-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="regn-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="regn-kort">
+            <h2><span id="regn-titel">Opgave</span><span class="taeller" id="regn-taeller"></span></h2>
+            <p class="maal-tekst" id="regn-prompt"></p>
+            <div class="raekker" id="regn-raekker"></div>
+            <p class="besked" id="regn-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="regn-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="regn-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="regn-loest">0</b>/12</span></h2>
+            <div class="vaelgerrad" id="regn-niveau" role="group" aria-label="Sværhedsgrad"></div>
+            <div class="hyldeliste" id="regn-liste"></div>
+            <button class="knap nye" id="regn-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Idealgasligningen</h2>
+        <div class="eksempel formel-stor">p · V = n · R · T</div>
+        <p>p er trykket i bar, V volumen i L, n stofmængden i mol og T temperaturen i kelvin. Gaskonstanten er R = 0,0831 L·bar/(mol·K).</p>
+        <p>Temperaturen i kelvin: T = t + 273, hvor t er temperaturen i °C.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            Hvor meget fylder 2,00 mol gas ved 100 °C og 1,013 bar?<br>
+            T = (100 + 273) K = 373 K<br>
+            V = <span class="broek"><span>n · R · T</span><span>p</span></span>
+            = <span class="broek"><span>2,00 mol · 0,0831 L·bar/(mol·K) · 373 K</span><span>1,013 bar</span></span> = 61,2 L
+        </div>
+        <p>Ved samme n og T er p og V omvendt proportionale. Ved samme p og n er V proportional med T. Ved samme V og n er p proportional med T.</p>
+        <p>1 mol gas fylder ca. 24 L ved stuetemperatur og 1,013 bar, uanset hvilken gas det er.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/gas.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/sim_stempel.js"></script>
+<script src="js/sim_regn.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

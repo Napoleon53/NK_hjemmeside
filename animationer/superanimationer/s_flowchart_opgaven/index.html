@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kan du løse opgaven?</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">?</span> Kan du løse opgaven?</h1>
+    <span class="fyld"></span>
+    <button class="ikonknap tekstknap" id="heleknap" type="button" title="Vis hele flowchartet (V)">Vis hele</button>
+    <button class="ikonknap tekstknap" id="forfraknap" type="button" title="Start forfra (R)">Forfra</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Sådan virker den (H)" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+    <div class="scene" id="scene">
+        <div class="papir" id="papir">
+            <svg id="diagram" role="img" aria-label="Flowchartet Kan du løse opgaven?"></svg>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <!-- Flowchartets kommentar til det sidste svar -->
+        <div class="kort kommentar start" id="kommentar" aria-live="polite">
+            <span class="k-hoved" id="k-hoved" hidden></span>
+            <p class="k-tekst" id="k-tekst"></p>
+        </div>
+
+        <!-- Kassen, brikken står i, eller udfordringen -->
+        <div class="kort hovedkort" id="hovedkort">
+            <span class="kicker" id="kicker"></span>
+            <p class="paastand" id="paastand" hidden></p>
+            <p class="kasse-titel" id="kasse-titel"></p>
+            <p class="kasse-lille" id="kasse-lille" hidden></p>
+            <ol class="trinliste" id="trin" hidden></ol>
+            <div class="valg" id="valg"></div>
+        </div>
+
+        <p class="tal">Sendt tilbage: <b id="antal-tilbage">0 gange</b> &nbsp;·&nbsp; Svar: <b id="antal-besvaret">0</b></p>
+    </aside>
+</main>
+
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Kan du løse opgaven?</h2>
+        <p>Til når du sidder fast i en opgave. Svar Ja eller Nej i hver kasse. Hvert svar bliver tjekket, og kan du ikke stå inde for det, bliver du sendt tilbage.</p>
+        <p>Ja og Nej kan vælges i panelet eller på pilene i flowchartet.</p>
+        <h3>Genveje</h3>
+        <p><kbd>J</kbd> ja &nbsp;·&nbsp; <kbd>N</kbd> nej &nbsp;·&nbsp; <kbd>1</kbd> til <kbd>4</kbd> svar &nbsp;·&nbsp; <kbd>Enter</kbd> videre &nbsp;·&nbsp; <kbd>V</kbd> vis hele &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper">
+            <button class="knap blaa" type="button" data-luk>Luk</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/kerne.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

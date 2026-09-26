@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc7.3 pH-beregninger</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at tallene rammer tabelværdierne (pH, K_w, to
+   betydende cifre), at lommeregneren læser udtrykkene rigtigt (også
+   når en parentes mangler), at Maple-koden er den, Maple skal have, at
+   elevens svar kan skrives på mange måder, at de typiske fejl giver den
+   rigtige forklaring, at tasterne i Vis tasterne og Maple-koden giver
+   facit i hundredvis af opgaver, at alle tre faner kan gennemføres, at
+   tastaturet går til lommeregneren, at sproget overholder reglerne, at
+   Kemichael kan vises og sendes ud, og at layoutet holder fra
+   520 × 380 til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc7.3-ph", "nk-sc7.3-konc", "nk-sc7.3-staerk", "nk-sc7.3-maple",
+    "nk-sc7.3-intro-ph", "nk-sc7.3-intro-konc", "nk-sc7.3-intro-staerk"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function naer(a, b, tol) { return Math.abs(a - b) <= (tol || 1e-9); }
+function naerRel(a, b, tol) { return Math.abs(a / b - 1) <= (tol || 1e-6); }
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, K = NK.Kemi, R = NK.Regner, Tg = NK.Tegn;
+    paastand("data.js, kemi.js, regner.js og tegning.js er kørt", !!(D && D.STOFFER && K && K.trinPhAfH && R && R.parse && Tg && Tg.station));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-ph"] && NK.sims["fane-konc"] && NK.sims["fane-staerk"]));
+    var sprites = D.STOFFER.map(function (s) { return s.id; }).concat(["phmeter", "flaske", "kaffekop", "laererKrop", "laererHoved", "laererArm"]);
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var S1 = NK.sims["fane-ph"], S2 = NK.sims["fane-konc"], S3 = NK.sims["fane-staerk"];
+    paastand("Kemichael er koblet på alle tre faner", !!(S1.laerer && S2.laerer && S3.laerer));
+    paastand("lommeregneren står i den aktive fanes panel", d.getElementById("regner").parentNode.id === "ph-regnerplads");
+
+    overskrift("2. Tallene");
+    paastand("pH af 5,0 · 10⁻³ M er 2,30", K.phTekst(K.ph(5.0e-3)) === "2,30");
+    paastand("[H₃O⁺] ved pH 3,42 er 3,8 · 10⁻⁴ M", K.konc(K.h3o(3.42)) === "3,8 · 10⁻⁴ M", K.konc(K.h3o(3.42)));
+    paastand("K_w = 1,0 · 10⁻¹⁴: [OH⁻] ved [H₃O⁺] = 3,2 · 10⁻³ er 3,1 · 10⁻¹² M", K.trinOhAfH(3.2e-3).facitTekst === "3,1 · 10⁻¹² M", K.trinOhAfH(3.2e-3).facitTekst);
+    paastand("9,99 · 10⁻⁴ rundes til 1,0 · 10⁻³", K.potens(9.99e-4) === "1,0 · 10⁻³", K.potens(9.99e-4));
+    paastand("1,0 · 10⁻⁷ og 2,5 · 10⁻¹", K.potens(1e-7) === "1,0 · 10⁻⁷" && K.potens(0.25) === "2,5 · 10⁻¹");
+    paastand("flaskens koncentration som kommatal: 0,050 og 0,0012", K.decimal(0.05) === "0,050" && K.decimal(0.0012) === "0,0012");
+    paastand("pH med to decimaler: 12,48 og 7,00", K.phTekst(12.4771) === "12,48" && K.phTekst(7) === "7,00");
+    paastand("Ca(OH)₂ 0,015 M: pH 12,48", K.phTekst(K.trinPhAfH(K.rund(1e-14 / 0.030)).facit) === "12,48");
+    paastand("stofferne har samme pH som i sc7.2 (citron 2,3, blod 7,4, klorin 12,5)", D.stof("citron").ph === 2.3 && D.stof("blod").ph === 7.4 && D.stof("klorin").ph === 12.5);
+    paastand("12 stoffer, 2 stærke syrer, 4 stærke baser", D.STOFFER.length === 12 && D.SYRER.length === 2 && D.BASER.length === 4);
+    paastand("Ca(OH)₂ er højst 0,020 M (opløseligheden)", D.BASER.filter(function (b) { return b.formel === "Ca(OH)₂"; })[0].c.every(function (c) { return c <= 0.0201; }));
+    paastand("alle koncentrationer har to betydende cifre", D.SYRER.concat(D.BASER).every(function (s) {
+        return s.c.every(function (c) { return naer(K.rund(c), c, 1e-15); });
+    }));
+
+    overskrift("3. Lommeregneren læser rigtigt");
+    function regn(tekst, ans) {
+        var p = R.parse(R.tilTokens(tekst));
+        return R.regn(p.ast, ans);
+    }
+    function fejlTekst(tekst) {
+        try { regn(tekst); return ""; } catch (e) { return e.besked || String(e); }
+    }
+    function html(tekst) { return R.html2d(R.parse(R.tilTokens(tekst)).ast); }
+    paastand("−log(5,0·10^(−3)) = 2,301029996", R.tiTekst(regn("−log(5,0·10^(−3))")) === "2,301029996");
+    paastand("10^(−3,42) = 3,801893963 · 10⁻⁴", R.tiTekst(regn("10^(−3,42)")) === "3,801893963 · 10⁻⁴", R.tiTekst(regn("10^(−3,42)")));
+    paastand("uden parentes om nævneren: 1,0·10^(−14)/4,0·10^(−12) = 2,5 · 10⁻²⁷", naerRel(regn("1,0·10^(−14)/4,0·10^(−12)"), 2.5e-27));
+    paastand("med parentes: 1,0·10^(−14)/(4,0·10^(−12)) = 0,0025", naerRel(regn("1,0·10^(−14)/(4,0·10^(−12))"), 2.5e-3));
+    paastand("linje 2 viser 10⁻¹² uden for brøken", /brok-n">4,0<\/span><\/span> · 10<sup>/.test(html("1,0·10^(−14)/4,0·10^(−12)")), html("1,0·10^(−14)/4,0·10^(−12)"));
+    paastand("en manglende ) lukkes til sidst og vises bleg", naer(regn("−log(5,0·10^(−3"), 2.301029996, 1e-9) && /r-auto/.test(html("−log(5,0")));
+    paastand("gange uden tegn: 2(3) = 6 og 2log(100) = 4", regn("2(3)") === 6 && naer(regn("2log(100)"), 4));
+    paastand("−2^2 = −4 og 2^−2 = 0,25", regn("−2^2") === -4 && regn("2^−2") === 0.25);
+    paastand("5· giver: Der mangler et tal efter ·.", fejlTekst("5·") === "Der mangler et tal efter ·.", fejlTekst("5·"));
+    paastand("5··3 viser et hul: 5 · □ · 3", /r-hul/.test(html("5··3")));
+    paastand("log() giver: Der mangler et tal inde i log( ).", fejlTekst("log()") === "Der mangler et tal inde i log( ).");
+    paastand("log(−5) giver en besked om negativt tal og minusset", /negativt/.test(fejlTekst("log(−5)")) && /minusset/.test(fejlTekst("log(−5)")));
+    paastand("1/0 giver: Man kan ikke dele med 0.", fejlTekst("1/0") === "Man kan ikke dele med 0.");
+    paastand("1,2,3 giver: to kommaer", /to kommaer/.test(fejlTekst("1,2,3")));
+    paastand("Ans uden svar giver en besked", /Ans/.test(fejlTekst("Ans")));
+
+    function tryk(liste) { liste.forEach(function (t) { R.tryk(t); }); }
+    R.tryk("AC");
+    tryk(["5", ")", "="]);
+    paastand("en ) for meget: Der er en ) for meget.", R.fejl === "Der er en ) for meget." && R.resultat === null);
+    tryk(["AC", "2", "·", "3", "="]);
+    paastand("2·3 = 6, og Ans er 6", R.resultat === 6 && R.ans === 6);
+    tryk(["·", "2", "="]);
+    paastand("efter = regner · videre med Ans: Ans·2 = 12", R.tokens[0] === "Ans" && R.resultat === 12);
+    tryk(["−", "log(", "1", "0", "0", "="]);
+    paastand("efter = starter − forfra: −log(100) = −2", R.tokens[0] === "−" && R.resultat === -2);
+    tryk(["AC", "1", "2", "3", "◀", "◀", "⌫", "="]);
+    paastand("◀ og ⌫ retter midt i: 123 bliver til 23", R.resultat === 23);
+
+    overskrift("4. Maple-koden");
+    var mapleSager = [
+        ["−log(5,0·10^(−3))", "-log10(5.0*10^(-3))"],
+        ["10^(−3,42)", "10^(-3.42)"],
+        ["1,0·10^(−14)/(4,0·10^(−12))", "1.0*10^(-14)/(4.0*10^(-12))"],
+        ["1,0·10^(−14)/4,0·10^(−12)", "1.0*10^(-14)/4.0*10^(-12)"],
+        ["2(3)", "2*3"],
+        ["2·−3", "2*(-3)"],
+        ["Ans·2", "%*2"],
+        ["10^2", "10^2"],
+        ["−(2+3)·4", "-(2+3)*4"],
+        [",5+1", "0.5+1"]
+    ];
+    mapleSager.forEach(function (s) {
+        paastand("Maple: " + s[0] + " → " + s[1], R.mapleAf(s[0]) === s[1], R.mapleAf(s[0]));
+    });
+    function mSvar(tekst) {
+        var p = R.parse(R.tilTokens(tekst));
+        return R.mapleSvar(p.ast, R.regn(p.ast));
+    }
+    paastand("Maple med kommatal: 2.301029996", mSvar("−log(5,0·10^(−3))").ud === "2.301029996" && !mSvar("−log(5,0·10^(−3))").note);
+    paastand("Maple uden komma: −log10(5*10^(−3)) er et eksakt udtryk med en note", /eksakt/.test(mSvar("−log(5·10^(−3))").ud) && /5.0/.test(mSvar("−log(5·10^(−3))").note));
+    paastand("Maple uden komma: 10^(−3) er brøken 1/1000", /1<\/span><span class="brok-n">1000/.test(mSvar("10^(−3)").ud));
+    paastand("Maple uden komma: 2·3 = 6 og −log10(10^(−3)) = 3", mSvar("2·3").ud === "6" && mSvar("−log(10^(−3))").ud === "3");
+    paastand("Maple: små tal i potensform, 2.5 × 10⁻¹³", /2\.5 × 10<sup>−13<\/sup>/.test(mSvar("1,0·10^(−14)/(4,0·10^(−2))").ud), mSvar("1,0·10^(−14)/(4,0·10^(−2))").ud);
+
+    overskrift("5. Elevens svar kan skrives på mange måder");
+    var s;
+    s = K.laesTal("2,30"); paastand("2,30: 2,3 med 2 decimaler", s && s.v === 2.3 && s.d === 2);
+    s = K.laesTal("2.3"); paastand("2.3 med punktum: 1 decimal", s && s.v === 2.3 && s.d === 1);
+    s = K.laesKonc("3,8", "-4"); paastand("3,8 og −4: 3,8 · 10⁻⁴ med 2 betydende cifre", s && naerRel(s.v, 3.8e-4) && s.bc === 2);
+    s = K.laesKonc("3,8", "−4"); paastand("eksponenten med rigtigt minus", s && naerRel(s.v, 3.8e-4));
+    s = K.laesKonc("0,00038", ""); paastand("0,00038 i ét felt: 2 betydende cifre", s && naerRel(s.v, 3.8e-4) && s.bc === 2);
+    ["3,8e-4", "3.8E-4", "3,8·10^-4", "3,8*10^(-4)", "3,8 · 10⁻⁴", "3,8×10^−4"].forEach(function (t) {
+        var x = K.laesKonc(t, "");
+        paastand("“" + t + "” læses som 3,8 · 10⁻⁴", x && naerRel(x.v, 3.8e-4), x && x.v);
+    });
+    paastand("tekst, der ikke er et tal, giver null", K.laesTal("abc") === null && K.laesKonc("3,8", "x") === null);
+
+    overskrift("6. Tjekket og forklaringerne på de typiske fejl");
+    function svar(trin, v, d, bc) { return K.tjek(trin, { v: v, d: d === undefined ? 2 : d, bc: bc === undefined ? 2 : bc }); }
+    function besked(trin, v) { var r = svar(trin, v); return r.rigtig ? "RIGTIG" : (r.besked || ""); }
+    var t1 = K.trinPhAfH(5.0e-3);
+    paastand("pH 2,30 er rigtig", svar(t1, 2.30).rigtig);
+    paastand("pH 2,3 er rigtig, men får noten om to decimaler", svar(t1, 2.3, 1).rigtig && /to decimaler: 2,30/.test(svar(t1, 2.3, 1).note));
+    paastand("pH 2,31 er rigtig (afrundet undervejs)", svar(t1, 2.31).rigtig);
+    paastand("pH 2,35 er forkert", !svar(t1, 2.35).rigtig);
+    var phFejl = [[-2.30, /Minusset/], [5.30, /ln/], [-0.70, /kun taget log af 5,0/], [-3.70, /negativ: 10⁻³/], [3, /Tallet 5,0 foran/], [11.70, /14 − pH/]];
+    phFejl.forEach(function (f) { paastand("pH " + f[0] + ": " + f[1].source, f[1].test(besked(t1, f[0])), besked(t1, f[0])); });
+
+    var t2 = K.trinHAfPh(3.42);
+    paastand("[H₃O⁺] 3,8 · 10⁻⁴ er rigtig ved pH 3,42", svar(t2, 3.8e-4).rigtig);
+    var hFejl = [[2630, /Minusset mangler/], [0.0327, /e-tasten/], [1e-3, /kun brugt 3/], [3.8e-3, /eksponenten i det lille felt/], [2.63e-11, /Det er \[OH⁻\]/], [-0.534, /log af pH/], [3.42, /pH-værdien/]];
+    hFejl.forEach(function (f) { paastand("[H₃O⁺] = " + f[0] + ": " + f[1].source, f[1].test(besked(t2, f[0])), besked(t2, f[0])); });
+
+    var t3 = K.trinOhAfH(3.8e-4, 3.42);
+    paastand("[OH⁻] 2,6 · 10⁻¹¹ er rigtig", svar(t3, 2.6e-11).rigtig);
+    paastand("[OH⁻] ud fra den ikke-afrundede [H₃O⁺] er også rigtig", svar(t3, 1e-14 / 3.8019e-4).rigtig);
+    var ohFejl = [[3.8e-18, /ganget/], [3.8e10, /vendt brøken om/], [3.8e-4, /Det er \[H₃O⁺\]/], [2.63e-19, /parentes om tallet under brøkstregen/], [2.63e17, /Minusset i eksponenten/], [10.58, /14 − pH/]];
+    ohFejl.forEach(function (f) { paastand("[OH⁻] = " + f[0] + ": " + f[1].source, f[1].test(besked(t3, f[0])), besked(t3, f[0])); });
+    paastand("en negativ koncentration får sin egen besked", /negativ/.test(besked(t3, -2.6e-11)));
+
+    var hcl = D.SYRER[0];
+    var t4 = K.trinHAfSyre(hcl, 0.050);
+    paastand("HCl 0,050 M: [H₃O⁺] = 5,0 · 10⁻² er rigtig", svar(t4, 0.05).rigtig);
+    paastand("HCl: 0,10 giver: én H₃O⁺", /én H₃O⁺/.test(besked(t4, 0.1)));
+    paastand("HCl: 5,0 · 10⁻³ giver: eksponenten i det lille felt", /Eksponenten i det lille felt/.test(besked(t4, 5e-3)), besked(t4, 5e-3));
+    paastand("HCl: 1,30 giver: Det er pH", /Det er pH/.test(besked(t4, 1.30)));
+
+    var caoh = D.BASER.filter(function (b) { return b.formel === "Ca(OH)₂"; })[0], naoh = D.BASER[0];
+    paastand("Ca(OH)₂: 1 OH⁻ giver: Parentesen (OH)₂", /Parentesen/.test(besked(K.trinNOh(caoh), 1)));
+    paastand("NaOH: 2 OH⁻ giver: kun én OH", /kun én OH/.test(besked(K.trinNOh(naoh), 2)));
+    var t5 = K.trinOhAfBase(caoh, 0.020);
+    paastand("Ca(OH)₂ 0,020 M: [OH⁻] = 4,0 · 10⁻² er rigtig", svar(t5, 0.040).rigtig);
+    paastand("Ca(OH)₂: 0,020 giver: gang med 2", /Gang med 2/.test(besked(t5, 0.020)));
+    paastand("Ca(OH)₂: 0,010 giver: flere OH⁻, ikke færre", /flere OH⁻/.test(besked(t5, 0.010)));
+    var t6 = K.trinPhAfH(2.5e-13, [[-K.log10(0.04), "Det er −log[OH⁻]. pH regnes af [H₃O⁺]."]]);
+    paastand("base: pH 1,40 (−log[OH⁻]) giver: Det er −log[OH⁻]", /−log\[OH⁻\]/.test(besked(t6, 1.40)));
+
+    overskrift("7. Hundredvis af opgaver: tasterne og Maple giver facit");
+    var fane = { ph: S1, konc: S2, staerk: S3 };
+    var tasterFejl = [], mapleFejl = [], tekstFejl = [], antalTrin = 0, stofSet = {};
+    ["ph", "konc", "staerk"].forEach(function (p) {
+        var sim = fane[p];
+        for (var n = 0; n < 60; n++) {
+            var opg = p === "ph" ? sim.lavPh(n) : (p === "konc" ? sim.lavKonc(n) : sim.lavStaerk(n));
+            stofSet[opg.stof || opg.flaske.formel] = true;
+            opg.trin.forEach(function (t) {
+                antalTrin++;
+                var hints = (t.formler ? [t.formelHint] : []).concat(t.taster ? [t.tastTekst, t.tastHint] : [], [t.skrivTekst, t.skrivHint]);
+                if (!t.beregning || !t.facitTekst || !t.spm || hints.some(function (h) { return !h; })) tekstFejl.push(p + " " + t.slags);
+                if (t.formler && (t.formler.filter(function (f) { return f.rigtig; }).length !== 1 || t.formler.some(function (f) { return !f.rigtig && !f.forkl; }))) tekstFejl.push(p + " formler " + t.slags);
+                if (t.felt === "ph" && !(t.facit > 0 && t.facit < 14)) tekstFejl.push(p + " pH " + t.facit);
+                if (t.beregning.indexOf(t.facitTekst.replace(" M", "")) < 0 && t.felt !== "tal") tekstFejl.push(p + " beregning uden facit: " + t.beregning);
+                if (t.taster) {
+                    R.demo(t.taster);
+                    R.spolDemo();
+                    var ok = R.resultat !== null && (t.felt === "ph" ? naer(R.resultat, t.facit, 0.006) : naerRel(R.resultat, t.facit, 0.03));
+                    if (!ok) tasterFejl.push(t.slags + ": " + R.tokens.join("") + " = " + R.resultat + " (facit " + t.facit + ")");
+                    var mTast = R.maple(R.parse(R.tokens).ast);
+                    if (mTast !== t.maple) mapleFejl.push(t.slags + ": " + mTast + " ≠ " + t.maple);
+                }
+                if (t.maple) {
+                    var v = R.vaerdi(t.maple);
+                    if (v === null || (t.felt === "ph" ? !naer(v, t.facit, 0.006) : !naerRel(v, t.facit, 0.03))) mapleFejl.push("værdi " + t.maple + " = " + v);
+                }
+                if (!K.tjek(t, { v: t.facit, d: 2, bc: 2 }).rigtig) tekstFejl.push("facit er ikke rigtigt: " + t.slags);
+            });
+        }
+    });
+    R.tryk("AC");
+    paastand(antalTrin + " trin: tasterne i Vis tasterne giver facit", tasterFejl.length === 0, tasterFejl.slice(0, 3).join(" | "));
+    paastand("tasterne giver præcis trinets Maple-kode, og Maple-koden giver facit", mapleFejl.length === 0, mapleFejl.slice(0, 3).join(" | "));
+    paastand("alle trin har spørgsmål, hint, pæn beregning med facit, og facit godkendes", tekstFejl.length === 0, tekstFejl.slice(0, 3).join(" | "));
+    paastand("alle 12 stoffer og alle 6 flasker kommer med", Object.keys(stofSet).length === 18, Object.keys(stofSet).length);
+    var foerste = [S1.lavPh(0), S2.lavKonc(0), S3.lavStaerk(0), S3.lavStaerk(1)];
+    paastand("første opgaver: citronsaft 5,0 · 10⁻³ M, cola pH 2,50, HCl 0,10 M, NaOH 0,10 M",
+        foerste[0].stof === "citron" && /5,0 · 10⁻³/.test(foerste[0].tekst) && foerste[1].stof === "cola" && /2,50/.test(foerste[1].tekst) &&
+        foerste[2].flaske.formel === "HCl" && foerste[2].c === 0.10 && foerste[3].flaske.formel === "NaOH");
+
+    overskrift("8. Fanerne kan gennemføres i små bider");
+    function raekke(sim) { return sim.el.raekker.querySelector('[data-i="' + sim.trinNr + '"]'); }
+    function bid(sim, b) { return raekke(sim).querySelector('.bid[data-bid="' + b + '"]'); }
+    function skrivSvar(sim, v) {
+        var ind = raekke(sim).querySelectorAll("input");
+        v.forEach(function (x, i) { ind[i].value = x; });
+        sim.tjek();
+    }
+    function kor(sim, n) { for (var i = 0; i < n; i++) { R.opdater(1 / 30); sim.opdater(1 / 30); } }
+    function felterAf(t) {
+        if (t.felt === "konc") { var m = K.mantisse(t.facit); return [m.m, String(m.e)]; }
+        return [t.facit === Math.round(t.facit) && t.felt === "tal" ? String(t.facit) : K.phTekst(t.facit)];
+    }
+    function formelNr(t, rigtig) {
+        for (var i = 0; i < t.formler.length; i++) if (!!t.formler[i].rigtig === rigtig) return i;
+        return -1;
+    }
+    function loesTrin(sim) {
+        var t = sim.trin();
+        if (sim.bid === "formel") sim.vaelgFormel(formelNr(t, true));
+        skrivSvar(sim, felterAf(t));
+    }
+    function loesOpgave(sim) {
+        var n = 0;
+        while (!sim.faerdig && n++ < 6) loesTrin(sim);
+        return sim.faerdig;
+    }
+
+    NK.visFane("fane-ph");
+    S1.nyOpgave();
+    kor(S1, 30);
+    var foer = S1.loest;
+    var tp = S1.trin();
+    paastand("fane 1: kun [H₃O⁺] og pH står på regnevejen, og der er ingen pil", S1.stationSes("h") && S1.stationSes("ph") && !S1.stationSes("oh") && !S1.pilSes("h>ph"));
+    paastand("fane 1: første bid er at vælge formlen; feltet til svaret ses ikke endnu",
+        S1.bid === "formel" && bid(S1, "formel").classList.contains("nu") && bid(S1, "skriv").classList.contains("kommer") && S1.el.knap.textContent === "Giv hint");
+    paastand("formlen vælges blandt 3 knapper med én rigtig", tp.formler.length === 3 && tp.formler.filter(function (f) { return f.rigtig; }).length === 1 &&
+        raekke(S1).querySelectorAll("[data-formel]").length === 3);
+    S1.vaelgFormel(formelNr(tp, false));
+    paastand("en forkert formel giver en forklaring, og knappen streges ud", /skidt/.test(S1.el.besked.className) && S1.bid === "formel" &&
+        raekke(S1).querySelector(".formelknap.forkert").disabled);
+    S1.vaelgFormel(formelNr(tp, true));
+    kor(S1, 30);
+    paastand("den rigtige formel: pilen kommer frem med formlen, og næste bid er lommeregneren",
+        S1.pilSes("h>ph") && S1.pilEtiket("h>ph") === "pH = −log[H₃O⁺]" && S1.bid === "tast" && !bid(S1, "skriv").classList.contains("kommer"));
+    R.tryk("AC");
+    tp.taster.slice(1).concat(["="]).forEach(function (k) { R.tryk(k); });
+    paastand("lommeregneren uden minus: panelet siger, at minusset mangler", /Minusset/.test(S1.el.besked.innerHTML) && S1.bid === "tast", S1.el.besked.textContent);
+    R.tryk("AC");
+    tp.taster.concat(["="]).forEach(function (k) { R.tryk(k); });
+    paastand("lommeregneren rigtigt: bid 2 er klaret, og næste bid er at skrive svaret",
+        S1.bid === "skriv" && S1.tastVist === R.tiTekst(R.resultat) && bid(S1, "tast").classList.contains("klar") && /Rigtigt regnet/.test(S1.el.besked.innerHTML));
+    skrivSvar(S1, ["−" + felterAf(tp)[0]]);
+    paastand("fane 1: et forkert svar giver en rød besked og ingen fremgang", !S1.faerdig && /skidt/.test(S1.el.besked.className));
+    skrivSvar(S1, felterAf(tp));
+    paastand("fane 1: det rigtige svar løser opgaven, og løst tæller op", S1.faerdig && S1.loest === foer + 1);
+    paastand("fane 1: pH-metret måler, og knappen er låst imens", !!S1.maaling && S1.el.knap.disabled);
+    kor(S1, 60);
+    paastand("fane 1: pH-metret viser facit bagefter", S1.visning === K.phTekst(S1.opg.slutPh) && !S1.el.knap.disabled && S1.el.knap.textContent === "Ny opgave");
+    paastand("fane 1: pilen er brugt, og stationen pH er regnet", S1.pilStatus("h>ph") === "brugt" && S1.stationStatus("ph") === "loest");
+    S1.knap();
+    paastand("fane 1: Ny opgave giver en ny opgave, og pilen er væk igen", !S1.faerdig && S1.trinNr === 0 && !S1.pilSes("h>ph"));
+
+    /* En elev med sin egen lommeregner kan skrive svaret, så snart formlen er valgt */
+    S1.vaelgFormel(formelNr(S1.trin(), true));
+    skrivSvar(S1, felterAf(S1.trin()));
+    paastand("svaret kan skrives uden at bruge lommeregneren", S1.faerdig);
+    kor(S1, 60);
+    S1.knap();
+    /* En elev, der regner rigtigt uden at vælge formlen, springer valget over */
+    R.tryk("AC");
+    S1.trin().taster.concat(["="]).forEach(function (k) { R.tryk(k); });
+    paastand("regnes der rigtigt før formlen er valgt, er formlen klaret, og pilen kommer", S1.formelOk && S1.bid === "skriv" && S1.pilSes("h>ph"));
+    kor(S1, 10);
+    S1.nyOpgave();
+
+    /* Hjaelpen til hver bid */
+    S1.knap();
+    paastand("formel: Giv hint giver et hint og så Vis formlen", /Hint:/.test(S1.el.besked.innerHTML) && S1.el.knap.textContent === "Vis formlen" && !S1.pilSes("h>ph"));
+    S1.knap();
+    paastand("Vis formlen: formlen er valgt og står på pilen; næste bid", S1.formelOk && S1.pilSes("h>ph") && S1.bid === "tast" && S1.el.knap.textContent === "Giv hint");
+    S1.knap();
+    paastand("tast: Giv hint viser tallene sat ind og så Vis tasterne", /Hint:/.test(S1.el.besked.innerHTML) && S1.el.knap.textContent === "Vis tasterne");
+    S1.knap();
+    paastand("Vis tasterne: lommeregneren taster selv, og knappen er låst", R.iDemo() && S1.el.knap.disabled);
+    R.spolDemo();
+    kor(S1, 2);
+    paastand("… og regner facit ud, så næste bid er at skrive svaret", naer(R.resultat, S1.trin().facit, 0.006) && S1.bid === "skriv" && S1.el.knap.textContent === "Giv hint",
+        R.resultat + " / " + S1.trin().facit + " / " + S1.bid + " / " + S1.el.knap.textContent + " / " + R.tokens.join(""));
+    S1.knap();
+    paastand("skriv: Giv hint forklarer afrundingen og så Vis svaret", /to decimaler/.test(S1.el.besked.innerHTML) && S1.el.knap.textContent === "Vis svaret");
+    var foer2 = S1.loest;
+    S1.knap();
+    kor(S1, 60);
+    paastand("Vis svaret: trinet er vist, og løst tæller ikke op", S1.status[0] === "vist" && S1.faerdig && S1.loest === foer2);
+
+    NK.visFane("fane-konc");
+    S2.nyOpgave();
+    kor(S2, 60);
+    paastand("fane 2: pH-metret har målt, før eleven regner", S2.maalt && S2.visning === K.phTekst(S2.opg.maalFoer));
+    paastand("fane 2: [OH⁻] står ikke på regnevejen endnu", !S2.stationSes("oh"));
+    loesTrin(S2);
+    paastand("fane 2: [H₃O⁺] rigtig, trin 2 kommer, og [OH⁻] kommer på regnevejen", S2.trinNr === 1 && S2.bid === "formel" && S2.stationSes("oh") && !S2.pilSes("h>oh"));
+    loesTrin(S2);
+    paastand("fane 2: [OH⁻] rigtig, og opgaven er løst", S2.faerdig && S2.stationStatus("oh") === "loest" && S2.pilSes("h>oh"));
+
+    NK.visFane("fane-staerk");
+    S3.nyOpgave(); S3.nyOpgave(); S3.nyOpgave();
+    while (S3.opg.syre || S3.opg.flaske.n !== 2) S3.nyOpgave();
+    paastand("fane 3 base: kun c og [OH⁻] står på regnevejen i trin 1", S3.stationSes("cb") && S3.stationSes("oh") && !S3.stationSes("h") && !S3.stationSes("ph") && !S3.stationSes("cs"));
+    loesTrin(S3);
+    paastand("fane 3 base: efter afstemningen står formlen for [OH⁻] ikke på pilen endnu", S3.trinNr === 1 && !S3.pilSes("cb>oh") && S3.bid === "formel");
+    loesTrin(S3);
+    paastand("fane 3 base: [OH⁻] rigtig; pilen har 2 · c, og [H₃O⁺] kommer frem", S3.pilEtiket("cb>oh") === "[OH⁻] = 2 · c" && S3.stationSes("h"));
+    var sy = 0, ba = 0;
+    for (var n2 = 0; n2 < 8; n2++) {
+        S3.nyOpgave();
+        if (loesOpgave(S3)) { if (S3.opg.syre) sy++; else ba++; }
+        kor(S3, 60);
+    }
+    paastand("fane 3: syrer og baser kan løses hele vejen til pH (" + sy + " syrer, " + ba + " baser)", sy > 0 && ba > 0 && sy + ba === 8);
+    paastand("fane 3: pH-metret viser facit til sidst", S3.visning === K.phTekst(S3.opg.slutPh));
+
+    overskrift("9. Tastaturet");
+    function tast(key, maal) {
+        var e = new W.KeyboardEvent("keydown", { key: key, bubbles: true, cancelable: true });
+        (maal || d.body).dispatchEvent(e);
+    }
+    NK.visFane("fane-ph");
+    S1.nyOpgave();
+    R.tryk("AC");
+    ["-", "l", "1", "0", "0", ")", "Enter"].forEach(function (k) { tast(k); });
+    paastand("tasterne - l 1 0 0 ) Enter giver −log(100) = −2", R.resultat === -2, R.tokens.join(""));
+    var felt = raekke(S1).querySelector("input");
+    R.tryk("AC");
+    felt.focus();
+    tast("7", felt);
+    paastand("i et svarfelt går tasterne ikke til lommeregneren", R.tokens.length === 0);
+    felt.blur();
+    var mFoer = R.mapleTil;
+    tast("m");
+    paastand("M slår Maple til og fra", R.mapleTil !== mFoer && d.body.classList.contains("maple-til") === R.mapleTil);
+    tast("m");
+
+    overskrift("10. Sproget");
+    var tekster = [];
+    Object.keys(D.INTRO).forEach(function (p) { tekster = tekster.concat(D.INTRO[p]); });
+    Object.keys(D.ROS).forEach(function (p) { tekster.push(D.ROS[p]); });
+    Object.keys(D.FANER).forEach(function (p) { Object.keys(D.FANER[p].status).forEach(function (k) { tekster.push(D.FANER[p].status[k]); }); });
+    Object.keys(D.STATION).forEach(function (k) { tekster.push(D.STATION[k]); });
+    tekster.push(D.AEG_42);
+    [t1, t2, t3, t4, t5].forEach(function (t) {
+        tekster.push(t.beregning, t.spm, t.formelHint || "", t.tastTekst || "", t.tastHint || "", t.skrivTekst, t.skrivHint);
+        (t.formler || []).forEach(function (f) { tekster.push(f.f, f.forkl || ""); });
+    });
+    phFejl.forEach(function (f) { tekster.push(besked(t1, f[0])); });
+    hFejl.forEach(function (f) { tekster.push(besked(t2, f[0])); });
+    ohFejl.forEach(function (f) { tekster.push(besked(t3, f[0])); });
+    tekster.push(d.getElementById("teori").textContent, d.querySelector(".top").textContent);
+    var streg = tekster.filter(function (t) { return /[—–]/.test(t); });
+    paastand("ingen tankestreger (– eller —)", streg.length === 0, streg.slice(0, 2).join(" | "));
+    var ladning = tekster.filter(function (t) { return /¹[⁺⁻]|[A-Za-z)]1[+−-](?!\d)/.test(t); });
+    paastand("ingen ladning skrevet som 1+ eller 1−", ladning.length === 0, ladning.slice(0, 2).join(" | "));
+    var lange = [].concat(D.INTRO.ph, D.INTRO.konc, D.INTRO.staerk).filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("ingen natronlud (natriumhydroxid)", tekster.join(" ").indexOf("atronlud") < 0);
+    var smaa = [];
+    Array.prototype.forEach.call(d.querySelectorAll(".kort, .regner, .scene-mrk"), function (el) {
+        var px = parseFloat(W.getComputedStyle(el).fontSize);
+        if (px < 12) smaa.push(el.className + " " + px);
+    });
+    paastand("ingen tekst under 12 px i kortene og lommeregneren", smaa.length === 0, smaa.slice(0, 3).join(" | "));
+
+    overskrift("11. Kemichael");
+    [S1, S2, S3].forEach(function (sim, i) {
+        NK.visFane(["fane-ph", "fane-konc", "fane-staerk"][i]);
+        sim.startIntro(true);
+        for (var k = 0; k < 90; k++) { sim.tilpas(); sim.opdater(1 / 30); }
+        var inde = sim.laererIIntro();
+        sim.springIntro();
+        for (k = 0; k < 90; k++) { sim.opdater(1 / 30); }
+        paastand("fane " + (i + 1) + ": præsentationen starter med K og går ved Esc", inde && !sim.laererIIntro());
+    });
+    NK.visFane("fane-ph");
+    S1.startIntro(true);
+    for (var k2 = 0; k2 < 400 && S1.introTrin !== 2; k2++) S1.opdater(1 / 30);
+    paastand("under replik 2 lyser lommeregneren", d.getElementById("regner").classList.contains("peg"));
+    S1.springIntro();
+    for (k2 = 0; k2 < 60; k2++) S1.opdater(1 / 30);
+    paastand("… og holder op bagefter", !d.getElementById("regner").classList.contains("peg"));
+
+    overskrift("12. Layoutet");
+    var ramme = document.getElementById("ramme");
+    [[520, 380], [1024, 640], [1366, 700], [1500, 900]].forEach(function (str) {
+        ramme.style.width = str[0] + "px";
+        ramme.style.height = str[1] + "px";
+        ["fane-ph", "fane-konc", "fane-staerk"].forEach(function (f) {
+            NK.visFane(f);
+            var sim = NK.sims[f];
+            sim.tilpas();
+            sim.layout();
+            var lay = sim.lay;
+            var ok = lay.vejBund <= sim.etiketY() + 2 && lay.etiketX > lay.glas.x && lay.st.ph.x + lay.st.ph.b / 2 <= lay.W;
+            var em = Tg.etiketMaal(sim.L.ctx, sim.opg.etiket.map(function (l) { return { navn: l.navn, vaerdi: "8,8 · 10⁻¹⁴ M" }; }), lay.etiketPx);
+            var fri = lay.etiketX + em.b <= lay.meter.x - lay.meter.b / 2 + 4;
+            paastand(str[0] + " × " + str[1] + " " + f + ": vejen over etiketten, etiketten mellem glas og pH-meter", ok && fri,
+                "vejBund " + Math.round(lay.vejBund) + ", etiketY " + Math.round(sim.etiketY()) + ", etiket " + Math.round(lay.etiketX + em.b) + " / meter " + Math.round(lay.meter.x - lay.meter.b / 2));
+        });
+        if (str[0] >= 1024) {
+            NK.visFane("fane-staerk");
+            var lig = d.querySelector('[data-t="="]').getBoundingClientRect();
+            paastand(str[0] + " × " + str[1] + ": lommeregnerens =-tast kan ses", lig.bottom <= str[1] && lig.top > 0, Math.round(lig.bottom));
+        }
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    NK.visFane("fane-ph");
+}
+</script>
+</body>
+</html>

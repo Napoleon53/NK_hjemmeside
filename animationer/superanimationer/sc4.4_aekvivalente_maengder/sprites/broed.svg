@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 48" width="130" height="48">
+<!-- Et hotdogbroed set oppefra med snittet paa langs.
+     Midten er (65, 24). Snittet ligger i y 20-28. -->
+<defs>
+  <radialGradient id="skorpe" cx="0.5" cy="0.35" r="0.75">
+    <stop offset="0" stop-color="#f0c27a"/>
+    <stop offset="0.7" stop-color="#d9994a"/>
+    <stop offset="1" stop-color="#b07230"/>
+  </radialGradient>
+</defs>
+<rect x="3" y="4" width="124" height="40" rx="20" fill="url(#skorpe)" stroke="#8a551d" stroke-width="1.5"/>
+<path d="M14 24 Q65 15 116 24 Q65 33 14 24 Z" fill="#f6e2b8"/>
+<path d="M14 24 Q65 15 116 24" stroke="#a8692a" stroke-width="1.6" fill="none"/>
+<path d="M14 24 Q65 33 116 24" stroke="#c98a44" stroke-width="1.2" fill="none"/>
+<path d="M24 11 Q55 7 92 10" stroke="#fbe0ae" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+<g fill="#f8f0dc" opacity="0.8">
+  <ellipse cx="34" cy="37" rx="1.4" ry="0.8"/>
+  <ellipse cx="58" cy="39" rx="1.4" ry="0.8"/>
+  <ellipse cx="82" cy="37" rx="1.4" ry="0.8"/>
+  <ellipse cx="102" cy="35" rx="1.4" ry="0.8"/>
+</g>
+</svg>

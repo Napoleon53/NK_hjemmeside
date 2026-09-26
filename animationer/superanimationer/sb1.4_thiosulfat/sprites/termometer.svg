@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="320" viewBox="0 0 30 320">
+  <!-- Termometer med hvid bagside. Den roede soejle tegnes af
+       animationen OVENPAA denne fil, i kapillaeret x 13,5-16,5 fra
+       kuglen og op til y = 262 - 2,2 * T  (0 °C ved y 262, 100 °C
+       ved y 42). Kuglen har centrum (15, 293) og radius 10.
+       Skalaen staar til hoejre for kapillaeret (x 17-21). -->
+  <defs>
+    <linearGradient id="roer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e8f3fb" stop-opacity="0.35"/>
+      <stop offset="0.5" stop-color="#e8f3fb" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#e8f3fb" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Roeret og kuglen -->
+  <path d="M9 10 Q9 4 15 4 Q21 4 21 10 L21 283 A12 12 0 1 1 9 283 Z"
+        fill="url(#roer)" stroke="#d6eaf8" stroke-opacity="0.9" stroke-width="1.6"/>
+
+  <!-- Hvid bagside med skalaen -->
+  <rect x="11" y="16" width="8.5" height="262" rx="2" fill="#f2efe6" fill-opacity="0.92"/>
+  <g stroke="#1b1b21" stroke-opacity="0.9" stroke-width="1.1" stroke-linecap="round">
+    <path d="M19.5 262 h-3 M19.5 240 h-3 M19.5 218 h-3 M19.5 196 h-3 M19.5 174 h-3 M19.5 152 h-3 M19.5 130 h-3 M19.5 108 h-3 M19.5 86 h-3 M19.5 64 h-3 M19.5 42 h-3"/>
+  </g>
+  <g stroke="#1b1b21" stroke-opacity="0.55" stroke-width="0.8" stroke-linecap="round">
+    <path d="M19.5 251 h-2 M19.5 229 h-2 M19.5 207 h-2 M19.5 185 h-2 M19.5 163 h-2 M19.5 141 h-2 M19.5 119 h-2 M19.5 97 h-2 M19.5 75 h-2 M19.5 53 h-2"/>
+  </g>
+
+  <!-- Genskin paa glasset -->
+  <rect x="9.8" y="14" width="1.2" height="264" rx="0.6" fill="#ffffff" fill-opacity="0.4"/>
+</svg>

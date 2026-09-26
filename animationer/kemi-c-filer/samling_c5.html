@@ -299,11 +299,9 @@
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="c5.1" data-beskrivelse="Animation der viser, hvad stofmængdekoncentration betyder, og hvordan den hænger sammen med mol og volumen." onclick="visAnimation(this, 'c5.1_animation_stofmængdekoncentration.html')" title="Animation: Koncentration"><span class="btn-num">1</span><span class="btn-text">Forstå Koncentration</span></button>
-            <button class="tab-btn" data-emne="c5.2" data-beskrivelse="Opgaver i at beregne stofmængdekoncentration for forskellige opløsninger." onclick="visAnimation(this, 'c5.2_opgaver_stofmængdekoncentration1.html')" title="Opgave: Koncentration"><span class="btn-num">2</span><span class="btn-text">Opg: Koncentration</span></button>
-            <button class="tab-btn" data-emne="c5.3" data-beskrivelse="Animation der viser forskellen på aktuel og formel koncentration, når et salt går i opløsning." onclick="visAnimation(this, 'c5.3_animationer_aktuelkonc_master2.html')" title="Animation: Aktuel vs Formel"><span class="btn-num">3</span><span class="btn-text">Aktuel vs Formel</span></button>
-            <button class="tab-btn" data-emne="c5.4" data-beskrivelse="Opgaver hvor du regner videre med aktuel og formel koncentration efter fortynding." onclick="visAnimation(this, 'c5.4_opgaver_aktuelkonc.html')" title="Aktuel/formel konc"><span class="btn-num">4</span><span class="btn-text">Aktuel/formel konc</span></button>
-            <button class="tab-btn" data-emne="c5.5" data-beskrivelse="Animation der simulerer en Mohrtitrering af havvand, med mikro- og makroniveau, til at bestemme saltindholdet." onclick="visAnimation(this, 'c5.5_eksperiment_mohrtitrering.html')" title="Forsøg: Mohrtitrering"><span class="btn-num">5</span><span class="btn-text">Forsøg: Mohrtitrering</span></button>
+            <button class="tab-btn" data-emne="c5.1" data-beskrivelse="Se hvad stofmængdekoncentration er, lav opløsninger i en målekolbe, og fortynd dem." onclick="visAnimation(this, '../superanimationer/sc5.1_koncentration/index.html')" title="Koncentration"><span class="btn-num">1</span><span class="btn-text">Koncentration</span></button>
+            <button class="tab-btn" data-emne="c5.2" data-beskrivelse="Se forskellen på formel og aktuel koncentration, når et salt går i opløsning, og regn på ionerne og på blandinger." onclick="visAnimation(this, '../superanimationer/sc5.2_formel_og_aktuel/index.html')" title="Formel og aktuel koncentration"><span class="btn-num">2</span><span class="btn-text">Formel og aktuel</span></button>
+            <button class="tab-btn" data-emne="c5.3" data-beskrivelse="Animation der simulerer en Mohrtitrering af havvand, med mikro- og makroniveau, til at bestemme saltindholdet." onclick="visAnimation(this, 'c5.5_eksperiment_mohrtitrering.html')" title="Forsøg: Mohrtitrering"><span class="btn-num">3</span><span class="btn-text">Forsøg: Mohrtitrering</span></button>
 
         </div>
 
@@ -421,9 +419,11 @@
                 if (aliasKnap) {
                     aliasKnap.click();
                 } else {
+                    // Gamle numre efter omnummereringen 26. sept. 2026: c5.5 findes
+                    // via filnavnet, som stadig har det gamle nummer.
                     knapper.forEach(knap => {
-                        if (knap.getAttribute('onclick').includes(emneFil)) {
-                            visAnimation(knap, emneFil);
+                        if (knap.getAttribute('onclick').includes(emneFil) && !document.querySelector('.tab-btn.active')) {
+                            knap.click();
                         }
                     });
                 }

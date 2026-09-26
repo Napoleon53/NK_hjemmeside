@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Byg et fedtstof</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">◆</span> Byg et fedtstof</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-fabrik" role="tab" aria-selected="true"><span class="nr">1</span>Fabrikken</button>
+        <button class="faneknap" data-fane="fane-koele" role="tab" aria-selected="false"><span class="nr">2</span>Køleskabet</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FABRIKKEN                                                  -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-fabrik" role="tabpanel" aria-label="Fabrikken">
+    <div class="scene medtekst">
+        <canvas id="fabrik-laerred"></canvas>
+        <div class="anker" id="fabrik-anker-glycerol"></div>
+        <div class="anker" id="fabrik-anker-fliser"></div>
+        <div class="anker" id="fabrik-anker-glas"></div>
+        <div class="tilbud" id="fabrik-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="fabrik-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="fabrik-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste ordre -->
+        <div class="kort opgavekort" id="fabrik-kort">
+            <h2><span id="fabrik-titel">Ordre</span><span class="taeller" id="fabrik-taeller"></span></h2>
+            <p class="maal-tekst" id="fabrik-kunde"></p>
+            <p class="opgave-spm" id="fabrik-tekst"></p>
+            <div class="pips" id="fabrik-pips"></div>
+            <p class="besked" id="fabrik-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fabrik-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="fabrik-fedt-kort">
+            <h2>Dit fedtstof <span class="taeller" id="fabrik-db"></span></h2>
+            <div id="fabrik-fedt"></div>
+        </div>
+
+        <!-- Alle fem ordrer forfra (samme som R) -->
+        <button class="knap nulstil" id="fabrik-forfra" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: KOELESKABET                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-koele" role="tabpanel" aria-label="Køleskabet">
+    <div class="scene medtekst">
+        <canvas id="koele-laerred"></canvas>
+        <div class="anker" id="koele-anker-skab"></div>
+        <div class="anker" id="koele-anker-vindue"></div>
+        <div class="anker" id="koele-anker-zoom"></div>
+        <div class="anker" id="koele-anker-bord"></div>
+        <div class="tilbud" id="koele-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="koele-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="koele-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="koele-kort">
+            <h2><span id="koele-titel">Gæt</span><span class="taeller" id="koele-taeller"></span></h2>
+            <p class="maal-tekst" id="koele-spm"></p>
+            <p class="opgave-spm" id="koele-under"></p>
+            <div class="valgliste" id="koele-valg"></div>
+            <p class="besked" id="koele-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="koele-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="koele-dekl-kort">
+            <h2>Varedeklaration <span class="taeller" id="koele-dekl-navn"></span></h2>
+            <div id="koele-dekl"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Fedtstoffer</h2>
+        <p>Et fedtstof (et triglycerid) er glycerol bundet til tre fedtsyrer. Glycerol er en alkohol med tre OH-grupper. En fedtsyre er en lang kæde med en syregruppe (COOH) for enden.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Esterbindingen</span>
+            syre + alkohol → ester + vand
+        </div>
+        <svg class="formel" viewBox="0 0 528 96" role="img" aria-label="Ethansyre og methanol giver methylethanoat og vand">
+            <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" font-size="18" fill="#e6ebf1">
+                <text x="6" y="66">H₃C</text>
+                <text x="69" y="66" text-anchor="middle">C</text>
+                <text x="69" y="25" text-anchor="middle" fill="#ff7b72">O</text>
+                <text x="95" y="66" fill="#ff7b72">O</text><text x="109" y="66">H</text>
+                <text x="136" y="67" text-anchor="middle" font-weight="400" font-size="20">+</text>
+                <text x="150" y="66">H₃C</text>
+                <text x="208" y="66" fill="#ff7b72">O</text><text x="222" y="66">H</text>
+                <text x="296" y="66">H₃C</text>
+                <text x="359" y="66" text-anchor="middle">C</text>
+                <text x="359" y="25" text-anchor="middle" fill="#ff7b72">O</text>
+                <text x="391" y="66" text-anchor="middle" fill="#ff7b72">O</text>
+                <text x="417" y="66">CH₃</text>
+                <text x="466" y="67" text-anchor="middle" font-weight="400" font-size="20">+</text>
+                <text x="478" y="66">H₂O</text>
+            </g>
+            <g stroke="#e6ebf1" stroke-width="2.5">
+                <line x1="46" y1="60" x2="60" y2="60"/>
+                <line x1="66" y1="50" x2="66" y2="29"/><line x1="72" y1="50" x2="72" y2="29"/>
+                <line x1="78" y1="60" x2="92" y2="60"/>
+                <line x1="190" y1="60" x2="205" y2="60"/>
+                <line x1="250" y1="60" x2="274" y2="60"/>
+                <line x1="336" y1="60" x2="350" y2="60"/>
+                <line x1="356" y1="50" x2="356" y2="29"/><line x1="362" y1="50" x2="362" y2="29"/>
+                <line x1="368" y1="60" x2="382" y2="60"/>
+                <line x1="400" y1="60" x2="414" y2="60"/>
+            </g>
+            <polygon points="274,54 286,60 274,66" fill="#e6ebf1"/>
+            <g font-family="Segoe UI, Arial, sans-serif" font-size="12" fill="#a9b0ba">
+                <text x="6" y="90">ethansyre</text>
+                <text x="150" y="90">methanol</text>
+                <text x="296" y="90">methylethanoat (en ester)</text>
+                <text x="478" y="90">vand</text>
+            </g>
+        </svg>
+        <p>Syrens OH og alkoholens H bliver til vand. I et fedtstof sker det tre gange, derfor hedder det et <b>tri</b>glycerid. Vand kan spalte bindingerne igen (hydrolyse).</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Mættet og umættet</span>
+            mættet: ingen dobbeltbindinger · enkeltumættet: én · flerumættet: flere
+        </div>
+        <p>En dobbeltbinding i en fedtsyre giver et knæk i kæden. Rette kæder kan ligge tæt og holder godt fast i hinanden. Kæder med knæk kan ikke pakke tæt, så molekylerne holder dårligere sammen.</p>
+        <p>Derfor er mættet fedt fast ved stuetemperatur (smør, kakaosmør), og umættet fedt er flydende (olier). Jo flere knæk, jo lavere smeltepunkt.</p>
+        <p class="note">Alle fire fedtsyrer har 18 C-atomer: stearinsyre (ingen dobbeltbindinger), oliesyre (1), linolsyre (2) og linolensyre (3, en omega-3-fedtsyre). Smeltepunkterne for de rene fedtstoffer er målte værdier; de blandede er regnet med en model og står med "ca.".</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/fedt.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_fabrik.js"></script>
+<script src="js/sim_koele.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

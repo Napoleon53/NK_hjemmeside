@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spændingsrækken</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚡</span> Spændingsrækken</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-forsoeg" role="tab" aria-selected="true"><span class="nr">1</span>Forsøget</button>
+        <button class="faneknap" data-fane="fane-raekken" role="tab" aria-selected="false"><span class="nr">2</span>Rækken</button>
+        <button class="faneknap" data-fane="fane-forudsig" role="tab" aria-selected="false"><span class="nr">3</span>Forudsig</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FORSOEGET                                                  -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
+    <div class="scene medtekst">
+        <canvas id="fs-laerred"></canvas>
+        <div class="anker" id="fs-anker-holder"></div>
+        <div class="anker" id="fs-anker-glas"></div>
+        <div class="anker" id="fs-anker-lup"></div>
+        <div class="tilbud" id="fs-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="fs-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="fs-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste -->
+        <div class="kort opgavekort" id="fs-kort">
+            <h2><span>Forsøget</span><span class="taeller" id="fs-taeller">mål 1/5</span></h2>
+            <p class="maal-tekst" id="fs-prompt"></p>
+            <div class="opgave-felt" id="fs-valg"></div>
+            <p class="besked" id="fs-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fs-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="fs-skemakort">
+            <h2>Skemaet <span class="taeller"><b id="fs-antal">0</b>/25 forsøg</span></h2>
+            <div class="skema" id="fs-skema"></div>
+            <p class="note">✓ reaktion · – ingen reaktion</p>
+            <button class="knap nulstil" id="fs-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: RAEKKEN                                                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-raekken" role="tabpanel" aria-label="Rækken">
+    <div class="scene medtekst">
+        <canvas id="rk-laerred"></canvas>
+        <div class="anker" id="rk-anker-hylde"></div>
+        <div class="anker" id="rk-anker-kort"></div>
+        <div class="tilbud" id="rk-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="rk-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="rk-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Til Forudsig -->
+        <div class="kort opgavekort" id="rk-kort">
+            <h2><span>Rækken</span><span class="taeller" id="rk-taeller">0/6 på hylden</span></h2>
+            <p class="maal-tekst" id="rk-prompt"></p>
+            <p class="besked" id="rk-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="rk-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="rk-skemakort">
+            <h2>Skemaet fra forsøget <span class="taeller"><b id="rk-antal">0</b>/25 forsøg</span></h2>
+            <div class="skema" id="rk-skema"></div>
+            <p class="note" id="rk-note"></p>
+            <button class="knap nulstil" id="rk-nulstil" type="button"><span>Bland kortene</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FORUDSIG                                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-forudsig" role="tabpanel" aria-label="Forudsig">
+    <div class="scene medtekst">
+        <canvas id="fu-laerred"></canvas>
+        <div class="anker" id="fu-anker-raekke"></div>
+        <div class="anker" id="fu-anker-glas"></div>
+        <div class="anker" id="fu-anker-lup"></div>
+        <div class="tilbud" id="fu-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="fu-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="fu-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="fu-kort">
+            <h2><span id="fu-titel">Opgave 1</span><span class="taeller" id="fu-taeller"></span></h2>
+            <p class="maal-tekst" id="fu-prompt"></p>
+            <p class="opgave-spm" id="fu-spm"></p>
+            <div class="opgave-felt" id="fu-valg"></div>
+            <p class="besked" id="fu-svar" aria-live="polite"></p>
+            <p class="opgave-spm" id="fu-spm2"></p>
+            <div class="skemafelt" id="fu-skema"></div>
+            <div class="chips" id="fu-chips"></div>
+            <p class="besked" id="fu-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fu-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="fu-logkort">
+            <h2>Dine svar <span class="taeller"><b id="fu-rigtige">0 af 0</b> gættet rigtigt</span></h2>
+            <div class="logliste" id="fu-log"></div>
+            <button class="knap nulstil" id="fu-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Spændingsrækken</h2>
+        <p>Et metal kan afgive elektroner til ionerne af et andet metal. Det sker kun, når metallet står til venstre for ionernes metal i spændingsrækken.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Spændingsrækken</span>
+            K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au<br>
+            <span class="eksempel-note">uædel til venstre, ædel til højre</span>
+        </div>
+        <p>Zink i kobber(II)sulfat: zink afgiver elektroner og går i opløsning som Zn²⁺. Kobberionerne optager elektronerne og sætter sig som kobber på stangen.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Reaktionen</span>
+            Zn ⟶ Zn²⁺ + 2 e⁻<br>
+            Cu²⁺ + 2 e⁻ ⟶ Cu<br>
+            Zn(s) + Cu²⁺(aq) ⟶ Zn²⁺(aq) + Cu(s)
+        </div>
+        <p>Metaller til venstre for H afgiver elektroner til H⁺ i en syre. Der dannes hydrogen, H₂, som bobler op.</p>
+        <p>I en afstemt reaktion afgives lige så mange elektroner, som der optages. Derfor står der 2 foran Ag⁺, når kobber reagerer med sølvioner: Cu(s) + 2 Ag⁺(aq) ⟶ Cu²⁺(aq) + 2 Ag(s).</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lup.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_forsoeg.js"></script>
+<script src="js/sim_raekken.js"></script>
+<script src="js/sim_forudsig.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

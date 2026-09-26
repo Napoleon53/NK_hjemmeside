@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, sc4.10 Afrunding og opskrivning</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Åbner index.html i en iframe og kontrollerer det, man ikke kan se på
+   et skærmbillede: at modellen tæller og afrunder rigtigt (også der,
+   hvor kommatal i maskinen snyder), at alle opgaver, generatorerne kan
+   lave, har et gyldigt facit, at de typiske fejl får den rigtige
+   besked, at en hel runde kan gennemføres på alle fire faner med rigtige
+   svar, hint og Vis svaret, at kommaet hopper færdigt, at Kemichael
+   kun taler, når han bliver bedt om det, og kan sendes ud, at sproget
+   overholder reglerne, og at tallene kan være på tavlen. Skal køres
+   gennem en lokal server med animationer/ som rod (Kemichael hentes
+   derfra). Elevens gemte valg og rekord lægges tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK") + " (" + antal + " påstande)", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc4.10-valg", "nk-sc4.10-rekord", "nk-sc4.10-kemichael-ude"];
+var gemt = {};
+try { NOEGLER.forEach(function (k) { gemt[k] = localStorage.getItem(k); localStorage.removeItem(k); }); } catch (e) {}
+function laegTilbage() {
+    try { NOEGLER.forEach(function (k) { if (gemt[k] === null || gemt[k] === undefined) localStorage.removeItem(k); else localStorage.setItem(k, gemt[k]); }); } catch (e) {}
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    try { koerAlt(); } catch (e) { fejl++; skriv("  FEJL  undtagelse: " + e + "\n" + (e.stack || ""), "fejl"); }
+    laegTilbage();
+    vis();
+}
+
+function koerAlt() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var C = NK.Cifre, D = NK.Data;
+    paastand("fire faner er bygget (tael, afrund, komma, blandet)", !!(NK.faner && NK.faner.tael && NK.faner.afrund && NK.faner.komma && NK.faner.blandet));
+    var raekke = Array.prototype.map.call(d.querySelectorAll(".faneknap"), function (b) { return b.getAttribute("data-fane"); }).join(",");
+    paastand("rækkefølgen er Tæl cifrene, Flyt kommaet, Afrund, Blandet (også tasterne 1 til 4)", raekke === "tael,komma,afrund,blandet" && NK.Data.FANE_RAEKKE.join(",") === raekke, raekke);
+    paastand("Kemichael ved katederet findes", !!NK.laerer && !!NK.Kemichael);
+    function el(id) { return d.getElementById(id); }
+    function tid(sek) { for (var i = 0; i < Math.round(sek * 60); i++) NK.trin(1 / 60); }
+
+    /* ----- 2. Modellen --------------------------------------------------------- */
+    overskrift("2. Modellen: betydende cifre, afrunding og skrivemåder");
+    var tael = [["0,0250", 3], ["4500", 4], ["12,0", 3], ["305", 3], ["0,5", 1], ["100,5", 4], ["0,00382", 3],
+        ["45 600", 5], ["1.250.000", 7], ["2.5", 2], ["7", 1], ["0,000100", 3]];
+    var tf = tael.filter(function (x) { var t = C.fraTekst(x[0]); return !t || C.antal(t) !== x[1]; });
+    paastand("tæller betydende cifre som i den gamle (nuller foran tæller ikke, alle andre gør)", tf.length === 0, tf.map(function (x) { return x[0]; }).join(", "));
+    var afr = [["12,46", 3, "12,5"], ["0,03449", 2, "0,034"], ["45678", 2, "4,6 · 10⁴"], ["999,7", 3, "1,00 · 10³"],
+        ["100422", 1, "1 · 10⁵"], ["9,95", 2, "10"], ["0,0995", 2, "0,10"], ["2,5", 1, "3"], ["1,005", 3, "1,01"],
+        ["1,015", 3, "1,02"], ["6820,4", 4, "6820"], ["0,000456", 1, "0,0005"], ["399,5", 3, "400"]];
+    var af = afr.filter(function (x) { return C.tekst(C.afrund(C.fraTekst(x[0]), x[1])) !== x[2]; });
+    paastand("afrunding på cifre, uden de fejl kommatal giver (1,005 → 1,01; 100422 → 1 · 10⁵)", af.length === 0,
+        af.map(function (x) { return x[0] + " → " + C.tekst(C.afrund(C.fraTekst(x[0]), x[1])); }).join(" | "));
+    paastand("5 rundes op: 0,125 med 2 er 0,13", C.tekst(C.afrund(C.fraTekst("0,125"), 2)) === "0,13");
+    paastand("potensform: 4,56 · 10⁻³ og 7 · 10³", C.potensTekst(C.fraTekst("0,00456")) === "4,56 · 10⁻³" && C.potensTekst(C.tal("7", 3)) === "7 · 10³");
+    paastand("tusindtal med smalt mellemrum fra fem cifre, ikke ved fire", C.skillerum("45600") === "45 600" && C.skillerum("4500") === "4500" && C.skillerum("1250000,5") === "1 250 000,5");
+    var g1 = C.gange(C.fraTekst("2,5"), C.fraTekst("4,00")), g2 = C.gange(C.fraTekst("1,5"), C.fraTekst("2,00"));
+    paastand("gange uden afrunding: 2,5 · 4,00 = 10,000 og 1,5 · 2,00 = 3,000", C.almindelig(g1) === "10,000" && C.almindelig(g2) === "3,000");
+    paastand("resultatet med 2 cifre: 10 og 3,0", C.tekst(C.afrund(g1, 2)) === "10" && C.tekst(C.afrund(g2, 2)) === "3,0");
+    var ls = [["4,56", "3", 4560], ["4,56e3", "", 4560], ["4,56*10^-2", "", 0.0456], ["4,56·10^3", "", 4560], ["−2,5", "", -2.5], ["45 600", "", 45600]];
+    var lf = ls.filter(function (x) { var s = C.laesSvar(x[0], x[1]); return !s.tal || Math.abs(Number((s.tal.neg ? "-" : "") + "0." + s.tal.s) * Math.pow(10, s.tal.p + 1) - x[2]) > 1e-9; });
+    paastand("svarfeltet læser komma, punktum, e, *10^ og ·10^", lf.length === 0, lf.map(function (x) { return x[0]; }).join(", "));
+    paastand("tomt felt er tomt, ikke et svar; eksponent to steder afvises", C.laesSvar("", "").tom === true && !!C.laesSvar("4e3", "2").fejl && !!C.laesSvar("4,5,6", "").fejl);
+
+    /* ----- 3. Generatorerne --------------------------------------------------- */
+    overskrift("3. Alle opgaver, generatorerne laver, har et gyldigt facit");
+    function facitSvar(o) {
+        if (o.type === "tael") return { valgt: o.betydende.slice() };
+        if (o.type === "potens" || ((o.type === "afrund" || o.type === "regn") && !C.kanAlmindelig(o.facit))) return { mantisse: C.mantisse(o.facit), eksp: String(o.facit.p) };
+        return { mantisse: C.skillerum(C.almindelig(o.facit)), eksp: "" };
+    }
+    var typer = ["tael", "afrund", "regn", "potens", "almindelig", "enhed"], N = 1500, problemer = [];
+    typer.forEach(function (ty) {
+        for (var i = 0; i < N; i++) {
+            var o = C.lav(ty, {}, { foran: i % 7 === 0 });
+            var grund = [];
+            if (!o) { problemer.push(ty + ": ingen opgave"); break; }
+            if (ty === "tael") {
+                if (o.facit !== C.betydendeI(o.vis).length || o.facit < 1) grund.push("antal");
+            } else if (ty === "afrund") {
+                if (o.tal.s.length <= o.n) grund.push("intet at runde");
+                if (C.antal(o.facit) !== o.n) grund.push("cifre i facit");
+                if (o.vis.length > 7) grund.push("over 7 tegn");
+                if (!C.kanAlmindelig(o.facit) && C.iOmraade(o.facit)) grund.push("potens mellem 0,01 og 100");
+            } else if (ty === "regn") {
+                if (!C.kanAlmindelig(o.facit)) grund.push("facit kun som potens");
+                if (o.n !== Math.min(C.antal(o.A), C.antal(o.B))) grund.push("n");
+                if (C.antal(o.facit) !== o.n) grund.push("cifre i facit");
+            } else if (ty === "potens") {
+                if (C.antal(o.facit) !== o.n || !C.ens(C.fraTekst(o.vis), o.facit)) grund.push("facit");
+                if (C.iOmraade(o.facit)) grund.push("tal mellem 0,01 og 100 i videnskabelig notation");
+            } else if (ty === "almindelig") {
+                if (!C.ens(C.fraTekst(C.almindelig(o.facit)), o.tal)) grund.push("facit");
+            } else if (ty === "enhed") {
+                var v = C.fraTekst(o.vis);
+                if (!C.ens(C.tal(v.s, v.p + o.k), o.facit) || !o.k || Math.abs(o.k) > 6) grund.push("omregning");
+                var fam = C.ENHEDER[o.slags];
+                if (!fam || fam.eksp[o.fra] === undefined || fam.eksp[o.til] === undefined || fam.eksp[o.fra] - fam.eksp[o.til] !== o.k) grund.push("enhederne passer ikke sammen");
+            }
+            var r = C.tjek(o, facitSvar(o));
+            if (!r.ok) grund.push("facit godkendes ikke: " + r.besked);
+            if (grund.length) { problemer.push(ty + " " + (o.vis || o.a) + ": " + grund.join(", ")); if (problemer.length > 6) break; }
+        }
+    });
+    paastand(N + " opgaver af hver af de seks typer: gyldigt facit, og facit godkendes", problemer.length === 0, problemer.slice(0, 5).join(" | "));
+    var enere = 0, runde = {};
+    for (var k = 0; k < 200; k++) { if (C.lav("afrund", runde).n === 1) enere++; }
+    paastand("højst én afrunding til ét ciffer pr. runde (som i den gamle)", enere <= 1, enere + " i samme runde");
+    var foran = 0;
+    for (k = 0; k < 50; k++) { if (C.nulTyper(C.lav("tael", {}, { foran: true }).vis).foran) foran++; }
+    paastand("rundens første tælleopgave har nuller foran", foran === 50);
+    var regnDele = 0;
+    for (k = 0; k < 400; k++) { if (C.lav("regn").op === "/") regnDele++; }
+    paastand("regnestykkerne har både gange og division", regnDele > 60 && regnDele < 340, regnDele + " af 400 er division");
+    var slags = {}, enh = {};
+    for (k = 0; k < 1500; k++) { var eo = C.lav("enhed"); slags[eo.slags] = (slags[eo.slags] || 0) + 1; enh[eo.fra] = 1; enh[eo.til] = 1; }
+    paastand("enheder: alle fem slags kommer (volumen, masse, stofmængde, koncentration, tryk), volumen oftest",
+        ["volumen", "masse", "stofmaengde", "koncentration", "tryk"].every(function (s) { return slags[s] > 50; }) && slags.volumen > slags.tryk, JSON.stringify(slags));
+    paastand("enheder: alle 20 enheder bruges, også dL, cm³, dm³, m³, µg, µmol og hPa", Object.keys(enh).length === 20, Object.keys(enh).join(" "));
+    paastand("forholdet skrives rigtigt: 1 kg = 1000 g, 1 hPa = 100 Pa, 1 L = 1000 cm³, 1 mol = 1 000 000 µmol",
+        C.enhedRelation({ fra: "kg", til: "g", k: 3 }) === "1 kg = 1000 g" && C.enhedRelation({ fra: "Pa", til: "hPa", k: -2 }) === "1 hPa = 100 Pa" &&
+        C.enhedRelation({ fra: "cm³", til: "L", k: -3 }) === "1 L = 1000 cm³" && C.enhedRelation({ fra: "mol", til: "µmol", k: 6 }) === "1 mol = 1 000 000 µmol");
+    paastand("den uskrevne regel: 0,01 til 100 er i området, 0,00999 og 100,5 er ikke",
+        C.iOmraade(C.fraTekst("0,01")) && C.iOmraade(C.fraTekst("99,9")) && C.iOmraade(C.fraTekst("100")) && !C.iOmraade(C.fraTekst("0,00999")) && !C.iOmraade(C.fraTekst("100,5")) && !C.iOmraade(C.fraTekst("45600")));
+
+    /* ----- 4. De typiske fejl --------------------------------------------------- */
+    overskrift("4. De typiske fejl får en besked, der passer (og intet facit)");
+    function afrOpg(vis, n) { var t = C.fraTekst(vis); return { type: "afrund", vis: vis, tal: t, n: n, facit: C.afrund(t, n) }; }
+    function potOpg(retning, mant, pot) {
+        var m = C.fraTekst(mant), t = C.tal(m.s, m.p + pot);
+        return retning === "almindelig" ? { type: "almindelig", tal: t, n: m.s.length, facit: t, vis: C.mantisse(t), eksp: pot } :
+            { type: "potens", tal: t, n: m.s.length, facit: t, vis: C.almindelig(t) };
+    }
+    function besked(o, m, e) { return C.tjek(o, { mantisse: m, eksp: e || "" }).besked; }
+    var A = afrOpg("12,46", 3);
+    paastand("skåret af i stedet for afrundet (12,4)", /skåret cifrene af/.test(besked(A, "12,4")) && !/12,5/.test(besked(A, "12,4")));
+    paastand("rundet op, når det skulle ned (12,43 → 12,5)", /under 5, så der rundes ned/.test(besked(afrOpg("12,43", 3), "12,5")));
+    paastand("afrundet til decimaler (0,034562 → 0,03)", /2 decimaler/.test(besked(afrOpg("0,034562", 2), "0,03")));
+    paastand("rigtigt tal, for mange cifre (12,50)", /har 4 betydende cifre\. Det skal have 3/.test(besked(A, "12,50")));
+    paastand("nullet til sidst glemt (7,5 skal være 7,50)", /har kun 2/.test(besked(afrOpg("7,4999", 3), "7,5")));
+    paastand("46 000 med 2 cifre: brug 10-feltet", /Brug feltet ved 10-tallet/.test(besked(afrOpg("45678", 2), "46000")));
+    paastand("46 for 45 678: størrelsen er forkert", /1000 gange for lille/.test(besked(afrOpg("45678", 2), "46")));
+    paastand("46 · 10³ godkendes, med en note om ét ciffer foran kommaet", C.tjek(afrOpg("45678", 2), { mantisse: "46", eksp: "3" }).ok && /ét ciffer foran kommaet/.test(C.tjek(afrOpg("45678", 2), { mantisse: "46", eksp: "3" }).note));
+    var ur = C.tjek(A, { mantisse: "1,25", eksp: "1" });
+    paastand("den uskrevne regel: 1,25 · 10¹ for 12,5 godkendes med en note (12,5)", ur.ok && /0,01 og 100/.test(ur.note) && /12,5/.test(ur.note), ur.note);
+    paastand("den uskrevne regel: 4,6 · 10⁴ får ingen note", !/0,01 og 100/.test(C.tjek(afrOpg("45678", 2), { mantisse: "4,6", eksp: "4" }).note || ""));
+    var R = { type: "regn", a: "2,5", b: "4,00", A: C.fraTekst("2,5"), B: C.fraTekst("4,00"), op: "·", praecis: C.lommeregner(g1), n: 2, facit: C.afrund(g1, 2), mindst: "2,5" };
+    var R2 = { type: "regn", a: "1,23", b: "2,0", A: C.fraTekst("1,23"), B: C.fraTekst("2,0"), op: "·", n: 2, mindst: "2,0" };
+    R2.praecis = C.lommeregner(C.gange(R2.A, R2.B)); R2.facit = C.afrund(R2.praecis, 2);
+    paastand("regnestykke: lommeregnerens tal uden afrunding (2,46)", /lommeregnerens tal/.test(besked(R2, "2,46")));
+    var R3 = { type: "regn", a: "1,23", b: "2,5", A: C.fraTekst("1,23"), B: C.fraTekst("2,5"), op: "·", n: 2, mindst: "2,5" };
+    R3.praecis = C.lommeregner(C.gange(R3.A, R3.B)); R3.facit = C.afrund(R3.praecis, 2);
+    paastand("regnestykke: afrundet efter den mest præcise faktor (1,23 · 2,5 som 3,08)", /mest præcise/.test(besked(R3, "3,08")), besked(R3, "3,08"));
+    paastand("regnestykke: 10 er rigtigt for 2,5 · 4,00", C.tjek(R, { mantisse: "10", eksp: "" }).ok);
+    var P = potOpg("potens", "4,56", 4);
+    paastand("notation: fortegnet på eksponenten", /Fortegnet/.test(besked(P, "4,56", "-4")) && /under 1/.test(besked(potOpg("potens", "3,2", -3), "3,2", "3")));
+    paastand("notation: ikke ét ciffer foran kommaet (45,6 · 10³)", /ét ciffer \(1 til 9\)/.test(besked(P, "45,6", "3")));
+    paastand("notation: eksponenten for lille", /for lille/.test(besked(P, "4,56", "3")));
+    paastand("notation: for mange cifre foran 10-tallet (4,560)", /skal have 3 betydende cifre/.test(besked(P, "4,560", "4")));
+    paastand("notation: skrevet som almindeligt tal", /videnskabelig notation/.test(besked(P, "45600")));
+    var Q = potOpg("almindelig", "7,05", 3);
+    paastand("almindeligt tal: kommaet den forkerte vej", /til højre/.test(besked(Q, "0,00705")));
+    paastand("almindeligt tal: kommaet for lidt", /for lidt/.test(besked(Q, "70,5")));
+    var E1 = { type: "enhed", vis: "250", tal: C.fraTekst("250"), fra: "mL", til: "L", k: -3, facit: C.fraTekst("0,25") };
+    var E2 = { type: "enhed", vis: "1,25", tal: C.fraTekst("1,25"), fra: "L", til: "µL", k: 6, facit: C.fraTekst("1250000") };
+    paastand("enheder: den forkerte vej (250 mL → 250 000 L)", /mindre, ikke større/.test(besked(E1, "250000")));
+    paastand("enheder: 0,250 er også rigtigt", C.tjek(E1, { mantisse: "0,250" }).ok);
+    paastand("enheder: L til µL med 1000 i stedet for 10⁶", /to trin på 1000/.test(besked(E2, "1250")));
+    var E3 = { type: "enhed", vis: "101,3", tal: C.fraTekst("101,3"), fra: "kPa", til: "hPa", k: 1, facit: C.fraTekst("1013") };
+    paastand("enheder: kPa til hPa flyttet for langt (10 130) giver forholdet 1 kPa = 10 hPa", /1 kPa = 10 hPa/.test(besked(E3, "10130")), besked(E3, "10130"));
+    paastand("enheder: hintet siger forholdet, men ikke vejen eller antallet af pladser", /1 kPa = 10 hPa/.test(C.hint(E3)) && !/til højre|til venstre|1 plads/.test(C.hint(E3)));
+    var T = C.lav("tael", {}, { foran: true });
+    var foranI = T.vis.replace(/[^\d]/g, "").search(/[1-9]/) - 1;
+    paastand("tælling: et nul foran valgt", /foran det første ciffer, der ikke er nul/.test(C.tjek(T, { valgt: T.betydende.concat([foranI]) }).besked));
+    var T2 = { type: "tael", vis: "12,50", betydende: [0, 1, 2, 3], facit: 4 };
+    paastand("tælling: nullet til sidst efter kommaet mangler", /til sidst efter kommaet/.test(C.tjek(T2, { valgt: [0, 1, 2] }).besked));
+    var T3 = { type: "tael", vis: "4500", betydende: [0, 1, 2, 3], facit: 4 };
+    paastand("tælling: nullerne til sidst i et helt tal mangler", /helt tal/.test(C.tjek(T3, { valgt: [0, 1] }).besked));
+    var T4 = { type: "tael", vis: "305", betydende: [0, 1, 2], facit: 3 };
+    paastand("tælling: nullet i midten mangler", /mellem to andre cifre/.test(C.tjek(T4, { valgt: [0, 2] }).besked));
+    paastand("tælling: intet valgt er tomt, ikke forkert", C.tjek(T4, { valgt: [] }).tom === true);
+    var ingenFacit = [besked(A, "12,4"), besked(afrOpg("12,43", 3), "12,5"), besked(P, "4,56", "3"), besked(Q, "70,5")];
+    paastand("beskederne ved forkerte svar indeholder ikke facit", !/12,5/.test(ingenFacit[0]) && !/12,4\b/.test(ingenFacit[1]) && !/10⁴|10<sup>4/.test(ingenFacit[2]) && !/7050/.test(ingenFacit[3]));
+
+    /* ----- 5. Forløbet på fanerne ----------------------------------------------- */
+    overskrift("5. En hel runde på hver fane");
+    function skrivFelt(m, e) {
+        var a = el("svar-m"), b = el("svar-e");
+        a.value = m; a.dispatchEvent(new w.Event("input"));
+        b.value = e || ""; b.dispatchEvent(new w.Event("input"));
+    }
+    function loesRigtigt(f) {
+        var s = facitSvar(f.opg);
+        if (s.valgt) s.valgt.forEach(function (i) { f.klikBrik(i); }); else skrivFelt(s.mantisse, s.eksp);
+        f.tjek();
+        return f.loest;
+    }
+    ["tael", "afrund", "komma", "blandet"].forEach(function (id) {
+        NK.visFane(id);
+        var f = NK.aktivFane, ok = true, hop = true;
+        paastand(id + ": fanen er aktiv og viser opgave 1", f.id === id && el("kort-nr").textContent === "1");
+        for (var n = 0; n < D.RUNDE; n++) {
+            if (!loesRigtigt(f)) { ok = false; break; }
+            tid(3.5);
+            if (f.hop && !f.hop.faerdig) hop = false;
+            if (n < D.RUNDE - 1) f.naeste();
+        }
+        paastand(id + ": ti rigtige svar i træk giver 10 af 10", ok && f.runde.slut && f.rigtige() === 10, f.runde.status.join(","));
+        paastand(id + ": kommaet hopper færdigt på 3,5 s", hop);
+        paastand(id + ": knappen hedder Ny runde, og listen har ti linjer", el("opgaveknap").textContent.indexOf("Ny runde") === 0 && el("rundeliste").children.length === 10);
+        f.knap();
+        paastand(id + ": Ny runde starter forfra", f.runde.nr === 0 && !f.runde.slut && f.runde.log.length === 0);
+    });
+    paastand("Blandet: 10 af 10 bliver rekord", Number(w.localStorage.getItem("nk-sc4.10-rekord")) === 10);
+    NK.visFane("komma");
+    var fe = NK.aktivFane, okE = true;
+    fe.skiftValg("enhed");
+    for (var ne = 0; ne < D.RUNDE; ne++) {
+        if (fe.opg.type !== "enhed" || !loesRigtigt(fe)) { okE = false; break; }
+        tid(3.5);
+        if (ne < D.RUNDE - 1) fe.naeste();
+    }
+    paastand("Flyt kommaet med Enheder: ti omregninger i træk giver 10 af 10", okE && fe.runde.slut && fe.rigtige() === 10, fe.runde.status.join(","));
+    fe.skiftValg("notation");
+
+    NK.visFane("afrund");
+    var f = NK.aktivFane;
+    f.lavOpgave(); f.vis();
+    paastand("Afrund: 10-feltet står der altid, også når facit er et almindeligt tal", !el("potens").hidden);
+    paastand("Afrund: måleren er tom, før eleven skriver", el("maaler").querySelectorAll("i.fyldt, i.over").length === 0);
+    skrivFelt("", "");
+    f.tjek();
+    paastand("et tomt svar tæller ikke som en fejl", f.fejl === 0 && !f.loest);
+    skrivFelt("1", "");
+    f.tjek();
+    paastand("et forkert svar giver en rød linje og tæller som fejl", f.fejl === 1 && el("besked").className.indexOf("skidt") >= 0);
+    loesRigtigt(f);
+    paastand("rigtigt efter en fejl er gult (med hjælp)", f.runde.status[0] === "hjulpet");
+    f.naeste();
+    f.knap();
+    paastand("Giv hint: knappen bliver til Vis svaret", el("opgaveknap").textContent === "Vis svaret");
+    f.knap();
+    paastand("Vis svaret: opgaven er løst og rød, og svaret står i feltet", f.loest && f.runde.status[1] === "vist" && el("svar-m").value !== "");
+    paastand("Vis svaret: knappen bliver til Næste opgave", el("opgaveknap").textContent.indexOf("Næste opgave") === 0);
+    f.skiftValg("regn");
+    paastand("skift til regnestykker: ny runde, og valget huskes", f.runde.nr === 0 && f.opg.type === "regn" && JSON.parse(w.localStorage.getItem("nk-sc4.10-valg")).afrund === "regn");
+    f.skiftValg("maaletal");
+
+    NK.visFane("tael");
+    f = NK.aktivFane;
+    var kl = d.querySelector("#talrk [data-komma]");
+    if (kl) kl.click();
+    paastand("påskeæg: et klik på kommaet får et svar", !kl || /Kommaet/.test(el("besked").textContent));
+    var b0 = d.querySelector("#talrk .brik");
+    b0.click();
+    paastand("et klik på en brik vælger den (og viser antallet)", b0.getAttribute("data-i") !== null && /Valgt/.test(el("valgt-info").textContent));
+
+    /* ----- 6. Kemichael ------------------------------------------------------------ */
+    overskrift("6. Kemichael taler kun, når han bliver bedt om det");
+    NK.visFane("komma");
+    f = NK.aktivFane;
+    f.nyRunde(); f.vis();
+    tid(1);
+    paastand("han siger intet, når fanen åbnes", el("boble").hidden);
+    skrivFelt("1", ""); f.tjek(); tid(0.5);
+    paastand("han siger intet ved et forkert svar", el("boble").hidden);
+    f.knap(); tid(0.3);
+    paastand("Giv hint: hintet står i hans boble", !el("boble").hidden && /Hint/.test(el("boble").textContent));
+    loesRigtigt(f); tid(0.3);
+    paastand("opgaven løst: han tier igen", el("boble").hidden);
+    f.naeste();
+    el("kknap").click(); tid(3);
+    paastand("Send Kemichael ud: knappen hedder Hent Kemichael", el("kknap").textContent === "Hent Kemichael");
+    f.knap(); tid(0.3);
+    paastand("ude: hintet står i linjen under svaret", el("boble").hidden && /Hint/.test(el("besked").textContent));
+    el("kknap").click(); tid(0.5);
+    paastand("hentet ind igen", el("kknap").textContent === "Send Kemichael ud" && NK.laerer.inde());
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "k" })); tid(0.3);
+    paastand("K: han siger, hvor man er", !el("boble").hidden && el("boble").textContent.length > 5);
+
+    /* ----- 7. Sproget -------------------------------------------------------------- */
+    overskrift("7. Sproget");
+    var tekster = [d.body.innerText];
+    Object.keys(D).forEach(function (k) {
+        var v = D[k];
+        if (typeof v === "string") tekster.push(v);
+        else if (Array.isArray(v)) tekster.push(v.join(" "));
+        else if (v && typeof v === "object") Object.keys(v).forEach(function (j) { if (typeof v[j] === "string") tekster.push(v[j]); });
+    });
+    for (k = 0; k < 300; k++) {
+        var o = C.lav(typer[k % typer.length], {});
+        tekster.push(o.spm, C.hint(o), C.svar(o), C.forklaring(o));
+    }
+    var alt = tekster.join("\n").replace(/<[^>]+>/g, "");
+    paastand("ingen tankestreger (– og —)", !/[–—]/.test(alt), (alt.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
+    paastand("ingen udråbstegn", !/!/.test(alt), (alt.match(/.{0,30}!.{0,10}/) || [""])[0]);
+    paastand("ingen 1+ eller 1− som ladning", !/[A-Za-z][¹1][⁺⁻+−]/.test(alt));
+    paastand("replikkerne er højst ca. 60 tegn", [D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST].concat(D.KAFFE, D.KOMMA, Object.keys(D.KEMICHAEL).map(function (x) { return D.KEMICHAEL[x]; })).every(function (s) { return s.length <= 62; }));
+
+    /* ----- 8. Layout --------------------------------------------------------------- */
+    overskrift("8. Tallene kan være på tavlen");
+    var brede = [["1400px", "860px"], ["1100px", "640px"], ["900px", "700px"]], overl = [];
+    brede.forEach(function (st) {
+        ramme.style.width = st[0]; ramme.style.height = st[1];
+        void ramme.offsetWidth;
+        tid(0.1);
+        ["afrund", "komma", "blandet"].forEach(function (id) {
+            NK.visFane(id);
+            var g = NK.aktivFane;
+            for (var n = 0; n < 12; n++) {
+                g.nyRunde(); g.vis();
+                var rk = el("talrk"), bs = rk.querySelectorAll(".brik");
+                var brudt = bs.length && Math.abs(bs[0].getBoundingClientRect().top - bs[bs.length - 1].getBoundingClientRect().top) > 5;
+                if (brudt || el("arbejde").scrollWidth > el("arbejde").clientWidth + 1) overl.push(st[0] + " " + id + " " + (g.opg.vis || g.opg.a));
+            }
+        });
+    });
+    ramme.style.width = "1400px"; ramme.style.height = "860px";
+    paastand("tallene står på én linje på tavlen ved 1400, 1100 og 900 px", overl.length === 0, overl.slice(0, 4).join(" | "));
+    var fs = [];
+    ["#spm", ".valgt-info", ".besked", ".rundeliste li", ".note"].forEach(function (s) {
+        var e = d.querySelector(s);
+        if (e && parseFloat(w.getComputedStyle(e).fontSize) < 12.5) fs.push(s);
+    });
+    paastand("ingen tekst, eleven skal læse, er under 12,5 px", fs.length === 0, fs.join(", "));
+}
+</script>
+</body>
+</html>

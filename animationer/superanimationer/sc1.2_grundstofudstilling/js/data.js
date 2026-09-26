@@ -452,7 +452,7 @@
     D.SLUT_REPLIK = {
         ingen: "Nul point. Udstillingen står der stadig. Den venter.",
         faa: "Der var flere grundstoffer, end du nåede. Det er der altid.",
-        mange: "Hurtigere end kaffemaskinen. Og den er hurtig.",
+        mange: "Hurtigere end kaffemaskinen. Det er ikke svært.",
         rekord: "Ny rekord. Jeg skriver det ned. Et sted."
     };
 

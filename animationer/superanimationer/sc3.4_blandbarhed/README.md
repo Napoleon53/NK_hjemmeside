@@ -1,7 +1,7 @@
 # sc3.4: Blandbarhed
 
 Superanimation, der afløser `animationer/kemi-c-filer/c3.4_molekyler_blandbarhed.html`.
-Ikke i menuen endnu.
+I menuen fra 26. sept. 2026.
 
 ## Bestillingen
 
@@ -24,7 +24,7 @@ emnet; denne er bygget tæt på den gamle c3.4.
    forsøget med stoffer i vand og heptan. Destillation er et andet emne; her er
    kun iagttagelsen fra den gamle, at ethanol koger før vand.
 4. **Loftet:** 3 stoffer. 1 scene, ingen faner. På scenen 1 bassin og 1 lille
-   glas; højst 864 kugler plus dampen. 6 opgaver og 5 quizspørgsmål. Ingen
+   glas; højst 1320 kugler plus dampen. 6 opgaver og 5 quizspørgsmål. Ingen
    flasker, man hælder med musen, intet stativ, intet affaldsglas, ingen uheld.
 5. **Layoutet:** toplinje, scene og panel. Bassinet er stjernen og fylder
    scenen; det lille glas står i hjørnet og viser det, øjet ser. Panelet har
@@ -36,13 +36,14 @@ emnet; denne er bygget tæt på den gamle c3.4.
 Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
 * **Bassinet** er et glas væske, forstørret, så molekylerne ses. Hver kugle er et
-  molekyle, og væsken er altid tæt: tre portioner fylder ni rækker, ni portioner
-  fylder bassinet (864 kugler), og mere løber over kanten. Det er det samme,
-  hvor stort vinduet er. Musen over en kugle viser, hvad den er ("Ethanol,
+  molekyle, og væsken er altid tæt: tre portioner fylder ni rækker, elleve
+  portioner fylder bassinet (1320 kugler), og mere løber over kanten. Det er det
+  samme, hvor stort vinduet er. Bassinet starter med to portioner vand. Musen over en kugle viser, hvad den er ("Ethanol,
   C₂H₅OH, polær"). Træk i bassinet for at ryste det.
 * **Glasset** til højre er det samme bassin i almindelig størrelse, set med det
   blotte øje: vand og ethanol er klare, olien er lysegul, grænsen mellem to lag
-  er en lys streg, og en emulsion er mælket. Det er regnet af den samme model.
+  er en tynd lys streg, og en emulsion er mælket. Det er tegnet skarpt, felt for
+  felt, ud fra den samme model.
 * **Panelet:** tre knapper hælder en portion vand, ethanol eller olie i (en
   stråle midt i bassinet). Ryst bassinet. Temperaturen fra 20 til 120 °C med
   kogepunkterne for ethanol (78 °C) og vand (100 °C) i stoffernes farver. Tøm.
@@ -60,14 +61,17 @@ Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddis
   ligget nederst i halvandet sekund.
 * **Quiz** (fem spørgsmål) og **Teori** ligger bag knapper i toplinjen, **?** giver
   rundvisningen.
-* **Kemichael** præsenterer bassinet første gang (tre linjer, peger på Hæld i),
-  og han kommer forbi med én replik, når bassinet løber over, når olien svæver,
-  og når der rystes i noget, der allerede er ét lag. Højst én gang hver pr.
-  sidevisning.
+* **Kemichael** præsenterer bassinet, når eleven vælger det (to linjer, peger på
+  Hæld i). Ellers kommer han kun forbi med én replik, når en stor oliedråbe
+  hænger midt i blandingen (påskeægget), højst én gang pr. sidevisning. Brugeren syntes, han talte for
+  meget, da han også kommenterede overløb og rystninger.
 
-Påskeæg: lige dele vand og ethanol vejer 0,926 g/mL, næsten det samme som olie.
-Hæld tre portioner af hver, så olie, og ryst: oliedråberne svæver midt i
-blandingen.
+Påskeæg: lige dele vand og ethanol vejer 0,926 g/mL, næsten det samme som olie
+(0,92). Hæld lige meget af hver, så olie, og ryst: oliedråberne hænger længe midt
+i blandingen, før de når op (15-20 s). Med fire portioner vand og fem ethanol
+(0,915 g/mL) synker de i stedet langsomt. Ingen blanding af hele portioner vejer
+præcis som olie, så olien svæver aldrig helt stille. Olie flyder altså oven på
+vand og ethanol, når der er mindst lige så meget vand som ethanol.
 
 Genveje: <kbd>V</kbd> <kbd>E</kbd> <kbd>O</kbd> hæld i · <kbd>mellemrum</kbd> ryst ·
 <kbd>↑</kbd> <kbd>↓</kbd> temperatur · <kbd>R</kbd> tøm · <kbd>Q</kbd> quiz ·
@@ -87,7 +91,7 @@ rundvisningen, teorien og mængden i bassinet under knapperne.
 
 ## Modellen
 
-`js/model.js`. Bassinet er et gitter på 32 × 27 pladser i tæt pakning (hver
+`js/model.js`. Bassinet er et gitter på 40 × 33 pladser i tæt pakning (hver
 anden række forskudt en halv plads). Fire ting flytter kuglerne:
 
 1. **Diffusion.** To naboer bytter plads med Metropolis-sandsynlighed ud fra, hvor
@@ -103,8 +107,19 @@ anden række forskudt en halv plads). Fire ting flytter kuglerne:
    overfladen efter sit damptryk (Clausius-Clapeyron) og koger, når damptrykket
    når 1 atm: så dannes der bobler inde i væsken. Dampen bliver til dråber i den
    kolde zone foroven og drypper ned.
-4. **Eleven.** Det, der hældes i, falder i en stråle og trykkes op til 11 rækker
-   ned i væsken. En rystning bytter tilfældige kugler rundt inden for 7 rækker.
+4. **Eleven.** Det, der hældes i, falder i en rolig stråle (75 kugler i sekundet)
+   og trykkes op til 8 rækker ned i væsken. En rystning er mange små hvirvler:
+   en ring af kugler om et tilfældigt punkt drejer et par pladser rundt, og
+   kuglerne glider i en bue. Hvirvlerne folder lagene ind i hinanden, så olien
+   bliver til dråber, uden at kuglerne springer på kryds og tværs.
+
+Tempoet er skruet ned efter brugerens første afprøvning (24. september 2026):
+kuglerne er en femtedel mindre, vibrerer halvt så meget og langsommere, bytter
+plads halvt så ofte, og dråberne vandrer mindre. Det tager stadig 5 til 9
+sekunder, før en rystet blanding af olie og vand ligger i to rene lag. Efter
+anden afprøvning blev rystningen til hvirvler (før byttede kugler plads over op til
+8 rækker), bassinet svajer langsommere, og hældningen er halvt så hurtig og
+mindre dyb.
 
 Hvem der kan blandes, står ingen steder i koden: det følger af `D.BINDING`
 (`D.blandbar`), og faserne regnes ud af det.
@@ -134,7 +149,8 @@ dele (rumfang) vejer 0,926 g/mL; 2 dele vand og 3 dele ethanol 0,904 g/mL.
 * Tyngden er gjort meget stærkere end i et rigtigt glas med 30 molekyler i
   bredden, ellers ville overfladespændingen holde lagene skæve. Små dråber bevæger
   sig med forskellen i tæthed opløftet i 0,6 i stedet for 1 (Stokes), så man ikke
-  skal vente et halvt minut; under 0,008 g/mL står de stille (det giver påskeægget).
+  skal vente et halvt minut. Under 0,003 g/mL står de stille; det nås ikke med
+  hele portioner.
 * Hvert stof fordamper, som om det var alene (ingen Raoults lov). En blanding af
   vand og ethanol koger i virkeligheden ved 80-95 °C, og dampen indeholder også
   vand.
@@ -163,7 +179,7 @@ _selvtest.html        udviklerværktøj, indgår ikke i animationen
 ```
 
 Bassinets inderside i spritet (x 20-670, y 30-604,4 i en tegning på 690 × 626)
-svarer til gitteret: 32,5 × 28,72 kuglediametre. Ændres gitteret i `js/model.js`,
+svarer til gitteret: 40,5 × 35,79 kuglediametre. Ændres gitteret i `js/model.js`,
 skal spritet og målene øverst i `js/scene.js` følge med.
 
 ## At rette i den
@@ -178,21 +194,18 @@ skal spritet og målene øverst i `js/scene.js` følge med.
 
 `_selvtest.html` åbner `index.html` i en iframe og kontrollerer tabelværdierne og
 tætheden af blandingerne, at blandbarheden følger af `D.BINDING`, at bassinet
-altid er tæt og løber over ved ti portioner, at vand og ethanol giver ét lag og
+altid er tæt og løber over ved tolv portioner, at vand og ethanol giver ét lag og
 olie to (øverst på vand, nederst på ethanol), at en emulsion skiller sig ad igen,
 at ethanol koger før vand, og at alt falder tilbage, at olien synker, når
 blandingen bliver lettere end 0,92 g/mL, at alle seks opgaver og quizzen kan
 gennemføres, og at sproget overholder reglerne. Chrome kræver
 `--allow-file-access-from-files`.
 
-## Hvis den skal ind i menuen
+## I menuen
 
-`animationer/kemi-c-filer/samling_c3.html` og `animationer/samling_NV.html` har
-hver en knap med `data-emne="c3.4"`, som peger på den gamle animation
-`c3.4_molekyler_blandbarhed.html`. Skift den til `../superanimationer/sc3.4_blandbarhed/index.html`
-(i `samling_NV.html` uden `../`), flyt den gamle fil til
-`animationer/kemi-c-filer/arkiv/c3.4_molekyler_blandbarhed_oldversion.html`, og ret
-kolonnen "I menuen" i `../README.md`.
+I menuen fra 26. sept. 2026 som c3.4 i `kemi-c-filer/samling_c3.html` og i
+`samling_NV.html`. Den gamle ligger i
+`kemi-c-filer/arkiv/c3.4_molekyler_blandbarhed_oldversion.html`.
 
 ## Tilbuddet om præsentationen
 

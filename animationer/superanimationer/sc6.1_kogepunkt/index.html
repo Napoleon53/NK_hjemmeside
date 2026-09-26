@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alkaners kogepunkt</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">♨</span> Alkaners kogepunkt</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-varm" role="tab" aria-selected="true"><span class="nr">1</span>Varm op</button>
+        <button class="faneknap" data-fane="fane-form" role="tab" aria-selected="false"><span class="nr">2</span>Formen</button>
+        <button class="faneknap" data-fane="fane-spil" role="tab" aria-selected="false"><span class="nr">3</span>Hvem koger først?</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: VARM OP                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-varm" role="tabpanel" aria-label="Varm op">
+    <div class="scene medtekst">
+        <canvas id="varm-laerred"></canvas>
+        <div class="anker" id="varm-anker-hylde"></div>
+        <div class="anker" id="varm-anker-kammer"></div>
+        <div class="anker" id="varm-anker-termometer"></div>
+        <div class="anker" id="varm-anker-zoom"></div>
+        <div class="tilbud" id="varm-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="varm-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="varm-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste maal -->
+        <div class="kort opgavekort" id="varm-kort">
+            <h2><span id="varm-maal-titel">Mål</span><span class="taeller" id="varm-taeller">mål <b id="varm-nr">1</b>/4</span></h2>
+            <p class="maal-tekst" id="varm-prompt"></p>
+            <p class="besked" id="varm-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="varm-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="varm-kurve-kort">
+            <h2>Kogepunkter <span class="taeller" id="varm-antal"></span></h2>
+            <canvas class="kurve" id="varm-kurve"></canvas>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FORMEN                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-form" role="tabpanel" aria-label="Formen">
+    <div class="scene medtekst">
+        <canvas id="form-laerred"></canvas>
+        <div class="anker" id="form-anker-zoom"></div>
+        <div class="anker" id="form-anker-bad"></div>
+        <div class="anker" id="form-anker-termometer"></div>
+        <div class="tilbud" id="form-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="form-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="form-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="form-kort">
+            <h2><span id="form-titel">Gæt</span><span class="taeller" id="form-trin"></span></h2>
+            <p class="maal-tekst" id="form-spm"></p>
+            <div class="valgliste" id="form-valg"></div>
+            <p class="besked" id="form-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="form-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="form-tabel-kort">
+            <h2>Kogepunkter <span class="taeller">C₅H₁₂</span></h2>
+            <div class="hyldeliste" id="form-tabel"></div>
+            <button class="knap stor ekstra" id="form-beroering" type="button"><span>Se, hvor molekylerne rører hinanden</span><span class="tegn">›</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: HVEM KOGER FOERST?                                         -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-spil" role="tabpanel" aria-label="Hvem koger først?">
+    <div class="scene medtekst">
+        <canvas id="spil-laerred"></canvas>
+        <div class="anker" id="spil-anker-kammer"></div>
+        <div class="anker" id="spil-anker-zoom"></div>
+        <div class="tilbud" id="spil-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="spil-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="spil-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste blanding -->
+        <div class="kort opgavekort" id="spil-kort">
+            <h2><span id="spil-niveau"></span><span class="taeller">blanding <b id="spil-nr">1</b>/<span id="spil-antal">9</span></span></h2>
+            <p class="opgave-spm">Hvem koger først? Gæt, før kammeret varmer op.</p>
+            <div class="valgliste" id="spil-valg"></div>
+            <p class="besked" id="spil-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="spil-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="spil-runde">
+            <h2>Runden <span class="taeller">rekord <b id="spil-rekord">0</b></span></h2>
+            <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="spil-point">0</span></div>
+            <div class="talraekke"><span>I træk</span><span class="tal" id="spil-stime">0</span></div>
+            <button class="knap nulstil" id="spil-nulstil" type="button"><span>Ny runde</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Alkaners kogepunkt</h2>
+        <p>Et stof koger, når molekylerne river sig løs fra væsken og bliver til gas. Kogepunktet er den temperatur, hvor det sker ved normalt tryk (1 atm). Under kogepunktet fordamper der kun lidt fra overfladen.</p>
+        <p>Når et stof koger, går molekylerne fra hinanden. Bindingerne inde i molekylet brydes ikke.</p>
+        <p>Alkaner er upolære. Molekylerne holdes sammen af London-kræfter (van der Waals-bindinger). De virker der, hvor molekylerne rører hinanden.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Kædens længde</span>
+            Jo længere kæden er, jo mere rører molekylerne hinanden, og jo højere er kogepunktet.
+        </div>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Formen: tre stoffer med formlen C₅H₁₂</span>
+            pentan 36,1 °C · 2-methylbutan 27,9 °C · 2,2-dimethylpropan 9,5 °C
+        </div>
+        <p>Et forgrenet molekyle er mere kugleformet. Det rører sine naboer mindre og koger lavere end den lige kæde med samme formel. Kædelængden betyder mest: et C-atom ekstra løfter kogepunktet mere, end en gren sænker det.</p>
+        <p>Ved stuetemperatur er alkanerne fra CH₄ til C₄H₁₀ gasser, fra C₅H₁₂ til C₁₆H₃₄ væsker og fra C₁₇H₃₆ faste stoffer.</p>
+        <p class="note">I modellen er hvert C-atom med sine H-atomer tegnet som én kugle. Gule prikker viser, hvor to molekyler rører hinanden. Tallene er fra CRC Handbook of Chemistry and Physics.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- FANE 2: den valgfrie boks om beroeringen (aabnes kun med knappen)  -->
+<!-- ================================================================= -->
+<div class="overlay" id="beroering">
+    <div class="overlay-boks bred">
+        <h2>Hvor molekylerne rører hinanden</h2>
+        <p>To molekyler af hvert stof, lagt så tæt sammen, som de kan. De gule prikker viser, hvor de rører hinanden. Det er der, molekylerne tiltrækker hinanden.</p>
+        <canvas class="par-laerred" id="beroering-laerred"></canvas>
+        <p>Den lige kæde kan lægge sig langs sin nabo og røre den mange steder. Det kugleformede molekyle rører kun sin nabo få steder. Jo færre steder, jo svagere holder molekylerne sammen, og jo lavere er kogepunktet.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/model.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/termostat.js"></script>
+<script src="js/sim_varm.js"></script>
+<script src="js/sim_form.js"></script>
+<script src="js/sim_spil.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

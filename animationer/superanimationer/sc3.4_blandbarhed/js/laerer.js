@@ -7,15 +7,16 @@
    tegnebord, saa laereren tegnes skaleret efter laerredets hoejde
    (laererLaerredSkala), som i sc2.1, sc2.3 og sc2.4.
 
-   Praesentationen: foerste gang siden aabnes i en browser, gaar han ind
-   foran bassinet, siger de tre linjer i D.INTRO og gaar igen. Mens han
+   Praesentationen starter kun, naar eleven vaelger Start praesentation
+   (js/praesentation.js). Han gaar ind foran bassinet, siger de to
+   linjer i D.INTRO og gaar igen. Mens han
    siger linjen D.INTRO_PEG, peger han paa panelet, og kortet Haeld i
    lyser op. Scenen laaser ikke. Knappen Spring praesentationen over, to
    klik paa ham og Esc sender ham ud; K viser praesentationen igen.
 
-   Besoeg: han kommer forbi med én replik (D.REPLIK), naar bassinet loeber
-   over, naar en oliedraabe svaever, og naar der rystes i noget, der ikke
-   kan skilles. Hvert besoeg sker hoejst én gang pr. sidevisning.
+   Besoeg: han kommer kun forbi med én replik (D.REPLIK.svaever), naar en
+   oliedraabe svaever midt i blandingen (paaskeaegget), hoejst én gang pr.
+   sidevisning. Brugeren syntes, han talte for meget.
    ===================================================================== */
 (function () {
     "use strict";

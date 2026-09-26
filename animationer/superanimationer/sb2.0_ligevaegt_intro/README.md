@@ -72,18 +72,8 @@ skærmen. Brug den efter ændringer i modellerne: den viser, om hver fane stadig
 rammer sin beregnede ligevægt, og om Le Chatelier-indgrebene flytter systemet
 den rigtige vej. Filen bruges ikke af animationen og kan slettes.
 
-## Hvis den skal ind i menuen
+## I menuen
 
-Den er med vilje ikke linket ind endnu. Én linje i
-`animationer/kemi-b-filer/samling_b2.html` er nok:
-
-```html
-<button class="tab-btn" data-emne="b2.0"
-    data-beskrivelse="Fire modeller af dynamisk ligevægt: trafikken over Lillebælt, rensdyr og føde, torvets priser og til sidst N₂O₄ ⇌ 2 NO₂."
-    onclick="visAnimation(this, '../v2/superanimation/sb2.0_ligevaegt_intro/index.html')"
-    title="Dynamisk ligevægt: introduktion"><span class="btn-num">0</span><span class="btn-text">Dynamisk ligevægt</span></button>
-```
-
-Bemærk `../` — det er første gang en samling skal linke ud af sin egen mappe.
-Kapitlet skal også have en linje i `FEEDBACK_EMNER` i
-`animationer/samling_alt_b.html`, hvis den skal kunne vælges i feedback-boksen.
+I menuen fra 26. sept. 2026 som b2.0 (nr. 0, før Ligevægtsloven) i
+`animationer/kemi-b-filer/samling_b2.html` og i `FEEDBACK_EMNER` i
+`animationer/samling_alt_b.html` ("Dynamisk ligevægt").

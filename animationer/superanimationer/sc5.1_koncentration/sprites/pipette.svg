@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="260" viewBox="0 0 40 260">
+  <!-- Fuldpipette. Animationen tegner vaesken BAG filen: stilken
+       x 18-22 fra maerket y 44 ned til boblen, boblen som en ellipse med
+       midte (20, 124) og radierne 11 og 34, og den nederste stilk fra
+       y 158 til spidsen (20, 254). Maerket er y 44. Toppen er y 0. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.34"/>
+      <stop offset="0.3" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.26"/>
+    </linearGradient>
+  </defs>
+  <path d="M17 2 L23 2 L23 92 Q32 98 32 124 Q32 150 23 156 L22 238 L21 254 L19 254 L18 238 L17 156 Q8 150 8 124 Q8 98 17 92 Z"
+        fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M17 44 L23 44" stroke="#ffffff" stroke-opacity="0.95" stroke-width="1.6"/>
+  <path d="M12 112 Q12 102 16 98" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round"/>
+</svg>

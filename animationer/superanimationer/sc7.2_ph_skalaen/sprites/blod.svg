@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120">
+  <!-- Blod i en blodpose. Staar paa y 118. -->
+  <defs>
+    <linearGradient id="blod" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6d0c14"/>
+      <stop offset="0.4" stop-color="#b3141f"/>
+      <stop offset="1" stop-color="#5e0a11"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="116" rx="32" ry="3" fill="#000000" fill-opacity="0.3"/>
+  <!-- Posen -->
+  <path d="M24 16 Q24 8 32 8 L68 8 Q76 8 76 16 L78 100 Q78 110 68 110 L32 110 Q22 110 22 100 Z"
+        fill="#eef2f5" fill-opacity="0.35" stroke="#c8d2dc" stroke-width="1.6"/>
+  <rect x="42" y="11" width="16" height="5" rx="2.5" fill="none" stroke="#c8d2dc" stroke-width="1.4"/>
+  <!-- Blodet -->
+  <path d="M26.5 34 Q50 30 73.5 34 L75.5 100 Q75.5 107.5 68 107.5 L32 107.5 Q24.5 107.5 24.5 100 Z" fill="url(#blod)"/>
+  <!-- Etiketten -->
+  <rect x="32" y="52" width="36" height="30" rx="2" fill="#ffffff" fill-opacity="0.93"/>
+  <rect x="32" y="52" width="36" height="7" rx="2" fill="#c41a28"/>
+  <path d="M50 64 v12 M44 70 h12" stroke="#c41a28" stroke-width="3.5"/>
+  <!-- Slangen -->
+  <path d="M44 110 L44 116 M56 110 L56 116" stroke="#c8d2dc" stroke-width="3" stroke-linecap="round"/>
+  <rect x="30" y="38" width="3" height="60" rx="1.5" fill="#ffffff" fill-opacity="0.22"/>
+</svg>

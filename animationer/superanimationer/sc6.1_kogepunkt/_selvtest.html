@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc6.1 Alkaners kogepunkt</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at smelte- og kogepunkterne passer med
+   tabellen, at modellen smelter, koger, fortætter og fryser ved de
+   rigtige temperaturer for alle stofferne, at det bedste par rører
+   mest for den lige kæde, at blandingerne i spillet starter som væsker
+   og koger i den rigtige rækkefølge, at alle tre faner kan gennemføres
+   (også med musen på fane 1), at sproget overholder reglerne, og at
+   layoutet holder fra 520 × 380 til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc6.1-varm", "nk-sc6.1-form", "nk-sc6.1-spil",
+    "nk-sc6.1-intro-varm", "nk-sc6.1-intro-form", "nk-sc6.1-intro-spil"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    var i;
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data;
+    paastand("data.js og model.js er kørt", !!(D && D.STOFFER && NK.Proeve && NK.Form));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-varm"] && NK.sims["fane-form"] && NK.sims["fane-spil"]));
+    var sprites = ["reagensglas", "kammer", "termometer", "taendstikaeske", "vandbad", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var V = NK.sims["fane-varm"], F = NK.sims["fane-form"], S = NK.sims["fane-spil"];
+    paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
+
+    overskrift("2. Tallene");
+    /* CRC Handbook of Chemistry and Physics, 97. udg., °C ved 1 atm */
+    var CRC = {
+        metan: [-182.5, -161.5], ethan: [-182.8, -88.6], propan: [-187.6, -42.1], butan: [-138.3, -0.5],
+        pentan: [-129.7, 36.1], hexan: [-95.3, 68.7], heptan: [-90.6, 98.4], octan: [-56.8, 125.6],
+        nonan: [-53.5, 150.8], decan: [-29.7, 174.1], icosan: [36.7, 343.0],
+        methylbutan: [-159.8, 27.9], dimethylpropan: [-16.5, 9.5]
+    };
+    var forkerte = D.STOFFER.filter(function (st) { var c = CRC[st.id]; return !c || c[0] !== st.smp || c[1] !== st.kp; });
+    paastand("smelte- og kogepunkterne passer med tabellen (13 stoffer)", D.STOFFER.length === 13 && forkerte.length === 0, forkerte.map(function (s) { return s.id; }).join(", "));
+    paastand("formlerne passer med antallet af C: CnH2n+2", D.STOFFER.every(function (st) {
+        return NK.formel(st.formel) === NK.formel(st.nC === 1 ? "CH4" : "C" + st.nC + "H" + (2 * st.nC + 2));
+    }));
+    paastand("kogepunktet stiger med kædelængden på hylden", D.HYLDE.every(function (st, k) { return k === 0 || st.kp > D.HYLDE[k - 1].kp; }));
+    paastand("de tre isomerer: 2,2-dimethylpropan < 2-methylbutan < pentan",
+        D.stof("dimethylpropan").kp < D.stof("methylbutan").kp && D.stof("methylbutan").kp < D.stof("pentan").kp);
+    paastand("ved 20 °C er C₁ til C₄ gasser, C₅ til C₁₀ væsker og icosan fast", D.HYLDE.every(function (st) {
+        var t = st.nC <= 4 ? "gas" : (st.nC <= 10 ? "vaeske" : "fast");
+        return t === (20 >= st.kp ? "gas" : (20 < st.smp ? "fast" : "vaeske"));
+    }));
+    paastand("damptrykket er 1 atm ved kogepunktet og stiger med temperaturen", D.STOFFER.every(function (st) {
+        return Math.abs(D.damptryk(st, st.kp) - 1) < 1e-9 && D.damptryk(st, st.kp - 10) < D.damptryk(st, st.kp - 5);
+    }));
+    var pPentan = D.damptryk(D.stof("pentan"), 20);
+    paastand("Troutons regel giver pentans damptryk ved 20 °C tæt på målt (0,56 atm)", Math.abs(pPentan - 0.56) < 0.08, pPentan.toFixed(2));
+    paastand("temperaturer skrives med komma og rigtigt minus", D.gradTekst(-0.5) === "−0,5 °C" && D.gradTekst(36.1) === "36,1 °C" &&
+        D.gradTekst(-161.5) === "−161,5 °C" && D.grader(-0.04) === "0,0" && D.gradTekst(343, 0) === "343 °C");
+
+    overskrift("3. Molekylerne og parret");
+    paastand("én kugle pr. C-atom", D.STOFFER.every(function (st) { return NK.Form.form(st).n === st.nC; }));
+    var par = D.ISOMERER.map(function (st) { return NK.Form.bedstePar(st).n; });
+    paastand("det bedste par rører mest for pentan og mindst for 2,2-dimethylpropan", par[0] > par[1] && par[1] > par[2], par.join(" > "));
+    paastand("længere kæder rører mere: hexan > pentan > butan",
+        NK.Form.bedstePar(D.stof("hexan")).n > par[0] && par[0] > NK.Form.bedstePar(D.stof("butan")).n);
+    var parOverlap = D.ISOMERER.filter(function (st) {
+        var f = NK.Form.form(st), p = NK.Form.bedstePar(st), a = NK.Form.kugler(f, 0, 0, 0), b = NK.Form.kugler(f, p.x, p.y, p.a);
+        return a.some(function (q) { return b.some(function (r) { return Math.hypot(q[0] - r[0], q[1] - r[1]) < 1.99; }); });
+    });
+    paastand("molekylerne i parret overlapper ikke", parOverlap.length === 0, parOverlap.map(function (s) { return s.id; }).join(", "));
+
+    overskrift("4. Modellen: smelte, koge, fortætte og fryse");
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    function tael(p) { var t = [0, 0, 0]; p.mol.forEach(function (m) { t[m.tilstand]++; }); return t; }
+    function overlap(p) {
+        var maks = 0;
+        for (var a = 0; a < p.mol.length; a++) for (var b = a + 1; b < p.mol.length; b++) {
+            var ka = NK.Form.kugler(p.mol[a].f, p.mol[a].x, p.mol[a].y, p.mol[a].a), kb = NK.Form.kugler(p.mol[b].f, p.mol[b].x, p.mol[b].y, p.mol[b].a);
+            ka.forEach(function (q) { kb.forEach(function (r) { maks = Math.max(maks, 2 - Math.hypot(q[0] - r[0], q[1] - r[1])); }); });
+        }
+        return maks;
+    }
+    function inde(p) {
+        return p.mol.every(function (m) { return Math.abs(m.x) <= p.W / 2 && Math.abs(m.y) <= p.H / 2; });
+    }
+    var modelFejl = [], haendFejl = [], vaeskeFejl = [];
+    D.HYLDE.forEach(function (st) {
+        var p = new NK.Proeve({ W: 32, H: 31, T: 20, stoffer: [{ st: st, n: st.antal }] });
+        var t = tael(p), maks = p.dampMaks(p.grupper[0]);
+        var forv = 20 >= st.kp ? [0, 0, st.antal] : (20 < st.smp ? [st.antal, 0, 0] : null);
+        if (forv ? t.join() !== forv.join() : (t[0] || t[2] > maks)) modelFejl.push(st.id + " ved 20 °C: " + t.join("/"));
+        if (!forv && overlap(p) > 0.6) vaeskeFejl.push(st.id + " " + overlap(p).toFixed(2));
+        /* Op over kogepunktet: alt er gas, og der kom koge-haendelser */
+        p.T = st.kp + 20; tik({ opdater: function (dt) { p.opdater(dt); } }, 8);
+        var h = p.hentHaendelser();
+        t = tael(p);
+        if (t[2] !== st.antal) modelFejl.push(st.id + " ved kp + 20: " + t.join("/"));
+        if (20 < st.kp && !h.some(function (x) { return x.slags === "koge"; })) haendFejl.push(st.id + " koger uden haendelse");
+        /* Ned mellem smelte- og kogepunktet: vaeske og lidt damp */
+        p.T = (st.smp + st.kp) / 2; tik({ opdater: function (dt) { p.opdater(dt); } }, 12);
+        h = p.hentHaendelser();
+        t = tael(p);
+        if (t[0] || t[2] > maks) modelFejl.push(st.id + " mellem smp og kp: " + t.join("/"));
+        if (!h.some(function (x) { return x.slags === "fortaette"; })) haendFejl.push(st.id + " fortaetter uden haendelse");
+        /* Under smeltepunktet: fast stof paa pladserne */
+        p.T = st.smp - 20; tik({ opdater: function (dt) { p.opdater(dt); } }, 16);
+        h = p.hentHaendelser();
+        t = tael(p);
+        if (t[0] !== st.antal) modelFejl.push(st.id + " under smp: " + t.join("/"));
+        if (!h.some(function (x) { return x.slags === "fryse"; })) haendFejl.push(st.id + " fryser uden haendelse");
+        var afPlads = 0;
+        p.mol.forEach(function (m) { if (m.plads) afPlads = Math.max(afPlads, Math.hypot(m.x - m.plads.x, m.y - m.plads.y)); });
+        if (afPlads > 1.2) modelFejl.push(st.id + " fast, men " + afPlads.toFixed(1) + " fra pladsen");
+        if (overlap(p) > 0.6) modelFejl.push(st.id + " fast, overlap " + overlap(p).toFixed(2));
+        if (!inde(p)) modelFejl.push(st.id + " uden for kassen");
+        /* Og op igen: det smelter */
+        p.T = st.smp + 15; tik({ opdater: function (dt) { p.opdater(dt); } }, 6);
+        h = p.hentHaendelser();
+        if (!h.some(function (x) { return x.slags === "smelte"; })) haendFejl.push(st.id + " smelter uden haendelse");
+    });
+    paastand("alle elleve alkaner på hylden er gas, væske og fast stof ved de rigtige temperaturer", modelFejl.length === 0, modelFejl.slice(0, 4).join("; "));
+    paastand("hvert skifte giver en hændelse (koge, fortætte, fryse, smelte)", haendFejl.length === 0, haendFejl.slice(0, 4).join("; "));
+    paastand("væsken ved 20 °C starter uden molekyler, der krydser hinanden", vaeskeFejl.length === 0, vaeskeFejl.join("; "));
+    var lige = new NK.Proeve({ W: 32, H: 26, T: 35, startT: 20, stoffer: [{ st: D.stof("pentan"), n: 24 }] });
+    tik({ opdater: function (dt) { lige.opdater(dt); } }, 6);
+    var tl = tael(lige);
+    paastand("pentan ved 35 °C, lige under kogepunktet: væske med lidt damp, ingen ballon", tl[1] > 18 && tl[2] >= 1 && lige.makro().ballon === 0, tl.join("/"));
+    lige.T = 37; tik({ opdater: function (dt) { lige.opdater(dt); } }, 1);
+    var tl2 = tael(lige);
+    paastand("ved 37 °C koger det stille: noget er gas efter 1 s, men ikke det hele", tl2[2] > tl[2] && tl2[1] > 4 && lige.makro().koger > 0, tl2.join("/"));
+    tik({ opdater: function (dt) { lige.opdater(dt); } }, 14);
+    paastand("efter 15 s ved 37 °C er alt kogt, og ballonen er fuld", tael(lige)[2] === 24 && lige.makro().ballon > 0.95);
+    var fart0 = new NK.Proeve({ W: 32, H: 26, T: 20, stoffer: [{ st: D.stof("metan"), n: 30 }] });
+    var fart1 = new NK.Proeve({ W: 32, H: 26, T: 200, stoffer: [{ st: D.stof("decan"), n: 12 }] });
+    paastand("gassen farer hurtigere, jo lettere molekylet er", fart0.gasFart(fart0.mol[0]) > 2 * fart1.gasFart(fart1.mol[0]));
+    var hot = new NK.Proeve({ W: 32, H: 26, T: 300, stoffer: [{ st: D.stof("metan"), n: 30 }] });
+    paastand("varm gas fylder ballonen mere (300 °C mod 20 °C)", hot.makro().ballon > 1.8 * fart0.makro().ballon);
+
+    overskrift("5. Blandingerne i spillet");
+    var blandFejl = [], raekkeFejl = [];
+    D.BLANDINGER.forEach(function (b) {
+        var p = new NK.Proeve({ W: 32, H: 30, T: b.start, stoffer: b.st.map(function (st) { return { st: st, n: S.antal(b, st) }; }) });
+        var start = p.grupper.map(function (g) { return p.taelling(g); });
+        if (start.some(function (t, k) { return t[0] || t[2] > p.dampMaks(p.grupper[k]); })) blandFejl.push(b.stoffer.join("+") + " ved " + b.start + " °C");
+        b.st.forEach(function (st) { if (b.start <= st.smp + 1 || b.start >= st.kp - 5) blandFejl.push(b.stoffer.join("+") + ": " + st.id + " for tæt på"); });
+        p.T = b.maal; tik({ opdater: function (dt) { p.opdater(dt); } }, 10);
+        var ok = p.grupper.every(function (g) {
+            var t = p.taelling(g);
+            return g.st === b.foerst ? t[2] === g.n : t[2] <= p.dampMaks(g);
+        });
+        if (!ok) raekkeFejl.push(b.stoffer.join("+"));
+    });
+    paastand("alle " + D.BLANDINGER.length + " blandinger starter som væsker, 5 grader fra kogepunkterne", blandFejl.length === 0, blandFejl.slice(0, 3).join("; "));
+    paastand("ved målet er netop det første stof kogt væk", raekkeFejl.length === 0, raekkeFejl.slice(0, 3).join("; "));
+    paastand("hvert niveau har mindst tre blandinger", [0, 1, 2].every(function (n) { return D.BLANDINGER.filter(function (b) { return b.niveau === n; }).length >= D.RUNDE[n]; }));
+    paastand("niveau 2 (Formen) har kun isomerer af C₅H₁₂", D.BLANDINGER.filter(function (b) { return b.niveau === 1; }).every(function (b) {
+        return b.st.every(function (s) { return s.nC === 5; });
+    }));
+    paastand("niveau 3 har en forgrenet med flere C-atomer, der koger efter en kortere lige kæde", D.BLANDINGER.some(function (b) {
+        return b.niveau === 2 && b.st.some(function (s) { return s.grene > 0 && s.nC > b.foerst.nC; }) && b.foerst.grene === 0;
+    }));
+    var forklaringer = [];
+    D.BLANDINGER.forEach(function (b) { b.st.forEach(function (s) { if (s !== b.foerst) forklaringer.push(D.hvorfor(b.foerst, s)); }); });
+    paastand("hvert forkert svar får en forklaring", forklaringer.every(function (t) { return t && t.length > 10; }));
+    paastand("forklaringen passer til fejlen", /forgrenede/.test(D.hvorfor(D.stof("dimethylpropan"), D.stof("pentan"))) &&
+        /Flere C-atomer/.test(D.hvorfor(D.stof("butan"), D.stof("dimethylpropan"))) &&
+        /korte kæde/.test(D.hvorfor(D.stof("hexan"), D.stof("decan"))));
+
+    overskrift("6. Varm op kan gennemføres");
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    klik('[data-fane="fane-varm"]');
+    V.tilpas();
+    V.afvisTilbud();
+    V.maalNr = 0; V.fundet = []; V.gaet = null; V.naaet = false; V.hjaelp = 0; V.rost = false;
+    V.termo.saet(20); V.termo.roert = false;
+    V.proeve = V.lavProeve(V.valgt);
+    V.visMaal();
+    paastand("pentan står i kammeret ved 20 °C, og mål 1 er at få det til at koge",
+        V.stof().id === "pentan" && /pentan til at koge/.test(d.getElementById("varm-prompt").textContent));
+    paastand("linjen under scenen siger, at man skal trække i termometeret", /Træk i termometeret/.test(d.getElementById("varm-status").textContent));
+    var c = d.getElementById("varm-laerred"), rc = c.getBoundingClientRect(), lay = V.lay;
+    function mus(type, x, y) {
+        c.dispatchEvent(new W.PointerEvent(type, { clientX: rc.left + x, clientY: rc.top + y, pointerId: 7, bubbles: true, isPrimary: true }));
+    }
+    var TM = lay.termo;
+    mus("pointerdown", TM.x, TM.yFor(20));
+    mus("pointermove", TM.x, TM.yFor(30));
+    mus("pointermove", TM.x, TM.yFor(48));
+    mus("pointerup", TM.x, TM.yFor(48));
+    paastand("termometeret kan trækkes op med musen", Math.abs(V.termo.T - 48) <= 2, V.termo.T);
+    tik(V, 4);
+    paastand("pentan koger, mål 1 er nået, og kogepunktet er på kurven", V.naaet && V.fundet.indexOf("pentan") >= 0 &&
+        V.proeve.makro().ballon > 0.5 && /36,1/.test(V.el.besked.textContent));
+    V.knap();
+    paastand("Næste mål: mål 2", V.maalNr === 1 && !V.naaet);
+    /* Traek metan fra hylden ned i kammeret */
+    mus("pointerdown", lay.hyldeGlas[0].x, lay.hyldeGlas[0].y - lay.hyldeGlasH * 0.4);
+    mus("pointermove", lay.glas.x - 30, lay.glas.top + 60);
+    mus("pointermove", lay.glas.x, lay.glas.top + 80);
+    mus("pointerup", lay.glas.x, lay.glas.top + 80);
+    tik(V, 1);
+    paastand("et glas kan trækkes fra hylden ned i kammeret", V.stof().id === "metan");
+    V.termo.saet(-175); tik(V, 6);
+    paastand("metan fortætter under −161,5 °C, og det tæller som kogepunktet", V.fundet.indexOf("metan") >= 0 &&
+        /fortætter/.test(d.getElementById("varm-note").textContent));
+    mus("pointerdown", lay.hyldeGlas[5].x, lay.hyldeGlas[5].y - lay.hyldeGlasH * 0.4);
+    mus("pointerup", lay.hyldeGlas[5].x, lay.hyldeGlas[5].y - lay.hyldeGlasH * 0.4);
+    tik(V, 1);
+    paastand("et klik på et glas på hylden sætter det i", V.stof().id === "hexan");
+    V.termo.saet(80); tik(V, 4);
+    V.skift(7); tik(V, 1); V.termo.saet(140); tik(V, 4);
+    paastand("tre andre kogepunkter: mål 2 er nået", V.naaet && V.fundet.length === 4, V.fundet.join(","));
+    V.knap();
+    paastand("mål 3 gætter på decan", V.maalNr === 2 && V.gaet && V.gaet.id === "decan" && /decan/.test(d.getElementById("varm-prompt").textContent));
+    V.knap();
+    paastand("hintet nævner octan", /octan/.test(V.el.besked.textContent), V.el.besked.textContent);
+    /* Gaettet traekkes paa kurven */
+    var kc = d.getElementById("varm-kurve"), krc = kc.getBoundingClientRect();
+    var K = NK.Tegn.kurveMaal(V.KL.b, V.KL.h);
+    function kmus(type, x, y) {
+        kc.dispatchEvent(new W.PointerEvent(type, { clientX: krc.left + x, clientY: krc.top + y, pointerId: 8, bubbles: true, isPrimary: true }));
+    }
+    kmus("pointerdown", K.xFor(10), K.yFor(V.gaet.t));
+    kmus("pointermove", K.xFor(10), K.yFor(150));
+    kmus("pointerup", K.xFor(10), K.yFor(160));
+    paastand("gættet kan trækkes på kurven", V.gaet.sat && Math.abs(V.gaet.t - 160) <= 5, V.gaet.t);
+    V.skift(9); tik(V, 1); V.termo.saet(190); tik(V, 4);
+    paastand("decan måles: mål 3 er nået, og beskeden sammenligner med gættet", V.naaet && /Du gættede 160 °C/.test(V.el.besked.textContent) &&
+        /174,1/.test(V.el.besked.textContent), V.el.besked.textContent);
+    V.knap();
+    V.hjaelp = 1; V.knap();
+    tik(V, 6);
+    paastand("Vis svaret på mål 4 sætter icosan i og koger det", V.stof().id === "icosan" && V.fundet.indexOf("icosan") >= 0 && V.naaet);
+    V.knap(); tik(V, 3);
+    paastand("efter de fire mål er der frit valg, og Kemichael roser", !V.maal() && /forfra/.test(V.el.knap.textContent) &&
+        !!(V.laerer && V.laerer.scene && V.laerer.scene.navn === "faerdig"));
+    tik(V, 8);
+    /* Taendstikken: en fuld ballon braender, og Kemichael saetter en ny i */
+    V.skift(0); tik(V, 1); V.termo.saet(20); tik(V, 2);
+    var bf = V.ballonFelt();
+    paastand("metan ved 20 °C har gas i ballonen", !!bf && bf.fuld && V.proeve.gasIBallonen());
+    var ae = lay.aeske;
+    mus("pointerdown", ae.x + ae.b * 0.7, ae.y + 4);
+    mus("pointermove", ae.x + ae.b * 0.7, ae.y - 40);
+    paastand("en tændstik trukket op af æsken brænder", !!(V.stik && V.stik.braender));
+    mus("pointermove", bf.x, bf.y + 8);
+    tik(V, 0.1);
+    paastand("tændstikken ved den fulde ballon brænder gassen", !!V.brand && V.proeve.braendt && V.proeve.produkter.length > 0);
+    mus("pointerup", bf.x, bf.y + 8);
+    var co2 = V.proeve.produkter.filter(function (p) { return p.slags === "co2"; }).length;
+    var h2o = V.proeve.produkter.filter(function (p) { return p.slags === "h2o"; }).length;
+    paastand("CH₄ + 2 O₂ → CO₂ + 2 H₂O: dobbelt så meget vand som CO₂", co2 > 0 && h2o === 2 * co2, co2 + "/" + h2o);
+    tik(V, 2.5);
+    paastand("Kemichael kommer", !!(V.laerer.scene && V.laerer.scene.navn === "brand"));
+    tik(V, 14);
+    paastand("han sætter et nyt glas med ny ballon i", !V.brand && !V.ballonVaek && !V.proeve.braendt && V.proeve.gasIBallonen());
+    V.skift(4); tik(V, 1); V.termo.saet(20); tik(V, 1);
+    mus("pointerdown", ae.x + ae.b * 0.7, ae.y + 4);
+    mus("pointermove", ae.x + ae.b * 0.7, ae.y - 40);
+    bf = V.ballonFelt();
+    mus("pointermove", bf.x, bf.y + 4);
+    tik(V, 0.1);
+    paastand("en tom ballon brænder ikke, men får et svar", !V.brand && /Ballonen er tom/.test(V.el.besked.textContent));
+    mus("pointerup", bf.x, bf.y + 4);
+    tik(V, 0.2);
+    paastand("tændstikken slukkes, når den slippes", !V.stik);
+    V.knap();
+    paastand("Start målene forfra", V.maalNr === 0 && V.fundet.length === 0);
+
+    overskrift("7. Formen kan gennemføres");
+    klik('[data-fane="fane-form"]');
+    F.tilpas();
+    F.afvisTilbud();
+    F.nulstil();
+    F.rost = false;
+    paastand("parrene står ikke i scenen, men i en boks bag en knap", !F.lay.par && !!d.getElementById("form-beroering") &&
+        !d.getElementById("beroering").classList.contains("vis"));
+    paastand("vandbadet starter ved 0 °C, og alle tre er væsker", F.termo.T === 0 && F.proever.every(function (p) {
+        var t = tael(p); return t[0] === 0 && t[2] <= p.dampMaks(p.grupper[0]);
+    }));
+    var cf = d.getElementById("form-laerred"), rcf = cf.getBoundingClientRect(), fl = F.lay;
+    function fmus(type, x, y) {
+        cf.dispatchEvent(new W.PointerEvent(type, { clientX: rcf.left + x, clientY: rcf.top + y, pointerId: 9, bubbles: true, isPrimary: true }));
+    }
+    fmus("pointerdown", fl.glas[0].x, fl.glas[0].bund - 20);
+    fmus("pointerup", fl.glas[0].x, fl.glas[0].bund - 20);
+    paastand("et klik på et glas er et gæt", F.gaettet === 0 && F.trin === "varm");
+    F.termo.animerTil(45, 8); tik(F, 9);
+    paastand("ved jævn opvarmning koger de i rækkefølgen 2,2-dimethylpropan, 2-methylbutan, pentan", F.raekke.join() === "2,1,0", F.raekke.join());
+    paastand("gættet på pentan får et svar, der siger, hvem der kogte først", /Du gættede pentan/.test(F.el.besked.textContent) && /2,2-dimethylpropan koger først/.test(F.el.besked.textContent));
+    tik(F, 2);
+    paastand("så kommer spørgsmålet hvorfor, med fire svar", F.trin === "hvorfor" && d.querySelectorAll("#form-valg button").length === 4);
+    klik('#form-valg button[data-nr="3"]');
+    paastand("svaret om bindingerne inde i molekylet forklarer fejlen", /Molekylerne selv er hele/.test(F.el.besked.textContent) && F.trin === "hvorfor");
+    klik('#form-valg button[data-nr="0"]');
+    tik(F, 2);
+    paastand("det rigtige svar afslutter, og Kemichael roser", F.trin === "faerdig" && !!(F.laerer.scene && F.laerer.scene.navn === "faerdig"));
+    paastand("til sidst går knappen videre til fane 3, ikke forfra", /Videre til Hvem koger først/.test(F.el.knap.textContent));
+    tik(F, 10);
+    F.nulstil();
+    F.termo.saet(45); tik(F, 3);
+    paastand("trukket op i ét hug står de stadig i kogepunkternes rækkefølge", F.raekke.join() === "2,1,0", F.raekke.join());
+    tik(F, 2);
+    klik('#form-valg button[data-nr="0"]');
+    tik(F, 3);
+    paastand("anden gang roser Kemichael ikke igen", F.trin === "faerdig" && !(F.laerer.scene && F.laerer.scene.navn === "faerdig"));
+    klik("#form-beroering");
+    var bl = d.getElementById("beroering");
+    paastand("knappen åbner boksen med de tre par", bl.classList.contains("vis") && F.BL && F.BL.b > 100);
+    klik("#beroering [data-luk]");
+    paastand("boksen lukkes igen", !bl.classList.contains("vis"));
+    F.knap();
+    paastand("knappen Videre åbner fane 3", d.querySelector('[data-fane="fane-spil"]').classList.contains("aktiv"));
+    klik('[data-fane="fane-form"]');
+    F.nulstil();
+
+    overskrift("8. Hvem koger først kan spilles");
+    klik('[data-fane="fane-spil"]');
+    S.tilpas();
+    S.afvisTilbud();
+    S.nyRunde();
+    paastand("en runde er ni blandinger, tre fra hvert niveau",
+        S.runde.length === 9 && [0, 1, 2].every(function (nv) { return S.runde.filter(function (b) { return b.niveau === nv; }).length === 3; }));
+    var rigtige = 0;
+    for (i = 0; i < 9; i++) {
+        var b = S.b, ret = i % 3 !== 2;
+        var k = ret ? b.st.indexOf(b.foerst) : (b.st.indexOf(b.foerst) + 1) % b.st.length;
+        klik('#spil-valg button[data-nr="' + k + '"]');
+        tik(S, 16);
+        if (S.fase !== "svar") { paastand("blanding " + (i + 1) + " bliver færdig", false, b.stoffer.join("+")); break; }
+        if (ret) rigtige++;
+        if (i < 8) S.knap();
+    }
+    paastand("seks rigtige og tre forkerte giver 6 point", S.point === 6 && S.slut, S.point);
+    paastand("rekorden gemmes", S.rekord >= 6);
+    S.nyRunde();
+    S.knap(); S.knap(); tik(S, 16);
+    paastand("Vis svaret giver ikke point", S.fase === "svar" && S.point === 0 && /Sådan/.test(S.el.besked.textContent));
+
+    overskrift("9. Sproget");
+    var krop = d.body.innerText;
+    var replikker = [].concat(D.INTRO_VARM, D.INTRO_FORM, D.INTRO_SPIL, [D.MAAL_FAERDIG, D.FORM_FAERDIG, D.REKORD_REPLIK, D.BRAND, D.NY_BALLON],
+        D.BRAND_IGEN, D.RUNDE_REPLIK.map(function (r) { return r[1]; }));
+    var tekster = replikker.concat(
+        D.MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + m.efter; }),
+        D.HVORFOR.valg.map(function (v) { return v.t + " " + v.svar; }), [D.HVORFOR.spm, D.HVORFOR.hint, D.FORM_HINT, D.FORM_VARM_HINT, D.TOM_BALLON],
+        D.SPIL_NIVEAUER.map(function (n) { return n.hint; }), forklaringer);
+    var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
+    paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
+    var lange = replikker.filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("hver præsentation har to eller tre replikker", [D.INTRO_VARM, D.INTRO_FORM, D.INTRO_SPIL].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    var tur = ["#varm-anker-hylde", "#varm-anker-kammer", "#varm-anker-termometer", "#varm-anker-zoom", "#varm-kurve-kort", "#varm-kort",
+        "#form-anker-bad", "#form-anker-zoom", "#form-anker-termometer", "#form-kort", "#form-tabel-kort",
+        "#spil-anker-zoom", "#spil-valg", "#spil-anker-kammer", "#spil-kort", "#spil-runde"];
+    paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
+
+    overskrift("10. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-varm", "fane-form", "fane-spil"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H;
+            function indeR(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            function termoR(TM) { return { x: TM.venstre, y: TM.top, b: TM.b + 40, h: TM.h }; }
+            if (id === "fane-varm" || id === "fane-spil") {
+                var K = lay.kammer, kr = { x: K.x, y: K.y, b: K.b, h: K.h };
+                indeR(kr, "kammeret");
+                indeR(lay.zoom, "zoomvinduet");
+                over(kr, lay.zoom, "kammeret under zoomvinduet");
+                over(termoR(lay.termo), lay.zoom, "termometeret under zoomvinduet");
+                /* Maerkerne kp og smp til venstre for termometeret */
+                over({ x: lay.termo.x - 58, y: lay.termo.top, b: 58 - lay.termo.b / 2, h: lay.termo.h }, lay.zoom, "termometerets mærker under zoomvinduet");
+                /* Ballonen fuld ved 360 °C skal kunne vaere over kammeret */
+                var B = NK.Tegn.ballonMaal(lay.glas.mund.x, lay.glas.mund.y, lay.glas.s, 1.6);
+                if (B.y - B.r * 1.1 < (id === "fane-varm" ? lay.hylde.bund : 0)) problemer.push(id + ": den fulde ballon rammer " + (id === "fane-varm" ? "reolen" : "toppen"));
+                /* Mikroniveauet i centrum: zoomvinduet fylder mindst 30 % af scenen */
+                if (Wc >= 900 && lay.zoom.b * lay.zoom.h < 0.3 * Wc * Hc) problemer.push(id + ": zoomvinduet fylder kun " + Math.round(100 * lay.zoom.b * lay.zoom.h / (Wc * Hc)) + " %");
+            }
+            if (id === "fane-varm") {
+                var reol = { x: lay.hylde.x0, y: lay.hylde.top, b: lay.hylde.x1 - lay.hylde.x0, h: lay.hylde.bund - lay.hylde.top };
+                indeR(reol, "reolen");
+                over(reol, lay.zoom, "reolen under zoomvinduet");
+                over(reol, kr, "reolen over kammeret");
+                if (Hc >= 700 && reol.y < 72 && reol.x + reol.b > Wc / 2 - 170) problemer.push(id + ": tilbuddet dækker glassene");
+                if (lay.plads < 40) problemer.push(id + ": der er kun " + Math.round(lay.plads) + " px til hvert glas");
+                if (lay.aeske) {
+                    indeR(lay.aeske, "tændstikæsken");
+                    over(lay.aeske, kr, "æsken under kammeret");
+                } else if (Wc >= 900) problemer.push(id + ": tændstikæsken er væk");
+            }
+            if (id === "fane-form") {
+                lay.zoom.forEach(function (z, k) {
+                    indeR(z, "zoomvindue " + k);
+                    if (k) over(z, lay.zoom[k - 1], "zoomvinduerne over hinanden");
+                });
+                var g0 = lay.glas[0], Bf = NK.Tegn.ballonMaal(g0.mund.x, g0.mund.y, g0.s, 1.1);
+                if (Bf.y - Bf.r * 1.1 < lay.zoom[0].y + lay.zoom[0].h) problemer.push(id + ": ballonen rammer zoomvinduet");
+                indeR(termoR(lay.termo), "termometeret");
+                indeR({ x: lay.bad.glas.x, y: lay.bad.glas.y, b: lay.bad.glas.b, h: lay.bordY - lay.bad.glas.y }, "badet");
+                lay.zoom.forEach(function (z) { over(termoR(lay.termo), z, "termometeret under et zoomvindue"); });
+                var areal = lay.zoom.reduce(function (s, z) { return s + z.b * z.h; }, 0);
+                if (Wc >= 900 && areal < 0.28 * Wc * Hc) problemer.push(id + ": zoomvinduerne fylder kun " + Math.round(100 * areal / (Wc * Hc)) + " %");
+            }
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-varm"]');
+}
+</script>
+</body>
+</html>

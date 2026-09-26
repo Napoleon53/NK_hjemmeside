@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120">
+  <!-- Maelkekarton. Staar paa y 118. -->
+  <ellipse cx="50" cy="116" rx="30" ry="3.2" fill="#000000" fill-opacity="0.3"/>
+  <!-- Gavlen -->
+  <path d="M30 34 L50 16 L70 34 Z" fill="#e9edf2" stroke="#9aa4b0" stroke-width="1.4" stroke-linejoin="round"/>
+  <rect x="44" y="6" width="12" height="11" fill="#dfe4ea" stroke="#9aa4b0" stroke-width="1.4"/>
+  <path d="M50 16 L50 34" stroke="#b9c2cc" stroke-width="1"/>
+  <!-- Siden -->
+  <rect x="28" y="34" width="44" height="82" rx="2" fill="#f6f8fa" stroke="#9aa4b0" stroke-width="1.4"/>
+  <rect x="28" y="34" width="8" height="82" fill="#dde3ea"/>
+  <!-- Blaa bund med graes og etiket -->
+  <path d="M28 88 Q40 80 50 86 Q60 92 72 84 L72 114 Q72 116 70 116 L30 116 Q28 116 28 114 Z" fill="#2f6fc4"/>
+  <path d="M28 96 Q42 88 52 94 Q62 100 72 92 L72 100 Q60 106 50 101 Q40 96 28 104 Z" fill="#4b8ee0"/>
+  <rect x="33" y="46" width="34" height="22" rx="3" fill="#2f6fc4"/>
+  <text x="50" y="62" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="800" fill="#ffffff">MÆLK</text>
+  <text x="50" y="79" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8" font-weight="700" fill="#2f6fc4">1 LITER</text>
+</svg>

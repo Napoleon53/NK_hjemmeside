@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Pacman Quiz</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fa6af; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i spillet og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede:
+     - at balancen er den samme som i den gamle c_spil_pacman_emner.html
+       (tallene sammenlignes med den gamle fil, hvis den kan hentes)
+     - at spoegelserne opfoerer sig som i den gamle: sovetid, skridt,
+       nye spoegelser paa Svaer, og den lange soevn efter et forkert rum
+     - at alle opgaver har tre forskellige forkerte svar med et hint
+     - at Svaer + Mix giver Labyrintmester, som escaperoommet spoerger om
+     - at knapperne, tastaturet, Kemichael og sproget overholder reglerne
+   Skal koeres gennem en lokal server (Chrome maa ikke kigge ind i en
+   iframe paa file://). ?stop=N stopper efter afsnit N.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function note(t) { skriv("  ·     " + t, "note"); }
+var STOP = +(new URLSearchParams(location.search).get("stop") || 0);
+function overskrift(t) {
+    if (STOP && parseInt(t, 10) > STOP) throw new Error("stoppet før " + t);
+    skriv("\n" + t, "h");
+}
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+/* Det, spillet gemmer i browseren, gemmes og saettes tilbage til sidst.
+   Iframen har samme oprindelse, saa den starter uden hukommelse. */
+var gemt = {};
+for (var gi = 0; gi < localStorage.length; gi++) {
+    var gn = localStorage.key(gi);
+    if (/^nk-pacman/.test(gn)) gemt[gn] = localStorage.getItem(gn);
+}
+Object.keys(gemt).forEach(function (k) { localStorage.removeItem(k); });
+function afslut() {
+    var nu = [];
+    for (var i = 0; i < localStorage.length; i++) if (/^nk-pacman/.test(localStorage.key(i))) nu.push(localStorage.key(i));
+    nu.forEach(function (k) { localStorage.removeItem(k); });
+    Object.keys(gemt).forEach(function (k) { localStorage.setItem(k, gemt[k]); });
+}
+
+function hentTekst(sti) {
+    try {
+        var x = new XMLHttpRequest();
+        x.open("GET", sti, false);
+        x.send();
+        return x.status === 200 ? x.responseText : null;
+    } catch (e) { return null; }
+}
+
+var ramme = document.createElement("iframe");
+ramme.src = "index.html";
+document.body.appendChild(ramme);
+ramme.addEventListener("load", function () {
+    setTimeout(function () {
+        try { koer(); } catch (e) { skriv("  FEJL  testen stoppede: " + e.message, "fejl"); fejl++; if (window.console) console.log("selvtest: " + e.stack); }
+        afslut();
+        vis();
+    }, 900);
+});
+
+/* Fast tilfaeldighed, saa testen er ens hver gang */
+function froe(a) {
+    return function () {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        var t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+function koer() {
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+    var BILLEDE = 1000 / 60;
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    var D = NK.Data, E = NK.Emner, A = NK.app;
+    paastand("data, emner, spil, tegning og app er indlæst", !!(D && E && NK.Spil && NK.Tegning && A));
+    paastand("Kemichael er med", !!NK.laerer);
+    paastand("rundvisningen er med", !!NK.Rundvisning);
+
+    /* --------------------------------------------------------------- */
+    overskrift("2. Balancen er den samme som i den gamle udgave");
+    var FORVENTET = {
+        let:    { sovMs: 5000, trinMs: 667 },
+        mellem: { sovMs: 3000, trinMs: 417 },
+        svaer:  { sovMs: 2500, trinMs: 313 }
+    };
+    Object.keys(FORVENTET).forEach(function (k) {
+        paastand(k + ": sover " + FORVENTET[k].sovMs + " ms og går hvert " + FORVENTET[k].trinMs + " ms",
+            D.SVAERHED[k].sovMs === FORVENTET[k].sovMs && D.SVAERHED[k].trinMs === FORVENTET[k].trinMs,
+            D.SVAERHED[k].sovMs + " / " + D.SVAERHED[k].trinMs);
+    });
+    paastand("kun Svær får nye spøgelser", !D.SVAERHED.let.nye && !D.SVAERHED.mellem.nye && D.SVAERHED.svaer.nye);
+    paastand("et nyt spøgelse hvert 5000 ms, højst 4", D.NYT_SPOEGELSE_MS === 5000 && D.SPOEGELSE_START.length === 4);
+    paastand("3 liv, to spøgelser fra opgave 5", D.LIV === 3 && D.TO_SPOEGELSER_FRA === 4);
+    paastand("hvert 4. skridt tilfældigt (0,25)", D.TILFAELDIGT_SKRIDT === 0.25);
+    paastand("skjold 5 s (300 billeder) og fredet 2 s (120 billeder)", D.SKJOLD_MS === 5000 && D.FREDET_MS === 2000);
+    paastand("Mix: 3 fra hvert emne", D.MIX_PR_EMNE === 3);
+    paastand("spøgelserne starter samme steder",
+        JSON.stringify(D.SPOEGELSE_START) === JSON.stringify([{ x: 1, y: 6 }, { x: 17, y: 6 }, { x: 9, y: 1 }, { x: 9, y: 13 }]));
+    paastand("spilleren starter i (9, 6)", D.START.x === 9 && D.START.y === 6);
+
+    /* Sammenlign med den gamle fil, hvis den kan hentes */
+    var gammel = hentTekst("../../kemi-c-filer/c_spil_pacman_emner.html") || hentTekst("../../kemi-c-filer/arkiv/c_spil_pacman_emner_oldversion.html");
+    if (!gammel) {
+        note("den gamle fil blev ikke fundet; tallene ovenfor er skrevet ind i testen");
+    } else {
+        var mKort = /const MAP = (\[[\s\S]*?\]);\s*\n/.exec(gammel);
+        var gKort = mKort ? JSON.parse(mKort[1].replace(/\s+/g, "")) : null;
+        paastand("labyrinten er felt for felt den samme som den gamle", gKort && JSON.stringify(gKort) === JSON.stringify(D.KORT));
+        ["let", "mellem", "svaer"].forEach(function (k) {
+            var m = new RegExp(k + ":\\s*\\{[^}]*freezeTime:\\s*(\\d+),\\s*ghostMoveMs:\\s*(\\d+)").exec(gammel);
+            paastand(k + " har samme tal som den gamle fil", m && +m[1] === D.SVAERHED[k].sovMs && +m[2] === D.SVAERHED[k].trinMs, m ? m[1] + "/" + m[2] : "ikke fundet");
+        });
+        var mInt = /GHOST_SPAWN_INTERVAL = (\d+)/.exec(gammel);
+        paastand("nye spøgelser med samme interval som den gamle", mInt && +mInt[1] === D.NYT_SPOEGELSE_MS);
+        paastand("skjoldet 300 billeder og fredet 120 billeder i den gamle", /shieldT = 300/.test(gammel) && /shieldT = 120/.test(gammel));
+        paastand("0,25 tilfældige skridt i den gamle", /Math\.random\(\) < 0\.25/.test(gammel));
+        paastand("to spøgelser fra opgave 5 i den gamle", /this\.currentIdx < 4 \? 1 : 2/.test(gammel));
+    }
+
+    /* --------------------------------------------------------------- */
+    overskrift("3. Labyrinten");
+    var K = D.KORT;
+    paastand("15 rækker og 19 kolonner", K.length === 15 && K.every(function (r) { return r.length === 19; }));
+    var kant = true;
+    for (var x = 0; x < 19; x++) kant = kant && K[0][x] === 1 && K[14][x] === 1;
+    for (var y = 0; y < 15; y++) kant = kant && K[y][0] === 1 && K[y][18] === 1;
+    paastand("kanten er mur hele vejen rundt", kant);
+    paastand("starten er en gang", K[D.START.y][D.START.x] === 0);
+    /* De to oeverste rum er 4 x 4 felter, de to nederste 4 x 5 */
+    var FELTER = { 2: 16, 3: 16, 4: 20, 5: 20 };
+    [2, 3, 4, 5].forEach(function (z) {
+        var n = 0;
+        K.forEach(function (r) { r.forEach(function (v) { if (v === z) n++; }); });
+        paastand("rum " + z + " har " + FELTER[z] + " felter", n === FELTER[z], n);
+        paastand("rum " + z + " kan nås fra starten", !!vej({ x: D.START.x, y: D.START.y }, z));
+    });
+    D.SPOEGELSE_START.forEach(function (s, i) {
+        var ud = [[0, -1], [0, 1], [-1, 0], [1, 0]].some(function (r) { return !NK.Spil.mur(s.x + r[0], s.y + r[1]); });
+        paastand("spøgelse " + (i + 1) + " kan komme ud fra sin plads", ud);
+    });
+
+    /* Korteste vej fra et felt til et rum gennem gangene */
+    function vej(fra, z) {
+        var ko = [[fra.x, fra.y]], set = {}, far = {};
+        set[fra.x + "," + fra.y] = 1;
+        while (ko.length) {
+            var p = ko.shift();
+            if (K[p[1]][p[0]] === z) {
+                var v = [], n = p[0] + "," + p[1];
+                while (far[n]) { var a = n.split(",").map(Number), b = far[n].split(",").map(Number); v.unshift([a[0] - b[0], a[1] - b[1]]); n = far[n]; }
+                return v;
+            }
+            [[0, -1], [0, 1], [-1, 0], [1, 0]].forEach(function (r) {
+                var x2 = p[0] + r[0], y2 = p[1] + r[1], k = x2 + "," + y2;
+                if (K[y2] && (K[y2][x2] === 0 || K[y2][x2] === z) && !set[k]) { set[k] = 1; far[k] = p[0] + "," + p[1]; ko.push([x2, y2]); }
+            });
+        }
+        return null;
+    }
+    function gaaTil(S, z) {
+        vej(S.spiller, z).forEach(function (r) { S.styr(r[0], r[1]); S.opdater(BILLEDE); });
+    }
+
+    /* --------------------------------------------------------------- */
+    overskrift("4. Opgaverne");
+    var alleTekster = [];
+    var TAL = { grundstoffer: 32, ioner: 10, maengde: 10, oplosning: 10, syrebase: 10, binding: 10, organisk: 10, redox: 10 };
+    E.ALMINDELIGE.forEach(function (k) {
+        var em = E.EMNER[k], ok = true, noter = [];
+        paastand(em.titel + ": " + TAL[k] + " opgaver", em.niveauer.length === TAL[k], em.niveauer.length);
+        for (var gang = 0; gang < 12; gang++) {
+            var rng = froe(gang * 97 + 3);
+            em.niveauer.forEach(function (data) {
+                var q = E.lav({ emne: k, data: data }, rng);
+                var svar = [q.rigtig].concat(q.forkerte.map(function (f) { return f.t; }));
+                var god = q.forkerte.length === 3
+                    && svar.every(function (s, i) { return s && svar.indexOf(s) === i; })
+                    && q.forkerte.every(function (f) { return f.hint && f.hint.length > 5; })
+                    && !svar.some(function (s) { return /\?/.test(s); })
+                    && q.tekst && q.forklaring;
+                if (!god && noter.length < 2) noter.push(q.tekst + " -> " + svar.join(" | "));
+                ok = ok && god;
+                alleTekster.push(q.tekst, q.rigtig, q.forklaring);
+                q.forkerte.forEach(function (f) { alleTekster.push(f.t, f.hint); });
+            });
+        }
+        paastand(em.titel + ": tre forskellige forkerte svar, hvert med et hint", ok, noter.join(" / "));
+    });
+
+    function svarPaa(k, filter) {
+        var d0 = E.EMNER[k].niveauer.filter(filter)[0];
+        return E.lav({ emne: k, data: d0 }, froe(1)).rigtig;
+    }
+    var SALTE = ["NaCl", "MgO", "K₂S", "CaI₂", "AlCl₃", "Na₂SO₄", "Ca(NO₃)₂", "NH₄Cl", "Al₂O₃", "Fe₂(SO₄)₃"];
+    paastand("saltenes formler er rigtige", E.EMNER.ioner.niveauer.every(function (dd, i) {
+        return E.lav({ emne: "ioner", data: dd }, froe(2)).rigtig === SALTE[i];
+    }), E.EMNER.ioner.niveauer.map(function (dd) { return E.lav({ emne: "ioner", data: dd }, froe(2)).rigtig; }).join(" "));
+    paastand("H og Cl: polær, Na og Cl: ion, C og H: upolær",
+        svarPaa("binding", function (b) { return b.a === "H" && b.b === "Cl"; }) === "Polær binding"
+        && svarPaa("binding", function (b) { return b.a === "Na"; }) === "Ionbinding"
+        && svarPaa("binding", function (b) { return b.a === "C" && b.b === "H"; }) === "Upolær binding");
+    paastand("C₈H₁₈ hedder octan", svarPaa("organisk", function (o) { return o.n === 8; }) === "Octan");
+    paastand("pH i 0,001 M stærk syre er 3", svarPaa("syrebase", function (s) { return s.c === 0.001; }) === "3");
+    paastand("c = 0,25 mol / 0,5 L = 0,5 M", svarPaa("oplosning", function (o) { return o.n === 0.25; }) === "0,5 M");
+    paastand("m = 3 mol · 18 g/mol = 54 g", svarPaa("maengde", function (m) { return m.n === 3; }) === "54 g");
+    paastand("oxidationstallet for S i H₂S er −2", svarPaa("redox", function (r) { return r.formel === "H₂S"; }) === "−2");
+    paastand("iod skrives I", svarPaa("grundstoffer", function (g) { return g.navn === "Iod"; }) === "I");
+
+    var mix = E.raekke("mix", froe(5));
+    var prEmne = {};
+    mix.forEach(function (o) { prEmne[o.emne] = (prEmne[o.emne] || 0) + 1; });
+    paastand("Mix har 24 opgaver, 3 fra hvert af de 8 emner", mix.length === 24
+        && E.ALMINDELIGE.every(function (k) { return prEmne[k] === 3; }), JSON.stringify(prEmne));
+    var nogler = mix.map(function (o) { return o.emne + JSON.stringify(o.data); });
+    paastand("Mix har ingen opgave to gange", nogler.every(function (n, i) { return nogler.indexOf(n) === i; }));
+    var mix2 = E.raekke("mix", froe(6)).map(function (o) { return o.emne + JSON.stringify(o.data); });
+    paastand("Mix trækker nye opgaver hver gang", mix2.join() !== nogler.join());
+
+    /* Skiltene: ved en almindelig skaerm (felter paa 40 px) er skriften mindst 14 px */
+    var tg = A.tegning, gammelT = tg.T, ctx = tg.L.ctx, mindst = 99, hvilket = "";
+    tg.T = 40;
+    E.ALMINDELIGE.forEach(function (k) {
+        E.EMNER[k].niveauer.forEach(function (dd) {
+            var q = E.lav({ emne: k, data: dd }, froe(4));
+            var s = tg.skilte(ctx, [q.rigtig].concat(q.forkerte.map(function (f) { return f.t; }))).s;
+            if (s < mindst) { mindst = s; hvilket = q.rigtig; }
+        });
+    });
+    tg.T = gammelT;
+    paastand("svarene på skiltene er mindst 14 px med felter på 40 px", mindst >= 14, Math.round(mindst) + " px ved " + hvilket);
+
+    /* --------------------------------------------------------------- */
+    overskrift("5. Reglerne");
+    function nyt(sv, emne, frø) {
+        var S = new NK.Spil(froe(frø || 11));
+        S.vaelgSvaerhed(sv);
+        S.start(emne || "ioner");
+        return S;
+    }
+    var S = nyt("mellem");
+    paastand("et forløb starter med 3 liv, opgave 1 og ét spøgelse", S.liv === 3 && S.nr === 0 && S.spoegelser.length === 1 && S.skaerm === "spil");
+    paastand("fire rum med ét rigtigt svar", S.rum.length === 4 && S.rum.filter(function (r) { return r.ok; }).length === 1);
+    paastand("ét skjold i gangene", S.skjolde.length === 1 && K[S.skjolde[0].y][S.skjolde[0].x] === 0);
+    S.nr = 4; S.opgave();
+    paastand("fra opgave 5 er der to spøgelser", S.spoegelser.length === 2);
+
+    /* Sovetid og skridt ved 60 billeder i sekundet */
+    ["let", "mellem", "svaer"].forEach(function (k) {
+        var T = nyt(k, "ioner", 21), g = T.spoegelser[0], start = g.x + "," + g.y;
+        T.spiller.skjold = true; T.spiller.skjoldMs = T.spiller.skjoldMax = 1e9;
+        var foerste = null, skridt = [], sidst = start, sb = 0;
+        for (var b = 1; b <= 60 * 9; b++) {
+            T.opdater(BILLEDE);
+            var nu = T.spoegelser[0].x + "," + T.spoegelser[0].y;
+            if (nu !== sidst) { if (foerste === null) foerste = T.tid; skridt.push(b - sb); sb = b; sidst = nu; }
+        }
+        var S2 = D.SVAERHED[k];
+        paastand(k + ": første skridt lige efter " + S2.sovMs + " ms", foerste !== null && foerste > S2.sovMs && foerste <= S2.sovMs + BILLEDE + 0.01, foerste);
+        var forventet = Math.ceil(S2.trinMs / BILLEDE - 1e-9);
+        var mellem = skridt.slice(1);
+        paastand(k + ": et skridt hvert " + forventet + ". billede (" + S2.trinMs + " ms)", mellem.length > 3 && mellem.every(function (n) { return n === forventet; }), mellem.slice(0, 6).join(","));
+        paastand(k + ": vågner-uret viser sovetiden", Math.abs(nyt(k).vaagnerOm() - S2.sovMs) < 1);
+    });
+
+    /* Nye spoegelser paa Svaer */
+    var Sv = nyt("svaer", "ioner", 31);
+    Sv.spiller.skjold = true; Sv.spiller.skjoldMs = Sv.spiller.skjoldMax = 1e9;
+    var antal = [];
+    [4.9, 5.1, 9.9, 10.1, 15.1, 25].forEach(function (sek) {
+        while (Sv.tid < sek * 1000) Sv.opdater(BILLEDE);
+        antal.push(Sv.spoegelser.length);
+    });
+    paastand("Svær: nyt spøgelse efter 5, 10 og 15 s, højst 4", antal.join(",") === "1,2,2,3,4,4", antal.join(","));
+    var Sm = nyt("mellem", "ioner", 31);
+    Sm.spiller.skjold = true; Sm.spiller.skjoldMs = Sm.spiller.skjoldMax = 1e9;
+    while (Sm.tid < 20000) Sm.opdater(BILLEDE);
+    paastand("Mellem: ingen nye spøgelser", Sm.spoegelser.length === 1);
+
+    /* Styring: ikke gennem mure */
+    var Ss = nyt("mellem");
+    paastand("spilleren kan ikke gå ind i en mur", Ss.styr(-1, 0) === false && Ss.spiller.retning.x === 0);
+    var fy = Ss.spiller.y;
+    Ss.styr(0, -1); Ss.opdater(BILLEDE);
+    paastand("ét tryk flytter ét felt", Ss.spiller.y === fy - 1);
+
+    /* Et forkert rum */
+    var Sf = nyt("mellem", "ioner", 41);
+    var forkertRum = Sf.rum.filter(function (r) { return !r.ok; })[0];
+    Sf.spoegelser = [];
+    while (Sf.tid < 12000) Sf.opdater(BILLEDE);
+    var gammelTid = Sf.tid, skridtTil = vej(Sf.spiller, forkertRum.z).length;
+    gaaTil(Sf, forkertRum.z);
+    paastand("et forkert rum koster et liv", Sf.liv === 2 && Sf.skaerm === "spil");
+    paastand("hintet til netop det svar vises", Sf.hint === forkertRum.hint && forkertRum.proevet);
+    paastand("spilleren er tilbage i starten med ét spøgelse", Sf.spiller.x === D.START.x && Sf.spiller.y === D.START.y && Sf.spoegelser.length === 1);
+    paastand("fredet i 2 s bagefter", Sf.spiller.skjold && Math.abs(Sf.spiller.skjoldMs - (2000 - BILLEDE)) < 1);
+    /* Som i den gamle: spoegelserne sover, til der er gaaet lige saa lang
+       tid, som opgaven havde varet (plus ét skridt) */
+    var sover = Sf.vaagnerOm();
+    paastand("efter et forkert rum sover spøgelserne så længe, som opgaven havde varet",
+        Math.abs(sover - (gammelTid + skridtTil * BILLEDE + 417)) < 1, Math.round(sover) + " ms");
+    var g0 = Sf.spoegelser[0], pos0 = g0.x + "," + g0.y, flyttet = null;
+    Sf.spiller.skjold = true; Sf.spiller.skjoldMs = Sf.spiller.skjoldMax = 1e9;
+    for (var b2 = 0; b2 < 60 * 20; b2++) {
+        Sf.opdater(BILLEDE);
+        if (flyttet === null && Sf.spoegelser[0].x + "," + Sf.spoegelser[0].y !== pos0) flyttet = Sf.tid;
+    }
+    paastand("og tager først et skridt, når uret er talt ned", flyttet !== null && Math.abs(flyttet - sover) <= BILLEDE + 1, flyttet + " / " + Math.round(sover));
+
+    /* Samme i den gamle kode: koer den gamle Game.update() i et lukket
+       miljoe og sammenlign, hvornaar spoegelset tager sit foerste skridt */
+    if (gammel) {
+        var gamleSover = gammelSoevn(gammel);
+        if (gamleSover === null) note("den gamle Game.update() kunne ikke køres her");
+        else paastand("den gamle udgave sov lige så længe efter et forkert rum", Math.abs(gamleSover - sover) <= 2 * BILLEDE, Math.round(gamleSover) + " ms i den gamle");
+    }
+
+    /* Fanget af et spoegelse: almindelig sovetid bagefter */
+    var Sg = nyt("mellem", "ioner", 51);
+    while (Sg.tid < 3100) { Sg.spiller.skjold = true; Sg.spiller.skjoldMs = 1e9; Sg.opdater(BILLEDE); }
+    Sg.spiller.skjold = false;
+    Sg.spoegelser[0].x = Sg.spiller.x; Sg.spoegelser[0].y = Sg.spiller.y;
+    Sg.sidsteSkridt = Sg.tid;
+    Sg.opdater(BILLEDE);
+    paastand("et spøgelse på samme felt koster et liv", Sg.liv === 2);
+    paastand("bagefter sover spøgelserne den almindelige tid", Math.abs(Sg.vaagnerOm() - 3000) < 1, Math.round(Sg.vaagnerOm()));
+
+    /* Skjoldet */
+    var Sk = nyt("mellem", "ioner", 61);
+    var m = Sk.skjolde[0];
+    var nabo = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(function (r) { return K[m.y + r[1]] && K[m.y + r[1]][m.x + r[0]] === 0; })[0];
+    Sk.spiller.x = m.x + nabo[0]; Sk.spiller.y = m.y + nabo[1];
+    Sk.styr(-nabo[0], -nabo[1]);
+    Sk.opdater(BILLEDE);
+    paastand("mønten giver et skjold i 5 s", Sk.skjolde.length === 0 && Sk.spiller.skjold && Sk.spiller.skjoldMax === 5000);
+    while (Sk.tid < 3500) Sk.opdater(BILLEDE);
+    Sk.spoegelser[0].x = Sk.spiller.x; Sk.spoegelser[0].y = Sk.spiller.y; Sk.sidsteSkridt = Sk.tid;
+    Sk.opdater(BILLEDE);
+    paastand("med skjold fanger spøgelserne ikke", Sk.liv === 3);
+    while (Sk.tid < 5200) { Sk.spoegelser = []; Sk.opdater(BILLEDE); }
+    paastand("skjoldet er væk efter 5 s", !Sk.spiller.skjold);
+
+    /* Rigtigt, naeste og slut */
+    function spilIgennem(sv, emne) {
+        var T = nyt(sv, emne, 71), vagt = 0;
+        while (T.skaerm !== "slut" && vagt++ < 500) {
+            if (T.skaerm === "spil") { T.spoegelser = []; gaaTil(T, T.rum.filter(function (r) { return r.ok; })[0].z); }
+            else if (T.skaerm === "rigtigt") T.naeste();
+            else if (T.skaerm === "tabt") T.proevIgen();
+        }
+        return T;
+    }
+    var Sr = nyt("mellem", "ioner", 81);
+    Sr.spoegelser = [];
+    gaaTil(Sr, Sr.rum.filter(function (r) { return r.ok; })[0].z);
+    paastand("det rigtige rum giver Rigtigt", Sr.skaerm === "rigtigt" && Sr.liv === 3);
+    Sr.naeste();
+    paastand("Næste giver opgave 2 med de samme liv", Sr.nr === 1 && Sr.skaerm === "spil" && Sr.liv === 3);
+    var Sslut = spilIgennem("mellem", "ioner");
+    paastand("efter sidste opgave er emnet gennemført", Sslut.skaerm === "slut" && Sslut.nr === 10);
+
+    /* Tabt og proev igen */
+    var St = nyt("mellem", "ioner", 91), orden = JSON.stringify(St.raekke);
+    St.nr = 3; St.opgave();
+    for (var i2 = 0; i2 < 3; i2++) {
+        St.spoegelser = [];
+        var fr = St.rum.filter(function (r) { return !r.ok && !r.proevet; })[0];
+        gaaTil(St, fr.z);
+    }
+    paastand("tre fejl giver Ingen liv tilbage", St.skaerm === "tabt" && St.liv === 0 && !St.koerer);
+    St.proevIgen();
+    paastand("Prøv igen starter emnet forfra med 3 liv i samme rækkefølge", St.nr === 0 && St.liv === 3 && JSON.stringify(St.raekke) === orden);
+
+    /* --------------------------------------------------------------- */
+    overskrift("6. Labyrintmester og escaperoommet");
+    paastand("Svær + Mix giver Labyrintmester", spilIgennem("svaer", "mix").mester === true);
+    paastand("Mellem + Mix giver det ikke", spilIgennem("mellem", "mix").mester === false);
+    paastand("Svær + Salte giver det ikke", spilIgennem("svaer", "ioner").mester === false);
+    paastand("sætningen er den samme som i den gamle udgave",
+        D.MESTER.tekst === "På sværeste niveau i Mix er du hermed kåret til Labyrintmester."
+        && (!gammel || gammel.indexOf(D.MESTER.tekst) >= 0));
+    var escape = hentTekst("../../kemi-c-filer/c_spil_escaperoom.html");
+    if (!escape) {
+        note("escaperoommet blev ikke fundet");
+    } else {
+        var seglLinje = (/pacman:\s*\{[^\n]*\}/.exec(escape) || [""])[0];
+        var svarE = (/answer:\s*'([^']+)'/.exec(seglLinje) || [])[1];
+        paastand("escaperoommets svar findes i titlen (" + svarE + ")", !!svarE && D.MESTER.titel.toLowerCase() === svarE.toLowerCase());
+        paastand("escaperoommet kalder spillet Pacman Quiz, og titlen er den samme",
+            /Pacman Quiz/.test(seglLinje) && d.title === "Pacman Quiz");
+        paastand("escaperoommets hint nævner SVÆR og Mix, som findes i spillet",
+            /SVÆR/.test(seglLinje) && /"Mix"/.test(seglLinje)
+            && D.SVAERHED.svaer.navn.toUpperCase() === "SVÆR" && E.EMNER.mix.titel === "Mix");
+    }
+
+    /* --------------------------------------------------------------- */
+    overskrift("7. Knapperne, tastaturet og skærmen");
+    function tast(key) { d.dispatchEvent(new w.KeyboardEvent("keydown", { key: key, bubbles: true, cancelable: true })); }
+    function synlig(id) { var e = d.getElementById(id); return !!e && !e.hidden && w.getComputedStyle(e).display !== "none"; }
+    var AS = A.spil;
+    paastand("startskærmen vises først", AS.skaerm === "start" && synlig("start"));
+    paastand("emnerne er låst, til der er valgt sværhedsgrad", d.getElementById("emner").classList.contains("laast"));
+    d.querySelector('#emner [data-emne="ioner"]').click();
+    paastand("et klik på et låst emne starter ikke spillet", AS.skaerm === "start");
+    d.querySelector('#svaerhed [data-s="mellem"]').click();
+    paastand("Mellem er valgt, og emnerne er låst op", AS.svaerhed === "mellem" && !d.getElementById("emner").classList.contains("laast"));
+    paastand("noten siger sovetiden og farten", /3 s/.test(d.getElementById("svaerhed-note").textContent), d.getElementById("svaerhed-note").textContent);
+    paastand("der er 9 emner med Mix til sidst", d.querySelectorAll("#emner .emne").length === 9 && d.querySelector("#emner .emne:last-child").textContent.indexOf("Mix") === 0);
+    d.querySelector('#emner [data-emne="ioner"]').click();
+    paastand("et klik på Salte starter spillet", AS.skaerm === "spil" && AS.emne === "ioner" && !synlig("start"));
+    A.hud();
+    paastand("toplinjen viser emne og sværhedsgrad", d.getElementById("status").textContent === "Salte · Mellem");
+    paastand("tre hjerter og Opgave 1/10", d.querySelectorAll("#liv .hjerte:not(.tomt)").length === 3 && d.getElementById("nr").textContent === "Opgave 1/10");
+    paastand("spørgsmålet står over labyrinten", d.getElementById("sp-tekst").textContent === AS.q.tekst);
+    paastand("vågner-uret vises", synlig("vaekker") && /vågner om 3 s/.test(d.getElementById("vaekker").textContent), d.getElementById("vaekker").textContent);
+    var py0 = AS.spiller.y;
+    tast("ArrowUp"); AS.opdater(BILLEDE);
+    paastand("piletasten flytter spilleren", AS.spiller.y === py0 - 1);
+    tast("s"); AS.opdater(BILLEDE);
+    paastand("S virker også", AS.spiller.y === py0);
+    AS.spoegelser = [];
+    var fr2 = AS.rum.filter(function (r) { return !r.ok; })[0];
+    gaaTil(AS, fr2.z);
+    A.hud();
+    paastand("et forkert rum viser hintet under spørgsmålet", synlig("sp-hint") && d.getElementById("sp-hint").textContent === fr2.hint);
+    paastand("og guiden siger, hvad man gør nu", d.getElementById("guide").textContent === D.GUIDE.forkert);
+    AS.spoegelser = [];
+    gaaTil(AS, AS.rum.filter(function (r) { return r.ok; })[0].z);
+    A.render();
+    paastand("det rigtige rum viser kortet Rigtigt med forklaringen", synlig("kort-rigtigt") && d.getElementById("rigtigt-tekst").textContent === AS.q.forklaring);
+    tast("Enter");
+    paastand("Enter går til næste opgave", AS.skaerm === "spil" && AS.nr === 1 && !synlig("kort-rigtigt"));
+    NK.Rundvisning.start("spil");
+    paastand("spillet står stille under rundvisningen", A.pauset());
+    tast("Escape");
+    paastand("Esc lukker rundvisningen", !NK.Rundvisning.aktiv() && !A.pauset());
+    d.getElementById("regelknap").click();
+    paastand("reglerne har tabellen med sværhedsgraderne", d.querySelectorAll("#regel-tabel tr").length === 4 && A.pauset());
+    tast("Escape");
+    d.getElementById("emneknap").click();
+    paastand("Emner går tilbage til startskærmen med Mellem valgt", AS.skaerm === "start" && synlig("start") && AS.svaerhed === "mellem");
+
+    /* Labyrintmester paa skaermen */
+    A.vaelgSvaerhed("svaer");
+    A.startEmne("mix");
+    var vagt2 = 0;
+    while (AS.skaerm !== "slut" && vagt2++ < 200) {
+        if (AS.skaerm === "spil") { AS.spoegelser = []; AS.tid = 0; gaaTil(AS, AS.rum.filter(function (r) { return r.ok; })[0].z); }
+        if (AS.skaerm === "rigtigt") A.primaer();
+    }
+    A.haendelser();
+    A.render();
+    paastand("kortet efter Mix på Svær viser Labyrintmester", synlig("kort-slut") && synlig("mester")
+        && d.getElementById("mester-tekst").textContent === D.MESTER.tekst);
+    paastand("spørgsmålslinjen siger, at emnet er gennemført", d.getElementById("sp-tekst").textContent === "Emnet er gennemført" && d.getElementById("nr").textContent === "Opgave 24/24");
+    var klaret = JSON.parse(w.localStorage.getItem(A.KLARET) || "{}");
+    paastand("Mix på Svær huskes som klaret", !!(klaret.mix && klaret.mix.svaer), JSON.stringify(klaret));
+    tast("Enter");
+    paastand("Enter går til emnerne", AS.skaerm === "start");
+    paastand("Mix har mærket Labyrintmester på emnerne", !!d.querySelector('#emner [data-emne="mix"] .emne-mester'));
+
+    /* Et link */
+    w.location.hash = "#svaer&grundstoffer";
+    A.fraLink();
+    paastand("#svaer&grundstoffer starter Grundstoffer på Svær", AS.skaerm === "spil" && AS.emne === "grundstoffer" && AS.svaerhed === "svaer" && AS.antal() === 32);
+    A.tilStart();
+    w.location.hash = "";
+
+    /* Tegningen i alle tilstande */
+    var tegnFejl = null;
+    try {
+        ["start"].forEach(function () { A.tegning.tegn(AS, 1000); });
+        A.startEmne("binding"); A.tegning.tegn(AS, 1100);
+        AS.skaerm = "rigtigt"; A.tegning.tegn(AS, 1200);
+        AS.skaerm = "tabt"; A.tegning.tegn(AS, 1300);
+        AS.skaerm = "slut"; A.tegning.startKonfetti(); A.tegning.tegn(AS, 1400);
+        AS.tilStart();
+    } catch (e) { tegnFejl = e.message; }
+    paastand("labyrinten kan tegnes i alle tilstande", tegnFejl === null, tegnFejl);
+    A.render();
+
+    /* --------------------------------------------------------------- */
+    overskrift("8. Kemichael");
+    var L = NK.laerer;
+    w.localStorage.removeItem("nk-pacman-intro");
+    L.startIntro(false);
+    paastand("tilbuddet vises første gang", synlig("tilbud"));
+    d.querySelector("#tilbud .tilbud-nej").click();
+    paastand("Nej tak skjuler tilbuddet (display: none)", w.getComputedStyle(d.getElementById("tilbud")).display === "none");
+    paastand("og valget huskes", NK.hent("nk-pacman-intro", false) === true);
+    L.startIntro(false);
+    paastand("tilbuddet kommer ikke igen", !synlig("tilbud"));
+    tast("k");
+    for (var i3 = 0; i3 < 60 * 4; i3++) L.opdater(1 / 60);
+    paastand("K viser præsentationen uden at spørge", L.laererIIntro());
+    L.opdater(1 / 60);
+    paastand("knappen Spring præsentationen over vises", synlig("spring-over"));
+    tast("Escape");
+    for (var i4 = 0; i4 < 60 * 3; i4++) L.opdater(1 / 60);
+    paastand("Esc sender ham ud", !L.laererIIntro());
+    w.localStorage.removeItem("nk-pacman-intro");
+    L.startIntro(false);
+    A.vaelgSvaerhed("let");
+    A.startEmne("ioner");
+    paastand("et spil, der går i gang, er det samme som Nej tak", !synlig("tilbud") && NK.hent("nk-pacman-intro", false) === true);
+    A.tilStart();
+    L.mesterBesoeg();
+    for (var i5 = 0; i5 < 60; i5++) L.opdater(1 / 60);
+    paastand("han kan komme forbi til Labyrintmester", L.iScene("mester"));
+
+    /* --------------------------------------------------------------- */
+    overskrift("9. Sproget");
+    var lange = D.INTRO.start.filter(function (l) { return l.length > 60; }).concat(D.MESTER_REPLIK.filter(function (l) { return l.length > 60; }));
+    paastand("Kemichaels linjer er højst 60 tegn", lange.length === 0, lange.join(" | "));
+    var sideTekst = d.body.innerText;
+    var alt = alleTekster.concat([sideTekst, D.MESTER.tekst], Object.keys(D.GUIDE).map(function (k) { return D.GUIDE[k]; }),
+        Object.keys(D.BESKED).map(function (k) { return D.BESKED[k]; }), D.INTRO.start, D.MESTER_REPLIK).join("\n");
+    var dash = alt.match(/.{0,20}[–—].{0,20}/);
+    paastand("ingen tankestreger", !dash, dash && dash[0]);
+    var enEr = alt.match(/.{0,12}(¹⁺|¹⁻|[A-Za-z₀-₉)]1[+−]).{0,12}/);
+    paastand("ladning ±1 skrives + og −, aldrig 1+ og 1−", !enEr, enEr && enEr[0]);
+    var punktum = alleTekster.join("\n").match(/.{0,15}\d\.\d.{0,15}/);
+    paastand("decimaltal med komma", !punktum, punktum && punktum[0]);
+    var smaa = [];
+    Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+        if (!e.offsetWidth) return;
+        var harTekst = Array.prototype.some.call(e.childNodes, function (x) { return x.nodeType === 3 && x.textContent.trim(); });
+        if (harTekst && parseFloat(w.getComputedStyle(e).fontSize) < 12) smaa.push(e.id || e.className || e.tagName);
+    });
+    paastand("ingen synlig tekst under 12 px", smaa.length === 0, smaa.slice(0, 5).join(", "));
+}
+
+/* Den gamle Game.update(), koert i et lukket miljoe med falsk tid:
+   hvor laenge sover spoegelset efter et forkert rum efter 12 s? */
+function gammelSoevn(kilde) {
+    try {
+        var s = /<script>([\s\S]*?)<\/script>/.exec(kilde)[1];
+        s = s.replace(/window\.onload\s*=.*$/m, "");
+        var tid = { nu: 0 };
+        var falskDok = {
+            getElementById: function () { return { style: {}, classList: { add: function () {}, remove: function () {}, contains: function () { return true; }, toggle: function () {} }, innerText: "", innerHTML: "" }; },
+            querySelectorAll: function () { return []; }
+        };
+        var fabrik = new Function("document", "Date", "window", "setTimeout", "requestAnimationFrame", s + "\nreturn { Game: Game, EMNER: EMNER };");
+        var ud = fabrik(falskDok, { now: function () { return tid.nu; } }, {}, function () {}, function () {});
+        var G = ud.Game;
+        G.selectDifficulty("mellem");
+        G.currentMode = "ioner";
+        G.currentIdx = 0;
+        G.lives = 3;
+        tid.nu = 1000;
+        G.setupLevel();
+        G.ghosts = [];
+        /* 12 s + det samme antal billeder, som testen brugte paa at gaa */
+        for (var b = 0; b < 12 * 60; b++) { tid.nu += 1000 / 60; G.update(); }
+        var forkert = G.answers.filter(function (a) { return !a.ok; })[0].z;
+        /* Gaa den korteste vej til det forkerte rum */
+        var K = window.frames[0].NK.Data.KORT;
+        var ko = [[G.player.tx, G.player.ty]], set = {}, far = {}, maal = null;
+        set[G.player.tx + "," + G.player.ty] = 1;
+        while (ko.length) {
+            var p = ko.shift();
+            if (K[p[1]][p[0]] === forkert) { maal = p; break; }
+            [[0, -1], [0, 1], [-1, 0], [1, 0]].forEach(function (r) {
+                var x2 = p[0] + r[0], y2 = p[1] + r[1], k = x2 + "," + y2;
+                if (K[y2] && (K[y2][x2] === 0 || K[y2][x2] === forkert) && !set[k]) { set[k] = 1; far[k] = p[0] + "," + p[1]; ko.push([x2, y2]); }
+            });
+        }
+        var v = [], n = maal[0] + "," + maal[1];
+        while (far[n]) { var a = n.split(",").map(Number), c = far[n].split(",").map(Number); v.unshift([a[0] - c[0], a[1] - c[1]]); n = far[n]; }
+        var TAST = { "0,-1": "ArrowUp", "0,1": "ArrowDown", "-1,0": "ArrowLeft", "1,0": "ArrowRight" };
+        v.forEach(function (r) { G.input(TAST[r[0] + "," + r[1]]); tid.nu += 1000 / 60; G.update(); });
+        if (G.lives !== 2) return null;
+        var g = G.ghosts[0], pos = g.tx + "," + g.ty, start = tid.nu;
+        G.player.invincible = true; G.player.shieldT = 1e9;
+        for (var b2 = 0; b2 < 60 * 20; b2++) {
+            tid.nu += 1000 / 60; G.update();
+            if (G.ghosts[0].tx + "," + G.ghosts[0].ty !== pos) return tid.nu - start;
+        }
+        return null;
+    } catch (e) {
+        if (window.console) console.log("gammel: " + e.stack);
+        return null;
+    }
+}
+</script>
+</body>
+</html>

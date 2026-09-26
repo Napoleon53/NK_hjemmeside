@@ -1,0 +1,898 @@
+/* =====================================================================
+   sc4.10 - Afrunding og opskrivning
+   Stilark. Samme udtryk som de andre superanimationer (toplinje, faner,
+   panel, kort og knapper som sc4.5 og sc8.4). Nyt: tavlen med cifrene
+   som brikker, kommaet, der hopper, og svarfeltet med eksponenten.
+   Kemichaels boble og knappen, der sender ham ud, er som i sc4.5.
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
+   dansk komma. Dansk komma bruges kun i tekst, som brugeren laeser.
+   ===================================================================== */
+
+:root {
+    --bund:        #1b1b21;
+    --scene-bund:  #15151c;
+    --panel:       #2b2b36;
+    --panel-2:     #333340;
+    --panel-3:     #3d3d4b;
+    --linje:       #464655;
+    --tekst:       #f2f3f5;
+    --tekst-svag:  #b9c0c9;
+    --tekst-mat:   #8a919c;
+
+    --blaa:        #3d9ee0;
+    --blaa-mork:   #2a76ac;
+    --groen:       #3fae72;
+    --groen-mork:  #2b7d51;
+    --groen-lys:   #7ee0a8;
+    --roed:        #e05446;
+    --roed-lys:    #f0918a;
+    --gul:         #f2c53d;
+    --gul-lys:     #f0d77a;
+    --okker:       #c9a227;
+    --lilla:       #9b6bd6;
+
+    --radius:      10px;
+    --radius-lil:  6px;
+    --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
+    --panel-bredde: 380px;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bund);
+    color: var(--tekst);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+   TOPLINJE
+   --------------------------------------------------------------------- */
+.top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    background-color: #15151b;
+    border-bottom: 1px solid #33333f;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    flex-shrink: 0;
+}
+
+/* I en samling i fuld skaerm staar knappen, der gendanner panelet, i hjoernet */
+.samling-fuld .top { padding-left: 56px; }
+
+.top h1 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.top h1 .ikon { font-size: 1.15rem; margin-right: 3px; color: var(--gul); }
+
+.faneknapper {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.faneknapper::-webkit-scrollbar { display: none; }
+
+.faneknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid transparent;
+    padding: 8px 14px;
+    border-radius: var(--radius-lil);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.faneknap .nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    color: var(--tekst-svag);
+    font-size: 0.72rem;
+    flex-shrink: 0;
+}
+
+.faneknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.faneknap.aktiv { background-color: var(--blaa); color: #ffffff; }
+.faneknap.aktiv .nr { background-color: rgba(255, 255, 255, 0.25); color: #ffffff; }
+
+.ikonknap {
+    background: transparent;
+    border: 1px solid #4a4a58;
+    color: var(--tekst-svag);
+    border-radius: 4px;
+    width: 30px;
+    height: 28px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.ikonknap.tekstknap { width: auto; padding: 0 10px; font-family: inherit; font-size: 0.84rem; font-weight: 600; }
+
+#hjaelpknap {
+    width: 38px;
+    height: 36px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background-color: #a33529;
+    border-color: var(--roed);
+    color: #d9dde3;
+}
+
+#hjaelpknap:hover { background-color: var(--roed); color: #ffffff; }
+#teoriknap { height: 36px; }
+
+/* ---------------------------------------------------------------------
+   HOVEDLAYOUT: scenen til venstre, panelet til hoejre
+   --------------------------------------------------------------------- */
+main { flex: 1; position: relative; min-height: 0; }
+
+.fane {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
+}
+
+/* Scenen er ternet papir. Laerredet bag det hele har kun Kemichaels
+   baand forneden (--baand saettes af js/app.js). */
+.scene {
+    --baand: 130px;
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background-color: var(--scene-bund);
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+.scene > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* Usynligt felt over katederet, som rundvisningen peger paa */
+.anker { position: absolute; pointer-events: none; }
+
+.arbejde {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: var(--baand);
+    z-index: 2;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: safe center;
+    padding: 18px 22px;
+}
+
+.arbejdsbord {
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.opg-type {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blaa);
+}
+
+.spm {
+    margin: -4px 0 2px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-align: center;
+}
+
+/* ---------------------------------------------------------------------
+   TAVLEN: tallet som brikker, ét ciffer pr. brik
+   --------------------------------------------------------------------- */
+.tavle {
+    width: 100%;
+    background: linear-gradient(180deg, #1c1d27 0%, #13131a 100%);
+    border: 1px solid #353544;
+    border-radius: 16px;
+    padding: 26px 16px 14px;
+    box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: border-color 0.3s ease;
+}
+
+.tavle.loest { border-color: rgba(63, 174, 114, 0.55); }
+.tavle.vist { border-color: rgba(224, 180, 58, 0.55); }
+
+.talrk {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: center;
+    row-gap: 0.25em;
+    font-size: clamp(1.9rem, 3.5vw, 3.1rem);
+    font-variant-numeric: tabular-nums;
+    min-height: 1.5em;
+}
+
+.brik {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.02em;
+    height: 1.34em;
+    margin: 0 0.04em;
+    padding: 0;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--tekst);
+    background-color: #242431;
+    border: 1px solid #45455a;
+    border-radius: 0.17em;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease, opacity 0.35s ease, box-shadow 0.15s ease;
+}
+
+.brik:hover { background-color: #2d2d3c; border-color: #6a6a80; }
+.brik.mr { margin-left: 0.3em; }
+
+/* Taelle-fanen: valgt af eleven, og bagefter svaret */
+.brik.valgt { background-color: rgba(242, 197, 61, 0.2); border-color: var(--gul); color: #ffffff; transform: translateY(-0.08em); }
+.brik.bet { background-color: rgba(63, 174, 114, 0.24); border-color: var(--groen); color: #ffffff; }
+.brik.ikke { opacity: 0.35; }
+
+/* Markeret til at taelle efter (de andre faner) */
+.brik.mark { box-shadow: inset 0 -0.11em 0 var(--gul); }
+
+/* Afrunding: det, der bliver, det ciffer, der afgoer, og det, der fjernes */
+.brik.behold { background-color: rgba(63, 174, 114, 0.22); border-color: var(--groen); }
+.brik.afgoer { border-color: var(--gul); box-shadow: 0 0 0 0.07em rgba(242, 197, 61, 0.45); }
+.brik.vaek, .brik.foran { opacity: 0.32; }
+
+/* Facit og tallet under og efter hoppet */
+.brik.facit { background-color: rgba(63, 174, 114, 0.24); border-color: var(--groen); color: #ffffff; cursor: default; animation: ind 0.35s ease-out; }
+.tavle.vist .brik.facit { background-color: rgba(224, 180, 58, 0.18); border-color: #e0b43a; }
+.brik.lille-ind { cursor: default; }
+.brik.ny { border-style: dashed; border-color: var(--gul); color: var(--gul-lys); }
+
+.komma {
+    display: inline-block;
+    width: 0.3em;
+    margin: 0 -0.02em;
+    padding-bottom: 0.08em;
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    color: var(--gul);
+    user-select: none;
+}
+
+.komma[data-komma] { cursor: pointer; }
+.komma.hop { animation: hop 0.3s ease-out; }
+.komma.slut { opacity: 0.5; }
+
+.minus { align-self: center; margin-right: 0.08em; color: var(--tekst-svag); }
+
+.potensdel {
+    align-self: center;
+    margin-left: 0.28em;
+    font-size: 0.72em;
+    font-weight: 600;
+    color: var(--tekst-svag);
+    white-space: nowrap;
+}
+
+.potensdel sup { font-size: 0.72em; font-weight: 700; color: var(--gul); margin-left: 0.04em; }
+.potensdel.facit { color: #ffffff; animation: ind 0.35s ease-out; }
+.potensdel.facit sup { color: var(--groen-lys); }
+.tavle.vist .potensdel.facit sup { color: var(--gul-lys); }
+.potensdel.taeller sup { display: inline-block; min-width: 1.2em; }
+
+.enhedsdel { align-self: center; margin-left: 0.3em; font-size: 0.6em; font-weight: 600; color: var(--tekst-svag); }
+.enhedsdel.facit { color: #ffffff; }
+
+/* Regnestykket: to faktorer med antallet af cifre under (som den gamle) */
+.faktor { display: inline-flex; align-items: flex-end; position: relative; padding-bottom: 0.62em; }
+.faktor .tag {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    font-size: max(12px, 0.34em);
+    font-weight: 600;
+    color: var(--blaa);
+    white-space: nowrap;
+}
+
+.op { align-self: center; margin: 0 0.28em 0.55em; font-size: 0.8em; color: var(--tekst-mat); }
+.spoerg { align-self: center; margin-bottom: 0.55em; color: #5d5d6c; font-weight: 600; }
+
+/* Raekken under tallet: facit, eller hvor langt kommaet er flyttet */
+.efter {
+    min-height: 1.45em;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.3rem, 2.3vw, 2rem);
+    font-variant-numeric: tabular-nums;
+}
+
+.tegn-lig { margin: 0 0.35em; color: var(--tekst-mat); font-weight: 600; }
+.efter-tekst { font-size: max(14px, 0.55em); font-weight: 600; color: var(--groen-lys); }
+.efter-tekst.mat { color: var(--tekst-svag); }
+.tavle.vist .efter-tekst { color: var(--gul-lys); }
+.tavle.vist .efter-tekst.mat { color: var(--tekst-svag); }
+
+@keyframes ind {
+    from { transform: translateY(0.12em); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes hop {
+    0%   { transform: translateY(-0.28em) scale(1.25); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes ryst {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+.ryst { animation: ryst 0.35s ease 1; }
+
+/* En ny opgave glider let ind (js/fane.js, animerNy) */
+.talrk.ny-opg { animation: ind 0.35s ease-out; }
+
+/* ---------------------------------------------------------------------
+   SVARET
+   --------------------------------------------------------------------- */
+.svarrad {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.valgt-info { font-size: 1.05rem; color: var(--tekst-svag); }
+.valgt-info b { font-size: 1.25rem; color: var(--gul); }
+
+.felter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #101016;
+    border: 2px solid #3f3f50;
+    border-radius: 12px;
+    padding: 6px 10px 6px 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.felter:focus-within { border-color: var(--gul); box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.18); }
+.felter.ok { border-color: var(--groen); box-shadow: 0 0 0 3px rgba(63, 174, 114, 0.18); }
+.felter.vist { border-color: #e0b43a; }
+
+.svarfelt {
+    width: 8.5em;
+    padding: 4px 2px;
+    font-family: inherit;
+    font-size: 1.6rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--tekst);
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.svarfelt::placeholder { color: #55556a; font-weight: 400; }
+.felter.ok .svarfelt { color: var(--groen-lys); }
+.felter.vist .svarfelt, .felter.vist .eksfelt { color: var(--gul-lys); }
+
+.potens { display: inline-flex; align-items: flex-start; gap: 5px; }
+.gange { align-self: center; font-size: 1.35rem; font-weight: 600; color: var(--tekst-svag); white-space: nowrap; }
+
+.eksfelt {
+    width: 3.2em;
+    margin-top: -2px;
+    padding: 3px 4px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--gul);
+    background-color: #1c1c25;
+    border: 1px solid #55556a;
+    border-radius: 6px;
+    outline: none;
+}
+
+.eksfelt:focus { border-color: var(--gul); box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.25); }
+
+.fortegn {
+    align-self: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--tekst-svag);
+    background-color: var(--panel-2);
+    border: 1px solid #4a4a58;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.fortegn:hover:not(:disabled) { color: var(--tekst); border-color: var(--gul); }
+.fortegn:disabled { opacity: 0.35; cursor: default; }
+
+.svar-enhed { font-size: 1.25rem; font-weight: 600; color: var(--tekst-svag); }
+
+.knap.tjekknap { min-width: 112px; justify-content: center; padding: 12px 22px; font-size: 1rem; }
+.knap.tjekknap.videre { background-color: var(--groen-mork); border-color: var(--groen); }
+.knap.tjekknap.videre:hover:not(:disabled) { background-color: var(--groen); }
+
+/* Maaleren: hvor mange betydende cifre dit eget tal har */
+.maaler { display: flex; align-items: center; gap: 10px; font-size: 0.92rem; color: var(--tekst-mat); }
+.prikker-m { display: inline-flex; gap: 5px; }
+.prikker-m i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #5f5f72; }
+.prikker-m i.fyldt { background-color: var(--blaa); border-color: var(--blaa); }
+.prikker-m i.over { background-color: var(--roed); border-color: var(--roed); }
+
+/* Linjen under svaret: naeste skridt, fejl, ros og hint */
+.besked {
+    margin: 0;
+    max-width: 660px;
+    min-height: 1.5em;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--tekst-svag);
+}
+
+.besked:empty { visibility: hidden; }
+.besked b { color: #ffffff; }
+.besked sup { font-size: 0.72em; }
+.besked.god   { color: var(--groen-lys); background-color: rgba(63, 174, 114, 0.08); }
+.besked.skidt { color: var(--roed-lys); background-color: rgba(224, 84, 70, 0.08); }
+.besked.gul   { color: var(--gul-lys); background-color: rgba(242, 197, 61, 0.07); }
+
+/* ---------------------------------------------------------------------
+   HOEJRE SPALTE
+   --------------------------------------------------------------------- */
+.panel {
+    background-color: var(--panel);
+    border-left: 1px solid #1f1f27;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d5c var(--panel);
+}
+
+.panel::-webkit-scrollbar { width: 9px; }
+.panel::-webkit-scrollbar-track { background: var(--panel); }
+.panel::-webkit-scrollbar-thumb { background: #4d4d5c; border-radius: 5px; }
+
+.kort {
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 12px;
+}
+
+.kort > h2 {
+    margin: 0 0 10px 0;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.kort > h2 .taeller {
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--tekst-mat);
+    white-space: nowrap;
+}
+
+.kort > h2 .taeller b { color: var(--tekst); }
+.kort.opgavekort { border-left: 3px solid var(--lilla); }
+
+.vaelgerrad { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+
+.vaelger {
+    flex: 1 1 auto;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.vaelger:hover { background-color: var(--panel-3); color: var(--tekst); }
+.vaelger.valgt { background-color: var(--blaa-mork); border-color: var(--blaa); color: #ffffff; }
+
+/* Runden som ti streger */
+.prikker { display: flex; gap: 5px; margin: 2px 0 12px; }
+.prikker i { flex: 1; height: 8px; border-radius: 4px; background-color: #3a3a48; transition: background-color 0.3s ease; }
+.prikker i.nu { background-color: var(--blaa); box-shadow: 0 0 0 2px rgba(61, 158, 224, 0.3); }
+.prikker i.rigtig { background-color: var(--groen); }
+.prikker i.hjulpet { background-color: var(--okker); }
+.prikker i.vist { background-color: var(--roed); }
+
+.kort-slut { margin: 0 0 12px; font-size: 0.95rem; line-height: 1.5; color: var(--groen-lys); }
+.kort-slut b { color: #ffffff; }
+
+/* Listen over de loeste opgaver med facit */
+.rundeliste { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+
+.rundeliste li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 9px;
+    border-radius: var(--radius-lil);
+    border-left: 3px solid #555566;
+    background-color: rgba(255, 255, 255, 0.035);
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+    animation: ind 0.3s ease-out;
+}
+
+.rundeliste li.rigtig { border-left-color: var(--groen); }
+.rundeliste li.hjulpet { border-left-color: var(--okker); }
+.rundeliste li.vist { border-left-color: var(--roed); }
+
+.rl-nr { font-size: 0.78rem; font-weight: 700; color: var(--tekst-mat); }
+.rl-opg { color: var(--tekst-svag); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rl-opg em { font-style: normal; font-size: 0.86em; color: var(--tekst-mat); }
+.rl-svar { font-weight: 700; color: var(--tekst); white-space: nowrap; }
+.rundeliste sup { font-size: 0.7em; }
+
+.note { margin: 0; font-size: 0.85rem; line-height: 1.45; color: var(--tekst-mat); }
+.note.forklar { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 0.8rem; }
+.prik { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-left: 2px; }
+.prik.rigtig { background-color: var(--groen); }
+.prik.hjulpet { background-color: var(--okker); }
+.prik.vist { background-color: var(--roed); }
+
+.rekord { margin: 10px 0 0; font-size: 0.9rem; color: var(--gul-lys); }
+.rekord b { color: var(--gul); }
+
+/* ---------------------------------------------------------------------
+   KNAPPER
+   --------------------------------------------------------------------- */
+.knapper { display: flex; flex-direction: column; gap: 7px; }
+
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.knap:active:not(:disabled) { transform: scale(0.985); }
+.knap:disabled { opacity: 0.4; cursor: not-allowed; }
+.knap.stor { padding: 11px 13px; font-size: 0.95rem; width: 100%; justify-content: center; }
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+
+/* Den knap, der er det naturlige naeste skridt, banker stille. */
+@keyframes bank {
+    0%   { box-shadow: 0 0 0 0 rgba(61, 158, 224, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(61, 158, 224, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(61, 158, 224, 0); }
+}
+
+.knap.banker { animation: bank 1.7s ease-out infinite; }
+
+/* ---------------------------------------------------------------------
+   KEMICHAELS BOBLE (fast til hoejre for ham, som i sc4.5)
+   --------------------------------------------------------------------- */
+.kboble {
+    --hale: 30px;
+    position: absolute;
+    z-index: 4;
+    background-color: #fffdf6;
+    color: #1f2328;
+    border: 2px solid #2a2f36;
+    border-left-width: 5px;
+    border-radius: 12px;
+    padding: 7px 14px 8px 12px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.38;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    overflow: visible;
+    transition: opacity 0.22s ease, border-color 0.3s ease;
+}
+
+.kboble::before,
+.kboble::after {
+    content: "";
+    position: absolute;
+    top: var(--hale);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    transform: translateY(-50%);
+}
+
+/* Halen: en trekant, der peger mod hans mund */
+.kboble::before { left: -15px; border-width: 8px 12px 8px 0; border-color: transparent #2a2f36 transparent transparent; }
+.kboble::after  { left: -9px;  border-width: 6px 9px 6px 0;  border-color: transparent #fffdf6 transparent transparent; }
+
+.kb-tekst { max-height: inherit; overflow: hidden; }
+.kboble.skift { opacity: 0.25; transition: none; }
+.kboble.god   { border-left-color: var(--groen); }
+.kboble.skidt { border-left-color: var(--roed); }
+.kboble.hint  { border-left-color: var(--gul); }
+.kboble.svar  { border-left-color: #e0b43a; }
+.kboble b { color: #000000; }
+.kboble sup { font-size: 0.72em; }
+
+.kknap {
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+    z-index: 5;
+    background-color: rgba(20, 20, 28, 0.85);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.kknap:hover { color: var(--tekst); border-color: #6e6e80; background-color: var(--panel-3); }
+.kknap.ude { color: var(--gul); border-color: rgba(242, 197, 61, 0.6); }
+
+/* ---------------------------------------------------------------------
+   POP OP (teorien)
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 8, 12, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 680px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 24px 26px;
+}
+
+.overlay-boks h2 { margin: 0 0 8px 0; font-size: 1.2rem; color: var(--blaa); }
+
+.overlay-boks h3 {
+    margin: 18px 0 6px 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+}
+
+.overlay-boks p { margin: 0 0 8px; font-size: 0.95rem; line-height: 1.55; color: #dde3ea; }
+
+.eksempel {
+    margin: 4px 0 6px;
+    padding: 9px 14px;
+    border-left: 4px solid var(--lilla);
+    border-radius: 0 var(--radius-lil) var(--radius-lil) 0;
+    background-color: rgba(255, 255, 255, 0.05);
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--tekst);
+}
+
+kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid #55556a;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background-color: #1f1f28;
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--tekst);
+}
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som sc8.4)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+
+.rundvisning-baggrund {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.rundvisning-tal { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.07em; color: var(--tekst-mat); }
+
+.rundvisning-luk {
+    background: transparent;
+    border: none;
+    color: var(--tekst-svag);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.rundvisning-luk:hover { color: var(--tekst); }
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.88rem; line-height: 1.5; color: #c8ced6; }
+
+.rundvisning-knapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
+
+/* ---------------------------------------------------------------------
+   TILGAENGELIGHED OG SMALLE SKAERME
+   --------------------------------------------------------------------- */
+button:focus-visible {
+    outline: 2px solid var(--gul);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1320px) {
+    :root { --panel-bredde: 340px; }
+}
+
+@media (max-width: 1100px) {
+    .top { gap: 10px; padding: 8px 12px; }
+    .faneknap { padding: 7px 10px; font-size: 0.84rem; gap: 6px; }
+    .faneknap .nr { width: 17px; height: 17px; font-size: 0.66rem; }
+    .spm { font-size: 1.15rem; }
+    .svarfelt { width: 7em; font-size: 1.4rem; }
+}
+
+@media (max-width: 860px) {
+    body { overflow: auto; }
+    .top { flex-wrap: wrap; gap: 10px; }
+    .faneknapper { order: 3; width: 100%; flex: none; }
+    main { overflow: visible; }
+    .fane { position: static; grid-template-columns: minmax(0, 1fr); }
+    .scene { height: 72vh; min-height: 520px; }
+    .panel { border-left: none; border-top: 1px solid #1f1f27; }
+}
+
+@media (max-height: 640px) {
+    .tavle { padding-top: 18px; }
+    .arbejdsbord { gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

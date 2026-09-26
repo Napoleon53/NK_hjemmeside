@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Afrunding og opskrivning</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-fane="tael">
+
+<header class="top">
+    <h1><span class="ikon">≈</span> Afrunding og opskrivning</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="tael" role="tab" aria-selected="true" title="Tæl cifrene (1)"><span class="nr">1</span>Tæl cifrene</button>
+        <button class="faneknap" data-fane="komma" role="tab" aria-selected="false" title="Flyt kommaet (2)"><span class="nr">2</span>Flyt kommaet</button>
+        <button class="faneknap" data-fane="afrund" role="tab" aria-selected="false" title="Afrund (3)"><span class="nr">3</span>Afrund</button>
+        <button class="faneknap" data-fane="blandet" role="tab" aria-selected="false" title="Blandet (4)"><span class="nr">4</span>Blandet</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane aktiv" id="fane" role="tabpanel">
+    <div class="scene" id="scene">
+        <canvas id="laerred" aria-label="Kemichael ved katederet"></canvas>
+        <div class="anker" id="anker-laerer"></div>
+
+        <!-- Arbejdet: spørgsmålet, tavlen med cifrene, svaret og linjen -->
+        <div class="arbejde" id="arbejde">
+            <div class="arbejdsbord">
+                <span class="opg-type" id="opg-type"></span>
+                <p class="spm" id="spm"></p>
+
+                <div class="tavle" id="tavle">
+                    <div class="talrk" id="talrk"></div>
+                    <div class="efter" id="efter"></div>
+                </div>
+
+                <div class="svarrad" id="svarrad">
+                    <div class="valgt-info" id="valgt-info"></div>
+                    <div class="felter" id="felter">
+                        <input class="svarfelt" id="svar-m" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Dit svar" placeholder="Svar">
+                        <span class="potens" id="potens">
+                            <span class="gange">· 10</span>
+                            <input class="eksfelt" id="svar-e" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="Eksponent" title="Eksponenten. Tomt: ingen tierpotens">
+                            <button class="fortegn" id="fortegn" type="button" title="Skift fortegn på eksponenten" aria-label="Skift fortegn">±</button>
+                        </span>
+                        <span class="svar-enhed" id="svar-enhed" hidden></span>
+                    </div>
+                    <button class="knap blaa tjekknap" id="tjek" type="button">Tjek</button>
+                </div>
+                <div class="maaler" id="maaler" hidden></div>
+                <p class="besked" id="besked" aria-live="polite"></p>
+            </div>
+        </div>
+
+        <div class="kboble" id="boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der ændrer sig: Giv hint -> Vis svaret -> Næste opgave -->
+        <div class="kort opgavekort" id="opgavekort">
+            <h2><span id="kort-titel">Tæl cifrene</span><span class="taeller">opgave <b id="kort-nr">1</b>/10</span></h2>
+            <div class="vaelgerrad" id="vaelgere" hidden></div>
+            <div class="prikker" id="prikker" aria-hidden="true"></div>
+            <p class="kort-slut" id="kort-slut" hidden></p>
+            <button class="knap stor" id="opgaveknap" type="button">Giv hint</button>
+        </div>
+
+        <div class="kort" id="rundekort">
+            <h2>Runden <span class="taeller">rigtige i første forsøg: <b id="rigtige">0</b></span></h2>
+            <ol class="rundeliste" id="rundeliste"></ol>
+            <p class="note" id="rundenote">Opgaverne kommer her, når de er løst.</p>
+            <p class="note forklar"><i class="prik rigtig"></i>første forsøg <i class="prik hjulpet"></i>med hjælp <i class="prik vist"></i>svaret vist</p>
+            <p class="rekord" id="rekord" hidden></p>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (åbnes kun med knappen eller T)                            -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Afrunding og opskrivning</h2>
+        <p>Antallet af betydende cifre viser, hvor præcist et tal er kendt. Et resultat skrives aldrig mere præcist, end målingerne er.</p>
+
+        <h3>Betydende cifre</h3>
+        <p>Alle cifre er betydende, undtagen nullerne foran det første ciffer, der ikke er nul. Nuller til sidst tæller også med.</p>
+        <div class="eksempel">0,0250 har 3 &nbsp;·&nbsp; 4500 har 4 &nbsp;·&nbsp; 12,0 har 3 &nbsp;·&nbsp; 305 har 3</div>
+
+        <h3>Videnskabelig notation</h3>
+        <p>Ét ciffer (1 til 9) foran kommaet, gange en tierpotens. Eksponenten er antallet af pladser, kommaet er flyttet: til venstre giver positiv eksponent, til højre negativ. Skal nullerne til sidst i et helt tal ikke tælle, skrives tallet sådan.</p>
+        <div class="eksempel">45 600 = 4,56 · 10⁴ &nbsp;·&nbsp; 0,00456 = 4,56 · 10⁻³ &nbsp;·&nbsp; 4500 med 2 betydende cifre = 4,5 · 10³</div>
+        <p>Uskreven regel: tal mellem 0,01 og 100 skrives som almindelige tal. Større og mindre tal skrives gerne i videnskabelig notation.</p>
+
+        <h3>Enheder</h3>
+        <p>Forstavelsen siger, hvor mange gange større eller mindre enheden er. Kommaet flyttes lige så mange pladser, som der er nuller.</p>
+        <div class="eksempel">k = 1000 &nbsp;·&nbsp; h = 100 &nbsp;·&nbsp; d = 1/10 &nbsp;·&nbsp; m = 1/1000 &nbsp;·&nbsp; µ = 1/1 000 000</div>
+        <div class="eksempel">1 L = 1000 mL = 1 000 000 µL &nbsp;·&nbsp; 1 L = 10 dL &nbsp;·&nbsp; 1 kg = 1000 g &nbsp;·&nbsp; 1 mol = 1000 mmol &nbsp;·&nbsp; 1 kPa = 1000 Pa</div>
+        <div class="eksempel">1 L = 1 dm³ &nbsp;·&nbsp; 1 mL = 1 cm³ &nbsp;·&nbsp; 1 m³ = 1000 L</div>
+
+        <h3>Afrunding</h3>
+        <p>Tæl cifrene fra det første, der ikke er nul. Er det næste ciffer 5 eller mere, rundes der op.</p>
+        <div class="eksempel">12,46 med 3 betydende cifre er 12,5 &nbsp;·&nbsp; 0,03449 med 2 er 0,034</div>
+
+        <h3>Gange og dele</h3>
+        <p>Resultatet får lige så mange betydende cifre som det tal i regnestykket, der har færrest.</p>
+        <div class="eksempel">2,5 · 4,00 = 10 (2 betydende cifre, lige som 2,5)</div>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> ny runde &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>K</kbd> Kemichael &nbsp;·&nbsp; <kbd>Esc</kbd> luk. I svarfeltet springer <kbd>e</kbd> eller <kbd>^</kbd> til eksponenten.</p>
+
+        <div class="knapper" style="margin-top:16px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight på ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/cifre.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

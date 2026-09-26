@@ -1,11 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="690" height="626" viewBox="0 0 690 626">
   <!-- Bassinet. Molekylerne tegnes af animationen BAG denne fil, saa
-       glasset ligger ovenpaa. 20 enheder pr. kuglediameter.
-       Inderside: x 20-670 (32,5 kugler), y 30-604,4 (28,72 kugler).
-       Det svarer til gitteret i js/model.js: 32 x 27 pladser plus 5,2
-       kugler luft foroven. Den kolde zone er de oeverste 1,7 kugler
-       (y 30-64), hvor koelekappen sidder udenpaa.
-       Stregerne til venstre: én pr. portion (tre raekker kugler).
+       glasset ligger ovenpaa.
+       Inderside: x 20-670 (40,5 kugler), y 30-604,4 (35,79 kugler),
+       16,05 enheder pr. kuglediameter. Det svarer til gitteret i
+       js/model.js: 40 x 33 pladser plus 7,08 kugler luft foroven. Den
+       kolde zone er de oeverste 2,12 kugler (y 30-64), hvor koelekappen
+       sidder udenpaa.
+       Stregerne til venstre: én pr. portion (tre raekker kugler), elleve i alt.
        Det samme sprite bruges til det lille glas. -->
   <defs>
     <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
@@ -42,11 +43,11 @@
     <circle cx="600" cy="42" r="1.5"/>
   </g>
 
-  <!-- Inddeling: én streg pr. portion, laengere ved 3, 6 og 9 -->
+  <!-- Inddeling: én streg pr. portion, laengere ved 5 og 10 -->
   <g stroke="#eef6fc" stroke-opacity="0.5" stroke-width="2.2" stroke-linecap="round">
-    <path d="M22 549.8 h14 M22 497.8 h14 M22 393.9 h14 M22 341.9 h14 M22 238 h14 M22 186 h14"/>
+    <path d="M22 560.6 h14 M22 518.9 h14 M22 477.2 h14 M22 435.5 h14 M22 352.1 h14 M22 310.4 h14 M22 268.7 h14 M22 227 h14 M22 143.6 h14"/>
   </g>
   <g stroke="#eef6fc" stroke-opacity="0.75" stroke-width="2.6" stroke-linecap="round">
-    <path d="M22 445.8 h26 M22 290 h26 M22 134.1 h26"/>
+    <path d="M22 393.8 h26 M22 185.3 h26"/>
   </g>
 </svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="400" viewBox="0 0 70 200">
+  <!-- Gasflasken. Haandhjulet paa ventilen er omkring (35, 6), dysen,
+       hvor slangen sidder, ender i (68, 18). Etiketten tegnes af
+       animationen mellem y 92 og y 150 (x 9-61). Bunden er y 199. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4f5963"/>
+      <stop offset="0.3" stop-color="#8e99a5"/>
+      <stop offset="0.55" stop-color="#6f7a86"/>
+      <stop offset="1" stop-color="#3b434c"/>
+    </linearGradient>
+    <linearGradient id="messing" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a2a"/>
+      <stop offset="0.45" stop-color="#e2bf6a"/>
+      <stop offset="1" stop-color="#7a5b20"/>
+    </linearGradient>
+  </defs>
+  <path d="M 5 70 Q 5 44 28 40 L 42 40 Q 65 44 65 70 L 65 190 Q 65 199 56 199 L 14 199 Q 5 199 5 190 Z" fill="url(#krop)" stroke="#262b31" stroke-width="1.5"/>
+  <rect x="5" y="56" width="60" height="12" fill="#2f6e9e" opacity="0.9"/>
+  <rect x="26" y="26" width="18" height="15" fill="url(#messing)" stroke="#5a4418" stroke-width="1"/>
+  <rect x="22" y="12" width="26" height="15" rx="2" fill="url(#messing)" stroke="#5a4418" stroke-width="1"/>
+  <rect x="47" y="15" width="21" height="7" rx="1.5" fill="url(#messing)" stroke="#5a4418" stroke-width="1"/>
+  <rect x="33" y="5" width="4" height="8" fill="#5a4418"/>
+  <ellipse cx="35" cy="5" rx="14" ry="4" fill="#3a3f46" stroke="#1d2024" stroke-width="1"/>
+  <ellipse cx="35" cy="4.3" rx="10" ry="2.3" fill="#565c64"/>
+  <path d="M 13 76 L 13 184" stroke="#ffffff" stroke-width="3" opacity="0.18" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="170" height="50" viewBox="0 0 170 50">
+  <!-- Magnetomroerer. Kolben staar paa pladen, hvis overflade er y 5
+       (x 12-158). Bunden er y 49. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9ecef"/>
+      <stop offset="1" stop-color="#b9c0c8"/>
+    </linearGradient>
+    <linearGradient id="plade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfbfb"/>
+      <stop offset="1" stop-color="#dfe3e7"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="12" width="166" height="37" rx="6" fill="url(#krop)" stroke="#7d868f" stroke-width="1.2"/>
+  <rect x="10" y="4" width="150" height="10" rx="3" fill="url(#plade)" stroke="#9aa3ac" stroke-width="1"/>
+  <rect x="2" y="44" width="166" height="5" rx="2.5" fill="#000000" fill-opacity="0.12"/>
+  <!-- Lampen og knappen -->
+  <circle cx="24" cy="30" r="3.5" fill="#46c07a" stroke="#2c7a4c" stroke-width="1"/>
+  <circle cx="142" cy="30" r="9" fill="#5b646d" stroke="#3a4148" stroke-width="1.2"/>
+  <path d="M142 30 L142 22.5" stroke="#e9ecef" stroke-width="2" stroke-linecap="round"/>
+  <path d="M38 30 h86" stroke="#9aa3ac" stroke-width="1" stroke-opacity="0.6"/>
+</svg>

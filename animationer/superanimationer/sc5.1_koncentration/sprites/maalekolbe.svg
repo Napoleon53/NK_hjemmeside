@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="260" viewBox="0 0 120 260">
+  <!-- Maalekolbe. Animationen tegner vaesken BAG filen og etiketten
+       OVENPAA den. Det indre: halsen x 54-66 fra y 10 til y 150, og
+       boblen, en cirkel med midte (60, 202) og radius 48, skaaret af
+       ved bunden y 248. Maerket paa halsen er y 60: der staar netop
+       kolbens rumfang. Rumfanget skrives paa boblen omkring (60, 214).
+       Bunden staar paa y 256. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.32"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.07"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.26"/>
+    </linearGradient>
+  </defs>
+  <path d="M52 8 L52 152 Q10 164 10 206 Q10 234 24 250 L96 250 Q110 234 110 206 Q110 164 68 152 L68 8 Z" fill="url(#glas)"/>
+  <path d="M49 6 L52 8 L52 152 Q10 164 10 206 Q10 234 24 252 Q26 254 30 254 L90 254 Q94 254 96 252 Q110 234 110 206 Q110 164 68 152 L68 8 L71 6"
+        fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Maerket rundt om halsen -->
+  <path d="M52 60 L68 60" stroke="#ffffff" stroke-opacity="0.95" stroke-width="1.8"/>
+  <path d="M52 62 Q60 65 68 62" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1"/>
+  <!-- Genskin -->
+  <rect x="62" y="16" width="2" height="128" rx="1" fill="#ffffff" fill-opacity="0.2"/>
+  <path d="M22 196 Q24 176 40 166" fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="4" stroke-linecap="round"/>
+</svg>

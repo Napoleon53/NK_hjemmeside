@@ -635,3 +635,6 @@ input:focus-visible {
 }
 
 .tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+/* hidden skal skjule tilbuddet, selv om .tilbud giver display: flex */
+.tilbud[hidden] { display: none; }

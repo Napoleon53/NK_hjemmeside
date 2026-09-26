@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="140" viewBox="0 0 90 140">
+  <!-- Reagensflaske med slebet prop. Animationen tegner vaesken BAG filen,
+       klippet til det indre (x 12-78, y 40-134), og etikettens tekst
+       OVENPAA filen i omraadet x 16-74, y 70-110. Bunden er y 138. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.34"/>
+      <stop offset="0.18" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="0.82" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.28"/>
+    </linearGradient>
+  </defs>
+  <!-- Proppen -->
+  <path d="M32 4 L58 4 Q61 4 61 7 L61 12 Q61 14 58 14 L32 14 Q29 14 29 12 L29 7 Q29 4 32 4 Z" fill="#e9f3fa" fill-opacity="0.55" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="1.3"/>
+  <path d="M36 14 L54 14 L53 24 L37 24 Z" fill="#e9f3fa" fill-opacity="0.35" stroke="#dcecf8" stroke-opacity="0.8" stroke-width="1.1"/>
+  <!-- Flasken -->
+  <path d="M35 22 L55 22 L55 30 Q55 34 62 36 Q80 40 80 58 L80 128 Q80 138 70 138 L20 138 Q10 138 10 128 L10 58 Q10 40 28 36 Q35 34 35 30 Z"
+        fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.6"/>
+  <path d="M14 130 Q15 135 21 135 L69 135 Q75 135 76 130" fill="none" stroke="#dcecf8" stroke-opacity="0.35" stroke-width="1.2"/>
+  <!-- Etiketten -->
+  <rect x="15" y="68" width="60" height="44" rx="3" fill="#fbfaf5" stroke="#b9b4a2" stroke-width="1"/>
+  <rect x="68" y="44" width="4" height="84" rx="2" fill="#ffffff" fill-opacity="0.18"/>
+  <rect x="16" y="46" width="2.5" height="80" rx="1.2" fill="#ffffff" fill-opacity="0.12"/>
+</svg>

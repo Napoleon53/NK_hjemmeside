@@ -238,16 +238,7 @@ chrome --headless=new --allow-file-access-from-files --window-size=1400,4600
 Uden `--allow-file-access-from-files` nægter Chrome siden at kigge ind i sin egen
 iframe; brug så en lokal server eller Firefox.
 
-## Hvis den skal ind i menuen
+## I menuen
 
-`animationer/kemi-c-filer/samling_c2.html` har en knap med `data-emne="c2.1"`,
-som peger på den gamle animation. Skal den nye afløse den, er det den ene linje,
-der skal skiftes ud. Bemærk `../`, fordi superanimationerne ligger uden for
-kapitlets egen mappe:
-
-```html
-<button class="tab-btn" data-emne="c2.1"
-    data-beskrivelse="Se vandet rive ionerne løs af en saltkrystal, og find ud af, hvor meget der overhovedet kan opløses, før resten bliver til bundfald."
-    onclick="visAnimation(this, '../v2/superanimation/sc2.1_salt_i_vand/index.html')"
-    title="Salt i vand"><span class="btn-num">1</span><span class="btn-text">Salt i vand</span></button>
-```
+I menuen fra 26. sept. 2026 som c2.1 i `kemi-c-filer/samling_c2.html`. Den gamle
+ligger i `kemi-c-filer/arkiv/c2.1_salte_vand_oploest_oldversion.html`.

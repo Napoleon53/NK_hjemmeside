@@ -199,9 +199,5 @@ Reglen står i `../README.md` under "Kemichael præsenterer hvert rum".
 
 ## I menuen
 
-Ikke endnu. Menuen viser stadig den gamle c4.1. Når den skal i menuen: knappen
-med `data-emne="c4.1"` i `animationer/kemi-c-filer/samling_c4.html` skal pege
-på `../superanimationer/sc4.1_molarmasse/index.html`, den gamle flyttes til
-`kemi-c-filer/arkiv/c4.1_opgave_molarmasse_oldversion.html`, og navnet
-`'Opg: Molarmasse'` i `FEEDBACK_EMNER` i `animationer/samling_alt.html` rettes
-til `'Molarmasse'`.
+I menuen fra 26. sept. 2026 som c4.1 i `kemi-c-filer/samling_c4.html`. Den gamle
+ligger i `kemi-c-filer/arkiv/c4.1_opgave_molarmasse_oldversion.html`.

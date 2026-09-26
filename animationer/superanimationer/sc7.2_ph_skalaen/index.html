@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pH-skalaen</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> pH-skalaen</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-skala" role="tab" aria-selected="true"><span class="nr">1</span>Skalaen</button>
+        <button class="faneknap" data-fane="fane-lup" role="tab" aria-selected="false"><span class="nr">2</span>Luppen</button>
+        <button class="faneknap" data-fane="fane-fortynd" role="tab" aria-selected="false"><span class="nr">3</span>Fortyndingen</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: SKALAEN                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-skala" role="tabpanel" aria-label="Skalaen">
+    <div class="scene medtekst">
+        <canvas id="skala-laerred"></canvas>
+        <div class="anker" id="skala-anker-skala"></div>
+        <div class="anker" id="skala-anker-stoffer"></div>
+        <div class="anker" id="skala-anker-meter"></div>
+        <div class="anker" id="skala-anker-baner"></div>
+        <div class="tilbud" id="skala-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="skala-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="skala-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste hylde -->
+        <div class="kort opgavekort" id="skala-kort">
+            <h2><span id="skala-titel">Hylde 1</span><span class="taeller">målt <b id="skala-maalt">0</b>/<span id="skala-ialt">6</span></span></h2>
+            <p class="maal-tekst" id="skala-prompt"></p>
+            <p class="besked" id="skala-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="skala-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="skala-stof" hidden>
+            <h2><span id="skala-stofnavn"></span><span class="taeller" id="skala-surhed"></span></h2>
+            <p class="storttal" id="skala-stofph"></p>
+            <p class="note" id="skala-gaet"></p>
+            <p class="note" id="skala-modvand"></p>
+            <p class="note" id="skala-note"></p>
+        </div>
+
+        <div class="kort" id="skala-gaetkort">
+            <h2>Gæt og målt</h2>
+            <div class="tabel" id="skala-liste"></div>
+            <button class="knap nulstil" id="skala-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: LUPPEN                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-lup" role="tabpanel" aria-label="Luppen">
+    <div class="scene medtekst">
+        <canvas id="lup-laerred"></canvas>
+        <div class="anker" id="lup-anker-skala"></div>
+        <div class="anker" id="lup-anker-glas"></div>
+        <div class="anker" id="lup-anker-lup"></div>
+        <div class="anker" id="lup-anker-zoom"></div>
+        <div class="tilbud" id="lup-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="lup-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="lup-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="lup-kort">
+            <h2><span id="lup-titel">Mål</span><span class="taeller" id="lup-taeller">mål <b id="lup-nr">1</b>/5</span></h2>
+            <p class="maal-tekst" id="lup-prompt"></p>
+            <p class="besked" id="lup-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="lup-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="lup-maaling">
+            <h2>I luppen <span class="taeller">1 prik = 1 ion</span></h2>
+            <div class="talraekke"><span>pH</span><span class="tal gul" id="lup-ph"></span></div>
+            <div class="talraekke"><span>H₃O⁺ i luppen</span><span class="tal roed" id="lup-nh"></span></div>
+            <div class="talraekke"><span>OH⁻ i luppen</span><span class="tal blaa" id="lup-no"></span></div>
+            <div class="talraekke"><span>[H₃O⁺]</span><span class="tal" id="lup-ch"></span></div>
+            <div class="talraekke"><span>[OH⁻]</span><span class="tal" id="lup-co"></span></div>
+            <div class="talraekke"><span>Luppens terning</span><span class="tal" id="lup-side"></span></div>
+            <p class="note" id="lup-modvand"></p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FORTYNDINGEN                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fortynd" role="tabpanel" aria-label="Fortyndingen">
+    <div class="scene medtekst">
+        <canvas id="fortynd-laerred"></canvas>
+        <div class="anker" id="fortynd-anker-skala"></div>
+        <div class="anker" id="fortynd-anker-flasker"></div>
+        <div class="anker" id="fortynd-anker-knapper"></div>
+        <div class="anker" id="fortynd-anker-lup"></div>
+        <div class="anker" id="fortynd-anker-skilt"></div>
+        <div class="tilbud" id="fortynd-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="fortynd-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="fortynd-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste maal -->
+        <div class="kort opgavekort" id="fortynd-kort">
+            <h2><span id="fortynd-titel">Mål</span><span class="taeller" id="fortynd-taeller">mål <b id="fortynd-nr">1</b>/5</span></h2>
+            <p class="maal-tekst" id="fortynd-prompt"></p>
+            <div class="opgave-felt" id="fortynd-opgave"></div>
+            <p class="besked" id="fortynd-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fortynd-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="fortynd-glas">
+            <h2>Glasset <span class="taeller" id="fortynd-surhed"></span></h2>
+            <p class="glasnavn" id="fortynd-glasnavn"></p>
+            <div class="talraekke"><span>pH</span><span class="tal gul" id="fortynd-ph"></span></div>
+            <div class="talraekke"><span>H₃O⁺ i luppen</span><span class="tal roed" id="fortynd-nh"></span></div>
+            <div class="talraekke"><span>OH⁻ i luppen</span><span class="tal blaa" id="fortynd-no"></span></div>
+            <div class="talraekke"><span>[H₃O⁺]</span><span class="tal" id="fortynd-ch"></span></div>
+            <button class="knap nulstil" id="fortynd-nulstil" type="button"><span>Tøm bordet</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>pH-skalaen</h2>
+        <p>pH er et mål for, hvor mange oxoniumioner, H₃O⁺, der er i en opløsning:</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Definition</span>
+            pH = −log[H₃O⁺] &nbsp;&nbsp;og&nbsp;&nbsp; [H₃O⁺] = 10<sup>−pH</sup> M
+        </div>
+        <p>Ét trin ned på skalaen er 10 gange flere H₃O⁺. To trin er 10 · 10 = 100 gange. Fra pH 0 til pH 14 er der 14 trin, altså en faktor 10¹⁴.</p>
+        <p>Vand indeholder altid både H₃O⁺ og OH⁻. Ved 25 °C er produktet af koncentrationerne det samme i alle vandige opløsninger:</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Vands ionprodukt ved 25 °C</span>
+            [H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴ M²
+        </div>
+        <p>Når der bliver 10 gange flere H₃O⁺, bliver der derfor 10 gange færre OH⁻. Under pH 7 er der flest H₃O⁺, og opløsningen er sur. Ved pH 7 er der lige mange, og den er neutral. Over pH 7 er der flest OH⁻, og den er basisk.</p>
+        <p>Fortyndes en syre 10 gange, bliver der 10 gange færre H₃O⁺, og pH stiger ét trin. Men pH kommer aldrig over 7, fordi vandet selv har lige mange H₃O⁺ og OH⁻.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lup.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_skala.js"></script>
+<script src="js/sim_lup.js"></script>
+<script src="js/sim_fortynd.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

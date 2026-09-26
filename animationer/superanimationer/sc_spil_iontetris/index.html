@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ion-Tetris</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-niveau="let">
+
+<header class="top">
+    <h1><span class="ikon">▦</span> Ion-Tetris</h1>
+
+    <!-- Samme spil i tre sværhedsgrader. Maaleren (1-3 streger) og den
+         lille tekst siger, hvilke ioner der falder. -->
+    <div class="niveauvalg">
+        <span class="niveau-etiket">Sværhedsgrad</span>
+        <div class="faneknapper" role="tablist" aria-label="Sværhedsgrad">
+            <button class="faneknap aktiv" data-niveau="let" role="tab" aria-selected="true" title="Let (1)"><span class="maaler"><i class="fyldt"></i><i></i><i></i></span><span class="fn"><b>Let</b><small>simple ioner</small></span></button>
+            <button class="faneknap" data-niveau="middel" role="tab" aria-selected="false" title="Middel (2)"><span class="maaler"><i class="fyldt"></i><i class="fyldt"></i><i></i></span><span class="fn"><b>Middel</b><small>også Al³⁺ og N³⁻</small></span></button>
+            <button class="faneknap" data-niveau="svaer" role="tab" aria-selected="false" title="Svær (3)"><span class="maaler"><i class="fyldt"></i><i class="fyldt"></i><i class="fyldt"></i></span><span class="fn"><b>Svær</b><small>sammensatte ioner</small></span></button>
+        </div>
+    </div>
+
+    <button class="teoriknap" id="regelknap" type="button" title="Reglerne">Regler</button>
+    <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd">🔊</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane" id="fane" role="tabpanel" aria-label="Spillet">
+    <div class="scene">
+        <div class="spilomraade" id="spilomraade">
+            <canvas id="laerred" aria-label="Brættet med de faldende ioner"></canvas>
+
+            <!-- Usynlige felter over laerredet, saa rundvisningen og
+                 Kemichael kan pege paa brættet, gem og koeen -->
+            <div class="omraade" id="braet-omraade"></div>
+            <div class="omraade" id="gem-omraade"></div>
+            <div class="omraade" id="naeste-omraade"></div>
+
+            <div class="midterkort" id="midterkort">
+                <h2 id="mk-titel">Let</h2>
+                <p class="mk-ioner" id="mk-ioner"></p>
+                <p class="mk-tekst" id="mk-tekst"></p>
+                <button class="knap stor blaa" id="mk-knap" type="button">Start spil</button>
+                <button class="tekstknap" id="mk-forfra" type="button" hidden>Start forfra</button>
+            </div>
+
+            <div class="tilbud" id="tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+            <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        </div>
+
+        <p class="statuslinje" id="statuslinje" aria-live="polite"></p>
+
+        <!-- Knapper til skaerme uden tastatur -->
+        <div class="touch" id="touch">
+            <button type="button" data-h="drejMod" aria-label="Drej mod uret">⟲</button>
+            <button type="button" data-h="venstre" data-hold="1" aria-label="Venstre">◀</button>
+            <button type="button" data-h="ned" data-hold="1" aria-label="Ned">▼</button>
+            <button type="button" data-h="hoejre" data-hold="1" aria-label="Højre">▶</button>
+            <button type="button" data-h="drej" aria-label="Drej med uret">⟳</button>
+            <button type="button" data-h="slip" aria-label="Slip">⤓</button>
+            <button type="button" data-h="gem" aria-label="Gem">Gem</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort spilkort" id="spilkort">
+            <h2>Spillet <span class="taeller">rekord <b id="rekord">0</b></span></h2>
+            <div class="tal3">
+                <div><small>Tid</small><b id="tid">0:00</b></div>
+                <div><small>Rækker</small><b id="raekker">0</b></div>
+                <div><small>Niveau</small><b id="niveau">1</b></div>
+            </div>
+            <button class="knap stor blaa" id="spilknap" type="button">Start spil</button>
+        </div>
+
+        <div class="kort saltkort" id="saltkort">
+            <h2>Salte <span class="taeller"><b id="salte-antal">0</b> af <span id="salte-i-alt">0</span></span></h2>
+            <div class="sidste" id="sidste"></div>
+            <div class="saltgitter" id="saltgitter"></div>
+        </div>
+
+        <div class="kort styrekort" id="styrekort">
+            <h2>Styring</h2>
+            <div class="styring">
+                <span><kbd>←</kbd> <kbd>→</kbd></span><span>flyt</span>
+                <span><kbd>↑</kbd></span><span>drej</span>
+                <span><kbd>↓</kbd></span><span>hurtigere ned</span>
+                <span><kbd>Mellemrum</kbd></span><span>slip</span>
+                <span><kbd>C</kbd></span><span>gem brikken</span>
+                <span><kbd>P</kbd></span><span>pause</span>
+            </div>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="regler">
+    <div class="overlay-boks">
+        <h2>Ion-Tetris</h2>
+
+        <h3>Målet</h3>
+        <p>Lav alle saltene i panelet til højre. Så har du vundet. Rekorden er den hurtigste tid.</p>
+
+        <h3>Sådan spiller du</h3>
+        <ol>
+            <li><b>Farvede brikker er ioner.</b> Blå er positive, røde negative, og jo mørkere, jo større ladning. Ladningen står i symbolet: Al³⁺ har tre plusladninger, O²⁻ to minusladninger.</li>
+            <li><b>Plus mod minus.</b> Ioner, der rører hinanden, bliver til salt, når ladningerne går lige op. Al³⁺ og tre Cl⁻ bliver til AlCl₃. Brikkerne skal hænge sammen, men ikke alle behøver at røre Al³⁺. Saltet smuldrer til pulver og forsvinder, og det ovenover falder ned.</li>
+            <li><b>Grå sten.</b> En del af brikkerne er grå sten med fem felter: hver anden på Let, hver fjerde på Middel og hver sjette på Svær. De reagerer ikke og forsvinder kun, når en række er fuld, som i almindelig tetris. En fuld række tager også ioner med; en ion, der forsvinder helt, kommer igen i køen.</li>
+        </ol>
+        <div class="ligning">Al³⁺ + 3 Cl⁻ → AlCl₃</div>
+
+        <h3>Formlen</h3>
+        <p>Et salt har én slags plus og én slags minus. Formlen viser forholdet, der får ladningerne til at gå lige op: Al₂O₃ er to Al³⁺ (+6) for hver tre O²⁻ (−6). En sammensat ion sættes i parentes, når der er mere end én: Al₂(SO₄)₃.</p>
+
+        <h3>Sværhedsgraderne</h3>
+        <p><b>Let:</b> Na⁺, K⁺, Mg²⁺, Cl⁻, Br⁻ og O²⁻ (9 salte). Skyggen under brikken lyser grønt, hvis den bliver til salt dér. <b>Middel:</b> Na⁺, Mg²⁺, Al³⁺, Cl⁻, O²⁻ og N³⁻ (9 salte). <b>Svær:</b> sammensatte ioner (18 salte), to salte blandet i køen og ingen tal over ionerne. Brikkerne falder hurtigere for hver 30 brikker.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>←</kbd> <kbd>→</kbd> flyt &nbsp;·&nbsp; <kbd>↑</kbd> eller <kbd>X</kbd> drej &nbsp;·&nbsp; <kbd>Z</kbd> drej den anden vej &nbsp;·&nbsp; <kbd>↓</kbd> ned &nbsp;·&nbsp; <kbd>Mellemrum</kbd> slip &nbsp;·&nbsp; <kbd>C</kbd> gem &nbsp;·&nbsp; <kbd>P</kbd> pause &nbsp;·&nbsp; <kbd>Enter</kbd> start &nbsp;·&nbsp; <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sværhedsgrad &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>Esc</kbd> luk eller pause</p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="regler-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/braet.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

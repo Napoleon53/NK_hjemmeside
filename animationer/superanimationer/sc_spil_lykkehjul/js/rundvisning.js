@@ -18,6 +18,7 @@
 
     var TURE = {
         "titel": [
+            { sel: "#tilstand", titel: "Hvem spiller", tekst: "Hold på tavlen: klassen spiller, og læreren styrer. Alene: én spiller skriver selv løsningerne, har 3 liv i hver runde og kan sætte rekord." },
             { sel: "#quizvalg", titel: "Quizzen", tekst: "Vælg en af de indbyggede quizzer eller en af dine egne." },
             { sel: "#egneknap", titel: "Quizzer som tekst", tekst: "Skriv, upload eller eksportér en quiz som tekst. Vinduet viser tavlerne, mens du skriver, og kan lave et link til kolleger." },
             { sel: "#opsaetning", titel: "Holdene", tekst: "Vælg 2 til 4 hold, og skriv navnene. De kan også rettes undervejs nederst på skærmen." },

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stofmængde</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚖</span> Stofmængde</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-vaegt" role="tab" aria-selected="true"><span class="nr">1</span>Vægten</button>
+        <button class="faneknap" data-fane="fane-atomer" role="tab" aria-selected="false"><span class="nr">2</span>Flest atomer</button>
+        <button class="faneknap" data-fane="fane-afvej" role="tab" aria-selected="false"><span class="nr">3</span>Afvejning</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: VAEGTEN                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-vaegt" role="tabpanel" aria-label="Vægten">
+    <div class="scene medtekst">
+        <canvas id="vaegt-laerred"></canvas>
+        <div class="anker" id="vaegt-anker-hylde"></div>
+        <div class="anker" id="vaegt-anker-vaegt"></div>
+        <div class="anker" id="vaegt-anker-zoom"></div>
+        <div class="anker" id="vaegt-anker-plakat"></div>
+        <div class="tilbud" id="vaegt-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="vaegt-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="vaegt-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste maal -->
+        <div class="kort opgavekort" id="vaegt-kort">
+            <h2><span id="vaegt-maal-titel">Mål</span><span class="taeller" id="vaegt-taeller">mål <b id="vaegt-nr">1</b>/4</span></h2>
+            <p class="maal-tekst" id="vaegt-prompt"></p>
+            <p class="besked" id="vaegt-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="vaegt-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="vaegt-maaling">
+            <h2>På vægten <span class="taeller" id="vaegt-stof"></span></h2>
+            <div class="regn"><span class="regn-navn">Stofmængde</span><span class="regn-linje" id="vaegt-regn-n"></span></div>
+            <div class="regn"><span class="regn-navn">Masse</span><span class="regn-linje" id="vaegt-regn-m"></span></div>
+            <div class="regn"><span class="regn-navn">Antal atomer</span><span class="regn-linje" id="vaegt-regn-N"></span></div>
+            <div class="talraekke"><span>Klumperne fylder</span><span class="tal" id="vaegt-V"></span></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FLEST ATOMER                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-atomer" role="tabpanel" aria-label="Flest atomer">
+    <div class="scene medtekst">
+        <canvas id="atomer-laerred"></canvas>
+        <div class="anker" id="atomer-anker-vaegte"></div>
+        <div class="anker" id="atomer-anker-skilt"></div>
+        <div class="anker" id="atomer-anker-plakat"></div>
+        <div class="tilbud" id="atomer-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="atomer-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="atomer-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="atomer-kort">
+            <h2><span id="atomer-niveau"></span><span class="taeller">par <b id="atomer-nr">1</b>/<span id="atomer-antal">9</span></span></h2>
+            <p class="opgave-spm">Hvor er der flest atomer? Gæt, før vægtene tæller.</p>
+            <div class="valgrad" id="atomer-valg">
+                <button class="valgknap" type="button" data-svar="v"><span class="pil">←</span>Venstre</button>
+                <button class="valgknap" type="button" data-svar="l"><span class="pil">↓</span>Lige mange</button>
+                <button class="valgknap" type="button" data-svar="h"><span class="pil">→</span>Højre</button>
+            </div>
+            <p class="besked" id="atomer-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="atomer-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling">
+            <h2>Runden <span class="taeller">rekord <b id="atomer-rekord">0</b></span></h2>
+            <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="atomer-point">0</span></div>
+            <div class="talraekke"><span>I træk</span><span class="tal" id="atomer-stime">0</span></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: AFVEJNING                                                  -->
+<!-- Raekkerne i opgavekortet bygges af sim_afvej.js                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-afvej" role="tabpanel" aria-label="Afvejning">
+    <div class="scene medtekst">
+        <canvas id="afvej-laerred"></canvas>
+        <div class="anker" id="afvej-anker-krukke"></div>
+        <div class="anker" id="afvej-anker-vaegt"></div>
+        <div class="anker" id="afvej-anker-plakat"></div>
+        <div class="tilbud" id="afvej-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="afvej-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="afvej-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste ordre -->
+        <div class="kort opgavekort" id="afvej-kort">
+            <h2><span id="afvej-niveau"></span><span class="taeller">ordre <b id="afvej-nr">1</b>/<span id="afvej-antal-i-niveau">4</span></span></h2>
+            <div class="opgave-prompt" id="afvej-prompt"></div>
+            <p class="opgave-spm" id="afvej-spm"></p>
+            <div class="raekker" id="afvej-raekker"></div>
+            <p class="besked" id="afvej-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="afvej-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="afvej-fremskridt">
+            <h2>Ordrerne <span class="taeller">afvejet <b id="afvej-loest">0</b>/12</span></h2>
+            <div class="hyldeliste" id="afvej-niveauer"></div>
+            <button class="knap nulstil" id="afvej-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Stofmængde</h2>
+        <p>Stofmængden <i>n</i> er et antal. Enheden er mol. 1 mol er 6,02 · 10²³ stk., uanset hvilket stof det er.</p>
+        <p>Avogadros konstant er antallet pr. mol: <i>N</i><sub>A</sub> = 6,02 · 10²³ mol⁻¹. Antallet af atomer er stofmængden gange <i>N</i><sub>A</sub>.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: 2,00 mol kobber</span>
+            N = 2,00 mol · 6,02 · 10²³ mol⁻¹ = 1,20 · 10²⁴
+        </div>
+        <p>Molarmassen <i>M</i> er massen af 1 mol. Massen af <i>n</i> mol er <i>n</i> gange så stor.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: 2,00 mol kobber</span>
+            m = 2,00 mol · 63,55 g/mol = 127 g
+        </div>
+        <p>Samme stofmængde af to stoffer er lige mange atomer, men massen er forskellig. Samme masse af to stoffer er ikke lige mange atomer: stoffet med de letteste atomer har flest.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_vaegt.js"></script>
+<script src="js/sim_atomer.js"></script>
+<script src="js/sim_afvej.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 /* =====================================================================
    sim_molekyler.js - fane 2: rigtige molekyler i 3D
 
-   NK.MolSim er det, fane 2 og 3 har til faelles: laerredet, kameraet,
-   molekylemenuen, prikformlen, langsom drejning, klik paa atomer og
-   vinkelmaaleren. NK.SimMolekyler bygger videre med visningen
+   NK.MolSim er grundlaget: laerredet, kameraet, molekylemenuen,
+   prikformlen, langsom drejning, klik paa atomer og vinkelmaaleren.
+   (sc3.3 har en kopi til sin fane om polaritet.) NK.SimMolekyler
+   bygger videre med visningen
    (kugle-stang eller kalotte, frie elektronpar) og opgaverne om form,
    vinkel og frie elektronpar.
 

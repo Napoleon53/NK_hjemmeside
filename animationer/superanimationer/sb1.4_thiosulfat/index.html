@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thiosulfat og syre</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">✕</span> Thiosulfat og syre</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="kryds" role="tab" aria-selected="true" title="Krydset (1)"><span class="nr">1</span>Krydset</button>
+        <button class="faneknap" data-fane="konc" role="tab" aria-selected="false" title="Koncentration (2)"><span class="nr">2</span>Koncentration</button>
+        <button class="faneknap" data-fane="temp" role="tab" aria-selected="false" title="Temperatur (3)"><span class="nr">3</span>Temperatur</button>
+    </div>
+
+    <button class="teoriknap" id="teoriknap" type="button" title="Teori om forsøget">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: KRYDSET. Glas, ur og graf tegnes af js/sim_kryds.js       -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-kryds" role="tabpanel" aria-label="Krydset">
+    <div class="scene">
+        <canvas id="kryds-laerred" aria-label="Bægerglas på et papir med et kryds, krydset set oppefra, et stopur og kurven for svovlet"></canvas>
+        <div class="tilbud" id="kryds-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="kryds-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <p class="status" id="kryds-status" aria-live="polite"></p>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="kryds-blanding">
+            <h2>Blandingen</h2>
+            <div class="ligning lille">S₂O₃²⁻ + 2 H₃O⁺ → S + SO₂ + 3 H₂O</div>
+            <div class="vaelger-raekke"><span class="vaelger-navn">Na₂S₂O₃</span>
+                <div class="segment" id="kryds-segment">
+                    <button type="button">40 mL</button><button type="button">30 mL</button><button type="button">20 mL</button>
+                </div>
+            </div>
+            <p class="note" id="kryds-note"></p>
+        </div>
+
+        <div class="kort" id="kryds-maaling">
+            <h2><span>Måling</span><span class="taeller">uret: <b id="kryds-tid">0,0 s</b></span></h2>
+            <button class="knap stor groen" id="kryds-knap" type="button"><span>Tilsæt syren</span><span class="tegn">▶</span></button>
+            <table class="lilletabel" id="kryds-tabel"></table>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Start opgave -> Giv hint -> Vis svaret -> Ny opgave -->
+        <div class="kort opgavekort" id="kryds-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="kryds-loest">0</b></span><button class="afslut" id="kryds-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="kryds-opgavetekst" data-start="Lav et par målinger, og start så en opgave."></p>
+            <div class="valg" id="kryds-valg"></div>
+            <p class="besked hint" id="kryds-hint"></p>
+            <p class="besked" id="kryds-besked" aria-live="polite"></p>
+            <button class="knap stor blaa" id="kryds-opgaveknap" type="button">Start opgave</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: KONCENTRATION. Graf og glas tegnes af js/sim_konc.js,     -->
+<!-- tabellen bygges af den samme fil.                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-konc" role="tabpanel" aria-label="Koncentration">
+    <div class="scene soejle">
+        <div class="graf-omraade">
+            <canvas id="konc-laerred" aria-label="Krydset set oppefra og grafen for 1/Δt mod koncentrationen"></canvas>
+            <div class="grafvalg" id="konc-akse">
+                <span class="vt-etiket">Vandret akse</span>
+                <div class="segment">
+                    <button type="button" data-akse="c" class="aktiv">[S₂O₃²⁻]</button><button type="button" data-akse="h">[H₃O⁺]</button>
+                </div>
+            </div>
+            <div class="tilbud" id="konc-tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+            <button class="spring-over" id="konc-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        </div>
+
+        <div class="arbejdsbord">
+            <table class="forsoegstabel" id="konc-tabel"></table>
+            <p class="besked" id="konc-tabelbesked" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="konc-forsoeg">
+            <h2>Nyt forsøg</h2>
+            <div class="stepper-raekke"><span class="vaelger-navn">Na₂S₂O₃ <small id="konc-thio-flaske">0,30 M</small></span>
+                <button class="trin" type="button" data-stof="thio" data-d="-5" aria-label="5 mL mindre Na₂S₂O₃">−</button><b id="konc-thio">20 mL</b><button class="trin" type="button" data-stof="thio" data-d="5" aria-label="5 mL mere Na₂S₂O₃">+</button>
+            </div>
+            <div class="stepper-raekke"><span class="vaelger-navn">HCl <small>1,0 M</small></span>
+                <button class="trin" type="button" data-stof="syre" data-d="-5" aria-label="5 mL mindre HCl">−</button><b id="konc-syre">5 mL</b><button class="trin" type="button" data-stof="syre" data-d="5" aria-label="5 mL mere HCl">+</button>
+            </div>
+            <div class="stepper-raekke"><span class="vaelger-navn">Vand</span>
+                <button class="trin" type="button" data-stof="vand" data-d="-5" aria-label="5 mL mindre vand">−</button><b id="konc-vand">25 mL</b><button class="trin" type="button" data-stof="vand" data-d="5" aria-label="5 mL mere vand">+</button>
+            </div>
+            <div class="raekke" id="konc-ialt-raekke"><span>I alt i glasset</span><b id="konc-ialt">50 mL</b></div>
+            <p class="note advar-note" id="konc-ialt-note"></p>
+            <button class="knap stor groen" id="konc-maal" type="button"><span>Bland og mål</span><span class="tegn">▶</span></button>
+            <button class="knap lille" id="konc-ryd" type="button" title="Ryd tabellen (R)"><span>Ryd tabellen</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort opgavekort" id="konc-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="konc-loest">0</b></span><button class="afslut" id="konc-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="konc-opgavetekst" data-start="Lav nogle forsøg, og start så en opgave."></p>
+            <div class="valg" id="konc-valg"></div>
+            <p class="besked hint" id="konc-hint"></p>
+            <p class="besked" id="konc-besked" aria-live="polite"></p>
+            <button class="knap stor blaa" id="konc-opgaveknap" type="button">Start opgave</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: TEMPERATUR. Graf og glas tegnes af js/sim_temp.js         -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-temp" role="tabpanel" aria-label="Temperatur">
+    <div class="scene soejle">
+        <div class="graf-omraade">
+            <canvas id="temp-laerred" aria-label="Krydset set oppefra, termometeret og grafen for 1/Δt mod temperaturen"></canvas>
+            <div class="tilbud" id="temp-tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+            <button class="spring-over" id="temp-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        </div>
+
+        <div class="arbejdsbord">
+            <table class="forsoegstabel" id="temp-tabel"></table>
+            <p class="besked" id="temp-tabelbesked" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="temp-forsoeg">
+            <h2>Nyt forsøg</h2>
+            <p class="note foerst" id="temp-blanding"></p>
+            <div class="stepper-raekke"><span class="vaelger-navn">Temperatur</span>
+                <button class="trin" type="button" id="temp-ned" aria-label="5 °C koldere">−</button><b id="temp-T">20 °C</b><button class="trin" type="button" id="temp-op" aria-label="5 °C varmere">+</button>
+            </div>
+            <button class="knap stor groen" id="temp-maal" type="button"><span>Mål</span><span class="tegn">▶</span></button>
+            <button class="knap lille" id="temp-ryd" type="button" title="Ryd tabellen (R)"><span>Ryd tabellen</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort opgavekort" id="temp-opgavekort">
+            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="temp-loest">0</b></span><button class="afslut" id="temp-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="temp-opgavetekst" data-start="Mål ved nogle temperaturer, og start så en opgave."></p>
+            <div class="valg" id="temp-valg"></div>
+            <p class="besked hint" id="temp-hint"></p>
+            <p class="besked" id="temp-besked" aria-live="polite"></p>
+            <button class="knap stor blaa" id="temp-opgaveknap" type="button">Start opgave</button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Thiosulfat og syre</h2>
+        <p>Når der kommer syre i en opløsning af thiosulfat, dannes der svovl. Svovlet er små korn, som gør væsken uklar.</p>
+        <div class="ligning">S₂O₃²⁻(aq) + 2 H₃O⁺(aq) → S(s) + SO₂(aq) + 3 H₂O(l)</div>
+
+        <h3>Hvorfor 1/Δt</h3>
+        <p>Krydset forsvinder, når der er dannet en bestemt mængde svovl. Er der lige meget væske i glasset, er det den samme mængde hver gang. Hastigheden er v = Δ[S] / Δt, og når Δ[S] er den samme, er v proportional med 1/Δt.</p>
+        <p>Kun omkring 1 % af thiosulfatet er brugt, når krydset forsvinder. Koncentrationerne er derfor næsten de samme under hele målingen.</p>
+
+        <h3>Koncentrationen i glasset</h3>
+        <p>Opløsningerne bliver fortyndet, når de blandes:</p>
+        <div class="ligning">[S₂O₃²⁻] = c(Na₂S₂O₃) · V(Na₂S₂O₃) / V(i alt)</div>
+        <p>Der fyldes op med vand til samme rumfang hver gang. Så ændres kun den koncentration, man skruer på, og lyset går gennem lige meget væske.</p>
+
+        <h3>Det viser forsøgene</h3>
+        <p>1/Δt er proportional med [S₂O₃²⁻]: dobbelt så meget thiosulfat giver dobbelt så stor hastighed. [H₃O⁺] betyder kun lidt, når der er syre nok. Tallene i reaktionsskemaet siger ikke, hvordan hastigheden afhænger af koncentrationerne. Det skal måles, som i 1.1.</p>
+
+        <h3>Temperatur</h3>
+        <p>En tommelfingerregel siger, at hastigheden omtrent fordobles for hver 10 °C. Hvorfor, står i 1.2 Energidiagram.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Mellemrum</kbd> tilsæt syren, stop uret eller mål &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/model.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/glas.js"></script>
+<script src="js/raekke.js"></script>
+<script src="js/sim_kryds.js"></script>
+<script src="js/sim_konc.js"></script>
+<script src="js/sim_temp.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

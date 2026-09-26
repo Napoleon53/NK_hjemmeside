@@ -19,9 +19,9 @@ holder styr på hjulet, gåderne og pointene. Hører til kategorien Spil
 3. **Naboerne.** Kemi-Jeopardy (`sc_spil_jeopardy`) ejer ledetråd og svar.
    Hangman (`c_spil_hangman.html`) ejer ét ord, som én elev gætter. Her gætter
    holdene på en hel løsning på en tavle med hjul og point.
-4. **Loftet.** 2 til 4 hold, højst 20 gåder og én finale pr. quiz, ét hjul med 24
-   felter, ét præmiehjul, 10 lyde. Ingen faner: én skærm, der skifter mellem
-   titel, tavle, hjul og plakat.
+4. **Loftet.** 2 til 4 hold eller én spiller alene, højst 20 gåder og én finale pr.
+   quiz, ét hjul med 24 felter, ét præmiehjul, 10 lyde. Ingen faner: én skærm, der
+   skifter mellem titel, tavle, hjul og plakat.
 5. **Layoutet.** Toplinje, scenen med tavlen under lysende buer, styringen med
    bogstaverne og knapperne, og podierne i holdfarver nederst. Hjulet dækker
    scenen og styringen, når det drejer.
@@ -50,17 +50,48 @@ holder styr på hjulet, gåderne og pointene. Hører til kategorien Spil
 ## Quizzerne
 
 De indbyggede står i `js/data.js` i det samme tekstformat, som læreren skriver i.
-Linket vælger: `index.html` er Kemi B, `#a` er Kemi A, `#nf` er NF.
+Linket vælger: `index.html` er Kemi B, `#a` er Kemi A, `#nf` er NF, og `#atom`,
+`#molekyler` og `#beregning` er emnequizzerne. Linket kan kombineres med
+tilstanden, fx `#atom&alene`.
 
 * **Kemi B, grundbegreber** (standard) er fra "Afsluttende lykkehjulquiz kemi B
   2024.pptm". Redox (*Oxidation er afgivelse af elektroner*) og syre-base (*En
   buffer holder pH næsten konstant*) er tilføjet, så B-kernestoffet er dækket.
 * **Kemi A** og **NF** er fra de to andre filer.
+* **Emnequizzer** med fem runder uden toss-ups og uden finale, skrevet af Claude
+  til C-niveauet: **Atomet og ioner** (`#atom`), **Molekyler og organisk kemi**
+  (`#molekyler`) og **Beregninger, koncentration og pH** (`#beregning`).
+  Løsningerne er korte faglige sætninger på mindst 20 felter, fx *Stofmængde er
+  masse divideret med molarmasse*, så der er noget at dreje efter.
 * Rettet fra skabelonen: *Chatelier* hedder nu *Le Chateliers princip*, og
   *Gibbsfri energi* er *Gibbs fri energi*. Lange ord er delt med bindestreg, som
   skabelonen gjorde (*Substitutions-reaktion*, *Elektro-negativitet*).
 * Ikke med: den ældste B-fil (*Plastic*, *Anthocyaniner*) og 2z-filen fra 2020,
   som ikke havde en finale. De kan skrives ind som egne quizzer.
+
+## Alene ved computeren
+
+Forsiden vælger mellem **Hold på tavlen** (læreren styrer) og **Alene** (én elev
+ved sin egen computer). Valget huskes, og linket kan vælge det: `index.html#alene`,
+`index.html#a&alene`, `index.html#hold`. Hver tilstand har sit eget gemte spil.
+
+Balancen alene (tallene står i `D.ALENE` i `js/data.js`):
+
+* Spilleren skriver løsningen, og spillet tjekker den. Store og små bogstaver,
+  mellemrum, bindestreger og tegn er ligegyldige, og ae, oe og aa gælder for æ, ø
+  og å (`S.tjek` i `js/spil.js`).
+* **Runder:** 3 liv. Alt, der i holdspillet giver turen videre, koster et liv: et
+  bogstav, der ikke er der, Fallit, Mist tur og en forkert løsning. Uden liv er
+  runden tabt, løsningen vises, og rundens penge er væk. Så er valget mellem at
+  dreje videre for flere penge og at løse i tide spilleren eget. En løst runde giver
+  mindst 1.000 kr. som med hold. Løs gåden kan annulleres uden at koste noget.
+* **Toss-up:** værdien falder med andelen af viste bogstaver (rundet ned til hele
+  50 kr., mindst 50 kr.). Et forkert svar viser 2 bogstaver mere. Er alle vist, er
+  toss-uppen tabt.
+* **Finalen:** 20 sekunder til at skrive løsningen, og man må prøve flere gange.
+  Kuverterne er mindre (2.000 til 10.000 kr.), så rekorden mest afgøres af gåderne.
+* **Rekord** pr. quiz i browseren, vist på forsiden og til sidst. Fortryd,
+  pointrettelser og gådeoversigten er slået fra alene.
 
 ## Quizzer som tekst
 
@@ -117,9 +148,8 @@ Titelskærmen viser, hvilke lyde der bruges.
 headless Chrome). Spillet kører 25 gange hurtigere under testen (`NK.tempo`), og
 hjulet kan tvinges til et felt (`NK.app.ui.tvungetFelt`).
 
-## Menuen
+## I menuen
 
-Ikke i menuen endnu. Når brugeren siger til: en knap i
-`kemi-c-filer/samling_c_spil.html` med `data-emne="spil.lykkehjul"`, der peger på
-`../superanimationer/sc_spil_lykkehjul/index.html`, og en linje i
-`FEEDBACK_EMNER`. Ret så kolonnen "I menuen" i `../README.md`.
+I menuen fra 26. sept. 2026 som spil.lykkehjul (nr. 7) i
+`kemi-c-filer/samling_c_spil.html` og i `FEEDBACK_EMNER`. EscapeRoom er rykket
+til nr. 8.

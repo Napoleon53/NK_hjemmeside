@@ -1,10 +1,14 @@
-﻿# sc3.2: Molekylers rumlige opbygning
+# sc3.2: Molekylers rumlige opbygning
 
-**Status: ikke aktiv.** For mange bugs til at være den viste 3.2 lige nu.
-`samling_c3.html` og `samling_NV.html` peger igen på den gamle
-`animationer/kemi-c-filer/c3.2_rumlig_opbygning.html`. Mappen her ligger
-fortsat blandt superanimationerne, men skal ikke rettes eller genaktiveres,
-før der er overskud til det.
+**Status: i menuen** fra 26. sept. 2026 som c3.2 i `samling_c3.html` og
+`samling_NV.html`. Den gamle ligger i
+`kemi-c-filer/arkiv/c3.2_rumlig_opbygning_oldversion2.html` (en ældre udgave
+lå der allerede som `c3.2_rumlig_opbygning_oldversion.html`).
+
+24. september 2026 blev den delt i to efter brugerens ønske. sc3.2 handler nu
+kun om formen. Fanerne om polaritet og vandstrålen er flyttet til
+`sc3.3_polaere_molekyler`, der også har elektronegativiteten fra den gamle c3.3.
+Formen bruger ikke elektronegativitet til noget, så det hører til der.
 
 En superanimation: i modsætning til de gamle animationer, som er én HTML-fil,
 ligger den i sin egen mappe med adskilt CSS, JavaScript og sprites.
@@ -23,12 +27,10 @@ også er kopieret tilbage som den aktive fil.
 |---|------|-----------------|--------|
 | 1 | Byg molekylet | vælger C, N, O og Cl, sætter dem sammen og vælger bindingerne | formen omkring hvert atom følger af bindinger og frie elektronpar |
 | 2 | Molekylerne | drejer 11 rigtige molekyler, sammenligner med prikformlen og måler vinkler | samme regel forklarer CH₄, NH₃, H₂O, CO₂ og resten |
-| 3 | Polær eller upolær? | ser trækket i hver polær binding og det samlede træk | et molekyle med polære bindinger kan være upolært, hvis det er symmetrisk |
-| 4 | Forsøg: vandstrålen | lader en stav og holder den ved en stråle af vand, ethanol og heptan | polære væsker bøjer mod staven, uanset om den er positiv eller negativ |
 
-Fane 1-3 har et opgavekort med én knap: Start opgave → Giv hint → Vis svaret →
-Ny opgave. På fane 4 er opgaverne låst, til forsøget er slut. Teorien ligger bag
-knappen **Teori**, og **?** starter en rundvisning for den aktive fane.
+Begge faner har et opgavekort med én knap: Start opgave → Giv hint → Vis svaret →
+Ny opgave. Teorien ligger bag knappen **Teori**, og **?** starter en rundvisning
+for den aktive fane.
 
 ### Fane 1: byg molekylet
 
@@ -66,55 +68,23 @@ enkeltbinding, så CO₂ er lineær og CH₂O plan med 120°.
 H₂O, NH₃, CH₄, CO₂, HCN, CH₂O, C₂H₄, C₂H₂, CCl₄, CH₃Cl og HCl som kugle-stang
 eller kalotte, med eller uden frie elektronpar. Prikformlen i hjørnet tegnes som i
 sc3.1. Opgaverne spørger om form, bindingsvinkel og antal frie elektronpar på
-centralatomet; svaret står som "?" i panelet, mens opgaven er i gang.
+centralatomet; svaret står som "?" i panelet, mens opgaven er i gang. De samme
+elleve molekyler står på fane 2 i sc3.3, hvor de er polære eller upolære.
 
-### Fane 3: polær eller upolær?
+Direkte link til en fane: `index.html#byg` eller `#molekyler`.
 
-En binding er polær fra en forskel i elektronegativitet på 0,5 (samme grænse og
-EN-tal som c3.3). Pilen går fra δ+ mod δ− og er længere, jo større forskellen er.
-Om molekylet er polært, regnes ud af de samme pile i `klargoer()` i `js/data.js`,
-så tegningen og facit ikke kan være uenige.
-
-### Fane 4: forsøg med vandstrålen
-
-Laboratoriebordet har en burette i et stativ, et bægerglas, flasker med vand,
-ethanol og heptan, en plastikstav, en glasstav og en uldklud.
-
-* Klik på en flaske for at fylde 30 mL i buretten (den skal være tom, og hanen
-  lukket). Klik på hanegrebet for at åbne og lukke.
-* Tag fat i en stav og træk den frem og tilbage over kluden. Plastik bliver
-  negativ, glas positiv. Ladningen ses som − eller + langs staven og aftager
-  langsomt.
-* Hold staven tæt på strålen. Strålen er partikler, der falder med tyngdekraften
-  og trækkes mod staven med en kraft ∝ ladning · polaritet / afstand². Polariteten
-  står i `D.VAESKER`: vand 1, ethanol 0,55, heptan 0,02. Rører staven strålen,
-  bliver den våd og mister ladningen.
-* Når en ladet stav er tæt på strålen, viser en lup molekylerne: vand og ethanol
-  vender den modsat ladede ende mod staven, heptan gør ikke.
-* Et test registreres, når en ladet stav har været tæt på strålen i 1,2 s.
-  Forsøget er slut, når alle tre væsker er testet, og vand er testet med begge
-  stave. Så låses tegneserien og opgaverne op.
-* Bægerglasset samler væskerne: heptan lægger sig oven på vand og ethanol. Klik på
-  det for at tømme det. Rammer strålen ved siden af, dannes en pyt.
-
-Tegneserien (`js/tegneserie.js`) bruger elevens resultater: hvilken stav der blev
-brugt til hver væske, og om heptan ligger oven på vandet. Resultatskemaet står i
-sidste rude.
-
-Direkte link til en fane: `index.html#molekyler`, `#polaritet` eller `#vand`.
-
-Genveje: <kbd>1</kbd>-<kbd>4</kbd> faner · <kbd>V</kbd> vinkelmåler ·
-<kbd>I</kbd> hint (fane 4) · <kbd>S</kbd> tegneserie (fane 4) · <kbd>T</kbd> teori ·
-<kbd>R</kbd> start fanen forfra · <kbd>H</kbd> rundvisning · <kbd>Esc</kbd> luk.
+Genveje: <kbd>1</kbd>-<kbd>2</kbd> faner · <kbd>V</kbd> vinkelmåler ·
+<kbd>T</kbd> teori · <kbd>R</kbd> start fanen forfra · <kbd>H</kbd> rundvisning ·
+<kbd>Esc</kbd> luk.
 
 ## Filer
 
 ```
-index.html            markup for de fire faner, teori, tegneserie og rundvisning
+index.html            markup for de to faner, teori og rundvisning
 css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js           NK-navnerum, dansk talformat, vektorer og drejninger,
                       DPR-skarpt canvas
-js/data.js            grundstoffer, molekyler, væsker, frastødningens styrker, teori
+js/data.js            grundstoffer, molekyler, frastødningens styrker, teori
 js/sprites.js         indlæser sprites/*.svg
 js/frastoedning.js    elektronparrene, der skubber til hinanden
 js/bygning.js         fane 1: regler, automatisk H, geometri, genkendelse
@@ -122,44 +92,36 @@ js/model3d.js         kameraet og tegningen af atomer, pinde og elektronpar;
                       vinkelbuen og pilene
 js/prikformel.js      prikformlen i hjørnet
 js/opgave.js          opgavekortet med én knap (samme som sc2.1)
-js/valg.js            det valgte molekyle, delt af fane 2 og 3
+js/valg.js            det valgte molekyle på fane 2
 js/sim_byg.js         fane 1
-js/sim_molekyler.js   NK.MolSim (det fane 2 og 3 har til fælles) og fane 2
-js/sim_polaritet.js   fane 3
-js/vand_tegning.js    fane 4: alt, der tegnes, og scenens mål
-js/sim_vandstraale.js fane 4: burette, stråle, stave, forløb og opgaver
-js/tegneserie.js      fane 4: forsøget som tegneserie
+js/sim_molekyler.js   NK.MolSim (grundlaget) og fane 2
 js/rundvisning.js     spotlight-rundvisningen
-js/app.js             faneskift, overlays, tastatur, tegneløkke
-sprites/              atomkugler (C, H, O, N, Cl), elektronpar, vinkelmåler,
-                      stativ, burette, bægerglas, flaske, plastikstav, glasstav
-                      og uldklud
+js/app.js             faneskift, teori, tastatur, tegneløkke
+sprites/              atomkugler (C, H, O, N, Cl), elektronpar og vinkelmåler
 _selvtest.html        udviklerværktøj, indgår ikke i animationen
 ```
+
+Filerne til polaritet og vandstrålen (`js/sim_polaritet.js`, `js/vand_tegning.js`,
+`js/sim_vandstraale.js`, `js/tegneserie.js` og sprites til haner, vask, stave og
+uldklud) bruges ikke længere her. De ligger i sc3.3.
 
 ## At rette i den
 
 **Et nyt kendt molekyle på fane 1** er én linje i `B.KENDTE` i `js/bygning.js`:
 atomerne (uden H) og bindingerne `[atom, atom, orden]`. Navnet findes af sig selv.
 
-**Et nyt molekyle på fane 2 og 3** er ét objekt i `D.MOLEKYLER`: atomer med plads
-i rummet (`p`) og i prikformlen (`prik`), bindinger, `centrum`, `vinkel`, formen
-og fire tekster. Frie elektronpar, δ+ og δ−, træk og polaritet regnes ud af sig
-selv. Et atom med frie elektronpar skal have sine bindinger vandret eller lodret
-i `prik`.
-
-**Forsøgets tal** står øverst i `js/sim_vandstraale.js` (mængde, flow, stavens
-træk, hvor tæt og hvor længe et test kræver). Scenens mål (hanen, spidsen,
-bægerglasset, kluden) står i `MAAL` i `js/vand_tegning.js` og skal passe med
-sprites; hver sprite skriver i en kommentar, hvor den tegnes.
+**Et nyt molekyle på fane 2** er ét objekt i `D.MOLEKYLER`: atomer med plads i
+rummet (`p`) og i prikformlen (`prik`), bindinger, `centrum`, `vinkel`, formen og
+to tekster. Frie elektronpar regnes ud af sig selv. Et atom med frie elektronpar
+skal have sine bindinger vandret eller lodret i `prik`. Skal molekylet også være
+med i sc3.3, lægges det ind der med.
 
 **Opgaverne** står øverst i hver `sim_*.js` som funktioner, der returnerer et
 opgaveobjekt (formatet står i `js/opgave.js`).
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kontrollerer: molekylerne
-på fane 2 og 3 (oktet, form, vinkel, polaritet); byggeren på fane 1 (vinkler for
-alle kendte molekyler, plan og lineær form, reglerne for C, antal atomer og
-bindinger, genkendelse, drejningen mellem gammel og ny form); vandstrålen (vand
-bøjer mest, ethanol mindre, heptan ikke; våd stav; gnidning; volumen; hele
-forløbet til tegneserien); at alle opgaver kan løses; og at ingen tekst bruger
-tankestreger eller er under 12 px. Chrome kræver `--allow-file-access-from-files`.
+på fane 2 (oktet, form, vinkel); byggeren på fane 1 (vinkler for alle kendte
+molekyler, plan og lineær form, reglerne for C, antal atomer og bindinger,
+genkendelse, drejningen mellem gammel og ny form); at alle opgaver kan løses; og
+at ingen tekst bruger tankestreger eller er under 12 px. Chrome kræver
+`--allow-file-access-from-files`.

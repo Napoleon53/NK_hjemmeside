@@ -14,8 +14,6 @@
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Byg molekylet</button>
         <button class="faneknap" data-fane="fane-molekyler" role="tab" aria-selected="false"><span class="nr">2</span>Molekylerne</button>
-        <button class="faneknap" data-fane="fane-polaritet" role="tab" aria-selected="false"><span class="nr">3</span>Polær eller upolær?</button>
-        <button class="faneknap" data-fane="fane-vand" role="tab" aria-selected="false"><span class="nr">4</span>Forsøg: vandstrålen</button>
     </div>
 
     <button class="topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -138,89 +136,6 @@
     </aside>
 </section>
 
-<!-- ================================================================= -->
-<!-- FANE 3: POLAER ELLER UPOLAER?                                      -->
-<!-- ================================================================= -->
-<section class="fane" id="fane-polaritet" role="tabpanel" aria-label="Polær eller upolær?">
-    <div class="scene">
-        <canvas id="pol-laerred" aria-label="Det valgte molekyle med træk i de polære bindinger"></canvas>
-        <div class="prikpanel" id="pol-prikpanel">
-            <div class="prik-titel">Prikformel</div>
-            <canvas id="pol-prik"></canvas>
-        </div>
-        <div class="scenebesked" id="pol-besked" aria-live="polite"></div>
-    </div>
-
-    <aside class="panel">
-        <div class="kort">
-            <h2>Vælg molekyle</h2>
-            <div class="molvalg" id="pol-menu"></div>
-        </div>
-
-        <div class="kort">
-            <h2>Visning</h2>
-            <div class="tjekraekke">
-                <label class="tjek"><input type="checkbox" id="pol-delta" checked> δ+ og δ−</label>
-                <label class="tjek"><input type="checkbox" id="pol-traek" checked> Træk i bindingerne</label>
-                <label class="tjek"><input type="checkbox" id="pol-samlet"> Samlet træk</label>
-                <label class="tjek"><input type="checkbox" id="pol-drej" checked> Drej langsomt</label>
-            </div>
-        </div>
-
-        <div class="kort maaling" id="pol-en">
-            <h2>Bindingerne <span class="taeller">elektronegativitet</span></h2>
-            <div id="pol-en-tabel"></div>
-            <div class="talraekke sum"><span id="pol-formel">Molekylet</span><span class="maerke" id="pol-polaer"></span></div>
-        </div>
-
-        <div class="kort opgavekort">
-            <h2>Opgave <span class="taeller">løst: <b id="pol-opg-loest">0</b></span></h2>
-            <p class="opgave-spm" id="pol-opg-tekst"></p>
-            <div class="valg" id="pol-opg-valg" hidden></div>
-            <p class="besked" id="pol-opg-hint"></p>
-            <p class="besked" id="pol-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="pol-opg-knap" type="button">Start opgave</button></div>
-        </div>
-    </aside>
-</section>
-
-<!-- ================================================================= -->
-<!-- FANE 4: FORSOEG MED VANDSTRAALEN                                   -->
-<!-- ================================================================= -->
-<section class="fane" id="fane-vand" role="tabpanel" aria-label="Forsøg: vandstrålen">
-    <div class="scene">
-        <canvas id="vand-laerred" aria-label="Laboratoriebord med en burette i et stativ, et bægerglas, tre flasker, en plastikstav, en glasstav og en uldklud"></canvas>
-        <div class="scenebesked" id="vand-besked" aria-live="polite"></div>
-    </div>
-
-    <aside class="panel">
-        <div class="kort fremhaev" id="vand-forloeb">
-            <h2>Forløb <span class="taeller" id="vand-taeller"></span></h2>
-            <ol class="trinliste" id="vand-trin"></ol>
-            <div class="knaprad">
-                <button class="knap" id="vand-hint-knap" type="button" title="Hint til trinnet (I)">Hint</button>
-                <button class="knap nulstil" id="vand-forfra" type="button">Start forfra <span class="tegn">↺</span></button>
-            </div>
-            <p class="hint" id="vand-hint" hidden></p>
-        </div>
-
-        <div class="kort" id="vand-serie">
-            <h2>Tegneserie</h2>
-            <p class="besked" id="vand-serie-tekst">Låses op, når forsøget er slut.</p>
-            <button class="knap blaa stor" id="vand-serieknap" type="button" hidden>Se forsøget som tegneserie <span class="tegn">→</span></button>
-        </div>
-
-        <div class="kort opgavekort" id="vand-opgave">
-            <h2>Opgave <span class="taeller">løst: <b id="vand-opg-loest">0</b></span></h2>
-            <p class="opgave-spm" id="vand-opg-tekst"></p>
-            <div class="valg" id="vand-opg-valg" hidden></div>
-            <p class="besked" id="vand-opg-hint"></p>
-            <p class="besked" id="vand-opg-svar"></p>
-            <div class="knaprad"><button class="knap blaa" id="vand-opg-knap" type="button">Start opgave</button></div>
-        </div>
-    </aside>
-</section>
-
 </main>
 
 <!-- ================================================================= -->
@@ -232,19 +147,6 @@
         <div class="teoriliste" id="teori-liste"></div>
         <div class="knapper">
             <button class="knap blaa" id="teori-luk" type="button">Luk</button>
-        </div>
-    </div>
-</div>
-
-<!-- ================================================================= -->
-<!-- TEGNESERIEN: aabnes fra fane 4, naar forsoeget er slut              -->
-<!-- ================================================================= -->
-<div class="overlay" id="tegneserie">
-    <div class="overlay-boks bred">
-        <h2>Forsøget som tegneserie</h2>
-        <div class="serie" id="serie-ruder"></div>
-        <div class="knapper">
-            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
         </div>
     </div>
 </div>
@@ -278,10 +180,6 @@
 <script src="js/valg.js"></script>
 <script src="js/sim_byg.js"></script>
 <script src="js/sim_molekyler.js"></script>
-<script src="js/sim_polaritet.js"></script>
-<script src="js/vand_tegning.js"></script>
-<script src="js/sim_vandstraale.js"></script>
-<script src="js/tegneserie.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>
 </body>

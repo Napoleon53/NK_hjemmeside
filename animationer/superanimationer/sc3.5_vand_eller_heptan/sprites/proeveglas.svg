@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="110" viewBox="0 0 90 110">
+  <!-- Proeveglas med stoffet, der testes. Indholdet tegnes af animationen
+       BAG denne fil; etiketten (et hvidt felt) staar i filen, og navnet
+       skrives paa den af animationen.
+       Inderside: x 11-79, top y 16, bund y 103 (hjoerneradius 8).
+       Etiketten: x 15-75, y 52-80. Mundingen y 6-15. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e4f1fb" stop-opacity="0.3"/>
+      <stop offset="0.2" stop-color="#e4f1fb" stop-opacity="0.06"/>
+      <stop offset="0.8" stop-color="#e4f1fb" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#e4f1fb" stop-opacity="0.24"/>
+    </linearGradient>
+  </defs>
+  <path d="M8 14 L8 98 Q8 106 16 106 L74 106 Q82 106 82 98 L82 14 Z" fill="url(#glas)"/>
+  <path d="M8 14 L8 98 Q8 106 16 106 L74 106 Q82 106 82 98 L82 14"
+        fill="none" stroke="#3f4b57" stroke-opacity="0.75" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M10.4 16 L10.4 98 Q10.4 103.6 16 103.6 L74 103.6 Q79.6 103.6 79.6 98 L79.6 16"
+        fill="none" stroke="#f4f9fd" stroke-opacity="0.5" stroke-width="1.1" stroke-linejoin="round"/>
+  <!-- Mundingen -->
+  <rect x="5" y="6" width="80" height="9" rx="4.5" fill="#e4f1fb" fill-opacity="0.3" stroke="#3f4b57" stroke-opacity="0.75" stroke-width="2"/>
+  <!-- Etiketten -->
+  <rect x="15" y="52" width="60" height="28" rx="2.5" fill="#fbfbf7" stroke="#8a8f96" stroke-width="1"/>
+  <!-- Genskin -->
+  <rect x="13.5" y="20" width="4" height="26" rx="2" fill="#ffffff" fill-opacity="0.4"/>
+  <rect x="13.5" y="84" width="4" height="14" rx="2" fill="#ffffff" fill-opacity="0.4"/>
+</svg>

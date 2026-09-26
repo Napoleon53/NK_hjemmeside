@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+<!-- En stegt burgerbøf set oppefra. Midten er (30, 30). -->
+<defs>
+  <radialGradient id="kod" cx="0.45" cy="0.4" r="0.7">
+    <stop offset="0" stop-color="#8a5634"/>
+    <stop offset="0.7" stop-color="#5e3419"/>
+    <stop offset="1" stop-color="#3f200d"/>
+  </radialGradient>
+</defs>
+<path d="M30 2 Q42 3 50 10 Q58 18 57 30 Q58 42 50 50 Q41 58 30 57 Q18 58 10 50 Q2 42 3 30 Q2 18 10 10 Q18 3 30 2 Z"
+      fill="url(#kod)" stroke="#2e1609" stroke-width="1.5"/>
+<g stroke="#2e1609" stroke-width="2.4" stroke-linecap="round" opacity="0.55">
+  <path d="M14 22 L46 16"/>
+  <path d="M12 33 L48 27"/>
+  <path d="M15 44 L45 38"/>
+</g>
+<g fill="#b98158" opacity="0.7">
+  <circle cx="22" cy="18" r="1.2"/>
+  <circle cx="38" cy="24" r="1"/>
+  <circle cx="26" cy="38" r="1.2"/>
+  <circle cx="40" cy="44" r="1"/>
+  <circle cx="18" cy="30" r="0.9"/>
+</g>
+</svg>

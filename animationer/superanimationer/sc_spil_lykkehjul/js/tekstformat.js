@@ -114,7 +114,7 @@
         if (gaader.length > F.MAKS_GAADER) fejl.push("Der er " + gaader.length + " gåder. Spillet har plads til højst " + F.MAKS_GAADER + ".");
 
         var toss = gaader.filter(function (g) { return g.type === "tossup"; }).length;
-        var oversigt = toss + (toss === 1 ? " toss-up, " : " toss-ups, ")
+        var oversigt = (toss ? toss + (toss === 1 ? " toss-up, " : " toss-ups, ") : "")
             + (gaader.length - toss) + (gaader.length - toss === 1 ? " runde" : " runder")
             + (final ? " og en Final" : ", ingen Final");
 

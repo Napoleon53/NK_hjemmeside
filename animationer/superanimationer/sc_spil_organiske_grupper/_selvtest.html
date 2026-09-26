@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Organiske grupper</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at molekylemotoren giver det navn og den
+   stofklasse, der staar i data, at gruppen findes i hvert molekyle, at
+   balancen er de gamle spils tal for tal, et helt spil (rigtig, forkert,
+   niveauer, hjaelperne, turbo, pause, Stofgruppemester, slut), Kemi B
+   med toplisten, knapperne og tasterne, escaperoommets segl og sproget.
+   Skal koeres gennem en lokal server med animationer/ som rod.
+
+   Testen sender ALDRIG en score til den faelles liste: NK.ingenNet
+   saettes, og fetch i iframen er skiftet ud, foer noget startes.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+/* De gamle spils tal, skrevet af fra c_spil_organiske_grupper.html og
+   b_spil_organiske_grupper.html (kemi-c-filer), saa testen ogsaa virker,
+   naar de er flyttet til arkiv/. aren og aromater hedder nu aromat. */
+var GAMMEL = {
+    c: { turbo: 0.35, niveauer: [
+        [0, 1.32, ["alkan", "alken"]], [1000, 1.32, ["alkan", "alken", "alkyn"]], [2500, 1.44, ["alken", "alkyn", "cycloalkan"]],
+        [4500, 1.3, ["alkyn", "cycloalkan", "aren"]], [7000, 1.4, ["cycloalkan", "aren", "alkohol", "syre"]],
+        [10000, 1.55, ["alken", "alkyn", "cycloalkan", "aren", "syre"]], [13500, 1.70, ["alkan", "alkyn", "cycloalkan", "alkohol", "syre"]],
+        [17500, 1.85, ["alken", "cycloalkan", "aren", "alkohol", "syre"]], [22000, 2.00, ["alkan", "alken", "alkyn", "aren", "syre"]],
+        [27000, 2.15, ["cycloalkan", "aren", "alkohol", "syre", "alken"]]],
+        molekyler: ["propan", "butan", "pentan", "propen", "but-1-en", "propyn", "but-1-yn", "cyclopropan", "cyclobutan", "cyclohexan",
+            "benzen", "methylbenzen", "ethanol", "butan-2-ol", "ethansyre", "propansyre"] },
+    b: { turbo: 0.25, niveauer: [
+        [0, 1.1, ["alkan", "alkohol", "syre"]], [1000, 1.1, ["alkan", "alkohol", "syre", "aromater"]], [2500, 1.2, ["alkohol", "syre", "aromater", "amin"]],
+        [4500, 1.3, ["syre", "amin", "keton", "aldehyd"]], [7000, 1.4, ["keton", "aldehyd", "ester", "amin", "aromater"]],
+        [10000, 1.55, ["keton", "aldehyd", "ester", "amin", "aromater"]], [13500, 1.70, ["keton", "aldehyd", "ester", "amin", "aromater"]],
+        [17500, 1.85, ["keton", "aldehyd", "ester", "amin", "aromater"]], [22000, 2.00, ["keton", "aldehyd", "ester", "amin", "aromater"]],
+        [27000, 2.15, ["keton", "aldehyd", "ester", "amin", "aromater"]]],
+        molekyler: ["propan", "butan", "pentan", "heptan", "decan", "ethanol", "propan-1-ol", "butan-2-ol", "hexan-1-ol", "decan-1-ol",
+            "ethansyre", "propansyre", "butansyre", "heptansyre", "decansyre", "benzen", "methylbenzen", "ethylbenzen", "propylbenzen",
+            "butylbenzen", "ethylamin", "propylamin", "butylamin", "hexylamin", "decylamin", "propanon", "butanon", "hexan-2-on",
+            "decan-2-on", "ethanal", "propanal", "pentanal", "octanal", "decanal", "methylethanoat", "ethylethanoat", "propylethanoat",
+            "butylpropanoat", "pentylpentanoat"] }
+};
+var NYT_NAVN = { aren: "aromat", aromater: "aromat" };
+
+/* Tilbuddet skal vises foerste gang: glem valget, foer siden aabnes */
+try {
+    ["nk-organiske-intro", "nk-organiske-c-rekord", "nk-organiske-c-uge", "nk-organiske-c-ugenr"].forEach(function (k) { localStorage.removeItem(k); });
+} catch (e) {}
+/* B bruger den gamle udgaves noegler: gem elevens tal og laeg dem tilbage bagefter */
+var GEMT = {};
+["orgSortering_bestAllTime", "orgSortering_bestWeekly", "orgSortering_weekKey", "orgSortering_playerName"].forEach(function (k) {
+    try { GEMT[k] = localStorage.getItem(k); localStorage.removeItem(k); } catch (e) {}
+});
+function laegTilbage() {
+    Object.keys(GEMT).forEach(function (k) {
+        try { if (GEMT[k] === null) localStorage.removeItem(k); else localStorage.setItem(k, GEMT[k]); } catch (e) {}
+    });
+}
+
+var ramme = document.createElement("iframe");
+ramme.src = "index.html";
+document.body.appendChild(ramme);
+ramme.addEventListener("load", function () { setTimeout(koer, 900); });
+
+function koer() {
+    try { tests(); } catch (e) { fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl"); }
+    laegTilbage();
+    vis();
+}
+
+function tests() {
+    var w = ramme.contentWindow, d = ramme.contentDocument, NK = w.NK;
+    var netKald = 0;
+    NK.ingenNet = true;
+    w.fetch = function () { netKald++; return Promise.reject(new Error("selvtest")); };
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    var D = NK.Data, Kemi = NK.Kemi;
+    paastand("molekylemotoren er indlæst", !!(NK.Smiles && NK.Navn && NK.Layout && NK.Struktur));
+    paastand("Kemichael er indlæst", !!NK.Kemichael && !!NK.laerer);
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    w.requestAnimationFrame = function () {};      /* selvtesten styrer tiden */
+    var tilbud = d.getElementById("tilbud");
+    paastand("tilbuddet om præsentationen vises første gang", w.getComputedStyle(tilbud).display !== "none");
+    paastand("index.html er Kemi C", NK.app.udgave() === "c" && d.getElementById("udgave-maerke").textContent === "Kemi C");
+    paastand("Kemi C har ingen top 10", d.getElementById("toplistekort").hidden);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("2. Molekylerne (molekylemotoren er facit)");
+    ["c", "b"].forEach(function (u) {
+        var U = D.UDGAVER[u], alle = Kemi.molekyler(u);
+        var navn = [], klasse = [], gruppe = [], brede = [], dobbelt = [], set = {};
+        alle.forEach(function (m) {
+            if (m.res.navn !== m.navn) navn.push(m.navn + " → " + m.res.navn);
+            if (m.res.stofklasse !== D.KLASSER[m.klasse].motor) klasse.push(m.navn + ": " + m.res.stofklasse);
+            if (!m.gruppe.bindinger.length) gruppe.push(m.navn);
+            var t = Kemi.tegning(m, NK.Spil.VIS);
+            if (t.b > 215) brede.push(m.navn + " " + Math.round(t.b));
+            if (set[m.navn]) dobbelt.push(m.navn);
+            set[m.navn] = true;
+        });
+        paastand(U.navn + ": motoren giver det navn, der står i data (" + alle.length + " molekyler)", !navn.length, navn.join(", "));
+        paastand(U.navn + ": motoren giver den stofklasse, der står i data", !klasse.length, klasse.join(", "));
+        paastand(U.navn + ": gruppen findes i hvert molekyle", !gruppe.length, gruppe.join(", "));
+        paastand(U.navn + ": fem molekyler i hver stofklasse", U.klasser.every(function (k) { return alle.filter(function (m) { return m.klasse === k; }).length === 5; }));
+        paastand(U.navn + ": intet molekyle to gange", !dobbelt.length, dobbelt.join(", "));
+        paastand(U.navn + ": et faldende molekyle er højst ca. 200 enheder bredt", !brede.length, brede.join(", "));
+        var mangler = GAMMEL[u].molekyler.filter(function (n) { return !set[n]; });
+        paastand(U.navn + ": alle molekyler fra den gamle udgave er med", !mangler.length, mangler.join(", "));
+        paastand(U.navn + ": alle stofklasser har en farve og et kendetegn", U.klasser.every(function (k) { return D.FARVER[u][k] && D.KLASSER[k] && D.KLASSER[k].kendetegn; }));
+    });
+    function find(u, n) { return Kemi.molekyler(u).filter(function (m) { return m.navn === n; })[0]; }
+    function grundstoffer(m) { return Object.keys(m.gruppe.atomer).map(function (id) { return m.mol.atom(+id).el; }).sort().join(""); }
+    var m = find("b", "ethylethanoat");
+    paastand("ethylethanoat: gruppen er C(=O)–O–C (to C, to O, tre bindinger)", grundstoffer(m) === "CCOO" && m.gruppe.bindinger.length === 3);
+    m = find("b", "ethansyre");
+    paastand("ethansyre: gruppen er COOH", grundstoffer(m) === "COO" && m.gruppe.bindinger.length === 2);
+    m = find("b", "propanal");
+    paastand("propanal: gruppen er C=O for enden", m.gruppe.bindinger.length === 1 && m.gruppe.bindinger[0].orden === 2);
+    m = find("b", "pentan-3-on");
+    paastand("pentan-3-on: gruppen er C=O i kæden", m.gruppe.bindinger.length === 1 && m.gruppe.bindinger[0].orden === 2);
+    paastand("ethanol: gruppen er C–O(H)", grundstoffer(find("b", "ethanol")) === "CO");
+    paastand("ethylamin: gruppen er C–N(H₂)", grundstoffer(find("b", "ethylamin")) === "CN");
+    paastand("benzen: gruppen er de seks bindinger i ringen", find("c", "benzen").gruppe.bindinger.length === 6);
+    paastand("methylcyclohexan: ringen, ikke methylgruppen", find("c", "methylcyclohexan").gruppe.bindinger.length === 6);
+    m = find("c", "but-2-yn");
+    paastand("but-2-yn: kun tripelbindingen", m.gruppe.bindinger.length === 1 && m.gruppe.bindinger[0].orden === 3);
+    m = find("c", "2-methylpropen");
+    paastand("2-methylpropen: kun dobbeltbindingen", m.gruppe.bindinger.length === 1 && m.gruppe.bindinger[0].orden === 2);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("3. Balancen er de gamle spils, tal for tal");
+    ["c", "b"].forEach(function (u) {
+        var U = D.UDGAVER[u], G = GAMMEL[u], afvig = [];
+        paastand(U.navn + ": ti niveauer", U.niveauer.length === G.niveauer.length);
+        G.niveauer.forEach(function (g, i) {
+            var n = U.niveauer[i];
+            if (!n) { afvig.push("mangler " + (i + 1)); return; }
+            var typer = g[2].map(function (t) { return NYT_NAVN[t] || t; });
+            if (n.graense !== g[0]) afvig.push((i + 1) + ": grænse " + n.graense);
+            if (n.fart !== g[1]) afvig.push((i + 1) + ": fart " + n.fart);
+            if (n.typer.join() !== typer.join()) afvig.push((i + 1) + ": " + n.typer.join("/"));
+        });
+        paastand(U.navn + ": grænser, fart og spande pr. niveau", !afvig.length, afvig.join("; "));
+        paastand(U.navn + ": turboboost " + G.turbo * 100 + " % pr. tryk", U.turboPrTryk === G.turbo);
+        var ny = [];
+        U.niveauer.forEach(function (n, i) {
+            if (!i) return;
+            var foer = U.niveauer.slice(0, i).reduce(function (a, x) { return a.concat(x.typer); }, []);
+            var nye = n.typer.filter(function (k) { return foer.indexOf(k) < 0; });
+            if ((n.ny || []).slice().sort().join() !== nye.sort().join()) ny.push((i + 1) + ": " + (n.ny || []).join("/") + " ≠ " + nye.join("/"));
+        });
+        paastand(U.navn + ": \"ny\" er præcis de stofklasser, der kommer til", !ny.length, ny.join("; "));
+        paastand(U.navn + ": højst fem spande ad gangen", U.niveauer.every(function (n) { return n.typer.length <= 5; }));
+        paastand(U.navn + ": alle stofklasser kommer med i et niveau", U.klasser.every(function (k) { return U.niveauer.some(function (n) { return n.typer.indexOf(k) >= 0; }); }));
+    });
+    var tal = [["grundfart 70", D.GRUNDFART, 70], ["nyt molekyle hvert 2200 ms", D.NYT_HVERT, 2200], ["220 ms hurtigere pr. niveau", D.NYT_PR_NIVEAU, 220],
+        ["mindst 600 ms", D.NYT_MINDST, 600], ["1000 ms ekstra i starten af et niveau", D.NYT_START, 1000], ["100 point", D.POINT, 100], ["tre liv", D.LIV, 3],
+        ["3 s stilstand efter en fejl", D.LIV_PAUSE, 3], ["spand 120 høj", D.SPAND_HOEJDE, 120], ["greb 60", D.GREB, 60], ["hjælpelinje 6 s", D.HINT_TID, 6],
+        ["mester ved 14.000", D.MESTER, 14000], ["10 % pr. 1000 point bagefter", D.UENDELIG_TRIN, 1000], ["én pause", D.PAUSER, 1],
+        ["turbo 15 s", D.TURBO.tid, 15], ["højst fem turbo", D.TURBO.maks, 5], ["første hjælper efter 20 s", D.HJAELP.foerste, 20],
+        ["hjælper hvert 25-45 s", D.HJAELP.min + "-" + D.HJAELP.maks, "25-45"], ["inhibitor 7 s", D.HJAELP.inhibitorTid, 7],
+        ["inhibitor 30 % fart", D.HJAELP.inhibitorFart, 0.3], ["hjælpere falder 55", D.HJAELP.fald, 55], ["katalysator halve point", D.HJAELP.enzymPoint, 0.5],
+        ["scenen 900 høj", D.HOEJDE, 900]];
+    var tfejl = tal.filter(function (x) { return x[1] !== x[2]; }).map(function (x) { return x[0] + ": " + x[1]; });
+    paastand("de faste tal (" + tal.length + ")", !tfejl.length, tfejl.join("; "));
+    paastand("turbobeskederne er de gamle", D.TURBO_BESKED.join("|") === "Turboboost i 15 sekunder!|Ekstraboost!|Crazy!|Spænd sikkerhedsselen!|Du er ikke rask!");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("4. Et spil på Kemi C");
+    var S = NK.app.spil();
+    function spand(k) { return S.spande.filter(function (s) { return s.klasse === k; })[0]; }
+    function forkertSpand(k) { return S.spande.filter(function (s) { return s.klasse !== k; })[0]; }
+    function laeg(t, s) { t.x = s.x + s.b / 2; t.y = S.H - D.SPAND_HOEJDE + 0.5; S.opdater(0.02); }
+    /* Tiden gaar, uden at molekylerne naar ned (de fjernes hvert skridt) */
+    function vent(sek) {
+        for (var i = 0; i < sek * 50; i++) {
+            S.opdater(0.02);
+            S.ting = S.ting.filter(function (t) { return t.art !== "mol"; });
+        }
+    }
+    var haendelser = [];
+    var gammelNaar = S.naar;
+    S.naar = function (n, dt) { haendelser.push(n); gammelNaar(n, dt); };
+
+    NK.app.primaer();
+    NK.app.trin(1 / 60);
+    paastand("Start spil starter spillet", S.tilstand === "koerer");
+    paastand("tilbuddet forsvinder, når spillet starter (også i stilarket)", w.getComputedStyle(tilbud).display === "none");
+    paastand("valget huskes som Nej tak", !!JSON.parse(w.localStorage.getItem("nk-organiske-intro") || "{}").c);
+    paastand("kortet midt på scenen er skjult under spillet", w.getComputedStyle(d.getElementById("midterkort")).display === "none");
+    S.saetStoerrelse(1000, 900);
+    paastand("niveau 1 har spandene Alkan og Alken", S.spande.map(function (s) { return s.klasse; }).join() === "alkan,alken");
+    S.opdater(0.3);
+    paastand("intet molekyle efter 0,3 s (som den gamle: 2700 ms af 3200)", S.ting.length === 0);
+    S.opdater(0.3);
+    paastand("det første molekyle kommer efter ca. et halvt sekund", S.ting.length === 1);
+    var t = S.ting[0];
+    paastand("det falder med 60 % af fuld fart i starten (± 20 %)", t.vy >= 70 * 1.32 * 0.6 * 0.8 - 1 && t.vy <= 70 * 1.32 * 0.6 * 1.2 + 1, Math.round(t.vy));
+    laeg(t, spand(t.m.klasse));
+    paastand("den rigtige spand giver 100 point", S.point === 100 && S.rigtige === 1 && S.sorteret[t.m.klasse] === 1);
+    paastand("det sidste molekyle er rigtigt", S.sidste && S.sidste.rigtig && S.sidste.m === t.m);
+    NK.app.trin(1 / 60);
+    paastand("panelet viser navnet på det sidste molekyle", d.getElementById("sidste-navn").textContent === NK.stortForbogstav(Kemi.fuldtNavn(t.m)));
+
+    t = S.nytMolekyle(find("c", "propen"));
+    laeg(t, spand("alkan"));
+    paastand("den forkerte spand koster et liv", S.liv === 2 && S.tilstand === "livTabt");
+    paastand("forklaringen passer til fejlen", S.sidste.tekst.foerste === "Propen er en alken, ikke en alkan." &&
+        S.sidste.tekst.anden === D.FORVEKSLING["alken>alkan"], S.sidste.tekst.foerste + " / " + S.sidste.tekst.anden);
+    NK.app.trin(1 / 60);
+    paastand("kortet med gruppen vises", !d.getElementById("fejlkort").hidden && d.getElementById("fk-foerste").textContent.indexOf("Propen") === 0);
+    var foerTid = S.tid;
+    for (var i = 0; i < 100; i++) S.opdater(0.02);
+    paastand("spillet står stille, mens kortet vises", S.tid === foerTid && S.tilstand === "livTabt");
+    for (i = 0; i < 60; i++) S.opdater(0.02);
+    paastand("efter 3 s kører spillet igen, og skærmen er ryddet", S.tilstand === "koerer" && S.ting.length === 0);
+    NK.app.trin(1 / 60);
+    paastand("kortet med gruppen er væk igen", d.getElementById("fejlkort").hidden);
+
+    t = S.nytMolekyle(find("c", "propyn"));
+    paastand("en klasse uden spand forsvinder uden straf", (function () { laeg(t, spand("alkan")); return S.liv === 2 && S.ting.indexOf(t) < 0; }()));
+
+    /* Nyt niveau */
+    haendelser = [];
+    S.point = 950;
+    t = S.nytMolekyle(find("c", "butan"));
+    laeg(t, spand("alkan"));
+    paastand("1000 point giver niveau 2 med Alkyn", S.niveau === 1 && S.spande.map(function (s) { return s.klasse; }).join() === "alkan,alken,alkyn");
+    paastand("niveau 2 er en ny stofklasse, og skærmen ryddes", haendelser.indexOf("nyKlasse") >= 0 && S.ting.length === 0);
+    NK.app.trin(1 / 60);
+    paastand("kortet Ny stofklasse viser Alkyner med et eksempel", !d.getElementById("nykort").hidden && /Alkyner/.test(d.getElementById("nk-klasser").textContent) &&
+        d.querySelector("#nk-klasser canvas").width > 50);
+    t = S.nytMolekyle();
+    paastand("i starten af et nyt niveau har molekylerne en hjælpelinje", t.hint === true);
+    vent(6.2);
+    t = S.nytMolekyle();
+    paastand("efter 6 s ingen hjælpelinje", t.hint === false);
+    S.ting = [];
+
+    /* Hjaelperne */
+    vent(13);
+    paastand("ingen hjælper før 20 s på niveau 2", !S.ting.some(function (x) { return x.art === "hjaelp"; }));
+    vent(1.2);
+    var h = S.ting.filter(function (x) { return x.art === "hjaelp"; });
+    paastand("en hjælper efter 20 s, og kun én", h.length === 1);
+    paastand("linjen siger, hvad den gør, første gang", S.besked && S.besked.tekst === D.BESKED.hjaelpNy[h[0].slags], S.besked && S.besked.tekst);
+    S.ting = [];
+
+    S.point = 2400;
+    for (i = 0; i < 3; i++) S.nytMolekyle();
+    var enzym = S.nyHjaelper("enzym");
+    S.tryk(enzym.x, enzym.y);
+    paastand("katalysatoren giver 50 point pr. molekyle og rydder skærmen", S.point === 2550 && !S.ting.some(function (x) { return x.art === "mol"; }));
+    paastand("et spring over en grænse giver det nye niveau", S.niveau === 2 && S.spande.map(function (s) { return s.klasse; }).join() === "alken,alkyn,cycloalkan");
+
+    var inhib = S.nyHjaelper("inhibitor");
+    S.tryk(inhib.x, inhib.y);
+    paastand("inhibitoren giver 30 % fart", Math.abs(S.fartFaktor() - 0.3) < 1e-9);
+    vent(6.9);
+    paastand("stadig bremset efter 6,9 s", S.inhibitor);
+    vent(0.2);
+    paastand("efter 7 s er farten normal igen", !S.inhibitor && S.fartFaktor() === 1);
+    inhib = S.nyHjaelper("inhibitor");
+    S.tryk(inhib.x, inhib.y);
+    S.fjernInhibitor();
+    paastand("inhibitoren kan fjernes", !S.inhibitor);
+
+    var pauseH = S.nyHjaelper("pause");
+    S.tryk(pauseH.x, pauseH.y);
+    paastand("+1 pause giver to pauser", S.pauser === 2);
+
+    for (i = 0; i < 6; i++) S.turboboost();
+    paastand("turboboost: højst fem, +35 % hver", S.turbo.length === 5 && Math.abs(S.turboFaktor() - 2.75) < 1e-9);
+    vent(15.1);
+    paastand("turboboost varer 15 s", S.turbo.length === 0);
+
+    /* Pausen */
+    paastand("pause bruger en af pauserne", S.pause() && S.pauser === 1 && S.tilstand === "pause");
+    NK.app.trin(1 / 60);
+    paastand("kortet siger Fortsæt", d.getElementById("mk-knap").textContent === "Fortsæt");
+    S.fortsaet();
+    S.pause(); S.fortsaet();
+    paastand("uden pauser tilbage kan spillet ikke holde pause", S.pauser === 0 && !S.pause() && S.tilstand === "koerer");
+
+    /* Kaffen */
+    var kaffe = S.nyKaffe();
+    kaffe.x = S.spande[0].x + 20; kaffe.y = S.H - D.SPAND_HOEJDE + 0.5;
+    var livFoer = S.liv;
+    S.opdater(0.02);
+    paastand("kaffen i en spand koster ikke et liv", S.liv === livFoer && S.ting.indexOf(kaffe) < 0 && S.besked.tekst === D.BESKED.kaffeSpand);
+
+    /* Traek */
+    t = S.nytMolekyle(find("c", "cyclopentan"));
+    t.x = 300; t.y = 200;
+    S.tryk(300, 200);
+    paastand("et klik på molekylet griber det", S.trukket === t);
+    var sp2 = spand("cycloalkan");
+    S.flyt(sp2.x + sp2.b / 2, 500);
+    for (i = 0; i < 30; i++) S.opdater(0.02);
+    paastand("spanden under det, der holdes, lyser op", sp2.over === true);
+    var p0 = S.point;
+    S.flyt(sp2.x + sp2.b / 2, S.H - 90);
+    for (i = 0; i < 40 && S.point === p0; i++) S.opdater(0.02);
+    paastand("trukket ned i den rigtige spand giver point", S.point === p0 + 100 && !S.trukket);
+    t = S.nytMolekyle(find("c", "propylbenzen") || find("c", "methylbenzen"));
+    t.x = 500; t.y = 300; t.rot = 1.2;
+    var loc = { x: Math.cos(t.rot) * (t.hb - 5) + 500, y: Math.sin(t.rot) * (t.hb - 5) + 300 };
+    paastand("et drejet molekyle kan gribes yderst", S.rammer(t, loc.x, loc.y));
+    S.ting = [];
+
+    /* Faldtiden er den samme paa et lavt laerred */
+    function faldTid(H) {
+        S.saetStoerrelse(1000, H);
+        var x = S.nytMolekyle(find("c", "cyclohexan"));
+        x.vy = 90; x.x = S.spande[0].x + 30;
+        var n = 0;
+        while (S.ting.indexOf(x) >= 0 && n < 5000) { S.opdater(0.01); n++; }
+        return n * 0.01;
+    }
+    var pauser = S.pauser, livNu = S.liv, pointNu = S.point, niv = S.niveau;
+    var t900 = faldTid(900), t640 = faldTid(640);
+    S.point = pointNu; S.liv = livNu; S.pauser = pauser; S.niveau = niv; S.tilstand = "koerer"; S.ting = []; S.saetStoerrelse(1000, 900);
+    paastand("faldtiden er den samme på et lavt lærred (±6 %)", Math.abs(t640 / t900 - 1) < 0.06, t900.toFixed(2) + " s og " + t640.toFixed(2) + " s");
+
+    /* Stofgruppemester */
+    haendelser = [];
+    S.point = 13950;
+    S.tjekNiveau();
+    t = S.nytMolekyle();
+    laeg(t, spand(t.m.klasse));
+    paastand("14.000 point: skærmen ryddes og fyrværkeriet går i gang", S.mesterVist && S.fyr > 0 && S.ting.length === 0);
+    for (i = 0; i < 70 && S.tilstand === "koerer"; i++) { S.opdater(0.02); S.ting = []; }
+    paastand("efter 1,2 s kommer kortet Stofgruppemester", S.tilstand === "mester" && haendelser.indexOf("mester") >= 0);
+    NK.app.trin(1 / 60);
+    paastand("kortet siger Stofgruppemester og Spil videre", /Stofgruppemester/.test(d.getElementById("midterkort").textContent) &&
+        d.getElementById("mk-knap").textContent === "Spil videre");
+    NK.app.primaer();
+    paastand("Spil videre fortsætter spillet", S.tilstand === "koerer");
+    S.point = 16000;
+    S.niveau = 6; S.niveauStart = S.tid - 30;
+    paastand("efter 14.000 kommer der 10 % flere molekyler pr. 1000 point", Math.abs(S.nytHvert() - Math.max(600, 2200 - 6 * 220) / 1.2) < 1e-6, S.nytHvert());
+
+    /* Slut */
+    S.liv = 1;
+    t = S.nytMolekyle();
+    laeg(t, forkertSpand(t.m.klasse));
+    for (i = 0; i < 200; i++) S.opdater(0.02);
+    paastand("tre forkerte, og spillet er slut", S.tilstand === "slut");
+    paastand("rekorden gemmes i browseren", Number(w.localStorage.getItem("nk-organiske-c-rekord")) === 16000);
+    NK.app.trin(1 / 60);
+    paastand("kortet siger Ny rekord og Spil igen", d.getElementById("mk-titel").textContent === "Ny rekord" && d.getElementById("mk-knap").textContent === "Spil igen");
+    NK.app.primaer();
+    paastand("Spil igen starter forfra", S.tilstand === "koerer" && S.point === 0 && S.liv === 3 && S.niveau === 0);
+    S.pause();
+
+    /* ----------------------------------------------------------------- */
+    overskrift("5. Kemi B (index.html#b)");
+    NK.app.visUdgave("b");
+    NK.app.trin(1 / 60);
+    var B = NK.app.spil();
+    paastand("B er sit eget spil", B !== S && B.udgave === "b" && d.getElementById("udgave-maerke").textContent === "Kemi B");
+    paastand("B har top 10 og navnefeltet", !d.getElementById("toplistekort").hidden && !d.getElementById("mk-navn").hidden);
+    paastand("B starter med Alkan, Alkohol og Carboxylsyre", B.spande.map(function (s) { return s.klasse; }).join() === "alkan,alkohol,syre");
+    d.getElementById("navnefelt").value = "Selvtest";
+    NK.app.primaer();
+    paastand("navnet gemmes under den gamle nøgle", w.localStorage.getItem("orgSortering_playerName") === "Selvtest");
+    B.saetStoerrelse(1000, 900);
+    var ald = B.alle.filter(function (x) { return x.navn === "propanal"; })[0];
+    B.niveau = 3; B.lavSpande();
+    var bt = B.nytMolekyle(ald);
+    bt.x = B.spande.filter(function (s) { return s.klasse === "keton"; })[0].x + 30; bt.y = B.H - D.SPAND_HOEJDE + 0.5;
+    B.opdater(0.02);
+    paastand("aldehyd i keton: forklaringen siger, hvor C=O sidder", B.sidste.tekst.anden === D.FORVEKSLING["aldehyd>keton"], B.sidste.tekst.anden);
+    for (i = 0; i < 200; i++) B.opdater(0.02);
+    /* Ester og carboxylsyre har aldrig spand paa samme tid i B; ester og keton har */
+    B.liv = 1;
+    B.niveau = 4; B.lavSpande();
+    bt = B.nytMolekyle(B.alle.filter(function (x) { return x.navn === "ethylethanoat"; })[0]);
+    bt.x = B.spande.filter(function (s) { return s.klasse === "keton"; })[0].x + 30; bt.y = B.H - D.SPAND_HOEJDE + 0.5;
+    B.point = 1234;
+    B.opdater(0.02);
+    paastand("ester i keton: forklaringen peger på O'et i kæden", B.sidste.tekst.anden === D.FORVEKSLING["ester>keton"], B.sidste.tekst.anden);
+    for (i = 0; i < 200; i++) B.opdater(0.02);
+    paastand("B slutter og gemmer rekorden under den gamle nøgle", B.tilstand === "slut" && Number(w.localStorage.getItem("orgSortering_bestAllTime")) === 1234);
+    paastand("selvtesten har ikke sendt noget til den fælles liste", netKald === 0, netKald + " kald");
+    NK.app.visUdgave("c");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Knapper, taster og Kemichael");
+    var C = NK.app.spil();
+    C.nulstil();
+    function tast(key) { NK.app.tastatur({ key: key, preventDefault: function () {}, target: d.body }); }
+    tast("Enter");
+    paastand("Enter starter spillet", C.tilstand === "koerer");
+    tast("t");
+    paastand("T giver turboboost", C.turbo.length === 1);
+    tast("s");
+    paastand("S åbner stofklasserne og bruger pausen", d.getElementById("teori").classList.contains("vis") && C.tilstand === "pause" && C.pauser === 0);
+    paastand("stofklasserne viser syv eksempler", d.querySelectorAll("#teorigitter canvas").length === 7 && d.querySelector("#teorigitter canvas").width > 50);
+    tast("Escape");
+    paastand("Esc lukker", !d.getElementById("teori").classList.contains("vis") && C.tilstand === "pause");
+    tast("p");
+    paastand("P fortsætter", C.tilstand === "koerer");
+    tast("r");
+    paastand("uden pauser åbner R ikke reglerne midt i spillet", !d.getElementById("regler").classList.contains("vis") && C.tilstand === "koerer");
+    C.pauser = 1;
+    tast("p");
+    paastand("P holder pause", C.tilstand === "pause");
+    tast("r");
+    paastand("R åbner reglerne, når spillet holder pause", d.getElementById("regler").classList.contains("vis"));
+    tast("Escape");
+    var kFejl = null;
+    try { NK.laerer.startIntro("c", true); for (var kt = 0; kt < 500; kt++) NK.app.trin(1 / 60); } catch (e) { kFejl = String(e); }
+    paastand("Kemichaels præsentation kører uden fejl", !kFejl, kFejl);
+    NK.laerer.stopIntro();
+    kFejl = null;
+    try { NK.laerer.laererSlut("mester"); for (kt = 0; kt < 300; kt++) NK.app.trin(1 / 60); } catch (e) { kFejl = String(e); }
+    paastand("Kemichaels replik ved Stofgruppemester kører uden fejl", !kFejl, kFejl);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("7. Escaperoommets segl 4");
+    var er = "";
+    try {
+        var x = new XMLHttpRequest();
+        x.open("GET", "../../kemi-c-filer/c_spil_escaperoom.html", false);
+        x.send();
+        er = x.status === 200 ? x.responseText : "";
+    } catch (e) { er = ""; }
+    paastand("escaperoommet er fundet", er.length > 1000);
+    paastand("seglet kræver stofgruppemester ved 14.000 point", /answer:\s*'stofgruppemester'/.test(er) && /14\.000 point/.test(er) && D.MESTER === 14000);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("8. Sproget");
+    var tekster = [];
+    ["c", "b"].forEach(function (u) { D.UDGAVER[u].intro.forEach(function (l) { tekster.push(l); }); });
+    Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) { tekster.push(l); }); });
+    Object.keys(D.BESKED).forEach(function (k) {
+        var v = D.BESKED[k];
+        if (typeof v === "string") tekster.push(v); else Object.keys(v).forEach(function (j) { tekster.push(v[j]); });
+    });
+    Object.keys(D.FORVEKSLING).forEach(function (k) { tekster.push(D.FORVEKSLING[k]); });
+    Object.keys(D.KLASSER).forEach(function (k) { tekster.push(D.KLASSER[k].kendetegn); });
+    var lange = [];
+    ["c", "b"].forEach(function (u) { D.UDGAVER[u].intro.forEach(function (l) { if (l.length > 62) lange.push(l); }); });
+    Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) { if (l.length > 62) lange.push(l); }); });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", !lange.length, lange.join(" | "));
+    paastand("tre replikker pr. udgave", D.UDGAVER.c.intro.length === 3 && D.UDGAVER.b.intro.length === 3);
+    var sideTekst = d.body.innerText + "\n" + tekster.join("\n");
+    paastand("ingen tankestreger (– kun som binding, fx –OH)", !/—|\s–\s|\s–$|^–\s/m.test(sideTekst), (sideTekst.match(/.{0,20}(—|\s–\s).{0,20}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(¹[⁺⁻])|([A-Za-z₀-₉)]1[+−-](?![0-9a-z]))/.test(sideTekst), (sideTekst.match(/.{0,10}(¹[⁺⁻]|[A-Za-z₀-₉)]1[+−-]).{0,10}/) || [""])[0]);
+    paastand("natriumhydroxid, aldrig natronlud", !/natronlud/i.test(sideTekst));
+    var hjaelpeord = tekster.filter(function (l) { return /jo |alts|ligesom|faktisk|super|mega/i.test(l); });
+    paastand("intet talesprog i replikkerne og linjerne", !hjaelpeord.length, hjaelpeord.join(" | "));
+    var smaa = [];
+    d.querySelectorAll("p, span, b, small, button, li, kbd, label, h2").forEach(function (e) {
+        if (!e.offsetWidth || !e.textContent.trim() || e.children.length) return;
+        var s = parseFloat(w.getComputedStyle(e).fontSize);
+        if (s < 12) smaa.push(e.textContent.trim().slice(0, 20) + " " + s + "px");
+    });
+    paastand("ingen synlig tekst under 12 px", !smaa.length, smaa.slice(0, 4).join(" | "));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" width="160" height="90">
+<!-- Stegepladen med bøffer, set forfra. Bunden staar i y 88.
+     Pladen er y 46-60; bøfferne ligger oven paa den. -->
+<defs>
+  <linearGradient id="staal" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#5b626e"/>
+    <stop offset="1" stop-color="#2c3038"/>
+  </linearGradient>
+  <linearGradient id="kod" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#8a5634"/>
+    <stop offset="1" stop-color="#4a2712"/>
+  </linearGradient>
+</defs>
+<rect x="16" y="60" width="10" height="28" rx="2" fill="#3a3f48"/>
+<rect x="134" y="60" width="10" height="28" rx="2" fill="#3a3f48"/>
+<rect x="22" y="70" width="116" height="6" rx="2" fill="#4a505a"/>
+<g stroke="#2e1609" stroke-width="1.2" fill="url(#kod)">
+  <rect x="22" y="34" width="36" height="14" rx="7"/>
+  <rect x="62" y="32" width="36" height="16" rx="8"/>
+  <rect x="102" y="34" width="36" height="14" rx="7"/>
+</g>
+<g stroke="#c89068" stroke-width="1.5" stroke-linecap="round" opacity="0.5">
+  <path d="M28 38 L52 38"/><path d="M68 36 L92 36"/><path d="M108 38 L132 38"/>
+</g>
+<rect x="6" y="46" width="148" height="14" rx="4" fill="url(#staal)" stroke="#1f232a" stroke-width="1.5"/>
+<rect x="6" y="46" width="148" height="3" rx="1.5" fill="#8e96a3" opacity="0.7"/>
+<rect x="0" y="50" width="8" height="6" rx="2" fill="#1f232a"/>
+<rect x="152" y="50" width="8" height="6" rx="2" fill="#1f232a"/>
+</svg>

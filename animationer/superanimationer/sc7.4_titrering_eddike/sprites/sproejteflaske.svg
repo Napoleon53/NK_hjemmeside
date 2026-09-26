@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="110" height="130" viewBox="0 0 110 130">
+  <!-- Sproejteflaske med demineraliseret vand. Tuden peger ned til venstre,
+       og vandet kommer ud ved (8, 34). Bunden er y 128. -->
+  <defs>
+    <linearGradient id="plast" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe3f2" stop-opacity="0.55"/>
+      <stop offset="0.3" stop-color="#f4f9fd" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#bcd4e6" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+  <!-- Tuden -->
+  <path d="M60 28 L60 16 Q60 10 52 10 L22 10 Q14 10 12 18 L8 34" fill="none" stroke="#e8eef3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60 28 L60 16 Q60 10 52 10 L22 10 Q14 10 12 18 L8 34" fill="none" stroke="#9fb0c0" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.7"/>
+  <!-- Laaget -->
+  <rect x="50" y="26" width="22" height="12" rx="2" fill="#e8eef3" stroke="#8a9aaa" stroke-width="1.2"/>
+  <!-- Flasken -->
+  <path d="M52 38 L70 38 Q92 44 92 64 L92 120 Q92 128 84 128 L38 128 Q30 128 30 120 L30 64 Q30 44 52 38 Z"
+        fill="url(#plast)" stroke="#8fa6ba" stroke-width="1.5"/>
+  <path d="M33 78 L89 78 L89 120 Q89 125 84 125 L38 125 Q33 125 33 120 Z" fill="#9fd0f2" fill-opacity="0.5"/>
+  <path d="M33 78 L89 78" stroke="#d6effd" stroke-width="1.2"/>
+  <!-- Etiket -->
+  <rect x="40" y="88" width="42" height="24" rx="3" fill="#ffffff" fill-opacity="0.92" stroke="#9fb0c0" stroke-width="0.8"/>
+  <text x="61" y="104" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" fill="#2a76ac">H₂O</text>
+  <rect x="36" y="50" width="4" height="68" rx="2" fill="#ffffff" fill-opacity="0.35"/>
+</svg>

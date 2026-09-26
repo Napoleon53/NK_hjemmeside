@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc3.5 Vand eller heptan</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at strukturformlerne passer med sumformlerne
+   og valenserne, at de polære grupper findes rigtigt, at svarene passer
+   med reglen fra nabo-animationen (C-atomer pr. polær gruppe mod 4), at
+   hvert stof opfører sig rigtigt i hvert glas (lag, rækkefølge,
+   opløsning), at begge faner kan gennemføres (også med musen), at
+   sproget overholder reglerne, og at layoutet holder fra 520 × 380 til
+   1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens rekord og valg og lægger dem tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc3.5-gaet", "nk-sc3.5-skema-ros", "nk-sc3.5-intro-forsoeg", "nk-sc3.5-intro-gaet"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Massefylde ved 20 °C i g/mL (Databogen) */
+var RHO = { vand: 0.998, heptan: 0.684, glycerol: 1.261, hexanol: 0.814, methanol: 0.792, methansyre: 1.22,
+            ethandiol: 1.113, pentanol: 0.815, octanol: 0.826, hexansyre: 0.929 };
+
+/* Antal C-atomer og polære grupper, talt i hånden */
+var TAL = { vand: [0, 1], heptan: [7, 0], glycerol: [3, 3], hexanol: [6, 1], glucose: [6, 6], urinstof: [1, 3],
+            citronsyre: [6, 4], iod: [0, 0], methanol: [1, 1], methansyre: [1, 1], ethandiol: [2, 2],
+            pentanol: [5, 1], octanol: [8, 1], hexansyre: [6, 1] };
+
+var VALENS = { H: 1, C: 4, N: 3, O: 2, I: 1 };
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, M = NK.Molekyle;
+    paastand("data.js, molekyle.js og glas.js er kørt", !!(D && D.STOFFER && M && M.grupper && NK.Glas));
+    paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-forsoeg"] && NK.sims["fane-gaet"]));
+    var sprites = ["reagensglas", "stativ", "stativ_forkant", "pipette", "spatel", "proeveglas", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var F = NK.sims["fane-forsoeg"], G = NK.sims["fane-gaet"];
+    paastand("Kemichael er koblet på begge faner", !!(F.laerer && G.laerer));
+
+    function steg(sim, s) { for (var i = 0; i < Math.round(s * 60); i++) sim.opdater(1 / 60); sim.tegn(); }
+
+    overskrift("2. Stofferne og formlerne");
+    var ider = Object.keys(D.STOFFER);
+    paastand("14 stoffer: 8 i forsøget og 6 nye i gættelegen", ider.length === 14 && D.FORSOEG.length === 8 && D.GAET_NYE.length === 6 &&
+        D.GAET_NYE.every(function (id) { return D.FORSOEG.indexOf(id) < 0; }));
+    var sumFejl = [], valFejl = [], afstand = [], talFejl = [], rhoFejl = [];
+    ider.forEach(function (id) {
+        var s = D.stof(id), mol = M.laes(s);
+        var t = M.taelAtomer(mol), sum = {};
+        s.sum.replace(/([A-Z][a-z]?)(\d*)/g, function (_, el, n) { if (el) sum[el] = (sum[el] || 0) + (n ? parseInt(n, 10) : 1); return ""; });
+        var ens = Object.keys(sum).length === Object.keys(t).length && Object.keys(sum).every(function (el) { return sum[el] === t[el]; });
+        if (!ens) sumFejl.push(id + " " + JSON.stringify(t));
+        mol.atomer.forEach(function (a, i) {
+            var v = M.naboer(mol, i).reduce(function (x, nb) { return x + nb.n; }, 0);
+            if (v !== VALENS[a.el]) valFejl.push(id + " " + a.el + i + "=" + v);
+        });
+        for (var i = 0; i < mol.atomer.length; i++) {
+            for (var j = i + 1; j < mol.atomer.length; j++) {
+                var bundet = M.naboer(mol, i).some(function (nb) { return nb.j === j; });
+                var a = mol.atomer[i], b = mol.atomer[j];
+                var dd = Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+                if (!bundet && dd < 0.95) afstand.push(id + " " + a.el + i + "/" + b.el + j);
+            }
+        }
+        var g = M.grupper(mol);
+        if (M.antalC(mol) !== TAL[id][0] || g.length !== TAL[id][1]) talFejl.push(id + " " + M.antalC(mol) + "/" + g.length);
+        if (s.tilstand === "vaeske" && Math.abs(s.rho - RHO[id]) > 0.002) rhoFejl.push(id);
+    });
+    paastand("strukturformlerne har de rigtige atomer (sumformlen)", sumFejl.length === 0, sumFejl.join("; "));
+    paastand("hvert atom har sin valens (H 1, C 4, N 3, O 2, I 1)", valFejl.length === 0, valFejl.slice(0, 5).join("; "));
+    paastand("ingen atomer uden binding står oven i hinanden", afstand.length === 0, afstand.slice(0, 5).join("; "));
+    paastand("C-atomer og polære grupper passer med optællingen i hånden", talFejl.length === 0, talFejl.join("; "));
+    paastand("massefylderne passer med Databogen", rhoFejl.length === 0, rhoFejl.join(", "));
+    var cooh = M.grupper(M.laes(D.stof("citronsyre"))).filter(function (x) { return x.slags === "COOH"; });
+    paastand("citronsyre: tre COOH-grupper med C'et i gruppen", cooh.length === 3 && cooh.every(function (x) { return x.atomer.length === 4; }));
+
+    /* Reglen fra 6.5 (sc6.2): C-atomer pr. polær gruppe under 4 giver vand, over 4 heptan */
+    var regel = ider.filter(function (id) {
+        var c = TAL[id][0], n = TAL[id][1];
+        var efterRegel = n === 0 ? "heptan" : (c < 4 * n ? "vand" : (c > 4 * n ? "heptan" : "graense"));
+        return efterRegel !== D.stof(id).blandes;
+    });
+    paastand("svarene passer med reglen i nabo-animationen, og intet stof ligger på grænsen", regel.length === 0, regel.join(", "));
+    ["vand", "heptan"].forEach(function (slags) {
+        var n = D.FORSOEG.concat(D.GAET_NYE).filter(function (id) { return D.stof(id).blandes === slags; }).length;
+        paastand("mindst 5 stoffer blandes med " + slags, n >= 5);
+    });
+    var flydende = ider.filter(function (id) { return D.stof(id).tilstand === "vaeske"; });
+    paastand("de faste stoffer er glucose, urinstof, citronsyre og iod", ider.length - flydende.length === 4 &&
+        ["glucose", "urinstof", "citronsyre", "iod"].every(function (id) { return D.stof(id).tilstand === "fast"; }));
+
+    overskrift("3. Glassene");
+    function test(stofId, opl, portioner) {
+        var g = new NK.Glas(opl), rystninger = 0, t = 0;
+        for (var p = 0; p < (portioner || 1); p++) {
+            g.tilsaet(stofId);
+            for (var i = 0; i < 90 && g.tilsaetT >= 0; i++) g.opdater(1 / 60);
+        }
+        while (!g.resultat && t < 30) {
+            if (g.rystT < 0 && (!g.rystet || g.mereAtRyste())) { g.ryst(); rystninger++; }
+            g.opdater(1 / 60);
+            t += 1 / 60;
+        }
+        return { g: g, rystninger: rystninger, t: t };
+    }
+    var modelFejl = [], raekkeFejl = [], tidFejl = [];
+    ider.forEach(function (id) {
+        D.OPL.forEach(function (opl) {
+            var r = test(id, opl);
+            var s = D.stof(id);
+            if (!r.g.resultat) { modelFejl.push(id + "/" + opl + " intet resultat"); return; }
+            if (r.g.resultat.blandes !== D.blandbar(id, opl)) modelFejl.push(id + "/" + opl);
+            if (r.t > 6) tidFejl.push(id + "/" + opl + " " + r.t.toFixed(1) + " s");
+            var lag = r.g.lag();
+            if (s.tilstand === "vaeske") {
+                if (D.blandbar(id, opl) !== (lag.length === 1)) raekkeFejl.push(id + "/" + opl + " " + lag.length + " lag");
+                if (lag.length === 2) {
+                    var nederst = lag[0].navn === s.navn ? s.rho : D.stof(opl).rho;
+                    var oeverst = lag[1].navn === s.navn ? s.rho : D.stof(opl).rho;
+                    if (!(nederst > oeverst)) raekkeFejl.push(id + "/" + opl + " det tunge lag ligger ikke nederst");
+                }
+            }
+        });
+    });
+    paastand("hvert stof blandes med det rigtige glas (28 forsøg)", modelFejl.length === 0, modelFejl.join(", "));
+    paastand("to lag, når det ikke blandes, og det tungeste lag nederst", raekkeFejl.length === 0, raekkeFejl.join(", "));
+    paastand("hvert forsøg er klar inden 6 s efter én portion", tidFejl.length === 0, tidFejl.join(", "));
+    paastand("iagttagelserne: to lag, ét lag, opløst, opløses næsten ikke",
+        D.iagttagelse("heptan", "vand") === "to lag" && D.iagttagelse("hexanol", "heptan") === "ét lag" &&
+        D.iagttagelse("glucose", "vand") === "opløst" && D.iagttagelse("glucose", "heptan") === "opløses ikke" &&
+        D.iagttagelse("iod", "vand") === "opløses næsten ikke");
+    var tre = test("glucose", "vand", 3);
+    paastand("tre spatelspidser glucose kræver mere end én rystning", tre.g.resultat && tre.rystninger >= 2, tre.rystninger);
+    var iod = test("iod", "heptan");
+    var farve = iod.g.lag()[0].tint;
+    paastand("iod farver heptan violet", farve[0] > farve[1] && farve[2] > farve[1] && farve[3] > 0.25, JSON.stringify(farve));
+    var iv = test("iod", "vand").g.lag()[0].tint;
+    paastand("iod i vand giver kun et svagt skær", iv[3] <= 0.2, iv[3]);
+    var hep = test("heptan", "vand").g.lag();
+    paastand("heptan lægger sig oven på vand", hep[1].navn === "heptan" && hep[0].navn === "vand");
+    var gly = new NK.Glas("vand");
+    gly.tilsaet("glycerol");
+    for (var ii = 0; ii < 90 && gly.tilsaetT >= 0; ii++) gly.opdater(1 / 60);
+    paastand("glycerol ligger for sig, til glasset rystes", gly.blandet < 0.05 && !gly.resultat);
+    var fuld = new NK.Glas("vand");
+    for (var p = 0; p < 4; p++) { fuld.tilsaet("methanol"); for (ii = 0; ii < 90 && fuld.tilsaetT >= 0; ii++) fuld.opdater(1 / 60); }
+    paastand("højst tre portioner i et glas", fuld.portioner === 3 && fuld.fuld());
+
+    overskrift("4. Fane 1: forsøget");
+    klik('[data-fane="fane-forsoeg"]');
+    F.startForfra();
+    F.tilpas();
+    paastand("forsøget starter med heptan og to tomme glas", F.stof === "heptan" && F.glas[0].tom() && F.glas[1].tom());
+    paastand("linjen under scenen siger, hvad man skal", /Træk pipetten/.test(F.statusTekst()));
+    /* Med musen: grib pipetten, træk den over vandglasset og slip */
+    var c = F.L.canvas, r = c.getBoundingClientRect();
+    function mus(type, x, y) {
+        c.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, bubbles: true, pointerId: 1, isPrimary: true }));
+    }
+    var pp = F.pipPos(), gl = F.lay.glas[0];
+    mus("pointerdown", pp.x, pp.y - 60 * F.lay.k);
+    mus("pointermove", pp.x - 30, pp.y - 70 * F.lay.k);
+    mus("pointermove", gl.cx, gl.y + 20 * F.lay.k);
+    paastand("pipetten følger musen og finder vandglasset", F.pip.tilstand === "traek" && F.over === 0, F.pip.tilstand + " " + F.over);
+    mus("pointerup", gl.cx, gl.y + 20 * F.lay.k);
+    steg(F, 1.6);
+    paastand("sluppet over glasset drypper den heptan i vandet", F.glas[0].portioner === 1 && F.glas[0].stof === "heptan");
+    paastand("linjen beder om en rystning", /ryste/.test(F.statusTekst()));
+    mus("pointerdown", gl.cx, F.lay.bordY - 40);
+    mus("pointerup", gl.cx, F.lay.bordY - 40);
+    paastand("et klik på glasset ryster det", F.glas[0].rystT >= 0);
+    steg(F, 4);
+    paastand("skemaet får 'to lag' for heptan i vand", F.skema.heptan && F.skema.heptan.vand && F.skema.heptan.vand.obs === "to lag");
+    paastand("skemaets celle viser det", /to lag/.test(d.querySelector('tr[data-stof="heptan"] td').textContent));
+    /* Et klik på det tomme heptanglas er det samme som at trække pipetten derhen */
+    F.klikGlas(1);
+    steg(F, 1.6);
+    paastand("et klik på et tomt glas drypper stoffet i", F.glas[1].portioner === 1);
+    F.vaelg("glucose");
+    paastand("et nyt stof giver nye glas og spatlen", F.glas[0].tom() && F.glas[1].tom() && F.redskab() === "spatel");
+    /* Resten af skemaet */
+    try { W.localStorage.removeItem("nk-sc3.5-skema-ros"); } catch (e) { /* ingen hukommelse */ }
+    D.FORSOEG.forEach(function (id) {
+        F.vaelg(id);
+        [0, 1].forEach(function (i) {
+            if (F.skema[id] && F.skema[id][D.OPL[i]]) return;
+            F.klikGlas(i);
+            steg(F, 1.7);
+            for (var n = 0; n < 4 && !F.glas[i].resultat; n++) { F.klikGlas(i); steg(F, 3.6); }
+        });
+    });
+    paastand("alle 16 felter i skemaet kan udfyldes", F.skemaFuldt(), F.antalUdfyldt());
+    var skemaFejl = D.FORSOEG.filter(function (id) {
+        return D.OPL.some(function (o) { return !F.skema[id][o] || F.skema[id][o].blandes !== D.blandbar(id, o); });
+    });
+    paastand("skemaet stemmer med stofferne", skemaFejl.length === 0, skemaFejl.join(", "));
+    paastand("Kemichael kommer, når skemaet er fuldt", F.rosVent > 0 || (F.laerer.scene && F.laerer.scene.navn === "skema"));
+    steg(F, 1.5);
+    paastand("… og det huskes, så han kun kommer én gang", W.localStorage.getItem("nk-sc3.5-skema-ros") === "true");
+    /* Paaskeaegget */
+    F.laererNyt();
+    F.paaskeVist = false;
+    var gg = F.glas[1];
+    for (var k = 0; k < 7; k++) { gg.rystT = -1; gg.ryst(); steg(F, 0.1); }
+    paastand("et færdigt glas rystet seks gange giver Kemichaels bemærkning", F.paaskeVist && F.laerer.scene && F.laerer.scene.navn === "ryst");
+    F.laererNyt();
+
+    overskrift("5. Fane 2: gæt polaritet");
+    klik('[data-fane="fane-gaet"]');
+    G.tilpas();
+    G.nyRunde();
+    var runde = G.runde.slice();
+    paastand("en runde er ti stoffer, fem af hver slags, med alle seks nye", runde.length === 10 &&
+        runde.filter(function (id) { return D.stof(id).blandes === "vand"; }).length === 5 &&
+        D.GAET_NYE.every(function (id) { return runde.indexOf(id) >= 0; }) &&
+        runde.every(function (id, i) { return runde.indexOf(id) === i; }));
+    /* Klik paa en polaer gruppe og paa et C */
+    G.runde[0] = "hexansyre";
+    G.nytStof();
+    steg(G, 0.1);
+    var gr = G.grupper[0], a0 = M.px(G.plan, G.mol.atomer[gr.atomer[1]]);
+    G.klikKort(a0);
+    paastand("et klik på COOH giver gruppen sin boble", G.markeret[0] === true && G.antalMarkeret() === 1);
+    var cIdx = G.mol.atomer.findIndex(function (a) { return a.el === "C"; });
+    G.klikKort(M.px(G.plan, G.mol.atomer[cIdx]));
+    paastand("et klik på et C blinker gråt og markerer intet", G.blink && G.blink.atom === cIdx && G.antalMarkeret() === 1);
+    /* Forkert svar med musen: traek pipetten til vandglasset */
+    var c2 = G.L.canvas;
+    r = c2.getBoundingClientRect();
+    function mus2(type, x, y) {
+        c2.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, bubbles: true, pointerId: 2, isPrimary: true }));
+    }
+    var p2 = G.pipPos(), g2 = G.lay.glas[0];
+    mus2("pointerdown", p2.x, p2.y - 60 * G.lay.k);
+    mus2("pointermove", p2.x - 30, p2.y - 70 * G.lay.k);
+    mus2("pointermove", g2.cx, g2.y + 20 * G.lay.k);
+    mus2("pointerup", g2.cx, g2.y + 20 * G.lay.k);
+    paastand("pipetten sluppet over vandglasset er svaret vand", G.svar === "vand" && G.fase === "test1");
+    paastand("svarknapperne er låst, mens forsøget kører", d.querySelector('#gaet-valg [data-svar="heptan"]').disabled && G.el.knap.disabled);
+    steg(G, 7);
+    paastand("forsøget afgør: forkert, ingen point", G.fase !== "test1" && G.point === 0 && /Nej/.test(G.el.besked.textContent));
+    paastand("forklaringen passer til fejlen", /Carbonkæden fylder for meget/.test(G.el.besked.textContent));
+    paastand("bagefter testes det andet glas også", G.glas[1].portioner === 1);
+    paastand("formlen viser facit: polære grupper blå, carbonkæden gul", G.fase === "test2" || G.fase === "faerdig");
+    paastand("stoffet står under Heptan i Sorteret, med kryds", /hexansyre/.test(d.getElementById("gaet-liste-heptan").textContent) &&
+        /✗/.test(d.getElementById("gaet-liste-heptan").textContent));
+    G.knap();
+    paastand("knappen går videre til næste stof", G.nr === 1 && G.fase === "gaet");
+    /* Rigtigt svar med knappen i panelet */
+    G.runde[1] = "methanol";
+    G.nytStof();
+    klik('#gaet-valg [data-svar="vand"]');
+    steg(G, 6);
+    paastand("rigtigt svar giver et point", G.point === 1 && G.stime === 1 && /Rigtigt/.test(G.el.besked.textContent));
+    G.knap();
+    /* Hint og svar */
+    G.runde[2] = "glucose";
+    G.nytStof();
+    G.knap();
+    paastand("hintet markerer alle polære grupper", G.antalMarkeret() === 6 && /Hint/.test(G.el.besked.textContent));
+    paastand("knappen hedder nu Vis svaret", G.el.knap.textContent === "Vis svaret");
+    G.knap();
+    steg(G, 6);
+    paastand("Vis svaret tester det rigtige glas og giver intet point", G.svar === "vand" && G.point === 1 && /Svaret/.test(G.el.besked.textContent));
+    /* Resten af runden */
+    for (var n = 0; n < 12 && !G.slut; n++) {
+        if (G.fase === "gaet") G.vaelg(D.stof(G.stof).blandes);
+        steg(G, 6);
+        G.knap();
+    }
+    paastand("runden kan gøres færdig", G.slut && G.el.knap.textContent === "Ny runde", G.nr);
+    paastand("rekorden huskes", G.rekord === G.point && JSON.parse(W.localStorage.getItem("nk-sc3.5-gaet")).rekord === G.point);
+    steg(G, 3.5);
+    paastand("Kemichael kommer, når runden er slut", G.laerer.scene && G.laerer.scene.navn === "slut");
+    G.laererNyt();
+    G.knap();
+    paastand("Ny runde starter forfra", !G.slut && G.nr === 0 && G.point === 0);
+
+    overskrift("6. Kemichael og tilbuddet");
+    var tb = d.getElementById("gaet-tilbud");
+    G.visTilbud(false);
+    paastand("tilbuddet forsvinder helt efter Nej tak", W.getComputedStyle(tb).display === "none");
+    paastand("replikkerne er højst 60 tegn", D.INTRO_FORSOEG.concat(D.INTRO_GAET, [D.SKEMA_FULDT, D.RYST_FOR_MEGET.blandes, D.RYST_FOR_MEGET.ikke, D.REKORD_REPLIK],
+        D.RUNDE_REPLIK.map(function (x) { return x[1]; })).every(function (l) { return l.length <= 60; }));
+    paastand("to eller tre linjer i hver præsentation", D.INTRO_FORSOEG.length === 3 && D.INTRO_GAET.length === 3);
+
+    overskrift("7. Sproget");
+    var tekster = [d.body.innerText];
+    ider.forEach(function (id) { tekster.push(D.stof(id).hvorfor); });
+    tekster = tekster.concat(D.INTRO_FORSOEG, D.INTRO_GAET, D.RUNDE_REPLIK.map(function (x) { return x[1]; }));
+    ider.forEach(function (id) {
+        G.stof = id; G.mol = M.laes(D.stof(id)); G.grupper = M.grupper(G.mol);
+        tekster.push(G.hint());
+    });
+    G.nyRunde();
+    var alt = tekster.join("\n");
+    paastand("ingen tankestreger (– og —)", !/[–—]/.test(alt), (alt.match(/.{0,20}[–—].{0,20}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/1[+−]/.test(alt));
+    paastand("ingen 'du skal lige'-talesprog", !/\b(lige|bare|faktisk)\b/i.test(D.INTRO_FORSOEG.concat(D.INTRO_GAET).join(" ")));
+
+    overskrift("8. Layout");
+    var ramme = document.getElementById("ramme");
+    [[520, 380], [700, 560], [860, 640], [1100, 700], [1300, 820], [1500, 900]].forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-forsoeg", "fane-gaet"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H, k = lay.k;
+            function inde(q, navn) {
+                if (q.x < -1 || q.y < -1 || q.x + q.b > Wc + 1 || q.y + q.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            var glas = { x: lay.glas[0].x, y: lay.glas[0].y - 24, b: lay.glas[1].x + 60 * k - lay.glas[0].x, h: lay.bordY - lay.glas[0].y + 24 };
+            var vial = { x: lay.vial.x, y: lay.pipTop, b: lay.vial.b, h: lay.bordY - lay.pipTop };
+            inde(lay.kort, "kortet"); inde(lay.rack, "stativet"); inde(vial, "prøven"); inde(glas, "glassene");
+            over(lay.kort, glas, "kortet over glassene");
+            over(lay.kort, vial, "kortet over prøven");
+            over(glas, vial, "glassene over prøven");
+            /* Maerkaterne: 150 px til venstre for stativet og til hoejre for det */
+            if (lay.rack.x - 4 - (Wc >= 700 ? 150 : 110) < -1) problemer.push(id + ": ingen plads til mærkaterne til venstre");
+            if (lay.rack.x + lay.rack.b + 4 + 150 > lay.vial.x + 1 && Wc >= 700) problemer.push(id + ": mærkaterne til højre rammer prøven");
+            /* Pipetten over et glas er inde i billedet */
+            [0, 1].forEach(function (i) {
+                var po = sim.pipOver(i);
+                if (po.y - 170 * k < 0) problemer.push(id + ": pipetten går op over kanten");
+            });
+            if (lay.kort.b < 240) problemer.push(id + ": kortet er kun " + Math.round(lay.kort.b) + " px bredt");
+            /* Den bredeste formel skal kunne læses */
+            var bredest = ["octanol", "citronsyre", "glucose"].map(function (sid) {
+                var mol = M.laes(D.stof(sid));
+                var felt = { x: lay.kort.x + 16, y: lay.kort.y + 40, b: lay.kort.b - 32, h: lay.kort.h - 50 - (id === "fane-gaet" ? 44 : 0) };
+                return M.plan(mol, felt, 46).u;
+            });
+            var mindst = Math.min.apply(null, bredest);
+            if (mindst < 18 && Wc >= 700) problemer.push(id + ": formlen er for lille (" + mindst.toFixed(1) + " px pr. binding)");
+            if (mindst < 14) problemer.push(id + ": formlen er ulæselig (" + mindst.toFixed(1) + ")");
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-forsoeg"]');
+    F.startForfra();
+
+    function klik(sel) {
+        var e = d.querySelector(sel);
+        if (e) e.click();
+    }
+}
+</script>
+</body>
+</html>

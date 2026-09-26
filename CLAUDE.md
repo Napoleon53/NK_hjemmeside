@@ -18,9 +18,13 @@ holdes urørte.
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
 (bl.a. `sc2.1_salt_i_vand`, `sc2.2_saltbygger`, `sc2.3`, `sc2.4`, `sc3.1`, `sc3.4_blandbarhed`,
-`sc3.4_blandbarhed_inaktiv` og `sc4.1_molarmasse`),
+`sc3.4_blandbarhed_inaktiv`, `sc4.1_molarmasse`, `sc4.2_stofmaengde`, `sc4.3_stofmaengdeberegning`, `sc4.4_aekvivalente_maengder`, `sc4.5_maengdeberegning`, `sc4.6_idealgasligningen`, `sc4.10_betydende_cifre`, `sc4.11_kalk_i_muslingeskaller`, `sc5.1_koncentration`, `sc5.2_formel_og_aktuel`, `sc6.1_kogepunkt`, `sc6.6_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike`, `sc8.1_spaendingsraekken`, `sc8.2_oxidationstal` og `sc8.5_kaliumpermanganat`),
 indlæser filer fra `laboratoriet/` og `kemichael/`. Fjernes de, går
 animationerne i sort på kemiformler.dk.
+
+Skal Kemichael opføre sig anderledes i superanimationerne (kaffen, prik,
+baggrundsliv), rettes det i `animationer/superanimationer/kemichael/superanimation.js`,
+som alle superanimationer indlæser lige efter den frosne `kemichael.js`.
 
 **Superanimationerne er flyttet ud af `v2/`** og ligger igen i
 `animationer/superanimationer/` (20. september). De er ikke frosne og rettes

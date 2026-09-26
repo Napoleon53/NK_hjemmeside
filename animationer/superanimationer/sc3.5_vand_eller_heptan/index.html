@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vand eller heptan</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Vand eller heptan</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-forsoeg" role="tab" aria-selected="true"><span class="nr">1</span>Forsøget</button>
+        <button class="faneknap" data-fane="fane-gaet" role="tab" aria-selected="false"><span class="nr">2</span>Gæt polaritet</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FORSOEGET                                                  -->
+<!-- Raekkerne i skemaet bygges af sim_forsoeg.js                       -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
+    <div class="scene medtekst">
+        <canvas id="forsoeg-laerred"></canvas>
+        <div class="anker" id="forsoeg-anker-glas"></div>
+        <div class="anker" id="forsoeg-anker-proeve"></div>
+        <div class="anker" id="forsoeg-anker-kort"></div>
+        <div class="tilbud" id="forsoeg-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="forsoeg-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="forsoeg-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="forsoeg-skema">
+            <h2>Skemaet <span class="taeller">udfyldt <b id="forsoeg-udfyldt">0</b>/16</span></h2>
+            <table class="skema">
+                <thead><tr><th scope="col">Stof</th><th scope="col">Vand</th><th scope="col">Heptan</th></tr></thead>
+                <tbody id="forsoeg-raekker"></tbody>
+            </table>
+            <button class="knap nulstil" id="forsoeg-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: GAET POLARITET                                             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-gaet" role="tabpanel" aria-label="Gæt polaritet">
+    <div class="scene medtekst">
+        <canvas id="gaet-laerred"></canvas>
+        <div class="anker" id="gaet-anker-glas"></div>
+        <div class="anker" id="gaet-anker-proeve"></div>
+        <div class="anker" id="gaet-anker-kort"></div>
+        <div class="tilbud" id="gaet-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="gaet-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="gaet-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste stof -->
+        <div class="kort opgavekort" id="gaet-kort">
+            <h2><span>Gæt polaritet</span><span class="taeller">stof <b id="gaet-nr">1</b>/<span id="gaet-antal">10</span></span></h2>
+            <p class="opgave-spm">Blandes stoffet med vand eller heptan?</p>
+            <div class="valgrad to" id="gaet-valg">
+                <button class="valgknap vand" type="button" data-svar="vand"><span class="pil">←</span>Vand</button>
+                <button class="valgknap heptan" type="button" data-svar="heptan"><span class="pil">→</span>Heptan</button>
+            </div>
+            <p class="besked" id="gaet-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="gaet-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="gaet-runde">
+            <h2>Runden <span class="taeller">rekord <b id="gaet-rekord">0</b></span></h2>
+            <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="gaet-point">0</span></div>
+            <div class="talraekke"><span>I træk</span><span class="tal" id="gaet-stime">0</span></div>
+        </div>
+
+        <div class="kort" id="gaet-sorteret">
+            <h2>Sorteret</h2>
+            <div class="sorteret">
+                <div class="spalte vand"><h3>Blandes med vand</h3><ul id="gaet-liste-vand"></ul></div>
+                <div class="spalte heptan"><h3>Blandes med heptan</h3><ul id="gaet-liste-heptan"></ul></div>
+            </div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Vand eller heptan</h2>
+        <p>Vand er polært. Heptan er upolært. Et stof blandes med det, der ligner det selv: polære stoffer med vand, upolære med heptan.</p>
+        <p>I et organisk molekyle er der to slags dele. De <b>polære grupper</b> (OH, COOH, C=O og NH₂) laver hydrogenbindinger til vandmolekylerne. <b>Carbonkæden</b> med C og H er upolær og blandes med heptan.</p>
+        <p>Har et stof begge dele, afgør forholdet, hvad det blandes med. Mange polære grupper i forhold til C-atomerne trækker mod vand. En lang carbonkæde trækker mod heptan.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: to alkoholer</span>
+            Methanol: 1 OH-gruppe og 1 C-atom. Blandes med vand.<br>
+            Hexan-1-ol: 1 OH-gruppe og 6 C-atomer. Blandes med heptan.
+        </div>
+        <p>I reagensglasset ses det sådan: to væsker, der blandes, giver ét lag. To væsker, der ikke blandes, giver to lag, og den tungeste ligger nederst. Et fast stof, der opløses, forsvinder, når glasset rystes. Ellers ligger det på bunden.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/molekyle.js"></script>
+<script src="js/glas.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/bord.js"></script>
+<script src="js/sim_forsoeg.js"></script>
+<script src="js/sim_gaet.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,10 +1,10 @@
 /* =====================================================================
    model.js - molekylerne i bassinet
 
-   Bassinet er et fast gitter paa 32 x 27 pladser i taet pakning (hver
+   Bassinet er et fast gitter paa 40 x 33 pladser i taet pakning (hver
    anden raekke forskudt en halv plads). En kugle er et molekyle, og
    vaesken er altid taet: alle raekker under overfladen er fulde. Derfor
-   fylder ni portioner bassinet helt, uanset hvor stort billedet er.
+   fylder elleve portioner bassinet helt, uanset hvor stort billedet er.
 
    Fire ting flytter kuglerne:
 
@@ -24,7 +24,7 @@
       damptrykket naar 1 atm: saa dannes der bobler inde i vaesken. Dampen
       stiger op, bliver til draaber i den kolde zone foroven og drypper ned.
    4. Eleven. Det, der haeldes i, falder ned i en straale og trykkes et
-      stykke ned i vaesken. En rystning bytter tilfaeldige kugler rundt.
+      stykke ned i vaesken. En rystning er mange smaa hvirvler.
 
    Koordinater: x mod hoejre og y OPAD fra bunden, i kuglediametre.
    ===================================================================== */
@@ -42,35 +42,36 @@
     /* Modellens tal. Kan pilles ved fra konsollen: NK.Model.PARAM */
     var PARAM = {
         kT20: 0.22,          /* kT ved 20 °C i BINDING's enheder */
-        byt20: 10,           /* byttefoersoeg pr. kugle pr. sekund ved 20 °C */
+        byt20: 5,            /* byttefoersoeg pr. kugle pr. sekund ved 20 °C */
         byttEa: 1800,        /* hvor meget hurtigere det gaar, naar det er varmt (K) */
         G: 4,                /* tyngdens vaegt i byttet mellem to faser */
         cMaks: 8,            /* hvor meget en stor fase vejer i byttet */
         kv: 2.2,             /* draabers fart i raekker/s: kv · (forskel i g/mL)^0,6 · kvadratrod af kugler */
-        svaeve: 0.008,       /* under denne forskel i taethed (g/mL) staar en draabe stille */
+        svaeve: 0.003,       /* under denne forskel (g/mL) staar en draabe stille; ingen blanding af hele portioner kommer saa taet paa olie */
         vMaks: 4,            /* draabers stoerste fart, raekker/s */
-        brown: 6,            /* draabers tilfaeldige skridt pr. s (deles med kvadratroden af kugler) */
+        brown: 3,            /* draabers tilfaeldige skridt pr. s (deles med kvadratroden af kugler) */
         draabeMaks: 150,     /* stoerre klumper flyttes ikke som én */
         udjaevnHver: 0.15,   /* sekunder mellem to bytninger, der flader et lag ud */
         fordamp: 0.04,       /* fordampning fra overfladen pr. sekund ved 1 atm */
         kog: 0.05,           /* bobler pr. kugle pr. sekund pr. atm over 1 atm */
         bobleTrin: 0.045,    /* sekunder pr. raekke, en boble stiger */
-        haeldFart: 130,      /* kugler pr. sekund i straalen */
-        dybde: 11,           /* hvor mange raekker straalen hoejst trykker ned */
-        rystFart: 7,         /* bytninger pr. kugle pr. sekund under rystning */
+        haeldFart: 75,       /* kugler pr. sekund i straalen */
+        dybde: 8,            /* hvor mange raekker straalen hoejst trykker ned */
+        rystTrin: 10,        /* pladser, hver kugle flytter sig pr. sekund under rystning */
         faseByt: 0.35,       /* to faser bytter sjaeldnere: draaber skal presse sig sammen */
-        glid: 11             /* hvor hurtigt en kugle glider paa plads (1/s) */
+        glid: 7              /* hvor hurtigt en kugle glider paa plads (1/s) */
     };
 
     function Model(D, valg) {
         valg = valg || {};
         this.D = D;
-        this.C = valg.kolonner || 32;
-        this.R = valg.raekker || 27;
+        this.C = valg.kolonner || 40;
+        this.R = valg.raekker || 33;
         this.bredde = this.C + 0.5;
         this.fyldHoejde = (this.R - 1) * H + 1;
-        this.hoejde = this.fyldHoejde + (valg.hoved || 5.2);
-        this.koelFra = this.hoejde - 1.7;          /* den kolde zone foroven */
+        /* Luften foroven og den kolde zone passer til sprites/bassin.svg */
+        this.hoejde = this.fyldHoejde + (valg.hoved || 7.077);
+        this.koelFra = this.hoejde - (valg.koel || 2.118);
         this.tilf = valg.tilfaeldig || Math.random;
 
         var n = D.STOFFER.length, a, b;
@@ -487,7 +488,8 @@
             if (!vaegt) return;
             var drho = sum / vaegt - komp.rho;
             /* Smaa forskelle giver lidt hurtigere draaber end Stokes, saa
-               man ikke skal vente et halvt minut; under svaeve staar de stille */
+               man ikke skal vente et halvt minut. Ved lige dele vand og
+               ethanol (0,926 mod 0,92 g/mL) er olien alligevel laenge om det. */
             var adr = Math.abs(drho);
             var v = adr < PARAM.svaeve ? 0 : (drho > 0 ? 1 : -1) * PARAM.kv * Math.pow(adr, 0.6) * Math.sqrt(komp.n);
             v = klamp(v, -PARAM.vMaks, PARAM.vMaks);
@@ -738,7 +740,7 @@
             h.rest--;
             var x = this.bredde / 2 + (this.tilf() - 0.5) * 0.8;
             var b = this.nyKugle(h.art, FALD, x, this.hoejde + 1 + this.tilf() * 0.6);
-            this.kugler[b].vy = -9;
+            this.kugler[b].vy = -4;
         }
         if (h.rest <= 0) this.haeld.shift();
     };
@@ -749,7 +751,7 @@
         for (i = 0; i < n; i++) {
             var k = this.kugler[i];
             if (k.tilst === FALD) {
-                k.vy -= 30 * dt;
+                k.vy -= 16 * dt;
                 k.y += k.vy * dt;
                 k.x += k.vx * dt;
                 if (k.y <= this.overflade() + 0.3) this.lodNed(i, true);
@@ -870,20 +872,63 @@
 
     /* ----- 4. Rystningen ------------------------------------------------ */
 
+    /* En rystning er hvirvler: en ring af kugler om et tilfaeldigt
+       midtpunkt drejer et par pladser rundt, og kuglerne glider i en bue.
+       Mange smaa hvirvler foelder lagene ind i hinanden, saa olien bliver
+       til draaber i vandet, uden at kuglerne springer paa kryds og tvaers. */
     P.rystBytte = function (dt) {
         var liste = [], i;
         for (i = 0; i < this.plads.length; i++) if (this.plads[i] >= 0) liste.push(i);
-        if (liste.length < 2) return;
-        var n = Math.round(liste.length * PARAM.rystFart * this.rystStyrke * dt);
-        var C = this.C, R = this.R;
-        for (i = 0; i < n; i++) {
-            var k = liste[(this.tilf() * liste.length) | 0];
-            var r = this.raekke(k), c = k - r * C;
-            var r2 = r + Math.round((this.tilf() - 0.5) * 14), c2 = c + Math.round((this.tilf() - 0.5) * 16);
-            if (r2 < 0 || r2 >= R || c2 < 0 || c2 >= C) continue;
-            var j = r2 * C + c2;
-            if (j === k || this.plads[j] < 0 || this.plads[k] < 0) continue;
-            this.byt(k, j);
+        if (liste.length < 7) return;
+        var maal = liste.length * PARAM.rystTrin * this.rystStyrke * dt, flyttet = 0;
+        for (var forsoeg = 0; flyttet < maal && forsoeg < 80; forsoeg++) {
+            var d = 1 + ((this.tilf() * 4) | 0);
+            var ring = this.ring(liste[(this.tilf() * liste.length) | 0], d);
+            if (!ring) continue;
+            var trin = 1 + ((this.tilf() * d) | 0);
+            this.drejRing(ring, trin, this.tilf() < 0.5 ? 1 : -1);
+            flyttet += ring.length * trin;
+        }
+    };
+
+    /* Pladserne i ringen med radius d om plads k, i raekkefoelge rundt.
+       null, hvis ringen rammer en vaeg, overfladen eller en boble. */
+    var RETNING = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
+    P.ring = function (k, d) {
+        var r = this.raekke(k), c = k - r * this.C;
+        var q = c - (r - (r & 1)) / 2 + RETNING[4][0] * d, rr = r + RETNING[4][1] * d;
+        var ud = [];
+        for (var side = 0; side < 6; side++) {
+            for (var t = 0; t < d; t++) {
+                var cc = q + (rr - (rr & 1)) / 2;
+                if (rr < 0 || rr >= this.R || cc < 0 || cc >= this.C) return null;
+                var s = rr * this.C + cc;
+                if (this.plads[s] < 0 || this.boble[s]) return null;
+                ud.push(s);
+                q += RETNING[side][0];
+                rr += RETNING[side][1];
+            }
+        }
+        return ud;
+    };
+
+    /* Drejer ringen trin pladser rundt; hver kugle glider gennem de
+       pladser, den passerer */
+    P.drejRing = function (ring, trin, retning) {
+        var n = ring.length, mig = this;
+        var kugler = ring.map(function (s) { return mig.plads[s]; });
+        var id = ring.map(function (s) { return mig.kompId[s]; });
+        for (var i = 0; i < n; i++) {
+            var til = ((i + retning * trin) % n + n) % n, s = ring[til], b = kugler[i];
+            this.plads[s] = b;
+            this.kompId[s] = id[i];
+            var kugle = this.kugler[b], vej = [];
+            kugle.k = s;
+            for (var t = 1; t <= trin; t++) {
+                var p = ring[((i + retning * t) % n + n) % n];
+                vej.push({ x: this.px(p), y: this.py(p) });
+            }
+            kugle.vej = vej;
         }
     };
 

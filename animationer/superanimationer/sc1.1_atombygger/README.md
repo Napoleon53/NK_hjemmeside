@@ -12,8 +12,9 @@ gæt-ladningen-øvelsen og elektronoverførslen til et salt. Resten er bygget om
 
 Den gamle animation ligger nu i `animationer/kemi-c-filer/arkiv/c1.1_atommodel_ioner_oldversion.html`.
 Den oprindelige sti, `c1.1_atommodel_ioner.html`, er en genvej (meta-refresh +
-JS-redirect) til denne superanimations `index.html`, så de eksisterende knapper
-i `samling_c1.html` og `samling_NV.html` ikke behøvede at blive ændret.
+JS-redirect) til denne superanimations `index.html`. Siden 26. sept. 2026 peger
+knapperne i `samling_c1.html` og `samling_NV.html` direkte hertil; genvejen er
+kun tilbage for gamle links udefra.
 
 ## Hvad viser den
 
@@ -187,11 +188,10 @@ ikke lige nu, springes trinnet automatisk over. Rundvisningen blokerer klik
 og tastaturgenveje på resten af siden, mens den er åben, og lukker sig selv,
 hvis man skifter fane.
 
-## Den er nu i menuen
+## I menuen
 
-`samling_c1.html` og `samling_NV.html` peger stadig på den gamle sti
-(`c1.1_atommodel_ioner.html`), men den sti er nu selv genvejen til denne
-superanimation — se ovenfor. Ingen af knapperne er derfor ændret.
+Knappen c1.1 i `samling_c1.html` og `samling_NV.html` peger fra 26. sept. 2026
+direkte på `sc1.1_atombygger/index.html`, ikke længere via genvejen.
 
 Feedback-boksen i `animationer/samling_alt.html` har allerede pladsen: i
 `FEEDBACK_EMNER` står `C1: Atomer` med `{ nr: 1, navn: 'Atommodel' }` — det navn

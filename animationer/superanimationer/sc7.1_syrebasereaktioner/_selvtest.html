@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc7.1 Syre-base-reaktioner</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at formlerne og ladningerne passer, at hver
+   struktur opfylder oktetreglen før og efter hydronen er flyttet, at
+   modellen udpeger den samme syre som opgaverne, at træningens par
+   bevarer H og ladning, at de forkerte svar aldrig er rigtige, at
+   mærkaterne vurderes rigtigt, at alle tre faner kan gennemføres (også
+   med musen), at Kemichael kommer, når han skal, at sproget overholder
+   reglerne, og at layoutet holder fra 520 × 380 til 1500 × 900.
+
+   Kræver en lokal server med animationer/ som rod (Kemichael hentes
+   derfra). Testen gemmer elevens fremskridt og lægger det tilbage.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc7.1-hydron", "nk-sc7.1-produkter", "nk-sc7.1-par", "nk-sc7.1-niveau",
+    "nk-sc7.1-intro-hydron", "nk-sc7.1-intro-produkter", "nk-sc7.1-intro-par", "nk-kemichael"];
+var gemt = {};
+try { NOEGLER.forEach(function (n) { gemt[n] = localStorage.getItem(n); localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+
+var ramme = document.getElementById("ramme");
+ramme.addEventListener("load", function () { setTimeout(koer, 1500); });
+ramme.src = "index.html";
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) localStorage.removeItem(n); else localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    function tik(sim, sek) {
+        var n = Math.round(sek * 60);
+        for (var i = 0; i < n; i++) { sim.tilpas(); sim.opdater(1 / 60); }
+        sim.tegn();
+    }
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function mus(sim, type, x, y) {
+        var r = sim.L.canvas.getBoundingClientRect();
+        var e = new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 1, bubbles: true, isPrimary: true, button: 0 });
+        sim.L.canvas.dispatchEvent(e);
+    }
+    function traek(sim, x0, y0, x1, y1) {
+        mus(sim, "pointerdown", x0, y0);
+        for (var i = 1; i <= 8; i++) mus(sim, "pointermove", x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * i / 8);
+        mus(sim, "pointerup", x1, y1);
+    }
+    function vises(el) { return !!el && W.getComputedStyle(el).display !== "none" && !el.closest("[hidden]"); }
+    function ingenScene(sim) { return !(sim.laerer && sim.laerer.scene); }
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, S = NK.Syrebase, M = NK.Mol;
+    paastand("data.js og model.js er kørt", !!(D && D.FAM && S && M));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-hydron"] && NK.sims["fane-produkter"] && NK.sims["fane-par"]));
+    var sprites = ["kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("Kemichaels " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var A = NK.sims["fane-hydron"], B = NK.sims["fane-produkter"], C = NK.sims["fane-par"];
+    paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
+
+    overskrift("2. Formlerne og rollerne");
+    var ventet = { "cl:1": "HCl", "cl:0": "Cl⁻", "vand:3": "H₃O⁺", "vand:2": "H₂O", "vand:1": "OH⁻", "nh:4": "NH₄⁺", "nh:3": "NH₃",
+        "ac:1": "CH₃COOH", "ac:0": "CH₃COO⁻", "po4:3": "H₃PO₄", "po4:1": "HPO₄²⁻", "po4:0": "PO₄³⁻", "co3:1": "HCO₃⁻",
+        "co3:0": "CO₃²⁻", "so4:1": "HSO₄⁻", "no3:0": "NO₃⁻", "fo:1": "HCOOH" };
+    var forkerteF = Object.keys(ventet).filter(function (id) { return S.formel(id) !== ventet[id]; });
+    paastand("formlerne skrives som i bogen (" + Object.keys(ventet).length + " stk.)", forkerteF.length === 0, forkerteF.map(function (id) { return S.formel(id); }).join(" "));
+    paastand("ladning ±1 skrives uden 1", S.formel("cl:0") === "Cl⁻" && S.formel("vand:3") === "H₃O⁺" && S.formel("cl:0", 1) === "Cl⁺");
+    D.HYDRON.forEach(function (o, i) {
+        var r = S.roller(o.a, o.b);
+        paastand("reaktion " + (i + 1) + ": modellen siger, at " + S.formel(o.syre) + " er syren", !!r && r.syre === o.syre, r && r.syre);
+    });
+    paastand("H₂O er base over for HCl og syre over for NH₃", S.roller("cl:1", "vand:2").base === "vand:2" && S.roller("nh:3", "vand:2").syre === "vand:2");
+    paastand("HCO₃⁻ + H₂O er for tvetydig til træningen", !S.gyldig("co3:1", "vand:2"));
+    paastand("HCO₃⁻ + CO₃²⁻ er ingen reaktion", !S.gyldig("co3:1", "co3:0"));
+    paastand("NH₄⁺ + CH₃COO⁻ forløber ikke og er ikke med", !S.gyldig("nh:4", "ac:0"));
+    paastand("SO₄²⁻ + H₂O er for svag til at være med", !S.gyldig("so4:0", "vand:2"));
+    paastand("H₃O⁺ + OH⁻ er med", !!S.gyldig("vand:3", "vand:1"));
+    var antal = {}, brud = [];
+    D.NIVEAU_RAEKKE.forEach(function (n) {
+        var par = S.par(n);
+        antal[n] = par.length;
+        par.forEach(function (p) {
+            var o = S.opgave(p.roller.syre, p.roller.base, true);
+            var h = S.del(o.syre).n + S.del(o.base).n - S.del(o.kb).n - S.del(o.ks).n;
+            var q = S.ladning(o.syre) + S.ladning(o.base) - S.ladning(o.kb) - S.ladning(o.ks);
+            if (h || q || !S.findes(o.kb) || !S.findes(o.ks)) brud.push(o.noegle);
+            var medVand = p.a === "vand:2" || p.b === "vand:2";
+            if (n === "let" && !medVand) brud.push("let uden vand " + p.noegle);
+            if (n === "middel" && medVand) brud.push("middel med vand " + p.noegle);
+            if (n === "svaer" && D.NIVEAUER.svaer.flere.indexOf(p.a) < 0 && D.NIVEAUER.svaer.flere.indexOf(p.b) < 0) brud.push("svær uden flere " + p.noegle);
+        });
+    });
+    paastand("Let " + antal.let + ", Middel " + antal.middel + " og Svær " + antal.svaer + " reaktioner (mindst 10 hver)", antal.let >= 10 && antal.middel >= 10 && antal.svaer >= 10);
+    paastand("hver træningsreaktion bevarer H og ladning og passer til sit niveau", brud.length === 0, brud.slice(0, 4).join("; "));
+
+    overskrift("3. Strukturerne");
+    function tjekMol(m) {
+        var galt = [];
+        m.atomer.forEach(function (a, i) {
+            if (a.vaek || a.gruppe) return;
+            var e = M.elektroner(m, i), maal = a.s === "H" ? 2 : 8;
+            var ok = (a.s === "P" || a.s === "S") ? e >= 8 : e === maal;
+            if (!ok || M.frie(m, i) % 1) galt.push(a.s + i + " har " + e);
+        });
+        var p = S.del(m.art), kerneH = D.KERNE_H[p.fam] || 0;
+        if (M.hAntal(m) - kerneH !== p.n) galt.push("H passer ikke med " + m.art);
+        if (M.ladning(m) !== S.ladning(m.art)) galt.push("ladningen passer ikke med " + m.art);
+        return galt;
+    }
+    var strukGalt = [];
+    Object.keys(D.STRUKTUR).forEach(function (id) { strukGalt = strukGalt.concat(tjekMol(M.lav(id, false)), tjekMol(M.lav(id, true))); });
+    paastand("alle " + Object.keys(D.STRUKTUR).length + " strukturer: oktet (duet for H), rigtig ladning og antal H", strukGalt.length === 0, strukGalt.slice(0, 3).join("; "));
+    var overGalt = [], antalOver = 0;
+    D.HYDRON.forEach(function (o) {
+        var base = o.a === o.syre ? o.b : o.a;
+        M.loseH(M.lav(o.syre, false)).forEach(function (h) {
+            var ms = M.lav(o.syre, false), info = M.fjernH(ms, h);
+            if (ms.art !== S.korr(o.syre, -1)) overGalt.push("syren blev " + ms.art);
+            overGalt = overGalt.concat(tjekMol(ms));
+            M.modtagere(M.lav(base, true)).forEach(function (a) {
+                M.parVinkler(M.lav(base, true), a).forEach(function (v) {
+                    var mb = M.lav(base, true);
+                    M.tilfoejH(mb, a, v);
+                    antalOver++;
+                    if (mb.art !== S.korr(base, 1)) overGalt.push("basen blev " + mb.art);
+                    overGalt = overGalt.concat(tjekMol(mb));
+                });
+            });
+            M.tilbage(ms, info);
+            if (ms.art !== o.syre || tjekMol(ms).length) overGalt.push("tilbage " + o.syre);
+        });
+    });
+    paastand("hver hydron kan flyttes til hvert frit par (" + antalOver + " måder), og begge sider holder oktetreglen", overGalt.length === 0, overGalt.slice(0, 3).join("; "));
+    var ac = M.lav("ac:1", false);
+    paastand("eddikesyre: 1 H kan tages, 3 H på C sidder fast", M.loseH(ac).length === 1 && M.fasteH(ac).length === 3);
+    paastand("OH⁻ tager imod med O, og CH₃COO⁻ med det negative O", M.modtagere(M.lav("vand:1")).length === 1 &&
+        (function () { var m = M.lav("ac:1"); M.fjernH(m, 7); var r = M.modtagere(m); return r.length === 1 && m.atomer[r[0]].q === -1; }()));
+
+    overskrift("4. De forkerte svar og mærkaterne");
+    var fkGalt = [], fkFaa = [];
+    D.NIVEAU_RAEKKE.forEach(function (n) {
+        S.par(n).forEach(function (p) {
+            var o = S.opgave(p.roller.syre, p.roller.base, true), fk = S.forkerte(o);
+            var rig = [S.formel(o.kb), S.formel(o.ks)];
+            if (fk.length < 4) fkFaa.push(o.noegle + " " + fk.length);
+            fk.forEach(function (f) { if (rig.indexOf(f.f) >= 0 || !f.hvorfor) fkGalt.push(f.f); });
+        });
+    });
+    paastand("hver reaktion har mindst fire forkerte svar", fkFaa.length === 0, fkFaa.slice(0, 3).join("; "));
+    paastand("et forkert svar er aldrig et af de rigtige, og det har en forklaring", fkGalt.length === 0, fkGalt.slice(0, 3).join(" "));
+    var fkHCl = S.forkerte(S.opgave("cl:1", "vand:2", true)).map(function (f) { return f.f; });
+    paastand("HCl + H₂O: Cl, Cl⁺, H₃O, OH⁻ og H₂Cl⁺ er blandt de forkerte", ["Cl", "Cl⁺", "H₃O", "OH⁻", "H₂Cl⁺"].every(function (f) { return fkHCl.indexOf(f) >= 0; }), fkHCl.join(" "));
+    var fkP = S.forkerte(S.opgave("po4:3", "vand:2", true)).map(function (f) { return f.f; });
+    paastand("H₃PO₄ + H₂O: HPO₄²⁻ (to hydroner) er blandt de forkerte", fkP.indexOf("HPO₄²⁻") >= 0);
+    var mkGalt = [];
+    D.NIVEAU_RAEKKE.forEach(function (n) {
+        S.par(n).forEach(function (p) {
+            var o = S.opgave(p.roller.syre, p.roller.base, true), arter = o.reaktanter.concat(o.produkter);
+            S.MAERKER.forEach(function (mk) {
+                arter.forEach(function (id, k) {
+                    var ret = S.maerkeArt(o, mk);
+                    var rigtig = (k < 2) === (mk === "syre" || mk === "base") && S.formel(ret) === S.formel(id);
+                    var svar = S.maerkeFejl(o, mk, id, k < 2);
+                    if (rigtig !== (svar === "")) mkGalt.push(o.noegle + " " + mk + " på " + id);
+                });
+            });
+        });
+    });
+    paastand("hvert mærkat på hvert stof vurderes rigtigt, og et forkert får en forklaring", mkGalt.length === 0, mkGalt.slice(0, 3).join("; "));
+    var oH2O = S.opgave("vand:3", "vand:1", true);
+    paastand("H₃O⁺ + OH⁻: begge H₂O kan få korresp. base og korresp. syre", S.maerkeFejl(oH2O, "kb", "vand:2", false) === "" && S.maerkeFejl(oH2O, "ks", "vand:2", false) === "");
+    paastand("syre på H₂O over for HCl forklarer, at H₂O her tager imod", /tager den imod/.test(S.maerkeFejl(S.opgave("cl:1", "vand:2", true), "syre", "vand:2", true)));
+
+    overskrift("5. Fane 1: Hydronen");
+    klik('[data-fane="fane-hydron"]');
+    tik(A, 0.5);
+    var tilbudA = d.getElementById("hydron-tilbud");
+    paastand("tilbuddet om præsentationen står der første gang", vises(tilbudA));
+    klik("#hydron-tilbud .tilbud-nej");
+    paastand("Nej tak fjerner knapperne", !vises(tilbudA));
+    A.nyOpgave(0); tik(A, 0.3);
+    paastand("første reaktion er HCl + H₂O med HCl til venstre", A.ids[0] === "cl:1" && A.ids[1] === "vand:2" && A.syreSide === 0);
+    var hH = M.loseH(A.mols[0])[0], fra = A.atomPx(0, hH), til = A.parVed(1, fra);
+    traek(A, fra.x, fra.y, til.x, til.y);
+    tik(A, 0.8);
+    paastand("et H trukket fra HCl over på vandet giver Cl⁻ og H₃O⁺", A.loest && A.mols[0].art === "cl:0" && A.mols[1].art === "vand:3");
+    paastand("Cl⁻ har fire frie par og H₃O⁺ ét", M.frie(A.mols[0], 0) === 4 && M.frie(A.mols[1], 0) === 1);
+    paastand("parkortet viser HCl / Cl⁻ og H₃O⁺ / H₂O", /HCl \/ Cl⁻/.test(d.getElementById("hydron-parliste").textContent) &&
+        /H₃O⁺ \/ H₂O/.test(d.getElementById("hydron-parliste").textContent));
+    paastand("knappen hedder Næste reaktion", A.el.knap.textContent === "Næste reaktion");
+    A.knap(); tik(A, 0.3);
+    paastand("Næste reaktion går til reaktion 2", A.opgNr === 1 && !A.loest);
+    /* Eddikesyre: H paa C sidder fast */
+    A.nyOpgave(2); tik(A, 0.3);
+    var sA = A.syreSide, fastH = M.fasteH(A.mols[sA])[0], pF = A.atomPx(sA, fastH);
+    mus(A, "pointerdown", pF.x, pF.y); mus(A, "pointerup", pF.x, pF.y);
+    tik(A, 0.1);
+    paastand("et H på C ryster og sidder fast", !A.hold && A.ryst && M.hAntal(A.mols[sA]) === 4 && /bliver siddende/.test(A.el.besked.textContent));
+    /* Ammoniak og vand: forkert vej og saa den rigtige */
+    A.nyOpgave(3); tik(A, 0.3);
+    var sN = A.ids.indexOf("nh:3"), sV = 1 - sN;
+    var hN = M.loseH(A.mols[sN])[0], pN = A.atomPx(sN, hN), tilV = A.parVed(sV, pN);
+    traek(A, pN.x, pN.y, tilV.x, tilV.y);
+    tik(A, 0.1);
+    var besked = A.el.besked.textContent;
+    tik(A, 1.5);
+    paastand("et H fra NH₃ sluppet på vandet hopper tilbage med en forklaring", !A.loest && A.mols[sN].art === "nh:3" && A.mols[sV].art === "vand:2" &&
+        /NH₃ afgiver ikke en hydron/.test(besked), besked);
+    var hV = M.loseH(A.mols[sV])[0], pV = A.atomPx(sV, hV), tilN = A.parVed(sN, pV);
+    traek(A, pV.x, pV.y, tilN.x, tilN.y);
+    tik(A, 0.8);
+    paastand("et H fra vandet over på NH₃ giver NH₄⁺ og OH⁻", A.loest && A.mols[sN].art === "nh:4" && A.mols[sV].art === "vand:1");
+    /* Sluppet i tomrummet: tilbage */
+    A.nyOpgave(4); tik(A, 0.3);
+    var sC = A.syreSide, hC = M.loseH(A.mols[sC])[0], pC = A.atomPx(sC, hC);
+    traek(A, pC.x, pC.y, pC.x, 12);
+    tik(A, 1);
+    paastand("en hydron sluppet i luften flyver hjem", !A.loest && A.mols[sC].art === "cl:1");
+    /* Paaskeaegget */
+    traek(A, pC.x, pC.y, A.lay.kop.x, A.lay.kop.y - 20);
+    tik(A, 0.6);
+    paastand("en hydron i kaffen: Kemichael kommer", A.laerer.scene && A.laerer.scene.navn === "kaffeSur");
+    tik(A, 8);
+    paastand("og hydronen kommer tilbage", A.mols[sC].art === "cl:1" && !A.flyv && !A.hold);
+    /* Hint og Vis svaret for resten */
+    A.nyOpgave(5); tik(A, 0.3);
+    A.knap();
+    paastand("knappen giver først et hint", /Hint/.test(A.el.besked.textContent) && A.el.knap.textContent === "Vis svaret");
+    A.knap(); tik(A, 2);
+    paastand("Vis svaret flytter hydronen fra H₃O⁺ til OH⁻", A.loest && A.mols.every(function (m) { return m.art === "vand:2"; }));
+    [1, 2, 4, 6, 7, 8, 9].forEach(function (n) { A.nyOpgave(n); tik(A, 0.2); A.knap(); A.knap(); tik(A, 2); });
+    paastand("alle ti reaktioner er løst", A.loeste.length === 10, A.loeste.join());
+    tik(A, 2);
+    paastand("Kemichael roser efter ti", A.laerer.scene && A.laerer.scene.navn === "faerdig");
+    paastand("knappen går videre til Produkterne", A.el.knap.textContent === "Videre til Produkterne");
+    tik(A, 9);
+    A.knap();
+    paastand("den åbner fane 2", d.getElementById("fane-produkter").classList.contains("aktiv"));
+    klik('[data-fane="fane-hydron"]');
+    klik("#hydron-forfra"); tik(A, 0.5);
+    paastand("Start forfra: ingen løste, reaktion 1", A.loeste.length === 0 && A.opgNr === 0 && !A.loest);
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (n) { A.nyOpgave(n); tik(A, 0.2); A.knap(); A.knap(); tik(A, 2); });
+    tik(A, 2);
+    paastand("anden gang roser Kemichael ikke igen", A.loeste.length === 10 && !(A.laerer.scene && A.laerer.scene.navn === "faerdig"));
+
+    overskrift("6. Fane 2: Produkterne");
+    klik('[data-fane="fane-produkter"]');
+    tik(B, 0.4);
+    var tilbudB = d.getElementById("prod-tilbud");
+    paastand("tilbuddet står der første gang", vises(tilbudB));
+    klik("#prod-tilbud .tilbud-nej");
+    paastand("Nej tak fjerner knapperne", !vises(tilbudB));
+    klik('#prod-niveau [data-niveau="let"]');
+    tik(B, 0.3);
+    paastand("Let: reaktionen har vand", B.opg.reaktanter.indexOf("vand:2") >= 0);
+    var iF = B.brikker.findIndex(function (b) { return !b.rigtig; }), bF = B.brikker[iF];
+    mus(B, "pointerdown", bF.r.x + bF.r.b / 2, bF.r.y + bF.r.h / 2); mus(B, "pointerup", bF.r.x + bF.r.b / 2, bF.r.y + bF.r.h / 2);
+    tik(B, 0.1);
+    paastand("et klik på et forkert svar giver dets forklaring", !B.pladser[0] && B.el.besked.textContent === bF.hvorfor && B.glimt);
+    B.nyOpgave(); tik(B, 0.3);
+    var rig = B.brikker.filter(function (b) { return b.rigtig; });
+    var b0 = rig[0], P0 = B.pladsR[0];
+    traek(B, b0.r.x + b0.r.b / 2, b0.r.y + b0.r.h / 2, P0.x + P0.b / 2, P0.y + P0.h / 2);
+    tik(B, 0.1);
+    paastand("et rigtigt produkt kan trækkes op på pladsen", B.pladser[0] === b0.tekst);
+    var b1 = rig[1] || rig[0];
+    mus(B, "pointerdown", b1.r.x + b1.r.b / 2, b1.r.y + b1.r.h / 2); mus(B, "pointerup", b1.r.x + b1.r.b / 2, b1.r.y + b1.r.h / 2);
+    tik(B, 2);
+    paastand("det andet ved et klik, og så er den løst: 1 i træk", B.loest && B.iTraek === 1 && B.el.knap.textContent === "Ny reaktion");
+    var gammel = B.opg.noegle;
+    B.knap(); tik(B, 0.2);
+    paastand("Ny reaktion giver en anden reaktion", B.opg.noegle !== gammel && !B.loest);
+    B.knap();
+    paastand("knappen giver et hint med syren og basen", /er syren/.test(B.el.besked.textContent) && B.el.knap.textContent === "Vis svaret");
+    B.knap(); tik(B, 1);
+    paastand("Vis svaret udfylder og tæller ikke med", B.loest && B.iTraek === 0);
+    klik('#prod-niveau [data-niveau="svaer"]');
+    tik(B, 0.2);
+    var flere = D.NIVEAUER.svaer.flere;
+    paastand("Svær: nyt sæt, og knapperne følger med på fane 3", S.niveau === "svaer" && B.opg.reaktanter.some(function (id) { return flere.indexOf(id) >= 0; }) &&
+        d.querySelector('#par-niveau [data-niveau="svaer"]').classList.contains("aktiv"));
+    for (var n = 0; n < 10; n++) {
+        B.nyOpgave();
+        var rs = B.rigtige.slice();
+        rs.forEach(function (t) { B.placer(B.brikker.findIndex(function (b) { return b.tekst === t; }), null); });
+        tik(B, 0.1);
+    }
+    tik(B, 2);
+    paastand("ti i træk: Kemichael kommer", B.iTraek === 10 && B.laerer.scene && B.laerer.scene.navn === "tiITraek", B.iTraek);
+    paastand("rekorden er gemt", B.rekord.svaer === 10);
+
+    overskrift("7. Fane 3: Parrene");
+    klik('[data-fane="fane-par"]');
+    tik(C, 0.4);
+    var tilbudC = d.getElementById("par-tilbud");
+    paastand("tilbuddet står der første gang", vises(tilbudC));
+    klik("#par-tilbud .tilbud-nej");
+    paastand("Nej tak fjerner knapperne", !vises(tilbudC));
+    klik('#par-niveau [data-niveau="let"]');
+    tik(C, 0.3);
+    var f = C.facit(), iSyre = 0, hj = C.hjem[iSyre];
+    var PB = C.pladsR[f.base];
+    traek(C, hj.x + hj.b / 2, hj.y + hj.h / 2, PB.x + PB.b / 2, PB.y + PB.h / 2);
+    tik(C, 0.1);
+    paastand("syre trukket hen under basen hopper tilbage med en forklaring", C.brikker[0].kol === null && C.el.besked.className.indexOf("skidt") >= 0, C.el.besked.textContent);
+    var PS = C.pladsR[f.syre];
+    traek(C, hj.x + hj.b / 2, hj.y + hj.h / 2, PS.x + PS.b / 2, PS.y + PS.h / 2);
+    tik(C, 0.1);
+    paastand("syre trukket hen under syren bliver siddende", C.brikker[0].kol === f.syre);
+    var hk = C.hjem[2], PK = C.pladsR[f.kb];
+    mus(C, "pointerdown", hk.x + 5, hk.y + 5); mus(C, "pointerup", hk.x + 5, hk.y + 5);
+    paastand("et klik vælger mærkatet", C.valgt === 2);
+    mus(C, "pointerdown", PK.x + PK.b / 2, PK.y + PK.h / 2); mus(C, "pointerup", PK.x + PK.b / 2, PK.y + PK.h / 2);
+    paastand("og et klik på formlen sætter det", C.brikker[2].kol === f.kb && C.valgt === null);
+    C.saet(1, f.base); C.saet(3, f.ks);
+    tik(C, 2);
+    paastand("alle fire: løst, og 0 i træk (der var en fejl)", C.loest && C.iTraek === 0);
+    C.nyOpgave(); tik(C, 0.2);
+    f = C.facit();
+    S.MAERKER.forEach(function (mk, i) { C.saet(i, f[mk]); });
+    paastand("uden fejl: 1 i træk", C.loest && C.iTraek === 1);
+    /* H₃O⁺ + OH⁻: begge H₂O kan tage begge korresponderende */
+    C.nyOpgave();
+    C.opg = S.opgave("vand:3", "vand:1", true);
+    C.arter = C.opg.reaktanter.concat(C.opg.produkter);
+    C.stil(); tik(C, 0.1);
+    C.saet(0, 0); C.saet(1, 1); C.saet(3, 2); C.saet(2, 3);
+    paastand("H₃O⁺ + OH⁻: korresp. syre og base kan stå på hver sin H₂O", C.loest);
+    C.nyOpgave(); tik(C, 0.2);
+    C.knap(); C.knap(); tik(C, 1);
+    paastand("hint og Vis svaret sætter alle fire", C.loest && C.brikker.every(function (b) { return b.kol !== null; }) && C.iTraek === 0);
+
+    overskrift("8. Kemichaels præsentation");
+    [["fane-hydron", A], ["fane-produkter", B], ["fane-par", C]].forEach(function (x) {
+        klik('[data-fane="' + x[0] + '"]');
+        var sim = x[1];
+        tik(sim, 12);
+        sim.startIntro(true);
+        tik(sim, 3);
+        var iIntro = sim.laererIIntro();
+        var ryk = sim.fri > 50;
+        klik("#" + sim.el.knap.id.replace("-knap", "-spring"));
+        tik(sim, 4);
+        paastand(x[0] + ": K viser præsentationen, indholdet rykker til højre, og knappen sender ham ud", iIntro && ryk && !sim.laererIIntro() && sim.fri < 1);
+    });
+
+    overskrift("9. Sproget");
+    var krop = d.body.innerText, teori = d.getElementById("teori").textContent;
+    var replikker = [].concat(D.INTRO_HYDRON, D.INTRO_PRODUKTER, D.INTRO_PAR, [D.HYDRON_FAERDIG, D.TI_I_TRAEK], D.KAFFE_SUR);
+    var tekster = replikker.concat(D.HYDRON.map(function (o) { return o.tekst + " " + o.hint; }));
+    D.NIVEAU_RAEKKE.forEach(function (n) {
+        S.par(n).forEach(function (p) {
+            var o = S.opgave(p.roller.syre, p.roller.base, true);
+            S.forkerte(o).forEach(function (fk) { tekster.push(fk.hvorfor); });
+            o.reaktanter.concat(o.produkter).forEach(function (id, k) {
+                S.MAERKER.forEach(function (mk) { tekster.push(S.maerkeFejl(o, mk, id, k < 2)); });
+            });
+        });
+    });
+    var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i replikker, opgaver, hints og forklaringer (" + tekster.length + " tekster)", streg.length === 0, streg.slice(0, 2).join(" | "));
+    paastand("ingen tankestreger på siden og i teorien", !/[–—]/.test(krop) && !/[–—]/.test(teori));
+    var enere = tekster.concat([krop, teori]).filter(function (t) { return /[¹1][⁺⁻+−]/.test(t.replace(/\d+[+−-]\d/g, "")); });
+    paastand("ingen 1+ eller 1−", enere.length === 0, enere.slice(0, 2).join(" | "));
+    var lange = replikker.filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("hver præsentation har to eller tre replikker", [D.INTRO_HYDRON, D.INTRO_PRODUKTER, D.INTRO_PAR].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    var tur = ["#hydron-anker-mol", "#hydron-anker-skema", "#hydron-kort", "#hydron-par-kort", "#hydron-forfra", "#teoriknap",
+        "#prod-anker-lign", "#prod-anker-brikker", "#prod-niveau", "#prod-kort", "#par-anker-lign", "#par-anker-brikker", "#par-niveau", "#par-kort"];
+    paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
+
+    overskrift("10. Layoutet");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        function over(a, b) { return a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1; }
+        /* Fane 1: hver reaktion, foer og efter */
+        klik('[data-fane="fane-hydron"]');
+        D.HYDRON.forEach(function (o, nr) {
+            A.nyOpgave(nr); tik(A, 0.2);
+            [0, 1].forEach(function (trin) {
+                if (trin) { A.knap(); A.knap(); tik(A, 2); }
+                var lay = A.lay, rekt = [];
+                A.mols.forEach(function (m, s) {
+                    var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, mm = NK.Tegn.molMaal(A.b);
+                    m.atomer.forEach(function (a, i) {
+                        if (a.vaek) return;
+                        var p = A.atomPx(s, i);
+                        x0 = Math.min(x0, p.x - A.b * 0.35); x1 = Math.max(x1, p.x + A.b * 0.35);
+                        y0 = Math.min(y0, p.y - A.b * 0.35); y1 = Math.max(y1, p.y + A.b * 0.35);
+                        M.parVinkler(m, i).forEach(function (v) {
+                            var q = NK.Tegn.parPx(A.L.ctx, m, i, v, A.pos[s].ox, A.pos[s].oy, mm);
+                            x0 = Math.min(x0, q.x - 4); x1 = Math.max(x1, q.x + 4); y0 = Math.min(y0, q.y - 4); y1 = Math.max(y1, q.y + 4);
+                        });
+                    });
+                    rekt.push({ x: x0, y: y0, b: x1 - x0, h: y1 - y0 });
+                    if (x0 < 0 || x1 > lay.W || y0 < 0) problemer.push("reaktion " + (nr + 1) + ": partikel uden for");
+                    if (y1 > lay.skemaY - lay.fs * 1.2) problemer.push("reaktion " + (nr + 1) + ": partikel ned i skemaet");
+                });
+                if (over(rekt[0], rekt[1])) problemer.push("reaktion " + (nr + 1) + ": partiklerne overlapper");
+                if (A.capY > lay.skemaY - lay.fs * 1.2) problemer.push("reaktion " + (nr + 1) + ": formlen under partiklen rammer skemaet");
+                if (trin && A.skemaX && (A.skemaX[0] < 20 || A.skemaX[3] > lay.W - 20)) problemer.push("reaktion " + (nr + 1) + ": skemaet uden for");
+                if (NK.Tegn.molMaal(A.b).px < 14) problemer.push("atomerne er for små");
+            });
+        });
+        /* Fane 2 og 3: ligning, pladser og brikker inde paa tavlen og uden overlap */
+        [["fane-produkter", B], ["fane-par", C]].forEach(function (x) {
+            klik('[data-fane="' + x[0] + '"]');
+            var sim = x[1];
+            D.NIVEAU_RAEKKE.forEach(function (niv) {
+                klik('#' + (x[0] === "fane-par" ? "par" : "prod") + '-niveau [data-niveau="' + niv + '"]');
+                for (var g = 0; g < 4; g++) {
+                    sim.nyOpgave(); tik(sim, 0.1);
+                    var R = sim.lay.R, sk = sim.sk, brikker = sim.brikker.map(function (b, i) { return sim.hjem ? sim.hjem[i] : b.r; });
+                    if (sk.x[0] - 30 < R.x || sk.x[3] + 30 > R.x + R.b) problemer.push(x[0] + ": ligningen uden for tavlen");
+                    brikker.forEach(function (r, i) {
+                        if (r.x < R.x || r.x + r.b > R.x + R.b || r.y < R.y || r.y + r.h > R.y + R.h) problemer.push(x[0] + ": brik uden for tavlen");
+                        for (var j = i + 1; j < brikker.length; j++) if (over(r, brikker[j])) problemer.push(x[0] + ": brikker overlapper");
+                        if (r.y < (sim.underY || sim.lay.ligY + sim.fs * 1.3) + sim.fs * 0.45) problemer.push(x[0] + ": brik oppe i ligningen");
+                    });
+                    sim.pladsR.forEach(function (p, i) {
+                        if (i && over(p, sim.pladsR[i - 1])) problemer.push(x[0] + ": pladserne overlapper");
+                    });
+                    if (sim.bfs < 13) problemer.push(x[0] + ": brikkernes skrift er " + sim.bfs.toFixed(1) + " px");
+                }
+            });
+        });
+        var unikke = problemer.filter(function (p, i) { return problemer.indexOf(p) === i; });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], unikke.length === 0, unikke.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-hydron"]');
+}
+</script>
+</body>
+</html>

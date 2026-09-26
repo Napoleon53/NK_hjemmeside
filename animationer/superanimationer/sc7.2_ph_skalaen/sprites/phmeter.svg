@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="140" viewBox="0 0 80 140">
+  <!-- pH-meter til at holde i haanden. Animationen skriver tallet OVENPAA
+       filen i displayet: x 14-66, y 22-60 (midten 40, 41).
+       Ledningen til elektroden gaar ud foroven ved (40, 6). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2b5f8c"/>
+      <stop offset="0.35" stop-color="#3f86c0"/>
+      <stop offset="1" stop-color="#244f75"/>
+    </linearGradient>
+    <linearGradient id="lcd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c7d8b8"/>
+      <stop offset="1" stop-color="#a9bf98"/>
+    </linearGradient>
+  </defs>
+  <rect x="34" y="2" width="12" height="8" rx="2" fill="#2a2d33"/>
+  <rect x="6" y="8" width="68" height="128" rx="14" fill="url(#krop)" stroke="#173a58" stroke-width="1.6"/>
+  <rect x="11" y="18" width="58" height="46" rx="5" fill="#1d2b38"/>
+  <rect x="14" y="22" width="52" height="38" rx="3" fill="url(#lcd)"/>
+  <text x="20" y="31" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="700" fill="#4c5c40">pH</text>
+  <g fill="#d9e4ec" stroke="#173a58" stroke-width="1">
+    <circle cx="26" cy="82" r="7"/>
+    <circle cx="54" cy="82" r="7"/>
+  </g>
+  <rect x="24" y="96" width="32" height="10" rx="5" fill="#e2703a" stroke="#173a58" stroke-width="1"/>
+  <text x="40" y="126" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8" font-weight="800"
+        fill="#d9e8f5" letter-spacing="0.6">pH-METER</text>
+  <rect x="10" y="68" width="3" height="60" rx="1.5" fill="#ffffff" fill-opacity="0.18"/>
+</svg>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc4.4 Ækvivalente mængder</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at skemaerne er afstemt, at molekylerne har de
+   atomer, formlen siger, at opgavernes svar passer med facit regnet i
+   hånden, at tjekket godkender de rigtige svar og giver den rigtige
+   besked ved de typiske fejl, at reaktionen i kammeret bevarer atomerne,
+   at sproget overholder reglerne, at alle tre faner kan gennemføres
+   (også med musen), og at layoutet holder fra 520 × 380 til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc4.4-poelsevogn", "nk-sc4.4-molekyler", "nk-sc4.4-regn",
+    "nk-sc4.4-intro-hotdog", "nk-sc4.4-intro-molekyler", "nk-sc4.4-intro-regn"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Opgaverne regnet i hånden: kendt stof og stofmængde, og svarene i ledenes rækkefølge */
+var FACIT = [
+    ["vand O2 2,0", ["4,0", "2,0", "4,0"]], ["ammoniak N2 2,0", ["2,0", "6,0", "4,0"]],
+    ["vand H2 6,0", ["6,0", "3,0", "6,0"]], ["methan CH4 3,0", ["3,0", "6,0", "3,0", "6,0"]],
+    ["vand H2 3,0", ["3,0", "1,5", "3,0"]], ["ammoniak H2 6,0", ["2,0", "6,0", "4,0"]],
+    ["methan CH4 0,25", ["0,25", "0,50", "0,25", "0,50"]], ["ammoniak NH3 5,0", ["2,5", "7,5", "5,0"]],
+    ["methan O2 1,0", ["0,50", "1,0", "0,50", "1,0"]], ["propan O2 10,0", ["2,00", "10,0", "6,00", "8,00"]],
+    ["propan C3H8 0,50", ["0,50", "2,5", "1,5", "2,0"]], ["propan H2O 2,0", ["0,50", "2,5", "1,5", "2,0"]]
+];
+
+/* Atomerne i en formel talt op: "C3H8" -> { C: 3, H: 8 } */
+function atomerIFormel(f) {
+    var ud = {}, m, re = /([A-Z][a-z]?)(\d*)/g;
+    while ((m = re.exec(f))) { if (m[1]) ud[m[1]] = (ud[m[1]] || 0) + (m[2] ? parseInt(m[2], 10) : 1); }
+    return ud;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, T = NK.Tjek;
+    paastand("data.js og tjek.js er kørt", !!(D && D.REAKTIONER && T && T.mol && T.antal && T.begr && T.koefficienter));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-hotdog"] && NK.sims["fane-molekyler"] && NK.sims["fane-regn"]));
+    var sprites = ["poelse", "broed", "agurk", "gryde", "kurv", "agurkglas", "klokke", "kammer", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var H = NK.sims["fane-hotdog"], M = NK.sims["fane-molekyler"], R = NK.sims["fane-regn"];
+    paastand("Kemichael er koblet på alle tre faner", !!(H.laerer && M.laerer && R.laerer));
+
+    overskrift("2. Kemien");
+    var ikkeAfstemt = D.REAKTIONER.filter(function (r) { return !D.afstemt(r, r.led.map(function (l) { return l.k; })).ok; });
+    paastand("de fire skemaer er afstemt", D.REAKTIONER.length === 4 && ikkeAfstemt.length === 0, ikkeAfstemt.map(function (r) { return r.id; }).join(", "));
+    var ikkeMindst = D.REAKTIONER.filter(function (r) { return r.led.map(function (l) { return l.k; }).reduce(function (a, b) { return NK.gcd(a, b); }) !== 1; });
+    paastand("koefficienterne er de mindste hele tal", ikkeMindst.length === 0);
+    var forkertMolekyle = Object.keys(D.STOFFER).filter(function (id) {
+        var st = D.STOFFER[id], a = atomerIFormel(st.f);
+        return JSON.stringify(Object.keys(a).sort().map(function (g) { return g + a[g]; })) !==
+            JSON.stringify(Object.keys(st.antal).sort().map(function (g) { return g + st.antal[g]; }));
+    });
+    paastand("hvert molekyle har de atomer, formlen siger", forkertMolekyle.length === 0, forkertMolekyle.join(", "));
+    paastand("skemaet skrives 2 H₂ + O₂ ⟶ 2 H₂O", D.skema(D.reaktion("vand")) === "2 H₂ + O₂ ⟶ 2 H₂O");
+    paastand("propan skrives C₃H₈ + 5 O₂ ⟶ 3 CO₂ + 4 H₂O", D.skema(D.reaktion("propan")) === "C₃H₈ + 5 O₂ ⟶ 3 CO₂ + 4 H₂O");
+
+    overskrift("3. Opgaverne regner rigtigt");
+    var facitFejl = D.OPGAVER.filter(function (o, i) {
+        var f = FACIT[i], navn = o.r.id + " " + o.r.led[o.kendt].s + " " + o.nTekst;
+        return f[0] !== navn || JSON.stringify(o.svar.map(function (s) { return s.tekst; })) !== JSON.stringify(f[1]);
+    });
+    paastand("de 12 opgaver har de svar, der står i facit", D.OPGAVER.length === 12 && facitFejl.length === 0,
+        facitFejl.map(function (o) { return o.r.id + ": " + o.svar.map(function (s) { return s.tekst; }).join("/"); }).join("; "));
+    var forhold = D.OPGAVER.filter(function (o) {
+        var pr = o.svar[0].v / o.r.led[0].k;
+        return o.svar.some(function (s, j) { return Math.abs(s.v / o.r.led[j].k - pr) > 1e-9; });
+    });
+    paastand("i hver opgave er stofmængde / koefficient den samme for alle stoffer", forhold.length === 0);
+    paastand("hvert niveau har fire opgaver, og Svær afstemmer", [0, 1, 2].every(function (n) {
+        return D.OPGAVER.filter(function (o) { return o.niveau === n; }).length === 4;
+    }) && D.NIVEAUER[2].afstem && !D.NIVEAUER[0].afstem);
+    paastand("Middel har et kendt produkt, Svær også", D.OPGAVER.some(function (o) { return o.niveau === 1 && o.r.led[o.kendt].side === 1; }) &&
+        D.OPGAVER.some(function (o) { return o.niveau === 2 && o.r.led[o.kendt].side === 1; }));
+    var forStore = D.ORDRER.filter(function (o) {
+        var fyld = Object.keys(o.fyld || {}).some(function (id) { return o.fyld[id] > D.DISK_MAKS; });
+        var brugt = o.ops.led.some(function (l) { return o.P * l[1] > D.DISK_MAKS; });
+        return fyld || brugt;
+    });
+    paastand("ingen ordre bruger mere end 12 af en ting, så alt kan ses på brættet", forStore.length === 0,
+        forStore.map(function (o) { return "ordre " + (o.nr + 1); }).join(", "));
+    paastand("seks ordrer med hotdogs (1 : 1 : 2) og fire med dobbeltburgere (1 : 2 : 3)",
+        D.ORDRER.filter(function (o) { return o.o === "hotdog"; }).length === 6 && D.ORDRER.filter(function (o) { return o.o === "burger"; }).length === 4 &&
+        D.forhold({ led: D.OPSKRIFTER.burger.led.map(function (l) { return { k: l[1] }; }) }) === "1 : 2 : 3");
+    paastand("ordrerne med antal: 6, 6, 12 og 4, 8, 12", JSON.stringify(D.ORDRER[2].trin.map(function (t) { return t.svar; })) === "[6,6,12]" &&
+        JSON.stringify(D.ORDRER[7].trin.map(function (t) { return t.svar; })) === "[4,8,12]");
+    var BEGR = [[3, "agurk", 5, "5,5,0"], [4, "agurk", 6, "2,4,0"], [5, "broed", 5, "7,0,2"], [8, "ost", 3, "2,2,0"], [9, "boef", 3, "3,1,3"]];
+    var begrFejl = BEGR.filter(function (b) {
+        var o = D.ORDRER[b[0]];
+        return o.slags !== "begr" || o.begr !== b[1] || o.P !== b[2] || o.ops.led.map(function (l) { return o.over[l[0]]; }).join(",") !== b[3];
+    });
+    paastand("fem opgaver med den begrænsende ingrediens: ingrediensen, antallet og overskuddet passer", begrFejl.length === 0,
+        begrFejl.map(function (b) { return "ordre " + (b[0] + 1); }).join(", "));
+    paastand("den begrænsende er entydig i hver opgave", D.ORDRER.filter(function (o) { return o.slags === "begr"; }).every(function (o) {
+        return o.ops.led.filter(function (l) { return o.rakker[l[0]] === o.P; }).length === 1;
+    }));
+    paastand("i en opgave er der færrest af noget, der ikke er begrænsende (8 pølser, 12 agurkeskiver)", D.ORDRER.some(function (o) {
+        if (o.slags !== "begr") return false;
+        var mindst = o.ops.led.reduce(function (a, l) { return o.fyld[l[0]] < o.fyld[a] ? l[0] : a; }, o.ops.led[0][0]);
+        return mindst !== o.begr;
+    }));
+    paastand("i en opgave er der rest af den begrænsende (7 bøffer til 3 burgere)", D.ORDRER.some(function (o) {
+        return o.slags === "begr" && o.over[o.begr] > 0 && /ikke nok til en dobbeltburger mere/.test(o.efter);
+    }));
+    var maalFejl = D.MAAL.filter(function (m) {
+        var ind = M.maalIndhold(m), n = 0;
+        Object.keys(ind).forEach(function (s) { n += ind[s]; if (ind[s] !== Math.round(ind[s])) n = 999; });
+        return n > D.KAMMER_MAKS;
+    });
+    paastand("målene på fane 2 kan nås med hele figurer og højst " + D.KAMMER_MAKS + " i kammeret", maalFejl.length === 0);
+
+    overskrift("4. Tjek af stofmængder");
+    function mol(raa, i, j) { return T.mol(raa, D.OPGAVER[i], j); }
+    paastand("facit godkendes i alle felter i alle opgaver", D.OPGAVER.every(function (o, i) {
+        return o.svar.every(function (s, j) { return j === o.kendt || (mol(s.tekst, i, j).ok && mol(String(s.v).replace(".", ","), i, j).ok); });
+    }));
+    paastand("1,5, 1.5, 1,50 og 1,5 mol godkendes", ["1,5", "1.5", "1,50", "1,5 mol", " 1,5 "].every(function (x) { return mol(x, 4, 1).ok; }));
+    var FEJL = [
+        ["6", 4, 1, /vendt om/], ["3", 4, 1, /Det er stofmængden af H₂/], ["12", 5, 2, /ganget med 2, men ikke divideret med 3/],
+        ["2", 5, 2, /divideret med 3, men ikke ganget med 2/], ["9", 5, 2, /vendt om/], ["1", 5, 0, /koefficienten/],
+        ["6", 3, 2, /Det er stofmængden af O₂/], ["40", 5, 2, /kommaet/i], ["4,1", 5, 2, /Tæt på/], ["7", 5, 2, /Brug forholdet/],
+        ["abc", 5, 2, /Skriv et tal/]
+    ];
+    var molFejl = FEJL.filter(function (f) { var r = mol(f[0], f[1], f[2]); return r.ok || !f[3].test(r.besked || ""); });
+    paastand(FEJL.length + " typiske fejl giver den rigtige besked", molFejl.length === 0,
+        molFejl.map(function (f) { return f[0] + "→" + (mol(f[0], f[1], f[2]).besked || "ok"); }).join("; "));
+    paastand("et tomt felt er ikke en fejl", mol("", 4, 1).tom === true);
+
+    overskrift("5. Tjek af koefficienter og hotdogs");
+    var vand = D.reaktion("vand"), propan = D.reaktion("propan");
+    function ko(a, r) { return T.koefficienter(a, r); }
+    paastand("2, 1, 2 er afstemt", ko(["2", "1", "2"], vand).ok);
+    paastand("4, 2, 4 skal forkortes", /forkort/.test(ko(["4", "2", "4"], vand).besked || ""));
+    paastand("1, 1, 1 giver: 2 O til venstre og 1 O til højre", /Der er 2 O til venstre og 1 O til højre/.test(ko(["1", "1", "1"], vand).besked || ""));
+    paastand("propan 1, 5, 3, 3 giver: 8 H til venstre og 6 H til højre", /Der er 8 H til venstre og 6 H til højre/.test(ko(["1", "5", "3", "3"], propan).besked || ""));
+    paastand("et tomt felt, 0 og 1,5 er ikke koefficienter", ko(["2", "1", ""], vand).tom && /hele tal/.test(ko(["2", "0", "2"], vand).besked) &&
+        /hele tal/.test(ko(["2", "1,5", "2"], vand).besked));
+    /* Ordrerne ved pølsevognen: [svar, ordre, art, ingrediens, besked] */
+    function pv(raa, oi, art, id) {
+        var o = D.ORDRER[oi];
+        if (art === "antal") return T.antal(raa, id, o);
+        if (art === "begr") return T.begr(raa, o);
+        if (art === "produkter") return T.produkter(raa, o);
+        return T.overskud(raa, id, o);
+    }
+    var PV = [
+        ["6", 2, "antal", "agurk", /antallet af hotdogs/], ["3", 2, "antal", "agurk", /divideret med 2/], ["8", 2, "antal", "agurk", /lagt 2 til/],
+        ["13", 2, "antal", "agurk", /Opskriften: 2 agurkeskiver pr\. hotdog/], ["12,5", 2, "antal", "agurk", /helt antal/], ["x", 2, "antal", "agurk", /Skriv et tal/],
+        ["12", 2, "antal", "poelse", /kun 1 pølse/], ["3", 2, "antal", "broed", /lige så mange/],
+        ["4", 7, "antal", "ost", /antallet af dobbeltburgere\. Hver dobbeltburger skal have 3 skiver ost/], ["2", 7, "antal", "boef", /divideret med 2/],
+        ["7", 7, "antal", "ost", /lagt 3 til/],
+        ["poelse", 4, "begr", null, /færrest pølser, men de rækker til 8 hotdogs/], ["broed", 4, "begr", null, /Brødene rækker til 10 hotdogs/],
+        ["poelse", 3, "begr", null, /^Pølserne rækker til 10 hotdogs/], ["ost", 9, "begr", null, /Osteskiverne rækker til 4 dobbeltburgere/],
+        ["12", 4, "produkter", null, /antallet af agurkeskiver\. Der går 2/], ["24", 4, "produkter", null, /ganget med 2/],
+        ["8", 4, "produkter", null, /antallet af pølser\. Men agurkeskiverne slipper op før/], ["30", 4, "produkter", null, /lagt sammen/],
+        ["7", 4, "produkter", null, /ikke agurkeskiver til/], ["5", 4, "produkter", null, /til flere end det/], ["3,5", 9, "produkter", null, /helt antal/],
+        ["7", 9, "produkter", null, /antallet af bøffer/],
+        ["6", 4, "overskud", "poelse", /der bliver brugt/], ["8", 4, "overskud", "poelse", /alle pølserne/], ["-2", 4, "overskud", "poelse", /under 0/],
+        ["4", 9, "overskud", "boef", /Der går 2 bøffer på hver dobbeltburger/], ["5", 4, "overskud", "broed", /minus det, der bliver brugt/]
+    ];
+    var pvFejl = PV.filter(function (f) { var r = pv(f[0], f[1], f[2], f[3]); return r.ok || !f[4].test(r.besked || ""); });
+    paastand(PV.length + " typiske fejl ved pølsevognen giver den rigtige besked", pvFejl.length === 0,
+        pvFejl.map(function (f) { return f[0] + "→" + (pv(f[0], f[1], f[2], f[3]).besked || "ok"); }).join("; "));
+    paastand("facit godkendes i alle trin i alle ordrer", D.ORDRER.every(function (o, i) {
+        return !o.trin || o.trin.every(function (t) { return pv(String(t.svar), i, t.art, t.id).ok; });
+    }));
+    paastand("et overskud på 0 godkendes, og et tomt felt er ikke en fejl", T.overskud("0", "agurk", D.ORDRER[3]).ok && T.produkter("", D.ORDRER[3]).tom);
+
+    overskrift("6. Sproget");
+    var replikker = [].concat(D.INTRO_HOTDOG, D.INTRO_MOLEKYLER, D.INTRO_REGN, D.NIVEAU_ROS,
+        [D.HOTDOG_FAERDIG, D.MAAL_FAERDIG, D.OPGAVER_FAERDIG, D.AEG_AGURK]);
+    var tekster = replikker.concat(
+        D.ORDRER.map(function (o) { return o.tekst + " " + (o.hint || "") + " " + o.efter + " " + o.bon; }),
+        [].concat.apply([], D.ORDRER.map(function (o) {
+            return (o.trin || []).map(function (t) { return H.hint(o, t) + " " + H.svarTekst(o, t); });
+        })),
+        D.MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + m.efter; }),
+        Object.keys(D.AFSTEM_HINT).map(function (k) { return D.AFSTEM_HINT[k]; }),
+        D.NIVEAUER.map(function (n) { return n.kort; }));
+    var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
+    var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
+    paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
+    paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
+    var lange = replikker.filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("hver præsentation har to eller tre replikker", [D.INTRO_HOTDOG, D.INTRO_MOLEKYLER, D.INTRO_REGN].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
+
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+
+    overskrift("7. Pølsevognen kan gennemføres");
+    klik('[data-fane="fane-hotdog"]');
+    H.tilpas();
+    H.afvisTilbud();
+    H.nulstilAlt(); H.tilpas(); tik(H, 0.3);
+    var c = d.getElementById("hotdog-laerred"), lay = H.lay, i;
+    function mus(canvas, type, x, y) {
+        var r = canvas.getBoundingClientRect();
+        canvas.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 7, bubbles: true, isPrimary: true }));
+    }
+    function felt(j, v) { H.trin[j].input.value = v; H.tjek(); }
+    var gr = lay.beholdere.poelse, ku = lay.beholdere.broed, gl = lay.beholdere.agurk;
+    mus(c, "pointerdown", gr.x, gr.y - gr.h * 0.5);
+    mus(c, "pointermove", lay.braet.x + 60, lay.braet.y + 30);
+    mus(c, "pointermove", lay.braet.x + lay.braet.b / 2, lay.braet.y + lay.braet.h / 2);
+    mus(c, "pointerup", lay.braet.x + lay.braet.b / 2, lay.braet.y + lay.braet.h / 2);
+    tik(H, 1);
+    paastand("en pølse kan trækkes fra gryden hen på brættet", H.antal("poelse") === 1);
+    mus(c, "pointerdown", ku.x, ku.y - ku.h * 0.5); mus(c, "pointerup", ku.x, ku.y - ku.h * 0.5);
+    mus(c, "pointerdown", gl.x, gl.y - gl.h * 0.5); mus(c, "pointerup", gl.x, gl.y - gl.h * 0.5);
+    tik(H, 1);
+    paastand("et klik på kurven og glasset lægger et brød og en skive på", H.antal("broed") === 1 && H.antal("agurk") === 1);
+    H.laegPaa("poelse"); H.laegPaa("broed"); H.laegPaa("agurk");
+    tik(H, 1);
+    H.server(); tik(H, 1.6);
+    paastand("2 pølser, 2 brød og 2 skiver: kun 1 hotdog, og kunden sender den tilbage",
+        H.serveret && H.serveret.h === 1 && /Kun 1 hotdog/.test(H.el.besked.textContent) && /i overskud/.test(H.el.besked.textContent) && !H.naaet);
+    tik(H, 3);
+    paastand("bagefter ligger tingene igen på brættet", H.antal("poelse") === 2 && H.antal("broed") === 2 && H.antal("agurk") === 2 && !H.serv);
+    var skive = H.iRaekke("agurk")[0];
+    mus(c, "pointerdown", skive.x, skive.y); mus(c, "pointerup", skive.x, skive.y);
+    tik(H, 1);
+    paastand("et klik på en skive lægger den tilbage i glasset", H.antal("agurk") === 1);
+    H.laegPaa("agurk"); H.laegPaa("agurk"); H.laegPaa("agurk"); tik(H, 1);
+    mus(c, "pointerdown", lay.klokke.x, lay.klokke.y - lay.klokke.b * 0.3); mus(c, "pointerup", lay.klokke.x, lay.klokke.y - lay.klokke.b * 0.3);
+    tik(H, 2);
+    paastand("klokken: 2 hotdogs uden overskud, ordre 1 er klaret", H.naaet && H.serveret.h === 2 && H.el.knap.textContent === "Næste ordre →");
+    tik(H, 2);
+    paastand("hotdoggene køres ud til kunden", !H.ting.some(function (t) { return t.produkt >= 0; }));
+    H.knap(); tik(H, 0.5);
+    paastand("ordre 2: 6 skiver ligger på brættet, og glasset er tomt", H.nr === 1 && H.antal("agurk") === 6 && H.beholdning.agurk === 0);
+    H.laegPaa("agurk");
+    paastand("et klik på det tomme glas giver et svar", /Glasset er tomt/.test(H.el.besked.textContent) && H.antal("agurk") === 6);
+    for (i = 0; i < 3; i++) { H.laegPaa("poelse"); H.laegPaa("broed"); }
+    tik(H, 1); H.server(); tik(H, 2);
+    paastand("3 hotdogs af 6 skiver: ordre 2 er klaret", H.naaet && H.serveret.h === 3);
+    H.knap(); tik(H, 0.3);
+    H.laegPaa("poelse");
+    paastand("ordre 3: brættet er låst, mens der regnes", H.antal("poelse") === 0 && /Brættet viser opgaven/.test(H.el.besked.textContent));
+    felt(0, "12");
+    paastand("12 pølser til 6 hotdogs giver en besked om opskriften", /kun 1 pølse/.test(H.el.besked.textContent) && H.k === 0);
+    felt(0, "6"); felt(1, "6"); felt(2, "12"); tik(H, 5);
+    paastand("6, 6 og 12: brættet fyldes, 6 hotdogs samles, og ordren er klaret", H.naaet && H.serveret && H.serveret.h === 6);
+    H.knap(); tik(H, 0.3);
+    paastand("ordre 4: 10 af hver ligger på brættet, og første trin er at vælge", H.antal("poelse") === 10 && H.antal("broed") === 10 &&
+        H.antal("agurk") === 10 && H.aktivtTrin().art === "begr" && /begrænsende ingrediens/.test(d.getElementById("hotdog-prompt").textContent));
+    klik('#hotdog-raekker .valgknap[data-id="poelse"]');
+    paastand("pølserne er forkert: de rækker til 10 hotdogs", /Pølserne rækker til 10 hotdogs/.test(H.el.besked.textContent) && H.k === 0);
+    klik('#hotdog-raekker .valgknap[data-id="agurk"]');
+    paastand("agurkeskiverne er begrænsende, og brættet markerer dem", H.k === 1 && H.begrFundet() === "agurk");
+    felt(1, "5"); felt(2, "5"); felt(3, "5"); tik(H, 3);
+    paastand("5 hotdogs, og 5 pølser og 5 brød er i overskud", H.naaet && H.serveret.h === 5 && H.serveret.rest.join(",") === "5 pølser,5 brød" &&
+        H.ting.filter(function (t) { return t.rest; }).length === 10);
+    H.knap(); tik(H, 0.3);
+    var bn = H.lay.baner.agurk;
+    mus(c, "pointerdown", H.lay.braet.x + H.lay.braet.b * 0.8, bn.y); mus(c, "pointerup", H.lay.braet.x + H.lay.braet.b * 0.8, bn.y);
+    paastand("ordre 5: et klik på agurkernes række på brættet vælger dem", H.k === 1 && H.begrFundet() === "agurk");
+    H.knap();
+    paastand("hintet siger, hvad der bestemmer antallet", /bestemmer det/.test(H.el.besked.textContent));
+    H.knap();
+    paastand("Vis svaret skriver udregningen: 12 agurkeskiver / 2 = 6 hotdogs", H.trin[1].status === "svar" &&
+        /12 agurkeskiver \/ 2 = 6 hotdogs/.test(H.el.besked.textContent));
+    felt(2, "8");
+    paastand("overskud 8 pølser: det er alle pølserne", /alle pølserne/.test(H.el.besked.textContent));
+    felt(2, "2"); felt(3, "4"); tik(H, 3);
+    paastand("ordre 5 er klaret: 6 hotdogs, 2 pølser og 4 brød i overskud", H.naaet && H.serveret.h === 6);
+    H.knap(); tik(H, 0.3);
+    H.vaelg("broed"); felt(1, "5"); felt(2, "7"); felt(3, "2"); tik(H, 3);
+    paastand("ordre 6: brødene er begrænsende, 5 hotdogs, 7 pølser og 2 skiver i overskud", H.naaet && H.serveret.rest.join(",") === "7 pølser,2 agurkeskiver");
+    H.knap(); tik(H, 0.3);
+    paastand("ordre 7: dobbeltburgeren med bolle, bøf og ost og en stegeplade", H.ops().id === "burger" &&
+        H.ids().join(",") === "bolle,boef,ost" && H.lay.beholdere.boef.navn === "stegeplade");
+    for (i = 0; i < 2; i++) H.laegPaa("bolle");
+    for (i = 0; i < 4; i++) H.laegPaa("boef");
+    for (i = 0; i < 6; i++) H.laegPaa("ost");
+    tik(H, 1); H.server(); tik(H, 2);
+    paastand("2 boller, 4 bøffer og 6 skiver ost: 2 dobbeltburgere", H.naaet && H.serveret.h === 2);
+    H.knap(); tik(H, 0.3);
+    felt(0, "4"); felt(1, "8"); felt(2, "12"); tik(H, 5);
+    paastand("ordre 8: 4, 8 og 12 giver 4 dobbeltburgere", H.naaet && H.serveret.h === 4);
+    H.knap(); tik(H, 0.3);
+    H.vaelg("boef");
+    paastand("ordre 9: bøfferne er forkert, de rækker til 4", /Bøfferne rækker til 4 dobbeltburgere/.test(H.el.besked.textContent));
+    H.vaelg("ost"); felt(1, "3"); felt(2, "2"); felt(3, "2"); tik(H, 3);
+    paastand("osteskiverne er begrænsende: 3 dobbeltburgere", H.naaet && H.serveret.h === 3);
+    H.knap(); tik(H, 0.3);
+    H.vaelg("boef"); felt(1, "3");
+    paastand("ordre 10: også den begrænsende har overskud (1 bøf)", H.trin.length === 5 && H.trin[3].id === "boef" && H.trin[3].svar === 1);
+    felt(2, "3"); felt(3, "1"); felt(4, "3"); tik(H, 3);
+    paastand("og det står bagefter, at den ene bøf ikke er nok", H.naaet && /1 bøf er ikke nok til en dobbeltburger mere/.test(H.el.besked.textContent));
+    tik(H, 3);
+    paastand("efter alle ti ordrer roser Kemichael", !!(H.laerer.scene && H.laerer.scene.navn === "faerdig"));
+    paastand("knappen går videre til molekylerne", H.el.knap.textContent === "Videre til molekylerne →");
+    H.knap();
+    paastand("og fane 2 vises", d.getElementById("fane-molekyler").classList.contains("aktiv"));
+    klik('[data-fane="fane-hotdog"]');
+    paastand("fane 1 har nu frit valg med de to opskrifter", !H.ordre() && !d.getElementById("hotdog-opskrifter").hidden);
+    paastand("ordrekortet viser 6/6 og 4/4", d.getElementById("hotdog-g-0").textContent === "6/6" && d.getElementById("hotdog-g-1").textContent === "4/4");
+    tik(H, 10);
+    function ingenOverlap() {
+        var fejl = 0;
+        H.ids().forEach(function (id) {
+            var iw = H.baneIw(id), l = H.iRaekke(id), w = NK.Tegn.tingBredde(id, iw), h = NK.Tegn.tingHoejde(id, iw);
+            for (var a = 0; a < l.length; a++) for (var b = a + 1; b < l.length; b++) {
+                if (Math.abs(l[a].x - l[b].x) < w * 0.99 && Math.abs(l[a].y - l[b].y) < h * 0.99) fejl++;
+            }
+            l.forEach(function (t) {
+                if (t.x - w / 2 < H.lay.braet.x || t.x + w / 2 > H.lay.braet.x + H.lay.braet.b - 34 ||
+                    t.y - h / 2 < H.lay.braet.y || t.y + h / 2 > H.lay.braet.y + H.lay.braet.h) fejl++;
+            });
+        });
+        return fejl;
+    }
+    H.ids().forEach(function (id) { for (var n = 0; n < 13; n++) H.laegPaa(id); });
+    tik(H, 2);
+    paastand("frit valg: højst 12 af hver, og de 12 ligger på brættet uden at røre hinanden", H.antal("poelse") === 12 && H.antal("agurk") === 12 &&
+        /ikke plads/.test(H.el.besked.textContent) && ingenOverlap() === 0, ingenOverlap() + " overlap");
+    H.server(); tik(H, 2);
+    paastand("12 af hver giver 6 hotdogs", H.serveret.h === 6);
+    tik(H, 2); H.nulstil(); tik(H, 1);
+    for (i = 0; i < 4; i++) H.laegPaa("agurk");
+    tik(H, 1); H.server(); tik(H, 2);
+    paastand("påskeægget: lutter agurker får en kommentar fra Kemichael", !!(H.laerer.scene && H.laerer.scene.navn === "aeg"));
+    tik(H, 8); H.nulstil(); tik(H, 1);
+    klik('#hotdog-opskrifter [data-ops="burger"]'); H.tilpas(); tik(H, 0.3);
+    H.ids().forEach(function (id) { for (var n = 0; n < 12; n++) H.laegPaa(id); });
+    tik(H, 2);
+    paastand("12 boller, 12 bøffer og 12 skiver ost ligger uden at røre hinanden", H.ops().id === "burger" && ingenOverlap() === 0);
+    H.server(); tik(H, 2);
+    paastand("og giver 4 dobbeltburgere med 8 boller og 4 bøffer i overskud", H.serveret.h === 4 && H.serveret.rest.join(",") === "8 boller,4 bøffer");
+    tik(H, 2);
+    H.vaelgGruppe("burger");
+    paastand("ordrekortet springer til dobbeltburgerne", H.nr === 6);
+    H.nulstilAlt(); tik(H, 0.3);
+    paastand("Start forfra", H.nr === 0 && !H.loest.some(Boolean) && d.getElementById("hotdog-g-0").textContent === "0/6");
+    H.knap(); H.knap(); tik(H, 3);
+    paastand("Vis svaret på en ordre lægger det rigtige på og ringer", H.naaet);
+    tik(H, 2);
+    H.nulstilAlt(); tik(H, 0.3);
+
+    overskrift("8. Molekylerne kan gennemføres");
+    klik('[data-fane="fane-molekyler"]');
+    M.tilpas();
+    M.afvisTilbud();
+    M.nr = 0; M.startMaal(); M.tilpas(); tik(M, 0.3);
+    var cm = d.getElementById("molekyler-laerred");
+    var lm = M.lay, k0 = lm.kasser[0], k1 = lm.kasser[1];
+    mus(cm, "pointerdown", k0.x, k0.y - k0.h * 0.5);
+    mus(cm, "pointermove", lm.ind.x + 40, lm.ind.y + 40);
+    mus(cm, "pointermove", lm.ind.x + lm.ind.b / 2, lm.ind.y + lm.ind.h / 2);
+    mus(cm, "pointerup", lm.ind.x + lm.ind.b / 2, lm.ind.y + lm.ind.h / 2);
+    tik(M, 1);
+    paastand("et H₂ kan trækkes fra kassen ind i kammeret", M.antal("H2") === 1);
+    mus(cm, "pointerdown", k1.x, k1.y - k1.h * 0.5); mus(cm, "pointerup", k1.x, k1.y - k1.h * 0.5);
+    tik(M, 1);
+    paastand("et klik på kassen med O₂ lægger et O₂ i", M.antal("O2") === 1);
+    M.start();
+    paastand("1 H₂ og 1 O₂: ikke nok til skemaet, og intet reagerer", M.fase === "fyld" && /ikke nok/.test(M.el.besked.textContent));
+    M.tilsaet("H2"); tik(M, 1);
+    function atomer() {
+        var a = {};
+        M.enheder.forEach(function (u) { if (!u.hjem) Object.keys(u.st.antal).forEach(function (g) { a[g] = (a[g] || 0) + u.st.antal[g]; }); });
+        return Object.keys(a).sort().map(function (g) { return g + a[g]; }).join(" ");
+    }
+    var foer = atomer();
+    mus(cm, "pointerdown", lm.knap.x + lm.knap.b / 2, lm.knap.y + lm.knap.h / 2); mus(cm, "pointerup", lm.knap.x + lm.knap.b / 2, lm.knap.y + lm.knap.h / 2);
+    paastand("knappen Start sætter reaktionen i gang", M.fase === "reagerer");
+    tik(M, 3);
+    paastand("2 H₂ og 1 O₂ gav 2 H₂O, og mål 1 er nået", M.fase === "efter" && M.antal("H2O") === 2 && M.naaet);
+    paastand("atomerne er de samme før og efter", atomer() === foer, foer + " / " + atomer());
+    M.knap();
+    for (i = 0; i < 6; i++) M.tilsaet("H2");
+    for (i = 0; i < 4; i++) M.tilsaet("O2");
+    tik(M, 1); foer = atomer(); M.start(); tik(M, 3.5);
+    paastand("6 H₂ og 4 O₂: 6 H₂O og 1 O₂ i overskud, målet er ikke nået", M.antal("H2O") === 6 && M.antal("O2") === 1 &&
+        !M.naaet && /1 O₂ er i overskud/.test(M.el.besked.textContent));
+    paastand("overskuddet har en orange ring", M.enheder.some(function (u) { return u.rest && u.st.id === "O2"; }));
+    paastand("atomerne er også bevaret med rester", atomer() === foer);
+    M.startKnap(); tik(M, 1);
+    paastand("Tøm tømmer kammeret", M.fase === "fyld" && !M.i().length);
+    for (i = 0; i < 6; i++) M.tilsaet("H2");
+    for (i = 0; i < 3; i++) M.tilsaet("O2");
+    tik(M, 1); M.start(); tik(M, 3.5);
+    paastand("6 H₂ og 3 O₂: mål 2 er nået", M.naaet && M.antal("H2O") === 6);
+    M.knap(); M.tilpas(); tik(M, 0.3);
+    paastand("mål 3: der er 2 N₂ i kammeret fra start", M.antal("N2") === 2 && M.r().id === "ammoniak");
+    M.knap(); M.knap(); tik(M, 5);
+    paastand("Vis svaret fylder H₂ i og starter: 4 NH₃", M.naaet && M.antal("NH3") === 4);
+    M.knap(); M.tilpas(); tik(M, 0.3);
+    paastand("mål 4: hver figur er nu 1 mol, og plakaten blinker", M.enhed() === "mol" && M.plakatBlink > 0);
+    for (i = 0; i < 4; i++) M.tilsaet("H2");
+    M.tilsaet("O2"); M.tilsaet("O2");
+    tik(M, 1); M.start(); tik(M, 3.5);
+    paastand("4 mol H₂ og 2 mol O₂ gav 4 mol H₂O", M.naaet && M.antal("H2O") === 4);
+    M.knap(); M.tilpas(); tik(M, 0.3);
+    M.tilsaet("CH4"); M.tilsaet("CH4");
+    for (i = 0; i < 4; i++) M.tilsaet("O2");
+    tik(M, 1); foer = atomer(); M.start(); tik(M, 3.5);
+    paastand("2 mol CH₄ og 4 mol O₂ gav 2 mol CO₂ og 4 mol H₂O", M.naaet && M.antal("CO2") === 2 && M.antal("H2O") === 4);
+    paastand("tabellen viser før og efter", d.getElementById("molekyler-foer-0").textContent === "2" &&
+        d.getElementById("molekyler-efter-3").textContent === "4" && d.getElementById("molekyler-foer-3").textContent === "0");
+    tik(M, 3);
+    paastand("efter det sidste mål roser Kemichael", !!(M.laerer.scene && M.laerer.scene.navn === "faerdig"));
+    M.knap();
+    paastand("knappen gik videre til tavlen", d.getElementById("fane-regn").classList.contains("aktiv"));
+    klik('[data-fane="fane-molekyler"]');
+    paastand("fane 2 har nu frit valg med reaktioner og enhed", !M.maal() && !d.getElementById("molekyler-frit").hidden);
+    klik('#molekyler-reaktioner [data-r="propan"]'); M.tilpas(); tik(M, 0.3);
+    M.tilsaet("C3H8");
+    for (i = 0; i < 5; i++) M.tilsaet("O2");
+    tik(M, 1); foer = atomer(); M.start(); tik(M, 3.5);
+    paastand("frit valg: propan brænder til 3 CO₂ og 4 H₂O, og atomerne er bevaret",
+        M.r().id === "propan" && M.antal("CO2") === 3 && M.antal("H2O") === 4 && atomer() === foer);
+    M.toem(true);
+    for (i = 0; i < 20; i++) M.tilsaet("O2");
+    paastand("der kan højst være " + D.KAMMER_MAKS + " figurer i kammeret", M.i().length === D.KAMMER_MAKS && /ikke plads/.test(M.el.besked.textContent));
+    M.toem(true);
+    klik('#molekyler-reaktioner [data-r="vand"]');
+    M.knap();
+    paastand("Start målene forfra", M.nr === 0 && M.maal() === D.MAAL[0]);
+
+    overskrift("9. Tavlen kan gennemføres");
+    klik('[data-fane="fane-regn"]');
+    R.tilpas();
+    R.afvisTilbud();
+    R.nulstilAlt();
+    function loes(i) {
+        R.vaelg(i);
+        var og = R.opg;
+        if (!og.afstemt) {
+            og.koef.forEach(function (k, j) { k.input.value = String(og.o.r.led[j].k); });
+            R.tjekKoef(og.koef.length - 1);
+        }
+        og.felter.forEach(function (f) { if (!f.kendt) { f.input.value = og.o.svar[f.j].tekst; R.tjek(f.j); } });
+    }
+    var ikkeLoest = [];
+    D.OPGAVER.forEach(function (o, i) {
+        loes(i);
+        if (!R.status[i].loest || !R.status[i].stjerne) ikkeLoest.push(o.r.id + " " + o.nTekst);
+    });
+    paastand("alle 12 opgaver kan løses og får en stjerne", ikkeLoest.length === 0, ikkeLoest.join(", "));
+    paastand("de løste beregninger står som n(O₂) = 1/2 · n(H₂) = 1/2 · 3,0 mol = 1,5 mol", (function () {
+        R.vaelg(4);
+        return /n\(O₂\) = 12 · n\(H₂\) = 12 · 3,0 mol = 1,5 mol/.test(d.getElementById("regn-linjer").textContent) &&
+            d.getElementById("regn-linjer").querySelectorAll(".broek").length >= 4;
+    })());
+    R.nulstilAlt();
+    R.vaelg(4); R.tilpas(); tik(R, 1.5);
+    var og = R.opg;
+    var blok = R.lay.blok.h;
+    paastand("den kendte stofmængde fylder netop sine 2 blokke", Math.abs(og.felter[0].fyld - 2 * blok) < 1);
+    og.felter[1].input.value = "6"; R.tjek(1); tik(R, 2);
+    paastand("den omvendte brøk: rød søjle, 4 gange for høj, og besked", og.felter[1].forkert &&
+        Math.abs(og.felter[1].fyld - 4 * blok) < 1 && /vendt om/.test(R.el.besked.textContent));
+    og.felter[1].input.value = "1,5"; R.tjek(1); tik(R, 2);
+    paastand("1,5 mol: søjlen fylder netop sin ene blok", og.felter[1].status === "ok" && Math.abs(og.felter[1].fyld - blok) < 1);
+    R.knap();
+    paastand("hintet giver brøken og hvad en blok er", R.fremhaev === 2 && /Hver stiplet blok er 1,5 mol/.test(R.el.besked.textContent));
+    R.knap();
+    paastand("Vis svaret løser opgaven, men uden stjerne", R.status[4].loest && !R.status[4].stjerne);
+    R.vaelg(9); tik(R, 0.3);
+    og = R.opg;
+    ["1", "5", "3", "3"].forEach(function (v, j) { og.koef[j].input.value = v; });
+    R.tjekKoef(3);
+    paastand("Svær: forkerte koefficienter giver en optælling af H", !og.afstemt && /8 H til venstre og 6 H til højre/.test(R.el.besked.textContent));
+    ["2", "10", "6", "8"].forEach(function (v, j) { og.koef[j].input.value = v; });
+    R.tjekKoef(3);
+    paastand("2, 10, 6, 8 skal forkortes", !og.afstemt && /forkort/.test(R.el.besked.textContent));
+    ["1", "5", "3", "4"].forEach(function (v, j) { og.koef[j].input.value = v; });
+    R.tjekKoef(3);
+    paastand("1, 5, 3, 4 er afstemt, og felterne kommer frem", og.afstemt && !og.felter[0].el.classList.contains("skjult"));
+    R.nulstilAlt();
+    [0, 1, 2, 3].forEach(loes);
+    tik(R, 3);
+    paastand("fire opgaver på Let: Kemichael roser", R.rost[0] === true && !!(R.laerer.scene && R.laerer.scene.navn === "niveau"));
+    R.vaelg(0);
+    paastand("en løst opgave vises færdig", R.opg.gennemsyn && R.opg.faerdig && R.el.knap.textContent === "Regn den igen");
+    R.nulstilAlt();
+    paastand("Start forfra nulstiller alt", R.antalLoest() === 0);
+    tik(R, 3);
+
+    overskrift("10. Kemichaels præsentation og rundvisningen");
+    [["fane-hotdog", H, "hotdog"], ["fane-molekyler", M, "molekyler"], ["fane-regn", R, "regn"]].forEach(function (x) {
+        klik('[data-fane="' + x[0] + '"]');
+        var sim = x[1];
+        sim.startIntro(true);
+        tik(sim, 1);
+        paastand(x[2] + ": K viser præsentationen, og knappen Spring over står der",
+            !!(sim.laerer.scene && sim.laerer.scene.navn === "intro") && !d.getElementById(x[2] + "-spring").hidden);
+        sim.springIntro();
+        paastand(x[2] + ": Spring over sender ham ud", sim.laerer.scene && sim.laerer.scene.navn === "introUd");
+        tik(sim, 3);
+    });
+    klik('[data-fane="fane-hotdog"]');
+    H.startIntro(true); tik(H, 0.5);
+    H.laegPaa("poelse"); tik(H, 1);
+    paastand("man kan lægge på brættet, mens han taler", H.antal("poelse") >= 1 && H.laerer.scene.navn === "intro");
+    H.springIntro(); tik(H, 3);
+    paastand("tilbuddet skjules med display: none efter Nej tak", (function () {
+        H.visTilbud(true); H.afvisTilbud();
+        return W.getComputedStyle(d.getElementById("hotdog-tilbud")).display === "none";
+    })());
+    var tur = ["#hotdog-anker-skilt", "#hotdog-anker-bon", "#hotdog-anker-beholdere", "#hotdog-anker-braet", "#hotdog-anker-klokke", "#hotdog-kort", "#hotdog-ordrer",
+        "#molekyler-anker-skilt", "#molekyler-anker-plakat", "#molekyler-anker-kasser", "#molekyler-anker-kammer", "#molekyler-maaling", "#molekyler-kort",
+        "#regn-anker-skema", "#regn-anker-soejler", "#regn-felter", "#regn-kort", "#regn-beregninger", "#regn-fremskridt"];
+    paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
+
+    overskrift("11. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    M.nr = 4; M.startMaal();
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-hotdog", "fane-molekyler", "fane-regn"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            if (id === "fane-regn") { sim.vaelg(10); sim.layoutSkema(); }
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H;
+            function inde(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            if (id === "fane-hotdog") {
+                inde(lay.skilt, "opskriften"); inde(lay.bon, "bonen"); inde(lay.braet, "brættet"); inde(lay.bakke, "bakken");
+                over(lay.skilt, lay.bon, "opskriften over bonen");
+                over(lay.braet, lay.bakke, "brættet over bakken");
+                ["hotdog", "burger"].forEach(function (ops) {
+                    sim.friOps = ops; sim.vaelgOrdre(D.ORDRER.length);
+                    lay = sim.lay;
+                    var ids = sim.ids(), b0 = lay.beholdere[ids[0]];
+                    var beh = { x: b0.x - b0.b / 2, y: lay.bagY - lay.hc * 1.05, b: lay.beholdereX1 - (b0.x - b0.b / 2), h: lay.hc * 1.05 };
+                    inde(beh, ops + ": beholderne");
+                    over(beh, lay.skilt, ops + ": beholderne over opskriften");
+                    if (lay.beholdereX1 > lay.klokke.x - lay.klokke.b) problemer.push(id + ": " + ops + ": beholderne rører klokken");
+                    /* 12 af hver skal kunne ligge i deres række uden at røre hinanden */
+                    var lb = lay.braet.b - 66, iw = lay.iw * lay.sk;
+                    ids.forEach(function (ing) {
+                        var bn = lay.baner[ing], biw = sim.baneIw(ing), w = NK.Tegn.tingBredde(ing, biw), h = NK.Tegn.tingHoejde(ing, biw);
+                        if (bn.r * bn.c < 12 || bn.c * w * 1.08 > lb + 1 || bn.r * h * 1.15 > lay.bane - 9) problemer.push(id + ": 12 " + ing + " er der ikke plads til");
+                        if (w < 13) problemer.push(id + ": " + ing + " er for lille (" + Math.round(w) + " px)");
+                    });
+                    var nMaks = ops === "hotdog" ? 6 : 4, sidste = sim.produktPlads(nMaks - 1, nMaks), pw = NK.Tegn.tingBredde(ops, iw);
+                    if (sidste.y + NK.Tegn.tingHoejde(ops, iw) / 2 > lay.bakke.y + lay.bakke.h || sidste.x + pw / 2 > lay.bakke.x + lay.bakke.b) {
+                        problemer.push(id + ": " + nMaks + " " + ops + " er ikke på bakken");
+                    }
+                    if (Hc >= 700 && lay.skilt.y < 70) problemer.push(id + ": tilbuddet dækker opskriften");
+                });
+                sim.friOps = "hotdog"; sim.vaelgOrdre(0);
+            }
+            if (id === "fane-molekyler") {
+                inde(lay.skilt, "skiltet"); inde(lay.plakat, "plakaten");
+                var km = { x: lay.kammer.x - lay.kammer.b / 2, y: lay.ind.y - 10, b: lay.kammer.b, h: lay.bordY - lay.ind.y + 10 };
+                inde(km, "kammeret");
+                over(km, lay.skilt, "kammeret over skiltet");
+                lay.kasser.forEach(function (k) { over({ x: k.x - k.b / 2, y: k.y - k.h, b: k.b, h: k.h }, km, "en kasse under kammeret"); });
+                if (2 * sim.radius(NK.Data.stof("C3H8")) > lay.ind.h * 0.6) problemer.push(id + ": propan er for stor til kammeret");
+            }
+            if (id === "fane-regn") {
+                inde(lay.tavle, "tavlen");
+                var fb = lay.feltB;
+                for (var j = 1; j < lay.midter.length; j++) {
+                    if (lay.midter[j] - lay.midter[j - 1] < fb + 2) problemer.push(id + ": felterne overlapper");
+                }
+                if (lay.midter[0] - fb / 2 < lay.tavle.x || lay.midter[lay.midter.length - 1] + fb / 2 > lay.tavle.x + lay.tavle.b) problemer.push(id + ": et felt uden for tavlen");
+                if (lay.soejleBund - 5 * lay.blok.h < lay.soejleTop - 1) problemer.push(id + ": 5 blokke kan ikke være der");
+                if (lay.blok.h < 8) problemer.push(id + ": blokkene er for lave");
+                if (lay.feltY + 40 > lay.tavle.y + lay.tavle.h) problemer.push(id + ": felterne går under tavlen");
+            }
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    M.nr = 0; M.startMaal();
+    R.nulstilAlt();
+    H.nr = 0; H.startOrdre();
+    klik('[data-fane="fane-hotdog"]');
+}
+</script>
+</body>
+</html>

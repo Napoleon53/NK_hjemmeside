@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 30" width="120" height="30">
+<!-- En roed poelse set oppefra, som den ligger paa disken.
+     Midten er (60, 15). -->
+<defs>
+  <linearGradient id="kod" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f26a55"/>
+    <stop offset="0.4" stop-color="#d42a22"/>
+    <stop offset="1" stop-color="#8c1510"/>
+  </linearGradient>
+</defs>
+<rect x="2" y="3" width="116" height="24" rx="12" fill="url(#kod)" stroke="#5c0f0a" stroke-width="1.5"/>
+<path d="M13 9.5 Q60 5.5 107 9.5" stroke="#ffb3a6" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.75"/>
+<g stroke="#6e120c" stroke-width="2" stroke-linecap="round" opacity="0.45">
+  <path d="M33 9 L28 21"/>
+  <path d="M53 9 L48 21"/>
+  <path d="M73 9 L68 21"/>
+  <path d="M93 9 L88 21"/>
+</g>
+<ellipse cx="6" cy="15" rx="2.2" ry="4" fill="#7a130d" opacity="0.5"/>
+<ellipse cx="114" cy="15" rx="2.2" ry="4" fill="#7a130d" opacity="0.5"/>
+</svg>

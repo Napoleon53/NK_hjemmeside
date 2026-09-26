@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Syregalgen</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1366px; height:768px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i spillet og kan slettes.
+
+   Aabner index.html i en iframe (1366 x 768) og kontrollerer det, man
+   ikke kan se paa et skaermbillede: at ordlisterne kan laeses, at ingen
+   ledetraad nævner sit eget ord, at sproget overholder reglerne, at
+   reglerne og pointene er rigtige, at knappen gaar i de rigtige trin,
+   at omraaderne virker, og at Kemichael kun kommer efter et plask.
+   Tiden koeres frem billede for billede (NK.app.tegnEt), saa testen ikke
+   afhaenger af requestAnimationFrame. Skal koeres gennem en lokal server.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); vis(true); }
+function vis(undervejs) {
+    document.getElementById("ud").innerHTML = linjer.join("\n")
+        + (undervejs ? "\n\nKører …" : "\n\n" + (fejl ? '<span class="fejl">' + fejl + " FEJL</span>" : '<span class="ok">ALT OK</span>'));
+}
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+var ramme = document.getElementById("ramme");
+function aabn(hash) {
+    return new Promise(function (ok) {
+        ramme.onload = function () {
+            var w = ramme.contentWindow;
+            try { w.localStorage.removeItem("nk-syregalgen"); w.localStorage.removeItem("nk-kemichael"); } catch (e) {}
+            w.requestAnimationFrame = function () {};
+            ok(w);
+        };
+        ramme.src = "index.html?t=" + Date.now() + (hash || "");
+    });
+}
+function frem(w, s) { for (var i = 0; i < Math.round(s * 60); i++) w.NK.app.tegnEt(1 / 60); }
+function forkerteBogstaver(w) {
+    var o = w.NK.app.spil().runde.ord;
+    return w.NK.Galge.BOGSTAVER.split("").filter(function (c) { return o.indexOf(c) < 0; });
+}
+function norm(s) { return s.toLowerCase().replace(/[^a-zæøå0-9 -]/g, " "); }
+
+/* Naevner ledetraaden ordet? Hvert ord i svaret paa 6 bogstaver eller
+   flere tjekkes med sine foerste 6 bogstaver; kortere ord som hele ord. */
+function afsloerer(ord, tekst) {
+    var t = " " + norm(tekst) + " ";
+    return ord.toLowerCase().split(/[ -]/).some(function (del) {
+        if (del.length >= 6) return t.indexOf(del.slice(0, 6)) >= 0;
+        return new RegExp("[^a-zæøå]" + del + "[^a-zæøå]").test(t);
+    });
+}
+
+async function koer() {
+    var w = await aabn();
+    var NK = w.NK, G = NK.Galge;
+
+    /* ------------------------------------------------------------- */
+    overskrift("1 Ordlisterne");
+    Object.keys(NK.app.lister).forEach(function (id) {
+        var l = NK.app.lister[id].laest;
+        paastand(id + ": kan læses uden fejl", l.fejl.length === 0, l.fejl.map(function (f) { return "linje " + f.linje + ": " + f.besked; }).join("; "));
+        paastand(id + ": har områder, og hvert har mindst 3 ord", l.omraader.length > 0 && l.omraader.every(function (o) { return o.ord.length >= 3; }));
+        var ids = l.omraader.map(function (o) { return o.id; });
+        paastand(id + ": områdernes id er forskellige og ikke navnet på en liste", ids.every(function (x, i) { return ids.indexOf(x) === i && !NK.app.lister[x]; }));
+        var afs = l.ord.filter(function (p) { return afsloerer(p.ord, p.ledetraad); }).map(function (p) { return p.ord; });
+        paastand(id + ": ingen ledetråd nævner sit eget ord", afs.length === 0, afs.join(", "));
+        skriv("        " + l.ord.length + " ord i " + l.omraader.length + " områder: " + l.omraader.map(function (o) { return o.navn + " " + o.ord.length; }).join(", "));
+    });
+    var kemi = NK.app.lister.kemi.laest;
+    paastand("kemi C har mindst 180 ord", kemi.ord.length >= 180, kemi.ord.length);
+    paastand("kemi C har de otte kapitler c1 til c8", kemi.omraader.map(function (o) { return o.id; }).join() === "c1,c2,c3,c4,c5,c6,c7,c8");
+
+    /* ------------------------------------------------------------- */
+    overskrift("2 Sproget");
+    var alle = [];
+    Object.keys(NK.app.lister).forEach(function (id) {
+        NK.app.lister[id].laest.ord.forEach(function (p) { alle.push(p); });
+    });
+    function tjekTekst(navn, f) {
+        var daarlige = alle.filter(function (p) { return f(p.ledetraad) || f(p.forklaring); }).map(function (p) { return p.ord; });
+        paastand(navn, daarlige.length === 0, daarlige.slice(0, 8).join(", "));
+    }
+    tjekTekst("ingen tankestreger (– og —)", function (t) { return /[–—]/.test(t); });
+    tjekTekst("ingen bindestreg brugt som tankestreg", function (t) { return / - /.test(t); });
+    tjekTekst("ingen ladning skrevet som 1+ eller 1−", function (t) { return /¹[⁺⁻]|\b1[+−]\s/.test(t); });
+    tjekTekst("ingen dobbelte mellemrum", function (t) { return /  /.test(t); });
+    tjekTekst("hver tekst slutter med punktum, ! eller ?", function (t) { return !/[.!?]$/.test(t); });
+    var lange = alle.filter(function (p) { return p.ledetraad.length > 120 || p.forklaring.length > 200; }).map(function (p) { return p.ord; });
+    paastand("ingen for lange tekster", lange.length === 0, lange.join(", "));
+    paastand("tungtopløselig følger sidens grænse på 1 g pr. 100 mL", /1 g/.test(kemi.ord.filter(function (p) { return p.ord === "TUNGTOPLØSELIG"; })[0].ledetraad));
+    var linjerKem = NK.Laerer.REPLIKKER.plask.concat(NK.Laerer.REPLIKKER.opgivet);
+    paastand("Kemichaels replikker er højst 60 tegn", linjerKem.every(function (l) { return l.length <= 60; }), linjerKem.filter(function (l) { return l.length > 60; }).join(" | "));
+
+    /* ------------------------------------------------------------- */
+    overskrift("3 Reglerne");
+    var tal = 0.123;
+    function rnd() { tal = (tal * 9301 + 49297) % 233280 / 233280; return tal; }
+    var s = new G.Spil(kemi, rnd);
+    s.vaelg(["c3"]);
+    var c3 = kemi.omraader[2].ord.length, sete = {};
+    for (var i = 0; i < c3; i++) sete[s.nytOrd().ord] = true;
+    paastand("alle ord i C3 kommer, før et ord kommer igen", Object.keys(sete).length === c3);
+    paastand("kun ord fra C3", Object.keys(sete).every(function (o) { return kemi.omraader[2].ord.some(function (p) { return p.ord === o; }); }));
+    var foer = s.sidste;
+    paastand("det sidste ord kommer ikke lige efter en ny blanding", s.nytOrd().post !== foer);
+    paastand("vaelg med alle områder er det samme som alle", s.vaelg(kemi.omraader.map(function (o) { return o.id; })).length === 0);
+    paastand("vaelg sorterer ukendte områder fra", s.vaelg(["c2", "xx"]).join() === "c2");
+
+    s = new G.Spil(kemi, rnd);
+    var r = s.nytOrd();
+    var forkerte = G.BOGSTAVER.split("").filter(function (c) { return r.ord.indexOf(c) < 0; });
+    paastand("et gæt, der ikke er et bogstav, tæller ikke", s.gaet("1") === null && s.gaet("ab") === null);
+    paastand("små bogstaver og æøå tæller", s.gaet(forkerte[0].toLowerCase()) !== null);
+    paastand("samme bogstav to gange tæller ikke", s.gaet(forkerte[0]) === null);
+    s.gaet(forkerte[1]); s.gaet(forkerte[2]); s.gaet(forkerte[3]);
+    paastand("ledetråd kan købes med 4 forkerte", s.kanFaaLedetraad());
+    s.gaet(forkerte[4]);
+    paastand("ledetråd kan ikke købes med det sidste skridt", !s.kanFaaLedetraad() && !s.ledetraad());
+    s.gaet(forkerte[5]);
+    paastand("seks forkerte giver plask", r.status === "tabt" && s.iTraek === 0);
+
+    s = new G.Spil(kemi, rnd);
+    r = s.nytOrd();
+    r.ord.split("").forEach(function (c) { s.gaet(c); });
+    paastand("et ord uden fejl giver 60 point", r.status === "vundet" && r.point === 60 && s.point === 60);
+    r = s.nytOrd();
+    forkerte = G.BOGSTAVER.split("").filter(function (c) { return r.ord.indexOf(c) < 0; });
+    s.gaet(forkerte[0]); s.ledetraad();
+    r.ord.split("").forEach(function (c) { s.gaet(c); });
+    paastand("2 skridt brugt og 1 i træk giver 10 · 4 + 5 · 1 = 45 point", r.point === 45, r.point);
+    paastand("pointene er hele tal", s.point === Math.round(s.point));
+    for (i = 0; i < 3; i++) { r = s.nytOrd(); r.ord.split("").forEach(function (c) { s.gaet(c); }); }
+    paastand("femte ord i træk er Syreimmun", r.syreimmun && s.iTraek === 5);
+    r = s.nytOrd(); s.givOp();
+    paastand("Vis ordet taber runden og nulstiller træk", r.status === "tabt" && s.iTraek === 0);
+
+    /* ------------------------------------------------------------- */
+    overskrift("4 Knappen i trin og scenen");
+    var d = w.document, app = NK.app;
+    frem(w, 2);
+    paastand("29 bogstaver på tastaturet", d.querySelectorAll("#tastatur .tast").length === 29);
+    paastand("knappen begynder på Ledetråd", /^Ledetråd/.test(d.getElementById("hovedknap").textContent));
+    var fb = forkerteBogstaver(w);
+    d.querySelector('#tastatur .tast[data-bogstav="' + fb[0] + '"]').click();
+    paastand("et klik på et bogstav gætter", app.spil().runde.gaettet.indexOf(fb[0]) >= 0);
+    paastand("bogstavet bliver rødt og låst", d.querySelector('.tast[data-bogstav="' + fb[0] + '"]').classList.contains("forkert") && d.querySelector('.tast[data-bogstav="' + fb[0] + '"]').disabled);
+    app.gaet(fb[1]);
+    frem(w, 2.5);
+    var kar = app.kar();
+    paastand("to forkerte: pH 5,0 i karret", w.NK.Kar.phTekst(kar.ph) === "5,0", w.NK.Kar.phTekst(kar.ph));
+    paastand("klassekammeraten står på skridt 2", Math.abs(kar.elev.x - w.NK.Kar.POS[2]) < 1, kar.elev.x);
+    d.getElementById("hovedknap").click();
+    paastand("ledetråden vises og koster et skridt", !d.getElementById("tekstkort").hidden && app.spil().runde.forkerte === 3);
+    paastand("ledetråden står i kortet", d.getElementById("tekstkort-tekst").textContent === app.spil().runde.post.ledetraad);
+    paastand("knappen står nu på Vis ordet", /^Vis ordet/.test(d.getElementById("hovedknap").textContent));
+    var laerer = app.laerer();
+    paastand("Kemichael er ikke kommet endnu", !laerer.synlig());
+    d.getElementById("hovedknap").click();
+    paastand("Vis ordet taber runden, og knappen står på Næste ord", app.spil().runde.status === "tabt" && /^Næste ord/.test(d.getElementById("hovedknap").textContent));
+    paastand("de manglende bogstaver står i rødt", d.querySelectorAll("#ordtavle .felt.mangler").length > 0);
+    frem(w, 4.5);
+    paastand("klassekammeraten er faldet i", kar.elev.tilstand === "vaek" || kar.elev.tilstand === "falder");
+    paastand("brillerne flyder", !!kar.briller && kar.briller.t > 0);
+    paastand("Kemichael er kommet og taler", laerer.synlig() && laerer.laererTaler());
+    var sagt = laerer.laerer.tale;
+    paastand("han siger en replik om at give op", NK.Laerer.REPLIKKER.opgivet.indexOf(sagt) >= 0, sagt);
+    paastand("plasket står i hans uheldsregnskab", JSON.parse(w.localStorage.getItem("nk-kemichael") || "{}").uheld === 1);
+    frem(w, 9);
+    paastand("han går igen af sig selv", !laerer.synlig());
+
+    /* Enter giver et nyt ord, og en ny klassekammerat gaar ind */
+    var gammel = kar.elev;
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("Enter giver et nyt ord", app.spil().runde.status === "spiller" && app.spil().runde.gaettet.length === 0);
+    paastand("en ny klassekammerat går ind", kar.elev !== gammel && kar.elev.tilstand === "ind");
+    frem(w, 2);
+    paastand("karret er neutralt igen", w.NK.Kar.phTekst(kar.ph) === "7,0");
+    paastand("tastaturet er låst op igen", d.querySelectorAll("#tastatur .tast:disabled").length === 0);
+
+    /* Et vundet ord: ingen Kemichael */
+    app.spil().runde.ord.split("").forEach(function (c) { d.dispatchEvent(new w.KeyboardEvent("keydown", { key: c.toLowerCase(), bubbles: true })); });
+    paastand("tastaturet gætter hele ordet", app.spil().runde.status === "vundet");
+    frem(w, 4);
+    paastand("Kemichael kommer ikke ved et vundet ord", !laerer.synlig());
+    paastand("kortet siger Reddet", d.getElementById("tekstkort-titel").textContent === "Reddet");
+    paastand("rekorden er gemt i browseren", JSON.parse(w.localStorage.getItem("nk-syregalgen")).rekord.kemi === 1);
+    paastand("toplinjen viser point og træk", d.getElementById("tal-point").textContent === String(app.spil().point) && d.getElementById("tal-traek").textContent === "1");
+
+    /* Fem i traek: Syreimmun (escape-rummets segl 2 spoerger til det) */
+    for (i = 0; i < 4; i++) {
+        d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+        app.spil().runde.ord.split("").forEach(function (c) { app.gaet(c); });
+    }
+    paastand("femte ord i træk giver kortet Syreimmun", app.spil().iTraek === 5 && d.getElementById("tekstkort-titel").textContent === "Syreimmun" && /Du er officielt Syreimmun/.test(d.getElementById("tekstkort-ros").textContent));
+    paastand("kortet har regnbuekanten", d.getElementById("tekstkort").classList.contains("immun"));
+
+    /* ------------------------------------------------------------- */
+    overskrift("5 Træningsområderne");
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    d.querySelector('.chip[data-id="c5"]').click();
+    paastand("et område midt i et urørt ord giver straks et ord derfra", app.spil().runde.post.omraade === "c5");
+    paastand("chippen er aktiv, og Alle er ikke", d.querySelector('.chip[data-id="c5"]').classList.contains("aktiv") && !d.querySelector('.chip[data-id=""]').classList.contains("aktiv"));
+    paastand("antallet af ord passer", d.getElementById("antal-ord").textContent === kemi.omraader[4].ord.length + " ord");
+    app.gaet(forkerteBogstaver(w)[0]);
+    d.querySelector('.chip[data-id="c6"]').click();
+    paastand("midt i et ord gælder valget fra næste ord", app.spil().runde.post.omraade === "c5" && !d.getElementById("omraade-note").hidden);
+    paastand("noten er synlig", w.getComputedStyle(d.getElementById("omraade-note")).display !== "none");
+    app.spil().givOp();
+    app.nytOrd();
+    paastand("næste ord er fra C5 eller C6", ["c5", "c6"].indexOf(app.spil().runde.post.omraade) >= 0);
+    paastand("noten er væk igen", w.getComputedStyle(d.getElementById("omraade-note")).display === "none");
+    paastand("valget huskes i browseren", JSON.parse(w.localStorage.getItem("nk-syregalgen")).omraader.kemi.join() === "c5,c6");
+    d.querySelector('.chip[data-id=""]').click();
+    paastand("Alle rydder valget", app.spil().valgte.length === 0);
+
+    /* ------------------------------------------------------------- */
+    overskrift("6 Links og det lange ord");
+    w = await aabn("#c3+c4");
+    frem(w, 0.5);
+    paastand("#c3+c4 vælger to områder", w.NK.app.spil().valgte.join() === "c3,c4");
+    w = await aabn("#historie");
+    frem(w, 0.5);
+    paastand("#historie vælger historielisten", w.NK.app.liste().id === "historie" && /Historie/.test(w.document.getElementById("listenavn").textContent));
+    w = await aabn("#c4");
+    var sp = w.NK.app.spil();
+    var langt = w.NK.app.lister.kemi.laest.ord.reduce(function (a, p) { return p.ord.length > a.ord.length ? p : a; });
+    sp.runde = { post: langt, ord: langt.ord, gaettet: langt.ord.split(""), forkerte: 0, ledetraad: false, status: "spiller" };
+    w.NK.app.visOrd();
+    var tavle = w.document.getElementById("ordtavle"), scene = w.document.getElementById("scene");
+    paastand("det længste ord (" + langt.ord + ") kan være i scenen", tavle.scrollWidth <= scene.clientWidth && tavle.getBoundingClientRect().right <= scene.getBoundingClientRect().right + 1, tavle.scrollWidth + " > " + scene.clientWidth);
+}
+
+window.addEventListener("load", function () {
+    koer().then(function () { vis(false); }, function (e) {
+        skriv("  FEJL  testen stoppede: " + e.message, "fejl"); fejl++; vis(false);
+        if (window.console) console.log("selvtest: " + e.stack);
+    });
+});
+</script>
+</body>
+</html>

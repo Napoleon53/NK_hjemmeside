@@ -112,7 +112,7 @@ window.NK = NK;
         return Math.exp(-stof.dHvap / R * (1 / (T + 273.15) - 1 / (stof.kp + 273.15)));
     };
 
-    /* En portion er 96 kugler: tre raekker i bassinet. Bassinet rummer ni. */
-    D.PORTION = 96;
+    /* En portion er 120 kugler: tre raekker i bassinet. Bassinet rummer elleve. */
+    D.PORTION = 120;
     D.PORTION_ML = 10;
 }());

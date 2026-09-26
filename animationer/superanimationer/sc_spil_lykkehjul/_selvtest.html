@@ -145,6 +145,15 @@ async function koer() {
             r.quiz.gaader.every(function (g) { return g.type !== "runde" || Object.keys(g.antal).some(S.erKonsonant); }));
     });
     paastand("Kemi B er standard", D.STANDARD === "b" && B.valgt() === "i:b");
+    ["atom", "molekyler", "beregning"].forEach(function (n) {
+        var rq = F.fraTekst(D.INDBYGGEDE.filter(function (x) { return x.noegle === n; })[0].tekst).quiz;
+        paastand("#" + n + ": fem runder uden toss-ups og uden finale", !!rq && rq.gaader.length === 5
+            && rq.gaader.every(function (g) { return g.type === "runde"; }) && !rq.final);
+        paastand("#" + n + ": hver løsning har mindst 20 felter, så den ikke løses på et øjeblik", !!rq
+            && rq.gaader.every(function (g) { return g.celler.filter(function (c) { return c.bogstav; }).length >= 20; }));
+    });
+    paastand("#atom, #molekyler og #beregning vælger emnequizzerne", B.fraHash("#atom") === "i:atom"
+        && B.fraHash("#molekyler") === "i:molekyler" && B.fraHash("#beregning") === "i:beregning");
     var r = F.fraTekst("Titel: Test\nRunde: Syre-base ; Buffer\nToss-up 2.000 kr.: Redox ; Oxidation\n// kommentar\nFinal: Natur ; Koffein");
     paastand("toss-up med beløb, runde, kommentar og final læses", !!r.quiz && r.quiz.gaader.length === 2
         && r.quiz.gaader[1].vaerdi === 2000 && r.quiz.final && r.quiz.final.loesning === "Koffein", r.fejl.join(" | "));
@@ -176,6 +185,7 @@ async function koer() {
 
     /* ----------------------------------------------------------------- */
     overskrift("5. Reglerne i en runde");
+    A.skiftTilstand(false);
     A.skiftQuiz("i:b");
     var Q = S.Q();
     var rNr = Q.gaader.map(function (g) { return g.type; }).indexOf("runde");
@@ -426,6 +436,184 @@ async function koer() {
         if (A.ui.titel) A.startSpil();
         paastand("tilbuddet forsvinder og huskes, når spillet går i gang", d.getElementById("tilbud").hidden && !!NK.hent("nk-lykkehjul-intro", {}).titel);
     }
+
+    /* ----------------------------------------------------------------- */
+    overskrift("11. Alene: reglerne");
+    paastand("#alene og #a&alene vælger alene, #hold vælger hold", A.tilstandFraHash("#alene") === true && A.tilstandFraHash("#a&alene") === true
+        && A.tilstandFraHash("#hold") === false && A.tilstandFraHash("#a") === null);
+    paastand("resten af linket vælger stadig quizzen", A.udenTilstand("#a&alene") === "#a" && A.udenTilstand("#alene") === "#" && A.udenTilstand("#alene&nf") === "#nf");
+    A.skiftTilstand(true);
+    paastand("alene har sit eget gemte spil", S.alene() && (!S.T() || S.T().alene === true));
+    S.nyt(["Test"]);
+    T = S.T();
+    paastand("én spiller", T.hold.length === 1 && T.alene === true && T.hold[0].navn === "Test");
+    S.start(rNr);
+    G = S.aktuel();
+    paastand("en runde begynder med " + D.ALENE.liv + " liv", T.g.liv === D.ALENE.liv);
+    var ikkeA = D.KONSONANTER.split("").filter(function (b) { return !G.antal[b]; })[0];
+    S.drejet(felt("vaerdi", 500));
+    S.vaelg(ikkeA);
+    paastand("en konsonant, der ikke er der, koster et liv, og man beholder turen", T.g.liv === D.ALENE.liv - 1 && T.g.tur === 0 && T.g.fase === "tur");
+    var kA = Object.keys(G.antal).filter(S.erKonsonant)[0];
+    S.drejet(felt("vaerdi", 500));
+    S.vaelg(kA);
+    S.drejet(felt("fallit"));
+    paastand("Fallit sletter rundens penge og koster et liv", T.g.runde[0] === 0 && T.g.liv === D.ALENE.liv - 2);
+    S.loes();
+    S.fortrydLoes();
+    paastand("Løs gåden kan fortrydes uden at koste et liv", T.g.fase === "tur" && T.g.liv === D.ALENE.liv - 2);
+    S.drejet(felt("vaerdi", 900));
+    S.vaelg(Object.keys(G.antal).filter(function (b) { return S.erKonsonant(b) && T.g.gaettet.indexOf(b) < 0; })[0]);
+    S.drejet(felt("mist"));
+    paastand("uden liv er runden tabt: løsningen vises, og pengene er væk", T.g.tabt && T.g.loest && T.g.runde[0] === 0 && T.faerdige[rNr].gevinst === 0
+        && G.celler.every(function (c, i) { return S.synlig(i); }));
+    S.start(rNr);
+    paastand("den skrevne løsning tjekkes uden hensyn til store bogstaver, mellemrum og tegn",
+        S.tjek("le chateliers princip") && S.tjek("LE CHATELIER'S PRINCIP") && S.tjek(" Le-Chateliers  princip ") && !S.tjek("le chatelier") && !S.tjek(""));
+    var bufNr = Q.gaader.map(function (g) { return g.loesning; }).indexOf("En buffer holder pH næsten konstant");
+    S.start(bufNr);
+    paastand("ae, oe og aa gælder for æ, ø og å", S.tjek("en buffer holder ph naesten konstant") && S.tjek("En buffer holder pH næsten konstant"));
+    S.start(rNr);
+    S.loes();
+    S.loesSvar(false);
+    paastand("en forkert løsning koster et liv", T.g.liv === D.ALENE.liv - 1 && T.g.fase === "tur");
+    S.loes();
+    var totalFoerA = T.hold[0].total;
+    S.loesSvar(true);
+    paastand("en rigtig løsning giver mindst 1.000 kr.", T.hold[0].total - totalFoerA === D.MINDSTE_GEVINST && T.g.vinder === 0);
+    S.start(tNr);
+    var GT = S.aktuel();
+    S.tossupStart();
+    paastand("toss-uppen er det fulde beløb værd, før der er vist noget", S.tossupVaerdi() === GT.vaerdi);
+    var bogstavfelter = GT.celler.filter(function (c) { return c.bogstav; }).length;
+    for (var ti = 0; ti < Math.floor(bogstavfelter / 2); ti++) S.tossupAfslor();
+    var halv = S.tossupVaerdi();
+    paastand("med halvdelen vist er den omtrent det halve værd (" + NK.beloeb(halv, "kr.") + ")", halv <= GT.vaerdi / 2 + D.ALENE.trin && halv >= GT.vaerdi / 2 - 2 * D.ALENE.trin && halv % D.ALENE.trin === 0);
+    var aabneFoer = T.g.aabne.length;
+    S.tossupSvarer(0);
+    S.tossupSvar(false);
+    paastand("et forkert svar viser " + D.ALENE.straf + " bogstaver mere, og man må prøve igen", T.g.aabne.length === aabneFoer + D.ALENE.straf && T.g.fase === "koerer" && S.tossupKanSvare(0));
+    S.tossupSvarer(0);
+    var vNu = S.tossupVaerdi(), fTot = T.hold[0].total;
+    S.tossupSvar(true);
+    paastand("et rigtigt svar giver det, toss-uppen var værd lige da", T.hold[0].total - fTot === vNu && vNu < halv);
+    S.start(Q.gaader.length);
+    paastand("finalen spilles af spilleren", T.g.final.hold === 0);
+    S.glemRekord();
+    T.hold[0].total = 5000;
+    S.slut();
+    paastand("et resultat bliver rekord", T.nyRekord === true && S.rekord().point === 5000 && S.rekord().navn === "Test");
+    S.tilbageFraSlut();
+    T.hold[0].total = 3000;
+    S.slut();
+    paastand("et dårligere resultat overskriver ikke rekorden", T.nyRekord === false && S.rekord().point === 5000);
+    A.skiftTilstand(false);
+    paastand("holdspillet har sit eget gemte spil", !S.alene() && (!S.T() || !S.T().alene));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("12. Alene: et spil med tastaturet");
+    function skriv(tekst) {
+        var inp = d.getElementById("svar-input");
+        inp.value = tekst;
+        inp.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true }));
+    }
+    function synlig(id) { var e = d.getElementById(id); return !!(e && (e.offsetWidth || e.offsetHeight)); }
+    A.skiftTilstand(true);
+    S.glem();
+    S.glemRekord();
+    A.visTitel();
+    paastand("forsiden viser valget, og Alene er valgt", d.getElementById("tilstand-alene").classList.contains("valgt") && synlig("tilstand"));
+    paastand("alene er holdene skjult og navnet og rekorden fremme", !synlig("holdnavne") && synlig("alene-navn") && synlig("rekord"));
+    d.getElementById("alene-navn").value = "Selvtest";
+    d.getElementById("alene-navn").dispatchEvent(new w.Event("input", { bubbles: true }));
+    A.startSpil();
+    if (A.ui.titel) A.startSpil();
+    T = S.T();
+    paastand("spillet starter med ét podie og spillerens navn", d.querySelectorAll(".podie").length === 1 && T.hold[0].navn === "Selvtest");
+    paastand("ingen Gåder, ingen Fortryd", !synlig("gaadeknap") && !d.getElementById("k-fortryd"));
+    await til(function () { return !A.ui.laast; });
+    if (T.g.type === "tossup") {
+        tast(" ", "Space");
+        await til(function () { return T.g.aabne.length >= 2; }, 3000);
+        tast(" ", "Space");
+        paastand("Mellemrum er Jeg ved det, og svarfeltet står i stedet for bogstaverne", T.g.fase === "svarer" && synlig("svar-input") && !synlig("bogstaver"));
+        var aab = T.g.aabne.length;
+        skriv("forkert gæt");
+        paastand("Enter med et forkert svar giver flere bogstaver", T.g.aabne.length > aab && T.g.fase === "koerer" && !synlig("svar-input"));
+        await vent(100);
+        tast(" ", "Space");
+        skriv(S.aktuel().loesning.toLowerCase());
+        paastand("Enter med den rigtige løsning giver toss-uppens værdi", T.g.loest && T.hold[0].total > 0 && T.hold[0].total < S.aktuel().vaerdi);
+    }
+    A.startGaade(rNr);
+    await til(function () { return !A.ui.laast; });
+    paastand("runden viser tre hjerter ved navnet", (d.querySelector(".podie .liv") || {}).textContent === "♥♥♥");
+    A.ui.tvungetFelt = felt("vaerdi", 600);
+    tast(" ", "Space");
+    await til(function () { return d.getElementById("hjulscene").hidden && !A.ui.laast; }, 6000);
+    G = S.aktuel();
+    var ikkeB = D.KONSONANTER.split("").filter(function (b) { return !G.antal[b]; })[0];
+    tast(ikkeB.toLowerCase(), "Key" + ikkeB);
+    paastand("et forkert bogstav fjerner et hjerte", T.g.liv === 2 && d.querySelector(".podie .liv").textContent === "♥♥♡");
+    tast("z", "KeyZ", { ctrlKey: true });
+    paastand("Ctrl+Z fortryder ikke alene", T.g.liv === 2);
+    d.getElementById("k-loes").click();
+    paastand("Løs gåden viser svarfeltet med Svar og Annullér", synlig("svar-input") && !!d.getElementById("k-svar") && !!d.getElementById("k-annuller"));
+    d.getElementById("svar-input").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", code: "Escape", bubbles: true }));
+    paastand("Esc i svarfeltet annullerer uden at koste et liv", T.g.fase === "tur" && T.g.liv === 2);
+    d.getElementById("k-loes").click();
+    skriv("Le Chateliers princip");
+    await til(function () { return !A.ui.laast; }, 2000);
+    paastand("den rigtige løsning vinder runden", T.g.loest && T.g.vinder === 0 && !T.g.tabt);
+    A.startGaade(Q.gaader.length);
+    paastand("finalen alene har ingen holdvalg", !d.getElementById("plakat").hidden && !d.querySelector("[data-finalhold]"));
+    tast(" ", "Space");
+    await til(function () { return T.g.fase === "rstlne" && !A.ui.laast; }, 6000);
+    paastand("kuverten er en af de små kuverter", D.ALENE.praemier.indexOf(T.g.final.praemie) >= 0);
+    tast(" ", "Space");
+    await til(function () { return T.g.fase === "valg" && !A.ui.laast; }, 4000);
+    ["b", "c", "d", "a"].forEach(function (b) { tast(b, "Key" + b.toUpperCase()); });
+    tast(" ", "Space");
+    await til(function () { return T.g.fase === "ur" && !A.ui.laast; }, 4000);
+    tast(" ", "Space");
+    paastand("uret går, og svarfeltet er fremme", !!A.ui.ur && synlig("svar-input"));
+    skriv("kaffe");
+    paastand("et forkert svar i finalen må prøves igen", T.g.fase === "ur" && !T.g.loest);
+    await til(function () { return T.g.loest; }, 3000);
+    paastand("når tiden går, er finalen tabt af sig selv", T.g.loest && T.g.final.vundet === false);
+    await til(function () { return !A.ui.laast; }, 2000);
+    tast(" ", "Space");
+    tast(" ", "Space");
+    paastand("resultatet viser pengene, rekorden og hver gåde", T.slut && d.querySelectorAll(".gaaderesultat li").length === Q.gaader.length + 1
+        && !!d.querySelector(".rekordlinje.ny") && S.rekord().navn === "Selvtest");
+    var tekstAlene = d.body.innerText;
+    paastand("ingen tankestreger alene", !/[–—]/.test(tekstAlene + d.getElementById("regler").textContent));
+    A.skiftTilstand(false);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("13. En emnequiz fra start til slut");
+    A.skiftQuiz("i:atom");
+    S.glem();
+    A.visTitel();
+    paastand("forsiden siger bare 5 runder", tekst("titel-quiz") === "5 runder");
+    A.startSpil();
+    if (A.ui.titel) A.startSpil();
+    T = S.T();
+    for (var rn = 0; rn < 5; rn++) {
+        await til(function () { return !A.ui.laast; });
+        if (T.g.type !== "runde") break;
+        S.loes();
+        A.loesSvar(true);
+        await til(function () { return !A.ui.laast; }, 2000);
+        if (rn < 4) A.naesteGaade();
+    }
+    paastand("fem runder spilles, og alle hold kommer til", Object.keys(T.faerdige).length === 5
+        && [0, 1, 2].every(function (h) { return T.hold[h].total > 0; }));
+    paastand("efter femte runde går den gule knap til resultatet", /Resultat/.test(d.getElementById("k-videre").textContent));
+    d.getElementById("k-videre").click();
+    paastand("resultatet viser holdene", T.slut && d.querySelectorAll(".rangliste li").length === 3);
+    S.glem();
+    A.skiftQuiz("i:b");
     } finally {
         /* Ryd op: gemt spil og indstillinger tilbage */
         S.glem();

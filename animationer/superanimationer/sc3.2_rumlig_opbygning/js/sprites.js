@@ -21,16 +21,7 @@
         atom_N:          { fil: "atom_n.svg", b: 128, h: 128 },
         atom_Cl:         { fil: "atom_cl.svg", b: 128, h: 128 },
         elektronpar:     { fil: "elektronpar.svg", b: 64, h: 110 },
-        vinkelmaaler:    { fil: "vinkelmaaler.svg", b: 64, h: 38 },
-
-        /* Fane 4: vandstraaleforsoeget */
-        stativ:          { fil: "stativ.svg", b: 220, h: 530 },
-        burette:         { fil: "burette.svg", b: 40, h: 250 },
-        baegerglas:      { fil: "baegerglas.svg", b: 150, h: 100 },
-        flaske:          { fil: "flaske.svg", b: 80, h: 150 },
-        plastikstav:     { fil: "plastikstav.svg", b: 200, h: 14 },
-        glasstav:        { fil: "glasstav.svg", b: 200, h: 14 },
-        uldklud:         { fil: "uldklud.svg", b: 150, h: 56 }
+        vinkelmaaler:    { fil: "vinkelmaaler.svg", b: 64, h: 38 }
     };
 
     /* Ankerpunkter i spritets egne enheder. */

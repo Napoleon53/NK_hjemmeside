@@ -11,37 +11,21 @@
     var D = window.NK.Data;
 
     /* ----- Kemichael -----------------------------------------------------
-       Praesentationen, foerste gang siden aabnes. Han peger paa panelet,
-       mens han siger linjen D.INTRO_PEG. */
+       Praesentationen: to linjer. Han peger paa panelet, mens han siger
+       linjen D.INTRO_PEG. Ellers siger han kun noget ved paaskeaegget. */
     D.INTRO = [
         "Et glas væske. Forstørret, så du ser molekylerne.",
-        "Hæld i herovre. Bliver det ét lag eller to?",
-        "Olien er lånt fra kantinen. Den skal tilbage."
+        "Hæld i herovre. Bliver det ét lag eller to?"
     ];
     D.INTRO_PEG = 1;
 
     D.REPLIK = {
-        /* En stor oliedraabe svaever midt i blandingen (paaskeaegget) */
+        /* En stor oliedraabe haenger midt i blandingen, fordi taethederne
+           naesten er ens (paaskeaegget) */
         svaever: [
-            "Olien svæver. Det lykkes sjældent for nogen.",
-            "En svævende oliekugle. Kantinen vil ikke tro det.",
-            "Tætheden går lige op. Rør ikke ved noget."
-        ],
-        /* Bassinet loeb over */
-        overloeb: [
-            "Bassinet rummer ni portioner. Gulvet har fået resten.",
-            "Det løb over. Gulvet var ellers lige vasket.",
-            "Ni portioner er loftet. Det ved gulvet nu."
-        ],
-        /* Rystet noget, der allerede er ét lag */
-        rystBlandet: [
-            "Det kan ikke blive mere blandet end blandet.",
-            "Du ryster en færdig blanding. Den er ligeglad."
-        ],
-        /* Rystet et tomt bassin */
-        rystTomt: [
-            "Du ryster luft. Den er allerede godt blandet.",
-            "Et tomt bassin skilles aldrig."
+            "Olien svæver næsten. Det lykkes sjældent for nogen.",
+            "Olien har ingen hast. Den kan ikke bestemme sig.",
+            "Næsten en svævende oliekugle. Kantinen vil ikke tro det."
         ]
     };
 

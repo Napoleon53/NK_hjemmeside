@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syre-base-reaktioner</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">◆</span> Syre-base-reaktioner</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-hydron" role="tab" aria-selected="true" title="Hydronen (1)"><span class="nr">1</span>Hydronen</button>
+        <button class="faneknap" data-fane="fane-produkter" role="tab" aria-selected="false" title="Produkterne (2)"><span class="nr">2</span>Produkterne</button>
+        <button class="faneknap" data-fane="fane-par" role="tab" aria-selected="false" title="Parrene (3)"><span class="nr">3</span>Parrene</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: HYDRONEN                                                   -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-hydron" role="tabpanel" aria-label="Hydronen">
+    <div class="scene medtekst">
+        <canvas id="hydron-laerred"></canvas>
+        <div class="anker" id="hydron-anker-mol"></div>
+        <div class="anker" id="hydron-anker-skema"></div>
+        <div class="tilbud" id="hydron-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="hydron-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="hydron-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste reaktion -->
+        <div class="kort opgavekort" id="hydron-kort">
+            <h2><span>Reaktion</span><span class="taeller" id="hydron-taeller"></span></h2>
+            <div class="pips" id="hydron-pips"></div>
+            <p class="maal-tekst" id="hydron-tekst"></p>
+            <p class="besked" id="hydron-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="hydron-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="hydron-par-kort">
+            <h2>Syre-basepar <span class="taeller" id="hydron-par-tal"></span></h2>
+            <div id="hydron-parliste"></div>
+        </div>
+
+        <!-- Alle ti reaktioner forfra (samme som R) -->
+        <button class="knap nulstil" id="hydron-forfra" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: PRODUKTERNE                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-produkter" role="tabpanel" aria-label="Produkterne">
+    <div class="scene medtekst">
+        <canvas id="prod-laerred"></canvas>
+        <div class="anker" id="prod-anker-lign"></div>
+        <div class="anker" id="prod-anker-brikker"></div>
+        <div class="tilbud" id="prod-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="prod-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="prod-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort niveaukort" id="prod-niveau">
+            <h2>Sværhedsgrad</h2>
+            <div class="niveauknapper">
+                <button type="button" class="niveauknap" data-niveau="let" aria-pressed="false">Let</button>
+                <button type="button" class="niveauknap" data-niveau="middel" aria-pressed="false">Middel</button>
+                <button type="button" class="niveauknap" data-niveau="svaer" aria-pressed="false">Svær</button>
+            </div>
+            <p class="note niveau-tekst"></p>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Ny reaktion -->
+        <div class="kort opgavekort" id="prod-kort">
+            <h2><span>Produkterne</span><span class="taeller" id="prod-taeller"></span></h2>
+            <p class="maal-tekst">Hvad dannes?</p>
+            <p class="opgave-spm">Træk de to produkter op på pladserne efter pilen.</p>
+            <p class="besked" id="prod-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="prod-knap" type="button">Giv hint</button></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: PARRENE                                                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-par" role="tabpanel" aria-label="Parrene">
+    <div class="scene medtekst">
+        <canvas id="par-laerred"></canvas>
+        <div class="anker" id="par-anker-lign"></div>
+        <div class="anker" id="par-anker-brikker"></div>
+        <div class="tilbud" id="par-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="par-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="par-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort niveaukort" id="par-niveau">
+            <h2>Sværhedsgrad</h2>
+            <div class="niveauknapper">
+                <button type="button" class="niveauknap" data-niveau="let" aria-pressed="false">Let</button>
+                <button type="button" class="niveauknap" data-niveau="middel" aria-pressed="false">Middel</button>
+                <button type="button" class="niveauknap" data-niveau="svaer" aria-pressed="false">Svær</button>
+            </div>
+            <p class="note niveau-tekst"></p>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Ny reaktion -->
+        <div class="kort opgavekort" id="par-kort">
+            <h2><span>Parrene</span><span class="taeller" id="par-taeller"></span></h2>
+            <p class="maal-tekst">Hvem er hvem?</p>
+            <p class="opgave-spm">Sæt syre, base og de to korresponderende under de rigtige formler.</p>
+            <p class="besked" id="par-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="par-knap" type="button">Giv hint</button></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Syrer og baser</h2>
+        <p>En <b>syre</b> afgiver en hydron, H⁺. En <b>base</b> optager en hydron. I en syre-base-reaktion flytter én hydron fra syren til basen.</p>
+        <p>En hydron er et hydrogenatom uden sin elektron. Når den forlader syren, bliver elektronparret fra bindingen tilbage som et frit elektronpar. Basen tager imod hydronen med et af sine frie elektronpar.</p>
+        <svg class="formel" viewBox="0 0 520 132" role="img" aria-label="HCl og H₂O giver Cl⁻ og H₃O⁺. HCl og Cl⁻ er det ene par, H₂O og H₃O⁺ det andet.">
+            <g fill="none" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+                <path d="M 58 38 V 18 H 330 V 38" stroke="#6cb6ff"/>
+                <path d="M 170 100 V 120 H 452 V 100" stroke="#c79bf2"/>
+            </g>
+            <g font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="24" text-anchor="middle">
+                <text x="58" y="64" fill="#6cb6ff">HCl</text>
+                <text x="114" y="64" fill="#a9b0ba" font-weight="400">+</text>
+                <text x="170" y="64" fill="#c79bf2">H₂O</text>
+                <text x="250" y="64" fill="#a9b0ba" font-weight="400">⟶</text>
+                <text x="330" y="64" fill="#6cb6ff">Cl⁻</text>
+                <text x="390" y="64" fill="#a9b0ba" font-weight="400">+</text>
+                <text x="452" y="64" fill="#c79bf2">H₃O⁺</text>
+            </g>
+            <g font-family="Segoe UI, Arial, sans-serif" font-size="13" text-anchor="middle">
+                <text x="58" y="88" fill="#6cb6ff">syre</text>
+                <text x="170" y="88" fill="#c79bf2">base</text>
+                <text x="330" y="88" fill="#6cb6ff">korresp. base</text>
+                <text x="452" y="88" fill="#c79bf2">korresp. syre</text>
+            </g>
+        </svg>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Korresponderende syre-basepar</span>
+            syren mister én H⁺: én H mindre, ladningen én lavere<br>
+            basen får én H⁺: én H mere, ladningen én højere
+        </div>
+        <p>Syren og den base, den bliver til, er et <b>korresponderende syre-basepar</b>. Det samme er basen og den syre, den bliver til. Et par er ens bortset fra én hydron.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Amfolyt</span>
+            H₂O, HCO₃⁻, H₂PO₄⁻ og HPO₄²⁻ kan både afgive og optage en hydron
+        </div>
+        <p>Om en amfolyt er syre eller base, afhænger af, hvem den møder. Vand er base over for HCl og syre over for NH₃.</p>
+        <p class="note">Alle reaktioner skrives med ⟶. Hvor langt en reaktion forløber, hører til pH og syrestyrke. Hvem der er syren, afgøres af animationen ud fra tabelværdier, som ikke vises.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/model.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/tavle.js"></script>
+<script src="js/sim_hydron.js"></script>
+<script src="js/sim_produkter.js"></script>
+<script src="js/sim_par.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

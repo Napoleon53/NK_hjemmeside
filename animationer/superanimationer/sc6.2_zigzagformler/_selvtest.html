@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc6.2 Zigzagformler</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at navngivningen giver bogens navne (også alle
+   isomerer af C4 til C9), at molekylformel og molarmasse passer, at de
+   tilfældige opgaver har det navn, de siger, og kan tegnes med luft, at
+   tjekket giver den rigtige besked ved de typiske fejl, at tavlen på
+   quizfanerne overholder reglerne, at alle fire faner kan gennemføres
+   (også opløselighedsspillet og reglen om 4 C pr. polær gruppe), at
+   klistermærkerne låses op, at sproget overholder reglerne, og at
+   layoutet holder fra 520 × 380 til 1500 × 900.
+
+   Tegnebrættet og det meste af motoren testes i
+   ../tegnebraet/_selvtest.html (fra 25. sept. 2026).
+
+   Kræver en lokal server (iframe, motoren fra ../../molekylemotor/ og
+   Kemichael fra ../../v2/kemichael/). Testen gemmer elevens valg og
+   lægger dem tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-skuffe", "nk-sc6.2-skuffe", "nk-sc6.2-intro-zigzag", "nk-sc6.2-intro-navne", "nk-sc6.2-intro-isomerer",
+    "nk-sc6.2-intro-oploeselighed", "nk-sc6.2-oploeselighed-rekord"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Et molekyle ud fra en lille SMILES-streng: C, N, O, S, F, Cl, Br, I,
+   grene (), bindinger = og #, ringlukning med cifre. Koordinaterne er
+   tilfældige, så navnet må ikke afhænge af dem (undtagen cis/trans). */
+function smiles(NK, s) {
+    var m = new NK.Molekyle(), i = 0, forrige = null, orden = 1, stak = [], ringe = {};
+    while (i < s.length) {
+        var c = s[i];
+        if (c === "(") { stak.push(forrige); i++; continue; }
+        if (c === ")") { forrige = stak.pop(); i++; continue; }
+        if (c === "=") { orden = 2; i++; continue; }
+        if (c === "#") { orden = 3; i++; continue; }
+        if (/\d/.test(c)) {
+            if (ringe[c]) { m.bind(ringe[c].id, forrige, Math.max(orden, ringe[c].orden)); delete ringe[c]; }
+            else ringe[c] = { id: forrige, orden: orden };
+            orden = 1; i++; continue;
+        }
+        var el = c;
+        if (s.substr(i, 2) === "Cl" || s.substr(i, 2) === "Br") { el = s.substr(i, 2); i += 2; } else i++;
+        var a = m.tilfoej(el, Math.random() * 10, Math.random() * 10);
+        if (forrige !== null) m.bind(forrige, a.id, orden);
+        orden = 1; forrige = a.id;
+    }
+    return m;
+}
+
+/* Navne efter bogens regler (IUPAC 1979/1993, dansk stavning) */
+var NAVNE = [
+    ["CCCC", "butan"], ["CC(C)C", "2-methylpropan"], ["C", "methan"], ["CC", "ethan"],
+    ["CC(CC)CC", "3-methylpentan"], ["CCC(C)CC", "3-methylpentan"], ["C(C)(C)CC", "2-methylbutan"],
+    ["CC(C)C(C)C", "2,3-dimethylbutan"], ["CCC(CC)C(C)C", "3-ethyl-2-methylpentan"],
+    ["CC(CC)C(C)C", "2,3-dimethylpentan"], ["CC(C)(C)C(C)CC", "2,2,3-trimethylpentan"],
+    ["CCC(C)C(CC)CC", "3-ethyl-4-methylhexan"], ["CCC(C(C)C)CCC", "3-ethyl-2-methylhexan"],
+    ["CCCCC(C(C)C)CCCC", "5-(1-methylethyl)nonan"], ["CCCCC(C(C)(C)C)CCCC", "5-(1,1-dimethylethyl)nonan"],
+    ["CCCCC(CCl)CCCC", "5-(chlormethyl)nonan"],
+    ["CC(Br)C", "2-brompropan"], ["BrCCBr", "1,2-dibromethan"], ["CC(C)(Br)C", "2-brom-2-methylpropan"],
+    ["ClC(Cl)Cl", "trichlormethan"], ["CCCCCCBr", "1-bromhexan"], ["CC(Cl)C(C)C", "2-chlor-3-methylbutan"],
+    ["CCBr", "bromethan"], ["FC(F)(F)C(Cl)Br", "2-brom-2-chlor-1,1,1-trifluorethan"],
+    ["C=C", "ethen"], ["C=CC", "propen"], ["C=CCC", "but-1-en"], ["CC=CC", "but-2-en"], ["C=C(C)C", "2-methylpropen"],
+    ["CC(C)=CC", "2-methylbut-2-en"], ["C=CC=C", "buta-1,3-dien"], ["C=CC(C)C", "3-methylbut-1-en"],
+    ["CCC(=C)CC", "2-ethylbut-1-en"], ["CCC(C=C)CCC", "3-ethylhex-1-en"], ["CC(C)C=CC(C)C", "2,5-dimethylhex-3-en"],
+    ["C#C", "ethyn"], ["CC#C", "propyn"], ["CC#CC", "but-2-yn"], ["C#CC=C", "but-1-en-3-yn"],
+    ["BrCC=C", "3-brompropen"], ["ClC=CCl", "1,2-dichlorethen"], ["C=CCl", "chlorethen"],
+    ["C1CCCCC1", "cyclohexan"], ["CC1CCCCC1", "methylcyclohexan"], ["CC1CCCCC1C", "1,2-dimethylcyclohexan"],
+    ["C1=CCCCC1", "cyclohexen"], ["CC1C=CCCC1", "3-methylcyclohexen"], ["C1=CC=CC=C1", "benzen"],
+    ["CC1=CC=CC=C1", "methylbenzen"], ["ClC1=CC=CC=C1", "chlorbenzen"], ["BrC1CCCCC1Br", "1,2-dibromcyclohexan"],
+    ["CCCCCCCCCCCCCCCCCC", "octadecan"]
+];
+
+/* Antal isomerer af CnH2n+2 (kendte tal) og alkener uden ring (strukturisomerer) */
+var ISOMERER = { 4: 2, 5: 3, 6: 5, 7: 9, 8: 18, 9: 35 };
+var C8 = "2,2,3,3-tetramethylbutan,2,2,3-trimethylpentan,2,2,4-trimethylpentan,2,2-dimethylhexan,2,3,3-trimethylpentan,2,3,4-trimethylpentan,2,3-dimethylhexan,2,4-dimethylhexan,2,5-dimethylhexan,2-methylheptan,3,3-dimethylhexan,3,4-dimethylhexan,3-ethyl-2-methylpentan,3-ethyl-3-methylpentan,3-ethylhexan,3-methylheptan,4-methylheptan,octan";
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    var i;
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    paastand("motoren er kørt (fra ../../molekylemotor/)", !!(NK.Molekyle && NK.Navn && NK.Layout && NK.Struktur && NK.Tegnebraet && NK.Skuffe && NK.Tavle && NK.Opgaver && NK.Tjek));
+    paastand("alle fire faner er bygget, og tegnebrættet er ikke en fane længere", !!(NK.sims && NK.sims["fane-zigzag"] && NK.sims["fane-navne"] && NK.sims["fane-isomerer"] && NK.sims["fane-oploeselighed"]) &&
+        !NK.sims["fane-tegn"] && !d.getElementById("fane-tegn"));
+    var sprites = ["kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("Kemichaels " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var Z = NK.sims["fane-zigzag"], N = NK.sims["fane-navne"], I = NK.sims["fane-isomerer"], OS = NK.sims["fane-oploeselighed"];
+    paastand("Kemichael er koblet på alle fire faner", !!(Z.laerer && N.laerer && I.laerer && OS.laerer));
+    var knapper = Array.prototype.map.call(d.querySelectorAll(".faneknap"), function (k) { return k.getAttribute("data-fane"); });
+    paastand("Zigzag er fane 1 og den, siden åbner med", knapper.join() === "fane-zigzag,fane-navne,fane-isomerer,fane-oploeselighed" &&
+        d.getElementById("fane-zigzag").classList.contains("aktiv") && d.querySelector(".faneknap.aktiv") === d.querySelector(".faneknap"), knapper.join());
+    W.document.dispatchEvent(new W.KeyboardEvent("keydown", { key: "2", bubbles: true }));
+    var efter2 = d.getElementById("fane-navne").classList.contains("aktiv");
+    W.document.dispatchEvent(new W.KeyboardEvent("keydown", { key: "1", bubbles: true }));
+    paastand("tast 2 giver Navne, tast 1 Zigzag", efter2 && d.getElementById("fane-zigzag").classList.contains("aktiv"));
+    W.document.dispatchEvent(new W.KeyboardEvent("keydown", { key: "4", bubbles: true }));
+    var efter4 = d.getElementById("fane-oploeselighed").classList.contains("aktiv");
+    NK.visFane("zigzag");
+    NK.visFane("oploeselighed");
+    paastand("tast 4 og #oploeselighed giver Opløselighed som fane 4", efter4 && d.getElementById("fane-oploeselighed").classList.contains("aktiv"));
+    NK.visFane("zigzag");
+    var link = d.getElementById("tegnelink");
+    paastand("knappen Tegnebræt i toppen åbner tegnebrættets egen side i en ny fane", !!link && /\.\.\/tegnebraet\/index\.html$/.test(link.getAttribute("href")) && link.getAttribute("target") === "_blank");
+
+    overskrift("2. Navngivningen");
+    var navnFejl = NAVNE.filter(function (r) { return NK.Navn.analyser(smiles(NK, r[0])).navnUdenStereo !== r[1]; });
+    paastand(NAVNE.length + " navne efter bogens regler", navnFejl.length === 0,
+        navnFejl.map(function (r) { return r[0] + " gav " + NK.Navn.analyser(smiles(NK, r[0])).navnUdenStereo + ", ikke " + r[1]; }).join("; "));
+    paastand("navnet afhænger ikke af, hvilket atom man tegner fra", ["CC(CC)CC", "C(CC)(CC)C", "C(C)(CC)CC"].every(function (s) {
+        return NK.Navn.analyser(smiles(NK, s)).navn === "3-methylpentan";
+    }));
+    paastand("flest sidegrupper vinder ved lige lange kæder: 3-ethyl-2-methylhexan", NK.Navn.analyser(smiles(NK, "CCC(C(C)C)CCC")).navn === "3-ethyl-2-methylhexan");
+    paastand("lige numre: den første i alfabetet får det laveste", NK.Navn.analyser(smiles(NK, "CCC(CC)C(C)CC")).navn === "3-ethyl-4-methylhexan");
+    paastand("hovedkæden går gennem dobbeltbindingen", NK.Navn.analyser(smiles(NK, "CCCC(C=C)CCCC")).navn === "3-propylhept-1-en");
+    var r = NK.Navn.analyser(smiles(NK, "CCO"));
+    paastand("motoren kender også de funktionelle grupper: ethanol", r.navn === "ethanol" && r.stofklasse === "alkohol");
+    paastand("to ringe: intet navn", NK.Navn.analyser(smiles(NK, "C1CC2CCC1C2")).grund === "ringe");
+
+    function traeer(n) {
+        var lag = [smiles(NK, "C")];
+        for (var k = 2; k <= n; k++) {
+            var ny = [], set = {};
+            lag.forEach(function (m) {
+                m.atomer.forEach(function (a) {
+                    if (m.grad(a.id) >= 4) return;
+                    var m2 = m.kopi(), b = m2.tilfoej("C", Math.random(), Math.random());
+                    m2.bind(a.id, b.id, 1);
+                    var nv = NK.Navn.analyser(m2).navn;
+                    if (!set[nv]) { set[nv] = true; ny.push(m2); }
+                });
+            });
+            lag = ny;
+        }
+        return lag;
+    }
+    var talFejl = [];
+    for (var n = 4; n <= 9; n++) { var l = traeer(n).length; if (l !== ISOMERER[n]) talFejl.push("C" + n + ": " + l); }
+    paastand("alle alkaner C4-C9 får hver sit navn (2, 3, 5, 9, 18, 35 isomerer)", talFejl.length === 0, talFejl.join(", "));
+    var c8 = traeer(8).map(function (m) { return NK.Navn.analyser(m).navn; }).sort().join(",");
+    paastand("de 18 navne på C8H18 er bogens", c8 === C8, c8);
+    function alkener(n) {
+        var set = {};
+        traeer(n).forEach(function (m) {
+            m.bindinger.forEach(function (bd, j) {
+                if (m.bindingssum(bd.a) >= 4 || m.bindingssum(bd.b) >= 4) return;
+                var m2 = m.kopi();
+                m2.bindinger[j].orden = 2;
+                set[NK.Navn.analyser(m2).navnUdenStereo] = true;
+            });
+        });
+        return Object.keys(set).length;
+    }
+    paastand("alkener uden ring: 3, 5 og 13 strukturisomerer af C4H8, C5H10, C6H12", alkener(4) === 3 && alkener(5) === 5 && alkener(6) === 13,
+        alkener(4) + ", " + alkener(5) + ", " + alkener(6));
+
+    function buten(cis) {
+        var m = new NK.Molekyle();
+        var p = [[0, 0], [0.866, -0.5], [1.732, 0], [2.598, cis ? 1 : -0.5]];
+        var a = p.map(function (q) { return m.tilfoej("C", q[0], q[1]); });
+        m.bind(a[0].id, a[1].id, 1); m.bind(a[1].id, a[2].id, 2); m.bind(a[2].id, a[3].id, 1);
+        return m;
+    }
+    paastand("zigzag er trans: trans-but-2-en", NK.Navn.analyser(buten(false)).navn === "trans-but-2-en");
+    paastand("samme side er cis: cis-but-2-en", NK.Navn.analyser(buten(true)).navn === "cis-but-2-en");
+    paastand("but-1-en og 2-methylbut-2-en har ingen cis/trans", !NK.Navn.analyser(smiles(NK, "C=CCC")).stereoMulig && NK.Navn.analyser(smiles(NK, "CC(C)=CC")).stereo === null);
+    paastand("den gamle skrivemåde 2-methyl-2-buten kendes", NK.Navn.gammelForm(NK.Navn.analyser(smiles(NK, "CC(C)=CC"))) === "2-methyl-2-buten");
+
+    overskrift("3. Molekylformel og molarmasse (H 1,01 som i sc4.1)");
+    var fm = [["CCO", "C₂H₆O", "46,08"], ["CC(=O)O", "C₂H₄O₂", "60,06"], ["CCCCCC", "C₆H₁₄", "86,20"], ["CBr", "CH₃Br", "94,94"],
+        ["CN", "CH₅N", "31,07"], ["C1=CC=CC=C1", "C₆H₆", "78,12"], ["ClC(Cl)Cl", "CHCl₃", "119,37"]];
+    var fmFejl = fm.filter(function (x) { var m = smiles(NK, x[0]); return m.formel() !== x[1] || NK.komma(m.molarmasse()) !== x[2]; });
+    paastand("formel og M for ethanol, eddikesyre, hexan, brommethan, methylamin, benzen, chloroform", fmFejl.length === 0,
+        fmFejl.map(function (x) { var m = smiles(NK, x[0]); return m.formel() + " " + NK.komma(m.molarmasse()); }).join("; "));
+    var tegnetH = new NK.Molekyle(), ca = tegnetH.tilfoej("C", 0, 0), ha = tegnetH.tilfoej("H", 1, 0);
+    tegnetH.bind(ca.id, ha.id, 1);
+    paastand("et tegnet H tæller med: CH₄", tegnetH.formel() === "CH₄");
+
+    overskrift("4. Opgaverne");
+    var O = NK.Opgaver, sFejl = [];
+    ["ZIGZAG", "ATOMER", "ALKANER", "ALKENER"].forEach(function (k) {
+        for (var runde = 0; runde < 6; runde++) {
+            var s = O.serie(O[k]);
+            if (s.length !== 10) sFejl.push(k + " har " + s.length);
+            s.forEach(function (m, j) {
+                var rr = NK.Navn.analyser(m.mol);
+                if (rr.navn !== m.navn) sFejl.push(k + j + ": " + rr.navn + " / " + m.navn);
+                if (k === "ATOMER" && m.antal > 7) sFejl.push(k + j + " har " + m.antal + " C");
+                if (k === "ALKENER" && j >= 5 && !m.stereo) sFejl.push(k + j + " uden cis/trans: " + m.navn);
+                if (k === "ALKENER" && j < 5 && m.stereo) sFejl.push(k + j + " med cis/trans: " + m.navn);
+                if (k === "ALKANER" && !m.res.sub.length) sFejl.push(k + j + " uden sidegruppe: " + m.navn);
+                var A = m.mol.atomer;
+                for (var a = 0; a < A.length; a++) for (var b = a + 1; b < A.length; b++) {
+                    if (Math.hypot(A[a].x - A[b].x, A[a].y - A[b].y) < 0.6) { sFejl.push(m.navn + " har atomer oven i hinanden"); a = A.length; break; }
+                }
+                var s90 = NK.Layout.struktur90(m.mol, rr), t90 = s90.optaelling(), t0 = m.mol.optaelling();
+                if (t90.C !== t0.C || t90.H !== t0.H) sFejl.push(m.navn + ": strukturformlen har " + s90.formel());
+            });
+        }
+    });
+    paastand("seks serier af hver slags: ti opgaver med rigtigt navn, cis/trans som trinnet siger, og luft mellem atomerne", sFejl.length === 0, sFejl.slice(0, 5).join("; "));
+    var isoFejl = [4, 5, 6, 7].filter(function (n) { return O.isomerer(n).length !== ISOMERER[n]; });
+    paastand("Isomerer har 2, 3, 5 og 9 isomerer", isoFejl.length === 0, isoFejl.join(", "));
+
+    overskrift("5. Tjekket");
+    var TJ = NK.Tjek;
+    function besked(r) { return r.ok ? "OK" + (r.note ? ": " + r.note : "") : r.besked; }
+    var fT = [
+        ["C5H12", 5, 12, false, "OK"], ["c5h12", 5, 12, false, "OK: Rigtigt. Grundstofsymbolerne"], ["C₅H₁₂", 5, 12, false, "OK"],
+        ["H12C5", 5, 12, false, "Skriv C først"], ["C4H12", 5, 12, false, "Tæl C-atomerne"], ["C5H10", 5, 12, false, "Tæl H igen"],
+        ["C5H12", 5, 10, true, "formlen for en alkan"], ["pentan", 5, 12, false, "Skriv formlen som C og H"]
+    ];
+    var fFejl = fT.filter(function (x) { return besked(TJ.formel(x[0], x[1], x[2], x[3])).indexOf(x[4]) !== 0 && besked(TJ.formel(x[0], x[1], x[2], x[3])).indexOf(x[4]) < 0; });
+    paastand("formlen: rigtige svar og de typiske fejl", fFejl.length === 0, fFejl.map(function (x) { return x[0] + " -> " + besked(TJ.formel(x[0], x[1], x[2], x[3])); }).join("; "));
+
+    function maal(s, stereo) {
+        var m = smiles(NK, s);
+        return O.faerdig(m, stereo || null);
+    }
+    var m1 = maal("CCC(CC)C(C)C"), m2 = maal("CC(C)(C)CC"), m3 = maal("CC=CC(C)C", "cis"), m4 = maal("CC(C)=CC");
+    var nT = [
+        [m1, "3-ethyl-2-methylpentan", "OK"], [m1, "3-Ethyl-2-methylpentan", "OK"], [m1, " 3-ethyl-2-methylpentan ", "OK"],
+        [m1, "2-methyl-3-ethylpentan", "alfabetisk"], [m1, "3ethyl2methylpentan", "bindestreg"], [m1, "3-ethyl-2-methylhexan", "hovedkæden"],
+        [m1, "3-ethyl-4-methylpentan", "numrene"], [m1, "2-methylpentan", "mangler en sidegruppe"], [m1, "ethylmethylpentan", "mangler numrene"],
+        [m1, "3-ethyl-2-methylpentane", "dansk"], [m2, "2,2-methylbutan", "di"], [m2, "2-2-dimethylbutan", "komma"],
+        [m2, "2,2-dimethylbuten", "ingen dobbeltbinding"],
+        [m3, "cis-4-methylpent-2-en", "OK"], [m3, "4-methylpent-2-en", "mangler cis eller trans"], [m3, "trans-4-methylpent-2-en", "dobbeltbindingen igen"],
+        [m3, "cis-2-methylpent-3-en", "dobbeltbindingens nummer"], [m3, "cis-4-methyl-2-penten", "OK: Rigtigt. Den nyere"], [m3, "4-methylpent-2-an", "-en"],
+        [m4, "2-methylbut-2-en", "OK"], [m4, "cis-2-methylbut-2-en", "ingen cis eller trans"]
+    ];
+    var nFejl = nT.filter(function (x) { return besked(TJ.navn(x[1], x[0])).indexOf(x[2]) < 0; });
+    paastand("navnet: " + nT.length + " rigtige svar og typiske fejl giver den rette besked", nFejl.length === 0,
+        nFejl.map(function (x) { return x[1] + " -> " + besked(TJ.navn(x[1], x[0])); }).join("; "));
+
+    function tegnet(s) { var m = smiles(NK, s); NK.Layout.zigzag(m, NK.Navn.analyser(m)); return NK.Navn.analyser(m); }
+    var tT = [
+        [tegnet("CCC(CC)C(C)C"), m1, "OK"], [tegnet("CCCCCCC"), m1, "længste kæde"], [tegnet("CC(C)C(C)CC"), m1, "Der skal være"],
+        [tegnet("CCC(C)C(C)C"), maal("CC(C)CC(C)C"), "forkerte C-atomer"],
+        [tegnet("CC(C)C(C)CC"), maal("CC=C(C)CC"), "mangler dobbeltbindingen"], [tegnet("C=CC(C)CC"), m1, "ingen dobbeltbinding"]
+    ];
+    var tFejl = tT.filter(function (x) { return besked(TJ.tegning(x[0], x[1], true)).indexOf(x[2]) < 0; });
+    paastand("tegningen: rigtig tegning og typiske fejl", tFejl.length === 0, tFejl.map(function (x) { return besked(TJ.tegning(x[0], x[1], true)); }).join("; "));
+    var trans = maal("CC=CC(C)C", "trans");
+    paastand("cis tegnet, trans bestilt: rigtigt molekyle, men forkert side", besked(TJ.tegning(m3.res, trans, true)).indexOf("men det er cis") >= 0);
+
+    overskrift("6. Tavlen på quizfanerne");
+    function braet(regler) {
+        return new NK.Tegnebraet({
+            felt: function () { return { x: 0, y: 0, b: 1000, h: 700 }; }, skala: function () { return 50; },
+            regler: regler, aendret: function () {}, toast: function (t) { braet.sidst = t || braet.sidst; }
+        });
+    }
+    var B = braet({ kunC: true, dobbelt: true, enDobbelt: true, knaek: true, sletAlt: false, maks: function () { return 8; }, maksTekst: function () { return "fuld"; } });
+    B.nulstil(true, true);
+    var p0 = B.px(B.mol.atomer[0]);
+    B.ned(p0, { button: 0 });
+    for (i = 1; i <= 40; i++) B.flyt({ x: p0.x + i * 7, y: p0.y });
+    B.op({ x: p0.x + 280, y: p0.y });
+    var res = NK.Navn.analyser(B.mol);
+    var vinkler = [];
+    B.mol.atomer.forEach(function (a) {
+        var nb = B.mol.naboer(a.id);
+        if (nb.length === 2) {
+            var u = B.mol.atom(nb[0]), w = B.mol.atom(nb[1]);
+            var v = Math.abs(Math.atan2(u.y - a.y, u.x - a.x) - Math.atan2(w.y - a.y, w.x - a.x)) * 180 / Math.PI;
+            vinkler.push(Math.round(v > 180 ? 360 - v : v));
+        }
+    });
+    paastand("et vandret træk giver en lige kæde uden grene", res.navn && res.sub.length === 0 && res.kaede.length === B.mol.atomer.length, res.navn);
+    paastand("kæden har 120 grader i hvert knæk", vinkler.length > 2 && vinkler.every(function (v) { return v === 120; }), vinkler.join(","));
+    var bd = B.mol.bindinger[1];
+    B.skiftBinding(bd);
+    paastand("klik på en binding giver en dobbeltbinding", bd.orden === 2);
+    B.skiftBinding(B.mol.bindinger[2]);
+    paastand("et C kan ikke have to dobbeltbindinger på opgavefanerne", B.mol.bindinger[2].orden === 1);
+    B.skiftBinding(bd);
+    paastand("og et klik mere gør den enkelt igen (ingen tripel på opgavefanerne)", bd.orden === 1);
+    var midt = B.mol.atomer[2];
+    paastand("et atom midt i kæden kan ikke slettes på opgavefanerne", !B.sletAtom(midt) && !!B.mol.atom(midt.id));
+    var foer = B.antal();
+    B.fortryd();
+    paastand("fortryd tager det sidste skridt tilbage: dobbeltbindingen er der igen", B.mol.bindinger[1].orden === 2 && B.antal() === foer);
+    B.gentag();
+    paastand("og gentag gør den enkelt igen", B.mol.bindinger[1].orden === 1);
+    var c4 = new NK.Molekyle(), cc = c4.tilfoej("C", 0, 0);
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (q) { c4.bind(cc.id, c4.tilfoej("C", q[0], q[1]).id, 1); });
+    B.saet(c4, true);
+    paastand("et C med fire bindinger får ikke en femte", B.nytFra(cc.id) === null && B.antal() === 5);
+
+
+    overskrift("7. Fanerne kan gennemføres");
+    /* Zigzag: strukturformel -> zigzag */
+    Z.retning = "tegn";
+    Z.serier.tegn = { liste: [O.faerdig(O.byg(6, [{ p: 3, s: 1 }], 0), null)].concat(O.serie(O.ZIGZAG).slice(1)), nr: 0, status: [0,0,0,0,0,0,0,0,0,0], mini: -1 };
+    Z.startOpgave();
+    Z.tilpas();
+    Z.braet.saet(smiles(NK, "CC(C)CCCC"), true);
+    NK.Layout.zigzag(Z.braet.mol, NK.Navn.analyser(Z.braet.mol));
+    Z.aendret("atom");
+    paastand("Zigzag: forkert tegning (2-methylhexan) giver en besked og løser ikke", !Z.loest && d.getElementById("zz-besked").textContent.indexOf("sidder på de forkerte") >= 0, d.getElementById("zz-besked").textContent);
+    Z.braet.saet(smiles(NK, "CCC(C)CCC"), true);
+    NK.Layout.zigzag(Z.braet.mol, NK.Navn.analyser(Z.braet.mol));
+    Z.aendret("atom");
+    paastand("Zigzag: 3-methylhexan tegnet løser opgaven", Z.loest && Z.serie().status[0] === 1);
+    paastand("Zigzag: knappen er nu Næste molekyle", d.getElementById("zz-knap").textContent.indexOf("Næste") === 0);
+    Z.knap();
+    paastand("Zigzag: næste opgave starter med ét C på tavlen", !Z.loest && Z.braet.antal() === 1 && Z.serie().nr === 1);
+    Z.knap(); Z.knap();
+    paastand("Zigzag: hint og så svaret; svaret tæller som vist", Z.loest && Z.serie().status[1] === 2);
+    /* Zigzag: zigzag -> strukturformel */
+    d.querySelector('#zz-retning button[data-v="atomer"]').click();
+    paastand("Zigzag: skifteren skifter retning", Z.retning === "atomer" && Z.trin === 1);
+    Z.braet.mol.atomer.forEach(function (a) { Z.c[a.id] = true; });
+    Z.musKrog("ned", Z.braet.px(Z.braet.mol.atomer[0]), { button: 2 });
+    Z.musKrog("ned", Z.braet.px(Z.braet.mol.atomer[0]), { button: 0 });
+    paastand("Zigzag: når alle C er sat, kommer trin 2", Z.trin === 2);
+    Z.braet.mol.atomer.forEach(function (a) {
+        for (var k = 0; k < Z.forventetH(a.id); k++) Z.musKrog("ned", Z.braet.px(a), { button: 0 });
+    });
+    paastand("Zigzag: rigtige H giver trin 3", Z.trin === 3);
+    d.getElementById("zz-input").value = "C9H20";
+    Z.tjekFormel();
+    paastand("Zigzag: forkert formel løser ikke", !Z.loest);
+    d.getElementById("zz-input").value = NK.Molekyle.formelAscii(Z.braet.mol.optaelling());
+    Z.tjekFormel();
+    paastand("Zigzag: rigtig formel løser opgaven", Z.loest && Z.serie().status[Z.serie().nr] === 1);
+    d.querySelector('#zz-retning button[data-v="tegn"]').click();
+
+    /* Navne */
+    var mB = O.faerdig(smiles(NK, "CC=CC(C)C"), "cis");
+    N.retning = "byg"; N.slags = "alkener";
+    N.serie().liste[N.serie().nr] = mB;
+    N.startOpgave();
+    var tr = O.faerdig(smiles(NK, "CC=CC(C)C"), "trans").mol;
+    N.braet.saet(tr, true);
+    N.aendret("atom");
+    paastand("Navne: trans tegnet, cis bestilt: ikke løst, besked om siden", !N.loest && d.getElementById("nv-besked").textContent.indexOf("men det er trans") >= 0, d.getElementById("nv-besked").textContent);
+    N.braet.saet(mB.mol.kopi(), true);
+    N.aendret("atom");
+    paastand("Navne: cis tegnet løser opgaven", N.loest);
+    d.querySelector('#nv-retning button[data-v="navn"]').click();
+    paastand("Navne: Giv navnet viser molekylet låst på tavlen", N.retning === "navn" && N.braet.laast && N.braet.antal() === N.maal.antal);
+    d.getElementById("nv-input").value = "forkert";
+    N.tjekNavn();
+    paastand("Navne: et forkert navn giver en besked", !N.loest && d.getElementById("nv-besked").textContent.length > 5);
+    N.knap();
+    paastand("Navne: hintet farver hovedkæden og nummererer den", !!N.braet.lokanter && Object.keys(N.braet.lokanter).length === N.maal.res.kaede.length);
+    d.getElementById("nv-input").value = N.maal.navn;
+    N.tjekNavn();
+    paastand("Navne: det rigtige navn løser opgaven", N.loest);
+
+    /* Isomerer */
+    d.querySelector('#is-niveau button[data-v="5"]').click();
+    paastand("Isomerer: C5H12 valgt, tom liste", I.n === 5 && I.fundet[5].length === 0);
+    function isoTegn(s) {
+        var m = smiles(NK, s);
+        NK.Layout.zigzag(m, NK.Navn.analyser(m));
+        I.ryd = 0;
+        I.braet.saet(m, true);
+        I.aendret("atom");
+    }
+    isoTegn("CCCCC");
+    isoTegn("CCCCC");
+    paastand("Isomerer: samme molekyle igen tæller ikke", I.fundet[5].length === 1 && d.getElementById("is-besked").textContent.indexOf("allerede") >= 0);
+    isoTegn("C(C)(C)CC");
+    paastand("Isomerer: 2-methylbutan tegnet fra et andet atom kendes", I.fundet[5].length === 2 && I.fundet[5][1] === "2-methylbutan");
+    I.knap(); I.knap();
+    paastand("Isomerer: hint og så en vist isomer; alle tre er fundet", I.faerdig() && I.vist[5]["2,2-dimethylpropan"]);
+    I.knap();
+    paastand("Isomerer: knappen går videre til C6H14", I.n === 6);
+
+
+    overskrift("8. Kemichaels skuffe og fejringen");
+    var SK = NK.Skuffe;
+    W.localStorage.removeItem(SK.NOEGLE);
+    W.localStorage.removeItem("nk-sc6.2-skuffe");
+    paastand("skuffen har ti klistermærker, ét for hver quiz", SK.ALLE.length === 10 && SK.antalAabne() === 0);
+    var alleQuiz = SK.ALLE.map(function (k) { return k.quiz; }).sort().join();
+    paastand("quizzerne er de ti på Zigzag, Navne og Isomerer", alleQuiz === ["is-4", "is-5", "is-6", "is-7", "nv-byg-alkaner", "nv-byg-alkener", "nv-navn-alkaner", "nv-navn-alkener", "zz-atomer", "zz-tegn"].join(), alleQuiz);
+    var kort = SK.ALLE.filter(function (k) { return k.replik.length > 62 || /[–—]/.test(k.replik + k.hvordan + k.titel); });
+    paastand("replikkerne er korte og uden tankestreger", kort.length === 0, kort.map(function (k) { return k.navn; }).join(", "));
+    var k1 = SK.laasOp("is-4"), k2 = SK.laasOp("is-4");
+    paastand("en quiz låser sit klistermærke op én gang", k1 && k1.navn === "kaffekop" && k2 === null && SK.aaben("kaffekop") && SK.antalAabne() === 1);
+    paastand("skuffen gemmes under den fælles nøgle, som tegnebrættet også læser", SK.NOEGLE === "nk-skuffe" && /kaffekop/.test(W.localStorage.getItem("nk-skuffe") || ""));
+    W.localStorage.removeItem(SK.NOEGLE);
+    W.localStorage.setItem("nk-sc6.2-skuffe", JSON.stringify({ festhat: true }));
+    paastand("det, der var låst op under den gamle nøgle, flyttes med over", SK.aaben("festhat") && SK.antalAabne() === 1);
+    W.localStorage.removeItem(SK.NOEGLE);
+    W.localStorage.removeItem("nk-sc6.2-skuffe");
+    /* Isomerer, C4H10 klaret selv: kaffekoppen, konfetti og vinduet */
+    NK.visFane("isomerer");
+    d.querySelector('#is-niveau button[data-v="4"]').click();
+    I.fundet[4] = []; I.vist[4] = {};
+    I.nytNiveau(4);
+    ["CCCC", "CC(C)C"].forEach(function (sm) {
+        var mm = smiles(NK, sm);
+        NK.Layout.zigzag(mm, NK.Navn.analyser(mm));
+        I.ryd = 0; I.braet.mol = mm; I.aendret("atom");
+    });
+    var gave = d.querySelector("#fane-isomerer .gave");
+    paastand("Isomerer: C₄H₁₀ klaret giver kaffekoppen, konfetti og vinduet", SK.aaben("kaffekop") && gave && gave.textContent.indexOf("Kaffekoppen") >= 0 && I.konfettiListe && I.konfettiListe.length > 100);
+    var proev = gave && gave.querySelector(".gave-proev");
+    paastand("knappen i vinduet åbner tegnebrættet i en ny fane med kaffekoppen klar",
+        !!proev && proev.tagName === "A" && /\.\.\/tegnebraet\/index\.html#klister=kaffekop$/.test(proev.getAttribute("href")) && proev.getAttribute("target") === "_blank",
+        proev && proev.getAttribute("href"));
+    gave.remove();
+    /* Med for mange viste svar: intet fra skuffen */
+    d.querySelector('#is-niveau button[data-v="5"]').click();
+    I.fundet[5] = []; I.vist[5] = {};
+    I.nytNiveau(5);
+    I.knap(); I.knap(); I.ryd = 0; I.knap(); I.knap(); I.ryd = 0; I.knap(); I.knap();
+    paastand("Isomerer: alle isomerer vist af knappen giver ikke Bunsen", I.faerdig() && !SK.aaben("bunsen"));
+    /* Zigzag: en serie med højst tre viste svar giver gloøjnene */
+    NK.visFane("zigzag");
+    d.querySelector('#zz-retning button[data-v="tegn"]').click();
+    var zs = Z.serie();
+    zs.status = [1, 1, 1, 1, 1, 1, 2, 2, 2, 0];
+    zs.nr = 9;
+    Z.startOpgave();
+    Z.braet.saet(Z.maal.mol.kopi(), true);
+    Z.aendret("atom");
+    paastand("Zigzag: serien klaret med tre viste svar giver gloøjnene", Z.loest && SK.aaben("gloeoejne"));
+    Array.prototype.forEach.call(d.querySelectorAll(".gave"), function (x) { x.remove(); });
+    paastand("kaffekoppen er den samme på alle fire faner", Z.g.kaffekop === N.g.kaffekop && N.g.kaffekop === I.g.kaffekop && I.g.kaffekop === OS.g.kaffekop);
+
+    overskrift("9. Opløselighed (fane 4, den gamle 6.5)");
+    var OP = NK.Oploes;
+    function lavOP(navn) { return OP.lav(OP.MOLEKYLER.filter(function (x) { return x.navn === navn; })[0]); }
+    var alleOP = OP.MOLEKYLER.map(function (x) { return OP.lav(x); });
+    var svarFejl = alleOP.filter(function (m) { return m.svar !== m.data.svar; });
+    paastand("reglen giver det svar, der står ved alle " + alleOP.length + " molekyler", svarFejl.length === 0,
+        svarFejl.map(function (m) { return m.navn + " gav " + m.svar; }).join("; "));
+    /* De 17 fra den gamle 6.5: C-atomer, polære grupper og svar (dipropylether
+       tæller nu O i kæden som en polær gruppe; svaret er det samme) */
+    var GAMLE = [["ethanol", 2, 1, "vand"], ["butan-1-ol", 4, 1, "begge"], ["pentan-1-ol", 5, 1, "heptan"], ["octan", 8, 0, "heptan"],
+        ["glycerol", 3, 3, "vand"], ["ethansyre", 2, 1, "vand"], ["benzen", 6, 0, "heptan"], ["methansyre", 1, 1, "vand"],
+        ["propan-2-ol", 3, 1, "vand"], ["dipropylether", 6, 1, "heptan"], ["octan-1,2,3-triol", 8, 3, "vand"],
+        ["dodecan-1,6,12-triol", 12, 3, "begge"], ["heptan-1,4,7-triol", 7, 3, "vand"], ["nonan-4,6-diol", 9, 2, "heptan"],
+        ["decan-4,5-diol", 10, 2, "heptan"], ["dodecan-1,7-diol", 12, 2, "heptan"], ["tetradecan-5,10-diol", 14, 2, "heptan"]];
+    var gFejl = GAMLE.filter(function (r) { var m = lavOP(r[0]); return m.c !== r[1] || m.grupper.length !== r[2] || m.svar !== r[3]; });
+    paastand("de 17 fra den gamle 6.5: samme C-atomer, polære grupper og svar", gFejl.length === 0,
+        gFejl.map(function (r) { var m = lavOP(r[0]); return r[0] + ": " + m.c + " C, " + m.grupper.length + " grupper, " + m.svar; }).join("; "));
+    var FORMLER = [["glycerol", "C₃H₈O₃"], ["ethansyre", "C₂H₄O₂"], ["benzen", "C₆H₆"], ["cyclohexan", "C₆H₁₂"], ["octadecansyre", "C₁₈H₃₆O₂"],
+        ["hexan-1,2,3,4,5,6-hexol", "C₆H₁₄O₆"], ["diethylether", "C₄H₁₀O"], ["methansyre", "CH₂O₂"], ["nonan-1,5,9-triol", "C₉H₂₀O₃"]];
+    var fFejlOP = FORMLER.filter(function (r) { return lavOP(r[0]).formel !== r[1]; });
+    paastand("molekylformlerne passer til navnene", fFejlOP.length === 0, fFejlOP.map(function (r) { return r[0] + " " + lavOP(r[0]).formel; }).join("; "));
+    var slagsOK = lavOP("ethansyre").grupper.map(function (x) { return x.slags; }).join() === "COOH" &&
+        lavOP("dipropylether").grupper.map(function (x) { return x.slags; }).join() === "O" &&
+        lavOP("glycerol").grupper.every(function (x) { return x.slags === "OH"; });
+    paastand("COOH er én gruppe, O i kæden er en gruppe, OH er en gruppe", slagsOK);
+    paastand("forholdet skrives med dansk komma: 4,5 · ≈ 2,7 · 4", OP.forholdTekst(9, 2) === "4,5" && OP.forholdTekst(8, 3) === "≈ 2,7" && OP.forholdTekst(12, 3) === "4");
+    var taet = alleOP.filter(function (m) {
+        var t = m.mol.atomer;
+        for (var a = 0; a < t.length; a++) for (var b = a + 1; b < t.length; b++) if (Math.hypot(t[a].x - t[b].x, t[a].y - t[b].y) < 0.9) return true;
+        return false;
+    });
+    paastand("alle molekyler er tegnet med luft mellem atomerne", taet.length === 0, taet.map(function (m) { return m.navn; }).join(", "));
+    var bFejl = [];
+    for (var br = 0; br < 30; br++) {
+        var bk = OP.bunke({});
+        [1, 2, 3].forEach(function (sv, k) {
+            var fem = bk.slice(5 * k, 5 * k + 5), sv2 = fem.map(function (m) { return m.sv; });
+            var v = fem.filter(function (m) { return m.svar === "vand"; }).length, h = fem.filter(function (m) { return m.svar === "heptan"; }).length;
+            var be = fem.filter(function (m) { return m.svar === "begge"; }).length;
+            if (fem.length !== 5 || sv2.some(function (x) { return x !== sv; }) || !v || !h || be > 1) bFejl.push(sv + ": " + fem.map(function (m) { return m.navn; }).join(","));
+        });
+        var navne = bk.map(function (m) { return m.navn; });
+        if (navne.filter(function (n, j) { return navne.indexOf(n) !== j; }).length) bFejl.push("to ens");
+    }
+    paastand("bunken: 15 forskellige, fem af hver sværhed, vand og heptan i hver femmer, højst ét grænsetilfælde", bFejl.length === 0, bFejl.slice(0, 3).join(" | "));
+    var sete = {};
+    OP.bunke({}).forEach(function (m) { sete[m.navn] = true; });
+    var igen = OP.bunke(sete).filter(function (m) { return sete[m.navn]; }).length;
+    paastand("næste spil tager de molekyler, man ikke har set, først", igen <= 3, igen + " set før");
+
+    /* Spillet */
+    NK.visFane("oploeselighed");
+    OS.tilpas();
+    OS.nytSpil();
+    function saetOP(navn) { OS.bunke[OS.nr] = lavOP(navn); OS.startMolekyle(); OS.opdater(1 / 60); }
+    function tid(sek) { for (var k = 0; k < sek * 60; k++) OS.opdater(1 / 60); OS.tegn(); }
+    saetOP("nonan-4,6-diol");
+    tid(0.5);
+    OS.knap();
+    paastand("fane 4: hintet farver de polære grupper, og knappen bliver Vis svaret", OS.farver === 1 && d.getElementById("op-knap").textContent === "Vis svaret");
+    OS.vaelg("heptan");
+    paastand("fane 4: rigtigt med hint giver 70 point, og knappen er Næste molekyle", OS.point === 70 && OS.res[0] === 1 && d.getElementById("op-knap").textContent.indexOf("Næste") === 0);
+    paastand("fane 4: regnestykket står med brøkstreg: 9 C-atomer / 2 polære grupper = 4,5", !!d.querySelector("#op-regn .broek") && /Forhold\s*=\s*9 C-atomer\s*2 polære grupper\s*=\s*4,5/.test(d.getElementById("op-regn").textContent.replace(/\s+/g, " ")),
+        d.getElementById("op-regn").textContent);
+    OS.knap();
+    saetOP("glycerol");
+    OS.vaelg("heptan");
+    paastand("fane 4: forkert koster et liv og giver beskeden til fejlen", OS.liv === 2 && OS.res[1] === 3 && /Forkert\. De 3 polære grupper vejer tungest/.test(d.getElementById("op-besked").textContent),
+        d.getElementById("op-besked").textContent);
+    tid(3);
+    paastand("fane 4: og molekylet flytter selv over i vandet", OS.fig.sted === "vand" && OS.fig.y > OS.zoner.graense);
+    OS.knap();
+    saetOP("butan-1-ol");
+    OS.vaelg("vand");
+    tid(3.5);
+    paastand("fane 4: præcis 4 C pr. gruppe tæller begge veje og lægger sig i grænsen med OH nedad",
+        OS.point === 170 && OS.fig.sted === "graense" && Math.abs(OS.fig.rot) > 0.5 && Math.abs(OS.fig.y - OS.zoner.graense) < OS.zoner.vand.h);
+    OS.knap();
+    saetOP("octadecansyre");
+    OS.knap(); OS.knap();
+    tid(3);
+    paastand("fane 4: Vis svaret giver 0 point, gul prik og molekylet i heptan", OS.point === 170 && OS.res[3] === 2 && OS.fig.sted === "heptan" &&
+        d.querySelectorAll("#op-prikker .prik")[3].classList.contains("vist"));
+    OS.knap();
+    saetOP("octan");
+    var f5 = OS.fig, hp = OS.zoner.heptan;
+    OS.musKrog("ned", { x: f5.x, y: f5.y }, { button: 0, pointerId: 1 });
+    OS.musKrog("flyt", { x: hp.x + hp.b / 2, y: hp.y + hp.h / 2 }, {});
+    var lyser = OS.overLag === "heptan";
+    OS.musKrog("op", { x: hp.x + hp.b / 2, y: hp.y + hp.h / 2 }, {});
+    paastand("fane 4: molekylet trækkes ned i heptan; laget lyser op, mens det holdes", lyser && OS.res[4] === 1 && OS.point === 270);
+    OS.knap();
+    saetOP("ethanol");
+    var vd = { x: OS.zoner.vand.x + OS.zoner.vand.b / 2, y: OS.zoner.vand.y + 20 };
+    OS.musKrog("ned", vd, { button: 0, pointerId: 1 });
+    OS.musKrog("op", vd, {});
+    paastand("fane 4: et klik på vandet er også et svar", OS.res[5] === 1 && OS.point === 370);
+    OS.knap();
+    saetOP("hexan");
+    d.querySelector('#op-tegning button[data-v="alle"]').click();
+    var gAlle = OS.geo(0);
+    paastand("fane 4: Alle atomer tegner også H-atomerne", OS.stil === "alle" && gAlle.tekster.filter(function (t) { return t.t === "H"; }).length === 14);
+    d.querySelector('#op-tegning button[data-v="zigzag"]').click();
+    OS.vaelg("vand");
+    OS.knap();
+    saetOP("pentan-1-ol");
+    OS.vaelg("vand");
+    paastand("fane 4: tre liv brugt: spillet er slut, og knappen er Nyt spil", OS.slut === "tabt" && d.getElementById("op-knap").textContent.indexOf("Nyt spil") === 0 &&
+        d.getElementById("op-titel").textContent === "Spillet er slut");
+    d.querySelectorAll("#op-prikker .prik")[1].click();
+    paastand("fane 4: en rød prik viser molekylet og det lag, eleven valgte", d.querySelectorAll("#op-prikker .prik.forkert").length === 3 &&
+        /glycerol/.test(d.getElementById("op-mini").textContent) && /Du valgte heptan/.test(d.getElementById("op-mini").textContent));
+    OS.knap();
+    paastand("fane 4: Nyt spil giver en ny bunke med tre liv og 0 point", !OS.slut && OS.liv === 3 && OS.point === 0 && OS.nr === 0 && OS.res.every(function (x) { return x === 0; }));
+    OS.bunke.forEach(function (m, k) { OS.vaelg(OS.m.svar === "begge" ? "vand" : OS.m.svar); if (k < OS.bunke.length - 1) OS.knap(); });
+    paastand("fane 4: hele bunken rigtigt: 1500 point, rekorden huskes, og Kemichael roser", OS.slut === "vundet" && OS.point === 1500 &&
+        W.JSON.parse(W.localStorage.getItem("nk-sc6.2-oploeselighed-rekord")) === 1500 && OS.laerer && OS.laerer.scene && OS.laerer.scene.navn === "faerdig");
+    OS.nytSpil();
+    NK.visFane("zigzag");
+
+    overskrift("10. Sproget");
+    var tekst = d.body.innerText + "\n" + JSON.stringify(NK.Data) + "\n" + nT.map(function (x) { return besked(TJ.navn(x[1], x[0])); }).join("\n");
+    paastand("ingen tankestreger (– og —)", !/[–—]/.test(tekst), (tekst.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
+    paastand("ingen 1+ eller 1−", !/\b1[+−-]\s/.test(tekst));
+    var replikker = [].concat(NK.Data.INTRO_ZIGZAG, NK.Data.INTRO_NAVNE, NK.Data.INTRO_ISOMERER, NK.Data.INTRO_OPLOES,
+        Object.keys(NK.Data.ROS).map(function (k) { return NK.Data.ROS[k]; }));
+    var lange = replikker.filter(function (x) { return x.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+
+    overskrift("11. Layout");
+    var ramme = document.getElementById("ramme");
+    [[520, 380], [900, 600], [1300, 820], [1500, 900]].forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        W.dispatchEvent(new W.Event("resize"));
+        var fejlL = [];
+        ["fane-zigzag", "fane-navne", "fane-isomerer", "fane-oploeselighed"].forEach(function (id) {
+            NK.visFane(id.replace("fane-", ""));
+            var s = NK.sims[id];
+            s.tilpas();
+            s.opdater(1 / 60);
+            s.tegn();
+            if (!s.lay || s.lay.tavle.b < 150 || s.lay.tavle.h < 100) fejlL.push(id + " tavle " + (s.lay ? Math.round(s.lay.tavle.b) + "x" + Math.round(s.lay.tavle.h) : "mangler"));
+            var f = s.felt();
+            if (f.h < 60) fejlL.push(id + " felt " + Math.round(f.h));
+        });
+        var vandret = d.documentElement.scrollWidth > d.documentElement.clientWidth + 1;
+        paastand(st[0] + " × " + st[1] + ": tavler og felter har plads, ingen vandret rulning", !fejlL.length && !vandret, fejlL.join(", ") + (vandret ? " rulning" : ""));
+        /* Fane 5: de store molekyler kan stå på tavlen over glasset og ligge i begge lag */
+        NK.visFane("oploeselighed");
+        var o5 = NK.sims["fane-oploeselighed"], fejl5 = [];
+        ["octadecansyre", "tetradecan-5,10-diol", "hexan-1,2,3,4,5,6-hexol"].forEach(function (navn) {
+            ["zigzag", "alle"].forEach(function (stil) {
+                o5.stil = stil;
+                o5.bunke[o5.nr] = lavOP(navn);
+                o5.startMolekyle();
+                o5.tilpas();
+                o5.opdater(1 / 60);
+                var g = o5.geo(0), mt = o5.maal("tavle"), t = o5.lay.tavle, z = o5.zoner;
+                if (mt.y + g.y0 < t.y || mt.y + g.y1 > z.glas.y || mt.x + g.x0 < t.x || mt.x + g.x1 > t.x + t.b) fejl5.push(navn + " " + stil + " tavle");
+                ["heptan", "vand"].forEach(function (lag) {
+                    var m = o5.maal(lag), L = z[lag];
+                    if (m.y + g.y0 * m.s < L.y - 1 || m.y + g.y1 * m.s > L.y + L.h + 1 || m.x + g.x0 * m.s < L.x - 1 || m.x + g.x1 * m.s > L.x + L.b + 1) fejl5.push(navn + " " + stil + " " + lag);
+                });
+            });
+        });
+        o5.stil = "zigzag";
+        o5.nytSpil();
+        paastand(st[0] + " × " + st[1] + ": fane 4: lange molekyler står på tavlen over glasset og ligger inde i lagene", !fejl5.length, fejl5.join(", "));
+    });
+    NK.visFane("zigzag");
+}
+</script>
+</body>
+</html>

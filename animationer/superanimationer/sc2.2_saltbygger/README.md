@@ -6,7 +6,7 @@ Mappen henter kun filer inde fra sig selv, bortset fra Kemichael
 harddisken.
 
 Den afløser `animationer/kemi-c-filer/c2.2_salte_sammensatte_ioner.html`. Den
-ligger kun i sin egen mappe, til brugeren siger, at den skal i menuen.
+er i menuen fra 26. sept. 2026 (se nederst).
 
 ## Bestillingen
 
@@ -340,22 +340,11 @@ præsentation (første gang, ikke anden gang, K, Esc, knappen og to klik på
 ham), at teksterne er uden tankestreger og 1+/1−, og at rundvisningen peger
 på noget, der findes.
 
-## Hvis den skal ind i menuen
+## I menuen
 
-I `animationer/kemi-c-filer/samling_c2.html` skiftes knappen med
-`data-emne="c2.2"` ud med:
-
-```html
-<button class="tab-btn" data-emne="c2.2"
-    data-beskrivelse="Byg salte af ioner, så ladningerne går op, se hvad der sker, når saltet opløses i vand, og find ladningen på en ukendt ion ud fra formlen."
-    onclick="visAnimation(this, '../superanimationer/sc2.2_saltbygger/index.html')"
-    title="Saltbyggeren"><span class="btn-num">2</span><span class="btn-text">Saltbyggeren</span></button>
-```
-
-I `FEEDBACK_EMNER` i `animationer/samling_alt.html` rettes `{ nr: 2, navn:
-'Neutrale forbindelser' }` til `'Saltbyggeren'`. Den gamle fil flyttes med
-`git mv` til `kemi-c-filer/arkiv/c2.2_salte_sammensatte_ioner_oldversion.html`,
-og kolonnen "I menuen" i `../README.md` rettes.
+I menuen fra 26. sept. 2026 som c2.2 i `kemi-c-filer/samling_c2.html` (navnet
+"Saltbyggeren", også i `FEEDBACK_EMNER`). Den gamle ligger i
+`kemi-c-filer/arkiv/c2.2_salte_sammensatte_ioner_oldversion.html`.
 
 ## Tilbuddet om præsentationen
 

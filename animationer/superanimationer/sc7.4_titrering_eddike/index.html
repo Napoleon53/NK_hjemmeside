@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titrering af eddike</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Titrering af eddike</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-titrering" role="tab" aria-selected="true"><span class="nr">1</span>Titreringen</button>
+        <button class="faneknap" data-fane="fane-beregning" role="tab" aria-selected="false"><span class="nr">2</span>Beregningen</button>
+        <button class="faneknap" data-fane="fane-forbrug" role="tab" aria-selected="false"><span class="nr">3</span>To kolber</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: TITRERINGEN                                                -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-titrering" role="tabpanel" aria-label="Titreringen">
+    <div class="scene medtekst">
+        <canvas id="tit-laerred"></canvas>
+        <div class="anker" id="tit-anker-buret"></div>
+        <div class="anker" id="tit-anker-hane"></div>
+        <div class="anker" id="tit-anker-kolbe"></div>
+        <div class="anker" id="tit-anker-lup"></div>
+        <div class="tilbud" id="tit-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="tit-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="tit-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Til beregningen -->
+        <div class="kort opgavekort" id="tit-kort">
+            <h2><span id="tit-titel">Prøve 1</span><span class="taeller">2,00 g eddike</span></h2>
+            <p class="maal-tekst" id="tit-prompt"></p>
+            <div class="opgave-felt" id="tit-felt"></div>
+            <p class="besked" id="tit-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="tit-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="tit-buretkort">
+            <h2>Buretten ved menisken <span class="taeller">aflæs bunden</span></h2>
+            <canvas class="panel-laerred aflaes" id="tit-aflaes"></canvas>
+        </div>
+
+        <div class="kort" id="tit-kurvekort">
+            <h2>Titreringskurven <button class="lilleknap" id="tit-tabelknap" type="button">Tabel</button></h2>
+            <canvas class="panel-laerred kurve" id="tit-kurve"></canvas>
+            <button class="knap nulstil" id="tit-nulstil" type="button"><span>Ny prøve</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: BEREGNINGEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-beregning" role="tabpanel" aria-label="Beregningen">
+    <div class="scene medtekst">
+        <canvas id="ber-laerred"></canvas>
+        <div class="anker" id="ber-anker-tavle"></div>
+        <div class="tilbud" id="ber-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="ber-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="ber-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="ber-data">
+            <h2><span id="ber-titel">Din måling</span></h2>
+            <div class="talraekke"><span>Eddike, m(prøve)</span><span class="tal" id="ber-m"></span></div>
+            <div class="talraekke"><span>Natriumhydroxid, c(NaOH)</span><span class="tal" id="ber-c"></span></div>
+            <div class="talraekke"><span>Forbrug, V(NaOH)</span><span class="tal gul" id="ber-v"></span></div>
+            <div class="talraekke"><span>M(CH₃COOH)</span><span class="tal">60,05 g/mol</span></div>
+            <p class="note" id="ber-note"></p>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Ny opgave -->
+        <div class="kort opgavekort" id="ber-kort">
+            <h2><span>Masseprocenten</span><span class="taeller">trin <b id="ber-nr">1</b>/4</span></h2>
+            <p class="maal-tekst" id="ber-prompt"></p>
+            <div class="raekker" id="ber-raekker"></div>
+            <p class="besked" id="ber-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="ber-knap" type="button">Giv hint</button></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: TO KOLBER                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-forbrug" role="tabpanel" aria-label="To kolber">
+    <div class="scene medtekst">
+        <canvas id="for-laerred"></canvas>
+        <div class="anker" id="for-anker-a"></div>
+        <div class="anker" id="for-anker-b"></div>
+        <div class="tilbud" id="for-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="for-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="for-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste -->
+        <div class="kort opgavekort" id="for-kort">
+            <h2><span>Hvad sker der?</span><span class="taeller"><b id="for-nr">1</b>/<span id="for-ialt">6</span></span></h2>
+            <p class="maal-tekst" id="for-prompt"></p>
+            <div class="opgave-felt" id="for-valg"></div>
+            <p class="besked" id="for-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="for-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="for-tabelkort">
+            <h2>Kolberne</h2>
+            <div class="ab-tabel" id="for-tabel"></div>
+            <p class="note" id="for-note"></p>
+            <button class="knap nulstil" id="for-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Titrering af eddike</h2>
+        <p>Eddike er en opløsning af eddikesyre, CH₃COOH, i vand. Buretten indeholder en opløsning af natriumhydroxid, NaOH. Den indeholder OH⁻, som tager en H⁺ fra hver eddikesyre. Na⁺ er med, men reagerer ikke.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Reaktionen</span>
+            CH₃COOH + OH⁻ → CH₃COO⁻ + H₂O
+        </div>
+        <p>Én OH⁻ reagerer med én CH₃COOH. Når al syren er brugt, er der tilsat lige så mange mol NaOH, som der var eddikesyre. Det er ækvivalenspunktet. Den næste dråbe giver overskud af OH⁻, og phenolphthalein bliver lyserød. Omslaget ligger mellem pH 8,2 og 10.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Beregningen</span>
+            n(NaOH) = c · V<br>
+            n(CH₃COOH) = n(NaOH)<br>
+            m(CH₃COOH) = n · M, &nbsp;M = 60,05 g/mol<br>
+            m% = m(CH₃COOH) / m(prøve) · 100 %
+        </div>
+        <p>Vandet i kolben ændrer ikke stofmængden af syre, så det ændrer heller ikke forbruget. Det gør bare farveomslaget lettere at se.</p>
+        <p>Ved ækvivalenspunktet er pH ca. 8,7 og ikke 7, fordi acetationen, CH₃COO⁻, er en svag base. Derfor bruges phenolphthalein.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- DATATABELLEN TIL EXCEL (fane 1)                                    -->
+<!-- ================================================================= -->
+<div class="overlay" id="tabel">
+    <div class="overlay-boks smal">
+        <h2>Målingerne bag kurven</h2>
+        <div class="tabel-styring">
+            <label>Én række for hver
+                <select id="tabel-trin">
+                    <option value="0.25">0,25 mL</option>
+                    <option value="0.5" selected>0,50 mL</option>
+                    <option value="1">1,00 mL</option>
+                </select>
+            </label>
+            <button class="knap blaa" id="tabel-kopier" type="button">Kopiér tabellen</button>
+        </div>
+        <p class="note">Tabellen kan sættes direkte ind i Excel. De to kolonner lander i hver sin kolonne.</p>
+        <div class="tabel-rul">
+            <table class="datatabel">
+                <thead><tr><th>Tilsat NaOH (mL)</th><th>pH</th></tr></thead>
+                <tbody id="tabel-krop"></tbody>
+            </table>
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lup.js"></script>
+<script src="js/graf.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_titrering.js"></script>
+<script src="js/sim_beregning.js"></script>
+<script src="js/sim_forbrug.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

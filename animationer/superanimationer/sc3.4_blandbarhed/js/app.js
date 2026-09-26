@@ -97,7 +97,7 @@
         if (NK.Sprites) NK.Sprites.start();
         bassin = new NK.Bassin(NK.el("laerred"));
         NK.bassin = bassin;                   /* saa den kan pilles ved fra konsollen og selvtesten */
-        bassin.nulstil([["vand", 3]]);
+        bassin.nulstil([["vand", 2]]);
 
         opgaver = new NK.Opgaver(bassin, saetT);
         NK.opgaver = opgaver;
@@ -113,9 +113,8 @@
                 return laerer.laererIntroKlik(x, y) || laerer.laererKlik(x, y);
             };
             bassin.overLaerer = function (x, y) { return laerer.laererUnder(x, y); };
-            ["overloeb", "svaever", "rystBlandet", "rystTomt"].forEach(function (h) {
-                bassin.paa(h, function () { laerer.besoeg(h); });
-            });
+            /* Han kommer kun forbi ved paaskeaegget */
+            bassin.paa("svaever", function () { laerer.besoeg("svaever"); });
         }
 
         /* Panelet */

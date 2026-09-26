@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="220" viewBox="0 0 140 220">
+  <!-- Vandhanen: et roer ned fra loftet, der boejer til venstre og ender
+       i en tud, der peger ned. Vandet kommer ud ved (22, 214).
+       Haandtaget (den blaa knap) har midten omkring (104, 128).
+       Roeret er skaaret af foroven ved y 0, saa det kan forlaenges op. -->
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#76828f"/>
+      <stop offset="0.4" stop-color="#eef2f6"/>
+      <stop offset="1" stop-color="#8d97a3"/>
+    </linearGradient>
+    <linearGradient id="metal2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef2f6"/>
+      <stop offset="0.55" stop-color="#aeb8c3"/>
+      <stop offset="1" stop-color="#76828f"/>
+    </linearGradient>
+  </defs>
+  <!-- Roeret ned fra loftet -->
+  <rect x="70" y="0" width="16" height="140" fill="url(#metal)" stroke="#5d6874" stroke-width="1"/>
+  <!-- Hanehuset med knappen -->
+  <rect x="64" y="112" width="28" height="34" rx="5" fill="url(#metal2)" stroke="#5d6874" stroke-width="1.2"/>
+  <rect x="92" y="124" width="10" height="8" fill="#8d97a3" stroke="#5d6874" stroke-width="0.8"/>
+  <path d="M100 112 L116 112 Q120 112 120 116 L120 140 Q120 144 116 144 L100 144 Q96 144 96 140 L96 116 Q96 112 100 112 Z"
+        fill="#2a76ac" stroke="#174a6e" stroke-width="1.2"/>
+  <path d="M100 126 L116 126 M108 116 L108 140" stroke="#bfe0f7" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Svanehalsen og tuden -->
+  <path d="M78 146 L78 158 Q78 176 60 176 L34 176 Q22 176 22 188 L22 204"
+        fill="none" stroke="#5d6874" stroke-width="15" stroke-linecap="butt" stroke-linejoin="round"/>
+  <path d="M78 146 L78 158 Q78 176 60 176 L34 176 Q22 176 22 188 L22 204"
+        fill="none" stroke="url(#metal2)" stroke-width="12.5" stroke-linecap="butt" stroke-linejoin="round"/>
+  <rect x="13" y="202" width="18" height="12" rx="2" fill="url(#metal2)" stroke="#5d6874" stroke-width="1"/>
+  <rect x="16" y="211" width="12" height="3" fill="#3a434d"/>
+</svg>

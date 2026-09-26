@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="104" viewBox="0 0 120 104">
+  <!-- Hjertemusling (Cerastoderma edule), den ene skal set udefra, som den
+       ligger paa bordet. Toppen (umbo) er (55, 6), og skallen ligger paa
+       y 100. Bruges som paaskeaeg paa fane 1. -->
+  <defs>
+    <linearGradient id="skal" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#f6eedd"/>
+      <stop offset="0.55" stop-color="#e6d3b2"/>
+      <stop offset="1" stop-color="#c8a97c"/>
+    </linearGradient>
+    <clipPath id="form">
+      <path d="M55 6 C40 4 19 16 11 36 C3 57 10 81 26 92 C41 101 77 102 93 92 C109 81 115 58 108 37 C101 16 72 4 55 6 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Skygge paa bordet -->
+  <ellipse cx="60" cy="99" rx="48" ry="4" fill="#000000" fill-opacity="0.32"/>
+
+  <!-- Skallen -->
+  <path d="M55 6 C40 4 19 16 11 36 C3 57 10 81 26 92 C41 101 77 102 93 92 C109 81 115 58 108 37 C101 16 72 4 55 6 Z"
+        fill="url(#skal)"/>
+
+  <g clip-path="url(#form)">
+    <!-- Vaekstbaandene: aarringe omkring toppen -->
+    <g fill="none" stroke="#a5804e" stroke-linecap="round">
+      <ellipse cx="56" cy="2" rx="34" ry="30" stroke-opacity="0.35" stroke-width="3"/>
+      <ellipse cx="56" cy="2" rx="50" ry="48" stroke-opacity="0.4" stroke-width="4"/>
+      <ellipse cx="56" cy="2" rx="64" ry="66" stroke-opacity="0.45" stroke-width="3"/>
+      <ellipse cx="56" cy="2" rx="76" ry="84" stroke-opacity="0.5" stroke-width="5"/>
+      <ellipse cx="56" cy="2" rx="86" ry="96" stroke-opacity="0.35" stroke-width="3"/>
+    </g>
+    <!-- Ribberne fra toppen og ud -->
+    <g stroke="#8a6a3f" stroke-opacity="0.55" stroke-width="2.2" fill="none">
+      <path d="M55 6 L166.3 51.0"/>
+      <path d="M55 6 L160.2 63.8"/>
+      <path d="M55 6 L152.6 75.9"/>
+      <path d="M55 6 L143.6 86.9"/>
+      <path d="M55 6 L133.4 96.8"/>
+      <path d="M55 6 L122.1 105.5"/>
+      <path d="M55 6 L109.9 112.7"/>
+      <path d="M55 6 L96.8 118.5"/>
+      <path d="M55 6 L83.2 122.6"/>
+      <path d="M55 6 L69.2 125.2"/>
+      <path d="M55 6 L55.0 126.0"/>
+      <path d="M55 6 L40.8 125.2"/>
+      <path d="M55 6 L26.8 122.6"/>
+      <path d="M55 6 L13.2 118.5"/>
+      <path d="M55 6 L0.1 112.7"/>
+      <path d="M55 6 L-12.1 105.5"/>
+      <path d="M55 6 L-23.4 96.8"/>
+      <path d="M55 6 L-33.6 86.9"/>
+      <path d="M55 6 L-42.6 75.9"/>
+      <path d="M55 6 L-50.2 63.8"/>
+    </g>
+    <!-- Lyset paa ribbernes ryg -->
+    <g stroke="#ffffff" stroke-opacity="0.45" stroke-width="1.1" fill="none" transform="translate(2 0)">
+      <path d="M55 6 L152.6 75.9"/>
+      <path d="M55 6 L133.4 96.8"/>
+      <path d="M55 6 L109.9 112.7"/>
+      <path d="M55 6 L83.2 122.6"/>
+      <path d="M55 6 L55.0 126.0"/>
+      <path d="M55 6 L26.8 122.6"/>
+      <path d="M55 6 L0.1 112.7"/>
+      <path d="M55 6 L-23.4 96.8"/>
+    </g>
+    <!-- Lidt skygge nederst, hvor skallen buer ned mod bordet -->
+    <path d="M0 80 Q60 104 120 80 L120 110 L0 110 Z" fill="#6b4f2c" fill-opacity="0.18"/>
+  </g>
+
+  <!-- Kanten og toppen -->
+  <path d="M55 6 C40 4 19 16 11 36 C3 57 10 81 26 92 C41 101 77 102 93 92 C109 81 115 58 108 37 C101 16 72 4 55 6 Z"
+        fill="none" stroke="#8f7047" stroke-width="1.5"/>
+  <path d="M45 11 Q50 -1 63 5" fill="none" stroke="#8f7047" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M47 10 Q52 2 61 6" fill="none" stroke="#fff8ea" stroke-opacity="0.8" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

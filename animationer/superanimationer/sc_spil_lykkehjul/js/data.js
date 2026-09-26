@@ -66,11 +66,47 @@
         "Final: Plast ; Polyethylen"
     ].join("\n");
 
+    /* ----- Emnequizzer: fem runder uden toss-ups og uden finale ------------
+       Skrevet af Claude til C-niveauet. Løsningerne er korte faglige
+       sætninger, så der er mange forskellige bogstaver at gætte på. */
+    var QUIZ_ATOM = [
+        "Titel: Atomet og ioner",
+        "",
+        "Runde: Atomets byggesten ; Protoner, neutroner og elektroner",
+        "Runde: Det periodiske system ; Ædelgasserne har fuld yderskal",
+        "Runde: Isotoper ; Samme grundstof med forskellig masse",
+        "Runde: Ioner ; Positive ioner hedder kationer",
+        "Runde: Ionforbindelser ; Natriumchlorid er køkkensalt"
+    ].join("\n");
+
+    var QUIZ_MOLEKYLER = [
+        "Titel: Molekyler og organisk kemi",
+        "",
+        "Runde: Kovalente bindinger ; Atomerne deler elektronpar",
+        "Runde: Polaritet ; Vand er et polært molekyle",
+        "Runde: Bindinger mellem molekyler ; Hydrogen-bindinger hæver kogepunktet",
+        "Runde: Carbonhydrider ; Alkener har en dobbeltbinding",
+        "Runde: Isomeri ; Isomerer har samme molekylformel"
+    ].join("\n");
+
+    var QUIZ_BEREGNING = [
+        "Titel: Beregninger, koncentration og pH",
+        "",
+        "Runde: Enheder ; Koncentration måles i mol pr. liter",
+        "Runde: Mængdeberegning ; Stofmængde er masse divideret med molarmasse",
+        "Runde: Fortynding ; Stofmængden er den samme før og efter",
+        "Runde: pH-skalaen ; Sure opløsninger har pH under 7",
+        "Runde: Syre og base ; En syre afgiver en hydron"
+    ].join("\n");
+
     /* noegle: det, linket skriver efter # */
     D.INDBYGGEDE = [
         { noegle: "b", tekst: QUIZ_B },
         { noegle: "a", tekst: QUIZ_A },
-        { noegle: "nf", tekst: QUIZ_NF }
+        { noegle: "nf", tekst: QUIZ_NF },
+        { noegle: "atom", tekst: QUIZ_ATOM },
+        { noegle: "molekyler", tekst: QUIZ_MOLEKYLER },
+        { noegle: "beregning", tekst: QUIZ_BEREGNING }
     ];
     D.STANDARD = "b";
 
@@ -117,6 +153,20 @@
         D.PRAEMIEHJUL.push({ type: "kuvert", tekst: i % 6 === 0 ? "★" : "✉", farve: PASTEL[i % PASTEL.length], skrift: "#0b1d4d" });
     }
     D.PRAEMIER = [5000, 6000, 7000, 7500, 8000, 10000, 12500, 15000, 25000];
+
+    /* ----- Alene ved computeren ----------------------------------------------
+       Ingen lærer og ingen andre hold, så spilleren skriver løsningen, og
+       spillet tjekker den. Alt, der i holdspillet giver turen videre, koster
+       et liv. En toss-up er mindre værd, jo flere bogstaver der er vist. */
+    D.ALENE = {
+        liv: 3,          /* liv i hver runde */
+        finalTid: 20,    /* sekunder til at skrive finalens løsning */
+        straf: 2,        /* bogstaver, der vises ekstra efter et forkert svar i en toss-up */
+        trin: 50,        /* toss-uppens værdi rundes ned til hele 50 kr. */
+        navn: "Spiller",
+        /* Mindre kuverter end med hold, så rekorden mest afgøres af gåderne */
+        praemier: [2000, 3000, 4000, 5000, 6000, 8000, 10000]
+    };
 
     /* ----- Tider (sekunder) ------------------------------------------------- */
     D.TOSSUP_INTERVAL = 1.1;

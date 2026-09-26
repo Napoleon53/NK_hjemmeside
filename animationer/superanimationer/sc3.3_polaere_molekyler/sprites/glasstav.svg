@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="14" viewBox="0 0 200 14">
+  <!-- Glasstav. Spidsen er venstre ende (0, 7); animationen drejer
+       staven om den. Ladningen tegnes i koden. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef7fd" stop-opacity="0.9"/>
+      <stop offset="0.45" stop-color="#bcd9ee" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#86abc7" stop-opacity="0.75"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="198" height="12" rx="6" fill="url(#krop)" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="1"/>
+  <rect x="8" y="3" width="184" height="2" rx="1" fill="#ffffff" fill-opacity="0.75"/>
+  <rect x="8" y="9.5" width="184" height="1" rx="0.5" fill="#ffffff" fill-opacity="0.3"/>
+</svg>

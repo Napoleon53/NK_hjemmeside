@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" width="300" height="250">
+<!-- Reaktionskammeret: en glaskasse paa en sokkel, set forfra.
+     Det indre (hvor molekylerne flyver) er x 18-282 og y 18-196.
+     Soklen er y 200-248; knappen tegnes i koden midt paa den (y 212-238).
+     Bunden staar i y 248. -->
+<defs>
+  <linearGradient id="glas" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#bfe3ff" stop-opacity="0.16"/>
+    <stop offset="0.5" stop-color="#bfe3ff" stop-opacity="0.05"/>
+    <stop offset="1" stop-color="#bfe3ff" stop-opacity="0.12"/>
+  </linearGradient>
+  <linearGradient id="sokkel" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#5b626f"/>
+    <stop offset="1" stop-color="#2f343d"/>
+  </linearGradient>
+  <linearGradient id="ramme" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#8e96a3"/>
+    <stop offset="0.5" stop-color="#c8ced7"/>
+    <stop offset="1" stop-color="#7c8491"/>
+  </linearGradient>
+</defs>
+<rect x="10" y="10" width="280" height="194" rx="10" fill="url(#glas)" stroke="#9fc4df" stroke-width="2.5"/>
+<path d="M26 28 L26 150" stroke="#ffffff" stroke-width="5" opacity="0.18" stroke-linecap="round"/>
+<path d="M40 22 L120 22" stroke="#ffffff" stroke-width="3" opacity="0.14" stroke-linecap="round"/>
+<g fill="url(#ramme)" stroke="#4f5560" stroke-width="1">
+  <rect x="4" y="4" width="22" height="10" rx="3"/>
+  <rect x="274" y="4" width="22" height="10" rx="3"/>
+  <rect x="4" y="4" width="10" height="24" rx="3"/>
+  <rect x="286" y="4" width="10" height="24" rx="3"/>
+</g>
+<rect x="0" y="198" width="300" height="50" rx="7" fill="url(#sokkel)" stroke="#1f232a" stroke-width="1.5"/>
+<rect x="0" y="198" width="300" height="4" fill="#8e96a3" opacity="0.6"/>
+<g fill="#1f232a" opacity="0.7">
+  <circle cx="16" cy="224" r="3"/>
+  <circle cx="284" cy="224" r="3"/>
+</g>
+</svg>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Ion-Tetris</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: formlerne og ionligningerne, reglen for hvornaar
+   ioner bliver til salt, pulveret, tyngdekraften og pointene, drejningerne, at posen
+   altid giver neutrale salte, at ladningsregnskabet gaar op gennem hele
+   spil med tilfaeldige traek, knapperne og tilbuddet om praesentationen,
+   og at sproget overholder reglerne. Skal koeres gennem en lokal server
+   (Chrome maa ikke kigge ind i en iframe paa file://).
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+/* Tilbuddet skal vises foerste gang: glem valget, foer siden aabnes */
+try { localStorage.removeItem("nk-iontetris-intro"); localStorage.removeItem("nk-iontetris-rekord"); } catch (e) {}
+var ramme = document.createElement("iframe");
+ramme.src = "index.html";
+document.body.appendChild(ramme);
+ramme.addEventListener("load", function () { setTimeout(koer, 900); });
+
+function koer() {
+    try { tests(); } catch (e) { fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl"); }
+    vis();
+}
+
+function tests() {
+    var w = ramme.contentWindow, d = ramme.contentDocument, NK = w.NK;
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    var D = NK.Data, Kemi = NK.Kemi, Braet = NK.Braet;
+    paastand("tre spil er bygget", !!(NK.spil && NK.spil.let && NK.spil.middel && NK.spil.svaer));
+    paastand("Kemichael er indlæst", !!NK.Kemichael && !!NK.laerer);
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    w.requestAnimationFrame = function () {};      /* selvtesten styrer tiden */
+
+    /* Til/fra-tilstand: tilbuddet er synligt, foer noget er startet */
+    var tilbud = d.getElementById("tilbud");
+    paastand("tilbuddet om præsentationen vises første gang", w.getComputedStyle(tilbud).display !== "none");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("2. Formler og ionligninger");
+    var i = Kemi.ion;
+    var forvent = {
+        "Na-Cl": "NaCl", "Mg-Cl": "MgCl₂", "Al-Cl": "AlCl₃", "Na-O": "Na₂O", "Mg-O": "MgO", "Al-O": "Al₂O₃",
+        "Na-N": "Na₃N", "Mg-N": "Mg₃N₂", "Al-N": "AlN", "Na-OH": "NaOH", "Mg-OH": "Mg(OH)₂", "Al-OH": "Al(OH)₃",
+        "Na-NO3": "NaNO₃", "Mg-NO3": "Mg(NO₃)₂", "Al-SO4": "Al₂(SO₄)₃", "Na-SO4": "Na₂SO₄", "Mg-SO4": "MgSO₄",
+        "Mg-PO4": "Mg₃(PO₄)₂", "Al-PO4": "AlPO₄", "Na-PO4": "Na₃PO₄", "K-Br": "KBr", "K-O": "K₂O", "Mg-Br": "MgBr₂"
+    };
+    var forkerte = Object.keys(forvent).filter(function (k) { var p = k.split("-"); return Kemi.formel(i(p[0]), i(p[1])) !== forvent[k]; });
+    paastand("23 formler skrives som i bogen", !forkerte.length, forkerte.join(", "));
+    var alle = [], ubalance = [];
+    D.NIVEAU_ORDEN.forEach(function (id) { Kemi.salte(D.NIVEAUER[id]).forEach(function (s) { alle.push(s); }); });
+    alle.forEach(function (s) {
+        if (s.x * s.kat.q + s.y * s.an.q !== 0 || NK.gcd(s.x, s.y) !== 1) ubalance.push(s.formel);
+    });
+    paastand("alle " + alle.length + " salte er neutrale og forkortede", !ubalance.length, ubalance.join(", "));
+    paastand("ionligning: 2 Al³⁺ + 3 O²⁻ → Al₂O₃", Kemi.ionligning(i("Al"), i("O")) === "2 Al³⁺ + 3 O²⁻ → Al₂O₃", Kemi.ionligning(i("Al"), i("O")));
+    paastand("ionligning: Na⁺ + Cl⁻ → NaCl", Kemi.ionligning(i("Na"), i("Cl")) === "Na⁺ + Cl⁻ → NaCl");
+    paastand("ionladning ±1 uden tal (Na⁺, Cl⁻, NO₃⁻)", Kemi.ionTekst(i("Na")) === "Na⁺" && Kemi.ionTekst(i("Cl")) === "Cl⁻" && Kemi.ionTekst(i("NO3")) === "NO₃⁻");
+    paastand("salte pr. sværhedsgrad: 9, 9 og 18", Kemi.salte(D.NIVEAUER.let).length === 9 && Kemi.salte(D.NIVEAUER.middel).length === 9 && Kemi.salte(D.NIVEAUER.svaer).length === 18);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("3. Reglen for salt");
+    var nr = 0;
+    /* Laeg en O-brik (2 x 2) med oeverste venstre celle i (x, y) */
+    function O(B, ion, x, y) { var id = B.placer({ form: "O", rot: 0, x: x - 1, y: y, ion: ion }); return { id: id, r: B.reager(id) }; }
+    var B = new Braet();
+    O(B, "Na", 0, 20);
+    var r = O(B, "Cl", 2, 20).r;
+    paastand("Na⁺ op ad Cl⁻ bliver til NaCl", r.length === 1 && r[0].formel === "NaCl");
+
+    B = new Braet();
+    O(B, "Al", 0, 20); var r1 = O(B, "Cl", 2, 20).r, r2 = O(B, "Cl", 4, 20).r, r3 = O(B, "Cl", 6, 20).r;
+    paastand("Al³⁺ med én og to Cl⁻ reagerer ikke", !r1.length && !r2.length);
+    paastand("tre Cl⁻ i en kæde, hvor kun én rører Al³⁺, giver AlCl₃", r3.length === 1 && r3[0].formel === "AlCl₃" && r3[0].ids.length === 4);
+
+    B = new Braet();
+    O(B, "Mg", 0, 20); O(B, "Cl", 2, 20);
+    var v = B.ventende();
+    paastand("Mg²⁺ og én Cl⁻ venter med ladningen +1", v.length === 1 && v[0].q === 1);
+    r = O(B, "Cl", 4, 20).r;
+    paastand("den anden Cl⁻ giver MgCl₂", r.length === 1 && r[0].formel === "MgCl₂");
+
+    B = new Braet();
+    O(B, "Na", 0, 20); O(B, "Mg", 2, 20); r = O(B, "O", 4, 20).r;
+    paastand("en Na⁺ til overs blokerer ikke: Mg²⁺ og O²⁻ bliver til MgO", r.length === 1 && r[0].formel === "MgO");
+    v = B.ventende();
+    paastand("Na⁺ venter bagefter med +1", v.length === 1 && v[0].q === 1 && v[0].ids.length === 1);
+
+    B = new Braet();
+    O(B, "Na", 0, 20); O(B, "N", 2, 20); r = O(B, "Mg", 4, 20).r;
+    v = B.ventende();
+    paastand("Na⁺, N³⁻ og Mg²⁺ går lige op, men er to slags plus: ingen reaktion", !r.length && v.length === 1 && v[0].q === 0);
+
+    B = new Braet();
+    O(B, "Na", 0, 20); r = O(B, "Na", 2, 20).r;
+    paastand("to Na⁺ reagerer ikke med hinanden", !r.length && B.ventende()[0].q === 2);
+
+    B = new Braet();
+    O(B, "Al", 0, 20); O(B, "O", 2, 20); O(B, "Al", 4, 20); O(B, "O", 6, 20); r = O(B, "O", 8, 20).r;
+    paastand("to Al³⁺ og tre O²⁻ giver Al₂O₃ (5 brikker)", r.length === 1 && r[0].formel === "Al₂O₃" && r[0].ids.length === 5);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("4. Saltet bliver til pulver, og brikkerne falder");
+    /* Lav en brik direkte: celler og om den er salt */
+    function lav(B, ion, celler, salt) {
+        var id = "t" + (++nr);
+        B.stykker[id] = { id: id, ion: i(ion), orden: nr, salt: !!salt, enhed: salt ? 999 : 0 };
+        celler.forEach(function (c) { B.g[c[1]][c[0]] = { id: id }; });
+        return id;
+    }
+    function raekke(y, fra, til) { var c = []; for (var x = fra; x <= til; x++) c.push([x, y]); return c; }
+    function fald(B) { var n = 0; while (B.tyngdeSkridt() && n < 50) n++; return n; }
+    B = new Braet();
+    O(B, "Na", 0, 20); O(B, "Cl", 2, 20);
+    var celler = B.fjernSalt();
+    paastand("NaCl forsvinder helt: 8 celler, tomt bræt", celler === 8 && B.tomt());
+
+    B = new Braet();
+    lav(B, "Na", [[0, 20], [1, 20], [0, 21], [1, 21]], true);
+    var mgId = lav(B, "Mg", [[0, 18], [1, 18], [0, 19], [1, 19]], false);
+    lav(B, "O", [[2, 20], [3, 20], [2, 21], [3, 21]], false);
+    paastand("Mg²⁺ ovenpå saltet rører ikke O²⁻ (kun på skrå)", !B.reager().length);
+    B.fjernSalt();
+    var n4 = fald(B);
+    paastand("saltet forsvinder, og Mg²⁺ falder to rækker ned", n4 === 2 && B.celle(0, 21) && B.celle(0, 21).id === mgId);
+    r = B.reager();
+    paastand("så rører Mg²⁺ og O²⁻ hinanden: kædereaktion til MgO", r.length === 1 && r[0].formel === "MgO");
+
+    B = new Braet();
+    var hang = lav(B, "Na", [[0, 18], [1, 18], [1, 19]], false);
+    var stoette = lav(B, "Cl", [[1, 20], [1, 21]], true);
+    paastand("en brik, der hviler på noget med én celle, hænger (ingen tyngde celle for celle)", fald(B) === 0 && B.celle(0, 18).id === hang);
+    B.fjernSalt();
+    fald(B);
+    paastand("fjernes støtten, falder brikken hel", B.celle(0, 20) && B.celle(0, 20).id === hang && B.celle(1, 20).id === hang && B.celle(1, 21).id === hang);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("5. Brikkerne, stenene og drejningen");
+    function drejerRundt(n) {
+        var F = Braet.FORMER[n], s0 = JSON.stringify(F.stillinger[0].slice().sort());
+        var s = F.stillinger[3].map(function (p) { return [F.n - 1 - p[1], p[0]]; });
+        return F.fast || JSON.stringify(s.sort()) === s0;
+    }
+    paastand("syv ioner med fire celler, og fire drejninger giver udgangspunktet", Braet.FORM_NAVNE.length === 7
+        && Braet.FORM_NAVNE.every(function (n) { return Braet.FORMER[n].stillinger.every(function (s) { return s.length === 4; }) && drejerRundt(n); }));
+    var formNoegle = {};
+    Braet.STEN_NAVNE.forEach(function (n) {
+        var c = Braet.FORMER[n].stillinger[0], mx = 9, my = 9;
+        c.forEach(function (p) { mx = Math.min(mx, p[0]); my = Math.min(my, p[1]); });
+        formNoegle[JSON.stringify(c.map(function (p) { return [p[0] - mx, p[1] - my]; }).sort())] = true;
+    });
+    paastand("18 forskellige sten med fem felter (alle pentominoer, også spejlvendte)", Braet.STEN_NAVNE.length === 18
+        && Object.keys(formNoegle).length === 18
+        && Braet.STEN_NAVNE.every(function (n) { return Braet.FORMER[n].stillinger.every(function (s) { return s.length === 5; }) && drejerRundt(n); }));
+    B = new Braet();
+    paastand("O-brikken drejer ikke", B.drej({ form: "O", rot: 0, x: 3, y: 5 }, 1) === null);
+    var k = B.drej({ form: "I", rot: 1, x: -2, y: 5 }, 1);
+    paastand("lodret I ved venstre væg sparkes fri, når den drejes", !!k && k.rot === 2 && k.x === 0 && k.y === 5, JSON.stringify(k));
+    k = B.drej({ form: "T", rot: 0, x: 3, y: 5 }, 1);
+    paastand("T drejer med uret uden spark midt på brættet", !!k && k.rot === 1 && k.x === 3 && k.y === 5);
+    k = B.drej({ form: "s_I", rot: 1, x: -2, y: 5 }, 1);
+    paastand("den lange sten drejer fri af væggen", !!k && k.rot === 2 && B.passer("s_I", k.rot, k.x, k.y), JSON.stringify(k));
+    lav(B, "Na", raekke(21, 0, 9), true);
+    paastand("skyggen lander oven på det, der ligger", B.bund({ form: "O", rot: 0, x: 3, y: 0 }) === 19);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Sten og fulde rækker");
+    function sten(B, celler) {
+        var id = "t" + (++nr);
+        B.stykker[id] = { id: id, sten: true, orden: nr, salt: false };
+        celler.forEach(function (c) { B.g[c[1]][c[0]] = { id: id }; });
+        return id;
+    }
+    B = new Braet();
+    O(B, "Na", 0, 20);
+    sten(B, [[2, 20], [2, 21], [3, 21], [4, 21], [4, 20]]);
+    r = O(B, "Cl", 5, 20).r;
+    paastand("en sten mellem Na⁺ og Cl⁻ stopper reaktionen", !r.length);
+    B = new Braet();
+    sten(B, raekke(21, 0, 4));
+    sten(B, raekke(21, 5, 9));
+    var over = sten(B, [[3, 20], [3, 19]]);
+    var vaek = B.fjernRaekker(B.fuldeRaekker());
+    paastand("en fuld række af sten forsvinder, og det ovenover rykker ned", !vaek.length && B.celle(3, 21) && B.celle(3, 21).id === over && !B.celle(3, 19));
+    B = new Braet();
+    sten(B, raekke(21, 0, 8));
+    var cl = lav(B, "Cl", [[9, 21]], false);
+    var na = lav(B, "Na", [[0, 20], [0, 19]], false);
+    vaek = B.fjernRaekker(B.fuldeRaekker());
+    paastand("en fuld række tager ioner med; en ion, der forsvinder helt, meldes", vaek.length === 1 && vaek[0].id === "Cl" && !!B.stykker[na]);
+    var sp = new NK.Spil("let");
+    sp.start();
+    sp.braet.nulstil();
+    sten(sp.braet, raekke(21, 0, 8));
+    lav(sp.braet, "Cl", [[9, 21]], false);
+    sp.aktiv = null;
+    sp.ryddes = { led: 0 };
+    sp.kaede();
+    var sik6 = 0;
+    while (sp.ryddes && sik6++ < 100) sp.opdater(0.05);
+    paastand("i spillet: rækken forsvinder, og Cl⁻ kommer igen i køen", sp.raekker === 1 && (sp.pose.ioner[0] === "Cl" || (sp.koe.concat(sp.aktiv ? [sp.aktiv] : [])).some(function (b) { return b.ion === "Cl"; })), sp.raekker + " / " + JSON.stringify(sp.pose.ioner.slice(0, 2)));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("7. Posen");
+    var neutral = true;
+    D.NIVEAU_ORDEN.forEach(function (id) {
+        var N = D.NIVEAUER[id], q = 0;
+        if (N.intro) N.intro.forEach(function (x) { q += i(x).q; });
+        if (q !== 0) neutral = false;
+    });
+    D.NIVEAU_ORDEN.forEach(function (id) {
+        var N = D.NIVEAUER[id], p = new NK.Spil.Pose(N);
+        for (var n = 0; n < 200; n++) {
+            p.ioner = [];
+            var foer = p.ion(), q = i(foer).q;
+            p.ioner.forEach(function (x) { q += i(x).q; });
+            if (q !== 0) neutral = false;
+        }
+    });
+    paastand("introen og hver pose er neutral på alle tre sværhedsgrader", neutral);
+    var former = new NK.Spil.Pose(D.NIVEAUER.let), syv = {};
+    for (var n = 0; n < 7; n++) syv[former.form()] = true;
+    paastand("ionernes former kommer i poser med alle syv", Object.keys(syv).length === 7);
+    var andele = D.NIVEAU_ORDEN.map(function (id) {
+        var p = new NK.Spil.Pose(D.NIVEAUER[id]), s = 0;
+        p.pladser = [];
+        for (var n = 0; n < 240; n++) if (p.naeste().sten) s++;
+        return Math.abs(s / 240 - Math.round(D.NIVEAUER[id].sten * 12) / 12) < 1e-9;
+    });
+    paastand("andelen af sten er " + D.NIVEAU_ORDEN.map(function (id) { return D.NIVEAUER[id].sten; }).join(", "), andele.every(function (x) { return x; }));
+    var pm = new NK.Spil.Pose(D.NIVEAUER.let, function (f) { return f !== "KBr"; }), kbr = 0;
+    for (n = 0; n < 400; n++) if (pm.vaelgSalt().formel === "KBr") kbr++;
+    paastand("et salt, der mangler, kommer langt oftere (KBr: " + kbr + " af 400)", kbr > 200);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("8. Kædereaktion, niveau og sejr");
+    /* Hele forloebet: Mg²⁺ over salt, der forsvinder, falder ned til O²⁻ */
+    sp = new NK.Spil("let");
+    sp.start();
+    sp.braet.nulstil();
+    lav(sp.braet, "Mg", [[1, 18], [2, 18], [1, 19], [2, 19]], false);
+    lav(sp.braet, "O", [[3, 20], [4, 20], [3, 21], [4, 21]], false);
+    lav(sp.braet, "Na", [[1, 20], [1, 21]], false);
+    sp.aktiv = { form: "I", ion: "Cl", rot: 1, x: -2, y: 5 };
+    sp.aktiv.y = sp.braet.bund(sp.aktiv);
+    var saltFoer = sp.antalSalte;
+    sp.haardt();
+    var skridt = 0;
+    while (sp.ryddes && skridt++ < 200) sp.opdater(0.02);
+    paastand("Cl⁻ gør Na⁺ til salt, Mg²⁺ falder, og MgO kommer som andet led", sp.antalSalte - saltFoer === 2 && sp.salte["MgO"] === 1 && sp.salte["NaCl"] === 1, (sp.antalSalte - saltFoer) + " salte");
+    paastand("brættet er tomt bagefter, og næste brik er på vej", sp.braet.tomt() && !!sp.aktiv && !sp.ryddes);
+    sp = new NK.Spil("let");
+    sp.start();
+    sp.antalBrikker = D.BRIKKER_PR_NIVEAU - 1;
+    sp.aktiv = { form: "O", ion: "Na", rot: 0, x: 3, y: 1 };
+    sp.haardt();
+    paastand("niveauet stiger for hver " + D.BRIKKER_PR_NIVEAU + " brikker", sp.niveau === 2);
+
+    w.localStorage.removeItem("nk-iontetris-tid");
+    sp = new NK.Spil("let");
+    sp.start();
+    sp.salteListe.forEach(function (s) { if (s.formel !== "NaCl") sp.salte[s.formel] = 1; });
+    sp.tid = 83.4;
+    sp.braet.nulstil();
+    O(sp.braet, "Na", 0, 20);
+    sp.aktiv = { form: "O", ion: "Cl", rot: 0, x: 1, y: 5 };
+    sp.haardt();
+    skridt = 0;
+    while (sp.ryddes && skridt++ < 200) sp.opdater(0.02);
+    paastand("det sidste salt vinder spillet", sp.tilstand === "vundet" && sp.fundne() === 9);
+    paastand("rekorden er tiden, gemt i browseren (" + NK.Spil.tidTekst(sp.rekord) + ")", sp.nyRekord && sp.rekord === sp.tid && sp.tid > 83 && JSON.parse(w.localStorage.getItem("nk-iontetris-tid")).let === sp.tid);
+    paastand("tiden skrives m:ss: 83,4 s bliver 1:23", NK.Spil.tidTekst(83.4) === "1:23" && NK.Spil.tidTekst(605) === "10:05");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("9. Hele spil med tilfældige træk");
+    function seed(s) { s = s >>> 0 || 1; w.Math.random = function () { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return (s % 1000000) / 1000000; }; }
+    var brud = [], spilIalt = 0, brikkerIalt = 0, saltIalt = 0;
+    function regnskab(sp) {
+        var q = 0, B = sp.braet;
+        Object.keys(B.stykker).forEach(function (id) { var s = B.stykker[id]; if (!s.salt && !s.sten) q += s.ion.q; });
+        sp.koe.forEach(function (b) { if (!b.sten) q += i(b.ion).q; });
+        if (sp.aktiv && !sp.aktiv.sten) q += i(sp.aktiv.ion).q;
+        if (sp.gemt && !sp.gemt.sten) q += i(sp.gemt.ion).q;
+        sp.pose.ioner.forEach(function (x) { q += i(x).q; });
+        return q;
+    }
+    D.NIVEAU_ORDEN.forEach(function (niv, ni) {
+        for (var g = 0; g < 3; g++) {
+            seed(1000 + ni * 97 + g * 13);
+            var sp = new NK.Spil(niv);
+            sp.start();
+            spilIalt++;
+            for (var t = 0; t < 400 && sp.tilstand === "koerer"; t++) {
+                /* Laeg brikken saa lavt som muligt (tilfaeldig ved lige) */
+                if (Math.random() < 0.08) sp.tryk("gem");
+                if (!sp.aktiv) break;
+                var bedst = null;
+                for (var rot = 0; rot < 4; rot++) {
+                    for (var bx = -2; bx < 10; bx++) {
+                        var a0 = { form: sp.aktiv.form, rot: rot, x: bx, y: sp.aktiv.y };
+                        if (!sp.braet.passer(a0.form, rot, bx, a0.y)) continue;
+                        var by = sp.braet.bund(a0) + Math.random() * 0.5;
+                        if (!bedst || by > bedst.y) bedst = { rot: rot, x: bx, y: by };
+                    }
+                }
+                if (bedst) { sp.aktiv.rot = bedst.rot; sp.aktiv.x = bedst.x; }
+                sp.tryk("slip");
+                var sikring = 0;
+                while (sp.ryddes && sikring++ < 200) sp.opdater(0.05);
+                brikkerIalt++;
+                /* Invarianter */
+                var B2 = sp.braet, x, y, celleFejl = false;
+                for (y = 0; y < B2.H; y++) for (x = 0; x < B2.B; x++) if (B2.g[y][x] && !B2.stykker[B2.g[y][x].id]) celleFejl = true;
+                if (celleFejl) brud.push(niv + ": celle uden brik");
+                var gr = B2.graf();
+                if (Kemi.findReaktion(gr.noder, gr.kanter)) brud.push(niv + ": en gruppe kunne have reageret");
+                if (sp.tilstand !== "koerer") break;
+                var qq = regnskab(sp);
+                if (qq !== 0) { brud.push(niv + ": ladningsregnskabet er " + qq + " efter brik " + t); break; }
+            }
+            Object.keys(sp.salte).forEach(function (f) { saltIalt += sp.salte[f]; });
+        }
+    });
+    paastand(spilIalt + " spil, " + brikkerIalt + " brikker uden brud på reglerne", !brud.length, brud.slice(0, 3).join("; "));
+    paastand("der blev dannet salt (" + saltIalt + ")", saltIalt > 20);
+
+    seed(4242);
+    w.localStorage.removeItem("nk-iontetris-rekord");
+    sp = new NK.Spil("let");
+    sp.start();
+    sp.pose.ion = function () { return "Na"; };
+    sp.koe.forEach(function (b) { b.ion = "Na"; });
+    sp.aktiv.ion = "Na";
+    for (var t = 0; t < 500 && sp.tilstand === "koerer"; t++) { for (var a2 = 0; a2 < 5; a2++) sp.flyt(-1); sp.tryk("slip"); while (sp.ryddes) sp.opdater(0.05); }
+    paastand("lutter Na⁺ stablet i én søjle slutter spillet", sp.tilstand === "slut");
+    sp.start();
+    paastand("Spil igen starter forfra", sp.tilstand === "koerer" && sp.tid === 0 && sp.fundne() === 0 && sp.braet.tomt());
+    sp.aktiv = { form: "T", ion: "Na", rot: 0, x: 3, y: 1 };
+    var foerGem = sp.gemt;
+    paastand("gem virker én gang pr. brik", sp.gem() === true && sp.gem() === false && sp.gemt && sp.gemt.ion === "Na" && foerGem === null);
+    sp.laasUr = 0;
+    var yFoer = sp.aktiv.y;
+    sp.opdater(D.NIVEAUER.let.start + 0.01);
+    paastand("brikken falder én række pr. " + D.NIVEAUER.let.start + " s på Let, niveau 1", sp.aktiv && sp.aktiv.y === yFoer + 1);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("10. Hint og skygge");
+    sp = new NK.Spil("let");
+    sp.start();
+    sp.braet.nulstil();
+    O(sp.braet, "Mg", 0, 20); O(sp.braet, "Cl", 2, 20);
+    sp.ventende = sp.braet.ventende();
+    sp.antalBrikker = 5;
+    sp.aktiv = { form: "O", ion: "Cl", rot: 0, x: 3, y: 1 };
+    var h = sp.hint();
+    paastand("hint: Mg²⁺ og Cl⁻ mangler én minusladning. Læg Cl⁻ op ad dem.", h === "Mg²⁺ og Cl⁻ mangler én minusladning. Læg Cl⁻ op ad dem.", h);
+    sp.aktiv = { form: "O", ion: "Cl", rot: 0, x: 3, y: 1 };
+    sp.opdaterSkygge();
+    paastand("skyggen lyser grønt med MgCl₂, når Cl⁻ lander op ad dem", !!sp.glimt && sp.glimt.formel === "MgCl₂", JSON.stringify(sp.glimt && sp.glimt.formel));
+    sp.aktiv.x = 7;
+    sp.opdaterSkygge();
+    paastand("langt væk lyser skyggen ikke", !sp.glimt);
+    sp.braet.nulstil();
+    O(sp.braet, "Na", 0, 20); O(sp.braet, "N", 2, 20); O(sp.braet, "Mg", 4, 20);
+    sp.N = D.NIVEAUER.middel;
+    sp.ventende = sp.braet.ventende();
+    paastand("hint ved to slags plus: et salt har kun én slags af hver", sp.hint() === D.BESKED.blandet);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("11. Knapper, faner og tilbuddet");
+    w.localStorage.removeItem("nk-iontetris-rekord");
+    NK.app.visNiveau("let");
+    NK.app.primaer();
+    var S = NK.spil.let;
+    paastand("Start spil starter spillet", S.tilstand === "koerer");
+    NK.app.trin(1 / 60);
+    paastand("tilbuddet forsvinder, når spillet starter (også i stilarket)", w.getComputedStyle(tilbud).display === "none");
+    paastand("valget huskes som Nej tak", !!JSON.parse(w.localStorage.getItem("nk-iontetris-intro") || "{}").let);
+    paastand("kortet midt på brættet er skjult under spillet", w.getComputedStyle(d.getElementById("midterkort")).display === "none");
+    NK.app.primaer();
+    NK.app.trin(1 / 60);
+    paastand("den store knap giver pause, og kortet siger Fortsæt", S.tilstand === "pause" && d.getElementById("mk-knap").textContent === "Fortsæt");
+    NK.app.primaer();
+    NK.app.visNiveau("middel");
+    NK.app.trin(1 / 60);
+    paastand("faneskift sætter det andet spil på pause", S.tilstand === "pause" && NK.app.aktiv() === "middel");
+    paastand("saltkortet viser Middels 9 salte", d.querySelectorAll("#saltgitter .salt").length === 9);
+    function tast(key, type) { NK.app[type === "keyup" ? "tastOp" : "tastatur"]({ key: key, preventDefault: function () {}, target: d.body }); }
+    tast("Enter");
+    var M = NK.spil.middel;
+    paastand("Enter starter spillet på Middel", M.tilstand === "koerer");
+    var x0 = M.aktiv.x;
+    tast("ArrowLeft"); tast("ArrowLeft", "keyup");
+    paastand("pil venstre flytter brikken", M.aktiv.x === x0 - 1);
+    var antal = M.antalBrikker;
+    tast(" ");
+    while (M.ryddes) M.opdater(0.05);
+    paastand("mellemrum slipper brikken", M.antalBrikker === antal + 1);
+    tast("p");
+    paastand("P giver pause", M.tilstand === "pause");
+    tast("Escape");
+    paastand("Esc lukker ikke spillet op igen", M.tilstand === "pause");
+    NK.app.visNiveau("let");
+    var kFejl = null;
+    try { NK.laerer.startIntro("let", true); for (var kt = 0; kt < 400; kt++) NK.app.trin(1 / 60); } catch (e) { kFejl = String(e); }
+    paastand("Kemichaels præsentation kører uden fejl (også når han taler)", !kFejl, kFejl);
+    NK.laerer.stopIntro();
+
+    /* ----------------------------------------------------------------- */
+    overskrift("12. Sproget");
+    var tekster = [];
+    Object.keys(D.INTRO).forEach(function (k) { D.INTRO[k].forEach(function (l) { tekster.push(l); }); });
+    Object.keys(D.SLUT).forEach(function (k) { D.SLUT[k].forEach(function (l) { tekster.push(l); }); });
+    Object.keys(D.BESKED).forEach(function (k) { tekster.push(D.BESKED[k]); });
+    var introLange = [];
+    Object.keys(D.INTRO).forEach(function (k) { D.INTRO[k].forEach(function (l) { if (l.length > 62) introLange.push(l); }); });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", !introLange.length, introLange.join(" | "));
+    paastand("tre replikker pr. sværhedsgrad", D.NIVEAU_ORDEN.every(function (k) { return D.INTRO[k].length === 3; }));
+    var sideTekst = d.body.innerText + "\n" + tekster.join("\n");
+    paastand("ingen tankestreger", !/[–—]/.test(sideTekst), (sideTekst.match(/.{0,20}[–—].{0,20}/) || [""])[0]);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/(¹[⁺⁻])|([A-Za-z₀-₉)]1[+−-](?![0-9]))/.test(sideTekst), (sideTekst.match(/.{0,10}(¹[⁺⁻]|[A-Za-z₀-₉)]1[+−-]).{0,10}/) || [""])[0]);
+    var smaa = [];
+    d.querySelectorAll("p, span, b, small, button, li, kbd").forEach(function (e) {
+        if (!e.offsetWidth || !e.textContent.trim() || e.children.length) return;
+        var s = parseFloat(w.getComputedStyle(e).fontSize);
+        if (s < 12) smaa.push(e.textContent.trim().slice(0, 20) + " " + s + "px");
+    });
+    paastand("ingen synlig tekst under 12 px", !smaa.length, smaa.slice(0, 4).join(" | "));
+}
+</script>
+</body>
+</html>

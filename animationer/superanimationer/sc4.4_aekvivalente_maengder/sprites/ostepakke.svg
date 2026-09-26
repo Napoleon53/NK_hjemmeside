@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 84" width="120" height="84">
+<!-- En stak osteskiver paa et lille bræt, set forfra. Bunden staar i y 82. -->
+<defs>
+  <linearGradient id="ost" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffe17a"/>
+    <stop offset="1" stop-color="#e9ad26"/>
+  </linearGradient>
+  <linearGradient id="trae" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#c79352"/>
+    <stop offset="1" stop-color="#8a5d2a"/>
+  </linearGradient>
+</defs>
+<rect x="4" y="68" width="112" height="14" rx="4" fill="url(#trae)" stroke="#5e3c16" stroke-width="1.3"/>
+<g stroke="#c28d14" stroke-width="1" fill="url(#ost)">
+  <rect x="18" y="58" width="84" height="10" rx="3"/>
+  <rect x="16" y="49" width="86" height="10" rx="3"/>
+  <rect x="20" y="40" width="82" height="10" rx="3"/>
+  <rect x="17" y="31" width="85" height="10" rx="3"/>
+  <rect x="21" y="22" width="80" height="10" rx="3"/>
+  <rect x="19" y="13" width="82" height="10" rx="3"/>
+</g>
+<g fill="#e3a91f" opacity="0.8">
+  <ellipse cx="34" cy="17" rx="4" ry="2"/>
+  <ellipse cx="70" cy="18" rx="3" ry="1.6"/>
+  <ellipse cx="88" cy="16" rx="2.4" ry="1.3"/>
+</g>
+<path d="M24 15 L60 15" stroke="#fff4c4" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+</svg>

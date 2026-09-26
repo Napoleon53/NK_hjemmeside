@@ -18,12 +18,10 @@
    Udviklerværktøj. Indgår ikke i animationen og kan slettes.
 
    Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
-   se på et skærmbillede: at molekylerne på fane 2 og 3 opfylder
-   oktetreglen og har lærebogens form, vinkel og polaritet; at byggeren
-   på fane 1 overholder reglerne og giver de rigtige vinkler; at
-   vandstrålen bøjer mest for vand, mindre for ethanol og ikke for
-   heptan; at alle opgaver kan løses; og at teksterne overholder sitets
-   regler.
+   se på et skærmbillede: at molekylerne på fane 2 opfylder oktetreglen
+   og har lærebogens form og vinkel; at byggeren på fane 1 overholder
+   reglerne og giver de rigtige vinkler; at alle opgaver kan løses; og
+   at teksterne overholder sitets regler.
 
    Chrome kigger kun ind i en iframe på file://, hvis den startes med
    --allow-file-access-from-files. Ellers: brug en lokal server eller
@@ -55,15 +53,14 @@ function koerTest() {
     var NK = W.NK;
 
     overskrift("1. Indlæsning");
-    paastand("NK og de fire faner findes", !!(NK && NK.sims && NK.sims["fane-byg"] && NK.sims["fane-molekyler"] && NK.sims["fane-polaritet"] && NK.sims["fane-vand"]));
+    paastand("NK og de to faner findes", !!(NK && NK.sims && NK.sims["fane-byg"] && NK.sims["fane-molekyler"]) && d.querySelectorAll(".faneknap").length === 2);
     if (!NK || !NK.sims) return;
     var D = NK.Data, V = NK.V, B = NK.Bygning;
     var mangler = Object.keys(NK.Sprites.FILER).filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("alle " + Object.keys(NK.Sprites.FILER).length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
 
-    overskrift("2. Molekylerne på fane 2 og 3");
+    overskrift("2. Molekylerne på fane 2");
     var VINKEL = { H2O: 104.5, NH3: 107, CH4: 109.47, CO2: 180, HCN: 180, CH2O: 120, C2H4: 120, C2H2: 180, CCl4: 109.47, CH3Cl: 109.47 };
-    var POLAER = { H2O: true, NH3: true, CH4: false, CO2: false, HCN: true, CH2O: true, C2H4: false, C2H2: false, CCl4: false, CH3Cl: true, HCl: true };
     D.MOLEKYLER.forEach(function (mol) {
         var oktet = mol.atomer.every(function (a, i) {
             var sum = mol.naboer[i].reduce(function (s, n) { return s + n.orden; }, 0);
@@ -72,8 +69,8 @@ function koerTest() {
         var form = mol.centrum === null ? (mol.atomer.length === 2 ? "lineaer" : null)
             : D.form(mol.naboer[mol.centrum].length, mol.frieAntal[mol.centrum]);
         var vinkelOk = mol.vinkel ? naer(mol.vinkelGrader, VINKEL[mol.id], 0.3) : !VINKEL[mol.id];
-        paastand(mol.id + ": oktet, " + mol.form + ", " + (mol.vinkel ? NK.grader(mol.vinkelGrader) : "ingen vinkel") + ", " + (mol.polaer ? "polært" : "upolært"),
-            oktet && form === mol.form && vinkelOk && mol.polaer === POLAER[mol.id],
+        paastand(mol.id + ": oktet, " + mol.form + ", " + (mol.vinkel ? NK.grader(mol.vinkelGrader) : "ingen vinkel"),
+            oktet && form === mol.form && vinkelOk,
             "oktet " + oktet + ", form " + form + ", vinkel " + vinkelOk);
     });
 
@@ -180,7 +177,7 @@ function koerTest() {
     });
     byg.skiftVinkelmaaler(false);
 
-    ["fane-molekyler", "fane-polaritet"].forEach(function (fane) {
+    ["fane-molekyler"].forEach(function (fane) {
         var sim = NK.sims[fane];
         NK.visFane(fane);
         sim.OPGAVER.forEach(function (lav, i) {
@@ -188,10 +185,7 @@ function koerTest() {
             for (var gang = 0; gang < 10; gang++) {
                 var o = lav(sim);
                 var mol = D.molekyle(o.mol);
-                var ok = loestOpgave(sim, o, function (o) {
-                    if (o.valg) { sim.opgaver.vaelg(o.rigtig); return; }
-                    sim.opgaver.klik(mol.delta.indexOf(-1));
-                });
+                var ok = loestOpgave(sim, o, function (o) { sim.opgaver.vaelg(o.rigtig); });
                 if (fane === "fane-molekyler" && i === 0) ok = ok && o.valg[o.rigtig] === D.FORMER[mol.form].knap;
                 if (fane === "fane-molekyler" && i === 1) ok = ok && o.valg[o.rigtig] === NK.grader(mol.vinkelGrader);
                 if (fane === "fane-molekyler" && i === 2) ok = ok && o.rigtig === mol.frieAntal[mol.centrum];
@@ -202,106 +196,24 @@ function koerTest() {
         });
     });
 
-    overskrift("5. Fane 4: vandstrålen");
-    var vand = NK.sims["fane-vand"];
-    NK.visFane("fane-vand");
-    var GRAD16 = 16 * Math.PI / 180;
-
-    /* Straale af vaesken v, ladet stav med spidsen afst til hoejre for straalen. */
-    function forsoeg(v, stav, afst, nulstil) {
-        if (nulstil !== false) vand.nulstilForsoeg();
-        vand.slip();
-        vand.fyld(v);
-        vand.saetHane(true);
-        for (var n = 0; n < 50; n++) vand.opdater(1 / 60);
-        var tip = { x: 390 + afst, y: 360 };
-        vand.grib(stav, tip.x + 0.8 * 200 * Math.cos(GRAD16), tip.y + 0.8 * 200 * Math.sin(GRAD16), 0.8);
-        vand.stave[stav].vinkel = GRAD16;
-        vand.stave[stav].ladning = 1;
-        var sum = 0, tal = 0;
-        for (n = 0; n < 100; n++) {
-            vand.opdater(1 / 60);
-            if (n >= 60) vand.partikler.forEach(function (p) { if (p.y > 420) { sum += p.x - 390; tal++; } });
-        }
-        var ud = { udsving: tal ? sum / tal : 0, ladning: vand.stave[stav].ladning, registreret: !!vand.resultater[v][stav] };
-        vand.slip();
-        return ud;
-    }
-
-    var rv = forsoeg("vand", "plastik", 45), re = forsoeg("ethanol", "plastik", 45), rh = forsoeg("heptan", "plastik", 45), rg = forsoeg("vand", "glas", 45);
-    skriv("        udsving ved bægerglasset: vand " + rv.udsving.toFixed(1) + ", ethanol " + re.udsving.toFixed(1) + ", heptan " + rh.udsving.toFixed(1) + ", vand med glasstav " + rg.udsving.toFixed(1), "note");
-    paastand("vandstrålen bøjer tydeligt mod staven", rv.udsving > 20 && rv.ladning > 0.5);
-    paastand("ethanol bøjer mindre end vand, men mere end heptan", re.udsving > 5 && re.udsving < rv.udsving * 0.8);
-    paastand("heptan løber næsten lige ned", Math.abs(rh.udsving) < 3);
-    paastand("vandstrålen bøjer også mod den positive glasstav", rg.udsving > 20);
-    paastand("et test registreres efter lidt over et sekund", rv.registreret && re.registreret && rh.registreret && rg.registreret);
-
-    var rr = forsoeg("vand", "plastik", 2);
-    paastand("rører staven strålen, mister den ladningen", rr.ladning === 0);
-
-    vand.nulstilForsoeg();
-    vand.grib("plastik", 700, 590, 0.7);
-    for (var g = 0; g < 40; g++) { vand.flytStav(g % 2 ? 900 : 960, 598); vand.opdater(1 / 60); }
-    paastand("staven bliver ladet, når den gnides på kluden (" + vand.stave.plastik.ladning.toFixed(2) + ")", vand.stave.plastik.ladning > 0.5 && vand.trinGjort("gnedet"));
-    vand.slip();
-
-    vand.nulstilForsoeg();
-    vand.fyld("vand");
-    vand.saetHane(true);
-    for (g = 0; g < 60 * 20; g++) vand.opdater(1 / 60);
-    var ialt = vand.baeger.vand + vand.pytter.reduce(function (t, p) { return t + p.vol; }, 0);
-    paastand("de 30 mL i buretten ender i bægerglasset (" + ialt.toFixed(1) + " mL)", naer(ialt, 30, 0.6) && vand.vol === 0);
-    paastand("en fuld burette kan ikke fyldes, og en tom hane kan ikke åbnes",
-        (function () { vand.saetHane(false); vand.nulstilForsoeg(); var a = vand.saetHane(true); vand.fyld("vand"); var b = vand.fyld("heptan"); return !a && !b; }()));
-
-    vand.nulstilForsoeg();
-    paastand("opgaven er låst, før forsøget er slut", d.getElementById("vand-opg-knap").disabled);
-    forsoeg("vand", "plastik", 45, false);
-    for (g = 0; g < 60 * 16; g++) vand.opdater(1 / 60);
-    vand.saetHane(false);
-    forsoeg("ethanol", "plastik", 45, false);
-    for (g = 0; g < 60 * 16; g++) vand.opdater(1 / 60);
-    vand.saetHane(false);
-    forsoeg("heptan", "plastik", 45, false);
-    for (g = 0; g < 60 * 16; g++) vand.opdater(1 / 60);
-    vand.saetHane(false);
-    paastand("efter tre væsker mangler kun vand med glasstaven", vand.trinGjort("alle") && !vand.slut() && vand.aktueltTrin().id === "begge");
-    forsoeg("vand", "glas", 45, false);
-    paastand("forsøget er slut, og tegneserien og opgaven er låst op",
-        vand.slut() && !d.getElementById("vand-serieknap").hidden && !d.getElementById("vand-opg-knap").disabled);
-    NK.aabnSerie();
-    var ruder = d.querySelectorAll("#serie-ruder .rude");
-    var tabel = d.querySelector("#serie-ruder .resultater");
-    paastand("tegneserien har " + ruder.length + " ruder og resultatskemaet i sidste rude",
-        ruder.length >= 8 && tabel && ruder[ruder.length - 1].contains(tabel) && tabel.querySelectorAll("tr").length === 4);
-    paastand("resultatskemaet bruger elevens resultater", tabel && tabel.innerText.indexOf("bøjer tydeligt") >= 0 && tabel.innerText.indexOf("løber lige ned") >= 0);
-    var serieTekst = d.getElementById("serie-ruder").innerText;
-    d.getElementById("tegneserie").classList.remove("vis");
-
-    vand.OPGAVER.forEach(function (lav, i) {
-        var o = lav(vand);
-        paastand("fane 4, opgave " + (i + 1) + ": " + o.tekst, loestOpgave(vand, o, function (o) { vand.opgaver.vaelg(o.rigtig); }));
-    });
-
-    overskrift("6. Tekster og skrift");
-    var tekster = [d.body.innerText, serieTekst];
+    overskrift("5. Tekster og skrift");
+    var tekster = [d.body.innerText];
     D.TEORI.forEach(function (a) { tekster.push(a.h); a.p.forEach(function (p) { tekster.push(p); }); });
-    D.MOLEKYLER.forEach(function (m) { tekster.push(m.navn, m.hintForm, m.svarForm, m.hintPol, m.svarPol); });
-    [byg, NK.sims["fane-molekyler"], NK.sims["fane-polaritet"], vand].forEach(function (sim) {
+    D.MOLEKYLER.forEach(function (m) { tekster.push(m.navn, m.hintForm, m.svarForm); });
+    [byg, NK.sims["fane-molekyler"]].forEach(function (sim) {
         sim.OPGAVER.forEach(function (lav) {
             var o = lav(sim);
             tekster.push(o.tekst, o.hint || "", o.svar || "");
             (o.valg || []).forEach(function (v) { tekster.push(v); });
         });
     });
-    vand.TRIN.forEach(function (t) { tekster.push(t.tekst, t.hint(vand)); });
     NK.Rundvisning.TUR.forEach(function (t) { tekster.push(t.titel, t.tekst); });
     var alt = tekster.join("\n");
     var streger = alt.match(/.{0,30}[–—].{0,30}/g);
     paastand("ingen tankestreger (– eller —)", !streger, streger && streger.slice(0, 3).join(" | "));
 
     var smaa = [];
-    ["fane-byg", "fane-molekyler", "fane-polaritet", "fane-vand"].forEach(function (fane) {
+    ["fane-byg", "fane-molekyler"].forEach(function (fane) {
         NK.visFane(fane);
         Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
             if (!e.offsetWidth && !e.offsetHeight) return;

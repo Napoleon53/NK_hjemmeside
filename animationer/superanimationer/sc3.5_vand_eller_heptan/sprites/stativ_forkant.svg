@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="14" viewBox="0 0 240 14">
+  <!-- Forkanten af stativets plade. Tegnes OVEN PAA glassene med
+       oeverste venstre hjoerne i stativets (0, 22), saa glassene ser ud
+       til at staa i hullerne. -->
+  <rect x="1" y="1" width="238" height="12" rx="2" fill="#8d97a1" stroke="#454d56" stroke-width="1.5"/>
+  <path d="M4 3.5 H236" stroke="#ffffff" stroke-opacity="0.35" stroke-width="1.2"/>
+</svg>

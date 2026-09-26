@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="360" viewBox="0 0 60 360">
+  <!-- Reagensglas. Indholdet (vaesker, korn, draaber) tegnes af animationen
+       BAG denne fil, saa glasset ligger ovenpaa.
+       Inderside: x 9-51, top y 12, bunden er en halvcirkel med centrum
+       (30, 330) og radius 21, saa bunden inderst er y 351.
+       Yderside: x 6-54, bund y 354. Kanten foroven y 4-13.
+       Kanten er tegnet baade lys og moerk, saa glasset kan ses mod de
+       hvide fliser og mod den moerke vaeg. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e4f1fb" stop-opacity="0.34"/>
+      <stop offset="0.2" stop-color="#e4f1fb" stop-opacity="0.06"/>
+      <stop offset="0.75" stop-color="#e4f1fb" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#e4f1fb" stop-opacity="0.24"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Glassets krop -->
+  <path d="M6 11 L6 330 A24 24 0 0 0 54 330 L54 11 Z" fill="url(#glas)"/>
+
+  <!-- Vaeggen: en moerk kant udenpaa og en lys indenfor -->
+  <path d="M6 11 L6 330 A24 24 0 0 0 54 330 L54 11"
+        fill="none" stroke="#3f4b57" stroke-opacity="0.7" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M8.2 13 L8.2 330 A21.8 21.8 0 0 0 51.8 330 L51.8 13"
+        fill="none" stroke="#f4f9fd" stroke-opacity="0.55" stroke-width="1.2" stroke-linejoin="round"/>
+
+  <!-- Kanten foroven -->
+  <rect x="3" y="4" width="54" height="9" rx="4.5" fill="#e4f1fb" fill-opacity="0.32"
+        stroke="#3f4b57" stroke-opacity="0.7" stroke-width="2"/>
+  <path d="M7 6.5 H53" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Genskin -->
+  <rect x="13" y="24" width="5" height="296" rx="2.5" fill="#ffffff" fill-opacity="0.42"/>
+  <rect x="44.5" y="40" width="2.5" height="262" rx="1.2" fill="#ffffff" fill-opacity="0.24"/>
+  <path d="M16 338 Q20 347 29 349" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round"/>
+</svg>

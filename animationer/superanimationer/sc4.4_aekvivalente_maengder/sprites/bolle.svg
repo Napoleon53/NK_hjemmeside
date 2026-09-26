@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<!-- En burgerbolle set oppefra med sesamfroe. Midten er (32, 32). -->
+<defs>
+  <radialGradient id="skorpe" cx="0.42" cy="0.38" r="0.7">
+    <stop offset="0" stop-color="#f4c882"/>
+    <stop offset="0.65" stop-color="#d9994a"/>
+    <stop offset="1" stop-color="#a86a2a"/>
+  </radialGradient>
+</defs>
+<circle cx="32" cy="32" r="30" fill="url(#skorpe)" stroke="#7e4e1a" stroke-width="1.5"/>
+<path d="M14 22 Q22 10 38 9" stroke="#fbe3b6" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+<g fill="#fbf1d6" stroke="#d8b77e" stroke-width="0.4">
+  <ellipse cx="24" cy="24" rx="1.6" ry="2.6" transform="rotate(30 24 24)"/>
+  <ellipse cx="36" cy="20" rx="1.6" ry="2.6" transform="rotate(-20 36 20)"/>
+  <ellipse cx="44" cy="30" rx="1.6" ry="2.6" transform="rotate(60 44 30)"/>
+  <ellipse cx="30" cy="33" rx="1.6" ry="2.6" transform="rotate(-50 30 33)"/>
+  <ellipse cx="20" cy="38" rx="1.6" ry="2.6" transform="rotate(10 20 38)"/>
+  <ellipse cx="38" cy="42" rx="1.6" ry="2.6" transform="rotate(40 38 42)"/>
+  <ellipse cx="28" cy="46" rx="1.6" ry="2.6" transform="rotate(-30 28 46)"/>
+  <ellipse cx="46" cy="44" rx="1.6" ry="2.6" transform="rotate(80 46 44)"/>
+  <ellipse cx="48" cy="22" rx="1.6" ry="2.6" transform="rotate(-70 48 22)"/>
+</g>
+</svg>

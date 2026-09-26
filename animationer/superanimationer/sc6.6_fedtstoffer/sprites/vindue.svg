@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="340" viewBox="0 0 240 340">
+<!-- Vinduet med solen og vindueskarmen (sc6.6).
+     Maal (MAAL.vindue i js/sprites.js):
+       b 240, h 340
+       karmen: x 4-236, overside 306 (glassene staar paa den)
+       solen: midte (178, 62) -->
+<defs>
+  <linearGradient id="himmel" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#5aa7e0"/>
+    <stop offset="0.7" stop-color="#9fd0f0"/>
+    <stop offset="1" stop-color="#d9eefa"/>
+  </linearGradient>
+  <radialGradient id="sol" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#fff8c4"/>
+    <stop offset="0.55" stop-color="#ffe066"/>
+    <stop offset="1" stop-color="#ffc233" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="karm" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f4efe6"/>
+    <stop offset="1" stop-color="#cbbfae"/>
+  </linearGradient>
+  <linearGradient id="lys" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fff3b0" stop-opacity="0"/>
+    <stop offset="1" stop-color="#fff3b0" stop-opacity="0.35"/>
+  </linearGradient>
+</defs>
+
+<!-- Rammen -->
+<rect x="14" y="8" width="212" height="300" rx="4" fill="#efe9df" stroke="#a89c8a" stroke-width="2"/>
+<!-- Ruderne -->
+<rect x="26" y="20" width="188" height="276" fill="url(#himmel)"/>
+<circle cx="178" cy="62" r="46" fill="url(#sol)"/>
+<circle cx="178" cy="62" r="20" fill="#fff4a8"/>
+<!-- En sky og et tag i det fjerne -->
+<path d="M44 96 q6 -14 20 -10 q6 -12 20 -6 q14 -2 12 12 q10 4 2 12 l-56 0 q-10 -4 2 -8 Z" fill="#ffffff" opacity="0.9"/>
+<path d="M26 250 l40 -26 l40 26 Z M66 224 l0 0" fill="#b5524a" opacity="0.75"/>
+<rect x="36" y="250" width="60" height="46" fill="#d9c9a8" opacity="0.8"/>
+<rect x="110" y="236" width="104" height="60" fill="#7fb07a" opacity="0.55"/>
+<!-- Sprosserne -->
+<rect x="116" y="20" width="8" height="276" fill="#efe9df" stroke="#a89c8a" stroke-width="1"/>
+<rect x="26" y="152" width="188" height="7" fill="#efe9df" stroke="#a89c8a" stroke-width="1"/>
+<!-- Genskin i glasset -->
+<path d="M34 30 l30 0 l-24 50 l-14 0 Z" fill="#ffffff" opacity="0.18"/>
+<path d="M130 166 l24 0 l-20 44 l-12 0 Z" fill="#ffffff" opacity="0.14"/>
+<!-- Sollyset ned over karmen -->
+<path d="M150 90 L236 312 L60 312 Z" fill="url(#lys)"/>
+<!-- Karmen -->
+<rect x="4" y="306" width="232" height="14" rx="3" fill="url(#karm)" stroke="#a89c8a" stroke-width="1.5"/>
+<rect x="12" y="320" width="216" height="12" fill="#b6a995"/>
+<rect x="4" y="306" width="232" height="2.5" fill="#ffffff" opacity="0.7"/>
+</svg>

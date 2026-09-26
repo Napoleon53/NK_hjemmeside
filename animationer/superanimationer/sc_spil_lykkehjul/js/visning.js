@@ -208,6 +208,7 @@
     /* ----- Knapperne ----------------------------------------------------- */
     /* liste: [{ id, tekst, klasse, handling, slaaet, titel }] */
     V.knapper = function (liste) {
+        liste = liste.filter(function (k) { return !!k; });
         var noegle = JSON.stringify(liste.map(function (k) { return [k.id, k.tekst, k.klasse, !!k.slaaet, k.titel]; }));
         knapHandlinger = {};
         primaer = null;
@@ -258,6 +259,7 @@
                 + '<div class="podie-top">'
                 + '<button type="button" class="podie-lys" data-h="' + h + '" title="Giv holdet turen" aria-label="Giv holdet turen"></button>'
                 + '<button type="button" class="podie-navn" data-h="' + h + '" title="Ret navnet">' + NK.html(x.navn) + "</button>"
+                + (o.top || "")
                 + "</div>"
                 + '<button type="button" class="podie-stor" data-h="' + h + '" data-hvad="' + (o.storHvad || "total") + '" title="Ret pointene">' + o.stor + "</button>"
                 + (o.lille ? '<div class="podie-lille">' + o.lille + "</div>" : "")

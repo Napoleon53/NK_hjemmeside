@@ -299,12 +299,11 @@
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="c8.1" data-beskrivelse="Animation hvor du tester forskellige metaller mod hinanden for selv at opstille spændingsrækken." onclick="visAnimation(this, 'c8.1_eksperiment_spændingsrækken.html')" title="Spændingsrækken"><span class="btn-num">1</span><span class="btn-text">Spændingsrækken</span></button>
-            <button class="tab-btn" data-emne="c8.2" data-beskrivelse="Lær at bestemme oxidationstal trin for trin med et live regnestykke, og øv dig derefter på 25 molekyler og ioner i trænings-laboratoriet." onclick="visAnimation(this, 'c8.2_oxidationstal_regler.html')" title="Oxidationstal"><span class="btn-num">2</span><span class="btn-text">Oxidationstal</span></button>
-            <button class="tab-btn" data-emne="c8.3" data-beskrivelse="Gæt oxidationstal ud fra elektronegativitet og se elektronerne rykke sig fra atom til atom - og mød undtagelserne fra reglerne om H og O, fx i H₂O₂ og OF₂, samt ionerne OH⁻ og NH₄⁺." onclick="visAnimation(this, 'c8.3_oxidationstal_elektronegativitet.html')" title="Elektronegativitet"><span class="btn-num">3</span><span class="btn-text">Elektronegativitet</span></button>
-            <button class="tab-btn" data-emne="c8.4" data-beskrivelse="Træn at afstemme redoxreaktioner ved hjælp af oxidationstal." onclick="visAnimation(this, 'c8.4_opgaver_redoxafstemning.html')" title="Afstem Redox"><span class="btn-num">4</span><span class="btn-text">Afstem Redox</span></button>
-            <button class="tab-btn" data-emne="c8.5" data-beskrivelse="Undersøg kaliumpermanganats farve og oxidationstal i forskellige redoxreaktioner." onclick="visAnimation(this, 'c8.5_kaliumpermanganat_oxidationstal.html')" title="Kaliumpermanganat"><span class="btn-num">5</span><span class="btn-text">Kaliumpermanganat</span></button>
-            <button class="tab-btn" data-emne="c8.6" data-beskrivelse="Afvej ståluld, opløs den i syre, titrer med kaliumpermanganat og beregn jernindholdet." onclick="visAnimation(this, '../v2/superlab/sc8.6_jern_i_staaluld/index.html')" title="Forsøg: Jern i ståluld"><span class="btn-num">6</span><span class="btn-text">Jern i ståluld</span></button>
+            <button class="tab-btn" data-emne="c8.1" data-beskrivelse="Sæt metalstænger i opløsninger af metalioner, stil spændingsrækken op ud fra forsøgene, og forudsig nye reaktioner." onclick="visAnimation(this, '../superanimationer/sc8.1_spaendingsraekken/index.html')" title="Spændingsrækken"><span class="btn-num">1</span><span class="btn-text">Spændingsrækken</span></button>
+            <button class="tab-btn" data-emne="c8.2" data-beskrivelse="Bestem oxidationstal med reglerne trin for trin, og se i elektronprikformler, hvor elektronerne ender, også i undtagelserne H₂O₂ og OF₂." onclick="visAnimation(this, '../superanimationer/sc8.2_oxidationstal/index.html')" title="Oxidationstal"><span class="btn-num">2</span><span class="btn-text">Oxidationstal</span></button>
+            <button class="tab-btn" data-emne="c8.3" data-beskrivelse="Afstem redoxreaktioner trin for trin med oxidationstal, elektroner, ladning og vand." onclick="visAnimation(this, '../superanimationer/sc8.4_redoxafstemning/index.html')" title="Afstem redoxreaktioner"><span class="btn-num">3</span><span class="btn-text">Afstem Redox</span></button>
+            <button class="tab-btn" data-emne="c8.4" data-beskrivelse="Afstem kaliumpermanganats reaktioner i surt, neutralt og basisk miljø, og find manganstoffet ud fra farven." onclick="visAnimation(this, '../superanimationer/sc8.5_kaliumpermanganat/index.html')" title="Kaliumpermanganat"><span class="btn-num">4</span><span class="btn-text">Kaliumpermanganat</span></button>
+            <button class="tab-btn" data-emne="c8.5" data-beskrivelse="Afvej ståluld, opløs den i syre, titrer med kaliumpermanganat og beregn jernindholdet." onclick="visAnimation(this, '../v2/superlab/sc8.6_jern_i_staaluld/index.html')" title="Forsøg: Jern i ståluld"><span class="btn-num">5</span><span class="btn-text">Jern i ståluld</span></button>
 
         </div>
 
@@ -415,9 +414,11 @@
                 if (aliasKnap) {
                     aliasKnap.click();
                 } else {
+                    // Gamle numre efter omnummereringen 26. sept. 2026: c8.6 findes
+                    // via mappenavnet, som stadig har det gamle nummer.
                     knapper.forEach(knap => {
-                        if (knap.getAttribute('onclick').includes(emneFil)) {
-                            visAnimation(knap, emneFil);
+                        if (knap.getAttribute('onclick').includes(emneFil) && !document.querySelector('.tab-btn.active')) {
+                            knap.click();
                         }
                     });
                 }

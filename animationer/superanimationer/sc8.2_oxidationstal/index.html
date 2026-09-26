@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oxidationstal</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">±</span> Oxidationstal</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-rg" role="tab" aria-selected="true"><span class="nr">1</span>Reglerne</button>
+        <button class="faneknap" data-fane="fane-ek" role="tab" aria-selected="false"><span class="nr">2</span>Elektronerne</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: REGLERNE                                                   -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-rg" role="tabpanel" aria-label="Reglerne">
+    <div class="scene">
+        <canvas id="rg-laerred"></canvas>
+        <!-- Tavlen: formlen med felterne, regnestykket og brikkerne (js/sim_regler.js) -->
+        <div class="tavle" id="rg-tavle"></div>
+        <div class="anker" id="rg-anker-laerer"></div>
+        <button class="forfraknap" id="rg-forfra" type="button" title="Samme stof forfra (R)">Start forfra ↺</button>
+        <div class="kboble" id="rg-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="rg-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="rg-kort">
+            <h2><span id="rg-titel">Opgave</span><span class="taeller">stof <b id="rg-nr">1</b>/<span id="rg-antal">31</span></span></h2>
+            <div id="rg-prompt"></div>
+            <p class="besked" id="rg-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="rg-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="rg-opgaver">
+            <h2>Stofferne <span class="taeller">løst <b id="rg-loest">0</b>/31</span></h2>
+            <div class="opg-liste" id="rg-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: ELEKTRONERNE                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ek" role="tabpanel" aria-label="Elektronerne">
+    <div class="scene">
+        <canvas id="ek-laerred"></canvas>
+        <div class="anker" id="ek-anker-molekyle"></div>
+        <div class="anker" id="ek-anker-en"></div>
+        <div class="anker" id="ek-anker-laerer"></div>
+        <button class="forfraknap" id="ek-forfra" type="button" title="Parrene tilbage i bindingerne (R)">Start forfra ↺</button>
+        <div class="kboble" id="ek-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="ek-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="ek-kort">
+            <h2><span id="ek-titel">Opgave</span><span class="taeller">molekyle <b id="ek-nr">1</b>/<span id="ek-antal">12</span></span></h2>
+            <div id="ek-prompt"></div>
+            <div class="raekker gaet" id="ek-gaet"></div>
+            <p class="besked" id="ek-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="ek-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="ek-regnskabkort">
+            <h2>Regnskabet</h2>
+            <div id="ek-regnskab"></div>
+        </div>
+
+        <div class="kort" id="ek-opgaver">
+            <h2>Molekylerne <span class="taeller">løst <b id="ek-loest">0</b>/12</span></h2>
+            <div class="opg-liste" id="ek-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Oxidationstal</h2>
+        <p>Et oxidationstal er en tænkt ladning på et atom. Man lader, som om hvert elektronpar i en binding gik helt over til det atom, der trækker hårdest i det. Oxidationstallet viser så, hvor mange elektroner atomet har fået eller afgivet.</p>
+        <h3 class="teori-hoved">Sådan finder man det</h3>
+        <ol class="teori-trin">
+            <li>Tegn stoffets elektronprikformel.</li>
+            <li>Giv hvert elektronpar i en binding til det atom, der er mest elektronegativt. Er de to atomer ens, får de én elektron hver.</li>
+            <li>Tæl elektronerne om hvert atom, og sammenlign med atomets valenselektroner, altså dem, det havde som frit atom.</li>
+            <li>Har atomet fået elektroner, er oxidationstallet negativt. Har det afgivet elektroner, er det positivt. Tallet er forskellen.</li>
+        </ol>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: vand, <span class="f">H₂O</span></span>
+            O er mere elektronegativt end H (3,5 mod 2,1), så O får begge elektronpar.<br>
+            O havde 6 valenselektroner og har nu 8: 6 − 8 = −2, så O er −II.<br>
+            Hvert H havde 1 og har nu 0: 1 − 0 = +1, så H er +I.
+        </div>
+        <p>Fanen Elektronerne viser det molekyle for molekyle.</p>
+        <h3 class="teori-hoved">Reglerne: en genvej</h3>
+        <p>Man behøver ikke tegne hvert stof. For de fleste stoffer giver tre regler det samme tal:</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Reglerne</span>
+            1. H har oxidationstallet +I.<br>
+            2. O har oxidationstallet −II.<br>
+            3. Summen af oxidationstallene er stoffets ladning.
+        </div>
+        <p>Deraf følger, at et grundstof har 0 (H₂, O₂, S₈), og at en ion af ét atom har ionens ladning som oxidationstal (Mn²⁺ er +II).</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: dichromat-ion, <span class="f">Cr₂O₇²⁻</span></span>
+            Ladningen er −2, og hvert O er −II.<br>
+            2 · Cr + 7 · (−2) = −2<br>
+            2 · Cr = −2 − 7 · (−2) = +12<br>
+            Cr = +12 / 2 = +6, så Cr er +VI
+        </div>
+        <p>Reglerne passer ikke, når O er bundet til O, som i H₂O₂ (O er −I), eller til F, som i OF₂ (O er +II). Så må man tilbage til elektronerne.</p>
+        <p>Oxidationstallet over et atom skrives med romertal og fortegn: +VII, −II og 0. I mellemregningerne bruges almindelige tal. I felterne kan du skrive begge dele.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>K</kbd> Kemichael &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ox.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_regler.js"></script>
+<script src="js/sim_elektroner.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

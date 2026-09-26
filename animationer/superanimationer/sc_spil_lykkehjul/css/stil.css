@@ -1426,3 +1426,123 @@ button:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
 }
 
 .tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+/* ---------------------------------------------------------------------
+   HOLD ELLER ALENE
+   Forsiden vælger, hvem der spiller. body.alene skjuler holdenes felter,
+   og svarfeltet står i stedet for bogstaverne, når løsningen skrives.
+   --------------------------------------------------------------------- */
+.tilstand {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 12px;
+    background-color: rgba(0, 0, 0, 0.35);
+    border: 1px solid #2d3470;
+}
+
+.tilstand button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border: 2px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--tekst-svag);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.tilstand button b { font-size: 1.1rem; font-weight: 800; }
+.tilstand button small { font-size: 0.85rem; color: var(--tekst-mat); }
+.tilstand button:hover { background-color: rgba(255, 255, 255, 0.06); }
+.tilstand button.valgt { background-color: #10206e; border-color: var(--beloeb); color: #ffffff; }
+.tilstand button.valgt small { color: #d8def8; }
+
+body.alene .kun-hold,
+body:not(.alene) .kun-alene { display: none !important; }
+
+.alene-navn {
+    min-width: 0;
+    width: 220px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(180deg, #ff5d52, #d7191f);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.alene-navn:focus { outline: none; border-color: #ffffff; }
+
+.rekord { font-size: 0.95rem; font-weight: 700; color: var(--beloeb); }
+.alene-regler { margin: 0; font-size: 0.92rem; line-height: 1.5; color: var(--tekst-svag); }
+
+/* Svarfeltet */
+.svarfelt { display: flex; justify-content: center; width: 100%; }
+
+.svarfelt input {
+    width: min(760px, 92%);
+    height: clamp(40px, 5.8vh, 56px);
+    padding: 0 18px;
+    font-family: var(--tavle-skrift);
+    font-weight: 900;
+    font-size: clamp(18px, 2.8vh, 28px);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #111111;
+    background-color: #ffffff;
+    border: 3px solid var(--beloeb);
+    border-radius: 10px;
+    box-shadow: 0 0 22px rgba(255, 217, 46, 0.35);
+}
+
+.svarfelt input::placeholder { color: #8a8fa3; text-transform: none; letter-spacing: 0.02em; font-weight: 700; }
+.svarfelt input:focus { outline: none; }
+.styring.svarer .bogstaver { display: none; }
+
+/* Livene på podiet */
+.liv {
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: clamp(20px, 3vh, 30px);
+    line-height: 1;
+    letter-spacing: 0.06em;
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255, 40, 80, 0.9), 0 1px 0 #5a0008;
+}
+body.alene .podie { flex-basis: 380px; }
+
+/* Resultatet alene */
+.rekordlinje { font-size: clamp(16px, 2.6vh, 26px); font-weight: 800; color: rgba(255, 255, 255, 0.85); }
+.rekordlinje.ny { color: var(--beloeb); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.gaaderesultat {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6vh 1.2vw;
+    width: min(80vw, 900px);
+    font-size: clamp(14px, 2vh, 19px);
+}
+
+.gaaderesultat li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0.3em 0.8em;
+    border-radius: 7px;
+    background-color: rgba(8, 14, 60, 0.75);
+    text-align: left;
+}
+
+.gaaderesultat li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gaaderesultat li b { white-space: nowrap; font-family: var(--tal-skrift); font-weight: 400; color: var(--beloeb); }
+.gaaderesultat li.tabt b { color: rgba(255, 255, 255, 0.5); font-family: inherit; font-weight: 600; }

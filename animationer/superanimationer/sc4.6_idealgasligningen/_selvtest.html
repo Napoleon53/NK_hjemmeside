@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc4.6 Idealgasligningen</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen rammer tabelværdierne (24,0 L og
+   22,4 L pr. mol), at stemplet, låsen og stoppet følger p · V = n · R · T,
+   at opgaverne på fane 2 har det rigtige facit, også med nye tal, at
+   formlerne godkendes i alle rigtige skrivemåder og afvises med den
+   rigtige besked, at de typiske regnefejl giver den rigtige besked, at
+   sproget holder reglerne, at begge faner kan gennemføres, at Kemichael
+   kun taler ved hint og svar, og at layoutet holder fra 520 × 380 til
+   1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc4.6-stempel", "nk-sc4.6-regn", "nk-sc4.6-regn-niveau", "nk-sc4.6-kemichael-ude", "nk-kemichael"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Ord, der er skrevet uden æ, ø og å, og som derfor ikke må nå eleven */
+var ASCII_ORD = /\b(Vaelg\w*|vaelg\w*|maengde\w*|Maengde\w*|stofmaengde\w*|foer|faerdig|naeste|Naeste|gaa|staa|paa|laast\w*|Laas\w*|foerst|hoejre|Saet|saet|traek\w*|Traek\w*|oeget)\b/;
+
+/* Facit regnet i hånden med R = 0,0831 L·bar/(mol·K) og T = t + 273 */
+var FACIT = { L1: "36,1", L2: "0,208", L3: "6,09", L4: "244", M1: "61,2", M2: "2,74", M3: "3,30", M4: "20",
+              S1: "36,2", S2: "5,50", S3: "58,1", S4: "328" };
+var TRIN = { L1: "gas", L2: "gas", L3: "gas", L4: "gas", M1: "T gas", M2: "T gas", M3: "T gas", M4: "gas t",
+             S1: "T n gas", S2: "T gas m", S3: "T gas M", S4: "T gas m" };
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    function enter(inp) { inp.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true })); }
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function skyder(T) { var e = d.getElementById("stempel-T"); e.value = String(T); e.dispatchEvent(new W.Event("input", { bubbles: true })); }
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, G = NK.Gas, T = NK.Tjek;
+    paastand("data.js, gas.js, tjek.js og laerer.js er kørt", !!(D && D.REGN && G && G.Stempel && T && T.formel && NK.RoligLaerer));
+    paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-stempel"] && NK.sims["fane-regn"]));
+    var sprites = ["lod", "manometer", "gasflaske", "varmeplade", "kateder", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle sprites er indlæst", mangler.length === 0, mangler.join(", "));
+    var S1 = NK.sims["fane-stempel"], R = NK.sims["fane-regn"];
+
+    /* ------------------------------------------------------------------ */
+    overskrift("2. Modellen");
+    paastand("R er 8,3145 J/(mol·K) = 0,083145 L·bar/(mol·K) med tre betydende cifre", Math.abs(D.R / 0.083145 - 1) < 0.001);
+    var v1 = G.volumen(1, 293, 1.013);
+    paastand("1 mol ved 20 °C og 1,013 bar fylder 24,0 L", G.fmt("V", v1) === "24,0 L", G.fmt("V", v1));
+    paastand("1 mol ved 0 °C og 1,013 bar fylder 22,4 L", G.fmt("V", G.volumen(1, 273, 1.013)) === "22,4 L");
+    paastand("de fire formler hænger sammen", Math.abs(G.tryk(2, 350, G.volumen(2, 350, 1.7)) - 1.7) < 1e-9 &&
+        Math.abs(G.stofmaengde(1.7, G.volumen(2, 350, 1.7), 350) - 2) < 1e-9 && Math.abs(G.temperatur(1.7, G.volumen(2, 350, 1.7), 2) - 350) < 1e-9);
+    var st = new G.Stempel();
+    st.saet({ n: 1, T: 293, lodder: 0, laast: false });
+    paastand("frit stempel: trykket inde er luftens 1,013 bar", Math.abs(st.p - 1.013) < 1e-9);
+    var V0 = st.V;
+    st.saetLodder(1);
+    paastand("et lod: trykket er 2,013 bar, og volumen er næsten det halve", Math.abs(st.p - 2.013) < 1e-9 && Math.abs(st.V / V0 - 1.013 / 2.013) < 1e-9);
+    st.saetLodder(0);
+    st.saetT(586);
+    paastand("dobbelt så høj temperatur i kelvin: dobbelt volumen ved frit stempel", Math.abs(st.V / V0 - 2) < 1e-9 || st.T !== 586, st.T);
+    st.saet({ n: 1, T: 293, lodder: 0, laast: true });
+    st.saetT(400);
+    paastand("låst stempel: volumen er det samme, og trykket stiger med T", Math.abs(st.V - V0) < 1e-9 && Math.abs(st.p - 1.013 * 400 / 293) < 1e-9);
+    st.saetLodder(3);
+    paastand("låst stempel: lodderne ændrer ikke trykket i gassen", Math.abs(st.p - 1.013 * 400 / 293) < 1e-9);
+    st.saet({ n: 2, T: 500, lodder: 0, laast: false });
+    paastand("stoppet: 2 mol ved 500 K står ved 60 L med mere end 1,013 bar", st.stop && Math.abs(st.V - 60) < 1e-9 && st.p > 1.013 + 0.1, st.V + " " + st.p);
+    paastand("grænserne: 0,25 til 2,00 mol, 150 til 500 K, højst 3 lodder", !st.saetN(2.25) && st.n === 2 && st.saetN(0.25) && !st.saetN(0) &&
+        !st.saetT(510) && st.saetT(150) && !st.saetT(100) && st.saetLodder(3) && !st.saetLodder(4));
+    paastand("de faste starttilstande: lod-opgaven giver 24,0 L og 12,1 L", (function () {
+        var s = new G.Stempel(); s.saet(D.FORUDSIG[1].start); var a = G.fmt("V", s.V); s.saetLodder(1); return a === "24,0 L" && G.fmt("V", s.V) === "12,1 L";
+    }()));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Opgaverne på fane 2 regner rigtigt");
+    D.REGN.forEach(function (def) {
+        var o = G.lavOpgave(def, false);
+        var sidste = o.trin[o.trin.length - 1];
+        var ids = o.trin.map(function (t) { return t.id; }).join(" ");
+        paastand(def.id + " " + def.navn + ": " + ids + " giver " + G.fmt(sidste.x, sidste.facit, sidste.id === "M"),
+            G.talTekst(sidste.x, sidste.facit, sidste.id === "M") === FACIT[def.id] && ids === TRIN[def.id], G.talTekst(sidste.x, sidste.facit, sidste.id === "M") + " / " + ids);
+    });
+    /* Hvert trin kan regnes efter med de tal, der står skrevet i trinene før */
+    var gaarOp = true, rimelige = true, nyeTal = true, gasOk = true;
+    D.REGN.forEach(function (def) {
+        var forrige = null;
+        for (var n = 0; n < 30; n++) {
+            var o = G.lavOpgave(def, n > 0, forrige);
+            var k = {};
+            for (var a in o.givet) k[a] = o.givet[a];
+            if (o.givet.VmL !== undefined) k.V = o.givet.VmL / 1000;
+            o.trin.forEach(function (t) {
+                var r = G.regnTrin(t, k);
+                if (Math.abs(G.rund(t.x, r, t.id === "M") - t.facit) > 1e-9) gaarOp = false;
+                k[t.x] = t.facit;
+            });
+            if (!(k.T >= 150 && k.T <= 700 && k.V > 0.05 && k.V < 400 && k.p > 0.1 && k.p < 400)) rimelige = false;
+            if (def.find === "M") {
+                var gas = D.GASSER[o.givet.gas];
+                if (Math.abs(k.M / gas.M - 1) > 0.01) gasOk = false;
+            }
+            if (n > 0 && forrige && JSON.stringify(forrige) === JSON.stringify(o.givet) && def.tal && Object.keys(def.tal).some(function (x) { return def.tal[x].length > 1; })) nyeTal = false;
+            forrige = o.givet;
+        }
+    });
+    paastand("hvert facit følger af tallene i trinene før (12 opgaver × 30 træk)", gaarOp);
+    paastand("nye tal giver en rimelig gas (150 K til 700 K, V og p inden for skalaerne)", rimelige);
+    paastand("nye tal er andre end sidst", nyeTal);
+    paastand("den ukendte gas: molarmassen passer med gassen, der er trukket", gasOk);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Formlerne");
+    function formel(rel, x, raa) { return T.formel({ rel: rel, x: x }, raa); }
+    var rigtige = {
+        V: ["pV=nRT", "p·V = n·R·T", "V=nRT/p", "V = n*R*T/p", "nRT/p", "V=(n·R·T)/p", "V(NH₃) = n(NH₃)·R·T/p", "PV=NRT", "n = pV/(RT)", "n=pV/RT", "nRT = pV", "V = n · R · T / p"],
+        n: ["n=pV/(RT)", "n = p·V/(R·T)", "pV/RT", "pV=nRT", "n = (p*V)/(R*T)"],
+        p: ["p=nRT/V", "nRT/V", "p·V=n·R·T"],
+        T: ["T=pV/(nR)", "pV/nR", "T = p·V/(n·R)"]
+    };
+    var alleOk = true, ikkeIso = true, iso = true, huller = [];
+    Object.keys(rigtige).forEach(function (x) {
+        rigtige[x].forEach(function (f) {
+            var r = formel("gas", x, f);
+            if (!r.ok) { alleOk = false; huller.push(x + ": " + f); }
+        });
+    });
+    paastand("alle rigtige skrivemåder godkendes (" + [].concat.apply([], Object.keys(rigtige).map(function (k) { return rigtige[k]; })).length + ")", alleOk, huller.join(" | "));
+    iso = formel("gas", "V", "V=nRT/p").isoleret === true && formel("gas", "V", "nRT/p").isoleret === true;
+    ikkeIso = formel("gas", "V", "pV=nRT").isoleret === false && formel("gas", "V", "n = pV/(RT)").isoleret === false;
+    paastand("en isoleret formel er isoleret, en omskrevet er det ikke", iso && ikkeIso);
+    function besked(rel, x, f, re) { var r = formel(rel, x, f); return !r.ok && re.test(r.besked || ""); }
+    paastand("V = pnRT: p skal stå under brøkstregen", besked("gas", "V", "V = pnRT", /p skal stå under brøkstregen/));
+    paastand("V = nRT: p mangler", besked("gas", "V", "V = nRT", /p mangler/));
+    paastand("V = p/(nRT): brøken er vendt om", besked("gas", "V", "V = p/(nRT)", /under brøkstregen|over brøkstregen/));
+    paastand("n = pVRT: R og T under brøkstregen", besked("gas", "n", "n = pVRT", /skal stå under brøkstregen/));
+    paastand("tal i stedet for bogstaver afvises", besked("gas", "V", "5,47·0,0831·293/1,013", /bogstaver først/));
+    paastand("0,0831 i stedet for R afvises med besked om R", besked("gas", "V", "V = n·0,0831·T/p", /Skriv R i formlen/));
+    paastand("m i idealgasligningen afvises", besked("gas", "V", "V = m/M", /hører ikke til/));
+    paastand("et ukendt bogstav afvises", besked("gas", "V", "V = nRT/x", /Bogstavet x/));
+    paastand("tomt felt: skriv formlen først", formel("gas", "V", "  ").tom === true);
+    paastand("n = m/M godkendes, også som m/M og m = n·M", formel("nmM", "n", "n = m/M").ok && formel("nmM", "n", "m/M").ok && formel("nmM", "n", "m = n·M").ok && formel("nmM", "n", "n(NH3) = m(NH3)/M(NH3)").ok);
+    paastand("m = n·M og M = m/n godkendes", formel("nmM", "m", "m=n·M").ok && formel("nmM", "M", "M = m/n").ok && formel("nmM", "M", "m=nM").ok);
+    paastand("n = m·M: M under brøkstregen", besked("nmM", "n", "n = m·M", /M skal stå under brøkstregen/));
+    paastand("M = n/m: forkert vej", besked("nmM", "M", "M = n/m", /brøkstregen/));
+    paastand("store og små m er to forskellige", !formel("nmM", "n", "n = M/m").ok);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Tallene og de typiske fejl");
+    function opg(id) { var def = D.REGN.filter(function (x) { return x.id === id; })[0]; return G.lavOpgave(def, false); }
+    function kendt(o, j) {
+        var k = {}, a;
+        for (a in o.givet) k[a] = o.givet[a];
+        if (o.givet.VmL !== undefined) k.V = o.givet.VmL / 1000;
+        for (var s = 0; s < j; s++) k[o.trin[s].x] = o.trin[s].facit;
+        return k;
+    }
+    function tal(o, j, raa) { return T.tal(o.trin[j], raa, kendt(o, j), o.givet); }
+    var L1 = opg("L1"), M1 = opg("M1"), S3 = opg("S3"), L4 = opg("L4"), Sa1 = opg("S1"), S2 = opg("S2"), M4 = opg("M4");
+    paastand("36,1 og 36.1 og 36,1 L og 3,61·10¹ og 3.61e1 godkendes", ["36,1", "36.1", "36,1 L", "3,61·10¹", "3.61e1", "36,05"].every(function (s) { return tal(L1, 0, s).ok; }));
+    paastand("et regnestykke med tal alene godkendes", tal(L1, 0, "1,50·0,0831·293/1,013").ok);
+    paastand("R = 8,314: besked om R med bar og liter", /R = 0,0831/.test(tal(L1, 0, NK.betydende(1.5 * 8.314 * 293 / 1.013, 3)).besked || ""));
+    paastand("p ganget på i stedet for divideret: p under brøkstregen", /p skal stå under/.test(tal(L1, 0, NK.betydende(1.5 * 0.0831 * 293 * 1.013, 3)).besked || ""));
+    paastand("kommaet flyttet: tjek kommaet", /kommaet/.test(tal(L1, 0, "3,61").besked || ""));
+    paastand("tæt på: regn med alle cifrene", /Tæt på/.test(tal(L1, 0, "35,5").besked || ""));
+    paastand("p glemt (p er næsten 1 bar): p mangler", /p mangler/.test(tal(L1, 0, "36,5").besked || ""));
+    paastand("M1 temperaturen: 100 + 273 = 373", tal(M1, 0, "373").ok && tal(M1, 0, "373,15").ok);
+    paastand("M1 temperaturen: 100 − 273 giver besked om at lægge til", /Læg 273 til/.test(tal(M1, 0, "-173").besked || ""));
+    paastand("M1 temperaturen: 100 giver besked om °C", /°C/.test(tal(M1, 0, "100").besked || ""));
+    paastand("M1 volumen regnet med °C: besked om kelvin", /kelvin/.test(tal(M1, 1, NK.betydende(2 * 0.0831 * 100 / 1.013, 3)).besked || ""));
+    paastand("M1 volumen med 24 L pr. mol: besked om tommelfingerreglen", /24 L pr. mol/.test(tal(M1, 1, "48,0").besked || ""));
+    paastand("S3 stofmængden med 180 i stedet for 0,180 L: besked om liter", /liter/.test(tal(S3, 1, NK.betydende(1.013 * 180 / (0.0831 * 293), 3)).besked || ""));
+    paastand("L4 temperaturen i °C i stedet for kelvin: besked", /°C/.test(tal(L4, 0, "-29").besked || ""));
+    paastand("S1 n = m · M: du har ganget", /ganget/.test(tal(Sa1, 1, NK.betydende(10 * 17.03, 3)).besked || ""));
+    paastand("S2 m = n / M: du har divideret", /divideret/.test(tal(S2, 2, NK.betydende(S2.trin[1].facit / 44.01, 3)).besked || ""));
+    paastand("M4 t: 293 + 273 giver besked om at trække fra", /Træk 273 fra/.test(tal(M4, 1, "566").besked || ""));
+    paastand("M4 t: 293 giver besked om kelvin", /kelvin/.test(tal(M4, 1, "293").besked || ""));
+    paastand("M4 t: 20 og 19,7 godkendes", tal(M4, 1, "20").ok && tal(M4, 1, "19,7").ok);
+    paastand("formel i talfeltet: skriv tallet", /tallet/.test(tal(L1, 0, "nRT/p").besked || ""));
+    paastand("tomt talfelt", tal(L1, 0, "").tom === true);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Sproget");
+    var replikker = [].concat(
+        Object.keys(D.INTRO).map(function (k) { return D.INTRO[k]; }),
+        Object.keys(D.FAERDIG).map(function (k) { return D.FAERDIG[k]; }),
+        D.ROS, D.ROS_OPGAVE, D.KAFFE, [D.PRIK_SIDST, D.UD_LINJE, D.IND_LINJE]);
+    var tekster = replikker.slice();
+    D.FORUDSIG.forEach(function (o) {
+        tekster.push(o.spm, o.hint, o.hvorfor);
+        if (o.proev) tekster.push(o.proev, o.proevHint);
+        o.valg.forEach(function (v) { tekster.push(v.t); if (v.svar) tekster.push(v.svar); });
+    });
+    D.REGN.forEach(function (o) { tekster.push(o.tekst, o.slut, o.navn); });
+    Object.keys(D.SCENE).forEach(function (k) { tekster.push(D.SCENE[k]); });
+    var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
+    var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i replikker og opgavetekster", streg.length === 0, streg.join(" | "));
+    paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
+    paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
+    var lange = replikker.filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels faste replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    var ascii = tekster.concat([krop]).filter(function (t) { return ASCII_ORD.test(t); });
+    paastand("ingen ord uden æ, ø og å i det, eleven ser", ascii.length === 0, ascii.map(function (t) { return t.match(ASCII_ORD)[0]; }).join(", "));
+    paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
+    var synlig = d.body.innerText.replace(d.getElementById("teori").innerText, "");
+    paastand("formlen står ikke på siden uden for teorien", !/n\s*·\s*R\s*·\s*T|nRT|p\s*·\s*V\s*=/.test(synlig));
+    paastand("tavlen viser ikke formlen, før den er skrevet", !/R\s*·\s*T|n · R/.test(d.getElementById("regn-tavle").innerText));
+
+    /* Alle linjer, Kemichael og opgavekortet siger undervejs, samles og tjekkes til sidst */
+    var sagt = [], talteSelv = 0;
+    [S1, R].forEach(function (sim) {
+        var sig = sim.k.sig, svar = sim.k.svar, bs = sim.besked, kb = sim.kortBesked;
+        sim.k.sig = function (h, s, v) { sagt.push(h); return sig.call(this, h, s, v); };
+        sim.k.svar = function (h, s, t) { sagt.push(h); return svar.call(this, h, s, t); };
+        sim.besked = function (h, kl) { sagt.push(h); return bs.call(this, h, kl); };
+        sim.kortBesked = function (h, t) { sagt.push(h); return kb.call(this, h, t); };
+    });
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. Stemplet kan gennemføres");
+    klik('[data-fane="fane-stempel"]');
+    paastand("Kemichael er tavs, når fanen åbnes", !S1.k.taler() && !R.k.taler());
+    paastand("linjen i kortet siger næste skridt", /Vælg det, du tror/.test(S1.beskedTekst()), S1.beskedTekst());
+    function vaelgRigtig(i) {
+        var o = D.FORUDSIG[i], j = 0;
+        o.valg.forEach(function (v, k) { if (v.ok) j = k; });
+        d.querySelectorAll("#stempel-valg .valgknap")[j].click();
+    }
+    function goer(o) {
+        var g = S1.g;
+        if (o.handling === "varm") skyder(g.T + 60);
+        else if (o.handling === "lod") klik("#stempel-lod-plus");
+        else if (o.handling === "dobbeltN") { var maal = 2 * g.n; while (g.n < maal - 1e-9) klik("#stempel-n-plus"); }
+        else if (o.handling === "udN") klik("#stempel-n-minus");
+        else if (o.handling === "maal") {
+            var m = o.maalTilstand;
+            while (g.n < m.n - 1e-9) klik("#stempel-n-plus");
+            while (g.lodder > m.lodder) klik("#stempel-lod-minus");
+        }
+    }
+    var forventet = { varme: /Volumen steg fra 24,0 L/, lod: /Volumen faldt fra 24,0 L til 12,1 L\. Det er næsten det halve/,
+        dobbelt: /Volumen steg fra 12,0 L til 24,0 L\. Det er det dobbelte/, laast: /Trykket steg fra 1,013 bar/,
+        hvorfor: /Hurtige molekyler/, ud: /Trykket faldt fra 2,026 bar til 1,772 bar/, molvolumen: /1,00 mol gas fylder 24,0 L/ };
+    D.FORUDSIG.forEach(function (o, i) {
+        S1.vaelg(i);
+        tik(S1, 2);
+        vaelgRigtig(i);
+        if (S1.k.taler()) talteSelv++;
+        goer(o);
+        tik(S1, 3);
+        paastand((i + 1) + ". " + o.navn + ": løst med en stjerne og det rigtige resultat", S1.fase === "faerdig" && S1.status[i].stjerne &&
+            /^Rigtigt\./.test(S1.beskedTekst()) && forventet[o.id].test(S1.beskedTekst()), S1.fase + " | " + S1.beskedTekst());
+    });
+    paastand("alle syv er løst, og knappen går videre til Beregningen", S1.antalLoest() === 7 && /Videre til Beregningen/.test(S1.el.knap.textContent) && S1.beskedTekst().indexOf(D.FAERDIG.stempel) >= 0);
+    /* Et forkert gæt */
+    S1.vaelg(0);
+    d.querySelectorAll("#stempel-valg .valgknap")[1].click();
+    skyder(S1.g.T + 60);
+    tik(S1, 3);
+    paastand("et forkert gæt: forklaringen og det rigtige svar, ingen afvisning", S1.fase === "faerdig" && /^Du gættede: volumen bliver mindre\. Volumen steg/.test(S1.beskedTekst()) &&
+        S1.el.besked.className.indexOf("skidt") >= 0 && d.querySelector("#stempel-valg .rigtig") && d.querySelector("#stempel-valg .forkert"), S1.beskedTekst());
+    /* To ting på én gang */
+    S1.vaelg(0);
+    vaelgRigtig(0);
+    klik("#stempel-lod-plus");
+    skyder(S1.g.T + 60);
+    tik(S1, 3);
+    paastand("to ting på én gang: stilles tilbage med en besked", S1.fase === "proev" && /Du ændrede også lodderne/.test(S1.beskedTekst()) && S1.g.lodder === 0, S1.beskedTekst());
+    /* Låsen i en opgave med låst stempel */
+    S1.vaelg(3);
+    vaelgRigtig(3);
+    klik("#stempel-frit");
+    paastand("låst stempel åbnet: linjen beder om at låse igen", /Lås det igen/.test(S1.fast.html), S1.fast.html);
+    skyder(S1.g.T + 60);
+    tik(S1, 3);
+    paastand("… og forsøget aflæses først, når stemplet er låst", S1.fase === "proev");
+    klik("#stempel-laast");
+    tik(S1, 3);
+    paastand("… og forsøget er stillet tilbage og kører videre efter låsen", S1.fase === "proev" || S1.fase === "faerdig");
+    /* Hint og Vis svaret */
+    S1.vaelg(1);
+    S1.status[1].stjerne = false;
+    klik("#stempel-knap");
+    paastand("Giv hint: Kemichael siger hintet", S1.k.taler() && S1.k.tekst().indexOf("Hint") === 0, S1.k.tekst());
+    klik("#stempel-knap");
+    paastand("Vis svaret: han siger svaret, og forsøget kører af sig selv", S1.valgt >= 0 && D.FORUDSIG[1].valg[S1.valgt].ok && !!S1.auto);
+    tik(S1, 4);
+    paastand("… og opgaven er løst uden stjerne", S1.fase === "faerdig" && !S1.status[1].stjerne && !S1.k.taler(), S1.fase);
+    /* Scenen */
+    S1.vaelg(0);
+    var n0 = S1.g.n;
+    S1.klikScene("flaske");
+    paastand("klik på gasflasken: 0,25 mol mere", Math.abs(S1.g.n - n0 - 0.25) < 1e-9 && /0,25 mol gas mere/.test(S1.beskedTekst()));
+    S1.klikScene("hane");
+    paastand("klik på hanen: 0,25 mol ud", Math.abs(S1.g.n - n0) < 1e-9);
+    S1.klikScene("hylde");
+    paastand("klik på loddet på hylden: et lod på stemplet", S1.g.lodder === 1 && /Et lod mere/.test(S1.beskedTekst()));
+    S1.klikScene("stempelLod");
+    S1.klikScene("stempel");
+    paastand("klik på stemplet: det låses", S1.g.laast && /låst/.test(S1.beskedTekst()));
+    S1.klikScene("stempel");
+    var T0 = S1.g.T;
+    S1.klikScene("varm");
+    paastand("varmepladens knapper: 25 K ad gangen", S1.g.T === T0 + 25);
+    S1.klikScene("koel");
+    tik(S1, 1);
+    paastand("molekylerne passer med stofmængden (40 pr. mol)", S1.part.levende() === Math.round(S1.g.n * 40), S1.part.levende());
+    S1.g.saet({ n: 2, T: 293, lodder: 0, laast: false });
+    S1.efter();
+    skyder(500);
+    paastand("stoppet: beskeden om, at trykket stiger i stedet", S1.g.stop && /stoppet/.test(S1.beskedTekst()), S1.beskedTekst());
+    S1.g.saet({ n: 1, T: 290, lodder: 0, laast: false });
+    S1.aeg224 = false;
+    skyder(273);
+    tik(S1, 1.5);
+    paastand("påskeægget: 22,4 L ved 0 °C", /22,4 L/.test(S1.beskedTekst()), S1.beskedTekst());
+
+    /* ------------------------------------------------------------------ */
+    overskrift("8. Beregningen kan gennemføres");
+    klik('[data-fane="fane-regn"]');
+    tik(R, 0.5);
+    var VARIANT = { V: "pV = nRT", n: "n = pV/(RT)", p: "p = nRT/V", T: "T = pV/(nR)" };
+    function loes(r) {
+        var o = r.o, n = 0;
+        while (!r.faerdig && n++ < 20) {
+            var t = r.aktivt();
+            if (!t || !t.input) return "intet felt";
+            if (t.fase === "formel") {
+                t.input.value = t.rel === "gas" ? VARIANT[t.x] : (t.x === "n" ? "n = m/M" : t.x === "m" ? "m = n·M" : "M = m/n");
+            } else {
+                t.input.value = G.talTekst(t.x, t.facit, t.id === "M");
+            }
+            enter(t.input);
+            if (r.k.taler()) talteSelv++;
+        }
+        return r.faerdig ? "" : "ikke færdig";
+    }
+    var tavleOk = true, sceneOk = true, lukketOk = true, taeller = 0;
+    D.REGN.forEach(function (def, i) {
+        R.vaelg(i, false);
+        paastand(def.id + " " + def.navn + ": kan løses ved at skrive formlen og tallet", loes(R) === "" && R.status[i].stjerne, R.beskedTekst());
+        var linjer = d.querySelectorAll("#regn-tavle .tv-linje").length;
+        if (linjer < 1 + R.o.trin.length || !d.querySelector("#regn-tavle .tv-slut")) tavleOk = false;
+        if (!R.kendt("V") || !R.kendt("p") || !R.kendt("n") || !R.kendt("T")) sceneOk = false;
+        if ((def.beholder === "lukket") !== (def.find === "p" || def.id === "M4" || def.id === "S4")) lukketOk = false;
+        taeller++;
+    });
+    paastand("tavlen har en linje pr. trin og slutsætningen", tavleOk);
+    paastand("til sidst er alt kendt på instrumenterne", sceneOk);
+    paastand("flasker og dæk er lukkede, balloner og stempler frie", lukketOk);
+    paastand("alle tolv er løst, og rosen for alle kom", R.antalLoest() === 12 && R.beskedTekst().indexOf(D.FAERDIG.regn) >= 0, R.beskedTekst());
+    /* En forkert formel, så hint og svar */
+    R.vaelg(0, true);
+    var t0 = R.aktivt();
+    t0.input.value = "V = pnRT";
+    enter(t0.input);
+    paastand("forkert formel: feltet ryster, og linjen siger hvorfor", /p skal stå under/.test(R.beskedTekst()) && R.el.besked.className.indexOf("skidt") >= 0 && t0.fase === "formel");
+    paastand("… og Kemichael er tavs", !R.k.taler());
+    klik("#regn-knap");
+    paastand("Giv hint: det, man kender, ikke formlen", R.k.taler() && /Du kender n, T og p|Du kender p, n og T|Du kender/.test(R.k.tekst()) && !/nRT|n · R · T/.test(R.k.tekst()), R.k.tekst());
+    klik("#regn-knap");
+    paastand("Vis svaret: formlen, og feltet er nu til tallet", t0.fase === "tal" && R.k.taler() && /Formlen/.test(R.k.tekst()));
+    var inp = R.aktivt().input;
+    inp.value = "3";
+    inp.dispatchEvent(new W.Event("input", { bubbles: true }));
+    paastand("… og svaret lukker, når eleven skriver", !R.k.taler());
+    klik("#regn-knap");
+    klik("#regn-knap");
+    paastand("Vis svaret på tallet: beregningen, opgaven er løst uden stjerne", R.faerdig && !R.status[0].stjerne || R.faerdig && R.brugtSvar, R.beskedTekst());
+    paastand("nye tal giver andre tal i teksten", (function () { var a = R.opgaveTekst(); klik("#regn-nye"); return R.opgaveTekst() !== a; }()));
+    paastand("niveauerne: Svær viser fire opgaver", (function () { klik('#regn-niveau [data-niveau="svaer"]'); return d.querySelectorAll("#regn-liste .hyldelinje").length === 4 && R.o.def.niveau === "svaer"; }()));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("9. Kemichael ved katederet");
+    paastand("han talte aldrig af sig selv, mens opgaverne blev løst", talteSelv === 0, talteSelv);
+    R.vaelg(0, false);
+    R.k.sendUd();
+    tik(R, 2.5);
+    paastand("send ud: han er væk, og knappen hedder Hent Kemichael", !R.k.inde() && /Hent Kemichael/.test(d.getElementById("regn-kknap").textContent) && /Hent/.test(d.getElementById("stempel-kknap").textContent));
+    klik("#regn-knap");
+    paastand("… hintet står så i opgavekortet", /Hint/.test(R.beskedTekst()) && R.el.besked.className.indexOf("gul") >= 0 && !R.k.taler());
+    R.k.hentInd();
+    tik(R, 1);
+    paastand("hent ind: han er tilbage på begge faner", R.k.inde() && S1.k.inde());
+    tik(R, 5);
+    var ren = sagt.filter(function (t) { return /[–—]/.test(t) || /[A-Za-z]1[+−]/.test(t) || ASCII_ORD.test(t.replace(/<[^>]+>/g, "")); });
+    paastand("sproget i alt, der blev sagt og skrevet undervejs (" + sagt.length + " linjer)", ren.length === 0, ren.slice(0, 3).join(" | "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("10. Rundvisningen");
+    ["fane-stempel", "fane-regn"].forEach(function (id) {
+        klik('[data-fane="' + id + '"]');
+        NK.sims[id].tilpas();
+        NK.sims[id].layout();
+        NK.Rundvisning.start(id);
+        var ok = true, n = 0;
+        while (NK.Rundvisning.aktiv() && n++ < 20) {
+            if (!d.getElementById("rv-titel").textContent) ok = false;
+            klik("#rv-naeste");
+        }
+        paastand(id + ": rundvisningen kan gennemgås", ok && !NK.Rundvisning.aktiv());
+    });
+
+    /* ------------------------------------------------------------------ */
+    overskrift("11. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    function over(a, b2) { return a.x < b2.x + b2.b - 1 && a.x + a.b > b2.x + 1 && a.y < b2.y + b2.h - 1 && a.y + a.h > b2.y + 1; }
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-stempel", "fane-regn"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            sim.layout();
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H, kl = sim.k.lay;
+            function inde(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            var c = lay.cyl;
+            inde({ x: c.x - 8, y: c.y, b: c.b + 16, h: c.h + c.bund }, "cylinderen");
+            var ms = NK.Tegn.manometerStr(lay.mano);
+            var mr = { x: ms.x, y: ms.y, b: ms.b, h: ms.h };
+            inde(mr, "manometeret");
+            if (over(mr, { x: c.x, y: c.y, b: c.b, h: c.h })) problemer.push(id + ": manometeret over cylinderen");
+            if (c.y + c.h + c.bund > lay.bordY + 1) problemer.push(id + ": cylinderen står under bordet");
+            if (kl.y < lay.bordY) problemer.push(id + ": båndet går op over bordet");
+            var te = sim.k.tekstEl;
+            if (te.scrollHeight > te.clientHeight + 2) problemer.push(id + ": teksten er ikke i boblen");
+            var kk = sim.k.knap, sr = sim.L.canvas.getBoundingClientRect(), kr = kk.getBoundingClientRect();
+            var knapR = { x: kr.left - sr.left, y: kr.top - sr.top, b: kr.width, h: kr.height };
+            inde(knapR, "knappen Send Kemichael ud");
+            if (over(knapR, kl.desk)) problemer.push(id + ": knappen over katederet");
+            if (id === "fane-stempel") {
+                var fl = lay.flaske;
+                inde({ x: fl.x, y: fl.y, b: fl.b, h: fl.h }, "gasflasken");
+                if (over({ x: fl.x, y: fl.y, b: fl.b, h: fl.h }, { x: c.x, y: c.y, b: c.b, h: c.h })) problemer.push(id + ": flasken over cylinderen");
+                var hy = lay.hylde;
+                inde({ x: hy.x, y: hy.y - 3 * lay.lodH, b: hy.b, h: 3 * lay.lodH + 8 }, "hylden");
+                if (lay.pxPrL * 24 < 40) problemer.push(id + ": 24 L er under 40 px");
+                if (c.y - lay.stempelH - 3 * lay.lodH < 0) problemer.push(id + ": lodderne kan gå ud over toppen");
+                if (lay.graf) {
+                    inde(lay.graf, "grafen");
+                    if (over(lay.graf, mr)) problemer.push(id + ": grafen over manometeret");
+                    if (over(lay.graf, { x: c.x - 8, y: c.y, b: c.b + 16, h: c.h })) problemer.push(id + ": grafen over cylinderen");
+                } else if (st[0] >= 1100) problemer.push(id + ": ingen plads til grafen");
+            } else {
+                var tv = lay.tavle;
+                inde(tv, "tavlen");
+                if (over(tv, { x: c.x - 8, y: c.y, b: c.b + 16, h: c.h })) problemer.push(id + ": tavlen over cylinderen");
+                if (over(tv, mr)) problemer.push(id + ": tavlen over manometeret");
+                if (tv.b < 180) problemer.push(id + ": tavlen er for smal (" + Math.round(tv.b) + ")");
+            }
+            var panel = d.querySelector("#" + id + " .panel");
+            if (panel.scrollWidth > panel.clientWidth + 1) problemer.push(id + ": panelet er for bredt");
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 4).join("; "));
+    });
+    /* Tavlen med en lang beregning (S1) skal kunne være der ved 1400 × 860 */
+    ramme.style.width = "1400px";
+    ramme.style.height = "860px";
+    klik('[data-fane="fane-regn"]');
+    R.tilpas();
+    R.layout();
+    R.vaelg(D.REGN.map(function (o) { return o.id; }).indexOf("S1"), false);
+    loes(R);
+    var tel = d.getElementById("regn-tavle");
+    paastand("tavlen med den længste beregning løber ikke over (" + tel.style.fontSize + ")", tel.scrollHeight <= tel.clientHeight + 1 && tel.scrollWidth <= tel.clientWidth + 1 && parseFloat(tel.style.fontSize) >= 14);
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-stempel"]');
+}
+</script>
+</body>
+</html>

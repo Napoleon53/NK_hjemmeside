@@ -1,15 +1,16 @@
 /* =====================================================================
    data.js - grundstoffer, molekyler og tekster for sc3.2
 
-   GRUNDSTOFFER: valenselektroner (v), elektronegativitet (en, samme
-   tal som c3.3), radius i kugle-stang-modellen (r) og i kalotte-
-   modellen (rk).
+   GRUNDSTOFFER: valenselektroner (v), radius i kugle-stang-modellen (r)
+   og i kalotte-modellen (rk).
 
    MOLEKYLER: hvert molekyle har atomer med en plads i rummet (p) og i
    prikformlen (prik), bindinger [atom, atom, orden] og det atom, formen
-   og vinklen gaelder for (centrum, vinkel). Frie elektronpar, traek og
-   polaritet regnes ud af klargoer() nedenfor, saa de ikke kan komme i
-   modstrid med atomerne.
+   og vinklen gaelder for (centrum, vinkel). Frie elektronpar regnes ud
+   af klargoer() nedenfor, saa de ikke kan komme i modstrid med atomerne.
+
+   Elektronegativitet og polaritet ligger i sc3.3_polaere_molekyler, som
+   har de samme molekyler.
 
    Teksterne til teoriboksen staar nederst.
    ===================================================================== */
@@ -26,15 +27,12 @@ window.NK = NK;
     var GRAD = Math.PI / 180;
 
     D.GRUNDSTOFFER = {
-        H:  { navn: "hydrogen", v: 1, en: 2.1, r: 0.25, rk: 0.96, farve: "#e4e8ee", moerkTekst: true },
-        C:  { navn: "carbon",   v: 4, en: 2.5, r: 0.36, rk: 1.36, farve: "#3b414b" },
-        N:  { navn: "nitrogen", v: 5, en: 3.0, r: 0.35, rk: 1.24, farve: "#3464d6" },
-        O:  { navn: "oxygen",   v: 6, en: 3.5, r: 0.34, rk: 1.22, farve: "#d93a2a" },
-        Cl: { navn: "chlor",    v: 7, en: 3.0, r: 0.46, rk: 1.4,  farve: "#34ad48" }
+        H:  { navn: "hydrogen", v: 1, r: 0.25, rk: 0.96, farve: "#e4e8ee", moerkTekst: true },
+        C:  { navn: "carbon",   v: 4, r: 0.36, rk: 1.36, farve: "#3b414b" },
+        N:  { navn: "nitrogen", v: 5, r: 0.35, rk: 1.24, farve: "#3464d6" },
+        O:  { navn: "oxygen",   v: 6, r: 0.34, rk: 1.22, farve: "#d93a2a" },
+        Cl: { navn: "chlor",    v: 7, r: 0.46, rk: 1.4,  farve: "#34ad48" }
     };
-
-    /* En binding er polaer fra denne forskel i elektronegativitet (som c3.3). */
-    D.POLAER_GRAENSE = 0.5;
 
     /* Frastoedningen paa fane 1. n er eksponenten i kraftloven, LB og LL
        styrken mellem et frit par og en binding og mellem to frie par
@@ -60,16 +58,6 @@ window.NK = NK;
         if (bindinger === 3) return bindinger + frie === 3 ? "plan" : "pyramide";
         return "tetraeder";
     };
-
-    /* ----- Fane 4: vaeskerne i vandstraaleforsoeget --------------------------
-       pol er, hvor kraftigt en ladet stav trækker i strålen (vand = 1).
-       Tallene er ikke maalte, men raekkefoelgen passer med forsoeget. */
-    D.VAESKER = {
-        vand:    { navn: "vand",    formel: "H2O",    pol: 1,    farve: "rgba(150, 205, 245, 0.75)", polaer: true },
-        ethanol: { navn: "ethanol", formel: "C2H5OH", pol: 0.55, farve: "rgba(190, 220, 240, 0.7)", polaer: true },
-        heptan:  { navn: "heptan",  formel: "C7H16",  pol: 0.02, farve: "rgba(240, 232, 190, 0.75)", polaer: false }
-    };
-    D.VAESKE_ORDEN = ["vand", "ethanol", "heptan"];
 
     /* ----- Hjaelpere til koordinaterne -------------------------------------- */
     /* Retning med polarvinkel fra +y og azimut i xz-planen fra +z (grader). */
@@ -98,9 +86,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1], [0, 2, 1]],
             hintForm: "Tæl elektronparrene omkring O i prikformlen. Hvor mange er bindinger, og hvor mange er frie?",
-            svarForm: "O har to bindinger og to frie elektronpar. De fire par peger mod hjørnerne af et tetraeder, men kun de to H-atomer ses, så molekylet er vinklet.",
-            hintPol: "O-H-bindingerne er polære. Peger de to træk samme vej, eller ophæver de hinanden?",
-            svarPol: "Molekylet er vinklet, så trækkene i de to O-H-bindinger ophæver ikke hinanden. Vand er polært."
+            svarForm: "O har to bindinger og to frie elektronpar. De fire par peger mod hjørnerne af et tetraeder, men kun de to H-atomer ses, så molekylet er vinklet."
         },
         {
             id: "NH3", navn: "ammoniak", form: "pyramide", centrum: 0, vinkel: [1, 0, 2],
@@ -112,9 +98,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1], [0, 2, 1], [0, 3, 1]],
             hintForm: "Drej molekylet, så N vender opad. Ligger de tre H-atomer i samme plan som N?",
-            svarForm: "N har tre bindinger og ét frit elektronpar. Det frie par skubber H-atomerne ned, så atomerne danner en pyramide med N i toppen.",
-            hintPol: "N-H-bindingerne er polære. Hvilken vej peger de tre træk?",
-            svarPol: "Alle tre træk peger op mod N og ophæver ikke hinanden. Ammoniak er polært."
+            svarForm: "N har tre bindinger og ét frit elektronpar. Det frie par skubber H-atomerne ned, så atomerne danner en pyramide med N i toppen."
         },
         {
             id: "CH4", navn: "methan", form: "tetraeder", centrum: 0, vinkel: [1, 0, 2],
@@ -127,9 +111,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]],
             hintForm: "Carbon har fire bindinger og ingen frie elektronpar. Hvordan kommer fire elektronpar længst væk fra hinanden?",
-            svarForm: "Fire bindinger og ingen frie elektronpar giver et tetraeder med 109,5° mellem bindingerne.",
-            hintPol: "Find forskellen i elektronegativitet mellem C og H i tabellen.",
-            svarPol: "Forskellen er kun 0,4, så C-H-bindingerne er upolære, og der er intet træk. Methan er upolært."
+            svarForm: "Fire bindinger og ingen frie elektronpar giver et tetraeder med 109,5° mellem bindingerne."
         },
         {
             id: "CO2", navn: "carbondioxid", form: "lineaer", centrum: 1, vinkel: [0, 1, 2],
@@ -140,9 +122,7 @@ window.NK = NK;
             ],
             bindinger: [[1, 0, 2], [1, 2, 2]],
             hintForm: "En dobbeltbinding peger kun i én retning. Hvor mange retninger har carbonatomet?",
-            svarForm: "Carbon har to dobbeltbindinger og ingen frie elektronpar. De to retninger ligger 180° fra hinanden, så molekylet er lineært.",
-            hintPol: "C=O-bindingerne er polære. Drej molekylet, og se, hvilken vej de to træk peger.",
-            svarPol: "De to træk er lige store og peger modsat. De ophæver hinanden, så CO₂ er upolært."
+            svarForm: "Carbon har to dobbeltbindinger og ingen frie elektronpar. De to retninger ligger 180° fra hinanden, så molekylet er lineært."
         },
         {
             id: "HCN", navn: "blåsyre", form: "lineaer", centrum: 1, vinkel: [0, 1, 2],
@@ -153,9 +133,7 @@ window.NK = NK;
             ],
             bindinger: [[1, 0, 1], [1, 2, 3]],
             hintForm: "Carbon har en enkeltbinding og en tripelbinding. Hvor mange retninger er det?",
-            svarForm: "Carbon har to retninger og ingen frie elektronpar. Molekylet er lineært.",
-            hintPol: "Kun én af bindingerne er polær. Er der noget, der kan ophæve dens træk?",
-            svarPol: "Trækket i C≡N-bindingen ophæves ikke af noget. HCN er polært."
+            svarForm: "Carbon har to retninger og ingen frie elektronpar. Molekylet er lineært."
         },
         {
             id: "CH2O", navn: "formaldehyd", form: "plan", centrum: 0, vinkel: [2, 0, 3],
@@ -167,9 +145,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 2], [0, 2, 1], [0, 3, 1]],
             hintForm: "Carbon har to enkeltbindinger og én dobbeltbinding. Hvor mange retninger er det?",
-            svarForm: "Tre retninger og ingen frie elektronpar på carbon giver en plan trekant med 120° mellem bindingerne.",
-            hintPol: "C=O-bindingen er polær, men C-H-bindingerne er det ikke.",
-            svarPol: "Trækket mod O ophæves ikke af noget. Formaldehyd er polært."
+            svarForm: "Tre retninger og ingen frie elektronpar på carbon giver en plan trekant med 120° mellem bindingerne."
         },
         {
             id: "C2H4", navn: "ethen", form: "plan", centrum: 0, vinkel: [2, 0, 3],
@@ -183,9 +159,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 2], [0, 2, 1], [0, 3, 1], [1, 4, 1], [1, 5, 1]],
             hintForm: "Se på ét carbonatom ad gangen. Hvor mange retninger har det?",
-            svarForm: "Hvert carbonatom har tre retninger og ingen frie elektronpar. Alle seks atomer ligger i samme plan med 120° mellem bindingerne.",
-            hintPol: "Find forskellen i elektronegativitet for hver slags binding i tabellen.",
-            svarPol: "Hverken C=C eller C-H er polære, så der er intet træk. Ethen er upolært."
+            svarForm: "Hvert carbonatom har tre retninger og ingen frie elektronpar. Alle seks atomer ligger i samme plan med 120° mellem bindingerne."
         },
         {
             id: "C2H2", navn: "ethyn", form: "lineaer", centrum: 1, vinkel: [0, 1, 2],
@@ -197,9 +171,7 @@ window.NK = NK;
             ],
             bindinger: [[1, 0, 1], [1, 2, 3], [2, 3, 1]],
             hintForm: "Hvert carbonatom har en enkeltbinding og en tripelbinding. Hvor mange retninger er det?",
-            svarForm: "Hvert carbonatom har to retninger, der ligger 180° fra hinanden. Alle fire atomer ligger på en ret linje.",
-            hintPol: "Find forskellen i elektronegativitet for hver slags binding i tabellen.",
-            svarPol: "Hverken C≡C eller C-H er polære, så der er intet træk. Ethyn er upolært."
+            svarForm: "Hvert carbonatom har to retninger, der ligger 180° fra hinanden. Alle fire atomer ligger på en ret linje."
         },
         {
             id: "CCl4", navn: "tetrachlormethan", form: "tetraeder", centrum: 0, vinkel: [1, 0, 2],
@@ -212,9 +184,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]],
             hintForm: "Tæl kun elektronparrene omkring carbon. De frie elektronpar sidder på chloratomerne.",
-            svarForm: "Carbon har fire bindinger og ingen frie elektronpar. Molekylet er et tetraeder.",
-            hintPol: "Alle fire C-Cl-bindinger er polære. Drej molekylet, og se, hvordan trækkene peger.",
-            svarPol: "De fire træk er lige store og peger symmetrisk ud fra carbon. De ophæver hinanden, så CCl₄ er upolært."
+            svarForm: "Carbon har fire bindinger og ingen frie elektronpar. Molekylet er et tetraeder."
         },
         {
             id: "CH3Cl", navn: "chlormethan", form: "tetraeder", centrum: 0, vinkel: [2, 0, 3],
@@ -227,9 +197,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]],
             hintForm: "Carbon har fire enkeltbindinger, selvom de ikke går til ens atomer.",
-            svarForm: "Fire bindinger og ingen frie elektronpar på carbon giver et tetraeder.",
-            hintPol: "Sammenlign med CCl₄. Hvad sker der, når tre af chloratomerne er skiftet ud med H?",
-            svarPol: "Kun C-Cl-bindingen er polær, og intet ophæver dens træk. Chlormethan er polært."
+            svarForm: "Fire bindinger og ingen frie elektronpar på carbon giver et tetraeder."
         },
         {
             id: "HCl", navn: "hydrogenchlorid", form: "lineaer", centrum: null, vinkel: null,
@@ -239,9 +207,7 @@ window.NK = NK;
             ],
             bindinger: [[0, 1, 1]],
             hintForm: "Hvor mange atomer er der i molekylet?",
-            svarForm: "To atomer ligger altid på en linje. HCl er lineært.",
-            hintPol: "Find forskellen i elektronegativitet mellem H og Cl i tabellen.",
-            svarPol: "Forskellen er 0,9, så bindingen er polær, og der er ingen andre bindinger til at ophæve trækket. HCl er polært."
+            svarForm: "To atomer ligger altid på en linje. HCl er lineært."
         }
     ];
 
@@ -310,26 +276,6 @@ window.NK = NK;
             });
         });
 
-        /* Traek: fra det mindst til det mest elektronegative atom i hver
-           polaer binding. Summen afgoer, om molekylet er polaert. */
-        mol.traek = [];
-        mol.delta = mol.atomer.map(function () { return 0; });
-        var samlet = [0, 0, 0];
-        mol.bindinger.forEach(function (b) {
-            var A = mol.atomer[b[0]], B = mol.atomer[b[1]];
-            var dEN = Math.abs(D.GRUNDSTOFFER[A.el].en - D.GRUNDSTOFFER[B.el].en);
-            if (dEN < D.POLAER_GRAENSE - 1e-9) return;
-            var plus = D.GRUNDSTOFFER[A.el].en < D.GRUNDSTOFFER[B.el].en ? b[0] : b[1];
-            var minus = plus === b[0] ? b[1] : b[0];
-            var u = V.enhed(V.minus(mol.atomer[minus].p, mol.atomer[plus].p));
-            mol.traek.push({ plus: plus, minus: minus, dEN: dEN });
-            mol.delta[plus] = 1;
-            mol.delta[minus] = -1;
-            samlet = V.plus(samlet, V.gange(u, dEN));
-        });
-        mol.samletTraek = samlet;
-        mol.polaer = V.laengde(samlet) > 0.05;
-
         mol.vinkelGrader = mol.vinkel ? V.vinkel(
             V.minus(mol.atomer[mol.vinkel[0]].p, mol.atomer[mol.vinkel[1]].p),
             V.minus(mol.atomer[mol.vinkel[2]].p, mol.atomer[mol.vinkel[1]].p)) : null;
@@ -380,15 +326,6 @@ window.NK = NK;
 
         { h: "Formen er atomernes placering",
           p: ["De frie elektronpar bestemmer, hvor atomerne sidder, men de indgår ikke i formens navn. I NH₃ peger de fire elektronpar mod hjørnerne af et tetraeder, men atomerne danner en pyramide."] },
-
-        { h: "Polære molekyler",
-          p: ["En binding er polær, når forskellen i elektronegativitet er mindst 0,5. Elektronerne trækkes mod det mest elektronegative atom, der bliver δ−.",
-              "Et molekyle er polært, når trækkene i bindingerne ikke ophæver hinanden. CO₂ og CCl₄ har polære bindinger, men er symmetriske og derfor upolære."] },
-
-        { h: "Vandstrålen og den ladede stav",
-          p: ["En plastikstav, der gnides med uld, bliver negativ. En glasstav bliver positiv.",
-              "Molekylerne i en polær væske drejer, så den modsat ladede ende vender mod staven, og trækkes hen mod den. Derfor bøjer strålen mod staven, uanset om den er positiv eller negativ.",
-              "Heptan består kun af C og H og er upolært. Molekylerne drejer sig ikke, og strålen løber lige ned."] },
 
         { h: "Modellerne",
           p: ["Kugle-stang-modellen viser bindingerne og vinklerne. Kalotte-modellen viser, hvor meget plads atomerne fylder. Ingen af dem er målfaste."] }

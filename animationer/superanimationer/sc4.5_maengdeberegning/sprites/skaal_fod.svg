@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+  <!-- Skaalvaegtens fod og soejle. Armen hviler paa knivsaeggen i
+       (100, 36). Viseren tegnes af animationen fra (100, 36) ned til
+       skalaen, der har midten i (100, 232). Bunden staar paa y 296. -->
+  <defs>
+    <linearGradient id="messing" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a2c"/>
+      <stop offset="0.35" stop-color="#e2c177"/>
+      <stop offset="0.6" stop-color="#c9a24f"/>
+      <stop offset="1" stop-color="#7a5c24"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b3a2a"/>
+      <stop offset="1" stop-color="#2c2219"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="100" cy="295" rx="92" ry="4" fill="#000000" fill-opacity="0.35"/>
+
+  <!-- Fodpladen af trae -->
+  <path d="M14 280 Q14 272 22 272 L178 272 Q186 272 186 280 L186 290 Q186 294 182 294 L18 294 Q14 294 14 290 Z"
+        fill="url(#fod)" stroke="#1d160f" stroke-width="1"/>
+  <path d="M20 275 L180 275" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1.2"/>
+
+  <!-- Soejlen -->
+  <rect x="80" y="258" width="40" height="15" rx="3" fill="url(#messing)" stroke="#5e4619" stroke-width="1"/>
+  <rect x="93" y="42" width="14" height="218" fill="url(#messing)" stroke="#5e4619" stroke-width="1"/>
+  <rect x="88" y="150" width="24" height="7" rx="2" fill="url(#messing)" stroke="#5e4619" stroke-width="0.8"/>
+
+  <!-- Skalaen til viseren -->
+  <path d="M62 226 Q100 244 138 226 L138 236 Q100 254 62 236 Z" fill="#efe7d4" stroke="#5e4619" stroke-width="1"/>
+  <g stroke="#3a2e1c" stroke-width="1.1" stroke-linecap="round">
+    <path d="M100 236 L100 244"/>
+    <path d="M86 234 L85 240 M114 234 L115 240 M73 230 L71 235 M127 230 L129 235"/>
+  </g>
+
+  <!-- Knivsaeggen oeverst -->
+  <path d="M86 44 L86 32 Q86 26 92 26 L108 26 Q114 26 114 32 L114 44 Z" fill="url(#messing)" stroke="#5e4619" stroke-width="1"/>
+  <path d="M94 38 L100 30 L106 38 Z" fill="#3d2f16"/>
+</svg>

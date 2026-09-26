@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="360" viewBox="0 0 300 360">
+  <!-- Karret: et glaskar paa 1 L med en tappehane forneden til hoejre,
+       paa en sokkel. Animationen tegner vaesken og pulveret BAG filen,
+       klippet til det indre: x 30-230, y 20-290 (bundens hjoerner r 12).
+       Rumfang: y = 290 - 240 * V (V i liter), saa 1,0 L staar ved y 50.
+       Hanens tud: vandet kommer ud ved (281, 300). Haandtaget er
+       omkring (262, 246). Soklen er y 300-360; bunden staar paa y 360. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.30"/>
+      <stop offset="0.12" stop-color="#d4ebfa" stop-opacity="0.07"/>
+      <stop offset="0.88" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.24"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef2f6"/>
+      <stop offset="0.55" stop-color="#aeb8c3"/>
+      <stop offset="1" stop-color="#76828f"/>
+    </linearGradient>
+    <linearGradient id="sokkel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a616e"/>
+      <stop offset="1" stop-color="#3a3f49"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Soklen -->
+  <rect x="18" y="300" width="226" height="60" rx="4" fill="url(#sokkel)" stroke="#262a31" stroke-width="1.5"/>
+  <rect x="18" y="300" width="226" height="4" fill="#ffffff" fill-opacity="0.12"/>
+
+  <!-- Glasset -->
+  <path d="M30 20 L30 278 Q30 290 42 290 L218 290 Q230 290 230 278 L230 20 Z" fill="url(#glas)"/>
+  <path d="M24 14 Q30 14 30 20 L30 278 Q30 292 44 292 L216 292 Q230 292 230 278 L230 20 Q230 14 236 14"
+        fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M34 292 L226 292 L226 300 L34 300 Z" fill="#cfe3f2" fill-opacity="0.35" stroke="#dcecf8" stroke-opacity="0.5" stroke-width="1"/>
+
+  <!-- Genskin -->
+  <rect x="212" y="34" width="5" height="236" rx="2.5" fill="#ffffff" fill-opacity="0.14"/>
+  <rect x="38" y="40" width="3" height="220" rx="1.5" fill="#ffffff" fill-opacity="0.10"/>
+
+  <!-- Inddelingen: hver 0,1 L, lange streger og tal ved hver 0,2 L -->
+  <g stroke="#eef6fc" stroke-opacity="0.75" stroke-width="1.6" stroke-linecap="round">
+    <path d="M31 242 h26 M31 194 h26 M31 146 h26 M31 98 h26 M31 50 h26"/>
+  </g>
+  <g stroke="#eef6fc" stroke-opacity="0.5" stroke-width="1.2" stroke-linecap="round">
+    <path d="M31 266 h14 M31 218 h14 M31 170 h14 M31 122 h14 M31 74 h14"/>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#eef6fc" fill-opacity="0.85">
+    <text x="62" y="247">0,2</text>
+    <text x="62" y="199">0,4</text>
+    <text x="62" y="151">0,6</text>
+    <text x="62" y="103">0,8</text>
+    <text x="62" y="55">1,0 L</text>
+  </g>
+
+  <!-- Tappehanen: roeret ud gennem glasset, tuden ned og haandtaget -->
+  <rect x="226" y="256" width="52" height="11" rx="3" fill="url(#metal)" stroke="#5d6874" stroke-width="1"/>
+  <path d="M272 262 L272 294 Q272 300 277 300 L285 300 Q290 300 290 294 L290 262 Q290 256 284 256 L272 256 Z"
+        fill="url(#metal)" stroke="#5d6874" stroke-width="1"/>
+  <rect x="274" y="296" width="14" height="5" rx="1.5" fill="#5d6874"/>
+  <rect x="258" y="238" width="8" height="20" rx="2" fill="#8d97a3" stroke="#5d6874" stroke-width="0.8"/>
+  <path d="M246 234 L278 234 Q282 234 282 238 L282 240 Q282 244 278 244 L246 244 Q242 244 242 240 L242 238 Q242 234 246 234 Z"
+        fill="#c0392b" stroke="#7a2219" stroke-width="1"/>
+  <rect x="246" y="236" width="30" height="2.5" rx="1.2" fill="#ffffff" fill-opacity="0.35"/>
+</svg>

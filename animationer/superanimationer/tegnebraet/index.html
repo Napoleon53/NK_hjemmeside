@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tegnebræt</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⌬</span> Tegnebræt</h1>
+    <div class="topfyld"></div>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Navne på stofklasserne (T)">Navne</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (?)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<section class="fane aktiv" id="fane-tegn" aria-label="Tegnebræt">
+    <div class="scene medtekst">
+        <canvas id="tb-laerred"></canvas>
+        <div class="anker" id="tb-anker-tavle"></div>
+        <div class="zoomknapper" id="tb-zoom" role="group" aria-label="Zoom">
+            <button type="button" id="tb-zoom-ud" title="Zoom ud (−)" aria-label="Zoom ud">−</button>
+            <button type="button" id="tb-zoom-ind" title="Zoom ind (+)" aria-label="Zoom ind">+</button>
+            <button type="button" id="tb-zoom-tilpas" class="tekst" title="Vis alt på tavlen (0)">Vis alt</button>
+        </div>
+        <div class="toast" id="tb-toast" hidden></div>
+        <div class="tilbud" id="tb-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="tb-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="tb-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="tb-vaerktoej">
+            <h2>Tegn med</h2>
+            <div class="palet" id="tb-palet">
+                <button type="button" data-el="C" class="aktiv" title="C (tast C)">C</button>
+                <button type="button" data-el="H" title="H (tast H)">H</button>
+                <button type="button" data-el="O" title="O (tast O)">O</button>
+                <button type="button" data-el="N" title="N (tast N)">N</button>
+                <button type="button" data-el="Cl" title="Cl (tast L eller Shift+C)">Cl</button>
+                <button type="button" data-el="Br" title="Br (tast B)">Br</button>
+                <button type="button" data-el="I" title="I (tast I)">I</button>
+            </div>
+            <div class="palet grupper" id="tb-grupper">
+                <button type="button" data-v="gruppe:OH" title="Klik på et atom for at sætte –OH på">–OH</button>
+                <button type="button" data-v="gruppe:O" title="Klik på et atom for at sætte =O på">=O</button>
+                <button type="button" data-v="gruppe:CHO" title="Klik på et atom for at sætte –CHO på">–CHO</button>
+                <button type="button" data-v="gruppe:COOH" title="Klik på et atom for at sætte –COOH på">–COOH</button>
+                <button type="button" data-v="gruppe:COO" title="Klik på et atom for at sætte –COO⁻ på">–COO⁻</button>
+                <button type="button" data-v="gruppe:NH2" title="Klik på et atom for at sætte –NH₂ på">–NH₂</button>
+                <button type="button" data-v="ladning" class="bred" title="Klik på et atom: −, så +, så ingen ladning">± Ladning</button>
+            </div>
+            <div class="palet ringe" id="tb-ringe">
+                <button type="button" data-v="ring5" title="Femring">⬠ 5-ring</button>
+                <button type="button" data-v="ring6" title="Seksring">⬡ 6-ring</button>
+                <button type="button" data-v="benzen" title="Benzenring">⌬ Benzen</button>
+                <button type="button" data-v="marker" title="Markér og flyt molekyler (tast M). Shift: flere, Delete: slet, højreklik eller Esc: tilbage til C">⬚ Markér</button>
+            </div>
+            <div class="palet pile" id="tb-pile">
+                <button type="button" data-v="pil" title="Reaktionspil">→ Pil</button>
+                <button type="button" data-v="lig" title="Ligevægtspil">⇌ Ligevægt</button>
+                <button type="button" data-v="plus" title="Plus mellem stofferne">+ Plus</button>
+            </div>
+            <p class="note" id="tb-hvordan">Træk fra et atom for at tegne en kæde. Et klik på et atom gør kæden ét C længere.</p>
+            <div class="knaprad">
+                <button class="knap" id="tb-fortryd" type="button" title="Fortryd (Ctrl+Z)">↶ Fortryd</button>
+                <button class="knap" id="tb-gentag" type="button" title="Gentag (Ctrl+Y)">↷ Gentag</button>
+                <button class="knap" id="tb-ryd" type="button">Ryd tavlen</button>
+            </div>
+        </div>
+
+        <div class="kort" id="tb-markeret" hidden>
+            <h2>Det markerede <span class="taeller" id="tb-mark-antal"></span></h2>
+            <div class="knaprad taet">
+                <button class="knap" id="tb-paen" type="button" title="Tegn det markerede som i bogen, med zigzag. Er intet markeret: alt på tavlen">Pæn tegning</button>
+                <button class="knap" id="tb-spejl" type="button" title="Spejl det markerede vandret">⇋ Spejlvend</button>
+            </div>
+            <div class="knaprad">
+                <button class="knap" id="tb-kopier-valg" type="button" title="Kopiér det markerede (Ctrl+C)">Kopiér</button>
+                <button class="knap" id="tb-indsaet" type="button" title="Indsæt en kopi (Ctrl+V)">Indsæt</button>
+                <button class="knap" id="tb-slet-valg" type="button" title="Slet det markerede (Delete)">Slet</button>
+            </div>
+        </div>
+
+        <div class="kort" id="tb-pilkort" hidden>
+            <h2>Pilen <span class="taeller">tekst ved pilen</span></h2>
+            <div class="felt aktiv">
+                <span class="felt-pre">Over</span>
+                <input type="text" id="tb-over" autocomplete="off" spellcheck="false" placeholder="fx H2SO4" aria-label="Tekst over pilen">
+            </div>
+            <div class="felt aktiv" style="margin-top:6px;">
+                <span class="felt-pre">Under</span>
+                <input type="text" id="tb-under-pil" autocomplete="off" spellcheck="false" placeholder="fx lys" aria-label="Tekst under pilen">
+            </div>
+            <div class="knaprad"><button class="knap nulstil" id="tb-slet-pil" type="button"><span>Slet pilen</span><span class="tegn">✕</span></button></div>
+        </div>
+
+        <div class="kort" id="tb-klisterkort" hidden>
+            <h2><span id="tb-klister-titel">Klistermærket</span></h2>
+            <div class="knaprad taet">
+                <button class="knap" id="tb-mindre" type="button">− Mindre</button>
+                <button class="knap" id="tb-stoerre" type="button">+ Større</button>
+                <button class="knap nulstil" id="tb-slet-klister" type="button" style="margin-top:0;">Slet</button>
+            </div>
+        </div>
+
+        <div class="kort" id="tb-navnkort">
+            <h2>Skriv et navn</h2>
+            <div class="felt aktiv" id="tb-navnfelt">
+                <input type="text" id="tb-navn" autocomplete="off" spellcheck="false" placeholder="fx propan-2-ol" aria-label="Navn på et molekyle">
+                <button class="felt-ok" id="tb-navn-ok" type="button" aria-label="Tegn">Tegn</button>
+            </div>
+            <p class="besked" id="tb-navn-besked" aria-live="polite"></p>
+            <p class="note">Også et skema: ethanol + ethansyre -&gt; ethylethanoat + vand</p>
+        </div>
+
+        <div class="kort maaling" id="tb-molekyle">
+            <h2><button type="button" class="foldknap" id="tb-fold" aria-expanded="true">Molekyler på tavlen <span class="fold-pil">▾</span></button>
+                <span class="taeller" id="tb-antal-mol"></span></h2>
+            <div id="tb-aflaes"></div>
+        </div>
+
+        <div class="kort" id="tb-rapport">
+            <h2>Indstillinger</h2>
+            <div class="skifter lille" id="tb-stil" role="group" aria-label="Visning">
+                <button type="button" data-v="zigzag" class="aktiv">Zigzag</button>
+                <button type="button" data-v="alle">Alle atomer</button>
+            </div>
+            <label class="afkryds"><input type="checkbox" id="tb-numre"> Numre på kæden</label>
+            <label class="afkryds"><input type="checkbox" id="tb-under" checked> Navn under molekylerne</label>
+            <div class="knaprad taet" style="margin-top:10px;">
+                <button class="knap blaa" id="tb-kopier" type="button"><span>Kopiér billede</span><span class="tegn">⧉</span></button>
+                <button class="knap" id="tb-svg" type="button" title="Gem billedet. Filen kan åbnes her igen"><span>Gem som SVG</span><span class="tegn">⤓</span></button>
+            </div>
+            <div class="knaprad">
+                <button class="knap" id="tb-aabn" type="button" title="Åbn en SVG, der er gemt fra tegnebrættet. Du kan også trække filen ind på tavlen"><span>Åbn tegning</span><span class="tegn">⤒</span></button>
+            </div>
+            <input type="file" id="tb-fil" accept=".svg,image/svg+xml,.json,application/json" hidden>
+            <p class="note" id="tb-note"></p>
+        </div>
+
+        <div class="kort" id="tb-skuffe" hidden>
+            <h2>Kemichaels skuffe <span class="taeller"><b id="tb-skuffe-antal">0</b>/10</span></h2>
+            <div class="skuffe" id="tb-skuffe-felter"></div>
+            <p class="note" id="tb-skuffe-note">Tom. Klar en quiz i <a href="../sc6.2_zigzagformler/index.html" target="_blank" rel="noopener">Zigzagformler</a>.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- NAVNENE (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Navne på stofklasserne</h2>
+        <div class="teori-spalter">
+            <div>
+                <table class="endelser">
+                    <tr><th>Stofklasse</th><th>Gruppe</th><th>Navnet</th></tr>
+                    <tr><td>alkohol</td><td>–OH</td><td>propan-2-<b>ol</b></td></tr>
+                    <tr><td>aldehyd</td><td>–CHO</td><td>propan<b>al</b></td></tr>
+                    <tr><td>keton</td><td>C=O i kæden</td><td>propan<b>on</b></td></tr>
+                    <tr><td>carboxylsyre</td><td>–COOH</td><td>propan<b>syre</b></td></tr>
+                    <tr><td>ester</td><td>–COO–</td><td>ethyl + ethan<b>oat</b></td></tr>
+                    <tr><td>amid</td><td>–CONH₂</td><td>ethan<b>amid</b></td></tr>
+                    <tr><td>amin</td><td>–NH₂</td><td>ethyl<b>amin</b></td></tr>
+                    <tr><td>ether</td><td>–O–</td><td>diethyl<b>ether</b></td></tr>
+                    <tr><td>carboxylat-ion</td><td>–COO⁻</td><td>ethan<b>oat</b>, CH₃COO⁻</td></tr>
+                </table>
+            </div>
+            <div>
+                <p><b>1.</b> Hovedkæden er den længste kæde med den vigtigste gruppe. Den giver endelsen.</p>
+                <p><b>2.</b> Rækkefølgen: syre, ester, amid, aldehyd, keton, alkohol, amin.</p>
+                <p><b>3.</b> Kæden nummereres, så den vigtigste gruppe får det laveste nummer: propan-2-ol, ikke propan-3-ol.</p>
+                <p><b>4.</b> De andre grupper står foran i alfabetisk rækkefølge: hydroxy (OH), oxo (=O), amino (NH₂), methoxy (OCH₃), chlor og methyl.</p>
+                <div class="eksempel">
+                    <span class="eksempel-hoved">Eksempel</span>
+                    2-hydroxypropansyre: syren giver endelsen, OH står foran.
+                </div>
+            </div>
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen                                -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<!-- Motoren (molekylet, navnene, tegningen og tavlen) er faelles med
+     sc6.2 Zigzagformler og ligger i ../../molekylemotor/ -->
+<script src="../../molekylemotor/js/klistermaerker.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/trivialnavne.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="../../molekylemotor/js/navnlaeser.js"></script>
+<script src="../../molekylemotor/js/tavle.js"></script>
+<script src="../../molekylemotor/js/tegnebraet.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_tegn.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

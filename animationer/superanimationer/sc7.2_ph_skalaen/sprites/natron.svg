@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120">
+  <!-- Natron i vand: et glas med en teske og pakken ved siden af. Staar paa y 118. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.35"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.10"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.30"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="116" rx="42" ry="3.2" fill="#000000" fill-opacity="0.3"/>
+  <!-- Pakken bagved til hoejre -->
+  <rect x="58" y="62" width="34" height="54" rx="2" fill="#f2f0e8" stroke="#8f8a7a" stroke-width="1.3"/>
+  <rect x="58" y="62" width="34" height="12" fill="#d8472f"/>
+  <text x="75" y="93" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6.6" font-weight="800" fill="#b8341f">NATRON</text>
+  <rect x="64" y="99" width="22" height="3" rx="1.5" fill="#c9c3b0"/>
+  <!-- Teskeen -->
+  <path d="M34 38 L52 78" stroke="#c8ced6" stroke-width="3.2" stroke-linecap="round"/>
+  <!-- Glasset med uklart vand -->
+  <path d="M12 52 L60 52 L56 112 Q55.5 116 51 116 L21 116 Q16.5 116 16 112 Z" fill="url(#glas)"/>
+  <path d="M14.5 66 L57.5 66 L55.5 111 Q55 114.5 51 114.5 L21 114.5 Q17 114.5 16.5 111 Z" fill="#e8f3fb" fill-opacity="0.55"/>
+  <ellipse cx="36" cy="66" rx="21.5" ry="2.6" fill="#ffffff" fill-opacity="0.5"/>
+  <g fill="#ffffff" fill-opacity="0.8">
+    <circle cx="26" cy="96" r="1.3"/><circle cx="40" cy="104" r="1.1"/><circle cx="46" cy="86" r="1.2"/>
+    <circle cx="32" cy="80" r="0.9"/><circle cx="48" cy="108" r="1"/><circle cx="24" cy="108" r="0.9"/>
+  </g>
+  <path d="M12 52 L16 112 Q16.5 116 21 116 L51 116 Q55.5 116 56 112 L60 52" fill="none" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.6"/>
+  <path d="M50 78 L48 112" stroke="#c8ced6" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="47" cy="112" rx="5" ry="2.4" fill="#c8ced6" fill-opacity="0.45"/>
+  <rect x="19" y="56" width="3" height="52" rx="1.5" fill="#ffffff" fill-opacity="0.2"/>
+</svg>

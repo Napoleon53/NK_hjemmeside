@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="230" viewBox="0 0 240 230">
+  <!-- Reagensglasstativ af metal til to glas, set lidt oppefra. Det meste
+       tegnes BAG glassene; pladens forkant (stativ_forkant.svg) tegnes
+       ovenpaa dem, saa glassene staar i hullerne.
+       Hullerne har centrum i x 70 og x 170 (y 18). Glassenes bund staar
+       paa foden ved y 209. Foden rammer bordet ved y 230.
+       Samme skala som reagensglas.svg: glasset er 60 bredt. -->
+
+  <!-- Stolperne -->
+  <rect x="8" y="12" width="10" height="204" rx="3" fill="#7f8993" stroke="#454d56" stroke-width="1.5"/>
+  <rect x="222" y="12" width="10" height="204" rx="3" fill="#7f8993" stroke="#454d56" stroke-width="1.5"/>
+  <rect x="10.5" y="16" width="2.5" height="194" rx="1.2" fill="#ffffff" fill-opacity="0.25"/>
+  <rect x="224.5" y="16" width="2.5" height="194" rx="1.2" fill="#ffffff" fill-opacity="0.25"/>
+
+  <!-- Pladen foroven, set oppefra, med to huller -->
+  <path d="M5 10 L235 10 L239 26 L1 26 Z" fill="#b9c1c9" stroke="#454d56" stroke-width="1.5" stroke-linejoin="round"/>
+  <ellipse cx="70" cy="18" rx="33" ry="5.5" fill="#39414a"/>
+  <ellipse cx="170" cy="18" rx="33" ry="5.5" fill="#39414a"/>
+  <path d="M7 12 H233" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1.2"/>
+
+  <!-- Foden: oversiden og forkanten -->
+  <path d="M3 204 L237 204 L240 214 L0 214 Z" fill="#aab2ba" stroke="#454d56" stroke-width="1.5" stroke-linejoin="round"/>
+  <rect x="0" y="214" width="240" height="15" rx="2" fill="#7f8993" stroke="#454d56" stroke-width="1.5"/>
+  <path d="M3 216.5 H237" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.2"/>
+  <ellipse cx="70" cy="209" rx="26" ry="3" fill="#6b747d" fill-opacity="0.7"/>
+  <ellipse cx="170" cy="209" rx="26" ry="3" fill="#6b747d" fill-opacity="0.7"/>
+</svg>

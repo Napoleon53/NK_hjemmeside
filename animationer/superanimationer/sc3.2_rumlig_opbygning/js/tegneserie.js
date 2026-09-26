@@ -1,11 +1,9 @@
 /* =====================================================================
    tegneserie.js - vandstraaleforsoeget opsummeret som en tegneserie
 
-   Bag knappen i panelet paa fane 4, som laases op, naar forsoeget er
-   slut. Hver rude er et lille laerred tegnet med vand_tegning.js og en
-   kort tekst. Ruderne bruger elevens egne resultater: hvilken stav der
-   blev brugt til hver vaeske, og om heptan ligger oven paa vandet i
-   baegerglasset. Resultatskemaet staar i sidste rude.
+   Bag knappen i panelet paa fane 4, som laases op, naar skemaet er
+   udfyldt. Hver rude er et lille laerred tegnet med vand_tegning.js og
+   en kort tekst. Resultatskemaet fra panelet staar i sidste rude.
    ===================================================================== */
 (function () {
     "use strict";
@@ -16,14 +14,7 @@
     var M = T.MAAL;
 
     var B = 300, H = 300;
-    var UDSNIT = { x: 240, y: 14, b: 380, h: 536 };
-
-    function stort(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-    function afboejning(v) {
-        var p = D.VAESKER[v].pol;
-        return p >= 0.8 ? "bøjer tydeligt" : p >= 0.3 ? "bøjer lidt" : "løber lige ned";
-    }
+    var UDSNIT = { x: 150, y: 76, b: 500, h: 474 };
 
     function udsving(v) {
         var p = D.VAESKER[v].pol;
@@ -52,13 +43,14 @@
         container.appendChild(div);
     }
 
-    /* Et udsnit af scenen omkring buretten og baegerglasset. */
+    /* Et udsnit af scenen omkring hanerne og vasken. */
     function scene(ctx, fn) {
         var s = Math.min(B / UDSNIT.b, H / UDSNIT.h);
         ctx.save();
         ctx.translate((B - UDSNIT.b * s) / 2 - UDSNIT.x * s, (H - UDSNIT.h * s) / 2 - UDSNIT.y * s);
         ctx.scale(s, s);
         T.bord(ctx);
+        T.vask(ctx);
         fn(ctx);
         ctx.restore();
     }
@@ -72,56 +64,24 @@
     function forsoegsbillede(ctx, v, stavId) {
         scene(ctx, function (c) {
             var d = udsving(v);
-            var indhold = { vand: 0, ethanol: 0, heptan: 0 };
-            indhold[v] = 40;
-            T.burette(c, 16, v, true);
-            T.straale(c, T.boejetStraale(d), D.VAESKER[v].farve);
-            T.baeger(c, indhold);
+            var x0 = T.hane(v).x;
+            T.haner(c, v, null);
+            T.straale(c, T.boejetStraale(v, d), D.VAESKER[v].farve);
             var y = 372;
-            var t = (y - M.TIP.y) / (M.BAEGER.top - M.TIP.y);
-            T.stav(c, stav(stavId, { x: M.TIP.x + d * t * t + 34, y: y }, 1));
+            var t = (y - M.TUD_Y) / (M.VASK.top - M.TUD_Y);
+            T.stav(c, stav(stavId, { x: x0 + d * t * t + 34, y: y }, 1));
         });
-    }
-
-    function resultatTabel(sim) {
-        var tabel = document.createElement("table");
-        tabel.className = "resultater";
-        var hoved = document.createElement("tr");
-        ["", "Plastikstav (−)", "Glasstav (+)"].forEach(function (t) {
-            var th = document.createElement("th");
-            th.textContent = t;
-            hoved.appendChild(th);
-        });
-        tabel.appendChild(hoved);
-        D.VAESKE_ORDEN.forEach(function (v) {
-            var tr = document.createElement("tr");
-            var th = document.createElement("th");
-            th.textContent = stort(D.VAESKER[v].navn);
-            tr.appendChild(th);
-            ["plastik", "glas"].forEach(function (id) {
-                var td = document.createElement("td");
-                td.textContent = sim.resultater[v][id] ? afboejning(v) : "ikke testet";
-                if (!sim.resultater[v][id]) td.className = "ikke";
-                tr.appendChild(td);
-            });
-            tabel.appendChild(tr);
-        });
-        return tabel;
     }
 
     NK.Tegneserie = {
-        resultatTabel: resultatTabel,
-
         byg: function (sim, container) {
             container.innerHTML = "";
             var nr = 0;
-            var r = sim.resultater;
 
-            rude(container, ++nr, "Buretten fyldes, og hanen åbnes. Strålen løber lige ned i bægerglasset.", function (ctx) {
+            rude(container, ++nr, "Hanen åbnes. Strålen løber lige ned i vasken.", function (ctx) {
                 scene(ctx, function (c) {
-                    T.burette(c, 24, "vand", true);
-                    T.straale(c, T.boejetStraale(0), D.VAESKER.vand.farve);
-                    T.baeger(c, { vand: 30 });
+                    T.haner(c, "vand", null);
+                    T.straale(c, T.boejetStraale("vand", 0), D.VAESKER.vand.farve);
                 });
             });
 
@@ -138,15 +98,12 @@
                 heptan: "Heptan: strålen løber lige ned, selvom staven holdes lige så tæt på."
             };
             D.VAESKE_ORDEN.forEach(function (v) {
-                var stavId = r[v].plastik ? "plastik" : "glas";
-                rude(container, ++nr, TEKST[v], function (ctx) { forsoegsbillede(ctx, v, stavId); });
+                rude(container, ++nr, TEKST[v], function (ctx) { forsoegsbillede(ctx, v, "plastik"); });
             });
 
-            if (r.vand.plastik && r.vand.glas) {
-                rude(container, ++nr, "Glasstaven er positiv, men vandstrålen bøjer også mod den.", function (ctx) {
-                    forsoegsbillede(ctx, "vand", "glas");
-                });
-            }
+            rude(container, ++nr, "Glasstaven er positiv, men vandstrålen bøjer også mod den.", function (ctx) {
+                forsoegsbillede(ctx, "vand", "glas");
+            });
 
             rude(container, ++nr, "Vandmolekylerne drejer, så den modsat ladede ende vender mod staven. Derfor trækkes vandet mod både en negativ og en positiv stav.", function (ctx) {
                 [[80, -1, "negativ stav"], [220, 1, "positiv stav"]].forEach(function (l) {
@@ -159,18 +116,6 @@
                 });
             });
 
-            var vandig = sim.baeger.vand + sim.baeger.ethanol;
-            if (sim.baeger.heptan > 0.5 && vandig > 0.5) {
-                rude(container, ++nr, "I bægerglasset ligger heptan oven på vand og ethanol. Polære og upolære væsker blandes ikke.", function (ctx) {
-                    ctx.save();
-                    ctx.translate(B / 2 - 390 * 2, H / 2 - 490 * 2);
-                    ctx.scale(2, 2);
-                    T.bord(ctx);
-                    T.baeger(ctx, sim.baeger);
-                    ctx.restore();
-                });
-            }
-
             var sidste = document.createElement("div");
             sidste.className = "rude";
             var overskrift = document.createElement("p");
@@ -180,7 +125,7 @@
             overskrift.appendChild(nrSpan);
             overskrift.appendChild(document.createTextNode("Resultater: bøjer strålen mod staven?"));
             sidste.appendChild(overskrift);
-            sidste.appendChild(resultatTabel(sim));
+            sidste.appendChild(NK.SimVandstraale.resultatTabel(sim));
             container.appendChild(sidste);
         }
     };

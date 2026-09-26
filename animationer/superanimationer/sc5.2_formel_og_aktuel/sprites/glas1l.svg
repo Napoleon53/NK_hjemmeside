@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 240 300">
+  <!-- Baegerglas paa 1 L. Animationen tegner vaesken og pulveret BAG
+       filen, klippet til det indre: x 22-218, y 20-280 (bundens hjoerner
+       r 10). Rumfang: y = 280 - 220 * V (V i liter), saa 1,0 L staar ved
+       y 60. Tuden sidder oeverst til venstre. Bunden staar paa y 286. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.30"/>
+      <stop offset="0.12" stop-color="#d4ebfa" stop-opacity="0.07"/>
+      <stop offset="0.88" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.24"/>
+    </linearGradient>
+  </defs>
+  <path d="M22 20 L22 270 Q22 280 32 280 L208 280 Q218 280 218 270 L218 20 Z" fill="url(#glas)"/>
+  <path d="M12 12 Q22 12 22 22 L22 272 Q22 284 34 284 L206 284 Q218 284 218 272 L218 20 Q218 15 223 13"
+        fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="202" y="32" width="5" height="232" rx="2.5" fill="#ffffff" fill-opacity="0.14"/>
+  <g stroke="#eef6fc" stroke-opacity="0.75" stroke-width="1.5" stroke-linecap="round">
+    <path d="M23 236 h24 M23 192 h24 M23 148 h24 M23 104 h24 M23 60 h24"/>
+  </g>
+  <g stroke="#eef6fc" stroke-opacity="0.45" stroke-width="1.1" stroke-linecap="round">
+    <path d="M23 258 h12 M23 214 h12 M23 170 h12 M23 126 h12 M23 82 h12"/>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#eef6fc" fill-opacity="0.85">
+    <text x="52" y="241">0,2</text>
+    <text x="52" y="197">0,4</text>
+    <text x="52" y="153">0,6</text>
+    <text x="52" y="109">0,8</text>
+    <text x="52" y="65">1,0 L</text>
+  </g>
+</svg>

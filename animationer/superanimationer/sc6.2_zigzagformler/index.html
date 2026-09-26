@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zigzagformler</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⌇</span> Zigzagformler</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-zigzag" role="tab" aria-selected="true"><span class="nr">1</span>Zigzag</button>
+        <button class="faneknap" data-fane="fane-navne" role="tab" aria-selected="false"><span class="nr">2</span>Navne</button>
+        <button class="faneknap" data-fane="fane-isomerer" role="tab" aria-selected="false"><span class="nr">3</span>Isomerer</button>
+        <button class="faneknap" data-fane="fane-oploeselighed" role="tab" aria-selected="false"><span class="nr">4</span>Opløselighed</button>
+    </div>
+
+    <a class="ikonknap tekstknap" id="tegnelink" href="../tegnebraet/index.html" target="_blank" rel="noopener" title="Tegnebrættet til rapporter åbner i en ny fane">Tegnebræt ↗</a>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: ZIGZAG (den gamle 6.2)                                     -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-zigzag" role="tabpanel" aria-label="Zigzag">
+    <div class="scene medtekst">
+        <canvas id="zz-laerred"></canvas>
+        <div class="anker" id="zz-anker-papir"></div>
+        <div class="anker" id="zz-anker-tavle"></div>
+        <div class="toast" id="zz-toast" hidden></div>
+        <div class="tilbud" id="zz-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="zz-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="zz-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="skifter" id="zz-retning" role="group" aria-label="Retning">
+            <button type="button" data-v="tegn" class="aktiv">Strukturformel → zigzag</button>
+            <button type="button" data-v="atomer">Zigzag → strukturformel</button>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste molekyle -->
+        <div class="kort opgavekort" id="zz-kort">
+            <h2><span id="zz-titel">Tegn zigzagformlen</span><span class="taeller">molekyle <b id="zz-nr">1</b>/10</span></h2>
+            <p class="opgave-spm" id="zz-spm"></p>
+            <div class="trinrad" id="zz-trinrad" hidden>
+                <span class="trinprik" data-t="1">1 C</span><span class="trinprik" data-t="2">2 H</span><span class="trinprik" data-t="3">3 Formel</span>
+            </div>
+            <div class="talraekke" id="zz-taelrad"><span id="zz-taelnavn">C-atomer</span><span class="tal" id="zz-tael"></span></div>
+            <div class="felt aktiv" id="zz-felt" hidden>
+                <span class="felt-pre">Formel</span>
+                <input type="text" id="zz-input" autocomplete="off" spellcheck="false" placeholder="fx C5H12" aria-label="Molekylformel">
+                <button class="felt-ok" id="zz-ok" type="button" aria-label="Tjek">✓</button>
+            </div>
+            <p class="besked" id="zz-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="zz-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="zz-serie">
+            <h2>Serien <span class="taeller">løst <b id="zz-loest">0</b>/10</span></h2>
+            <div class="prikker" id="zz-prikker"></div>
+            <div class="miniature" id="zz-mini"></div>
+            <button class="knap nulstil" id="zz-forfra" type="button"><span>Nye molekyler</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: NAVNE (den gamle 6.4)                                      -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-navne" role="tabpanel" aria-label="Navne">
+    <div class="scene medtekst">
+        <canvas id="nv-laerred"></canvas>
+        <div class="anker" id="nv-anker-tavle"></div>
+        <div class="toast" id="nv-toast" hidden></div>
+        <div class="tilbud" id="nv-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="nv-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="nv-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="skifter" id="nv-retning" role="group" aria-label="Retning">
+            <button type="button" data-v="byg" class="aktiv">Byg ud fra navnet</button>
+            <button type="button" data-v="navn">Giv navnet</button>
+        </div>
+        <div class="skifter lille" id="nv-slags" role="group" aria-label="Stofklasse">
+            <button type="button" data-v="alkaner" class="aktiv">Alkaner</button>
+            <button type="button" data-v="alkener">Alkener</button>
+        </div>
+
+        <div class="kort opgavekort" id="nv-kort">
+            <h2><span id="nv-titel">Byg molekylet</span><span class="taeller">molekyle <b id="nv-nr">1</b>/10</span></h2>
+            <div class="opgave-prompt" id="nv-prompt"></div>
+            <p class="opgave-spm" id="nv-spm"></p>
+            <div class="talraekke" id="nv-taelrad"><span>C-atomer</span><span class="tal" id="nv-tael"></span></div>
+            <div class="felt aktiv" id="nv-felt" hidden>
+                <span class="felt-pre">Navn</span>
+                <input type="text" id="nv-input" autocomplete="off" spellcheck="false" placeholder="fx 2-methylpentan" aria-label="Navn">
+                <button class="felt-ok" id="nv-ok" type="button" aria-label="Tjek">✓</button>
+            </div>
+            <p class="besked" id="nv-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="nv-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="nv-serie">
+            <h2>Serien <span class="taeller">løst <b id="nv-loest">0</b>/10</span></h2>
+            <div class="prikker" id="nv-prikker"></div>
+            <div class="miniature" id="nv-mini"></div>
+            <button class="knap nulstil" id="nv-forfra" type="button"><span>Nye molekyler</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: ISOMERER (den gamle 6.3)                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-isomerer" role="tabpanel" aria-label="Isomerer">
+    <div class="scene medtekst">
+        <canvas id="is-laerred"></canvas>
+        <div class="anker" id="is-anker-tavle"></div>
+        <div class="toast" id="is-toast" hidden></div>
+        <div class="tilbud" id="is-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="is-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="is-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="skifter" id="is-niveau" role="group" aria-label="Molekylformel">
+            <button type="button" data-v="4" class="aktiv">C₄H₁₀</button>
+            <button type="button" data-v="5">C₅H₁₂</button>
+            <button type="button" data-v="6">C₆H₁₄</button>
+            <button type="button" data-v="7">C₇H₁₆</button>
+        </div>
+
+        <div class="kort opgavekort" id="is-kort">
+            <h2><span>Find alle isomerer</span><span class="taeller">fundet <b id="is-fundet">0</b>/<span id="is-antal">2</span></span></h2>
+            <div class="opgave-prompt" id="is-prompt"></div>
+            <p class="opgave-spm" id="is-spm">Tegn et molekyle med formlen. Tegn så et andet.</p>
+            <div class="talraekke"><span>C-atomer</span><span class="tal" id="is-tael"></span></div>
+            <p class="besked" id="is-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="is-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="is-liste-kort">
+            <h2>Isomererne <span class="taeller" id="is-liste-t"></span></h2>
+            <div class="fundliste" id="is-liste"></div>
+            <button class="knap nulstil" id="is-forfra" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 4: OPLOESELIGHED (den gamle 6.5)                             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-oploeselighed" role="tabpanel" aria-label="Opløselighed">
+    <div class="scene medtekst">
+        <canvas id="op-laerred"></canvas>
+        <div class="anker" id="op-anker-tavle"></div>
+        <div class="anker" id="op-anker-mol"></div>
+        <div class="anker" id="op-anker-glas"></div>
+        <div class="toast" id="op-toast" hidden></div>
+        <div class="tilbud" id="op-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="op-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="op-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="skifter lille" id="op-tegning" role="group" aria-label="Tegning">
+            <button type="button" data-v="zigzag" class="aktiv">Zigzag</button>
+            <button type="button" data-v="alle">Alle atomer</button>
+        </div>
+
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste molekyle -->
+        <div class="kort opgavekort" id="op-kort">
+            <h2><span id="op-titel">Hvor opløses det?</span><span class="taeller">molekyle <b id="op-nr">1</b>/<span id="op-antal">15</span></span></h2>
+            <div class="opgave-prompt" id="op-prompt"></div>
+            <div class="talraekke"><span>Point</span><span class="tal" id="op-point">0</span></div>
+            <div class="talraekke"><span>Liv</span><span class="tal liv" id="op-liv"></span></div>
+            <p class="besked" id="op-besked" aria-live="polite"></p>
+            <div id="op-regn"></div>
+            <div class="knaprad"><button class="knap" id="op-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="op-bunke">
+            <h2>Bunken <span class="taeller">sorteret <b id="op-sorteret">0</b>/<span id="op-ialt">15</span></span></h2>
+            <div class="prikker" id="op-prikker"></div>
+            <div class="miniature" id="op-mini"></div>
+            <p class="note" id="op-rekord"></p>
+            <button class="knap nulstil" id="op-forfra" type="button"><span>Nyt spil</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Zigzagformler og navne</h2>
+        <div class="teori-spalter">
+            <div>
+                <h3>Zigzagformlen</h3>
+                <p>Hvert knæk og hver ende er et C-atom. H-atomerne på C tegnes ikke. Et C-atom har altid fire bindinger; dem, der ikke er tegnet, går til H.</p>
+                <div class="eksempel">
+                    <span class="eksempel-hoved">Eksempel</span>
+                    Et C for enden af kæden har én binding og derfor tre H: CH₃.
+                </div>
+                <h3>Isomerer</h3>
+                <p>Isomerer har samme molekylformel, men atomerne sidder forskelligt. De har hver sit navn. To tegninger med samme navn er det samme stof, også når de vender forskelligt.</p>
+                <h3>cis og trans</h3>
+                <p>Ved en dobbeltbinding midt i kæden: sidder kædens to dele på samme side af dobbeltbindingen, er det cis. Sidder de på hver sin side, er det trans.</p>
+            </div>
+            <div>
+                <h3>Navngivning</h3>
+                <p><b>1.</b> Find den længste kæde. Den giver navnets sidste del: meth, eth, prop, but, pent, hex, hept, oct, non, dec + <b>an</b>.</p>
+                <p><b>2.</b> Nummerér kæden fra den ende, der er nærmest en sidegruppe.</p>
+                <p><b>3.</b> Sidegrupperne: methyl (1 C), ethyl (2 C), propyl (3 C). Nummeret står foran. Ens grupper samles med di, tri og tetra: 2,3-dimethyl.</p>
+                <p><b>4.</b> Forskellige sidegrupper skrives i alfabetisk rækkefølge. Komma mellem tal, bindestreg mellem tal og bogstav.</p>
+                <div class="eksempel">
+                    <span class="eksempel-hoved">Eksempel</span>
+                    3-ethyl-2-methylpentan
+                </div>
+                <p><b>Alkener.</b> En dobbeltbinding giver endelsen <b>en</b>. Hovedkæden skal indeholde dobbeltbindingen og nummereres, så den får det laveste nummer: but-1-en, pent-2-en.</p>
+                <h3>Opløselighed</h3>
+                <p>Polære grupper (OH, COOH og O i kæden) trækker molekylet mod vand. Carbonkæden trækker mod heptan. Tæl C-atomerne, og del med antallet af polære grupper.</p>
+                <div class="eksempel">
+                    <span class="eksempel-hoved">Tommelfingerregel</span>
+                    Under 4: vand. Over 4: heptan. Præcis 4: lidt i begge.<br>
+                    nonan-4,6-diol: 9 C / 2 polære grupper = 4,5. Heptan.
+                </div>
+            </div>
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<!-- Motoren (molekylet, navnene, tegningen og tavlen) er faelles med
+     tegnebraettet og ligger i ../../molekylemotor/ -->
+<script src="../../molekylemotor/js/klistermaerker.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="js/opgaver.js"></script>
+<script src="js/oploeselighed.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="../../molekylemotor/js/tavle.js"></script>
+<script src="../../molekylemotor/js/tegnebraet.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/opgavefane.js"></script>
+<script src="js/sim_zigzag.js"></script>
+<script src="js/sim_navne.js"></script>
+<script src="js/sim_isomerer.js"></script>
+<script src="js/sim_oploeselighed.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

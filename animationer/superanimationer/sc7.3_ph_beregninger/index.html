@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pH-beregninger</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> pH-beregninger</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-ph" role="tab" aria-selected="true"><span class="nr">1</span>Find pH</button>
+        <button class="faneknap" data-fane="fane-konc" role="tab" aria-selected="false"><span class="nr">2</span>Find koncentrationen</button>
+        <button class="faneknap" data-fane="fane-staerk" role="tab" aria-selected="false"><span class="nr">3</span>Stærke syrer og baser</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FIND PH                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-ph" role="tabpanel" aria-label="Find pH">
+    <div class="scene medtekst">
+        <canvas id="ph-laerred"></canvas>
+        <div class="anker" id="ph-anker-vej"></div>
+        <div class="anker" id="ph-anker-glas"></div>
+        <div class="anker" id="ph-anker-etiket"></div>
+        <div class="anker" id="ph-anker-meter"></div>
+        <div class="tilbud" id="ph-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="ph-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="ph-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis tasterne -> Vis svaret -> Ny opgave -->
+        <div class="kort opgavekort" id="ph-kort">
+            <h2><span id="ph-titel">Opgave</span><span class="taeller">løst <b id="ph-loest">0</b></span></h2>
+            <p class="maal-tekst" id="ph-prompt"></p>
+            <div class="raekker" id="ph-raekker"></div>
+            <p class="besked" id="ph-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap stor" id="ph-knap" type="button">Giv hint</button></div>
+        </div>
+        <div class="regner-plads" id="ph-regnerplads">
+
+            <!-- Lommeregneren: faelles for de tre faner, app.js flytter den -->
+            <div class="kort regner" id="regner">
+                <h2><span>Lommeregner</span><button class="r-maple" id="r-maple" type="button" aria-pressed="false" title="Vis det tastede som Maple-kode (M)">Maple</button></h2>
+                <div class="r-skaerm">
+                    <div class="r-tastet" id="r-tastet"></div>
+                    <div class="r-laest" id="r-laest"><span class="r-laest-mrk">læst som</span><span class="r-udtryk" id="r-udtryk"></span><span class="r-res" id="r-res"></span></div>
+                    <div class="r-besked" id="r-besked" aria-live="polite"></div>
+                </div>
+                <div class="r-maplefelt">
+                    <div class="r-mapleind"><span class="r-prompt">&gt;</span> <span id="r-mapleind"></span></div>
+                    <div class="r-mapleud" id="r-mapleud"></div>
+                    <div class="r-maplenote" id="r-maplenote"></div>
+                </div>
+                <div class="r-taster">
+                    <button type="button" class="r-fn" data-t="log(" title="log (L)">log</button>
+                    <button type="button" class="r-fn" data-t="10^(" title="10 opløftet i">10<sup>x</sup></button>
+                    <button type="button" class="r-op" data-t="(">(</button>
+                    <button type="button" class="r-op" data-t=")">)</button>
+                    <button type="button" class="r-slet" data-t="⌫" title="Slet (Backspace)">⌫</button>
+
+                    <button type="button" data-t="7">7</button>
+                    <button type="button" data-t="8">8</button>
+                    <button type="button" data-t="9">9</button>
+                    <button type="button" class="r-op" data-t="/" title="Divider (/)">/</button>
+                    <button type="button" class="r-slet" data-t="AC" title="Ryd (Delete)">AC</button>
+
+                    <button type="button" data-t="4">4</button>
+                    <button type="button" data-t="5">5</button>
+                    <button type="button" data-t="6">6</button>
+                    <button type="button" class="r-op" data-t="·" title="Gange (*)">·</button>
+                    <button type="button" class="r-pil" data-t="◀" title="Flyt markøren til venstre">◀</button>
+
+                    <button type="button" data-t="1">1</button>
+                    <button type="button" data-t="2">2</button>
+                    <button type="button" data-t="3">3</button>
+                    <button type="button" class="r-op" data-t="−" title="Minus (-)">−</button>
+                    <button type="button" class="r-pil" data-t="▶" title="Flyt markøren til højre">▶</button>
+
+                    <button type="button" data-t="0">0</button>
+                    <button type="button" data-t=",">,</button>
+                    <button type="button" class="r-fn" data-t="Ans" title="Det sidste resultat (A)">Ans</button>
+                    <button type="button" class="r-op" data-t="+">+</button>
+                    <button type="button" class="r-lig" data-t="=" title="Regn ud (Enter)">=</button>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FIND KONCENTRATIONEN                                        -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-konc" role="tabpanel" aria-label="Find koncentrationen">
+    <div class="scene medtekst">
+        <canvas id="konc-laerred"></canvas>
+        <div class="anker" id="konc-anker-vej"></div>
+        <div class="anker" id="konc-anker-glas"></div>
+        <div class="anker" id="konc-anker-etiket"></div>
+        <div class="anker" id="konc-anker-meter"></div>
+        <div class="tilbud" id="konc-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="konc-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="konc-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="konc-kort">
+            <h2><span id="konc-titel">Opgave</span><span class="taeller">løst <b id="konc-loest">0</b></span></h2>
+            <p class="maal-tekst" id="konc-prompt"></p>
+            <div class="raekker" id="konc-raekker"></div>
+            <p class="besked" id="konc-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap stor" id="konc-knap" type="button">Giv hint</button></div>
+        </div>
+        <div class="regner-plads" id="konc-regnerplads"></div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: STAERKE SYRER OG BASER                                      -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-staerk" role="tabpanel" aria-label="Stærke syrer og baser">
+    <div class="scene medtekst">
+        <canvas id="staerk-laerred"></canvas>
+        <div class="anker" id="staerk-anker-vej"></div>
+        <div class="anker" id="staerk-anker-glas"></div>
+        <div class="anker" id="staerk-anker-etiket"></div>
+        <div class="anker" id="staerk-anker-meter"></div>
+        <div class="tilbud" id="staerk-tilbud" hidden>
+            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+            <button class="tilbud-nej" type="button">Nej tak</button>
+        </div>
+        <button class="spring-over" id="staerk-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        <div class="scene-mrk" id="staerk-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="staerk-kort">
+            <h2><span id="staerk-titel">Opgave</span><span class="taeller">løst <b id="staerk-loest">0</b></span></h2>
+            <p class="maal-tekst" id="staerk-prompt"></p>
+            <div class="raekker" id="staerk-raekker"></div>
+            <p class="besked" id="staerk-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap stor" id="staerk-knap" type="button">Giv hint</button></div>
+        </div>
+        <div class="regner-plads" id="staerk-regnerplads"></div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>pH-beregninger</h2>
+        <p>pH og oxoniumkoncentrationen er to måder at skrive det samme på:</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Definitionen</span>
+            pH = −log[H₃O⁺] &nbsp;&nbsp;og&nbsp;&nbsp; [H₃O⁺] = 10<sup>−pH</sup> M
+        </div>
+        <p>I alle vandige opløsninger ved 25 °C er produktet af de to ionkoncentrationer det samme:</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Vands ionprodukt</span>
+            K<sub>w</sub> = [H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴ M²
+        </div>
+        <p>En stærk syre reagerer fuldstændigt med vand. Hvert molekyle giver én H₃O⁺, så [H₃O⁺] er syrens koncentration. En stærk base som NaOH eller Ca(OH)₂ opløses fuldstændigt. Ca(OH)₂ giver to OH⁻, så [OH⁻] er to gange basens koncentration.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Afrunding</span>
+            Koncentrationer med to betydende cifre, pH med to decimaler.
+        </div>
+        <p><b>På lommeregneren</b> står det, du taster, øverst. Linjen under viser, hvordan den har læst det. Står 10⁻¹² ikke i nævneren, mangler der en parentes.</p>
+        <p><b>I Maple</b> skrives log som log10, gange som * og decimaler med punktum: <code>-log10(5.0*10^(-3));</code> Uden komma regner Maple eksakt; skriv 5.0 i stedet for 5, eller brug evalf( ).</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/regner.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/sim_regn.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Koncentration</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Koncentration</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-kar" role="tab" aria-selected="true"><span class="nr">1</span>Karret</button>
+        <button class="faneknap" data-fane="fane-kolbe" role="tab" aria-selected="false"><span class="nr">2</span>Målekolben</button>
+        <button class="faneknap" data-fane="fane-fortynd" role="tab" aria-selected="false"><span class="nr">3</span>Fortynding</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: KARRET                                                     -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-kar" role="tabpanel" aria-label="Karret">
+    <div class="scene">
+        <canvas id="kar-laerred"></canvas>
+        <div class="anker" id="kar-anker-kar"></div>
+        <div class="anker" id="kar-anker-krukke"></div>
+        <div class="anker" id="kar-anker-haner"></div>
+        <div class="anker" id="kar-anker-zoom"></div>
+        <div class="anker" id="kar-anker-laerer"></div>
+        <button class="forfraknap" id="kar-forfra" type="button" title="Karret som ved opgavens start (R)">Start forfra ↺</button>
+        <div class="kboble" id="kar-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="kar-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="kar-kort">
+            <h2><span id="kar-titel">Opgave</span><span class="taeller">opgave <b id="kar-nr">1</b>/<span id="kar-antal">5</span></span></h2>
+            <div id="kar-prompt"></div>
+            <div class="knaprad valgrad" id="kar-valg" hidden></div>
+            <p class="besked" id="kar-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="kar-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="kar-data">
+            <h2>Karret</h2>
+            <div class="talraekke"><span>Stofmængde, n</span><span class="tal" id="kar-n"></span></div>
+            <div class="talraekke"><span>Rumfang, V</span><span class="tal" id="kar-V"></span></div>
+            <div class="talraekke"><span>Koncentration, c</span><span class="tal gul" id="kar-c"></span></div>
+            <div class="regn-linje" id="kar-regn"></div>
+            <p class="note" id="kar-note"></p>
+        </div>
+
+        <div class="kort" id="kar-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="kar-loest">0</b>/5</span></h2>
+            <div class="hyldeliste" id="kar-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: MAALEKOLBEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-kolbe" role="tabpanel" aria-label="Målekolben">
+    <div class="scene">
+        <canvas id="kolbe-laerred"></canvas>
+        <div class="anker" id="kolbe-anker-tavle"></div>
+        <div class="anker" id="kolbe-anker-bord"></div>
+        <div class="anker" id="kolbe-anker-laerer"></div>
+        <div class="kboble" id="kolbe-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="kolbe-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="kolbe-kort">
+            <h2><span id="kolbe-titel">Opgave</span><span class="taeller">opgave <b id="kolbe-nr">1</b>/<span id="kolbe-antal">6</span></span></h2>
+            <div id="kolbe-prompt"></div>
+            <div class="raekker" id="kolbe-raekker"></div>
+            <p class="besked" id="kolbe-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="kolbe-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="kolbe-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="kolbe-loest">0</b>/6</span></h2>
+            <div class="hyldeliste" id="kolbe-liste"></div>
+            <button class="knap nye" id="kolbe-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FORTYNDING                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fortynd" role="tabpanel" aria-label="Fortynding">
+    <div class="scene">
+        <canvas id="fortynd-laerred"></canvas>
+        <div class="anker" id="fortynd-anker-tavle"></div>
+        <div class="anker" id="fortynd-anker-lupper"></div>
+        <div class="anker" id="fortynd-anker-bord"></div>
+        <div class="anker" id="fortynd-anker-laerer"></div>
+        <button class="forfraknap" id="fortynd-forfra" type="button" title="Tøm kolberne (R)">Start forfra ↺</button>
+        <div class="kboble" id="fortynd-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="fortynd-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="fortynd-kort">
+            <h2><span id="fortynd-titel">Opgave</span><span class="taeller">opgave <b id="fortynd-nr">1</b>/<span id="fortynd-antal">5</span></span></h2>
+            <div id="fortynd-prompt"></div>
+            <div class="raekker" id="fortynd-raekker"></div>
+            <p class="besked" id="fortynd-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fortynd-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="fortynd-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="fortynd-loest">0</b>/5</span></h2>
+            <div class="hyldeliste" id="fortynd-liste"></div>
+            <button class="knap nye" id="fortynd-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Koncentration</h2>
+        <p>Koncentrationen er stofmængden pr. liter opløsning. Enheden er mol/L, som skrives M.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Formlen</span>
+            c = <span class="broek"><span>n</span><span>V</span></span>&nbsp;&nbsp;&nbsp;&nbsp;n = c · V&nbsp;&nbsp;&nbsp;&nbsp;V = <span class="broek"><span>n</span><span>c</span></span>
+        </div>
+        <p>Rumfanget skal være i liter: 250 mL = 0,250 L. Kender man massen, findes stofmængden først: n = m / M.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            14,61 g NaCl opløses til 250 mL<br>
+            n = <span class="broek"><span>14,61 g</span><span>58,44 g/mol</span></span> = 0,250 mol<br>
+            c = <span class="broek"><span>0,250 mol</span><span>0,250 L</span></span> = 1,00 M
+        </div>
+        <p>Tapper man noget ud, er det den samme opløsning: c er den samme.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Fortynding</span>
+            Der kommer vand til, men ikke stof. Stofmængden er den samme før og efter:<br>
+            c₁ · V₁ = c₂ · V₂
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/regning.js"></script>
+<script src="js/sim_kar.js"></script>
+<script src="js/sim_kolbe.js"></script>
+<script src="js/sim_fortynd.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120">
+  <!-- Coladaase. Staar paa y 118. -->
+  <defs>
+    <linearGradient id="daase" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8e1414"/>
+      <stop offset="0.25" stop-color="#e03030"/>
+      <stop offset="0.45" stop-color="#f25a50"/>
+      <stop offset="0.7" stop-color="#c81f1f"/>
+      <stop offset="1" stop-color="#7a1010"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8d949e"/>
+      <stop offset="0.4" stop-color="#e6eaef"/>
+      <stop offset="1" stop-color="#7c838d"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="116" rx="26" ry="3" fill="#000000" fill-opacity="0.3"/>
+  <!-- Krop -->
+  <path d="M28 24 L72 24 L72 108 Q72 115 64 116 L36 116 Q28 115 28 108 Z" fill="url(#daase)"/>
+  <!-- Top og bund i metal -->
+  <path d="M31 14 L69 14 L73 24 L27 24 Z" fill="url(#metal)"/>
+  <ellipse cx="50" cy="14" rx="19" ry="3.5" fill="#c6ccd4" stroke="#8d949e" stroke-width="1"/>
+  <path d="M44 13 q6 -3 12 0" fill="none" stroke="#7c838d" stroke-width="2" stroke-linecap="round"/>
+  <path d="M28 108 Q28 115 36 116 L64 116 Q72 115 72 108 L72 111 Q70 118 50 118 Q30 118 28 111 Z" fill="url(#metal)"/>
+  <!-- Hvid boelge og skrift -->
+  <path d="M28 70 Q40 56 52 66 Q62 74 72 62 L72 70 Q62 82 52 74 Q40 64 28 78 Z" fill="#ffffff" fill-opacity="0.92"/>
+  <text x="50" y="52" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="800"
+        font-style="italic" fill="#ffffff" letter-spacing="0.5">COLA</text>
+  <!-- Genskin -->
+  <rect x="38" y="26" width="4" height="80" rx="2" fill="#ffffff" fill-opacity="0.22"/>
+</svg>

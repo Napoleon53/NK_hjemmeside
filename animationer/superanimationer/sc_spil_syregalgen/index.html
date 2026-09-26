@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syregalgen</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Syregalgen</h1>
+    <span class="listenavn" id="listenavn"></span>
+    <div class="tal" aria-label="Point">
+        <span>Point <b id="tal-point">0</b></span>
+        <span>I træk <b id="tal-traek">0</b></span>
+        <span title="Flest ord i træk i denne browser">Rekord <b id="tal-rekord">0</b></span>
+    </div>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Sådan spiller du (?)" aria-label="Sådan spiller du">?</button>
+</header>
+
+<main class="studie">
+    <section class="scene" id="scene">
+        <canvas id="laerred" aria-hidden="true"></canvas>
+        <div class="ordplads">
+            <div class="ordtavle" id="ordtavle" aria-label="Ordet"></div>
+            <div class="omraadelinje" id="omraadelinje"></div>
+        </div>
+        <p class="statuslinje" id="status" aria-live="polite"></p>
+    </section>
+
+    <aside class="panel" aria-label="Styring">
+        <div class="kort">
+            <h2>Træningsområde <span class="taeller" id="antal-ord"></span></h2>
+            <div class="omraader" id="omraader" role="group" aria-label="Træningsområder"></div>
+            <p class="note" id="omraade-note" hidden>Gælder fra næste ord.</p>
+        </div>
+
+        <div class="kort">
+            <div class="tastatur" id="tastatur" role="group" aria-label="Bogstaver"></div>
+            <button class="knap stor" id="hovedknap" type="button"></button>
+        </div>
+
+        <div class="kort tekstkort" id="tekstkort" hidden>
+            <h2 id="tekstkort-titel"></h2>
+            <p class="tekstkort-ord" id="tekstkort-ord"></p>
+            <p class="tekstkort-tekst" id="tekstkort-tekst"></p>
+            <p class="tekstkort-ros" id="tekstkort-ros" hidden></p>
+        </div>
+    </aside>
+</main>
+
+<div class="overlay" id="hjaelp" role="dialog" aria-modal="true" aria-labelledby="hjaelp-titel">
+    <div class="overlay-boks">
+        <h2 id="hjaelp-titel">Sådan spiller du</h2>
+        <p>Gæt fagordet ét bogstav ad gangen. Hvert bogstav, der ikke er med, sender klassekammeraten et skridt ud på planken, og karret bliver surere. Efter seks forkerte er det plask.</p>
+        <p>Ledetråden forklarer ordet uden at nævne det. Den koster et skridt.</p>
+        <p>Vælg et eller flere træningsområder i panelet. Alle er valgt, når ingen er.</p>
+        <h3>Point</h3>
+        <p>10 point pr. skridt, der er tilbage, når ordet er gættet, og 5 point ekstra for hvert ord i træk før det. Rekorden er flest ord i træk og gemmes i browseren.</p>
+        <h3>Genveje</h3>
+        <p><kbd>A</kbd> til <kbd>Å</kbd> gætter &nbsp;·&nbsp; <kbd>Enter</kbd> næste ord &nbsp;·&nbsp; <kbd>?</kbd> denne side &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <h3>Til læreren</h3>
+        <p>Et link kan vælge område: <code>#c3</code> giver C3 Molekyler, <code>#c3+c4</code> to områder og <code>#historie</code> historielisten.</p>
+        <div class="knapper">
+            <button class="knap blaa" id="hjaelp-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/ordlister.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/kar.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organiske grupper</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-udgave="c">
+
+<header class="top">
+    <h1><span class="ikon">⌬</span> Organiske grupper <span class="udgave" id="udgave-maerke">Kemi C</span></h1>
+    <span class="fyld"></span>
+    <button class="teoriknap" id="teoriknap" type="button" title="Stofklasserne med et eksempel (S)">Stofklasserne</button>
+    <button class="teoriknap" id="regelknap" type="button" title="Reglerne (R)">Regler</button>
+    <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd">🔊</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane" id="fane" aria-label="Spillet">
+    <div class="scene">
+        <div class="spilomraade" id="spilomraade">
+            <canvas id="laerred" aria-label="Molekyler, der falder ned mod spandene"></canvas>
+
+            <!-- Usynligt felt over spandene, saa rundvisningen og Kemichael kan pege paa dem -->
+            <div class="omraade" id="spand-omraade"></div>
+
+            <div class="midterkort" id="midterkort">
+                <h2 id="mk-titel">Organiske grupper</h2>
+                <div class="mk-klasser" id="mk-klasser"></div>
+                <p class="mk-tekst" id="mk-tekst"></p>
+                <div class="mk-navn" id="mk-navn" hidden>
+                    <label for="navnefelt">Navn til top 10</label>
+                    <input type="text" id="navnefelt" maxlength="20" placeholder="Anonym" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="mk-liste" id="mk-liste" hidden></div>
+                <button class="knap stor blaa" id="mk-knap" type="button">Start spil</button>
+                <button class="tekstknap" id="mk-forfra" type="button" hidden>Start forfra</button>
+            </div>
+
+            <!-- Et forkert molekyle: gruppen i den rigtige farve og hvad der skiller -->
+            <div class="fejlkort" id="fejlkort" hidden aria-live="polite">
+                <div class="hjerter" id="fk-hjerter"></div>
+                <canvas id="fk-laerred" aria-hidden="true"></canvas>
+                <p class="fk-foerste" id="fk-foerste"></p>
+                <p class="fk-anden" id="fk-anden"></p>
+            </div>
+
+            <!-- En ny stofklasse: et eksempel med gruppen fremhaevet -->
+            <div class="nykort" id="nykort" hidden aria-live="polite">
+                <h2>Ny stofklasse</h2>
+                <div class="nk-klasser" id="nk-klasser"></div>
+            </div>
+
+            <div class="tilbud" id="tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+            <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
+        </div>
+
+        <p class="statuslinje" id="statuslinje" aria-live="polite"></p>
+    </div>
+
+    <aside class="panel">
+        <div class="kort spilkort" id="spilkort">
+            <h2>Spillet <span class="taeller">rekord <b id="rekord">0</b></span></h2>
+            <div class="tal3">
+                <div><small>Point</small><b id="point">0</b></div>
+                <div><small>Liv</small><b id="liv" class="liv">♥♥♥</b></div>
+                <div><small>Niveau</small><b id="niveau">1</b></div>
+            </div>
+            <button class="knap stor blaa" id="spilknap" type="button">Start spil</button>
+            <div class="hjaelpere">
+                <button class="knap turbo" id="turboknap" type="button" title="Turboboost (T): 15 sekunder, op til fem på én gang">🚀 Turboboost</button>
+                <button class="knap inhib" id="inhibknap" type="button" title="Fjern inhibitoren (I)" hidden>✕ Fjern inhibitor</button>
+            </div>
+            <div class="turbouret" id="turbouret"></div>
+        </div>
+
+        <div class="kort sidstekort" id="sidstekort">
+            <h2>Det sidste molekyle <span class="taeller" id="sidste-mark"></span></h2>
+            <canvas id="sidste-laerred" aria-hidden="true"></canvas>
+            <p class="sidste-navn" id="sidste-navn">Intet endnu.</p>
+            <p class="sidste-klasse" id="sidste-klasse"></p>
+        </div>
+
+        <div class="kort klassekort" id="klassekort">
+            <h2>Stofklasser <span class="taeller"><b id="klasser-moedt">0</b> af <span id="klasser-i-alt">0</span></span></h2>
+            <ul class="klasseliste" id="klasseliste"></ul>
+        </div>
+
+        <div class="kort toplistekort" id="toplistekort" hidden>
+            <h2>Top 10 <span class="taeller" id="topliste-uge"></span></h2>
+            <div class="topfaner" role="tablist">
+                <button type="button" class="topfane aktiv" data-liste="uge" role="tab">Denne uge</button>
+                <button type="button" class="topfane" data-liste="alle" role="tab">Alle tider</button>
+            </div>
+            <ol class="topliste" id="topliste"></ol>
+            <p class="topliste-egen" id="topliste-egen"></p>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Stofklasserne</h2>
+        <p class="lille">Gruppen, der afgør stofklassen, står i spandens farve.</p>
+        <div class="teorigitter" id="teorigitter"></div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="regler">
+    <div class="overlay-boks">
+        <h2>Organiske grupper</h2>
+
+        <h3>Sådan spiller du</h3>
+        <ol>
+            <li><b>Træk molekylet ned i den rigtige spand</b>, før det når bunden. Falder det rigtigt af sig selv, tæller det også.</li>
+            <li><b>Den forkerte spand koster et liv.</b> Spillet står stille, mens gruppen vises i den rigtige farve. Efter tre forkerte er spillet slut.</li>
+            <li><b>Hvert molekyle giver 100 point.</b> Ved bestemte point kommer en ny stofklasse til, og skærmen ryddes. Til sidst stiger kun farten.</li>
+            <li><b>14.000 point</b> gør dig til Stofgruppemester. Så kan du spille videre efter rekorden.</li>
+        </ol>
+
+        <h3>Hjælperne</h3>
+        <p>De falder nu og da fra niveau 2. Klik på dem, træk dem ikke i en spand.</p>
+        <ul>
+            <li><b>Katalysatoren</b> (gul) giver halve point for alle molekyler på skærmen og rydder den.</li>
+            <li><b>Inhibitoren</b> (turkis) bremser alt i 7 sekunder. Den kan fjernes igen.</li>
+            <li><b>+1 pause</b> (blå) giver en pause mere. Du starter med én.</li>
+        </ul>
+        <p><b>Turboboost</b> giver mere fart i 15 sekunder, op til fem gange på én gang.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>Enter</kbd> start eller fortsæt &nbsp;·&nbsp; <kbd>P</kbd> pause &nbsp;·&nbsp; <kbd>T</kbd> turboboost &nbsp;·&nbsp; <kbd>I</kbd> fjern inhibitor &nbsp;·&nbsp; <kbd>S</kbd> stofklasserne &nbsp;·&nbsp; <kbd>R</kbd> reglerne &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="lille">Kemi C: <code>index.html</code>. Kemi B: <code>index.html#b</code>.</p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="regler-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/topliste.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/praesentation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

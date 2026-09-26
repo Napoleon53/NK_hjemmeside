@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="24" viewBox="0 0 150 24">
+  <!-- Spatel af staal, vandret. Skeen er til venstre med midten i
+       (16, 12); det er ankerpunktet. Stoffet paa skeen tegnes af
+       animationen OVEN PAA denne fil. -->
+  <!-- Skaftet -->
+  <rect x="30" y="9.5" width="118" height="5" rx="2.5" fill="#aeb6bf" stroke="#4e5660" stroke-width="1.3"/>
+  <path d="M34 11 H144" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.1" stroke-linecap="round"/>
+  <!-- Skeen -->
+  <path d="M2 12 Q2 4 14 4 L26 6 Q34 8 34 12 Q34 16 26 18 L14 20 Q2 20 2 12 Z"
+        fill="#c3cad1" stroke="#4e5660" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M7 9 Q14 6.5 24 8" fill="none" stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.3" stroke-linecap="round"/>
+</svg>

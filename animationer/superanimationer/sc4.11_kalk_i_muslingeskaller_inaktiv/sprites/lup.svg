@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140">
+  <!-- Lup. Linsens midte er (52, 52), inderradius 38. -->
+  <defs>
+    <linearGradient id="skaft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a6d47"/>
+      <stop offset="1" stop-color="#5e3f26"/>
+    </linearGradient>
+  </defs>
+  <path d="M94 94 L130 130" stroke="url(#skaft)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M96 93 L126 123" stroke="#c49a72" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+  <path d="M83 83 L96 96" stroke="#aab3bf" stroke-width="17" stroke-linecap="round"/>
+  <circle cx="52" cy="52" r="38" fill="#bfe3ff" fill-opacity="0.07"/>
+  <circle cx="52" cy="52" r="42" fill="none" stroke="#c9d3de" stroke-width="8"/>
+  <circle cx="52" cy="52" r="38.5" fill="none" stroke="#6f7b89" stroke-width="1.5"/>
+  <circle cx="52" cy="52" r="45.5" fill="none" stroke="#6f7b89" stroke-width="1"/>
+  <path d="M26 40 A30 30 0 0 1 44 23" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

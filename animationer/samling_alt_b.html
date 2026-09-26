@@ -481,7 +481,7 @@
             <button class="tab-btn" data-beskrivelse="Udforsk hvad der påvirker, hvor hurtigt en kemisk reaktion forløber - koncentration, temperatur, katalysator og inhibitor." onclick="visKategori(this, 'kemi-b-filer/samling_b1.html')" title="B1: Kinetik"><span class="btn-num">B1</span><span class="btn-text">Kinetik</span></button>
             <button class="tab-btn" data-beskrivelse="Opskriv reaktionsbrøken, regn på ligevægtskonstanten K, og forskyd en rigtig ligevægt i et virtuelt laboratorium." onclick="visKategori(this, 'kemi-b-filer/samling_b2.html')" title="B2: Ligevægt"><span class="btn-num">B2</span><span class="btn-text">Ligevægt</span></button>
             <button class="tab-btn" data-beskrivelse="Regn med syrekonstanten Ks og pKs, og træn at omregne mellem dem." onclick="visKategori(this, 'kemi-b-filer/samling_b3.html')" title="B3: Syre/Base"><span class="btn-num">B3</span><span class="btn-text">Syre/Base</span></button>
-            <button class="tab-btn" data-beskrivelse="Estersyntese, DNPH/Tollens, intermolekylære kræfter, isomeri og et par spil om organiske stofklasser og polymerer." onclick="visKategori(this, 'kemi-b-filer/samling_b4,5,6.html')" title="B4-6: Organisk B"><span class="btn-num">B4</span><span class="btn-text">Organisk B</span></button>
+            <button class="tab-btn" data-beskrivelse="Estersyntese, DNPH/Tollens, intermolekylære kræfter, isomeri, et tegnebræt og et par spil om organiske stofklasser og polymerer." onclick="visKategori(this, 'kemi-b-filer/samling_b4,5,6.html')" title="B4-6: Organisk B"><span class="btn-num">B4</span><span class="btn-text">Organisk B</span></button>
             <button class="tab-btn" data-beskrivelse="Se hvordan glucose og fructose lukker ring og danner alfa- og beta-anomerer." onclick="visKategori(this, 'kemi-b-filer/samling_b7.html')" title="B7: Kulhydrater"><span class="btn-num">B7</span><span class="btn-text">Kulhydrater</span></button>
             <button class="tab-btn" data-beskrivelse="Absorptionsspektre og Lambert-Beers lov, inkl. et rigtigt forsøg med azofarvestof i en Breezer." onclick="visKategori(this, 'kemi-b-filer/samling_b9.html')" title="B9: Spektroskopi"><span class="btn-num">B9</span><span class="btn-text">Spektroskopi</span></button>
 
@@ -587,7 +587,7 @@
             if (/^b1/i.test(emne)) return 'kemi-b-filer/samling_b1.html';
             if (/^b2/i.test(emne)) return 'kemi-b-filer/samling_b2.html';
             if (/^b3/i.test(emne)) return 'kemi-b-filer/samling_b3.html';
-            if (/^(b[456]|eb\d*|b\.spil)/i.test(emne)) return 'kemi-b-filer/samling_b4,5,6.html';
+            if (/^(b[456]|eb\d*|b\.spil|tegnebraet)/i.test(emne)) return 'kemi-b-filer/samling_b4,5,6.html';
             if (/^b7/i.test(emne)) return 'kemi-b-filer/samling_b7.html';
             if (/^b9/i.test(emne)) return 'kemi-b-filer/samling_b9.html';
             return null;
@@ -681,25 +681,27 @@
         // Skal opdateres med én linje, når en ny animation tilføjes til et kapitel.
         const FEEDBACK_EMNER = [
             { navn: 'B1: Kinetik', animationer: [
-                { nr: 1, navn: 'Reaktionshastighed' }, { nr: 2, navn: 'Energidiagram' }, { nr: 3, navn: 'Katalyse (H₂O₂)' }
+                { nr: 1, navn: 'Reaktionshastighed' }, { nr: 2, navn: 'Energidiagram' }, { nr: 3, navn: 'Katalyse (H₂O₂)' }, { nr: 4, navn: 'Thiosulfat og syre' }
             ]},
             { navn: 'B2: Ligevægt', animationer: [
-                { nr: 1, navn: 'Ligevægtsloven' }, { nr: 2, navn: 'Indgreb i ligevægte' }, { nr: 3, navn: 'Ligevægtsberegninger' }, { nr: 4, navn: 'Forsøg: Jernthiocyanat' },
+                { nr: 0, navn: 'Dynamisk ligevægt' }, { nr: 1, navn: 'Ligevægtsloven' }, { nr: 2, navn: 'Indgreb i ligevægte' }, { nr: 3, navn: 'Ligevægtsberegninger' }, { nr: 4, navn: 'Forsøg: Jernthiocyanat' },
                 { nr: 5, navn: 'Ligevægtssimulation' }, { nr: 6, navn: 'Volumenændring' }
             ]},
             { navn: 'B3: Syre/Base', animationer: [
                 { nr: 1, navn: 'Fra Ks til pKs' }, { nr: 2, navn: 'Titreringssimulator' }
             ]},
             { navn: 'B4-6: Organisk B', animationer: [
-                { nr: 1, navn: 'Estersyntese' }, { nr: 2, navn: 'DNPH/Tollens' }, { nr: 3, navn: 'Intermolekylært' },
-                { nr: 4, navn: 'Spil: polymerisation' }, { nr: 5, navn: 'Sælg kemikalier' },
-                { nr: 6, navn: 'Geometrisk isomeri' }, { nr: 7, navn: 'Spejlbilledeisomeri' }
+                { nr: 1, navn: 'Estersyntese' }, { nr: 2, navn: 'DNPH/Tollens' }, { nr: 3, navn: 'Oxidation af alkohol' },
+                { nr: 4, navn: 'Intermolekylært' }, { nr: 5, navn: 'Sælg kemikalier' },
+                { nr: 6, navn: 'Geometrisk isomeri' }, { nr: 7, navn: 'Spejlbilledeisomeri' }, { nr: 8, navn: 'Tegnebræt' },
+                { nr: 9, navn: 'Organiske grupper' }
             ]},
             { navn: 'B7: Kulhydrater', animationer: [
                 { nr: 1, navn: 'Ringslutning' }
             ]},
             { navn: 'B9: Spektroskopi', animationer: [
-                { nr: 1, navn: 'Absorptionsspektre' }, { nr: 2, navn: 'Breezer-forsøg' }, { nr: 3, navn: 'Lambert-Beers Lov' }, { nr: 4, navn: 'Nitrit i vand' }
+                { nr: 1, navn: 'Absorptionsspektre' }, { nr: 2, navn: 'Breezer-forsøg' }, { nr: 3, navn: 'Lambert-Beers Lov' }, { nr: 4, navn: 'Nitrit i vand' },
+                { nr: 5, navn: 'Spektroskopiopgaver' }
             ]},
             { navn: 'Generelt (ikke et bestemt kapitel)', animationer: [] }
         ];

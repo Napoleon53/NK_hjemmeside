@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="300" viewBox="0 0 120 150">
+  <!-- Manometeret: kassen og skiven uden tal. Skivens midte er (60, 60),
+       og tallene og viseren tegnes af animationen inden for radius 46.
+       Stilken med gevindet gaar fra y 114 til bunden, y 150 (x 52-68),
+       hvor roeret til cylinderen sidder. -->
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e4e8ee"/>
+      <stop offset="0.45" stop-color="#9aa2ad"/>
+      <stop offset="1" stop-color="#5d646e"/>
+    </linearGradient>
+    <linearGradient id="messing" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a2a"/>
+      <stop offset="0.45" stop-color="#e2bf6a"/>
+      <stop offset="1" stop-color="#7a5b20"/>
+    </linearGradient>
+    <radialGradient id="skive" cx="0.42" cy="0.38" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e6e9ee"/>
+    </radialGradient>
+  </defs>
+  <rect x="52" y="112" width="16" height="30" fill="url(#messing)" stroke="#5a4418" stroke-width="1"/>
+  <rect x="48" y="138" width="24" height="12" rx="2" fill="url(#messing)" stroke="#5a4418" stroke-width="1"/>
+  <line x1="52" y1="118" x2="68" y2="118" stroke="#6b5220" stroke-width="1"/>
+  <line x1="52" y1="124" x2="68" y2="124" stroke="#6b5220" stroke-width="1"/>
+  <line x1="52" y1="130" x2="68" y2="130" stroke="#6b5220" stroke-width="1"/>
+  <circle cx="60" cy="60" r="57" fill="url(#ring)" stroke="#3b4048" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="50" fill="#2c3036"/>
+  <circle cx="60" cy="60" r="48" fill="url(#skive)"/>
+  <path d="M 24 34 A 44 44 0 0 1 70 17" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.55" stroke-linecap="round"/>
+</svg>

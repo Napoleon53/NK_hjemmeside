@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sc8.5 Kaliumpermanganat</title>
+<style>
+    body { background: #1b1d24; color: #dde3ea; font-family: "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    h1 { font-size: 1rem; margin: 0 0 14px; color: #f2c53d; }
+    h2 { font-size: 0.8rem; margin: 18px 0 8px; color: #a9b0ba; text-transform: uppercase; letter-spacing: 0.08em; }
+    .ark { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+    figure { margin: 0; padding: 10px; background: #3b404c; border: 1px solid #4a4a58; border-radius: 8px; text-align: center; }
+    figure img, figure canvas { display: block; margin: 0 auto 6px; }
+    figcaption { font-size: 0.78rem; color: #c8ced6; }
+</style>
+</head>
+<body>
+<!-- Udviklerværktøj: viser tegningerne alene, før de sættes i bevægelse. Indgår ikke i animationen. -->
+<h1>sc8.5: urglasset, dråbeflasken og luppen</h1>
+<h2>Sprites</h2>
+<div class="ark">
+    <figure><img src="sprites/urglas.svg" width="330"><figcaption>urglas.svg (væsken tegnes i koden)</figcaption></figure>
+    <figure><img src="sprites/draabeflaske.svg" width="96"><figcaption>draabeflaske.svg</figcaption></figure>
+    <figure><img src="sprites/kateder.svg" width="300"><figcaption>kateder.svg (fra sc8.2)</figcaption></figure>
+</div>
+<h2>Urglassene med væske (tegnet i js/tegning.js)</h2>
+<div class="ark">
+    <figure><canvas id="glas" width="1180" height="190"></canvas><figcaption>violet MnO₄⁻, grøn MnO₄²⁻, brunsten MnO₂, næsten farveløs Mn²⁺, iod og svovl med bobler</figcaption></figure>
+</div>
+<h2>Flasken og luppen</h2>
+<div class="ark">
+    <figure><canvas id="flaske" width="560" height="220"></canvas><figcaption>hjemme, vendt over glasset med dråber, og luppen med 5 SO₃²⁻ (2 e⁻ hver) og 2 MnO₄⁻ (5 pladser hver)</figcaption></figure>
+</div>
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script>
+    NK.Sprites.start();
+    setTimeout(function () {
+        var T = NK.Tegn, D = NK.Data;
+        var ctx = document.getElementById("glas").getContext("2d");
+        ctx.fillStyle = "#2b2f37";
+        ctx.fillRect(0, 0, 1180, 190);
+        var glas = [["violet"], ["groen"], ["brun", "brun"], ["klar"], ["iod"], ["klar", "gul", true]];
+        glas.forEach(function (x, i) {
+            var g = T.urglasGeo(100 + i * 196, 130, 170);
+            T.klinke(ctx, g.cx, g.bund, g.b, i === 0 ? 1 : 0);
+            var bobler = x[2] ? [{ x: 80, y: 28, r: 3, t: 0.3, liv: 0.6 }, { x: 130, y: 32, r: 2.5, t: 0.3, liv: 0.6 }, { x: 105, y: 24, r: 2, t: 0.3, liv: 0.6 }] : [];
+            T.urglas(ctx, g, { farve: D.FARVE[x[0]], bundfald: x[1] ? D.BUNDFALD[x[1]] : null, bundA: 1, bobler: bobler, fro: 11 + i });
+            T.skilt(ctx, g.cx, g.bund + g.b * 0.1 + 3, x[0], i === 0);
+        });
+        var c2 = document.getElementById("flaske").getContext("2d");
+        c2.fillStyle = "#2b2f37";
+        c2.fillRect(0, 0, 560, 220);
+        T.flaske(c2, 50, 60, 1.05, 0, "Na₂SO₃", 0);
+        var g2 = T.urglasGeo(230, 190, 150);
+        T.klinke(c2, g2.cx, g2.bund, g2.b, 0);
+        T.urglas(c2, g2, { farve: D.FARVE.violet, blob: { x: 100, y: 30, r: 40, farve: D.FARVE.klar, drej: 0.5 } });
+        T.flaske(c2, 222, 120, 1.05, Math.PI * 0.76, "Na₂SO₃", 0);
+        T.draabe(c2, 222, 140, 4.2, D.FARVE.vand);
+        var cx = 460, cy = 95, r = 70;
+        c2.save();
+        T.lupIndre(c2, cx, cy, r, T.rgba(D.FARVE.violet, 0.3));
+        c2.clip();
+        [[-44, -30], [-20, -30], [-44, 0], [-20, 0], [-32, 30]].forEach(function (p) {
+            T.partikel(c2, cx + p[0], cy + p[1], 8, D.PARTIKEL["SO3 2-"]);
+            T.elektron(c2, cx + p[0], cy + p[1] - 12, 2.3);
+            T.elektron(c2, cx + p[0], cy + p[1] + 12, 2.3);
+        });
+        [[30, -18], [30, 22]].forEach(function (p) {
+            T.partikel(c2, cx + p[0], cy + p[1], 8, D.PARTIKEL["MnO4 -"]);
+            for (var k = 0; k < 5; k++) {
+                var v = -Math.PI / 2 + 0.3 + k * Math.PI * 2 / 5;
+                T.plads(c2, cx + p[0] + Math.cos(v) * 12, cy + p[1] + Math.sin(v) * 12, 2.3);
+            }
+        });
+        c2.restore();
+        T.lupRamme(c2, cx, cy, r);
+    }, 500);
+</script>
+</body>
+</html>

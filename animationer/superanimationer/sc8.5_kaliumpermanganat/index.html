@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaliumpermanganat</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇅</span> Kaliumpermanganat</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-ug" role="tab" aria-selected="true"><span class="nr">1</span>Urglassene</button>
+        <button class="faneknap" data-fane="fane-fl" role="tab" aria-selected="false"><span class="nr">2</span>Flere reaktioner</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: URGLASSENE                                                 -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-ug" role="tabpanel" aria-label="Urglassene">
+    <div class="scene">
+        <canvas id="ug-laerred"></canvas>
+        <!-- Hæftet: skemaet, klammerne og rækkerne (js/haefte.js) -->
+        <div class="haefte" id="ug-haefte"></div>
+        <div class="anker" id="ug-anker-bord"></div>
+        <div class="anker" id="ug-anker-lup"></div>
+        <div class="anker" id="ug-anker-laerer"></div>
+        <button class="forfraknap" id="ug-forfra" type="button" title="Samme reaktion forfra (R)">Start forfra ↺</button>
+        <div class="kboble" id="ug-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="ug-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der ændrer sig: Giv hint -> Vis svaret -> Næste opgave -->
+        <div class="kort opgavekort" id="ug-kort">
+            <h2><span id="ug-titel">Opgave</span><span class="taeller">reaktion <b id="ug-nr">1</b>/<span id="ug-antal">3</span></span></h2>
+            <div id="ug-prompt"></div>
+            <div class="trinliste" id="ug-trin"></div>
+            <p class="besked" id="ug-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="ug-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort farvekort" id="ug-farvekortet">
+            <h2>Farvekortet <span class="taeller">mangan</span></h2>
+            <div id="ug-farvekort"></div>
+        </div>
+
+        <div class="kort" id="ug-opgaver">
+            <h2>Reaktionerne <span class="taeller">afstemt <b id="ug-loest">0</b>/3</span></h2>
+            <div class="opg-liste" id="ug-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FLERE REAKTIONER                                           -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fl" role="tabpanel" aria-label="Flere reaktioner">
+    <div class="scene">
+        <canvas id="fl-laerred"></canvas>
+        <div class="haefte" id="fl-haefte"></div>
+        <div class="anker" id="fl-anker-bord"></div>
+        <div class="anker" id="fl-anker-lup"></div>
+        <div class="anker" id="fl-anker-laerer"></div>
+        <button class="forfraknap" id="fl-forfra" type="button" title="Samme reaktion forfra (R)">Start forfra ↺</button>
+        <div class="kboble" id="fl-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="fl-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="fl-kort">
+            <h2><span id="fl-titel">Opgave</span><span class="taeller">reaktion <b id="fl-nr">1</b>/<span id="fl-antal">14</span></span></h2>
+            <div id="fl-prompt"></div>
+            <div class="trinliste" id="fl-trin"></div>
+            <p class="besked" id="fl-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fl-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort farvekort" id="fl-farvekortet">
+            <h2>Farvekortet <span class="taeller">mangan</span></h2>
+            <div id="fl-farvekort"></div>
+        </div>
+
+        <div class="kort" id="fl-opgaver">
+            <h2>Reaktionerne <span class="taeller">afstemt <b id="fl-loest">0</b>/14</span></h2>
+            <div class="opg-liste" id="fl-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (åbnes kun med knappen eller T)                            -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Afstemning med oxidationstal</h2>
+        <p>I en redoxreaktion stiger oxidationstallet for ét grundstof, og det falder for et andet. Den samlede stigning er lige så stor som det samlede fald, for de elektroner, der afgives, bliver optaget.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Skemaet skrevet i hånden</span>
+            1. Skriv oxidationstallet over de atomer, der skifter.<br>
+            2. Står grundstoffet ikke lige mange gange på begge sider, så sæt et tal foran.<br>
+            3. Tegn en klamme fra atomet før pilen til det samme atom efter pilen. Skriv stigningen ↑ eller faldet ↓ under pilen.<br>
+            4. Gang, så stigning gange tal er lige så meget som fald gange tal. Tallene kommer foran formlerne.<br>
+            5. Afstem ladningen med H⁺ (surt) eller OH⁻ (basisk).<br>
+            6. Afstem H med H₂O (hvert H₂O har 2 H), og tjek til sidst, at O passer.
+        </div>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            5 Fe²⁺ + MnO₄⁻ + 8 H⁺ ⟶ 5 Fe³⁺ + Mn²⁺ + 4 H₂O<br>
+            Fe: +II til +III, ↑1. Mn: +VII til +II, ↓5. Så 5 · 1 = 1 · 5.<br>
+            Ladning: +9 før pilen og +17 efter, så 8 H⁺ før pilen.
+        </div>
+        <p>Kaliumpermanganat, KMnO₄, er violet. Hvor langt mangan falder, afhænger af miljøet: i surt miljø til Mn²⁺, der er næsten farveløs, i neutralt miljø til brunsten, MnO₂, og i stærkt basisk miljø først til grønt manganat, MnO₄²⁻, og med mere at reagere med videre til brunsten.</p>
+        <p>K⁺ og Na⁺ skrives ikke med i skemaerne. De er med i opløsningen, men de reagerer ikke.</p>
+        <p>Oxidationstal skrives med romertal og fortegn: +VII, −II og 0. Du kan også skrive +7 og −2.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>K</kbd> Kemichael &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> vend pilen &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ================================================================= -->
+<!-- KEMICHAELS FORKLARING bag knappen Læs mere (js/forklaring.js)      -->
+<!-- ================================================================= -->
+<div class="overlay" id="forklaring">
+    <div class="overlay-boks forklaring-boks">
+        <div class="fx-top">
+            <span class="fx-afsender">Kemichaels forklaring</span>
+            <button class="rundvisning-luk" type="button" data-luk aria-label="Luk forklaringen">✕</button>
+        </div>
+        <h2 id="fx-titel"></h2>
+        <p class="fx-skema" id="fx-skema"></p>
+        <div class="fx-kortene" id="fx-indhold"></div>
+        <div class="knapper" style="margin-top:16px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen på den aktive fane             -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/redox.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/haefte.js"></script>
+<script src="js/bord.js"></script>
+<script src="js/forklaring.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

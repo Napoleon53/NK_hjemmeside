@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc6.6 Byg et fedtstof</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at smeltepunkterne passer med tabelværdierne,
+   og at modellen falder, jo flere knæk der er, at kæderne har de
+   rigtige vinkler, at hver ordre kan løses, at de rigtige fedtstoffer
+   er faste og flydende de rigtige steder, at zoomvinduets molekyler
+   holder sig inde og har den rigtige faste andel, at begge faner kan
+   gennemføres (også med musen), at påskeægget virker, at sproget
+   overholder reglerne, og at layoutet holder fra 520 × 380 til
+   1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc6.6-fabrik", "nk-sc6.6-koele", "nk-sc6.6-intro-fabrik", "nk-sc6.6-intro-koele", "nk-kemichael"];
+var gemt = {};
+try { NOEGLER.forEach(function (n) { gemt[n] = localStorage.getItem(n); localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+
+var ramme = document.getElementById("ramme");
+ramme.addEventListener("load", function () { setTimeout(koer, 1500); });
+ramme.src = "index.html";
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) localStorage.removeItem(n); else localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    function tik(sim, sek) {
+        var n = Math.round(sek * 60);
+        for (var i = 0; i < n; i++) { sim.tilpas(); sim.opdater(1 / 60); }
+        sim.tegn();
+    }
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function mus(sim, type, x, y) {
+        var r = sim.L.canvas.getBoundingClientRect();
+        var e = new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 1, bubbles: true, isPrimary: true, button: 0 });
+        sim.L.canvas.dispatchEvent(e);
+    }
+    function traek(sim, x0, y0, x1, y1) {
+        mus(sim, "pointerdown", x0, y0);
+        for (var i = 1; i <= 8; i++) mus(sim, "pointermove", x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * i / 8);
+        mus(sim, "pointerup", x1, y1);
+    }
+    function vises(el) { return !!el && W.getComputedStyle(el).display !== "none" && !el.closest("[hidden]"); }
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, F = NK.Fedt;
+    paastand("data.js og fedt.js er kørt", !!(D && D.SYRER && F && NK.Proeve));
+    paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-fabrik"] && NK.sims["fane-koele"]));
+    var sprites = ["koeleskab", "vindue", "glas", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var A = NK.sims["fane-fabrik"], B = NK.sims["fane-koele"];
+    paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
+
+    overskrift("2. Smeltepunkterne");
+    paastand("tristearin 73 °C", F.smp(["S", "S", "S"]) === 73);
+    paastand("triolein 5 °C", F.smp(["O", "O", "O"]) === 5);
+    paastand("trilinolein −13 °C", F.smp(["L", "L", "L"]) === -13);
+    paastand("trilinolenin −24 °C", F.smp(["Ln", "Ln", "Ln"]) === -24);
+    paastand("SOS 43 °C (samme som SSO, rækkefølgen tæller ikke)", F.smp(["S", "O", "S"]) === 43 && F.smp(["S", "S", "O"]) === 43);
+    var alle = F.alle();
+    paastand("der er 20 fedtstoffer", alle.length === 20);
+    var maalt = alle.filter(function (k) { return F.smpMaalt(k); });
+    paastand("fem smeltepunkter er målte, resten står med ca.", maalt.length === 5 && /^ca\. /.test(F.smpTekst(["S", "O", "O"])) && !/ca/.test(F.smpTekst(["S", "S", "S"])));
+    /* Et knaek mere giver aldrig et hoejere smeltepunkt */
+    var raekke = ["S", "O", "L", "Ln"], brud = [];
+    alle.forEach(function (k) {
+        k.forEach(function (id, i) {
+            var n = raekke.indexOf(id);
+            if (n >= 3) return;
+            var k2 = k.slice(); k2[i] = raekke[n + 1];
+            if (F.smpRaa(k2) > F.smpRaa(k) + 1e-9) brud.push(k.join("") + "→" + k2.join(""));
+        });
+    });
+    paastand("flere knæk giver lavere smeltepunkt", brud.length === 0, brud.slice(0, 4).join(", "));
+    paastand("alle smeltepunkter ligger mellem −24 og 73 °C", alle.every(function (k) { var t = F.smp(k); return t >= -24 && t <= 73; }));
+
+    overskrift("3. Kæderne");
+    D.SYRER.forEach(function (s) {
+        var k = F.kaede(s.id, 1), p = k.pkt;
+        var laengder = true, vinkler = true;
+        for (var i = 1; i < p.length; i++) {
+            var l = Math.hypot(p[i].x - p[i - 1].x, p[i].y - p[i - 1].y);
+            if (Math.abs(l - 1) > 1e-9) laengder = false;
+        }
+        for (i = 1; i < p.length - 1; i++) {
+            var ax = p[i - 1].x - p[i].x, ay = p[i - 1].y - p[i].y, bx = p[i + 1].x - p[i].x, by = p[i + 1].y - p[i].y;
+            var v = Math.acos((ax * bx + ay * by)) * 180 / Math.PI;
+            var cis = s.cis.indexOf(i + 1) >= 0 || s.cis.indexOf(i) >= 0;
+            if (Math.abs(v - (cis ? 135 : 120)) > 0.01) vinkler = false;
+        }
+        /* Boejningen: retningen af de sidste to bindinger mod de foerste to */
+        function midt(a, b, c) { return Math.atan2(c.y - a.y, c.x - a.x); }
+        var boej = (midt(p[15], p[16], p[17]) - midt(p[0], p[1], p[2])) * 180 / Math.PI;
+        var ventet = 30 * s.db;
+        paastand(s.navn + ": 18 C-atomer, alle bindinger lige lange", p.length === 18 && laengder);
+        paastand(s.navn + ": 120° og 135° ved cis-dobbeltbindingerne", vinkler);
+        paastand(s.navn + ": " + s.db + " dobbeltbinding(er) og kæden bøjer " + ventet + "°", k.dobbelt.length === s.db && Math.abs(boej - ventet) < 1.5, boej.toFixed(1));
+    });
+
+    overskrift("4. Ordrerne");
+    D.ORDRER.forEach(function (o) {
+        var ok = alle.filter(function (k) { return F.tjekOrdre(o, k).ok; });
+        paastand(o.kunde + ": kan løses (" + ok.length + " måder), og svaret løser den", ok.length >= 1 && F.tjekOrdre(o, o.svar).ok);
+    });
+    var galt = F.tjekOrdre(D.ORDRER[1], ["S", "S", "S"]);
+    paastand("for hårdt fedt til salatbaren giver \"haard\"", !galt.ok && galt.galt === "haard");
+    galt = F.tjekOrdre(D.ORDRER[0], ["O", "O", "O"]);
+    paastand("for blødt fedt til fuglehuset giver \"bloed\"", !galt.ok && galt.galt === "bloed");
+
+    overskrift("5. De rigtige fedtstoffer");
+    var ventet = {
+        smoer: ["fast", "fast", "delvist", "flydende"], kakao: ["fast", "fast", "fast", "flydende"],
+        oliven: ["fast", "delvist", "flydende", "flydende"], solsikke: ["delvist", "flydende", "flydende", "flydende"],
+        hoerfroe: ["flydende", "flydende", "flydende", "flydende"]
+    };
+    D.FEDT.forEach(function (f) {
+        var sum = f.andel.S + f.andel.O + f.andel.L + f.andel.Ln;
+        var t = D.STEDER.map(function (st) { return F.tilstand(f, st.T); });
+        paastand(f.navn + ": fedtsyrerne giver 100 %, og " + t.join(", "), Math.abs(sum - 100) < 0.01 && t.join() === ventet[f.id].join(), t.join());
+    });
+    D.KOELE_OPGAVER.forEach(function (o) {
+        var t = F.tilstand(D.fedt(o.fedt), D.sted(o.sted).T);
+        paastand("opgaven " + o.fedt + " " + D.sted(o.sted).i + " har svaret " + o.svar, t === o.svar, t);
+    });
+
+    overskrift("6. Zoomvinduet");
+    var udenfor = [], andel = [], nan = [], orden = [];
+    D.FEDT.concat([{ id: "dit", kaeder: ["S", "O", "Ln"] }, { id: "dit2", kaeder: ["O", "O", "O"] }]).forEach(function (f) {
+        D.STEDER.forEach(function (st) {
+            var p = new NK.Proeve(f, st.T, 10);
+            for (var i = 0; i < 600; i++) p.opdater(1 / 60);
+            var faste = p.mol.filter(function (m) { return m.fast; });
+            var fa = F.fastAndel(f, st.T);
+            var forventet = f.kaeder ? (fa >= 100 ? 10 : (fa > 0 ? 5 : 0)) : Math.round(fa / 100 * 10);
+            if (faste.length !== forventet) andel.push(f.id + " " + st.id + " " + faste.length + "/" + forventet);
+            p.mol.forEach(function (m) {
+                if (!isFinite(m.x) || !isFinite(m.y) || !isFinite(m.a)) nan.push(f.id);
+                var y = NK.Proeve.yderst(m);
+                if (!m.fast && (y.x0 < -0.3 || y.x1 > p.W + 0.3 || y.y0 < -0.3 || y.y1 > p.H + 0.3)) udenfor.push(f.id + " " + st.id);
+            });
+            /* De faste er dem med det hoejeste smeltepunkt */
+            var min = Math.min.apply(null, faste.map(function (m) { return m.smp; }).concat([Infinity]));
+            if (p.mol.some(function (m) { return !m.fast && m.smp > min + 1e-9; })) orden.push(f.id + " " + st.id);
+        });
+    });
+    paastand("antallet af faste molekyler passer med den faste andel", andel.length === 0, andel.slice(0, 4).join("; "));
+    paastand("de faste er dem med det højeste smeltepunkt", orden.length === 0, orden.slice(0, 3).join("; "));
+    paastand("ingen molekyler får ugyldige tal", nan.length === 0);
+    paastand("de flydende bliver inde i vinduet", udenfor.length === 0, udenfor.slice(0, 4).join("; "));
+
+    overskrift("7. Fane 1: Fabrikken");
+    klik('[data-fane="fane-fabrik"]');
+    tik(A, 0.5);
+    var tilbudA = d.getElementById("fabrik-tilbud");
+    paastand("tilbuddet om præsentationen står der første gang", vises(tilbudA));
+    klik("#fabrik-tilbud .tilbud-nej");
+    paastand("Nej tak fjerner knapperne", !vises(tilbudA));
+    var lay = A.lay, fl = lay.fliser;
+    /* Klik paa en flise: den foerste ledige plads */
+    mus(A, "pointerdown", fl[0].x + fl[0].b / 2, fl[0].y + fl[0].h / 2);
+    mus(A, "pointerup", fl[0].x + fl[0].b / 2, fl[0].y + fl[0].h / 2);
+    tik(A, 0.6);
+    var vand = A.vande.filter(function (v) { return !v.ind; }).length;
+    tik(A, 1.2);
+    paastand("et klik på stearinsyre sætter den på den første OH-gruppe", A.slots[0].syre === "S" && A.slots[0].t >= 1);
+    paastand("bindingen danner et vandmolekyle", vand === 1);
+    /* Traek oliesyre hen paa plads 2 */
+    var geo = A.geo();
+    traek(A, fl[1].x + fl[1].b / 2, fl[1].y + fl[1].h / 2, geo.slot[1].C1.x + 2.2 * A.b, geo.slot[1].y);
+    tik(A, 1.2);
+    paastand("oliesyre kan trækkes hen på den midterste OH-gruppe", A.slots[1].syre === "O");
+    /* Traek linolensyre hen paa plads 1 (optaget): de bytter */
+    geo = A.geo();
+    traek(A, fl[3].x + fl[3].b / 2, fl[3].y + fl[3].h / 2, geo.slot[0].C1.x + 2.2 * A.b, geo.slot[0].y);
+    tik(A, 1.2);
+    paastand("en fedtsyre sluppet på en optaget plads bytter den ud", A.slots[0].syre === "Ln" && A.slots[1].syre === "O");
+    /* Klik paa kaeden: den gaar af */
+    geo = A.geo();
+    var pk = A.syrePunkter("O", A.slots[1].fortegn, geo.slot[1].C1.x, geo.slot[1].C1.y);
+    mus(A, "pointerdown", pk[8].x, pk[8].y);
+    mus(A, "pointerup", pk[8].x, pk[8].y);
+    tik(A, 1);
+    paastand("et klik på en kæde tager den af igen", A.slots[1].syre === null && /Vand spaltede/.test(A.el.besked.textContent));
+    /* Forkert vare */
+    A.nyOrdre(); tik(A, 1);
+    ["O", "O", "O"].forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
+    tik(A, 1.5);
+    paastand("triolein til fuglehuset afvises med et råd", !A.loest && A.el.besked.className.indexOf("skidt") >= 0 && /rette kæder/.test(A.el.besked.textContent));
+    paastand("panelet viser smeltepunktet og de fire steder", /5 °C/.test(d.getElementById("fabrik-fedt").textContent) && d.querySelectorAll("#fabrik-fedt .stedlinje").length === 4);
+    /* Knappen: hint, svaret */
+    A.knap();
+    paastand("knappen giver først et hint", /Hint/.test(A.el.besked.textContent) && A.el.knap.textContent === "Vis svaret");
+    A.knap(); tik(A, 4);
+    paastand("Vis svaret bygger tristearin og leverer ordren", A.loest && A.kaeder() && A.kaeder().join() === "S,S,S" && A.el.knap.textContent === "Næste ordre");
+    paastand("NK.ditFedt er det byggede fedt", NK.ditFedt && NK.ditFedt.join() === "S,S,S");
+    /* Resten af ordrerne */
+    var leveret = 1;
+    for (var n = 1; n < D.ORDRER.length; n++) {
+        A.knap(); tik(A, 1.2);
+        var o = A.ordre();
+        o.svar.forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
+        tik(A, 1.5);
+        if (A.loest) leveret++;
+    }
+    paastand("alle fem ordrer kan leveres", leveret === 5 && A.leveret.length === 5, leveret);
+    tik(A, 1.5);
+    paastand("Kemichael kommer med ros efter fem ordrer", A.laerer && A.laerer.scene && A.laerer.scene.navn === "faerdig");
+    A.knap();
+    paastand("så er det fri leg, og knappen går videre", A.frileg && A.el.knap.textContent === "Til køleskabet");
+    tik(A, 8);
+    A.knap();
+    paastand("knappen i fri leg åbner køleskabet", d.getElementById("fane-koele").classList.contains("aktiv"));
+    klik('[data-fane="fane-fabrik"]');
+    A.nulstil();
+    paastand("R starter ordrerne forfra", !A.frileg && A.leveret.length === 0 && A.ordreNr === 0);
+    for (n = 0; n < D.ORDRER.length; n++) {
+        A.ordre().svar.forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
+        tik(A, 1.5);
+        A.knap(); tik(A, 1.2);
+    }
+    tik(A, 1.5);
+    paastand("anden gang roser Kemichael ikke igen", A.leveret.length === 5 && !(A.laerer.scene && A.laerer.scene.navn === "faerdig"));
+    A.saetPaa(0, "S", { x: 100, y: 100 }); tik(A, 1.2);
+    klik("#fabrik-forfra"); tik(A, 1);
+    paastand("Start forfra giver ordre 1, ingen leveret og en tom glycerol", !A.frileg && A.leveret.length === 0 && A.ordreNr === 0 &&
+        A.slots.every(function (s) { return !s.syre; }) && A.el.knap.textContent === "Giv hint");
+
+    overskrift("8. Fane 2: Køleskabet");
+    klik('[data-fane="fane-koele"]');
+    tik(B, 0.3);
+    var tilbudB = d.getElementById("koele-tilbud");
+    paastand("tilbuddet står der første gang", vises(tilbudB));
+    klik("#koele-tilbud .tilbud-nej");
+    paastand("Nej tak fjerner knapperne", !vises(tilbudB));
+    var dit = B.glasMedId("dit");
+    paastand("glasset med dit fedtstof har fedtet fra fane 1", !dit.fedt.tom && dit.fedt.kaeder.join() === NK.ditFedt.join());
+    paastand("første opgave er smør i køleskabet", B.opgave().fedt === "smoer" && B.opgave().sted === "koele" && B.trin === "gaet");
+    /* Traek smoerret ind i koeleskabet med musen */
+    var smoer = B.glasMedId("smoer"), Gs = B.glasMaal(smoer), Z = B.lay.zoner.koele;
+    traek(B, Gs.x, Gs.bund - Gs.h * 0.4, Z.x + Z.b / 2, Z.y + Z.h * 0.6);
+    tik(B, 2);
+    paastand("smørret kan trækkes ind i køleskabet", smoer.sted === "koele");
+    paastand("så viser opgaven svaret: fast", B.trin === "set" && /fast/.test(B.el.besked.textContent));
+    paastand("zoomvinduet viser smørret", B.valgt === smoer && smoer.proeve.T === 5);
+    B.knap();
+    /* De naeste opgaver med et gaet */
+    var rigtige = 0;
+    for (n = 1; n < D.KOELE_OPGAVER.length; n++) {
+        var og = B.opgave();
+        B.gaet(n === 2 ? "fast" : og.svar);
+        tik(B, 1.5);
+        var gl = B.glasMedId(og.fedt);
+        if (gl.sted === og.sted && B.trin === "set") rigtige++;
+        if (n === 2) paastand("et forkert gæt giver svaret og forklaringen", B.el.besked.className.indexOf("skidt") >= 0 && /Du gættede fast/.test(B.el.besked.textContent));
+        B.knap();
+    }
+    paastand("alle seks opgaver flytter glasset og viser svaret", rigtige === D.KOELE_OPGAVER.length - 1, rigtige);
+    paastand("til sidst: hvorfor?", B.trin === "hvorfor" && d.querySelectorAll("#koele-valg button").length === 4);
+    B.svarHvorfor(1);
+    paastand("et forkert svar på hvorfor bliver gråt og forklares", d.querySelectorAll("#koele-valg button:disabled").length === 1 && /plante/.test(B.el.besked.textContent));
+    B.svarHvorfor(0);
+    tik(B, 1.2);
+    paastand("det rigtige svar afslutter fanen, og Kemichael roser", B.trin === "faerdig" && B.laerer.scene && B.laerer.scene.navn === "faerdig");
+    paastand("så går knappen videre til fabrikken", B.el.knap.textContent === "Byg dit eget fedt");
+    tik(B, 8);
+    B.nulstil(); tik(B, 0.5);
+    B.opgNr = D.KOELE_OPGAVER.length; B.nyOpgave();
+    B.svarHvorfor(0); tik(B, 1.2);
+    paastand("anden gang roser Kemichael ikke igen", B.trin === "faerdig" && !(B.laerer.scene && B.laerer.scene.navn === "faerdig"));
+    /* Fuldt sted: glassene bytter */
+    B.nulstil(); tik(B, 1);
+    B.flyt(B.glasMedId("oliven"), "fryser"); B.flyt(B.glasMedId("solsikke"), "fryser");
+    B.flyt(B.glasMedId("kakao"), "fryser");
+    var iFryser = B.glas.filter(function (g) { return g.sted === "fryser"; }).map(function (g) { return g.id; });
+    paastand("et fuldt sted bytter glas i stedet for at stable dem", iFryser.length === 2 && iFryser.indexOf("kakao") >= 0, iFryser.join());
+    /* Vis svaret flytter glasset */
+    B.nulstil(); tik(B, 1);
+    B.knap(); B.knap(); tik(B, 1.5);
+    paastand("Vis svaret sætter smørret i køleskabet", B.glasMedId("smoer").sted === "koele" && B.trin === "set");
+    /* Paaskeaegget */
+    B.nulstil(); tik(B, 1);
+    smoer = B.glasMedId("smoer");
+    B.flyt(smoer, "sol");
+    tik(B, D.HARSK_TID + 0.5);
+    paastand("smør i solen i " + D.HARSK_TID + " s bliver harskt", smoer.harsk && smoer.proeve.mol.some(function (m) { return m.kaeder[0] === "C4"; }));
+    paastand("Kemichael kommer", B.laerer.scene && B.laerer.scene.navn === "harsk");
+    tik(B, 14);
+    paastand("han sætter nyt smør på bordet", !smoer.harsk && smoer.sted === "bord");
+
+    overskrift("9. Sproget");
+    var krop = d.body.innerText;
+    var replikker = [].concat(D.INTRO_FABRIK, D.INTRO_KOELE, [D.ORDRER_FAERDIG, D.KOELE_FAERDIG, D.HARSK, D.NYT_SMOER], D.HARSK_IGEN);
+    var tekster = replikker.concat(
+        D.ORDRER.map(function (o) { return o.kunde + " " + o.tekst + " " + o.hint; }),
+        D.KOELE_OPGAVER.map(function (o) { return o.hint + " " + o.efter; }),
+        D.KOELE_HVORFOR.valg.map(function (v) { return v.t + " " + v.svar; }), [D.KOELE_HVORFOR.spm, D.KOELE_HVORFOR.hint]);
+    var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
+    paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
+    paastand("ingen 1+ eller 1− på siden", !/1[+−-](?!\d)/.test(krop.replace(/\d+[+−-]\d/g, "")));
+    var lange = replikker.filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("hver præsentation har to eller tre replikker", [D.INTRO_FABRIK, D.INTRO_KOELE].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    var tur = ["#fabrik-anker-fliser", "#fabrik-anker-glycerol", "#fabrik-kort", "#fabrik-fedt-kort", "#fabrik-anker-glas", "#fabrik-forfra",
+        "#koele-anker-bord", "#koele-anker-skab", "#koele-anker-vindue", "#koele-anker-zoom", "#koele-kort", "#koele-dekl-kort"];
+    paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
+
+    overskrift("10. Layoutet");
+    A.nyOrdre();
+    ["S", "L", "Ln"].forEach(function (id, i) { A.saetPaa(i, id, { x: 100, y: 100 }); });
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-fabrik", "fane-koele"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            tik(sim, 1.5);
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H;
+            function indeR(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            if (id === "fane-fabrik") {
+                lay.fliser.forEach(function (f, k) { indeR(f, "flise " + k); });
+                var G = lay.glas, gr = { x: G.venstre, y: G.top, b: G.b, h: G.h };
+                indeR(gr, "glasset");
+                /* Molekylet: alle punkter inde og over bordet */
+                var g2 = sim.geo(), x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+                sim.slots.forEach(function (s, i) {
+                    var sl = g2.slot[i];
+                    var pkt = s.syre ? sim.syrePunkter(s.syre, s.fortegn, sl.C1.x, sl.C1.y) : [sl.H];
+                    pkt.concat([sl.lbl]).forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+                });
+                var mr = { x: x0 - 20, y: y0 - 10, b: x1 - x0 + 30, h: y1 - y0 + 20 };
+                indeR(mr, "molekylet");
+                if (mr.y + mr.h > lay.bordY + 2) problemer.push(id + ": molekylet går ned i bordet");
+                over(mr, gr, "molekylet over glasset");
+                if (g2.px < 12) problemer.push(id + ": atomerne er skrevet med " + g2.px.toFixed(1) + " px");
+            } else {
+                var K = lay.K, V = lay.V, z = lay.zoom;
+                indeR({ x: K.x, y: K.top, b: K.b, h: K.h }, "køleskabet");
+                indeR({ x: V.x, y: V.top, b: V.b, h: V.h }, "vinduet");
+                indeR(z, "zoomvinduet");
+                over(z, { x: K.x, y: K.top, b: K.b, h: K.h }, "zoomvinduet over køleskabet");
+                over(z, { x: V.x, y: V.top, b: V.b, h: V.h }, "zoomvinduet over vinduet");
+                over(z, { x: K.x + K.b, y: lay.bordY - lay.gh, b: Wc, h: lay.gh }, "zoomvinduet over glassene på bordet");
+                if (z.b < 150) problemer.push(id + ": zoomvinduet er kun " + z.b + " px bredt");
+                Object.keys(lay.pladser).forEach(function (sid) {
+                    lay.pladser[sid].forEach(function (p) {
+                        var G2 = NK.Tegn.glasMaal(p.x, p.y, lay.gh);
+                        indeR({ x: G2.venstre, y: G2.top, b: G2.b, h: G2.h }, "et glas " + sid);
+                    });
+                });
+                var rum = K.koeleGulv - K.koeleTop;
+                if (lay.gh > rum - 30) problemer.push(id + ": glassene er for høje til køleskabet");
+            }
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-fabrik"]');
+}
+</script>
+</body>
+</html>

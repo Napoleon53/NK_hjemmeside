@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc3.3 Polære molekyler</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.36; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at grænserne for upolær, polær og ionbinding
+   giver de rigtige svar for alle par på fane 1, og at et metal kun kan
+   sættes sammen med N, O, F og Cl; at elektronparret glider mod det
+   atom, der trækker hårdest; at molekylerne på fane 2 har lærebogens
+   polaritet; at vandstrålen bøjer mest for vand, mindre for ethanol og
+   ikke for heptan; at alle opgaver kan løses; at tilbuddet om
+   Kemichaels præsentation virker; og at teksterne overholder sitets
+   regler.
+
+   Chrome kigger kun ind i en iframe på file://, hvis den startes med
+   --allow-file-access-from-files. Ellers: brug en lokal server eller
+   Firefox.
+   ===================================================================== */
+var linjer = [], fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    try { koerTest(); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    skriv("\n" + (antal - fejl) + " af " + antal + " påstande holder." + (fejl ? " " + fejl + " FEJL" : " ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var W = ramme.contentWindow;
+    var NK = W.NK;
+
+    overskrift("1. Indlæsning");
+    paastand("NK og de tre faner findes", !!(NK && NK.sims && NK.sims["fane-en"] && NK.sims["fane-polaritet"] && NK.sims["fane-vand"]) && d.querySelectorAll(".faneknap").length === 3);
+    if (!NK || !NK.sims) return;
+    var D = NK.Data;
+    var mangler = Object.keys(NK.Sprites.FILER).filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + Object.keys(NK.Sprites.FILER).length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    paastand("Kemichael er hentet", !!(NK.Kemichael && NK.laerer));
+    if (NK.Kemichael && NK.Kemichael.baggrundsliv) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("2. Bindingerne på fane 1");
+    paastand("C-N er præcis 0,5 og polær, C-H 0,4 og upolær", D.dEN("C", "N") === 0.5 && D.bindingstype("C", "N") === "polaer" && D.dEN("C", "H") === 0.4 && D.bindingstype("C", "H") === "upolaer");
+    paastand("Li-Cl er præcis 2,0 og en ionbinding, H-F 1,9 og polær", D.dEN("Li", "Cl") === 2 && D.bindingstype("Li", "Cl") === "ion" && D.bindingstype("H", "F") === "polaer");
+    paastand("Na og H, Na og C og Na og K kan ikke sættes sammen", typeof D.tilladt("Na", "H") === "string" && typeof D.tilladt("C", "Na") === "string" && typeof D.tilladt("Na", "K") === "string");
+    var par = D.par();
+    var metalFejl = par.filter(function (p) {
+        var metal = !!(D.GRUNDSTOFFER[p[0]].metal || D.GRUNDSTOFFER[p[1]].metal);
+        return metal !== (D.bindingstype(p[0], p[1]) === "ion");
+    });
+    paastand("alle " + par.length + " par: ionbinding netop når et metal er med", metalFejl.length === 0, metalFejl.map(function (p) { return p.join("-"); }).join(", "));
+    var typer = {};
+    par.forEach(function (p) { var t = D.bindingstype(p[0], p[1]); typer[t] = (typer[t] || 0) + 1; });
+    skriv("        upolære " + typers(typer, "upolaer") + ", polære " + typers(typer, "polaer") + ", ionbindinger " + typers(typer, "ion"), "note");
+    function typers(t, k) { return t[k] || 0; }
+    paastand("der er par af alle tre slags", typer.upolaer >= 2 && typer.polaer >= 5 && typer.ion >= 5);
+
+    var en = NK.sims["fane-en"];
+    NK.visFane("fane-en");
+    function koer1(n) { for (var i = 0; i < (n || 120); i++) en.opdater(1 / 60); en.tegn(); }
+    function parTil(a, b) { en.saetPar(a, b); koer1(); }
+
+    parTil("H", "Cl");
+    var g = en.geo, px = en.parPlads(g);
+    paastand("H-Cl: parret ligger tættest på Cl og er glidet mod det", en.vist.skift > 0.4 && Math.abs(px - g.x[1]) < Math.abs(px - g.x[0]));
+    paastand("panelet regner ΔEN = 3,0 − 2,1 = 0,9 og siger polær", d.getElementById("en-regning").textContent === "3,0 − 2,1 = 0,9" && d.getElementById("en-type").textContent === "polær");
+    parTil("Cl", "Cl");
+    paastand("Cl-Cl: parret ligger i midten, og bindingen er upolær", Math.abs(en.vist.skift) < 0.01 && d.getElementById("en-type").textContent === "upolær");
+    parTil("F", "Na");
+    paastand("F-Na: F tager parret helt, og atomerne skilles som ioner", en.vist.skift < -0.98 && en.vist.adskil > 0.98 && d.getElementById("en-type").textContent === "ionbinding");
+    parTil("H", "F");
+    var hf = en.vist.skift;
+    parTil("H", "N");
+    paastand("parret glider længere i H-F end i H-N", hf > en.vist.skift && en.vist.skift > 0);
+    paastand("billedteksten siger, hvem der trækker hårdest", /^N trækker hårdest/.test(en.billedtekst()), en.billedtekst());
+
+    en.slot = 0;
+    parTil("H", "Cl");
+    en.vaelg("O");
+    paastand("et klik i tabellen skifter atomet med ringen ud, og ringen hopper", en.par[0] === "O" && en.par[1] === "Cl" && en.slot === 1);
+    en.saetPar("H", "Cl");
+    en.slot = 0;
+    en.opdaterTabel();
+    var naFelt = d.querySelector('.pt-felt[data-el="Na"]');
+    var foer = naFelt.classList.contains("spaerret");
+    en.slot = 1;
+    en.opdaterTabel();
+    paastand("metallerne er dæmpet, når ringen står over for H, men kan stadig klikkes",
+        !foer && naFelt.classList.contains("spaerret") && !naFelt.disabled && !d.querySelector('.pt-felt[data-el="O"]').classList.contains("spaerret"));
+    naFelt.click();
+    paastand("natrium kan ikke sættes på hydrogen, og scenen siger hvorfor", en.par[0] === "H" && en.par[1] === "Cl" && en.slot === 1 && /Natrium og hydrogen/.test(d.getElementById("en-besked").textContent));
+    en.slot = 0;
+    en.opdaterTabel();
+    d.querySelector(".pt-felt.tom").click();
+    paastand("et tomt felt svarer på klik", /er ikke med her/.test(d.getElementById("en-besked").textContent));
+    paastand("tabellen har 9 atomer, 13 tomme felter og hul i første periode", d.querySelectorAll(".pt-felt[data-el]").length === 9 && d.querySelectorAll(".pt-felt.tom").length === 13 && d.querySelectorAll(".pt-hul").length === 6);
+
+    overskrift("3. Molekylerne på fane 2");
+    var POLAER = { H2O: true, NH3: true, CH4: false, CO2: false, HCN: true, CH2O: true, C2H4: false, C2H2: false, CCl4: false, CH3Cl: true, HCl: true };
+    var polFejl = D.MOLEKYLER.filter(function (m) { return m.polaer !== POLAER[m.id]; }).map(function (m) { return m.id; });
+    paastand("alle " + D.MOLEKYLER.length + " molekyler har lærebogens polaritet", polFejl.length === 0 && D.MOLEKYLER.length === 11, polFejl.join(", "));
+    var oktetFejl = D.MOLEKYLER.filter(function (mol) {
+        return !mol.atomer.every(function (a, i) {
+            var sum = mol.naboer[i].reduce(function (s, n) { return s + n.orden; }, 0);
+            return 2 * sum + 2 * mol.frieAntal[i] === (a.el === "H" ? 2 : 8);
+        });
+    }).map(function (m) { return m.id; });
+    paastand("alle molekyler opfylder oktetreglen", oktetFejl.length === 0, oktetFejl.join(", "));
+
+    overskrift("4. Opgaverne kan løses");
+    function loestOpgave(sim, o, loes) {
+        sim.opgaver.startOpgave(o);
+        loes(o);
+        sim.opdater(1 / 60);
+        return o.afsluttet && d.getElementById(sim.opgaver.id("knap")).textContent === "Ny opgave";
+    }
+
+    NK.visFane("fane-en");
+    var ENTYPER = ["δ− ved klik", "upolær, polær eller ion", "byg selv", "mest polær"];
+    en.OPGAVER.forEach(function (lav, i) {
+        var alleOk = true, note = "";
+        for (var gang = 0; gang < 10; gang++) {
+            var o = lav(en);
+            var ok = loestOpgave(en, o, function (o) {
+                if (i === 0) {
+                    var forkert = en.par[0] === D.staerkest(en.par[0], en.par[1]) ? 1 : 0;
+                    var svar = en.opgaver.klik(forkert);
+                    var besked = d.getElementById("en-opg-svar").textContent;
+                    if (!svar || !/mindste/.test(besked) || o.afsluttet) { alleOk = false; note = "forkert klik: " + besked; }
+                    en.opgaver.klik(1 - forkert);
+                } else if (i === 1) {
+                    var t = D.bindingstype(en.par[0], en.par[1]);
+                    en.opdater(1 / 60);
+                    if (o.valg[o.rigtig] !== D.TYPER[t].knap || d.getElementById("en-type").textContent !== "?" || !/= \?$/.test(d.getElementById("en-regning").textContent)) { alleOk = false; note = o.tekst; }
+                    en.opgaver.vaelg(o.rigtig);
+                } else if (i === 2) {
+                    var b = en.sidsteByg;
+                    en.opgaver.opdater();
+                    if (d.getElementById("en-opg-svar").textContent) { alleOk = false; note = "besked før første klik: " + o.tekst; }
+                    var forkertPar = D.par().filter(function (p) { return !b.ok(p[0], p[1]); })[0];
+                    en.saetPar(forkertPar[0], forkertPar[1]);
+                    en.opgaver.opdater();
+                    if (!d.getElementById("en-opg-svar").textContent) { alleOk = false; note = "ingen besked ved " + forkertPar.join("-") + ": " + o.tekst; }
+                    if (!b.ok(b.eksempel[0], b.eksempel[1])) { alleOk = false; note = "eksemplet passer ikke: " + o.tekst; }
+                    en.saetPar(b.eksempel[0], b.eksempel[1]);
+                } else {
+                    var bedst = o.valg[o.rigtig].split("-");
+                    var maks = Math.max.apply(null, o.valg.map(function (v) { var p = v.split("-"); return D.dEN(p[0], p[1]); }));
+                    if (D.dEN(bedst[0], bedst[1]) !== maks || o.valg.length !== 4) { alleOk = false; note = o.valg.join(", "); }
+                    en.opgaver.vaelg(o.rigtig);
+                }
+            });
+            ok = ok && !en.fastPar && !en.skjul.skift;
+            if (!ok) { alleOk = false; note = note || o.tekst; break; }
+        }
+        paastand("elektronegativitet, opgavetype " + (i + 1) + " (" + ENTYPER[i] + ", 10 tilfældige)", alleOk, note);
+    });
+    paastand("alle fem byg-opgaver har et eksempel, der passer", en.BYG.every(function (b) { return b.ok(b.eksempel[0], b.eksempel[1]) && D.tilladt(b.eksempel[0], b.eksempel[1]) === true; }));
+
+    var pol = NK.sims["fane-polaritet"];
+    NK.visFane("fane-polaritet");
+    pol.OPGAVER.forEach(function (lav, i) {
+        var alleOk = true, note = "";
+        for (var gang = 0; gang < 10; gang++) {
+            var o = lav(pol);
+            var mol = D.molekyle(o.mol);
+            var ok = loestOpgave(pol, o, function (o) {
+                if (o.valg) { pol.opgaver.vaelg(o.rigtig); return; }
+                pol.opgaver.klik(mol.delta.indexOf(-1));
+            });
+            ok = ok && !pol.menuLaast() && pol.molId() === o.mol;
+            if (!ok) { alleOk = false; note = o.mol + ": " + o.tekst; break; }
+        }
+        paastand("polær eller upolær, opgavetype " + (i + 1) + " (10 tilfældige)", alleOk, note);
+    });
+
+    overskrift("5. Fane 3: vandstrålen");
+    var vand = NK.sims["fane-vand"];
+    NK.visFane("fane-vand");
+    var GRAD16 = 16 * Math.PI / 180;
+    var TV = NK.VandTegning;
+    var naesteTekster = [];
+
+    /* Straale af vaesken v, ladet stav med spidsen afst til hoejre for straalen. */
+    function forsoeg(v, stav, afst, nulstil) {
+        if (nulstil !== false) vand.nulstilForsoeg();
+        vand.slip();
+        vand.aabn(v);
+        for (var n = 0; n < 50; n++) vand.opdater(1 / 60);
+        naesteTekster.push(vand.naeste());
+        var x0 = TV.hane(v).x;
+        var tip = { x: x0 + afst, y: 340 };
+        vand.grib(stav, tip.x + 0.8 * 200 * Math.cos(GRAD16), tip.y + 0.8 * 200 * Math.sin(GRAD16), 0.8);
+        vand.stave[stav].vinkel = GRAD16;
+        vand.stave[stav].ladning = 1;
+        var sum = 0, tal = 0;
+        for (n = 0; n < 100; n++) {
+            vand.opdater(1 / 60);
+            if (n === 20) naesteTekster.push(vand.naeste());
+            if (n >= 60) vand.partikler.forEach(function (p) { if (p.vaeske === v && p.y > 420) { sum += p.x - x0; tal++; } });
+        }
+        naesteTekster.push(vand.naeste());
+        var ud = { udsving: tal ? sum / tal : 0, ladning: vand.stave[stav].ladning, registreret: !!vand.resultater[v][stav],
+                   spild: vand.sidsteBesked.spild !== undefined };
+        vand.slip();
+        return ud;
+    }
+
+    vand.nulstilForsoeg();
+    vand.opdater(1 / 60);
+    paastand("linjen over skemaet siger, at man skal klikke på en hane", /hane/.test(d.getElementById("vand-naeste").textContent));
+
+    var rv = forsoeg("vand", "plastik", 45), re = forsoeg("ethanol", "plastik", 45), rh = forsoeg("heptan", "plastik", 45), rg = forsoeg("vand", "glas", 45);
+    skriv("        udsving ved vasken: vand " + rv.udsving.toFixed(1) + ", ethanol " + re.udsving.toFixed(1) + ", heptan " + rh.udsving.toFixed(1) + ", vand med glasstav " + rg.udsving.toFixed(1), "note");
+    paastand("vandstrålen bøjer tydeligt mod staven", rv.udsving > 20 && rv.ladning > 0.5);
+    paastand("ethanol bøjer mindre end vand, men mere end heptan", re.udsving > 5 && re.udsving < rv.udsving * 0.8);
+    paastand("heptan løber næsten lige ned", Math.abs(rh.udsving) < 3);
+    paastand("vandstrålen bøjer også mod den positive glasstav", rg.udsving > 20);
+    paastand("et test registreres efter lidt over et sekund", rv.registreret && re.registreret && rh.registreret && rg.registreret);
+    paastand("den bøjede stråle lander stadig i vasken", !rv.spild && !re.spild && !rg.spild);
+
+    var rr = forsoeg("vand", "plastik", 2);
+    paastand("rører staven strålen, mister den ladningen", rr.ladning === 0);
+
+    vand.nulstilForsoeg();
+    vand.grib("plastik", 700, 590, 0.7);
+    for (var gn = 0; gn < 40; gn++) { vand.flytStav(gn % 2 ? 900 : 960, 598); vand.opdater(1 / 60); }
+    paastand("staven bliver ladet, når den gnides på kluden (" + vand.stave.plastik.ladning.toFixed(2) + ")", vand.stave.plastik.ladning > 0.5);
+    vand.slip();
+
+    vand.nulstilForsoeg();
+    vand.skiftHane("vand");
+    for (gn = 0; gn < 60 * 20; gn++) vand.opdater(1 / 60);
+    var loeber = vand.aaben === "vand" && vand.partikler.length > 30;
+    vand.skiftHane("ethanol");
+    for (gn = 0; gn < 60; gn++) vand.opdater(1 / 60);
+    var skiftet = vand.aaben === "ethanol" && vand.partikler.some(function (p) { return p.vaeske === "ethanol" && p.x0 === TV.hane("ethanol").x; });
+    paastand("en hane løber, til den lukkes, og en ny hane lukker den gamle", loeber && skiftet);
+    vand.skiftHane("ethanol");
+    for (gn = 0; gn < 90; gn++) vand.opdater(1 / 60);
+    paastand("et klik mere lukker hanen, og strålen er væk efter halvandet sekund", vand.aaben === null && vand.partikler.length === 0);
+
+    vand.nulstilForsoeg();
+    paastand("opgaven er låst, før skemaet er udfyldt", d.getElementById("vand-opg-knap").disabled);
+    [["vand", "plastik"], ["vand", "glas"], ["ethanol", "plastik"], ["ethanol", "glas"], ["heptan", "plastik"]].forEach(function (k) {
+        forsoeg(k[0], k[1], 45, false);
+    });
+    vand.opdater(1 / 60);
+    var skema = d.getElementById("vand-skema");
+    paastand("efter fem af seks felter mangler ét, og linjen peger på glasstaven",
+        !vand.slut() && d.getElementById("vand-taeller").textContent === "5/6" &&
+        skema.querySelectorAll("td.ikke").length === 1 && /glasstaven/.test(d.getElementById("vand-naeste").textContent),
+        d.getElementById("vand-naeste").textContent);
+    forsoeg("heptan", "glas", 45, false);
+    paastand("skemaet er udfyldt, og tegneserien og opgaven er låst op",
+        vand.slut() && d.getElementById("vand-taeller").textContent === "6/6" && !skema.querySelector("td.ikke") &&
+        !d.getElementById("vand-serieknap").hidden && !d.getElementById("vand-opg-knap").disabled);
+    NK.aabnSerie();
+    var ruder = d.querySelectorAll("#serie-ruder .rude");
+    var tabel = d.querySelector("#serie-ruder .resultater");
+    paastand("tegneserien har " + ruder.length + " ruder og resultatskemaet i sidste rude",
+        ruder.length >= 8 && tabel && ruder[ruder.length - 1].contains(tabel) && tabel.querySelectorAll("tr").length === 4);
+    var serieTekst = d.getElementById("serie-ruder").innerText;
+    d.getElementById("tegneserie").classList.remove("vis");
+
+    vand.OPGAVER.forEach(function (lav, i) {
+        var o = lav(vand);
+        paastand("vandstrålen, opgave " + (i + 1) + ": " + o.tekst, loestOpgave(vand, o, function (o) { vand.opgaver.vaelg(o.rigtig); }));
+    });
+
+    overskrift("6. Kemichaels præsentation");
+    var laerer = NK.laerer;
+    var tilbud = d.getElementById("tilbud");
+    function synlig(e) { return W.getComputedStyle(e).display !== "none"; }
+    W.localStorage.removeItem("nk-sc3.3-intro");
+    NK.visFane("fane-en");
+    paastand("første gang står tilbuddet i scenen på fane 1", synlig(tilbud) && d.querySelector("#fane-en .scene").contains(tilbud));
+    tilbud.querySelector(".tilbud-nej").click();
+    paastand("Nej tak skjuler tilbuddet, og valget huskes", !synlig(tilbud) && !!NK.hent("nk-sc3.3-intro", {})["fane-en"]);
+    NK.visFane("fane-polaritet");
+    paastand("fane 2 har sit eget tilbud, i sin egen scene", synlig(tilbud) && d.querySelector("#fane-polaritet .scene").contains(tilbud) && d.querySelector("#fane-polaritet .scene").contains(d.getElementById("laerer-lag")));
+    var o2 = pol.OPGAVER[0](pol);
+    loestOpgave(pol, o2, function (o) { pol.opgaver.vaelg(o.rigtig); });
+    paastand("en løst opgave fjerner tilbuddet", !synlig(tilbud));
+    NK.visFane("fane-vand");
+    tilbud.querySelector(".tilbud-start").click();
+    for (var k = 0; k < 90; k++) laerer.opdater(1 / 60);
+    paastand("Start præsentation sender Kemichael ind, og Spring over står fremme", laerer.laererIIntro() && !d.getElementById("spring-over").hidden);
+    for (k = 0; k < 60 * 9; k++) laerer.opdater(1 / 60);
+    paastand("han peger på skemaet, mens han taler om det", d.getElementById("vand-forloeb").classList.contains("peg") || laerer.introTrin > 2, "trin " + laerer.introTrin);
+    d.getElementById("spring-over").click();
+    for (k = 0; k < 120; k++) laerer.opdater(1 / 60);
+    paastand("Spring over sender ham ud igen", !laerer.laererIIntro() && d.getElementById("spring-over").hidden && !d.querySelector(".peg"));
+
+    var lange = [];
+    Object.keys(D.INTRO).forEach(function (id) {
+        D.INTRO[id].linjer.forEach(function (l) { if (l.length > 60) lange.push(l); });
+    });
+    paastand("replikkerne er højst 60 tegn", lange.length === 0, lange.join(" | "));
+
+    overskrift("7. Tekster og skrift");
+    var tekster = [d.body.innerText, serieTekst];
+    D.TEORI.forEach(function (a) { tekster.push(a.h); a.p.forEach(function (p) { tekster.push(p); }); });
+    D.MOLEKYLER.forEach(function (m) { tekster.push(m.navn, m.hintPol, m.svarPol); });
+    Object.keys(D.INTRO).forEach(function (id) { D.INTRO[id].linjer.forEach(function (l) { tekster.push(l); }); });
+    [en, pol, vand].forEach(function (sim) {
+        sim.OPGAVER.forEach(function (lav) {
+            var o = lav(sim);
+            tekster.push(o.tekst, o.hint || "", o.svar || "");
+            (o.valg || []).forEach(function (v) { tekster.push(v); });
+        });
+    });
+    en.BYG.forEach(function (b) {
+        tekster.push(b.tekst, b.hint, b.svar);
+        D.par().forEach(function (p) { if (!b.ok(p[0], p[1])) tekster.push(b.fejl(p[0], p[1])); });
+    });
+    D.par().forEach(function (p) { en.saetPar(p[0], p[1]); tekster.push(en.billedtekst()); });
+    D.EN_ORDEN.forEach(function (a) { D.EN_ORDEN.forEach(function (b) { var t = D.tilladt(a, b); if (t !== true) tekster.push(t); }); });
+    naesteTekster.forEach(function (t) { tekster.push(t); });
+    NK.Rundvisning.TUR.forEach(function (t) { tekster.push(t.titel, t.tekst); });
+    var alt = tekster.join("\n");
+    var streger = alt.match(/.{0,30}[–—].{0,30}/g);
+    paastand("ingen tankestreger (– eller —)", !streger, streger && streger.slice(0, 3).join(" | "));
+    var enPlus = alt.match(/.{0,20}(1\+|1−|1-)(?![0-9,]).{0,10}/g);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !enPlus, enPlus && enPlus.slice(0, 3).join(" | "));
+
+    var smaa = [];
+    ["fane-en", "fane-polaritet", "fane-vand"].forEach(function (fane) {
+        NK.visFane(fane);
+        Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+            if (!e.offsetWidth && !e.offsetHeight) return;
+            var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+            if (!harTekst) return;
+            var px = parseFloat(W.getComputedStyle(e).fontSize);
+            if (px < 12) smaa.push((e.id || e.className || e.tagName) + " " + px + "px");
+        });
+    });
+    NK.visFane("fane-en");
+    paastand("ingen synlig tekst under 12 px", smaa.length === 0, smaa.slice(0, 6).join(", "));
+}
+</script>
+</body>
+</html>

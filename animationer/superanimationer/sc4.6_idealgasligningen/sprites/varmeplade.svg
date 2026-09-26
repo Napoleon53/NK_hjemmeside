@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="120" viewBox="0 0 260 60">
+  <!-- Varmepladen, der ogsaa kan koele. Pladen, cylinderen staar paa,
+       er y 0-10 (x 10-250). Displayet (x 80-180, y 18-46) og de to
+       knapper (koel ved x 40, varm ved x 220, y 32, radius 12) tegnes af
+       animationen, saa de kan lyse og klikkes paa. Bunden er y 60. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9dde3"/>
+      <stop offset="0.5" stop-color="#b9bfc8"/>
+      <stop offset="1" stop-color="#8c939d"/>
+    </linearGradient>
+    <linearGradient id="plade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b4f56"/>
+      <stop offset="1" stop-color="#2b2e33"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="8" width="256" height="50" rx="7" fill="url(#krop)" stroke="#4d535c" stroke-width="1.5"/>
+  <rect x="10" y="1" width="240" height="10" rx="3" fill="url(#plade)" stroke="#1f2226" stroke-width="1"/>
+  <rect x="78" y="16" width="104" height="32" rx="4" fill="#5d646e"/>
+  <rect x="80" y="18" width="100" height="28" rx="3" fill="#10151a"/>
+  <circle cx="40" cy="32" r="14" fill="#9aa1ab"/>
+  <circle cx="220" cy="32" r="14" fill="#9aa1ab"/>
+  <rect x="6" y="54" width="248" height="4" rx="2" fill="#6d747e"/>
+</svg>

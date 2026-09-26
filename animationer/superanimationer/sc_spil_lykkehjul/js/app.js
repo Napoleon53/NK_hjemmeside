@@ -51,8 +51,13 @@
         tossupUr: 0,
         ur: null,
         noegle: null,
-        tvungetFelt: undefined
+        tvungetFelt: undefined,
+        /* Alene: én spiller, ingen laerer (se spil.js) */
+        alene: false,
+        aleneNavn: D.ALENE.navn,
+        forkertSvar: ""
     };
+    var TILSTAND = "nk-lykkehjul-tilstand";
     var laerred = null;
     var laerer = null;
     var sidsteTid = 0;
@@ -100,15 +105,38 @@
         if (!q) { noegle = "i:" + D.STANDARD; q = B.quiz(noegle); }
         ui.noegle = noegle;
         B.vaelg(noegle);
-        S.init(q);
+        S.init(q, ui.alene);
         S.efterGenindlaesning();
         V.visGaade(null);
         titelFraSpil();
     }
 
+    /* #alene eller #hold i linket vaelger tilstanden, fx index.html#a&alene */
+    var TILSTANDSORD = /(^#?|[&,+])(alene|solo|hold)(?=$|[&,+])/i;
+    function tilstandFraHash(h) {
+        var m = TILSTANDSORD.exec(String(h || ""));
+        return m ? m[2].toLowerCase() !== "hold" : null;
+    }
+    function udenTilstand(h) {
+        return String(h || "").replace(TILSTANDSORD, "$1").replace(/^#[&,+]/, "#").replace(/[&,+]$/, "");
+    }
+
+    function skiftTilstand(alene) {
+        if (!!alene === ui.alene) return;
+        ui.alene = !!alene;
+        NK.gem(TILSTAND, ui.alene ? "alene" : "hold");
+        indlaesQuiz(ui.noegle);
+        ui.startSikker = 0;
+        render();
+    }
+
     /* ----- Titelskaermen ------------------------------------------------- */
     function titelFraSpil() {
         var t = T();
+        if (ui.alene) {
+            if (t) ui.aleneNavn = t.hold[0].navn;
+            return;
+        }
         ui.navne = t ? t.hold.map(function (x) { return x.navn; }) : D.HOLD.slice();
     }
 
@@ -132,8 +160,9 @@
         tegnQuizvalg();
         var q = S.Q();
         var toss = q.gaader.filter(function (g) { return g.type === "tossup"; }).length;
-        NK.saetTekst("titel-quiz", toss + (toss === 1 ? " toss-up, " : " toss-ups, ") + (q.gaader.length - toss)
-            + (q.gaader.length - toss === 1 ? " runde" : " runder") + (q.final ? " og en finale" : ""));
+        var runder = q.gaader.length - toss;
+        NK.saetTekst("titel-quiz", (toss ? toss + (toss === 1 ? " toss-up, " : " toss-ups, ") : "") + runder
+            + (runder === 1 ? " runde" : " runder") + (q.final ? " og en finale" : ""));
         NK.saetTekst("hold-antal", String(ui.navne.length));
         var rod = el("holdnavne");
         if (rod.children.length !== ui.navne.length) {
@@ -152,6 +181,13 @@
         }
         el("hold-minus").disabled = ui.navne.length <= D.MIN_HOLD;
         el("hold-plus").disabled = ui.navne.length >= D.MAKS_HOLD;
+        el("tilstand-hold").classList.toggle("valgt", !ui.alene);
+        el("tilstand-alene").classList.toggle("valgt", ui.alene);
+        el("tilstand-hold").setAttribute("aria-pressed", String(!ui.alene));
+        el("tilstand-alene").setAttribute("aria-pressed", String(ui.alene));
+        if (document.activeElement !== el("alene-navn")) el("alene-navn").value = ui.aleneNavn;
+        var rekord = S.rekord();
+        NK.saetTekst("rekord", rekord ? "Rekord i denne browser: " + kr(rekord.point) + " (" + rekord.navn + ")" : "Ingen rekord endnu");
         var igang = !!T();
         el("fortsaet").hidden = !igang;
         el("start").textContent = ui.startSikker ? "Sikker? Start forfra" : (igang ? "Nyt spil" : "Start spillet");
@@ -189,14 +225,15 @@
             return;
         }
         clearTimeout(ui.startSikker);
-        S.nyt(ui.navne);
+        S.nyt(ui.alene ? [ui.aleneNavn] : ui.navne);
         forladTitel();
         startGaade(0);
     }
 
     function fortsaet() {
         if (!T()) return;
-        S.saetHold(ui.navne);
+        if (ui.alene) S.omdoeb(0, ui.aleneNavn);
+        else S.saetHold(ui.navne);
         forladTitel();
         if (T().g) V.visGaade(G());
         else if (!T().slut) { startGaade(Math.max(0, S.naeste())); return; }
@@ -212,6 +249,7 @@
     /* ----- Gaaderne ------------------------------------------------------ */
     function startGaade(nr) {
         stopAlt();
+        ui.forkertSvar = "";
         Lyd.stop("tossup", 0.3);
         if (!S.start(nr)) return;
         lukOverlay();
@@ -241,7 +279,7 @@
     }
 
     function fortryd() {
-        if (!S.kanFortryde() || ui.titel) return;
+        if (!S.kanFortryde() || ui.titel || ui.alene) return;
         stopAlt();
         Lyd.stop("tossup", 0.2);
         if (S.fortryd()) {
@@ -251,18 +289,28 @@
         }
     }
 
+    /* Alene: er runden tabt (ingen liv), vises resten af loesningen */
+    function visTab(skjulte) {
+        var g = T() && T().g;
+        if (!g || !g.tabt) return false;
+        Lyd.stop("tossup", 0.3);
+        if (skjulte && skjulte.length) V.afslor(skjulte, { hurtig: true });
+        return true;
+    }
+
     /* ----- En runde med hjulet ------------------------------------------ */
     function drejHjul() {
         if (ui.laast || !S.kanDreje()) return;
         var h = T().g.tur;
         ui.laast = true;
-        var H = V.visHjul("hjul", D.HOLDFARVER[h], navn(h) + " drejer");
+        var H = V.visHjul("hjul", D.HOLDFARVER[h], ui.alene ? "Du drejer" : navn(h) + " drejer");
         render();
         Lyd.spil("hjul");
         var felt = ui.tvungetFelt;
         ui.tvungetFelt = undefined;
         H.drej({ tid: D.HJUL_TID, tempo: NK.tempo, felt: felt, tik: Lyd.tik }, function (felt) {
             Lyd.stop("hjul", 0.25);
+            var skjulte = S.skjulteFelter();
             var type = S.drejet(felt);
             var f = D.HJUL[felt];
             if (type === "fallit") {
@@ -278,6 +326,7 @@
             setTimeout(function () {
                 V.skjulHjul();
                 ui.laast = false;
+                visTab(skjulte);
                 render();
             }, sek(type === "vaerdi" ? 1.3 : 2.2));
         });
@@ -285,6 +334,7 @@
 
     function vaelgBogstav(b) {
         if (ui.laast || ui.titel || !T() || !T().g || !S.kanVaelge(b)) return;
+        var skjulte = S.skjulteFelter();
         var r = S.vaelg(b);
         if (!r) return;
         if (r.valg) { render(); return; }
@@ -299,6 +349,7 @@
         } else {
             Lyd.spil("forkert");
             V.pop(r.hold, "Intet " + b, "minus");
+            visTab(skjulte);
             render();
         }
     }
@@ -332,7 +383,31 @@
         } else {
             Lyd.spil("forkert");
             V.pop(h, "Forkert", "minus");
+            visTab(skjulte);
             render();
+        }
+    }
+
+    /* Alene: fortryd Løs gåden uden at svare */
+    function annullerLoes() {
+        if (S.fortrydLoes()) render();
+    }
+
+    /* Alene: spilleren har skrevet løsningen og trykket Svar eller Enter */
+    function aleneSvar() {
+        var g = T() && T().g;
+        if (!ui.alene || !g || ui.laast) return;
+        var input = el("svar-input"), tekst = input.value;
+        if (!tekst.trim()) { input.focus(); return; }
+        var rigtigt = S.tjek(tekst);
+        ui.forkertSvar = rigtigt ? "" : tekst.trim();
+        input.value = "";
+        if (g.type === "runde" && g.fase === "loes") loesSvar(rigtigt);
+        else if (g.type === "tossup" && g.fase === "svarer") tossupSvar(rigtigt);
+        else if (g.type === "final" && g.fase === "ur" && ui.ur && !ui.ur.slut) {
+            /* I finalen må man prøve igen, til tiden er gået */
+            if (rigtigt) finalSvar(true);
+            else { Lyd.spil("forkert"); V.pop(0, "Forkert", "minus"); render(); input.focus(); }
         }
     }
 
@@ -356,6 +431,8 @@
             if (i >= 0) V.afslor([i], { hurtig: true });
             if (T().g.fase === "koerer") tossupLoekke();
             else Lyd.stop("tossup", 1.2);
+            /* Alene er en toss-up uden skjulte bogstaver intet værd */
+            if (ui.alene && T().g.fase === "alle") { tossupIngen(); return; }
             render();
         }, sek(D.TOSSUP_INTERVAL));
     }
@@ -386,7 +463,7 @@
     function tossupSvar(rigtigt) {
         var g = T().g;
         if (g.fase !== "svarer") return;
-        var skjulte = S.skjulteFelter(), h = g.svarer;
+        var skjulte = S.skjulteFelter(), h = g.svarer, aabneFoer = g.aabne.length;
         if (!S.tossupSvar(rigtigt)) return;
         if (rigtigt) {
             Lyd.stop("tossup", 0.3);
@@ -396,6 +473,10 @@
         } else {
             Lyd.spil("forkert");
             V.pop(h, "Forkert", "minus");
+            /* Alene: straffen er flere bogstaver på tavlen */
+            var nye = T().g.aabne.slice(aabneFoer);
+            if (nye.length) V.afslor(nye, { hurtig: true });
+            if (ui.alene && T().g.fase === "alle") { tossupIngen(); return; }
             if (T().g.fase === "koerer") {
                 ui.tossupUr = setTimeout(function () {
                     if (T().g.fase !== "koerer") return;
@@ -408,7 +489,10 @@
     }
 
     function tossupFortrydSvarer() {
-        if (S.tossupFortryd()) render();
+        if (!S.tossupFortryd()) return;
+        /* Alene gaar bogstaverne straks videre */
+        if (ui.alene && T().g.fase === "pause") { tossupStart(); return; }
+        render();
     }
 
     function tossupIngen() {
@@ -426,12 +510,12 @@
         if (ui.laast || g.type !== "final" || g.fase !== "hold") return;
         var h = g.final.hold;
         ui.laast = true;
-        var H = V.visHjul("praemie", D.HOLDFARVER[h], navn(h) + " drejer præmiehjulet");
+        var H = V.visHjul("praemie", D.HOLDFARVER[h], ui.alene ? "Du drejer præmiehjulet" : navn(h) + " drejer præmiehjulet");
         render();
         Lyd.spil("hjul");
         H.drej({ tid: D.HJUL_TID, tempo: NK.tempo, tik: Lyd.tik }, function () {
             Lyd.stop("hjul", 0.25);
-            S.finalPraemie(NK.tilfaeldig(D.PRAEMIER));
+            S.finalPraemie(NK.tilfaeldig(ui.alene ? D.ALENE.praemier : D.PRAEMIER));
             ding();
             V.hjulBesked("Kuverten er valgt", "kuvert");
             setTimeout(function () {
@@ -464,17 +548,23 @@
     function finalUr() {
         var g = T() && T().g;
         if (ui.ur || ui.laast || !g || g.type !== "final" || g.fase !== "ur") return;
-        ui.ur = { start: performance.now(), varighed: D.FINAL_TID, slut: false };
-        Lyd.spil("ur");
+        var varighed = ui.alene ? D.ALENE.finalTid : D.FINAL_TID;
+        ui.ur = { start: performance.now(), varighed: varighed, slut: false, lyd: false };
+        /* Urets lyd varer de sidste ti sekunder */
+        if (varighed <= D.FINAL_TID) { ui.ur.lyd = true; Lyd.spil("ur"); }
         render();
         opdaterUr();
     }
 
     function opdaterUr() {
         if (!ui.ur) return;
-        var andel = 1 - (performance.now() - ui.ur.start) / 1000 / (ui.ur.varighed * NK.tempo);
+        var tilbage = ui.ur.varighed - (performance.now() - ui.ur.start) / 1000 / NK.tempo;
+        var andel = tilbage / ui.ur.varighed;
+        if (!ui.ur.lyd && tilbage <= D.FINAL_TID) { ui.ur.lyd = true; Lyd.spil("ur"); }
         if (andel <= 0 && !ui.ur.slut) {
             ui.ur.slut = true;
+            /* Alene: tiden er gået, og finalen er tabt */
+            if (ui.alene) { setTimeout(function () { ui.forkertSvar = ""; finalSvar(false); }, 0); }
             render();
         }
         V.ur(true, andel, ui.ur.slut);
@@ -539,20 +629,22 @@
                 var n = S.antalGaader();
                 if (t.g.type === "final") tekst = "Finalen";
                 else tekst = "Gåde " + (t.g.nr + 1) + " af " + n + " · " + (t.g.type === "tossup" ? "Toss-up" : "Runde")
-                    + (t.g.type === "runde" && !t.g.loest ? " · " + navn(t.g.tur) + " har turen" : "");
+                    + (t.g.type === "runde" && !t.g.loest && !ui.alene ? " · " + navn(t.g.tur) + " har turen" : "")
+                    + (ui.alene ? " · alene" : "");
             }
         }
         NK.saetTekst("status", tekst);
     }
 
     function topknapper() {
-        el("gaadeknap").hidden = ui.titel || !T();
+        el("gaadeknap").hidden = ui.titel || !T() || ui.alene;
         el("lydknap").textContent = Lyd.slukket() ? "🔇" : "🔊";
         el("lydknap").classList.toggle("slukket", Lyd.slukket());
     }
 
     var FORTRYD = { id: "fortryd", tekst: "↶", klasse: "lille", titel: "Fortryd (Ctrl+Z)", handling: fortryd };
     function fortrydKnap() {
+        if (ui.alene) return null;
         return { id: FORTRYD.id, tekst: FORTRYD.tekst, klasse: FORTRYD.klasse, titel: FORTRYD.titel, handling: fortryd,
             slaaet: ui.laast || !S.kanFortryde() };
     }
@@ -560,6 +652,41 @@
     function besked(html) {
         var b = el("besked");
         if (b.innerHTML !== (html || "")) b.innerHTML = html || "";
+    }
+
+    /* Hvem der goer noget: holdets navn, eller "Du", naar man spiller alene */
+    function hvem(h) { return ui.alene ? "Du" : "<b>" + hnavn(h) + "</b>"; }
+
+    /* Alene: livene som hjerter */
+    function hjerter(liv) {
+        var s = "";
+        for (var i = 0; i < D.ALENE.liv; i++) s += i < liv ? "♥" : "♡";
+        return '<span class="liv" title="' + liv + " liv" + ' tilbage">' + s + "</span>";
+    }
+
+    /* Alene: feltet, hvor løsningen skrives, står i stedet for bogstaverne.
+       pladsholder er null, når feltet skal væk. */
+    function svarfelt(pladsholder) {
+        var f = el("svarfelt"), inp = el("svar-input"), vis = pladsholder !== null && pladsholder !== undefined;
+        var foer = !f.hidden;
+        f.hidden = !vis;
+        el("styring").classList.toggle("svarer", vis);
+        if (vis) {
+            inp.placeholder = pladsholder;
+            if (!foer) inp.value = "";
+            if (document.activeElement !== inp) setTimeout(function () { if (!f.hidden) inp.focus(); }, 0);
+        } else if (document.activeElement === inp) {
+            inp.blur();
+        }
+    }
+
+    function svarKnapper(annuller) {
+        return [{ id: "svar", tekst: "Svar", klasse: "gul", handling: aleneSvar, slaaet: ui.laast, titel: "Enter" },
+                { id: "annuller", tekst: "Annullér", klasse: "graa", handling: annuller, slaaet: ui.laast, titel: "Esc" }];
+    }
+
+    function forkertTekst() {
+        return ui.forkertSvar ? "«" + NK.html(ui.forkertSvar) + "» er forkert" : "Forkert løsning";
     }
 
     function bogstavTilstand(g, G) {
@@ -574,7 +701,87 @@
         };
     }
 
+    /* Alene: en runde med tre liv og uden andre hold */
+    function renderRundeAlene(t, g, Gd) {
+        var laast = ui.laast;
+        V.display(g.fase === "konsonant" && g.drej ? kr(g.drej.vaerdi) : (g.fase === "vokal" ? "VOKAL" : ""), g.fase);
+        V.bogstaver(bogstavTilstand(g, Gd), g.fase === "konsonant" || g.fase === "vokal" ? g.fase : "");
+        var s = g.sidst, foer = "";
+        if (s && (g.fase === "tur" || g.tabt)) {
+            if (s.type === "fallit") foer = "Fallit: rundens penge er væk, og du mister et liv. ";
+            else if (s.type === "mist") foer = "Mist tur: du mister et liv. ";
+            else if (s.type === "forkert") foer = "Intet " + s.bogstav + ": du mister et liv. ";
+            else if (s.type === "forkert-loesning") foer = forkertTekst() + ", og du mister et liv. ";
+            else if (s.type === "rigtigt" && s.antal) foer = s.antal + " × " + s.bogstav + (s.point ? " giver " + kr(s.point) + " " : ". ");
+        }
+        var knap;
+        if (g.fase === "tur") {
+            var konsTilbage = S.konsonanterTilbage().length, vokTilbage = S.vokalerTilbage().length;
+            besked(foer + "Drej hjulet, køb en vokal, eller løs gåden." + (!konsTilbage ? " Der er ingen konsonanter tilbage." : ""));
+            knap = [
+                { id: "drej", tekst: "Drej hjulet", klasse: "gul", handling: drejHjul, slaaet: laast || !S.kanDreje(),
+                    titel: konsTilbage ? "Mellemrum" : "Der er ingen konsonanter tilbage" },
+                { id: "vokal", tekst: "Køb vokal · " + kr(D.VOKALPRIS), handling: koebVokal, slaaet: laast || !S.kanKoebeVokal(),
+                    titel: !vokTilbage ? "Der er ingen vokaler tilbage" : (g.runde[0] < D.VOKALPRIS ? "Du har ikke 250 kr. i denne runde" : "") },
+                { id: "loes", tekst: "Løs gåden", handling: loes, slaaet: laast }
+            ];
+        } else if (g.fase === "konsonant") {
+            besked("Hjulet gav " + kr(g.drej.vaerdi) + " pr. felt. Vælg en konsonant.");
+            knap = [];
+        } else if (g.fase === "vokal") {
+            besked("Vælg en vokal.");
+            knap = [];
+        } else if (g.fase === "loes") {
+            besked("Skriv løsningen, og tryk Enter. Et forkert svar koster et liv.");
+            knap = svarKnapper(annullerLoes);
+            ui.visSvar = "Skriv løsningen";
+        } else {
+            besked(g.tabt ? foer.replace(/, og du mister et liv\. $|: du mister et liv\. $/, ". ") + "Ingen liv tilbage. Løsningen står på tavlen."
+                : "Rigtigt. Du får " + kr(g.gevinst));
+            knap = [{ id: "videre", tekst: naesteTekst(), klasse: "gul", handling: naesteGaade, slaaet: laast }];
+        }
+        V.knapper(knap);
+        V.podier(function () {
+            return { stor: kr(g.runde[0]), storHvad: "runde", lille: "I alt " + kr(t.hold[0].total), top: hjerter(g.liv),
+                tur: !g.loest, vinder: g.vinder === 0 };
+        });
+    }
+
+    /* Alene: toss-uppen er mindre værd for hvert bogstav, der dukker op */
+    function renderTossupAlene(t, g, Gd) {
+        V.display(kr(g.loest ? g.gevinst : S.tossupVaerdi()), "tossup");
+        V.bogstaver(bogstavTilstand(g, Gd), "");
+        var ved = { id: "ved", tekst: "✋ Jeg ved det", klasse: "gul", handling: function () { tossupSvarer(0); }, slaaet: ui.laast, titel: "Mellemrum" };
+        var opgiv = { id: "opgiv", tekst: "Giv op", klasse: "graa", handling: tossupIngen, slaaet: ui.laast };
+        var knap;
+        if (g.fase === "klar") {
+            besked("Bogstaverne dukker op ét ad gangen, og gåden bliver mindre værd for hvert bogstav. Løs den så hurtigt som muligt.");
+            knap = [{ id: "start", tekst: "▶ Start", klasse: "gul", handling: tossupStart, slaaet: ui.laast }];
+        } else if (g.fase === "koerer") {
+            besked((g.forkerte ? "Forkert, så der kom " + D.ALENE.straf + " bogstaver mere. " : "") + "Tryk Jeg ved det, når du kan løse den.");
+            knap = [ved, opgiv];
+        } else if (g.fase === "pause") {
+            besked("Toss-uppen holder pause.");
+            knap = [{ id: "start", tekst: "▶ Fortsæt", klasse: "gul", handling: tossupStart }, opgiv];
+        } else if (g.fase === "svarer") {
+            besked("Skriv løsningen, og tryk Enter. Et forkert svar viser " + D.ALENE.straf + " bogstaver mere.");
+            knap = svarKnapper(tossupFortrydSvarer);
+            ui.visSvar = "Skriv løsningen";
+        } else if (g.fase === "alle") {
+            besked("Alle bogstaver er vist.");
+            knap = [{ id: "ingen", tekst: "Videre", klasse: "gul", handling: tossupIngen }];
+        } else {
+            besked(g.vinder === 0 ? "Rigtigt. Du får " + kr(g.gevinst) : "Ingen point denne gang. Løsningen står på tavlen.");
+            knap = [{ id: "videre", tekst: naesteTekst(), klasse: "gul", handling: naesteGaade, slaaet: ui.laast }];
+        }
+        V.knapper(knap);
+        V.podier(function () {
+            return { stor: kr(t.hold[0].total), lille: "", tur: g.fase === "svarer", vinder: g.vinder === 0 };
+        });
+    }
+
     function renderRunde(t, g, Gd) {
+        if (ui.alene) { renderRundeAlene(t, g, Gd); return; }
         var h = g.tur, laast = ui.laast;
         V.display(g.fase === "konsonant" && g.drej ? kr(g.drej.vaerdi) : (g.fase === "vokal" ? "VOKAL" : ""), g.fase);
         V.bogstaver(bogstavTilstand(g, Gd), g.fase === "konsonant" || g.fase === "vokal" ? g.fase : "");
@@ -627,6 +834,7 @@
     }
 
     function renderTossup(t, g, Gd) {
+        if (ui.alene) { renderTossupAlene(t, g, Gd); return; }
         V.display("TOSS-UP", "tossup");
         V.bogstaver(bogstavTilstand(g, Gd), "");
         var kanSvare = /^(klar|koerer|pause|alle)$/.test(g.fase);
@@ -673,7 +881,14 @@
         V.display("FINALE", "final");
         V.bogstaver(bogstavTilstand(g, Gd), g.fase === "valg" ? "valg" : "");
         var knap = [];
-        if (g.fase === "hold") {
+        if (g.fase === "hold" && ui.alene) {
+            V.visPlakat("final-alene", "finalplakat",
+                '<div class="lille">Finalen</div>'
+                + '<div class="stort tilpas">' + NK.html(Gd.kategori) + "</div>"
+                + '<div class="lille note">Drej præmiehjulet. Du får R, S, T, L, N og E og vælger selv 3 konsonanter og 1 vokal. Kuverten åbnes, når finalen er afgjort.</div>');
+            besked("");
+            knap = [{ id: "praemie", tekst: "Drej præmiehjulet", klasse: "gul", handling: finalDrej, slaaet: ui.laast }];
+        } else if (g.fase === "hold") {
             V.visPlakat("final-hold-" + h + "-" + t.hold.length, "finalplakat",
                 '<div class="lille">Finalen</div>'
                 + '<div class="stort tilpas">' + NK.html(Gd.kategori) + "</div>"
@@ -690,19 +905,31 @@
                 '<div class="kuvert-tegning" aria-hidden="true">✉</div>'
                 + '<div class="lille">Kuverten indeholdt</div>'
                 + '<div class="stort tilpas beloeb">' + kr(F.praemie) + "</div>"
-                + '<div class="lille">' + (F.vundet ? hnavn(h) + " vinder beløbet" : "Gåden blev ikke løst") + "</div>");
+                + '<div class="lille">' + (F.vundet ? (ui.alene ? "Du vinder beløbet" : hnavn(h) + " vinder beløbet") : "Gåden blev ikke løst") + "</div>");
             besked("");
             knap = [{ id: "videre", tekst: "Resultat →", klasse: "gul", handling: tilResultat }];
         } else {
             V.skjulPlakat();
             if (g.fase === "rstlne") {
-                besked("<b>" + hnavn(h) + "</b> spiller om kuverten. R, S, T, L, N og E vises først.");
+                besked(hvem(h) + " spiller om kuverten. R, S, T, L, N og E vises først.");
                 knap = [{ id: "rstlne", tekst: "Vis R S T L N E", klasse: "gul", handling: finalRSTLNE, slaaet: ui.laast }];
             } else if (g.fase === "valg") {
                 var k = F.valgt.filter(S.erKonsonant).length, v = F.valgt.filter(S.erVokal).length;
-                besked("<b>" + hnavn(h) + "</b> vælger " + D.FINAL_KONSONANTER + " konsonanter og " + D.FINAL_VOKALER
+                besked(hvem(h) + " vælger " + D.FINAL_KONSONANTER + " konsonanter og " + D.FINAL_VOKALER
                     + " vokal: <span class='taeller'>" + k + " af " + D.FINAL_KONSONANTER + "</span> og <span class='taeller'>" + v + " af " + D.FINAL_VOKALER + "</span>.");
                 knap = [{ id: "vis-valg", tekst: "Vis bogstaverne", klasse: "gul", handling: finalVisValg, slaaet: ui.laast || !S.finalValgKlar() }, fortrydKnap()];
+            } else if (g.fase === "ur" && ui.alene) {
+                if (!ui.ur) {
+                    besked("Du har " + D.ALENE.finalTid + " sekunder til at skrive løsningen og må prøve flere gange.");
+                    knap = [{ id: "ur", tekst: "⏱ Start uret", klasse: "gul", handling: finalUr, slaaet: ui.laast }];
+                } else if (!ui.ur.slut) {
+                    besked(ui.forkertSvar ? forkertTekst() + ". Prøv igen." : "Skriv løsningen, og tryk Enter.");
+                    knap = [{ id: "svar", tekst: "Svar", klasse: "gul", handling: aleneSvar, titel: "Enter" }];
+                    ui.visSvar = "Skriv løsningen";
+                } else {
+                    besked("Tiden er gået.");
+                    knap = [];
+                }
             } else if (g.fase === "ur") {
                 if (!ui.ur) {
                     besked("<b>" + hnavn(h) + "</b> har " + D.FINAL_TID + " sekunder til at løse gåden.");
@@ -715,7 +942,7 @@
                             { id: "forkert", tekst: "✗ Forkert", klasse: "roed", handling: function () { finalSvar(false); }, titel: "X" }];
                 }
             } else if (g.fase === "loest") {
-                besked(F.vundet ? "<b>" + hnavn(h) + "</b> løste finalen." : "Finalen blev ikke løst.");
+                besked(F.vundet ? hvem(h) + " løste finalen." : (ui.alene ? "Tiden er gået, og finalen blev ikke løst." : "Finalen blev ikke løst."));
                 knap = [fortrydKnap(), { id: "kuvert", tekst: "✉ Åbn kuverten", klasse: "gul", handling: finalAabn, slaaet: ui.laast }];
             }
         }
@@ -726,7 +953,44 @@
         });
     }
 
+    function konfetti(antal) {
+        var ud = "";
+        for (var i = 0; i < antal; i++) {
+            ud += '<i class="konfetti" style="left:' + (Math.random() * 100).toFixed(1) + "%;animation-delay:" + (Math.random() * 3).toFixed(2)
+                + "s;animation-duration:" + (2.8 + Math.random() * 2.4).toFixed(2) + "s;background:"
+                + NK.tilfaeldig(["#e8262a", "#ffd21f", "#1fb4ef", "#28c35c", "#ff72c8", "#ffffff"]) + '"></i>';
+        }
+        return ud;
+    }
+
+    /* Alene: pengene, rekorden og hvordan det gik med hver gåde */
+    function renderSlutAlene(t) {
+        var q = S.Q(), total = t.hold[0].total, r = S.rekord();
+        var liste = q.gaader.map(function (g, i) { return { g: g, nr: i }; });
+        if (q.final) liste.push({ g: q.final, nr: S.finalNr() });
+        var raekker = liste.map(function (x) {
+            var f = S.faerdig(x.nr);
+            var udfald = !f ? "ikke spillet" : (f.gevinst ? kr(f.gevinst) : "ikke løst");
+            return '<li class="' + (f && f.gevinst ? "loest" : "tabt") + '"><span>' + NK.html(x.g.kategori) + "</span><b>" + udfald + "</b></li>";
+        }).join("");
+        var rekord = t.nyRekord ? '<div class="rekordlinje ny">Ny rekord!</div>'
+            : (r ? '<div class="rekordlinje">Rekorden er ' + kr(r.point) + " (" + NK.html(r.navn) + ")</div>" : "");
+        V.visPlakat("alene-slut-" + total + "-" + t.nyRekord + "-" + (r ? r.point : 0), "slutplakat alene-slut",
+            (t.nyRekord ? konfetti(30) : "")
+            + '<div class="lille">' + hnavn(0) + " fik</div>"
+            + '<div class="stort tilpas vindernavn">' + kr(total) + "</div>"
+            + rekord
+            + '<ol class="gaaderesultat">' + raekker + "</ol>");
+        V.kategori("", "");
+        besked("");
+        V.display("", "");
+        V.bogstaver(null, "");
+        V.knapper([{ id: "nyt", tekst: "Nyt spil", klasse: "gul", handling: visTitel }]);
+        V.podier(function () { return { stor: kr(total), lille: "", vinder: !!t.nyRekord }; });
+    }
+
     function renderSlut(t) {
+        if (ui.alene) { renderSlutAlene(t); return; }
         var vindere = S.vindere(), liste = S.rangliste();
         var noegle = "slut" + liste.map(function (h) { return h + ":" + t.hold[h].total + ":" + t.hold[h].navn; }).join("|");
         var konfetti = "";
@@ -753,6 +1017,8 @@
 
     function render() {
         var t = T();
+        ui.visSvar = null;
+        document.body.classList.toggle("alene", ui.alene);
         el("titel").hidden = !ui.titel;
         if (ui.titel || !t) {
             tegnTitel();
@@ -772,6 +1038,7 @@
             else renderFinal(t, g, Gd);
             if (!ui.ur) V.ur(false);
         }
+        svarfelt(ui.titel ? null : ui.visSvar);
         document.body.setAttribute("data-skaerm", skaermNavn());
         topknapper();
         status();
@@ -864,7 +1131,7 @@
             return;
         }
         var m = /^(Digit|Numpad)([1-4])$/.exec(e.code || "");
-        if (m && T().hold[+m[2] - 1] && T().g && T().g.type === "tossup") {
+        if (m && !ui.alene && T().hold[+m[2] - 1] && T().g && T().g.type === "tossup") {
             e.preventDefault();
             tossupSvarer(+m[2] - 1);
         }
@@ -872,7 +1139,10 @@
 
     /* ----- Start ------------------------------------------------------- */
     function start() {
-        var fraLink = B.fraHash(window.location.hash);
+        var tilstand = tilstandFraHash(window.location.hash);
+        ui.alene = tilstand === null ? NK.hent(TILSTAND, "hold") === "alene" : tilstand;
+        if (tilstand !== null) NK.gem(TILSTAND, ui.alene ? "alene" : "hold");
+        var fraLink = B.fraHash(udenTilstand(window.location.hash));
         if (fraLink && /^#quiz=/.test(window.location.hash) && window.history && window.history.replaceState) {
             window.history.replaceState(null, "", window.location.href.replace(/#.*$/, ""));
         }
@@ -912,14 +1182,36 @@
         el("start").addEventListener("click", startSpil);
         el("fortsaet").addEventListener("click", fortsaet);
 
-        /* Et andet link (#a, #nf eller #quiz=...), uden at siden indlaeses igen */
+        /* Hold på tavlen eller alene */
+        el("tilstand").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-tilstand]");
+            if (b) skiftTilstand(b.getAttribute("data-tilstand") === "alene");
+        });
+        el("alene-navn").addEventListener("input", function () { ui.aleneNavn = el("alene-navn").value; });
+        el("alene-navn").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") { e.preventDefault(); if (T()) fortsaet(); else startSpil(); }
+        });
+
+        /* Alene: Enter svarer, Esc fortryder Løs gåden */
+        el("svar-input").addEventListener("keydown", function (e) {
+            if (e.key === "Enter") { e.preventDefault(); aleneSvar(); }
+            else if (e.key === "Escape") {
+                var g = T() && T().g;
+                if (g && g.fase === "loes") annullerLoes();
+                else if (g && g.fase === "svarer") tossupFortrydSvarer();
+            }
+        });
+
+        /* Et andet link (#a, #nf, #alene eller #quiz=...), uden at siden indlaeses igen */
         window.addEventListener("hashchange", function () {
-            var noegle = B.fraHash(window.location.hash);
-            if (!noegle) return;
+            var tilstand = tilstandFraHash(window.location.hash);
+            var noegle = B.fraHash(udenTilstand(window.location.hash));
+            if (!noegle && tilstand === null) return;
             if (/^#quiz=/.test(window.location.hash) && window.history.replaceState) {
                 window.history.replaceState(null, "", window.location.href.replace(/#.*$/, ""));
             }
-            indlaesQuiz(noegle);
+            if (tilstand !== null) { ui.alene = tilstand; NK.gem(TILSTAND, ui.alene ? "alene" : "hold"); }
+            indlaesQuiz(noegle || ui.noegle);
             visTitel();
         });
 
@@ -945,7 +1237,7 @@
         /* Podierne: turen, svarer, og ret point og navne */
         el("podier").addEventListener("click", function (e) {
             var b = e.target.closest("button");
-            if (!b || !T()) return;
+            if (!b || !T() || ui.alene) return;
             var h = +b.getAttribute("data-h");
             var hvad = b.getAttribute("data-podie");
             if (hvad === "svarer") { tossupSvarer(h); return; }
@@ -1025,6 +1317,8 @@
             tossupStart: tossupStart, tossupPause: tossupPause, tossupSvarer: tossupSvarer, tossupSvar: tossupSvar, tossupIngen: tossupIngen,
             finalDrej: finalDrej, finalRSTLNE: finalRSTLNE, finalVisValg: finalVisValg, finalUr: finalUr, finalSvar: finalSvar,
             finalAabn: finalAabn, tilResultat: tilResultat, tastatur: tastatur, aabnGaader: aabnGaader,
+            skiftTilstand: skiftTilstand, aleneSvar: aleneSvar, annullerLoes: annullerLoes,
+            tilstandFraHash: tilstandFraHash, udenTilstand: udenTilstand,
             noegle: function () { return ui.noegle; }
         };
 

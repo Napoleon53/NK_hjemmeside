@@ -16,7 +16,14 @@
      aabne    felter, der er vist i en toss-up
      runde    holdenes point i denne runde
      tur      holdet, der har turen (runde)
+     liv      alene: de liv, der er tilbage i runden
    T.hold[h].total er holdets samlede point.
+
+   Alene (T.alene): én spiller og ingen laerer. Alt, der i holdspillet
+   giver turen videre, koster et liv, og uden liv er runden tabt. En
+   toss-up er mindre vaerd, jo flere bogstaver der er vist, og et forkert
+   svar viser D.ALENE.straf bogstaver mere. Hver tilstand har sit eget
+   gemte spil.
    ===================================================================== */
 (function () {
     "use strict";
@@ -27,27 +34,32 @@
     var MAKS_AFTRYK = 60;
     var Q = null;
     var T = null;
+    var alene = false;
 
-    function lagernoegle() { return "nk-lykkehjul-spil-" + Q.id; }
+    function lagernoegle() { return "nk-lykkehjul-spil-" + (alene ? "alene-" : "") + Q.id; }
+    function rekordnoegle() { return "nk-lykkehjul-rekord-" + Q.id; }
 
     function erVokal(b) { return D.VOKALER.indexOf(b) >= 0; }
     function erKonsonant(b) { return D.KONSONANTER.indexOf(b) >= 0; }
 
     function gyldig(t) {
-        return !!(t && t.version === VERSION && t.quiz === Q.id && t.hold && t.hold.length >= D.MIN_HOLD
-            && t.faerdige && t.historik);
+        return !!(t && t.version === VERSION && t.quiz === Q.id && t.hold && t.hold.length >= (alene ? 1 : D.MIN_HOLD)
+            && !!t.alene === alene && t.faerdige && t.historik);
     }
 
     var S = NK.Spil = {};
     S.erVokal = erVokal;
     S.erKonsonant = erKonsonant;
 
-    S.init = function (quiz) {
+    S.init = function (quiz, somAlene) {
         Q = quiz;
+        alene = !!somAlene;
         T = NK.hent(lagernoegle(), null);
         if (!gyldig(T)) T = null;
         return T;
     };
+
+    S.alene = function () { return alene; };
 
     S.Q = function () { return Q; };
     S.T = function () { return T; };
@@ -64,7 +76,9 @@
         T = {
             version: VERSION,
             quiz: Q.id,
-            hold: holdliste(navne),
+            alene: alene,
+            nyRekord: false,
+            hold: alene ? [{ navn: String(navne[0] || "").trim() || D.ALENE.navn, total: 0 }] : holdliste(navne),
             nr: -1,
             g: null,
             starter: 0,
@@ -159,7 +173,8 @@
             vinder: null,
             gevinst: 0,
             loest: false,
-            final: G.type === "final" ? { hold: S.rangliste()[0], praemie: null, valgt: [], vundet: null } : null
+            liv: alene && G.type === "runde" ? D.ALENE.liv : null,
+            final: G.type === "final" ? { hold: alene ? 0 : S.rangliste()[0], praemie: null, valgt: [], vundet: null } : null
         };
         S.gem();
         return true;
@@ -206,9 +221,28 @@
 
     /* ----- En runde med hjulet ----------------------------------------- */
     function naesteTur() {
+        T.g.drej = null;
+        if (alene) {
+            mistLiv();
+            return;
+        }
         T.g.tur = (T.g.tur + 1) % T.hold.length;
         T.g.fase = "tur";
-        T.g.drej = null;
+    }
+
+    /* Alene: turen gaar ikke videre, men koster et liv. Uden liv er runden
+       tabt, og loesningen vises uden point. */
+    function mistLiv() {
+        var g = T.g;
+        g.liv = Math.max(0, (g.liv || 0) - 1);
+        if (g.liv > 0) { g.fase = "tur"; return; }
+        g.runde[0] = 0;
+        g.loest = true;
+        g.tabt = true;
+        g.vinder = null;
+        g.gevinst = 0;
+        g.fase = "loest";
+        T.faerdige[g.nr] = { vinder: null, gevinst: 0 };
     }
 
     S.kanDreje = function () {
@@ -326,6 +360,27 @@
         return true;
     };
 
+    /* Alene: fortryd "Løs gåden", foer der er svaret. Det koster intet. */
+    S.fortrydLoes = function () {
+        if (T.g.fase !== "loes") return false;
+        T.g.fase = "tur";
+        S.gem();
+        return true;
+    };
+
+    /* Er den skrevne loesning rigtig? Store og smaa bogstaver, mellemrum,
+       bindestreger og tegn er ligegyldige, og AE, OE og AA godtages for
+       Æ, Ø og Å. */
+    function kompakt(s) {
+        return NK.Tavle.normaliser(s).replace(/Æ/g, "AE").replace(/Ø/g, "OE").replace(/Å/g, "AA").replace(/[^A-Z0-9]/g, "");
+    }
+
+    S.tjek = function (tekst) {
+        var G = S.aktuel();
+        var k = kompakt(tekst);
+        return !!(G && k && k === kompakt(G.loesning));
+    };
+
     S.giveTur = function (h) {
         if (!T.hold[h] || T.g.type !== "runde" || T.g.loest) return false;
         aftryk();
@@ -396,19 +451,43 @@
         return true;
     };
 
+    /* Hvad toss-uppen er vaerd lige nu. Med hold hele beloebet. Alene den
+       andel af bogstaverne, der stadig er skjult, rundet ned til hele
+       D.ALENE.trin, men mindst ét trin, saa laenge der er noget skjult. */
+    S.tossupVaerdi = function () {
+        var G = S.aktuel();
+        if (!alene) return G.vaerdi;
+        var alle = G.celler.filter(function (c) { return c.bogstav; }).length;
+        var skjulte = S.skjulteFelter().length;
+        if (!skjulte || !alle) return 0;
+        var trin = D.ALENE.trin;
+        return Math.max(trin, Math.floor(G.vaerdi * skjulte / alle / trin) * trin);
+    };
+
     S.tossupSvar = function (rigtigt) {
         var g = T.g;
         if (g.fase !== "svarer") return false;
         aftryk();
         var h = g.svarer;
         if (rigtigt) {
-            T.hold[h].total += S.aktuel().vaerdi;
-            g.gevinst = S.aktuel().vaerdi;
+            var v = S.tossupVaerdi();
+            T.hold[h].total += v;
+            g.gevinst = v;
             g.vinder = h;
             g.loest = true;
             g.fase = "loest";
             T.faerdige[g.nr] = { vinder: h, gevinst: g.gevinst };
             T.starter = h;
+        } else if (alene) {
+            /* Alene: et forkert svar viser flere bogstaver, saa gaaden bliver mindre vaerd */
+            for (var k = 0; k < D.ALENE.straf; k++) {
+                var skjulte = S.skjulteFelter();
+                if (!skjulte.length) break;
+                g.aabne.push(NK.tilfaeldig(skjulte));
+            }
+            g.forkerte = (g.forkerte || 0) + 1;
+            g.svarer = null;
+            g.fase = S.skjulteFelter().length ? "koerer" : "alle";
         } else {
             g.ude.push(h);
             g.svarer = null;
@@ -530,9 +609,28 @@
     };
 
     S.slut = function () {
+        if (alene && !T.slut) T.nyRekord = S.gemRekord();
         T.slut = true;
         S.gem();
     };
+
+    /* ----- Rekorden (alene) --------------------------------------------- */
+    S.rekord = function () {
+        var r = NK.hent(rekordnoegle(), null);
+        return r && isFinite(r.point) ? r : null;
+    };
+
+    /* Gemmer spillerens resultat, hvis det er bedre end rekorden. */
+    S.gemRekord = function () {
+        if (!alene || !T) return false;
+        var r = S.rekord(), p = T.hold[0].total;
+        if (r && r.point >= p) return false;
+        if (p <= 0) return false;
+        NK.gem(rekordnoegle(), { point: p, navn: T.hold[0].navn, dato: new Date().toISOString().slice(0, 10) });
+        return true;
+    };
+
+    S.glemRekord = function () { NK.glem(rekordnoegle()); };
 
     S.tilbageFraSlut = function () {
         T.slut = false;

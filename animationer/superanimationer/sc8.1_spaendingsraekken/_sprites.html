@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sc8.1 Spændingsrækken</title>
+<style>
+    body { background: #1b1d24; color: #dde3ea; font-family: "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    h1 { font-size: 1rem; margin: 0 0 14px; color: #f2c53d; }
+    h2 { font-size: 0.8rem; margin: 18px 0 8px; color: #a9b0ba; text-transform: uppercase; letter-spacing: 0.08em; }
+    .ark { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+    figure { margin: 0; padding: 10px; background: #3b404c; border: 1px solid #4a4a58; border-radius: 8px; text-align: center; }
+    figure img, figure canvas { display: block; margin: 0 auto 6px; }
+    figcaption { font-size: 0.78rem; color: #c8ced6; }
+</style>
+</head>
+<body>
+<!-- Udviklerværktøj: viser tegningerne alene, før de sættes i bevægelse. Indgår ikke i animationen. -->
+<h1>sc8.1: bægerglasset og stængerne</h1>
+<h2>Sprite</h2>
+<div class="ark">
+    <figure><img src="sprites/baegerglas.svg" width="200"><figcaption>baegerglas.svg (fra sc2.1 og sc7.2)</figcaption></figure>
+</div>
+<h2>Stængerne med deres lag (tegnet i js/tegning.js)</h2>
+<div class="ark">
+    <figure><canvas id="laerred" width="760" height="300"></canvas><figcaption>Zn i Cu²⁺, Cu i Ag⁺, Fe i Cu²⁺, Mg i H⁺, Zn i Fe²⁺, Pb i Ag⁺</figcaption></figure>
+</div>
+<script src="js/kerne.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script>
+    NK.Sprites.start();
+    setTimeout(function () {
+        var ctx = document.getElementById("laerred").getContext("2d"), Tg = NK.Tegn;
+        ctx.fillStyle = "#262833";
+        ctx.fillRect(0, 0, 760, 300);
+        [["Zn", "Cu"], ["Cu", "Ag"], ["Fe", "Cu"], ["Mg", "H"], ["Zn", "Fe"], ["Pb", "Ag"]].forEach(function (p, n) {
+            var g = Tg.glasMaal(70 + n * 124, 280, 104);
+            var r = NK.Kemi.reaktion(p[0], p[1]);
+            var bobler = [];
+            if (r.gas) for (var k = 0; k < 8; k++) bobler.push({ x: g.cx + (k % 2 ? 9 : -9), y: g.overflade + 10 + k * 7, r: 2.5 + (k % 3) });
+            Tg.glas(ctx, g, Tg.oplLag(p[1], p[0], 0.6, r.koef[0] / r.koef[1]), {
+                inde: function (c) {
+                    Tg.stang(c, { x: g.cx, top: g.bundY - 9 - 165, b: 16, l: 165, metal: p[0], klemme: g.top + 4,
+                        belaeg: r.gas ? null : { metal: p[1], x: 0.8, fra: g.overflade } });
+                    if (bobler.length) Tg.bobler(c, bobler);
+                }
+            });
+        });
+    }, 400);
+</script>
+</body>
+</html>

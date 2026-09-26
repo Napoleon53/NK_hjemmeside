@@ -115,11 +115,11 @@ lyde der bruges.
 
 ## Menuen
 
-Ikke i menuen endnu. Når brugeren siger til: en knap i
-`kemi-c-filer/samling_c_spil.html` med `data-emne="spil.jeopardy"`, der peger på
-`../superanimationer/sc_spil_jeopardy/index.html` (C), og en knap et sted i
-B-menuen, der peger på `index.html#b`. Der er ingen spil-samling på B endnu. Tilføj
-en linje i `FEEDBACK_EMNER`, og ret kolonnen "I menuen" i `../README.md`.
+I menuen fra 25. sept. 2026: knap nr. 3 i `kemi-c-filer/samling_c_spil.html`
+(`data-emne="spil.jeopardy"`, peger på `../superanimationer/sc_spil_jeopardy/index.html`,
+altså C), i stedet for den gamle Ion-Tetris, og i `FEEDBACK_EMNER` i
+`samling_alt.html`. B-udgaven (`index.html#b`) har ingen knap endnu, fordi der ikke
+er en spil-samling på B.
 
 ## Tilbuddet om præsentationen
 

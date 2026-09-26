@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc7.2 pH-skalaen</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen rammer tabelværdierne (vands
+   ionprodukt, pH for fortyndet saltsyre og natronlud, antallet af ioner i
+   luppen), at tallene skrives rigtigt, at tjekket af tallet på fane 3
+   giver den rigtige besked ved de typiske fejl, at sproget overholder
+   reglerne, at alle tre faner kan gennemføres (også med musen), at
+   syren aldrig bliver basisk, at Kemichael kan vises og sendes ud, og at
+   layoutet holder fra 520 × 380 til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc7.2-skala", "nk-sc7.2-lup", "nk-sc7.2-fortynd",
+    "nk-sc7.2-intro-skala", "nk-sc7.2-intro-lup", "nk-sc7.2-intro-fortynd"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function naer(a, b, tol) { return Math.abs(a - b) <= (tol || 1e-9); }
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, K = NK.Kemi, Tg = NK.Tegn;
+    paastand("data.js, kemi.js, tegning.js og lup.js er kørt", !!(D && D.STOFFER && K && K.syre && Tg && Tg.skala && NK.Lup));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-skala"] && NK.sims["fane-lup"] && NK.sims["fane-fortynd"]));
+    var sprites = D.STOFFER.map(function (s) { return s.id; }).concat(["phmeter", "baegerglas", "flaske", "pipette", "sproejteflaske",
+        "kaffekop", "laererKrop", "laererHoved", "laererArm"]);
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var S = NK.sims["fane-skala"], L = NK.sims["fane-lup"], F = NK.sims["fane-fortynd"];
+    paastand("Kemichael er koblet på alle tre faner", !!(S.laerer && L.laerer && F.laerer));
+
+    overskrift("2. Modellen");
+    var ionprodukt = [0, 1, 2.3, 5, 7, 7.4, 9, 12.5, 14].filter(function (ph) { return !naer(K.h3o(ph) * K.oh(ph), 1e-14, 1e-24); });
+    paastand("[H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴ M² ved alle pH", ionprodukt.length === 0, ionprodukt.join(", "));
+    paastand("pH 7: [H₃O⁺] = [OH⁻] = 1,0 · 10⁻⁷ M", naer(K.h3o(7), 1e-7, 1e-20) && naer(K.oh(7), 1e-7, 1e-20));
+    paastand("pH 3: [H₃O⁺] = 1,0 · 10⁻³ M og [OH⁻] = 1,0 · 10⁻¹¹ M", naer(K.h3o(3), 1e-3, 1e-15) && naer(K.oh(3), 1e-11, 1e-22));
+    paastand("ét pH-trin ned er 10 gange flere H₃O⁺", naer(K.h3o(4) / K.h3o(5), 10, 1e-9) && naer(K.oh(5) / K.oh(4), 10, 1e-9));
+    var syre = [[0.1, "1,00"], [1e-2, "2,00"], [1e-4, "4,00"], [1e-6, "6,00"], [1e-7, "6,79"], [1e-8, "6,98"], [1e-9, "7,00"], [1e-10, "7,00"]];
+    var syreFejl = syre.filter(function (x) { return K.phTekst(K.syre(x[0]).ph, 2) !== x[1]; });
+    paastand("fortyndet saltsyre: pH 1, 2, 4, 6, 6,79, 6,98, 7,00, 7,00", syreFejl.length === 0,
+        syreFejl.map(function (x) { return x[0] + "→" + K.phTekst(K.syre(x[0]).ph, 2); }).join(", "));
+    var aldrig = [1e-7, 1e-8, 1e-9, 1e-10, 1e-12, 1e-15].every(function (c) { return K.syre(c).ph < 7 && K.base(c).ph > 7; });
+    paastand("syren kommer aldrig over pH 7, basen aldrig under", aldrig);
+    var base = [[0.1, "13,00"], [1e-4, "10,00"], [1e-7, "7,21"], [1e-8, "7,02"]];
+    var baseFejl = base.filter(function (x) { return K.phTekst(K.base(x[0]).ph, 2) !== x[1]; });
+    paastand("fortyndet natronlud: pH 13, 10, 7,21, 7,02", baseFejl.length === 0,
+        baseFejl.map(function (x) { return x[0] + "→" + K.phTekst(K.base(x[0]).ph, 2); }).join(", "));
+    paastand("syren: [H₃O⁺] = c + [OH⁻] (hver H₃O⁺ fra vandet har en OH⁻ med)", [1e-6, 1e-7, 1e-8].every(function (c) {
+        var m = K.syre(c); return naer(m.h3o, c + m.oh, 1e-20);
+    }));
+    paastand("luppen: 10 H₃O⁺ ved pH 7 og zoom 8, og 10 ved pH 13 og zoom 14", naer(K.antal(K.h3o(7), 8), 10, 1e-9) && naer(K.antal(K.h3o(13), 14), 10, 1e-9));
+    paastand("luppen: ét zoomklik er et 10 gange større rum", naer(K.rumfang(10) / K.rumfang(9), 10, 1e-9) && naer(K.side(10) / K.side(9), Math.pow(10, 1 / 3), 1e-9));
+    paastand("luppen: antallet er c · V · N_A", naer(K.antal(1e-7, 9), 1e-7 * K.rumfang(9) * K.NA, 1e-6));
+    paastand("terningen: 5,5 nm, 1,2 µm og 0,26 mm", K.sideTekst(2) === "5,5 nm" && K.sideTekst(9) === "1,2 µm" && K.sideTekst(16) === "0,26 mm",
+        K.sideTekst(2) + " / " + K.sideTekst(9) + " / " + K.sideTekst(16));
+    paastand("terningen på 1,2 µm er som en bakterie, 0,26 mm som et sandkorn", K.sammenligning(9) === "en bakterie" && K.sammenligning(16) === "et sandkorn");
+    var f1 = K.farve(1), f7 = K.farve(7), f13 = K.farve(13);
+    paastand("universalindikatoren: rød ved 1, grøn ved 7, lilla ved 13", f1[0] > f1[1] && f1[0] > f1[2] && f7[1] > f7[0] && f7[1] > f7[2] && f13[2] > f13[1] && f13[0] > f13[1]);
+
+    overskrift("3. Tallene skrives rigtigt");
+    var ord = [[10, "10"], [100, "100"], [10000, "10.000"], [50119, "50.000"], [3162, "3.200"], [1e6, "1 million"], [3.162e6, "3,2 millioner"],
+        [1e10, "10 milliarder"], [1e12, "1 billion"], [2, "2"], [2.51, "2,5"]];
+    var ordFejl = ord.filter(function (x) { return K.ord(x[0]) !== x[1]; });
+    paastand("store tal i ord: 10.000, 3,2 millioner, 10 milliarder, 1 billion", ordFejl.length === 0,
+        ordFejl.map(function (x) { return x[0] + "→" + K.ord(x[0]); }).join(", "));
+    paastand("ioner i luppen: 0, 7, 1.000, 10⁵, 5,0 · 10⁵", K.antalTekst(0.3) === "0" && K.antalTekst(7.2) === "7" && K.antalTekst(1000) === "1.000" &&
+        K.antalTekst(1e5) === "10⁵" && K.antalTekst(5e5) === "5,0 · 10⁵");
+    paastand("gennemsnit under én: 0,1 og 10⁻⁸", K.gennemsnitTekst(0.1) === "0,1" && K.gennemsnitTekst(1e-8) === "10⁻⁸");
+    paastand("pH 6: 10 gange så mange H₃O⁺ som i rent vand", K.modVand(6) === "10 gange så mange H₃O⁺ som i rent vand.");
+    paastand("pH 9: 100 gange så mange OH⁻", K.modVand(9) === "100 gange så mange OH⁻ som i rent vand.");
+    paastand("pH 2,3: ca. 50.000 gange så mange H₃O⁺", K.modVand(2.3) === "Ca. 50.000 gange så mange H₃O⁺ som i rent vand.", K.modVand(2.3));
+    paastand("pH 7,0 er neutral, 6,98 er sur, 7,02 er basisk", K.surhed(7, 1) === "neutral" && K.surhed(6.98, 2) === "sur" && K.surhed(7.02, 2) === "basisk" &&
+        K.surhed(6.998, 2) === "neutral");
+
+    overskrift("4. Stofferne og målene");
+    paastand("12 stoffer, 6 på hver hylde", D.STOFFER.length === 12 && D.HYLDER.every(function (h) { return h.stoffer.length === 6; }));
+    paastand("hver hylde har sure og basiske stoffer og spænder over mindst 10 pH-enheder", D.HYLDER.every(function (h) {
+        var ph = h.stoffer.map(function (s) { return s.ph; });
+        return ph.filter(function (p) { return p < 7; }).length >= 2 && ph.filter(function (p) { return p > 7; }).length >= 2 &&
+            Math.max.apply(null, ph) - Math.min.apply(null, ph) >= 10;
+    }));
+    paastand("øl 4,5, blod 7,4 og sæbevand 9,5 fra den gamle er med", D.stof("oel").ph === 4.5 && D.stof("blod").ph === 7.4 && D.stof("saebevand").ph === 9.5);
+    paastand("alle pH-værdier er mellem 0 og 14", D.STOFFER.every(function (s) { return s.ph >= 0 && s.ph <= 14; }));
+    var lupUmulig = D.LUP_MAAL.filter(function (m) {
+        for (var z = K.ZOOM_MIN; z <= K.ZOOM_MAKS; z++) {
+            if ((m.maal.zMin === undefined || z >= m.maal.zMin) && (m.maal.zMaks === undefined || z <= m.maal.zMaks)) return false;
+        }
+        return true;
+    });
+    paastand("alle fem mål i luppen kan nås inden for zoomen", D.LUP_MAAL.length === 5 && lupUmulig.length === 0);
+    paastand("mål 3: ved pH 2 og zoom 2-5 er der 1-1.000 H₃O⁺", [2, 3, 4, 5].every(function (z) { var n = K.antal(K.h3o(2), z); return n >= 1 && n <= 1000; }));
+    paastand("mål 4: den første OH⁻ ved pH 2 kommer ved zoom 12", K.antal(K.oh(2), 11) < 0.5 && K.antal(K.oh(2), 12) >= 1);
+    paastand("mål 4: ved pH 2 er der 10 milliarder H₃O⁺ for hver OH⁻", K.ord(K.h3o(2) / K.oh(2)) === "10 milliarder" && /10 milliarder/.test(D.LUP_MAAL[3].efter));
+    paastand("mål 5: fra pH 1 til 13 er 12 klik", D.LUP_MAAL[4].maal.zMin - D.LUP_MAAL[4].start.z === 12);
+    var m1 = D.FORTYND_MAAL[0], m5 = D.FORTYND_MAAL[4];
+    paastand("fortyndingen, mål 1: det rigtige svar er modellens pH", m1.valg[m1.rigtig][0] === "pH " + K.phTekst(K.syre(D.START_C / 10).ph, 0));
+    paastand("fortyndingen, mål 5: det rigtige svar er modellens pH", m5.valg[m5.rigtig][0] === "pH " + K.phTekst(K.base(D.START_C / 1000).ph, 0));
+    paastand("fortyndingen, mål 3: facit er 10⁴", D.FORTYND_MAAL[2].svar === Math.round(D.START_C / 1e-5));
+    paastand("hvert forkert valg har en forklaring", [m1, m5].every(function (m) {
+        return m.valg.every(function (v, i) { return i === m.rigtig ? true : v[1].length > 10; });
+    }));
+
+    overskrift("5. Tjek af tallet på fane 3");
+    var T = NK.SimFortynd.tjekTal, m3 = D.FORTYND_MAAL[2];
+    var gode = ["10000", "10.000", "10 000", "10^4", "10⁴", "1·10⁴", "1 · 10^4", "1e4", "10000 gange"];
+    var ikkeGod = gode.filter(function (x) { return !T(x, m3).ok; });
+    paastand(gode.length + " skrivemåder af 10.000 godkendes", ikkeGod.length === 0, ikkeGod.join(", "));
+    var FEJL = [["4", /antallet af fortyndinger/], ["40", /lagt 10 sammen/], ["5", /glassets pH/], ["1000", /Tæl fortyndingerne/],
+        ["10^5", /Tæl fortyndingerne/], ["123", /Gang dem sammen/], ["abc", /Skriv et tal/]];
+    var tjekFejl = FEJL.filter(function (f) { var r = T(f[0], m3); return r.ok || !f[1].test(r.besked || ""); });
+    paastand(FEJL.length + " typiske fejl giver den rigtige besked", tjekFejl.length === 0,
+        tjekFejl.map(function (f) { return f[0] + "→" + (T(f[0], m3).besked || "ok"); }).join("; "));
+    paastand("et tomt felt er ikke en fejl", T("", m3).tom === true && T("  ", m3).tom === true);
+
+    overskrift("6. Sproget");
+    var replikker = [].concat(D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND, D.HYLDE_ROS,
+        [D.LUP_FAERDIG, D.FORTYND_BASISK, D.FORTYND_FAERDIG, D.AEG_PRAECIS, D.AEG_ZOOM]);
+    var tekster = replikker.concat(
+        D.STOFFER.map(function (s) { return s.navn + " " + s.note; }),
+        D.HYLDER.map(function (h) { return h.navn + " " + h.hint; }),
+        D.LUP_MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + m.efter; }),
+        D.FORTYND_MAAL.map(function (m) {
+            return m.tekst + " " + m.hint + " " + m.efter + " " + (m.valg || []).map(function (v) { return v.join(" "); }).join(" ") +
+                " " + (m.fejl || []).map(function (f) { return f[1]; }).join(" ");
+        }));
+    var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
+    var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
+    paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
+    paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
+    var lange = replikker.filter(function (t) { return t.length > 62; });
+    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("hver præsentation har to eller tre replikker", [D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
+
+    function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    function mus(canvas, type, x, y) {
+        var r = canvas.getBoundingClientRect();
+        canvas.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 7, bubbles: true, isPrimary: true }));
+    }
+
+    overskrift("7. Skalaen kan gennemføres");
+    klik('[data-fane="fane-skala"]');
+    S.tilpas();
+    S.afvisTilbud();
+    S.nulstil(); tik(S, 0.3);
+    var c = d.getElementById("skala-laerred"), lay = S.lay;
+    var cit = S.stoffer.filter(function (s) { return s.st.id === "citron"; })[0];
+    var tx = Tg.skalaX(lay.skala, 4);
+    mus(c, "pointerdown", cit.x, cit.y - cit.h * 0.5);
+    mus(c, "pointermove", cit.x + 30, cit.y - 80);
+    mus(c, "pointermove", tx, lay.skala.y + lay.skala.h / 2);
+    paastand("mens citronsaften trækkes over skalaen, står gættet i linjen under scenen", /Dit gæt: pH 4,0/.test(d.getElementById("skala-status").textContent));
+    mus(c, "pointerup", tx, lay.skala.y + lay.skala.h / 2);
+    paastand("citronsaften kan trækkes op på skalaen, og gættet er pH 4,0", cit.gaet === 4 && cit.status === "tilMaaler");
+    tik(S, 1);
+    paastand("pH-metret måler, og elektroden er nede i citronsaften", cit.status === "maales" && S.elektrodeSpids().y > lay.bordY - lay.hi * 0.6);
+    tik(S, 1.2);
+    paastand("pH-metret viser 2,3", S.visning === "2,3");
+    tik(S, 1);
+    paastand("citronsaften står ved pH 2,3 over skalaen", cit.status === "placeret" && !cit.flyver && Math.abs(cit.x - Tg.skalaX(lay.skala, 2.3)) < 1 && cit.y < lay.skala.y);
+    paastand("panelet viser citronsaften, gættet og hvor mange H₃O⁺", /Citronsaft/.test(d.getElementById("skala-stofnavn").textContent) &&
+        /Dit gæt: 4,0\. Nogenlunde/.test(d.getElementById("skala-gaet").textContent) &&
+        /50\.000 gange så mange H₃O⁺/.test(d.getElementById("skala-modvand").textContent));
+    paastand("listen viser gæt og målt", /4,0/.test(d.getElementById("skala-liste").textContent) && /2,3/.test(d.getElementById("skala-liste").textContent));
+    var cola = S.stoffer.filter(function (s) { return s.st.id === "cola"; })[0];
+    mus(c, "pointerdown", cola.x, cola.y - cola.h * 0.5);
+    mus(c, "pointermove", cola.x + 30, cola.y - 30);
+    mus(c, "pointerup", cola.x + 30, cola.y - 30);
+    paastand("slippes et stof ved siden af skalaen, kommer det tilbage og får en besked", cola.status === "hylde" && /Slip stoffet over skalaen/.test(S.el.besked.textContent));
+    tik(S, 1);
+    mus(c, "pointerdown", cola.x, cola.y - cola.h * 0.5); mus(c, "pointerup", cola.x, cola.y - cola.h * 0.5);
+    paastand("et klik på et stof siger, hvad man gør", /Træk cola op på skalaen/.test(S.el.besked.textContent));
+    S.gaet(cola, 2.5, { x: cola.x, y: cola.y, h: cola.h });
+    tik(S, 3.5);
+    paastand("påskeægget: et gæt, der rammer præcist, får en kommentar fra Kemichael", !!(S.laerer.scene && S.laerer.scene.navn === "aeg"));
+    tik(S, 6);
+    var navne = ["kaffe", "maelk", "natron", "afloebsrens"];
+    navne.forEach(function (id) {
+        var s = S.stoffer.filter(function (a) { return a.st.id === id; })[0];
+        S.gaet(s, 7, { x: s.x, y: s.y, h: s.h });
+        tik(S, 3.3);
+    });
+    paastand("hylde 1 er målt: 6/6, besked og Næste hylde", S.naaet && S.antalMaalt() === 6 && S.el.knap.textContent === "Næste hylde →" &&
+        /Alle seks er målt. 2 af dine 6 gæt/.test(S.el.besked.textContent), S.el.besked.textContent);
+    tik(S, 2.5);
+    paastand("efter hylde 1 roser Kemichael", !!(S.laerer.scene && S.laerer.scene.navn === "faerdig"));
+    var baner = S.stoffer.every(function (s) { return s.bane >= 0 && s.bane < 5; });
+    var roerer = S.stoffer.some(function (a) {
+        return S.stoffer.some(function (b) { return a !== b && a.bane === b.bane && Math.abs(a.x - b.x) < lay.ikonH * 0.9; });
+    });
+    paastand("de målte stoffer står i baner uden at røre hinanden", baner && !roerer);
+    tik(S, 8);
+    S.knap(); tik(S, 0.5);
+    paastand("hylde 2: hylde 1 står blegt over skalaen, og seks nye er på bordet", S.hylde === 1 &&
+        S.stoffer.filter(function (s) { return s.gammel && s.status === "placeret"; }).length === 6 &&
+        S.stoffer.filter(function (s) { return s.status === "hylde"; }).length === 6);
+    S.knap();
+    paastand("Giv hint giver hyldens hint", /Maven skal kunne nedbryde maden/.test(S.el.besked.textContent) && S.el.knap.textContent === "Vis svaret");
+    S.knap();
+    tik(S, 12);
+    paastand("Vis svaret måler resten uden gæt", S.naaet && S.antalMaalt() === 6 && S.denneHylde().every(function (s) { return s.gaet === null; }));
+    paastand("knappen går videre til luppen", S.el.knap.textContent === "Videre til luppen →");
+    tik(S, 8);
+    S.knap();
+    paastand("og fane 2 vises", d.getElementById("fane-lup").classList.contains("aktiv"));
+    klik('[data-fane="fane-skala"]');
+    tik(S, 0.5);
+    paastand("fane 1 viser nu alle tolv stoffer over skalaen", S.stoffer.length === 12 && S.stoffer.every(function (s) { return s.status === "placeret" && !s.gammel; }));
+    S.nulstil(); tik(S, 0.3);
+    paastand("R starter forfra med hylde 1", S.hylde === 0 && S.antalMaalt() === 0);
+
+    overskrift("8. Luppen kan gennemføres");
+    klik('[data-fane="fane-lup"]');
+    L.tilpas();
+    L.afvisTilbud();
+    L.nr = 0; L.startMaal(); tik(L, 0.5);
+    paastand("mål 1 starter ved pH 7 med 10 H₃O⁺ og 10 OH⁻ i luppen", L.ph === 7 && L.lup.synlige("h3o") === 10 && L.lup.synlige("oh") === 10);
+    var cl = d.getElementById("lup-laerred"), ll = L.lay;
+    L.zoom(1); tik(L, 1);
+    paastand("zoom ud ved pH 7: 100 H₃O⁺, men målet er ikke nået", L.lup.synlige("h3o") === 100 && !L.naaet);
+    L.zoom(-1); tik(L, 1);
+    var x7 = Tg.skalaX(ll.skala, 7), x6 = Tg.skalaX(ll.skala, 6.05);
+    mus(cl, "pointerdown", x7, ll.skala.y + ll.skala.h / 2);
+    mus(cl, "pointermove", (x7 + x6) / 2, ll.skala.y + ll.skala.h / 2);
+    mus(cl, "pointermove", x6, ll.skala.y + ll.skala.h / 2);
+    tik(L, 0.2);
+    paastand("mens mærket holdes, er målet ikke nået endnu", !L.naaet);
+    mus(cl, "pointerup", x6, ll.skala.y + ll.skala.h / 2);
+    tik(L, 0.8);
+    paastand("pH-mærket kan trækkes til pH 6: 100 H₃O⁺ og 1 OH⁻, og mål 1 er nået", L.ph === 6 && L.naaet &&
+        L.lup.synlige("h3o") === 100 && L.lup.synlige("oh") === 1);
+    paastand("panelet viser 10 gange så mange H₃O⁺ og [H₃O⁺] = 1,0 · 10⁻⁶ M", /10 gange så mange H₃O⁺/.test(d.getElementById("lup-modvand").textContent) &&
+        d.getElementById("lup-ch").textContent === "1,0 · 10⁻⁶ M");
+    L.knap(); tik(L, 0.3);
+    L.saetPh(8); L.traek = null; tik(L, 0.3);
+    paastand("mål 2: pH 8 er ikke nok", !L.naaet);
+    L.saetPh(9); tik(L, 0.5);
+    paastand("pH 9 giver 1.000 OH⁻, og mål 2 er nået", L.naaet && L.lup.synlige("oh") === 1000);
+    L.knap(); tik(L, 0.3);
+    L.saetPh(2); tik(L, 0.5);
+    paastand("mål 3: ved pH 2 er der for mange H₃O⁺, og luppen viser en tåge", L.lup.taageMaal.h3o === 1 && L.lup.synlige("h3o") === 0 &&
+        /Zoom ind/.test(d.getElementById("lup-status").textContent));
+    var z0 = L.z;
+    L.zoom(-1); L.zoom(-1); tik(L, 0.6);
+    paastand("to klik ind er ikke nok", !L.naaet);
+    L.zoom(-1); L.zoom(-1); tik(L, 0.6);
+    paastand("fire klik ind: 100 H₃O⁺, og mål 3 er nået", L.naaet && L.lup.synlige("h3o") === 100 && /zoomede 4 gange ind/.test(L.el.besked.textContent) && z0 - L.z === 4);
+    L.knap(); tik(L, 0.3);
+    for (var i = 0; i < 7; i++) L.zoom(1);
+    tik(L, 0.6);
+    paastand("mål 4: efter 7 klik ud er der stadig ingen OH⁻", !L.naaet && L.lup.synlige("oh") === 0);
+    L.zoom(1); tik(L, 0.6);
+    paastand("zoom 12: én OH⁻ i luppen, og mål 4 er nået", L.naaet && L.lup.synlige("oh") === 1 && L.z === 12);
+    L.knap(); tik(L, 0.3);
+    paastand("mål 5 starter ved pH 1 og zoom 2 med 10 H₃O⁺", L.ph === 1 && L.z === 2 && L.lup.synlige("h3o") === 10);
+    L.saetPh(13); tik(L, 0.3);
+    for (i = 0; i < 11; i++) L.zoom(1);
+    tik(L, 0.6);
+    paastand("11 klik er ikke nok", !L.naaet);
+    L.zoom(1); tik(L, 3);
+    paastand("12 klik ud ved pH 13: 10 H₃O⁺, og mål 5 er nået", L.naaet && L.lup.synlige("h3o") === 10);
+    paastand("efter det sidste mål roser Kemichael", !!(L.laerer.scene && L.laerer.scene.navn === "faerdig"));
+    tik(L, 8);
+    L.knap();
+    paastand("knappen går videre til fortyndingen", d.getElementById("fane-fortynd").classList.contains("aktiv"));
+    klik('[data-fane="fane-lup"]');
+    paastand("fane 2 har nu frit valg", !L.maal() && L.el.knap.textContent === "Start målene forfra");
+    L.saetPh(7); L.traek = null;
+    L.tast({ key: "ArrowLeft" });
+    paastand("venstre pil sænker pH med 0,1", naer(L.ph, 6.9, 1e-9));
+    L.tast({ key: "ArrowDown" });
+    paastand("pil ned går til nærmeste hele pH under", L.ph === 6);
+    var zf = L.z; L.tast({ key: "+" });
+    paastand("+ zoomer ind", L.z === zf - 1);
+    for (i = 0; i < 20; i++) L.zoom(1);
+    paastand("zoom stopper ved " + K.ZOOM_MAKS + " med en besked", L.z === K.ZOOM_MAKS && /Længere ud/.test(L.el.besked.textContent));
+    L.knap();
+    paastand("Start målene forfra", L.nr === 0 && L.maal() === D.LUP_MAAL[0]);
+    L.nr = 2; L.startMaal(); L.knap(); L.knap(); tik(L, 1);
+    paastand("Vis svaret på mål 3: pH 2 og zoom 5", L.naaet && L.ph === 2 && L.z === 5 && L.lup.synlige("h3o") === 1000);
+    L.nr = 0; L.startMaal();
+
+    overskrift("9. Fortyndingen kan gennemføres");
+    klik('[data-fane="fane-fortynd"]');
+    F.tilpas();
+    F.afvisTilbud();
+    F.nr = 0; F.toemBordet(); F.startMaal(); tik(F, 0.3);
+    var cf = d.getElementById("fortynd-laerred"), lf = F.lay;
+    paastand("bordet har saltsyren ved pH 1 og natronluden ved pH 13", F.serier.syre.length === 1 && F.serier.base.length === 1 &&
+        Math.abs(F.serier.syre[0].x - Tg.skalaX(lf.skala, 1)) < 1 && Math.abs(F.serier.base[0].x - Tg.skalaX(lf.skala, 13)) < 1);
+    klik("#fortynd-opgave .vaelger:nth-child(2)");
+    paastand("mål 1: et bud på pH 1,1 bliver husket", F.valgNr === 1 && /Dit bud/.test(F.el.besked.textContent) && !F.naaet);
+    var ks = lf.knapSyre;
+    mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
+    paastand("knappen Fortynd 10 gange starter pipetten", !!F.anim && F.animFase() === "suger");
+    mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
+    paastand("et klik mere, mens der fyldes, giver en besked", /Vent/.test(F.el.besked.textContent) && F.serier.syre.length === 2);
+    tik(F, 2.2);
+    var g1 = F.serier.syre[1];
+    paastand("det nye glas har pH 2,00 og står under pH 2", !F.anim && K.phTekst(g1.ph, 2) === "2,00" && Math.abs(g1.x - Tg.skalaX(lf.skala, 2)) < 1 && g1.fyld > 100);
+    paastand("buddet pH 1,1 var forkert og får sin forklaring", !F.naaet && /helt trin/.test(F.el.besked.textContent));
+    klik("#fortynd-opgave .vaelger:nth-child(3)");
+    paastand("pH 2: mål 1 er nået", F.naaet);
+    paastand("luppen viser det nye glas", F.valgt === g1 && d.getElementById("fortynd-ph").textContent === "2,00");
+    F.knap();
+    for (i = 0; i < 3; i++) { F.fortynd("syre"); tik(F, 2); }
+    paastand("mål 2: fire fortyndinger giver pH 5, og målet er nået", F.naaet && K.phTekst(F.sidste("syre").ph, 2) === "5,00");
+    F.knap(); tik(F, 0.2);
+    F.input.value = "40"; F.tjekFelt();
+    paastand("mål 3: 40 giver beskeden om at gange", !F.naaet && /lagt 10 sammen/.test(F.el.besked.textContent));
+    F.input.value = "10.000"; F.tjekFelt();
+    paastand("10.000 er rigtigt", F.naaet);
+    F.knap(); tik(F, 0.2);
+    var surt = true;
+    for (i = 0; i < 5; i++) { F.fortynd("syre"); tik(F, 2); if (!(F.sidste("syre").ph < 7)) surt = false; }
+    paastand("mål 4: syren er fortyndet 9 gange, og pH kom aldrig over 7", surt && F.antalFortyndinger("syre") === D.MAKS_GLAS && F.naaet,
+        F.serier.syre.map(function (g) { return K.phTekst(g.ph, 2); }).join(" "));
+    paastand("de sidste glas viser 6,79, 6,98, 7,00 og 7,00", F.serier.syre.slice(6).map(function (g) { return K.phTekst(g.ph, 2); }).join(" ") === "6,79 6,98 7,00 7,00");
+    tik(F, 2.5);
+    paastand("Kemichael: det er vand nu", !!(F.laerer.scene && F.laerer.scene.navn === "sig"));
+    F.fortynd("syre");
+    paastand("en tiende fortynding giver en besked om pladsen", /ikke plads/.test(F.el.besked.textContent) && F.antalFortyndinger("syre") === D.MAKS_GLAS);
+    var fejlSide = F.serier.syre.some(function (g) { return g.k > 0 && g.x > Tg.skalaX(lf.skala, 7); });
+    paastand("syreglassene står til venstre for 7, og ingen højere end 5 rækker", !fejlSide && F.serier.syre.every(function (g) { return g.r < 5; }));
+    tik(F, 8);
+    F.knap(); tik(F, 0.2);
+    klik("#fortynd-opgave .vaelger:nth-child(3)");
+    for (i = 0; i < 3; i++) { F.fortynd("base"); tik(F, 2); }
+    paastand("mål 5: natronluden fortyndet 1.000 gange har pH 10,00, og målet er nået", F.naaet && K.phTekst(F.sidste("base").ph, 2) === "10,00");
+    tik(F, 3);
+    paastand("efter det sidste mål roser Kemichael", !!(F.laerer.scene && F.laerer.scene.navn === "sig"));
+    tik(F, 8);
+    F.knap();
+    paastand("frit valg bagefter", !F.maal() && F.el.knap.textContent === "Start målene forfra");
+    var basisk = F.serier.base.every(function (g) { return g.ph > 7; });
+    paastand("natronluden er basisk i alle glas", basisk);
+    var gl = F.serier.syre[3];
+    var hb = gl.bund - lf.gh * gl.skala * 0.5;
+    mus(cf, "pointerup", gl.x, hb);
+    paastand("et klik på et glas viser det i luppen", F.valgt === gl && d.getElementById("fortynd-ph").textContent === "4,00");
+    F.nulstil();
+    paastand("Tøm bordet efterlader kun de to flasker", F.serier.syre.length === 1 && F.serier.base.length === 1);
+    F.knap();
+    paastand("Start målene forfra", F.nr === 0);
+    F.nr = 1; F.startMaal(); F.knap(); F.knap(); tik(F, 10);
+    paastand("Vis svaret på mål 2 fortynder selv til pH 5", F.naaet && F.antalFortyndinger("syre") >= 4);
+    F.nr = 0; F.toemBordet(); F.startMaal();
+
+    overskrift("10. Kemichaels præsentation og rundvisningen");
+    [["fane-skala", S, "skala"], ["fane-lup", L, "lup"], ["fane-fortynd", F, "fortynd"]].forEach(function (x) {
+        klik('[data-fane="' + x[0] + '"]');
+        var sim = x[1];
+        sim.startIntro(true);
+        tik(sim, 1);
+        paastand(x[2] + ": K viser præsentationen, og knappen Spring over står der",
+            !!(sim.laerer.scene && sim.laerer.scene.navn === "intro") && !d.getElementById(x[2] + "-spring").hidden,
+            (sim.laerer.scene && sim.laerer.scene.navn) + " / vent " + sim.introVent + " / skjult " + d.getElementById(x[2] + "-spring").hidden);
+        sim.springIntro();
+        paastand(x[2] + ": Spring over sender ham ud", sim.laerer.scene && sim.laerer.scene.navn === "introUd");
+        tik(sim, 3);
+        sim.visTilbud(true); sim.afvisTilbud();
+        paastand(x[2] + ": tilbuddet skjules med display: none efter Nej tak", W.getComputedStyle(d.getElementById(x[2] + "-tilbud")).display === "none");
+    });
+    klik('[data-fane="fane-lup"]');
+    L.startIntro(true); tik(L, 0.5);
+    L.saetPh(5); tik(L, 0.3);
+    paastand("man kan flytte pH, mens han taler", L.ph === 5 && L.laerer.scene.navn === "intro");
+    L.springIntro(); tik(L, 3);
+    L.nr = 0; L.startMaal();
+    var tur = ["#skala-anker-skala", "#skala-anker-stoffer", "#skala-anker-meter", "#skala-anker-baner", "#skala-kort",
+        "#lup-anker-skala", "#lup-anker-glas", "#lup-anker-lup", "#lup-anker-zoom", "#lup-maaling", "#lup-kort",
+        "#fortynd-anker-knapper", "#fortynd-anker-flasker", "#fortynd-anker-skala", "#fortynd-anker-lup", "#fortynd-glas", "#fortynd-kort"];
+    paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
+
+    overskrift("11. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
+    stoerrelser.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        var problemer = [];
+        ["fane-skala", "fane-lup", "fane-fortynd"].forEach(function (id) {
+            klik('[data-fane="' + id + '"]');
+            var sim = NK.sims[id];
+            sim.tilpas();
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H;
+            function inde(r, navn) {
+                if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
+            }
+            function over(a, b, navn) {
+                if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
+            }
+            var sk = { x: lay.skala.x0, y: lay.skala.y, b: lay.skala.x1 - lay.skala.x0, h: lay.skalaBund - lay.skala.y };
+            inde(sk, "skalaen");
+            if (id === "fane-skala") {
+                var bh = Tg.stofBredde(lay.hi);
+                lay.pladser.forEach(function (x, i) {
+                    var r = { x: x - bh / 2, y: lay.bordY - lay.hi, b: bh, h: lay.hi };
+                    inde(r, "stof " + i);
+                    if (r.y < lay.skalaBund + 8) problemer.push(id + ": stof " + i + " rører skalaen");
+                    if (i > 0 && lay.pladser[i] - lay.pladser[i - 1] < bh * 0.9) problemer.push(id + ": stofferne rører hinanden");
+                });
+                var me = { x: lay.meter.x - lay.meter.b / 2, y: lay.meter.bund - lay.meter.h, b: lay.meter.b, h: lay.meter.h };
+                inde(me, "pH-metret");
+                var sidst = lay.pladser[5] + bh / 2;
+                if (sidst > lay.maalX - lay.hi * 0.4) problemer.push(id + ": det sidste stof står på malepladsen");
+                if (lay.luft + 3 * lay.baneH > lay.skala.y) problemer.push(id + ": banerne går ned i skalaen");
+                if (lay.hi < 40) problemer.push(id + ": stofferne er for små");
+            }
+            if (id === "fane-lup") {
+                var Lp = lay.lup;
+                inde({ x: Lp.cx - Lp.R, y: Lp.cy - Lp.R, b: 2 * Lp.R, h: 2 * Lp.R }, "luppen");
+                if (Lp.cy - Lp.R < lay.skalaBund) problemer.push(id + ": luppen rører skalaen");
+                var g = lay.glas;
+                var gr = { x: g.cx - g.b / 2, y: g.bund - g.b * 1.2, b: g.b, h: g.b * 1.2 };
+                inde(gr, "glasset");
+                over(gr, { x: Lp.cx - Lp.R, y: Lp.cy - Lp.R, b: 2 * Lp.R, h: 2 * Lp.R }, "glasset under luppen");
+                [lay.ud, lay.ind].forEach(function (k) { inde({ x: k.x - k.r, y: k.y - k.r, b: 2 * k.r, h: 2 * k.r }, "en zoomknap"); });
+                if (lay.tekstY + 40 > Hc) problemer.push(id + ": tællingen går under kanten");
+            }
+            if (id === "fane-fortynd") {
+                var Lf = lay.lup;
+                var lr = { x: Lf.cx - Lf.R, y: Lf.cy - Lf.R, b: 2 * Lf.R, h: 2 * Lf.R };
+                inde(lr, "luppen");
+                if (Lf.cy - Lf.R < lay.skalaBund) problemer.push(id + ": luppen rører skalaen");
+                if (lay.tekstY + 36 > lay.bordY - lay.fb * 1.55) problemer.push(id + ": tællingen rører flaskerne");
+                inde(lay.knapSyre, "knappen til syren"); inde(lay.knapBase, "knappen til basen");
+                over(lay.knapSyre, lay.knapBase, "knapperne overlapper");
+                if (lay.bordY - lay.gh - (RAEKKER_I_TEST - 1) * lay.raekke < lay.skalaBund + 4) problemer.push(id + ": bunken ved 7 når op i skalaen");
+                if (lay.gw < 26) problemer.push(id + ": glassene er for små");
+            }
+        });
+        paastand("layoutet holder ved " + st[0] + " × " + st[1], problemer.length === 0, problemer.slice(0, 3).join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    klik('[data-fane="fane-skala"]');
+    S.nulstil();
+}
+var RAEKKER_I_TEST = 5;
+</script>
+</body>
+</html>

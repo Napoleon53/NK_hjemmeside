@@ -81,8 +81,9 @@ function koer() {
     paastand("lige dele vand og ethanol vejer 0,926 g/mL (tabellen: 44 % ethanol)", naer(t11, 0.926, 0.002), t11.toFixed(4));
     paastand("2 dele vand og 3 dele ethanol vejer 0,904 g/mL, lettere end olie", naer(t23, 0.904, 0.002) && t23 < 0.92, t23.toFixed(4));
     paastand("ren vand og ren ethanol giver tabelværdien", naer(D.faseTaethed([1, 0, 0]), 0.998, 1e-6) && naer(D.faseTaethed([0, 1, 0]), 0.789, 1e-6));
-    paastand("olien svæver kun i lige dele (under 0,008 g/mL fra olie)",
-        Math.abs(t11 - 0.92) < NK.Model.PARAM.svaeve && Math.abs(t23 - 0.92) > NK.Model.PARAM.svaeve);
+    var t45 = D.faseTaethed([4, 5, 0]);
+    paastand("ingen blanding af hele portioner vejer præcis som olie: lige dele er lidt tungere (" + t11.toFixed(4) + "), 4 vand og 5 ethanol lidt lettere (" + t45.toFixed(4) + ")",
+        t11 - 0.92 > NK.Model.PARAM.svaeve && 0.92 - t45 > NK.Model.PARAM.svaeve);
 
     overskrift("3. Blandbarheden følger af kræfterne mellem molekylerne");
     paastand("vand og ethanol kan blandes", D.blandbar(iv, ie));
@@ -97,14 +98,17 @@ function koer() {
     fyld(m, [iv, iv, iv]);
     paastand("tre portioner fylder præcis ni rækker", m.top() === 8 && m.raekkeAntal[8] === m.C);
     m = model(3);
-    fyld(m, [iv, iv, iv, iv, iv, iv, iv, iv, iv]);
-    paastand("ni portioner fylder bassinet helt (" + m.C * m.R + " kugler)", m.top() === m.R - 1 && m.raekkeAntal[m.R - 1] === m.C && m.spildt === 0);
+    var fulde = m.R / 3, liste = [];
+    for (var i = 0; i < fulde; i++) liste.push(iv);
+    fyld(m, liste);
+    paastand(fulde + " portioner fylder bassinet helt (" + m.C * m.R + " kugler)", m.top() === m.R - 1 && m.raekkeAntal[m.R - 1] === m.C && m.spildt === 0);
+    paastand("bassinet starter med to portioner, under en femtedel fuldt", NK.bassin.m.opgoer().alt[iv] <= 2 * D.PORTION && 2 / fulde < 0.2);
     m = model(4);
     fyld(m, [iv, iv]);
-    for (var i = 0; i < 8; i++) m.haeldI(i % 2 ? io : iv);
-    trin(m, 12);
+    for (i = 0; i < fulde - 1; i++) m.haeldI(i % 2 ? io : iv);
+    trin(m, 26);
     var o4 = m.opgoer();
-    paastand("ti portioner: det, der er for meget, løber over", m.spildt >= 96 && o4.alt[iv] + o4.alt[io] === m.C * m.R, "spildt " + m.spildt);
+    paastand((fulde + 1) + " portioner: det, der er for meget, løber over", m.spildt >= D.PORTION && m.spildt < D.PORTION + 10 && o4.alt[iv] + o4.alt[io] === m.C * m.R, "spildt " + m.spildt);
     paastand("ingen huller under overfladen efter hældning og overløb", hulFri(m));
     m = model(5);
     fyld(m, [iv, iv, iv, io]);
@@ -150,7 +154,7 @@ function koer() {
     trin(m, 12);
     a = m.analyse();
     lo = lagAf(a, m.fase[io]);
-    paastand("olie + vand rystet: to lag igen efter 12 s, olien øverst", !a.uklart && !!lo && lo.til === m.top() && lo.n >= 90);
+    paastand("olie + vand rystet: to lag igen efter 12 s, olien øverst", !a.uklart && !!lo && lo.til === m.top() && lo.n >= 0.9 * D.PORTION);
     m = model(10);
     fyld(m, [iv, iv, ie, ie], true);
     m.ryst(1.2);
@@ -197,11 +201,30 @@ function koer() {
     m.haeldI(io);
     trin(m, 1.5);
     m.ryst(1.2);
-    trin(m, 25);
+    trin(m, 5);
     a = m.analyse();
     lo = lagAf(a, m.fase[io]);
-    paastand("lige dele vand og ethanol: olien samler sig hverken i bunden eller i toppen",
-        !lo || !(lo.fra === 0 && lo.n > 80) && !(lo.til === m.top() && lo.n > 80 && !lo.svaever));
+    paastand("lige dele vand og ethanol: 5 s efter rystningen er olien ikke oppe endnu",
+        !lo || !(lo.til === m.top() && lo.n > 0.9 * D.PORTION));
+    tid = 5;
+    while (tid < 60) {
+        a = m.analyse(); lo = lagAf(a, m.fase[io]);
+        if (lo && lo.til === m.top() && lo.n > 0.9 * D.PORTION && !a.uklart) break;
+        trin(m, 1); tid++;
+    }
+    paastand("lige dele vand og ethanol: olien flyder langsomt op (" + tid + " s)", tid < 60 && tid > 8);
+    m = model(15);
+    fyld(m, [iv, iv, iv, iv, ie, ie, ie, ie, ie], true);
+    m.haeldI(io);
+    trin(m, 1.5);
+    m.ryst(1.2);
+    tid = 0;
+    while (tid < 150) {
+        a = m.analyse(); lo = lagAf(a, m.fase[io]);
+        if (lo && lo.fra === 0 && lo.n > 0.9 * D.PORTION && !a.uklart) break;
+        trin(m, 1); tid++;
+    }
+    paastand("4 vand og 5 ethanol: olien synker langsomt til bunds (" + tid + " s)", tid < 150 && tid > 8);
 
     overskrift("8. Opgaverne");
     var OP = D.OPGAVER;
@@ -259,6 +282,7 @@ function koer() {
     overskrift("10. Kemichael");
     paastand("præsentationen har to eller tre linjer på højst 60 tegn",
         D.INTRO.length >= 2 && D.INTRO.length <= 3 && D.INTRO.every(function (l) { return l.length <= 60; }));
+    paastand("han kommer kun forbi ved påskeægget", Object.keys(D.REPLIK).join(",") === "svaever");
     paastand("hans replikker er højst 60 tegn",
         Object.keys(D.REPLIK).every(function (k) { return D.REPLIK[k].every(function (l) { return l.length <= 60; }); }));
 

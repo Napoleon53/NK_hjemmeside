@@ -6,7 +6,7 @@
    de samme funktioner i mindre ruder.
 
    MAAL samler alle maal, saa tegning og simulation er enige om, hvor
-   hanen, spidsen og baegerglasset er.
+   hanerne, tuderne og vasken er.
    ===================================================================== */
 (function () {
     "use strict";
@@ -17,12 +17,11 @@
 
     var MAAL = {
         W: 1000, H: 640, BORD: 540,
-        TIP: { x: 390, y: 264 },
-        HANE: { x: 390, y: 218 },
-        BURETTE: { venstre: 381, hoejre: 399, bund: 206, nul: 30, maks: 50 },
-        BAEGER: { venstre: 327, hoejre: 453, bund: 536, top: 446, pxPrML: 0.36, maks: 250 },
-        FLASKER: [{ vaeske: "vand", x: 600 }, { vaeske: "ethanol", x: 690 }, { vaeske: "heptan", x: 780 }],
-        FLASKE_TOP: 390,
+        HANER: [{ vaeske: "vand", x: 290 }, { vaeske: "ethanol", x: 400 }, { vaeske: "heptan", x: 510 }],
+        GREB_Y: 196,        /* hanegrebet midt paa ventilen */
+        TUD_Y: 246,         /* hvor straalen kommer ud */
+        SKILT_Y: 86,        /* skiltenes overkant */
+        VASK: { venstre: 196, hoejre: 604, top: 466 },
         KLUD: { x: 825, y: 572, b: 150, h: 56 },
         STAV_L: 200,
         LUP: { x: 850, y: 185, r: 118 }
@@ -30,6 +29,11 @@
 
     var T = { MAAL: MAAL };
     NK.VandTegning = T;
+
+    T.hane = function (vaeske) {
+        for (var i = 0; i < MAAL.HANER.length; i++) if (MAAL.HANER[i].vaeske === vaeske) return MAAL.HANER[i];
+        return null;
+    };
 
     var MINUS = "#8fcaf0";
     var PLUS = "#f39a8f";
@@ -55,80 +59,71 @@
         ctx.fillRect(-3000, MAAL.BORD, 7000, 2);
     };
 
-    /* ----- Stativ, burette og hane ------------------------------------------- */
-    T.burette = function (ctx, vol, vaeske, haneAaben) {
-        var B = MAAL.BURETTE;
-        S.tegn(ctx, "stativ", 200, 10, 220, 530);
-        if (vol > 0.01 && vaeske) {
-            var top = B.bund - vol / B.maks * (B.bund - B.nul);
-            ctx.fillStyle = D.VAESKER[vaeske].farve;
-            ctx.fillRect(B.venstre, top, B.hoejre - B.venstre, B.bund - top);
-            ctx.fillRect(388, 206, 4, 50);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
-            ctx.fillRect(B.venstre, top, B.hoejre - B.venstre, 1.5);
-        }
-        S.tegn(ctx, "burette", 370, 16, 40, 250);
+    /* ----- Haner og vask -------------------------------------------------------
+       aaben: vaesken, hvis hane er aaben (eller null). fremhaev: hanen under
+       musen. Grebet paa langs af tuden er aabent, paa tvaers er lukket. */
+    T.haner = function (ctx, aaben, fremhaev) {
+        S.tegn(ctx, "haner", 120, 60, 520, 480);
 
-        /* Hanegrebet: paa langs af buretten er aaben, paa tvaers er lukket. */
-        ctx.save();
-        ctx.translate(MAAL.HANE.x, MAAL.HANE.y);
-        ctx.rotate(haneAaben ? Math.PI / 2 : 0);
-        NK.rundtRekt(ctx, -19, -4, 38, 8, 4);
-        ctx.fillStyle = "#c9602e";
-        ctx.fill();
-        ctx.strokeStyle = "#7d3517";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.restore();
-        ctx.fillStyle = "#3b4250";
-        ctx.beginPath();
-        ctx.arc(MAAL.HANE.x, MAAL.HANE.y, 4.5, 0, Math.PI * 2);
-        ctx.fill();
-    };
-
-    /* ----- Baegerglasset ----------------------------------------------------
-       Vand og ethanol blandes; heptan laegger sig ovenpaa. */
-    T.baeger = function (ctx, indhold) {
-        var B = MAAL.BAEGER;
-        var vandig = (indhold.vand || 0) + (indhold.ethanol || 0);
-        var heptan = indhold.heptan || 0;
-        var y = B.bund, h;
-        if (vandig > 0.2) {
-            h = vandig * B.pxPrML;
-            ctx.fillStyle = (indhold.ethanol || 0) > (indhold.vand || 0) ? D.VAESKER.ethanol.farve : D.VAESKER.vand.farve;
-            ctx.fillRect(B.venstre, y - h, B.hoejre - B.venstre, h);
-            y -= h;
-        }
-        if (heptan > 0.2) {
-            h = heptan * B.pxPrML;
-            ctx.fillStyle = D.VAESKER.heptan.farve;
-            ctx.fillRect(B.venstre, y - h, B.hoejre - B.venstre, h);
-            if (vandig > 0.2) {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-                ctx.fillRect(B.venstre, y - 1, B.hoejre - B.venstre, 2);
-            }
-            y -= h;
-        }
-        if (y < B.bund) {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-            ctx.fillRect(B.venstre, y, B.hoejre - B.venstre, 1.5);
-        }
-        S.tegn(ctx, "baegerglas", 315, 440, 150, 100);
-    };
-
-    /* ----- Flasker og klud --------------------------------------------------- */
-    T.flasker = function (ctx, fremhaev) {
-        MAAL.FLASKER.forEach(function (f) {
-            if (fremhaev === f.vaeske) {
-                NK.rundtRekt(ctx, f.x - 46, MAAL.FLASKE_TOP - 6, 92, 160, 10);
+        MAAL.HANER.forEach(function (h) {
+            var v = D.VAESKER[h.vaeske];
+            if (fremhaev === h.vaeske) {
+                NK.rundtRekt(ctx, h.x - 50, MAAL.SKILT_Y - 6, 100, 172, 10);
                 ctx.fillStyle = "rgba(61, 158, 224, 0.14)";
                 ctx.fill();
+                ctx.strokeStyle = "rgba(242, 197, 61, 0.8)";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(h.x, MAAL.GREB_Y, 25, 0, Math.PI * 2);
+                ctx.stroke();
             }
-            S.tegn(ctx, "flaske", f.x - 40, MAAL.FLASKE_TOP, 80, 150);
-            var v = D.VAESKER[f.vaeske];
-            NK.tekst(ctx, stort(v.navn), f.x, MAAL.FLASKE_TOP + 94, { font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#2b2f36" });
-            NK.tekst(ctx, NK.formel(v.formel), f.x, MAAL.FLASKE_TOP + 110, { font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#4a505a" });
+            NK.tekst(ctx, stort(v.navn), h.x, MAAL.SKILT_Y + 17, { font: "700 15px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#2b2f36" });
+            NK.tekst(ctx, NK.formel(v.formel), h.x, MAAL.SKILT_Y + 34, { font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#4a505a" });
+
+            ctx.save();
+            ctx.translate(h.x, MAAL.GREB_Y);
+            ctx.rotate(aaben === h.vaeske ? Math.PI / 2 : 0);
+            NK.rundtRekt(ctx, -21, -4.5, 42, 9, 4.5);
+            ctx.fillStyle = "#c9602e";
+            ctx.fill();
+            ctx.strokeStyle = "#7d3517";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
+            ctx.fillStyle = "#3b4250";
+            ctx.beginPath();
+            ctx.arc(h.x, MAAL.GREB_Y, 4.5, 0, Math.PI * 2);
+            ctx.fill();
         });
+
+        /* Maerkatet ved heptanhanen */
+        var hep = T.hane("heptan");
+        ctx.strokeStyle = "#8b8470";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(hep.x + 46, 157);
+        ctx.lineTo(hep.x + 48, 178);
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(hep.x + 90, 198);
+        ctx.rotate(-0.07);
+        NK.rundtRekt(ctx, -50, -21, 100, 42, 5);
+        ctx.fillStyle = "#efe2b4";
+        ctx.fill();
+        ctx.strokeStyle = "#b09c5e";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        ctx.fillStyle = "#3b3526";
+        ctx.beginPath();
+        ctx.arc(-42, -14, 2.6, 0, Math.PI * 2);
+        ctx.fill();
+        NK.tekst(ctx, "Kun i", 4, -7, { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#5a4a1c" });
+        NK.tekst(ctx, "animationer", 4, 10, { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#5a4a1c" });
+        ctx.restore();
+    };
+
+    T.vask = function (ctx) {
+        S.tegn(ctx, "vask", 180, 456, 440, 84);
     };
 
     T.klud = function (ctx) {
@@ -153,7 +148,7 @@
             ctx.beginPath();
             pts.forEach(function (p, i) { if (i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
             ctx.strokeStyle = farve;
-            ctx.lineWidth = 4.4;
+            ctx.lineWidth = 5;
             ctx.stroke();
             ctx.beginPath();
             pts.forEach(function (p, i) { if (i) ctx.lineTo(p.x - 1, p.y); else ctx.moveTo(p.x - 1, p.y); });
@@ -164,25 +159,17 @@
         ctx.restore();
     };
 
-    /* En straale, der bøjer defl til siden, til brug i tegneserien. */
-    T.boejetStraale = function (defl) {
+    /* En straale fra hanen med vaesken, der bøjer defl til siden, til brug
+       i tegneserien. */
+    T.boejetStraale = function (vaeske, defl) {
+        var x0 = T.hane(vaeske).x;
         var pts = [];
         for (var i = 0; i <= 24; i++) {
             var t = i / 24;
-            var y = MAAL.TIP.y + t * (MAAL.BAEGER.top - MAAL.TIP.y);
-            pts.push({ x: MAAL.TIP.x + defl * t * t, y: y });
+            var y = MAAL.TUD_Y + t * (MAAL.VASK.top - MAAL.TUD_Y);
+            pts.push({ x: x0 + defl * t * t, y: y });
         }
         return [pts];
-    };
-
-    T.pytter = function (ctx, pytter) {
-        pytter.forEach(function (p) {
-            var r = Math.min(70, 8 + Math.sqrt(p.vol) * 9);
-            ctx.fillStyle = D.VAESKER[p.vaeske].farve;
-            ctx.beginPath();
-            ctx.ellipse(p.x, MAAL.BORD + 3, r, 3 + r * 0.06, 0, 0, Math.PI * 2);
-            ctx.fill();
-        });
     };
 
     /* ----- Stavene -------------------------------------------------------------

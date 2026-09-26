@@ -6,14 +6,11 @@
    bassinet og viser navnet paa den kugle, musen staar over.
 
    Bassinet er spritet sprites/bassin.svg (690 x 626 enheder, inderside
-   x 20-670 og y 30-604,4 = modellens 32,5 x 28,72 kuglediametre). Det
+   x 20-670 og y 30-604,4 = modellens 40,5 x 35,79 kuglediametre). Det
    lille glas er det samme sprite i godt en fjerdedel af stoerrelsen.
 
-   Haendelser, som Kemichael lytter efter (NK.Bassin.prototype.paa):
-     overloeb    bassinet loeb over
-     rystBlandet der blev rystet, men alt er ét lag
-     rystTomt    der blev rystet i et tomt bassin
-     svaever     en stor oliedraabe svaever midt i det hele
+   Haendelsen, som Kemichael lytter efter (NK.Bassin.prototype.paa):
+     svaever     en stor oliedraabe svaever midt i det hele (paaskeaegget)
    ===================================================================== */
 (function () {
     "use strict";
@@ -37,7 +34,6 @@
         this.greb = null;          /* musen holder i bassinet */
         this.mus = null;
         this.lyttere = {};
-        this.spildtFoer = 0;
         this.svaeverUr = 1;
         this.maengdeTekst = "";
         this.koblMus();
@@ -55,7 +51,6 @@
     /* fyld: [["vand", 3], ["olie", 1]] */
     P.nulstil = function (fyld, blandet) {
         this.m.nulstil();
-        this.spildtFoer = 0;
         if (fyld && fyld.length) {
             var arter = [];
             fyld.forEach(function (f) { for (var i = 0; i < f[1]; i++) arter.push(D.nr(f[0])); });
@@ -65,14 +60,9 @@
 
     P.haeld = function (stofId) { this.m.haeldI(D.nr(stofId)); };
 
-    P.ryst = function (sek) {
-        var a = this.m.analyse();
-        if (!a.n && !this.m.haelder()) this.udsend("rystTomt");
-        else if (a.faser === 1 && a.antal.filter(function (x) { return x > 0; }).length > 1) this.udsend("rystBlandet");
-        this.m.ryst(sek || 1.2, 1);
-    };
+    P.ryst = function (sek) { this.m.ryst(sek || 1.2, 1); };
 
-    P.toem = function () { this.m.toem(); this.spildtFoer = 0; };
+    P.toem = function () { this.m.toem(); };
 
     P.saetT = function (T) { this.m.saetT(T); };
 
@@ -90,7 +80,7 @@
         var gk = k * GLAS_SKALA;
         var gx = x0 + (SPRITE_B + MELLEM) * k, gy = y0 + SPRITE_H * k - SPRITE_H * gk;
         this.lay = {
-            k: k, x0: x0, y0: y0, u: 20 * k,
+            k: k, x0: x0, y0: y0, u: IND_B * k / this.m.bredde,
             ind: { x: x0 + IND_X * k, y: y0 + IND_Y * k, b: IND_B * k, h: (IND_BUND - IND_Y) * k },
             glas: { x: gx, y: gy, k: gk,
                     ind: { x: gx + IND_X * gk, y: gy + IND_Y * gk, bredde: IND_B * gk, hoejde: (IND_BUND - IND_Y) * gk } }
@@ -123,14 +113,9 @@
         /* Bassinet ryster, mens modellen ryster, og fjedrer tilbage, naar
            musen slipper */
         if (m.rystTid > 0 && !this.greb) {
-            this.ryk = Math.sin(this.tid * 38) * 9 * Math.min(1, m.rystTid * 3);
+            this.ryk = Math.sin(this.tid * 13) * 5 * Math.min(1, m.rystTid * 2);
         } else if (!this.greb) {
             this.ryk *= Math.exp(-12 * dt);
-        }
-
-        if (m.spildt > this.spildtFoer) {
-            this.spildtFoer = m.spildt;
-            this.udsend("overloeb");
         }
 
         this.svaeverUr -= dt;
@@ -164,7 +149,7 @@
         L.ryd();
         var dpr = L._dpr || 1, u = l.u, r = u * 0.47;
         var T = m.T, t = this.tid, i, k, p;
-        var amp = (0.05 + 0.1 * (T - 20) / 100) * u;
+        var amp = (0.025 + 0.06 * (T - 20) / 100) * u;
 
         /* Skygge og varme under bassinet */
         ctx.save();
@@ -199,7 +184,7 @@
         for (i = 0; i < n; i++) {
             k = kugler[i];
             if (k.tilst !== TILST.VAESKE) continue;
-            var w1 = 4 + (k.f1 % 1.7), w2 = 3.6 + (k.f2 % 1.5);
+            var w1 = 1.8 + (k.f1 % 1.2), w2 = 1.6 + (k.f2 % 1.1);
             p = this.tilPx(k.x + Math.sin(t * w1 + k.f1) * amp / u, k.y + Math.sin(t * w2 + k.f2) * amp / u);
             Tg.kugle(ctx, k.art, p.x, p.y, r, dpr);
         }
@@ -338,7 +323,7 @@
             var p = punkt(e);
             if (mig.klikFoerst && mig.klikFoerst(p.x, p.y)) return;
             if (!mig.iBassin(p.x, p.y)) return;
-            mig.greb = { x0: p.x, ryk0: mig.ryk, sidst: p.x, t: performance.now(), bevaeget: 0 };
+            mig.greb = { x0: p.x, ryk0: mig.ryk, sidst: p.x, t: performance.now() };
             try { c.setPointerCapture(e.pointerId); } catch (fejl) { /* ingen fangst */ }
             c.style.cursor = "grabbing";
         });
@@ -349,12 +334,10 @@
                 var g = mig.greb, nu = performance.now();
                 mig.ryk = NK.klamp(g.ryk0 + p.x - g.x0, -40, 40);
                 var fart = Math.abs(p.x - g.sidst) / Math.max(8, nu - g.t) * 1000;
-                g.bevaeget += Math.abs(p.x - g.sidst);
                 g.sidst = p.x;
                 g.t = nu;
                 /* Hurtige ryk ryster vaesken; langsomme flytter bare glasset */
                 if (fart > 500) mig.m.ryst(0.12, NK.klamp((fart - 500) / 1500, 0.2, 1));
-                if (g.bevaeget > 400 && !g.meldt) { g.meldt = true; mig.meldRyst(); }
                 return;
             }
             var over = mig.iBassin(p.x, p.y) || (mig.overLaerer && mig.overLaerer(p.x, p.y));
@@ -368,12 +351,6 @@
         c.addEventListener("pointerup", slip);
         c.addEventListener("pointercancel", slip);
         c.addEventListener("pointerleave", function () { mig.mus = null; });
-    };
-
-    /* Et langt ryk med musen taeller som en rystning for Kemichael */
-    P.meldRyst = function () {
-        var a = this.m.analyse();
-        if (a.faser === 1 && a.antal.filter(function (x) { return x > 0; }).length > 1) this.udsend("rystBlandet");
     };
 
     NK.Bassin = Bassin;

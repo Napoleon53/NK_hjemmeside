@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mængdeberegning</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇄</span> Mængdeberegning</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-vej" role="tab" aria-selected="true"><span class="nr">1</span>Vejen</button>
+        <button class="faneknap" data-fane="fane-skema" role="tab" aria-selected="false"><span class="nr">2</span>Skemaet</button>
+        <button class="faneknap" data-fane="fane-begr" role="tab" aria-selected="false"><span class="nr">3</span>Begrænsende mængde</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: VEJEN                                                      -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-vej" role="tabpanel" aria-label="Vejen">
+    <div class="scene">
+        <canvas id="vej-laerred"></canvas>
+        <div class="anker" id="vej-anker-skema"></div>
+        <div class="anker" id="vej-anker-vaegte"></div>
+        <div class="anker" id="vej-anker-boble"></div>
+        <div class="anker" id="vej-anker-laerer"></div>
+        <div class="skema-felter" id="vej-felter"></div>
+        <div class="kboble" id="vej-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="vej-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="vej-kort">
+            <h2><span id="vej-titel">Opgave</span><span class="taeller">opgave <b id="vej-nr">1</b>/<span id="vej-antal">4</span></span></h2>
+            <div id="vej-prompt"></div>
+            <p class="besked" id="vej-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="vej-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="vej-beregninger">
+            <h2>Beregningerne</h2>
+            <div class="regn-linjer" id="vej-linjer"></div>
+        </div>
+
+        <div class="kort" id="vej-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="vej-loest">0</b>/4</span></h2>
+            <div class="hyldeliste" id="vej-liste"></div>
+            <button class="knap nye" id="vej-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SKEMAET                                                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-skema" role="tabpanel" aria-label="Skemaet">
+    <div class="scene">
+        <canvas id="skema-laerred"></canvas>
+        <div class="anker" id="skema-anker-skema"></div>
+        <div class="anker" id="skema-anker-vaegt"></div>
+        <div class="anker" id="skema-anker-boble"></div>
+        <div class="anker" id="skema-anker-laerer"></div>
+        <div class="skema-felter" id="skema-felter"></div>
+        <div class="kboble" id="skema-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="skema-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="skema-kort">
+            <h2><span id="skema-titel">Opgave</span><span class="taeller">opgave <b id="skema-nr">1</b>/<span id="skema-antal">5</span></span></h2>
+            <div id="skema-prompt"></div>
+            <p class="besked" id="skema-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="skema-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="skema-beregninger">
+            <h2>Beregningerne</h2>
+            <div class="regn-linjer" id="skema-linjer"></div>
+        </div>
+
+        <div class="kort" id="skema-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="skema-loest">0</b>/5</span></h2>
+            <div class="vaelgerrad" id="skema-tilstand" role="group" aria-label="Trinvis eller frit">
+                <button class="vaelger" type="button" data-tilstand="trinvis">Trinvis</button>
+                <button class="vaelger" type="button" data-tilstand="frit">Frit</button>
+            </div>
+            <div class="hyldeliste" id="skema-liste"></div>
+            <button class="knap nye" id="skema-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: BEGRAENSENDE MAENGDE                                       -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-begr" role="tabpanel" aria-label="Begrænsende mængde">
+    <div class="scene">
+        <canvas id="begr-laerred"></canvas>
+        <div class="anker" id="begr-anker-skema"></div>
+        <div class="anker" id="begr-anker-bord"></div>
+        <div class="anker" id="begr-anker-boble"></div>
+        <div class="anker" id="begr-anker-laerer"></div>
+        <div class="skema-felter" id="begr-felter"></div>
+        <div class="kboble" id="begr-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="begr-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="begr-kort">
+            <h2><span id="begr-titel">Opgave</span><span class="taeller">opgave <b id="begr-nr">1</b>/<span id="begr-antal">6</span></span></h2>
+            <div id="begr-prompt"></div>
+            <p class="besked" id="begr-besked" aria-live="polite"></p>
+            <div class="knaprad valgrad" id="begr-valg" hidden></div>
+            <div class="knaprad"><button class="knap" id="begr-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="begr-beregninger">
+            <h2>Beregningerne</h2>
+            <div class="regn-linjer" id="begr-linjer"></div>
+        </div>
+
+        <div class="kort" id="begr-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="begr-loest">0</b>/6</span></h2>
+            <div class="hyldeliste" id="begr-liste"></div>
+            <button class="knap nye" id="begr-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Mængdeberegning</h2>
+        <p>Koefficienterne i et afstemt reaktionsskema gælder stofmængder, ikke masser. Vejen fra gram til gram går derfor altid over mol.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            111,70 g Fe reagerer: Fe + S ⟶ FeS<br>
+            n(Fe) = <span class="broek"><span>111,70 g</span><span>55,85 g/mol</span></span> = 2,00 mol<br>
+            n(FeS) = <span class="broek"><span>1</span><span>1</span></span> · n(Fe) = 2,00 mol<br>
+            m(FeS) = 2,00 mol · 87,91 g/mol = 175,82 g
+        </div>
+        <p>I skemaet står massen m, molarmassen M og stofmængden n under hver formel. Skemaet afstemmes først, og molarmassen regnes af atommasserne.</p>
+        <p>Massen er bevaret: summen af masserne før reaktionen er lig med summen efter.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Begrænsende mængde</span>
+            Del hver reaktants stofmængde med sin koefficient. Det mindste tal slipper op først og bestemmer, hvor meget der dannes. Resten er i overskud.
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/skema.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_vej.js"></script>
+<script src="js/sim_skema.js"></script>
+<script src="js/sim_begr.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

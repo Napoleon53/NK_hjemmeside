@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120">
+  <!-- Mavesaft: en mave (som i biologibogen) med saft i bunden. Staar paa y 118. -->
+  <defs>
+    <linearGradient id="mave" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3a2a8"/>
+      <stop offset="1" stop-color="#cf6571"/>
+    </linearGradient>
+    <clipPath id="inde">
+      <path d="M38 22 Q40 42 30 54 Q14 74 22 96 Q32 116 58 110 Q84 104 86 76 Q88 56 72 50 Q60 46 58 36 L58 18 Z"/>
+    </clipPath>
+  </defs>
+  <ellipse cx="54" cy="116" rx="34" ry="3" fill="#000000" fill-opacity="0.3"/>
+  <!-- Spiseroeret og tarmen -->
+  <path d="M40 4 L40 22 M56 4 L56 20" stroke="#c9707a" stroke-width="2"/>
+  <rect x="40" y="2" width="16" height="22" fill="#eb9aa1"/>
+  <path d="M84 80 Q94 84 92 98 L92 112" fill="none" stroke="#e29098" stroke-width="10" stroke-linecap="round"/>
+  <!-- Maven -->
+  <path d="M38 22 Q40 42 30 54 Q14 74 22 96 Q32 116 58 110 Q84 104 86 76 Q88 56 72 50 Q60 46 58 36 L58 18 Z"
+        fill="url(#mave)" stroke="#a84552" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Saften i bunden -->
+  <g clip-path="url(#inde)">
+    <path d="M10 86 Q30 82 50 86 Q70 90 96 84 L96 120 L10 120 Z" fill="#e8e27a" fill-opacity="0.85"/>
+    <path d="M10 86 Q30 82 50 86 Q70 90 96 84" fill="none" stroke="#fff6a8" stroke-width="1.5"/>
+  </g>
+  <!-- Folder i vaeggen -->
+  <g fill="none" stroke="#b9525f" stroke-opacity="0.6" stroke-width="1.6" stroke-linecap="round">
+    <path d="M34 62 Q44 58 52 64"/>
+    <path d="M60 58 Q70 56 76 64"/>
+    <path d="M30 74 Q40 70 50 76"/>
+  </g>
+  <path d="M30 60 Q34 52 40 50" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+</svg>

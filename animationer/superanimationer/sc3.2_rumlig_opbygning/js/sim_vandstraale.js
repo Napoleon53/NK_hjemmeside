@@ -1,17 +1,20 @@
 /* =====================================================================
    sim_vandstraale.js - fane 4: forsoeg med vandstraalen og en ladet stav
 
-   En burette fyldes med vand, ethanol eller heptan, og hanen aabnes.
-   Straalen er en raekke smaa partikler, der falder med tyngdekraften.
-   En stav, der er gnedet med uldkluden, er ladet: plastik negativt,
-   glas positivt. Holdes den taet paa straalen, traekker den i hver
-   partikel med en kraft, der aftager med afstanden i anden potens og
-   er proportional med vaeskens polaritet (D.VAESKER[].pol).
+   Over en vask sidder tre haner med vand, ethanol og heptan. Et klik
+   aabner en hane (og lukker den, der var aaben), og straalen loeber, til
+   hanen lukkes. Straalen er en raekke smaa partikler, der falder med
+   tyngdekraften. En stav, der er gnedet med uldkluden, er ladet:
+   plastik negativt, glas positivt. Holdes den taet paa straalen,
+   traekker den i hver partikel med en kraft, der aftager med afstanden
+   i anden potens og er proportional med vaeskens polaritet
+   (D.VAESKER[].pol).
 
    Roerer staven straalen, bliver den vaad og mister ladningen. Et test
    registreres, naar en ladet stav har vaeret taet paa straalen i lidt
-   over et sekund. Naar alle tre vaesker er testet, og vand er testet
-   med begge stave, er forsoeget slut, og tegneserien laases op.
+   over et sekund, og skrives i skemaet i panelet. Naar alle tre vaesker
+   er testet med begge stave, er forsoeget slut, og tegneserien og
+   opgaverne laases op.
 
    Alt tegnes med vand_tegning.js i scenens egne enheder (1000 x 640).
    ===================================================================== */
@@ -23,10 +26,7 @@
     var T = NK.VandTegning;
     var MAAL = T.MAAL;
 
-    var FYLD = 30;             /* mL, der haeldes i buretten */
-    var FLOW = 2;              /* mL pr. sekund, naar hanen er aaben */
     var UDSLIP = 90;           /* straalepartikler pr. sekund */
-    var VOL_P = FLOW / UDSLIP; /* mL pr. partikel */
     var TYNGDE = 1000;         /* enheder pr. s² */
     var START_FART = 70;
     var K = 2.0e6;             /* stavens traek */
@@ -41,35 +41,52 @@
         plastik: { navn: "plastikstaven", sprite: "plastikstav", tegn: -1, hvile: { x: 560, y: 590 } },
         glas:    { navn: "glasstaven", sprite: "glasstav", tegn: 1, hvile: { x: 560, y: 616 } }
     };
+    var STAV_ORDEN = ["plastik", "glas"];
 
     function stort(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-    function oplist(navne) {
+    function oplist(navne, og) {
         if (navne.length < 2) return navne.join("");
-        return navne.slice(0, -1).join(", ") + " og " + navne[navne.length - 1];
+        return navne.slice(0, -1).join(", ") + " " + (og || "og") + " " + navne[navne.length - 1];
     }
 
-    /* ----- Forloebet ------------------------------------------------------ */
-    var TRIN = [
-        { id: "fyldt", tekst: "Fyld buretten fra en flaske",
-          hint: function () { return "Klik på en af flaskerne. Buretten skal være tom, og hanen skal være lukket."; } },
-        { id: "aabnet", tekst: "Åbn hanen, så der løber en stråle",
-          hint: function () { return "Klik på det orange hanegreb nederst på buretten."; } },
-        { id: "gnedet", tekst: "Gnid en stav med uldkluden",
-          hint: function () { return "Tag fat i en stav, og træk den frem og tilbage hen over uldkluden."; } },
-        { id: "holdt", tekst: "Hold staven tæt på strålen",
-          hint: function () { return "Hold museknappen nede, og før spidsen af staven tæt på strålen uden at røre den."; } },
-        { id: "alle", tekst: "Test alle tre væsker",
-          hint: function (sim) {
-              var mangler = D.VAESKE_ORDEN.filter(function (v) { return !sim.testet(v); }).map(function (v) { return D.VAESKER[v].navn; });
-              return "Mangler: " + oplist(mangler) + ". Lad buretten løbe tom, og fyld den med den næste væske.";
-          } },
-        { id: "begge", tekst: "Test vand med begge stave",
-          hint: function (sim) {
-              var stav = sim.resultater.vand.plastik ? "glasstaven" : "plastikstaven";
-              return "Fyld buretten med vand, og hold " + stav + " ved strålen.";
-          } }
-    ];
+    /* Hvad skemaet skriver om en vaeske. */
+    function afboejning(v) {
+        var p = D.VAESKER[v].pol;
+        return p >= 0.8 ? "bøjer tydeligt" : p >= 0.3 ? "bøjer lidt" : "løber lige ned";
+    }
+
+    /* Skemaet: vaeskerne paa raekkerne, stavene i kolonnerne. Faar den
+       celler med, gemmes cellerne der, saa panelet kan rette i dem. */
+    function resultatTabel(sim, celler) {
+        var tabel = document.createElement("table");
+        tabel.className = "resultater";
+        var hoved = document.createElement("tr");
+        ["", "Plastikstav (−)", "Glasstav (+)"].forEach(function (t) {
+            var th = document.createElement("th");
+            th.textContent = t;
+            hoved.appendChild(th);
+        });
+        tabel.appendChild(hoved);
+        D.VAESKE_ORDEN.forEach(function (v) {
+            var tr = document.createElement("tr");
+            var th = document.createElement("th");
+            th.textContent = stort(D.VAESKER[v].navn);
+            tr.appendChild(th);
+            STAV_ORDEN.forEach(function (id) {
+                var td = document.createElement("td");
+                td.textContent = sim.resultater[v][id] ? afboejning(v) : "?";
+                if (!sim.resultater[v][id]) td.className = "ikke";
+                if (celler) {
+                    celler[v] = celler[v] || {};
+                    celler[v][id] = td;
+                }
+                tr.appendChild(td);
+            });
+            tabel.appendChild(tr);
+        });
+        return tabel;
+    }
 
     /* ----- Opgaverne: laases op, naar forsoeget er slut ------------------- */
     function valgopgave(tekst, svar, hint, forklaring) {
@@ -110,7 +127,6 @@
         this.s = 1;
         this.ox = 0;
         this.oy = 0;
-        this.TRIN = TRIN;
         this.OPGAVER = OPGAVER;
         this.opgaver = new NK.Opgaver("vand", OPGAVER, this);
         this.nulstilForsoeg();
@@ -123,15 +139,10 @@
     P.nulstilForsoeg = function () {
         var mig = this;
         this.tid = 0;
-        this.vaeske = null;
-        this.vol = 0;
-        this.visVol = 0;
-        this.haneAaben = false;
+        this.aaben = null;
         this.partikler = [];
         this.udslipRest = 0;
         this.naesteNr = 0;
-        this.baeger = { vand: 0, ethanol: 0, heptan: 0 };
-        this.pytter = [];
         this.gnister = [];
         this.stave = {};
         Object.keys(STAVE).forEach(function (id) {
@@ -143,7 +154,9 @@
         this.resultater = { vand: {}, ethanol: {}, heptan: {} };
         this.testTid = {};
         this.testMaks = {};
-        this.gjort = { fyldt: false, aabnet: false, gnedet: false, holdt: false };
+        this.maalerNu = null;
+        this.nyNoegle = null;
+        this.nyTid = -10;
         this.minAfstand = Infinity;
         this.naermeste = null;
         this.afboejningNu = 0;
@@ -159,23 +172,39 @@
     };
 
     /* ----- Forloebet --------------------------------------------------------- */
-    P.testet = function (vaeske) {
-        return Object.keys(this.resultater[vaeske]).length > 0;
+    P.antalResultater = function () {
+        var mig = this;
+        return D.VAESKE_ORDEN.reduce(function (n, v) { return n + Object.keys(mig.resultater[v]).length; }, 0);
     };
 
-    P.trinGjort = function (id) {
-        if (id === "alle") return D.VAESKE_ORDEN.every(this.testet, this);
-        if (id === "begge") return !!(this.resultater.vand.plastik && this.resultater.vand.glas);
-        return !!this.gjort[id];
-    };
-
-    P.aktueltTrin = function () {
-        for (var i = 0; i < TRIN.length; i++) if (!this.trinGjort(TRIN[i].id)) return TRIN[i];
-        return null;
+    P.faerdig = function (vaeske) {
+        return !!(this.resultater[vaeske].plastik && this.resultater[vaeske].glas);
     };
 
     P.slut = function () {
-        return this.trinGjort("alle") && this.trinGjort("begge");
+        return D.VAESKE_ORDEN.every(this.faerdig, this);
+    };
+
+    /* Linjen over skemaet: det naeste, eleven skal goere. */
+    P.naeste = function () {
+        var mig = this;
+        if (this.slut()) return "Skemaet er udfyldt. Se tegneserien, eller tag en opgave.";
+        var v = this.aaben;
+        if (!v || this.faerdig(v)) {
+            if (!this.antalResultater()) return "Klik på en hane, så løber der en stråle.";
+            var mangler = D.VAESKE_ORDEN.filter(function (x) { return !mig.faerdig(x); })
+                .map(function (x) { return D.VAESKER[x].navn; });
+            return "Åbn hanen med " + oplist(mangler, "eller") + ".";
+        }
+        var mulige = STAV_ORDEN.filter(function (id) { return !mig.resultater[v][id]; });
+        var ladede = mulige.filter(function (id) { return mig.stave[id].ladning >= MIN_LADNING; });
+        if (!ladede.length) {
+            if (mulige.length > 1) return "Tag en stav, og gnid den frem og tilbage på uldkluden.";
+            return "Gnid " + STAVE[mulige[0]].navn + " frem og tilbage på uldkluden.";
+        }
+        if (this.maalerNu) return "Hold staven stille lidt endnu.";
+        var id = ladede.indexOf(this.holdt) >= 0 ? this.holdt : ladede[0];
+        return "Hold " + STAVE[id].navn + " tæt på strålen af " + D.VAESKER[v].navn + " uden at røre den.";
     };
 
     /* ----- Handlinger ---------------------------------------------------------- */
@@ -192,27 +221,20 @@
         this._beskedUr = window.setTimeout(function () { e.classList.remove("vis"); }, 3000);
     };
 
-    P.fyld = function (vaeske) {
-        if (this.haneAaben) { this.besked("Luk hanen, før du fylder buretten."); return false; }
-        if (this.vol > 0.5) { this.besked("Buretten er ikke tom endnu. Åbn hanen, og lad den løbe ud."); return false; }
-        this.vaeske = vaeske;
-        this.vol = FYLD;
-        this.visVol = Math.min(this.visVol, 0);
-        this.gjort.fyldt = true;
-        return true;
+    /* Aabner hanen med vaesken. En aaben hane lukkes, saa der kun loeber én straale. */
+    P.aabn = function (vaeske) {
+        if (this.aaben === vaeske) return;
+        this.aaben = vaeske;
+        this.naesteNr++;   /* et hul i nummereringen bryder straalen */
     };
 
-    P.saetHane = function (aaben) {
-        if (aaben && this.vol <= 0.01) { this.besked("Buretten er tom. Klik på en flaske for at fylde den."); return false; }
-        this.haneAaben = !!aaben;
-        if (aaben) this.gjort.aabnet = true;
-        return true;
+    P.luk = function () {
+        this.aaben = null;
     };
 
-    P.toemBaeger = function () {
-        if (this.baeger.vand + this.baeger.ethanol + this.baeger.heptan < 0.5) return;
-        this.baeger = { vand: 0, ethanol: 0, heptan: 0 };
-        this.besked("Bægerglasset er tømt.");
+    P.skiftHane = function (vaeske) {
+        if (this.aaben === vaeske) this.luk();
+        else this.aabn(vaeske);
     };
 
     /* ----- Stavene ------------------------------------------------------------- */
@@ -264,7 +286,6 @@
                 var p = ender(st);
                 var tt = 0.3 + Math.random() * 0.6;
                 this.gnister.push({ x: p.a.x + (p.b.x - p.a.x) * tt, y: p.a.y + (p.b.y - p.a.y) * tt - 6, liv: 1 });
-                if (st.ladning >= 0.5) this.gjort.gnedet = true;
             }
         }
         this.sidstePunkt = { x: x, y: y };
@@ -298,22 +319,12 @@
     };
 
     /* ----- Straalen ------------------------------------------------------------ */
-    P.spild = function (p) {
-        this.besked("Strålen rammer ved siden af bægerglasset.", "spild");
-        for (var i = 0; i < this.pytter.length; i++) {
-            var q = this.pytter[i];
-            if (q.vaeske === p.vaeske && Math.abs(q.x - p.x) < 30) { q.vol += VOL_P; return; }
-        }
-        this.pytter.push({ x: p.x, vaeske: p.vaeske, vol: VOL_P });
-    };
-
     P.flytPartikler = function (dt) {
         var st = this.holdt ? this.stave[this.holdt] : null;
         var traekker = st && st.ladning > 0.01 ? st : null;
         var antal = Math.max(1, Math.ceil(dt / 0.008));
         var h = dt / antal;
-        var B = MAAL.BAEGER;
-        var total = this.baeger.vand + this.baeger.ethanol + this.baeger.heptan;
+        var V = MAAL.VASK;
         var rest = [];
         this.minAfstand = Infinity;
         this.naermeste = null;
@@ -339,17 +350,12 @@
                 p.vy += ay * h;
                 p.x += p.vx * h;
                 p.y += p.vy * h;
-                if (p.y >= B.top && p.x > B.venstre && p.x < B.hoejre) {
-                    if (total < B.maks) {
-                        this.baeger[p.vaeske] += VOL_P;
-                        total += VOL_P;
-                    } else {
-                        this.besked("Bægerglasset er fuldt. Klik på det for at tømme det.", "fuldt");
-                    }
+                if (p.y >= V.top && p.x > V.venstre && p.x < V.hoejre) { vaek = true; break; }
+                if (p.y >= MAAL.BORD) {
+                    this.besked("Strålen rammer ved siden af vasken.", "spild");
                     vaek = true;
                     break;
                 }
-                if (p.y >= MAAL.BORD) { this.spild(p); vaek = true; break; }
                 if (p.x < -50 || p.x > MAAL.W + 50) { vaek = true; break; }
             }
             if (vaek) continue;
@@ -358,7 +364,7 @@
                 var d = afstand(st, p.x, p.y).d;
                 if (d < this.minAfstand) { this.minAfstand = d; this.naermeste = p; }
             }
-            if (p.y > B.top - 30) this.afboejningNu = Math.max(this.afboejningNu, Math.abs(p.x - MAAL.TIP.x));
+            if (p.y > V.top - 30) this.afboejningNu = Math.max(this.afboejningNu, Math.abs(p.x - p.x0));
         }
         this.partikler = rest;
     };
@@ -374,24 +380,30 @@
             stykke.pts.push({ x: p.x, y: p.y });
             forrige = p;
         });
-        if (this.haneAaben && this.vol > 0 && stykker.length) {
+        if (this.aaben && stykker.length) {
             var sidste = stykker[stykker.length - 1];
-            sidste.pts.push({ x: MAAL.TIP.x, y: MAAL.TIP.y });
+            if (sidste.vaeske === this.aaben) sidste.pts.push({ x: T.hane(this.aaben).x, y: MAAL.TUD_Y });
         }
         return stykker;
     };
 
     /* ----- Test og lup ------------------------------------------------------------ */
     P.registrer = function (dt) {
+        this.maalerNu = null;
         var st = this.holdt ? this.stave[this.holdt] : null;
         if (!st || st.ladning < MIN_LADNING || !this.naermeste || this.minAfstand > TEST_AFSTAND || this.partikler.length < 15) return;
         var v = this.naermeste.vaeske;
+        if (this.resultater[v][st.id]) return;
         var noegle = v + "|" + st.id;
+        this.maalerNu = noegle;
         this.testTid[noegle] = (this.testTid[noegle] || 0) + dt;
         this.testMaks[noegle] = Math.max(this.testMaks[noegle] || 0, this.afboejningNu);
-        if (this.testTid[noegle] >= TEST_TID && !this.resultater[v][st.id]) {
+        if (this.testTid[noegle] >= TEST_TID) {
             this.resultater[v][st.id] = { afboejning: this.testMaks[noegle] };
-            this.gjort.holdt = true;
+            this.maalerNu = null;
+            this.nyNoegle = noegle;
+            this.nyTid = this.tid;
+            this.besked(stort(D.VAESKER[v].navn) + " med " + st.navn + " er skrevet i skemaet.", "noteret");
         }
     };
 
@@ -410,65 +422,53 @@
     /* ----- Panelet ---------------------------------------------------------------- */
     P._bindPanel = function () {
         var mig = this;
-        NK.el("vand-hint-knap").addEventListener("click", function () { mig.visHint(); });
+        this.celler = {};
+        NK.el("vand-skema").appendChild(resultatTabel(this, this.celler));
         NK.el("vand-forfra").addEventListener("click", function () { mig.nulstil(); });
-    };
-
-    P.visHint = function () {
-        var t = this.aktueltTrin();
-        var e = NK.el("vand-hint");
-        if (!t) { e.hidden = true; return; }
-        e.textContent = t.hint(this);
-        e.hidden = false;
     };
 
     P.signatur = function () {
         var mig = this;
-        var t = this.aktueltTrin();
+        var ny = this.nyNoegle && this.tid - this.nyTid < 1.5 ? this.nyNoegle : "";
         return [
-            TRIN.map(function (x) { return mig.trinGjort(x.id) ? 1 : 0; }).join(""),
             D.VAESKE_ORDEN.map(function (v) { return Object.keys(mig.resultater[v]).sort().join("+"); }).join(","),
-            t ? t.id : "", this.serieSet, !!this.opgaver.opgave
+            this.maalerNu || "", ny, this.naeste(), this.serieSet, !!this.opgaver.opgave
         ].join("|");
     };
 
     P.opdaterPanel = function () {
         var sig = this.signatur();
         if (sig === this.sidsteSig) return;
-        var forrigeTrin = this.sidsteSig ? this.sidsteSig.split("|")[2] : null;
         this.sidsteSig = sig;
         var mig = this;
-        var aktiv = this.aktueltTrin();
+        var ny = sig.split("|")[2];
 
-        var ol = NK.el("vand-trin");
-        ol.innerHTML = "";
-        var antalGjort = 0;
-        TRIN.forEach(function (t, i) {
-            var gjort = mig.trinGjort(t.id);
-            var li = document.createElement("li");
-            if (gjort) { li.className = "gjort"; antalGjort++; }
-            else if (aktiv && t.id === aktiv.id) li.className = "aktiv";
-            var nr = document.createElement("span");
-            nr.className = "nr";
-            nr.textContent = gjort ? "✓" : String(i + 1);
-            li.appendChild(nr);
-            var tekst = t.tekst;
-            if (t.id === "alle") tekst += " (" + D.VAESKE_ORDEN.filter(mig.testet, mig).length + "/3)";
-            li.appendChild(document.createTextNode(tekst));
-            ol.appendChild(li);
+        D.VAESKE_ORDEN.forEach(function (v) {
+            STAV_ORDEN.forEach(function (id) {
+                var td = mig.celler[v][id], noegle = v + "|" + id;
+                if (mig.resultater[v][id]) {
+                    td.textContent = afboejning(v);
+                    td.className = noegle === ny ? "ny" : "";
+                } else if (noegle === mig.maalerNu) {
+                    td.textContent = "måler …";
+                    td.className = "maaler";
+                } else {
+                    td.textContent = "?";
+                    td.className = "ikke";
+                }
+            });
         });
-        NK.saetTekst("vand-taeller", antalGjort + "/" + TRIN.length);
-        if (!aktiv || aktiv.id !== forrigeTrin) NK.el("vand-hint").hidden = true;
-        NK.el("vand-hint-knap").disabled = !aktiv;
+        NK.saetTekst("vand-taeller", this.antalResultater() + "/6");
+        NK.saetTekst("vand-naeste", this.naeste());
 
         var slut = this.slut();
         var knap = NK.el("vand-serieknap");
         knap.hidden = !slut;
         knap.classList.toggle("banker", slut && !this.serieSet);
-        NK.saetTekst("vand-serie-tekst", slut ? "Forsøget er slut." : "Låses op, når forsøget er slut.");
+        NK.saetTekst("vand-serie-tekst", slut ? "Forsøget er slut." : "Låses op, når skemaet er udfyldt.");
 
         NK.el("vand-opg-knap").disabled = !slut;
-        if (!slut) NK.saetTekst("vand-opg-tekst", "Låses op, når forsøget er slut.");
+        if (!slut) NK.saetTekst("vand-opg-tekst", "Låses op, når skemaet er udfyldt.");
         else if (!this.opgaver.opgave) NK.saetTekst("vand-opg-tekst", "");
     };
 
@@ -481,12 +481,13 @@
     P.genstandVed = function (x, y) {
         var st = this.stavVed(x, y);
         if (st) return { slags: "stav", id: st.id, t: st.t };
-        if (Math.hypot(x - MAAL.HANE.x, y - MAAL.HANE.y) < 26) return { slags: "hane" };
-        for (var i = 0; i < MAAL.FLASKER.length; i++) {
-            var f = MAAL.FLASKER[i];
-            if (x > f.x - 40 && x < f.x + 40 && y > MAAL.FLASKE_TOP && y < MAAL.BORD) return { slags: "flaske", vaeske: f.vaeske };
+        for (var i = 0; i < MAAL.HANER.length; i++) {
+            var h = MAAL.HANER[i];
+            if (Math.abs(x - h.x) < 44 && y > MAAL.SKILT_Y - 6 && y < MAAL.TUD_Y + 8) return { slags: "hane", vaeske: h.vaeske };
         }
-        if (x > 315 && x < 465 && y > 440 && y < MAAL.BORD) return { slags: "baeger" };
+        var k = MAAL.KLUD;
+        if (x > k.x && x < k.x + k.b && y > k.y && y < k.y + k.h) return { slags: "klud" };
+        if (x > 180 && x < 620 && y > 456 && y < MAAL.BORD) return { slags: "vask" };
         return null;
     };
 
@@ -503,11 +504,11 @@
                 try { cvs.setPointerCapture(e.pointerId); } catch (fejl) { /* ignoreres */ }
                 cvs.style.cursor = "grabbing";
             } else if (g.slags === "hane") {
-                mig.saetHane(!mig.haneAaben);
-            } else if (g.slags === "flaske") {
-                mig.fyld(g.vaeske);
-            } else if (g.slags === "baeger") {
-                mig.toemBaeger();
+                mig.skiftHane(g.vaeske);
+            } else if (g.slags === "klud") {
+                mig.besked("Tag fat i en stav, og træk den frem og tilbage over kluden.", "klud");
+            } else if (g.slags === "vask") {
+                mig.besked("Afløbet tager det hele. Klik på en hane.", "vask");
             }
         });
 
@@ -554,25 +555,21 @@
                 st.vinkel += (0 - st.vinkel) * k;
             }
             st.ladning *= Math.exp(-dt / 90);
-            if (st.ladning >= 0.5) mig.gjort.gnedet = true;
         });
 
-        if (this.haneAaben && this.vol > 0) {
-            var ud = Math.min(this.vol, FLOW * dt);
-            this.vol -= ud;
-            this.udslipRest += ud / VOL_P;
+        if (this.aaben) {
+            var hane = T.hane(this.aaben);
+            this.udslipRest += UDSLIP * dt;
             while (this.udslipRest >= 1) {
                 this.udslipRest -= 1;
-                this.partikler.push({ nr: this.naesteNr++, x: MAAL.TIP.x, y: MAAL.TIP.y, vx: 0, vy: START_FART, vaeske: this.vaeske });
+                this.partikler.push({ nr: this.naesteNr++, x: hane.x, x0: hane.x, y: MAAL.TUD_Y, vx: 0, vy: START_FART, vaeske: this.aaben });
             }
-            if (this.vol < 1e-6) this.vol = 0;
         } else {
+            this.udslipRest = 0;
             this.naesteNr++;   /* et hul i nummereringen bryder straalen */
         }
 
         this.flytPartikler(dt);
-        if (this.vol === 0 && !this.partikler.length) this.vaeske = null;
-        this.visVol = NK.mod(this.visVol, this.vol, this.visVol < this.vol ? 3 : 20, dt);
 
         this.gnister.forEach(function (g) { g.liv -= dt * 2.2; g.y -= 18 * dt; });
         this.gnister = this.gnister.filter(function (g) { return g.liv > 0; });
@@ -592,23 +589,13 @@
         ctx.scale(this.s, this.s);
 
         T.bord(ctx);
-        T.pytter(ctx, this.pytter);
-        T.flasker(ctx, this.hover && this.hover.slags === "flaske" ? this.hover.vaeske : null);
         T.klud(ctx);
-        T.burette(ctx, this.visVol, this.vaeske, this.haneAaben);
-
-        if (this.hover && this.hover.slags === "hane") {
-            ctx.strokeStyle = "rgba(242, 197, 61, 0.8)";
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(MAAL.HANE.x, MAAL.HANE.y, 24, 0, Math.PI * 2);
-            ctx.stroke();
-        }
+        T.vask(ctx);
+        T.haner(ctx, this.aaben, this.hover && this.hover.slags === "hane" ? this.hover.vaeske : null);
 
         this.straalestykker().forEach(function (st) {
             T.straale(ctx, [st.pts], D.VAESKER[st.vaeske].farve);
         });
-        T.baeger(ctx, this.baeger);
 
         Object.keys(this.stave).forEach(function (id) { if (!mig.stave[id].holdt) T.stav(ctx, mig.stave[id]); });
         if (this.holdt) T.stav(ctx, this.stave[this.holdt]);
@@ -640,12 +627,14 @@
     P.nulstil = function () {
         this.opgaver.nulstil();
         this.nulstilForsoeg();
-        NK.el("vand-hint").hidden = true;
         this.opdaterPanel();
     };
 
     P.skiftVinkelmaaler = function () { /* ingen vinkelmaaler i forsoeget */ };
 
     NK.SimVandstraale.STAVE = STAVE;
+    NK.SimVandstraale.STAV_ORDEN = STAV_ORDEN;
     NK.SimVandstraale.stort = stort;
+    NK.SimVandstraale.afboejning = afboejning;
+    NK.SimVandstraale.resultatTabel = resultatTabel;
 }());

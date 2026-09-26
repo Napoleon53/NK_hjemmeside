@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200">
+  <!-- Pacman Quiz: titlen paa startskaermen. Egen tegning. -->
+  <defs>
+    <linearGradient id="gul" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff1a8"/>
+      <stop offset="0.55" stop-color="#ffd84a"/>
+      <stop offset="1" stop-color="#f0a92a"/>
+    </linearGradient>
+    <filter id="glod" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Titlen -->
+  <g font-family="'Arial Black', 'Segoe UI Black', Impact, sans-serif" font-weight="900" text-anchor="middle">
+    <text x="320" y="92" font-size="80" textLength="590" lengthAdjust="spacingAndGlyphs" fill="none" stroke="#2b3bd6" stroke-width="14" stroke-linejoin="round" filter="url(#glod)">PACMAN QUIZ</text>
+    <text x="320" y="92" font-size="80" textLength="590" lengthAdjust="spacingAndGlyphs" fill="url(#gul)" stroke="#0b0e2a" stroke-width="3" stroke-linejoin="round">PACMAN QUIZ</text>
+  </g>
+
+  <!-- Pacman, prikkerne og et spoegelse -->
+  <g transform="translate(0 150)">
+    <path d="M150 0 L182 -18 A36 36 0 1 0 182 18 Z" fill="url(#gul)" filter="url(#glod)"/>
+    <circle cx="143" cy="-19" r="4.5" fill="#1a1400"/>
+    <g fill="#ffe7a0">
+      <circle cx="222" cy="0" r="6"/>
+      <circle cx="262" cy="0" r="6"/>
+      <circle cx="302" cy="0" r="6"/>
+      <circle cx="342" cy="0" r="6"/>
+      <circle cx="382" cy="0" r="6"/>
+      <circle cx="422" cy="0" r="11" fill="#ffd23f" filter="url(#glod)"/>
+    </g>
+    <g transform="translate(492 0)" filter="url(#glod)">
+      <path d="M-30 30 L-30 -4 A30 30 0 0 1 30 -4 L30 30 Q25 20 20 30 Q15 20 10 30 Q5 20 0 30 Q-5 20 -10 30 Q-15 20 -20 30 Q-25 20 -30 30 Z" fill="#ff4757"/>
+      <ellipse cx="-11" cy="-4" rx="8" ry="10" fill="#ffffff"/>
+      <ellipse cx="11" cy="-4" rx="8" ry="10" fill="#ffffff"/>
+      <circle cx="-15" cy="-3" r="4" fill="#1a2a8a"/>
+      <circle cx="7" cy="-3" r="4" fill="#1a2a8a"/>
+    </g>
+  </g>
+</svg>
