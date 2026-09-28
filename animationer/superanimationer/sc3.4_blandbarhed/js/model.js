@@ -20,11 +20,17 @@
       ned, hurtigere jo stoerre de er; det, de skubber til side, glider
       uden om dem.
    3. Overfladen. Kugler falder ned i huller, og overfladen jaevner sig.
-      Et stof fordamper fra overfladen efter sit damptryk og koger, naar
-      damptrykket naar 1 atm: saa dannes der bobler inde i vaesken. Dampen
-      stiger op, bliver til draaber i den kolde zone foroven og drypper ned.
-   4. Eleven. Det, der haeldes i, falder ned i en straale og trykkes et
-      stykke ned i vaesken. En rystning er mange smaa hvirvler.
+      Et stof fordamper fra overfladen efter sit partialtryk (Raoults lov
+      med aktivitetskoefficienter, NK.Data.flygtighed), og vaesken koger,
+      naar summen af partialtrykkene naar 1 atm: saa dannes der bobler
+      inde i vaesken, mest af det stof, der fordamper lettest. Dampen
+      stiger op og trækkes mod halsen i laaget. I roeret over halsen
+      (js/apparat.js) bliver den til draaber, hvor koeleren sidder. En
+      tilbagesvaler sender draaberne tilbage; en destillation sender dem
+      ud af roeret (naarUd), og scene.js drypper dem i forlaget.
+   4. Eleven. Det, der haeldes i, falder ned gennem tragten i en straale
+      og trykkes et stykke ned i vaesken. En rystning er mange smaa
+      hvirvler.
 
    Koordinater: x mod hoejre og y OPAD fra bunden, i kuglediametre.
    ===================================================================== */
@@ -37,7 +43,7 @@
     function klamp(v, lav, hoej) { return v < lav ? lav : (v > hoej ? hoej : v); }
 
     /* Kuglernes tilstande */
-    var VAESKE = 0, DAMP = 1, DRAABE = 2, FALD = 3, SPILD = 4, AFLOEB = 5, BOBLE = 6;
+    var VAESKE = 0, DAMP = 1, DRAABE = 2, FALD = 3, SPILD = 4, AFLOEB = 5, BOBLE = 6, ROER = 7, UD = 8;
 
     /* Modellens tal. Kan pilles ved fra konsollen: NK.Model.PARAM */
     var PARAM = {
@@ -54,6 +60,10 @@
         udjaevnHver: 0.15,   /* sekunder mellem to bytninger, der flader et lag ud */
         fordamp: 0.04,       /* fordampning fra overfladen pr. sekund ved 1 atm */
         kog: 0.05,           /* bobler pr. kugle pr. sekund pr. atm over 1 atm */
+        dampFart: 3,         /* dampens fart op mod laaget, kuglediametre/s */
+        roerFart: 5,         /* dampens fart gennem roeret */
+        kold: 3,             /* fortaetning pr. sekund, hvor koeleren sidder */
+        loebFart: 7,         /* draabernes fart gennem roeret */
         bobleTrin: 0.045,    /* sekunder pr. raekke, en boble stiger */
         haeldFart: 75,       /* kugler pr. sekund i straalen */
         dybde: 8,            /* hvor mange raekker straalen hoejst trykker ned */
@@ -69,10 +79,14 @@
         this.R = valg.raekker || 33;
         this.bredde = this.C + 0.5;
         this.fyldHoejde = (this.R - 1) * H + 1;
-        /* Luften foroven og den kolde zone passer til sprites/bassin.svg */
+        /* Luften foroven passer til sprites/bassin.svg */
         this.hoejde = this.fyldHoejde + (valg.hoved || 7.077);
-        this.koelFra = this.hoejde - (valg.koel || 2.118);
         this.tilf = valg.tilfaeldig || Math.random;
+        /* Roeret over halsen (js/apparat.js). null: laaget er helt lukket,
+           som i forlaget. */
+        this.koeler = valg.koeler !== undefined ? valg.koeler :
+            (NK.Apparat ? NK.Apparat.koeler("tilbagesvaler") : null);
+        this.naarUd = null;
 
         var n = D.STOFFER.length, a, b;
         this.nStof = n;
@@ -105,7 +119,7 @@
     }
 
     Model.PARAM = PARAM;
-    Model.TILSTAND = { VAESKE: VAESKE, DAMP: DAMP, DRAABE: DRAABE, FALD: FALD, SPILD: SPILD, AFLOEB: AFLOEB, BOBLE: BOBLE };
+    Model.TILSTAND = { VAESKE: VAESKE, DAMP: DAMP, DRAABE: DRAABE, FALD: FALD, SPILD: SPILD, AFLOEB: AFLOEB, BOBLE: BOBLE, ROER: ROER, UD: UD };
 
     var P = Model.prototype;
 
@@ -196,7 +210,33 @@
         this.spildt = 0;
         this.rystTid = 0;
         this.rystStyrke = 0;
+        this.ude = [];                         /* kugler, der er loebet ud af roeret */
+        for (var i = 0; i < this.nStof; i++) this.ude[i] = 0;
+        this.tryk = 0;                         /* damptrykket over vaesken, atm */
+        this.fl = [];                          /* hvor let hvert stof fordamper (γ · p*) */
         this.maerk();
+    };
+
+    /* Skifter roeret over halsen. Det, der er i roeret, falder tilbage
+       gennem halsen: dampen som damp, draaberne som draaber. */
+    P.saetKoeler = function (koeler) {
+        var gammel = this.koeler;
+        for (var i = 0; i < this.kugler.length; i++) {
+            var k = this.kugler[i];
+            if (k.tilst !== ROER) continue;
+            k.x = gammel ? gammel.hx + k.q * (gammel.aabning - 0.6) : this.bredde / 2;
+            k.y = this.hoejde - 0.4;
+            k.vx = 0;
+            k.vy = -0.5;
+            k.tilst = k.damp ? DAMP : DRAABE;
+        }
+        this.koeler = koeler;
+    };
+
+    /* En draabe udefra (forlaget): falder fra hoejden y og lander i overfladen */
+    P.dryp = function (art, x, y) {
+        var b = this.nyKugle(art, DRAABE, klamp(x + (this.tilf() - 0.5) * 0.6, 0.5, this.bredde - 0.5), y);
+        this.kugler[b].vy = -1;
     };
 
     /* Fylder straks op nedefra, fx [0, 0, 0] = tre portioner vand.
@@ -253,7 +293,9 @@
     P.toem = function () {
         var mig = this;
         this.kugler.forEach(function (k) {
-            if (k.tilst === SPILD || k.tilst === AFLOEB) return;
+            if (k.tilst === SPILD || k.tilst === AFLOEB || k.tilst === UD) return;
+            /* Det, der er i roeret, forsvinder bare */
+            if (k.tilst === ROER) { k.tilst = UD; k.alfa = 0; return; }
             if (k.k >= 0) mig.fjern(k.k);
             if (k.tilst === BOBLE && k.k >= 0) mig.boble[k.k] = 0;
             k.tilst = AFLOEB;
@@ -273,6 +315,7 @@
     P.opdater = function (dt) {
         if (dt <= 0) return;
         this.tid += dt;
+        this.maalDamptryk();
         this.haeldStraale(dt);
         this.fri(dt);
         if (this.rystTid > 0) {
@@ -298,17 +341,18 @@
     };
 
     /* Fjerner kugler, der er loebet ud eller spildt, naar de er ude af syne */
+    function vaek(k) { return (k.tilst === AFLOEB || k.tilst === SPILD || k.tilst === UD) && k.alfa <= 0; }
+
     P.ryd = function () {
         var faer = false, i;
         for (i = 0; i < this.kugler.length; i++) {
-            var k = this.kugler[i];
-            if ((k.tilst === AFLOEB || k.tilst === SPILD) && k.alfa <= 0) { faer = true; break; }
+            if (vaek(this.kugler[i])) { faer = true; break; }
         }
         if (!faer) return;
         var gammel = this.kugler, ny = [], om = new Int32Array(gammel.length);
         for (i = 0; i < gammel.length; i++) {
             var g = gammel[i];
-            if ((g.tilst === AFLOEB || g.tilst === SPILD) && g.alfa <= 0) { om[i] = -1; continue; }
+            if (vaek(g)) { om[i] = -1; continue; }
             om[i] = ny.length;
             ny.push(g);
         }
@@ -657,14 +701,30 @@
         return -1;
     };
 
+    /* Damptrykket over vaesken ud fra det, der er i den nu */
+    P.maalDamptryk = function () {
+        var antal = [], i;
+        for (i = 0; i < this.nStof; i++) antal[i] = 0;
+        for (i = 0; i < this.plads.length; i++) {
+            var b = this.plads[i];
+            if (b >= 0) antal[this.kugler[b].art]++;
+        }
+        var f = this.D.flygtighed(antal, this.T);
+        this.fl = f.flygtig;
+        this.tryk = f.P;
+    };
+
+    /* Fra overfladen fordamper hvert stof efter sit partialtryk pr. kugle
+       (γ · p*). Naar summen af partialtrykkene er over 1 atm, koger
+       vaesken: der dannes bobler, og en kugle af et stof, der fordamper
+       let, bliver oftere til en boble. Rent stof koger ved sit kogepunkt. */
     P.fordamp = function (dt) {
-        var D = this.D, mig = this, pl = this.plads;
-        var p = D.STOFFER.map(function (s) { return D.damptryk(s, mig.T); });
-        if (!p.some(function (x) { return x > 0.004; })) return;
+        var pl = this.plads, fl = this.fl, P0 = this.tryk;
+        if (!fl.some(function (x) { return x > 0.004; })) return;
         for (var k = 0; k < pl.length; k++) {
             var b = pl[k];
             if (b < 0) continue;
-            var kugle = this.kugler[b], pa = p[kugle.art];
+            var kugle = this.kugler[b], pa = fl[kugle.art];
             if (!pa) continue;
             if (this.frit(k)) {
                 if (this.tilf() < PARAM.fordamp * pa * dt) {
@@ -673,7 +733,7 @@
                     kugle.vx = (this.tilf() - 0.5) * 2;
                     kugle.vy = 2 + this.tilf() * 2;
                 }
-            } else if (pa > 1 && this.tilf() < PARAM.kog * (pa - 1) * dt) {
+            } else if (P0 > 1 && this.tilf() < PARAM.kog * (P0 - 1) * pa / P0 * dt) {
                 /* En boble: kuglen bliver til damp inde i vaesken */
                 this.fjern(k);
                 this.boble[k] = 1;
@@ -730,16 +790,18 @@
         });
     };
 
-    /* Straalen: kuglerne falder ned oppefra, midt i bassinet */
+    /* Straalen: kuglerne falder ned oppefra gennem tragten */
     P.haeldStraale = function (dt) {
         var h = this.haeld[0];
         if (!h) return;
+        var K = this.koeler;
+        var x0 = K ? K.tragt.x : this.bredde / 2, y0 = K ? K.tragt.y : this.hoejde + 1;
         h.ur += dt * PARAM.haeldFart;
         while (h.ur >= 1 && h.rest > 0) {
             h.ur -= 1;
             h.rest--;
-            var x = this.bredde / 2 + (this.tilf() - 0.5) * 0.8;
-            var b = this.nyKugle(h.art, FALD, x, this.hoejde + 1 + this.tilf() * 0.6);
+            var x = x0 + (this.tilf() - 0.5) * (K ? 0.25 : 0.8);
+            var b = this.nyKugle(h.art, FALD, x, y0 + this.tilf() * 0.6);
             this.kugler[b].vy = -4;
         }
         if (h.rest <= 0) this.haeld.shift();
@@ -760,26 +822,40 @@
                 k.y += k.vy * dt;
                 if (k.y <= this.overflade() + 0.3) this.lodNed(i, false);
             } else if (k.tilst === DAMP) {
-                k.vx += (this.tilf() - 0.5) * 30 * dt;
-                k.vy += (2.5 - k.vy) * 1.5 * dt + (this.tilf() - 0.5) * 20 * dt;
-                k.vx *= Math.exp(-1.2 * dt);
+                /* Dampen stiger og trækkes mod halsen: jo taettere paa
+                   laaget, jo mere til siden */
+                var K = this.koeler, ux = 0;
+                if (K) ux = klamp((K.hx - k.x) * PARAM.dampFart / Math.max(1.2, this.hoejde - k.y), -5, 5);
+                k.vx += (ux - k.vx) * 1.5 * dt + (this.tilf() - 0.5) * 30 * dt;
+                k.vy += (PARAM.dampFart - k.vy) * 1.5 * dt + (this.tilf() - 0.5) * 20 * dt;
                 k.x += k.vx * dt;
                 k.y += k.vy * dt;
                 if (k.x < 0.5) { k.x = 0.5; k.vx = Math.abs(k.vx); }
                 if (k.x > this.bredde - 0.5) { k.x = this.bredde - 0.5; k.vx = -Math.abs(k.vx); }
                 var loft = this.hoejde - 0.5;
-                if (k.y > loft) { k.y = loft; k.vy = -Math.abs(k.vy) * 0.3; }
+                if (k.y > loft) {
+                    if (K && Math.abs(k.x - K.hx) < K.aabning - 0.45) {
+                        /* Op i halsen */
+                        k.tilst = ROER;
+                        k.damp = true;
+                        k.s = 0.05;
+                        k.q = klamp((k.x - K.hx) / (K.aabning - 0.45), -1, 1);
+                        k.vs = Math.max(1, k.vy);
+                        continue;
+                    }
+                    k.y = loft;
+                    k.vy = -Math.abs(k.vy) * 0.3;
+                }
                 var bund = this.overflade() + 0.2;
                 if (k.y < bund) { k.y = bund; k.vy = Math.abs(k.vy); }
-                /* I den kolde zone bliver dampen til draaber, og under
-                   kogepunktet ogsaa undervejs */
-                var kold = k.y > this.koelFra ? 3 : 0;
-                var under = Math.max(0, 1 - this.D.damptryk(this.D.STOFFER[k.art], this.T));
-                if (this.tilf() < (kold + 1.5 * under) * dt) {
+                /* Under kogepunktet bliver dampen til draaber undervejs */
+                if (this.tilf() < 1.5 * Math.max(0, 1 - this.tryk) * dt) {
                     k.tilst = DRAABE;
                     k.vy = 0;
                     k.vx = 0;
                 }
+            } else if (k.tilst === ROER) {
+                this.iRoer(k, dt);
             } else if (k.tilst === SPILD) {
                 k.vy -= 20 * dt;
                 k.x += k.vx * dt;
@@ -791,6 +867,69 @@
                 if (k.y < 0) k.alfa -= dt * 4;
             }
         }
+    };
+
+    /* En kugle i roeret over halsen. Den foelger roerets vej (s er
+       laengden fra laaget, q er pladsen paa tvaers). Dampen stiger og
+       bliver til en draabe, hvor koeleren sidder, og under kogepunktet
+       ogsaa undervejs. En draabe paa vaeggen loeber tilbage i bassinet,
+       med mindre den er fortaettet i en destillations koeler: saa loeber
+       den frem og ud af spidsen. */
+    P.iRoer = function (k, dt) {
+        var K = this.koeler;
+        if (k.damp) {
+            k.vs += (PARAM.roerFart - k.vs) * 2 * dt + (this.tilf() - 0.5) * 14 * dt;
+            k.s += k.vs * dt;
+            k.q = klamp(k.q + (this.tilf() - 0.5) * 5 * dt, -1, 1);
+            if (k.s < 0) {
+                /* Tilbage ned i bassinet */
+                k.tilst = DAMP;
+                k.x = K.hx + k.q * (K.aabning - 0.6);
+                k.y = this.hoejde - 0.6;
+                k.vx = 0;
+                k.vy = -0.5;
+                return;
+            }
+            if (k.s >= K.L) {
+                if (K.ud) { this.ud(k); return; }
+                k.s = K.L;
+                k.vs = -Math.abs(k.vs) * 0.3;
+            }
+            var kold = k.s >= K.koldFra && k.s <= K.koldTil;
+            var fart = kold ? PARAM.kold : 1.5 * Math.max(0, 1 - this.tryk);
+            if (!K.ud && k.s > K.L - 0.4) fart = 20;          /* oeverst i tilbagesvaleren */
+            if (this.tilf() < fart * dt) {
+                k.damp = false;
+                k.ret = K.ud && k.s >= K.koldFra ? 1 : -1;
+                k.q = K.lodret(k.s) ? (k.q < 0 ? -1 : 1) : 1;
+            }
+        } else {
+            k.s += k.ret * PARAM.loebFart * dt;
+            if (k.s <= 0) {
+                /* Draaben drypper ned fra halsen */
+                k.tilst = DRAABE;
+                k.x = K.hx + k.q * (K.aabning - 0.6);
+                k.y = this.hoejde - 0.4;
+                k.vx = 0;
+                k.vy = 0;
+                return;
+            }
+            if (k.s >= K.L) { this.ud(k); return; }
+            /* Draaber paa den skraa del loeber paa den nederste side */
+            if (!K.lodret(k.s)) k.q = 1;
+        }
+        var p = K.punkt(k.s, k.q);
+        k.x = p.x;
+        k.y = p.y;
+    };
+
+    /* Ud af spidsen: kuglen forlader bassinet, og scene.js drypper den i
+       forlaget */
+    P.ud = function (k) {
+        k.tilst = UD;
+        k.alfa = 0;
+        this.ude[k.art]++;
+        if (this.naarUd) this.naarUd(k.art);
     };
 
     /* En kugle rammer overfladen. Straalen trykker den et stykke ned i
@@ -992,14 +1131,16 @@
         return ud;
     };
 
-    /* Antal kugler af hvert stof i vaesken, dampen og straalen */
+    /* Antal kugler af hvert stof i vaesken, dampen (ogsaa i roeret) og
+       straalen, og hvor mange der er loebet ud af roeret (ude) */
     P.opgoer = function () {
-        var ud = { vaeske: [], damp: [], alt: [] }, i;
-        for (i = 0; i < this.nStof; i++) { ud.vaeske[i] = 0; ud.damp[i] = 0; ud.alt[i] = 0; }
+        var ud = { vaeske: [], damp: [], roer: [], alt: [], ude: this.ude.slice() }, i;
+        for (i = 0; i < this.nStof; i++) { ud.vaeske[i] = 0; ud.damp[i] = 0; ud.roer[i] = 0; ud.alt[i] = 0; }
         this.kugler.forEach(function (k) {
-            if (k.tilst === SPILD || k.tilst === AFLOEB) return;
+            if (k.tilst === SPILD || k.tilst === AFLOEB || k.tilst === UD) return;
             if (k.tilst === VAESKE) ud.vaeske[k.art]++;
-            else if (k.tilst === DAMP || k.tilst === DRAABE || k.tilst === BOBLE) ud.damp[k.art]++;
+            else if (k.tilst === DAMP || k.tilst === DRAABE || k.tilst === BOBLE || k.tilst === ROER) ud.damp[k.art]++;
+            if (k.tilst === ROER) ud.roer[k.art]++;
             ud.alt[k.art]++;
         });
         return ud;

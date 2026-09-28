@@ -315,6 +315,8 @@
         var h = Math.min(H - top - bundLuft, (W - 40) * SPRITE.h / SPRITE.b, 660);
         var b = h * SPRITE.b / SPRITE.h;
         var x = (W - b) / 2;
+        /* Kemichaels hjoerne (hjoerne, sat af js/laerer.js) */
+        if (this.hjoerne) x = Math.max(20, Math.min(x, W - this.hjoerne - b));
         var y = top + Math.max(0, (H - top - bundLuft - h) / 2);
         var sk = b / SPRITE.b;
         var vl = x + SPRITE.venstre * sk, vh = x + SPRITE.hoejre * sk;

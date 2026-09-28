@@ -18,7 +18,7 @@ holdes urørte.
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
 (bl.a. `sc2.1_salt_i_vand`, `sc2.2_saltbygger`, `sc2.3`, `sc2.4`, `sc3.1`, `sc3.4_blandbarhed`,
-`sc3.4_blandbarhed_inaktiv`, `sc4.1_molarmasse`, `sc4.2_stofmaengde`, `sc4.3_stofmaengdeberegning`, `sc4.4_aekvivalente_maengder`, `sc4.5_maengdeberegning`, `sc4.6_idealgasligningen`, `sc4.10_betydende_cifre`, `sc4.11_kalk_i_muslingeskaller`, `sc5.1_koncentration`, `sc5.2_formel_og_aktuel`, `sc6.1_kogepunkt`, `sc6.6_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike`, `sc8.1_spaendingsraekken`, `sc8.2_oxidationstal` og `sc8.5_kaliumpermanganat`),
+`sc3.4_blandbarhed_inaktiv`, `sc4.1_molarmasse`, `sc4.2_stofmaengde`, `sc4.3_stofmaengdeberegning`, `sc4.4_aekvivalente_maengder`, `sc4.5_maengdeberegning`, `sc4.6_idealgasligningen`, `sc4.7_natron`, `sc4.8_staaluld`, `sc4.9_lightergas`, `sc4.10_betydende_cifre`, `sc4.11_kalk_i_muslingeskaller`, `sc5.1_koncentration`, `sc5.2_formel_og_aktuel`, `sc5.3_mohrtitrering`, `sc6.1_kogepunkt`, `sc6.6_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike`, `sc8.1_spaendingsraekken`, `sc8.2_oxidationstal` og `sc8.5_kaliumpermanganat`),
 indlæser filer fra `laboratoriet/` og `kemichael/`. Fjernes de, går
 animationerne i sort på kemiformler.dk.
 
@@ -67,14 +67,11 @@ sync; denne er færdig.
 - Skal en superanimation bygges eller rettes, så læs
   `animationer/superanimationer/README.md` først. Afsnittet "Bestillingen, før
   der skrives kode" er bindende.
-- Kemichael præsenterer hver fane (hvert rum) i en superanimation, men kommer
-  ikke af sig selv: første gang fanen åbnes, står der to knapper midt foroven,
-  "Start præsentation" og "Nej tak". Præsentationen er to eller tre korte
-  replikker, der ikke låser fanen. Han går kun, når eleven vil det: den store
-  knap "Spring præsentationen over", to klik direkte på ham eller Esc, aldrig ved
-  et tilfældigt klik eller tastetryk. Reglen står i superanimationernes README
-  under "Kemichael præsenterer hvert rum"; mønster `sc1.2_grundstofudstilling`
-  (`js/praesentation.js`).
+- Kemichael præsenterer ikke fanerne i en superanimation (brugerens valg 27.
+  sept. 2026: præsentationerne blev ofte indforståede). Nye superanimationer
+  bruger den rolige Kemichael ved katederet, der kun taler ved Giv hint og Vis
+  svaret; han må kort introducere én ting fra sit hjørne, fx et gratis gæt.
+  Se superanimationernes README under "Kemichael".
 - Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
   gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).
   Punkterne om superanimationer gælder som hidtil og arbejdes i

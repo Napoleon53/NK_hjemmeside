@@ -21,22 +21,23 @@ window.NK = NK;
        kp       kogepunkt i °C ved 1 atm (Databogen). Olie har intet: den
                 koger ikke, foer den brydes ned (over 300 °C)
        dHvap    fordampningsvarme ved kogepunktet, kJ/mol (Databogen)
+       M        molar masse, g/mol. Bruges til molbroeken i damptrykket
        farve    kuglens farve; den samme som i den gamle c3.4
        ------------------------------------------------------------------ */
     D.STOFFER = [
         {
             id: "vand", navn: "vand", Navn: "Vand", formel: "H₂O",
-            polaer: true, taethed: 0.998, kp: 100.0, dHvap: 40.7,
+            polaer: true, taethed: 0.998, kp: 100.0, dHvap: 40.7, M: 18.02,
             farve: "#3b82f6", lys: "#9cc3ff", moerk: "#1d4ed8"
         },
         {
             id: "ethanol", navn: "ethanol", Navn: "Ethanol", formel: "C₂H₅OH",
-            polaer: true, taethed: 0.789, kp: 78.3, dHvap: 38.6,
+            polaer: true, taethed: 0.789, kp: 78.3, dHvap: 38.6, M: 46.07,
             farve: "#d946ef", lys: "#f0a6fb", moerk: "#a21caf"
         },
         {
             id: "olie", navn: "olie", Navn: "Olie", formel: "fedtstof",
-            polaer: false, taethed: 0.92, kp: null, dHvap: null,
+            polaer: false, taethed: 0.92, kp: null, dHvap: null, M: null,
             farve: "#fbbf24", lys: "#fde68a", moerk: "#b45309"
         }
     ];
@@ -110,6 +111,54 @@ window.NK = NK;
         if (stof.kp === null) return 0;
         var R = 8.314e-3;
         return Math.exp(-stof.dHvap / R * (1 / (T + 273.15) - 1 / (stof.kp + 273.15)));
+    };
+
+    /* ------------------------------------------------------------------
+       DAMPTRYKKET OVER EN BLANDING AF VAND OG ETHANOL
+
+       Raoults lov med aktivitetskoefficienter: partialtrykket af et stof
+       er x · γ · p*, hvor x er molbroeken i vaesken og p* damptrykket af
+       det rene stof. γ regnes med van Laars ligning med de gængse
+       konstanter for ethanol (1) og vand (2) ved 1 atm, A12 = 1,68 og
+       A21 = 0,92. Sammen med damptrykket nedenfor rammer det de maalte
+       kogepunkter inden for en halv grad: molbroek 0,07 ethanol koger ved
+       88,5 °C (maalt 89,0), 0,24 ved 82,5 °C (maalt 82,7), og dampen over
+       0,24 har molbroeken 0,55 (maalt 0,54). Lige dele (rumfang) koger
+       altsaa ved ca. 83 °C, og dampen har omtrent fire gange saa meget
+       ethanol som vand (regnet i rumfang). Ved ca. 0,9 ethanol har dampen
+       samme sammensaetning som vaesken: derfor kan man ikke destillere
+       sig til ren ethanol.
+
+       antal  kugler af hvert stof i vaesken. En kugle er et fast rumfang,
+              saa molbroeken regnes med taethed og molar masse.
+       Svaret: flygtig[i] = γ · p* for stof i (atm), og P = summen af
+       partialtrykkene. Blandingen koger, naar P naar 1 atm.
+       ------------------------------------------------------------------ */
+    D.VAN_LAAR = { ethanol: 1.6798, vand: 0.9227 };
+
+    D.flygtighed = function (antal, T) {
+        var iv = D.nr("vand"), ie = D.nr("ethanol");
+        var mol = [], sum = 0, i;
+        for (i = 0; i < D.STOFFER.length; i++) {
+            var s = D.STOFFER[i];
+            mol[i] = s.M && antal[i] ? antal[i] * s.taethed / s.M : 0;
+            sum += mol[i];
+        }
+        var ud = { flygtig: [], P: 0 };
+        var ge = 1, gv = 1;
+        if (mol[iv] > 0 && mol[ie] > 0) {
+            var xe = mol[ie] / (mol[ie] + mol[iv]), xv = 1 - xe;
+            var A12 = D.VAN_LAAR.ethanol, A21 = D.VAN_LAAR.vand;
+            var n = A12 * xe + A21 * xv;
+            ge = Math.exp(A12 * Math.pow(A21 * xv / n, 2));
+            gv = Math.exp(A21 * Math.pow(A12 * xe / n, 2));
+        }
+        for (i = 0; i < D.STOFFER.length; i++) {
+            var g = i === ie ? ge : (i === iv ? gv : 1);
+            ud.flygtig[i] = g * D.damptryk(D.STOFFER[i], T);
+            if (sum > 0) ud.P += mol[i] / sum * ud.flygtig[i];
+        }
+        return ud;
     };
 
     /* En portion er 120 kugler: tre raekker i bassinet. Bassinet rummer elleve. */

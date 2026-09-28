@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="220" viewBox="0 0 80 220">
+  <!-- Iltflaske med hvid skulder (som i EU). Haandhjulet paa toppen om
+       (40, 10). Udtaget, hvor slangen sidder: (15, 21). Bunden staar paa
+       y 218. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#16181c"/>
+      <stop offset="0.28" stop-color="#4a505a"/>
+      <stop offset="0.6" stop-color="#2c3037"/>
+      <stop offset="1" stop-color="#121418"/>
+    </linearGradient>
+    <linearGradient id="skulder" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a9adb3"/>
+      <stop offset="0.3" stop-color="#ffffff"/>
+      <stop offset="0.65" stop-color="#e3e6ea"/>
+      <stop offset="1" stop-color="#9ea3a9"/>
+    </linearGradient>
+    <linearGradient id="messing" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a26"/>
+      <stop offset="0.35" stop-color="#f1d58a"/>
+      <stop offset="0.7" stop-color="#c9a24a"/>
+      <stop offset="1" stop-color="#7a5c1e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Skygge paa bordet -->
+  <ellipse cx="40" cy="217" rx="30" ry="3" fill="#000000" fill-opacity="0.35"/>
+
+  <!-- Kroppen -->
+  <path d="M14 66 L14 206 Q14 216 24 216 L56 216 Q66 216 66 206 L66 66 Z" fill="url(#krop)" stroke="#0b0c0e" stroke-width="1"/>
+
+  <!-- Skulderen -->
+  <path d="M14 68 Q14 42 32 38 L48 38 Q66 42 66 68 Z" fill="url(#skulder)" stroke="#7d828a" stroke-width="1"/>
+
+  <!-- Etiketten -->
+  <rect x="21" y="112" width="38" height="44" rx="4" fill="#f4f5f7" stroke="#8a9098" stroke-width="0.8"/>
+  <g font-family="Segoe UI, sans-serif" text-anchor="middle">
+    <text x="40" y="138" font-size="17" font-weight="800" fill="#1d2330">O₂</text>
+    <text x="40" y="150" font-size="8" font-weight="700" fill="#4a5261" letter-spacing="1">ILT</text>
+  </g>
+
+  <!-- Halsen, ventilen og udtaget -->
+  <rect x="33" y="26" width="14" height="13" fill="url(#messing)" stroke="#5e4716" stroke-width="0.8"/>
+  <rect x="28" y="15" width="24" height="13" rx="2" fill="url(#messing)" stroke="#5e4716" stroke-width="0.8"/>
+  <rect x="14" y="18" width="16" height="6" rx="1.5" fill="url(#messing)" stroke="#5e4716" stroke-width="0.8"/>
+  <rect x="38" y="9" width="4" height="7" fill="#6f747c"/>
+
+  <!-- Haandhjulet -->
+  <ellipse cx="40" cy="10" rx="15" ry="4" fill="#23262b" stroke="#0b0c0e" stroke-width="0.8"/>
+  <ellipse cx="40" cy="9" rx="13" ry="3" fill="#3a3f47"/>
+</svg>

@@ -111,6 +111,37 @@
         ctx.restore();
     };
 
+    /* ----- Opgavens tekst over tavlen (fane 1) ------------------------------------------
+       Én linje, hvis den kan staa med mindst mindst px; ellers to linjer,
+       helst delt efter et punktum. Giver { px, linjer, h }. */
+    T.overTavle = function (ctx, tekst, b, stoerst, mindst) {
+        var px = NK.passendeSkrift(ctx, tekst, b, stoerst, mindst, "600");
+        var lh = function (p) { return Math.round(p * 1.38); };
+        if (ctx.measureText(tekst).width <= b) return { px: px, linjer: [tekst], h: lh(px) };
+        var ord = tekst.split(" "), bedst = null;
+        ctx.font = font("600", stoerst);
+        for (var i = 1; i < ord.length; i++) {
+            var a = ord.slice(0, i).join(" "), c = ord.slice(i).join(" ");
+            var s = Math.max(ctx.measureText(a).width, ctx.measureText(c).width) * (/\.$/.test(a) ? 0.8 : 1);
+            if (!bedst || s < bedst.s) bedst = { s: s, a: a, c: c };
+        }
+        px = Math.min(NK.passendeSkrift(ctx, bedst.a, b, stoerst, 12, "600"), NK.passendeSkrift(ctx, bedst.c, b, stoerst, 12, "600"));
+        return { px: px, linjer: [bedst.a, bedst.c], h: lh(px) * 2 };
+    };
+
+    /* Teksten paa vaeggen med en gul streg foran, saa den ses */
+    T.tegnOverTavle = function (ctx, o, x, y) {
+        ctx.save();
+        ctx.fillStyle = "#f2c53d";
+        NK.rundtRekt(ctx, x, y + 2, 4, o.h - 4, 2);
+        ctx.fill();
+        ctx.restore();
+        var lh = o.h / o.linjer.length;
+        o.linjer.forEach(function (l, i) {
+            NK.tekst(ctx, l, x + 14, y + lh * (i + 0.5) + 1, { font: font("600", o.px), linje: "middle", farve: "#f2f3f5" });
+        });
+    };
+
     /* En lille overskrift i smaa versaler */
     T.etiket = function (ctx, tekst, x, y, px, farve, just) {
         NK.tekst(ctx, tekst.toUpperCase(), x, y, { font: font("700", px), linje: "middle", farve: farve || "#6a7280", justering: just || "left" });
@@ -587,6 +618,55 @@
         bogstav("M", NK.lerp(C.x, A.x, 0.55), NK.lerp(midY, B.y, 0.55));
         ctx.restore();
         return h;
+    };
+
+    /* ----- Et regnestykke med rigtige broekstreger (tavlen paa Vaegten) -------------------
+       dele: { t, matte, farve, fed } eller { top, bund, matte } (en broek).
+       (x, y): venstre ende af linjens midte. Broekens dele er lidt mindre. */
+    function delFont(d, px) {
+        if (d.matte) return T.matte(Math.round(px * 1.08), "600");
+        return font(d.fed ? "800" : "600", px);
+    }
+
+    function delBredde(ctx, d, px) {
+        if (d.top !== undefined) {
+            var bp = px * 0.9;
+            ctx.font = delFont(d, bp);
+            return Math.max(ctx.measureText(d.top).width, ctx.measureText(d.bund).width) + px * 0.35;
+        }
+        ctx.font = delFont(d, px);
+        return ctx.measureText(d.t).width;
+    }
+
+    T.regnestykkeBredde = function (ctx, dele, px) {
+        var b = 0;
+        dele.forEach(function (d) { b += delBredde(ctx, d, px); });
+        return b;
+    };
+
+    T.regnestykke = function (ctx, dele, x, y, px, farve) {
+        var xx = x;
+        dele.forEach(function (d) {
+            var b = delBredde(ctx, d, px);
+            if (d.top !== undefined) {
+                var bp = px * 0.9, cx = xx + b / 2;
+                NK.tekst(ctx, d.top, cx, y - px * 0.66, { font: delFont(d, bp), justering: "center", linje: "middle", farve: d.farve || farve });
+                NK.tekst(ctx, d.bund, cx, y + px * 0.72, { font: delFont(d, bp), justering: "center", linje: "middle", farve: d.farve || farve });
+                ctx.save();
+                ctx.strokeStyle = d.farve || farve;
+                ctx.lineWidth = Math.max(1.5, px * 0.08);
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(xx + px * 0.1, y);
+                ctx.lineTo(xx + b - px * 0.1, y);
+                ctx.stroke();
+                ctx.restore();
+            } else {
+                NK.tekst(ctx, d.t, xx, y + 1, { font: delFont(d, px), linje: "middle", farve: d.farve || farve });
+            }
+            xx += b;
+        });
+        return xx - x;
     };
 
     /* ----- Linjen med enhederne ----------------------------------------------------------

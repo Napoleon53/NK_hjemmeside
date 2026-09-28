@@ -16,8 +16,9 @@
         "bassin": [
             { sel: "#anker-bassin", titel: "Bassinet", tekst: "Et glas væske, forstørret, så du kan se molekylerne. Hver kugle er et molekyle. Hold musen over en kugle for at se, hvad den er, og træk i bassinet for at ryste det." },
             { sel: "#anker-glas", titel: "Glasset", tekst: "Det samme glas i almindelig størrelse. Vand og ethanol er klare, olien er lysegul, og en emulsion er uklar. Det er det, du ville se i laboratoriet." },
-            { sel: "#haeld-kort", titel: "Hæld i", tekst: "Hver knap hælder en portion i. Bassinet rummer ni. Farven på knappen er farven på kuglerne." },
+            { sel: "#haeld-kort", titel: "Hæld i", tekst: "Hver knap hælder en portion i gennem tragten. Bassinet rummer elleve. Farven på knappen er farven på kuglerne." },
             { sel: "#energi-kort", titel: "Ryst og varm", tekst: "Ryst blandingen, eller skru op for varmen. De farvede tal under skyderen er kogepunkterne for ethanol og vand." },
+            { sel: "#anker-koeler", titel: "Køleren", tekst: "Tilbagesvaleren køler dampen, så den drypper tilbage i bassinet. Vælg Destillation, så løber den over i et forlag." },
             { sel: "#opgavekort", titel: "Opgaverne", tekst: "Seks opgaver. Knappen giver først et hint, så svaret og til sidst en ny opgave." },
             { sel: "#quizknap, #teoriknap", titel: "Quiz og teori", tekst: "Fem spørgsmål, når du har prøvet dig frem. Teorien samler det hele." }
         ]

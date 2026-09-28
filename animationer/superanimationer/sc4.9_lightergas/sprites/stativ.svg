@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="440" viewBox="0 0 260 440">
+  <!-- Stativ med muffe og klemme, der holder maaleglasset. Stangen staar
+       til hoejre (x 232-240), og foden staar paa bordet ved y 440.
+       Klemmen griber om maaleglasset med midten i x 30, y 60; kaeberne
+       passer til et glas, der er 46 bredt (x 7-53). Set forfra ligger
+       den forreste kaebe som et baand hen over glasset. -->
+  <defs>
+    <linearGradient id="stang" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7b8591"/>
+      <stop offset="0.4" stop-color="#e6ebf0"/>
+      <stop offset="1" stop-color="#6a7480"/>
+    </linearGradient>
+    <linearGradient id="arm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e6ebf0"/>
+      <stop offset="1" stop-color="#7b8591"/>
+    </linearGradient>
+    <linearGradient id="kaebe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7dde3"/>
+      <stop offset="0.5" stop-color="#a6b0ba"/>
+      <stop offset="1" stop-color="#6f7984"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a505b"/>
+      <stop offset="1" stop-color="#2a2e35"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Foden -->
+  <ellipse cx="228" cy="439" rx="32" ry="2.5" fill="#000000" fill-opacity="0.35"/>
+  <path d="M198 440 L202 426 Q203 422 208 422 L252 422 Q257 422 258 426 L260 440 Z" fill="url(#fod)" stroke="#1c1f24" stroke-width="1"/>
+
+  <!-- Stangen -->
+  <rect x="232" y="6" width="8" height="418" rx="3" fill="url(#stang)" stroke="#565f69" stroke-width="0.8"/>
+
+  <!-- Armen fra muffen til klemmen -->
+  <rect x="56" y="56" width="178" height="8" rx="3" fill="url(#arm)" stroke="#565f69" stroke-width="0.8"/>
+
+  <!-- Muffen paa stangen med skruen -->
+  <rect x="224" y="48" width="24" height="24" rx="3" fill="#8a949f" stroke="#4d5660" stroke-width="1"/>
+  <rect x="226" y="50" width="20" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.35"/>
+  <rect x="248" y="56" width="10" height="8" rx="2" fill="#d4a33a" stroke="#8a6a1f" stroke-width="0.8"/>
+
+  <!-- Klemmen: kaeberne om glasset med kork paa siderne -->
+  <rect x="1" y="51" width="7" height="18" rx="2" fill="#b98a55" stroke="#7d5a31" stroke-width="0.7"/>
+  <rect x="52" y="51" width="7" height="18" rx="2" fill="#b98a55" stroke="#7d5a31" stroke-width="0.7"/>
+  <path d="M0 54 Q0 50 4 50 L60 50 Q66 50 66 56 L66 64 Q66 70 60 70 L4 70 Q0 70 0 66 Z" fill="url(#kaebe)" fill-opacity="0.92" stroke="#4d5660" stroke-width="1"/>
+  <rect x="3" y="52" width="58" height="2.4" rx="1.2" fill="#ffffff" fill-opacity="0.4"/>
+  <rect x="62" y="53" width="8" height="14" rx="2" fill="#d4a33a" stroke="#8a6a1f" stroke-width="0.8"/>
+</svg>

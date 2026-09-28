@@ -152,13 +152,15 @@
             ctx.fill();
         }
 
-        /* En bred etiket gaar lidt om paa siderne af glasset, saa navnet
-           kan laeses paa et mindre glas (hylden paa samlebaandet) */
-        var e = T.etiketRekt(x, y, h, v.bredEtiket);
-        var medTekst = v.tekst !== undefined ? v.tekst : h >= 105;
+        /* En bred etiket gaar lidt om paa siderne af glasset, saa teksten
+           kan laeses paa et mindre glas (hylderne). Paa et lille glas
+           staar kun det, der kan laeses (etiketTekst). */
+        var e = T.etiketRekt(x, y, h, v.bredEtiket !== undefined ? v.bredEtiket : h < 110);
+        var medTekst = v.tekst !== undefined ? v.tekst : true;
         if (v.etiket === "ny") T.nyEtiket(ctx, e.x, e.y, e.b, e.h, st, { tekst: medTekst });
         else if (v.etiket !== "ingen") T.gammelEtiket(ctx, e.x, e.y, e.b, e.h, st, { tekst: medTekst, retning: v.retning || st.retning });
 
+        if (st.fare && v.fare !== false) T.faremaerke(ctx, st.fare, x, y0 + 41 * k, 9 * k);
         if (v.stjerne) T.stjerne(ctx, x + b * 0.36, y0 + 3 * k, Math.max(6, 9 * k), v.stjerne);
         ctx.restore();
         return { x: x0, y: y0, b: b, h: h, etiket: e };
@@ -177,17 +179,24 @@
         }));
     }
 
+    /* Mindre skrift end dette kan ikke laeses paa en etiket. Saa staar
+       formlen alene, eller der staar intet. */
+    var LAESBAR = 10;
+
     /* Navnet paa én linje, delt i positiv og negativ ion paa to eller med
        hydrogen- paa sin egen linje. Der vaelges den opdeling, der giver
-       den stoerste skrift; flere linjer kun, hvis det giver tydeligt mere. */
-    function navnLinjer(ctx, st, b, stoerst, mindst, vaegt) {
+       den stoerste skrift; flere linjer kun, hvis det giver tydeligt mere,
+       eller hvis det er det, der goer navnet stort nok til at kunne laeses. */
+    function navnLinjer(ctx, st, b, stoerst, mindst, vaegt, maxH) {
         var an = st.anIon.navn;
         var muligheder = [[st.navn], [st.katIon.saltdel, an]];
         if (an.indexOf("hydrogen") === 0 && an.length > 8) muligheder.push([st.katIon.saltdel, "hydrogen-", an.slice(8)]);
         var bedst = null;
         muligheder.forEach(function (linjer) {
             var px = faelles(ctx, linjer, b, stoerst, mindst, vaegt);
-            if (!bedst || px > bedst.px + 1.5) bedst = { linjer: linjer, px: px };
+            /* maxH: linjerne skal ogsaa kunne vaere i hoejden */
+            if (maxH) px = Math.min(px, maxH / (linjer.length * 1.1));
+            if (!bedst || px > bedst.px + (bedst.px < LAESBAR ? 0 : 1.5)) bedst = { linjer: linjer, px: px };
         });
         return bedst;
     }
@@ -195,7 +204,9 @@
     /* Teksten paa en etiket: navnet foroven, formlen forneden.
        o.navn / o.formel: hvilke af delene der staar paa etiketten.
        Staar begge dele der, stables de og centreres, saa de aldrig
-       overlapper; paa den revne etiket staar hver del i sin halvdel. */
+       overlapper; paa den revne etiket staar hver del i sin halvdel.
+       Paa en lille etiket (glassene paa hylderne) staar kun det, der kan
+       laeses: er navnet for smaat, staar formlen alene og stoerre. */
     function etiketTekst(ctx, st, x, y, b, h, o) {
         var band = Math.max(2, h * 0.08);
         var bi = b * 0.9, cx = x + b / 2;
@@ -206,9 +217,10 @@
         ctx.textBaseline = "middle";
         ctx.fillStyle = o.farve;
         var vaegt = o.navnVaegt || "600";
+        var fpx;
         if (o.navn && o.formel) {
             var nl2 = navnLinjer(ctx, st, bi, navnStr, 9, vaegt);
-            var fpx = NK.passendeSkrift(ctx, st.formelTekst, bi, formelStr, 10, "700");
+            fpx = NK.passendeSkrift(ctx, st.formelTekst, bi, formelStr, 10, "700");
             var npx = nl2.px, lh = 1.12;
             var blok = nl2.linjer.length * npx * lh + npx * 0.25 + fpx * 1.05;
             var plads = (h - band) * 0.92;
@@ -218,26 +230,39 @@
                 fpx *= s;
                 blok = plads;
             }
-            var top = y + band + (h - band - blok) / 2;
-            ctx.font = font(vaegt, npx);
-            nl2.linjer.forEach(function (l, i) { ctx.fillText(l, cx, top + npx * lh * (i + 0.5)); });
-            ctx.font = font("700", fpx);
-            ctx.fillText(st.formelTekst, cx, top + nl2.linjer.length * npx * lh + npx * 0.25 + fpx * 0.55);
+            if (npx >= LAESBAR) {
+                var top = y + band + (h - band - blok) / 2;
+                ctx.font = font(vaegt, npx);
+                nl2.linjer.forEach(function (l, i) { ctx.fillText(l, cx, top + npx * lh * (i + 0.5)); });
+                ctx.font = font("700", fpx);
+                ctx.fillText(st.formelTekst, cx, top + nl2.linjer.length * npx * lh + npx * 0.25 + fpx * 0.55);
+            } else {
+                fpx = faelles(ctx, [st.formelTekst], bi, (h - band) * 0.6, 6, "700");
+                if (fpx >= LAESBAR - 1) {
+                    ctx.font = font("700", fpx);
+                    ctx.fillText(st.formelTekst, cx, y + band + (h - band) / 2 + 1);
+                }
+            }
             ctx.restore();
             return;
         }
         var midtNavn = y + band + (h - band) * 0.3;
         var midtFormel = y + band + (h - band) * 0.74;
         if (o.navn) {
-            var nl = navnLinjer(ctx, st, bi, navnStr, 9, vaegt);
-            ctx.font = font(vaegt, nl.px);
-            nl.linjer.forEach(function (l, i) {
-                ctx.fillText(l, cx, midtNavn + (i - (nl.linjer.length - 1) / 2) * nl.px * 1.1);
-            });
+            var nl = navnLinjer(ctx, st, bi, navnStr, 6, vaegt, (h - band) * 0.5);
+            if (nl.px >= LAESBAR) {
+                ctx.font = font(vaegt, nl.px);
+                nl.linjer.forEach(function (l, i) {
+                    ctx.fillText(l, cx, midtNavn + (i - (nl.linjer.length - 1) / 2) * nl.px * 1.1);
+                });
+            }
         }
         if (o.formel) {
-            NK.passendeSkrift(ctx, st.formelTekst, bi, formelStr, 10, "700");
-            ctx.fillText(st.formelTekst, cx, midtFormel);
+            fpx = Math.min(faelles(ctx, [st.formelTekst], bi, formelStr, 6, "700"), (h - band) * 0.42);
+            if (fpx >= LAESBAR - 1) {
+                ctx.font = font("700", fpx);
+                ctx.fillText(st.formelTekst, cx, midtFormel);
+            }
         }
         ctx.restore();
     }
@@ -684,6 +709,33 @@
         ctx.strokeStyle = "#8a6510";
         ctx.lineWidth = 1;
         ctx.stroke();
+        ctx.restore();
+    };
+
+    /* Et GHS-faremaerke med midte i (cx, cy); s er den halve diagonal.
+       fare: "giftig" eller "sundhedsskadelig" (D.FARE_NAVN). Er filen
+       ikke klar, tegnes en roed rombe med et groft tegn, saa maerket
+       aldrig forsvinder. */
+    T.faremaerke = function (ctx, fare, cx, cy, s) {
+        if (s < 3) return;
+        if (NK.Sprites.tegn(ctx, "ghs_" + fare, cx - s, cy - s, 2 * s, 2 * s)) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s);
+        ctx.lineTo(cx + s, cy);
+        ctx.lineTo(cx, cy + s);
+        ctx.lineTo(cx - s, cy);
+        ctx.closePath();
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "#e0001a";
+        ctx.lineWidth = Math.max(1, s * 0.14);
+        ctx.stroke();
+        ctx.fillStyle = "#111111";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = font("800", Math.max(6, s * 0.9));
+        ctx.fillText(fare === "giftig" ? "☠" : "!", cx, cy + s * 0.05);
         ctx.restore();
     };
 

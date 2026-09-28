@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sc4.9 Lightergas</title>
+<style>
+    body { background: #1b1d24; color: #dde3ea; font-family: "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    h1 { font-size: 1rem; margin: 0 0 14px; color: #f2c53d; }
+    .ark { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+    figure { margin: 0; padding: 12px; background: #262833; border: 1px solid #3a3a47; border-radius: 8px; text-align: center; }
+    figure img { display: block; margin: 0 auto 8px; }
+    figcaption { font-size: 0.8rem; color: #a9b0ba; }
+    .samlet { position: relative; width: 192px; height: 540px; margin: 0 auto 8px; }
+    .samlet img { position: absolute; }
+</style>
+</head>
+<body>
+<!-- Udviklerværktøj: viser sprites alene, før de sættes i bevægelse. Indgår ikke i animationen. -->
+<h1>sc4.9: sprites i dobbelt størrelse (lighteren i tredobbelt)</h1>
+<div class="ark">
+    <figure><img src="sprites/lighter.svg" width="192"><figcaption>lighter.svg (ny, uden hætte)</figcaption></figure>
+    <figure>
+        <div class="samlet">
+            <img src="sprites/lighter.svg" width="192" style="left:0; top:0;">
+            <img src="sprites/haette.svg" width="84" style="left:30px; top:42px;">
+        </div>
+        <figcaption>lighter med hætte</figcaption>
+    </figure>
+    <figure><img src="sprites/haette.svg" width="84"><figcaption>haette.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/maaleglas.svg" width="120"><figcaption>maaleglas.svg (ny, omvendt)</figcaption></figure>
+    <figure><img src="sprites/kar.svg" width="640"><figcaption>kar.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/stativ.svg" width="520"><figcaption>stativ.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/vaegt.svg" width="480"><figcaption>vaegt.svg (som sc4.11)</figcaption></figure>
+    <figure><img src="sprites/lup.svg" width="140"><figcaption>lup.svg (som sc4.11)</figcaption></figure>
+</div>
+</body>
+</html>

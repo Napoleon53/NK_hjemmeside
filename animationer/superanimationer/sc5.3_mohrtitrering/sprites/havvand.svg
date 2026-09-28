@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="70" height="150" viewBox="0 0 70 150">
+  <!-- Proeveflaske af glas med havvand og blaat skruelaag. Etikettens
+       tekst skrives af animationen OVENPAA filen i omraadet x 10-60,
+       y 78-112 (mellem de to blaa baand). Bunden er y 148. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e6f1f8" stop-opacity="0.5"/>
+      <stop offset="0.3" stop-color="#f7fbfe" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#cfe0ec" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="vand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc6cf" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#3f93a6" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+  <!-- Havvandet -->
+  <path d="M10 58 L60 58 L60 140 Q60 146 54 146 L16 146 Q10 146 10 140 Z" fill="url(#vand)"/>
+  <path d="M10 58 L60 58" stroke="#d9f1f4" stroke-opacity="0.7" stroke-width="1.2"/>
+  <!-- Flasken: skulder og hals som en blaalaagsflaske -->
+  <path d="M26 18 L44 18 L44 28 Q44 34 54 38 Q62 42 62 52 L62 140 Q62 148 54 148 L16 148 Q8 148 8 140 L8 52 Q8 42 16 38 Q26 34 26 28 Z"
+        fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="1.5"/>
+  <!-- Laaget -->
+  <rect x="23" y="3" width="24" height="16" rx="2.5" fill="#2f74b5" stroke="#1d4f78" stroke-width="1"/>
+  <path d="M27 6 v10 M31 6 v10 M35 6 v10 M39 6 v10 M43 6 v10" stroke="#1d4f78" stroke-opacity="0.55" stroke-width="1"/>
+  <rect x="21" y="17" width="28" height="4" rx="1.5" fill="#f2c53d" stroke="#a88414" stroke-width="0.8"/>
+  <!-- Etiketten -->
+  <rect x="9" y="68" width="52" height="54" rx="3" fill="#fbfaf5" stroke="#b9b4a2" stroke-width="1"/>
+  <rect x="9" y="68" width="52" height="9" rx="3" fill="#2f74b5"/>
+  <rect x="9" y="113" width="52" height="9" rx="3" fill="#2f74b5"/>
+  <!-- Genskin -->
+  <rect x="53" y="48" width="3" height="88" rx="1.5" fill="#ffffff" fill-opacity="0.3"/>
+</svg>

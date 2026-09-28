@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc4.9 Lightergas</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at molarmasserne og molvolumenet passer, at
+   eksemplerne og den ukendte gas giver den rigtige alkan, at lighterens
+   ventil og tuningen opfører sig som beskrevet, at formlerne og tallene
+   genkendes med de typiske fejl, at fane 1 kan gennemføres med musen,
+   at påskeæggene (stikflamme, vand i lighteren, brandkugle) kalder
+   Kemichael ind, at fane 2 og 3 kan gennemføres, at de seks fejlkilder
+   går den rigtige vej, at sproget holder reglerne, og at layoutet holder
+   fra 520 × 380 til 1500 × 900.
+
+   Kræver en lokal server eller Chrome med --allow-file-access-from-files.
+   Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sc4.9-forsoeg", "nk-sc4.9-beregning", "nk-sc4.9-fejl", "nk-sc4.9-maalinger", "nk-kemichael"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Ord, der er skrevet uden æ, ø og å, og som derfor ikke må nå eleven */
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|hoejere|vaegt\w*|Vaegt\w*|laerer\w*|forsoeg\w*|maaling\w*|Maaling\w*|haette\w*|maaleglas\w*|fejlkild\w*|toer\w*)\b/;
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+
+    function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    function enter(inp) { inp.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true })); }
+    function felt(id, tekst) { var e = d.getElementById(id); e.value = tekst; enter(e); }
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, K = NK.Kemi, T = NK.Tjek, Tg = NK.Tegn;
+    paastand("data.js, kemi.js, tjek.js, regning.js og laerer.js er kørt", !!(D && D.FEJL && K && K.Lighter && K.Forloeb && T && T.formel && NK.Regning && NK.Laerer));
+    paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-forsoeg"] && NK.sims["fane-beregning"] && NK.sims["fane-fejl"]));
+    var sprites = ["lighter", "haette", "maaleglas", "kar", "stativ", "vaegt", "lup", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var A = NK.sims["fane-forsoeg"], B = NK.sims["fane-beregning"], C = NK.sims["fane-fejl"];
+    paastand("Kemichael præsenterer ikke: ingen tilbudsknapper og ingen kateder", !d.querySelector(".tilbud") && !d.querySelector(".kknap") && !NK.RoligLaerer);
+    paastand("Kemichael står uden for scenen fra start", !A.laerer.synlig());
+
+    overskrift("2. Kemien");
+    var M = D.ALKANER.map(function (a) { return K.Mtekst(D.ALKANER.indexOf(a)); });
+    paastand("molarmasserne: 16,05, 30,08, 44,11, 58,14 og 72,17 g/mol", M.join(" ") === "16,05 30,08 44,11 58,14 72,17", M.join(" "));
+    paastand("formlerne er CₙH₂ₙ₊₂", D.ALKANER.map(function (a) { return a.formel; }).join(" ") === "CH4 C2H6 C3H8 C4H10 C5H12");
+    paastand("1 mol butan fylder 24,0 L ved 20 °C", Math.abs(K.mL(K.M_GAS) - 24000) < 1e-6);
+    paastand("150 mL butan vejer 0,363 g", NK.betydende(K.gram(150), 3) === "0,363", K.gram(150));
+    paastand("ved 30 °C fylder den samme gas 3,4 % mere", Math.abs(K.vm(30) / K.vm(20) - 303 / 293) < 1e-9);
+    D.EKSEMPEL.forEach(function (e, i) {
+        var f = K.facit(e);
+        paastand("eksempel " + (i + 1) + " giver butan (" + K.Mv(f.M) + " g/mol)", f.alkan === D.LIGHTERGAS && Math.abs(f.M / K.M_GAS - 1) < 0.02);
+        /* Og det er det, modellen giver: m(efter) = m(før) − massen af V mL */
+        paastand("eksempel " + (i + 1) + " passer med modellen", K.r2(e.mf - K.gram(e.V)) === e.me, K.r2(e.mf - K.gram(e.V)) + " / " + e.me);
+    });
+    var ukendt = D.BEREGNING[2].tal.map(function (t) { var f = K.facit(t); return { a: f.alkan, afv: Math.abs(f.M / K.M(f.alkan) - 1) }; });
+    paastand("de fire ukendte gasser er fire forskellige alkaner", ukendt.map(function (u) { return u.a; }).sort().join("") === "0123");
+    paastand("de ukendte gasser ligger højst 1,5 % fra deres alkan", ukendt.every(function (u) { return u.afv < 0.015; }), JSON.stringify(ukendt));
+
+    overskrift("3. Lighteren og tuningen");
+    var lt = new K.Lighter(17.84);
+    paastand("den nye lighter vejer det, den skal (med hætte)", lt.visning() === 17.84);
+    paastand("fabrikkens indstilling giver 24 mL/s", lt.flow() === 24);
+    paastand("pinden kan ikke løftes med hætten på", lt.loeft() === false && !lt.loeftet);
+    lt.saetPind(1);
+    paastand("pinden helt frem giver åbning 1 (ikke tunet)", lt.aabning() === 1 && !lt.tunet());
+    lt.haette = false;
+    paastand("hætten vejer " + NK.tal2(D.HAETTE) + " g", Math.abs(K.r2(17.84 - D.HAETTE) - lt.visning()) < 0.001);
+    lt.loeft(); lt.saetPind(0); lt.saenk(); lt.saetPind(1);
+    paastand("frem, løft, tilbage, ned, frem: åbning 2 og tunet", Math.abs(lt.aabning() - 2) < 1e-9 && lt.tunet());
+    lt.saetPind(0);
+    paastand("tilbage uden løft: åbning 1 og stadig tunet", Math.abs(lt.aabning() - 1) < 1e-9 && !lt.tunet());
+    lt.saetPind(1);
+    for (var n = 0; n < 6; n++) { lt.loeft(); lt.saetPind(0); lt.saenk(); lt.saetPind(1); }
+    paastand("åbningen stopper ved " + D.AABEN_MAKS, lt.aabning() === D.AABEN_MAKS);
+    paastand("en tunet lighter giver store bobler, og en del slipper forbi", K.fang(lt.flow()) < 0.7 && K.fang(24) === 1);
+    var m0 = lt.masse(), ud = lt.slip(100);
+    paastand("100 mL gas ud: lighteren bliver 0,242 g lettere", Math.abs(m0 - lt.masse() - K.gram(100)) < 1e-9 && Math.abs(ud - 100) < 1e-9);
+
+    overskrift("4. Formler og tal");
+    var formler = [
+        ["dm", "m(før) − m(efter)", true], ["dm", "mfør-mefter", true], ["dm", "m1 - m2", true], ["dm", "m(gas) = m(før) - m(efter)", true],
+        ["dm", "m(efter) - m(før)", "Omvendt"], ["dm", "m(før) + m(efter)", "tabte masse"],
+        ["n", "V/Vm", true], ["n", "n = V / Vₘ", true], ["n", "V_m", false], ["n", "n(gas) = p*V/(R*T)", true], ["n", "pV/(RT)", true],
+        ["n", "V/(1000*Vm)", "V er i mL"], ["n", "V/24", "Skriv molvolumenet som Vₘ"], ["n", "V*Vm", "ikke ganget"], ["n", "Vm/V", "vendt om"],
+        ["n", "m(gas)/M(gas)", "kender du ikke endnu"], ["n", "0,150/24", "symboler først"],
+        ["M", "m/n", true], ["M", "M = m(gas)/n(gas)", true], ["M", "(m(før)-m(efter))/n", true], ["M", "m(gas)*n(gas)", "ikke ganget"],
+        ["M", "n/m", "vendt om"], ["M", "m(før)/n(gas)", "hele lighteren"]
+    ];
+    var skaeve = [];
+    formler.forEach(function (f) {
+        var s = T.formel(f[0], f[1]);
+        var ok = f[2] === true ? s.ok : (f[2] === false ? !s.ok : (!s.ok && s.besked && s.besked.indexOf(f[2]) >= 0) || (s.ok && s.note && s.note.indexOf(f[2]) >= 0));
+        if (!ok) skaeve.push(f[0] + " " + f[1] + " → " + (s.ok ? "ok" : s.besked));
+    });
+    paastand(formler.length + " formler og typiske fejl genkendes", skaeve.length === 0, skaeve.join("; "));
+    var o = { tal: { mf: 17.84, V: 150, me: 17.48 } };
+    o.facit = K.facit(o.tal);
+    var tal = [
+        ["dm", "0,36", true], ["dm", "-0,36", "Omvendt"], ["dm", "17,84", "m(før)"],
+        ["n", "0,00625", true], ["n", "6,25·10^-3", true], ["n", "6,25e-3", true], ["n", "6,25 · 10⁻³ mol", true],
+        ["n", "6,25", "liter"], ["n", "0,00670", "22,4"], ["n", "3,6", "ganget"],
+        ["M", "57,6", true], ["M", "57,6 g/mol", true], ["M", "0,00225", "ganget"], ["M", "0,0174", "vendt om"], ["M", "2854", "hele beholderen"], ["M", "0,0576", "liter"]
+    ];
+    skaeve = [];
+    tal.forEach(function (t) {
+        var s = T.trin(t[0], t[1], o);
+        var ok = t[2] === true ? s.ok : (!s.ok && s.besked && s.besked.indexOf(t[2]) >= 0);
+        if (!ok) skaeve.push(t[0] + " " + t[1] + " → " + (s.ok ? "ok" : s.besked));
+    });
+    paastand(tal.length + " tal og typiske fejl genkendes", skaeve.length === 0, skaeve.join("; "));
+    var regn = D.TRIN_ID.map(function (id) { var r = T.regning(id, o); return r[0] + " " + r[1]; });
+    paastand("de pæne beregninger", regn[0] === "m(gas) = m(før) − m(efter) = 17,84 g − 17,48 g = 0,36 g" &&
+        regn[1] === "n(gas) = V / Vₘ = 0,150 L / 24,0 L/mol = 6,25 · 10⁻³ mol" &&
+        regn[2] === "M(gas) = m(gas) / n(gas) = 0,36 g / 6,25 · 10⁻³ mol = 57,6 g/mol", regn.join(" | "));
+
+    overskrift("5. Fane 1 med musen");
+    W.NK.visFane("fane-forsoeg");
+    A.vaelg(0, false);
+    A.forfra();
+    function mus(type, sx, sy) {
+        var r = A.L.canvas.getBoundingClientRect(), l = A.lay;
+        A.L.canvas.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + l.ox + sx * l.k, clientY: r.top + l.oy + sy * l.k, bubbles: true, pointerId: 1, button: 0, isPrimary: true }));
+    }
+    function veje(pts) {
+        mus("pointerdown", pts[0][0], pts[0][1]);
+        for (var i = 1; i < pts.length; i++) {
+            var a = pts[i - 1], b = pts[i];
+            for (var j = 1; j <= 5; j++) { mus("pointermove", a[0] + (b[0] - a[0]) * j / 5, a[1] + (b[1] - a[1]) * j / 5); tik(A, 0.02); }
+        }
+        var z = pts[pts.length - 1];
+        mus("pointerup", z[0], z[1]);
+        tik(A, 0.4);
+    }
+    function midt() { var b = A.lighterBund(); return [b.x, b.yb - 55]; }
+    function ventUd() { var n = 0; while (A.laerer.optaget() && n++ < 40) tik(A, 0.5); return !A.laerer.optaget(); }
+    tik(A, 0.2);
+    paastand("første skridt: lighteren på vægten", A.fase() === "foer" && /vægten/.test(A.beskedTekst()), A.beskedTekst());
+    felt("forsoeg-f0", "17,00");
+    paastand("m(før), før lighteren står på vægten, afvises", A.noteret.mf === null && /på vægten først/.test(A.beskedTekst()));
+    veje([midt(), [130, 430]]);
+    paastand("lighteren kan trækkes op på vægten", A.sted === "vaegt");
+    felt("forsoeg-f0", "12,34");
+    paastand("et forkert tal afvises", A.noteret.mf === null);
+    felt("forsoeg-f0", NK.tal2(A.lt.visning()));
+    tik(A, 0.1);
+    paastand("m(før) noteres, og næste skridt er vandet", A.noteret.mf === A.lt.m0 && A.fase() === "saenk" && /vandet/.test(A.beskedTekst()), A.beskedTekst());
+    veje([midt(), [640, 420]]);
+    paastand("lighteren kan trækkes ned under måleglasset", A.sted === "vand");
+    var p = midt();
+    mus("pointerdown", p[0], p[1]);
+    tik(A, 2);
+    paastand("et tryk på lighteren under vand lukker gas ud i glasset", A.gasPaa && Math.abs(A.glas.V - 48) < 1.5, A.glas.V);
+    felt("forsoeg-v0", "48");
+    paastand("V kan ikke skrives, mens gassen bobler", A.noteret.V === null && /Slip/.test(A.beskedTekst()));
+    tik(A, 4.25);
+    mus("pointerup", p[0], p[1]);
+    tik(A, 0.2);
+    var V = A.glas.V;
+    paastand("slippet: ca. 150 mL i glasset", !A.gasPaa && Math.abs(V - 150) < 2, V);
+    felt("forsoeg-v0", String(Math.round(250 - V)));
+    paastand("aflæst fra den forkerte ende: forklaring", A.noteret.V === null && /på hovedet/.test(A.beskedTekst()), A.beskedTekst());
+    felt("forsoeg-v0", String(Math.round(V) + 1));
+    paastand("V inden for en streg godkendes", A.noteret.V === Math.round(V) + 1);
+    tik(A, 0.1);
+    paastand("så kommer gættet med tre svar", A.fase() === "gaet" && d.querySelectorAll("#forsoeg-valg button").length === 3);
+    felt("forsoeg-e0", "1");
+    paastand("m(efter) kan ikke skrives før gættet", A.noteret.me === null);
+    d.querySelectorAll("#forsoeg-valg button")[0].click();
+    tik(A, 0.1);
+    paastand("gættet noteres, og næste skridt er at tørre og veje", A.valgt === 0 && A.fase() === "op");
+    veje([midt(), [midt()[0], midt()[1] - 30], [130, 430]]);
+    paastand("op af vandet er lighteren våd", A.lt.vaad() && A.fase() === "toer");
+    var vaad = A.lt.visning();
+    felt("forsoeg-e0", NK.tal2(vaad));
+    paastand("den våde vejning afvises med en forklaring", A.noteret.me === null && /vejer med/.test(A.beskedTekst()), A.beskedTekst());
+    veje([midt(), [400, 520]]);
+    tik(A, 1.2);
+    paastand("papiret tørrer lighteren", A.sted === "papir" && !A.lt.vaad());
+    veje([midt(), [130, 430]]);
+    felt("forsoeg-e0", NK.tal2(A.lt.visning()));
+    tik(A, 0.1);
+    var mA = NK.maalinger[0];
+    paastand("måling 1 er færdig og gemt", A.faerdig && mA && mA.mf === A.noteret.mf && mA.me === A.lt.visning());
+    paastand("målingen giver butan", K.facit(mA).alkan === D.LIGHTERGAS, K.Mv(K.facit(mA).M));
+    paastand("gættet (0,04 g) får sin forklaring", /Gas er let/.test(A.beskedTekst()), A.beskedTekst());
+    paastand("fane 2 bruger den nye måling", B.opg.tal.egen && B.opg.tal.mf === mA.mf, JSON.stringify(B.opg.tal));
+
+    overskrift("6. Påskeæggene");
+    function tuning() {
+        var g = A.lighterGeo();
+        var hx = (g.haette.x0 + g.haette.x1) / 2, hy = (g.haette.y0 + g.haette.y1) / 2;
+        veje([[hx, hy], [hx, hy - 8]]);
+        var sidderFast = A.lt.haette;
+        veje([[hx, hy], [hx, hy - 30], [245, 550]]);
+        g = A.lighterGeo();
+        var tip = Tg.pindTip(g, A.lt.pind, false), ro = tip.y;
+        veje([[tip.x, ro], [tip.x + 40, ro]]);
+        tip = Tg.pindTip(g, A.lt.pind, false);
+        veje([[tip.x, ro], [tip.x, ro - 14], [tip.x - 50, ro - 14], [tip.x - 50, ro]]);
+        tip = Tg.pindTip(g, A.lt.pind, false);
+        veje([[tip.x, ro], [tip.x + 50, ro]]);
+        return sidderFast;
+    }
+    A.vaelg(1, false);
+    A.forfra();
+    tik(A, 0.2);
+    var fast = tuning();
+    paastand("hætten sidder fast ved et lille ryk", fast);
+    paastand("hætten kan trækkes af og ligger på bordet", !A.lt.haette && !A.hat.paa && A.hat.yb === 580);
+    paastand("med musen: frem, løft, tilbage, ned, frem giver en tunet lighter", Math.abs(A.lt.aabning() - 2) < 0.01 && A.lt.tunet(), A.lt.aabning());
+    var g1 = A.lighterGeo();
+    mus("pointerdown", g1.hjul.x, g1.hjul.y);
+    tik(A, 0.3);
+    paastand("hjulet på en tunet lighter giver en stikflamme", A.flamme && A.flamme.stik && A.uheld === "stik");
+    paastand("Kemichael kommer ind", A.laerer.optaget());
+    mus("pointerup", g1.hjul.x, g1.hjul.y);
+    paastand("han går igen", ventUd());
+    /* Haetten paa igen */
+    var m1 = A.lt.visning(), gh = A.lighterGeo();
+    veje([[A.hat.x, A.hat.yb - 12], [(gh.haette.x0 + gh.haette.x1) / 2, gh.haette.y1 - 16]]);
+    paastand("hætten kan sættes på igen og vejer med", A.lt.haette && A.hat.paa && Math.abs(A.lt.visning() - m1 - 0.62) < 0.011, A.lt.visning() + " " + m1);
+    veje([[(gh.haette.x0 + gh.haette.x1) / 2, (gh.haette.y0 + gh.haette.y1) / 2], [(gh.haette.x0 + gh.haette.x1) / 2, gh.haette.y0 - 30], [245, 550]]);
+    /* Vand i lighteren: terningen slår 0,05 */
+    var terning = W.NK.terning;
+    W.NK.terning = function () { return 0.05; };
+    veje([midt(), [640, 420]]);
+    p = midt();
+    mus("pointerdown", p[0], p[1]);
+    tik(A, 1);
+    mus("pointerup", p[0], p[1]);
+    tik(A, 0.3);
+    paastand("en tunet lighter under vand suger vand ind (20 %)", A.lt.vand > 0.3 && A.uheld === "vand" && A.laerer.optaget(), A.lt.vand);
+    var vandFoer = A.lt.vand;
+    mus("pointerdown", p[0], p[1]);
+    tik(A, 0.5);
+    mus("pointerup", p[0], p[1]);
+    paastand("der rulles kun én gang pr. tur i vandet", A.lt.vand === vandFoer);
+    W.NK.terning = function () { return 0.9; };
+    ventUd();
+    veje([midt(), [midt()[0], midt()[1] - 30], [290, 520]]);
+    veje([midt(), [640, 420]]);
+    p = midt();
+    mus("pointerdown", p[0], p[1]);
+    tik(A, 0.5);
+    mus("pointerup", p[0], p[1]);
+    paastand("ved 80 % sker der ingenting", A.lt.vand === vandFoer);
+    W.NK.terning = terning;
+    A.forfra();
+    ventUd();
+    var n1 = 0, tre = 0;
+    for (n = 0; n < 400; n++) { if (W.NK.terning() < D.VAND_SANDS) n1++; }
+    paastand("terningen giver ca. 20 %", n1 > 40 && n1 < 125, n1);
+    /* Brandkuglen */
+    var g2 = A.lighterGeo(), kx = (g2.knap.x0 + g2.knap.x1) / 2, ky = (g2.knap.y0 + g2.knap.y1) / 2;
+    mus("pointerdown", kx, ky);
+    tik(A, 1.8);
+    mus("pointerup", kx, ky);
+    paastand("gasknappen på bordet lukker gas ud i luften", A.sky > D.SKY.graense, A.sky);
+    mus("pointerdown", g2.hjul.x, g2.hjul.y);
+    mus("pointerup", g2.hjul.x, g2.hjul.y);
+    tik(A, 0.2);
+    paastand("gas på bordet og en gnist: brandkuglen og Kemichael", A.wush && A.uheld === "wush" && A.sky === 0 && A.laerer.optaget());
+    ventUd();
+    A.forfra();
+    tik(A, 0.2);
+    g2 = A.lighterGeo();
+    mus("pointerdown", g2.hjul.x, g2.hjul.y);
+    tik(A, 0.3);
+    paastand("en almindelig lighter giver en lille flamme uden Kemichael", A.flamme && !A.flamme.stik && !A.laerer.optaget() && A.uheld === null);
+    mus("pointerup", g2.hjul.x, g2.hjul.y);
+    tik(A, 1);
+    paastand("replikkerne er højst 60 tegn", Object.keys(D.PAATALE).every(function (k) { return D.PAATALE[k].every(function (l) { return l.length <= 60; }); }));
+    void tre;
+
+    overskrift("7. Fane 2");
+    W.NK.visFane("fane-beregning");
+    [0, 1, 2].forEach(function (i) {
+        B.vaelg(i, false);
+        var tr = 0;
+        while (!B.faerdig && tr++ < 20) { B.knap(); B.knap(); }
+        paastand("opgave " + (i + 1) + " kan løses med Vis svaret", B.faerdig && B.alkan === B.opg.facit.alkan, B.beskedTekst());
+    });
+    paastand("måling 2 har formlerne stående (kun tal)", B.regning && D.BEREGNING[1].kunTal);
+    B.vaelg(0, false);
+    function skrivB(t) { var f = B.regning.aktivt(); f.input.value = t; enter(f.input); }
+    skrivB("m(før)-m(efter)"); skrivB(NK.tal2(B.opg.facit.dm));
+    skrivB("V/Vm"); skrivB(K.mol(B.opg.facit.n));
+    skrivB("m/n"); skrivB(K.Mv(B.opg.facit.M));
+    paastand("når M er fundet, skal alkanen vælges", B.skalVaelge() && /søjlen/.test(B.beskedTekst()));
+    var forkert = (B.opg.facit.alkan + 1) % 5;
+    d.querySelectorAll("#beregning-valg button")[forkert].click();
+    paastand("en forkert alkan forklares ud fra molarmassen", B.skalVaelge() && /Din værdi/.test(B.beskedTekst()));
+    d.querySelectorAll("#beregning-valg button")[B.opg.facit.alkan].click();
+    paastand("den rigtige alkan løser opgaven", B.faerdig && /butan/.test(B.beskedTekst()), B.beskedTekst());
+
+    overskrift("8. Fane 3");
+    W.NK.visFane("fane-fejl");
+    D.FEJL.forEach(function (o, i) {
+        C.vaelg(i, false);
+        var ret = D.FEJL_SVAR.map(function (s) { return s.id; }).indexOf(o.rigtig);
+        d.querySelectorAll("#fejl-valg button")[ret].click();
+        tik(C, 10);
+        var tb = d.getElementById("fejl-tabel");
+        var vist = tb.classList.contains("hoejere") ? "hoejere" : (tb.classList.contains("lavere") ? "lavere" : "samme");
+        paastand(o.titel + ": " + o.rigtig + " (A " + K.Mv(C.res.A.M) + ", B " + K.Mv(C.res.B.M) + ")", C.faerdig && vist === o.rigtig && C.retning() === o.rigtig);
+    });
+
+    overskrift("9. Sproget");
+    var tekster = [];
+    /* Id'erne (id, rigtig) er interne og naar aldrig eleven */
+    (function saml(x, noegle) {
+        if (noegle === "id" || noegle === "rigtig") return;
+        if (typeof x === "string") tekster.push(x);
+        else if (Array.isArray(x)) x.forEach(function (y) { saml(y); });
+        else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k], k); });
+    }(D));
+    var daarlige = tekster.filter(function (t) { return /[–—]|1[+−-]\b|¹⁺|¹⁻/.test(t) || ASCII_ORD.test(t); });
+    paastand(tekster.length + " tekster uden tankestreger, 1+/1− og ord uden æ, ø og å", daarlige.length === 0, daarlige.join(" | "));
+    var synligt = d.body.innerText;
+    paastand("siden viser ingen ord uden æ, ø og å", !ASCII_ORD.test(synligt), (synligt.match(ASCII_ORD) || [])[0]);
+    var udenPaatale = tekster.filter(function (t) { return Object.keys(D.PAATALE).every(function (k) { return D.PAATALE[k].indexOf(t) < 0; }); });
+    paastand("tuningen står ingen steder (kun Kemichael nævner den bagefter)", !/tun(e|et|ing)/i.test(synligt) && !udenPaatale.some(function (t) { return /tun(e|et|ing)/i.test(t); }));
+
+    overskrift("10. Layoutet");
+    var ramme = document.getElementById("ramme");
+    [[520, 380], [800, 600], [1100, 700], [1500, 900]].forEach(function (s) {
+        ramme.style.width = s[0] + "px";
+        ramme.style.height = s[1] + "px";
+        void ramme.offsetWidth;
+        var ok = true, noter = [];
+        [A, B, C].forEach(function (sim, i) {
+            W.NK.visFane(["fane-forsoeg", "fane-beregning", "fane-fejl"][i]);
+            try { sim.tilpas(); sim.layout(); sim.opdater(1 / 60); sim.tegn(); }
+            catch (e) { ok = false; noter.push(e.message); }
+            if (sim.L.b < 50 || sim.L.h < 50) { ok = false; noter.push("lærred " + sim.L.b + "×" + sim.L.h); }
+            if (sim.lay && sim.lay.ox !== undefined && sim.lay.ox < -0.5) { ok = false; noter.push("scenen er bredere end lærredet"); }
+        });
+        paastand(s[0] + " × " + s[1] + ": alle tre faner tegnes", ok, noter.join("; "));
+    });
+    W.NK.visFane("fane-forsoeg");
+}
+</script>
+</body>
+</html>

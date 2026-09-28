@@ -30,7 +30,15 @@
         komma: {
             navn: "Flyt kommaet", nr: 2,
             valg: [{ id: "notation", navn: "Videnskabelig notation" }, { id: "enhed", navn: "Enheder" }],
-            typer: function (v) { return v === "enhed" ? "enhed" : "notation"; }
+            typer: function (v) { return v === "enhed" ? "enhed" : "notation"; },
+            /* Enhedernes niveauer (js/cifre.js, C.NIVEAUER). Meget svær er
+               laast, til de tre andre er klaret (D.OPLAAS). */
+            niveauer: [
+                { id: "let", navn: "Let", note: "Kilo og milli: kg, g, mg, L og mL." },
+                { id: "middel", navn: "Middel", note: "Også mikro og mol: µg, µL, mol, mmol og µmol." },
+                { id: "svaer", navn: "Svær", note: "Også mol/L og tal med mange nuller." },
+                { id: "meget", navn: "Meget svær", note: "Alle forstavelser: M, k, h, da, d, c, m, µ og n.", laast: true }
+            ]
         },
         blandet: {
             navn: "Blandet", nr: 4,
@@ -44,10 +52,16 @@
        cifre." */
     D.INTRO = {
         tael: "Tryk Tjek, når du har valgt dem.",
-        afrund: "Skriv svaret, og tryk Tjek. En eksponent skrives i det lille felt ved 10-tallet.",
-        komma: "Skriv svaret, og tryk Tjek. Eksponenten skrives i det lille felt ved 10-tallet.",
+        afrund: "Skriv svaret, og tryk Tjek.",
+        komma: "Skriv svaret, og tryk Tjek.",
         blandet: "Ti blandede opgaver. Kun første forsøg tæller."
     };
+
+    /* Meget svær under Enheder: laases op af en runde med mindst
+       D.OPLAAS rigtige i foerste forsoeg paa hvert af de tre andre */
+    D.OPLAAS = 7;
+    D.LAAST = "Meget svær låses op, når du har klaret en runde med mindst 7 rigtige på Let, Middel og Svær.";
+    D.LAAST_OP = "Meget svær er låst op.";
 
     /* Foran forklaringen ved et rigtigt svar */
     D.ROS = ["Rigtigt.", "Ja.", "Det passer.", "Præcis."];

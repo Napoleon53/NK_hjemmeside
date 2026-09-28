@@ -44,12 +44,22 @@ videnskabelig notation), den uskrevne regel om tal mellem 0,01 og 100 (se
 nedenfor) og flere enhedsomregninger. Loftet for enheder er derfor fem slags
 mængder med i alt 20 enheder, alle med forstavelser, så kommaet flyttes.
 
+27. sept. 2026 (brugerens ønske): 10-feltet lagde op til videnskabelig
+notation, også når facit lå mellem 0,01 og 100, og det forvirrede. Nu vælger
+eleven over svarfeltet mellem Almindeligt tal (altid valgt, når en opgave
+starter) og Videnskabelig notation, og eksponentfeltet står hævet ved
+10-tallet. Enhederne har fire niveauer med stigende sværhedsgrad og kun g, L
+og mol (tryk er ude; Pa bruges normalt ikke i kemi): Let med kilo og milli,
+Middel med mikro og mol, Svær med mol/L og tal med mange nuller, og Meget
+svær med de sjældne forstavelser, som først låses op, når de tre andre er
+trænet.
+
 ## Hvad den viser
 
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
 | 1 | Tæl cifrene | klikker på de cifre i tallet, der er betydende | kun nullerne foran tæller ikke |
-| 2 | Flyt kommaet | skriver et tal i videnskabelig notation eller som almindeligt tal, eller omregner enheder (volumen, masse, stofmængde, koncentration og tryk) | eksponenten og forstavelsen er antallet af pladser; cifrene ændres ikke |
+| 2 | Flyt kommaet | skriver et tal i videnskabelig notation eller som almindeligt tal, eller omregner enheder med g, L og mol i fire niveauer | eksponenten og forstavelsen er antallet af pladser; cifrene ændres ikke |
 | 3 | Afrund | afrunder et måletal til et antal cifre, eller regner et regnestykke ud og afrunder | 5 og derover rundes op; det mindst præcise tal bestemmer |
 | 4 | Blandet | ti opgaver af alle fem typer | kun første forsøg tæller; rekorden huskes |
 
@@ -69,11 +79,16 @@ viser tavlen hvorfor:
   kant, og nuller foran, som kommaet er gået forbi, falder væk. Til sidst
   står facit.
 
-**Svarfeltet.** Tallet skrives med komma (punktum er også komma). Eksponenten
-skrives i det lille felt ved 10-tallet; `e`, `^`, `*` eller `x` i tallet
-springer derover, og ± skifter fortegnet. `4,56e3` og `4,56*10^3` forstås
-også. På Afrund står 10-feltet der altid, også når facit ikke skal have en
-tierpotens, så feltet ikke afslører svaret. Under feltet viser prikkerne,
+**Svarfeltet.** Tallet skrives med komma (punktum er også komma). Over
+feltet står to knapper, Almindeligt tal og Videnskabelig notation. Hver ny
+opgave starter på Almindeligt tal, så intet lægger op til en tierpotens, og
+valget afslører ikke svaret. Først med Videnskabelig notation kommer "· 10"
+frem med eksponentfeltet hævet som en potens. `e`, `^`, `*` eller `x` i
+tallet skifter derover og springer til eksponenten, og ± skifter fortegnet.
+`4,56e3` og `4,56*10^3` forstås også. En eksponent, der står i feltet, når
+man skifter tilbage til Almindeligt tal, tæller ikke. Siger opgaven selv,
+hvordan tallet skal skrives (Skriv i videnskabelig notation, Skriv som
+almindeligt tal), er knappen låst på det. Under feltet viser prikkerne,
 hvor mange betydende cifre ens eget tal har, og hvor mange der skal være
 (røde, når der er for mange). Ved regnestykker står kun ens eget antal, for
 antallet er en del af svaret.
@@ -83,7 +98,13 @@ rigtigt efter et hint eller et forkert svar, og rød er Vis svaret. Tallet
 "rigtige i første forsøg" er de grønne, som i den gamle, hvor kun første svar
 talte. Listen i panelet viser rundens opgaver med facit. Afrund har knapperne
 Måletal og Regnestykker, og Flyt kommaet har Videnskabelig notation og
-Enheder; et skift starter en ny runde og huskes i browseren.
+Enheder; et skift starter en ny runde og huskes i browseren. Under Enheder
+står niveauerne Let, Middel, Svær og Meget svær med en linje om, hvad
+niveauet har. Et niveau får et flueben, når en runde er klaret med mindst 7
+rigtige i første forsøg (`D.OPLAAS`). Meget svær har en lås, til Let, Middel
+og Svær har flueben; et klik på låsen siger hvorfor. Fluebenene huskes i
+browseren (`nk-sc4.10-enheder`), og slutteksten siger, når Meget svær er
+låst op.
 
 ## Reglen og tallene
 
@@ -96,8 +117,9 @@ ikke tælle, skrives tallet i videnskabelig notation, og derfor er facit
 **Den uskrevne regel** (brugerens ønske): tal mellem 0,01 og 100 skrives som
 almindelige tal. Den står i teorien under Videnskabelig notation, men ingen
 opgave lægger op til at bryde den: der bliver aldrig bedt om videnskabelig
-notation for et tal i det område, og en afrunding, hvis facit kun kunne
-skrives med 10-tallet i området (67 med ét ciffer er 7 · 10¹), springes over.
+notation for et tal i det område, svaret starter altid som almindeligt tal,
+og en afrunding, hvis facit kun kunne skrives med 10-tallet i området (67
+med ét ciffer er 7 · 10¹), springes over.
 Skriver eleven alligevel 1,25 · 10¹ for 12,5, er det rigtigt, med en note om,
 at man normalt skriver 12,5 (`C.iOmraade` og slutningen af `C.tjek`).
 
@@ -118,20 +140,21 @@ Tallene laves som i den gamle (`js/cifre.js`, `lav`):
   halvdelen hver vej. Til almindeligt tal er de små tal 10⁻² til 10⁻⁴ som i
   den gamle; til videnskabelig notation 10⁻³ til 10⁻⁵, og 100 springes over
   (den uskrevne regel).
-* Enheder: den gamle havde mL, L og µL (250 mL, 1,5 L, 500 µL). Nu fem
-  slags, alle med forstavelser (`C.ENHEDER`, tallene i `ENHED_TAL`):
+* Enheder: den gamle havde mL, L og µL (250 mL, 1,5 L, 500 µL). Nu g, L og
+  mol med forstavelser i fire niveauer (`C.NIVEAUER`, tallene i
+  `ENHED_TAL`). Tryk, m³, dm³ og cm³ er ude (brugerens ønske 27. sept. 2026).
 
-  | Slags | Enheder | Hvor ofte |
-  |-------|---------|-----------|
-  | volumen | m³, L, dm³, dL, mL, cm³, µL | 3 af 9 |
-  | masse | kg, g, mg, µg | 2 af 9 |
-  | stofmængde | mol, mmol, µmol | 2 af 9 |
-  | koncentration | mol/L, mmol/L, µmol/L | 1 af 9 |
-  | tryk | kPa, hPa, Pa | 1 af 9 |
+  | Niveau | Enheder | Det nye |
+  |--------|---------|---------|
+  | Let | kg, g, mg, L, mL | kilo og milli, ét trin på 1000; de første tre opgaver går fra stor til lille enhed |
+  | Middel | + µg, µL, mol, mmol, µmol | mikro og mol og spring på 10⁶ (3 af 4 opgaver) |
+  | Svær | + mol/L, mmol/L, µmol/L | koncentration (4 af 10) og tal med mange nuller som 0,0045 og 45 000 (6 af 10) |
+  | Meget svær | g: M, k, h, da, d, c, m, µ, n; L: h, d, c, m, µ, n; mol: k, m, µ, n; mol/L: m, µ, n | en sjælden forstavelse (85 %); hintet siger, hvad den betyder (h er hekto (100)) |
 
-  Tallene ligner rigtige mængder: 0,025 mol, 250 mg, 101,3 kPa, 1013 hPa.
-  Par med samme potens (mL og cm³, L og dm³) og spring på mere end 10⁶ (m³
-  til µL) bruges ikke.
+  Blandet tager Let, Middel og Svær (2 : 2 : 1), aldrig Meget svær. På Let og
+  Middel ligner tallene rigtige mængder (0,025 mol, 250 mg); på Meget svær er
+  de korte tal fra 0,01 til 999. Spring på mere end 10⁶ bruges ikke, tallet
+  har højst 8 tegn og facit højst 9, så det kan stå på tavlen.
 
 Alt regnes på cifferstrenge, ikke med kommatal i maskinen, så 1,005 afrundet
 til tre cifre er 1,01 og 100 422 med ét ciffer er 1 · 10⁵.
@@ -152,13 +175,13 @@ forkert svar giver en besked, der passer til fejlen, uden facit
 | Afrund | rundet op, når det skulle ned | det er under 5 |
 | Afrund | afrundet til decimaler | det er betydende cifre, der tælles |
 | Afrund | rigtigt tal, forkert antal cifre (12,50 eller 7,5 for 7,50) | antallet nu og det rigtige |
-| Afrund | 46 000 for to cifre | nullerne til sidst tæller; brug 10-feltet |
+| Afrund | 46 000 for to cifre | nullerne til sidst tæller; skriv det i videnskabelig notation |
 | Afrund | 46 for 45 678 | tallet er 1000 gange for lille |
 | Regn | lommeregnerens tal uden afrunding | afrund til så mange cifre som den mindst præcise |
 | Regn | afrundet efter den mest præcise faktor | det er den mindst præcise, der bestemmer |
 | Notation | fortegnet, eksponenten for stor eller lille, ikke ét ciffer foran kommaet, for mange cifre, skrevet uden 10-tallet | hver sin |
 | Almindeligt tal | kommaet den forkerte vej, for lidt eller for meget | hver sin |
-| Enheder | den forkerte vej, 1000 i stedet for 1 000 000, kommaet flyttet for langt eller for kort | hver sin, med forholdet (1 kPa = 1000 Pa) |
+| Enheder | den forkerte vej, 1000 i stedet for 1 000 000, kommaet flyttet for langt eller for kort | hver sin, med forholdet (1 kg = 1000 g) |
 
 Et rigtigt svar får også en forklaring: "Det næste ciffer er 6, så der rundes
 op." Et svar som 46 · 10³ godkendes med en note om, at der i videnskabelig
@@ -186,7 +209,8 @@ ciffer."), og 10 af 10 i Blandet ("Med to betydende cifre.").
   almindelige tal efter reglen har seks betydende cifre (som i den gamle).
 * 5 og derover rundes op.
 * Enheder: værdien skal passe; antallet af cifre er ligegyldigt (som i den
-  gamle), så både 0,25 og 0,250 er rigtigt. Kun omregninger, hvor kommaet
+  gamle), så både 0,25 og 0,250 er rigtigt, og 2,5 · 10⁻¹ også (med noten om
+  0,01 til 100). Kun omregninger, hvor kommaet
   flyttes: temperatur (°C og K) er ikke med, og heller ikke sammensatte
   omregninger som g/L til mg/mL.
 * Den uskrevne regel om 0,01 til 100 er en vane, ikke en regel. Derfor giver
@@ -228,12 +252,16 @@ _selvtest.html      udviklerværktøj, se nedenfor
 `_selvtest.html` skal åbnes gennem en lokal server med `animationer/` som rod
 (Kemichael hentes derfra). Den tjekker fanernes rækkefølge, tællingen og afrundingen mod faste
 eksempler (også 1,005 og 100 422), at 1500 opgaver af hver type har et gyldigt
-facit, der godkendes, at de typiske fejl får den rigtige besked uden facit, at
+facit, der godkendes (enhederne på alle fire niveauer), hvad hvert niveau
+indeholder, at de typiske fejl får den rigtige besked uden facit, at
 en hel runde kan gennemføres på alle fire faner (og kommaet hopper færdigt),
-hint, Vis svaret og tomme svar, at Kemichael kun taler ved hint og svar og kan
-sendes ud, sproget, og at tallene står på én linje fra 900 til 1400 px.
-Elevens gemte valg og rekord lægges tilbage bagefter.
-Sidst kørt: ALT OK (99 påstande), 25. september 2026.
+at Meget svær først låses op af tre klarede niveauer, svarknapperne
+(almindeligt tal som start, låst, når opgaven siger det, eksponentfeltet
+hævet, `e` skifter), hint, Vis svaret og tomme svar, at Kemichael kun taler
+ved hint og svar og kan sendes ud, sproget, og at tallene står på én linje
+fra 900 til 1400 px, også løste enhedsopgaver på Svær og Meget svær.
+Elevens gemte valg, rekord og klarede niveauer lægges tilbage bagefter.
+Sidst kørt: ALT OK (127 påstande), 27. september 2026.
 
 ## I menuen
 

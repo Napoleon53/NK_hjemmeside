@@ -1,17 +1,26 @@
 /* =====================================================================
-   regning.js - regnetrinene paa Vaegten (som sc5.1)
+   regning.js - regnetrinene paa Vaegten
 
-   Raekkerne i opgavekortet: i hvert trin skriver eleven foerst formlen
-   og saa tallet med enheden (brugerens oenske fra sc7.4; enheden skal
-   skrives her, fordi den er en del af det, der skal laeres). Kun det
-   aktive trin er aabent.
+   Hvert trin er et lille regnestykke i opgavekortet, der vokser nedad
+   med lighedstegnene ud for hinanden, saadan som eleverne skal skrive
+   det (brugerens oenske 27. sept. 2026):
 
-   Tavlen i scenen viser opgavens tal og beregningerne. Et trin staar
-   som "n = ?", til formlen er skrevet, saa som "n = m / M = ?", og til
-   sidst som den paene beregning med enhederne.
+       n(NaCl) = m/M                    1. formlen, skrevet med bogstaver
+               = 116,88 g/58,44 g/mol   2. mellemregningen: tallene med
+                                           enheder i en broek med to felter
+                                           (eller to felter med et gangetegn)
+               = 2,00 mol               3. resultatet med enhed
+
+   Kun det aktive felt er aabent, og en ny linje kommer frem, naar den
+   forrige er rigtig. Broeker staar med en rigtig broekstreg, ogsaa i
+   felterne, saa eleverne vaenner sig til den i stedet for "/".
+
+   Tavlen i scenen viser opgavens tal og det samme regnestykke, efter
+   hvad der er skrevet: "n(NaCl) = ?", saa "n(NaCl) = m/M = ?" osv.
 
    NK.Regning.paa(P) giver fanen trinInfo, trinLinje, opgaveFaerdig og
-   de kald, raekkerne bruger (formelOk, regnLoest, regnFejl).
+   de kald, raekkerne bruger (formelOk, ledOk, indsaetOk, regnLoest,
+   regnFejl).
    ===================================================================== */
 (function () {
     "use strict";
@@ -34,7 +43,10 @@
         this.opg = opg;
         this.k = 0;
         this.felter = opg.trin.map(function (id, i) {
-            return { id: id, status: i === 0 ? "aktiv" : "laast", fase: "formel" };
+            /* plads: det led, der staar i hvert af mellemregningens to felter
+               (null, til det er rigtigt). tekst: det, eleven har skrevet der. */
+            return { id: id, status: i === 0 ? "aktiv" : "laast", fase: "formel",
+                     plads: [null, null], vist: [false, false], tekst: ["", ""] };
         });
         this.byg();
     };
@@ -45,7 +57,34 @@
         return this.felter.some(function (f) { return f.id === id && (f.status === "ok" || f.status === "svar"); });
     };
 
+    /* Mellemregningens to tal (med enhed) i den raekkefoelge, de staar i felterne */
+    P.ledTekster = function (f) {
+        var led = T.led(f.id, this.opg);
+        return f.plads.map(function (j) { return j === null ? null : led[j].tekst; });
+    };
+
     /* ----- Raekkerne ------------------------------------------------------------- */
+    function celle(klasse, html) {
+        var e = document.createElement(klasse === "rs-hoejre" ? "div" : "span");
+        e.className = klasse;
+        if (html) e.innerHTML = html;
+        return e;
+    }
+
+    /* Én linje i regnestykket: venstre side (kun paa foerste linje), = og hoejre side */
+    function linje(g, venstre, hoejre) {
+        g.appendChild(celle("rs-venstre", venstre ? NK.html(venstre) : ""));
+        g.appendChild(celle("rs-lig", "="));
+        var h = celle("rs-hoejre");
+        if (typeof hoejre === "string") h.innerHTML = hoejre;
+        else h.appendChild(hoejre);
+        g.appendChild(h);
+    }
+
+    function okKnap(fra) {
+        return '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
+    }
+
     P.byg = function () {
         var mig = this, o = this.opg, vaert = this.vaert;
         vaert.innerHTML = "";
@@ -53,58 +92,147 @@
             var t = D.TRIN[f.id];
             var rk = document.createElement("div");
             rk.className = "raekke";
-            var formelKendt = f.fase === "tal" || f.status === "ok" || f.status === "svar";
-            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + (i + 1) + ". " + NK.html(t.navn) +
-                '</span></div>' + (formelKendt ? '<div class="raekke-formel">' + NK.html(T.formelTekst(f.id, o)) + "</div>" : "") +
-                '<div class="felter"></div>';
-            var fe = document.createElement("div");
-            f.feltEl = fe;
+            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + (i + 1) + ". " + NK.html(t.navn) + "</span></div>";
+            var venstre = T.venstre(f.id, o);
+            var g = document.createElement("div");
+            /* lang: to felter med gangetegn efter en lang venstreside (se stil.css) */
+            g.className = "regnestykke" + (t.op === "*" && venstre.length >= 8 ? " lang" : "");
+            rk.appendChild(g);
             f.input = null;
-            var pre = T.venstre(f.id, o) + " =";
-            if (f.status === "ok" || f.status === "svar") {
-                fe.className = "felt " + f.status;
-                fe.innerHTML = '<span class="felt-pre">' + NK.html(pre) + '</span><span class="felt-svar"><b>' +
-                    NK.html(T.facitTekst(f.id, o)) + '</b></span><span class="felt-maerke">' + (f.status === "ok" ? "✓" : "↩") + "</span>";
-            } else {
-                var fra = f.status === "aktiv" ? "" : " disabled";
-                var formel = f.fase === "formel";
-                fe.className = "felt " + f.status + (formel ? " formelfelt" : "");
-                fe.innerHTML = '<span class="felt-pre">' + NK.html(pre) + '</span>' +
-                    '<input type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="' +
-                    NK.html((formel ? "Formlen for " : "Tal og enhed for ") + t.navn.toLowerCase()) + '" placeholder="' +
-                    (formel ? "skriv formlen" : "tal og enhed") + '"' + fra + '>' +
-                    '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
-                var inp = fe.querySelector("input");
-                inp.addEventListener("keydown", function (e) {
-                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
-                });
-                inp.addEventListener("input", function () { if (mig.fane.k) mig.fane.k.skriver(); });
-                fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
-                f.input = inp;
+            f.inputs = null;
+            f.feltEl = null;
+            f.delEl = null;
+            var loest = f.status === "ok" || f.status === "svar";
+
+            /* 1. Formlen */
+            if (f.fase === "formel" && !loest) linje(g, venstre, mig.enkeltFelt(f, "formel"));
+            else linje(g, venstre, '<span class="rs-vist">' + T.formelHTML(f.id) + "</span>");
+
+            /* 2. Mellemregningen */
+            if (f.fase === "indsaet") linje(g, "", mig.broekFelt(f));
+            else if (f.fase === "tal" || loest) linje(g, "", '<span class="rs-vist">' + T.indsaetHTML(f.id, mig.ledTekster(f)) + "</span>");
+
+            /* 3. Resultatet */
+            if (loest) {
+                linje(g, "", '<span class="rs-vist' + (f.status === "svar" ? " svar" : "") + '"><b>' + NK.html(T.facitTekst(f.id, o)) +
+                    '</b></span><span class="rs-maerke' + (f.status === "svar" ? " svar" : "") + '">' + (f.status === "ok" ? "✓" : "↩") + "</span>");
+            } else if (f.fase === "tal") {
+                linje(g, "", mig.enkeltFelt(f, "tal"));
             }
-            rk.querySelector(".felter").appendChild(fe);
             vaert.appendChild(rk);
         });
     };
 
-    P.fokus = function () {
+    /* Et felt til formlen eller resultatet */
+    P.enkeltFelt = function (f, slags) {
+        var mig = this, t = D.TRIN[f.id];
+        var fra = f.status === "aktiv" ? "" : " disabled";
+        var fe = document.createElement("div");
+        fe.className = "felt " + f.status + (slags === "formel" ? " formelfelt" : "");
+        fe.style.flex = "1";
+        fe.innerHTML = '<input type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="' +
+            NK.html((slags === "formel" ? "Formlen for " : "Resultatet med enhed for ") + t.navn.toLowerCase()) + '" placeholder="' +
+            (slags === "formel" ? "skriv formlen" : "tal og enhed") + '"' + fra + ">" + okKnap(fra);
+        var inp = fe.querySelector("input");
+        inp.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
+        });
+        inp.addEventListener("input", function () { if (mig.fane.k) mig.fane.k.skriver(); });
+        fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
+        f.feltEl = fe;
+        f.input = inp;
+        return fe;
+    };
+
+    /* Mellemregningen: to felter i en broek (over og under stregen) eller
+       med et gangetegn imellem. Et felt, der er rigtigt, viser tallet. */
+    P.broekFelt = function (f) {
+        var mig = this, t = D.TRIN[f.id], broek = t.op === "/";
+        var tekster = this.ledTekster(f);
+        var fe = document.createElement("div");
+        fe.className = "felt aktiv broekfelt";
+        fe.style.flex = "1";
+        var krop = document.createElement("div");
+        krop.className = "bf-krop";
+        var holder = broek ? document.createElement("div") : krop;
+        if (broek) { holder.className = "bf-broek"; krop.appendChild(holder); }
+        f.inputs = [null, null];
+        f.delEl = [null, null];
+        var NAVN = broek ? ["over brøkstregen", "under brøkstregen"] : ["det første tal", "det andet tal"];
+        [0, 1].forEach(function (i) {
+            if (i === 1) {
+                var mellem = document.createElement(broek ? "div" : "span");
+                mellem.className = broek ? "bf-streg" : "bf-gange";
+                if (!broek) mellem.textContent = "·";
+                holder.appendChild(mellem);
+            }
+            var del = document.createElement("div");
+            f.delEl[i] = del;
+            if (f.plads[i] !== null) {
+                del.className = "bf-del ok";
+                del.innerHTML = '<span class="bf-tekst">' + NK.html(tekster[i]) + "</span>";
+            } else {
+                del.className = "bf-del";
+                del.innerHTML = '<input type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="Tal og enhed ' +
+                    NAVN[i] + '" placeholder="tal og enhed">';
+                var inp = del.querySelector("input");
+                inp.value = f.tekst[i] || "";
+                inp.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter") { e.preventDefault(); mig.tjek(i); }
+                });
+                inp.addEventListener("input", function () {
+                    f.tekst[i] = inp.value;
+                    if (mig.fane.k) mig.fane.k.skriver();
+                });
+                f.inputs[i] = inp;
+            }
+            holder.appendChild(del);
+        });
+        fe.appendChild(krop);
+        var knap = document.createElement("div");
+        knap.innerHTML = okKnap("");
+        var ok = knap.firstChild;
+        ok.addEventListener("click", function () { mig.tjek(); });
+        fe.appendChild(ok);
+        f.feltEl = fe;
+        return fe;
+    };
+
+    /* Det felt, der skal skrives i nu */
+    P.aktivtInput = function () {
         var f = this.aktivt();
-        if (f && f.input) {
-            try { f.input.focus({ preventScroll: true }); } catch (e) { f.input.focus(); }
+        if (!f) return null;
+        if (f.fase === "indsaet") {
+            if (!f.inputs) return null;
+            for (var i = 0; i < 2; i++) if (f.plads[i] === null && f.inputs[i]) return f.inputs[i];
+            return null;
+        }
+        return f.input;
+    };
+
+    P.fokus = function (i) {
+        var f = this.aktivt();
+        var inp = f && f.fase === "indsaet" && i !== undefined && f.inputs ? f.inputs[i] : this.aktivtInput();
+        if (inp) {
+            try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
         }
     };
 
-    P.ryst = function (f) {
-        if (!f.feltEl) return;
-        f.feltEl.classList.remove("ryst");
-        void f.feltEl.offsetWidth;
-        f.feltEl.classList.add("ryst");
+    P.ryst = function (el) {
+        if (!el) return;
+        el.classList.remove("ryst");
+        void el.offsetWidth;
+        el.classList.add("ryst");
     };
 
-    /* ----- Tjek ------------------------------------------------------------------ */
-    P.tjek = function () {
+    /* ----- Tjek ------------------------------------------------------------------
+       hvor: det af mellemregningens felter, der blev trykket Enter i.
+       Knappen (↵) tjekker dem begge. */
+    P.tjek = function (hvor) {
         var f = this.aktivt();
-        if (!f || !f.input || this.fane.auto) return;
+        if (!f || this.fane.auto) return;
+        if (f.fase === "indsaet") { this.tjekLed(f, hvor); return; }
+        if (!f.input) return;
         var raa = f.input.value, svar;
         if (f.fase === "formel") {
             svar = T.formel(f.id, raa);
@@ -113,16 +241,48 @@
             svar = T.trin(f.id, raa, this.opg);
             if (svar.ok) { this.loes("ok"); return; }
         }
-        if (!svar.tom) this.ryst(f);
+        if (!svar.tom) this.ryst(f.feltEl);
         var tal = f.fase === "tal" ? T.svar(raa) : null;
         this.fane.regnFejl(svar.besked, svar.tom, f.id, tal && !svar.talOk ? tal.v : null);
     };
 
+    P.tjekLed = function (f, hvor) {
+        var op = D.TRIN[f.id].op;
+        var raekke = hvor === undefined ? [0, 1] : [hvor];
+        for (var k = 0; k < raekke.length; k++) {
+            var i = raekke[k];
+            if (f.plads[i] !== null) continue;
+            /* I en broek hoerer hvert led til sit felt; et produkt kan staa i begge raekkefoelger */
+            var ledige = op === "/" ? [i] : [0, 1].filter(function (j) { return f.plads.indexOf(j) < 0; });
+            var svar = T.tjekLed(f.id, this.opg, i, f.inputs[i] ? f.inputs[i].value : "", ledige);
+            if (!svar.ok) {
+                if (!svar.tom) this.ryst(f.delEl[i]);
+                this.fane.regnFejl(svar.besked, svar.tom, f.id, null);
+                this.fokus(i);
+                return;
+            }
+            f.plads[i] = svar.led;
+        }
+        this.ledPlaceret(f, false);
+    };
+
+    /* Et eller begge felter i mellemregningen er rigtige */
+    P.ledPlaceret = function (f, vist) {
+        if (f.plads[0] !== null && f.plads[1] !== null) {
+            f.fase = "tal";
+            this.byg();
+            this.fane.indsaetOk(vist, T.indsaetHTML(f.id, this.ledTekster(f)));
+            return;
+        }
+        this.byg();
+        this.fane.ledOk();
+    };
+
     P.formelOk = function (vist, note) {
         var f = this.aktivt();
-        f.fase = "tal";
+        f.fase = "indsaet";
         this.byg();
-        this.fane.formelOk(vist, note, T.formelTekst(f.id, this.opg));
+        this.fane.formelOk(vist, note, T.venstre(f.id, this.opg) + " = " + T.formelHTML(f.id));
     };
 
     P.loes = function (maade) {
@@ -135,11 +295,25 @@
         this.fane.regnLoest(f.id, maade);
     };
 
-    /* ----- Hint og svar ---------------------------------------------------------- */
+    /* ----- Hint og svar -----------------------------------------------------------
+       Hintene er rettet mod det felt, eleven er ved, og giver tit
+       halvdelen af svaret (se D.TRIN). */
+    function fyld(skabelon, led, stof) {
+        return skabelon.replace("{a0}", led[0].tal).replace("{b0}", led[1].tal)
+            .replace("{a}", led[0].tekst).replace("{b}", led[1].tekst).replace("{stof}", stof);
+    }
+
     P.hintHTML = function () {
         var f = this.aktivt();
         if (!f) return "";
-        return NK.html(f.fase === "formel" ? D.TRIN[f.id].formelHint : T.talHint(f.id, this.opg));
+        var t = D.TRIN[f.id], o = this.opg;
+        var led = T.led(f.id, o), stof = (f.id === "m" && o.st2 ? o.st2 : o.st).navn;
+        if (f.fase === "formel") return NK.html(t.formelHint);
+        if (f.fase === "tal") return NK.html(fyld(t.talHint, led, stof));
+        /* Mellemregningen: hintet til det led, der mangler foerst */
+        var mangler = [0, 1].filter(function (j) { return f.plads.indexOf(j) < 0; })[0];
+        if (mangler === 0 && f.id === "m" && o.st2) return NK.html(fyld(D.MESTER_HINT, led, stof));
+        return NK.html(fyld(t.indsaetHint[mangler], led, stof));
     };
 
     /* Trekanten er det andet hint, naar formlen skal vendes */
@@ -152,94 +326,135 @@
     P.visSvar = function () {
         var f = this.aktivt();
         if (!f) return;
-        if (f.fase === "formel") this.formelOk(true);
-        else this.loes("svar");
+        if (f.fase === "formel") { this.formelOk(true); return; }
+        if (f.fase === "indsaet") {
+            /* De felter, der mangler, faar de led, der ikke er brugt */
+            var fri = [0, 1].filter(function (j) { return f.plads.indexOf(j) < 0; });
+            [0, 1].forEach(function (i) {
+                if (f.plads[i] !== null) return;
+                f.plads[i] = D.TRIN[f.id].op === "/" ? i : fri.shift();
+                f.vist[i] = true;
+            });
+            this.ledPlaceret(f, true);
+            return;
+        }
+        this.loes("svar");
     };
 
     P.regningHTML = function (id) {
-        var r = T.regning(id, this.opg);
-        return NK.html(r[0] + " " + r[1]);
+        var f = this.felter.filter(function (x) { return x.id === id; })[0];
+        return T.regningHTML(id, this.opg, f ? this.ledTekster(f) : null);
     };
 
     P.trinTekst = function () {
         var f = this.aktivt();
         if (!f) return "";
-        var n = this.felter.length;
-        var hvad = f.fase === "formel" ? "Skriv <b>formlen</b> for " + NK.html(T.venstre(f.id, this.opg)) + "." :
-            "Skriv <b>tallet og enheden</b>.";
-        return (n > 1 ? "Trin " + (this.k + 1) + " af " + n + ": " : "") + NK.html(D.TRIN[f.id].navn) + ". " + hvad;
+        var n = this.felter.length, t = D.TRIN[f.id], hvad;
+        if (f.fase === "formel") hvad = "Skriv <b>formlen</b> for " + NK.html(T.venstre(f.id, this.opg)) + ".";
+        else if (f.fase === "tal") hvad = "Regn <b>resultatet</b> ud, og skriv det med enhed.";
+        else if (f.plads[0] === null && f.plads[1] === null) {
+            hvad = t.op === "/" ? "Sæt <b>tallene</b> med enheder ind over og under brøkstregen." :
+                "Sæt de to <b>tal</b> med enheder ind, som skal ganges.";
+        } else if (t.op === "/") hvad = "Skriv nu tallet med enhed " + (f.plads[0] === null ? "over" : "under") + " brøkstregen.";
+        else hvad = "Skriv nu det andet tal med enhed.";
+        return (n > 1 ? "Trin " + (this.k + 1) + " af " + n + ": " + NK.html(t.navn) + ". " : "") + hvad;
     };
 
     /* ----- Tavlen ------------------------------------------------------------------
        r: rektanglet. data: linjerne med opgavens tal. hoejre: plads, der
-       skal holdes fri i hoejre side (til trekanten). */
-    function linje(ctx, dele, x, y, b, f, farver) {
-        var hel = dele.join(" ");
-        ctx.font = Tg.font("600", f);
-        if (ctx.measureText(hel).width <= b || dele.length < 2) {
-            var s0 = NK.passendeSkrift(ctx, hel, b, f, 12, "600");
-            var xx = x;
-            dele.forEach(function (d, i) {
-                NK.tekst(ctx, d, xx, y, { font: Tg.font("600", s0), linje: "middle", farve: farver[i] || farver[0] });
-                ctx.font = Tg.font("600", s0);
-                xx += ctx.measureText(d + " ").width;
-            });
-            return 1;
-        }
-        NK.tekst(ctx, dele[0], x, y, { font: Tg.font("600", f), linje: "middle", farve: farver[0] });
-        var s = NK.passendeSkrift(ctx, dele.slice(1).join(" "), b - f * 1.5, f, 12, "600");
-        NK.tekst(ctx, dele.slice(1).join(" "), x + f * 1.5, y + f * 1.5, { font: Tg.font("600", s), linje: "middle", farve: farver[1] || farver[0] });
-        return 2;
+       skal holdes fri i hoejre side (til trekanten). Hvert trin har en
+       fast hoejde efter det endelige regnestykke, saa intet hopper, naar
+       det vokser. Et regnestykke, der er for bredt, deles efter formlen. */
+    P.regnDele = function (f) {
+        var loest = f.status === "ok" || f.status === "svar";
+        return T.regnDele(f.id, this.opg, {
+            formel: f.fase !== "formel" || loest,
+            led: f.fase === "formel" && !loest ? null : this.ledTekster(f),
+            resultat: loest,
+            farve: f.status === "svar" ? "#9a6a00" : "#1d7a48"
+        });
+    };
+
+    /* Hoejden, et trin faar paa tavlen (i skriftstoerrelser): en broek er
+       hoejere end en linje, og et regnestykke paa to linjer er dobbelt saa hoejt */
+    function trinHoejde(id, to) {
+        var broek = D.TRIN[id].op === "/";
+        return to ? (broek ? 4.6 : 2.7) : (broek ? 2.6 : 1.5);
     }
 
-    P.tegnTavle = function (ctx, r, data, tid, hoejre, skrift) {
+    /* Tavlens maal: bredden til tekst, om opgavens tal kan staa paa én
+       linje, og for hvert trin skriften, om det skal paa to linjer, og
+       hoejden. hoejre: plads, der holdes fri til trekanten. */
+    P.tavleMaal = function (ctx, bredde, data, f, hoejre) {
+        var o = this.opg, lh = f * 1.55;
+        var b = bredde - f * 2.2;
+        var dtekst = data.join("     ");
+        NK.passendeSkrift(ctx, dtekst, b - (hoejre || 0), f, 12, "600");
+        var enLinje = ctx.measureText(dtekst).width <= b - (hoejre || 0);
+        var trin = this.felter.map(function (fe) {
+            var hel = T.regnDele(fe.id, o, { formel: true, led: T.led(fe.id, o).map(function (l) { return l.tekst; }), resultat: true });
+            var px = f;
+            while (px > 12 && Tg.regnestykkeBredde(ctx, hel, px) > b) px -= 0.5;
+            var to = Tg.regnestykkeBredde(ctx, hel, px) > b;
+            if (to) px = f;
+            return { px: px, to: to, hh: trinHoejde(fe.id, to) * f };
+        });
+        var h = f * 1.1 + lh * 0.85 + (enLinje ? lh : lh * 0.95 * data.length) + lh * 0.25 + lh * 0.85 - f * 0.55;
+        trin.forEach(function (t) { h += t.hh; });
+        return { b: b, enLinje: enLinje, trin: trin, h: h + f * 0.5 };
+    };
+
+    P.tegnTavle = function (ctx, r, data, tid, hoejre, f) {
         Tg.tavle(ctx, r);
-        var o = this.opg;
-        var f = skrift || NK.klamp(Math.min(r.h / 12, r.b / 30), 13, 20);
-        var x = r.x + f * 1.1, b = r.b - f * 2.2 - (hoejre || 0), y = r.y + f * 1.3, lh = f * 1.55;
+        var m = this.tavleMaal(ctx, r.b, data, f, hoejre);
+        var x = r.x + f * 1.1, b = m.b, y = r.y + f * 1.1, lh = f * 1.55;
         var lille = NK.klamp(f * 0.72, 12, 14);
-        var moerk = "#1f2530", svag = "rgba(31, 37, 48, 0.4)", groen = "#1d7a48", gul = "#9a6a00";
+        var moerk = "#1f2530", svag = "rgba(31, 37, 48, 0.4)";
         Tg.etiket(ctx, "Opgavens tal", x, y, lille);
         y += lh * 0.85;
-        var dtekst = data.join("     ");
-        NK.passendeSkrift(ctx, dtekst, b, f, 12, "600");
-        if (ctx.measureText(dtekst).width <= b) {
+        if (m.enLinje) {
+            var dtekst = data.join("     ");
+            NK.passendeSkrift(ctx, dtekst, b - (hoejre || 0), f, 12, "600");
             NK.tekst(ctx, dtekst, x, y, { font: ctx.font, linje: "middle", farve: moerk });
             y += lh;
         } else {
             data.forEach(function (d) {
-                NK.tekst(ctx, d, x, y, { font: Tg.font("600", f), linje: "middle", farve: moerk });
+                var px = NK.passendeSkrift(ctx, d, b - (hoejre || 0), f, 12, "600");
+                NK.tekst(ctx, d, x, y, { font: Tg.font("600", px), linje: "middle", farve: moerk });
                 y += lh * 0.95;
             });
         }
         y += lh * 0.25;
         Tg.etiket(ctx, "Beregningen", x, y, lille);
-        y += lh * 0.85;
+        y += lh * 0.85 - f * 0.55;
         var puls = 0.55 + 0.45 * Math.sin((tid || 0) * 6);
-        this.felter.forEach(function (fe) {
-            var loest = fe.status === "ok" || fe.status === "svar";
-            var aktiv = fe.status === "aktiv";
-            var dele, farver;
-            if (loest) {
-                dele = T.regning(fe.id, o);
-                farver = [moerk, fe.status === "svar" ? gul : groen];
-            } else if (fe.fase === "tal") {
-                dele = [T.formelTekst(fe.id, o), "= ?"];
-                farver = [moerk, moerk];
-            } else {
-                dele = [T.venstre(fe.id, o) + " = ?"];
-                farver = [aktiv ? moerk : svag];
-            }
+        var mig = this;
+        this.felter.forEach(function (fe, i) {
+            var aktiv = fe.status === "aktiv", tm = m.trin[i], hh = tm.hh, px = tm.px;
+            var dele = mig.regnDele(fe);
             if (aktiv) {
                 ctx.save();
                 ctx.strokeStyle = "rgba(214, 160, 20, " + (0.4 + 0.5 * puls) + ")";
                 ctx.lineWidth = 2;
-                NK.rundtRekt(ctx, x - f * 0.45, y - lh * 0.55, b + f * 0.6, lh * 1.1, 6);
+                NK.rundtRekt(ctx, x - f * 0.45, y + f * 0.1, b + f * 0.6, hh - f * 0.2, 6);
                 ctx.stroke();
                 ctx.restore();
             }
-            var n = linje(ctx, dele, x, y, b, f, farver);
-            y += lh * (n === 2 ? 1.95 : 1.15);
+            var farve = aktiv || fe.status !== "laast" ? moerk : svag;
+            if (!tm.to) {
+                Tg.regnestykke(ctx, dele, x, y + hh / 2, px, farve);
+            } else {
+                /* Formlen paa foerste linje, resten paa anden, med lighedstegnet under lighedstegnet */
+                var dl = T.regnDeleSplit(dele);
+                var ind = Tg.regnestykkeBredde(ctx, [dele[0]], px) - Tg.regnestykkeBredde(ctx, [{ t: "= " }], px);
+                Tg.regnestykke(ctx, dl[0], x, y + hh * 0.25, px, farve);
+                if (dl[1].length) {
+                    var px2 = px;
+                    while (px2 > 12 && ind + Tg.regnestykkeBredde(ctx, dl[1], px2) > b) px2 -= 0.5;
+                    Tg.regnestykke(ctx, dl[1], x + ind, y + hh * 0.75, px2, farve);
+                }
+            }
+            y += hh;
         });
     };
 
@@ -255,26 +470,38 @@
         P2.trinLinje = function () { return this.regning.trinTekst(); };
         P2.opgaveFaerdig = function () { return this.regning.faerdig(); };
 
-        P2.formelOk = function (vist, note, formel) {
+        /* Et trin er gaaet videre: Kemichael tier (eller siger det svar, han
+           blev bedt om), og linjen siger det naeste skridt */
+        P2.videre = function (vistHTML, godHTML) {
             this.hjaelp = 0;
             this.trekant = null;
-            if (vist) {
-                var h = "<b>Formlen:</b> " + NK.html(formel) + ".";
-                if (this.k.sig(h, "svar", { lukVedSkriv: true })) this.besked("Regn nu tallet ud, og skriv enheden.", "");
-                else this.besked(h + " Regn nu tallet ud, og skriv enheden.", "gul");
+            var trin = this.trinLinje();
+            if (vistHTML) {
+                if (this.k.sig(vistHTML, "svar", { lukVedSkriv: true })) this.besked(trin, "");
+                else this.besked(vistHTML + " " + trin, "gul");
             } else {
                 this.k.tie();
-                this.besked((note ? NK.html(note) + " <b>" + NK.html(formel) + "</b>." : "Rigtig formel.") +
-                    " Regn nu tallet ud, og skriv enheden.", "god");
+                this.besked(godHTML + " " + trin, "god");
             }
-            if (this.efterFormel) this.efterFormel();
             this.visKnap();
             this.fokus();
         };
 
+        P2.formelOk = function (vist, note, formelHTML) {
+            this.videre(vist ? "<b>Formlen:</b> " + formelHTML : null,
+                note ? NK.html(note) + " <b>" + formelHTML + "</b>." : "Rigtig formel.");
+            if (this.efterFormel) this.efterFormel();
+        };
+
+        P2.ledOk = function () { this.videre(null, "Rigtigt."); };
+
+        P2.indsaetOk = function (vist, html) {
+            this.videre(vist ? "<b>Mellemregningen:</b> " + html : null, "Rigtigt.");
+        };
+
         P2.regnLoest = function (id, maade) {
             if (this.efterTrin) this.efterTrin(id, maade);
-            this.trinLoest(maade, maade === "svar" ? this.regning.regningHTML(id) + "." : null);
+            this.trinLoest(maade, maade === "svar" ? this.regning.regningHTML(id) : null);
         };
 
         P2.regnFejl = function (besked, tom, id, v) {

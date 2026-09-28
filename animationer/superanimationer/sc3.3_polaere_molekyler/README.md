@@ -4,9 +4,8 @@
 `samling_c3.html` og `samling_NV.html`. Den gamle ligger i
 `kemi-c-filer/arkiv/c3.3_elektronegativitet_oldversion.html`.
 
-Åbn **`index.html`**. Mappen er selvstændig bortset fra Kemichael, der hentes
-fra `../../v2/kemichael/`. Den bruger hverken `fetch` eller moduler og virker
-derfor også, når den åbnes direkte fra harddisken.
+Åbn **`index.html`**. Mappen er selvstændig. Den bruger hverken `fetch` eller
+moduler og virker derfor også, når den åbnes direkte fra harddisken.
 
 ## Bestillingen
 
@@ -36,9 +35,7 @@ Alle faner har et opgavekort med én knap: Start opgave → Giv hint → Vis sva
 Ny opgave. På fane 3 er opgaverne låst, til skemaet er udfyldt. Teorien ligger bag
 knappen **Teori**, og **?** starter en rundvisning for den aktive fane.
 
-Kemichael præsenterer hver fane, når eleven siger ja til tilbuddet (Start
-præsentation / Nej tak). Replikkerne står i `D.INTRO` i `js/data.js`. Mens han
-præsenterer fane 1, rykker atomerne til højre, så taleboblen ikke dækker dem.
+Der er ingen præsentation og ingen Kemichael (brugerens ønske 27. sept. 2026).
 
 ### Fane 1: elektronegativitet
 
@@ -91,8 +88,8 @@ ikke målte).
 Direkte link til en fane: `index.html#en`, `#polaritet` eller `#vand`.
 
 Genveje: <kbd>1</kbd>-<kbd>3</kbd> faner · <kbd>S</kbd> tegneserie (fane 3) ·
-<kbd>T</kbd> teori · <kbd>K</kbd> Kemichaels præsentation · <kbd>R</kbd> start
-fanen forfra · <kbd>H</kbd> rundvisning · <kbd>Esc</kbd> luk eller Nej tak.
+<kbd>T</kbd> teori · <kbd>R</kbd> start fanen forfra · <kbd>H</kbd> rundvisning ·
+<kbd>Esc</kbd> luk.
 
 ## Forenklinger
 
@@ -109,9 +106,9 @@ fanen forfra · <kbd>H</kbd> rundvisning · <kbd>Esc</kbd> luk eller Nej tak.
 index.html            markup for de tre faner, teori, tegneserie og rundvisning
 css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js           NK-navnerum, dansk talformat, vektorer og drejninger,
-                      DPR-skarpt canvas, hukommelse og hjælpere til Kemichael
-js/data.js            grundstoffer og grænser, molekyler, væsker, teori, INTRO
-js/sprites.js         indlæser sprites/*.svg og Kemichaels sprites
+                      DPR-skarpt canvas og hukommelse
+js/data.js            grundstoffer og grænser, molekyler, væsker, teori
+js/sprites.js         indlæser sprites/*.svg
 js/frastoedning.js    placerer de frie elektronpar (samme som sc3.2)
 js/model3d.js         kameraet og tegningen af molekylerne; pilene
 js/prikformel.js      prikformlen i hjørnet på fane 2
@@ -123,10 +120,8 @@ js/sim_polaritet.js   fane 2
 js/vand_tegning.js    fane 3: alt, der tegnes, og scenens mål
 js/sim_vandstraale.js fane 3: haner, stråle, stave, skema og opgaver
 js/tegneserie.js      fane 3: forsøget som tegneserie
-js/laerer.js          Kemichael på de tre faner
-js/praesentation.js   tilbuddet om præsentationen (ens i alle superanimationer)
 js/rundvisning.js     spotlight-rundvisningen
-js/app.js             faneskift, overlays, Kemichaels lag, tastatur, tegneløkke
+js/app.js             faneskift, overlays, tastatur, tegneløkke
 sprites/              atomkugler (H, Li, C, N, O, F, Na, Cl, K), elektronpar,
                       rør med tre haner, vask, plastikstav, glasstav og uldklud
 _selvtest.html        udviklerværktøj, indgår ikke i animationen
@@ -151,10 +146,9 @@ opgaveobjekt (formatet står i `js/opgave.js`). Byg-opgaverne på fane 1 står i
 metalreglen for alle 27 par; at parret glider mod det rigtige atom og længere,
 jo større ΔEN er; tabellen og beskederne; molekylernes polaritet og oktet;
 vandstrålen (vand bøjer mest, ethanol mindre, heptan ikke; våd stav; gnidning;
-hele forløbet til tegneserien); at alle opgaver kan løses; tilbuddet om
-Kemichaels præsentation; og at ingen tekst bruger tankestreger, skriver ladning
-som 1+ eller er under 12 px. Den kræver en lokal server, fordi Kemichael hentes
-uden for mappen.
+hele forløbet til tegneserien); at alle opgaver kan løses; at der ingen
+præsentation er; og at ingen tekst bruger tankestreger, skriver ladning som 1+
+eller er under 12 px.
 
 ## Linjen til menuen
 

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sc4.7 Natron</title>
+<style>
+    body { background: #1b1d24; color: #dde3ea; font-family: "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    h1 { font-size: 1rem; margin: 0 0 14px; color: #f2c53d; }
+    .ark { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+    figure { margin: 0; padding: 12px; background: #262833; border: 1px solid #3a3a47; border-radius: 8px; text-align: center; }
+    figure img { display: block; margin: 0 auto 8px; }
+    figcaption { font-size: 0.8rem; color: #a9b0ba; }
+    .opstilling { position: relative; width: 340px; height: 400px; }
+    .opstilling img { position: absolute; }
+</style>
+</head>
+<body>
+<!-- Udviklerværktøj: viser sprites alene, før de sættes i bevægelse. Indgår ikke i animationen. -->
+<h1>sc4.7: sprites i dobbelt størrelse</h1>
+<div class="ark">
+    <figure><img src="sprites/bunsen.svg" width="160"><figcaption>bunsen.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/trefod_bag.svg" width="340"><figcaption>trefod_bag.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/trefod_for.svg" width="340"><figcaption>trefod_for.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/digel.svg" width="180"><figcaption>digel.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/tang.svg" width="360"><figcaption>tang.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/natron.svg" width="160"><figcaption>natron.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/kage.svg" width="240"><figcaption>kage.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/vaegt.svg" width="480"><figcaption>vaegt.svg (som sc4.5)</figcaption></figure>
+    <figure><img src="sprites/lup.svg" width="140"><figcaption>lup.svg (som sc2.1)</figcaption></figure>
+    <figure><img src="sprites/kateder.svg" width="600"><figcaption>kateder.svg (som sc4.5)</figcaption></figure>
+    <!-- Opstillingen i dobbelt stoerrelse: trefoden (ring i y 22) staar paa bordet,
+         braenderens munding under ringen, diglen med bunden i trefodens (85, 36) -->
+    <figure>
+        <div class="opstilling">
+            <img src="sprites/trefod_bag.svg" width="340" style="left:0; top:80px;">
+            <img src="sprites/bunsen.svg" width="80" style="left:130px; top:207px;">
+            <img src="sprites/digel.svg" width="144" style="left:98px; top:71px;">
+            <img src="sprites/trefod_for.svg" width="340" style="left:0; top:80px;">
+        </div>
+        <figcaption>opstillingen</figcaption>
+    </figure>
+</div>
+</body>
+</html>

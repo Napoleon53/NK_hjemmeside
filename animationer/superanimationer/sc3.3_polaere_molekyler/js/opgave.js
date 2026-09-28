@@ -182,9 +182,6 @@
         if (!o || o.afsluttet) return;
         this.loeste++;
         NK.saetTekst(this.id("loest"), String(this.loeste));
-        /* Er eleven kommet i gang, er tilbuddet om Kemichaels
-           praesentation det samme som Nej tak (js/praesentation.js). */
-        if (NK.laerer && NK.laerer.afvisTilbud) NK.laerer.afvisTilbud();
         /* Ved et valgspoergsmaal vises svaret ogsaa i billedet bagefter,
            saa eleven kan se, at det passer. */
         if (o.valg && o.visSvar) o.visSvar(this.sim);

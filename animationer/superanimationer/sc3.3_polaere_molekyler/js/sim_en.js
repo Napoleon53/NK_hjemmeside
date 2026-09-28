@@ -224,7 +224,6 @@
         this.aendringer = 0;
         this.tid = 0;
         this.pop = [0, 0];
-        this.ryk = 0;
         this.hover = -1;
         this.geo = null;
         this.sidsteByg = null;
@@ -442,11 +441,6 @@
         this.vist.dEN = NK.mod(this.vist.dEN, D.dEN(this.par[0], this.par[1]), 7, dt);
         this.pop[0] = Math.max(0, this.pop[0] - dt * 3);
         this.pop[1] = Math.max(0, this.pop[1] - dt * 3);
-        /* Mens Kemichael praesenterer fanen fra venstre, rykker atomerne
-           til hoejre, saa hans taleboble ikke daekker dem. */
-        var L = NK.laerer;
-        var taler = !!(L && L.laererIIntro && L.laererIIntro() && L.introId === "fane-en");
-        this.ryk = NK.mod(this.ryk, taler ? 0.2 : 0, 4, dt);
         this.opgaver.opdater();
         this.opdaterPanel();
     };
@@ -468,7 +462,7 @@
         }, this);
         var gab = U * (0.95 + 0.85 * ad);
         var afst = R[0] + R[1] + gab;
-        var midt = b / 2 + (R[0] - R[1]) / 2 + this.ryk * b;
+        var midt = b / 2 + (R[0] - R[1]) / 2;
         this.geo = { U: U, y: cy, x: [midt - afst / 2, midt + afst / 2], R: R, bund: bund };
         return this.geo;
     };

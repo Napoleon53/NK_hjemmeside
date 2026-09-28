@@ -16,7 +16,8 @@
         <button class="faneknap" data-fane="fane-baand" role="tab" aria-selected="false"><span class="nr">2</span>Samlebåndet</button>
     </div>
 
-    <!-- Tilvalg: seks glas faar sværere ioner (Sr, Sn, Pb, Hg, HCO3-).
+    <!-- Tilvalg: elleve glas faar sværere ioner (Be, Sr, Sn, Pb, Hg og
+         fem sammensatte ioner: HCO3-, MnO4-, S2O3 2-, CrO4 2-, Cr2O7 2-).
          Gaelder begge faner og huskes i browseren (js/app.js). -->
     <label class="kontakt" id="svaer-kontakt">
         <input type="checkbox" id="svaer-knap">
@@ -79,11 +80,6 @@
                    aria-label="Skriv den halvdel af etiketten, der mangler">
         </div>
         <div class="baand-besked tom" id="baand-besked" aria-live="polite"></div>
-        <div class="tilbud" id="baand-tilbud" hidden>
-            <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-            <button class="tilbud-nej" type="button">Nej tak</button>
-        </div>
-        <button class="spring-over" id="baand-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
         <div class="anker" id="baand-anker-baand"></div>
         <div class="anker" id="baand-anker-plakater"></div>
         <div class="anker" id="baand-anker-kasse"></div>
@@ -108,6 +104,16 @@
         <div class="kort" id="baand-kasse-kort" hidden>
             <h2>I kassen</h2>
             <ul class="kasseliste" id="baand-kasseliste"></ul>
+        </div>
+
+        <!-- Kemichaels praesentation staar paa denne fane nederst i panelet,
+             ikke i scenen, hvor den daekkede hylden (brugerens valg) -->
+        <div class="panel-bund">
+            <div class="tilbud i-panel" id="baand-tilbud" hidden>
+                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
+                <button class="tilbud-nej" type="button">Nej tak</button>
+            </div>
+            <button class="spring-over i-panel" id="baand-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
         </div>
     </aside>
 </section>

@@ -17,7 +17,7 @@ fil er superanimationernes egen udgave: alt, der gælder her, står her.
 | Eleven | bygger, skruer, forudsiger og spiller | udfører forsøget selv, trin for trin |
 | Form | op til fire faner med hver sin vinkel på samme idé | én scene med en rigtig opstilling, normalt uden faner |
 | Kode | selvstændig mappe med egen kerne | står på den fælles motor i `../v2/laboratoriet/` |
-| Kemichael | præsenterer hver fane og kan komme på besøg | fast bestanddel |
+| Kemichael | sidder ved katederet og hjælper, når eleven beder om det | fast bestanddel |
 
 Begge er selvbærende: eleven kan bruge dem alene, uden at emnet er gennemgået på
 tavlen først. Det er det, der gør dem super, ikke at de er store eller ligger i
@@ -131,10 +131,14 @@ animation kommer først i menuen, når brugeren siger til.
 | `sc4.4_aekvivalente_maengder` | ja | `samling_c4.html` (26. sept. 2026); ny, sept. 2026, afløser c4.4 (pølsevognen med hotdogs og dobbeltburgere, begrænsende ingrediens og overskud, molekyler i et kammer, hvor hver figur til sidst er 1 mol, og tavlen med søjler, hvor et rigtigt svar fylder netop sine blokke; afstemning kun på Svær); lutter agurker er et påskeæg; den gamle c4.4 ligger i `arkiv/` |
 | `sc4.5_maengdeberegning` | ja | `samling_c4.html` (26. sept. 2026); ny, 25. sept. 2026, afløser c4.5 (Vejen: pulver på en vægt bliver til poser med 1 mol, poserne går gennem reaktionspilen og vejes; Skemaet: de gamle opgaver med afstemning, trinvis eller frit, og en skålvægt, der står lige, når alle masser er fundet; Begrænsende mængde: poserne reagerer i hele sæt, og resten ligger tilbage). Kemichael sidder stille ved et kateder med en fast boble, der siger næste skridt, og der er ingen knapper til præsentationen (brugerens valg); den gamle c4.5 ligger i `arkiv/` |
 | `sc4.6_idealgasligningen` | ja | `samling_c4.html` (26. sept. 2026); ny, 25. sept. 2026, afløser c4.6 i to faner (brugerens valg): Stemplet (cylinderen med stempel, lodder, varmeplade, gasflaske og lås fra den gamle; quizzen er blevet til syv forudsigelser, hvor eleven gætter først og prøver selv, og modellen er facit; pV-grafen står i scenen; et stop ved 60 L) og Beregningen (tolv opgaver i Let, Middel og Svær med formlen først, instrumenter, der er dækket, til tallet er regnet, en tavle med de pæne beregninger og en besked til °C, R = 8,314, mL og 24 L pr. mol); bar og R = 0,0831 L·bar/(mol·K) som i kompendiet i stedet for den gamles opfundne konstant; den rolige Kemichael ved katederet som sc4.5; 22,4 L ved 0 °C er et påskeæg; den gamle c4.6 ligger i `arkiv/` |
-| `sc4.10_betydende_cifre` | ja | `samling_c4.html` (26. sept. 2026); ny, 25. sept. 2026, afløser c4.10 "Afrunding/opskrivning" med de samme fem opgavetyper og runder på ti: Tæl cifrene (eleven klikker på de betydende cifre), Flyt kommaet (videnskabelig notation begge veje eller enheder for volumen, masse, stofmængde, koncentration og tryk; kommaet hopper plads for plads, og eksponenten tæller med), Afrund (måletal eller regnestykker, nu også division) og Blandet (rekorden huskes); cifrene står som brikker på en tavle, og hver typisk fejl får sin besked; den uskrevne regel (tal mellem 0,01 og 100 skrives som almindelige tal) står i teorien, og ingen opgave bryder den; den rolige Kemichael ved katederet som sc4.5 (brugerens valg); et klik på kommaet er et påskeæg; den gamle c4.10 ligger i `arkiv/` |
+| `sc4.7_natron` | ja | `samling_c4.html` som c4.7 (27. sept. 2026); ny, 27. sept. 2026, afløser c4.7 "Forsøg: Natron", der var tør (brugerens ønske: mere spændende): Forsøget (gæt først mellem A Na₂O, B Na₂CO₃ og C NaOH; diglen på vægten, trefoden og brænderen med Sluk, Lav og Høj; høj flamme fra start får pulveret til at sprøjte; en varm digel vejer for lidt; vej, til to vejninger giver det samme; luppen med Na⁺ og HCO₃⁻, hvor det, der bliver tilbage, står som ?, til dommen er faldet), Hypoteserne (n(NaHCO₃) og for hver hypotese afstemning, n og m med formlen først og brøkfelter som sc4.3; hver hypotese bliver en streg på grafen ved siden af vejningerne; dommen med reaktionen som kugler) og Fejlkilder (seks, gruppe 1 og 2, gæt først); journalen til udskrift og Snyd-knappen med snydebeviset fra den gamle; den rolige Kemichael som sc4.5; kagen på katederet er et påskeæg; den gamle c4.7 ligger i `arkiv/` |
+| `sc4.8_staaluld` | ja | `samling_c4.html` som c4.8 (27. sept. 2026); ny, 27. sept. 2026, afløser c4.8 "Afbrænding ståluld" med de samme elementer: Forsøget (et gratis gæt først på tre kort med billeder, Lettere, Det samme og Tungere, oven på scenen, men ikke over Kemichael, der introducerer hypotesen fra sit hjørne (brugerens ønske: den gamle hypoteseskærm var invasiv og kedelig); så en klump ståluld på en nulstillet vægt, m(før), 9 V-batteriet trækkes hen til ulden, den gløder og bliver sort, iltflasken gør det hurtigere, og m(efter) aflæses, når vægten står stille; luppen med jernatomer, O₂ og N₂, hvor den inderste del af jernet ikke når at reagere; to målinger) og Beregningen (n(Fe), n(FeO) = n(Fe) og m(FeO) med formlen, mellemregningen i brøkfelter og resultatet som sc4.3, tavlen og søjler med jern og ilt; til sidst den gamles spørgsmål om, hvorfor vægten viste mindre); den rolige Kemichael som sc4.5; stjernekasteren er et påskeæg; den gamle c4.8 ligger i `arkiv/` |
+| `sc4.9_lightergas` | ja | `samling_c4.html` som c4.9 (27. sept. 2026); ny, 27. sept. 2026, afløser c4.9 "Forsøg: Lightergas": Forsøget (lighteren vejes, gassen samles i et omvendt måleglas i et kar med vand, rumfanget aflæses i en lup, et gæt på massen, lighteren tørres på papir og vejes igen; to målinger), Beregningen (m(gas), n = V / Vₘ og M = m / n med formlen først, tavlen og søjlerne med methan til pentan, hvor elevens molarmasse er en stiplet linje; en ukendt gas med nye tal) og Fejlkilder (seks, to grupper, gæt først). Kemichael præsenterer ikke; han kommer kun ind ved påskeæggene, hvor forsøget går helt galt (brugerens valg): en tunet lighter giver en stikflamme eller suger vand ind (20 %), og gas på bordet antændes af en gnist. Tuningen (hætten af, pinden frem, løftet tilbage og frem igen) står bevidst ingen steder i animationen; se mappens README; den gamle c4.9 ligger i `arkiv/` |
+| `sc4.10_betydende_cifre` | ja | `samling_c4.html` (26. sept. 2026); ny, 25. sept. 2026, afløser c4.10 "Afrunding/opskrivning" med de samme fem opgavetyper og runder på ti: Tæl cifrene (eleven klikker på de betydende cifre), Flyt kommaet (videnskabelig notation begge veje eller enheder med g, L og mol i fire niveauer, hvor Meget svær er låst, til de tre andre er klaret, fra 27. sept. 2026; kommaet hopper plads for plads, og eksponenten tæller med), Afrund (måletal eller regnestykker, nu også division) og Blandet (rekorden huskes); cifrene står som brikker på en tavle, og hver typisk fejl får sin besked; den uskrevne regel (tal mellem 0,01 og 100 skrives som almindelige tal) står i teorien, og ingen opgave bryder den; den rolige Kemichael ved katederet som sc4.5 (brugerens valg); et klik på kommaet er et påskeæg; den gamle c4.10 ligger i `arkiv/` |
 | `sc4.11_kalk_i_muslingeskaller_inaktiv` | nej | mappen har fået `_inaktiv` i navnet og er ikke sat i menuen; ny, 25. sept. 2026, bygget fra bunden ud fra NF-øvelsen med muslingeskaller (Havhaven), placeret i emne 4 som vejeanalyse: Forsøget (vejebåd og kolben med saltsyre på hver sin vægt, eleven aflæser m(før), trækker pulveret over med spatlen, venter, til vægten står stille, og aflæser m(efter); luppen viser H₃O⁺, der tager CO₃²⁻ fra kalken, og CO₂, der stiger op; alt på én gang sprøjter), Beregningen (de to målinger og én baglæns, formlen først, med omskifteren Uden mol (2,27) / Med mol (n = m / M, 1 : 1, m = n · M), også via `#nf` og `#mol`) og Fejlkilder (gruppe A og B side om side, seks fejl, gæt først); den rolige Kemichael ved katederet som sc4.5; hjertemuslingen er et påskeæg; ikke i menuen |
 | `sc5.1_koncentration` | ja | `samling_c5.html` som c5.1 (26. sept. 2026); ny, 25. sept. 2026, afløser c5.1 og c5.2 (emne 5 bliver to superanimationer, sc5.1 og sc5.2): Karret (skefulde kobber(II)sulfat, en vandhane og en tappehane, luppen med altid lige meget væske, c = n / V i panelet; fem opgaver, to med et gæt først), Målekolben (seks regneopgaver fra c5.2, formlen først, vægten og kolben gør det, der er regnet, og en forkert masse vejes af) og Fortynding (pipette, målekolbe og sprøjteflaske til ti gange tyndere, så fire fortyndinger med formlen først). Den rolige Kemichael ved katederet som sc4.5 (brugerens valg); de gamle c5.1 og c5.2 ligger i `arkiv/` |
 | `sc5.2_formel_og_aktuel` | ja | `samling_c5.html` som c5.2 (26. sept. 2026); Mohrtitreringen er rykket op som c5.3; ny, 25. sept. 2026, afløser c5.3 og c5.4: Opløsningen (portioner salt i et literglas, luppen og søjler med saltets og ionernes koncentration; seks opgaver, to med et gæt og én med to salte), Ionerne (tallene foran ionerne i skemaet og så ionernes koncentrationer i Let, Middel med baglæns og Svær fra massen; nye salte hver gang) og Blandinger (to salte i ét glas og to glas, der hældes sammen, når det samlede rumfang er fundet). Den gamle c5.4 opgave 5 regnede en blanding forkert; her er den to salte i samme glas. Den rolige Kemichael som sc5.1; de gamle c5.3 og c5.4 ligger i `arkiv/` |
+| `sc5.3_mohrtitrering` | nej | ny, 26. sept. 2026, afløser Mohrtitreringen (menuens c5.3, filen `c5.5_eksperiment_mohrtitrering.html`), bygget som `sc7.4` (brugerens ønske: den må gerne minde om de andre titreringer): Titreringen (1,00 g havvand fra et af seks steder med kaliumchromat, 0,050 M sølvnitrat i buretten, skyderen ved hanen og 1 dråbe; kolben bliver uklar af AgCl, og rødbrune skyer forsvinder, så længe der er Cl⁻; farven regnes af opløselighedsprodukterne; luppen med 8 Cl⁻, der synker til bunds som AgCl, og kurven over Cl⁻, AgCl og Ag₂CrO₄), Beregningen (fire trin med formlen først og tavlen) og To kolber (seks situationer, heriblandt postevand); Kemichael præsenterer som i sc7.4; ikke i menuen |
 | `sc6.1_kogepunkt` | ja | `samling_c6.html` (26. sept. 2026); ny, sept. 2026, afløser c6.1, brugerens første animation (varm op med glas og ballon og kurven, formen med tre isomerer af C₅H₁₂, hvem koger først i blandinger; tændstikken er et påskeæg); den gamle c6.1 ligger i `arkiv/` |
 | `sc6.2_zigzagformler` | ja | `samling_c6.html` som c6.2; de gamle c6.2, c6.3 og c6.4 ligger i `arkiv/`, og knap 4 og 5 er fjernet (C6 er omnummereret uden huller 26. sept. 2026); sept. 2026: quizzerne zigzag, navne og isomerer og fane 4 Opløselighed (`#oploeselighed`, den gamle c6.5 som spil med et bægerglas med heptan og vand); Kemichaels skuffe med klistermærker fra quizzerne til tegnebrættet; tegnebrættet var fane 1 og har fra 25. sept. 2026 sin egen side (`tegnebraet/`); motoren til at tegne og navngive molekyler ligger i `../molekylemotor/` og deles med tegnebrættet; den gamle c6.5 ligger i `arkiv/`, fanen har ingen egen knap |
 | `sc6.6_fedtstoffer` | ja | `samling_c6.html` som c6.4 fra 26. sept. 2026 (C6 omnummereret); den gamle c6.6 ligger i `arkiv/`; sept. 2026: to faner (fabrikken, hvor eleven bygger fedtstoffer til fem kunder, og køkkenet, hvor fedtstofferne står i fryser, køleskab, på bordet og i solen, med molekylerne i et zoomvindue); det harske smør er et påskeæg |
@@ -213,49 +217,24 @@ den må aldrig stå i vejen for pointen.
   tegningen.
 * Mønster at læse først: `sc1.1_atombygger` og `sb3.2_titreringssimulator`.
 
-## Kemichael præsenterer hvert rum
+## Kemichael
 
-Hver fane (hvert rum) har en kort præsentation ved Kemichael. Han kommer ikke af
-sig selv: første gang fanen åbnes i en browser, står der to knapper midt foroven
-i scenen, **Start præsentation** og **Nej tak**. Så kan eleven kigge sig omkring
-først og selv vælge, hvornår han skal tale, eller sige nej. Trykker eleven Start,
-går han ind, siger, hvor man er, og hvad man skal, og går igen. Mønster:
-`sc1.2_grundstofudstilling` (`js/praesentation.js` med tilbuddet,
-`laererIntro` og `introVaek` i `js/laerer.js`).
+Kemichael præsenterer ikke fanerne. Brugeren fjernede reglen om, at han
+præsenterer hvert rum, den 27. september 2026, fordi præsentationerne ofte blev
+indforståede. De ældre superanimationer har stadig deres præsentation bag
+knapperne Start præsentation og Nej tak; de beholder den, til brugeren siger
+andet.
 
-* To eller tre replikker på højst ca. 60 tegn: hvor man er, hvad man gør, og
-  gerne en tør bemærkning til sidst. Han forklarer ikke teori.
-* Han peger på det, han taler om, og det lyser op, fx feltet, man skriver i.
-* Præsentationen låser ikke fanen. Man kan klikke og skrive, mens han taler,
-  uden at han forsvinder.
-* Han går kun, når eleven vil det: den store knap "Spring præsentationen over"
-  midt foroven i scenen, to klik direkte på ham eller Esc. Det første klik på ham
-  får knappen til at blinke. Et klik andre steder og tastetryk sender ham ikke ud.
-* Tilbuddet kommer én gang pr. fane pr. browser. Valget huskes i `localStorage`.
-  Starter eleven et spil, er det det samme som Nej tak, og tilbuddet må gerne
-  også forsvinde, når den første opgave er løst (det gør det i sc1.2). <kbd>Esc</kbd> er det samme som Nej tak. <kbd>K</kbd> viser
-  præsentationen igen uden at spørge, fx når læreren vil vise den for klassen.
-* Replikkerne står som data (`D.INTRO` i `js/data.js`), ikke inde i scenen.
-* Stilarket skal have `[hidden] { display: none !important; }` eller
-  `.tilbud[hidden] { display: none; }`. Ellers bliver knapperne stående efter
-  Nej tak, fordi `.tilbud` giver `display: flex` (rettet i sb1.1, sc2.4 og sc3.4
-  den 24. sept. 2026).
-
-Reglen kom til med `sc2.3` i september 2026. Tilbuddet med de to knapper kom til
-med `sc1.2` den 24. september 2026 efter brugerens ønske: det var svært at følge
-med i præsentationen, når den startede, mens man selv kiggede sig omkring. Samme dag fik
-alle superanimationer med en præsentation tilbuddet. De ældre beholder deres
-egen `startIntro`, og `NK.Praesentation.pakInd` i `js/app.js` pakker den ind;
-nye bruger `NK.Praesentation.kobl` som sc1.2.
-
-**Undtagelse: den rolige Kemichael.** I `sc4.5_maengdeberegning` sidder han stille
-ved et kateder nederst til venstre, og hans boble står fast til højre for ham
-som linjen med næste skridt. Den skifter kun, når der er noget nyt, og
-forsvinder ikke af sig selv. Hans første linje på en fane er præsentationen,
-så der er ingen knapper. Brugerens valg 25. september 2026: talebobler, der
-kører ind over scenen og forsvinder igen, kan være forstyrrende. Koden er
-`js/laerer.js` (`NK.RoligLaerer`) med figuren fra `K.tegneserieFigur`.
-`sc4.6_idealgasligningen` bruger samme udgave (brugerens valg 25. september 2026).
+* Nye superanimationer bruger den rolige Kemichael: han sidder stille ved et
+  kateder nederst til venstre, siger kun noget ved Giv hint og Vis svaret, tier,
+  når trinnet er løst, og kan sendes ud. Næste skridt, fejl og ros står i
+  opgavekortet. Koden er `js/laerer.js` (`NK.RoligLaerer`) fra
+  `sc4.5_maengdeberegning`.
+* Han må gerne introducere én bestemt ting kort fra sit hjørne, fx det gratis
+  gæt før forsøget i `sc4.8_staaluld`: én eller to linjer, der ikke dækker
+  noget i animationen, og han tier, når eleven har valgt.
+* I `sc4.9_lightergas` og `sc_spil_syregalgen` er han der ikke; han kommer kun
+  ind, når forsøget går helt galt i et påskeæg.
 
 ## Fælles opbygning
 
@@ -294,7 +273,7 @@ kører ind over scenen og forsvinder igen, kan være forstyrrende. Koden er
 - [ ] Quizzens forkerte svar er de fejl, elever faktisk laver.
 - [ ] Sproget er kort og uden tankestreger, talesprog og 1+/1−.
 - [ ] Humoren rammer handlingen, aldrig eleven.
-- [ ] Kemichael tilbyder at præsentere hver fane (Start præsentation / Nej tak) og går kun, når eleven vil det.
+- [ ] Kemichael blander sig ikke: han taler kun ved hint og svar og højst med én kort introduktion fra sit hjørne.
 - [ ] `_selvtest.html` er grøn, og siden virker fra harddisken.
 - [ ] Brugeren har sagt, at den skal i menuen.
 

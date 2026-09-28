@@ -29,6 +29,7 @@
 <section class="fane aktiv" id="fane-formel" role="tabpanel" aria-label="Formlen">
     <div class="scene">
         <canvas id="formel-laerred"></canvas>
+        <div class="anker" id="formel-anker-opgave"></div>
         <div class="anker" id="formel-anker-formel"></div>
         <div class="anker" id="formel-anker-skema"></div>
         <div class="anker" id="formel-anker-bunke"></div>
@@ -38,9 +39,9 @@
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> (Vis trekanten ->) Vis svaret -> Naeste runde -->
+        <!-- Én knap, der aendrer sig: Giv hint -> (Vis trekanten ->) Vis svaret -> Naeste opgave. Opgavens tekst staar over tavlen i scenen -->
         <div class="kort opgavekort" id="formel-kort">
-            <h2><span id="formel-titel">Runde</span><span class="taeller">runde <b id="formel-nr">1</b>/<span id="formel-antal">6</span></span></h2>
+            <h2><span id="formel-titel">Opgave</span><span class="taeller">opgave <b id="formel-nr">1</b>/<span id="formel-antal">6</span></span></h2>
             <div id="formel-prompt"></div>
             <div class="raekker" id="formel-raekker" hidden></div>
             <p class="besked" id="formel-besked" aria-live="polite"></p>
@@ -48,7 +49,7 @@
         </div>
 
         <div class="kort" id="formel-opgaver">
-            <h2>Runderne <span class="taeller">løst <b id="formel-loest">0</b>/6</span></h2>
+            <h2>Opgaverne <span class="taeller">løst <b id="formel-loest">0</b>/6</span></h2>
             <div class="hyldeliste" id="formel-liste"></div>
         </div>
     </aside>
@@ -102,13 +103,14 @@
         <div class="kort opgavekort" id="hurtig-kort">
             <h2><span>Hurtigrunden</span></h2>
             <p class="maal-tekst">Svar så hurtigt, du kan. Formlen skal sidde uden at tænke over den.</p>
+            <p class="om-tekst">Et forkert svar giver tidsstraf, og spørgsmålet kommer igen.</p>
             <p class="besked" id="hurtig-besked" aria-live="polite"></p>
             <div class="knaprad"><button class="knap blaa banker" id="hurtig-knap" type="button">Start runden</button></div>
         </div>
 
         <div class="kort maaling" id="hurtig-data">
             <h2>Runden</h2>
-            <div class="talraekke"><span>Tid med straf</span><span class="tal gul" id="hurtig-tid">0 s</span></div>
+            <div class="talraekke"><span>Tid med tidsstraf</span><span class="tal gul" id="hurtig-tid">0 s</span></div>
             <div class="talraekke"><span>Rigtige første gang</span><span class="tal" id="hurtig-rigtige">0/12</span></div>
             <div class="talraekke"><span>Fejl</span><span class="tal" id="hurtig-fejl">0</span></div>
             <div class="talraekke"><span>Din rekord</span><span class="tal" id="hurtig-rekord">ingen endnu</span></div>

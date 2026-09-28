@@ -22,10 +22,13 @@ emnet; denne er bygget tæt på den gamle c3.4.
    kuglerne), og olien lå altid øverst, også på ethanol, som er lettere.
 3. **Naboerne:** `c3.3` ejer elektronegativitet og polære bindinger. `c3.5` ejer
    forsøget med stoffer i vand og heptan. Destillation er et andet emne; her er
-   kun iagttagelsen fra den gamle, at ethanol koger før vand.
-4. **Loftet:** 3 stoffer. 1 scene, ingen faner. På scenen 1 bassin og 1 lille
-   glas; højst 1320 kugler plus dampen. 6 opgaver og 5 quizspørgsmål. Ingen
-   flasker, man hælder med musen, intet stativ, intet affaldsglas, ingen uheld.
+   kun iagttagelsen fra den gamle, at ethanol koger før vand, og (fra 27. sept.
+   2026, brugerens ønske) at man ikke kan adskille vand og ethanol helt ved at
+   destillere. Der er ingen opgaver om destillation.
+4. **Loftet:** 3 stoffer. 1 scene, ingen faner. På scenen 1 bassin med 1 køler,
+   1 forlag og 1 lille glas; højst 1320 kugler i bassinet og 462 i forlaget plus
+   dampen. 6 opgaver og 5 quizspørgsmål. Ingen flasker, man hælder med musen,
+   intet stativ, intet affaldsglas, ingen uheld.
 5. **Layoutet:** toplinje, scene og panel. Bassinet er stjernen og fylder
    scenen; det lille glas står i hjørnet og viser det, øjet ser. Panelet har
    knapperne, der hælder i, rystning og temperatur, og opgavekortet.
@@ -40,13 +43,26 @@ Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddis
   portioner fylder bassinet (1320 kugler), og mere løber over kanten. Det er det
   samme, hvor stort vinduet er. Bassinet starter med to portioner vand. Musen over en kugle viser, hvad den er ("Ethanol,
   C₂H₅OH, polær"). Træk i bassinet for at ryste det.
-* **Glasset** til højre er det samme bassin i almindelig størrelse, set med det
-  blotte øje: vand og ethanol er klare, olien er lysegul, grænsen mellem to lag
-  er en tynd lys streg, og en emulsion er mælket. Det er tegnet skarpt, felt for
-  felt, ud fra den samme model.
+* **Låget** har to halse: en tragt med hane, som der hældes i (hanen står
+  lodret, mens der hældes), og en hals, som køleren sidder på.
+* **Køleren** er en tilbagesvaler: en lille kuglekøler med tre kugler, trykket
+  sammen, så den ikke fylder. Dampen trækkes mod halsen, fortætter i køleren og
+  drypper tilbage. Knappen **Destillation** (eller <kbd>D</kbd>) bytter den ud
+  med et destillationshoved og en skrå Liebigkøler, hvor dampen fortætter på
+  vej ned. Dråberne løber ned i **forlaget** til højre, et glas med sit eget
+  lille gitter (14 × 33), så destillatet ses som kugler: mest ethanol, men altid
+  med lidt vand. Forlaget bliver stående, når man skifter tilbage, så længe der
+  er noget i det. Tøm tømmer begge, og en opgave sætter tilbagesvaleren på igen.
+* **Glasset** er det samme bassin i almindelig størrelse, set med det blotte
+  øje: vand og ethanol er klare, olien er lysegul, grænsen mellem to lag er en
+  tynd lys streg, og en emulsion er mælket. Det er tegnet skarpt, felt for felt,
+  ud fra den samme model, og viser kun bassinet, ikke køleren eller forlaget.
+  Det står nede ved bassinet og glider op i hjørnet, når forlaget er fremme.
 * **Panelet:** tre knapper hælder en portion vand, ethanol eller olie i (en
-  stråle midt i bassinet). Ryst bassinet. Temperaturen fra 20 til 120 °C med
-  kogepunkterne for ethanol (78 °C) og vand (100 °C) i stoffernes farver. Tøm.
+  stråle gennem tragten). Ryst bassinet. Temperaturen fra 20 til 120 °C med
+  kogepunkterne for ethanol (78 °C) og vand (100 °C) i stoffernes farver.
+  Tilbagesvaling eller destillation, og under knapperne, hvor meget der er i
+  destillatet. Tøm.
 * **Opgavekortet** har én knap: Start opgave, Giv hint, Vis svaret, Ny opgave.
   De seks opgaver kommer i rækkefølge, fordi de bygger på hinanden:
   1. olie i vand (forudsig)
@@ -54,7 +70,7 @@ Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddis
   3. olie i ethanol (forudsig: olien lægger sig nederst)
   4. ryst olie og vand (forudsig)
   5. få olien til at ligge nederst uden at tømme bassinet (byg: ethanol i og ryst)
-  6. varm vand og ethanol til 90 °C (forudsig)
+  6. varm vand og ethanol til 90 °C (forudsig: det koger, og dampen er mest ethanol)
 
   I en forudsigelse vælger eleven først, og så sker det i bassinet. Et forkert
   valg giver forklaringen til netop den fejl. Byg-opgaven er løst, når olien har
@@ -74,7 +90,7 @@ præcis som olie, så olien svæver aldrig helt stille. Olie flyder altså oven 
 vand og ethanol, når der er mindst lige så meget vand som ethanol.
 
 Genveje: <kbd>V</kbd> <kbd>E</kbd> <kbd>O</kbd> hæld i · <kbd>mellemrum</kbd> ryst ·
-<kbd>↑</kbd> <kbd>↓</kbd> temperatur · <kbd>R</kbd> tøm · <kbd>Q</kbd> quiz ·
+<kbd>↑</kbd> <kbd>↓</kbd> temperatur · <kbd>D</kbd> tilbagesvaling eller destillation · <kbd>R</kbd> tøm · <kbd>Q</kbd> quiz ·
 <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichaels præsentation ·
 <kbd>Esc</kbd> luk.
 
@@ -87,7 +103,9 @@ forkerte svar er typiske fejl; spørgsmålet om destillation er byttet ud med
 ethanol og olie, fordi varmen nu har sin egen opgave).
 
 Nyt: modellen (se nedenfor), det lille glas, opgavekortet, Kemichael,
-rundvisningen, teorien og mængden i bassinet under knapperne.
+rundvisningen, teorien og mængden i bassinet under knapperne. Fra 27. sept.
+2026 (brugerens ønske): låget med tragt, tilbagesvaleren i stedet for den kolde
+zone foroven og destillationen med forlaget.
 
 ## Modellen
 
@@ -103,12 +121,18 @@ anden række forskudt en halv plads). Fire ting flytter kuglerne:
    tæthed er tætheden af hele blandingen i den (`D.faseTaethed`). Små dråber stiger
    eller synker som én klump, og det, de skubber til side, glider uden om. Store
    lag flader ud.
-3. **Overfladen.** Kugler falder ned i huller. Hvert stof fordamper fra
-   overfladen efter sit damptryk (Clausius-Clapeyron) og koger, når damptrykket
-   når 1 atm: så dannes der bobler inde i væsken. Dampen bliver til dråber i den
-   kolde zone foroven og drypper ned.
-4. **Eleven.** Det, der hældes i, falder i en rolig stråle (75 kugler i sekundet)
-   og trykkes op til 8 rækker ned i væsken. En rystning er mange små hvirvler:
+3. **Overfladen og dampen.** Kugler falder ned i huller. Hvert stof fordamper
+   fra overfladen efter sit partialtryk, og væsken koger, når summen af
+   partialtrykkene når 1 atm: så dannes der bobler inde i væsken, oftest af det
+   stof, der fordamper lettest (Raoults lov med aktivitetskoefficienter, se
+   nedenfor). Dampen stiger og trækkes mod halsen i låget. I røret over halsen
+   (`js/apparat.js`) følger den rørets vej og bliver til dråber, hvor køleren
+   sidder, og under kogepunktet også undervejs. I tilbagesvaleren løber dråberne
+   tilbage og drypper fra halsen. I destillationen løber det, der fortætter i
+   Liebigkøleren, frem og drypper fra spidsen ned i forlaget; det, der fortætter
+   i destillationshovedet, løber tilbage.
+4. **Eleven.** Det, der hældes i, falder gennem tragten i en rolig stråle (75
+   kugler i sekundet) og trykkes op til 8 rækker ned i væsken. En rystning er mange små hvirvler:
    en ring af kugler om et tilfældigt punkt drejer et par pladser rundt, og
    kuglerne glider i en bue. Hvirvlerne folder lagene ind i hinanden, så olien
    bliver til dråber, uden at kuglerne springer på kryds og tværs.
@@ -132,6 +156,16 @@ Hvem der kan blandes, står ingen steder i koden: det følger af `D.BINDING`
 | ethanol | 0,789 g/mL | 78,3 °C | 38,6 kJ/mol | Databogen |
 | olie (rapsolie) | 0,92 g/mL | koger ikke | | Databogen |
 
+Damptrykket over vand og ethanol: Raoults lov, p = x · γ · p*, med molbrøken
+(regnet med tæthed og molar masse, 18,02 og 46,07 g/mol) og γ fra van Laars
+ligning med de gængse konstanter for ethanol og vand ved 1 atm (A12 = 1,68,
+A21 = 0,92). Det rammer de målte kogepunkter inden for en halv grad: molbrøk
+0,07 ethanol koger ved 88,5 °C (målt 89,0), 0,24 ved 82,5 °C (målt 82,7), og
+dampen over 0,24 har molbrøken 0,55 (målt 0,54). Lige dele (rumfang) koger ved
+ca. 83 °C, og dampen er ca. 80 % ethanol regnet i rumfang. Destilleres 3
+portioner vand og 3 portioner ethanol ved 90 °C, bliver destillatet ca. 76 %
+ethanol, og der er ca. 8 % ethanol tilbage i bassinet.
+
 Blandinger af vand og ethanol: målt tæthed ved 20 °C i trin på 10 masseprocent
 (CRC Handbook, "Concentrative properties of aqueous solutions: ethanol"). Lige
 dele (rumfang) vejer 0,926 g/mL; 2 dele vand og 3 dele ethanol 0,904 g/mL.
@@ -151,9 +185,12 @@ dele (rumfang) vejer 0,926 g/mL; 2 dele vand og 3 dele ethanol 0,904 g/mL.
   sig med forskellen i tæthed opløftet i 0,6 i stedet for 1 (Stokes), så man ikke
   skal vente et halvt minut. Under 0,003 g/mL står de stille; det nås ikke med
   hele portioner.
-* Hvert stof fordamper, som om det var alene (ingen Raoults lov). En blanding af
-  vand og ethanol koger i virkeligheden ved 80-95 °C, og dampen indeholder også
-  vand.
+* Et dampmolekyle fylder det samme som et i væsken, så der er meget damp i
+  bassinet og røret, mens det koger (op mod en femtedel af kuglerne). Dampen
+  trækkes mod halsen af en strøm, der er valgt, ikke regnet.
+* Røret har ingen luft og ingen varmetab: dampen fortætter kun i køleren, og i
+  destillationshovedet kun, når væsken ikke koger. Temperaturen er den samme i
+  hele bassinet, og der er ikke noget termometer i destillationshovedet.
 * Tæthederne ændrer sig ikke med temperaturen.
 
 ## Filer
@@ -161,13 +198,19 @@ dele (rumfang) vejer 0,926 g/mL; 2 dele vand og 3 dele ethanol 0,904 g/mL.
 ```
 index.html            toplinje, scene, panel, teori, quiz og rundvisning
 css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
-sprites/bassin.svg    bassinet med kølekappe og en streg pr. portion; det
-                      samme sprite bruges til det lille glas
+sprites/bassin.svg    bassinet med låg, tragt, hals og en streg pr. portion;
+                      det samme sprite bruges til det lille glas
+sprites/tilbagesvaler.svg, destillation.svg, forlag.svg
+                      køleren i de to udgaver og forlaget; viewBox'en er i
+                      bassinets enheder, og tegningen er regnet ud fra målene
+                      i js/apparat.js
 js/kerne.js           NK-navnerum, lærred, tekst (samme som sc2.4)
 js/data.js            stofferne, BINDING, tætheden af vand-ethanol, damptryk
 js/tekster.js         opgaverne, quizzen og Kemichaels replikker
 js/model.js           gitteret og de fire ting, der flytter kuglerne
-js/sprites.js         indlæser bassinet; Kemichael lægger sine sprites her
+js/apparat.js         målene på låget, køleren og forlaget, rørets vej til
+                      modellen, kølevandet og hanen
+js/sprites.js         indlæser glasset; Kemichael lægger sine sprites her
 js/tegning.js         kuglerne som stempler, det lille glas, navneskiltet
 js/scene.js           placering, tegning, musen og hændelserne til Kemichael
 js/opgaver.js         opgavekortet med én knap og tjekket til byg-opgaven
@@ -178,9 +221,14 @@ js/app.js             panelet, genvejene og tegneløkken
 _selvtest.html        udviklerværktøj, indgår ikke i animationen
 ```
 
-Bassinets inderside i spritet (x 20-670, y 30-604,4 i en tegning på 690 × 626)
-svarer til gitteret: 40,5 × 35,79 kuglediametre. Ændres gitteret i `js/model.js`,
-skal spritet og målene øverst i `js/scene.js` følge med.
+Bassinets inderside i spritet (x 20-670, y 30-604,4 i en tegning på 690 × 686,
+der går fra y -60) svarer til gitteret: 40,5 × 35,79 kuglediametre. Ændres
+gitteret i `js/model.js`, skal spritet og målene øverst i `js/scene.js` følge med.
+
+Køleren og forlaget er regnet ud fra målene i `js/apparat.js` (`A.vaegge`,
+`A.SPRITE`), så kuglerne altid er inde i røret. Rettes et mål der, skal de tre
+sprites laves om med et lille script, der læser `js/apparat.js` og skriver
+dem; det blev brugt 27. sept. 2026 og ligger ikke i mappen.
 
 ## At rette i den
 
@@ -196,9 +244,14 @@ skal spritet og målene øverst i `js/scene.js` følge med.
 tætheden af blandingerne, at blandbarheden følger af `D.BINDING`, at bassinet
 altid er tæt og løber over ved tolv portioner, at vand og ethanol giver ét lag og
 olie to (øverst på vand, nederst på ethanol), at en emulsion skiller sig ad igen,
-at ethanol koger før vand, og at alt falder tilbage, at olien synker, når
-blandingen bliver lettere end 0,92 g/mL, at alle seks opgaver og quizzen kan
-gennemføres, og at sproget overholder reglerne. Chrome kræver
+at dampen fra vand og ethanol er mest ethanol, og at alt falder tilbage, at olien
+synker, når blandingen bliver lettere end 0,92 g/mL, at kogepunktet og dampen
+over lige dele passer med de målte, at tilbagesvaleren intet mister, at en
+destillation giver et destillat med mest ethanol og lidt vand og lader lidt
+ethanol blive tilbage, at knappen, D og Tøm virker, at alle seks opgaver og
+quizzen kan gennemføres, og at sproget overholder reglerne. Påskeægget (olien
+flyder langsomt op i lige dele) er medianen af seks forsøg, fordi tiden svinger
+meget fra gang til gang. Chrome kræver
 `--allow-file-access-from-files`.
 
 ## I menuen

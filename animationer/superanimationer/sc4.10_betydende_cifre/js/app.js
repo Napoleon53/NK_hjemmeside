@@ -122,13 +122,15 @@
         if (e.key.length === 1 && /[0-9,.\-]/.test(e.key) && f.erIndtastning() && !f.loest) f.fokus();
     }
 
-    /* Taster i svarfeltet: Enter tjekker, e, *, ^ og x springer til
-       eksponenten, og tilbage i et tomt eksponentfelt gaar til tallet. */
+    /* Taster i svarfeltet: Enter tjekker, e, *, ^ og x skifter til
+       videnskabelig notation og springer til eksponenten, og tilbage i et
+       tomt eksponentfelt gaar til tallet. */
     function feltTast(e) {
         var f = NK.aktivFane;
         if (e.key === "Enter") { e.preventDefault(); f.tjek(); return; }
         if (e.target.id === "svar-m" && /^[eE*^xX·×]$/.test(e.key)) {
             e.preventDefault();
+            if (el("potens").hidden) f.skiftMaade("pot");
             if (!el("potens").hidden) el("svar-e").focus();
             return;
         }
@@ -197,6 +199,17 @@
         el("vaelgere").addEventListener("click", function (ev) {
             var b = ev.target.closest("[data-valg]");
             if (b) NK.aktivFane.skiftValg(b.getAttribute("data-valg"));
+        });
+        el("niveauer").addEventListener("click", function (ev) {
+            var b = ev.target.closest("[data-niveau]");
+            if (b) NK.aktivFane.skiftNiveau(b.getAttribute("data-niveau"));
+        });
+        el("svarmaade").addEventListener("click", function (ev) {
+            var b = ev.target.closest("[data-maade]"), f = NK.aktivFane;
+            if (!b || b.disabled) return;
+            f.skiftMaade(b.getAttribute("data-maade"));
+            if (f.maade === "pot" && f.mant && !f.loest) el("svar-e").focus();
+            else f.fokus();
         });
         el("svar-m").addEventListener("keydown", feltTast);
         el("svar-e").addEventListener("keydown", feltTast);

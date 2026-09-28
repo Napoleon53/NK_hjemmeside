@@ -50,7 +50,7 @@
     function SimLager() {
         this.L = new NK.Laerred(NK.el("lager-laerred"));
         this.tid = 0;
-        /* Fremskridtet huskes pr. stof for alle 36, saa intet gaar tabt,
+        /* Fremskridtet huskes pr. stof for alle 41, saa intet gaar tabt,
            naar Sværere ioner slaas til eller fra */
         var gemt = NK.hent(NOEGLE, {});
         this.statusAlle = {};
@@ -114,7 +114,7 @@
         this.vaelg(plads, true);
         this.over = null;
         NK.saetHTML("lager-status", NK.indstil.svaer
-            ? "Seks glas har fået sværere ioner: " + D.SVAER_IONER + "."
+            ? D.stort(D.SVAER_ANTAL_ORD) + " glas har fået sværere ioner. De nye sammensatte ioner står på plakaten."
             : "Reolen har igen de almindelige ioner.");
     };
 
@@ -151,35 +151,46 @@
         var lay = {};
         lay.W = W;
         lay.H = H;
-        lay.bordY = Math.round(H * 0.84);
+        lay.bordY = Math.round(H * 0.87);
 
+        /* Reolen er saa bred og hoej, som bordet og plakaterne tillader,
+           saa glassene paa hylderne bliver store nok til, at etiketten kan
+           laeses. Glassets bredde bestemmer hoejden; reolen er ikke hoejere,
+           end glassene kraever, og det store glas paa bordet faar resten,
+           dog mindst storMin, saa dets etiket altid kan laeses. */
         var rx = Math.max(10, W * 0.02);
-        var rb = W * 0.68 - rx;
-        /* Reolen har en top, og der er luft mellem den og glassene */
+        var rb = W * 0.765 - rx;
         var ry = Math.max(18, H * 0.045);
-        var rh = H * 0.52 - ry;
-        lay.reol = { x: rx, y: ry, b: rb, h: rh };
         lay.tyk = NK.klamp(H * 0.018, 8, 14);
+        lay.slot = (rb - 24) / 10;
+        var breddeH = lay.slot * 0.88 / 0.77;
+        /* Skiltet sidder paa hyldebraettet og naar lidt under det */
+        lay.skiltUnder = 20 + 1 - lay.tyk;
+        var luft = lay.skiltUnder + 5;
+        var storMin = NK.klamp(H * 0.25, 100, 150);
+        var rhMax = Math.min(H * 0.62 - ry, lay.bordY - storMin - 34 - ry);
+        var rh = Math.min(3 * (breddeH + lay.tyk + luft) + lay.tyk, rhMax);
+        lay.reol = { x: rx, y: ry, b: rb, h: rh };
         var rum = (rh - lay.tyk) / 3;
         lay.hylder = [0, 1, 2].map(function (i) { return ry + lay.tyk + rum * (i + 1) - lay.tyk; });
-        lay.slot = (rb - 24) / 10;
-        lay.lilleH = Math.max(30, Math.min(lay.slot * 0.84 / 0.77, rum - lay.tyk - 38));
+        lay.lilleH = Math.max(30, Math.min(breddeH, rum - lay.tyk - luft));
         lay.pladser = this.stoffer.map(function (st) {
             return { x: rx + 12 + lay.slot * (st.pladsPaaHylde + 0.5), y: lay.hylder[st.hylde], h: lay.lilleH };
         });
 
-        /* Plakaterne til hoejre for reolen */
-        var px = W * 0.715, pb = Math.min(W * 0.965 - px, 260);
-        px = W * 0.965 - pb;
-        var ptH = NK.klamp(pb * 0.52, 90, rh * 0.5);
+        /* Plakaterne i en smal soejle til hoejre for reolen */
+        var pb = Math.min(W * 0.985 - (rx + rb + 14), 240);
+        var px = W * 0.985 - pb;
+        var ptH = NK.klamp(pb * 0.52, 60, rh * 0.45);
         lay.plakater = {
             pt: { x: px, y: ry + 6, b: pb, h: ptH },
-            ioner: { x: px + pb * 0.08, y: ry + 6 + ptH + NK.klamp(rh * 0.07, 10, 26), b: pb * 0.84, h: NK.klamp(rh - ptH - 40, 80, 190) }
+            ioner: { x: px + pb * 0.04, y: ry + 6 + ptH + NK.klamp(rh * 0.06, 10, 22), b: pb * 0.92,
+                     h: NK.klamp(rh - ptH - 34, 80, 230) }
         };
 
         /* Arbejdsbordet: det store glas, kuglerne og etiketmaskinen */
         /* Det store glas skal staa under reolen og dens nederste skilt */
-        lay.storH = NK.klamp(Math.min(H * 0.34, W * 0.28, lay.bordY - (ry + rh + 34)), 100, 290);
+        lay.storH = NK.klamp(Math.min(H * 0.3, W * 0.28, lay.bordY - (ry + rh + 34)), 100, 290);
         lay.stor = { x: Math.max(W * 0.19, Tg.glasBredde(lay.storH) / 2 + 20), y: lay.bordY };
         var mb = NK.klamp(W * 0.25, 130, 300);
         var mh = mb * 150 / 240;
@@ -778,7 +789,7 @@
             ctx.setLineDash([]);
         }
         D.HYLDER.forEach(function (h, nr) {
-            Tg.skilt(ctx, lay.reol.x + 14, lay.hylder[nr] + lay.tyk + 3, h.navn, mig.antalLoest(nr) + "/10", h.farve);
+            Tg.skilt(ctx, lay.reol.x + 14, lay.hylder[nr] + 1, h.navn, mig.antalLoest(nr) + "/10", h.farve);
         });
 
         /* Bordet, koppen og etiketmaskinen */
@@ -827,6 +838,7 @@
                 t: gs.loest ? (gs.stjerne ? "Løst uden hjælp ★" : "Løst") : "Mangler " + (gst.retning === "formel" ? "formlen" : "navnet"),
                 px: 12, vaegt: "400", farve: gs.loest ? "#7ee0a8" : "#a9b0ba"
             });
+            if (gst.fare) linjer.push({ t: "Faremærke: " + D.FARE_NAVN[gst.fare], px: 12, vaegt: "400", farve: "#f0918a" });
             Tg.boble(ctx, gp.x, gp.y - gp.h - 4, linjer, lay.W, gp.y + lay.tyk);
         }
 
@@ -924,7 +936,7 @@
         var lay = this.lay, st = this.opg.st;
         var mm = Tg.maskineMaal(lay.maskine.x, lay.maskine.y, lay.maskine.b);
         var bp = this.bankPos();
-        var e = Tg.etiketRekt(bp.x, bp.y, bp.h);
+        var e = Tg.etiketRekt(bp.x, bp.y, bp.h, bp.h < 110);
         var ud = NK.klamp(r.t / 0.7, 0, 1);
         var over = NK.blod(NK.klamp((r.t - 0.8) / 0.5, 0, 1));
         var cx0 = mm.slids.x - e.b / 2, cy0 = mm.slids.y;

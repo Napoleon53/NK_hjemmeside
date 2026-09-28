@@ -267,9 +267,18 @@
         var Hs = baand.y;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.1, 30, 50));
-        /* Tavlen faar den hoejde, teksten skal bruge; resten gaar til bordet */
+        /* Tavlen faar den hoejde, regnestykket skal bruge (broeker er
+           hoejere end en linje); resten gaar til bordet. Plads til
+           trekanten i hoejre side, hvis formlen skal vendes. */
         lay.f = NK.klamp(Math.min(W / 40, Hs / 24), 14, 22);
-        var tavleH = Math.round(NK.klamp(lay.f * 9.4, 140, Hs * 0.46));
+        var vend = o && o.trin.some(function (id) { return D.TRIN[id].vend; });
+        var tsFri = vend ? NK.klamp((W - 32) * 0.3, 80, 150) + 14 : 0;
+        var tm = this.regning.tavleMaal(this.L.ctx, W - 32, this.data(), lay.f, tsFri);
+        while (tm.h > Hs * 0.5 && lay.f > 13) {
+            lay.f -= 0.5;
+            tm = this.regning.tavleMaal(this.L.ctx, W - 32, this.data(), lay.f, tsFri);
+        }
+        var tavleH = Math.round(Math.max(140, tm.h));
         var fri = lay.bordY - (16 + tavleH + 34);
         var vb = NK.klamp(Math.min(W * 0.25, fri * 1.35), 120, 290);
         var vh = Tg.vaegtHoejde(vb);

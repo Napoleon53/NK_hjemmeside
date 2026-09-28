@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="190" viewBox="0 0 80 190">
+  <!-- Bunsenbraender set forfra. Roerets munding er (40, 18); flammen
+       tegnes af animationen derfra og opad. Gashanen (hjulet) sidder i
+       (60, 168). Bunden staar paa y 186. -->
+  <defs>
+    <linearGradient id="roer" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6d737b"/>
+      <stop offset="0.35" stop-color="#e3e7eb"/>
+      <stop offset="0.6" stop-color="#b9bfc6"/>
+      <stop offset="1" stop-color="#5f656d"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a5058"/>
+      <stop offset="1" stop-color="#23272d"/>
+    </linearGradient>
+    <linearGradient id="krave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a2c"/>
+      <stop offset="0.4" stop-color="#e2c071"/>
+      <stop offset="1" stop-color="#7b5d24"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Skygge paa bordet -->
+  <ellipse cx="40" cy="185" rx="36" ry="4" fill="#000000" fill-opacity="0.35"/>
+
+  <!-- Slangen ud til venstre -->
+  <path d="M14 170 Q2 172 0 184" fill="none" stroke="#b5452e" stroke-width="7" stroke-linecap="round"/>
+  <path d="M14 170 Q2 172 0 184" fill="none" stroke="#e07a5f" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <rect x="10" y="165" width="14" height="9" rx="2" fill="url(#roer)" stroke="#50565e" stroke-width="0.8"/>
+
+  <!-- Foden -->
+  <path d="M10 184 Q10 172 24 168 L56 168 Q70 172 70 184 Z" fill="url(#fod)" stroke="#16191d" stroke-width="1"/>
+  <ellipse cx="40" cy="168" rx="16" ry="3" fill="#5a6068"/>
+
+  <!-- Gashanen -->
+  <rect x="54" y="163" width="8" height="10" rx="1.5" fill="url(#roer)" stroke="#50565e" stroke-width="0.8"/>
+  <circle cx="64" cy="168" r="6" fill="#2d62b3" stroke="#1b3e73" stroke-width="1"/>
+  <path d="M60 168 L68 168 M64 164 L64 172" stroke="#8fb4ea" stroke-width="1.3" stroke-linecap="round"/>
+
+  <!-- Roeret -->
+  <rect x="33" y="18" width="14" height="150" fill="url(#roer)" stroke="#50565e" stroke-width="1"/>
+  <ellipse cx="40" cy="18" rx="7" ry="2" fill="#2a2e34" stroke="#50565e" stroke-width="0.8"/>
+
+  <!-- Luftkraven med hullet -->
+  <rect x="30" y="138" width="20" height="16" rx="2" fill="url(#krave)" stroke="#5b451a" stroke-width="1"/>
+  <ellipse cx="40" cy="146" rx="4" ry="3.2" fill="#1a1a1a"/>
+  <path d="M31 140 L49 140" stroke="#fff3c9" stroke-opacity="0.5" stroke-width="1"/>
+</svg>

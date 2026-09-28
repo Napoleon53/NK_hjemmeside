@@ -22,7 +22,7 @@
             { sel: "#lager-anker-bord", titel: "Arbejdsbordet", tekst: "De ioner, du finder, lægger sig ved glasset. Er svaret rigtigt, printer etiketmaskinen en ny etiket." },
             { sel: "#lager-anker-plakater", titel: "Plakaterne", tekst: "Det periodiske system og de sammensatte ioner. Klik for at se dem i stort format." },
             { sel: "#lager-fremskridt", titel: "Hylderne", tekst: "Et glas, du løser uden at se svaret, får en stjerne." },
-            { sel: "#svaer-kontakt", titel: "Sværere ioner", tekst: "Slå til, så seks glas får sværere ioner: Sr²⁺, Sn²⁺, Pb²⁺, Pb⁴⁺, Hg²⁺ og HCO₃⁻. Det gælder også samlebåndet." },
+            { sel: "#svaer-kontakt", titel: "Sværere ioner", tekst: "Slå til, så elleve glas får sværere ioner, bl.a. Be²⁺, Hg²⁺, MnO₄⁻ og S₂O₃²⁻. Det gælder også samlebåndet." },
             { sel: ".faneknapper", titel: "Samlebåndet", tekst: "De samme stoffer på tid." }
         ],
         "fane-baand": [

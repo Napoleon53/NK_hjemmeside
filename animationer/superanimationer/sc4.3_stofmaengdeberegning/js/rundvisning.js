@@ -16,18 +16,19 @@
 
     var TURE = {
         "fane-formel": [
+            { sel: "#formel-anker-opgave", titel: "Opgaven", tekst: "Her står, hvad du skal gøre i opgaven." },
             { sel: "#formel-anker-bunke", titel: "Brikkerne", tekst: "Træk en brik op på en plads på tavlen. Du kan også klikke på en brik og så på pladsen." },
             { sel: "#formel-anker-formel", titel: "Formlen", tekst: "Formlen tjekkes, når alle dens pladser er fyldt. Det, der sidder rigtigt, bliver siddende." },
-            { sel: "#formel-anker-skema", titel: "Skemaet", tekst: "Navnet og enheden for n, m og M. I nogle runder skal du selv sætte dem på." },
-            { sel: "#formel-kort", titel: "Runden", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret. Når formlen skal vendes, kommer trekanten som andet hint." },
-            { sel: "#formel-opgaver", titel: "Runderne", tekst: "Seks runder. Hjælpen forsvinder runde for runde, og til sidst skriver du det hele selv." },
+            { sel: "#formel-anker-skema", titel: "Skemaet", tekst: "Navnet og enheden for n, m og M. I nogle opgaver skal du selv sætte dem på." },
+            { sel: "#formel-kort", titel: "Kortet", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret. Når formlen skal vendes, kommer trekanten som andet hint." },
+            { sel: "#formel-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. Hjælpen forsvinder opgave for opgave, og til sidst skriver du det hele selv." },
             { sel: "#formel-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du har løst det." },
             { sel: "#formel-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Vægten: regn med formlen, og se stoffet blive delt i poser på 1 mol. Hurtigrunden: tolv spørgsmål på tid." }
         ],
         "fane-vaegt": [
-            { sel: "#vaegt-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningerne. En beregning står der, når den er rigtig." },
-            { sel: "#vaegt-raekker", titel: "Formlen og tallet", tekst: "Skriv først formlen med bogstaver, fx n = m / M, og tryk Enter. Så tallet med enheden, fx 2,00 mol." },
+            { sel: "#vaegt-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og regnestykket, efterhånden som du skriver det rigtigt." },
+            { sel: "#vaegt-raekker", titel: "Regnestykket", tekst: "Tre linjer, én ad gangen: formlen med bogstaver, så tallene med enheder over og under brøkstregen, og til sidst resultatet med enhed. Tryk Enter efter hver." },
             { sel: "#vaegt-anker-bord", titel: "Bordet", tekst: "Molarmassen står på krukken. Vægten viser massen. Det, du regner, sker her." },
             { sel: "#vaegt-anker-poser", titel: "Poserne", tekst: "Hver pose er 1 mol og vejer M gram. Stofmængden er antallet af poser." },
             { sel: "#vaegt-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret." },
@@ -35,9 +36,9 @@
         ],
         "fane-hurtig": [
             { sel: "#hurtig-anker-tavle", titel: "Spørgsmålet", tekst: "Tolv spørgsmål om formlen, enhederne og navnene, og lidt hovedregning." },
-            { sel: "#hurtig-anker-svar", titel: "Svarene", tekst: "Klik på det rigtige svar, eller tast 1 til 4. Et forkert svar giver 5 s ekstra, og spørgsmålet kommer igen senere." },
-            { sel: "#hurtig-kort", titel: "Knappen", tekst: "Start runden. Undervejs giver den et hint (5 s ekstra) og derefter svaret." },
-            { sel: "#hurtig-data", titel: "Tiden", tekst: "Tiden med straf, antallet, du fik rigtigt første gang, og din rekord i denne browser." }
+            { sel: "#hurtig-anker-svar", titel: "Svarene", tekst: "Klik på det rigtige svar, eller tast 1 til 4. Et forkert svar giver tidsstraf, og spørgsmålet kommer igen senere." },
+            { sel: "#hurtig-kort", titel: "Knappen", tekst: "Start runden. Undervejs giver den et hint (det koster lidt tid) og derefter svaret." },
+            { sel: "#hurtig-data", titel: "Tiden", tekst: "Tiden med tidsstraf, antallet, du fik rigtigt første gang, og din rekord i denne browser." }
         ]
     };
     var trin = [];

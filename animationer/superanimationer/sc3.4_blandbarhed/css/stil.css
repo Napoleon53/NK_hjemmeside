@@ -299,6 +299,34 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .temperatur { margin-top: 12px; }
 
+/* Tilbagesvaling eller destillation: to knapper, den valgte lyser */
+.koelervalg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 12px;
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    overflow: hidden;
+}
+
+.koelerknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 0;
+    padding: 8px 6px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.koelerknap + .koelerknap { border-left: 1px solid #4a4a58; }
+.koelerknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.koelerknap.valgt { background-color: #1f4d6b; color: #e0f2fe; box-shadow: inset 0 -2px 0 #7dd3fc; }
+
+#destillat { margin-top: 8px; }
+
 .temp-hoved {
     display: flex;
     justify-content: space-between;

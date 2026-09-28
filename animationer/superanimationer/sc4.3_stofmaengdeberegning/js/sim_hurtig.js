@@ -5,7 +5,7 @@
    M = ?), enhederne, navnene, enheder der gaar ud med hinanden og
    hovedregning med nemme tal. Eleven klikker paa et svar (eller taster
    1 til 4). De forkerte svar er de fejl, elever laver, og hvert har sin
-   forklaring. Et forkert svar giver 5 sekunder ekstra, og spoergsmaalet
+   forklaring. Et forkert svar giver tidsstraf (D.STRAF, 10 s), og spoergsmaalet
    kommer igen senere i runden, saa formlen hentes frem flere gange.
    Den bedste tid huskes i browseren.
    ===================================================================== */
@@ -186,7 +186,7 @@
             this.rekord = samlet;
             NK.gem(NOEGLE, { r: samlet });
         }
-        var t = "Runden er slut: " + samlet + " s" + (this.straf ? " (heraf " + this.straf + " s for fejl og hint)" : "") + ".";
+        var t = "Runden er slut: " + samlet + " s" + (this.straf ? " (heraf " + this.straf + " s i tidsstraf)" : "") + ".";
         this.besked(t + (this.nyRekord ? " <b>Ny rekord.</b>" : " Rekorden er " + this.rekord + " s."), "god");
         this.visKnap();
         this.visTal();
@@ -199,7 +199,7 @@
             e.textContent = this.tilstand === "klar" ? "Start runden" : "Ny runde ↺";
             e.className = "knap blaa banker";
         } else {
-            e.textContent = this.hjaelp === 0 ? "Giv hint (+" + D.STRAF + " s)" : "Vis svaret";
+            e.textContent = this.hjaelp === 0 ? "Giv hint (koster tid)" : "Vis svaret";
             e.className = "knap";
         }
         e.disabled = false;
@@ -210,7 +210,7 @@
         if (this.pause > 0 || !this.nuv) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.straf += D.STRAF;
+            this.straf += D.STRAF_HINT;
             this.strafT = 1.2;
             this.hjaelpVis("<b>Hint:</b> " + NK.html(this.nuv.hint), "hint");
         } else {
@@ -353,8 +353,8 @@
         if (this.tilstand !== "koerer") {
             NK.tekst(ctx, "Hurtigrunden", R.x + R.b / 2, R.y + R.h * 0.2, { font: Tg.font("800", Math.round(lay.spmPx * 1.1)), justering: "center", linje: "middle", farve: moerk });
             var linjer = this.tilstand === "slut" ?
-                [this.samlet + " s" + (this.straf ? ", heraf " + this.straf + " s for fejl og hint" : ""), this.nyRekord ? "Ny rekord" : "Rekorden er " + this.rekord + " s"] :
-                [D.HURTIG_ANTAL + " spørgsmål om stofmængde, masse og molarmasse.", "Et forkert svar giver " + D.STRAF + " s ekstra og kommer igen senere."];
+                [this.samlet + " s" + (this.straf ? ", heraf " + this.straf + " s i tidsstraf" : ""), this.nyRekord ? "Ny rekord" : "Rekorden er " + this.rekord + " s"] :
+                [D.HURTIG_ANTAL + " spørgsmål om stofmængde, masse og molarmasse.", "Et forkert svar giver tidsstraf, og spørgsmålet kommer igen."];
             linjer.forEach(function (t, i) {
                 var px = NK.passendeSkrift(ctx, t, R.b - 40, NK.klamp(lay.spmPx * 0.6, 14, 22), 12, "600");
                 NK.tekst(ctx, t, R.x + R.b / 2, R.y + R.h * (0.34 + i * 0.1), { font: Tg.font("600", px), justering: "center", linje: "middle",
@@ -390,7 +390,7 @@
         if (this.strafT > 0) {
             ctx.save();
             ctx.globalAlpha = Math.min(1, this.strafT);
-            NK.tekst(ctx, "+" + D.STRAF + " s", R.x + R.b - 20, py + lay.spmPx * 0.9 - (1.2 - this.strafT) * 10,
+            NK.tekst(ctx, "Tidsstraf", R.x + R.b - 20, py + lay.spmPx * 0.9 - (1.2 - this.strafT) * 10,
                 { font: Tg.font("800", Math.round(NK.klamp(lay.spmPx * 0.6, 14, 22))), justering: "right", linje: "middle", farve: "#c0392b" });
             ctx.restore();
         }

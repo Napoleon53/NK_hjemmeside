@@ -90,8 +90,9 @@ man er i gang med.
    have flere ladninger. Hvilken ladning har tin her?" Begge ioners kort er
    foldet sammen med "?", og der er intet regnskab ved lynlåsen, for det
    ville røbe svaret. Knappen hedder "Start opgave".
-1. **Den kendte ion.** Kemichael kommer ind fra venstre, peger på den ion,
-   eleven kender, og siger en tør linje ("Start med O. Den kender du.").
+1. **Den kendte ion.** Kemichael kommer ind i sit hjørne, den ion, eleven
+   kender, får en gul ramme, og han siger en tør linje ("Start med O. Den
+   kender du.").
    Kortene lyser gult. En linje i opgavekortet siger, at ladningen kan
    udledes af det periodiske system (grundstof i en hovedgruppe), eller at
    en sammensat ions ladning skal man kende. Eleven vælger blandt fire
@@ -138,20 +139,31 @@ skal bruge, `js/kerne.js` har de tre hjælpere, han regner med (`NK.blod`,
 `NK.r`, `NK.tilVerden`), og `js/laerer.js` kobler ham på alle tre faner.
 Klik på ham giver de fælles svar, når man prikker til ham.
 
-* **Præsentationen.** Første gang en fane åbnes i browseren, går han ind og
-  siger to eller tre korte linjer (`D.INTRO` i `js/data.js`) og peger på
-  hylden, panelet eller plakaterne. Fanen er ikke låst imens. Han går kun,
-  når eleven vil det: knappen "Spring præsentationen over", to klik på ham
-  eller Esc. Det huskes pr. fane i browseren (`nk-sc2.2-intro-<fane>`), og
-  <kbd>K</kbd> får ham til at præsentere fanen igen. Mønster: sc2.3.
-  Trykker man Start opgave på fane 3, mens han præsenterer, går han direkte
-  over til at vise, hvor man starter.
-* **Størrelsen.** Han tegnes med 0,92 × lærredets højde / 600 som i sc2.3,
-  og scenens gulv (`NK.Scene.GULV`) sættes til lærredets bund, hver gang han
-  tegnes. Med den mindre skala før blev kitlen under ham lang, så det lignede
-  lange ben. Samme løsning som F84 i det virtuelle laboratorium, men uden at
-  røre den fælles fil, så Kemichael i de andre animationer er uændret. Han
-  stiller sig så langt til venstre, han kan uden at blive skåret af.
+* **Hjørnet** (27. sept. 2026, efter brugerens ønske: han talte ind over
+  animationen). Han står fast nederst i højre hjørne og ses fra brystet og
+  op; på fane 1 står han oven på den nederste hylde. Han går ind og ud ad
+  højre kant og aldrig hen over bordet eller glasset. Taleboblen tegnes i
+  `js/laerer.js` (ikke af den fælles figur) over hans hoved i samme hjørne og
+  holder sig fri af kortene, mærket, formlen, glasset og plakaterne; er den
+  brede boble i vejen, brydes teksten smallere. Bordet (`NK.Bord.layout`) og
+  glasset (`NK.SimVand.maal`) holder hjørnet fri (`hjoerne`, 190 px): er der
+  ikke plads, rykker de til venstre, og i en smal scene bliver bordets
+  felter lidt mindre, dog ikke under 60 px. Ved 1024 px bredde kan boblen
+  stadig dække kanten af mærket "0 neutral", mens han taler.
+* **Præsentationen.** Når eleven har sagt ja (se nedenfor), siger han tre
+  eller fire korte, saglige linjer (`D.INTRO` i `js/data.js`): hvad fanen er
+  til, og hvor tingene er. Det, han taler om, får en gul ramme
+  (`NK.Fremhaev`): bordet, hylderne, glasset, saltkortet, formlen, trinene,
+  plakaterne og knappen Start opgave. Til venstre for ham peger han ikke
+  (armen ville gå hen over ansigtet), han kigger derhen; mod panelet peger han.
+  Fanen er ikke låst imens. Han går, når eleven vil det: knappen "Spring over"
+  over boblen, to klik på ham eller Esc. Det huskes pr. fane i browseren
+  (`nk-sc2.2-intro-<fane>`), og <kbd>K</kbd> får ham til at præsentere fanen
+  igen. Trykker man Start opgave på fane 3, mens han præsenterer, går han
+  direkte over til at vise, hvor man starter.
+* **Størrelsen.** Han tegnes med 0,55 × lærredets højde / 600 (0,4-0,8), og
+  scenens gulv (`NK.Scene.GULV`) sættes hvert billede til gulvet i hjørnet, så
+  kitlen stopper dér og ikke bliver til lange ben. Den fælles fil røres ikke.
 
 Teorien står bag knappen Teori. Rundvisningen bag `?` peger på ét element ad
 gangen på den fane, man står på.
@@ -337,7 +349,8 @@ og hver ion rører en modsat), fane 3 (præcis én ladning lukker lynlåsen i
 alle 27 opgaver, svarmulighederne, hints, træk i kortet, plakaterne,
 partnertrinnet, svarene i trinlisten og hele forløbet), Kemichaels
 præsentation (første gang, ikke anden gang, K, Esc, knappen og to klik på
-ham), at teksterne er uden tankestreger og 1+/1−, og at rundvisningen peger
+ham, hjørnet, ind og ud ad højre kant, de gule rammer, og at boblen er fri af
+bordet, mærket, formlen, glasset og plakaterne, også med Al₂(SO₄)₃), at teksterne er uden tankestreger og 1+/1−, og at rundvisningen peger
 på noget, der findes.
 
 ## I menuen
@@ -349,7 +362,9 @@ I menuen fra 26. sept. 2026 som c2.2 i `kemi-c-filer/samling_c2.html` (navnet
 ## Tilbuddet om præsentationen
 
 Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
-åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
+åbnes, står der Start præsentation og Nej tak (fra 27. sept. 2026 nederst i
+højre hjørne, hvor han selv kommer til at stå, og på fane 1 oven på den
+nederste hylde; ellers er reglen midt foroven). Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
 spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
 `js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).

@@ -23,9 +23,8 @@
    sættes sammen med N, O, F og Cl; at elektronparret glider mod det
    atom, der trækker hårdest; at molekylerne på fane 2 har lærebogens
    polaritet; at vandstrålen bøjer mest for vand, mindre for ethanol og
-   ikke for heptan; at alle opgaver kan løses; at tilbuddet om
-   Kemichaels præsentation virker; og at teksterne overholder sitets
-   regler.
+   ikke for heptan; at alle opgaver kan løses; at der ingen
+   præsentation er; og at teksterne overholder sitets regler.
 
    Chrome kigger kun ind i en iframe på file://, hvis den startes med
    --allow-file-access-from-files. Ellers: brug en lokal server eller
@@ -61,8 +60,9 @@ function koerTest() {
     var D = NK.Data;
     var mangler = Object.keys(NK.Sprites.FILER).filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("alle " + Object.keys(NK.Sprites.FILER).length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
-    paastand("Kemichael er hentet", !!(NK.Kemichael && NK.laerer));
-    if (NK.Kemichael && NK.Kemichael.baggrundsliv) NK.Kemichael.baggrundsliv(false);
+    paastand("ingen præsentation: hverken Kemichael, tilbud eller Spring over",
+        !NK.Kemichael && !NK.laerer && !d.getElementById("tilbud") && !d.getElementById("spring-over") && !d.getElementById("laerer-lag"));
+    paastand("?-knappen til rundvisningen er der stadig", !!d.getElementById("hjaelpknap"));
 
     overskrift("2. Bindingerne på fane 1");
     paastand("C-N er præcis 0,5 og polær, C-H 0,4 og upolær", D.dEN("C", "N") === 0.5 && D.bindingstype("C", "N") === "polaer" && D.dEN("C", "H") === 0.4 && D.bindingstype("C", "H") === "upolaer");
@@ -293,41 +293,10 @@ function koerTest() {
         paastand("vandstrålen, opgave " + (i + 1) + ": " + o.tekst, loestOpgave(vand, o, function (o) { vand.opgaver.vaelg(o.rigtig); }));
     });
 
-    overskrift("6. Kemichaels præsentation");
-    var laerer = NK.laerer;
-    var tilbud = d.getElementById("tilbud");
-    function synlig(e) { return W.getComputedStyle(e).display !== "none"; }
-    W.localStorage.removeItem("nk-sc3.3-intro");
-    NK.visFane("fane-en");
-    paastand("første gang står tilbuddet i scenen på fane 1", synlig(tilbud) && d.querySelector("#fane-en .scene").contains(tilbud));
-    tilbud.querySelector(".tilbud-nej").click();
-    paastand("Nej tak skjuler tilbuddet, og valget huskes", !synlig(tilbud) && !!NK.hent("nk-sc3.3-intro", {})["fane-en"]);
-    NK.visFane("fane-polaritet");
-    paastand("fane 2 har sit eget tilbud, i sin egen scene", synlig(tilbud) && d.querySelector("#fane-polaritet .scene").contains(tilbud) && d.querySelector("#fane-polaritet .scene").contains(d.getElementById("laerer-lag")));
-    var o2 = pol.OPGAVER[0](pol);
-    loestOpgave(pol, o2, function (o) { pol.opgaver.vaelg(o.rigtig); });
-    paastand("en løst opgave fjerner tilbuddet", !synlig(tilbud));
-    NK.visFane("fane-vand");
-    tilbud.querySelector(".tilbud-start").click();
-    for (var k = 0; k < 90; k++) laerer.opdater(1 / 60);
-    paastand("Start præsentation sender Kemichael ind, og Spring over står fremme", laerer.laererIIntro() && !d.getElementById("spring-over").hidden);
-    for (k = 0; k < 60 * 9; k++) laerer.opdater(1 / 60);
-    paastand("han peger på skemaet, mens han taler om det", d.getElementById("vand-forloeb").classList.contains("peg") || laerer.introTrin > 2, "trin " + laerer.introTrin);
-    d.getElementById("spring-over").click();
-    for (k = 0; k < 120; k++) laerer.opdater(1 / 60);
-    paastand("Spring over sender ham ud igen", !laerer.laererIIntro() && d.getElementById("spring-over").hidden && !d.querySelector(".peg"));
-
-    var lange = [];
-    Object.keys(D.INTRO).forEach(function (id) {
-        D.INTRO[id].linjer.forEach(function (l) { if (l.length > 60) lange.push(l); });
-    });
-    paastand("replikkerne er højst 60 tegn", lange.length === 0, lange.join(" | "));
-
-    overskrift("7. Tekster og skrift");
+    overskrift("6. Tekster og skrift");
     var tekster = [d.body.innerText, serieTekst];
     D.TEORI.forEach(function (a) { tekster.push(a.h); a.p.forEach(function (p) { tekster.push(p); }); });
     D.MOLEKYLER.forEach(function (m) { tekster.push(m.navn, m.hintPol, m.svarPol); });
-    Object.keys(D.INTRO).forEach(function (id) { D.INTRO[id].linjer.forEach(function (l) { tekster.push(l); }); });
     [en, pol, vand].forEach(function (sim) {
         sim.OPGAVER.forEach(function (lav) {
             var o = lav(sim);

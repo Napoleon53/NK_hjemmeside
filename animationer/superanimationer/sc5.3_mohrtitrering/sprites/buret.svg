@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="600" viewBox="0 0 40 600">
+  <!-- Burette paa 25 mL. Vaesken tegnes af animationen BAG filen: roeret
+       har indersiden x 14-26 fra y 8 til y 522, og spidsen snaevrer ind
+       fra x 16-24 ved y 546 til x 19-21 ved y 594. Inddelingen: 0 mL ved
+       y 40 og 25 mL ved y 490 (18 enheder pr. mL). Tallene skrives af
+       animationen. Hanens midte er (20, 533); haandtaget tegnes af
+       animationen. Spidsen slutter i (20, 596). -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.38"/>
+      <stop offset="0.25" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="0.75" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.32"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Roeret -->
+  <rect x="12" y="6" width="16" height="518" fill="url(#glas)"/>
+  <path d="M12 6 L12 524 M28 6 L28 524" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.6"/>
+  <rect x="10" y="2" width="20" height="6" rx="2" fill="#dcecf8" fill-opacity="0.25" stroke="#e6f2fb" stroke-opacity="0.9" stroke-width="1.2"/>
+
+  <!-- Inddelingen: en streg pr. mL, lange streger ved hver 5. mL -->
+  <g stroke="#f4f9fd" stroke-opacity="0.8" stroke-width="1" stroke-linecap="round">
+    <path d="M14 40 h10 M14 130 h10 M14 220 h10 M14 310 h10 M14 400 h10 M14 490 h10"/>
+  </g>
+  <g stroke="#f4f9fd" stroke-opacity="0.55" stroke-width="0.8" stroke-linecap="round">
+    <path d="M14 58 h5 M14 76 h5 M14 94 h5 M14 112 h5
+             M14 148 h5 M14 166 h5 M14 184 h5 M14 202 h5
+             M14 238 h5 M14 256 h5 M14 274 h5 M14 292 h5
+             M14 328 h5 M14 346 h5 M14 364 h5 M14 382 h5
+             M14 418 h5 M14 436 h5 M14 454 h5 M14 472 h5"/>
+  </g>
+
+  <!-- Genskin -->
+  <rect x="24" y="14" width="2" height="500" rx="1" fill="#ffffff" fill-opacity="0.2"/>
+
+  <!-- Hanen: glaslegemet og tappen, der sidder paa tvaers -->
+  <path d="M13 522 L27 522 L27 546 L13 546 Z" fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.4"/>
+  <rect x="5" y="527" width="30" height="12" rx="6" fill="#dbe7f0" fill-opacity="0.45" stroke="#e6f2fb" stroke-opacity="0.95" stroke-width="1.2"/>
+
+  <!-- Spidsen -->
+  <path d="M15 546 L25 546 L21.8 594 Q20 598 18.2 594 Z" fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.2" stroke-linejoin="round"/>
+</svg>

@@ -586,24 +586,36 @@
     };
 
     /* ----- Kemichaels praesentation af fanerne --------------------------
-       Foerste gang en fane aabnes (js/laerer.js). Hoejst ca. 60 tegn pr.
-       replik: hvor man er, hvad man goer, og en toer bemaerkning. Ingen
-       teori. peg er den replik, han peger under. */
+       Naar eleven har sagt ja til den (js/laerer.js). Hoejst ca. 60 tegn
+       pr. replik, kort og sagligt: hvad fanen er til, og hvor tingene
+       er. Ingen teori og ingen sjove bemaerkninger. maal er det, der faar
+       en gul ramme, mens linjen siges. */
     D.INTRO = {
-        "fane-bord": { peg: 1, linjer: [
-            "Saltbyggeren. Her bygger man salte af ioner.",
-            "Træk ionerne ned på bordet, til lynlåsen lukker.",
-            "Går plus og minus op, er det et salt. Resten er detaljer."
-        ] },
-        "fane-vand": { peg: 1, linjer: [
-            "Vandet. Her går saltene i opløsning.",
-            "Vælg et salt til højre, og læg det i glasset.",
-            "Glasset er vasket op. Denne gang."
-        ] },
-        "fane-ukendt": { peg: 2, linjer: [
-            "Ukendte ioner. Formlen ved mere, end man tror.",
-            "Tryk Start opgave, så viser jeg, hvor du begynder.",
-            "Plakaterne på væggen er gratis at kigge på."
-        ] }
+        "fane-bord": {
+            linjer: [
+                "Her bygger du salte af positive og negative ioner.",
+                "Træk ionerne fra hylderne ind på bordet.",
+                "Når lynlåsen lukker, går plus og minus op.",
+                "Opgaverne starter du her."
+            ],
+            maal: ["bord", "hylder", "bord", "opgave"]
+        },
+        "fane-vand": {
+            linjer: [
+                "Her ser du ionerne gå fra hinanden, når saltet opløses.",
+                "Vælg ionerne her, og læg saltet i vandet.",
+                "Opgaverne starter du her."
+            ],
+            maal: ["glas", "salt", "opgave"]
+        },
+        "fane-ukendt": {
+            linjer: [
+                "Her finder du ladningen på en ukendt ion ud fra formlen.",
+                "Opgaven er delt i trin. De står her.",
+                "Mangler du en ladning, så klik på plakaterne.",
+                "Tryk Start opgave, så viser jeg, hvor du begynder."
+            ],
+            maal: ["formel", "trin", "plakater", "opgave"]
+        }
     };
 }());

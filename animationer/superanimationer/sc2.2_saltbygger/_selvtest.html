@@ -644,17 +644,39 @@ function koer() {
     var tilbudB = d.getElementById("bord-tilbud");
     paastand("første gang: der står Start præsentation og Nej tak, og han kommer ikke af sig selv",
         !tilbudB.hidden && !fb2.laererIIntro() && !(fb2.introVent > 0));
+    var tr = tilbudB.getBoundingClientRect(), hbr = fb2.bord.hyldeBund.getBoundingClientRect();
+    var cr0 = fb2.L.canvas.getBoundingClientRect(), bo0 = fb2.laererOptaget()[0];
+    paastand("tilbuddet står i hjørnet nederst til højre, oven på den nederste hylde og fri af bordet",
+        tr.right > cr0.right - 30 && tr.bottom <= hbr.top && tr.left > cr0.left + bo0.x + bo0.b,
+        Math.round(tr.left) + "-" + Math.round(tr.right) + " / " + Math.round(tr.bottom) + " / hylde " + Math.round(hbr.top));
     tilbudB.querySelector(".tilbud-start").click();
-    koerB(4);
+    koerB(0.35);
+    var sHj = fb2.laererLaerredSkala();
+    paastand("han går ind fra højre kant, ikke hen over bordet", fb2.laerer.x > fb2.laererHjoerneX() && fb2.laerer.x * sHj < fb2.L.b + 200,
+        Math.round(fb2.laerer.x * sHj) + " / " + Math.round(fb2.laererHjoerneX() * sHj));
+    koerB(3.65);
     var spring = d.getElementById("bord-spring");
-    paastand("Start præsentation: han går ind og præsenterer, og knappen Spring præsentationen over står der",
+    var Lk = fb2.laererRekt();
+    paastand("han står nederst i højre hjørne, oven på den nederste hylde",
+        Lk.x * sHj > fb2.L.b * 0.6 && (Lk.x + Lk.b) * sHj <= fb2.L.b && Math.abs((Lk.y + Lk.h) * sHj - fb2.laererGulv()) < 1
+        && fb2.laererGulv() < fb2.L.h - 20,
+        Math.round(Lk.x * sHj) + "-" + Math.round((Lk.x + Lk.b) * sHj) + " / gulv " + Math.round(fb2.laererGulv()) + " af " + fb2.L.h);
+    var ramme1 = NK.Fremhaev.synlige();
+    paastand("første replik: bordet har en gul ramme", fb2.introTrin === 1 && ramme1.length === 1
+        && Math.abs(ramme1[0].left - (cr0.left + fb2.bord.g.x0 - 15)) < 2, fb2.introTrin + " / " + ramme1.length);
+    var sp = spring.getBoundingClientRect();
+    var bobleTop = Math.min.apply(null, D.INTRO["fane-bord"].linjer.map(function (l) { return fb2.laererBoblePlads(l).y; }));
+    paastand("Spring over står i hjørnet over boblen og fri af bordet",
+        sp.left > cr0.left + bo0.x + bo0.b && sp.right <= cr0.right && sp.bottom <= cr0.top + bobleTop,
+        Math.round(sp.left) + "-" + Math.round(sp.right) + " / " + Math.round(sp.bottom));
+    paastand("Start præsentation: han går ind og præsenterer, og knappen Spring over står der",
         fb2.laererIIntro() && !spring.hidden && fb2.introTrin >= 1 && cw.localStorage.getItem("nk-sc2.2-intro-fane-bord") === "true",
         fb2.laererIIntro() + " / " + spring.hidden + " / " + fb2.introTrin + " / " + cw.localStorage.getItem("nk-sc2.2-intro-fane-bord"));
     var opgaveFoer = fb2.opgave;
     d.getElementById("bord-opgaveknap").click();
     paastand("præsentationen låser ikke: opgaven kan startes, og han bliver", !opgaveFoer && !!fb2.opgave && fb2.laererIIntro());
     fb2.visFrit();
-    klikB(fb2.L.b - 5, fb2.L.h - 5);
+    klikB(10, fb2.L.h - 5);
     paastand("et klik ved siden af ham sender ham ikke ud", fb2.laererIIntro());
     var s2 = fb2.laererLaerredSkala(), Lb = fb2.laerer;
     var hx = Lb.x * s2, hy = (Lb.y + 60) * s2;
@@ -677,14 +699,60 @@ function koer() {
     spring.click();
     koerB(0.2);
     paastand("knappen sender ham ud", !fb2.laererIIntro() && spring.hidden);
-    paastand("replikkerne er to eller tre pr. fane og korte", ["fane-bord", "fane-vand", "fane-ukendt"].every(function (f) {
-        var l = D.INTRO[f].linjer;
-        return l.length >= 2 && l.length <= 3 && l.every(function (x) { return x.length <= 70; });
-    }));
+    koerB(1);
+    paastand("han går ud ad højre kant, og den gule ramme forsvinder", fb2.laerer.x === NK.Kemichael.UDE
+        && NK.Fremhaev.synlige().length === 0, fb2.laerer.x + " / " + NK.Fremhaev.synlige().length);
+    paastand("replikkerne er tre eller fire pr. fane, korte, og hver har noget, der får en ramme",
+        ["fane-bord", "fane-vand", "fane-ukendt"].every(function (f) {
+            var l = D.INTRO[f].linjer, m = D.INTRO[f].maal;
+            return l.length >= 3 && l.length <= 4 && l.every(function (x) { return x.length <= 70; })
+                && m.length === l.length && m.every(function (n) { return NK.sims[f].laererMaalRekt(n).length > 0; });
+        }));
     var skala = fb2.laererLaerredSkala();
-    paastand("Kemichael tegnes i samme størrelse som i sc2.3, og kitlen stopper ved lærredets bund",
-        Math.abs(skala - NK.klamp(fb2.L.h / 600 * 0.92, 0.45, 1.25)) < 1e-9
-        && Math.abs(NK.Scene.GULV - fb2.L.h / skala) < 1e-6, skala + " / " + NK.Scene.GULV);
+    paastand("Kemichael er mindre end i sc2.3, og kitlen stopper ved gulvet",
+        Math.abs(skala - NK.klamp(fb2.L.h / 600 * 0.55, 0.4, 0.8)) < 1e-9
+        && Math.abs(NK.Scene.GULV - fb2.laererGulv() / skala) < 1e-6, skala + " / " + NK.Scene.GULV);
+
+    /* Boblen: i hjørnet og fri af bordet, også med et stort salt paa */
+    function boblerFri(sim) {
+        var ud = [];
+        sim.laerer.x = sim.laererHjoerneX();
+        D.INTRO[sim === fb2 ? "fane-bord" : "fane-ukendt"].linjer.concat(["Start med SO₄. Den kender du."]).forEach(function (l) {
+            var r = sim.laererBoblePlads(l);
+            var fri = r.x + r.b <= sim.L.b && r.y >= 0 && r.x > sim.L.b * 0.5
+                && sim.laererOptaget().filter(Boolean).every(function (o) {
+                    return r.x >= o.x + o.b || r.x + r.b <= o.x || r.y >= o.y + o.h || r.y + r.h <= o.y;
+                });
+            if (!fri) ud.push(l.slice(0, 20) + " @" + Math.round(r.x) + "," + Math.round(r.y));
+        });
+        sim.laerer.x = NK.Kemichael.UDE;
+        return ud;
+    }
+    var Al = D.KATIONER.filter(function (k) { return k.id === "Al"; })[0];
+    var SO4 = D.ANIONER.filter(function (a) { return a.id === "SO4"; })[0];
+    fb2.bord.saet(Al, 2, SO4, 3);
+    koerB(1);
+    var ikkeFri = boblerFri(fb2);
+    paastand("fane 1: boblen står i hjørnet og dækker hverken kortene, mærket eller formlen, også med Al₂(SO₄)₃",
+        !ikkeFri.length, ikkeFri.join("; "));
+    fb2.nulstil();
+    koerB(0.5);
+    var fu4 = NK.sims["fane-ukendt"];
+    d.querySelector('.faneknap[data-fane="fane-ukendt"]').click();
+    for (var t4 = 0; t4 < 30; t4++) { fu4.tilpas(); fu4.opdater(1 / 60); }
+    ikkeFri = boblerFri(fu4);
+    paastand("fane 3: boblen står i hjørnet og dækker hverken bordet eller plakaterne", !ikkeFri.length, ikkeFri.join("; "));
+    var fv4 = NK.sims["fane-vand"];
+    d.querySelector('.faneknap[data-fane="fane-vand"]').click();
+    for (t4 = 0; t4 < 30; t4++) { fv4.tilpas(); fv4.opdater(1 / 60); }
+    fv4.laerer.x = fv4.laererHjoerneX();
+    ikkeFri = D.INTRO["fane-vand"].linjer.filter(function (l) {
+        var r = fv4.laererBoblePlads(l), g = fv4.laererGlas();
+        return !(r.x >= g.x + g.b && r.x + r.b <= fv4.L.b);
+    });
+    fv4.laerer.x = NK.Kemichael.UDE;
+    paastand("fane 2: boblen står til højre for glasset", !ikkeFri.length, ikkeFri.join("; "));
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
     ["fane-vand", "fane-ukendt"].forEach(function (f) {
         var sim = NK.sims[f];
         sim.startIntro(true);

@@ -1,0 +1,220 @@
+# sc4.7 Natron i diglen
+
+Superanimation om natronforsøget: natron varmes i en digel, gas
+forsvinder, og massen, der er tilbage, afgør, hvilken af tre
+reaktioner der sker. Åbn `index.html`. Mappen henter kun filer inde fra
+sig selv, bortset fra Kemichael (`../../v2/kemichael/kemichael.js` og
+`../kemichael/superanimation.js`). Ingen `fetch` og ingen moduler, så den
+virker fra harddisken.
+
+## Bestillingen
+
+1. **Pointen:** massen, der er tilbage i diglen, afgør, hvilken af de tre
+   reaktioner der sker: regn den forventede slutmasse ud for hver
+   hypotese, og se, hvilken vægten rammer.
+2. **Afløser** `kemi-c-filer/c4.7_eksperiment_natron.html` (menuens c4.7
+   "Forsøg: Natron"), brugerens ønske 27. sept. 2026: den gamle var tør,
+   og den nye skulle være mere spændende. Med fra den gamle: hypoteserne
+   Na₂O og Na₂CO₃, den tilfældige startmasse mellem 4,50 og 5,50 g,
+   afstemningen af skemaerne, n(NaHCO₃), stofmængden af produktet ud fra
+   forholdet og massen af produktet, opvarmningen med bunsenbrænder,
+   grafen over massen, mikroniveauet, konklusionen, journalen til
+   udskrift og Snyd-knappen med snydebeviset. Nyt: den tredje hypotese
+   (NaOH), gæt først, konstant masse med rigtige vejninger (vægten viste
+   før massen, mens diglen stod over flammen), lav og høj flamme, der
+   kan få pulveret til at sprøjte, en varm digel, der vejer for lidt,
+   luppen med ionerne, hypotesernes streger på grafen, dommen og fanen
+   Fejlkilder. Ud: at M(NaHCO₃) regnes af atommasserne (sc4.1 ejer
+   molarmassen; den står på tavlen og på natronglasset).
+3. **Naboerne:** `sc4.1` ejer molarmassen, `sc4.3` n = m / M, `sc4.5`
+   mængdeberegningsskemaet og begrænsende mængde, `sc4.11` vejeanalysen
+   med CO₂ fra kalk. c4.8 (ståluld) og c4.9 (lightergas) er andre forsøg.
+   Her bruges kun forholdet fra skemaet og de fire molarmasser.
+4. **Loftet:** 3 faner. Fane 1: 1 digel, 1 trefod, 1 brænder med tre
+   knapper, 1 vægt, 1 lup med 8 Na⁺ og 8 HCO₃⁻, 1 graf, højst 10
+   vejninger. Fane 2: 5 opgaver (natronen, hypotese A, B og C, dommen).
+   Fane 3: 6 fejlkilder, 2 grupper.
+5. **Layoutet:** scene plus panel som `sc4.11`, med den rolige Kemichael
+   ved katederet i et bånd nederst i scenen.
+
+Claude valgte selv faner, tal og den tredje hypotese (27. sept. 2026), og
+den rolige Kemichael som i resten af emne 4, fordi animationen mest er
+regning. Han blander sig ikke: han siger kun noget ved Giv hint og Vis
+svaret, tier, når trinnet er løst, og kan sendes ud. Ingen knapper til
+præsentationen.
+
+Det er en superanimation, ikke en superlab-animation: diglen står klar
+med natron, der er ingen flasker, uheld eller oprydning. Sprøjtet er en
+konsekvens af flammen, ikke et uheld, og eleven kan fortsætte.
+
+## Hvad den viser
+
+| # | Fane | Hvad man gør | Pointe |
+|---|------|--------------|--------|
+| 1 | Forsøget | gætter, aflæser startmassen, varmer, lader diglen køle af, vejer og gentager, til massen er konstant | noget forsvinder som gas, og massen ender et bestemt sted |
+| 2 | Hypoteserne | regner stofmængden af natron og for hver hypotese: afstemning, n(produkt) og m(produkt); så dommen | den hypotese, hvis streg kurven ender på, er den rigtige |
+| 3 | Fejlkilder | gætter, om gruppe 2's slutmasse bliver højere, lavere eller den samme, og ser begge forsøg | vægten kan kun afgøre det, hvis massen er målt rigtigt |
+
+**Forsøget.** Diglen med natron (4,56-5,45 g) står på en vægt, der er
+nulstillet med den tomme digel. Opgaven starter med et gæt: A Na₂O, B
+Na₂CO₃ eller C NaOH. Eleven skriver startmassen i skemaet, trækker diglen
+over på trefoden (eller klikker på den) og tænder brænderen med Lav eller
+Høj under trefoden. 1 sekund er 1 minut; skiltet øverst viser, hvor
+længe diglen har været opvarmet, og dens temperatur. Høj flamme, før
+natronen er kommet i gang, får pulveret til at sprøjte (korn flyver ud,
+linjen siger det, og slutmassen bliver for lav). Sluk og flyt diglen over
+på vægten: en varm digel vejer for lidt, og tallet flakker og står rødt,
+til den er kølet af. Hver vejning skrives i skemaet og bliver et punkt på
+grafen. Massen er konstant, når to vejninger i træk giver det samme, og
+diglen har været rigtig varm imellem (over 200 °C). Luppen viser Na⁺ og
+HCO₃⁻; det, der bliver tilbage, står som ?, og gassen som grå pust, til
+dommen er faldet på fane 2. Derefter viser luppen, at to HCO₃⁻ bliver til
+CO₃²⁻, CO₂ og H₂O. Målingen og gættet huskes i browseren og bruges på
+fane 2 og i journalen. En målt og gemt måling vises færdig; Start forfra
+giver en ny digel med en ny masse.
+
+**Hypoteserne.** Opgaven står over tavlen. 1: n(NaHCO₃) = m / M med
+formlen, mellemregningen i brøkfelter og resultatet med enhed (som
+sc4.3). 2-4: én opgave pr. hypotese. Først afstemmes skemaet med et felt
+foran hvert stof; tomme felter tæller ikke som 1, og tavlen tæller
+atomerne på begge sider. Så n(produkt) = n(NaHCO₃) / 2 (eller
+n(NaHCO₃), når forholdet er 1 : 1) og m(produkt) = n · M. I A skrives
+formlen og hele mellemregningen; i B og C er stilladset mindre: formlen
+for stofmængden skal skrives, resten er kun resultater. Når massen er
+regnet, kommer hypotesens streg på grafen ved siden af elevens vejninger.
+5: dommen. Tre knapper; et forkert valg forklares med forskellen i gram.
+Den rigtige viser skemaet, gættet fra fane 1 og reaktionen som kugler på
+tavlen. Har eleven ikke målt selv, bruges eksemplet (5,21 g → 3,29 g),
+og kortet siger det. Snyd-knappen under opgavelisten udfylder alle
+regneopgaver (dommen skal eleven selv tage), og journalen får et
+snydebevis.
+
+**Fejlkilder.** Gruppe 1 gør det rigtigt: 5,10 g natron, lav flamme i 4
+minutter, så høj, og de vejer, til massen er konstant. Gruppe 2 gør én
+ting anderledes: vejer kun én gang efter 6 minutter (højere), vejer
+diglen varm (lavere), høj flamme fra start (sprøjt, lavere), fugtig
+natron med 0,30 g vand (lavere), 30 minutter mere (det samme) og soda i
+stedet for natron (højere, passer ikke med nogen hypotese). Eleven gætter
+først. Så kører begge forsøg i den samme model som på fane 1, 6 minutter
+pr. sekund, med vejningerne på grafen og hypotesernes streger for 5,10 g.
+Tabellen viser startmasse, slutmasse, tab og den hypotese, massen passer
+med. Forklaringen tager fat i gættet. Et forkert gæt løser opgaven uden
+stjerne. Kør igen gentager.
+
+**Journalen** (knappen i toplinjen eller J) samler gættet, vejningerne,
+de forventede masser, konklusionen og et mærke: snydebevis, eller "uden
+en eneste fejl", hvis eleven har regnet alt uden fejl og uden Vis svaret.
+Den kan udskrives eller gemmes som PDF.
+
+**Påskeæg:** kagen på Kemichaels kateder. Et klik giver en tør bemærkning
+om natron i dejen. Natronglasset svarer også.
+
+Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>J</kbd>
+journal · <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning · <kbd>K</kbd>
+Kemichael siger, hvor man er · <kbd>R</kbd> start forfra eller kør igen ·
+<kbd>Enter</kbd> tjek feltet eller næste opgave · <kbd>Esc</kbd> luk.
+Link til en fane: `index.html#hypoteser`, `index.html#fejl`.
+
+## Filer
+
+```
+index.html          markup for de tre faner, teorien, journalen og rundvisningen
+css/stil.css        alt udseende (kopi af sc4.11; nyt nederst: skemaerne, regnestykket som sc4.3,
+                    afstemningen, snydeknappen og journalen med udskrift). NB: decimaltal med PUNKTUM i CSS
+sprites/            bunsen, trefod_bag og trefod_for (trefoden i to lag, så diglen står i trekanten),
+                    digel, tang, natron og kage (nye); vægten og katederet (som sc4.5), luppen (som sc2.1)
+js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.11)
+js/data.js          atommasserne, stofferne, hypoteserne, prøverne, flammen og opvarmningen, regnetrinene,
+                    fejlkilderne og replikkerne
+js/kemi.js          diglen (opvarmning, reaktion, sprøjt, afkøling, hvad vægten viser), facit og de to
+                    gruppers forløb på fane 3
+js/tjek.js          afstemningen, formlen, mellemregningen og tallet i hvert trin, de typiske fejl og de
+                    pæne beregninger
+js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
+js/tegning.js       rummet, bordet og tavlen, vægten, brænderen med flammen og knapperne, trefoden,
+                    diglen med pulveret, tangen, damp og korn, luppen med ionerne, grafen, skemaet og
+                    atomtællingen, regnestykket med brøkstreger og kuglerne i dommen
+js/laerer.js        Kemichael ved katederet (som sc4.11 og sc4.5)
+js/fane.js          det, fanerne deler: opgavelisten, knappen, linjen i kortet, Kemichael og musen
+js/regning.js       regnetrinene i kortet og tavlen på fane 2
+js/sim_forsoeg.js   fane 1 og målingen, som fane 2 bruger
+js/sim_hypoteser.js fane 2
+js/sim_fejl.js      fane 3
+js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
+js/app.js           faneskift, teorien, journalen, genveje, tegneløkke
+_selvtest.html      udviklerværktøj, indgår ikke i animationen
+_sprites.html       udviklerværktøj: viser tegningerne alene og opstillingen samlet
+```
+
+## At rette i den
+
+**Atommasserne** (`D.ATOMMASSE`), **hypoteserne** (`D.HYP`: stofferne og
+det afstemte skema) og **prøverne** (`D.PROEVER`, valgt så slutmassen
+ligger tydeligt på én hundrededel; selvtesten holder øje) står i
+`js/data.js`. **Opvarmningen** er `D.FLAMME` (lav og høj), `D.TAU`
+(opvarmning og afkøling), `D.K_MAX`, `D.T_START` og `D.T_FULD`;
+**sprøjtet** `D.SPROEJT`; **den varme digel** `D.OPDRIFT` og `D.FLAKKER`;
+**konstant masse** `D.KONSTANT`. **Regnetrinene** er `D.TRIN` (navn,
+enhed, hints til formlen, mellemregningen og tallet), **opgaverne på fane
+2** `D.HYPOTESER` og **fejlkilderne** `D.FEJL`. **Eksemplet**
+(`D.EKSEMPEL`) er regnet af modellen; ændres modellen, skal det regnes om
+(selvtesten siger til). **Replikkerne** står i `D.INTRO`, `D.FAERDIG`,
+`D.ROS`, `D.KAFFE`, `D.KAGE` og `D.KRUKKE`.
+
+**Formlernes regler** (hvad trinnet finder, hvad man kender, de typiske
+fejl) står i `regler` i `js/tjek.js`, **talfejlene** i `kandidater`.
+Formlen tjekkes ved at regne den ud med prøvetal, hvor alle
+sammenhængene passer, så n(NaHCO₃)/2, 0,5 · n(NaHCO₃) og ½ n er det
+samme, og en omskrevet formel godkendes med den isolerede vist.
+
+**`_selvtest.html`** åbner index.html i en iframe og tjekker
+molarmasserne og andelene, at alle prøver ender på 63,08 % med lav flamme
+først og uden sprøjt, at høj flamme fra start sprøjter, at en varm digel
+vejer for lidt, at 30 minutter mere ikke ændrer noget, at eksemplet er
+regnet af modellen, at de seks fejlkilder går den rigtige vej,
+afstemningen, 29 formler og 18 tal med de typiske fejl, sproget, fane 1
+med musen (gæt, forkert startmasse, træk, knapperne, varm vejning,
+konstant masse) og med Vis svaret hele vejen med sprøjt, fane 2 ved at
+skrive og med hint og svar, dommen, journalen og snydebeviset, fane 3
+med alle seks, Kemichael og layoutet fra 520 × 380 til 1500 × 900. Den
+kræver en lokal server eller Chrome med `--allow-file-access-from-files`
+og lægger elevens gemte fremskridt tilbage bagefter. Sidst kørt 27.
+september 2026: ALT OK (76 påstande).
+
+## Forenklinger
+
+* Kun B sker: 2 NaHCO₃ → Na₂CO₃ + CO₂ + H₂O. Na₂CO₃ tåler flammen; det
+  sønderdeles først langt over en bunsenbrænders temperatur.
+* Reaktionen er af første orden i den natron, der er tilbage, med en
+  hastighed, der vokser fra 100 °C til 300 °C og så er konstant. Diglens
+  temperatur glider mod flammens (260 °C ved lav, 430 °C ved høj) og mod
+  stuetemperatur, når den køler af. Tiden er trykket sammen: 1 sekund er 1
+  minut, og en digel er kølet af på ca. 4 minutter.
+* Det sprøjter, når der dannes mere end 0,43 g gas pr. minut; så ryger
+  pulver ud i forhold til, hvor meget det er over grænsen. Det sker kun
+  med høj flamme, før natronen er kommet i gang.
+* Den varme digel: vægten viser 0,0007 g for lidt pr. grad over 30 °C, og
+  det sidste ciffer flakker over 45 °C. I virkeligheden afhænger det af
+  vægten og diglen; retningen er den samme.
+* Luppen er et billede, ikke et antal: 8 Na⁺ og 8 HCO₃⁻, der parvis bliver
+  til CO₃²⁻, og CO₂ og H₂O er hver én kugle. Sammensatte ioner er én kugle
+  med formlen på.
+* Atommasserne har to decimaler (som sc4.1): NaHCO₃ 84,01, Na₂O 61,98,
+  Na₂CO₃ 105,99 og NaOH 40,00 g/mol.
+* Aflæste masser har to decimaler; regnede stofmængder og masser tre
+  betydende cifre, og hvert trin regnes videre med det afrundede tal, som
+  eleven gør. Et tal er rigtigt, når det højst er 1 % fra facit.
+* Dampen over diglen er pynt: CO₂ er usynlig, og vanddampen ses kun, hvor
+  den bliver kølet.
+
+## I menuen
+
+Ja, fra 27. september 2026 (brugerens ønske: "Erstat den gamle animation
+med superanimationen"):
+
+* `animationer/kemi-c-filer/samling_c4.html`: knappen c4.7 "Forsøg:
+  Natron" peger på `../superanimationer/sc4.7_natron/index.html`.
+* Den gamle `c4.7_eksperiment_natron.html` ligger i `kemi-c-filer/arkiv/`
+  som `c4.7_eksperiment_natron_oldversion.html`.
+* Navnet i `FEEDBACK_EMNER` i `animationer/samling_alt.html` er det samme
+  som før ("Forsøg: Natron").

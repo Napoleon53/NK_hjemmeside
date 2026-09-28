@@ -40,6 +40,11 @@
                 </div>
 
                 <div class="svarrad" id="svarrad">
+                    <!-- Hvert nyt svar starter som almindeligt tal; 10-feltet kommer først, når man vælger det -->
+                    <div class="svarmaade" id="svarmaade" role="group" aria-label="Skriv svaret som">
+                        <button type="button" data-maade="alm">Almindeligt tal</button>
+                        <button type="button" data-maade="pot">Videnskabelig notation</button>
+                    </div>
                     <div class="valgt-info" id="valgt-info"></div>
                     <div class="felter" id="felter">
                         <input class="svarfelt" id="svar-m" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Dit svar" placeholder="Svar">
@@ -66,6 +71,8 @@
         <div class="kort opgavekort" id="opgavekort">
             <h2><span id="kort-titel">Tæl cifrene</span><span class="taeller">opgave <b id="kort-nr">1</b>/10</span></h2>
             <div class="vaelgerrad" id="vaelgere" hidden></div>
+            <div class="vaelgerrad niveaurad" id="niveauer" hidden></div>
+            <p class="niveaunote" id="niveaunote" hidden></p>
             <div class="prikker" id="prikker" aria-hidden="true"></div>
             <p class="kort-slut" id="kort-slut" hidden></p>
             <button class="knap stor" id="opgaveknap" type="button">Giv hint</button>
@@ -100,10 +107,10 @@
         <p>Uskreven regel: tal mellem 0,01 og 100 skrives som almindelige tal. Større og mindre tal skrives gerne i videnskabelig notation.</p>
 
         <h3>Enheder</h3>
-        <p>Forstavelsen siger, hvor mange gange større eller mindre enheden er. Kommaet flyttes lige så mange pladser, som der er nuller.</p>
-        <div class="eksempel">k = 1000 &nbsp;·&nbsp; h = 100 &nbsp;·&nbsp; d = 1/10 &nbsp;·&nbsp; m = 1/1000 &nbsp;·&nbsp; µ = 1/1 000 000</div>
-        <div class="eksempel">1 L = 1000 mL = 1 000 000 µL &nbsp;·&nbsp; 1 L = 10 dL &nbsp;·&nbsp; 1 kg = 1000 g &nbsp;·&nbsp; 1 mol = 1000 mmol &nbsp;·&nbsp; 1 kPa = 1000 Pa</div>
-        <div class="eksempel">1 L = 1 dm³ &nbsp;·&nbsp; 1 mL = 1 cm³ &nbsp;·&nbsp; 1 m³ = 1000 L</div>
+        <p>Forstavelsen siger, hvor mange gange større eller mindre enheden er. Kommaet flyttes lige så mange pladser, som der er nuller. De vigtigste i kemi er k, m og µ.</p>
+        <div class="eksempel">k (kilo) = 1000 &nbsp;·&nbsp; m (milli) = 1/1000 &nbsp;·&nbsp; µ (mikro) = 1/1 000 000</div>
+        <div class="eksempel">1 kg = 1000 g = 1 000 000 mg &nbsp;·&nbsp; 1 L = 1000 mL = 1 000 000 µL &nbsp;·&nbsp; 1 mol = 1000 mmol</div>
+        <div class="eksempel">Sjældne: M (mega) = 1 000 000 &nbsp;·&nbsp; h (hekto) = 100 &nbsp;·&nbsp; da (deka) = 10 &nbsp;·&nbsp; d (deci) = 1/10 &nbsp;·&nbsp; c (centi) = 1/100 &nbsp;·&nbsp; n (nano) = 1/1 000 000 000</div>
 
         <h3>Afrunding</h3>
         <p>Tæl cifrene fra det første, der ikke er nul. Er det næste ciffer 5 eller mere, rundes der op.</p>
@@ -114,7 +121,7 @@
         <div class="eksempel">2,5 · 4,00 = 10 (2 betydende cifre, lige som 2,5)</div>
 
         <h3>Genveje</h3>
-        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> ny runde &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>K</kbd> Kemichael &nbsp;·&nbsp; <kbd>Esc</kbd> luk. I svarfeltet springer <kbd>e</kbd> eller <kbd>^</kbd> til eksponenten.</p>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> ny runde &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>K</kbd> Kemichael &nbsp;·&nbsp; <kbd>Esc</kbd> luk. I svarfeltet skifter <kbd>e</kbd> eller <kbd>^</kbd> til videnskabelig notation og springer til eksponenten.</p>
 
         <div class="knapper" style="margin-top:16px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>

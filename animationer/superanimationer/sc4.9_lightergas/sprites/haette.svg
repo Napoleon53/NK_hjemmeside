@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="34" viewBox="0 0 28 34">
+  <!-- Lighterens haette (vindskaerm af blank metal) set forfra.
+       Den sidder over dysen og justeringsringen: filens (0, 0) er
+       lighterens (10, 14). Spalten i toppen er x 9-19. -->
+  <defs>
+    <linearGradient id="krom" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7c8691"/>
+      <stop offset="0.25" stop-color="#f4f7fa"/>
+      <stop offset="0.55" stop-color="#c3ccd5"/>
+      <stop offset="0.8" stop-color="#eef2f6"/>
+      <stop offset="1" stop-color="#6b7580"/>
+    </linearGradient>
+  </defs>
+  <path d="M1 34 L1 6 Q1 1 6 1 L22 1 Q27 1 27 6 L27 34 Z" fill="url(#krom)" stroke="#4f5862" stroke-width="1"/>
+  <rect x="9" y="0.5" width="10" height="4.5" rx="1.2" fill="#1d2127"/>
+  <!-- Huller til luften -->
+  <g fill="#2b3037">
+    <circle cx="7" cy="12" r="1.4"/><circle cx="14" cy="12" r="1.4"/><circle cx="21" cy="12" r="1.4"/>
+    <circle cx="7" cy="18" r="1.4"/><circle cx="14" cy="18" r="1.4"/><circle cx="21" cy="18" r="1.4"/>
+  </g>
+  <!-- Den nederste kant, der er klemt om kraven -->
+  <rect x="0.5" y="28" width="27" height="5.5" rx="1" fill="#9aa4ae" stroke="#4f5862" stroke-width="0.8"/>
+  <rect x="3" y="3" width="2" height="24" rx="1" fill="#ffffff" fill-opacity="0.55"/>
+</svg>

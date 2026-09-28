@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Natron i diglen</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Natron i diglen</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-forsoeg" role="tab" aria-selected="true"><span class="nr">1</span>Forsøget</button>
+        <button class="faneknap" data-fane="fane-hypoteser" role="tab" aria-selected="false"><span class="nr">2</span>Hypoteserne</button>
+        <button class="faneknap" data-fane="fane-fejl" role="tab" aria-selected="false"><span class="nr">3</span>Fejlkilder</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="journalknap" type="button" title="Din journal (J)">Journal</button>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FORSOEGET                                                  -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
+    <div class="scene">
+        <canvas id="forsoeg-laerred"></canvas>
+        <div class="anker" id="forsoeg-anker-opstilling"></div>
+        <div class="anker" id="forsoeg-anker-knapper"></div>
+        <div class="anker" id="forsoeg-anker-vaegt"></div>
+        <div class="anker" id="forsoeg-anker-zoom"></div>
+        <div class="anker" id="forsoeg-anker-graf"></div>
+        <div class="anker" id="forsoeg-anker-laerer"></div>
+        <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny digel med natron (R)">Start forfra ↺</button>
+        <div class="kboble" id="forsoeg-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="forsoeg-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Videre -->
+        <div class="kort opgavekort" id="forsoeg-kort">
+            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">opgave <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">1</span></span></h2>
+            <div id="forsoeg-prompt"></div>
+            <div class="knaprad valgrad" id="forsoeg-valg" hidden></div>
+            <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="forsoeg-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="forsoeg-skema">
+            <h2>Vejningerne</h2>
+            <table class="skema vejeskema">
+                <thead><tr><th></th><th>Opvarmet</th><th>Masse</th></tr></thead>
+                <tbody id="forsoeg-tbody"></tbody>
+            </table>
+            <p class="note" id="forsoeg-note"></p>
+        </div>
+
+        <div class="kort" id="forsoeg-opgaver">
+            <h2>Opgaven <span class="taeller">løst <b id="forsoeg-loest">0</b>/1</span></h2>
+            <div class="hyldeliste" id="forsoeg-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: HYPOTESERNE                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-hypoteser" role="tabpanel" aria-label="Hypoteserne">
+    <div class="scene">
+        <canvas id="hypoteser-laerred"></canvas>
+        <div class="anker" id="hypoteser-anker-tavle"></div>
+        <div class="anker" id="hypoteser-anker-graf"></div>
+        <div class="anker" id="hypoteser-anker-laerer"></div>
+        <div class="kboble" id="hypoteser-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="hypoteser-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="hypoteser-kort">
+            <h2><span id="hypoteser-titel">Opgave</span><span class="taeller">opgave <b id="hypoteser-nr">1</b>/<span id="hypoteser-antal">5</span></span></h2>
+            <div id="hypoteser-prompt"></div>
+            <div class="raekker" id="hypoteser-raekker"></div>
+            <div class="knaprad valgrad" id="hypoteser-valg" hidden></div>
+            <p class="besked" id="hypoteser-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="hypoteser-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="hypoteser-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="hypoteser-loest">0</b>/5</span></h2>
+            <div class="hyldeliste" id="hypoteser-liste"></div>
+            <button class="snydknap" id="hypoteser-snyd" type="button" title="Udfylder alle beregninger. Det står i journalen.">Snyd (udfyld alt)</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FEJLKILDER                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fejl" role="tabpanel" aria-label="Fejlkilder">
+    <div class="scene">
+        <canvas id="fejl-laerred"></canvas>
+        <div class="anker" id="fejl-anker-g1"></div>
+        <div class="anker" id="fejl-anker-g2"></div>
+        <div class="anker" id="fejl-anker-graf"></div>
+        <div class="anker" id="fejl-anker-laerer"></div>
+        <button class="forfraknap" id="fejl-forfra" type="button" title="De samme to forsøg en gang til (R)">Kør igen ↺</button>
+        <div class="kboble" id="fejl-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="fejl-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="fejl-kort">
+            <h2><span id="fejl-titel">Opgave</span><span class="taeller">opgave <b id="fejl-nr">1</b>/<span id="fejl-antal">6</span></span></h2>
+            <div id="fejl-prompt"></div>
+            <div class="knaprad valgrad" id="fejl-valg" hidden></div>
+            <p class="besked" id="fejl-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fejl-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="fejl-resultat">
+            <h2>Resultaterne</h2>
+            <table class="skema tal" id="fejl-tabel">
+                <thead><tr><th></th><th>Gruppe 1</th><th>Gruppe 2</th></tr></thead>
+                <tbody>
+                    <tr><th>Før</th><td id="fejl-t-mf-1"></td><td id="fejl-t-mf-2"></td></tr>
+                    <tr class="slut"><th>Slutmasse</th><td id="fejl-t-slut-1"></td><td id="fejl-t-slut-2"></td></tr>
+                    <tr><th>Tabt</th><td id="fejl-t-tab-1"></td><td id="fejl-t-tab-2"></td></tr>
+                    <tr><th>Passer med</th><td id="fejl-t-hyp-1"></td><td id="fejl-t-hyp-2"></td></tr>
+                </tbody>
+            </table>
+            <p class="note">Hypotese A giver 1,88 g, B 3,22 g og C 2,43 g, når man starter med 5,10 g natron.</p>
+        </div>
+
+        <div class="kort" id="fejl-opgaver">
+            <h2>Fejlkilderne <span class="taeller">løst <b id="fejl-loest">0</b>/6</span></h2>
+            <div class="hyldeliste" id="fejl-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Natron i diglen</h2>
+        <p>Natron er natriumhydrogencarbonat, NaHCO₃. Det bruges i bagepulver. Når natron varmes op, dannes der gas, som forlader diglen, og et fast stof bliver tilbage.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Tre hypoteser (ikke afstemt)</span>
+            A: NaHCO₃ → Na₂O + CO₂ + H₂O<br>
+            B: NaHCO₃ → Na₂CO₃ + CO₂ + H₂O<br>
+            C: NaHCO₃ → NaOH + CO₂
+        </div>
+        <p>Hver hypotese giver sin egen masse af fast stof. Den hypotese, hvis masse passer med vægten, er den rigtige.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Sådan regnes den forventede masse</span>
+            n(NaHCO₃) = <span class="broek"><span>m(NaHCO₃)</span><span>M(NaHCO₃)</span></span>&nbsp;&nbsp;&nbsp;
+            n(produkt) = n(NaHCO₃) · forholdet i skemaet&nbsp;&nbsp;&nbsp;
+            m(produkt) = n(produkt) · M(produkt)
+        </div>
+        <p><b>Konstant masse.</b> Varm, lad diglen køle af, og vej den. Gentag, til to vejninger i træk giver det samme. Så er al natronen omdannet.</p>
+        <p><b>Varm digel.</b> En varm digel vejer for lidt: varm luft stiger op fra den og løfter den en smule. Vent, til vægten står stille.</p>
+        <p><b>Lav flamme først.</b> Dannes gassen for hurtigt, sprøjter pulveret ud af diglen, og så bliver slutmassen for lav.</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- JOURNALEN (knappen Journal eller J), kan udskrives                -->
+<!-- ================================================================= -->
+<div class="overlay" id="journal">
+    <div class="overlay-boks journal">
+        <div id="journal-indhold"></div>
+        <div class="knapper journal-knapper">
+            <button class="knap blaa" type="button" id="journal-print" style="justify-content:center;">Udskriv eller gem som PDF</button>
+            <button class="knap" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/regning.js"></script>
+<script src="js/sim_forsoeg.js"></script>
+<script src="js/sim_hypoteser.js"></script>
+<script src="js/sim_fejl.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -268,7 +268,7 @@
        Typerne er de fem fra den gamle c4.10: tael (optaelling), afrund
        (afrunding), potens og almindelig (notation begge veje), regn
        (regneregler, nu ogsaa division) og enhed (mL, L og µL i den gamle,
-       nu ogsaa masse, stofmaengde, koncentration og tryk).
+       nu g, L og mol med forstavelser i fire niveauer).
        runde er fanens runde; den husker, om der har vaeret en opgave med
        ét betydende ciffer (hoejst én pr. runde, som i den gamle).
        ================================================================================= */
@@ -434,31 +434,37 @@
     }
 
     /* ----- Enheder ----------------------------------------------------------------------
-       Den gamle havde mL, L og µL. Nu fem slags maengder, alle med
-       forstavelser, saa kommaet flyttes (brugerens oenske 25. sept. 2026).
-       eksp er enhedens tierpotens i forhold til grundenheden. vaegt er,
-       hvor ofte slagsen kommer; volumen oftest, som i den gamle. Et par
-       med samme potens (mL og cm³) og et spring paa mere end 10⁶ bruges
-       ikke. */
-    C.ENHEDER = {
-        volumen: { vaegt: 3, eksp: { "m³": 3, "L": 0, "dm³": 0, "dL": -1, "mL": -3, "cm³": -3, "µL": -6 } },
-        masse: { vaegt: 2, eksp: { "kg": 3, "g": 0, "mg": -3, "µg": -6 } },
-        stofmaengde: { vaegt: 2, eksp: { "mol": 0, "mmol": -3, "µmol": -6 } },
-        koncentration: { vaegt: 1, eksp: { "mol/L": 0, "mmol/L": -3, "µmol/L": -6 } },
-        tryk: { vaegt: 1, eksp: { "kPa": 3, "hPa": 2, "Pa": 0 } }
-    };
+       Kun g, L og mol med forstavelser, i fire niveauer med stigende
+       svaerhedsgrad (brugerens oenske 27. sept. 2026; tryk og m³ er ude):
+         let     kilo og milli: kg, g, mg, L og mL, ét trin paa 1000
+         middel  ogsaa mikro og mol: µg, µL, mol, mmol og µmol, op til 10⁶
+         svaer   ogsaa mol/L, mmol/L og µmol/L, og tal med mange nuller
+         meget   alle forstavelser fra M til n (laases op i js/fane.js)
+       I hvert niveau handler de fleste opgaver om det, der er nyt i
+       niveauet (NY_ANDEL). Et spring paa mere end 10⁶ bruges ikke. */
+    C.FORSTAVELSER = { "M": 6, "k": 3, "h": 2, "da": 1, "": 0, "d": -1, "c": -2, "m": -3, "µ": -6, "n": -9 };
+    C.FORSTAVELSE_NAVN = { "M": "mega", "k": "kilo", "h": "hekto", "da": "deka", "d": "deci", "c": "centi", "m": "milli", "µ": "mikro", "n": "nano" };
+    C.GRUND_SLAGS = { "g": "masse", "L": "volumen", "mol": "stofmaengde", "mol/L": "koncentration" };
 
-    /* Tallene i hver enhed, saa de ligner rigtige maengder: 250 mL, 1,5 L
-       og 500 µL (som i den gamle), 0,025 mol, 101,3 kPa, 1013 hPa. hel:
-       antal cifre foran kommaet (0: tallet er under 1). dec: antal
+    C.NIVEAU_RAEKKE = ["let", "middel", "svaer", "meget"];
+    C.NIVEAUER = {
+        let: { "g": ["k", "", "m"], "L": ["", "m"] },
+        middel: { "g": ["k", "", "m", "µ"], "L": ["", "m", "µ"], "mol": ["", "m", "µ"] },
+        svaer: { "g": ["k", "", "m", "µ"], "L": ["", "m", "µ"], "mol": ["", "m", "µ"], "mol/L": ["", "m", "µ"] },
+        meget: {
+            "g": ["M", "k", "h", "da", "", "d", "c", "m", "µ", "n"], "L": ["h", "", "d", "c", "m", "µ", "n"],
+            "mol": ["k", "", "m", "µ", "n"], "mol/L": ["", "m", "µ", "n"]
+        }
+    };
+    var NY_ANDEL = { let: 1, middel: 0.75, svaer: 0.4, meget: 0.85 };
+
+    /* Tallene i hver enhed paa Let og Middel, saa de ligner rigtige
+       maengder: 250 mL, 1,5 L og 500 µL (som i den gamle), 0,025 mol.
+       hel: antal cifre foran kommaet (0: tallet er under 1). dec: antal
        decimaler (et vaelges). Er der flere, vaelges et af dem. */
     var ENHED_TAL = {
-        "m³": [{ hel: 1, dec: [1, 2] }],
         "L": [{ hel: 1, dec: [1, 2, 2] }],
-        "dm³": [{ hel: 1, dec: [1, 2, 2] }],
-        "dL": [{ hel: 1, dec: [0, 1] }],
         "mL": [{ hel: 3, dec: [0, 0, 1] }],
-        "cm³": [{ hel: 3, dec: [0, 0, 1] }],
         "µL": [{ hel: 4, dec: [0, 0, 0] }],
         "kg": [{ hel: 1, dec: [1, 2, 3] }],
         "g": [{ hel: 2, dec: [1, 2] }, { hel: 0, dec: [2, 3] }],
@@ -469,53 +475,82 @@
         "µmol": [{ hel: 3, dec: [0] }],
         "mol/L": [{ hel: 0, dec: [2, 3, 4] }, { hel: 1, dec: [2, 3] }],
         "mmol/L": [{ hel: 2, dec: [0, 1] }, { hel: 3, dec: [0] }],
-        "µmol/L": [{ hel: 3, dec: [0] }],
-        "kPa": [{ hel: 3, dec: [0, 1] }],
-        "hPa": [{ hel: 4, dec: [0] }],
-        "Pa": [{ hel: 6, dec: [0] }]
+        "µmol/L": [{ hel: 3, dec: [0] }]
     };
 
-    C.ENHED_EKSP = {};
-    Object.keys(C.ENHEDER).forEach(function (s) {
-        var e = C.ENHEDER[s].eksp;
-        Object.keys(e).forEach(function (n) { C.ENHED_EKSP[n] = e[n]; });
-    });
-
-    function vaelgSlags() {
-        var navne = Object.keys(C.ENHEDER), sum = 0, r;
-        navne.forEach(function (n) { sum += C.ENHEDER[n].vaegt; });
-        r = C.rnd() * sum;
-        for (var i = 0; i < navne.length; i++) {
-            r -= C.ENHEDER[navne[i]].vaegt;
-            if (r < 0) return navne[i];
-        }
-        return navne[0];
+    /* Er forstavelsen ny i niveauet (ikke med i niveauet foer)? */
+    function erNy(niveau, grund, f) {
+        var i = C.NIVEAU_RAEKKE.indexOf(niveau);
+        if (i <= 0) return true;
+        var foer = C.NIVEAUER[C.NIVEAU_RAEKKE[i - 1]][grund];
+        return !foer || foer.indexOf(f) < 0;
     }
 
-    function lavEnhed(slags) {
-        var e, enheder, fra, til, k;
-        slags = slags || vaelgSlags();
-        e = C.ENHEDER[slags].eksp;
-        enheder = Object.keys(e);
+    /* To enheder af samme slags. De foerste tre opgaver i en runde paa
+       Let gaar fra stor til lille enhed, saa tallet bliver stoerre. */
+    function vaelgPar(niveau, runde) {
+        var grund = C.NIVEAUER[niveau], navne = Object.keys(grund);
+        var nyt = C.rnd() < NY_ANDEL[niveau], maks = niveau === "let" ? 3 : 6;
+        var g, a, b, k, ok, forsoeg = 0;
         do {
-            fra = vaelg(enheder);
-            til = vaelg(enheder);
-            k = e[fra] - e[til];
-        } while (k === 0 || Math.abs(k) > 6);
-        var o = vaelg(ENHED_TAL[fra]);
+            g = vaelg(navne);
+            a = vaelg(grund[g]);
+            b = vaelg(grund[g]);
+            k = C.FORSTAVELSER[a] - C.FORSTAVELSER[b];
+            ok = k !== 0 && Math.abs(k) <= maks;
+            if (ok && nyt && niveau !== "let") ok = erNy(niveau, g, a) || erNy(niveau, g, b) || (niveau === "middel" && Math.abs(k) === 6);
+            if (ok && niveau === "let" && runde && runde.nr < 3) ok = k > 0;
+            forsoeg++;
+        } while (!ok && forsoeg < 300);
+        return { grund: g, fraF: a, tilF: b, fra: a + g, til: b + g, k: k };
+    }
+
+    /* Et tal med sf betydende cifre og det foerste ciffer paa plads p */
+    function talMedCifre(sf, p) {
+        var s = String(heltal(1, 9));
+        for (var i = 1; i < sf; i++) s += heltal(0, 9);
+        return C.almindelig(tal(s.replace(/0+$/, ""), p, false));
+    }
+
+    /* Tallet foran enheden. Svær har mest tal med mange nuller (0,0045
+       eller 45 000), og Meget svær har korte tal fra 0,01 til 999. */
+    function enhedTal(niveau, enhed) {
+        if (niveau === "meget" || !ENHED_TAL[enhed]) return talMedCifre(heltal(1, 3), heltal(-2, 2));
+        if (niveau === "svaer" && C.rnd() < 0.6) return talMedCifre(heltal(1, 2), vaelg([-4, -3, -2, 3, 4]));
+        var o = vaelg(ENHED_TAL[enhed]);
         var d = vaelg(o.dec);
         var h = o.hel > 0 ? Math.floor(C.rnd() * (Math.pow(10, o.hel) - 1)) + 1 : 0;
         var rest = d > 0 ? Math.floor(C.rnd() * Math.pow(10, d)) : 0;
         if (!h && !rest) rest = 1;
-        var base = tekstAf((h + rest / Math.pow(10, d)).toFixed(d));
-        var t = C.fraTekst(base);
+        return tekstAf((h + rest / Math.pow(10, d)).toFixed(d));
+    }
+
+    /* niveau: let, middel, svaer eller meget. Uden niveau (Blandet)
+       vaelges et af de tre foerste. Tallet og facit holdes paa hoejst 8
+       og 9 tegn, saa de kan staa paa tavlen. */
+    function lavEnhed(niveau, runde) {
+        if (!C.NIVEAUER[niveau]) niveau = vaelg(["let", "let", "middel", "middel", "svaer"]);
+        var par, base, t, facit, forsoeg = 0;
+        do {
+            par = vaelgPar(niveau, runde);
+            base = enhedTal(niveau, par.fra);
+            t = C.fraTekst(base);
+            facit = C.lommeregner(tal(t.s, t.p + par.k, false));
+            forsoeg++;
+        } while ((base.length > 8 || C.almindelig(facit).length > 9) && forsoeg < 80);
         return {
-            type: "enhed", spm: "Omregn til " + til + ".", slags: slags,
-            vis: base, tal: t, fra: fra, til: til, k: k,
-            facit: C.lommeregner(tal(t.s, t.p + k, false))
+            type: "enhed", spm: "Omregn til " + par.til + ".", slags: C.GRUND_SLAGS[par.grund], niveau: niveau,
+            grund: par.grund, fraF: par.fraF, tilF: par.tilF,
+            vis: base, tal: t, fra: par.fra, til: par.til, k: par.k, facit: facit
         };
     }
     C.lavEnhed = lavEnhed;
+
+    /* Forstavelsen med navn og vaerdi: "h er hekto (100)", "µ er mikro (1/1 000 000)" */
+    C.forstavelseTekst = function (f) {
+        var p = C.FORSTAVELSER[f], v = C.skillerum("1" + nuller(Math.abs(p)));
+        return f + " er " + C.FORSTAVELSE_NAVN[f] + " (" + (p < 0 ? "1/" : "") + v + ")";
+    };
 
     /* 1 kg = 1000 g: den store enhed udtrykt i den lille */
     C.enhedRelation = function (opg) {
@@ -532,7 +567,7 @@
         if (type === "afrund") return lavAfrund(runde);
         if (type === "regn") return lavRegn();
         if (type === "potens" || type === "almindelig") return lavNotation(type);
-        if (type === "enhed") return lavEnhed();
+        if (type === "enhed") return lavEnhed(valg.niveau, runde);
         return null;
     };
 
@@ -582,7 +617,7 @@
             }
             if (k > n && !sv.potens && !C.kanAlmindelig(f)) {
                 return { ok: false, besked: "Tallet er rigtigt, men " + C.skillerum(C.almindelig(u)) + " har " + cifre(k) +
-                    ". Nullerne til sidst tæller med. Brug feltet ved 10-tallet, så de forsvinder." };
+                    ". Nullerne til sidst tæller med. Skriv det i videnskabelig notation, så de forsvinder." };
             }
             if (faktorTekst) return { ok: false, besked: "Tallet er rigtigt, men svaret skal have " + cifre(n) + ", lige som " + faktorTekst + ". Dit har " + k + "." };
             if (k < n) return { ok: false, besked: "Tallet er rigtigt, men det har kun " + cifre(k) + ". Det skal have " + n + ". Nuller til sidst efter kommaet tæller med." };
@@ -737,7 +772,7 @@
         }
         if (opg.type === "afrund") {
             return "Tæl " + opg.n + " cifre fra det første, der ikke er nul. Se så på det næste ciffer: er det 5 eller mere, rundes der op." +
-                (C.kanAlmindelig(opg.facit) ? "" : " Et almindeligt tal får her for mange cifre, så brug feltet ved 10-tallet.");
+                (C.kanAlmindelig(opg.facit) ? "" : " Et almindeligt tal får her for mange cifre, så skriv svaret i videnskabelig notation.");
         }
         if (opg.type === "regn") {
             return "Det tal i regnestykket, der har færrest betydende cifre, bestemmer. Regn ud, og afrund til " +
@@ -752,7 +787,10 @@
             return "10<sup>" + eksTekst(opg.eksp) + "</sup> betyder, at kommaet flyttes " + pladser(Math.abs(opg.eksp)) +
                 " til " + venstreHoejre(opg.eksp) + ". Mangler der cifre, fyldes der nuller på.";
         }
-        return C.enhedRelation(opg) + ". Kommaet flyttes lige så mange pladser, som der er nuller. Tænk over, om tallet skal blive større eller mindre.";
+        /* Meget svær: de sjældne forstavelser med navn og værdi foran forholdet */
+        var sjaeldne = opg.niveau === "meget" ? [opg.fraF, opg.tilF].filter(function (f) { return f && erNy("meget", opg.grund, f); }) : [];
+        var fs = sjaeldne.length ? sjaeldne.map(C.forstavelseTekst).join(", og ") + ". " : "";
+        return fs + C.enhedRelation(opg) + ". Kommaet flyttes lige så mange pladser, som der er nuller. Tænk over, om tallet skal blive større eller mindre.";
     };
 
     C.svar = function (opg) {

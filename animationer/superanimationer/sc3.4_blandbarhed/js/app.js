@@ -88,6 +88,7 @@
         if (t === "e") { bassin.haeld("ethanol"); return; }
         if (t === "o") { bassin.haeld("olie"); return; }
         if (t === "r") { bassin.toem(); return; }
+        if (t === "d") { bassin.skiftKoeler(); return; }
         if (e.key === " ") { e.preventDefault(); bassin.ryst(1.2); return; }
         if (e.key === "ArrowUp" || e.key === "ArrowRight") { e.preventDefault(); saetT(bassin.m.T + 5); return; }
         if (e.key === "ArrowDown" || e.key === "ArrowLeft") { e.preventDefault(); saetT(bassin.m.T - 5); return; }
@@ -125,6 +126,12 @@
             }(stofknapper[i]));
         }
         NK.el("ryst").addEventListener("click", function () { bassin.ryst(1.2); });
+        var koelerknapper = document.querySelectorAll(".koelerknap");
+        for (i = 0; i < koelerknapper.length; i++) {
+            (function (k) {
+                k.addEventListener("click", function () { bassin.saetKoeler(k.getAttribute("data-koeler")); });
+            }(koelerknapper[i]));
+        }
         NK.el("toem").addEventListener("click", function () { bassin.toem(); });
         NK.el("temp").addEventListener("input", function () { saetT(parseInt(NK.el("temp").value, 10)); });
 

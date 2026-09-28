@@ -15,11 +15,11 @@
     var TAVLE_TAEL = { sel: "#tavle", titel: "Tavlen", tekst: "Tallet i opgaven. Klik på de cifre, der er betydende. Et klik mere fjerner dem igen." };
     var TAVLE = { sel: "#tavle", titel: "Tavlen", tekst: "Tallet i opgaven. Du kan klikke på cifrene for at tælle dem. Når svaret er rigtigt, viser tavlen hvorfor." };
     var TJEK_TAEL = { sel: "#svarrad", titel: "Tjek", tekst: "Her står, hvor mange cifre du har valgt. Tryk Tjek, eller Enter." };
-    var SVAR = { sel: "#svarrad", titel: "Svaret", tekst: "Skriv tallet med komma, og tryk Tjek eller Enter. En eksponent skrives i det lille felt ved 10-tallet; ± skifter fortegnet." };
+    var SVAR = { sel: "#svarrad", titel: "Svaret", tekst: "Skriv tallet med komma, og tryk Tjek eller Enter. Over feltet vælger du almindeligt tal eller videnskabelig notation. Eksponenten skrives i det lille, hævede felt; ± skifter fortegnet." };
     var LINJE = { sel: "#besked", titel: "Linjen", tekst: "Her står, hvad der gik galt, og hvorfor et svar er rigtigt." };
     var KORT = { sel: "#opgavekort", titel: "Opgaven", tekst: "Ti opgaver i en runde. Knappen giver først et hint, så svaret og til sidst en ny opgave." };
     var VAELG_AFRUND = { sel: "#vaelgere", titel: "To slags opgaver", tekst: "Måletal, der skal afrundes, eller regnestykker, hvor svaret skal afrundes. Et skift starter en ny runde." };
-    var VAELG_KOMMA = { sel: "#vaelgere", titel: "To slags opgaver", tekst: "Videnskabelig notation begge veje, eller enheder for volumen, masse, stofmængde, koncentration og tryk. Et skift starter en ny runde." };
+    var VAELG_KOMMA = { sel: "#vaelgere, #niveauer, #niveaunote", titel: "To slags opgaver", tekst: "Videnskabelig notation begge veje, eller enheder. Enhederne har fire niveauer; Meget svær låses op, når du har klaret en runde med mindst 7 rigtige på de tre andre. Et skift starter en ny runde." };
     var RUNDE = { sel: "#rundekort", titel: "Runden", tekst: "De løste opgaver med facit. Grøn er rigtigt i første forsøg, gul med hjælp og rød, når svaret blev vist." };
     var LAERER = { sel: "#anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når opgaven er løst." };
     var KKNAP = { sel: "#kknap", titel: "Send ham ud", tekst: "Så står hintene i linjen under svarfeltet i stedet. Samme knap henter ham igen." };

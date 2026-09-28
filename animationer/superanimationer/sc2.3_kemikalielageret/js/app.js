@@ -141,7 +141,7 @@
            det nye sæt fra naeste glas */
         var svaerKnap = NK.el("svaer-knap");
         svaerKnap.checked = NK.indstil.svaer;
-        NK.el("svaer-kontakt").title = "Seks glas får sværere ioner: " + NK.Data.SVAER_IONER;
+        NK.el("svaer-kontakt").title = NK.Data.stort(NK.Data.SVAER_ANTAL_ORD) + " glas får sværere ioner: " + NK.Data.SVAER_IONER;
         svaerKnap.addEventListener("change", function () {
             NK.indstil.svaer = svaerKnap.checked;
             NK.gem("nk-sc2.3-svaer", NK.indstil.svaer);

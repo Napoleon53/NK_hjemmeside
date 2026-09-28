@@ -37,6 +37,12 @@
         FILER[navn] = { fil: navn + ".svg", b: MAAL[navn].b, h: MAAL[navn].h };
     });
 
+    /* Faremaerkerne: FN's GHS-piktogrammer, kopieret fra laboratoriet i
+       NK_Undervisning (kilde og licens i sprites/ghs/KILDE.md). Romben
+       fylder hele filens kvadrat. */
+    FILER.ghs_giftig = { fil: "GHS-pictogram-skull.svg", mappe: "sprites/ghs/", b: 64, h: 64 };
+    FILER.ghs_sundhedsskadelig = { fil: "GHS-pictogram-exclam.svg", mappe: "sprites/ghs/", b: 64, h: 64 };
+
     /* Har en post sin egen mappe, hentes filen derfra. */
     function indlaes(navn, f) {
         var sti = (f.mappe || MAPPE) + f.fil;

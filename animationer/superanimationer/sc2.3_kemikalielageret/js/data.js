@@ -115,6 +115,13 @@
     ion({ id: "CO3", formel: "CO3", q: -2, navn: "carbonat", sammensat: true });
     ion({ id: "PO4", formel: "PO4", q: -3, navn: "phosphat", sammensat: true });
 
+    /* Kun med Sværere ioner: dem, der bruges på B-niveau (redox, Mohr,
+       thiosulfat og syre) */
+    ion({ id: "MnO4", formel: "MnO4", q: -1, navn: "permanganat", sammensat: true });
+    ion({ id: "S2O3", formel: "S2O3", q: -2, navn: "thiosulfat", sammensat: true });
+    ion({ id: "CrO4", formel: "CrO4", q: -2, navn: "chromat", sammensat: true });
+    ion({ id: "Cr2O7", formel: "Cr2O7", q: -2, navn: "dichromat", sammensat: true });
+
     /* Det, der kan regnes ud af hver ion */
     Object.keys(IONER).forEach(function (id) {
         var i = IONER[id];
@@ -140,12 +147,13 @@
     D.IONER = IONER;
     D.ion = function (id) { return IONER[id]; };
 
-    /* De sammensatte ioner paa plakaten, i den raekkefoelge de staar der.
-       HCO3- er ikke blandt kompendiets seks vigtige og kommer kun med,
-       naar Sværere ioner er slaaet til. */
-    D.PLAKAT_IONER = ["NH4", "OH", "NO3", "HCO3", "SO4", "CO3", "PO4"];
+    /* De sammensatte ioner paa plakaten, i den raekkefoelge de staar der
+       (efter ladning). Kompendiets seks vigtige staar der altid; resten
+       kommer kun med, naar Sværere ioner er slaaet til. */
+    D.PLAKAT_IONER = ["NH4", "OH", "NO3", "HCO3", "MnO4", "SO4", "CO3", "S2O3", "CrO4", "Cr2O7", "PO4"];
+    var PLAKAT_SVAER = ["HCO3", "MnO4", "S2O3", "CrO4", "Cr2O7"];
     D.plakatIoner = function (svaer) {
-        return D.PLAKAT_IONER.filter(function (id) { return svaer || id !== "HCO3"; });
+        return D.PLAKAT_IONER.filter(function (id) { return svaer || PLAKAT_SVAER.indexOf(id) < 0; });
     };
 
     /* Kontakten Sværere ioner. Huskes i browseren. */
@@ -159,7 +167,7 @@
         { navn: "Sammensatte ioner", kort: "begge veje", farve: "#3fae72" }
     ];
 
-    /* ----- De 30 stoffer og de 6 sværere -----------------------------
+    /* ----- De 30 stoffer og de 11 sværere ----------------------------
        [positiv ion, negativ ion, retning, hylde, farve, form, fakta]
        retning "formel": etiketten har navnet, og eleven skriver formlen.
        retning "navn":   etiketten har formlen, og eleven skriver navnet.
@@ -179,7 +187,7 @@
         ["Ba", "F", "formel", 0, "#f3f3f3", "pulver", "Linser, der lukker infrarødt lys igennem."],
         ["Li", "N", "formel", 0, "#b8485e", "pulver", "Dannes, når lithium reagerer med luftens nitrogen."],
         ["Ca", "Cl", "formel", 0, "#f5f4f0", "krystal", "Vejsalt, der virker ved lavere temperatur end køkkensalt."],
-        ["Be", "O", "formel", 0, "#f0f0ec", "pulver", "Keramik, der leder varme næsten som et metal."],
+        ["Mg", "O", "formel", 0, "#f3f3ef", "pulver", "Magnesia: tabletter mod halsbrand og forstoppelse."],
         ["Ca", "P", "formel", 0, "#8a5a44", "krystal", "Nødblus til søs: med vand dannes en gas, der selv tager fyr."],
 
         ["Fe2", "O", "navn", 1, "#2b2724", "pulver", "Sort. Findes i hammerskæl, der springer af under smedning."],
@@ -209,15 +217,43 @@
        pladsen [hylde, plads] fra et stof i grundsaettet. */
     var SVAER = [
         ["Sr", "Cl", "formel", 0, "#f4f4f0", "krystal", "Farver en flamme rød.", 7],
+        ["Be", "O", "formel", 0, "#f0f0ec", "pulver", "Keramik, der leder varme næsten som et metal.", 8],
         ["Pb4", "O", "navn", 1, "#3b2718", "pulver", "Sidder på pluspolen i et bilbatteri.", 7],
         ["Sn2", "F", "navn", 1, "#f5f5f2", "pulver", "Fluoren i nogle tandpastaer.", 8],
         ["Hg2", "O", "navn", 1, "#c23a20", "pulver", "Priestley fik ilt ud af det i 1774.", 9],
+        ["K", "MnO4", "navn", 2, "#5a2168", "krystal", "Violette krystaller. Bruges i fodbad mod svamp.", 1],
+        ["Na", "S2O3", "formel", 2, "#f4f4f0", "krystal", "Fjerner sølvbromid fra fotopapir, så billedet tåler lys.", 2],
         ["Na", "HCO3", "navn", 2, "#f7f7f4", "pulver", "Natron: hævemiddel i bagepulver.", 3],
-        ["Pb2", "NO3", "navn", 2, "#f4f4f1", "krystal", "Giver gult bundfald med kaliumiodid.", 5]
+        ["K", "CrO4", "formel", 2, "#efcd1c", "krystal", "Den gule indikator, når chlorid titreres med sølvnitrat.", 4],
+        ["Pb2", "NO3", "navn", 2, "#f4f4f1", "krystal", "Giver gult bundfald med kaliumiodid.", 5],
+        ["K", "Cr2O7", "formel", 2, "#e2621e", "krystal", "Orange. Blev grøn i gamle alkoholtestere.", 6]
     ];
 
     /* Det, kontakten Sværere ioner tilføjer, med ord til knappens forklaring */
-    D.SVAER_IONER = "Sr²⁺, Sn²⁺, Pb²⁺, Pb⁴⁺, Hg²⁺ og HCO₃⁻";
+    D.SVAER_IONER = "Be²⁺, Sr²⁺, Sn²⁺, Pb²⁺, Pb⁴⁺, Hg²⁺, HCO₃⁻, MnO₄⁻, S₂O₃²⁻, CrO₄²⁻ og Cr₂O₇²⁻";
+    var TALORD = ["nul", "ét", "to", "tre", "fire", "fem", "seks", "syv", "otte", "ni", "ti", "elleve", "tolv"];
+    D.SVAER_ANTAL = SVAER.length;
+    D.SVAER_ANTAL_ORD = TALORD[SVAER.length] || String(SVAER.length);
+
+    /* ----- Faremaerker ------------------------------------------------
+       Kun to af GHS-piktogrammerne er med (sprites/ghs/): doedningehovedet
+       (GHS06, akut giftig) og udraabstegnet (GHS07, sundhedsskadelig).
+       Et glas har hoejst ét. Har stoffet GHS06, har det ikke ogsaa GHS07
+       (CLP's forrangsregel). Stoffer, der kun er aetsende, brandnaerende
+       eller miljoefarlige, har intet af de to og faar intet maerke.
+       Kilde: CLP bilag VI, hvor stoffet staar der, ellers leverandoerernes
+       sikkerhedsdatablade for det rene, faste stof. */
+    var FARE = {
+        /* doedningehovedet */
+        K2S: "giftig", Ca3P2: "giftig", CuCl2: "giftig",
+        BeO: "giftig", SnF2: "giftig", HgO: "giftig", K2Cr2O7: "giftig",
+        /* udraabstegnet */
+        BaF2: "sundhedsskadelig", CaCl2: "sundhedsskadelig", Cu2O: "sundhedsskadelig",
+        FeCl3: "sundhedsskadelig", FeCl2: "sundhedsskadelig", NH4Cl: "sundhedsskadelig",
+        K2CO3: "sundhedsskadelig", CuSO4: "sundhedsskadelig", PbO2: "sundhedsskadelig",
+        "Pb(NO3)2": "sundhedsskadelig", KMnO4: "sundhedsskadelig", K2CrO4: "sundhedsskadelig"
+    };
+    D.FARE_NAVN = { giftig: "Akut giftig", sundhedsskadelig: "Sundhedsskadelig" };
 
     /* Én del af formlen: ionen og antallet. En sammensat ion, der er
        flere af, kommer i parentes; et ettal skrives ikke. */
@@ -246,10 +282,11 @@
         st.navn = k.saltdel + a.navn;
         st.navne = [st.navn];
         if (k.variabel) st.navne.push(k.stamme + "(" + k.q + "+)" + a.navn);
+        st.fare = FARE[st.id] || null;
         return st;
     }
 
-    /* Alle 36 stoffer: grundsaettet foerst, saa de sværere */
+    /* Alle 41 stoffer: grundsaettet foerst, saa de sværere */
     D.STOFFER = S.map(function (r, nr) { return lavStof(r, nr, nr % 10, false); })
         .concat(SVAER.map(function (r, i) { return lavStof(r, S.length + i, r[7], true); }));
 

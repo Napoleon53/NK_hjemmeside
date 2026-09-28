@@ -25,6 +25,14 @@
 
     var NOEGLE_VALG = "nk-sc4.10-valg";
     var NOEGLE_REKORD = "nk-sc4.10-rekord";
+    var NOEGLE_KLARET = "nk-sc4.10-enheder";   /* de enhedsniveauer, der er klaret */
+
+    function klaret() { return NK.hent(NOEGLE_KLARET, {}) || {}; }
+    function oplaast(k) { k = k || klaret(); return !!(k.let && k.middel && k.svaer); }
+    NK.enhederOplaast = oplaast;
+
+    var LAAS_SVG = '<svg class="laas" viewBox="0 0 12 14" aria-hidden="true"><rect x="1.5" y="6" width="9" height="7" rx="1.5" fill="currentColor"/>' +
+        '<path d="M3.5 6V4.3a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 
     /* Kommaet, der flytter sig: pause foer foerste hop og tid pr. hop */
     var HOP_PAUSE = 0.45, HOP_TID = 0.3;
@@ -38,6 +46,8 @@
         this.k = laerer;
         var gemt = NK.hent(NOEGLE_VALG, {}) || {};
         this.valg = this.def.valg ? (gemt[id] || this.def.valg[0].id) : null;
+        this.niveau = this.def.niveauer ? (gemt[id + "-niveau"] || "let") : null;
+        if (this.niveau === "meget" && !oplaast()) this.niveau = "let";
         this.fast = { html: NK.html(D.INTRO[id]), klasse: "" };
         this.kortT = 0;
         this.kommaNr = 0;
@@ -56,7 +66,11 @@
 
     P.lavOpgave = function () {
         var type = this.def.typer(this.valg);
-        this.opg = C.lav(type, this.runde, { foran: this.id === "tael" && this.runde.nr === 0 });
+        this.opg = C.lav(type, this.runde, { foran: this.id === "tael" && this.runde.nr === 0, niveau: this.niveau });
+        /* Svaret starter altid som almindeligt tal, saa 10-feltet ikke
+           laegger op til videnskabelig notation (brugerens oenske 27. sept.
+           2026). Kun "Skriv i videnskabelig notation" starter med det. */
+        this.maade = this.opg.type === "potens" ? "pot" : "alm";
         this.hjaelp = 0;
         this.fejl = 0;
         this.loest = false;
@@ -107,6 +121,41 @@
         this.fokus();
     };
 
+    /* Enhedernes niveauer: en ny runde. Meget svær er laast, til Let,
+       Middel og Svær er klaret. */
+    P.skiftNiveau = function (n) {
+        var def = (this.def.niveauer || []).filter(function (x) { return x.id === n; })[0];
+        if (!def || n === this.niveau) return;
+        if (def.laast && !oplaast()) {
+            this.kortBesked(NK.html(D.LAAST), 6);
+            return;
+        }
+        this.niveau = n;
+        var gemt = NK.hent(NOEGLE_VALG, {}) || {};
+        gemt[this.id + "-niveau"] = n;
+        NK.gem(NOEGLE_VALG, gemt);
+        this.nyRunde();
+        this.saetBesked("Ny runde: enheder, " + NK.html(def.navn.toLowerCase()) + ".", "");
+        if (this.k) this.k.tie();
+        this.vis();
+        this.animerNy();
+        this.fokus();
+    };
+
+    /* Almindeligt tal eller videnskabelig notation. Kan kun skiftes,
+       naar opgaven ikke selv siger, hvordan tallet skal skrives. */
+    P.maadeFri = function () {
+        var t = this.opg.type;
+        return t === "afrund" || t === "regn" || t === "enhed";
+    };
+
+    P.skiftMaade = function (m) {
+        if (this.loest || !this.maadeFri() || m === this.maade) return;
+        this.maade = m;
+        this.visSvarrad();
+        this.visMaaler();
+    };
+
     /* ----- Tjek, hint og svar --------------------------------------------------------- */
     P.valgteListe = function () {
         var mig = this;
@@ -115,7 +164,8 @@
 
     P.tjek = function () {
         if (this.loest) { this.naeste(); return; }
-        var svar = this.opg.type === "tael" ? { valgt: this.valgteListe() } : { mantisse: this.mant, eksp: this.eksp };
+        var svar = this.opg.type === "tael" ? { valgt: this.valgteListe() } :
+            { mantisse: this.mant, eksp: this.maade === "pot" ? this.eksp : "" };
         var r = C.tjek(this.opg, svar);
         if (r.tom) { this.saetBesked(r.besked, ""); this.fokus(); return; }
         if (r.ok) { this.loes("ok", r); return; }
@@ -153,9 +203,11 @@
                 var mig = this;
                 o.betydende.forEach(function (i) { mig.valgt[i] = true; });
             } else if (o.type === "potens" || (o.type === "afrund" || o.type === "regn") && !C.kanAlmindelig(o.facit)) {
+                this.maade = "pot";
                 this.mant = C.mantisse(o.facit);
                 this.eksp = String(o.facit.p).replace("-", "−");
             } else {
+                this.maade = "alm";
                 this.mant = C.skillerum(C.almindelig(o.facit));
                 this.eksp = "";
             }
@@ -179,9 +231,18 @@
 
     P.rundeSlut = function () {
         this.runde.slut = true;
+        var r = this.rigtige();
         if (this.id === "blandet") {
-            var r = this.rigtige(), rek = NK.hent(NOEGLE_REKORD, 0) || 0;
+            var rek = NK.hent(NOEGLE_REKORD, 0) || 0;
             if (r > rek) NK.gem(NOEGLE_REKORD, r);
+        }
+        /* Et enhedsniveau er klaret med mindst D.OPLAAS rigtige i foerste
+           forsoeg. Er Let, Middel og Svær klaret, er Meget svær aaben. */
+        if (this.def.niveauer && this.valg === "enhed" && this.niveau !== "meget" && r >= D.OPLAAS) {
+            var k = klaret(), foer = oplaast(k);
+            k[this.niveau] = true;
+            NK.gem(NOEGLE_KLARET, k);
+            this.runde.laastOp = !foer && oplaast(k);
         }
     };
 
@@ -376,15 +437,25 @@
     /* ----- Svarfeltet ---------------------------------------------------------------- */
     P.visSvarrad = function () {
         if (!this.aktiv()) return;
-        var o = this.opg, tael = o.type === "tael";
+        var o = this.opg, tael = o.type === "tael", mig = this;
         el("valgt-info").hidden = !tael;
         el("felter").hidden = tael;
+        el("svarmaade").hidden = tael;
         if (tael) {
             var n = this.valgteListe().length;
             NK.saetHTML("valgt-info", n ? "Valgt: <b>" + n + "</b> " + (n === 1 ? "ciffer" : "cifre") : "Ingen valgt endnu");
         } else {
-            var potens = o.type === "afrund" || o.type === "regn" || o.type === "potens";
-            el("potens").hidden = !potens;
+            /* Svarmaaden: det valgte er blaat. Siger opgaven selv, hvordan
+               tallet skal skrives, kan der ikke skiftes. */
+            var fri = this.maadeFri(), pot = this.maade === "pot";
+            Array.prototype.forEach.call(el("svarmaade").querySelectorAll("[data-maade]"), function (b) {
+                var valgt = b.getAttribute("data-maade") === mig.maade;
+                b.classList.toggle("valgt", valgt);
+                b.setAttribute("aria-pressed", valgt ? "true" : "false");
+                b.disabled = mig.loest || !fri;
+            });
+            el("potens").hidden = !pot;
+            el("felter").classList.toggle("pot", pot);
             el("svar-enhed").textContent = o.type === "enhed" ? o.til : "";
             el("svar-enhed").hidden = o.type !== "enhed";
             var m = el("svar-m"), e = el("svar-e");
@@ -463,6 +534,24 @@
         NK.saetHTML("vaelgere", vh);
         el("vaelgere").hidden = !vh;
 
+        /* Enhedernes niveauer med flueben ved dem, der er klaret, og en laas
+           paa Meget svær, til de tre andre er klaret */
+        var nh = "", note = "";
+        if (this.def.niveauer && this.valg === "enhed") {
+            var kl = klaret(), aaben = oplaast(kl);
+            nh = this.def.niveauer.map(function (n) {
+                var laast = n.laast && !aaben;
+                if (n.id === mig.niveau) note = n.note;
+                return '<button type="button" class="vaelger niveau' + (n.id === mig.niveau ? " valgt" : "") + (laast ? " laast" : "") +
+                    '" data-niveau="' + n.id + '" title="' + NK.html(laast ? D.LAAST : n.note) + '"' + (laast ? ' aria-disabled="true"' : "") + ">" +
+                    (laast ? LAAS_SVG : "") + n.navn + (kl[n.id] ? '<span class="flueben" title="Klaret">✓</span>' : "") + "</button>";
+            }).join("");
+        }
+        NK.saetHTML("niveauer", nh);
+        el("niveauer").hidden = !nh;
+        NK.saetTekst("niveaunote", note);
+        el("niveaunote").hidden = !nh;
+
         var ph = "";
         for (var i = 0; i < D.RUNDE; i++) {
             var s = r.status[i];
@@ -475,6 +564,7 @@
             var rig = this.rigtige();
             var t = "Runden er slut: <b>" + rig + " af " + D.RUNDE + "</b> rigtige i første forsøg. " + D.SLUT(rig, D.RUNDE);
             if (this.id === "blandet" && rig === D.RUNDE) t += " " + D.TI_AF_TI;
+            if (r.laastOp) t += " <b>" + D.LAAST_OP + "</b>";
             slut.innerHTML = t;
         }
         slut.hidden = !r.slut;

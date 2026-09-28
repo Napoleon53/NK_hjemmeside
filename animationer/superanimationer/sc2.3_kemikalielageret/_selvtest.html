@@ -68,7 +68,8 @@ function koerTest(W) {
     var D = NK.Data, T = NK.Tjek;
     paastand("data.js og tjek.js er kørt", !!(D && D.STOFFER && T && T.formel));
     paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-lager"] && NK.sims["fane-baand"]));
-    var sprites = ["pulverglas", "etiketmaskine", "kasse", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var sprites = ["pulverglas", "etiketmaskine", "kasse", "kaffekop", "laererKrop", "laererHoved", "laererArm",
+        "ghs_giftig", "ghs_sundhedsskadelig"];
     var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     paastand("Kemichael er koblet på begge faner", !!(NK.sims["fane-lager"].laerer && NK.sims["fane-baand"].laerer));
@@ -77,9 +78,10 @@ function koerTest(W) {
     if (NK.indstil.svaer) svaerKnap.click();
     paastand("testen starter uden sværere ioner", !NK.indstil.svaer && !svaerKnap.checked);
 
-    overskrift("2. De 30 stoffer og de 6 sværere");
+    overskrift("2. De 30 stoffer og de 11 sværere");
     var grund = D.aktive(false), svaere = D.STOFFER.filter(function (s) { return s.svaer; });
-    paastand("36 stoffer: 30 i grundsættet og 6 sværere", D.STOFFER.length === 36 && grund.length === 30 && svaere.length === 6);
+    paastand("41 stoffer: 30 i grundsættet og 11 sværere", D.STOFFER.length === 41 && grund.length === 30 && svaere.length === 11 &&
+        D.SVAER_ANTAL === 11 && D.SVAER_ANTAL_ORD === "elleve");
     [false, true].forEach(function (sv) {
         var saet = D.aktive(sv);
         paastand((sv ? "med" : "uden") + " sværere ioner: 10 glas på hver hylde, ét på hver plads", saet.length === 30 &&
@@ -97,11 +99,26 @@ function koerTest(W) {
         });
     });
     paastand("grundsættet bruger kun grundstof 1-20, Br, I, Ba, Fe, Cu, Ag, Zn og de seks sammensatte ioner", udenfor.length === 0, udenfor.join(", "));
-    paastand("hvert sværere stof har Sr, Sn, Pb, Hg eller HCO₃⁻", svaere.every(function (s) {
-        return ["Sr", "Sn", "Pb", "Hg"].indexOf(s.katIon.formel) >= 0 || s.anIon.id === "HCO3";
+    var svaereIoner = ["HCO3", "MnO4", "S2O3", "CrO4", "Cr2O7"];
+    paastand("hvert sværere stof har Be, Sr, Sn, Pb, Hg eller en af de fem sværere sammensatte ioner", svaere.every(function (s) {
+        return ["Be", "Sr", "Sn", "Pb", "Hg"].indexOf(s.katIon.formel) >= 0 || svaereIoner.indexOf(s.anIon.id) >= 0;
     }));
-    paastand("plakaten har HCO₃⁻ kun med sværere ioner", D.plakatIoner(false).indexOf("HCO3") < 0 && D.plakatIoner(true).indexOf("HCO3") >= 0 &&
-        D.plakatIoner(false).length === 6);
+    paastand("beryllium er kun med sværere ioner", grund.every(function (s) { return s.katIon.formel !== "Be"; }) &&
+        svaere.some(function (s) { return s.id === "BeO"; }));
+    paastand("MnO₄⁻, S₂O₃²⁻, CrO₄²⁻ og Cr₂O₇²⁻ bruges af et sværere stof hver", ["MnO4", "S2O3", "CrO4", "Cr2O7"].every(function (id) {
+        return svaere.some(function (s) { return s.anIon.id === id; });
+    }));
+    paastand("plakaten har de fem sværere sammensatte ioner kun med sværere ioner", D.plakatIoner(false).length === 6 &&
+        D.plakatIoner(true).length === 11 && svaereIoner.every(function (id) {
+            return D.plakatIoner(false).indexOf(id) < 0 && D.plakatIoner(true).indexOf(id) >= 0;
+        }));
+    var farer = D.STOFFER.filter(function (s) { return s.fare; });
+    paastand("faremærkerne er kun dødningehovedet og udråbstegnet, og hvert navngivet stof findes",
+        farer.every(function (s) { return s.fare === "giftig" || s.fare === "sundhedsskadelig"; }) && farer.length === 19);
+    paastand("fx K₂Cr₂O₇, BeO og HgO er giftige, KMnO₄ og CuSO₄ sundhedsskadelige, NaOH, MgCl₂ og Na₂S₂O₃ uden mærke",
+        D.stof("K2Cr2O7").fare === "giftig" && D.stof("BeO").fare === "giftig" && D.stof("HgO").fare === "giftig" &&
+        D.stof("KMnO4").fare === "sundhedsskadelig" && D.stof("CuSO4").fare === "sundhedsskadelig" &&
+        D.stof("NaOH").fare === null && D.stof("MgCl2").fare === null && D.stof("Na2S2O3").fare === null);
     var ider = {};
     D.STOFFER.forEach(function (s) { ider[s.id] = (ider[s.id] || 0) + 1; });
     paastand("ingen stoffer er der to gange", Object.keys(ider).every(function (k) { return ider[k] === 1; }));
@@ -202,7 +219,9 @@ function koerTest(W) {
 
     fejlTjek("NaO: ladningen går ikke op", T.formel("NaO", Na2O), /går ikke lige op: 1 Na⁺ giver \+1, og 1 O²⁻ giver −2/);
     fejlTjek("Al3O2: tallene byttet om", T.formel("Al3O2", Al2O3), /byttet om/);
-    fejlTjek("Be2O2: kan forkortes", T.formel("Be2O2", D.stof("BeO")), /forkortes/);
+    fejlTjek("Mg2O2: kan forkortes", T.formel("Mg2O2", D.stof("MgO")), /forkortes/);
+    fejlTjek("K2(Cr2O7): unødvendig parentes om dichromat", T.formel("K2(Cr2O7)", D.stof("K2Cr2O7")), /Parentesen bruges kun/);
+    fejlTjek("NaS2O3: ladningen går ikke op", T.formel("NaS2O3", D.stof("Na2S2O3")), /går ikke lige op/);
     fejlTjek("Al2SO43: parentes mangler", T.formel("Al2SO43", AlS), /parentes: \(SO₄\)₃/);
     fejlTjek("NH42SO4: parentes mangler om ammonium", T.formel("NH42SO4", D.stof("(NH4)2SO4")), /\(NH₄\)₂/);
     fejlTjek("Ba(SO4): unødvendig parentes", T.formel("Ba(SO4)", D.stof("BaSO4")), /Parentesen bruges kun/);
@@ -225,6 +244,14 @@ function koerTest(W) {
     fejlTjek("natrium(I)oxid: romertal på natrium", T.navn("natrium(I)oxid", Na2O), /kun én ion/);
     fejlTjek("rust: hverdagsnavn", T.navn("rust", Fe2O3), /cyklen/);
     fejlTjek("natron: hverdagsnavn", T.navn("natron", D.stof("NaHCO3")), /køkkenet/);
+    fejlTjek("hypermangan: hverdagsnavn", T.navn("hypermangan", D.stof("KMnO4")), /apoteket/);
+    fejlTjek("kaliumchromat for K2Cr2O7: chromat og dichromat", T.navn("kaliumchromat", D.stof("K2Cr2O7")), /hedder dichromat/);
+    fejlTjek("kaliummanganat for KMnO4", T.navn("kaliummanganat", D.stof("KMnO4")), /permanganat/);
+    fejlTjek("dinatriumthiosulfat: talord", T.navn("dinatriumthiosulfat", D.stof("Na2S2O3")), /talord/);
+    var tio = T.navn("natriumtiosulfat", D.stof("Na2S2O3"));
+    paastand("tiosulfat godkendes, men staves thiosulfat", tio.ok && /thiosulfat/.test(tio.note));
+    var krom = T.navn("kaliumkromat", D.stof("K2CrO4"));
+    paastand("kromat godkendes, men staves chromat", krom.ok && /chromat/.test(krom.note));
 
     fejlTjek("oxidion: negativ ion med -ion", T.ionNavn("oxidion", D.ion("O")), /får ikke endelsen -ion/);
     fejlTjek("oxygen: grundstoffets navn", T.ionNavn("oxygen", D.ion("O")), /endelsen -id/);
@@ -233,6 +260,9 @@ function koerTest(W) {
     fejlTjek("jern(II)ion for Fe3+", T.ionNavn("jern(II)ion", D.ion("Fe3")), /romertal/);
     fejlTjek("sulfid for SO4 2-", T.ionNavn("sulfid", D.ion("SO4")), /Sulfid er S²⁻/);
     fejlTjek("carbonat for HCO3-", T.ionNavn("carbonat", D.ion("HCO3")), /også et H/);
+    fejlTjek("sulfat for S2O3 2-", T.ionNavn("sulfat", D.ion("S2O3")), /hedder thiosulfat/);
+    fejlTjek("dichromat for CrO4 2-", T.ionNavn("dichromat", D.ion("CrO4")), /kun ét Cr/);
+    fejlTjek("CrO4 2- for dichromat: forkert sammensat ion", T.ion("CrO42-", D.ion("Cr2O7"), D.stof("K2Cr2O7"), "formel"), /plakaten/);
     fejlTjek("tomt felt tæller ikke", { besked: T.formel("", Na2O).tom ? "tom" : "" }, /tom/);
 
     overskrift("6. Hjælpen findes til hvert felt");
@@ -327,8 +357,12 @@ function koerTest(W) {
         var pl = B.lay.plakater;
         paastand(m[0] + " x " + m[1] + ": samlebåndet har også de to plakater, inden for scenen og over kassen",
             pl.pt.x + pl.pt.b <= B.lay.W && pl.ioner.y + pl.ioner.h < B.lay.kasse.y && B.lay.hyldeX1 < pl.pt.x);
+        paastand(m[0] + " x " + m[1] + ": hylden på samlebåndet har plads til mindst otte glas", B.lay.hyldePlads >= 8, B.lay.hyldePlads);
     });
     B.L.b = 0;
+    var tilbudB = d.getElementById("baand-tilbud"), springB = d.getElementById("baand-spring");
+    paastand("samlebåndet: Start præsentation og Spring over står nederst i panelet, ikke i scenen",
+        !!tilbudB.closest(".panel") && !!springB.closest(".panel") && !tilbudB.closest(".scene") && !springB.closest(".scene"));
 
     overskrift("9. Lageret kan gennemføres");
     function svar(v) { var f = L.aktivtFelt(); f.input.value = v; L.tjek(); }
@@ -373,9 +407,27 @@ function koerTest(W) {
     paastand("Kemichael venter med at rose den sidste hylde og hele lageret", !!(L.ventRos && L.ventRos.hylde === 2 && L.ventRos.alt));
     var gemt = JSON.parse(W.localStorage.getItem("nk-sc2.3-lager") || "{}");
     paastand("fremskridtet er gemt i browseren", Object.keys(gemt).length === 30);
+
+    /* Fejlen fra 27. sept. 2026: et loest glas kom tilbage paa hylden med
+       en blank etiket, fordi glassene der var for smaa til tekst */
+    var skrevet = [], lctx = L.L.ctx, fillText = lctx.fillText;
+    lctx.fillText = function (tekst) { skrevet.push(String(tekst)); return fillText.apply(this, arguments); };
+    L.L.b = 980; L.L.h = 760;
+    L.layout();
+    L.tegn();
+    lctx.fillText = fillText;
+    L.L.b = 0;
+    L.tilpas();
+    var formlerPaaHylden = ["Na₂O", "KI", "FeO", "CuCl₂", "NaOH", "K₂CO₃", "Al₂(SO₄)₃"];
+    var blanke = formlerPaaHylden.filter(function (f) { return skrevet.indexOf(f) < 0; });
+    paastand("980 x 760: de løste glas på hylden har formlen på etiketten", blanke.length === 0, "blanke: " + blanke.join(", "));
+
     svaerKnap.click();
-    paastand("sværere ioner: seks glas er byttet ud og står uløste", NK.indstil.svaer && L.antalLoest() === 24 &&
-        L.stoffer[17].id === "PbO2" && L.stoffer[23].id === "NaHCO3");
+    paastand("sværere ioner: elleve glas er byttet ud og står uløste", NK.indstil.svaer && L.antalLoest() === 19 &&
+        L.stoffer[8].id === "BeO" && L.stoffer[17].id === "PbO2" && L.stoffer[21].id === "KMnO4" &&
+        L.stoffer[23].id === "NaHCO3" && L.stoffer[26].id === "K2Cr2O7", L.antalLoest());
+    paastand("kontakten fortæller, at det er elleve glas", /^Elleve glas/.test(d.getElementById("lager-status").textContent) &&
+        /^Elleve glas/.test(d.getElementById("svaer-kontakt").title));
     paastand("sværere ioner huskes i browseren", W.localStorage.getItem("nk-sc2.3-svaer") === "true");
     paastand("samlebåndet trækker også sværere stoffer", (function () {
         B.nivNr = 1; B.pose = [];
@@ -436,6 +488,13 @@ function koerTest(W) {
         paastand(m[0] + " x " + m[1] + ": det store glas står under reolen", lay.bordY - lay.storH >= reolBund + 20);
         paastand(m[0] + " x " + m[1] + ": plads til kuglerne mellem glas og maskine", o.x1 - o.x0 >= 120, Math.round(o.x1 - o.x0));
         paastand(m[0] + " x " + m[1] + ": etiketmaskinen er inden for scenen", lay.maskine.x + lay.maskine.b <= m[0]);
+        var pl = lay.plakater;
+        paastand(m[0] + " x " + m[1] + ": plakaterne står til højre for reolen, inden for scenen og over etiketmaskinen",
+            pl.pt.x > lay.reol.x + lay.reol.b && pl.pt.x + pl.pt.b <= m[0] && pl.ioner.y + pl.ioner.h <= lay.maskine.y);
+        if (m[0] >= 980) {
+            paastand(m[0] + " x " + m[1] + ": glassene på hylden er store nok til, at formlen kan læses", lay.lilleH >= (m[0] >= 1500 ? 110 : 75),
+                Math.round(lay.lilleH));
+        }
     });
     L.L.b = 0;
     L.tilpas();

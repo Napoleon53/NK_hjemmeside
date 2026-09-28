@@ -103,13 +103,13 @@
             start: { fyld: [["vand", 2], ["ethanol", 2]], blandet: true },
             tekst: "Vand og ethanol er blandet til ét lag. Du varmer op til 90 °C. Hvad sker der?",
             valg: [
-                { tekst: "Ethanol koger, og vandet bliver", rigtig: true },
-                { tekst: "Begge koger, for de er blandet til ét stof", fejl: "De er blandet, men molekylerne er stadig to stoffer med hvert sit kogepunkt. Se, hvilke der stiger op." },
-                { tekst: "Intet, før blandingen når 100 °C", fejl: "Ethanol koger ved 78 °C. Ved 90 °C er ethanol over sit kogepunkt og vandet under sit." }
+                { tekst: "Det koger, og dampen er mest ethanol", rigtig: true },
+                { tekst: "Begge koger lige meget, for de er blandet til ét stof", fejl: "De er blandet, men molekylerne er stadig to stoffer med hvert sit kogepunkt. Se, hvilke der stiger op." },
+                { tekst: "Intet, før blandingen når 100 °C", fejl: "Ethanol koger ved 78 °C. Blandingen koger allerede ved ca. 83 °C, for ethanol fordamper let." }
             ],
             handling: { T: 90 },
             hint: "Kogepunkterne står ved temperaturskyderen.",
-            svar: "Ethanol koger ved 78 °C og vand ved 100 °C. Ved 90 °C forlader ethanol blandingen som damp, mens vandet bliver. Ét lag, men stadig to stoffer."
+            svar: "Ethanol koger ved 78 °C og vand ved 100 °C. Ved 90 °C koger blandingen, og dampen er mest ethanol, men lidt vand kommer med. Ét lag, men stadig to stoffer."
         }
     ];
 

@@ -22,6 +22,7 @@
         <!-- Pladser, rundvisningen peger paa. js/scene.js flytter dem efter tegningen. -->
         <div class="anker" id="anker-bassin"></div>
         <div class="anker" id="anker-glas"></div>
+        <div class="anker" id="anker-koeler"></div>
         <div class="tilbud" id="tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
@@ -53,7 +54,12 @@
                     <span class="kant-h">120 °C</span>
                 </div>
             </div>
-            <button class="knap lille" id="toem" type="button" title="Tøm bassinet (R)">Tøm bassinet</button>
+            <div class="koelervalg" id="koelervalg" role="group" aria-label="Køleren">
+                <button class="koelerknap valgt" type="button" data-koeler="tilbagesvaler" aria-pressed="true" title="Dampen løber tilbage i bassinet (D)">Tilbagesvaling</button>
+                <button class="koelerknap" type="button" data-koeler="destillation" aria-pressed="false" title="Dampen løber over i forlaget (D)">Destillation</button>
+            </div>
+            <p class="maengde" id="destillat" hidden></p>
+            <button class="knap lille" id="toem" type="button" title="Tøm bassinet og forlaget (R)">Tøm bassinet</button>
         </div>
 
         <!-- Én knap, der aendrer sig: Start opgave -> Giv hint -> Vis svaret -> Ny opgave -->
@@ -91,13 +97,16 @@
 
         <h3>Rystning og varme</h3>
         <p>En rystning deler olien i små dråber, og det ser uklart ud: en emulsion. Dråberne finder sammen igen, fordi molekylerne er de samme. Varme får molekylerne til at bevæge sig hurtigere, men ændrer heller ikke på, hvad der kan blandes.</p>
-        <p>Ethanol koger ved 78 °C og vand ved 100 °C. I en blanding er molekylerne stadig to stoffer, og ethanol koger først. Olie koger ikke; den brydes ned over 300 °C.</p>
+        <p>Ethanol koger ved 78 °C og vand ved 100 °C. En blanding af de to koger midt imellem: lige dele ved ca. 83 °C. Dampen er mest ethanol, men der er også vand i. Olie koger ikke; den brydes ned over 300 °C.</p>
+
+        <h3>Tilbagesvaling og destillation</h3>
+        <p>Tilbagesvaleren køler dampen, så den drypper tilbage i bassinet, og intet går tabt. I en destillation løber det, der fortætter i køleren, over i forlaget. Destillatet af vand og ethanol er mest ethanol, men altid med lidt vand, og lidt ethanol bliver tilbage. Man kan ikke adskille dem helt ved at destillere.</p>
 
         <h3>Modellen</h3>
         <p>Hver kugle er et molekyle. Farverne er kun til at kende dem fra hinanden: i glasset er vand og ethanol klare, og olien er lysegul. Kuglerne er lige store, men et oliemolekyle er i virkeligheden omkring 50 gange så stort som et vandmolekyle.</p>
 
         <h3>Genveje</h3>
-        <p><kbd>V</kbd> <kbd>E</kbd> <kbd>O</kbd> hæld i &nbsp;·&nbsp; <kbd>mellemrum</kbd> ryst &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperatur &nbsp;·&nbsp; <kbd>R</kbd> tøm &nbsp;·&nbsp; <kbd>Q</kbd> quiz &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p><kbd>V</kbd> <kbd>E</kbd> <kbd>O</kbd> hæld i &nbsp;·&nbsp; <kbd>mellemrum</kbd> ryst &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperatur &nbsp;·&nbsp; <kbd>D</kbd> tilbagesvaling eller destillation &nbsp;·&nbsp; <kbd>R</kbd> tøm &nbsp;·&nbsp; <kbd>Q</kbd> quiz &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
 
         <div class="knapper">
             <button class="knap blaa" type="button" data-luk>Luk</button>
@@ -140,6 +149,7 @@
 <script src="js/data.js"></script>
 <script src="js/tekster.js"></script>
 <script src="js/model.js"></script>
+<script src="js/apparat.js"></script>
 <script src="js/sprites.js"></script>
 <script src="../../v2/kemichael/kemichael.js"></script>
 <script src="../kemichael/superanimation.js"></script>

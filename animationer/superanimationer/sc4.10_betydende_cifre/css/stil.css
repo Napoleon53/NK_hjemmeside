@@ -437,13 +437,46 @@ main { flex: 1; position: relative; min-height: 0; }
 .felter.ok .svarfelt { color: var(--groen-lys); }
 .felter.vist .svarfelt, .felter.vist .eksfelt { color: var(--gul-lys); }
 
-.potens { display: inline-flex; align-items: flex-start; gap: 5px; }
-.gange { align-self: center; font-size: 1.35rem; font-weight: 600; color: var(--tekst-svag); white-space: nowrap; }
+/* Svarmaaden: almindeligt tal eller videnskabelig notation. Siger
+   opgaven selv, hvordan tallet skal skrives, er det andet valg daempet. */
+.svarmaade {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.svarmaade button {
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--tekst-svag);
+    background-color: var(--panel-2);
+    border: 1px solid #4a4a58;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.svarmaade button:first-child { border-radius: 999px 0 0 999px; }
+.svarmaade button:last-child { border-radius: 0 999px 999px 0; border-left: none; }
+.svarmaade button:hover:not(:disabled) { color: var(--tekst); background-color: var(--panel-3); }
+.svarmaade button.valgt { color: #ffffff; background-color: var(--blaa-mork); border-color: var(--blaa); }
+.svarmaade button:disabled { cursor: default; }
+.svarmaade button:disabled:not(.valgt) { opacity: 0.4; }
+
+/* Videnskabelig notation: "· 10" paa linje med tallet og eksponentfeltet
+   haevet op ved 10-tallet, saa man kan se, at det er en potens */
+.felter.pot { align-items: flex-end; }
+.felter.pot .svarfelt { width: 5.5em; }
+.felter.pot .svar-enhed { padding-bottom: 9px; }
+
+.potens { display: inline-flex; align-items: flex-end; }
+.gange { padding: 4px 0; font-size: 1.6rem; font-weight: 600; color: var(--tekst-svag); white-space: nowrap; }
 
 .eksfelt {
-    width: 3.2em;
-    margin-top: -2px;
-    padding: 3px 4px;
+    width: 2.8em;
+    margin: 0 0 22px 3px;
+    padding: 2px 4px;
     font-family: inherit;
     font-size: 1.05rem;
     font-weight: 700;
@@ -458,9 +491,9 @@ main { flex: 1; position: relative; min-height: 0; }
 .eksfelt:focus { border-color: var(--gul); box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.25); }
 
 .fortegn {
-    align-self: center;
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
+    margin: 0 0 22px 6px;
     padding: 0;
     font-family: inherit;
     font-size: 1rem;
@@ -577,6 +610,15 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .vaelger:hover { background-color: var(--panel-3); color: var(--tekst); }
 .vaelger.valgt { background-color: var(--blaa-mork); border-color: var(--blaa); color: #ffffff; }
+
+/* Enhedernes niveauer: Meget svær er laast, til de tre andre er klaret */
+.niveaurad { margin: -4px 0 6px; }
+.vaelger.niveau { padding: 6px 8px; font-size: 0.84rem; }
+.vaelger.laast, .vaelger.laast:hover { color: var(--tekst-mat); background-color: transparent; border-style: dashed; cursor: default; }
+.vaelger .laas { width: 10px; height: 12px; margin-right: 5px; vertical-align: -1px; }
+.vaelger .flueben { margin-left: 5px; color: var(--groen-lys); }
+.vaelger.valgt .flueben { color: #ffffff; }
+.niveaunote { margin: 0 0 12px; font-size: 0.85rem; line-height: 1.45; color: var(--tekst-mat); }
 
 /* Runden som ti streger */
 .prikker { display: flex; gap: 5px; margin: 2px 0 12px; }

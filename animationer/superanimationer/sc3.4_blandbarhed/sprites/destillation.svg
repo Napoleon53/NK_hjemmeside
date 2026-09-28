@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="246" viewBox="400 -146 460 246">
+  <!-- Destillationen: destillationshoved med prop, sidearm, Liebigkoeler og
+       en spids, der drypper i forlaget. Vandet loeber ind ved den nederste
+       ende og ud ved den oeverste. Dampen og draaberne tegnes af animationen
+       bag glasset.
+       Enhederne er de samme som i bassin.svg (16,05 pr. kuglediameter), og
+       viewBox'en er stedet i forhold til bassinet. Lavet ud fra maalene i
+       js/apparat.js (A.vaegge og A.SPRITE); rettes et maal der, skal filen
+       laves om. -->
+  <defs>
+    <linearGradient id="kappe" gradientUnits="userSpaceOnUse" x1="0" y1="-28" x2="0" y2="28">
+      <stop offset="0" stop-color="#7dd3fc" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#7dd3fc" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(512 -73.8) rotate(20)">
+    <path d="M7 -28 H253.5 Q260.5 -28 260.5 -21 V21 Q260.5 28 253.5 28 H7 Q0 28 0 21 V-21 Q0 -28 7 -28 Z M0 -14.6 H260.5 V14.6 H0 Z" fill="url(#kappe)" fill-rule="evenodd"/>
+  </g>
+  <path d="M726.6 34.1 l-4.8 13.2" stroke="#7dd3fc" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/>
+  <path d="M542.2 -92.6 l4.8 -13.2" stroke="#7dd3fc" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/>
+  <g transform="translate(512 -73.8) rotate(20)">
+    <path d="M7 -28 H253.5 Q260.5 -28 260.5 -21 V21 Q260.5 28 253.5 28 H7 Q0 28 0 21 V-21 Q0 -28 7 -28 Z" stroke="#7dd3fc" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+  </g>
+  <!-- Hovedet: venstre vaeg, hoejre vaeg med hul til sidearmen -->
+  <path d="M412.4 -19 L424.4 -30 V-122" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M467.6 -19 L455.6 -30 V-78.8 M455.6 -109.9 V-122" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M455.6 -109.9 L807.4 18.2 L838.8 46 L843.5 82.3" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M455.6 -78.8 L792.6 43.8 L813.2 60 L816.5 85.7" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Proppen -->
+  <path d="M425 -136 H455 Q458 -136 458 -133 V-123 Q458 -120 455 -120 H425 Q422 -120 422 -123 V-133 Q422 -136 425 -136 Z" fill="#d6eaf8" fill-opacity="0.28" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="2"/>
+  <!-- Slibningen, der sidder i halsens krave -->
+  <path d="M409 -14 V-26 M471 -14 V-26" stroke="#d6eaf8" stroke-opacity="0.4" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

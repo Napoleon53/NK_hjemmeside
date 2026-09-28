@@ -424,11 +424,101 @@
         return T.Mtal(f.M) + " g/mol";
     };
 
-    /* Hintet til tallet: tallene sat ind med enhederne */
-    T.talHint = function (id, o) {
-        var r = T.regning(id, o);
-        var ind = r[1].slice(2).split(" = ")[0];
-        return "Sæt tallene ind med enhederne: " + T.venstre(id, o) + " = " + ind + ".";
+    /* ----- Mellemregningen: tallene med enheder sat ind i formlen ---------------------
+       T.led giver de to led i formlens raekkefoelge (m og M i n = m / M):
+       { sym, navn, v, enhed, tekst (med enhed), tal (uden) }. */
+    T.led = function (id, o) {
+        var t = o.tal, f = o.facit, st = id === "m" && o.st2 ? o.st2 : o.st;
+        var Mled = { sym: "M", navn: "molarmassen", v: st.Mv, enhed: "g/mol", tal: NK.komma(st.M) };
+        var ud;
+        if (id === "n") ud = [{ sym: "m", navn: "massen", v: t.m, enhed: "g", tal: T.g(t.m) }, Mled];
+        else if (id === "m") ud = [{ sym: "n", navn: "stofmængden", v: f.n, enhed: "mol", tal: T.mol(f.n) }, Mled];
+        else ud = [{ sym: "m", navn: "massen", v: f.m, enhed: "g", tal: T.g(f.m) },
+                   { sym: "n", navn: "stofmængden", v: t.n, enhed: "mol", tal: T.mol(t.n) }];
+        ud.forEach(function (l) { l.tekst = l.tal + " " + l.enhed; });
+        return ud;
+    };
+
+    function stort(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    /* Et tal med enhed i et af mellemregningens felter. i: feltet (0 er
+       over broekstregen eller det foerste tal). ledige: de led, feltet maa
+       vaere (i en broek kun led i, i et produkt dem, der ikke er brugt).
+       Giver { ok, led } eller { besked, tom, talOk }. */
+    T.tjekLed = function (id, o, i, raa, ledige) {
+        var led = T.led(id, o), broek = D.TRIN[id].op === "/";
+        var hvor = broek ? (i === 0 ? "over brøkstregen" : "under brøkstregen") : (i === 0 ? "i det første felt" : "i det andet felt");
+        if (!String(raa || "").trim()) return { tom: true, besked: "Skriv tallet og enheden " + hvor + "." };
+        var s = T.svar(raa);
+        if (!s) return { besked: "Skriv et tal og en enhed " + hvor + "." };
+        /* Et tal mere efter enheden (men ikke mol-1 eller mol⁻¹): hele broeken i ét felt */
+        if (/\d/.test(s.raaEnhed.replace(/\^?\s*[-−⁻]\s*[1¹]/g, ""))) {
+            return { besked: broek ? "Skriv kun ét tal i hvert felt: det ene over brøkstregen, det andet under." : "Skriv kun ét tal i hvert felt." };
+        }
+        for (var k = 0; k < ledige.length; k++) {
+            var L = led[ledige[k]];
+            if (!naer(s.v, L.v)) continue;
+            if (!s.enhed) return { besked: "Tallet er rigtigt. Skriv også enheden efter tallet.", talOk: true };
+            if (s.enhed !== L.enhed) return { besked: "Tallet er rigtigt, men " + L.navn + " måles i " + L.enhed + ".", talOk: true };
+            return { ok: true, led: ledige[k] };
+        }
+        if (broek && naer(s.v, led[1 - i].v)) {
+            return { besked: "Brøken er vendt om. " + stort(led[0].navn) + " står øverst, som i formlen." };
+        }
+        /* Mesteren: tallene fra det andet stof */
+        if (id === "m" && o.st2) {
+            if (naer(s.v, o.st.Mv)) return { besked: "Det er molarmassen af " + o.st.navn + ". Brug molarmassen af " + o.st2.navn + "." };
+            if (naer(s.v, o.tal.m)) return { besked: "Det er massen af " + o.st.navn + ". Brug stofmængden fra trin 1." };
+        }
+        var L0 = led[ledige[0]];
+        if (ledige.length === 1 && kommaFlyttet(s.v, L0.v)) return { besked: "Tjek kommaet. Tallet er for " + (s.v > L0.v ? "stort." : "lille.") };
+        if (broek) return { besked: "Det tal passer ikke. " + stort(hvor) + " står " + led[i].navn + " " + led[i].sym + "." };
+        return { besked: "Det tal passer ikke. De to tal er " + led[0].navn + " " + led[0].sym + " og " + led[1].navn + " " + led[1].sym + "." };
+    };
+
+    /* ----- Regnestykket med rigtige broekstreger ---------------------------------------
+       Som HTML (i kortet og Kemichaels boble) og som dele til tavlen:
+       { t, matte, farve, fed } for tekst og { top, bund, matte } for en broek. */
+    function broekHTML(a, b) { return '<span class="broek"><span>' + a + "</span><span>" + b + "</span></span>"; }
+
+    T.formelHTML = function (id) {
+        var t = D.TRIN[id], l = t.led;
+        return t.op === "/" ? broekHTML("<i>" + l[0] + "</i>", "<i>" + l[1] + "</i>") : "<i>" + l[0] + "</i> · <i>" + l[1] + "</i>";
+    };
+
+    /* tekster: de to tal med enhed, som de staar i felterne (null: ikke endnu) */
+    T.indsaetHTML = function (id, tekster) {
+        var a = tekster && tekster[0] ? NK.html(tekster[0]) : "?", b = tekster && tekster[1] ? NK.html(tekster[1]) : "?";
+        return D.TRIN[id].op === "/" ? broekHTML(a, b) : a + " · " + b;
+    };
+
+    T.regningHTML = function (id, o, tekster) {
+        tekster = tekster && tekster[0] && tekster[1] ? tekster : T.led(id, o).map(function (l) { return l.tekst; });
+        return NK.html(T.venstre(id, o)) + " = " + T.formelHTML(id) + " = " + T.indsaetHTML(id, tekster) +
+            " = <b>" + NK.html(T.facitTekst(id, o)) + "</b>";
+    };
+
+    /* v: { formel, led (tekster eller null), resultat, farve }. Delene
+       faar split: der, hvor regnestykket deles, hvis det skal paa to linjer. */
+    T.regnDele = function (id, o, v) {
+        var t = D.TRIN[id], l = t.led, dele = [{ t: T.venstre(id, o) + " = " }];
+        if (!v.formel) { dele.push({ t: "?" }); return dele; }
+        if (t.op === "/") dele.push({ top: l[0], bund: l[1], matte: true });
+        else dele.push({ t: l[0], matte: true }, { t: " · " }, { t: l[1], matte: true });
+        dele.split = dele.length;
+        dele.push({ t: " = " });
+        if (!v.led || (!v.led[0] && !v.led[1])) { dele.push({ t: "?" }); return dele; }
+        var a = v.led[0] || "?", b = v.led[1] || "?";
+        if (t.op === "/") dele.push({ top: a, bund: b });
+        else dele.push({ t: a + " · " + b });
+        dele.push({ t: " = " });
+        dele.push(v.resultat ? { t: T.facitTekst(id, o), farve: v.farve, fed: true } : { t: "?" });
+        return dele;
+    };
+
+    T.regnDeleSplit = function (dele) {
+        if (!dele.split) return [dele, []];
+        return [dele.slice(0, dele.split), [{ t: "= " }].concat(dele.slice(dele.split + 1))];
     };
 
     /* ----- Linjen med enhederne, der gaar ud med hinanden --------------------------------

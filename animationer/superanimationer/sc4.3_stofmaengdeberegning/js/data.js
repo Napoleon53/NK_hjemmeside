@@ -1,8 +1,8 @@
 /* =====================================================================
-   data.js - stofferne, runderne, opgaverne, spoergsmaalene og replikkerne
+   data.js - stofferne, opgaverne, spoergsmaalene og replikkerne
 
    Alt, en laerer kan have lyst til at rette i, staar her: atommasserne,
-   stofferne, de seks runder paa Formlen, de seks opgaver paa Vaegten,
+   stofferne, de seks opgaver paa Formlen, de seks opgaver paa Vaegten,
    spoergsmaalene til Hurtigrunden og det, Kemichael siger. Enhederne og
    formlerne tjekkes i tjek.js; tegningen kender kun resultatet.
    ===================================================================== */
@@ -67,45 +67,51 @@
     D.ENHED_TEKST = { n: "mol", m: "g", M: "g/mol" };
 
     /* ----- Fane 1: Formlen ------------------------------------------------------
-       ramme: "broek" (n = □ / □), "linje" (□ = □ □ □ med et regnetegn) eller
-       "skriv" (felter i opgavekortet, ingen brikker).
+       ramme: "broek" (n = □ / □), "linje" (m = □ □ □ med et regnetegn) eller
+       "skriv" (felter i opgavekortet, ingen brikker). Det bogstav, der skal
+       findes (maal), staar fast paa venstre side; kun i introduktionen er
+       det en plads med et blegt bogstav (brugerens oenske 27. sept. 2026:
+       en helt fri formel var for uklar).
        aabne: de dele, eleven udfylder: formel, navn, enhed. Resten staar.
        brikker: det, der ligger i bunken (hoejst otte).
        skygge: de blege bogstaver i formlen.
+       tekst: linjen over tavlen. om: det, der staar i opgavekortet.
        hint og hint2 (trekanten) til knappen; efter: linjen med enhederne. */
     D.FORMEL = [
-        { id: "skygge", titel: "Formlen", ramme: "broek", maal: "n", skygge: true,
+        { id: "skygge", titel: "Introduktion", ramme: "broek", maal: "n", skygge: true,
           aabne: ["formel"], brikker: ["n", "m", "M"],
-          tekst: "Byg formlen for stofmængden. Træk brikkerne hen på de blege bogstaver.",
+          tekst: "Byg formlen for stofmængden n. Træk brikkerne hen på de blege bogstaver.",
+          om: "De seks opgaver her skal hjælpe dig med at lære formlen udenad: først med meget hjælp, til sidst uden.",
           hint: "De blege bogstaver viser, hvor brikkerne skal hen. Lille m og stort M er to forskellige ting.",
           faerdig: "Stofmængden er massen delt med molarmassen." },
-        { id: "navne", titel: "Navnene", ramme: "broek", maal: "n",
-          aabne: ["formel", "navn"], brikker: ["n", "m", "M", "N", "stofmængde", "masse", "molarmasse", "antal partikler"],
-          tekst: "Byg formlen igen, nu uden de blege bogstaver. Sæt navnene på i skemaet.",
-          hint: "Svaret skal være i mol. Massen er i g, og molarmassen er i g/mol. Hvad skal deles med hvad?",
+        { id: "navne", titel: "Navnene på n, m og M", ramme: "broek", maal: "n",
+          aabne: ["formel", "navn"], brikker: ["m", "M", "stofmængde", "masse", "molarmasse", "antal partikler"],
+          tekst: "Byg formlen for stofmængden n igen, og sæt navnene på i skemaet.",
+          hint: "Svaret skal være i mol. Massen er i g, og molarmassen er i g/mol. Hvad skal stå øverst?",
           faerdig: "Lille m er massen. Stort M er molarmassen, massen af 1 mol." },
-        { id: "enheder", titel: "Enhederne", ramme: "broek", maal: "n",
-          aabne: ["formel", "enhed"], brikker: ["n", "m", "M", "mol", "g", "g/mol", "mol/g", "g · mol"],
-          tekst: "Byg formlen, og sæt enhederne på i skemaet.",
-          hint: "Svaret skal være i mol. Massen er i g, og molarmassen er i g/mol. Hvad skal deles med hvad?",
+        { id: "enheder", titel: "Enhederne for n, m og M", ramme: "broek", maal: "n",
+          aabne: ["formel", "enhed"], brikker: ["m", "M", "mol", "g", "g/mol", "mol/g", "g · mol"],
+          tekst: "Byg formlen for stofmængden n, og sæt enhederne på i skemaet.",
+          hint: "Svaret skal være i mol. Massen er i g, og molarmassen er i g/mol. Hvad skal stå øverst?",
           efter: "n",
           faerdig: "Gram går ud med gram. Tilbage er mol." },
-        { id: "vend_m", titel: "Find massen", ramme: "linje", maal: "m",
-          aabne: ["formel"], brikker: ["m", "n", "M", "·", "/"],
-          tekst: "Isolér massen m i n = m / M.",
+        { id: "vend_m", titel: "Isolér massen m", ramme: "linje", maal: "m",
+          aabne: ["formel"], brikker: ["n", "M", "·", "/"],
+          tekst: "Isolér massen m i n = m / M. Byg højre side af m = … med brikkerne.",
           hint: "Gang begge sider af n = m / M med M. Så står m alene.",
           trekant: true, efter: "m",
           faerdig: "Mol går ud med mol. Tilbage er gram." },
-        { id: "vend_M", titel: "Find molarmassen", ramme: "linje", maal: "M",
-          aabne: ["formel"], brikker: ["M", "m", "n", "·", "/"],
-          tekst: "Isolér molarmassen M i n = m / M.",
+        { id: "vend_M", titel: "Isolér molarmassen M", ramme: "linje", maal: "M",
+          aabne: ["formel"], brikker: ["m", "n", "·", "/"],
+          tekst: "Isolér molarmassen M i n = m / M. Byg højre side af M = … med brikkerne.",
           hint: "Gang begge sider af n = m / M med M, og del så begge sider med n.",
           trekant: true, efter: "M",
           faerdig: "Gram pr. mol. Enheden siger selv, hvad der skal deles med hvad." },
-        { id: "hukommelse", titel: "Fra hukommelsen", ramme: "skriv", maal: "n",
+        { id: "hukommelse", titel: "Skriv formlen selv", ramme: "skriv", maal: "n",
           aabne: ["formel", "enhed"], efter: "n",
-          tekst: "Ingen brikker. Skriv formlen og enhederne selv.",
-          faerdig: "Den sidder. Uden brikker." }
+          tekst: "Ingen brikker denne gang. Skriv formlen og enhederne i felterne til højre.",
+          om: "Rigtig udenadslære kommer først med mange timers træning. Det her er første skridt.",
+          faerdig: "Uden brikker. Resten er træning." }
     ];
 
     /* Brikkerne. slags: sym, navn, enhed eller op */
@@ -124,7 +130,7 @@
         enhed: "Massen er det, vægten viser. Molarmassen er massen af 1 mol: gram pr. mol."
     };
 
-    /* Hintene i sidste runde, ét pr. felt */
+    /* Hintene i sidste opgave, ét pr. felt */
     D.SKRIV = [
         { id: "formel", navn: "Formlen for stofmængden", pre: "n =", hint: "Svaret skal være i mol. Du kender massen i g og molarmassen i g/mol." },
         { id: "n", navn: "Enheden for stofmængden", pre: "n:", hint: "Stofmængden tæller portioner. Én portion er 1 …" },
@@ -158,17 +164,36 @@
           tal: [{ m: 29.22 }, { m: 11.69 }, { m: 58.44 }, { m: 87.66 }] }
     ];
 
-    /* Regnetrinene: navnet i raekken, venstresiden, enheden og hintene.
-       Det foerste hint til formlen siger, hvad man kender, ikke formlen.
-       hint2 er trekanten, naar formlen skal vendes. */
+    /* Regnetrinene: navnet i raekken, venstresiden, enheden, formlen og
+       hintene. Hvert trin har tre dele: formlen, mellemregningen (tallene
+       med enheder sat ind, i en broek med to felter eller to felter med et
+       gangetegn) og resultatet. Hintene er rettet mod opgaven og giver
+       tit halvdelen af svaret (brugerens oenske 27. sept. 2026): formlens
+       begyndelse, det foerste tal i mellemregningen, enheden i resultatet.
+       I hintene er {a} og {b} de to tal med enhed, {a0} og {b0} de samme
+       uden enhed, og {stof} navnet paa stoffet. hint2 er trekanten, naar
+       formlen skal vendes.
+       led: de to bogstaver i mellemregningen, op: broek eller gange. */
     D.TRIN = {
-        n: { navn: "Stofmængden", venstre: "n", enhed: "mol", formel: "m / M",
-             formelHint: "Du kender massen i g og molarmassen i g/mol. Svaret skal være i mol." },
-        m: { navn: "Massen", venstre: "m", enhed: "g", formel: "n · M", vend: true,
-             formelHint: "Du kender stofmængden og molarmassen. Skriv formlen for n, og isolér m." },
-        M: { navn: "Molarmassen", venstre: "M", enhed: "g/mol", formel: "m / n", vend: true,
-             formelHint: "Du kender massen og stofmængden. Skriv formlen for n, og isolér M." }
+        n: { navn: "Stofmængden", venstre: "n", enhed: "mol", formel: "m / M", op: "/", led: ["m", "M"],
+             formelHint: "Du kender massen og skal finde stofmængden. Formlen begynder sådan: n = m / …",
+             indsaetHint: ["Øverst står massen fra opgaven: {a}. Nederst står molarmassen.",
+                           "Nederst står molarmassen af {stof}. Den står på krukkens etiket."],
+             talHint: "Tast {a0} : {b0} på lommeregneren. Gram går ud med gram, så svaret er i mol." },
+        m: { navn: "Massen", venstre: "m", enhed: "g", formel: "n · M", op: "*", led: ["n", "M"], vend: true,
+             formelHint: "Du kender stofmængden og skal finde massen. Formlen begynder sådan: m = n · …",
+             indsaetHint: ["Først stofmængden: {a}. Den skal ganges med molarmassen.",
+                           "Molarmassen af {stof} står på krukkens etiket."],
+             talHint: "Tast {a0} · {b0} på lommeregneren. Mol går ud med mol, så svaret er i g." },
+        M: { navn: "Molarmassen", venstre: "M", enhed: "g/mol", formel: "m / n", op: "/", led: ["m", "n"], vend: true,
+             formelHint: "Du kender massen og stofmængden og skal finde molarmassen. Formlen begynder sådan: M = m / …",
+             indsaetHint: ["Øverst står massen fra opgaven: {a}. Nederst står stofmængden.",
+                           "Nederst står stofmængden fra opgaven."],
+             talHint: "Tast {a0} : {b0} på lommeregneren. Svaret er gram pr. mol: g/mol." }
     };
+
+    /* I Mesteren kommer stofmaengden i andet trin fra foerste trin */
+    D.MESTER_HINT = "Brug stofmængden fra trin 1: {a}. Den skal ganges med molarmassen af glukose.";
 
     /* Trekanten: Kemichaels ord, naar den kommer frem */
     D.TREKANT = "Dæk det over, du vil finde. Det, der er tilbage, er formlen: ved siden af hinanden ganges, over hinanden deles.";
@@ -179,7 +204,10 @@
        er rigtigt. slags bestemmer, hvor mange af hver en runde faar. */
     D.RUNDE = { formel: 3, enhed: 2, navn: 1, forkort: 2, tal: 4 };
     D.HURTIG_ANTAL = Object.keys(D.RUNDE).reduce(function (s, k) { return s + D.RUNDE[k]; }, 0);
-    D.STRAF = 5;              /* sekunder oven i tiden for et forkert svar eller et hint */
+    /* Sekunder oven i tiden. Tallet staar ikke i teksten, kun "tidsstraf"
+       (brugerens oenske 27. sept. 2026: 10 s for et forkert svar). */
+    D.STRAF = 10;             /* et forkert svar eller Vis svaret */
+    D.STRAF_HINT = 5;         /* et hint */
 
     D.HURTIG = [
         { slags: "formel", spm: "n = ?", svar: ["m / M", "M / m", "m · M"],
@@ -242,7 +270,7 @@
         hurtig: "Tolv spørgsmål på tid. Fejl kommer igen."
     };
     D.FAERDIG = {
-        formel: "Alle seks. Formlen sidder, også baglæns.",
+        formel: "Alle seks. Træn videre på Vægten og i Hurtigrunden.",
         vaegt: "Alle seks. Formlen først, så tallet med enhed."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];

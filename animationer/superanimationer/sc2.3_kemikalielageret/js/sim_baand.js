@@ -91,9 +91,10 @@
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
         lay.bordY = Math.round(H * 0.93);
-        /* Glassene paa hylden er store nok til, at navnet kan laeses */
-        lay.lilleH = NK.klamp(H * 0.19, 70, 150);
-        lay.hyldeY = Math.round(Math.max(H * 0.2, lay.lilleH + 14));
+        /* Glassene paa hylden er store nok til, at navnet kan laeses, og
+           smaa nok til, at der er plads til otte ved siden af hinanden */
+        lay.lilleH = NK.klamp(H * 0.147, 64, 118);
+        lay.hyldeY = Math.round(Math.max(H * 0.18, lay.lilleH + 16));
         lay.baandY = Math.round(H * 0.56);
         lay.x0 = 0;
         lay.x1 = Math.round(W * 0.8);
@@ -108,6 +109,9 @@
            foroven slutter foer dem */
         var pb = Math.min(W * 0.17, 200), px = W - pb - Math.max(10, W * 0.015);
         lay.hyldeX1 = px - 16;
+        /* Hvor mange glas der er plads til paa hylden, og afstanden mellem dem */
+        lay.hyldeLb = Tg.glasBredde(lay.lilleH) * 1.02;
+        lay.hyldePlads = Math.max(1, Math.floor((lay.hyldeX1 - 8 - 24) / lay.hyldeLb));
         var ptH = NK.klamp(pb * 0.62, 70, 130);
         var ionH = NK.klamp(lay.kasse.y - 26 - (14 + ptH + 16), 70, 190);
         lay.plakater = {
@@ -388,8 +392,8 @@
         ctx.fillRect(8, lay.hyldeY + 5, hb, 8);
         ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
         ctx.fillRect(8, lay.hyldeY + 13, hb, 4);
-        var lb = Tg.glasBredde(lay.lilleH) * 1.08;
-        var plads = Math.max(1, Math.floor((hb - 24) / lb));
+        var lb = lay.hyldeLb;
+        var plads = lay.hyldePlads;
         var vis = this.paaHylden.slice(-plads);
         vis.forEach(function (st, i) {
             Tg.glas(ctx, 24 + lb * (i + 0.5), lay.hyldeY, lay.lilleH, st, { etiket: "ny", bredEtiket: true, tekst: true });

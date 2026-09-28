@@ -40,12 +40,9 @@
         elektronpar: { x: 32, y: 108, top: 3 }    /* spids ved atomet, top af wolken */
     };
 
-    /* Kemichaels sprites (krop, hoved, arm og kaffekop) laegger
-       ../../v2/kemichael/kemichael.js selv i FILER med deres egen mappe.
-       Derfor indlaeses kemichael.js efter denne fil, og indlaesningen
-       startes foerst fra app.js. */
+    /* Indlaesningen startes fra app.js. */
     function indlaes(navn, f) {
-        var sti = (f.mappe || MAPPE) + f.fil;
+        var sti = MAPPE + f.fil;
         var post = { img: new Image(), klar: false, fejlet: false };
         lager[navn] = post;
         post.img.addEventListener("load", function () { post.klar = true; });
@@ -96,21 +93,6 @@
             ctx.fillRect(x, y, b, h);
             ctx.restore();
             return false;
-        },
-
-        /* Tegner spritet drejet om ankerpunktet, der staar i positur p
-           (bruges af Kemichael). */
-        tegnPositur: function (ctx, navn, p, anker, alfa, skala) {
-            var f = FILER[navn];
-            if (!f) return;
-            var k = skala || 1;
-            ctx.save();
-            if (alfa !== undefined) ctx.globalAlpha *= NK.klamp(alfa, 0, 1);
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.v);
-            ctx.scale(k, k);
-            NK.Sprites.tegn(ctx, navn, -anker.x, -anker.y, f.b, f.h);
-            ctx.restore();
         },
 
         /* Billedet, hvis det er indlaest, ellers null. */

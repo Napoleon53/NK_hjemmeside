@@ -35,7 +35,8 @@
     var STAVNING = [
         [/fosf/g, "phosph"], [/klor/g, "chlor"], [/jod/g, "iod"], [/karbon/g, "carbon"],
         [/kalcium/g, "calcium"], [/caesium|cesium/g, "cæsium"], [/aluminum/g, "aluminium"],
-        [/sulph/g, "sulf"], [/oxyd/g, "oxid"], [/nikel/g, "nikkel"], [/kobolt/g, "cobalt"]
+        [/sulph/g, "sulf"], [/oxyd/g, "oxid"], [/nikel/g, "nikkel"], [/kobolt/g, "cobalt"],
+        [/krom/g, "chrom"], [/tiosulf/g, "thiosulf"]
     ];
 
     function stav(s) {
@@ -79,6 +80,22 @@
             ammoniak: "Ammoniak er NH₃, et molekyle. NH₄⁺ er en ion med sit eget navn.",
             ammoniakion: "Ammoniak er NH₃, et molekyle. NH₄⁺ er en ion med sit eget navn."
         },
+        MnO4: {
+            manganat: "Manganat er MnO₄²⁻. MnO₄⁻ hedder permanganat.",
+            hypermanganat: "Tæt på. Ionen hedder permanganat.",
+            hypermangan: "Hypermangan er hverdagsnavnet for kaliumpermanganat. Ionen hedder permanganat."
+        },
+        S2O3: {
+            sulfat: "Sulfat er SO₄²⁻. S₂O₃²⁻ har to S og hedder thiosulfat.",
+            sulfit: "Sulfit er SO₃²⁻. S₂O₃²⁻ har to S og hedder thiosulfat.",
+            thiosulfit: "Tæt på. Ionen hedder thiosulfat."
+        },
+        CrO4: {
+            dichromat: "Dichromat er Cr₂O₇²⁻. CrO₄²⁻ har kun ét Cr og hedder chromat."
+        },
+        Cr2O7: {
+            chromat: "Chromat er CrO₄²⁻. Cr₂O₇²⁻ har to Cr og hedder dichromat."
+        },
         S: {
             sulfat: "Sulfat er SO₄²⁻. Her er der kun svovl.",
             sulfit: "Sulfit er SO₃²⁻. Her er der kun svovl.",
@@ -120,7 +137,10 @@
         ZnO: { zinksalve: "Zinksalve står der på tuben." },
         KNO3: { salpeter: "Salpeter står der på den gamle krukke." },
         CuSO4: { blåvitriol: "Blåvitriol er det gamle navn.", kobbervitriol: "Kobbervitriol er det gamle navn." },
-        CaCl2: { vejsalt: "Vejsalt står der på sækken." }
+        CaCl2: { vejsalt: "Vejsalt står der på sækken." },
+        MgO: { magnesia: "Magnesia står der på pakken fra apoteket." },
+        KMnO4: { hypermangan: "Hypermangan står der på den gamle flaske fra apoteket." },
+        Na2S2O3: { fixersalt: "Fixersalt står der på posen i mørkekammeret." }
     };
 
     /* Formler, som ikke er et af lagerets stoffer */

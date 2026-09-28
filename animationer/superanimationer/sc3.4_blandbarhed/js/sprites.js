@@ -1,9 +1,9 @@
 /* =====================================================================
-   sprites.js - indlaeser bassinet og Kemichaels sprites
+   sprites.js - indlaeser glasset og Kemichaels sprites
 
-   Bassinet (sprites/bassin.svg) staar i FILER. Filen er ogsaa det lager,
-   ../../v2/kemichael/kemichael.js laegger laererens sprites (krop,
-   hoved, arm og kaffekop) i, med deres egen mappe. Derfor skal den
+   Bassinet, koelerne og forlaget (sprites/*.svg) staar i FILER. Filen
+   er ogsaa det lager, ../../v2/kemichael/kemichael.js laegger laererens
+   sprites (krop, hoved, arm og kaffekop) i, med deres egen mappe. Derfor skal den
    indlaeses foer kemichael.js, og indlaesningen startes foerst fra app.js.
 
    Sprites hentes med <img>, ikke med fetch, saa de ogsaa virker, naar
@@ -15,8 +15,13 @@
     var NK = window.NK;
     var lager = {};
     var FILER = {
-        /* Indersiden er x 20-670 og y 30-604,4 (se kommentaren i filen) */
-        bassin: { fil: "bassin.svg", b: 690, h: 626 }
+        /* Tegningen gaar fra y -60 til 626; indersiden er x 20-670 og y
+           30-604,4 (se kommentaren i filen) */
+        bassin: { fil: "bassin.svg", b: 690, h: 686 },
+        /* Koeleren og forlaget: viewBox'en er i bassinets enheder (js/apparat.js, A.SPRITE) */
+        tilbagesvaler: { fil: "tilbagesvaler.svg", b: 160, h: 172 },
+        destillation: { fil: "destillation.svg", b: 460, h: 246 },
+        forlag: { fil: "forlag.svg", b: 262, h: 520 }
     };
 
     function indlaes(navn, f) {

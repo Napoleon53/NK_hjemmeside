@@ -855,3 +855,77 @@ select:focus-visible {
     border-bottom: 1px solid var(--linje);
 }
 .teoritabel i { font-family: Cambria, "Times New Roman", serif; font-size: 1.1em; }
+
+/* Formlen: opgavens tekst staar over tavlen; kortet har kun formaalet
+   (introduktionen og sidste opgave). Listerne fylder mindre
+   (brugerens oenske 27. sept. 2026). */
+.om-tekst { margin: 0 0 4px; font-size: 0.9rem; line-height: 1.45; color: #c8ced6; }
+.hyldeliste { gap: 3px; }
+.hyldelinje { padding: 4px 9px; gap: 8px; }
+.hl-navn { font-size: 0.84rem; }
+.hl-nr { width: 18px; height: 18px; font-size: 0.68rem; }
+
+/* ---------------------------------------------------------------------
+   SC4.3: regnestykket paa Vaegten. Formlen, mellemregningen og
+   resultatet staar under hinanden med lighedstegnene ud for hinanden,
+   og broeker har en rigtig broekstreg, ogsaa i felterne (brugerens
+   oenske 27. sept. 2026: ikke "/").
+   --------------------------------------------------------------------- */
+.regnestykke {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 7px;
+    row-gap: 6px;
+}
+
+.rs-venstre { font-size: 1rem; font-weight: 700; color: var(--gul); white-space: nowrap; }
+.rs-lig { font-size: 1rem; font-weight: 700; color: #cfd6de; text-align: center; }
+.rs-hoejre { min-width: 0; display: flex; align-items: center; gap: 6px; }
+.rs-vist { font-size: 1rem; font-weight: 600; color: #e6ebf0; font-variant-numeric: tabular-nums; }
+.rs-vist b { color: #b8f0cf; }
+.rs-vist.svar b { color: #fff3c4; }
+.rs-vist i { font-family: Cambria, "Times New Roman", serif; font-size: 1.15em; font-weight: 600; }
+.rs-vist .broek { font-size: 1em; line-height: 1.2; }
+.rs-vist .broek > span { padding: 0 4px; }
+.rs-maerke { font-weight: 700; color: #7ee0a8; }
+.rs-maerke.svar { color: var(--gul); }
+
+/* Et felt med en broek: to indtastninger over hinanden med en streg imellem */
+.felt.broekfelt { min-height: 0; }
+.bf-krop { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 5px 8px; }
+.bf-broek { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: stretch; }
+.bf-streg { height: 2px; margin: 4px 0; background-color: #cfd6de; border-radius: 1px; }
+.bf-gange { font-size: 1.1rem; font-weight: 700; color: #cfd6de; }
+.bf-del {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    background-color: #23232d;
+    border: 1px solid #4a4a58;
+    border-radius: 5px;
+}
+.felt .bf-del input { padding: 5px 6px; min-width: 40px; width: 100%; text-align: center; }
+/* To tal med gangetegn: smallere felter, lidt mindre skrift */
+.bf-krop > .bf-del { flex: 1 1 0; }
+.bf-krop > .bf-del input { font-size: 0.95rem; padding: 5px 3px; }
+
+/* Et smalt kort og en lang venstreside (m(C₆H₁₂O₆) = n · M): venstresiden
+   staar alene paa foerste linje, og lighedstegnene rykkes ind under den,
+   saa de to felter med gangetegnet kan staa paa én linje */
+.raekke { container-type: inline-size; }
+@container (max-width: 370px) {
+    .regnestykke.lang { grid-template-columns: 14px auto minmax(0, 1fr); }
+    .regnestykke.lang > .rs-venstre { grid-column: 1; }
+    .regnestykke.lang > .rs-lig { grid-column: 2; }
+    .regnestykke.lang > .rs-hoejre { grid-column: 3; }
+    .regnestykke.lang > .rs-venstre:first-child { grid-column: 1 / 4; }
+}
+.bf-krop > .bf-del input::placeholder { font-size: 0.8rem; }
+.bf-krop > .bf-del .bf-tekst { font-size: 0.95rem; padding: 5px 4px; }
+.bf-del:focus-within { border-color: var(--gul); }
+.bf-del.ok { border-color: rgba(63, 174, 114, 0.6); background-color: rgba(63, 174, 114, 0.13); }
+.bf-del.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
+.bf-del .bf-tekst { flex: 1; padding: 5px 8px; text-align: center; font-size: 1rem; font-weight: 600; color: #b8f0cf; white-space: nowrap; }
+.felt.broekfelt.aktiv:focus-within { box-shadow: none; }

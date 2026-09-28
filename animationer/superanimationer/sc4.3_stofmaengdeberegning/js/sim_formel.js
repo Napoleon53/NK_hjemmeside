@@ -1,13 +1,15 @@
 /* =====================================================================
    sim_formel.js - fane 1: Formlen
 
-   Seks runder, der traener at huske n = m / M med navne og enheder, og
-   at vende den. Tavlen har formlen (broek eller linje) og et skema med
-   n, m og M, deres navne og enheder. Brikkerne ligger i bunden af tavlen
-   og traekkes op paa pladserne (eller: klik paa en brik og saa paa en
-   plads). Stilladset forsvinder runde for runde: blege bogstaver,
-   lokkebrikker, navne, enheder, formlen vendt, og til sidst skrives det
-   hele i felter uden brikker.
+   Seks opgaver, der traener at huske n = m / M med navne og enheder, og
+   at vende den. Over tavlen staar opgavens tekst paa én linje (eller to).
+   Tavlen har formlen (broek eller linje) og et skema med n, m og M,
+   deres navne og enheder. Det bogstav, der skal findes, staar fast paa
+   venstre side (i introduktionen er det en plads med et blegt bogstav).
+   Brikkerne ligger i bunden af tavlen og traekkes op paa pladserne
+   (eller: klik paa en brik og saa paa en plads). Stilladset forsvinder
+   opgave for opgave: blege bogstaver, lokkebrikker, navne, enheder,
+   formlen vendt, og til sidst skrives det hele i felter uden brikker.
 
    En del (formlen, navnene, enhederne) vurderes, naar alle dens pladser
    er fyldt. Formlen vurderes som helhed, saa m = n · M og m = M · n er
@@ -39,7 +41,7 @@
     var P = SimFormel.prototype;
     NK.Fane.paa(P, { navn: "formel", naesteFane: "fane-vaegt", naesteNavn: "Vægten" });
 
-    /* ----- Runden ------------------------------------------------------------------ */
+    /* ----- Opgaven ------------------------------------------------------------------ */
     P.lavOpgave = function (i) {
         var r = D.FORMEL[i];
         this.runde = r;
@@ -62,21 +64,23 @@
         this.el.raekker.hidden = r.ramme !== "skriv";
     };
 
-    /* Pladserne: formlen (F_), navnene (N_) og enhederne (E_) */
+    /* Pladserne: formlen (F_), navnene (N_) og enhederne (E_). Venstre
+       side (F_v) er kun en plads i introduktionen; ellers staar den fast. */
     P.lavPladser = function () {
         var r = this.runde, pl = {};
         var aabenF = r.aabne.indexOf("formel") >= 0 && r.ramme !== "skriv";
+        var aabenV = aabenF && !!r.skygge;
         function ny(id, slags, del, facit, aaben) {
             pl[id] = { id: id, slags: slags, del: del, facit: facit, aaben: aaben, brik: null, x: 0, y: 0, b: 1, h: 1 };
         }
         if (r.ramme === "linje") {
             var kan = r.maal === "m" ? ["m", "n", "·", "M"] : ["M", "m", "/", "n"];
-            ny("F_v", "sym", "formel", kan[0], aabenF);
+            ny("F_v", "sym", "formel", kan[0], aabenV);
             ny("F_a", "sym", "formel", kan[1], aabenF);
             ny("F_op", "op", "formel", kan[2], aabenF);
             ny("F_b", "sym", "formel", kan[3], aabenF);
         } else {
-            ny("F_v", "sym", "formel", "n", aabenF);
+            ny("F_v", "sym", "formel", "n", aabenV);
             ny("F_t", "sym", "formel", "m", aabenF);
             ny("F_n", "sym", "formel", "M", aabenF);
         }
@@ -90,8 +94,10 @@
     P.harNyeTal = function () { return false; };
     P.nulstil = function () { this.vaelg(this.nr, true); };
 
+    /* Opgavens tekst staar over tavlen (brugerens oenske 27. sept. 2026:
+       i kortet blev den overset). Kortet har kun det, der staar i om. */
     P.promptHTML = function () {
-        return '<p class="maal-tekst">' + NK.html(this.runde.tekst) + "</p>";
+        return this.runde.om ? '<p class="om-tekst">' + NK.html(this.runde.om) + "</p>" : "";
     };
 
     P.opgaveFaerdig = function () {
@@ -110,7 +116,7 @@
         if (r.skygge) return "Træk n, m og M fra bunden op på de blege bogstaver.";
         var mangler = Object.keys(d).filter(function (k) { return !d[k]; }).map(function (k) { return DELNAVN[k]; });
         if (!mangler.length) return "";
-        if (r.ramme === "linje") return "Byg " + r.maal + " = … med brikkerne.";
+        if (r.ramme === "linje") return "Træk brikkerne op på de tomme pladser efter lighedstegnet.";
         return "Træk brikkerne op: " + mangler.join(" og ") + ".";
     };
 
@@ -232,7 +238,11 @@
     /* ----- Vurderingen af en fyldt del ---------------------------------------------------- */
     P.formelFraPladser = function () {
         var r = this.runde, pl = this.pl, mig = this;
-        function t(id) { var b = pl[id].brik ? mig.brik(pl[id].brik) : null; return b ? b.tekst : null; }
+        function t(id) {
+            if (!pl[id].aaben) return pl[id].facit;
+            var b = pl[id].brik ? mig.brik(pl[id].brik) : null;
+            return b ? b.tekst : null;
+        }
         if (r.ramme === "linje") {
             var op = t("F_op") === "·" ? "*" : "/";
             return { venstre: t("F_v"), hoejre: { op: op, a: { s: t("F_a") }, b: { s: t("F_b") } } };
@@ -478,7 +488,7 @@
 
     P.nedScene = function (pt) {
         if (this.faerdig && this.runde.ramme !== "skriv") {
-            if (this.brikUnder(pt) || this.pladsUnder(pt)) this.kortBesked("Runden er løst. Knappen i kortet går videre.");
+            if (this.brikUnder(pt) || this.pladsUnder(pt)) this.kortBesked("Opgaven er løst. Knappen i kortet går videre.");
             return false;
         }
         var b = this.brikUnder(pt);
@@ -584,8 +594,12 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h, r = this.runde, ctx = this.L.ctx, mig = this;
         var baand = this.k.layout(W, H);
-        var R = { x: 16, y: 16, b: W - 32, h: Math.max(160, baand.y - 16 - 24) };
-        var lay = { W: W, H: H, Hs: baand.y, tavle: R };
+        /* Opgavens tekst over tavlen, saa tavlen under den */
+        var opg = Tg.overTavle(ctx, r.tekst, W - 32 - 14, NK.klamp(Math.min(W / 44, baand.y / 26), 15, 20), 15);
+        var opgY = 12;
+        var ry = opgY + opg.h + 16;
+        var R = { x: 16, y: ry, b: W - 32, h: Math.max(160, baand.y - ry - 24) };
+        var lay = { W: W, H: H, Hs: baand.y, tavle: R, opg: opg, opgY: opgY };
         var navne = RAEKKER.map(function (s) { return FACIT_NAVN[s]; });
         var enheder = RAEKKER.map(function (s) { return D.ENHED_TEKST[s]; });
         this.brikker.forEach(function (b) {
@@ -687,6 +701,7 @@
             else { b.x = b.hx; b.y = b.hy; }
         });
         this.lay = lay;
+        this.saetAnker("opgave", R.x, opgY, R.b, opg.h);
         this.saetAnker("formel", R.x, R.y, tx0 - R.x - 8, topH);
         this.saetAnker("skema", tx0 - 6, R.y + 4, R.x + R.b - tx0 + 2, topH - 4);
         this.saetAnker("bunke", lay.tray.x, lay.tray.y, lay.tray.b, lay.tray.h);
@@ -700,6 +715,7 @@
         var s = lay.s, R = lay.tavle;
         this.L.ryd();
         Tg.rum(ctx, lay.W, lay.Hs, lay.Hs);
+        Tg.tegnOverTavle(ctx, lay.opg, R.x, lay.opgY);
         Tg.tavle(ctx, R);
 
         /* Bunken med brikker: et lidt moerkere felt nederst paa tavlen */
@@ -721,7 +737,9 @@
         var pl = this.pl;
         var hvidF = r.ramme === "linje" ? null : lay.broek;
         if (r.ramme === "linje") {
-            NK.tekst(ctx, "n = m / M", lay.fx0, lay.fy - s * 1.05, { font: Tg.matte(NK.klamp(s * 0.36, 13, 22)), linje: "middle", farve: "#8a93a0" });
+            /* Den formel, der skal vendes, med en rigtig broekstreg */
+            Tg.regnestykke(ctx, [{ t: "n", matte: true }, { t: " = " }, { top: "m", bund: "M", matte: true }],
+                lay.fx0, lay.fy - s * 1.2, NK.klamp(s * 0.36, 14, 24), "#8a93a0");
         }
         Tg.tegnPaaTavle(ctx, "=", lay.lig.x, lay.lig.y, Math.round(s * 0.6));
         if (hvidF) {
@@ -746,7 +764,7 @@
             var p = pl[k];
             if (p.del !== "formel") return;
             if (p.aaben) Tg.plads(ctx, p, { lys: lys(p), skygge: r.skygge ? p.facit : "" });
-            else if (r.ramme === "skriv" && !skrivF) Tg.plads(ctx, p, {});
+            else if (r.ramme === "skriv" && !skrivF && p.id !== "F_v") Tg.plads(ctx, p, {});
             else Tg.plads(ctx, p, { tekst: p.facit });
         });
 

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160">
+  <!-- Gaettet "tungere": et blankt soem og det samme soem, naar det er
+       rustent, med luft, der blaeser ind paa det. Vises paa kortet i det
+       gratis gaet. -->
+  <defs>
+    <linearGradient id="blank" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f4"/>
+      <stop offset="0.45" stop-color="#aeb6bf"/>
+      <stop offset="1" stop-color="#6c747e"/>
+    </linearGradient>
+    <linearGradient id="rust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d98a4a"/>
+      <stop offset="0.45" stop-color="#a8521f"/>
+      <stop offset="1" stop-color="#6a2f12"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Det blanke soem -->
+  <g transform="translate(0 6)">
+    <rect x="14" y="76" width="7" height="34" rx="2" fill="url(#blank)" stroke="#4d545c" stroke-width="0.8"/>
+    <path d="M21 88 L92 88 L106 93 L92 98 L21 98 Z" fill="url(#blank)" stroke="#4d545c" stroke-width="0.8"/>
+  </g>
+
+  <!-- Pilen -->
+  <path d="M112 99 L132 99" stroke="#c8ced6" stroke-width="4" stroke-linecap="round"/>
+  <path d="M128 91 L138 99 L128 107 Z" fill="#c8ced6"/>
+
+  <!-- Luften, der blaeser ind paa det rustne soem -->
+  <g fill="none" stroke="#8ec5f0" stroke-width="3" stroke-linecap="round">
+    <path d="M152 22 C 164 30, 170 42, 170 64"/>
+    <path d="M192 18 C 196 32, 194 46, 188 66"/>
+    <path d="M222 36 C 218 48, 212 56, 206 70"/>
+  </g>
+  <g fill="#8ec5f0">
+    <path d="M164 62 L170 74 L176 62 Z"/>
+    <path d="M182 64 L187 76 L194 66 Z"/>
+    <path d="M200 67 L203 80 L211 70 Z"/>
+  </g>
+
+  <!-- Det rustne soem: lidt tykkere, med flager -->
+  <g transform="translate(0 6)">
+    <rect x="142" y="74" width="9" height="38" rx="2.5" fill="url(#rust)" stroke="#4a200b" stroke-width="0.8"/>
+    <path d="M151 86 L218 86 L232 93 L218 100 L151 100 Z" fill="url(#rust)" stroke="#4a200b" stroke-width="0.8"/>
+    <g fill="#c96a2e" stroke="#5a270e" stroke-width="0.5">
+      <path d="M160 84 L166 81 L170 85 L164 87 Z"/>
+      <path d="M182 100 L188 104 L184 107 L179 103 Z"/>
+      <path d="M200 83 L207 82 L206 86 Z"/>
+      <path d="M170 99 L174 103 L168 104 Z"/>
+      <path d="M212 99 L218 101 L214 104 Z"/>
+    </g>
+    <g fill="#e7a064" fill-opacity="0.8">
+      <circle cx="176" cy="91" r="1.4"/><circle cx="196" cy="95" r="1.2"/><circle cx="208" cy="90" r="1.3"/>
+    </g>
+  </g>
+</svg>

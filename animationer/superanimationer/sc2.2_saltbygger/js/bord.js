@@ -488,10 +488,17 @@
         var smal = W < 640;
         var venstre = smal ? 102 : 136, hoejre = smal ? 54 : 96;
         var U = NK.klamp((W - venstre - hoejre) / felter, 30, 84);
+        /* Kemichaels hjoerne nederst til hoejre (hjoerne, sat af
+           js/laerer.js): bordet med maerket til hoejre for sig holder sig
+           til venstre for det, og i en smal scene bliver felterne lidt
+           mindre for det, dog ikke under 60. */
+        var hjoerne = this.hjoerne && !smal ? this.hjoerne + 80 : 0;
+        if (hjoerne > hoejre) U = Math.max(Math.min(U, 60), Math.min(U, (W - venstre - hjoerne) / felter));
         var r = NK.klamp(U * 0.15, 7, 11);
         var gab = r + 3;
         var hc = NK.klamp((y1 - y0) / 2 - gab - 12, 56, 128);
         var x0 = venstre + Math.max(0, (W - venstre - hoejre - felter * U) / 2);
+        if (hjoerne) x0 = Math.max(venstre, Math.min(x0, W - hjoerne - felter * U));
         return { W: W, H: H, y0: y0, y1: y1, zy: (y0 + y1) / 2, U: U, r: r, gab: gab, hc: hc, x0: x0,
                  felter: felter, styrB: smal ? 98 : 128 };
     };

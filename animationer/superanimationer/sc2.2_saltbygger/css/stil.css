@@ -447,24 +447,23 @@ main { flex: 1; position: relative; min-height: 0; }
 /* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
 .anker { position: absolute; pointer-events: none; }
 
-/* Den store knap, der sender Kemichael ud under praesentationen (som i
-   sc2.3). Midt foroven i scenen, saa den ikke kan overses. */
+/* Knappen, der sender Kemichael ud under praesentationen. Den staar i
+   hjoernet over hans taleboble; js/laerer.js saetter top og right. */
 .spring-over {
     position: absolute;
     top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 10px;
     z-index: 6;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background-color: rgba(20, 20, 28, 0.94);
     color: #ffffff;
     border: 2px solid var(--gul);
     border-radius: 999px;
-    padding: 11px 22px;
+    padding: 6px 14px;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
@@ -472,21 +471,33 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Fane 1: under hylden, saa ionerne kan tages under praesentationen.
-   Fane 3: under formlen, mellem plakaterne. */
-#bord-spring { top: 92px; }
-#ukendt-spring { top: 104px; }
+.spring-over span { color: var(--gul); font-size: 1rem; }
 
 /* Foerste klik paa Kemichael: knappen blinker og viser vejen */
 @keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: scale(1); }
+    40%  { transform: scale(1.08); }
+    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: scale(1); }
 }
 
 .spring-over.puf { animation: puf 0.7s ease-out 2; }
+
+/* Den gule ramme om det, Kemichael taler om (NK.Fremhaev i js/laerer.js).
+   Den ligger oven paa siden og fanger ingen klik. */
+.fremhaev-ramme {
+    position: fixed;
+    z-index: 7;
+    pointer-events: none;
+    border: 3px solid var(--gul);
+    border-radius: 12px;
+    animation: fremhaev 1.3s ease-out infinite;
+}
+
+@keyframes fremhaev {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.55); }
+    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -972,21 +983,22 @@ select:focus-visible {
 .traekker .chip { cursor: grabbing; }
 #vand-laerred { touch-action: manipulation; }
 
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
+/* Tilbuddet om Kemichaels praesentation: nederst i hoejre hjoerne af
+   scenen, hvor han selv kommer til at staa (js/praesentation.js). Paa
+   fane 1 flytter js/laerer.js det op over den nederste hylde. */
 .tilbud {
     position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 12px;
+    bottom: 12px;
     z-index: 6;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
     background-color: rgba(20, 20, 28, 0.94);
     border: 1px solid #4a4a58;
-    border-radius: 999px;
-    padding: 6px;
+    border-radius: 14px;
+    padding: 7px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     white-space: nowrap;
 }
@@ -996,8 +1008,8 @@ select:focus-visible {
     font-weight: 700;
     border-radius: 999px;
     cursor: pointer;
-    padding: 9px 18px;
-    font-size: 0.98rem;
+    padding: 7px 16px;
+    font-size: 0.92rem;
 }
 
 .tilbud-start {

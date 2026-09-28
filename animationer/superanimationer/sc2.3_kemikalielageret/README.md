@@ -16,7 +16,7 @@ moduler, så den virker fra harddisken.
 3. **Naboerne:** `sc2.2_saltbygger` ejer lynlåsen og at bygge et salt med musen,
    `c2.1` ejer opløsningen, `c2.4` fældningen og `sc1.1` elektronoverførslen, der
    giver ionerne deres ladning. Intet af det kopieres herind.
-4. **Loftet:** 2 faner. 30 stoffer ad gangen (36 i alt med de 6 sværere), de
+4. **Loftet:** 2 faner. 30 stoffer ad gangen (41 i alt med de 11 sværere), de
    samme på begge faner. På scenen højst 30 glas, 2 plakater, etiketmaskinen og
    Kemichael.
 5. **Layoutet:** scene plus panel. Fane 1: scenen er lageret (reol, arbejdsbord,
@@ -40,13 +40,18 @@ Panelet har én række pr. ion og én til sidst. Hver ion, eleven finder, lægge
 sig som en kugle ved glasset. Er formlen eller navnet rigtigt, kommer der
 kugler til, så der står 2 Al³⁺ og 3 O²⁻ med +6 og −6, i alt 0. Kuglerne ryger
 ned i glasset, etiketmaskinen printer en ny etiket, og under scenen står, hvor
-man møder stoffet. Et glas løst uden at se svaret får en stjerne.
+man møder stoffet. Et glas løst uden at se svaret får en stjerne. Tilbage på
+hylden har glasset den nye etiket med formlen på. Er glassene store nok,
+står navnet der også; ellers står formlen alene, og musen over glasset viser
+begge dele. Reolen fylder så meget af scenen, som arbejdsbordet tillader, og
+hyldeskiltene sidder på hyldebrættet, så glassene kan blive så store som
+muligt. Plakaterne hænger i en smal søjle til højre.
 
 **Samlebåndet.** Glassene kører mod kassen med halvdelen af etiketten. Svaret
 skrives på etiketmaskinen og gælder altid det forreste glas (pilen). Rigtigt:
 etiketten printes, og glasset ryger op på hylden, hvor navn og formel kan læses
-(glassene er større der, og etiketten går lidt om på siderne). Hylden viser de
-sidste glas, der er plads til. Forkert: samme forklaring som
+(etiketten går lidt om på siderne). Hylden viser de sidste otte glas (flere på
+en stor skærm). Forkert: samme forklaring som
 på lageret, og stimen er væk. Et glas i kassen koster et liv, og efter tre er
 spillet slut. Kassen viser bagefter facit på de glas, der røg i den. Hvert
 femte rigtige svar giver et nyt niveau: formler, navne, sammensatte ioner og
@@ -56,18 +61,37 @@ til sidst det hele blandet i begge retninger og hurtigere.
 holder glassene sig til det, kompendiet til kapitel 2 bruger: hovedgrupperne
 blandt de første 20 grundstoffer plus Br, I og Ba, metalionerne Fe, Cu, Ag og Zn
 og de seks vigtige sammensatte ioner (OH⁻, NO₃⁻, SO₄²⁻, CO₃²⁻, PO₄³⁻, NH₄⁺).
-Slås den til, bytter seks glas plads med sværere stoffer: SrCl₂ for CaCl₂, PbO₂
-for CuO, SnF₂ for Ag₂S, HgO for FeCl₂, NaHCO₃ for KNO₃ og Pb(NO₃)₂ for CuSO₄.
-HCO₃⁻ kommer på plakaten, og samlebåndet trækker fra det samme sæt. Kontakten og
-fremskridtet huskes for alle 36 stoffer, så intet går tabt ved at slå den til
-og fra.
+Slås den til, bytter elleve glas plads med sværere stoffer: SrCl₂ for CaCl₂,
+BeO for MgO, PbO₂ for CuO, SnF₂ for Ag₂S, HgO for FeCl₂, KMnO₄ for NH₄Cl,
+Na₂S₂O₃ for K₂CO₃, NaHCO₃ for KNO₃, K₂CrO₄ for BaSO₄, Pb(NO₃)₂ for CuSO₄ og
+K₂Cr₂O₇ for Al₂(SO₄)₃. HCO₃⁻, MnO₄⁻, S₂O₃²⁻, CrO₄²⁻ og Cr₂O₇²⁻ kommer på
+plakaten, og samlebåndet trækker fra det samme sæt. Kontakten og fremskridtet
+huskes for alle 41 stoffer, så intet går tabt ved at slå den til og fra.
+
+Beryllium står blandt de første 20 grundstoffer, men er en sværere ion
+(brugerens valg 27. sept. 2026), så BeO er flyttet bag kontakten, og MgO
+(magnesia) har taget pladsen. De fire nye sammensatte ioner er dem, der bruges
+på B-niveau: permanganat i redoxtitrering, thiosulfat og syre, chromat som
+indikator i Mohr-titrering og dichromat i den gamle alkoholtest.
+
+**Faremærkerne.** Et glas med et farligt stof har et GHS-piktogram på skulderen
+over etiketten, og musen over glasset på reolen siger, hvad det betyder. Kun to
+af de ni piktogrammer er med: dødningehovedet (GHS06, akut giftig) og
+udråbstegnet (GHS07, sundhedsskadelig). Et glas har højst ét; har stoffet
+GHS06, får det ikke også GHS07 (CLP's forrangsregel). Stoffer, der kun er
+ætsende (NaOH, Na₂O), brandnærende (KNO₃) eller miljøfarlige (ZnO), har intet
+af de to og får intet mærke. Klassificeringen står i `FARE` i `js/data.js`: CLP
+bilag VI, hvor stoffet står der, ellers leverandørernes sikkerhedsdatablade for
+det rene, faste stof.
 
 **Kemichael** præsenterer fanen første gang, den åbnes i en browser: på lageret
 tre korte replikker (han peger over på panelet, mens han siger, at svarene
 skrives dér, og feltet lyser op), ved samlebåndet to. Scenen låser ikke: man kan
 klikke og skrive, mens han taler. Han går kun ved den store knap "Spring
 præsentationen over", to klik direkte på ham (det første får knappen til at
-blinke) eller Esc, og på samlebåndet også ved Start. <kbd>K</kbd> viser
+blinke) eller Esc, og på samlebåndet også ved Start. På samlebåndet står
+tilbuddet og "Spring præsentationen over" nederst i panelet i stedet for midt
+foroven i scenen, hvor de dækkede hylden (brugerens valg 27. sept. 2026). <kbd>K</kbd> viser
 præsentationen igen. Det er reglen for alle superanimationer (se
 `../README.md`, "Kemichael præsenterer hvert rum"). Replikkerne står i `D.INTRO` og
 `D.INTRO_BAAND` i `js/data.js`. Ellers kommer han på besøg, når en hylde er
@@ -130,8 +154,9 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>P</kbd> periodisk system ·
 index.html          markup for begge faner, plakaterne i stort format og rundvisningen
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 sprites/            pulverglas, etiketmaskine og kasse (SVG)
+sprites/ghs/        to GHS-piktogrammer; kilde og licens i KILDE.md
 js/kerne.js         NK-navnerum, hævet og sænket skrift, formler, hukommelse, lærred
-js/data.js          grundstofferne, ionerne, de 36 stoffer, trinene og hjælpen
+js/data.js          grundstofferne, ionerne, de 41 stoffer, faremærkerne, trinene og hjælpen
 js/tjek.js          tjek af ion, ionnavn, formel og navn; beskederne ved fejl
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       glas, etiketter, ionkugler, etiketmaskine, reol, plakater, bånd, kasse
@@ -151,7 +176,11 @@ hylde, farve, form og fakta-linjen. Formlen, navnet, trinene og hjælpen regnes
 ud af ionerne. En ny ion skrives i listen over ioner lige over. Hver hylde skal
 have ti glas. De sværere står i `SVAER` med pladsen på hylden som sidste tal;
 de tager den plads, når kontakten er slået til. Skal der flere sværere stoffer
-til, tilføjes de dér, og `D.SVAER_IONER` rettes, så kontaktens forklaring passer.
+til, tilføjes de dér, og `D.SVAER_IONER` rettes, så kontaktens forklaring passer
+(antallet i teksterne regnes selv ud). En ny sammensat ion skal også i
+`D.PLAKAT_IONER` og, hvis den kun hører til de sværere, i `PLAKAT_SVAER`.
+
+**Faremærkerne** står i `FARE` i `js/data.js` med stoffets formel som nøgle.
 
 **Hjælpen** står i `D.hjaelp` i `js/data.js`, én gren pr. slags felt.
 
@@ -165,14 +194,17 @@ gangen.
 
 **Kemichaels replikker** står nederst i `js/data.js`.
 
-**`_selvtest.html`** åbner index.html i en iframe og tjekker, at alle 30 formler
+**`_selvtest.html`** åbner index.html i en iframe og tjekker, at alle 41 formler
 går op med de mindste tal og har parentes de rigtige steder, at alle rigtige svar
 godkendes (også med hævet skrift og mellemrum), at grundsættet kun bruger
-kompendiets ioner, at kontakten Sværere ioner bytter de seks glas og kan slås
-fra igen uden tab, at over 40 typiske fejl giver den
-rigtige besked, at der er hint og svar til alle 120 felter, at sproget holder
-reglerne, at begge faner kan gennemføres, og at layoutet holder fra 520 × 380
-til 1500 × 900. Den kræver en lokal server eller Chrome med
+kompendiets ioner, at beryllium og de fem sværere sammensatte ioner kun er med
+bag kontakten, at kontakten bytter de elleve glas og kan slås fra igen uden
+tab, at faremærkerne kun er de to piktogrammer, at over 50 typiske fejl giver
+den rigtige besked, at der er hint og svar til alle 165 felter, at sproget
+holder reglerne, at begge faner kan gennemføres, at løste glas på hylden har
+formlen på etiketten, at samlebåndets hylde har plads til otte glas, at
+præsentationens knapper står i panelet på samlebåndet, og at layoutet holder
+fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
 bagefter.
 
@@ -189,7 +221,8 @@ bagefter.
 ## Tilbuddet om præsentationen
 
 Siden 24. september 2026 kommer Kemichael ikke af sig selv. Første gang en fane
-åbnes, står der Start præsentation og Nej tak midt foroven i scenen. Start
+åbnes, står der Start præsentation og Nej tak midt foroven i scenen (på
+samlebåndet nederst i panelet). Start
 sender ham ind, Nej tak og Esc husker valget, og K viser præsentationen uden at
 spørge. Koden er `js/praesentation.js` (samme fil som i sc1.2), som i
 `js/app.js` pakker den gamle `startIntro` ind (`NK.Praesentation.pakInd`).

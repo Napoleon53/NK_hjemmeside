@@ -101,6 +101,7 @@
         this.o = { d: o, afsluttet: false, hjulpet: false };
         this.holdt = 0;
         this.temp(20);
+        this.b.saetKoeler("tilbagesvaler");
         this.b.nulstil(o.start.fyld, o.start.blandet);
         NK.saetTekst("opg-tekst", (this.nr + 1) + ". " + o.tekst);
         var vaert = NK.el("opg-valg");

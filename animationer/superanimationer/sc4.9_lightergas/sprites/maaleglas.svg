@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="330" viewBox="0 0 60 330">
+  <!-- Maaleglas paa 250 mL, vendt paa hovedet: foden er oeverst, og den
+       aabne ende vender ned i karret. Indersiden er x 9-51 fra y 22
+       (bunden, som nu er toppen) til y 326 (aabningen). Inddelingen og
+       vandet tegnes af animationen: y = 22 + 1,1 · V (V i mL), saa
+       250 mL staar ved y 297. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.42"/>
+      <stop offset="0.18" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="0.82" stop-color="#d4ebfa" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.36"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f5a94"/>
+      <stop offset="1" stop-color="#3f86cc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Glasroeret -->
+  <path d="M7 16 L7 326 L53 326 L53 16 Z" fill="url(#glas)"/>
+  <path d="M7 16 L7 326 M53 326 L53 16" fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2"/>
+  <!-- Den aabne ende med en lille kant -->
+  <path d="M5 322 L5 328 Q5 330 7 330 L53 330 Q55 330 55 328 L55 322" fill="none" stroke="#e6f2fb" stroke-opacity="0.85" stroke-width="1.4"/>
+  <!-- Bunden af glasset (nu oeverst) -->
+  <path d="M7 16 Q7 22 13 22 L47 22 Q53 22 53 16" fill="#dcecf8" fill-opacity="0.25" stroke="#e6f2fb" stroke-opacity="0.8" stroke-width="1"/>
+  <!-- Foden af plast -->
+  <path d="M0 3 Q0 0 4 0 L56 0 Q60 0 60 3 L58 14 Q58 16 55 16 L5 16 Q2 16 2 14 Z" fill="url(#fod)" stroke="#173f69" stroke-width="1"/>
+  <rect x="6" y="2" width="48" height="2" rx="1" fill="#ffffff" fill-opacity="0.22"/>
+  <!-- Genskin -->
+  <rect x="11" y="30" width="2.8" height="286" rx="1.4" fill="#ffffff" fill-opacity="0.2"/>
+</svg>

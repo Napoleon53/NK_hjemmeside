@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160">
+  <!-- Gaettet "lettere": et baal, hvor braendet bliver til en lille bunke
+       aske, og roegen stiger op. Vises paa kortet i det gratis gaet. -->
+  <defs>
+    <linearGradient id="flamme" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#e2531c"/>
+      <stop offset="0.6" stop-color="#f59a2b"/>
+      <stop offset="1" stop-color="#ffd35a"/>
+    </linearGradient>
+    <linearGradient id="kerne" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#ffb640"/>
+      <stop offset="1" stop-color="#fff2b0"/>
+    </linearGradient>
+    <linearGradient id="log" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a5a33"/>
+      <stop offset="1" stop-color="#4f311b"/>
+    </linearGradient>
+    <radialGradient id="aske" cx="0.5" cy="0.2" r="0.8">
+      <stop offset="0" stop-color="#b4b8be"/>
+      <stop offset="1" stop-color="#6d7178"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Jorden -->
+  <rect x="8" y="140" width="224" height="3" rx="1.5" fill="#3b3f48"/>
+
+  <!-- Baalet: to braendestykker og flammerne -->
+  <g transform="rotate(-14 62 128)">
+    <rect x="22" y="121" width="82" height="14" rx="7" fill="url(#log)" stroke="#2e1c0f" stroke-width="1"/>
+    <ellipse cx="100" cy="128" rx="5" ry="6.5" fill="#c79a66" stroke="#2e1c0f" stroke-width="0.8"/>
+  </g>
+  <g transform="rotate(14 62 128)">
+    <rect x="20" y="121" width="82" height="14" rx="7" fill="url(#log)" stroke="#2e1c0f" stroke-width="1"/>
+    <ellipse cx="24" cy="128" rx="5" ry="6.5" fill="#c79a66" stroke="#2e1c0f" stroke-width="0.8"/>
+  </g>
+  <path d="M62 34 C 82 62, 96 78, 90 104 C 86 122, 74 130, 62 130 C 48 130, 36 122, 34 106 C 31 86, 46 76, 50 60 C 54 72, 58 74, 60 70 C 60 58, 58 48, 62 34 Z"
+        fill="url(#flamme)"/>
+  <path d="M63 70 C 74 86, 80 96, 76 110 C 73 121, 68 126, 62 126 C 54 126, 48 120, 48 110 C 48 98, 58 94, 58 82 C 61 88, 63 86, 63 70 Z"
+        fill="url(#kerne)"/>
+
+  <!-- Pilen -->
+  <path d="M114 100 L136 100" stroke="#c8ced6" stroke-width="4" stroke-linecap="round"/>
+  <path d="M132 92 L142 100 L132 108 Z" fill="#c8ced6"/>
+
+  <!-- Asken og roegen -->
+  <path d="M160 140 Q 170 124, 186 122 Q 202 124, 212 140 Z" fill="url(#aske)" stroke="#50545b" stroke-width="0.8"/>
+  <circle cx="178" cy="132" r="1.6" fill="#f08a3a"/>
+  <circle cx="194" cy="129" r="1.3" fill="#f3a74c"/>
+  <circle cx="186" cy="135" r="1.2" fill="#e0602a"/>
+  <g fill="none" stroke="#a7aeb8" stroke-linecap="round">
+    <path d="M178 118 C 170 104, 186 96, 176 82 C 168 70, 182 60, 174 46" stroke-width="5" stroke-opacity="0.55"/>
+    <path d="M190 116 C 200 100, 186 90, 196 74 C 204 62, 192 50, 200 34" stroke-width="6" stroke-opacity="0.4"/>
+    <path d="M200 120 C 210 110, 204 98, 212 88" stroke-width="4" stroke-opacity="0.35"/>
+  </g>
+</svg>

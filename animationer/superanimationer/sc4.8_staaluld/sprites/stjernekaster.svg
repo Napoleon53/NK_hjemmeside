@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="160" viewBox="0 0 40 160">
+  <!-- Stjernekaster i et lille glas med sand (paaskeaegget).
+       Spidsen af belaegningen: (20, 5). Bunden staar paa y 158. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d9e6f2" stop-opacity="0.55"/>
+      <stop offset="0.3" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="0.8" stop-color="#cfdceb" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#b7c7d8" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Traaden og belaegningen -->
+  <line x1="20" y1="4" x2="20" y2="146" stroke="#8d949c" stroke-width="1.6"/>
+  <rect x="17" y="4" width="6" height="80" rx="3" fill="#4d5058" stroke="#2d3036" stroke-width="0.6"/>
+  <g fill="#8b8f97">
+    <circle cx="18.6" cy="12" r="0.8"/><circle cx="21.4" cy="20" r="0.8"/><circle cx="19" cy="29" r="0.7"/>
+    <circle cx="21" cy="38" r="0.8"/><circle cx="18.8" cy="47" r="0.7"/><circle cx="21.3" cy="56" r="0.8"/>
+    <circle cx="19.2" cy="65" r="0.7"/><circle cx="21" cy="74" r="0.8"/>
+  </g>
+
+  <!-- Glasset med sand -->
+  <path d="M8 118 L32 118 L30 156 Q30 158 28 158 L12 158 Q10 158 10 156 Z" fill="#c9ad7c"/>
+  <path d="M8 118 L32 118 L30 156 Q30 158 28 158 L12 158 Q10 158 10 156 Z" fill="none"/>
+  <path d="M6 112 L34 112 L31 156 Q31 159 28 159 L12 159 Q9 159 9 156 Z" fill="url(#glas)" stroke="#9fb3c7" stroke-width="1"/>
+  <path d="M11 116 L12 152" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.2"/>
+</svg>

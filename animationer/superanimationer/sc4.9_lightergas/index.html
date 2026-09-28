@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lightergas</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Lightergas</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-forsoeg" role="tab" aria-selected="true"><span class="nr">1</span>Forsøget</button>
+        <button class="faneknap" data-fane="fane-beregning" role="tab" aria-selected="false"><span class="nr">2</span>Beregningen</button>
+        <button class="faneknap" data-fane="fane-fejl" role="tab" aria-selected="false"><span class="nr">3</span>Fejlkilder</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FORSOEGET                                                  -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
+    <div class="scene">
+        <canvas id="forsoeg-laerred"></canvas>
+        <div class="anker" id="forsoeg-anker-vaegt"></div>
+        <div class="anker" id="forsoeg-anker-glas"></div>
+        <div class="anker" id="forsoeg-anker-lup"></div>
+        <div class="anker" id="forsoeg-anker-papir"></div>
+        <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny lighter og et måleglas fyldt med vand (R)">Start forfra ↺</button>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
+        <div class="kort opgavekort" id="forsoeg-kort">
+            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">opgave <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">2</span></span></h2>
+            <div id="forsoeg-prompt"></div>
+            <div class="knaprad valgrad" id="forsoeg-valg" hidden></div>
+            <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="forsoeg-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="forsoeg-skema">
+            <h2>Skemaet</h2>
+            <table class="skema">
+                <thead><tr><th></th><th id="forsoeg-h0">Måling 1</th><th id="forsoeg-h1">Måling 2</th></tr></thead>
+                <tbody>
+                    <tr><th>m(før)</th>
+                        <td><div class="felt lille"><input id="forsoeg-f0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før), måling 1"><span class="felt-efter">g</span></div></td>
+                        <td><div class="felt lille"><input id="forsoeg-f1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før), måling 2"><span class="felt-efter">g</span></div></td></tr>
+                    <tr><th>V</th>
+                        <td><div class="felt lille"><input id="forsoeg-v0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Rumfanget af gassen, måling 1"><span class="felt-efter">mL</span></div></td>
+                        <td><div class="felt lille"><input id="forsoeg-v1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Rumfanget af gassen, måling 2"><span class="felt-efter">mL</span></div></td></tr>
+                    <tr><th>m(efter)</th>
+                        <td><div class="felt lille"><input id="forsoeg-e0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(efter), måling 1"><span class="felt-efter">g</span></div></td>
+                        <td><div class="felt lille"><input id="forsoeg-e1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(efter), måling 2"><span class="felt-efter">g</span></div></td></tr>
+                </tbody>
+            </table>
+            <p class="note" id="forsoeg-note"></p>
+        </div>
+
+        <div class="kort" id="forsoeg-opgaver">
+            <h2>Målingerne <span class="taeller">løst <b id="forsoeg-loest">0</b>/2</span></h2>
+            <div class="hyldeliste" id="forsoeg-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: BEREGNINGEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-beregning" role="tabpanel" aria-label="Beregningen">
+    <div class="scene">
+        <canvas id="beregning-laerred"></canvas>
+        <div class="anker" id="beregning-anker-tavle"></div>
+        <div class="anker" id="beregning-anker-graf"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="beregning-kort">
+            <h2><span id="beregning-titel">Opgave</span><span class="taeller">opgave <b id="beregning-nr">1</b>/<span id="beregning-antal">3</span></span></h2>
+            <div id="beregning-prompt"></div>
+            <div class="raekker" id="beregning-raekker"></div>
+            <div class="knaprad alkanrad" id="beregning-valg" hidden></div>
+            <p class="besked" id="beregning-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="beregning-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="beregning-opsum">
+            <h2>Opsummering</h2>
+            <table class="skema tal">
+                <thead><tr><th></th><th>Måling 1</th><th>Måling 2</th></tr></thead>
+                <tbody>
+                    <tr><th>m(gas)</th><td id="beregning-o-dm-0"></td><td id="beregning-o-dm-1"></td></tr>
+                    <tr><th>n(gas)</th><td id="beregning-o-n-0"></td><td id="beregning-o-n-1"></td></tr>
+                    <tr><th>M(gas)</th><td id="beregning-o-M-0"></td><td id="beregning-o-M-1"></td></tr>
+                </tbody>
+            </table>
+            <p class="note">Butan, C₄H₁₀, har M = 58,14 g/mol.</p>
+        </div>
+
+        <div class="kort" id="beregning-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="beregning-loest">0</b>/3</span></h2>
+            <div class="hyldeliste" id="beregning-liste"></div>
+            <button class="knap nye" id="beregning-nye" type="button"><span>Nye tal</span><span class="tegn">⟳</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FEJLKILDER                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fejl" role="tabpanel" aria-label="Fejlkilder">
+    <div class="scene">
+        <canvas id="fejl-laerred"></canvas>
+        <div class="anker" id="fejl-anker-a"></div>
+        <div class="anker" id="fejl-anker-b"></div>
+        <button class="forfraknap" id="fejl-forfra" type="button" title="De samme to forsøg en gang til (R)">Kør igen ↺</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="fejl-kort">
+            <h2><span id="fejl-titel">Opgave</span><span class="taeller">opgave <b id="fejl-nr">1</b>/<span id="fejl-antal">6</span></span></h2>
+            <div id="fejl-prompt"></div>
+            <div class="knaprad valgrad" id="fejl-valg" hidden></div>
+            <p class="besked" id="fejl-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="fejl-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="fejl-resultat">
+            <h2>Resultaterne</h2>
+            <table class="skema tal" id="fejl-tabel">
+                <thead><tr><th></th><th>Gruppe A</th><th>Gruppe B</th></tr></thead>
+                <tbody>
+                    <tr><th>m(før)</th><td id="fejl-t-mf-a"></td><td id="fejl-t-mf-b"></td></tr>
+                    <tr><th>V</th><td id="fejl-t-V-a"></td><td id="fejl-t-V-b"></td></tr>
+                    <tr><th>m(efter)</th><td id="fejl-t-me-a"></td><td id="fejl-t-me-b"></td></tr>
+                    <tr><th>m(gas)</th><td id="fejl-t-dm-a"></td><td id="fejl-t-dm-b"></td></tr>
+                    <tr class="molar"><th>M(gas)</th><td id="fejl-t-M-a"></td><td id="fejl-t-M-b"></td></tr>
+                </tbody>
+            </table>
+            <p class="note">Begge grupper regner med Vₘ = 24,0 L/mol.</p>
+        </div>
+
+        <div class="kort" id="fejl-opgaver">
+            <h2>Fejlkilderne <span class="taeller">løst <b id="fejl-loest">0</b>/6</span></h2>
+            <div class="hyldeliste" id="fejl-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Lightergas</h2>
+        <p>Gassen i en lighter er en alkan. Den står som væske i lighteren under tryk og bliver til gas, når den slipper ud.</p>
+        <p>Gassen samles over vand: et måleglas fyldt med vand står på hovedet i et kar. Gassen skubber vandet ned, og rumfanget kan aflæses. Lighteren vejes før og efter.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Massen og stofmængden</span>
+            m(gas) = m(før) − m(efter)<br>
+            n(gas) = <span class="broek"><span>V</span><span>Vₘ</span></span>&nbsp;&nbsp;&nbsp; med V i liter
+        </div>
+        <p>Alle gasser fylder lige meget pr. mol ved samme temperatur og tryk. Ved 20 °C og 1,013 bar fylder 1 mol ca. 24,0 L. Det er molvolumenet, Vₘ. Idealgasligningen giver det samme: n = p · V / (R · T).</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Molarmassen</span>
+            M(gas) = <span class="broek"><span>m(gas)</span><span>n(gas)</span></span>
+        </div>
+        <p>Alkanerne har formlen CₙH₂ₙ₊₂: methan CH₄ (16,05 g/mol), ethan C₂H₆ (30,08), propan C₃H₈ (44,11), butan C₄H₁₀ (58,14) og pentan C₅H₁₂ (72,17).</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="../kemichael/superanimation.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/regning.js"></script>
+<script src="js/sim_forsoeg.js"></script>
+<script src="js/sim_beregning.js"></script>
+<script src="js/sim_fejl.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

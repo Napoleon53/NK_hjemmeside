@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="76" viewBox="0 0 90 76">
+  <!-- Digel af porcelaen set forfra, lidt oppefra.
+       Randen: midte (45, 10), rx 40, ry 8. Indersidens aabning: rx 35,
+       ry 6.5. Pulveret tegnes af animationen i aabningen.
+       Bunden staar paa y 74 (midten x 45). -->
+  <defs>
+    <linearGradient id="glasur" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b8bec6"/>
+      <stop offset="0.3" stop-color="#ffffff"/>
+      <stop offset="0.65" stop-color="#eef1f4"/>
+      <stop offset="1" stop-color="#a7aeb7"/>
+    </linearGradient>
+    <linearGradient id="inde" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9ca3ac"/>
+      <stop offset="1" stop-color="#e3e7ec"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Kroppen: lidt smallere forneden, rund bund -->
+  <path d="M5 10 L15 66 Q17 74 45 74 Q73 74 75 66 L85 10 Z" fill="url(#glasur)" stroke="#8b929c" stroke-width="1.2"/>
+  <!-- Den uglaserede bundring -->
+  <path d="M16 67 Q18 73 45 73 Q72 73 74 67" fill="none" stroke="#c9c1ae" stroke-width="2.2"/>
+  <!-- Et blaat maerke paa siden -->
+  <text x="45" y="47" font-family="Segoe UI, sans-serif" font-size="10" font-weight="700" fill="#3e6fb0" fill-opacity="0.8" text-anchor="middle">3</text>
+  <path d="M34 51 L56 51" stroke="#3e6fb0" stroke-opacity="0.55" stroke-width="1"/>
+
+  <!-- Randen og indersiden -->
+  <ellipse cx="45" cy="10" rx="40" ry="8" fill="#f7f8fa" stroke="#8b929c" stroke-width="1.2"/>
+  <ellipse cx="45" cy="10.5" rx="35" ry="6.5" fill="url(#inde)"/>
+  <path d="M12 12 A33 6 0 0 0 78 12" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1"/>
+</svg>

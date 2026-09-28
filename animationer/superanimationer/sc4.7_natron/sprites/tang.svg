@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="44" viewBox="0 0 180 44">
+  <!-- Digeltang set fra siden. Kaeberne griber om diglens rand i
+       (8, 22). Leddet sidder i (46, 22), grebene ender i x 178. -->
+  <defs>
+    <linearGradient id="staal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9edf1"/>
+      <stop offset="0.5" stop-color="#9ea6b0"/>
+      <stop offset="1" stop-color="#5c636c"/>
+    </linearGradient>
+  </defs>
+  <!-- Oeverste arm: fra kaeben over leddet til grebet -->
+  <path d="M6 16 Q14 10 26 14 L46 21 L176 8" fill="none" stroke="url(#staal)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Nederste arm -->
+  <path d="M6 28 Q14 34 26 30 L46 23 L176 36" fill="none" stroke="url(#staal)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Kaebernes buede spidser -->
+  <path d="M6 16 Q2 18 4 21" fill="none" stroke="#7d858f" stroke-width="3" stroke-linecap="round"/>
+  <path d="M6 28 Q2 26 4 23" fill="none" stroke="#7d858f" stroke-width="3" stroke-linecap="round"/>
+  <!-- Leddet -->
+  <circle cx="46" cy="22" r="4.5" fill="#c5ccd4" stroke="#50565e" stroke-width="1"/>
+  <circle cx="46" cy="22" r="1.4" fill="#50565e"/>
+</svg>

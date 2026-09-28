@@ -29,25 +29,6 @@ window.NK = NK;
         return nu + (maal - nu) * (1 - Math.exp(-hastighed * dt));
     };
 
-    /* ----- Til Kemichael (../../v2/kemichael/kemichael.js) ------------- */
-    /* Blod S-kurve fra 0 til 1. */
-    NK.blod = function (t) {
-        t = NK.klamp(t, 0, 1);
-        return t * t * (3 - 2 * t);
-    };
-
-    NK.r = function (a, b) {
-        return a + Math.random() * (b - a);
-    };
-
-    /* En positur er { x, y, v }: hvor ankerpunktet staar, og hvor meget
-       genstanden er drejet om det. */
-    NK.tilVerden = function (p, anker, lx, ly) {
-        var c = Math.cos(p.v), s = Math.sin(p.v);
-        var dx = lx - anker.x, dy = ly - anker.y;
-        return { x: p.x + dx * c - dy * s, y: p.y + dx * s + dy * c };
-    };
-
     NK.tilfaeldig = function (liste) {
         return liste[Math.floor(Math.random() * liste.length)];
     };

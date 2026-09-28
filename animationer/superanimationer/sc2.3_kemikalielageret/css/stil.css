@@ -908,3 +908,26 @@ select:focus-visible {
 }
 
 .tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+/* Paa samlebaandet staar tilbuddet og Spring over nederst i panelet
+   (brugerens valg 27. sept. 2026: i scenen daekkede de hylden) */
+.panel-bund { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+
+.tilbud.i-panel,
+.spring-over.i-panel {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    justify-content: center;
+}
+
+.tilbud.i-panel { white-space: normal; flex-wrap: wrap; border-radius: var(--radius); }
+.spring-over.i-panel { width: 100%; white-space: normal; }
+
+@keyframes puf-panel {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: scale(1); }
+    40%  { transform: scale(1.04); }
+    100% { box-shadow: 0 0 0 14px rgba(242, 197, 61, 0); transform: scale(1); }
+}
+
+.spring-over.i-panel.puf { animation: puf-panel 0.7s ease-out 2; }

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="170" height="160" viewBox="0 0 170 160">
+  <!-- Trefodens bageste del: det bageste ben, ringens bageste halvdel og
+       porcelaenstrekantens to bageste roer. Tegnes FOER braenderen og
+       diglen; trefod_for.svg tegnes bagefter. Samme maal i begge filer:
+       ringens midte (85, 22), rx 70, ry 12; trekantens forreste roer i
+       y 29 fra x 34 til 136, spidsen bagest i (85, 11). Benene staar paa
+       y 157. -->
+  <defs>
+    <linearGradient id="ler" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbf6ea"/>
+      <stop offset="1" stop-color="#cfc6b2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Skygge under det bageste ben -->
+  <ellipse cx="85" cy="150" rx="7" ry="2" fill="#000000" fill-opacity="0.2"/>
+
+  <!-- Det bageste ben -->
+  <path d="M85 12 L85 150" stroke="#353a41" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Ringens bageste halvdel -->
+  <path d="M15 22 A70 12 0 0 1 155 22" fill="none" stroke="#454b53" stroke-width="5"/>
+
+  <!-- Trekantens to bageste roer -->
+  <path d="M34 29 L85 11" stroke="#8d8570" stroke-width="7" stroke-linecap="round"/>
+  <path d="M136 29 L85 11" stroke="#8d8570" stroke-width="7" stroke-linecap="round"/>
+  <path d="M34 29 L85 11" stroke="url(#ler)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M136 29 L85 11" stroke="url(#ler)" stroke-width="5" stroke-linecap="round"/>
+  <!-- Traaden ved spidsen -->
+  <path d="M85 11 L85 8" stroke="#9aa1aa" stroke-width="1.6"/>
+</svg>

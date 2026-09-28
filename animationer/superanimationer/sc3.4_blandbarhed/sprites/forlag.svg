@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="262" height="520" viewBox="700 95 262 520">
+  <!-- Forlaget: et baegerglas med tud, som destillatet drypper ned i.
+       Indersiden er x 713.6-946.4 og y 115-604.4: 14 x 33 pladser i
+       forlagets model plus luft foroven. En streg for hver 10 mL (120 kugler).
+       Enhederne er de samme som i bassin.svg (16,05 pr. kuglediameter), og
+       viewBox'en er stedet i forhold til bassinet. Lavet ud fra maalene i
+       js/apparat.js (A.vaegge og A.SPRITE); rettes et maal der, skal filen
+       laves om. -->
+  <defs>
+    <linearGradient id="glas" gradientUnits="userSpaceOnUse" x1="713.6" y1="0" x2="946.4" y2="0">
+      <stop offset="0" stop-color="#cfe6f7" stop-opacity="0.14"/>
+      <stop offset="0.1" stop-color="#cfe6f7" stop-opacity="0.03"/>
+      <stop offset="0.9" stop-color="#cfe6f7" stop-opacity="0.03"/>
+      <stop offset="1" stop-color="#cfe6f7" stop-opacity="0.12"/>
+    </linearGradient>
+  </defs>
+  <rect x="713.6" y="115" width="232.7" height="489.4" fill="url(#glas)"/>
+  <path d="M703.1 104 Q711.1 106 711.1 113 V598.4 Q711.1 607.4 720.1 607.4 H939.9 Q948.9 607.4 948.9 598.4 V107" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="4.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M719.1 601.4 H940.9" stroke="#d6eaf8" stroke-opacity="0.16" stroke-width="2"/>
+  <rect x="932.9" y="155" width="6" height="399.4" rx="3" fill="#ffffff" fill-opacity="0.08"/>
+  <g stroke="#eef6fc" stroke-opacity="0.5" stroke-width="2.2" stroke-linecap="round">
+    <path d="M715.6 483.1 h12"/>
+    <path d="M715.6 364 h24"/>
+    <path d="M715.6 244.8 h12"/>
+  </g>
+</svg>

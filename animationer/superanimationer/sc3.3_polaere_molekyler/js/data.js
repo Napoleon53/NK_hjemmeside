@@ -18,7 +18,7 @@
    traek og polaritet regnes ud af klargoer() nedenfor, saa de ikke kan
    komme i modstrid med atomerne.
 
-   Teksterne til teoriboksen og Kemichaels praesentation staar nederst.
+   Teksterne til teoriboksen staar nederst.
    ===================================================================== */
 var NK = window.NK || {};
 window.NK = NK;
@@ -408,25 +408,4 @@ window.NK = NK;
         { h: "Modellerne",
           p: ["Elektronskyen på fane 1 viser, hvor elektronerne oftest er. Kugle-stang-modellen på fane 2 er ikke målfast. Elektronegativiteterne er Paulings værdier med én decimal."] }
     ];
-
-    /* ----- Kemichael praesenterer fanerne -----------------------------------
-       To eller tre replikker paa hoejst ca. 60 tegn. Mens han siger linjen
-       peg, peger han paa det, den handler om (js/laerer.js). */
-    D.INTRO = {
-        "fane-en": { peg: 1, linjer: [
-            "Tovtrækning. To atomer deler ét elektronpar.",
-            "Vælg de to atomer i tabellen herovre.",
-            "Det mest elektronegative atom vinder. Hver gang."
-        ] },
-        "fane-polaritet": { peg: 1, linjer: [
-            "Nu trækker alle bindinger i et molekyle på én gang.",
-            "Vælg et molekyle herovre, og drej det.",
-            "Symmetri ophæver det hele. Næsten poetisk."
-        ] },
-        "fane-vand": { peg: 1, linjer: [
-            "Laboratoriet. Tre haner, to stave og en uldklud.",
-            "Resultaterne skriver sig selv i skemaet herovre.",
-            "Heptanhanen findes kun i animationer. Jeg har spurgt."
-        ] }
-    };
 }());
