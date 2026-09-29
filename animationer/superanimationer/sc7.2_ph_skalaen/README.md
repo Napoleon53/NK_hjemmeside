@@ -11,7 +11,7 @@ virker fra harddisken.
    færre OH⁻, og skalaen fra 0 til 14 spænder derfor over en faktor 10¹⁴.
 2. **Afløser** `kemi-c-filer/c7.2_ph_skalaen.html`. Den gamle talte prikker
    (1 prik = 10⁻⁷ M) og kunne derfor kun dække pH 4 til 10. Med fra den gamle:
-   pH-skyderen (nu et mærke på skalaen fra 0 til 14), prikkerne for H₃O⁺ og
+   pH-skyderen (nu et mærke på skalaen fra −1 til 15), prikkerne for H₃O⁺ og
    OH⁻ (nu i en lup, der zoomer), koncentrationerne i panelet, øl, blod og
    sæbevand (nu blandt tolv hverdagsstoffer) og quizzens spørgsmål (nu som mål
    i fanerne; vands ionprodukt står i teorien). Ud: vippen med de to glas og
@@ -22,8 +22,9 @@ virker fra harddisken.
    Brugerens valg (25. sept. 2026): tre faner, Skalaen, Luppen og
    Fortyndingen, og 1 prik = 1 ion i luppen.
 4. **Loftet:** 3 faner. Fane 1: 12 stoffer, 6 ad gangen. Fane 2: 1 glas, 1
-   lup, zoom i 18 trin, højst 1.000 prikker af hver ion, 5 mål. Fane 3: 2
-   flasker, højst 9 fortyndinger af hver, 1 lup, 5 mål.
+   lup, der selv zoomer i 7 trin (højst ca. 100 prikker af den ion, der er
+   flest af), 5 mål. Fane 3: 2 flasker, højst 9 fortyndinger af hver, 1 lup,
+   5 mål.
 5. **Layoutet:** scene plus panel, som `sc4.1`, `sc4.2` og `sc4.4`. Skalaen
    står øverst i alle tre faner.
 
@@ -32,10 +33,10 @@ virker fra harddisken.
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
 | 1 | Skalaen | trækker hverdagsstoffer op på skalaen, der hvor man tror, de hører til, og pH-metret måler dem | skalaen går fra stærkt surt til stærkt basisk, og hverdagen spænder over det hele |
-| 2 | Luppen | trækker pH-mærket og zoomer i trin af ti; tæller H₃O⁺ og OH⁻ | ét trin er 10 gange flere H₃O⁺ og 10 gange færre OH⁻; fra pH 1 til 13 er 12 klik |
-| 3 | Fortyndingen | fortynder saltsyre og natronlud 10 gange ad gangen | 10 gange mere vand er ét trin mod 7, og syren bliver aldrig basisk |
+| 2 | Luppen | trækker pH-mærket; luppen zoomer selv i trin af ti | ét trin er 10 gange flere H₃O⁺ og 10 gange færre OH⁻; hvert trin væk fra 6 eller 8 er ét zoom |
+| 3 | Fortyndingen | fortynder saltsyre og natriumhydroxid 10 gange ad gangen, ét mål ad gangen | 10 gange mere vand er ét trin mod 7 og ét zoom ud, og syren bliver aldrig basisk |
 
-**Skalaen.** Skalaen fra 0 til 14 i universalindikatorens farver står øverst.
+**Skalaen.** Skalaen fra −1 til 15 i universalindikatorens farver står øverst.
 På bordet står seks hverdagsstoffer. Eleven trækker et stof op på skalaen og
 slipper det der, hvor det tror, stoffet hører til; imens står gættet over
 skalaen. Så flyver stoffet hen til pH-metret, elektroden dykker ned, tallet
@@ -52,26 +53,38 @@ uden gæt). En pil viser vejen, så længe intet er målt.
 
 **Luppen.** Et bægerglas med vand og universalindikator og en lup, der viser
 et lille rum af væsken. 1 prik = 1 ion: røde er H₃O⁺, blå er OH⁻. Eleven
-trækker pH-mærket på skalaen (et klik på skalaen virker også; hele tal
-trækker lidt i mærket). Knapperne − og + zoomer ud og ind i trin af ti: rummet
-bliver 10 gange større eller mindre, og terningens side vises med noget, der
-er lige så stort ("Terning på 1,2 µm, som en bakterie"). Er der over 1.000
-ioner af én slags, bliver de til en tåge; er der under én, står gennemsnittet
-under luppen. En enkelt ion blandt mange får en gul ring. Fem mål: 10 gange
-så mange H₃O⁺ (pH 6), 100 gange så mange OH⁻ (pH 9), zoom ind ved pH 2, find
-én OH⁻ ved pH 2 (zoom 12: 10 milliarder H₃O⁺ for hver OH⁻) og fra pH 1 til 13
-med 12 klik ud. Et mål er nået, når pH og zoom passer, og mærket er sluppet.
+trækker pH-mærket på skalaen (et klik på skalaen får mærket til at glide
+derhen; hele tal trækker lidt i mærket). Luppen zoomer selv: den viser altid
+over 10 og højst ca. 100 af den ion, der er flest af. I rent vand er der 10
+af hver; ved pH 6 er der 100 H₃O⁺ i samme rum, og ved pH 5,9 zoomer den ind.
+Et zoom varsles med en gul ring om det rum, der bliver det nye, prikkerne
+glider ud, og skiltet "10 gange mindre rum" står i luppen. Luppen tager ét
+zoom ad gangen, så man kan tælle dem. Under luppen står tallene og "Zoomet 3
+gange ind: rummet er 1.000 gange mindre" (i forhold til rent vand). Rummet er
+aldrig større end i rent vand (550 nm), så ionerne kan aldrig ses med det blotte
+øje, og der er ingen tåge. En enkelt ion blandt mange får en gul ring. Fem
+mål i små bidder: 10 gange så mange H₃O⁺ (pH 6, samme rum), træk videre til
+pH 5 (det første zoom), gå til pH 2 og tæl zoomene (tre), hvor mange gange så
+mange H₃O⁺ er der ved pH 2 end i rent vand (valg: 5, 50, 10.000 eller
+100.000), og pH 12 (nu er det OH⁻, luppen følger). Et pH-mål er nået, når
+mærket er sluppet på den rigtige pH, og luppen er færdig med at zoome.
 
 **Fortyndingen.** Skalaen hænger over et langt bord. Saltsyren (0,1 M) står
-ved pH 1 og natronluden (0,1 M) ved pH 13. Knappen Fortynd 10 gange under hver
+ved pH 1 og natriumhydroxiden (0,1 M) ved pH 13. Knappen Fortynd 10 gange under hver
 af dem laver et nyt glas: pipetten tager 1 mL fra det sidste glas, og
 sprøjteflasken fylder op med 9 mL vand. Det nye glas står under sin pH på
 skalaen med en streg op til den, så hver fortynding er ét trin mod 7. Tæt ved
 7 står glassene på klodser bag hinanden, syren fra venstre og basen fra højre
 (6,79, 6,98, 7,00, 7,00 og 7,21, 7,02, 7,00, 7,00). Et klik på et glas viser
-det i luppen. Fem mål: gæt pH efter én fortynding (pH 0,1, 1,1, 2 eller 10),
-fortynd til pH 5, hvor mange gange er det (10.000), fortynd til basisk (det
-kan ikke lade sig gøre; luppen viser 101 H₃O⁺ mod 100 OH⁻) og natronluden
+det i luppen. Luppen zoomer selv (som i fane 2): efter en fortynding viser den
+først det nye glas i samme rum (10 gange færre H₃O⁺), og efter et sekund
+zoomer den ud til et 10 gange større rum med 100 igen. Tæt ved 7 zoomer den
+ikke længere ud, og til sidst er der 10 af hver. Fanen er en kravlegård: kun
+den knap, målet skal bruge, er tændt, buddet skal vælges før fortyndingen, og
+der kan ikke fortyndes forbi målet (et klik på en slukket knap siger hvorfor).
+Svaret kommer, når luppen har zoomet. Fem mål: gæt pH efter én fortynding
+(pH 0,1, 1,1, 2 eller 10), fortynd til pH 5, hvor mange gange er det
+(10.000), fortynd til basisk (det kan ikke lade sig gøre) og natriumhydroxiden
 1.000 gange (pH 16, 13, 10 eller 7).
 
 **Kemichael** præsenterer hver fane, når eleven trykker Start præsentation
@@ -82,7 +95,7 @@ viser præsentationen igen. Ellers roser han tørt efter hver hylde og det
 sidste mål i luppen og i fortyndingen, og når syren ikke blev basisk: "Det er
 vand nu. Meget dyrt vand." Kaffekoppen på bordet er det fælles påskeæg.
 **Påskeæg:** et gæt, der rammer inden for 0,1 ("Præcis. Du har vel ikke smagt
-på den?"), og luppen zoomet helt ud.
+på den?").
 
 Direkte links: `index.html#lup` og `index.html#fortynd`.
 
@@ -90,14 +103,13 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 <kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichaels præsentation ·
 <kbd>R</kbd> forfra eller tøm bordet · <kbd>Enter</kbd> næste eller fortynd ·
 <kbd>←</kbd> <kbd>→</kbd> pH ±0,1 og <kbd>↑</kbd> <kbd>↓</kbd> hele tal (fane 2) ·
-<kbd>+</kbd> <kbd>−</kbd> zoom · <kbd>F</kbd> fortynd (fane 3) ·
-<kbd>Esc</kbd> luk eller send Kemichael ud. Musehjulet over luppen zoomer.
+<kbd>F</kbd> fortynd (fane 3) · <kbd>Esc</kbd> luk eller send Kemichael ud.
 
 ### Det nye i forhold til den gamle animation
 
-* **Hele skalaen** i alle tre faner: fra 0 til 14 i stedet for 4 til 10.
-* **Luppen zoomer i trin af ti**, så tællingen virker ved alle pH. Antallet af
-  klik er antallet af pH-trin.
+* **Hele skalaen** i alle tre faner: fra −1 til 15 i stedet for 4 til 10.
+* **Luppen zoomer selv i trin af ti**, så der altid er 10 til 100 at se ved
+  alle pH. Hvert pH-trin væk fra 6 eller 8 er ét zoom.
 * **1 prik = 1 ion** i et rum af en bestemt størrelse, i stedet for 1 prik =
   10⁻⁷ M.
 * **Tolv hverdagsstoffer**, som eleven selv placerer, før de måles.
@@ -122,7 +134,7 @@ js/data.js          stofferne og deres pH, hylderne, målene i fane 2 og 3 og re
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, skalaen og mærket, stofferne, pH-metret, glassene, flasken,
                     pipetten, sprøjteflasken, luppen, ionerne og knapperne
-js/lup.js           luppen med prikkerne: fælles for fane 2 og 3
+js/lup.js           luppen med prikkerne og dens autozoom: fælles for fane 2 og 3
 js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
 js/sim_skala.js     fane 1
 js/sim_lup.js       fane 2
@@ -140,40 +152,47 @@ _sprites.html       udviklerværktøj: viser tegningerne alene
 linje (`note`). Et nyt stof skal have en tegning i `sprites/` med samme navn
 som `id` (100 × 120, bunden i y 118) og en linje i `MAAL` i `js/sprites.js`.
 **Hyldernes hint** står i `D.HYLDER`. **Målene i luppen** står i
-`D.LUP_MAAL` med start (pH og zoom) og mål (pH og evt. zMin og zMaks).
+`D.LUP_MAAL` med start og mål (pH), eller som valg (`slags: "valg"`).
 **Målene i fortyndingen** står i `D.FORTYND_MAAL`; de forkerte valg har hver
 sin forklaring, og tal-opgavens typiske fejl står i `fejl`.
 
 **Modellen** står i `js/kemi.js`. Luppens rum ved zoom z er 10^z / N_A liter,
-så antallet af en ion er c · 10^z. Er der over 1.000 af én slags, tegnes de
-som tåge (`MAKS` i `js/lup.js`).
+så antallet af en ion er c · 10^z. `K.autoZoom` vælger z, så der er over 10
+og højst ca. 100 af den ion, der er flest af (z fra 1 ved pH −1 og 15 til 8 i
+rent vand). `js/lup.js` tager ét zoom ad gangen mod det rum; er den bagud,
+tegnes højst 300 prikker, til den er fremme.
 
 **`_selvtest.html`** åbner index.html i en iframe og tjekker vands ionprodukt,
-pH for fortyndet saltsyre og natronlud (1, 2, ..., 6,79, 6,98, 7,00) mod
+pH for fortyndet saltsyre og natriumhydroxid (1, 2, ..., 6,79, 6,98, 7,00) mod
 tabelværdierne, at syren aldrig kommer over 7, antallet af ioner i luppen,
 terningens størrelse, at tallene skrives rigtigt (10.000, 3,2 millioner, 10
 milliarder, 1 billion), at målene kan nås, at 9 skrivemåder af 10.000
 godkendes og 7 typiske fejl giver den rigtige besked, at sproget holder
-reglerne, at alle tre faner kan gennemføres (fane 1, 2 og 3 også med musen),
-at Kemichael kan vises og sendes ud på alle faner, og at layoutet holder fra
-520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
+reglerne, at luppen ved alle pH viser 10 til 100 af den ion, der er flest af,
+og zoomer ét trin ad gangen (tre gange fra pH 5 til 2, fire ud og fire ind fra
+pH 2 til 12), at kravlegården i fane 3 spærrer de rigtige knapper, at alle
+tre faner kan gennemføres (fane 1, 2 og 3 også med musen), at Kemichael kan
+vises og sendes ud på alle faner, og at layoutet holder fra 520 × 380 til
+1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 25. september 2026: ALT OK (135 påstande).
+bagefter. Sidst kørt 29. september 2026: ALT OK (159 påstande).
 
 ## Forenklinger
 
 * Alt er ved 25 °C, hvor vands ionprodukt er 1,0 · 10⁻¹⁴ M². Skalaen går fra
-  0 til 14; pH under 0 og over 14 findes, men er ikke med.
+  −1 til 15 (brugerens ønske 29. sept. 2026), så eleven ser, at den ikke stopper
+  ved 0 og 14. Universalindikatorens farve er den samme under 0 og over 14.
 * Hverdagsstoffernes pH er typiske værdier fra opslagsværker. Den varierer
   fra produkt til produkt (fx afløbsrens 13 til 14, sæbevand 9 til 10).
   Regnvand er ren regn med CO₂ fra luften (5,6). Natron i vand er en 0,1 M
   opløsning af NaHCO₃ (8,3).
 * Luppen viser det gennemsnitlige antal ioner, rundet til et helt tal. I et
   rigtigt lille rum svinger antallet. Vandmolekylerne er ikke tegnet.
-* Terningens sammenligning ("som en bakterie") er en størrelsesorden.
+* Luppen er en tegning af en terning: ét zoom gør terningens side 2,15 gange
+  (10^(1/3)) større eller mindre, og den gule ring har den radius.
 * Universalindikatorens farver er omtrentlige, og skalaen i den ender i
   samme farve fra 12 til 14.
-* Fortyndingen regner saltsyre og natronlud som stærke og fuldstændigt
+* Fortyndingen regner saltsyre og natriumhydroxid som stærke og fuldstændigt
   protolyserede. Vandets egne ioner er med: [H₃O⁺] = c/2 + √(c²/4 + K<sub>w</sub>)
   for syren og det samme for [OH⁻] for basen. Pipetten tager 1 mL og
   sprøjteflasken 9 mL, men glassene er tegnet lige fulde.
@@ -188,6 +207,17 @@ Esc husker valget, og K viser præsentationen uden at spørge. Tilbuddet
 forsvinder også, når eleven har gjort noget på fanen. Koden er
 `js/praesentation.js` (samme fil som i sc1.2), koblet med
 `NK.Praesentation.kobl` i hver `sim_*.js`.
+
+## Luppen bygget om (29. sept. 2026)
+
+Brugeren: luppen var forvirrende i praksis, især i fane 2. Med zoomknapperne
+blev hele luppen en rød eller blå tåge, når der var over 1.000 af én slags, og
+zoom helt ud ("et sandkorn", påskeægget "Den kan man næsten se") fik det til
+at se ud, som om man kunne se H₃O⁺ med det blotte øje. Brugerens forslag var
+en lup, der zoomer selv, og fane 3 skulle være mere en kravlegård end fri
+leg. Nu: ingen zoomknapper, intet musehjul, ingen tåge; luppen zoomer selv ét
+trin ad gangen med ring og skilt; fane 2 har nye mål i små bidder, og fane 3
+spærrer de knapper, målet ikke bruger.
 
 ## I menuen
 

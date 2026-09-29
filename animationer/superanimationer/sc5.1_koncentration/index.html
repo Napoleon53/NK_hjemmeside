@@ -13,8 +13,9 @@
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-kar" role="tab" aria-selected="true"><span class="nr">1</span>Karret</button>
-        <button class="faneknap" data-fane="fane-kolbe" role="tab" aria-selected="false"><span class="nr">2</span>Målekolben</button>
-        <button class="faneknap" data-fane="fane-fortynd" role="tab" aria-selected="false"><span class="nr">3</span>Fortynding</button>
+        <button class="faneknap" data-fane="fane-glas" role="tab" aria-selected="false"><span class="nr">2</span>c eller n?</button>
+        <button class="faneknap" data-fane="fane-kolbe" role="tab" aria-selected="false"><span class="nr">3</span>Målekolben</button>
+        <button class="faneknap" data-fane="fane-fortynd" role="tab" aria-selected="false"><span class="nr">4</span>Fortynding</button>
     </div>
 
     <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -66,7 +67,47 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 2: MAALEKOLBEN                                                -->
+<!-- FANE 2: C ELLER N?                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-glas" role="tabpanel" aria-label="c eller n?">
+    <div class="scene">
+        <canvas id="glas-laerred"></canvas>
+        <div class="anker" id="glas-anker-over"></div>
+        <div class="anker" id="glas-anker-glassene"></div>
+        <div class="anker" id="glas-anker-lupper"></div>
+        <div class="anker" id="glas-anker-glas0"></div>
+        <div class="anker" id="glas-anker-glas1"></div>
+        <div class="anker" id="glas-anker-glas2"></div>
+        <div class="anker" id="glas-anker-laerer"></div>
+        <button class="forfraknap" id="glas-forfra" type="button" title="Opgaven forfra (R)">Start forfra ↺</button>
+        <div class="kboble" id="glas-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
+        <button class="kknap" id="glas-kknap" type="button">Send Kemichael ud</button>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="glas-kort">
+            <h2><span id="glas-titel">Opgave</span><span class="taeller">opgave <b id="glas-nr">1</b>/<span id="glas-antal">8</span></span></h2>
+            <div id="glas-prompt"></div>
+            <div class="knaprad valgrad" id="glas-valg" hidden></div>
+            <p class="besked" id="glas-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="glas-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort maaling" id="glas-data">
+            <h2>Glassene</h2>
+            <div id="glas-tabel"></div>
+            <p class="note">Hver prik i et glas er 0,01 mol. Lupperne viser lige meget væske fra hvert glas.</p>
+        </div>
+
+        <div class="kort" id="glas-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="glas-loest">0</b>/8</span></h2>
+            <div class="hyldeliste" id="glas-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: MAALEKOLBEN                                                -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-kolbe" role="tabpanel" aria-label="Målekolben">
     <div class="scene">
@@ -96,7 +137,7 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 3: FORTYNDING                                                 -->
+<!-- FANE 4: FORTYNDING                                                 -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-fortynd" role="tabpanel" aria-label="Fortynding">
     <div class="scene">
@@ -137,6 +178,12 @@
         <h2>Koncentration</h2>
         <p>Koncentrationen er stofmængden pr. liter opløsning. Enheden er mol/L, som skrives M.</p>
         <div class="eksempel">
+            <span class="eksempel-hoved">n eller c?</span>
+            Stofmængden n er alt stoffet i glasset. Enheden er mol.<br>
+            Koncentrationen c er stof pr. liter. Enheden er M = mol/L.<br>
+            Hælder man halvdelen ud, halveres n, men c er den samme.
+        </div>
+        <div class="eksempel">
             <span class="eksempel-hoved">Formlen</span>
             c = <span class="broek"><span>n</span><span>V</span></span>&nbsp;&nbsp;&nbsp;&nbsp;n = c · V&nbsp;&nbsp;&nbsp;&nbsp;V = <span class="broek"><span>n</span><span>c</span></span>
         </div>
@@ -151,7 +198,7 @@
         <div class="eksempel">
             <span class="eksempel-hoved">Fortynding</span>
             Der kommer vand til, men ikke stof. Stofmængden er den samme før og efter:<br>
-            c₁ · V₁ = c₂ · V₂
+            c<sub>før</sub> · V<sub>før</sub> = c<sub>efter</sub> · V<sub>efter</sub>
         </div>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
@@ -191,6 +238,7 @@
 <script src="js/fane.js"></script>
 <script src="js/regning.js"></script>
 <script src="js/sim_kar.js"></script>
+<script src="js/sim_glas.js"></script>
 <script src="js/sim_kolbe.js"></script>
 <script src="js/sim_fortynd.js"></script>
 <script src="js/rundvisning.js"></script>

@@ -1,15 +1,13 @@
 /* =====================================================================
-   tjek.js - tjek af massen og antallet af atomer, som eleven skriver
+   tjek.js - tjek af massen, som eleven skriver paa fane 3
 
    Et forkert tal faar en besked, der passer til fejlen: divideret i
    stedet for ganget, stofmaengden eller molarmassen glemt, et andet
-   grundstofs molarmasse, atomnummeret, kommaet flyttet og potensen
-   forkert.
+   grundstofs molarmasse, atomnummeret og kommaet flyttet.
 
-   Svarene er { ok, besked, note, tom }. note er en bemaerkning ved et
-   rigtigt svar, besked er beskeden ved et forkert. Et svar er rigtigt,
-   naar det hoejst er 1 % fra facit, saa afrunding til to eller tre
-   betydende cifre og 6,022 i stedet for 6,02 ogsaa er rigtigt.
+   Svarene er { ok, besked, tom }. Et svar er rigtigt, naar det hoejst
+   er 1 % fra facit, saa afrunding til to eller tre betydende cifre
+   ogsaa er rigtigt.
    ===================================================================== */
 (function () {
     "use strict";
@@ -65,47 +63,6 @@
         }
         if (naer(v, m, 0.05)) return { besked: "Tæt på. Regn efter: m = " + o.nTekst + " mol · " + NK.komma(st.M) + " g/mol." };
         return { besked: "Gang stofmængden med molarmassen: m = n · M." };
-    };
-
-    /* ----- Antallet af atomer: N = n · N_A ------------------------------------------
-       mant og eks er de to felter (1,51 og 23). Staar hele tallet i det
-       foerste felt (1,51e23), bruges det. */
-    T.antal = function (mantRaa, eksRaa, o) {
-        var mTom = !String(mantRaa || "").trim(), eTom = !String(eksRaa || "").trim();
-        if (mTom && eTom) return { tom: true, besked: "Skriv antallet som et tal gange 10 i en potens." };
-        var tm = T.tal(mantRaa);
-        if (!tm) return { besked: "Skriv et tal foran, fx 1,51." };
-        var v = tm.v;
-        if (!tm.potens) {
-            if (eTom) {
-                if (v < 1e6) return { besked: "Skriv også potensen, det lille tal efter 10." };
-            } else {
-                var e = NK.ascii(String(eksRaa)).replace(/\s+/g, "").replace(/−/g, "-");
-                if (!/^[-+]?\d+$/.test(e)) return { besked: "Potensen skal være et helt tal, fx 23." };
-                v *= Math.pow(10, parseInt(e, 10));
-            }
-        }
-        var N = o.N, n = o.n, NA = D.NA, M = o.st.M / 100;
-        if (naer(v, N)) {
-            /* 15,1 · 10²² er rigtigt, men skrives normalt 1,51 · 10²³ */
-            var foran = tm.potens ? tm.foran : (eTom ? null : tm.v);
-            if (foran !== null && (foran < 1 || foran >= 10)) {
-                return { ok: true, note: "Rigtigt. Med ét ciffer før kommaet skrives det " + o.NTekst + "." };
-            }
-            return { ok: true };
-        }
-        if (naer(v, NA)) return { besked: "Det er antallet i 1 mol. Gang med stofmængden." };
-        if (naer(v, n)) return { besked: "Det er stofmængden. Gang den med 6,02 · 10²³ mol⁻¹." };
-        for (var k = 1; k <= 3; k++) {
-            if (naer(v, N * Math.pow(10, k)) || naer(v, N / Math.pow(10, k))) {
-                return { besked: "Tjek potensen. Tallet er " + Math.pow(10, k) + " gange for " + (v > N ? "stort." : "lille.") };
-            }
-        }
-        if (naer(v, NA / n) || naer(v, n / NA)) return { besked: "Du har divideret. Antallet er stofmængden gange 6,02 · 10²³ mol⁻¹." };
-        if (naer(v, n * M * NA)) return { besked: "Molarmassen skal ikke bruges her. N = n · N_A." };
-        if (naer(v, o.m)) return { besked: "Det er massen. Her skal du finde antallet af atomer." };
-        if (naer(v, N, 0.05)) return { besked: "Tæt på. Regn efter: N = " + o.nTekst + " mol · " + D.NA_TEKST + "." };
-        return { besked: "Gang stofmængden med Avogadros konstant: N = n · N_A." };
     };
 
     NK.Tjek = T;

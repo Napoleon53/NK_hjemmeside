@@ -197,10 +197,14 @@
     var KONC_FEJL = "Koncentrationer kan ikke lægges sammen, når man blander. Brug stofmængden og det samlede rumfang.";
     function regler(id, o) {
         switch (id) {
-        case "n_mM": return { maal: "n", kendt: ["m", "M"], vaerdi: U.n,
+        case "n_mM":
+        case "nSA":
+        case "nSB": return { maal: "n", kendt: ["m", "M"], vaerdi: U.n,
             fejl: [["m*M", "Stofmængden er massen divideret med molarmassen, ikke ganget."],
                    ["M/m", "Brøken er vendt om. Massen står øverst."]] };
-        case "c": return { maal: "c", kendt: ["n", "v", "m", "M"], vaerdi: U.c,
+        case "c":
+        case "cSA":
+        case "cSB": return { maal: "c", kendt: ["n", "v", "m", "M"], vaerdi: U.c,
             fejl: [["v/n", "Brøken er vendt om. Stofmængden står øverst."],
                    ["n*v", "Koncentrationen er stofmængde divideret med rumfang, ikke ganget."],
                    ["m/v", "Her skal du bruge stofmængden n, ikke massen m."]] };
@@ -334,6 +338,10 @@
         case "kat": return "[" + ionT(st.kat) + "]";
         case "an": return "[" + ionT(st.an) + "]";
         case "anden": return "[" + ionT(andenIon(o)) + "]";
+        case "nSA": return "n(" + D.salt(o.tal.A).formel + ")";
+        case "nSB": return "n(" + D.salt(o.tal.B).formel + ")";
+        case "cSA": return "c(" + D.salt(o.tal.A).formel + ")";
+        case "cSB": return "c(" + D.salt(o.tal.B).formel + ")";
         case "bidragA": return "[" + ionT(o.ion) + "] fra " + D.salt(o.tal.A).formel;
         case "bidragB": return "[" + ionT(o.ion) + "] fra " + D.salt(o.tal.B).formel;
         case "total": return "[" + ionT(o.ion) + "]";
@@ -357,6 +365,13 @@
 
     T.formelHint = function (id) { return D.TRIN[id].formelHint || ""; };
 
+    /* Trinnets navn, med saltenes formler for {A} og {B} */
+    T.navn = function (id, o) {
+        var n = D.TRIN[id].navn, t = o.tal;
+        if (!t) return n;
+        return n.replace("{A}", D.salt(t.A).formel).replace("{B}", D.salt(t.B).formel);
+    };
+
     /* ----- Den paene beregning: [venstre og formlen, tallene] ----------------------------- */
     function gange(k, v, enhed) { return (k > 1 ? k + " · " : "") + v + " " + enhed; }
 
@@ -378,10 +393,14 @@
             var g = givenIon(o), kg = K.k(st, g);
             if (kg === 1) return [v + " = [" + ionT(g) + "]", "= " + K.c(o.ionC) + " M"];
             return [v + " = [" + ionT(g) + "] / " + kg, "= " + K.c(o.ionC) + " M / " + kg + " = " + K.c(f.cSalt) + " M"];
+        case "nSA": return [v + " = m / M", "= " + K.g(t.mA) + " g / " + K.M(D.salt(t.A)) + " g/mol = " + K.mol(f.nSA) + " mol"];
+        case "nSB": return [v + " = m / M", "= " + K.g(t.mB) + " g / " + K.M(D.salt(t.B)) + " g/mol = " + K.mol(f.nSB) + " mol"];
+        case "cSA": return [v + " = n / V", "= " + K.mol(f.nSA) + " mol / " + K.L(t.V) + " L = " + K.c(f.cSA) + " M"];
+        case "cSB": return [v + " = n / V", "= " + K.mol(f.nSB) + " mol / " + K.L(t.V) + " L = " + K.c(f.cSB) + " M"];
         case "bidragA": return [v + " = " + gange(f.kA, "c(" + D.salt(t.A).formel + ")", "").trim(),
-            "= " + gange(f.kA, K.c(t.cA), "M") + (f.kA > 1 ? " = " + K.c(f.bidragA) + " M" : "")];
+            "= " + gange(f.kA, K.c(f.cSA), "M") + (f.kA > 1 ? " = " + K.c(f.bidragA) + " M" : "")];
         case "bidragB": return [v + " = " + gange(f.kB, "c(" + D.salt(t.B).formel + ")", "").trim(),
-            "= " + gange(f.kB, K.c(t.cB), "M") + (f.kB > 1 ? " = " + K.c(f.bidragB) + " M" : "")];
+            "= " + gange(f.kB, K.c(f.cSB), "M") + (f.kB > 1 ? " = " + K.c(f.bidragB) + " M" : "")];
         case "total": return [v, "= " + K.c(f.bidragA) + " M + " + K.c(f.bidragB) + " M = " + K.c(f.total) + " M"];
         case "nA": return [T.formelTekst(id, o), "= " + gange(f.kA, K.c(t.cA), "M") + " · " + K.L(t.VA) + " L = " + K.mol(f.nA) + " mol"];
         case "nB": return [T.formelTekst(id, o), "= " + gange(f.kB, K.c(t.cB), "M") + " · " + K.L(t.VB) + " L = " + K.mol(f.nB) + " mol"];
@@ -399,6 +418,8 @@
         switch (id) {
         case "M": return K.M(st) + " g/mol";
         case "n_mM": return K.mol(f.n_mM) + " mol";
+        case "nSA": return K.mol(f.nSA) + " mol";
+        case "nSB": return K.mol(f.nSB) + " mol";
         case "nA": return K.mol(f.nA) + " mol";
         case "nB": return K.mol(f.nB) + " mol";
         case "Vsum": return K.L(o.tal.VA + o.tal.VB) + " L";
@@ -434,6 +455,7 @@
         }
         var mL = "";
         if (id === "c") mL = "Husk: " + K.mL(o.V) + " mL = " + K.L(o.V) + " L. ";
+        if (id === "cSA" || id === "cSB") mL = "Husk: " + K.mL(t.V) + " mL = " + K.L(t.V) + " L. ";
         if (id === "nA") mL = "Husk: " + K.mL(t.VA) + " mL = " + K.L(t.VA) + " L. ";
         if (id === "nB") mL = "Husk: " + K.mL(t.VB) + " mL = " + K.L(t.VB) + " L. ";
         return mL + "Sæt tallene ind: " + T.venstre(id, o) + " = " + ind + ".";
@@ -480,13 +502,29 @@
                 fc.push([o.ionC, "Del med " + kg + ". Der er " + kg + " " + ionT(g) + " for hver " + st.formel + "."]);
             }
             return { facit: f.cSalt, fejl: fc };
+        case "nSA":
+        case "nSB":
+            var mS = id === "nSA" ? t.mA : t.mB, MS = D.salt(id === "nSA" ? t.A : t.B).Mv;
+            return { facit: mS / MS, fejl: [[mS * MS, "Du har ganget. n = m / M."], [MS / mS, "Brøken er vendt om. n = m / M."],
+                [mS, "Det er massen. Del den med molarmassen."]] };
+        case "cSA":
+        case "cSB":
+            var nS = id === "cSA" ? f.nSA : f.nSB, mS2 = id === "cSA" ? t.mA : t.mB, VL = t.V / 1000;
+            return { facit: nS / VL, fejl: [[nS / t.V, "Rumfanget skal være i liter: " + K.mL(t.V) + " mL = " + K.L(t.V) + " L."],
+                [VL / nS, "Brøken er vendt om. c = n / V."], [nS * VL, "Du har ganget. c = n / V."],
+                [nS, "Det er stofmængden n. Koncentrationen er stofmængde pr. liter: del med rumfanget."],
+                [mS2 / VL, "Du har brugt massen. Brug stofmængden n, som du lige har regnet."]] };
         case "bidragA":
         case "bidragB":
-            var kb = id === "bidragA" ? f.kA : f.kB, cb = id === "bidragA" ? t.cA : t.cB, sb = D.salt(id === "bidragA" ? t.A : t.B);
-            return { facit: kb * cb, fejl: kb > 1 ? [[cb, "Hver " + sb.formel + " giver " + kb + " " + ionT(o.ion) + ". Gang med " + kb + "."]] : [] };
+            var kb = id === "bidragA" ? f.kA : f.kB, cb = id === "bidragA" ? f.cSA : f.cSB, sb = D.salt(id === "bidragA" ? t.A : t.B);
+            var nb = id === "bidragA" ? f.nSA : f.nSB, fb = [];
+            if (kb > 1) fb.push([cb, "Hver " + sb.formel + " giver " + kb + " " + ionT(o.ion) + ". Gang med " + kb + "."]);
+            fb.push([kb * nb, "Du har brugt stofmængden. Brug koncentrationen c(" + sb.formel + ")."]);
+            return { facit: kb * cb, fejl: fb };
         case "total":
-            return { facit: f.total, fejl: [[t.cA + t.cB, "Husk tallet foran " + ionT(o.ion) + " i begge salte."],
-                [f.total / 2, "Ionerne er i det samme glas. Bidragene lægges sammen, ikke midles."]] };
+            return { facit: f.total, fejl: [[f.cSA + f.cSB, "Husk tallet foran " + ionT(o.ion) + " i begge salte."],
+                [f.total / 2, "Ionerne er i det samme glas. Bidragene lægges sammen, ikke midles."],
+                [f.kA * f.nSA + f.kB * f.nSB, "Det er stofmængden af " + ionT(o.ion) + ". Læg bidragene sammen, de er koncentrationer."]] };
         case "nA":
         case "nB":
             var kn = id === "nA" ? f.kA : f.kB, cn = id === "nA" ? t.cA : t.cB, Vn = id === "nA" ? t.VA : t.VB;

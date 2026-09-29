@@ -130,9 +130,9 @@
             if (Object.prototype.hasOwnProperty.call(sims, navn)) sims[navn].tilpas();
         }
 
-        /* Man kan linke direkte til en fane med  index.html#beregning  */
+        /* Man kan linke direkte til en fane med  index.html#beregning  eller  #fejlkilder */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
-        if (oenske === "kolber") oenske = "forbrug";
+        if (oenske === "kolber" || oenske === "fejlkilder") oenske = "forbrug";
         visFane(sims["fane-" + oenske] ? "fane-" + oenske : faner[0]);
 
         window.requestAnimationFrame(function (ts) {

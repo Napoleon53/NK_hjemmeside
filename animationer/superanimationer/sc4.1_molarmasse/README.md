@@ -59,9 +59,13 @@ beregningen af massen af 1 mol, skrevet som en pæn beregning (brugerens
 `m = 1 mol · (2 · 1,01 + 16,00) g/mol` og efter svaret `... = 18,02 g`.
 Beregningerne står under hinanden, så de kan sammenlignes. Skiltet afløste
 et kort under hver skål, fordi de lange beregninger (H₂SO₄, ethanol) ikke kunne
-være på et kort på små skærme. Eleven svarer venstre, lige eller højre (også
-med piletasterne). Så falder stolperne, armen svinger
-og falder til ro, og en linje forklarer parret. Parrene er valgt efter fejlen "flest atomer vejer mest":
+være på et kort på små skærme. Opgavekortet siger det hele ud (brugerens ønske
+29. sept. 2026, "Hvilken side synker? 1 mol i hver skål." var for indforstået):
+"I hver skål ligger 1 mol af et stof. Skiltet på bordet viser, hvilke stoffer
+det er. Vægten er låst. Gæt, hvilken skål der synker, når låsen slippes."
+Eleven svarer Venstre, Står lige eller Højre (også med piletasterne). Så
+falder stolperne, armen svinger og falder til ro, og en linje forklarer
+parret og siger, hvilket stof der vejer mest. Parrene er valgt efter fejlen "flest atomer vejer mest":
 CH₄ mod O₂, H₂ mod He, Fe mod butan og K mod Ar (K har størst atomnummer, Ar
 størst atommasse). I de svære par er forskellen 0,07-0,51 g, og CO mod N₂ står
 lige. En runde er ni par, tre fra hvert niveau, i tilfældig rækkefølge og på
@@ -84,11 +88,14 @@ et felt viser navnet.
 
 **Kemichael** præsenterer hver fane første gang, den åbnes i en browser, efter
 reglen i `../README.md`: vægten tre replikker (han peger på panelet og på
-forklaringen på plakaten), skålvægten to (han peger på svarene), ukendt stof
+forklaringen på plakaten), skålvægten tre (han peger på svarene), ukendt stof
 tre (han peger på mærket). Han går kun ved den store knap, to klik på ham
-eller Esc. <kbd>K</kbd> viser præsentationen igen. Ellers roser han tørt, når
+eller Esc. <kbd>K</kbd> viser præsentationen igen. Ellers roser han kort, når
 et niveau er løst, og kommenterer runden på skålvægten. Replikkerne står
-nederst i `js/data.js`. Kaffekoppen på bordet (fane 1 og 3) er det fælles
+nederst i `js/data.js`. 29. sept. 2026 blev de skrevet om til almindeligt
+dansk (brugeren: "Kemichael snakker generelt i tåger"): hver replik skal kunne
+forstås uden at kende scenen, fx "Her ligger 1 mol af et stof i hver skål."
+i stedet for "Skålvægten. 1 mol på hver side." Kaffekoppen på bordet (fane 1 og 3) er det fælles
 påskeæg.
 
 Direkte links: `index.html#skaal` og `index.html#ukendt`.

@@ -57,11 +57,22 @@ krukker. En portion er 0,10 mol; den kan trækkes ned i glasset, eller man
 kan klikke på krukken. Luppen viser altid lige meget væske: én prik er
 0,05 M af en ion. Søjlerne viser saltets koncentration (grå) og hver ions,
 og en stiplet linje viser målet. Panelet viser skemaet, c = n / V og
-[ion] = tallet foran · c. De seks opgaver: NaCl (én til én), Na₂SO₄ (gæt
-[Na⁺] først), FeCl₃ (tre Cl⁻), K₃PO₄ (tre K⁺ i 0,50 L), Al₂(SO₄)₃ (gæt,
-hvilken ion der er flest af) og to salte med Na⁺ til [Na⁺] = 0,50 M.
-Forklaringen kommer, når glasset viser målet, og siger noget om netop det
-gæt. Er der kommet for meget i, siger linjen hvorfor og Start forfra.
+[ion] = tallet foran · c. De seks opgaver: NaCl (én til én), Na₂SO₄ (tre
+spørgsmål i små trin), FeCl₃ (tre Cl⁻), K₃PO₄ (tre K⁺ i 0,50 L),
+Al₂(SO₄)₃ (gæt, hvilken ion der er flest af) og to salte med Na⁺ til
+[Na⁺] = 0,50 M. Forklaringen kommer, når glasset viser målet, og siger
+noget om netop det gæt. Er der kommet for meget i, siger linjen hvorfor
+og Start forfra.
+
+**Na₂SO₄ i små trin** (brugerens ønske 29. sept. 2026: "Der indgår 3
+forskellige størrelser og et antalsforhold"). Først kommer saltet i
+glasset (0,10 mol i 0,50 L), så tre spørgsmål med svarmuligheder, ét ad
+gangen (`spm` i `D.OPL`): c(Na₂SO₄) = n / V, hvor mange Na⁺ én Na₂SO₄
+giver, og [Na⁺]. Glasset viser kun det, der er svaret på: den grå søjle
+efter c, ionerne i luppen efter antallet og ionernes søjler efter [Na⁺];
+panelet viser n og V, men ? for resten. Et forkert svar bliver slået fra
+og forklaret (0,10 M: det er stofmængden n). Mens spørgsmålene står, kan
+der ikke komme mere salt i, og Start forfra er væk.
 
 **Ionerne.** Let: salte med 1 : 1, 1 : 2 og 2 : 1 (NaCl, KI, CaCl₂, MgCl₂,
 BaCl₂, Na₂SO₄, K₂SO₄, Na₂CO₃). Middel: 1 : 3, 3 : 1 og 2 : 3 (FeCl₃, AlCl₃,
@@ -76,7 +87,17 @@ de pæne beregninger, søjlerne kommer, når tallene er fundet, og luppen
 fyldes til sidst.
 
 **Blandinger.** To salte i ét glas (bidragene lægges sammen), samme
-rumfang, forskelligt rumfang og en ion, der kun er i det ene glas. I
+rumfang, forskelligt rumfang og en ion, der kun er i det ene glas.
+
+**To salte i ét glas** (brugerens ønske 29. sept. 2026: eleverne blander c
+og n sammen) starter fra saltene: fx 5,55 g CaCl₂ og 4,00 g AlCl₃ ligger
+på to vægte ved siden af et bægerglas med 200 mL vand. Syv trin: n af hvert
+salt (m / M, molarmassen står på tavlen), c af hvert salt (n / V), bidraget
+til [Cl⁻] fra hvert salt og summen. Når n er fundet, står stofmængden over
+bunken; når c er fundet, bærer spatlen saltet over i vandet. Masserne er
+valgt, så n og c bliver pæne tal (selvtesten tjekker det). Fejlene, der
+blander c og n, har egne beskeder: c = stofmængden, c = m / V og et bidrag
+regnet med n i stedet for c. I
 stofmængden skal tallet foran ionen med: n(Cl⁻) = 2 · c · V for CaCl₂.
 Når det samlede rumfang er fundet, hældes A og B i blandingsglasset, og når
 koncentrationen er fundet, viser luppen ionerne. De typiske fejl har egne
@@ -101,14 +122,14 @@ næste opgave · <kbd>Esc</kbd> luk.
 ```
 index.html          markup for de tre faner, teorien og rundvisningen
 css/stil.css        alt udseende (som sc5.1 plus skemaet med felter). NB: decimaltal med PUNKTUM i CSS
-sprites/            literglasset (nyt); bægerglasset (som sc5.1), flasken (som sc7.2), krukken og
-                    katederet (som sc4.5), spatlen og luppen (som sc2.1)
+sprites/            literglasset (nyt); bægerglasset, vægten og vejebåden (som sc5.1), flasken
+                    (som sc7.2), krukken og katederet (som sc4.5), spatlen og luppen (som sc2.1)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.5)
 js/data.js          atommasserne, ionerne, saltene, opgaverne og niveauerne, regnetrinene og replikkerne
 js/kemi.js          glasset på fane 1, opløsningsskemaet og facit på fane 2 og 3
 js/tjek.js          skemaet, formlen og tallet i hvert trin, de typiske fejl og de pæne beregninger
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
-js/tegning.js       rummet, bordet, tavlen, krukken, spatlen, glassene, flasken, søjlerne og luppen
+js/tegning.js       rummet, bordet, tavlen, krukken, spatlen, vægten, glassene, flasken, søjlerne og luppen
 js/laerer.js        Kemichael ved katederet (som sc4.5)
 js/fane.js          det, fanerne deler (som sc5.1, plus niveauerne på fane 2)
 js/regning.js       regnetrinene i kortet (skemaet, formlen og tallet) og tavlen
@@ -127,9 +148,10 @@ _sprites.html       udviklerværktøj: viser tegningerne alene
 `D.IONER` med navn, ladning og farve i luppen. **Saltene** står i
 `D.SALTE`: kationen og anionen og tallet foran hver i skemaet (`kk`, `ka`);
 formlen skal have parenteser om sammensatte ioner med et tal efter, fx
-`Al2(SO4)3`. **Opgaverne** står i `D.OPL` (fane 1), `D.NIV` (fane 2: saltene
-og tallene, der trækkes blandt, og den første opgave `std`) og `D.BLAND`
-(fane 3: sæt af tal; V i mL). **Beskederne ved fejl** står i `js/tjek.js`
+`Al2(SO4)3`. **Opgaverne** står i `D.OPL` (fane 1; `spm` er spørgsmålene
+efter opløsningen), `D.NIV` (fane 2: saltene og tallene, der trækkes
+blandt, og den første opgave `std`) og `D.BLAND` (fane 3: sæt af tal; V i
+mL, masserne i g). **Beskederne ved fejl** står i `js/tjek.js`
 (`T.afstem`, `regler` og `kandidater`).
 
 **`_selvtest.html`** åbner index.html i en iframe og tjekker, at 11
@@ -137,12 +159,15 @@ molarmasser passer med tabellen, at ladningerne går lige op i alle 15
 salte, og at tallet foran kationen er tallet i formlen, at glasset regner
 [ion] rigtigt med to salte, at svaret i fane 1's opgaver rammer målet, at
 60 tilfældige opgaver på fane 2 og alle tal på fane 3 kan skrives som
-svar, at 16 fejl i skemaet, formlerne og tallene giver den rigtige besked,
-at sproget holder reglerne, at alle tre faner kan gennemføres med musen og
-ved at skrive (også med gæt, for meget salt, hint og svar), at glassene
-først hældes sammen, når rumfanget er fundet, at Kemichael kun taler ved
-hint og svar og kan sendes ud, og at layoutet holder fra 520 × 380 til
-1500 × 900. Sidst kørt 25. september 2026: ALT OK (74 påstande).
+svar, at masserne i fane 3's første opgave giver pæne tal, at 21 fejl i
+skemaet, formlerne og tallene giver den rigtige besked, at sproget holder
+reglerne, at alle tre faner kan gennemføres med musen og ved at skrive
+(også med gæt, spørgsmålene i små trin, for meget salt, hint og svar), at
+glasset på fane 1 først viser det, der er svaret på, at saltene først
+kommer i vandet og glassene først hældes sammen, når det er regnet, at
+Kemichael kun taler ved hint og svar og kan sendes ud, og at layoutet
+holder fra 520 × 380 til 1500 × 900. Sidst kørt 29. september 2026: ALT
+OK (100 påstande).
 
 ## Forenklinger
 
@@ -161,5 +186,5 @@ I menuen fra 26. sept. 2026 som c5.2 i `kemi-c-filer/samling_c5.html`. De gamle
 ligger i
 `kemi-c-filer/arkiv/c5.3_animationer_aktuelkonc_master2_oldversion.html` og
 `kemi-c-filer/arkiv/c5.4_opgaver_aktuelkonc_oldversion.html`. Mohrtitreringen er
-rykket op som c5.3 (filen hedder stadig `c5.5_eksperiment_mohrtitrering.html`,
-og gamle links med c5.5 finder den).
+rykket op som c5.3 og er fra 28. sept. 2026 superanimationen `sc5.3_mohrtitrering`
+(gamle links med c5.5 finder den).

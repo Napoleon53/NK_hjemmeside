@@ -26,8 +26,11 @@
    og klikke med musen (også med fejl, hint, trekanten og svaret), at
    Vægten kan løses ved at skrive, og at scenen gør det, der er regnet,
    at en hel Hurtigrunde kan køres (også med fejl, der kommer igen), at
-   Kemichael kun taler ved hint og svar og kan sendes ud, at sproget
-   holder reglerne, og at layoutet holder fra 520 × 380 til 1500 × 900.
+   Kemichael kun taler ved hint og svar, roser kort, når en del er
+   rigtig, og kan sendes ud, at en løst opgave er grøn i listen, at
+   Vægten har linjen med de tre trin, et bredere panel og større felter,
+   at sproget holder reglerne, og at layoutet holder fra 520 × 380 til
+   1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
@@ -227,7 +230,9 @@ function koerTest(W) {
     });
     tekster.push(D.MESTER_HINT);
     D.HURTIG.forEach(function (q) { tekster.push(q.spm, q.forkl); tekster = tekster.concat(q.svar, q.fejl); });
-    ["INTRO", "FAERDIG", "HINT_DEL"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
+    ["INTRO", "FAERDIG", "HINT_DEL", "DEL_OK"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
+    Object.keys(D.ROS_K).forEach(function (k) { tekster = tekster.concat(D.ROS_K[k]); });
+    tekster = tekster.concat(D.TRINBAR);
     Object.keys(T.LOKKER).forEach(function (k) { tekster.push(T.LOKKER[k]); });
     tekster = tekster.concat(D.ROS, D.ROS_OPGAVE, D.KAFFE, [D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST, D.TREKANT, D.MULDVARP]);
     ["n", "m", "M"].forEach(function (s) {
@@ -265,6 +270,19 @@ function koerTest(W) {
     traekTil("n", "F_v"); traekTil("m", "F_t"); traekTil("M", "F_n");
     paastand("introduktionen: n, m og M trukket på plads løser opgaven med stjerne", A.faerdig && A.status[0].stjerne, besked(A));
     paastand("knappen hedder Næste opgave", /Næste/.test(A.el.knap.textContent), A.el.knap.textContent);
+    var raekke0 = d.querySelectorAll("#formel-liste .hyldelinje")[0];
+    /* Overgangen slås fra, så farven måles, som den ender */
+    raekke0.style.transition = "none";
+    var farve0 = W.getComputedStyle(raekke0).backgroundColor;
+    raekke0.style.transition = "";
+    paastand("den løste opgave er grøn i listen med ✓ i cirklen og en stjerne",
+        raekke0.classList.contains("loest") && raekke0.querySelector(".hl-nr").textContent === "✓" && /★/.test(raekke0.textContent) &&
+        /63, 174, 114/.test(farve0), farve0);
+    paastand("de uløste opgaver er ikke grønne", !d.querySelectorAll("#formel-liste .hyldelinje")[1].classList.contains("loest"));
+    paastand("kortets overskrift siger ✓ Løst", /✓ Løst/.test(d.getElementById("formel-titel").textContent), d.getElementById("formel-titel").textContent);
+    paastand("Kemichael roser kort, at formlen er rigtig", A.k.taler() && /form(el|len)/i.test(A.k.tekst()) && A.k.vist.slags === "god", A.k.tekst());
+    tik(A, 4);
+    paastand("rosen går selv igen efter et par sekunder", !A.k.taler(), A.k.tekst());
 
     vaelgA(1);
     paastand("opgave 2: n står fast på venstre side, og der er ingen n-brik", !A.pl.F_v.aaben && A.pl.F_v.facit === "n" && !brik("n") && !brik("N"));
@@ -272,10 +290,17 @@ function koerTest(W) {
     paastand("opgave 2: n = M / m er vendt om, og begge hopper tilbage", /vendt om/.test(besked(A)) && !A.pl.F_t.brik && !A.pl.F_n.brik, besked(A));
     traekTil("m", "F_t"); traekTil("M", "F_n");
     paastand("opgave 2: formlen er rigtig, navnene mangler", A.dele.formel && !A.dele.navn && !A.faerdig);
+    paastand("opgave 2: kortet siger, at formlen er rigtig, og Kemichael roser", /Formlen er rigtig/.test(besked(A)) && A.k.taler() && /form(el|len)/i.test(A.k.tekst()) &&
+        A.okDel === "formel", besked(A) + " | " + A.k.tekst());
+    paastand("opgaven bliver ikke grøn i listen, før den er løst", !d.querySelectorAll("#formel-liste .hyldelinje")[1].classList.contains("loest"));
     traekTil("antal partikler", "N_n"); traekTil("masse", "N_m"); traekTil("molarmasse", "N_M");
     paastand("antal partikler ved n: det er stort N", /stort N/.test(besked(A)) && !A.pl.N_n.brik && !!A.pl.N_m.brik, besked(A));
     traekTil("stofmængde", "N_n");
-    paastand("opgave 2 er løst", A.faerdig, besked(A));
+    paastand("opgave 2 er løst, og Kemichael roser navnene", A.faerdig && /navne/i.test(A.k.tekst()), besked(A) + " | " + A.k.tekst());
+    vaelgA(1);
+    paastand("en ny opgave: rosen fra den forrige er væk", !A.k.taler(), A.k.tekst());
+    traekTil("m", "F_t"); traekTil("M", "F_n");
+    traekTil("stofmængde", "N_n"); traekTil("masse", "N_m"); traekTil("molarmasse", "N_M");
     var laastM = A.brik(A.pl.F_t.brik), lm = midt(laastM);
     traek(A, lm.x, lm.y, 20, 20);
     paastand("en låst brik kan ikke trækkes", A.pl.F_t.brik === laastM.id && A.faerdig);
@@ -385,8 +410,29 @@ function koerTest(W) {
     paastand("alle seks opgaver kan løses ved at skrive formlen, mellemregningen og resultatet", loeste.every(Boolean), loeste.join(","));
     paastand("Mesteren: begge rækker poser er fyldt", B.s.raekker.every(function (r) { return r.fyldt >= 1; }));
     B.vaelg(0, false);
-    skrivB("n = m/M"); tik(B, 0.2);
     var rk = d.getElementById("vaegt-raekker");
+    function chips() {
+        return Array.prototype.map.call(rk.querySelectorAll(".raekke")[0].querySelectorAll(".tb-trin"), function (c) {
+            return c.classList.contains("ok") ? "ok" : (c.classList.contains("nu") ? "nu" : (c.classList.contains("svar") ? "svar" : "-"));
+        }).join(",");
+    }
+    paastand("Vægten: linjen over regnestykket har de tre trin, og trin 1 (formlen) er fremhævet",
+        /Formlen/.test(rk.textContent) && /Tallene ind/.test(rk.textContent) && /Resultatet/.test(rk.textContent) && chips() === "nu,-,-", chips());
+    paastand("linjen i kortet siger trin 1 og at tallene kommer i trin 2, uden introlinjen",
+        /Trin 1: Skriv formlen for n\(NaCl\) med bogstaver\. Tallene kommer i trin 2\./.test(besked(B)) && besked(B).indexOf(D.INTRO.vaegt) < 0, besked(B));
+    paastand("formelfeltet siger, at formlen skrives med bogstaver", /bogstaver/.test(rk.querySelector("input").placeholder), rk.querySelector("input").placeholder);
+    var fs = parseFloat(W.getComputedStyle(rk.querySelector("input")).fontSize);
+    paastand("felterne på Vægten har større skrift (mindst 19 px)", fs >= 19, fs);
+    var pbV = d.querySelector("#fane-vaegt .panel").getBoundingClientRect().width;
+    NK.visFane("fane-formel");
+    var pbF = d.querySelector("#fane-formel .panel").getBoundingClientRect().width;
+    NK.visFane("fane-vaegt");
+    B.tilpas(); B.layout();
+    paastand("panelet på Vægten er bredere end på Formlen", pbV >= pbF + 60, Math.round(pbV) + " og " + Math.round(pbF));
+    skrivB("n = m/M"); tik(B, 0.2);
+    paastand("rigtig formel: kortet siger det, Kemichael roser, trin 1 får ✓, og trin 2 er fremhævet",
+        /Formlen er rigtig\./.test(besked(B)) && /Trin 2/.test(besked(B)) && B.k.taler() && /form(el|len)/i.test(B.k.tekst()) && chips() === "ok,nu,-" &&
+        !!rk.querySelector(".rs-hoejre.rs-ny") && /✓/.test(rk.querySelector(".rs-hoejre").textContent), besked(B) + " | " + B.k.tekst() + " | " + chips());
     paastand("efter formlen: formlen står som brøk, og mellemregningen har to felter over og under en brøkstreg",
         !!rk.querySelector(".rs-vist .broek") && B.regning.aktivt().fase === "indsaet" && rk.querySelectorAll(".broekfelt .bf-broek input").length === 2 && !!rk.querySelector(".bf-streg"));
     paastand("tavlen viser n(NaCl) = m/M = ?", B.regning.regnDele(B.regning.aktivt()).map(function (x) { return x.t || (x.top + "/" + x.bund); }).join("") === "n(NaCl) = m/M = ?");
@@ -399,7 +445,8 @@ function koerTest(W) {
     skrivLed(1, "58,44");
     paastand("58,44 uden enhed: skriv enheden", /Skriv også enheden/.test(besked(B)), besked(B));
     skrivLed(1, "58,44 g/mol");
-    paastand("mellemregningen er rigtig: Kemichael tier, og der er et felt til resultatet", B.regning.aktivt().fase === "tal" && !B.k.taler() && /resultatet/.test(besked(B)), besked(B));
+    paastand("mellemregningen er rigtig: Kemichael roser kort, og der er et felt til resultatet", B.regning.aktivt().fase === "tal" && B.k.taler() &&
+        /Mellemregningen|tal/.test(B.k.tekst()) && /Mellemregningen er rigtig/.test(besked(B)) && /resultatet/.test(besked(B)) && chips() === "ok,ok,nu", besked(B) + " | " + chips());
     B.knap();
     paastand("Giv hint til resultatet: hvad der tastes, og at svaret er i mol", /Tast 116,88 : 58,44/.test(B.k.tekst()) && /mol/.test(B.k.tekst()), B.k.tekst());
     skrivB("6830,5 mol");
@@ -408,6 +455,7 @@ function koerTest(W) {
     tik(B, 4);
     paastand("rigtig n: bunken deles i poser, og vægten viser 0,00 g", B.s.raekker[0].fyldt >= 1 && B.s.vaegtM === 0);
     paastand("det færdige regnestykke står i kortet med brøkstreger og ✓", rk.querySelectorAll(".rs-vist .broek").length === 2 && /2,00 mol/.test(rk.textContent) && /✓/.test(rk.textContent));
+    paastand("alle tre trin har ✓, og opgaven er grøn i listen", chips() === "ok,ok,ok" && d.querySelectorAll("#vaegt-liste .hyldelinje")[0].classList.contains("loest"), chips());
     B.vaelg(2, false);
     B.knap();
     paastand("Giv hint i formeltrinnet for m: halvdelen af formlen", /Du kender stofmængden/.test(B.k.tekst()) && /m = n · …/.test(B.k.tekst()), B.k.tekst());
@@ -417,6 +465,7 @@ function koerTest(W) {
     B.knap();
     paastand("Vis svaret viser formlen, og nu kommer mellemregningen med et gangetegn", /Formlen/.test(B.k.tekst()) && B.regning.aktivt().fase === "indsaet" && !B.trekant &&
         rk.querySelectorAll(".bf-krop > .bf-del input").length === 2 && !!rk.querySelector(".bf-gange"), B.k.tekst());
+    paastand("en vist formel får ↩ i gult i linjen med trinnene, ikke ✓", chips() === "svar,nu,-", chips());
     B.knap();
     paastand("Giv hint i mellemregningen for m: stofmængden er det første tal", /Først stofmængden: 0,250 mol/.test(B.k.tekst()), B.k.tekst());
     B.knap();
@@ -446,7 +495,9 @@ function koerTest(W) {
     skrivLed(0, "58,44 g/mol");
     paastand("Mesteren: molarmassen af natriumchlorid i trin 2 forklares", /natriumchlorid/.test(besked(B)), besked(B));
     B.knap();
-    paastand("Mesteren: hintet siger, at stofmængden kommer fra trin 1", /fra trin 1/.test(B.k.tekst()), B.k.tekst());
+    paastand("Mesteren: hintet siger, at stofmængden kommer fra del 1", /fra del 1/.test(B.k.tekst()), B.k.tekst());
+    paastand("Mesteren: de to dele har hver sin overskrift og sin linje med trin", /Del 1: Stofmængden af natriumchlorid/.test(rk.textContent) &&
+        /Del 2: Massen af glukose/.test(rk.textContent) && rk.querySelectorAll(".trinbar").length === 2 && /^Del 2 af 2\./.test(B.trinLinje()), B.trinLinje());
 
     overskrift("9. Hurtigrunden");
     NK.visFane("fane-hurtig");

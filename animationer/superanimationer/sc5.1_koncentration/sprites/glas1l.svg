@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="240" viewBox="0 0 180 240">
+  <!-- Baegerglas paa 1 L (fane 2). Animationen tegner vaesken og prikkerne
+       BAG filen, klippet til det indre: x 22-158, y 18-222 (bundens
+       hjoerner r 10). Rumfang: y = 222 - 180 * V (V i liter), saa 1,0 L
+       staar ved y 42. Stregerne sidder ved hver 0,1 L; tallene ved dem
+       tegnes af animationen (saa glasset kan spejles, naar det haelder).
+       Tuden sidder oeverst til venstre ved (14, 12). Bunden staar paa y 227. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.30"/>
+      <stop offset="0.15" stop-color="#d4ebfa" stop-opacity="0.07"/>
+      <stop offset="0.85" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.24"/>
+    </linearGradient>
+  </defs>
+  <path d="M22 18 L22 212 Q22 222 32 222 L148 222 Q158 222 158 212 L158 18 Z" fill="url(#glas)"/>
+  <path d="M10 11 Q22 10 22 20 L22 214 Q22 225 33 225 L147 225 Q158 225 158 214 L158 18 Q158 13 164 12"
+        fill="none" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="142" y="30" width="5" height="176" rx="2.5" fill="#ffffff" fill-opacity="0.14"/>
+  <g stroke="#eef6fc" stroke-opacity="0.75" stroke-width="1.5" stroke-linecap="round">
+    <path d="M23 186 h22 M23 150 h22 M23 114 h22 M23 78 h22 M23 42 h22"/>
+  </g>
+  <g stroke="#eef6fc" stroke-opacity="0.45" stroke-width="1.1" stroke-linecap="round">
+    <path d="M23 204 h12 M23 168 h12 M23 132 h12 M23 96 h12 M23 60 h12"/>
+  </g>
+</svg>

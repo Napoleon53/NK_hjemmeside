@@ -20,10 +20,11 @@
    Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
    se på et skærmbillede: at molarmasserne og massefylderne passer med
    tabelværdierne, at tallene skrives rigtigt, at målene, parrene og
-   ordrerne regner rigtigt, at tjekket godkender de rigtige svar og giver
-   den rigtige besked ved de typiske fejl, at sproget overholder reglerne,
-   at alle tre faner kan gennemføres (også med musen på fane 1), og at
-   layoutet holder fra 520 × 380 til 1500 × 900.
+   ordrerne regner rigtigt, at hver opgave på fane 1 har ét svar inden
+   for 10 mol, at tjekket godkender de rigtige svar og giver den rigtige
+   besked ved de typiske fejl, at sproget overholder reglerne, at alle tre
+   faner kan gennemføres (også med musen og blandede klumper på fane 1),
+   og at layoutet holder fra 520 × 380 til 1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
@@ -74,13 +75,27 @@ var PAR_FACIT = {
     "Al1mol/Au100g": "a", "Cu63.55g/Cu1mol": "lige", "Fe50g/Fe1mol": "b", "C2mol/Ag100g": "a", "Au0.5mol/Cu100g": "b"
 };
 
-/* Ordrerne: massen og antallet med tre betydende cifre, regnet i hånden */
+/* Ordrerne: massen med tre betydende cifre, regnet i hånden */
 var ORDRE_FACIT = [
-    ["2,00 mol Cu", "127", "1,20 · 10²⁴"], ["3,00 mol Al", "80,9", "1,81 · 10²⁴"], ["5,00 mol C", "60,1", "3,01 · 10²⁴"],
-    ["1,00 mol Au", "197", "6,02 · 10²³"], ["0,500 mol Fe", "27,9", "3,01 · 10²³"], ["0,250 mol Ag", "27,0", "1,51 · 10²³"],
-    ["0,750 mol Cu", "47,7", "4,52 · 10²³"], ["0,100 mol Au", "19,7", "6,02 · 10²²"], ["1,35 mol Al", "36,4", "8,13 · 10²³"],
-    ["0,0400 mol Au", "7,88", "2,41 · 10²²"], ["0,0250 mol Ag", "2,70", "1,51 · 10²²"], ["2,40 mol C", "28,8", "1,44 · 10²⁴"]
+    ["2,00 mol Cu", "127"], ["3,00 mol Al", "80,9"], ["5,00 mol C", "60,1"],
+    ["1,00 mol Au", "197"], ["0,500 mol Fe", "27,9"], ["0,250 mol Ag", "27,0"],
+    ["0,750 mol Cu", "47,7"], ["0,100 mol Au", "19,7"], ["1,35 mol Al", "36,4"],
+    ["0,0400 mol Au", "7,88"], ["0,0250 mol Ag", "2,70"], ["2,40 mol C", "28,8"]
 ];
+
+/* Alle måder at lægge n klumper på vægten: { symbol: antal } */
+function blandinger(S, n) {
+    var ud = [];
+    (function laeg(i, rest, tal) {
+        if (i === S.length - 1) { var t = {}; for (var s in tal) t[s] = tal[s]; if (rest) t[S[i].s] = rest; ud.push(t); return; }
+        for (var a = 0; a <= rest; a++) {
+            if (a) tal[S[i].s] = a; else delete tal[S[i].s];
+            laeg(i + 1, rest - a, tal);
+        }
+        delete tal[S[i].s];
+    }(0, n, {}));
+    return ud;
+}
 
 function koerTest(W) {
     var d = W.document;
@@ -91,8 +106,8 @@ function koerTest(W) {
     overskrift("1. Indlæsning");
     paastand("NK findes", !!NK);
     if (!NK) return;
-    var D = NK.Data, T = NK.Tjek;
-    paastand("data.js og tjek.js er kørt", !!(D && D.STOFFER && T && T.masse && T.antal));
+    var D = NK.Data, T = NK.Tjek, O = NK.Opgaver;
+    paastand("data.js, opgaver.js og tjek.js er kørt", !!(D && D.STOFFER && T && T.masse && O && O.MAAL && O.TYPER));
     paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-vaegt"] && NK.sims["fane-atomer"] && NK.sims["fane-afvej"]));
     var sprites = ["vaegt", "vejebaad", "pulverglas", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
     var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
@@ -126,17 +141,70 @@ function koerTest(W) {
     ].filter(function (p) { return lig(p[0], p[1]) !== true; });
     paastand("potensform, betydende cifre og komma skrives rigtigt", talFejl.length === 0, talFejl.map(function (p) { return p[0] + "≠" + p[1]; }).join("; "));
 
-    overskrift("4. Målene, parrene og ordrerne regner rigtigt");
+    overskrift("4. Målene, opgaverne, parrene og ordrerne regner rigtigt");
     var cu = D.stof("Cu");
     paastand("beregningen skrives m = 3 mol · 63,55 g/mol = 190,65 g", D.regnMasse(cu, 3, null, NK.komma(D.masse(cu, 3))) === "m = 3 mol · 63,55 g/mol = 190,65 g");
     paastand("og N = 3 mol · 6,02 · 10²³ mol⁻¹ = 1,81 · 10²⁴", D.regnAntal(3, null, NK.potens(D.antal(3))) === "N = 3 mol · 6,02 · 10²³ mol⁻¹ = 1,81 · 10²⁴");
-    var maalFejl = D.MAAL.filter(function (m) {
-        var st = D.stof(m.s), masse = NK.komma(D.masse(st, m.n));
-        return m.efter.indexOf(masse) < 0 || (m.n === 1 && m.efter.indexOf("6,02 · 10²³") < 0);
+    function kompAf(tal) { return O.komp(tal); }
+    function sum(tal) { return Object.keys(tal).reduce(function (s, x) { return s + tal[x]; }, 0); }
+    var maalFejl = O.MAAL.filter(function (m) { return !(m.tjek(kompAf(m.svar)) || {}).ok; });
+    paastand("de tre mål: svaret løser målet", O.MAAL.length === 3 && maalFejl.length === 0, maalFejl.map(function (m) { return m.tekst; }).join("; "));
+    paastand("mål 1 viser beregningen for 3 mol kobber", O.efter(O.MAAL[0]) === "m = 3 mol · 63,55 g/mol = 190,65 g. Hver klump er 1 mol.");
+    paastand("mål 2 nævner begge masser", /590,91 g/.test(O.efter(O.MAAL[1])) && /190,65 g/.test(O.efter(O.MAAL[1])));
+    paastand("mål 3 er det letteste stof", O.MAAL[2].svar[D.STOFFER[0].s] === 3);
+    var m3 = O.MAAL[2].tjek(kompAf({ Au: 3 }));
+    paastand("mål 3 med 3 mol guld: \"3 mol guld vejer 590,91 g. Det kan gøres lettere.\"",
+        m3 && m3.besked === "3 mol guld vejer 590,91 g. Det kan gøres lettere.", m3 && m3.besked);
+    var m3b = O.MAAL[2].tjek(kompAf({ C: 2, Au: 1 }));
+    paastand("mål 3 med en blanding giver et svar om blandingen", m3b && /^Blandingen vejer 220,99 g/.test(m3b.besked), m3b && m3b.besked);
+    paastand("alle summer af to og af tre klumper er forskellige", [2, 3].every(function (n) {
+        var set = {};
+        return blandinger(D.STOFFER, n).every(function (t) { var m = kompAf(t).m; if (set[m]) return false; set[m] = 1; return true; });
+    }));
+    var typeFejl = [];
+    O.TYPER.forEach(function (ty, ti) {
+        ty.alle().forEach(function (p, pi) {
+            var o = O.opgave(O.MAAL.length + ti, pi), k = kompAf(o.svar), n = sum(o.svar);
+            if (o.navn !== ty.navn) typeFejl.push(ty.navn + ": forkert type");
+            if (!(o.tjek(k) || {}).ok) typeFejl.push(o.tekst + ": svaret løser ikke opgaven");
+            if (n > D.KLUMPER_MAKS || k.m > 220000) typeFejl.push(o.tekst + ": for meget på vægten");
+            if (!o.hint || !O.efter(o, k)) typeFejl.push(o.tekst + ": mangler hint eller besked");
+            var rigtige = blandinger(D.STOFFER, n).filter(function (t) { return (o.tjek(kompAf(t)) || {}).ok; });
+            if (ty.navn === "Over grænsen") {
+                /* Med ét mol mindre maa intet naa over graensen */
+                var X = parseInt(o.tekst.match(/over (\d+) g/)[1], 10) * 100;
+                if (blandinger(D.STOFFER, n - 1).some(function (t) { return kompAf(t).m > X; })) typeFejl.push(o.tekst + ": kan klares med færre mol");
+                if (!rigtige.length) typeFejl.push(o.tekst + ": ingen løsning");
+            } else if (rigtige.length !== 1) {
+                typeFejl.push(o.tekst + ": " + rigtige.length + " løsninger");
+            }
+        });
     });
-    paastand("hvert mål nævner den masse, modellen giver", maalFejl.length === 0, maalFejl.map(function (m) { return m.tekst; }).join("; "));
-    paastand("mål 3 nævner antallet for 3 mol", D.MAAL[2].efter.indexOf(NK.potens(D.antal(3))) >= 0);
-    paastand("mål 4 er det letteste stof", D.MAAL[3].s === D.STOFFER[0].s);
+    paastand("hver af de " + O.TYPER.length + " slags opgaver har ét svar for alle " +
+        O.TYPER.reduce(function (s, ty) { return s + ty.alle().length; }, 0) + " muligheder, inden for 10 mol og 2200 g",
+        typeFejl.length === 0, typeFejl.slice(0, 3).join("; "));
+    paastand("typerne kommer på skift efter målene", O.opgave(3).navn === "To klumper" && O.opgave(4).navn === "To stoffer" &&
+        O.opgave(5).navn === "Over grænsen" && O.opgave(6).navn === "Tre stoffer" && O.opgave(7).navn === "To klumper");
+    var pFe = O.TYPER[0].alle().findIndex(function (p) { return D.STOFFER[p[0]].s === "Fe" && D.STOFFER[p[1]].s === "Ag"; });
+    var oB = O.opgave(3, pFe);
+    paastand("to klumper: \"Find to klumper, der tilsammen vejer 163,72 g.\"", oB.tekst === "Find to klumper, der tilsammen vejer 163,72 g.", oB.tekst);
+    var rB = oB.tjek(kompAf({ Cu: 1, Ag: 1 })), rB2 = oB.tjek(kompAf({ Cu: 2 }));
+    paastand("forkerte to klumper får for meget eller for lidt", rB && rB.besked === "Kobber og sølv vejer 171,42 g. Det er for meget." &&
+        rB2 && rB2.besked === "To klumper kobber vejer 127,10 g. Det er for lidt.", (rB && rB.besked) + " | " + (rB2 && rB2.besked));
+    var pC = O.TYPER[1].alle().findIndex(function (p) { return D.STOFFER[p[0]].s === "Cu" && D.STOFFER[p[1]].s === "Au" && p[2] === 4 && p[3] === 2; });
+    var oC = O.opgave(4, pC);
+    paastand("to stoffer: \"Bland kobber og guld: 4 mol i alt, og vægten skal vise 521,04 g.\"",
+        oC.tekst === "Bland kobber og guld: 4 mol i alt, og vægten skal vise 521,04 g.", oC.tekst);
+    var rC = oC.tjek(kompAf({ Cu: 3, Au: 1 })), rC2 = oC.tjek(kompAf({ Cu: 2, Ag: 1 }));
+    paastand("to stoffer: for lidt, og et forkert stof får besked", rC && rC.besked === "4 mol og 387,62 g. Det er for lidt." &&
+        rC2 && rC2.besked === "Brug kun kobber og guld.", (rC && rC.besked) + " | " + (rC2 && rC2.besked));
+    var oD = O.opgave(5, O.GRAENSER.indexOf(500));
+    var rD = oD.tjek(kompAf({ Au: 4 })), rD2 = oD.tjek(kompAf({ Au: 2, Ag: 1 }));
+    paastand("over 500 g: 3 mol er nok, 4 mol får besked, og 2 guld og 1 sølv er også rigtigt",
+        oD.nmin === 3 && rD && /færre/.test(rD.besked) && rD2 && rD2.ok, rD && rD.besked);
+    var oE = O.opgave(6, 0);
+    var rE = oE.tjek(kompAf({ C: 2, Al: 1 }));
+    paastand("tre stoffer: to ens klumper får besked", rE && rE.besked === "De tre klumper skal være af hvert sit stof.", rE && rE.besked);
     var nTal = [["Au", 100, "0,508"], ["Ag", 100, "0,927"], ["Cu", 100, "1,57"]];
     paastand("forklaringerne har de rigtige stofmængder (0,508, 0,927 og 1,57 mol)", nTal.every(function (x) {
         var n = x[1] / (D.stof(x[0]).M / 100);
@@ -163,10 +231,10 @@ function koerTest(W) {
     paastand("hvert niveau har mindst tre par", [0, 1, 2].every(function (n) { return D.PAR.filter(function (p) { return p.niveau === n; }).length >= D.RUNDE[n]; }));
     var ordreFejl = D.ORDRER.filter(function (o, i) {
         var f = ORDRE_FACIT[i];
-        return f[0] !== o.nTekst + " mol " + o.st.s || f[1] !== o.mTekst || f[2] !== o.NTekst;
+        return f[0] !== o.nTekst + " mol " + o.st.s || f[1] !== o.mTekst;
     });
-    paastand("de 12 ordrer har den masse og det antal, der står i facit", D.ORDRER.length === 12 && ordreFejl.length === 0,
-        ordreFejl.map(function (o) { return o.nTekst + " " + o.st.s + ": " + o.mTekst + " / " + o.NTekst; }).join("; "));
+    paastand("de 12 ordrer har den masse, der står i facit", D.ORDRER.length === 12 && ordreFejl.length === 0,
+        ordreFejl.map(function (o) { return o.nTekst + " " + o.st.s + ": " + o.mTekst; }).join("; "));
 
     overskrift("5. Tjek af massen");
     function ms(raa, i) { return T.masse(raa, D.ORDRER[i]); }
@@ -184,34 +252,17 @@ function koerTest(W) {
         mFejl.map(function (f) { return f[0] + "→" + (ms(f[0], f[1]).besked || "ok"); }).join("; "));
     paastand("et tomt felt er ikke en fejl", ms("", 0).tom === true);
 
-    overskrift("6. Tjek af antallet");
-    function an(m, e, i) { return T.antal(m, e, D.ORDRER[i]); }
-    var GODE = [["1,20", "24"], ["1,2", "24"], ["1,204", "24"], ["1,204e24", ""], ["1,20·10^24", ""], ["1,20 · 10²⁴", ""],
-        ["1,20*10^24", ""], ["1,20 x 10^24", ""], ["1204000000000000000000000", ""], ["1,20", "+24"]];
-    var ikkeGod = GODE.filter(function (g) { return !an(g[0], g[1], 0).ok; });
-    paastand("tallet godkendes skrevet på " + GODE.length + " måder", ikkeGod.length === 0, ikkeGod.map(function (g) { return g.join("|"); }).join(", "));
-    var note = an("12,0", "23", 0);
-    paastand("12,0 · 10²³ er rigtigt, med en bemærkning om ét ciffer før kommaet", note.ok && /1,20 · 10²⁴/.test(note.note || ""));
-    paastand("alle ordrers antal godkendes delt i tal og potens", D.ORDRER.every(function (o, i) {
-        var dele = o.NTekst.split(" · 10");
-        return an(dele[0], NK.ascii(dele[1]), i).ok;
-    }));
-    var FEJL_N = [
-        ["6,02", "23", 0, /antallet i 1 mol/], ["6,02", "23", 7, /antallet i 1 mol/], ["1,20", "23", 0, /potensen/],
-        ["1,20", "25", 0, /potensen/], ["2", "", 0, /også potensen/], ["3,01", "23", 0, /divideret/],
-        ["7,65", "25", 0, /Molarmassen skal ikke/], ["1,2", "x", 0, /helt tal/], ["abc", "23", 0, /Skriv et tal foran/],
-        ["1,23", "24", 0, /Tæt på/], ["5", "24", 0, /Avogadros konstant/]
-    ];
-    var nFejl = FEJL_N.filter(function (f) { var r = an(f[0], f[1], f[2]); return r.ok || !f[3].test(r.besked || ""); });
-    paastand(FEJL_N.length + " typiske fejl i antallet giver den rigtige besked", nFejl.length === 0,
-        nFejl.map(function (f) { return f[0] + "·10^" + f[1] + "→" + (an(f[0], f[1], f[2]).besked || "ok"); }).join("; "));
-    paastand("to tomme felter er ikke en fejl", an("", "", 0).tom === true);
-
-    overskrift("7. Sproget");
+    overskrift("6. Sproget");
     var replikker = [].concat(D.INTRO_VAEGT, D.INTRO_ATOMER, D.INTRO_AFVEJ, D.ORDRE_ROS,
         [D.MAAL_FAERDIG, D.ORDRER_FAERDIG, D.REKORD_REPLIK], D.RUNDE_REPLIK.map(function (r) { return r[1]; }));
     var tekster = replikker.concat(
-        D.MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + m.efter; }),
+        O.MAAL.map(function (m) { return m.tekst + " " + m.hint + " " + O.efter(m, O.komp(m.svar)); }),
+        [].concat.apply([], O.TYPER.map(function (ty, ti) {
+            return ty.alle().map(function (p, pi) {
+                var o = O.opgave(O.MAAL.length + ti, pi);
+                return o.navn + " " + o.tekst + " " + o.hint + " " + O.efter(o, O.komp(o.svar));
+            });
+        })),
         D.PAR.map(function (p) { return p.hvorfor; }),
         D.PAR_NIVEAUER.map(function (n) { return n.hint; }),
         D.ORDRE_NIVEAUER.map(function (n) { return n.kort; }));
@@ -225,15 +276,21 @@ function koerTest(W) {
     paastand("hver præsentation har to eller tre replikker", [D.INTRO_VAEGT, D.INTRO_ATOMER, D.INTRO_AFVEJ].every(function (l) { return l.length >= 2 && l.length <= 3; }));
     paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
 
-    overskrift("8. Vægten kan gennemføres");
+    overskrift("7. Vægten kan gennemføres");
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
     function tik(sim, sek) { for (var k = 0; k < Math.round(sek * 60); k++) sim.opdater(1 / 60); }
+    /* Tal og enhed staar med haardt mellemrum i panelet */
+    function tekst(e) { return e.textContent.replace(/ /g, " "); }
+    function besked() { return tekst(V.el.besked); }
     klik('[data-fane="fane-vaegt"]');
     V.tilpas();
     V.afvisTilbud();
     V.tomVaegten(); tik(V, 1.5);
-    V.maalNr = 0; V.naaet = false; V.hjaelp = 0; V.valgt = D.STOFFER.indexOf(cu); V.visMaal();
+    V.maalNr = 0; V.opg = O.opgave(0); V.naaet = false; V.hjaelp = 0; V.valgt = D.STOFFER.indexOf(cu); V.visMaal();
     var cuI = D.STOFFER.indexOf(cu), auI = D.STOFFER.indexOf(D.stof("Au"));
+    paastand("første opgave: 3 mol kobber, og knappen giver et hint", tekst(d.getElementById("vaegt-prompt")) === "Læg 3 mol kobber på vægten." &&
+        d.getElementById("vaegt-prompt").innerHTML.indexOf("3&nbsp;mol") >= 0 &&
+        V.el.knap.textContent === "Giv hint" && d.getElementById("vaegt-maal-titel").textContent === "Opvarmning");
     /* Musen: traek fra krukken med kobber op paa vaegten */
     var c = d.getElementById("vaegt-laerred"), rc = c.getBoundingClientRect(), lay = V.lay;
     function mus(type, x, y) {
@@ -244,9 +301,8 @@ function koerTest(W) {
     mus("pointermove", lay.skaal.x, lay.skaal.y - 30);
     mus("pointerup", lay.skaal.x, lay.skaal.y - 30);
     tik(V, 1);
-    paastand("en klump kan trækkes fra krukken op på vægten", V.landet() === 1 && V.klumper.length === 1);
-    paastand("vægten viser 63,55 g, og mål 1 er nået", /63,55/.test(d.getElementById("vaegt-regn-m").textContent) && V.naaet &&
-        V.el.knap.textContent === "Næste mål →");
+    paastand("en klump kan trækkes fra krukken op på vægten, og vægten viser 63,55 g", V.landet() === 1 && V.klumper.length === 1 &&
+        /63,55/.test(d.getElementById("vaegt-regn-m").textContent) && !V.naaet);
     /* Klikket rammer skaalens kant, ikke klumpen i midten (den ville blive taget af) */
     mus("pointerdown", 5, 5); mus("pointerup", lay.skaal.x + lay.skaal.b * 0.42, lay.skaal.y - 6);
     tik(V, 1);
@@ -255,42 +311,95 @@ function koerTest(W) {
     mus("pointermove", 20, lay.bordY - 20);
     mus("pointerup", 20, lay.bordY - 20);
     tik(V, 1);
-    paastand("en klump sluppet uden for vægten lægges ikke på, men får et svar", V.landet() === 2 && /Slip klumpen over vægten/.test(V.el.besked.textContent));
+    paastand("en klump sluppet uden for vægten lægges ikke på, men får et svar", V.landet() === 2 && /Slip klumpen over vægten/.test(besked()));
+    mus("pointerdown", lay.krukker[cuI].x, lay.hylde.y - lay.krukkeH / 2); mus("pointerup", lay.krukker[cuI].x, lay.hylde.y - lay.krukkeH / 2);
+    tik(V, 1);
+    paastand("et klik på krukken lægger en klump på: 3 mol kobber, målet er nået", V.landet() === 3 && V.naaet &&
+        V.el.knap.textContent === "Næste opgave →" && /190,65 g/.test(besked()));
     V.knap();
-    paastand("Næste mål: mål 2", V.maalNr === 1 && !V.naaet);
-    V.laegPaa(cuI); tik(V, 1);
-    paastand("tre klumper kobber: mål 2 er nået, og N = 1,81 · 10²⁴", V.naaet && /1,81 · 10²⁴/.test(d.getElementById("vaegt-regn-N").textContent));
+    tik(V, 1);
+    paastand("mål 2: kobberet bliver liggende", V.maalNr === 1 && !V.naaet && V.landet() === 3 && V.komp().tal.Cu === 3);
+    mus("pointerdown", lay.krukker[auI].x, lay.hylde.y - lay.krukkeH / 2);
+    mus("pointermove", lay.skaal.x, lay.skaal.y - 60);
+    mus("pointerup", lay.skaal.x, lay.skaal.y - 60);
+    tik(V, 1);
+    paastand("en klump guld lægges ved siden af kobberet (klumperne blandes)", V.komp().tal.Cu === 3 && V.komp().tal.Au === 1 &&
+        d.getElementById("vaegt-stof").textContent === "Cu + Au");
+    V.laegPaa(auI); V.laegPaa(auI); tik(V, 1);
+    var mTekst = d.getElementById("vaegt-regn-m").innerText.replace(/ /g, " ");
+    paastand("3 kobber og 3 guld: mål 2 er nået, og massen regnes for hvert stof og i alt", V.naaet &&
+        /m\(Cu\) = 3 mol · 63,55 g\/mol = 190,65 g/.test(mTekst) && /m\(Au\) = 3 mol · 196,97 g\/mol = 590,91 g/.test(mTekst) &&
+        /m = 190,65 g \+ 590,91 g = 781,56 g/.test(mTekst) &&
+        tekst(d.getElementById("vaegt-regn-n")) === "n = 3 mol + 3 mol = 6 mol", mTekst.replace(/\n/g, " | "));
+    var k6 = V.paaVaegten(), overlap = 0;
+    k6.forEach(function (a, i) { k6.forEach(function (b, j) {
+        if (j > i && Math.abs(a.y - b.y) < 1 && Math.abs(a.x - b.x) < (V.kantPx(a.st) + V.kantPx(b.st)) / 2 - 1) overlap++;
+    }); });
+    paastand("klumper i samme række overlapper ikke", k6.length === 6 && overlap === 0, overlap + " par");
     V.knap();
-    V.skift(auI);
-    tik(V, 0.1);
-    paastand("under skiftet viser panelet det nye stof", /guld/.test(d.getElementById("vaegt-stof").textContent));
+    paastand("mål 3 begynder med en tom vægt", V.maalNr === 2 && V.paaVaegten().length === 0);
+    tik(V, 1);
+    V.laegPaa(auI); V.laegPaa(auI); V.laegPaa(auI); tik(V, 1);
+    paastand("3 mol guld: \"3 mol guld vejer 590,91 g. Det kan gøres lettere.\"", !V.naaet && besked() === "3 mol guld vejer 590,91 g. Det kan gøres lettere.", besked());
+    V.tagAf(V.paaVaegten()[2]); tik(V, 1);
+    paastand("tages en klump af, forsvinder bemærkningen", besked() === "", besked());
+    V.knap();
+    paastand("hintet lyser alle krukker op", V.fremhaev === "alle" && /mindste molarmasse/.test(besked()));
+    V.knap(); tik(V, 2);
+    paastand("Vis svaret lægger 3 mol carbon på, og guldet flyver hjem", V.naaet && V.landet() === 3 && V.komp().tal.C === 3 &&
+        V.el.knap.textContent === "Til de sværere opgaver →");
+    V.knap(); tik(V, 3);
+    paastand("så kommer opgaverne, og Kemichael roser én gang", V.maalNr === 3 && V.opg.navn === "To klumper" &&
+        V.paaVaegten().length === 0 && !!(V.laerer.scene && V.laerer.scene.navn === "faerdig"));
+    V.opg = O.opgave(3, pFe); V.visMaal();
+    V.laegPaa(cuI); V.laegPaa(D.STOFFER.indexOf(D.stof("Ag"))); tik(V, 1);
+    paastand("to klumper: kobber og sølv er for meget", !V.naaet && besked() === "Kobber og sølv vejer 171,42 g. Det er for meget.", besked());
+    V.knap();
+    paastand("hintet siger den ene klump og lyser sølvet op", /Den ene klump er sølv/.test(besked()) && V.fremhaev.join() === "Ag");
+    V.tagAf(V.paaVaegten()[0]); V.laegPaa(D.STOFFER.indexOf(D.stof("Fe"))); tik(V, 1);
+    paastand("jern og sølv: løst, og beskeden viser regnestykket", V.naaet &&
+        besked() === "Jern og sølv: m = 55,85 g + 107,87 g = 163,72 g.", besked());
+    V.knap(); tik(V, 1);
+    paastand("næste opgave: to stoffer, med en tom vægt", V.maalNr === 4 && V.opg.navn === "To stoffer" && V.paaVaegten().length === 0);
+    V.knap(); V.knap(); tik(V, 2);
+    paastand("to stoffer: Vis svaret løser den", V.naaet && O.ens(V.komp().tal, V.opg.svar));
+    V.knap(); tik(V, 1);
+    V.opg = O.opgave(5, O.GRAENSER.indexOf(500)); V.visMaal();
+    for (i = 0; i < 4; i++) V.laegPaa(auI);
+    tik(V, 1);
+    paastand("over 500 g med 4 mol guld: det kan gøres med færre", !V.naaet && /færre/.test(besked()), besked());
+    V.tagAf(V.paaVaegten()[3]); tik(V, 1);
+    paastand("3 mol guld: løst", V.naaet && /Med 2 mol kan vægten højst vise 393,94 g/.test(besked()), besked());
+    V.knap(); tik(V, 1);
+    paastand("fjerde slags: tre stoffer", V.opg.navn === "Tre stoffer");
+    V.knap(); V.knap(); tik(V, 2);
+    paastand("tre stoffer: Vis svaret løser den", V.naaet && V.landet() === 3 && V.komp().dele.length === 3);
+    V.knap(); tik(V, 1);
+    paastand("så forfra med to klumper og nye tal", V.maalNr === 7 && V.opg.navn === "To klumper");
+    paastand("hvor langt eleven er nået, huskes", (JSON.parse(W.localStorage.getItem("nk-sc4.2-vaegt")) || {}).maal === 7);
+    var S6 = [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0];
+    var lagtPaa = S6.map(function (x) { return V.laegPaa(x); });
     tik(V, 2);
-    paastand("skift til guld: stadig 3 mol, men 590,91 g, og mål 3 er nået",
-        V.landet() === 3 && V.valgt === auI && /590,91/.test(d.getElementById("vaegt-regn-m").textContent) && V.naaet);
-    V.knap();
-    V.skift(D.STOFFER.indexOf(D.stof("Al"))); tik(V, 2);
-    paastand("mål 4 med aluminium giver et svar, men er ikke nået", !V.naaet && /aluminium vejer 80,94 g/.test(V.el.besked.textContent));
-    V.knap(); V.knap();
-    tik(V, 2);
-    paastand("Vis svaret lægger 3 mol carbon på", V.naaet && V.valgt === 0 && V.landet() === 3);
-    V.knap();
-    tik(V, 3);
-    paastand("efter de fire mål er der frit valg, og Kemichael roser", !V.maal() && /forfra/.test(V.el.knap.textContent) &&
-        !!(V.laerer.scene && V.laerer.scene.navn === "faerdig"));
-    for (i = 0; i < 12; i++) V.laegPaa(0);
-    tik(V, 2);
-    paastand("der kan højst ligge 10 mol på vægten", V.landet() === 10 && /ikke plads/.test(V.el.besked.textContent));
-    var foerste = V.paaVaegten()[0];
+    paastand("der kan højst ligge 10 mol på vægten", V.landet() === 10 && lagtPaa.filter(function (x) { return !x; }).length === 2);
     lay = V.lay;
+    var alle = V.paaVaegten(), svaever = 0, skaevt = 0;
+    alle.forEach(function (k) {
+        if (k.y > lay.skaal.y + 2) skaevt++;
+        var c0 = V.kantPx(k.st);
+        if (k.y < lay.skaal.y - 1 && !alle.some(function (u) {
+            return u !== k && Math.abs(u.y - V.kantPx(u.st) - k.y) < 0.5 && Math.abs(u.x - k.x) < (V.kantPx(u.st) + c0) / 2;
+        })) svaever++;
+    });
+    paastand("10 blandede klumper: hver klump ligger på skålen eller på en klump", svaever === 0 && skaevt === 0, svaever + " svæver");
+    var foerste = V.paaVaegten()[0];
     var rk = NK.Tegn.klumpRekt(foerste.x, foerste.y, V.kantPx(foerste.st));
     mus("pointerdown", rk.x + rk.b * 0.4, rk.y + rk.h * 0.6); mus("pointerup", rk.x + rk.b * 0.4, rk.y + rk.h * 0.6);
     tik(V, 1.5);
     paastand("et klik på en klump tager den af", V.landet() === 9);
-    V.knap();
-    paastand("Start målene forfra", V.maalNr === 0 && V.maal() === D.MAAL[0]);
-    tik(V, 2);
+    V.nulstil(); tik(V, 2);
+    paastand("R tømmer vægten", V.landet() === 0);
 
-    overskrift("9. Flest atomer kan spilles");
+    overskrift("8. Flest atomer kan spilles");
     klik('[data-fane="fane-atomer"]');
     A.tilpas();
     A.afvisTilbud();
@@ -325,17 +434,14 @@ function koerTest(W) {
     paastand("skiltet har højst tre linjer pr. prøve og regner gram om til mol", planFejl.length === 0, planFejl.slice(0, 3).join(", "));
     A.nyRunde();
 
-    overskrift("10. Afvejningen kan gennemføres");
+    overskrift("9. Afvejningen kan gennemføres");
     klik('[data-fane="fane-afvej"]');
     F.tilpas();
     F.afvisTilbud();
     F.nulstilAlt();
     function loesOrdre(i) {
         F.vaelg(i);
-        var o = F.opg.o;
-        F.aktivtFelt().input.value = o.mTekst; F.tjek();
-        var dele = o.NTekst.split(" · 10"), f = F.aktivtFelt();
-        f.input.value = dele[0]; f.eks.value = NK.ascii(dele[1]); F.tjek();
+        F.aktivtFelt().input.value = F.opg.o.mTekst; F.tjek();
     }
     var ikkeLoest = [];
     D.ORDRER.forEach(function (o, i) {
@@ -345,19 +451,24 @@ function koerTest(W) {
     paastand("alle 12 ordrer kan afvejes og får en stjerne", ikkeLoest.length === 0, ikkeLoest.join(", "));
     F.nulstilAlt();
     F.vaelg(0);
+    paastand("ordren har kun ét felt, massen, og intet om atomer", F.opg.felter.length === 1 &&
+        !d.querySelector("#afvej-raekker input.eks") && !/atom/i.test(d.getElementById("fane-afvej").querySelector(".panel").innerText) &&
+        d.getElementById("afvej-spm").textContent === "Hvad skal vægten vise?");
     F.aktivtFelt().input.value = "63,55"; F.tjek();
-    paastand("massen af 1 mol giver den rigtige besked", /massen af 1 mol/.test(F.el.besked.textContent) && F.aktivtFelt().slags === "m");
+    paastand("massen af 1 mol giver den rigtige besked", /massen af 1 mol/.test(F.el.besked.textContent) && !F.opg.faerdig);
     F.aktivtFelt().input.value = "127"; F.tjek();
-    paastand("en rigtig masse sætter hældningen i gang", F.haeldT === 0 && F.aktivtFelt().slags === "N");
+    paastand("en rigtig masse sætter hældningen i gang og løser ordren", F.haeldT === 0 && F.opg.faerdig && F.status[0].loest && F.status[0].stjerne);
     tik(F, 3);
     paastand("bagefter viser vægten 127,10 g, og krukken står på bordet igen",
         F.display().t === "127,10 g" && F.krukkePositur().u === 0 && !F.krukkePositur().i);
+    paastand("linjen under scenen siger massen", /vejer 127 g\.$/.test(d.getElementById("afvej-status").textContent), d.getElementById("afvej-status").textContent);
+    F.vaelg(1);
     F.knap();
-    paastand("hintet til antallet peger på plakaten", F.fremhaev === "plakat" && /står på plakaten/.test(F.el.besked.textContent));
+    paastand("hintet peger på krukken og giver regnestykket", F.fremhaev === "krukke" && /m = n · M = 3,00 mol · 26,98 g\/mol/.test(F.el.besked.textContent));
     F.knap();
-    tik(F, 2);
-    paastand("Vis svaret løser ordren, men uden stjerne", F.status[0].loest && !F.status[0].stjerne && F.display().etiket === "atomer");
-    loesOrdre(1); loesOrdre(2); loesOrdre(3);
+    tik(F, 3);
+    paastand("Vis svaret løser ordren, men uden stjerne", F.status[1].loest && !F.status[1].stjerne && F.display().t === "80,94 g");
+    loesOrdre(2); loesOrdre(3);
     tik(F, 4);
     paastand("fire ordrer i niveau 1: Kemichael roser", F.rost[0] === true && !!(F.laerer.scene && F.laerer.scene.navn === "niveau"));
     F.vaelg(0);
@@ -365,7 +476,7 @@ function koerTest(W) {
     F.nulstilAlt();
     paastand("Start forfra nulstiller alt", F.antalLoest() === 0);
 
-    overskrift("11. Kemichaels præsentation og rundvisningen");
+    overskrift("10. Kemichaels præsentation og rundvisningen");
     [["fane-vaegt", V], ["fane-atomer", A], ["fane-afvej", F]].forEach(function (x) {
         klik('[data-fane="' + x[0] + '"]');
         var sim = x[1];
@@ -388,7 +499,7 @@ function koerTest(W) {
         "#afvej-kort", "#afvej-anker-krukke", "#afvej-anker-plakat", "#afvej-anker-vaegt", "#afvej-fremskridt"];
     paastand("alle rundvisningens mål findes", tur.every(function (s) { return !!d.querySelector(s); }));
 
-    overskrift("12. Layoutet");
+    overskrift("11. Layoutet");
     var ramme = document.getElementById("ramme");
     var stoerrelser = [[1500, 900], [1400, 860], [1300, 820], [1100, 700], [1000, 640], [860, 700], [700, 600], [520, 380]];
     stoerrelser.forEach(function (st) {
@@ -421,8 +532,8 @@ function koerTest(W) {
                 var vr = { x: lay.vaegt.x - lay.vaegtB / 2, y: lay.bordY - vh, b: lay.vaegtB, h: vh };
                 inde(vr, "vægten");
                 over(vr, zr, "vægten under zoomboblen");
-                /* 10 klumper guld: raekken paa 5 skal kunne vaere paa skaalen, og toppen under hylden */
-                var cAu = sim.kantPx(D.stof("Au"));
+                /* 10 af de stoerste klumper: raekken paa 5 skal kunne vaere paa skaalen, og toppen under hylden */
+                var cAu = sim.kantPx(sim.stoerste());
                 if (5 * cAu * 1.12 + cAu * 0.3 > lay.skaal.b) problemer.push(id + ": fem klumper er bredere end skålen");
                 var toppen = lay.skaal.y - 3 * cAu - cAu * 0.22;
                 if (toppen < lay.hylde.y + 14) problemer.push(id + ": stakken rører hylden");

@@ -7,9 +7,16 @@
    saltets koncentration (graa) og hver ions koncentration. Panelet
    viser c = n / V og [ion] = tallet foran ionen · c.
 
-   Seks opgaver: ram en ions koncentration, gaet foer du proever (to
-   Na⁺, hvem er flest) og to salte med en faelles ion. En opgave er
-   loest, naar glasset viser maalet; saa forklarer linjen i kortet.
+   Seks opgaver: ram en ions koncentration, gaet foer du proever (hvem
+   er flest), spoergsmaal i smaa trin efter opløsningen (to Na⁺) og to
+   salte med en faelles ion. En opgave er loest, naar glasset viser
+   maalet, eller naar det sidste spoergsmaal er besvaret; saa forklarer
+   linjen i kortet.
+
+   Spoergsmaalene (o.spm) kommer ét ad gangen, naar saltet er i glasset.
+   Glasset viser kun det, der er svaret paa: den graa soejle, ionerne i
+   luppen og ionernes soejler kommer, naar spoergsmaalet om dem er
+   besvaret.
    ===================================================================== */
 (function () {
     "use strict";
@@ -56,14 +63,25 @@
         this.forklaring = "";
         this.part = new NK.Partikler(11 + i);
         this.vis = {};
+        this.spmNr = 0;
+        this.spmFejl = [];
+        this.spmOrden = o.spm ? o.spm.map(function (q) { return NK.bland(q.svar.map(function (s, j) { return j; })); }) : [];
+        this.afsl = {};
         this.visPanel();
     };
 
-    P.harForfra = function () { return true; };
+    /* Viser glasset det? Uden spoergsmaal viser det alt; med spoergsmaal
+       kun det, der er svaret paa (salt, lup, ioner). */
+    P.vist = function (hvad) {
+        if (!this.opg.spm || this.fase === "faerdig") return true;
+        return !!this.afsl[hvad];
+    };
+
+    P.harForfra = function () { return this.fase !== "spm"; };
     P.harNyeTal = function () { return false; };
 
     P.forfra = function () {
-        if (this.auto) return;
+        if (this.auto || this.fase === "spm") return;
         this.glas = new K.Glas(this.opg.V, this.opg.salte);
         this.spatel = null;
         this.fald = [];
@@ -74,13 +92,18 @@
     };
 
     P.promptHTML = function () {
-        var o = this.opg;
-        return '<p class="maal-tekst">' + NK.html(o.tekst) + "</p>" +
-            (o.valg ? '<p class="opgave-spm">' + NK.html(o.valg.spm) + "</p>" : "");
+        var o = this.opg, h = '<p class="maal-tekst">' + NK.html(o.tekst) + "</p>";
+        if (o.valg) h += '<p class="opgave-spm">' + NK.html(o.valg.spm) + "</p>";
+        if (o.spm && (this.fase === "spm" || this.fase === "faerdig")) {
+            for (var i = 0; i < this.spmNr; i++) h += '<p class="spm-loest">✓ ' + NK.html(o.spm[i].kort) + "</p>";
+            if (this.fase === "spm") h += '<p class="spm-nu">' + NK.html(o.spm[this.spmNr].spm) + "</p>";
+        }
+        return h;
     };
 
     P.visKortEkstra = function () {
         var o = this.opg, mig = this, e = this.el.valg;
+        if (o.spm) { this.visSpmKnapper(); return; }
         if (!o.valg) { e.hidden = true; e.innerHTML = ""; return; }
         e.hidden = false;
         e.innerHTML = "";
@@ -117,13 +140,69 @@
         this.visKort();
     };
 
+    /* ----- Spoergsmaalene efter opløsningen, ét ad gangen ---------------------------- */
+    P.visSpmKnapper = function () {
+        var o = this.opg, mig = this, e = this.el.valg;
+        e.innerHTML = "";
+        if (this.fase !== "spm") { e.hidden = true; return; }
+        e.hidden = false;
+        var q = o.spm[this.spmNr];
+        this.spmOrden[this.spmNr].forEach(function (j) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "knap";
+            b.textContent = q.svar[j].t;
+            if (mig.spmFejl.indexOf(j) >= 0) { b.disabled = true; b.classList.add("forkert"); }
+            b.addEventListener("click", function () { mig.vaelgSpm(j, "klik"); });
+            e.appendChild(b);
+        });
+    };
+
+    P.vaelgSpm = function (j, maade) {
+        if (this.fase !== "spm" || this.auto) return;
+        var o = this.opg, q = o.spm[this.spmNr], s = q.svar[j];
+        if (!s.ok) {
+            if (this.spmFejl.indexOf(j) < 0) this.spmFejl.push(j);
+            this.k.tie();
+            this.besked(NK.html(s.forkl + " Prøv et af de andre."), "skidt");
+            this.visKort();
+            return;
+        }
+        this.afsl[q.vis] = true;
+        this.spmNr++;
+        this.spmFejl = [];
+        this.visPanel();
+        if (this.spmNr >= o.spm.length) {
+            this.fase = "faerdig";
+            this.forklaring = NK.html(o.efter);
+            this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html(o.efter) : null);
+            return;
+        }
+        this.hjaelp = 0;
+        this.visKort();
+        if (maade === "svar") {
+            this.brugtSvar = true;
+            this.svarVis(NK.html(q.efter));
+        } else {
+            this.k.tie();
+            this.besked(NK.html(NK.tilfaeldig(D.ROS) + " " + q.efter + " " + this.trinLinje()), "god");
+        }
+        this.visKnap();
+        this.fokus();
+    };
+
     /* ----- Knappen: hint og svar ------------------------------------------------ */
     P.trinInfo = function () {
-        var o = this.opg, mig = this;
+        var o = this.opg, mig = this, ret;
         if (this.faerdig) return null;
         if (this.fase === "valg") {
-            var ret = o.valg.svar.map(function (s) { return !!s.ok; }).indexOf(true);
+            ret = o.valg.svar.map(function (s) { return !!s.ok; }).indexOf(true);
             return { hint: NK.html(o.valg.hint), svar: function () { mig.vaelgSvar(ret, "svar"); } };
+        }
+        if (this.fase === "spm") {
+            var q = o.spm[this.spmNr];
+            ret = q.svar.map(function (s) { return !!s.ok; }).indexOf(true);
+            return { hint: NK.html(q.hint), svar: function () { mig.vaelgSpm(ret, "svar"); } };
         }
         return { hint: NK.html(o.hint), svar: function () { mig.visGoer(); } };
     };
@@ -132,6 +211,9 @@
 
     P.trinLinje = function () {
         if (this.fase === "valg") return "Gæt først: vælg et af svarene herunder.";
+        if (this.fase === "spm") {
+            return this.spmNr === 0 ? "Saltet er opløst. Vælg svaret på spørgsmålet i kortet." : "Vælg svaret på det næste spørgsmål i kortet.";
+        }
         if (!this.handlet) return this.opg.linje;
         return this.statusLinje();
     };
@@ -166,6 +248,16 @@
             if (m.begge) ok = ok && o.salte.every(function (s) { return g.n[s] > 0; });
         }
         if (!ok) return false;
+        if (o.spm) {
+            /* Saltet er i glasset: nu spoergsmaalene, ét ad gangen */
+            this.fase = "spm";
+            this.spmNr = 0;
+            this.spmFejl = [];
+            this.visKort();
+            this.visPanel();
+            this.trinLoest(this.maade, this.maade === "svar" ? NK.html(o.svar) : null);
+            return true;
+        }
         this.fase = "faerdig";
         var pre = "";
         if (o.valg && this.valgt !== null) {
@@ -275,12 +367,20 @@
         if (!u) return false;
         if (u.slags === "krukke") {
             if (this.fase === "valg") { this.blokValg(); return false; }
+            if (this.fase === "spm") {
+                this.kortBesked("Saltet er opløst. Svar på spørgsmålet i kortet.");
+                this.pegT = 1.6;
+                return false;
+            }
             if (this.flyv) return false;
             this.spatel = { x: pt.x, y: pt.y, sx: pt.x, sy: pt.y, trukket: false, salt: u.salt };
             return true;
         }
         if (u.slags === "glas") this.kortBesked("Træk en portion fra krukken hertil.");
-        if (u.slags === "zoom") this.kortBesked("Luppen viser altid lige meget væske. Én prik er 0,05 M af ionen.");
+        if (u.slags === "zoom") {
+            this.kortBesked(this.vist("lup") ? "Luppen viser altid lige meget væske. Én prik er 0,05 M af ionen." :
+                "Ionerne kommer i luppen, når du har svaret på, hvor mange ioner saltet giver.");
+        }
         if (u.slags === "soejler") this.kortBesked("Den grå søjle er saltets koncentration. De farvede er ionernes.");
         return false;
     };
@@ -308,14 +408,24 @@
 
     /* ----- Panelet ------------------------------------------------------------------- */
     P.visPanel = function () {
-        var g = this.glas, o = this.opg, html = "";
+        var g = this.glas, o = this.opg, html = "", mig = this;
         var VL = K.to(g.V / 1000);
         o.salte.forEach(function (s) {
             var st = D.salt(s);
+            if (!mig.vist("salt")) {
+                html += '<div class="regn-linje">n(' + NK.html(st.formel) + ") = " + K.to(g.n[s]) + " mol og V = " + VL + " L</div>" +
+                    '<div class="regn-linje">c(' + NK.html(st.formel) + ") = <b>?</b></div>";
+                return;
+            }
             html += '<div class="regn-linje">c(' + NK.html(st.formel) + ") = n / V = " + K.to(g.n[s]) + " mol / " + VL + " L = <b>" +
                 K.to(g.cSalt(s)) + " M</b></div>";
         });
         g.ionListe().forEach(function (id) {
+            if (!mig.vist("ioner")) {
+                html += '<div class="regn-linje ion"><span class="prik" style="background:' + D.ion(id).farve + '"></span>[' +
+                    NK.html(D.ion(id).t) + "] = <b>?</b></div>";
+                return;
+            }
             var dele = [];
             o.salte.forEach(function (s) {
                 var k = K.k(D.salt(s), id);
@@ -327,7 +437,11 @@
                 midt + "<b>" + K.to(g.ion(id)) + " M</b></div>";
         });
         NK.saetHTML("opl-regn", html);
-        NK.saetHTML("opl-skema", o.salte.map(function (s) { return NK.html(K.skema(D.salt(s))); }).join("<br>"));
+        NK.saetHTML("opl-skema", o.salte.map(function (s) {
+            var st = D.salt(s);
+            if (!mig.vist("lup")) return NK.html(st.formel + "(s) ⟶ ? " + D.ion(st.kat).t + "(aq) + ? " + D.ion(st.an).t + "(aq)");
+            return NK.html(K.skema(st));
+        }).join("<br>"));
     };
 
     /* ----- Layout ----------------------------------------------------------------------- */
@@ -387,11 +501,12 @@
         this.fald = nyt;
         this.skyer.forEach(function (s) { s.r += 70 * g.k * dt; s.a -= 0.55 * dt; });
         this.skyer = this.skyer.filter(function (s) { return s.a > 0; });
-        /* Soejlerne glider mod tallene */
+        /* Soejlerne glider mod tallene (med spoergsmaal: naar de er besvaret) */
         var vis = this.vis, gl = this.glas;
-        this.opg.salte.forEach(function (s) { vis["s" + s] = NK.mod(vis["s" + s] || 0, gl.cSalt(s), 6, dt); });
-        this.ioner().forEach(function (id) { vis["i" + id] = NK.mod(vis["i" + id] || 0, gl.ion(id), 6, dt); });
-        this.part.saet(this.ioner().map(function (id) { return Tg.prikker(gl.ion(id)); }));
+        var vSalt = this.vist("salt"), vIoner = this.vist("ioner"), vLup = this.vist("lup");
+        this.opg.salte.forEach(function (s) { vis["s" + s] = NK.mod(vis["s" + s] || 0, vSalt ? gl.cSalt(s) : 0, 6, dt); });
+        this.ioner().forEach(function (id) { vis["i" + id] = NK.mod(vis["i" + id] || 0, vIoner ? gl.ion(id) : 0, 6, dt); });
+        this.part.saet(this.ioner().map(function (id) { return vLup ? Tg.prikker(gl.ion(id)) : 0; }));
         this.part.opdater(dt);
         if (this.pegT > 0) {
             this.pegT -= dt;
@@ -455,17 +570,21 @@
         var z = lay.zoom, ioner = this.ioner();
         Tg.zoomLinje(ctx, lay.lup.x, lay.lup.y, z.x - z.r, z.y);
         var st = { ioner: ioner.map(function (id) { return D.ion(id); }) };
-        Tg.zoom(ctx, z.x, z.y, z.r, { part: this.part, st: st, farve: farve, titel: "Luppen: altid lige meget væske" });
+        var skjultLup = !this.vist("lup") && this.handlet;
+        Tg.zoom(ctx, z.x, z.y, z.r, { part: this.part, st: st, farve: farve, titel: "Luppen: altid lige meget væske",
+            tekst: skjultLup ? "?" : "", forklar: !skjultLup });
         var lk = NK.klamp(g.k * 0.45, 0.25, 0.6);
         NK.Sprites.tegn(ctx, "lup", lay.lup.x - 52 * lk, lay.lup.y - 52 * lk, 140 * lk, 140 * lk);
 
-        /* Soejlerne: saltene graa, ionerne i deres farve, maalet stiplet */
-        var s = [], vis = this.vis, maks = 0.6;
+        /* Soejlerne: saltene graa, ionerne i deres farve, maalet stiplet.
+           Med spoergsmaal staar der ?, til spoergsmaalet er besvaret. */
+        var s = [], vis = this.vis, maks = 0.6, i = this.handlet;
+        var skjultSalt = i && !this.vist("salt"), skjultIon = i && !this.vist("ioner");
         o.salte.forEach(function (sa) {
-            s.push({ navn: "c(" + D.salt(sa).formel + ")", v: vis["s" + sa] || 0, farve: "#8b93a0" });
+            s.push({ navn: "c(" + D.salt(sa).formel + ")", v: vis["s" + sa] || 0, farve: "#8b93a0", skjult: skjultSalt });
         });
         ioner.forEach(function (id) {
-            var so = { navn: "[" + D.ion(id).t + "]", v: vis["i" + id] || 0, farve: D.ion(id).farve };
+            var so = { navn: "[" + D.ion(id).t + "]", v: vis["i" + id] || 0, farve: D.ion(id).farve, skjult: skjultIon };
             if (o.maal.ion === id) so.maal = o.maal.c;
             s.push(so);
             maks = Math.max(maks, mig.glas.ion(id) * 1.1, o.maal.c ? o.maal.c * 1.2 : 0);

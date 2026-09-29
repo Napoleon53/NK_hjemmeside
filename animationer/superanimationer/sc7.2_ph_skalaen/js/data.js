@@ -50,29 +50,37 @@
     };
 
     /* ----- Fane 2: maalene i luppen ------------------------------------------
-       start: pH og zoom, naar maalet begynder. Et maal er naaet, naar
-       pH er maal.ph (med én decimal) og zoom er inden for zMin-zMaks. */
+       start: pH, naar maalet begynder (der, hvor det forrige sluttede).
+       ph: maalet er naaet, naar maerket er sluppet paa den pH, og luppen
+       er faerdig med at zoome. slags "valg": vaelg det rigtige svar.
+       Luppen zoomer selv (se lup.js og NK.Kemi.autoZoom). */
     D.LUP_MAAL = [
         { tekst: "Rent vand har pH 7. Gør vandet surere, så der er 10 gange så mange H₃O⁺.",
-          start: { ph: 7, z: 8 }, maal: { ph: 6 },
-          hint: "Træk pH-mærket mod venstre. Tæl de røde H₃O⁺ i luppen undervejs.",
-          efter: "pH 6: 10 gange så mange H₃O⁺. Se også OH⁻: 10 gange færre." },
-        { tekst: "Gør vandet basisk, så der er 100 gange så mange OH⁻ som i rent vand.",
-          start: { ph: 7, z: 8 }, maal: { ph: 9 },
-          hint: "Ét trin op på skalaen giver 10 gange så mange OH⁻. Hvor mange trin giver 100 gange?",
-          efter: "pH 9: to trin op. 10 · 10 = 100 gange så mange OH⁻." },
-        { tekst: "Gå til pH 2. Zoom ind, til du kan tælle H₃O⁺ i luppen.",
-          start: { ph: 7, z: 8 }, maal: { ph: 2, zMin: 2, zMaks: 5 },
-          hint: "Tryk på + ved luppen. Hvert klik viser et 10 gange mindre rum.",
-          efter: "" },
-        { tekst: "Bliv på pH 2. Zoom ud, til der er mindst én OH⁻ i luppen.",
-          start: { ph: 2, z: 4 }, maal: { ph: 2, zMin: 12 },
-          hint: "OH⁻ er de blå. Ved pH 2 er der meget langt imellem dem. Tryk på − mange gange.",
-          efter: "Ved pH 2 er der 10 milliarder H₃O⁺ for hver OH⁻." },
-        { tekst: "Gå fra pH 1 til pH 13. Zoom ud, til luppen igen viser 10 H₃O⁺.",
-          start: { ph: 1, z: 2 }, maal: { ph: 13, zMin: 14, zMaks: 14 },
-          hint: "Ét pH-trin er ét klik. Hvor mange trin er der fra 1 til 13?",
-          efter: "12 klik ud. Ved pH 13 er der 10¹² gange færre H₃O⁺ end ved pH 1. Det er en billion." }
+          start: 7, ph: 6,
+          hint: "Træk pH-mærket mod venstre. Der er 10 røde H₃O⁺ i luppen nu. Hvornår er der 100?",
+          efter: "pH 6: 100 H₃O⁺ i stedet for 10, og OH⁻ faldt fra 10 til 1. Ét trin på skalaen er 10 gange." },
+        { tekst: "Træk videre til pH 5, og se, hvad luppen gør.",
+          start: 6, ph: 5,
+          hint: "Træk mærket ét trin mere mod venstre. Hold øje med luppen, når der bliver over 100 H₃O⁺.",
+          efter: "Luppen zoomede ind, fordi der blev over 100. Rummet er 10 gange mindre, og der er stadig 100 H₃O⁺. Altså 10 gange så mange som ved pH 6." },
+        { tekst: "Gå til pH 2. Tæl, hvor mange gange luppen zoomer ind.",
+          start: 5, ph: 2,
+          hint: "Træk mærket hen til 2 på skalaen. Den gule ring viser, hvor luppen zoomer ind.",
+          efter: "Tre gange: én gang for hvert trin fra pH 5 til pH 2. Hvert zoom er et 10 gange mindre rum." },
+        { slags: "valg", start: 2,
+          tekst: "Hvor mange gange så mange H₃O⁺ er der ved pH 2 som i rent vand?",
+          valg: [
+              ["5 gange", "5 er antallet af trin fra pH 7 til pH 2. Hvert trin er 10 gange."],
+              ["50 gange", "Du har lagt 10 sammen fem gange. Hvert trin ganger med 10."],
+              ["10.000 gange", "Tæl trinene fra pH 7 til pH 2 igen. Der er fem."],
+              ["100.000 gange", ""]
+          ], rigtig: 3,
+          hint: "Der er fem trin fra pH 7 til pH 2, og hvert trin er 10 gange: 10 · 10 · 10 · 10 · 10.",
+          efter: "Fem trin: 10 · 10 · 10 · 10 · 10 = 100.000 gange så mange H₃O⁺ som i rent vand." },
+        { tekst: "Gå over på den basiske side til pH 12. Hvilken ion er der nu flest af i luppen?",
+          start: 2, ph: 12,
+          hint: "Træk mærket helt over til 12. Luppen zoomer ud hen mod 7 og ind igen på den anden side.",
+          efter: "OH⁻. Over pH 7 er der flest OH⁻, og luppen zoomer efter dem. Ved pH 12 er der 100.000 gange så mange OH⁻ som i rent vand." }
     ];
 
     /* ----- Fane 3: maalene ved fortyndingsbordet --------------------------------
@@ -80,7 +88,7 @@
        glas), tal (skriv et tal), basisk (kan ikke naas; se sim_fortynd.js).
        serie og k: saa mange fortyndinger skal der vaere i den serie. */
     D.MAKS_GLAS = 9;           /* fortyndinger pr. serie; saa er bordet fuldt */
-    D.START_C = 0.1;           /* saltsyre og natronlud, mol/L */
+    D.START_C = 0.1;           /* saltsyre og natriumhydroxid, mol/L */
 
     D.FORTYND_MAAL = [
         { slags: "valg", serie: "syre", k: 1,
@@ -92,11 +100,11 @@
               ["pH 10", "pH 10 er basisk. Vand gør ikke en syre basisk."]
           ], rigtig: 2,
           hint: "Ti gange færre H₃O⁺. Hvor langt er det på skalaen?",
-          efter: "pH 2. Ti gange mere vand giver ti gange færre H₃O⁺: ét trin op." },
+          efter: "pH 2. Ti gange mere vand giver ti gange færre H₃O⁺: ét trin op. Luppen zoomede ud for at finde 100 igen." },
         { slags: "glas", serie: "syre", k: 4,
           tekst: "Fortynd saltsyren, til pH er 5.",
           hint: "Ét trin pr. fortynding. Fra pH 1 til pH 5 er der fire trin.",
-          efter: "Fire fortyndinger. Fire trin op ad skalaen." },
+          efter: "Fire fortyndinger. Fire trin op ad skalaen, og luppen har zoomet ud fire gange." },
         { slags: "tal", svar: 10000,
           tekst: "Hvor mange gange er glasset med pH 5 fortyndet i forhold til saltsyren?",
           fejl: [
@@ -113,7 +121,7 @@
           hint: "Se på pH og luppen, når glassene nærmer sig 7. Hvilken ion er der flest af?",
           efter: "Den bliver aldrig basisk. Vandet har selv lige mange H₃O⁺ og OH⁻, så pH går mod 7 og stopper der." },
         { slags: "valg", serie: "base", k: 3,
-          tekst: "Natronluden har pH 13. Hvad bliver pH, når den fortyndes 1.000 gange?",
+          tekst: "Natriumhydroxiden har pH 13. Hvad bliver pH, når den fortyndes 1.000 gange?",
           valg: [
               ["pH 16", "Mere vand bringer pH tættere på 7. For en base går pH ned."],
               ["pH 13", "Der er 1.000 gange færre OH⁻ nu. Det kan pH-metret se."],
@@ -133,12 +141,12 @@
     ];
     D.INTRO_LUP = [
         "Luppen viser ionerne i et bitte lille rum.",
-        "Træk pH-mærket, og zoom med plus og minus.",
+        "Træk pH-mærket. Luppen zoomer selv.",
         "Vandmolekylerne har jeg skjult. De fyldte alt."
     ];
     D.INTRO_FORTYND = [
-        "Fortyndingsbordet. Saltsyre, natronlud og masser af vand.",
-        "Tryk Fortynd under saltsyren eller natronluden.",
+        "Fortyndingsbordet. Saltsyre, NaOH og masser af vand.",
+        "Tryk Fortynd under saltsyren eller natriumhydroxiden.",
         "Pipetten er ny. Den gamle ligger i vasken."
     ];
 
@@ -146,13 +154,12 @@
         "Køkkenet er målt. Også min kaffe. Det var ikke aftalt.",
         "Klorin og syre må aldrig blandes. Det er ikke en quiz."
     ];
-    D.LUP_FAERDIG = "Tolv klik ud. En billion. Og du zoomede selv.";
+    D.LUP_FAERDIG = "Fem mål. Luppen zoomede selv. Jeg vil have sådan en.";
     D.FORTYND_BASISK = "Det er vand nu. Meget dyrt vand.";
     D.FORTYND_FAERDIG = "Fem mål, og pipetten er hel. Det skriver jeg ned.";
 
     /* Paaskeaeg */
     D.AEG_PRAECIS = "Præcis. Du har vel ikke smagt på den?";
-    D.AEG_ZOOM = "En halv millimeter. Den kan man næsten se.";
 
     NK.Data = D;
 }());

@@ -727,6 +727,9 @@ select:focus-visible {
     color: var(--tekst-mat);
 }
 
+/* En formel i etiketten beholder sine smaa bogstaver (CaCl₂, ikke CACL₂) */
+.raekke-etiket .formel { text-transform: none; letter-spacing: 0.02em; font-size: 0.8rem; }
+
 .raekke-formel { margin: 0 0 4px; font-size: 0.95rem; font-weight: 600; color: #cfd6de; }
 
 .felter { display: flex; gap: 6px; }
@@ -813,6 +816,10 @@ select:focus-visible {
 }
 
 .valgrad.peg .knap:not(:disabled) { border-color: var(--gul); animation: peg 1s ease-out infinite; }
+
+/* Spoergsmaalene efter opløsningen paa fane 1: de besvarede med ✓, det aktuelle fremhaevet */
+.spm-loest { margin: 0 0 3px; font-size: 0.92rem; line-height: 1.4; color: #7ee0a8; }
+.opgavekort .spm-nu { margin: 6px 0 4px; font-size: 1.02rem; font-weight: 700; line-height: 1.4; color: var(--tekst); }
 
 /* Start forfra i Kemichaels baand, til venstre for knappen, der sender ham ud */
 .forfraknap {

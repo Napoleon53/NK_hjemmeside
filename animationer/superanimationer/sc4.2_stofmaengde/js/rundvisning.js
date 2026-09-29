@@ -17,14 +17,14 @@
 
     var TURE = {
         "fane-vaegt": [
-            { sel: "#vaegt-anker-hylde", titel: "Krukkerne", tekst: "Én krukke pr. grundstof. Molarmassen står på etiketten. Klik på en krukke for at skifte stof." },
-            { sel: "#vaegt-anker-vaegt", titel: "Vægten", tekst: "Træk en klump fra krukken herop. Hver klump er 1 mol. Klik på en klump for at tage den af." },
+            { sel: "#vaegt-anker-hylde", titel: "Krukkerne", tekst: "Én krukke pr. grundstof. Molarmassen står på etiketten. Træk en klump op, eller klik på krukken." },
+            { sel: "#vaegt-anker-vaegt", titel: "Vægten", tekst: "Træk klumper herop. Hver klump er 1 mol, og stofferne kan blandes. Klik på en klump for at tage den af." },
             { sel: "#vaegt-anker-zoom", titel: "Atomerne", tekst: "Når der ligger noget på vægten, zoomer boblen ind på atomerne i det." },
             { sel: "#vaegt-anker-plakat", titel: "Plakaten", tekst: "1 mol er altid lige mange atomer, uanset stoffet." },
-            { sel: "#vaegt-maaling", titel: "På vægten", tekst: "Stofmængden, massen og antallet af atomer for det, der ligger på vægten." },
-            { sel: "#vaegt-kort", titel: "Målene", tekst: "Fire små mål. Knappen giver et hint og derefter svaret." },
+            { sel: "#vaegt-maaling", titel: "På vægten", tekst: "Stofmængden, massen og antallet af atomer for det, der ligger på vægten. Ligger der flere stoffer, regnes massen for hvert af dem." },
+            { sel: "#vaegt-kort", titel: "Opgaven", tekst: "Tre mål som opvarmning, derefter sværere opgaver med nye tal hver gang. Knappen giver et hint og derefter svaret." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Stofmængde, masse og antal atomer kort forklaret." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Flest atomer: gæt, hvor der er flest. Afvejning: regn massen og antallet ud for en ordre." }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Flest atomer: gæt, hvor der er flest. Afvejning: regn massen ud for en ordre." }
         ],
         "fane-atomer": [
             { sel: "#atomer-anker-vaegte", titel: "Vægtene", tekst: "En prøve på hver vægt. De viser massen, til du har svaret. Så tæller de atomerne." },
@@ -33,10 +33,10 @@
             { sel: "#atomer-kort", titel: "Runden", tekst: "Ni par. Knappen giver et hint og derefter svaret. Rekorden huskes." }
         ],
         "fane-afvej": [
-            { sel: "#afvej-kort", titel: "Ordren", tekst: "Stofmængden, der skal afvejes. Skriv massen og antallet af atomer. Knappen giver et hint og derefter svaret." },
+            { sel: "#afvej-kort", titel: "Ordren", tekst: "Stofmængden, der skal afvejes. Skriv massen. Knappen giver et hint og derefter svaret." },
             { sel: "#afvej-anker-krukke", titel: "Krukken", tekst: "Molarmassen står på etiketten." },
-            { sel: "#afvej-anker-plakat", titel: "Plakaten", tekst: "Antallet af atomer i 1 mol." },
-            { sel: "#afvej-anker-vaegt", titel: "Vægten", tekst: "Den afvejer, når massen er rigtig, og tæller atomerne, når antallet er rigtigt." },
+            { sel: "#afvej-anker-plakat", titel: "Plakaten", tekst: "Formlen for massen. Enhederne går op: mol · g/mol giver g." },
+            { sel: "#afvej-anker-vaegt", titel: "Vægten", tekst: "Den afvejer, når massen er rigtig." },
             { sel: "#afvej-fremskridt", titel: "Ordrerne", tekst: "En ordre, du løser uden at se svaret, får en stjerne. Klik på et niveau for at tage dets næste ordre." }
         ]
     };

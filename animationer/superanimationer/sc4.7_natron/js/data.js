@@ -88,9 +88,12 @@
     D.KONSTANT = { tol: 0.005, minTid: 1 };
     D.MAX_VEJNINGER = 10;
 
+    /* trin: de tre skridt, kortet viser efter gaettet. Det skridt, eleven
+       er naaet til, er fremhaevet; de gjorte har et flueben. */
     D.FORSOEG = [
         { id: "konstant", titel: "Varm natron til konstant masse",
           tekst: "Varm natronen i diglen, og vej den, til massen ikke ændrer sig mere.",
+          trin: ["Vej natronen, før du varmer.", "Varm den, lad den køle af, og vej den.", "Gentag, til to vejninger i træk er ens."],
           valg: { spm: "Hvad tror du, der bliver tilbage i diglen, når natron varmes op?",
                   hint: "Natron er NaHCO₃. Gasser forsvinder op i luften. Hvilket fast stof kan blive tilbage?",
                   svar: [{ id: "A", t: "A: Na₂O" }, { id: "B", t: "B: Na₂CO₃" }, { id: "C", t: "C: NaOH" }] } }
@@ -105,7 +108,7 @@
         varm: "Natronen varmes op. Sluk, når du vil veje, og flyt diglen over på vægten.",
         vaegtVent: "Diglen er varm. Vent, til vægten står stille, og aflæs den så.",
         vej: "Vægten står stille. Skriv massen i skemaet.",
-        igen: "Sæt diglen tilbage på trefoden, og varm igen. Massen er konstant, når to vejninger giver det samme.",
+        igen: "Sæt diglen tilbage på trefoden, og varm igen.",
         slukket: "Brænderen er slukket. Tænd den igen for at varme videre."
     };
 
@@ -182,6 +185,8 @@
 
     D.DOM = {
         spm: "Hvilken hypotese passer med den masse, du målte?",
+        ikkeKonstant: "Massen i din digel er ikke konstant endnu. Varm videre på fanen Forsøget, til to vejninger i træk er ens. Så kan du sammenligne.",
+        konstantHint: "Først når massen er konstant, ved du, hvad der er tilbage i diglen. Varm videre på fanen Forsøget.",
         hint: "Sammenlign massen i skemaet med de tre streger på grafen. Hvilken streg ender kurven på?",
         rigtig: "Natron bliver til natriumcarbonat, soda. Gassen er CO₂ og vand.",
         skema: "2 NaHCO₃ → Na₂CO₃ + CO₂ + H₂O",
@@ -189,22 +194,30 @@
     };
 
     /* ----- Fane 3: fejlkilderne -----------------------------------------------------
-       Gruppe 1 goer det rigtigt: 5,10 g natron, lav flamme de foerste 4
-       minutter, saa hoej, og de vejer, til massen er konstant. Gruppe 2
-       goer én ting anderledes (B). rigtig: hvordan gruppe 2's slutmasse
-       bliver. fejl: forklaringen til de to forkerte gaet. */
-    D.FEJL_SPM = "Hvordan bliver gruppe 2's slutmasse i forhold til gruppe 1's?";
-    D.FEJL_SVAR = [{ id: "hoejere", t: "Højere" }, { id: "lavere", t: "Lavere" }, { id: "samme", t: "Det samme" }];
-    D.FEJL_1 = "Gruppe 1 gør det rigtigt: 5,10 g natron, lav flamme først, og de vejer, til massen er konstant.";
+       Begge grupper starter med 5,10 g natron og vejer diglen én gang, naar
+       den er koelet af. Gruppe 1 goer det rigtigt: lav flamme de foerste
+       FEJL_LAV minutter, saa hoej, FEJL_TID minutter i alt. Gruppe 2 goer
+       én ting anderledes (B). Uret paa fanen er trykket mere sammen end paa
+       fane 1: 1 minut paa uret er FEJL_SKALA minutter i modellen, saa 5
+       minutter er nok til, at al natronen er omdannet (brugerens oenske 29.
+       sept. 2026: 5 minutter mod 2). rigtig: hvad gruppe 2's digel vejer
+       til sidst. fejl: forklaringen til de to forkerte gaet. */
+    D.FEJL_SPM = "Gæt: Hvad vejer diglen hos gruppe 2 til sidst, sammenlignet med gruppe 1?";
+    D.FEJL_SVAR = [{ id: "hoejere", t: "Mere end hos gruppe 1" }, { id: "lavere", t: "Mindre end hos gruppe 1" },
+        { id: "samme", t: "Det samme som hos gruppe 1" }];
+    D.FEJL_1 = "Gruppe 1 gør det rigtigt: 5,10 g natron, lav flamme først, 5 minutter i alt, og de vejer diglen, når den er kølet af.";
     D.FEJL_M = 5.10;
+    D.FEJL_TID = 5;
+    D.FEJL_LAV = 2;
+    D.FEJL_SKALA = 4;
 
     D.FEJL = [
-        { id: "tidligt", titel: "Kun én vejning", kort: "vejer kun én gang", rigtig: "hoejere", B: { stopEfter: 6 },
-          tekst: "Gruppe 2 har travlt. De varmer i 6 minutter, vejer én gang og skriver det som slutmassen.",
-          hint: "Er al natronen nået at reagere efter 6 minutter? Hvordan kan de vide det?",
-          forkl: "Efter 6 minutter er der stadig natron i diglen. Slutmassen bliver for høj. Kun to vejninger, der giver det samme, viser, at massen er konstant.",
+        { id: "tidligt", titel: "Kun 2 minutter", kort: "varmer kun 2 min", rigtig: "hoejere", B: { tid: 2 },
+          tekst: "Gruppe 1 varmer natronen i 5 minutter. Gruppe 2 har travlt og varmer kun i 2 minutter.",
+          hint: "Er al natronen nået at blive til fast stof og gas efter 2 minutter?",
+          forkl: "Efter 2 minutter er der stadig natron i diglen, og der er forsvundet mindre gas. Slutmassen bliver for høj.",
           fejl: { lavere: "Der er ikke forsvundet mere gas hos gruppe 2. Der er forsvundet mindre, fordi de stoppede for tidligt.",
-                  samme: "Diglen taber stadig masse efter 6 minutter. Gruppe 2 stoppede, før massen var konstant." } },
+                  samme: "Efter 2 minutter er der stadig natron i diglen, som ikke har afgivet sin gas." } },
         { id: "varm", titel: "Vejet varm", kort: "vejer diglen varm", rigtig: "lavere", B: { varmVejning: true },
           tekst: "Gruppe 2 venter ikke på, at diglen køler af. De vejer den, mens den er varm.",
           hint: "Den varme digel varmer luften omkring sig. Varm luft stiger op.",
@@ -223,12 +236,12 @@
           forkl: "Vandet damper væk, og der er kun 4,80 g natron til at blive til fast stof. Slutmassen bliver for lav.",
           fejl: { hoejere: "Vandet bliver ikke i diglen. Det damper væk, og der er mindre natron i de 5,10 g.",
                   samme: "Vandet tager pladsen fra natronen i de 5,10 g. Der bliver mindre fast stof tilbage." } },
-        { id: "laenge", titel: "Dobbelt så længe", kort: "varmer dobbelt så længe", rigtig: "samme", B: { ekstra: 30 },
-          tekst: "Gruppe 2 vil være sikre. De varmer i 30 minutter mere, før de vejer sidste gang.",
-          hint: "Hvad er der tilbage i diglen, når massen er konstant? Kan det også sønderdeles?",
-          forkl: "Når al natronen er blevet til Na₂CO₃, sker der ikke mere. Na₂CO₃ tåler flammen. Mere tid giver den samme slutmasse.",
+        { id: "laenge", titel: "Dobbelt så længe", kort: "varmer i 10 min", rigtig: "samme", B: { tid: 10 },
+          tekst: "Gruppe 2 vil være sikre. De varmer i 10 minutter i stedet for 5.",
+          hint: "Hvad er der tilbage i diglen efter 5 minutter? Kan det også sønderdeles?",
+          forkl: "Efter 5 minutter er al natronen blevet til Na₂CO₃, og så sker der ikke mere. Na₂CO₃ tåler flammen. Mere tid giver den samme slutmasse.",
           fejl: { hoejere: "Længere tid kan ikke gøre diglen tungere. Der kommer intet til.",
-                  lavere: "Det ville passe, hvis stoffet i diglen blev ved med at give gas. Men når massen er konstant, sker der ikke mere." } },
+                  lavere: "Det ville passe, hvis stoffet i diglen blev ved med at give gas. Men når al natronen er omdannet, sker der ikke mere." } },
         { id: "soda", titel: "Den forkerte krukke", kort: "tager soda", rigtig: "hoejere", B: { soda: true },
           tekst: "Gruppe 2 tager fejl af krukkerne. De varmer 5,10 g soda, Na₂CO₃, i stedet for natron.",
           hint: "Soda er det, natron bliver til. Kan det give mere gas?",

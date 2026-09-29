@@ -1,10 +1,10 @@
 /* =====================================================================
-   sim_kolbe.js - fane 2: maalekolben
+   sim_kolbe.js - fane 3: maalekolben
 
    Seks regneopgaver fra den gamle c5.2: find c, n og V, fra masse til
-   koncentration og hvor meget der skal afvejes. I hvert trin skriver
-   eleven formlen og saa tallet. Tavlen viser opgavens tal og
-   beregningerne. Scenen goer det, eleven har regnet: vaegten vejer
+   koncentration og hvor meget der skal afvejes. Hvert trin er et
+   regnestykke: formlen i felter, tallene med enheder og resultatet med
+   enhed (regning.js). Tavlen viser opgavens tal og beregningerne. Scenen goer det, eleven har regnet: vaegten vejer
    stoffet af, pulveret kommer i kolben, der fyldes op til maerket, og
    kolben faar en etiket. Et forkert tal for massen vejes ogsaa af, og
    linjen siger, hvilken koncentration det ville give.
@@ -35,7 +35,7 @@
         var spec = D.KOLBE[i];
         var tal = nyeTal ? this.traek(spec.tal, this.sidstTal[spec.id]) : (this.sidstTal[spec.id] || spec.tal[0]);
         this.sidstTal[spec.id] = tal;
-        var o = { id: spec.id, fane: 2, titel: spec.titel, stof: tal.stof || spec.stof, tal: tal, enhed: spec.enhed,
+        var o = { id: spec.id, fane: 3, titel: spec.titel, stof: tal.stof || spec.stof, tal: tal, enhed: spec.enhed,
                   trin: spec.trin, tekst: spec.tekst };
         o.facit = K.facitKolbe(o);
         this.opg = o;

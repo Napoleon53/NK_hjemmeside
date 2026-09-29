@@ -27,9 +27,9 @@
         ],
         "fane-skaal": [
             { sel: "#skaal-anker-vaegt", titel: "Skålvægten", tekst: "1 mol af et stof i hver skål. Vægten er låst, til du har svaret." },
-            { sel: "#skaal-valg", titel: "Dit svar", tekst: "Hvilken side synker? Piletasterne virker også." },
+            { sel: "#skaal-valg", titel: "Dit svar", tekst: "Hvilken skål synker, eller står vægten lige? Piletasterne virker også." },
             { sel: "#skaal-anker-kort", titel: "Skiltet", tekst: "Det, der ligger i skålene, og beregningen af massen. Pilen peger mod skålen. Hintet sætter atommasserne ind, og efter svaret står resultatet der." },
-            { sel: "#skaal-kort", titel: "Runden", tekst: "Ni par. Knappen giver beregningen som hint. Rekorden huskes." }
+            { sel: "#skaal-kort", titel: "Runden", tekst: "Ni par pr. runde. Giv hint sætter atommasserne ind på skiltet. Rekorden huskes." }
         ],
         "fane-ukendt": [
             { sel: "#ukendt-anker-flaske", titel: "Flasken", tekst: "Etiketten er faldet af. Glasset er brunt, så man kan ikke se stoffet." },

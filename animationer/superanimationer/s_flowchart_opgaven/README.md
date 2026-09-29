@@ -7,7 +7,9 @@ svar, bliver brikken sendt tilbage ad pilen.
 
 Det er ikke en superanimation om et kemisk begreb, men et studieværktøj, der deler
 rammen (toplinje, scene, panel). Generel udgave: ingen fagligt indhold og ingen Kemichael
-(brugerens ønske, 26. sept. 2026). Ikke i menuen og skal ikke i samlingerne.
+(brugerens ønske, 26. sept. 2026). I menuen fra 28. sept. 2026: øverst i NV-samlingen
+uden nummer (badge ?) som "Hjælp til selvhjælp", direkte link `samling_NV.html?emne=hjaelp`.
+Ikke i de andre samlinger.
 
 ## Bestillingen
 

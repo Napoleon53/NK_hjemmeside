@@ -18,7 +18,7 @@
 
    Scener:
      intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil
-     faerdig   fane 1: alle fire maal er naaet
+     faerdig   fane 1: de tre maal er naaet
      slut      fane 2: runden er slut
      niveau    fane 3: et helt niveau er afvejet
    Kaffen staar paa bordet paa fane 1 og 3 og er det faelles paaskeaeg.

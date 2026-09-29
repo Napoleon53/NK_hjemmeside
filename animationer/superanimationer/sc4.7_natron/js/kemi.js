@@ -178,79 +178,72 @@
     };
 
     /* ----- Fane 3: en gruppes forloeb ------------------------------------------------
-       B: afvigelsen fra D.FEJL (tom for gruppe 1). Planen er en raekke
-       skridt: { varm: "lav"/"hoej", min } eller { vej: true }. Efter hver
-       vejning afgoeres, om massen er konstant; ellers varmer gruppen 3
-       minutter mere. Vejningerne gemmes som { t (opvarmning), m }. */
+       B: afvigelsen fra D.FEJL (tom for gruppe 1). Diglen staar foerst paa
+       vaegten (foer). Saa varmes den paa trefoden (varm): lav flamme de
+       foerste D.FEJL_LAV minutter og derefter hoej, i alt B.tid eller
+       D.FEJL_TID minutter paa uret. Saa flyttes den over paa vaegten,
+       koeler af (koel) og vejes én gang. Uret er modellens tid divideret
+       med D.FEJL_SKALA. Vejningerne gemmes som { t (uret), m }. */
+    var LUFT = 1e-6;
+
     function Forloeb(B) {
         B = B || {};
         this.B = B;
         this.d = new Digel({ m: D.FEJL_M, vand: B.vand, soda: B.soda });
-        this.d.sted = "trefod";
-        this.plan = B.hoejFraStart ? [{ varm: "hoej", min: 10 }, { vej: true }] :
-            [{ varm: "lav", min: 4 }, { varm: "hoej", min: B.stopEfter ? B.stopEfter - 4 : 6 }, { vej: true }];
+        this.tid = B.tid || D.FEJL_TID;
+        this.fase = "foer";
+        this.koelT = 0;
         this.vejninger = [{ t: 0, m: D.FEJL_M }];
-        this.i = 0;
-        this.fase = null;        /* { slags, t } for det skridt, der er i gang */
         this.faerdig = false;
         this.slut = null;
-        this.ekstraGjort = false;
-        this.t = 0;
     }
 
-    /* Giver true, naar en ny vejning er skrevet ned. dt i minutter. */
-    Forloeb.prototype.opdater = function (dt) {
-        if (this.faerdig) return false;
-        var d = this.d, ny = false;
-        this.t += dt;
-        if (!this.fase) {
-            var s = this.plan[this.i];
-            if (!s) { this.naeste(); s = this.plan[this.i]; }
-            if (s.varm) { d.sted = "trefod"; d.flamme = s.varm; this.fase = { slags: "varm", slut: d.opv + s.min }; }
-            else { d.flamme = ""; d.sted = "vaegt"; this.fase = { slags: "vej", t: 0 }; }
-        }
-        d.opdater(dt);
-        if (this.fase.slags === "varm" && d.opv >= this.fase.slut - 1e-9) { this.fase = null; this.i++; }
-        else if (this.fase.slags === "vej") {
-            this.fase.t += dt;
-            var klar = this.B.varmVejning ? this.fase.t >= 0.3 : d.stille();
-            if (klar) {
-                this.vejninger.push({ t: d.opv, m: d.visning() });
-                this.fase = null;
-                this.i++;
-                ny = true;
-                this.efterVejning();
-            }
-        }
-        return ny;
+    /* Minutter paa uret, diglen har vaeret opvarmet */
+    Forloeb.prototype.ur = function () { return this.d.opv / D.FEJL_SKALA; };
+
+    Forloeb.prototype.flamme = function () {
+        if (this.B.hoejFraStart) return "hoej";
+        return this.ur() < D.FEJL_LAV - LUFT ? "lav" : "hoej";
     };
 
-    Forloeb.prototype.efterVejning = function () {
-        var v = this.vejninger, n = v.length;
-        if (this.B.stopEfter) { this.slutter(); return; }
-        var konstant = n >= 3 && Math.abs(v[n - 1].m - v[n - 2].m) <= D.KONSTANT.tol;
-        if (konstant && this.B.ekstra && !this.ekstraGjort) {
-            this.ekstraGjort = true;
-            this.plan.push({ varm: "hoej", min: this.B.ekstra }, { vej: true });
+    Forloeb.prototype.start = function () {
+        if (this.fase !== "foer") return;
+        this.fase = "varm";
+        this.d.sted = "trefod";
+        this.d.flamme = this.flamme();
+    };
+
+    /* dt i modellens minutter. Et skridt gaar aldrig forbi skiftet fra lav
+       til hoej flamme eller slutningen, saa resultatet ikke afhaenger af
+       billedraten. */
+    Forloeb.prototype.opdater = function (dt) {
+        if (this.faerdig || this.fase === "foer") return;
+        var d = this.d;
+        if (this.fase === "varm") {
+            d.flamme = this.flamme();
+            var graense = d.flamme === "lav" && !this.B.hoejFraStart ? D.FEJL_LAV : this.tid;
+            d.opdater(Math.max(0, Math.min(dt, (graense - this.ur()) * D.FEJL_SKALA)));
+            if (this.ur() >= this.tid - LUFT) {
+                d.flamme = "";
+                d.sted = "vaegt";
+                this.fase = "koel";
+            }
             return;
         }
-        if (konstant || n > 14) this.slutter();
+        d.opdater(dt);
+        this.koelT += dt;
+        if (this.B.varmVejning ? this.koelT >= 0.3 : d.stille()) {
+            this.slut = d.visning();
+            this.vejninger.push({ t: this.tid, m: this.slut });
+            this.fase = "faerdig";
+            this.faerdig = true;
+        }
     };
 
-    /* Endnu ikke konstant: 3 minutter mere og en vejning */
-    Forloeb.prototype.naeste = function () {
-        this.plan.push({ varm: "hoej", min: 3 }, { vej: true });
-    };
-
-    Forloeb.prototype.slutter = function () {
-        this.faerdig = true;
-        this.d.flamme = "";
-        this.slut = this.vejninger[this.vejninger.length - 1].m;
-    };
-
-    /* Koer hele forloebet paa én gang (selvtesten og Vis svaret) */
+    /* Koer hele forloebet paa én gang (selvtesten) */
     Forloeb.prototype.koerFaerdig = function () {
         var n = 0;
+        this.start();
         while (!this.faerdig && n++ < 200000) this.opdater(0.05);
         return this.slut;
     };

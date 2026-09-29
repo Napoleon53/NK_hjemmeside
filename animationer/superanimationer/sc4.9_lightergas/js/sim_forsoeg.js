@@ -245,12 +245,19 @@
             if (this.glas.V < D.V_MIN) return this.sted === "vand" ? "gas" : "saenk";
             return this.gasPaa ? "gas" : "aflaes";
         }
-        if (this.opg.gaet && this.valgt === null) return "gaet";
-        if (this.sted === "vaegt" && !this.haand && !this.flyt) return this.lt.vaad() ? "toer" : "efter";
+        /* m(efter) og V kan skrives i begge raekkefoelger; gaettet kommer kun,
+           naar V staar der foer m(efter) */
+        if (this.opg.gaet && this.valgt === null && n.me === null) return "gaet";
+        if (this.paaVaegt()) return this.lt.vaad() ? "toer" : "efter";
         return "op";
     };
 
-    P.opgaveFaerdig = function () { return this.noteret.me !== null; };
+    P.opgaveFaerdig = function () {
+        var n = this.noteret;
+        return n.mf !== null && n.V !== null && n.me !== null;
+    };
+
+    P.paaVaegt = function () { return this.sted === "vaegt" && !this.haand && !this.flyt; };
 
     P.trinLinje = function () {
         var f = this.fase();
@@ -306,7 +313,7 @@
         } else if (f === "aflaes") {
             var V = Math.round(this.glas.V);
             this.svarVis(NK.html(D.SVAR.aflaes.replace("{V}", K.V(V))));
-            this.noterV(V);
+            this.noterV(V, "svar");
         } else if (f === "op" || f === "toer") {
             this.flytTil("papir", function () {
                 mig.lt.film = 0;
@@ -325,6 +332,8 @@
 
     P.bindSkema = function () {
         var mig = this;
+        this.el.aflaes = NK.el("forsoeg-aflaes");
+        this.el.aflaes.addEventListener("click", function () { mig.aflaesVaegt(); });
         [0, 1].forEach(function (r) {
             FELTER.forEach(function (hvad) {
                 var e = inp(r, hvad);
@@ -341,7 +350,12 @@
         return K.g2(v);
     }
 
-    /* Hvilke felter er aabne, og hvad staar der */
+    /* Det felt, der er det naeste skridt (det lyser gult) */
+    var FORVENTET = { foer: "f", aflaes: "v", efter: "e", toer: "e" };
+
+    /* Hvad staar der. Maalingens egne felter er altid aabne, til tallet
+       er skrevet; kommer et tal i den forkerte raekkefoelge, siger linjen
+       hvorfor (tjekFelt). Kun den anden maalings tomme felter er laast. */
     P.visSkema = function () {
         var mig = this, f = this.fase();
         [0, 1].forEach(function (r) {
@@ -350,17 +364,16 @@
             FELTER.forEach(function (hvad) {
                 var e = inp(r, hvad), felt = e.parentNode;
                 var v = hvad === "f" ? tal.mf : (hvad === "v" ? tal.V : tal.me);
-                var aaben = aktiv && (v === null || v === undefined) && f !== "faerdig" &&
-                    ((hvad === "f") || (hvad === "v" && mig.noteret.mf !== null) ||
-                     (hvad === "e" && mig.noteret.V !== null && f !== "gaet"));
-                if (v !== null && v !== undefined) {
+                var kendt = v !== null && v !== undefined;
+                var aaben = aktiv && !kendt && f !== "faerdig";
+                if (kendt) {
                     var t = formater(hvad, v);
                     if (e.value !== t) e.value = t;
                 } else if (!aaben && document.activeElement !== e) e.value = "";
                 e.disabled = !aaben;
-                felt.classList.toggle("ok", v !== null && v !== undefined);
-                felt.classList.toggle("aktiv", aaben);
-                felt.classList.toggle("laast", !aaben && (v === null || v === undefined));
+                felt.classList.toggle("ok", kendt);
+                felt.classList.toggle("aktiv", aaben && FORVENTET[f] === hvad);
+                felt.classList.toggle("laast", !aaben && !kendt);
             });
             var th = NK.el("forsoeg-h" + r);
             if (th) th.classList.toggle("valgt", aktiv);
@@ -368,6 +381,30 @@
         var m = this.noteret;
         NK.saetTekst("forsoeg-note", m.mf !== null && m.me !== null ?
             "Lighteren tabte " + K.g2(m.mf) + " g − " + K.g2(m.me) + " g = " + K.g2(K.r2(m.mf - m.me)) + " g." : "");
+        this.visAflaes();
+    };
+
+    /* Knappen Aflaes vaegten: kan bruges, saa laenge en masse mangler, og
+       banker, naar lighteren staar toer paa vaegten og en masse er det
+       naeste skridt */
+    P.visAflaes = function () {
+        var k = this.el && this.el.aflaes;
+        if (!k) return;
+        var n = this.noteret, f = this.fase();
+        var mangler = !this.faerdig && (n.mf === null || n.me === null);
+        k.disabled = !mangler || !!this.auto;
+        k.classList.toggle("banker", mangler && this.paaVaegt() && !this.lt.vaad() && (f === "foer" || f === "efter"));
+    };
+
+    /* Skriv det, vaegten viser, i det felt, der mangler (m(før), ellers
+       m(efter)), og tjek det som et tal, eleven selv har skrevet */
+    P.aflaesVaegt = function () {
+        if (this.faerdig || this.auto) return;
+        var n = this.noteret, hvad = n.mf === null ? "f" : (n.me === null ? "e" : null);
+        if (!hvad) return;
+        if (!this.paaVaegt()) { this.besked("Stil lighteren på vægten først.", "gul"); return; }
+        inp(this.nr, hvad).value = K.g2(this.lt.visning());
+        this.tjekFelt(this.nr, hvad);
     };
 
     P.fokusFelt = function () {
@@ -391,9 +428,20 @@
         if (!String(raa).trim()) { this.besked(hvad === "v" ? "Skriv tallet fra måleglasset." : "Skriv tallet fra vægten.", "gul"); return; }
         var t = T.tal(raa);
         if (!t) { ryst(e); this.besked(hvad === "v" ? "Skriv et tal, fx 152." : "Skriv et tal, fx 17,84.", "skidt"); return; }
+        /* Tal i den forkerte raekkefoelge: en forklaring i stedet for et laast felt */
+        if (hvad !== "f" && this.noteret.mf === null) {
+            ryst(e);
+            this.besked("Vej lighteren først, så m(før) står i skemaet.", "skidt");
+            return;
+        }
         if (hvad === "v") { this.tjekV(e, t.v); return; }
+        if (hvad === "e" && this.noteret.V === null && this.glas.V < D.V_MIN) {
+            ryst(e);
+            this.besked("Saml gassen i måleglasset først. Så vejes lighteren igen.", "skidt");
+            return;
+        }
         var v = Math.round(t.v * 100);
-        var paaVaegt = this.sted === "vaegt" && !this.haand && !this.flyt;
+        var paaVaegt = this.paaVaegt();
         var vist = Math.round(this.lt.visning() * 100);
         if (hvad === "f") {
             if (!paaVaegt) { ryst(e); this.besked("Stil lighteren på vægten først.", "skidt"); return; }
@@ -442,8 +490,12 @@
         this.visSkema();
     };
 
-    P.noterV = function (v) {
+    P.noterV = function (v, maade) {
         this.noteret.V = v;
+        if (this.noteret.me !== null) {
+            this.afslut(maade || "ok", maade === "svar" ? NK.html(D.SVAR.aflaes.replace("{V}", K.V(v))) : null);
+            return;
+        }
         if (this.opg.gaet && this.valgt === null) this.lavMuligheder();
         this.rosNaeste = NK.tilfaeldig(D.ROS);
         this.visKort();
@@ -453,6 +505,19 @@
     P.noterEfter = function (maade) {
         var n = this.noteret;
         n.me = this.lt.visning();
+        this.gasVedEfter = this.lt.gas;
+        if (n.V === null) {
+            /* Vejet, foer rumfanget er skrevet: V mangler stadig */
+            this.rosNaeste = NK.tilfaeldig(D.ROS);
+            this.visSkema();
+            return;
+        }
+        this.afslut(maade, maade === "svar" ? NK.html(D.SVAR.efter.replace("{m}", K.g2(n.me))) : null);
+    };
+
+    /* Alle tre tal staar i skemaet: maalingen gemmes, og forklaringen kommer */
+    P.afslut = function (maade, svarHTML) {
+        var n = this.noteret;
         NK.maalinger[this.nr] = { mf: n.mf, V: n.V, me: n.me };
         NK.gemMaalinger();
         var pre = "";
@@ -463,7 +528,7 @@
         var adv = this.advarsel();
         this.forklaring = NK.html((pre ? pre + " " : "") + (adv || this.opg.efter));
         this.sidsteFase = "faerdig";
-        this.trinLoest(maade, maade === "svar" ? NK.html(D.SVAR.efter.replace("{m}", K.g2(n.me))) : null);
+        this.trinLoest(maade, svarHTML || null);
         this.visSkema();
         if (NK.sims && NK.sims["fane-beregning"]) NK.sims["fane-beregning"].nyeMaalinger();
     };
@@ -569,7 +634,7 @@
     };
 
     /* Er maalingen i gang (m(før) skrevet, m(efter) ikke)? */
-    P.iGang = function () { return this.noteret.mf !== null && this.noteret.me === null; };
+    P.iGang = function () { return this.noteret.mf !== null && !this.faerdig; };
 
     /* Kemichael kommer: forfra, naar maalingen er i gang og nu er oedelagt */
     P.paatale = function (slags) {
@@ -691,6 +756,11 @@
             this.haand = { x: s.x, y: s.y, dx: s.x - b.x, dy: s.y - b.yb, fra: this.sted };
             this.stopGas();
             return true;
+        }
+        /* Et klik paa vaegten med lighteren paa: samme som knappen Aflaes vaegten */
+        if (u === "vaegt" && this.paaVaegt() && !this.faerdig && (this.noteret.mf === null || this.noteret.me === null)) {
+            this.aflaesVaegt();
+            return false;
         }
         var info = {
             vaegt: "Vægten viser lighterens masse med to decimaler.",
@@ -839,6 +909,12 @@
             this.besked("Der er kommet mere gas i måleglasset. Skriv det nye rumfang.", "gul");
             this.visSkema();
         }
+        /* Har lighteren tabt gas, efter m(efter) blev skrevet? */
+        if (this.noteret.me !== null && !this.faerdig && lt.gas < this.gasVedEfter - 0.004) {
+            this.noteret.me = null;
+            this.besked("Lighteren har tabt mere gas, efter den blev vejet. Vej den igen.", "gul");
+            this.visSkema();
+        }
         this.sky *= Math.pow(0.5, dt / D.SKY.halvering);
         /* Flammen */
         if (this.flamme) {
@@ -865,6 +941,18 @@
         /* Mens Vis svaret flytter eller lukker gas ud, kan knappen ikke bruges */
         var auto = !!(this.autoGas || (this.flyt && this.flyt.efter));
         if (auto !== !!this.auto) { this.auto = auto || null; this.visKnap(); }
+        this.visAflaes();
+        /* Lighteren er landet paa vaegten: linjen siger, at den kan aflaeses */
+        var paa = this.paaVaegt();
+        if (paa !== this.varPaaVaegt) {
+            this.varPaaVaegt = paa;
+            var fv = this.fase();
+            if (paa && !this.auto && (fv === "foer" || fv === "efter" || fv === "toer") && fv === this.sidsteFase) {
+                this.hjaelp = 0;
+                this.besked(this.trinLinje(), "");
+                this.visKnap();
+            }
+        }
         /* Fasen */
         var fa = this.fase();
         if (fa !== this.sidsteFase) {

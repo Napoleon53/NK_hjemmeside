@@ -3,13 +3,15 @@
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
 
-     * opgavelisten i panelet med loest og stjerne (huskes i browseren)
+     * opgavelisten i panelet med loest og stjerne (huskes i browseren);
+       en loest opgave er groen (brugerens oenske 29. sept. 2026)
      * knappen i opgavekortet: Giv hint, (Vis trekanten,) Vis svaret,
        Naeste opgave. Trekanten er det andet hint, naar formlen skal
        vendes (brugerens valg 25. sept. 2026).
      * linjen i opgavekortet: hvor man er, naeste skridt, fejl og ros
      * Kemichael ved katederet, der kun siger noget, naar eleven beder om
-       et hint eller svaret, og tier igen, naar trinnet er loest. Er han
+       et hint eller svaret, og tier igen, naar trinnet er loest. Er en
+       del rigtig, siger han en kort ros, der selv gaar igen. Er han
        sendt ud, staar hintet i opgavekortet i stedet.
      * musen i scenen: hold, traek og klik
 
@@ -80,7 +82,7 @@
                 var knap = document.createElement("button");
                 knap.type = "button";
                 knap.className = "hyldelinje";
-                knap.innerHTML = '<span class="hl-nr">' + (i + 1) + '</span><span class="hl-navn">' + NK.html(o.titel) +
+                knap.innerHTML = '<span class="hl-nr" id="' + navn + '-hlnr-' + i + '">' + (i + 1) + '</span><span class="hl-navn">' + NK.html(o.titel) +
                     '</span><span class="hl-stjerner" id="' + navn + '-stj-' + i + '"></span>';
                 knap.addEventListener("click", function () { mig.vaelg(i, false); });
                 mig.el.liste.appendChild(knap);
@@ -91,9 +93,14 @@
             if (!this.el.liste) return;
             var mig = this;
             var knapper = this.el.liste.querySelectorAll(".hyldelinje");
+            /* En loest opgave er groen med ✓ i cirklen; stjernen er for en
+               opgave, der er loest uden Vis svaret */
             this.status.forEach(function (s, i) {
                 knapper[i].classList.toggle("valgt", i === mig.nr);
-                NK.saetTekst(navn + "-stj-" + i, s.stjerne ? "★" : (s.loest ? "✓" : ""));
+                knapper[i].classList.toggle("loest", s.loest);
+                NK.saetTekst(navn + "-hlnr-" + i, s.loest ? "✓" : String(i + 1));
+                NK.saetTekst(navn + "-stj-" + i, s.stjerne ? "★" : "");
+                knapper[i].title = s.loest ? (s.stjerne ? "Løst uden at se svaret" : "Løst") : "";
             });
             NK.saetTekst(navn + "-loest", String(this.antalLoest()));
         };
@@ -109,7 +116,7 @@
             this.layout();
             this.visKort();
             this.visListe();
-            this.k.tie();
+            this.k.tie(true);
             this.naesteLinje(this.introNu ? D.INTRO[navn] : "", "");
             this.introNu = false;
             this.fokus();
@@ -125,7 +132,7 @@
 
         P.visKort = function () {
             var o = this.opgaver[this.nr];
-            NK.saetTekst(navn + "-titel", o.titel);
+            NK.saetHTML(navn + "-titel", NK.html(o.titel) + (this.faerdig ? ' <span class="titel-ok">✓ Løst</span>' : ""));
             NK.saetTekst(navn + "-nr", String(this.nr + 1));
             NK.saetTekst(navn + "-antal", String(this.opgaver.length));
             NK.saetHTML(navn + "-prompt", this.promptHTML());
@@ -191,22 +198,33 @@
             this.fokus();
         };
 
-        /* Et trin er loest: Kemichael tier (eller viser det svar, han blev bedt
-           om), trekanten forsvinder, og linjen siger det naeste skridt */
-        P.trinLoest = function (maade, svarHTML) {
+        /* Et trin er loest: Kemichael roser kort (eller viser det svar, han
+           blev bedt om), trekanten forsvinder, og linjen siger, hvad der er
+           rigtigt, og det naeste skridt. del: formel, navn, enhed, enhed1,
+           indsaet eller tal (D.DEL_OK og D.ROS_K). */
+        P.trinLoest = function (maade, svarHTML, del) {
             this.hjaelp = 0;
             this.trekant = null;
             if (maade === "svar") this.brugtSvar = true;
             if (this.opgaveFaerdig()) {
                 if (maade === "svar" && svarHTML) this.k.sig(svarHTML, "svar", { lukVedSkriv: true });
-                else this.k.tie();
+                else this.kRos(del);
                 this.opgaveLoest(maade);
             } else {
                 if (maade === "svar" && svarHTML) this.svarVis(svarHTML);
-                else { this.k.tie(); this.naesteLinje(NK.tilfaeldig(D.ROS), "god"); }
+                else { this.kRos(del); this.naesteLinje(D.DEL_OK[del] || NK.tilfaeldig(D.ROS), "god"); }
             }
             this.visKnap();
             this.fokus();
+        };
+
+        /* Kemichaels korte ros; replikkerne tages paa skift, saa den samme
+           ikke kommer to gange i traek */
+        P.kRos = function (del) {
+            var liste = D.ROS_K[del];
+            if (!liste) { this.k.tie(); return; }
+            this.rosNr = this.rosNr === undefined ? Math.floor(Math.random() * 6) : this.rosNr + 1;
+            this.k.ros(NK.html(liste[this.rosNr % liste.length]));
         };
 
         P.opgaveLoest = function (maade) {

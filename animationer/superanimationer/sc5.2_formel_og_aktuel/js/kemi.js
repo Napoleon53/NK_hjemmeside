@@ -98,8 +98,13 @@
         f.kA = K.k(A, ion);
         f.kB = K.k(B, ion);
         if (o.id === "samme") {
-            f.bidragA = f.kA * t.cA;
-            f.bidragB = f.kB * t.cB;
+            /* Saltene vejes af og opløses: n = m / M, c = n / V */
+            f.nSA = t.mA / A.Mv;
+            f.nSB = t.mB / B.Mv;
+            f.cSA = f.nSA / (t.V / 1000);
+            f.cSB = f.nSB / (t.V / 1000);
+            f.bidragA = f.kA * f.cSA;
+            f.bidragB = f.kB * f.cSB;
             f.total = f.bidragA + f.bidragB;
             return f;
         }

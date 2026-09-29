@@ -33,8 +33,10 @@
         /* Fuldpipetten: stilken, maerket, boblen og spidsen */
         pipette: { b: 40, h: 260, stilkV: 18, stilkH: 22, maerke: 44, bobleX: 20, bobleY: 124, bobleRx: 11, bobleRy: 34,
                    nedreTop: 158, spids: 254 },
-        /* Baegerglasset paa fane 3 (400 mL) */
+        /* Baegerglasset paa fane 4 (400 mL) */
         baegerglas: { b: 160, h: 200, indV: 18, indH: 142, indTop: 16, indBund: 186, indR: 8, prmL: 0.35, bund: 190 },
+        /* Baegerglasset paa 1 L paa fane 2: det indre, rumfangsskalaen og tuden */
+        glas1l: { b: 180, h: 240, indV: 22, indH: 158, indTop: 18, indBund: 222, indR: 10, prL: 180, tudX: 14, tudY: 12, bund: 227 },
         /* Flasken med stamopløsningen (som sc7.2) */
         flaske: { b: 90, h: 140, indV: 12, indH: 78, indTop: 40, indBund: 134, etiketV: 16, etiketH: 74, etiketTop: 70,
                   etiketBund: 110, bund: 138 },

@@ -20,7 +20,7 @@
      intro     hver fane: praesentationen (D.INTRO_*), naar eleven vil
      faerdig   fane 1: en hylde er maalt; fane 2: det sidste maal
      sig       fane 3: syren blev ikke basisk, og det sidste maal
-     aeg       fane 1: et gaet, der rammer inden for 0,1; fane 2: fuld zoom ud
+     aeg       fane 1: et gaet, der rammer inden for 0,1
    Kaffen staar paa bordet i alle tre faner og er det faelles paaskeaeg.
    ===================================================================== */
 (function () {
@@ -266,13 +266,6 @@
     PL.laererFaerdig = function () {
         if (!this.laerer) return;
         this.laererKoer("faerdig", rosTrin(PL, D.LUP_FAERDIG), false);
-    };
-
-    /* Paaskeaegget: luppen zoomet helt ud. Én gang pr. besoeg. */
-    PL.laererAeg = function () {
-        if (!this.laerer || this.aegVist || this.laerer.scene) return;
-        this.aegVist = true;
-        this.laererKoer("aeg", bemaerkning(PL, D.AEG_ZOOM), false);
     };
 
     /* ----- Fane 3: fortyndingsbordet ------------------------------------------------ */

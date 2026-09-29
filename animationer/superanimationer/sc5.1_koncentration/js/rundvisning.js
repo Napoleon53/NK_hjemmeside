@@ -24,11 +24,19 @@
             { sel: "#kar-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du har løst det." },
             { sel: "#kar-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
             { sel: "#kar-forfra", titel: "Start forfra", tekst: "Karret, som det var, da opgaven begyndte." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Målekolben: regn en opløsning ud, før den laves. Fortynding: der kommer vand til, men ikke stof." }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "c eller n?: forskellen på stofmængde og koncentration. Målekolben: regn en opløsning ud, før den laves. Fortynding: der kommer vand til, men ikke stof." }
+        ],
+        "fane-glas": [
+            { sel: "#glas-anker-glassene", titel: "Glassene", tekst: "Hver prik i et glas er 0,01 mol kobber(II)sulfat. Tæl prikkerne, så har du stofmængden n." },
+            { sel: "#glas-anker-lupper", titel: "Lupperne", tekst: "En lup viser altid lige meget væske. Flere ioner i luppen betyder en højere koncentration c." },
+            { sel: "#glas-anker-over", titel: "Teksten på væggen", tekst: "Hvad der er i glassene, og hvad du skal gøre. Nogle gange skal du hælde, før spørgsmålet kommer." },
+            { sel: "#glas-kort", titel: "Spørgsmålet", tekst: "Vælg et svar. Når spørgsmålet handler om et glas, kan du også klikke på glasset. Et forkert svar bliver forklaret." },
+            { sel: "#glas-data", titel: "Tabellen", tekst: "Det, du ved om glassene. Et spørgsmålstegn er noget, du skal finde." },
+            { sel: "#glas-opgaver", titel: "Opgaverne", tekst: "Otte opgaver. En opgave, du løser uden forkerte svar og uden at se svaret, får en stjerne." }
         ],
         "fane-kolbe": [
-            { sel: "#kolbe-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningerne. En beregning står der, når den er rigtig." },
-            { sel: "#kolbe-raekker", titel: "Formlen og tallet", tekst: "Skriv først formlen med bogstaver, fx c = n / V, og tryk Enter. Så tallet." },
+            { sel: "#kolbe-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningen, efterhånden som du skriver den." },
+            { sel: "#kolbe-raekker", titel: "Regnestykket", tekst: "Tre trin: vælg formlens form og skriv bogstaverne, sæt tallene ind med enheder, og skriv resultatet med enhed." },
             { sel: "#kolbe-anker-bord", titel: "Bordet", tekst: "Det, du har regnet, sker her: stoffet vejes af, hældes i kolben, og kolben fyldes op til mærket." },
             { sel: "#kolbe-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret." },
             { sel: "#kolbe-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. En opgave, du løser uden at se svaret, får en stjerne. Nye tal giver samme opgave med andre tal." }
@@ -37,7 +45,7 @@
             { sel: "#fortynd-anker-lupper", titel: "Lupperne", tekst: "Flasken og kolben. Ionerne fra pipetten fordeler sig i mere vand, så der er færre i luppen." },
             { sel: "#fortynd-anker-bord", titel: "Bordet", tekst: "I første opgave: klik på en pipette, så på en målekolbe og til sidst på sprøjteflasken." },
             { sel: "#fortynd-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningerne." },
-            { sel: "#fortynd-kort", titel: "Opgaven", tekst: "Fra opgave 2 skriver du formlen og så tallet. Scenen gør det, du har regnet." },
+            { sel: "#fortynd-kort", titel: "Opgaven", tekst: "Fra opgave 2 regner du i tre trin: formlen, tallene med enheder og resultatet. Før og efter står med lille skrift: V før fortyndingen og V efter. Scenen gør det, du har regnet." },
             { sel: "#fortynd-opgaver", titel: "Opgaverne", tekst: "Fem opgaver. Nye tal giver samme opgave med andre tal." }
         ]
     };

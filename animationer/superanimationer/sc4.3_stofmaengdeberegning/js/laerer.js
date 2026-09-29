@@ -5,9 +5,10 @@
    stille bag sit kateder i scenens nederste venstre hjoerne med kaffen
    foran sig, og han blander sig ikke: han siger kun noget, naar eleven
    trykker Giv hint eller Vis svaret (eller K). Boblen staar fast til
-   hoejre for ham og lukker igen, naar delopgaven er loest. Naeste skridt,
-   fejl og ros staar i opgavekortet i panelet, ikke hos ham (brugerens
-   valg 25. sept. 2026).
+   hoejre for ham og lukker igen, naar delopgaven er loest. Naeste skridt
+   og fejl staar i opgavekortet i panelet, ikke hos ham (brugerens valg
+   25. sept. 2026). Naar en del er rigtig, siger han en kort ros, der
+   selv gaar igen (ros, brugerens oenske 29. sept. 2026).
 
    Knappen i scenens hjoerne sender ham ud. Saa staar katederet tomt med
    en seddel, og hintene staar i opgavekortet i stedet. Samme knap (eller
@@ -26,6 +27,7 @@
      var baand = this.k.layout(W, H);   // { y, h }: det nederste baand
      this.k.sig(html, slags, valg);     // kun hint og svar; giver false, naar han er ude
      this.k.tie();                      // delopgaven er loest
+     this.k.ros(html);                  // en del er rigtig: kort ros, der selv gaar igen
      this.k.opdater(dt); this.k.tegn(ctx);
      this.k.klik(pt) / this.k.hover(pt)
    ===================================================================== */
@@ -170,10 +172,21 @@
         return true;
     };
 
-    P.tie = function () {
+    /* alt: ogsaa et kort svar eller en ros, der staar lige nu (ny opgave) */
+    P.tie = function (alt) {
         this.linje = { html: "", slags: "" };
         this.lukVedSkriv = false;
+        if (alt && this.gaar <= 0) this.midl = null;
         if (!this.midl) this.vis(this.linje);
+    };
+
+    /* En del er rigtig: en kort ros, der selv gaar igen. Giver false,
+       naar han er ude. */
+    P.ros = function (html) {
+        if (faelles.ude || this.gaar > 0) return false;
+        this.tie();
+        this.svar(html, "god", D.ROS_TID);
+        return true;
     };
 
     /* Eleven skriver i et felt: et vist svar lukker */

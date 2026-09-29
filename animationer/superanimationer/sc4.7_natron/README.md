@@ -53,7 +53,7 @@ konsekvens af flammen, ikke et uheld, og eleven kan fortsætte.
 |---|------|--------------|--------|
 | 1 | Forsøget | gætter, aflæser startmassen, varmer, lader diglen køle af, vejer og gentager, til massen er konstant | noget forsvinder som gas, og massen ender et bestemt sted |
 | 2 | Hypoteserne | regner stofmængden af natron og for hver hypotese: afstemning, n(produkt) og m(produkt); så dommen | den hypotese, hvis streg kurven ender på, er den rigtige |
-| 3 | Fejlkilder | gætter, om gruppe 2's slutmasse bliver højere, lavere eller den samme, og ser begge forsøg | vægten kan kun afgøre det, hvis massen er målt rigtigt |
+| 3 | Fejlkilder | gætter, om gruppe 2's digel til sidst vejer mere, mindre eller det samme som gruppe 1's, og ser begge forsøg | vægten kan kun afgøre det, hvis massen er målt rigtigt |
 
 **Forsøget.** Diglen med natron (4,56-5,45 g) står på en vægt, der er
 nulstillet med den tomme digel. Opgaven starter med et gæt: A Na₂O, B
@@ -73,6 +73,15 @@ CO₃²⁻, CO₂ og H₂O. Målingen og gættet huskes i browseren og bruges p�
 fane 2 og i journalen. En målt og gemt måling vises færdig; Start forfra
 giver en ny digel med en ny masse.
 
+Efter gættet står gættet på én linje, og kortet viser tre trin: vej
+natronen før, varm og vej, gentag til to vejninger i træk er ens. Det
+trin, eleven er nået til, er fremhævet. Skemaet har en kolonne med
+ændringen fra vejningen før og en grå række for den næste vejning ("varm
+igen først"), og linjen siger, hvor meget massen faldt. Der er ingen
+opgaveliste på fanen (brugerens ønske 29. sept. 2026: knappen med den ene
+opgave startede bare forfra, og det var uklart, hvad man skulle efter to
+vejninger).
+
 **Hypoteserne.** Opgaven står over tavlen. 1: n(NaHCO₃) = m / M med
 formlen, mellemregningen i brøkfelter og resultatet med enhed (som
 sc4.3). 2-4: én opgave pr. hypotese. Først afstemmes skemaet med et felt
@@ -84,19 +93,32 @@ for stofmængden skal skrives, resten er kun resultater. Når massen er
 regnet, kommer hypotesens streg på grafen ved siden af elevens vejninger.
 5: dommen. Tre knapper; et forkert valg forklares med forskellen i gram.
 Den rigtige viser skemaet, gættet fra fane 1 og reaktionen som kugler på
-tavlen. Har eleven ikke målt selv, bruges eksemplet (5,21 g → 3,29 g),
-og kortet siger det. Snyd-knappen under opgavelisten udfylder alle
-regneopgaver (dommen skal eleven selv tage), og journalen får et
-snydebevis.
+tavlen. Fanen regner på diglen fra fane 1, så snart startmassen er
+skrevet, også før massen er konstant; så venter dommen, og kortet sender
+eleven tilbage til Forsøget. Uden en startmasse fra fane 1 bruges den
+sidste færdige måling og ellers eksemplet (5,21 g → 3,29 g), og kortet
+siger det. Skifter diglen på fane 1, begynder en påbegyndt opgave forfra
+med de nye tal (brugerens ønske 29. sept. 2026: fane 2 kom med helt nye
+tal). Panelet er bredere end på de andre faner (540 px, 460 px under
+1320 px) med større skrift i regnestykket, og et rigtigt svar får
+rækken og linjen til at blinke grønt med et flueben. Snyd-knappen under
+opgavelisten udfylder alle regneopgaver (dommen skal eleven selv tage),
+og journalen får et snydebevis.
 
-**Fejlkilder.** Gruppe 1 gør det rigtigt: 5,10 g natron, lav flamme i 4
-minutter, så høj, og de vejer, til massen er konstant. Gruppe 2 gør én
-ting anderledes: vejer kun én gang efter 6 minutter (højere), vejer
-diglen varm (lavere), høj flamme fra start (sprøjt, lavere), fugtig
-natron med 0,30 g vand (lavere), 30 minutter mere (det samme) og soda i
-stedet for natron (højere, passer ikke med nogen hypotese). Eleven gætter
-først. Så kører begge forsøg i den samme model som på fane 1, 6 minutter
-pr. sekund, med vejningerne på grafen og hypotesernes streger for 5,10 g.
+**Fejlkilder.** Begge grupper starter med 5,10 g natron og vejer diglen
+én gang, når den er kølet af. Gruppe 1 gør det rigtigt: lav flamme i 2
+minutter, så høj, 5 minutter i alt (3,22 g). Gruppe 2 gør én ting
+anderledes: varmer kun 2 minutter (3,63 g, mere), vejer diglen varm
+(mindre), høj flamme fra start (sprøjt, mindre), fugtig natron med 0,30 g
+vand (mindre), varmer i 10 minutter (det samme) og soda i stedet for
+natron (mere, passer ikke med nogen hypotese). Kortet siger situationen
+og spørger: "Hvad vejer diglen hos gruppe 2 til sidst, sammenlignet med
+gruppe 1?" med knapperne Mere, Mindre og Det samme som hos gruppe 1.
+Så kører begge forsøg roligt i den samme model som på fane 1 (1,5 sekund
+pr. minut på uret, ca. 12-17 sekunder i alt): diglerne står først på
+vægtene med 5,10 g, flyttes over på trefødderne og varmes, og et skilt
+over hver gruppe viser uret med en bjælke og til sidst slutmassen og
+tabet. Ingen graf (brugerens ønske 29. sept. 2026: der skete for meget).
 Tabellen viser startmasse, slutmasse, tab og den hypotese, massen passer
 med. Forklaringen tager fat i gættet. Et forkert gæt løser opgaven uden
 stjerne. Kør igen gentager.
@@ -127,7 +149,7 @@ js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, 
 js/data.js          atommasserne, stofferne, hypoteserne, prøverne, flammen og opvarmningen, regnetrinene,
                     fejlkilderne og replikkerne
 js/kemi.js          diglen (opvarmning, reaktion, sprøjt, afkøling, hvad vægten viser), facit og de to
-                    gruppers forløb på fane 3
+                    gruppers forløb på fane 3 (vejet før, varmet, kølet af og vejet én gang)
 js/tjek.js          afstemningen, formlen, mellemregningen og tallet i hvert trin, de typiske fejl og de
                     pæne beregninger
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
@@ -139,7 +161,7 @@ js/fane.js          det, fanerne deler: opgavelisten, knappen, linjen i kortet, 
 js/regning.js       regnetrinene i kortet og tavlen på fane 2
 js/sim_forsoeg.js   fane 1 og målingen, som fane 2 bruger
 js/sim_hypoteser.js fane 2
-js/sim_fejl.js      fane 3
+js/sim_fejl.js      fane 3: to opstillinger med et skilt over hver (uret og slutmassen)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, journalen, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -156,7 +178,8 @@ ligger tydeligt på én hundrededel; selvtesten holder øje) står i
 **sprøjtet** `D.SPROEJT`; **den varme digel** `D.OPDRIFT` og `D.FLAKKER`;
 **konstant masse** `D.KONSTANT`. **Regnetrinene** er `D.TRIN` (navn,
 enhed, hints til formlen, mellemregningen og tallet), **opgaverne på fane
-2** `D.HYPOTESER` og **fejlkilderne** `D.FEJL`. **Eksemplet**
+2** `D.HYPOTESER` og **fejlkilderne** `D.FEJL` (tiden på fane 3: `D.FEJL_TID`,
+`D.FEJL_LAV` og `D.FEJL_SKALA`; tempoet står øverst i `js/sim_fejl.js`). **Eksemplet**
 (`D.EKSEMPEL`) er regnet af modellen; ændres modellen, skal det regnes om
 (selvtesten siger til). **Replikkerne** står i `D.INTRO`, `D.FAERDIG`,
 `D.ROS`, `D.KAFFE`, `D.KAGE` og `D.KRUKKE`.
@@ -172,14 +195,18 @@ molarmasserne og andelene, at alle prøver ender på 63,08 % med lav flamme
 først og uden sprøjt, at høj flamme fra start sprøjter, at en varm digel
 vejer for lidt, at 30 minutter mere ikke ændrer noget, at eksemplet er
 regnet af modellen, at de seks fejlkilder går den rigtige vej,
-afstemningen, 29 formler og 18 tal med de typiske fejl, sproget, fane 1
-med musen (gæt, forkert startmasse, træk, knapperne, varm vejning,
-konstant masse) og med Vis svaret hele vejen med sprøjt, fane 2 ved at
-skrive og med hint og svar, dommen, journalen og snydebeviset, fane 3
-med alle seks, Kemichael og layoutet fra 520 × 380 til 1500 × 900. Den
-kræver en lokal server eller Chrome med `--allow-file-access-from-files`
-og lægger elevens gemte fremskridt tilbage bagefter. Sidst kørt 27.
-september 2026: ALT OK (76 påstande).
+at gruppe 1 på fane 3 er færdig efter 5 minutter, at 2 minutter giver
+mindst 0,3 g mere, at det ikke afhænger af skridtene, afstemningen, 29
+formler og 18 tal med de typiske fejl, sproget, fane 1 med musen (gæt,
+ingen opgaveliste, trinnene, forkert startmasse, træk, knapperne, varm
+vejning, ændringen i skemaet, konstant masse) og med Vis svaret hele
+vejen med sprøjt, fane 2 med startmassen fra en digel, der ikke er
+færdig, dommen, der venter, ved at skrive og med hint og svar, dommen,
+journalen og snydebeviset, fane 3 uden graf med spørgsmålet, alle seks,
+uret og tempoet, Kemichael og layoutet (også skiltene på fane 3) fra
+520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
+`--allow-file-access-from-files` og lægger elevens gemte fremskridt
+tilbage bagefter. Sidst kørt 29. september 2026: ALT OK (89 påstande).
 
 ## Forenklinger
 
@@ -204,6 +231,10 @@ september 2026: ALT OK (76 påstande).
 * Aflæste masser har to decimaler; regnede stofmængder og masser tre
   betydende cifre, og hvert trin regnes videre med det afrundede tal, som
   eleven gør. Et tal er rigtigt, når det højst er 1 % fra facit.
+* Fane 3's ur er trykket mere sammen end fane 1's: 1 minut på uret er 4
+  minutter i modellen, så gruppe 1 er færdig efter 5 minutter, og 2
+  minutter er tydeligt for lidt. Fane 1 bruger 1 minut pr. sekund og
+  modellens egne minutter.
 * Dampen over diglen er pynt: CO₂ er usynlig, og vanddampen ses kun, hvor
   den bliver kølet.
 

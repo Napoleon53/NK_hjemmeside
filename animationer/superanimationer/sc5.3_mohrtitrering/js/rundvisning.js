@@ -24,7 +24,7 @@
             { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Buretten ved menisken. Aflæs bunden af menisken." },
             { sel: "#tit-kurvekort", titel: "Kurverne", tekst: "Hvor meget Cl⁻, AgCl og Ag₂CrO₄ der er i kolben, mens der løber sølvnitrat ned." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionen, indikatoren og beregningen kort forklaret." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra forbruget til masseprocenten. To kolber: hvad ændrer resultatet?" }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra forbruget til masseprocenten. Fejlkilder: hvad ændrer forbruget og masseprocenten?" }
         ],
         "fane-beregning": [
             { sel: "#ber-data", titel: "Målingen", tekst: "Din aflæsning fra titreringen, eller en klassekammerats." },
@@ -34,8 +34,8 @@
         "fane-forbrug": [
             { sel: "#for-anker-a", titel: "Kolbe A", tekst: "Som på fane 1: 1,00 g havvand fra Vesterhavet, 20 mL demineraliseret vand og 0,050 M sølvnitrat." },
             { sel: "#for-anker-b", titel: "Kolbe B", tekst: "Én ting er ændret. Skiltet på bordet siger hvad." },
-            { sel: "#for-kort", titel: "Dit gæt", tekst: "Gæt først. Så titreres begge kolber til omslaget." },
-            { sel: "#for-tabelkort", titel: "Kolberne", tekst: "Hvor mange mL sølvnitrat der gik til, og den masseprocent, man ville regne ud." }
+            { sel: "#for-kort", titel: "Dit svar", tekst: "Vælg et svar. Så titreres begge kolber til omslaget." },
+            { sel: "#for-tabelkort", titel: "Kolberne", tekst: "Forbruget af sølvnitrat og den beregnede masseprocent for begge kolber." }
         ]
     };
 

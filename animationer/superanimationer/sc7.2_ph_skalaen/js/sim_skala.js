@@ -1,7 +1,7 @@
 /* =====================================================================
    sim_skala.js - fane 1: skalaen
 
-   pH-skalaen fra 0 til 14 i universalindikatorens farver. Paa bordet
+   pH-skalaen fra −1 til 15 i universalindikatorens farver. Paa bordet
    staar seks hverdagsstoffer. Eleven traekker et stof op paa skalaen, der
    hvor det tror, stoffet hoerer til. Saa maaler pH-metret det, og stoffet
    flyver hen til sin rigtige plads over skalaen. Gaettet staar som en
@@ -196,7 +196,7 @@
     /* ----- Maalingen ---------------------------------------------------------------------- */
     /* Eleven har sluppet stoffet over skalaen ved gaet */
     P.gaet = function (s, gaet, fra) {
-        s.gaet = Math.round(NK.klamp(gaet, 0, 14) * 10) / 10;
+        s.gaet = Math.round(NK.klamp(gaet, K.PH_MIN, K.PH_MAKS) * 10) / 10;
         s.status = "tilMaaler";
         s.fra = { x: fra.x, y: fra.y, h: fra.h };
         s.t = 0;

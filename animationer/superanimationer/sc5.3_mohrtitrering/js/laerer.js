@@ -1,5 +1,5 @@
 /* =====================================================================
-   laerer.js - Kemichael ved titreringen, tavlen og de to kolber (som sc7.4)
+   laerer.js - Kemichael ved titreringen, tavlen og fejlkilderne (som sc7.4)
 
    Selve figuren (gang, arm, ansigt, tale, kaffen og klik paa ham) staar
    i ../../v2/kemichael/kemichael.js, som er faelles og ikke rettes her.
@@ -248,7 +248,7 @@
         }
     });
 
-    /* ----- Fane 3: forbruget -------------------------------------------------------------- */
+    /* ----- Fane 3: fejlkilder ------------------------------------------------------------- */
     var PF = NK.SimForbrug.prototype;
     PF.springId = "for-spring";
     PF.introLinjer = function () { return D.INTRO_FORBRUG; };

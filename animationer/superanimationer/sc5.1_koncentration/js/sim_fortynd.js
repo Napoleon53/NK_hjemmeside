@@ -1,13 +1,16 @@
 /* =====================================================================
-   sim_fortynd.js - fane 3: fortynding
+   sim_fortynd.js - fane 4: fortynding
 
    Flasken har 1,00 M kobber(II)sulfat. Foerste opgave goer eleven selv:
    klik paa en pipette (den tager sit rumfang op fra flasken), klik paa
    en maalekolbe (pipetten toemmes i den) og klik paa sproejteflasken
    (kolben fyldes op til maerket). Maalet er en opløsning, der er ti
-   gange tyndere. De andre fire opgaver regnes med formlen foerst, og
-   scenen goer det, eleven har regnet. Luppen over flasken og luppen
-   over kolben viser de samme ioner fordelt i mere vand.
+   gange tyndere. De andre fire opgaver regnes som regnestykker (formlen
+   i felter, tallene med enheder og resultatet), og scenen goer det,
+   eleven har regnet. Luppen over flasken og luppen over kolben viser de
+   samme ioner fordelt i mere vand. Foer og efter skrives med saenket
+   skrift: c_før, V_før, c_efter og V_efter (brugerens oenske 29. sept.
+   2026).
    ===================================================================== */
 (function () {
     "use strict";
@@ -41,7 +44,7 @@
     /* ----- Opgaven -------------------------------------------------------------------- */
     P.lavOpgave = function (i, nyeTal) {
         var spec = D.FORTYND[i];
-        var o = { id: spec.id, fane: 3, titel: spec.titel, slags: spec.slags, tekst: spec.tekst, trin: spec.trin || [], glas: !!spec.glas };
+        var o = { id: spec.id, fane: 4, titel: spec.titel, slags: spec.slags, tekst: spec.tekst, trin: spec.trin || [], glas: !!spec.glas };
         if (spec.tal) {
             var tal = nyeTal ? this.traek(spec.tal, this.sidstTal[spec.id]) : (this.sidstTal[spec.id] || spec.tal[0]);
             this.sidstTal[spec.id] = tal;
@@ -81,11 +84,11 @@
         var o = this.opg, t = o.tal;
         switch (o.id) {
         case "c2":
-        case "formel": return ["c₁ = 1,00 M", "V₁ = " + K.mL(t.V1) + " mL", "V₂ = " + K.mL(t.V2) + " mL"];
-        case "V1": return ["c₁ = 1,00 M", "c₂ = " + K.c(t.c2) + " M", "V₂ = " + K.mL(t.V2) + " mL"];
-        case "vand": return ["V₁ = " + K.mL(t.V1) + " mL", "c₁ = " + K.c(t.c1) + " M", "c₂ = " + K.c(t.c2) + " M"];
+        case "formel": return ["c_før = 1,00 M", "V_før = " + K.mL(t.V1) + " mL", "V_efter = " + K.mL(t.V2) + " mL"];
+        case "V1": return ["c_før = 1,00 M", "c_efter = " + K.c(t.c2) + " M", "V_efter = " + K.mL(t.V2) + " mL"];
+        case "vand": return ["V_før = " + K.mL(t.V1) + " mL", "c_før = " + K.c(t.c1) + " M", "c_efter = " + K.c(t.c2) + " M"];
         }
-        return ["c₁ = 1,00 M"];
+        return ["c_før = 1,00 M"];
     };
 
     /* ----- Hint, svar og linjen ------------------------------------------------------------ */
@@ -279,10 +282,10 @@
     P.vurder = function (j) {
         var s = this.s, k = s.kolber[j], c = cKolbe(k), o = this.opg;
         var n = k.n, V2 = k.V;
-        var regn = "n = " + K.mol(n) + " mol, og c₂ = " + K.mol(n) + " mol / " + K.L(V2) + " L = " + K.c(c) + " M.";
+        var regn = "n = " + K.mol(n) + " mol, og c_efter = " + K.mol(n) + " mol / " + K.L(V2) + " L = " + K.c(c) + " M.";
         if (Math.abs(c - o.maal) < 0.0005) {
             this.goerFaerdig = true;
-            this.forklaring = NK.html(regn + " Stoffet fra pipetten fordeler sig i ti gange så meget væske.");
+            this.forklaring = NK.sub(regn + " Stoffet fra pipetten fordeler sig i ti gange så meget væske.");
             this.trinLoest(this.maade, this.maade === "svar" ?
                 NK.html("25 mL i en 250 mL kolbe. 10 mL i 100 mL og 50 mL i 500 mL giver det samme.") : null);
             this.visKort();
@@ -444,14 +447,17 @@
         var moerk = "#1f2530", lille = Tg.font("700", NK.klamp(f * 0.72, 12, 14));
         NK.tekst(ctx, "FORTYNDINGEN", x, y, { font: lille, linje: "middle", farve: "#6a7280" });
         y += lh * 0.9;
-        NK.tekst(ctx, "c₁ = 1,00 M i flasken. Målet: c₂ = 0,100 M.", x, y, { font: Tg.font("600", f), linje: "middle", farve: moerk });
+        var t0 = "c_før = 1,00 M i flasken. Målet: c_efter = 0,100 M.", px0 = f;
+        while (px0 > 12 && Tg.rigBredde(ctx, t0, Tg.font("600", px0), px0) > r.b - f * 2.2) px0 -= 0.5;
+        Tg.rig(ctx, t0, x, y, { font: Tg.font("600", px0), px: px0, farve: moerk });
         y += lh;
         var brugt = s.kolber.filter(function (k) { return k.mL > 0; });
         brugt.forEach(function (k) {
-            var t = "V₂ = " + K.mL(k.V) + " mL: n = " + K.mol(k.n) + " mol";
-            if (k.op) t += ", c₂ = " + K.c(cKolbe(k)) + " M";
-            NK.passendeSkrift(ctx, t, r.b - f * 2.2, f, 12, "600");
-            NK.tekst(ctx, t, x, y, { font: ctx.font, linje: "middle", farve: k.op && Math.abs(cKolbe(k) - 0.1) < 0.0005 ? "#1d7a48" : moerk });
+            var t = "V_efter = " + K.mL(k.V) + " mL: n = " + K.mol(k.n) + " mol";
+            if (k.op) t += ", c_efter = " + K.c(cKolbe(k)) + " M";
+            var px = f;
+            while (px > 12 && Tg.rigBredde(ctx, t, Tg.font("600", px), px) > r.b - f * 2.2) px -= 0.5;
+            Tg.rig(ctx, t, x, y, { font: Tg.font("600", px), px: px, farve: k.op && Math.abs(cKolbe(k) - 0.1) < 0.0005 ? "#1d7a48" : moerk });
             y += lh;
         });
     };

@@ -79,11 +79,19 @@
     P.harNyeTal = function () { return false; };
     P.harForfra = function () { return false; };
 
-    /* Fane 1 har en ny maaling: stregerne regnes om, og er opgaven ikke
-       begyndt, bruges tallene med det samme */
+    /* Fane 1 har en ny maaling, eller eleven kommer tilbage fra fane 1:
+       stregerne regnes om. Har diglen en anden startmasse end den, opgaven
+       er regnet paa, begynder opgaven forfra med de nye tal; saa staar der
+       aldrig to forskellige digler paa fanen. */
     P.nyMaaling = function () {
+        var m = NK.maaling(), gl = this.maal;
         this.opdaterForventet();
-        if (this.opg && !this.faerdig && (this.opg.dom || this.regning.k === 0)) this.vaelg(this.nr, false);
+        if (!this.opg) return;
+        var nyeTal = !!gl && (gl.mf !== m.mf || gl.egen !== m.egen);
+        if (!this.faerdig && (this.opg.dom || nyeTal || this.regning.k === 0)) {
+            this.vaelg(this.nr, false);
+            if (nyeTal && m.egen && this.harVist) this.naesteLinje("Tallene er nu fra din digel: " + K.g2(m.mf) + " g natron.", "");
+        } else this.maal = m;
     };
 
     P.promptHTML = function () {
@@ -94,7 +102,7 @@
         else {
             var mangler = this.mangler();
             s = mangler.length ? "Regn først " + mangler.map(function (h) { return "hypotese " + h; }).join(", ").replace(/, ([^,]*)$/, " og $1") + ". Så kan du sammenligne." :
-                D.DOM.spm;
+                (m.faerdig ? D.DOM.spm : D.DOM.ikkeKonstant);
         }
         return '<p class="maal-tekst">' + NK.html(s) + "</p>" + note;
     };
@@ -108,7 +116,7 @@
     P.visKortEkstra = function () {
         var o = this.opg, mig = this, e = this.el.valg;
         if (!o.dom) { e.hidden = true; e.innerHTML = ""; return; }
-        var klar = !this.mangler().length;
+        var klar = !this.mangler().length && this.maal.faerdig;
         e.hidden = !klar;
         e.innerHTML = "";
         if (!klar) return;
@@ -185,6 +193,8 @@
             return { hint: NK.html("Hypotese " + mangler[0] + " står i listen over opgaverne herunder."),
                      svar: function () { mig.vaelg(i, false); } };
         }
+        /* Massen er ikke konstant endnu: svaret er at gaa tilbage og varme */
+        if (!this.maal.faerdig) return { hint: NK.html(D.DOM.konstantHint), svar: function () { if (NK.visFane) NK.visFane("fane-forsoeg"); } };
         return { hint: NK.html(D.DOM.hint), svar: function () { mig.doem(mig.rigtigDom(), "svar"); } };
     };
 
@@ -192,7 +202,8 @@
         var o = this.opg;
         if (!o.dom) return trinLinjeRegning.call(this);
         if (this.faerdig) return "";
-        return this.mangler().length ? "Vælg den hypotese, der mangler, i listen herunder." : "Vælg den hypotese, der passer med din måling.";
+        if (this.mangler().length) return "Vælg den hypotese, der mangler, i listen herunder.";
+        return this.maal.faerdig ? "Vælg den hypotese, der passer med din måling." : "Gå til fanen Forsøget, og varm videre.";
     };
 
     P.opgaveFaerdig = function () {
@@ -318,8 +329,9 @@
         var x = r.x + f * 1.1, y = r.y + f * 1.3, lh = f * 1.9, b = r.b - f * 2.2;
         Tg.etiket(ctx, m.egen ? "Din digel" : "Eksemplets digel", x, y, NK.klamp(f * 0.72, 12, 14));
         y += lh * 0.7;
-        NK.passendeSkrift(ctx, "Før: " + K.g2(m.mf) + " g     Til sidst: " + K.g2(m.slut) + " g", b, f * 1.05, 12, "700");
-        NK.tekst(ctx, "Før: " + K.g2(m.mf) + " g     Til sidst: " + K.g2(m.slut) + " g", x, y, { font: ctx.font, linje: "middle", farve: "#1f2530" });
+        var foerTekst = "Før: " + K.g2(m.mf) + " g     Til sidst: " + (m.faerdig ? K.g2(m.slut) + " g" : "ikke konstant endnu");
+        NK.passendeSkrift(ctx, foerTekst, b, f * 1.05, 12, "700");
+        NK.tekst(ctx, foerTekst, x, y, { font: ctx.font, linje: "middle", farve: "#1f2530" });
         y += lh * 0.95;
         Tg.etiket(ctx, "Hypoteserne", x, y, NK.klamp(f * 0.72, 12, 14));
         y += lh * 0.7;
@@ -353,6 +365,7 @@
     P.tegn = function () {
         var ctx = this.L.ctx, lay = this.lay, o = this.opg;
         if (!lay || !o) return;
+        this.harVist = true;
         this.L.ryd();
         Tg.rum(ctx, lay.W, lay.Hs, lay.bordY + 12);
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.Hs);

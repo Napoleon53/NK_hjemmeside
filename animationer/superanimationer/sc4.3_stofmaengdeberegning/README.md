@@ -42,6 +42,17 @@ var for uklar). Vægten tvinger mellemregningen igennem med rigtige
 brøkstreger, og hintene er rettet mod opgaven og giver tit halvdelen af
 svaret. Hurtigrunden siger "tidsstraf" uden tal.
 
+Rettet efter brugerens test 29. sept. 2026: det skal være tydeligt, når en
+opgave eller en del er rigtig. En løst opgave er grøn i listen (✓ i cirklen,
+★ hvis den er løst uden Vis svaret), og kortets overskrift får "✓ Løst".
+Kemichael siger en kort ros, når en del er rigtig ("Rigtig formel. Godt."),
+og linjen i kortet siger det samme foran næste skridt. På Formlen får en
+rigtig del en grøn ramme med ✓ på tavlen. På Vægten forvirrede "skriv
+formlen" under "Hvor mange mol er det?": nu står de tre trin (Formlen ›
+Tallene ind › Resultatet) over regnestykket med det aktuelle i gult, linjen
+siger "Trin 1: Skriv formlen for n(NaCl) med bogstaver. Tallene kommer i
+trin 2.", og panelet er bredere med større felter.
+
 ## Hvad den viser
 
 | # | Fane | Hvad man gør | Pointe |
@@ -75,17 +86,27 @@ Formlen tjekkes som helhed og får en besked med enhederne: "Brøken er vendt
 om. Enhederne giver (g/mol) / g = 1/mol, men stofmængden er i mol." Det, der
 sidder rigtigt, låses; resten hopper tilbage. Mens en brik holdes, lyser de
 pladser op, den kan komme på. I introduktionen viser en pil den første brik.
+En del, der er rigtig, får en grøn ramme med ✓ på tavlen (en del, der er
+vist med Vis svaret, en gul ramme uden ✓).
 
 **Vægten.** De seks opgaver: find n af 116,88 g natriumchlorid, find n af
 kridt (CaCO₃), find m af natron (NaHCO₃), find m af kobber(II)sulfat, find M
 af et pulver uden etiket (KCl, NaOH, Na₂CO₃ eller KNO₃, etiketten kommer frem
 til sidst) og Mesteren: hvor mange gram glukose er den samme stofmængde som
-et antal gram natriumchlorid. Hvert trin er et regnestykke i kortet, der
-vokser nedad med lighedstegnene ud for hinanden:
+et antal gram natriumchlorid (to dele: først stofmængden, så massen). Hvert
+regnestykke står i kortet og vokser nedad med lighedstegnene ud for
+hinanden, i tre trin:
 
-    n(NaCl) = m/M                     formlen, skrevet med bogstaver
-            = 116,88 g/58,44 g/mol    mellemregningen: to felter i en brøk
-            = 2,00 mol                resultatet med enhed
+    n(NaCl) = m/M                     trin 1: formlen, skrevet med bogstaver
+            = 116,88 g/58,44 g/mol    trin 2: tallene ind, to felter i en brøk
+            = 2,00 mol                trin 3: resultatet med enhed
+
+Over regnestykket står de tre trin som en linje (Formlen › Tallene ind ›
+Resultatet): det, eleven er ved, er gult, de færdige grønne med ✓ (gule med
+↩, hvis de er vist). En rigtig linje får ✓ og lyser kort grønt op. Linjen
+i kortet siger trinnet: "Trin 1: Skriv formlen for n(NaCl) med bogstaver.
+Tallene kommer i trin 2." Panelet er bredere på Vægten (540 px, 470 px under
+1320 px, 420 px under 1100 px), og felterne har større skrift.
 
 Formlen og brøkerne vises med rigtige brøkstreger, og mellemregningen har
 et felt over og et under brøkstregen (eller to felter med et gangetegn ved
@@ -120,8 +141,11 @@ Den bedste tid huskes i browseren.
 
 **Kemichael ved katederet.** Som i sc4.5 og sc5.1: han sidder stille nederst
 til venstre og siger kun noget ved Giv hint (til trinnet er løst) og Vis
-svaret. Knappen Send Kemichael ud sender ham på lærerværelset; så står
-hintene i opgavekortet. <kbd>K</kbd> får ham til at sige, hvor man er.
+svaret. Når en del er rigtig (formlen, navnene, enhederne, mellemregningen,
+resultatet), siger han en kort ros, som selv går igen efter godt 3 s
+(`D.ROS_K`, brugerens ønske 29. sept. 2026). Knappen Send Kemichael ud
+sender ham på lærerværelset; så står hintene i opgavekortet. <kbd>K</kbd>
+får ham til at sige, hvor man er.
 
 **Påskeæg:** to hurtige klik på mol-brikken (opgave 3), eller "muldvarp" som
 enhed i opgave 6, får en muldvarp op af bunken. På engelsk hedder begge en
@@ -176,7 +200,9 @@ tal, en opgave kan have (det første bruges først; Nye tal trækker et andet).
 rigtige svar først og en forklaring til hvert forkert; tallene til
 hovedregning i `D.HURTIG_TAL`; hvor mange af hver slags i `D.RUNDE`; straffen
 i `D.STRAF` og `D.STRAF_HINT`. **Replikkerne** står i `D.INTRO`, `D.FAERDIG`, `D.ROS`,
-`D.ROS_OPGAVE`, `D.KAFFE` og `D.TREKANT`.
+`D.ROS_OPGAVE`, `D.KAFFE` og `D.TREKANT`; rosen, når en del er rigtig, i
+`D.ROS_K` og linjen i kortet i `D.DEL_OK`. De tre trin over regnestykket står
+i `D.TRINBAR`.
 
 **Formlernes typiske fejl** står i `KENDTE` i `js/tjek.js`, **talfejlene** i
 `kandidater`.
@@ -191,10 +217,12 @@ seks opgaver på Formlen kan løses med musen (træk og klik, med fejl, låste
 brikker, hint, trekanten og muldvarpen), og at teksten står over tavlen, at mellemregningens felter genkender tallene med de typiske fejl, at alle seks opgaver på Vægten kan
 løses ved at skrive, og at scenen gør det, der er regnet, at en hel
 Hurtigrunde kan køres med en fejl, der kommer igen, at Kemichael kun taler
-ved hint og svar og kan sendes ud, og at layoutet holder fra 520 × 380 til
+ved hint og svar, roser kort, når en del er rigtig, og kan sendes ud, at
+en løst opgave er grøn i listen, at Vægten har linjen med de tre trin, et
+bredere panel og større felter, og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 27. september 2026: ALT OK (133 påstande).
+bagefter. Sidst kørt 29. september 2026: ALT OK (150 påstande).
 
 ## Forenklinger
 

@@ -95,7 +95,7 @@
         this.laast = false;
         this.laasT = 0;
         var f = this.facit();
-        var ord = { v: "venstre side synker", h: "højre side synker", l: "den står lige" };
+        var ord = { v: "venstre skål synker", h: "højre skål synker", l: "vægten står lige" };
         var start = this.visteSvar ? "Svaret: " + ord[f] + "." : (rigtigt ? "Rigtigt, " + ord[f] + "." : "Nej, " + ord[f] + ".");
         this.besked("<b>" + start + "</b> " + NK.html(this.par.hvorfor), this.visteSvar ? "gul" : (rigtigt ? "god" : "skidt"));
         if (this.nr === this.runde.length - 1) this.afslut();
@@ -126,7 +126,7 @@
         }
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.besked("<b>Hint:</b> Atommasserne står nu i beregningerne på skiltet. Regn dem ud for begge sider.", "gul");
+            this.besked("<b>Hint:</b> Skiltet viser nu atommasserne. Regn massen af 1 mol ud for begge stoffer. Det tungeste stof synker.", "gul");
             this.visPanel();
         } else {
             this.visteSvar = true;
@@ -185,7 +185,7 @@
             NK.saetHTML("skaal-status", NK.html("1 mol " + this.par.v.tekst + " vejer " + NK.komma(this.par.v.M) + " g, og 1 mol " +
                 this.par.h.tekst + " vejer " + NK.komma(this.par.h.M) + " g."));
         } else {
-            NK.saetHTML("skaal-status", "Hvilken side synker, når låsen slippes? Svar til højre, eller brug piletasterne.");
+            NK.saetHTML("skaal-status", "Svar med knapperne i panelet: Venstre, Står lige eller Højre. Piletasterne virker også.");
         }
     };
 

@@ -5,10 +5,12 @@
    er nulstillet med pladen. Maaling 1 starter med et gratis gaet: tre
    kort med billeder oven paa scenen (Lettere, Det samme, Tungere).
    Kemichael introducerer gaettet fra sit hjoerne og tier, naar det er
-   valgt. Saa aflaeser eleven m(før), taender stålulden med batteriet
-   (traek det hen, eller klik paa det), venter, til vaegten staar stille
-   (iltflasken goer det hurtigere), og aflaeser m(efter). Tallene
-   skriver eleven selv i skemaet i panelet.
+   valgt. Saa aflaeser eleven m(før), taender stålulden med
+   bunsenbraenderen, der holdes vandret (traek den hen, eller klik paa
+   den), venter, til vaegten staar stille, og aflaeser m(efter). Uden ilt
+   fra flasken gaar stålulden ud, foer alt jernet har reageret; klik paa
+   flasken, mens den gloeder, holder den i live. Tallene skriver eleven
+   selv i skemaet i panelet.
 
    Luppen viser overfladen af en ståltraad: O₂ fra luften saetter sig
    paa jernatomerne, og den inderste raekke naar ikke at reagere.
@@ -113,7 +115,7 @@
         this.uld = new Tg.Uld(nr, m);
         this.lup = new Tg.LupJern(nr + 3);
         this.gnister = new Tg.Gnister(nr + 5);
-        this.bat = { x: null, y: null, v: 0, holdt: null, flyv: null };
+        this.brn = { x: null, y: null, v: 0, holdt: null, flyv: null };
         this.noteret = { mf: null, me: null };
         this.hurtig = false;
         this.auto = null;
@@ -261,7 +263,7 @@
             this.noterFoer();
         } else if (f === "taend") {
             this.svarVis(NK.html(D.SVAR.taend));
-            this.flyvBatteri();
+            this.flyvBraender();
         } else if (f === "vent") {
             this.hurtig = true;
             this.svarVis(NK.html(D.SVAR.vent));
@@ -378,6 +380,7 @@
         if (s) dele.push(s.ok ? "Dit gæt holdt." : "Du gættede: " + s.t.toLowerCase() + ".");
         dele.push("Stålulden tog " + K.g2(K.r2(this.noteret.me - this.noteret.mf)) + " g på.");
         dele.push(s && !s.ok ? s.forkl : o.efter);
+        if (this.klump.ude) dele.push(this.klump.brugtIlt ? "Den gik ud, før alt jernet havde reageret." : D.UDEN_ILT);
         this.forklaring = NK.html(dele.join(" "));
         this.sidsteFase = "faerdig";
         this.trinLoest(maade, maade === "svar" ? NK.html(D.SVAR.efter.replace("{m}", K.g2(this.noteret.me))) : null);
@@ -390,34 +393,47 @@
         this.kortBesked("Gæt først: klik på et af de tre billeder.");
     };
 
-    /* ----- Batteriet: traek det hen til ulden, eller klik paa det ---------------------- */
-    P.batHjem = function () {
-        var b = this.lay.bat;
+    /* ----- Bunsenbraenderen: traek den hen, saa flammen roerer ulden, eller klik paa den --
+       Den holdes vandret med flammen mod hoejre (brugerens oenske 28. sept.
+       2026). Roerer flammespidsen ulden, gaar den i brand. */
+    P.brnHjem = function () {
+        var b = this.lay.brn;
         return { x: b.x, y: b.y, v: 0 };
     };
 
-    P.batPos = function () {
-        if (this.bat.x === null) { var h = this.batHjem(); this.bat.x = h.x; this.bat.y = h.y; }
-        return this.bat;
+    P.brnPos = function () {
+        if (this.brn.x === null) { var h = this.brnHjem(); this.brn.x = h.x; this.brn.y = h.y; }
+        return this.brn;
     };
 
-    /* Kontaktpunktet paa ulden, hvor batteriet roerer ved et klik */
+    /* Punktet paa ulden, flammen roerer ved et klik: venstre side */
     P.uldKontakt = function () {
         var u = this.lay.uld;
-        return { x: u.cx - u.rx * 0.45, y: u.cy - u.ry * 0.62 };
+        return { x: u.cx - u.rx * 0.7, y: u.cy - u.ry * 0.1 };
     };
 
-    /* Batteriet flyver selv hen til ulden, taender den og flyver hjem */
-    P.flyvBatteri = function () {
-        if (this.bat.flyv || this.klump.taendt) return;
-        var b = this.batPos(), h = this.lay.bat.h, k = this.uldKontakt();
-        var dy = (NK.Sprites.MAAL.batteri.h / 2 - NK.Sprites.MAAL.batteri.pol) * h / NK.Sprites.MAAL.batteri.h;
-        this.bat.flyv = { t: 0, fra: { x: b.x, y: b.y, v: b.v }, til: { x: k.x, y: k.y - dy, v: Math.PI }, slags: "hen" };
+    /* Flammespidsen, som braenderen holdes nu */
+    P.spids = function () {
+        var b = this.brnPos();
+        return Tg.bunsenSpids(b.x, b.y, this.lay.brn.h, b.v);
     };
 
-    P.batteriHjem = function () {
-        var b = this.batPos(), hj = this.batHjem();
-        this.bat.flyv = { t: 0, fra: { x: b.x, y: b.y, v: b.v }, til: hj, slags: "hjem" };
+    /* Grebet, naar braenderen holdes vandret med flammespidsen i punktet */
+    P.grebFor = function (pt) {
+        var v = Math.PI / 2, s = Tg.bunsenSpids(0, 0, this.lay.brn.h, v);
+        return { x: pt.x - s.x, y: pt.y - s.y, v: v };
+    };
+
+    /* Braenderen flyver selv hen til ulden, taender den og flyver hjem */
+    P.flyvBraender = function () {
+        if (this.brn.flyv || this.klump.taendt) return;
+        var b = this.brnPos();
+        this.brn.flyv = { t: 0, fra: { x: b.x, y: b.y, v: b.v }, til: this.grebFor(this.uldKontakt()), slags: "hen" };
+    };
+
+    P.braenderHjem = function () {
+        var b = this.brnPos();
+        this.brn.flyv = { t: 0, fra: { x: b.x, y: b.y, v: b.v }, til: this.brnHjem(), slags: "hjem" };
     };
 
     P.taend = function (pt) {
@@ -440,31 +456,32 @@
         return dx * dx + dy * dy <= 1;
     };
 
-    P.opdaterBatteri = function (dt) {
-        var b = this.batPos(), f = b.flyv;
+    P.opdaterBraender = function (dt) {
+        var b = this.brnPos(), f = b.flyv;
         if (f) {
-            f.t += dt / (f.slags === "vent" ? 0.35 : 0.65);
+            f.t += dt / (f.slags === "vent" ? 0.6 : 0.7);
             var u = NK.blod(Math.min(1, f.t));
             if (f.slags !== "vent") {
                 b.x = NK.lerp(f.fra.x, f.til.x, u);
-                b.y = NK.lerp(f.fra.y, f.til.y, u) - Math.sin(u * Math.PI) * 40;
+                b.y = NK.lerp(f.fra.y, f.til.y, u) - Math.sin(u * Math.PI) * 30;
                 b.v = NK.lerp(f.fra.v, f.til.v, u);
             }
             if (f.t >= 1) {
                 if (f.slags === "hen") {
-                    this.taend(Tg.batteriKontakt(b.x, b.y, this.lay.bat.h, b.v));
+                    this.taend(this.spids());
                     b.flyv = { t: 0, slags: "vent" };
                 } else if (f.slags === "vent") {
-                    this.batteriHjem();
+                    this.braenderHjem();
                 } else {
                     b.flyv = null;
                 }
             }
         } else if (b.holdt) {
-            /* Mens det holdes, vender polerne nedad */
-            if (b.holdt.trukket) b.v = NK.mod(b.v, Math.PI, 8, dt);
+            /* Mens den holdes, vendes den vandret, og roerer flammen ulden, gaar den i brand */
+            if (b.holdt.trukket) b.v = NK.mod(b.v, Math.PI / 2, 8, dt);
+            if (!this.klump.taendt && b.v > 1.0 && this.paaUld(this.spids(), 1.0)) this.taend(this.spids());
         } else if (this.lay) {
-            var h = this.batHjem();
+            var h = this.brnHjem();
             b.x = h.x; b.y = h.y; b.v = 0;
         }
     };
@@ -473,10 +490,8 @@
     P.hvad = function (pt) {
         var lay = this.lay;
         if (!lay || !pt) return null;
-        var b = this.batPos(), bh = lay.bat.h, bb = lay.bat.b;
-        var rb = Math.max(bh, bb) * 0.55;
-        if (Math.abs(pt.x - b.x) <= (Math.abs(Math.sin(b.v)) > 0.5 ? rb : bb * 0.7) &&
-            Math.abs(pt.y - b.y) <= (Math.abs(Math.sin(b.v)) > 0.5 ? bb * 0.7 : bh * 0.55)) return "batteri";
+        var b = this.brnPos();
+        if (Tg.bunsenRamt(b.x, b.y, lay.brn.h, b.v, pt)) return "braender";
         var fl = lay.flGeo;
         if (fl && pt.x >= fl.x0 - 4 && pt.x <= fl.x0 + fl.b + 4 && pt.y >= fl.y0 && pt.y <= lay.bordY) return "flaske";
         if (lay.dyse && Math.hypot(pt.x - lay.dyse.x - 6, pt.y - lay.dyse.y) < 12) return "flaske";
@@ -497,39 +512,46 @@
 
     P.nedScene = function (pt) {
         var u = this.hvad(pt), k = this.klump;
-        if (u === "batteri") {
+        if (u === "braender") {
             if (this.faerdig) { this.kortBesked(this.gemtVist ? "Målingen er færdig. Tryk på Start forfra for at måle igen." : "Målingen er færdig."); return false; }
             if (this.fase() === "valg") { this.blokValg(); return false; }
-            if (k.taendt) { this.kortBesked(k.braender() ? "Stålulden brænder allerede." : "Stålulden er brændt. Tryk på Start forfra for en ny klump."); return false; }
-            if (this.bat.flyv) return false;
-            var b = this.batPos();
+            if (k.taendt) {
+                this.kortBesked(k.braender() ? "Stålulden gløder allerede." : (k.ude ?
+                    "Stålulden er gået ud og kan ikke tændes igen. Tryk på Start forfra for en ny klump, og brug iltflasken, mens den gløder." :
+                    "Stålulden er brændt færdig. Tryk på Start forfra for en ny klump."));
+                return false;
+            }
+            if (this.brn.flyv) return false;
+            var b = this.brnPos();
             b.holdt = { sx: pt.x, sy: pt.y, dx: b.x - pt.x, dy: b.y - pt.y, trukket: false };
             return true;
         }
         if (u === "flaske") {
             if (k.braender()) {
                 k.givIlt();
-                this.kortBesked("Ren ilt fra flasken. Stålulden brænder hurtigere.", 2.5);
+                this.kortBesked("Ren ilt fra flasken. Stålulden gløder kraftigere.", 2.5);
+            } else if (k.ude) {
+                this.kortBesked("Stålulden er gået ud. Ilten skal på, mens den gløder.");
             } else if (k.taendt) {
-                this.kortBesked("Stålulden er brændt. Der er ikke mere jern, ilten kan nå.");
+                this.kortBesked("Alt det jern, ilten kan nå, har reageret.");
             } else {
-                this.kortBesked("Iltflasken giver ren ilt. Brug den, når stålulden brænder.");
+                this.kortBesked("Iltflasken giver ren ilt. Brug den, når stålulden gløder.");
             }
             return false;
         }
         if (u === "stjerne") {
+            /* Den samme linje hver gang (brugerens oenske 28. sept. 2026) */
             this.stjerneT = 4;
-            this.stjerneNr = ((this.stjerneNr === undefined ? -1 : this.stjerneNr) + 1) % D.STJERNE.length;
-            var t = D.STJERNE[this.stjerneNr];
-            if (this.k.inde()) this.k.svar(NK.html(t), "", 4.5);
-            else this.kortBesked(t);
+            if (this.k.inde()) this.k.svar(NK.html(D.STJERNE), "", 4.5);
+            else this.kortBesked(D.STJERNE);
             return false;
         }
         if (u === "uld") {
             if (this.fase() === "valg") { this.blokValg(); return false; }
-            this.kortBesked(!k.taendt ? "Ståluld er tynde tråde af jern. Tænd den med batteriet." :
+            this.kortBesked(!k.taendt ? "Ståluld er tynde tråde af jern. Tænd den med bunsenbrænderen." :
                 (k.braender() ? "Stålulden gløder. Jernet reagerer med ilten i luften." :
-                    "Stålulden er blevet sort. Jernet er blevet til jernoxid."));
+                    (k.ude ? "Stålulden er gået ud. De grå tråde nåede ikke at reagere." :
+                        "Stålulden er blevet sort. Jernet er blevet til jernoxid.")));
         }
         if (u === "vaegt") this.kortBesked("Vægten er nulstillet med den varmefaste plade. Den viser kun stålulden.");
         if (u === "zoom") this.kortBesked("Luppen viser overfladen af en ståltråd. Ilten sætter sig på jernatomerne. Nitrogen i luften reagerer ikke.");
@@ -537,7 +559,7 @@
     };
 
     P.flytScene = function (pt) {
-        var b = this.bat, h = b.holdt;
+        var b = this.brn, h = b.holdt;
         if (!h) return;
         b.x = pt.x + h.dx;
         b.y = pt.y + h.dy;
@@ -545,18 +567,20 @@
     };
 
     P.opScene = function () {
-        var b = this.bat, h = b.holdt;
+        var b = this.brn, h = b.holdt;
         if (!h) return;
         b.holdt = null;
-        if (!h.trukket) { this.flyvBatteri(); return; }
-        var kontakt = Tg.batteriKontakt(b.x, b.y, this.lay.bat.h, b.v);
-        if (this.paaUld(kontakt, 1.35) || this.paaUld({ x: b.x, y: b.y }, 1.1)) {
-            this.taend(this.paaUld(kontakt, 1.0) ? kontakt : { x: b.x, y: this.lay.uld.cy - this.lay.uld.ry * 0.6 });
+        if (!h.trukket) { this.flyvBraender(); return; }
+        if (this.klump.taendt) { this.braenderHjem(); return; }
+        /* Sluppet lige ved ulden: flammen naar den, naar braenderen er vandret */
+        var s = Tg.bunsenSpids(b.x, b.y, this.lay.brn.h, Math.PI / 2);
+        if (this.paaUld(s, 1.5) || this.paaUld(this.spids(), 1.3)) {
+            this.taend(this.paaUld(this.spids(), 1.0) ? this.spids() : this.uldKontakt());
             b.flyv = { t: 0, slags: "vent" };
             return;
         }
-        this.batteriHjem();
-        this.kortBesked("Hold batteriets poler mod stålulden.");
+        this.braenderHjem();
+        this.kortBesked("Hold flammen mod stålulden.");
     };
 
     /* ----- Layout ----------------------------------------------------------------------- */
@@ -574,16 +598,17 @@
         var vb = NK.klamp(hoejre * 0.44, 140, 330);
         var vh = Tg.vaegtHoejde(vb);
         var fh = NK.klamp(Math.min(lay.bordY - 70, vb * 0.95), 110, 290), fb = fh * MA.iltflaske.b / MA.iltflaske.h;
-        var bh = NK.klamp(vb * 0.34, 46, 84), bbr = bh * MA.batteri.b / MA.batteri.h;
+        var bh = NK.klamp(Math.min(vb * 0.7, lay.bordY * 0.55), 90, 210), bbr = bh * MA.bunsen.b / MA.bunsen.h;
         var sh = NK.klamp(vb * 0.6, 70, 140), sbr = sh * MA.stjernekaster.b / MA.stjernekaster.h;
-        var gruppe = bbr + 34 + vb + 30 + fb;
+        var gruppe = bbr + 30 + vb + 30 + fb;
         var medPynt = hoejre - gruppe > sbr + 40;
         if (medPynt) gruppe += sbr + 28;
         var x0 = Math.max(10, (hoejre - gruppe) / 2 + 6);
         lay.stjGeo = medPynt ? Tg.stjerneGeo(x0 + sbr / 2, lay.bordY, sh) : null;
         if (medPynt) x0 += sbr + 28;
-        lay.bat = { x: x0 + bbr / 2, y: lay.bordY - bh / 2 - 1, h: bh, b: bbr };
-        x0 += bbr + 34;
+        var hj = Tg.bunsenHjem(x0 + bbr / 2, lay.bordY, bh);
+        lay.brn = { x: hj.x, y: hj.y, h: bh, b: bbr, x0: x0 };
+        x0 += bbr + 30;
         lay.v = { x: x0 + vb / 2, b: vb, h: vh, top: lay.bordY - vh };
         x0 += vb + 30;
         lay.fl = { x: x0 + fb / 2, h: fh, b: fb };
@@ -601,12 +626,13 @@
         this.lay = lay;
         var fgTop = lay.bordY - fh;
         this.saetAnker("vaegt", lay.v.x - vb / 2, lay.uld.cy - ry - 8, vb, lay.bordY - (lay.uld.cy - ry - 8));
-        this.saetAnker("batteri", lay.bat.x - bbr / 2 - 6, lay.bordY - bh - 6, bbr + 12, bh + 6);
+        var flTop = Tg.bunsenMund(hj.x, hj.y, bh, 0).y - Tg.flammeLaengde(bh);
+        this.saetAnker("braender", lay.brn.x0 - 6, flTop, bbr + 12, lay.bordY - flTop);
         this.saetAnker("flaske", lay.fl.x - fb / 2 - 4, fgTop - 4, fb + 8, fh + 4);
         this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 30, 2 * zr, 2 * zr + 64);
         this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
         if (this.el.gaet) this.el.gaet.style.bottom = Math.round(H - baand.y) + "px";
-        if (this.bat && !this.bat.holdt && !this.bat.flyv) { this.bat.x = lay.bat.x; this.bat.y = lay.bat.y; this.bat.v = 0; }
+        if (this.brn && !this.brn.holdt && !this.brn.flyv) { this.brn.x = lay.brn.x; this.brn.y = lay.brn.y; this.brn.v = 0; }
     };
 
     /* ----- Opdater ----------------------------------------------------------------------- */
@@ -614,13 +640,14 @@
         var lay = this.lay;
         if (!lay) return;
         var tf = this.hurtig ? 15 : 1;
-        this.opdaterBatteri(dt);
+        this.opdaterBraender(dt);
         this.klump.opdater(dt * tf);
         if (this.hurtig && this.klump.stille()) this.hurtig = false;
         var k = this.klump;
-        /* Gnisterne fra den gloedende front */
+        /* Gnisterne fra den gloedende front: faerre, naar gloeden doer */
         var u = lay.uld, kilder = this.uld.frontPunkter(k.p, u.cx, u.cy, u.rx, u.ry);
-        var rate = k.braender() ? (k.ilt > 0 ? 70 : 24) * NK.klamp(kilder.length / this.uld.t.length * 5, 0.25, 1) : 0;
+        var rate = k.braender() ? (k.ilt > 0 ? 70 : 24) * NK.klamp(kilder.length / this.uld.t.length * 5, 0.25, 1) *
+            NK.klamp(k.G * 1.5, 0.15, 1) : 0;
         this.gnister.opdater(dt, rate, kilder);
         this.lup.opdater(dt * (this.hurtig ? 3 : 1), k.reageret(), k.ilt > 0, k.braender());
         /* Ilten fra flasken ses i gloeden og slangen; stjernekasteren braender ud */
@@ -632,8 +659,8 @@
             if (this.gaetUd < 0.5) this.el.gaet.classList.add("vaek");
             if (this.gaetUd <= 0) { this.gaetUd = 0; this.el.gaet.hidden = true; }
         }
-        /* Mens batteriet flyver selv, eller Vis svaret skruer tiden op, kan knappen ikke bruges */
-        var auto = !!(this.bat.flyv || this.hurtig);
+        /* Mens braenderen flyver selv, eller Vis svaret skruer tiden op, kan knappen ikke bruges */
+        var auto = !!(this.brn.flyv || this.hurtig);
         if (auto !== !!this.auto) { this.auto = auto || null; this.visKnap(); }
         /* Fasen */
         var f = this.fase();
@@ -652,6 +679,10 @@
         Tg.rum(ctx, lay.W, lay.Hs, lay.bordY + 12);
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.Hs);
         var px = NK.klamp(lay.v.b * 0.06, 13, 15), ety = lay.bordY + 12 + (lay.Hs - lay.bordY - 12) / 2;
+        var b = this.brnPos(), iHaanden = !!(b.holdt || b.flyv);
+
+        /* Gasslangen fra braenderen ud ad bordets venstre kant */
+        Tg.gasslange(ctx, b.x, b.y, lay.brn.h, b.v, lay.bordY);
 
         /* Stjernekasteren (paaskeaegget) */
         if (lay.stjGeo) {
@@ -666,10 +697,16 @@
         var v = Tg.vaegt(ctx, lay.v.x, lay.bordY, lay.v.b, K.g2(k.visning()) + " g", { lys: over === "vaegt" ? 1 : 0 });
         Tg.plade(ctx, lay.plade.x, lay.plade.bund, lay.plade.b, lay.plade.h);
         this.iltVis = this.iltVis || 0;
-        Tg.gloed(ctx, this.uld, k.braender() ? 0.7 + 0.5 * this.iltVis : 0);
+        Tg.gloed(ctx, this.uld, k.braender() ? (0.7 + 0.5 * this.iltVis) * NK.klamp(k.G * 1.5, 0, 1) : 0);
         var u = lay.uld;
-        Tg.uld(ctx, this.uld, u.cx, u.cy, u.rx, u.ry, { p: k.p, ilt: this.iltVis, tid: t, lys: over === "uld" });
+        Tg.uld(ctx, this.uld, u.cx, u.cy, u.rx, u.ry, { p: k.p, gloed: k.G, ilt: this.iltVis, tid: t, lys: over === "uld" });
         Tg.etiket(ctx, "Vægten", lay.v.x, ety, px);
+
+        /* Braenderen paa bordet (i haanden tegnes den til sidst, oven paa alt) */
+        if (!iHaanden) {
+            Tg.bunsen(ctx, b.x, b.y, lay.brn.h, b.v, t, over === "braender");
+            Tg.etiket(ctx, "Bunsenbrænder", lay.brn.x, ety, px);
+        }
 
         /* Iltflasken og slangen */
         Tg.flaske(ctx, lay.flGeo, over === "flaske");
@@ -684,15 +721,16 @@
         Tg.lupLinje(ctx, lay.lupPunkt.x, lay.lupPunkt.y, z.x - z.r, z.y);
         Tg.lup(ctx, this.lup, z.x, z.y, z.r, { titel: "Luppen: en ståltråd", lys: over === "zoom", maksX: lay.W });
 
-        /* Batteriet: hjemme paa bordet, i haanden eller paa vej */
-        var b = this.batPos();
-        Tg.batteri(ctx, b.x, b.y, lay.bat.h, b.v, over === "batteri" && !b.holdt);
-        if (!b.holdt && !b.flyv) Tg.etiket(ctx, "9 V", lay.bat.x, ety, px);
+        /* Braenderen i haanden eller paa vej */
+        if (iHaanden) Tg.bunsen(ctx, b.x, b.y, lay.brn.h, b.v, t, false);
 
         /* Pilen over det, der skal bruges nu */
         var f = this.fase();
         if (f === "foer" && !k.taendt) Tg.pegepil(ctx, lay.v.x, v.disp.y - 8, t);
-        else if (f === "taend" && !b.holdt && !b.flyv) Tg.pegepil(ctx, lay.bat.x, lay.bordY - lay.bat.h - 10, t);
+        else if (f === "taend" && !iHaanden) {
+            var mund = Tg.bunsenMund(b.x, b.y, lay.brn.h, 0);
+            Tg.pegepil(ctx, mund.x, mund.y - Tg.flammeLaengde(lay.brn.h) - 8, t);
+        }
         else if (f === "vent" && k.ilt <= 0 && !this.hurtig) Tg.pegepil(ctx, lay.flGeo.hjul.x, lay.flGeo.y0 - 10, t);
         else if (f === "efter") Tg.pegepil(ctx, lay.v.x, v.disp.y - 8, t);
 

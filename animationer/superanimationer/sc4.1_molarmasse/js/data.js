@@ -330,22 +330,23 @@
 
     /* ----- Fane 2: skaalvaegten -------------------------------------------------
        Par af stoffer, 1 mol af hvert. Niveau 0 er tydelige, 2 er taette.
-       Forklaringen rammer den fejl, parret er valgt for. */
+       Forklaringen rammer den fejl, parret er valgt for, og siger, hvilket
+       stof der vejer mest. Massen af 1 mol staar i statuslinjen. */
     D.PAR = [
-        ["H2O", "CO2", 0, "Lige mange atomer. C og O vejer meget mere end H."],
-        ["CH4", "O2", 0, "CH₄ har flest atomer, men fire af dem er H, og H vejer kun 1,01."],
-        ["H2", "He", 0, "He er ét atom, men det vejer næsten det dobbelte af to H."],
-        ["C6H14", "Cl2", 0, "Her vinder den med flest atomer: seks C vejer mere end to Cl."],
-        ["NH3", "H2O", 1, "Tre atomer mod fire. O vejer mere end N og H tilsammen."],
-        ["CH4", "NH3", 1, "N vejer mere end C og H tilsammen. Fem atomer taber til fire."],
-        ["Fe", "C4H10", 1, "Ét tungt atom mod fjorten lette. Butan vejer lidt mere."],
-        ["Ar", "K", 1, "K har det største atomnummer, men Ar har den største atommasse."],
-        ["O3", "CO2", 1, "Tre atomer hver. Tre O vejer mere end ét C og to O."],
-        ["CO", "N2", 2, "28,01 mod 28,02. Skålvægten kan ikke mærke 0,01 g."],
-        ["Cu", "SO2", 2, "Ét atom mod tre. SO₂ vejer 0,51 g mere."],
-        ["CO2", "C3H8", 2, "44,01 mod 44,11. Elleve atomer vejer lidt mere end tre."],
-        ["H2SO4", "H3PO4", 2, "98,08 mod 98,00. Det er S og P, der gør forskellen."],
-        ["C2H5OH", "NO2", 2, "46,08 mod 46,01. Tæt, men ethanol vejer mest."]
+        ["H2O", "CO2", 0, "Begge har tre atomer. CO₂ vejer mest, fordi C og O vejer meget mere end H."],
+        ["CH4", "O2", 0, "CH₄ har flest atomer, men fire af dem er H, som kun vejer 1,01. O₂ vejer mest."],
+        ["H2", "He", 0, "He er kun ét atom, men det vejer 4,00. De to H i H₂ vejer kun 2,02 tilsammen."],
+        ["C6H14", "Cl2", 0, "Her vejer stoffet med flest atomer også mest. Seks C vejer alene mere end to Cl."],
+        ["NH3", "H2O", 1, "NH₃ har flest atomer, men H₂O vejer mest. O vejer 2 mere end N, og det ekstra H i NH₃ vejer kun 1."],
+        ["CH4", "NH3", 1, "CH₄ har flest atomer, men NH₃ vejer mest. N vejer 2 mere end C, og det ekstra H i CH₄ vejer kun 1."],
+        ["Fe", "C4H10", 1, "Ét tungt atom mod fjorten lette. Fire C og ti H vejer tilsammen lidt mere end ét Fe."],
+        ["Ar", "K", 1, "K har det største atomnummer, men Ar har den største atommasse. Det er atommassen, der tæller."],
+        ["O3", "CO2", 1, "Begge har tre atomer. O₃ vejer mest, fordi ét O vejer mere end ét C."],
+        ["CO", "N2", 2, "Forskellen er kun 0,01 g. Så lidt kan skålvægten ikke mærke, så den står lige."],
+        ["Cu", "SO2", 2, "Ét atom mod tre, men næsten samme masse. SO₂ vejer 0,51 g mere end Cu."],
+        ["CO2", "C3H8", 2, "Næsten samme masse. C₃H₈ vejer 0,10 g mere, og det kan skålvægten mærke."],
+        ["H2SO4", "H3PO4", 2, "Næsten samme masse. S vejer lidt mere end P og ét H tilsammen, så H₂SO₄ vejer mest."],
+        ["C2H5OH", "NO2", 2, "Næsten samme masse. Ethanol vejer 0,07 g mere, og det kan skålvægten lige mærke."]
     ].map(function (r) { return { a: STOF[r[0]], b: STOF[r[1]], niveau: r[2], hvorfor: r[3] }; });
 
     /* Skaalvaegten kan maerke 0,05 g. Mindre forskelle staar lige. */
@@ -353,12 +354,12 @@
     D.RUNDE = [3, 3, 3];   /* par fra hvert niveau i en runde */
 
     D.RUNDE_REPLIK = [
-        [0, "Flest atomer vinder ikke. Det har vægten vist nogle gange."],
-        [3, "Det er atommasserne, der vejer. Ikke antallet."],
-        [6, "Flertallet rigtigt. Vægten er enig med dig. Oftest."],
-        [9, "Ni rigtige. Skålvægten har ikke mere at lære dig."]
+        [0, "Flest atomer betyder ikke flest gram. Se på atommasserne."],
+        [3, "Det er atommasserne, der afgør det, ikke antallet af atomer."],
+        [6, "Mere end halvdelen rigtige. Du ser på atommasserne."],
+        [9, "Ni rigtige af ni. Du ved, hvad der gør et stof tungt."]
     ];
-    D.REKORD_REPLIK = "Ny rekord. Jeg noterer det. Et sted.";
+    D.REKORD_REPLIK = "Ny rekord. Prøv at slå den i næste runde.";
 
     /* ----- Fane 3: ukendt stof ---------------------------------------------------
        Etiketten er faldet af flasken. Kun molarmassen er tilbage. Det
@@ -391,35 +392,38 @@
     });
 
     /* ----- Kemichael ----------------------------------------------------------
-       Hoejst ca. 60 tegn pr. replik og ingen teori. */
+       Hoejst ca. 60 tegn pr. replik. Almindeligt dansk, der kan forstaas
+       uden at kende scenen: ingen gaader og ingen halve saetninger
+       (brugerens oenske 29. sept. 2026). */
     D.INTRO_VAEGT = [
-        "Vægten. Den kan veje meget, men ikke ét molekyle.",
-        "Byg molekylet, og regn molarmassen til højre.",
-        "Atommassen er det nederste tal. Ikke atomnummeret."
+        "Her bygger du et molekyle og finder dets molarmasse.",
+        "Klik på grundstofferne, og skriv atommasserne til højre.",
+        "Atommassen står nederst i feltet. Atomnummeret står øverst."
     ];
     D.INTRO_SKAAL = [
-        "Skålvægten. 1 mol på hver side.",
-        "Gæt, hvilken side der synker, før jeg slipper den."
+        "Her ligger 1 mol af et stof i hver skål.",
+        "Gæt til højre, hvilken skål der synker.",
+        "1 mol vejer lige så mange gram som stoffets molarmasse."
     ];
     D.INTRO_UKENDT = [
-        "Etiketterne er faldet af flaskerne. Igen.",
+        "Her er etiketten faldet af flasken.",
         "Molarmassen står på mærket. Find etiketten, der passer.",
-        "Afrunding er ikke en undskyldning."
+        "Regn med to decimaler. Nogle af stofferne ligger meget tæt."
     ];
 
     D.NIVEAU_ROS = [
-        "Fire stoffer vejet. Vægten står stadig på nul. Du gør ikke.",
-        "Tyve atomer i hexan, og ingen blev glemt.",
-        "Parenteserne holdt. Det gør de ikke altid."
+        "Fire stoffer vejet. Du har styr på tallene i formlen.",
+        "Mange atomer i formlerne, og du glemte ikke et eneste.",
+        "Du husker at gange ind i parenteserne. Det glemmer mange."
     ];
-    D.VAEGT_FAERDIG = "Tolv stoffer vejet. Jeg skriver det i regnskabet.";
+    D.VAEGT_FAERDIG = "Alle tolv stoffer er vejet. Du kan regne molarmasser.";
 
     D.GAADE_ROS = [
-        "Fire flasker har fået etiket. Lageret takker.",
-        "Tæt på var ikke tæt nok. Godt regnet.",
-        "To decimaler. Nu ved du, hvorfor de står der."
+        "Fire flasker har fået den rigtige etiket.",
+        "Godt regnet. Du fandt den rigtige, selv om de lå tæt.",
+        "Uden to decimaler kunne du ikke have skilt dem ad."
     ];
-    D.GAADER_FAERDIG = "Tolv etiketter på plads. Nu må rektor gerne komme.";
+    D.GAADER_FAERDIG = "Alle tolv flasker har fået den rigtige etiket.";
 
     NK.Data = D;
 }());

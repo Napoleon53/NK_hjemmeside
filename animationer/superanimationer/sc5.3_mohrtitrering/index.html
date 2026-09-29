@@ -14,7 +14,7 @@
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-titrering" role="tab" aria-selected="true"><span class="nr">1</span>Titreringen</button>
         <button class="faneknap" data-fane="fane-beregning" role="tab" aria-selected="false"><span class="nr">2</span>Beregningen</button>
-        <button class="faneknap" data-fane="fane-forbrug" role="tab" aria-selected="false"><span class="nr">3</span>To kolber</button>
+        <button class="faneknap" data-fane="fane-forbrug" role="tab" aria-selected="false"><span class="nr">3</span>Fejlkilder</button>
     </div>
 
     <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -101,9 +101,9 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 3: TO KOLBER                                                  -->
+<!-- FANE 3: FEJLKILDER                                                 -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-forbrug" role="tabpanel" aria-label="To kolber">
+<section class="fane" id="fane-forbrug" role="tabpanel" aria-label="Fejlkilder">
     <div class="scene medtekst">
         <canvas id="for-laerred"></canvas>
         <div class="anker" id="for-anker-a"></div>
@@ -119,7 +119,7 @@
     <aside class="panel">
         <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste -->
         <div class="kort opgavekort" id="for-kort">
-            <h2><span>Hvad sker der?</span><span class="taeller"><b id="for-nr">1</b>/<span id="for-ialt">6</span></span></h2>
+            <h2><span id="for-titel">Fejlkilde</span><span class="taeller"><b id="for-nr">1</b>/<span id="for-ialt">6</span></span></h2>
             <p class="maal-tekst" id="for-prompt"></p>
             <div class="opgave-felt" id="for-valg"></div>
             <p class="besked" id="for-besked" aria-live="polite"></p>

@@ -299,9 +299,9 @@
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="c5.1" data-beskrivelse="Se hvad stofmængdekoncentration er, lav opløsninger i en målekolbe, og fortynd dem." onclick="visAnimation(this, '../superanimationer/sc5.1_koncentration/index.html')" title="Koncentration"><span class="btn-num">1</span><span class="btn-text">Koncentration</span></button>
+            <button class="tab-btn" data-emne="c5.1" data-beskrivelse="Se hvad stofmængdekoncentration er, skeln mellem c og n, lav opløsninger i en målekolbe, og fortynd dem." onclick="visAnimation(this, '../superanimationer/sc5.1_koncentration/index.html')" title="Koncentration"><span class="btn-num">1</span><span class="btn-text">Koncentration</span></button>
             <button class="tab-btn" data-emne="c5.2" data-beskrivelse="Se forskellen på formel og aktuel koncentration, når et salt går i opløsning, og regn på ionerne og på blandinger." onclick="visAnimation(this, '../superanimationer/sc5.2_formel_og_aktuel/index.html')" title="Formel og aktuel koncentration"><span class="btn-num">2</span><span class="btn-text">Formel og aktuel</span></button>
-            <button class="tab-btn" data-emne="c5.3" data-beskrivelse="Animation der simulerer en Mohrtitrering af havvand, med mikro- og makroniveau, til at bestemme saltindholdet." onclick="visAnimation(this, 'c5.5_eksperiment_mohrtitrering.html')" title="Forsøg: Mohrtitrering"><span class="btn-num">3</span><span class="btn-text">Forsøg: Mohrtitrering</span></button>
+            <button class="tab-btn" data-emne="c5.3" data-beskrivelse="Titrér havvand med sølvnitrat, aflæs buretten, og beregn masseprocenten af NaCl. Se også, hvilke fejlkilder der ændrer resultatet." onclick="visAnimation(this, '../superanimationer/sc5.3_mohrtitrering/index.html')" title="Forsøg: Mohrtitrering"><span class="btn-num">3</span><span class="btn-text">Forsøg: Mohrtitrering</span></button>
 
         </div>
 
@@ -415,12 +415,13 @@
 
             if (emneFil) {
                 const knapper = document.querySelectorAll('.tab-btn');
-                const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === emneFil);
+                // Gamle numre efter omnummereringen 26. sept. 2026: Mohrtitreringen hed c5.5.
+                const gamleNumre = { 'c5.5': 'c5.3' };
+                const kode = gamleNumre[emneFil] || emneFil;
+                const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === kode);
                 if (aliasKnap) {
                     aliasKnap.click();
                 } else {
-                    // Gamle numre efter omnummereringen 26. sept. 2026: c5.5 findes
-                    // via filnavnet, som stadig har det gamle nummer.
                     knapper.forEach(knap => {
                         if (knap.getAttribute('onclick').includes(emneFil) && !document.querySelector('.tab-btn.active')) {
                             knap.click();

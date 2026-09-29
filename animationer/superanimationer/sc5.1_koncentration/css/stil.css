@@ -833,3 +833,192 @@ select:focus-visible {
 
 .forfraknap:hover { color: var(--tekst); border-color: #6e6e80; background-color: var(--panel-3); }
 .knap:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------
+   SC5.1 (29. sept. 2026): regnestykket paa Maalekolben og Fortynding
+   (som sc4.3). Formlen, tallene med enheder og resultatet staar under
+   hinanden med lighedstegnene ud for hinanden, og broeker har en rigtig
+   broekstreg, ogsaa i felterne. Formlen skrives i felter: eleven vaelger
+   foerst formens skabelon og skriver saa bogstaverne.
+   --------------------------------------------------------------------- */
+sub { font-size: 0.68em; line-height: 0; vertical-align: -0.3em; font-style: normal; font-weight: 600; }
+
+.regnestykke {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 9px;
+    row-gap: 8px;
+}
+
+.rs-venstre { font-size: 1.2rem; font-weight: 700; color: var(--gul); white-space: nowrap; }
+.rs-lig { font-size: 1.2rem; font-weight: 700; color: #cfd6de; text-align: center; }
+.rs-hoejre { min-width: 0; display: flex; align-items: center; gap: 6px; }
+.rs-vist { font-size: 1.18rem; font-weight: 600; color: #e6ebf0; font-variant-numeric: tabular-nums; }
+.rs-vist b { color: #b8f0cf; }
+.rs-vist.svar b { color: #fff3c4; }
+.rs-vist i { font-family: Cambria, "Times New Roman", serif; font-size: 1.15em; font-weight: 600; }
+.rs-vist .broek { font-size: 1em; line-height: 1.25; }
+.rs-vist .broek > span { padding: 0 4px; }
+.rs-vist.rs-laast { color: var(--tekst-mat); }
+.rs-maerke { font-weight: 700; font-size: 1.05rem; color: #7ee0a8; }
+.rs-maerke.svar { color: var(--gul); }
+
+@keyframes rs-ny {
+    0%   { background-color: rgba(63, 174, 114, 0.4); box-shadow: 0 0 0 5px rgba(63, 174, 114, 0.4); }
+    100% { background-color: rgba(63, 174, 114, 0); box-shadow: 0 0 0 5px rgba(63, 174, 114, 0); }
+}
+.rs-hoejre.rs-ny { border-radius: 5px; animation: rs-ny 1.4s ease-out 1; }
+
+/* Felter i en skabelon: en broek, to felter med et regnetegn eller to
+   felter med gangetegn over en broekstreg */
+.felt.broekfelt { min-height: 0; }
+.bf-krop { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 7px 9px; }
+.bf-broek { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: stretch; }
+.bf-top { display: flex; align-items: center; gap: 6px; }
+.bf-top > .bf-del { flex: 1 1 0; }
+.bf-streg { height: 2.5px; margin: 6px 0; background-color: #cfd6de; border-radius: 1px; }
+.bf-gange { font-size: 1.35rem; font-weight: 700; color: #cfd6de; }
+.bf-del {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    background-color: #23232d;
+    border: 1px solid #4a4a58;
+    border-radius: 5px;
+}
+.felt .bf-del input { padding: 8px 6px; min-width: 40px; width: 100%; text-align: center; font-size: 1.12rem; }
+.bf-krop > .bf-del { flex: 1 1 0; }
+.felt .bf-del input::placeholder { font-size: 0.9rem; }
+.bf-del:focus-within { border-color: var(--gul); }
+.bf-del.ok { border-color: rgba(63, 174, 114, 0.6); background-color: rgba(63, 174, 114, 0.13); }
+.bf-del.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
+.bf-del .bf-tekst { flex: 1; padding: 8px 6px; text-align: center; font-size: 1.1rem; font-weight: 600; color: #b8f0cf; white-space: nowrap; }
+.felt.broekfelt.aktiv:focus-within { box-shadow: none; }
+
+/* Bogstaverne i formlen: kursiv som i bogen, smallere felter */
+.bogstavfelt .bf-krop { justify-content: flex-start; }
+.bogstavfelt .bf-broek { flex: 0 1 190px; }
+.bogstavfelt .bf-krop > .bf-del { flex: 0 1 92px; }
+.felt .bf-del.bogstav input { font-family: Cambria, "Times New Roman", serif; font-style: italic; font-size: 1.3rem; padding: 6px 4px; }
+.felt .bf-del.bogstav input::placeholder { font-style: normal; color: #6a707b; }
+
+.formel-omr { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+/* Skabelonerne: formlens form, eleven vaelger foer bogstaverne */
+.skabeloner { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sk-tekst { flex-basis: 100%; font-size: 0.9rem; font-weight: 600; color: #f0d77a; }
+.skabeloner.lille .sk-tekst { flex-basis: auto; font-size: 0.78rem; color: var(--tekst-mat); margin-right: 2px; }
+.sk-knap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    min-height: 46px;
+    padding: 4px 10px;
+    background-color: rgba(242, 197, 61, 0.1);
+    color: var(--tekst);
+    border: 1px solid rgba(242, 197, 61, 0.6);
+    border-radius: var(--radius-lil);
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.sk-knap:hover { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); }
+.skabeloner.lille .sk-knap { min-width: 40px; min-height: 30px; padding: 2px 7px; font-size: 0.8rem; background-color: transparent; border-color: #4a4a58; color: var(--tekst-svag); }
+.skabeloner.lille .sk-knap:hover { border-color: var(--gul); color: var(--tekst); }
+.sk-broek { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; }
+.sk-broek > span:first-child { border-bottom: 2px solid currentColor; padding: 0 3px 1px; }
+.sk-broek > span:last-child { padding-top: 1px; }
+
+/* Linjen over regnestykket med de tre skridt (som sc4.3) */
+.trinbar {
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+.tb-trin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 4px;
+    border: 1px solid #454555;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: var(--tekst-mat);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.tb-nr {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--panel-3);
+    color: var(--tekst-svag);
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.tb-pil { color: #6a707b; font-size: 1rem; font-weight: 700; }
+.tb-trin.nu { border-color: var(--gul); background-color: rgba(242, 197, 61, 0.12); color: #f7dc85; }
+.tb-trin.nu .tb-nr { background-color: var(--gul); color: #1b1b21; }
+.tb-trin.ok { border-color: rgba(63, 174, 114, 0.55); background-color: rgba(63, 174, 114, 0.14); color: #9fe6bf; }
+.tb-trin.ok .tb-nr { background-color: var(--groen); color: #ffffff; }
+.tb-trin.svar { border-color: rgba(242, 197, 61, 0.45); background-color: rgba(242, 197, 61, 0.08); color: #e8d9a8; }
+.tb-trin.svar .tb-nr { background-color: #b98f1d; color: #ffffff; }
+.trinbar.laast { opacity: 0.45; }
+.raekke.laast .regnestykke { opacity: 0.55; }
+
+/* Et smalt kort og en lang venstreside (c(Na₂CO₃)): venstresiden staar
+   alene paa foerste linje, og lighedstegnene rykkes ind under den */
+.raekke { container-type: inline-size; }
+@container (max-width: 430px) {
+    .regnestykke.lang { grid-template-columns: 14px auto minmax(0, 1fr); }
+    .regnestykke.lang > .rs-venstre { grid-column: 1; }
+    .regnestykke.lang > .rs-lig { grid-column: 2; }
+    .regnestykke.lang > .rs-hoejre { grid-column: 3; }
+    .regnestykke.lang > .rs-venstre:first-child { grid-column: 1 / 4; }
+}
+
+/* Et bredere panel paa regnefanerne, saa felterne kan vaere store */
+#fane-kolbe, #fane-fortynd { --panel-bredde: 520px; }
+@media (max-width: 1320px) { #fane-kolbe, #fane-fortynd { --panel-bredde: 460px; } }
+@media (max-width: 1100px) { #fane-kolbe, #fane-fortynd { --panel-bredde: 420px; } }
+#fane-kolbe .maal-tekst, #fane-fortynd .maal-tekst { font-size: 1.18rem; }
+#fane-kolbe .felt, #fane-fortynd .felt { min-height: 48px; }
+#fane-kolbe .felt input, #fane-fortynd .felt input { font-size: 1.15rem; padding: 9px 11px; }
+#fane-kolbe .felt-ok, #fane-fortynd .felt-ok { padding: 0 15px; font-size: 1.1rem; }
+
+/* ---------------------------------------------------------------------
+   SC5.1 (29. sept. 2026): fane 2, c eller n? Tabellen med glassenes tal
+   --------------------------------------------------------------------- */
+.glastabel { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 0.92rem; }
+.glastabel th { font-weight: 600; color: var(--tekst-mat); text-align: left; padding: 0 6px 0 0; font-size: 0.8rem; }
+.glastabel thead th { text-align: center; color: var(--tekst-svag); font-size: 0.82rem; }
+.glastabel thead th:first-child { text-align: left; }
+.glastabel td {
+    text-align: center;
+    padding: 6px 4px;
+    background-color: rgba(255, 255, 255, 0.045);
+    font-weight: 700;
+    color: var(--tekst);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.glastabel td.ukendt { color: var(--gul); }
+@keyframes ny-tal {
+    0%   { background-color: rgba(63, 174, 114, 0.55); }
+    100% { background-color: rgba(255, 255, 255, 0.045); }
+}
+.glastabel td.ny { animation: ny-tal 1.6s ease-out 1; color: #b8f0cf; }
+#glas-valg .knap { font-size: 0.95rem; }

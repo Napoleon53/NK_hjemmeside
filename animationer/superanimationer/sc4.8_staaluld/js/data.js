@@ -30,11 +30,17 @@
        som i den gamle (75-88 %). Ilten naar ikke ind til det inderste. */
     D.UDBYTTE = { min: 0.75, maks: 0.88 };
 
-    /* Hvor hurtigt det braender: p er den del af det jern, der kan naas,
-       som har reageret (0-1). dp/dt = k · (1 − p) + min, saa det gaar
-       hurtigt i starten og langsomt til sidst (ca. 20 s i alt). Ilt fra
-       flasken goer det seks gange hurtigere i 2 s ad gangen. */
-    D.BRAND = { k: 0.10, min: 0.015, ilt: 6, iltTid: 2.0 };
+    /* Branden (brugerens oenske 28. sept. 2026: lidt langsommere, og den
+       naar ikke til ende uden iltflasken). p er den del af det jern, ilten
+       kan naa, der har reageret (0-1), og G er gloeden (0-1).
+         I luft:     dp/dt = k/luft · G · (luft − p), og G falder med
+                     slukker pr. sekund. Gloeden doer, foer p naar luft,
+                     og under ud er stålulden gaaet ud (ca. 33 s; p ender
+                     ved ca. 0,6).
+         Med ilt:    dp/dt = ilt · (k · G · (1 − p) + iltMin · G), og G
+                     stiger mod 1. Ét klik giver ilt i iltTid sekunder.
+       Er stålulden gaaet ud, kan den ikke taendes igen. */
+    D.BRAND = { k: 0.12, luft: 0.7, slukker: 0.085, ud: 0.06, ilt: 3, iltMin: 0.02, iltTid: 2.0 };
 
     D.FORSOEG = [
         { id: "m1", titel: "Måling 1", gaet: true,
@@ -69,28 +75,31 @@
     D.LINJE = {
         valg: "Gæt først: klik på et af de tre billeder.",
         foer: "Aflæs vægten, og skriv m(før) i skemaet.",
-        taend: "Tænd stålulden: træk batteriet hen til den, eller klik på batteriet.",
-        vent: "Stålulden brænder, og vægten stiger. Vent, til den står stille. Klik på iltflasken for at give mere ilt.",
+        taend: "Tænd stålulden: træk bunsenbrænderen hen, så flammen rører den, eller klik på brænderen.",
+        vent: "Stålulden gløder, og vægten stiger. Klik på iltflasken, så mere af jernet reagerer. Skriv m(efter), når vægten står stille.",
         efter: "Vægten står stille. Aflæs den, og skriv m(efter) i skemaet."
     };
 
     D.HINT = {
         foer: "Tallet står på displayet på vægten. Skriv det med to decimaler.",
-        taend: "Batteriet står på bordet til venstre for vægten. Træk det hen til stålulden. Et klik på batteriet virker også.",
-        vent: "Vægten stiger, så længe jernet reagerer med ilten. Iltflasken gør det hurtigere.",
+        taend: "Bunsenbrænderen står til venstre for vægten. Træk den hen, så flammen rører stålulden. Et klik på brænderen virker også.",
+        vent: "Uden ekstra ilt går stålulden ud, før alt jernet har reageret. Klik på iltflasken flere gange, mens den gløder.",
         efter: "Tallet står på displayet på vægten."
     };
 
     D.SVAR = {
         foer: "Vægten viser {m} g.",
-        taend: "Batteriet tænder stålulden.",
+        taend: "Brænderen tænder stålulden.",
         vent: "Tiden går hurtigere, til vægten står stille.",
         efter: "Vægten viser {m} g."
     };
 
+    /* Er stålulden gaaet ud uden ilt fra flasken, siger linjen det bagefter */
+    D.UDEN_ILT = "Uden iltflasken gik den ud, før alt jernet havde reageret.";
+
     /* Eksempler, hvis eleven ikke har maalt selv (samme model: 4,00 g
-       med 82 % og 3,00 g med 79 % af jernet) */
-    D.EKSEMPEL = [{ mf: 4.00, me: 4.94 }, { mf: 3.00, me: 3.68 }];
+       med ilt til sidst og 82 % af jernet, 3,00 g uden ilt og 80 %) */
+    D.EKSEMPEL = [{ mf: 4.00, me: 4.94 }, { mf: 3.00, me: 3.41 }];
 
     /* ----- Fane 2: beregningen ----------------------------------------------------------
        Maaling 1 og 2 kommer fra fane 1 (eller fra D.EKSEMPEL). I maaling 2
@@ -160,12 +169,9 @@
     ];
     D.PRIK_SIDST = "Jeg sidder her bare. Vej du.";
 
-    /* Paaskeaegget: stjernekasteren paa bordet */
-    D.STJERNE = [
-        "Gnisterne fra en stjernekaster er små korn af jern, der brænder.",
-        "Samme reaktion som stålulden. Bare til nytår.",
-        "Den er fra sidste nytår. Jeg kunne ikke smide den ud."
-    ];
+    /* Paaskeaegget: stjernekasteren paa bordet. Én linje, den samme hver
+       gang (brugerens oenske 28. sept. 2026). */
+    D.STJERNE = "Gnisterne fra en stjernekaster er små korn af jern, der brænder.";
 
     NK.Data = D;
 }());

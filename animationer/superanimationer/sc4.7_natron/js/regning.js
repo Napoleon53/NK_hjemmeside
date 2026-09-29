@@ -110,7 +110,7 @@
         vaert.innerHTML = "";
         this.felter.forEach(function (f, i) {
             var rk = document.createElement("div");
-            rk.className = "raekke";
+            rk.className = "raekke" + (i === mig.blinkNr ? " blink" : "");
             var navn = T.fyldP(D.TRIN[f.id].navn, o.hyp);
             rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + (i + 1) + ". " + NK.html(navn) + "</span></div>";
             f.input = null;
@@ -149,6 +149,7 @@
             }
             vaert.appendChild(rk);
         });
+        this.blinkNr = null;
     };
 
     /* Afstemningen: et felt foran hvert stof */
@@ -349,7 +350,10 @@
         this.ledPlaceret(f, false);
     };
 
+    /* Et rigtigt svar faar raekken til at blinke groent (brugerens oenske 29.
+       sept. 2026: det skal vaere tydeligt, naar man goer det rigtigt) */
     P.ledPlaceret = function (f, vist) {
+        if (!vist) this.blinkNr = this.k;
         if (f.plads[0] !== null && f.plads[1] !== null) {
             f.fase = "tal";
             this.byg();
@@ -362,6 +366,7 @@
 
     P.formelOk = function (vist, note) {
         var f = this.aktivt();
+        if (!vist) this.blinkNr = this.k;
         if (!T.op(f.id, this.opg)) f.fase = "tal";
         else if (this.opg.kort) { f.fase = "tal"; f.plads = [0, 1]; }
         else f.fase = "indsaet";
@@ -371,6 +376,7 @@
 
     P.loes = function (maade) {
         var f = this.aktivt();
+        if (maade === "ok") this.blinkNr = this.k;
         f.status = maade;
         if (f.fase !== "afstem") f.fase = "tal";
         this.k++;

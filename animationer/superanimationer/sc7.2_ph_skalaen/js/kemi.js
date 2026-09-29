@@ -7,7 +7,9 @@
 
    Luppen: ved zoomtrin z viser den et rumfang paa 10^z / N_A liter. Saa
    er antallet af en ion med koncentrationen c (mol/L) praecis c · 10^z,
-   og ét klik er et 10 gange stoerre eller mindre rum. 1 prik = 1 ion.
+   og ét zoom er et 10 gange stoerre eller mindre rum. 1 prik = 1 ion.
+   Luppen zoomer selv (K.autoZoom): der er altid mellem 10 og 100 af den
+   ion, der er flest af, og rummet er aldrig stoerre end i rent vand.
    ===================================================================== */
 (function () {
     "use strict";
@@ -17,8 +19,11 @@
 
     K.KW = 1.0e-14;          /* vands ionprodukt ved 25 °C, M² */
     K.NA = 6.022e23;         /* Avogadros tal, 1/mol */
-    K.ZOOM_MIN = 0;
-    K.ZOOM_MAKS = 17;
+    K.ZOOM_NEUTRAL = 8;      /* rent vand: 10 H₃O⁺ og 10 OH⁻ */
+    K.ZOOM_MIN = 1;          /* pH -1 og 15: 100 af den ene */
+    K.PH_MIN = -1;           /* skalaen stopper ikke ved 0 og 14 */
+    K.PH_MAKS = 15;
+    K.ZOOM_MAKS = K.ZOOM_NEUTRAL;
 
     function log10(v) { return Math.log(v) / Math.LN10; }
     K.log10 = log10;
@@ -47,28 +52,31 @@
     K.rumfang = function (z) { return Math.pow(10, z) / K.NA; };            /* liter */
     K.side = function (z) { return Math.pow(K.rumfang(z) * 1e-3, 1 / 3); };  /* meter */
 
-    /* Terningens side med en passende enhed: 5,5 nm, 1,2 µm, 0,26 mm */
+    /* Det rum, luppen selv vaelger: flest af den ene ion giver over 10 og
+       hoejst ca. 100 af den (ved pH 6 er der 100 H₃O⁺ i samme rum som rent
+       vand, ved pH 5,9 zoomer den ind). Rent vand er ZOOM_NEUTRAL. Den lille
+       luft (0,01) holder de fortyndede glas med pH 5,00 og 6,00 paa 100 og
+       101, selv om vandets egne ioner goer dem en anelse surere. */
+    K.autoZoom = function (h3o, oh) {
+        var z = Math.floor(2 - log10(Math.max(h3o, oh)) + 0.01);
+        return NK.klamp(z, K.ZOOM_MIN, K.ZOOM_NEUTRAL);
+    };
+
+    /* Hvor meget mindre rummet er end i rent vand. kort: uden antallet af zoom */
+    K.rumTekst = function (z, kort) {
+        var k = K.ZOOM_NEUTRAL - z;
+        if (k <= 0) return "Samme rum som i rent vand";
+        var rest = K.tusind(Math.pow(10, k)) + " gange mindre";
+        return kort ? "Rummet er " + rest : "Zoomet " + (k === 1 ? "én gang" : k + " gange") + " ind: rummet er " + rest;
+    };
+
+    /* Terningens side med en passende enhed. Luppen gaar fra 2,6 nm ved
+       pH -1 og 15 til 550 nm i rent vand. */
     K.sideTekst = function (z) {
         var s = K.side(z);
         if (s < 1e-6) return NK.betydende(s * 1e9, 2) + " nm";
         if (s < 1e-4) return NK.betydende(s * 1e6, 2) + " µm";
         return NK.betydende(s * 1e3, 2) + " mm";
-    };
-
-    /* Noget, der er omtrent saa stort som terningen */
-    var SAMMENLIGN = [
-        [3e-9, "et par vandmolekyler"],
-        [20e-9, "et proteinmolekyle"],
-        [300e-9, "et virus"],
-        [3e-6, "en bakterie"],
-        [20e-6, "et rødt blodlegeme"],
-        [150e-6, "et hårs tykkelse"],
-        [1, "et sandkorn"]
-    ];
-    K.sammenligning = function (z) {
-        var s = K.side(z);
-        for (var i = 0; i < SAMMENLIGN.length; i++) if (s < SAMMENLIGN[i][0]) return SAMMENLIGN[i][1];
-        return SAMMENLIGN[SAMMENLIGN.length - 1][1];
     };
 
     /* ----- Universalindikatorens farver (som sb3.2) ------------------------ */
@@ -113,7 +121,7 @@
         dec = dec === undefined ? 1 : dec;
         var v = Math.round(ph * Math.pow(10, dec)) / Math.pow(10, dec);
         if (Math.abs(v) < 1e-9) v = 0;
-        return v.toFixed(dec).replace(".", ",");
+        return v.toFixed(dec).replace(".", ",").replace("-", "−");
     };
 
     /* Sur, neutral eller basisk ud fra den pH, der vises */

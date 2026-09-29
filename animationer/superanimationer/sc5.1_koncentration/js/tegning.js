@@ -17,8 +17,183 @@
     var SKRIFT = "'Segoe UI', sans-serif";
     var DISPLAY = "Consolas, 'Courier New', monospace";
 
+    var MATTE = "Cambria, 'Cambria Math', 'Times New Roman', serif";
+
     function font(vaegt, px) { return vaegt + " " + px + "px " + SKRIFT; }
     T.font = font;
+    /* Bogstaverne i formlerne: kursiv som i bogen, saa m og M ikke ligner hinanden */
+    T.matte = function (px, vaegt) { return "italic " + (vaegt || "600") + " " + px + "px " + MATTE; };
+
+    /* ----- Tekst med saenket før, efter og vand -------------------------------------
+       "V_før" tegnes som V med et lille før lidt under linjen (brugerens
+       oenske 29. sept. 2026). Resten tegnes med den skrift, der er givet. */
+    function rigDele(tekst) {
+        var ud = [], sidst = 0, m, re = /([A-Za-z])_(før|efter|vand)/g;
+        tekst = String(tekst);
+        while ((m = re.exec(tekst)) !== null) {
+            if (m.index > sidst) ud.push({ t: tekst.slice(sidst, m.index) });
+            ud.push({ t: m[1] });
+            ud.push({ t: m[2], sub: true });
+            sidst = m.index + m[0].length;
+        }
+        if (sidst < tekst.length) ud.push({ t: tekst.slice(sidst) });
+        return ud;
+    }
+    function subFont(px) { return font("600", Math.max(9, Math.round(px * 0.64))); }
+
+    T.rigBredde = function (ctx, tekst, fnt, px) {
+        var b = 0;
+        rigDele(tekst).forEach(function (d) {
+            ctx.font = d.sub ? subFont(px) : fnt;
+            b += ctx.measureText(d.t).width + (d.sub ? px * 0.06 : 0);
+        });
+        return b;
+    };
+
+    /* opt: { font, px, farve, justering, linje } */
+    T.rig = function (ctx, tekst, x, y, opt) {
+        var fnt = opt.font, px = opt.px, dele = rigDele(tekst);
+        var bredde = T.rigBredde(ctx, tekst, fnt, px);
+        var xx = opt.justering === "center" ? x - bredde / 2 : (opt.justering === "right" ? x - bredde : x);
+        ctx.save();
+        ctx.textAlign = "left";
+        ctx.textBaseline = opt.linje || "middle";
+        ctx.fillStyle = opt.farve || "#ffffff";
+        dele.forEach(function (d) {
+            ctx.font = d.sub ? subFont(px) : fnt;
+            ctx.fillText(d.t, xx + (d.sub ? px * 0.03 : 0), y + (d.sub ? px * 0.32 : 0));
+            xx += ctx.measureText(d.t).width + (d.sub ? px * 0.06 : 0);
+        });
+        ctx.restore();
+        return bredde;
+    };
+
+    /* En lille overskrift i smaa versaler */
+    T.etiket = function (ctx, tekst, x, y, px, farve, just) {
+        NK.tekst(ctx, tekst.toUpperCase(), x, y, { font: font("700", px), linje: "middle", farve: farve || "#6a7280", justering: just || "left" });
+    };
+
+    /* ----- Et regnestykke med rigtige broekstreger (tavlen paa fane 3 og 4) --------------
+       dele: { t, matte, farve, fed } eller { top, bund, matte } (en broek).
+       (x, y): venstre ende af linjens midte. Broekens dele er lidt mindre. */
+    function delFont(d, px) {
+        if (d.matte) return T.matte(Math.round(px * 1.08), "600");
+        return font(d.fed ? "800" : "600", px);
+    }
+
+    function delBredde(ctx, d, px) {
+        if (d.top !== undefined) {
+            var bp = px * 0.9;
+            return Math.max(T.rigBredde(ctx, d.top, delFont(d, bp), bp), T.rigBredde(ctx, d.bund, delFont(d, bp), bp)) + px * 0.35;
+        }
+        return T.rigBredde(ctx, d.t, delFont(d, px), px);
+    }
+
+    T.regnestykkeBredde = function (ctx, dele, px) {
+        var b = 0;
+        dele.forEach(function (d) { b += delBredde(ctx, d, px); });
+        return b;
+    };
+
+    T.regnestykke = function (ctx, dele, x, y, px, farve) {
+        var xx = x;
+        dele.forEach(function (d) {
+            var b = delBredde(ctx, d, px);
+            if (d.top !== undefined) {
+                var bp = px * 0.9, cx = xx + b / 2;
+                T.rig(ctx, d.top, cx, y - px * 0.66, { font: delFont(d, bp), px: bp, justering: "center", farve: d.farve || farve });
+                T.rig(ctx, d.bund, cx, y + px * 0.72, { font: delFont(d, bp), px: bp, justering: "center", farve: d.farve || farve });
+                ctx.save();
+                ctx.strokeStyle = d.farve || farve;
+                ctx.lineWidth = Math.max(1.5, px * 0.08);
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(xx + px * 0.1, y);
+                ctx.lineTo(xx + b - px * 0.1, y);
+                ctx.stroke();
+                ctx.restore();
+            } else {
+                T.rig(ctx, d.t, xx, y + 1, { font: delFont(d, px), px: px, farve: d.farve || farve });
+            }
+            xx += b;
+        });
+        return xx - x;
+    };
+
+    /* ----- Linjen med enhederne (fane 2, opgaven Enhederne, som sc4.3) --------------------
+       dele: [{ t, s (streges over), fed (resultatet) }]. t: 0-1, hvor langt
+       animationen er: stregerne tegnes, og saa kommer resultatet. */
+    T.enhedslinje = function (ctx, x, y, dele, px, t, farve) {
+        ctx.save();
+        ctx.textBaseline = "middle";
+        var xx = x, streger = [], antalS = dele.filter(function (d) { return d.s; }).length, sNr = 0;
+        dele.forEach(function (d) {
+            ctx.font = font(d.fed ? "800" : "600", px);
+            var b = ctx.measureText(d.t).width;
+            var a = 1;
+            if (d.fed) a = NK.klamp((t - 0.75) / 0.2, 0, 1);
+            ctx.globalAlpha = a;
+            ctx.fillStyle = d.fed ? "#7ee0a8" : (farve || "#e6ebf0");
+            ctx.fillText(d.t, xx, y);
+            ctx.globalAlpha = 1;
+            if (d.s) {
+                var t0 = 0.1 + 0.6 * sNr / Math.max(1, antalS);
+                streger.push({ x0: xx - 2, x1: xx + b + 2, u: NK.klamp((t - t0) / (0.6 / Math.max(1, antalS)), 0, 1) });
+                sNr++;
+            }
+            xx += b;
+        });
+        ctx.strokeStyle = "#f0918a";
+        ctx.lineWidth = Math.max(2, px * 0.12);
+        ctx.lineCap = "round";
+        streger.forEach(function (s) {
+            if (s.u <= 0) return;
+            ctx.beginPath();
+            ctx.moveTo(s.x0, y + px * 0.3);
+            ctx.lineTo(NK.lerp(s.x0, s.x1, s.u), y + px * 0.3 - (px * 0.6) * s.u);
+            ctx.stroke();
+        });
+        ctx.restore();
+        return xx - x;
+    };
+
+    T.enhedslinjeBredde = function (ctx, dele, px) {
+        var b = 0;
+        dele.forEach(function (d) { ctx.font = font(d.fed ? "800" : "600", px); b += ctx.measureText(d.t).width; });
+        return b;
+    };
+
+    /* ----- Opgavens tekst paa vaeggen (fane 2, som sc4.3) ---------------------------------
+       Én linje, hvis den kan staa med mindst mindst px; ellers to linjer,
+       helst delt efter et punktum. Giver { px, linjer, h }. */
+    T.overTavle = function (ctx, tekst, b, stoerst, mindst) {
+        var px = NK.passendeSkrift(ctx, tekst, b, stoerst, mindst, "600");
+        var lh = function (p) { return Math.round(p * 1.38); };
+        if (ctx.measureText(tekst).width <= b) return { px: px, linjer: [tekst], h: lh(px) };
+        var ord = tekst.split(" "), bedst = null;
+        ctx.font = font("600", stoerst);
+        for (var i = 1; i < ord.length; i++) {
+            var a = ord.slice(0, i).join(" "), c = ord.slice(i).join(" ");
+            var s = Math.max(ctx.measureText(a).width, ctx.measureText(c).width) * (/\.$/.test(a) ? 0.8 : 1);
+            if (!bedst || s < bedst.s) bedst = { s: s, a: a, c: c };
+        }
+        if (!bedst) return { px: px, linjer: [tekst], h: lh(px) };
+        px = Math.min(NK.passendeSkrift(ctx, bedst.a, b, stoerst, 12, "600"), NK.passendeSkrift(ctx, bedst.c, b, stoerst, 12, "600"));
+        return { px: px, linjer: [bedst.a, bedst.c], h: lh(px) * 2 };
+    };
+
+    /* Teksten paa vaeggen med en gul streg foran, saa den ses */
+    T.tegnOverTavle = function (ctx, o, x, y) {
+        ctx.save();
+        ctx.fillStyle = "#f2c53d";
+        NK.rundtRekt(ctx, x, y + 2, 4, o.h - 4, 2);
+        ctx.fill();
+        ctx.restore();
+        var lh = o.h / o.linjer.length;
+        o.linjer.forEach(function (l, i) {
+            NK.tekst(ctx, l, x + 14, y + lh * (i + 0.5) + 1, { font: font("600", o.px), linje: "middle", farve: "#f2f3f5" });
+        });
+    };
 
     /* ----- Farver --------------------------------------------------------- */
     function rgb(hex) {
@@ -807,6 +982,138 @@
             }
         }
         ctx.restore();
+    };
+
+    /* ----- Baegerglasset paa 1 L (fane 2) -----------------------------------------------
+       (x, y): venstre side og bunden (bordet). h: hoejden. */
+    T.glas1Geo = function (x, y, h) {
+        var M = MAAL.glas1l, k = h / M.h, y0 = y - M.bund * k;
+        return { k: k, x0: x, y0: y0, b: M.b * k, h: h, cx: x + (M.indV + M.indH) / 2 * k,
+                 ind: { x0: x + M.indV * k, x1: x + M.indH * k, top: y0 + M.indTop * k, bund: y0 + M.indBund * k },
+                 yV: function (VL) { return y0 + (M.indBund - M.prL * VL) * k; },
+                 tud: { x: x + M.tudX * k, y: y0 + M.tudY * k } };
+    };
+
+    /* Hvor glassets tud er, naar det er flyttet (dx, dy), drejet (vinkel) og
+       evt. spejlet (tuden til hoejre), og hvordan et punkt i glasset (i
+       spritets px gange k) ligger i scenen. */
+    T.glas1Form = function (g, v) {
+        var M = MAAL.glas1l, k = g.k;
+        var a = v.vinkel || 0, sx = v.spejl ? -1 : 1;
+        var piv = { x: (v.spejl ? g.x0 + g.b - M.tudX * k : g.tud.x) + (v.dx || 0), y: g.tud.y + (v.dy || 0) };
+        var c = Math.cos(a), s = Math.sin(a);
+        return {
+            a: a, sx: sx, piv: piv,
+            verden: function (lx, ly) {
+                var dx = (lx - M.tudX * k) * sx, dy = ly - M.tudY * k;
+                return { x: piv.x + dx * c - dy * s, y: piv.y + dx * s + dy * c };
+            }
+        };
+    };
+
+    /* Prikkens plads i glasset (u, v fra 0 til 1) i spritets px gange k,
+       naar vaesken staar til VL liter */
+    T.glas1Prik = function (g, VL, u, vv) {
+        var M = MAAL.glas1l, k = g.k;
+        var r = NK.klamp(4.6 * k, 3, 6.5), m = r + 3;
+        var ix0 = M.indV * k, ix1 = M.indH * k, bund = M.indBund * k, top = (M.indBund - M.prL * VL) * k;
+        return { x: ix0 + m + u * (ix1 - ix0 - 2 * m), y: bund - m - vv * Math.max(0, bund - top - 2 * m), r: r };
+    };
+
+    /* v: { V (liter), farve, prikker: [{ u, v, a, lys, fra: {x, y}, ny }], vinkel,
+            spejl, dx, dy, etiket: [linje 1, linje 2] eller null, lys (musen),
+            tekst: 0-1 (tallene paa skalaen og etiketten) } */
+    T.glas1 = function (ctx, g, v) {
+        var M = MAAL.glas1l, k = g.k, F = T.glas1Form(g, v);
+        var ix0 = M.indV * k, ix1 = M.indH * k, itop = M.indTop * k, ibund = M.indBund * k;
+        var niv = (M.indBund - M.prL * Math.max(0, v.V)) * k;
+        var tekstA = v.tekst === undefined ? 1 : v.tekst;
+        ctx.save();
+        var base = ctx.getTransform();
+        if (v.lys && !F.a) {
+            ctx.fillStyle = "rgba(242, 197, 61, " + (0.12 * v.lys) + ")";
+            NK.rundtRekt(ctx, g.x0 - 8 + (v.dx || 0), g.y0 - 8 + (v.dy || 0), g.b + 16, g.h + 12, 12);
+            ctx.fill();
+        }
+        ctx.translate(F.piv.x, F.piv.y);
+        ctx.rotate(F.a);
+        ctx.scale(F.sx, 1);
+        ctx.translate(-M.tudX * k, -M.tudY * k);
+        /* Vaesken, klippet til glassets indre. Naar glasset haelder, er
+           overfladen stadig vandret i scenen. */
+        if (v.V > 0.0005) {
+            ctx.save();
+            NK.rundtRekt(ctx, ix0, itop - 40 * k, ix1 - ix0, ibund - itop + 40 * k, M.indR * k);
+            ctx.clip();
+            if (!F.a) {
+                ctx.fillStyle = v.farve;
+                ctx.fillRect(ix0, niv, ix1 - ix0, ibund - niv + 2);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
+                ctx.fillRect(ix0, niv, ix1 - ix0, Math.max(1.5, 2 * k));
+            } else {
+                var p = F.verden((ix0 + ix1) / 2, niv);
+                ctx.setTransform(base);
+                ctx.fillStyle = v.farve;
+                ctx.fillRect(p.x - 3000, p.y, 6000, 3000);
+            }
+            ctx.restore();
+        }
+        /* Prikkerne: stoffet, én prik pr. D.PRIK_GLAS mol */
+        if (v.prikker && v.prikker.length) {
+            ctx.save();
+            ctx.setTransform(base);
+            v.prikker.forEach(function (d) {
+                if (!(d.a > 0.01)) return;
+                var q = T.glas1Prik(g, v.V, d.u, d.v);
+                var w = F.verden(q.x, q.y);
+                if (d.fra && d.ny < 1) {
+                    var u = NK.blod(NK.klamp(d.ny, 0, 1));
+                    w = { x: NK.lerp(d.fra.x, w.x, u), y: NK.lerp(d.fra.y, w.y, u) };
+                }
+                var lys = d.lys || 0, r = q.r * (1 + 0.35 * lys);
+                ctx.globalAlpha = d.a;
+                ctx.fillStyle = lys > 0.05 ? "rgb(" + Math.round(253 - 11 * lys) + "," + Math.round(253 - 56 * lys) + "," + Math.round(247 - 186 * lys) + ")" : "#fdfdf7";
+                ctx.beginPath();
+                ctx.arc(w.x, w.y, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#16395e";
+                ctx.lineWidth = 1.3;
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+        NK.Sprites.tegn(ctx, "glas1l", 0, 0, M.b * k, M.h * k);
+        /* Tallene paa skalaen og etiketten, ikke spejlet */
+        if (tekstA > 0.01 && F.sx > 0) {
+            ctx.globalAlpha = tekstA;
+            var px = NK.klamp(12.5 * k, 12, 15);
+            ["0,2", "0,4", "0,6", "0,8", "1,0 L"].forEach(function (t, i) {
+                NK.tekst(ctx, t, 50 * k, (186 - 36 * i) * k, { font: font("700", px), linje: "middle", farve: "rgba(238, 246, 252, 0.85)",
+                    kant: true, kantFarve: "rgba(10, 14, 20, 0.45)", kantBredde: 2.5 });
+            });
+            if (v.etiket) {
+                var eb = Math.max(58 * k, 52), eh = Math.max(38 * k, 34);
+                var ex = 154 * k - eb, ey = 21 * k;
+                ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+                ctx.fillRect(ex + 2, ey + 3, eb, eh);
+                ctx.fillStyle = "#fbfaf5";
+                ctx.fillRect(ex, ey, eb, eh);
+                ctx.strokeStyle = "#b9b4a2";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(ex + 0.5, ey + 0.5, eb - 1, eh - 1);
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "#1c1f26";
+                NK.passendeSkrift(ctx, v.etiket[0], eb - 6, NK.klamp(eh * 0.34, 12, 15), 12, "700");
+                ctx.fillText(v.etiket[0], ex + eb / 2, ey + eh * 0.3);
+                ctx.fillStyle = "#1d6fb8";
+                NK.passendeSkrift(ctx, v.etiket[1], eb - 6, NK.klamp(eh * 0.4, 13, 17), 12, "800");
+                ctx.fillText(v.etiket[1], ex + eb / 2, ey + eh * 0.7);
+            }
+            ctx.globalAlpha = 1;
+        }
+        ctx.restore();
+        return F;
     };
 
     /* En stiplet linje fra et punkt til zoomvinduet */

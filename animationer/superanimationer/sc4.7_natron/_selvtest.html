@@ -145,8 +145,15 @@ function koerTest(W) {
     /* ================================================================ */
     overskrift("3. Fejlkilderne i modellen");
     var forv = K.forventet(D.FEJL_M);
-    var g1 = new K.Forloeb({}).koerFaerdig();
-    paastand("gruppe 1 ender på B: " + komma(g1) + " g", g1 === K.slutVisning(D.FEJL_M) && K.naermest(g1, forv) === "B");
+    var f1 = new K.Forloeb({}), g1 = f1.koerFaerdig();
+    paastand("gruppe 1 ender på B efter 5 minutter uden sprøjt: " + komma(g1) + " g", g1 === K.slutVisning(D.FEJL_M) && K.naermest(g1, forv) === "B" &&
+        Math.abs(f1.ur() - 5) < 0.01 && f1.d.tabt < 0.001, f1.ur() + " min, sprøjt " + f1.d.tabt);
+    var f2 = new K.Forloeb({ tid: 2 }), g2 = f2.koerFaerdig();
+    paastand("kun 2 minutter: uret stopper ved 2, og tabet er mindst 0,3 g mindre end gruppe 1's", Math.abs(f2.ur() - 2) < 0.01 && g2 - g1 >= 0.3,
+        f2.ur() + " min, " + g2 + " mod " + g1);
+    paastand("resultatet afhænger ikke af, hvor store skridt modellen tager", [0.01, 0.13, 0.3].every(function (dt) {
+        var f = new K.Forloeb({ tid: 2 }), n = 0; f.start(); while (!f.faerdig && n++ < 100000) f.opdater(dt); return f.slut === g2;
+    }));
     var retning = [];
     D.FEJL.forEach(function (f) {
         var s = new K.Forloeb(f.B).koerFaerdig();
@@ -225,7 +232,7 @@ function koerTest(W) {
     /* ================================================================ */
     overskrift("7. Sproget");
     var tekster = [];
-    D.FORSOEG.forEach(function (o) { tekster.push(o.titel, o.tekst, o.valg.spm, o.valg.hint); o.valg.svar.forEach(function (s) { tekster.push(s.t); }); });
+    D.FORSOEG.forEach(function (o) { tekster.push(o.titel, o.tekst, o.valg.spm, o.valg.hint); tekster = tekster.concat(o.trin); o.valg.svar.forEach(function (s) { tekster.push(s.t); }); });
     ["LINJE", "HINT", "SVAR", "INTRO", "FAERDIG", "AFSTEM", "DOM"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
     D.HYPOTESER.forEach(function (o) { tekster.push(o.titel); });
     Object.keys(D.TRIN).forEach(function (id) {
@@ -258,12 +265,18 @@ function koerTest(W) {
     d.querySelectorAll("#forsoeg-valg .knap")[1].click();
     tik(A, 0.2);
     paastand("gættet er valgt: aflæs startmassen", A.fase() === "foer" && NK.gaet === "B" && /Aflæs vægten/.test(besked(A)), besked(A));
+    paastand("fane 1 har ingen opgaveliste, der kan starte forfra", !d.getElementById("forsoeg-liste") && !d.getElementById("forsoeg-opgaver"));
+    function trinNu() { var li = d.querySelectorAll("#forsoeg-prompt .trinliste li"); for (var k = 0; k < li.length; k++) if (li[k].classList.contains("nu")) return k + 1; return 0; }
+    paastand("gættet står på én linje, knapperne er væk, og trin 1 er fremhævet", d.getElementById("forsoeg-valg").hidden &&
+        /Dit gæt: B: Na₂CO₃/.test(d.getElementById("forsoeg-prompt").textContent) && trinNu() === 1, trinNu());
     var inp = d.getElementById("forsoeg-inp");
     inp.value = komma(A.proeve + 0.1); enter(inp);
     paastand("forkert startmasse: det står der ikke på vægten", /står der ikke/.test(besked(A)) && A.vejninger.length === 0, besked(A));
     inp = d.getElementById("forsoeg-inp"); inp.value = komma(A.proeve); enter(inp);
     tik(A, 0.2);
     paastand("startmassen står i skemaet, og diglen skal på trefoden", A.vejninger.length === 1 && A.fase() === "flyt", A.fase());
+    paastand("trin 2 er fremhævet, og skemaet har en grå række: varm diglen først", trinNu() === 2 &&
+        /varm diglen først/.test(d.getElementById("forsoeg-tbody").textContent), trinNu());
     dg = A.digelNu();
     traek(A, dg.x, dg.bund - 20, A.lay.op.x, A.lay.op.digel.bund - 20);
     tik(A, 1);
@@ -290,6 +303,11 @@ function koerTest(W) {
     inp = d.getElementById("forsoeg-inp"); inp.value = komma(A.d.visning()); enter(inp);
     tik(A, 0.2);
     paastand("den kolde digel vejes: en ny række i skemaet og et punkt på grafen", A.vejninger.length === 2 && A.fase() === "igen", A.fase());
+    var fald = NK.tal2(A.vejninger[0].m - A.vejninger[1].m);
+    paastand("efter to vejninger: trin 3 er fremhævet, linjen siger, hvor meget massen faldt, og skemaet viser ændringen",
+        trinNu() === 3 && besked(A).indexOf("Massen faldt " + fald + " g. Den er ikke konstant endnu.") === 0 &&
+        d.querySelector("#forsoeg-tbody td.aendr").textContent === "−" + fald + " g" && /varm igen først/.test(d.getElementById("forsoeg-tbody").textContent),
+        besked(A));
     /* Videre til konstant masse: 3 minutter ad gangen */
     for (var runde = 0; runde < 12 && !A.faerdig; runde++) {
         dg = A.digelNu(); klik(A, dg.x, dg.bund - 20); tik(A, 1);
@@ -320,7 +338,25 @@ function koerTest(W) {
 
     /* ================================================================ */
     overskrift("9. Hypoteserne");
-    /* En maaling uden sproejt til resten */
+    /* En digel, der kun er vejet foer opvarmningen: fane 2 bruger dens startmasse */
+    NK.visFane("fane-forsoeg");
+    A.forfra();
+    inp = d.getElementById("forsoeg-inp"); inp.value = komma(A.proeve); enter(inp); tik(A, 0.2);
+    NK.visFane("fane-hypoteser");
+    B.vaelg(0, false);
+    paastand("fane 2 regner på startmassen fra fane 1, før massen er konstant", B.maal.egen && B.maal.mf === A.proeve && !B.maal.faerdig &&
+        d.getElementById("hypoteser-prompt").textContent.indexOf(komma(A.proeve) + " g natron") >= 0, B.maal.mf + " / " + A.proeve);
+    [1, 2, 3].forEach(function (k) { B.status[k].loest = true; });
+    B.opdaterForventet();
+    B.vaelg(4, false);
+    paastand("dommen venter, til massen er konstant: ingen knapper, og kortet siger hvorfor", B.opg.dom && d.getElementById("hypoteser-valg").hidden &&
+        /ikke konstant endnu/.test(d.getElementById("hypoteser-prompt").textContent), d.getElementById("hypoteser-prompt").textContent);
+    B.knap(); B.knap();
+    paastand("Vis svaret i dommen sender eleven til Forsøget", d.getElementById("fane-forsoeg").classList.contains("aktiv"));
+    [1, 2, 3].forEach(function (k) { B.status[k].loest = false; });
+    B.hjaelp = 0;
+    A.forfra();
+    /* En faerdig maaling uden sproejt til resten */
     NK.minMaaling = { mf: 5.21, slut: 3.29, vejninger: D.EKSEMPEL.vejninger.slice(), sprojt: false };
     NK.visFane("fane-hypoteser");
     B.vaelg(0, false);
@@ -383,15 +419,23 @@ function koerTest(W) {
     /* ================================================================ */
     overskrift("10. Fejlkilder");
     NK.visFane("fane-fejl");
-    var dirFejl = [];
+    paastand("fane 3 har ingen graf", C.lay.graf === undefined && !d.getElementById("fejl-anker-graf"));
+    paastand("spørgsmålet siger, hvad der gættes på: hvad diglen hos gruppe 2 vejer til sidst", C.vaelg(0, false) === undefined &&
+        /Hvad vejer diglen hos gruppe 2 til sidst/.test(d.getElementById("fejl-prompt").textContent) &&
+        d.querySelectorAll("#fejl-valg .knap")[0].textContent === "Mere end hos gruppe 1");
+    var dirFejl = [], sek = {};
     D.FEJL.forEach(function (o, n) {
         C.vaelg(n, false);
         var ret = D.FEJL_SVAR.map(function (s) { return s.id; }).indexOf(o.rigtig);
         d.querySelectorAll("#fejl-valg .knap")[ret].click();
-        for (var q = 0; q < 200 && C.koerer; q++) tik(C, 1);
+        for (var q = 0; q < 400 && C.koerer; q++) tik(C, 0.5);
+        sek[o.id] = q / 2;
         if (!C.faerdig || !C.status[n].stjerne) dirFejl.push(o.id);
+        if (o.id === "tidligt") sek.ur = [C.G[0].f.ur(), C.G[1].f.ur()];
     });
     paastand("alle seks kan løses med det rigtige gæt og giver en stjerne", dirFejl.length === 0, dirFejl.join(", "));
+    paastand("kun 2 minutter: uret stopper ved 5 hos gruppe 1 og ved 2 hos gruppe 2", Math.abs(sek.ur[0] - 5) < 0.01 && Math.abs(sek.ur[1] - 2) < 0.01, sek.ur.join(" / "));
+    paastand("forsøget går roligt: 9 til 20 sekunder", sek.tidligt >= 9 && sek.laenge <= 20, JSON.stringify(sek));
     paastand("tabellen: slutmasser og hypoteser for begge grupper", /Na₂CO₃|ingen/.test(d.getElementById("fejl-t-hyp-2").textContent) &&
         d.getElementById("fejl-t-slut-1").textContent === komma(g1) + " g", d.getElementById("fejl-t-slut-1").textContent);
     C.status[0].stjerne = false;
@@ -439,6 +483,10 @@ function koerTest(W) {
             } else {
                 if (L.st[1].x1 > Wc + 1 || L.st[0].x0 < 0) problemer.push(navn + " grupperne");
                 if (L.st[0].x1 > L.st[1].x0) problemer.push(navn + " grupperne overlapper");
+                L.st.forEach(function (st, k) {
+                    if (st.skilt.x < 0 || st.skilt.x + st.skilt.b > Wc + 1) problemer.push(navn + " skilt " + (k + 1) + " uden for");
+                    if (st.skilt.y + st.skilt.h > st.op.top - st.op.th * 0.3) problemer.push(navn + " skilt " + (k + 1) + " rammer diglen");
+                });
             }
             try { sim.tegn(); } catch (e) { problemer.push(navn + " tegn: " + e.message); }
             if (!(Hc > 100)) problemer.push(navn + " højde " + Hc);

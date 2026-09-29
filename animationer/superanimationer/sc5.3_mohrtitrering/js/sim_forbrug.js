@@ -1,5 +1,5 @@
 /* =====================================================================
-   sim_forbrug.js - fane 3: to kolber (hvad aendrer forbruget?)
+   sim_forbrug.js - fane 3: fejlkilder (hvad aendrer forbruget og resultatet?)
 
    To opstillinger side om side. A er som paa fane 1 med havvand fra
    Vesterhavet. Ved B er én ting aendret: mere vand, mindre havvand,
@@ -125,7 +125,7 @@
         this.besked(rigtig ? NK.html(t) : t, rigtig ? "god" : "skidt");
         if (this.nr >= D.SITUATIONER.length - 1) {
             this.besked(this.el.besked.innerHTML + "<br><b>" + this.rigtige + " af " + D.SITUATIONER.length +
-                " rigtige gæt i første forsøg.</b>", rigtig ? "god" : "skidt");
+                " rigtige svar i første forsøg.</b>", rigtig ? "god" : "skidt");
             if (!NK.hent(NOEGLE_ROS, false)) {
                 NK.gem(NOEGLE_ROS, true);
                 this.ventRos = 1.2;
@@ -216,6 +216,7 @@
 
     P.visKort = function () {
         var sit = this.sit();
+        NK.saetTekst("for-titel", sit ? sit.titel : "Fejlkilde");
         NK.saetTekst("for-nr", String(this.nr + 1));
         NK.saetTekst("for-ialt", String(D.SITUATIONER.length));
         NK.saetTekst("for-prompt", sit ? sit.tekst : "");
@@ -243,22 +244,22 @@
         var h = '<div class="ab-raekke hoved"><span></span><span>A</span><span>B</span></div>';
         h += raekke("Havvand (g)", NK.tal2(A.m), NK.tal2(B.m) + (B.spild ? "*" : ""), B.m !== A.m || B.spild > 0);
         h += raekke("Vand (mL)", String(A.vand), String(B.vand) + (B.post ? "*" : ""), B.vand !== A.vand || B.post);
-        h += raekke("AgNO₃ (M)", K.c(A.c), K.c(B.c) + (B.cTror !== B.c ? "*" : ""), B.c !== A.c);
-        h += raekke("AgNO₃ brugt (mL)", vist ? K.mL(A.v) : "?", vist ? K.mL(B.v) : "?", false);
+        h += raekke("c(AgNO₃) (M)", K.c(A.c), K.c(B.c) + (B.cTror !== B.c ? "*" : ""), B.c !== A.c);
+        h += raekke("Forbrug (mL)", vist ? K.mL(A.v) : "?", vist ? K.mL(B.v) : "?", false);
         h += raekke("Masseprocent (%)", vist ? K.pct(A.procent) : "?", vist ? K.pct(B.procent) : "?", false);
         NK.saetHTML("for-tabel", h);
         var note = "";
-        if (B.spild) note = "* Noget af havvandet nåede aldrig kolben, men du regner med " + NK.tal2(B.m) + " g.";
+        if (B.spild) note = "* Noget af havvandet kom ikke i kolben, men der beregnes med " + NK.tal2(B.m) + " g.";
         else if (B.post) note = "* Postevand med lidt chlorid i stedet for demineraliseret vand.";
-        else if (B.cTror !== B.c) note = "* Du regner med " + K.c(B.cTror) + " M.";
+        else if (B.cTror !== B.c) note = "* Der beregnes med " + K.c(B.cTror) + " M.";
         NK.saetTekst("for-note", note);
     };
 
     P.visStatus = function () {
         var t;
-        if (this.fase === "vaelg") t = "Kolbe B er ændret: <b>" + NK.html(this.sit().aendring) + "</b>. Vælg dit gæt til højre.";
-        else if (this.fase === "koerer") t = "Kemichael titrerer begge kolber, til de bliver rødbrune.";
-        else t = "Kolbe A brugte " + K.mL(this.A.v) + " mL sølvnitrat og kolbe B " + K.mL(this.B.v) + " mL.";
+        if (this.fase === "vaelg") t = "Kolbe B: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved kolbe A. Vælg et svar til højre.";
+        else if (this.fase === "koerer") t = "Kemichael titrerer begge kolber til omslaget.";
+        else t = "Forbrug af sølvnitrat: " + K.mL(this.A.v) + " mL i kolbe A og " + K.mL(this.B.v) + " mL i kolbe B.";
         NK.saetHTML("for-status", t);
     };
 
@@ -400,7 +401,7 @@
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
         if (u.slags === "A") NK.saetHTML("for-status", "Kolbe A: " + NK.tal2(this.A.m) + " g havvand fra " + this.sted + ", " + this.A.vand +
             " mL demineraliseret vand og sølvnitrat " + K.c(this.A.c) + " M.");
-        if (u.slags === "B") NK.saetHTML("for-status", "Kolbe B: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved A.");
+        if (u.slags === "B") NK.saetHTML("for-status", "Kolbe B: <b>" + NK.html(this.sit().aendring) + "</b>. Resten er som ved kolbe A.");
     };
 
     P.tast = function (e) {

@@ -17,8 +17,8 @@
     var TURE = {
         "fane-forsoeg": [
             { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Stålulden ligger på en varmefast plade, og vægten er nulstillet med pladen. Den viser altså kun stålulden. Skriv tallet som m(før) i skemaet." },
-            { sel: "#forsoeg-anker-batteri", titel: "Batteriet", tekst: "Træk batteriet hen til stålulden, eller klik på det. Strømmen gør de tynde tråde glødende, og så brænder stålulden." },
-            { sel: "#forsoeg-anker-flaske", titel: "Iltflasken", tekst: "Klik på flasken, mens stålulden gløder. Mere ilt får den til at brænde hurtigere." },
+            { sel: "#forsoeg-anker-braender", titel: "Bunsenbrænderen", tekst: "Træk brænderen hen til stålulden. Den vendes vandret, og når flammen rører stålulden, går den i brand. Et klik på brænderen virker også." },
+            { sel: "#forsoeg-anker-flaske", titel: "Iltflasken", tekst: "I luft går stålulden ud, før alt jernet har reageret. Klik på flasken, mens den gløder, så mere af jernet når at reagere." },
             { sel: "#forsoeg-anker-zoom", titel: "Luppen", tekst: "Overfladen af en ståltråd. Ilten fra luften sætter sig på jernatomerne. Nitrogen reagerer ikke." },
             { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Skriv m(før) og m(efter) for begge målinger. Tallene bruges på fanen Beregningen." },
             { sel: "#forsoeg-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Knappen giver et hint og derefter svaret." },

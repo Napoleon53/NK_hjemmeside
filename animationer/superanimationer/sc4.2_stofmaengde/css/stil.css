@@ -679,12 +679,12 @@ select:focus-visible {
 }
 
 /* ---------------------------------------------------------------------
-   SC4.2: maalene, beregningerne, felterne med potens og svarene
+   SC4.2: opgaverne, beregningerne og svarene
    --------------------------------------------------------------------- */
 
 .ikonknap.tekstknap { width: auto; padding: 0 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; }
 
-/* Maalet paa fane 1 */
+/* Opgaven paa fane 1 */
 .maal-tekst {
     margin: 2px 0 6px;
     font-size: 1.15rem;
@@ -741,32 +741,6 @@ select:focus-visible {
 .felt-svar { font-size: 0.95rem; }
 .felt-svar b { color: #ffffff; }
 .felt.svar .felt-svar b { color: #fff3c4; }
-
-/* Antallet af atomer: tallet foran, "· 10" og potensen haevet */
-.felt-gange {
-    align-self: center;
-    padding: 0 1px 0 4px;
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: var(--tekst);
-    white-space: nowrap;
-}
-
-.felt input.eks {
-    flex: 0 0 46px;
-    width: 46px;
-    min-width: 40px;
-    align-self: flex-start;
-    margin: 3px 6px 3px 1px;
-    padding: 1px 5px;
-    font-size: 0.86rem;
-    border: 1px solid #6a6a7c;
-    border-radius: 4px;
-    background-color: #262631;
-}
-
-.felt input.eks:focus { border-color: var(--gul); }
-.felt.laast input.eks { border-color: #4a4a58; }
 
 .raekke-hoved .raekke-del { font-style: italic; }
 

@@ -51,14 +51,22 @@ og Kemichael rydder ikke op. Uheldene er påskeæg, ikke en del af forløbet.
 | 3 | Fejlkilder | gætter, om gruppe B's molarmasse bliver højere, lavere eller den samme, og ser begge forsøg | vægten og måleglasset skal se den samme gas |
 
 **Forsøget.** Lighteren står på bordet ved siden af vægten. Eleven trækker
-den op på vægten og skriver m(før) i skemaet, trækker den ned i karret,
+den op på vægten og trykker på Aflæs vægten under skemaet (eller klikker
+på vægten eller skriver tallet selv), så m(før) står i skemaet. Knappen
+kom til 28. sept. 2026 efter brugerens første test: det var besværligt at
+taste vægten. Den skriver det, vægten viser, og tjekker det som et tal,
+eleven selv har skrevet, så en våd vejning stadig afvises. Målingens tre
+felter er åbne hele tiden; et tal i den forkerte rækkefølge får en
+forklaring i stedet for et låst felt, og m(efter) og V kan skrives i begge
+rækkefølger (gættet kommer kun, når V står der først). Eleven trækker
+lighteren ned i karret,
 hvor den lander under det omvendte måleglas, og holder musen nede på den
 (eller mellemrumstasten). Gassen bobler op og skubber vandet ned; luppen
 viser vandoverfladen med en streg for hver 2 mL. V godkendes inden for én
 streg, og kun når gassen står stille. Måling 1 har så et gæt: hvor meget
 lettere er lighteren blevet (ca. 0,04 g, 0,4 g eller 4 g)? Op af vandet
 er lighteren våd, og en våd vejning afvises med en forklaring. Papiret
-tørrer den. m(efter) aflæses på vægten. Målingerne huskes i browseren og
+tørrer den. m(efter) aflæses på vægten med samme knap. Målingerne huskes i browseren og
 bruges på fane 2. Et klik på vægten, papiret, karret, måleglasset eller
 luppen giver en kort forklaring.
 

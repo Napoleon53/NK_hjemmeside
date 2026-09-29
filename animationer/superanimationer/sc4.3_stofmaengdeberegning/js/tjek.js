@@ -468,7 +468,7 @@
         /* Mesteren: tallene fra det andet stof */
         if (id === "m" && o.st2) {
             if (naer(s.v, o.st.Mv)) return { besked: "Det er molarmassen af " + o.st.navn + ". Brug molarmassen af " + o.st2.navn + "." };
-            if (naer(s.v, o.tal.m)) return { besked: "Det er massen af " + o.st.navn + ". Brug stofmængden fra trin 1." };
+            if (naer(s.v, o.tal.m)) return { besked: "Det er massen af " + o.st.navn + ". Brug stofmængden fra del 1." };
         }
         var L0 = led[ledige[0]];
         if (ledige.length === 1 && kommaFlyttet(s.v, L0.v)) return { besked: "Tjek kommaet. Tallet er for " + (s.v > L0.v ? "stort." : "lille.") };

@@ -102,24 +102,24 @@
 
     /* Linjen i opgavekortet i hver fase af en maaling */
     D.LINJE = {
-        foer: "Træk lighteren op på vægten. Skriv m(før) i skemaet.",
-        foerVaegt: "Aflæs vægten, og skriv m(før) i skemaet.",
+        foer: "Træk lighteren op på vægten.",
+        foerVaegt: "Tryk på Aflæs vægten, så står m(før) i skemaet.",
         saenk: "Træk lighteren ned i vandet under måleglasset.",
         gas: "Hold musen nede på lighteren, så gassen bobler op i måleglasset. Slip ved ca. 150 mL.",
         aflaes: "Aflæs rumfanget i luppen, og skriv V i skemaet.",
         gaet: "Gæt først: vælg et af svarene herunder.",
         op: "Tag lighteren op af vandet, tør den på papiret, og stil den på vægten.",
         toer: "Lighteren er våd. Tør den på papiret, før den vejes.",
-        efter: "Aflæs vægten, og skriv m(efter) i skemaet."
+        efter: "Tryk på Aflæs vægten, så står m(efter) i skemaet."
     };
 
     D.HINT = {
-        foer: "Træk lighteren hen på vægten. Tallet står på displayet med to decimaler.",
+        foer: "Træk lighteren hen på vægten, og tryk på Aflæs vægten under skemaet. Du kan også skrive tallet fra displayet selv.",
         saenk: "Slip lighteren i vandet lige under måleglassets åbning. Stedet lyser op, mens du holder den.",
         gas: "Tryk på lighteren, og hold musen nede. Mellemrumstasten virker også.",
         aflaes: "Luppen viser måleglasset ved vandet. Læs ud for bunden af den buede vandoverflade. Hver streg er 2 mL.",
         op: "Træk lighteren op af vandet og hen på papiret. Den er tør, når dråberne er væk.",
-        efter: "Tallet står på displayet under lighteren."
+        efter: "Tryk på Aflæs vægten under skemaet, eller skriv tallet fra displayet."
     };
 
     D.SVAR = {

@@ -35,11 +35,10 @@
             { sel: "#hypoteser-opgaver", titel: "Opgaverne", tekst: "Natronen, de tre hypoteser og til sidst dommen: hvilken streg ender kurven på?" }
         ],
         "fane-fejl": [
-            { sel: "#fejl-anker-g1", titel: "Gruppe 1", tekst: "Gør det rigtigt: 5,10 g natron, lav flamme først, og de vejer, til massen er konstant." },
-            { sel: "#fejl-anker-g2", titel: "Gruppe 2", tekst: "Gør én ting anderledes. Den står i opgavekortet." },
-            { sel: "#fejl-kort", titel: "Gæt først", tekst: "Bliver gruppe 2's slutmasse højere, lavere eller den samme? Så laver begge grupper forsøget." },
-            { sel: "#fejl-anker-graf", titel: "Grafen", tekst: "Begge gruppers vejninger og de tre hypotesers streger." },
-            { sel: "#fejl-resultat", titel: "Resultaterne", tekst: "Slutmassen og den hypotese, massen passer med, for begge grupper." },
+            { sel: "#fejl-anker-g1", titel: "Gruppe 1", tekst: "Gør det rigtigt: 5,10 g natron, lav flamme først, 5 minutter i alt, og de vejer diglen, når den er kølet af." },
+            { sel: "#fejl-anker-g2", titel: "Gruppe 2", tekst: "Gør én ting anderledes. Den står i opgavekortet. Skiltet viser uret og til sidst slutmassen." },
+            { sel: "#fejl-kort", titel: "Gæt først", tekst: "Vejer diglen hos gruppe 2 til sidst mere, mindre eller det samme som hos gruppe 1? Så laver begge grupper forsøget." },
+            { sel: "#fejl-resultat", titel: "Resultaterne", tekst: "Slutmassen, tabet og den hypotese, massen passer med, for begge grupper." },
             { sel: "#fejl-opgaver", titel: "Fejlkilderne", tekst: "Seks ting, der kan gå galt. Et rigtigt gæt første gang giver en stjerne." }
         ]
     };

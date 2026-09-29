@@ -32,12 +32,22 @@
         return null;
     }());
     NK.gaet = NK.hent(NOEGLE_GAET, null);
-    /* Maalingen, fane 2 regner paa: elevens egen eller eksemplet */
+    /* Maalingen, fane 2 regner paa. Foerst den digel, der staar paa fane 1,
+       saa snart startmassen er skrevet (ogsaa foer massen er konstant: saa
+       er slut null, og dommen venter). Saa den sidste faerdige maaling, og
+       til sidst eksemplet (brugerens oenske 29. sept. 2026: fane 2 maa ikke
+       komme med helt nye tal, naar eleven har vejet selv). */
     NK.maaling = function () {
+        var A = NK.sims && NK.sims["fane-forsoeg"];
+        if (A && A.vejninger && A.vejninger.length && !A.gemtVist) {
+            var v = A.vejninger;
+            return { mf: A.proeve, slut: A.konstant ? v[v.length - 1].m : null, vejninger: v.slice(), sprojt: A.d.tabt > 0.02,
+                     egen: true, faerdig: !!A.konstant };
+        }
         var m = NK.minMaaling;
-        if (m) return { mf: m.mf, slut: m.slut, vejninger: m.vejninger, sprojt: !!m.sprojt, egen: true };
+        if (m) return { mf: m.mf, slut: m.slut, vejninger: m.vejninger, sprojt: !!m.sprojt, egen: true, faerdig: true };
         var e = D.EKSEMPEL;
-        return { mf: e.mf, slut: e.slut, vejninger: e.vejninger, sprojt: false, egen: false };
+        return { mf: e.mf, slut: e.slut, vejninger: e.vejninger, sprojt: false, egen: false, faerdig: true };
     };
 
     var FLYT_TID = 0.7;     /* sekunder, tangen er om at flytte diglen */
@@ -109,6 +119,7 @@
         this.auto = null;
         this.holdSvar = 0;
         this.rosNaeste = "";
+        this.rosKlasse = "";
         this.sidsteFase = null;
         this.gemtVist = false;
         this.skemaSig = "";
@@ -133,17 +144,32 @@
         this.fokus();
     };
 
+    /* Foer gaettet: spoergsmaalet. Bagefter: gaettet paa én linje og de tre
+       trin, med det trin, eleven er naaet til, fremhaevet (brugerens oenske
+       29. sept. 2026: det var uklart, hvad man skulle efter to vejninger). */
     P.promptHTML = function () {
         var o = this.opg;
-        return '<p class="maal-tekst">' + NK.html(o.tekst) + "</p>" +
-            (this.valgt === null && !this.faerdig ? '<p class="opgave-spm">' + NK.html(o.valg.spm) + "</p>" : "");
+        if (this.valgt === null && !this.faerdig) return '<p class="maal-tekst">' + NK.html(o.valg.spm) + "</p>";
+        var gaet = this.valgt !== null ? '<p class="gaet-linje">Dit gæt: <b>' + NK.html(o.valg.svar[this.valgt].t) + "</b></p>" : "";
+        var nu = this.trinNu();
+        return gaet + '<ol class="trinliste">' + o.trin.map(function (t, i) {
+            return '<li class="' + (i < nu ? "gjort" : (i === nu ? "nu" : "")) + '">' + NK.html(t) + "</li>";
+        }).join("") + "</ol>";
     };
 
-    /* Valgknapperne til gaettet */
+    /* Det trin i kortet, eleven er naaet til (3: alle er gjort) */
+    P.trinNu = function () {
+        if (this.faerdig || this.konstant) return 3;
+        var n = this.vejninger.length;
+        return n === 0 ? 0 : (n === 1 ? 1 : 2);
+    };
+
+    /* Valgknapperne til gaettet. De forsvinder, naar der er gaettet. */
     P.visKortEkstra = function () {
         var o = this.opg, mig = this, e = this.el.valg;
-        e.hidden = false;
         e.innerHTML = "";
+        e.hidden = this.valgt !== null || this.faerdig;
+        if (e.hidden) return;
         o.valg.svar.forEach(function (s, j) {
             var b = document.createElement("button");
             b.type = "button";
@@ -172,7 +198,8 @@
             this.holdSvar = 1;
         } else {
             this.k.tie();
-            this.rosNaeste = NK.html("Dit gæt: " + s.t + ". Forsøget afgør det.");
+            this.rosNaeste = "Forsøget afgør det.";
+            this.rosKlasse = "neutral";
         }
         this.visKort();
         this.visSkema();
@@ -216,8 +243,10 @@
         this.hjaelp = 0;
         if (this.holdSvar > 0) this.holdSvar--;
         else this.k.tie();
-        if (f !== "faerdig") this.besked((this.rosNaeste ? this.rosNaeste + " " : "") + this.trinLinje(), this.rosNaeste ? "god" : "");
+        var klasse = this.rosNaeste ? (this.rosKlasse === "neutral" ? "" : (this.rosKlasse || "god")) : "";
+        if (f !== "faerdig") this.besked((this.rosNaeste ? this.rosNaeste + " " : "") + this.trinLinje(), klasse);
         this.rosNaeste = "";
+        this.rosKlasse = "";
         this.visKnap();
         this.visSkema();
         if (f === "foer" || f === "vej") this.fokus();
@@ -271,12 +300,22 @@
         return f === "foer" || f === "vej" || f === "vaegtVent";
     };
 
+    /* Aendringen fra vejningen foer: "−0,50 g", eller "0,00 g", naar de er ens */
+    function aendring(v, forrige) {
+        if (!forrige) return "";
+        var d = Math.round((v.m - forrige.m) * 100);
+        return '<td class="aendr' + (d === 0 ? " ens" : "") + '">' + NK.komma(d) + " g</td>";
+    }
+
     P.visSkema = function () {
         var mig = this, tb = this.el.tbody;
         if (!tb) return;
         var aktiv = this.aktivRaekke() && this.vejninger.length < D.MAX_VEJNINGER;
+        /* Naeste raekke staar graa, mens diglen skal varmes */
+        var n = this.vejninger.length;
+        var naeste = !aktiv && !this.faerdig && !this.konstant && n >= 1 && n < D.MAX_VEJNINGER;
         var sig = this.vejninger.map(function (v) { return v.t.toFixed(1) + ":" + v.m; }).join("|") + (aktiv ? "|aktiv" + this.opvarmetTekst() : "") +
-            (this.faerdig ? "|f" : "");
+            (naeste ? "|n" : "") + (this.faerdig ? "|f" : "");
         if (sig === this.skemaSig) return;
         var gammel = tb.querySelector("input");
         var vaerdi = gammel ? gammel.value : "";
@@ -288,15 +327,21 @@
             var sidste = mig.faerdig && i >= mig.vejninger.length - 2 && i > 0;
             tr.className = sidste ? "konstant" : "";
             tr.innerHTML = "<th>" + (i === 0 ? "Før" : i + ". vejning") + "</th><td>" + (i === 0 ? "0 min" : K.min(v.t) + " min") +
-                '</td><td><div class="felt lille ok"><input type="text" disabled value="' + K.g2(v.m) + '"><span class="felt-efter">g</span></div></td>';
+                '</td><td><div class="felt lille ok"><input type="text" disabled value="' + K.g2(v.m) + '"><span class="felt-efter">g</span></div></td>' +
+                (aendring(v, mig.vejninger[i - 1]) || "<td></td>");
             tb.appendChild(tr);
         });
+        if (naeste) {
+            var tn = document.createElement("tr");
+            tn.className = "naeste";
+            tn.innerHTML = "<th>" + n + ". vejning</th><td colspan=\"3\">" + (n === 1 ? "varm diglen først" : "varm igen først") + "</td>";
+            tb.appendChild(tn);
+        }
         if (aktiv) {
             var tr = document.createElement("tr");
             tr.className = "valgt";
-            var n = this.vejninger.length;
             tr.innerHTML = "<th>" + (n === 0 ? "Før" : n + ". vejning") + "</th><td>" + (n === 0 ? "0 min" : this.opvarmetTekst()) +
-                '</td><td><div class="felt lille aktiv"><input id="forsoeg-inp" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen i diglen"><span class="felt-efter">g</span></div></td>';
+                '</td><td><div class="felt lille aktiv"><input id="forsoeg-inp" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen i diglen"><span class="felt-efter">g</span></div></td><td></td>';
             tb.appendChild(tr);
             var inp = tr.querySelector("input");
             inp.value = vaerdi;
@@ -308,7 +353,7 @@
         }
         var m = this.vejninger.length ? this.vejninger[this.vejninger.length - 1] : null;
         NK.saetTekst("forsoeg-note", this.faerdig && m ? "Massen er konstant: " + K.g2(m.m) + " g. Natronen tabte " +
-            K.g2(K.r2(this.vejninger[0].m - m.m)) + " g." : "Massen er konstant, når to vejninger i træk giver det samme.");
+            K.g2(K.r2(this.vejninger[0].m - m.m)) + " g." : "Massen er konstant, når to vejninger i træk er ens: ændringen er 0,00 g.");
     };
 
     P.opvarmetTekst = function () { return K.min(this.d.opv) + " min"; };
@@ -369,16 +414,21 @@
             if (!this.holdSvar) this.k.tie();
             this.rosNaeste = NK.tilfaeldig(D.ROS);
             this.visSkema();
+            this.visKort();
             return;
         }
         var ens = forrige && this.vejninger.length >= 3 && Math.abs(forrige.m - m) < D.KONSTANT.tol;
         if (ens && varmTil >= 200) { this.slut(maade); return; }
         if (!this.holdSvar) this.k.tie();
+        /* Massen er ikke konstant endnu: linjen siger, hvor meget den faldt */
+        var fald = K.r2(forrige.m - m);
+        this.rosKlasse = "gul";
         if (ens) this.rosNaeste = "Det samme som sidst, men diglen nåede ikke at blive rigtig varm. Varm længere.";
         else if (this.vejninger.length >= D.MAX_VEJNINGER) this.rosNaeste = "Skemaet er fuldt. Tryk på Start forfra, og varm længere ad gangen.";
-        else if (maade === "svar") this.rosNaeste = "";
+        else if (fald > 0) this.rosNaeste = "Massen faldt " + K.g2(fald) + " g. Den er ikke konstant endnu.";
         else this.rosNaeste = "Noteret: " + K.g2(m) + " g.";
         this.visSkema();
+        this.visKort();
     };
 
     /* Massen er konstant: maalingen gemmes */

@@ -25,8 +25,9 @@
     var MAAL = {
         /* Vaegten (som sc4.5 og sc4.11) */
         vaegt: { b: 240, h: 130, skaalX: 120, skaalY: 13, skaalB: 156, dispV: 72, dispH: 168, dispTop: 68, dispBund: 94, bund: 128 },
-        /* 9 V-batteriet: polerne rører ved y 3; det drejes om midten */
-        batteri: { b: 60, h: 100, pol: 3 },
+        /* Bunsenbraenderen (som sc4.7): mundingen (40, 18), slangens ende (1, 184),
+           bunden y 186. Den drejes om grebet (40, 100), naar den holdes vandret. */
+        bunsen: { b: 80, h: 190, mundX: 40, mundY: 18, bund: 186, grebX: 40, grebY: 100, slangeX: 1, slangeY: 184 },
         /* Iltflasken: udtaget (15, 21), haandhjulet (40, 10), bunden y 218 */
         iltflaske: { b: 80, h: 220, bund: 218, udtagX: 15, udtagY: 21, hjulX: 40, hjulY: 10 },
         /* Stjernekasteren (paaskeaegget): spidsen (20, 5), bunden y 158 */

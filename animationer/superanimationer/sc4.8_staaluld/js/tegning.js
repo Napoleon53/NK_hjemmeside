@@ -3,9 +3,9 @@
 
    Rummet, bordet og tavlen (som sc4.11), vaegten (som sc4.5), den
    varmefaste plade, klumpen af ståluld, der gloeder og bliver sort,
-   gnisterne, batteriet, iltflasken med slangen, stjernekasteren,
-   luppen med jernatomerne og luften, soejlerne paa fane 2 og
-   regnestykket med broekstreger (som sc4.3). Funktionerne tegner én ting
+   gnisterne, bunsenbraenderen med flammen og gasslangen, iltflasken
+   med slangen, stjernekasteren, luppen med jernatomerne og luften,
+   soejlerne paa fane 2 og regnestykket med broekstreger (som sc4.3). Funktionerne tegner én ting
    et bestemt sted og husker intet selv, bortset fra de smaa systemer
    (ulden, gnisterne og luppen), der hver hoerer til én klump. Fanerne
    bestemmer, hvor tingene staar.
@@ -242,7 +242,7 @@
     /* ----- Klumpen af ståluld ------------------------------------------------------------
        Traadene ligger i en ellipse med radius 1 (enhedskoordinater) og
        tegnes skaleret til klumpens stoerrelse. Naar klumpen er taendt,
-       faar hver traad en taerskel efter afstanden fra der, batteriet
+       faar hver traad en taerskel efter afstanden fra der, flammen
        roerte: den gloeder, naar branden (p) naar den, og bliver sort
        bagefter. */
     var BAAND = 0.16;       /* hvor bred den gloedende front er (del af p) */
@@ -267,7 +267,7 @@
         this.glo = [];          /* de gloedende traades midte i px (til gnisterne) */
     }
 
-    /* (u, v): der, batteriet roerte, i enhedskoordinater */
+    /* (u, v): der, flammen roerte, i enhedskoordinater */
     Uld.prototype.saetTaendt = function (u, v) {
         var maks = 0.01;
         this.t.forEach(function (f) { f.thr = Math.hypot(f.mx - u, f.my - v); maks = Math.max(maks, f.thr); });
@@ -294,11 +294,11 @@
     };
     T.Uld = Uld;
 
-    /* v: { p, ilt (0-1), tid, lys } */
+    /* v: { p, gloed (0-1), ilt (0-1), tid, lys } */
     T.uld = function (ctx, uld, cx, cy, rx, ry, v) {
         var p = v.p || 0, tid = v.tid || 0, ilt = v.ilt || 0;
         var bw = NK.klamp(rx / 55, 0.8, 1.7);
-        var sluk = NK.klamp((1 - p) / 0.03, 0, 1);         /* gloeden doer ud til sidst */
+        var sluk = NK.klamp((v.gloed || 0) * 1.6, 0, 1);    /* fronten falmer, naar gloeden doer */
         ctx.save();
         /* Skyggen paa pladen og en taet bund, saa klumpen ser fyldig ud */
         ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
@@ -422,22 +422,103 @@
     Gnister.prototype.antal = function () { return this.g.length; };
     T.Gnister = Gnister;
 
-    /* ----- Batteriet --------------------------------------------------------------------
-       (x, y): midten. h: hoejden. vinkel: 0 staaende, pi med polerne nedad. */
-    T.batteriKontakt = function (x, y, h, vinkel) {
-        var M = MAAL.batteri, k = h / M.h;
-        var dy = (M.pol - M.h / 2) * k;
-        return { x: x - Math.sin(vinkel) * dy, y: y + Math.cos(vinkel) * dy };
+    /* ----- Bunsenbraenderen (som sc4.7) ----------------------------------------------------
+       (gx, gy): grebet midt paa roeret. h: hoejden. vinkel: 0 staaende,
+       pi/2 vandret med flammen mod hoejre. Flammen er lige lang hele tiden. */
+    function bunsenPunkt(gx, gy, h, v, sx, sy) {
+        var M = MAAL.bunsen, k = h / M.h;
+        var dx = (sx - M.grebX) * k, dy = (sy - M.grebY) * k, c = Math.cos(v), s = Math.sin(v);
+        return { x: gx + dx * c - dy * s, y: gy + dx * s + dy * c };
+    }
+    T.bunsenPunkt = bunsenPunkt;
+
+    /* Grebet, naar braenderen staar paa bordet med midten af foden i x */
+    T.bunsenHjem = function (x, bund, h) {
+        var M = MAAL.bunsen, k = h / M.h;
+        return { x: x, y: bund - (M.bund - M.grebY) * k };
     };
 
-    T.batteri = function (ctx, x, y, h, vinkel, lys) {
-        var M = MAAL.batteri, k = h / M.h, b = M.b * k;
+    T.flammeLaengde = function (h) { return 0.36 * h; };
+
+    T.bunsenMund = function (gx, gy, h, v) { return bunsenPunkt(gx, gy, h, v, MAAL.bunsen.mundX, MAAL.bunsen.mundY); };
+
+    /* Spidsen af flammen: her taender den stålulden */
+    T.bunsenSpids = function (gx, gy, h, v) {
+        var m = T.bunsenMund(gx, gy, h, v), L = T.flammeLaengde(h) * 0.85;
+        return { x: m.x + Math.sin(v) * L, y: m.y - Math.cos(v) * L };
+    };
+
+    /* Er punktet paa braenderen? */
+    T.bunsenRamt = function (gx, gy, h, v, pt) {
+        var M = MAAL.bunsen, k = h / M.h;
+        var dx = pt.x - gx, dy = pt.y - gy, c = Math.cos(v), s = Math.sin(v);
+        var lx = (dx * c + dy * s) / k + M.grebX, ly = (-dx * s + dy * c) / k + M.grebY;
+        return lx >= 4 && lx <= M.b - 4 && ly >= 8 && ly <= M.h;
+    };
+
+    /* Gasslangen fra braenderen hen over bordet og ud ad venstre kant */
+    T.gasslange = function (ctx, gx, gy, h, v, bordY) {
+        var M = MAAL.bunsen, k = h / M.h;
+        var e = bunsenPunkt(gx, gy, h, v, M.slangeX, M.slangeY);
         ctx.save();
-        if (lys) T.skaer(ctx, x, y, b * 0.9, h * 0.62);
-        ctx.translate(x, y);
-        ctx.rotate(vinkel || 0);
-        NK.Sprites.tegn(ctx, "batteri", -b / 2, -h / 2, b, h);
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#b5452e";
+        ctx.lineWidth = 7 * k;
+        ctx.beginPath();
+        ctx.moveTo(e.x, e.y);
+        ctx.bezierCurveTo(e.x - 30 * k, Math.min(e.y + 60 * k, bordY - 2), 70, bordY - 3, -12, bordY - 3);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(224, 122, 95, 0.6)";
+        ctx.lineWidth = 2 * k;
+        ctx.stroke();
         ctx.restore();
+    };
+
+    /* Den blaa flamme fra mundingen (x, y) i retningen vinkel (0 er opad) */
+    T.flamme = function (ctx, x, y, h, v, t) {
+        var L = T.flammeLaengde(h) * (1 + 0.05 * Math.sin(t * 31) + 0.03 * Math.sin(t * 17));
+        var b = 0.075 * h;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(v);
+        ctx.globalCompositeOperation = "lighter";
+        var g = ctx.createLinearGradient(0, 0, 0, -L);
+        g.addColorStop(0, "rgba(90, 150, 255, 0.75)");
+        g.addColorStop(0.55, "rgba(120, 110, 255, 0.45)");
+        g.addColorStop(1, "rgba(180, 120, 255, 0)");
+        ctx.fillStyle = g;
+        var sv = Math.sin(t * 9) * b * 0.12;
+        ctx.beginPath();
+        ctx.moveTo(-b * 0.55, 0);
+        ctx.bezierCurveTo(-b, -L * 0.35, -b * 0.35 + sv, -L * 0.8, sv, -L);
+        ctx.bezierCurveTo(b * 0.35 + sv, -L * 0.8, b, -L * 0.35, b * 0.55, 0);
+        ctx.closePath();
+        ctx.fill();
+        var hi = L * 0.38;
+        var g2 = ctx.createLinearGradient(0, 0, 0, -hi);
+        g2.addColorStop(0, "rgba(160, 220, 255, 0.95)");
+        g2.addColorStop(1, "rgba(110, 170, 255, 0.35)");
+        ctx.fillStyle = g2;
+        ctx.beginPath();
+        ctx.moveTo(-b * 0.42, 0);
+        ctx.quadraticCurveTo(-b * 0.3, -hi * 0.7, 0, -hi);
+        ctx.quadraticCurveTo(b * 0.3, -hi * 0.7, b * 0.42, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    };
+
+    /* Braenderen med flammen. Grebet i (gx, gy), drejet vinkel om det. */
+    T.bunsen = function (ctx, gx, gy, h, v, t, lys) {
+        var M = MAAL.bunsen, k = h / M.h;
+        ctx.save();
+        if (lys) T.skaer(ctx, gx, gy, M.b * k * 0.9, h * 0.6);
+        ctx.translate(gx, gy);
+        ctx.rotate(v || 0);
+        NK.Sprites.tegn(ctx, "bunsen", -M.grebX * k, -M.grebY * k, M.b * k, h);
+        ctx.restore();
+        var m = T.bunsenMund(gx, gy, h, v || 0);
+        T.flamme(ctx, m.x, m.y, h, v || 0, t || 0);
     };
 
     /* ----- Iltflasken og slangen --------------------------------------------------------------

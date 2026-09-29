@@ -564,6 +564,28 @@
         NK.tekst(ctx, tekst, x, y, { font: font("600", px), justering: "center", linje: "middle", farve: farve || "#2a2f36" });
     };
 
+    /* Et groent maerke med ✓ ved en del, der er rigtig. (x, y): midten, r: radius */
+    T.okMaerke = function (ctx, x, y, r, alfa) {
+        ctx.save();
+        if (alfa !== undefined) ctx.globalAlpha *= NK.klamp(alfa, 0, 1);
+        ctx.fillStyle = "#2b9a5f";
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.lineWidth = Math.max(2, r * 0.24);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(x - r * 0.45, y + r * 0.02);
+        ctx.lineTo(x - r * 0.12, y + r * 0.36);
+        ctx.lineTo(x + r * 0.48, y - r * 0.34);
+        ctx.stroke();
+        ctx.restore();
+    };
+
     /* ----- Trekanten (det andet hint, naar formlen skal vendes) ------------------------
        (x, y): oeverste venstre hjoerne af kortet, s: bredden. maal: det
        bogstav, der dækkes over. Giver hoejden. */

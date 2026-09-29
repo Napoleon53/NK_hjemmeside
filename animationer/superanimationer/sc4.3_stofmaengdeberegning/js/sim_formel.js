@@ -52,6 +52,7 @@
         this.muldvarp = null;
         this.pilT = 0;
         this.rystT = 0;
+        this.okT = 1;
         this.lavPladser();
         var mig = this;
         this.brikker = (r.brikker ? NK.bland(r.brikker) : []).map(function (tekst, j) {
@@ -59,6 +60,7 @@
                      plads: null, laast: false, roed: 0, groen: 0, fly: null };
         });
         this.dele = {};
+        this.deleVist = {};
         (r.aabne || []).forEach(function (d) { mig.dele[d] = false; });
         if (r.ramme === "skriv") this.lavSkriv(); else this.el.raekker.innerHTML = "";
         this.el.raekker.hidden = r.ramme !== "skriv";
@@ -157,6 +159,7 @@
                 b.laast = true;
             });
             mig.dele[del] = true;
+            mig.deleVist[del] = true;
         });
         this.valgt = null;
         this.efterLoest();
@@ -315,7 +318,9 @@
         this.dele[del] = true;
         this.valgt = null;
         if (this.opgaveFaerdig()) this.efterLoest();
-        this.trinLoest(maade);
+        this.okT = 0;
+        this.okDel = del;
+        this.trinLoest(maade, null, del);
     };
 
     SimFormel.navnFejl = function (sym, tekst) {
@@ -437,8 +442,10 @@
         var faerdigt = i + 1 >= this.skrivF.length;
         if (faerdigt) { this.dele.formel = true; this.dele.enhed = true; this.efterLoest(); }
         else if (f.id === "formel") this.dele.formel = true;
+        if (faerdigt || f.id === "formel") { this.okT = 0; this.okDel = faerdigt ? "enhed" : "formel"; }
+        if (maade === "svar") this.deleVist[f.id === "formel" ? "formel" : "enhed"] = true;
         var svarHTML = maade === "svar" ? "<b>Svaret:</b> " + NK.html(f.id === "formel" ? "n = m / M" : "enheden for " + f.id + " er " + D.ENHED_TEKST[f.id]) + "." : null;
-        this.trinLoest(maade, svarHTML);
+        this.trinLoest(maade, svarHTML, f.id === "formel" ? "formel" : (faerdigt ? "enhed" : "enhed1"));
         if (note && maade === "ok" && !faerdigt) this.besked(NK.html(note) + " <b>n = m / M</b>. " + this.trinLinje(), "god");
     };
 
@@ -584,6 +591,7 @@
         if (this.enhedT > 0 && this.enhedT < 1) this.enhedT = Math.min(1, this.enhedT + dt / 2.4);
         if (this.pilT >= 0) this.pilT += dt;
         if (this.rystT > 0) this.rystT = Math.max(0, this.rystT - dt);
+        if (this.okT < 1) this.okT = Math.min(1, this.okT + dt / 0.45);
         if (this.muldvarp) {
             this.muldvarp.t += dt;
             if (this.muldvarp.t > 4) this.muldvarp = null;
@@ -709,6 +717,47 @@
     };
 
     /* ----- Tegn ----------------------------------------------------------------------- */
+
+    /* Rammerne om de rigtige dele: formlen og kolonnerne i skemaet. Maerket
+       med ✓ popper op for den del, der lige er blevet rigtig. En del, der
+       er vist med Vis svaret, faar en gul ramme og intet maerke. */
+    P.rammeOk = function (del) {
+        var lay = this.lay, s = lay.s, pl = this.pl, r = this.runde;
+        if (del === "formel") {
+            var hoej = r.ramme === "linje" ? s * 0.5 : s * 1.12;
+            var bred = r.ramme === "linje" ? s * 4.7 : s * 2.85;
+            return { x: lay.fx0 - s * 0.18, y: lay.fy - hoej - s * 0.14, b: bred + s * 0.36, h: hoej * 2 + s * 0.28, hjoerne: true };
+        }
+        var fo = del === "navn" ? "N_" : "E_";
+        var top = lay.tHoved - NK.klamp(s * 0.22, 12, 14) - 3;
+        var x = pl[fo + "n"].x - s * 0.1, b = pl[fo + "n"].b + s * 0.2;
+        return { x: x, y: top, b: b, h: pl[fo + "M"].y + pl[fo + "M"].h + s * 0.1 - top, hjoerne: false };
+    };
+
+    P.tegnOk = function (ctx) {
+        var mig = this, s = this.lay.s;
+        ["formel", "navn", "enhed"].forEach(function (del) {
+            if (!mig.dele[del]) return;
+            var q = mig.rammeOk(del), vist = !!mig.deleVist[del];
+            ctx.save();
+            ctx.fillStyle = vist ? "rgba(242, 197, 61, 0.1)" : "rgba(63, 174, 114, 0.1)";
+            NK.rundtRekt(ctx, q.x, q.y, q.b, q.h, 10);
+            ctx.fill();
+            ctx.strokeStyle = vist ? "rgba(201, 150, 20, 0.7)" : "rgba(43, 125, 81, 0.7)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+            if (vist) return;
+            var ny = mig.okDel === del || (del === "enhed" && mig.okDel === "enhed1");
+            var pop = ny && mig.okT < 1 ? NK.blod(mig.okT) : 1;
+            var rr = NK.klamp(s * 0.2, 10, 16);
+            /* Formlen: i rammens hjoerne. Kolonnerne: i hoejre side af overskriften */
+            var mx = q.hjoerne ? q.x + q.b : q.x + q.b - rr - 4;
+            var my = q.hjoerne ? q.y : mig.lay.tHoved;
+            Tg.okMaerke(ctx, mx, my, rr * (0.4 + 0.6 * pop), pop);
+        });
+    };
+
     P.tegn = function () {
         var ctx = this.L.ctx, lay = this.lay, r = this.runde, mig = this;
         if (!lay) return;
@@ -733,8 +782,12 @@
                 justering: "center", linje: "middle", farve: "rgba(60, 72, 90, 0.45)" });
         }
 
-        /* Formlen */
+        /* De dele, der er rigtige: en groen ramme med ✓ (brugerens oenske
+           29. sept. 2026: det skal vaere tydeligt, at formlen er rigtig) */
         var pl = this.pl;
+        this.tegnOk(ctx);
+
+        /* Formlen */
         var hvidF = r.ramme === "linje" ? null : lay.broek;
         if (r.ramme === "linje") {
             /* Den formel, der skal vendes, med en rigtig broekstreg */

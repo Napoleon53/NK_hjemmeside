@@ -32,6 +32,9 @@
         /* Krukken (som sc4.5), spatlen og luppen (som sc2.1) og katederet (som sc4.5) */
         pulverglas: { b: 100, h: 130, indV: 10, indH: 90, indTop: 34, indBund: 126, indR: 9,
                       etiketV: 12, etiketH: 88, etiketTop: 54, etiketBund: 108 },
+        /* Vaegten og vejebaaden paa fane 3 (som sc5.1) */
+        vaegt: { b: 240, h: 130, skaalX: 120, skaalY: 13, skaalB: 156, dispV: 72, dispH: 168, dispTop: 68, dispBund: 94, bund: 128 },
+        vejebaad: { b: 120, h: 36, indV: 16, indH: 104, indBund: 14, bund: 34 },
         spatel: { b: 160, h: 40, bladX: 22, bladY: 20, spidsX: 3, endeX: 157 },
         lup: { b: 140, h: 140, midtX: 52, midtY: 52, r: 38 },
         kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 }

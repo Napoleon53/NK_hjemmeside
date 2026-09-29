@@ -23,7 +23,9 @@ virker fra harddisken.
    dækker scenen, og Kemichael introducerer den fra sit hjørne (brugerens
    ønske 27. sept. 2026: den gamle hypoteseskærm var invasiv og en kedelig
    start); eleven aflæser og skriver selv m(før) og m(efter); stålulden
-   tændes med et 9 V-batteri; beregningen har formlen, mellemregningen i
+   tændes med en bunsenbrænder, der holdes vandret, og går ud, før alt
+   jernet har reageret, medmindre eleven giver ilt fra flasken (brugerens
+   ønsker 28. sept. 2026); beregningen har formlen, mellemregningen i
    brøkfelter og resultatet med enhed som sc4.3. Ud: skyderen med massen
    (klumperne har forskellig masse i stedet) og præcisions-badget (stjernerne
    i opgavelisten gør det samme, og gættet tæller ikke med, fordi det er
@@ -32,7 +34,7 @@ virker fra harddisken.
    skemaet og begrænsende mængde, `sc4.7` og `sc4.9` er de andre vejeforsøg,
    og `sc8.*` ejer redox. Her bruges kun forholdet 2 : 2 og de to
    molarmasser, der står på tavlen.
-4. **Loftet:** 2 faner. Forsøget: 2 målinger, 1 vægt, 1 klump, 1 batteri, 1
+4. **Loftet:** 2 faner. Forsøget: 2 målinger, 1 vægt, 1 klump, 1 bunsenbrænder, 1
    iltflaske, 1 lup med 45 jernatomer. Beregningen: 2 opgaver med 3 trin og
    ét spørgsmål, 3 søjler.
 5. **Layoutet:** scene plus panel som `sc4.11`, med den rolige Kemichael ved
@@ -45,7 +47,7 @@ vægten, der er ingen flasker at hælde fra, ingen uheld og ingen oprydning.
 
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
-| 1 | Forsøget | gætter gratis, aflæser m(før), tænder stålulden med batteriet, giver evt. ilt og aflæser m(efter) | stålulden bliver tungere, fordi ilt fra luften binder sig til jernet |
+| 1 | Forsøget | gætter gratis, aflæser m(før), tænder stålulden med bunsenbrænderen, giver evt. ilt og aflæser m(efter) | stålulden bliver tungere, fordi ilt fra luften binder sig til jernet |
 | 2 | Beregningen | skriver formlen, mellemregningen og resultatet i tre trin og svarer på, hvorfor vægten viste mindre | alt jernet kunne give m(FeO), men ilten når ikke ind til det hele |
 
 **Det gratis gæt.** Måling 1 begynder med tre kort oven på scenen: Lettere
@@ -61,12 +63,17 @@ linjen, om gættet holdt, og forklarer det ellers ud fra det, eleven gættede.
 
 **Forsøget.** Vægten er nulstillet med den varmefaste plade, så den viser
 stålulden (2,50-5,00 g). Eleven skriver m(før) i skemaet og trækker
-9 V-batteriet hen til stålulden (et klik på batteriet virker også: det
-flyver selv derhen). Stålulden gløder fra der, hvor batteriet rørte, fronten
-breder sig, trådene bliver mørke, og der kommer gnister. Vægten stiger
-hurtigt i starten og langsomt til sidst (ca. 20 s). Et klik på iltflasken
-giver ren ilt i 2 s, og så brænder den seks gange hurtigere og hvidere.
-m(efter) godkendes først, når vægten står stille. Tændes stålulden, før
+bunsenbrænderen hen til stålulden. Mens den holdes, vendes den vandret med
+flammen mod højre, og når flammespidsen rører stålulden, går den i brand
+(et klik på brænderen virker også: den flyver selv derhen). En gasslange
+går fra brænderen ud ad bordets venstre kant. Stålulden gløder fra der,
+hvor flammen rørte, fronten breder sig, trådene bliver mørke, og der kommer
+gnister. I luft falmer gløden, og efter ca. 33 s er stålulden gået ud, før
+alt jernet har reageret: en del af trådene er stadig grå. Et klik på
+iltflasken, mens den gløder, giver ren ilt i 2 s: gløden blusser op, den
+brænder hvidere og hurtigere, og med ilt nok når den helt til ende. Er den
+gået ud, kan den ikke tændes igen, og linjen siger bagefter, at den gik
+ud uden iltflasken. m(efter) godkendes først, når vægten står stille. Tændes stålulden, før
 m(før) er skrevet, siger linjen det; m(før) kan stadig skrives, hvis man så
 tallet. Luppen viser overfladen af en ståltråd: O₂ og N₂ flyver rundt, et
 O₂ flyver ned, deles, og de to O sætter sig på hver sit Fe. Overfladen
@@ -88,7 +95,7 @@ bordet er stålulden før, vægten efter og det, der er regnet ud; den grå del
 er jernet, den røde ilten, og den sidste søjle står stiplet med "?", til
 massen af FeO er regnet. Efter spørgsmålet viser en stiplet rød kasse den
 ilt, der ikke kom på. Har eleven ikke målt selv, bruges et eksempel
-(4,00 → 4,94 g og 3,00 → 3,68 g), og kortet siger det.
+(4,00 → 4,94 g med ilt og 3,00 → 3,41 g uden), og kortet siger det.
 
 **Kemichael ved katederet.** Som i sc4.5: han sidder stille nederst til
 venstre, introducerer gættet og siger ellers kun noget ved Giv hint og Vis
@@ -96,7 +103,9 @@ svaret. Knappen Send Kemichael ud sender ham på lærerværelset; så står
 hintene i opgavekortet. <kbd>K</kbd> får ham til at sige, hvor man er.
 
 **Påskeæg:** stjernekasteren i glasset på bordet. Et klik tænder den, og
-Kemichael siger noget tørt om den.
+Kemichael siger den samme linje hver gang: gnisterne er små korn af jern,
+der brænder (brugerens ønske 28. sept. 2026; tre skiftende replikker var
+forvirrende).
 
 Direkte link: `index.html#beregning`.
 
@@ -111,15 +120,16 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>T</kbd> teori ·
 index.html          markup for de to faner, gættet, teorien og rundvisningen
 css/stil.css        alt udseende (kopi af sc4.11; nyt nederst: gættets kort og brøkfelterne fra sc4.3).
                     NB: decimaltal med PUNKTUM i CSS
-sprites/            batteriet, iltflasken, stjernekasteren og de tre billeder til gættet (nye);
-                    vægten, luppen og katederet (som sc4.11)
+sprites/            iltflasken, stjernekasteren og de tre billeder til gættet (nye);
+                    bunsenbrænderen (som sc4.7), vægten, luppen og katederet (som sc4.11)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.11)
 js/data.js          atommasserne, klumperne, udbyttet, branden, gættet, regnetrinene, spørgsmålet og replikkerne
 js/kemi.js          klumpen (branden, ilten, hvad vægten viser) og facit
 js/tjek.js          formlen, mellemregningens felter og resultatet med enhed, de typiske fejl og de pæne beregninger
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
-js/tegning.js       rummet, bordet, tavlen, vægten, pladen, stålulden, der gløder, gnisterne, batteriet,
-                    iltflasken og slangen, stjernekasteren, luppen med atomerne, søjlerne og regnestykket
+js/tegning.js       rummet, bordet, tavlen, vægten, pladen, stålulden, der gløder, gnisterne, bunsenbrænderen
+                    med flammen og gasslangen, iltflasken og slangen, stjernekasteren, luppen med atomerne,
+                    søjlerne og regnestykket
 js/laerer.js        Kemichael ved katederet (som sc4.5 og sc4.11)
 js/fane.js          det, fanerne deler: opgavelisten, knappen, linjen i kortet, Kemichael og musen
 js/regning.js       regnestykket i kortet (formel, mellemregning i brøkfelter, resultat) og tavlen
@@ -134,7 +144,8 @@ _sprites.html       udviklerværktøj: viser tegningerne alene
 ## At rette i den
 
 **Klumperne** (`D.KLUMPER`), **udbyttet** (`D.UDBYTTE`) og **branden**
-(`D.BRAND`: hastigheden, og hvor meget ilten fra flasken hjælper) står i
+(`D.BRAND`: hastigheden, hvor hurtigt gløden dør i luft, og hvor meget ilten
+fra flasken hjælper) står i
 `js/data.js`. **Gættet** står i `D.GAET` (spørgsmålet, noten, Kemichaels
 linje og for hvert kort titlen, billedet, teksten og forklaringen, hvis
 gættet ikke holdt). **Regnetrinene** står i `D.TRIN` (navn, venstreside,
@@ -148,16 +159,18 @@ afgør stoffet: m(Fe), m(før), m(jern) og m(stålulden) er det samme, og m, n
 og M uden etiket får trinnets betydning, hvor det er entydigt.
 
 **`_selvtest.html`** åbner index.html i en iframe og tjekker molarmasserne,
-at alle klumper ender på den rigtige visning og bliver tungere, at ilten gør
-det mindst tre gange hurtigere, over 30 formler og fejl, facit og
-mellemregningens tal for alle klumper, de pæne beregninger, sproget, det
-gratis gæt (kortene, Kemichaels linje, ingen hint-knap, batteriet låst),
-fane 1 med musen (batteriet ved siden af og på ulden, iltflasken, m(efter)
-for tidligt, hint og svar hele vejen, tændt før m(før), stjernekasteren),
+at alle klumper med ilt hele vejen ender på den rigtige visning, at de uden
+ilt går ud efter 25-45 s med 45-70 % af det jern, ilten kan nå, at en
+udgået klump ikke kan tændes igen, eksemplerne, over 30 formler og fejl,
+facit og mellemregningens tal for alle klumper, de pæne beregninger,
+sproget, det gratis gæt (kortene, Kemichaels linje, ingen hint-knap,
+brænderen låst), fane 1 med musen (brænderen vendes vandret, sluppet langt
+væk og med flammen på ulden, iltflasken, m(efter) for tidligt, hint og svar
+hele vejen, tændt før m(før), gået ud, stjernekasteren med den samme linje),
 fane 2 med hint, brøkfelter, spørgsmålet og måling 2, Kemichael og layoutet
 fra 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 27. september 2026: ALT OK (119 påstande).
+bagefter. Sidst kørt 28. september 2026: ALT OK (127 påstande).
 
 ## Forenklinger
 
@@ -168,9 +181,13 @@ bagefter. Sidst kørt 27. september 2026: ALT OK (119 påstande).
 * Kun en del af jernet reagerer (75-88 %, ny for hver klump): ilten når ikke
   ind til det inderste. Gnister og stumper, der falder af, tager ingen masse
   med i modellen.
-* Branden: dp/dt = 0,10 · (1 − p) + 0,015 pr. sekund, hvor p er den del af
-  det jern, ilten kan nå, der har reageret; seks gange hurtigere med ilt fra
-  flasken. Tiden er trykket sammen: en klump brænder på ca. 20 s.
+* Branden: p er den del af det jern, ilten kan nå, der har reageret, og G er
+  gløden (1 ved tænding). I luft er dp/dt = 0,12 / 0,7 · G · (0,7 − p), og G
+  falder med 8,5 % pr. sekund; under 0,06 er stålulden gået ud (efter ca.
+  33 s, med p ≈ 0,6). Med ilt fra flasken stiger G mod 1, og dp/dt =
+  3 · (0,12 · G · (1 − p) + 0,02 · G), så p når 1. Tiden er trykket sammen.
+  At en udgået klump ikke kan tændes igen, er valgt, så forsøget kun når til
+  ende med iltflasken.
 * Luppen er et billede, ikke et antal: 45 jernatomer, hvor antallet med O
   følger modellen, og O sætter sig oven på Fe i stedet for et rigtigt
   oxidgitter. Luften har 7 N₂ og 3 O₂ (med flasken 3 og 8).

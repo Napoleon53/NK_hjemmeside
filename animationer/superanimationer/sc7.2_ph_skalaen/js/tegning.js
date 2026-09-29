@@ -56,9 +56,11 @@
     };
 
     /* ----- pH-skalaen ----------------------------------------------------------
-       s = { x0, x1, y, h }: baandet fra pH 0 (x0) til pH 14 (x1), y er toppen. */
-    T.skalaX = function (s, ph) { return s.x0 + (s.x1 - s.x0) * NK.klamp(ph, 0, 14) / 14; };
-    T.skalaPh = function (s, x) { return NK.klamp((x - s.x0) / (s.x1 - s.x0) * 14, 0, 14); };
+       s = { x0, x1, y, h }: baandet fra pH -1 (x0) til pH 15 (x1), y er toppen.
+       Skalaen stopper ikke ved 0 og 14 (K.PH_MIN og K.PH_MAKS). */
+    var SPAEND = K.PH_MAKS - K.PH_MIN;
+    T.skalaX = function (s, ph) { return s.x0 + (s.x1 - s.x0) * (NK.klamp(ph, K.PH_MIN, K.PH_MAKS) - K.PH_MIN) / SPAEND; };
+    T.skalaPh = function (s, x) { return NK.klamp(K.PH_MIN + (x - s.x0) / (s.x1 - s.x0) * SPAEND, K.PH_MIN, K.PH_MAKS); };
 
     /* v.px: tallenes stoerrelse, v.ord: SUR/NEUTRAL/BASISK i baandet,
        v.lys: 0-1, baandet lyser (noget holdes over det) */
@@ -67,7 +69,7 @@
         var px = v.px || 14;
         ctx.save();
         var g = ctx.createLinearGradient(s.x0, 0, s.x1, 0);
-        for (var p = 0; p <= 14; p += 0.5) g.addColorStop(p / 14, K.farveCss(p));
+        for (var p = K.PH_MIN; p <= K.PH_MAKS; p += 0.5) g.addColorStop((p - K.PH_MIN) / SPAEND, K.farveCss(p));
         ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
         NK.rundtRekt(ctx, s.x0 + 3, s.y + 4, s.x1 - s.x0, s.h, 7);
         ctx.fill();
@@ -89,23 +91,23 @@
         ctx.font = font("700", px);
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        for (var i = 0; i <= 14; i++) {
+        for (var i = K.PH_MIN; i <= K.PH_MAKS; i++) {
             var x = T.skalaX(s, i);
             ctx.beginPath();
             ctx.moveTo(x, s.y + s.h);
             ctx.lineTo(x, s.y + s.h + (i === 7 ? 9 : 6));
             ctx.stroke();
             ctx.fillStyle = i === 7 ? "#ffffff" : "#c8ced6";
-            ctx.fillText(String(i), x, s.y + s.h + 9);
+            ctx.fillText(String(i).replace("-", "−"), x, s.y + s.h + 9);
         }
 
         /* Ordene i selve baandet */
         if (v.ord) {
             var op = NK.klamp(s.h * 0.42, 11, 15);
             var t = s.y + s.h / 2;
-            NK.tekst(ctx, "⟵ SUR", T.skalaX(s, 0.25), t, { font: font("800", op), linje: "middle", kant: true, kantBredde: 3 });
+            NK.tekst(ctx, "⟵ SUR", T.skalaX(s, K.PH_MIN + 0.25), t, { font: font("800", op), linje: "middle", kant: true, kantBredde: 3 });
             if (v.ord !== "ender") NK.tekst(ctx, "NEUTRAL", T.skalaX(s, 7), t, { font: font("800", op), linje: "middle", justering: "center", kant: true, kantBredde: 3 });
-            NK.tekst(ctx, "BASISK ⟶", T.skalaX(s, 13.75), t, { font: font("800", op), linje: "middle", justering: "right", kant: true, kantBredde: 3 });
+            NK.tekst(ctx, "BASISK ⟶", T.skalaX(s, K.PH_MAKS - 0.25), t, { font: font("800", op), linje: "middle", justering: "right", kant: true, kantBredde: 3 });
         }
         ctx.restore();
     };
@@ -474,28 +476,6 @@
             ctx.textBaseline = "middle";
             ctx.font = font("800", Math.round(r * (slags === "h3o" ? 0.62 : 0.72)));
             ctx.fillText(I.tekst, x, y + 1);
-        }
-        ctx.restore();
-    };
-
-    /* For mange ioner at tegne: en taet taage i ionens farve */
-    T.taage = function (ctx, cx, cy, R, slags, alfa) {
-        var I = ION[slags], c = I.farve;
-        ctx.save();
-        ctx.globalAlpha *= alfa === undefined ? 1 : alfa;
-        var g = ctx.createRadialGradient(cx, cy, R * 0.1, cx, cy, R);
-        g.addColorStop(0, c);
-        g.addColorStop(1, I.kant);
-        ctx.fillStyle = g;
-        ctx.globalAlpha *= 0.82;
-        ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
-        ctx.globalAlpha /= 0.82;
-        /* Et fint net af prikker, saa det ligner mange smaa */
-        ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
-        var rnd = T.froe(17);
-        for (var i = 0; i < 700; i++) {
-            var a = rnd() * Math.PI * 2, d = Math.sqrt(rnd()) * R;
-            ctx.fillRect(cx + Math.cos(a) * d, cy + Math.sin(a) * d, 1.4, 1.4);
         }
         ctx.restore();
     };

@@ -19,8 +19,9 @@
 
    Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
    se på et skærmbillede: at modellen rammer tabelværdierne (vands
-   ionprodukt, pH for fortyndet saltsyre og natronlud, antallet af ioner i
-   luppen), at tallene skrives rigtigt, at tjekket af tallet på fane 3
+   ionprodukt, pH for fortyndet saltsyre og natriumhydroxid, antallet af ioner i
+   luppen), at luppen selv zoomer til 10-100 af den ion, der er flest af,
+   og tager ét zoom ad gangen, at tallene skrives rigtigt, at tjekket af tallet på fane 3
    giver den rigtige besked ved de typiske fejl, at sproget overholder
    reglerne, at alle tre faner kan gennemføres (også med musen), at
    syren aldrig bliver basisk, at Kemichael kan vises og sendes ud, og at
@@ -97,17 +98,37 @@ function koerTest(W) {
     paastand("syren kommer aldrig over pH 7, basen aldrig under", aldrig);
     var base = [[0.1, "13,00"], [1e-4, "10,00"], [1e-7, "7,21"], [1e-8, "7,02"]];
     var baseFejl = base.filter(function (x) { return K.phTekst(K.base(x[0]).ph, 2) !== x[1]; });
-    paastand("fortyndet natronlud: pH 13, 10, 7,21, 7,02", baseFejl.length === 0,
+    paastand("fortyndet natriumhydroxid: pH 13, 10, 7,21, 7,02", baseFejl.length === 0,
         baseFejl.map(function (x) { return x[0] + "→" + K.phTekst(K.base(x[0]).ph, 2); }).join(", "));
     paastand("syren: [H₃O⁺] = c + [OH⁻] (hver H₃O⁺ fra vandet har en OH⁻ med)", [1e-6, 1e-7, 1e-8].every(function (c) {
         var m = K.syre(c); return naer(m.h3o, c + m.oh, 1e-20);
     }));
-    paastand("luppen: 10 H₃O⁺ ved pH 7 og zoom 8, og 10 ved pH 13 og zoom 14", naer(K.antal(K.h3o(7), 8), 10, 1e-9) && naer(K.antal(K.h3o(13), 14), 10, 1e-9));
-    paastand("luppen: ét zoomklik er et 10 gange større rum", naer(K.rumfang(10) / K.rumfang(9), 10, 1e-9) && naer(K.side(10) / K.side(9), Math.pow(10, 1 / 3), 1e-9));
-    paastand("luppen: antallet er c · V · N_A", naer(K.antal(1e-7, 9), 1e-7 * K.rumfang(9) * K.NA, 1e-6));
-    paastand("terningen: 5,5 nm, 1,2 µm og 0,26 mm", K.sideTekst(2) === "5,5 nm" && K.sideTekst(9) === "1,2 µm" && K.sideTekst(16) === "0,26 mm",
-        K.sideTekst(2) + " / " + K.sideTekst(9) + " / " + K.sideTekst(16));
-    paastand("terningen på 1,2 µm er som en bakterie, 0,26 mm som et sandkorn", K.sammenligning(9) === "en bakterie" && K.sammenligning(16) === "et sandkorn");
+    paastand("luppen: 10 H₃O⁺ og 10 OH⁻ ved pH 7 og zoom 8", naer(K.antal(K.h3o(7), 8), 10, 1e-9) && naer(K.antal(K.oh(7), 8), 10, 1e-9));
+    paastand("luppen: ét zoom er et 10 gange større rum", naer(K.rumfang(8) / K.rumfang(7), 10, 1e-9) && naer(K.side(8) / K.side(7), Math.pow(10, 1 / 3), 1e-9));
+    paastand("luppen: antallet er c · V · N_A", naer(K.antal(1e-7, 8), 1e-7 * K.rumfang(8) * K.NA, 1e-6));
+    var AZ = [[7, 8], [6, 8], [5.9, 7], [5, 7], [2, 4], [0, 2], [-1, 1], [8, 8], [8.1, 7], [12, 4], [14, 2], [15, 1]];
+    var azFejl = AZ.filter(function (x) { return K.autoZoom(K.h3o(x[0]), K.oh(x[0])) !== x[1]; });
+    paastand("autozoom: pH 7 og 6 → 8, 5,9 → 7, 2 → 4, 0 og 14 → 2, −1 og 15 → 1", azFejl.length === 0,
+        azFejl.map(function (x) { return x[0] + "→" + K.autoZoom(K.h3o(x[0]), K.oh(x[0])); }).join(", "));
+    var azUd = [];
+    for (var p10 = -10; p10 <= 150; p10++) {
+        var ph = p10 / 10, z = K.autoZoom(K.h3o(ph), K.oh(ph));
+        var flest = Math.round(Math.max(K.antal(K.h3o(ph), z), K.antal(K.oh(ph), z)));
+        var faerrest = Math.round(Math.min(K.antal(K.h3o(ph), z), K.antal(K.oh(ph), z)));
+        if (flest < 10 || flest > 102 || faerrest > flest || z < K.ZOOM_MIN || z > K.ZOOM_NEUTRAL) azUd.push(ph + ": " + flest + " i zoom " + z);
+    }
+    paastand("autozoom: ved alle pH fra −1 til 15 er der 10-100 af den ion, der er flest af", azUd.length === 0, azUd.slice(0, 4).join("; "));
+    var syreZ = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5].map(function (c) { var m = K.syre(c); return K.autoZoom(m.h3o, m.oh); });
+    paastand("autozoom: hver fortynding af saltsyren er ét zoom ud (3, 4, 5, 6, 7)", syreZ.join(",") === "3,4,5,6,7", syreZ.join(","));
+    var naer7 = [1e-7, 1e-8, 1e-9].map(function (c) { var m = K.syre(c); return K.autoZoom(m.h3o, m.oh); });
+    paastand("autozoom: tæt ved 7 bliver rummet ikke større end i rent vand", naer7.every(function (z) { return z === K.ZOOM_NEUTRAL; }));
+    paastand("skalaen går fra −1 til 15, og 7 står i midten", K.PH_MIN === -1 && K.PH_MAKS === 15 &&
+        naer(Tg.skalaX({ x0: 0, x1: 160 }, 7), 80, 1e-9) && naer(Tg.skalaPh({ x0: 0, x1: 160 }, 0), -1, 1e-9) && K.phTekst(-1, 1) === "−1,0");
+    paastand("terningen: 5,5 nm ved zoom 2 og 550 nm i rent vand", K.sideTekst(2) === "5,5 nm" && K.sideTekst(8) === "550 nm",
+        K.sideTekst(2) + " / " + K.sideTekst(8));
+    paastand("rummets linje: samme rum, én gang og 1.000 gange mindre", K.rumTekst(8) === "Samme rum som i rent vand" &&
+        K.rumTekst(7) === "Zoomet én gang ind: rummet er 10 gange mindre" && K.rumTekst(5) === "Zoomet 3 gange ind: rummet er 1.000 gange mindre",
+        K.rumTekst(7) + " / " + K.rumTekst(5));
     var f1 = K.farve(1), f7 = K.farve(7), f13 = K.farve(13);
     paastand("universalindikatoren: rød ved 1, grøn ved 7, lilla ved 13", f1[0] > f1[1] && f1[0] > f1[2] && f7[1] > f7[0] && f7[1] > f7[2] && f13[2] > f13[1] && f13[0] > f13[1]);
 
@@ -135,17 +156,17 @@ function koerTest(W) {
     }));
     paastand("øl 4,5, blod 7,4 og sæbevand 9,5 fra den gamle er med", D.stof("oel").ph === 4.5 && D.stof("blod").ph === 7.4 && D.stof("saebevand").ph === 9.5);
     paastand("alle pH-værdier er mellem 0 og 14", D.STOFFER.every(function (s) { return s.ph >= 0 && s.ph <= 14; }));
-    var lupUmulig = D.LUP_MAAL.filter(function (m) {
-        for (var z = K.ZOOM_MIN; z <= K.ZOOM_MAKS; z++) {
-            if ((m.maal.zMin === undefined || z >= m.maal.zMin) && (m.maal.zMaks === undefined || z <= m.maal.zMaks)) return false;
-        }
-        return true;
-    });
-    paastand("alle fem mål i luppen kan nås inden for zoomen", D.LUP_MAAL.length === 5 && lupUmulig.length === 0);
-    paastand("mål 3: ved pH 2 og zoom 2-5 er der 1-1.000 H₃O⁺", [2, 3, 4, 5].every(function (z) { var n = K.antal(K.h3o(2), z); return n >= 1 && n <= 1000; }));
-    paastand("mål 4: den første OH⁻ ved pH 2 kommer ved zoom 12", K.antal(K.oh(2), 11) < 0.5 && K.antal(K.oh(2), 12) >= 1);
-    paastand("mål 4: ved pH 2 er der 10 milliarder H₃O⁺ for hver OH⁻", K.ord(K.h3o(2) / K.oh(2)) === "10 milliarder" && /10 milliarder/.test(D.LUP_MAAL[3].efter));
-    paastand("mål 5: fra pH 1 til 13 er 12 klik", D.LUP_MAAL[4].maal.zMin - D.LUP_MAAL[4].start.z === 12);
+    function azPh(ph) { return K.autoZoom(K.h3o(ph), K.oh(ph)); }
+    var LM = D.LUP_MAAL;
+    paastand("fem mål i luppen, og hvert starter, hvor det forrige sluttede", LM.length === 5 &&
+        LM.every(function (m, i) { return i === 0 ? m.start === 7 : m.start === (LM[i - 1].ph !== undefined ? LM[i - 1].ph : LM[i - 1].start); }));
+    paastand("mål 1: pH 6 er 100 H₃O⁺ og 1 OH⁻ i samme rum som rent vand", LM[0].ph === 6 && azPh(6) === 8 &&
+        Math.round(K.antal(K.h3o(6), 8)) === 100 && Math.round(K.antal(K.oh(6), 8)) === 1);
+    paastand("mål 2: fra pH 6 til 5 zoomer luppen én gang", azPh(LM[1].start) - azPh(LM[1].ph) === 1);
+    paastand("mål 3: fra pH 5 til 2 zoomer luppen tre gange, som svaret siger", azPh(LM[2].start) - azPh(LM[2].ph) === 3 && /Tre gange/.test(LM[2].efter));
+    paastand("mål 4: det rigtige valg er 10 opløftet i antallet af trin", LM[3].valg[LM[3].rigtig][0] === K.tusind(Math.pow(10, 7 - LM[3].start)) + " gange" &&
+        LM[3].valg.every(function (v, i) { return i === LM[3].rigtig ? v[1] === "" : v[1].length > 10; }));
+    paastand("mål 5: ved pH 12 viser luppen 100 OH⁻ og ingen H₃O⁺", Math.round(K.antal(K.oh(12), azPh(12))) === 100 && K.antal(K.h3o(12), azPh(12)) < 0.5);
     var m1 = D.FORTYND_MAAL[0], m5 = D.FORTYND_MAAL[4];
     paastand("fortyndingen, mål 1: det rigtige svar er modellens pH", m1.valg[m1.rigtig][0] === "pH " + K.phTekst(K.syre(D.START_C / 10).ph, 0));
     paastand("fortyndingen, mål 5: det rigtige svar er modellens pH", m5.valg[m5.rigtig][0] === "pH " + K.phTekst(K.base(D.START_C / 1000).ph, 0));
@@ -168,7 +189,7 @@ function koerTest(W) {
 
     overskrift("6. Sproget");
     var replikker = [].concat(D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND, D.HYLDE_ROS,
-        [D.LUP_FAERDIG, D.FORTYND_BASISK, D.FORTYND_FAERDIG, D.AEG_PRAECIS, D.AEG_ZOOM]);
+        [D.LUP_FAERDIG, D.FORTYND_BASISK, D.FORTYND_FAERDIG, D.AEG_PRAECIS]);
     var tekster = replikker.concat(
         D.STOFFER.map(function (s) { return s.navn + " " + s.note; }),
         D.HYLDER.map(function (h) { return h.navn + " " + h.hint; }),
@@ -185,6 +206,9 @@ function koerTest(W) {
     var lange = replikker.filter(function (t) { return t.length > 62; });
     paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
     paastand("hver præsentation har to eller tre replikker", [D.INTRO_SKALA, D.INTRO_LUP, D.INTRO_FORTYND].every(function (l) { return l.length >= 2 && l.length <= 3; }));
+    paastand("ordet natronlud står ingen steder (natriumhydroxid)", !tekster.concat([krop]).some(function (t) { return /natronlud/i.test(t); }));
+    paastand("ingen zoomknapper nævnes (luppen zoomer selv)", !tekster.concat([krop]).some(function (t) { return /[Zz]oom med|klik ud|klik ind|med \+ og/.test(t); }),
+        tekster.filter(function (t) { return /[Zz]oom med|klik ud|klik ind/.test(t); }).join(" | "));
     paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
 
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
@@ -270,70 +294,94 @@ function koerTest(W) {
     L.tilpas();
     L.afvisTilbud();
     L.nr = 0; L.startMaal(); tik(L, 0.5);
-    paastand("mål 1 starter ved pH 7 med 10 H₃O⁺ og 10 OH⁻ i luppen", L.ph === 7 && L.lup.synlige("h3o") === 10 && L.lup.synlige("oh") === 10);
-    var cl = d.getElementById("lup-laerred"), ll = L.lay;
-    L.zoom(1); tik(L, 1);
-    paastand("zoom ud ved pH 7: 100 H₃O⁺, men målet er ikke nået", L.lup.synlige("h3o") === 100 && !L.naaet);
-    L.zoom(-1); tik(L, 1);
+    function lupStatus() { return d.getElementById("lup-status").textContent; }
+    paastand("mål 1 starter ved pH 7 med 10 H₃O⁺ og 10 OH⁻, og der er ingen zoomknapper", L.ph === 7 && L.lup.z === 8 &&
+        L.lup.synlige("h3o") === 10 && L.lup.synlige("oh") === 10 && !L.lay.ud && !L.lay.ind && !L.zoom);
+    var cl = d.getElementById("lup-laerred"), ll = L.lay, sy = ll.skala.y + ll.skala.h / 2;
     var x7 = Tg.skalaX(ll.skala, 7), x6 = Tg.skalaX(ll.skala, 6.05);
-    mus(cl, "pointerdown", x7, ll.skala.y + ll.skala.h / 2);
-    mus(cl, "pointermove", (x7 + x6) / 2, ll.skala.y + ll.skala.h / 2);
-    mus(cl, "pointermove", x6, ll.skala.y + ll.skala.h / 2);
+    mus(cl, "pointerdown", x7, sy);
+    mus(cl, "pointermove", (x7 + x6) / 2, sy);
+    mus(cl, "pointermove", x6, sy);
     tik(L, 0.2);
     paastand("mens mærket holdes, er målet ikke nået endnu", !L.naaet);
-    mus(cl, "pointerup", x6, ll.skala.y + ll.skala.h / 2);
+    mus(cl, "pointerup", x6, sy);
     tik(L, 0.8);
-    paastand("pH-mærket kan trækkes til pH 6: 100 H₃O⁺ og 1 OH⁻, og mål 1 er nået", L.ph === 6 && L.naaet &&
+    paastand("pH-mærket kan trækkes til pH 6: 100 H₃O⁺ og 1 OH⁻ i samme rum, og mål 1 er nået", L.ph === 6 && L.naaet && L.lup.z === 8 &&
         L.lup.synlige("h3o") === 100 && L.lup.synlige("oh") === 1);
     paastand("panelet viser 10 gange så mange H₃O⁺ og [H₃O⁺] = 1,0 · 10⁻⁶ M", /10 gange så mange H₃O⁺/.test(d.getElementById("lup-modvand").textContent) &&
         d.getElementById("lup-ch").textContent === "1,0 · 10⁻⁶ M");
     L.knap(); tik(L, 0.3);
-    L.saetPh(8); L.traek = null; tik(L, 0.3);
-    paastand("mål 2: pH 8 er ikke nok", !L.naaet);
-    L.saetPh(9); tik(L, 0.5);
-    paastand("pH 9 giver 1.000 OH⁻, og mål 2 er nået", L.naaet && L.lup.synlige("oh") === 1000);
+    paastand("mål 2 starter ved pH 6", L.ph === 6 && !L.naaet && L.maal() === D.LUP_MAAL[1]);
+    L.saetPh(5.9); tik(L, 0.03);
+    paastand("ved pH 5,9 er der over 100 H₃O⁺, og linjen siger, at luppen zoomer ind", L.lup.zoomerMod() === -1 && /zoomer ind/.test(lupStatus()), lupStatus());
+    tik(L, 0.3);
+    paastand("under zoomet står skiltet \"10 gange mindre rum\" i luppen", !!L.lup.skilt && L.lup.skilt.tekst === "10 gange mindre rum" && L.lup.zoomT < 1);
+    tik(L, 1);
+    paastand("luppen har zoomet ind én gang: 13 H₃O⁺ i et 10 gange mindre rum", L.lup.z === 7 && L.lup.synlige("h3o") === 13 && L.lup.rolig());
+    paastand("panelet viser luppens nye terning (260 nm)", d.getElementById("lup-side").textContent === "260 nm", d.getElementById("lup-side").textContent);
+    L.saetPh(5); tik(L, 0.8);
+    paastand("pH 5: 100 H₃O⁺ i det lille rum, og mål 2 er nået", L.naaet && L.lup.z === 7 && L.lup.synlige("h3o") === 100);
     L.knap(); tik(L, 0.3);
-    L.saetPh(2); tik(L, 0.5);
-    paastand("mål 3: ved pH 2 er der for mange H₃O⁺, og luppen viser en tåge", L.lup.taageMaal.h3o === 1 && L.lup.synlige("h3o") === 0 &&
-        /Zoom ind/.test(d.getElementById("lup-status").textContent));
-    var z0 = L.z;
-    L.zoom(-1); L.zoom(-1); tik(L, 0.6);
-    paastand("to klik ind er ikke nok", !L.naaet);
-    L.zoom(-1); L.zoom(-1); tik(L, 0.6);
-    paastand("fire klik ind: 100 H₃O⁺, og mål 3 er nået", L.naaet && L.lup.synlige("h3o") === 100 && /zoomede 4 gange ind/.test(L.el.besked.textContent) && z0 - L.z === 4);
+    var x2 = Tg.skalaX(ll.skala, 2);
+    mus(cl, "pointerdown", x2, sy); mus(cl, "pointerup", x2, sy);
+    tik(L, 0.05);
+    paastand("et klik på skalaen får mærket til at glide derhen", !!L.glid && L.ph < 5 && L.ph > 2);
+    var zooms = 0, zSidst = L.lup.z, maksPrikker = 0;
+    for (var i = 0; i < 60 * 6; i++) {
+        L.opdater(1 / 60);
+        if (L.lup.z !== zSidst) { zooms++; zSidst = L.lup.z; }
+        maksPrikker = Math.max(maksPrikker, L.lup.synlige("h3o"));
+    }
+    paastand("fra pH 5 til 2 zoomer luppen tre gange, én ad gangen, og mål 3 er nået", zooms === 3 && L.lup.z === 4 && L.ph === 2 && L.naaet, zooms + " zoom, z " + L.lup.z);
+    paastand("mens mærket gled, tegnede luppen højst " + NK.Lup.MAKS_TEGN + " prikker", maksPrikker <= NK.Lup.MAKS_TEGN, maksPrikker);
     L.knap(); tik(L, 0.3);
-    for (var i = 0; i < 7; i++) L.zoom(1);
-    tik(L, 0.6);
-    paastand("mål 4: efter 7 klik ud er der stadig ingen OH⁻", !L.naaet && L.lup.synlige("oh") === 0);
-    L.zoom(1); tik(L, 0.6);
-    paastand("zoom 12: én OH⁻ i luppen, og mål 4 er nået", L.naaet && L.lup.synlige("oh") === 1 && L.z === 12);
+    paastand("mål 4 har fire valg og ingen pH at nå", d.querySelectorAll("#lup-opgave .vaelger").length === 4 && L.maal().slags === "valg");
+    klik("#lup-opgave .vaelger:nth-child(2)");
+    paastand("50 gange giver beskeden om at gange", !L.naaet && /lagt 10 sammen/.test(L.el.besked.textContent) && /Vælg igen/.test(L.el.besked.textContent));
+    klik("#lup-opgave .vaelger:nth-child(4)");
+    paastand("100.000 gange er rigtigt", L.naaet && d.querySelector("#lup-opgave .vaelger:nth-child(4)").classList.contains("rigtig"));
     L.knap(); tik(L, 0.3);
-    paastand("mål 5 starter ved pH 1 og zoom 2 med 10 H₃O⁺", L.ph === 1 && L.z === 2 && L.lup.synlige("h3o") === 10);
-    L.saetPh(13); tik(L, 0.3);
-    for (i = 0; i < 11; i++) L.zoom(1);
-    tik(L, 0.6);
-    paastand("11 klik er ikke nok", !L.naaet);
-    L.zoom(1); tik(L, 3);
-    paastand("12 klik ud ved pH 13: 10 H₃O⁺, og mål 5 er nået", L.naaet && L.lup.synlige("h3o") === 10);
+    var x12 = Tg.skalaX(ll.skala, 12), zoomUd = 0, zoomInd = 0, zs = L.lup.z;
+    mus(cl, "pointerdown", Tg.skalaX(ll.skala, 2), sy);
+    for (var t5 = 3; t5 <= 12; t5++) {
+        mus(cl, "pointermove", Tg.skalaX(ll.skala, t5), sy);
+        for (var k5 = 0; k5 < 54; k5++) {
+            L.opdater(1 / 60);
+            if (L.lup.z !== zs) { if (L.lup.z > zs) zoomUd++; else zoomInd++; zs = L.lup.z; }
+        }
+    }
+    paastand("mens mærket holdes på pH 12, er mål 5 ikke nået", L.ph === 12 && !L.naaet);
+    paastand("fra pH 2 til 12 zoomer luppen 4 gange ud og 4 gange ind", zoomUd === 4 && zoomInd === 4, zoomUd + " ud, " + zoomInd + " ind");
+    mus(cl, "pointerup", x12, sy);
+    tik(L, 1);
+    paastand("pH 12: 100 OH⁻ og ingen H₃O⁺, og mål 5 er nået", L.naaet && L.lup.z === 4 && L.lup.synlige("oh") === 100 && L.lup.synlige("h3o") === 0);
+    tik(L, 1);
     paastand("efter det sidste mål roser Kemichael", !!(L.laerer.scene && L.laerer.scene.navn === "faerdig"));
     tik(L, 8);
     L.knap();
     paastand("knappen går videre til fortyndingen", d.getElementById("fane-fortynd").classList.contains("aktiv"));
     klik('[data-fane="fane-lup"]');
     paastand("fane 2 har nu frit valg", !L.maal() && L.el.knap.textContent === "Start målene forfra");
-    L.saetPh(7); L.traek = null;
+    L.glid = null; L.saetPh(7); L.traek = null; L.lup.straks();
     L.tast({ key: "ArrowLeft" });
     paastand("venstre pil sænker pH med 0,1", naer(L.ph, 6.9, 1e-9));
-    L.tast({ key: "ArrowDown" });
-    paastand("pil ned går til nærmeste hele pH under", L.ph === 6);
-    var zf = L.z; L.tast({ key: "+" });
-    paastand("+ zoomer ind", L.z === zf - 1);
-    for (i = 0; i < 20; i++) L.zoom(1);
-    paastand("zoom stopper ved " + K.ZOOM_MAKS + " med en besked", L.z === K.ZOOM_MAKS && /Længere ud/.test(L.el.besked.textContent));
+    L.tast({ key: "ArrowDown" }); tik(L, 1);
+    paastand("pil ned glider til nærmeste hele pH under", L.ph === 6);
+    paastand("+ og − gør ingenting", L.tast({ key: "+" }) === false && L.tast({ key: "-" }) === false);
+    var forMange = [];
+    for (var q = -10; q <= 150; q += 4) {
+        L.glid = null; L.saetPh(q / 10); L.lup.straks();
+        var a1 = L.lup.synlige("h3o"), a2 = L.lup.synlige("oh");
+        if (Math.max(a1, a2) > 102 || Math.max(a1, a2) < 10) forMange.push(q / 10 + ": " + a1 + "/" + a2);
+    }
+    paastand("færdigzoomet tegner luppen 10-100 prikker af den ion, der er flest af, ved alle pH", forMange.length === 0, forMange.slice(0, 4).join("; "));
     L.knap();
-    paastand("Start målene forfra", L.nr === 0 && L.maal() === D.LUP_MAAL[0]);
-    L.nr = 2; L.startMaal(); L.knap(); L.knap(); tik(L, 1);
-    paastand("Vis svaret på mål 3: pH 2 og zoom 5", L.naaet && L.ph === 2 && L.z === 5 && L.lup.synlige("h3o") === 1000);
+    paastand("Start målene forfra", L.nr === 0 && L.maal() === D.LUP_MAAL[0] && L.ph === 7 && L.lup.z === 8);
+    L.nr = 2; L.startMaal(); L.knap(); L.knap(); tik(L, 0.1);
+    paastand("Vis svaret på mål 3: knappen venter, mens mærket glider", L.el.knap.disabled && !L.naaet);
+    tik(L, 5);
+    paastand("og så er mærket på pH 2, luppen har zoomet, og svaret står i gult", L.naaet && L.ph === 2 && L.lup.z === 4 &&
+        /Svar:/.test(L.el.besked.innerHTML) && /gul/.test(L.el.besked.className));
     L.nr = 0; L.startMaal();
 
     overskrift("9. Fortyndingen kan gennemføres");
@@ -342,36 +390,56 @@ function koerTest(W) {
     F.afvisTilbud();
     F.nr = 0; F.toemBordet(); F.startMaal(); tik(F, 0.3);
     var cf = d.getElementById("fortynd-laerred"), lf = F.lay;
-    paastand("bordet har saltsyren ved pH 1 og natronluden ved pH 13", F.serier.syre.length === 1 && F.serier.base.length === 1 &&
+    function vent(sek) { tik(F, sek || 3.6); }
+    paastand("bordet har saltsyren ved pH 1 og natriumhydroxiden ved pH 13", F.serier.syre.length === 1 && F.serier.base.length === 1 &&
         Math.abs(F.serier.syre[0].x - Tg.skalaX(lf.skala, 1)) < 1 && Math.abs(F.serier.base[0].x - Tg.skalaX(lf.skala, 13)) < 1);
+    paastand("luppen viser saltsyren: 100 H₃O⁺ og ingen zoomknapper", F.lup.z === 3 && F.lup.synlige("h3o") === 100 && !lf.ud && !lf.ind);
+    var ks = lf.knapSyre, kb = lf.knapBase;
+    mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
+    paastand("kravlegården: før buddet er valgt, virker knappen ikke og siger hvorfor", !F.anim && /Vælg dit bud/.test(F.el.besked.textContent));
     klik("#fortynd-opgave .vaelger:nth-child(2)");
     paastand("mål 1: et bud på pH 1,1 bliver husket", F.valgNr === 1 && /Dit bud/.test(F.el.besked.textContent) && !F.naaet);
-    var ks = lf.knapSyre;
+    mus(cf, "pointerup", kb.x + kb.b / 2, kb.y + kb.h / 2);
+    paastand("kravlegården: natriumhydroxidens knap er spærret i mål 1", !F.anim && /saltsyren/.test(F.el.besked.textContent) && F.spaerret("base") !== "");
     mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
     paastand("knappen Fortynd 10 gange starter pipetten", !!F.anim && F.animFase() === "suger");
     mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
     paastand("et klik mere, mens der fyldes, giver en besked", /Vent/.test(F.el.besked.textContent) && F.serier.syre.length === 2);
-    tik(F, 2.2);
+    tik(F, 2.0);
     var g1 = F.serier.syre[1];
     paastand("det nye glas har pH 2,00 og står under pH 2", !F.anim && K.phTekst(g1.ph, 2) === "2,00" && Math.abs(g1.x - Tg.skalaX(lf.skala, 2)) < 1 && g1.fyld > 100);
+    paastand("luppen viser det nye glas i samme rum: 10 gange færre H₃O⁺", F.valgt === g1 && F.lup.z === 3 && F.lup.synlige("h3o") === 10 &&
+        /10 gange færre H₃O⁺/.test(d.getElementById("fortynd-status").textContent));
+    paastand("svaret kommer først, når luppen har zoomet", !F.naaet && !/helt trin/.test(F.el.besked.textContent));
+    vent(2);
+    paastand("så zoomer luppen ud til et 10 gange større rum med 100 H₃O⁺", F.lup.z === 4 && F.lup.synlige("h3o") === 100 && F.lup.rolig());
     paastand("buddet pH 1,1 var forkert og får sin forklaring", !F.naaet && /helt trin/.test(F.el.besked.textContent));
+    mus(cf, "pointerup", ks.x + ks.b / 2, ks.y + ks.h / 2);
+    paastand("kravlegården: der kan ikke fortyndes mere i mål 1", !F.anim && F.serier.syre.length === 2 && /Vælg igen/.test(F.el.besked.textContent));
     klik("#fortynd-opgave .vaelger:nth-child(3)");
     paastand("pH 2: mål 1 er nået", F.naaet);
-    paastand("luppen viser det nye glas", F.valgt === g1 && d.getElementById("fortynd-ph").textContent === "2,00");
+    paastand("panelet viser det nye glas", d.getElementById("fortynd-ph").textContent === "2,00" && d.getElementById("fortynd-nh").textContent === "100");
     F.knap();
-    for (i = 0; i < 3; i++) { F.fortynd("syre"); tik(F, 2); }
+    for (i = 0; i < 3; i++) { F.fortynd("syre"); vent(); }
     paastand("mål 2: fire fortyndinger giver pH 5, og målet er nået", F.naaet && K.phTekst(F.sidste("syre").ph, 2) === "5,00");
+    paastand("luppen er zoomet ud til pH 5-glasset: 100 H₃O⁺ i zoom 7", F.lup.z === 7 && F.lup.synlige("h3o") === 100);
+    F.fortynd("syre");
+    paastand("kravlegården: der kan ikke fortyndes forbi målet", !F.anim && F.antalFortyndinger("syre") === 4);
     F.knap(); tik(F, 0.2);
+    F.fortynd("syre");
+    paastand("mål 3 (skriv tallet): knapperne er spærret", !F.anim && /Skriv tallet/.test(F.el.besked.textContent));
     F.input.value = "40"; F.tjekFelt();
     paastand("mål 3: 40 giver beskeden om at gange", !F.naaet && /lagt 10 sammen/.test(F.el.besked.textContent));
     F.input.value = "10.000"; F.tjekFelt();
     paastand("10.000 er rigtigt", F.naaet);
     F.knap(); tik(F, 0.2);
-    var surt = true;
-    for (i = 0; i < 5; i++) { F.fortynd("syre"); tik(F, 2); if (!(F.sidste("syre").ph < 7)) surt = false; }
+    var surt = true, zNaer7 = [];
+    for (i = 0; i < 5; i++) { F.fortynd("syre"); vent(); if (!(F.sidste("syre").ph < 7)) surt = false; zNaer7.push(F.lup.z); }
     paastand("mål 4: syren er fortyndet 9 gange, og pH kom aldrig over 7", surt && F.antalFortyndinger("syre") === D.MAKS_GLAS && F.naaet,
         F.serier.syre.map(function (g) { return K.phTekst(g.ph, 2); }).join(" "));
     paastand("de sidste glas viser 6,79, 6,98, 7,00 og 7,00", F.serier.syre.slice(6).map(function (g) { return K.phTekst(g.ph, 2); }).join(" ") === "6,79 6,98 7,00 7,00");
+    paastand("tæt ved 7 zoomer luppen ikke længere ud, og til sidst er der 10 af hver", zNaer7.join(",") === "8,8,8,8,8" &&
+        F.lup.synlige("h3o") === 10 && F.lup.synlige("oh") === 10, zNaer7.join(","));
     tik(F, 2.5);
     paastand("Kemichael: det er vand nu", !!(F.laerer.scene && F.laerer.scene.navn === "sig"));
     F.fortynd("syre");
@@ -380,25 +448,29 @@ function koerTest(W) {
     paastand("syreglassene står til venstre for 7, og ingen højere end 5 rækker", !fejlSide && F.serier.syre.every(function (g) { return g.r < 5; }));
     tik(F, 8);
     F.knap(); tik(F, 0.2);
+    paastand("mål 5: nu er det natriumhydroxidens knap, der virker", F.spaerret("base") !== "" && /Vælg dit bud/.test(F.spaerret("base")));
     klik("#fortynd-opgave .vaelger:nth-child(3)");
-    for (i = 0; i < 3; i++) { F.fortynd("base"); tik(F, 2); }
-    paastand("mål 5: natronluden fortyndet 1.000 gange har pH 10,00, og målet er nået", F.naaet && K.phTekst(F.sidste("base").ph, 2) === "10,00");
+    for (i = 0; i < 3; i++) { F.fortynd("base"); vent(); }
+    paastand("mål 5: natriumhydroxiden fortyndet 1.000 gange har pH 10,00, og målet er nået", F.naaet && K.phTekst(F.sidste("base").ph, 2) === "10,00");
+    paastand("luppen viser 100 OH⁻ i pH 10-glasset", F.lup.z === 6 && F.lup.synlige("oh") === 100);
     tik(F, 3);
     paastand("efter det sidste mål roser Kemichael", !!(F.laerer.scene && F.laerer.scene.navn === "sig"));
     tik(F, 8);
     F.knap();
-    paastand("frit valg bagefter", !F.maal() && F.el.knap.textContent === "Start målene forfra");
+    paastand("frit valg bagefter: basens knap virker, syrens række er fuld", !F.maal() && F.el.knap.textContent === "Start målene forfra" &&
+        F.spaerret("base") === "" && /ikke plads/.test(F.spaerret("syre")));
     var basisk = F.serier.base.every(function (g) { return g.ph > 7; });
-    paastand("natronluden er basisk i alle glas", basisk);
+    paastand("natriumhydroxiden er basisk i alle glas", basisk);
     var gl = F.serier.syre[3];
     var hb = gl.bund - lf.gh * gl.skala * 0.5;
     mus(cf, "pointerup", gl.x, hb);
-    paastand("et klik på et glas viser det i luppen", F.valgt === gl && d.getElementById("fortynd-ph").textContent === "4,00");
+    paastand("et klik på et glas viser det i luppen med det samme (100 H₃O⁺ i zoom 6)", F.valgt === gl && d.getElementById("fortynd-ph").textContent === "4,00" &&
+        F.lup.z === 6 && F.lup.synlige("h3o") === 100);
     F.nulstil();
     paastand("Tøm bordet efterlader kun de to flasker", F.serier.syre.length === 1 && F.serier.base.length === 1);
     F.knap();
     paastand("Start målene forfra", F.nr === 0);
-    F.nr = 1; F.startMaal(); F.knap(); F.knap(); tik(F, 10);
+    F.nr = 1; F.startMaal(); F.knap(); F.knap(); tik(F, 12);
     paastand("Vis svaret på mål 2 fortynder selv til pH 5", F.naaet && F.antalFortyndinger("syre") >= 4);
     F.nr = 0; F.toemBordet(); F.startMaal();
 
@@ -471,7 +543,6 @@ function koerTest(W) {
                 var gr = { x: g.cx - g.b / 2, y: g.bund - g.b * 1.2, b: g.b, h: g.b * 1.2 };
                 inde(gr, "glasset");
                 over(gr, { x: Lp.cx - Lp.R, y: Lp.cy - Lp.R, b: 2 * Lp.R, h: 2 * Lp.R }, "glasset under luppen");
-                [lay.ud, lay.ind].forEach(function (k) { inde({ x: k.x - k.r, y: k.y - k.r, b: 2 * k.r, h: 2 * k.r }, "en zoomknap"); });
                 if (lay.tekstY + 40 > Hc) problemer.push(id + ": tællingen går under kanten");
             }
             if (id === "fane-fortynd") {

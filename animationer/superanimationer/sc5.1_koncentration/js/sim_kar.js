@@ -42,7 +42,7 @@
     }
 
     var P = SimKar.prototype;
-    NK.Fane.paa(P, { navn: "kar", naesteFane: "fane-kolbe", naesteNavn: "Målekolben" });
+    NK.Fane.paa(P, { navn: "kar", naesteFane: "fane-glas", naesteNavn: "c eller n?" });
 
     /* ----- Opgaven ------------------------------------------------------------ */
     P.lavOpgave = function (i) {

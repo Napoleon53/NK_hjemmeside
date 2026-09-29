@@ -1,5 +1,5 @@
 /* =====================================================================
-   app.js - binder de tre faner sammen
+   app.js - binder de fire faner sammen
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
    fane opdateres og tegnes. Kemichael praesenterer ikke med knapper her:
@@ -13,7 +13,7 @@
     var NK = window.NK;
 
     var sims = {};
-    var faner = ["fane-kar", "fane-kolbe", "fane-fortynd"];
+    var faner = ["fane-kar", "fane-glas", "fane-kolbe", "fane-fortynd"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
 
@@ -84,7 +84,7 @@
             return;
         }
         if (e.key === "k" || e.key === "K") { if (sim) sim.startIntro(true); return; }
-        if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
+        if (e.key === "1" || e.key === "2" || e.key === "3" || e.key === "4") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
         if (e.key === "r" || e.key === "R") { if (sim) sim.nulstil(); return; }
@@ -103,6 +103,7 @@
         NK.Sprites.start();
 
         sims["fane-kar"] = new NK.SimKar();
+        sims["fane-glas"] = new NK.SimGlas();
         sims["fane-kolbe"] = new NK.SimKolbe();
         sims["fane-fortynd"] = new NK.SimFortynd();
         NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen og selvtesten */

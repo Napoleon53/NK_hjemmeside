@@ -145,6 +145,43 @@
         return p1;
     };
 
+    /* ----- Plakaten paa fane 3: formlen for massen og enhederne ----------------- */
+    T.formelPlakat = function (ctx, x, y, b, h) {
+        ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+        ctx.fillRect(x + 4, y + 5, b, h);
+        ctx.fillStyle = "#ece8dd";
+        NK.rundtRekt(ctx, x, y, b, h, 4);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        [[x + 8, y + 8], [x + b - 8, y + 8]].forEach(function (q) {
+            ctx.fillStyle = "#c0392b";
+            ctx.beginPath();
+            ctx.arc(q[0], q[1], 3.2, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        /* m = n · M med bogstaverne i kursiv */
+        var dele = [["m", true], [" = ", false], ["n", true], [" · ", false], ["M", true]];
+        var px = NK.klamp(h * 0.34, 14, 40);
+        function skrift(kursiv) { return (kursiv ? "italic " : "") + font("700", px); }
+        var bredde = 0;
+        dele.forEach(function (d) { ctx.font = skrift(d[1]); d.push(ctx.measureText(d[0]).width); bredde += d[2]; });
+        var x1 = x + b / 2 - bredde / 2;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#1c1f26";
+        dele.forEach(function (d) { ctx.font = skrift(d[1]); ctx.fillText(d[0], x1, y + h * 0.38); x1 += d[2]; });
+        /* Enhederne under */
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#4a4438";
+        var t2 = "g = mol · g/mol";
+        NK.passendeSkrift(ctx, t2, b - 20, NK.klamp(px * 0.55, 12, 20), 10, "600");
+        ctx.fillText(t2, x + b / 2, y + h * 0.74);
+        ctx.restore();
+    };
+
     /* ----- Hylden paa vaeggen --------------------------------------------------- */
     T.hylde = function (ctx, x0, x1, y) {
         ctx.save();

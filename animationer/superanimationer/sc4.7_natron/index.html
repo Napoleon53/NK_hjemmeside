@@ -44,7 +44,7 @@
     <aside class="panel">
         <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Videre -->
         <div class="kort opgavekort" id="forsoeg-kort">
-            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">opgave <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">1</span></span></h2>
+            <h2><span id="forsoeg-titel">Opgave</span></h2>
             <div id="forsoeg-prompt"></div>
             <div class="knaprad valgrad" id="forsoeg-valg" hidden></div>
             <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
@@ -54,15 +54,10 @@
         <div class="kort maaling" id="forsoeg-skema">
             <h2>Vejningerne</h2>
             <table class="skema vejeskema">
-                <thead><tr><th></th><th>Opvarmet</th><th>Masse</th></tr></thead>
+                <thead><tr><th></th><th>Opvarmet</th><th>Masse</th><th>Ændring</th></tr></thead>
                 <tbody id="forsoeg-tbody"></tbody>
             </table>
             <p class="note" id="forsoeg-note"></p>
-        </div>
-
-        <div class="kort" id="forsoeg-opgaver">
-            <h2>Opgaven <span class="taeller">løst <b id="forsoeg-loest">0</b>/1</span></h2>
-            <div class="hyldeliste" id="forsoeg-liste"></div>
         </div>
     </aside>
 </section>
@@ -106,7 +101,6 @@
         <canvas id="fejl-laerred"></canvas>
         <div class="anker" id="fejl-anker-g1"></div>
         <div class="anker" id="fejl-anker-g2"></div>
-        <div class="anker" id="fejl-anker-graf"></div>
         <div class="anker" id="fejl-anker-laerer"></div>
         <button class="forfraknap" id="fejl-forfra" type="button" title="De samme to forsøg en gang til (R)">Kør igen ↺</button>
         <div class="kboble" id="fejl-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>

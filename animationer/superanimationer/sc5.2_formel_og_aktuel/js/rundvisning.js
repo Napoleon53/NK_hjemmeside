@@ -21,7 +21,7 @@
             { sel: "#opl-anker-zoom", titel: "Luppen", tekst: "Luppen viser altid lige meget væske. Én prik er 0,05 M af ionen." },
             { sel: "#opl-anker-soejler", titel: "Søjlerne", tekst: "Den grå søjle er saltets koncentration. De farvede er ionernes. Den stiplede linje er målet." },
             { sel: "#opl-data", titel: "Tallene", tekst: "Opløsningsskemaet, c = n / V og ionernes koncentrationer, mens du arbejder." },
-            { sel: "#opl-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Nogle opgaver starter med et gæt. Knappen giver et hint og derefter svaret." },
+            { sel: "#opl-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Nogle opgaver starter med et gæt, og nogle har spørgsmål, når saltet er opløst. Knappen giver et hint og derefter svaret." },
             { sel: "#opl-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du har løst det." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Ionerne: regn ionernes koncentrationer ud. Blandinger: en ion, der kommer fra to salte." }
         ],
@@ -33,7 +33,7 @@
             { sel: "#ioner-opgaver", titel: "Niveauerne", tekst: "Let, Middel og Svær. Middel er af og til baglæns. Svær starter fra massen. Ny opgave giver et nyt salt." }
         ],
         "fane-bland": [
-            { sel: "#bland-anker-glas", titel: "Glassene", tekst: "A og B hældes i blandingen, når du har regnet det samlede rumfang." },
+            { sel: "#bland-anker-glas", titel: "Glassene", tekst: "I første opgave kommer saltet fra vægten i vandet, når du har regnet dets koncentration. Ellers hældes A og B i blandingen, når du har regnet det samlede rumfang." },
             { sel: "#bland-anker-tavle", titel: "Tavlen", tekst: "Opgavens tal og beregningerne." },
             { sel: "#bland-kort", titel: "Opgaven", tekst: "Skriv formlen og så tallet. I stofmængden skal tallet foran ionen med, fx n = 2 · c · V." },
             { sel: "#bland-anker-zoom", titel: "Luppen", tekst: "Ionerne i blandingen kommer, når koncentrationen er fundet." },

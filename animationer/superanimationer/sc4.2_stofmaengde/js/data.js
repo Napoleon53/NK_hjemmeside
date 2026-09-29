@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - grundstofferne, maalene, parrene, ordrerne og replikkerne
+   data.js - grundstofferne, parrene, ordrerne og replikkerne
 
    Alt, der kan staa som data, staar her. Masser regnes i hundrededele
    af et gram (heltal), saa 3 · 63,55 giver praecis 190,65.
@@ -70,23 +70,9 @@
     };
 
     /* ----- Fane 1: vaegten ------------------------------------------------------
-       Fire maal i raekkefoelge. Hver klump er 1 mol. Maalet er naaet, naar
-       der ligger n mol af stoffet s paa vaegten. efter: beskeden bagefter. */
+       Hver klump er 1 mol, og klumper af forskellige stoffer kan ligge
+       sammen. Maalene og opgaverne staar i js/opgaver.js. */
     D.KLUMPER_MAKS = 10;
-    D.MAAL = [
-        { s: "Cu", n: 1, tekst: "Læg 1 mol kobber på vægten.",
-          hint: "Træk en klump fra krukken med kobber op på vægten. Hver klump er 1 mol.",
-          efter: "1 mol kobber vejer 63,55 g. Det er 6,02 · 10²³ atomer." },
-        { s: "Cu", n: 3, tekst: "Læg 3 mol kobber på vægten.",
-          hint: "Hver klump er 1 mol. Der skal ligge tre klumper kobber.",
-          efter: "3 mol vejer 3 gange så meget: 190,65 g. Og der er 3 gange så mange atomer." },
-        { s: "Au", n: 3, tekst: "Skift til guld, og lad de 3 mol ligge.",
-          hint: "Klik på krukken med guld. Klumperne på vægten skifter stof, men ikke antal.",
-          efter: "Stadig 3 mol og lige mange atomer: 1,81 · 10²⁴. Men massen er 590,91 g." },
-        { s: "C", n: 3, fremhaev: "alle", tekst: "Find det stof, hvor 3 mol vejer mindst.",
-          hint: "Molarmassen står på krukkerne. Den mindste molarmasse giver den mindste masse.",
-          efter: "3 mol carbon vejer kun 36,03 g. Carbonatomerne er de letteste her." }
-    ];
 
     /* ----- Fane 2: flest atomer -----------------------------------------------
        To proever, hver givet som [symbol, maengde, "mol" eller "g"]. Niveau
@@ -142,7 +128,7 @@
 
     /* ----- Fane 3: afvejning -------------------------------------------------
        En ordre er [niveau, symbol, stofmaengden, som den staar i ordren].
-       Svarene regnes med tre betydende cifre, som stofmaengden har. */
+       Massen regnes med tre betydende cifre, som stofmaengden har. */
     D.ORDRE_NIVEAUER = [
         { navn: "Hele mol", kort: "2,00 mol kobber og tre andre", farve: "#3d9ee0" },
         { navn: "Under 1 mol", kort: "0,500 mol jern og tre andre", farve: "#3fae72" },
@@ -158,8 +144,7 @@
         var mG = n * st.M / 100;
         return {
             nr: i, niveau: r[0], st: st, n: n, nTekst: r[2],
-            m: mG, mTekst: NK.betydende(mG, 3), vaegt: D.masse(st, n),
-            N: D.antal(n), NTekst: NK.potens(D.antal(n), 3)
+            m: mG, mTekst: NK.betydende(mG, 3), vaegt: D.masse(st, n)
         };
     });
     D.ORDRE_NIVEAUER.forEach(function (nv, n) {
@@ -171,7 +156,7 @@
        Hoejst ca. 60 tegn pr. replik og ingen teori. */
     D.INTRO_VAEGT = [
         "Vægten. Hver klump fra en krukke er 1 mol.",
-        "Træk dem op på vægten. Klik på en krukke for at skifte.",
+        "Træk dem op på vægten. Stofferne må gerne blandes.",
         "Tæl gerne atomerne selv. Jeg venter ikke."
     ];
     D.INTRO_ATOMER = [
@@ -184,12 +169,12 @@
         "Vægten afvejer, når tallet er rigtigt. Ikke før."
     ];
 
-    D.MAAL_FAERDIG = "Fire mål. Guldet bliver på hylden, tak.";
+    D.MAAL_FAERDIG = "Opvarmningen er slut. Guldet bliver på hylden, tak.";
 
     D.ORDRE_ROS = [
         "Fire ordrer afvejet. Hele mol er de nemme.",
         "Under 1 mol, og intet gik tabt.",
-        "Skæve tal og store potenser. Godt regnet."
+        "Skæve tal og små mængder. Godt regnet."
     ];
     D.ORDRER_FAERDIG = "Tolv ordrer afvejet. Jeg skriver det i regnskabet.";
 

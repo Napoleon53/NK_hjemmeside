@@ -50,16 +50,24 @@
         return f ? f.fase : null;
     };
 
+    /* Etiketten staar med store bogstaver; saltenes formler maa ikke foelge med */
+    function navnHTML(id, o) {
+        var h = NK.html(D.TRIN[id].navn), t = o.tal;
+        if (!t) return h;
+        return h.replace("{A}", '<span class="formel">' + NK.html(D.salt(t.A).formel) + "</span>")
+            .replace("{B}", '<span class="formel">' + NK.html(D.salt(t.B).formel) + "</span>");
+    }
+
     /* ----- Raekkerne ------------------------------------------------------------- */
     P.byg = function () {
         var mig = this, o = this.opg, vaert = this.vaert;
         vaert.innerHTML = "";
         this.felter.forEach(function (f, i) {
-            var t = D.TRIN[f.id];
+            var t = D.TRIN[f.id], navn = T.navn(f.id, o);
             var rk = document.createElement("div");
             rk.className = "raekke";
             var formelKendt = t.formel && (f.fase === "tal" || f.status === "ok" || f.status === "svar");
-            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + (i + 1) + ". " + NK.html(t.navn) +
+            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + (i + 1) + ". " + navnHTML(f.id, o) +
                 '</span></div>' + (formelKendt ? '<div class="raekke-formel">' + NK.html(T.formelTekst(f.id, o)) + "</div>" : "") +
                 '<div class="felter"></div>';
             var fe = document.createElement("div");
@@ -81,7 +89,7 @@
                 fe.className = "felt " + f.status + (formel ? " formelfelt" : "");
                 fe.innerHTML = '<span class="felt-pre">' + NK.html(pre) + '</span>' +
                     '<input type="text" inputmode="' + (formel ? "text" : "decimal") + '" autocomplete="off" spellcheck="false" aria-label="' +
-                    NK.html((formel ? "Formlen for " : "") + t.navn) + '" placeholder="' + (formel ? "skriv formlen" : "tallet") + '"' + fra + '>' +
+                    NK.html((formel ? "Formlen for " : "") + navn) + '" placeholder="' + (formel ? "skriv formlen" : "tallet") + '"' + fra + '>' +
                     (formel ? "" : '<span class="felt-efter">' + NK.html(t.enhed) + '</span>') +
                     '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
                 var inp = fe.querySelector("input");
@@ -208,23 +216,27 @@
         var n = this.felter.length;
         var hvad = f.fase === "formel" ? "Skriv <b>formlen</b> for " + NK.html(T.venstre(f.id, this.opg)) + "." :
             (f.fase === "koef" ? "Skriv <b>tallene</b> foran ionerne." : "Skriv <b>tallet</b>.");
-        return (n > 1 ? "Trin " + (this.k + 1) + " af " + n + ": " : "") + NK.html(D.TRIN[f.id].navn) + ". " + hvad;
+        return (n > 1 ? "Trin " + (this.k + 1) + " af " + n + ": " : "") + NK.html(T.navn(f.id, this.opg)) + ". " + hvad;
     };
 
     /* ----- Tavlen ------------------------------------------------------------------
-       r: rektanglet. data: linjerne med opgavens tal. */
-    function linje(ctx, dele, x, y, b, f, farver) {
+       r: rektanglet. data: linjerne med opgavens tal. Med tegn = false maales
+       der kun (saa skriften kan skrumpe, til alt er paa tavlen). */
+    function linje(ctx, dele, x, y, b, f, farver, tegn) {
         var hel = dele.join(" ");
         ctx.font = Tg.font("600", f);
         if (ctx.measureText(hel).width <= b || dele.length < 2) {
-            var xx = x;
+            if (!tegn) return 1;
+            var s1 = NK.passendeSkrift(ctx, hel, b, f, 12, "600"), xx = x;
             dele.forEach(function (d, i) {
-                NK.tekst(ctx, d, xx, y, { font: Tg.font("600", f), linje: "middle", farve: farver[i] || farver[0] });
+                NK.tekst(ctx, d, xx, y, { font: Tg.font("600", s1), linje: "middle", farve: farver[i] || farver[0] });
+                ctx.font = Tg.font("600", s1);
                 xx += ctx.measureText(d + " ").width;
             });
             return 1;
         }
-        NK.tekst(ctx, dele[0], x, y, { font: Tg.font("600", f), linje: "middle", farve: farver[0] });
+        if (!tegn) return 2;
+        NK.tekst(ctx, dele[0], x, y, { font: Tg.font("600", NK.passendeSkrift(ctx, dele[0], b, f, 12, "600")), linje: "middle", farve: farver[0] });
         var s = NK.passendeSkrift(ctx, dele.slice(1).join(" "), b - f * 1.5, f, 12, "600");
         NK.tekst(ctx, dele.slice(1).join(" "), x + f * 1.5, y + f * 1.5, { font: Tg.font("600", s), linje: "middle", farve: farver[1] || farver[0] });
         return 2;
@@ -232,28 +244,36 @@
 
     P.tegnTavle = function (ctx, r, data, tid) {
         Tg.tavle(ctx, r);
-        var o = this.opg, mig = this;
         /* Skriften skrumper, naar der er mange trin, saa alt kan vaere der */
-        var linjer = 3.4 + this.felter.length * 1.25;
+        var linjer = 3.4 + Math.max(0, data.length - 2) * 0.95 + this.felter.length * 1.25;
         var f = NK.klamp(Math.min(r.h / (linjer * 1.55 + 1.2), r.b / 30), 12, 20);
+        while (f > 12 && this.tavleGennem(ctx, r, data, tid, f, false) > r.y + r.h - f * 0.2) f -= 0.5;
+        this.tavleGennem(ctx, r, data, tid, f, true);
+    };
+
+    /* Én gang gennem tavlen med skriftstoerrelsen f; giver y under sidste linje */
+    P.tavleGennem = function (ctx, r, data, tid, f, tegn) {
+        var o = this.opg;
         var x = r.x + f * 1.1, b = r.b - f * 2.2, y = r.y + f * 1.3, lh = f * 1.55;
         var lille = Tg.font("700", NK.klamp(f * 0.72, 12, 14));
         var moerk = "#1f2530", svag = "rgba(31, 37, 48, 0.4)", groen = "#1d7a48", gul = "#9a6a00";
-        NK.tekst(ctx, "OPGAVENS TAL", x, y, { font: lille, linje: "middle", farve: "#6a7280" });
+        if (tegn) NK.tekst(ctx, "OPGAVENS TAL", x, y, { font: lille, linje: "middle", farve: "#6a7280" });
         y += lh * 0.85;
         NK.passendeSkrift(ctx, data.join("     "), b, f, 12, "600");
         var dfont = ctx.font;
-        if (ctx.measureText(data.join("     ")).width <= b) {
-            NK.tekst(ctx, data.join("     "), x, y, { font: dfont, linje: "middle", farve: moerk });
+        /* Tre linjer eller flere (to salte og rumfanget) staar altid under hinanden */
+        if (data.length <= 2 && ctx.measureText(data.join("     ")).width <= b) {
+            if (tegn) NK.tekst(ctx, data.join("     "), x, y, { font: dfont, linje: "middle", farve: moerk });
             y += lh;
         } else {
             data.forEach(function (d) {
-                NK.tekst(ctx, d, x, y, { font: Tg.font("600", f), linje: "middle", farve: moerk });
+                var sd = NK.passendeSkrift(ctx, d, b, f, 12, "600");
+                if (tegn) NK.tekst(ctx, d, x, y, { font: Tg.font("600", sd), linje: "middle", farve: moerk });
                 y += lh * 0.95;
             });
         }
         y += lh * 0.25;
-        NK.tekst(ctx, "BEREGNINGEN", x, y, { font: lille, linje: "middle", farve: "#6a7280" });
+        if (tegn) NK.tekst(ctx, "BEREGNINGEN", x, y, { font: lille, linje: "middle", farve: "#6a7280" });
         y += lh * 0.85;
         var puls = 0.55 + 0.45 * Math.sin((tid || 0) * 6);
         this.felter.forEach(function (fe) {
@@ -273,7 +293,7 @@
                 dele = [T.venstre(fe.id, o) + " = ?"];
                 farver = [aktiv ? moerk : svag];
             }
-            if (aktiv) {
+            if (aktiv && tegn) {
                 ctx.save();
                 ctx.strokeStyle = "rgba(214, 160, 20, " + (0.4 + 0.5 * puls) + ")";
                 ctx.lineWidth = 2;
@@ -281,10 +301,11 @@
                 ctx.stroke();
                 ctx.restore();
             }
-            var n = linje(ctx, dele, x, y, b, f, farver);
+            var n = linje(ctx, dele, x, y, b, f, farver, tegn);
             y += lh * (n === 2 ? 1.95 : 1.15);
-            mig.sidstY = y;
         });
+        if (tegn) this.sidstY = y;
+        return y - lh * 0.6;
     };
 
     NK.Regning = Regning;

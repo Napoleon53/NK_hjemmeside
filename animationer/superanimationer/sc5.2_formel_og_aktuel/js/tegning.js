@@ -1,8 +1,9 @@
 /* =====================================================================
    tegning.js - det, fanerne tegner
 
-   Rummet, bordet og tavlen, krukken, spatlen, literglasset,
-   baegerglasset, flasken, soejlerne og zoomvinduet med ionerne.
+   Rummet, bordet og tavlen, krukken, spatlen, vaegten med vejebaaden,
+   literglasset, baegerglasset, flasken, soejlerne og zoomvinduet med
+   ionerne.
    Funktionerne tegner én ting et bestemt sted og husker intet selv;
    fanerne bestemmer, hvor tingene staar, og hvordan de bevaeger sig.
    Det meste er som i sc5.1; literglasset og soejlerne er nye.
@@ -247,6 +248,69 @@
         ctx.restore();
     };
 
+    /* ----- Vaegten og pulveret i vejebaaden paa fane 3 (som sc5.1) ------------------- */
+    T.vaegtHoejde = function (b) { return MAAL.vaegt.h * b / MAAL.vaegt.b; };
+
+    T.vaegt = function (ctx, x, y, b, tekst, v) {
+        v = v || {};
+        var M = MAAL.vaegt, k = b / M.b, h = M.h * k;
+        var x0 = x - b / 2, y0 = y - M.bund * k;
+        NK.Sprites.tegn(ctx, "vaegt", x0, y0, b, h);
+        var dx = x0 + M.dispV * k, dy = y0 + M.dispTop * k, db = (M.dispH - M.dispV) * k, dh = (M.dispBund - M.dispTop) * k;
+        ctx.save();
+        ctx.fillStyle = v.lys ? "rgba(125, 240, 192, " + (0.1 + 0.12 * v.lys) + ")" : "rgba(125, 240, 192, 0.06)";
+        ctx.fillRect(dx + 2, dy + 2, db - 4, dh - 4);
+        ctx.fillStyle = v.roed ? "#ff9d8f" : "#7df0c0";
+        ctx.shadowColor = v.roed ? "rgba(255, 140, 120, 0.6)" : "rgba(125, 240, 192, 0.6)";
+        ctx.shadowBlur = 6;
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        var px = NK.klamp(dh * 0.62, 10, 30);
+        ctx.font = "700 " + px + "px " + DISPLAY;
+        var t = tekst || "";
+        while (px > 8 && ctx.measureText(t).width > db - 10) { px -= 0.5; ctx.font = "700 " + px + "px " + DISPLAY; }
+        ctx.fillText(t, dx + db - 6, dy + dh / 2 + 1);
+        ctx.restore();
+        return { x: x, y: y0 + M.skaalY * k, b: M.skaalB * k, k: k, top: y0, h: h };
+    };
+
+    T.bunke = function (ctx, x, y, bb, st, t, hoejde, nr) {
+        var M = MAAL.vejebaad, k = bb / M.b, h = M.h * k;
+        var x0 = x - bb / 2, y0 = y - M.bund * k;
+        var bundY = y0 + M.indBund * k + 4 * k;
+        var tt = Math.sqrt(NK.klamp(t, 0, 1));
+        var hh = hoejde * tt;
+        var ix0 = x0 + (M.indV + 4) * k, ix1 = x0 + (M.indH - 4) * k;
+        var bredde = (ix1 - ix0) * (0.45 + 0.55 * tt);
+        var a0 = x - bredde / 2, a1 = x + bredde / 2;
+        ctx.save();
+        if (hh > 0.5) {
+            var g = ctx.createLinearGradient(0, bundY - hh, 0, bundY);
+            g.addColorStop(0, nuance(st.pulver, 0.12));
+            g.addColorStop(1, nuance(st.pulver, -0.22));
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.moveTo(a0, bundY + 2);
+            ctx.quadraticCurveTo(a0 + bredde * 0.18, bundY - hh * 0.55, x - bredde * 0.12, bundY - hh * 0.96);
+            ctx.quadraticCurveTo(x, bundY - hh * 1.06, x + bredde * 0.12, bundY - hh * 0.96);
+            ctx.quadraticCurveTo(a1 - bredde * 0.18, bundY - hh * 0.55, a1, bundY + 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.save();
+            ctx.clip();
+            var r = froe((nr || 0) + 17);
+            for (var i = 0; i < 110; i++) {
+                var lyst = r() < 0.45;
+                ctx.fillStyle = lyst ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.18)";
+                var s = lyst ? 1.3 : 1.8;
+                ctx.fillRect(a0 + r() * bredde, bundY - r() * hh * 1.05, s, s);
+            }
+            ctx.restore();
+        }
+        NK.Sprites.tegn(ctx, "vejebaad", x0, y0, bb, h);
+        ctx.restore();
+    };
+
     /* ----- Baegerglasset (400 mL): (x, y) venstre side og bunden ---------------------- */
     T.glasGeo = function (x, y, h) {
         var M = MAAL.baegerglas, k = h / M.h;
@@ -430,6 +494,8 @@
                 NK.rundtRekt(ctx, cx - sb / 2, y1, sb, bund - y1, 4);
                 ctx.fill();
                 NK.tekst(ctx, NK.betydende(so.v, 2), cx, y1 - 8, { font: font("700", px), justering: "center", farve: "#f2f3f5" });
+            } else if (so.skjult) {
+                NK.tekst(ctx, "?", cx, bund - px - 4, { font: font("700", px + 6), justering: "center", linje: "middle", farve: "#f5dd8a" });
             }
             if (so.maal !== undefined) {
                 var ym = y(so.maal);

@@ -4,27 +4,30 @@
    Seks krukker staar paa hylden, én pr. grundstof, med molarmassen paa
    etiketten. Hver klump i en krukke er 1 mol. Eleven traekker klumper op
    paa vaegten (eller klikker paa krukken eller vaegten), og vaegten viser
-   massen. Et klik paa en anden krukke skifter stof: klumperne flyver hjem,
-   og lige saa mange kommer fra den nye krukke. Saa ses det, at antallet af
-   mol og atomer er det samme, men massen en anden.
+   massen. Klumper fra forskellige krukker kan ligge sammen, og panelet
+   regner massen ud for hvert stof og i alt.
 
    Klumperne er terninger med det rumfang, 1 mol af stoffet har, tegnet i
    vaegtens maalestok (NK.Sprites.MAAL.vaegt.cm). Zoomboblen viser atomerne.
 
-   Fire maal (D.MAAL) foerer eleven igennem pointen. Knappen giver et hint
-   og saa svaret. Hvor langt eleven er naaet, huskes under NOEGLE.
+   Tre maal og derefter opgaver, der skifter (js/opgaver.js). Knappen
+   giver et hint og saa svaret. Hvor langt eleven er naaet, huskes under
+   NOEGLE.
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
     var D = NK.Data;
+    var O = NK.Opgaver;
     var Tg = NK.Tegn;
 
     var NOEGLE = "nk-sc4.2-vaegt";
     var FLYV_TID = 0.42;
-    var FORSKYD = 0.06;          /* klumperne letter efter hinanden ved et skift */
     var RAEKKER = [5, 4, 1];     /* klumper i hver raekke paa skaalen */
+
+    /* Et tal og dets enhed knaekker ikke over to linjer: "119,88 g" */
+    function ubrudt(t) { return NK.html(t).replace(/(\d) (g|mol)\b/g, "$1&nbsp;$2"); }
 
     function SimVaegt() {
         this.L = new NK.Laerred(NK.el("vaegt-laerred"));
@@ -36,16 +39,20 @@
         this.valgt = D.STOFFER.indexOf(D.stof("Cu"));
         this.g = { kaffekop: { skjult: false, iHaand: false } };
         var gemt = NK.hent(NOEGLE, {}) || {};
-        this.maalNr = NK.klamp(gemt.maal || 0, 0, D.MAAL.length);
-        this.rost = this.maalNr >= D.MAAL.length;
+        this.maalNr = Math.max(0, Math.floor(gemt.maal || 0));
+        this.rost = this.maalNr >= O.MAAL.length;
+        this.sidstP = {};
         this.hjaelp = 0;
         this.naaet = false;
         this.fremhaev = null;
+        this.naerBesked = false;
+        this.opg = O.opgave(this.maalNr);
 
         this.bygPanel();
         this.bygTilbud();
         this.koblMus();
         if (this.laererStart) this.laererStart();
+        if (this.opg.start) this.laegStraks(this.opg.start);
         this.visMaal();
         this.visMaaling();
         this.visStatus();
@@ -94,7 +101,7 @@
 
         /* Feltet over skaalen, hvor en klump kan slippes: tre raekker af de
            stoerste klumper og lidt luft */
-        var slipTop = lay.skaal.y - 3.4 * this.kantPx(D.stof("Au"), lay) - 30;
+        var slipTop = lay.skaal.y - 3.4 * this.kantPx(this.stoerste(), lay) - 30;
         lay.slip = { x: lay.vaegt.x - vb / 2, y: slipTop, b: vb, h: lay.bordY - slipTop };
         this.lay = lay;
         this.maalKlumper(true);
@@ -124,6 +131,11 @@
         return st.kant * lay.cm;
     };
 
+    /* Stoffet med den stoerste klump (soelv, en anelse over guld) */
+    P.stoerste = function () {
+        return D.STOFFER.reduce(function (a, b) { return b.kant > a.kant ? b : a; });
+    };
+
     /* ----- Klumperne ------------------------------------------------------------------
        En klump er { st, plads, x, y, fra, t, maal, hjem }. hjem: den er paa
        vej tilbage til sin krukke og forsvinder, naar den er der. */
@@ -131,31 +143,56 @@
         return this.klumper.filter(function (k) { return !k.hjem; });
     };
 
+    function erLandet(k) { return !k.hjem && !k.fra; }
+
     /* Klumperne, der er landet: dem viser vaegten og panelet */
     P.landet = function () {
-        return this.klumper.filter(function (k) { return !k.hjem && !k.fra && !k.venter; }).length;
+        return this.klumper.filter(erLandet).length;
+    };
+
+    /* De landede klumper som antal pr. symbol, lagt sammen af NK.Opgaver */
+    P.komp = function () {
+        var tal = {};
+        this.klumper.forEach(function (k) { if (erLandet(k)) tal[k.st.s] = (tal[k.st.s] || 0) + 1; });
+        return O.komp(tal);
     };
 
     P.iLuften = function () {
-        return this.klumper.some(function (k) { return k.fra || k.venter; });
+        return this.klumper.some(function (k) { return k.fra; });
     };
 
-    /* Pladsen paa skaalen: raekker paa 5, 4 og 1, hver centreret */
-    P.klumpPlads = function (plads, antal, c) {
-        var lay = this.lay, raekke = 0, foer = 0;
-        while (raekke < RAEKKER.length - 1 && plads >= foer + RAEKKER[raekke]) { foer += RAEKKER[raekke]; raekke++; }
-        var iRaekke = Math.min(RAEKKER[raekke], Math.max(1, antal - foer));
-        var mellem = c * 1.12, dx = c * 0.3;
-        var x0 = lay.skaal.x - dx / 2 - (iRaekke - 1) * mellem / 2;
-        return { x: x0 + (plads - foer) * mellem, y: lay.skaal.y + 1 - raekke * c, raekke: raekke };
-    };
-
+    /* Pladserne paa skaalen: raekker paa 5, 4 og 1, hver centreret. Klumperne
+       er ikke lige store, saa hver raekke maales for sig, og en klump i en
+       oevre raekke ligger paa den hoejeste af dem under sig. */
     P.maalKlumper = function (straks) {
         if (!this.lay) return;
-        var mig = this, paa = this.paaVaegten(), antal = paa.length;
-        paa.forEach(function (k) {
-            k.maal = mig.klumpPlads(k.plads, antal, mig.kantPx(k.st));
-            if (straks && !k.fra) { k.x = k.maal.x; k.y = k.maal.y; }
+        var mig = this, lay = this.lay;
+        var paa = this.paaVaegten().slice().sort(function (a, b) { return a.plads - b.plads; });
+        var under = null, i = 0;
+        RAEKKER.forEach(function (antal) {
+            var rk = paa.slice(i, i + antal);
+            i += antal;
+            if (!rk.length) return;
+            var c = rk.map(function (k) { return mig.kantPx(k.st); });
+            var cmax = Math.max.apply(null, c), mellem = cmax * 0.12;
+            var bredde = c.reduce(function (s, v) { return s + v; }, 0) + mellem * (rk.length - 1);
+            var x = lay.skaal.x - cmax * 0.15 - bredde / 2;
+            var denne = [];
+            rk.forEach(function (k, j) {
+                var mx = x + c[j] / 2, y = lay.skaal.y + 1;
+                if (under) {
+                    y = Infinity;
+                    under.forEach(function (u) {
+                        if (Math.abs(u.x - mx) < (u.c + c[j]) / 2) y = Math.min(y, u.y - u.c);
+                    });
+                    if (y === Infinity) y = Math.min.apply(null, under.map(function (u) { return u.y - u.c; }));
+                }
+                k.maal = { x: mx, y: y };
+                if (straks && !k.fra) { k.x = mx; k.y = y; }
+                denne.push({ x: mx, y: y, c: c[j] });
+                x += c[j] + mellem;
+            });
+            under = denne;
         });
     };
 
@@ -166,14 +203,15 @@
 
     /* Laeg én klump af stof i paa vaegten. fra: hvor den kommer fra (musen) */
     P.laegPaa = function (i, fra) {
-        if (i !== this.valgt) this.skift(i);
+        this.valgt = i;
         var paa = this.paaVaegten();
         if (paa.length >= D.KLUMPER_MAKS) {
-            this.besked("Der er ikke plads til flere. 10 mol er nok til at se det.", "gul");
+            this.besked("Der er ikke plads til flere. 10 mol er nok.", "gul");
+            this.naerBesked = true;
             return false;
         }
         var st = D.STOFFER[i];
-        var start = fra || this.krukkeMund(i);
+        var start = fra || (this.lay ? this.krukkeMund(i) : { x: 0, y: 0 });
         var k = { st: st, plads: paa.length, x: start.x, y: start.y, fra: { x: start.x, y: start.y }, t: 0, maal: null };
         this.klumper.push(k);
         this.maalKlumper(false);
@@ -187,110 +225,106 @@
         k.hjem = true;
         k.fra = { x: k.x, y: k.y };
         k.t = 0;
-        k.venter = 0;
-        k.maal = this.krukkeMund(D.STOFFER.indexOf(k.st));
+        k.maal = this.lay ? this.krukkeMund(D.STOFFER.indexOf(k.st)) : { x: 0, y: 0 };
         var n = 0;
         this.klumper.forEach(function (x) { if (!x.hjem) x.plads = n++; });
         this.maalKlumper(false);
         this.efterHandling();
     };
 
-    /* Skift stof: de klumper, der ligger, flyver hjem, og lige saa mange
-       kommer fra den nye krukke til de samme pladser */
-    P.skift = function (i) {
-        if (i === this.valgt) return;
-        var mig = this, gamle = this.paaVaegten();
-        this.valgt = i;
-        gamle.forEach(function (k, j) {
-            k.hjem = true;
-            k.fra = { x: k.x, y: k.y };
-            k.t = 0;
-            k.venter = j * FORSKYD;
-            k.maal = mig.krukkeMund(D.STOFFER.indexOf(k.st));
+    /* Laeg netop svar paa vaegten ({ symbol: antal }). De klumper, der
+       passer, bliver liggende; resten flyver hjem, og det, der mangler,
+       kommer fra krukkerne. */
+    P.saetTil = function (svar) {
+        var mig = this, rest = {};
+        Object.keys(svar).forEach(function (s) { rest[s] = svar[s]; });
+        this.paaVaegten().slice().forEach(function (k) {
+            if (rest[k.st.s] > 0) rest[k.st.s]--;
+            else mig.tagAf(k);
         });
-        var st = D.STOFFER[i], start = this.krukkeMund(i);
-        gamle.forEach(function (g, j) {
-            mig.klumper.push({ st: st, plads: g.plads, x: start.x, y: start.y, fra: { x: start.x, y: start.y }, t: 0,
-                venter: 0.18 + j * FORSKYD, maal: null });
+        D.STOFFER.forEach(function (st, i) {
+            for (var j = 0; j < (rest[st.s] || 0); j++) mig.laegPaa(i);
         });
-        this.maalKlumper(false);
-        this.efterHandling();
     };
 
-    /* Vis svaret: stof og antal saettes, som maalet vil have det */
-    P.saetTil = function (s, n) {
-        var i = D.STOFFER.indexOf(D.stof(s));
-        if (i !== this.valgt) this.skift(i);
-        var paa = this.paaVaegten();
-        while (paa.length > n) { this.tagAf(paa[paa.length - 1]); paa = this.paaVaegten(); }
-        while (this.paaVaegten().length < n) this.laegPaa(i);
+    /* Ved opstart, foer der er et layout: klumperne ligger der bare */
+    P.laegStraks = function (svar) {
+        var mig = this;
+        D.STOFFER.forEach(function (st) {
+            for (var j = 0; j < (svar[st.s] || 0); j++) {
+                mig.klumper.push({ st: st, plads: mig.klumper.length, x: 0, y: 0, fra: null, t: 1, maal: null });
+            }
+        });
+        this.maalKlumper(true);
     };
 
-    /* Efter hver handling: statuslinjen og panelet. Om maalet er naaet,
+    /* Efter hver handling: statuslinjen og panelet. Om opgaven er loest,
        ses foerst, naar klumperne er landet (opdater). */
     P.efterHandling = function () {
         this.visStatus();
         this.visMaaling();
     };
 
-    /* ----- Maalene ----------------------------------------------------------------------- */
-    P.maal = function () { return D.MAAL[this.maalNr] || null; };
+    /* ----- Opgaverne ------------------------------------------------------------------- */
+    P.maal = function () { return this.opg; };
 
     P.tjekMaal = function () {
-        var m = this.maal();
-        if (!m || this.naaet || this.iLuften()) return;
-        var st = D.STOFFER[this.valgt], n = this.landet();
-        if (st.s === m.s && n === m.n) {
+        var o = this.opg;
+        if (!o || this.naaet || this.iLuften()) return;
+        var k = this.komp(), r = o.tjek(k);
+        if (r && r.ok) {
             this.naaet = true;
             this.hjaelp = 0;
             this.fremhaev = null;
-            this.besked(m.efter, "god");
+            this.naerBesked = false;
+            this.besked(ubrudt(O.efter(o, k)), "god");
             if (this.afvisTilbud) this.afvisTilbud();
             NK.gem(NOEGLE, { maal: Math.max(this.maalNr + 1, (NK.hent(NOEGLE, {}) || {}).maal || 0) });
             this.visMaal();
             return;
         }
-        /* Maal 4: tre mol af et andet stof faar et svar */
-        if (this.maalNr === 3 && n === 3 && st.s !== m.s && this.sidstSvaret !== st.s) {
-            this.sidstSvaret = st.s;
-            this.besked("3 mol " + st.navn + " vejer " + NK.komma(D.masse(st, 3)) + " g. Der er et stof, der vejer mindre.", "gul");
+        if (r && r.besked) {
+            this.besked(ubrudt(r.besked), "gul");
+            this.naerBesked = true;
+        } else if (this.naerBesked) {
+            /* Den gamle bemaerkning passer ikke laengere */
+            this.besked("", "");
+            this.naerBesked = false;
         }
     };
 
+    P.nyOpgave = function () {
+        var ty = O.type(this.maalNr);
+        this.opg = O.opgave(this.maalNr, null, ty ? this.sidstP[ty.navn] : undefined);
+        if (ty) this.sidstP[ty.navn] = this.opg.p;
+        this.naaet = false;
+        this.hjaelp = 0;
+        this.fremhaev = null;
+        this.naerBesked = false;
+        this.besked("", "");
+        if (this.opg.start) this.saetTil(this.opg.start);
+        else this.tomVaegten();
+        this.visMaal();
+    };
+
     P.knap = function () {
-        var m = this.maal();
-        if (!m) {
-            /* Alle maal er naaet: forfra */
-            this.maalNr = 0;
-            NK.gem(NOEGLE, { maal: D.MAAL.length });
-            this.tomVaegten();
-            this.valgt = D.STOFFER.indexOf(D.stof("Cu"));
-            this.naaet = false;
-            this.hjaelp = 0;
-            this.besked("", "");
-            this.visMaal();
-            return;
-        }
+        var o = this.opg;
         if (this.naaet) {
             this.maalNr++;
-            this.naaet = false;
-            this.hjaelp = 0;
-            this.sidstSvaret = null;
-            this.besked("", "");
-            if (this.maalNr >= D.MAAL.length && !this.rost) {
+            if (this.maalNr >= O.MAAL.length && !this.rost) {
                 this.rost = true;
                 this.ventRos = 1.0;
             }
-            this.visMaal();
-            this.tjekMaal();
+            this.nyOpgave();
             return;
         }
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.fremhaev = m.fremhaev || m.s;
-            this.besked("<b>Hint:</b> " + NK.html(m.hint), "gul");
+            this.fremhaev = o.fremhaev || null;
+            this.naerBesked = false;
+            this.besked("<b>Hint:</b> " + ubrudt(o.hint), "gul");
         } else {
-            this.saetTil(m.s, m.n);
+            this.saetTil(o.svar);
         }
         this.visMaal();
     };
@@ -303,13 +337,20 @@
     P.nulstil = function () {
         this.tomVaegten();
         this.besked("", "");
+        this.naerBesked = false;
     };
 
     P.enter = function () {
-        if (this.naaet || !this.maal()) this.knap();
+        if (this.naaet) this.knap();
     };
 
     P.fokus = function () {};
+
+    /* Skal krukken lyse, fordi hintet peger paa den? */
+    P.fremhaeves = function (st) {
+        var f = this.fremhaev;
+        return f === "alle" || (Array.isArray(f) && f.indexOf(st.s) >= 0);
+    };
 
     /* ----- Panelet ---------------------------------------------------------------------- */
     P.bygPanel = function () {
@@ -329,34 +370,44 @@
     };
 
     P.visMaal = function () {
-        var m = this.maal();
-        NK.saetTekst("vaegt-nr", String(Math.min(this.maalNr + 1, D.MAAL.length)));
-        if (m) {
-            NK.saetTekst("vaegt-maal-titel", "Mål");
-            NK.saetTekst("vaegt-prompt", m.tekst);
-        } else {
-            NK.saetTekst("vaegt-maal-titel", "Frit valg");
-            NK.saetTekst("vaegt-prompt", "Læg på, tag af og skift stof, som du vil.");
-        }
+        var o = this.opg;
+        NK.saetTekst("vaegt-nr", String(this.maalNr + 1));
+        NK.saetTekst("vaegt-maal-titel", o.navn);
+        NK.saetHTML("vaegt-prompt", ubrudt(o.tekst));
         var tekst, klasse = "knap";
-        if (!m) { tekst = "Start målene forfra"; }
-        else if (this.naaet) { tekst = this.maalNr >= D.MAAL.length - 1 ? "Afslut målene →" : "Næste mål →"; klasse = "knap blaa banker"; }
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+        if (this.naaet) {
+            tekst = this.maalNr === O.MAAL.length - 1 ? "Til de sværere opgaver →" : "Næste opgave →";
+            klasse = "knap blaa banker";
+        } else {
+            tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+        }
         this.el.knap.textContent = tekst;
         this.el.knap.className = klasse;
         this.el.kort.classList.toggle("sejr", this.naaet);
-        NK.el("vaegt-taeller").hidden = !m;
     };
 
-    /* Beregningerne for det, der er landet paa vaegten */
+    /* Beregningerne for det, der er landet paa vaegten. Ligger der flere
+       stoffer, regnes massen for hvert af dem og saa i alt. */
     P.visMaaling = function () {
-        var st = D.STOFFER[this.valgt], n = this.landet();
-        var m = D.masse(st, n);
-        NK.saetTekst("vaegt-stof", st.navn + ", " + st.s);
-        NK.saetTekst("vaegt-regn-n", "n = " + n + " mol");
-        NK.saetTekst("vaegt-regn-m", n ? D.regnMasse(st, n, null, NK.komma(m)) : "m = 0 g");
-        NK.saetTekst("vaegt-regn-N", n ? D.regnAntal(n, null, NK.potens(D.antal(n), 3)) : "N = 0");
-        NK.saetTekst("vaegt-V", n ? NK.betydende(D.rumfang(st, m), 3) + " cm³" : "0 cm³");
+        var k = this.komp(), d = k.dele;
+        var enkelt = d.length <= 1;
+        NK.saetTekst("vaegt-stof", !d.length ? "tom" : enkelt ? d[0].st.navn + ", " + d[0].st.s
+            : d.map(function (x) { return x.st.s; }).join(" + "));
+        NK.saetHTML("vaegt-regn-n", ubrudt(enkelt ? "n = " + k.n + " mol"
+            : "n = " + d.map(function (x) { return x.n + " mol"; }).join(" + ") + " = " + k.n + " mol"));
+        var linjer;
+        if (!k.n) linjer = ["m = 0 g"];
+        else if (enkelt) linjer = [D.regnMasse(d[0].st, k.n, null, NK.komma(k.m))];
+        else {
+            linjer = d.map(function (x) {
+                return D.regnMasse(x.st, x.n, null, NK.komma(x.m)).replace(/^m = /, "m(" + x.st.s + ") = ");
+            });
+            linjer.push("m = " + d.map(function (x) { return NK.komma(x.m) + " g"; }).join(" + ") + " = " + NK.komma(k.m) + " g");
+        }
+        NK.saetHTML("vaegt-regn-m", linjer.map(ubrudt).join("<br>"));
+        NK.saetTekst("vaegt-regn-N", k.n ? D.regnAntal(k.n, null, NK.potens(D.antal(k.n), 3)) : "N = 0");
+        var V = d.reduce(function (s, x) { return s + D.rumfang(x.st, x.m); }, 0);
+        NK.saetTekst("vaegt-V", k.n ? NK.betydende(V, 3) + " cm³" : "0 cm³");
     };
 
     P.visStatus = function () {
@@ -364,17 +415,15 @@
         if (this.traek && this.traek.flyttet) t = "Slip klumpen over vægten.";
         else if (n === 0) t = "Træk en klump fra en krukke op på vægten. Hver klump er 1 mol.";
         else if (n >= D.KLUMPER_MAKS) t = "Vægten er fuld. Klik på en klump for at tage den af.";
-        else t = "Klik på en anden krukke for at skifte stof. Klik på en klump for at tage den af.";
+        else t = "Klumper fra forskellige krukker kan blandes. Klik på en klump for at tage den af.";
         NK.saetHTML("vaegt-status", t);
     };
 
     /* ----- Tegneloekken ------------------------------------------------------------------- */
     P.opdater = function (dt) {
         this.tid += dt;
-        var mig = this, landede = false;
+        var landede = false;
         this.klumper.forEach(function (k) {
-            if (k.venter > 0) { k.venter -= dt; return; }
-            k.venter = 0;
             if (k.fra) {
                 if (!k.maal) return;
                 k.t = Math.min(1, k.t + dt / FLYV_TID);
@@ -390,7 +439,7 @@
             }
         });
         var foer = this.klumper.length;
-        this.klumper = this.klumper.filter(function (k) { return !(k.hjem && !k.fra && !k.venter); });
+        this.klumper = this.klumper.filter(function (k) { return !(k.hjem && !k.fra); });
         if (landede || foer !== this.klumper.length) {
             this.visMaaling();
             this.tjekMaal();
@@ -405,7 +454,7 @@
 
     /* Klumpens plads lige nu (ogsaa undervejs i luften) */
     P.klumpPos = function (k) {
-        if (!k.fra || !k.maal || k.venter > 0) return { x: k.fra ? k.fra.x : k.x, y: k.fra ? k.fra.y : k.y };
+        if (!k.fra || !k.maal) return { x: k.fra ? k.fra.x : k.x, y: k.fra ? k.fra.y : k.y };
         var t = NK.blod(k.t);
         return {
             x: NK.lerp(k.fra.x, k.maal.x, t),
@@ -422,15 +471,16 @@
         var puls = 0.55 + 0.45 * Math.sin(this.tid * 7);
         Tg.molPlakat(ctx, lay.plakat.x, lay.plakat.y, lay.plakat.b, lay.plakat.h, {});
 
-        /* Hylden med krukkerne */
+        /* Hylden med krukkerne. En gul ramme om de stoffer, der ligger paa vaegten. */
+        var paaTal = this.komp().tal;
         Tg.hylde(ctx, lay.hylde.x0, lay.hylde.x1, lay.hylde.y);
         D.STOFFER.forEach(function (st, i) {
             var kr = lay.krukker[i];
             var over = mig.over && mig.over.slags === "krukke" && mig.over.i === i;
             Tg.krukke(ctx, kr.x, kr.y, lay.krukkeH, st, {
-                valgt: i === mig.valgt,
+                valgt: !!paaTal[st.s],
                 lys: over || mig.pegHylde,
-                fremhaev: mig.fremhaev === st.s || mig.fremhaev === "alle" ? puls : 0
+                fremhaev: mig.fremhaeves(st) ? puls : 0
             });
         });
 
@@ -444,8 +494,7 @@
         }
 
         /* Vaegten med displayet */
-        var st = D.STOFFER[this.valgt], n = this.landet();
-        Tg.vaegt(ctx, lay.vaegt.x, lay.vaegt.y, lay.vaegtB, Tg.gram(D.masse(st, n)), { lys: this.iLuften() ? 1 : 0 });
+        Tg.vaegt(ctx, lay.vaegt.x, lay.vaegt.y, lay.vaegtB, Tg.gram(this.komp().m), { lys: this.iLuften() ? 1 : 0 });
 
         /* Klumperne paa skaalen, nedefra og fra venstre; dem i luften til sidst */
         var paa = this.klumper.filter(function (k) { return !k.fra && !k.hjem && k !== (mig.traek && mig.traek.klump); });
@@ -455,7 +504,7 @@
             Tg.klump(ctx, k.x, k.y, mig.kantPx(k.st), k.st, { lys: lys ? 1 : 0 });
         });
 
-        /* Zoomboblen, naar der ligger noget */
+        /* Zoomboblen, naar der ligger noget: atomerne i den oeverste klump */
         var oeverst = null;
         paa.forEach(function (k) { if (!oeverst || k.y < oeverst.y) oeverst = k; });
         if (oeverst) {
@@ -469,11 +518,6 @@
 
         this.klumper.forEach(function (k) {
             if (!k.fra) return;
-            /* En klump, der venter paa at flyve hjem, ligger endnu paa skaalen */
-            if (k.venter > 0) {
-                if (k.hjem) Tg.klump(ctx, k.fra.x, k.fra.y, mig.kantPx(k.st), k.st, {});
-                return;
-            }
             var p = mig.klumpPos(k);
             var skala = k.hjem ? 1 - 0.5 * NK.blod(k.t) : 0.5 + 0.5 * NK.blod(k.t);
             Tg.klump(ctx, p.x, p.y, mig.kantPx(k.st) * skala, k.st, {});
@@ -568,6 +612,7 @@
                     mig.laegPaa(tr.i, { x: pt.x, y: pt.y + mig.kantPx(D.STOFFER[tr.i]) / 2 });
                 } else {
                     mig.besked("Slip klumpen over vægten.", "gul");
+                    mig.naerBesked = true;
                 }
                 mig.visStatus();
                 return;
@@ -582,20 +627,21 @@
         var u = this.hvadErUnder(pt);
         if (!u) return;
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
-        if (u.slags === "krukke") {
-            if (u.i !== this.valgt) {
-                this.skift(u.i);
-                if (!this.paaVaegten().length) this.besked(D.STOFFER[u.i].Navn + " er valgt. Træk en klump op på vægten.", "");
-            } else {
-                this.laegPaa(u.i);
-            }
-            return;
-        }
+        if (u.slags === "krukke") { this.laegPaa(u.i); return; }
         if (u.slags === "klump") { this.tagAf(u.k); this.over = null; return; }
         if (u.slags === "vaegt") { this.laegPaa(this.valgt); return; }
-        if (u.slags === "plakat") { this.besked("1 mol er 6,02 · 10²³ atomer, uanset hvilket stof det er.", ""); return; }
+        if (u.slags === "plakat") {
+            this.besked("1 mol er 6,02 · 10²³ atomer, uanset hvilket stof det er.", "");
+            this.naerBesked = true;
+            return;
+        }
         if (u.slags === "zoom") {
-            this.besked("Atomerne i " + NK.html(D.STOFFER[this.valgt].navn) + ". Hver klump er 6,02 · 10²³ af dem.", "");
+            var oeverst = null;
+            this.paaVaegten().forEach(function (k) { if (!oeverst || k.y < oeverst.y) oeverst = k; });
+            if (oeverst) {
+                this.besked("Atomerne i " + NK.html(oeverst.st.navn) + ". Hver klump er 6,02 · 10²³ af dem.", "");
+                this.naerBesked = true;
+            }
         }
     };
 

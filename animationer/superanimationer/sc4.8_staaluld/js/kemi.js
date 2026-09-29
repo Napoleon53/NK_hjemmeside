@@ -31,49 +31,70 @@
     K.r2 = function (v) { return Math.round(v * 100 + 1e-9) / 100; };
 
     /* ----- Klumpen --------------------------------------------------------------
-       m: stålulden (g), udbytte: den del af jernet, der naar at reagere.
-       p (0-1) er den del af det jern, ilten kan naa, der har reageret.
-       Der regnes i faste skridt paa 1/120 s, saa resultatet ikke afhaenger
-       af billedraten. */
+       m: stålulden (g), udbytte: den del af jernet, ilten kan naa (resten
+       ligger inderst). p (0-1) er den del af det jern, ilten kan naa, der
+       har reageret, og G er gloeden (0-1). I luft doer gloeden, foer alt
+       jernet har reageret; ilt fra flasken holder den i live og bringer p
+       helt til 1 (se D.BRAND). Der regnes i faste skridt paa 1/120 s, saa
+       resultatet ikke afhaenger af billedraten. */
     function Klump(m, udbytte) {
         this.m0 = m;
         this.udbytte = udbytte;
         this.p = 0;
+        this.G = 0;
         this.taendt = false;
+        this.ude = false;          /* gaaet ud, foer alt jernet havde reageret */
         this.ilt = 0;              /* sekunder med ekstra ilt tilbage */
+        this.brugtIlt = false;
         this.rate = 0;             /* dp/dt lige nu */
         this.tid = 0;
     }
     var SKRIDT = 1 / 120;
+    var B = D.BRAND;
 
-    Klump.prototype.taend = function () { this.taendt = true; };
+    /* Taend: kun én gang. Er den gaaet ud, kan den ikke taendes igen. */
+    Klump.prototype.taend = function () {
+        if (this.taendt) return false;
+        this.taendt = true;
+        this.G = 1;
+        return true;
+    };
 
-    /* Mere ilt fra flasken (virker kun, mens den braender) */
+    /* Mere ilt fra flasken (virker kun, mens den gloeder) */
     Klump.prototype.givIlt = function () {
         if (!this.braender()) return false;
-        this.ilt = D.BRAND.iltTid;
+        this.ilt = B.iltTid;
+        this.brugtIlt = true;
         return true;
     };
 
     Klump.prototype.skridt = function (h) {
-        var f = this.ilt > 0 ? D.BRAND.ilt : 1;
-        this.rate = (D.BRAND.k * (1 - this.p) + D.BRAND.min) * f;
-        this.p = Math.min(1, this.p + this.rate * h);
-        if (this.ilt > 0) this.ilt = Math.max(0, this.ilt - h);
-        if (this.p >= 1) { this.rate = 0; this.ilt = 0; }
+        var p = this.p, G = this.G;
+        if (this.ilt > 0) {
+            this.rate = B.ilt * (B.k * G * (1 - p) + B.iltMin * G);
+            this.G = Math.min(1, G + 4 * (1 - G) * h);
+            this.ilt = Math.max(0, this.ilt - h);
+        } else {
+            this.rate = p < B.luft ? B.k / B.luft * G * (B.luft - p) : 0;
+            /* Kan luften ikke naa mere jern, doer gloeden hurtigere */
+            this.G = G * (1 - B.slukker * (p < B.luft ? 1 : 3) * h);
+        }
+        this.p = Math.min(1, p + this.rate * h);
+        if (this.p >= 1) { this.rate = 0; this.ilt = 0; this.G = 0; }
+        else if (this.G < B.ud) { this.G = 0; this.rate = 0; this.ude = true; }
         this.tid += h;
     };
 
     Klump.prototype.opdater = function (dt) {
-        if (!this.taendt || this.p >= 1) { this.rate = 0; return; }
+        if (!this.braender()) { this.rate = 0; return; }
         this.rest = (this.rest || 0) + dt;
-        while (this.rest >= SKRIDT && this.p < 1) {
+        while (this.rest >= SKRIDT && this.braender()) {
             this.rest -= SKRIDT;
             this.skridt(SKRIDT);
         }
     };
 
-    Klump.prototype.braender = function () { return this.taendt && this.p < 1; };
+    Klump.prototype.braender = function () { return this.taendt && this.G > 0 && this.p < 1; };
     Klump.prototype.stille = function () { return !this.braender(); };
 
     /* Ilten, klumpen kan binde, hvis den braender helt (g) */

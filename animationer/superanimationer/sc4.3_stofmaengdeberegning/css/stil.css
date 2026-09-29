@@ -929,3 +929,116 @@ select:focus-visible {
 .bf-del.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
 .bf-del .bf-tekst { flex: 1; padding: 5px 8px; text-align: center; font-size: 1rem; font-weight: 600; color: #b8f0cf; white-space: nowrap; }
 .felt.broekfelt.aktiv:focus-within { box-shadow: none; }
+
+/* ---------------------------------------------------------------------
+   SC4.3 (29. sept. 2026): en loest opgave er groen i listen og faar
+   "✓ Løst" i kortets overskrift (brugerens oenske: det skal vaere
+   tydeligt, naar en opgave er gennemfoert)
+   --------------------------------------------------------------------- */
+.hyldelinje.loest { background-color: rgba(63, 174, 114, 0.16); border-color: rgba(63, 174, 114, 0.4); }
+.hyldelinje.loest:hover { background-color: rgba(63, 174, 114, 0.26); border-color: rgba(63, 174, 114, 0.7); }
+.hyldelinje.loest .hl-nr { background-color: var(--groen); color: #ffffff; }
+.hyldelinje.loest .hl-navn { color: #d8f5e4; }
+.hyldelinje.loest.valgt { border-color: var(--blaa); }
+
+.titel-ok {
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background-color: rgba(63, 174, 114, 0.22);
+    color: #7ee0a8;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------
+   SC4.3 (29. sept. 2026): Vaegten. Linjen med de tre trin over
+   regnestykket, en rigtig linje lyser kort op, og panelet er bredere
+   med stoerre felter (brugerens oenske: plads til stoerre inputfelter)
+   --------------------------------------------------------------------- */
+.trinbar {
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.tb-trin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 4px;
+    border: 1px solid #454555;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.03);
+    color: var(--tekst-mat);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tb-nr {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--panel-3);
+    color: var(--tekst-svag);
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.tb-pil { color: #6a707b; font-size: 1rem; font-weight: 700; }
+.tb-trin.nu { border-color: var(--gul); background-color: rgba(242, 197, 61, 0.12); color: #f7dc85; }
+.tb-trin.nu .tb-nr { background-color: var(--gul); color: #1b1b21; }
+.tb-trin.ok { border-color: rgba(63, 174, 114, 0.55); background-color: rgba(63, 174, 114, 0.14); color: #9fe6bf; }
+.tb-trin.ok .tb-nr { background-color: var(--groen); color: #ffffff; }
+.tb-trin.svar { border-color: rgba(242, 197, 61, 0.45); background-color: rgba(242, 197, 61, 0.08); color: #e8d9a8; }
+.tb-trin.svar .tb-nr { background-color: #b98f1d; color: #ffffff; }
+.trinbar.laast { opacity: 0.45; }
+
+@keyframes rs-ny {
+    0%   { background-color: rgba(63, 174, 114, 0.4); box-shadow: 0 0 0 5px rgba(63, 174, 114, 0.4); }
+    100% { background-color: rgba(63, 174, 114, 0); box-shadow: 0 0 0 5px rgba(63, 174, 114, 0); }
+}
+.rs-hoejre.rs-ny { border-radius: 5px; animation: rs-ny 1.4s ease-out 1; }
+
+/* Et bredere panel paa Vaegten, saa felterne kan vaere stoerre */
+#fane-vaegt { --panel-bredde: 540px; }
+@media (max-width: 1320px) { #fane-vaegt { --panel-bredde: 470px; } }
+@media (max-width: 1100px) { #fane-vaegt { --panel-bredde: 420px; } }
+
+#fane-vaegt .maal-tekst { font-size: 1.2rem; }
+#fane-vaegt .regnestykke { column-gap: 9px; row-gap: 8px; }
+#fane-vaegt .rs-venstre,
+#fane-vaegt .rs-lig,
+#fane-vaegt .rs-vist { font-size: 1.22rem; }
+#fane-vaegt .rs-maerke { font-size: 1.1rem; }
+#fane-vaegt .felt { min-height: 50px; }
+#fane-vaegt .felt input { font-size: 1.22rem; padding: 10px 12px; }
+#fane-vaegt .felt input::placeholder { font-size: 1rem; }
+#fane-vaegt .felt-ok { padding: 0 16px; font-size: 1.15rem; }
+#fane-vaegt .bf-krop { padding: 7px 9px; gap: 8px; }
+#fane-vaegt .bf-streg { height: 2.5px; margin: 6px 0; }
+#fane-vaegt .bf-gange { font-size: 1.35rem; }
+#fane-vaegt .felt .bf-del input { font-size: 1.18rem; padding: 8px 6px; }
+#fane-vaegt .bf-krop > .bf-del input { font-size: 1.12rem; padding: 8px 4px; }
+#fane-vaegt .bf-krop > .bf-del input::placeholder { font-size: 0.9rem; }
+#fane-vaegt .bf-del .bf-tekst,
+#fane-vaegt .bf-krop > .bf-del .bf-tekst { font-size: 1.14rem; padding: 8px 6px; }
+
+/* Med den stoerre skrift staar en lang venstreside (m(C₆H₁₂O₆)) alene
+   paa foerste linje allerede i et mellembredt kort */
+@container (max-width: 460px) {
+    #fane-vaegt .regnestykke.lang { grid-template-columns: 14px auto minmax(0, 1fr); }
+    #fane-vaegt .regnestykke.lang > .rs-venstre { grid-column: 1; }
+    #fane-vaegt .regnestykke.lang > .rs-lig { grid-column: 2; }
+    #fane-vaegt .regnestykke.lang > .rs-hoejre { grid-column: 3; }
+    #fane-vaegt .regnestykke.lang > .rs-venstre:first-child { grid-column: 1 / 4; }
+}

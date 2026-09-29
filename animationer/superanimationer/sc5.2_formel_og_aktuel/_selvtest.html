@@ -93,7 +93,8 @@ function koerTest(W) {
         return true;
     }
     function besked(sim) { return sim.beskedTekst(); }
-    var FORMLER = { n_mM: "n = m / M", c: "c = n / V", ionBland: "[ion] = n / V", ion2: "n / V" };
+    var FORMLER = { n_mM: "n = m / M", c: "c = n / V", ionBland: "[ion] = n / V", ion2: "n / V",
+                    nSA: "n = m / M", nSB: "n(B) = m / M", cSA: "c = n / V", cSB: "c(B) = n / V" };
     /* Løs resten af opgaven ved at skrive det rigtige */
     function loesAlt(sim) {
         var n = 0, f, o = sim.opg;
@@ -115,7 +116,8 @@ function koerTest(W) {
     var D = NK.Data, K = NK.Kemi, T = NK.Tjek;
     paastand("data.js, kemi.js, tjek.js, regning.js og laerer.js er kørt", !!(D && D.OPL && K && K.Glas && T && T.afstem && NK.Regning && NK.RoligLaerer));
     paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-opl"] && NK.sims["fane-ioner"] && NK.sims["fane-bland"]));
-    var sprites = ["glas1l", "baegerglas", "flaske", "pulverglas", "spatel", "lup", "kateder", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var sprites = ["glas1l", "baegerglas", "flaske", "pulverglas", "vaegt", "vejebaad", "spatel", "lup", "kateder", "kaffekop", "laererKrop",
+                   "laererHoved", "laererArm"];
     var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var A = NK.sims["fane-opl"], B = NK.sims["fane-ioner"], C = NK.sims["fane-bland"];
@@ -172,21 +174,42 @@ function koerTest(W) {
     }
     paastand("60 tilfældige opgaver på fane 2: skema, facit og beregninger", ikkeOk.length === 0, ikkeOk.slice(0, 6).join("; "));
     /* Fane 3: alle tal */
-    var bland = [];
+    var bland = [], paene = [];
+    function tal(t) { return parseFloat(t.replace(",", ".")); }
     D.BLAND.forEach(function (s) {
         s.tal.forEach(function (t) {
             var ob = { fane: 3, id: s.id, tal: t, ion: t.ion || s.ion, ion2: t.ion2 };
             ob.facit = K.facitBland(ob);
-            var tr = s.id === "samme" ? ["bidragA", "bidragB", "total"] : ["nA", "nB", "Vsum", "ionBland"].concat(ob.ion2 ? ["ion2"] : []);
+            var tr = s.id === "samme" ? ["nSA", "nSB", "cSA", "cSB", "bidragA", "bidragB", "total"] :
+                ["nA", "nB", "Vsum", "ionBland"].concat(ob.ion2 ? ["ion2"] : []);
             tr.forEach(function (id) {
                 var ft = T.facitTekst(id, ob).replace(/ (M|mol|L)$/, "");
                 if (!T.trin(id, ft, ob).ok) bland.push(s.id + "/" + id + " " + ft);
+                var r = T.regning(id, ob).join(" ");
+                if (/NaN|undefined|Infinity/.test(r)) bland.push(s.id + "/" + id + " beregning " + r);
             });
             if (t.VA && (t.VA + t.VB > 400 || t.VA > 400)) bland.push(s.id + " rumfang " + (t.VA + t.VB));
+            if (t.V && t.V > 400) bland.push(s.id + " rumfang " + t.V);
             if (K.k(D.salt(t.A), ob.ion) < 1 || K.k(D.salt(t.B), ob.ion) < 1) bland.push(s.id + ": ionen er ikke i begge glas");
+            /* I første opgave: n / V med de viste tal giver den viste c, og c er et pænt tal */
+            if (s.id === "samme") {
+                ["A", "B"].forEach(function (h) {
+                    var n = ob.facit["nS" + h], c = ob.facit["cS" + h];
+                    if (K.c(tal(K.mol(n)) / tal(K.L(t.V))) !== K.c(c) || Math.abs(c * 20 - Math.round(c * 20)) > 0.01) {
+                        paene.push(t[h] + ": " + K.mol(n) + " mol / " + K.L(t.V) + " L = " + K.c(c) + " M");
+                    }
+                });
+            }
         });
     });
     paastand("alle tal på fane 3 godkendes, ionen er i begge glas, og blandingen kan være i glasset", bland.length === 0, bland.join("; "));
+    paastand("første opgave på fane 3: masserne giver pæne tal, og n / V passer med c", paene.length === 0, paene.join("; "));
+    var o0 = { fane: 3, id: "samme", tal: D.BLAND[0].tal[0], ion: "Cl" };
+    o0.facit = K.facitBland(o0);
+    paastand("5,55 g CaCl₂ og 4,00 g AlCl₃ i 200 mL: [Cl⁻] = 0,950 M", T.facitTekst("total", o0) === "0,950 M", T.facitTekst("total", o0));
+    paastand("beregningen: c(CaCl₂) = n / V = 0,0500 mol / 0,200 L = 0,250 M",
+        T.regning("cSA", o0).join(" ") === "c(CaCl₂) = n / V = 0,0500 mol / 0,200 L = 0,250 M", T.regning("cSA", o0).join(" "));
+    paastand("trinnet hedder Stofmængden af CaCl₂", T.navn("nSA", o0) === "Stofmængden af CaCl₂", T.navn("nSA", o0));
     var o1 = { fane: 3, id: "forskellig", tal: D.BLAND[2].tal[0], ion: "Cl" };
     o1.facit = K.facitBland(o1);
     paastand("100 mL 0,300 M CaCl₂ + 200 mL 0,150 M NaCl: [Cl⁻] = 0,300 M", T.facitTekst("ionBland", o1) === "0,300 M", T.facitTekst("ionBland", o1));
@@ -216,12 +239,24 @@ function koerTest(W) {
     var oS = { salt: "Pb(NO3)2", m: 4.14, V: 250 }; oS.facit = K.facitIoner(oS);
     paastand("n(Pb(NO₃)₂) = m / M er rigtig", T.formel("n_mM", "n(Pb(NO3)2) = m/M", oS).ok);
     paastand("M(Pb(NO₃)₂) uden parentesens 2: tæl atomerne", /Tæl atomerne/.test(T.trin("M", "269,21", oS).besked || ""));
+    paastand("fane 3, første opgave: n(CaCl₂) = m / M og c(AlCl₃) = n / V er rigtige",
+        T.formel("nSA", "n(CaCl2) = m/M", o0).ok && T.formel("cSB", "c(AlCl₃) = n / V", o0).ok);
+    paastand("c = m / V: brug stofmængden, ikke massen", /stofmængden n/.test(T.formel("cSA", "c = m / V", o0).besked || ""));
+    paastand("c(CaCl₂) = 0,0500 (stofmængden skrevet som koncentration): det er stofmængden n",
+        /Det er stofmængden n/.test(T.trin("cSA", "0,0500", o0).besked || ""), T.trin("cSA", "0,0500", o0).besked);
+    paastand("c(CaCl₂) = 0,000250 (rumfanget i mL): liter", /liter/.test(T.trin("cSA", "0,000250", o0).besked || ""));
+    paastand("[Cl⁻] fra CaCl₂ = 0,100 (2 · n): brug koncentrationen", /Brug koncentrationen/.test(T.trin("bidragA", "0,100", o0).besked || ""),
+        T.trin("bidragA", "0,100", o0).besked);
 
     overskrift("4. Sproget");
     var tekster = [];
     D.OPL.forEach(function (o) {
         tekster.push(o.titel, o.tekst, o.linje, o.hint, o.svar, o.efter);
         if (o.valg) { tekster.push(o.valg.spm, o.valg.hint); o.valg.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); }); }
+        (o.spm || []).forEach(function (q) {
+            tekster.push(q.spm, q.hint, q.kort, q.efter || "");
+            q.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); });
+        });
     });
     D.BLAND.concat(D.NIV).forEach(function (o) { tekster.push(o.titel, o.tekst || ""); });
     Object.keys(D.TRIN).forEach(function (id) { tekster.push(D.TRIN[id].navn, D.TRIN[id].formelHint || ""); });
@@ -245,14 +280,48 @@ function koerTest(W) {
     paastand("et klik på krukken giver en portion: [Cl⁻] = 0,10 M", Math.abs(A.glas.ion("Cl") - 0.1) < 1e-9 && /målet er 0,30 M/.test(besked(A)), besked(A));
     portion(0); portion(0);
     paastand("tre portioner NaCl: opgave 1 er løst med stjerne", A.faerdig && A.status[0].stjerne, besked(A));
+    function valgKnap(t) {
+        return [].filter.call(d.querySelectorAll("#opl-valg .knap"), function (b) { return b.textContent === t; })[0];
+    }
+    function prompt() { return d.getElementById("opl-prompt").textContent; }
+    function panel() { return d.getElementById("opl-data").textContent; }
     vaelgA(1);
+    paastand("opgave 2 starter uden spørgsmål: først skal saltet i", d.getElementById("opl-valg").hidden && !/\?/.test(prompt()), prompt());
     portion(0);
-    paastand("før gættet kan der ikke komme salt i", A.glas.n.Na2SO4 === 0 && /Gæt først/.test(besked(A)), besked(A));
-    [].filter.call(d.querySelectorAll("#opl-valg .knap"), function (b) { return b.textContent === "0,20 M"; })[0].click();
-    paastand("gættet står i linjen", /Dit gæt: 0,20 M/.test(besked(A)), besked(A));
+    tik(A, 2);
+    paastand("en portion Na₂SO₄: første spørgsmål er c(Na₂SO₄), og Start forfra er væk",
+        A.fase === "spm" && /Hvad er c\(Na₂SO₄\)\?/.test(prompt()) && d.getElementById("opl-forfra").hidden, prompt());
+    paastand("glasset venter: ingen søjler, tom lup, og panelet viser n og V, men c = ?",
+        (A.vis.sNa2SO4 || 0) < 1e-3 && (A.vis.iNa || 0) < 1e-3 && A.part.antal(0) === 0 && /0,10 mol og V = 0,50 L/.test(panel()) &&
+        /c\(Na₂SO₄\) = \?/.test(panel()) && /\? Na⁺/.test(panel()), panel());
     portion(0);
-    paastand("en portion Na₂SO₄: [Na⁺] = 0,40 M, og det forkerte gæt forklares", A.faerdig && Math.abs(A.glas.ion("Na") - 0.4) < 1e-9 &&
-        /to Na⁺/.test(besked(A)), besked(A));
+    paastand("mere salt kan ikke komme i, mens spørgsmålene står", Math.abs(A.glas.n.Na2SO4 - 0.1) < 1e-9 && /Svar på spørgsmålet/.test(besked(A)), besked(A));
+    valgKnap("0,10 M").click();
+    paastand("0,10 M: det er stofmængden n, og knappen er slået fra", /stofmængden n/.test(besked(A)) && valgKnap("0,10 M").disabled && A.spmNr === 0,
+        besked(A));
+    valgKnap("0,20 M").click();
+    tik(A, 2);
+    paastand("0,20 M: den grå søjle kommer, og næste spørgsmål er antallet af Na⁺",
+        Math.abs(A.vis.sNa2SO4 - 0.2) < 0.01 && (A.vis.iNa || 0) < 1e-3 && /Hvor mange Na⁺/.test(prompt()) && /✓ c\(Na₂SO₄\) = 0,20 M/.test(prompt()),
+        prompt());
+    A.knap();
+    paastand("Giv hint på spørgsmålet: tallet efter Na", /tallet efter Na/.test(A.k.tekst()), A.k.tekst());
+    valgKnap("4").click();
+    paastand("4: det hører til O i sulfat-ionen", /sulfat-ionen/.test(besked(A)), besked(A));
+    valgKnap("2").click();
+    tik(A, 2);
+    paastand("2: luppen viser ionerne, skemaet får tallene, og sidste spørgsmål er [Na⁺]",
+        A.part.antal(0) === 8 && A.part.antal(1) === 4 && /2 Na⁺\(aq\)/.test(panel()) && /Hvad bliver \[Na⁺\]\?/.test(prompt()), A.part.antal(0) + " " + prompt());
+    valgKnap("0,40 M").click();
+    tik(A, 2);
+    paastand("0,40 M: opgave 2 er løst med stjerne, og ionernes søjler står", A.faerdig && A.status[1].stjerne && Math.abs(A.vis.iNa - 0.4) < 0.01 &&
+        /2 · 0,20 M = 0,40 M/.test(besked(A)), besked(A));
+    vaelgA(1);
+    A.knap(); A.knap();
+    tik(A, 4);
+    paastand("Vis svaret i opgave 2: glasset får saltet, og første spørgsmål står", A.fase === "spm" && Math.abs(A.glas.n.Na2SO4 - 0.1) < 1e-9, A.fase);
+    for (i = 0; i < 3; i++) { A.knap(); A.knap(); tik(A, 1); }
+    paastand("Vis svaret på alle tre spørgsmål: opgaven er løst", A.faerdig && A.fase === "faerdig", A.fase);
     vaelgA(2);
     portion(0);
     paastand("én portion FeCl₃: [Cl⁻] = 0,30 M, tre gange c(FeCl₃)", Math.abs(A.glas.ion("Cl") - 0.3) < 1e-9 && Math.abs(A.glas.ion("Fe") - 0.1) < 1e-9);
@@ -266,7 +335,10 @@ function koerTest(W) {
     portion(0);
     paastand("én portion K₃PO₄ i 0,50 L: [K⁺] = 0,60 M", A.faerdig, besked(A));
     vaelgA(4);
-    [].filter.call(d.querySelectorAll("#opl-valg .knap"), function (b) { return b.textContent === "SO₄²⁻"; })[0].click();
+    portion(0);
+    paastand("før gættet kan der ikke komme salt i", A.glas.n["Al2(SO4)3"] === 0 && /Gæt først/.test(besked(A)), besked(A));
+    valgKnap("SO₄²⁻").click();
+    paastand("gættet står i linjen", /Dit gæt: SO₄²⁻/.test(besked(A)), besked(A));
     portion(0);
     paastand("Al₂(SO₄)₃: gættet holdt, [SO₄²⁻] = 0,30 M", A.faerdig && /Dit gæt holdt/.test(besked(A)) && Math.abs(A.glas.ion("SO4") - 0.3) < 1e-9, besked(A));
     vaelgA(5);
@@ -321,6 +393,24 @@ function koerTest(W) {
     C.tilpas(); C.layout();
     var bl = D.BLAND.map(function (s, i) { C.vaelg(i, false); return loesAlt(C); });
     paastand("alle fire opgaver kan løses ved at skrive formlen og tallet", bl.every(Boolean), bl.join(","));
+    C.vaelg(0, false);
+    paastand("første opgave: syv trin, stofmængderne først, så koncentrationerne",
+        C.opg.trin.join(",") === "nSA,nSB,cSA,cSB,bidragA,bidragB,total" && /Stofmængden af CaCl₂/.test(besked(C)), besked(C));
+    skrivI(C, "n = m/M"); skrivI(C, "0,0500"); skrivI(C, "n = m/M"); skrivI(C, "0,0300");
+    tik(C, 2);
+    paastand("saltene ligger på vægtene, til koncentrationen er regnet", C.s.bunke.A === 1 && C.s.bunke.B === 1 && !C.s.iGlas.CaCl2);
+    skrivI(C, "c = n/V"); skrivI(C, "0,0500");
+    paastand("c(CaCl₂) = 0,0500: det er stofmængden", /Det er stofmængden n/.test(besked(C)) && !C.s.iGlas.CaCl2, besked(C));
+    skrivI(C, "0,250");
+    tik(C, 2);
+    paastand("c(CaCl₂) fundet: CaCl₂ er i vandet, AlCl₃ ligger stadig på vægten",
+        C.s.iGlas.CaCl2 && C.s.bunke.A === 0 && C.s.bunke.B === 1 && !C.s.iGlas.AlCl3);
+    skrivI(C, "c = n/V"); skrivI(C, "0,150");
+    tik(C, 2);
+    paastand("c(AlCl₃) fundet: begge salte er i vandet, luppen venter", C.s.iGlas.AlCl3 && !C.s.vist);
+    skrivI(C, "0,500"); skrivI(C, "0,450"); skrivI(C, "0,950");
+    tik(C, 2);
+    paastand("[Cl⁻] = 0,950 M: opgaven er løst, og luppen viser ionerne", C.faerdig && C.s.vist && C.part.antal(2) > 0, besked(C));
     C.vaelg(2, false);
     skrivI(C, "n = 2cV"); skrivI(C, "0,06"); skrivI(C, "cV"); skrivI(C, "0,03");
     paastand("glassene står, til rumfanget er fundet", C.s.Vmix === 0);

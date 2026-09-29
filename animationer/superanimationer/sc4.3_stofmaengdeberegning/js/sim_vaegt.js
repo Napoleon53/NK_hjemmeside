@@ -27,7 +27,9 @@
         this.over = null;
         this.startFane(D.VAEGT);
         this.regning = new NK.Regning({ vaert: NK.el("vaegt-raekker"), fane: this });
-        this.introNu = true;
+        /* Ingen introlinje her: linjen i kortet siger kun trinnet, saa den
+           ikke blander sig med opgavens spoergsmaal (brugerens oenske 29.
+           sept. 2026). K siger stadig, hvor man er. */
         this.vaelg(0, false);
     }
 

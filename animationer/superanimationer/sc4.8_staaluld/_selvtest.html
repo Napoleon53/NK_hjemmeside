@@ -97,7 +97,7 @@ function koerTest(W) {
     var D = NK.Data, K = NK.Kemi, T = NK.Tjek;
     paastand("data.js, kemi.js, tjek.js, regning.js og laerer.js er kørt", !!(D && D.GAET && K && K.Klump && T && T.formel && NK.Regning && NK.RoligLaerer));
     paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-forsoeg"] && NK.sims["fane-beregning"]));
-    var sprites = ["vaegt", "batteri", "iltflaske", "stjernekaster", "lup", "kateder", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var sprites = ["vaegt", "bunsen", "iltflaske", "stjernekaster", "lup", "kateder", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
     var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var billeder = [].slice.call(d.querySelectorAll("#forsoeg-gaet img"));
@@ -109,33 +109,37 @@ function koerTest(W) {
 
     overskrift("2. Kemien");
     paastand("M(Fe) = 55,85 g/mol og M(FeO) = 71,85 g/mol", K.Mtekst("Fe") === "55,85" && K.Mtekst("FeO") === "71,85");
-    var skaeve = [];
+    /* Braend en klump til den staar stille: med ilt hele tiden, eller uden */
+    function braend(m, u, medIlt) {
+        var k = new K.Klump(m, u), t = 0;
+        k.taend();
+        while (k.braender() && t < 200) { if (medIlt && k.ilt <= 0) k.givIlt(); k.opdater(0.1); t += 0.1; }
+        k.t = t;
+        return k;
+    }
+    var skaeve = [], luft = [];
     D.KLUMPER.forEach(function (m) {
         [D.UDBYTTE.min, 0.8, D.UDBYTTE.maks].forEach(function (u) {
-            var k = new K.Klump(m, u);
-            k.taend();
-            var n = 0;
-            while (k.braender() && n++ < 2000) k.opdater(0.1);
-            if (k.visning() !== K.slutVisning(m, u)) skaeve.push(m + "/" + u + ": " + k.visning() + " / " + K.slutVisning(m, u));
-            if (!(k.visning() > m)) skaeve.push(m + " blev ikke tungere");
+            var k = braend(m, u, true);
+            if (k.visning() !== K.slutVisning(m, u) || k.p < 1) skaeve.push(m + "/" + u + ": " + k.visning() + " / " + K.slutVisning(m, u));
+            var l = braend(m, u, false);
+            if (!(l.visning() > m && l.visning() < K.slutVisning(m, u) && l.ude && l.p > 0.45 && l.p < 0.7)) luft.push(m + "/" + u + ": " + l.visning() + " p " + l.p.toFixed(2));
         });
     });
-    paastand("alle " + D.KLUMPER.length + " klumper ender på den rigtige visning og bliver tungere", skaeve.length === 0, skaeve.join("; "));
-    var k1 = new K.Klump(4, 0.8);
-    k1.taend();
-    var tid = 0;
-    while (k1.braender() && tid < 100) { k1.opdater(0.1); tid += 0.1; }
-    paastand("uden ekstra ilt brænder den på 15-30 s", tid >= 15 && tid <= 30, tid.toFixed(1) + " s");
-    var k2 = new K.Klump(4, 0.8), tid2 = 0;
-    k2.taend();
-    while (k2.braender() && tid2 < 100) { if (k2.ilt <= 0) k2.givIlt(); k2.opdater(0.1); tid2 += 0.1; }
-    paastand("med ilt hele tiden går det mindst tre gange hurtigere", tid2 * 3 <= tid, tid2.toFixed(1) + " s");
+    paastand("med ilt hele tiden når alle " + D.KLUMPER.length + " klumper helt til ende og den rigtige visning", skaeve.length === 0, skaeve.join("; "));
+    paastand("uden ilt går de ud, før alt jernet har reageret (p mellem 0,45 og 0,7), men de bliver tungere", luft.length === 0, luft.join("; "));
+    var k1 = braend(4, 0.8, false);
+    paastand("uden ilt gløder den i 25-45 s", k1.t >= 25 && k1.t <= 45, k1.t.toFixed(1) + " s");
+    var k2 = braend(4, 0.8, true);
+    paastand("med ilt hele tiden er den færdig på under 15 s", k2.t < 15, k2.t.toFixed(1) + " s");
     var k3 = new K.Klump(4, 0.8);
     paastand("ilt virker ikke, før stålulden er tændt", !k3.givIlt() && k3.ilt === 0);
     k3.taend(); k3.opdater(1);
-    paastand("mens den brænder, står vægten ikke stille", !k3.stille() && k3.visning() > 4);
-    var ekstra = D.EKSEMPEL.filter(function (e) { var u = K.udbytteAf(e.mf, e.me); return u < D.UDBYTTE.min - 0.01 || u > D.UDBYTTE.maks + 0.01; });
-    paastand("eksemplerne på fane 2 ligger inden for modellens udbytte", ekstra.length === 0, JSON.stringify(ekstra));
+    paastand("mens den gløder, står vægten ikke stille", !k3.stille() && k3.visning() > 4);
+    paastand("når den er gået ud, kan den ikke tændes igen, og ilt virker ikke", !k1.taend() && !k1.givIlt() && !k1.braender());
+    var ekstra = K.udbytteAf(D.EKSEMPEL[0].mf, D.EKSEMPEL[0].me);
+    paastand("eksempel 1 er målt med ilt: udbyttet ligger inden for modellens", ekstra >= D.UDBYTTE.min && ekstra <= D.UDBYTTE.maks, ekstra.toFixed(3));
+    paastand("eksempel 2 er målt uden ilt: 3,00 g med 80 % giver 3,41 g", braend(3, 0.8, false).visning() === D.EKSEMPEL[1].me, braend(3, 0.8, false).visning());
     var f4 = K.facit({ tal: { mf: 4, me: 4.94 } });
     paastand("4,00 g jern: n = 0,0716 mol, m(FeO) = 5,14 g, ca. 82 % reagerede",
         K.mol(f4.n) === "0,0716" && K.g2(f4.m) === "5,14" && K.pct(f4.pct) === "82", K.mol(f4.n) + " " + K.g2(f4.m) + " " + K.pct(f4.pct));
@@ -229,7 +233,7 @@ function koerTest(W) {
     tekster.push(D.HVORFOR.spm, D.HVORFOR.hint, D.HVORFOR.efter, D.OVER_TAVLE);
     D.HVORFOR.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); });
     Object.keys(T.REGLER).forEach(function (id) { T.REGLER[id].fejl.forEach(function (x) { tekster.push(x[1]); }); });
-    tekster = tekster.concat(D.ROS, D.ROS_OPGAVE, D.KAFFE, D.STJERNE, [D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST]);
+    tekster = tekster.concat(D.ROS, D.ROS_OPGAVE, D.KAFFE, [D.STJERNE, D.UDEN_ILT, D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST]);
     tekster.push(d.body.innerText, d.getElementById("teori").innerText);
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[–—]/.test(alt), (alt.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
@@ -248,8 +252,8 @@ function koerTest(W) {
     paastand("der er ingen hint-knap under gættet", A.el.knap.hidden && !synlig(A.el.knap));
     paastand("linjen i kortet siger: gæt først", /Gæt først/.test(besked(A)), besked(A));
     var lay = A.lay;
-    A.nedScene({ x: lay.bat.x, y: lay.bat.y });
-    paastand("batteriet kan ikke bruges før gættet", !A.klump.taendt && /Gæt først/.test(besked(A)), besked(A));
+    A.nedScene({ x: lay.brn.x, y: lay.brn.y });
+    paastand("brænderen kan ikke bruges før gættet", !A.klump.taendt && /Gæt først/.test(besked(A)), besked(A));
     [].filter.call(gaet.querySelectorAll(".gk"), function (k) { return k.getAttribute("data-gaet") === "lettere"; })[0].click();
     paastand("efter gættet tier Kemichael, og kortet med Lettere er markeret", !A.k.taler() && gaet.querySelector(".gk.valgt").getAttribute("data-gaet") === "lettere");
     tik(A, 1.3);
@@ -262,17 +266,18 @@ function koerTest(W) {
     paastand("et forkert tal for m(før) afvises", A.noteret.mf === null && /står der ikke/.test(besked(A)), besked(A));
     felt(0, "f", komma(A.proeve) + " g");
     tik(A, 0.1);
-    paastand("m(før) aflæst (også med g efter), og linjen siger: tænd", A.noteret.mf === A.proeve && /batteriet/.test(besked(A)), besked(A));
+    paastand("m(før) aflæst (også med g efter), og linjen siger: tænd", A.noteret.mf === A.proeve && /bunsenbrænderen/.test(besked(A)), besked(A));
     paastand("m(efter) er lukket, før stålulden er tændt", d.getElementById("forsoeg-e0").disabled);
-    var bat = A.batPos();
-    traek(A, bat.x, bat.y, lay.zoom.x - lay.zoom.r - 30, lay.bordY - 40);
+    var brn = A.brnPos();
+    traek(A, brn.x, brn.y, brn.x, 30);
+    paastand("brænderen vendes vandret, mens den holdes", A.brn.v > 1.0, A.brn.v.toFixed(2));
     tik(A, 1);
-    paastand("batteriet sluppet ved siden af: det flyver hjem, og intet brænder", !A.klump.taendt && /poler/.test(besked(A)), besked(A));
-    bat = A.batPos();
-    var u = lay.uld, M = NK.Sprites.MAAL.batteri, dy = (M.h / 2 - M.pol) * lay.bat.h / M.h;
-    traek(A, bat.x, bat.y, u.cx - u.rx * 0.3, u.cy - u.ry * 0.3 - dy);
+    paastand("brænderen sluppet langt fra stålulden: den går hjem, og intet brænder", !A.klump.taendt && /Hold flammen/.test(besked(A)), besked(A));
+    brn = A.brnPos();
+    var maal = A.grebFor(A.uldKontakt());
+    traek(A, brn.x, brn.y, maal.x, maal.y);
     tik(A, 0.1);
-    paastand("batteriet trukket hen til stålulden: den er tændt", A.klump.taendt, besked(A));
+    paastand("brænderen trukket hen, så flammen rører stålulden: den er tændt", A.klump.taendt, besked(A));
     tik(A, 3);
     paastand("den gløder, der kommer gnister, og vægten stiger", A.uld.frontAndel(A.klump.p) > 0 && A.gnister.antal() > 0 && A.klump.visning() > A.proeve,
         A.uld.frontAndel(A.klump.p).toFixed(2) + " " + A.gnister.antal() + " " + A.klump.visning());
@@ -283,9 +288,14 @@ function koerTest(W) {
     klik(A, A.lay.flGeo.x0 + A.lay.flGeo.b / 2, A.lay.flGeo.y0 + A.lay.flGeo.h * 0.6);
     tik(A, 0.2);
     paastand("et klik på iltflasken: den brænder hurtigere", A.klump.ilt > 0 && A.klump.rate > rate0 * 2, rate0.toFixed(3) + " → " + A.klump.rate.toFixed(3));
-    tik(A, 40);
+    /* Ilt hele vejen, til alt det jern, ilten kan nå, har reageret */
+    for (var n = 0; n < 120 && A.klump.braender(); n++) {
+        if (A.klump.ilt <= 0) klik(A, A.lay.flGeo.x0 + A.lay.flGeo.b / 2, A.lay.flGeo.y0 + A.lay.flGeo.h * 0.6);
+        tik(A, 0.25);
+    }
+    tik(A, 8);
     paastand("vægten står stille, og linjen siger: aflæs m(efter)", A.fase() === "efter" && /m\(efter\)/.test(besked(A)), A.fase() + " " + besked(A));
-    paastand("vægten står på det, modellen siger", A.klump.visning() === K.slutVisning(A.proeve, A.klump.udbytte));
+    paastand("med ilt hele vejen står vægten på det, modellen siger", A.klump.p === 1 && A.klump.visning() === K.slutVisning(A.proeve, A.klump.udbytte));
     var maks = Math.floor(NK.Tegn.LUP_ATOMER * A.klump.udbytte / 2) * 2;
     paastand("luppen: den inderste del af jernet har ikke reageret", A.lup.reageret() === maks && maks < NK.Tegn.LUP_ATOMER, A.lup.reageret() + " af " + NK.Tegn.LUP_ATOMER);
     felt(0, "e", komma(A.proeve));
@@ -311,19 +321,32 @@ function koerTest(W) {
         tik(A, 1.5);
     }
     paastand("Vis svaret hele vejen løser måling 2 uden stjerne", A.faerdig && !A.status[1].stjerne && NK.maalinger[1] !== null, besked(A));
+    paastand("uden ilt gik den ud: vægten viser mindre end med ilt, og linjen siger det",
+        A.klump.ude && A.klump.p < 1 && A.klump.visning() < K.slutVisning(A.proeve, A.klump.udbytte) && /Uden iltflasken/.test(besked(A)), besked(A));
 
     /* Start forfra og tænd, før m(før) er skrevet */
     A.forfra();
     paastand("Start forfra: ny klump med samme masse, ikke tændt", !A.faerdig && !A.klump.taendt && A.noteret.mf === null);
-    klik(A, A.lay.bat.x, A.lay.bat.y);
+    klik(A, A.lay.brn.x, A.lay.brn.y);
     tik(A, 2);
-    paastand("et klik på batteriet: det flyver selv hen og tænder", A.klump.taendt, besked(A));
+    paastand("et klik på brænderen: den flyver selv hen og tænder", A.klump.taendt, besked(A));
     paastand("tændt uden m(før): linjen siger det", /m\(før\) står ikke i skemaet/.test(besked(A)), besked(A));
     felt(1, "f", komma(A.proeve));
     paastand("m(før) kan stadig skrives, hvis man så den", A.noteret.mf === A.proeve);
+    tik(A, 60);
+    var pUde = A.klump.p;
+    klik(A, A.lay.brn.x, A.lay.brn.y);
+    tik(A, 2);
+    paastand("gået ud: brænderen kan ikke tænde den igen, og det siges", A.klump.ude && A.klump.p === pUde && /kan ikke tændes igen/.test(besked(A)), besked(A));
+    klik(A, A.lay.flGeo.x0 + A.lay.flGeo.b / 2, A.lay.flGeo.y0 + A.lay.flGeo.h * 0.6);
+    paastand("gået ud: iltflasken siger, at ilten skal på, mens den gløder", A.klump.ilt === 0 && /mens den gløder/.test(besked(A)), besked(A));
     if (A.lay.stjGeo) {
         klik(A, A.lay.stjGeo.x + A.lay.stjGeo.b / 2, A.lay.stjGeo.y + A.lay.stjGeo.h * 0.3);
-        paastand("påskeægget: stjernekasteren tænder, og Kemichael siger noget om den", A.stjerneT > 0 && D.STJERNE.indexOf(A.k.tekst()) >= 0, A.k.tekst());
+        var t1 = A.k.tekst();
+        tik(A, 0.5);
+        klik(A, A.lay.stjGeo.x + A.lay.stjGeo.b / 2, A.lay.stjGeo.y + A.lay.stjGeo.h * 0.3);
+        paastand("påskeægget: stjernekasteren tænder, og Kemichael siger det samme hver gang: gnisterne er jern",
+            A.stjerneT > 0 && t1 === D.STJERNE && A.k.tekst() === D.STJERNE && /jern/.test(D.STJERNE), A.k.tekst());
     }
 
     overskrift("8. Fane 2: beregningen");
@@ -403,7 +426,8 @@ function koerTest(W) {
             if (id === "fane-forsoeg") {
                 if (L.zoom.x + L.zoom.r > Wc + 1) problemer.push(navn + " luppen");
                 if (L.fl.x + L.fl.b / 2 > L.zoom.x - L.zoom.r + 4) problemer.push(navn + " flasken rammer luppen");
-                if (L.bat.x + L.bat.b / 2 > L.v.x - L.v.b / 2) problemer.push(navn + " batteriet rammer vægten");
+                if (L.brn.x + L.brn.b / 2 > L.v.x - L.v.b / 2) problemer.push(navn + " brænderen rammer vægten");
+                if (NK.Tegn.bunsenMund(L.brn.x, L.brn.y, L.brn.h, 0).y - NK.Tegn.flammeLaengde(L.brn.h) < 0) problemer.push(navn + " flammen");
                 if (L.uld.cy - L.uld.ry < 20) problemer.push(navn + " stålulden");
                 if (L.bordY - L.fl.h < 0) problemer.push(navn + " flasken");
                 if (L.zoom.y - L.zoom.r < 26) problemer.push(navn + " luppens titel");

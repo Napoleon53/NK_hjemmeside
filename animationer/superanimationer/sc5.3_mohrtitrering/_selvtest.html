@@ -190,8 +190,12 @@ function koerTest(W) {
         [D.ROS_TITRERING, D.ROS_BEREGNING, D.ROS_FORBRUG, D.BEM_MORK, D.BEM_TOM, D.AEG_PRAECIS]);
     var tekster = replikker.concat([D.TITRER_HINT, D.AFLAES_HINT],
         D.TRIN.map(function (x) { return x.navn + " " + x.hint + " " + x.formelHint; }),
-        D.SITUATIONER.map(function (s) { return s.tekst + " " + s.hint + " " + s.efter + " " + s.forkert.join(" ") + " " + s.valg.join(" ") + " " + s.aendring; }));
+        D.SITUATIONER.map(function (s) { return s.titel + " " + s.tekst + " " + s.hint + " " + s.efter + " " + s.forkert.join(" ") + " " + s.valg.join(" ") + " " + s.aendring; }));
     var krop = d.body.innerText + " " + d.getElementById("teori").innerText;
+    var snak = D.SITUATIONER.filter(function (s) {
+        return /hvor mange mL|skal der .* til\?|mL sølvnitrat til/i.test(s.tekst + " " + s.hint + " " + s.efter + " " + s.forkert.join(" "));
+    });
+    paastand("fejlkilderne spørger om forbruget, ikke om hvor mange mL der skal til", snak.length === 0, snak.map(function (s) { return s.id; }).join(", "));
     var streg = tekster.filter(function (x) { return /[–—]/.test(x); });
     paastand("ingen tankestreger i replikker, hints og forklaringer", streg.length === 0, streg.join(" | "));
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
@@ -327,11 +331,14 @@ function koerTest(W) {
     for (i = 0; i < 40; i++) { var km = S2.kammerat(); if (km.V > 2 && km.V < 25) kammerater++; }
     paastand("klassekammeraternes forbrug ligger mellem 2 og 25 mL", kammerater === 40);
 
-    overskrift("8. To kolber kan gennemføres");
+    overskrift("8. Fejlkilderne kan gennemføres");
     klik('[data-fane="fane-forbrug"]');
     S3.tilpas();
     S3.afvisTilbud();
     S3.nulstil();
+    paastand("fane 3 hedder Fejlkilder, og kortet viser situationens titel",
+        /Fejlkilder/.test(d.querySelector('[data-fane="fane-forbrug"]').textContent) && d.getElementById("for-titel").textContent === D.SITUATIONER[0].titel,
+        d.getElementById("for-titel").textContent);
     var V = {};
     D.SITUATIONER.forEach(function (s, n) {
         S3.vaelg(s.rigtig);
@@ -355,7 +362,7 @@ function koerTest(W) {
     S3.nulstil();
     S3.vaelg(2);
     tik(S3, 5);
-    paastand("et forkert gæt giver forklaringen til netop det svar", /lige så mange Cl⁻/.test(d.getElementById("for-besked").textContent) && S3.rigtige === 0);
+    paastand("et forkert gæt giver forklaringen til netop det svar", /stofmængden af Cl⁻ er den samme/.test(d.getElementById("for-besked").textContent) && S3.rigtige === 0);
     paastand("det rigtige svar er markeret grønt og det valgte rødt", !!d.querySelector("#for-valg .vaelger.rigtig") && !!d.querySelector("#for-valg .vaelger.forkert"));
     S3.nulstil();
 

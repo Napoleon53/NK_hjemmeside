@@ -192,8 +192,12 @@
              talHint: "Tast {a0} : {b0} på lommeregneren. Svaret er gram pr. mol: g/mol." }
     };
 
-    /* I Mesteren kommer stofmaengden i andet trin fra foerste trin */
-    D.MESTER_HINT = "Brug stofmængden fra trin 1: {a}. Den skal ganges med molarmassen af glukose.";
+    /* I Mesteren kommer stofmaengden i anden del fra foerste del. (Trin er
+       de tre skridt i hvert regnestykke: formlen, tallene og resultatet.) */
+    D.MESTER_HINT = "Brug stofmængden fra del 1: {a}. Den skal ganges med molarmassen af glukose.";
+
+    /* De tre skridt i hvert regnestykke, som de staar i linjen over det */
+    D.TRINBAR = ["Formlen", "Tallene ind", "Resultatet"];
 
     /* Trekanten: Kemichaels ord, naar den kommer frem */
     D.TREKANT = "Dæk det over, du vil finde. Det, der er tilbage, er formlen: ved siden af hinanden ganges, over hinanden deles.";
@@ -262,8 +266,8 @@
     /* ----- Replikkerne ------------------------------------------------------------------
        Linjen i opgavekortet siger, hvor man er (INTRO), naeste skridt,
        fejl og ros. Kemichael blander sig ikke: han siger kun noget ved
-       Giv hint og Vis svaret, naar han sendes ud eller hentes, og naar der
-       klikkes paa ham eller koppen. */
+       Giv hint og Vis svaret, en kort ros, naar en del er rigtig, naar
+       han sendes ud eller hentes, og naar der klikkes paa ham eller koppen. */
     D.INTRO = {
         formel: "Formlen for stofmængden bygges af brikker.",
         vaegt: "Vægten deler stoffet i portioner på 1 mol.",
@@ -275,6 +279,26 @@
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
+
+    /* En del er rigtig (brugerens oenske 29. sept. 2026: det skal vaere
+       tydeligt, at man har skrevet den rigtige formel). Linjen i kortet
+       siger DEL_OK foran naeste skridt, og Kemichael siger en kort ros
+       (ROS_K), der selv gaar igen efter ROS_TID sekunder. enhed1 er én
+       enhed skrevet i sidste opgave paa Formlen, indsaet mellemregningen
+       og tal resultatet paa Vaegten. */
+    D.DEL_OK = {
+        formel: "Formlen er rigtig.", navn: "Navnene er rigtige.", enhed: "Enhederne er rigtige.",
+        enhed1: "Enheden er rigtig.", indsaet: "Mellemregningen er rigtig.", tal: "Resultatet er rigtigt."
+    };
+    D.ROS_K = {
+        formel: ["Rigtig formel. Godt.", "Flot. Formlen er rigtig.", "Rigtig formel. Den skal du bruge tit."],
+        navn: ["Rigtige navne. Godt.", "Flot. Navnene er rigtige."],
+        enhed: ["Rigtige enheder. Godt.", "Flot. Enhederne er rigtige."],
+        enhed1: ["Rigtig enhed.", "Ja. Den enhed er rigtig."],
+        indsaet: ["Rigtige tal på de rigtige pladser.", "Flot. Mellemregningen er rigtig."],
+        tal: ["Rigtigt resultat, og med enhed. Godt.", "Flot. Resultatet er rigtigt."]
+    };
+    D.ROS_TID = 3.2;
 
     D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
     D.IND_LINJE = "Tilbage. Kaffen derude var ikke bedre.";

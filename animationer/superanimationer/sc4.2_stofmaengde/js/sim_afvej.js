@@ -4,9 +4,8 @@
    En ordre siger en stofmaengde af et grundstof, fx 0,250 mol kobber.
    Krukken med stoffet staar paa bordet, og molarmassen staar paa dens
    etiket. Eleven skriver massen (m = n · M), og saa haelder krukken
-   stoffet i vejebaaden, og vaegten taeller op til massen. Til sidst
-   skriver eleven antallet af atomer (N = n · N_A) som et tal gange en
-   potens af 10, og displayet skifter til antallet.
+   stoffet i vejebaaden, og vaegten taeller op til massen. Plakaten paa
+   vaeggen er formlen med enhederne.
 
    Knappen giver foerst et hint og saa svaret. Et forkert tal giver en
    besked, der passer til fejlen (js/tjek.js). En ordre, der er loest uden
@@ -25,7 +24,6 @@
     var LOEFT = 0.45, HAELD = 1.0, TILBAGE = 0.5;
     var HAELD_TID = LOEFT + HAELD + TILBAGE;
     var VINKEL = 1.95;
-    var TAEL_TID = 0.9;
 
     function SimAfvej() {
         this.L = new NK.Laerred(NK.el("afvej-laerred"));
@@ -203,19 +201,17 @@
 
     P.nyOpgave = function (gennemsyn) {
         var o = D.ORDRER[this.valgt];
-        var felter = [{ slags: "m" }, { slags: "N" }];
+        var felter = [{ slags: "m" }];
         felter.forEach(function (f, i) { f.i = i; f.status = "laast"; f.forsoeg = 0; });
         this.opg = { o: o, felter: felter, k: 0, hjaelp: 0, brugtSvar: false, faerdig: false, gennemsyn: !!gennemsyn };
         this.fremhaev = null;
         this.haeldT = -1;
-        this.taelT = -1;
         this.besked("", "");
         if (gennemsyn) {
             felter.forEach(function (f) { f.status = "ok"; });
             this.opg.k = felter.length;
             this.opg.faerdig = true;
             this.haeldT = 99;
-            this.taelT = 99;
             this.besked(this.status[this.valgt].stjerne ? "Afvejet uden hjælp. ★" : "Afvejet.", "god");
         } else {
             felter[0].status = "aktiv";
@@ -232,10 +228,9 @@
     };
 
     /* Den faerdige beregning i en raekke */
-    P.facitTekst = function (f) {
+    P.facitTekst = function () {
         var o = this.opg.o;
-        if (f.slags === "m") return D.regnMasse(o.st, o.n, o.nTekst, "<b>" + o.mTekst + "</b>");
-        return D.regnAntal(o.n, o.nTekst, "<b>" + o.NTekst + "</b>");
+        return D.regnMasse(o.st, o.n, o.nTekst, "<b>" + o.mTekst + "</b>");
     };
 
     P.bygRaekker = function () {
@@ -245,14 +240,11 @@
         o.felter.forEach(function (f) {
             var rk = document.createElement("div");
             rk.className = "raekke";
-            var etiket = f.slags === "m" ? "Massen" : "Antal atomer";
-            var enhed = f.slags === "m" ? "m" : "N";
-            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + etiket + '</span>' +
-                '<span class="raekke-del">' + enhed + '</span></div><div class="felter"></div>';
+            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">Massen</span>' +
+                '<span class="raekke-del">m</span></div><div class="felter"></div>';
             var fe = document.createElement("div");
             f.feltEl = fe;
             f.input = null;
-            f.eks = null;
             if (f.status === "ok" || f.status === "svar") {
                 fe.className = "felt " + f.status;
                 fe.innerHTML = '<span class="felt-svar">' + mig.facitTekst(f) + '</span><span class="felt-maerke">' +
@@ -260,17 +252,10 @@
             } else {
                 var aktiv = f.status === "aktiv";
                 var fra = aktiv ? "" : " disabled";
-                fe.className = "felt " + f.status + (f.slags === "N" ? " potensfelt" : "");
-                if (f.slags === "m") {
-                    fe.innerHTML = '<span class="felt-pre">m =</span>' +
-                        '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen i gram" placeholder="massen"' + fra + '>' +
-                        '<span class="felt-efter">g</span>';
-                } else {
-                    fe.innerHTML = '<span class="felt-pre">N =</span>' +
-                        '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Tallet foran potensen" placeholder="tal" class="mant"' + fra + '>' +
-                        '<span class="felt-gange">· 10</span>' +
-                        '<input type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="Potensen" class="eks"' + fra + '>';
-                }
+                fe.className = "felt " + f.status;
+                fe.innerHTML = '<span class="felt-pre">m =</span>' +
+                    '<input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen i gram" placeholder="massen"' + fra + '>' +
+                    '<span class="felt-efter">g</span>';
                 fe.innerHTML += '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
                 var inputs = fe.querySelectorAll("input");
                 Array.prototype.forEach.call(inputs, function (inp) {
@@ -280,7 +265,6 @@
                 });
                 fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
                 f.input = inputs[0];
-                f.eks = inputs[1] || null;
             }
             rk.querySelector(".felter").appendChild(fe);
             vaert.appendChild(rk);
@@ -302,7 +286,7 @@
         NK.saetTekst("afvej-nr", String(ordre.plads + 1));
         NK.saetTekst("afvej-antal-i-niveau", String(this.iNiveau(ordre.niveau)));
         NK.saetTekst("afvej-prompt", ordre.nTekst + " mol " + ordre.st.navn);
-        NK.saetTekst("afvej-spm", "Hvad skal vægten vise, og hvor mange atomer er det?");
+        NK.saetTekst("afvej-spm", "Hvad skal vægten vise?");
         this.el.kort.classList.toggle("sejr", o.faerdig && !o.gennemsyn);
         this.visKnap();
         this.opdaterFremskridt();
@@ -329,30 +313,21 @@
     P.visStatus = function () {
         var o = this.opg;
         if (!o) return;
-        var ordre = o.o, f = this.aktivtFelt();
+        var ordre = o.o;
         if (o.faerdig) {
             NK.saetHTML("afvej-status", "<b>" + NK.html(ordre.nTekst + " mol " + ordre.st.navn) + "</b> vejer " +
-                NK.html(ordre.mTekst) + " g og er " + NK.html(ordre.NTekst) + " atomer.");
-        } else if (f && f.slags === "N") {
-            NK.saetHTML("afvej-status", "Vægten afvejer " + NK.html(Tg.gram(ordre.vaegt)) + ". Skriv antallet af atomer til højre.");
+                NK.html(ordre.mTekst) + " g.");
         } else {
             NK.saetHTML("afvej-status", "Skriv massen til højre. Molarmassen står på krukken.");
         }
     };
 
-    P.hjaelp = function (f) {
+    P.hjaelp = function () {
         var o = this.opg.o;
-        if (f.slags === "m") {
-            return {
-                hint: "m = n · M = " + NK.html(D.regnMasse(o.st, o.n, o.nTekst).replace(/^m = /, "")) + ". Molarmassen står på krukken.",
-                svar: this.facitTekst(f) + ".",
-                fremhaev: "krukke"
-            };
-        }
         return {
-            hint: "N = n · N<sub>A</sub> = " + NK.html(D.regnAntal(o.n, o.nTekst).replace(/^N = /, "")) + ". N<sub>A</sub> står på plakaten.",
-            svar: this.facitTekst(f) + ".",
-            fremhaev: "plakat"
+            hint: "m = n · M = " + NK.html(D.regnMasse(o.st, o.n, o.nTekst).replace(/^m = /, "")) + ". Molarmassen står på krukken.",
+            svar: this.facitTekst() + ".",
+            fremhaev: "krukke"
         };
     };
 
@@ -364,7 +339,7 @@
             return;
         }
         var f = this.aktivtFelt();
-        var h = this.hjaelp(f);
+        var h = this.hjaelp();
         if (o.hjaelp === 0) {
             o.hjaelp = 1;
             this.besked("<b>Hint:</b> " + h.hint, "gul");
@@ -381,9 +356,7 @@
     P.tjek = function () {
         var o = this.opg, f = this.aktivtFelt();
         if (!f) return;
-        var res = f.slags === "m"
-            ? Tj.masse(f.input ? f.input.value : "", o.o)
-            : Tj.antal(f.input ? f.input.value : "", f.eks ? f.eks.value : "", o.o);
+        var res = Tj.masse(f.input ? f.input.value : "", o.o);
         if (res.tom) { this.besked(res.besked, ""); this.fokus(); return; }
         if (res.ok) {
             this.feltRigtigt(f, "ok");
@@ -407,8 +380,7 @@
         this.fremhaev = null;
         if (maade === "ok") this.besked("", "");
         if (this.afvisTilbud) this.afvisTilbud();
-        if (f.slags === "m") this.haeldT = 0;
-        if (f.slags === "N") this.taelT = 0;
+        this.haeldT = 0;
         if (o.k >= o.felter.length - 1) {
             o.k = o.felter.length;
             this.loes();
@@ -464,7 +436,6 @@
             if (this.nulstilSikker <= 0) { this.nulstilSikker = 0; this.visNulstil(); }
         }
         if (this.haeldT >= 0 && this.haeldT < 99) this.haeldT = Math.min(99, this.haeldT + dt);
-        if (this.taelT >= 0 && this.taelT < 99) this.taelT = Math.min(99, this.taelT + dt);
         if (this.ventRos) {
             this.ventRos.t -= dt;
             if (this.ventRos.t <= 0 && this.laererNiveau) {
@@ -506,10 +477,6 @@
 
     P.display = function () {
         var o = this.opg.o;
-        if (this.taelT >= 0.3) {
-            var a = NK.klamp((this.taelT - 0.3) / TAEL_TID, 0, 1);
-            return { t: Tg.displayAntal(o.N), etiket: "atomer", lys: a < 1 ? 1 : 0.4 };
-        }
         var h = this.haeldt();
         return { t: Tg.gram(Math.round(o.vaegt * h)), lys: h > 0 && h < 1 ? 1 : 0 };
     };
@@ -520,7 +487,7 @@
         var o = this.opg.o;
         var puls = 0.55 + 0.45 * Math.sin(this.tid * 7);
         Tg.rum(ctx, lay.W, lay.H, lay.bordY + 6);
-        Tg.molPlakat(ctx, lay.plakat.x, lay.plakat.y, lay.plakat.b, lay.plakat.h, { lys: this.fremhaev === "plakat" ? puls : 0 });
+        Tg.formelPlakat(ctx, lay.plakat.x, lay.plakat.y, lay.plakat.b, lay.plakat.h, {});
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.H + 10);
 
         var kop = this.g.kaffekop;
@@ -530,7 +497,7 @@
         }
 
         var d = this.display();
-        Tg.vaegt(ctx, lay.vaegt.x, lay.vaegt.y, lay.vaegtB, d.t, { lys: d.lys, etiket: d.etiket });
+        Tg.vaegt(ctx, lay.vaegt.x, lay.vaegt.y, lay.vaegtB, d.t, { lys: d.lys });
         var h = this.haeldt();
         var hoejde = Tg.bunkeHoejde(lay.baadB, D.rumfang(o.st, o.vaegt));
         var b = Tg.bunke(ctx, lay.skaal.x, lay.skaal.y + 1, lay.baadB, o.st, h, hoejde, o.nr);
@@ -603,12 +570,11 @@
             var o = mig.opg, f = mig.aktivtFelt();
             /* Krukken og vaegten svarer med det, de kan fortaelle */
             if (u.slags === "plakat") {
-                mig.besked("Plakaten: 1 mol er 6,02 · 10²³ atomer. Det er Avogadros konstant, <i>N</i><sub>A</sub>.", "");
+                mig.besked("Plakaten: m = n · M. Massen er stofmængden gange molarmassen, og mol · g/mol giver g.", "");
             } else if (u.slags === "krukke") {
                 mig.besked("Krukken: " + NK.html(o.o.st.navn) + ", M = " + NK.komma(o.o.st.M) + " g/mol.", "");
             } else if (u.slags === "vaegt") {
-                if (f && f.slags === "m") mig.besked("Vægten afvejer, når massen til højre er rigtig.", "");
-                else if (f) mig.besked("Vægten tæller atomerne, når antallet til højre er rigtigt.", "");
+                if (f) mig.besked("Vægten afvejer, når massen til højre er rigtig.", "");
             }
             mig.fokus();
         });

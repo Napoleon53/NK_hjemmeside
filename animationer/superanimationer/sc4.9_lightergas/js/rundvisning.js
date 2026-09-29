@@ -18,11 +18,11 @@
        oenske: det skal man selv finde ud af) */
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Træk lighteren op på vægten, og skriv tallet som m(før) i skemaet." },
+            { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Træk lighteren op på vægten. Knappen Aflæs vægten under skemaet skriver tallet for dig." },
             { sel: "#forsoeg-anker-glas", titel: "Karret og måleglasset", tekst: "Måleglasset er fyldt med vand og står på hovedet i karret. Træk lighteren ned under det, og hold musen nede på den. Gassen skubber vandet ned." },
             { sel: "#forsoeg-anker-lup", titel: "Luppen", tekst: "Vandet i måleglasset, forstørret. Læs rumfanget ud for bunden af den buede vandoverflade." },
             { sel: "#forsoeg-anker-papir", titel: "Papiret", tekst: "Lighteren er våd, når den kommer op af vandet. Stil den på papiret, før den vejes igen." },
-            { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "m(før), V og m(efter) for begge målinger. Tallene bruges på fanen Beregningen." },
+            { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "m(før), V og m(efter) for begge målinger. Aflæs vægten skriver vægtens tal. V læser du selv i luppen. Tallene bruges på fanen Beregningen." },
             { sel: "#forsoeg-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Knappen giver et hint og derefter svaret." },
             { sel: "#forsoeg-forfra", titel: "Start forfra", tekst: "En ny lighter og et måleglas fyldt med vand." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra masse og rumfang til molarmassen og alkanen. Fejlkilder: hvad sker der, når noget går galt?" }

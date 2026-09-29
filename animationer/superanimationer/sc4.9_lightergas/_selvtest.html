@@ -183,14 +183,22 @@ function koerTest(W) {
     function ventUd() { var n = 0; while (A.laerer.optaget() && n++ < 40) tik(A, 0.5); return !A.laerer.optaget(); }
     tik(A, 0.2);
     paastand("første skridt: lighteren på vægten", A.fase() === "foer" && /vægten/.test(A.beskedTekst()), A.beskedTekst());
+    paastand("målingens tre felter er åbne fra start", ["f0", "v0", "e0"].every(function (id) { return !d.getElementById("forsoeg-" + id).disabled; }) &&
+        d.getElementById("forsoeg-f1").disabled);
+    felt("forsoeg-v0", "100");
+    paastand("V før m(før) giver en forklaring", A.noteret.V === null && /Vej lighteren først/.test(A.beskedTekst()), A.beskedTekst());
     felt("forsoeg-f0", "17,00");
     paastand("m(før), før lighteren står på vægten, afvises", A.noteret.mf === null && /på vægten først/.test(A.beskedTekst()));
+    d.getElementById("forsoeg-aflaes").click();
+    paastand("Aflæs vægten uden lighter på vægten giver en forklaring", A.noteret.mf === null && /på vægten først/.test(A.beskedTekst()));
     veje([midt(), [130, 430]]);
     paastand("lighteren kan trækkes op på vægten", A.sted === "vaegt");
+    paastand("nu banker knappen Aflæs vægten", d.getElementById("forsoeg-aflaes").classList.contains("banker") && /Aflæs vægten/.test(A.beskedTekst()), A.beskedTekst());
     felt("forsoeg-f0", "12,34");
     paastand("et forkert tal afvises", A.noteret.mf === null);
-    felt("forsoeg-f0", NK.tal2(A.lt.visning()));
+    d.getElementById("forsoeg-aflaes").click();
     tik(A, 0.1);
+    paastand("Aflæs vægten skriver m(før) i skemaet", A.noteret.mf === A.lt.m0 && d.getElementById("forsoeg-f0").value === NK.tal2(A.lt.m0));
     paastand("m(før) noteres, og næste skridt er vandet", A.noteret.mf === A.lt.m0 && A.fase() === "saenk" && /vandet/.test(A.beskedTekst()), A.beskedTekst());
     veje([midt(), [640, 420]]);
     paastand("lighteren kan trækkes ned under måleglasset", A.sted === "vand");
@@ -218,20 +226,46 @@ function koerTest(W) {
     paastand("gættet noteres, og næste skridt er at tørre og veje", A.valgt === 0 && A.fase() === "op");
     veje([midt(), [midt()[0], midt()[1] - 30], [130, 430]]);
     paastand("op af vandet er lighteren våd", A.lt.vaad() && A.fase() === "toer");
-    var vaad = A.lt.visning();
-    felt("forsoeg-e0", NK.tal2(vaad));
-    paastand("den våde vejning afvises med en forklaring", A.noteret.me === null && /vejer med/.test(A.beskedTekst()), A.beskedTekst());
+    d.getElementById("forsoeg-aflaes").click();
+    paastand("den våde vejning afvises med en forklaring, også med knappen", A.noteret.me === null && /vejer med/.test(A.beskedTekst()), A.beskedTekst());
     veje([midt(), [400, 520]]);
     tik(A, 1.2);
     paastand("papiret tørrer lighteren", A.sted === "papir" && !A.lt.vaad());
     veje([midt(), [130, 430]]);
-    felt("forsoeg-e0", NK.tal2(A.lt.visning()));
+    d.getElementById("forsoeg-aflaes").click();
     tik(A, 0.1);
     var mA = NK.maalinger[0];
     paastand("måling 1 er færdig og gemt", A.faerdig && mA && mA.mf === A.noteret.mf && mA.me === A.lt.visning());
     paastand("målingen giver butan", K.facit(mA).alkan === D.LIGHTERGAS, K.Mv(K.facit(mA).M));
     paastand("gættet (0,04 g) får sin forklaring", /Gas er let/.test(A.beskedTekst()), A.beskedTekst());
     paastand("fane 2 bruger den nye måling", B.opg.tal.egen && B.opg.tal.mf === mA.mf, JSON.stringify(B.opg.tal));
+    paastand("knappen Aflæs vægten kan ikke bruges, når målingen er færdig", d.getElementById("forsoeg-aflaes").disabled);
+
+    /* Maaling 2 i en anden raekkefoelge: m(efter) foer V, og klik paa vaegten */
+    A.vaelg(1, false);
+    tik(A, 0.2);
+    veje([midt(), [130, 430]]);
+    var gv = A.lay, rv = A.L.canvas.getBoundingClientRect();
+    A.L.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { clientX: rv.left + gv.ox + 130 * gv.k, clientY: rv.top + gv.oy + 560 * gv.k, bubbles: true, pointerId: 1, button: 0 }));
+    A.L.canvas.dispatchEvent(new W.PointerEvent("pointerup", { clientX: rv.left + gv.ox + 130 * gv.k, clientY: rv.top + gv.oy + 560 * gv.k, bubbles: true, pointerId: 1, button: 0 }));
+    tik(A, 0.1);
+    paastand("et klik på vægten virker som Aflæs vægten", A.noteret.mf === A.lt.m0);
+    veje([midt(), [640, 420]]);
+    p = midt();
+    mus("pointerdown", p[0], p[1]);
+    tik(A, 5);
+    mus("pointerup", p[0], p[1]);
+    tik(A, 0.2);
+    veje([midt(), [midt()[0], midt()[1] - 30], [400, 520]]);
+    tik(A, 1.2);
+    veje([midt(), [130, 430]]);
+    d.getElementById("forsoeg-aflaes").click();
+    tik(A, 0.1);
+    paastand("m(efter) kan skrives, før V står der", A.noteret.me !== null && A.noteret.V === null && !A.faerdig && A.fase() === "aflaes");
+    felt("forsoeg-v1", String(Math.round(A.glas.V)));
+    tik(A, 0.1);
+    paastand("V til sidst gør målingen færdig", A.faerdig && NK.maalinger[1] && NK.maalinger[1].V === Math.round(A.glas.V) &&
+        K.facit(NK.maalinger[1]).alkan === D.LIGHTERGAS, JSON.stringify(NK.maalinger[1]));
 
     overskrift("6. Påskeæggene");
     function tuning() {

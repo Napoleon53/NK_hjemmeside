@@ -1020,3 +1020,97 @@ select:focus-visible {
 .bf-del.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
 .bf-del .bf-tekst { flex: 1; padding: 5px 8px; text-align: center; font-size: 1rem; font-weight: 600; color: #b8f0cf; white-space: nowrap; }
 .felt.broekfelt.aktiv:focus-within { box-shadow: none; }
+
+/* ---------------------------------------------------------------------
+   SC4.7, 29. sept. 2026 (brugerens tilbagemelding)
+   --------------------------------------------------------------------- */
+
+/* Fane 1: gaettet paa én linje og de tre trin, med det trin, eleven er
+   naaet til, fremhaevet */
+.gaet-linje { margin: 0 0 6px; font-size: 0.86rem; color: var(--tekst-svag); }
+.gaet-linje b { color: var(--tekst); }
+.trinliste { margin: 2px 0 4px; padding: 0; list-style: none; counter-reset: trin; display: flex; flex-direction: column; gap: 4px; }
+.trinliste li {
+    counter-increment: trin;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: var(--radius-lil);
+    font-size: 0.95rem;
+    line-height: 1.35;
+    color: var(--tekst-mat);
+}
+.trinliste li::before {
+    content: counter(trin);
+    flex: 0 0 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    color: var(--tekst-svag);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-1px);
+}
+.trinliste li.nu { color: var(--tekst); font-weight: 700; font-size: 1.05rem; background-color: rgba(242, 197, 61, 0.12); box-shadow: inset 3px 0 0 var(--gul); }
+.trinliste li.nu::before { background-color: var(--gul); color: #1b1b21; }
+.trinliste li.gjort { color: var(--tekst-svag); }
+.trinliste li.gjort::before { content: "✓"; background-color: var(--groen-mork); color: #ffffff; }
+
+/* Fane 1: skemaet med aendringen fra vejningen foer og en graa raekke for
+   den naeste vejning */
+.vejeskema td:last-child { width: auto; }
+.vejeskema td:nth-child(3) { width: 38%; }
+.vejeskema td.aendr { text-align: right; white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; color: #f2a93d; }
+.vejeskema td.aendr.ens { color: #7ee0a8; }
+.vejeskema tr.naeste th { color: var(--tekst-mat); }
+.vejeskema tr.naeste td { color: var(--tekst-mat); font-style: italic; padding: 6px 3px; }
+
+/* Et rigtigt svar: linjen i kortet faar et flueben og blinker groent */
+@keyframes rigtigBlink {
+    0%   { background-color: rgba(63, 174, 114, 0.45); box-shadow: 0 0 0 0 rgba(63, 174, 114, 0.6); }
+    60%  { box-shadow: 0 0 0 8px rgba(63, 174, 114, 0); }
+    100% { background-color: rgba(63, 174, 114, 0.14); box-shadow: 0 0 0 0 rgba(63, 174, 114, 0); }
+}
+.opgavekort .besked.god { background-color: rgba(63, 174, 114, 0.14); color: #9ff0c2; animation: rigtigBlink 0.9s ease-out 1; }
+.opgavekort .besked.god::before { content: "✓ "; font-weight: 800; }
+
+/* Fane 2: den raekke, der lige er regnet rigtigt, blinker groent */
+@keyframes raekkeBlink {
+    0%   { background-color: rgba(63, 174, 114, 0.4); box-shadow: 0 0 0 0 rgba(63, 174, 114, 0.6); }
+    60%  { box-shadow: 0 0 0 10px rgba(63, 174, 114, 0); }
+    100% { background-color: rgba(63, 174, 114, 0); box-shadow: 0 0 0 0 rgba(63, 174, 114, 0); }
+}
+.raekke.blink { border-radius: var(--radius-lil); animation: raekkeBlink 1.1s ease-out 1; }
+.raekke.blink .rs-maerke { animation: pop 0.5s ease-out 1; }
+@keyframes pop {
+    0%   { transform: scale(0.4); }
+    60%  { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
+.rs-maerke { display: inline-block; font-size: 1.25rem; }
+
+/* Fane 2: et bredere panel med stoerre skrift i regnestykket (brugerens
+   oenske 29. sept. 2026: "hoejre bar maa gerne vaere stoerre") */
+#fane-hypoteser { --panel-bredde: 540px; }
+#fane-hypoteser .maal-tekst { font-size: 1.22rem; }
+#fane-hypoteser .raekke-etiket { font-size: 0.8rem; }
+#fane-hypoteser .rs-venstre,
+#fane-hypoteser .rs-lig,
+#fane-hypoteser .rs-vist { font-size: 1.18rem; }
+#fane-hypoteser .felt input { font-size: 1.12rem; }
+#fane-hypoteser .felt .bf-del input,
+#fane-hypoteser .bf-krop > .bf-del input { font-size: 1.08rem; padding: 7px 6px; }
+#fane-hypoteser .bf-del .bf-tekst,
+#fane-hypoteser .bf-krop > .bf-del .bf-tekst { font-size: 1.1rem; }
+#fane-hypoteser .sk-stof, #fane-hypoteser .sk-pil, #fane-hypoteser .sk-plus, #fane-hypoteser .sk-vist { font-size: 1.12rem; }
+#fane-hypoteser .sk-led input { width: 34px; min-width: 34px; flex-basis: 34px; font-size: 1.1rem; }
+#fane-hypoteser .opgavekort .besked { font-size: 0.98rem; }
+@media (max-width: 1320px) { #fane-hypoteser { --panel-bredde: 460px; } }
+@media (max-width: 1100px) { #fane-hypoteser { --panel-bredde: 420px; } }
+
+/* Fane 3: spoergsmaalet, der gaettes paa, staar tydeligt over knapperne */
+.opgave-spm.skarp { margin: 6px 0 4px; font-size: 1rem; font-weight: 700; line-height: 1.4; color: var(--gul); }

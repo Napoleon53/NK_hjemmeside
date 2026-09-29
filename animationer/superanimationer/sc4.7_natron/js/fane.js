@@ -68,9 +68,12 @@
             return this.status.filter(function (s) { return s.loest; }).length;
         };
 
-        /* ----- Opgavelisten ---------------------------------------------------- */
+        /* ----- Opgavelisten ------------------------------------------------------
+           Fane 1 har ingen liste: den har kun én opgave, og et klik paa den
+           startede forfra (brugerens oenske 29. sept. 2026: fjernet). */
         P.bygListe = function () {
             var mig = this;
+            if (!this.el.liste) return;
             this.el.liste.innerHTML = "";
             this.opgaver.forEach(function (o, i) {
                 var knap = document.createElement("button");
@@ -85,6 +88,7 @@
 
         P.visListe = function () {
             var mig = this;
+            if (!this.el.liste) return;
             var knapper = this.el.liste.querySelectorAll(".hyldelinje");
             this.status.forEach(function (s, i) {
                 knapper[i].classList.toggle("valgt", i === mig.nr);
@@ -227,9 +231,11 @@
             this.visBesked({ html: html, klasse: "" });
         };
 
+        /* En ny linje med ros blinker groent, ogsaa naar linjen foer var groen */
         P.visBesked = function (b) {
             var e = this.el.besked;
             if (!e) return;
+            if (b.klasse === "god" && e.innerHTML !== b.html) { e.className = "besked"; void e.offsetWidth; }
             e.innerHTML = b.html;
             e.className = "besked" + (b.klasse ? " " + b.klasse : "");
         };

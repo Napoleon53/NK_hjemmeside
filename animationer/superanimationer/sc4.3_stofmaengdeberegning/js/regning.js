@@ -15,6 +15,11 @@
    forrige er rigtig. Broeker staar med en rigtig broekstreg, ogsaa i
    felterne, saa eleverne vaenner sig til den i stedet for "/".
 
+   Over regnestykket staar de tre trin (Formlen › Tallene ind ›
+   Resultatet) med det, eleven er ved, i gult og de faerdige i groent,
+   og en rigtig linje faar ✓ og lyser kort op (brugerens oenske 29.
+   sept. 2026: det var uklart, at formlen er foerste skridt mod svaret).
+
    Tavlen i scenen viser opgavens tal og det samme regnestykke, efter
    hvad der er skrevet: "n(NaCl) = ?", saa "n(NaCl) = m/M = ?" osv.
 
@@ -85,14 +90,47 @@
         return '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
     }
 
+    /* ✓ ved en linje, der er rigtig, ↩ ved en, der er vist med Vis svaret */
+    function maerke(vist) {
+        return '<span class="rs-maerke' + (vist ? " svar" : "") + '">' + (vist ? "↩" : "✓") + "</span>";
+    }
+
+    /* Hvor langt et regnestykke er: 0 formlen, 1 tallene, 2 resultatet, 3 faerdigt */
+    function skridt(f) {
+        if (f.status === "ok" || f.status === "svar") return 3;
+        return f.fase === "formel" ? 0 : (f.fase === "indsaet" ? 1 : 2);
+    }
+
+    /* Linjen over regnestykket med de tre skridt: det, eleven er ved, er
+       gult, de faerdige er groenne med ✓ (brugerens oenske 29. sept. 2026:
+       det var uklart, at formlen er foerste skridt mod antallet af mol) */
+    P.trinbar = function (f) {
+        var nu = skridt(f), laast = f.status === "laast";
+        var vist = [!!f.formelVist, f.vist[0] || f.vist[1], f.status === "svar"];
+        var html = '<ol class="trinbar' + (laast ? " laast" : "") + '" aria-label="Regnestykkets tre trin">';
+        D.TRINBAR.forEach(function (navn, j) {
+            var klasse = "tb-trin", nr = String(j + 1);
+            if (j < nu) { klasse += vist[j] ? " svar" : " ok"; nr = vist[j] ? "↩" : "✓"; }
+            else if (j === nu && !laast) klasse += " nu";
+            if (j > 0) html += '<li class="tb-pil" aria-hidden="true">›</li>';
+            html += '<li class="' + klasse + '"' + (j === nu && !laast ? ' aria-current="step"' : "") + '><span class="tb-nr">' + nr +
+                '</span><span class="tb-navn">' + NK.html(navn) + "</span></li>";
+        });
+        return html + "</ol>";
+    };
+
     P.byg = function () {
-        var mig = this, o = this.opg, vaert = this.vaert;
+        var mig = this, o = this.opg, vaert = this.vaert, flere = this.felter.length > 1;
+        var ny = this.ny;
+        this.ny = null;
         vaert.innerHTML = "";
         this.felter.forEach(function (f, i) {
             var t = D.TRIN[f.id];
             var rk = document.createElement("div");
-            rk.className = "raekke";
-            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + (i + 1) + ". " + NK.html(t.navn) + "</span></div>";
+            rk.className = "raekke" + (f.status === "laast" ? " laast" : "");
+            /* Overskriften: i Mesteren delene (stofmaengden, saa massen) */
+            var etiket = flere ? "Del " + (i + 1) + ": " + t.navn + " af " + (f.id === "m" && o.st2 ? o.st2 : o.st).navn : "Regn det ud i tre trin";
+            rk.innerHTML = '<div class="raekke-hoved"><span class="raekke-etiket">' + NK.html(etiket) + "</span></div>" + mig.trinbar(f);
             var venstre = T.venstre(f.id, o);
             var g = document.createElement("div");
             /* lang: to felter med gangetegn efter en lang venstreside (se stil.css) */
@@ -106,18 +144,23 @@
 
             /* 1. Formlen */
             if (f.fase === "formel" && !loest) linje(g, venstre, mig.enkeltFelt(f, "formel"));
-            else linje(g, venstre, '<span class="rs-vist">' + T.formelHTML(f.id) + "</span>");
+            else linje(g, venstre, '<span class="rs-vist">' + T.formelHTML(f.id) + "</span>" + maerke(f.formelVist));
 
             /* 2. Mellemregningen */
             if (f.fase === "indsaet") linje(g, "", mig.broekFelt(f));
-            else if (f.fase === "tal" || loest) linje(g, "", '<span class="rs-vist">' + T.indsaetHTML(f.id, mig.ledTekster(f)) + "</span>");
+            else if (f.fase === "tal" || loest) linje(g, "", '<span class="rs-vist">' + T.indsaetHTML(f.id, mig.ledTekster(f)) + "</span>" + maerke(f.vist[0] || f.vist[1]));
 
             /* 3. Resultatet */
             if (loest) {
                 linje(g, "", '<span class="rs-vist' + (f.status === "svar" ? " svar" : "") + '"><b>' + NK.html(T.facitTekst(f.id, o)) +
-                    '</b></span><span class="rs-maerke' + (f.status === "svar" ? " svar" : "") + '">' + (f.status === "ok" ? "✓" : "↩") + "</span>");
+                    "</b></span>" + maerke(f.status === "svar"));
             } else if (f.fase === "tal") {
                 linje(g, "", mig.enkeltFelt(f, "tal"));
+            }
+            /* Den linje, der lige er blevet rigtig, lyser kort groent op */
+            if (ny && ny.i === i) {
+                var h = g.querySelectorAll(".rs-hoejre")[ny.linje];
+                if (h) h.classList.add("rs-ny");
             }
             vaert.appendChild(rk);
         });
@@ -132,7 +175,7 @@
         fe.style.flex = "1";
         fe.innerHTML = '<input type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="' +
             NK.html((slags === "formel" ? "Formlen for " : "Resultatet med enhed for ") + t.navn.toLowerCase()) + '" placeholder="' +
-            (slags === "formel" ? "skriv formlen" : "tal og enhed") + '"' + fra + ">" + okKnap(fra);
+            (slags === "formel" ? "formlen med bogstaver" : "resultatet med enhed") + '"' + fra + ">" + okKnap(fra);
         var inp = fe.querySelector("input");
         inp.addEventListener("keydown", function (e) {
             if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
@@ -270,6 +313,7 @@
     P.ledPlaceret = function (f, vist) {
         if (f.plads[0] !== null && f.plads[1] !== null) {
             f.fase = "tal";
+            if (!vist) this.ny = { i: this.k, linje: 1 };
             this.byg();
             this.fane.indsaetOk(vist, T.indsaetHTML(f.id, this.ledTekster(f)));
             return;
@@ -281,6 +325,8 @@
     P.formelOk = function (vist, note) {
         var f = this.aktivt();
         f.fase = "indsaet";
+        f.formelVist = !!vist;
+        if (!vist) this.ny = { i: this.k, linje: 0 };
         this.byg();
         this.fane.formelOk(vist, note, T.venstre(f.id, this.opg) + " = " + T.formelHTML(f.id));
     };
@@ -289,6 +335,7 @@
         var f = this.aktivt();
         f.status = maade;
         f.fase = "tal";
+        if (maade === "ok") this.ny = { i: this.k, linje: 2 };
         this.k++;
         if (!this.faerdig()) this.felter[this.k].status = "aktiv";
         this.byg();
@@ -349,15 +396,18 @@
     P.trinTekst = function () {
         var f = this.aktivt();
         if (!f) return "";
+        /* Trinnene er de samme tre som i linjen over regnestykket. Formlen
+           kommer foer tallene, og linjen siger det (brugerens oenske 29.
+           sept. 2026: "skriv formlen" under "hvor mange mol" forvirrede). */
         var n = this.felter.length, t = D.TRIN[f.id], hvad;
-        if (f.fase === "formel") hvad = "Skriv <b>formlen</b> for " + NK.html(T.venstre(f.id, this.opg)) + ".";
-        else if (f.fase === "tal") hvad = "Regn <b>resultatet</b> ud, og skriv det med enhed.";
+        if (f.fase === "formel") hvad = "Trin 1: Skriv <b>formlen</b> for " + NK.html(T.venstre(f.id, this.opg)) + " med bogstaver. Tallene kommer i trin 2.";
+        else if (f.fase === "tal") hvad = "Trin 3: Regn <b>resultatet</b> ud, og skriv det med enhed.";
         else if (f.plads[0] === null && f.plads[1] === null) {
-            hvad = t.op === "/" ? "Sæt <b>tallene</b> med enheder ind over og under brøkstregen." :
-                "Sæt de to <b>tal</b> med enheder ind, som skal ganges.";
+            hvad = t.op === "/" ? "Trin 2: Sæt <b>tallene</b> med enheder ind over og under brøkstregen." :
+                "Trin 2: Sæt de to <b>tal</b> med enheder ind, som skal ganges.";
         } else if (t.op === "/") hvad = "Skriv nu tallet med enhed " + (f.plads[0] === null ? "over" : "under") + " brøkstregen.";
         else hvad = "Skriv nu det andet tal med enhed.";
-        return (n > 1 ? "Trin " + (this.k + 1) + " af " + n + ": " + NK.html(t.navn) + ". " : "") + hvad;
+        return (n > 1 ? "Del " + (this.k + 1) + " af " + n + ". " : "") + hvad;
     };
 
     /* ----- Tavlen ------------------------------------------------------------------
@@ -470,9 +520,10 @@
         P2.trinLinje = function () { return this.regning.trinTekst(); };
         P2.opgaveFaerdig = function () { return this.regning.faerdig(); };
 
-        /* Et trin er gaaet videre: Kemichael tier (eller siger det svar, han
-           blev bedt om), og linjen siger det naeste skridt */
-        P2.videre = function (vistHTML, godHTML) {
+        /* Et trin er gaaet videre: Kemichael roser kort, naar en hel linje
+           er rigtig (del), eller siger det svar, han blev bedt om, og
+           linjen siger det naeste skridt */
+        P2.videre = function (vistHTML, godHTML, del) {
             this.hjaelp = 0;
             this.trekant = null;
             var trin = this.trinLinje();
@@ -480,7 +531,7 @@
                 if (this.k.sig(vistHTML, "svar", { lukVedSkriv: true })) this.besked(trin, "");
                 else this.besked(vistHTML + " " + trin, "gul");
             } else {
-                this.k.tie();
+                if (del) this.kRos(del); else this.k.tie();
                 this.besked(godHTML + " " + trin, "god");
             }
             this.visKnap();
@@ -489,19 +540,19 @@
 
         P2.formelOk = function (vist, note, formelHTML) {
             this.videre(vist ? "<b>Formlen:</b> " + formelHTML : null,
-                note ? NK.html(note) + " <b>" + formelHTML + "</b>." : "Rigtig formel.");
+                note ? NK.html(note) + " <b>" + formelHTML + "</b>." : D.DEL_OK.formel, "formel");
             if (this.efterFormel) this.efterFormel();
         };
 
         P2.ledOk = function () { this.videre(null, "Rigtigt."); };
 
         P2.indsaetOk = function (vist, html) {
-            this.videre(vist ? "<b>Mellemregningen:</b> " + html : null, "Rigtigt.");
+            this.videre(vist ? "<b>Mellemregningen:</b> " + html : null, D.DEL_OK.indsaet, "indsaet");
         };
 
         P2.regnLoest = function (id, maade) {
             if (this.efterTrin) this.efterTrin(id, maade);
-            this.trinLoest(maade, maade === "svar" ? this.regning.regningHTML(id) : null);
+            this.trinLoest(maade, maade === "svar" ? this.regning.regningHTML(id) : null, "tal");
         };
 
         P2.regnFejl = function (besked, tom, id, v) {

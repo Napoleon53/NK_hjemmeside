@@ -2,7 +2,7 @@
    sim_fortynd.js - fane 3: fortyndingen
 
    Skalaen hænger over et langt bord. Saltsyren (0,1 M, pH 1) staar ved
-   pH 1 og natronluden (0,1 M, pH 13) ved pH 13. Knappen Fortynd 10
+   pH 1 og natriumhydroxiden (0,1 M, pH 13) ved pH 13. Knappen Fortynd 10
    gange laver et nyt glas: pipetten tager 1 mL fra det sidste glas i
    raekken, og sproejteflasken fylder op med 9 mL vand. Det nye glas
    staar under sin pH paa skalaen, saa hver fortynding er ét trin mod 7.
@@ -10,11 +10,16 @@
    hoejre. Alle glas har et par draaber universalindikator.
 
    pH regnes med vandets egne ioner (NK.Kemi.syre og .base), saa syren
-   aldrig bliver basisk. Luppen viser det valgte glas.
+   aldrig bliver basisk. Luppen viser det nyeste glas (eller det, eleven
+   klikker paa) og zoomer selv (lup.js): efter en fortynding viser den
+   foerst 10 gange faerre ioner i samme rum og zoomer saa ud.
 
    Fem maal (D.FORTYND_MAAL): gaet pH efter én fortynding, naa pH 5, hvor
    mange gange, fortynd til basisk (det kan ikke lade sig goere) og
-   natronluden 1.000 gange. Hvor langt eleven er naaet, huskes under NOEGLE.
+   natriumhydroxiden 1.000 gange. Fanen er en kravlegaard: kun den knap, maalet
+   skal bruge, virker (spaerret), buddet kommer foer fortyndingen, og der
+   kan ikke fortyndes forbi maalet. Hvor langt eleven er naaet, huskes
+   under NOEGLE.
    ===================================================================== */
 (function () {
     "use strict";
@@ -31,7 +36,7 @@
     var FASER = [                /* pipetten og sproejteflasken */
         ["suger", 0.35], ["flytter", 0.45], ["drypper", 0.25], ["vand", 0.6], ["faerdig", 0.2]
     ];
-    var ZOOM = 9;
+    var VENT_ZOOM = 1.0;         /* sekunder med 10 gange faerre, foer luppen zoomer ud */
 
     function SimFortynd() {
         this.L = new NK.Laerred(NK.el("fortynd-laerred"));
@@ -39,7 +44,6 @@
         this.lay = null;
         this.over = null;
         this.lup = new NK.Lup();
-        this.z = ZOOM;
         this.g = { kaffekop: { skjult: false, iHaand: false } };
         var gemt = NK.hent(NOEGLE, {}) || {};
         this.nr = NK.klamp(gemt.maal || 0, 0, D.FORTYND_MAAL.length);
@@ -70,7 +74,7 @@
         lay.skalaBund = lay.skala.y + bandH + 12 + lay.px;
         var foran = NK.klamp(H * 0.12, 44, 86);
         lay.bordY = Math.round(H - foran);
-        var enhed = (lay.skala.x1 - lay.skala.x0) / 14;
+        var enhed = (lay.skala.x1 - lay.skala.x0) / (K.PH_MAKS - K.PH_MIN);
         lay.gw = NK.klamp(Math.min(enhed * 0.86, (lay.bordY - lay.skalaBund) * 0.16), 26, 66);
         lay.gh = lay.gw * 1.2;
         lay.raekke = lay.gh * 0.62;
@@ -87,11 +91,6 @@
         var bund = lay.bordY - lay.fb * 1.6 - 56;
         var R = NK.klamp(Math.min((bund - top) / 2, (Tg.skalaX(lay.skala, 5.8) - kant - 10) / 2), 44, 150);
         lay.lup = { cx: Math.max(kant + R + 14, Tg.skalaX(lay.skala, 5.8) - R - 6), cy: top + R, R: R };
-        var kr = NK.klamp(R * 0.15, 15, 22);
-        var a = Math.PI * 0.8;
-        lay.ud = { x: lay.lup.cx + Math.cos(a) * (R + kr * 0.4), y: lay.lup.cy + Math.sin(a) * (R + kr * 0.4), r: kr };
-        a = Math.PI * 0.2;
-        lay.ind = { x: lay.lup.cx + Math.cos(a) * (R + kr * 0.4), y: lay.lup.cy + Math.sin(a) * (R + kr * 0.4), r: kr };
         lay.tekstY = lay.lup.cy + R + 12;
         var sx = Tg.skalaX(lay.skala, 8.3);
         lay.skilt = { x: sx, y: top, b: Math.min(lay.skala.x1 - sx, 300), h: 0 };
@@ -131,6 +130,7 @@
         this.serier = { syre: [glasAf("syre", 0)], base: [glasAf("base", 0)] };
         this.anim = null;
         this.auto = null;
+        this.ventTjek = false;
         this.valgt = this.serier.syre[0];
         this.lup.nulstil();
         this.placerAlle(true);
@@ -173,16 +173,32 @@
     };
 
     /* ----- Fortyndingen -------------------------------------------------------------------- */
+    /* Kravlegaarden: hvorfor knappen ikke virker lige nu ("" = den virker) */
+    P.spaerret = function (serie) {
+        if (this.antalFortyndinger(serie) >= D.MAKS_GLAS) return "Der er ikke plads til flere glas i den række. Tryk R for at tømme bordet.";
+        var m = this.maal();
+        if (!m) return "";
+        if (this.naaet) return "Målet er nået. Tryk på knappen til højre for at gå videre.";
+        if (!m.serie) return "Du skal ikke fortynde nu. Skriv tallet til højre.";
+        if (m.serie !== serie) return "I dette mål skal du fortynde " + (m.serie === "syre" ? "saltsyren" : "natriumhydroxiden") + ".";
+        if (m.slags === "valg" && this.valgNr < 0) return "Vælg dit bud til højre først.";
+        var til = m.slags === "basisk" ? D.MAKS_GLAS : m.k;
+        if (this.antalFortyndinger(serie) >= til) return m.slags === "valg" ? "Glasset er lavet. Vælg igen til højre." : "Du har fortyndet nok.";
+        return "";
+    };
+
     P.fortynd = function (serie, stille) {
         if (this.anim) {
             if (!stille) this.besked("Vent, til glasset er fyldt.", "gul");
             return false;
         }
-        if (this.antalFortyndinger(serie) >= D.MAKS_GLAS) {
-            if (!stille) this.besked("Der er ikke plads til flere glas i den række. Tryk R for at tømme bordet.", "gul");
+        var grund = stille ? (this.antalFortyndinger(serie) >= D.MAKS_GLAS ? "fuld" : "") : this.spaerret(serie);
+        if (grund) {
+            if (!stille) this.besked(grund, "gul");
             return false;
         }
         var fra = this.sidste(serie);
+        this.vaelgGlas(fra);
         var ny = glasAf(serie, fra.k + 1);
         ny.fyld = 0;
         ny.farvePh = fra.ph;
@@ -202,9 +218,9 @@
         ny.farvePh = ny.ph;
         this.anim = null;
         this.valgt = ny;
-        this.opdaterLup();
+        this.opdaterLup(false, VENT_ZOOM);
         this.visGlas();
-        this.tjekMaal();
+        this.ventTjek = true;       /* maalet tjekkes, naar luppen har zoomet */
         this.visStatus();
     };
 
@@ -237,29 +253,22 @@
     };
 
     /* ----- Luppen ------------------------------------------------------------------------ */
-    P.opdaterLup = function (straks) {
+    /* vent: sekunder, foer luppen zoomer (efter en fortynding) */
+    P.opdaterLup = function (straks, vent) {
         var g = this.valgt;
         if (!g) return;
-        this.lup.saet(K.antal(g.h3o, this.z), K.antal(g.oh, this.z));
+        this.lup.saet(g.h3o, g.oh, vent);
         if (straks) this.lup.straks();
         this.visGlas();
     };
 
-    P.zoom = function (retning) {
-        var z = this.z + retning;
-        if (z < K.ZOOM_MIN || z > K.ZOOM_MAKS) {
-            this.besked(retning > 0 ? "Længere ud kan luppen ikke zoome." : "Længere ind kan luppen ikke zoome.", "gul");
-            return;
-        }
-        this.z = z;
-        this.lup.zoom(retning);
-        this.opdaterLup();
-    };
-
+    /* Et klik paa et glas: luppen hopper straks til det rigtige rum */
     P.vaelgGlas = function (g) {
         if (this.valgt === g) return;
         this.valgt = g;
         this.opdaterLup();
+        this.lup.hop();
+        this.visGlas();
     };
 
     /* ----- Maalene ---------------------------------------------------------------------- */
@@ -327,7 +336,7 @@
         var set = this.antalFortyndinger(m.serie) >= m.k;
         if (!set) {
             this.besked("Dit bud: <b>" + NK.html(m.valg[i][0]) + "</b>. Tryk på Fortynd 10 gange under " +
-                (m.serie === "syre" ? "saltsyren" : "natronluden") + " for at se det.", "");
+                (m.serie === "syre" ? "saltsyren" : "natriumhydroxiden") + " for at se det.", "");
         } else if (i !== m.rigtig) {
             this.besked(NK.html(m.valg[i][1]) + " Vælg igen.", "skidt");
         }
@@ -496,7 +505,7 @@
         var tekst, klasse = "knap";
         if (!m) {
             NK.saetTekst("fortynd-titel", "Frit valg");
-            NK.saetTekst("fortynd-prompt", "Fortynd saltsyren og natronluden, og klik på et glas for at se det i luppen.");
+            NK.saetTekst("fortynd-prompt", "Fortynd saltsyren og natriumhydroxiden, og klik på et glas for at se det i luppen.");
             tekst = "Start målene forfra";
         } else {
             NK.saetTekst("fortynd-titel", "Mål");
@@ -517,26 +526,31 @@
     P.visGlas = function () {
         var g = this.valgt;
         if (!g) return;
-        var navn = g.serie === "syre" ? "Saltsyre" : "Natronlud";
+        var navn = g.serie === "syre" ? "Saltsyre" : "Natriumhydroxid";
         NK.saetTekst("fortynd-glasnavn", g.k === 0 ? navn + ", 0,1 M" : navn + " fortyndet " + K.tusind(Math.pow(10, g.k)) + " gange");
         NK.saetTekst("fortynd-ph", K.phTekst(g.ph, 2));
         var s = K.surhed(g.ph, 2);
         NK.saetTekst("fortynd-surhed", s.charAt(0).toUpperCase() + s.slice(1));
-        NK.saetTekst("fortynd-nh", K.antalTekst(K.antal(g.h3o, this.z)));
-        NK.saetTekst("fortynd-no", K.antalTekst(K.antal(g.oh, this.z)));
+        NK.saetTekst("fortynd-nh", K.antalTekst(this.lup.antal("h3o")));
+        NK.saetTekst("fortynd-no", K.antalTekst(this.lup.antal("oh")));
         NK.saetTekst("fortynd-ch", NK.potens(g.h3o, 2) + " M");
     };
 
     P.visStatus = function () {
         var m = this.maal(), t;
         var g = this.valgt;
-        var serieNavn = m && m.serie === "base" ? "natronluden" : "saltsyren";
+        var serieNavn = m && m.serie === "base" ? "natriumhydroxiden" : "saltsyren";
+        var zm = this.lup.zoomerMod(), ion = g && g.serie === "base" ? "OH⁻" : "H₃O⁺";
         if (this.anim) t = "Pipetten tager 1 mL fra glasset før, og sprøjteflasken fylder op med 9 mL vand.";
+        else if (zm > 0) t = "10 gange mere vand: 10 gange færre " + ion + " i luppen. Den zoomer ud til et 10 gange større rum.";
+        else if (zm < 0) t = "Luppen zoomer ind på et 10 gange mindre rum.";
         else if (m && this.naaet) t = "Målet er nået. Tryk på knappen til højre for at gå videre.";
         else if (m && m.slags === "valg" && this.valgNr < 0) t = "Vælg dit bud til højre. Tryk så på <b>Fortynd 10 gange</b> under " + serieNavn + ".";
         else if (m && m.slags === "tal") t = "Skriv tallet til højre. Glassene står på bordet.";
         else if (m && m.slags === "basisk" && g && g.serie === "syre" && g.k >= 5) {
             t = "pH " + K.phTekst(g.ph, 2) + ". " + (K.surhed(g.ph, 2) === "sur" ? "Stadig sur. Fortynd igen." : "Neutral, men ikke basisk. Fortynd igen.");
+        } else if (m && m.serie && this.spaerret(m.serie)) {
+            t = this.spaerret(m.serie);
         } else if (m && m.serie) {
             var n = this.antalFortyndinger(m.serie), k = m.slags === "basisk" ? 0 : m.k;
             t = "Tryk på <b>Fortynd 10 gange</b> under " + serieNavn + "." + (k > 1 && n > 0 && n < k ? " " + n + " af " + k + " gange." : "");
@@ -549,6 +563,12 @@
     P.opdater = function (dt) {
         this.tid += dt;
         this.lup.opdater(dt);
+        var lup = this.lup, noegle = lup.z + "|" + lup.zMaal + "|" + (lup.zoomT < 1);
+        if (noegle !== this.sidsteNoegle) {
+            this.sidsteNoegle = noegle;
+            this.visGlas();
+            this.visStatus();
+        }
         var a = this.anim;
         if (a) {
             a.t += dt / FASER[a.fase][1];
@@ -566,7 +586,11 @@
             }
         } else if (this.auto) {
             if (this.antalFortyndinger(this.auto.serie) < this.auto.til) this.fortynd(this.auto.serie, true);
-            else { this.auto = null; this.tjekMaal(); }
+            else { this.auto = null; this.ventTjek = true; }
+        }
+        if (this.ventTjek && !this.anim && this.lup.rolig()) {
+            this.ventTjek = false;
+            this.tjekMaal();
         }
         if (this.ventReplik) {
             this.ventReplik.t -= dt;
@@ -704,22 +728,18 @@
             Tg.zoomKegle(ctx, g.x, gy, L.cx, L.cy, L.R);
         }
         this.lup.tegn(ctx, L.cx, L.cy, L.R, this.tid, { farve: g ? K.farveCss(g.farvePh, 0.1) : null, lys: this.pegLup ? puls : 0 });
-        var z = this.z;
-        Tg.rundKnap(ctx, lay.ud.x, lay.ud.y, lay.ud.r, "−", { lys: this.over && this.over.slags === "ud", slukket: z >= K.ZOOM_MAKS });
-        Tg.rundKnap(ctx, lay.ind.x, lay.ind.y, lay.ind.r, "+", { lys: this.over && this.over.slags === "ind", slukket: z <= K.ZOOM_MIN });
         NK.tekst(ctx, "1 prik = 1 ion", L.cx, L.cy - L.R - 10, { font: Tg.font("700", NK.klamp(lay.px - 1, 12, 14)), justering: "center", farve: "#c8ced6", kant: true });
-        if (g) NK.Lup.taelling(ctx, L.cx, lay.tekstY, L.R, K.antal(g.h3o, z), K.antal(g.oh, z), z, NK.klamp(lay.px - 1, 12, 14));
+        if (g) NK.Lup.taelling(ctx, L.cx, lay.tekstY, L.R, this.lup, NK.klamp(lay.px - 1, 12, 14), lay.W);
 
-        /* Knapperne */
-        var ventSyre = m && !this.naaet && m.serie === "syre" && !(m.slags === "valg" && this.valgNr < 0);
-        var ventBase = m && !this.naaet && m.serie === "base" && !(m.slags === "valg" && this.valgNr < 0);
+        /* Knapperne: kun den, maalet skal bruge, er taendt */
+        var aabenSyre = !this.spaerret("syre"), aabenBase = !this.spaerret("base");
         Tg.knap(ctx, lay.knapSyre, "Fortynd 10 gange ▸", {
-            lys: this.over && this.over.slags === "knapSyre", slukket: this.antalFortyndinger("syre") >= D.MAKS_GLAS,
-            puls: (ventSyre && !this.anim) || this.pegKnapper ? puls : 0
+            lys: aabenSyre && this.over && this.over.slags === "knapSyre", slukket: !aabenSyre,
+            puls: (m && aabenSyre && !this.anim && !this.auto) || this.pegKnapper ? puls : 0
         });
         Tg.knap(ctx, lay.knapBase, "◂ Fortynd 10 gange", {
-            lys: this.over && this.over.slags === "knapBase", slukket: this.antalFortyndinger("base") >= D.MAKS_GLAS,
-            puls: (ventBase && !this.anim) || this.pegKnapper ? puls : 0
+            lys: aabenBase && this.over && this.over.slags === "knapBase", slukket: !aabenBase,
+            puls: (m && aabenBase && !this.anim && !this.auto) || this.pegKnapper ? puls : 0
         });
 
         if (this.laererTegnOver) this.laererTegnOver(ctx);
@@ -761,9 +781,6 @@
         if (!kop.skjult && !kop.iHaand && Math.abs(pt.x - lay.kop.x) < 26 && pt.y < lay.kop.y + 4 && pt.y > lay.kop.y - 60) return { slags: "kop" };
         if (this.overKnap(pt, lay.knapSyre)) return { slags: "knapSyre" };
         if (this.overKnap(pt, lay.knapBase)) return { slags: "knapBase" };
-        function i(k) { var dx = pt.x - k.x, dy = pt.y - k.y; return dx * dx + dy * dy <= (k.r + 4) * (k.r + 4); }
-        if (i(lay.ud)) return { slags: "ud" };
-        if (i(lay.ind)) return { slags: "ind" };
         /* Glassene: forreste raekke foerst */
         var alle = this.serier.syre.concat(this.serier.base).filter(function (g) { return g.placeret; });
         alle.sort(function (a, b) { return a.r - b.r; });
@@ -790,17 +807,6 @@
         });
         c.addEventListener("pointerleave", function () { mig.over = null; c.style.cursor = "default"; });
         c.addEventListener("pointerup", function (e) { mig.klik(mig.L.punkt(e)); });
-        c.addEventListener("wheel", function (e) {
-            var pt = mig.L.punkt(e), L = mig.lay && mig.lay.lup;
-            if (!L) return;
-            var dx = pt.x - L.cx, dy = pt.y - L.cy;
-            if (dx * dx + dy * dy > L.R * L.R) return;
-            e.preventDefault();
-            var nu = Date.now();
-            if (mig.sidsteHjul && nu - mig.sidsteHjul < 180) return;
-            mig.sidsteHjul = nu;
-            mig.zoom(e.deltaY > 0 ? 1 : -1);
-        }, { passive: false });
     };
 
     P.klik = function (pt) {
@@ -811,17 +817,13 @@
         if (u.slags === "kop" && this.klikKop) { this.klikKop(); return; }
         if (u.slags === "knapSyre") { this.fortynd("syre"); return; }
         if (u.slags === "knapBase") { this.fortynd("base"); return; }
-        if (u.slags === "ud") { this.zoom(1); return; }
-        if (u.slags === "ind") { this.zoom(-1); return; }
         if (u.slags === "glas") { this.vaelgGlas(u.g); return; }
-        if (u.slags === "lup") { this.besked("Luppen viser det glas, du har klikket på. Zoom med + og −.", ""); return; }
+        if (u.slags === "lup") { this.besked("Luppen viser det nyeste glas, eller det du har klikket på. Den zoomer selv, så der er 10 til 100 af den ion, der er flest af.", ""); return; }
         if (u.slags === "skilt") { this.besked("1 del fra glasset før og 9 dele vand: 10 gange så meget væske og 10 gange lavere koncentration.", ""); return; }
         if (u.slags === "skala") this.besked("Hvert glas står under sin pH. Stregen viser hvor.", "");
     };
 
     P.tast = function (e) {
-        if (e.key === "+") { this.zoom(-1); return true; }
-        if (e.key === "-" || e.key === "−") { this.zoom(1); return true; }
         if (e.key === "f" || e.key === "F") {
             var m = this.maal();
             this.fortynd(m && m.serie === "base" ? "base" : "syre");

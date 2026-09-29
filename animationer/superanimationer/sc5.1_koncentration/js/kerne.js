@@ -188,6 +188,19 @@ window.NK = NK;
         return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     };
 
+    /* Stoerrelser med et ord i saenket skrift: "V_før" bliver V<sub>før</sub>
+       (brugerens oenske 29. sept. 2026: V(før) med saenket før, ikke V₁).
+       NK.sub escaper teksten foerst; NK.subTekst skriver "V(før)" til
+       steder uden HTML (aria-label). */
+    var SUB = /([A-Za-z])_(før|efter|vand)/g;
+    NK.SUB = SUB;
+    NK.sub = function (s) {
+        return NK.html(s).replace(SUB, "$1<sub>$2</sub>");
+    };
+    NK.subTekst = function (s) {
+        return String(s).replace(SUB, "$1($2)");
+    };
+
     /* ----- Laerred: canvas med korrekt skarphed paa alle skaerme ------ */
     NK.Laerred = function (canvas) {
         this.canvas = canvas;

@@ -124,16 +124,33 @@
           goer: [["NaCl", 3]],
           efter: "Hver NaCl giver én Cl⁻, så [Cl⁻] = c(NaCl) = 0,30 M." },
         { id: "na2so4", titel: "To Na⁺", salte: ["Na2SO4"], V: 500, maal: { portioner: 1 },
-          tekst: "Du opløser en portion (0,10 mol) Na₂SO₄ i 0,50 L. Så er c(Na₂SO₄) = 0,20 M.",
-          valg: { spm: "Hvad bliver [Na⁺]?",
-                  hint: "Se på formlen. Hvor mange Na er der i én Na₂SO₄?",
-                  svar: [{ t: "0,40 M", ok: true },
-                         { t: "0,20 M", forkl: "Hver Na₂SO₄ giver to Na⁺, så [Na⁺] er dobbelt så stor som c(Na₂SO₄)." },
-                         { t: "0,10 M", forkl: "Der kommer flere ioner, ikke færre: to Na⁺ for hver Na₂SO₄." }] },
-          linje: "Prøv det: træk en portion ned i glasset.",
+          tekst: "Opløs en portion (0,10 mol) Na₂SO₄ i glasset med 0,50 L vand.",
+          linje: "Træk en portion natriumsulfat ned i glasset.",
           hint: "Træk fra krukken, eller klik på den.",
           svar: "En portion Na₂SO₄ i 0,50 L.",
           goer: [["Na2SO4", 1]],
+          /* Spoergsmaalene efter opløsningen, ét ad gangen. vis: det, glasset
+             viser, naar svaret er fundet (salt: den graa soejle, lup: ionerne i
+             luppen, ioner: ionernes soejler). */
+          spm: [
+              { spm: "Hvad er c(Na₂SO₄)?", vis: "salt", kort: "c(Na₂SO₄) = 0,20 M",
+                hint: "Koncentrationen er stofmængde pr. liter. Du har 0,10 mol i 0,50 L.",
+                svar: [{ t: "0,20 M", ok: true },
+                       { t: "0,10 M", forkl: "0,10 mol er stofmængden n. Koncentrationen er n / V, og rumfanget er 0,50 L." },
+                       { t: "0,050 M", forkl: "Du har ganget med rumfanget. Koncentrationen er n / V = 0,10 mol / 0,50 L." }],
+                efter: "c(Na₂SO₄) = 0,10 mol / 0,50 L = 0,20 M." },
+              { spm: "Hvor mange Na⁺ giver én Na₂SO₄?", vis: "lup", kort: "Hver Na₂SO₄ giver 2 Na⁺",
+                hint: "Se på tallet efter Na i formlen Na₂SO₄.",
+                svar: [{ t: "2", ok: true },
+                       { t: "1", forkl: "Tallet efter Na i Na₂SO₄ er 2. Der er to Na⁺ i hver." },
+                       { t: "4", forkl: "4 hører til O inde i sulfat-ionen SO₄²⁻. Se på tallet efter Na." }],
+                efter: "Na₂SO₄ ⟶ 2 Na⁺ + SO₄²⁻. Luppen viser to Na⁺ for hver SO₄²⁻." },
+              { spm: "Hvad bliver [Na⁺]?", vis: "ioner", kort: "[Na⁺] = 0,40 M",
+                hint: "c(Na₂SO₄) = 0,20 M, og der er to Na⁺ for hver Na₂SO₄.",
+                svar: [{ t: "0,40 M", ok: true },
+                       { t: "0,20 M", forkl: "Det er c(Na₂SO₄). Hver Na₂SO₄ giver to Na⁺, så [Na⁺] er dobbelt så stor." },
+                       { t: "0,10 M", forkl: "Der kommer flere ioner, ikke færre: to Na⁺ for hver Na₂SO₄." }] }
+          ],
           efter: "Na₂SO₄ ⟶ 2 Na⁺ + SO₄²⁻. [Na⁺] = 2 · 0,20 M = 0,40 M, og [SO₄²⁻] = 0,20 M." },
         { id: "fecl3", titel: "Tre Cl⁻", salte: ["FeCl3"], V: 1000, maal: { ion: "Cl", c: 0.60 },
           tekst: "Gør [Cl⁻] = 0,60 M.",
@@ -188,14 +205,15 @@
     ];
 
     /* ----- Fane 3: blandinger ---------------------------------------------------------------
-       samme: to salte i den samme opløsning. De andre: to glas, A og B,
-       haeldes sammen. ion: den ion, der spoerges om (i begge glas); ion2:
-       en ion, der kun er i det ene glas. V i mL. */
+       samme: to salte vejes af og opløses i det samme glas vand (mA og mB i
+       g, V i mL). Masserne er valgt, saa n og c bliver paene tal. De andre:
+       to glas, A og B, haeldes sammen. ion: den ion, der spoerges om (i
+       begge glas); ion2: en ion, der kun er i det ene glas. V i mL. */
     D.BLAND = [
         { id: "samme", titel: "To salte i ét glas", ion: "Cl",
-          tekst: "Et glas har både {cA} M {A} og {cB} M {B}. Hvad er [{ion}]?",
-          tal: [{ A: "CaCl2", cA: 0.250, B: "AlCl3", cB: 0.150 }, { A: "NaCl", cA: 0.200, B: "CaCl2", cB: 0.100 },
-                { A: "MgCl2", cA: 0.150, B: "KCl", cB: 0.200 }, { A: "BaCl2", cA: 0.100, B: "FeCl3", cB: 0.100 }] },
+          tekst: "Du opløser {mA} g {A} og {mB} g {B} i {V} vand. Hvad er [{ion}]?",
+          tal: [{ A: "CaCl2", mA: 5.55, B: "AlCl3", mB: 4.00, V: 200 }, { A: "NaCl", mA: 2.92, B: "CaCl2", mB: 2.78, V: 250 },
+                { A: "MgCl2", mA: 2.86, B: "KCl", mB: 2.98, V: 200 }, { A: "BaCl2", mA: 5.21, B: "FeCl3", mB: 4.06, V: 250 }] },
         { id: "lige", titel: "Samme rumfang", ion: "Cl",
           tekst: "Glas A har {VA} {cA} M {A}. Glas B har {VB} {cB} M {B}. De hældes sammen. Hvad er [{ion}]?",
           tal: [{ A: "NaCl", cA: 0.200, VA: 100, B: "KCl", cB: 0.200, VB: 100 },
@@ -217,7 +235,8 @@
     ];
 
     /* ----- Regnetrinene -------------------------------------------------------------------
-       formel: formlen, eleven skriver foerst ("" = kun tallet).
+       formel: formlen, eleven skriver foerst ("" = kun tallet). {A} og {B} i
+       navnet bliver til saltenes formler.
        Venstresiden og tallene afhaenger af opgaven og laves i tjek.js. */
     D.TRIN = {
         afstem: { navn: "Opløsningsskemaet", enhed: "" },
@@ -230,8 +249,16 @@
         an: { navn: "Anionen", enhed: "M", formel: "" },
         cSalt: { navn: "Saltets koncentration", enhed: "M", formel: "" },
         anden: { navn: "Den anden ion", enhed: "M", formel: "" },
-        bidragA: { navn: "Bidraget fra det første salt", enhed: "M", formel: "" },
-        bidragB: { navn: "Bidraget fra det andet salt", enhed: "M", formel: "" },
+        nSA: { navn: "Stofmængden af {A}", enhed: "mol", formel: "m / M",
+               formelHint: "Du kender massen og molarmassen. Formlen begynder n = m / …" },
+        nSB: { navn: "Stofmængden af {B}", enhed: "mol", formel: "m / M",
+               formelHint: "Du kender massen og molarmassen. Formlen begynder n = m / …" },
+        cSA: { navn: "Koncentrationen af {A}", enhed: "M", formel: "n / V",
+               formelHint: "Du kender stofmængden og rumfanget. Koncentrationen er stofmængde pr. liter: c = n / …" },
+        cSB: { navn: "Koncentrationen af {B}", enhed: "M", formel: "n / V",
+               formelHint: "Du kender stofmængden og rumfanget. Koncentrationen er stofmængde pr. liter: c = n / …" },
+        bidragA: { navn: "Bidraget fra {A}", enhed: "M", formel: "" },
+        bidragB: { navn: "Bidraget fra {B}", enhed: "M", formel: "" },
         total: { navn: "Det hele", enhed: "M", formel: "" },
         nA: { navn: "Stofmængden fra glas A", enhed: "mol", formel: "k · c · V",
               formelHint: "Du kender saltets koncentration og rumfanget i glas A. Husk, hvor mange af ionen hver formelenhed giver." },

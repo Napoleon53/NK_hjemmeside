@@ -247,7 +247,7 @@
         var over = this.forbi();
         var tekst;
         if (over <= D.PRAECIS + 1e-9) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben blev rødbrun på den sidste dråbe.";
-        else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er tydeligt rødbrun, så der kom lidt for meget sølvnitrat i.";
+        else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er tydeligt rødbrun, så der er tilsat lidt for meget sølvnitrat.";
         else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er mørk rødbrun: omslaget kom tidligere, så forbruget er for stort.";
         this.besked((vist ? "<b>Svar:</b> " : "") + NK.html(tekst), vist ? "gul" : "god");
         NK.maaling = { V: v, m: this.pr.m, c: this.pr.c, p: this.pr.p, sted: this.pr.sted, egen: true, over: over, nr: this.nr, brugt: false };

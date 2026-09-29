@@ -63,7 +63,9 @@
     function h(s) { return NK.html(s); }
 
     function journalHTML() {
-        var m = NK.minMaaling, j = NK.journal || {}, T = NK.Tjek;
+        /* Elevens egen digel, ogsaa en, der ikke er faerdig endnu (som fane 2) */
+        var m = NK.maaling(), j = NK.journal || {}, T = NK.Tjek;
+        if (!m.egen) m = null;
         var dato = new Date().toLocaleDateString("da-DK");
         var ud = '<h2>Journal: natron varmes i en digel</h2><p class="note">Lavet ' + h(dato) + "</p>";
         ud += '<div class="journal-afsnit"><h3>1. Gættet</h3><p>' +
@@ -74,8 +76,8 @@
             m.vejninger.forEach(function (v, i) {
                 ud += "<tr><td>" + (i === 0 ? "Før" : i + ". vejning") + "</td><td>" + h(K.min(v.t)) + " min</td><td>" + h(K.g2(v.m)) + " g</td></tr>";
             });
-            ud += "</table><p>Massen var konstant: " + h(K.g2(m.slut)) + " g. Natronen tabte " + h(K.g2(K.r2(m.mf - m.slut))) + " g." +
-                (m.sprojt ? " Pulveret sprøjtede undervejs." : "") + "</p>";
+            ud += "</table><p>" + (m.faerdig ? "Massen var konstant: " + h(K.g2(m.slut)) + " g. Natronen tabte " + h(K.g2(K.r2(m.mf - m.slut))) + " g." :
+                "Massen er ikke konstant endnu.") + (m.sprojt ? " Pulveret sprøjtede undervejs." : "") + "</p>";
         } else ud += "<p>Forsøget er ikke lavet endnu.</p>";
         ud += "</div>";
         ud += '<div class="journal-afsnit"><h3>3. Hypoteserne</h3>';

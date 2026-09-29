@@ -8,7 +8,7 @@ Superanimation om Mohrs titrering af havvand: buretten tæller chloridet. Åbn
 Det er en superanimation, ikke en superlab-animation, og den er bygget som
 `sc7.4_titrering_eddike` (brugerens ønske 26. sept. 2026: "den må gerne minde om
 de andre titreringsøvelser"). Samme ramme, samme tre faner, samme opstilling,
-skyder, dråbeknap, luppe, aflæsning, tavle og to kolber. Kolben står klar, der
+skyder, dråbeknap, luppe, aflæsning, tavle og to kolber på fane 3. Kolben står klar, der
 er ingen flasker at hælde fra, ingen uheld og intet forløb trin for trin.
 
 ## Bestillingen
@@ -17,7 +17,8 @@ er ingen flasker at hælde fra, ingen uheld og intet forløb trin for trin.
    var Cl⁻ i prøven, og den rødbrune farve kommer først, når der ikke er mere
    Cl⁻ at fælde. Masseprocenten følger af n = c · V, 1 : 1, m = n · M og
    m% = m / m(prøve) · 100 %.
-2. **Afløser** `kemi-c-filer/c5.5_eksperiment_mohrtitrering.html` (menuens c5.3).
+2. **Afløser** `kemi-c-filer/c5.5_eksperiment_mohrtitrering.html` (menuens c5.3, nu
+   i `arkiv/` som `c5.5_eksperiment_mohrtitrering_oldversion.html`).
    Med fra den gamle: 1,00 g havvand, 0,050 M sølvnitrat, M(NaCl) = 58,44 g/mol,
    en masseprocent mellem ca. 1,5 og 4 %, buretten med en hane i trin, den gule
    chromatindikator, der bliver rødbrun, mikroniveauet med Cl⁻, Ag⁺, AgCl, CrO₄²⁻
@@ -41,7 +42,7 @@ er ingen flasker at hælde fra, ingen uheld og intet forløb trin for trin.
 |---|------|--------------|--------|
 | 1 | Titreringen | åbner hanen, drypper til sidst, lukker ved omslaget og aflæser buretten | omslaget kommer, når det sidste Cl⁻ er fældet |
 | 2 | Beregningen | skriver formlen og regner tallet i fire trin fra forbruget til masseprocenten | n(Ag⁺) = n(NaCl), og resten er regning |
-| 3 | To kolber | gætter, hvad der sker med antallet af mL sølvnitrat eller masseprocenten, når én ting er ændret | kun chloridet i kolben og koncentrationen af sølvnitrat ændrer forbruget |
+| 3 | Fejlkilder | vælger, hvordan forbruget af sølvnitrat eller masseprocenten bliver, når én ting er ændret ved kolbe B | kun chloridet i kolben og koncentrationen af sølvnitrat ændrer forbruget; postevand og spild er fejlkilder, mere vand og en mindre prøve er ikke |
 
 **Titreringen.** Kolben står klar på magnetomrøreren med 1,00 g havvand, 20 mL
 demineraliseret vand og lidt kaliumchromat, der farver den gul, og buretten er
@@ -71,13 +72,16 @@ resultatet med havvandets rigtige masseprocent. Ny opgave giver en
 klassekammerats måling med havvand fra et andet sted, en anden prøvemasse og en
 anden koncentration.
 
-**To kolber.** Seks situationer: 60 mL demineraliseret vand (lige så mange mL
-sølvnitrat), 0,50 g havvand (færre mL) og masseprocenten for den (den samme),
-0,100 M sølvnitrat (færre mL), postevand i stedet for demineraliseret vand
+**Fejlkilder** (hed To kolber til 28. sept. 2026). Seks situationer: 60 mL demineraliseret vand (samme
+forbrug), 0,50 g havvand (mindre forbrug) og masseprocenten for den (den samme),
+0,100 M sølvnitrat (mindre forbrug), postevand i stedet for demineraliseret vand
 (masseprocenten for høj, fordi postevand indeholder chlorid) og spildt havvand
-(for lav). Eleven gætter, og så titrerer Kemichael begge kolber til omslaget.
-Tabellen i panelet viser mL sølvnitrat og masseprocent for A og B, og et forkert
-gæt får en forklaring, der passer til netop det svar.
+(for lav). Hver situation har en titel i opgavekortet. Spørgsmålene bruger
+fagordene forbrug, stofmængde og rumfang, ikke "hvor mange mL der skal til"
+(brugerens ønske 28. sept. 2026). Eleven vælger et svar, og så titrerer Kemichael
+begge kolber til omslaget.
+Tabellen i panelet viser forbrug og masseprocent for A og B, og et forkert
+svar får en forklaring, der passer til netop det svar.
 
 **Kemichael** præsenterer hver fane, når eleven trykker Start præsentation, tre
 replikker pr. fane. Han roser første gang en titrering er præcis, første gang en
@@ -88,7 +92,8 @@ på hundrededelen, og glimtet om hans første titrering, når resultatet er lang
 for højt. Kaffekoppen er det fælles påskeæg. Han er den samme som i sc7.4, ikke
 den rolige Kemichael fra sc5.1 og sc5.2.
 
-Direkte links: `index.html#beregning` og `index.html#kolber` (også `#forbrug`).
+Direkte links: `index.html#beregning` og `index.html#fejlkilder` (også `#kolber`
+og `#forbrug`). Fanens id er stadig `fane-forbrug`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 <kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichaels præsentation ·
@@ -108,7 +113,7 @@ send Kemichael ud.
   rigtigt forsøg, og som bliver længere tæt på omslaget.
 * **Eleven aflæser selv** buretten og skriver selv formlerne.
 * **Havvand fra seks steder** i stedet for et tilfældigt tal.
-* **Fane 3 er ny**, med postevand som den fejl, der hører til netop denne
+* **Fane 3, Fejlkilder, er ny**, med postevand som den fejl, der hører til netop denne
   titrering.
 * **Hjælpen er én knap:** Giv hint, så Vis svaret.
 
@@ -145,7 +150,7 @@ koncentration, prøvens masse, vand, chromat, chlorid i postevand, dråbestørre
 antallet af figurer i luppen og de seks steder) og grænserne for en præcis
 titrering og aflæsningen øverst i `js/data.js`. **Situationerne på fane 3** står i
 `D.SITUATIONER`: hvad der er ændret ved B (`m`, `vand`, `c`, `post`, `spild`),
-spørgsmålet, de tre svar, forklaringen til hvert forkert svar, hintet og
+titlen i opgavekortet, spørgsmålet, de tre svar, forklaringen til hvert forkert svar, hintet og
 forklaringen bagefter. **Regnetrinene** står i `D.TRIN`, og de godkendte formler og
 beskederne til de typiske fejl i `FORMLER` og resten af `js/tjek.js`.
 
@@ -161,7 +166,7 @@ og 3 kan gennemføres, at alle kolber på fane 3 er rødbrune til sidst, at
 Kemichael kan vises og sendes ud på alle faner, og at layoutet holder fra
 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`, og den lægger elevens valg tilbage bagefter.
-Sidst kørt 26. september 2026: ALT OK (98 påstande).
+Sidst kørt 28. september 2026: ALT OK (100 påstande).
 
 ## Forenklinger
 
@@ -199,10 +204,9 @@ gjort noget på fanen. Koden er `js/praesentation.js`, koblet med
 
 ## I menuen
 
-Nej, ikke endnu. Når brugeren siger til: knappen med `data-emne="c5.3"` i
-`animationer/kemi-c-filer/samling_c5.html` skal pege på
-`../superanimationer/sc5.3_mohrtitrering/index.html` i stedet for
-`c5.5_eksperiment_mohrtitrering.html`, den gamle flyttes med `git mv` til
-`kemi-c-filer/arkiv/c5.5_eksperiment_mohrtitrering_oldversion.html`, og kolonnen
-"I menuen" i `../README.md` rettes. Navnet i `FEEDBACK_EMNER` i
-`animationer/samling_alt.html` er "Forsøg: Mohrtitrering".
+Ja, fra 28. sept. 2026 (brugerens ønske). Knappen med `data-emne="c5.3"` i
+`animationer/kemi-c-filer/samling_c5.html` peger på
+`../superanimationer/sc5.3_mohrtitrering/index.html`, og den gamle ligger i
+`kemi-c-filer/arkiv/c5.5_eksperiment_mohrtitrering_oldversion.html`. Gamle links
+med `?emne=c5.5` finder knappen via `gamleNumre` i `samling_c5.html`. Navnet i
+`FEEDBACK_EMNER` i `animationer/samling_alt.html` er stadig "Forsøg: Mohrtitrering".
