@@ -236,11 +236,34 @@ function tests() {
 
     function braek(nr) { return d.querySelector('#pa-hoejre .p-brik[data-nr="' + nr + '"]'); }
     function plads(nr) { return d.querySelector('#pa-venstre .p-plads[data-nr="' + nr + '"]'); }
+
+    /* Traek med musen: pointerdown, to traek og slip oven paa pladsen */
+    function traek(fra, til) {
+        var a = fra.getBoundingClientRect(), b = til.getBoundingClientRect();
+        function send(type, x, y) {
+            fra.dispatchEvent(new w.PointerEvent(type, {
+                bubbles: true, cancelable: true, clientX: x, clientY: y,
+                pointerId: 1, pointerType: "mouse", isPrimary: true, button: 0, buttons: 1
+            }));
+        }
+        send("pointerdown", a.left + a.width / 2, a.top + a.height / 2);
+        send("pointermove", a.left + a.width / 2 + 25, a.top + a.height / 2 + 12);
+        send("pointermove", b.left + b.width / 2, b.top + b.height / 2);
+        send("pointerup", b.left + b.width / 2, b.top + b.height / 2);
+    }
+    traek(braek(1), plads(2));
+    paastand("et forkert træk tæller en fejl", el("pa-fejl").textContent === "1");
+    paastand("den forkerte plads er stadig tom", !plads(2).classList.contains("rigtig"));
+    traek(braek(1), plads(1));
+    paastand("et rigtigt træk sætter svaret på pladsen", plads(1).classList.contains("rigtig"));
+    paastand("den trukne brik forsvinder", !braek(1));
+    paastand("ingen brik bliver hængende i luften", !d.querySelector(".p-flyver"));
+
     braek(0).click();
     paastand("et klik vælger svaret", braek(0).classList.contains("valgt"));
-    plads(1).click();
-    paastand("et forkert par tæller en fejl", el("pa-fejl").textContent === "1");
-    paastand("pladsen er stadig tom", !plads(1).classList.contains("rigtig"));
+    plads(3).click();
+    paastand("et forkert par tæller en fejl", el("pa-fejl").textContent === "2");
+    paastand("pladsen er stadig tom", !plads(3).classList.contains("rigtig"));
     paastand("svaret er stadig valgt efter en fejl", braek(0).classList.contains("valgt"));
     plads(0).click();
     paastand("det rigtige par sætter sig på pladsen", plads(0).classList.contains("rigtig"));

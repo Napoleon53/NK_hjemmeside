@@ -100,7 +100,7 @@
         vendinger++;
         tegn();
         if (vendinger === 7) {
-            status("Syvende vending. Bagsiden bliver ikke en anden af at blive set på.");
+            status("Syvende vending. Bagsiden er den samme som de seks første.");
         } else if (vendt) {
             status("Kunne du det?");
         } else {
@@ -201,8 +201,8 @@
 
     /* ----- Tastatur ------------------------------------------------------ */
     T.tast = function (e) {
+        if (faerdig && (e.key === "Enter" || e.key === "r" || e.key === "R")) { T.nulstil(); return true; }
         if (e.key === " " || e.key === "Enter") { T.vend(); return true; }
-        if (faerdig && (e.key === "r" || e.key === "R")) { T.nulstil(); return true; }
         if (!vendt) return false;
         if (e.key === "1" || e.key === "j" || e.key === "J" || e.key === "ArrowRight") { T.svar(true); return true; }
         if (e.key === "2" || e.key === "n" || e.key === "N" || e.key === "ArrowLeft") { T.svar(false); return true; }

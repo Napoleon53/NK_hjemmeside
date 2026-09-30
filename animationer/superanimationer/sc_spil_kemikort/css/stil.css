@@ -501,6 +501,20 @@ kbd {
 .midterkort h2 { margin: 0 0 8px 0; font-size: 1.2rem; color: var(--gul); }
 .midterkort .mk-tekst { margin: 0 0 16px 0; font-size: 0.95rem; color: var(--tekst-svag); line-height: 1.5; }
 
+.tekstknap {
+    display: block;
+    margin: 10px auto 0;
+    background: none;
+    border: none;
+    color: var(--tekst-mat);
+    font-family: inherit;
+    font-size: 0.85rem;
+    text-decoration: underline dotted;
+    cursor: pointer;
+}
+
+.tekstknap:hover { color: var(--tekst); }
+
 /* Dem, der driller */
 .svaerekort { flex: 0 0 auto; }
 .svaereliste { display: flex; flex-direction: column; gap: 5px; max-height: 240px; overflow-y: auto; }
@@ -934,5 +948,6 @@ textarea:focus-visible {
     #egne-tekst, .egne-preview { height: 34vh; }
     .parring { grid-template-columns: minmax(0, 1fr); }
     .top { flex-wrap: wrap; }
-    .saetvalg { order: 5; width: 100%; }
+    .saetvalg { order: 5; flex: 1 1 100%; }
+    #saetvaelger { max-width: none; }
 }

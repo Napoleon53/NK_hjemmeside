@@ -76,7 +76,11 @@
     /* ----- Tastatur ------------------------------------------------------- */
     function skriverIFelt(e) {
         var t = e.target;
-        return t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT" || t.tagName === "SELECT");
+        if (!t) return false;
+        if (t.tagName === "TEXTAREA" || t.tagName === "INPUT" || t.tagName === "SELECT") return true;
+        /* Staar man paa en knap, skal Enter og mellemrum trykke paa den,
+           ikke vende kortet. */
+        return t.tagName === "BUTTON" && (e.key === "Enter" || e.key === " ");
     }
 
     function tast(e) {
@@ -124,6 +128,8 @@
         el("regler-luk").addEventListener("click", lukRegler);
         el("regler").addEventListener("click", function (e) { if (e.target === el("regler")) lukRegler(); });
         el("hjaelpknap").addEventListener("click", function () { NK.Rundvisning.start(aktiv); });
+        /* Naar bunken er tom, gaar knappen videre til testen, ikke forfra */
+        el("tr-tilspil").addEventListener("click", function () { visFane("vendespil"); });
         document.addEventListener("keydown", tast);
 
         var h = laesHash();
