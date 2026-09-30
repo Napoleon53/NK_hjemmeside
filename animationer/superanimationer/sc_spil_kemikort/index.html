@@ -203,9 +203,9 @@
         </ol>
 
         <h3>Dine egne kort</h3>
-        <p>Knappen <b>Mine sæt</b> åbner sættet som tekst. Ét kort pr. linje, forside og bagside delt af en lodret streg:</p>
+        <p>Knappen <b>Mine sæt</b> åbner sættet som tekst i samme format som Quizlet: ét kort pr. linje og et tabulatortegn mellem forside og bagside. En lodret streg virker også:</p>
         <div class="ligning">Na⁺ | natriumion</div>
-        <p>Du kan rette i et indbygget sæt (det bliver gemt som dit eget), hente en fil ind, gemme sættet som fil eller kopiere et link, der har sættet i sig. Et sæt, der er kopieret ud af Quizlet med tabulator mellem de to sider, kan sættes direkte ind. Egne sæt ligger i den browser, du bruger, ikke på nettet.</p>
+        <p>Et sæt, der er eksporteret fra Quizlet med Tab og Ny linje, kan sættes direkte ind, og <b>Kopiér til Quizlet</b> giver kortene tilbage i samme form. Du kan også rette i et indbygget sæt (det bliver gemt som dit eget), hente en fil ind, gemme sættet som fil eller kopiere et link, der har sættet i sig. Egne sæt ligger i den browser, du bruger, ikke på nettet.</p>
 
         <h3>Genveje</h3>
         <p><kbd>T</kbd> <kbd>V</kbd> <kbd>P</kbd> faner &nbsp;·&nbsp; <kbd>Mellemrum</kbd> vend kortet &nbsp;·&nbsp; <kbd>1</kbd> kunne det &nbsp;·&nbsp; <kbd>2</kbd> ikke endnu &nbsp;·&nbsp; <kbd>Enter</kbd> videre &nbsp;·&nbsp; <kbd>S</kbd> mine sæt &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
@@ -233,15 +233,17 @@
         <details class="egne-format">
             <summary>Formatet</summary>
             <pre>Sæt: C2 Ioner: formel og navn
-Sider: Ion | Navn
+Sider: Ion	Navn
 
-Na⁺ | natriumion
-SO₄²⁻ | sulfation</pre>
-            <p>Ét kort pr. linje. Forside og bagside deles af en lodret streg, et tabulatortegn eller et semikolon, så et sæt fra Quizlet kan sættes direkte ind. Linjen <b>Sæt:</b> giver navnet, og <b>Sider:</b> giver de to overskrifter. // begynder en kommentar. Højst 90 tegn på hver side, og hver forside må kun stå én gang.</p>
+Na⁺	natriumion
+SO₄²⁻	sulfation</pre>
+            <p>Samme format som Quizlet: ét kort pr. linje og et tabulatortegn mellem forside og bagside. Tab-tasten skriver tabulatortegnet her i feltet. En lodret streg virker også (Na⁺ | natriumion). De to linjer øverst kan undværes: <b>Sæt:</b> giver navnet, og <b>Sider:</b> giver de to overskrifter. // begynder en kommentar. Højst 90 tegn på hver side, og hver forside må kun stå én gang.</p>
+            <p><b>Fra Quizlet:</b> vælg Eksportér med Tab og Ny linje, kopiér teksten og sæt den ind her. <b>Til Quizlet:</b> tryk Kopiér til Quizlet, og sæt teksten ind under Importér i et nyt Quizlet-sæt med Tab og Ny linje.</p>
         </details>
         <div class="egne-knapper">
             <button class="knap" id="egne-upload" type="button" title="Hent en .txt-fil. Du kan også trække filen ind i tekstfeltet.">Hent fil</button>
-            <button class="knap" id="egne-eksport" type="button" title="Gem teksten som .txt-fil">Gem som fil</button>
+            <button class="knap" id="egne-quizlet" type="button" title="Kun kortene, med tabulator og linjeskift, klar til Quizlets import">Kopiér til Quizlet</button>
+            <button class="knap" id="egne-eksport" type="button" title="Kortene som .txt-fil i Quizlets format. Filnavnet bliver sættets navn, når filen hentes ind igen.">Gem som fil</button>
             <button class="knap" id="egne-link" type="button" title="Et link med sættet i. Den, der åbner linket, får sættet.">Kopiér link</button>
             <button class="knap" id="egne-ai" type="button" title="En vejledning, du kan give en AI sammen med dit emne">Kopiér vejledning til AI</button>
             <button class="knap" id="egne-ny" type="button">Nyt sæt</button>

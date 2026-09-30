@@ -57,8 +57,43 @@ ramme.addEventListener("load", function () { setTimeout(koer, 400); });
 
 function koer() {
     try { tests(); } catch (e) { fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl"); }
-    laegTilbage();
-    vis();
+    /* Filen laeses med FileReader, som svarer senere */
+    try {
+        filTest(function () { laegTilbage(); vis(); });
+    } catch (e) {
+        fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl");
+        laegTilbage(); vis();
+    }
+}
+
+/* Henter en Quizlet-fil uden Sæt: gennem knappen Hent fil og ser, at
+   filnavnet bliver saettets navn, og at Tab-tasten skriver et tabulatortegn. */
+function filTest(faerdig) {
+    var w = ramme.contentWindow, d = ramme.contentDocument, NK = w.NK;
+    overskrift("9. Hent fil og Tab-tasten");
+    NK.Editor.aabn(null, function () {});
+    var felt = d.getElementById("egne-tekst");
+    felt.value = "";
+    felt.focus();
+    felt.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true }));
+    paastand("Tab-tasten skriver et tabulatortegn i feltet", felt.value === "\t", JSON.stringify(felt.value));
+
+    var fil = new w.File(["﻿Na⁺\tnatriumion\nK⁺\tkaliumion\nCl⁻\tchloridion\nBr⁻\tbromidion\n"], "Ioner fra Quizlet.txt", { type: "text/plain" });
+    var dt = new w.DataTransfer();
+    dt.items.add(fil);
+    var input = d.getElementById("egne-fil");
+    input.files = dt.files;
+    input.dispatchEvent(new w.Event("change"));
+    var forsoeg = 0;
+    (function vent() {
+        if (felt.value.indexOf("Sæt:") < 0 && forsoeg++ < 40) { setTimeout(vent, 50); return; }
+        paastand("filnavnet bliver sættets navn", felt.value.indexOf("Sæt: Ioner fra Quizlet") === 0, felt.value.split("\n")[0]);
+        paastand("BOM'en i starten af filen er fjernet", felt.value.indexOf("﻿") < 0);
+        var r = NK.Tekstformat.fraTekst(felt.value);
+        paastand("filen giver fire kort", !!r.saet && r.saet.kort.length === 4);
+        NK.Editor.luk();
+        faerdig();
+    }());
 }
 
 function tests() {
@@ -130,6 +165,32 @@ function tests() {
     paastand("skabelonen kan læses som et udkast", F.fraTekst(F.skabelon()).udkast.kort.length === 4);
     paastand("AI-vejledningen har formatet og et eksempel", /Sider:/.test(F.aiVejledning()) && /Na⁺ \| natriumion/.test(F.aiVejledning()));
     paastand("linket frem og tilbage giver den samme tekst", F.fraLink(F.tilLink(god)) === god);
+
+    overskrift("3b. Quizlet (tabulator og linjeskift)");
+    paastand("de indbyggede sæt står med tabulator, ikke lodret streg",
+        D.INDBYGGEDE.every(function (s) { return s.tekst.indexOf(" | ") < 0 && s.tekst.indexOf("\t") > 0; }));
+    var quizlet = "Na⁺\tnatriumion\nK⁺\tkaliumion\nCl⁻\tchloridion\nSO₄²⁻\tsulfation\n";
+    var rq = F.fraTekst(quizlet);
+    paastand("et rent Quizlet-sæt uden Sæt: godtages", !!rq.saet, rq.fejl.join(" / "));
+    paastand("det får standardnavnet", !!rq.saet && rq.saet.navn === F.STANDARDNAVN);
+    paastand("vinduet får at vide, at navnet mangler", rq.harNavn === false);
+    paastand("Windows-linjeskift fra Quizlet virker", !!F.fraTekst(quizlet.replace(/\n/g, "\r\n")).saet);
+    var titel = F.fraTekst("Titel: noget\tet kort\nK⁺\tkaliumion\nCl⁻\tchloridion\nNa⁺\tnatriumion\n");
+    paastand("en Quizlet-forside, der begynder med Titel:, bliver et kort, ikke navnet",
+        !!titel.saet && titel.saet.kort.length === 4 && !titel.harNavn);
+    var ionsaet = B.saet("i:ioner");
+    var ud = F.tilQuizlet(ionsaet);
+    var udLinjer = ud.replace(/\n$/, "").split("\n");
+    paastand("Kopiér til Quizlet giver én linje pr. kort", udLinjer.length === ionsaet.kort.length, udLinjer.length);
+    paastand("hver linje har præcis ét tabulatortegn", udLinjer.every(function (l) { return l.split("\t").length === 2; }));
+    paastand("navn og overskrifter er ikke med (Quizlet ville læse dem som kort)", !/^(Sæt|Sider):/m.test(ud));
+    var tilbage = F.fraTekst(ud).saet;
+    paastand("teksten til Quizlet læses tilbage til de samme kort",
+        !!tilbage && JSON.stringify(tilbage.kort) === JSON.stringify(ionsaet.kort));
+    paastand("tilTekst bruger tabulator og kan læses igen",
+        JSON.stringify(F.fraTekst(F.tilTekst(ionsaet)).saet) === JSON.stringify(ionsaet));
+    paastand("filnavnet er sættets navn uden kolon", NK.filnavn("C2 Ioner: formel og navn") === "C2 Ioner formel og navn.txt");
+    paastand("skabelonen bruger tabulator", F.skabelon().indexOf("[forside 1]\t[bagside 1]") >= 0);
 
     /* ----------------------------------------------------------------- */
     overskrift("4. Biblioteket");

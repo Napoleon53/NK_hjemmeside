@@ -5,10 +5,11 @@
    se ud. Fejl vises med linjenummer, mens man skriver, og et klik paa en
    fejl springer hen til linjen.
 
-   Herfra kan man ogsaa hente en fil (ogsaa et Quizlet-saet, der er
-   kopieret ud med tabulator mellem de to sider), gemme saettet som fil,
-   kopiere et link med saettet i og hente en vejledning, man kan give en
-   AI sammen med sit emne.
+   Formatet er Quizlets (tabulator og linjeskift), saa et saet flyttes
+   begge veje ved at kopiere og saette ind. Kopiér til Quizlet og Gem som
+   fil giver kun kortene; navn og overskrifter ville Quizlet laese som kort.
+   Herfra kan man ogsaa hente en fil, kopiere et link med hele saettet i
+   og hente en vejledning, man kan give en AI sammen med sit emne.
    ===================================================================== */
 (function () {
     "use strict";
@@ -38,7 +39,8 @@
         var st = el("egne-status");
         st.classList.toggle("fejl", !r.saet);
         if (r.saet) {
-            st.innerHTML = "✓ " + NK.html(r.udkast.navn) + ": " + NK.html(r.oversigt) + ". Klar til brug.";
+            st.innerHTML = "✓ " + NK.html(r.udkast.navn) + ": " + NK.html(r.oversigt) + ". Klar til brug."
+                + (r.harNavn ? "" : '<span class="egne-tip">Giv sættet et navn med en linje øverst: Sæt: og navnet.</span>');
         } else {
             st.innerHTML = r.fejl.slice(0, 4).map(function (f) {
                 var m = /^Linje (\d+):/.exec(f);
@@ -108,15 +110,39 @@
         return noegle;
     };
 
+    /* En fil fra Quizlet eller fra Gem som fil har kun kortene. Saa bliver
+       filnavnet saettets navn. */
     function laesFil(fil) {
         if (!fil) return;
         var r = new FileReader();
         r.onload = function () {
-            el("egne-tekst").value = String(r.result).replace(/^\ufeff/, "");
+            var tekst = String(r.result).replace(/^\ufeff/, "");
+            if (!F.fraTekst(tekst).harNavn) {
+                var navn = String(fil.name || "").replace(/\.(txt|tsv|csv)$/i, "").trim();
+                if (navn) tekst = "S\u00e6t: " + navn + "\n\n" + tekst;
+            }
+            el("egne-tekst").value = tekst;
             aktuelNoegle = null;
             E.kontroller();
         };
         r.readAsText(fil, "utf-8");
+    }
+
+    /* Kortene i Quizlets format, eller null hvis teksten har fejl. */
+    function quizletTekst() {
+        var r = F.fraTekst(el("egne-tekst").value);
+        if (!r.saet) { E.kontroller(); return null; }
+        return { tekst: F.tilQuizlet(r.saet), navn: r.saet.navn };
+    }
+
+    /* Tab-tasten skriver et tabulatortegn i feltet i stedet for at flytte
+       fokus. Skift+Tab flytter stadig videre, saa man kan komme ud. */
+    function tabulator(e) {
+        if (e.key !== "Tab" || e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+        e.preventDefault();
+        var t = el("egne-tekst");
+        t.setRangeText("\t", t.selectionStart, t.selectionEnd, "end");
+        planlaeg();
     }
 
     E.luk = function () { el("egne").classList.remove("vis"); };
@@ -124,11 +150,16 @@
 
     function init() {
         el("egne-tekst").addEventListener("input", planlaeg);
+        el("egne-tekst").addEventListener("keydown", tabulator);
         el("egne-brug").addEventListener("click", E.brug);
         el("egne-luk").addEventListener("click", E.luk);
         el("egne-eksport").addEventListener("click", function () {
-            var tekst = el("egne-tekst").value;
-            NK.gemFil(tekst, NK.filnavn(F.fraTekst(tekst).udkast.navn));
+            var q = quizletTekst();
+            if (q) NK.gemFil(q.tekst, NK.filnavn(q.navn));
+        });
+        el("egne-quizlet").addEventListener("click", function () {
+            var q = quizletTekst();
+            if (q) NK.kopier(q.tekst, el("egne-quizlet"));
         });
         el("egne-ai").addEventListener("click", function () { NK.kopier(F.aiVejledning(), el("egne-ai")); });
         el("egne-link").addEventListener("click", function () {

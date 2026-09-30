@@ -1,24 +1,28 @@
 /* =====================================================================
    tekstformat.js - kortsaettet som tekst: laes, skriv og vejledning
 
-   Formatet er skrevet, saa en laerer (eller en AI) kan lave et saet i en
-   almindelig teksteditor, og saa et kopieret Quizlet-saet kan saettes
-   direkte ind. Én linje pr. kort:
+   Formatet er Quizlets: tabulator mellem forside og bagside og et
+   linjeskift mellem kortene. Saa kan et saet flyttes begge veje ved at
+   kopiere og saette ind. Oven over kortene kan der staa to linjer, som
+   kun dette spil bruger:
 
      Sæt: C2 Ioner: formel og navn
-     Sider: Ion | Navn
+     Sider: Ion<TAB>Navn
 
-     Na⁺ | natriumion
-     SO₄²⁻ | sulfation
+     Na⁺<TAB>natriumion
+     SO₄²⁻<TAB>sulfation
 
-   Forside og bagside deles af en lodret streg, et tabulatortegn eller et
-   semikolon. Den foerste af dem, linjen indeholder, er den, der deler.
-   // begynder en kommentar, og [ ] omkring en tekst fjernes, saa en
-   skabelon som "[forside] | [bagside]" ogsaa virker.
+   Begge linjer kan undvaeres; et rent Quizlet-saet faar navnet
+   "Importeret saet" (eller filnavnet, se editor.js). En lodret streg
+   eller et semikolon deler ogsaa, saa en laerer eller en AI kan skrive
+   "Na⁺ | natriumion". Den foerste af de tre, linjen indeholder, er den,
+   der deler. // begynder en kommentar, og [ ] omkring en tekst fjernes,
+   saa skabelonen ogsaa kan laeses.
 
-   F.fraTekst giver { saet, udkast, fejl, linjefejl, oversigt }. Er der
-   fejl, er saet null, men udkast rummer det, der kunne laeses, saa
-   vinduet kan vise kortene, mens man skriver.
+   F.fraTekst giver { saet, udkast, fejl, linjefejl, oversigt, harNavn }.
+   Er der fejl, er saet null, men udkast rummer det, der kunne laeses, saa
+   vinduet kan vise kortene, mens man skriver. F.tilQuizlet giver kun
+   kortene, klar til Quizlets import.
    ===================================================================== */
 (function () {
     "use strict";
@@ -30,7 +34,11 @@
     F.MAKS = 300;
     F.MAKS_TEGN = 90;
 
-    var HOVED = /^(sæt|saet|titel|navn)\s*:\s*(.*)$/i;
+    F.STANDARDNAVN = "Importeret sæt";
+
+    /* Navnelinjen har ingen tabulator. Ellers kunne et Quizlet-kort med
+       forsiden "Titel: ..." blive laest som saettets navn. */
+    var HOVED = /^(sæt|saet|titel)\s*:\s*([^\t]*)$/i;
     var SIDER = /^(sider|side)\s*:\s*(.*)$/i;
 
     function udenKlammer(s) {
@@ -78,17 +86,17 @@
             if ((m = SIDER.exec(l))) {
                 var s = m[2];
                 var d = deler(s);
-                if (!d) { meld(nr, "de to overskrifter skal deles af en lodret streg."); return; }
+                if (!d) { meld(nr, "de to overskrifter skal deles af et tabulatortegn."); return; }
                 var dele = s.split(d);
                 var a = udenKlammer(dele[0]), b = udenKlammer(dele[1]);
-                if (!a || !b) { meld(nr, "der skal stå en overskrift på begge sider af stregen."); return; }
+                if (!a || !b) { meld(nr, "der skal stå en overskrift på begge sider af tabulatortegnet."); return; }
                 sider = [a, b];
                 return;
             }
 
             var tegn = deler(l);
             if (!tegn) {
-                meld(nr, "der mangler en lodret streg mellem forside og bagside.");
+                meld(nr, "der mangler et tabulatortegn mellem forside og bagside.");
                 return;
             }
             if (antal(l, tegn) > 1) {
@@ -116,7 +124,7 @@
         });
 
         var udkast = {
-            navn: navn || "Uden navn",
+            navn: navn || F.STANDARDNAVN,
             sider: sider || ["Forside", "Bagside"],
             kort: kort
         };
@@ -128,7 +136,6 @@
         if (kort.length < F.MINDST) {
             fejl.push("Der skal være mindst " + F.MINDST + " kort. Der er " + kort.length + ".");
         }
-        if (!navn) fejl.push("Der mangler en linje, der begynder med Sæt:");
 
         var oversigt = udkast.kort.length + " kort · " + udkast.sider[0] + " og " + udkast.sider[1];
 
@@ -141,27 +148,34 @@
             udkast: udkast,
             fejl: fejl,
             linjefejl: linjefejl,
-            oversigt: oversigt
+            oversigt: oversigt,
+            harNavn: !!navn
         };
     };
 
-    /* Saettet tilbage som tekst (bruges ikke af spillet, men af proeverne
-       i _selvtest.html og af den, der vil se et saet i formatet). */
+    /* Hele saettet som tekst, med navn og overskrifter. */
     F.tilTekst = function (saet) {
-        var linjer = ["Sæt: " + saet.navn, "Sider: " + saet.sider[0] + " | " + saet.sider[1], ""];
-        saet.kort.forEach(function (k) { linjer.push(k.forside + " | " + k.bagside); });
+        var linjer = ["Sæt: " + saet.navn, "Sider: " + saet.sider[0] + "\t" + saet.sider[1], ""];
+        saet.kort.forEach(function (k) { linjer.push(k.forside + "\t" + k.bagside); });
         return linjer.join("\n");
+    };
+
+    /* Kun kortene, som Quizlet vil have dem: tabulator mellem forside og
+       bagside og et linjeskift mellem kortene. Navn og overskrifter er
+       ikke med, for Quizlet ville laese dem som kort. */
+    F.tilQuizlet = function (saet) {
+        return saet.kort.map(function (k) { return k.forside + "\t" + k.bagside; }).join("\n") + "\n";
     };
 
     F.skabelon = function () {
         return [
             "Sæt: [navnet på sættet]",
-            "Sider: [overskrift forside] | [overskrift bagside]",
+            "Sider: [overskrift forside]\t[overskrift bagside]",
             "",
-            "[forside 1] | [bagside 1]",
-            "[forside 2] | [bagside 2]",
-            "[forside 3] | [bagside 3]",
-            "[forside 4] | [bagside 4]",
+            "[forside 1]\t[bagside 1]",
+            "[forside 2]\t[bagside 2]",
+            "[forside 3]\t[bagside 3]",
+            "[forside 4]\t[bagside 4]",
             ""
         ].join("\n");
     };

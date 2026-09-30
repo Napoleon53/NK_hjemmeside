@@ -43,27 +43,40 @@ som i `sc4.6_idealgasligningen`, og oxidationstal skrives med romertal som i
 
 ## Egne sæt
 
-Knappen **Mine sæt** åbner sættet som tekst. Formatet er én linje pr. kort:
+Knappen **Mine sæt** åbner sættet som tekst. Formatet er Quizlets (brugerens
+ønske 30. sept. 2026): ét kort pr. linje, **tabulator** mellem forside og bagside
+og **linjeskift** mellem kortene. To linjer øverst kan undværes:
 
 ```
 Sæt: C2 Ioner: formel og navn
-Sider: Ion | Navn
+Sider: Ion<TAB>Navn
 
-Na⁺ | natriumion
-SO₄²⁻ | sulfation
+Na⁺<TAB>natriumion
+SO₄²⁻<TAB>sulfation
 ```
 
-* Forside og bagside deles af en **lodret streg**, et **tabulatortegn** eller et
-  **semikolon**. Den første af dem, linjen indeholder, er den, der deler. Derfor
-  kan et sæt, der er kopieret ud af Quizlet, sættes direkte ind.
+* **Fra Quizlet:** eksportér med Tab og Ny linje, kopiér og sæt ind i feltet. Uden
+  `Sæt:` hedder sættet "Importeret sæt", og statuslinjen foreslår et navn.
+* **Til Quizlet:** **Kopiér til Quizlet** og **Gem som fil** giver kun kortene i
+  Quizlets format. Navn og overskrifter er ikke med, for Quizlet ville læse dem
+  som kort. Filnavnet er sættets navn (uden tegn som `:`), og når filen hentes ind
+  igen uden `Sæt:`, bliver filnavnet navnet. Overskrifterne fra `Sider:` følger
+  ikke med gennem en fil; linket gør.
+* Tab-tasten skriver et tabulatortegn i feltet (Skift+Tab flytter videre). En
+  **lodret streg** eller et **semikolon** deler også, så en AI kan skrive
+  `Na⁺ | natriumion` (chatvinduer laver tabulatorer om til mellemrum). Den første
+  af de tre, linjen indeholder, er den, der deler.
+* De indbyggede sæt er skrevet med ` | ` i `js/data.js`, så de er lette at læse,
+  og laves om til tabulator, når filen indlæses.
 * `Sæt:` giver navnet, `Sider:` giver de to overskrifter, `//` begynder en
-  kommentar, og `[ ]` omkring en tekst fjernes, så skabelonen også virker.
+  kommentar, og `[ ]` omkring en tekst fjernes, så skabelonen også virker. En
+  navnelinje med tabulator i er et kort, ikke navnet.
 * Store og små bogstaver er ikke det samme: `m` (masse) og `M` (molarmasse) må
   stå i samme sæt.
 * Fejl vises med linjenummer, mens man skriver, og et klik på fejlen springer
   hen til linjen. Kortene vises til højre, som de kommer til at se ud.
 * Knapperne: **Hent fil** (en .txt kan også trækkes ind i tekstfeltet),
-  **Gem som fil**, **Kopiér link** (linket har hele sættet i sig, `#kort=...`;
+  **Kopiér til Quizlet**, **Gem som fil**, **Kopiér link** (linket har hele sættet i sig, `#kort=...`;
   fra harddisken peger det på kemiformler.dk), **Kopiér vejledning til AI** og
   **Nyt sæt**.
 * Retter man i et indbygget sæt, bliver det gemt som et nyt, eget sæt. De

@@ -5,7 +5,7 @@
    (js/tekstformat.js). Saa kan et indbygget saet aabnes i vinduet
    "Kort som tekst", rettes og gemmes som sit eget.
 
-   Formatet:
+   Formatet (lodret streg her, tabulator i spillet, se nederst):
      Saet: navnet paa saettet
      Sider: forsidens overskrift | bagsidens overskrift
      forside | bagside
@@ -249,4 +249,11 @@
             ].join("\n")
         }
     ];
+
+    /* Saettene er skrevet med " | " herover, saa de er lette at laese i
+       koden. I spillet staar de med tabulator som i Quizlet, saa et
+       indbygget saet, der aabnes i vinduet, kan kopieres direkte. */
+    D.INDBYGGEDE.forEach(function (s) {
+        s.tekst = s.tekst.replace(/ \| /g, "\t");
+    });
 }());

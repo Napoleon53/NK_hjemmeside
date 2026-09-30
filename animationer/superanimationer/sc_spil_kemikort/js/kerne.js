@@ -127,11 +127,11 @@ window.NK = NK;
         setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     };
 
-    /* Dansk filnavn uden aegte bogstaver. */
-    NK.filnavn = function (navn, forstavelse) {
-        var rent = String(navn || "saet").toLowerCase()
-            .replace(/æ/g, "ae").replace(/ø/g, "oe").replace(/å/g, "aa")
-            .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-        return (forstavelse || "kemikort-") + (rent || "saet") + ".txt";
+    /* Filnavnet er saettets navn uden de tegn, Windows ikke taaler. Saa
+       kan navnet laeses tilbage fra filnavnet, naar filen hentes ind igen. */
+    NK.filnavn = function (navn) {
+        var rent = String(navn || "").replace(/[\\\/:*?"<>|]+/g, " ")
+            .replace(/\s+/g, " ").trim();
+        return (rent || "Kemikort") + ".txt";
     };
 }());

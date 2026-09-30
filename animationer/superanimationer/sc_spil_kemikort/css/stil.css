@@ -785,9 +785,12 @@ kbd {
     border-radius: var(--radius-lil);
     white-space: pre;
     overflow: auto;
+    tab-size: 14;
 }
 
 #egne-tekst:focus { outline: none; border-color: var(--blaa); }
+
+.egne-tip { display: block; color: var(--gul); font-size: 0.86rem; }
 
 .egne-preview {
     height: min(52vh, 520px);
@@ -861,6 +864,7 @@ kbd {
     background-color: #1f1f28;
     border-radius: var(--radius-lil);
     white-space: pre-wrap;
+    tab-size: 14;
 }
 
 .egne-knapper { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
