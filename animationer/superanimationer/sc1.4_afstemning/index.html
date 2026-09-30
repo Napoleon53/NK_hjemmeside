@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Afstem reaktioner</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇄</span> Afstem reaktioner</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-kg" role="tab" aria-selected="true"><span class="nr">1</span>Kuglerne</button>
+        <button class="faneknap" data-fane="fane-sk" role="tab" aria-selected="false"><span class="nr">2</span>Skemaet</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: KUGLERNE                                                   -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-kg" role="tabpanel" aria-label="Kuglerne">
+    <div class="scene">
+        <canvas id="kg-laerred"></canvas>
+        <!-- Skemaet med tallene foran stofferne (js/sim_kugler.js) -->
+        <div class="tavle skema" id="kg-skema"></div>
+        <button class="reagerknap" id="kg-reager" type="button" title="Lad dem reagere (Enter)">Lad dem reagere</button>
+        <div class="anker" id="kg-anker-bakker"></div>
+
+        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, og den ene knap -->
+        <div class="statuslinje" id="kg-status">
+            <p class="st-tekst" id="kg-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="kg-forfra" type="button" title="Samme reaktion forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="kg-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="kg-kort">
+            <h2><span id="kg-titel">Opgave</span><span class="taeller">reaktion <b id="kg-nr">1</b>/<span id="kg-antal">10</span></span></h2>
+            <div id="kg-prompt"></div>
+        </div>
+
+        <div class="kort maaling" id="kg-regnskabkort">
+            <h2>Atomerne</h2>
+            <div class="regnskab" id="kg-regnskab"></div>
+        </div>
+
+        <div class="kort" id="kg-opgaver">
+            <h2>Reaktionerne <span class="taeller">løst <b id="kg-loest">0</b>/10</span></h2>
+            <div class="opg-liste" id="kg-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SKEMAET                                                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-sk" role="tabpanel" aria-label="Skemaet">
+    <div class="scene">
+        <canvas id="sk-laerred"></canvas>
+        <!-- Tavlen: skemaet med felterne og regnskabet (js/sim_skema.js) -->
+        <div class="tavle" id="sk-tavle"></div>
+        <!-- Optaellingen er slaaet fra ved hver ny reaktion (js/sim_skema.js) -->
+        <button class="optaelknap" id="sk-optael" type="button">Vis optællingen</button>
+
+        <div class="statuslinje" id="sk-status">
+            <p class="st-tekst" id="sk-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="sk-forfra" type="button" title="Samme reaktion med tomme felter (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="sk-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="sk-kort">
+            <h2><span id="sk-titel">Opgave</span><span class="taeller">reaktion <b id="sk-nr">1</b>/<span id="sk-antal">24</span></span></h2>
+            <div id="sk-prompt"></div>
+        </div>
+
+        <div class="kort" id="sk-opgaver">
+            <h2>Reaktionerne <span class="taeller">løst <b id="sk-loest">0</b>/24</span></h2>
+            <div class="opg-liste" id="sk-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Afstemning af reaktionsskemaer</h2>
+        <p>I en kemisk reaktion bytter atomerne partnere. Der forsvinder ingen atomer, og der kommer ingen nye til. Derfor skal der være lige mange af hvert slags atom før og efter pilen.</p>
+        <h3 class="teori-hoved">Tallet foran og det lille tal</h3>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: <span class="f">3 H₂O</span></span>
+            Det lille tal, ₂, hører til formlen. Det siger, at ét vandmolekyle har 2 H.<br>
+            Tallet foran, 3, siger, at der er 3 vandmolekyler. Det giver 3 · 2 = 6 H og 3 O.
+        </div>
+        <p>Man afstemmer kun med tallene foran. Ændrer man det lille tal, er det et andet stof: H₂O₂ er hydrogenperoxid, ikke vand.</p>
+        <h3 class="teori-hoved">Sådan afstemmer man</h3>
+        <ol class="teori-trin">
+            <li>Tæl hvert slags atom før og efter pilen.</li>
+            <li>Start med et atom, der kun findes i ét stof på hver side. Lad O og H vente til sidst.</li>
+            <li>Sæt et tal foran det stof, hvor der mangler atomer. Tæl igen.</li>
+            <li>Brug de mindste hele tal. Kan alle tallene deles med 2, så del dem.</li>
+        </ol>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: methan brænder</span>
+            CH₄ + O₂ → CO₂ + H₂O<br>
+            C passer: 1 før og 1 efter.<br>
+            H: 4 før og 2 efter. Sæt 2 foran H₂O: CH₄ + O₂ → CO₂ + 2 H₂O<br>
+            O: 2 før og 2 + 2 = 4 efter. Sæt 2 foran O₂: CH₄ + 2 O₂ → CO₂ + 2 H₂O
+        </div>
+        <p>Står man med et ulige antal O og O₂ foran, mangler der et halvt O₂. Gang så alle tallene med 2.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> reager eller tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/afst.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_kugler.js"></script>
+<script src="js/sim_skema.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

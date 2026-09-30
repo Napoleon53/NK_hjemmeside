@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tierpotenser og forstavelser</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-fane="potens">
+
+<header class="top">
+    <h1><span class="ikon">10ⁿ</span> Tierpotenser og forstavelser</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="potens" role="tab" aria-selected="true" title="Tierpotenser (1)"><span class="nr">1</span>Tierpotenser</button>
+        <button class="faneknap" data-fane="forstavelse" role="tab" aria-selected="false" title="Forstavelser (2)"><span class="nr">2</span>Forstavelser</button>
+        <button class="faneknap" data-fane="omregn" role="tab" aria-selected="false" title="Omregning (3)"><span class="nr">3</span>Omregning</button>
+        <button class="faneknap" data-fane="blandet" role="tab" aria-selected="false" title="Blandet (4)"><span class="nr">4</span>Blandet</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane aktiv" id="fane" role="tabpanel">
+    <div class="scene" id="scene">
+
+        <!-- Arbejdet: spørgsmålet, tavlen og svaret -->
+        <div class="arbejde" id="arbejde">
+            <div class="arbejdsbord">
+                <span class="opg-type" id="opg-type"></span>
+                <p class="spm" id="spm"></p>
+
+                <div class="tavle" id="tavle">
+                    <div class="talrk" id="talrk"></div>
+                    <div class="efter" id="efter"></div>
+                </div>
+
+                <div class="svarrad" id="svarrad">
+                    <div class="svarmaade" id="svarmaade" role="group" aria-label="Skriv svaret som">
+                        <button type="button" data-maade="alm">Almindeligt tal</button>
+                        <button type="button" data-maade="pot">10-talspotens</button>
+                    </div>
+                    <div class="felter" id="felter">
+                        <input class="svarfelt" id="svar-m" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Dit svar" placeholder="Svar">
+                        <span class="potens" id="potens">
+                            <span class="gange">· 10</span>
+                            <input class="eksfelt" id="svar-e" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="Eksponent" title="Eksponenten. Tomt: ingen tierpotens">
+                            <button class="fortegn" id="fortegn" type="button" title="Skift fortegn på eksponenten" aria-label="Skift fortegn">±</button>
+                        </span>
+                        <span class="svar-enhed" id="svar-enhed" hidden></span>
+                    </div>
+                    <!-- Fane 2: forstavelserne i stedet for skrivefeltet -->
+                    <div class="chips" id="chips" role="group" aria-label="Vælg forstavelsen" hidden></div>
+                    <button class="knap blaa tjekknap" id="tjek" type="button">Tjek</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stigen fra 10⁻⁹ til 10⁹ (js/stige.js) -->
+        <div class="stige" id="stige">
+            <canvas id="laerred" aria-label="Stigen med tierpotenser og forstavelser"></canvas>
+        </div>
+
+        <!-- Statuslinjen: næste skridt, fejl, hint og ros, og den ene knap -->
+        <div class="statuslinje" id="statuslinje">
+            <p class="st-tekst" id="besked" aria-live="polite"></p>
+            <button class="knap hjaelp" id="opgaveknap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="opgavekort">
+            <h2><span id="kort-titel">Opgaven</span><span class="taeller">opgave <b id="kort-nr">1</b>/10</span></h2>
+            <div class="vaelgerrad" id="vaelgere" hidden></div>
+            <div class="vaelgerrad niveaurad" id="niveauer" hidden></div>
+            <p class="niveaunote" id="niveaunote" hidden></p>
+            <div class="prikker" id="prikker" aria-hidden="true"></div>
+            <p class="kort-slut" id="kort-slut" hidden></p>
+        </div>
+
+        <div class="kort" id="rundekort">
+            <h2>Runden <span class="taeller">rigtige i første forsøg: <b id="rigtige">0</b></span></h2>
+            <ol class="rundeliste" id="rundeliste"></ol>
+            <p class="note" id="rundenote">Opgaverne kommer her, når de er løst.</p>
+            <p class="note forklar"><i class="prik rigtig"></i>første forsøg <i class="prik hjulpet"></i>med hjælp <i class="prik vist"></i>svaret vist</p>
+            <p class="rekord" id="rekord" hidden></p>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (åbnes kun med knappen eller T)                            -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Tierpotenser og forstavelser</h2>
+        <p>En tierpotens siger, hvor mange pladser kommaet skal flyttes. Eksponenten er antallet af pladser: positiv eksponent flytter kommaet til højre og gør tallet større, negativ eksponent flytter det til venstre og gør tallet mindre.</p>
+        <div class="eksempel">10⁴ m = 10 000 m &nbsp;·&nbsp; 10⁻³ s = 0,001 s &nbsp;·&nbsp; 3,2 · 10⁶ W = 3 200 000 W</div>
+
+        <h3>Videnskabelig notation</h3>
+        <p>Ét ciffer fra 1 til 9 foran kommaet, gange en tierpotens. Antallet af pladser, kommaet flyttes, er eksponenten.</p>
+        <div class="eksempel">45 600 m = 4,56 · 10⁴ m &nbsp;·&nbsp; 0,000 45 s = 4,5 · 10⁻⁴ s</div>
+
+        <h3>Forstavelserne</h3>
+        <p>En forstavelse er et navn for en tierpotens. Den skrives foran enheden og ændrer ikke selve størrelsen, kun tallet foran.</p>
+        <table class="tabel">
+            <tr><th>Forstavelse</th><th>Symbol</th><th>Tierpotens</th><th>Tal</th></tr>
+            <tr><td>giga</td><td>G</td><td>10⁹</td><td>1 000 000 000</td></tr>
+            <tr><td>mega</td><td>M</td><td>10⁶</td><td>1 000 000</td></tr>
+            <tr><td>kilo</td><td>k</td><td>10³</td><td>1000</td></tr>
+            <tr><td>hekto</td><td>h</td><td>10²</td><td>100</td></tr>
+            <tr><td>deka</td><td>da</td><td>10¹</td><td>10</td></tr>
+            <tr><td>deci</td><td>d</td><td>10⁻¹</td><td>0,1</td></tr>
+            <tr><td>centi</td><td>c</td><td>10⁻²</td><td>0,01</td></tr>
+            <tr><td>milli</td><td>m</td><td>10⁻³</td><td>0,001</td></tr>
+            <tr><td>mikro</td><td>µ</td><td>10⁻⁶</td><td>0,000 001</td></tr>
+            <tr><td>nano</td><td>n</td><td>10⁻⁹</td><td>0,000 000 001</td></tr>
+        </table>
+        <div class="eksempel">10 000 m = 10 · 10³ m = 10 km &nbsp;·&nbsp; 0,000 002 s = 2 · 10⁻⁶ s = 2 µs</div>
+
+        <h3>Omregning</h3>
+        <p>Find forskellen mellem de to enheders tierpotenser, og flyt kommaet lige så mange pladser. Går du til en mindre enhed, bliver tallet større.</p>
+        <div class="eksempel">1 km = 1000 m, så 2,5 km = 2500 m &nbsp;·&nbsp; 1 L = 1000 mL, så 0,25 L = 250 mL</div>
+
+        <h3>Arealer og rumfang</h3>
+        <p>Forstavelsen står i samme potens som enheden. Derfor er et areal to pladser pr. trin og et rumfang tre pladser pr. trin.</p>
+        <div class="eksempel">1 cm = 10⁻² m, så 1 cm² = (10⁻² m)² = 10⁻⁴ m² &nbsp;·&nbsp; 1 cm³ = (10⁻² m)³ = 10⁻⁶ m³</div>
+        <div class="eksempel">1 L = 1 dm³ = 10⁻³ m³ &nbsp;·&nbsp; 1 mL = 1 cm³ &nbsp;·&nbsp; 1 m³ = 1000 L</div>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> ny runde &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk. I svarfeltet skifter <kbd>e</kbd> eller <kbd>^</kbd> til 10-talspotens og springer til eksponenten.</p>
+
+        <div class="knapper" style="margin-top:16px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight på ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/tal.js"></script>
+<script src="js/data.js"></script>
+<script src="js/stige.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

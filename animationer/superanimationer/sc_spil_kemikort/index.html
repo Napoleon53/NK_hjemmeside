@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kemikortene</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">🗂</span> Kemikortene</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Spilform">
+        <button class="faneknap aktiv" data-fane="traen" role="tab" aria-selected="true" title="Træn (T)"><span class="fn"><b>Træn</b><small>vend kortet</small></span></button>
+        <button class="faneknap" data-fane="vendespil" role="tab" aria-selected="false" title="Vendespil (V)"><span class="fn"><b>Vendespil</b><small>find parrene</small></span></button>
+        <button class="faneknap" data-fane="parring" role="tab" aria-selected="false" title="Parring (P)"><span class="fn"><b>Parring</b><small>træk sammen</small></span></button>
+    </div>
+
+    <div class="saetvalg">
+        <span class="saet-etiket">Sæt</span>
+        <select id="saetvaelger" aria-label="Vælg kortsæt"></select>
+        <button class="teoriknap" id="egneknap" type="button" title="Skriv, hent eller eksportér egne kortsæt (S)">Mine sæt</button>
+    </div>
+
+    <button class="teoriknap" id="regelknap" type="button" title="Reglerne">Regler</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================= FANE 1: TRÆN ================================== -->
+<section class="fane" id="fane-traen" role="tabpanel" aria-label="Træn">
+    <div class="scene">
+        <div class="spilomraade">
+            <p class="scene-taeller" id="tr-taeller">Kort 1 af 1</p>
+
+            <div class="kortholder">
+                <div class="flipkort" id="tr-kort" role="button" tabindex="0" aria-label="Vend kortet">
+                    <div class="flipkort-flade">
+                        <div class="flipside for">
+                            <span class="kort-etiket" id="tr-for-etiket"></span>
+                            <p class="kort-tekst" id="tr-for-tekst"></p>
+                            <span class="kort-vink">Klik for at vende</span>
+                        </div>
+                        <div class="flipside bag">
+                            <span class="kort-etiket" id="tr-bag-etiket"></span>
+                            <p class="kort-tekst" id="tr-bag-tekst"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="svarknapper" id="tr-svar">
+                    <button class="knap stor roed" data-svar="nej" type="button">Ikke endnu <kbd>2</kbd></button>
+                    <button class="knap stor groen" data-svar="ja" type="button">Kunne det <kbd>1</kbd></button>
+                </div>
+
+                <div class="midterkort" id="tr-faerdig" hidden>
+                    <h2>Bunken er tom</h2>
+                    <p class="mk-tekst" id="tr-faerdig-tekst"></p>
+                    <button class="knap stor blaa" id="tr-igen" type="button">Start forfra</button>
+                </div>
+            </div>
+        </div>
+
+        <p class="statuslinje" id="tr-status" aria-live="polite"></p>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="tr-fremdrift">
+            <h2>Bunken <span class="taeller">tilbage <b id="tr-bunke">0</b></span></h2>
+            <div class="bjaelke"><i id="tr-bjaelke"></i></div>
+            <p class="stortal">Klaret <b id="tr-kan">0 af 0</b></p>
+            <div class="knapper">
+                <button class="knap" id="tr-bland" type="button">Bland bunken</button>
+                <button class="knap" id="tr-forfra" type="button">Start forfra</button>
+            </div>
+        </div>
+
+        <div class="kort" id="tr-retning">
+            <h2>Retning</h2>
+            <div class="knapper">
+                <button class="knap valgt" data-retning="fb" type="button"><span id="tr-retning-fb"></span></button>
+                <button class="knap" data-retning="bf" type="button"><span id="tr-retning-bf"></span></button>
+                <button class="knap" data-retning="bl" type="button"><span>Blandet</span></button>
+            </div>
+        </div>
+
+        <div class="kort svaerekort">
+            <h2>Dem, der driller</h2>
+            <div class="svaereliste" id="tr-svaere"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================= FANE 2: VENDESPIL ============================== -->
+<section class="fane" id="fane-vendespil" role="tabpanel" aria-label="Vendespil" hidden>
+    <div class="scene">
+        <div class="spilomraade">
+            <div class="gitter" id="ve-gitter"></div>
+
+            <div class="midterkort" id="ve-slut" hidden>
+                <h2 id="ve-slut-titel">Alle par fundet</h2>
+                <p class="mk-tekst" id="ve-slut-tekst"></p>
+                <button class="knap stor blaa" id="ve-igen" type="button">Nyt spil</button>
+            </div>
+        </div>
+
+        <p class="statuslinje" id="ve-status" aria-live="polite"></p>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="ve-tal">
+            <h2>Spillet <span class="taeller">rekord <b id="ve-rekord">ingen</b></span></h2>
+            <div class="tal3">
+                <div><small>Tid</small><b id="ve-tid">0:00</b></div>
+                <div><small>Par</small><b id="ve-fundet">0 af 0</b></div>
+                <div><small>Fejl</small><b id="ve-fejl">0</b></div>
+            </div>
+            <button class="knap stor blaa" id="ve-nyt" type="button">Nyt spil</button>
+        </div>
+
+        <div class="kort" id="ve-stoerrelse">
+            <h2>Antal par</h2>
+            <div class="knapper">
+                <button class="knap" data-par="6" type="button"><span>6 par</span><kbd>12 brikker</kbd></button>
+                <button class="knap valgt" data-par="8" type="button"><span>8 par</span><kbd>16 brikker</kbd></button>
+                <button class="knap" data-par="10" type="button"><span>10 par</span><kbd>20 brikker</kbd></button>
+            </div>
+        </div>
+
+        <div class="kort">
+            <h2>Sådan</h2>
+            <p class="hjaelpetekst">Hvert kort ligger som to brikker. Vend to brikker, der kommer fra det samme kort. Rekorden er den hurtigste tid med netop dette antal par.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================= FANE 3: PARRING ================================ -->
+<section class="fane" id="fane-parring" role="tabpanel" aria-label="Parring" hidden>
+    <div class="scene">
+        <div class="spilomraade">
+            <div class="parring">
+                <div class="p-spalte" id="pa-venstre"></div>
+                <div class="p-spalte p-svar-spalte" id="pa-hoejre"></div>
+            </div>
+
+            <button class="knap stor blaa naesteknap" id="pa-naeste" type="button" hidden>Næste runde <kbd>Enter</kbd></button>
+
+            <div class="midterkort" id="pa-slut" hidden>
+                <h2 id="pa-slut-titel">Hele sættet er parret</h2>
+                <p class="mk-tekst" id="pa-slut-tekst"></p>
+                <button class="knap stor blaa" id="pa-igen" type="button">Nyt spil</button>
+            </div>
+        </div>
+
+        <p class="statuslinje" id="pa-status" aria-live="polite"></p>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="pa-tal">
+            <h2>Spillet <span class="taeller">rekord <b id="pa-rekord">ingen</b></span></h2>
+            <div class="tal3">
+                <div><small>Tid</small><b id="pa-tid">0:00</b></div>
+                <div><small>Runde</small><b id="pa-runde">1 af 1</b></div>
+                <div><small>Fejl</small><b id="pa-fejl">0</b></div>
+            </div>
+            <button class="knap stor blaa" id="pa-nyt" type="button">Nyt spil</button>
+        </div>
+
+        <div class="kort" id="pa-stoerrelse">
+            <h2>Par pr. runde</h2>
+            <div class="knapper">
+                <button class="knap" data-antal="4" type="button"><span>4 par</span></button>
+                <button class="knap valgt" data-antal="6" type="button"><span>6 par</span></button>
+                <button class="knap" data-antal="8" type="button"><span>8 par</span></button>
+            </div>
+        </div>
+
+        <div class="kort">
+            <h2>Sådan</h2>
+            <p class="hjaelpetekst">Træk et svar fra højre over på den forside, det hører til. Du kan også klikke på svaret og derefter på forsiden. Uret løber gennem hele sættet.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================= REGLER ========================================= -->
+<div class="overlay" id="regler">
+    <div class="overlay-boks">
+        <h2>Kemikortene</h2>
+
+        <h3>Målet</h3>
+        <p>Kortene er det, man skal kunne udenad: symboler, ioner, fagord, formler og grupper. Træn dem først, og test dem så i de to spil.</p>
+
+        <h3>De tre faner</h3>
+        <ol>
+            <li><b>Træn.</b> Du ser den ene side af kortet. Sig svaret til dig selv, vend kortet og svar ærligt, om du kunne det. Kunne du det ikke, kommer kortet igen i den samme runde. Runden er slut, når alle kort er ude af bunken.</li>
+            <li><b>Vendespil.</b> Hvert kort ligger som to brikker med bagsiden op. Find de to brikker, der kommer fra det samme kort. Tiden og fejlene tæller.</li>
+            <li><b>Parring.</b> Træk hvert svar over på den forside, det hører til. Sættet deles i runder, og uret løber gennem dem alle.</li>
+        </ol>
+
+        <h3>Dine egne kort</h3>
+        <p>Knappen <b>Mine sæt</b> åbner sættet som tekst. Ét kort pr. linje, forside og bagside delt af en lodret streg:</p>
+        <div class="ligning">Na⁺ | natriumion</div>
+        <p>Du kan rette i et indbygget sæt (det bliver gemt som dit eget), hente en fil ind, gemme sættet som fil eller kopiere et link, der har sættet i sig. Et sæt, der er kopieret ud af Quizlet med tabulator mellem de to sider, kan sættes direkte ind. Egne sæt ligger i den browser, du bruger, ikke på nettet.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>T</kbd> <kbd>V</kbd> <kbd>P</kbd> faner &nbsp;·&nbsp; <kbd>Mellemrum</kbd> vend kortet &nbsp;·&nbsp; <kbd>1</kbd> kunne det &nbsp;·&nbsp; <kbd>2</kbd> ikke endnu &nbsp;·&nbsp; <kbd>Enter</kbd> videre &nbsp;·&nbsp; <kbd>S</kbd> mine sæt &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="regler-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= KORT SOM TEKST ================================= -->
+<div class="overlay" id="egne">
+    <div class="overlay-boks bredest">
+        <h2>Kort som tekst</h2>
+        <p class="egne-kilde" id="egne-kilde"></p>
+        <div class="egne-grid">
+            <div class="egne-venstre">
+                <textarea id="egne-tekst" spellcheck="false" aria-label="Kortsættet som tekst"></textarea>
+                <p class="egne-status" id="egne-status"></p>
+            </div>
+            <div class="egne-hoejre">
+                <div class="egne-preview" id="egne-preview"></div>
+            </div>
+        </div>
+        <details class="egne-format">
+            <summary>Formatet</summary>
+            <pre>Sæt: C2 Ioner: formel og navn
+Sider: Ion | Navn
+
+Na⁺ | natriumion
+SO₄²⁻ | sulfation</pre>
+            <p>Ét kort pr. linje. Forside og bagside deles af en lodret streg, et tabulatortegn eller et semikolon, så et sæt fra Quizlet kan sættes direkte ind. Linjen <b>Sæt:</b> giver navnet, og <b>Sider:</b> giver de to overskrifter. // begynder en kommentar. Højst 90 tegn på hver side, og hver forside må kun stå én gang.</p>
+        </details>
+        <div class="egne-knapper">
+            <button class="knap" id="egne-upload" type="button" title="Hent en .txt-fil. Du kan også trække filen ind i tekstfeltet.">Hent fil</button>
+            <button class="knap" id="egne-eksport" type="button" title="Gem teksten som .txt-fil">Gem som fil</button>
+            <button class="knap" id="egne-link" type="button" title="Et link med sættet i. Den, der åbner linket, får sættet.">Kopiér link</button>
+            <button class="knap" id="egne-ai" type="button" title="En vejledning, du kan give en AI sammen med dit emne">Kopiér vejledning til AI</button>
+            <button class="knap" id="egne-ny" type="button">Nyt sæt</button>
+            <button class="knap advarsel" id="egne-slet" type="button" hidden>Slet sættet</button>
+            <span class="mellemrum"></span>
+            <button class="knap" id="egne-luk" type="button">Luk</button>
+            <button class="knap blaa" id="egne-brug" type="button">Gem og brug</button>
+        </div>
+        <input type="file" id="egne-fil" accept=".txt,.csv,.tsv,text/plain" hidden>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tekstformat.js"></script>
+<script src="js/bibliotek.js"></script>
+<script src="js/traen.js"></script>
+<script src="js/vendespil.js"></script>
+<script src="js/parring.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

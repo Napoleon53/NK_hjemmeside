@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Kemikortene</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i spillet og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se paa
+   et skaermbillede: at de seks indbyggede saet kan laeses, at
+   tekstformatet fanger de fejl, en laerer laver, at et eget saet kan
+   gemmes, vaelges og slettes igen, at alle tre spil kan spilles fra ende
+   til anden, at rekorderne foelger saettet, og at sproget og
+   skriftstoerrelserne holder reglerne.
+
+   Testen laegger elevens egne saet og rekorder tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined && note !== "" ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+/* Elevens eget indhold gemmes og laegges tilbage til sidst */
+var NOEGLER = ["nk-kemikort-egne", "nk-kemikort-valgt", "nk-kemikort-rekord"];
+var GEMT = {};
+NOEGLER.forEach(function (k) {
+    try { GEMT[k] = localStorage.getItem(k); localStorage.removeItem(k); } catch (e) {}
+});
+function laegTilbage() {
+    NOEGLER.forEach(function (k) {
+        try { if (GEMT[k] === null) localStorage.removeItem(k); else localStorage.setItem(k, GEMT[k]); } catch (e) {}
+    });
+}
+
+var ramme = document.createElement("iframe");
+ramme.src = "index.html";
+document.body.appendChild(ramme);
+ramme.addEventListener("load", function () { setTimeout(koer, 400); });
+
+function koer() {
+    try { tests(); } catch (e) { fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl"); }
+    laegTilbage();
+    vis();
+}
+
+function tests() {
+    var w = ramme.contentWindow, d = ramme.contentDocument, NK = w.NK;
+    var F = NK.Tekstformat, B = NK.Bibliotek, D = NK.Data;
+
+    /* ----------------------------------------------------------------- */
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    paastand("alle dele er indlæst", !!(F && B && D && NK.Traen && NK.Vendespil && NK.Parring && NK.Editor && NK.Rundvisning));
+    paastand("seks indbyggede sæt", D.INDBYGGEDE.length === 6, D.INDBYGGEDE.length);
+    paastand("standardsættet findes", !!B.saet("i:" + D.STANDARD));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("2. De indbyggede sæt");
+    var ialt = 0;
+    D.INDBYGGEDE.forEach(function (s) {
+        var r = F.fraTekst(s.tekst);
+        paastand(s.noegle + ": kan læses", !!r.saet, r.fejl.join(" / "));
+        if (!r.saet) return;
+        ialt += r.saet.kort.length;
+        paastand(s.noegle + ": mindst 15 kort (" + r.saet.kort.length + ")", r.saet.kort.length >= 15);
+        var lange = r.saet.kort.filter(function (k) { return k.bagside.length > 62 || k.forside.length > 40; });
+        paastand(s.noegle + ": ingen side er for lang til en brik", !lange.length, lange.map(function (k) { return k.forside; }).join(", "));
+        var dub = {}, ens = [];
+        r.saet.kort.forEach(function (k) { if (dub[k.bagside]) ens.push(k.bagside); dub[k.bagside] = 1; });
+        paastand(s.noegle + ": ingen ens bagsider (to rigtige svar i vendespillet)", !ens.length, ens.join(", "));
+        var tekst = r.saet.kort.map(function (k) { return k.forside + " " + k.bagside; }).join(" ");
+        paastand(s.noegle + ": ingen tankestreger", !/[–—]/.test(tekst));
+        paastand(s.noegle + ": ladning ±1 skrives + og −, ikke 1+ og 1−", !/¹[⁺⁻]|1[+−-]\s/.test(tekst));
+        paastand(s.noegle + ": to overskrifter på siderne", r.saet.sider.length === 2 && !!r.saet.sider[0] && !!r.saet.sider[1]);
+    });
+    paastand("mindst 150 kort i alt (" + ialt + ")", ialt >= 150);
+
+    /* Nogle faglige stikproever, saa en tastefejl i data opdages */
+    var ioner = B.saet("i:ioner").kort;
+    function bagside(saetNoegle, forside) {
+        var k = B.saet(saetNoegle).kort.filter(function (x) { return x.forside === forside; })[0];
+        return k ? k.bagside : null;
+    }
+    paastand("Na⁺ er natriumion", bagside("i:ioner", "Na⁺") === "natriumion");
+    paastand("SO₄²⁻ er sulfation", bagside("i:ioner", "SO₄²⁻") === "sulfation");
+    paastand("Fe har to ioner med romertal", !!bagside("i:ioner", "Fe²⁺") && !!bagside("i:ioner", "Fe³⁺"));
+    paastand("hver ion har en ladning i formlen", ioner.every(function (k) { return /[⁺⁻]/.test(k.forside); }));
+    paastand("hvert ionnavn ender på ion", ioner.every(function (k) { return /ion(\s|\)|$)/.test(k.bagside); }));
+    paastand("K er kalium (ikke potassium)", bagside("i:grundstoffer", "K") === "kalium");
+    paastand("S er svovl", bagside("i:grundstoffer", "S") === "svovl");
+    paastand("n = m / M står i formelsættet", !!bagside("i:beregninger", "n = m / M"));
+    paastand("gaskonstanten er 0,0831 L·bar/(mol·K) som i sc4.6", /0,0831/.test(bagside("i:beregninger", "R")));
+    paastand("molart rumfang er 24 L/mol", /24 L\/mol/.test(bagside("i:beregninger", "Vₘ")));
+    paastand("oxidationstal skrives med romertal", bagside("i:syrebase-redox", "oxidationstal for O i forbindelser") === "−II");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("3. Tekstformatet");
+    var god = "Sæt: Prøve\nSider: A | B\n\nen | to\ntre | fire\nfem | seks\nsyv | otte\n";
+    paastand("et gyldigt sæt godtages", !!F.fraTekst(god).saet);
+    paastand("tabulator virker som deler (Quizlet)", !!F.fraTekst(god.replace(/ \| /g, "\t")).saet);
+    paastand("semikolon virker som deler", !!F.fraTekst("Sæt: S\nSider: A | B\n\nen;to\ntre;fire\nfem;seks\nsyv;otte").saet);
+    var fejlTekst = "Sæt: Fejl\nSider: A | B\n\nen | to\nuden streg\ntre | fire\nen | fem\nseks | syv\n";
+    var rf = F.fraTekst(fejlTekst);
+    paastand("et sæt med fejl godtages ikke", rf.saet === null);
+    paastand("en linje uden streg meldes med linjenummer", !!rf.linjefejl[5]);
+    paastand("den samme forside to gange meldes", !!rf.linjefejl[7]);
+    paastand("udkastet viser de linjer, der kunne læses", rf.udkast.kort.length === 3, rf.udkast.kort.length);
+    paastand("under fire kort godtages ikke", F.fraTekst("Sæt: L\nSider: A | B\n\nen | to").saet === null);
+    paastand("m og M er ikke det samme kort", !!F.fraTekst("Sæt: S\nSider: A | B\n\nm | masse\nM | molarmasse\nn | stofmængde\nV | rumfang").saet);
+    var kom = F.fraTekst("Sæt: K\nSider: A | B\n// kommentar\n[en] | [to]\ntre | fire // slut\nfem | seks\nsyv | otte");
+    paastand("kommentarer og klammer fjernes", !!kom.saet && kom.saet.kort[0].forside === "en" && kom.saet.kort[1].bagside === "fire");
+    paastand("skabelonen kan læses som et udkast", F.fraTekst(F.skabelon()).udkast.kort.length === 4);
+    paastand("AI-vejledningen har formatet og et eksempel", /Sider:/.test(F.aiVejledning()) && /Na⁺ \| natriumion/.test(F.aiVejledning()));
+    paastand("linket frem og tilbage giver den samme tekst", F.fraLink(F.tilLink(god)) === god);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("4. Biblioteket");
+    var n1 = B.gem(god);
+    paastand("et eget sæt gemmes med e:", /^e:/.test(n1));
+    paastand("det kommer i listen", B.liste().length === 7);
+    paastand("det samme sæt gemmes ikke to gange", B.gem(god) === n1);
+    paastand("et indbygget sæt kan ikke slettes", B.slet("i:ioner") === false);
+    B.slet(n1);
+    paastand("et eget sæt kan slettes", B.liste().length === 6);
+    paastand("#ioner i linket vælger ionsættet", B.fraHash("#ioner") === "i:ioner");
+    paastand("#ioner&parring vælger også ionsættet", B.fraHash("#ioner&parring") === "i:ioner");
+    paastand("et ukendt link giver null", B.fraHash("#findes-ikke") === null);
+    var n2 = B.fraHash(B.link(god).replace(/^[^#]*#/, "#"));
+    paastand("et link med sættet i giver sættet tilbage", !!B.saet(n2) && B.saet(n2).navn === "Prøve");
+    B.slet(n2);
+    B.nyRekord("i:ioner", "vend8", 60000);
+    paastand("rekorden gemmes", B.rekord("i:ioner", "vend8") === 60000);
+    paastand("en dårligere tid bliver ikke rekord", B.nyRekord("i:ioner", "vend8", 70000) === false);
+    paastand("en bedre tid bliver rekord", B.nyRekord("i:ioner", "vend8", 50000) === true);
+    paastand("et andet sæt har sin egen rekord", B.rekord("i:grundstoffer", "vend8") === null);
+    paastand("et andet antal par har sin egen rekord", B.rekord("i:ioner", "vend6") === null);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("5. Træn");
+    function el(id) { return d.getElementById(id); }
+    function vaelg(noegle) {
+        el("saetvaelger").value = noegle;
+        el("saetvaelger").dispatchEvent(new w.Event("change"));
+    }
+    vaelg("i:grundstoffer");
+    var antalKort = B.saet("i:grundstoffer").kort.length;
+    paastand("tælleren viser sættets antal", el("tr-taeller").textContent.indexOf("af " + antalKort) > 0, el("tr-taeller").textContent);
+    paastand("bunken har alle kort", el("tr-bunke").textContent === String(antalKort));
+    paastand("kortet viser forsidens overskrift", el("tr-for-etiket").textContent === "Symbol");
+    var foerste = el("tr-for-tekst").textContent;
+    NK.Traen.vend();
+    paastand("kortet kan vendes", el("tr-kort").classList.contains("vendt"));
+    paastand("svarknapperne kommer frem, når kortet er vendt", el("tr-svar").classList.contains("vis"));
+    NK.Traen.svar(false);
+    paastand("et misset kort bliver liggende i bunken", el("tr-bunke").textContent === String(antalKort));
+    paastand("det kommer ikke igen med det samme", el("tr-for-tekst").textContent !== foerste);
+    paastand("det står under dem, der driller", el("tr-svaere").textContent.indexOf(foerste) >= 0);
+    NK.Traen.vend();
+    NK.Traen.svar(true);
+    paastand("et klaret kort ryger ud af bunken", el("tr-bunke").textContent === String(antalKort - 1));
+    var vaern = 0;
+    while (el("tr-faerdig").hidden && vaern++ < 400) { NK.Traen.vend(); NK.Traen.svar(true); }
+    paastand("hele runden kan gennemføres", el("tr-faerdig").hidden === false, vaern);
+    paastand("alle kort er klaret til sidst", el("tr-kan").textContent === antalKort + " af " + antalKort);
+    NK.Traen.nulstil();
+    paastand("Start forfra fylder bunken igen", el("tr-bunke").textContent === String(antalKort));
+    NK.Traen.saetRetning("bf");
+    paastand("den anden retning viser navnet først", el("tr-for-etiket").textContent === "Navn");
+    paastand("knappen for retningen er markeret", el("tr-retning").querySelector('[data-retning="bf"]').classList.contains("valgt"));
+    NK.Traen.saetRetning("fb");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Vendespil");
+    d.querySelector('.faneknap[data-fane="vendespil"]').click();
+    NK.Vendespil.saetStoerrelse(6);
+    var brikker = d.querySelectorAll("#ve-gitter .brik");
+    paastand("6 par giver 12 brikker", brikker.length === 12, brikker.length);
+    paastand("alle brikker ligger med bagsiden op", [].every.call(brikker, function (b) { return !b.classList.contains("aaben") && !b.classList.contains("fundet"); }));
+
+    /* Find parrene ud fra teksten paa brikkerne */
+    var saet = B.saet(B.valgt());
+    function kortNr(tekst) {
+        for (var i = 0; i < saet.kort.length; i++) {
+            if (saet.kort[i].forside === tekst || saet.kort[i].bagside === tekst) return i;
+        }
+        return -1;
+    }
+    var grupper = {};
+    [].forEach.call(brikker, function (b, i) {
+        var nr = kortNr(b.querySelector(".brik-for").textContent);
+        (grupper[nr] = grupper[nr] || []).push(i);
+    });
+    var par = Object.keys(grupper).map(function (k) { return grupper[k]; });
+    paastand("hver brik har en makker", par.length === 6 && par.every(function (p) { return p.length === 2; }));
+
+    /* Ét forkert forsoeg, saa alle parrene */
+    NK.Vendespil.klik(par[0][0]);
+    NK.Vendespil.klik(par[1][0]);
+    paastand("to brikker, der ikke passer, tæller en fejl", el("ve-fejl").textContent === "1");
+    paastand("de bliver ikke fundet", !brikker[par[0][0]].classList.contains("fundet"));
+    par.forEach(function (p) { NK.Vendespil.klik(p[0]); NK.Vendespil.klik(p[1]); });
+    paastand("alle par kan findes", el("ve-fundet").textContent === "6 af 6", el("ve-fundet").textContent);
+    paastand("spillet melder, at det er slut", el("ve-slut").hidden === false);
+    paastand("tiden er gemt som rekord", B.rekord(B.valgt(), "vend6") !== null);
+    paastand("statuslinjen nævner tiden", /\d:\d\d/.test(el("ve-status").textContent), el("ve-status").textContent);
+    NK.Vendespil.nyt();
+    paastand("et nyt spil nulstiller fejlene", el("ve-fejl").textContent === "0");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("7. Parring");
+    d.querySelector('.faneknap[data-fane="parring"]').click();
+    NK.Parring.saetStoerrelse(4);
+    /* En sidste runde med ét kort laegges til den forrige */
+    var runder = Math.ceil(saet.kort.length / 4) - (saet.kort.length % 4 === 1 ? 1 : 0);
+    paastand("sættet deles i runder", el("pa-runde").textContent === "1 af " + runder, el("pa-runde").textContent);
+    paastand("fire par i runden", d.querySelectorAll("#pa-hoejre .p-brik").length === 4);
+    paastand("pladserne er tomme", d.querySelectorAll("#pa-venstre .p-plads.rigtig").length === 0);
+
+    function braek(nr) { return d.querySelector('#pa-hoejre .p-brik[data-nr="' + nr + '"]'); }
+    function plads(nr) { return d.querySelector('#pa-venstre .p-plads[data-nr="' + nr + '"]'); }
+    braek(0).click();
+    paastand("et klik vælger svaret", braek(0).classList.contains("valgt"));
+    plads(1).click();
+    paastand("et forkert par tæller en fejl", el("pa-fejl").textContent === "1");
+    paastand("pladsen er stadig tom", !plads(1).classList.contains("rigtig"));
+    paastand("svaret er stadig valgt efter en fejl", braek(0).classList.contains("valgt"));
+    plads(0).click();
+    paastand("det rigtige par sætter sig på pladsen", plads(0).classList.contains("rigtig"));
+    paastand("svaret forsvinder fra højre spalte", !braek(0));
+    var vaern2 = 0;
+    while (el("pa-slut").hidden && vaern2++ < 200) {
+        var b = d.querySelector("#pa-hoejre .p-brik");
+        if (b) {
+            var nr = b.getAttribute("data-nr");
+            b.click();
+            plads(nr).click();
+        } else if (!el("pa-naeste").hidden) {
+            NK.Parring.naeste();
+        } else break;
+    }
+    paastand("hele sættet kan parres", el("pa-slut").hidden === false, vaern2);
+    paastand("tiden er gemt som rekord", B.rekord(B.valgt(), "par4") !== null);
+    NK.Parring.nyt();
+    paastand("et nyt spil starter forfra i runde 1", el("pa-runde").textContent === "1 af " + runder);
+    paastand("fejlene er nulstillet", el("pa-fejl").textContent === "0");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("8. Faner, sprog og skriftstørrelser");
+    ["traen", "vendespil", "parring"].forEach(function (f) {
+        d.querySelector('.faneknap[data-fane="' + f + '"]').click();
+        paastand("fanen " + f + " kan vises alene", !el("fane-" + f).hidden
+            && ["traen", "vendespil", "parring"].filter(function (a) { return a !== f && !el("fane-" + a).hidden; }).length === 0);
+    });
+    d.querySelector('.faneknap[data-fane="traen"]').click();
+
+    /* Hele sidens tekst, ogsaa den skjulte, men uden koden i script-tags */
+    var klon = d.body.cloneNode(true);
+    [].forEach.call(klon.querySelectorAll("script"), function (s) { s.remove(); });
+    var sidetekst = klon.textContent;
+    paastand("ingen tankestreger i teksten på siden", !/[–—]/.test(sidetekst), (sidetekst.match(/.{0,18}[–—].{0,18}/) || [""])[0]);
+    paastand("ingen 1+ eller 1− som ladning", !/¹[⁺⁻]/.test(sidetekst));
+    paastand("reglerne forklarer formatet", d.getElementById("regler").textContent.indexOf("Na⁺ | natriumion") > 0);
+
+    var forSmaa = [];
+    var alle = d.querySelectorAll("body *");
+    for (var i = 0; i < alle.length; i++) {
+        var e = alle[i];
+        if (!e.offsetWidth && !e.offsetHeight) continue;
+        if (!e.firstChild || e.firstChild.nodeType !== 3 || !e.firstChild.nodeValue.trim()) continue;
+        var px = parseFloat(w.getComputedStyle(e).fontSize);
+        if (px < 12) forSmaa.push(e.tagName.toLowerCase() + "." + (e.className || "?") + " " + px.toFixed(1) + "px");
+    }
+    paastand("ingen synlig tekst under 12 px", !forSmaa.length, forSmaa.slice(0, 4).join(", "));
+
+    var kortTekst = w.getComputedStyle(el("tr-for-tekst")).fontSize;
+    paastand("kortets tekst er stor (" + kortTekst + ")", parseFloat(kortTekst) >= 24);
+
+    /* Til sidst: standardsaettet igen, saa elevens valg ikke staar tilbage
+       paa et proevesaet */
+    vaelg("i:" + D.STANDARD);
+    paastand("sættet kan vælges tilbage", B.valgt() === "i:" + D.STANDARD);
+}
+</script>
+</body>
+</html>

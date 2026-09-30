@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Tierpotenser og forstavelser</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Åbner index.html i en iframe og kontrollerer det, man ikke kan se på et
+   skærmbillede: at modellen omregner rigtigt (også der, hvor kommatal i
+   maskinen snyder), at alle opgaver, generatorerne kan lave, har et gyldigt
+   facit, at de typiske fejl får den rigtige besked, at hintet altid er en
+   trappe på tre trin, at stigens afstand svarer til antallet af pladser
+   kommaet skal flyttes, at en hel runde kan gennemføres på alle fire faner
+   med rigtige svar, hint og Vis svaret, at kommaet hopper færdigt, og at
+   sproget overholder reglerne. Kræver en lokal server: en iframe på file://
+   afvises af browseren. Elevens gemte valg og rekord lægges tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0, vist = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { if (vist < 400) { skriv("  ok    " + navn, "ok"); vist++; } }
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK") + " (" + antal + " påstande)", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-fys-potens-valg", "nk-fys-potens-rekord"];
+var gemt = {};
+try { NOEGLER.forEach(function (k) { gemt[k] = localStorage.getItem(k); localStorage.removeItem(k); }); } catch (e) {}
+function laegTilbage() {
+    try { NOEGLER.forEach(function (k) { if (gemt[k] === null || gemt[k] === undefined) localStorage.removeItem(k); else localStorage.setItem(k, gemt[k]); }); } catch (e) {}
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1200); });
+
+function koer() {
+    try { koerAlt(); } catch (e) { fejl++; skriv("  FEJL  undtagelse: " + e + "\n" + (e.stack || ""), "fejl"); }
+    laegTilbage();
+    vis();
+}
+
+var HULLER = /\bundefined\b|\bNaN\b|\bnull\b|\[object/;
+
+function koerAlt() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, w = ramme.contentWindow, NK = w.NK;
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var T = NK.Tal, D = NK.Data;
+    paastand("fire faner er bygget", !!(NK.faner && NK.faner.potens && NK.faner.forstavelse && NK.faner.omregn && NK.faner.blandet));
+    var raekke = Array.prototype.map.call(d.querySelectorAll(".faneknap"), function (b) { return b.getAttribute("data-fane"); }).join(",");
+    paastand("rækkefølgen er Tierpotenser, Forstavelser, Omregning, Blandet", raekke === "potens,forstavelse,omregn,blandet" && D.FANE_RAEKKE.join(",") === raekke, raekke);
+    paastand("ingen lærer i scenen", !d.getElementById("kknap") && !d.getElementById("boble") && !w.NK.Kemichael);
+    var kilder = Array.prototype.map.call(d.querySelectorAll("script[src]"), function (s) { return s.getAttribute("src"); });
+    paastand("mappen henter ingen filer udefra", kilder.every(function (s) { return s.indexOf("..") < 0; }), kilder.join(" "));
+    paastand("statuslinjen og den ene knap findes", !!d.getElementById("statuslinje") && !!d.getElementById("opgaveknap"));
+
+    overskrift("2. Tal som cifre");
+    [["2500", 2500], ["0,0250", 0.025], ["12,46", 12.46], ["0,000002", 0.000002], ["1000000000", 1e9]].forEach(function (p) {
+        var t = T.fraTekst(p[0]);
+        paastand("læser " + p[0], !!t && Math.abs(parseFloat(T.almindelig(t).replace(",", ".")) - p[1]) < 1e-15, t ? T.almindelig(t) : "null");
+    });
+    paastand("punktum læses som komma", T.almindelig(T.fraTekst("2.5")) === "2,5");
+    paastand("mellemrum i svaret er tilladt", T.almindelig(T.fraTekst("2 500")) === "2500");
+    paastand("tusinder grupperes fra fem cifre", T.skillerum("10000") === "10 000" && T.skillerum("4500") === "4500", T.skillerum("10000"));
+    paastand("decimaler grupperes også", T.skillerum("0,000002") === "0,000 002", T.skillerum("0,000002"));
+    paastand("10⁴ skrives uden 1 foran", T.potensTekst(T.tal("1", 4, false)) === "10⁴", T.potensTekst(T.tal("1", 4, false)));
+
+    overskrift("3. Forstavelserne");
+    paastand("stigen går fra nano til giga", T.STIGE[0] === "n" && T.STIGE[T.STIGE.length - 1] === "G");
+    paastand("elleve pladser på stigen, ti forstavelser at vælge", T.STIGE.length === 11 && T.VALGBARE.length === 10);
+    paastand("deka og hekto spørges der ikke om", T.SPOERGES.indexOf("da") < 0 && T.SPOERGES.indexOf("h") < 0);
+    paastand("alle forstavelser ligger mellem 10⁻⁹ og 10⁹", T.STIGE.every(function (f) { return T.FORSTAVELSER[f] >= -9 && T.FORSTAVELSER[f] <= 9; }));
+    paastand("alle forstavelser har et navn", T.VALGBARE.every(function (f) { return !!T.NAVNE[f]; }));
+
+    overskrift("4. Enhederne");
+    var kendte = [
+        ["laengde", "km", "m", 3], ["laengde", "cm", "mm", 1], ["laengde", "L", "mL", 3],
+        ["areal", "cm²", "m²", -4], ["areal", "m²", "mm²", 6], ["areal", "km²", "m²", 6],
+        ["rumfang", "cm³", "m³", -6], ["rumfang", "L", "dm³", 0], ["rumfang", "mL", "cm³", 0],
+        ["rumfang", "m³", "L", 3], ["andre", "kg", "g", 3], ["andre", "s", "ms", 3]
+    ];
+    kendte.forEach(function (p) {
+        var a = findEnhed(T, p[0], p[1]), b = findEnhed(T, p[0], p[2]);
+        paastand(p[1] + " til " + p[2] + " er " + p[3] + " pladser", !!a && !!b && (a.e - b.e) === p[3],
+            a && b ? String(a.e - b.e) : "enhed mangler");
+    });
+
+    overskrift("5. Opgaverne");
+    var typer = ["udskriv", "potensform", "vaelg", "enhedspotens"];
+    var talt = {}, daarlig = 0, huller = 0, hintFejl = 0, stigeFejl = 0, tjekFejl = 0, beskedFejl = 0;
+    var i, o, r;
+    for (i = 0; i < 2000; i++) {
+        var type = typer[i % typer.length];
+        o = T.lav(type, {}, {});
+        talt[type] = (talt[type] || 0) + 1;
+        if (!o || !o.facit) { daarlig++; continue; }
+        var tekst = [o.spm, T.svar(o), T.forklaring(o), T.kortOpgave(o), T.facitHTML(o)].concat(T.hintTrin(o)).join(" | ");
+        if (HULLER.test(tekst) || tekst.indexOf("—") >= 0) huller++;
+        if (T.hintTrin(o).length !== 3) hintFejl++;
+        var p = T.stigePunkter(o);
+        if (!p || p.fra < -9 || p.fra > 9 || p.til < -9 || p.til > 9) stigeFejl++;
+        if (type === "vaelg") {
+            if (!T.tjek(o, { valgt: o.facit }).ok) tjekFejl++;
+            var anden = T.VALGBARE.filter(function (f) { return f !== o.facit; })[0];
+            r = T.tjek(o, { valgt: anden });
+            if (r.ok || !r.besked) beskedFejl++;
+            if (!T.ens(T.tal(o.koef.s, o.koef.p + o.eksp, false), T.lommeregner(o.tal))) tjekFejl++;
+        } else if (type === "potensform" || type === "enhedspotens") {
+            if (!T.tjek(o, { mantisse: T.mantisse(o.facit), eksp: String(o.facit.p) }).ok) tjekFejl++;
+            r = T.tjek(o, { mantisse: T.almindelig(o.facit), eksp: "" });
+            if (r.ok || !r.besked) beskedFejl++;
+        } else {
+            if (!T.tjek(o, { mantisse: T.almindelig(o.facit), eksp: "" }).ok) tjekFejl++;
+            r = T.tjek(o, { mantisse: T.almindelig(T.tal(o.facit.s, o.facit.p - 1, false)), eksp: "" });
+            if (r.ok || !r.besked) beskedFejl++;
+        }
+    }
+    paastand("alle fire typer bliver lavet", typer.every(function (t) { return talt[t] > 0; }));
+    paastand("alle opgaver har et facit", daarlig === 0, String(daarlig));
+    paastand("ingen huller eller tankestreger i teksterne", huller === 0, String(huller));
+    paastand("hintet har altid tre trin", hintFejl === 0, String(hintFejl));
+    paastand("stigen holder sig mellem 10⁻⁹ og 10⁹", stigeFejl === 0, String(stigeFejl));
+    paastand("det rigtige svar godkendes", tjekFejl === 0, String(tjekFejl));
+    paastand("de typiske fejl får en besked", beskedFejl === 0, String(beskedFejl));
+
+    overskrift("6. Omregningen på de fire niveauer");
+    T.NIVEAU_RAEKKE.forEach(function (niv) {
+        var galFacit = 0, galSpring = 0, galStige = 0, galTjek = 0, galRetning = 0, langt = 0;
+        for (var j = 0; j < 1500; j++) {
+            var op = T.lav("omregn", {}, { niveau: niv });
+            if (!T.ens(op.facit, T.lommeregner(T.tal(op.tal.s, op.tal.p + op.k, false)))) galFacit++;
+            if (Math.abs(op.k) > 6 || op.fra === op.til) galSpring++;
+            var pp = T.stigePunkter(op);
+            if (Math.abs(pp.fra - pp.til) !== Math.abs(op.k)) galStige++;
+            if (!T.tjek(op, { mantisse: T.almindelig(op.facit), eksp: "" }).ok) galTjek++;
+            if (!T.tjek(op, { mantisse: T.mantisse(op.facit), eksp: String(op.facit.p) }).ok) galTjek++;
+            if (op.k !== 0) {
+                var vend = T.tal(op.facit.s, op.facit.p - 2 * op.k, false);
+                var sv = T.tjek(op, { mantisse: T.almindelig(vend), eksp: "" });
+                if (sv.ok || !/større|mindre|forkert/.test(sv.besked)) galRetning++;
+            }
+            if (T.almindelig(op.facit).length > 14) langt++;
+        }
+        paastand(niv + ": facit er tallet flyttet k pladser", galFacit === 0, String(galFacit));
+        paastand(niv + ": springet er højst seks pladser", galSpring === 0, String(galSpring));
+        paastand(niv + ": stigens afstand er antallet af pladser", galStige === 0, String(galStige));
+        paastand(niv + ": rigtigt svar godkendes begge veje", galTjek === 0, String(galTjek));
+        paastand(niv + ": den forkerte vej får besked om retningen", galRetning === 0, String(galRetning));
+        paastand(niv + ": facit kan stå på tavlen", langt === 0, String(langt));
+    });
+
+    overskrift("7. En hel runde på hver fane");
+    D.FANE_RAEKKE.forEach(function (id) {
+        w.NK.visFane(id);
+        var f = w.NK.aktivFane;
+        f.nyRunde();
+        f.vis();
+        var brud = 0, hopBrud = 0;
+        for (var n = 0; n < D.RUNDE; n++) {
+            var op = f.opg;
+            /* Hver tredje opgave: hele hinttrappen og Vis svaret */
+            if (n % 3 === 2) {
+                f.knap(); f.knap(); f.knap();
+                if (!/Vis svaret/.test(d.getElementById("opgaveknap").textContent)) brud++;
+                f.knap();
+                if (!f.vist) brud++;
+            } else {
+                if (op.type === "vaelg") f.valgtF = op.facit;
+                else if (op.type === "potensform" || op.type === "enhedspotens") {
+                    f.maade = "pot"; f.mant = T.mantisse(op.facit); f.eksp = String(op.facit.p);
+                } else { f.mant = T.almindelig(op.facit); f.eksp = ""; }
+                f.tjek();
+                if (!f.loest || f.vist) brud++;
+            }
+            /* Ni pladser tager 0,45 + 9 · 0,3 sekunder, så der skal køres
+               mindst syv sekunder frem, før hoppet er færdigt */
+            for (var t2 = 0; t2 < 480; t2++) w.NK.trin(1 / 60);
+            if (f.hop && !f.hop.faerdig) hopBrud++;
+            if (!f.runde.slut) f.naeste();
+        }
+        paastand(id + ": ti opgaver kan gennemføres", brud === 0, String(brud));
+        paastand(id + ": kommaet hopper færdigt", hopBrud === 0, String(hopBrud));
+        paastand(id + ": runden slutter efter ti", f.runde.slut === true && f.runde.status.length === D.RUNDE, String(f.runde.status.length));
+        paastand(id + ": listen har ti linjer", d.querySelectorAll("#rundeliste li").length === D.RUNDE, String(d.querySelectorAll("#rundeliste li").length));
+        paastand(id + ": knappen tilbyder en ny runde", /Ny runde/.test(d.getElementById("opgaveknap").textContent), d.getElementById("opgaveknap").textContent);
+        paastand(id + ": rigtige i første forsøg tælles", f.rigtige() >= 6, String(f.rigtige()));
+    });
+
+    overskrift("8. Statuslinjen");
+    w.NK.visFane("omregn");
+    var f2 = w.NK.aktivFane;
+    f2.nyRunde(); f2.vis();
+    f2.mant = "123456789"; f2.eksp = "";
+    f2.tjek();
+    var linje = d.getElementById("statuslinje");
+    paastand("et forkert svar gør linjen rød", linje.classList.contains("skidt"));
+    paastand("mærket siger Ikke endnu", /IKKE ENDNU/i.test(d.getElementById("besked").textContent), d.getElementById("besked").textContent);
+    paastand("knappen lyser op efter en fejl", d.getElementById("opgaveknap").classList.contains("lyser"));
+    f2.knap();
+    paastand("hint 1 af 3 står i linjen", /HINT 1 AF 3/i.test(d.getElementById("besked").textContent), d.getElementById("besked").textContent);
+    paastand("linjen bliver gul ved hint", linje.classList.contains("hint"));
+    paastand("knappen holder op med at lyse", !d.getElementById("opgaveknap").classList.contains("lyser"));
+    f2.knap();
+    paastand("stigen afslører tierpotenserne ved hint 2", f2.stige.afsloer === true);
+    f2.mant = T.almindelig(f2.opg.facit); f2.eksp = "";
+    f2.tjek();
+    paastand("et rigtigt svar gør linjen grøn", linje.classList.contains("god"));
+    paastand("opgaven tæller som hjulpet", f2.runde.status[0] === "hjulpet", f2.runde.status[0]);
+    paastand("Tjek-knappen forsvinder, når opgaven er løst", d.getElementById("tjek").hidden === true);
+
+    overskrift("9. Sproget");
+    var tekster = [];
+    Array.prototype.forEach.call(d.querySelectorAll("#teori p, #teori .eksempel, .st-tekst, .niveaunote, .note"), function (e) { tekster.push(e.textContent); });
+    D.FANE_RAEKKE.forEach(function (id) { tekster.push(D.INTRO[id]); });
+    var samlet = tekster.join(" ");
+    paastand("ingen tankestreger", samlet.indexOf("—") < 0 && samlet.indexOf(" – ") < 0);
+    paastand("ingen huller", !HULLER.test(samlet));
+    paastand("teorien har forstavelsestabellen", d.querySelectorAll("#teori .tabel tr").length === 11, String(d.querySelectorAll("#teori .tabel tr").length));
+
+    overskrift("10. Rundvisningen");
+    D.FANE_RAEKKE.forEach(function (id) {
+        w.NK.visFane(id);
+        w.NK.Rundvisning.start(id);
+        paastand(id + ": rundvisningen kan åbnes", w.NK.Rundvisning.aktiv() === true);
+        w.NK.Rundvisning.luk();
+    });
+    w.NK.visFane("potens");
+}
+
+function findEnhed(T, niveau, sym) {
+    var saet = T.NIVEAUER[niveau].saet, i, j;
+    for (i = 0; i < saet.length; i++) {
+        for (j = 0; j < saet[i].length; j++) if (saet[i][j].sym === sym) return saet[i][j];
+    }
+    return null;
+}
+</script>
+</body>
+</html>
