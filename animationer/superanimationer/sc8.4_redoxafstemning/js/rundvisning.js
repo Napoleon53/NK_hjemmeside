@@ -12,17 +12,22 @@
 
     var NK = window.NK;
 
+    var SPM = { sel: "#opgavelinje, .ab-hoved", titel: "Opgaven", tekst: "Øverst står opgaven. Linjen under den siger, hvad trinnet spørger om." };
     var TAVLE = { sel: "#tavle", titel: "Tavlen", tekst: "Reaktionen, der skal afstemmes. Oxidationstallene og koefficienterne skrives direkte i felterne her." };
-    var VAEGT = { sel: "#vaegt-omraade", titel: "Elektronvægten", tekst: "Til venstre det, der afgiver elektroner, til højre det, der optager dem. Vægten står lige, når der afgives lige så mange, som der optages." };
-    var KONTROL = { sel: "#kontrol", titel: "Kontrollen", tekst: "Tallene før og efter pilen. De bliver grønne, når de er ens, og følger med, mens du skriver." };
-    var OPGAVE = { sel: "#opgavekort", titel: "Trinene", tekst: "De samme syv trin hver gang. Knappen giver først et hint, så svaret og til sidst en ny opgave." };
+    var TASTER = { sel: "#taster", titel: "Tasterne", tekst: "Klik på et felt, og vælg tallet her. Du kan også skrive på tastaturet." };
+    var KONTROL = { sel: "#kontrol", titel: "Kontrollen", tekst: "Tallene, der skal være ens. De følger med, mens du skriver, og bliver grønne, når de passer." };
+    var KNAPPER = { sel: ".ab-knapper", titel: "Tjek og hint", tekst: "Tjek svaret her. Sidder du fast, giver den gule knap først et hint, så svaret og til sidst en ny opgave." };
+    var OPGAVE = { sel: "#opgavekort", titel: "Trinene", tekst: "De samme syv trin hver gang. Det blå trin er det, du er nået til." };
     var LISTE = { sel: "#listekort", titel: "Reaktionerne", tekst: "Alle reaktioner på denne sværhedsgrad. Grøn er løst, gul betyder, at svaret blev vist." };
+    var VAEGT = { sel: "#vaegtknap", titel: "Elektronvægten", tekst: "Slå vægten til, hvis du vil se elektronerne blive vejet. Den står lige, når der afgives lige så mange, som der optages." };
     var NIVEAU = { sel: ".niveauvalg", titel: "Sværhedsgraderne", tekst: "Let har ingen ilt. Middel foregår i surt miljø. Svær har basisk miljø, H⁺ efter pilen og grundstoffer, der både oxideres og reduceres." };
 
+    /* Et trin, der ikke kan ses lige nu (tasterne i trin 2, en tom
+       kontrol), springes over. */
     var TURE = {
-        "let": [TAVLE, VAEGT, KONTROL, OPGAVE, LISTE, NIVEAU],
-        "middel": [TAVLE, VAEGT, KONTROL, OPGAVE, LISTE],
-        "svaer": [TAVLE, VAEGT, KONTROL, OPGAVE, LISTE]
+        "let": [SPM, TAVLE, TASTER, KONTROL, KNAPPER, OPGAVE, LISTE, VAEGT, NIVEAU],
+        "middel": [SPM, TAVLE, TASTER, KONTROL, KNAPPER, OPGAVE, LISTE, VAEGT],
+        "svaer": [SPM, TAVLE, TASTER, KONTROL, KNAPPER, OPGAVE, LISTE, VAEGT]
     };
 
     var trin = [];
@@ -115,7 +120,9 @@
     function start(niveauId) {
         var liste = TURE[niveauId];
         if (!liste || !liste.length) return;
-        trin = liste;
+        /* Kun det, der kan ses nu, så tallet passer, og Forrige virker */
+        trin = liste.filter(function (t) { return !!samletRect(t.sel); });
+        if (!trin.length) return;
         trinNr = 0;
         erAktiv = true;
         NK.el("rundvisning").hidden = false;

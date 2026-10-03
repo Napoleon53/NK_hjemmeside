@@ -39,36 +39,69 @@ tilsammen i 2 faner)". Kemichael er den rolige udgave ved katederet
 4. **Loftet:** to faner, 31 stoffer på fane 1 (6 trin for trin og 25 til
    øvelse) og 12 molekyler på fane 2. Én formel eller ét molekyle ad gangen.
 5. **Layoutet:** scene plus panel. Scenen er en tavle over Kemichaels
-   kateder; panelet har opgavekortet med den ene knap og listen med
-   formlerne.
+   kateder med arbejdsfeltet på tavlen; panelet har kun listen med
+   formlerne (og regnskabet på fane 2).
+
+## Arbejdsfeltet (brugerens test 3. oktober 2026)
+
+Brugeren om fane 1: stilladseringen er god, men den blev "lidt kluntet og
+uklar for den svage elev". Der skulle være mindre tekst, det skulle være
+"meget tydeligt, at det er ladningen som man skal bestemme", hint-knappen
+skulle stå "meget synlig lige ved siden af inputfeltet", og "der skal ikke
+være en ordre-tekst oppe i højre hjørne". Om fane 2: opgaveteksten i
+hjørnet var for lille, og det, der skal trækkes, skulle blinke eller have
+pile "i selve animationsvinduet".
+
+Derfor står alt, eleven skal læse og trykke på, nu samlet i et
+**arbejdsfelt** i scenen (`.arb` i stilarket, `js/fane.js`):
+
+* **spørgsmålet** til det trin, eleven er ved, som én kort linje ("Hvilken
+  ladning har CO₂?", "Hvilket oxidationstal har hvert O?", "Træk hvert
+  elektronpar hen til det atom, der trækker hårdest."),
+* **feltet** med Tjek (fane 1) eller gættet med Gæt (fane 2),
+* **knappen** lige ved siden af: Giv hint, så Vis svaret, så Næste opgave,
+* **linjen** under dem med et mærke forrest: Ikke endnu (rød, feltet
+  ryster, og hintknappen lyser op), Hint og Svaret (gul), Løst ✓ (grøn).
+
+Opgavekortet i panelet er væk. Opgaven står som én linje øverst på tavlen
+med en gul streg foran ("Find oxidationstallet for C i CO₂"), og den lange
+forklaring til hvert trin er skåret væk: det, den sagde, er nu hintet.
+Kemichael siger ikke længere hintet (se Kemichael nedenfor).
 
 ## Fane 1: Reglerne
 
 Tavlen, oppefra:
 
-* **Trinene og forklaringen:** mærker for hvert trin (Ladningen › O › H ›
-  det ukendte) og en forklaring til det trin, eleven er ved, fx "Start derfor
-  med ladningen på hele CO₂ …". Linjen i opgavekortet siger kun kort, hvad
-  der skal skrives i det gule felt, og hvad der gik galt.
-* **Formlen** med et felt over atomerne. Feltet, der skal skrives i, er gult
-  og banker stille.
+* **Opgaven og trinene:** "Find oxidationstallet for C i CO₂" og, for de
+  seks første, mærker for hvert trin (Ladningen › O › H › det ukendte).
+* **Formlen.** Det atom, der spørges til, er gult med et gult ? over sig,
+  og mens eleven skriver, står elevens eget tal der med romertal. Et rigtigt
+  tal bliver stående grønt.
+* **Arbejdsfeltet** lige under formlen: spørgsmålet, feltet, Tjek og Giv
+  hint. Hintet til ladningen får pladsen efter formlen til at lyse (også
+  når den er tom).
 * **Regnestykket:** summen af oxidationstallene = ladningen, med en lille
-  tekst under hver side. Det starter med ord og ladningens felt; atomerne
-  kommer ind, når ladningen er fundet (brugerens første test, 26. sept.
-  2026: eleven blev "kastet ud i en halv beregning").
+  tekst under hver side. Det kommer frem, når ladningen er fundet
+  (brugerens første test, 26. sept. 2026: eleven blev "kastet ud i en halv
+  beregning").
 * **Den pæne beregning**, når opgaven er løst: 2 · Cr = −2 − 7 · (−2) = +12
   og Cr = +12 / 2 = +6.
 * **Brikkerne:** ét atom pr. brik, når det første tal kendes, og til sidst
   summen (= −2 ✓).
 
+Pladsen til regnestykket, beregningen og brikkerne er sat af fra starten
+(de er usynlige, ikke væk), så arbejdsfeltet står stille, mens der skrives.
+Skriften vælges, så det hele kan være på tavlen med en linje mere i
+arbejdsfeltet (`layout` i `js/sim_regler.js`).
+
 Skrivemåden (brugerens valg): oxidationstallet over atomet og i svaret med
 romertal (+VI), mellemregninger med almindelige tal ((−2), +12, +6). Felterne
 godtager begge.
 
-* **Trin for trin (de seks første):** ladningen efter lighedstegnet i
-  regnestykket, så O, så H og til sidst det ukendte. Kun det aktive felt
-  står fremme; resten kommer, når opgaven når dem.
-* **Øvelse (de 25):** kun feltet over det ukendte. Hintet sætter O og H
+* **Trin for trin (de seks første):** ladningen, så O, så H og til sidst
+  det ukendte. Spørgsmålet i arbejdsfeltet skifter for hvert trin, og
+  linjen siger, hvad der var rigtigt ("Rigtigt. Ladningen er 0.").
+* **Øvelse (de 25):** kun spørgsmålet om det ukendte. Hintet sætter O og H
   ind med gråt og viser regnestykket. Navne med romertal (mangan(IV)oxid)
   står først i noten bagefter, så de ikke viser facit.
 
@@ -84,27 +117,34 @@ Et forkert tal får en besked, der passer til fejlen (`NK.Ox.fejl` i
 | det ukendte | fortegnet, H glemt, antallet af O glemt, ladningens fortegn | hver sin |
 | det ukendte | grundstof og ion af ét atom | reglen for dem |
 
-Vis svaret giver hele beregningen, fx "2 · Cr + 7 · (−2) = −2, så
-2 · Cr = −2 − 7 · (−2) = +12 og Cr = +12 / 2 = +6. Cr er +VI."
+Vis svaret på det sidste trin skriver den pæne beregning på tavlen, og
+linjen henviser til den ("Beregningen står herunder."). For et grundstof og
+en ion af ét atom står reglen i linjen.
 
 ## Fane 2: Elektronerne
 
 Molekylet står på tavlen som en elektronprikformel. Prikkens farve er
 farven fra det atom, elektronen kom fra; ionens ekstra elektron (OH⁻) er
 lilla, og den, NH₄⁺ mangler, er en tom ring. Tallet ved hvert atom er
-elektronegativiteten. Tre bidder:
+elektronegativiteten. Opgaven står øverst på tavlen, og arbejdsfeltet står
+nederst på tavlen. Tre bidder:
 
-1. **Gæt:** eleven skriver sit gæt i opgavekortet. Knappen er Giv hint og så
-   Spring gættet over.
-2. **Fordel:** eleven trækker hvert elektronpar i en binding hen til det
-   atom, der trækker hårdest (eller klikker på parret og så på atomet). Et par
-   mellem to ens atomer deles, én elektron (eller to) til hver. Et par hos
-   det forkerte atom bliver rødt, og linjen siger hvorfor. Parrene, der
-   mangler, banker stille.
+1. **Gæt:** "Gæt først: hvilket oxidationstal har Cl?" med et lille felt pr.
+   grundstof og knappen Gæt. Knappen ved siden af er Giv hint og så Spring
+   gættet over.
+2. **Fordel:** "Træk elektronparret hen til det atom, der trækker hårdest."
+   Parrene, der skal flyttes, blinker, og en pil peger fra parret mod hvert
+   af de to atomer; elektronegativiteten står tydeligt (gul og fed). Eleven
+   trækker parret (eller klikker på parret og så på atomet). Et par mellem
+   to ens atomer deles, én elektron (eller to) til hver. Et par hos det
+   forkerte atom bliver rødt med en pil mod det rigtige, og linjen siger
+   hvorfor.
 3. **Regnskabet:** hvert atom får en ring om sine elektroner og sit
-   oxidationstal. Panelet viser valenselektronerne, dem, atomet har nu, og
-   forskellen med almindelige tal og oxidationstallet med romertal (6 − 7 = −1,
-   −I), og summen står på tavlen. Gættet bliver grønt eller rødt.
+   oxidationstal. Arbejdsfeltet viser svaret, gættet som en grøn eller rød
+   brik og forklaringen; panelet viser valenselektronerne, dem, atomet har
+   nu, og forskellen med almindelige tal og oxidationstallet med romertal
+   (6 − 7 = −1, −I). Bliver arbejdsfeltet højt af en lang forklaring,
+   rykker molekylet op, så det ikke står bag feltet.
 
 Reglerne og elektronerne giver forskellige tal for H₂O₂ og OF₂ (og
 selvtesten tjekker, at det kun er de to), så et gæt efter reglerne bliver
@@ -112,12 +152,15 @@ rødt netop dér. H₂ og O₂ passer med reglen om grundstoffer.
 
 ## Kemichael
 
-Den rolige udgave fra sc4.5 og sc5.1 (`NK.RoligLaerer` i `js/laerer.js`):
-han sidder bag katederet, siger kun noget ved Giv hint og Vis svaret, tier,
-når trinnet er løst, og kan sendes ud (så står hintene i opgavekortet).
-Ingen Start præsentation / Nej tak. K får ham til at sige, hvor man er, og
-hvad man gør. Påskeæg: et elektronpar sluppet over hans kop ("Min kaffe er
-neutral. Lad den blive det."). Klik på koppen og på ham som i de andre.
+Han sidder bag katederet (`NK.RoligLaerer` i `js/laerer.js`, som sc4.5 og
+sc5.1) og blander sig ikke. Efter testen 3. okt. 2026 står hintet og svaret
+i arbejdsfeltet ved feltet, så han siger dem ikke længere; han svarer, når
+der klikkes på ham eller koppen, og K får ham til at sige, hvor man er, og
+hvad man gør. Han kan stadig sendes ud. Skal han igen sige hintet og svaret
+i sin boble, sættes `D.KEMICHAEL_SIGER_HINT = true` i `js/data.js`.
+Båndet med katederet er lavere end i sc5.1 (0,16 af scenens højde), så
+tavlen får pladsen. Påskeæg: et elektronpar sluppet over hans kop ("Min
+kaffe er neutral. Lad den blive det.").
 
 ## Forenklinger
 
@@ -138,19 +181,21 @@ neutral. Lad den blive det."). Klik på koppen og på ham som i de andre.
 ## Filer
 
 ```
-index.html          toplinje, de to faner, teori og rundvisning
+index.html          toplinje, de to faner med arbejdsfeltet i scenen, teori
+                    og rundvisning
 css/stil.css        alt udseende (grundlaget er sc5.1; nederst tavlen,
-                    brikkerne, listen, gættet og regnskabet). NB: decimaltal
-                    med PUNKTUM i CSS
+                    brikkerne, arbejdsfeltet, listen, gættet og regnskabet).
+                    NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, hævet og sænket skrift, lærred (som sc5.1)
 js/data.js          grundstofferne, de 31 stoffer, de 12 molekyler med
                     tegning og forklaring, og Kemichaels replikker
 js/ox.js            modellen: oxidationstal efter reglerne, læsning af
                     felterne, beskederne til fejlene og elektronregnskabet
 js/sprites.js       katederet (Kemichaels egne sprites kommer fra v2)
-js/tegning.js       væggen, tavlen på fane 2, prikkerne og klammerne
+js/tegning.js       væggen, tavlen på fane 2, prikkerne, pilene og klammerne
 js/laerer.js        Kemichael ved katederet (som sc5.1, egen nøgle)
-js/fane.js          det fælles: listen, knappen, linjen og musen
+js/fane.js          det fælles: listen, arbejdsfeltet (knappen og linjen)
+                    og musen
 js/sim_regler.js    fane 1
 js/sim_elektroner.js fane 2
 js/rundvisning.js   rundvisningen bag ?
@@ -176,9 +221,12 @@ tjek · <kbd>Esc</kbd> luk. Direkte links: `#regler` og `#elektroner`.
 med valenselektronerne, at reglerne kun svigter for H₂O₂ og OF₂, at felterne
 læser romertal og tal, beskederne til de typiske fejl, at alle opgaver kan
 gennemføres ved at skrive, med musen og med Vis svaret, at der ikke står et
-facit, før eleven har gjort noget, Kemichael inde og ude, sproget og
-layoutet fra 1100 × 700 til 1600 × 950.
-Sidst kørt: ALT OK (101 påstande), 26. september 2026.
+facit, før eleven har gjort noget, at spørgsmålet, feltet og Giv hint står
+samlet i scenen og ikke i panelet, at hintknappen står lige ved siden af
+feltet, at arbejdsfeltet står stille, mens opgaven løses, at parrene på
+fane 2 har pile, Kemichael inde og ude, sproget og layoutet fra 1100 × 700
+til 1600 × 950.
+Sidst kørt: ALT OK (120 påstande), 3. oktober 2026.
 
 ## I menuen
 

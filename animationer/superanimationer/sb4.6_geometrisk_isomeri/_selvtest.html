@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb4.6 Geometrisk isomeri</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: prioriteten for alle par af grupper, E og Z for
+   alle 10 000 molekyler mod en uafhængig udregning, opgavernes facit,
+   at byg-opgavernes facit opfylder kravene, at beskederne passer til de
+   typiske fejl (cis-fælden og størrelsesfælden), at alle opgaver kan
+   løses selv og med Vis svaret, at hinttrapperne har tre trin, fane 1
+   (drejningen, byttet og omridset), spillets point og fælder, sproget og
+   layoutet fra 1100 × 700 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb4.6-dr", "nk-sb4.6-pr", "nk-sb4.6-rekord"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|traek\w*|aendr\w*|vaelg|loest|saet)\b/;
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, EZ = NK.EZ;
+    var DR = NK.sims["fane-dr"], PR = NK.sims["fane-pr"], SP = NK.sims["fane-sp"];
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Prioriteten");
+    var RANG = ["I", "Br", "Cl", "F", "OCH3", "COOH", "CH2OH", "C2H5", "CH3", "H"];
+    var orden = D.PALET.slice().sort(function (a, b) { return EZ.sammenlign(b, a); });
+    paastand("rækkefølgen er I > Br > Cl > F > OCH₃ > COOH > CH₂OH > CH₂CH₃ > CH₃ > H", orden.join(",") === RANG.join(","), orden.join(","));
+    var anti = true, ens = true;
+    D.PALET.forEach(function (a) {
+        D.PALET.forEach(function (b) {
+            if (Math.sign(EZ.sammenlign(a, b)) !== -Math.sign(EZ.sammenlign(b, a))) anti = false;
+            if ((EZ.sammenlign(a, b) === 0) !== (a === b)) ens = false;
+        });
+    });
+    paastand("sammenligningen er symmetrisk", anti);
+    paastand("kun ens grupper står lige", ens);
+    paastand("Cl slår CH₂CH₃ ved første atom", EZ.foersteAtom("Cl", "C2H5") && EZ.sammenlign("Cl", "C2H5") > 0);
+    paastand("CH₂CH₃ slår CH₃ ved næste atom", !EZ.foersteAtom("C2H5", "CH3") && EZ.sammenlign("C2H5", "CH3") > 0);
+    paastand("COOH slår CH₂OH (C=O tæller som to O)", EZ.sammenlign("COOH", "CH2OH") > 0);
+    paastand("forklaringen ved næste atom nævner atomerne", /C, H, H/.test(EZ.hvorfor("CH3", "C2H5")) && /H, H, H/.test(EZ.hvorfor("CH3", "C2H5")));
+    paastand("forklaringen for COOH siger, at C=O tæller som to O", /to O/.test(EZ.hvorfor("COOH", "CH2OH")));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("E og Z for alle 10 000 molekyler");
+    function rang(id) { return RANG.length - RANG.indexOf(id); }
+    var forkert = 0, typer = { E: 0, Z: 0, ingen: 0 };
+    D.PALET.forEach(function (a) { D.PALET.forEach(function (b) { D.PALET.forEach(function (c) { D.PALET.forEach(function (e) {
+        var pos = [a, b, c, e], r = EZ.analyser(pos);
+        var forvent;
+        if (a === b || c === e) forvent = "ingen";
+        else forvent = ((rang(a) > rang(b)) === (rang(c) > rang(e))) ? "Z" : "E";
+        typer[r.type]++;
+        if (r.type !== forvent) forkert++;
+        if (r.type !== "ingen" && EZ.dom(r).indexOf(r.type) < 0) forkert++;
+    }); }); }); });
+    paastand("analysen passer med en uafhængig udregning", forkert === 0, forkert + " forkerte");
+    paastand("E og Z er lige hyppige", typer.E === typer.Z, typer.E + " og " + typer.Z);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Opgavernes facit");
+    var FACIT = { a1: "Z", a2: "E", a3: "E", a4: "E", a5: "E", a6: "ingen", a7: "Z", a8: "E" };
+    D.PRIO.forEach(function (o) {
+        if (o.slags === "afgoer") paastand(o.navn + " er " + FACIT[o.id], EZ.analyser(o.pos).type === FACIT[o.id], EZ.analyser(o.pos).type);
+        else paastand(o.navn + ": facit opfylder kravet", EZ.tjekByg(o, o.facit).ok, EZ.tjekByg(o, o.facit).tekst);
+    });
+    var b1 = D.PRIO[8], b2 = D.PRIO[9], b3 = D.PRIO[10], b4 = D.PRIO[11];
+    paastand("Byg 1: E med Br og Cl afvises", !EZ.tjekByg(b1, ["Br", "H", "H", "Cl"]).ok);
+    paastand("Byg 2: Z med CH₃ på samme side afvises", !EZ.tjekByg(b2, ["CH3", "H", "CH3", "H"]).ok);
+    paastand("Byg 2: E med CH₃ på hver sin side afvises", !EZ.tjekByg(b2, ["CH3", "H", "H", "CH3"]).ok);
+    paastand("Byg 3: H afvises", /H/.test(EZ.tjekByg(b3, ["H", "H", "Cl", "Br"]).tekst) && !EZ.tjekByg(b3, ["H", "H", "Cl", "Br"]).ok);
+    paastand("Byg 4: to ens grupper afvises", !EZ.tjekByg(b4, ["Br", "Br", "Cl", "H"]).ok);
+    paastand("en tom plads afvises", /mangler/.test(EZ.tjekByg(b1, ["Br", null, "Cl", "H"]).tekst));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Beskederne til de typiske fejl");
+    var a5 = EZ.analyser(D.PRIO[4].pos);
+    paastand("cis-fælden (a5 svaret Z) siger, at CH₃ ikke tæller", /ikke dem, der tæller/.test(EZ.fejl(a5, "Z")) && /Br/.test(EZ.fejl(a5, "Z")), EZ.fejl(a5, "Z"));
+    var a3 = EZ.analyser(D.PRIO[2].pos);
+    paastand("trans-but-2-en svaret Z nævner ikke en fælde", !/ikke dem, der tæller/.test(EZ.fejl(a3, "Z")), EZ.fejl(a3, "Z"));
+    var a4 = EZ.analyser(D.PRIO[3].pos);
+    paastand("størrelsesfælden (a4 svaret Z) nævner størrelsen", /størrelse/.test(EZ.fejl(a4, "Z")), EZ.fejl(a4, "Z"));
+    var a6 = EZ.analyser(D.PRIO[5].pos);
+    paastand("E for et molekyle uden isomeri forklarer de ens grupper", /to ens grupper/.test(EZ.fejl(a6, "E")));
+    paastand("Ingen for et E-molekyle siger, at der er to former", /to former/.test(EZ.fejl(a4, "ingen")));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 2: alle opgaver kan løses");
+    NK.visFane("fane-pr");
+    PR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var alleSelv = true, alleTre = true;
+    D.PRIO.forEach(function (o, i) {
+        PR.vaelg(i);
+        if (o.slags === "afgoer") {
+            ["v", "h", "svar"].forEach(function (t) { if (PR.hintTrin().length !== 3) alleTre = false; PR.trinNu(); });
+            var r = PR.r;
+            PR.klikGruppe(r.ensV ? 0 : r.v);
+            PR.klikGruppe(r.ensH ? 2 : r.h);
+            if (PR.hintTrin().length !== 3) alleTre = false;
+            PR.svarEZ(r.type);
+        } else {
+            if (PR.hintTrin().length !== 3) alleTre = false;
+            o.facit.forEach(function (id, j) { PR.saet(j, id); });
+            PR.tjek();
+        }
+        if (!PR.faerdig || !PR.status[i].stjerne) alleSelv = false;
+    });
+    paastand("alle 12 kan løses selv og giver stjerne", alleSelv);
+    paastand("hinttrapperne har tre trin", alleTre);
+    paastand("listen viser 12 løste", PR.antalLoest() === 12);
+
+    PR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var alleSvar = true;
+    D.PRIO.forEach(function (o, i) {
+        PR.vaelg(i);
+        for (var n = 0; n < 20 && !PR.faerdig; n++) PR.knap();
+        if (!PR.faerdig || PR.status[i].stjerne) alleSvar = false;
+    });
+    paastand("Vis svaret løser alle 12 uden stjerne", alleSvar);
+
+    PR.vaelg(3);
+    PR.klikGruppe(0);
+    paastand("et forkert klik giver en rød statuslinje", PR.el.status.classList.contains("skidt"));
+    paastand("og knappen lyser stille", PR.el.knap.classList.contains("peg"));
+    paastand("forkert klik viser atomnumrene på den side", PR.zVist.v);
+    PR.klikGruppe(1);
+    paastand("rigtigt klik giver grønt og næste skridt", PR.el.status.classList.contains("god") && /højre/.test(PR.beskedTekst()));
+    PR.svarEZ("Z");
+    paastand("et forkert E/Z-svar løser ikke opgaven", !PR.faerdig);
+    PR.svarEZ("E");
+    paastand("det rigtige svar løser den", PR.faerdig && PR.el.status.classList.contains("god"));
+
+    PR.vaelg(0);
+    PR.svarEZ("Z");
+    paastand("et rigtigt svar før vinderne er fundet godtages", PR.faerdig && PR.side.v === 0 && PR.side.h === 2);
+
+    PR.vaelg(8);
+    ["H", "H", "H", "H"].forEach(function (id, j) { PR.saet(j, id); });
+    paastand("fire H giver påskeægget om ethen", /ethen/.test(PR.beskedTekst()));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 1: dobbeltbindingen");
+    NK.visFane("fane-dr");
+    DR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    DR.vaelg(0);
+    paastand("butan starter med CH₃ på hver sin side", Math.abs(Math.cos(DR.theta) + 1) < 1e-9);
+    DR.theta = 0.2;
+    DR.opdater(1 / 60);
+    paastand("butan: CH₃ op på samme side løser opgaven", DR.faerdig);
+
+    DR.vaelg(1);
+    DR.hold = { type: "drej" };
+    DR.theta = 1.5;
+    DR.opdater(1 / 60);
+    paastand("but-2-en: dobbeltbindingen drejer højst 20°", Math.abs(DR.thetaVis) <= 20.01 * Math.PI / 180, DR.thetaVis);
+    paastand("og stregerne bliver røde", DR.spaending > 0.9);
+    DR.hold = null;
+    for (var n = 0; n < 200; n++) DR.opdater(1 / 60);
+    paastand("og den fjedrer tilbage", Math.abs(DR.theta) < 0.01);
+    DR.proevet = true;
+    DR.faerdigD2();
+    paastand("et hårdt forsøg løser opgaven", DR.faerdig);
+
+    DR.vaelg(2);
+    DR.svarTo("samme");
+    paastand("A og B er ikke det samme stof", !DR.faerdig && DR.el.status.classList.contains("skidt"));
+    DR.svarTo("to");
+    paastand("to forskellige stoffer løser opgaven og nævner kogepunkterne", DR.faerdig && /60 °C/.test(DR.beskedTekst()));
+
+    function sammenligning(o, vendt) {
+        var nu = DR.molekyle({ binding: 2, v: [o.v[1], o.v[0]], h: o.h, theta: 0, psi: vendt ? Math.PI : 0, byt: null });
+        var foer = DR.molekyle({ binding: 2, v: o.v, h: o.h, theta: 0, psi: 0, byt: null });
+        return nu.atomer.every(function (a) {
+            if (a.id === "C") return true;
+            return foer.atomer.some(function (s) { return s.id === a.id && Math.hypot(s.p[0] - a.p[0], s.p[1] - a.p[1], s.p[2] - a.p[2]) < 0.3; });
+        });
+    }
+    [3, 4, 5].forEach(function (i) {
+        var o = D.DREJ[i];
+        paastand(o.navn + ": byttet uden at vende passer ikke med omridset", !sammenligning(o, false));
+        paastand(o.navn + ": vendt passer det " + (o.svar === "samme" ? "" : "ikke ") + "med omridset", sammenligning(o, true) === (o.svar === "samme"));
+        DR.vaelg(i);
+        DR.svarByt(o.svar);
+        paastand(o.navn + ": svar før byttet godtages ikke", !DR.faerdig);
+        DR.startByt();
+        for (var k = 0; k < 120; k++) DR.opdater(1 / 60);
+        paastand(o.navn + ": grupperne har byttet plads", DR.byttet && DR.venstre[0] === o.v[1]);
+        DR.svarByt(o.svar === "samme" ? "nyt" : "samme");
+        paastand(o.navn + ": det forkerte svar giver en rød linje", !DR.faerdig && DR.el.status.classList.contains("skidt"));
+        DR.svarByt(o.svar);
+        paastand(o.navn + ": det rigtige svar løser den", DR.faerdig);
+    });
+    DR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var drSvar = true, drTre = true;
+    D.DREJ.forEach(function (o, i) {
+        DR.vaelg(i);
+        if (DR.hintTrin().length !== 3) drTre = false;
+        for (var n2 = 0; n2 < 6 && !DR.faerdig; n2++) DR.knap();
+        for (var k2 = 0; k2 < 600 && !DR.faerdig; k2++) DR.opdater(1 / 60);
+        if (!DR.faerdig || DR.status[i].stjerne) drSvar = false;
+    });
+    paastand("hinttrapperne på fane 1 har tre trin", drTre);
+    paastand("Vis svaret løser alle seks uden stjerne", drSvar);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 3: spillet");
+    NK.visFane("fane-sp");
+    var tilf = true;
+    ["E", "Z", "ingen"].forEach(function (t) {
+        for (var n3 = 0; n3 < 40; n3++) { if (EZ.analyser(EZ.tilfaeldigt(t, false)).type !== t) tilf = false; }
+    });
+    paastand("tilfældige molekyler har den ønskede slags", tilf);
+    var faelde = true;
+    for (var n4 = 0; n4 < 40; n4++) {
+        var p = EZ.tilfaeldigt(n4 % 2 ? "E" : "Z", true), r = EZ.analyser(p);
+        var f = (p[0] === p[2] && r.v !== 0) || (p[1] === p[3] && r.v !== 1) || (p[0] === p[3] && r.v !== 0) || (p[1] === p[2] && r.v !== 1);
+        if (!f) faelde = false;
+    }
+    paastand("fælderne har den samme gruppe på begge C-atomer uden at vinde begge steder", faelde);
+    SP.start();
+    var antalIngen = SP.molekyler.filter(function (m) { return EZ.analyser(m).type === "ingen"; }).length;
+    paastand("15 molekyler, heraf 3 uden E/Z-isomeri", SP.molekyler.length === 15 && antalIngen === 3);
+    for (var n5 = 0; n5 < 15; n5++) { SP.svar(SP.r.type); SP.naeste(); }
+    paastand("15 rigtige og lynhurtige giver 1500 point", SP.score === 1500 && SP.tilstand === "slut");
+    paastand("og Nobelpris-kandidat", SP.rang[1] === "Nobelpris-kandidat");
+    SP.start();
+    SP.tid += 5;
+    SP.svar(SP.r.type);
+    paastand("et svar efter 5 s giver 60 point", SP.score === 60);
+    SP.naeste();
+    SP.svar(SP.r.type === "E" ? "Z" : "E");
+    paastand("et forkert svar nulstiller stimen og venter på Næste", SP.stime === 0 && SP.tilstand === "svar" && SP.autoT <= 0);
+    paastand("og forklaringen står i en rød linje", SP.el.status.classList.contains("skidt"));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Sproget");
+    var tekster = [];
+    (function saml(x) {
+        if (typeof x === "string") tekster.push(x);
+        else if (Array.isArray(x)) x.forEach(saml);
+        else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
+    })(D);
+    D.PALET.forEach(function (a) { D.PALET.forEach(function (b) { tekster.push(EZ.hvorfor(a, b)); }); });
+    D.PRIO.forEach(function (o, i) { PR.vaelg(i); tekster.push(PR.promptHTML(), PR.trinLinje()); PR.hintTrin().forEach(function (t) { tekster.push(t); }); });
+    D.DREJ.forEach(function (o, i) { DR.vaelg(i); tekster.push(DR.promptHTML(), DR.trinLinje()); DR.hintTrin().forEach(function (t) { tekster.push(t); }); });
+    [a3, a4, a5, a6].forEach(function (r) { ["E", "Z", "ingen"].forEach(function (s) { tekster.push(EZ.fejl(r, s), EZ.dom(r)); }); });
+    tekster.push(d.body.innerText);
+    var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger", !tanke.length, tanke[0]);
+    var ascii = tekster.filter(function (t) { return ASCII_ORD.test(t); });
+    paastand("ingen ord stavet uden æ, ø og å", !ascii.length, ascii[0]);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Layoutet");
+    var ramme = document.getElementById("ramme");
+    [[1100, 700], [1300, 820], [1600, 950]].forEach(function (m) {
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        ["fane-dr", "fane-pr", "fane-sp"].forEach(function (f) {
+            NK.visFane(f);
+            var sim = NK.sims[f];
+            sim.tilpas();
+            sim.layout();
+            var valg = d.querySelector("#" + f + " .scene-valg");
+            var status = d.querySelector("#" + f + " .statuslinje");
+            var ok = true;
+            if (valg && !valg.hidden && valg.children.length) {
+                var rv = valg.getBoundingClientRect(), rs = status.getBoundingClientRect();
+                ok = rv.bottom <= rs.top + 1;
+            }
+            paastand(m[0] + " × " + m[1] + " " + f + ": knapperne står over statuslinjen", ok);
+            var panel = d.querySelector("#" + f + " .panel");
+            paastand(m[0] + " × " + m[1] + " " + f + ": panelet har plads uden at rulle", panel.scrollHeight <= panel.clientHeight + 2);
+        });
+    });
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+    var smaa = [];
+    d.querySelectorAll(".panel *, .statuslinje *, .scene-valg *").forEach(function (e) {
+        if (!e.offsetWidth) return;
+        var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+        if (egen && parseFloat(W.getComputedStyle(e).fontSize) < 11.5) smaa.push(e.textContent.trim().slice(0, 30));
+    });
+    paastand("ingen tekst under 12 px", !smaa.length, smaa.join(" | "));
+    NK.visFane("fane-dr");
+}
+</script>
+</body>
+</html>

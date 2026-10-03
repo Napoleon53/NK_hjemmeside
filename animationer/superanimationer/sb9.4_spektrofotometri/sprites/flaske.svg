@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="140" viewBox="0 0 50 140">
+  <!-- Sodavandsflaske. Animationen tegner vaesken BAG filen: kroppen er
+       x 8-42 fra y 52 til bunden y 134 (halsen er tom). Etiketten
+       (x 7-43, y 82-106) og navnet paa den tegnes ovenpaa. Bunden staar
+       paa y 138. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.35"/>
+      <stop offset="0.25" stop-color="#d4ebfa" stop-opacity="0.06"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.28"/>
+    </linearGradient>
+  </defs>
+  <!-- Kapslen -->
+  <rect x="17" y="2" width="16" height="9" rx="2" fill="#c9302c" stroke="#7d1a17" stroke-width="1.2"/>
+  <!-- Glasset -->
+  <path d="M19 11 L31 11 L31 30 Q42 40 42 54 L42 132 Q42 138 36 138 L14 138 Q8 138 8 132 L8 54 Q8 40 19 30 Z"
+        fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Genskin -->
+  <rect x="12" y="58" width="3" height="70" rx="1.5" fill="#ffffff" fill-opacity="0.25"/>
+</svg>

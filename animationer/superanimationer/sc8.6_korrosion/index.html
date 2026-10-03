@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korrosion</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">Fe</span> Korrosion</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-r" role="tab" aria-selected="true"><span class="nr">1</span>Rørene</button>
+        <button class="faneknap" data-fane="fane-s" role="tab" aria-selected="false"><span class="nr">2</span>Skibet</button>
+        <button class="faneknap" data-fane="fane-j" role="tab" aria-selected="false"><span class="nr">3</span>Rusten</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: RØRENE                                                     -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-r" role="tabpanel" aria-label="Rørene">
+    <div class="scene">
+        <canvas id="r-laerred"></canvas>
+        <!-- Tiden og plastmuffen (js/sim_roer.js) -->
+        <div class="vaerktoej" id="r-vaerktoej">
+            <div class="aar"><span class="aar-etiket">År</span><b id="r-aartal">0</b><span class="aar-af">af 20</span><i class="aar-bjaelke"><i id="r-aarfyld"></i></i></div>
+            <button class="tidknap" id="r-tid" type="button" title="Lad 20 år gå (Enter)">Lad tiden gå ▶</button>
+            <button class="kontakt" id="r-plast" type="button" aria-pressed="false" hidden>Plastmuffe</button>
+        </div>
+        <!-- Metallet til hvert rør -->
+        <div class="metalvalg" id="r-valg-v">
+            <span class="mv-etiket">Venstre rør</span>
+            <button type="button" data-metal="Cu">Kobber</button>
+            <button type="button" data-metal="Fe">Jern</button>
+            <button type="button" data-metal="Zn">Zink</button>
+        </div>
+        <div class="metalvalg" id="r-valg-h">
+            <span class="mv-etiket">Højre rør</span>
+            <button type="button" data-metal="Cu">Kobber</button>
+            <button type="button" data-metal="Fe">Jern</button>
+            <button type="button" data-metal="Zn">Zink</button>
+        </div>
+        <div class="anker" id="r-anker-lup"></div>
+        <div class="anker" id="r-anker-roer"></div>
+
+        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, og den ene knap -->
+        <div class="statuslinje" id="r-status">
+            <p class="st-tekst" id="r-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="r-forfra" type="button" title="Nye rør af samme metal (R)">Nye rør ↺</button>
+            <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="r-kort">
+            <h2><span id="r-titel">Opgave</span><span class="taeller">mål <b id="r-nr">1</b>/<span id="r-antal">5</span></span></h2>
+            <div id="r-prompt"></div>
+        </div>
+
+        <div class="kort maaling" id="r-raekkekort" hidden>
+            <h2>Spændingsrækken</h2>
+            <div id="r-raekke"></div>
+        </div>
+
+        <div class="kort" id="r-proevetkort" hidden>
+            <h2>Rør, der er prøvet</h2>
+            <div id="r-proevet"></div>
+        </div>
+
+        <div class="kort" id="r-opgaver">
+            <h2>Målene <span class="taeller">løst <b id="r-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="r-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SKIBET                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-s" role="tabpanel" aria-label="Skibet">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <div class="vaerktoej" id="s-vaerktoej">
+            <div class="aar kort-aar"><span class="aar-etiket">År</span><b id="s-aartal">0</b></div>
+            <button class="tidknap" id="s-tid" type="button" title="Sejl et år (Enter)">Sejl 1 år ▶</button>
+        </div>
+        <div class="anker" id="s-anker-kaj"></div>
+        <div class="anker" id="s-anker-pladser"></div>
+        <div class="anker" id="s-anker-propel"></div>
+
+        <div class="statuslinje" id="s-status">
+            <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="s-forfra" type="button" title="Nyt skrog uden klodser, år 0 (R)">På værft ↺</button>
+            <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="s-kort">
+            <h2><span id="s-titel">Opgave</span><span class="taeller">mål <b id="s-nr">1</b>/<span id="s-antal">5</span></span></h2>
+            <div id="s-prompt"></div>
+        </div>
+
+        <div class="kort maaling" id="s-skibkort">
+            <h2>Skibet</h2>
+            <div id="s-skib"></div>
+        </div>
+
+        <div class="kort maaling" id="s-raekkekort" hidden>
+            <h2>Spændingsrækken</h2>
+            <div id="s-raekke"></div>
+        </div>
+
+        <div class="kort" id="s-opgaver">
+            <h2>Målene <span class="taeller">løst <b id="s-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="s-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: RUSTEN                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-j" role="tabpanel" aria-label="Rusten">
+    <div class="scene">
+        <canvas id="j-laerred"></canvas>
+        <!-- Vand, ilt og salt (js/sim_rust.js) -->
+        <div class="kontakter" id="j-kontakter">
+            <button class="kontakt til" id="j-vand" type="button" aria-pressed="true">Vand</button>
+            <button class="kontakt til" id="j-ilt" type="button" aria-pressed="true">Ilt</button>
+            <button class="kontakt" id="j-salt" type="button" aria-pressed="false" hidden>Salt</button>
+        </div>
+        <!-- Tavlen med skemaet, eleven afstemmer -->
+        <div class="skematavle" id="j-tavle" hidden></div>
+        <div class="anker" id="j-anker-draabe"></div>
+        <div class="anker" id="j-anker-plade"></div>
+
+        <div class="statuslinje" id="j-status">
+            <p class="st-tekst" id="j-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="j-forfra" type="button" title="Ny jernplade (R)">Ny plade ↺</button>
+            <button class="knap hjaelp" id="j-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="j-kort">
+            <h2><span id="j-titel">Opgave</span><span class="taeller">mål <b id="j-nr">1</b>/<span id="j-antal">6</span></span></h2>
+            <div id="j-prompt"></div>
+        </div>
+
+        <div class="kort maaling" id="j-forsoegkort">
+            <h2>Vand og ilt</h2>
+            <div id="j-forsoeg"></div>
+        </div>
+
+        <div class="kort maaling" id="j-skemakort" hidden>
+            <h2>Reaktionsskemaerne</h2>
+            <div class="regn-linjer" id="j-skemaer"></div>
+        </div>
+
+        <div class="kort" id="j-opgaver">
+            <h2>Målene <span class="taeller">løst <b id="j-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="j-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Korrosion</h2>
+        <p>Når et metal korroderer, afgiver metalatomerne elektroner og bliver til ioner. Det er en oxidation. Noget andet skal optage elektronerne. I vand og luft er det ilt.</p>
+        <h3 class="teori-hoved">To metaller, der rører hinanden</h3>
+        <p>Rører to forskellige metaller hinanden i vand, går elektronerne fra det mindst ædle til det mest ædle. Det mindst ædle tæres hurtigere, og det mest ædle er beskyttet. Jo længere de to står fra hinanden i spændingsrækken, jo hurtigere går det.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Spændingsrækken, uædel til ædel</span>
+            K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au
+        </div>
+        <h3 class="teori-hoved">Offeranoder</h3>
+        <p>En klods af zink på et skrog af jern afgiver elektronerne i stedet for jernet. Klodsen tæres, og skroget er beskyttet, så længe der er zink tilbage. Galvaniseret jern har et lag af zink af samme grund, og en varmtvandsbeholder har en stav af magnesium.</p>
+        <h3 class="teori-hoved">Sådan ruster jern</h3>
+        <p>Jern afgiver elektroner og bliver til Fe²⁺. Ilt og vand optager elektronerne og bliver til OH⁻. Fe²⁺ og OH⁻ bliver til Fe(OH)₂, som ilt oxiderer videre til rust, FeO(OH). De enkelte skemaer afstemmer du på fane 3.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Alt i ét skema</span>
+            4 Fe + 3 O₂ + 2 H₂O → 4 FeO(OH)
+        </div>
+        <p>Elektronerne går gennem jernet, og ionerne går gennem vandet. Derfor ruster tørt jern ikke. Salt i vandet giver flere ioner, så ladningerne udlignes hurtigere, og jernet ruster hurtigere.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> lad tiden gå, sejl et år eller tjek &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/mikro.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_roer.js"></script>
+<script src="js/sim_skib.js"></script>
+<script src="js/sim_rust.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

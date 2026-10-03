@@ -205,10 +205,50 @@
     /* ----- Metalstangen ------------------------------------------------------------------
        s: { x (midten), top, b (bredde), l (laengde), metal,
             belaeg: { metal, x (0-1), fra (y, hvor vaesken begynder), frø },
+            taeret: { x (0-1), fra (y, hvor vaesken begyndte) },
             lys (0-1), klemme (y for glassets kant), etiket (true: skilt oeverst) } */
+
+    /* I syre gaar metallet i oploesning, uden at noget saetter sig paa
+       stangen. Saa bliver den del, der staar i vaesken, tyndere: op til
+       saa stor en del af bredden kan forsvinde. */
+    T.TAERET_MAKS = 0.6;
+
+    /* Hvor langt kanten er rykket ind i hver side, naar broekdelen x er taeret vaek */
+    T.taeretInd = function (b, x) {
+        return b * 0.5 * T.TAERET_MAKS * NK.klamp(x, 0, 1);
+    };
+
+    /* Stangens omrids, naar den er taeret under y = fra: hel foroven,
+       en kort overgang lige under overfladen og en ujaevn, tyndere del
+       nedenunder, der ogsaa er blevet lidt kortere. */
+    function taeretSti(ctx, s, x0, bund) {
+        var t = s.taeret, x = NK.klamp(t.x, 0, 1);
+        var fra = NK.klamp(t.fra, s.top + 3, bund - 6);
+        var ind = T.taeretInd(s.b, x);
+        var overgang = Math.min(7, (bund - fra) * 0.2);
+        var slut = bund - (bund - fra) * 0.08 * x;
+        var r = T.frø(s.metal + "syre");
+        var n = Math.max(3, Math.round((slut - fra - overgang) / 6));
+        var hoejre = [], venstre = [], i;
+        for (i = 0; i <= n; i++) {
+            var y = fra + overgang + (slut - fra - overgang) * i / n;
+            hoejre.push({ x: x0 + s.b - ind * (0.88 + 0.24 * r()), y: y });
+            venstre.push({ x: x0 + ind * (0.88 + 0.24 * r()), y: y });
+        }
+        ctx.beginPath();
+        ctx.moveTo(x0, s.top);
+        ctx.lineTo(x0 + s.b, s.top);
+        ctx.lineTo(x0 + s.b, fra);
+        for (i = 0; i <= n; i++) ctx.lineTo(hoejre[i].x, hoejre[i].y);
+        for (i = n; i >= 0; i--) ctx.lineTo(venstre[i].x, venstre[i].y);
+        ctx.lineTo(x0, fra);
+        ctx.closePath();
+    }
+
     T.stang = function (ctx, s) {
         var c = T.METAL[s.metal] || T.METAL.Fe;
         var x0 = s.x - s.b / 2, bund = s.top + s.l;
+        var taeret = s.taeret && s.taeret.x > 0.002;
         ctx.save();
         if (s.lys) {
             ctx.strokeStyle = "rgba(242, 197, 61, " + (0.4 + 0.55 * s.lys) + ")";
@@ -222,7 +262,12 @@
         g.addColorStop(0.55, c[1]);
         g.addColorStop(1, c[2]);
         ctx.fillStyle = g;
-        NK.rundtRekt(ctx, x0, s.top, s.b, s.l, 2.5);
+        if (taeret) {
+            ctx.lineJoin = "round";
+            taeretSti(ctx, s, x0, bund);
+        } else {
+            NK.rundtRekt(ctx, x0, s.top, s.b, s.l, 2.5);
+        }
         ctx.fill();
         ctx.strokeStyle = "rgba(0, 0, 0, 0.45)";
         ctx.lineWidth = 1;

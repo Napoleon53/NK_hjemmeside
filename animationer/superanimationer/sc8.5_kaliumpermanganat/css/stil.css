@@ -937,14 +937,19 @@ kbd {
 
 .haefte.faerdig { box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(63, 174, 114, 0.85); }
 
+/* Linjen øverst i hæftet: det næste skridt, helt kort (kortLinje i js/sim.js) */
 .hf-navn {
     position: absolute;
-    top: 6px;
+    top: 5px;
     left: calc(var(--margen) + 12px);
-    font-size: 0.9rem;
+    right: 10px;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--blyant);
     letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .hf-maal {
@@ -1219,6 +1224,44 @@ kbd {
 .hf-vaerdi .vent { color: #9a6a00; }
 .hf-rad.ilt .hf-vaerdi { color: #1f8a4c; }
 
+/* Knappen på papiret (brugerens ønske 3. okt. 2026): Giv hint og Vis svaret
+   i papirets nederste højre hjørne, Næste opgave midt i hæftet (klassen midt
+   og stedet sættes af placerKnap i js/haefte.js) */
+.hf-knap {
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+    z-index: 4;
+    justify-content: center;
+    padding: 8px 18px;
+    border: 2px solid #c79a12;
+    border-radius: 999px;
+    background-color: #ffdf6b;
+    color: #33290a;
+    font-size: 0.98rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
+    /* Ingen overgang paa transform: knappen skal staa paa sin plads med det samme */
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.hf-knap:hover:not(:disabled) { background-color: #ffd23e; border-color: #a67f08; }
+.hf-knap.svar { background-color: #fff6d6; color: #6a4a00; }
+.hf-knap.svar:hover:not(:disabled) { background-color: #ffeeb0; border-color: #a67f08; }
+
+.hf-knap.naeste {
+    padding: 12px 28px;
+    border-color: var(--blaa);
+    background-color: var(--blaa-mork);
+    color: #ffffff;
+    font-size: 1.12rem;
+}
+
+.hf-knap.naeste:hover:not(:disabled) { background-color: var(--blaa); border-color: var(--blaa); }
+.hf-knap.midt { right: auto; bottom: auto; transform: translate(-50%, -50%); }
+.hf-knap.midt:active:not(:disabled) { transform: translate(-50%, -50%) scale(0.985); }
+
 /* Tallene, der flyver op foran formlerne */
 .hf-flyver {
     position: absolute;
@@ -1263,7 +1306,7 @@ kbd {
 
 .fk-raekke {
     display: grid;
-    grid-template-columns: 22px 66px 1fr auto;
+    grid-template-columns: 22px 62px 1fr auto;
     align-items: center;
     gap: 8px;
     padding: 4px 6px;
@@ -1281,7 +1324,10 @@ kbd {
 }
 
 .fk-formel { font-size: 1rem; font-weight: 800; }
-.fk-tekst { color: var(--tekst-svag); }
+/* Navnet og farven med ord; i et smalt panel står farven under navnet */
+.fk-tekst { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; min-width: 0; color: var(--tekst-svag); }
+.fk-navn { font-weight: 600; color: var(--tekst); }
+.fk-ord { font-size: 0.82rem; }
 .fk-ox { min-width: 36px; text-align: right; font-weight: 800; color: var(--gul); }
 
 

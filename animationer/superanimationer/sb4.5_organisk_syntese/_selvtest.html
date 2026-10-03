@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb4.5 Organisk syntese</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at molekylemotoren giver stofferne deres navne,
+   at reglerne giver den rigtige ester, syre eller keton for alle par (og
+   at esteren er syre + alkohol − vand, atom for atom), at der skal
+   svovlsyre og varme til, at de forkerte par ikke reagerer, at alle ti
+   ordrer kan løses med hinttrappen og Vis svaret, at Fabrikkens penge
+   passer gennem de fem første ordrer, at tavlen kan bygges for alle
+   reaktioner i fire skærmstørrelser, at et stof kan trækkes op i
+   kolben, at sproget holder reglerne, og at skriften ikke er for lille.
+
+   iframen skal åbnes gennem en lokal server (rod: animationer/, fordi
+   molekylemotoren ligger i ../../molekylemotor/). Testen gemmer elevens
+   fremskridt og fabrikken og lægger dem tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb4.5-rk", "nk-sb4.5-fabrik"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|traek\w*|aendr\w*|toem\w*|koeb\w*|soelv|loes\w*|aabn\w*|haeld\w*|kroner)\b/;
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Antal atomer af hvert slags, ogsaa de H, der ikke er tegnet */
+function atomer(mol) {
+    var t = {};
+    mol.atomer.forEach(function (a) {
+        t[a.el] = (t[a.el] || 0) + 1;
+        var h = mol.implicitH(a.id);
+        if (h) t.H = (t.H || 0) + h;
+    });
+    return t;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kemi;
+    var S1 = NK.sims["fane-rk"], S2 = NK.sims["fane-fb"];
+    var BET = { hplus: true, varme: true };
+    var tekster = [];
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Stofferne");
+    var navnFejl = [], klasseFejl = [];
+    D.STOFFER.forEach(function (x) {
+        var s = K.stof(x.id);
+        if (x.smiles && s.res.navn !== (x.motornavn || x.navn)) navnFejl.push(x.id + " → " + s.res.navn);
+        var vent = x.ox ? "ox" : (/syre$/.test(x.navn) ? "syre" : (/ol$/.test(x.navn) ? "alkohol" : null));
+        if (vent && s.klasse !== vent) klasseFejl.push(x.id + " " + s.klasse);
+    });
+    paastand("motoren giver alle " + D.STOFFER.length + " stoffer deres navn", navnFejl.length === 0, navnFejl.join(", "));
+    paastand("alkoholer, syrer og oxidationsmiddel har den rigtige klasse", klasseFejl.length === 0, klasseFejl.join(", "));
+    var hylde = D.STOFFER.filter(function (x) { return x.hylde; });
+    paastand("hylden har 7 alkoholer, 3 syrer og kaliumpermanganat", hylde.length === 11 &&
+        hylde.filter(function (x) { return /ol$/.test(x.navn); }).length === 7, hylde.length);
+    paastand("alle stoffer på hylden har en pris", hylde.every(function (x) { return x.pris > 0; }));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("2. Esterne");
+    var syrer = D.STOFFER.filter(function (x) { return x.smiles && /syre$/.test(x.navn); }).map(function (x) { return K.stof(x.id); });
+    var alks = D.STOFFER.filter(function (x) { return /ol$/.test(x.navn); }).map(function (x) { return K.stof(x.id); });
+    var eFejl = [], vandFejl = [], navnE = [], antalE = 0;
+    syrer.forEach(function (s) {
+        alks.forEach(function (a) {
+            var u = K.reaktion(s.id, a.id, BET), v = K.reaktion(a.id, s.id, BET);
+            antalE++;
+            if (u.slags !== "ester" || !u.produkt || !u.mulig || u.mangler.length) { eFejl.push(s.id + "+" + a.id + " " + u.slags); return; }
+            if (v.produkt !== u.produkt) eFejl.push(a.id + "+" + s.id + " rækkefølgen");
+            tekster.push(u.tekst);
+            if (!/ester/.test(u.produkt.res.stofklasse)) eFejl.push(u.produkt.navn + " er " + u.produkt.res.stofklasse);
+            /* esteren = syre + alkohol − H₂O */
+            var ts = atomer(s.mol), ta = atomer(a.mol), te = atomer(u.produkt.mol);
+            ["C", "H", "O"].forEach(function (el) {
+                var vent = (ts[el] || 0) + (ta[el] || 0) - (el === "H" ? 2 : (el === "O" ? 1 : 0));
+                if ((te[el] || 0) !== vent) vandFejl.push(u.produkt.navn + " " + el);
+            });
+            navnE.push(u.produkt.navn);
+        });
+    });
+    paastand("alle " + antalE + " par af syre og alkohol giver en ester", eFejl.length === 0, eFejl.slice(0, 4).join(", "));
+    paastand("hver ester er syre + alkohol minus ét H₂O, atom for atom", vandFejl.length === 0, vandFejl.slice(0, 4).join(", "));
+    var ekst = function (a, b) { var u = K.reaktion(a, b, BET); return u.produkt ? u.produkt.navn : u.slags; };
+    paastand("ethansyre + ethanol giver ethylethanoat", ekst("ethansyre", "ethanol") === "ethylethanoat");
+    paastand("ethansyre + pentan-1-ol giver pentylethanoat", ekst("pentan1ol", "ethansyre") === "pentylethanoat");
+    paastand("butansyre + ethanol giver ethylbutanoat", ekst("butansyre", "ethanol") === "ethylbutanoat");
+    paastand("methansyre + ethanol giver ethylmethanoat", ekst("methansyre", "ethanol") === "ethylmethanoat");
+    paastand("salicylsyre + methanol giver methyl-2-hydroxybenzoat (COOH reagerer)", ekst("salicylsyre", "methanol") === "methyl-2-hydroxybenzoat");
+    paastand("ethansyre + salicylsyre giver acetylsalicylsyre (ringens OH reagerer)", ekst("salicylsyre", "ethansyre") === "2-(acetyloxy)benzoesyre");
+    paastand("salicylsyre reagerer ikke med sig selv", K.reaktion("salicylsyre", "salicylsyre", BET).slags === "ingen");
+    var u0 = K.reaktion("ethansyre", "ethanol", {}), uh = K.reaktion("ethansyre", "ethanol", { varme: true }), uv = K.reaktion("ethansyre", "ethanol", { hplus: true });
+    paastand("uden svovlsyre og varme sker der intet (blandingen bliver)", u0.mulig && u0.mangler.join() === "hplus,varme");
+    paastand("uden svovlsyre mangler H⁺, uden varme mangler varme", uh.mangler.join() === "hplus" && uv.mangler.join() === "varme");
+    tekster.push(u0.tekst, uh.tekst, uv.tekst);
+    var dele = K.navneDele(K.stofEfterNavn("pentylethanoat"), K.stof("ethansyre"));
+    paastand("navnet deles i alkoholens og syrens del: pentyl | ethanoat", dele[0].t === "pentyl" && dele[1].t === "ethanoat");
+    var dele2 = K.navneDele(K.stofEfterNavn("methyl-2-hydroxybenzoat"), K.stof("salicylsyre"));
+    paastand("og methyl- | 2-hydroxybenzoat (benzoesyre bliver benzoat)", dele2.length === 2 && dele2[1].t === "2-hydroxybenzoat");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Oxidationen og de forkerte par");
+    var oFejl = [];
+    alks.forEach(function (a) {
+        var u = K.reaktion(a.id, "permanganat", { varme: true });
+        tekster.push(u.tekst);
+        if (u.slags !== "oxidation" || !u.produkt) { oFejl.push(a.id + " " + u.slags); return; }
+        var c1 = atomer(a.mol).C, c2 = atomer(u.produkt.mol).C;
+        if (c1 !== c2) oFejl.push(a.id + " antal C");
+        if (a.id === "propan2ol") { if (u.produkt.navn !== "propanon" || !u.keton) oFejl.push("propan-2-ol → " + u.produkt.navn); }
+        else {
+            if (u.produkt.klasse !== "syre") oFejl.push(a.id + " → " + u.produkt.navn);
+            if (!/al$/.test(u.mellem)) oFejl.push(a.id + " mellem " + u.mellem);
+        }
+    });
+    paastand("primære alkoholer bliver til en syre med lige så mange C via aldehydet", oFejl.length === 0, oFejl.join(", "));
+    paastand("butan-1-ol bliver til butanal og butansyre", K.reaktion("butan1ol", "permanganat", { varme: true }).mellem === "butanal" &&
+        K.reaktion("butan1ol", "permanganat", { varme: true }).produkt.id === "butansyre");
+    paastand("propan-2-ol bliver til propanon og ikke til en syre", K.reaktion("permanganat", "propan2ol", { varme: true }).produkt.id === "propanon");
+    paastand("oxidationen skal have varme, men ikke svovlsyre", K.reaktion("ethanol", "permanganat", {}).mangler.join() === "varme" &&
+        K.reaktion("ethanol", "permanganat", { varme: true }).mangler.length === 0);
+    var forkert = [["ethansyre", "permanganat"], ["propanon", "permanganat"], ["permanganat", "permanganat"],
+        ["ethansyre", "methansyre"], ["methanol", "propan1ol"], ["ethanol", "ethanol", {}], ["propanon", "ethanol"]];
+    var fF = [];
+    forkert.forEach(function (p) {
+        var u = K.reaktion(p[0], p[1], p[2] || BET);
+        tekster.push(u.tekst);
+        if (u.slags !== "ingen" || u.mulig) fF.push(p.join("+") + " " + u.slags);
+    });
+    paastand("syre + permanganat, keton + permanganat, to syrer og to alkoholer giver ingen reaktion", fF.length === 0, fF.join(", "));
+    paastand("påskeæg: ethanol + ethanol med H⁺ og varme giver diethylether", K.reaktion("ethanol", "ethanol", BET).slags === "ether");
+    paastand("påskeæg: methansyre + permanganat bliver til CO₂ og vand", K.reaktion("methansyre", "permanganat", { varme: true }).slags === "co2");
+    tekster.push(K.reaktion("ethanol", "ethanol", BET).tekst, K.reaktion("methansyre", "permanganat", { varme: true }).tekst);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Duftene og ruterne");
+    var rFejl = [];
+    Object.keys(D.DUFTE).forEach(function (n) { if (!K.rute(n) && ["methansyre", "ethansyre", "diethylether"].indexOf(n) < 0) rFejl.push(n); });
+    paastand("alle stoffer med duft kan laves", rFejl.length === 0, rFejl.join(", "));
+    var oF = [];
+    D.ORDRER.forEach(function (o) {
+        var r = K.rute(o.maal);
+        if (!r) { oF.push(o.id + " ingen rute"); return; }
+        var raa = r.type === "ox" || r.syre.hylde;
+        if (o.gruppe === "let" && !raa) oF.push(o.id + " er ikke let");
+        if (o.gruppe === "middel" && r.type === "ester" && r.syre.hylde) oF.push(o.id + " er let");
+        if (!D.BRUG[o.maal]) oF.push(o.id + " mangler brug");
+    });
+    paastand("ordrerne passer til grupperne Let, Middel og Svær", oF.length === 0, oF.join(", "));
+    var fK = [];
+    D.FABRIK.faste.concat(D.FABRIK.tilfaeldige).forEach(function (o) {
+        var s = K.stofEfterNavn(o.maal);
+        if (!K.rute(o.maal)) fK.push(o.maal + " rute");
+        if (!s || !s.vaerdi) fK.push(o.maal + " pris");
+        if (!D.KUNDER[o.kunde]) fK.push(o.kunde);
+        if (!D.BRUG[o.maal]) fK.push(o.maal + " brug");
+    });
+    paastand("Fabrikkens ordrer kan laves og har kunde, pris og brug", fK.length === 0, fK.slice(0, 4).join(", "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Reaktoren: alle ti ordrer");
+    NK.visFane("fane-rk");
+    var R1 = S1.R;
+    S1.nulstil();
+    var trinF = [], loestF = [];
+    D.ORDRER.forEach(function (o, i) {
+        S1.vaelg(i);
+        var h = S1.hintNu();
+        if (h.trin.length !== 3) trinF.push(o.id);
+        h.trin.forEach(function (t) { tekster.push(t); });
+        for (var n = 0; n < 3 && !S1.faerdig; n++) {
+            S1.knap(); S1.knap(); S1.knap(); S1.knap();
+            tekster.push(S1.beskedTekst());
+            R1.start();
+            R1.spring();
+            tekster.push(S1.beskedTekst());
+            S1.nulstilHjaelp();
+        }
+        if (!S1.faerdig) loestF.push(o.id + ": " + S1.beskedTekst().slice(0, 60));
+    });
+    paastand("hvert hint er en trappe på tre trin", trinF.length === 0, trinF.join(", "));
+    paastand("alle ti ordrer kan løses med Vis svaret og Start", loestF.length === 0, loestF.slice(0, 2).join(" | "));
+    paastand("med svaret vist giver de ingen stjerne", S1.status.every(function (s) { return s.loest && !s.stjerne; }));
+    paastand("knappen går videre til Fabrikken efter sidste ordre", S1.knapVidere() === "Videre til Fabrikken →");
+
+    /* Første ordre som en elev: klik på kortene, og linjen siger næste skridt */
+    S1.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    S1.nulstil();
+    S1.vaelg(0);
+    var linje0 = S1.beskedTekst();
+    d.querySelector("#rk-hylde [data-id=ethanol] .sk-brug").click();
+    var linje1 = S1.beskedTekst();
+    d.querySelector("#rk-hylde [data-id=ethansyre] .sk-brug").click();
+    var linje2 = S1.beskedTekst();
+    paastand("første ordre: linjen siger næste skridt efter hvert klik", /hylden/.test(linje0) && /et stof mere/.test(linje1) && /svovlsyre og varme/.test(linje2),
+        linje0 + " | " + linje1 + " | " + linje2);
+    d.getElementById("rk-start").click(); R1.spring();
+    paastand("Start uden svovlsyre og varme: Ikke endnu, og blandingen bliver i kolben", /Ikke endnu/.test(S1.beskedTekst()) && R1.iKolben && !S1.faerdig);
+    paastand("knappen lyser stille efter fejlen", d.getElementById("rk-knap").classList.contains("peg"));
+    d.getElementById("rk-hplus").click(); d.getElementById("rk-varme").click();
+    d.getElementById("rk-start").click(); R1.spring();
+    paastand("med svovlsyre og varme bliver ordren leveret med stjerne", S1.faerdig && S1.status[0].stjerne && /Leveret/.test(S1.beskedTekst()));
+    paastand("esteren står under Lavet på hylden", !!d.querySelector("#rk-hylde .g-lavet [data-id='p:ethylethanoat']"));
+    /* Et forkert par hældes ud */
+    R1.laeg("ethansyre", 0); R1.laeg("methansyre", 1); R1.start(); R1.spring();
+    paastand("to syrer bliver hældt ud, og kolben er tom igen", !R1.iKolben && R1.plads[0] === null && /To syrer/.test(S1.beskedTekst()));
+
+    /* Træk et kort op i en plads med musen (PointerEvents) */
+    S1.nulstil();
+    var kort = d.querySelector("#rk-hylde [data-id=butan1ol] .sk-brug"), pl = d.getElementById("rk-plads1");
+    var a = kort.getBoundingClientRect(), b = pl.getBoundingClientRect();
+    function pe(type, el, x, y) { el.dispatchEvent(new W.PointerEvent(type, { bubbles: true, clientX: x, clientY: y, button: 0, pointerId: 1 })); }
+    pe("pointerdown", kort, a.left + 10, a.top + 10);
+    pe("pointermove", d, a.left + 40, a.top + 40);
+    pe("pointermove", d, b.left + 20, b.top + 20);
+    pe("pointerup", d, b.left + 20, b.top + 20);
+    paastand("et stof kan trækkes op i plads 2", R1.plads[1] === "butan1ol" && R1.plads[0] === null, JSON.stringify(R1.plads));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Fabrikken");
+    NK.visFane("fane-fb");
+    var R2 = S2.R;
+    S2.bekraeft = 1; S2.nulstil();
+    paastand("fabrikken starter med 300 kr. og tre ordrer", S2.penge === 300 && S2.ordrer.length === 3);
+    paastand("de tre første ordrer er de gamle missioner", S2.ordrer.map(function (o) { return o.maal; }).join() === "ethylethanoat,propylethanoat,pentylethanoat");
+    S2.mangler("butansyre", D.FABRIK.udsolgt[0].grund);
+    paastand("butansyre er udsolgt og siger hvorfor", /fører ikke butansyre/.test(S2.beskedTekst()));
+    S2.boers = { maal: "intet", pct: 0, t: 0 };
+    var foer = S2.penge, betalt = 0, brugt = 0, lev = 0;
+    var raekke = D.FABRIK.faste.map(function (f) { return f.maal; });
+    raekke.forEach(function (maal) {
+        var i = S2.ordrer.map(function (o) { return o.maal; }).indexOf(maal);
+        if (i < 0) return;
+        S2.vaelgOrdre(i);
+        for (var n = 0; n < 3; n++) {
+            if (S2.ordrer.map(function (o) { return o.maal; }).indexOf(maal) < 0 && n) break;
+            var h = S2.hintNu();
+            if (!h.svar) break;
+            h.svar.forEach(function (id) {
+                if (S2.antal(id) - R2.reserveret(id) > 0) return;
+                var s = K.stof(id);
+                if (s.hylde) { brugt += s.pris; S2.koebStof(id); }
+            });
+            R2.laeg(h.svar[0], 0); R2.laeg(h.svar[1], 1); R2.saetBet(h.hplus, h.varme);
+            var p0 = S2.penge;
+            R2.start(); R2.spring();
+            if (S2.penge > p0) { betalt += S2.penge - p0; lev++; break; }
+        }
+        tekster.push(S2.beskedTekst());
+    });
+    paastand("de fem første ordrer kan leveres", lev === 5, lev);
+    paastand("pengene passer: start − køb + betaling", S2.penge === foer - brugt + betalt, S2.penge + " ≠ " + (foer - brugt + betalt));
+    paastand("de fem ordrer betaler 2080 kr. uden børs", betalt === 180 + 250 + 400 + 450 + 800, betalt);
+    paastand("titlen stiger med pengene", S2.titelNr >= 1, S2.titelNr);
+    /* Børsen */
+    var o0 = S2.ordrer[0];
+    S2.boers = { maal: o0.maal, pct: 50, t: 0 };
+    paastand("børsen giver 50 % mere på sin duft", S2.pris(o0) === Math.round(K.stofEfterNavn(o0.maal).vaerdi * 1.5 / 10) * 10);
+    /* Tom kasse: banken låner */
+    S2.penge = 5; S2.lager = {}; S2.tjekLaan();
+    paastand("med tom kasse og tomt lager låner banken 200 kr.", S2.penge === 205);
+    /* Forfra kræver to tryk */
+    S2.bekraeft = 0; S2.penge = 999;
+    S2.nulstil();
+    var efterEt = S2.penge;
+    S2.nulstil();
+    paastand("Forfra kræver to tryk", efterEt === 999 && S2.penge === 300);
+    S2.bekraeft = 0;
+    d.getElementById("fb-forfra").textContent = "Forfra ↺";
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. Tavlen");
+    var ramme = document.getElementById("ramme");
+    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
+    var par = [["ethansyre", "ethanol", BET], ["pentansyre", "pentan1ol", BET], ["salicylsyre", "methanol", BET], ["ethansyre", "salicylsyre", BET],
+        ["octan1ol", "permanganat", { varme: true }], ["propan2ol", "permanganat", { varme: true }], ["methanol", "permanganat", { varme: true }],
+        ["ethansyre", "ethanol", {}], ["ethanol", "ethanol", BET], ["methansyre", "permanganat", { varme: true }], ["methansyre", "ethansyre", BET]];
+    var tF = [], skalaMin = {};
+    NK.visFane("fane-rk");
+    maal.forEach(function (m) {
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        R1.tilpas();
+        var T = R1.tavle;
+        par.forEach(function (p) {
+            var u = K.reaktion(p[0], p[1], p[2]);
+            T.vis({ type: "udfald", udfald: u });
+            T.tilpas();
+            T.spring();
+            if (!T.plan) { tF.push(m.join("×") + " " + p.join("+") + " ingen plan"); return; }
+            T.tegn();
+            var last = T.plan.billeder[T.plan.billeder.length - 1].pos;
+            Object.keys(last).forEach(function (k) {
+                var q = last[k];
+                if (q.a > 0.05 && (q.x < 4 || q.x > T.L.b - 4 || q.y < 4 || q.y > T.L.h - 4)) tF.push(m.join("×") + " " + p.join("+") + " uden for");
+            });
+            if (T.plan.s) skalaMin[m[0]] = Math.min(skalaMin[m[0]] || 99, T.plan.s);
+        });
+    });
+    paastand("tavlen kan bygges for alle slags reaktioner fra 1100 × 700 til 1600 × 950", tF.length === 0, tF.slice(0, 3).join(", "));
+    paastand("bindingerne er mindst 19 px lange ved 1100 × 700 og 24 px fra 1300 × 820", skalaMin[1100] >= 19 &&
+        skalaMin[1300] >= 24 && skalaMin[1500] >= 24 && skalaMin[1600] >= 24, JSON.stringify(skalaMin).replace(/(\.\d)\d+/g, "$1"));
+    /* Layoutet: intet stikker ud */
+    var lF = [];
+    maal.forEach(function (m) {
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        ["fane-rk", "fane-fb"].forEach(function (f) {
+            NK.visFane(f);
+            var sc = d.querySelector("#" + f + " .scene"), p = d.querySelector("#" + f + " .panel");
+            if (p.scrollWidth > p.clientWidth + 1) lF.push(m.join("×") + " " + f + " panelet er for bredt");
+            var st = d.querySelector("#" + f + " .statuslinje").getBoundingClientRect(), r = sc.getBoundingClientRect();
+            if (st.bottom > r.bottom + 1) lF.push(m.join("×") + " " + f + " statuslinjen er skåret af");
+            var kb = d.querySelector("#" + f + " .kolbe").getBoundingClientRect();
+            if (kb.height < 140) lF.push(m.join("×") + " " + f + " kolben er " + Math.round(kb.height) + " px");
+        });
+    });
+    paastand("panel, statuslinje og kolbe kan være der i alle fire størrelser", lF.length === 0, lF.slice(0, 3).join(", "));
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+    NK.visFane("fane-rk");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("8. Sproget og skriften");
+    (function saml(x) {
+        if (typeof x === "string") tekster.push(x);
+        else if (Array.isArray(x)) x.forEach(saml);
+        else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
+    }({ DUFTE: D.DUFTE, BRUG: D.BRUG, KUNDER: D.KUNDER, ORDRER: D.ORDRER, GRUPPER: D.GRUPPER, FAERDIG: D.FAERDIG, U: D.FABRIK.udsolgt }));
+    tekster.push(d.body.textContent);
+    var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger", tanke.length === 0, tanke.slice(0, 2).join(" | "));
+    var en = tekster.filter(function (t) { return /[A-Za-z)]¹[⁺⁻]|[A-Za-z)]1[+−](?![\d ])/.test(t); });
+    paastand("ingen 1+ eller 1− som ladning", en.length === 0, en.slice(0, 2).join(" | "));
+    var ascii = tekster.filter(function (t) { return ASCII_ORD.test(t); });
+    paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).map(function (t) { return t.match(ASCII_ORD)[0]; }).join(" | "));
+    var smaa = [];
+    d.querySelectorAll(".panel *, .hylde *, .statuslinje *, .reaktor *, .ordrelinje").forEach(function (e) {
+        if (!e.childNodes.length || !e.textContent.trim() || e.offsetParent === null) return;
+        var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+        if (!egen) return;
+        var px = parseFloat(W.getComputedStyle(e).fontSize);
+        if (px < 11.5) smaa.push(e.className + " " + px);
+    });
+    paastand("ingen tekst under 11,5 px i hylden, kolben, panelet og statuslinjen", smaa.length === 0, smaa.slice(0, 4).join(", "));
+
+    /* Ryd op */
+    S1.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    S1.nulstil();
+    S1.vaelg(0);
+}
+</script>
+</body>
+</html>

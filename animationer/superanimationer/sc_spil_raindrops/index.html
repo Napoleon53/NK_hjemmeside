@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ionregn</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<canvas id="regn" aria-hidden="true"></canvas>
+
+<header class="top">
+    <h1>IONREGN</h1>
+    <div class="hud">
+        <div class="felt"><span class="etiket">Niveau</span><b id="hud-niveau">Intro</b></div>
+        <div class="felt"><span class="etiket">Point</span><b id="hud-point">0</b></div>
+        <div class="felt combo" title="Combo stiger for hver 3 forbindelser i træk">
+            <span class="etiket">Combo</span>
+            <b id="hud-mult">×1</b>
+            <span class="prikker" id="hud-prikker"><i></i><i></i><i></i></span>
+        </div>
+        <div class="felt integritet" id="hud-integritet">
+            <span class="etiket">Systemintegritet</span>
+            <span class="bjaelke"><i id="hud-int"></i></span>
+            <b id="hud-int-tal">100 %</b>
+        </div>
+    </div>
+    <button class="ikonknap" id="pauseknap" type="button" title="Pause (mellemrum)" aria-label="Pause">❚❚</button>
+    <button class="ikonknap" id="regelknap" type="button" title="Regler" aria-label="Regler">?</button>
+</header>
+
+<div class="maalbar" id="maalbar" aria-live="polite">
+    <span class="etiket" id="maal-etiket">Klar</span>
+    <span class="maal" id="maal">Tryk Start</span>
+</div>
+
+<main class="scene" id="scene">
+    <canvas id="spil" aria-label="Fire baner med faldende ioner"></canvas>
+</main>
+
+<p class="besked" id="besked" aria-live="polite"></p>
+
+<section class="kolbe" id="kolbe" aria-label="Kolben">
+    <span class="etiket">Kolben</span>
+    <div class="kolbe-ioner" id="kolbe-ioner"></div>
+    <div class="ladning" id="ladning">Ladning: <b>0</b></div>
+</section>
+
+<!-- ============ STARTSKÆRM ============ -->
+<div class="lag" id="lag-start">
+    <div class="kasse start">
+        <h2 class="logo">IONREGN</h2>
+        <p class="intro">Ionerne falder i takt. Fang dem på linjen, og saml dem til neutrale ionforbindelser.</p>
+        <p class="taster"><kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd> <span>eller tryk på banen</span></p>
+        <p class="forklaring">
+            <span class="ion k">Na<sup>+</sup></span> kation
+            <span class="ion a">Cl<sup>−</sup></span> anion
+        </p>
+
+        <fieldset class="gruppe">
+            <legend>Begynd ved</legend>
+            <div class="valg" id="startvalg" role="radiogroup" aria-label="Begynd ved">
+                <button type="button" data-fase="intro" class="valgt">Begyndelsen</button>
+                <button type="button" data-fase="n1">Niveau 1</button>
+                <button type="button" data-fase="n2">Niveau 2</button>
+                <button type="button" data-fase="n3">Niveau 3</button>
+            </div>
+        </fieldset>
+
+        <fieldset class="gruppe">
+            <legend>Musik</legend>
+            <p class="musiknavn" id="musik-navn">Metronom</p>
+            <div class="knaprk">
+                <label class="knap lille" for="musikfil">Vælg lydfil</label>
+                <input type="file" id="musikfil" accept="audio/*,.mp3,.wav,.ogg,.m4a" hidden>
+                <button class="knap lille" id="std-musik" type="button" hidden>Standardmusik</button>
+                <button class="knap lille" id="metronom" type="button">Metronom</button>
+            </div>
+            <div class="felter">
+                <label>Tempo <input id="f-bpm" type="number" min="50" max="240" step="any" inputmode="decimal"> BPM</label>
+                <label id="f-offset-label">Første slag <input id="f-offset" type="number" step="1" inputmode="numeric"> ms</label>
+                <label class="tjek" id="f-klik-label"><input id="f-klik" type="checkbox"> Klik med</label>
+            </div>
+            <p class="note" id="musik-note"></p>
+        </fieldset>
+
+        <div class="knaprk midt">
+            <button class="knap stor" id="startknap" type="button">Start</button>
+            <button class="knap" id="kalibknap" type="button">Kalibrér</button>
+        </div>
+        <p class="note midt" id="kalib-note"></p>
+    </div>
+</div>
+
+<!-- ============ KALIBRERING ============ -->
+<div class="lag" id="lag-kalib" hidden>
+    <div class="kasse">
+        <h2>Kalibrering</h2>
+        <p>Lyt til de første 4 klik. Tryk så med på de næste 8: mellemrum, en banetast eller skærmen.</p>
+        <div class="kalib-prikker" id="kalib-prikker"></div>
+        <p class="kalib-status" id="kalib-status" aria-live="polite"></p>
+        <div class="knaprk midt">
+            <button class="knap stor" id="kalib-start" type="button">Start</button>
+            <button class="knap" id="kalib-nul" type="button">Nulstil</button>
+            <button class="knap" id="kalib-luk" type="button">Færdig</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============ PAUSE ============ -->
+<div class="lag" id="lag-pause" hidden>
+    <div class="kasse smal">
+        <h2 id="pause-titel">Pause</h2>
+        <p class="nedtael" id="pause-nedtael" hidden></p>
+        <div class="knaprk lodret" id="pause-knapper">
+            <button class="knap stor" id="fortsaet" type="button">Fortsæt</button>
+            <button class="knap" id="genstart" type="button">Start forfra</button>
+            <button class="knap" id="afslut" type="button">Afslut</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============ SLUTSKÆRM ============ -->
+<div class="lag" id="lag-slut" hidden>
+    <div class="kasse slut">
+        <h2 id="slut-titel">Sangen er slut</h2>
+        <div class="tal">
+            <div><span class="etiket">Point</span><b id="s-point">0</b></div>
+            <div><span class="etiket">Største combo</span><b id="s-combo">0</b></div>
+            <div><span class="etiket">Perfekte fangster</span><b id="s-perfekt">0</b></div>
+            <div><span class="etiket">Forbindelser</span><b id="s-forb">0</b></div>
+        </div>
+        <div id="s-forkerte-boks">
+            <h3>Det gik galt</h3>
+            <ul class="forkerte" id="s-forkerte"></ul>
+        </div>
+        <p class="note" id="s-ingen" hidden>Ingen forkerte forbindelser.</p>
+        <div class="knaprk midt">
+            <button class="knap stor" id="igen" type="button">Spil igen <kbd>R</kbd></button>
+            <button class="knap" id="tilstart" type="button">Til start</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============ REGLER ============ -->
+<div class="lag" id="lag-regler" hidden>
+    <div class="kasse regler">
+        <h2>Regler</h2>
+        <ul id="regel-liste"></ul>
+        <p class="forklaring"><span class="ion k">Na<sup>+</sup></span> kation: kantet med dobbelt kant
+            <span class="ion a">Cl<sup>−</sup></span> anion: rund med stiplet kant</p>
+        <div class="knaprk midt"><button class="knap" id="regel-luk" type="button">Luk</button></div>
+    </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

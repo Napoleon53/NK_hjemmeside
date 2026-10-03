@@ -219,6 +219,10 @@
             el.appendChild(rad);
             mig.rad[r[0]] = { el: rad, celle: celler };
         });
+
+        /* Knappen (Giv hint, Vis svaret, Naeste opgave) staar paa papiret.
+           Den er den samme knap hele tiden og lægges paa igen her. */
+        if (this.knap) el.appendChild(this.knap);
     };
 
     /* Formlen for et led bygges, naar den er kendt (produktet kendes foerst,
@@ -289,13 +293,13 @@
                 saetFelt("ox" + i);
             }
         });
-        /* Plus-tegnene: skjul et plus foran et skjult led */
+        /* Plus-tegnene: skjul et plus foran eller efter et skjult led */
         var boern = this.skema.children;
         for (var n = 0; n < boern.length; n++) {
             var b = boern[n];
             if (b.className === "hf-plus") {
-                var naeste = b.nextSibling;
-                b.hidden = !!(naeste && naeste.hidden);
+                var naeste = b.nextSibling, forrige = b.previousSibling;
+                b.hidden = !!((naeste && naeste.hidden) || (forrige && forrige.hidden));
             }
         }
 
@@ -515,6 +519,68 @@
             this.valg.style.top = (bund + fs * 0.35).toFixed(1) + "px";
         }
         this.stiLaengde = laengde;
+        this.placerKnap();
+    };
+
+    /* To kasser overlapper (med lidt luft imellem) */
+    function rammer(a, b, luft) {
+        return a.x < b.x + b.b + luft && a.x + a.b + luft > b.x && a.y < b.y + b.h + luft && a.y + a.h + luft > b.y;
+    }
+
+    /* Det, der staar paa papiret lige nu: skemaet, etiketterne, ordene,
+       valget og raekkernes celler */
+    P.optaget = function (o) {
+        var ud = [], mig = this;
+        function med(e) {
+            if (!e || e.hidden) return;
+            var r = rect(e, o);
+            if (r.b > 0 && r.h > 0) ud.push(r);
+        }
+        med(this.skema);
+        med(this.valg);
+        ["ox", "red"].forEach(function (t) { med(mig.etiket[t]); med(mig.tag[t]); });
+        Object.keys(this.rad).forEach(function (r) {
+            if (mig.rad[r].el.hidden) return;
+            med(mig.rad[r].celle.v);
+            med(mig.rad[r].celle.h);
+        });
+        return ud;
+    };
+
+    /* Knappen paa papiret (brugerens oenske 3. okt. 2026). Giv hint og Vis
+       svaret staar i papirets nederste hoejre hjoerne (CSS). Naeste opgave
+       staar midt i haeftet: under reaktionspilen, mellem raekkernes to
+       sider. Er der ikke plads dér, staar den midt for nederst paa
+       papiret, og ellers i hjoernet som de andre. */
+    P.placerKnap = function () {
+        var k = this.knap;
+        if (!k || k.parentNode !== this.el) return;
+        k.style.left = "";
+        k.style.top = "";
+        k.classList.remove("midt");
+        if (!k.classList.contains("naeste") || !this.pil || !this.el.offsetWidth) return;
+        var mig = this, o = this.el.getBoundingClientRect();
+        var kb = k.offsetWidth, kh = k.offsetHeight;
+        var pil = rect(this.pil, o), optaget = this.optaget(o);
+        var top = Infinity, bund = -Infinity;
+        Object.keys(this.rad).forEach(function (r) {
+            if (mig.rad[r].el.hidden) return;
+            var rr = rect(mig.rad[r].el, o);
+            top = Math.min(top, rr.y);
+            bund = Math.max(bund, rr.bund);
+        });
+        var steder = [];
+        if (bund > top) steder.push({ x: pil.cx, y: (top + bund) / 2 });
+        steder.push({ x: (this.margen() + this.b) / 2, y: this.h - kh / 2 - 12 });
+        for (var i = 0; i < steder.length; i++) {
+            var s = steder[i], kasse = { x: s.x - kb / 2, y: s.y - kh / 2, b: kb, h: kh };
+            if (kasse.y + kh > this.h - 4) continue;
+            if (optaget.some(function (r) { return rammer(kasse, r, 8); })) continue;
+            k.classList.add("midt");
+            k.style.left = s.x.toFixed(1) + "px";
+            k.style.top = s.y.toFixed(1) + "px";
+            return;
+        }
     };
 
     /* Klammerne tegnes frem, naar de kommer: stregen vokser */

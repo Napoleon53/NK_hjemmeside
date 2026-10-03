@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="440" viewBox="0 0 200 440">
+  <!-- Reaktoren: kuglekoeler (tilbagesvaler) over en rundkolbe i et vandbad
+       paa en varmeplade. Kun glasset og pladen; vaesken, vandet, gloeden,
+       boblerne og draaberne tegnes af js/reaktor.js bag og foran spritet.
+       Maal (samme enheder som i R.GEO i js/reaktor.js; rettes et maal her,
+       skal det ogsaa rettes der):
+         koeleren   x 80-120, y 8-196, kugler ved y 52, 102, 152
+         halsen     x 90-110, y 196-262
+         kolben     midte (100, 318), radius 64 udvendig, 60 indvendig
+         vandbadet  x 24-176, y 296-396, vandet staar til y 322
+         pladen     x 12-188, y 396-432 -->
+  <defs>
+    <linearGradient id="kappe" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7dd3fc" stop-opacity="0.20"/>
+      <stop offset="0.5" stop-color="#7dd3fc" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#7dd3fc" stop-opacity="0.20"/>
+    </linearGradient>
+    <linearGradient id="plade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b616e"/>
+      <stop offset="1" stop-color="#3a3f4a"/>
+    </linearGradient>
+    <radialGradient id="glans" cx="0.35" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="0.6" stop-color="#ffffff" stop-opacity="0.03"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Slangerne med koelevand: ind forneden til hoejre, ud foroven til venstre -->
+  <path d="M120 180 h22 q10 0 10 10 v40" stroke="#4aa3d8" stroke-opacity="0.75" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M80 28 h-22 q-10 0 -10 10 v30" stroke="#4aa3d8" stroke-opacity="0.75" stroke-width="7" fill="none" stroke-linecap="round"/>
+
+  <!-- Koelerens kappe -->
+  <rect x="80" y="8" width="40" height="188" rx="8" fill="url(#kappe)" stroke="#bfe3f7" stroke-opacity="0.65" stroke-width="2"/>
+  <!-- Det indre roer med tre kugler -->
+  <path d="M96 4 V40 C84 44 84 60 96 64 V90 C84 94 84 110 96 114 V140 C84 144 84 160 96 164 V214
+           M104 4 V40 C116 44 116 60 104 64 V90 C116 94 116 110 104 114 V140 C116 144 116 160 104 164 V214"
+        stroke="#e6f3fb" stroke-opacity="0.9" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+
+  <!-- Slibningen mellem koeler og kolbe -->
+  <rect x="87" y="196" width="26" height="16" rx="2" fill="#ffffff" fill-opacity="0.10" stroke="#e6f3fb" stroke-opacity="0.55" stroke-width="1.5"/>
+
+  <!-- Rundkolben: halsen og kuglen -->
+  <path d="M90 212 V256 A64 64 0 1 0 110 256 V212"
+        fill="url(#glans)" stroke="#e6f3fb" stroke-opacity="0.92" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Vandbadet (krystalliserskaal) -->
+  <path d="M24 296 V382 Q24 396 38 396 H162 Q176 396 176 382 V296"
+        fill="none" stroke="#e6f3fb" stroke-opacity="0.75" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M20 296 H28 M172 296 H180" stroke="#e6f3fb" stroke-opacity="0.75" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- Varmepladen -->
+  <rect x="12" y="396" width="176" height="36" rx="6" fill="url(#plade)" stroke="#23262d" stroke-width="1.5"/>
+  <rect x="18" y="396" width="164" height="6" rx="2" fill="#7a808c"/>
+  <circle cx="160" cy="418" r="8" fill="#2a2e36" stroke="#9aa1ad" stroke-width="1.5"/>
+  <path d="M160 418 L160 411" stroke="#d6dbe2" stroke-width="2" stroke-linecap="round"/>
+</svg>

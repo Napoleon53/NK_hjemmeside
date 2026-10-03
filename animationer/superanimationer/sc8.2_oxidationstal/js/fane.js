@@ -5,14 +5,17 @@
 
      * listen i panelet: stofferne som formler i grupper, med loest og
        stjerne (huskes i browseren)
-     * knappen i opgavekortet: Giv hint, Vis svaret, Naeste opgave
-     * linjen i opgavekortet: hvor man er, naeste skridt, fejl og ros
-     * Kemichael ved katederet, der kun siger noget, naar eleven beder om
-       et hint eller svaret, og tier igen, naar trinnet er loest. Er han
-       sendt ud, staar hintet i opgavekortet i stedet.
+     * arbejdsfeltet i scenen: spoergsmaalet, feltet, den ene knap (Giv
+       hint, Vis svaret, Naeste opgave) og linjen med fejl, hint og ros.
+       Det staar samlet ét sted, lige hvor eleven skriver, og ikke i
+       panelet (brugerens test 3. okt. 2026: "Der skal ikke være en
+       ordre-tekst oppe i højre hjørne", og hint-knappen skal staa lige
+       ved siden af feltet).
+     * Kemichael ved katederet. Hintet staar i arbejdsfeltet; han siger
+       det kun selv, hvis D.KEMICHAEL_SIGER_HINT er sat.
      * musen i scenen: hold, traek og klik
 
-   Fanen selv har: lavOpgave(nr), promptHTML(), trinInfo()
+   Fanen selv har: lavOpgave(nr), visSpm(), trinInfo()
    ({ hint, svar, svarNavn }), trinLinje(), opgaveFaerdig(), layout(),
    tegn(), opdaterScene(dt), fokusFelt() og musen i scenen: overScene,
    nedScene, flytScene, opScene, klikScene.
@@ -22,6 +25,9 @@
 
     var NK = window.NK;
     var D = NK.Data;
+
+    /* Maerket forrest i linjen siger, hvad der skete */
+    var MAERKE = { skidt: "Ikke endnu", hint: "Hint", svar: "Svaret", loest: "Løst ✓" };
 
     function paa(P, valg) {
         var navn = valg.navn;
@@ -45,7 +51,7 @@
             });
             this.rostAlt = !!gemt._rost;
             this.hjaelp = 0;
-            this.el = { knap: el("knap"), liste: el("liste"), kort: el("kort"), besked: el("besked"), forfra: el("forfra") };
+            this.el = { knap: el("knap"), liste: el("liste"), arb: el("arb"), spm: el("spm"), besked: el("besked"), forfra: el("forfra") };
             this.fast = { html: "", klasse: "" };
             this.kortT = 0;
             this.el.knap.addEventListener("click", function () { mig.knap(); });
@@ -127,29 +133,25 @@
             this.hjaelp = 0;
             this.brugtSvar = false;
             this.faerdig = false;
+            this.pegHint = false;
             this.lavOpgave(i);
-            this.layout();
+            this.besked("", "");
             this.visKort();
+            this.layout();
             this.visListe();
             this.k.tie();
-            this.naesteLinje(this.introNu ? D.INTRO[navn] : "", "");
-            this.introNu = false;
             this.fokus();
         };
 
+        /* Arbejdsfeltet: spoergsmaalet (fanen selv) og knappen */
         P.visKort = function () {
-            var o = this.opgaver[this.nr];
-            NK.saetTekst(navn + "-titel", o.navn);
-            NK.saetTekst(navn + "-nr", String(this.nr + 1));
-            NK.saetTekst(navn + "-antal", String(this.opgaver.length));
-            NK.saetHTML(navn + "-prompt", this.promptHTML());
-            this.el.kort.classList.toggle("sejr", this.faerdig);
-            if (this.visKortEkstra) this.visKortEkstra();
+            this.el.arb.classList.toggle("sejr", this.faerdig);
+            if (this.visSpm) this.visSpm();
             this.visKnap();
         };
 
         P.visKnap = function () {
-            var tekst, klasse = "knap";
+            var tekst, klasse = "knap hjaelp";
             if (this.faerdig) {
                 klasse = "knap blaa banker";
                 var naeste = this.naesteUloeste();
@@ -158,6 +160,8 @@
                 else tekst = "Forfra ↺";
             } else if (this.hjaelp === 0) {
                 tekst = "Giv hint";
+                /* Efter et forkert svar lyser knappen stille op */
+                if (this.pegHint) klasse += " peg";
             } else {
                 var info = this.trinInfo();
                 tekst = (info && info.svarNavn) || "Vis svaret";
@@ -190,7 +194,8 @@
             if (!info) return;
             if (this.hjaelp === 0) {
                 this.hjaelp = 1;
-                this.hjaelpVis("<b>Hint:</b> " + info.hint, "hint");
+                this.pegHint = false;
+                this.hjaelpVis(info.hint, "hint");
                 if (this.efterHint) this.efterHint();
                 this.visKnap();
                 this.fokus();
@@ -202,99 +207,107 @@
             this.fokus();
         };
 
-        /* Et trin er loest: Kemichael tier (eller viser det svar, han blev bedt
-           om), og linjen siger det naeste skridt */
-        P.trinLoest = function (maade, svarHTML) {
+        /* Et trin er loest: linjen siger, hvad der var rigtigt (eller viser det
+           svar, eleven bad om), og spoergsmaalet skifter til det naeste trin */
+        P.trinLoest = function (maade, svarHTML, rosHTML) {
             this.hjaelp = 0;
-            if (maade === "svar") this.brugtSvar = true;
-            if (this.opgaveFaerdig()) {
-                if (maade === "svar" && svarHTML) this.k.sig(svarHTML, "svar", { lukVedSkriv: true });
-                else this.k.tie();
-                this.opgaveLoest(maade);
-            } else {
-                if (maade === "svar" && svarHTML) this.svarVis(svarHTML);
-                else { this.k.tie(); this.naesteLinje(maade === "selv" ? NK.tilfaeldig(D.ROS) : "", maade === "selv" ? "god" : ""); }
-            }
-            this.visKnap();
-            this.fokus();
-        };
-
-        /* Et nyt trin uden ros (fx efter gaettet paa fane 2): foer er linjen
-           foer naeste skridt */
-        P.nytTrin = function (foer, slags) {
-            this.hjaelp = 0;
+            this.pegHint = false;
             this.k.tie();
-            this.naesteLinje(foer || "", slags || "");
-            this.visKnap();
+            if (maade === "svar") this.brugtSvar = true;
+            if (this.opgaveFaerdig()) this.opgaveLoest(maade, svarHTML);
+            else if (maade === "svar" && svarHTML) this.svarVis(svarHTML);
+            else this.besked(maade === "selv" ? (rosHTML || NK.tilfaeldig(D.ROS)) : "", maade === "selv" ? "god" : "");
+            this.visKort();
             this.fokus();
         };
 
-        P.opgaveLoest = function (maade) {
+        /* Et nyt trin uden ros (fx efter gaettet paa fane 2) */
+        P.nytTrin = function (linje, slags) {
+            this.hjaelp = 0;
+            this.pegHint = false;
+            this.k.tie();
+            this.besked(linje || "", slags || "");
+            this.visKort();
+            this.fokus();
+        };
+
+        P.opgaveLoest = function (maade, svarHTML) {
             var s = this.status[this.nr];
             this.faerdig = true;
             s.loest = true;
             s.stjerne = s.stjerne || (this.stjerneNu ? this.stjerneNu() : !this.brugtSvar);
             var alle = this.antalLoest() === this.opgaver.length;
-            var linje = this.slutLinje ? this.slutLinje() : "";
-            var ros = NK.tilfaeldig(D.ROS_OPGAVE);
-            if (alle && !this.rostAlt) { this.rostAlt = true; ros = D.FAERDIG[navn]; }
+            var dele = [];
+            if (maade === "svar" && svarHTML && !(D.KEMICHAEL_SIGER_HINT && this.k.sig(svarHTML, "svar", { lukVedSkriv: true }))) dele.push(svarHTML);
+            var linje = this.slutLinje ? this.slutLinje(maade) : "";
+            if (linje) dele.push(linje);
+            /* Maerket siger Loest; en ros kommer kun, naar der ikke staar andet */
+            if (alle && !this.rostAlt) { this.rostAlt = true; dele.push(D.FAERDIG[navn]); }
+            else if (maade !== "svar" && !dele.length) dele.push(NK.tilfaeldig(D.ROS_OPGAVE));
             this.gem();
-            this.besked((linje ? linje + " " : "") + ros, maade === "svar" ? "gul" : "god");
-            this.visKort();
+            this.besked(dele.join(" "), maade === "svar" ? "svar" : "loest");
             this.visListe();
             if (this.efterOpgave) this.efterOpgave();
         };
 
-        /* ----- Linjen i opgavekortet ---------------------------------------------
+        /* ----- Linjen i arbejdsfeltet ---------------------------------------------
            besked: den faste linje. kortBesked: et svar paa et klik i scenen,
-           der forsvinder igen efter sek sekunder. */
+           der forsvinder igen efter sek sekunder. Klassen farver hele
+           arbejdsfeltet: skidt (roed, ryster), hint og svar (gul), god og
+           loest (groen). */
         P.besked = function (html, klasse) {
             this.fast = { html: html || "", klasse: klasse || "" };
             this.kortT = 0;
             this.visBesked(this.fast);
         };
 
-        P.kortBesked = function (html, sek) {
+        P.kortBesked = function (html, sek, klasse) {
             this.kortT = sek || 4;
-            this.visBesked({ html: html, klasse: "" });
+            this.visBesked({ html: html, klasse: klasse || "" });
         };
 
         P.visBesked = function (b) {
-            var e = this.el.besked;
+            var e = this.el.besked, a = this.el.arb;
             if (!e) return;
-            e.innerHTML = b.html;
-            e.className = "besked" + (b.klasse ? " " + b.klasse : "");
+            var m = b.html && MAERKE[b.klasse] ? '<span class="b-maerke">' + MAERKE[b.klasse] + "</span>" : "";
+            e.innerHTML = m + b.html;
+            e.className = "arb-besked" + (b.klasse ? " " + b.klasse : "");
+            if (!a) return;
+            ["skidt", "hint", "svar", "god", "loest", "gul", "ryster"].forEach(function (k) { a.classList.remove(k); });
+            if (b.klasse) a.classList.add(b.klasse);
+            if (b.klasse === "skidt") {
+                void a.offsetWidth;
+                a.classList.add("ryster");
+            }
         };
 
         P.beskedTekst = function () { return this.el.besked ? this.el.besked.textContent : ""; };
 
-        P.naesteLinje = function (foer, slags) {
-            var t = this.faerdig ? "" : this.trinLinje();
-            this.besked((foer ? foer + " " : "") + t, slags || "");
-        };
-
-        /* Et forkert svar: beskeden og saa, hvad der skal goeres */
+        /* Et forkert svar: beskeden, og hintknappen lyser op */
         P.fejlLinje = function (tekst) {
+            if (this.hjaelp === 0) this.pegHint = true;
             this.besked(NK.html(tekst), "skidt");
+            this.visKnap();
         };
 
-        /* ----- Kemichael: kun naar eleven beder om det --------------------------- */
+        /* ----- Hint og svar: staar i arbejdsfeltet, ved feltet --------------------- */
         P.hjaelpVis = function (html, slags) {
-            if (!this.k.sig(html, slags)) this.besked(html, "gul");
+            if (D.KEMICHAEL_SIGER_HINT && this.k.sig("<b>Hint:</b> " + html, slags)) { this.besked("", ""); return; }
+            this.besked(html, "hint");
         };
 
         P.svarVis = function (html) {
-            var trin = this.faerdig ? "" : this.trinLinje();
-            if (this.k.sig(html, "svar", { lukVedSkriv: true })) this.besked(trin, "");
-            else this.besked(html + (trin ? " " + trin : ""), "gul");
+            if (D.KEMICHAEL_SIGER_HINT && this.k.sig(html, "svar", { lukVedSkriv: true })) { this.besked("", ""); return; }
+            this.besked(html, "svar");
         };
 
-        /* K: han siger, hvor man er, og hvad man skal (henter ham, hvis han er ude) */
+        /* K: Kemichael siger, hvor man er, og hvad man skal (henter ham, hvis
+           han er ude) */
         P.startIntro = function (tving) {
             if (!tving) return;
             if (!this.k.inde()) { this.k.hentInd(); return; }
             var t = this.faerdig ? "" : this.trinLinje();
-            this.k.sig(D.INTRO[navn] + (t ? " " + t : ""), "", { lukVedSkriv: true });
+            this.k.sig(NK.html(D.INTRO[navn] + (t ? " " + t : "")), "", { lukVedSkriv: true });
         };
 
         /* ----- Fokus og taster ---------------------------------------------------- */

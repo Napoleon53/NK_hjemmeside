@@ -16,20 +16,20 @@
 
     var TURE = {
         "fane-rg": [
-            { sel: "#rg-trin", titel: "Trinene", tekst: "Hvilket trin du er ved, og hvad du skal gøre. Du skriver altid i det gule felt." },
-            { sel: "#rg-tavle .tv-formel", titel: "Formlen", tekst: "Oxidationstallet skrives i feltet over atomet. Et rigtigt tal bliver stående med romertal." },
+            { sel: "#rg-trin", titel: "Trinene", tekst: "De seks første stoffer løses i trin: ladningen, O, H og til sidst det ukendte." },
+            { sel: "#rg-formel", titel: "Formlen", tekst: "Oxidationstallet står over atomet med romertal. Det gule ? viser, hvilket atom du er ved." },
+            { sel: "#rg-arb", titel: "Her svarer du", tekst: "Spørgsmålet, feltet og Tjek. Giv hint hjælper dig videre, og næste tryk viser svaret." },
             { sel: "#rg-regn", titel: "Regnestykket", tekst: "Summen af oxidationstallene er stoffets ladning. Mellemregningerne står med almindelige tal." },
             { sel: "#rg-brikker", titel: "Atomerne", tekst: "Ét atom pr. brik. Er der to Cr, får hver sin brik, og de deler summen." },
-            { sel: "#rg-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret." },
             { sel: "#rg-opgaver", titel: "Stofferne", tekst: "De seks første gennemgås trin for trin. Et stof, du løser uden at se svaret, får en stjerne." },
-            { sel: "#rg-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du har løst det." },
-            { sel: "#rg-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
+            { sel: "#rg-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Hjælpen får du med Giv hint ved feltet." },
+            { sel: "#rg-kknap", titel: "Send ham ud", tekst: "Så står katederet tomt. Samme knap henter ham igen." },
             { sel: ".faneknapper", titel: "Elektronerne", tekst: "Den anden fane viser, hvorfor reglerne virker, og hvornår de ikke gør." }
         ],
         "fane-ek": [
             { sel: "#ek-anker-molekyle", titel: "Molekylet", tekst: "En elektronprikformel. Prikkens farve viser, hvilket atom elektronen kom fra." },
             { sel: "#ek-anker-en", titel: "Elektronegativiteten", tekst: "Tallet ved hvert atom. Det atom med det største tal trækker hårdest i et elektronpar." },
-            { sel: "#ek-kort", titel: "Opgaven", tekst: "Først et gæt. Så trækker du parrene i bindingerne hen til det atom, der trækker hårdest." },
+            { sel: "#ek-arb", titel: "Her svarer du", tekst: "Først et gæt. Så trækker du parrene i bindingerne hen til det atom, der trækker hårdest. Giv hint hjælper dig videre." },
             { sel: "#ek-regnskabkort", titel: "Regnskabet", tekst: "Oxidationstallet er valenselektronerne minus de elektroner, atomet har, når alle par er fordelt." },
             { sel: "#ek-opgaver", titel: "Molekylerne", tekst: "Tolv molekyler og ioner. Et rigtigt gæt uden hjælp giver en stjerne." },
             { sel: "#ek-forfra", titel: "Start forfra", tekst: "Samme molekyle med parrene tilbage i bindingerne." }

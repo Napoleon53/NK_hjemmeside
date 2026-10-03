@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Ionregn: selvtest</title>
+<style>
+    body { font: 14px/1.45 Consolas, monospace; background: #000; color: #c6ffd9; margin: 16px; }
+    h1 { font-size: 18px; color: #00ff66; }
+    pre { white-space: pre-wrap; }
+    .fejl { color: #ff6b6b; }
+</style>
+</head>
+<body>
+<h1>Ionregn: selvtest</h1>
+<p>Tjekker kemien, reglerne, ionregnen over hele sangen med robotspillere, point og systemintegritet, tempomåleren og sproget.
+Siden virker også fra harddisken; sprogtjekket af index.html kræver en server.</p>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html#metronom" style="width:900px;height:600px;border:1px solid #063;display:block;margin-top:12px"></iframe>
+
+<script src="js/config.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/lyd.js"></script>
+<script>
+(function () {
+    "use strict";
+    var linjer = [], fejl = 0, ok = 0;
+    function tjek(betingelse, tekst) {
+        if (betingelse) ok++; else { fejl++; linjer.push("FEJL: " + tekst); }
+    }
+    function log(t) { linjer.push(t); }
+    function skriv(faerdig) {
+        var ud = document.getElementById("ud");
+        ud.textContent = linjer.join("\n") + "\n\n" + ok + " påstande holder." + (faerdig ? "\n" + (fejl ? fejl + " FEJL" : "ALT OK") : "\nKører …");
+        ud.className = fejl ? "fejl" : "";
+    }
+    var C = CONFIG, I = Kemi.IONER;
+
+    /* ---- 1. Kemien ----------------------------------------------------- */
+    log("1. Kemien");
+    function f(t) { return Kemi.forbindelse(t); }
+    tjek(f({ Ca: 1, OH: 2 }).tekst === "Ca(OH)₂" && f({ Ca: 1, OH: 2 }).navn === "calciumhydroxid", "Ca(OH)₂ calciumhydroxid");
+    tjek(f({ Al: 2, SO4: 3 }).tekst === "Al₂(SO₄)₃" && f({ Al: 2, SO4: 3 }).ioner === 5, "Al₂(SO₄)₃ med 5 ioner");
+    tjek(f({ NH4: 3, PO4: 1 }).tekst === "(NH₄)₃PO₄" && f({ NH4: 3, PO4: 1 }).navn === "ammoniumphosphat", "(NH₄)₃PO₄");
+    tjek(f({ Na: 2, Cl: 2 }).tekst === "NaCl" && f({ Na: 2, Cl: 2 }).ioner === 2, "Na₂Cl₂ forkortes til NaCl");
+    tjek(f({ Fe3: 2, O: 3 }).tekst === "Fe₂O₃" && f({ Fe3: 2, O: 3 }).navn === "jern(III)oxid", "Fe₂O₃ jern(III)oxid");
+    tjek(f({ Mg: 1, Cl: 2 }).html === "MgCl<sub>2</sub>", "HTML med sænket 2");
+    tjek(Kemi.ionTekst("SO4") === "SO₄²⁻" && Kemi.ionTekst("Na") === "Na⁺" && Kemi.ionTekst("N") === "N³⁻", "ionernes skrivemåde");
+    tjek(Kemi.ionHTML("PO4") === "PO<sub>4</sub><sup>3−</sup>", "PO₄³⁻ som HTML");
+    tjek(Kemi.samletLadningTekst(1) === "+1" && Kemi.samletLadningTekst(-2) === "−2" && Kemi.samletLadningTekst(0) === "0", "ladningen i kolben");
+    for (var id in I) {
+        tjek(!/^1[+−]$/.test(Kemi.ladningTekst(I[id].q)), id + ": ladning ±1 skrives + og −, ikke 1+ og 1−");
+    }
+
+    /* ---- 2. Data og indstillinger ------------------------------------- */
+    log("2. Data og indstillinger");
+    var forrigeTil = 0;
+    C.FASER.forEach(function (fa, i) {
+        tjek(fa.fra === forrigeTil + 1, fa.id + " begynder i takten efter den forrige fase");
+        forrigeTil = fa.til === null ? Infinity : fa.til;
+        tjek(fa.til === null ? i === C.FASER.length - 1 : fa.til >= fa.fra, fa.id + ": til");
+        (fa.ioner || []).forEach(function (x) { tjek(!!I[x], fa.id + ": ionen " + x + " findes"); });
+        if (fa.maal) {
+            tjek(fa.andel > 0 && fa.andel <= 1, fa.id + ": andel");
+            (Kemi.MAAL[fa.maalListe || fa.id] || []).forEach(function (p) {
+                var t = Kemi.maalTaelling(p[0], p[1]);
+                tjek(Kemi.antal(t) <= C.MAKS_IONER, fa.id + ": " + p.join("") + " kræver højst " + C.MAKS_IONER + " ioner");
+                tjek(fa.ioner.indexOf(p[0]) >= 0 && fa.ioner.indexOf(p[1]) >= 0, fa.id + ": " + p.join("") + " bruger kun fasens ioner");
+                tjek(Kemi.ladning(t) === 0 && I[p[0]].q > 0 && I[p[1]].q < 0, fa.id + ": " + p.join("") + " er neutral");
+            });
+        }
+    });
+    var n1 = C.FASER.filter(function (x) { return x.id === "n1"; })[0];
+    tjek(n1.fra === 9 && n1.til === 40 && C.FASER[2].fra === 41 && C.FASER[3].fra === 73, "faserne i takter: 1-8, 9-40, 41-72, 73-");
+    tjek(C.FALD_SLAG === 8, "ionerne falder i 2 takter");
+    tjek(C.VINDUE_MS.perfekt === 60 && C.VINDUE_MS.god === 120, "fangvinduerne ±60 og ±120 ms");
+
+    /* ---- 3. Robotspillere gennem hele sangen ---------------------------- */
+    log("3. Robotspillere");
+    function klog(s, ion) {
+        if (s.fase !== ion.fase && ion.fase.fra > s.fase.fra) return true;
+        if (s.fase.maal) { var t = Kemi.tael(s.kolbe); return s.maal.taelling[ion.id] !== undefined && (t[ion.id] || 0) < s.maal.taelling[ion.id]; }
+        var t2 = Kemi.tael(s.kolbe.concat([ion.id])), q = Kemi.ladning(t2);
+        return Math.abs(q) <= C.MAKS_LADNING && Kemi.kanNeutraliseres(q, s.kolbe.length + 1, C.MAKS_IONER);
+    }
+    function simuler(seed, bot, startFase, slutTakt, bpm) {
+        bpm = bpm || C.BPM;
+        var slagS = 60 / bpm, s = new Spil({ bpm: bpm, seed: seed, startFase: startFase || "intro", slutSlag: (slutTakt || 116) * 4 });
+        var dt = 1 / 120, brud = 0, sidsteLogg = 0;
+        for (var t = (s.startTakt - 1) * 4 * slagS - 0.5; !s.slut && t < 1000; t += dt) {
+            s.opdater(t);
+            s.tagHaendelser();
+            if (s.logg.length !== sidsteLogg) {
+                sidsteLogg = s.logg.length;
+                if (!s.fase.maal && s.fase.moenster !== "ingen" && s.kolbe.length && s.ladning() !== 0) {
+                    var hj = s.hjaelperLadninger(s.ladning(), s.kolbe.length);
+                    if (!s.ioner.some(function (i) { return i.tilstand === "falder" && i.land > t && hj.indexOf(i.q) >= 0; })) brud++;
+                }
+            }
+            for (var i = 0; i < s.ioner.length; i++) {
+                var ion = s.ioner[i];
+                if (ion.tilstand !== "falder" || ion.bot || t < ion.land - dt / 2) continue;
+                ion.bot = true;
+                var v = bot(s, ion);
+                if (v !== false) s.tryk(ion.bane, ion.land + (typeof v === "number" ? v : 0));
+                s.tagHaendelser();
+            }
+        }
+        return { s: s, brud: brud };
+    }
+    var samlet = { n1: [0, 0], n2: [0, 0] };
+    for (var seed = 1; seed <= 12; seed++) {
+        var r = simuler(seed, klog, "intro", 116, seed % 3 === 0 ? 128 : C.BPM), s = r.s;
+        tjek(s.slutGrund === "musik", "seed " + seed + ": den kloge robot når til sangens slutning (" + s.slutGrund + ")");
+        tjek(s.forkerte.length === 0, "seed " + seed + ": den kloge robot laver ingen fejl");
+        tjek(r.brud === 0, "seed " + seed + ": niveau 3 har altid en ion på vej, der kan gøre kolben neutral (" + r.brud + " brud)");
+        tjek(s.integritet === 100 && s.missede === 0, "seed " + seed + ": ingen brugbare ioner misset");
+        var prSlag = {};
+        s.logg.forEach(function (l) {
+            var takt = Math.floor(l.slag / 4) + 1, fa = s.faseForTakt(takt), pos = l.slag - (takt - 1) * 4;
+            (prSlag[Math.floor(l.slag)] = prSlag[Math.floor(l.slag)] || []).push(l);
+            tjek(fa.moenster !== "ingen", "ion i introen, takt " + takt);
+            tjek(!s.erLuft(takt, fa), "ion i en lufttakt, takt " + takt);
+            if (fa.moenster === "hver2") tjek(pos === 0 || pos === 2, "niveau 1: kun slag 1 og 3 (" + pos + ")");
+            if (fa.moenster === "hver") tjek(pos % 1 === 0, "niveau 2: kun hele slag");
+            if (fa.moenster === "par") tjek(pos % 1 === 0 || pos === 3.5, "niveau 3: ottendedel kun på slag 4");
+        });
+        for (var k in prSlag) {
+            var l = prSlag[k];
+            tjek(l.length <= 2, "højst 2 ioner i slag " + k);
+            if (l.length === 2) tjek(l[0].bane !== l[1].bane && l[0].fase === "n3", "par i forskellige baner og kun i niveau 3");
+        }
+        ["n1", "n2"].forEach(function (fid) {
+            var fa = C.FASER.filter(function (x) { return x.id === fid; })[0];
+            var b = s.logg.filter(function (x) { return x.fase === fid; }).map(function (x) { return x.brug; });
+            samlet[fid][0] += b.filter(Boolean).length; samlet[fid][1] += b.length;
+            for (var i = 0; i + 10 <= b.length; i++) {
+                tjek(b.slice(i, i + 10).filter(Boolean).length >= Math.ceil(fa.andel * 10 - 1e-9), fid + ": hver række af 10 ioner har mindst " + fa.andel * 100 + " % brugbare");
+            }
+        });
+        if (seed === 1) {
+            var antal = {};
+            s.logg.forEach(function (x) { antal[x.fase] = (antal[x.fase] || 0) + 1; });
+            log("   seed 1: " + s.forbindelser + " forbindelser, " + s.point.toLocaleString("da-DK") + " point, ioner pr. fase " + JSON.stringify(antal));
+            tjek(antal.n1 === 58, "niveau 1: 29 takter med ioner (32 minus 3 lufttakter) × 2 = 58 ioner (" + antal.n1 + ")");
+            tjek(antal.n2 === 116, "niveau 2: 29 takter × 4 = 116 ioner (" + antal.n2 + ")");
+        }
+    }
+    log("   brugbare ioner: niveau 1 " + Math.round(100 * samlet.n1[0] / samlet.n1[1]) + " %, niveau 2 " + Math.round(100 * samlet.n2[0] / samlet.n2[1]) + " %");
+    /* tilfældige robotter: ingen nedbrud, og hver fejl har en løsning */
+    for (seed = 31; seed <= 40; seed++) {
+        var rr = seed;
+        var tilf = function () { rr = (rr * 9301 + 49297) % 233280; return rr / 233280; };
+        var r2 = simuler(seed, function () { return tilf() < 0.6 ? (tilf() - 0.5) * 0.3 : false; }, ["intro", "n1", "n2", "n3"][seed % 4]);
+        tjek(r2.s.slut, "seed " + seed + ": tilfældig robot når en slutning");
+        r2.s.forkerte.forEach(function (x) {
+            tjek(x.lavet && x.aarsag && x.rigtigHTML && x.rigtigNavn && x.opskrift, "seed " + seed + ": fejlen har årsag og rigtig løsning: " + x.lavet);
+        });
+    }
+    /* sværhedsgraden ligger i tæthed og iontyper, ikke faldhastighed */
+    var rs = simuler(3, klog, "n3", 100).s;
+    tjek(rs.logg[0].slag >= 72 * 4, "begynd ved niveau 3: de første ioner lander i takt 73");
+
+    /* ---- 4. Point, combo og systemintegritet ---------------------------- */
+    log("4. Point og integritet");
+    var P = C.POINT;
+    function nySpil(fase) {
+        var s = new Spil({ bpm: 140, seed: 7, startFase: fase });
+        s.opdater((s.foersteIonTakt - 1) * 4 * s.slagS + 0.01);
+        s.tagHaendelser();
+        return s;
+    }
+    var nr = 9000;
+    function fang(s, id, afvig) {
+        s.ioner.forEach(function (x) { if (x.tilstand === "falder") x.tilstand = "gammel"; });
+        var ion = { nr: nr++, id: id, q: I[id].q, bane: 0, slag: s.slag, land: s.sek, fase: s.fase, tilstand: "falder" };
+        s.ioner.push(ion);
+        return s.tryk(0, s.sek + (afvig || 0));
+    }
+    var sp = nySpil("n1");
+    sp.ioner = [];
+    sp.maal = { kat: "Mg", an: "Cl", taelling: { Mg: 1, Cl: 2 }, forb: Kemi.forbindelse({ Mg: 1, Cl: 2 }), visning: "formel" };
+    var r1 = fang(sp, "Mg", 0.02);
+    tjek(r1.dom === "perfekt" && sp.point === P.perfekt, "perfekt fangst giver " + P.perfekt);
+    var r3 = fang(sp, "Cl", 0.1);
+    tjek(r3.dom === "god" && sp.point === P.perfekt + P.god, "god fangst giver " + P.god);
+    tjek(sp.ladning() === 1, "ladningen i kolben følger med (+1)");
+    tjek(fang(sp, "Cl", 0.13).dom === "miss" && sp.kolbe.length === 2, "130 ms ved siden af er miss");
+    var foer = sp.point;
+    var r4 = fang(sp, "Cl", -0.05);
+    tjek(r4.res === "forbindelse" && sp.point === foer + P.perfekt + P.forbindelse && sp.kolbe.length === 0, "færdig forbindelse giver " + P.forbindelse + ", og kolben tømmes");
+    tjek(sp.integritet === 100, "integriteten kan ikke komme over 100 %");
+    var nyMaal = sp.maal;
+    tjek(!(nyMaal.kat === "Mg" && nyMaal.an === "Cl"), "nyt mål efter en forbindelse");
+    sp.maal = { kat: "Mg", an: "Cl", taelling: { Mg: 1, Cl: 2 }, forb: Kemi.forbindelse({ Mg: 1, Cl: 2 }), visning: "formel" };
+    fang(sp, "Mg");
+    var rf = fang(sp, "Na");
+    tjek(rf.res === "fejl" && sp.integritet === 100 - C.INTEGRITET.forkert && sp.kolbe.length === 0 && sp.streak === 0, "forkert ion: −" + C.INTEGRITET.forkert + " %, kolben tømmes, combo nulstilles");
+    tjek(sp.forkerte.length === 1 && sp.forkerte[0].rigtigHTML === "MgCl<sub>2</sub>" && sp.forkerte[0].rigtigNavn === "magnesiumchlorid", "fejlen står i listen med den rigtige løsning");
+    tjek(/Na<sup>\+<\/sup> er ikke med i MgCl<sub>2<\/sub>/.test(sp.forkerte[0].aarsag), "årsagen siger, at Na⁺ ikke er med: " + sp.forkerte[0].aarsag);
+    fang(sp, "Mg"); var rm = fang(sp, "Mg");
+    tjek(rm.res === "fejl" && /har kun én Mg/.test(sp.forkerte[0].aarsag) && sp.forkerte[0].gange === 2, "en Mg²⁺ for meget er en fejl, og samme mål tælles som 2 gange");
+    tjek(sp.point === foer + P.perfekt + P.forbindelse + 2 * P.perfekt, "en fangst, der giver fejl, giver ingen point");
+    /* combo */
+    var sc = nySpil("n1"); sc.ioner = [];
+    function lavNaCl(s) {
+        s.maal = { kat: "Na", an: "Cl", taelling: { Na: 1, Cl: 1 }, forb: Kemi.forbindelse({ Na: 1, Cl: 1 }), visning: "formel" };
+        fang(s, "Na"); return fang(s, "Cl");
+    }
+    lavNaCl(sc); lavNaCl(sc); lavNaCl(sc);
+    tjek(sc.mult() === 2 && sc.point === 3 * (2 * P.perfekt + P.forbindelse), "×2 efter 3 forbindelser i træk");
+    var p0 = sc.point; lavNaCl(sc);
+    tjek(sc.point - p0 === 2 * (2 * P.perfekt + P.forbindelse), "×2 gælder både fangster og forbindelser");
+    lavNaCl(sc); lavNaCl(sc); tjek(sc.mult() === 3, "×3 efter 6");
+    lavNaCl(sc); lavNaCl(sc); lavNaCl(sc); tjek(sc.mult() === 4, "×4 efter 9");
+    lavNaCl(sc); lavNaCl(sc); lavNaCl(sc); tjek(sc.mult() === 4 && sc.maksStreak === 12, "×4 er loftet; største combo tælles");
+    sc.maal = { kat: "Na", an: "Cl", taelling: { Na: 1, Cl: 1 }, forb: Kemi.forbindelse({ Na: 1, Cl: 1 }), visning: "formel" };
+    fang(sc, "K"); tjek(sc.mult() === 1, "en fejl nulstiller combo");
+    /* miss på en brugbar ion */
+    var sm = nySpil("n1");
+    sm.ioner = [];
+    sm.maal = { kat: "Ca", an: "O", taelling: { Ca: 1, O: 1 }, forb: Kemi.forbindelse({ Ca: 1, O: 1 }), visning: "formel" };
+    sm.ioner.push({ nr: 1, id: "Ca", q: 2, bane: 1, slag: sm.slag, land: sm.sek, fase: sm.fase, tilstand: "falder" });
+    sm.ioner.push({ nr: 2, id: "Na", q: 1, bane: 2, slag: sm.slag, land: sm.sek, fase: sm.fase, tilstand: "falder" });
+    sm.planTakt = 999;
+    sm.opdater(sm.sek + 0.3);
+    tjek(sm.integritet === 100 - C.INTEGRITET.miss && sm.missede === 1, "en brugbar ion, der falder forbi, koster " + C.INTEGRITET.miss + " % (Na⁺ koster intet)");
+    sm.integritet = C.INTEGRITET.miss;
+    sm.ioner.push({ nr: 3, id: "O", q: -2, bane: 1, slag: sm.slag, land: sm.sek, fase: sm.fase, tilstand: "falder" });
+    sm.opdater(sm.sek + 0.3);
+    tjek(sm.slut && sm.slutGrund === "integritet", "ved 0 % slutter spillet");
+    /* niveau 3 */
+    var s3 = nySpil("n3"); s3.ioner = [];
+    fang(s3, "Al"); fang(s3, "Al"); var ro = fang(s3, "Ca");
+    tjek(ro.res === "fejl" && /Ladningen blev \+8\. Grænsen er ±6\./.test(s3.forkerte[0].aarsag), "niveau 3: ladning over ±6 er en fejl");
+    tjek(!!s3.forkerte[0].rigtigTekst, "niveau 3: fejlen får en mulig løsning (" + s3.forkerte[0].rigtigTekst + " " + s3.forkerte[0].rigtigNavn + ")");
+    fang(s3, "Na"); fang(s3, "Na"); fang(s3, "Na"); var rd = fang(s3, "K");
+    tjek(rd.res === "fejl" && /kan ikke udlignes med én ion mere/.test(s3.forkerte[1].aarsag), "niveau 3: +4 med fire ioner kan ikke nå 0 inden for 5 ioner");
+    var pf = s3.point; fang(s3, "Ca"); fang(s3, "Ca"); fang(s3, "Ca"); fang(s3, "PO4"); var r5 = fang(s3, "PO4");
+    tjek(r5.res === "forbindelse" && s3.point - pf === 5 * P.perfekt + P.forbindelse + P.bonus5, "Ca₃(PO₄)₂ med 5 ioner giver bonus");
+    pf = s3.point; fang(s3, "Na"); fang(s3, "Na"); fang(s3, "Cl"); fang(s3, "Cl");
+    tjek(s3.point - pf === 4 * P.perfekt + P.forbindelse, "Na₂Cl₂ er NaCl og giver ingen bonus");
+    pf = s3.point; fang(s3, "Ca"); fang(s3, "OH"); fang(s3, "OH");
+    tjek(s3.point - pf === 3 * P.perfekt + P.forbindelse && s3.lavede[s3.lavede.length - 1] === "Ca(OH)₂", "Ca(OH)₂ uden bonus");
+
+    /* ---- 5. Tempomåleren ------------------------------------------------ */
+    log("5. Tempomåleren");
+    function lavLyd(bpm, offsetS, sek) {
+        var sr = 44100, n = Math.floor(sr * sek), buf;
+        try { buf = new AudioBuffer({ length: n, sampleRate: sr, numberOfChannels: 1 }); }
+        catch (e) { buf = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, n, sr).createBuffer(1, n, sr); }
+        var d = buf.getChannelData(0), slagS = 60 / bpm, frø = 1;
+        function stoej() { frø = (frø * 16807) % 2147483647; return frø / 1073741823.5 - 1; }
+        for (var i = 0; i < n; i++) d[i] = 0.02 * Math.sin(2 * Math.PI * 220 * i / sr);   /* en tone fra start */
+        for (var k = 0; offsetS + k * slagS / 2 < sek; k++) {
+            var t0 = Math.floor((offsetS + k * slagS / 2) * sr), helt = k % 2 === 0;
+            for (var j = 0; j < sr * 0.15 && t0 + j < n; j++) {
+                var t = j / sr;
+                if (helt) d[t0 + j] += 0.8 * Math.sin(2 * Math.PI * (50 + 80 * Math.exp(-t * 30)) * t) * Math.exp(-t * 18);
+                if (j < sr * 0.03) d[t0 + j] += (helt ? 0.15 : 0.3) * stoej() * Math.exp(-t * 120);
+            }
+        }
+        return buf;
+    }
+    [[128, 0.35], [140, 0.064], [95, 1.2], [174, 0.5]].forEach(function (p) {
+        var a = Lyd.analyser(lavLyd(p[0], p[1], 40));
+        var forventet = p[1] * 1000;
+        var slagMs = 60000 / p[0];
+        var afv = Math.abs(a.offsetMs - forventet);
+        afv = Math.min(afv, Math.abs(afv - slagMs * Math.round(afv / slagMs)));
+        tjek(Math.abs(a.bpm - p[0]) < 0.02, "tempomåleren finder " + p[0] + " BPM (" + a.bpm + ")");
+        tjek(afv <= 12, "slaget ligger rigtigt ved " + p[0] + " BPM: " + a.offsetMs + " ms (forventet " + forventet + " ms, " + Math.round(afv) + " ms ved siden af)");
+    });
+
+    skriv(false);
+
+    /* ---- 6. Siden selv: sprog og skriftstørrelser ------------------------ */
+    function siden() {
+        var ramme = document.getElementById("ramme"), d;
+        try { d = ramme.contentDocument; } catch (e) { d = null; }
+        if (!d || !d.body || !d.getElementById("startknap")) {
+            log("6. Siden: kunne ikke læses (åbn selvtesten over en server for at tjekke den)");
+            skriv(true);
+            return;
+        }
+        log("6. Siden");
+        var w = ramme.contentWindow;
+        var tekst = d.body.innerText + " " + Array.prototype.map.call(d.querySelectorAll("[title],[aria-label]"), function (e) { return (e.title || "") + " " + (e.getAttribute("aria-label") || ""); }).join(" ");
+        var js = ["–", "—"];
+        js.forEach(function (tegn) { tjek(tekst.indexOf(tegn) < 0, "ingen tankestreg (" + tegn + ") i siden"); });
+        tjek(!/\b1[+−-](?!\d)/.test(tekst), "ingen 1+ eller 1− i siden");
+        tjek(d.getElementById("regel-liste").children.length >= 5, "reglerne er skrevet ud fra CONFIG");
+        var smaa = [];
+        Array.prototype.forEach.call(d.querySelectorAll("#lag-start p, #lag-start button, #lag-start label, .regler li, .maal, .ladning, .besked"), function (e) {
+            var fs = parseFloat(w.getComputedStyle(e).fontSize);
+            if (fs < 13) smaa.push(e.id || e.className || e.tagName);
+        });
+        tjek(smaa.length === 0, "ingen læsetekst under 13 px: " + smaa.join(", "));
+        tjek(!!w.Ionregn && w.Ionregn.tilstand() === "start", "siden starter på startskærmen");
+        skriv(true);
+    }
+    var ramme = document.getElementById("ramme");
+    if (ramme.contentDocument && ramme.contentDocument.readyState === "complete" && ramme.contentWindow.Ionregn) siden();
+    else ramme.addEventListener("load", function () { setTimeout(siden, 300); });
+    setTimeout(function () { if (!/ALT OK|FEJL$/.test(document.getElementById("ud").textContent)) siden(); }, 8000);
+})();
+</script>
+</body>
+</html>

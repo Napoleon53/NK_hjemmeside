@@ -33,6 +33,7 @@
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
     --panel-bredde: 430px;
+    --panel-bredde-3: 580px;      /* fane 3: plads til reaktionsskemaet paa én linje */
 }
 
 * { box-sizing: border-box; }
@@ -185,43 +186,131 @@ main { flex: 1; position: relative; min-height: 0; }
 /* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
 .anker { position: absolute; pointer-events: none; }
 
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven i scenen, saa den ikke kan overses. */
-.spring-over {
+/* Kemichaels taleboble under praesentationen. Den ligger oven paa
+   scenen, saa intet i tegningen kan daekke den, og knappen Naeste staar
+   i selve boblen: han gaar foerst videre, naar eleven trykker.
+   js/praesentation.js saetter left og top hvert billede og vaelger den
+   plads ved hans hoved, der ikke daekker det, han peger paa. */
+.intro-boble {
     position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
+    left: 90px;
+    top: 120px;
+    z-index: 31;
+    width: clamp(256px, 36%, 330px);
+    max-width: calc(100% - 16px);
+    background-color: #fffdf6;
+    color: #1f2328;
+    border: 2px solid #2a2f36;
+    border-radius: 12px;
+    padding: 10px 14px 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.intro-tekst {
+    margin: 0 0 9px;
+    font-size: 1.04rem;
+    font-weight: 700;
+    line-height: 1.32;
+}
+
+.intro-linje {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
+    gap: 6px 8px;
+    white-space: nowrap;
+}
+
+.intro-naeste {
+    background-color: var(--blaa-mork);
     color: #ffffff;
     border: 2px solid var(--gul);
     border-radius: 999px;
-    padding: 11px 22px;
+    padding: 7px 16px;
     font-family: inherit;
     font-size: 1rem;
     font-weight: 700;
-    white-space: nowrap;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    animation: bank 1.7s ease-out infinite;
 }
 
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
+.intro-naeste span { color: var(--gul); margin-left: 3px; }
+.intro-naeste:hover { background-color: var(--blaa); }
 
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
+.intro-tal {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #5b6470;
+    font-variant-numeric: tabular-nums;
+}
+
+.intro-spring {
+    margin-left: auto;
+    background-color: transparent;
+    color: #4a525d;
+    border: 1px solid #b9b5a6;
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.intro-spring:hover { background-color: #ece8d9; color: #1f2328; }
+
+/* Halen: et lille kvadrat paa hoejkant i boblens kant. Nedad, naar
+   boblen staar over hans hoved, og mod venstre, naar den staar ved
+   siden af (klassen .ved-siden). --hale er afstanden langs kanten. */
+.intro-hale {
+    position: absolute;
+    left: calc(var(--hale, 60px) - 9px);
+    bottom: -10px;
+    width: 16px;
+    height: 16px;
+    background-color: #fffdf6;
+    border-right: 2px solid #2a2f36;
+    border-bottom: 2px solid #2a2f36;
+    transform: rotate(45deg);
+}
+
+.intro-boble.ved-siden .intro-hale {
+    left: -10px;
+    bottom: auto;
+    top: calc(var(--hale, 40px) - 9px);
+    border-right: none;
+    border-bottom: 2px solid #2a2f36;
+    border-left: 2px solid #2a2f36;
+}
+
+/* Et klik paa Kemichael under praesentationen: Naeste blinker og viser vejen */
 @keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: scale(1); }
+    40%  { transform: scale(1.1); }
+    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: scale(1); }
 }
 
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
+.intro-naeste.puf { animation: puf 0.7s ease-out 2; }
 
-/* Feltet, Kemichael peger paa, mens han siger, hvor svarene skrives */
+/* Den gule ramme om det, Kemichael peger paa (NK.Fremhaev i
+   js/praesentation.js). Den blinker, ligger oven paa siden og fanger
+   ingen klik. */
+.fremhaev-ramme {
+    position: fixed;
+    z-index: 30;
+    pointer-events: none;
+    border: 3px solid var(--gul);
+    border-radius: 12px;
+    background-color: rgba(242, 197, 61, 0.1);
+    animation: fremhaev 0.9s ease-in-out infinite;
+}
+
+@keyframes fremhaev {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.6); }
+    50%      { opacity: 0.3; box-shadow: 0 0 0 9px rgba(242, 197, 61, 0); }
+}
+
+/* Ja og nej paa fane 3 blinker, naar eleven klikker paa glasset foer svaret */
 @keyframes peg {
     0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
     70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
@@ -654,10 +743,11 @@ select:focus-visible {
 }
 
 @media (max-width: 1320px) {
-    :root { --panel-bredde: 370px; }
+    :root { --panel-bredde: 370px; --panel-bredde-3: 500px; }
 }
 
 @media (max-width: 1100px) {
+    :root { --panel-bredde-3: 440px; }
     .top { gap: 10px; padding: 8px 12px; }
     .faneknap { padding: 7px 10px; font-size: 0.82rem; gap: 6px; }
     .faneknap .nr { width: 17px; height: 17px; font-size: 0.65rem; }
@@ -903,33 +993,45 @@ select:focus-visible {
 .skematabel td.aktiv  { outline: 2px solid var(--gul); outline-offset: -2px; }
 .skematabel .ialt     { color: var(--gul); background: none; }
 
-/* Skemalinjen paa fane 3: reaktanterne, pilen og produkterne */
+/* Fane 3 har et bredere panel, saa reaktionsskemaet med de fire felter
+   kan staa paa én linje med luft omkring (brugerens oenske 3. okt. 2026).
+   Under 861 px staar panelet under scenen som paa de andre faner. */
+@media (min-width: 861px) {
+    #fane-forudsig { grid-template-columns: minmax(0, 1fr) var(--panel-bredde-3); }
+}
+
+/* Skemalinjen paa fane 3: reaktanterne, pilen og produkterne. Skriften
+   foelger panelets bredde (cqw), og felter og mellemrum er maalt i em,
+   saa hele skemaet staar paa én linje, ogsaa i det smallere panel. */
+.skemafelt { container-type: inline-size; }
 .skemafelt:empty { display: none; }
 
 .skemalinje {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 7px;
-    margin: 8px 0 6px;
-    padding: 9px 10px;
+    justify-content: center;
+    gap: 0.45em 0.5em;
+    margin: 10px 0 8px;
+    padding: 16px 12px;
     border-radius: var(--radius-lil);
     background-color: rgba(255, 255, 255, 0.045);
     border: 1px solid #3a3a47;
-    font-size: 1.02rem;
+    font-size: 1.05rem;
+    font-size: clamp(0.82rem, 3.2cqw, 1.18rem);
     font-weight: 600;
 }
 
 .skemalinje.faerdig { border-color: rgba(63, 174, 114, 0.6); background-color: rgba(63, 174, 114, 0.12); color: #b8f0cf; }
 .skemalinje.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
 
-.skemalinje .led { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.skemalinje .led { display: inline-flex; align-items: center; gap: 0.3em; white-space: nowrap; }
 .skemalinje .tegn { color: var(--gul); font-weight: 700; }
 .skemalinje .koef { color: #ffffff; }
 
 .skemalinje .tomplads {
     display: inline-block;
-    min-width: 58px;
+    min-width: 3.4em;
     padding: 1px 8px;
     border: 1px dashed #6a707b;
     border-radius: 5px;
@@ -938,27 +1040,29 @@ select:focus-visible {
 }
 
 .koeffelt {
-    width: 36px;
+    width: 2.2em;
     background-color: #1a1a22;
     border: 1px solid #4a4a58;
     border-radius: 5px;
     color: var(--tekst);
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 1em;
     font-weight: 700;
     text-align: center;
-    padding: 4px 2px;
+    padding: 0.3em 0.1em;
     outline: none;
 }
 
 .koeffelt:focus { border-color: var(--gul); box-shadow: 0 0 0 1px var(--gul); }
 
+/* Tjek staar paa sin egen linje under skemaet */
+.skematjek { display: flex; justify-content: flex-end; margin: 0 0 8px; }
+
 .felt-ok.lille {
-    margin-left: auto;
     border-radius: 5px;
-    padding: 5px 12px;
+    padding: 8px 22px;
     font-weight: 700;
-    font-size: 0.86rem;
+    font-size: 0.95rem;
 }
 
 /* Stofferne, man kan vaelge imellem */

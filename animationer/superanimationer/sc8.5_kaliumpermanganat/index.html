@@ -28,8 +28,9 @@
 <section class="fane aktiv" id="fane-ug" role="tabpanel" aria-label="Urglassene">
     <div class="scene">
         <canvas id="ug-laerred"></canvas>
-        <!-- Hæftet: skemaet, klammerne og rækkerne (js/haefte.js) -->
-        <div class="haefte" id="ug-haefte"></div>
+        <!-- Hæftet: skemaet, klammerne og rækkerne (js/haefte.js). Knappen står på papiret:
+             Giv hint og Vis svaret i nederste højre hjørne, Næste opgave midt i hæftet -->
+        <div class="haefte" id="ug-haefte"><button class="knap hf-knap hint" id="ug-knap" type="button">Giv hint</button></div>
         <div class="anker" id="ug-anker-bord"></div>
         <div class="anker" id="ug-anker-lup"></div>
         <div class="anker" id="ug-anker-laerer"></div>
@@ -39,13 +40,12 @@
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der ændrer sig: Giv hint -> Vis svaret -> Næste opgave -->
+        <!-- Opgavekortet: hvor man er, næste skridt, fejl og ros. Knappen står på papiret i scenen -->
         <div class="kort opgavekort" id="ug-kort">
             <h2><span id="ug-titel">Opgave</span><span class="taeller">reaktion <b id="ug-nr">1</b>/<span id="ug-antal">3</span></span></h2>
             <div id="ug-prompt"></div>
             <div class="trinliste" id="ug-trin"></div>
             <p class="besked" id="ug-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="ug-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort farvekort" id="ug-farvekortet">
@@ -66,7 +66,7 @@
 <section class="fane" id="fane-fl" role="tabpanel" aria-label="Flere reaktioner">
     <div class="scene">
         <canvas id="fl-laerred"></canvas>
-        <div class="haefte" id="fl-haefte"></div>
+        <div class="haefte" id="fl-haefte"><button class="knap hf-knap hint" id="fl-knap" type="button">Giv hint</button></div>
         <div class="anker" id="fl-anker-bord"></div>
         <div class="anker" id="fl-anker-lup"></div>
         <div class="anker" id="fl-anker-laerer"></div>
@@ -81,7 +81,6 @@
             <div id="fl-prompt"></div>
             <div class="trinliste" id="fl-trin"></div>
             <p class="besked" id="fl-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="fl-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort farvekort" id="fl-farvekortet">

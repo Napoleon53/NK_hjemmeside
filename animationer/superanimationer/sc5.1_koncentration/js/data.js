@@ -180,7 +180,7 @@
                 efter: "c = 0,30 mol / 0,60 L = 0,50 M. Etiketten viser koncentrationen, ikke stofmængden.",
                 vis: { c: [0], etiket: [0] } },
               { tekst: "Hvad betyder 0,50 M?",
-                svar: [{ t: "0,50 mol i hver liter", ok: true },
+                svar: [{ t: "0,50 mol pr. liter vand", ok: true },
                        { t: "0,50 mol i glasset", forkl: "I glasset er der 0,30 mol. 0,50 M betyder 0,50 mol pr. liter, og glasset har kun 0,60 L." },
                        { t: "0,50 L opløsning", forkl: "M er ikke et rumfang. M betyder mol/L: mol pr. liter." }],
                 hint: "M er en forkortelse. Den står for mol/L.",

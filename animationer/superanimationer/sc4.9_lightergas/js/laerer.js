@@ -4,7 +4,7 @@
    Selve figuren (gang, arm, ansigt, tale og klik paa ham) staar i
    ../../v2/kemichael/kemichael.js, som er faelles og frosset. Her tegnes
    han oven paa scenen paa fane 1, skaleret efter laerredets hoejde, med
-   gulvet ved laerredets bund (samme loesning som i sc_spil_syregalgen),
+   gulvet ved laerredets bund (samme loesning som i sc_spil5_syregalgen),
    saa han staar i forgrunden nederst til venstre.
 
    Brugerens valg (27. sept. 2026): Kemichael praesenterer ikke

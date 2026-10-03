@@ -28,8 +28,29 @@
 <section class="fane aktiv" id="fane-rg" role="tabpanel" aria-label="Reglerne">
     <div class="scene">
         <canvas id="rg-laerred"></canvas>
-        <!-- Tavlen: formlen med felterne, regnestykket og brikkerne (js/sim_regler.js) -->
-        <div class="tavle" id="rg-tavle"></div>
+        <!-- Tavlen: opgaven, trinene, formlen, arbejdsfeltet, regnestykket og brikkerne (js/sim_regler.js) -->
+        <div class="tavle" id="rg-tavle">
+            <div class="tv-top">
+                <span class="tv-maal" id="rg-maal"></span>
+                <span class="tv-navn" id="rg-navn"></span>
+            </div>
+            <div class="tv-stak" id="rg-stak">
+                <div class="tv-chips" id="rg-trin"></div>
+                <div class="tv-formel" id="rg-formel"></div>
+                <!-- Arbejdsfeltet: spoergsmaalet, feltet og hjaelpen samlet ét sted (js/fane.js) -->
+                <div class="arb" id="rg-arb">
+                    <div class="arb-rk">
+                        <div class="arb-spm" id="rg-spm"></div>
+                        <div class="arb-felter" id="rg-felter"></div>
+                        <button class="knap hjaelp" id="rg-knap" type="button">Giv hint</button>
+                    </div>
+                    <p class="arb-besked" id="rg-besked" aria-live="polite"></p>
+                </div>
+                <div class="tv-regn" id="rg-regn"><span class="tv-led"></span><span class="tv-lig">=</span><span class="tv-q"></span><span class="tv-cap venstre">summen af oxidationstallene</span><span></span><span class="tv-cap hoejre">ladningen</span></div>
+                <div class="tv-isol" id="rg-isol"></div>
+                <div class="tv-brikker" id="rg-brikker"></div>
+            </div>
+        </div>
         <div class="anker" id="rg-anker-laerer"></div>
         <button class="forfraknap" id="rg-forfra" type="button" title="Samme stof forfra (R)">Start forfra ↺</button>
         <div class="kboble" id="rg-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
@@ -37,14 +58,6 @@
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="rg-kort">
-            <h2><span id="rg-titel">Opgave</span><span class="taeller">stof <b id="rg-nr">1</b>/<span id="rg-antal">31</span></span></h2>
-            <div id="rg-prompt"></div>
-            <p class="besked" id="rg-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="rg-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort" id="rg-opgaver">
             <h2>Stofferne <span class="taeller">løst <b id="rg-loest">0</b>/31</span></h2>
             <div class="opg-liste" id="rg-liste"></div>
@@ -58,6 +71,15 @@
 <section class="fane" id="fane-ek" role="tabpanel" aria-label="Elektronerne">
     <div class="scene">
         <canvas id="ek-laerred"></canvas>
+        <!-- Arbejdsfeltet nederst paa tavlen: gaettet, hvad der skal traekkes, og hjaelpen -->
+        <div class="arb paa-scene" id="ek-arb">
+            <div class="arb-rk">
+                <div class="arb-spm" id="ek-spm"></div>
+                <div class="arb-felter gaet" id="ek-gaet"></div>
+                <button class="knap hjaelp" id="ek-knap" type="button">Giv hint</button>
+            </div>
+            <p class="arb-besked" id="ek-besked" aria-live="polite"></p>
+        </div>
         <div class="anker" id="ek-anker-molekyle"></div>
         <div class="anker" id="ek-anker-en"></div>
         <div class="anker" id="ek-anker-laerer"></div>
@@ -67,14 +89,6 @@
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="ek-kort">
-            <h2><span id="ek-titel">Opgave</span><span class="taeller">molekyle <b id="ek-nr">1</b>/<span id="ek-antal">12</span></span></h2>
-            <div id="ek-prompt"></div>
-            <div class="raekker gaet" id="ek-gaet"></div>
-            <p class="besked" id="ek-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="ek-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="ek-regnskabkort">
             <h2>Regnskabet</h2>
             <div id="ek-regnskab"></div>

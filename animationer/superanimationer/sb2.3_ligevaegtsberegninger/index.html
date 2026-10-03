@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ligevægtsberegninger</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇌</span> Ligevægtsberegninger</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-bh" role="tab" aria-selected="true"><span class="nr">1</span>Beholderen</button>
+        <button class="faneknap" data-fane="fane-ux" role="tab" aria-selected="false"><span class="nr">2</span>Uden x</button>
+        <button class="faneknap" data-fane="fane-mx" role="tab" aria-selected="false"><span class="nr">3</span>Med x</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: BEHOLDEREN (js/sim_beholder.js)                            -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-bh" role="tabpanel" aria-label="Beholderen">
+    <div class="scene">
+        <div class="bh-arbejde" id="bh-arbejde">
+            <p class="opgavelinje" id="bh-linje"></p>
+            <div class="laerred-ramme"><canvas id="bh-laerred"></canvas></div>
+            <div class="bh-skyder">
+                <label for="bh-x" class="bh-xlab"><b>x = <span id="bh-xtal">0,000</span> M</b><span class="bh-xdef" id="bh-xdef"></span></label>
+                <input type="range" id="bh-x" min="0" max="0.2" step="0.001" value="0">
+            </div>
+            <div class="bh-under">
+                <div class="bh-skema" id="bh-skema"></div>
+                <div class="bh-y" id="bh-y"></div>
+            </div>
+        </div>
+
+        <div class="statuslinje" id="bh-status">
+            <p class="st-tekst" id="bh-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="bh-forfra" type="button" title="Samme mål forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="bh-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="bh-kort">
+            <h2><span id="bh-titel">Mål</span><span class="taeller">mål <b id="bh-nr">1</b>/<span id="bh-antal">8</span></span></h2>
+            <div id="bh-prompt"></div>
+        </div>
+
+        <div class="kort" id="bh-opgaver">
+            <h2>Målene <span class="taeller">nået <b id="bh-loest">0</b>/8</span></h2>
+            <div class="opg-liste" id="bh-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: UDEN X (js/regn.js)                                        -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ux" role="tabpanel" aria-label="Uden x">
+    <div class="scene">
+        <div class="arbejde" id="ux-arbejde">
+            <p class="opgavelinje" id="ux-linje"></p>
+            <div class="tavle" id="ux-tavle">
+                <div class="tv-navn" id="ux-navn"></div>
+                <div class="tv-stempel" id="ux-stempel" hidden></div>
+                <div class="tv-hoved" id="ux-hoved">
+                    <div class="skema" id="ux-reaktion"></div>
+                    <div class="ot-raekke" id="ux-oplyst"></div>
+                </div>
+                <ol class="delbar" id="ux-delbar" aria-label="Opgavens dele"></ol>
+                <div class="regn-dele" id="ux-dele"></div>
+            </div>
+        </div>
+
+        <div class="statuslinje" id="ux-status">
+            <p class="st-tekst" id="ux-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="ux-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="ux-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="ux-kort">
+            <h2><span id="ux-titel">Opgave</span><span class="taeller">opgave <b id="ux-nr">1</b>/<span id="ux-antal">5</span></span></h2>
+            <div id="ux-prompt"></div>
+        </div>
+
+        <div class="kort" id="ux-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="ux-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="ux-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: MED X (js/regn.js)                                         -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-mx" role="tabpanel" aria-label="Med x">
+    <div class="scene">
+        <div class="arbejde" id="mx-arbejde">
+            <p class="opgavelinje" id="mx-linje"></p>
+            <div class="tavle" id="mx-tavle">
+                <div class="tv-navn" id="mx-navn"></div>
+                <div class="tv-stempel" id="mx-stempel" hidden></div>
+                <div class="tv-hoved" id="mx-hoved">
+                    <div class="skema" id="mx-reaktion"></div>
+                    <div class="ot-raekke" id="mx-oplyst"></div>
+                </div>
+                <ol class="delbar" id="mx-delbar" aria-label="Opgavens dele"></ol>
+                <div class="regn-dele" id="mx-dele"></div>
+            </div>
+        </div>
+
+        <div class="statuslinje" id="mx-status">
+            <p class="st-tekst" id="mx-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="mx-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="mx-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="mx-kort">
+            <h2><span id="mx-titel">Opgave</span><span class="taeller">opgave <b id="mx-nr">1</b>/<span id="mx-antal">8</span></span></h2>
+            <div id="mx-prompt"></div>
+        </div>
+
+        <div class="kort" id="mx-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="mx-loest">0</b>/8</span></h2>
+            <div class="opg-liste" id="mx-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Ligevægtsberegninger</h2>
+        <h3 class="teori-hoved">Ligevægtsloven</h3>
+        <p>For ligevægten aA + bB ⇌ cC + dD gælder ved ligevægt:</p>
+        <div class="eksempel">K<sub>c</sub> = <span class="vbroek"><span>[C]<sup>c</sup>·[D]<sup>d</sup></span><span>[A]<sup>a</sup>·[B]<sup>b</sup></span></span></div>
+        <p>Enheden er M opløftet i (produkternes koefficienter − reaktanternes). Er tallet 0, har K<sub>c</sub> ingen enhed. K<sub>c</sub> gælder kun ved den temperatur, den er målt ved.</p>
+        <p>Kendes stofmængden n i rumfanget V, er koncentrationen c = n / V.</p>
+
+        <h3 class="teori-hoved">Skemaet med x</h3>
+        <p>Kendes kun startkoncentrationerne, indfører man x og skriver et skema med tre rækker: Start, Ændring og Ligevægt. Ligevægt = start + ændring.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Sådan indfører du x</span>
+            x er den koncentration af SO₂Cl₂, der omsættes, indtil ligevægten har indstillet sig. x måles i M.
+        </div>
+        <ol class="teori-trin">
+            <li>x knyttes til ét stof med koefficienten 1.</li>
+            <li>Reaktanterne ændres med −x, produkterne med +x. Koefficienten står foran x: 2NO giver ±2x.</li>
+            <li>x er en ændring, ikke en ligevægtskoncentration, og ikke en stofmængde i mol.</li>
+        </ol>
+
+        <h3 class="teori-hoved">Ligningen og CAS</h3>
+        <p>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven, og det hele sættes lig med K<sub>c</sub>'s værdi. Så er x den eneste ubekendte. Ligningen løses med CAS. CAS regner uden enheder; x er i M.</p>
+        <div class="eksempel">0,0500 = <span class="vbroek"><span>x · x</span><span>0,200 − x</span></span> &nbsp;⇒&nbsp; x = −0,128 ∨ x = 0,0781</div>
+
+        <h3 class="teori-hoved">Hvilken løsning kan bruges?</h3>
+        <p>CAS giver ofte to løsninger. Kun én giver positive koncentrationer. Sæt hver løsning ind i rækken Ligevægt, og skriv begrundelsen:</p>
+        <div class="eksempel">x = −0,128 M forkastes, fordi [SO₂] = x ville blive negativ.</div>
+        <p>En brugbar løsning ligger mellem 0 og den mindste startkoncentration af en reaktant (divideret med koefficienten). Den anden løsning er ofte også positiv, men større end det, der er til rådighed.</p>
+
+        <h3 class="teori-hoved">Kontrol</h3>
+        <p>Sæt ligevægtskoncentrationerne ind i ligevægtsloven. Giver det K<sub>c</sub> igen, er regningen rigtig. Svar med tre betydende cifre og med enhed.</p>
+        <p class="note-lille">Talværdierne i opgaverne er konstrueret, så regningen bliver overskuelig. Fremgangsmåden er den samme som ved målte data.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/model.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/regn.js"></script>
+<script src="js/sim_beholder.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

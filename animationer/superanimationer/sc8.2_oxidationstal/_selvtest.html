@@ -24,9 +24,10 @@
    felterne læser romertal og tal, at de typiske fejl får den rigtige
    besked, at alle opgaver kan gennemføres ved at skrive, med musen og
    med Vis svaret, at der ikke står et facit, før eleven har gjort noget,
-   at Kemichael kun taler ved hint og svar og kan sendes ud, at sproget
-   holder reglerne, og at tavlen og molekylet kan være på skærmen fra
-   1100 × 700 til 1600 × 950.
+   at spørgsmålet, feltet og Giv hint står samlet i scenen (ikke i
+   panelet), at parrene på fane 2 har pile, at Kemichael ikke blander sig
+   og kan sendes ud, at sproget holder reglerne, og at tavlen og molekylet
+   kan være på skærmen fra 1100 × 700 til 1600 × 950.
 
    Kræver en lokal server med animationer/ som rod (Kemichael hentes
    derfra). Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
@@ -212,30 +213,50 @@ function koerTest(W) {
     A.vaelg(0);
     paastand("første opgave: CO₂ trin for trin, ladningen først", A.opg.o.id === "co2" && A.aktivt() === "ladning");
     function led() { return d.querySelector("#rg-regn .tv-led").textContent; }
-    paastand("intet facit før tid: tomme felter, ingen tal over atomerne, ingen brikker endnu",
+    function spm() { return NK.el("rg-spm").textContent; }
+    function skjult(id) { return NK.el(id).classList.contains("skjult"); }
+    function arbFelt() { return d.querySelector("#rg-tavle #rg-arb .arb-felt input"); }
+    paastand("intet facit før tid: tomme felter, ingen tal over atomerne, ingen tal i brikkerne, intet regnestykke",
         A.felter.ladning.value === "" && !A.felter.ladning.placeholder && !A.slots.X.querySelector(".tv-ox") && !A.slots.O.querySelector(".tv-ox") &&
-        NK.el("rg-brikker").hidden);
-    paastand("tavlen forklarer første trin: start med ladningen", /Start derfor med ladningen/.test(NK.el("rg-trin").textContent) &&
-        d.querySelectorAll("#rg-trin .tv-chip").length === 3 && d.querySelector("#rg-trin .tv-chip.aktiv").textContent.indexOf("Ladningen") >= 0,
-        NK.el("rg-trin").textContent);
-    paastand("regnestykket starter med ord, ikke en halv beregning", /summen af oxidationstallene/.test(led()) && !/C/.test(led()), led());
-    paastand("feltet til ladningen er gult og står efter lighedstegnet", !!d.querySelector("#rg-regn .tv-q .tv-felt.aktiv input"));
-    paastand("linjen i opgavekortet siger kort, hvad der skal skrives", /Skriv ladningen i det gule felt/.test(A.beskedTekst()), A.beskedTekst());
+        skjult("rg-brikker") && !/[0-9]/.test(NK.el("rg-brikker").textContent) && skjult("rg-regn") && led() === "" && NK.el("rg-isol").textContent === "");
+    paastand("opgaven står på tavlen på én linje", NK.el("rg-maal").textContent === "Find oxidationstallet for C i CO₂" && NK.el("rg-navn").textContent === "Carbondioxid",
+        NK.el("rg-maal").textContent);
+    paastand("trinene står som mærker, og det første er ladningen", d.querySelectorAll("#rg-trin .tv-chip").length === 3 &&
+        d.querySelector("#rg-trin .tv-chip.aktiv").textContent.indexOf("Ladningen") >= 0, NK.el("rg-trin").textContent);
+    paastand("arbejdsfeltet spørger tydeligt efter ladningen", spm() === "Hvilken ladning har CO₂?", spm());
+    paastand("feltet, Tjek og Giv hint står samlet i arbejdsfeltet på tavlen", arbFelt() === A.felter.ladning &&
+        !!d.querySelector("#rg-arb .arb-felt .felt-ok") && !!d.querySelector("#rg-tavle #rg-arb #rg-knap") && A.el.knap.textContent === "Giv hint");
+    paastand("ingen ordretekst i panelet: der er kun listen med stofferne", d.querySelectorAll("#fane-rg .panel .kort").length === 1 &&
+        !d.querySelector("#fane-rg .panel .besked") && !d.querySelector("#fane-rg .panel .knap") && !d.querySelector("#fane-rg .panel input"));
+    paastand("der står ingen forklaring på tavlen, før eleven beder om hjælp", A.beskedTekst() === "" && !d.querySelector("#rg-tavle .tv-trintekst"), A.beskedTekst());
     A.nulstil();
-    paastand("Start forfra bygger tavlen igen med trin, regnestykke og brikker",
-        d.querySelectorAll("#rg-brikker .brik").length === 3 && /summen af oxidationstallene/.test(led()) && /ladningen/.test(NK.el("rg-trin").textContent), led());
+    paastand("Start forfra bygger tavlen igen med trin, spørgsmål og brikker",
+        d.querySelectorAll("#rg-brikker .brik").length === 3 && skjult("rg-regn") && /Ladningen/.test(NK.el("rg-trin").textContent) && /Hvilken ladning/.test(spm()), spm());
+    var arbTop = NK.el("rg-arb").getBoundingClientRect().top;
     A.felter.ladning.value = "";
     A.tjek("ladning");
     paastand("Enter i et tomt felt: skriv et tal først", /Skriv et tal/.test(A.beskedTekst()));
+    A.felter.ladning.value = "2";
+    d.querySelector("#rg-arb .arb-felt .felt-ok").click();
+    paastand("Tjek med et forkert tal: arbejdsfeltet bliver rødt med beskeden, og hintknappen lyser op", /Ikke endnu/.test(A.beskedTekst()) &&
+        /neutralt/.test(A.beskedTekst()) && A.el.arb.classList.contains("skidt") && A.el.knap.classList.contains("peg"), A.beskedTekst());
+    A.knap();
+    paastand("hintet til ladningen står ved feltet og peger på pladsen efter formlen", /^Hint/.test(A.beskedTekst()) && /efter formlen/.test(A.beskedTekst()) &&
+        A.el.arb.classList.contains("hint") && NK.el("rg-formel").classList.contains("vis-lad") && !!d.querySelector("#rg-formel .tv-lad.tom"), A.beskedTekst());
+    paastand("Kemichael siger ikke hintet, og knappen hedder nu Vis svaret", !A.k.taler() && A.el.knap.textContent === "Vis svaret" && !A.el.knap.classList.contains("peg"));
     A.felter.ladning.value = "0";
     A.tjek("ladning");
-    paastand("ladningen 0 er rigtig, og feltet over O kommer frem", A.aktivt() === "O" && !!A.slots.O.querySelector("input"));
-    paastand("nu kommer atomerne ind i regnestykket: C + 2 · O = 0", /^C \+ 2 · O$/.test(led().trim()) && /Nu O/.test(NK.el("rg-trin").textContent), led());
+    paastand("ladningen 0 er rigtig: spørgsmålet skifter til O, og et gult ? står over O", A.aktivt() === "O" && arbFelt() === A.felter.O &&
+        spm() === "Hvilket oxidationstal har hvert O?" && !!A.slots.O.querySelector(".tv-ox.spm") && !NK.el("rg-formel").classList.contains("vis-lad"), spm());
+    paastand("linjen siger, hvad der var rigtigt", /Rigtigt\. Ladningen er 0\./.test(A.beskedTekst()) && A.el.arb.classList.contains("god"), A.beskedTekst());
+    paastand("nu kommer regnestykket frem: C + 2 · O = 0", /^C \+ 2 · O$/.test(led().trim()) && !skjult("rg-regn") &&
+        d.querySelector("#rg-regn .tv-q").textContent === "0", led());
     A.felter.O.value = "-II";
     A.felter.O.dispatchEvent(new W.Event("input"));
     paastand("regnestykket viser det, der skrives, med almindelige tal: (−2)", /\(−2\)/.test(led()), led());
+    paastand("og tallet ses over O med romertal, mens der skrives", !!A.slots.O.querySelector(".tv-ox.vent") && A.slots.O.textContent === "−II", A.slots.O.textContent);
     A.tjek("O");
-    paastand("over O står romertallet −II, brikkerne kommer frem med −2", /−II/.test(A.slots.O.textContent) && !NK.el("rg-brikker").hidden &&
+    paastand("over O står romertallet −II, brikkerne kommer frem med −2", /−II/.test(A.slots.O.textContent) && !!A.slots.O.querySelector(".tv-ox.ok") && !skjult("rg-brikker") &&
         /−2/.test(NK.el("rg-brikker").textContent), NK.el("rg-brikker").textContent);
     A.felter.X.value = "+3";
     A.tjek("X");
@@ -247,6 +268,10 @@ function koerTest(W) {
     paastand("den pæne beregning står på tavlen: C + 2 · (−2) = 0 og under den C = 0 − 2 · (−2) = +4",
         /^C \+ 2 · \(−2\)$/.test(led().trim()) && /C = 0 − 2 · \(−2\) = \+4/.test(NK.el("rg-isol").textContent), led() + " | " + NK.el("rg-isol").textContent);
     paastand("knappen går videre til næste opgave", A.el.knap.textContent === "Næste opgave →");
+    paastand("arbejdsfeltet viser svaret, og feltet er væk", spm() === "✓ C har oxidationstallet +IV i CO₂." && A.feltBoks.hidden &&
+        A.el.arb.classList.contains("loest") && /^Løst ✓/.test(A.beskedTekst()), spm() + " | " + A.beskedTekst());
+    paastand("arbejdsfeltet har stået stille, mens regnestykket, beregningen og brikkerne kom frem",
+        Math.abs(NK.el("rg-arb").getBoundingClientRect().top - arbTop) < 1.5, NK.el("rg-arb").getBoundingClientRect().top + " mod " + arbTop);
 
     /* Alle 31 med rigtige svar (romertal og tal skiftevis) */
     var ikkeLoest = [];
@@ -275,18 +300,29 @@ function koerTest(W) {
     });
     paastand("Giv hint og Vis svaret fører helt igennem (CO₂, Cr₂O₇²⁻, Mn²⁺, HNO₃, S₈)", ikkeSvar.length === 0, ikkeSvar.join(", "));
     A.vaelg(28);
-    paastand("øvestof (SO₂): kun feltet over S, regnestykket skjult", A.opg.trin.join() === "X" && NK.el("rg-regn").hidden);
+    paastand("øvestof (SO₂): kun spørgsmålet om S, regnestykket skjult", A.opg.trin.join() === "X" && skjult("rg-regn") &&
+        spm() === "Hvilket oxidationstal har S?" && NK.el("rg-trin").textContent === "", spm());
     A.knap();
-    paastand("hintet sætter O ind med gråt og viser regnestykket", !NK.el("rg-regn").hidden && !!A.slots.O.querySelector(".tv-ox.graa") &&
+    paastand("hintet sætter O ind med gråt og viser regnestykket", !skjult("rg-regn") && !!A.slots.O.querySelector(".tv-ox.graa") &&
         /2 · \(−2\)/.test(led()), led());
-    paastand("hintet står i Kemichaels boble", /Hint/.test(A.k.tekst()), A.k.tekst());
+    paastand("hintet står i arbejdsfeltet ved feltet, og Kemichael tier", /^Hint/.test(A.beskedTekst()) && /O giver/.test(A.beskedTekst()) && !A.k.taler(), A.beskedTekst());
     A.felter.X.value = "+4";
     A.tjek("X");
     paastand("Kemichael tier, når opgaven er løst", !A.k.taler());
     A.vaelg(1);
     A.knap();
     A.knap();
-    paastand("Vis svaret skriver ladningen gult og beregningen i boblen", !!A.slots.ladning.querySelector(".tv-ox.vist") && /Ladningen er \+1/.test(A.k.tekst()), A.k.tekst());
+    paastand("Vis svaret skriver ladningen gult og svaret i arbejdsfeltet", !!A.slots.ladning.querySelector(".tv-ox.vist") &&
+        /^Svaret/.test(A.beskedTekst()) && /Ladningen er \+1/.test(A.beskedTekst()) && !A.k.taler(), A.beskedTekst());
+    A.vaelg(5);
+    var nn = 0;
+    while (!A.faerdig && nn++ < 12) A.knap();
+    paastand("Vis svaret på sidste trin (Cr₂O₇²⁻): beregningen står på tavlen, linjen henviser til den",
+        /Cr = \+12 \/ 2 = \+6/.test(NK.el("rg-isol").textContent) && /^Svaret/.test(A.beskedTekst()) && /Beregningen står herunder/.test(A.beskedTekst()), A.beskedTekst());
+    A.vaelg(7);
+    A.knap();
+    A.knap();
+    paastand("Vis svaret for en ion af ét atom (Mn²⁺): reglen står i linjen", /ion af ét atom/.test(A.beskedTekst()), A.beskedTekst());
 
     overskrift("7. Fane 2 kan gennemføres");
     W.NK.visFane("fane-ek");
@@ -296,21 +332,39 @@ function koerTest(W) {
     paastand("første molekyle: H₂O, gæt på O og H", B.m.def.id === "h2o" && B.trin === "gaet" && Object.keys(B.gaetFelter).join() === "O,H");
     paastand("intet facit før tid: tomme gætfelter uden et muligt svar, intet regnskab",
         B.gaetFelter.O.inp.value === "" && !/[0-9IV]/.test(B.gaetFelter.O.inp.placeholder) && /kommer, når/.test(NK.el("ek-regnskab").textContent));
+    function spm2() { return NK.el("ek-spm").textContent; }
+    /* Pilene tegnes paa laerredet: taelles ved at lytte paa NK.Tegn.pil i ét billede */
+    function pile() {
+        var n = 0, gl = NK.Tegn.pil;
+        NK.Tegn.pil = function () { n++; return gl.apply(this, arguments); };
+        try { B.tegn(); } finally { NK.Tegn.pil = gl; }
+        return n;
+    }
+    paastand("spørgsmålet, gættet og knappen står i scenen, ikke i panelet", !!d.querySelector("#fane-ek .scene #ek-arb #ek-knap") &&
+        !!d.querySelector("#fane-ek .scene #ek-arb input") && !d.querySelector("#fane-ek .panel input") && !d.querySelector("#fane-ek .panel .knap") &&
+        spm2() === "Gæt først: hvilke oxidationstal har O og H?", spm2());
+    paastand("ingen pile, før der er gættet", pile() === 0, pile());
     var u0 = B.enheder[0], c0 = B.midte(u0), pO = B.geo.pos[1];
     traek(B, c0.x, c0.y, pO.x, pO.y);
     tik(B, 0.3);
     paastand("parrene kan ikke flyttes, før der er gættet", u0.hos === null && /Gæt først/.test(B.beskedTekst()), B.beskedTekst());
     B.gaetFelter.O.inp.value = "-II";
     B.gaetTjek("O");
-    paastand("efter det første gæt: skriv også gættet for H", B.trin === "gaet" && /H/.test(B.beskedTekst()));
+    paastand("efter det første gæt: spørgsmålet gælder nu kun H", B.trin === "gaet" && spm2() === "Gæt først: hvilket oxidationstal har H?" &&
+        /−II/.test(B.gaetFelter.O.svar.textContent), spm2());
     B.gaetFelter.H.inp.value = "+1";
-    B.gaetTjek("H");
-    paastand("begge gæt skrevet ned: nu fordeles parrene", B.trin === "fordel" && /Dit gæt er skrevet ned/.test(B.beskedTekst()));
+    B.gaetKnap.click();
+    paastand("begge gæt skrevet ned: nu står der, hvad der skal trækkes", B.trin === "fordel" &&
+        spm2() === "Træk hvert elektronpar hen til det atom, der trækker hårdest." && /elektronegativiteten/.test(B.beskedTekst()) && B.gaetKnap.hidden, spm2());
+    tik(B, 0.3);
+    paastand("hvert par, der skal flyttes, har en pil mod hvert af de to atomer", pile() === 4, pile());
     var pH = B.geo.pos[0];
     c0 = B.midte(u0);
     traek(B, c0.x, c0.y, pH.x, pH.y);
     tik(B, 0.5);
-    paastand("parret trukket hen til H: rødt, og linjen siger hvorfor", u0.hos === 0 && u0.forkert && /O trækker hårdest/.test(B.beskedTekst()), B.beskedTekst());
+    paastand("parret trukket hen til H: rødt, og linjen siger hvorfor", u0.hos === 0 && u0.forkert && /O trækker hårdest/.test(B.beskedTekst()) &&
+        B.el.arb.classList.contains("skidt"), B.beskedTekst());
+    paastand("det forkerte par har én pil mod det rigtige atom (og det andet par stadig to)", pile() === 3, pile());
     c0 = B.midte(u0);
     traek(B, c0.x, c0.y, pO.x, pO.y);
     tik(B, 0.5);
@@ -327,6 +381,7 @@ function koerTest(W) {
         /Summen: 2 · \(\+1\) \+ \(−2\) = 0/.test(NK.el("ek-regnskab").textContent.replace(/\s+/g, " ")), NK.el("ek-regnskab").textContent);
     paastand("gættet står grønt", B.gaetFelter.O.felt.classList.contains("ok") && B.gaetFelter.H.felt.classList.contains("ok"));
     paastand("linjen siger, at gættet passede", /Dit gæt passede/.test(B.beskedTekst()), B.beskedTekst());
+    paastand("arbejdsfeltet viser svaret, og pilene er væk", spm2() === "✓ O er −II og H er +I i H₂O." && B.el.arb.classList.contains("loest") && pile() === 0, spm2());
 
     /* Påskeægget: et par sluppet over kaffen */
     B.vaelg(1);
@@ -383,10 +438,16 @@ function koerTest(W) {
     paastand("ude: knappen hedder Hent Kemichael på begge faner", A.k.knap.textContent === "Hent Kemichael" && B.k.knap.textContent === "Hent Kemichael");
     B.vaelg(0);
     B.knap();
-    paastand("ude: hintet står i opgavekortet i stedet", /Hint/.test(B.beskedTekst()) && !B.k.taler(), B.beskedTekst());
+    paastand("ude: hintet står i arbejdsfeltet som ellers", /^Hint/.test(B.beskedTekst()) && !B.k.taler(), B.beskedTekst());
     B.k.hentInd();
-    tik(B, 1);
+    tik(B, 4);
     paastand("hentet ind igen", B.k.inde() && A.k.inde());
+    D.KEMICHAEL_SIGER_HINT = true;
+    B.vaelg(0);
+    B.knap();
+    paastand("med D.KEMICHAEL_SIGER_HINT siger Kemichael hintet i sin boble", /Hint/.test(B.k.tekst()) && B.beskedTekst() === "", B.k.tekst());
+    D.KEMICHAEL_SIGER_HINT = false;
+    B.vaelg(0);
 
     overskrift("9. Sproget");
     var tekster = [];
@@ -405,9 +466,18 @@ function koerTest(W) {
     /* Teksterne paa tavlen og i linjen for hvert trin i alle 31 */
     D.REGLER.forEach(function (o, i) {
         A.vaelg(i);
-        A.opg.trin.forEach(function (k) { tekster.push(A.trinTekst(k), A.hint(k), A.svarTekst(k)); });
-        tekster.push(A.trinLinje(), NK.el("rg-trin").textContent);
+        A.opg.trin.forEach(function (k) { tekster.push(A.spmTekst(k), A.hint(k), A.svarTekst(k)); });
+        tekster.push(A.trinLinje(), NK.el("rg-trin").textContent, NK.el("rg-maal").textContent, A.slutLinje("svar"));
     });
+    /* Spoergsmaalene og hintene paa fane 2 i begge bidder */
+    W.NK.visFane("fane-ek");
+    D.MOLEKYLER.forEach(function (def, i) {
+        B.vaelg(i);
+        tekster.push(B.trinLinje(), B.trinInfo().hint);
+        B.springGaet();
+        tekster.push(B.trinLinje(), B.trinInfo().hint, B.beskedTekst());
+    });
+    W.NK.visFane("fane-rg");
     var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
     paastand("ingen tankestreger", tanke.length === 0, tanke.slice(0, 2).join(" | "));
     var en = tekster.filter(function (t) { return /[A-Za-z)]¹[⁺⁻]|[A-Za-z)]1[+−](?![\d ])/.test(t); });
@@ -419,7 +489,7 @@ function koerTest(W) {
     overskrift("10. Layoutet");
     var ramme = document.getElementById("ramme");
     var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
-    var lFejl = [];
+    var lFejl = [], knapFejl = [];
     maal.forEach(function (m) {
         ramme.style.width = m[0] + "px";
         ramme.style.height = m[1] + "px";
@@ -431,6 +501,15 @@ function koerTest(W) {
             if (t.scrollHeight > t.clientHeight + 1 || t.scrollWidth > t.clientWidth + 1) lFejl.push(m.join("×") + " tavlen " + D.REGLER[i].id);
             var f = t.querySelector(".tv-formel").getBoundingClientRect(), tr = t.getBoundingClientRect();
             if (f.left < tr.left || f.right > tr.right) lFejl.push(m.join("×") + " formlen " + D.REGLER[i].id);
+            /* Hintknappen staar lige ved siden af feltet, paa samme linje */
+            var fb = A.feltBoks.getBoundingClientRect(), kb = A.el.knap.getBoundingClientRect();
+            if (kb.left - fb.right < 0 || kb.left - fb.right > 40 || Math.abs((kb.top + kb.bottom) - (fb.top + fb.bottom)) > 16) {
+                knapFejl.push(m.join("×") + " " + D.REGLER[i].id + " afstand " + Math.round(kb.left - fb.right));
+            }
+            /* En lang besked i to linjer maa ikke skubbe noget ud af tavlen */
+            A.besked("Der er 2 Cr. Tilsammen giver de +12. Del det mellem dem. Der er 2 Cr. Tilsammen giver de +12. Del det mellem dem.", "skidt");
+            if (t.scrollHeight > t.clientHeight + 1) lFejl.push(m.join("×") + " tavlen med lang besked " + D.REGLER[i].id);
+            A.besked("", "");
             /* Loest: brikkerne og summen staar paa én linje */
             var n = 0;
             while (!A.faerdig && n++ < 12) A.knap();
@@ -446,22 +525,37 @@ function koerTest(W) {
             var g = B.geo, ind = B.lay.ind;
             if (g.bx0 < ind.x - 8 || g.bx1 > ind.x + ind.b + 8 || g.by0 < ind.y - 20 || g.by1 > ind.y + ind.h + 20) lFejl.push(m.join("×") + " molekylet " + def.id);
             if (g.F < 24) lFejl.push(m.join("×") + " små symboler " + def.id);
+            /* Molekylet staar over arbejdsfeltet, ogsaa naar forklaringen til sidst goer det hoejere */
+            var arb = B.el.arb;
+            if (g.by1 > arb.offsetTop + 2) lFejl.push(m.join("×") + " molekylet bag arbejdsfeltet " + def.id);
+            if (arb.offsetLeft < B.lay.tv.x || arb.offsetLeft + arb.offsetWidth > B.lay.tv.x + B.lay.tv.b) lFejl.push(m.join("×") + " arbejdsfeltet uden for tavlen " + def.id);
+            var n2 = 0;
+            while (!B.regnVist && n2++ < 8) { B.knap(); tik(B, 1.2); }
+            tik(B, 0.2);
+            if (B.geo.by1 > arb.offsetTop + 2) lFejl.push(m.join("×") + " molekylet bag arbejdsfeltet til sidst " + def.id);
+            if (arb.offsetTop < B.lay.tv.y + B.lay.hoved) lFejl.push(m.join("×") + " arbejdsfeltet for højt " + def.id);
         });
         var panel = d.querySelector("#fane-ek .panel");
         if (panel.scrollWidth > panel.clientWidth + 1) lFejl.push(m.join("×") + " panelet er for bredt");
     });
     paastand("tavlen og molekylerne kan være der fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 4).join(", "));
+    paastand("hintknappen står lige ved siden af feltet i alle størrelser", knapFejl.length === 0, knapFejl.slice(0, 4).join(", "));
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
     var smaa = [];
-    d.querySelectorAll(".panel *, .tavle *").forEach(function (e) {
+    W.NK.visFane("fane-rg");
+    A.vaelg(0);
+    A.knap();
+    d.querySelectorAll(".panel *, .tavle *, .arb *").forEach(function (e) {
         if (!e.childNodes.length || !e.textContent.trim() || e.offsetParent === null) return;
         var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
         if (!egen) return;
         var px = parseFloat(W.getComputedStyle(e).fontSize);
         if (px < 11.5) smaa.push(e.className + " " + px);
     });
-    paastand("ingen tekst under 11,5 px i panelet og på tavlen", smaa.length === 0, smaa.slice(0, 4).join(", "));
+    paastand("ingen tekst under 11,5 px i panelet, på tavlen og i arbejdsfeltet", smaa.length === 0, smaa.slice(0, 4).join(", "));
+    var arbSkrift = parseFloat(W.getComputedStyle(NK.el("rg-spm")).fontSize), beskedSkrift = parseFloat(W.getComputedStyle(NK.el("rg-besked")).fontSize);
+    paastand("spørgsmålet i arbejdsfeltet er stort (mindst 17 px), og linjen under mindst 15 px", arbSkrift >= 17 && beskedSkrift >= 15, arbSkrift + " og " + beskedSkrift);
 }
 </script>
 </body>

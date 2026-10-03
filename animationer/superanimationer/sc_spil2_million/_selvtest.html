@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest, Kemi-Millionær</title>
+<style>
+    body { background:#05071a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f5c542; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i spillet og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se paa
+   et skaermbillede: at de 70 spoergsmaal er hele, at reglerne holder
+   (beloeb, sikre trin, livliner, stop), at et spil kan spilles fra ende
+   til anden med mus og tastatur, at sejrsskaermen har den titel,
+   escaperoommet spoerger efter, at lydene kan regnes ud uden at klippe,
+   og at sproget og skriftstoerrelserne holder reglerne.
+
+   Testen saetter NK.Tempo til 0, saa ventetiderne forsvinder, og den
+   laegger elevens rekord og valg tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined && note !== "" ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+/* Elevens eget gemmes og laegges tilbage til sidst */
+var NOEGLER = ["nk-million-rekord", "nk-million-set", "nk-million-sprog", "nk-million-lyd"];
+var GEMT = {};
+NOEGLER.forEach(function (k) {
+    try { GEMT[k] = localStorage.getItem(k); localStorage.removeItem(k); } catch (e) {}
+});
+function laegTilbage() {
+    NOEGLER.forEach(function (k) {
+        try { if (GEMT[k] === null || GEMT[k] === undefined) localStorage.removeItem(k); else localStorage.setItem(k, GEMT[k]); } catch (e) {}
+    });
+}
+
+var ramme = document.createElement("iframe");
+ramme.src = "index.html";
+document.body.appendChild(ramme);
+ramme.addEventListener("load", function () { setTimeout(koer, 300); });
+
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+/* Venter paa en tilstand i stedet for et fast antal millisekunder */
+async function til(f, navn) {
+    for (var i = 0; i < 500; i++) {
+        if (f()) return true;
+        await vent(10);
+    }
+    paastand("ventede forgæves på: " + navn, false);
+    return false;
+}
+
+async function koer() {
+    try { await tests(); } catch (e) { fejl++; skriv("UNDTAGELSE " + e + "\n" + e.stack, "fejl"); }
+    laegTilbage();
+    vis();
+}
+
+async function tests() {
+    var w = ramme.contentWindow, d = ramme.contentDocument, NK = w.NK;
+    var D = NK.Data, Spil = NK.Spil, A = NK.App, L = NK.Spillyd;
+    NK.Tempo = 0;
+
+    function id(x) { return d.getElementById(x); }
+    function svarknap(i) { return d.querySelector('.svar[data-svar="' + i + '"]'); }
+    function tast(k) { d.dispatchEvent(new w.KeyboardEvent("keydown", { key: k, bubbles: true, cancelable: true })); }
+    function forkert(S) {
+        var q = Spil.aktuelt(S);
+        return [0, 1, 2, 3].filter(function (i) { return i !== q.rigtig && !S.fjernet[i]; })[0];
+    }
+    async function fremme() {
+        return til(function () { return A.skaerm() === "spil" && !A.optaget() && !A.vist(); }, "svarene er fremme");
+    }
+    /* Vaelger et svar med musen, laaser det og venter paa udfaldet */
+    async function svar(rigtigt) {
+        await fremme();
+        var S = A.spil(), q = Spil.aktuelt(S);
+        var i = rigtigt ? q.rigtig : forkert(S);
+        svarknap(i).click();
+        id("hovedknap").click();
+        await til(function () { return A.vist(); }, "udfaldet er vist");
+        return i;
+    }
+    async function rigtigeSvar(antal) {
+        for (var n = 0; n < antal; n++) {
+            await svar(true);
+            id("hovedknap").click();
+        }
+    }
+
+    /* ----------------------------------------------------------------- */
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    paastand("alle dele er indlæst", !!(D && Spil && A && L && NK.Visning && NK.Rundvisning));
+    paastand("70 spørgsmål", D.SPOERGSMAAL.length === 70, D.SPOERGSMAAL.length);
+    paastand("15 beløb, der stiger, og det sidste er en million",
+        D.BELOEB.length === 15 && D.BELOEB[14] === 1000000 && D.BELOEB.every(function (b, i) { return i === 0 || b > D.BELOEB[i - 1]; }));
+    paastand("spillet åbner på titelskærmen", A.skaerm() === "titel" && !id("titelskaerm").hidden && id("braet").hidden);
+    paastand("stigen har 15 trin med millionen øverst", id("stige").children.length === 15 && /1\.000\.000 kr\./.test(id("stige").children[0].textContent));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("2. Spørgsmålene");
+    var ids = {}, dub = [], skaeve = [], ens = [], lange = [], langeSvar = [], tomme = [];
+    D.SPOERGSMAAL.forEach(function (s) {
+        if (ids[s.id]) dub.push(s.id);
+        ids[s.id] = 1;
+        ["da", "en"].forEach(function (sp) {
+            if (!s.b[sp] || !s.b[sp].trim()) tomme.push(s.id);
+            if (!s.svar[sp] || s.svar[sp].length !== 4) { skaeve.push(s.id + " " + sp); return; }
+            var set = {};
+            s.svar[sp].forEach(function (x) {
+                if (set[x]) ens.push(s.id + " " + sp + ": " + x);
+                set[x] = 1;
+                if (!x || x.length > 28) langeSvar.push(s.id + ": " + x);
+            });
+            if (s.b[sp].length > 135) lange.push(s.id + " " + sp + " (" + s.b[sp].length + ")");
+        });
+    });
+    paastand("hvert id står én gang", !dub.length, dub.join(", "));
+    paastand("hver beskrivelse står på dansk og engelsk", !tomme.length, tomme.join(", "));
+    paastand("fire svar på hvert sprog", !skaeve.length, skaeve.join(", "));
+    paastand("ingen ens svar i samme spørgsmål", !ens.length, ens.join(", "));
+    paastand("ingen beskrivelse er for lang til ruden", !lange.length, lange.join(", "));
+    paastand("intet svar er for langt til ruden", !langeSvar.length, langeSvar.join(", "));
+    paastand("hvert kapitel har et navn på begge sprog",
+        D.SPOERGSMAAL.every(function (s) { return !!D.KAPITLER.da[s.kap] && !!D.KAPITLER.en[s.kap]; }));
+    D.TRIN.forEach(function (t, i) {
+        var n = D.SPOERGSMAAL.filter(function (s) { return t.kap.indexOf(s.kap) >= 0; }).length;
+        paastand("trin " + (i + 1) + " har spørgsmål nok til fem og et bytte (" + n + ")", n >= 6);
+    });
+    /* Det rigtige svar maa ikke ogsaa vaere det rigtige svar paa et andet
+       spoergsmaal med samme beskrivelse, og en beskrivelse maa ikke naevne
+       sit eget svar. */
+    var afsloerer = D.SPOERGSMAAL.filter(function (s) {
+        return s.b.da.toLowerCase().indexOf(s.svar.da[0].toLowerCase()) >= 0 && s.svar.da[0].length > 3;
+    }).map(function (s) { return s.id; });
+    paastand("ingen beskrivelse nævner sit eget svar", !afsloerer.length, afsloerer.join(", "));
+
+    function rigtigt(idet) { return D.SPOERGSMAAL.filter(function (s) { return s.id === idet; })[0].svar.da[0]; }
+    function beskrivelse(idet) { return D.SPOERGSMAAL.filter(function (s) { return s.id === idet; })[0].b.da; }
+    paastand("kernepartiklen med positiv ladning er en proton", rigtigt("c1_1") === "Proton");
+    paastand("tungtopløselig er under 1 g i 100 mL, som i sc2.1 og sc2.4", /under 1 g/.test(beskrivelse("c2_2")) && /over 1 g/.test(beskrivelse("c2_1")));
+    paastand("sammenhængen mellem p, V, n og T hedder idealgasligningen, som i sc4.6", rigtigt("c4_8") === "Idealgasligningen");
+    paastand("H₃O⁺ er oxonium", rigtigt("c7_2") === "Oxonium");
+    paastand("afgivelse af elektroner er oxidation, optagelse er reduktion", rigtigt("c8_1") === "Oxidation" && rigtigt("c8_2") === "Reduktion");
+    paastand("H₂ hedder hydrogen", rigtigt("c8_10") === "Hydrogen");
+    paastand("fem slags ros på hvert sprog", D.ROS.da.length === 5 && D.ROS.en.length === 5);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("3. Reglerne");
+    var S = Spil.nyt();
+    paastand("et spil har 15 forskellige spørgsmål", S.spoergsmaal.length === 15 &&
+        Object.keys(S.spoergsmaal.reduce(function (o, q) { o[q.id] = 1; return o; }, {})).length === 15);
+    paastand("sværhedsgraden følger kapitlerne (1-3, så 4, 5 og 7, så 5, 7 og 8)", S.spoergsmaal.every(function (q, i) {
+        return D.TRIN[Spil.trin(i)].kap.indexOf(q.kap) >= 0;
+    }));
+    paastand("trinene er 5, 5 og 5 spørgsmål", Spil.trin(0) === 0 && Spil.trin(4) === 0 && Spil.trin(5) === 1 && Spil.trin(9) === 1 && Spil.trin(10) === 2 && Spil.trin(14) === 2);
+    paastand("det rigtige svar følger med, når svarene blandes", S.spoergsmaal.every(function (q) {
+        var kilde = D.SPOERGSMAAL.filter(function (s) { return s.id === q.id; })[0];
+        return q.svar.da[q.rigtig] === kilde.svar.da[0] && q.svar.en[q.rigtig] === kilde.svar.en[0];
+    }));
+    var pladser = {};
+    for (var n = 0; n < 40; n++) Spil.nyt().spoergsmaal.forEach(function (q) { pladser[q.rigtig] = 1; });
+    paastand("det rigtige svar står ikke altid samme sted", Object.keys(pladser).length === 4);
+
+    paastand("et forkert svar før spørgsmål 6 giver 0 kr.", [0, 1, 2, 3, 4].every(function (i) { return Spil.sikret(i) === 0; }));
+    paastand("et forkert svar på spørgsmål 6 til 10 giver 1.000 kr.", [5, 6, 7, 8, 9].every(function (i) { return Spil.sikret(i) === 1000; }));
+    paastand("et forkert svar på spørgsmål 11 til 15 giver 32.000 kr.", [10, 11, 12, 13, 14].every(function (i) { return Spil.sikret(i) === 32000; }));
+    paastand("man har 0 kr. før spørgsmål 1 og 500 kr. før spørgsmål 5", Spil.har(0) === 0 && Spil.har(4) === 500);
+
+    S = Spil.nyt();
+    paastand("man kan ikke stoppe ved spørgsmål 1", !Spil.kanStoppe(S) && !Spil.stop(S));
+    paastand("et svar kan ikke låses, før det er valgt", Spil.laas(S) === null);
+    Spil.vaelg(S, forkert(S));
+    Spil.vaelg(S, Spil.aktuelt(S).rigtig);
+    paastand("man kan vælge om, indtil svaret er låst", S.valgt === Spil.aktuelt(S).rigtig && Spil.laas(S) === "rigtig");
+    paastand("et låst svar kan ikke ændres", !Spil.vaelg(S, forkert(S)));
+    Spil.videre(S);
+    paastand("et rigtigt svar giver næste spørgsmål", S.nr === 1 && !S.laast && S.valgt === null);
+    paastand("ved spørgsmål 2 kan man stoppe med 100 kr.", Spil.stop(S) && S.slut === "stoppet" && S.gevinst === 100);
+
+    S = Spil.nyt();
+    for (n = 0; n < 6; n++) { Spil.vaelg(S, Spil.aktuelt(S).rigtig); Spil.laas(S); Spil.videre(S); }
+    Spil.vaelg(S, forkert(S));
+    paastand("et forkert svar på spørgsmål 7 er forkert", Spil.laas(S) === "forkert");
+    Spil.videre(S);
+    paastand("og man går hjem med 1.000 kr.", S.slut === "tabt" && S.gevinst === 1000);
+
+    S = Spil.nyt();
+    for (n = 0; n < 15; n++) { Spil.vaelg(S, Spil.aktuelt(S).rigtig); Spil.laas(S); Spil.videre(S); }
+    paastand("15 rigtige svar giver en million", S.slut === "vundet" && S.gevinst === 1000000);
+
+    /* Livlinerne, mange gange, fordi de traekker tilfaeldigt */
+    var halvOk = true, fjernOk = true, sammenOk = true, bytOk = true, engangOk = true;
+    for (n = 0; n < 60; n++) {
+        var a = Spil.nyt(), q = Spil.aktuelt(a);
+        Spil.vaelg(a, forkert(a));
+        Spil.halv(a);
+        var tilbage = [0, 1, 2, 3].filter(function (i) { return !a.fjernet[i]; });
+        if (tilbage.length !== 2 || tilbage.indexOf(q.rigtig) < 0) halvOk = false;
+        if (a.valgt !== null && a.fjernet[a.valgt]) halvOk = false;
+        if (Spil.kan(a, "fjern") || Spil.fjern(a)) sammenOk = false;
+        if (Spil.halv(a)) engangOk = false;
+
+        var b = Spil.nyt(), qb = Spil.aktuelt(b);
+        Spil.fjern(b);
+        var tb = [0, 1, 2, 3].filter(function (i) { return !b.fjernet[i]; });
+        if (tb.length !== 3 || tb.indexOf(qb.rigtig) < 0) fjernOk = false;
+        Spil.halv(b);
+        tb = [0, 1, 2, 3].filter(function (i) { return !b.fjernet[i]; });
+        if (tb.length !== 2 || tb.indexOf(qb.rigtig) < 0) sammenOk = false;
+
+        var c = Spil.nyt(), foer = Spil.aktuelt(c).id, alle = c.spoergsmaal.map(function (x) { return x.id; });
+        Spil.fjern(c);
+        Spil.byt(c);
+        var ny = Spil.aktuelt(c);
+        if (ny.id === foer || alle.indexOf(ny.id) >= 0 || D.TRIN[0].kap.indexOf(ny.kap) < 0) bytOk = false;
+        if (c.fjernet.some(function (x) { return x; })) bytOk = false;
+        if (Spil.byt(c)) engangOk = false;
+    }
+    paastand("To væk lader det rigtige og ét forkert svar stå", halvOk);
+    paastand("Én væk fjerner ét forkert svar", fjernOk);
+    paastand("de to livliner sammen efterlader altid ét forkert svar, så svaret ikke afsløres", sammenOk);
+    paastand("Nyt spørgsmål giver et nyt fra samme trin, og de fjernede svar kommer igen", bytOk);
+    paastand("hver livline kan kun bruges én gang", engangOk);
+
+    /* Nye spoergsmaal i naeste spil */
+    try { w.localStorage.removeItem(Spil.NOEGLE_SET); } catch (e) {}
+    var set = {};
+    S = Spil.nyt();
+    for (n = 0; n < 5; n++) { set[Spil.aktuelt(S).id] = 1; Spil.vaelg(S, Spil.aktuelt(S).rigtig); Spil.laas(S); Spil.videre(S); }
+    var S2 = Spil.nyt();
+    paastand("det næste spil begynder med spørgsmål, eleven ikke har set", S2.spoergsmaal.slice(0, 5).every(function (x) { return !set[x.id]; }));
+    paastand("et forkert svar får sin egen forklaring, når ordet er et fagord i spillet",
+        Spil.beskrivelse("Neutron", "da") === "Kernepartikel med neutral ladning" && Spil.beskrivelse("Blok", "da") === null);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("4. Et helt spil med musen");
+    try { w.localStorage.removeItem("nk-million-rekord"); } catch (e) {}
+    id("startknap").click();
+    await fremme();
+    paastand("Start spillet viser brættet", A.skaerm() === "spil" && id("titelskaerm").hidden && !id("braet").hidden);
+    paastand("Lås svaret er slået fra, til et svar er valgt", id("hovedknap").disabled);
+    paastand("Stop findes ikke ved spørgsmål 1", id("stopknap").classList.contains("usynlig"));
+    paastand("der spilles om 100 kr.", /100 kr\./.test(id("pulje").textContent) && id("stige").querySelector("li.nu").getAttribute("data-nr") === "0");
+    S = A.spil();
+    var q1 = Spil.aktuelt(S);
+    svarknap(forkert(S)).click();
+    paastand("et klik vælger svaret (orange) og låser det ikke", svarknap(S.valgt).classList.contains("valgt") && !S.laast && !id("hovedknap").disabled);
+    svarknap(q1.rigtig).click();
+    paastand("man kan vælge om", S.valgt === q1.rigtig && d.querySelectorAll(".svar.valgt").length === 1);
+    id("hovedknap").click();
+    await til(function () { return A.vist(); }, "udfaldet er vist");
+    paastand("det rigtige svar bliver grønt", svarknap(q1.rigtig).classList.contains("rigtig"));
+    paastand("statuslinjen roser og nævner beløbet", id("status").classList.contains("god") && /100 kr\./.test(id("status").textContent));
+    paastand("trinnet er vundet på stigen", id("stige").querySelector('li[data-nr="0"]').classList.contains("vundet"));
+    paastand("knappen går videre", /Næste spørgsmål/.test(id("hovedknap").textContent));
+    id("hovedknap").click();
+    await rigtigeSvar(3);
+    await svar(true);
+    paastand("spørgsmål 5 sikrer 1.000 kr.", /1\.000 kr\./.test(id("status").textContent) && /sikret/.test(id("status").textContent) && id("sikret").textContent === "1.000 kr.");
+    id("hovedknap").click();
+    await rigtigeSvar(9);
+    await svar(true);
+    paastand("ved det sidste spørgsmål hedder knappen Se gevinsten", /Se gevinsten/.test(id("hovedknap").textContent));
+    id("hovedknap").click();
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    var kort = id("slutkort").textContent;
+    paastand("sejrsskærmen kårer eleven til Superkemiker (escaperoommets segl 1)", /kåret til\s+Superkemiker/.test(kort), kort);
+    await til(function () { return id("slut-beloeb").textContent === "1.000.000 kr."; }, "beløbet er talt op");
+    paastand("beløbet er 1.000.000 kr.", id("slut-beloeb").textContent === "1.000.000 kr.");
+    paastand("rosen er en af de fem", D.ROS.da.indexOf(id("slut-ros").textContent) >= 0 && !id("slut-ros").hidden);
+    paastand("det er en ny rekord, og den er gemt", !id("slut-maerke").hidden && id("rekord").textContent === "1.000.000 kr.");
+    paastand("millionen er markeret på stigen", id("stige").querySelector('li[data-nr="14"]').classList.contains("nu"));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("5. Forkert svar og stop");
+    id("nytknap").click();
+    await fremme();
+    paastand("Nyt spil begynder forfra med nye spørgsmål", A.skaerm() === "spil" && A.spil().nr === 0 && id("slutlag").hidden);
+    var valgt = await svar(false);
+    S = A.spil();
+    paastand("et forkert svar bliver rødt, og det rigtige grønt", svarknap(valgt).classList.contains("forkert") && svarknap(Spil.aktuelt(S).rigtig).classList.contains("rigtig"));
+    paastand("statuslinjen nævner det rigtige svar", id("status").classList.contains("daarlig") && id("status").textContent.indexOf(Spil.aktuelt(S).svar.da[Spil.aktuelt(S).rigtig]) >= 0);
+    paastand("knappen hedder Se resultatet", /Se resultatet/.test(id("hovedknap").textContent));
+    id("hovedknap").click();
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    paastand("forkert ved spørgsmål 1 giver 0 kr.", id("slut-beloeb").textContent === "0 kr." && /Spillet er slut/.test(id("slut-titel").textContent));
+    paastand("slutkortet viser svaret", id("slut-ekstra").textContent.indexOf(Spil.aktuelt(S).svar.da[Spil.aktuelt(S).rigtig]) >= 0);
+    paastand("ingen ny rekord", id("slut-maerke").hidden && id("rekord").textContent === "1.000.000 kr.");
+
+    id("nytknap").click();
+    await rigtigeSvar(6);
+    await svar(false);
+    id("hovedknap").click();
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    paastand("forkert ved spørgsmål 7 giver 1.000 kr.", id("slut-beloeb").textContent === "1.000 kr.");
+    paastand("stigen viser, hvad man går hjem med", id("stige").querySelector("li.hjem").getAttribute("data-nr") === "4" && !id("stige").querySelector("li.nu"));
+
+    id("nytknap").click();
+    await rigtigeSvar(2);
+    await fremme();
+    paastand("fra spørgsmål 2 kan man stoppe", !id("stopknap").classList.contains("usynlig") && /200 kr\./.test(id("stopknap").textContent));
+    id("stopknap").click();
+    paastand("Stop spørger først", !id("bekraeft").hidden && id("handling").hidden && /200 kr\./.test(id("bekraeft-tekst").textContent) && A.skaerm() === "spil");
+    paastand("mens der spørges, kan der ikke vælges svar", svarknap(0).disabled);
+    id("nejknap").click();
+    paastand("Nej fortsætter spillet", id("bekraeft").hidden && !id("handling").hidden && !A.spil().slut);
+    id("stopknap").click();
+    id("jaknap").click();
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    paastand("Ja stopper med 200 kr.", id("slut-beloeb").textContent === "200 kr." && /stoppede/.test(id("slut-titel").textContent));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Livlinerne og tastaturet");
+    tast("Enter");
+    await fremme();
+    paastand("Enter starter et nyt spil", A.skaerm() === "spil" && A.spil().nr === 0);
+    S = A.spil();
+    var liner = {};
+    Array.prototype.forEach.call(d.querySelectorAll(".livline"), function (k) { liner[k.getAttribute("data-livline")] = k; });
+    liner.halv.click();
+    paastand("To væk fjerner to svar på brættet", d.querySelectorAll(".svar.fjernet").length === 2 && liner.halv.classList.contains("brugt") && liner.halv.disabled);
+    paastand("Én væk er spærret, når der kun er ét forkert svar tilbage", liner.fjern.disabled && !liner.fjern.classList.contains("brugt"));
+    var foerId = Spil.aktuelt(S).id;
+    tast("7");
+    await fremme();
+    paastand("7 bytter spørgsmålet, og alle fire svar står der igen", Spil.aktuelt(S).id !== foerId && d.querySelectorAll(".svar.fjernet").length === 0 && liner.byt.classList.contains("brugt"));
+    tast("6");
+    paastand("6 fjerner ét svar", d.querySelectorAll(".svar.fjernet").length === 1 && liner.fjern.classList.contains("brugt"));
+    var bogstav = "abcd".charAt(Spil.aktuelt(S).rigtig);
+    tast(bogstav);
+    paastand("bogstavet vælger svaret", S.valgt === Spil.aktuelt(S).rigtig);
+    tast("Enter");
+    await til(function () { return A.vist(); }, "udfaldet er vist");
+    paastand("Enter låser svaret", S.laast && S.udfald === "rigtig");
+    tast("Enter");
+    await fremme();
+    paastand("Enter går videre", S.nr === 1);
+    tast("s");
+    paastand("S spørger om stop", !id("bekraeft").hidden);
+    tast("Escape");
+    paastand("Esc fortryder", id("bekraeft").hidden);
+    tast("1");
+    paastand("tallene 1 til 4 vælger også", S.valgt === 0);
+    var lydFoer = L.til();
+    tast("m");
+    paastand("M slår lyden fra og til", L.til() !== lydFoer);
+    tast("m");
+    tast("h");
+    paastand("H starter rundvisningen på brættet med mindst seks trin", NK.Rundvisning.aktiv() && NK.Rundvisning.antal() >= 6, NK.Rundvisning.antal());
+    tast("Escape");
+    paastand("Esc lukker rundvisningen", !NK.Rundvisning.aktiv());
+    id("regelknap").click();
+    paastand("Regler åbner reglerne med fem afsnit og genvejene", id("regler").classList.contains("vis") && id("regler-indhold").querySelectorAll("h3").length === 6);
+    tast("Escape");
+    paastand("Esc lukker reglerne", !id("regler").classList.contains("vis"));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("7. Engelsk");
+    id("sprogknap").click();
+    paastand("flaget skifter til engelsk midt i spillet", A.sprog() === "en" && d.documentElement.lang === "en" && /Question 2 of 15/.test(id("taeller").textContent));
+    S = A.spil();
+    paastand("beskrivelsen og svarene står på engelsk", id("beskrivelse").textContent === Spil.aktuelt(S).b.en &&
+        svarknap(0).querySelector(".svartekst").textContent === Spil.aktuelt(S).svar.en[0]);
+    paastand("valget følger med over sprogskiftet", S.valgt === 0 && svarknap(0).classList.contains("valgt"));
+    id("hovedknap").click();
+    await til(function () { return A.vist(); }, "udfaldet er vist");
+    if (S.udfald === "rigtig") { id("hovedknap").click(); await svar(false); }
+    id("hovedknap").click();
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    paastand("slutkortet står på engelsk", /Game over/.test(id("slut-titel").textContent));
+    id("nytknap").click();
+    await rigtigeSvar(15);
+    await til(function () { return A.skaerm() === "slut"; }, "slutkortet");
+    paastand("den engelske sejrsskærm har også titlen Superkemiker", /crowned\s+Superkemiker/.test(id("slutkort").textContent), id("slutkort").textContent);
+    id("sprogknap").click();
+    paastand("flaget skifter tilbage til dansk, og slutkortet følger med", A.sprog() === "da" && /Tillykke/.test(id("slut-titel").textContent));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("8. Lydene");
+    var OAC = w.OfflineAudioContext || w.webkitOfflineAudioContext;
+    async function regn(sek, byg) {
+        var c = new OAC(1, Math.ceil(44100 * sek), 44100);
+        byg(c);
+        var buf = await c.startRendering();
+        var data = buf.getChannelData(0), top = 0, endelig = true;
+        for (var i = 0; i < data.length; i++) {
+            var v = Math.abs(data[i]);
+            if (!(v < Infinity)) { endelig = false; break; }
+            if (v > top) top = v;
+        }
+        return { top: top, endelig: endelig };
+    }
+    if (!OAC) {
+        paastand("browseren kan regne lyd ud", false);
+    } else {
+        var navne = Object.keys(L.SYNTESE);
+        paastand("elleve lyde er lavet i koden", navne.length === 11, navne.join(", "));
+        for (n = 0; n < navne.length; n++) {
+            var navn = navne[n];
+            var r = await regn(navn === "vundet" ? 6 : 4.5, function (c) { L.SYNTESE[navn](c, c.destination, [], 0.02, navn === "spaending" ? 3.2 : 1); });
+            paastand(navn + ": kan høres og klipper ikke (top " + r.top.toFixed(2) + ")", r.endelig && r.top > 0.02 && r.top < 0.95);
+        }
+        var seng = await regn(4, function (c) {
+            var s = L.byggSeng(c, c.destination);
+            s.hoved.gain.setValueAtTime(0.8, 0);
+            s.stem(14, 0);
+            for (var t = 0.2; t < 3.8; t += 0.86) { L.slag(c, s.hoved, [], t, 0.3); L.slag(c, s.hoved, [], t + 0.23, 0.16); }
+        });
+        paastand("baggrunden kan høres, men er svagere end lydene (top " + seng.top.toFixed(2) + ")", seng.endelig && seng.top > 0.02 && seng.top < 0.6);
+    }
+    paastand("ingen lydfil er hentet fra tv-programmet: musikken er tre valgfrie filer i mappen",
+        D.MUSIK.filer.join(",") === "musik1.mp3,musik2.mp3,musik3.mp3");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("9. Sprog og skrift");
+    function alTekst(o, ud) {
+        ud = ud || [];
+        if (typeof o === "string") ud.push(o);
+        else if (typeof o === "function") { try { ud.push(String(o(3, "x"))); } catch (e) {} }
+        else if (o && typeof o === "object") Object.keys(o).forEach(function (k) { alTekst(o[k], ud); });
+        return ud;
+    }
+    ["da", "en"].forEach(function (sp) {
+        var tekst = alTekst(D.TEKST[sp]).concat(D.ROS[sp]).concat(D.SPOERGSMAAL.map(function (s) { return s.b[sp] + " " + s.svar[sp].join(" "); })).join(" ");
+        paastand(sp + ": ingen tankestreger", !/[–—]/.test(tekst));
+        paastand(sp + ": ladning ±1 skrives + og −, ikke 1+ og 1−", !/¹[⁺⁻]|\d[+−]\s/.test(tekst));
+    });
+    paastand("teksterne findes på begge sprog", Object.keys(D.TEKST.da).every(function (k) { return k in D.TEKST.en; }) &&
+        Object.keys(D.TEKST.en).every(function (k) { return k in D.TEKST.da; }));
+    paastand("rundvisningen har lige mange trin på de to sprog", D.TEKST.da.tur.length === D.TEKST.en.tur.length);
+
+    function smaa() {
+        var ud = [];
+        Array.prototype.forEach.call(d.querySelectorAll("body *"), function (e) {
+            if (!e.offsetWidth && !e.offsetHeight) return;
+            var harTekst = Array.prototype.some.call(e.childNodes, function (k) { return k.nodeType === 3 && k.textContent.trim(); });
+            if (!harTekst) return;
+            var px = parseFloat(w.getComputedStyle(e).fontSize);
+            if (px < 12.99) ud.push((e.id || e.className || e.tagName) + " " + px);
+        });
+        return ud;
+    }
+    var s1 = smaa();
+    paastand("ingen tekst på slutkortet er under 13 px", !s1.length, s1.join(", "));
+    id("nytknap").click();
+    await fremme();
+    var s2 = smaa();
+    paastand("ingen tekst på brættet er under 13 px", !s2.length, s2.join(", "));
+    var bredde = Array.prototype.every.call(d.querySelectorAll(".svar .svartekst"), function (e) { return e.scrollWidth <= e.clientWidth + 1; });
+    paastand("svarene kan være i ruderne", bredde);
+    var midte = id("spoergsmaal").getBoundingClientRect(), flade = id("spilflade").getBoundingClientRect();
+    paastand("brættet kan være i scenen", midte.top >= flade.top && id("hovedknap").getBoundingClientRect().bottom <= flade.bottom + 1);
+}
+</script>
+</body>
+</html>

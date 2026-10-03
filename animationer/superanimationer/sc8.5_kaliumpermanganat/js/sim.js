@@ -4,6 +4,9 @@
    Begge faner gør det samme: eleven drypper i et urglas, ser farven,
    vælger, hvad mangan blev til, og afstemmer i hæftet i små bidder:
 
+     bland      (kun den første på fane 1) fyld det tomme urglas med
+                kaliumpermanganat og natriumhydroxid, i den rækkefølge
+                eleven vil
      dryp       træk flasken hen over glasset
      produkt    hvad blev MnO₄⁻ til? (farvekortet i panelet)
      ox         oxidationstallet over de atomer, der skifter
@@ -31,6 +34,7 @@
     var X = NK.Redox;
 
     var TRIN_NAVN = {
+        bland: "Fyld urglasset",
         dryp: "Dryp i glasset", produkt: "Hvad blev mangan til?", ox: "Oxidationstal", "for": "Lige mange atomer",
         klammer: "Stigning og fald", gange: "Gangetal", ladning: "Ladning", ion: "", brint: "H-atomer", vand: "Vand"
     };
@@ -57,12 +61,14 @@
         var mig = this, navn = this.cfg.navn;
         var opgaver = D.REAKTIONER.filter(function (r) { return r.fane === navn; });
         this.haefte = new NK.Haefte(NK.el(navn + "-haefte"), navn);
+        /* Knappen (Giv hint, Vis svaret, Næste opgave) står på papiret */
+        this.haefte.knap = NK.el(navn + "-knap");
         this.haefte.vedEnter = function () { mig.tjekTrin(); };
         this.haefte.vedInput = function (k, inp) { mig.input(k, inp); };
         this.haefte.vedTast = function (k, e) { return mig.tast(k, e); };
         this.haefte.vedPil = function (t) { mig.vendPil(t); };
         this.haefte.vedValg = function (f) { mig.valgt(f, "selv"); };
-        /* Ét urglas paa begge faner; fane 1 har to flasker */
+        /* Ét urglas paa begge faner; fane 1 har fire flasker */
         this.bord = new NK.Bord({ navn: navn, glas: [{ tekst: "", farve: "vand" }],
             flasker: D.FLASKER[navn].map(function (id) { return D.FLASKE[id]; }) });
         this.bord.visAktiv = true;
@@ -80,9 +86,17 @@
     F.opgaveFaerdig = function () { return this.opg.nr >= this.opg.trin.length; };
     F.glasNr = function () { return 0; };
 
-    /* Den flaske, reaktionen skal bruge (nummeret paa bordet) */
+    /* Det, der endnu mangler i det tomme urglas (flaskernes id) */
+    F.mangler = function () {
+        var g = this.opg;
+        return (g.def.bland || []).filter(function (id) { return !g.iGlas[id]; });
+    };
+
+    /* Den flaske, der skal bruges nu (nummeret paa bordet): mens glasset
+       fyldes, den foerste af dem, der mangler; ellers reaktionens flaske */
     F.flaskeNr = function () {
         var id = this.opg.def.flaske || D.FLASKER[this.cfg.navn][0];
+        if (!this.faerdig && this.aktivt() === "bland") id = this.mangler()[0];
         return D.FLASKER[this.cfg.navn].indexOf(id);
     };
 
@@ -97,6 +111,7 @@
         var def = this.opgaver[i], R = X.reaktion(def);
         this.token++;
         var trin = ["dryp", "produkt", "ox"];
+        if (def.bland) trin.unshift("bland");
         if (R.forafstem) trin.push("for");
         trin.push("klammer", "gange", "ladning");
         if (R.ion.antal) trin.push("ion");
@@ -107,6 +122,7 @@
             tal: {},                           /* fundne tal: { v, slags } */
             pil: { ox: null, red: null },      /* elevens pile ved klammerne */
             forkert: {},                       /* forkerte valg af manganstoffet */
+            iGlas: {},                         /* det, eleven har fyldt i det tomme urglas */
             dryppet: false, produkt: false, koefFaerdig: false
         };
         this.bord.stop();
@@ -117,13 +133,34 @@
         this.visFarvekort();
     };
 
-    /* Glasset har farven fra foer reaktionen (paa fane 1: det, den forrige
-       reaktion efterlod) */
+    /* Glasset har farven fra foer reaktionen (paa fane 1: tomt foerst, og
+       siden det, den forrige reaktion efterlod) */
     F.saetGlassene = function () {
         var d = this.opg.def;
         this.bord.saetGlas(0, d.foer, d.foerBundfald || null);
-        this.bord.saetTekst(0, d.glasTekst);
+        this.bord.saetTekst(0, this.glasTekst());
         this.bord.aktiv = 0;
+    };
+
+    /* Skiltet under glasset. Fane 1 siger, hvad der er i glasset lige nu:
+       manganstoffet og miljoeet, fx "MnO₄⁻, basisk" (brugerens oenske
+       3. okt. 2026). Manganstoffet staar der kun, naar eleven kender det:
+       efter dryppet foerst, naar det er valgt i haeftet. Fane 2 har sin
+       faste tekst med det stof, der staar i glasset. */
+    F.glasTekst = function () {
+        var g = this.opg, d = g.def, R = g.R;
+        if (this.cfg.navn !== "ug") return d.glasTekst;
+        var mn, miljoe;
+        if (d.bland && !this.forbi("bland")) {
+            mn = g.iGlas.permanganat ? R.led[R.red.v].st.tekst : "";
+            miljoe = g.iGlas.base ? "basisk" : "";
+            if (!mn && !miljoe) return "Tomt urglas";
+        } else {
+            mn = !g.dryppet ? R.led[R.red.v].st.tekst : (g.produkt ? R.led[R.red.h].st.tekst : "");
+            miljoe = g.dryppet ? R.miljoe : (d.foerMiljoe || R.miljoe);
+        }
+        if (mn && miljoe) return mn + ", " + miljoe;
+        return mn || miljoe.charAt(0).toUpperCase() + miljoe.slice(1);
     };
 
     /* ----- Teksterne i opgavekortet ------------------------------------------------------ */
@@ -150,6 +187,11 @@
         var g = this.opg, R = g.R, t = this.aktivt();
         var A = R.led[R.ox.v].st, M = R.led[R.red.v].st;
         switch (t) {
+        case "bland":
+            var m = this.mangler().map(function (id) { return D.FLASKE[id]; });
+            if (m.length > 1) return "Urglasset er tomt. Træk flasken med " + m[0].navn + " (" + m[0].tekst + ") hen over urglasset, og slip den. Gør det samme med " +
+                m[1].navn + " (" + m[1].tekst + ").";
+            return "Nu mangler " + m[0].navn + " (" + m[0].tekst + "). Træk flasken hen over urglasset, og slip den.";
         case "dryp":
             var fl = D.FLASKE[D.FLASKER[this.cfg.navn][this.flaskeNr()]];
             return "Træk flasken med " + fl.navn + " (" + fl.tekst + ") hen over urglasset, og slip den. Du kan også klikke på glasset.";
@@ -183,6 +225,42 @@
             return "Hvert H₂O har 2 H. Sæt H₂O på den side, der har færrest H, så der er lige mange H på begge sider.";
         }
         return "";
+    };
+
+    /* Den helt korte udgave af naeste skridt. Den staar oeverst i haeftet,
+       hvor oejnene er, og skifter med hver bid (brugerens oenske 3. okt.
+       2026: "Skriv oxidationstallene for S og Mn i skemaet"). Den lange
+       linje staar stadig i opgavekortet. */
+    F.kortLinje = function () {
+        var g = this.opg, R = g.R, d = g.def;
+        if (this.faerdig) return d.navn + ": afstemt ✓";
+        switch (this.aktivt()) {
+        case "bland":
+            var m = this.mangler().map(function (id) { return D.FLASKE[id].tekst; });
+            return m.length > 1 ? "Tilsæt " + m.join(" og ") + " til urglasset" : "Tilsæt også " + m[0] + " til urglasset";
+        case "dryp":
+            return "Dryp " + D.FLASKE[D.FLASKER[this.cfg.navn][this.flaskeNr()]].tekst + " i urglasset";
+        case "produkt":
+            return "Vælg det stof, " + R.led[R.red.v].st.tekst + " blev til";
+        case "ox":
+            return "Skriv oxidationstallene for " + R.ox.E + " og " + R.red.E + " i skemaet";
+        case "for":
+            var K = R.ox.pv > 1 || R.ox.ph > 1 ? R.ox : R.red;
+            return "Skriv et tal foran " + R.led[K.pv > 1 ? K.v : K.h].st.tekst + ", så der er lige mange " + K.E;
+        case "klammer":
+            return "Skriv stigningen ↑ for " + R.ox.E + " og faldet ↓ for " + R.red.E + " ved klammerne";
+        case "gange":
+            return "Skriv et gangetal foran hver pil, så stigning og fald bliver lige store";
+        case "ladning":
+            return "Skriv ladningen på hver side af pilen";
+        case "ion":
+            return "Afstem ladningen med " + R.ionSt.tekst;
+        case "brint":
+            return "Tæl H-atomerne på hver side af pilen";
+        case "vand":
+            return "Afstem H-atomerne med H₂O";
+        }
+        return d.navn;
     };
 
     /* ----- Hæftet: det, der skal vises lige nu ------------------------------------------------- */
@@ -220,15 +298,15 @@
     F.visning = function () {
         var mig = this, g = this.opg, R = g.R, t = this.faerdig ? null : this.aktivt();
         var aktiv = t ? this.noegler(t).filter(function (k) { return !g.tal[k]; }) : [];
-        var d = g.def;
-        var navn = d.navn;
+        var fylder = t === "bland";
         return {
-            navn: navn,
+            navn: this.kortLinje(),
             faerdig: this.faerdig,
             aktiv: aktiv,
             kendt: function (i) {
                 var l = R.led[i];
-                if (l.side === "v") return true;
+                /* Mens urglasset fyldes, staar kun det i skemaet, der er i glasset */
+                if (l.side === "v") return !fylder || (i === R.red.v && !!g.iGlas.permanganat);
                 return g.dryppet && (i !== R.red.h || g.produkt);
             },
             ukendt: function (i) { return g.dryppet && i === R.red.h && !g.produkt; },
@@ -303,8 +381,13 @@
 
     F.visHaefte = function () {
         this.haefte.visTilstand(this.visning());
+        this.bord.saetTekst(0, this.glasTekst());
         this.opdaterLup();
     };
+
+    /* Knappen har skiftet rolle (hint, svar eller Næste opgave): hæftet
+       lægger den på plads */
+    F.knapVist = function () { this.haefte.placerKnap(); };
 
     /* ----- Farvekortet i panelet ---------------------------------------------------------- */
     F.bygFarvekort = function () {
@@ -314,8 +397,8 @@
         D.MANGAN.forEach(function (m, i) {
             var st = X.stof(m.f);
             html += '<div class="fk-raekke" data-i="' + i + '"><span class="fk-farve" style="background:' + NK.Tegn.rgba(D.FARVE[m.farve], 1 / D.FARVE[m.farve][3]) +
-                '"></span><span class="fk-formel">' + st.tekst + '</span><span class="fk-tekst">' + NK.html(m.tekst) +
-                '</span><span class="fk-ox"></span></div>';
+                '"></span><span class="fk-formel">' + st.tekst + '</span><span class="fk-tekst"><span class="fk-navn">' + NK.html(m.navn) +
+                '</span><span class="fk-ord">' + NK.html(m.tekst) + '</span></span><span class="fk-ox"></span></div>';
         });
         boks.innerHTML = html;
     };
@@ -325,6 +408,8 @@
         if (!boks || !this.opg) return;
         var mig = this, g = this.opg, R = g.R;
         var produkt = g.produkt ? R.led[R.red.h].st.f : null, reaktant = R.led[R.red.v].st.f;
+        /* I det tomme urglas er der intet manganstof at fremhaeve endnu */
+        if (g.def.bland && !g.iGlas.permanganat) reaktant = null;
         var r = boks.querySelectorAll(".fk-raekke");
         D.MANGAN.forEach(function (m, i) {
             var e = r[i];
@@ -406,7 +491,7 @@
         if (r.klik) { this.slipPaaGlas(0, r.flaske); return; }
         if (r.glas !== undefined) { this.slipPaaGlas(r.glas, r.flaske); return; }
         if (this.k.under(pt) === "kop") this.k.svar(NK.html(D.KAFFE_FLASKE[this.cfg.navn]), "skidt", 4);
-        else if (this.aktivt() === "dryp") this.kortBesked("Slip flasken over urglasset.", 4);
+        else if (this.aktivt() === "dryp" || this.aktivt() === "bland") this.kortBesked("Slip flasken over urglasset.", 4);
         this.bord.hjem(r.flaske);
     };
 
@@ -426,12 +511,14 @@
     F.slipPaaGlas = function (i, nr) {
         var rigtig = this.flaskeNr();
         if (nr === undefined) nr = rigtig;
-        if (this.faerdig || this.aktivt() !== "dryp") {
+        var t = this.faerdig ? null : this.aktivt();
+        if (t !== "dryp" && t !== "bland") {
             this.bord.hjem(nr);
             if (!this.faerdig) this.kortBesked("Der er dryppet i glasset. Afstem reaktionen i hæftet.", 4);
             else if (this.cfg.navn === "ug" && this.naesteUloeste() >= 0) this.kortBesked("Tryk Næste opgave for at dryppe igen.", 4);
             return;
         }
+        if (t === "bland") { this.slipIBlanding(nr); return; }
         if (nr !== rigtig) {
             var fl = D.FLASKE[D.FLASKER[this.cfg.navn][rigtig]];
             this.bord.hjem(nr);
@@ -441,8 +528,51 @@
         this.dryp();
     };
 
+    /* Urglasset fyldes: kaliumpermanganat og natriumhydroxid, i den
+       raekkefoelge eleven vil. Alt andet flyver hjem med en besked. */
+    F.slipIBlanding = function (nr) {
+        var g = this.opg, id = D.FLASKER[this.cfg.navn][nr];
+        var mangler = this.mangler().map(function (x) { return D.FLASKE[x]; });
+        var hvad = mangler.map(function (f) { return f.navn + " (" + f.tekst + ")"; }).join(" og ");
+        if (g.def.bland.indexOf(id) < 0) {
+            this.bord.hjem(nr);
+            this.kortBesked("Ikke endnu. Urglasset skal først have " + hvad + ".", 4);
+            return;
+        }
+        if (g.iGlas[id]) {
+            this.bord.hjem(nr);
+            this.kortBesked("Der er " + D.FLASKE[id].navn + " i glasset. Nu mangler " + hvad + ".", 4);
+            return;
+        }
+        this.tilsaet(id);
+    };
+
+    F.tilsaet = function (id) {
+        var mig = this, g = this.opg, token = this.token;
+        if (g.iGlas[id] || this.bord.optaget()) return;
+        var til = id === "permanganat" || g.iGlas.permanganat ? "violet" : "vand";
+        this.bord.dryp(0, { til: til }, function () {
+            if (token !== mig.token) return;
+            mig.tilsat(id);
+        }, D.FLASKER[this.cfg.navn].indexOf(id));
+    };
+
+    F.tilsat = function (id) {
+        var g = this.opg, R = g.R, M = R.led[R.red.v].st;
+        g.iGlas[id] = true;
+        var fyldt = !this.mangler().length;
+        if (fyldt) g.nr++;
+        this.visHaefte();
+        this.visKort();
+        this.visFarvekort();
+        this.nytTrin(fyldt ? "Nu er der " + M.tekst + " i basisk opløsning i glasset." :
+            (id === "permanganat" ? "Glasset er violet af permanganat, " + M.tekst + "." : "Der er natriumhydroxid i glasset."), "");
+    };
+
+    /* Dryp med den flaske, der skal bruges nu (ogsaa mens glasset fyldes) */
     F.dryp = function () {
         var mig = this, g = this.opg, token = this.token;
+        if (!this.faerdig && this.aktivt() === "bland") { this.tilsaet(this.mangler()[0]); return; }
         if (g.dryppet || this.aktivt() !== "dryp" || this.bord.optaget()) return;
         this.bord.dryp(0, { til: g.def.efter, bundfald: g.def.bundfald, gas: g.def.gas }, function () {
             if (token !== mig.token) return;
@@ -454,7 +584,6 @@
         var g = this.opg, d = g.def;
         g.dryppet = true;
         g.nr++;
-        if (d.glasEfter) this.bord.saetTekst(0, d.glasEfter);
         var obs = d.obs || OBS[d.efter] || "";
         if (d.bundfald === "gul") obs += " Der kommer et gult bundfald.";
         if (d.gas) obs += " Der kommer bobler.";
@@ -495,6 +624,7 @@
     F.tjekTrin = function () {
         if (this.faerdig || this.auto) return;
         switch (this.aktivt()) {
+        case "bland": this.kortBesked("Fyld urglasset først: træk flaskerne hen over det.", 3); return;
         case "dryp": this.kortBesked("Træk flasken hen over urglasset først.", 3); return;
         case "produkt": this.kortBesked("Vælg formlen i hæftet under spørgsmålstegnet.", 3); return;
         case "ox": this.tjekOx(); return;
@@ -806,6 +936,7 @@
         if (!t) return null;
         var OX = R.ox, RED = R.red, hint;
         switch (t) {
+        case "bland":
         case "dryp":
             var fl = D.FLASKE[D.FLASKER[this.cfg.navn][this.flaskeNr()]];
             return { hint: NK.html("Tag flasken med " + fl.tekst + ", og slip den over urglasset."),
@@ -932,7 +1063,7 @@
 
     F.enter = function () {
         if (this.faerdig) { this.knap(); return; }
-        if (this.aktivt() === "dryp") { this.dryp(); return; }
+        if (this.aktivt() === "dryp" || this.aktivt() === "bland") { this.dryp(); return; }
         this.tjekTrin();
     };
 
@@ -957,7 +1088,9 @@
         this.lay = { W: W, H: H, baand: baand };
         var bl = this.bord.lay, g0 = bl.glas[0], g1 = bl.glas[bl.glas.length - 1];
         this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
-        this.saetAnker("bord", bl.flaske.x - 40, bl.y, g1.cx + g1.b * 0.7 - (bl.flaske.x - 40), bordH);
+        /* Rundvisningens felt over bordet: fra den første flaske til glasset */
+        var venstre = bl.hjem[0].x - 32 * bl.flaske.s - 8;
+        this.saetAnker("bord", venstre, bl.y, g1.cx + g1.b * 0.7 - venstre, bordH);
         this.saetAnker("lup", bl.lup.cx - bl.lup.r - 6, bl.lup.cy - bl.lup.r - 6, bl.lup.r * 2 + 40, bl.lup.r * 2 + 50);
         void g0;
     };

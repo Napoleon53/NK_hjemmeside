@@ -1,5 +1,8 @@
 /* =====================================================================
-   vaegt.js - elektronvægten i scenen
+   vaegt.js - elektronvægten over tavlen
+
+   Vægten er slået fra fra start og vises kun, når eleven slår den til
+   med knappen Elektronvægt i toplinjen (js/app.js).
 
    Venstre skål er det, der oxideres (afgiver elektroner), højre skål
    det, der reduceres (optager elektroner). Hver brik er én enhed af
@@ -36,18 +39,17 @@
     var P = Vaegt.prototype;
 
     P.layout = function (W, H) {
-        var s = NK.klamp(Math.min(W / 880, H / 380), 0.62, 1.3);
+        var s = NK.klamp(Math.min(W / 880, H / 380), 0.86, 1.3);
         var bordH = NK.klamp(H * 0.11, 30, 54);
         var bund = H - bordH;
-        var cx = W > 640 ? W * 0.6 : W * 0.57;
+        var cx = W * 0.5;
         var postH = NK.klamp(H * 0.56, 100, 310);
         var Lb = NK.klamp(W * 0.23, 105, 260);
         this.lay = {
             W: W, H: H, s: s, bund: bund, bordH: bordH, cx: cx,
             top: bund - postH, Lb: Lb,
             snor: NK.klamp(H * 0.17, 36, 90),
-            panB: NK.klamp(Lb * 0.95, 100, 230),
-            kop: { x: W - 44 * s, y: bund }
+            panB: NK.klamp(Lb * 0.95, 100, 230)
         };
         return this.lay;
     };
@@ -98,14 +100,13 @@
         if (d && d.fase >= 3 && (d.v.antal || d.h.antal)) {
             var diff = d.h.antal * d.h.ePr - d.v.antal * d.v.ePr;
             if (diff) maal = (diff > 0 ? 1 : -1) * NK.klamp(0.05 + 0.012 * Math.abs(diff), 0.05, 0.2);
-            if (Math.max(d.v.antal, d.h.antal) >= NK.Data.OVERVAEGT_GRAENSE) maal = (d.v.antal * d.v.ePr > d.h.antal * d.h.ePr ? -1 : 1) * 0.27;
         }
         this.vinkel = NK.mod(this.vinkel, maal, 3.2, dt);
         if (niv && niv.eFlyv < 5) niv.eFlyv += dt;
     };
 
     /* ----- Tegning ------------------------------------------------------- */
-    P.tegn = function (L, kop) {
+    P.tegn = function (L) {
         var ctx = L.ctx, l = this.lay, d = this.data;
         if (!l) return;
         var s = l.s, mig = this;
@@ -182,10 +183,6 @@
 
         this.tegnIndhold(ctx);
         this.tegnKnapper(ctx);
-
-        if (kop && !kop.skjult && !kop.iHaand && NK.Sprites.klar("kaffekop")) {
-            NK.Sprites.tegn(ctx, "kaffekop", l.kop.x - 21 * s, l.kop.y - 40 * s + 2, 42 * s, 40 * s);
-        }
     };
 
     P.tegnIndhold = function (ctx) {
@@ -305,12 +302,6 @@
             if (Math.abs(x - k.x) <= k.r && Math.abs(y - k.y) <= k.r) return k;
         }
         return null;
-    };
-
-    P.kopVed = function (x, y, kop) {
-        var l = this.lay;
-        if (!l || !kop || kop.skjult || kop.iHaand) return false;
-        return Math.abs(x - l.kop.x) < 24 * l.s && y < l.kop.y + 4 && y > l.kop.y - 44 * l.s;
     };
 
     P.skaalVed = function (x, y) {

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kemi-Millionær</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><img class="ikon" src="sprites/emblem.svg" alt=""> <span id="top-titel">Kemi-Millionær</span></h1>
+    <span class="top-luft"></span>
+    <button class="topknap" id="lydknap" type="button" aria-label="Lyd">🔊</button>
+    <button class="flagknap" id="sprogknap" type="button">EN</button>
+    <button class="teoriknap" id="regelknap" type="button">Regler</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane" id="spil">
+    <div class="scene">
+        <div class="spilflade" id="spilflade">
+
+            <!-- Studiet: lys og gulv, kun pynt -->
+            <div class="studie" aria-hidden="true">
+                <i class="straale s1"></i>
+                <i class="straale s2"></i>
+                <i class="straale s3"></i>
+                <i class="straale s4"></i>
+                <i class="gulv g1"></i>
+                <i class="gulv g2"></i>
+            </div>
+
+            <!-- ================= TITEL ============================== -->
+            <div class="titelskaerm" id="titelskaerm">
+                <img class="emblem" src="sprites/emblem.svg" alt="">
+                <p class="fortitel" id="fortitel">Hvem vil være</p>
+                <h2 class="stortitel" id="stortitel">Kemi-millionær?</h2>
+                <p class="undertitel" id="undertitel"></p>
+                <ul class="chips" id="chips"></ul>
+                <button class="guldknap stor" id="startknap" type="button"><span id="start-tekst">Start spillet</span> <kbd>Enter</kbd></button>
+            </div>
+
+            <!-- ================= SPILLET ============================ -->
+            <div class="braet" id="braet" hidden>
+                <div class="braet-top">
+                    <span class="taeller" id="taeller"></span>
+                    <div class="livliner" id="livliner">
+                        <button class="livline" data-livline="halv" type="button"><span class="ll-oval">50:50</span><span class="ll-navn"></span></button>
+                        <button class="livline" data-livline="fjern" type="button"><span class="ll-oval">−1</span><span class="ll-navn"></span></button>
+                        <button class="livline" data-livline="byt" type="button"><span class="ll-oval">⇄</span><span class="ll-navn"></span></button>
+                    </div>
+                    <span class="kapitel" id="kapitel"></span>
+                </div>
+
+                <div class="braet-emblem" aria-hidden="true"><img src="sprites/emblem.svg" alt=""></div>
+
+                <div class="braet-midte">
+                    <p class="pulje" id="pulje"></p>
+
+                    <div class="raekke en">
+                        <div class="rude spoergsmaal" id="spoergsmaal">
+                            <div class="rude-indre">
+                                <small id="ledetekst"></small>
+                                <p id="beskrivelse"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="svarnet" id="svarnet">
+                        <div class="raekke">
+                            <button class="rude svar" data-svar="0" type="button"><span class="rude-indre"><b class="bogstav">A:</b><span class="svartekst"></span></span></button>
+                            <button class="rude svar" data-svar="1" type="button"><span class="rude-indre"><b class="bogstav">B:</b><span class="svartekst"></span></span></button>
+                        </div>
+                        <div class="raekke">
+                            <button class="rude svar" data-svar="2" type="button"><span class="rude-indre"><b class="bogstav">C:</b><span class="svartekst"></span></span></button>
+                            <button class="rude svar" data-svar="3" type="button"><span class="rude-indre"><b class="bogstav">D:</b><span class="svartekst"></span></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="handling" id="handling">
+                    <button class="stopknap" id="stopknap" type="button"></button>
+                    <button class="guldknap" id="hovedknap" type="button"><span id="hoved-tekst"></span> <kbd>Enter</kbd></button>
+                </div>
+
+                <div class="handling bekraeft" id="bekraeft" hidden>
+                    <span class="bekraeft-tekst" id="bekraeft-tekst"></span>
+                    <button class="stopknap" id="jaknap" type="button"></button>
+                    <button class="guldknap" id="nejknap" type="button"></button>
+                </div>
+            </div>
+
+            <!-- ================= SLUT =============================== -->
+            <div class="slutlag" id="slutlag" hidden>
+                <canvas id="konfetti"></canvas>
+                <div class="slutkort" id="slutkort">
+                    <p class="slut-maerke" id="slut-maerke" hidden></p>
+                    <h2 id="slut-titel"></h2>
+                    <p class="slut-tekst" id="slut-tekst"></p>
+                    <p class="slut-beloeb" id="slut-beloeb"></p>
+                    <p class="slut-ekstra" id="slut-ekstra"></p>
+                    <blockquote class="slut-ros" id="slut-ros" hidden></blockquote>
+                    <button class="guldknap stor" id="nytknap" type="button"><span id="nyt-tekst">Nyt spil</span> <kbd>Enter</kbd></button>
+                </div>
+            </div>
+        </div>
+
+        <p class="statuslinje" id="status" aria-live="polite"></p>
+    </div>
+
+    <aside class="panel">
+        <div class="kort stigekort">
+            <h2 id="stige-titel">Gevinst</h2>
+            <ol class="stige" id="stige"></ol>
+        </div>
+        <div class="kort talkort" id="talkort">
+            <div class="tal2">
+                <div id="sikret-boks"><small id="sikret-etiket">Sikret</small><b id="sikret">0 kr.</b></div>
+                <div><small id="rekord-etiket">Rekord</small><b id="rekord">ingen</b></div>
+            </div>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================= REGLER ========================================= -->
+<div class="overlay" id="regler">
+    <div class="overlay-boks">
+        <h2 id="regler-titel">Kemi-Millionær</h2>
+        <div id="regler-indhold"></div>
+        <div class="regler-knapper">
+            <button class="guldknap" id="regler-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/visning.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

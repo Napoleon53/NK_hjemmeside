@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - reaktionerne, sværhedsgraderne og Kemichaels replikker
+   data.js - reaktionerne og sværhedsgraderne
 
    En reaktion er skrevet som de to reaktanter (v) og de to produkter
    (h) før afstemningen. En formel skrives med ladningen efter et
@@ -68,7 +68,7 @@
         { id: "S3", niveau: "svaer", v: ["MnO4 -", "SO3 2-"], h: ["MnO2", "SO4 2-"], ox: [1, 1], red: [0, 0], miljoe: "basisk" },
         { id: "S4", niveau: "svaer", v: ["MnO4 -", "C2O4 2-"], h: ["MnO2", "CO3 2-"], ox: [1, 1], red: [0, 0], miljoe: "basisk" },
         { id: "S5", niveau: "svaer", v: ["NO2", "NO2"], h: ["NO3 -", "NO2 -"], ox: [0, 0], red: [1, 1], miljoe: "basisk", samme: "v",
-          kontekst: "Den brune gas NO₂ i natronlud." },
+          kontekst: "Den brune gas NO₂ i natriumhydroxid." },
         { id: "S6", niveau: "svaer", v: ["SO2", "MnO4 -"], h: ["SO4 2-", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt" },
         { id: "S7", niveau: "svaer", v: ["Br2", "SO2"], h: ["Br -", "SO4 2-"], ox: [1, 1], red: [0, 0], miljoe: "surt" },
         { id: "S8", niveau: "svaer", v: ["Pb", "PbO2"], h: ["Pb 2+", "Pb 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt", samme: "h",
@@ -90,44 +90,6 @@
         "svaer":  { navn: "Svær",   lille: "basisk og særlige" }
     };
     D.NIVEAU_RAEKKE = ["let", "middel", "svaer"];
-
-    /* ----- Kemichael ----------------------------------------------------------- */
-    /* Tre replikker pr. sværhedsgrad: hvor man er, hvad man gør (han peger,
-       og det lyser op), og en tør bemærkning. Højst ca. 60 tegn. */
-    D.INTRO = {
-        "let": [
-            "Redoxafstemning. Elektronerne skal gå lige op.",
-            "Trinene står til højre. Først oxidationstallene.",
-            "Vægten vejer elektroner. Den er kalibreret i går."
-        ],
-        "middel": [
-            "Nu er der ilt med. Så skal H⁺ og vand på.",
-            "De to sidste trin afstemmer ladning og ilt.",
-            "Vand er gratis. Det kan man ikke sige om kaffen."
-        ],
-        "svaer": [
-            "Basisk miljø og stoffer, der både giver og tager.",
-            "I basisk miljø bruger du OH⁻ i stedet for H⁺.",
-            "Jeg tæller altid O to gange. Nogle gange tre."
-        ]
-    };
-    D.INTRO_PEG = 1;
-    D.PEG_PAA = { "let": "opgavekort", "middel": "trinliste", "svaer": "arbejdsbord" };
-
-    /* Ros, første gang alle reaktioner på en sværhedsgrad er afstemt */
-    D.ROS = {
-        "let": "Alle de lette er afstemt. Middel har ilt med.",
-        "middel": "Alle i surt miljø. Svær venter, hvis du tør.",
-        "svaer": "Alt afstemt. Selv jeg tæller efter på de svære."
-    };
-
-    /* Påskeægget: 20 eller flere på en vægtskål */
-    D.OVERVAEGT = [
-        "Vægten går til 20. Den blev købt til noget andet.",
-        "Så mange elektroner har vi ikke på lager.",
-        "Vægtskålen er ikke til at stable på. Færre, tak."
-    ];
-    D.OVERVAEGT_GRAENSE = 20;
 
     NK.Data = D;
 }());

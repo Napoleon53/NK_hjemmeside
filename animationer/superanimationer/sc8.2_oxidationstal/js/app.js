@@ -3,9 +3,9 @@
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
    fane opdateres og tegnes. Kemichael praesenterer ikke med knapper her:
-   han sidder ved katederet, og linjen i opgavekortet siger, hvor man er,
-   og hvad man goer (brugerens valg 25. sept. 2026, som sc4.5 og sc5.1).
-   K faar ham til at sige det.
+   han sidder ved katederet, og arbejdsfeltet i scenen siger, hvad man
+   goer (brugerens valg 25. sept. og test 3. okt. 2026). K faar ham til
+   at sige det.
    ===================================================================== */
 (function () {
     "use strict";

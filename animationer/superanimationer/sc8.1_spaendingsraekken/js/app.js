@@ -79,6 +79,13 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
+        /* Under praesentationen er Enter og pil til hoejre det samme som Naeste */
+        if (sim && sim.laererIIntro && sim.laererIIntro() && (e.key === "Enter" || e.key === "ArrowRight")) {
+            if (e.key === "Enter" && e.target && e.target.tagName === "BUTTON") return;
+            e.preventDefault();
+            sim.introNaeste();
+            return;
+        }
         if (sim && sim.tast && sim.tast(e)) { e.preventDefault(); return; }
         if (e.key === "k" || e.key === "K") { if (sim && sim.startIntro) sim.startIntro(true); return; }
         if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }

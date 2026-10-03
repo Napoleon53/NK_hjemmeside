@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb2.1 Ligevægtsloven</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: skrivemåden af ioner, at facit regnet af
+   skemaet er det samme som i den gamle b2.1, at hver typisk fejl får
+   sin egen besked, at hintet er tre trin, at alle tolv reaktioner kan
+   skrives (med brikker, med træk og slip og med Vis svaret), at hver
+   tavle på fane 2 har netop én fejl eller ingen, og at de rigtige dele
+   faktisk er rigtige, quizzen, sproget og layoutet fra 1100 × 700 til
+   1600 × 950.
+
+   Animationen henter ikke filer uden for sin egen mappe, men iframen
+   skal åbnes gennem en lokal server. Testen gemmer elevens fremskridt
+   og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb2.1-br", "nk-sb2.1-ff", "nk-sb2.1-quiz"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|traekker|aendr\w*|toemt|taeller|naevner\w*|broek\w*|loest)\b/;
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* "NH3 ^2" -> brikker. ^n er en eksponent, · + − 1 er tegn */
+function T(s) {
+    if (!s) return [];
+    return s.split(" ").filter(function (x) { return x; }).map(function (x) {
+        if (/^\^\d$/.test(x)) return { k: "eks", v: parseInt(x.slice(1), 10) };
+        if (x === "·" || x === "+" || x === "−" || x === "1") return { k: "tegn", v: x };
+        return { k: "stof", v: x };
+    });
+}
+
+/* Facit som brikker */
+function facitBrikker(B, liste) {
+    var ud = [];
+    liste.forEach(function (l, i) {
+        if (i) ud.push({ k: "tegn", v: "·" });
+        ud.push({ k: "stof", v: l.s });
+        if (l.e > 1) ud.push({ k: "eks", v: l.e });
+    });
+    return ud;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, B = NK.Broek;
+    var S = NK.sims["fane-br"], F = NK.sims["fane-ff"];
+    function opg(id) { return D.BROEK.filter(function (o) { return o.id === id; })[0]; }
+    var tekster = [];
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Skrivemåden");
+    paastand("CO3^2- er CO₃²⁻", B.skriv("CO3^2-") === "CO₃²⁻", B.skriv("CO3^2-"));
+    paastand("NH4^+ er NH₄⁺ (ladning 1 uden tal)", B.skriv("NH4^+") === "NH₄⁺", B.skriv("NH4^+"));
+    paastand("Fe^3+ er Fe³⁺ og I^- er I⁻", B.skriv("Fe^3+") === "Fe³⁺" && B.skriv("I^-") === "I⁻");
+    paastand("et led med eksponent: [H₂]³, og 1 skrives ikke", B.led("H2", 3) === "[H₂]³" && B.led("O2", 1) === "[O₂]");
+    paastand("skemaet som tekst", B.skemaTekst(opg("nh3")) === "N₂(g) + 3H₂(g) ⇌ 2NH₃(g)", B.skemaTekst(opg("nh3")));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("2. Reaktionerne på fane 1");
+    paastand("12 reaktioner, de 10 gamle i samme rækkefølge", D.BROEK.length === 12 &&
+        ["hi", "nh3", "n2o4", "so3", "vandgas", "eddike", "ammoniak", "autoprotolyse", "kalk", "kalkbraending"].join() ===
+        D.BROEK.filter(function (o) { return o.id !== "fescn" && o.id !== "pbi2"; }).map(function (o) { return o.id; }).join());
+    /* Facit fra den gamle b2.1 (og de to nye) */
+    var GAMMEL = {
+        hi: "[HI]² / ([H₂]·[I₂])",
+        nh3: "[NH₃]² / ([N₂]·[H₂]³)",
+        n2o4: "[NO₂]² / [N₂O₄]",
+        so3: "[SO₃]² / ([SO₂]²·[O₂])",
+        vandgas: "([CO₂]·[H₂]) / ([CO]·[H₂O])",
+        eddike: "([CH₃COO⁻]·[H₃O⁺]) / [CH₃COOH]",
+        ammoniak: "([NH₄⁺]·[OH⁻]) / [NH₃]",
+        autoprotolyse: "[H₃O⁺]·[OH⁻]",
+        fescn: "[FeSCN²⁺] / ([Fe³⁺]·[SCN⁻])",
+        kalk: "[Ca²⁺]·[CO₃²⁻]",
+        pbi2: "[Pb²⁺]·[I⁻]²",
+        kalkbraending: "[CO₂]"
+    };
+    var facitFejl = [], brikFejl = [], ids = {};
+    D.BROEK.forEach(function (o) {
+        ids[o.id] = 1;
+        var l = B.linje(B.facit(o));
+        if (l !== GAMMEL[o.id]) facitFejl.push(o.id + ": " + l);
+        var u = {};
+        o.stoffer.forEach(function (s) { u[s] = 1; });
+        if (Object.keys(u).length !== 6) brikFejl.push(o.id + " har ikke 6 forskellige");
+        B.alle(o).forEach(function (a) { if (!u[a.s]) brikFejl.push(o.id + " mangler " + a.s); });
+        if (!o.stoffer.some(function (s) { return !B.find(o, s); })) brikFejl.push(o.id + " har intet stof uden for skemaet");
+        if (!o.forklaring || !o.tekst) brikFejl.push(o.id + " mangler tekst");
+    });
+    paastand("alle id er forskellige", Object.keys(ids).length === D.BROEK.length);
+    paastand("facit regnet af skemaet er det samme som i den gamle b2.1", facitFejl.length === 0, facitFejl.join(" | "));
+    paastand("6 stoffer i bakken: alle fra skemaet og mindst ét, der ligner", brikFejl.length === 0, brikFejl.join(", "));
+    paastand("syrer og baser har Kₛ, K_b og K_v", opg("eddike").ksub === "s" && opg("ammoniak").ksub === "b" && opg("autoprotolyse").ksub === "v");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Fejlene");
+    var nh3 = opg("nh3"), edd = opg("eddike"), kalk = opg("kalk"), vg = opg("vandgas");
+    function dom(o, n, m) { var r = B.dom(o, T(n), T(m)); tekster.push(r.tekst || ""); return r; }
+    function kode(o, n, m) { return dom(o, n, m).kode || "ok"; }
+    paastand("facit er rigtigt", B.dom(nh3, T("NH3 ^2"), T("N2 · H2 ^3")).ok);
+    paastand("rækkefølgen er ligegyldig", B.dom(nh3, T("NH3 ^2"), T("H2 ^3 · N2")).ok);
+    paastand("tom brøk", kode(nh3, "", "") === "tom");
+    paastand("+ i nævneren", kode(nh3, "NH3 ^2", "N2 + H2 ^3") === "plus");
+    paastand("− i tælleren", kode(vg, "CO2 − H2", "CO · H2O") === "plus");
+    paastand("mangler · mellem to stoffer", kode(nh3, "NH3 ^2", "N2 H2 ^3") === "prik-mangler");
+    paastand("mangler · efter en eksponent", kode(nh3, "NH3 ^2", "H2 ^3 N2") === "prik-mangler");
+    paastand("· bagerst og forrest", kode(nh3, "NH3 ^2", "N2 · H2 ^3 ·") === "prik-loes" && kode(nh3, "· NH3 ^2", "N2 · H2 ^3") === "prik-loes");
+    paastand("· · ved siden af hinanden", kode(nh3, "NH3 ^2", "N2 · · H2 ^3") === "prik-loes");
+    paastand("1 sammen med andre brikker", kode(nh3, "NH3 ^2", "N2 · 1") === "en");
+    paastand("eksponent forrest", kode(nh3, "^2 NH3", "N2 · H2 ^3") === "eks-foerst");
+    paastand("to eksponenter på ét stof", kode(nh3, "NH3 ^2 ^3", "N2 · H2 ^3") === "to-eks");
+    paastand("tæller og nævner byttet om", kode(nh3, "N2 · H2 ^3", "NH3 ^2") === "byttet");
+    paastand("et stof, der ikke står i skemaet", kode(nh3, "NH3 ^2 · NO", "N2 · H2 ^3") === "fremmed");
+    var ld = dom(edd, "CH3COO · H3O^+", "CH3COOH");
+    paastand("[CH₃COO] uden ladning: beskeden peger på CH₃COO⁻", ld.kode === "fremmed" && ld.ligner === "CH3COO^-");
+    var vd = dom(edd, "CH3COO^- · H3O^+", "CH3COOH · H2O");
+    paastand("vand som opløsningsmiddel er ikke med", vd.kode === "udeladt" && vd.t === "l" && vd.s === "H2O");
+    var sd = dom(kalk, "Ca^2+ · CO3^2-", "CaCO3");
+    paastand("et fast stof er ikke med", sd.kode === "udeladt" && sd.t === "s");
+    paastand("en reaktant i tælleren", kode(nh3, "NH3 ^2 · N2", "H2 ^3") === "side");
+    paastand("samme stof flere gange godtages ikke", kode(nh3, "NH3 ^2", "N2 · H2 · H2 · H2") === "gentaget");
+    var md = dom(nh3, "NH3 ^2", "N2");
+    paastand("der mangler et stof i nævneren", md.kode === "mangler" && md.s === "H2" && md.z === "den");
+    var gd = dom(vg, "CO2 · H2", "CO");
+    paastand("H₂O(g) mangler: hintet siger, at en gas er med", gd.kode === "mangler" && /gas/.test(B.hintTrin(vg, T("CO2 · H2"), T("CO")).trin[1]));
+    var ed = dom(nh3, "NH3 ^2", "N2 · H2");
+    paastand("eksponenten mangler", ed.kode === "eksponent" && ed.k === 3);
+    paastand("eksponent på en koefficient 1", kode(nh3, "NH3 ^2", "N2 ^2 · H2 ^3") === "eksponent");
+    paastand("1 i nævneren, når intet skal med", B.dom(kalk, T("Ca^2+ · CO3^2-"), T("1")).ok);
+    paastand("tom nævner, når intet skal med", B.dom(kalk, T("Ca^2+ · CO3^2-"), T("")).ok);
+    var ent = dom(nh3, "1", "N2 · H2 ^3");
+    paastand("1 i tælleren alene", ent.kode === "tom-side" && /Der står 1/.test(ent.tekst));
+    paastand("tom nævner, når der skal noget i den", kode(nh3, "NH3 ^2", "") === "tom-side");
+    paastand("en fejl giver røde brikker", dom(nh3, "NH3 ^2", "N2 + H2 ^3").rod.length === 1 && dom(nh3, "NH3 ^2", "N2 · H2").rod[0].i === 2);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Hinttrappen");
+    var trinFejl = [], afsloerer = [], lysFejl = [];
+    D.BROEK.forEach(function (o) {
+        var Fa = B.facit(o);
+        var tilstande = [["", ""]];
+        /* Facit med én fejl ad gangen */
+        var num = facitBrikker(B, Fa.num), den = facitBrikker(B, Fa.den);
+        tilstande.push([num, []]);
+        tilstande.push([[], den]);
+        if (den.length) tilstande.push([den, num]);
+        tilstande.push([num.concat([{ k: "tegn", v: "+" }, { k: "stof", v: o.stoffer.filter(function (s) { return !B.find(o, s); })[0] }]), den]);
+        B.alle(o).filter(B.udelades).forEach(function (a) { tilstande.push([num, den.concat(den.length ? [{ k: "tegn", v: "·" }] : []).concat([{ k: "stof", v: a.s }])]); });
+        tilstande.push([num.filter(function (t) { return t.k !== "eks"; }), den.filter(function (t) { return t.k !== "eks"; })]);
+        tilstande.forEach(function (ts) {
+            var n = typeof ts[0] === "string" ? T(ts[0]) : ts[0], m = typeof ts[1] === "string" ? T(ts[1]) : ts[1];
+            var r = B.dom(o, n, m);
+            var h = B.hintTrin(o, n, m);
+            h.trin.forEach(function (t) { tekster.push(t); });
+            tekster.push(r.tekst || "");
+            if (!r.ok && h.trin.length !== 3) trinFejl.push(o.id + ":" + r.kode + ":" + h.trin.length);
+            /* De to foerste trin siger ikke, hvad der skal staa */
+            if (!r.ok && (/skal være/.test(h.trin[0]) || /skal være/.test(h.trin[1]))) afsloerer.push(o.id + ":" + r.kode);
+            var lys = !h.s ? [] : (Array.isArray(h.s) ? h.s : [h.s]);
+            lys.forEach(function (s) { if (!B.find(o, s)) lysFejl.push(o.id + ":" + s); });
+        });
+    });
+    paastand("hvert hint er tre trin i alle 12 reaktioner og alle slags fejl", trinFejl.length === 0, trinFejl.slice(0, 4).join(", "));
+    paastand("de to første trin siger ikke svaret", afsloerer.length === 0, afsloerer.slice(0, 4).join(", "));
+    paastand("det, der lyser i skemaet, står i skemaet", lysFejl.length === 0, lysFejl.slice(0, 4).join(", "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Fane 1 i brug");
+    NK.visFane("fane-br");
+    var loesFejl = [];
+    D.BROEK.forEach(function (o, i) {
+        S.vaelg(i); S.nulstil();
+        var Fa = B.facit(o);
+        facitBrikker(B, Fa.num).forEach(function (t) { S.tilfoej("num", t); });
+        facitBrikker(B, Fa.den).forEach(function (t) { S.tilfoej("den", t); });
+        S.tjek();
+        var st = d.getElementById("br-status");
+        if (!S.faerdig || !st.classList.contains("god") || d.getElementById("br-stempel").hidden) loesFejl.push(o.id);
+        tekster.push(S.promptHTML(), S.beskedTekst());
+        S.nulstil();
+    });
+    paastand("alle 12 kan skrives med brikkerne", loesFejl.length === 0, loesFejl.join(", "));
+    /* Forfra med listen: intet er loest */
+    S.status.forEach(function (x) { x.loest = false; x.stjerne = false; });
+    S.visListe();
+    S.vaelg(1); S.nulstil();
+    paastand("en ny opgave har en tom brøk og en grå linje", !S.opg.a.num.length && d.getElementById("br-status").className === "statuslinje");
+    S.tilfoej("num", { k: "stof", v: "NH3" }); S.tilfoej("num", { k: "eks", v: 2 });
+    S.tilfoej("den", { k: "stof", v: "N2" }); S.tilfoej("den", { k: "tegn", v: "+" }); S.tilfoej("den", { k: "stof", v: "H2" });
+    S.tjek();
+    var st = d.getElementById("br-status");
+    paastand("en fejl gør linjen rød og får den til at ryste", st.classList.contains("skidt") && st.classList.contains("ryster"));
+    paastand("brikken med fejlen er rød", d.querySelectorAll("#br-den .brik.rod").length === 1 && d.querySelector("#br-den .brik.rod").textContent === "+");
+    paastand("knappen lyser stille efter en fejl", S.el.knap.classList.contains("peg"));
+    S.knap();
+    paastand("hint 1 af 3, og knappen holder op med at lyse", /Hint 1 af 3/.test(S.beskedTekst()) && !S.el.knap.classList.contains("peg"));
+    S.knap(); S.knap();
+    paastand("efter tre hint hedder knappen Vis svaret", S.el.knap.textContent === "Vis svaret");
+    S.fjern("den", 1);
+    paastand("en ændring starter trappen forfra", S.hjaelp === 0 && S.el.knap.textContent === "Giv et hint" && !d.querySelector("#br-den .brik.rod"));
+    S.knap(); S.knap(); S.knap(); S.knap();
+    paastand("Vis svaret skriver facit og giver det gule stempel", S.faerdig && B.dom(S.opg.o, S.opg.a.num, S.opg.a.den).ok &&
+        d.getElementById("br-status").classList.contains("gul") && d.getElementById("br-stempel").textContent === "Svaret");
+    paastand("uden stjerne, når svaret er vist", !S.status[1].stjerne);
+    paastand("knappen går videre til næste opgave", /Næste opgave/.test(S.el.knap.textContent));
+    S.knap();
+    paastand("Næste opgave er en anden reaktion", S.nr !== 1);
+    /* Loest opgave: skemaet farvet, det, der ikke er med, streget ud */
+    S.vaelg(11); S.nulstil();
+    S.tilfoej("num", { k: "stof", v: "CO2" }); S.tjek();
+    paastand("kalkbrænding: [CO₂] alene er rigtigt, og nævneren viser 1", S.faerdig && d.querySelector("#br-den .auto-en") !== null);
+    paastand("de faste stoffer er streget ud i skemaet", d.querySelectorAll("#br-skema .art.ude").length === 2 && d.querySelectorAll("#br-skema .art.op").length === 1);
+    paastand("arbejdet huskes, når man springer frem og tilbage", (function () {
+        S.vaelg(0); S.nulstil(); S.tilfoej("num", { k: "stof", v: "HI" });
+        S.vaelg(2); S.vaelg(0);
+        var ok = S.opg.a.num.length === 1;
+        S.vaelg(2);
+        return ok && S.chips[0].classList.contains("paabegyndt");
+    }()));
+
+    /* Traek og slip med rigtige pointer-haendelser */
+    S.vaelg(1); S.nulstil();
+    function midt(e) { var r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+    function haendelse(el, type, p) {
+        el.dispatchEvent(new W.PointerEvent(type, { bubbles: true, clientX: p.x, clientY: p.y, button: 0, pointerId: 1, isPrimary: true }));
+    }
+    function traek(el, maal, dx) {
+        var a = midt(el), b = midt(maal);
+        if (dx) b.x += dx;
+        haendelse(el, "pointerdown", a);
+        haendelse(d, "pointermove", { x: a.x + 10, y: a.y + 10 });
+        haendelse(d, "pointermove", b);
+        haendelse(d, "pointerup", b);
+    }
+    function brikIBakke(tekst) {
+        return Array.prototype.filter.call(d.querySelectorAll("#br-bakke .brik"), function (b) { return b.textContent === tekst; })[0];
+    }
+    traek(brikIBakke("[N₂]"), d.getElementById("br-den"));
+    paastand("træk en brik fra bakken ned i nævneren", S.opg.a.den.length === 1 && S.opg.a.den[0].v === "N2");
+    traek(brikIBakke("[H₂]"), d.getElementById("br-den"), 200);
+    var nB = d.querySelectorAll("#br-den .brik");
+    var mellem = { x: (midt(nB[0]).x + midt(nB[1]).x) / 2, y: midt(nB[0]).y };
+    var prik = brikIBakke("·"), pa = midt(prik);
+    haendelse(prik, "pointerdown", pa);
+    haendelse(d, "pointermove", { x: pa.x + 10, y: pa.y + 10 });
+    haendelse(d, "pointermove", mellem);
+    paastand("den grønne streg står mellem de to stoffer under trækket", d.querySelector("#br-den .mark") !== null &&
+        d.querySelector("#br-den .mark").previousElementSibling === nB[0]);
+    haendelse(d, "pointerup", mellem);
+    paastand("· landede mellem [N₂] og [H₂]", S.opg.a.den.map(function (t) { return t.v; }).join(" ") === "N2 · H2");
+    var foer = S.opg.a.den.length, ud = d.querySelectorAll("#br-den .brik")[0];
+    traek(ud, d.getElementById("br-bakke"));
+    paastand("træk en brik ud af brøken fjerner den", S.opg.a.den.length === foer - 1);
+    var k = brikIBakke("[NH₃]"), kp = midt(k);
+    S.vaelgZone("num");
+    haendelse(k, "pointerdown", kp); haendelse(d, "pointerup", kp);
+    paastand("et klik lægger brikken i den blå zone", S.opg.a.num.length === 1 && S.opg.a.num[0].v === "NH3");
+    var iz = d.querySelector("#br-num .brik"), ip = midt(iz);
+    haendelse(iz, "pointerdown", ip); haendelse(d, "pointerup", ip);
+    paastand("et klik på en brik i brøken fjerner den", S.opg.a.num.length === 0);
+    S.nulstil();
+
+    /* Paaskeaegget */
+    d.querySelector("#br-skema .ligepil").click();
+    paastand("et klik på ⇌ får pilene til at løbe og siger hvorfor", d.querySelector("#br-skema .ligepil").classList.contains("koerer") && /begge veje/.test(S.beskedTekst()));
+    tekster.push(S.beskedTekst());
+    S.opdater(7);
+    d.querySelector("#br-skema .art").click();
+    paastand("et klik på et stof siger tilstandsformen", /betyder/.test(S.beskedTekst()));
+    tekster.push(S.beskedTekst());
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Find fejlen");
+    NK.visFane("fane-ff");
+    paastand("12 tavler, heraf 2 uden fejl", D.FEJL.length === 12 && D.FEJL.filter(function (o) { return !o.slags; }).length === 2);
+    var tavleFejl = [], delFejl = [];
+    function somTok(dele) {
+        var ud = [];
+        for (var i = 0; i < dele.length; i++) {
+            var x = dele[i];
+            if (x.t === "led") { ud.push({ k: "stof", v: x.s }); if (x.e > 1) ud.push({ k: "eks", v: x.e }); }
+            else if (x.t === "tegn") ud.push({ k: "tegn", v: x.v });
+            else if (x.t === "en") ud.push({ k: "tegn", v: "1" });
+            else return null;
+        }
+        return ud;
+    }
+    D.FEJL.forEach(function (o) {
+        if (!!o.slags !== (o.maal.length > 0)) tavleFejl.push(o.id + " maal");
+        if (!o.hint || o.hint.length !== 3) tavleFejl.push(o.id + " hint");
+        if (o.lys && !B.find(o, o.lys)) tavleFejl.push(o.id + " lys");
+        var n = somTok(o.num), m = somTok(o.den);
+        if (n && m) {
+            var r = B.dom(o, n, m);
+            if (r.ok !== !o.slags) tavleFejl.push(o.id + " dom " + r.kode);
+        }
+        /* De dele, der ikke er fejlen, skal vaere rigtige */
+        var Fa = B.facit(o);
+        ["num", "den"].forEach(function (z) {
+            o[z].forEach(function (del, i) {
+                var maal = o.maal.some(function (mm) { return mm[0] === z && mm[1] === i; });
+                if (maal) return;
+                if (del.t === "led") {
+                    var f = Fa[z].filter(function (l) { return l.s === del.s; })[0];
+                    if (!f || f.e !== del.e) delFejl.push(o.id + " " + z + i);
+                    tekster.push(B.godDel(o, del));
+                } else if (del.t === "tegn" && del.v !== "·") delFejl.push(o.id + " " + z + i);
+                else if (del.t === "faktor" || del.t === "inde") delFejl.push(o.id + " " + z + i);
+            });
+        });
+        tekster.push(o.forklaring, o.navn);
+        o.hint.forEach(function (t) { tekster.push(t); });
+    });
+    paastand("hver tavle har netop det antal fejl, den skal have", tavleFejl.length === 0, tavleFejl.join(", "));
+    paastand("alle dele, der ikke er fejlen, er rigtige", delFejl.length === 0, delFejl.join(", "));
+    var ffFejl = [];
+    D.FEJL.forEach(function (o, i) {
+        F.vaelg(i);
+        var dele = d.querySelectorAll("#ff-tavle .del");
+        if (!o.slags) {
+            dele[0].click();
+            if (F.faerdig || !dele[0].classList.contains("god")) ffFejl.push(o.id + " klik");
+            F.ingenFejl();
+            if (!F.faerdig || !d.getElementById("ff-status").classList.contains("god")) ffFejl.push(o.id + " ingen fejl");
+            return;
+        }
+        F.ingenFejl();
+        if (F.faerdig || !d.getElementById("ff-status").classList.contains("skidt")) ffFejl.push(o.id + " ingen fejl godtaget");
+        /* En rigtig del foerst, hvis der er en */
+        var god = Array.prototype.filter.call(dele, function (e) { return !F.erMaal(e.getAttribute("data-z"), parseInt(e.getAttribute("data-i"), 10)); })[0];
+        if (god) { god.click(); if (F.faerdig || !god.classList.contains("god")) ffFejl.push(o.id + " god del"); tekster.push(F.beskedTekst()); }
+        var mal = Array.prototype.filter.call(dele, function (e) { return F.erMaal(e.getAttribute("data-z"), parseInt(e.getAttribute("data-i"), 10)); })[0];
+        mal.click();
+        if (!F.faerdig || !mal.classList.contains("fejlen") || d.getElementById("ff-rettet").hidden) ffFejl.push(o.id + " fundet");
+        tekster.push(F.beskedTekst(), F.promptHTML());
+    });
+    paastand("hver tavle kan rettes, og Ingen fejl godtages kun uden fejl", ffFejl.length === 0, ffFejl.join(", "));
+    F.vaelg(4);
+    F.knap(); F.knap(); F.knap();
+    paastand("hint i tre trin, og stoffet lyser i skemaet", /Hint 3 af 3/.test(F.beskedTekst()) && d.querySelector("#ff-skema .art.lys") !== null);
+    F.knap();
+    paastand("Vis svaret viser fejlen med gul ring", F.faerdig && d.querySelector("#ff-tavle .del.fejlen-vist") !== null && d.getElementById("ff-stempel").textContent === "Svaret");
+    NK.visFane("fane-br");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. Quizzen");
+    var qFejl = [];
+    D.QUIZ.forEach(function (q, i) {
+        if (q.svar.length !== 4 || q.nej.length !== 4 || q.nej[0] !== null) qFejl.push(i);
+        for (var j = 1; j < 4; j++) if (!q.nej[j]) qFejl.push(i + ":" + j);
+        tekster.push(q.q, q.hvorfor); q.svar.forEach(function (s) { tekster.push(s); }); q.nej.forEach(function (s) { if (s) tekster.push(s); });
+    });
+    paastand("5 spørgsmål med 4 svar og en besked til hvert forkert svar", D.QUIZ.length === 5 && qFejl.length === 0, qFejl.join(", "));
+    NK.Quiz.start();
+    NK.Quiz.aabn();
+    NK.Quiz.svar(1);
+    paastand("et forkert svar viser det rigtige og beskeden til fejlen", d.querySelector("#quiz .quiz-valg.rigtig") && d.querySelector("#quiz .quiz-valg.forkert") &&
+        d.querySelector("#quiz .quiz-dom").textContent.indexOf(D.QUIZ[0].nej[1]) >= 0);
+    NK.Quiz.start();
+    NK.Quiz.aabn();
+    for (var qi = 0; qi < 5; qi++) { NK.Quiz.svar(0); d.getElementById("quiz-videre").click(); }
+    paastand("fem rigtige gør knappen grøn", d.getElementById("quizknap").classList.contains("loest") && /5 af 5/.test(d.getElementById("quiz-indhold").textContent));
+    d.getElementById("quiz").classList.remove("vis");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("8. Sproget");
+    (function saml(x) {
+        if (typeof x === "string") tekster.push(x);
+        else if (Array.isArray(x)) x.forEach(saml);
+        else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
+    }({ B: D.BROEK.map(function (o) { return [o.navn, o.tekst, o.forklaring]; }), F: D.FAERDIG, R: D.ROS_OPGAVE }));
+    D.BROEK.forEach(function (o, i) { S.vaelg(i); tekster.push(S.promptHTML(), S.trinLinje()); });
+    tekster.push(F.trinLinje());
+    tekster.push(d.getElementById("teori").textContent, d.body.textContent);
+    var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger", tanke.length === 0, tanke.slice(0, 2).join(" | "));
+    var en = tekster.filter(function (t) { return /[A-Za-z)\]]¹[⁺⁻]|[A-Za-z)\]]1[+−](?![\d ])/.test(t); });
+    paastand("ingen 1+ eller 1− som ladning", en.length === 0, en.slice(0, 2).join(" | "));
+    var ascii = tekster.filter(function (t) { return ASCII_ORD.test(t.replace(/<[^>]*>/g, "")); });
+    paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).join(" | "));
+    var natron = tekster.filter(function (t) { return /natronlud/i.test(t); });
+    paastand("ingen natronlud", natron.length === 0);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("9. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
+    var lFejl = [], mindstSkema = 99;
+    function under(a, b) { return a.getBoundingClientRect().bottom <= b.getBoundingClientRect().top + 1; }
+    maal.forEach(function (m) {
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        NK.visFane("fane-br");
+        var sc = d.querySelector("#fane-br .scene");
+        D.BROEK.forEach(function (o, i) {
+            S.vaelg(i); S.nulstil();
+            /* Den bredeste broek: alle seks stoffer i taelleren */
+            o.stoffer.forEach(function (s, j) { if (j) S.tilfoej("num", { k: "tegn", v: "·" }); S.tilfoej("num", { k: "stof", v: s }); });
+            S.tilpas();
+            var sk = d.getElementById("br-skema");
+            if (sk.scrollWidth > sk.clientWidth + 1) lFejl.push(m.join("×") + " skemaet " + o.id);
+            mindstSkema = Math.min(mindstSkema, parseFloat(W.getComputedStyle(sk).fontSize));
+            if (!under(d.getElementById("br-bakke"), d.getElementById("br-status"))) lFejl.push(m.join("×") + " bakken bag statuslinjen " + o.id);
+            var t = d.getElementById("br-tavle").getBoundingClientRect(), s = sc.getBoundingClientRect();
+            if (t.top < s.top || t.right > s.right + 1 || t.left < s.left - 1) lFejl.push(m.join("×") + " tavlen uden for scenen " + o.id);
+            var tj = d.getElementById("br-tjek").getBoundingClientRect();
+            if (tj.right > t.right) lFejl.push(m.join("×") + " Tjek uden for tavlen " + o.id);
+            S.nulstil();
+        });
+        NK.visFane("fane-ff");
+        D.FEJL.forEach(function (o, i) {
+            F.vaelg(i);
+            F.tilpas();
+            var sk = d.getElementById("ff-skema");
+            if (sk.scrollWidth > sk.clientWidth + 1) lFejl.push(m.join("×") + " skemaet " + o.id);
+            if (!under(d.getElementById("ff-ingen"), d.getElementById("ff-status"))) lFejl.push(m.join("×") + " Ingen fejl bag statuslinjen " + o.id);
+            F.ingenFejl(); if (!F.faerdig) F.knap(), F.knap(), F.knap(), F.knap();
+            if (!under(d.getElementById("ff-tavle"), d.getElementById("ff-status"))) lFejl.push(m.join("×") + " den rettede tavle bag statuslinjen " + o.id);
+            F.tilpas();
+        });
+        ["#fane-br .panel", "#fane-ff .panel"].forEach(function (sel) {
+            NK.visFane(sel.indexOf("br") > 0 ? "fane-br" : "fane-ff");
+            var p = d.querySelector(sel);
+            if (p.scrollWidth > p.clientWidth + 1) lFejl.push(m.join("×") + " panelet er for bredt");
+        });
+    });
+    paastand("tavle, bakke og knapper kan være der fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 4).join(", "));
+    paastand("skemaet er mindst 18 px", mindstSkema >= 18, mindstSkema);
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+    NK.visFane("fane-br");
+    S.vaelg(0);
+    var smaa = [];
+    d.querySelectorAll(".panel *, .tavle *, .bakke *, .statuslinje *").forEach(function (e) {
+        if (!e.childNodes.length || !e.textContent.trim() || e.offsetParent === null) return;
+        var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+        if (!egen) return;
+        var px = parseFloat(W.getComputedStyle(e).fontSize);
+        if (px < 11.5) smaa.push(e.className + " " + px);
+    });
+    paastand("ingen tekst under 11,5 px", smaa.length === 0, smaa.slice(0, 4).join(", "));
+}
+</script>
+</body>
+</html>

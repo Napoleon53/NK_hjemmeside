@@ -1,8 +1,7 @@
 # sc8.4 Afstem redoxreaktioner
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
-filer inde fra sig selv, bortset fra Kemichael, som hentes fra
-`../../v2/kemichael/`. Den virker også, når den åbnes direkte fra harddisken.
+filer inde fra sig selv og virker også, når den åbnes direkte fra harddisken.
 
 Den afløser `animationer/kemi-c-filer/c8.4_opgaver_redoxafstemning.html` og er i
 menuen fra 26. sept. 2026 som c8.3; den gamle ligger i `kemi-c-filer/arkiv/`.
@@ -22,16 +21,46 @@ menuen fra 26. sept. 2026 som c8.3; den gamle ligger i `kemi-c-filer/arkiv/`.
    Nyt: 37 reaktioner i tre sværhedsgrader, en besked til hver typisk fejl,
    Giv hint og Vis svaret på hvert trin, kontrollen under skemaet og
    elektronvægten. Scoren (+100/−10) og enhjørningen er taget ud; tælleren
-   over løste reaktioner og Kemichaels ros afløser dem.
+   over løste reaktioner afløser dem.
 3. **Naboerne:** c8.2 ejer reglerne for oxidationstal, c8.3
    elektronegativiteten, c8.5 permanganatens farver og c8.1 spændingsrækken.
    Her er oxidationstallet ét trin, og hintet nævner kun, at O er −II, H er +I,
    og at summen er ladningen.
 4. **Loftet:** én opgave ad gangen med to reaktanter og to produkter, syv
-   trin, tre sværhedsgrader (9 + 14 + 14 reaktioner) og én vægt på scenen.
-5. **Layoutet:** scene plus panel, som sc2.4. Vægten og Kemichael foroven,
-   arbejdsbordet med tavlen forneden. Panelet har trinene, den ene
-   hjælpeknap og listen over reaktionerne.
+   trin, tre sværhedsgrader (9 + 14 + 14 reaktioner) og én vægt, som eleven
+   selv slår til.
+5. **Layoutet:** scene plus panel. Scenen er tavlen: opgaven øverst, så
+   trinnets spørgsmål og skemaet så stort, som bredden tillader. Panelet har
+   kun trinene og listen over reaktionerne.
+
+## Ombygningen 3. oktober 2026
+
+Brugeren efter at have brugt den: "Jeg synes vægten godt kan være forvirrende.
+Den fylder ret meget og er en smule svær at afkode for elever, som primært
+gerne bare vil forstå den trinvise metode. Lav det til en mulighed som man selv
+kan toggle på. Udgangspunktet skal være at reaktionsskemaet skal være meget
+større, og tilsvarende skal opgaveteksten og inputfelterne være mere synlig.
+Lav en god input-mulighed tæt på alle inputfelter. Fjern Michael helt fra denne
+animation, men behold ? oppe i hjørnet."
+
+* **Vægten er et tilvalg.** Knappen Elektronvægt i toplinjen (eller V) viser
+  den over tavlen. Den er slået fra, hver gang siden åbnes.
+* **Tavlen fylder scenen.** Skemaet begynder ved 5,2 rem og bliver kun mindre,
+  hvis det ikke kan stå på én linje. Felterne følger skemaets størrelse.
+* **Opgaven står over tavlen**, ikke i panelet, og trinnets spørgsmål står med
+  stor skrift og en gul streg foran.
+* **Tasterne.** Under felterne står en række taster, der skriver i det valgte
+  felt: oxidationstallene fra −IV til +VII, tal til koefficienter og
+  elektroner, og tal med fortegn til ladningen. Se afsnittet Tasterne.
+* **Tjek, hintknappen og beskeden** står på tavlen lige under tasterne. Den
+  ene knap fra panelet (Giv hint → Vis svaret → Ny opgave) er flyttet derned
+  som en gul knap ved siden af Tjek. Det bad brugeren ikke om her, men om
+  nabofilerne c8.2 og c8.4 samme dag ("hint-knappen skal være meget synlig
+  lige ved siden af inputfeltet"), så de tre opfører sig ens.
+* **Kemichael er taget helt ud:** ingen præsentation, ingen ros fra ham, intet
+  påskeæg med 20 på en vægtskål og ingen kaffekop. Første gang alle reaktioner
+  på en sværhedsgrad er løst, står det i beskeden. Rundvisningen bag ? er
+  bevaret.
 
 ## De syv trin
 
@@ -44,14 +73,15 @@ spørger om, og Tjek (eller Enter) tjekker det.
    oxideres og reduceres. Derefter er parrene blå (oxidation) og orange
    (reduktion) på tavlen og vægten.
 3. **Elektroner pr. atom.** Stigning og fald pr. atom, som i den gamle.
-   Vægten viser derefter elektronerne pr. enhed: én Cr₂O₇²⁻ optager 2 · 3 e⁻.
 4. **Koefficienter.** Tomme felter foran formlerne; eleven skriver også 1.
-   Plus og minus på bordkanten under vægten ændrer tallet foran reaktanten.
-   Skålene er tomme, indtil der står et tal, og vægten viser først = eller ≠,
-   når der ligger noget på begge skåle. Et tomt felt tæller altså ikke som 1,
-   så facit ikke står der, før eleven har gjort noget (brugerens første test,
-   25. sept. 2026: Zn/Cu²⁺ var afstemt og grøn, før der var trykket). Den
-   første reaktion på Let har derfor tal forskellige fra 1.
+   Under tasterne står elektronerne som regnestykker med elevens egne tal:
+   "5 Fe²⁺ afgiver 5 · 1 e⁻ = 5 e⁻" og "1 MnO₄⁻ optager 1 · 5 e⁻ = 5 e⁻" med =
+   eller ≠ imellem. Et tomt felt tæller ikke som 1: så står der kun, hvad én
+   enhed afgiver eller optager, og tegnet kommer først, når der står et tal
+   ved begge (brugerens første test, 25. sept. 2026: Zn/Cu²⁺ var afstemt og
+   grøn, før der var trykket). Den første reaktion på Let har derfor tal
+   forskellige fra 1. Er vægten slået til, viser den det samme, og linjen
+   under tasterne er væk.
 5. **Ladningen.** Summen før og efter pilen.
 6. **H⁺ eller OH⁻.** Et felt på hver side af pilen; eleven vælger siden.
 7. **H₂O.** Et felt på hver side af pilen.
@@ -61,16 +91,36 @@ der i andre reaktioner intet at gøre i trin 6 eller 7 (S9 og S14), springes
 trinnet over med en besked. Til sidst står det færdige skema uden 1-taller og
 med ens led slået sammen.
 
+## Tasterne
+
+`js/taster.js`. Rækken står lige under felterne, flytter sig hen under det
+valgte felt, og en lille hale peger op på det. Tastaturet virker som før.
+
+* Det valgte felt har gul ramme. Det er det felt, der sidst blev klikket i, og
+  det huskes, selv om markøren forlader feltet.
+* I trin 1, 3, 4 og 5 er det første tomme felt valgt fra start. I trin 6 og 7
+  er intet valgt, for siden af pilen er en del af svaret. Trykkes der på en
+  tast uden et valgt felt, blinker felterne, og beskeden siger, at man skal
+  klikke på et felt først.
+* Et oxidationstal skrives med ét tryk, og det næste tomme felt bliver valgt.
+* Tal: det første ciffer efter et klik i feltet eller et Tjek afløser det, der
+  stod der; det næste sættes bagefter (højst to cifre). ⌫ sletter det sidste.
+  Plus og minus skifter fortegnet uden at røre tallet.
+* På en skærm uden mus (`pointer: coarse`) har felterne `inputmode="none"`, så
+  skærmtastaturet ikke dækker tavlen.
+
 ## Hjælpen
 
-Den ene knap i panelet er Giv hint → Vis svaret → (næste trin) → Ny opgave.
-Hintet hører til trinnet og reaktionen, fx "I MnO₄⁻ er O −II. Summen af
+Den gule knap ved siden af Tjek er Giv hint → Vis svaret → (næste trin) → Ny
+opgave (grøn, når skemaet er afstemt). Efter et forkert svar lyser den stille
+op, til hintet er givet. Hintet hører til trinnet og reaktionen, fx "I MnO₄⁻ er O −II. Summen af
 oxidationstallene skal være ionens ladning, −1." Vis svaret giver svaret med
 beregningen, fx "Mn + 4 · (−II) = −1, så Mn = +VII." En reaktion, hvor et svar
 er vist, står gul i listen og tæller ikke som løst.
 
 Et forkert svar får en besked, der passer til fejlen (`NK.Redox.oxFejl`,
-`eFejl` og `tjek*` i `js/opgave.js`):
+`eFejl` og `tjek*` i `js/opgave.js`). Beskeden står i en boks under knapperne:
+rød ved en fejl, grøn ved et rigtigt svar og gul ved et hint.
 
 | Trin | Fejlen | Beskeden |
 |------|--------|----------|
@@ -86,19 +136,23 @@ Et forkert svar får en besked, der passer til fejlen (`NK.Redox.oxFejl`,
 | 6 | forkert side, begge sider, for få eller mange | med ladningen, som den er nu |
 | 7 | forkert side, for lidt eller meget | med antallet af O på hver side |
 
-Kontrollen under skemaet ("Før = efter") viser kun det, trinnet handler om,
-og kun tal, eleven selv har regnet ud: ladningen i trin 6, O og H i trin 7 og
-det hele, når skemaet er færdigt. Tallene er grønne, når de er ens, og følger
-med, mens der skrives. I trin 4 og 5 står der intet; elektronerne vises af
-vægten, og ladningen er det, trin 5 spørger om.
+Kontrollen under tasterne viser kun det, trinnet handler om, og kun tal,
+eleven selv har skrevet: elektronerne i trin 4, ladningen i trin 6, O og H i
+trin 7 og det hele, når skemaet er færdigt. Tallene er grønne, når de er ens,
+og følger med, mens der skrives. I trin 5 står der intet; ladningen er det,
+trinnet spørger om.
 
 ## Elektronvægten
+
+Slået fra fra start. Knappen Elektronvægt i toplinjen eller V viser den over
+tavlen, og tavlen bliver lavere, så begge kan ses.
 
 Venstre skål er det, der oxideres, højre skål det, der reduceres. Hver brik
 er én enhed af stoffet. Over brikkerne til venstre sidder de elektroner, den
 afgiver (gule prikker), og over brikkerne til højre de pladser, de skal hen
 (ringe). Vægten tipper mod den side med flest og står lige, når der er lige
-mange. Under skålene står regnestykket, fx 5 · 1 e⁻ = 5 e⁻. Når
+mange. Under skålene står regnestykket, fx 5 · 1 e⁻ = 5 e⁻. Plus og minus på
+bordkanten under vægten ændrer tallet foran reaktanten i trin 4. Når
 koefficienterne er rigtige, flyver elektronerne fra venstre til højre én
 gang. Et klik på vægten, der ikke kan bruges endnu, siger hvorfor.
 
@@ -129,52 +183,59 @@ afstemmes med hele oxidationstal og de mindste tal.
   opgaveteksten.
 * Elektronerne tegnes som gule prikker på brikkerne. Vægten er en model af
   regnskabet, ikke af massen.
+* Skemaet står altid på én linje. I de sidste trin af de længste reaktioner
+  bliver skriften derfor mindre (ned til ca. 20 px ved 1100 px i bredden).
 
-## Kemichael
+## Layoutet
 
-Han tilbyder at præsentere hver sværhedsgrad første gang (Start præsentation /
-Nej tak), og under anden replik peger han på det, den handler om:
-opgavekortet (Let), trinlisten (Middel) og arbejdsbordet (Svær). Han roser
-første gang alle reaktioner på en sværhedsgrad er løst uden Vis svaret.
-Påskeæg: 20 eller flere på en vægtskål, og han kommer og peger på den
-(`D.OVERVAEGT`, tre varianter). Kaffekoppen på bordet er det fælles påskeæg.
+* Feltet over et atom er bredere end et smalt atom (N, S, I). Står der flere
+  atomer i formlen, slutter feltet derfor ved atomets kant og stikker kun ud
+  til den frie side (`.oxrk.tv` og `.oxrk.th`), så det ikke dækker tallet over
+  naboatomet. Et felt, der ville stikke ud over tavlens kant, gør skriften
+  mindre (`ombrudt` i `js/opgave.js`).
+* Lave skærme (en bærbar, rammen i menuen) får mindre luft i to trin:
+  `max-height: 780px` og `700px` i `css/stil.css`. Under 700 px står knapperne
+  til højre for beskeden i stedet for over den.
+* Med vægten slået til har `body` klassen `med-vaegt`, og tavlen bruger de
+  små mål.
 
 ## Filer
 
 ```
 index.html          toplinje, scene, panel, teori og rundvisning
-css/stil.css        alt udseende (grundreglerne som sc2.4). NB: decimaltal
-                    med PUNKTUM i CSS
+css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, hævet og sænket skrift, lærred (som sc7.1)
-js/data.js          reaktionerne, sværhedsgraderne og Kemichaels replikker
+js/data.js          reaktionerne og sværhedsgraderne
 js/redox.js         modellen: oxidationstal, elektroner, afstemning og
                     beskederne til de typiske fejl
-js/sprites.js       lageret til Kemichaels sprites (ingen egne sprites)
 js/vaegt.js         elektronvægten på lærredet
+js/taster.js        tasterne under felterne
 js/opgave.js        motoren: de syv trin, tavlen, kontrollen og hjælpen
-js/laerer.js        Kemichael: præsentationen, rosen og påskeægget
 js/rundvisning.js   rundvisningen bag ?
-js/praesentation.js tilbuddet om præsentationen (ens i alle mapper)
-js/app.js           faneskift, tastatur, musen på vægten og tegneløkken
+js/app.js           faneskift, tastatur, knappen til vægten, musen på
+                    vægten og tegneløkken
 _selvtest.html      udviklerværktøj, se nedenfor
 ```
 
 ## Genveje
 
 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sværhedsgrad · <kbd>R</kbd> start forfra ·
-<kbd>H</kbd> rundvisning · <kbd>T</kbd> teori · <kbd>K</kbd> Kemichaels præsentation ·
+<kbd>V</kbd> elektronvægt · <kbd>H</kbd> rundvisning · <kbd>T</kbd> teori ·
 <kbd>Enter</kbd> tjek · <kbd>Esc</kbd> luk. Direkte links: `#let`, `#middel`, `#svaer`.
 
 ## Selvtest
 
-`_selvtest.html` skal åbnes gennem en lokal server med `animationer/` som rod
-(Kemichael hentes derfra). Den tjekker, at alle 37 reaktioner er afstemt i
-atomer og ladning med de mindste tal, oxidationstal mod tabelværdier, at
-felterne læser romertal og tal, at de typiske fejl får den rigtige besked, at
-alle reaktioner kan gennemføres med rigtige svar og med Vis svaret, vægten og
-plus og minus, Kemichaels tilbud og præsentation, sproget og at skemaet står
-på én linje fra 1100 til 1500 px i bredden.
-Sidst kørt: ALT OK, 25. september 2026.
+`_selvtest.html` skal åbnes gennem en lokal server (iframen kan ikke læses fra
+`file://`). Den tjekker, at alle 37 reaktioner er afstemt i atomer og ladning
+med de mindste tal, oxidationstal mod tabelværdier, at felterne læser romertal
+og tal, at de typiske fejl får den rigtige besked, at alle reaktioner kan
+gennemføres med rigtige svar og med Vis svaret, at vægten er slået fra fra
+start og følger med, når den slås til, at en hel reaktion kan afstemmes med
+tasterne alene, at Kemichael er væk, og at ? stadig viser rundt, sproget, og
+at skemaet står på én linje, tasterne på én række, intet felt dækker et tal,
+og intet skal rulles fra 1100 × 650 til 1500 × 900 (med vægten: 1280 × 720 og
+1400 × 860).
+Sidst kørt: ALT OK (110 påstande), 3. oktober 2026.
 
 ## I menuen
 

@@ -41,7 +41,7 @@
     /* Det, der sker i glasset, som en saetning uden stort begyndelsesbogstav */
     D.iagttagelse = function (m, i) {
         if (!K.reagerer(m, i)) return "intet sker";
-        var dele = [K.STOF[i].gas ? "der kommer bobler" : D.BELAEG[i]];
+        var dele = [K.STOF[i].gas ? "der kommer bobler, og stangen bliver tyndere" : D.BELAEG[i]];
         if (D.FARVE[i] && D.FARVE[m]) dele.push("væsken går fra " + D.FARVE[i] + " til " + D.FARVE[m]);
         else if (D.FARVE[i]) dele.push("den " + D.FARVE_BEST[i] + " farve bliver svagere");
         else if (D.FARVE[m]) dele.push("væsken bliver " + D.FARVE[m]);
@@ -117,7 +117,7 @@
 
     D.RK_PROMPT = "Stil de seks på hylden i rækkefølge, fra uædel til ædel.";
     D.RK_HINT = "Et metal står til venstre for de metaller, hvis ioner det reagerer med. Tæl fluebenene i hver række i skemaet.";
-    D.RK_FAERDIG = "Rigtigt. Øverst står rækken, som den står i bogen. Dine seks har deres pladser i den.";
+    D.RK_FAERDIG = "Rigtigt. Øverst står spændingsrækken med flere metaller. Dine seks har deres pladser i den.";
 
     /* Beskeden, naar r staar til hoejre for l, men skulle staa til
        venstre for det. set: har eleven set forsoeget paa fane 1? */
@@ -139,9 +139,9 @@
        De foerste tolv opgaver, fra det lette til det svaere: [stang, oploesning].
        Bagefter kommer tilfaeldige par fra K.alleOpgaver(). */
     D.OPGAVER = [
-        ["Ni", "Cu"], ["Pb", "Zn"], ["Zn", "Ag"], ["Cu", "H"],
-        ["Mg", "H"], ["Au", "Ag"], ["Fe", "Sn"], ["Al", "Cu"],
-        ["Sn", "Al"], ["Pb", "Ag"], ["Al", "H"], ["Cu", "Au"]
+        ["Fe", "Cu"], ["Pb", "Zn"], ["Zn", "Ag"], ["Cu", "H"],
+        ["Mg", "H"], ["Au", "Ag"], ["Zn", "Pb"], ["Al", "Cu"],
+        ["Fe", "Al"], ["Pb", "Ag"], ["Al", "H"], ["Cu", "Au"]
     ];
 
     D.opgaveTekst = function (m, i) {
@@ -215,26 +215,40 @@
         return r.koef[0] + " " + r.m + " afgiver " + r.e + " e⁻, og " + r.koef[1] + " " + K.ion(r.i) + " optager " + r.e + " e⁻.";
     };
 
-    /* ----- Kemichael ------------------------------------------------------------ */
+    /* ----- Kemichael ------------------------------------------------------------
+       Praesentationen: ét trin ad gangen, og eleven trykker Naeste.
+       Hvert trin siger, hvad fanen traener, eller hvordan en ting bruges.
+       Hele saetninger og ingen vittigheder. sel: det, han peger paa, og
+       som faar en gul ramme, der blinker (en CSS-selector; felterne paa
+       laerredet er de usynlige .anker fra rundvisningen). */
     D.INTRO_FORSOEG = [
-        "Forsøget. Fem metalstænger og seks glas med ioner.",
-        "Træk en stang ned i et glas, og se i luppen.",
-        "Stængerne er pudset. Det tog hele frikvarteret."
+        { tekst: "Her undersøger du, hvilke metaller der reagerer med hvilke metalioner." },
+        { tekst: "Her står fem metalstænger. Træk en stang ned i et glas.", sel: "#fs-anker-holder" },
+        { tekst: "Fem glas har metalioner, og ét har saltsyre. Ionen står på skiltet under glasset.", sel: "#fs-anker-glas" },
+        { tekst: "Luppen viser stangen og ionerne helt tæt på. Klik på et glas for at se det.", sel: "#fs-anker-lup" },
+        { tekst: "Her står, hvad du skal gøre nu. Knappen giver et hint.", sel: "#fs-kort" },
+        { tekst: "Hvert forsøg bliver skrevet ind i skemaet. Et flueben betyder en reaktion.", sel: "#fs-skemakort" }
     ];
     D.INTRO_RAEKKEN = [
-        "Rækken. Metallerne og hydrogen skal stå i rækkefølge.",
-        "Træk dem op på hylden. Skemaet fra forsøget hjælper.",
-        "Hydrogen er ikke et metal. Den står der alligevel."
+        { tekst: "Her stiller du metallerne og hydrogen i rækkefølge, fra uædel til ædel." },
+        { tekst: "Her ligger seks kort. Træk dem op på hylden.", sel: "#rk-anker-kort" },
+        { tekst: "Hylden har seks pladser. Det mest uædle skal stå længst til venstre.", sel: "#rk-anker-hylde" },
+        { tekst: "Skemaet viser dine forsøg fra fane 1. Brug det til at finde rækkefølgen.", sel: "#rk-skemakort" },
+        { tekst: "Rækkefølgen bliver tjekket, når alle seks står på hylden. Knappen giver et hint.", sel: "#rk-kort" }
     ];
     D.INTRO_FORUDSIG = [
-        "Forudsig. Rækken hænger foroven, som i bogen.",
-        "Svar i panelet. Så kommer stangen ned i glasset.",
-        "Guldstangen er lånt. Den skal tilbage i morgen."
+        { tekst: "Her bruger du spændingsrækken til at forudsige, om der sker en reaktion." },
+        { tekst: "Her hænger spændingsrækken. De uædle metaller står til venstre.", sel: "#fu-anker-raekke" },
+        { tekst: "En metalstang hænger over et glas med en opløsning.", sel: "#fu-anker-glas" },
+        { tekst: "Svar ja eller nej her. Bagefter kommer stangen ned i glasset.", sel: "#fu-valg" },
+        { tekst: "Sker der en reaktion, vælger du her de stoffer, der dannes, og afstemmer.", sel: "#fu-kort" },
+        { tekst: "Luppen viser, hvad der sker med elektronerne.", sel: "#fu-anker-lup" }
     ];
 
-    D.ROS_FORSOEG = "Hele skemaet. Stængerne skal pudses igen.";
-    D.ROS_RAEKKEN = "Rækken står. Så kan du spare stængerne.";
-    D.ROS_FORUDSIG = "Tolv reaktioner. Guldet er stadig helt.";
+    /* Ros, foerste gang en fane er klaret */
+    D.ROS_FORSOEG = "Du har prøvet alle 25 forsøg. Skemaet er klar til fane 2.";
+    D.ROS_RAEKKEN = "Rækkefølgen er rigtig. Du har selv fundet spændingsrækken.";
+    D.ROS_FORUDSIG = "Tolv opgaver er løst. Du kan bruge spændingsrækken.";
 
     /* Paaskeaegget: en stang sluppet over hans kaffe */
     D.AEG_KAFFE = "Ikke i kaffen. Den er sur nok i forvejen.";

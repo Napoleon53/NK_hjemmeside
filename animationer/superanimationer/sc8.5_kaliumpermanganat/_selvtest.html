@@ -23,8 +23,10 @@
    de kendte skemaer, at felterne læser romertal og tal, at de typiske
    fejl får den rigtige besked, at alle reaktioner kan gennemføres ved
    at skrive, med musen og med Vis svaret, at der ikke står et facit,
-   før eleven har gjort noget, at reaktionerne i glasset på fane 1 åbner
-   én ad gangen, at Kemichael kun siger én kort sætning ved hint og svar,
+   før eleven har gjort noget, at eleven selv fylder det tomme urglas på
+   fane 1, at reaktionerne i glasset åbner én ad gangen, at knappen står
+   på papiret, at den korte linje øverst i hæftet følger bidderne, at et
+   klik på Kemichael giver hintet, at Kemichael kun siger én kort sætning ved hint og svar,
    at Læs mere åbner hans forklaring (uden facit efter et hint), at
    han kan sendes ud, at sproget holder reglerne, og at hæftet og bordet
    kan være på skærmen fra 1100 × 700 til 1600 × 950.
@@ -109,7 +111,10 @@ async function koerTest(W) {
     }
     function besked(S) { return S.beskedTekst(); }
     var tekster = [];
+    var linjer0 = {};      /* de korte linjer øverst i hæftet, pr. bid */
     function saml(S) {
+        var kl = S.haefte.navnEl.textContent;
+        linjer0[kl] = kl.length;
         tekster.push(S.beskedTekst());
         if (S.k.taler()) tekster.push(S.k.tekst());
         tekster.push(d.getElementById(S.navn + "-prompt").textContent);
@@ -117,9 +122,14 @@ async function koerTest(W) {
     }
 
     /* Den bid, eleven er ved, løses ved at skrive det rigtige */
+    /* Gangetallene flyver op foran formlerne med timere; vent, til de er fremme
+       (også når maskinen har travlt) */
+    async function ventKoef(S) { for (var v = 0; v < 150 && !S.opg.koefFaerdig; v++) await vent(20); }
+
     function loesTrin(S) {
         var g = S.opg, R = g.R, X = NK.Redox, t = S.aktivt();
         switch (t) {
+        case "bland": S.dryp(); tik(S, 4); break;          /* én flaske pr. kald */
         case "dryp": S.dryp(); tik(S, 4); break;
         case "produkt": S.valgt(R.led[R.red.h].st.f, "selv"); break;
         case "ox":
@@ -145,7 +155,7 @@ async function koerTest(W) {
         while (!S.faerdig && n < 30) {
             var foer = S.aktivt();
             loesTrin(S);
-            if (foer === "gange") await vent(30);
+            if (foer === "gange") await ventKoef(S);
             n++;
         }
         return n;
@@ -175,8 +185,9 @@ async function koerTest(W) {
     /* Siden husker løste opgaver fra før; testen starter forfra */
     [A, B].forEach(function (S) { S.status.forEach(function (st) { st.loest = false; st.stjerne = false; }); S.rostAlt = false; S.visListe(); });
     paastand("3 reaktioner på fane 1 og 14 på fane 2", A.opgaver.length === 3 && B.opgaver.length === 14);
-    paastand("fane 1 har ét urglas og to flasker (natriumsulfit og svovlsyre)", A.bord.glas.length === 1 && A.bord.flasker.length === 2 &&
-        A.bord.flasker[0].tekst === "Na₂SO₃" && A.bord.flasker[1].tekst === "H₂SO₄");
+    paastand("fane 1 har ét urglas og fire flasker (KMnO₄, NaOH, Na₂SO₃ og H₂SO₄)", A.bord.glas.length === 1 &&
+        A.bord.flasker.map(function (x) { return x.tekst; }).join(",") === "KMnO₄,NaOH,Na₂SO₃,H₂SO₄", A.bord.flasker.map(function (x) { return x.tekst; }).join(","));
+    paastand("natriumhydroxid er 2 M", A.bord.flasker[1].styrke === "2 M");
     paastand("fane 2 har ét urglas og flasken med permanganat", B.bord.glas.length === 1 && B.bord.flasker.length === 1);
 
     overskrift("2. Modellen: de kendte skemaer");
@@ -255,7 +266,7 @@ async function koerTest(W) {
     skrivI(B, "g-ox", ""); skrivI(B, "g-red", "2"); B.tjekTrin();
     paastand("et tomt gangetal tæller ikke som 1", /Skriv 1, hvis tallet er 1/.test(besked(B)) && B.aktivt() === "gange");
     loesTrin(B);
-    await vent(30);
+    await ventKoef(B);
     skrivI(B, "lad-v", "−3"); skrivI(B, "lad-h", "−6"); B.tjekTrin();
     paastand("ladning −3 før pilen: husk tallene foran", /husk tallene foran/.test(besked(B)) && B.aktivt() === "ladning", besked(B));
     paastand("den rigtige side blev godkendt, den forkerte ikke", !!B.opg.tal["lad-h"] && !B.opg.tal["lad-v"]);
@@ -283,18 +294,43 @@ async function koerTest(W) {
     A.vaelg(1);
     paastand("reaktion 2 er låst, så længe reaktion 1 ikke er afstemt", A.nr === 0 && /Afstem skemaet/.test(besked(A)), besked(A));
     paastand("i listen står reaktion 2 og 3 som låst", A.chips[1].classList.contains("laast") && A.chips[2].classList.contains("laast") && !A.chips[0].classList.contains("laast"));
-    paastand("glasset starter violet og basisk", A.bord.glas[0].tekst === "Basisk · NaOH" && A.bord.glas[0].farve[0] === D.FARVE.violet[0]);
-    paastand("før dryppet er produkterne skjult", A.haefte.led.filter(function (L, i) { return A.opg.R.led[i].side === "h"; }).every(function (L) { return L.el.hidden; }));
+    /* Eleven fylder selv urglasset (brugerens ønske 3. okt. 2026) */
+    paastand("glasset starter tomt, og skiltet siger det", A.aktivt() === "bland" && A.bord.glas[0].tekst === "Tomt urglas" && A.bord.glas[0].farve[3] === 0, A.bord.glas[0].tekst);
+    paastand("hæftet er tomt, til der er noget i glasset", A.haefte.led.every(function (L) { return L.el.hidden; }));
+    paastand("den korte linje øverst i hæftet: Tilsæt KMnO₄ og NaOH til urglasset", A.haefte.navnEl.textContent === "Tilsæt KMnO₄ og NaOH til urglasset", A.haefte.navnEl.textContent);
+    paastand("farvekortet fremhæver intet manganstof, mens glasset er tomt", !d.querySelector("#ug-farvekort .fk-raekke.nu"));
+    A.slipPaaGlas(0, 2);
+    tik(A, 4);
+    paastand("natriumsulfit i det tomme glas: besked om, hvad der mangler, og intet drypper", !A.opg.dryppet && A.bord.glas[0].farve[3] === 0 &&
+        /skal først have kaliumpermanganat \(KMnO₄\) og natriumhydroxid \(NaOH\)/.test(besked(A)), besked(A));
+    A.slipPaaGlas(0, 0);
+    tik(A, 4);
+    paastand("kaliumpermanganat: glasset bliver violet, og skiltet siger MnO₄⁻", A.opg.iGlas.permanganat === true && A.bord.glas[0].farve[0] === D.FARVE.violet[0] &&
+        A.bord.glas[0].tekst === "MnO₄⁻" && A.aktivt() === "bland", A.bord.glas[0].tekst);
+    paastand("nu står MnO₄⁻ i hæftet, men ikke SO₃²⁻", !A.haefte.led[1].el.hidden && A.haefte.led[0].el.hidden && A.haefte.skema.children[1].hidden === true);
+    paastand("den korte linje: Tilsæt også NaOH til urglasset", A.haefte.navnEl.textContent === "Tilsæt også NaOH til urglasset", A.haefte.navnEl.textContent);
+    A.slipPaaGlas(0, 0);
+    tik(A, 2);
+    paastand("kaliumpermanganat igen: besked om, at natriumhydroxid mangler", /Nu mangler natriumhydroxid/.test(besked(A)) && A.aktivt() === "bland", besked(A));
     A.slipPaaGlas(0, 1);
+    tik(A, 4);
+    paastand("natriumhydroxid: skiltet siger MnO₄⁻, basisk, og nu skal der dryppes", A.bord.glas[0].tekst === "MnO₄⁻, basisk" && A.aktivt() === "dryp" &&
+        A.bord.glas[0].farve[0] === D.FARVE.violet[0], A.bord.glas[0].tekst + " / " + A.aktivt());
+    paastand("begge reaktanter står i hæftet", !A.haefte.led[0].el.hidden && !A.haefte.led[1].el.hidden);
+    paastand("før dryppet er produkterne skjult", A.haefte.led.filter(function (L, i) { return A.opg.R.led[i].side === "h"; }).every(function (L) { return L.el.hidden; }));
+    A.slipPaaGlas(0, 3);
     tik(A, 4);
     paastand("svovlsyren er den forkerte flaske nu: besked, og der drypper intet", !A.opg.dryppet && /natriumsulfit/.test(besked(A)), besked(A));
     loesTrin(A);
     paastand("efter dryppet er glasset grønt, og der står et spørgsmålstegn", A.bord.glas[0].farve[1] === D.FARVE.groen[1] && /\?/.test(A.haefte.skema.textContent));
+    paastand("skiltet røber ikke manganstoffet, før eleven har valgt det", A.bord.glas[0].tekst === "Basisk", A.bord.glas[0].tekst);
     paastand("valget har tre formler, og MnO₄⁻ er ikke blandt dem", A.haefte.valg.children.length === 3 && !/MnO₄⁻/.test(A.haefte.valg.textContent));
     A.valgt("Mn 2+", "selv");
     paastand("et forkert valg: besked om farven, og knappen bliver streget ud", /Glasset er grønt/.test(besked(A)) && A.aktivt() === "produkt" &&
         !!A.haefte.valg.querySelector(".forkert"), besked(A));
     loesTrin(A);
+    paastand("efter valget siger skiltet MnO₄²⁻, basisk", A.bord.glas[0].tekst === "MnO₄²⁻, basisk", A.bord.glas[0].tekst);
+    paastand("den korte linje: Skriv oxidationstallene for S og Mn i skemaet", A.haefte.navnEl.textContent === "Skriv oxidationstallene for S og Mn i skemaet", A.haefte.navnEl.textContent);
     A.tjekTrin();
     paastand("tomme oxidationstal tæller ikke", A.aktivt() === "ox" && /Skriv et oxidationstal/.test(besked(A)));
     paastand("ingen tal foran formlerne før gangetallene", koefTekster(A).every(function (t) { return t === ""; }));
@@ -306,7 +342,7 @@ async function koerTest(W) {
     paastand("luppen viser kun elevens eget tal (1 SO₃²⁻, 0 MnO₄⁻)", A.bord.lup.data.a.n === 1 && A.bord.lup.data.b.n === 0);
     paastand("stadig ingen tal foran formlerne", koefTekster(A).every(function (t) { return t === ""; }));
     skrivI(A, "g-red", "2"); A.tjekTrin();
-    await vent(30);
+    await ventKoef(A);
     paastand("efter gangetallene står 2 foran MnO₄⁻ og MnO₄²⁻", koefTekster(A).join(",") === ",2,,2", koefTekster(A).join(","));
     paastand("luppen flytter 2 elektroner", A.bord.lup.fase === "flyt" && A.bord.lup.data.a.n * A.bord.lup.data.a.e === 2);
     paastand("rækken Ladning er tom, før den er skrevet", !A.haefte.rad.lad.celle.v.querySelector(".hf-vaerdi").textContent);
@@ -315,7 +351,8 @@ async function koerTest(W) {
         /O passer også/.test(besked(A)), besked(A));
     paastand("nu er reaktion 2 åben, og 3 stadig låst", !A.chips[1].classList.contains("laast") && A.chips[2].classList.contains("laast"));
     A.knap();
-    paastand("Næste opgave går til reaktion 2 med det grønne glas", A.nr === 1 && A.bord.glas[0].farve[1] === D.FARVE.groen[1]);
+    paastand("Næste opgave går til reaktion 2 med det grønne glas (MnO₄²⁻, basisk)", A.nr === 1 && A.bord.glas[0].farve[1] === D.FARVE.groen[1] &&
+        A.bord.glas[0].tekst === "MnO₄²⁻, basisk" && A.aktivt() === "dryp", A.bord.glas[0].tekst);
 
     overskrift("6. Pilen kan vendes med klik, taster og fortegn");
     loesTrin(A); loesTrin(A); loesTrin(A);
@@ -331,15 +368,16 @@ async function koerTest(W) {
     paastand("begge klammer er rigtige, og ordene oxidation og reduktion kommer", A.aktivt() === "gange" && !A.haefte.tag.ox.hidden && !A.haefte.tag.red.hidden);
     await loesHele(A);
     A.knap();
-    paastand("reaktion 3: det brune glas, og nu skal der svovlsyre i", A.nr === 2 && A.bord.glas[0].bundfald && A.flaskeNr() === 1);
-    A.slipPaaGlas(0, 0);
+    paastand("reaktion 3: det brune glas (MnO₂, basisk), og nu skal der svovlsyre i", A.nr === 2 && A.bord.glas[0].bundfald && A.flaskeNr() === 3 &&
+        A.bord.glas[0].tekst === "MnO₂, basisk", A.bord.glas[0].tekst);
+    A.slipPaaGlas(0, 2);
     paastand("sulfitflasken er forkert nu", !A.opg.dryppet && /svovlsyre/.test(besked(A)), besked(A));
     tik(A, 2);
-    A.slipPaaGlas(0, 1);
+    A.slipPaaGlas(0, 3);
     tik(A, 4);
-    paastand("svovlsyren opløser brunstenen, og glasset er surt", A.opg.dryppet && !A.bord.glas[0].bundfald && A.bord.glas[0].tekst === "Surt · H₂SO₄");
+    paastand("svovlsyren opløser brunstenen, og glasset er surt", A.opg.dryppet && !A.bord.glas[0].bundfald && A.bord.glas[0].tekst === "Surt", A.bord.glas[0].tekst);
     await loesHele(A);
-    paastand("alle tre i glasset er afstemt", A.antalLoest() === 3);
+    paastand("alle tre i glasset er afstemt, og skiltet siger Mn²⁺, surt", A.antalLoest() === 3 && A.bord.glas[0].tekst === "Mn²⁺, surt", A.bord.glas[0].tekst);
 
     overskrift("7. Alle reaktioner kan gennemføres ved at skrive");
     for (var s = 0; s < 2; s++) {
@@ -439,22 +477,94 @@ async function koerTest(W) {
         mus("pointerup", g0.cx, g0.overflade - 30);
         A.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + g0.cx, clientY: r.top + g0.overflade - 30, bubbles: true }));
     }
-    traekFlaske(1);
+    traekFlaske(3);
     tik(A, 2);
-    paastand("svovlsyren trukket over glasset: besked, ingen dråber, og flasken går hjem", !A.opg.dryppet && /natriumsulfit/.test(besked(A)) && !A.bord.flasker[1].fase);
+    paastand("svovlsyren trukket over det tomme glas: besked, ingen dråber, og flasken går hjem", A.bord.glas[0].farve[3] === 0 &&
+        /skal først have kaliumpermanganat/.test(besked(A)) && !A.bord.flasker[3].fase, besked(A));
+    traekFlaske(1);
+    tik(A, 4);
+    paastand("natriumhydroxid må gerne komme først: skiltet siger Basisk, og glasset er farveløst", A.opg.iGlas.base === true && !A.opg.iGlas.permanganat &&
+        A.bord.glas[0].tekst === "Basisk" && A.bord.glas[0].farve[0] === D.FARVE.vand[0] && A.aktivt() === "bland", A.bord.glas[0].tekst);
     traekFlaske(0);
+    tik(A, 4);
+    paastand("så kaliumpermanganat: MnO₄⁻, basisk, og glasset er violet", A.bord.glas[0].tekst === "MnO₄⁻, basisk" && A.bord.glas[0].farve[0] === D.FARVE.violet[0] &&
+        A.aktivt() === "dryp", A.bord.glas[0].tekst + " / " + A.aktivt());
+    traekFlaske(3);
+    tik(A, 2);
+    paastand("svovlsyren trukket over glasset: besked, ingen dråber, og flasken går hjem", !A.opg.dryppet && /natriumsulfit/.test(besked(A)) && !A.bord.flasker[3].fase);
+    traekFlaske(2);
     tik(A, 4);
     paastand("natriumsulfit trukket over glasset drypper", A.opg.dryppet && A.aktivt() === "produkt", A.aktivt());
     A.vaelg(0);
     tik(A, 1);
-    A.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + g0.cx, clientY: r.top + g0.bund - 10, bubbles: true }));
-    tik(A, 4);
+    function klikGlas() {
+        A.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + g0.cx, clientY: r.top + g0.bund - 10, bubbles: true }));
+        tik(A, 4);
+    }
+    klikGlas();
+    paastand("et klik på det tomme glas fylder kaliumpermanganat i", A.opg.iGlas.permanganat === true && !A.opg.iGlas.base);
+    klikGlas();
+    paastand("et klik mere fylder natriumhydroxid i", A.opg.iGlas.base === true && A.aktivt() === "dryp");
+    klikGlas();
     paastand("et klik på glasset drypper med den rigtige flaske", A.opg.dryppet);
+
+    overskrift("9b. Knappen på papiret, klik på Kemichael og farvekortet");
+    var knap = d.getElementById("ug-knap");
+    function iHjoernet(S) {
+        var kr = S.el.knap.getBoundingClientRect(), hr = S.haefte.el.getBoundingClientRect();
+        return hr.right - kr.right >= 4 && hr.right - kr.right <= 30 && hr.bottom - kr.bottom >= 4 && hr.bottom - kr.bottom <= 30;
+    }
+    /* Knappen må ikke dække noget, der står på papiret */
+    function knapFri(S) {
+        var o = S.haefte.el.getBoundingClientRect(), kr = S.el.knap.getBoundingClientRect();
+        var k = { x: kr.left - o.left, y: kr.top - o.top, b: kr.width, h: kr.height };
+        return S.haefte.optaget(o).every(function (q) { return k.x >= q.x + q.b || k.x + k.b <= q.x || k.y >= q.y + q.h || k.y + k.h <= q.y; });
+    }
+    function knapNote(S) {
+        var o = S.haefte.el.getBoundingClientRect(), kr = S.el.knap.getBoundingClientRect();
+        var k = { x: kr.left - o.left, y: kr.top - o.top, b: kr.width, h: kr.height };
+        var ram = S.haefte.optaget(o).filter(function (q) { return !(k.x >= q.x + q.b || k.x + k.b <= q.x || k.y >= q.y + q.h || k.y + k.h <= q.y); });
+        function r(q) { return [q.x, q.y, q.b, q.h].map(Math.round).join(" "); }
+        return S.el.knap.className + " knap " + r(k) + " papir " + Math.round(o.width) + " " + Math.round(o.height) + " rammer " + ram.map(r).join(" / ");
+    }
+    paastand("knappen står på papiret, ikke i panelet", knap.parentNode === A.haefte.el && !d.querySelector("#ug-kort .knap") && !d.querySelector("#fl-kort .knap"));
+    paastand("Giv hint står i papirets nederste højre hjørne", knap.textContent === "Giv hint" && knap.classList.contains("hint") && iHjoernet(A));
+    loesTrin(A);
+    var hoved = A.k.lay.hoved;
+    function klikLaerer() {
+        A.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + hoved.x + hoved.b / 2, clientY: r.top + hoved.y + hoved.h / 2, bubbles: true }));
+    }
+    paastand("før klikket siger Kemichael ingenting", !A.k.taler() && A.hjaelp === 0);
+    klikLaerer();
+    paastand("et klik på Kemichael giver hintet til bidden", A.k.taler() && /^Hint: Se på SO₃²⁻/.test(A.k.tekst()) && A.hjaelp === 1 && A.aktivt() === "ox", A.k.tekst());
+    paastand("knappen hedder nu Vis svaret og står stadig i hjørnet", knap.textContent === "Vis svaret" && knap.classList.contains("svar") && iHjoernet(A));
+    klikLaerer();
+    paastand("et klik mere på ham viser ikke svaret og koster ikke stjernen", A.aktivt() === "ox" && !A.brugtSvar && A.hjaelp === 1 && !A.opg.tal.ox0);
+    paastand("skiltet ved ham siger Klik for et hint", A.k.hoverTekst === "Klik for et hint");
+    await loesHele(A);
+    paastand("afstemt: Næste opgave står midt i hæftet", knap.textContent === "Næste opgave →" && knap.classList.contains("naeste") && knap.classList.contains("midt") && (function () {
+        var kr = knap.getBoundingClientRect(), hr = A.haefte.el.getBoundingClientRect();
+        var cx = (kr.left + kr.right) / 2 - hr.left;
+        return cx > hr.width * 0.3 && cx < hr.width * 0.75;
+    }()));
+    paastand("Næste opgave dækker ikke skemaet, klammerne eller rækkerne", knapFri(A), knapNote(A));
+    paastand("den korte linje siger, at skemaet er afstemt", A.haefte.navnEl.textContent === "Lidt sulfit: afstemt ✓", A.haefte.navnEl.textContent);
+    paastand("afstemt: skiltet ved Kemichael er væk, og et klik giver hans sædvanlige svar", A.k.hoverTekst === "" && (klikLaerer(), A.k.taler() && !/^Hint/.test(A.k.tekst())), A.k.tekst());
+    tekster.push(A.k.tekst());
+    tik(A, 5);
+    var fk = d.getElementById("ug-farvekort").textContent;
+    paastand("farvekortet har navnene permanganat, manganat, brunsten og mangan(II)ion", ["permanganat", "manganat", "brunsten", "mangan(II)ion"].every(function (x) { return fk.indexOf(x) >= 0; }), fk);
+    paastand("farvekortet på fane 2 har de samme navne", /mangan\(II\)ion/.test(d.getElementById("fl-farvekort").textContent));
+    var lange = Object.keys(linjer0).filter(function (x) { return x.length > 75 || x.length < 8; });
+    paastand("de korte linjer øverst i hæftet er korte (" + Object.keys(linjer0).length + " forskellige, højst 75 tegn)", Object.keys(linjer0).length > 20 && lange.length === 0, lange.join(" | "));
+    tekster = tekster.concat(Object.keys(linjer0));
 
     overskrift("10. Sproget");
     D.REAKTIONER.forEach(function (x) { tekster.push(x.tekst, x.kontekst || "", x.navn, x.obs || ""); });
     Object.keys(D.INTRO).forEach(function (k) { tekster.push(D.INTRO[k], D.FAERDIG[k], D.KAFFE_FLASKE[k]); });
-    tekster = tekster.concat(D.KAFFE, D.ROS, D.ROS_OPGAVE, [D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST]);
+    tekster = tekster.concat(D.KAFFE, D.ROS, D.ROS_OPGAVE, [D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST, D.KLIK_HINT]);
+    D.MANGAN.forEach(function (x) { tekster.push(x.navn, x.tekst, x.ord); });
+    Object.keys(D.FLASKE).forEach(function (k) { tekster.push(D.FLASKE[k].navn); });
     tekster.push(d.getElementById("teori").textContent);
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[—–]/.test(alt), (alt.match(/.{0,30}[—–].{0,30}/) || [""])[0]);
@@ -475,6 +585,12 @@ async function koerTest(W) {
             NK.visFane(f ? "fane-fl" : "fane-ug");
             S2.vaelg(f ? idx(B, "F2") : 0);
             S2.tilpas(); S2.layout();
+            var navn = STR[z][0] + " × " + STR[z][1] + (f ? " fane 2" : " fane 1");
+            /* Frem til den sidste bid: dér er hæftet fyldt mest, og Giv hint står i hjørnet */
+            var vagt = 0;
+            while (!S2.faerdig && S2.opg.nr < S2.opg.trin.length - 1 && vagt++ < 30) { var ff = S2.aktivt(); loesTrin(S2); if (ff === "gange") await ventKoef(S2); }
+            S2.haefte.placer();
+            paastand(navn + ": Giv hint står i papirets hjørne og dækker ikke noget", iHjoernet(S2) && knapFri(S2), knapNote(S2));
             await loesHele(S2);
             S2.haefte.placer();
             var sc = S2.L.canvas.getBoundingClientRect(), he = S2.haefte.el.getBoundingClientRect();
@@ -483,7 +599,9 @@ async function koerTest(W) {
             var lup = S2.bord.lay.lup, bl = S2.bord.lay;
             var skiltBund = bl.glas[0].bund + bl.glas[0].b * 0.1 + 3 + 21;
             var flaskeH = bl.hjem[bl.hjem.length - 1].x + 32 * bl.flaske.s;
-            var navn = STR[z][0] + " × " + STR[z][1] + (f ? " fane 2" : " fane 1");
+            var kr2 = S2.el.knap.getBoundingClientRect();
+            paastand(navn + ": knappen efter opgaven er inde i hæftet og dækker ikke noget", kr2.left >= he.left && kr2.right <= he.right && kr2.bottom <= he.bottom && kr2.top >= he.top && knapFri(S2), knapNote(S2));
+            paastand(navn + ": den korte linje kan være i hæftet", S2.haefte.navnEl.scrollWidth <= S2.haefte.navnEl.clientWidth + 1, S2.haefte.navnEl.scrollWidth + " / " + S2.haefte.navnEl.clientWidth);
             paastand(navn + ": hæftet er inde i scenen", he.left >= sc.left && he.right <= sc.right + 0.5 && he.bottom <= sc.bottom);
             paastand(navn + ": skemaet kan være i hæftet (" + Math.round(bredde) + " af " + Math.round(plads) + " px)", bredde <= plads);
             paastand(navn + ": O-rækken (den sidste) er inde i hæftet", sidste.bottom <= he.bottom + 1, Math.round(sidste.bottom - he.bottom));

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="210" viewBox="0 0 380 210">
+  <!-- Spektrofotometer set forfra. Animationen tegner OVENPAA filen:
+       teksten i displayet (vinduet x 24-214, y 60-142), knapperne til
+       boelgelaengden (felt x 236-360, y 70-184) og kuvetten, der stikker
+       op af kuvetteholderen. Holderens aabning har midte x 294 og er
+       34 bred; kuvetten staar med bunden paa y 64 og ses over aabningen
+       ved y 30. Lampen sidder til venstre i rummet (x 246), detektoren
+       til hoejre (x 342), begge i hoejde y 40. Foedderne staar paa y 206. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e3e6eb"/>
+      <stop offset="1" stop-color="#b4bac4"/>
+    </linearGradient>
+    <linearGradient id="laag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d2d6dd"/>
+      <stop offset="1" stop-color="#a7aeb9"/>
+    </linearGradient>
+    <linearGradient id="vindue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16201c"/>
+      <stop offset="1" stop-color="#0d1411"/>
+    </linearGradient>
+  </defs>
+  <!-- Foedder -->
+  <rect x="26" y="196" width="34" height="10" rx="3" fill="#4b5059"/>
+  <rect x="320" y="196" width="34" height="10" rx="3" fill="#4b5059"/>
+  <!-- Kroppen -->
+  <rect x="6" y="44" width="368" height="156" rx="14" fill="url(#krop)" stroke="#7d848f" stroke-width="2"/>
+  <rect x="12" y="50" width="356" height="5" rx="2.5" fill="#ffffff" fill-opacity="0.45"/>
+  <!-- Kuvetterummet med laag og aabning -->
+  <path d="M228 46 L228 24 Q228 16 236 16 L352 16 Q360 16 360 24 L360 46 Z" fill="url(#laag)" stroke="#7d848f" stroke-width="2"/>
+  <rect x="276" y="22" width="36" height="10" rx="2" fill="#20242b"/>
+  <rect x="279" y="24" width="30" height="6" rx="1" fill="#0b0d10"/>
+  <!-- Lampe og detektor, smaa vinduer i rummets sider -->
+  <circle cx="246" cy="31" r="5" fill="#2b3038" stroke="#6b7280" stroke-width="1.5"/>
+  <rect x="337" y="26" width="10" height="10" rx="2" fill="#2b3038" stroke="#6b7280" stroke-width="1.5"/>
+  <!-- Displayet -->
+  <rect x="18" y="54" width="202" height="94" rx="9" fill="#6e7580"/>
+  <rect x="24" y="60" width="190" height="82" rx="6" fill="url(#vindue)"/>
+  <rect x="28" y="63" width="182" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.06"/>
+  <!-- Feltet til knapperne -->
+  <rect x="236" y="70" width="124" height="114" rx="8" fill="#c3c8d0" stroke="#9aa1ac" stroke-width="1.5"/>
+  <!-- Navneskiltet -->
+  <rect x="24" y="160" width="120" height="22" rx="4" fill="#2f3540"/>
+  <text x="84" y="175" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#cfd6df" letter-spacing="1.5">SPEKTRO 20</text>
+  <!-- Taend-knap -->
+  <circle cx="166" cy="171" r="9" fill="#3a404a" stroke="#22262d" stroke-width="1.5"/>
+  <circle cx="166" cy="171" r="3.5" fill="#6be08f"/>
+</svg>

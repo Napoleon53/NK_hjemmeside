@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spejlbilledeisomeri</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇋</span> Spejlbilledeisomeri</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-sb" role="tab" aria-selected="true"><span class="nr">1</span>Spejlbilledet</button>
+        <button class="faneknap" data-fane="fane-fi" role="tab" aria-selected="false"><span class="nr">2</span>Find C-atomet</button>
+        <button class="faneknap" data-fane="fane-rs" role="tab" aria-selected="false"><span class="nr">3</span>R eller S</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: SPEJLBILLEDET                                              -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-sb" role="tabpanel" aria-label="Spejlbilledet">
+    <div class="scene">
+        <canvas id="sb-laerred"></canvas>
+        <div class="anker" id="sb-anker-molekyle"></div>
+        <div class="anker" id="sb-anker-spejl"></div>
+        <div class="scene-valg" id="sb-valg"></div>
+
+        <div class="statuslinje" id="sb-status">
+            <p class="st-tekst" id="sb-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="sb-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="sb-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="sb-kort">
+            <h2><span id="sb-titel">Opgave</span><span class="taeller">opgave <b id="sb-nr">1</b>/<span id="sb-antal">6</span></span></h2>
+            <div id="sb-prompt"></div>
+        </div>
+
+        <div class="kort" id="sb-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="sb-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="sb-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FIND C-ATOMET                                              -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fi" role="tabpanel" aria-label="Find C-atomet">
+    <div class="scene">
+        <canvas id="fi-laerred"></canvas>
+        <div class="anker" id="fi-anker-tavle"></div>
+        <div class="scene-valg" id="fi-valg"></div>
+
+        <div class="statuslinje" id="fi-status">
+            <p class="st-tekst" id="fi-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="fi-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="fi-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="fi-kort">
+            <h2><span id="fi-titel">Opgave</span><span class="taeller">opgave <b id="fi-nr">1</b>/<span id="fi-antal">13</span></span></h2>
+            <div id="fi-prompt"></div>
+        </div>
+
+        <div class="kort" id="fi-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="fi-loest">0</b>/13</span></h2>
+            <div class="opg-liste" id="fi-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: R ELLER S                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-rs" role="tabpanel" aria-label="R eller S">
+    <div class="scene">
+        <canvas id="rs-laerred"></canvas>
+        <div class="anker" id="rs-anker-molekyle"></div>
+        <div class="scene-valg" id="rs-valg"></div>
+
+        <div class="statuslinje" id="rs-status">
+            <p class="st-tekst" id="rs-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="rs-forfra" type="button" title="Samme molekyle, ny drejning (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="rs-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="rs-kort">
+            <h2><span id="rs-titel">Opgave</span><span class="taeller">opgave <b id="rs-nr">1</b>/<span id="rs-antal">7</span></span></h2>
+            <div id="rs-prompt"></div>
+        </div>
+
+        <div class="kort maaling" id="rs-zkort">
+            <h2>Atomnumre</h2>
+            <div class="zliste">
+                <span><b>H</b>1</span><span><b>C</b>6</span><span><b>N</b>7</span><span><b>O</b>8</span>
+                <span><b>F</b>9</span><span><b>Cl</b>17</span><span><b>Br</b>35</span><span><b>I</b>53</span>
+            </div>
+        </div>
+
+        <div class="kort" id="rs-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="rs-loest">0</b>/7</span></h2>
+            <div class="opg-liste" id="rs-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Spejlbilledisomeri</h2>
+        <p>Et C-atom med fire forskellige grupper kaldes et asymmetrisk C-atom. Grupperne kan sidde på to måder, der er hinandens spejlbilleder, ligesom en venstre og en højre hånd. De to molekyler kan ikke drejes, så de passer oven i hinanden. De er to forskellige stoffer og kaldes enantiomerer. Et molekyle, der ikke passer med sit spejlbillede, kaldes kiralt.</p>
+        <p>Har C-atomet to ens grupper, fx to H, kan molekylet drejes, så det passer med sit spejlbillede. Så er der kun én form.</p>
+        <h3 class="teori-hoved">Prioriteten</h3>
+        <ol class="teori-trin">
+            <li>Se på det atom, der sidder direkte på C-atomet. Det højeste atomnummer vinder: OH (O, 8) slår NH₂ (N, 7), og NH₂ slår CH₃ (C, 6).</li>
+            <li>Er det det samme atom, ser man på de atomer, der sidder på det, det største først. CH₂CH₃ har C, H, H og slår CH₃ med H, H, H. En C=O tæller som to O, så COOH (O, O, O) slår CH₂OH (O, H, H).</li>
+        </ol>
+        <h3 class="teori-hoved">R og S</h3>
+        <ol class="teori-trin">
+            <li>Giv de fire grupper nummer 1 til 4 efter prioritet.</li>
+            <li>Drej molekylet, så gruppe 4 peger væk fra dig.</li>
+            <li>Følg 1 → 2 → 3. Med uret er R (rectus), mod uret er S (sinister).</li>
+        </ol>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: mælkesyre</span>
+            Grupperne er OH (1), COOH (2), CH₃ (3) og H (4). Med H vendt væk går OH → COOH → CH₃ enten med uret, (R)-mælkesyre, eller mod uret, (S)-mælkesyre. Musklerne laver (S)-mælkesyre.
+        </div>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/rum.js"></script>
+<script src="js/kiral.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_spejl.js"></script>
+<script src="js/sim_find.js"></script>
+<script src="js/sim_rs.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

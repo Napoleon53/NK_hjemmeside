@@ -1,7 +1,9 @@
 /* =====================================================================
    sc8.4 - Afstem redoxreaktioner
    Stilark. Grundreglerne (toplinje, faner, panel, kort, knapper, pop
-   op og rundvisning) er de samme som i sc1.1.
+   op og rundvisning) er de samme som i sc1.1. Scenen er tavlen; er
+   elektronvaegten slaaet til, har body klassen med-vaegt, og tavlen
+   bliver lavere.
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
    dansk komma.
    ===================================================================== */
@@ -36,7 +38,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 430px;
+    --panel-bredde: 360px;
 }
 
 * { box-sizing: border-box; }
@@ -158,6 +160,51 @@ body {
 
 .teoriknap:hover { background-color: var(--panel-3); color: var(--tekst); }
 
+/* Elektronvaegten slaas til og fra her. Den er slaaet fra fra start. */
+.vaegtknap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.vaegtknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.vaegtknap.til { color: var(--tekst); border-color: var(--groen); }
+
+.kontakt {
+    position: relative;
+    width: 30px;
+    height: 16px;
+    border-radius: 999px;
+    background-color: #55556a;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease;
+}
+
+.kontakt i {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #d9dde3;
+    transition: left 0.15s ease;
+}
+
+.vaegtknap.til .kontakt { background-color: var(--groen); }
+.vaegtknap.til .kontakt i { left: 16px; background-color: #ffffff; }
+
 .ikonknap {
     background: transparent;
     border: 1px solid #4a4a58;
@@ -196,8 +243,9 @@ main { flex: 1; position: relative; min-height: 0; }
     grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
 }
 
-/* Scenen er en soejle: baegerglassene foroven, arbejdsbordet med
-   tavlen forneden. Glassene faar den plads, der er tilbage. */
+/* Scenen er en soejle: opgaven oeverst og arbejdsbordet med tavlen
+   under den. Tavlen fylder resten. Slaas elektronvaegten til, staar den
+   mellem de to, og tavlen bliver lavere (body.med-vaegt). */
 .scene {
     position: relative;
     min-width: 0;
@@ -209,78 +257,17 @@ main { flex: 1; position: relative; min-height: 0; }
     overflow-x: hidden;
 }
 
-.vaegt-omraade {
-    flex: 1 1 auto;
-    min-height: 210px;
-    position: relative;
-}
-
-.vaegt-omraade > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: default; }
-
-/* Den store knap, der sender Kemichael ud under praesentationen. Midt
-   foroven over glassene, saa den ikke kan overses. Samme som i sc2.3. */
-.spring-over {
-    position: absolute;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: rgba(20, 20, 28, 0.94);
-    color: #ffffff;
-    border: 2px solid var(--gul);
-    border-radius: 999px;
-    padding: 10px 22px;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-}
-
-.spring-over[hidden] { display: none; }
-.spring-over:hover { background-color: var(--panel-3); }
-.spring-over span { color: var(--gul); font-size: 1.1rem; }
-
-/* Foerste klik paa Kemichael: knappen blinker og viser vejen */
-@keyframes puf {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); transform: translateX(-50%) scale(1); }
-    40%  { transform: translateX(-50%) scale(1.08); }
-    100% { box-shadow: 0 0 0 18px rgba(242, 197, 61, 0); transform: translateX(-50%) scale(1); }
-}
-
-.spring-over.puf { animation: puf 0.7s ease-out 2; }
-
-/* Det, Kemichael peger paa, mens han taler om det */
-@keyframes peg {
-    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
-    70%  { box-shadow: 0 0 0 12px rgba(242, 197, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-}
-
-.peg { outline: 2px solid var(--gul); outline-offset: 2px; animation: peg 1.2s ease-out infinite; }
-
-.arbejdsbord {
+/* Opgaven staar over arbejdsfladen, ikke i panelet */
+.opgavelinje {
     flex: 0 0 auto;
-    margin: 0 16px 16px;
-    background-color: rgba(0, 0, 0, 0.26);
-    border: 1px solid #3a3a47;
-    border-radius: var(--radius);
-    padding: 12px 16px 12px;
-}
-
-.ab-hoved {
     display: flex;
     align-items: baseline;
     gap: 12px;
-    flex-wrap: wrap;
+    padding: 14px 22px 2px;
 }
 
-.ab-trin {
-    font-size: 0.78rem;
+.ol-etiket {
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.09em;
     text-transform: uppercase;
@@ -288,36 +275,98 @@ main { flex: 1; position: relative; min-height: 0; }
     white-space: nowrap;
 }
 
-.ab-spm { font-size: 0.98rem; font-weight: 600; color: var(--tekst); line-height: 1.4; }
+.opgavetekst { margin: 0; font-size: 1.15rem; font-weight: 600; line-height: 1.4; color: var(--tekst); }
+.kontekst { margin-left: 6px; font-weight: 400; font-style: italic; color: var(--tekst-svag); }
+.kontekst[hidden] { display: none; }
+
+.vaegt-omraade {
+    flex: 1 1 auto;
+    min-height: 280px;
+    position: relative;
+}
+
+.vaegt-omraade[hidden] { display: none; }
+.vaegt-omraade > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: default; }
+
+.arbejdsbord {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    margin: 10px 14px 14px;
+    background-color: rgba(0, 0, 0, 0.26);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 14px 12px 12px;
+}
+
+body.med-vaegt .arbejdsbord { flex: 0 0 auto; margin: 0 14px 10px; padding: 10px 12px; }
+
+/* Det, trinnet spoerger om: den linje, eleven skal laese */
+.ab-hoved {
+    display: flex;
+    align-items: baseline;
+    gap: 6px 14px;
+    flex-wrap: wrap;
+    border-left: 4px solid var(--gul);
+    padding: 2px 0 2px 12px;
+}
+
+.ab-trin {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+    white-space: nowrap;
+}
+
+.ab-spm { font-size: 1.3rem; font-weight: 600; color: var(--tekst); line-height: 1.35; }
+body.med-vaegt .ab-spm { font-size: 1.08rem; }
 
 /* ---------------------------------------------------------------------
-   TAVLEN: reaktionen med felter over atomerne og foran formlerne
+   TAVLEN: reaktionen med felter over atomerne og foran formlerne,
+   trinnets egne felter, tasterne og kontrollen
    --------------------------------------------------------------------- */
 :root {
     --ox:        #6cb6ff;
     --ox-bund:   rgba(61, 158, 224, 0.16);
     --red:       #f0a35e;
     --red-bund:  rgba(230, 137, 42, 0.16);
+    --felt-kant: #7d8cc4;
+    --felt-bund: #1d2132;
 }
 
-.tavle {
-    margin-top: 10px;
+.tavleramme {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-top: 12px;
     background-color: #101016;
     border: 1px solid #34343f;
     border-radius: var(--radius-lil);
-    padding: 12px;
-    overflow-x: auto;
+    padding: 22px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
 }
 
+body.med-vaegt .tavleramme { margin-top: 8px; padding: 10px; gap: 9px; }
+
+.tavle { min-width: 0; }
+
+/* Skemaet er saa stort, som bredden tillader: skriften begynder her og
+   goeres mindre af tilpasSkema (js/opgave.js), til det staar paa én linje. */
 .skema {
     display: flex;
     align-items: flex-end;
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.2em 0.1em;
-    font-size: 2.1rem;
+    font-size: clamp(2.2rem, 5.4vw, 5.2rem);
     line-height: 1.15;
 }
+
+body.med-vaegt .skema { font-size: clamp(1.6rem, 2.9vw, 2.3rem); }
 
 .skema .op {
     color: var(--tekst-mat);
@@ -332,7 +381,7 @@ main { flex: 1; position: relative; min-height: 0; }
     display: inline-flex;
     align-items: flex-end;
     gap: 0.08em;
-    padding: 0.06em 0.28em;
+    padding: 0.06em 0.2em;
     border-radius: 8px;
     border: 1px solid transparent;
 }
@@ -348,11 +397,15 @@ main { flex: 1; position: relative; min-height: 0; }
 .atom .sym { font-weight: 600; white-space: nowrap; }
 .atom.lad .sym { margin-left: 1px; }
 
-/* Rækken med oxidationstal over atomerne. Den er 0 bred, så et felt
-   eller et tal over atomet ikke skubber atomerne fra hinanden; det
-   stikker lige meget ud til begge sider. */
+/* Rækken med oxidationstal over atomerne. Den tæller som 0 bred, så et
+   felt eller et tal over atomet ikke skubber atomerne fra hinanden, men
+   er lige så bred som atomet (min-width). Tallet står midt over atomet
+   og stikker lige meget ud til begge sider. Et felt over det første
+   eller sidste atom i en formel slutter ved atomets kant og stikker
+   kun ud til den frie side, så det ikke dækker tallet over naboen. */
 .oxrk {
     width: 0;
+    min-width: 100%;
     height: 1.9em;
     font-size: 0.5em;
     display: flex;
@@ -361,8 +414,11 @@ main { flex: 1; position: relative; min-height: 0; }
     padding-bottom: 3px;
 }
 
+.oxrk.tv { justify-content: flex-end; }
+.oxrk.th { justify-content: flex-start; }
+
 .oxtal { font-weight: 700; color: var(--tekst); white-space: nowrap; flex-shrink: 0; }
-.oxtal.fast { color: #8a8a99; font-weight: 600; }
+.oxtal.fast { color: #8a8a99; font-weight: 600; font-size: 0.88em; }
 .oxtal.r-ox { color: var(--ox); }
 .oxtal.r-red { color: var(--red); }
 .oxtal.ny { animation: ind 0.35s ease-out; color: #7ee0a8; }
@@ -371,15 +427,14 @@ main { flex: 1; position: relative; min-height: 0; }
 .koeftal { font-weight: 700; color: var(--gul); margin-right: 3px; }
 .koeftal.en { color: #5d5d6c; }
 
-.skema.slut { font-size: 1.95rem; }
 .skema.slut .koeftal { color: #7ee0a8; }
-.tavle.faerdig { border-color: var(--groen); box-shadow: 0 0 0 1px rgba(63, 174, 114, 0.35); }
+.tavleramme.faerdig { border-color: var(--groen); box-shadow: 0 0 0 1px rgba(63, 174, 114, 0.35); }
 .tavle.faerdig .skema { animation: ind 0.4s ease-out; }
 
 .tavle-note {
-    margin: 10px 0 0;
+    margin: 12px 0 0;
     text-align: center;
-    font-size: 0.84rem;
+    font-size: 0.95rem;
     color: var(--tekst-mat);
 }
 
@@ -388,29 +443,102 @@ main { flex: 1; position: relative; min-height: 0; }
     to   { transform: translateY(0); opacity: 1; }
 }
 
-/* Felterne */
+/* Felterne: tydelige rammer, og det felt, tasterne skriver i, er gult */
 .oxfelt, .koeffelt {
-    background-color: #1a1a22;
+    background-color: var(--felt-bund);
     color: var(--tekst);
-    border: 1px solid #55556a;
-    border-radius: 6px;
+    border: 2px solid var(--felt-kant);
+    border-radius: 8px;
     font-family: inherit;
     font-weight: 700;
     text-align: center;
     outline: none;
 }
 
-.oxfelt { width: 2.9em; padding: 3px 2px; font-size: clamp(0.82rem, 1em, 1.05rem); flex-shrink: 0; }
+.oxfelt { width: 2.7em; padding: 4px 2px; font-size: clamp(0.95rem, 1em, 1.75rem); flex-shrink: 0; }
 .koeffelt { width: 1.9em; padding: 3px 2px; font-size: 1.3rem; }
-.skema .koeffelt { font-size: clamp(0.95rem, 0.62em, 1.3rem); }
-.efelter .koeffelt { font-size: 1.05rem; width: 2.6em; }
-.koeffelt.bred { width: 3.4em; }
-.oxfelt::placeholder, .koeffelt::placeholder { color: #5d5d6c; font-weight: 400; }
-.oxfelt:focus, .koeffelt:focus { border-color: var(--gul); box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.25); }
-.oxfelt.fejl, .koeffelt.fejl { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.12); animation: ryst 0.35s; }
-.oxfelt.hint, .koeffelt.hint { border-color: var(--gul); box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.35); }
+/* Feltet foran en formel er aldrig hoejere end linjen, saa det ikke
+   naar op i oxidationstallene over naboatomet */
+.skema .koeffelt { width: 1.55em; height: 1.5em; padding: 0 2px; margin-right: 0.1em; font-size: clamp(0.8rem, 0.7em, 2.6rem); }
+.efelter .koeffelt { width: 2.6em; padding: 5px 4px; font-size: 1.5rem; }
+.efelter .koeffelt.bred { width: 3.4em; }
+.oxfelt::placeholder, .koeffelt::placeholder { color: #6d7494; font-weight: 400; }
+.oxfelt:hover, .koeffelt:hover { border-color: #a9b6e6; }
+.oxfelt:focus, .koeffelt:focus,
+.oxfelt.valgt, .koeffelt.valgt { border-color: var(--gul); box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.28); }
+.oxfelt.fejl, .koeffelt.fejl { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.14); animation: ryst 0.35s; }
+.oxfelt.hint, .koeffelt.hint { border-color: var(--gul); box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.4); }
 
-/* Kontrollen: tallene før og efter pilen */
+/* Der blev trykket paa en tast, foer et felt var valgt */
+@keyframes vink {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+    50%      { box-shadow: 0 0 0 6px rgba(242, 197, 61, 0.55); }
+}
+
+.oxfelt.vink, .koeffelt.vink { animation: vink 0.5s ease-in-out 2; }
+
+/* Tasterne: en række lige under felterne. Den flytter sig hen under
+   det valgte felt, og halen peger op paa det (js/taster.js). */
+.taster {
+    align-self: center;
+    position: relative;
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background-color: #23232e;
+    border: 1px solid #4a4a58;
+    border-radius: 12px;
+    transition: transform 0.16s ease;
+}
+
+.taster[hidden] { display: none; }
+
+.taster::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    left: var(--hale, 50%);
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    background-color: #23232e;
+    border-left: 1px solid #4a4a58;
+    border-top: 1px solid #4a4a58;
+    transform: rotate(45deg);
+}
+
+.taster.uden-hale::before { display: none; }
+
+.tast {
+    min-width: 44px;
+    height: 42px;
+    padding: 0 8px;
+    background-color: var(--panel-3);
+    color: var(--tekst);
+    border: 1px solid #5a5a6c;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1.12rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+}
+
+.taster.ox .tast { min-width: 52px; }
+.tast:hover { background-color: #4c4c60; border-color: var(--gul); }
+.tast:active { transform: scale(0.94); background-color: var(--blaa-mork); }
+.tast.fortegn { background-color: #2f3a55; }
+.tast.slet { background-color: #2c2c38; color: var(--tekst-svag); }
+.tast-skel { width: 6px; }
+
+body.med-vaegt .tast { min-width: 38px; height: 36px; font-size: 1rem; }
+body.med-vaegt .taster.ox .tast { min-width: 46px; }
+
+/* Kontrollen: tallene, der skal vaere ens */
 .kontrol:empty { display: none; }
 
 .kontrol {
@@ -418,12 +546,11 @@ main { flex: 1; position: relative; min-height: 0; }
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 6px 8px;
-    margin-top: 8px;
+    gap: 8px 10px;
 }
 
 .k-etiket {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -434,10 +561,10 @@ main { flex: 1; position: relative; min-height: 0; }
 .kchip {
     display: inline-flex;
     align-items: baseline;
-    gap: 5px;
-    padding: 3px 10px;
+    gap: 6px;
+    padding: 5px 13px;
     border-radius: 999px;
-    font-size: 0.9rem;
+    font-size: 1.05rem;
     font-weight: 600;
     white-space: nowrap;
     border: 1px solid;
@@ -446,33 +573,43 @@ main { flex: 1; position: relative; min-height: 0; }
 .kchip b { font-weight: 700; }
 .kchip.ok  { color: #7ee0a8; border-color: rgba(63, 174, 114, 0.6); background-color: rgba(63, 174, 114, 0.1); }
 .kchip.nej { color: #f0918a; border-color: rgba(224, 84, 70, 0.55); background-color: rgba(224, 84, 70, 0.08); }
+.kchip.r-ox  { color: var(--tekst); border-color: rgba(108, 182, 255, 0.5); background-color: var(--ox-bund); }
+.kchip.r-red { color: var(--tekst); border-color: rgba(240, 163, 94, 0.5); background-color: var(--red-bund); }
+.kchip.r-ox b { color: var(--ox); }
+.kchip.r-red b { color: var(--red); }
+
+/* = eller ≠ mellem de afgivne og de optagne elektroner i trin 4 */
+.ktegn { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.ktegn.ok  { color: #7ee0a8; }
+.ktegn.nej { color: #f0918a; }
+
+body.med-vaegt .kchip { font-size: 0.92rem; padding: 3px 10px; }
 
 /* ---------------------------------------------------------------------
-   UNDER TAVLEN: parrene, felterne og beskeden
+   UNDER SKEMAET: parrene, felterne og beskeden
    --------------------------------------------------------------------- */
 .ab-valg:empty { display: none; }
-.ab-valg { margin-top: 10px; }
 
-.parvalg { display: grid; gap: 8px; }
+.parvalg { display: grid; gap: 10px; width: 100%; max-width: 760px; margin: 0 auto; }
 
 .parrk {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-.partekst { font-size: 1.15rem; font-weight: 600; white-space: nowrap; }
-.partekst small { margin-left: 12px; font-size: 0.85rem; font-weight: 600; color: var(--tekst-mat); }
+.partekst { font-size: 1.5rem; font-weight: 600; white-space: nowrap; }
+.partekst small { margin-left: 14px; font-size: 1rem; font-weight: 600; color: var(--tekst-mat); }
 
 .valgknap {
     background-color: var(--panel-2);
     color: var(--tekst);
-    border: 1px solid #4a4a58;
+    border: 2px solid #5a5a6c;
     border-radius: var(--radius-lil);
-    padding: 7px 14px;
+    padding: 10px 20px;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
@@ -482,6 +619,10 @@ main { flex: 1; position: relative; min-height: 0; }
 .valgknap[data-valg="red"]:hover { border-color: var(--red); background-color: var(--red-bund); }
 .valgknap:active { transform: scale(0.97); }
 .valgknap.forkert { border-color: var(--roed); color: #f0918a; background-color: rgba(224, 84, 70, 0.1); animation: ryst 0.35s; }
+
+body.med-vaegt .partekst { font-size: 1.15rem; }
+body.med-vaegt .partekst small { font-size: 0.88rem; }
+body.med-vaegt .valgknap { padding: 7px 14px; font-size: 0.98rem; }
 
 @keyframes ryst {
     0%, 100% { transform: translateX(0); }
@@ -493,16 +634,16 @@ main { flex: 1; position: relative; min-height: 0; }
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px 22px;
+    gap: 10px 26px;
 }
 
 .erk {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
+    gap: 10px;
+    font-size: 1.15rem;
     color: var(--tekst-svag);
-    padding: 5px 10px;
+    padding: 8px 14px;
     border-radius: var(--radius-lil);
     border: 1px solid #3a3a47;
 }
@@ -513,20 +654,56 @@ main { flex: 1; position: relative; min-height: 0; }
 .erk.r-ox .etekst b { color: var(--ox); }
 .erk.r-red .etekst b { color: var(--red); }
 
+body.med-vaegt .erk { font-size: 1rem; padding: 5px 10px; }
+body.med-vaegt .efelter .koeffelt { font-size: 1.2rem; }
+
+/* Knapperne og beskeden staar paa tavlen lige under tasterne. Der er
+   plads til knapperne og to linjers besked fra start, saa tavlen ikke
+   hopper, naar beskeden kommer. Den gule knap er hjaelpen (Giv hint,
+   Vis svaret) og til sidst Ny opgave. */
 .ab-bund {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     gap: 12px;
-    margin-top: 10px;
+    min-height: 134px;
 }
 
-.ab-bund .besked { flex: 1; min-height: 1.5em; }
-.knap.tjekknap { flex-shrink: 0; min-width: 96px; justify-content: center; font-size: 0.92rem; padding: 9px 14px; }
+.ab-knapper { display: flex; align-items: center; justify-content: center; gap: 12px; flex-shrink: 0; }
 
-.besked { margin: 0; font-size: 0.95rem; line-height: 1.5; color: #c8ced6; }
+.knap.tjekknap { min-width: 190px; justify-content: center; font-size: 1.12rem; padding: 12px 22px; }
+.knap.tjekknap[hidden] { display: none; }
+
+.knap.hintknap {
+    min-width: 150px;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 1.05rem;
+    color: #f6d977;
+    background-color: rgba(242, 197, 61, 0.08);
+    border-color: rgba(242, 197, 61, 0.7);
+}
+
+.knap.hintknap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.18); border-color: var(--gul); }
+.knap.hintknap.lys { box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.22), 0 0 18px rgba(242, 197, 61, 0.45); }
+.knap.hintknap.groen { min-width: 190px; font-size: 1.12rem; color: #ffffff; background-color: var(--groen-mork); border-color: var(--groen); }
+.knap.hintknap.groen:hover:not(:disabled) { background-color: var(--groen); }
+
+.besked { margin: 0; font-size: 1.08rem; line-height: 1.5; color: #c8ced6; }
 .besked.god   { color: #7ee0a8; }
 .besked.skidt { color: #f0918a; }
 .besked.gul   { color: #f0d77a; }
+
+.ab-bund .besked { max-width: 880px; padding: 7px 16px; border: 1px solid transparent; border-radius: 8px; text-align: center; }
+.ab-bund .besked:empty { visibility: hidden; }
+.ab-bund .besked.god   { border-color: rgba(63, 174, 114, 0.5); background-color: rgba(63, 174, 114, 0.1); }
+.ab-bund .besked.skidt { border-color: rgba(224, 84, 70, 0.55); background-color: rgba(224, 84, 70, 0.1); }
+.ab-bund .besked.gul   { border-color: rgba(242, 197, 61, 0.45); background-color: rgba(242, 197, 61, 0.08); }
+
+body.med-vaegt .ab-bund { flex-direction: row-reverse; align-items: flex-start; gap: 12px; min-height: 0; }
+body.med-vaegt .ab-bund .besked { flex: 0 1 auto; margin-right: auto; padding: 5px 12px; text-align: left; font-size: 0.97rem; }
+body.med-vaegt .knap.tjekknap, body.med-vaegt .knap.hintknap { min-width: 96px; font-size: 0.95rem; padding: 9px 14px; }
+body.med-vaegt .ab-knapper { gap: 8px; }
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -611,7 +788,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .trin-punkt.givet .tnr { background-color: #4a4a58; color: var(--tekst-svag); }
 .trin-punkt.givet .tnavn { color: var(--tekst-mat); }
 
-.opgavetekst { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.45; color: var(--tekst); }
 .trin-punkt.aktiv { color: var(--tekst); background-color: rgba(61, 158, 224, 0.12); border-color: rgba(61, 158, 224, 0.45); }
 .trin-punkt.aktiv .tnr { background-color: var(--blaa); color: #ffffff; }
 .trin-punkt.gjort { color: var(--tekst-svag); }
@@ -621,9 +797,6 @@ main { flex: 1; position: relative; min-height: 0; }
 /* ---------------------------------------------------------------------
    REAKTIONERNE I PANELET
    --------------------------------------------------------------------- */
-.kontekst { margin: -4px 0 10px; font-size: 0.85rem; color: var(--tekst-mat); font-style: italic; }
-.kontekst[hidden] { display: none; }
-
 .nrknapper {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
@@ -857,16 +1030,26 @@ select:focus-visible {
 }
 
 @media (max-width: 1320px) {
-    :root { --panel-bredde: 380px; }
-    .skema { font-size: 1.6rem; }
+    :root { --panel-bredde: 320px; }
+    .ab-spm { font-size: 1.18rem; }
+    .taster.ox .tast { min-width: 44px; padding: 0 4px; font-size: 1rem; }
+    .efelter { gap: 8px 14px; }
+    .erk { gap: 8px; padding: 7px 10px; font-size: 1.05rem; }
+    .efelter .koeffelt { width: 2.3em; font-size: 1.3rem; }
+    .kchip { padding: 4px 11px; font-size: 0.98rem; }
 }
 
 @media (max-width: 1040px) {
-    :root { --panel-bredde: 340px; }
+    :root { --panel-bredde: 290px; }
     .top { gap: 10px; padding: 8px 12px; }
     .faneknap { padding: 5px 12px 5px 10px; gap: 8px; }
     .niveau-etiket { display: none; }
-    .arbejdsbord { margin: 0 10px 10px; padding: 10px 10px; }
+    .opgavelinje { padding: 10px 14px 0; }
+    .arbejdsbord { margin: 8px 10px 10px; padding: 10px 10px; }
+    .tavleramme { padding: 16px 8px; }
+    .taster { gap: 4px; padding: 7px 8px; }
+    .tast { min-width: 34px; height: 40px; padding: 0 4px; }
+    .taster.ox .tast { min-width: 36px; padding: 0 3px; font-size: 0.95rem; }
 }
 
 @media (max-width: 860px) {
@@ -876,59 +1059,45 @@ select:focus-visible {
     main { overflow: visible; }
     .fane { position: static; grid-template-columns: minmax(0, 1fr); }
     .scene { overflow: visible; }
-    .vaegt-omraade { height: 36vh; min-height: 220px; flex: none; }
+    .vaegt-omraade { height: 40vh; min-height: 280px; flex: none; }
+    .tavleramme { padding: 22px 8px; }
+    .taster.ox .tast { min-width: 44px; padding: 0 4px; font-size: 1rem; }
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
+}
+
+/* Lave skaerme (en baerbar, eller rammen i menuen): mindre luft, saa
+   intet skal rulles. Skemaet er stadig det stoerste paa tavlen. */
+@media (max-height: 780px) {
+    .skema { font-size: clamp(2rem, 5.4vw, 4.2rem); }
+    .opgavelinje { padding-top: 10px; }
+    .arbejdsbord { margin: 8px 12px 10px; padding: 10px 12px; }
+    .tavleramme { margin-top: 9px; padding: 14px 10px; gap: 11px; }
+    .tavle-note { margin-top: 6px; }
+    .tast { height: 38px; }
+    .ab-bund { gap: 9px; min-height: 116px; }
+    .knap.tjekknap, .knap.hintknap { padding: 9px 20px; font-size: 1.05rem; }
+    .vaegt-omraade { min-height: 236px; }
+    body.med-vaegt .tavleramme { padding: 8px 10px; gap: 7px; }
+    body.med-vaegt .tast { height: 34px; }
+    body.med-vaegt .tavle-note { margin-top: 4px; font-size: 0.88rem; }
+}
+
+/* Endnu lavere: Tjek staar til hoejre for beskeden i stedet for over den */
+@media (max-height: 700px) {
+    .skema { font-size: clamp(1.9rem, 5vw, 3.4rem); }
+    .tavleramme { padding: 10px 8px; gap: 8px; }
+    .ab-bund { flex-direction: row-reverse; align-items: flex-start; min-height: 0; }
+    .ab-bund .besked { flex: 0 1 auto; margin-right: auto; padding: 6px 12px; text-align: left; font-size: 1rem; }
+    .knap.tjekknap, .knap.hintknap { min-width: 104px; padding: 9px 14px; font-size: 1rem; }
+    .ab-knapper { gap: 8px; }
+    .erk { padding: 5px 10px; font-size: 1.05rem; }
+    .efelter .koeffelt { font-size: 1.25rem; }
+    .parvalg { gap: 6px; }
+    .partekst { font-size: 1.25rem; }
+    .partekst small { font-size: 0.92rem; }
+    .valgknap { padding: 7px 16px; font-size: 1rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
-
-/* Tilbuddet om Kemichaels praesentation: midt foroven i scenen, samme
-   sted som knappen, der springer den over (js/praesentation.js) */
-.tilbud {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 6;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background-color: rgba(20, 20, 28, 0.94);
-    border: 1px solid #4a4a58;
-    border-radius: 999px;
-    padding: 6px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    white-space: nowrap;
-}
-
-.tilbud button {
-    font-family: inherit;
-    font-weight: 700;
-    border-radius: 999px;
-    cursor: pointer;
-    padding: 9px 18px;
-    font-size: 0.98rem;
-}
-
-.tilbud-start {
-    background-color: var(--blaa-mork);
-    border: 2px solid var(--gul);
-    color: #ffffff;
-    animation: bank 1.7s ease-out infinite;
-}
-
-.tilbud-start span { color: var(--gul); margin-left: 4px; }
-.tilbud-start:hover { background-color: var(--blaa); }
-
-.tilbud-nej {
-    background-color: transparent;
-    border: 1px solid #5e5e70;
-    color: var(--tekst-svag);
-}
-
-.tilbud-nej:hover { background-color: var(--panel-3); color: var(--tekst); }
-
-/* hidden skal skjule tilbuddet, selv om .tilbud giver display: flex */
-.tilbud[hidden] { display: none; }

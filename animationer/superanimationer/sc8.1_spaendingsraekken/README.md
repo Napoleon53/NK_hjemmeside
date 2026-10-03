@@ -33,8 +33,8 @@ op, er pudset, og glasset har frisk opløsning.
    ladningerne, uden oxidationstal. c2.x ejer ionerne og saltenes navne.
 4. **Loftet:** 3 faner. Fane 1: 5 stænger, 6 glas, 1 lup, et skema med 25
    forsøg, 5 mål. Fane 2: 6 kort og 1 hylde. Fane 3: 1 glas, 1 lup, rækken
-   med 16 grundstoffer og 12 opgaver, derefter tilfældige par af 10 metaller
-   og 11 opløsninger.
+   med 14 grundstoffer og 12 opgaver, derefter tilfældige par af 8 metaller
+   og 9 opløsninger.
 5. **Layoutet:** scene plus panel, som sc7.4. Panelet har opgavekortet med én
    knap (Giv hint, Vis svaret, videre) og skemaet eller listen over svarene.
 
@@ -53,8 +53,9 @@ klikker på stangen og så på glasset. Et klik på en stang i et glas sender de
 hjem, og en ny stang i et glas sender den gamle hjem. Reagerer parret, sætter
 der sig et lag på stangen (brunt kobber, sorte jernkorn, grå krystaller af
 sølv), farven skifter (den blå forsvinder, eller væsken bliver blå), eller der
-kommer bobler i syren. Linjen under scenen siger, hvad man ser, uden at navngive
-stoffet. Luppen viser det valgte glas: stangens atomer i et gitter til højre,
+kommer bobler i syren. I syren bliver stangen også tyndere under overfladen
+(magnesium hurtigst), fordi metallet går i opløsning, uden at noget sætter sig
+på den. Linjen under scenen siger, hvad man ser, uden at navngive stoffet. Luppen viser det valgte glas: stangens atomer i et gitter til højre,
 ionerne og tilskuerionerne (SO₄²⁻, NO₃⁻, Cl⁻) til venstre. Hver hændelse er én
 gang den afstemte reaktion, fx ét Zn og én Cu²⁺ med to elektroner, eller ét Cu
 og to Ag⁺. Reagerer parret ikke, svømmer ionerne hen til stangen og videre.
@@ -73,10 +74,12 @@ hylden, tjekkes rækkefølgen. Er den forkert, bliver to kort ved siden af
 hinanden røde, og beskeden forklarer ud fra skemaet, fx "Zink står til højre
 for jern. Men zink reagerede med jernionerne, så zink skal stå til venstre."
 Hintet viser antallet af flueben i hver række af skemaet. Er rækken rigtig,
-kommer bogens spændingsrække frem foroven, og de seks får deres plads i den.
+kommer den lange spændingsrække frem foroven, og de seks får deres plads i den.
 
-**Forudsig.** Bogens række hænger foroven: K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu
-Ag Hg Pt Au. En stang hænger i et stativ over et glas. Eleven svarer ja eller
+**Forudsig.** Spændingsrækken hænger foroven: K Ca Na Mg Al Zn Fe Pb H Cu Ag
+Hg Pt Au. Nikkel og tin er taget ud af rækken og opgaverne (brugerens ønske
+3. oktober 2026: de bruges sjældent i undervisningen). En stang hænger i et
+stativ over et glas. Eleven svarer ja eller
 nej, stangen kommer ned, og glasset og luppen viser svaret. Rækken får mærkerne
 "stangen" og "ionerne" og en pil med e⁻, når der sker noget. Sker der noget,
 klikker eleven på de to stoffer, der dannes (de forkerte er stangen og ionen,
@@ -86,20 +89,34 @@ efter pilen eller tal, der kan forkortes. Et rigtigt svar tæller elektronerne:
 "2 Al afgiver 6 e⁻, og 3 Cu²⁺ optager 6 e⁻." De første tolv opgaver går fra 1 : 1
 over 1 : 2 og H₂ til 2 : 3 og 3 : 2; bagefter kommer tilfældige par. Listen i
 panelet viser de seneste seks og antallet af rigtige gæt i første forsøg.
+Panelet er bredere end på de to andre faner (580 px, 500 px under 1320 px), og
+skemaets skrift følger panelets bredde, så de fire felter og stofferne står på
+én linje med luft omkring. Tjek står på sin egen linje under skemaet.
 
-**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation
-(reglen i `../README.md`), tre replikker pr. fane. Han står bag holderen og
-kortene, så de kan gribes, mens han taler. Han roser første gang skemaet er
-fyldt ud, første gang rækken står rigtigt og efter den tolvte opgave.
-Påskeæg: en stang sluppet over hans kaffe ("Ikke i kaffen. Den er sur nok i
-forvejen."). Kaffekoppen er det fælles påskeæg.
+**Kemichael** præsenterer hver fane, når eleven trykker Start præsentation.
+Præsentationen går ét trin ad gangen (brugerens ønske 3. oktober 2026, reglerne
+står i `../kemichael/README.md`): han siger én ting, peger, og det, han peger
+på, får en gul ramme, der blinker. Han bliver stående, til eleven trykker
+Næste i taleboblen (Enter og pil til højre gør det samme), og han går aldrig
+videre af sig selv. Linjerne siger kun, hvad fanen træner, og hvordan tingene
+bruges, i hele sætninger og uden vittigheder: seks på fane 1, fem på fane 2 og
+seks på fane 3 (`D.INTRO_*` i `js/data.js`). Taleboblen er under
+præsentationen et HTML-element oven på scenen, så intet i tegningen kan dække
+den, og den vælger den plads ved hans hoved, der dækker mindst af det, han
+peger på. Kroppen tegnes bag stængerne og kortene, så de kan gribes, mens han
+taler; hans taleboble på lærredet (ros og påskeæg) tegnes allersidst. Han
+roser første gang skemaet er fyldt ud, første gang rækken står rigtigt og
+efter den tolvte opgave, i almindelige sætninger. Påskeæg: en stang sluppet
+over hans kaffe ("Ikke i kaffen. Den er sur nok i forvejen."). Kaffekoppen er
+det fælles påskeæg.
 
 Direkte links: `index.html#raekken` og `index.html#forudsig` (også `#forsoeg`).
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 <kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichaels præsentation ·
-<kbd>R</kbd> forfra · <kbd>Enter</kbd> videre · <kbd>J</kbd> <kbd>N</kbd>
-ja og nej på fane 3 · <kbd>Esc</kbd> luk eller send Kemichael ud.
+<kbd>R</kbd> forfra · <kbd>Enter</kbd> videre (under præsentationen: Næste,
+også <kbd>→</kbd>) · <kbd>J</kbd> <kbd>N</kbd> ja og nej på fane 3 ·
+<kbd>Esc</kbd> luk eller send Kemichael ud.
 
 ### Det nye i forhold til den gamle animation
 
@@ -110,8 +127,8 @@ ja og nej på fane 3 · <kbd>Esc</kbd> luk eller send Kemichael ud.
 * **Skemaet** med alle 25 forsøg følger med til fane 2.
 * **Luppen viser den afstemte reaktion**: 2 Al og 3 Cu²⁺ med 6 elektroner.
   Den gamle flyttede én elektron ad gangen uden at tælle.
-* **Fane 3 er ny:** forudsig med bogens række, også aluminium, nikkel, tin,
-  bly og guld, og afstem 1 : 2, 2 : 3 og 3 : 2.
+* **Fane 3 er ny:** forudsig med den lange række, også aluminium, bly og
+  guld, og afstem 1 : 2, 2 : 3 og 3 : 2.
 * **Ingen ventetid:** stængerne kan flyttes hele tiden.
 * **Hjælpen er én knap:** Giv hint, så Vis svaret.
 
@@ -130,11 +147,12 @@ js/sprites.js       indlæser SVG-filen; MAAL har koordinaterne i den
 js/tegning.js       farverne, rummet, glassene, stængerne med laget, holderen, boblerne,
                     stativet, hylden, kortene, rækken, keglen og skiltene
 js/lup.js           luppen: gitteret, ionerne og elektronerne (alle tre faner)
-js/praesentation.js tilbuddet om Kemichaels præsentation (samme fil som i sc1.2)
+js/praesentation.js tilbuddet om Kemichaels præsentation, trinnene med Næste, taleboblen
+                    oven på scenen og den gule ramme (NK.Fremhaev)
 js/sim_forsoeg.js   fane 1 og skemaet (NK.Skema), som fane 2 læser
 js/sim_raekken.js   fane 2
 js/sim_forudsig.js  fane 3
-js/laerer.js        Kemichael på alle tre faner (koden er sc7.4's)
+js/laerer.js        Kemichael på alle tre faner: præsentationen trin for trin, ros og påskeæg
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
 js/app.js           faneskift, teorien, genveje, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -145,7 +163,12 @@ _sprites.html       udviklerværktøj: viser bægerglasset alene
 
 **Stofferne** står øverst i `js/kemi.js` (`K.STOF`: navn, E°, ladning, saltet
 og tilskuerionen) sammen med rækken, de metaller, der findes som stang, og de
-opløsninger, der findes som glas på fane 3. `K.MINDSTE_FORSKEL` holder par,
+opløsninger, der findes som glas på fane 3. Nikkel og tin står stadig i
+`K.STOF` og kommer med igen, hvis de skrives ind i `K.RAEKKE`, `K.STAENGER` og
+`K.OPLOESNINGER` (rækken skal stå efter E°). **Kemichaels præsentation** står
+i `D.INTRO_*` i `js/data.js`: en tekst og en selector for det, der skal blinke.
+Hvor meget stangen bliver tyndere i syren, er `T.TAERET_MAKS` i
+`js/tegning.js`. `K.MINDSTE_FORSKEL` holder par,
 der ligger tættere end 0,2 V, ude af opgaverne. **Målene på fane 1** står i
 `D.MAAL` i `js/data.js` (teksten, hintet, spørgsmålet, svarene med en forklaring
 til hvert forkert og forklaringen bagefter), og **de tolv første opgaver** i
@@ -154,31 +177,40 @@ står øverst i `js/tegning.js`, og ordene for det, man ser, i `D.BELAEG` og
 `D.FARVE`.
 
 **`_selvtest.html`** åbner index.html i en iframe og tjekker, at rækken følger
-E° og er bogens, at skemaet har 25 forsøg med 13 reaktioner (Mg 5, Zn 4, Fe 3,
-Cu 1, Ag 0), koefficienterne for ni reaktioner, at alle 90 mulige opgaver har
-de mindste tal og lige mange elektroner begge veje, tjekket af koefficienterne
-ved de typiske fejl, at luppen afgiver lige så mange elektroner, som den
-optager, at sproget holder reglerne (955 tekster), at fane 1 og 2 kan
-gennemføres med musen, at alle tolv opgaver på fane 3 kan gennemføres, at
-felterne er tomme fra start, at Kemichael kan vises og sendes ud på alle faner,
-og at layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en lokal server
+E° og er uden nikkel og tin, at skemaet har 25 forsøg med 13 reaktioner (Mg 5,
+Zn 4, Fe 3, Cu 1, Ag 0), koefficienterne for ni reaktioner, at alle 63 mulige
+opgaver har de mindste tal og lige mange elektroner begge veje, tjekket af
+koefficienterne ved de typiske fejl, at luppen afgiver lige så mange
+elektroner, som den optager, at sproget holder reglerne (702 tekster), at fane
+1 og 2 kan gennemføres med musen, at stangen bliver tyndere i syren og er hel
+igen i holderen, at alle tolv opgaver på fane 3 kan gennemføres, at felterne
+er tomme fra start, at skemaet på fane 3 står på én linje, at Kemichaels
+præsentation på alle tre faner går ét trin ad gangen (han venter 25 s uden at
+gå videre, Næste viser hver linje, rammen står om det, han peger på, boblen
+dækker det ikke, Afslut og Spring over sender ham ud), og at layoutet holder
+fra 520 × 380 til 1500 × 900. Den kræver en lokal server
 eller Chrome med `--allow-file-access-from-files`, og den lægger elevens valg
-tilbage bagefter. Sidst kørt 25. september 2026: ALT OK (109 påstande).
+tilbage bagefter. Sidst kørt 3. oktober 2026: ALT OK (154 påstande).
 
 ## Forenklinger
 
 * Rækkefølgen er standardreduktionspotentialerne ved 25 °C (Databogen): Mg −2,37,
-  Al −1,66, Zn −0,76, Fe −0,44, Ni −0,26, Sn −0,14, Pb −0,13, H 0, Cu +0,34,
-  Ag +0,80, Au +1,50 V. Eleven ser dem ikke. Koncentrationen spiller ingen rolle.
+  Al −1,66, Zn −0,76, Fe −0,44, Pb −0,13, H 0, Cu +0,34, Ag +0,80, Au +1,50 V.
+  Eleven ser dem ikke. Koncentrationen spiller ingen rolle.
 * Et metal reagerer, når det står til venstre for ionernes metal, og ikke ellers.
-  Par tættere end 0,2 V (fx Sn og Pb) kommer ikke med som opgaver.
+  Par tættere end 0,2 V (bly og H⁺) kommer ikke med som opgaver.
+* Rækken foroven er ikke hele bogens: nikkel og tin er udeladt.
 * Oxidlaget på aluminium er ikke med, og magnesium reagerer ikke med vandet i
-  opløsningerne. Bly og tin i saltsyre er ikke med (for langsomme).
+  opløsningerne. Bly i saltsyre er ikke med (for langsomt).
+* I syren bliver stangen tyndere, i de andre glas dækker laget den. Hvor meget
+  den bliver tyndere, følger kun, hvor meget af syren der er brugt (højst 60 %
+  af bredden), ikke en rigtig masse.
 * Syren skrives som H⁺, ikke H₃O⁺, som i de fleste bøger i redoxkapitlet.
 * Jern bliver til Fe²⁺, og tin til Sn²⁺.
 * Hvor hurtigt det går, afhænger kun af, hvor langt fra hinanden de står i
   rækken. Højst 75 % af ionerne bliver brugt, så farven aldrig forsvinder helt.
-* En stang, der kommer op, er pudset, og glasset får frisk opløsning.
+* En stang, der kommer op, er pudset, og glasset får frisk opløsning. En stang,
+  der er blevet tyndere i syren, er først hel igen, når den står i holderen.
 * Luppen er et udsnit: nye ioner svømmer ind fra venstre, og de nye metalioner
   svømmer ud igen, når der er mere end fem.
 
@@ -187,9 +219,11 @@ tilbage bagefter. Sidst kørt 25. september 2026: ALT OK (109 påstande).
 Kemichael kommer ikke af sig selv. Første gang en fane åbnes, står der Start
 præsentation og Nej tak midt foroven i scenen. Start sender ham ind, Nej tak og
 Esc husker valget, og K viser præsentationen uden at spørge. Tilbuddet
-forsvinder også, når eleven har gjort noget på fanen. Koden er
-`js/praesentation.js` (samme fil som i sc1.2), koblet med
-`NK.Praesentation.kobl` i hver `sim_*.js`.
+forsvinder også, når eleven har gjort noget på fanen. Når han står der, kommer
+taleboblen med Næste, trinnets nummer og Spring over. Koden er
+`js/praesentation.js`, koblet med `NK.Praesentation.kobl` i hver `sim_*.js`;
+filen er sc1.2's med trinnene, HTML-boblen og rammen lagt til, og den er
+mønsteret for præsentationer efter reglerne fra 3. oktober 2026.
 
 ## I menuen
 

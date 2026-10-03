@@ -3,8 +3,8 @@
 
    Vaeggen bag tavlen, tavlen paa fane 2 (paa fane 1 er tavlen et
    HTML-element med samme udseende, se .tavle i css/stil.css) og de smaa
-   ting i elektronprikformlerne: prikkerne, ringene og klammerne om en
-   ion. Funktionerne tegner én ting et bestemt sted og husker intet selv.
+   ting i elektronprikformlerne: prikkerne, ringene, pilene og klammerne
+   om en ion. Funktionerne tegner én ting et bestemt sted og husker intet selv.
    ===================================================================== */
 (function () {
     "use strict";
@@ -92,6 +92,27 @@
         ctx.lineWidth = bredde || 2;
         ctx.strokeStyle = farve;
         ctx.stroke();
+        ctx.restore();
+    };
+
+    /* En pil fra (x0, y0) til (x1, y1) med et udfyldt hoved */
+    T.pil = function (ctx, x0, y0, x1, y1, farve, bredde, hoved) {
+        var v = Math.atan2(y1 - y0, x1 - x0);
+        ctx.save();
+        ctx.strokeStyle = farve;
+        ctx.fillStyle = farve;
+        ctx.lineWidth = bredde || 3;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1 - Math.cos(v) * hoved * 0.7, y1 - Math.sin(v) * hoved * 0.7);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1 - Math.cos(v - 0.5) * hoved, y1 - Math.sin(v - 0.5) * hoved);
+        ctx.lineTo(x1 - Math.cos(v + 0.5) * hoved, y1 - Math.sin(v + 0.5) * hoved);
+        ctx.closePath();
+        ctx.fill();
         ctx.restore();
     };
 

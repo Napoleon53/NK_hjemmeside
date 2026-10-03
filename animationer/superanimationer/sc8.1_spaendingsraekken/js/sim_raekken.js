@@ -6,8 +6,8 @@
    aedel, med skemaet fra fane 1 i panelet. Naar alle seks staar paa
    hylden, tjekkes raekkefoelgen. Er den forkert, bliver to kort, der
    staar forkert i forhold til hinanden, roede, og beskeden siger hvorfor
-   ud fra skemaet. Er den rigtig, kommer bogens spaendingsraekke frem
-   foroven, og de seks faar deres pladser i den.
+   ud fra skemaet. Er den rigtig, kommer den lange spaendingsraekke
+   (K.RAEKKE) frem foroven, og de seks faar deres pladser i den.
    ===================================================================== */
 (function () {
     "use strict";
@@ -185,7 +185,6 @@
             kort: NK.el("rk-kort")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("rk-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("rk-nulstil").addEventListener("click", function () { mig.nulstil(); });
     };
 
@@ -219,7 +218,7 @@
     P.visStatus = function () {
         var t;
         if (this.traek && this.traek.flyttet) t = "Slip kortet på en plads på hylden.";
-        else if (this.fase === "faerdig") t = "Rækken foroven er spændingsrækken, som den står i bogen.";
+        else if (this.fase === "faerdig") t = "Rækken foroven er spændingsrækken med flere metaller.";
         else if (this.fejlPar) t = "Ikke rigtigt endnu. Se på de to røde kort.";
         else if (this.antalPaa() === 0) t = "Træk kortene op på hylden, fra uædel til ædel.";
         else t = "Træk resten op. Kort på hylden kan flyttes igen.";
@@ -307,7 +306,7 @@
             NK.Sprites.tegn(ctx, "kaffekop", lay.kop.x - 18 * kk, lay.kop.y - 40 * kk, 42 * kk, 40 * kk);
         }
 
-        /* Bogens raekke, naar raekken er rigtig */
+        /* Den lange raekke, naar raekken er rigtig */
         if (this.afsloer > 0) {
             var lys = {};
             D.RAEKKEN.forEach(function (s) { lys[s] = true; });
@@ -344,13 +343,16 @@
             mig.tegnKort(ctx, k);
         });
         if (holdt) this.tegnKort(ctx, holdt, true);
+
+        /* Hans taleboble allersidst, saa intet daekker den */
+        if (this.laererTegnBoble) this.laererTegnBoble(ctx);
     };
 
     P.tegnKort = function (ctx, k, loeftet) {
         var lay = this.lay;
         var fejl = !!(this.fejlPar && this.fejlPar.indexOf(k.sym) >= 0);
         var hover = this.over && this.over.slags === "kort" && this.over.k === k;
-        var lys = hover || loeftet || (this.pegKort && k.plads < 0 && Math.sin(this.tid * 6) > -0.2);
+        var lys = hover || loeftet;
         Tg.kort(ctx, { x: k.x, y: k.y, b: lay.kb, h: lay.kh }, k.sym, K.navn(k.sym), {
             px: lay.px, fejl: fejl, ok: this.fase === "faerdig", lys: lys, loeftet: loeftet
         });
@@ -462,8 +464,6 @@
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
     NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-raekken", tilbud: "rk-tilbud", spring: "rk-spring" });
-
-    P.pegPaaFelt = function (til) { this.pegKort = til; };
 
     NK.SimRaekken = SimRaekken;
 }());

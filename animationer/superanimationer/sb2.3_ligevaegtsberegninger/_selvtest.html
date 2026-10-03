@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest sb2.3 Ligevægtsberegninger</title>
+<style>
+    body { margin: 0; padding: 10px; background: #15151b; color: #d8dde3; font: 13px Consolas, monospace; }
+    #ud { white-space: pre-wrap; }
+    iframe { border: 1px solid #444; display: block; margin-top: 10px; }
+</style>
+</head>
+<body>
+<!-- Udviklervaerktoej: aabnes gennem en lokal server (iframen afvises paa file://).
+     Slutlinjen er ALT OK eller N FEJL. -->
+<pre id="ud">Kører …</pre>
+<iframe id="f" width="1440" height="860"></iframe>
+<script>
+(function () {
+    "use strict";
+    var ud = document.getElementById("ud"), f = document.getElementById("f");
+    var linjer = [], fejl = 0, antal = 0, beskeder = [];
+
+    function ok(b, tekst) {
+        antal++;
+        if (!b) {
+            fejl++;
+            var hvor = "";
+            try { var a = W().document.querySelector(".fane.aktiv .statuslinje"); hvor = a ? " [" + a.className + ": " + a.textContent.trim().slice(0, 120) + "]" : ""; } catch (e) { /* intet */ }
+            linjer.push("FEJL: " + tekst + hvor);
+        } else linjer.push("ok   " + tekst);
+        ud.textContent = linjer.join("\n") + "\n…";
+    }
+    function sov(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    function aabn(w, h, hash) {
+        return new Promise(function (r) {
+            f.width = w; f.height = h;
+            f.onload = function () { setTimeout(r, 700); };
+            f.src = "index.html?r=" + Math.random() + (hash || "");
+        });
+    }
+    function W() { return f.contentWindow; }
+    function sim(navn) { return W().NK.sims["fane-" + navn]; }
+    function skriv(navn, key, v) {
+        var e = W().document.querySelector("#fane-" + navn + ' [data-key="' + key + '"]');
+        if (!e) return false;
+        e.value = v;
+        var Ev = W().Event;
+        e.dispatchEvent(new Ev(e.tagName === "SELECT" ? "change" : "input"));
+        return true;
+    }
+    function status(navn) { return W().document.getElementById(navn + "-status").className; }
+    function noter(s) { beskeder.push(s.beskedTekst()); return s.beskedTekst(); }
+    function fejlNu(navn) { return /skidt/.test(status(navn)); }
+
+    /* ===== 1. Modellen mod den gamle b2.3 ===================================== */
+    function modellen() {
+        var NK = W().NK, D = NK.Data, M = NK.Model;
+        D.UX.forEach(function (o) {
+            var g = D.GAMMEL[o.id];
+            if (o.type === "kc") {
+                var K = M.kAf(o, M.cAfN(o));
+                ok(Math.abs(K - g.K) / g.K < 2e-3, o.id + ": Kc = " + K.toPrecision(5) + " som den gamle (" + g.K + ")");
+            } else {
+                var r = M.loesUkendt(o).filter(function (v) { return v > 0; });
+                ok(r.length === 1 && Math.abs(r[0] - g.svar) / g.svar < 2e-3, o.id + ": " + o.ukendt + " = " + (r[0] || 0).toPrecision(4) + " som den gamle");
+            }
+        });
+        D.MX.forEach(function (o) {
+            var g = D.GAMMEL[o.id], r = M.loesX(o), x = M.xFacit(o);
+            ok(Math.abs(x - g.x) / g.x < 2e-3, o.id + ": x = " + x.toPrecision(5) + " som den gamle (" + g.x + ")");
+            if (g.x2 !== undefined) {
+                ok(r.some(function (v) { return Math.abs(v - g.x2) < 2e-4; }), o.id + ": den forkastede løsning " + g.x2 + " er med i CAS");
+            }
+            var gr = M.xGraenser(o);
+            ok(x > 0 && x < gr.hoej, o.id + ": x ligger mellem 0 og " + gr.hoej);
+            r.forEach(function (v) {
+                var d = M.dom(o, v);
+                ok(d.ok === (Math.abs(v - x) < 1e-9), o.id + ": løsningen " + v.toPrecision(4) + (d.ok ? " kan bruges" : " forkastes (" + d.neg + ")"));
+            });
+            var c = M.ceq(o, x);
+            ok(Math.abs(M.kAf(o, c) - o.K) / o.K < 1e-6, o.id + ": kontrollen giver Kc igen");
+        });
+        /* Udtryk, eleven kan skrive */
+        var lige = [["0,200 M − x", "0.2-x"], ["0,200-x", "0.2 - x"], ["(2x)^2", "4x^2"], ["(2x)²", "4*x*x"], ["x x", "x^2"],
+            ["2(0,1−x)", "0.2-2x"], ["4,00·10⁻³", "0.004"], ["4,00e-3", "0.004"], ["4,00·10^-3", "0.004"], ["25,0 M⁻¹", "25"],
+            ["−x", "-1*x"], ["+2x", "2*x"], ["0,0500 mol/L", "0.05"]];
+        lige.forEach(function (p) {
+            var a = M.udtryk(p[0]), b = M.udtryk(p[1]);
+            ok(a.ok && b.ok && M.samme(function (t) { return a.f(t); }, function (t) { return b.f(t); }), "udtrykket " + p[0] + " = " + p[1]);
+        });
+        ok(M.udtryk("(0,2-x").fejl, "en manglende parentes giver en besked");
+        ok(M.udtryk("[Cl2]").klamme, "[Cl₂] i et felt til CAS giver en besked");
+        /* Ligevaegtsloven skrevet i felterne */
+        var o = D.UX[0];
+        [["[NO]^2·[Cl2]", "[NOCl]^2", "ok"], ["[NO]²[Cl₂]", "[NOCl]²", "ok"], ["2[NO]·[Cl2]", "[NOCl]^2", "faktor"],
+            ["[NOCl]^2", "[NO]^2·[Cl2]", "byttet"], ["[NO]^2+[Cl2]", "[NOCl]^2", "plus"], ["[NO]^2·[Cl2]", "[NOCl]", "eksponent"],
+            ["[NO]^2", "[NOCl]^2", "mangler"], ["[NO]^2·[O2]", "[NOCl]^2", "fremmed"], ["[NOCl]^2·[Cl2]", "[NO]^2", "side"],
+            ["[NO]2·[Cl2]", "[NOCl]^2", "syntaks"]].forEach(function (t) {
+            var d = M.lovDom(o, t[0], t[1]);
+            ok(t[2] === "ok" ? d.ok : d.kode === t[2], "ligevægtsloven " + t[0] + " / " + t[1] + " giver " + t[2]);
+            if (!d.ok) {
+                var h = M.lovHint(o, t[0], t[1]);
+                ok(h.trin.length >= 1 && h.trin.length <= 3, "hintet til " + t[2] + " har 1 til 3 trin");
+            }
+        });
+        var h0 = M.lovHint(o, "", "");
+        ok(h0.trin.length === 3 && h0.trin[2].indexOf("[NO]²·[Cl₂]") >= 0 && h0.trin[0].indexOf("[NO]") < 0, "hinttrappen siger først svaret i sidste trin");
+    }
+
+    /* ===== 2. Fane 2 og 3: hver opgave regnet igennem med én fejl pr. trin ===== */
+    function facitDel(navn, s, d) {
+        var NK = W().NK, M = NK.Model, o = s.o;
+        if (d === "lov") {
+            var F = M.lovFelter(o);
+            skriv(navn, "lov.num", F.den); skriv(navn, "lov.den", F.num);
+            s.tjek(); noter(s);
+            ok(fejlNu(navn), o.id + " lov: en vendt brøk giver en fejl");
+            ok(s.hintTrin().trin.length === 3, o.id + " lov: hint i tre trin");
+            skriv(navn, "lov.num", F.num); skriv(navn, "lov.den", F.den);
+            s.tjek(); noter(s);
+            return;
+        }
+        if (d === "defx") {
+            var a = M.alle(o).filter(function (q) { return q.side === "r" && q.k === 1; })[0];
+            skriv(navn, "dx.str", "lig"); skriv(navn, "dx.stof", a.s); skriv(navn, "dx.verb", "oms"); skriv(navn, "dx.enh", "M");
+            s.tjek(); noter(s);
+            ok(fejlNu(navn), o.id + " x: ligevægtskoncentrationen godtages ikke");
+            skriv(navn, "dx.str", "konc"); skriv(navn, "dx.enh", "mol");
+            s.tjek(); noter(s);
+            ok(fejlNu(navn) && /koncentration/.test(s.beskedTekst()), o.id + " x: enheden mol godtages ikke");
+            skriv(navn, "dx.enh", "M");
+            s.tjek(); noter(s);
+            return;
+        }
+        if (d === "skema") {
+            var p = M.alle(o).filter(function (q) { return !M.c0(o, q.s); })[0];
+            M.alle(o).forEach(function (q) { skriv(navn, "sk.start." + q.s, q.s === p.s ? "0,100" : NK.tal(M.c0(o, q.s))); });
+            s.tjek(); noter(s);
+            ok(fejlNu(navn) && /fra start/.test(s.beskedTekst()), o.id + " skema: et produkt fra start giver en fejl");
+            skriv(navn, "sk.start." + p.s, "0"); s.tjek(); noter(s);
+            var r0 = M.alle(o)[0];
+            M.alle(o).forEach(function (q) { skriv(navn, "sk.aendr." + q.s, q.s === r0.s ? "+x" : M.aendrTekst(q)); });
+            s.tjek(); noter(s);
+            ok(fejlNu(navn) && /negativ/.test(s.beskedTekst()), o.id + " skema: +x for en reaktant giver en fejl om fortegnet");
+            skriv(navn, "sk.aendr." + r0.s, M.aendrTekst(r0)); s.tjek(); noter(s);
+            M.alle(o).forEach(function (q) { skriv(navn, "sk.lig." + q.s, q.s === r0.s ? M.aendrTekst(q) : M.ligTekst(o, q.s, false)); });
+            s.tjek(); noter(s);
+            ok(fejlNu(navn) && /start/.test(s.beskedTekst()), o.id + " skema: kun ændringen i rækken Ligevægt giver en fejl");
+            ok(s.hintTrin().trin.length === 3, o.id + " skema: hint i tre trin");
+            skriv(navn, "sk.lig." + r0.s, M.ligTekst(o, r0.s, false)); s.tjek(); noter(s);
+            return;
+        }
+        if (d === "ligning") {
+            var lov = M.lovFacit(o), r1 = lov.den[0];
+            skriv(navn, "lg.K", NK.tal(o.K));
+            lov.num.concat(lov.den).forEach(function (l) { skriv(navn, "lg.s." + l.s, l === r1 ? NK.tal(M.c0(o, l.s)) : M.ligTekst(o, l.s, false)); });
+            s.tjek(); noter(s);
+            ok(fejlNu(navn) && /startkoncentrationen/.test(s.beskedTekst()), o.id + " ligning: startkoncentrationen i stedet for udtrykket giver en fejl");
+            skriv(navn, "lg.s." + r1.s, M.ligTekst(o, r1.s, true));
+            s.tjek(); noter(s);
+            return;
+        }
+        if (d === "cas") { s.koerCas(); noter(s); return; }
+        if (d === "valg") {
+            var god = M.xFacit(o);
+            var gi = s.roedder.map(function (v) { return Math.abs(v - god) < 1e-12; }).indexOf(true);
+            s.proev(gi); s.forkast(gi); noter(s);
+            ok(fejlNu(navn), o.id + " løsning: at forkaste den brugbare giver en fejl");
+            s.roedder.forEach(function (v, i) {
+                if (i === gi) return;
+                var dm = M.dom(o, v);
+                s.proev(i); s.brug(i); noter(s);
+                ok(fejlNu(navn), o.id + " løsning: at bruge x = " + NK.tal(v) + " giver en fejl");
+                s.forkast(i);
+                var pos = M.alle(o).filter(function (q) { return M.vaerdi(M.plads(o, q.s), v) > 0; })[0];
+                if (pos) { s.klikCelle(pos.s); noter(s); ok(fejlNu(navn), o.id + " løsning: en positiv koncentration er ikke begrundelsen"); }
+                s.klikCelle(dm.neg); noter(s);
+            });
+            if (!s.faerdig && s.del() === "valg") { s.proev(gi); s.brug(gi); noter(s); }
+            return;
+        }
+        if (d === "konc") {
+            if (s.type === "kc") {
+                skriv(navn, "kn.formel", "V/n"); s.tjek(); noter(s);
+                ok(fejlNu(navn), o.id + " c = V/n giver en fejl");
+                skriv(navn, "kn.formel", "n / V"); s.tjek(); noter(s);
+                var c = M.cAfN(o);
+                Object.keys(o.n).forEach(function (q) { skriv(navn, "kn." + q, NK.tal(c[q])); });
+                s.tjek(); noter(s);
+                return;
+            }
+            var x = M.xFacit(o), ce = M.ceq(o, x), rr = M.alle(o)[0];
+            M.alle(o).forEach(function (q) { skriv(navn, "kx." + q.s, q.s === rr.s ? NK.tal(x) : NK.tal(ce[q.s])); });
+            s.tjek(); noter(s);
+            ok(fejlNu(navn), o.id + " koncentrationerne: x i stedet for " + M.ligTekst(o, rr.s) + " giver en fejl");
+            skriv(navn, "kx." + rr.s, NK.tal(ce[rr.s])); s.tjek(); noter(s);
+            return;
+        }
+        if (d === "indsaet") {
+            var lv = M.lovFacit(o);
+            if (s.type === "kc") {
+                var cc = M.cAfN(o);
+                lv.num.concat(lv.den).forEach(function (l) { skriv(navn, "ik." + l.s, NK.tal(o.n[l.s])); });
+                s.tjek(); noter(s);
+                ok(fejlNu(navn) && /stofmængden/.test(s.beskedTekst()), o.id + " indsæt: stofmængden i stedet for koncentrationen giver en fejl");
+                lv.num.concat(lv.den).forEach(function (l) { skriv(navn, "ik." + l.s, NK.tal(cc[l.s])); });
+                s.tjek(); noter(s);
+                var K = M.kAf(o, cc);
+                skriv(navn, "ik.res", String(1 / K).replace(".", ",")); s.tjek(); noter(s);
+                ok(fejlNu(navn) && /1\/K/.test(s.beskedTekst()), o.id + " indsæt: 1/Kc giver en fejl");
+                skriv(navn, "ik.res", NK.tal(K));
+                var E = { 0: "ingen", 1: "M", 2: "M2", 3: "M3", "-1": "Mm1", "-2": "Mm2", "-3": "Mm3" };
+                var e = M.deltaN(o);
+                skriv(navn, "ik.enh", E[e === 0 ? 1 : 0]); s.tjek(); noter(s);
+                ok(fejlNu(navn) && /enheden/.test(s.beskedTekst()), o.id + " indsæt: forkert enhed giver en fejl");
+                skriv(navn, "ik.enh", E[e]); s.tjek(); noter(s);
+                return;
+            }
+            skriv(navn, "iu.K", NK.tal(o.K));
+            lv.num.concat(lv.den).forEach(function (l) { skriv(navn, "iu." + l.s, l.s === o.ukendt ? "0,1" : NK.tal(o.kendt[l.s])); });
+            s.tjek(); noter(s);
+            ok(fejlNu(navn) && /bogstav/.test(s.beskedTekst()), o.id + " indsæt: et tal for den ukendte giver en fejl");
+            skriv(navn, "iu." + o.ukendt, "c"); s.tjek(); noter(s);
+            return;
+        }
+        if (d === "svar") {
+            s.roedder.forEach(function (v, i) {
+                if (v < 0) { s.domUk(i, "brug"); noter(s); ok(fejlNu(navn), o.id + " svar: en negativ koncentration godtages ikke"); }
+                s.domUk(i, v < 0 ? "forkast" : "brug"); noter(s);
+            });
+            skriv(navn, "us.svar", NK.tal(s.svarRod())); s.tjek(); noter(s);
+        }
+    }
+
+    function regnAlle(navn) {
+        var s = sim(navn), D = W().NK.Data;
+        var liste = navn === "ux" ? D.UX : D.MX;
+        W().NK.visFane("fane-" + navn);
+        liste.forEach(function (o, i) {
+            s.vaelg(i);
+            var vagt = 0;
+            while (!s.faerdig && vagt++ < 30) {
+                var d = s.del(), k = s.k, fase = JSON.stringify(s.fase);
+                facitDel(navn, s, d);
+                if (!s.faerdig && s.k === k && JSON.stringify(s.fase) === fase) { ok(false, o.id + ": delen " + d + " kom ikke videre (" + s.beskedTekst() + ")"); break; }
+            }
+            ok(s.faerdig && s.status[i].loest && s.status[i].stjerne, o.id + ": løst med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
+            ok(!W().document.getElementById(navn + "-stempel").hidden, o.id + ": stemplet Løst står på tavlen");
+            if (s.type === "x") ok(!!W().document.getElementById(navn + "-kurve"), o.id + ": kurven fra start til ligevægt står i panelet");
+        });
+    }
+
+    /* Vis svaret hele vejen: knappen giver hint og svar, til opgaven er loest */
+    function svarAlle(navn) {
+        var s = sim(navn);
+        W().NK.visFane("fane-" + navn);
+        s.opgaver.forEach(function (o, i) {
+            s.vaelg(i);
+            var vagt = 0;
+            while (!s.faerdig && vagt++ < 80) { s.knap(); noter(s); }
+            ok(s.faerdig && s.brugtSvarNogen, o.id + ": kan løses med Vis svaret alene (" + vagt + " tryk)");
+            ok(W().document.getElementById(navn + "-stempel").textContent === "Vist", o.id + ": stemplet siger Vist");
+        });
+    }
+
+    /* ===== 3. Fane 1: de otte maal ============================================= */
+    function beholderen() {
+        var NK = W().NK, M = NK.Model, D = NK.Data, s = sim("bh");
+        NK.visFane("fane-bh");
+        D.MAAL.forEach(function (m, i) {
+            s.vaelg(i);
+            var rx = s.rx;
+            if (m.type === "ligevaegt") {
+                s.saetX(0.01); s.slutTraek();
+                ok(!s.faerdig, m.id + ": x = 0,010 er ikke ligevægt");
+                ok(/for lille/.test(s.hintTrin().trin[1]), m.id + ": hintet siger, at Y er for lille");
+                s.saetX(Math.round(s.xEq * 1000) / 1000); s.slutTraek();
+            } else if (m.type === "udtryk") {
+                var f0 = M.alle(rx)[0];
+                m.raekker.forEach(function (r) {
+                    M.alle(rx).forEach(function (a) { skriv("bh", r + "." + a.s, r === "aendr" ? (a.s === f0.s ? "+x" : M.aendrTekst(a)) : M.ligTekst(rx, a.s, false)); });
+                });
+                s.tjek(); noter(s);
+                ok(fejlNu("bh"), m.id + ": +x for en reaktant giver en fejl");
+                skriv("bh", "aendr." + f0.s, M.aendrTekst(f0));
+                s.tjek(); noter(s);
+            } else if (m.type === "forkast") {
+                s.koerCas(); noter(s);
+                var god = M.xFacit(rx);
+                var gi = s.roedder.map(function (v) { return Math.abs(v - god) < 1e-12; }).indexOf(true);
+                s.vaelgRod(gi); noter(s);
+                ok(fejlNu("bh"), m.id + ": den brugbare løsning kan ikke forkastes");
+                s.vaelgRod(1 - gi); noter(s);
+            } else {
+                s.klikStof(M.alle(rx)[1]);
+                ok(!s.faerdig, m.id + ": et klik før x er helt oppe tæller ikke");
+                s.saetX(s.xMax);
+                ok(s.naaet, m.id + ": skyderen stopper ved " + s.xMax);
+                s.klikStof(M.alle(rx)[0]); noter(s);
+                ok(fejlNu("bh"), m.id + ": CO er ikke brugt op");
+                s.klikStof(M.alle(rx)[1]); noter(s);
+            }
+            ok(s.faerdig && s.status[i].stjerne, m.id + ": nået med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
+        });
+        /* Molekylerne passer med x */
+        s.vaelg(4);
+        s.saetX(0.16);
+        for (var t = 0; t < 30; t++) s.opdater(1 / 60);
+        var tael = {};
+        s.mol.forEach(function (q) { tael[q.s] = (tael[q.s] || 0) + 1; });
+        ok(tael.H2 === 2 && tael.Br2 === 2 && tael.HBr === 16, "ved x = 0,160 M er der 2 H₂, 2 Br₂ og 16 HBr (" + JSON.stringify(tael) + ")");
+        s.saetX(0);
+        for (t = 0; t < 30; t++) s.opdater(1 / 60);
+        tael = {};
+        s.mol.forEach(function (q) { tael[q.s] = (tael[q.s] || 0) + 1; });
+        ok(tael.H2 === 10 && tael.Br2 === 10 && !tael.HBr, "tilbage ved x = 0 er der 10 H₂ og 10 Br₂");
+        /* Vis svaret paa hvert maal */
+        D.MAAL.forEach(function (m, i) {
+            s.vaelg(i);
+            var vagt = 0;
+            while (!s.faerdig && vagt++ < 20) { s.knap(); noter(s); }
+            ok(s.faerdig, m.id + ": kan nås med Vis svaret");
+        });
+        /* Paaskeaegget */
+        s.aabnLaag();
+        ok(!!s.laag && /Låget/.test(s.beskedTekst()), "påskeægget: låget kan tages af");
+    }
+
+    /* ===== 4. Sproget ============================================================== */
+    function sproget() {
+        var D = W().NK.Data, tekster = beskeder.slice();
+        D.MAAL.forEach(function (m) { tekster.push(m.linje, m.tekst, m.slut); });
+        D.UX.concat(D.MX).forEach(function (o) { tekster.push(o.tekst, o.spm || ""); });
+        tekster.push(W().document.getElementById("teori").textContent);
+        var streg = tekster.filter(function (t) { return /[–—]/.test(t); });
+        ok(!streg.length, "ingen tankestreger (" + (streg[0] || "") + ")");
+        var en = tekster.filter(function (t) { return /[A-Za-z\])]1[+−]/.test(t) || /¹[⁺⁻]/.test(t); });
+        ok(!en.length, "ingen 1+ eller 1− (" + (en[0] || "") + ")");
+        ok(!tekster.some(function (t) { return /natronlud/i.test(t); }), "natriumhydroxid, ikke natronlud");
+        ok(!tekster.some(function (t) { return /undefined|NaN/.test(t); }), "ingen undefined eller NaN i teksterne");
+    }
+
+    /* ===== 5. Layoutet ============================================================== */
+    async function layout(w, h) {
+        await aabn(w, h, "#medx");
+        var s = sim("mx"), d = W().document;
+        s.vaelg(7);
+        var vagt = 0;
+        while (!s.faerdig && vagt++ < 30) { var k = s.k; facitDel("mx", s, s.del()); if (s.k === k && !s.faerdig) { /* fase */ } }
+        await sov(300);
+        s.tilpas();
+        var arb = d.getElementById("mx-arbejde"), tv = d.getElementById("mx-tavle");
+        function synlig(e) {
+            var ra = arb.getBoundingClientRect(), re = e.getBoundingClientRect();
+            return re.top >= ra.top - 2 && re.bottom <= ra.bottom + 2;
+        }
+        var fs = parseFloat(W().getComputedStyle(arb).fontSize);
+        ok(fs >= 16, w + "×" + h + ": skriften på tavlen er mindst 16 px (" + fs + ")");
+        ok(synlig(d.querySelector("#mx-dele .rb:last-child")), w + "×" + h + ": den sidste linje i besvarelsen kan ses" + (arb.scrollHeight > arb.clientHeight + 2 ? " (der rulles)" : ""));
+        ok(tv.scrollWidth <= tv.clientWidth + 2, w + "×" + h + ": tavlen er ikke for bred");
+        s.vaelg(7);
+        for (var i = 0; i < 6 && s.del() !== "valg"; i++) facitDel("mx", s, s.del());
+        s.proev(0);
+        await sov(200);
+        ok(synlig(d.querySelector("#mx-dele .rb.aktiv")), w + "×" + h + ": løsningerne kan ses, når den første er sat ind i skemaet");
+        ok(synlig(d.querySelector("#mx-dele .ice-lig")), w + "×" + h + ": rækken Ligevægt kan ses samtidig");
+        W().NK.visFane("fane-bh");
+        var b = sim("bh");
+        b.vaelg(3);
+        await sov(300);
+        var sk = d.getElementById("bh-skema"), c = d.getElementById("bh-laerred");
+        ok(sk.scrollWidth <= sk.clientWidth + 2, w + "×" + h + ": skemaet med felter på fane 1 er ikke for bredt");
+        b.vaelg(6);
+        await sov(200);
+        ok(sk.scrollWidth <= sk.clientWidth + 2, w + "×" + h + ": skemaet med fire stoffer på fane 1 er ikke for bredt");
+        b.vaelg(3);
+        await sov(200);
+        ok(c.clientHeight >= 200, w + "×" + h + ": beholderen og grafen er mindst 200 px høje (" + c.clientHeight + ")");
+        var sc = d.querySelector("#fane-bh .scene");
+        ok(sc.scrollHeight <= sc.clientHeight + 2, w + "×" + h + ": fane 1 kan være i scenen");
+        W().NK.visFane("fane-ux");
+        var u = sim("ux");
+        u.vaelg(1);
+        ok(d.getElementById("ux-tavle").scrollWidth <= d.getElementById("ux-tavle").clientWidth + 2, w + "×" + h + ": ligevægtsloven med felter er ikke for bred");
+    }
+
+    async function koer() {
+        try {
+            await aabn(1440, 860);
+            try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
+            await aabn(1440, 860);
+            modellen();
+            regnAlle("ux");
+            regnAlle("mx");
+            beholderen();
+            await aabn(1440, 860);
+            svarAlle("ux");
+            svarAlle("mx");
+            sproget();
+            await layout(1100, 700);
+            await layout(1440, 860);
+            await layout(1600, 950);
+            try { Object.keys(W().localStorage).forEach(function (k) { if (k.indexOf("nk-sb2.3-") === 0) W().localStorage.removeItem(k); }); } catch (e) { /* intet */ }
+        } catch (e) {
+            fejl++;
+            linjer.push("UNDTAGELSE: " + (e && e.stack || e));
+        }
+        linjer.push("");
+        linjer.push(fejl ? fejl + " FEJL (af " + antal + ")" : "ALT OK (" + antal + ")");
+        ud.textContent = linjer.join("\n");
+    }
+
+    koer();
+}());
+</script>
+</body>
+</html>

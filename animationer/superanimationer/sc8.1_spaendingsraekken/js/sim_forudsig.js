@@ -1,8 +1,8 @@
 /* =====================================================================
    sim_forudsig.js - fane 3: forudsig
 
-   Spaendingsraekken fra bogen haenger foroven. En metalstang haenger i
-   et stativ over et glas med en oploesning, fx nikkel over kobber(II)-
+   Spaendingsraekken (K.RAEKKE) haenger foroven. En metalstang haenger i
+   et stativ over et glas med en oploesning, fx jern over kobber(II)-
    sulfat. Eleven svarer foerst, om der sker noget. Saa kommer stangen
    ned, og glasset og luppen viser svaret. Sker der noget, vaelger eleven
    de to stoffer, der dannes, og afstemmer til sidst skemaet, saa der
@@ -255,7 +255,6 @@
             chips: NK.el("fu-chips")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("fu-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("fu-nulstil").addEventListener("click", function () { mig.nulstil(); });
         this.visLog();
     };
@@ -385,16 +384,20 @@
         led(fase === "produkt" ? this.produkter[0] : r.stoffer[2], 2);
         tegn("+");
         led(fase === "produkt" ? this.produkter[1] : r.stoffer[3], 3);
+        if (fase === "faerdig") linje.classList.add("faerdig");
+        vaert.appendChild(linje);
+        /* Tjek paa sin egen linje, saa skemaet har hele bredden */
         if (fase === "koef") {
+            var rad = document.createElement("div");
+            rad.className = "skematjek";
             var ok = document.createElement("button");
             ok.type = "button";
             ok.className = "felt-ok lille";
             ok.textContent = "Tjek";
             ok.addEventListener("click", function () { mig.tjekKoef(); });
-            linje.appendChild(ok);
+            rad.appendChild(ok);
+            vaert.appendChild(rad);
         }
-        if (fase === "faerdig") linje.classList.add("faerdig");
-        vaert.appendChild(linje);
     };
 
     P.visLog = function () {
@@ -440,6 +443,11 @@
         var venstre = kant + 90, hoejre = lay.lup.cx - R - 24;
         var gb = NK.klamp(Math.min((hoejre - venstre) * 0.55, (lay.bordY - under) / (1.2 * 2.25)), 70, 200);
         var gcx = (venstre + hoejre) / 2 + gb * 0.2;
+        /* Glasset rykker mod luppen, saa Kemichael kan staa til venstre
+           for det uden at daekke stangen og glasset */
+        var ls = this.laererLaerredSkala ? this.laererLaerredSkala() : 0;
+        var laererB = ls ? Math.max(150 * ls, 90, lay.kop.x + 70) + 112 * ls : 0;
+        gcx = Math.max(gcx, Math.min(laererB + gb / 2 + 8, hoejre - gb / 2));
         lay.glas = Tg.glasMaal(gcx, lay.bordY, gb);
         lay.stang = { b: Math.max(10, gb * 0.13), l: gb * 1.2 * 1.3 };
         lay.topOppe = lay.glas.top - lay.stang.l - 14;
@@ -450,7 +458,8 @@
         this.lay = lay;
         var g = lay.glas;
         this.saetAnker("fu-anker-raekke", lay.raekke.x - 60, lay.raekke.y - 34, lay.raekke.b + 120, lay.raekke.h + 40);
-        this.saetAnker("fu-anker-glas", lay.stativ.x - 44, lay.topOppe - 30, g.x + g.b - lay.stativ.x + 50, lay.H - lay.topOppe + 30);
+        /* Stangen og glasset (uden stativets stang, som Kemichael staar foran) */
+        this.saetAnker("fu-anker-glas", g.x - 8, lay.topOppe - 30, g.b + 16, lay.H - lay.topOppe + 30);
         this.saetAnker("fu-anker-lup", lay.lup.cx - R - 4, lay.lup.cy - R - 4, 2 * R + 8, 2 * R + 8);
     };
 
@@ -486,7 +495,7 @@
                         this.boble -= 1;
                         var side = Math.random() < 0.5 ? -1 : 1;
                         this.bobler.push({
-                            x: lay.glas.cx + side * (lay.stang.b / 2 + 1.5), y: NK.r(y0, y1),
+                            x: lay.glas.cx + side * (lay.stang.b / 2 - Tg.taeretInd(lay.stang.b, this.gx / 0.75) + 1.5), y: NK.r(y0, y1),
                             r: NK.r(2, 4.4) * k * 2, vy: -NK.r(40, 75) * k * 2, a: 1
                         });
                     }
@@ -507,7 +516,9 @@
             this.info.tid -= dt;
             if (this.info.tid <= 0 || this.fase !== "gaet") this.info = null;
         }
+        /* Et klik paa glasset foer svaret: ja og nej blinker lidt */
         if (this.pegValg > 0) this.pegValg -= dt;
+        this.el.valg.classList.toggle("peg", this.pegValg > 0);
         if (this.ventRos > 0) {
             this.ventRos -= dt;
             if (this.ventRos <= 0 && this.laererReplik) this.laererReplik(D.ROS_FORUDSIG, true);
@@ -552,8 +563,10 @@
         var top = NK.lerp(lay.topOppe, lay.topNede, t);
         var st = lay.stativ;
         var stang = { x: g.cx, top: top, b: lay.stang.b, l: lay.stang.l, metal: m, px: NK.klamp(lay.px, 12, 14) };
-        if (this.reag && !this.r.gas && this.ned >= 1) {
-            stang.belaeg = { metal: i, x: this.gx / 0.75, fra: g.overflade, frø: Tg.frø(m + i) };
+        if (this.reag && this.ned >= 1) {
+            /* I syren bliver stangen tyndere; ellers saetter der sig et lag */
+            if (this.r.gas) stang.taeret = { x: this.gx / 0.75, fra: g.overflade };
+            else stang.belaeg = { metal: i, x: this.gx / 0.75, fra: g.overflade, frø: Tg.frø(m + i) };
         }
         var lag = Tg.oplLag(i, this.reag ? m : null, this.gx, this.r ? this.r.koef[0] / this.r.koef[1] : 0);
         var iGlasset = top + lay.stang.l > g.top;
@@ -572,6 +585,7 @@
         this.lup.tegn(ctx, lay.lup.cx, lay.lup.cy, lay.lup.R, { titel: titel });
 
         if (this.laererTegnOver) this.laererTegnOver(ctx);
+        if (this.laererTegnBoble) this.laererTegnBoble(ctx);
     };
 
     /* ----- Musen ------------------------------------------------------------------------------------- */
@@ -627,8 +641,6 @@
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
     NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-forudsig", tilbud: "fu-tilbud", spring: "fu-spring" });
-
-    P.pegPaaFelt = function (til) { this.el.valg.classList.toggle("peg", !!til || this.pegValg > 0); };
 
     NK.SimForudsig = SimForudsig;
 }());

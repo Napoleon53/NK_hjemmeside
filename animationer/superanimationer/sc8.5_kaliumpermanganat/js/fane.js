@@ -5,11 +5,12 @@
 
      * listen i panelet: stofferne som formler i grupper, med loest og
        stjerne (huskes i browseren)
-     * knappen i opgavekortet: Giv hint, Vis svaret, Naeste opgave
+     * knappen paa papiret i scenen: Giv hint, Vis svaret, Naeste opgave
      * linjen i opgavekortet: hvor man er, naeste skridt, fejl og ros
      * Kemichael ved katederet, der kun siger noget, naar eleven beder om
-       et hint eller svaret, og tier igen, naar trinnet er loest. Er han
-       sendt ud, staar hintet i opgavekortet i stedet.
+       et hint eller svaret (paa knappen eller med et klik paa ham), og
+       tier igen, naar trinnet er loest. Er han sendt ud, staar hintet i
+       opgavekortet i stedet.
      * musen i scenen: hold, traek og klik
 
    Fanen selv har: lavOpgave(nr), promptHTML(), trinInfo()
@@ -156,10 +157,14 @@
             this.visKnap();
         };
 
+        /* Knappen staar paa papiret i scenen (brugerens oenske 3. okt. 2026):
+           Giv hint og Vis svaret i papirets nederste hoejre hjoerne, Naeste
+           opgave midt i haeftet. Klassen siger hvilken; fanen placerer den
+           (knapVist). */
         P.visKnap = function () {
-            var tekst, klasse = "knap";
+            var tekst, klasse = "knap hf-knap hint";
             if (this.faerdig) {
-                klasse = "knap blaa banker";
+                klasse = "knap hf-knap naeste banker";
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) tekst = "Næste opgave →";
                 else if (valg.naesteFane) tekst = "Videre til " + valg.naesteNavn + " →";
@@ -167,12 +172,15 @@
             } else if (this.hjaelp === 0) {
                 tekst = "Giv hint";
             } else {
+                klasse = "knap hf-knap svar";
                 var info = this.trinInfo();
                 tekst = (info && info.svarNavn) || "Vis svaret";
             }
             this.el.knap.textContent = tekst;
             this.el.knap.className = klasse;
             this.el.knap.disabled = !!this.auto;
+            this.k.hoverTekst = this.faerdig ? "" : D.KLIK_HINT;
+            if (this.knapVist) this.knapVist();
         };
 
         P.naesteUloeste = function () {
@@ -208,6 +216,23 @@
             info.svar();
             this.visKnap();
             this.fokus();
+        };
+
+        /* Et klik paa Kemichael giver hintet til den bid, eleven er ved
+           (brugerens oenske 3. okt. 2026). Det er det samme som Giv hint.
+           Svaret giver han kun paa knappen, saa et klik paa ham aldrig
+           koster stjernen. Giver false, naar der ikke er noget at hjaelpe
+           med (opgaven er afstemt); saa svarer han som ellers paa et prik. */
+        P.hintFraLaerer = function () {
+            if (this.auto || this.faerdig) return false;
+            var info = this.trinInfo();
+            if (!info) return false;
+            if (this.hjaelp === 0) this.hjaelp = 1;
+            this.hjaelpVis("<b>Hint:</b> " + info.hint, "hint");
+            if (this.efterHint) this.efterHint();
+            this.visKnap();
+            this.fokus();
+            return true;
         };
 
         /* Et trin er loest: Kemichael tier (eller viser det svar, han blev bedt
@@ -382,6 +407,7 @@
             c.addEventListener("click", function (e) {
                 var pt = mig.L.punkt(e);
                 if (mig.slapNetop) { mig.slapNetop = false; return; }
+                if (mig.k.under(pt) === "laerer" && mig.hintFraLaerer()) return;
                 if (mig.k.klik(pt)) return;
                 if (mig.klikScene) mig.klikScene(pt);
                 mig.fokus();

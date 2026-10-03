@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb4.7 Spejlbilledeisomeri</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer: prioriteten for
+   alle par af grupper, at R og S regnet i rummet passer med det, man ser
+   på skærmen (med uret, når gruppe 4 peger væk), at R og S ikke ændrer
+   sig, når molekylet drejes, men skifter i et spejl og ved et bytte, at
+   der er 12 justeringer, og at et molekyle med fire forskellige grupper
+   højst kan få to til at passe med sit spejlbillede, de asymmetriske
+   C-atomer i alle 13 molekyler på fane 2 og grundene til de forkerte,
+   at alle opgaver kan løses selv og med Vis svaret, sproget og layoutet.
+
+   Iframen skal åbnes gennem en lokal server (molekylemotoren ligger to
+   mapper oppe). Testen gemmer elevens fremskridt og lægger det tilbage.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb4.7-sb", "nk-sb4.7-fi", "nk-sb4.7-rs"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|traek\w*|aendr\w*|vaelg|loest|saet|goere)\b/;
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kiral, R = NK.Rum, Q = R.Q;
+    var SB = NK.sims["fane-sb"], FI = NK.sims["fane-fi"], RS = NK.sims["fane-rs"];
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Prioriteten");
+    var RANG = ["I", "Br", "Cl", "F", "OH", "NH2", "COOH", "CHO", "CH2OH", "C2H5", "CH3", "H"];
+    var alle = Object.keys(D.G);
+    var orden = alle.slice().sort(function (a, b) { return K.sammenlign(b, a); });
+    paastand("rækkefølgen er I > Br > Cl > F > OH > NH₂ > COOH > CHO > CH₂OH > CH₂CH₃ > CH₃ > H", orden.join(",") === RANG.join(","), orden.join(","));
+    var sym = true;
+    alle.forEach(function (a) { alle.forEach(function (b) {
+        if (Math.sign(K.sammenlign(a, b)) !== -Math.sign(K.sammenlign(b, a))) sym = false;
+        if ((K.sammenlign(a, b) === 0) !== (a === b)) sym = false;
+    }); });
+    paastand("sammenligningen er symmetrisk, og kun ens grupper står lige", sym);
+    var m = D.MOL.maelk.g;
+    paastand("mælkesyre: OH, COOH, CH₃, H", K.raekkefoelge(m).map(function (i) { return m[i]; }).join(",") === "OH,COOH,CH3,H");
+    var gl = D.MOL.glycer.g;
+    paastand("glyceraldehyd: OH, CHO, CH₂OH, H", K.raekkefoelge(gl).map(function (i) { return gl[i]; }).join(",") === "OH,CHO,CH2OH,H");
+    paastand("forklaringen for CHO siger, at C=O tæller som to O", /to O/.test(K.hvorfor("CHO", "CH2OH")));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("R og S");
+    function tilfQ() { return Q.norm([Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1]); }
+    var skaerm = 0, drej = 0, spejl = 0, byt = 0;
+    var mols = ["chbrclf", "chbrcli", "but2ol", "clbut", "alanin", "maelk", "glycer"];
+    for (var n = 0; n < 300; n++) {
+        var g = D.MOL[mols[n % mols.length]].g.slice();
+        var q = tilfQ(), ret = R.retninger(q), rs = K.rs(g, ret);
+        /* Drej, saa 4 peger vaek, og se paa skaermen: med uret er R */
+        var o = K.raekkefoelge(g);
+        var v4 = ret[o[3]], akse = R.kryds(v4, [0, 0, 1]), vink = Math.acos(Math.max(-1, Math.min(1, v4[2])));
+        var q2 = Math.hypot(akse[0], akse[1], akse[2]) < 1e-6 ? q : Q.norm(Q.gange(Q.akse(akse, vink), q));
+        var ret2 = R.retninger(q2);
+        var kam = { cx: 0, cy: 0, s: 100, f: 8 };
+        var p = [0, 1, 2].map(function (k) { var v = ret2[o[k]]; return R.projekter([v[0] * 1.3, v[1] * 1.3, v[2] * 1.3], kam); });
+        var kr = (p[1].x - p[0].x) * (p[2].y - p[1].y) - (p[1].y - p[0].y) * (p[2].x - p[1].x);
+        if ((kr > 0 ? "R" : "S") !== rs) skaerm++;
+        if (K.rs(g, ret2) !== rs) drej++;
+        if (K.rs(g, ret.map(R.spejl)) === rs) spejl++;
+        var g2 = g.slice(); var t = g2[0]; g2[0] = g2[3]; g2[3] = t;
+        if (K.rs(g2, ret) === rs) byt++;
+    }
+    paastand("R er med uret på skærmen, når 4 peger væk (300 tilfældige)", skaerm === 0, skaerm);
+    paastand("R og S ændrer sig ikke, når molekylet drejes", drej === 0, drej);
+    paastand("spejlbilledet har det modsatte bogstav", spejl === 0, spejl);
+    paastand("et bytte af to grupper giver det modsatte bogstav", byt === 0, byt);
+    paastand("et molekyle med to ens grupper har hverken R eller S", K.rs(D.MOL.prop2ol.g, R.BASIS) === null);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Spejlbilledet");
+    var just = R.justeringer(R.BASIS, R.BASIS.map(function (b) { return R.spejl(Q.drej(Q.akse([1, 2, 3], 0.7), b)); }));
+    paastand("der er 12 drejninger, der lægger molekylet oven i spejlbilledet", just.length === 12, just.length);
+    D.SPEJL.forEach(function (o, i) {
+        SB.vaelg(i);
+        var j = SB.justeringer();
+        var maks = Math.max.apply(null, j.map(function (x) { return SB.antalMatch(x.perm); }));
+        var forvent = o.byt ? 2 : (o.kan ? 4 : 2);
+        paastand(o.navn + (o.byt ? " (før byttet)" : "") + ": højst " + forvent + " grupper kan passe", maks === forvent, maks);
+        var start = SB.bedsteJustering(false);
+        paastand(o.navn + ": passer ikke fra start", start.v > 0.5 && SB.antalMatch(start.perm) < 4, start.v.toFixed(2));
+    });
+    SB.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    SB.vaelg(0);
+    SB.umuligt();
+    paastand("bromchlormethan: Det kan ikke lade sig gøre er forkert", !SB.faerdig && SB.el.status.classList.contains("skidt"));
+    var bj = SB.bedsteJustering(true);
+    SB.q = bj.q;
+    SB.vurder(bj);
+    paastand("bromchlormethan: drejet på plads løser opgaven med stjerne", SB.faerdig && SB.status[0].stjerne);
+    SB.vaelg(1);
+    var j2 = SB.bedsteJustering(false);
+    SB.q = j2.q; SB.vurder(j2);
+    paastand("bromchlorfluormethan: 2 af 4 og en gul linje", SB.antalMatch() === 2 && SB.el.status.classList.contains("gul") && !SB.faerdig);
+    SB.umuligt();
+    paastand("bromchlorfluormethan: Det kan ikke lade sig gøre løser opgaven", SB.faerdig && /enantiomerer/.test(SB.beskedTekst()));
+    SB.vaelg(2);
+    SB.umuligt();
+    paastand("opgave 3 før byttet: kan godt lade sig gøre", !SB.faerdig && /Byt først/.test(SB.beskedTekst()));
+    SB.klikPaa = SB.klikPaa;  /* klik paa to grupper bytter dem */
+    SB.byt(1, 2);
+    var j3 = SB.bedsteJustering(true);
+    paastand("opgave 3 efter byttet: alle fire kan passe", !!j3);
+    SB.q = j3.q; SB.vurder(j3);
+    paastand("opgave 3: drejet på plads løser opgaven", SB.faerdig);
+    SB.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var sbSvar = true, sbTre = true;
+    D.SPEJL.forEach(function (o, i) {
+        SB.vaelg(i);
+        if (SB.hintTrin().length !== 3) sbTre = false;
+        for (var k = 0; k < 6 && !SB.faerdig; k++) SB.knap();
+        for (var f = 0; f < 900 && !SB.faerdig; f++) SB.opdater(1 / 60);
+        if (!SB.faerdig || SB.status[i].stjerne) sbSvar = false;
+    });
+    paastand("hinttrapperne har tre trin", sbTre);
+    paastand("Vis svaret løser alle seks uden stjerne", sbSvar);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Find C-atomet");
+    NK.visFane("fane-fi");
+    D.FIND.forEach(function (o, i) {
+        paastand(o.visNavn + ": " + o.antal + " asymmetrisk" + (o.antal === 1 ? "" : "e"), FI.molekyler[i].asym.length === o.antal, FI.molekyler[i].asym.length);
+    });
+    function cMedNabo(mol, el) {
+        return mol.atomer.filter(function (a) { return a.el === "C" && mol.naboer(a.id).some(function (n) { return mol.atom(n).el === el; }); }).map(function (a) { return a.id; });
+    }
+    var bu = FI.molekyler[0].mol;
+    paastand("butan-2-ol: det asymmetriske C-atom er det med OH", FI.molekyler[0].asym[0] === cMedNabo(bu, "O")[0]);
+    var gt = K.grupperTekst(bu, FI.molekyler[0].asym[0]);
+    paastand("butan-2-ol: grupperne er H, CH₃, OH og CH₂CH₃", ["H", "CH₃", "OH", "CH₂CH₃"].every(function (x) { return gt.indexOf(x) >= 0; }), gt);
+    var pr = FI.molekyler[1].mol;
+    paastand("propan-2-ol: to ens grupper, CH₃ og CH₃", /to ens grupper: CH₃ og CH₃/.test(K.grund(pr, cMedNabo(pr, "O")[0])));
+    var bn = FI.molekyler[6].mol;
+    paastand("butanon: C=O-atomet har en dobbeltbinding", /dobbeltbinding/.test(K.grund(bn, cMedNabo(bn, "O")[0])));
+    var ende = bu.atomer.filter(function (a) { return a.el === "C" && bu.naboer(a.id).length === 1; })[0].id;
+    paastand("en CH₃ for enden har tre H", /tre H/.test(K.grund(bu, ende)));
+    var ci = FI.molekyler[11].mol;
+    var midt = ci.atomer.filter(function (a) { return a.el === "C" && ci.naboer(a.id).length === 4; })[0].id;
+    paastand("citronsyre: to ens grupper, CH₂COOH og CH₂COOH", /CH₂COOH og CH₂COOH/.test(K.grund(ci, midt)), K.grund(ci, midt));
+    var ib = FI.molekyler[12].mol;
+    var ibt = K.grupperTekst(ib, FI.molekyler[12].asym[0]);
+    paastand("ibuprofen: H, CH₃, COOH og en gren med en ring", /COOH/.test(ibt) && /CH₃/.test(ibt) && /ring/.test(ibt), ibt);
+    paastand("3-methylpentan: midten har to ens grupper, CH₂CH₃", /CH₂CH₃ og CH₂CH₃/.test(K.grund(FI.molekyler[8].mol, FI.molekyler[8].mol.atomer.filter(function (a) { return FI.molekyler[8].mol.naboer(a.id).length === 3; })[0].id)));
+
+    FI.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var fiSelv = true, fiTre = true;
+    D.FIND.forEach(function (o, i) {
+        FI.vaelg(i);
+        if (FI.hintTrin().length !== 3) fiTre = false;
+        if (FI.mm.asym.length) { FI.mm.asym.forEach(function (id) { FI.marker[id] = true; }); FI.tjek(); }
+        else FI.intet();
+        if (!FI.faerdig || !FI.status[i].stjerne) fiSelv = false;
+    });
+    paastand("alle 13 kan løses selv og giver stjerne", fiSelv);
+    paastand("hinttrapperne har tre trin", fiTre);
+    FI.vaelg(10);
+    FI.marker[FI.mm.asym[0]] = true;
+    FI.tjek();
+    paastand("vinsyre med én stjerne: der er et mere", !FI.faerdig && /mere/.test(FI.beskedTekst()));
+    FI.vaelg(1);
+    FI.intet();
+    paastand("propan-2-ol: Intet asymmetrisk C-atom løser opgaven", FI.faerdig);
+    FI.vaelg(0);
+    FI.intet();
+    paastand("butan-2-ol: Intet er forkert", !FI.faerdig && FI.el.status.classList.contains("skidt"));
+    FI.knap(); FI.knap();
+    paastand("hint 2 viser alle H", FI.visH);
+    FI.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var fiSvar = true;
+    D.FIND.forEach(function (o, i) {
+        FI.vaelg(i);
+        for (var k = 0; k < 6 && !FI.faerdig; k++) FI.knap();
+        if (!FI.faerdig || FI.status[i].stjerne) fiSvar = false;
+    });
+    paastand("Vis svaret løser alle 13 uden stjerne", fiSvar);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("R eller S");
+    NK.visFane("fane-rs");
+    RS.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var rsSelv = true, begge = true, startVaek = 0;
+    D.RS.forEach(function (o, i) {
+        ["R", "S"].forEach(function (vil) {
+            RS.vaelg(i);
+            RS.lavOpgave(i, vil);
+            RS.visKort();
+            if (RS.facit() !== vil) begge = false;
+            if (R.retninger(RS.q)[RS.orden[3]][2] > 0.5) startVaek++;
+            RS.orden.forEach(function (slot) { RS.giv(slot); });
+            RS.maalQ = RS.vaekDrejning();
+            for (var f = 0; f < 300 && RS.maalQ; f++) RS.opdater(1 / 60);
+            if (!RS.drejOK) rsSelv = false;
+            RS.svarRS(vil);
+            if (!RS.faerdig) rsSelv = false;
+            RS.status[i].loest = false;
+        });
+    });
+    paastand("alle syv molekyler findes både som R og S", begge);
+    paastand("ingen starter med gruppe 4 vendt væk", startVaek === 0, startVaek);
+    paastand("nummer, drej og svar løser alle 14", rsSelv);
+    RS.vaelg(4);
+    RS.lavOpgave(4, "R");
+    RS.giv(RS.orden[1]);
+    paastand("et forkert nummer giver en rød linje", RS.el.status.classList.contains("skidt") && RS.naesteTal === 1);
+    RS.giv(RS.orden[0]); RS.giv(RS.orden[1]); RS.giv(RS.orden[2]);
+    paastand("efter tre numre får den sidste nummer 4 af sig selv", RS.tal[RS.orden[3]] === 4 && RS.trinNu() === "drej");
+    RS.svarRS("S");
+    paastand("forkert svar før drejningen beder om at dreje", !RS.faerdig && /Drej|mod dig/.test(RS.beskedTekst()), RS.beskedTekst());
+    RS.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    var rsSvar = true, rsTre = true;
+    D.RS.forEach(function (o, i) {
+        RS.vaelg(i);
+        for (var k = 0; k < 30 && !RS.faerdig; k++) {
+            if (RS.hintTrin().length !== 3) rsTre = false;
+            RS.knap();
+            for (var f = 0; f < 400 && RS.maalQ; f++) RS.opdater(1 / 60);
+        }
+        if (!RS.faerdig || RS.status[i].stjerne) rsSvar = false;
+    });
+    paastand("hinttrapperne har tre trin i hvert trin", rsTre);
+    paastand("Vis svaret fører alle syv igennem uden stjerne", rsSvar);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Sproget");
+    var tekster = [];
+    (function saml(x) {
+        if (typeof x === "string") tekster.push(x);
+        else if (Array.isArray(x)) x.forEach(saml);
+        else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
+    })(D);
+    alle.forEach(function (a) { alle.forEach(function (b) { tekster.push(K.hvorfor(a, b)); }); });
+    [SB, FI, RS].forEach(function (S) {
+        S.opgaver.forEach(function (o, i) { S.vaelg(i); tekster.push(S.promptHTML(), S.trinLinje()); S.hintTrin().forEach(function (t) { tekster.push(t); }); });
+    });
+    FI.molekyler.forEach(function (mm) { mm.mol.atomer.forEach(function (a) { var gr = K.grund(mm.mol, a.id); if (gr) tekster.push(gr); }); });
+    tekster.push(d.body.innerText);
+    var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger", !tanke.length, tanke[0]);
+    var ascii = tekster.filter(function (t) { return ASCII_ORD.test(t); });
+    paastand("ingen ord stavet uden æ, ø og å", !ascii.length, ascii[0]);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Layoutet");
+    var ramme = document.getElementById("ramme");
+    [[1100, 700], [1300, 820], [1600, 950]].forEach(function (mm) {
+        ramme.style.width = mm[0] + "px";
+        ramme.style.height = mm[1] + "px";
+        ["fane-sb", "fane-fi", "fane-rs"].forEach(function (f) {
+            NK.visFane(f);
+            var sim = NK.sims[f];
+            sim.tilpas();
+            sim.layout();
+            var valg = d.querySelector("#" + f + " .scene-valg");
+            var status = d.querySelector("#" + f + " .statuslinje");
+            var rv = valg.getBoundingClientRect(), rst = status.getBoundingClientRect();
+            paastand(mm[0] + " × " + mm[1] + " " + f + ": knapperne står over statuslinjen", rv.bottom <= rst.top + 1);
+            var panel = d.querySelector("#" + f + " .panel");
+            paastand(mm[0] + " × " + mm[1] + " " + f + ": panelet har plads uden at rulle", panel.scrollHeight <= panel.clientHeight + 2);
+        });
+    });
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+    var smaa = [];
+    d.querySelectorAll(".panel *, .statuslinje *, .scene-valg *").forEach(function (e) {
+        if (!e.offsetWidth) return;
+        var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+        if (egen && parseFloat(W.getComputedStyle(e).fontSize) < 11.5) smaa.push(e.textContent.trim().slice(0, 30));
+    });
+    paastand("ingen tekst under 12 px", !smaa.length, smaa.join(" | "));
+    NK.visFane("fane-sb");
+}
+</script>
+</body>
+</html>

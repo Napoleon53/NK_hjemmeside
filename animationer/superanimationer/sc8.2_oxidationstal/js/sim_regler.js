@@ -2,19 +2,26 @@
    sim_regler.js - fane 1: reglerne
 
    Tavlen, oppefra:
-     * trinene (Ladningen, O, H, det ukendte) og en forklaring til det
-       trin, eleven er ved. Forklaringen staar paa tavlen, hvor der
-       arbejdes; linjen i opgavekortet siger kun kort, hvad der skal skrives,
-       og hvad der gik galt.
-     * formlen med et felt over atomerne. Oxidationstallet over atomet
+     * opgaven paa én linje (Find oxidationstallet for C i CO₂) og, for de
+       seks foerste, trinene som smaa maerker (Ladningen, O, H, det ukendte).
+     * formlen. Over det atom, der spoerges til, staar et gult ?, og det,
+       eleven skriver, ses der med det samme. Oxidationstallet over atomet
        skrives med romertal.
-     * regnestykket: summen af oxidationstallene = ladningen. Det starter
-       med ord og ladningens felt, og atomerne kommer ind, naar ladningen er
-       fundet, saa eleven ikke kastes ud i en halv beregning (brugerens
-       foerste test, 26. sept. 2026). Mellemregningerne bruger almindelige
-       tal, (−2) og (+1).
+     * arbejdsfeltet: spoergsmaalet til det trin, eleven er ved (Hvilken
+       ladning har CO₂?), feltet, Tjek og Giv hint lige ved siden af, og
+       under dem linjen med fejl, hint og ros. Alt, eleven skal laese og
+       trykke paa, staar her (brugerens test 3. okt. 2026: mindre tekst,
+       tydeligt at det er ladningen, hintknappen ved feltet, ingen
+       ordretekst i panelet).
+     * regnestykket: summen af oxidationstallene = ladningen. Det kommer
+       frem, naar ladningen er fundet, saa eleven ikke kastes ud i en halv
+       beregning (brugerens foerste test, 26. sept. 2026).
+       Mellemregningerne bruger almindelige tal, (−2) og (+1).
      * naar opgaven er loest: den paene beregning, hvor det ukendte isoleres.
      * atomerne én for én som brikker, naar det foerste tal kendes.
+
+   Pladsen til regnestykket, beregningen og brikkerne er sat af fra
+   starten, saa arbejdsfeltet ikke flytter sig, mens der skrives.
 
    De seks foerste stoffer gaas igennem trin for trin som i c8.2:
    ladningen, O, H og til sidst det ukendte. De 25 oevestoffer spoerger
@@ -31,8 +38,7 @@
     var D = NK.Data;
     var O = NK.Ox;
 
-    /* Tavlen bygges forfra for hvert stof, saa den faelles cache i
-       NK.saetHTML kan ikke bruges her: elementet husker selv sin tekst */
+    /* Elementet husker selv sin tekst, saa DOM'en kun roeres, naar den skifter */
     function saet(e, html) {
         if (!e || e._html === html) return;
         e.innerHTML = html;
@@ -43,8 +49,14 @@
 
     function SimRegler() {
         this.tavle = NK.el("rg-tavle");
+        this.stak = NK.el("rg-stak");
+        this.formelEl = NK.el("rg-formel");
+        this.trinEl = NK.el("rg-trin");
+        this.regnEl = NK.el("rg-regn");
+        this.isolEl = NK.el("rg-isol");
+        this.brikkerEl = NK.el("rg-brikker");
+        this.bygFelt();
         this.startFane(D.REGLER, D.GRUPPER_RG);
-        this.introNu = true;
         this.vaelg(0);
     }
 
@@ -52,6 +64,30 @@
     NK.Fane.paa(P, { navn: "rg", naesteFane: "fane-ek", naesteNavn: "Elektronerne" });
 
     P.chipTekst = function (o) { return NK.formel(o.f) + NK.ladningHaevet(o.q); };
+
+    /* Feltets ramme i arbejdsfeltet: det aktive felt og knappen Tjek */
+    P.bygFelt = function () {
+        var mig = this;
+        var boks = document.createElement("div");
+        boks.className = "arb-felt";
+        var plads = document.createElement("span");
+        plads.className = "arb-inp";
+        var ok = document.createElement("button");
+        ok.type = "button";
+        ok.className = "felt-ok";
+        ok.textContent = "Tjek";
+        ok.title = "Tjek (Enter)";
+        ok.addEventListener("click", function () {
+            var k = mig.aktivt();
+            if (k && !mig.faerdig) mig.tjek(k);
+            mig.fokus();
+        });
+        boks.appendChild(plads);
+        boks.appendChild(ok);
+        NK.el("rg-felter").appendChild(boks);
+        this.feltBoks = boks;
+        this.feltPlads = plads;
+    };
 
     /* ----- Opgaven ------------------------------------------------------------- */
     P.lavOpgave = function (i) {
@@ -69,7 +105,8 @@
             svar: {},      /* bekraeftede tal */
             vist: {},      /* tal fra Vis svaret */
             graa: {},      /* O og H, som hintet har sat ind */
-            visRegn: o.gruppe === "trin"
+            visRegn: o.gruppe === "trin",
+            visLad: false  /* hintet til ladningen peger paa pladsen efter formlen */
         };
         this.bygTavle();
     };
@@ -77,40 +114,27 @@
     P.aktivt = function () { return this.opg.trin[this.opg.nr]; };
     P.opgaveFaerdig = function () { return this.opg.nr >= this.opg.trin.length; };
 
-    P.promptHTML = function () {
+    /* Spoergsmaalet i arbejdsfeltet til det trin, eleven er ved */
+    P.spmTekst = function (k) {
         var st = this.opg.st;
-        return '<p class="maal-tekst">Find oxidationstallet for ' + st.X + " i " + st.tekst +
-            (this.opg.trinvis ? ", trin for trin." : ".") + "</p>";
+        if (k === "ladning") return "Hvilken ladning har " + st.tekst + "?";
+        var s = k === "X" ? st.X : k, n = k === "X" ? st.nX : (k === "O" ? st.nO : st.nH);
+        return "Hvilket oxidationstal har " + (n > 1 ? "hvert " : "") + s + "?";
     };
 
-    /* Linjen i opgavekortet: kort, hvad der skal skrives. Forklaringen
-       staar paa tavlen. */
     P.trinLinje = function () {
-        var k = this.aktivt(), st = this.opg.st;
-        if (k === "ladning") return "Skriv ladningen i det gule felt på tavlen, og tryk Enter.";
-        if (k === "O" || k === "H") return "Skriv oxidationstallet for " + k + " i det gule felt, og tryk Enter.";
-        if (k === "X") return "Skriv oxidationstallet for " + st.X + " i det gule felt, og tryk Enter.";
-        return "";
+        var k = this.aktivt();
+        return k ? this.spmTekst(k) : "";
     };
 
-    /* Forklaringen paa tavlen til det trin, eleven er ved */
-    P.trinTekst = function (k) {
-        var st = this.opg.st, X = st.X;
-        if (k === "ladning") {
-            return "Oxidationstallene i et stof giver tilsammen stoffets ladning. Start derfor med ladningen på hele " +
-                st.tekst + ". Den står som det lille tal og tegn efter formlen. Står der intet, er den 0.";
+    P.visSpm = function () {
+        var st = this.opg.st, e = this.el.spm;
+        if (this.opgaveFaerdig()) {
+            saet(e, '<span class="arb-ok">✓</span> ' + NK.html(st.X + " har oxidationstallet ") + "<b>" + O.ox(st.ox) + "</b>" +
+                NK.html(" i " + st.tekst + "."));
+            return;
         }
-        if (k === "O") return "Nu O. Oxygen har næsten altid det samme oxidationstal. Skriv det for ét O-atom i feltet over O.";
-        if (k === "H") return "Nu H. Hydrogen har næsten altid det samme oxidationstal. Skriv det for ét H-atom i feltet over H.";
-        if (k === "X" && this.opg.trinvis) {
-            return "Nu mangler kun " + X + ". Find det tal, der får regnestykket til at gå op, og skriv det i feltet over " + X + "." +
-                (st.nX > 1 ? " Der er " + st.nX + " " + X + ", så find først, hvad de giver tilsammen, og del så med " + st.nX + "." : "");
-        }
-        if (k === "X") {
-            return "Find oxidationstallet for " + X + ", og skriv det i feltet over " + X + ". Oxidationstallene skal tilsammen give " +
-                (st.q ? "ionens ladning, " + O.lad(st.q) : "0, for stoffet er neutralt") + ".";
-        }
-        return "";
+        saet(e, NK.html(this.spmTekst(this.aktivt())));
     };
 
     /* ----- Hjaelpen: Giv hint og Vis svaret ------------------------------------------ */
@@ -127,8 +151,8 @@
     P.hint = function (k) {
         var st = this.opg.st, X = st.X;
         if (k === "ladning") {
-            if (!st.q) return "Se efter formlen: der står intet tal og tegn efter " + st.tekst + ".";
-            return "Se efter formlen: der står " + NK.ladningHaevet(st.q) + "." +
+            if (!st.q) return "Ladningen står som et lille tal og tegn efter formlen. Efter " + st.tekst + " står der ingenting.";
+            return "Ladningen står som et lille tal og tegn efter formlen. Her står " + NK.ladningHaevet(st.q) + "." +
                 (Math.abs(st.q) === 1 ? " Et tegn uden tal betyder 1." : " Tallet er størrelsen, og tegnet er fortegnet.");
         }
         if (k === "O") return "O har næsten altid oxidationstallet −II.";
@@ -151,9 +175,11 @@
         return O.beregning(st);
     };
 
-    /* Hintet paa et oevestof saetter O og H ind med graat og viser regnestykket */
+    /* Hintet til ladningen peger paa pladsen efter formlen. Hintet paa et
+       oevestof saetter O og H ind med graat og viser regnestykket. */
     P.efterHint = function () {
         var g = this.opg;
+        if (this.aktivt() === "ladning") { g.visLad = true; this.visTavle(); return; }
         if (g.trinvis || this.aktivt() !== "X") return;
         if (g.st.nO) g.graa.O = -2;
         if (g.st.nH) g.graa.H = 1;
@@ -166,15 +192,15 @@
         if (k !== this.aktivt() || this.faerdig) return;
         var inp = this.felter[k], st = this.opg.st;
         var v = k === "ladning" ? O.laesLadning(inp.value) : O.laesOx(inp.value);
-        if (v === null) { this.ryst(inp); this.fejlLinje("Skriv et tal i det gule felt først."); return; }
+        if (v === null) { this.ryst(); this.fejlLinje("Skriv et tal i feltet først."); return; }
         if (isNaN(v)) {
-            this.ryst(inp);
+            this.ryst();
             this.fejlLinje(k === "ladning" ? "Skriv ladningen som et tal med fortegn, fx −2, +1 eller 0." :
                 "Skriv et oxidationstal, fx −II, +V eller 0. Du kan også skrive −2 eller +5.");
             return;
         }
         if (Math.abs(v - O.facit(st, k)) < 1e-9) { this.bekraeft(k, v, "selv"); return; }
-        this.ryst(inp);
+        this.ryst();
         this.fejlLinje(O.fejl(st, k, v));
     };
 
@@ -191,100 +217,76 @@
             if (g.st.nH && g.svar.H === undefined) g.graa.H = 1;
         }
         this.visTavle();
-        this.trinLoest(maade, maade === "svar" ? NK.html(this.svarTekst(k)) : "");
+        /* Svaret paa det sidste trin i et sammensat stof staar som den paene
+           beregning paa tavlen, saa det skrives ikke én gang til i linjen */
+        var svar = "";
+        if (maade === "svar" && !(k === "X" && g.st.slags === "sammensat")) svar = NK.html(this.svarTekst(k));
+        /* Rosen siger, hvad der var rigtigt: spoergsmaalet er allerede det naeste */
+        var ros = k === "ladning" ? "Rigtigt. Ladningen er " + O.lad(v) + "." :
+            "Rigtigt. " + (k === "X" ? g.st.X : k) + " er " + O.ox(v) + ".";
+        this.trinLoest(maade, svar, NK.html(ros));
     };
 
-    P.slutLinje = function () {
-        var g = this.opg, st = g.st;
-        return NK.html(st.X + " er " + O.ox(st.ox) + " i " + st.tekst + "." + (g.o.note ? " " + g.o.note : ""));
+    P.slutLinje = function (maade) {
+        var g = this.opg, dele = [];
+        if (maade === "svar" && g.st.slags === "sammensat") dele.push("Beregningen står herunder.");
+        if (g.o.note) dele.push(g.o.note);
+        return NK.html(dele.join(" "));
     };
 
     P.efterOpgave = function () { this.visTavle(); };
 
-    P.ryst = function (inp) {
-        var f = inp.parentNode;
+    P.ryst = function () {
+        var f = this.feltBoks;
         f.classList.remove("fejl");
         void f.offsetWidth;
         f.classList.add("fejl");
     };
 
     /* ----- Tavlen ------------------------------------------------------------------ */
-    function div(klasse, id) {
-        var e = document.createElement("div");
+    function span(klasse, tekst) {
+        var e = document.createElement("span");
         e.className = klasse;
-        if (id) e.id = id;
+        if (tekst !== undefined) e.textContent = tekst;
         return e;
     }
 
     P.bygTavle = function () {
         var mig = this, g = this.opg, st = g.st;
-        var t = this.tavle;
-        t.innerHTML = "";
-        t.classList.remove("faerdig");
+        this.tavle.classList.remove("faerdig");
+        NK.el("rg-maal").textContent = "Find oxidationstallet for " + st.X + " i " + st.tekst;
+        NK.el("rg-navn").textContent = g.o.navn;
 
-        var navn = div("tv-navn");
-        navn.textContent = g.o.navn;
-        t.appendChild(navn);
-
-        /* Trinene og forklaringen */
-        var trin = div("tv-trin", "rg-trin");
-        trin.innerHTML = '<div class="tv-chips"></div><p class="tv-trintekst"></p>';
-        t.appendChild(trin);
-        this.trinEl = trin;
-
-        /* Formlen: feltet staar over selve symbolet; indekstallet og
-           ladningen staar ved siden af, saa feltet ikke rykker skaevt */
-        var formel = div("tv-formel");
+        /* Formlen: tallet staar over selve symbolet; indekstallet og
+           ladningen staar ved siden af, saa tallet ikke rykker skaevt.
+           Ladningens plads findes ogsaa i et neutralt stof (tom), saa
+           hintet kan pege paa den. */
+        var formel = this.formelEl;
+        formel.innerHTML = "";
         this.slots = {};
+        this.kols = {};
         st.atomer.forEach(function (a, i) {
-            var atom = document.createElement("span");
-            atom.className = "tv-atom";
-            var kol = document.createElement("span");
-            kol.className = "tv-kol";
-            var over = document.createElement("span");
-            over.className = "tv-over";
-            var sym = document.createElement("span");
-            sym.className = "tv-sym";
-            sym.textContent = a.s;
+            var atom = span("tv-atom"), kol = span("tv-kol"), over = span("tv-over");
             kol.appendChild(over);
-            kol.appendChild(sym);
+            kol.appendChild(span("tv-sym", a.s));
             atom.appendChild(kol);
-            var idx = (a.n > 1 ? NK.saenket(a.n) : "") + (i === st.atomer.length - 1 ? NK.ladningHaevet(st.q) : "");
-            if (idx) {
-                var ix = document.createElement("span");
-                ix.className = "tv-idx";
-                ix.textContent = idx;
-                atom.appendChild(ix);
-            }
+            if (a.n > 1) atom.appendChild(span("tv-idx", NK.saenket(a.n)));
+            if (i === st.atomer.length - 1) atom.appendChild(span("tv-lad" + (st.q ? "" : " tom"), NK.ladningHaevet(st.q)));
             formel.appendChild(atom);
             mig.slots[a.k] = over;
+            mig.kols[a.k] = kol;
         });
-        t.appendChild(formel);
+        this.slots.ladning = this.regnEl.querySelector(".tv-q");
 
-        /* Regnestykket: venstresiden, lighedstegnet og ladningen, med en
-           lille tekst under hver side */
-        var regn = div("tv-regn", "rg-regn");
-        regn.innerHTML = '<span class="tv-led"></span><span class="tv-lig">=</span><span class="tv-q"></span>' +
-            '<span class="tv-cap venstre"></span><span></span><span class="tv-cap hoejre">ladningen</span>';
-        t.appendChild(regn);
-        this.regnEl = regn;
-        this.slots.ladning = regn.querySelector(".tv-q");
+        /* Pladsen til den paene beregning, naar opgaven er loest */
+        var linjer = st.slags === "ion" ? 0 : O.isolering(st).slice(1).length;
+        this.isolEl.style.minHeight = (linjer * 1.3) + "em";
 
-        /* Den paene beregning, naar opgaven er loest */
-        var isol = div("tv-isol", "rg-isol");
-        t.appendChild(isol);
-        this.isolEl = isol;
-
-        /* Atomerne én for én */
-        var brikker = div("tv-brikker", "rg-brikker");
-        t.appendChild(brikker);
-        this.brikkerEl = brikker;
-
-        /* Felterne: ét pr. trin, de bliver, mens der skrives */
+        /* Felterne: ét pr. trin. Det aktive staar i arbejdsfeltet. */
         this.felter = {};
+        this.feltPlads.innerHTML = "";
+        this.feltBoks.classList.remove("fejl");
         g.trin.forEach(function (k) {
-            var f = document.createElement("span");
-            f.className = "tv-felt" + (k === "ladning" ? " q" : "");
             var inp = document.createElement("input");
             inp.type = "text";
             inp.className = "oxfelt";
@@ -295,11 +297,11 @@
                 if (e.key === "Enter") { e.preventDefault(); mig.tjek(k); }
             });
             inp.addEventListener("input", function () {
-                f.classList.remove("fejl");
+                mig.feltBoks.classList.remove("fejl");
                 mig.k.skriver();
+                mig.visOver();
                 mig.visRegn();
             });
-            f.appendChild(inp);
             mig.felter[k] = inp;
         });
         this.visTavle();
@@ -315,21 +317,16 @@
     };
 
     P.visTavle = function () {
-        var mig = this, g = this.opg, aktiv = this.faerdig ? null : this.aktivt();
-        Object.keys(this.slots).forEach(function (k) {
-            var slot = mig.slots[k], v = mig.vaerdi(k);
-            var felt = mig.felter[k] ? mig.felter[k].parentNode : null;
-            if (k === aktiv && felt) {
-                if (felt.parentNode !== slot) { slot.innerHTML = ""; slot.appendChild(felt); }
-                felt.classList.add("aktiv");
-                return;
-            }
-            if (felt && felt.parentNode === slot) slot.removeChild(felt);
-            if (!v) { slot.innerHTML = k === "ladning" ? '<span class="tv-ox tom">?</span>' : ""; return; }
-            /* Over atomet med romertal, efter lighedstegnet som ladning */
-            var tekst = k === "ladning" ? O.lad(v.v) : O.ox(v.v);
-            slot.innerHTML = '<span class="tv-ox ' + v.slags + '">' + tekst + "</span>";
-        });
+        var g = this.opg, aktiv = this.faerdig || this.opgaveFaerdig() ? null : this.aktivt();
+        /* Det aktive felt staar i arbejdsfeltet */
+        var inp = aktiv ? this.felter[aktiv] : null;
+        if (inp && inp.parentNode !== this.feltPlads) {
+            this.feltPlads.innerHTML = "";
+            this.feltPlads.appendChild(inp);
+        }
+        this.feltBoks.hidden = !inp;
+        this.formelEl.classList.toggle("vis-lad", aktiv === "ladning" && g.visLad);
+        this.visOver();
         this.visTrin();
         this.visRegn();
         this.visIsol();
@@ -337,7 +334,28 @@
         this.tavle.classList.toggle("faerdig", !!this.faerdig);
     };
 
-    /* Trinene som smaa maerker og forklaringen til det aktive */
+    /* Tallene over atomerne og ladningen efter lighedstegnet. Over det
+       atom, der spoerges til, staar et gult ?, og mens eleven skriver,
+       staar elevens eget tal der (med romertal). */
+    P.visOver = function () {
+        var mig = this, aktiv = this.faerdig || this.opgaveFaerdig() ? null : this.aktivt();
+        Object.keys(this.slots).forEach(function (k) {
+            var slot = mig.slots[k], v = mig.vaerdi(k);
+            if (k === "ladning") {
+                saet(slot, v ? '<span class="tv-ox ' + v.slags + '">' + O.lad(v.v) + "</span>" : "");
+                return;
+            }
+            if (mig.kols[k]) mig.kols[k].classList.toggle("aktiv", k === aktiv);
+            if (k === aktiv) {
+                var p = O.laesOx(mig.felter[k].value);
+                saet(slot, p !== null && !isNaN(p) ? '<span class="tv-ox vent">' + O.ox(p) + "</span>" : '<span class="tv-ox spm">?</span>');
+                return;
+            }
+            saet(slot, v ? '<span class="tv-ox ' + v.slags + '">' + O.ox(v.v) + "</span>" : "");
+        });
+    };
+
+    /* Trinene som smaa maerker */
     P.visTrin = function () {
         var g = this.opg, st = g.st, aktiv = this.opgaveFaerdig() ? null : this.aktivt();
         var chips = "";
@@ -348,45 +366,35 @@
                     (i < g.nr ? " ✓" : "") + "</span>";
             }).join('<span class="tv-pil">›</span>');
         }
-        saet(this.trinEl.querySelector(".tv-chips"), chips);
-        var tekst = aktiv ? this.trinTekst(aktiv) : "";
-        saet(this.trinEl.querySelector(".tv-trintekst"), NK.html(tekst));
-        this.trinEl.classList.toggle("tom", !chips && !tekst);
+        saet(this.trinEl, chips);
     };
 
-    /* Regnestykket med det, eleven har fundet eller er ved at skrive.
-       Foer ladningen er fundet, staar venstresiden med ord. */
+    /* Regnestykket med det, eleven har fundet eller er ved at skrive. Det
+       kommer frem, naar ladningen er fundet. */
     P.visRegn = function () {
         var mig = this, g = this.opg, st = g.st, aktiv = this.faerdig ? null : this.aktivt();
-        this.regnEl.hidden = !g.visRegn;
-        var ord = g.trinvis && this.vaerdi("ladning") === null;
-        var led;
-        if (ord) led = '<span class="rv ord">summen af oxidationstallene</span>';
-        else {
-            /* Det ukendte bliver staaende som symbol, naar det er fundet: saa
-               staar regnestykket over den paene beregning, der isolerer det */
-            led = st.atomer.map(function (a) {
-                var v = a.k === "X" ? null : mig.vaerdi(a.k), t;
-                if (v) t = '<span class="rv ' + v.slags + '">' + O.talP(v.v) + "</span>";
-                else if (a.k === aktiv && mig.felter[a.k] && mig.felter[a.k].value.trim()) {
-                    var p = O.laesOx(mig.felter[a.k].value);
-                    t = '<span class="rv vent">' + (p !== null && !isNaN(p) ? O.talP(p) : NK.html(mig.felter[a.k].value.trim())) + "</span>";
-                } else t = '<span class="rv sym">' + a.s + "</span>";
-                return (a.n > 1 ? a.n + " · " : "") + t;
-            }).join(" + ");
-        }
+        var synlig = g.visRegn && this.vaerdi("ladning") !== null;
+        this.regnEl.classList.toggle("skjult", !synlig);
+        if (!synlig) { saet(this.regnEl.querySelector(".tv-led"), ""); return; }
+        /* Det ukendte bliver staaende som symbol, naar det er fundet: saa
+           staar regnestykket over den paene beregning, der isolerer det */
+        var led = st.atomer.map(function (a) {
+            var v = a.k === "X" ? null : mig.vaerdi(a.k), t;
+            if (v) t = '<span class="rv ' + v.slags + '">' + O.talP(v.v) + "</span>";
+            else if (a.k === aktiv && mig.felter[a.k] && mig.felter[a.k].value.trim()) {
+                var p = O.laesOx(mig.felter[a.k].value);
+                t = '<span class="rv vent">' + (p !== null && !isNaN(p) ? O.talP(p) : NK.html(mig.felter[a.k].value.trim())) + "</span>";
+            } else t = '<span class="rv sym">' + a.s + "</span>";
+            return (a.n > 1 ? a.n + " · " : "") + t;
+        }).join(" + ");
         saet(this.regnEl.querySelector(".tv-led"), led);
-        saet(this.regnEl.querySelector(".tv-cap.venstre"), ord ? "" : "summen af oxidationstallene");
     };
 
     /* Den paene beregning, naar det ukendte er fundet */
     P.visIsol = function () {
-        var g = this.opg, st = g.st;
-        var vis = this.opgaveFaerdig() && st.slags !== "ion";
-        this.isolEl.hidden = !vis;
-        if (!vis) { saet(this.isolEl, ""); return; }
+        var st = this.opg.st;
+        if (!this.opgaveFaerdig() || st.slags === "ion") { saet(this.isolEl, ""); return; }
         var linjer = O.isolering(st).slice(1);
-        if (!linjer.length) { this.isolEl.hidden = true; return; }
         saet(this.isolEl, linjer.map(function (l) { return "<div>" + NK.html(l) + "</div>"; }).join(""));
     };
 
@@ -407,7 +415,7 @@
         if (alle) html += '<span class="brik-sum' + (Math.abs(sum - st.q) < 1e-9 ? " ok" : "") + '">= ' + O.lad(sum) +
             (Math.abs(sum - st.q) < 1e-9 ? " ✓" : "") + "</span>";
         saet(this.brikkerEl, html);
-        this.brikkerEl.hidden = !nogen;
+        this.brikkerEl.classList.toggle("skjult", !nogen);
     };
 
     P.fokusFelt = function () {
@@ -424,19 +432,31 @@
         var b = Math.min(W - 2 * kant, 1000);
         var h = Math.max(160, baand.y - top - NK.klamp(H * 0.03, 10, 22));
         lay.tavle = { x: Math.round((W - b) / 2), y: top, b: Math.round(b), h: Math.round(h) };
-        var t = this.tavle;
+        var t = this.tavle, stak = this.stak;
         t.style.left = lay.tavle.x + "px";
         t.style.top = lay.tavle.y + "px";
         t.style.width = lay.tavle.b + "px";
         t.style.height = lay.tavle.h + "px";
-        /* Skriften foelger tavlens stoerrelse */
-        var fs = NK.klamp(Math.min(h / 7.6, b / 9.5), 30, 72);
-        t.style.setProperty("--fs", Math.round(fs) + "px");
-        /* Brikkerne skal kunne staa paa én linje med summen efter sig */
+        /* Skriften foelger tavlens stoerrelse: den stoerste, hvor det hele
+           (ogsaa regnestykket, beregningen og brikkerne, der kommer senere)
+           kan vaere der, med plads til en linje mere i arbejdsfeltet */
+        var stil = window.getComputedStyle(t);
+        var indre = t.clientHeight - parseFloat(stil.paddingTop) - parseFloat(stil.paddingBottom) -
+            t.querySelector(".tv-top").offsetHeight - (parseFloat(stil.rowGap) || 0);
         var n = 0;
         if (this.opg) this.opg.st.atomer.forEach(function (a) { n += a.n; });
-        var bb = NK.klamp(Math.min(fs * 0.9, (b - 60 - 3.4 * fs) / Math.max(1, n) - 6), 40, 72);
-        t.style.setProperty("--bb", Math.round(bb) + "px");
+        var fs = NK.klamp(Math.min(h / 7, b / 9.5), 30, 72);
+        stak.style.marginTop = "0px";
+        for (;;) {
+            t.style.setProperty("--fs", Math.round(fs) + "px");
+            /* Brikkerne skal kunne staa paa én linje med summen efter sig */
+            var bb = NK.klamp(Math.min(fs * 0.9, (b - 60 - 3.4 * fs) / Math.max(1, n) - 6), 34, 72);
+            t.style.setProperty("--bb", Math.round(bb) + "px");
+            if (fs <= 30 || stak.offsetHeight + 24 <= indre) break;
+            fs -= 2;
+        }
+        /* Det, der er tilovers, deles over og under (linjen mere er stadig sat af) */
+        stak.style.marginTop = Math.max(0, Math.round((indre - 24 - stak.offsetHeight) * 0.4)) + "px";
         this.lay = lay;
         this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };

@@ -330,6 +330,7 @@ function koerTest(W) {
             }
             var ret = s.svar.filter(function (x) { return x.ok; })[0];
             klikSvar(ret.t);
+            if (G.venter) G.el.knap.click();
             tik(G, 1);
         }
         tik(G, 3);
@@ -345,7 +346,16 @@ function koerTest(W) {
         knapper().filter(function (b) { return b.textContent === "Glas A"; })[0].classList.contains("forkert"), besked(G));
     paastand("Kemichael siger intet ved et forkert svar", !G.k.taler());
     klikSvar("De har lige meget");
-    paastand("rigtigt: prikkerne tælles, og næste spørgsmål kommer", G.spmNr === 1 && /største koncentration/.test(d.getElementById("glas-prompt").textContent), G.spmNr);
+    tik(G, 3);
+    paastand("rigtigt: spørgsmålet bliver stående, og forklaringen står alene i linjen", G.spmNr === 0 && /største stofmængde/.test(d.getElementById("glas-prompt").textContent) &&
+        /^Begge har 0,20 mol/.test(besked(G)) && !/Vælg et svar/.test(besked(G)), G.spmNr + " " + besked(G));
+    paastand("knappen i kortet hedder Næste spørgsmål", /^Næste spørgsmål/.test(G.el.knap.textContent), G.el.knap.textContent);
+    tryk(G, pA.x, pA.y);
+    paastand("mens fanen venter, svarer et klik på et glas ikke på det næste spørgsmål", G.spmNr === 0 && !G.faerdig);
+    tik(G, 5);
+    G.el.knap.click();
+    paastand("Næste spørgsmål: det nye spørgsmål kommer, og linjen siger kun, hvad man skal", G.spmNr === 1 && /største koncentration/.test(d.getElementById("glas-prompt").textContent) &&
+        besked(G) === "Vælg et svar i kortet, eller klik på et glas." && G.el.knap.textContent === "Giv hint", besked(G));
     var pB = midtGlas(0);
     tryk(G, pB.x, pB.y);
     tik(G, 3);
@@ -356,7 +366,11 @@ function koerTest(W) {
     paastand("Giv hint: Kemichael siger hintet", G.k.taler() && /Hint/.test(G.k.tekst()), G.k.tekst());
     G.knap();
     tik(G, 2);
-    paastand("Vis svaret: det rigtige svar vælges, og næste spørgsmål kommer", G.spmNr === 1, G.spmNr);
+    paastand("Vis svaret: Kemichael siger svaret, og knappen hedder Næste spørgsmål", G.spmNr === 0 && G.k.taler() && /Svaret: De har lige meget/.test(G.k.tekst()) &&
+        /^Næste spørgsmål/.test(G.el.knap.textContent), G.k.tekst() + " | " + G.el.knap.textContent);
+    G.knap();
+    paastand("Næste spørgsmål: Kemichael tier, og det næste spørgsmål kommer", G.spmNr === 1 && !G.k.taler(), G.spmNr);
+    paastand("0,50 M betyder 0,50 mol pr. liter vand", D.GLAS[1].spm[1].svar.filter(function (x) { return x.ok; })[0].t === "0,50 mol pr. liter vand");
 
     G.vaelg(2, false);
     G.layout();
@@ -373,9 +387,12 @@ function koerTest(W) {
     paastand("halvdelen er hældt over: 0,40 L og 0,20 mol i hvert glas", G.glas[0].V === 400 && Math.abs(G.glas[1].n - 0.2) < 1e-9 && G.glas[1].V === 400, G.glas.map(function (x) { return x.V + "/" + x.n; }).join(" "));
     paastand("prikkerne er flyttet med: 20 i hvert glas", prikkerPasser() && G.glas[1].prikker.length === 20);
     paastand("luppen over B viser det samme som luppen over A", G.glas[0].part.antal(0) === G.glas[1].part.antal(0), G.glas[0].part.antal(0) + " " + G.glas[1].part.antal(0));
+    var tabelH = d.getElementById("glas-tabel").innerText;
+    paastand("tabellen viser stadig tallene i A fra før der blev hældt (0,40 mol og 0,80 L)", /før 0,40 mol/.test(tabelH) && /før 0,80 L/.test(tabelH) && !/før 0,50 M/.test(tabelH), tabelH);
     klikSvar("0,25 M");
     paastand("0,25 M: den samme opløsning", /samme opløsning/.test(besked(G)), besked(G));
     klikSvar("0,50 M");
+    G.el.knap.click();
     klikSvar("0,20 M");
     paastand("0,20 M som stofmængde: stofmængden har enheden mol", /enheden mol/.test(besked(G)), besked(G));
     klikSvar("0,20 mol");
@@ -384,10 +401,23 @@ function koerTest(W) {
 
     var loestG = D.GLAS.map(function (s, i) { return loesG(i) && prikkerPasser(); });
     paastand("alle otte opgaver kan løses med musen, og prikkerne passer med stofmængden", loestG.every(Boolean), loestG.join(","));
+    G.vaelg(3, false);
+    G.layout();
+    [0, 1].forEach(function (j) { var q = midtGlas(j); tryk(G, q.x, q.y); tik(G, 5); });
+    var tabelS = d.getElementById("glas-tabel").innerText;
+    function antalI(tekst, re) { return (tekst.match(re) || []).length; }
+    paastand("To glas i ét: de tomme glas viser stadig tallene fra før (0,10 mol, 0,20 L og 0,50 M)", G.fase === "spm" && G.glas[0].V === 0 &&
+        antalI(tabelS, /før 0,10 mol/g) === 2 && antalI(tabelS, /før 0,20 L/g) === 2 && antalI(tabelS, /før 0,50 M/g) === 2, tabelS);
+    paastand("etiketten med 0,50 M bliver på de tomme glas", G.glas[0].etiket && G.glas[1].etiket && G.glas[0].foerTal.c === "0,50 M" && G.glas[1].foerTal.c === "0,50 M");
+    var qA = midtGlas(0);
+    tryk(G, qA.x, qA.y);
+    paastand("klik på det tomme glas A: linjen siger, hvad der var i det", /Glas A er tomt\. Før var der 0,20 L af en 0,50 M opløsning/.test(besked(G)), besked(G));
     G.vaelg(3, false); loesG(3);
     paastand("To glas i ét: 0,40 L og 0,20 mol i C, A og B er tomme", G.glas[2].V === 400 && Math.abs(G.glas[2].n - 0.2) < 1e-9 && G.glas[0].V === 0 && G.glas[1].V === 0);
     G.vaelg(5, false); loesG(5);
     paastand("Vand i glasset: 0,40 L og stadig 0,10 mol", Math.abs(G.glas[0].V - 400) < 0.5 && Math.abs(G.glas[0].n - 0.1) < 1e-9);
+    var tabelV = d.getElementById("glas-tabel").innerText;
+    paastand("Vand i glasset: tabellen viser også 0,20 L og 0,50 M fra før, men ikke stofmængden, der er den samme", /før 0,20 L/.test(tabelV) && /før 0,50 M/.test(tabelV) && !/før 0,10 mol/.test(tabelV), tabelV);
     G.vaelg(6, false);
     klikSvar("mol");
     paastand("Enhederne: L streges ud (mol/L · L = mol)", G.enhed && G.enhed.dele.some(function (x) { return x.s && x.t === "L"; }));

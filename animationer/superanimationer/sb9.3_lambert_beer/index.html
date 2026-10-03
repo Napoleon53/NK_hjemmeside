@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lambert-Beers lov</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">λ</span> Lambert-Beers lov</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-lys" role="tab" aria-selected="true"><span class="nr">1</span>Lyset</button>
+        <button class="faneknap" data-fane="fane-kurve" role="tab" aria-selected="false"><span class="nr">2</span>Standardkurven</button>
+        <button class="faneknap" data-fane="fane-regn" role="tab" aria-selected="false"><span class="nr">3</span>Beregningen</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: LYSET                                                      -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-lys" role="tabpanel" aria-label="Lyset">
+    <div class="scene">
+        <div class="sp-top">
+            <p class="opgavelinje" id="lys-spm"></p>
+            <div class="valgrad" id="lys-valg"></div>
+        </div>
+        <div class="laerred-ramme"><canvas id="lys-laerred"></canvas></div>
+        <div class="statuslinje" id="lys-status">
+            <p class="st-tekst" id="lys-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="lys-forfra" type="button" title="Samme forudsigelse forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="lys-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="lys-kort">
+            <h2><span id="lys-titel">Forudsigelse</span><span class="taeller">forudsigelse <b id="lys-nr">1</b>/<span id="lys-antal">6</span></span></h2>
+            <div id="lys-prompt"></div>
+        </div>
+
+        <div class="kort" id="lys-skruer">
+            <h2>Kuvetten</h2>
+            <div class="stoffer" id="lys-stoffer" role="group" aria-label="Stoffet i kuvetten">
+                <button type="button" class="stof-knap valgt" data-stof="mno4">MnO₄⁻</button>
+                <button type="button" class="stof-knap" data-stof="fescn">FeSCN²⁺</button>
+                <button type="button" class="stof-knap" data-stof="fephen">[Fe(phen)₃]²⁺</button>
+            </div>
+            <div class="skyder-boks" id="lys-c-boks">
+                <label for="lys-c"><span>Koncentration, c</span><b id="lys-c-tal">0,20 mM</b></label>
+                <input type="range" id="lys-c" min="0" max="0.6" step="0.01" value="0.2">
+            </div>
+            <div class="skyder-boks" id="lys-l-boks">
+                <label for="lys-l"><span>Kuvettebredde, l</span><b id="lys-l-tal">1,00 cm</b></label>
+                <input type="range" id="lys-l" min="0.5" max="3" step="0.1" value="1">
+            </div>
+            <div class="skyder-fod">
+                <span class="lambda" id="lys-lambda">λ = 525 nm</span>
+                <button type="button" class="lilleknap" id="lys-langsom">Langsomt lys</button>
+            </div>
+        </div>
+
+        <div class="kort" id="lys-opgaver">
+            <h2>Forudsigelserne <span class="taeller">prøvet <b id="lys-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="lys-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: STANDARDKURVEN                                             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-kurve" role="tabpanel" aria-label="Standardkurven">
+    <div class="scene">
+        <div class="sp-top">
+            <p class="opgavelinje" id="kurve-linje"></p>
+        </div>
+        <div class="laerred-ramme"><canvas id="kurve-laerred"></canvas></div>
+        <div class="statuslinje" id="kurve-status">
+            <p class="st-tekst" id="kurve-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="kurve-forfra" type="button" title="Samme opgave forfra med en ny prøve (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="kurve-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="kurve-kort">
+            <h2><span id="kurve-titel">Opgave</span><span class="taeller">opgave <b id="kurve-nr">1</b>/<span id="kurve-antal">4</span></span></h2>
+            <div id="kurve-prompt"></div>
+        </div>
+
+        <div class="kort" id="kurve-maalinger">
+            <h2>Målingerne</h2>
+            <div id="kurve-tabel"></div>
+        </div>
+
+        <div class="kort" id="kurve-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="kurve-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="kurve-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: BEREGNINGEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-regn" role="tabpanel" aria-label="Beregningen">
+    <div class="scene">
+        <div class="arbejde" id="regn-arbejde">
+            <p class="opgavelinje" id="regn-linje"></p>
+
+            <div class="tavle" id="regn-tavle">
+                <div class="tv-navn" id="regn-navn"></div>
+                <div class="tv-stempel" id="regn-stempel" hidden></div>
+                <div class="ot-raekke" id="regn-tal"></div>
+                <div class="regn-trin" id="regn-trin"></div>
+            </div>
+
+            <div class="bakke" id="regn-bakke">
+                <div class="bk-gruppe" id="regn-bk-form">
+                    <span class="bk-hoved">Formens form</span>
+                    <div class="bk-brikker" id="regn-skabeloner"></div>
+                </div>
+                <div class="bk-gruppe" id="regn-bk-bogst">
+                    <span class="bk-hoved">Bogstaverne</span>
+                    <div class="bk-brikker" id="regn-bogstaver"></div>
+                </div>
+                <div class="bk-gruppe" id="regn-bk-tal" hidden>
+                    <span class="bk-hoved">Opgavens tal</span>
+                    <div class="bk-brikker" id="regn-tallene"></div>
+                </div>
+                <div class="bk-gruppe" id="regn-bk-lommeregner" hidden>
+                    <span class="bk-hoved">Resultatet</span>
+                    <p class="bk-note">Regn på lommeregneren, og skriv resultatet på tavlen.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="statuslinje" id="regn-status">
+            <p class="st-tekst" id="regn-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="regn-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="regn-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="regn-kort">
+            <h2><span id="regn-titel">Opgave</span><span class="taeller">opgave <b id="regn-nr">1</b>/<span id="regn-antal">8</span></span></h2>
+            <div id="regn-prompt"></div>
+        </div>
+
+        <div class="kort" id="regn-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="regn-loest">0</b>/8</span></h2>
+            <div class="opg-liste" id="regn-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Lambert-Beers lov</h2>
+        <p>Lambert-Beers lov siger, at absorbansen er ligefrem proportional med koncentrationen af det stof, der absorberer lyset, og med lysets vej gennem opløsningen.</p>
+        <div class="eksempel">A = ε · l · c</div>
+        <ul class="teori-trin">
+            <li><b>A</b> er absorbansen. Den har ingen enhed.</li>
+            <li><b>ε</b> er ekstinktionskoefficienten. Den er en konstant for stoffet ved den valgte bølgelængde. Her i mM⁻¹·cm⁻¹, og 1 mM⁻¹·cm⁻¹ = 1000 M⁻¹·cm⁻¹.</li>
+            <li><b>l</b> er kuvettebredden, altså lysets vej gennem opløsningen, i cm.</li>
+            <li><b>c</b> er koncentrationen i mM.</li>
+        </ul>
+        <p>Enhederne går ud: mM⁻¹·cm⁻¹ · cm · mM = 1. Derfor har A ingen enhed.</p>
+
+        <h3 class="teori-hoved">Transmittans og absorbans</h3>
+        <p>Lyset ind i kuvetten har intensiteten I₀, og lyset ud har intensiteten I. Transmittansen er den brøkdel, der slipper igennem.</p>
+        <div class="eksempel">T = I / I₀ &nbsp;&nbsp;og&nbsp;&nbsp; A = −log(T)</div>
+        <p>T = 100 % giver A = 0. T = 10 % giver A = 1, og T = 1 % giver A = 2.</p>
+
+        <h3 class="teori-hoved">Hvorfor logaritmen</h3>
+        <p>Hvert lag af opløsningen tager den samme brøkdel af det lys, der kommer ind i laget. Lyset bliver derfor svagere med den samme faktor for hver centimeter, mens A vokser med det samme tal for hver centimeter. Derfor er det A og ikke T, der er proportional med c og l.</p>
+
+        <h3 class="teori-hoved">Standardkurven</h3>
+        <p>Man måler en blindprøve (vand) og en række standarder med kendt koncentration. Punkterne ligger på en ret linje gennem (0, 0):</p>
+        <div class="eksempel">A = a · c &nbsp;&nbsp;hvor&nbsp;&nbsp; a = ε · l</div>
+        <p>Prøvens koncentration aflæses på linjen eller beregnes som c = A / a. Prøven skal måles i samme kuvette og ved samme bølgelængde som standarderne.</p>
+
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/lb.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/regning.js"></script>
+<script src="js/sim_lys.js"></script>
+<script src="js/sim_kurve.js"></script>
+<script src="js/sim_regn.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

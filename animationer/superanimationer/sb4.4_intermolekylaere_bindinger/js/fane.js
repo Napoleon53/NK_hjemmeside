@@ -1,0 +1,427 @@
+/* =====================================================================
+   fane.js - det, de tre faner har til faelles (som sc1.4)
+
+   Der er ingen laerer i denne animation. Al hjaelp staar i
+   statuslinjen nederst i scenen, lige under det, eleven arbejder med,
+   og hjaelpeknappen sidder i samme linje.
+
+   NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
+
+     * listen i panelet: opgaverne i grupper, med loest og stjerne
+       (huskes i browseren)
+     * statuslinjen: naeste skridt, fejl, hint og ros, med farve efter
+       hvad der skete, og et ryst ved en fejl
+     * den ene knap: Giv et hint > Naeste hint > Vis svaret > Naeste opgave.
+       Den lyser stille op, naar eleven lige har svaret forkert.
+     * svarknapperne i opgavekortet (data-valg) og musen i scenen
+
+   Fanen selv har: lavOpgave(nr), promptHTML(), hintTrin(), visSvar(),
+   trinLinje(), layout(), tegn(), opdaterScene(dt), svarValg(i) og musen
+   i scenen: overScene, nedScene, flytScene, opScene, klikScene.
+   ===================================================================== */
+(function () {
+    "use strict";
+
+    var NK = window.NK;
+    var D = NK.Data;
+
+    function paa(P, valg) {
+        var navn = valg.navn;
+        var NOEGLE = "nk-sb4.4-" + navn;
+
+        function el(id) { return NK.el(navn + "-" + id); }
+
+        /* ----- Opstart --------------------------------------------------------- */
+        P.startFane = function (opgaver, grupper) {
+            var mig = this;
+            this.navn = navn;
+            this.L = new NK.Laerred(el("laerred"));
+            this.tid = 0;
+            this.opgaver = opgaver;
+            this.grupper = grupper;
+            var gemt = NK.hent(NOEGLE, {}) || {};
+            this.status = opgaver.map(function (o) {
+                var s = gemt[o.id];
+                return { loest: !!(s && s.l), stjerne: !!(s && s.s) };
+            });
+            this.hjaelp = 0;
+            this.pegKnap = false;
+            this.el = { knap: el("knap"), liste: el("liste"), kort: el("kort"),
+                besked: el("besked"), status: el("status"), forfra: el("forfra") };
+            this.fast = { html: "", klasse: "" };
+            this.kortT = 0;
+            this.el.knap.addEventListener("click", function () { mig.knap(); });
+            if (this.el.forfra) this.el.forfra.addEventListener("click", function () { mig.nulstil(); mig.fokus(); });
+            this.el.kort.addEventListener("click", function (e) {
+                var k = e.target.closest ? e.target.closest("[data-valg]") : null;
+                if (!k || k.disabled || !mig.svarValg) return;
+                mig.svarValg(parseInt(k.getAttribute("data-valg"), 10));
+            });
+            this.bygListe();
+            this.koblMus();
+        };
+
+        /* ----- Hukommelse ------------------------------------------------------ */
+        P.gem = function () {
+            var ud = {}, mig = this;
+            this.opgaver.forEach(function (o, i) {
+                var s = mig.status[i];
+                if (s.loest) ud[o.id] = { l: 1, s: s.stjerne ? 1 : 0 };
+            });
+            NK.gem(NOEGLE, ud);
+        };
+
+        P.antalLoest = function () {
+            return this.status.filter(function (s) { return s.loest; }).length;
+        };
+
+        P.antalStjerner = function () {
+            return this.status.filter(function (s) { return s.stjerne; }).length;
+        };
+
+        /* ----- Listen i panelet -------------------------------------------------- */
+        P.bygListe = function () {
+            var mig = this;
+            this.el.liste.innerHTML = "";
+            this.chips = [];
+            this.grupper.forEach(function (g) {
+                var boks = document.createElement("div");
+                boks.className = "opg-gruppe";
+                if (g.titel) {
+                    var hoved = document.createElement("div");
+                    hoved.className = "opg-hoved";
+                    hoved.innerHTML = "<span>" + NK.html(g.titel) + '</span><span class="opg-tal" id="' + navn + "-gt-" + g.id + '"></span>';
+                    boks.appendChild(hoved);
+                }
+                var raekke = document.createElement("div");
+                raekke.className = "opg-chips" + (g.lodret ? " lodret" : "");
+                mig.opgaver.forEach(function (o, i) {
+                    if ((o.gruppe || "alle") !== g.id) return;
+                    var knap = document.createElement("button");
+                    knap.type = "button";
+                    knap.className = "opg-chip";
+                    knap.title = o.navn;
+                    knap.innerHTML = '<span class="oc-f">' + mig.chipTekst(o, i) + '</span><i class="oc-m"></i>';
+                    knap.addEventListener("click", function () { mig.vaelg(i); });
+                    raekke.appendChild(knap);
+                    mig.chips[i] = knap;
+                });
+                boks.appendChild(raekke);
+                mig.el.liste.appendChild(boks);
+            });
+        };
+
+        P.visListe = function () {
+            var mig = this;
+            this.status.forEach(function (s, i) {
+                var c = mig.chips[i];
+                if (!c) return;
+                c.classList.toggle("valgt", i === mig.nr);
+                c.classList.toggle("loest", s.loest);
+                c.classList.toggle("stjerne", s.stjerne);
+                c.querySelector(".oc-m").textContent = s.stjerne ? "★" : (s.loest ? "✓" : "");
+            });
+            this.grupper.forEach(function (g) {
+                var ialt = 0, loest = 0;
+                mig.opgaver.forEach(function (o, i) {
+                    if ((o.gruppe || "alle") !== g.id) return;
+                    ialt++;
+                    if (mig.status[i].loest) loest++;
+                });
+                NK.saetTekst(navn + "-gt-" + g.id, loest + "/" + ialt);
+            });
+            NK.saetTekst(navn + "-loest", String(this.antalLoest()));
+            NK.saetTekst(navn + "-stjerner", String(this.antalStjerner()));
+        };
+
+        /* ----- Opgaven --------------------------------------------------------- */
+        P.vaelg = function (i) {
+            this.nr = i;
+            this.hjaelp = 0;
+            this.pegKnap = false;
+            this.brugtSvar = false;
+            this.faerdig = false;
+            this.lavOpgave(i);
+            this.layout();
+            this.visKort();
+            this.visListe();
+            this.naesteLinje("", "");
+            this.fokus();
+        };
+
+        P.visKort = function () {
+            var o = this.opgaver[this.nr];
+            NK.saetTekst(navn + "-titel", o.navn);
+            NK.saetTekst(navn + "-nr", String(this.nr + 1));
+            NK.saetTekst(navn + "-antal", String(this.opgaver.length));
+            NK.saetHTML(navn + "-prompt", this.promptHTML());
+            this.el.kort.classList.toggle("sejr", this.faerdig);
+            this.visKnap();
+        };
+
+        /* Hinttrappen for den tilstand, eleven staar i lige nu */
+        P.hintNu = function () {
+            var h = this.hintTrin();
+            return h && h.length ? h : ["Læs opgaven igen, og prøv dig frem i scenen."];
+        };
+
+        P.visKnap = function () {
+            var tekst, klasse;
+            if (this.faerdig) {
+                klasse = "knap videre banker";
+                var naeste = this.naesteUloeste();
+                if (naeste >= 0) tekst = "Næste opgave →";
+                else if (valg.naesteFane) tekst = "Videre til " + valg.naesteNavn + " →";
+                else tekst = "Start forfra ↺";
+            } else {
+                var h = this.hintNu();
+                klasse = "knap hjaelp";
+                if (this.hjaelp === 0) tekst = "Giv et hint";
+                else if (this.hjaelp < h.length) tekst = "Næste hint (" + (this.hjaelp + 1) + " af " + h.length + ")";
+                else tekst = "Vis svaret";
+                if (this.pegKnap) klasse += " peg";
+            }
+            this.el.knap.textContent = tekst;
+            this.el.knap.className = klasse;
+            this.el.knap.disabled = !!this.auto;
+        };
+
+        P.naesteUloeste = function () {
+            var n = this.status.length;
+            for (var d = 1; d <= n; d++) {
+                var i = (this.nr + d) % n;
+                if (!this.status[i].loest) return i;
+            }
+            return -1;
+        };
+
+        /* ----- Knappen: ét skridt hjaelp ad gangen ------------------------------- */
+        P.knap = function () {
+            if (this.auto) return;
+            if (this.faerdig) {
+                var naeste = this.naesteUloeste();
+                if (naeste >= 0) this.vaelg(naeste);
+                else if (valg.naesteFane && NK.visFane) NK.visFane(valg.naesteFane);
+                else this.vaelg((this.nr + 1) % this.opgaver.length);
+                return;
+            }
+            var h = this.hintNu();
+            this.pegKnap = false;
+            if (this.hjaelp < h.length) {
+                this.hjaelp++;
+                this.besked('<span class="b-maerke">Hint ' + this.hjaelp + " af " + h.length + "</span> " +
+                    NK.html(h[this.hjaelp - 1]), "hint");
+                this.visKnap();
+                if (this.efterHint) this.efterHint();
+                this.fokus();
+                return;
+            }
+            this.brugtSvar = true;
+            this.visSvar();
+            this.visKnap();
+            this.fokus();
+        };
+
+        /* Eleven har gjort noget nyt: hinttrappen begynder forfra */
+        P.nulstilHjaelp = function () {
+            if (this.hjaelp === 0) return;
+            this.hjaelp = 0;
+            this.visKnap();
+        };
+
+        /* ----- Opgaven er loest --------------------------------------------------- */
+        P.loest = function (maade, linje) {
+            var s = this.status[this.nr];
+            var foerste = !s.loest;
+            this.faerdig = true;
+            this.hjaelp = 0;
+            this.pegKnap = false;
+            s.loest = true;
+            s.stjerne = s.stjerne || !this.brugtSvar;
+            this.gem();
+            this.sejrT = 0;
+            var alle = this.antalLoest() === this.opgaver.length;
+            var html;
+            if (maade === "svar") {
+                html = '<span class="b-maerke">Svaret</span> ' + NK.html(linje || "");
+            } else {
+                html = '<span class="b-maerke stor">Rigtigt ✓</span> ' + NK.html(linje || "");
+            }
+            if (alle && foerste) html += " " + NK.html(D.FAERDIG[navn]);
+            this.besked(html, maade === "svar" ? "gul" : "god");
+            this.visKort();
+            this.visListe();
+            if (this.efterOpgave) this.efterOpgave();
+        };
+
+        /* ----- Statuslinjen nederst i scenen ---------------------------------------
+           besked: den faste linje. kortBesked: et svar paa et klik i scenen,
+           der forsvinder igen efter sek sekunder. */
+        P.besked = function (html, klasse) {
+            this.fast = { html: html || "", klasse: klasse || "" };
+            this.kortT = 0;
+            this.visBesked(this.fast);
+        };
+
+        P.kortBesked = function (tekst, sek, klasse) {
+            this.kortT = sek || 4;
+            this.visBesked({ html: NK.html(tekst), klasse: klasse || "peger" });
+        };
+
+        P.visBesked = function (b) {
+            var e = this.el.besked;
+            if (!e) return;
+            e.innerHTML = b.html;
+            if (this.el.status) this.el.status.className = "statuslinje" + (b.klasse ? " " + b.klasse : "");
+        };
+
+        P.beskedTekst = function () { return this.el.besked ? this.el.besked.textContent : ""; };
+
+        P.naesteLinje = function (foer, slags) {
+            var t = this.faerdig ? "" : NK.html(this.trinLinje());
+            this.besked((foer ? foer + " " : "") + t, slags || "");
+        };
+
+        /* En god delbesked: groen linje med ét skridt videre */
+        P.godLinje = function (tekst) {
+            this.besked('<span class="b-maerke">Godt</span> ' + NK.html(tekst), "god");
+        };
+
+        /* Et forkert svar: beskeden, et ryst og en knap, der lyser stille */
+        P.fejlLinje = function (tekst) {
+            this.besked('<span class="b-maerke">Ikke endnu</span> ' + NK.html(tekst), "skidt");
+            this.pegKnap = true;
+            this.visKnap();
+            this.ryst();
+        };
+
+        P.ryst = function () {
+            var e = this.el.status;
+            if (!e) return;
+            e.classList.remove("ryster");
+            void e.offsetWidth;
+            e.classList.add("ryster");
+        };
+
+        /* ----- Fokus, nulstil og maal ------------------------------------------- */
+        P.fokus = function () {
+            if (!NK.el("fane-" + navn).classList.contains("aktiv") ||
+                document.querySelector(".overlay.vis") || (NK.Rundvisning && NK.Rundvisning.aktiv())) return;
+            if (this.fokusFelt) this.fokusFelt();
+        };
+
+        P.nulstil = function () { this.vaelg(this.nr); };
+
+        P.tilpas = function () {
+            if (this.L.tilpas() || !this.lay) this.layout();
+        };
+
+        P.saetAnker = function (id, x, y, b, h) {
+            var e = NK.el(navn + "-anker-" + id);
+            if (!e) return;
+            e.style.left = Math.round(x) + "px";
+            e.style.top = Math.round(y) + "px";
+            e.style.width = Math.round(Math.max(1, b)) + "px";
+            e.style.height = Math.round(Math.max(1, h)) + "px";
+        };
+
+        /* Baandet, som statuslinjen fylder nederst i scenen */
+        P.baand = function () {
+            var e = this.el.status;
+            var h = e ? e.offsetHeight : 0;
+            if (!h) h = 68;
+            return { y: this.L.h - h, h: h };
+        };
+
+        /* ----- Tegneloekken ------------------------------------------------------- */
+        P.opdater = function (dt) {
+            this.tid += dt;
+            if (this.kortT > 0) {
+                this.kortT -= dt;
+                if (this.kortT <= 0) { this.kortT = 0; this.visBesked(this.fast); }
+            }
+            if (this.sejrT !== undefined && this.sejrT !== null) this.sejrT += dt;
+            if (this.opdaterScene) this.opdaterScene(dt);
+        };
+
+        /* ----- Musen -------------------------------------------------------------
+           Holder fanen tag i noget, faar den ogsaa flytningerne og slippet,
+           ogsaa uden for laerredet. */
+        P.koblMus = function () {
+            var mig = this, c = this.L.canvas;
+            this.greb = false;
+            c.addEventListener("pointermove", function (e) {
+                var pt = mig.L.punkt(e);
+                if (mig.greb && mig.flytScene) { mig.flytScene(pt); return; }
+                var u = mig.overScene ? mig.overScene(pt) : null;
+                c.style.cursor = u === "greb" ? "grab" : (u ? "pointer" : "default");
+            });
+            c.addEventListener("pointerleave", function () {
+                if (!mig.greb) { if (mig.overScene) mig.overScene(null); c.style.cursor = "default"; }
+            });
+            c.addEventListener("pointerdown", function (e) {
+                if (e.button !== undefined && e.button !== 0) return;
+                mig.slapNetop = false;
+                var pt = mig.L.punkt(e);
+                if (mig.nedScene && mig.nedScene(pt)) {
+                    mig.greb = true;
+                    c.style.cursor = "grabbing";
+                    try { c.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
+                    e.preventDefault();
+                }
+            });
+            function slip(e) {
+                if (!mig.greb) return;
+                mig.greb = false;
+                c.style.cursor = "default";
+                if (mig.opScene) mig.opScene(mig.L.punkt(e));
+                mig.slapNetop = true;
+            }
+            c.addEventListener("pointerup", slip);
+            c.addEventListener("pointercancel", slip);
+            c.addEventListener("click", function (e) {
+                var pt = mig.L.punkt(e);
+                if (mig.slapNetop) { mig.slapNetop = false; return; }
+                if (mig.klikScene) mig.klikScene(pt);
+                mig.fokus();
+            });
+        };
+
+        /* ----- Termometeret (fane 1 og 2) --------------------------------------------
+           Fanen har this.termo (NK.Termostat) og this.lay.termo (maalene). */
+        P.termoNed = function (pt) {
+            var TM = this.lay && this.lay.termo;
+            if (!TM || !this.termo) return false;
+            if (Math.hypot(pt.x - TM.kugle.x, pt.y - TM.kugle.y) <= TM.kugle.r + 4) return false;
+            if (this.termo.start(pt, TM)) { this.nulstilHjaelp(); this.roertTermo = true; return true; }
+            return false;
+        };
+
+        P.termoOver = function (pt) {
+            var TM = this.lay && this.lay.termo;
+            if (!TM || !this.termo || !pt) { this.haandtagLys = false; return null; }
+            this.haandtagLys = this.termo.rammerHaandtag(pt, TM);
+            if (this.haandtagLys) return "greb";
+            if (Math.hypot(pt.x - TM.kugle.x, pt.y - TM.kugle.y) <= TM.kugle.r + 4) return "pointer";
+            return this.termo.rammer(pt, TM) ? "pointer" : null;
+        };
+
+        /* Paaskeaegget: et klik paa termometerets kugle */
+        P.termoKugle = function (pt) {
+            var TM = this.lay && this.lay.termo;
+            if (!TM || Math.hypot(pt.x - TM.kugle.x, pt.y - TM.kugle.y) > TM.kugle.r + 4) return false;
+            var varm = this.termo.T > D.STOF.ethanol.kp;
+            this.kortBesked(varm ? D.PAASKE.varm : D.PAASKE.kold, 8, "gul");
+            NK.paaskeaeg = (NK.paaskeaeg || 0) + 1;
+            return true;
+        };
+
+        P.tast = function (e) {
+            if (!this.termo) return false;
+            if (this.termo.tast(e.key, e.shiftKey)) { this.nulstilHjaelp(); this.roertTermo = true; return true; }
+            return false;
+        };
+    }
+
+    NK.Fane = { paa: paa };
+}());

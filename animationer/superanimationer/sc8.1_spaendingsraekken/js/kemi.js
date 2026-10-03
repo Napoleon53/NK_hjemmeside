@@ -40,14 +40,17 @@
         Au: { navn: "guld",      E: 1.50,  q: 3, salt: "guld(III)chlorid", saltFormel: "AuCl3",     anion: "Cl",  anionQ: -1 }
     };
 
-    /* Spaendingsraekken, som den staar i bogen: uaedel til venstre */
-    K.RAEKKE = ["K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Ni", "Sn", "Pb", "H", "Cu", "Ag", "Hg", "Pt", "Au"];
+    /* Spaendingsraekken: uaedel til venstre. Nikkel og tin er taget ud
+       (brugerens oenske 3. okt. 2026: de bruges sjaeldent i undervisningen).
+       De staar stadig i K.STOF og kan saettes ind igen her og i de to
+       lister nedenfor; raekken skal staa efter E°. */
+    K.RAEKKE = ["K", "Ca", "Na", "Mg", "Al", "Zn", "Fe", "Pb", "H", "Cu", "Ag", "Hg", "Pt", "Au"];
 
     /* De metaller, der findes som stang, og de oploesninger, der findes
        som glas (fane 3). Kalium, calcium og natrium reagerer med vandet
        og er kun med i raekken. */
-    K.STAENGER = ["Mg", "Al", "Zn", "Fe", "Ni", "Sn", "Pb", "Cu", "Ag", "Au"];
-    K.OPLOESNINGER = ["Mg", "Al", "Zn", "Fe", "Ni", "Sn", "Pb", "H", "Cu", "Ag", "Au"];
+    K.STAENGER = ["Mg", "Al", "Zn", "Fe", "Pb", "Cu", "Ag", "Au"];
+    K.OPLOESNINGER = ["Mg", "Al", "Zn", "Fe", "Pb", "H", "Cu", "Ag", "Au"];
 
     /* Par, hvor forskellen er saa lille, at forsoeget i virkeligheden
        er langsomt eller tvivlsomt, kommer ikke med som opgaver. */

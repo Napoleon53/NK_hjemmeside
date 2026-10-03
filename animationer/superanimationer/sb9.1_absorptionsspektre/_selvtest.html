@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb9.1 Absorptionsspektre</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at farvemodellen giver komplementærfarverne fra
+   tabellen, at polyenerne rammer tabelværdierne, at hvert svar er det,
+   modellen regner, at alle opgaver kan løses (med rigtige museklik og
+   træk), at hintet er tre trin, at chromoforerne har det rigtige antal
+   konjugerede dobbeltbindinger, quizzen, sproget og layoutet fra
+   1100 × 700 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+function sov(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb9.1-fa", "nk-sb9.1-ko", "nk-sb9.1-ch", "nk-sb9.1-quiz"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|aendr\w*|taeller|loest|groen|roed|blaa|maal)\b/;
+
+async function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { await koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Musen paa et laerred: tryk, flyt, slip og klik */
+function mus(W, canvas, type, x, y) {
+    var r = canvas.getBoundingClientRect();
+    var opt = { clientX: r.left + x, clientY: r.top + y, bubbles: true, cancelable: true, pointerId: 1, button: 0, isPrimary: true };
+    var e = type === "click" ? new W.MouseEvent("click", opt) : new W.PointerEvent(type, opt);
+    canvas.dispatchEvent(e);
+}
+
+async function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, F = NK.Farve, M = NK.Mol;
+    var FA = NK.sims["fane-fa"], KO = NK.sims["fane-ko"], CH = NK.sims["fane-ch"];
+    function navnAf(toppe) { return F.navn(F.farve(toppe)); }
+    function stat(sim) { return sim.el.status.className; }
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Farvemodellen");
+    var y = F.cmf(555), x6 = F.cmf(600);
+    paastand("CIE: ȳ er størst omkring 555 nm, x̄(600) ca. 1,06", y.y > F.cmf(500).y && y.y > F.cmf(610).y && Math.abs(x6.x - 1.06) < 0.06, y.y.toFixed(2) + " " + x6.x.toFixed(2));
+    var hvid = F.farve([]);
+    paastand("intet absorberet: hvid og farveløs", F.navn(hvid) === "Farveløs" && hvid.r > 0.99 && hvid.g > 0.99 && hvid.b > 0.99);
+    var en = function (c) { return [{ c: c, w: 30, h: 1.5 }]; };
+    paastand("absorberer blåt (450 nm): gul", navnAf(en(450)) === "Gul", navnAf(en(450)));
+    paastand("absorberer blågrønt (500 nm): rød", navnAf(en(500)) === "Rød", navnAf(en(500)));
+    paastand("absorberer grønt (535 nm): lilla", navnAf(en(535)) === "Lilla", navnAf(en(535)));
+    paastand("absorberer orange (610 nm): blå", navnAf(en(610)) === "Blå", navnAf(en(610)));
+    paastand("absorberer rødt (650 nm): blå", navnAf(en(650)) === "Blå", navnAf(en(650)));
+    paastand("lysets navne som i den gamle", F.lysNavn(350) === "UV" && F.lysNavn(420) === "violet" && F.lysNavn(470) === "blå" &&
+        F.lysNavn(530) === "grøn" && F.lysNavn(580) === "gul" && F.lysNavn(600) === "orange" && F.lysNavn(650) === "rød");
+    paastand("farvecirklen: violet, blå, grøn, gul og rød i rækkefølge", F.lysTone(420) > F.lysTone(470) && F.lysTone(470) > F.lysTone(530) &&
+        F.lysTone(530) > F.lysTone(580) && F.lysTone(580) > F.lysTone(650));
+
+    var TAB = { 1: 171, 2: 217, 3: 258, 4: 290, 5: 334 };
+    var tabOk = Object.keys(TAB).every(function (n) { return F.polyenMax(+n) === TAB[n]; });
+    paastand("polyener: tabelværdierne (McMurry) for n = 1 til 5", tabOk);
+    paastand("polyener: n = 6 ca. 364, n = 8 ca. 410, n = 10 ca. 447 nm", Math.abs(F.polyenMax(6) - 364) < 6 && Math.abs(F.polyenMax(8) - 410) < 6 && Math.abs(F.polyenMax(10) - 447) < 8,
+        [6, 8, 10].map(function (n) { return F.polyenMax(n).toFixed(0); }).join(" "));
+    paastand("lycopen (11 konjugerede) ved 470 nm", Math.abs(F.polyenMax(11) - 470) < 3, F.polyenMax(11).toFixed(1));
+    var stiger = true;
+    for (var n = 1; n < D.KO_MAKS; n++) if (F.polyenMax(n + 1) <= F.polyenMax(n)) stiger = false;
+    paastand("λmax vokser med hver ny dobbeltbinding", stiger);
+    var POLY = { 5: "Farveløs", 6: "Farveløs", 7: "Farveløs", 8: "Gul", 9: "Gul", 10: "Gul", 11: "Orange", 12: "Orange", 13: "Rød" };
+    var polyFejl = [];
+    Object.keys(POLY).forEach(function (n) {
+        var c = F.farve(F.polyenToppe(+n));
+        if (F.navn(c) !== POLY[n]) polyFejl.push(n + ": " + F.navn(c));
+        if (F.margin(c) < 2) polyFejl.push(n + " ligger på grænsen (" + F.margin(c).toFixed(1) + ")");
+    });
+    paastand("farven af kæden: farveløs til 7, gul fra 8, orange ved 11, rød ved 13", polyFejl.length === 0, polyFejl.join(", "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("2. Fane 1: Farven");
+    var bygFejl = [], stofFejl = [];
+    D.FA.forEach(function (o) {
+        if (o.type === "byg") {
+            var c = F.farve(en(o.svar).map(function (t) { return { c: t.c, w: D.FA_TOP.w, h: D.FA_TOP.h }; }));
+            if (F.navn(c) !== o.maal) bygFejl.push(o.id + " svar giver " + F.navn(c));
+            if (F.margin(c) < 2) bygFejl.push(o.id + " svar på grænsen");
+            if (navnAf([{ c: o.start, w: D.FA_TOP.w, h: D.FA_TOP.h }]) === o.maal) bygFejl.push(o.id + " starter som målet");
+        } else {
+            var c2 = F.farve(o.toppe);
+            if (F.navn(c2) !== o.farve) stofFejl.push(o.id + " er " + F.navn(c2) + ", ikke " + o.farve);
+            if (F.margin(c2) < 2) stofFejl.push(o.id + " på grænsen");
+            Object.keys(o.nej || {}).forEach(function (k) {
+                if (k === o.farve || !D.FARVER.some(function (f) { return f.navn === k; })) stofFejl.push(o.id + " nej[" + k + "]");
+            });
+        }
+    });
+    paastand("Byg farven: hvert svar giver målet, og ingen starter som målet", bygFejl.length === 0, bygFejl.join(", "));
+    paastand("de fem stoffer: modellen giver den farve, opgaven venter", stofFejl.length === 0, stofFejl.join(", "));
+    paastand("de fem stoffer fra den gamle er med", ["klorofyl", "betacaroten", "kmno4", "cuso4", "cytc"].every(function (id) { return D.FA.some(function (o) { return o.id === id; }); }));
+
+    NK.visFane("fane-fa");
+    await sov(150);
+    var toppeFejl = [];
+    D.FA.forEach(function (o, i) {
+        if (o.type !== "stof") return;
+        FA.vaelg(i);
+        var lm = FA.maksI(o.top[0][0], o.top[0][1]);
+        if (o.id !== "cuso4" && Math.abs(lm - o.lmax) > 3) toppeFejl.push(o.id + ": toppen er " + lm);
+    });
+    paastand("toppen i spektret ligger ved λmax fra teksten", toppeFejl.length === 0, toppeFejl.join(", "));
+
+    /* Byg farven med et rigtigt træk */
+    FA.vaelg(0);
+    await sov(120);
+    var g = FA.g, cv = FA.L.canvas;
+    var hx = g.l2x(FA.topL), hy = g.a2y(FA.A(FA.topL));
+    mus(W, cv, "pointerdown", hx, hy);
+    for (var k = 1; k <= 6; k++) { mus(W, cv, "pointermove", hx + (g.l2x(445) - hx) * k / 6, hy); }
+    paastand("under trækket er opgaven ikke dømt endnu", !FA.faerdig);
+    mus(W, cv, "pointerup", g.l2x(445), hy);
+    mus(W, cv, "click", g.l2x(445), hy);
+    paastand("træk toppen til 445 nm: gul, løst med stjerne", FA.faerdig && FA.status[0].stjerne && /god/.test(stat(FA)), FA.topL.toFixed(0) + " " + stat(FA));
+
+    /* Piletasterne og Vis svaret */
+    FA.vaelg(1);
+    FA.pil(1);
+    paastand("piletasten flytter toppen 5 nm", Math.abs(FA.topL - 455) < 0.01);
+    FA.knap(); FA.knap(); FA.knap();
+    paastand("hintet er tre trin, og først det tredje siger tallet", FA.hjaelp === 3 && /610 nm/.test(FA.beskedTekst()) && !/610/.test(FA.hintTrin()[0] + FA.hintTrin()[1]));
+    FA.knap();
+    for (k = 0; k < 40 && !FA.faerdig; k++) FA.opdater(0.05);
+    paastand("Vis svaret glider toppen til 610 nm, uden stjerne", FA.faerdig && Math.abs(FA.topL - 610) < 0.5 && !FA.status[1].stjerne && /gul/.test(stat(FA)));
+
+    /* Et stof: klik paa grafen, forkert og rigtigt */
+    var iK = D.FA.map(function (o) { return o.id; }).indexOf("kmno4");
+    FA.vaelg(iK);
+    await sov(120);
+    g = FA.g;
+    paastand("kuvetten er dækket, og lampen er slukket", FA.skjult() && !FA.lampe);
+    mus(W, cv, "click", g.l2x(650), g.a2y(0.1));
+    paastand("klik ved 650 nm: Ikke endnu med absorbansen", /skidt/.test(stat(FA)) && /650 nm/.test(FA.beskedTekst()), FA.beskedTekst());
+    mus(W, cv, "click", g.l2x(530), g.a2y(0.5));
+    paastand("klik ved toppen: trin 2 og seks farveknapper i scenen", FA.trin === "farve" && d.querySelectorAll("#fa-valg .farveknap").length === 6 && FA.valgtL >= 520 && FA.valgtL <= 550);
+    FA.knapper["Grøn"].click();
+    paastand("Grøn (det absorberede lys): forklaringen siger det", /skidt/.test(stat(FA)) && /absorberes|absorbere|absorberet/.test(FA.beskedTekst()) && FA.knapper["Grøn"].disabled, FA.beskedTekst());
+    FA.knapper["Lilla"].click();
+    paastand("Lilla: løst, lampen tænder, og kuvetten vises", FA.faerdig && FA.lampe && !FA.skjult() && /god/.test(stat(FA)));
+    var iC = D.FA.map(function (o) { return o.id; }).indexOf("cytc");
+    FA.vaelg(iC);
+    await sov(80);
+    g = FA.g;
+    mus(W, cv, "click", g.l2x(550), g.a2y(0.6));
+    paastand("cytochrom c: klik på den lille top ved 550 nm siger, at den ikke er den højeste", /ikke den højeste/.test(FA.beskedTekst()));
+    var iB = D.FA.map(function (o) { return o.id; }).indexOf("betacaroten");
+    FA.vaelg(iB);
+    FA.vurderTop(451);
+    FA.svarFarve("Orange");
+    paastand("β-caroten: Orange får forklaringen om krystallerne", /krystaller/.test(FA.beskedTekst()));
+
+    /* Fotonerne: det absorberede lys stopper i kuvetten */
+    FA.vaelg(iK);
+    FA.saetTop(526);
+    FA.svarFarve("Lilla");
+    for (k = 0; k < 120; k++) { FA.opdaterScene(1 / 60); }
+    var stop = FA.fotoner.filter(function (p) { return p.stop !== null; });
+    var groenStop = stop.filter(function (p) { return p.l > 510 && p.l < 560; }).length;
+    var roedStop = stop.filter(function (p) { return p.l > 640; }).length;
+    paastand("fotonerne: grønt lys stopper i kuvetten, rødt slipper igennem", groenStop > 0 && groenStop > 3 * roedStop, groenStop + " mod " + roedStop);
+    FA.hover = 530; FA.tegn(); FA.hover = null;
+    paastand("musen over grafen tegner uden fejl", true);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Fane 2: Konjugeringen");
+    NK.visFane("fane-ko");
+    await sov(150);
+    function iKO(id) { return D.KO.map(function (o) { return o.id; }).indexOf(id); }
+    KO.vaelg(iKO("k-gaet"));
+    KO.skiftN(1);
+    paastand("Gæt først: + virker ikke, før der er gættet", KO.n === 2);
+    paastand("tre svar i scenen", d.querySelectorAll("#ko-valg .gaetknap").length === 3);
+    KO.svarGaet(2);
+    KO.skiftN(1);
+    paastand("rigtigt gæt og +: løst med stjerne, 217 til 258 nm", KO.faerdig && KO.status[iKO("k-gaet")].stjerne && /258/.test(KO.beskedTekst()));
+    W.localStorage.removeItem("nk-sb9.1-ko");
+    KO.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    KO.vaelg(iKO("k-gaet"));
+    KO.svarGaet(0);
+    KO.skiftN(1);
+    paastand("forkert gæt og +: løst, men uden stjerne", KO.faerdig && !KO.status[iKO("k-gaet")].stjerne && /Ikke helt/.test(KO.beskedTekst()));
+
+    KO.vaelg(iKO("k-farve"));
+    for (k = 0; k < 4; k++) KO.skiftN(1);
+    paastand("7 konjugerede: ikke farvet endnu", KO.n === 7 && !KO.faerdig);
+    d.querySelector('#ko-valg .valgknap.vend').click();
+    paastand("8 konjugerede (knappen + Længere kæde): farvet, 413 nm, gul", KO.n === 8 && KO.faerdig && /413/.test(KO.beskedTekst()) && /gul/.test(KO.beskedTekst()), KO.beskedTekst());
+    KO.vaelg(iKO("k-orange"));
+    KO.tast("+"); KO.tast("+"); KO.tast("+");
+    paastand("11 konjugerede (tasten +): orange", KO.n === 11 && KO.faerdig);
+    KO.vaelg(iKO("k-roed"));
+    KO.tast("+");
+    paastand("12 konjugerede: endnu ikke rød", KO.n === 12 && !KO.faerdig);
+    KO.tast("+");
+    paastand("13 konjugerede: rød", KO.n === 13 && KO.faerdig);
+    KO.saetN(D.KO_MAKS);
+    KO.skiftN(1);
+    paastand("kæden stopper ved " + D.KO_MAKS, KO.n === D.KO_MAKS);
+
+    /* Lycopen */
+    var LY = M.byg("lycopen");
+    var lk = M.konjugering(LY);
+    paastand("lycopen: 40 C-atomer, 13 dobbeltbindinger, 11 konjugerede", LY.atomer.length === 40 && lk.antalDob === 13 && lk.stoerst === 11 && lk.systemer.length === 3);
+    var LL = NK.SimKonj.LY_LANGS;
+    var bromFejl = [];
+    LL.forEach(function (bi, k) {
+        var m = LY.kopi(); m.addérBrom(bi);
+        var kk = M.konjugering(m);
+        var laengst = Math.max(k, 10 - k);
+        if (kk.stoerst !== laengst) bromFejl.push(k + ": " + kk.stoerst);
+        var t = [];
+        kk.systemer.forEach(function (s) { t = t.concat(F.polyenToppe(s.dob.length)); });
+        var nv = F.navn(F.farve(t));
+        var ventet = laengst >= 8 ? "Gul" : "Farveløs";
+        if (nv !== ventet) bromFejl.push(k + " giver " + nv);
+    });
+    paastand("brom på dobbeltbinding nr. k deler chromoforen i k og 10 − k, og farven følger det længste", bromFejl.length === 0, bromFejl.join(", "));
+
+    KO.vaelg(iKO("t-find"));
+    await sov(80);
+    var iso = lk.systemer[1].dob[0];
+    KO.klikFind(iso);
+    paastand("klik på en isoleret dobbeltbinding: Ikke endnu", /skidt/.test(stat(KO)) && !KO.marker[iso]);
+    KO.klikFind(LL[3]); KO.klikFind(LL[3]);
+    paastand("klik to gange fjerner markeringen", !KO.marker[LL[3]]);
+    /* rigtige klik paa laerredet */
+    await sov(80);
+    var cvK = KO.L.canvas;
+    LL.forEach(function (bi) { var p = M.midt(KO.mol, KO.vis, bi); mus(W, cvK, "click", p.x, p.y); });
+    paastand("11 klik på laerredet: chromoforen fundet", KO.faerdig && KO.antalMarker() === 11, KO.antalMarker() + " " + KO.beskedTekst());
+
+    KO.vaelg(iKO("t-gul"));
+    await sov(60);
+    KO.addér(LL[5]);
+    for (k = 0; k < 20; k++) KO.opdaterScene(0.05);
+    paastand("Gør den gul: brom i midten giver farveløs og en forklaring", !KO.faerdig && /farveløs/.test(KO.beskedTekst()));
+    KO.addér(LL[1]);
+    for (k = 0; k < 20; k++) KO.opdaterScene(0.05);
+    paastand("brom på nr. 2: gul, løst", KO.faerdig && /gul/.test(KO.beskedTekst()), KO.beskedTekst());
+    KO.vaelg(iKO("t-farveloes"));
+    await sov(60);
+    KO.addér(iso);
+    for (k = 0; k < 20; k++) KO.opdaterScene(0.05);
+    paastand("brom på en isoleret dobbeltbinding: farven er den samme", !KO.faerdig && /ikke konjugeret/.test(KO.beskedTekst()));
+    KO.addér(LL[6]);
+    for (k = 0; k < 20; k++) KO.opdaterScene(0.05);
+    paastand("brom i midten: farveløs, løst", KO.faerdig);
+
+    /* Tomatregnbuen */
+    paastand("regnbuen: uden brom orange, med al brom farveløs", NK.SimKonj.rbFarve(0).navn === "Orange" && NK.SimKonj.rbFarve(1).navn === "Farveløs");
+    KO.vaelg(iKO("t-regnbue"));
+    KO.svarGaet(0);
+    d.querySelector('#ko-valg .valgknap.tjek').click();
+    for (k = 0; k < 200 && !KO.faerdig; k++) KO.opdaterScene(0.05);
+    var lagNavn = [];
+    for (k = 0; k < 36; k++) lagNavn.push(NK.SimKonj.rbFarve(KO.lagP(k)).navn);
+    var forste = lagNavn[0], sidste = lagNavn[35];
+    var gulMidt = lagNavn.indexOf("Gul") > 0 && lagNavn.indexOf("Gul") < lagNavn.lastIndexOf("Orange");
+    paastand("regnbuen: farveløs øverst, gul i midten, orange nederst", KO.faerdig && forste === "Farveløs" && sidste === "Orange" && gulMidt, lagNavn.join(","));
+    paastand("rigtigt gæt i regnbuen giver stjerne", KO.status[iKO("t-regnbue")].stjerne);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Fane 3: Chromoforen");
+    NK.visFane("fane-ch");
+    await sov(150);
+    var ANTAL = { hexatrien: 3, pentadien: 1, benzen: 3, stilben: 7, smoergult: 7, betacaroten: 11, indigo: 9, allura: 9 };
+    var chFejl = [];
+    D.CH.forEach(function (o, i) {
+        var mm = CH.molekyler[i];
+        if (mm.konj.stoerst !== ANTAL[o.id]) chFejl.push(o.id + " har " + mm.konj.stoerst);
+        if (mm.farve.navn !== o.farve) chFejl.push(o.id + " er " + mm.farve.navn);
+        if (F.margin(mm.farve.c) < 2) chFejl.push(o.id + " på grænsen");
+        var bedst = 150, bedstA = -1;
+        for (var l = 150; l <= 700; l += 0.5) { var a = F.absorbans(mm.toppe, l); if (l >= 240 && a > bedstA) { bedstA = a; bedst = l; } }
+        var lm = o.toppe ? o.lmax : Math.round(F.polyenMax(o.polyen));
+        if (o.toppe && o.id !== "benzen" && Math.abs(bedst - o.lmax) > 4) chFejl.push(o.id + " top ved " + bedst);
+        if (o.fakta.indexOf(String(lm)) < 0 && o.id !== "pentadien") chFejl.push(o.id + " fakta nævner ikke " + lm);
+    });
+    paastand("otte molekyler: antal konjugerede, farven og λmax passer med teksten", chFejl.length === 0, chFejl.join(", "));
+    paastand("C=O og N=N tæller med (indigo og Allura rød har 9)", CH.molekyler[6].konj.stoerst === 9 && CH.molekyler[7].konj.stoerst === 9);
+
+    CH.vaelg(1);
+    await sov(80);
+    var cvC = CH.L.canvas;
+    var pd = CH.konj.systemer;
+    var p1 = M.midt(CH.mol, CH.vis, pd[0].dob[0]);
+    mus(W, cvC, "click", p1.x, p1.y);
+    paastand("penta-1,4-dien: én dobbeltbinding er hele chromoforen", CH.trin === "farve");
+    CH.vaelg(1);
+    CH.klikBinding(pd[0].dob[0]);
+    CH.vaelg(1);
+    CH.system = 0; CH.marker = {};
+    CH.klikBinding(pd[1].dob[0]);
+    paastand("den anden dobbeltbinding er ikke konjugeret med den første", CH.trin === "farve" || /ikke konjugeret/.test(CH.beskedTekst()));
+
+    CH.vaelg(6);
+    await sov(80);
+    var sys = CH.konj.systemer[0];
+    sys.dob.forEach(function (bi) { var p = M.midt(CH.mol, CH.vis, bi); mus(W, cvC, "click", p.x, p.y); });
+    paastand("indigo: ni klik på lærredet markerer chromoforen", CH.trin === "farve" && CH.antalMarker() === 9, CH.antalMarker());
+    paastand("spektret og glasset er skjult, til farven er valgt", !CH.faerdig);
+    CH.knapper["Rød"].click();
+    paastand("Rød: Ikke endnu", /skidt/.test(stat(CH)));
+    CH.knapper["Blå"].click();
+    paastand("Blå: løst, spektret med 606 nm", CH.faerdig && /606/.test(CH.promptHTML()));
+    CH.vaelg(4);
+    CH.konj.systemer[0].dob.forEach(function (bi) { CH.klikBinding(bi); });
+    CH.svarFarve("Farveløs");
+    paastand("smørgult: Farveløs får forklaringen om N=N", /N=N/.test(CH.beskedTekst()));
+    CH.vaelg(0);
+    CH.knap(); CH.knap(); CH.knap();
+    paastand("hint 3 får de manglende dobbeltbindinger til at lyse", Object.keys(CH.lysB).length === 3);
+    CH.knap();
+    paastand("Vis svaret markerer chromoforen og går videre til farven", CH.trin === "farve" && /gul/.test(stat(CH)));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Quizzen");
+    var qOk = D.QUIZ.length === 6 && D.QUIZ.every(function (q) { return q.svar.length === 4 && q.nej.length === 4 && q.hvorfor && !q.nej[0]; });
+    paastand("seks spørgsmål med fire svar og en forklaring til hvert forkert", qOk);
+    NK.Quiz.start();
+    NK.Quiz.aabn();
+    for (k = 0; k < D.QUIZ.length; k++) {
+        d.querySelector('#quiz-indhold .quiz-valg[data-i="0"]').click();
+        d.getElementById("quiz-videre").click();
+    }
+    paastand("alle rigtige: knappen bliver Quiz ✓", d.getElementById("quizknap").textContent === "Quiz ✓");
+    d.getElementById("quiz").classList.remove("vis");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Sproget");
+    var tekster = [];
+    D.FA.forEach(function (o) { ["navn", "beskrivelse", "forklaring", "absorberer", "lys"].forEach(function (f) { if (o[f]) tekster.push(o[f]); }); Object.keys(o.nej || {}).forEach(function (k) { tekster.push(o.nej[k]); }); });
+    D.KO.forEach(function (o) { tekster.push(o.tekst, o.navn); (o.svar || []).forEach(function (s) { tekster.push(s); }); });
+    D.CH.forEach(function (o) { tekster.push(o.navn, o.fakta); Object.keys(o.nej || {}).forEach(function (k) { tekster.push(o.nej[k]); }); });
+    D.QUIZ.forEach(function (q) { tekster.push(q.q, q.hvorfor); q.svar.concat(q.nej).forEach(function (s) { tekster.push(s); }); });
+    [FA, KO, CH].forEach(function (s) {
+        for (var i = 0; i < s.opgaver.length; i++) { s.vaelg(i); tekster.push(s.beskedTekst(), s.promptHTML().replace(/<[^>]*>/g, " ")); s.hintTrin().forEach(function (h) { tekster.push(h); }); }
+    });
+    tekster.push(d.getElementById("teori").textContent);
+    var alt = tekster.join(" | ");
+    paastand("ingen tankestreger (– og —)", !/[–—]/.test(alt), (alt.match(/.{30}[–—].{30}/) || [""])[0]);
+    paastand("ingen ASCII-ord (foer, paa …)", !ASCII_ORD.test(alt), (alt.match(ASCII_ORD) || [""])[0]);
+    paastand("ingen 1+ og 1− i ladninger", !/[¹][⁺⁻]|\b1[+−]/.test(alt));
+    paastand("intet om Lambert-Beer (b9.3 ejer den)", !/Lambert|ε ·|absorptionskoefficient/i.test(alt));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var STR = [[1100, 700], [1366, 768], [1600, 950]];
+    for (var si = 0; si < STR.length; si++) {
+        ramme.style.width = STR[si][0] + "px";
+        ramme.style.height = STR[si][1] + "px";
+        var problemer = [];
+        var faner = [["fane-fa", FA, [0, 4]], ["fane-ko", KO, [0, 4, 7]], ["fane-ch", CH, [7]]];
+        for (var fi = 0; fi < faner.length; fi++) {
+            NK.visFane(faner[fi][0]);
+            for (var oi = 0; oi < faner[fi][2].length; oi++) {
+                var sim = faner[fi][1];
+                sim.vaelg(faner[fi][2][oi]);
+                if (sim === FA && sim.o.type === "stof") sim.saetTop(sim.o.lmax);
+                if (sim === CH) { sim.konj.systemer[0].dob.forEach(function (bi) { sim.marker[bi] = true; }); sim.tjekFind(false); }
+                await sov(120);
+                sim.tilpas(); sim.layout(); sim.tegn();
+                var st = sim.el.status.getBoundingClientRect();
+                var valg = d.getElementById(sim.navn + "-valg");
+                var vr = valg.getBoundingClientRect();
+                var linje = d.getElementById(sim.navn + "-opgave").getBoundingClientRect();
+                var cr = sim.L.canvas.getBoundingClientRect();
+                var navnX = faner[fi][0] + "#" + faner[fi][2][oi];
+                if (valg.children.length && vr.bottom > st.top - 4) problemer.push(navnX + " knapper over statuslinjen");
+                var gr = sim.lay.graf;
+                if (gr.y + gr.h > (valg.children.length ? vr.top - cr.top : st.top - cr.top) + 2) problemer.push(navnX + " grafen under knapperne");
+                if (gr.h < 140) problemer.push(navnX + " grafen er kun " + Math.round(gr.h) + " px");
+                var top0 = sim === FA ? sim.lay.r1.y : sim.lay.tavle.y;
+                if (linje.bottom - cr.top > top0 + 1) problemer.push(navnX + " opgavelinjen over scenen");
+                if (sim.vis && sim.vis.s < 14) problemer.push(navnX + " molekylet er for lille (" + sim.vis.s.toFixed(0) + ")");
+                if (d.body.scrollWidth > d.documentElement.clientWidth + 1) problemer.push(navnX + " vandret rullebjælke");
+            }
+        }
+        paastand("layout " + STR[si][0] + " × " + STR[si][1] + ": intet overlapper", problemer.length === 0, problemer.join(", "));
+    }
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+}
+</script>
+</body>
+</html>

@@ -17,9 +17,11 @@
    Figuren er den faelles fra ../../v2/kemichael/ (K.tegneserieFigur),
    saa han ser ud som alle andre steder. Det eneste, der bevaeger sig, er
    oejnene (han blinker), brynene og brillerne (han kigger op over dem,
-   naar han siger noget) og armen, naar eleven klikker paa koppen. Klik
-   paa ham giver et kort svar fra de faelles prik-puljer, som forsvinder
-   igen efter fire sekunder.
+   naar han siger noget) og armen, naar eleven klikker paa koppen. Et
+   klik paa ham giver hintet til den bid, eleven er ved (fanen tager
+   klikket foerst, se hintFraLaerer i js/fane.js; brugerens oenske 3. okt.
+   2026). Er der ikke noget at hjaelpe med, giver klikket et kort svar fra
+   de faelles prik-puljer, som forsvinder igen efter fire sekunder.
 
    Brug (én pr. fane):
      this.k = new NK.RoligLaerer({ boble: "kar-boble", knap: "kar-kknap" });
@@ -83,6 +85,7 @@
         this.overKop = false;
         this.overHam = false;
         this.overSeddel = false;
+        this.hoverTekst = "";       /* et lille skilt ved ham, naar musen er over ham (fanen saetter det) */
         this.gaar = 0;              /* sekunder til han er vaek, mens han siger farvel */
         this.synlig = faelles.ude ? 0 : 1;
         if (this.knap) this.knap.addEventListener("click", function () { if (faelles.ude) mig.hentInd(); else mig.sendUd(); });
@@ -337,6 +340,20 @@
         }
         /* Sedlen paa det tomme kateder */
         if (this.synlig < 0.99) this.tegnSeddel(ctx, 1 - this.synlig);
+        /* Musen er over ham, og han siger ikke noget: et lille skilt der, hvor
+           boblen kommer, siger, hvad et klik goer */
+        if (this.overHam && this.hoverTekst && !this.taler() && this.synlig > 0.9 && this.gaar <= 0) {
+            ctx.font = "700 14px 'Segoe UI', sans-serif";
+            var tb = ctx.measureText(this.hoverTekst).width + 22, th = 28;
+            var tx = lay.boble.x - 4, ty = NK.klamp(lay.mund.y - th / 2, lay.y + 4, lay.bordY - th - 2);
+            ctx.fillStyle = "rgba(242, 197, 61, 0.96)";
+            NK.rundtRekt(ctx, tx, ty, tb, th, 14);
+            ctx.fill();
+            ctx.fillStyle = "#1f2328";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText(this.hoverTekst, tx + 11, ty + th / 2 + 0.5);
+        }
         ctx.restore();
     };
 

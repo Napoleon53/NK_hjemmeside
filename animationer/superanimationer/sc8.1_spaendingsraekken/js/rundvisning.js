@@ -31,7 +31,7 @@
             { sel: "#rk-skemakort", titel: "Skemaet", tekst: "Dine forsøg fra fane 1. Knappen giver et hint og derefter svaret." }
         ],
         "fane-forudsig": [
-            { sel: "#fu-anker-raekke", titel: "Spændingsrækken", tekst: "Som i bogen: uædel til venstre, ædel til højre." },
+            { sel: "#fu-anker-raekke", titel: "Spændingsrækken", tekst: "Uædel til venstre, ædel til højre." },
             { sel: "#fu-anker-glas", titel: "Glasset", tekst: "Stangen kommer ned, når du har svaret." },
             { sel: "#fu-anker-lup", titel: "Luppen", tekst: "Det samme glas, set helt tæt på." },
             { sel: "#fu-kort", titel: "Opgaven", tekst: "Sker der noget? Hvis ja: hvad dannes, og hvor mange af hver?" },

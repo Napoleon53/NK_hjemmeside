@@ -37,8 +37,8 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
    hver reaktion har to reaktanter og to produkter før afstemningen.
 5. **Layoutet:** scene plus panel. Øverst i scenen laboratoriebordet med
    flaskerne, urglasset og luppen, under det hæftet på ternet papir, nederst
-   Kemichael ved katederet. Panelet har opgavekortet med den ene knap,
-   farvekortet og listen.
+   Kemichael ved katederet. Panelet har opgavekortet, farvekortet og listen.
+   Den ene knap stod først i opgavekortet; fra 3. oktober står den på papiret.
 
 ### Rettet efter brugerens første test (26. september 2026)
 
@@ -57,6 +57,31 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
   Vis svaret, og knappen Læs mere åbner hans forklaring i fuld skærm (se
   Hjælpen).
 
+### Rettet efter brugerens anden test (3. oktober 2026)
+
+* "Lad brugeren selv tilsætte KMnO₄ og 2 M NaOH, så det er tydeligt hvad der
+  er i opløsningen fra start. Under glasset ville det være bedre, hvis der
+  står MnO₄⁻, basisk, når disse ingredienser er tilsat." Fane 1 begynder nu
+  med et tomt urglas og fire flasker (KMnO₄, NaOH 2 M, Na₂SO₃, H₂SO₄). Eleven
+  fylder selv glasset, i den rækkefølge eleven vil, og skiltet under glasset
+  følger med: Tomt urglas, MnO₄⁻ eller Basisk, og MnO₄⁻, basisk. Siden står
+  manganstoffet og miljøet der hele vejen (MnO₄²⁻, basisk; MnO₂, basisk;
+  Mn²⁺, surt), men manganstoffet først, når eleven har valgt det i hæftet.
+* "I farvekortet må gerne fremgå navne på farvestofferne." Kortet har nu
+  permanganat, manganat, brunsten og mangan(II)ion. Brugeren skrev
+  mangan(III)ion; Mn²⁺ er mangan(II)ion.
+* "Kan det ikke være sådan, at han giver et hint, når man trykker på ham."
+  Et klik på Kemichael giver hintet til bidden (det samme som Giv hint).
+  Svaret giver han kun på knappen, så et klik aldrig koster stjernen.
+* "En ultrakort midlertidig beskrivelse til hvert trin (gerne med samme
+  skrifttype og placering, som der hvor der står Lidt sulfit). Fx: Skriv
+  oxidationstallene for S og Mn i skemaet." Linjen øverst i hæftet viser nu
+  det næste skridt og skifter med hver bid (`kortLinje` i `js/sim.js`).
+* "Placer hint nede i højre hjørne af papirområdet" og "placer næste opgave
+  lidt mere centralt i animationen". Den ene knap står nu på papiret: Giv
+  hint og Vis svaret i papirets nederste højre hjørne, Næste opgave midt i
+  hæftet under reaktionspilen (eller midt for nederst, når der ikke er plads).
+
 ## Hæftet
 
 Skemaet står på ternet papir med en rød margenlinje. Det, eleven skriver,
@@ -64,12 +89,22 @@ står med blåt blæk i håndskrift, det givne med blyant, og
 et svar fra Vis svaret med brunt blæk. Reaktionspilen er lang, som i hånden,
 så der er plads til "5 ↑1" under den.
 
+Øverst i hæftet står det næste skridt helt kort, fx "Skriv oxidationstallene
+for S og Mn i skemaet". Når skemaet er afstemt, står der "Lidt sulfit:
+afstemt ✓".
+
 Bidderne (linjen i opgavekortet siger altid næste skridt i hele sætninger,
 og trinlisten over den viser de færdige med ✓):
 
+0. **Fyld urglasset** (kun den første reaktion på fane 1). Glasset er tomt.
+   Eleven trækker flaskerne med kaliumpermanganat og natriumhydroxid hen
+   over glasset, i den rækkefølge eleven vil. Dråberne bliver til en pyt,
+   der vokser, til glasset er fyldt. Mens glasset fyldes, står kun det i
+   hæftet, der er i glasset (MnO₄⁻, når permanganaten er kommet i). En
+   forkert flaske flyver hjem med en besked om, hvad der mangler.
 1. **Dryp i glasset.** Træk flasken hen over urglasset (eller klik på
    glasset eller flasken). Den vender tuden nedad og drypper tre dråber, og
-   farven breder sig fra dråben. På fane 1 er der to flasker; den forkerte
+   farven breder sig fra dråben. På fane 1 er der fire flasker; den forkerte
    flyver hjem med en besked om, hvilken der skal bruges.
 2. **Hvad blev mangan til?** Et spørgsmålstegn står, hvor manganstoffet skal
    stå, og under det tre formler. Farvekortet i panelet viser farverne. Et
@@ -107,8 +142,10 @@ til der er dryppet (se `feedback-ingen-facit-foer-tid` i noterne).
 
 ## Hjælpen
 
-Den ene knap i panelet er Giv hint → Vis svaret (Dryp for mig ved dryppet,
-det koster ikke stjernen) → Næste opgave. Kemichael siger én kort sætning i
+Den ene knap står på papiret i scenen: Giv hint → Vis svaret (Dryp for mig
+ved dryppet, det koster ikke stjernen) i papirets nederste højre hjørne, og
+Næste opgave midt i hæftet (`placerKnap` i `js/haefte.js`). Et klik på
+Kemichael giver også hintet, men aldrig svaret. Kemichael siger én kort sætning i
 almindelige ord, fx "Se på SO₃²⁻. Alle tallene skal give ionens ladning, −2.
 Hvad skal S så være?" eller "Her er tallene. S går fra +IV til +VI, og Mn
 går fra +VII til +VI." Bagefter står knappen **Læs mere**, der åbner hans
@@ -156,7 +193,7 @@ gangetallene, koefficienterne, ladningen, H⁺ eller OH⁻ og vandet.
 
 | Fane | Reaktionerne |
 |------|--------------|
-| Urglassene (3, i samme glas) | basisk permanganat og lidt sulfit (MnO₄²⁻, grønt, ↓1), mere sulfit (MnO₂, brunt, ↓2) og svovlsyre, der opløser brunstenen med den sulfit, der er tilbage (Mn²⁺, næsten farveløst, ↓2); i alt fra +VII til +II |
+| Urglassene (3, i samme glas) | eleven fylder glasset med permanganat og natriumhydroxid; så lidt sulfit (MnO₄²⁻, grønt, ↓1), mere sulfit (MnO₂, brunt, ↓2) og svovlsyre, der opløser brunstenen med den sulfit, der er tilbage (Mn²⁺, næsten farveløst, ↓2); i alt fra +VII til +II |
 | Surt miljø (6) | Fe²⁺ (tegningen og c8.6), SO₃²⁻ (↓5), Sn²⁺, NO₂⁻, H₂S (gult svovl), SO₂ (H⁺ efter pilen) |
 | Neutralt og basisk (4) | SO₃²⁻ i vand (OH⁻ efter pilen), NO₂⁻, I⁻ ⟶ IO₃⁻ (↑6 og ↓3 giver 1 og 2), S²⁻ |
 | Indekstal (4) | C₂O₄²⁻ ⟶ CO₂ (bobler), H₂O₂ ⟶ O₂ (bobler), I⁻ ⟶ I₂ (brunt, men klart), Br⁻ ⟶ Br₂ |
@@ -171,6 +208,9 @@ afstemt med de mindste tal.
   lærebøgerne: der er ingen H⁺ at tage af, og opløsningen bliver svagt basisk.
 * Det basiske glas bliver grønt med lidt sulfit og brunt med mere. Hvor
   meget sulfit der skal til, er ikke med.
+* Tre dråber fra flasken fylder urglasset. Mængderne er ikke med.
+* Sulfit eller syre i et glas, der ikke er fyldt endnu, afvises med en
+  besked. Reaktionen uden base (neutralt, brunsten) står på fane 2.
 * Den gamle c8.5 afstemte permanganat og sulfit i syre i sidste trin, men da
   er permanganaten brugt op. Her er det brunstenen, der reagerer med den
   sulfit, der er tilbage: SO₃²⁻ + MnO₂ + 2 H⁺ ⟶ SO₄²⁻ + Mn²⁺ + H₂O.
@@ -185,7 +225,9 @@ afstemt med de mindste tal.
 
 Den rolige udgave fra sc8.2 (`NK.RoligLaerer` i `js/laerer.js`): han sidder
 bag katederet, siger kun noget ved Giv hint og Vis svaret, tier, når bidden
-er løst, og kan sendes ud (så står hintene i opgavekortet). Ingen Start
+er løst, og kan sendes ud (så står hintene i opgavekortet). Et klik på ham
+giver hintet til bidden; holdes musen over ham, står der "Klik for et hint".
+Er skemaet afstemt, svarer han som ellers på et prik. Ingen Start
 præsentation / Nej tak. K får ham til at sige, hvor man er, og hvad man gør.
 Påskeæg: flasken sluppet over hans kop ("Sulfit i kaffen? Den er reduceret
 nok i forvejen." / "Ikke permanganat i kaffen. Den er oxideret nok.").
@@ -203,13 +245,15 @@ js/redox.js         modellen: oxidationstal, klammer, gangetal, afstemning
 js/sprites.js       katederet, urglasset og dråbeflasken
 js/tegning.js       bordet, klinken, væsken, flasken, dråberne og luppen
 js/laerer.js        Kemichael ved katederet (som sc8.2, egen nøgle)
-js/fane.js          det fælles: listen, knappen, linjen og musen (som sc8.2)
-js/haefte.js        hæftet: skemaet, felterne, klammerne (SVG) og rækkerne
+js/fane.js          det fælles: listen, knappen, linjen, musen og klikket
+                    på Kemichael (som sc8.2)
+js/haefte.js        hæftet: skemaet, felterne, klammerne (SVG), rækkerne, den
+                    korte linje øverst og knappen på papiret
 js/bord.js          bordet: glassene, flasken, dryppet og luppen
 js/forklaring.js    Kemichaels forklaring bag Læs mere (kort, tallinje,
                     gangetabeller og tabeller)
-js/sim.js           de to faner: bidderne, tjekkene, låsen på fane 1,
-                    hint og Vis svaret
+js/sim.js           de to faner: bidderne, tjekkene, det tomme urglas og
+                    låsen på fane 1, skiltet under glasset, hint og Vis svaret
 js/rundvisning.js   rundvisningen bag ?
 js/app.js           faneskift, tastatur og tegneløkken
 _sprites.html       udviklerværktøj: tegningerne alene
@@ -229,13 +273,16 @@ links: `#urglas` og `#flere`.
 (Kemichael hentes derfra). Den tjekker de 17 skemaer mod de kendte (også
 tegningens), klammerne og gangetallene, at felterne læser romertal og tal,
 beskederne til de typiske fejl, at der ikke står et facit før tid, at
-reaktionerne i glasset på fane 1 åbner én ad gangen og kræver den rigtige
-flaske, at pilen kan vendes med klik, taster og fortegn, at alle reaktioner
+eleven selv fylder det tomme urglas (i begge rækkefølger), at skiltet under
+glasset følger med, at reaktionerne i glasset på fane 1 åbner én ad gangen
+og kræver den rigtige flaske, at knappen står på papiret uden at dække
+noget, at den korte linje følger bidderne, at et klik på Kemichael giver
+hintet og aldrig svaret, at pilen kan vendes med klik, taster og fortegn, at alle reaktioner
 kan gennemføres ved at skrive, med musen og med Vis svaret, at Kemichael
 siger én kort sætning, og at Læs mere åbner forklaringen (uden facit efter et
 hint), Kemichael inde og ude, sproget (også i alle forklaringerne) og
 layoutet fra 1100 × 700 til 1600 × 950.
-Sidst kørt: ALT OK (215 påstande), 26. september 2026.
+Sidst kørt: ALT OK (266 påstande), 3. oktober 2026.
 
 ## I menuen
 

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organisk syntese</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Organisk syntese</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-rk" role="tab" aria-selected="true"><span class="nr">1</span>Reaktoren</button>
+        <button class="faneknap" data-fane="fane-fb" role="tab" aria-selected="false"><span class="nr">2</span>Fabrikken</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: REAKTOREN                                                  -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-rk" role="tabpanel" aria-label="Reaktoren">
+    <div class="scene">
+        <div class="hylde" id="rk-hylde"></div>
+        <p class="ordrelinje" id="rk-ordrelinje"></p>
+        <div class="arbejde">
+            <div class="reaktor" id="rk-reaktor">
+                <div class="pladser">
+                    <button class="plads" id="rk-plads0" type="button"></button>
+                    <button class="plads" id="rk-plads1" type="button"></button>
+                </div>
+                <canvas class="kolbe" id="rk-kolbe"></canvas>
+                <div class="betingelser">
+                    <button class="kontakt" id="rk-hplus" type="button" aria-pressed="false" title="Svovlsyre som katalysator (H⁺)"><i></i>Svovlsyre</button>
+                    <button class="kontakt" id="rk-varme" type="button" aria-pressed="false" title="Varmepladen under vandbadet"><i></i>Varme</button>
+                </div>
+                <div class="startrad">
+                    <button class="startknap" id="rk-start" type="button" title="Start (Enter)">Start ▶</button>
+                    <button class="toemknap" id="rk-toem" type="button" hidden>Tøm kolben</button>
+                </div>
+            </div>
+            <div class="tavleboks" id="rk-tavleboks"><canvas id="rk-tavle"></canvas></div>
+        </div>
+
+        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, og den ene knap -->
+        <div class="statuslinje" id="rk-status">
+            <p class="st-tekst" id="rk-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="rk-forfra" type="button" title="Tøm kolben og ryd det lavede (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="rk-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="rk-kort">
+            <h2><span>Ordren</span><span class="taeller">ordre <b id="rk-nr">1</b>/10</span></h2>
+            <div id="rk-prompt"></div>
+        </div>
+
+        <div class="kort" id="rk-opgaver">
+            <h2>Ordrerne <span class="taeller">leveret <b id="rk-loest">0</b>/10</span></h2>
+            <div class="opg-liste" id="rk-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FABRIKKEN                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fb" role="tabpanel" aria-label="Fabrikken">
+    <div class="scene">
+        <div class="hylde" id="fb-hylde"></div>
+        <p class="ordrelinje" id="fb-ordrelinje"></p>
+        <div class="arbejde">
+            <div class="reaktor" id="fb-reaktor">
+                <div class="pladser">
+                    <button class="plads" id="fb-plads0" type="button"></button>
+                    <button class="plads" id="fb-plads1" type="button"></button>
+                </div>
+                <canvas class="kolbe" id="fb-kolbe"></canvas>
+                <div class="betingelser">
+                    <button class="kontakt" id="fb-hplus" type="button" aria-pressed="false" title="Svovlsyre som katalysator (H⁺)"><i></i>Svovlsyre</button>
+                    <button class="kontakt" id="fb-varme" type="button" aria-pressed="false" title="Varmepladen under vandbadet"><i></i>Varme</button>
+                </div>
+                <div class="startrad">
+                    <button class="startknap" id="fb-start" type="button" title="Start (Enter)">Start ▶</button>
+                    <button class="toemknap" id="fb-toem" type="button" hidden>Tøm kolben</button>
+                </div>
+            </div>
+            <div class="tavleboks" id="fb-tavleboks"><canvas id="fb-tavle"></canvas></div>
+        </div>
+
+        <div class="statuslinje" id="fb-status">
+            <p class="st-tekst" id="fb-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="fb-forfra" type="button" title="Start fabrikken forfra">Forfra ↺</button>
+            <button class="knap hjaelp" id="fb-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort kasse" id="fb-kasse">
+            <h2><span>Kassen</span><span class="taeller">leveret <b id="fb-leveret">0</b></span></h2>
+            <div class="kasse-raekke">
+                <span class="kasse-penge"><b id="fb-penge">300</b> kr</span>
+                <span class="kasse-aendring" id="fb-aendring"></span>
+                <span class="kasse-titel" id="fb-titel">Lærling</span>
+            </div>
+            <div class="bar"><i id="fb-bar"></i></div>
+            <p class="note-tekst" id="fb-maal"></p>
+        </div>
+
+        <div class="kort" id="fb-kunder">
+            <h2><span>Kunderne</span><span class="taeller">klik for hint til ordren</span></h2>
+            <div class="ordreliste" id="fb-ordrer"></div>
+        </div>
+
+        <div class="kort boers" id="fb-boerskort">
+            <h2><span>Børsen</span></h2>
+            <p class="boers-tekst" id="fb-boers"></p>
+            <div class="bar tynd"><i id="fb-boersbar"></i></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Esterdannelse og oxidation</h2>
+
+        <h3 class="teori-hoved">En ester</h3>
+        <p>En carboxylsyre og en alkohol bliver til en ester og vand. Syrens OH og alkoholens H bliver til vandet, og C-atomet i COOH binder sig til alkoholens O.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O<br>
+            ethansyre + ethanol ⇌ ethylethanoat + vand
+        </div>
+        <p>Reaktionen går langsomt. Man tilsætter lidt koncentreret svovlsyre som katalysator (H⁺) og koger blandingen med en tilbagesvaler, så intet koger væk. Reaktionen er en ligevægt, så der er altid lidt syre og alkohol tilbage.</p>
+
+        <h3 class="teori-hoved">Navnet</h3>
+        <p>Navnet har to dele. Den første kommer fra alkoholen og ender på -yl. Den sidste kommer fra syren og ender på -oat.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            <span class="t-alk">pentyl</span><span class="t-syre">ethanoat</span> laves af <span class="t-alk">pentan-1-ol</span> og <span class="t-syre">ethansyre</span>.
+        </div>
+
+        <h3 class="teori-hoved">Oxidation af en alkohol</h3>
+        <ul class="teori-trin">
+            <li><b>Primær alkohol</b> (OH på et C for enden af kæden): bliver først til et aldehyd og så til en carboxylsyre med samme antal C. Med en tilbagesvaler når aldehydet ikke at koge væk.</li>
+            <li><b>Sekundær alkohol</b> (OH på et C inde i kæden): bliver til en keton. Propan-2-ol bliver til propanon.</li>
+            <li><b>Tertiær alkohol</b>: bliver ikke oxideret. C-atomet med OH har intet H.</li>
+        </ul>
+        <p>Kaliumpermanganat er violet. Når det oxiderer alkoholen, bliver det til næsten farveløs Mn²⁺.</p>
+
+        <h3 class="teori-hoved">Aspirin</h3>
+        <p>Salicylsyre har både en COOH-gruppe og en OH-gruppe på benzenringen. Med en alkohol reagerer COOH-gruppen (methylsalicylat). Med ethansyre reagerer ringens OH (acetylsalicylsyre). I fabrikken bruger man ethansyreanhydrid i stedet for ethansyre, fordi ringens OH reagerer langsomt.</p>
+
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> Start &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/trivialnavne.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/morf.js"></script>
+<script src="js/reaktor.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_reaktor.js"></script>
+<script src="js/sim_fabrik.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

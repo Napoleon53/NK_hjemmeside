@@ -145,7 +145,7 @@ js/tjek.js          formlen og tallet i hvert regnetrin, de typiske fejl og de p
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, bordet, tavlen, vægten, lighteren, flammen, brandkuglen, papiret, karret med måleglas og
                     stativ, boblerne, luppen og søjlerne med alkanerne
-js/laerer.js        Kemichael, der kun kommer ved påskeæggene (som sc_spil_syregalgen)
+js/laerer.js        Kemichael, der kun kommer ved påskeæggene (som sc_spil5_syregalgen)
 js/fane.js          det, fanerne deler: opgavelisten, knappen, linjen i kortet og musen
 js/regning.js       regnetrinene i kortet (formlen og tallet) og tavlen på fane 2
 js/sim_forsoeg.js   fane 1, målingerne, som fane 2 bruger, tuningen og påskeæggene

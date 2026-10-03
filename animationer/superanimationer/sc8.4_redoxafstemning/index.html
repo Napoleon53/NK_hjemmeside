@@ -22,20 +22,23 @@
         </div>
     </div>
 
+    <!-- Elektronvægten er slået fra, til eleven selv slår den til. -->
+    <button class="vaegtknap" id="vaegtknap" type="button" aria-pressed="false" title="Vis eller skjul elektronvægten (V)"><span class="kontakt"><i></i></span>Elektronvægt</button>
     <button class="teoriknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
     <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
 </header>
 
 <main>
 <section class="fane aktiv" id="fane" role="tabpanel" aria-label="Opgave">
-    <div class="scene">
-        <div class="vaegt-omraade" id="vaegt-omraade">
+    <div class="scene" id="scene">
+        <!-- Opgaven står over arbejdsfladen, ikke i panelet. -->
+        <div class="opgavelinje" id="opgavelinje">
+            <span class="ol-etiket">Opgave</span>
+            <p class="opgavetekst"><span id="opgavetekst"></span> <span class="kontekst" id="kontekst" hidden></span></p>
+        </div>
+
+        <div class="vaegt-omraade" id="vaegt-omraade" hidden>
             <canvas id="laerred" aria-label="Elektronvægten"></canvas>
-            <div class="tilbud" id="tilbud" hidden>
-                <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-                <button class="tilbud-nej" type="button">Nej tak</button>
-            </div>
-            <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
         </div>
 
         <div class="arbejdsbord" id="arbejdsbord">
@@ -43,23 +46,29 @@
                 <span class="ab-trin" id="ab-trin">Trin 1</span>
                 <span class="ab-spm" id="ab-spm"></span>
             </div>
-            <div class="tavle" id="tavle"></div>
-            <div class="kontrol" id="kontrol"></div>
-            <div class="ab-valg" id="ab-valg"></div>
-            <div class="ab-bund">
-                <p class="besked" id="besked" aria-live="polite"></p>
-                <button class="knap blaa tjekknap" id="tjek" type="button">Tjek</button>
+            <!-- Tavlen: skemaet, trinnets felter, tasterne, kontrollen,
+                 knapperne og beskeden. Det hele står samlet midt på tavlen.
+                 Den gule knap er Giv hint, så Vis svaret og til sidst Ny opgave. -->
+            <div class="tavleramme" id="tavleramme">
+                <div class="tavle" id="tavle"></div>
+                <div class="ab-valg" id="ab-valg"></div>
+                <div class="taster" id="taster" hidden></div>
+                <div class="kontrol" id="kontrol"></div>
+                <div class="ab-bund">
+                    <div class="ab-knapper">
+                        <button class="knap hintknap" id="opgaveknap" type="button">Giv hint</button>
+                        <button class="knap blaa tjekknap" id="tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="besked" id="besked" aria-live="polite"></p>
+                </div>
             </div>
         </div>
     </div>
 
     <aside class="panel">
         <div class="kort opgavekort" id="opgavekort">
-            <h2>Opgave</h2>
-            <p class="opgavetekst" id="opgavetekst"></p>
-            <p class="kontekst" id="kontekst" hidden></p>
+            <h2>De syv trin</h2>
             <ol class="trinliste" id="trinliste"></ol>
-            <button class="knap stor blaa" id="opgaveknap" type="button">Giv hint</button>
         </div>
 
         <div class="kort listekort" id="listekort">
@@ -98,10 +107,13 @@
         <p>Et grundstof kan både oxideres og reduceres i samme reaktion. Så står det samme stof to gange, mens der afstemmes, og de to slås sammen til sidst.</p>
 
         <h3>Skrivemåden</h3>
-        <p>Oxidationstal skrives med romertal: +VII, −II og 0. Du kan også skrive +7 og −2. Undervejs skriver du også 1 foran et stof. I det færdige skema udelades 1.</p>
+        <p>Oxidationstal skrives med romertal: +VII, −II og 0. Du kan også skrive +7 og −2. Undervejs skriver du også 1 foran et stof. I det færdige skema udelades 1. Klik på et felt, og brug tasterne under skemaet, eller skriv på tastaturet.</p>
+
+        <h3>Elektronvægten</h3>
+        <p>Knappen Elektronvægt i toplinjen viser en vægt over skemaet. Til venstre ligger det, der afgiver elektroner, til højre det, der optager dem. Vægten står lige, når der afgives lige så mange, som der optages.</p>
 
         <h3>Genveje</h3>
-        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sværhedsgrad &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>K</kbd> Kemichaels præsentation &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sværhedsgrad &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>V</kbd> elektronvægt &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
 
         <div class="knapper" style="margin-top:18px;">
             <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
@@ -130,14 +142,10 @@
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/redox.js"></script>
-<script src="js/sprites.js"></script>
-<script src="../../v2/kemichael/kemichael.js"></script>
-<script src="../kemichael/superanimation.js"></script>
 <script src="js/vaegt.js"></script>
+<script src="js/taster.js"></script>
 <script src="js/opgave.js"></script>
-<script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
-<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

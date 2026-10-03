@@ -107,8 +107,10 @@
 
     T.urglasGeo = function (cx, bund, b) {
         var s = b / MU.b;
+        /* skaal: glassets bund indvendigt, hvor en draabe lander i et tomt glas */
         return { cx: cx, bund: bund, b: b, s: s, x: cx - MU.cx * s, y: bund - MU.bund * s,
-                 overflade: bund - (MU.bund - MU.vy) * s, rx: MU.vrx * s, ry: MU.vry * s };
+                 overflade: bund - (MU.bund - MU.vy) * s, skaal: bund - (MU.bund - 58) * s,
+                 rx: MU.vrx * s, ry: MU.vry * s };
     };
 
     /* Et punkt i glassets egne enheder lavet om til laerredet og tilbage */
@@ -118,7 +120,23 @@
         ctx.save();
         ctx.translate(g.x, g.y);
         ctx.scale(g.s, g.s);
-        if (v.farve && v.farve[3] > 0.005) {
+        /* Et tomt glas har ingen vaeske; den foerste draabe bliver til en pyt,
+           der vokser fra bunden, til glasset er fyldt */
+        var tomt = !(v.farve && v.farve[3] > 0.005);
+        var pyt = tomt && v.blob && v.blob.r > 0.5 ? v.blob : null;
+        if (pyt) {
+            ctx.save();
+            vaeskeSti(ctx);
+            ctx.clip();
+            ctx.beginPath();
+            ctx.ellipse(pyt.x, pyt.y, pyt.r, pyt.r * 0.42, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(236, 240, 244, 0.88)";
+            ctx.fill();
+            ctx.fillStyle = T.rgba(pyt.farve);
+            ctx.fill();
+            ctx.restore();
+        }
+        if (!tomt) {
             ctx.save();
             vaeskeSti(ctx);
             ctx.clip();

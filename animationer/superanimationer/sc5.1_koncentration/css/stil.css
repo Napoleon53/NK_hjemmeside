@@ -1016,6 +1016,8 @@ sub { font-size: 0.68em; line-height: 0; vertical-align: -0.3em; font-style: nor
     white-space: nowrap;
 }
 .glastabel td.ukendt { color: var(--gul); }
+/* Tallet fra foer der blev haeldt, under det, der staar nu */
+.glastabel td .foer { display: block; margin-top: 1px; font-size: 0.8rem; font-weight: 600; color: var(--tekst-mat); }
 @keyframes ny-tal {
     0%   { background-color: rgba(63, 174, 114, 0.55); }
     100% { background-color: rgba(255, 255, 255, 0.045); }

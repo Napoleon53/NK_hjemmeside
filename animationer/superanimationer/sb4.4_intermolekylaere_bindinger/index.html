@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intermolekylære bindinger</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">δ</span> Intermolekylære bindinger</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-e" role="tab" aria-selected="true"><span class="nr">1</span>Ethanol</button>
+        <button class="faneknap" data-fane="fane-s" role="tab" aria-selected="false"><span class="nr">2</span>Sammenlign</button>
+        <button class="faneknap" data-fane="fane-r" role="tab" aria-selected="false"><span class="nr">3</span>Rangér</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: ETHANOL                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-e" role="tabpanel" aria-label="Ethanol">
+    <div class="scene">
+        <canvas id="e-laerred"></canvas>
+        <!-- Hvad der er i glasset, og bindingerne i luppen lige nu -->
+        <div class="signatur" id="e-signatur">
+            <div class="sig-titel">Ethanol <span class="sig-formel">CH₃CH₂OH</span></div>
+            <div class="sig-raekke"><i class="sig-hb"></i><span class="sig-navn">Hydrogenbindinger</span><b id="e-ant-hb">0</b></div>
+            <div class="sig-raekke"><i class="sig-lon"></i><span class="sig-navn">London-kræfter</span><b id="e-ant-lon">0</b></div>
+            <div class="sig-atomer"><span><i class="sig-c"></i>C</span><span><i class="sig-o"></i>O</span><span><i class="sig-h"></i>H</span></div>
+        </div>
+        <button class="kontakt til" id="e-kontakt" type="button" aria-pressed="true" hidden><span id="e-kontakt-tekst">Hydrogenbindinger: til</span></button>
+        <div class="anker" id="e-anker-lup"></div>
+        <div class="anker" id="e-anker-kammer"></div>
+        <div class="anker" id="e-anker-termometer"></div>
+
+        <div class="statuslinje" id="e-status">
+            <p class="st-tekst" id="e-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="e-forfra" type="button" title="Ny prøve ved 20 °C (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="e-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="e-kort">
+            <h2><span id="e-titel">Opgave</span><span class="taeller">mål <b id="e-nr">1</b>/<span id="e-antal">4</span></span></h2>
+            <div id="e-prompt"></div>
+        </div>
+
+        <div class="kort" id="e-opgaver">
+            <h2>Målene <span class="taeller">løst <b id="e-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="e-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SAMMENLIGN                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-s" role="tabpanel" aria-label="Sammenlign">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <div class="anker" id="s-anker-lupper"></div>
+        <div class="anker" id="s-anker-kamre"></div>
+        <div class="anker" id="s-anker-termometer"></div>
+
+        <div class="statuslinje" id="s-status">
+            <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="s-forfra" type="button" title="Samme par forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="s-kort">
+            <h2><span id="s-titel">Opgave</span><span class="taeller">par <b id="s-nr">1</b>/<span id="s-antal">5</span></span></h2>
+            <div id="s-prompt"></div>
+        </div>
+
+        <div class="kort maaling" id="s-grafkort">
+            <h2>Kogepunkterne</h2>
+            <canvas class="graf" id="s-graf"></canvas>
+            <div class="graf-noegle"><span><i class="gn-alkan"></i>alkan</span><span><i class="gn-alkohol"></i>alkohol</span><span><i class="gn-diol"></i>to OH</span></div>
+            <button class="knap nye" id="s-tabel" type="button" hidden>Vis hele tabellen</button>
+        </div>
+
+        <div class="kort" id="s-opgaver">
+            <h2>Parrene <span class="taeller">løst <b id="s-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="s-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: RANGÉR                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-r" role="tabpanel" aria-label="Rangér">
+    <div class="scene">
+        <canvas id="r-laerred"></canvas>
+        <div class="tavle rangtavle" id="r-tavle">
+            <div class="rt-akse"><span>Lavest kogepunkt</span><span class="rt-pil" aria-hidden="true"></span><span>Højest kogepunkt</span></div>
+            <div class="rt-pladser" id="r-pladser"></div>
+        </div>
+        <button class="tjekknap" id="r-tjek" type="button">Tjek rækkefølgen</button>
+        <div class="anker" id="r-anker-akse"></div>
+
+        <div class="statuslinje" id="r-status">
+            <p class="st-tekst" id="r-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="r-forfra" type="button" title="Samme stoffer i ny rækkefølge (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="r-kort">
+            <h2><span id="r-titel">Opgave</span><span class="taeller">opgave <b id="r-nr">1</b>/<span id="r-antal">12</span></span></h2>
+            <div id="r-prompt"></div>
+        </div>
+
+        <div class="kort" id="r-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="r-loest">0</b>/12 · ★ <b id="r-stjerner">0</b></span></h2>
+            <div class="opg-liste" id="r-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Intermolekylære bindinger</h2>
+        <p>Molekylerne i en væske holder fast i hinanden med bindinger mellem molekylerne. Når stoffet koger, brydes de, og molekylerne farer ud som damp. Bindingerne inde i molekylerne holder.</p>
+        <h3 class="teori-hoved">London-kræfter</h3>
+        <p>Virker mellem alle molekyler. De er større, jo mere molekylerne rører hinanden. En lang kæde rører sine naboer mere end en kort, og et forgrenet, kugleformet molekyle rører dem mindst.</p>
+        <h3 class="teori-hoved">Hydrogenbindinger</h3>
+        <p>Et H, der sidder på O, er δ+, fordi O trækker elektronerne til sig. Det tiltrækkes af et frit elektronpar på O i et nabomolekyle, som er δ−. Et H på C kan ikke, for C og H trækker næsten lige meget i elektronerne. Én hydrogenbinding holder langt stærkere end London-kræfterne mellem to CH-grupper.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: samme størrelse</span>
+            Propan, CH₃CH₂CH₃, 44 g/mol, koger ved −42 °C.<br>
+            Ethanol, CH₃CH₂OH, 46 g/mol, koger ved 78 °C.
+        </div>
+        <h3 class="teori-hoved">Tommelfingerregler for kogepunktet</h3>
+        <ol class="teori-trin">
+            <li>Flere OH-grupper giver et højere kogepunkt.</li>
+            <li>En længere kæde giver et højere kogepunkt.</li>
+            <li>Et forgrenet, mere kugleformet molekyle har et lavere kogepunkt.</li>
+            <li>I små molekyler betyder OH-gruppen mest. I store molekyler betyder kæden mest.</li>
+        </ol>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperaturen (med Skift ti grader) &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/molekyler.js"></script>
+<script src="js/model.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/termostat.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_ethanol.js"></script>
+<script src="js/sim_sammenlign.js"></script>
+<script src="js/sim_ranger.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -52,6 +52,15 @@ Brugerens tilbagemelding 29. sept. 2026 og valgene bagefter:
   sc4.3).
 * Fortynding skrives med V_før og V_efter (sænket før og efter), ikke V₁ og V₂.
 
+Brugerens tilbagemelding 3. okt. 2026 (fane 2):
+
+* Forklaringen til et rigtigt svar kom samtidig med det næste spørgsmål og
+  sluttede med "Vælg et svar i kortet." Nu bliver spørgsmålet og
+  forklaringen stående, og knappen i kortet bliver til Næste spørgsmål.
+* 0,50 M betyder "0,50 mol pr. liter vand" (brugerens ordlyd).
+* Hælder man først og tænker bagefter, var tallene væk. Nu står tallene fra
+  før under de nye i tabellen, og etiketten bliver på et tomt glas.
+
 ## Hvad den viser
 
 | # | Fane | Hvad man gør | Pointe |
@@ -85,12 +94,15 @@ skal findes, er et gult ?. Spørgsmålene står i kortet med svarknapper
 Et forkert svar bliver rødt og forklaret, og så prøver man igen (ingen
 stjerne). Et rigtigt svar får scenen til at vise det: prikkerne tælles én ad
 gangen, tallet kommer i tabellen, etiketten kommer på glasset, eller
-enhederne streges ud. Opgaverne:
+enhederne streges ud. Forklaringen står i linjen, og spørgsmålet bliver
+stående, til eleven trykker Næste spørgsmål (knappen i kortet; Enter gør
+det samme). Opgaverne:
 
 1. Samme stofmængde: 0,20 mol i 0,40 L og i 0,80 L. Største n? (lige meget),
    største c? (A).
 2. Etiketten: 0,30 mol i 0,60 L. Hvad står der på etiketten? (0,50 M, med
-   0,50 mol og 0,30 M som lokkere), hvad betyder 0,50 M?
+   0,50 mol og 0,30 M som lokkere), hvad betyder 0,50 M? (0,50 mol pr.
+   liter vand)
 3. Hæld halvdelen over: klik på glasset, så løftes det, hælder og kommer
    tilbage, og prikkerne falder ned i det andet glas. c og n i det nye glas.
 4. To glas i ét: to glas med 0,50 M hældes i et tredje. c er den samme,
@@ -106,7 +118,10 @@ enhederne streges ud. Opgaverne:
    0,30 M er lokkere).
 
 Det, en handling ændrer, skjules, når handlingen begynder, så luppen og
-bordkanten ikke viser svaret, mens der hældes.
+bordkanten ikke viser svaret, mens der hældes. Det, tabellen viste lige før,
+huskes (`huskFoer`): et tal, der er ændret eller skjult, får en lille linje
+under sig ("før 0,10 mol"), et glas, der er hældt tomt, beholder sin
+etiket, og et klik på det siger, hvad der var i det.
 
 **Målekolben.** Seks opgaver: find c (n og V kendt), find n, find V (hvor
 stor skal kolben være), fra masse til koncentration (molarmassen, n og c),

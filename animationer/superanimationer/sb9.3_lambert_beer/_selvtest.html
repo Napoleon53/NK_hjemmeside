@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb9.3 Lambert-Beers lov</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen rammer Lambert-Beers lov og
+   tabelværdierne, at fotonerne bliver absorberet efter I(x), at hver
+   forudsigelse har ét rigtigt svar, der passer med modellen, at alle
+   seks forudsigelser, fire standardkurver og otte regnestykker kan
+   gennemføres med rigtige klik, træk og tastninger (og med Vis svaret),
+   at hver typisk fejl får sin besked, at hintet er tre trin, sproget og
+   layoutet fra 1100 × 700 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb9.3-lys", "nk-sb9.3-kurve", "nk-sb9.3-regn"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|traekker|aendr\w*|taeller|loest|maal\w*|proev\w*|toer\w*|broek\w*|staar)\b/;
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, LB = NK.LB, R = NK.Regn;
+    var L = NK.sims["fane-lys"], K = NK.sims["fane-kurve"], G = NK.sims["fane-regn"];
+    var tekster = [];
+    function noter(t) { tekster.push(t); }
+
+    /* Tegneloekken koerer ikke af sig selv i en skjult iframe: kør den */
+    function koerTil(S, betingelse, max) {
+        for (var i = 0; i < (max || 400); i++) {
+            if (betingelse && betingelse()) return true;
+            S.opdater(0.05);
+        }
+        return betingelse ? betingelse() : true;
+    }
+    function skyd(id, v) {
+        var e = d.getElementById(id);
+        e.value = v;
+        e.dispatchEvent(new W.Event("input", { bubbles: true }));
+        e.dispatchEvent(new W.Event("change", { bubbles: true }));
+    }
+    /* Pointer-hændelser paa et laerred i laerredets egne koordinater */
+    function peg(cv, type, x, y) {
+        var r = cv.getBoundingClientRect();
+        cv.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + x, clientY: r.top + y, pointerId: 1, bubbles: true, button: 0, buttons: type === "pointerup" ? 0 : 1 }));
+    }
+    function klikPaa(cv, x, y) { peg(cv, "pointerdown", x, y); peg(cv, "pointerup", x, y); }
+    function traek(cv, x0, y0, x1, y1) {
+        peg(cv, "pointerdown", x0, y0);
+        for (var i = 1; i <= 8; i++) peg(cv, "pointermove", x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * i / 8);
+        peg(cv, "pointerup", x1, y1);
+    }
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Modellen");
+    paastand("A = ε · l · c: 2,45 · 1,00 · 0,20 = 0,490", Math.abs(LB.A(2.45, 1, 0.2) - 0.49) < 1e-12);
+    paastand("T = 10^(−A): A = 1 giver 10 %, A = 2 giver 1 %", Math.abs(LB.T(1) - 0.1) < 1e-12 && Math.abs(LB.T(2) - 0.01) < 1e-12);
+    paastand("lyset efter 2 cm er lyset efter 1 cm i anden", Math.abs(LB.lysEfter(2.45, 0.12, 2) - Math.pow(LB.lysEfter(2.45, 0.12, 1), 2)) < 1e-12);
+    /* Fotonerne: andelen, der absorberes i den første halvdel, skal passe med I(x) */
+    var n = 40000, foerst = 0, eps = 2.45, c = 0.4, l = 2;
+    for (var i = 0; i < n; i++) if (LB.absorbX(eps, c, l, Math.random()) < l / 2) foerst++;
+    var forventet = (1 - LB.lysEfter(eps, c, l / 2)) / (1 - LB.lysEfter(eps, c, l));
+    paastand("de absorberede fotoner falder efter I(x): " + (foerst / n * 100).toFixed(1) + " % i første halvdel (forventet " + (forventet * 100).toFixed(1) + " %)",
+        Math.abs(foerst / n - forventet) < 0.012);
+    var ude = 0;
+    for (i = 0; i < n; i++) { var x = LB.absorbX(eps, c, l, Math.random()); if (x < 0 || x > l + 1e-9) ude++; }
+    paastand("ingen foton absorberes uden for kuvetten", ude === 0, ude);
+    paastand("den bedste linje gennem (0, 0)", Math.abs(LB.haeldning([{ c: 1, A: 2 }, { c: 2, A: 4.2 }]) - (2 + 8.4) / 5) < 1e-12);
+    var L1 = LB.laes("0,130 mM"), L2 = LB.laes("1,30·10^-4 M"), L3 = LB.laes("1,3e-4 M"), L4 = LB.laes("1,30 · 10⁻⁴ M"), L5 = LB.laes("0.13mmol/L");
+    paastand("tal med enhed læses: 0,130 mM", L1.tal === 0.13 && L1.enhed === "mm", JSON.stringify(L1));
+    paastand("potens læses: 1,30·10^-4 M, 1,3e-4 M og 1,30 · 10⁻⁴ M",
+        Math.abs(L2.tal - 1.3e-4) < 1e-15 && Math.abs(L3.tal - 1.3e-4) < 1e-15 && Math.abs(L4.tal - 1.3e-4) < 1e-15 && L2.enhed === "m", JSON.stringify([L2, L3, L4]));
+    paastand("M regnes om til mM, og mmol/L er mM", Math.abs(LB.omregn("c", L2).v - 0.13) < 1e-12 && LB.omregn("c", L5).enhed === "ok");
+    paastand("en enhed efter A er forkert", LB.omregn("A", LB.laes("0,735 mM")).enhed === "forkert");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("2. Stofferne og forudsigelserne");
+    paastand("ε som i tabellerne: permanganat 2,45, FeSCN²⁺ 4,70 og [Fe(phen)₃]²⁺ 11,1 mM⁻¹·cm⁻¹",
+        D.STOFFER.mno4.eps === 2.45 && D.STOFFER.fescn.eps === 4.70 && D.STOFFER.fephen.eps === 11.1);
+    var fFejl = [];
+    D.FORUD.forEach(function (f) {
+        var ok = f.valg.filter(function (v) { return v.ok; });
+        if (ok.length !== 1) fFejl.push(f.id + ": " + ok.length + " rigtige");
+        var s = D.STOFFER[f.start.stof];
+        if (Math.abs(f.start.c / s.cTrin - Math.round(f.start.c / s.cTrin)) > 1e-9) fFejl.push(f.id + ": c passer ikke med skyderen");
+        if (f.hint.length !== 3) fFejl.push(f.id + ": hint");
+        /* Facit ved maalet */
+        var cM = f.maal.c ? (f.maal.c[0] + f.maal.c[1]) / 2 : f.start.c;
+        var lM = f.maal.l ? (f.maal.l[0] + f.maal.l[1]) / 2 : f.start.l;
+        if (f.maal.A) { cM = Math.round(1 / (s.eps * lM) / s.cTrin) * s.cTrin; }
+        var A = LB.A(s.eps, lM, cM), T = LB.T(A);
+        if (f.facit.T !== undefined && Math.abs(T - f.facit.T) > 0.006) fFejl.push(f.id + ": T = " + T.toFixed(4) + " mod " + f.facit.T);
+        if (f.facit.A !== undefined && Math.abs(A - f.facit.A) > 0.0006) fFejl.push(f.id + ": A = " + A.toFixed(4) + " mod " + f.facit.A);
+        /* Det rigtige svars tekst passer med facit */
+        var t = ok[0] ? ok[0].t : "";
+        if (f.facit.T !== undefined && /%/.test(t) && Math.round(T * 100) + " %" !== t) fFejl.push(f.id + ": " + t + " mod " + Math.round(T * 100) + " %");
+        if (f.facit.A !== undefined && /^\d/.test(t) && NK.dk(A, 3) !== t) fFejl.push(f.id + ": " + t + " mod " + NK.dk(A, 3));
+        noter(f.spm); noter(f.handling); noter(f.forklaring); f.hint.forEach(noter); f.valg.forEach(function (v) { noter(v.t); noter(v.n); });
+    });
+    paastand("hver forudsigelse har ét rigtigt svar, og modellen giver det", fFejl.length === 0, fFejl.join(" | "));
+    var start = D.FORUD[2].start, Ast = LB.A(D.STOFFER.mno4.eps, start.l, start.c);
+    paastand("tallene i spørgsmålene passer: A = 0,490 og 32 % ved 0,20 mM", NK.dk(Ast, 3) === "0,490" && Math.round(LB.T(Ast) * 100) === 32);
+    var A4 = LB.A(2.45, 1, 0.12);
+    paastand("Én centimeter mere: 51 % efter 1 cm og 26 % efter 2 cm", Math.round(LB.T(A4) * 100) === 51 && Math.round(LB.T(2 * A4) * 100) === 26);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Fane 1 i brug");
+    NK.visFane("fane-lys");
+    var cv1 = d.getElementById("lys-laerred");
+    L.tilpas();
+    var forkertOk = [], rigtigOk = [];
+    function vaelgSvar(nr, rigtig) {
+        L.vaelg(nr);
+        var f = D.FORUD[nr], j = -1;
+        f.valg.forEach(function (v, k) { if (!!v.ok === rigtig && j < 0) j = k; });
+        d.querySelectorAll("#lys-valg .valg-kort")[j].click();
+        return f;
+    }
+    function goerDet(nr) {
+        var f = D.FORUD[nr];
+        if (f.maal.l && f.maal.l[0] > 1.5) {
+            /* Traek i kuvettens hoejre side */
+            var g = L.geo();
+            traek(cv1, g.cr, g.ct + g.cuvH * 0.84, g.cx + 2.0 * g.pxCm / 2, g.ct + g.cuvH * 0.84);
+        }
+        if (f.maal.c) skyd("lys-c", (f.maal.c[0] + f.maal.c[1]) / 2);
+        if (f.maal.A) skyd("lys-c", L.maalC());
+    }
+    D.FORUD.forEach(function (f, nr) {
+        vaelgSvar(nr, false);
+        noter(L.beskedTekst());
+        goerDet(nr);
+        if (!(L.faerdig && /Du gættede/.test(L.beskedTekst()) && L.el.status.classList.contains("gul"))) forkertOk.push(f.id + ": " + L.beskedTekst().slice(0, 60));
+        noter(L.beskedTekst()); noter(L.promptHTML());
+        vaelgSvar(nr, true);
+        goerDet(nr);
+        if (!(L.faerdig && /Rigtigt/.test(L.beskedTekst()) && L.el.status.classList.contains("god"))) rigtigOk.push(f.id + ": " + L.beskedTekst().slice(0, 60));
+    });
+    paastand("alle seks kan prøves med skyderne og træk, også efter et forkert gæt", forkertOk.length === 0, forkertOk.join(" | "));
+    paastand("et rigtigt gæt giver Rigtigt ✓ og en grøn linje", rigtigOk.length === 0, rigtigOk.join(" | "));
+    paastand("kuvetten kan trækkes ud til 2,00 cm", (function () { L.vaelg(3); d.querySelectorAll("#lys-valg .valg-kort")[1].click(); goerDet(3); return Math.abs(L.l - 2) < 1e-9 && L.faerdig; })());
+    paastand("en skyder, der kun passerer målet, giver ikke svaret (kun når den slippes)", (function () {
+        L.vaelg(1); d.querySelectorAll("#lys-valg .valg-kort")[0].click();
+        var e = d.getElementById("lys-c"); e.value = 0.4; e.dispatchEvent(new W.Event("input", { bubbles: true }));
+        var foer = L.faerdig; e.value = 0.5; e.dispatchEvent(new W.Event("input", { bubbles: true })); e.dispatchEvent(new W.Event("change", { bubbles: true }));
+        return !foer && !L.faerdig;
+    })());
+    paastand("et svar stiller kuvetten tilbage til start", (function () {
+        L.vaelg(1); skyd("lys-c", 0.55); d.querySelectorAll("#lys-valg .valg-kort")[0].click();
+        return Math.abs(L.c - 0.20) < 1e-9 && L.fase === "proev";
+    })());
+    /* Hinttrappen og Vis svaret i gaettet */
+    L.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    L.vaelg(2);
+    var h = [];
+    for (i = 0; i < 4; i++) { h.push(L.el.knap.textContent); L.knap(); if (i < 3) noter(L.beskedTekst()); }
+    paastand("hintet er tre trin, så Vis svaret", h.join(" | ") === "Giv et hint | Næste hint (2 af 3) | Næste hint (3 af 3) | Vis svaret", h.join(" | "));
+    koerTil(L, function () { return L.faerdig; }, 80);
+    paastand("Vis svaret skruer selv, til detektoren viser svaret", L.faerdig && Math.abs(L.c - 0.4) < 1e-9 && /Svaret/.test(L.beskedTekst()), L.beskedTekst());
+    paastand("Vis svaret giver ingen stjerne", !L.status[2].stjerne);
+    /* Paaskeaegget */
+    var g1 = L.geo();
+    klikPaa(cv1, g1.dx + g1.detB / 2, g1.yc);
+    paastand("påskeægget: solbriller på detektoren giver A + 0,30", L.briller && Math.abs(L.Avis() - L.A() - 0.30) < 1e-12);
+    noter(L.beskedTekst());
+    klikPaa(cv1, g1.dx + g1.detB / 2, g1.yc);
+    paastand("solbrillerne kan tages af igen", !L.briller);
+    L.vaelg(0);
+    klikPaa(cv1, g1.dx + g1.detB / 2, g1.yc);
+    paastand("under en forudsigelse forklarer et klik på detektoren kun", !L.briller && /Detektoren måler/.test(L.beskedTekst()));
+    L.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Standardkurven");
+    NK.visFane("fane-kurve");
+    var cv2 = d.getElementById("kurve-laerred");
+    K.tilpas();
+    function klikKuv(k) {
+        var g = K.geo(), q = K.bakkePlads(g, k);
+        klikPaa(cv2, q.x + g.bk / 2, q.y + g.bh / 2);
+    }
+    function traekLinje(a) {
+        var g = K.geo(), gr = K.graf(), e = K.linjeEnde(g, gr);
+        var cc = gr.xMax * 0.8;
+        if (a * cc > gr.yMax * 0.9) cc = gr.yMax * 0.9 / a;
+        var p = K.tilPx(g, gr, cc, a * cc);
+        traek(cv2, e.x, e.y, p.x, p.y);
+    }
+    function traekAflaes(c) {
+        var g = K.geo(), gr = K.graf();
+        var x0 = K.tilPx(g, gr, K.aflaes.c, 0), x1 = K.tilPx(g, gr, c, 0);
+        traek(cv2, x0.x, x0.y + 8, x1.x, x1.y + 8);
+    }
+    var kFejl = [];
+    D.KURVE.forEach(function (o, nr) {
+        K.vaelg(nr);
+        for (var k = 0; k < 6; k++) klikKuv(k);
+        koerTil(K, function () { return K.alleMaalt() && !K.maaling && !K.koe.length; }, 600);
+        if (!K.alleMaalt()) { kFejl.push(o.id + " ikke målt"); return; }
+        if (Math.abs(K.kuv[0].A) > 1e-9) kFejl.push(o.id + " vand er ikke 0");
+        noter(K.beskedTekst()); noter(K.promptHTML());
+        if (o.aftryk) {
+            if (K.trin() !== "aftryk") kFejl.push(o.id + " fingeraftrykket ses ikke");
+            traekLinje(K.bedsteA());
+            if (K.linje.ok) kFejl.push(o.id + " linjen godtaget med fingeraftrykket");
+            noter(K.beskedTekst());
+            var g = K.geo(), pp = K.bakkePlads(g, K.kuv.length);
+            klikPaa(cv2, pp.x + g.bk / 2, pp.y + g.bh * 0.3);
+            klikKuv(K.aftrykI);
+            noter(K.beskedTekst());
+            if (K.kuv[K.aftrykI].aftryk) kFejl.push(o.id + " ikke tørret");
+            klikKuv(K.aftrykI);
+            koerTil(K, function () { return !K.maaling && !K.koe.length; }, 200);
+            if (K.trin() !== "linje") kFejl.push(o.id + " trin efter tørring: " + K.trin());
+        }
+        /* En linje, der er for stejl, og så den rigtige */
+        traekLinje(K.bedsteA() * 1.2);
+        if (K.linje.ok || !/over/.test(K.beskedTekst())) kFejl.push(o.id + " for stejl linje: " + K.beskedTekst().slice(0, 50));
+        noter(K.beskedTekst());
+        traekLinje(K.bedsteA() * 1.01);
+        if (!K.linje.ok) kFejl.push(o.id + " linjen godtages ikke: " + K.beskedTekst().slice(0, 60) + " a=" + K.linje.a + " best=" + K.bedsteA());
+        klikKuv(6);
+        koerTil(K, function () { return K.proeve().A !== null && !K.maaling; }, 200);
+        if (K.trin() !== "aflaes") { kFejl.push(o.id + " trin: " + K.trin()); return; }
+        var f = K.facitC();
+        traekAflaes(f * 0.7);
+        if (K.aflaes.ok) kFejl.push(o.id + " forkert aflæsning godtaget");
+        noter(K.beskedTekst());
+        traekAflaes(f * 1.005);
+        if (!K.faerdig || !K.status[nr].stjerne) kFejl.push(o.id + " ikke løst med stjerne: " + K.beskedTekst().slice(0, 60));
+        noter(K.beskedTekst()); noter(K.promptHTML());
+        /* Proevens koncentration ligger inden for standarderne */
+        if (K.proeveC < o.std[0] * 0.9 || K.proeveC > o.std[o.std.length - 1]) kFejl.push(o.id + " prøven uden for standarderne");
+    });
+    paastand("alle fire standardkurver kan løses med klik og træk (stjerne)", kFejl.length === 0, kFejl.join(" | "));
+    /* Vis svaret hele vejen */
+    var svFejl = [];
+    D.KURVE.forEach(function (o, nr) {
+        K.vaelg(nr);
+        for (var t = 0; t < 30 && !K.faerdig; t++) {
+            while (K.el.knap.textContent !== "Vis svaret" && !K.faerdig) K.knap();
+            if (K.faerdig) break;
+            K.knap();
+            koerTil(K, function () { return !K.maaling && !K.koe.length; }, 600);
+        }
+        if (!K.faerdig) svFejl.push(o.id + ": " + K.trin());
+    });
+    paastand("Vis svaret fører gennem alle fire", svFejl.length === 0, svFejl.join(" | "));
+    paastand("hinttrappen begynder forfra, når standarderne er målt", (function () {
+        K.vaelg(0); K.knap(); K.knap();
+        for (var k2 = 0; k2 < 6; k2++) K.klikKuvette(k2);
+        koerTil(K, function () { return K.alleMaalt() && !K.maaling && !K.koe.length; }, 600);
+        return K.el.knap.textContent === "Giv et hint";
+    })(), K.el.knap.textContent);
+    paastand("en ny prøve har en ny koncentration, når opgaven begynder forfra", (function () {
+        var set = {};
+        for (var q = 0; q < 6; q++) { K.vaelg(0); set[K.proeveC] = 1; }
+        return Object.keys(set).length > 1;
+    })());
+    K.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Regnestykkerne");
+    NK.visFane("fane-regn");
+    var facitFejl = [];
+    var FACIT = { r1: ["0,735"], r2: ["0,130 mM"], r3: ["11,1 mM⁻¹·cm⁻¹"], r4: ["0,120 mM"], r5: ["2,45 mM⁻¹·cm⁻¹"],
+        r6: ["0,0450 mM"], r7: ["4,70 mM⁻¹·cm⁻¹", "0,0800 mM"], r8: ["0,220 mM", "0,0550 mmol", "6,54 mg"] };
+    D.REGN.forEach(function (o) {
+        var t = o.trin.map(function (x, i) { return R.facitTekst(o, i); });
+        if (t.join("|") !== FACIT[o.id].join("|")) facitFejl.push(o.id + ": " + t.join(", "));
+        noter(o.tekst); noter(o.navn);
+    });
+    paastand("facit regnet af tallene: A = 0,735 … m = 6,54 mg", facitFejl.length === 0, facitFejl.join(" | "));
+
+    function felter(klasse) { return Array.prototype.slice.call(d.querySelectorAll("#regn-trin ." + klasse)); }
+    function skrivI(inp, v) { inp.value = v; inp.dispatchEvent(new W.Event("input", { bubbles: true })); }
+    function tjek() { d.querySelector("#regn-trin .tjekknap").click(); }
+    var uiFejl = [];
+    D.REGN.forEach(function (o, nr) {
+        G.vaelg(nr);
+        o.trin.forEach(function (id, i) {
+            var t = D.TRIN[id];
+            d.querySelector('#regn-skabeloner [data-sk="' + t.form + '"]').click();
+            /* Bogstaverne: faktorerne i omvendt raekkefoelge, for de maa byttes */
+            var b = R.facitBogstaver(id).slice();
+            if (t.form === "***" || t.form === "**") b.reverse();
+            else if (t.form === "/**") b = [b[0], b[2], b[1]];
+            var bf = felter("bf-in.bogstav");
+            if (bf.length !== b.length) uiFejl.push(o.id + " felter: " + bf.length);
+            bf.forEach(function (inp, j) { skrivI(inp, b[j] === "eps" ? "e" : R.vis(b[j])); });
+            tjek();
+            if (G.aktivt().fase !== "tal") { uiFejl.push(o.id + " formlen: " + G.beskedTekst().slice(0, 70)); return; }
+            noter(G.beskedTekst());
+            /* Tallene: klik paa talbrikkerne */
+            var V = R.vaerdier(o);
+            felter("bf-in.tal").forEach(function (inp, j) {
+                inp.focus();
+                var bb = G.aktivt().bogstL[j];
+                var knap = Array.prototype.filter.call(d.querySelectorAll("#regn-tallene .talbrik"), function (k) {
+                    return k.textContent.indexOf(R.vis(bb) + " =") === 0;
+                })[0];
+                if (knap) knap.click(); else skrivI(inp, V.tal[bb].tekst);
+            });
+            tjek();
+            if (G.aktivt().fase !== "res") { uiFejl.push(o.id + " tallene: " + G.beskedTekst().slice(0, 70)); return; }
+            noter(G.beskedTekst());
+            var res = felter("rs-in")[0];
+            skrivI(res, t.maal === "eps" ? V.facit[i].tekst : R.facitTekst(o, i));
+            tjek();
+            noter(G.beskedTekst());
+        });
+        if (!G.faerdig || !G.status[nr].stjerne) uiFejl.push(o.id + " ikke løst med stjerne: " + G.beskedTekst().slice(0, 70));
+        noter(G.promptHTML());
+    });
+    paastand("alle otte kan regnes på tavlen med skabelon, bogstaver, talbrikker og resultat", uiFejl.length === 0, uiFejl.join(" | "));
+
+    /* De typiske fejl */
+    function o(id) { return D.REGN.filter(function (x) { return x.id === id; })[0]; }
+    var bes = [];
+    function forvent(navn, svar, re) { bes.push(svar.besked || ""); paastand(navn, !svar.ok && re.test(svar.besked || ""), svar.besked); }
+    forvent("formlen som gangestykke, når der skal divideres", R.tjekFormel("c", "***", ["A", "eps", "l"]), /brøk/);
+    forvent("brøken vendt", R.tjekFormel("c", "/**", ["eps", "A", "l"]), /vendt/);
+    forvent("det, der skal findes, står i formlen", R.tjekFormel("c", "/**", ["A", "eps", "c"]), /skal finde/);
+    forvent("ét bogstav under brøkstregen, når der skal være to", R.tjekFormel("c", "/", ["A", "eps"]), /to bogstaver/);
+    paastand("ε kan skrives som e, eps og ε", ["e", "eps", "ε", "epsilon"].every(function (x) { return R.bogstav(x, o("r2")) === "eps"; }));
+    paastand("a er hældningen, når opgaven har en hældning, ellers A", R.bogstav("a", o("r5")) === "a" && R.bogstav("a", o("r2")) === "A");
+    forvent("et tal på den forkerte plads", R.tjekTal(o("r2"), "eps", "0,611"), /er A/);
+    forvent("V i mL", R.tjekTal(o("r8"), "V", "250"), /liter/);
+    paastand("V i mL med enheden mL godtages", R.tjekTal(o("r8"), "V", "250 mL").ok);
+    forvent("l med forkert enhed", R.tjekTal(o("r2"), "l", "1,00 g"), /enheden cm/);
+    forvent("l i mm i stedet for cm", R.tjekTal(o("r2"), "l", "1,00 mm"), /enheden ikke/);
+    forvent("c ganget i stedet for divideret", R.tjekRes(o("r2"), 0, "2,87 mM"), /ganget/);
+    forvent("c med vendt brøk", R.tjekRes(o("r2"), 0, "7,69 mM"), /vendt/);
+    forvent("kort kuvette: kun divideret med ε", R.tjekRes(o("r4"), 0, "0,0600 mM"), /kun divideret med ε/);
+    forvent("kort kuvette: uden parentes", R.tjekRes(o("r4"), 0, "0,0300 mM"), /parentes/);
+    forvent("c uden enhed", R.tjekRes(o("r2"), 0, "0,130"), /enheden/);
+    forvent("c i M uden omregning", R.tjekRes(o("r2"), 0, "0,130 M"), /enheden/);
+    paastand("c i M med omregning godtages", R.tjekRes(o("r2"), 0, "1,30·10^-4 M").ok);
+    forvent("A med enhed", R.tjekRes(o("r1"), 0, "0,735 mM"), /ingen enhed/);
+    forvent("m divideret", R.tjekRes(o("r8"), 2, (0.055 / 118.94).toFixed(6).replace(".", ",") + " mg"), /n · M/);
+    forvent("ε ganget", R.tjekRes(o("r3"), 0, "0,0178"), /ganget/);
+    forvent("tæt på, men afrundet undervejs", R.tjekRes(o("r8"), 2, "6,70 mg"), /afrunding/);
+    bes.forEach(noter);
+
+    /* Hinttrappen og Vis svaret paa tavlen */
+    G.vaelg(1);
+    var h3 = [];
+    for (i = 0; i < 4; i++) { h3.push(G.el.knap.textContent); G.knap(); if (i < 3) noter(G.beskedTekst()); }
+    paastand("hintet til formlen er tre trin, så Vis svaret", h3.join(" | ") === "Giv et hint | Næste hint (2 af 3) | Næste hint (3 af 3) | Vis svaret", h3.join(" | "));
+    paastand("første hint siger, hvad man kender, ikke formlen", /Du kender A, ε og l/.test(R.formelHint("c")[0]) && !/=/.test(R.formelHint("c")[0]));
+    paastand("Vis svaret giver formlen, og tallene kommer bagefter", G.aktivt().fase === "tal" && /A/.test(G.beskedTekst()));
+    paastand("hinttrappen begynder forfra i næste skridt", G.el.knap.textContent === "Giv et hint", G.el.knap.textContent);
+    var sv = 0;
+    D.REGN.forEach(function (o2, nr) {
+        G.vaelg(nr);
+        for (var q = 0; q < 60 && !G.faerdig; q++) G.knap();
+        if (G.faerdig && !G.status[nr].stjerne) sv++;
+        noter(G.beskedTekst());
+    });
+    paastand("Vis svaret fører gennem alle otte uden stjerne", sv === 0 || sv === D.REGN.length, sv);
+    G.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Sproget");
+    (function saml(x) {
+        if (typeof x === "string") tekster.push(x);
+        else if (Array.isArray(x)) x.forEach(saml);
+        else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { if (k.charAt(0) !== "_") saml(x[k]); });
+    }({ K: D.KURVE, F: D.FAERDIG, R: D.ROS_OPGAVE, B: D.BOGSTAV, T: D.TRIN }));
+    D.REGN.forEach(function (o2, nr) {
+        o2.trin.forEach(function (id, i) { R.formelHint(id).forEach(noter); R.resHint(o2, i).forEach(noter); });
+        noter(R.ENHED_FORKLARING);
+    });
+    tekster.push(d.getElementById("teori").textContent, d.body.textContent);
+    var ren = tekster.map(function (t) { return typeof t === "string" ? t : JSON.stringify(t); });
+    var tanke = ren.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger", tanke.length === 0, tanke.slice(0, 2).join(" | "));
+    var en = ren.filter(function (t) { return /[A-Za-z)\]]¹[⁺⁻]|[A-Za-z)\]]1[+−](?![\d ])/.test(t); });
+    paastand("ingen 1+ eller 1− som ladning", en.length === 0, en.slice(0, 2).join(" | "));
+    var ascii = ren.filter(function (t) { return ASCII_ORD.test(t.replace(/<[^>]*>/g, "")); });
+    paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).join(" | "));
+    var natron = ren.filter(function (t) { return /natronlud/i.test(t); });
+    paastand("ingen natronlud", natron.length === 0);
+    var punktum = ren.filter(function (t) { return /\d\.\d/.test(t.replace(/<[^>]*>/g, "").replace(/\d+\.\d+\.\d+/g, "")); });
+    paastand("decimaltal med komma", punktum.length === 0, punktum.slice(0, 2).join(" | "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. Layoutet");
+    var ramme = document.getElementById("ramme");
+    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
+    var lFejl = [];
+    function under(a, b) { return a.getBoundingClientRect().bottom <= b.getBoundingClientRect().top + 1; }
+    maal.forEach(function (m) {
+        var navn = m.join("×");
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        NK.visFane("fane-lys");
+        L.vaelg(3); L.tilpas();
+        [1, 3].forEach(function (lv) {
+            L.saetL(lv, false);
+            var g = L.geo();
+            if (g.kBund - g.kTop < 80) lFejl.push(navn + " kurven er lav");
+            if (g.cbund + g.px * 3.4 > g.tavleY) lFejl.push(navn + " kuvetten rører tavlen");
+            if (g.cl < g.x0 + 30 || g.cr > g.x1 - 30) lFejl.push(navn + " kuvetten uden for strålen ved l = " + lv);
+            var dispH = Math.min(19, Math.max(14, g.detB / 6.4)) * (2 * 1.45 + 0.7);
+            if (g.dispY + dispH > g.H) lFejl.push(navn + " displayet uden for lærredet");
+            if (g.ly < g.kBund - 40) lFejl.push(navn + " lampen rører kurven");
+        });
+        var sp = d.querySelector("#fane-lys .sp-top").getBoundingClientRect(), cvr = cv1.getBoundingClientRect();
+        if (cvr.height < 330) lFejl.push(navn + " lærredet på fane 1 er kun " + Math.round(cvr.height) + " px");
+        if (sp.bottom > cvr.top + 1) lFejl.push(navn + " valgkortene over lærredet");
+        NK.visFane("fane-kurve");
+        K.vaelg(3); K.tilpas();
+        var g2 = K.geo();
+        if (g2.bakkeY + g2.bakkeH > g2.H) lFejl.push(navn + " bakken uden for lærredet");
+        if (g2.gy1 - g2.gy0 < 250 || g2.gx1 - g2.gx0 < 300) lFejl.push(navn + " grafen er lille");
+        if (g2.dispY + g2.dispH > g2.sy + g2.sh) lFejl.push(navn + " displayet uden for spektrofotometret");
+        if (g2.slotY + g2.kh + 6 > g2.dispY) lFejl.push(navn + " displayet rører kuvetten");
+        NK.visFane("fane-regn");
+        D.REGN.forEach(function (o2, nr) {
+            G.vaelg(nr);
+            /* Den største tavle: alle trin løst undtagen det sidste, der står med tallene */
+            for (var q = 0; q < 60; q++) {
+                var st = G.aktivt();
+                if (!st || (G.k === G.ts.length - 1 && st.fase === "tal")) break;
+                G.knap();
+            }
+            G.tilpas();
+            var arb = d.getElementById("regn-arbejde");
+            if (arb.scrollHeight > arb.clientHeight + 1) lFejl.push(navn + " tavlen er for høj " + o2.id);
+            var tv = d.getElementById("regn-tavle");
+            if (tv.scrollWidth > tv.clientWidth + 1) lFejl.push(navn + " tavlen er for bred " + o2.id);
+            if (!under(d.getElementById("regn-tavle"), d.getElementById("regn-status"))) lFejl.push(navn + " tavlen bag statuslinjen " + o2.id);
+            var fs = parseFloat(W.getComputedStyle(arb).fontSize);
+            if (fs < 18) lFejl.push(navn + " skriften på tavlen er " + fs + " px " + o2.id);
+        });
+        ["#fane-lys .panel", "#fane-kurve .panel", "#fane-regn .panel"].forEach(function (sel) {
+            NK.visFane(sel.split(" ")[0].slice(1));
+            var p = d.querySelector(sel);
+            if (p.scrollWidth > p.clientWidth + 1) lFejl.push(navn + " panelet er for bredt " + sel);
+        });
+    });
+    paastand("lærred, tavle og panel kan være der fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 5).join(", "));
+    ramme.style.width = "1300px";
+    ramme.style.height = "820px";
+    var smaa = [];
+    ["fane-lys", "fane-kurve", "fane-regn"].forEach(function (f) {
+        NK.visFane(f);
+        d.querySelectorAll("#" + f + " .panel *, #" + f + " .tavle *, #" + f + " .bakke *, #" + f + " .statuslinje *, #" + f + " .sp-top *").forEach(function (e) {
+            if (!e.childNodes.length || !e.textContent.trim() || e.offsetParent === null) return;
+            var egen = Array.prototype.some.call(e.childNodes, function (n2) { return n2.nodeType === 3 && n2.textContent.trim(); });
+            if (!egen) return;
+            var px = parseFloat(W.getComputedStyle(e).fontSize);
+            if (px < 11.5) smaa.push(e.className + " " + px);
+        });
+    });
+    paastand("ingen tekst under 11,5 px", smaa.length === 0, smaa.slice(0, 4).join(", "));
+    NK.visFane("fane-lys");
+}
+</script>
+</body>
+</html>

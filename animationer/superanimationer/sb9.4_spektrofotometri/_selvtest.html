@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb9.4 Spektrofotometri</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen giver de rigtige absorbanser og
+   hældninger, at elevens tal og bogstaver bliver læst rigtigt, at alle
+   tre forsøg kan gennemføres (selv og med Vis svaret), at de typiske
+   fejl får hver sin besked, at Ny prøve virker, træk og slip med
+   rigtige pointer-hændelser, at hintene er udfyldt, sproget og
+   layoutet fra 1100 × 700 til 1600 × 950.
+
+   Animationen henter ikke filer uden for sin egen mappe, men iframen
+   skal åbnes gennem en lokal server. Testen gemmer elevens fremskridt
+   og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb9.4-let", "nk-sb9.4-mid", "nk-sb9.4-svr", "nk-sb9.4-quiz"];
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, M = NK.Model, T = NK.Tal, F = NK.Formel;
+    var S1 = NK.sims["fane-let"], S2 = NK.sims["fane-mid"], S3 = NK.sims["fane-svr"];
+
+    function tid(S, sek) { for (var i = 0; i < sek * 60; i++) S.opdater(1 / 60); }
+    function maal(S, id, lam) { if (lam && S.lambda !== lam) S.saetLambda(lam); S.scene.saetI(id); tid(S, 2.2); }
+    function felt(S, sel) { return S.el.trin.querySelector(sel); }
+    function alle(S, sel) { return S.el.trin.querySelectorAll(sel); }
+    function saet(inp, v) { inp.value = v; inp.dispatchEvent(new W.Event("input")); }
+    function besked(S) { return S.el.besked.textContent; }
+    function regn(S, sk, bogst, tal, res) {
+        felt(S, '.skabelon[data-sk="' + sk + '"]').click();
+        var b = alle(S, ".bogst-felt");
+        bogst.forEach(function (x, i) { saet(b[i], x); });
+        felt(S, ".tjek").click();
+        if (!tal) return besked(S);
+        var t = alle(S, ".tal-felt");
+        tal.forEach(function (x, i) { saet(t[i], x); });
+        felt(S, ".tjek").click();
+        if (!res) return besked(S);
+        saet(felt(S, ".res-felt"), res);
+        felt(S, ".tjek").click();
+        return besked(S);
+    }
+    function talfelt(S, v) {
+        var t = alle(S, ".tal-felt");
+        v.forEach(function (x, i) { if (t[i]) saet(t[i], x); });
+        felt(S, ".tjek").click();
+        return besked(S);
+    }
+    function dk(v, n) { return String(v.toFixed(n)).replace(".", ","); }
+    /* Vis svaret helt til fanen er faerdig */
+    function visSvarHele(S) {
+        var n = 0;
+        while (!S.faerdigt && n < 200) {
+            var h = S.hintNu().length;
+            for (var i = 0; i <= h; i++) S.knap();
+            tid(S, 6);
+            n++;
+        }
+        return S.faerdigt;
+    }
+
+    var alleTekster = [];
+    function samlTekst(t) { if (t) alleTekster.push(String(t)); }
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Modellen");
+    paastand("E129: A = 0,0260 · c ved 504 nm (20 µM giver 0,520)", M.rund(M.absorbans({ roed: 20 }, 504)) === 0.52);
+    paastand("ingen absorbans ved en anden bølgelængde", M.absorbans({ roed: 20 }, 630) === 0);
+    paastand("nitrit opsuger kun, når det er blevet til azofarvestof", M.absorbans({ nitrit: 10 }, 540, 0) === 0 &&
+        M.rund(M.absorbans({ nitrit: 10 }, 540, 1)) === 0.463 && M.rund(M.absorbans({ nitrit: 10 }, 540, 0.5)) === 0.232);
+    paastand("absorbanserne lægges sammen: 15 µM gul + 6 µM blå ved 427 nm = 0,444",
+        M.rund(M.absorbans({ gul: 15, blaa: 6 }, 427)) === 0.444, M.absorbans({ gul: 15, blaa: 6 }, 427));
+    paastand("ved 630 nm opsuger kun det blå: 6 µM giver 0,780", M.rund(M.absorbans({ gul: 15, blaa: 6 }, 630)) === 0.78);
+    paastand("A = 0,468 svarer til T = 34,0 %", dk(100 * M.transmittans(0.468), 1) === "34,0");
+    var gron = M.farve({ gul: 15, blaa: 6 }, 1);
+    paastand("gult og blåt giver en grøn væske", gron[1] > gron[0] && gron[1] > gron[2], gron.join(","));
+    var rod = M.farve({ roed: 20 }, 1);
+    paastand("E129 giver en rød væske", rod[0] > rod[1] && rod[0] > rod[2], rod.join(","));
+    var vand = M.farve({}, 1);
+    paastand("rent vand er næsten gennemsigtigt", vand[3] < 0.2);
+    paastand("hældningen gennem (0, 0): (2; 0,1) og (4; 0,2) giver 0,05", Math.abs(M.haeldning([{ c: 2, A: 0.1 }, { c: 4, A: 0.2 }]) - 0.05) < 1e-12);
+    paastand("ε i kommentaren passer: ε(E133, 630 nm) = 1,3 · 10⁵ L/(mol · cm) giver a = 0,130 µM⁻¹", D.STOFFER.blaa.a[630] === 1.3e5 * 1e-6);
+    var faktor = 5.0e4 * 50 / 54 * 1e-6;
+    paastand("nitrit: 5,0 · 10⁴ · 50/54 · 10⁻⁶ = 0,0463 µM⁻¹", Math.abs(faktor - D.STOFFER.azo.a[540]) < 0.00005, faktor);
+
+    overskrift("2. Elevens tal og bogstaver");
+    paastand("tal med komma, punktum og enhed: 0,520 · 0.52 · 18 µM", T.laes("0,520") === 0.52 && T.laes("0.52") === 0.52 && T.laes("18 µM") === 18);
+    paastand("potenser: 5,00·10^-5, 5,00 · 10⁻⁵ og 5e-5", T.laes("5,00·10^-5") === 5e-5 && T.laes("5,00 · 10⁻⁵") === 5e-5 && T.laes("5e-5") === 5e-5);
+    paastand("ikke et tal: 'abc' og tomt", isNaN(T.laes("abc")) && isNaN(T.laes("")));
+    paastand("betydende cifre: 0,0260 · 18,0 · 0,00650", T.bet(0.026, 3) === "0,0260" && T.bet(18, 3) === "18,0" && T.bet(0.0065, 3) === "0,00650");
+    var BOG = { "cfør": "c_foer", "c_før": "c_foer", "c(før)": "c_foer", "c1": "c_foer", "cefter": "c_efter", "c2": "c_efter",
+                "Vfør": "V_foer", "V(før)": "V_foer", "V_efter": "V_efter", "Vtotal": "V_efter", "A": "A", "a": "a", "εl": "a", "ε·l": "a", "c": "c" };
+    var bogFejl = [];
+    Object.keys(BOG).forEach(function (k) { if (F.norm(k) !== BOG[k]) bogFejl.push(k + " -> " + F.norm(k)); });
+    paastand("bogstaverne læses i mange skrivemåder", bogFejl.length === 0, bogFejl.join(", "));
+    paastand("x er ukendt", F.norm("x") === "?x");
+    var spec = { sk: "broek", felter: ["A", "c"] };
+    paastand("formlen A / c godtages", F.dom("broek", ["A", "c"], spec).ok);
+    paastand("c / A er vendt", F.dom("broek", ["c", "A"], spec).slags === "vendt");
+    paastand("a / c: lille a for stort A", F.dom("broek", ["a", "c"], spec).slags === "smaaA");
+    paastand("A · c har ikke den form", F.dom("gange", ["A", "c"], spec).slags === "form");
+    var spec2 = { sk: "gangebroek", felter: ["c_efter", "V_efter", "V_foer"] };
+    paastand("gangebrøk: tælleren må byttes", F.dom("gangebroek", ["V_efter", "c_efter", "V_foer"], spec2).ok);
+    paastand("gangebrøk: rumfangene byttet om", F.dom("gangebroek", ["c_efter", "V_foer", "V_efter"], spec2).slags === "rumfang");
+    paastand("gangebrøk: c uden før eller efter", F.dom("gangebroek", ["c", "V_efter", "V_foer"], spec2).slags === "hvilkenC");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Fane 1: rød sodavand");
+    NK.visFane("fane-let");
+    S1.nulstil();
+    paastand("første trin: blindprøven, og pilen peger på den", S1.trin().id === "nul" && S1.peg()[0] === "blind");
+    maal(S1, "s2");
+    paastand("måling før nulstillingen er 0,042 for høj og bliver ikke godkendt", S1.maalt("s2", 504).A === 0.302 && !S1.maalt("s2", 504).ok);
+    paastand("… og linjen siger det", /ikke nulstillet/i.test(besked(S1)), besked(S1));
+    maal(S1, "blind");
+    paastand("blindprøven nulstiller, og trin 2 begynder", S1.nulstillet && S1.trin().id === "std");
+    paastand("standarden fra før skal måles igen", S1.peg().indexOf("s2") >= 0);
+    ["s1", "s2", "s3", "s4", "s5"].forEach(function (k) { maal(S1, k); });
+    paastand("standardrækken: 0,130 0,260 0,390 0,520 0,650", ["s1", "s2", "s3", "s4", "s5"].map(function (k) { return T.A(S1.maalt(k, 504).A); }).join(" ") === "0,130 0,260 0,390 0,520 0,650");
+    var gi = S1.grafInfo(D.FANER.let.grafer[0]);
+    paastand("grafen har 6 punkter og en linje, men ingen ligning endnu", gi.serier[0].punkter.length === 6 && Math.abs(gi.serier[0].a - 0.026) < 1e-9 && !gi.serier[0].ligning);
+    samlTekst(besked(S1));
+    paastand("hældningen: c / A er vendt", /vendt/.test(regn(S1, "broek", ["c", "A"])));
+    felt(S1, ".skift").click();
+    paastand("A og c fra hver sin standard afvises", /samme standard/.test(regn(S1, "broek", ["A", "c"], ["0,520", "15"])));
+    var t1 = alle(S1, ".tal-felt"); saet(t1[0], "0,520"); saet(t1[1], "0,000020"); felt(S1, ".tjek").click();
+    paastand("c i M i stedet for µM får en besked", /µM/.test(besked(S1)), besked(S1));
+    t1 = alle(S1, ".tal-felt"); saet(t1[0], "0,520"); saet(t1[1], "20,0"); felt(S1, ".tjek").click();
+    saet(felt(S1, ".res-felt"), "38,5"); felt(S1, ".tjek").click();
+    paastand("resultatet c / A er vendt", /vendt/.test(besked(S1)), besked(S1));
+    saet(felt(S1, ".res-felt"), "0,26"); felt(S1, ".tjek").click();
+    paastand("kommaet forkert", /Kommaet/.test(besked(S1)), besked(S1));
+    saet(felt(S1, ".res-felt"), "0,0260"); felt(S1, ".tjek").click();
+    paastand("a = 0,0260 µM⁻¹, og ligningen kommer på grafen", Math.abs(S1.svar.a - 0.026) < 1e-12 &&S1.grafInfo(D.FANER.let.grafer[0]).serier[0].ligning === "A = 0,0260 · c");
+    paastand("beregningen står i trinlisten som en pæn beregning", /a = .*A.*c.*0,520.*20,0 µM.*0,0260 µM⁻¹/.test(S1.el.trin.textContent), S1.el.trin.textContent.slice(0, 300));
+    maal(S1, "p");
+    paastand("sodavanden: A = 0,468, og trinnet Aflæs begynder", S1.maalt("p", 504).A === 0.468 && S1.trin().id === "afl");
+    paastand("aflæsning 0,468 (absorbansen) får en besked", /absorbansen/.test(talfelt(S1, ["0,468"])));
+    talfelt(S1, ["22"]);
+    paastand("forkert aflæsning tegnes som en rød linje på grafen", S1.grafInfo(D.FANER.let.grafer[0]).elev && S1.grafInfo(D.FANER.let.grafer[0]).elev.c === 22);
+    paastand("… og linjen siger, hvor kurven ligger", /længere til venstre/.test(besked(S1)), besked(S1));
+    talfelt(S1, ["17,5"]);
+    paastand("17,5 godtages (inden for 1 µM af 18,0)", S1.trin().id === "c" && S1.svar.cAfl === 17.5);
+    paastand("c = A · a: ganget", /deles med a/.test(regn(S1, "gange", ["A", "a"])));
+    felt(S1, ".skift").click();
+    var rc = regn(S1, "broek", ["A", "a"], ["0,468", "0,026"], "18");
+    paastand("c = 18,0 µM", S1.svar.c === 0.468 / 0.026 && S1.trin().id === "foer", rc);
+    var rf = regn(S1, "gangebroek", ["c_efter", "V_foer", "V_efter"]);
+    paastand("fortyndingen: rumfangene byttet om", /byttet om/.test(rf), rf);
+    var b1 = alle(S1, ".bogst-felt"); saet(b1[0], "Vefter"); saet(b1[1], "cefter"); saet(b1[2], "Vfør"); felt(S1, ".tjek").click();
+    t1 = alle(S1, ".tal-felt"); saet(t1[0], "50"); saet(t1[1], "18"); saet(t1[2], "0,010"); felt(S1, ".tjek").click();
+    paastand("rumfang i L får en besked", /mL/.test(besked(S1)), besked(S1));
+    t1 = alle(S1, ".tal-felt"); saet(t1[0], "50"); saet(t1[1], "18"); saet(t1[2], "10"); felt(S1, ".tjek").click();
+    saet(felt(S1, ".res-felt"), "90"); felt(S1, ".tjek").click();
+    paastand("færdig: 90,0 µM, og mg/L står i forklaringen", S1.faerdigt && /90,0 µM/.test(besked(S1)) && /mg\/L/.test(S1.el.trin.textContent));
+    paastand("knappen hedder Ny prøve, og fanen har en stjerne", S1.el.knap.textContent === "Ny prøve →" && /★/.test(d.querySelector('[data-fane="fane-let"]').textContent));
+    samlTekst(S1.el.trin.textContent);
+    S1.knap();
+    paastand("Ny prøve: Kirsebærsodavand, standarderne beholdes, trin 4 begynder", S1.proeve().navn === "Kirsebærsodavand" && S1.trin().id === "pr" &&
+        S1.maalt("s3", 504) && !S1.maalt("p", 504));
+    maal(S1, "p");
+    paastand("kirsebær: A = 0,312", S1.maalt("p", 504).A === 0.312);
+    talfelt(S1, ["12"]);
+    regn(S1, "broek", ["A", "a"], ["0,312", "0,0260"], "12,0");
+    regn(S1, "gangebroek", ["c_efter", "V_efter", "V_foer"], ["12,0", "100,0", "25,0"], "48");
+    paastand("kirsebær: 25,0 mL → 100,0 mL giver 48,0 µM", S1.faerdigt && Math.abs(S1.svar.cFlaske - 48) < 1e-9);
+    /* Paaskeaegget */
+    S1.scene.saetI("flaske"); tid(S1, 2.2);
+    paastand("påskeægget: ufortyndet sodavand ligger langt over kurven og får en forklaring", S1.visA("flaske", 504) > 1.0 &&/fortyndes/.test(besked(S1)), besked(S1));
+    S1.scene.tagUd();
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Fane 2: nitrit i vand");
+    NK.visFane("fane-mid");
+    S2.nulstil();
+    paastand("første trin: reagenserne, og pilen peger på sulfanilamid", S2.trin().id === "farv" && S2.peg()[0] === "sulf");
+    maal(S2, "s1"); maal(S2, "s4");
+    paastand("standard 4 målt før reagenserne: farveløs og ikke godkendt", !S2.maalt("s4", 540).ok && /farveløs/.test(besked(S2)), besked(S2));
+    S2.paaReagens("kob");
+    paastand("koblingsreagens først: det venter på sulfanilamid", /sulfanilamid/.test(besked(S2)) && S2.frem === 0);
+    S2.paaReagens("sulf");
+    tid(S2, 1.5);
+    paastand("farven udvikler sig gradvist", S2.frem > 0 && S2.frem < 1, S2.frem);
+    maal(S2, "s4");
+    paastand("målt under ventetiden: for tidligt", !S2.maalt("s4", 540).ok && /færdig/.test(besked(S2)), besked(S2));
+    tid(S2, 6);
+    paastand("efter ventetiden er trin 1 løst, og trin 2 begynder", S2.frem === 1 && S2.trin().id === "std");
+    ["s1", "s2", "s3", "s4", "s5", "s6"].forEach(function (k) { maal(S2, k); });
+    paastand("standarderne med målestøj: 0,000 0,096 0,181 0,280 0,375 0,460",
+        ["s1", "s2", "s3", "s4", "s5", "s6"].map(function (k) { return T.A(S2.maalt(k, 540).A); }).join(" ") === "0,000 0,096 0,181 0,280 0,375 0,460");
+    paastand("ingen punkter på grafen, før c er beregnet (kun blindprøven)", S2.grafInfo(D.FANER.mid.grafer[0]).serier[0].punkter.length === 1);
+    var r2 = regn(S2, "gangebroek", ["cfør", "Vfør", "Vtotal"], ["50", "2", "48"]);
+    paastand("V_vand i nævneren får en besked", /ikke kun vandet/.test(r2), r2);
+    var t2 = alle(S2, ".tal-felt"); saet(t2[0], "0,0000500"); saet(t2[1], "2"); saet(t2[2], "50"); felt(S2, ".tjek").click();
+    paastand("c_før i M får en besked", /µM/.test(besked(S2)), besked(S2));
+    t2 = alle(S2, ".tal-felt"); saet(t2[0], "2,00"); saet(t2[1], "50,0"); saet(t2[2], "50,0"); felt(S2, ".tjek").click();
+    saet(felt(S2, ".res-felt"), "2"); felt(S2, ".tjek").click();
+    paastand("standard 2: 2,00 µM, punktet kommer på grafen", S2.svar.cStd.s2 === 2 && S2.grafInfo(D.FANER.mid.grafer[0]).serier[0].punkter.length === 2);
+    paastand("standard 3: 50 · 4 / 46 (vandet) får en besked", /ikke kun vandet/.test(talfelt(S2, ["4,35", "", "", ""])));
+    paastand("standard 3: rumfangene byttet om", /byttet om/.test(talfelt(S2, ["625"])));
+    talfelt(S2, ["4", "6,0"]);
+    paastand("to rigtige: de bliver grønne, de andre står åbne", S2.svar.cStd.s3 === 4 && S2.svar.cStd.s4 === 6 && alle(S2, ".tal-felt").length === 2);
+    talfelt(S2, ["8", "10"]);
+    var a2 = S2.aMid();
+    paastand("standardkurven: a = 0,0463 µM⁻¹ (regression gennem 0)", T.bet(a2, 3) === "0,0463", a2);
+    paastand("ligningen står på grafen", S2.grafInfo(D.FANER.mid.grafer[0]).serier[0].ligning === "A = 0,0463 · c");
+    maal(S2, "p1"); maal(S2, "p2");
+    paastand("vandprøverne: drikkevand 0,085 og spildevand 0,377", S2.maalt("p1", 540).A === 0.085 && S2.maalt("p2", 540).A === 0.377);
+    var r3 = regn(S2, "broek", ["A", "a"], ["0,377", "0,0463"]);
+    paastand("drikkevand: spildevandets A i tælleren får en besked", /drikkevandets absorbans/.test(r3), r3);
+    t2 = alle(S2, ".tal-felt"); saet(t2[0], "0,085"); saet(t2[1], "0,0463"); felt(S2, ".tjek").click();
+    saet(felt(S2, ".res-felt"), "1,84"); felt(S2, ".tjek").click();
+    paastand("drikkevand: 1,84 µM", Math.abs(S2.svar.c1 - 0.085 / 0.0463) < 1e-9 && S2.trin().id === "cp2");
+    paastand("spildevand: drikkevandets tal får en besked", /drikkevandets absorbans/.test(talfelt(S2, ["1,84"])));
+    paastand("spildevand: ganget får en besked", /ganget/.test(talfelt(S2, ["0,0175"])));
+    talfelt(S2, ["8,14"]);
+    paastand("færdig, og forklaringen nævner grænseværdien og 'under'", S2.faerdigt && /0,10 mg\/L/.test(S2.el.trin.textContent) && /under grænsen/.test(S2.el.trin.textContent));
+    samlTekst(S2.el.trin.textContent);
+    S2.knap();
+    paastand("Ny prøve: brøndvand og akvarievand", S2.kuvette("p1").navn === "brøndvandet" && S2.trin().id === "pr");
+    maal(S2, "p1"); maal(S2, "p2");
+    regn(S2, "broek", ["A", "a"], [T.A(S2.maalt("p1", 540).A), "0,0463"], dk(S2.maalt("p1", 540).A / 0.0463, 2));
+    talfelt(S2, [dk(S2.maalt("p2", 540).A / 0.0463, 2)]);
+    paastand("brøndvandet ligger over grænseværdien", S2.faerdigt && /over grænsen/.test(S2.el.trin.textContent), S2.el.trin.textContent.slice(-200));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Fane 3: to farvestoffer");
+    NK.visFane("fane-svr");
+    S3.nulstil();
+    maal(S3, "blind", 427);
+    ["g1", "g2", "g3", "g4", "b1", "b2", "b3", "b4"].forEach(function (k) { maal(S3, k, 427); });
+    paastand("alt målt ved 427 nm: knappen til 630 nm lyser, og linjen siger det", S3.pegLambda() && /630 nm/.test(S3.trinLinje()));
+    ["g1", "g2", "g3", "g4", "b1", "b2", "b3", "b4"].forEach(function (k) { maal(S3, k, 630); });
+    paastand("fire standardkurver: gul 427 = 0,0270, gul 630 = 0, blå 630 = 0,130, blå 427 = 0,00650",
+        T.bet(S3.aSerie("g427"), 3) === "0,0270" && S3.aSerie("g630") === 0 && T.bet(S3.aSerie("b630"), 3) === "0,130" && T.bet(S3.aSerie("b427"), 3) === "0,00650");
+    maal(S3, "p", 630); maal(S3, "p", 427);
+    paastand("sodavanden: A₄₂₇ = 0,444 og A₆₃₀ = 0,780", S3.maalt("p", 427).A === 0.444 && S3.maalt("p", 630).A === 0.78 && S3.trin().id === "cb");
+    paastand("c(blå) af A₄₂₇: begge opsuger", /begge farvestoffer/.test(talfelt(S3, ["68,3"])));
+    paastand("c(blå) med det gules hældning", /gules hældning/.test(talfelt(S3, ["28,9"])));
+    talfelt(S3, ["6,00"]);
+    paastand("c(blå) = 6,00 µM", Math.abs(S3.svar.cb - 6) < 1e-9 && S3.trin().id === "cg");
+    paastand("c(gul) uden at trække det blå fra: 16,4 er for meget", /Træk det blås bidrag fra/.test(talfelt(S3, ["16,4"])));
+    paastand("c(gul) med det blå lagt til: 17,9", /trækkes fra, ikke lægges til/.test(talfelt(S3, ["17,9"])));
+    paastand("c(gul) med A₆₃₀ trukket fra", /ikke det blås bidrag/.test(talfelt(S3, ["-12,6"])));
+    talfelt(S3, ["15"]);
+    var gg = S3.grafInfo(D.FANER.svr.grafer[0]);
+    paastand("færdig: 15,0 µM gul, og grafen viser det stablede bidrag 0,405 + 0,039", S3.faerdigt && Math.abs(S3.svar.cg - 15) < 1e-9 &&
+        gg.proever[0].bidrag && T.A(gg.proever[0].bidrag.gul) === "0,405");
+    samlTekst(S3.el.trin.textContent);
+    S3.knap();
+    maal(S3, "p", 630); maal(S3, "p", 427);
+    paastand("Ny prøve: sportsdrikken har A₄₂₇ = 0,669 og A₆₃₀ = 0,416", S3.proeve().navn === "Grøn sportsdrik" && S3.maalt("p", 427).A === 0.669 && S3.maalt("p", 630).A === 0.416);
+    talfelt(S3, ["3,20"]);
+    talfelt(S3, ["24,0"]);
+    paastand("sportsdrikken: 3,20 µM blå og 24,0 µM gul", S3.faerdigt);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Vis svaret hele vejen og hintene");
+    [["fane-let", S1], ["fane-mid", S2], ["fane-svr", S3]].forEach(function (p) {
+        NK.visFane(p[0]);
+        p[1].nulstil();
+        var hintFejl = [];
+        var n = 0;
+        while (!p[1].faerdigt && n < 200) {
+            var h = p[1].hintNu();
+            if (!h.length) hintFejl.push(p[1].trin().id + " har ingen hint");
+            h.forEach(function (x) { samlTekst(x); if (/\{\w+\}/.test(x)) hintFejl.push(p[1].trin().id + ": " + x); });
+            for (var i = 0; i <= h.length; i++) p[1].knap();
+            tid(p[1], 8);
+            n++;
+        }
+        paastand(p[0] + ": Vis svaret fører hele vejen igennem", p[1].faerdigt, p[1].trin() && p[1].trin().id);
+        paastand(p[0] + ": alle hint er udfyldt og findes", hintFejl.length === 0, hintFejl.join(" | "));
+    });
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. Træk og slip med rigtige pointer-hændelser");
+    NK.visFane("fane-let");
+    S1.nulstil();
+    S1.tilpas(); tid(S1, 0.2);
+    var sc = S1.scene, cv = sc.l.canvas, rr = cv.getBoundingClientRect();
+    function pe(type, x, y) {
+        cv.dispatchEvent(new W.PointerEvent(type, { clientX: rr.left + x, clientY: rr.top + y, pointerId: 7, bubbles: true }));
+    }
+    var tb = sc.ting("blind"), kr = sc.kuvRekt(tb.x, tb.y, sc.L.ks);
+    var mx = kr.x + kr.b / 2, my = kr.y + kr.h / 2;
+    var ix = sc.L.ix + 300 * sc.L.s, iy = sc.L.iy + 100 * sc.L.s;
+    pe("pointerdown", mx, my); pe("pointermove", mx, my - 60); pe("pointermove", ix, iy); pe("pointerup", ix, iy);
+    tid(S1, 2.2);
+    paastand("blindprøven trukket op i instrumentet bliver målt", S1.nulstillet && sc.holder === "blind");
+    var t2b = sc.ting("s3"), kr2 = sc.kuvRekt(t2b.x, t2b.y, sc.L.ks);
+    pe("pointerdown", kr2.x + kr2.b / 2, kr2.y + kr2.h / 2); pe("pointerup", kr2.x + kr2.b / 2, kr2.y + kr2.h / 2);
+    tid(S1, 2.2);
+    paastand("et klik på en kuvette er en genvej: den bliver målt", S1.maalt("s3", 504) && sc.holder === "s3");
+    var t3b = sc.ting("s1"), kr3 = sc.kuvRekt(t3b.x, t3b.y, sc.L.ks);
+    pe("pointerdown", kr3.x + kr3.b / 2, kr3.y + kr3.h / 2); pe("pointermove", kr3.x + 120, kr3.y - 40); pe("pointerup", kr3.x + 120, kr3.y - 40);
+    tid(S1, 2.2);
+    paastand("sluppet ved siden af instrumentet: intet sker", !S1.maalt("s1", 504) && sc.holder === "s3");
+    var hp = sc.holderPos();
+    pe("pointerdown", hp.x, sc.L.slotY - 10); pe("pointermove", hp.x + 40, sc.L.slotY + 300); pe("pointerup", hp.x + 40, sc.L.slotY + 300);
+    paastand("kuvetten kan trækkes ud af instrumentet igen", sc.holder === null);
+    NK.visFane("fane-mid");
+    S2.nulstil(); S2.tilpas(); tid(S2, 0.2);
+    var sc2 = S2.scene, cv2 = sc2.l.canvas, rr2 = cv2.getBoundingClientRect();
+    var fl = sc2.tingRekt(sc2.ting("sulf"));
+    cv2.dispatchEvent(new W.PointerEvent("pointerdown", { clientX: rr2.left + fl.x + fl.b / 2, clientY: rr2.top + fl.y + fl.h / 2, pointerId: 8, bubbles: true }));
+    cv2.dispatchEvent(new W.PointerEvent("pointerup", { clientX: rr2.left + fl.x + fl.b / 2, clientY: rr2.top + fl.y + fl.h / 2, pointerId: 8, bubbles: true }));
+    paastand("et klik på sulfanilamid tilsætter det", S2.reag.sulf && !S2.reag.kob);
+    NK.visFane("fane-svr");
+    S3.nulstil(); S3.tilpas(); tid(S3, 0.2);
+    var kn = S3.scene.lambdaKnapper()[1], rr3 = S3.scene.l.canvas.getBoundingClientRect();
+    S3.scene.l.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { clientX: rr3.left + kn.x + 10, clientY: rr3.top + kn.y + 10, pointerId: 9, bubbles: true }));
+    paastand("knappen 630 nm skifter bølgelængde", S3.lambda === 630);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("8. Quizzen");
+    paastand("8 spørgsmål med 4 svar og en forklaring til hvert forkert svar",
+        D.QUIZ.length === 8 && D.QUIZ.every(function (q) { return q.svar.length === 4 && q.nej.slice(1).every(function (x) { return !!x; }) && q.hvorfor; }));
+    NK.Quiz.aabn();
+    for (var qn = 0; qn < D.QUIZ.length; qn++) { NK.Quiz.svar(0); d.getElementById("quiz-videre").click(); }
+    paastand("alle rigtige: knappen bliver grøn", /✓/.test(d.getElementById("quizknap").textContent));
+    d.getElementById("quiz").classList.remove("vis");
+    D.QUIZ.forEach(function (q) { samlTekst(q.q); q.svar.forEach(samlTekst); q.nej.forEach(samlTekst); samlTekst(q.hvorfor); });
+
+    /* ------------------------------------------------------------------ */
+    overskrift("9. Sproget");
+    var vist = alleTekster.join("\n");
+    paastand("ingen tomme pladsholdere {…} i det viste", !/\{\w+\}/.test(vist), (vist.match(/[^\n]{0,30}\{\w+\}[^\n]{0,20}/) || [""])[0]);
+    /* Dataenes tekster: kun saetninger og navne, ikke id'er */
+    function samlData(o) {
+        if (typeof o === "string") { if (/\s/.test(o) || /[æøåÆØÅ]/.test(o)) samlTekst(o); return; }
+        if (o && typeof o === "object") Object.keys(o).forEach(function (k) { if (k !== "id" && k !== "type" && k !== "regn") samlData(o[k]); });
+    }
+    samlData(D.FANER);
+    samlTekst(d.getElementById("teori").textContent);
+    var tekst = alleTekster.join("\n");
+    var tanke = tekst.match(/[^\n]{0,30}[—–][^\n]{0,30}/g) || [];
+    paastand("ingen tankestreger i teksterne", tanke.length === 0, tanke.slice(0, 3).join(" | "));
+    var lad = tekst.match(/[A-Za-z₀-₉)]¹[⁺⁻]|\b1[+−-]\B/g) || [];
+    paastand("ingen ladning skrevet 1+ eller 1−", lad.length === 0, lad.join(" "));
+    var ascii = tekst.match(/\b(foer|faerdig|naeste|maal(?!e)|paa|hoejre|laes)\b/g) || [];
+    paastand("ingen æ, ø og å skrevet som ae, oe og aa", ascii.length === 0, ascii.slice(0, 5).join(" "));
+    paastand("NO₂⁻ skrives med ⁻ alene", d.body.innerHTML.indexOf("NO₂¹⁻") < 0);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("10. Layoutet");
+    var ramme = document.getElementById("ramme");
+    [[1100, 700], [1280, 720], [1400, 860], [1600, 950]].forEach(function (s) {
+        ramme.style.width = s[0] + "px";
+        ramme.style.height = s[1] + "px";
+        var probl = [];
+        ["fane-let", "fane-mid", "fane-svr"].forEach(function (f) {
+            NK.visFane(f);
+            var sim = NK.sims[f];
+            sim.tilpas();
+            try { sim.scene.tegn(); } catch (e) { probl.push(f + " tegner ikke: " + e.message); }
+            var L = sim.scene.L;
+            if (d.documentElement.scrollWidth > s[0] + 1) probl.push(f + " vandret rullebjælke");
+            if (L.by + L.br > L.yb - 40) probl.push(f + " boblen rammer stativet");
+            if (L.grafer[L.grafer.length - 1].y + L.grafer[L.grafer.length - 1].h > L.yb - 40) probl.push(f + " grafen rammer stativet");
+            if (L.bx - L.br < 0) probl.push(f + " boblen går ud over kanten");
+            var sidste = L.ting[L.ting.length - 1];
+            if (sidste.x + 30 > L.W) probl.push(f + " bordet er for smalt");
+            if (L.grafer[0].b < 260) probl.push(f + " grafen er for smal (" + Math.round(L.grafer[0].b) + ")");
+            var knap = d.getElementById(f.replace("fane-", "") + "-knap").getBoundingClientRect();
+            if (knap.right > s[0] - d.querySelector("#" + f + " .panel").getBoundingClientRect().width + 2) probl.push(f + " hjælpeknappen går ind under panelet");
+        });
+        paastand(s[0] + " × " + s[1] + ": scenen og panelet passer", probl.length === 0, probl.join(" | "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    NK.visFane("fane-let");
+}
+</script>
+</body>
+</html>

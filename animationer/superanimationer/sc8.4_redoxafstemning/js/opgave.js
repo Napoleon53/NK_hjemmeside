@@ -7,17 +7,19 @@
    gamle c8.4, bortset fra at H⁺ og vand er to trin:
 
      0 oxidationstal     felter over atomerne på tavlen
-     1 hvad oxideres     to knapper pr. par under tavlen
+     1 hvad oxideres     to knapper pr. par under skemaet
      2 elektroner        stigning og fald pr. atom
-     3 koefficienter     felter foran formlerne; vægten tæller med
+     3 koefficienter     felter foran formlerne; elektronerne tælles
+                         under skemaet (eller på vægten, når den er til)
      4 ladningen         før og efter pilen
      5 H⁺ eller OH⁻      et felt på hver side af pilen
      6 vand              et felt på hver side af pilen
 
-   Trin 5 og 6 springes over, når der intet skal til (Let). Den ene
-   knap i panelet er Giv hint -> Vis svaret -> ... -> Ny opgave. Et
+   Trin 5 og 6 springes over, når der intet skal til (Let). Den gule
+   knap ved siden af Tjek er Giv hint -> Vis svaret -> ... -> Ny opgave. Et
    forkert svar får en besked, der passer til netop den fejl
-   (NK.Redox.oxFejl, eFejl og fejlene nedenfor).
+   (NK.Redox.oxFejl, eFejl og fejlene nedenfor). Felterne kan også
+   udfyldes med tasterne under dem (js/taster.js).
    ===================================================================== */
 (function () {
     "use strict";
@@ -29,6 +31,10 @@
     var T_OX = 0, T_PAR = 1, T_E = 2, T_K = 3, T_LAD = 4, T_ION = 5, T_VAND = 6, ANTAL_TRIN = 7;
     var NOEGLE = "nk-sc8.4-loest";
     var aktiv = null;
+
+    /* En skærm uden mus (tablet, tavle): skærmtastaturet åbner ikke, for
+       tasterne under felterne skriver i dem. */
+    var GROV = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 
     function ionTekst(R) { return R.ionSt ? R.ionSt.tekst : "H⁺"; }
 
@@ -171,7 +177,6 @@
         }
         if (this.trin >= ANTAL_TRIN) this.afslut(t);
         this.besked = { tekst: t.join(" "), klasse: vist ? "gul" : "god" };
-        if (NK.laerer && NK.laerer.afvisTilbud) NK.laerer.afvisTilbud();
         this.vis();
     };
 
@@ -187,7 +192,7 @@
             if (!ros[this.id]) {
                 ros[this.id] = true;
                 NK.gem("nk-sc8.4-ros", ros);
-                if (NK.laerer && NK.laerer.ros) NK.laerer.ros(this.id);
+                t.push("Alle reaktioner på " + D.NIVEAUER[this.id].navn + " er afstemt.");
             }
         }
     };
@@ -231,6 +236,7 @@
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
             this.besked = { tekst: "Hint: " + this.hint(), klasse: "gul" };
+            if (this.hintFelt) this.fokusFelt = this.hintFelt;
             this.vis();
             return;
         }
@@ -552,15 +558,7 @@
         var el = NK.el("tavle").querySelector('[data-felt="k' + i + '"]');
         if (el) { el.value = this.f.k[i]; el.classList.remove("fejl"); }
         this.visKontrol();
-        this.tjekOvervaegt();
         return true;
-    };
-
-    P.tjekOvervaegt = function () {
-        var k = this.koefNu(), R = this.R;
-        var stor = Math.max(k[R.ox.v] || 0, k[R.red.v] || 0) >= D.OVERVAEGT_GRAENSE;
-        if (stor && !this.overvaegt && NK.laerer && NK.laerer.overvaegt) NK.laerer.overvaegt();
-        this.overvaegt = stor;
     };
 
     /* ----- Tavlen ------------------------------------------------------------- */
@@ -568,7 +566,7 @@
         var v = vaerdi !== undefined ? vaerdi : this.feltVaerdi(key);
         var fejl = this.fejlF[key], hint = this.hintFelt === key && !fejl;
         return '<input type="text" class="' + klasse + (fejl ? " fejl" : "") + (hint ? " hint" : "") + '" data-felt="' + key + '" value="'
-            + NK.html(v) + '" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="' + (klasse === "oxfelt" ? "text" : "numeric")
+            + NK.html(v) + '" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="' + (GROV ? "none" : (klasse === "oxfelt" ? "text" : "numeric"))
             + '"' + (pladsholder ? ' placeholder="' + pladsholder + '"' : "") + ' aria-label="Skriv her">';
     };
 
@@ -582,17 +580,24 @@
         return this.trin > T_PAR || this.faerdig ? (l.rolle === "ox" ? " r-ox" : " r-red") : "";
     };
 
-    /* En formel med oxidationstallene over atomerne */
+    /* En formel med oxidationstallene over atomerne. Et felt er bredere
+       end et smalt atom (N, S, I). Står der flere atomer i formlen,
+       stikker feltet derfor ud til den side, hvor der ikke står et tal
+       over naboatomet: til venstre over det første atom (tv), til højre
+       over det sidste (th). */
     P.formelHTML = function (l, medOx) {
-        var st = l.st, mig = this, h = '<span class="formel">';
-        st.atomer.forEach(function (a) {
-            var sym = a.s + (a.n > 1 ? NK.saenket(a.n) : ""), ox = "";
+        var st = l.st, mig = this, h = '<span class="formel">', sidst = st.atomer.length - 1;
+        st.atomer.forEach(function (a, ai) {
+            var sym = a.s + (a.n > 1 ? NK.saenket(a.n) : ""), ox = "", side = "";
             if (medOx) {
                 if (a.s !== st.ukendt) ox = '<span class="oxtal fast">' + X.ox(st.ox[a.s]) + "</span>";
-                else if (mig.trin === T_OX && !mig.ok[l.nr] && !mig.faerdig) ox = mig.felt("o" + l.nr, "oxfelt", "?");
+                else if (mig.trin === T_OX && !mig.ok[l.nr] && !mig.faerdig) {
+                    ox = mig.felt("o" + l.nr, "oxfelt", "?");
+                    if (sidst > 0) side = ai === 0 ? " tv" : (ai === sidst ? " th" : "");
+                }
                 else ox = '<span class="oxtal' + mig.rolleKlasse(l) + (mig.trin === T_OX ? " ny" : "") + '">' + X.ox(st.ox[a.s]) + "</span>";
             }
-            h += '<span class="atom">' + (medOx ? '<span class="oxrk">' + ox + "</span>" : "") + '<span class="sym">' + sym + "</span></span>";
+            h += '<span class="atom">' + (medOx ? '<span class="oxrk' + side + '">' + ox + "</span>" : "") + '<span class="sym">' + sym + "</span></span>";
         });
         if (st.q) h += '<span class="atom lad"><span class="sym">' + NK.ladningHaevet(st.q) + "</span></span>";
         return h + "</span>";
@@ -693,12 +698,33 @@
         return "";
     };
 
+    /* Elektronerne i trin 4, skrevet som regnestykker: det samme, som
+       står under vægtens skåle. Et tomt felt viser kun, hvad én enhed
+       giver, og = eller ≠ kommer først, når der står et tal ved begge. */
+    P.elektronHTML = function () {
+        var R = this.R, k = this.koefNu();
+        function chip(Pp, ord, klasse) {
+            var n = k[Pp.v], st = R.led[Pp.v].st;
+            var tekst = n > 0 ? "<b>" + n + " " + st.tekst + "</b> " + ord + " " + n + " · " + Pp.ePrEnhed + " e⁻ = " + n * Pp.ePrEnhed + " e⁻"
+                : "<b>Én " + st.tekst + "</b> " + ord + " " + (Pp.nV > 1 ? Pp.nV + " · " + Pp.delta + " e⁻ = " : "") + Pp.ePrEnhed + " e⁻";
+            return '<span class="kchip ' + klasse + '">' + tekst + "</span>";
+        }
+        var a = k[R.ox.v], b = k[R.red.v], tegn = "";
+        if (a > 0 && b > 0) {
+            var ens = a * R.ox.ePrEnhed === b * R.red.ePrEnhed;
+            tegn = '<span class="ktegn ' + (ens ? "ok" : "nej") + '">' + (ens ? "=" : "≠") + "</span>";
+        }
+        return '<span class="k-etiket">Elektroner</span>' + chip(R.ox, "afgiver", "r-ox") + tegn + chip(R.red, "optager", "r-red");
+    };
+
     /* Kontrollen under skemaet: tal før og efter pilen, der skal være ens.
        Kun det, trinnet handler om, og kun tal, eleven selv har regnet ud:
-       ladningen i trin 6, O og H i trin 7 og det hele, når skemaet er
-       færdigt. I trin 4 er det vægten, der viser elektronerne. */
+       elektronerne i trin 4 (når vægten er slået fra; ellers viser den
+       dem), ladningen i trin 6, O og H i trin 7 og det hele, når skemaet
+       er færdigt. */
     P.kontrolHTML = function () {
         var R = this.R;
+        if (!this.faerdig && this.trin === T_K) return NK.vaegtTil && NK.vaegtTil() ? "" : this.elektronHTML();
         if (!this.faerdig && this.trin !== T_ION && this.trin !== T_VAND) return "";
         var chips = [];
         function chip(navn, a, b) {
@@ -741,20 +767,34 @@
         tilpasSkema();
         NK.el("ab-valg").innerHTML = this.valgHTML();
         NK.el("tjek").hidden = this.faerdig || this.trin === T_PAR;
+        NK.el("tavleramme").classList.toggle("faerdig", this.faerdig);
+        NK.el("opgavetekst").textContent = this.opgaveTekst();
+        var kt = NK.el("kontekst");
+        kt.textContent = R.def.kontekst || "";
+        kt.hidden = !R.def.kontekst;
         this.visKontrol();
         var b = NK.el("besked");
         b.textContent = this.besked.tekst;
         b.className = "besked " + this.besked.klasse;
         this.visPanel();
+        NK.Taster.opdater(this.tasteSlags(), R.id + "/" + this.trin + (this.faerdig ? "f" : ""));
         this.fokus();
+    };
+
+    /* Den gule knap ved siden af Tjek */
+    P.knapTekst = function () {
+        if (this.faerdig) return this.naesteNr() === null && this.naesteNiveau() ? "Næste sværhedsgrad" : "Ny opgave";
+        return this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+    };
+
+    /* Hvilke taster trinnet har brug for under felterne */
+    P.tasteSlags = function () {
+        if (this.faerdig || this.trin === T_PAR) return null;
+        return this.trin === T_OX ? "ox" : (this.trin === T_LAD ? "ladning" : "tal");
     };
 
     P.visPanel = function () {
         var mig = this, R = this.R, h = "";
-        NK.el("opgavetekst").textContent = this.opgaveTekst();
-        var kt = NK.el("kontekst");
-        kt.textContent = R.def.kontekst || "";
-        kt.hidden = !R.def.kontekst;
         TRIN.forEach(function (t, i) {
             var st = mig.status[i] || (i === mig.trin && !mig.faerdig ? "aktiv" : "");
             var maerke = st === "vist" ? '<span class="tvist">svaret vist</span>' : (st === "unoedig" ? '<span class="tgivet">ikke nødvendig</span>' : "");
@@ -774,13 +814,12 @@
         NK.el("nrknapper").innerHTML = knapper.join("");
         NK.el("loest").textContent = n + " af " + this.liste.length;
 
-        var k = NK.el("opgaveknap"), tekst;
-        if (this.faerdig) tekst = this.naesteNr() === null && this.naesteNiveau() ? "Næste sværhedsgrad" : "Ny opgave";
-        else tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        k.textContent = tekst;
+        var k = NK.el("opgaveknap");
+        k.textContent = this.knapTekst();
         k.classList.toggle("banker", this.faerdig);
         k.classList.toggle("groen", this.faerdig);
-        k.classList.toggle("blaa", !this.faerdig);
+        /* Efter et forkert svar lyser knappen stille op, til hintet er givet */
+        k.classList.toggle("lys", !this.faerdig && this.hjaelp === 0 && this.besked.klasse === "skidt");
         NK.el("opgavekort").classList.toggle("sejr", this.faerdig && !this.vist);
     };
 
@@ -794,18 +833,26 @@
         }
         if (!maal) for (i = 0; i < alle.length; i++) if (!alle[i].value) { maal = alle[i]; break; }
         this.fokusFelt = null;
-        if (!maal || (NK.Rundvisning && NK.Rundvisning.aktiv()) || document.querySelector(".overlay.vis")) return;
-        if (this.trin === T_K || this.trin === T_ION || this.trin === T_VAND) return;   /* flere lige gode felter: eleven vælger */
+        if (!maal) return;
+        if (this.trin === T_ION || this.trin === T_VAND) return;   /* et felt på hver side af pilen: eleven vælger siden */
+        NK.Taster.vaelg(maal.getAttribute("data-felt"));           /* tasterne skriver i feltet, også uden markør */
+        if ((NK.Rundvisning && NK.Rundvisning.aktiv()) || document.querySelector(".overlay.vis")) return;
         try {
             maal.focus({ preventScroll: true });
             maal.setSelectionRange(maal.value.length, maal.value.length);
         } catch (e) { /* ældre browsere */ }
     };
 
-    /* Skemaet skal stå på én linje: er det for bredt, bliver skriften mindre */
+    /* Skemaet skal stå på én linje: er det for bredt, bliver skriften
+       mindre. Et felt, der stikker ud over tavlens kant, tæller med. */
     function ombrudt(sk) {
         var b = sk.children;
         if (sk.scrollWidth > sk.clientWidth + 1) return true;
+        var kant = sk.parentNode.getBoundingClientRect(), felter = sk.querySelectorAll("input");
+        for (var f = 0; f < felter.length; f++) {
+            var r = felter[f].getBoundingClientRect();
+            if (r.left < kant.left - 1 || r.right > kant.right + 1) return true;
+        }
         if (b.length < 2) return false;
         var bund = b[0].offsetTop + b[0].offsetHeight;
         for (var i = 1; i < b.length; i++) {
@@ -819,10 +866,11 @@
         if (!sk || !sk.offsetWidth) return;
         sk.style.fontSize = "";
         var fs = parseFloat(window.getComputedStyle(sk).fontSize);
-        for (var i = 0; i < 30 && fs > 15 && ombrudt(sk); i++) {
-            fs = Math.max(15, fs - 1);
+        for (var i = 0; i < 60 && fs > 15 && ombrudt(sk); i++) {
+            fs = Math.max(15, fs - (fs > 34 ? 2 : 1));
             sk.style.fontSize = fs + "px";
         }
+        NK.Taster.placer();
     }
     NK.tilpasSkema = tilpasSkema;
 
@@ -837,6 +885,7 @@
 
     NK.Niveau.init = function () {
         var tavle = NK.el("tavle"), valg = NK.el("ab-valg");
+        NK.Taster.init();
 
         function input(e) {
             var el = e.target, key = el.getAttribute("data-felt");
@@ -850,7 +899,6 @@
             else aktiv.f[key] = el.value;
             el.classList.remove("fejl");
             delete aktiv.fejlF[key];
-            if (key[0] === "k") aktiv.tjekOvervaegt();
             aktiv.visKontrol();
         }
         function enter(e) {
@@ -870,8 +918,8 @@
             if (!aktiv || e.target.tagName === "INPUT") return;
             var t = aktiv.trin;
             if (aktiv.faerdig) return;
-            if (t === T_PAR) aktiv.besked = { tekst: "Vælg under tavlen, om hvert par oxideres eller reduceres.", klasse: "" };
-            else if (t === T_E || t === T_LAD) aktiv.besked = { tekst: "Skriv svaret i felterne under tavlen.", klasse: "" };
+            if (t === T_PAR) aktiv.besked = { tekst: "Vælg under skemaet, om hvert par oxideres eller reduceres.", klasse: "" };
+            else if (t === T_E || t === T_LAD) aktiv.besked = { tekst: "Skriv svaret i felterne under skemaet.", klasse: "" };
             else return;
             NK.el("besked").textContent = aktiv.besked.tekst;
             NK.el("besked").className = "besked";

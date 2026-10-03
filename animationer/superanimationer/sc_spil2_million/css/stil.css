@@ -1,0 +1,1050 @@
+/* =====================================================================
+   Kemi-Millionaer - stilark
+   Rammen (toplinje, scene, panel, kort, pop op og rundvisning) er den
+   samme som i de andre spil. Scenen er et tv-studie: moerkeblaa med
+   lyskegler, ruder med spidse ender og en stige i guld.
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
+   dansk komma.
+   ===================================================================== */
+
+:root {
+    --bund:        #05071a;
+    --top:         #090c24;
+    --panel:       #0b1030;
+    --panel-2:     #141b48;
+    --panel-3:     #1d2762;
+    --linje:       #2a3574;
+    --tekst:       #f3f5fc;
+    --tekst-svag:  #cbd2ec;
+    --tekst-mat:   #9aa5d0;
+
+    --blaa:        #5b8cff;
+    --blaa-mork:   #2f55c8;
+    --guld:        #f5c542;
+    --guld-lys:    #fff1a8;
+    --guld-mork:   #c98a12;
+    --groen:       #37c978;
+    --roed:        #ef5a4c;
+    --roed-mork:   #9c2c22;
+
+    /* Lyset i studiet som r, g, b. Skifter ved spaending, jubel og fald. */
+    --lys:         120, 160, 255;
+
+    --radius:      10px;
+    --radius-lil:  6px;
+    --skygge:      0 6px 22px rgba(0, 0, 0, 0.5);
+    --panel-bredde: 300px;
+    --spids:       26px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bund);
+    color: var(--tekst);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+[hidden] { display: none !important; }
+
+/* ---------------------------------------------------------------------
+   TOPLINJE
+   --------------------------------------------------------------------- */
+.top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background-color: var(--top);
+    border-bottom: 1px solid #1c2454;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    flex-shrink: 0;
+}
+
+/* I en samling i fuld skaerm staar knappen, der gendanner panelet, i hjoernet */
+.samling-fuld .top { padding-left: 56px; }
+
+.top h1 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.top h1 .ikon { width: 28px; height: 28px; display: block; }
+
+.top-luft { flex: 1; }
+
+.teoriknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #34408a;
+    border-radius: var(--radius-lil);
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.teoriknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+.topknap {
+    background-color: var(--panel-2);
+    border: 1px solid #34408a;
+    border-radius: var(--radius-lil);
+    width: 40px;
+    height: 36px;
+    font-size: 1.05rem;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.topknap:hover { background-color: var(--panel-3); }
+.topknap.fra { opacity: 0.6; }
+
+.flagknap {
+    width: 44px;
+    height: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 5px;
+    background-size: cover;
+    background-position: center;
+    color: #000000;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 2px #ffffff, 0 0 3px #ffffff, 0 0 4px #ffffff, 0 0 5px #ffffff;
+    opacity: 0.8;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.flagknap:hover { opacity: 1; }
+
+.ikonknap {
+    background-color: var(--roed-mork);
+    border: 1px solid var(--roed);
+    color: #e6e9f5;
+    border-radius: 4px;
+    width: 38px;
+    height: 36px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ikonknap:hover { background-color: var(--roed); color: #ffffff; }
+
+/* ---------------------------------------------------------------------
+   HOVEDLAYOUT
+   --------------------------------------------------------------------- */
+main { flex: 1; position: relative; min-height: 0; }
+
+.fane {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
+}
+
+.scene {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.spilflade {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.statuslinje {
+    margin: 0;
+    padding: 6px 16px;
+    min-height: calc(2.8em + 12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.98rem;
+    line-height: 1.4;
+    color: var(--tekst-svag);
+    background-color: #04061a;
+    border-top: 1px solid #1c2454;
+    flex-shrink: 0;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.statuslinje b { color: var(--tekst); }
+.statuslinje.god { background-color: #0a2a1c; color: #c9f3dc; }
+.statuslinje.daarlig { background-color: #2c0f12; color: #f6cdc8; }
+
+/* ---------------------------------------------------------------------
+   STUDIET
+   --------------------------------------------------------------------- */
+.studie {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 62% 46% at 50% 34%, rgba(var(--lys), 0.3), transparent 72%),
+        radial-gradient(ellipse 95% 34% at 50% 108%, rgba(124, 70, 226, 0.42), transparent 72%),
+        linear-gradient(180deg, #02041a 0%, #091040 52%, #03051c 100%);
+    transition: filter 0.5s ease;
+}
+
+.straale {
+    position: absolute;
+    top: -12%;
+    width: 30%;
+    height: 135%;
+    transform-origin: 50% 0;
+    background: linear-gradient(180deg, rgba(var(--lys), 0.5), rgba(var(--lys), 0) 80%);
+    clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+    filter: blur(5px);
+    mix-blend-mode: screen;
+    opacity: 0.75;
+    animation: svaj 11s ease-in-out infinite alternate;
+    transition: opacity 0.5s ease;
+}
+
+.straale.s1 { left: -4%;  --fra: -30deg; --til: -12deg; animation-duration: 12s; }
+.straale.s2 { left: 20%;  --fra: -6deg;  --til: -22deg; animation-duration: 15s; }
+.straale.s3 { left: 50%;  --fra: 20deg;  --til: 6deg;   animation-duration: 13s; }
+.straale.s4 { left: 74%;  --fra: 12deg;  --til: 30deg;  animation-duration: 16s; }
+
+@keyframes svaj {
+    from { transform: rotate(var(--fra)); }
+    to   { transform: rotate(var(--til)); }
+}
+
+.gulv {
+    position: absolute;
+    left: 50%;
+    border-radius: 50%;
+    border: 2px solid rgba(var(--lys), 0.34);
+    box-shadow: 0 0 46px rgba(var(--lys), 0.22), inset 0 0 60px rgba(var(--lys), 0.16);
+    transform: translateX(-50%);
+}
+
+.gulv.g1 { bottom: -38%; width: 130%; height: 62%; }
+.gulv.g2 { bottom: -44%; width: 96%;  height: 62%; border-color: rgba(var(--lys), 0.2); }
+
+/* Lyset gaar ned, naar svaret er laast */
+.spilflade.spaending .straale { opacity: 0.22; }
+.spilflade.spaending .studie { filter: brightness(0.72); }
+.spilflade.jubel { --lys: 96, 232, 150; }
+.spilflade.fald  { --lys: 255, 104, 92; }
+
+/* ---------------------------------------------------------------------
+   TITELSKAERMEN
+   --------------------------------------------------------------------- */
+.titelskaerm {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    text-align: center;
+}
+
+.titelskaerm .emblem {
+    width: min(210px, 30vh);
+    height: auto;
+    filter: drop-shadow(0 0 30px rgba(var(--lys), 0.6));
+    animation: aande 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes aande {
+    from { transform: scale(1); }
+    to   { transform: scale(1.035); }
+}
+
+.fortitel {
+    margin: 14px 0 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--tekst-svag);
+}
+
+.stortitel {
+    margin: 2px 0 6px;
+    font-size: clamp(2rem, 5.4vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+    background: linear-gradient(180deg, var(--guld-lys) 0%, var(--guld) 48%, var(--guld-mork) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.6));
+}
+
+.undertitel { margin: 0 0 14px; font-size: 1rem; color: var(--tekst-svag); }
+
+.chips {
+    list-style: none;
+    margin: 0 0 20px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.chips li {
+    padding: 5px 14px;
+    border: 1px solid rgba(var(--lys), 0.5);
+    border-radius: 999px;
+    background-color: rgba(8, 14, 54, 0.7);
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--tekst-svag);
+}
+
+/* ---------------------------------------------------------------------
+   KNAPPER
+   --------------------------------------------------------------------- */
+.guldknap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 26px;
+    border: 1px solid #ffe69a;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffe17a 0%, var(--guld) 45%, #e3a11a 100%);
+    color: #201400;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(245, 197, 66, 0.35), 0 3px 8px rgba(0, 0, 0, 0.45);
+    transition: transform 0.08s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.guldknap.stor { padding: 13px 34px; font-size: 1.12rem; }
+.guldknap:hover:not(:disabled) { filter: brightness(1.08); box-shadow: 0 0 26px rgba(245, 197, 66, 0.55), 0 3px 8px rgba(0, 0, 0, 0.45); }
+.guldknap:active:not(:disabled) { transform: scale(0.98); }
+
+.guldknap:disabled {
+    background: #2a3158;
+    border-color: #3a4275;
+    color: #9aa5d0;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.guldknap kbd { background-color: rgba(32, 20, 0, 0.16); border-color: rgba(32, 20, 0, 0.35); color: #3a2600; }
+.guldknap:disabled kbd { background-color: transparent; border-color: #4a5388; color: #9aa5d0; }
+
+.stopknap {
+    padding: 10px 20px;
+    border: 1px solid #7f8cc8;
+    border-radius: 999px;
+    background-color: rgba(8, 14, 54, 0.75);
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.stopknap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #b3bdf0; }
+.stopknap:disabled { opacity: 0.5; cursor: not-allowed; }
+.stopknap.usynlig { visibility: hidden; }
+.stopknap[hidden] + .guldknap { margin: 0 auto; }
+
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #34408a;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); }
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+
+kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid #4a5596;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background-color: #0a0f30;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--tekst-mat);
+}
+
+/* ---------------------------------------------------------------------
+   BRAETTET
+   --------------------------------------------------------------------- */
+.braet {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 22px 14px;
+    overflow: hidden;
+}
+
+.braet-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.taeller, .kapitel {
+    padding-top: 6px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tekst-svag);
+}
+
+.kapitel { text-align: right; text-transform: none; letter-spacing: 0.01em; font-weight: 600; font-style: italic; }
+
+/* ----- Livlinerne ----- */
+.livliner { display: flex; gap: 14px; }
+
+.livline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--tekst-svag);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.ll-oval {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 46px;
+    border: 2px solid #a9c4ff;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 30%, #3f66e6, #142a8c 60%, #0a1552);
+    color: #ffffff;
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    box-shadow: 0 0 14px rgba(var(--lys), 0.35);
+    transition: transform 0.1s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.ll-navn { font-size: 0.82rem; font-weight: 600; }
+
+.livline:hover:not(:disabled) .ll-oval { transform: translateY(-2px); box-shadow: 0 0 22px rgba(var(--lys), 0.7); filter: brightness(1.15); }
+.livline:disabled { cursor: not-allowed; }
+.livline:disabled .ll-oval { filter: saturate(0.5) brightness(0.75); box-shadow: none; }
+
+/* En brugt livline er graa og streget over med et roedt kryds */
+.livline.brugt .ll-oval,
+.livline.brugt:disabled .ll-oval {
+    border-color: #56609a;
+    background: #161d48;
+    color: #7f89b8;
+    box-shadow: none;
+    filter: none;
+}
+
+.livline.brugt .ll-navn { color: var(--tekst-mat); text-decoration: line-through; }
+
+.livline.brugt .ll-oval::before,
+.livline.brugt .ll-oval::after {
+    content: "";
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 50%;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 2px;
+    background-color: #ff5a4c;
+}
+
+.livline.brugt .ll-oval::before { transform: rotate(24deg); }
+.livline.brugt .ll-oval::after { transform: rotate(-24deg); }
+
+/* ----- Emblemet over spoergsmaalet ----- */
+.braet-emblem {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    container-type: size;
+}
+
+/* Er der ikke plads til emblemet, er det der ikke */
+@container (max-height: 74px) {
+    .braet-emblem img { display: none; }
+}
+
+.braet-emblem img {
+    position: absolute;
+    inset: 6px 0;
+    margin: auto;
+    height: calc(100% - 12px);
+    max-height: 190px;
+    max-width: 100%;
+    filter: drop-shadow(0 0 26px rgba(var(--lys), 0.55));
+    transition: filter 0.4s ease;
+}
+
+.braet-midte {
+    width: 100%;
+    max-width: 1020px;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.pulje {
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto 8px;
+    padding: 3px 18px;
+    border: 1px solid var(--guld);
+    border-radius: 999px;
+    background-color: rgba(8, 14, 54, 0.8);
+    color: var(--guld);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+/* ----- Ruderne: spidse ender og en linje ud til siderne ----- */
+.raekke {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 30px;
+    margin-bottom: 10px;
+}
+
+.raekke.en { grid-template-columns: minmax(0, 1fr); }
+
+.raekke::before {
+    content: "";
+    position: absolute;
+    left: -400px;
+    right: -400px;
+    top: 50%;
+    height: 2px;
+    margin-top: -1px;
+    background: linear-gradient(90deg, transparent, rgba(var(--lys), 0.75) 22%, rgba(var(--lys), 0.75) 78%, transparent);
+}
+
+.rude {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 2px;
+    border: none;
+    background: linear-gradient(180deg, #c4d8ff 0%, #4f78dc 50%, #c4d8ff 100%);
+    clip-path: polygon(var(--spids) 0, calc(100% - var(--spids)) 0, 100% 50%, calc(100% - var(--spids)) 100%, var(--spids) 100%, 0 50%);
+    color: var(--tekst);
+    font-family: inherit;
+    text-align: left;
+}
+
+.rude-indre {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 7px calc(var(--spids) + 8px);
+    background: linear-gradient(180deg, #17318f 0%, #0a164c 47%, #050b2c 53%, #0e2070 100%);
+    clip-path: polygon(calc(var(--spids) - 1px) 0, calc(100% - var(--spids) + 1px) 0, 100% 50%, calc(100% - var(--spids) + 1px) 100%, calc(var(--spids) - 1px) 100%, 0 50%);
+    transition: background 0.15s ease;
+}
+
+.spoergsmaal .rude-indre {
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-height: 92px;
+    padding-top: 10px;
+    padding-bottom: 12px;
+    text-align: center;
+}
+
+.spoergsmaal small {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--guld);
+}
+
+.spoergsmaal p { margin: 0; font-size: 1.3rem; font-weight: 600; line-height: 1.3; }
+.spoergsmaal.lang p { font-size: 1.14rem; }
+.spoergsmaal.laengst p { font-size: 1.02rem; }
+
+/* ----- Svarene ----- */
+.svar { cursor: pointer; }
+.svar:disabled { cursor: default; }
+
+.bogstav { flex-shrink: 0; color: var(--guld); font-size: 1.08rem; font-weight: 800; }
+.svartekst { min-width: 0; font-size: 1.1rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+.svar.langt .svartekst { font-size: 0.98rem; }
+
+.svar:hover:not(:disabled) { background: linear-gradient(180deg, #ffffff 0%, #8fb2ff 50%, #ffffff 100%); }
+.svar:hover:not(:disabled) .rude-indre { background: linear-gradient(180deg, #2a4fc4 0%, #132a82 47%, #0c1c60 53%, #1c3aa6 100%); }
+.svar:focus-visible { outline: none; background: linear-gradient(180deg, var(--guld-lys), var(--guld) 50%, var(--guld-lys)); }
+
+/* Svaret er ikke kommet frem endnu */
+.svar.venter .rude-indre > * { opacity: 0; }
+.svar .rude-indre > * { transition: opacity 0.2s ease; }
+
+/* Fjernet af en livline */
+.svar.fjernet { opacity: 0.4; }
+.svar.fjernet .rude-indre > * { opacity: 0; }
+
+/* Valgt: orange. Laast: orange, der pulserer. */
+.svar.valgt, .svar.laast { background: linear-gradient(180deg, #fff1a8 0%, #f5a623 50%, #fff1a8 100%); }
+
+.svar.valgt .rude-indre, .svar.laast .rude-indre {
+    background: linear-gradient(180deg, #ffbe3d 0%, #ee8a06 47%, #cf6f00 53%, #f7a41e 100%);
+    color: #1d1100;
+}
+
+.svar.valgt .bogstav, .svar.laast .bogstav { color: #4a2500; }
+.svar.laast { animation: puls 0.75s ease-in-out infinite alternate; }
+
+@keyframes puls {
+    from { filter: brightness(0.9); }
+    to   { filter: brightness(1.22); }
+}
+
+/* Rigtigt: groen, der blinker tre gange. Forkert: roed. */
+.svar.rigtig { background: linear-gradient(180deg, #e2ffe9 0%, #37c978 50%, #e2ffe9 100%); animation: blink 0.36s ease-in-out 3 alternate; }
+
+.svar.rigtig .rude-indre {
+    background: linear-gradient(180deg, #58df8f 0%, #1faa5c 47%, #128a47 53%, #37c978 100%);
+    color: #03210f;
+}
+
+.svar.rigtig .bogstav { color: #ffffff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45); }
+
+@keyframes blink {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.55); }
+}
+
+.svar.forkert { background: linear-gradient(180deg, #ffd9d4 0%, #ef5a4c 50%, #ffd9d4 100%); }
+
+.svar.forkert .rude-indre {
+    background: linear-gradient(180deg, #f0685a 0%, #c53a2d 47%, #a02a1f 53%, #dd4a3c 100%);
+    color: #ffffff;
+}
+
+.svar.forkert .bogstav { color: #ffffff; }
+.svar.mat { opacity: 0.5; }
+
+/* ----- Knapperne under svarene ----- */
+.handling {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 46px;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.bekraeft-tekst { font-size: 1.02rem; font-weight: 700; color: var(--guld-lys); }
+
+/* ---------------------------------------------------------------------
+   SLUTKORTET
+   --------------------------------------------------------------------- */
+.slutlag {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background-color: rgba(3, 5, 22, 0.66);
+    z-index: 5;
+}
+
+#konfetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.slutkort {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 22px 28px 24px;
+    border: 2px solid #5f78d6;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #14267c 0%, #0a1244 100%);
+    box-shadow: 0 0 60px rgba(var(--lys), 0.35), var(--skygge);
+    text-align: center;
+    animation: ind 0.35s ease;
+}
+
+@keyframes ind {
+    from { transform: scale(0.86); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+.slutkort.tabt { border-color: #d0594d; }
+.slutkort.stoppet { border-color: var(--guld); }
+
+.slutkort.vundet {
+    border-color: transparent;
+    background:
+        linear-gradient(180deg, #14267c 0%, #0a1244 100%) padding-box,
+        linear-gradient(110deg, var(--guld-mork), var(--guld-lys), var(--guld), #ffffff, var(--guld), var(--guld-mork)) border-box;
+    background-size: 100% 100%, 300% 100%;
+    animation: ind 0.35s ease, glimt 4s linear infinite;
+}
+
+@keyframes glimt {
+    from { background-position: 0 0, 0% 0; }
+    to   { background-position: 0 0, 300% 0; }
+}
+
+.slutkort h2 { margin: 0 0 6px; font-size: 1.5rem; font-weight: 800; color: var(--tekst); }
+.slutkort.tabt h2 { color: #ff8e83; }
+.slutkort.stoppet h2, .slutkort.vundet h2 { color: var(--guld); }
+
+.slut-maerke {
+    display: inline-block;
+    margin: 0 0 8px;
+    padding: 2px 14px;
+    border-radius: 999px;
+    background-color: var(--groen);
+    color: #03210f;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.slut-tekst { margin: 0; font-size: 1rem; color: var(--tekst-svag); }
+
+.slut-beloeb {
+    margin: 4px 0 8px;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, var(--guld-lys) 0%, var(--guld) 50%, var(--guld-mork) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.slut-ekstra { margin: 0 0 14px; font-size: 1rem; line-height: 1.45; color: var(--tekst-svag); }
+.slut-ekstra b { color: var(--guld-lys); }
+.slutkort.vundet .slut-ekstra b { font-size: 1.25rem; }
+
+.slut-ros {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border-left: 4px solid var(--guld);
+    border-radius: var(--radius-lil);
+    background-color: rgba(3, 5, 22, 0.6);
+    font-size: 0.95rem;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--tekst-svag);
+    text-align: left;
+}
+
+/* ---------------------------------------------------------------------
+   HOEJRE PANEL: STIGEN
+   --------------------------------------------------------------------- */
+.panel {
+    background-color: var(--panel);
+    border-left: 1px solid #1c2454;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #34408a var(--panel);
+}
+
+.kort {
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 1px solid #222c68;
+    border-radius: var(--radius);
+    padding: 10px;
+}
+
+.kort > h2 {
+    margin: 0 0 6px 2px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--guld);
+}
+
+.stigekort { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+
+.stige {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stige li {
+    flex: 1 1 0;
+    min-height: 23px;
+    max-height: 40px;
+    display: grid;
+    grid-template-columns: 2em 1.3em minmax(0, 1fr);
+    align-items: center;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #f0a63a;
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.stige .nr { text-align: right; padding-right: 4px; }
+.stige .mk { text-align: center; font-size: 0.82rem; }
+.stige .kr { text-align: right; }
+
+/* De sikre beloeb er hvide */
+.stige li.sikker { color: #ffffff; }
+.stige li.sikker .mk::before { content: "◇"; }
+
+.stige li.vundet { color: #86d7a8; }
+.stige li.vundet .mk::before { content: "◆"; color: var(--groen); }
+
+.stige li.nu {
+    background: linear-gradient(90deg, #ffe17a, var(--guld) 40%, #e9a416);
+    color: #201400;
+    box-shadow: 0 0 16px rgba(245, 197, 66, 0.5);
+}
+
+.stige li.nu .mk::before { color: #201400; }
+
+/* Det, eleven gaar hjem med */
+.stige li.hjem { box-shadow: inset 0 0 0 2px var(--guld); color: var(--guld-lys); }
+.stige li.hjem.nu { color: #201400; }
+
+.talkort { flex-shrink: 0; }
+
+.tal2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+
+.tal2 > div {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lil);
+    padding: 6px 4px;
+    text-align: center;
+}
+
+.tal2 small { display: block; font-size: 0.82rem; color: var(--tekst-mat); }
+.tal2 b { display: block; font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------------
+   POP OP
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(3, 5, 18, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 640px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 22px 26px;
+}
+
+.overlay-boks h2 { margin: 0 0 4px 0; font-size: 1.15rem; color: var(--guld); }
+
+.overlay-boks h3 {
+    margin: 14px 0 4px 0;
+    font-size: 0.82rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--blaa);
+}
+
+.overlay-boks p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--tekst-svag);
+    margin: 0 0 6px 0;
+}
+
+.overlay-boks p b { color: var(--tekst); }
+.regler-knapper { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som sc1.1)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning[hidden] { display: none; }
+
+.rundvisning-baggrund { position: fixed; inset: 0; background: transparent; cursor: pointer; }
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(3, 5, 18, 0.76);
+    outline: 2px solid var(--guld);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel-2);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.rundvisning-tal { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; color: var(--tekst-mat); }
+
+.rundvisning-luk {
+    background: transparent;
+    border: none;
+    color: var(--tekst-svag);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.rundvisning-luk:hover { color: var(--tekst); }
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--guld); }
+.rundvisning-boks p { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--tekst-svag); }
+
+.rundvisning-knapper { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
+
+/* ---------------------------------------------------------------------
+   TILGAENGELIGHED OG SMALLE SKAERME
+   --------------------------------------------------------------------- */
+button:focus-visible {
+    outline: 2px solid var(--guld);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* Lave vinduer: mindre luft, saa ruderne kan vaere der */
+@media (max-height: 640px) {
+    .braet { padding-top: 8px; padding-bottom: 8px; }
+    .ll-oval { width: 74px; height: 40px; font-size: 1.02rem; }
+    .rude-indre { min-height: 46px; }
+    .spoergsmaal .rude-indre { min-height: 78px; }
+    .raekke { margin-bottom: 8px; }
+}
+
+@media (max-width: 1100px) {
+    :root { --panel-bredde: 250px; --spids: 22px; }
+    .stige li { font-size: 0.95rem; padding: 0 9px; }
+    .kapitel { display: none; }
+    .braet-top { grid-template-columns: auto minmax(0, 1fr); }
+    .livliner { justify-content: flex-end; }
+}
+
+@media (max-width: 860px) {
+    body { overflow: auto; }
+    .fane { position: static; grid-template-columns: minmax(0, 1fr); }
+    .scene { min-height: 86vh; }
+    .panel { border-left: none; border-top: 1px solid #1c2454; }
+    .stige li { flex: 0 0 auto; height: 30px; }
+}
+
+@media (max-width: 620px) {
+    :root { --spids: 18px; }
+    .braet { padding-left: 12px; padding-right: 12px; }
+    .raekke { grid-template-columns: minmax(0, 1fr); gap: 8px 0; }
+    .raekke::before { display: none; }
+    .braet-top { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+    .taeller { padding-top: 0; }
+    .ll-oval { width: 72px; height: 40px; font-size: 1rem; }
+    .spoergsmaal p { font-size: 1.1rem; }
+    .spoergsmaal.lang p, .spoergsmaal.laengst p { font-size: 1rem; }
+    .braet-emblem img { display: none; }
+    .top h1 span { display: none; }
+}

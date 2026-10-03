@@ -154,10 +154,16 @@
     ];
 
     /* ----- Replikkerne ---------------------------------------------------------------
-       Linjen i opgavekortet siger, hvor man er (INTRO), naeste skridt,
-       fejl og ros. Kemichael blander sig ikke: han siger kun noget ved
-       Giv hint og Vis svaret, naar han sendes ud eller hentes, og naar der
-       klikkes paa ham eller koppen. */
+       Spoergsmaalet, fejl, hint og ros staar i arbejdsfeltet i scenen, ved
+       feltet. Kemichael blander sig ikke: han siger noget, naar han sendes
+       ud eller hentes, naar der klikkes paa ham eller koppen, og ved K
+       (INTRO: hvor man er).
+
+       KEMICHAEL_SIGER_HINT: false, saa staar hintet og svaret i
+       arbejdsfeltet lige ved feltet (brugerens test 3. okt. 2026). Med true
+       siger Kemichael dem i sin boble ved katederet, som foer. */
+    D.KEMICHAEL_SIGER_HINT = false;
+
     D.INTRO = {
         rg: "Her finder du oxidationstal med reglerne, ét trin ad gangen.",
         ek: "Hvert elektronpar går til det atom, der trækker hårdest."
@@ -167,7 +173,7 @@
         ek: "Alle 12. Reglerne er en genvej. Elektronerne er grunden."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Præcis.", "Ja.", "Fint."];
-    D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
+    D.ROS_OPGAVE = ["Den er i hus.", "Rigtigt regnet.", "Summen passer."];
 
     D.UD_LINJE = "Fint. Jeg går på lærerværelset.";
     D.IND_LINJE = "Tilbage. Nogen havde taget min stol.";

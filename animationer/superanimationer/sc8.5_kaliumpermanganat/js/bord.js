@@ -4,7 +4,9 @@
    Urglassene staar paa hvide klinker. Draabeflasken kan traekkes hen
    over et glas (eller man kan klikke paa glasset eller flasken). Saa
    flyver den derhen, vender tuden nedad og drypper tre draaber, og den
-   nye farve breder sig fra der, hvor draaberne ramte.
+   nye farve breder sig fra der, hvor draaberne ramte. Er glasset tomt
+   (farven "tom"), lander draaberne paa bunden og bliver til en pyt, der
+   vokser, til glasset er fyldt.
 
    Luppen viser elektronerne, naar gangetallene skrives: hver partikel af
    det, der oxideres, har sine elektroner (gule), og hver partikel af
@@ -177,13 +179,14 @@
 
     P.opdaterResten = function (dt) {
         var mig = this, lay = this.lay;
-        /* Draaberne falder og rammer vaesken */
+        /* Draaberne falder og rammer vaesken (i et tomt glas: glassets bund) */
         this.draaber = this.draaber.filter(function (d) {
             var g = lay.glas[d.glas];
+            var flade = mig.glas[d.glas].farve[3] > 0.005 ? g.overflade : g.skaal;
             d.vy += 1900 * dt;
             d.y += d.vy * dt;
-            if (d.y >= g.overflade) {
-                mig.ramt(d.glas, d.x, g.overflade, d.nr);
+            if (d.y >= flade) {
+                mig.ramt(d.glas, d.x, flade, d.nr);
                 return false;
             }
             return true;

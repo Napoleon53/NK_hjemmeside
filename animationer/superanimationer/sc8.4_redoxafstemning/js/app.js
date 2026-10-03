@@ -1,9 +1,9 @@
 /* =====================================================================
    app.js - binder sværhedsgraderne sammen
 
-   Faneskift (Let, Middel, Svær), tastaturgenveje, teorien, musen på
-   vægten og tegneløkken. Vægten og Kemichael deler ét lærred over
-   arbejdsbordet. Samme opbygning som sc2.4.
+   Faneskift (Let, Middel, Svær), tastaturgenveje, teorien, knappen, der
+   slår elektronvægten til og fra, musen på vægten og tegneløkken.
+   Vægten er slået fra fra start; så fylder tavlen hele scenen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -11,29 +11,10 @@
     var NK = window.NK;
     var D = NK.Data;
 
-    /* Kemichael kommer ikke af sig selv: første gang står der Start
-       præsentation og Nej tak (js/praesentation.js). Esc er det samme
-       som Nej tak. Faneskift og Spring over (stopIntro) skjuler
-       tilbuddet uden at huske det. */
-    if (NK.Laerer) {
-        NK.Praesentation.pakInd(NK.Laerer.prototype, {
-            tilbud: "tilbud",
-            medId: true,
-            set: function (id) { return !!NK.hent("nk-sc8.4-intro", {})[id]; },
-            husk: function (id) { var s = NK.hent("nk-sc8.4-intro", {}); s[id] = true; NK.gem("nk-sc8.4-intro", s); }
-        });
-        (function (P) {
-            var stop = P.stopIntro;
-            P.stopIntro = function () {
-                this.skjulTilbud();
-                return stop.apply(this, arguments);
-            };
-        }(NK.Laerer.prototype));
-    }
-
     var niveauer = {};
     var aktivId = "let";
-    var laerred = null, vaegt = null, laerer = null;
+    var laerred = null, vaegt = null;
+    var vaegtTil = false;
     var sidsteTid = 0;
 
     function visNiveau(id) {
@@ -48,10 +29,19 @@
         document.body.setAttribute("data-niveau", id);
         NK.Rundvisning.luk();
         NK.Niveau.aktiver(niveauer[id]);
-        if (laerer) {
-            laerer.stopIntro();
-            laerer.startIntro(id, false);
-        }
+    }
+
+    /* Elektronvægten over tavlen. Slås den til, bliver tavlen mindre, og
+       elektronerne i trin 4 vises af vægten i stedet for under skemaet. */
+    function saetVaegt(til) {
+        vaegtTil = !!til;
+        document.body.classList.toggle("med-vaegt", vaegtTil);
+        NK.el("vaegt-omraade").hidden = !vaegtTil;
+        var k = NK.el("vaegtknap");
+        k.classList.toggle("til", vaegtTil);
+        k.setAttribute("aria-pressed", vaegtTil ? "true" : "false");
+        if (niveauer[aktivId]) niveauer[aktivId].visKontrol();
+        NK.tilpasSkema();
     }
 
     function aabn(id) { NK.el(id).classList.add("vis"); }
@@ -65,12 +55,10 @@
         sidsteTid = tidsstempel;
         if (!isFinite(dt) || dt < 0) dt = 0;
         if (dt > 0.1) dt = 0.1;
-        laerred.tilpas();
-        vaegt.opdater(dt, niveauer[aktivId], laerred.b, laerred.h);
-        vaegt.tegn(laerred, laerer ? laerer.g.kaffekop : null);
-        if (laerer) {
-            laerer.opdater(dt);
-            laerer.laererTegnOver(laerred.ctx);
+        if (vaegtTil) {
+            laerred.tilpas();
+            vaegt.opdater(dt, niveauer[aktivId], laerred.b, laerred.h);
+            vaegt.tegn(laerred);
         }
         window.requestAnimationFrame(loekke);
     }
@@ -79,13 +67,11 @@
         if (e.key === "Escape") {
             lukOverlay();
             NK.Rundvisning.luk();
-            if (laerer && !laerer.afvisTilbud()) laerer.stopIntro();
             return;
         }
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (e.key >= "1" && e.key <= "3") { visNiveau(D.NIVEAU_RAEKKE[parseInt(e.key, 10) - 1]); return; }
-        if ((e.key === "k" || e.key === "K") && laerer) { laerer.startIntro(aktivId, true); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
             if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
             else { lukOverlay(); NK.Rundvisning.start(aktivId); }
@@ -93,6 +79,7 @@
         }
         if (NK.Rundvisning.aktiv() || document.querySelector(".overlay.vis")) return;
         if (e.key === "t" || e.key === "T") { aabn("teori"); return; }
+        if (e.key === "v" || e.key === "V") { saetVaegt(!vaegtTil); return; }
         if (e.key === "r" || e.key === "R") { niveauer[aktivId].forfra(); return; }
         if (e.key === "Enter") {
             var niv = niveauer[aktivId];
@@ -115,12 +102,8 @@
         laerred = new NK.Laerred(NK.el("laerred"));
         vaegt = new NK.Vaegt();
         NK.vaegt = vaegt;
-        if (NK.Sprites) NK.Sprites.start();
-        if (NK.Laerer) {
-            laerer = new NK.Laerer(laerred, vaegt);
-            NK.laerer = laerer;
-            NK.el("spring-over").addEventListener("click", function () { laerer.stopIntro(); });
-        }
+        NK.vaegtTil = function () { return vaegtTil; };
+        NK.saetVaegt = saetVaegt;
         D.NIVEAU_RAEKKE.forEach(function (id) { niveauer[id] = new NK.Niveau(id); });
         NK.niveauer = niveauer;        /* så de kan pilles ved fra konsollen og selvtesten */
         NK.visNiveau = visNiveau;
@@ -136,9 +119,10 @@
         NK.el("teoriknap").addEventListener("click", function () { aabn("teori"); });
         NK.el("teori-luk").addEventListener("click", lukOverlay);
         NK.el("teori").addEventListener("click", function (e) { if (e.target === NK.el("teori")) lukOverlay(); });
+        NK.el("vaegtknap").addEventListener("click", function () { saetVaegt(!vaegtTil); });
         document.addEventListener("keydown", tastatur);
 
-        /* Musen på lærredet: Kemichael, koppen, plus og minus, skålene */
+        /* Musen på lærredet: plus og minus på bordkanten og skålene */
         var cv = NK.el("laerred");
         function punkt(e) {
             var r = cv.getBoundingClientRect();
@@ -146,9 +130,6 @@
         }
         cv.addEventListener("click", function (e) {
             var p = punkt(e), niv = niveauer[aktivId];
-            if (laerer && laerer.laererIntroKlik(p.x, p.y)) return;
-            if (laerer && laerer.laererKlik(p.x, p.y)) return;
-            if (laerer && vaegt.kopVed(p.x, p.y, laerer.g.kaffekop)) { laerer.klikKop(); return; }
             var k = vaegt.knapVed(p.x, p.y);
             if (k) { niv.vaegtKlik(k.side, k.d); return; }
             if (vaegt.skaalVed(p.x, p.y) && !niv.faerdig) {
@@ -161,8 +142,7 @@
             var p = punkt(e);
             var k = vaegt.knapVed(p.x, p.y);
             vaegt.overKnap = k;
-            var over = k || (laerer && (laerer.laererUnder(p.x, p.y) || vaegt.kopVed(p.x, p.y, laerer.g.kaffekop))) || vaegt.skaalVed(p.x, p.y);
-            cv.style.cursor = over ? "pointer" : "default";
+            cv.style.cursor = k || vaegt.skaalVed(p.x, p.y) ? "pointer" : "default";
         });
         cv.addEventListener("pointerleave", function () { vaegt.overKnap = null; });
 

@@ -16,21 +16,23 @@
 
     var TURE = {
         "fane-ug": [
-            { sel: "#ug-anker-bord", titel: "Urglasset", tekst: "Ét urglas med kaliumpermanganat gjort basisk. Træk flasken med natriumsulfit hen over glasset. Til sidst skal der svovlsyre i." },
-            { sel: "#ug-haefte", titel: "Hæftet", tekst: "Her afstemmer du, som du ville gøre i hånden: oxidationstal over atomerne og klammer under skemaet med ↑ og ↓ under pilen." },
+            { sel: "#ug-anker-bord", titel: "Urglasset", tekst: "Urglasset er tomt. Træk flaskerne med kaliumpermanganat og natriumhydroxid hen over glasset, og dryp så natriumsulfit i. Til sidst skal der svovlsyre i." },
+            { sel: "#ug-haefte", titel: "Hæftet", tekst: "Her afstemmer du, som du ville gøre i hånden: oxidationstal over atomerne og klammer under skemaet med ↑ og ↓ under pilen. Øverst står det næste skridt." },
+            { sel: "#ug-knap", titel: "Giv hint", tekst: "Knappen på papiret giver et hint og derefter svaret. Når skemaet er afstemt, står Næste opgave midt i hæftet." },
             { sel: "#ug-anker-lup", titel: "Luppen", tekst: "Når du skriver gangetallene, viser luppen elektronerne. Går de op, flytter elektronerne over." },
-            { sel: "#ug-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret." },
-            { sel: "#ug-farvekortet", titel: "Farvekortet", tekst: "Farven viser, hvad mangan er blevet til. Oxidationstallet kommer på, når du har fundet det." },
+            { sel: "#ug-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt." },
+            { sel: "#ug-farvekortet", titel: "Farvekortet", tekst: "Farven viser, hvad mangan er blevet til. Navnet står ved formlen, og oxidationstallet kommer på, når du har fundet det." },
             { sel: "#ug-opgaver", titel: "Reaktionerne", tekst: "Tre reaktioner i samme glas. Den næste åbner, når skemaet er afstemt. En reaktion uden Vis svaret giver en stjerne." },
-            { sel: "#ug-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Trykker du Giv hint, siger han kort, hvad du kan gøre. Læs mere viser hans grundige forklaring." },
+            { sel: "#ug-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Klik på ham, eller tryk Giv hint, så siger han kort, hvad du kan gøre. Læs mere viser hans grundige forklaring." },
             { sel: "#ug-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
             { sel: ".faneknapper", titel: "Flere reaktioner", tekst: "Den anden fane har 14 reaktioner mere med permanganat, afstemt på samme måde." }
         ],
         "fane-fl": [
             { sel: "#fl-anker-bord", titel: "Urglasset", tekst: "Et andet stof står i glasset. Træk flasken med kaliumpermanganat hen over glasset, og se, hvad der sker med farven." },
             { sel: "#fl-haefte", titel: "Hæftet", tekst: "Samme metode som på den første fane. Står et grundstof ikke lige mange gange på begge sider, sætter du først et tal foran." },
+            { sel: "#fl-knap", titel: "Giv hint", tekst: "Knappen på papiret giver et hint og derefter svaret. Du kan også klikke på Kemichael." },
             { sel: "#fl-anker-lup", titel: "Luppen", tekst: "Viser elektronerne med de gangetal, du skriver." },
-            { sel: "#fl-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Knappen giver et hint og derefter svaret." },
+            { sel: "#fl-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt." },
             { sel: "#fl-opgaver", titel: "Reaktionerne", tekst: "Surt miljø, basisk miljø og reaktioner med indekstal. Den første er den fra titreringen af jern." },
             { sel: "#fl-forfra", titel: "Start forfra", tekst: "Samme reaktion med et frisk glas og et tomt hæfte." }
         ]

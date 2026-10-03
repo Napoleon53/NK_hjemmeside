@@ -1,0 +1,239 @@
+/* Ionregn: sort baggrund, grøn monospace, kationer blå og kantede, anioner røde og runde. */
+:root {
+    --bg: #000;
+    --groen: #00ff66;
+    --groen-dim: rgba(0, 255, 102, 0.35);
+    --groen-svag: rgba(0, 255, 102, 0.14);
+    --tekst: #c6ffd9;
+    --lys: #eafff1;
+    --kation: #5fd7ff;
+    --kation-bund: rgba(8, 36, 52, 0.94);
+    --anion: #ff8a70;
+    --anion-bund: rgba(56, 14, 10, 0.94);
+    --fejl: #ff5a5a;
+    --font: Consolas, "Cascadia Mono", Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+    --kant: 1px solid var(--groen-dim);
+    --fs: clamp(14px, 1.15vw + 8px, 22px);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+    background: var(--bg);
+    color: var(--tekst);
+    font-family: var(--font);
+    font-size: var(--fs);
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+#regn { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+body > *:not(#regn) { position: relative; z-index: 1; }
+sub, sup { font-size: 0.68em; line-height: 0; }
+kbd {
+    display: inline-block; min-width: 1.6em; padding: 0.05em 0.35em; margin: 0 0.1em;
+    border: var(--kant); border-bottom-width: 3px; border-radius: 4px;
+    font-family: var(--font); font-size: 0.85em; color: var(--groen); text-align: center;
+}
+.etiket {
+    display: block; font-size: 0.62em; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--groen-dim); white-space: nowrap;
+}
+
+/* ---- Toplinjen ---------------------------------------------------- */
+.top {
+    display: flex; align-items: center; gap: 0.8em;
+    padding: 0.35em max(16px, env(safe-area-inset-left)) 0.35em max(16px, env(safe-area-inset-right));
+    background: rgba(0, 0, 0, 0.82);
+    border-bottom: var(--kant);
+}
+.top h1 {
+    margin: 0; font-size: 1.15em; letter-spacing: 0.22em; color: var(--groen);
+    text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+}
+.hud { display: flex; flex: 1; gap: 1.2em; align-items: center; justify-content: center; flex-wrap: wrap; }
+.felt { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.felt b { color: var(--lys); font-size: 1.05em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.combo { flex-direction: row; align-items: baseline; gap: 0.35em; flex-wrap: wrap; }
+.combo .etiket { width: 100%; }
+.prikker { display: inline-flex; gap: 3px; }
+.prikker i { width: 0.5em; height: 0.5em; border: 1px solid var(--groen); display: inline-block; }
+.prikker i.fuld { background: var(--groen); }
+.integritet { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0 0.5em; }
+.integritet .etiket { width: 100%; }
+.bjaelke {
+    display: inline-block; width: clamp(80px, 14vw, 220px); height: 0.7em;
+    border: 1px solid var(--groen); padding: 1px; background: rgba(0, 0, 0, 0.6);
+}
+.bjaelke i { display: block; height: 100%; width: 100%; background: var(--groen); transition: width 0.25s, background 0.25s; }
+.integritet.lav .bjaelke i { background: #ffd23f; }
+.integritet.kritisk .bjaelke i { background: var(--fejl); }
+.integritet.ramt { animation: ramt 0.35s; }
+@keyframes ramt { 0%, 100% { transform: none; } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.ikonknap {
+    flex: none; width: 2.2em; height: 2.2em; border-radius: 4px; cursor: pointer;
+    background: transparent; color: var(--groen); border: var(--kant); font: inherit; font-size: 0.9em;
+}
+.ikonknap:hover, .ikonknap:focus-visible { background: var(--groen-svag); outline: none; }
+
+/* ---- Målet ------------------------------------------------------- */
+.maalbar {
+    display: flex; align-items: baseline; justify-content: center; gap: 0.6em;
+    padding: 0.3em 16px; min-height: 2.4em;
+    background: rgba(0, 0, 0, 0.7);
+}
+.maalbar .etiket { display: inline; font-size: 0.75em; }
+.maal { font-size: 1.45em; font-weight: bold; color: var(--lys); text-shadow: 0 0 10px rgba(0, 255, 102, 0.45); }
+.maal small { font-size: 0.55em; font-weight: normal; color: var(--tekst); margin-left: 0.6em; }
+.maalbar.nyt .maal { animation: nyt 0.6s; }
+@keyframes nyt { 0% { color: var(--groen); transform: scale(1.15); } 100% { transform: none; } }
+
+/* ---- Scenen ------------------------------------------------------ */
+.scene { min-height: 0; position: relative; touch-action: none; cursor: pointer; }
+#spil { position: absolute; inset: 0; display: block; touch-action: none; }
+
+/* ---- Beskeden og kolben ----------------------------------------- */
+.besked {
+    margin: 0; min-height: 2.9em; padding: 0.25em 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; background: rgba(0, 0, 0, 0.75); line-height: 1.25;
+}
+.besked .formel { font-size: 1.3em; font-weight: bold; color: var(--groen); }
+.besked .navn { color: var(--lys); margin-left: 0.6em; }
+.besked .point { color: var(--groen); margin-left: 0.6em; font-size: 0.85em; }
+.besked.fejl .lavet { color: var(--fejl); font-weight: bold; }
+.besked .aarsag { color: var(--lys); font-size: 0.9em; }
+.besked.ok { animation: blink 0.4s; }
+@keyframes blink { 0% { background: rgba(0, 255, 102, 0.35); } 100% { background: rgba(0, 0, 0, 0.75); } }
+.besked.fejl { animation: roed 0.5s; }
+@keyframes roed { 0% { background: rgba(255, 60, 60, 0.45); } 100% { background: rgba(0, 0, 0, 0.75); } }
+
+.kolbe {
+    display: flex; align-items: center; gap: 0.8em; flex-wrap: wrap;
+    padding: 0.45em max(16px, env(safe-area-inset-left)) calc(0.45em + env(safe-area-inset-bottom));
+    background: rgba(0, 0, 0, 0.88); border-top: var(--kant); min-height: 3.4em;
+}
+.kolbe-ioner { flex: 1; display: flex; gap: 0.4em; flex-wrap: wrap; align-items: center; min-height: 2em; }
+.ladning { font-size: 1.05em; white-space: nowrap; }
+.ladning b { color: var(--lys); font-size: 1.2em; }
+.ladning.nul b { color: var(--groen); }
+
+/* ioner som HTML: samme former som på lærredet */
+.ion {
+    display: inline-block; text-align: center; vertical-align: middle;
+    min-width: 3.2em; padding: 0.15em 0.6em; font-weight: bold; color: var(--lys);
+    line-height: 1.5; white-space: nowrap;
+}
+.ion.k { background: var(--kation-bund); border: 3px double var(--kation); border-radius: 3px; }
+.ion.a { background: var(--anion-bund); border: 2px dashed var(--anion); border-radius: 999px; }
+.kolbe-ioner .ion { animation: ind 0.2s; }
+@keyframes ind { 0% { transform: translateY(-0.6em); opacity: 0; } 100% { transform: none; opacity: 1; } }
+
+/* ---- Lagene ovenpå ----------------------------------------------- */
+.lag {
+    position: fixed !important; inset: 0; z-index: 10 !important;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.72); padding: 16px; overflow-y: auto;
+}
+.lag[hidden] { display: none; }
+.kasse {
+    width: min(640px, 100%); max-height: 100%; overflow-y: auto; margin: auto;
+    background: rgba(0, 8, 2, 0.93); border: 1px solid var(--groen);
+    box-shadow: 0 0 24px rgba(0, 255, 102, 0.25); border-radius: 6px;
+    padding: 1em 1.3em; user-select: text; -webkit-user-select: text;
+}
+.kasse.smal { width: min(360px, 100%); text-align: center; }
+.kasse h2 { margin: 0 0 0.5em; color: var(--groen); letter-spacing: 0.1em; font-size: 1.35em; }
+.kasse h3 { margin: 0.9em 0 0.4em; color: var(--groen); font-size: 1em; letter-spacing: 0.08em; }
+.kasse p { margin: 0.5em 0; line-height: 1.4; }
+.logo {
+    text-align: center; font-size: clamp(2em, 6vw, 3em) !important; letter-spacing: 0.3em !important;
+    text-shadow: 0 0 14px rgba(0, 255, 102, 0.7); margin-bottom: 0.2em !important;
+}
+.intro { text-align: center; color: var(--lys); }
+.taster { text-align: center; }
+.taster span { color: var(--tekst); margin-left: 0.3em; }
+.forklaring { text-align: center; display: flex; gap: 0.6em; align-items: center; justify-content: center; flex-wrap: wrap; }
+.forklaring .ion { margin-left: 0.8em; }
+.gruppe { border: var(--kant); border-radius: 4px; margin: 0.8em 0 0; padding: 0.4em 0.8em 0.6em; }
+.gruppe legend {
+    font-size: 0.62em; letter-spacing: 0.14em; text-transform: uppercase; color: var(--groen-dim); padding: 0 0.4em;
+}
+.musiknavn { margin: 0.2em 0 0.5em !important; color: var(--lys); word-break: break-all; }
+.knaprk { display: flex; gap: 0.5em; flex-wrap: wrap; align-items: center; margin-top: 0.5em; }
+.knaprk.midt { justify-content: center; }
+.knaprk.lodret { flex-direction: column; align-items: stretch; }
+.knap {
+    font: inherit; cursor: pointer; color: var(--groen); background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--groen); border-radius: 4px; padding: 0.45em 1em; display: inline-block;
+}
+.knap:hover, .knap:focus-visible { background: rgba(0, 255, 102, 0.15); outline: none; }
+.knap.stor {
+    font-size: 1.15em; font-weight: bold; padding: 0.55em 1.6em; background: var(--groen); color: #001a08;
+}
+.knap.stor:hover, .knap.stor:focus-visible { background: #6dffa6; }
+.knap.stor kbd { color: #001a08; border-color: #001a08; }
+.knap.lille { font-size: 0.85em; padding: 0.35em 0.8em; }
+.valg { display: flex; flex-wrap: wrap; gap: 0.4em; }
+.valg button {
+    font: inherit; font-size: 0.9em; cursor: pointer; padding: 0.35em 0.8em; border-radius: 4px;
+    color: var(--tekst); background: transparent; border: 1px solid var(--groen-dim);
+}
+.valg button.valgt { background: var(--groen); color: #001a08; border-color: var(--groen); font-weight: bold; }
+.felter { display: flex; flex-wrap: wrap; gap: 0.5em 1.2em; margin-top: 0.6em; align-items: center; }
+.felter label { white-space: nowrap; }
+.felter input[type=number] {
+    width: 5.2em; font: inherit; color: var(--lys); background: #001006; border: var(--kant);
+    border-radius: 3px; padding: 0.15em 0.3em;
+}
+.felter .tjek input { accent-color: var(--groen); }
+.note { font-size: 0.85em; color: var(--groen-dim); min-height: 1em; }
+.note.midt { text-align: center; }
+.note.advarsel { color: #ffd23f; }
+
+.kalib-prikker { display: flex; gap: 0.5em; justify-content: center; margin: 1em 0; flex-wrap: wrap; }
+.kalib-prikker span {
+    width: 1.6em; height: 1.6em; border-radius: 50%; border: 2px solid var(--groen-dim);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 0.7em; color: var(--groen-dim);
+}
+.kalib-prikker span.lyt { border-style: dotted; }
+.kalib-prikker span.nu { background: rgba(0, 255, 102, 0.5); border-color: var(--groen); color: #001a08; }
+.kalib-prikker span.ramt { background: var(--groen); border-color: var(--groen); color: #001a08; }
+.kalib-status { text-align: center; min-height: 2.6em; color: var(--lys); }
+
+.nedtael { font-size: 3em; color: var(--groen); margin: 0.2em 0 !important; }
+
+.slut .tal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6em; margin: 0.6em 0; }
+.slut .tal div { border: var(--kant); border-radius: 4px; padding: 0.4em 0.6em; }
+.slut .tal b { font-size: 1.4em; color: var(--lys); }
+.forkerte { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45em; }
+.forkerte li { border-left: 3px solid var(--fejl); padding: 0.3em 0.6em; background: rgba(255, 60, 60, 0.06); line-height: 1.45; }
+.forkerte .lavet { color: var(--fejl); font-weight: bold; }
+.forkerte .gange { color: var(--groen-dim); font-size: 0.85em; }
+.forkerte .aarsag { display: block; font-size: 0.9em; }
+.forkerte .rigtig { display: block; }
+.forkerte .rigtig b { color: var(--groen); font-size: 1.1em; }
+.forkerte .opskrift { color: var(--tekst); font-size: 0.85em; margin-left: 0.5em; }
+.regler ul { padding-left: 1.2em; margin: 0; line-height: 1.5; }
+.regler li { margin-bottom: 0.4em; }
+
+/* ---- Små skærme -------------------------------------------------- */
+@media (max-width: 640px) {
+    .slut .tal { grid-template-columns: repeat(2, 1fr); }
+    .top { gap: 0.5em; flex-wrap: wrap; }
+    .top h1 { font-size: 1em; letter-spacing: 0.15em; }
+    .hud { order: 3; flex: 1 1 100%; justify-content: space-between; gap: 0.3em 0.8em; }
+    .bjaelke { width: 22vw; }
+    .top .ikonknap:first-of-type { margin-left: auto; }
+    .maal { font-size: 1.25em; }
+}
+@media (max-height: 520px) {
+    .maalbar { min-height: 0; padding: 0.15em 16px; }
+    .besked { min-height: 2.2em; }
+    .kolbe { min-height: 2.6em; padding-top: 0.25em; padding-bottom: 0.25em; }
+}

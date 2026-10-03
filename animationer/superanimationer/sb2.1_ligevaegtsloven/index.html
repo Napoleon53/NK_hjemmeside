@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ligevægtsloven</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇌</span> Ligevægtsloven</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-br" role="tab" aria-selected="true"><span class="nr">1</span>Brøken</button>
+        <button class="faneknap" data-fane="fane-ff" role="tab" aria-selected="false"><span class="nr">2</span>Find fejlen</button>
+    </div>
+
+    <button class="ikonknap tekstknap quizknap" id="quizknap" type="button" title="Fem spørgsmål (Q)">Quiz</button>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: BROEKEN                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-br" role="tabpanel" aria-label="Brøken">
+    <div class="scene">
+        <div class="arbejde">
+            <p class="opgavelinje">Skriv reaktionsbrøken for ligevægten.</p>
+
+            <!-- Tavlen: skemaet og broeken (js/sim_broek.js) -->
+            <div class="tavle" id="br-tavle">
+                <div class="tv-navn" id="br-navn"></div>
+                <div class="tv-stempel" id="br-stempel" hidden></div>
+                <div class="skema" id="br-skema"></div>
+                <div class="broekrad" id="br-broek">
+                    <span class="k-tegn" id="br-k">K =</span>
+                    <div class="broek-zoner">
+                        <div class="zone" id="br-num" data-zone="num" data-tom="Tæller"></div>
+                        <div class="broekstreg"></div>
+                        <div class="zone" id="br-den" data-zone="den" data-tom="Nævner"></div>
+                    </div>
+                    <button class="tjekknap" id="br-tjek" type="button" title="Tjek brøken (Enter)">Tjek brøken</button>
+                </div>
+            </div>
+
+            <!-- Bakken med brikkerne -->
+            <div class="bakke" id="br-bakke">
+                <div class="bk-gruppe bk-stoffer">
+                    <span class="bk-hoved">Stoffer</span>
+                    <div class="bk-brikker" id="br-stoffer"></div>
+                </div>
+                <div class="bk-gruppe">
+                    <span class="bk-hoved">Tegn</span>
+                    <div class="bk-brikker" id="br-tegn"></div>
+                </div>
+                <div class="bk-gruppe">
+                    <span class="bk-hoved">Eksponenter</span>
+                    <div class="bk-brikker" id="br-eks"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, og den ene knap -->
+        <div class="statuslinje" id="br-status">
+            <p class="st-tekst" id="br-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="br-forfra" type="button" title="Samme reaktion med en tom brøk (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="br-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="br-kort">
+            <h2><span id="br-titel">Opgave</span><span class="taeller">reaktion <b id="br-nr">1</b>/<span id="br-antal">12</span></span></h2>
+            <div id="br-prompt"></div>
+        </div>
+
+        <div class="kort" id="br-opgaver">
+            <h2>Reaktionerne <span class="taeller">løst <b id="br-loest">0</b>/12</span></h2>
+            <div class="opg-liste" id="br-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FIND FEJLEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ff" role="tabpanel" aria-label="Find fejlen">
+    <div class="scene">
+        <div class="arbejde">
+            <p class="opgavelinje">Find fejlen i elevens reaktionsbrøk.</p>
+
+            <!-- Tavlen: skemaet og elevens broek (js/sim_fejl.js) -->
+            <div class="tavle" id="ff-tavle">
+                <div class="tv-navn" id="ff-navn"></div>
+                <div class="tv-stempel" id="ff-stempel" hidden></div>
+                <div class="skema" id="ff-skema"></div>
+                <div class="broekrad" id="ff-broek">
+                    <span class="k-tegn" id="ff-k">K =</span>
+                    <div class="broek-vis">
+                        <div class="vis-linje" id="ff-num"></div>
+                        <div class="broekstreg"></div>
+                        <div class="vis-linje" id="ff-den"></div>
+                    </div>
+                </div>
+                <div class="rettet" id="ff-rettet" hidden></div>
+            </div>
+
+            <button class="ingenknap" id="ff-ingen" type="button">Ingen fejl</button>
+        </div>
+
+        <div class="statuslinje" id="ff-status">
+            <p class="st-tekst" id="ff-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="ff-forfra" type="button" title="Samme tavle forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="ff-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="ff-kort">
+            <h2><span id="ff-titel">Opgave</span><span class="taeller">tavle <b id="ff-nr">1</b>/<span id="ff-antal">12</span></span></h2>
+            <div id="ff-prompt"></div>
+        </div>
+
+        <div class="kort" id="ff-opgaver">
+            <h2>Tavlerne <span class="taeller">rettet <b id="ff-loest">0</b>/12</span></h2>
+            <div class="opg-liste" id="ff-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Ligevægtsloven</h2>
+        <p>Når en reaktion er i ligevægt, løber den lige hurtigt begge veje, og koncentrationerne ændrer sig ikke. Reaktionsbrøken har da den samme værdi ved en given temperatur. Den værdi er ligevægtskonstanten K.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">For ligevægten aA + bB ⇌ cC + dD</span>
+            K = <span class="vbroek"><span>[C]<sup>c</sup>·[D]<sup>d</sup></span><span>[A]<sup>a</sup>·[B]<sup>b</sup></span></span>
+        </div>
+        <h3 class="teori-hoved">Sådan skrives reaktionsbrøken</h3>
+        <ol class="teori-trin">
+            <li>Produkterne, efter pilen, står i tælleren. Reaktanterne, før pilen, står i nævneren.</li>
+            <li>Koefficienterne bliver til eksponenter. En koefficient på 1 skrives ikke.</li>
+            <li>Leddene ganges sammen med en gangeprik, ·.</li>
+            <li>[H₂] betyder koncentrationen af H₂ i mol/L.</li>
+            <li>Faste stoffer (s) og opløsningsmidlet vand, H₂O(l), er ikke med. Deres koncentration ændrer sig ikke.</li>
+            <li>Er der ikke noget tilbage i nævneren, skriver man 1.</li>
+        </ol>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: N₂(g) + 3H₂(g) ⇌ 2NH₃(g)</span>
+            K = <span class="vbroek"><span>[NH₃]²</span><span>[N₂]·[H₂]³</span></span>
+        </div>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: CaCO₃(s) ⇌ Ca²⁺(aq) + CO₃²⁻(aq)</span>
+            K = [Ca²⁺]·[CO₃²⁻]
+        </div>
+        <p>Vand som gas, H₂O(g), er med som de andre gasser.</p>
+        <h3 class="teori-hoved">Værdien af K</h3>
+        <p>Er K meget større end 1, er ligevægten forskudt mod højre, og der er mest produkt. Er K meget mindre end 1, er der mest reaktant. K afhænger kun af temperaturen.</p>
+        <h3 class="teori-hoved">Enheden</h3>
+        <p>Enheden regnes af brøken. Er der lige mange led over og under brøkstregen, går enhederne ud, og K har ingen enhed. K<sub>v</sub> = [H₃O⁺]·[OH⁻] har enheden (mol/L)².</p>
+        <h3 class="teori-hoved">Konstanter med egne navne</h3>
+        <p>K<sub>s</sub> er syrestyrkekonstanten, K<sub>b</sub> basestyrkekonstanten og K<sub>v</sub> vands ionprodukt. For et tungtopløseligt salt er K opløselighedsproduktet.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Q</kbd> quiz &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- QUIZZEN (js/quiz.js)                                               -->
+<!-- ================================================================= -->
+<div class="overlay" id="quiz">
+    <div class="overlay-boks">
+        <h2>Quiz: Ligevægtsloven</h2>
+        <div id="quiz-indhold"></div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/broek.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_broek.js"></script>
+<script src="js/sim_fejl.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

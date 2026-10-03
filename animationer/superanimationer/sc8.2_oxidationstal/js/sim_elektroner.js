@@ -5,15 +5,21 @@
    Hver prik har farven fra det atom, elektronen kom fra, og tallet ved
    hvert atom er elektronegativiteten. Opgaven har tre bidder:
 
-     1. Gaet: eleven skriver sit gaet paa oxidationstallet i opgavekortet
-        (med reglerne fra fane 1 eller elektronegativiteten).
+     1. Gaet: eleven skriver sit gaet paa oxidationstallet i arbejdsfeltet
+        nederst paa tavlen (med reglerne fra fane 1).
      2. Fordel: eleven traekker hvert elektronpar i en binding hen til det
-        atom, der traekker hårdest. Et par mellem to ens atomer deles. Et
-        par, der ender hos det forkerte atom, bliver roedt, og linjen siger
-        hvorfor. Man kan ogsaa klikke paa parret og saa paa atomet.
+        atom, der traekker hårdest. Parrene, der skal flyttes, blinker, og
+        en pil peger mod hvert af de to atomer. Et par mellem to ens
+        atomer deles. Et par, der ender hos det forkerte atom, bliver
+        roedt, og linjen siger hvorfor. Man kan ogsaa klikke paa parret og
+        saa paa atomet.
      3. Regnskabet: naar alle par er paa plads, faar hvert atom en ring om
         sine elektroner og sit oxidationstal (valenselektroner minus de
         elektroner, det har nu), og gaettet sammenlignes.
+
+   Alt, eleven skal laese og trykke paa, staar i arbejdsfeltet i scenen
+   (brugerens test 3. okt. 2026: opgaveteksten i panelets hjoerne var for
+   lille, og det, der skal traekkes, skal blinke eller have pile).
 
    Undtagelserne fra reglerne (H₂, O₂, H₂O₂, OF₂) og ionerne (OH⁻ med en
    ekstra elektron, NH₄⁺ med én for lidt) kommer af sig selv af modellen i
@@ -32,7 +38,6 @@
     function SimElektroner() {
         this.gaetEl = NK.el("ek-gaet");
         this.startFane(D.MOLEKYLER, [{ id: "alle", titel: "Molekyler og ioner" }]);
-        this.introNu = true;
         this.vaelg(0);
     }
 
@@ -93,47 +98,63 @@
         return ord.slice(0, -1).join(", ") + " og " + ord[ord.length - 1];
     }
 
-    P.promptHTML = function () {
-        return '<p class="maal-tekst">Find oxidationstallet for ' + liste(this.spurgte()) + " i " + this.m.tekst + ".</p>";
+    /* Det, eleven skal nu: staar som spoergsmaalet i arbejdsfeltet */
+    P.trinLinje = function () {
+        if (this.trin === "gaet") {
+            var mangler = this.spurgte().filter(function (x) { return this.gaet[x] === undefined; }, this);
+            return "Gæt først: " + (mangler.length > 1 ? "hvilke oxidationstal har " : "hvilket oxidationstal har ") + liste(mangler) + "?";
+        }
+        var dobbelt = this.enheder.some(function (u) { return u.b.orden > 1; });
+        var hvad = dobbelt ? (this.enheder.length > 1 ? "elektronerne i hver binding" : "elektronerne i bindingen") :
+            (this.enheder.length > 1 ? "hvert elektronpar" : "elektronparret");
+        return "Træk " + hvad + " hen til det atom, der trækker hårdest.";
     };
 
-    P.trinLinje = function () {
-        var s = this.spurgte();
-        if (this.trin === "gaet") {
-            var mangler = s.filter(function (x) { return this.gaet[x] === undefined; }, this);
-            return "Gæt først: skriv oxidationstallet for " + liste(mangler) + " i " + (mangler.length > 1 ? "felterne" : "feltet") +
-                " i opgavekortet, og tryk Enter.";
-        }
-        if (this.trin === "fordel") {
-            return "Træk hvert elektronpar hen til det atom, der trækker hårdest. Tallet ved atomet er elektronegativiteten.";
-        }
-        return "";
+    P.visSpm = function () {
+        var m = this.m, html;
+        if (this.regnVist) {
+            html = '<span class="arb-ok">✓</span> ' + liste(this.spurgte().map(function (s) {
+                return NK.html(s + " er ") + "<b>" + O.ox(O.oxFor(m, s)) + "</b>";
+            })) + NK.html(" i " + m.tekst + ".");
+        } else html = NK.html(this.trinLinje());
+        NK.saetHTML("ek-spm", html);
     };
+
+    /* Linjen, naar parrene skal fordeles: hvad tallene ved atomerne er */
+    var EN_LINJE = "Tallet ved hvert atom er elektronegativiteten.";
 
     /* ----- Hjaelpen ---------------------------------------------------------------- */
     P.trinInfo = function () {
         var mig = this;
         if (this.trin === "gaet") {
             return {
-                hint: "Brug reglerne: H er som regel +I, O er som regel −II, og summen er ladningen. Du kan også bruge tallene ved atomerne.",
+                hint: "Brug reglerne fra fane 1: H er som regel +I, O er som regel −II, og summen er ladningen.",
                 svarNavn: "Spring gættet over",
                 svar: function () { mig.springGaet(); }
             };
         }
         if (this.trin === "fordel") {
             return {
-                hint: "Tallet ved hvert atom er elektronegativiteten. Parret går til atomet med det største tal. Er tallene ens, deles parret.",
+                hint: "Elektronerne går til atomet med det største tal. Er tallene ens, deles de.",
                 svar: function () { mig.visFordeling(); }
             };
         }
         return null;
     };
 
-    /* ----- Gaettet i opgavekortet --------------------------------------------------- */
+    /* ----- Gaettet i arbejdsfeltet ---------------------------------------------------
+       Ét lille felt pr. grundstof, der spoerges til, og én knap. Naar der
+       er gaettet, staar gaettet der som en brik, der bliver groen eller
+       roed, naar regnskabet er gjort op. */
     P.bygGaet = function () {
         var mig = this;
         this.gaetEl.innerHTML = "";
         this.gaetFelter = {};
+        var etiket = document.createElement("span");
+        etiket.className = "gaet-etiket";
+        etiket.textContent = "Dit gæt:";
+        this.gaetEl.appendChild(etiket);
+        this.gaetEtiket = etiket;
         this.spurgte().forEach(function (s) {
             var rk = document.createElement("div");
             rk.className = "gaet-rk";
@@ -145,15 +166,9 @@
             felt.className = "felt aktiv";
             var inp = document.createElement("input");
             inp.type = "text";
-            inp.placeholder = "dit gæt";
             inp.autocomplete = "off";
             inp.spellcheck = false;
             inp.setAttribute("aria-label", "Dit gæt på oxidationstallet for " + s);
-            var ok = document.createElement("button");
-            ok.type = "button";
-            ok.className = "felt-ok";
-            ok.textContent = "↵";
-            ok.title = "Gæt (Enter)";
             var svar = document.createElement("span");
             svar.className = "felt-svar";
             svar.hidden = true;
@@ -161,38 +176,51 @@
                 if (e.key === "Enter") { e.preventDefault(); mig.gaetTjek(s); }
             });
             inp.addEventListener("input", function () { felt.classList.remove("ryst"); mig.k.skriver(); });
-            ok.addEventListener("click", function () { mig.gaetTjek(s); });
             felt.appendChild(inp);
-            felt.appendChild(ok);
             felt.appendChild(svar);
             rk.appendChild(navn);
             rk.appendChild(felt);
             mig.gaetEl.appendChild(rk);
-            mig.gaetFelter[s] = { felt: felt, inp: inp, ok: ok, svar: svar };
+            mig.gaetFelter[s] = { felt: felt, inp: inp, svar: svar };
         });
+        var ok = document.createElement("button");
+        ok.type = "button";
+        ok.className = "felt-ok gaet-ok";
+        ok.textContent = "Gæt";
+        ok.title = "Gæt (Enter)";
+        ok.addEventListener("click", function () { mig.gaetAlle(); mig.fokus(); });
+        this.gaetEl.appendChild(ok);
+        this.gaetKnap = ok;
         this.visGaet();
     };
 
+    /* Knappen Gaet: alle felter, der er skrevet i, i raekkefoelge */
+    P.gaetAlle = function () {
+        var mangler = this.spurgte().filter(function (x) { return this.gaet[x] === undefined; }, this);
+        for (var i = 0; i < mangler.length; i++) if (!this.gaetTjek(mangler[i])) return;
+    };
+
     P.gaetTjek = function (s) {
-        if (this.trin !== "gaet" || this.gaet[s] !== undefined) return;
+        if (this.trin !== "gaet" || this.gaet[s] !== undefined) return false;
         var f = this.gaetFelter[s], v = O.laesOx(f.inp.value);
         if (v === null || isNaN(v)) {
             f.felt.classList.remove("ryst");
             void f.felt.offsetWidth;
             f.felt.classList.add("ryst");
             this.fejlLinje(v === null ? "Skriv dit gæt i feltet først." : "Skriv et oxidationstal, fx −II, +I eller 0.");
-            return;
+            return false;
         }
         this.gaet[s] = v;
         this.visGaet();
         var mangler = this.spurgte().filter(function (x) { return this.gaet[x] === undefined; }, this);
         if (mangler.length) {
-            this.besked("Skriv også dit gæt for " + liste(mangler) + ".", "");
-            this.fokus();
-            return;
+            this.nytTrin("", "");
+            return true;
         }
         this.trin = "fordel";
-        this.nytTrin("Dit gæt er skrevet ned. Nu viser elektronerne, om det passer.");
+        this.visGaet();
+        this.nytTrin(EN_LINJE);
+        return true;
     };
 
     P.springGaet = function () {
@@ -200,26 +228,29 @@
         this.spurgte().forEach(function (s) { if (mig.gaet[s] === undefined) mig.gaet[s] = null; });
         this.trin = "fordel";
         this.visGaet();
-        this.nytTrin("Du gætter ikke denne gang.");
+        this.nytTrin(EN_LINJE);
     };
 
     P.visGaet = function () {
-        var mig = this;
+        var mig = this, iGaet = this.trin === "gaet";
+        this.gaetEtiket.hidden = iGaet;
+        this.gaetKnap.hidden = !iGaet;
+        /* Mens parrene fordeles, er gaettet kun en paamindelse (skjules paa en smal scene) */
+        this.el.arb.classList.toggle("fordeler", !iGaet && !this.regnVist);
         this.spurgte().forEach(function (s) {
             var f = mig.gaetFelter[s], g = mig.gaet[s];
             var sand = O.oxFor(mig.m, s);
-            var aaben = g === undefined && mig.trin === "gaet";
+            var aaben = g === undefined && iGaet;
+            var intet = g === null || g === undefined;
             f.inp.hidden = !aaben;
-            f.ok.hidden = !aaben;
             f.svar.hidden = aaben;
             f.felt.className = "felt";
             if (aaben) { f.felt.classList.add("aktiv"); return; }
-            var t;
-            if (g === null || g === undefined) t = "Intet gæt";
-            else t = "Dit gæt: <b>" + O.ox(g) + "</b>";
+            var t = intet ? "Intet gæt" : "<b>" + O.ox(g) + "</b>";
             if (mig.regnVist) {
-                if (g !== null && g !== undefined && g === sand) { f.felt.classList.add("ok"); t += " ✓"; }
-                else { f.felt.classList.add(g === null || g === undefined ? "laast" : "forkert"); t += ". Elektronerne giver <b>" + O.ox(sand) + "</b>."; }
+                if (intet) f.felt.classList.add("laast");
+                else if (g === sand) { f.felt.classList.add("ok"); t += " ✓"; }
+                else { f.felt.classList.add("forkert"); t += " ✗"; }
             } else f.felt.classList.add("gaettet");
             f.svar.innerHTML = t;
         });
@@ -354,22 +385,40 @@
     };
 
     /* ----- Geometrien -------------------------------------------------------------------- */
+    /* Pladsen, arbejdsfeltet faar nederst paa tavlen. Det kan blive hoejere
+       (en lang forklaring til sidst), saa molekylet staar over det. */
+    var ARB_H = 124;
+
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var baand = this.k.layout(W, H);
         var kant = NK.klamp(W * 0.025, 10, 30), top = NK.klamp(H * 0.03, 8, 22);
         var tv = { x: kant, y: top, b: W - 2 * kant, h: Math.max(180, baand.y - top - NK.klamp(H * 0.025, 8, 18)) };
         var ramme = NK.klamp(tv.b * 0.012, 7, 12);
-        var hoved = NK.klamp(tv.h * 0.12, 34, 56);
-        var ind = { x: tv.x + ramme + 16, y: tv.y + ramme + hoved, b: tv.b - 2 * ramme - 32, h: tv.h - 2 * ramme - hoved - 40 };
+        var hoved = 34;
+        /* Arbejdsfeltet: spoergsmaalet, gaettet og knappen */
+        var arb = this.el.arb;
+        var bund = tv.y + tv.h - ramme - 10;
+        arb.style.left = Math.round(tv.x + ramme + 10) + "px";
+        arb.style.width = Math.round(tv.b - 2 * ramme - 20) + "px";
+        arb.style.bottom = Math.round(H - bund) + "px";
+        var arbH = Math.max(ARB_H, arb.offsetHeight || 0);
+        this.arbBrugt = arbH;
+        var ind = { x: tv.x + ramme + 16, y: tv.y + ramme + hoved, b: tv.b - 2 * ramme - 32,
+            h: Math.max(120, bund - arbH - 8 - (tv.y + ramme + hoved)) };
         this.lay = { W: W, H: H, baand: baand, tv: tv, ramme: ramme, ind: ind, hoved: hoved };
         this.geometri();
         this.snap = true;
         var g = this.geo;
         this.saetAnker("molekyle", g.bx0, g.by0, g.bx1 - g.bx0, g.by1 - g.by0);
-        this.saetAnker("en", tv.x + tv.b - ramme - 310, tv.y + ramme + 4, 304, hoved - 6);
+        /* Tallet ved det foerste atom, til rundvisningen */
+        var p0 = g.pos[0], epx = this.enPx();
+        this.saetAnker("en", p0.x + p0.hb + g.F * 0.06 - 4, p0.y + g.F * 0.3 - 3, epx * 2 + 8, epx * 1.2 + 6);
         this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
+
+    /* Skriftstoerrelsen paa elektronegativiteten ved atomerne */
+    P.enPx = function () { return Math.max(14, Math.round(this.geo.F * 0.29)); };
 
     P.geometri = function () {
         var m = this.m, ind = this.lay.ind, ctx = this.L.ctx;
@@ -377,8 +426,8 @@
         var minX = Math.min.apply(null, gx), maxX = Math.max.apply(null, gx);
         var minY = Math.min.apply(null, gy), maxY = Math.max.apply(null, gy);
         var ion = m.q !== 0;
-        var L = Math.min(ind.b / (maxX - minX + (ion ? 2.2 : 1.7)), ind.h / (maxY - minY + (ion ? 2.1 : 1.8)), 240);
-        var F = NK.klamp(L * 0.35, 24, 78);
+        var L = Math.min(ind.b / (maxX - minX + (ion ? 2.2 : 1.7)), ind.h / (maxY - minY + (ion ? 1.8 : 1.4)), 240);
+        var F = NK.klamp(L * 0.33, 24, 78);
         var cx = ind.x + ind.b / 2 - (minX + maxX) / 2 * L;
         var cy = ind.y + ind.h / 2 - (minY + maxY) / 2 * L;
         ctx.save();
@@ -467,6 +516,9 @@
     P.opdaterScene = function (dt) {
         var mig = this;
         if (!this.geo) return;
+        /* Arbejdsfeltet er blevet hoejere eller lavere (en lang forklaring):
+           molekylet faar den plads, der er */
+        if (Math.max(ARB_H, this.el.arb.offsetHeight || 0) !== this.arbBrugt) this.layout();
         var hurtig = this.snap ? 1e6 : 12;
         this.frie.forEach(function (e) {
             var p = mig.maalFri(e);
@@ -544,7 +596,8 @@
         var u = this.enhedUnder(pt);
         if (!u) return false;
         if (this.trin === "gaet") {
-            this.kortBesked("Gæt først. Skriv dit gæt i opgavekortet og tryk Enter.", 4);
+            this.kortBesked("Gæt først. Skriv dit gæt i feltet her, og tryk Gæt.", 4, "gul");
+            this.fokus();
             this.ignorerKlik = true;
             return false;
         }
@@ -660,7 +713,9 @@
 
         if (m.q) T.klammer(ctx, g.bx0, g.by0, g.bx1, g.by1, m.q > 0 ? (m.q > 1 ? m.q + "+" : "+") : (m.q < -1 ? -m.q + "−" : "−"), g.F);
 
-        /* Atomerne: symbolet, elektronegativiteten og ringene, naar et par holdes */
+        /* Atomerne: symbolet, elektronegativiteten og ringene, naar et par holdes.
+           Mens parrene skal fordeles, staar elektronegativiteten tydeligt. */
+        var fordel = this.trin === "fordel";
         var holdt = this.traek && this.traek.flyttet ? this.traek.u : null;
         var maalAtom = holdt ? this.naermest(holdt, this.traek.pt) : -1;
         m.atomer.forEach(function (a) {
@@ -678,11 +733,10 @@
             ctx.textBaseline = "alphabetic";
             ctx.fillStyle = a.farve;
             ctx.fillText(a.s, p.x, p.y + g.F * 0.35);
-            var epx = Math.max(13, Math.round(g.F * 0.27));
-            ctx.font = T.font("600", epx);
+            ctx.font = T.font(fordel ? "700" : "600", mig.enPx());
             ctx.textAlign = "left";
             ctx.textBaseline = "top";
-            ctx.fillStyle = T.KRIDT_SVAG;
+            ctx.fillStyle = fordel ? "#f7e4ab" : T.KRIDT_SVAG;
             ctx.fillText(mig.enNavn(a), p.x + p.hb + g.F * 0.06, p.y + g.F * 0.3);
             ctx.restore();
         });
@@ -698,6 +752,15 @@
         this.frie.forEach(function (e) {
             T.prik(ctx, e.x, e.y, g.r, e.ekstra ? D.EKSTRA_FARVE : m.atomer[e.atom].farve);
         });
+
+        /* Pilene: fra hvert par, der mangler, mod de to atomer, det sidder
+           imellem, og fra et par hos det forkerte atom mod det rigtige */
+        if (fordel && !holdt) {
+            this.enheder.forEach(function (u) {
+                if (u.hos === null) mig.tegnPile(ctx, u);
+                else if (u.forkert) mig.tegnPile(ctx, u, u.b.mest);
+            });
+        }
 
         /* Bindingernes elektroner (det holdte par til sidst) */
         this.enheder.forEach(function (u) { if (u !== holdt) mig.tegnEnhed(ctx, u); });
@@ -721,7 +784,6 @@
                 ctx.fillText(t, p.x + p.hb + g.F * 0.04, p.y - g.F * 0.3);
                 ctx.restore();
             });
-            this.tegnSum(ctx);
         }
 
         this.k.tegn(ctx);
@@ -729,44 +791,77 @@
 
     P.tegnEnhed = function (ctx, u) {
         var g = this.geo, m = this.m, tid = this.tid;
-        var c = this.midte(u), rad = (u.b.orden > 1 ? 1.35 : 1) * g.F * 0.3;
+        var c = this.midte(u), rad = (u.b.orden > 1 ? 1.35 : 1) * g.F * 0.3, r = g.r;
         if (u.forkert) {
             T.ring(ctx, c.x, c.y, rad + 2, "rgba(240, 110, 96, " + (0.75 + 0.25 * u.blink) + ")", 2.5);
         } else if (this.valgt === u) {
             T.ring(ctx, c.x, c.y, rad + 2, "rgba(242, 197, 61, 0.95)", 2.5);
-        } else if (this.trin === "fordel" && !this.paaPlads(u) && u.hos === null) {
-            /* Parrene, der mangler, banker stille: dem kan man flytte */
-            var puls = 0.5 + 0.5 * Math.sin(tid * 3.2 + u.b.i * 0.9);
-            T.ring(ctx, c.x, c.y, rad + 1 + 3 * puls, "rgba(242, 197, 61, " + (0.18 + 0.3 * puls) + ")", 2);
+        } else if (this.trin === "fordel" && !this.paaPlads(u) && u.hos === null && !(this.traek && this.traek.u === u && this.traek.flyttet)) {
+            /* Parrene, der mangler, blinker: dem skal man flytte */
+            var puls = 0.5 + 0.5 * Math.sin(tid * 4 + u.b.i * 0.9);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, rad + 3, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(242, 197, 61, " + (0.1 + 0.22 * puls) + ")";
+            ctx.fill();
+            ctx.restore();
+            T.ring(ctx, c.x, c.y, rad + 2 + 2 * puls, "rgba(242, 197, 61, " + (0.5 + 0.5 * puls) + ")", 2.5);
+            r = g.r * (1 + 0.14 * puls);
         } else if (this.overU === u && this.trin === "fordel") {
             T.ring(ctx, c.x, c.y, rad + 2, "rgba(233, 238, 233, 0.4)", 1.5);
         }
-        u.e.forEach(function (e) { T.prik(ctx, e.x, e.y, g.r, m.atomer[e.fra].farve); });
+        u.e.forEach(function (e) { T.prik(ctx, e.x, e.y, r, m.atomer[e.fra].farve); });
     };
 
+    /* Pilene fra et par mod de to atomer, det sidder imellem (eller kun mod
+       atom kunMod). De gaar fra parrets kant til atomets kant og banker i
+       takt med parret. */
+    P.tegnPile = function (ctx, u, kunMod) {
+        var g = this.geo, c = this.midte(u), tid = this.tid;
+        var rad = (u.b.orden > 1 ? 1.35 : 1) * g.F * 0.3;
+        var ender = [[u.b.a, u.b.sideA], [u.b.b, u.b.sideB]];
+        for (var n = 0; n < 2; n++) {
+            var i = ender[n][0], side = ender[n][1];
+            if (kunMod !== undefined && i !== kunMod) continue;
+            var p = g.pos[i];
+            var kant = side === "op" || side === "ned" ? g.F * 0.5 : p.hb + g.F * 0.14;
+            var dx = p.x - c.x, dy = p.y - c.y, d = Math.sqrt(dx * dx + dy * dy) || 1;
+            var fra = rad + 7, til = d - kant - 2;
+            var ux = dx / d, uy = dy / d;
+            var fase = 0.5 + 0.5 * Math.sin(tid * 4 + u.b.i * 0.9);
+            var farve = "rgba(242, 197, 61, " + (0.55 + 0.45 * fase) + ")";
+            if (til - fra < 9) {
+                /* Trangt (lille skaerm): kun pilens hoved, lige uden for parret */
+                var spids = Math.max(til, rad + 9) + 1.5 * fase;
+                T.pil(ctx, c.x + ux * (spids - 1), c.y + uy * (spids - 1), c.x + ux * spids, c.y + uy * spids, farve, 0.01, 7);
+                continue;
+            }
+            T.pil(ctx, c.x + ux * (fra + 3 * fase), c.y + uy * (fra + 3 * fase), c.x + ux * til, c.y + uy * til,
+                farve, NK.klamp(g.F * 0.06, 2.5, 4), NK.klamp((til - fra) * 0.5, 7, 14));
+        }
+    };
+
+    /* Oeverst paa tavlen: opgaven til venstre og stoffets navn til hoejre */
     P.tegnHoved = function (ctx) {
         var lay = this.lay, tv = lay.tv, r = lay.ramme, m = this.m;
         var x = tv.x + r + 16, y = tv.y + r + lay.hoved * 0.5;
         ctx.save();
         ctx.textBaseline = "middle";
+        /* Den gule streg foran opgaven */
+        ctx.fillStyle = "#f2c53d";
+        ctx.fillRect(x, y - 10, 4, 20);
         ctx.textAlign = "left";
-        ctx.font = T.font("700", 17);
+        ctx.font = T.font("700", 18);
         ctx.fillStyle = T.KRIDT;
-        ctx.fillText(m.def.navn, x, y);
-        var b = ctx.measureText(m.def.navn).width;
-        ctx.font = T.font("600", 20);
-        ctx.fillStyle = T.KRIDT_SVAG;
-        ctx.fillText(m.tekst, x + b + 12, y);
-        /* Forklaringen oppe til hoejre */
+        ctx.fillText("Find oxidationstallet for " + liste(this.spurgte()) + " i " + m.tekst, x + 12, y);
         ctx.textAlign = "right";
-        ctx.font = T.font("600", 13);
+        ctx.font = T.font("600", 16);
         ctx.fillStyle = T.KRIDT_SVAG;
-        var hx = tv.x + tv.b - r - 14;
-        ctx.fillText("Tallet ved atomet: elektronegativiteten", hx, y - 9);
-        ctx.fillText("Prikkens farve: det atom, elektronen kom fra", hx, y + 9);
+        ctx.fillText(m.def.navn, tv.x + tv.b - r - 16, y);
         /* Ionens ekstra eller manglende elektron */
-        var ex = x, ey = y + lay.hoved * 0.5 + 8;
+        var ex = x, ey = y + lay.hoved * 0.5 + 10;
         ctx.textAlign = "left";
+        ctx.font = T.font("600", 14);
         m.atomer.forEach(function (a) {
             if (!a.ekstra && !a.mangler) return;
             if (a.ekstra) T.prik(ctx, ex + 5, ey, 4.5, D.EKSTRA_FARVE);
@@ -774,18 +869,6 @@
             ctx.fillStyle = T.KRIDT_SVAG;
             ctx.fillText(a.ekstra ? "ionens ekstra elektron" : "den elektron, ionen mangler", ex + 16, ey);
         });
-        ctx.restore();
-    };
-
-    P.tegnSum = function (ctx) {
-        var lay = this.lay, tv = lay.tv, r = lay.ramme;
-        ctx.save();
-        ctx.globalAlpha = this.regnAlfa;
-        ctx.font = T.font("700", NK.klamp(Math.round(this.geo.F * 0.36), 16, 22));
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.fillStyle = T.KRIDT;
-        ctx.fillText("Summen: " + this.sumTekst(), tv.x + tv.b / 2, tv.y + tv.h - r - 12);
         ctx.restore();
     };
 

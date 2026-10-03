@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absorptionsspektre</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">◐</span> Absorptionsspektre</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-fa" role="tab" aria-selected="true"><span class="nr">1</span>Farven</button>
+        <button class="faneknap" data-fane="fane-ko" role="tab" aria-selected="false"><span class="nr">2</span>Konjugeringen</button>
+        <button class="faneknap" data-fane="fane-ch" role="tab" aria-selected="false"><span class="nr">3</span>Chromoforen</button>
+    </div>
+
+    <button class="ikonknap tekstknap quizknap" id="quizknap" type="button" title="Seks spørgsmål (Q)">Quiz</button>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: FARVEN (js/sim_farve.js)                                   -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-fa" role="tabpanel" aria-label="Farven">
+    <div class="scene">
+        <canvas id="fa-laerred"></canvas>
+        <p class="opgavelinje" id="fa-opgave"></p>
+        <div class="anker" id="fa-anker-lys"></div>
+        <div class="anker" id="fa-anker-cirkel"></div>
+        <div class="anker" id="fa-anker-graf"></div>
+        <div class="scene-valg" id="fa-valg"></div>
+
+        <div class="statuslinje" id="fa-status">
+            <p class="st-tekst" id="fa-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="fa-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="fa-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="fa-kort">
+            <h2><span id="fa-titel">Opgave</span><span class="taeller">opgave <b id="fa-nr">1</b>/<span id="fa-antal">9</span></span></h2>
+            <div id="fa-prompt"></div>
+        </div>
+
+        <div class="kort" id="fa-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="fa-loest">0</b>/9</span></h2>
+            <div class="opg-liste" id="fa-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: KONJUGERINGEN (js/sim_konj.js)                             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ko" role="tabpanel" aria-label="Konjugeringen">
+    <div class="scene">
+        <canvas id="ko-laerred"></canvas>
+        <p class="opgavelinje" id="ko-opgave"></p>
+        <div class="anker" id="ko-anker-tavle"></div>
+        <div class="anker" id="ko-anker-graf"></div>
+        <div class="anker" id="ko-anker-glas"></div>
+        <div class="scene-valg" id="ko-valg"></div>
+
+        <div class="statuslinje" id="ko-status">
+            <p class="st-tekst" id="ko-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="ko-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="ko-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="ko-kort">
+            <h2><span id="ko-titel">Opgave</span><span class="taeller">opgave <b id="ko-nr">1</b>/<span id="ko-antal">8</span></span></h2>
+            <div id="ko-prompt"></div>
+        </div>
+
+        <div class="kort" id="ko-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="ko-loest">0</b>/8</span></h2>
+            <div class="opg-liste" id="ko-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: CHROMOFOREN (js/sim_chrom.js)                              -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ch" role="tabpanel" aria-label="Chromoforen">
+    <div class="scene">
+        <canvas id="ch-laerred"></canvas>
+        <p class="opgavelinje" id="ch-opgave"></p>
+        <div class="anker" id="ch-anker-tavle"></div>
+        <div class="anker" id="ch-anker-graf"></div>
+        <div class="scene-valg" id="ch-valg"></div>
+
+        <div class="statuslinje" id="ch-status">
+            <p class="st-tekst" id="ch-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="ch-forfra" type="button" title="Samme molekyle forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="ch-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="ch-kort">
+            <h2><span id="ch-titel">Opgave</span><span class="taeller">molekyle <b id="ch-nr">1</b>/<span id="ch-antal">8</span></span></h2>
+            <div id="ch-prompt"></div>
+        </div>
+
+        <div class="kort" id="ch-opgaver">
+            <h2>Molekylerne <span class="taeller">løst <b id="ch-loest">0</b>/8</span></h2>
+            <div class="opg-liste" id="ch-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Absorptionsspektre og farver</h2>
+
+        <h3 class="teori-hoved">Lys og farver</h3>
+        <p>Hvidt lys er en blanding af alle bølgelængder fra ca. 400 nm til 700 nm. Jo kortere bølgelængden er, jo mere energi har lyset: E = h · c / λ. Lys under 400 nm er UV, som øjet ikke kan se.</p>
+        <table class="teori-tabel">
+            <tr><th>λ (nm)</th><td>400-450</td><td>450-495</td><td>495-570</td><td>570-590</td><td>590-620</td><td>620-700</td></tr>
+            <tr><th>Lyset</th><td>violet</td><td>blåt</td><td>grønt</td><td>gult</td><td>orange</td><td>rødt</td></tr>
+        </table>
+
+        <h3 class="teori-hoved">Absorptionsspektret</h3>
+        <p>Spektret viser absorbansen A ved hver bølgelængde. Toppen, λ<sub>max</sub>, er den bølgelængde, stoffet absorberer mest. Et spektrofotometer stilles til λ<sub>max</sub>.</p>
+
+        <h3 class="teori-hoved">Komplementærfarver</h3>
+        <p>Vi ser det lys, der ikke bliver absorberet. I farvecirklen står den farve, vi ser, over for det lys, der bliver absorberet.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Absorberet lys → farven, vi ser</span>
+            violet og blåt → gul · blågrønt → rød · grønt → lilla · orange og rødt → blå
+        </div>
+
+        <h3 class="teori-hoved">Konjugerede dobbeltbindinger</h3>
+        <p>To dobbeltbindinger er konjugerede, når der er præcis én enkeltbinding imellem dem. Elektronerne i dobbeltbindingerne er så fælles for hele systemet. De er delokaliserede.</p>
+        <p>Jo længere det konjugerede system er, jo mindre energi skal der til at excitere en elektron, og jo længere bølgelængde bliver absorberet. Fra ca. 8 konjugerede dobbeltbindinger når toppen ind i det synlige lys, og stoffet er farvet.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">H(CH=CH)ₙH</span>
+            n = 2: 217 nm · n = 3: 258 nm · n = 5: 334 nm · n = 8: 413 nm, gul · lycopen, n = 11: 470 nm
+        </div>
+
+        <h3 class="teori-hoved">Chromofore grupper</h3>
+        <p>Den del af molekylet, der absorberer lyset, er chromoforen. I organiske farvestoffer er det et system af konjugerede dobbeltbindinger, hvor C=O, N=N og benzenringe kan være med. Azofarvestoffer har azogruppen -N=N- mellem to aromatiske ringe. Grupper som -OH og -N(CH₃)₂ på chromoforen flytter toppen mod længere bølgelængde.</p>
+        <p>Brom adderes til en dobbeltbinding, så den bliver til en enkeltbinding. Det bryder chromoforen i kortere stykker, og farven forsvinder.</p>
+
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>←</kbd> <kbd>→</kbd> flyt toppen &nbsp;·&nbsp; <kbd>+</kbd> <kbd>−</kbd> kæden &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Q</kbd> quiz &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- QUIZZEN (js/quiz.js)                                               -->
+<!-- ================================================================= -->
+<div class="overlay" id="quiz">
+    <div class="overlay-boks">
+        <h2>Quiz: Absorptionsspektre</h2>
+        <div id="quiz-indhold"></div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/farve.js"></script>
+<script src="js/data.js"></script>
+<script src="js/molekyle.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_farve.js"></script>
+<script src="js/sim_konj.js"></script>
+<script src="js/sim_chrom.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

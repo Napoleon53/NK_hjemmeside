@@ -1,12 +1,16 @@
 # Molekylemotoren
 
-Fælles kode til at tegne og navngive molekyler. Den bruges af tre sider:
+Fælles kode til at tegne og navngive molekyler. Den bruges af fire sider:
 
 * `../superanimationer/tegnebraet/`: tegnebrættet til rapporter
 * `../superanimationer/sc6.2_zigzagformler/`: quizzerne om zigzagformler, navne
   og isomerer og opløselighedsspillet
-* `../superanimationer/sc_spil_organiske_grupper/`: spillet, hvor molekylerne
+* `../superanimationer/sc_spil4_organiske_grupper/`: spillet, hvor molekylerne
   sorteres efter stofklasse (tegningen, navnet og stofklassen; ikke tavlen)
+* `../superanimationer/sb4.5_organisk_syntese/`: esterdannelse og oxidation;
+  produkterne bygges som grafer og navngives af motoren, og tavlen tegner
+  atomerne, mens de flytter sig (molekyle, navngivning, smiles, trivialnavne,
+  layout og struktur; ikke tavlen)
 
 Koden lå i sc6.2 indtil 25. september 2026. Da fik tegnebrættet sin egen side, og
 motoren blev flyttet hertil, så den ikke skal kopieres fra mappe til mappe. Den
@@ -198,8 +202,9 @@ Motoren testes i `../superanimationer/tegnebraet/_selvtest.html` (navngivning,
 funktionelle grupper, trivialnavne, navn til tegning, tusind tilfældige molekyler,
 tavlen og billedet) og i `../superanimationer/sc6.2_zigzagformler/_selvtest.html`
 (carbonhydriderne i quizzerne), og navnene og stofklasserne på spillets 75
-molekyler i `../superanimationer/sc_spil_organiske_grupper/_selvtest.html`. Kør
-alle tre efter en ændring her.
+molekyler i `../superanimationer/sc_spil4_organiske_grupper/_selvtest.html`, og
+esterne og oxidationsprodukterne i `../superanimationer/sb4.5_organisk_syntese/_selvtest.html`.
+Kør alle fire efter en ændring her.
 
 ## Forenklinger
 

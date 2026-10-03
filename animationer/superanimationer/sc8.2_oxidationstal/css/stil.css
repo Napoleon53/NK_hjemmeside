@@ -1,8 +1,9 @@
 /* =====================================================================
    sc8.2 - Oxidationstal
    Stilark. Samme udtryk som de andre superanimationer (grundlaget er sc5.1
-   med den rolige Kemichael). Nyt nederst: tavlen paa fane 1 med felterne
-   over atomerne, brikkerne, listen med formlerne, gaettet og regnskabet.
+   med den rolige Kemichael). Nyt nederst: tavlen paa fane 1, brikkerne,
+   arbejdsfeltet i scenen (spoergsmaal, felt og Giv hint samlet ét sted),
+   listen med formlerne, gaettet og regnskabet.
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
    dansk komma. Dansk komma bruges kun i tekst, som brugeren laeser.
    ===================================================================== */
@@ -471,6 +472,16 @@ select:focus-visible {
 
 @media (max-width: 1320px) {
     :root { --panel-bredde: 370px; }
+    /* Arbejdsfeltet paa en smal scene: lidt mindre, saa knappen bliver paa linjen */
+    .arb { padding: 8px 12px; }
+    .arb-rk { gap: 6px 10px; }
+    .arb-spm { flex-basis: 170px; font-size: 1.08rem; }
+    .arb.fordeler .arb-felter { display: none; }
+    .arb .knap { min-width: 110px; padding: 9px 12px; }
+    .arb .felt-svar { padding: 5px 9px; font-size: 1.02rem; }
+    .arb .felt input, .oxfelt { width: 3.6em; }
+    .gaet-etiket { font-size: 0.88rem; }
+    .arb-besked { font-size: 0.95rem; }
 }
 
 @media (max-width: 1100px) {
@@ -846,10 +857,10 @@ select:focus-visible {
     z-index: 2;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: calc(var(--fs) * 0.3);
-    padding: 34px 20px 16px;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 10px 18px 12px;
     background: linear-gradient(135deg, #22302b, #1b2622);
     border: 10px solid #6d4c2f;
     border-radius: 8px;
@@ -861,14 +872,43 @@ select:focus-visible {
 
 .tavle.faerdig { box-shadow: 3px 5px 0 rgba(0, 0, 0, 0.35), inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(63, 174, 114, 0.7); }
 
-.tv-navn {
-    position: absolute;
-    top: 8px;
-    left: 16px;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #9fb1a9;
+/* Oeverst: opgaven paa én linje med en gul streg foran, og stoffets navn */
+.tv-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
 }
+
+.tv-maal {
+    padding-left: 10px;
+    border-left: 4px solid var(--gul);
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #f2f5f2;
+}
+
+.tv-navn {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #9fb1a9;
+    text-align: right;
+}
+
+/* Alt det, der arbejdes med, under hinanden. Pladsen til regnestykket,
+   beregningen og brikkerne er sat af fra starten (se .skjult), saa
+   arbejdsfeltet staar stille, mens der skrives. */
+.tv-stak {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, calc(var(--fs) * 0.2), 14px);
+    flex-shrink: 0;
+}
+
+.tv-stak .skjult { visibility: hidden; }
 
 .tv-formel {
     display: flex;
@@ -884,17 +924,38 @@ select:focus-visible {
 .tv-kol { display: inline-flex; flex-direction: column; align-items: center; }
 .tv-idx { line-height: 1; }
 
-/* Feltet eller tallet over atomet. Raekken er 0 bred, saa et felt ikke
-   skubber atomerne fra hinanden; det stikker lige meget ud til begge sider. */
+.tv-lad { line-height: 1; }
+
+/* Hintet til ladningen: pladsen efter formlen lyser, ogsaa naar den er tom */
+.tv-lad.tom { align-self: flex-start; width: 0.34em; height: 0.34em; margin-top: calc(var(--fs) * 0.66); margin-left: 0.08em; }
+
+.tv-formel.vis-lad .tv-lad {
+    border-radius: 6px;
+    outline: 2px dashed var(--gul);
+    outline-offset: 2px;
+    color: var(--gul);
+    animation: ladpuls 1.6s ease-in-out infinite;
+}
+
+@keyframes ladpuls {
+    0%, 100% { outline-color: rgba(242, 197, 61, 0.45); }
+    50%      { outline-color: rgba(242, 197, 61, 1); }
+}
+
+/* Tallet over atomet. Raekken er 0 bred, saa et tal ikke skubber atomerne
+   fra hinanden; det stikker lige meget ud til begge sider. */
 .tv-over {
     width: 0;
-    height: calc(var(--fs) * 0.95);
+    height: calc(var(--fs) * 0.6);
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    padding-bottom: calc(var(--fs) * 0.12);
+    padding-bottom: calc(var(--fs) * 0.1);
     font-size: max(18px, calc(var(--fs) * 0.38));
 }
+
+/* Det atom, der spoerges til, er gult */
+.tv-kol.aktiv .tv-sym { color: var(--gul); }
 
 .tv-sym { letter-spacing: 0.01em; }
 
@@ -905,29 +966,19 @@ select:focus-visible {
 .tv-ox.given { color: #aebfb7; animation: none; }
 .tv-ox.tom   { color: #6f817a; animation: none; }
 
+/* Over det atom, der spoerges til: et gult ?, og elevens eget tal, mens der skrives */
+.tv-ox.spm  { color: var(--gul); animation: spmpuls 1.6s ease-in-out infinite; }
+.tv-ox.vent { color: #f5dd8a; font-style: italic; animation: none; }
+
+@keyframes spmpuls {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+}
+
 @keyframes ind {
     from { transform: translateY(6px); opacity: 0; }
     to   { transform: translateY(0); opacity: 1; }
 }
-
-.tv-felt { display: inline-flex; flex-shrink: 0; }
-
-.oxfelt {
-    width: 2.7em;
-    padding: 2px 2px;
-    background-color: rgba(0, 0, 0, 0.35);
-    color: #ffffff;
-    border: 2px solid rgba(233, 238, 233, 0.55);
-    border-radius: 7px;
-    font-family: inherit;
-    font-size: 1em;
-    font-weight: 800;
-    text-align: center;
-    outline: none;
-}
-
-.oxfelt:focus { border-color: var(--gul); box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.3); }
-.tv-felt.fejl .oxfelt { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.2); animation: ryst 0.35s; }
 
 /* Det felt, der skal skrives i nu, er gult og banker stille, ogsaa uden fokus */
 @keyframes feltpuls {
@@ -936,20 +987,7 @@ select:focus-visible {
     100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
 }
 
-.tv-felt.aktiv .oxfelt { border-color: var(--gul); animation: feltpuls 1.8s ease-out infinite; }
-.tv-felt.aktiv.fejl .oxfelt { border-color: var(--roed); animation: ryst 0.35s; }
-
-/* Trinene og forklaringen oeverst paa tavlen */
-.tv-trin {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    max-width: min(760px, 100%);
-    text-align: center;
-}
-
-.tv-trin.tom { display: none; }
+/* Trinene oeverst paa tavlen */
 .tv-chips { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 6px; }
 .tv-chips:empty { display: none; }
 
@@ -981,16 +1019,6 @@ select:focus-visible {
 .tv-chip.gjort { color: #8ff0b4; border-color: rgba(143, 240, 180, 0.45); }
 .tv-pil { color: #6f817a; font-weight: 700; }
 
-.tv-trintekst {
-    margin: 0;
-    font-size: max(15px, calc(var(--fs) * 0.24));
-    font-weight: 600;
-    line-height: 1.45;
-    color: #e3ebe6;
-}
-
-.tv-trintekst:empty { display: none; }
-
 /* Regnestykket: venstresiden = ladningen, med en lille tekst under hver side */
 .tv-regn {
     display: grid;
@@ -1015,7 +1043,6 @@ select:focus-visible {
 .rv.graa,
 .rv.given { color: #aebfb7; }
 .rv.vent { color: #f5dd8a; font-style: italic; }
-.rv.ord  { color: #8fa39a; font-style: italic; font-weight: 600; font-size: 0.8em; }
 
 .tv-cap {
     font-size: 0.85rem;
@@ -1029,13 +1056,14 @@ select:focus-visible {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
     font-size: max(17px, calc(var(--fs) * 0.34));
     font-weight: 700;
+    line-height: 1.3;
     color: #cfe0d8;
     font-variant-numeric: tabular-nums;
-    animation: ind 0.4s ease-out;
 }
+
+.tv-isol > div { animation: ind 0.4s ease-out; }
 
 /* Brikkerne: ét atom pr. brik */
 .tv-brikker {
@@ -1080,6 +1108,157 @@ select:focus-visible {
 }
 
 .brik-sum.ok { color: #8ff0b4; }
+
+/* ---------------------------------------------------------------------
+   SC8.2: arbejdsfeltet i scenen. Spoergsmaalet, feltet, Tjek og Giv hint
+   staar samlet, og under dem linjen med fejl, hint og ros. Paa fane 1
+   staar det under formlen paa tavlen, paa fane 2 nederst paa tavlen.
+   Rammens farve siger, hvad der skete: roed (ikke endnu), gul (hint og
+   svar) og groen (rigtigt og loest).
+   --------------------------------------------------------------------- */
+.arb {
+    width: min(100%, 800px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 14px;
+    border: 2px solid rgba(242, 197, 61, 0.8);
+    border-radius: 12px;
+    background-color: rgba(12, 17, 15, 0.72);
+    text-align: left;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.arb.paa-scene {
+    position: absolute;
+    z-index: 3;
+    width: auto;
+    background-color: rgba(12, 17, 15, 0.9);
+}
+
+.arb-rk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+
+.arb-spm {
+    flex: 1 1 220px;
+    min-width: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #ffffff;
+}
+
+.arb-spm b { color: #8ff0b4; }
+.arb-ok { color: #8ff0b4; font-weight: 800; margin-right: 2px; }
+.arb.svar .arb-spm b, .arb.svar .arb-ok { color: #f5dd8a; }
+
+.arb-felter { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+
+/* Feltet og Tjek i én ramme */
+.arb-felt {
+    display: inline-flex;
+    align-items: stretch;
+    border: 2px solid var(--gul);
+    border-radius: 9px;
+    background-color: rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+    animation: feltpuls 1.8s ease-out infinite;
+}
+
+.arb-felt:focus-within { box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.3); animation: none; }
+.arb-felt.fejl { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.2); animation: ryst 0.35s; }
+.arb-inp { display: inline-flex; }
+
+.oxfelt {
+    width: 4.2em;
+    padding: 7px 6px;
+    background: transparent;
+    color: #ffffff;
+    border: none;
+    font-family: inherit;
+    font-size: 1.3rem;
+    font-weight: 800;
+    text-align: center;
+    outline: none;
+}
+
+.arb .felt-ok { padding: 0 14px; font-size: 0.98rem; font-weight: 700; }
+
+/* Linjen under: plads til én linje er sat af, saa feltet ikke flytter sig */
+.arb-besked {
+    margin: 0;
+    min-height: 1.45em;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: #cfd9d4;
+}
+
+.arb.paa-scene .arb-besked:empty { display: none; }
+
+.b-maerke {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 0 9px;
+    border-radius: 999px;
+    background-color: rgba(233, 238, 233, 0.16);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.arb.skidt { border-color: var(--roed); background-color: rgba(42, 20, 20, 0.85); }
+.arb.skidt .arb-besked { color: #ffb3aa; }
+.arb.skidt .b-maerke { background-color: rgba(224, 84, 70, 0.35); color: #ffd7d2; }
+
+.arb.hint .arb-besked,
+.arb.svar .arb-besked,
+.arb.gul .arb-besked { color: #f7e4ab; }
+.arb.hint .b-maerke,
+.arb.svar .b-maerke { background-color: rgba(242, 197, 61, 0.3); color: #fff2cc; }
+
+.arb.god { border-color: #5fcf92; }
+.arb.god .arb-besked { color: #b8f0cf; }
+
+.arb.loest { border-color: #5fcf92; background-color: rgba(16, 36, 26, 0.9); }
+.arb.loest .arb-besked { color: #cdeeda; }
+.arb.loest .b-maerke { background-color: rgba(63, 174, 114, 0.4); color: #d6ffe8; }
+.arb.svar { border-color: rgba(242, 197, 61, 0.8); }
+
+@keyframes arb-ryst {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+}
+
+.arb.ryster { animation: arb-ryst 0.4s ease-in-out 1; }
+
+/* Hjaelpeknappen: gul og stor nok til, at oejet finder den af sig selv */
+.arb .knap {
+    flex: 0 0 auto;
+    justify-content: center;
+    min-width: 128px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.knap.hjaelp {
+    background-color: rgba(242, 197, 61, 0.16);
+    border: 2px solid rgba(242, 197, 61, 0.8);
+    color: #fbe9b0;
+}
+
+.knap.hjaelp:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.3); border-color: var(--gul); color: #fff6d8; }
+
+/* Efter et forkert svar lyser knappen stille op */
+@keyframes knap-peg {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+    50% { box-shadow: 0 0 0 6px rgba(242, 197, 61, 0.28); }
+}
+
+.knap.hjaelp.peg { animation: knap-peg 1.7s ease-in-out infinite; border-color: var(--gul); background-color: rgba(242, 197, 61, 0.26); }
 
 /* ---------------------------------------------------------------------
    SC8.2: listen med formlerne i panelet
@@ -1127,25 +1306,31 @@ select:focus-visible {
 /* ---------------------------------------------------------------------
    SC8.2: gaettet og regnskabet paa fane 2
    --------------------------------------------------------------------- */
-.raekker.gaet { gap: 6px; margin: 6px 0 4px; }
-.raekker.gaet:empty { display: none; }
-
-.gaet-rk { display: flex; align-items: center; gap: 10px; }
+.arb-felter.gaet { flex-wrap: wrap; }
+.gaet-etiket { font-size: 0.95rem; font-weight: 600; color: #9fb1a9; }
+.gaet-rk { display: flex; align-items: center; gap: 6px; }
 
 .gaet-s {
-    width: 30px;
     flex-shrink: 0;
     font-size: 1.3rem;
     font-weight: 800;
     text-align: center;
 }
 
+.arb .felt { flex: 0 0 auto; min-height: 42px; border-width: 2px; border-radius: 9px; background-color: rgba(0, 0, 0, 0.45); }
+.arb .felt input { width: 4.2em; min-width: 0; flex: 0 0 auto; padding: 7px 6px; font-size: 1.25rem; font-weight: 800; text-align: center; }
+.arb .felt.aktiv { border-color: var(--gul); animation: feltpuls 1.8s ease-out infinite; }
+.arb .felt.aktiv:focus-within { animation: none; box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.3); }
+.arb .felt-svar { flex: 0 0 auto; padding: 6px 12px; font-size: 1.1rem; white-space: nowrap; }
+.arb .gaet-ok { align-self: stretch; min-height: 42px; border-radius: 9px; }
+
 .felt.gaettet { border-color: #5e5e70; background-color: rgba(255, 255, 255, 0.04); }
 .felt.gaettet .felt-svar { color: var(--tekst); }
 .felt.forkert { border-color: rgba(224, 84, 70, 0.6); background-color: rgba(224, 84, 70, 0.12); }
 .felt.forkert .felt-svar { color: #f7b9b2; }
 .felt.forkert .felt-svar b { color: #ffffff; }
-.felt.laast .felt-svar { color: var(--tekst-svag); }
+.felt.laast .felt-svar { color: var(--tekst-svag); font-size: 0.95rem; }
+.arb .felt.laast { opacity: 0.7; }
 
 .rs-tabel {
     width: 100%;

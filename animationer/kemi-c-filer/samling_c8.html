@@ -304,6 +304,7 @@
             <button class="tab-btn" data-emne="c8.3" data-beskrivelse="Afstem redoxreaktioner trin for trin med oxidationstal, elektroner, ladning og vand." onclick="visAnimation(this, '../superanimationer/sc8.4_redoxafstemning/index.html')" title="Afstem redoxreaktioner"><span class="btn-num">3</span><span class="btn-text">Afstem Redox</span></button>
             <button class="tab-btn" data-emne="c8.4" data-beskrivelse="Afstem kaliumpermanganats reaktioner i surt, neutralt og basisk miljø, og find manganstoffet ud fra farven." onclick="visAnimation(this, '../superanimationer/sc8.5_kaliumpermanganat/index.html')" title="Kaliumpermanganat"><span class="btn-num">4</span><span class="btn-text">Kaliumpermanganat</span></button>
             <button class="tab-btn" data-emne="c8.5" data-beskrivelse="Afvej ståluld, opløs den i syre, titrer med kaliumpermanganat og beregn jernindholdet." onclick="visAnimation(this, '../v2/superlab/sc8.6_jern_i_staaluld/index.html')" title="Forsøg: Jern i ståluld"><span class="btn-num">5</span><span class="btn-text">Jern i ståluld</span></button>
+            <button class="tab-btn" data-emne="c8.6" data-beskrivelse="Se, hvorfor rør af to metaller tæres ved samlingen, beskyt et skib med offeranoder, og afstem skemaerne for, hvordan jern ruster med vand, ilt og salt." onclick="visAnimation(this, '../superanimationer/sc8.6_korrosion/index.html')" title="Korrosion"><span class="btn-num">6</span><span class="btn-text">Korrosion</span></button>
 
         </div>
 
@@ -414,8 +415,8 @@
                 if (aliasKnap) {
                     aliasKnap.click();
                 } else {
-                    // Gamle numre efter omnummereringen 26. sept. 2026: c8.6 findes
-                    // via mappenavnet, som stadig har det gamle nummer.
+                    // Gamle numre findes via mappenavnet. c8.6 var Jern i ståluld før
+                    // omnummereringen 26. sept. 2026 og er fra 3. okt. 2026 Korrosion.
                     knapper.forEach(knap => {
                         if (knap.getAttribute('onclick').includes(emneFil) && !document.querySelector('.tab-btn.active')) {
                             knap.click();

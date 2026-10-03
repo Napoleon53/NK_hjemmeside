@@ -31,6 +31,7 @@
         brun:   [104, 66, 34, 0.9],      /* MnO₂ slemmet op */
         klar:   [240, 222, 230, 0.3],    /* Mn²⁺: næsten farveløs, svagt lyserød */
         vand:   [214, 232, 246, 0.26],
+        tom:    [214, 232, 246, 0],      /* et tomt urglas */
         lysgroen: [196, 226, 180, 0.42], /* Fe²⁺ */
         lysgul: [238, 214, 128, 0.5],    /* Fe³⁺ */
         iod:    [150, 82, 28, 0.78],     /* I₂ */
@@ -41,22 +42,27 @@
     D.BUNDFALD = { brun: "#3b2414", gul: "#e7c93c" };
 
     /* ----- Farvekortet: manganstofferne fra højeste til laveste oxidationstal
-       Navnene har ingen romertal, så kortet ikke viser facit. */
+       Navnene står på kortet (brugerens ønske 3. okt. 2026). Mn²⁺ hedder
+       mangan(II)ion; romertallet er ionens ladning. */
     D.MANGAN = [
-        { f: "MnO4 -",  farve: "violet", tekst: "violet", ord: "violet" },
-        { f: "MnO4 2-", farve: "groen",  tekst: "grøn", ord: "grøn" },
-        { f: "MnO2",    farve: "brun",   tekst: "brunt fast stof", ord: "et brunt fast stof" },
-        { f: "Mn 2+",   farve: "klar",   tekst: "næsten farveløs", ord: "næsten farveløs" }
+        { f: "MnO4 -",  farve: "violet", navn: "permanganat", tekst: "violet", ord: "violet" },
+        { f: "MnO4 2-", farve: "groen",  navn: "manganat", tekst: "grøn", ord: "grøn" },
+        { f: "MnO2",    farve: "brun",   navn: "brunsten", tekst: "brunt fast stof", ord: "et brunt fast stof" },
+        { f: "Mn 2+",   farve: "klar",   navn: "mangan(II)ion", tekst: "næsten farveløs", ord: "næsten farveløs" }
     ];
 
     /* ----- Flaskerne ------------------------------------------------------------
-       Fane 1 har natriumsulfit og svovlsyre, fane 2 kaliumpermanganat. */
+       Fane 1 har fire flasker: eleven fylder selv urglasset med
+       kaliumpermanganat og natriumhydroxid (brugerens ønske 3. okt. 2026) og
+       drypper så natriumsulfit og til sidst svovlsyre i. Fane 2 har
+       kaliumpermanganat. */
     D.FLASKE = {
         sulfit: { id: "sulfit", tekst: "Na₂SO₃", styrke: "0,1 M", navn: "natriumsulfit", farve: "vand" },
         syre:   { id: "syre", tekst: "H₂SO₄", styrke: "2 M", navn: "svovlsyre", farve: "vand" },
+        base:   { id: "base", tekst: "NaOH", styrke: "2 M", navn: "natriumhydroxid", farve: "vand" },
         permanganat: { id: "permanganat", tekst: "KMnO₄", styrke: "0,02 M", navn: "kaliumpermanganat", farve: "violet" }
     };
-    D.FLASKER = { ug: ["sulfit", "syre"], fl: ["permanganat"] };
+    D.FLASKER = { ug: ["permanganat", "base", "sulfit", "syre"], fl: ["permanganat"] };
 
     D.REAKTIONER = [
         /* ----- Fane 1: ét urglas, tre reaktioner efter hinanden (som den gamle
@@ -66,19 +72,23 @@
            +II. Den næste låses først op, når skemaet er afstemt (brugerens
            ønske 26. sept. 2026). Den gamle afstemte permanganat og sulfit i
            syre i sidste trin, men da er permanganaten brugt; her er det
-           brunstenen, der reagerer. */
+           brunstenen, der reagerer.
+           bland: det, eleven selv kommer i det tomme urglas, før der dryppes.
+           Skiltet under glasset regnes ud (glasTekst i js/sim.js): manganstoffet
+           og miljøet, fx "MnO₄⁻, basisk". foerMiljoe er miljøet før dryppet,
+           når det er et andet end reaktionens. */
         { id: "U1", fane: "ug", gruppe: "urglas", navn: "Lidt sulfit", kort: "1. Grønt",
-          tekst: "Kaliumpermanganat gjort basisk med natriumhydroxid. Dryp natriumsulfit i.",
+          tekst: "Et tomt urglas. Tilsæt kaliumpermanganat og natriumhydroxid, og dryp så natriumsulfit i.",
           v: ["SO3 2-", "MnO4 -"], h: ["SO4 2-", "MnO4 2-"], ox: [0, 0], red: [1, 1], miljoe: "basisk",
-          flaske: "sulfit", glasTekst: "Basisk · NaOH", foer: "violet", efter: "groen" },
+          flaske: "sulfit", bland: ["permanganat", "base"], foer: "tom", efter: "groen" },
         { id: "U2", fane: "ug", gruppe: "urglas", navn: "Mere sulfit", kort: "2. Brunt",
           tekst: "Det grønne glas. Dryp mere natriumsulfit i.",
           v: ["SO3 2-", "MnO4 2-"], h: ["SO4 2-", "MnO2"], ox: [0, 0], red: [1, 1], miljoe: "basisk",
-          flaske: "sulfit", glasTekst: "Basisk · NaOH", foer: "groen", efter: "brun", bundfald: "brun" },
+          flaske: "sulfit", foer: "groen", efter: "brun", bundfald: "brun" },
         { id: "U3", fane: "ug", gruppe: "urglas", navn: "Svovlsyre", kort: "3. Farveløst",
           tekst: "Det brune glas. Dryp svovlsyre i. Der er stadig sulfit i glasset.",
           v: ["SO3 2-", "MnO2"], h: ["SO4 2-", "Mn 2+"], ox: [0, 0], red: [1, 1], miljoe: "surt",
-          flaske: "syre", glasTekst: "Basisk · NaOH", glasEfter: "Surt · H₂SO₄",
+          flaske: "syre", foerMiljoe: "basisk",
           foer: "brun", foerBundfald: "brun", efter: "klar",
           obs: "Det brune forsvandt. Glasset er næsten farveløst.", kontekst: "Syren opløser brunstenen." },
 
@@ -183,7 +193,7 @@
 
     /* ----- Kemichael ------------------------------------------------------------- */
     D.INTRO = {
-        ug: "Ét urglas med basisk permanganat. Dryp i, og afstem det, der sker.",
+        ug: "Ét urglas og fire flasker. Fyld glasset, dryp i, og afstem det, der sker.",
         fl: "Permanganat dryppes i andre stoffer. Afstem på samme måde, med klammer under skemaet."
     };
     D.FAERDIG = {
@@ -204,6 +214,8 @@
         "Stadig kold."
     ];
     D.PRIK_SIDST = "Jeg sidder her bare. Afstem du.";
+    /* Skiltet ved ham, når musen holdes over ham: et klik giver hintet */
+    D.KLIK_HINT = "Klik for et hint";
 
     /* Påskeægget: flasken sluppet over hans kop */
     D.KAFFE_FLASKE = {

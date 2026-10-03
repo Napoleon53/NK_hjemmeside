@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <!-- Spillets eget emblem: en kolbe med guld i en benzenring. De 15 prikker
+       er de 15 spoergsmaal; de to hvide er de sikre beloeb. -->
+  <defs>
+    <radialGradient id="bund" cx="50%" cy="40%" r="62%">
+      <stop offset="0" stop-color="#3558e0"/>
+      <stop offset="0.55" stop-color="#14257a"/>
+      <stop offset="1" stop-color="#070d36"/>
+    </radialGradient>
+    <linearGradient id="guld" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff4b8"/>
+      <stop offset="0.45" stop-color="#f5c542"/>
+      <stop offset="1" stop-color="#b9770e"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.16"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="116" fill="url(#guld)"/>
+  <circle cx="120" cy="120" r="108" fill="url(#bund)"/>
+  <circle cx="120" cy="120" r="97" fill="none" stroke="#f5c542" stroke-width="1.5" opacity="0.55"/>
+
+  <!-- De 15 spoergsmaal rundt i kanten -->
+  <g fill="#f5c542">
+    <circle cx="120.0" cy="18.0" r="3.2"/>
+    <circle cx="161.5" cy="26.8" r="3.2"/>
+    <circle cx="195.8" cy="51.7" r="3.2"/>
+    <circle cx="217.0" cy="88.5" r="3.2"/>
+    <circle cx="221.4" cy="130.7" r="4.2" fill="#ffffff"/>
+    <circle cx="208.3" cy="171.0" r="3.2"/>
+    <circle cx="180.0" cy="202.5" r="3.2"/>
+    <circle cx="141.2" cy="219.8" r="3.2"/>
+    <circle cx="98.8" cy="219.8" r="3.2"/>
+    <circle cx="60.0" cy="202.5" r="4.2" fill="#ffffff"/>
+    <circle cx="31.7" cy="171.0" r="3.2"/>
+    <circle cx="18.6" cy="130.7" r="3.2"/>
+    <circle cx="23.0" cy="88.5" r="3.2"/>
+    <circle cx="44.2" cy="51.7" r="3.2"/>
+    <circle cx="78.5" cy="26.8" r="3.2"/>
+  </g>
+
+  <!-- Benzenringen -->
+  <polygon points="120,40 189.3,80 189.3,160 120,200 50.7,160 50.7,80" fill="none" stroke="#8fb6ff" stroke-width="3" stroke-linejoin="round" opacity="0.55"/>
+  <g stroke="#8fb6ff" stroke-width="3" stroke-linecap="round" opacity="0.4">
+    <line x1="127" y1="52" x2="178" y2="81.5"/>
+    <line x1="178" y1="158.5" x2="127" y2="188"/>
+    <line x1="61.5" y1="153" x2="61.5" y2="87"/>
+  </g>
+
+  <!-- Kolben -->
+  <path d="M108 66 V104 L74 164 Q67 180 84 180 H156 Q173 180 166 164 L132 104 V66 Z" fill="url(#glas)"/>
+  <path d="M88.5 139 Q104 132 120 139 T151.5 139 L166 164 Q173 180 156 180 H84 Q67 180 74 164 Z" fill="url(#guld)"/>
+  <path d="M108 66 V104 L74 164 Q67 180 84 180 H156 Q173 180 166 164 L132 104 V66" fill="none" stroke="#eaf1ff" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="101" y1="64" x2="139" y2="64" stroke="#eaf1ff" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M96 168 Q100 158 106 150" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Guldet bobler op -->
+  <g fill="url(#guld)" stroke="#8a5a08" stroke-width="1.2">
+    <circle cx="131" cy="160" r="6"/>
+    <circle cx="112" cy="152" r="4.5"/>
+    <circle cx="121" cy="122" r="5.5"/>
+    <circle cx="116" cy="97" r="4.5"/>
+    <circle cx="123" cy="78" r="5"/>
+    <circle cx="114" cy="52" r="5.5"/>
+    <circle cx="128" cy="36" r="4"/>
+  </g>
+</svg>

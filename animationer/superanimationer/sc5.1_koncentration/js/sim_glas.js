@@ -15,6 +15,12 @@
    Et rigtigt svar faar scenen til at vise det: prikkerne taelles, tallet
    kommer i tabellen, etiketten kommer paa glasset, eller enhederne
    streges ud. Et forkert svar forklares og kan ikke vaelges igen.
+
+   Efter et rigtigt svar bliver forklaringen staaende, og knappen i kortet
+   bliver til Naeste spoergsmaal: det naeste kommer foerst, naar eleven
+   selv gaar videre. Det, tabellen viste, foer der blev haeldt, staar som
+   en lille linje under de tal, der har aendret sig, og etiketten bliver
+   paa et glas, der er haeldt tomt (brugerens oenske 3. okt. 2026).
    ===================================================================== */
 (function () {
     "use strict";
@@ -39,6 +45,27 @@
 
     function cAf(g) { return g.V > 0 ? g.n / (g.V / 1000) : 0; }
     function antalPrikker(n) { return Math.round(n / D.PRIK_GLAS + 1e-9); }
+    function talTekst(g, h) {
+        return h === "n" ? K.to(g.n) + " mol" : (h === "V" ? K.to(g.V / 1000) + " L" : K.to(cAf(g)) + " M");
+    }
+
+    /* Knappen i kortet: mens fanen venter efter et rigtigt svar, gaar den
+       videre til det naeste spoergsmaal */
+    var faellesKnap = P.knap, faellesVisKnap = P.visKnap;
+
+    P.visKnap = function () {
+        faellesVisKnap.call(this);
+        if (!this.venter || this.faerdig) return;
+        this.el.knap.textContent = "Næste spørgsmål →";
+        this.el.knap.className = "knap blaa banker";
+    };
+
+    P.knap = function () {
+        if (this.venter && !this.faerdig) { this.naesteSpm(); return; }
+        faellesKnap.call(this);
+    };
+
+    P.enter = function () { if (this.faerdig || this.venter) this.knap(); };
 
     /* ----- Opgaven -------------------------------------------------------------- */
     P.lavOpgave = function (i) {
@@ -51,7 +78,7 @@
                        kendt: { n: /n/.test(g.kendt), V: /V/.test(g.kendt), c: /c/.test(g.kendt) }, ny: {},
                        prikVis: spec.prikker ? 1 : 0, prikMaal: spec.prikker ? 1 : 0,
                        part: new NK.Partikler(31 + j * 7 + i * 3), pose: { dx: 0, dy: 0, vinkel: 0, spejl: false, tekst: 1 },
-                       blink: 0, tael: null, taelVist: false };
+                       blink: 0, tael: null, taelVist: false, foerTal: null };
             mig.nyePrikker(gl, antalPrikker(n), null);
             gl.prikker.forEach(function (d) { d.a = 1; d.ny = 1; });
             var np = Tg.prikker(cAf(gl));
@@ -70,7 +97,8 @@
         this.sproejte = { dx: 0, dy: 0, v: 0, straale: 0 };
         this.samlet = [];
         this.samletFaerdig = 0;
-        this.venter = null;
+        this.venter = false;
+        this.foerSpm = -1;
         this.overLinje = spec.linje || "";
         this.startSpm();
         if (this.lay) this.layout();
@@ -177,9 +205,11 @@
                 var t, kl = "";
                 if (g.V <= 0 && !mig.flytter(g)) t = "–";
                 else if (!g.kendt[r[0]]) { t = "?"; kl = "ukendt"; }
-                else t = r[0] === "n" ? K.to(g.n) + " mol" : (r[0] === "V" ? K.to(g.V / 1000) + " L" : K.to(cAf(g)) + " M");
+                else t = talTekst(g, r[0]);
                 if (g.ny[r[0]]) kl += " ny";
-                html += '<td class="' + kl + '">' + t + "</td>";
+                /* Tallet fra foer der blev haeldt, naar det ikke er det, der staar nu */
+                var foer = g.foerTal && g.foerTal[r[0]];
+                html += '<td class="' + kl + '">' + t + (foer && foer !== t ? '<span class="foer">før ' + foer + "</span>" : "") + "</td>";
             });
             html += "</tr>";
         });
@@ -192,7 +222,7 @@
 
     /* ----- Svarene --------------------------------------------------------------------- */
     P.vaelgSvar = function (j, maade) {
-        if (this.fase !== "spm" || this.faerdig || this.travl()) return;
+        if (this.fase !== "spm" || this.faerdig || this.venter || this.travl()) return;
         var s = this.spm(), x = s.svar[j];
         if (this.forkerte.indexOf(j) >= 0) return;
         if (!x.ok) {
@@ -228,23 +258,21 @@
             this.trinLoest(maade, maade === "svar" ? svarHTML : null);
             return;
         }
+        /* Forklaringen bliver staaende ved det besvarede spoergsmaal, til eleven
+           selv gaar videre med knappen (ikke ros og et nyt spoergsmaal paa én gang) */
+        this.venter = true;
         this.visKort();
-        /* Naeste spoergsmaal kommer, naar kortet har vist det rigtige svar lidt
-           (og enhederne er naaet at blive streget ud) */
-        this.venter = { t: vis.enhed ? 2.6 : 1.1, maade: maade, html: svarHTML, efter: s.efter };
         if (maade === "svar") this.svarVis(svarHTML);
         else { this.k.tie(); this.besked(NK.html(s.efter), "god"); }
     };
 
     P.naesteSpm = function () {
-        var v = this.venter;
-        this.venter = null;
+        this.venter = false;
         this.spmNr++;
         this.startSpm();
         this.visKort();
-        var linje = this.trinLinje();
-        if (v.maade === "svar" && this.k.taler()) this.besked(linje, "");
-        else this.besked(NK.html(v.efter) + " " + linje, v.maade === "svar" ? "gul" : "god");
+        this.k.tie();
+        this.besked(this.trinLinje(), "");
     };
 
     P.saetKendt = function (i, hvad) {
@@ -267,7 +295,7 @@
     P.opgaveFaerdig = function () { return this.fase === "faerdig"; };
 
     P.trinLinje = function () {
-        if (this.faerdig) return "";
+        if (this.faerdig || this.venter) return "";
         var s = this.spm();
         if (this.fase === "handling") return s.foer.linje;
         return s.hvem ? "Vælg et svar i kortet, eller klik på et glas." : "Vælg et svar i kortet.";
@@ -300,12 +328,26 @@
        mens der haeldes) */
     P.skjulFoer = function () {
         var mig = this;
+        this.huskFoer();
         (this.spm().foer.kendt || []).forEach(function (x) {
             var g = mig.glas[x.glas];
             ["n", "V", "c"].forEach(function (h) { if (x[h] === false) g.kendt[h] = false; });
             if (x.etiket === false) g.etiket = false;
         });
         this.visTabel();
+    };
+
+    /* Det, tabellen viser om glassene, lige foer der haeldes (én gang pr.
+       handling). Haelder man foerst og taenker bagefter, kan tallene stadig
+       ses: i tabellen under det nye tal og paa etiketten af et tomt glas. */
+    P.huskFoer = function () {
+        if (this.foerSpm === this.spmNr) return;
+        this.foerSpm = this.spmNr;
+        this.glas.forEach(function (g) {
+            g.foerTal = {};
+            if (g.V <= 0) return;
+            ["n", "V", "c"].forEach(function (h) { if (g.kendt[h]) g.foerTal[h] = talTekst(g, h); });
+        });
     };
 
     /* Ét af glassene haeldes over i det store glas; naar alle er haeldt, er handlingen faerdig */
@@ -448,10 +490,6 @@
                 if (!this.koe.length) { this.visKnap(); this.visTabel(); }
             }
         }
-        if (this.venter) {
-            this.venter.t -= dt;
-            if (this.venter.t <= 0 && !this.travl()) this.naesteSpm();
-        }
         if (this.enhed) this.enhed.t = Math.min(1, this.enhed.t + dt / 1.8);
         this.glas.forEach(function (g) {
             if (!mig.flytter(g)) g.prikVis = NK.mod(g.prikVis, g.prikMaal, 4, dt);
@@ -514,14 +552,15 @@
     P.nedScene = function (pt) {
         var u = this.hvad(pt);
         if (!u) return false;
-        if (this.travl() || this.venter) { if (!this.venter) this.kortBesked("Vent lidt."); return false; }
+        if (this.travl()) { this.kortBesked("Vent lidt."); return false; }
         var s = this.spm();
         if (this.fase === "handling" && this.kanKlikkes(u)) {
             if (s.foer.slags === "saml") this.samlIGlas(u.i);
             else this.goerHandling(false);
             return false;
         }
-        if (this.fase === "spm" && s.hvem && u.slags === "glas") {
+        /* Mens fanen venter paa Naeste spoergsmaal, svarer et klik paa et glas ikke */
+        if (this.fase === "spm" && s.hvem && u.slags === "glas" && !this.venter) {
             var j = s.svar.map(function (x) { return x.glas; }).indexOf(u.i);
             if (j >= 0) this.vaelgSvar(j, "ok");
             return false;
@@ -533,7 +572,10 @@
         if (u.slags === "glas") {
             var g = this.glas[u.i];
             if (this.fase === "handling") this.kortBesked(NK.html(s.foer.hint), 4);
-            else if (g.V <= 0) this.kortBesked("Glas " + g.navn + " er tomt.", 3);
+            else if (g.V <= 0) {
+                var f0 = g.foerTal || {};
+                this.kortBesked("Glas " + g.navn + " er tomt." + (f0.V && f0.c ? " Før var der " + f0.V + " af en " + f0.c + " opløsning i det." : ""), f0.V ? 5 : 3);
+            }
             else this.kortBesked("Glas " + g.navn + ": " + K.to(g.V / 1000) + " L kobber(II)sulfat. Hver prik er 0,01 mol.", 4);
             return false;
         }
@@ -677,9 +719,11 @@
             }) : null;
             var lys = mig.over && mig.over.slags === "glas" && mig.over.i === i ? 1 : 0;
             if (g.blink > 0) lys = 0;
+            /* Et glas, der er haeldt tomt, beholder sin etiket */
+            var paaEtiket = !g.etiket ? null : (g.V > 0 ? K.to(cAf(g)) + " M" : (g.foerTal && g.foerTal.c) || null);
             Tg.glas1(ctx, gg, { V: g.visV, farve: Tg.vaeske(ST, cAf(g)), prikker: prikker, vinkel: g.pose.vinkel, spejl: g.pose.spejl,
                 dx: g.pose.dx, dy: g.pose.dy, tekst: g.pose.tekst, lys: lys,
-                etiket: g.etiket && g.V > 0 ? [ST.formel, K.to(cAf(g)) + " M"] : null });
+                etiket: paaEtiket ? [ST.formel, paaEtiket] : null });
             if (g.blink > 0) {
                 ctx.save();
                 ctx.strokeStyle = "rgba(224, 84, 70, " + Math.min(1, g.blink * 1.5) + ")";

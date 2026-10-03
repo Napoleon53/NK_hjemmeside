@@ -3,15 +3,14 @@
 
    I denne animation gaar Kemichael ikke ind og ud af scenen. Han sidder
    stille bag sit kateder i scenens nederste venstre hjoerne med kaffen
-   foran sig, og han blander sig ikke: han siger kun noget, naar eleven
-   trykker Giv hint eller Vis svaret (eller K). Boblen staar fast til
-   hoejre for ham og lukker igen, naar delopgaven er loest. Naeste skridt,
-   fejl og ros staar i opgavekortet i panelet, ikke hos ham (brugerens
-   valg 25. sept. 2026).
+   foran sig, og han blander sig ikke. Spoergsmaalet, fejl, hint og ros
+   staar i arbejdsfeltet paa tavlen, lige ved feltet (brugerens test 3.
+   okt. 2026), saa han siger kun noget, naar eleven klikker paa ham eller
+   koppen eller trykker K. Med D.KEMICHAEL_SIGER_HINT siger han igen
+   hintet og svaret i boblen til hoejre for sig.
 
    Knappen i scenens hjoerne sender ham ud. Saa staar katederet tomt med
-   en seddel, og hintene staar i opgavekortet i stedet. Samme knap (eller
-   et klik paa sedlen) henter ham igen. Valget gaelder begge faner og
+   en seddel. Samme knap (eller et klik paa sedlen) henter ham igen. Valget gaelder begge faner og
    huskes i browseren.
 
    Figuren er den faelles fra ../../v2/kemichael/ (K.tegneserieFigur),
@@ -100,7 +99,8 @@
        Baandet i bunden af scenen: katederet med ham til venstre og boblen
        til hoejre for hovedet. Giver { y, h }. */
     P.layout = function (W, H) {
-        var hB = Math.round(NK.klamp(H * 0.19, 92, 150));
+        /* Baandet er lavt: tavlen skal have pladsen til arbejdsfeltet */
+        var hB = Math.round(NK.klamp(H * 0.16, 92, 150));
         var y = H - hB;
         var kant = NK.klamp(W * 0.014, 8, 16);
         var bordY = y + Math.round(hB * 0.7);                 /* pladens overflade */
@@ -232,8 +232,7 @@
         if (!this.knap) return;
         this.knap.textContent = faelles.ude ? "Hent Kemichael" : "Send Kemichael ud";
         this.knap.classList.toggle("ude", faelles.ude);
-        this.knap.title = faelles.ude ? "Kemichael kommer tilbage og giver hint, når du beder om det" :
-            "Kemichael går på lærerværelset. Hintene står så i opgavekortet";
+        this.knap.title = faelles.ude ? "Kemichael kommer tilbage til katederet" : "Kemichael går på lærerværelset";
     };
 
     /* ----- Tid ------------------------------------------------------------------------ */

@@ -24,8 +24,10 @@
    giver den rigtige besked ved de typiske fejl, at luppen afgiver lige
    så mange elektroner, som den optager, at sproget overholder reglerne,
    at alle tre faner kan gennemføres (fane 1 og 2 også med musen), at
-   Kemichael kan vises og sendes ud, og at layoutet holder fra 520 × 380
-   til 1500 × 900.
+   stangen bliver tyndere i syren, at Kemichaels præsentation går ét trin
+   ad gangen og først videre ved Næste, at det, han peger på, får en
+   ramme, at skemaet på fane 3 står på én linje, og at layoutet holder
+   fra 520 × 380 til 1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens valg og lægger dem tilbage bagefter.
@@ -91,8 +93,8 @@ async function koerTest(W, ramme) {
     overskrift("Modellen: rækken og reaktionerne");
     var sorteret = K.RAEKKE.slice().sort(function (a, b) { return K.STOF[a].E - K.STOF[b].E; });
     paastand("spændingsrækken står efter E°", sorteret.join() === K.RAEKKE.join(), K.RAEKKE.join(" "));
-    paastand("rækken er bogens: K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au",
-        K.RAEKKE.join(" ") === "K Ca Na Mg Al Zn Fe Ni Sn Pb H Cu Ag Hg Pt Au");
+    paastand("rækken er K Ca Na Mg Al Zn Fe Pb H Cu Ag Hg Pt Au (uden nikkel og tin)",
+        K.RAEKKE.join(" ") === "K Ca Na Mg Al Zn Fe Pb H Cu Ag Hg Pt Au");
     var tal = {};
     D.STAENGER.forEach(function (m) { tal[m] = D.GLAS.filter(function (i) { return K.reagerer(m, i); }).length; });
     paastand("fane 1: Mg reagerer med 5, Zn 4, Fe 3, Cu 1, Ag 0", tal.Mg === 5 && tal.Zn === 4 && tal.Fe === 3 && tal.Cu === 1 && tal.Ag === 0, JSON.stringify(tal));
@@ -101,7 +103,7 @@ async function koerTest(W, ramme) {
     paastand("Cu reagerer ikke med saltsyre, Zn gør", !K.reagerer("Cu", "H") && K.reagerer("Zn", "H"));
 
     var FACIT = { "Zn/Cu": [1, 1, 1, 1], "Cu/Ag": [1, 2, 1, 2], "Al/Cu": [2, 3, 2, 3], "Mg/H": [1, 2, 1, 1],
-        "Al/H": [2, 6, 2, 3], "Cu/Au": [3, 2, 3, 2], "Pb/Ag": [1, 2, 1, 2], "Fe/Sn": [1, 1, 1, 1], "Zn/Au": [3, 2, 3, 2] };
+        "Al/H": [2, 6, 2, 3], "Cu/Au": [3, 2, 3, 2], "Pb/Ag": [1, 2, 1, 2], "Zn/Pb": [1, 1, 1, 1], "Zn/Au": [3, 2, 3, 2] };
     Object.keys(FACIT).forEach(function (n) {
         var p = n.split("/"), r = K.reaktion(p[0], p[1]);
         paastand("koefficienterne for " + K.skemaTekst(r), r.koef.join() === FACIT[n].join(), r.koef.join());
@@ -122,6 +124,9 @@ async function koerTest(W, ramme) {
     });
     paastand("alle " + alle.length + " opgaver: lige mange e⁻ begge veje, mindste tal, og facit godkendes", gode === alle.length, gode + "/" + alle.length);
     paastand("ingen opgave med samme metal eller under " + K.MINDSTE_FORSKEL + " V fra hinanden", smaa === 0, smaa);
+    var sjaeldne = alle.concat(D.OPGAVER).filter(function (p) { return /^(Ni|Sn)$/.test(p[0]) || /^(Ni|Sn)$/.test(p[1]); });
+    paastand("ingen opgaver med nikkel eller tin", sjaeldne.length === 0, sjaeldne.join("; "));
+    paastand("alle metaller i opgaverne står i rækken", K.STAENGER.concat(K.OPLOESNINGER).every(function (m) { return K.RAEKKE.indexOf(m) >= 0; }));
     var ok12 = D.OPGAVER.every(function (p) {
         return K.STAENGER.indexOf(p[0]) >= 0 && K.OPLOESNINGER.indexOf(p[1]) >= 0 && Math.abs(K.forskel(p[0], p[1])) >= K.MINDSTE_FORSKEL;
     });
@@ -179,7 +184,8 @@ async function koerTest(W, ramme) {
         else if (Array.isArray(v)) v.forEach(saml);
         else if (v && typeof v === "object") Object.keys(v).forEach(function (k) { saml(v[k]); });
     }
-    saml(D.MAAL); saml(D.INTRO_FORSOEG); saml(D.INTRO_RAEKKEN); saml(D.INTRO_FORUDSIG);
+    var INTRO = D.INTRO_FORSOEG.concat(D.INTRO_RAEKKEN, D.INTRO_FORUDSIG);
+    saml(D.MAAL); saml(INTRO.map(function (l) { return l.tekst; }));
     [D.ROS_FORSOEG, D.ROS_RAEKKEN, D.ROS_FORUDSIG, D.AEG_KAFFE, D.RK_PROMPT, D.RK_HINT, D.RK_FAERDIG, D.PRODUKT_SPM, D.KOEF_SPM, D.FU_SPM].forEach(saml);
     alle.concat([["Fe", "H"], ["H", "Cu"]]).forEach(function (p) {
         var m = p[0], i = p[1];
@@ -198,8 +204,12 @@ async function koerTest(W, ramme) {
     paastand("ingen tankestreger i " + tekster.length + " tekster", tankestreg.length === 0, tankestreg[0]);
     var enPlus = tekster.filter(function (s) { return /¹⁺|¹⁻|1\+|1−/.test(s); });
     paastand("ladning 1 skrives som + og −, aldrig 1+ og 1−", enPlus.length === 0, enPlus[0]);
-    var lange = D.INTRO_FORSOEG.concat(D.INTRO_RAEKKEN, D.INTRO_FORUDSIG).filter(function (s) { return s.length > 60; });
-    paastand("Kemichaels replikker er højst ca. 60 tegn", lange.length === 0, lange[0]);
+    var lange = INTRO.filter(function (l) { return l.tekst.length > 85; });
+    paastand("præsentationens linjer er højst 85 tegn (de står, til eleven trykker Næste)", lange.length === 0, lange[0] && lange[0].tekst);
+    var halve = INTRO.filter(function (l) { return !/^[A-ZÆØÅ].*\.$/.test(l.tekst) || l.tekst.split(" ").length < 6; });
+    paastand("præsentationens linjer er hele sætninger", halve.length === 0, halve[0] && halve[0].tekst);
+    var korte = [D.ROS_FORSOEG, D.ROS_RAEKKEN, D.ROS_FORUDSIG, D.AEG_KAFFE].filter(function (t) { return t.length > 60; });
+    paastand("ros og påskeæg er højst ca. 60 tegn", korte.length === 0, korte[0]);
     paastand("ingen 'natronlud'", tekster.every(function (s) { return !/natronlud/i.test(s); }));
     paastand("ingen 'undefined' eller 'NaN' i teksterne", tekster.every(function (s) { return !/undefined|NaN/.test(s); }),
         tekster.filter(function (s) { return /undefined|NaN/.test(s); })[0]);
@@ -262,6 +272,26 @@ async function koerTest(W, ramme) {
     f.vaelgSvar(0);
     f.knap();
     paastand("mål 5: resten af skemaet", D.MAAL[f.maalNr].id === "skema");
+    /* Stangen bliver tyndere i syren og er hel igen i holderen */
+    var mgS = f.staenger[0];
+    f.saetI(0, 5);
+    koerTid(f, 5);
+    var tMg = f.stangTegning(mgS).taeret;
+    paastand("Mg i saltsyre: stangen er blevet tyndere under overfladen", !!tMg && tMg.x > 0.5 && Math.abs(tMg.fra - f.lay.glas[5].overflade) < 1, tMg && tMg.x);
+    paastand("scenelinjen siger, at stangen bliver tyndere", /stangen bliver tyndere/.test(doc.getElementById("fs-status").textContent), doc.getElementById("fs-status").textContent);
+    paastand("den tynde del er smallere end stangen", NK.Tegn.taeretInd(f.lay.stang.b, tMg.x) > f.lay.stang.b * 0.15);
+    f.hjem(0);
+    koerTid(f, 0.1);
+    paastand("på vej op er stangen stadig tynd", !!f.stangTegning(mgS).taeret);
+    koerTid(f, 2);
+    paastand("hjemme i holderen er stangen hel igen", mgS.fase === "hjemme" && !f.stangTegning(mgS).taeret);
+    f.saetI(3, 5);
+    koerTid(f, 3);
+    paastand("Cu i saltsyre: stangen bliver ikke tyndere", !f.stangTegning(f.staenger[3]).taeret);
+    f.saetI(1, 3);
+    koerTid(f, 3);
+    paastand("Zn i Cu²⁺: et lag, ikke en tyndere stang", !!f.stangTegning(f.staenger[1]).belaeg && !f.stangTegning(f.staenger[1]).taeret);
+    f.hjem(1); f.hjem(3);
     /* Paaskeaegget: en stang over kaffen */
     var ag = f.staenger[4];
     koerTid(f, 1);
@@ -351,6 +381,17 @@ async function koerTest(W, ramme) {
     paastand("to rigtige stoffer: videre til afstemningen", fu.fase === "koef");
     var fl = doc.querySelectorAll("#fu-skema input");
     paastand("felterne er tomme (intet facit før tid)", Array.prototype.every.call(fl, function (x) { return x.value === ""; }));
+    var led = doc.querySelectorAll("#fu-skema .skemalinje > *");
+    var top0 = led[0].getBoundingClientRect().top, sidst = led[led.length - 1].getBoundingClientRect();
+    paastand("skemaet med de fire felter står på én linje", Math.abs(sidst.top - top0) < sidst.height, Math.round(top0) + " / " + Math.round(sidst.top));
+    var skrift = parseFloat(W.getComputedStyle(doc.querySelector("#fu-skema .skemalinje")).fontSize);
+    paastand("skemaets skrift er mindst 13 px", skrift >= 13, skrift);
+    var panelB = doc.querySelector("#fane-forudsig .panel").getBoundingClientRect().width;
+    var panelA = 0;
+    NK.visFane("fane-forsoeg");
+    panelA = doc.querySelector("#fane-forsoeg .panel").getBoundingClientRect().width;
+    NK.visFane("fane-forudsig");
+    paastand("panelet på fane 3 er bredere end på fane 1", panelB > panelA + 80, panelA + " / " + panelB);
     fu.tjekKoef();
     paastand("tomme felter: skriv et tal", /alle fire felter/.test(doc.getElementById("fu-besked").textContent));
     [1, 1, 1, 1].forEach(function (v, k) { fl[k].value = v; });
@@ -363,19 +404,67 @@ async function koerTest(W, ramme) {
     paastand("tasten N svarer nej", fu.valgt === 1);
 
     /* ----------------------------------------------------------------- */
-    overskrift("Kemichael på alle tre faner");
-    var navne = { "fane-forsoeg": "fs-spring", "fane-raekken": "rk-spring", "fane-forudsig": "fu-spring" };
+    overskrift("Kemichaels præsentation: ét trin ad gangen");
+    var navne = { "fane-forsoeg": ["fs-spring", D.INTRO_FORSOEG], "fane-raekken": ["rk-spring", D.INTRO_RAEKKEN], "fane-forudsig": ["fu-spring", D.INTRO_FORUDSIG] };
+    function inden(a, b, luft) {
+        return a.left >= b.left - luft && a.top >= b.top - luft && a.right <= b.right + luft && a.bottom <= b.bottom + luft;
+    }
     for (var fane in navne) {
         NK.visFane(fane);
-        var sim = NK.sims[fane];
+        var sim = NK.sims[fane], boble = doc.getElementById(navne[fane][0]), linjer = navne[fane][1];
+        if (sim.nulstil) sim.nulstil();
+        koerTid(sim, 2.5);
         sim.startIntro(true);
-        koerTid(sim, 1.5);
-        var inde = sim.laererIIntro();
-        var knapVist = !doc.getElementById(navne[fane]).hidden;
-        sim.springIntro();
+        paastand(fane + ": boblen vises ikke, før han står der", boble.hidden);
+        koerTid(sim, 2.5);
+        var st = sim.introStatus();
+        paastand(fane + ": K starter præsentationen, og boblen viser linje 1 med Næste",
+            sim.laererIIntro() && !!st && st.nr === 0 && !boble.hidden && W.getComputedStyle(boble).display !== "none" &&
+            boble.querySelector(".intro-tekst").textContent === linjer[0].tekst && /Næste/.test(boble.querySelector(".intro-naeste").textContent),
+            boble.querySelector(".intro-tekst").textContent);
+        koerTid(sim, 25);
+        paastand(fane + ": han går ikke videre af sig selv (25 s)", sim.laererIIntro() && sim.introStatus().nr === 0 && !boble.hidden);
+        var sceneR = boble.parentNode.getBoundingClientRect();
+        paastand(fane + ": boblen står inde i scenen", inden(boble.getBoundingClientRect(), sceneR, 1));
+        var trinOk = true, rammeOk = true, daekOk = true, note = "";
+        for (var t = 1; t < linjer.length; t++) {
+            boble.querySelector(".intro-naeste").click();
+            koerTid(sim, 1);
+            var s2 = sim.introStatus();
+            if (!s2 || s2.nr !== t || boble.querySelector(".intro-tekst").textContent !== linjer[t].tekst ||
+                    boble.querySelector(".intro-tal").textContent !== (t + 1) + "/" + linjer.length) { trinOk = false; note = "trin " + t; }
+            var maal = doc.querySelector(linjer[t].sel), rammer = NK.Fremhaev.synlige();
+            if (!maal || rammer.length !== 1) { rammeOk = false; note = "ramme i trin " + t + ": " + rammer.length; continue; }
+            var mr = maal.getBoundingClientRect(), rr = rammer[0];
+            if (!(mr.width > 20 && mr.height > 20) || Math.abs(rr.left - (mr.left - 5)) > 2 || Math.abs(rr.top - (mr.top - 5)) > 2 ||
+                    Math.abs(rr.width - (mr.width + 10)) > 2) { rammeOk = false; note = "ramme i trin " + t + " står forkert"; }
+            /* Boblen daekker hoejst en mindre del af det, han peger paa */
+            var br = boble.getBoundingClientRect();
+            var fb = Math.min(br.right, mr.right) - Math.max(br.left, mr.left), fh = Math.min(br.bottom, mr.bottom) - Math.max(br.top, mr.top);
+            var del = fb > 0 && fh > 0 ? fb * fh / (mr.width * mr.height) : 0;
+            if (del > 0.25) { daekOk = false; note = "boblen dækker " + Math.round(del * 100) + " % af " + linjer[t].sel; }
+        }
+        paastand(fane + ": Næste viser de " + linjer.length + " linjer én ad gangen", trinOk, note);
+        paastand(fane + ": det, han peger på, har en ramme om sig", rammeOk, note);
+        paastand(fane + ": boblen dækker ikke det, han peger på", daekOk, note);
+        paastand(fane + ": armen er løftet mod det, der blinker", sim.laerer.arm < NK.Kemichael.HAENGER - 0.5, sim.laerer.arm);
+        paastand(fane + ": sidste trin hedder Afslut", /Afslut/.test(boble.querySelector(".intro-naeste").textContent));
+        boble.querySelector(".intro-naeste").click();
         koerTid(sim, 3);
-        paastand(fane + ": præsentationen starter med K og kan springes over", inde && knapVist && !sim.laererIIntro());
+        paastand(fane + ": Afslut sender ham ud, og boblen og rammen forsvinder",
+            !sim.laererIIntro() && boble.hidden && NK.Fremhaev.synlige().length === 0 && sim.laerer.x < -100, sim.laerer.x);
+        sim.startIntro(true);
+        koerTid(sim, 2.5);
+        boble.querySelector(".intro-naeste").click();
+        koerTid(sim, 0.5);
+        var midt = sim.introStatus();
+        boble.querySelector(".intro-spring").click();
+        koerTid(sim, 3);
+        paastand(fane + ": Spring over stopper den midt i (trin 2)", !!midt && midt.nr === 1 && !sim.laererIIntro() && boble.hidden && NK.Fremhaev.synlige().length === 0);
     }
+    /* Taleboblen paa laerredet tegnes efter alt andet (ros og paaskeaeg) */
+    var kildeF = NK.SimForsoeg.prototype.tegn.toString(), kildeR = NK.SimRaekken.prototype.tegn.toString();
+    paastand("fane 1 og 2 tegner hans taleboble allersidst", /laererTegnBoble\(ctx\);\s*}\s*$/.test(kildeF) && /laererTegnBoble\(ctx\);\s*}\s*$/.test(kildeR));
 
     /* ----------------------------------------------------------------- */
     overskrift("Layoutet");

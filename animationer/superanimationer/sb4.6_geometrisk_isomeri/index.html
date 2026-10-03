@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geometrisk isomeri</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⇅</span> Geometrisk isomeri</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-dr" role="tab" aria-selected="true"><span class="nr">1</span>Dobbeltbindingen</button>
+        <button class="faneknap" data-fane="fane-pr" role="tab" aria-selected="false"><span class="nr">2</span>Prioriteten</button>
+        <button class="faneknap" data-fane="fane-sp" role="tab" aria-selected="false"><span class="nr">3</span>E eller Z?</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: DOBBELTBINDINGEN                                           -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-dr" role="tabpanel" aria-label="Dobbeltbindingen">
+    <div class="scene">
+        <canvas id="dr-laerred"></canvas>
+        <div class="anker" id="dr-anker-model"></div>
+        <!-- Knapperne til opgaven (js/sim_drej.js) -->
+        <div class="scene-valg" id="dr-valg" hidden></div>
+
+        <div class="statuslinje" id="dr-status">
+            <p class="st-tekst" id="dr-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="dr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="dr-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="dr-kort">
+            <h2><span id="dr-titel">Opgave</span><span class="taeller">opgave <b id="dr-nr">1</b>/<span id="dr-antal">6</span></span></h2>
+            <div id="dr-prompt"></div>
+        </div>
+
+        <div class="kort" id="dr-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="dr-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="dr-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: PRIORITETEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-pr" role="tabpanel" aria-label="Prioriteten">
+    <div class="scene">
+        <canvas id="pr-laerred"></canvas>
+        <div class="anker" id="pr-anker-tavle"></div>
+        <div class="anker" id="pr-anker-palet"></div>
+        <div class="scene-valg" id="pr-valg"></div>
+
+        <div class="statuslinje" id="pr-status">
+            <p class="st-tekst" id="pr-besked" aria-live="polite"></p>
+            <button class="forfraknap" id="pr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            <button class="knap hjaelp" id="pr-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="pr-kort">
+            <h2><span id="pr-titel">Opgave</span><span class="taeller">opgave <b id="pr-nr">1</b>/<span id="pr-antal">12</span></span></h2>
+            <div id="pr-prompt"></div>
+        </div>
+
+        <div class="kort maaling" id="pr-zkort">
+            <h2>Atomnumre</h2>
+            <div class="zliste">
+                <span><b>H</b>1</span><span><b>C</b>6</span><span><b>N</b>7</span><span><b>O</b>8</span>
+                <span><b>F</b>9</span><span><b>Cl</b>17</span><span><b>Br</b>35</span><span><b>I</b>53</span>
+            </div>
+        </div>
+
+        <div class="kort" id="pr-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="pr-loest">0</b>/12</span></h2>
+            <div class="opg-liste" id="pr-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: SPILLET                                                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-sp" role="tabpanel" aria-label="E eller Z?">
+    <div class="scene">
+        <canvas id="sp-laerred"></canvas>
+        <div class="anker" id="sp-anker-tavle"></div>
+        <div class="scene-valg" id="sp-valg">
+            <button class="valgknap stor-bogstav" type="button" data-svar="E" title="E: på hver sin side (tast E)">E</button>
+            <button class="valgknap stor-bogstav" type="button" data-svar="Z" title="Z: på samme side (tast Z)">Z</button>
+            <button class="valgknap" type="button" data-svar="ingen" title="Tast I">Ingen E/Z-isomeri</button>
+        </div>
+
+        <div class="statuslinje" id="sp-status">
+            <p class="st-tekst" id="sp-besked" aria-live="polite"></p>
+            <button class="knap videre" id="sp-knap" type="button">Start spillet</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="sp-pointkort">
+            <h2>Point</h2>
+            <div class="pointgitter">
+                <div><span class="pg-etiket">Point</span><span class="pg-tal" id="sp-score">0</span></div>
+                <div><span class="pg-etiket">Stime</span><span class="pg-tal" id="sp-stime">0</span></div>
+                <div><span class="pg-etiket">Molekyle</span><span class="pg-tal" id="sp-runde">–</span></div>
+                <div><span class="pg-etiket">Rekord</span><span class="pg-tal" id="sp-rekord">0</span></div>
+            </div>
+            <p class="note-tekst" style="margin-top:10px;">Rigtigt svar: 50 point. Bonus: under 2 s +50, under 3 s +30, under 4 s +20, under 10 s +10.</p>
+        </div>
+
+        <div class="kort" id="sp-rangkort">
+            <h2>Rang</h2>
+            <div class="rangliste">
+                <div><span>Laborant</span><b>700</b></div>
+                <div><span>Kemiker</span><b>1000</b></div>
+                <div><span>Professor</span><b>1150</b></div>
+                <div><span>Nobelpris-kandidat</span><b>1350</b></div>
+            </div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Geometrisk isomeri (E/Z)</h2>
+        <p>En enkeltbinding kan drejes frit. En dobbeltbinding kan ikke: så skulle den ene af de to bindinger brydes. Derfor kan grupperne på hver side af en dobbeltbinding sidde på to måder, og det er to forskellige stoffer med hver sit kogepunkt.</p>
+        <p>Det kræver, at begge C-atomer i dobbeltbindingen har to forskellige grupper. Har det ene C-atom to ens grupper, fx to H, er der kun én form.</p>
+        <h3 class="teori-hoved">Prioriteten på hvert C-atom</h3>
+        <ol class="teori-trin">
+            <li>Se på det atom, der sidder direkte på C-atomet. Det højeste atomnummer vinder: Br (35) slår Cl (17), og Cl slår C (6).</li>
+            <li>Er det det samme atom, ser man på de atomer, der sidder på det, det største først. CH₂CH₃ har C, H, H og slår CH₃ med H, H, H. En C=O tæller som to O.</li>
+        </ol>
+        <h3 class="teori-hoved">E og Z</h3>
+        <p><b>Z</b> (zusammen, sammen): de to grupper med højest prioritet sidder på samme side af dobbeltbindingen. <b>E</b> (entgegen, modsat): de sidder på hver sin side.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: but-2-en</span>
+            På begge C-atomer slår CH₃ (C, 6) H (1). Sidder de to CH₃ på samme side, er det (Z)-but-2-en. Det kaldes også cis-but-2-en.
+        </div>
+        <p>Cis og trans bruges kun, når de to C-atomer har en gruppe, der er ens. E og Z virker altid, og Z er ikke altid det samme som cis: sidder to CH₃ på samme side, men vinder Br over CH₃ på det ene C-atom, er det E.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>E</kbd> <kbd>Z</kbd> <kbd>I</kbd> svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ez.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_drej.js"></script>
+<script src="js/sim_prioritet.js"></script>
+<script src="js/sim_spil.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

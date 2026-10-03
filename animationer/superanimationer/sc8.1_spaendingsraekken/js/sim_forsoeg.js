@@ -204,7 +204,11 @@
             st.x = p.x;
             st.top = p.top;
             st.bane.shift();
-            if (!st.bane.length) st.fase = st.glas >= 0 ? "i" : "hjemme";
+            if (!st.bane.length) {
+                st.fase = st.glas >= 0 ? "i" : "hjemme";
+                /* Hjemme i holderen staar der en hel stang igen */
+                if (st.fase === "hjemme") st.taeret = null;
+            }
         } else {
             st.x += dx / d * skridt;
             st.top += dy / d * skridt;
@@ -325,7 +329,6 @@
             valg: NK.el("fs-valg")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
-        NK.el("fs-spring").addEventListener("click", function () { mig.springIntro(); });
         NK.el("fs-nulstil").addEventListener("click", function () { mig.nulstil(); });
     };
 
@@ -451,6 +454,7 @@
             st.top = p.top;
             st.bane = [];
             st.fase = st.glas >= 0 ? "i" : "hjemme";
+            if (st.fase === "hjemme") st.taeret = null;
         });
 
         var h = lay.holder, gs = lay.glas;
@@ -483,6 +487,15 @@
                 g.tid += dt;
                 var reag = K.reagerer(st.metal, g.ion);
                 if (reag) g.x = 0.75 * (1 - Math.exp(-g.tid / K.tau(st.metal, g.ion)));
+                /* I syren bliver stangen tyndere. Det bliver den ved med
+                   at vaere, til den staar i holderen igen (flytStang). */
+                if (reag && K.STOF[g.ion].gas && lay) {
+                    var gs = lay.glas[gi];
+                    st.taeret = {
+                        x: Math.max(g.x / 0.75, st.taeret ? st.taeret.x : 0),
+                        del: (st.top + lay.stang.l - gs.overflade) / lay.stang.l
+                    };
+                }
                 if (g.tid >= D.SYNLIG && !g.noteret) {
                     g.noteret = true;
                     Skema.saet(st.metal, g.ion, reag);
@@ -495,7 +508,8 @@
                         g.boble -= 1;
                         var side = Math.random() < 0.5 ? -1 : 1;
                         g.bobler.push({
-                            x: st.x + side * (lay.stang.b / 2 + 1.5), y: NK.r(gm.overflade + 8, st.top + lay.stang.l - 4),
+                            x: st.x + side * (lay.stang.b / 2 - Tg.taeretInd(lay.stang.b, g.x / 0.75) + 1.5),
+                            y: NK.r(gm.overflade + 8, st.top + lay.stang.l - 4),
                             r: NK.r(2, 4.4) * gm.k * 2, vy: -NK.r(40, 75) * gm.k * 2, a: 1
                         });
                     }
@@ -552,7 +566,8 @@
         };
         var over = this.over && this.over.slags === "stang" && this.over.n === st.n;
         v.lys = st.n === this.valgt || (this.traek && this.traek.n === st.n) ? 1 : (over ? 0.5 : 0);
-        if (this.pegStaenger && st.glas < 0) v.lys = 0.6 + 0.4 * Math.sin(this.tid * 6);
+        /* Taeret i syren: den del af stangen, der stod under overfladen */
+        if (st.taeret) v.taeret = { x: st.taeret.x, fra: st.top + lay.stang.l * (1 - st.taeret.del) };
         if (gi >= 0 && st.fase === "i") {
             var g = this.glas[gi], gm = lay.glas[gi];
             v.klemme = gm.top + 4;
@@ -623,6 +638,9 @@
             if (mig.iGlas(st, st.glas) || mig.iGlas(st, st.fraGlas)) return;
             Tg.stang(ctx, mig.stangTegning(st));
         });
+
+        /* Hans taleboble allersidst, saa intet daekker den */
+        if (this.laererTegnBoble) this.laererTegnBoble(ctx);
     };
 
     /* ----- Musen --------------------------------------------------------------------------- */
@@ -769,9 +787,6 @@
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
     NK.Praesentation.kobl(P, { noegle: "nk-sc8.1-intro-forsoeg", tilbud: "fs-tilbud", spring: "fs-spring" });
-
-    /* Mens han siger, hvad man goer, lyser stængerne i holderen */
-    P.pegPaaFelt = function (til) { this.pegStaenger = til; };
 
     NK.SimForsoeg = SimForsoeg;
 }());

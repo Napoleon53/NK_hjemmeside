@@ -244,7 +244,7 @@
         D.MANGAN.forEach(function (m) {
             var f = D.FARVE[m.farve];
             t += '<div class="fx-farve' + (medSvar && m.f === rigtig ? " rigtig" : "") + '"><span class="fx-prik" style="background:rgb(' +
-                f[0] + "," + f[1] + "," + f[2] + ')"></span><b>' + X.stof(m.f).tekst + "</b><span>" + h(m.tekst) + "</span></div>";
+                f[0] + "," + f[1] + "," + f[2] + ')"></span><b>' + X.stof(m.f).tekst + "</b><span>" + h(m.navn + ", " + m.tekst) + "</span></div>";
         });
         t += "</div>";
         var m = D.MANGAN.filter(function (x) { return x.f === rigtig; })[0];
