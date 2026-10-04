@@ -10,6 +10,7 @@
      laast       er svaret laast
      udfald      "rigtig" eller "forkert", naar svaret er laast
      fjernet     hvilke svar en livline har taget vaek
+     publikum    publikums stemmer i procent, naar de er spurgt
      livliner    hvilke livliner der er brugt
      slut        null, "vundet", "tabt" eller "stoppet"
      gevinst     det, eleven gaar hjem med
@@ -100,7 +101,8 @@
                 laast: false,
                 udfald: null,
                 fjernet: [false, false, false, false],
-                livliner: { halv: false, fjern: false, byt: false },
+                livliner: { halv: false, publikum: false, byt: false },
+                publikum: null,
                 slut: null,
                 gevinst: 0
             };
@@ -154,6 +156,7 @@
             S.laast = false;
             S.udfald = null;
             S.fjernet = [false, false, false, false];
+            S.publikum = null;
             husk(S.spoergsmaal[S.nr]);
             return true;
         },
@@ -169,11 +172,11 @@
 
         forkerteTilbage: forkerteTilbage,
 
-        /* Kan livlinen bruges nu? To vaek og Én vaek spaerres, naar der kun
-           er ét forkert svar tilbage: ellers ville de afsloere svaret. */
+        /* Kan livlinen bruges nu? */
         kan: function (S, navn) {
             if (S.slut || S.laast || S.livliner[navn]) return false;
             if (navn === "byt") return Spil.erstatning(S).length > 0;
+            if (navn === "publikum") return true;
             return forkerteTilbage(S).length >= 2;
         },
 
@@ -186,11 +189,38 @@
             return true;
         },
 
-        /* Én vaek */
-        fjern: function (S) {
-            if (!Spil.kan(S, "fjern")) return false;
-            tagVaek(S, [NK.tilfaeldig(forkerteTilbage(S))]);
-            S.livliner.fjern = true;
+        /* Publikums stemmer i procent, én pr. svar (0 for et fjernet svar).
+           Foerst traekkes, hvor godt publikum rammer (D.PUBLIKUM), saa faar
+           det rigtige svar et tal i det spaend, og resten deles tilfaeldigt
+           mellem de forkerte svar, der staar tilbage. */
+        stemmer: function (rigtig, forkerte) {
+            var r = Math.random(), sum = 0, k = D.PUBLIKUM[D.PUBLIKUM.length - 1];
+            for (var i = 0; i < D.PUBLIKUM.length; i++) {
+                sum += D.PUBLIKUM[i].andel;
+                if (r < sum) { k = D.PUBLIKUM[i]; break; }
+            }
+            var ud = [0, 0, 0, 0];
+            ud[rigtig] = Math.round(k.fra + Math.random() * (k.til - k.fra));
+            if (!forkerte.length) { ud[rigtig] = 100; return ud; }
+            var rest = 100 - ud[rigtig];
+            var vaegt = forkerte.map(function () { return Math.random(); });
+            var ialt = vaegt.reduce(function (a, b) { return a + b; }, 0) || 1;
+            var dele = vaegt.map(function (v) { return rest * v / ialt; });
+            var brugt = 0;
+            forkerte.forEach(function (nr, j) { ud[nr] = Math.floor(dele[j]); brugt += ud[nr]; });
+            /* de sidste procent gaar til dem, der blev rundet mest ned */
+            var orden = forkerte.map(function (nr, j) { return j; }).sort(function (a, b) {
+                return (dele[b] - Math.floor(dele[b])) - (dele[a] - Math.floor(dele[a]));
+            });
+            for (var n = 0; brugt < rest; n++, brugt++) ud[forkerte[orden[n % orden.length]]]++;
+            return ud;
+        },
+
+        /* Spoerg publikum */
+        publikum: function (S) {
+            if (!Spil.kan(S, "publikum")) return false;
+            S.publikum = Spil.stemmer(S.spoergsmaal[S.nr].rigtig, forkerteTilbage(S));
+            S.livliner.publikum = true;
             return true;
         },
 
@@ -209,6 +239,7 @@
             S.spoergsmaal[S.nr] = ny;
             S.valgt = null;
             S.fjernet = [false, false, false, false];
+            S.publikum = null;
             S.livliner.byt = true;
             husk(ny);
             return true;

@@ -209,7 +209,8 @@ async function tests() {
     paastand("15 rigtige svar giver en million", S.slut === "vundet" && S.gevinst === 1000000);
 
     /* Livlinerne, mange gange, fordi de traekker tilfaeldigt */
-    var halvOk = true, fjernOk = true, sammenOk = true, bytOk = true, engangOk = true;
+    var halvOk = true, pubOk = true, sammenOk = true, bytOk = true, engangOk = true;
+    function sum(p) { return p[0] + p[1] + p[2] + p[3]; }
     for (n = 0; n < 60; n++) {
         var a = Spil.nyt(), q = Spil.aktuelt(a);
         Spil.vaelg(a, forkert(a));
@@ -217,29 +218,48 @@ async function tests() {
         var tilbage = [0, 1, 2, 3].filter(function (i) { return !a.fjernet[i]; });
         if (tilbage.length !== 2 || tilbage.indexOf(q.rigtig) < 0) halvOk = false;
         if (a.valgt !== null && a.fjernet[a.valgt]) halvOk = false;
-        if (Spil.kan(a, "fjern") || Spil.fjern(a)) sammenOk = false;
         if (Spil.halv(a)) engangOk = false;
+        /* publikum efter To vaek: kun de to svar, der staar tilbage, faar stemmer */
+        Spil.publikum(a);
+        if (sum(a.publikum) !== 100 || a.publikum.some(function (p, i) { return a.fjernet[i] && p !== 0; })) sammenOk = false;
+        if (Spil.publikum(a)) engangOk = false;
 
-        var b = Spil.nyt(), qb = Spil.aktuelt(b);
-        Spil.fjern(b);
-        var tb = [0, 1, 2, 3].filter(function (i) { return !b.fjernet[i]; });
-        if (tb.length !== 3 || tb.indexOf(qb.rigtig) < 0) fjernOk = false;
-        Spil.halv(b);
-        tb = [0, 1, 2, 3].filter(function (i) { return !b.fjernet[i]; });
-        if (tb.length !== 2 || tb.indexOf(qb.rigtig) < 0) sammenOk = false;
+        var b = Spil.nyt();
+        Spil.publikum(b);
+        if (sum(b.publikum) !== 100 || b.publikum.some(function (p) { return p < 0 || p > 100 || p !== Math.round(p); })) pubOk = false;
+        if (b.fjernet.some(function (x) { return x; })) pubOk = false;
 
         var c = Spil.nyt(), foer = Spil.aktuelt(c).id, alle = c.spoergsmaal.map(function (x) { return x.id; });
-        Spil.fjern(c);
+        Spil.halv(c);
+        Spil.publikum(c);
         Spil.byt(c);
         var ny = Spil.aktuelt(c);
         if (ny.id === foer || alle.indexOf(ny.id) >= 0 || D.TRIN[0].kap.indexOf(ny.kap) < 0) bytOk = false;
-        if (c.fjernet.some(function (x) { return x; })) bytOk = false;
+        if (c.fjernet.some(function (x) { return x; }) || c.publikum !== null) bytOk = false;
         if (Spil.byt(c)) engangOk = false;
     }
     paastand("To væk lader det rigtige og ét forkert svar stå", halvOk);
-    paastand("Én væk fjerner ét forkert svar", fjernOk);
-    paastand("de to livliner sammen efterlader altid ét forkert svar, så svaret ikke afsløres", sammenOk);
-    paastand("Nyt spørgsmål giver et nyt fra samme trin, og de fjernede svar kommer igen", bytOk);
+    paastand("Spørg publikum giver fire hele procenter, der tilsammen er 100, og fjerner intet", pubOk);
+    paastand("efter To væk stemmer publikum kun på de to svar, der står tilbage", sammenOk);
+    paastand("Nyt spørgsmål giver et nyt fra samme trin, og fjernede svar og stemmer er væk", bytOk);
+
+    /* Fordelingen: 40.000 afstemninger mod brugerens tal */
+    var grupper = [0, 0, 0, 0], flest = 0, ANTAL = 40000, yderOk = true;
+    for (n = 0; n < ANTAL; n++) {
+        var p = Spil.stemmer(2, [0, 1, 3]);
+        if (sum(p) !== 100) yderOk = false;
+        var r = p[2];
+        if (r > 50) grupper[0]++; else if (r > 40) grupper[1]++; else if (r >= 20) grupper[2]++; else grupper[3]++;
+        if (r >= p[0] && r >= p[1] && r >= p[3]) flest++;
+    }
+    var andel = grupper.map(function (g) { return g / ANTAL; });
+    paastand("hver afstemning giver 100 % i alt", yderOk);
+    paastand("det rigtige svar får over 50 % i ca. 60 % af afstemningerne (" + (andel[0] * 100).toFixed(1) + " %)", Math.abs(andel[0] - 0.60) < 0.03);
+    paastand("40 til 50 % i ca. 10 % (" + (andel[1] * 100).toFixed(1) + " %)", Math.abs(andel[1] - 0.10) < 0.025);
+    paastand("20 til 40 % i ca. 25 % (" + (andel[2] * 100).toFixed(1) + " %)", Math.abs(andel[2] - 0.25) < 0.03);
+    paastand("under 20 % i ca. 5 % (" + (andel[3] * 100).toFixed(1) + " %)", Math.abs(andel[3] - 0.05) < 0.015);
+    paastand("publikum peger oftest, men ikke altid, på det rigtige svar (" + (flest / ANTAL * 100).toFixed(0) + " %)", flest / ANTAL > 0.6 && flest / ANTAL < 0.95);
+    paastand("sandsynlighederne i D.PUBLIKUM giver 100 %", Math.abs(D.PUBLIKUM.reduce(function (s, k) { return s + k.andel; }, 0) - 1) < 1e-9);
     paastand("hver livline kan kun bruges én gang", engangOk);
 
     /* Nye spoergsmaal i naeste spil */
@@ -339,13 +359,17 @@ async function tests() {
     Array.prototype.forEach.call(d.querySelectorAll(".livline"), function (k) { liner[k.getAttribute("data-livline")] = k; });
     liner.halv.click();
     paastand("To væk fjerner to svar på brættet", d.querySelectorAll(".svar.fjernet").length === 2 && liner.halv.classList.contains("brugt") && liner.halv.disabled);
-    paastand("Én væk er spærret, når der kun er ét forkert svar tilbage", liner.fjern.disabled && !liner.fjern.classList.contains("brugt"));
+    liner.publikum.click();
+    var viste = Array.prototype.filter.call(d.querySelectorAll(".svar .stemmer"), function (e) { return !e.hidden; });
+    paastand("Spørg publikum viser procenter på de to svar, der står tilbage, og de giver 100", viste.length === 2 &&
+        viste.reduce(function (s, e) { return s + parseInt(e.textContent, 10); }, 0) === 100 && liner.publikum.classList.contains("brugt"));
     var foerId = Spil.aktuelt(S).id;
     tast("7");
     await fremme();
     paastand("7 bytter spørgsmålet, og alle fire svar står der igen", Spil.aktuelt(S).id !== foerId && d.querySelectorAll(".svar.fjernet").length === 0 && liner.byt.classList.contains("brugt"));
+    paastand("det nye spørgsmål har ingen stemmer", Array.prototype.every.call(d.querySelectorAll(".svar .stemmer"), function (e) { return e.hidden; }));
     tast("6");
-    paastand("6 fjerner ét svar", d.querySelectorAll(".svar.fjernet").length === 1 && liner.fjern.classList.contains("brugt"));
+    paastand("6 spørger kun publikum én gang", A.spil().publikum === null);
     var bogstav = "abcd".charAt(Spil.aktuelt(S).rigtig);
     tast(bogstav);
     paastand("bogstavet vælger svaret", S.valgt === Spil.aktuelt(S).rigtig);
@@ -414,7 +438,7 @@ async function tests() {
         paastand("browseren kan regne lyd ud", false);
     } else {
         var navne = Object.keys(L.SYNTESE);
-        paastand("elleve lyde er lavet i koden", navne.length === 11, navne.join(", "));
+        paastand("tretten lyde er lavet i koden", navne.length === 13, navne.join(", "));
         for (n = 0; n < navne.length; n++) {
             var navn = navne[n];
             var r = await regn(navn === "vundet" ? 6 : 4.5, function (c) { L.SYNTESE[navn](c, c.destination, [], 0.02, navn === "spaending" ? 3.2 : 1); });

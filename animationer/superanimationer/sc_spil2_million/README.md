@@ -11,7 +11,7 @@ lækkere", og et spørgsmål om musikken fra tv-programmet.
 
 1. **Pointen i én sætning.** Eleven finder fagordet til en beskrivelse, 15 gange
    i træk, og hvert rigtigt svar er et trin op ad stigen.
-2. **Hvad den afløser.** `kemi-c-filer/c_spil2_million.html`. Alt derfra er med:
+2. **Hvad den afløser.** `kemi-c-filer/c_spil2_million.html` (nu i `arkiv/`). Alt derfra er med:
    de 70 spørgsmål fra Fagordsquiz for Kemi C, de 15 beløb, de sikre beløb ved
    spørgsmål 5 og 10, sværhedsgraden efter kapitel, de tre livliner, Lås svaret,
    Stop med et ekstra spørgsmål, sejrsskærmen med titlen Superkemiker og den
@@ -42,6 +42,17 @@ lækkere", og et spørgsmål om musikken fra tv-programmet.
 * **Lyd** og musik, se nedenfor.
 * **Uden Kemichael.** Hjælpen står i statuslinjen under scenen, og den ene store
   knap skifter fra Lås svaret til Næste spørgsmål.
+
+## Livlinerne (4. okt. 2026)
+
+Brugeren bad om Spørg publikum i stedet for Én væk. Livlinerne er nu To væk
+(50:50), Spørg publikum og Nyt spørgsmål. Publikums stemmer står som en lille
+søjle med procent i hvert svar. Hvor godt publikum rammer, står i `D.PUBLIKUM` i
+`js/data.js` (brugerens tal): i 60 % af tilfældene får det rigtige svar 50 til
+90 %, i 10 % får det 40 til 50 %, i 25 % får det 20 til 40 %, og i 5 % får det
+under 20 %. Resten deles tilfældigt mellem de forkerte svar, der står tilbage.
+Brugerens fire tal gav 95 %; de sidste 5 % er lagt til den øverste linje. Hvor
+der længere nede står Én væk, gælder Spørg publikum.
 
 ## Spørgsmålene
 
@@ -92,14 +103,25 @@ Under et spørgsmål spiller en baggrund:
 * **Med filer:** ligger `musik1.mp3`, `musik2.mp3` eller `musik3.mp3` i denne
   mappe, spilles filen i stedet: `musik1` til spørgsmål 1 til 5, `musik2` til 6
   til 10 og `musik3` til 11 til 15. Mangler en fil, bruges den nærmeste med
-  lavere nummer, så `musik1.mp3` alene dækker hele spillet. Mere skal der ikke
-  til end at lægge filen i mappen.
+  lavere nummer.
 
-Filen behøver ikke være klippet til en løkke: de sidste 2 sekunder toner over i
-starten (`D.MUSIK.kryds`). Musikken dæmpes, mens svaret er låst, holder pause,
-når svaret vises, og fortsætter, hvor den slap, ved næste spørgsmål. Styrken er
-`D.MUSIK.styrke`. Knappen med højttaleren og `M` slår al lyd til og fra, og
-valget huskes.
+**4. okt. 2026:** brugeren har lavet to numre i Suno. `musik1.mp3` dækker
+spørgsmål 1 til 10 (der er ingen `musik2.mp3`), og `musik3.mp3` tager over ved
+spørgsmål 11. Begge er klippet til løkker: `musik1` er 40 takter (96,0 s, 100,0
+slag i minuttet, uden nummerets første 8 takter og afslutningen), `musik3` er 56
+takter (134,8 s, 99,7 slag i minuttet, uden afslutningen). Den sidste takt i hver
+fil er en overgang, hvor den følgende takt toner ud og filens første toner ind,
+så filen kan gentages uden klik. Begge er sat til samme styrke (−18 dB).
+Originalerne og scriptet `lav_loekke.py` ligger i
+`C:\NK_Undervisning\Million-musik\`. Et nyt nummer skal klippes på samme måde,
+ellers høres afslutningen, hver gang filen gentages.
+
+Fra en server hentes filen som en lydbuffer og gentages uden pause. Åbnes spillet
+fra harddisken, bruges `<audio loop>`, som laver et lille hak ved gentagelsen.
+Musikken dæmpes, mens svaret er låst, holder pause, når svaret vises, og
+fortsætter, hvor den slap, ved næste spørgsmål. Styrken er `D.MUSIK.styrke`
+(0,4, sat efter tal, ikke efter øret). Knappen med højttaleren og `M` slår al
+lyd til og fra, og valget huskes.
 
 ## Filer
 
@@ -158,15 +180,7 @@ Slutlinjen er "ALT OK" eller "N FEJL". Den skal køres over en lille server med
 
 ## Menuen
 
-**Ikke i menuen endnu.** Den gamle `c_spil2_million.html` står stadig som spil
-nr. 2. Når brugeren siger til:
-
-1. I `kemi-c-filer/samling_c_spil.html` rettes knap 2 til
-   `visAnimation(this, '../superanimationer/sc_spil2_million/index.html')`.
-   `data-emne="spil.million"` ændres ikke.
-2. Den gamle flyttes med `git mv` til
-   `kemi-c-filer/arkiv/c_spil_million_oldversion.html`.
-3. Kolonnen "I menuen" rettes i `../README.md`, og linjen om de to gamle
-   enkeltfiler rettes til én (`c_spil8_escaperoom.html`).
-
-`FEEDBACK_EMNER` i `samling_alt.html` har allerede Kemi-Millionær som nr. 2.
+I menuen fra 4. oktober 2026: knap nr. 2 i `kemi-c-filer/samling_c_spil.html`
+(`data-emne="spil.million"`, uændret, så gamle links til menuen holder). Den gamle
+ligger i `kemi-c-filer/arkiv/c_spil_million_oldversion.html`. `FEEDBACK_EMNER` i
+`samling_alt.html` havde allerede Kemi-Millionær som nr. 2.

@@ -15,7 +15,7 @@ holder styr på brættet, pointene og tiden. Hører til kategorien Spil
    + og − under hvert hold, Daily Double med indsats, Final med indsatser og
    tænketid, uret og de seks lyde. Makroerne, indstillingssiderne og
    Excel-importen er ikke med: quizzen er data i `js/data.js`.
-3. **Naboerne.** Kemi-Millionær (`c_spil2_million.html`) ejer quizzen med
+3. **Naboerne.** Kemi-Millionær (`sc_spil2_million`) ejer quizzen med
    svarmuligheder og jokere. Her er der ingen svarmuligheder: holdene svarer
    selv, og læreren dømmer.
 4. **Loftet.** Én quiz pr. niveau (C og B), én runde med 6 × 5 felter, én Daily

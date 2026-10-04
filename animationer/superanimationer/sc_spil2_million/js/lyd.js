@@ -7,13 +7,13 @@
 
    Under et spoergsmaal spiller en baggrund:
      - Ligger musik1.mp3, musik2.mp3 eller musik3.mp3 i spillets mappe
-       (D.MUSIK), spilles filen i loekke. Enden toner over i starten.
+       (D.MUSIK), spilles filen i loekke.
      - Ellers spiller spillets egen baggrund: en dyb tone og et
        hjerteslag. Tonen stiger en halv tone for hvert spoergsmaal, og
        hjerteslaget bliver hurtigere for hvert trin.
 
-   Filerne hentes med <audio>, ikke med fetch, saa det virker paa
-   file://. Browseren spiller foerst lyd, naar der er klikket paa siden.
+   Fra harddisken (file://) spilles filerne med <audio>, fordi fetch ikke
+   virker der. Browseren spiller foerst lyd, naar der er klikket paa siden.
 
      NK.Spillyd.spil(navn, data)  en lyd; giver et haandtag med stop(fade)
      NK.Spillyd.seng(trin, nr)    baggrunden til spoergsmaal nr; null stopper
@@ -206,6 +206,17 @@
             slag(c, ud, noder, t, 0.5);
         },
 
+        /* Naar der er musik fra filer, er udfaldet kun en lille klokke eller et
+           blødt dunk, saa lyden ikke slaas med musikken */
+        rigtigtBloed: function (c, ud, noder, t) {
+            tone(c, ud, noder, t, mtof(91), 0.5, { type: "sine", styrke: 0.06, anslag: 0.005 });
+            tone(c, ud, noder, t + 0.09, mtof(98), 0.7, { type: "sine", styrke: 0.05, anslag: 0.005 });
+        },
+
+        forkertBloed: function (c, ud, noder, t) {
+            tone(c, ud, noder, t, 110, 0.5, { type: "sine", glid: 55, styrke: 0.16, anslag: 0.01 });
+        },
+
         /* En livline: et sus op og to klokker */
         livline: function (c, ud, noder, t) {
             stoej(c, ud, noder, t, 0.4, { frek: 500, glid: 4500, q: 2.5, styrke: 0.35, fald: 0.4 });
@@ -376,55 +387,105 @@
     }
 
     /* ----- Musik fra filer ---------------------------------------------- */
-    /* Hver fil har to <audio>: naar den ene er ved at vaere slut, begynder
-       den anden forfra, og de toner over i hinanden. */
+    /* Filerne er klippet til loekker (se README). Fra en server hentes filen
+       ind som en lydbuffer og gentages uden pause. Fra harddisken kan filen
+       ikke hentes med fetch; der bruges <audio loop>, som laver et lille hak,
+       hver gang filen begynder forfra. */
     var SPOR = [];
     var musikHentet = false;
     var ur = null;
+
+    function meldKlar(s) {
+        if (s.klar) return;
+        s.klar = true;
+        s.afgjort = true;
+        opdaterBund();
+        lyttere.forEach(function (f) { f(til); });
+    }
+
+    /* Filen findes ikke */
+    function meldMangler(s) {
+        s.afgjort = true;
+        opdaterBund();
+    }
+
+    /* Ved vi, om der er musikfiler? Indtil da spilles hverken fanfaren ved
+       start eller spillets egen baggrund, saa de ikke ligger oven i musikken,
+       naar den kommer et oejeblik efter. */
+    function musikAfgjort() {
+        return musikHentet && SPOR.every(function (s) { return s.afgjort; });
+    }
 
     function Spor(src) {
         var self = this;
         this.src = src;
         this.klar = false;
-        this.aktiv = 0;
+        this.afgjort = false;
         this.spiller = false;
         this.niveau = 0;
-        this.a = [new window.Audio(), new window.Audio()];
-        this.a.forEach(function (x) {
+        this.buffer = null;     /* lydbufferen, naar filen er hentet med fetch */
+        this.kilde = null;      /* den afspiller, der koerer nu */
+        this.styrke = null;     /* dens styrkeknap */
+        this.sted = 0;          /* hvor i filen musikken er naaet til (s) */
+        this.startet = 0;       /* kontekstens tid, da stedet var 0 */
+        this.lyd = null;        /* <audio>, naar filen ikke kan hentes med fetch */
+
+        if (window.location.protocol !== "file:" && window.fetch && kontekst()) {
+            window.fetch(src).then(function (r) {
+                if (!r.ok) throw new Error("ingen fil");
+                return r.arrayBuffer();
+            }).then(function (data) {
+                return new Promise(function (ok, fejl) { ctx.decodeAudioData(data, ok, fejl); });
+            }).then(function (buffer) {
+                self.buffer = buffer;
+                meldKlar(self);
+            }).catch(function () { meldMangler(self); });
+        } else {
+            var x = this.lyd = new window.Audio();
             x.preload = "auto";
+            x.loop = true;
             x.volume = 0;
             x._maal = 0;
             x._fart = 1;
-            x._pause = false;
-        });
-        this.a[0].addEventListener("canplaythrough", function () {
-            if (self.klar) return;
-            self.klar = true;
-            self.a[1].src = src;
-            opdaterBund();
-            lyttere.forEach(function (f) { f(til); });
-        });
-        this.a[0].addEventListener("error", function () { self.klar = false; });
-        this.a[0].src = src;
+            x.addEventListener("canplaythrough", function () { meldKlar(self); });
+            x.addEventListener("error", function () { self.klar = false; meldMangler(self); });
+            x.src = src;
+        }
     }
 
-    function afspil(x) {
-        var p = x.play();
-        if (p && p.then) p.then(null, function () { /* venter paa et klik */ });
-    }
-
+    /* Ind paa 2,5 s. Skrues der op eller ned undervejs, tager det 0,35 s. */
     Spor.prototype.start = function (niveau) {
-        var x = this.a[this.aktiv];
         var fraStille = !this.spiller;
         this.niveau = niveau;
-        if (fraStille) {
-            this.spiller = true;
-            afspil(x);
+        this.spiller = true;
+        if (this.buffer) {
+            var nu = ctx.currentTime;
+            if (fraStille) {
+                var g = ctx.createGain();
+                g.gain.setValueAtTime(0.0001, nu);
+                g.connect(ctx.destination);
+                var k = ctx.createBufferSource();
+                k.buffer = this.buffer;
+                k.loop = true;
+                k.connect(g);
+                k.start(nu, this.sted % this.buffer.duration);
+                this.startet = nu - this.sted;
+                this.kilde = k;
+                this.styrke = g;
+            }
+            var p = this.styrke.gain;
+            p.cancelScheduledValues(nu);
+            p.setValueAtTime(Math.max(0.0001, p.value), nu);
+            p.linearRampToValueAtTime(Math.max(0.0001, niveau), nu + (fraStille ? 2.5 : 0.35));
+            return;
         }
-        /* Ind paa 0,9 s. Skrues der op eller ned undervejs, tager det 0,35 s. */
+        var x = this.lyd;
+        if (fraStille) {
+            var loefte = x.play();
+            if (loefte && loefte.then) loefte.then(null, function () { /* venter paa et klik */ });
+        }
         x._maal = niveau;
-        x._fart = Math.max(0.05, Math.abs(niveau - x.volume)) / (fraStille ? 0.9 : 0.35);
-        x._pause = false;
+        x._fart = Math.max(0.05, Math.abs(niveau - x.volume)) / (fraStille ? 2.5 : 0.35);
         startUr();
     };
 
@@ -432,47 +493,46 @@
     Spor.prototype.stop = function (fade) {
         if (!this.spiller) return;
         this.spiller = false;
-        this.a.forEach(function (x) {
-            x._maal = 0;
-            x._fart = 1 / Math.max(0.05, fade);
-            x._pause = true;
-        });
+        if (this.buffer) {
+            var nu = ctx.currentTime, k = this.kilde, g = this.styrke;
+            this.sted = (nu + fade - this.startet) % this.buffer.duration;
+            g.gain.cancelScheduledValues(nu);
+            g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), nu);
+            g.gain.linearRampToValueAtTime(0.0001, nu + fade);
+            try { k.stop(nu + fade + 0.05); } catch (e) { /* allerede stoppet */ }
+            k.onended = function () { try { g.disconnect(); } catch (e) { /* ikke koblet */ } };
+            this.kilde = null;
+            this.styrke = null;
+            return;
+        }
+        this.lyd._maal = 0;
+        this.lyd._fart = 1 / Math.max(0.05, fade);
         startUr();
     };
 
+    /* Kun <audio>: styrken glider mod maalet, og ved 0 holder filen pause */
     Spor.prototype.tik = function (dt) {
-        var x = this.a[this.aktiv];
-        var kryds = D.MUSIK.kryds;
-        if (this.spiller && isFinite(x.duration)) {
-            if (x.duration > kryds * 3 && x.duration - x.currentTime <= kryds) {
-                var y = this.a[1 - this.aktiv];
-                try { y.currentTime = 0; } catch (e) { /* ikke klar */ }
-                y.volume = 0;
-                y._maal = this.niveau;
-                y._fart = Math.max(0.05, this.niveau) / kryds;
-                y._pause = false;
-                afspil(y);
-                x._maal = 0;
-                x._fart = Math.max(0.05, this.niveau) / kryds;
-                x._pause = true;
-                this.aktiv = 1 - this.aktiv;
-            } else if (x.ended) {
-                try { x.currentTime = 0; } catch (e) { /* ikke klar */ }
-                afspil(x);
-            }
+        var x = this.lyd;
+        if (!x) return false;
+        var d = x._maal - x.volume;
+        if (Math.abs(d) > 0.001) {
+            var skridt = Math.min(Math.abs(d), x._fart * dt);
+            x.volume = NK.klamp(x.volume + (d > 0 ? skridt : -skridt), 0, 1);
+            return true;
         }
-        var iGang = this.spiller;
-        this.a.forEach(function (lyd) {
-            var d = lyd._maal - lyd.volume;
-            if (Math.abs(d) > 0.001) {
-                var skridt = Math.min(Math.abs(d), lyd._fart * dt);
-                lyd.volume = NK.klamp(lyd.volume + (d > 0 ? skridt : -skridt), 0, 1);
-                iGang = true;
-            } else if (lyd._pause && lyd._maal === 0 && !lyd.paused) {
-                lyd.pause();
-            }
-        });
-        return iGang;
+        if (!this.spiller && !x.paused) x.pause();
+        return false;
+    };
+
+    Spor.prototype.tilstand = function () {
+        if (this.buffer) {
+            return { buffer: true, spiller: this.spiller, pause: !this.spiller,
+                tid: this.spiller ? (ctx.currentTime - this.startet) % this.buffer.duration : this.sted,
+                styrke: this.styrke ? this.styrke.gain.value : 0, laengde: this.buffer.duration };
+        }
+        var x = this.lyd;
+        if (!x) return { buffer: false, spiller: false, pause: true, tid: 0, styrke: 0, laengde: 0 };
+        return { buffer: false, spiller: this.spiller, pause: x.paused, tid: x.currentTime, styrke: x.volume, laengde: x.duration };
     };
 
     function startUr() {
@@ -509,11 +569,20 @@
             stopSeng(0.5);
             spor.start(NK.klamp(D.MUSIK.styrke, 0, 1) * daemp);
         } else if (o) {
-            startSeng(o.trin, o.nr);
+            if (musikAfgjort()) startSeng(o.trin, o.nr);
         } else {
             stopSeng(0.5);
         }
     }
+
+    /* Er der fundet mindst én musikfil? Saa spiller musikken hele spillet
+       igennem, og lydene traeder tilbage (brugerens oenske 4. okt. 2026). */
+    function harMusik() {
+        return SPOR.some(function (s) { return s.klar; });
+    }
+
+    /* null = lyden spilles ikke, naar der er musik; et navn = den bloede udgave */
+    var MED_MUSIK = { start: null, spaending: null, sikret: null, rigtigt: "rigtigtBloed", forkert: "forkertBloed" };
 
     /* ----- Det, spillet bruger ------------------------------------------ */
     NK.Spillyd = {
@@ -523,11 +592,18 @@
 
         spil: function (navn, data) {
             var h = { stop: function () {} };
+            var styrke = 0.9;
+            if (navn === "start" && !musikAfgjort()) return h;
+            if (harMusik()) {
+                if (MED_MUSIK[navn] === null) return h;
+                if (MED_MUSIK[navn]) navn = MED_MUSIK[navn];
+                styrke = 0.45;
+            }
             if (!til || !SYNTESE[navn]) return h;
             var c = kontekst();
             if (!c) return h;
             var hoved = c.createGain();
-            hoved.gain.value = 0.9;
+            hoved.gain.value = styrke;
             hoved.connect(c.destination);
             var noder = [];
             try { SYNTESE[navn](c, hoved, noder, c.currentTime + 0.02, data); } catch (e) { return h; }
@@ -553,6 +629,7 @@
 
         /* Filerne hentes, foerste gang et spil starter */
         hentMusik: hentMusik,
+        harMusik: harMusik,
 
         /* Hvilke filer der er fundet, og hvad de laver lige nu */
         musikTilstand: function () {
@@ -561,10 +638,7 @@
                 filer: klar,
                 kilde: klar.indexOf(true) >= 0 ? "filer" : "egen",
                 egen: !!seng && !seng.doer,
-                spor: SPOR.map(function (s) {
-                    var x = s.a[s.aktiv];
-                    return { spiller: s.spiller, aktiv: s.aktiv, tid: x.currentTime, styrke: x.volume, pause: x.paused };
-                })
+                spor: SPOR.map(function (s) { return s.tilstand(); })
             };
         },
 

@@ -202,7 +202,9 @@
         V.lys("spaending");
         var ms = D.TEMPO.spaending[Spil.trin(S.nr)];
         Lyd.spil("laas");
-        Lyd.daemp(0.3);
+        /* Spillets egen baggrund daempes i ventetiden. Musik fra filer spiller
+           uforstyrret videre gennem ventetiden og udfaldet. */
+        if (!Lyd.harMusik()) Lyd.daemp(0.3);
         spaendingslyd = Lyd.spil("spaending", ms / 1000);
         tegn();
         vent(ms, afsloerUdfald);
@@ -223,7 +225,7 @@
         optaget = false;
         vist = true;
         if (spaendingslyd) { spaendingslyd.stop(0.15); spaendingslyd = null; }
-        Lyd.seng(null);
+        if (!Lyd.harMusik()) Lyd.seng(null);
         Lyd.daemp(1);
         if (S.udfald === "rigtig") {
             var sikker = D.SIKRE.indexOf(S.nr) >= 0;
@@ -277,6 +279,7 @@
         optaget = false;
         skaerm = "slut";
         slutTid = Date.now();
+        Lyd.seng(null);
         var foer = rekord();
         slutData = {
             rosNr: Math.floor(Math.random() * D.ROS.da.length),
@@ -295,7 +298,7 @@
         Spil[navn](S);
         Lyd.spil("livline");
         if (navn === "byt") { nytSpoergsmaal(false, "sByt"); return; }
-        var noegle = navn === "halv" ? "sHalv" : "sFjern";
+        var noegle = navn === "halv" ? "sHalv" : "sPublikum";
         besked = function (t) { return { html: t[noegle] }; };
         tegn();
     }
@@ -369,7 +372,7 @@
         if (i < 0) i = "1234".indexOf(l);
         if (i >= 0) { vaelg(i); e.preventDefault(); return; }
         if (l === "5") { livline("halv"); e.preventDefault(); return; }
-        if (l === "6") { livline("fjern"); e.preventDefault(); return; }
+        if (l === "6") { livline("publikum"); e.preventDefault(); return; }
         if (l === "7") { livline("byt"); e.preventDefault(); return; }
         if (l === "s") { spoergStop(); e.preventDefault(); return; }
         if (l === "m") { Lyd.skift(); e.preventDefault(); return; }
@@ -420,6 +423,7 @@
         V.tekster(T(), sprog);
         V.lydknap(Lyd.til(), T());
         tegn();
+        Lyd.hentMusik();
     }
 
     /* Til selvtesten */

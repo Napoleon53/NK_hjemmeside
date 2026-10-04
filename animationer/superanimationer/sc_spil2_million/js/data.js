@@ -37,6 +37,18 @@
        (c_spil8_escaperoom.html), saa den maa ikke aendres. */
     D.TITEL = "Superkemiker";
 
+    /* ----- Spoerg publikum ---------------------------------------------- */
+    /* Hvor godt publikum rammer (brugerens tal 4. okt. 2026). andel er
+       sandsynligheden, og fra/til er den procent, det rigtige svar faar.
+       Resten deles tilfaeldigt mellem de forkerte svar. Brugerens fire tal
+       gav 95 %; de sidste 5 % er lagt til den oeverste linje. */
+    D.PUBLIKUM = [
+        { andel: 0.60, fra: 50, til: 90 },
+        { andel: 0.10, fra: 40, til: 50 },
+        { andel: 0.25, fra: 20, til: 40 },
+        { andel: 0.05, fra: 0, til: 20 }
+    ];
+
     /* ----- Tempo (millisekunder) --------------------------------------- */
     D.TEMPO = {
         foer: 650,                      /* spoergsmaalet staar alene */
@@ -49,12 +61,11 @@
     /* Ligger filerne i spillets mappe, spilles de under spoergsmaalene i
        stedet for spillets egen baggrundslyd: musik1 til spoergsmaal 1-5,
        musik2 til 6-10 og musik3 til 11-15. Mangler en fil, bruges den
-       naermeste med lavere nummer. Enden af filen toner over i starten
-       (kryds, i sekunder), saa filen ikke behoever vaere klippet til. */
+       naermeste med lavere nummer: uden musik2 daekker musik1 spoergsmaal
+       1 til 10. Filerne skal vaere klippet til loekker (se README). */
     D.MUSIK = {
         filer: ["musik1.mp3", "musik2.mp3", "musik3.mp3"],
-        styrke: 0.55,
-        kryds: 2.0
+        styrke: 0.4
     };
 
     /* ----- Kapitlerne -------------------------------------------------- */
@@ -291,11 +302,11 @@
             nyRekord: "Ny rekord",
             livliner: {
                 halv: { navn: "To væk", tip: "Fjerner to forkerte svar (5)" },
-                fjern: { navn: "Én væk", tip: "Fjerner ét forkert svar (6)" },
+                publikum: { navn: "Spørg publikum", tip: "Viser, hvad publikum ville svare (6)" },
                 byt: { navn: "Nyt spørgsmål", tip: "Bytter spørgsmålet ud med et andet, der er lige så svært (7)" }
             },
             brugt: "Livlinen er brugt.",
-            spaerret: "Kan ikke bruges, når der kun er ét forkert svar tilbage.",
+            spaerret: "Kan ikke bruges nu.",
             lydTil: "Lyden er til. Klik for at slå den fra (M)",
             lydFra: "Lyden er fra. Klik for at slå den til (M)",
             skiftSprog: "Switch to English",
@@ -315,7 +326,7 @@
             sForkert: function (svar) { return "Forkert. Det rigtige svar er <b>" + svar + "</b>."; },
             sPasserTil: function (ord, b) { return "<b>" + ord + "</b> passer til: “" + b + "”."; },
             sHalv: "To forkerte svar er fjernet.",
-            sFjern: "Ét forkert svar er fjernet.",
+            sPublikum: "Publikum har stemt. De har ikke altid ret.",
             sByt: "Spørgsmålet er byttet ud.",
             sStop: function (kr) { return "Svarer du forkert, går du hjem med <b>" + kr + "</b>"; },
 
@@ -333,7 +344,7 @@
                 ["Svaret", "Vælg et svar, og tryk <b>Lås svaret</b>. Først da gælder det, så du kan nå at vælge om."],
                 ["Sikre beløb", "Ved spørgsmål 5 og 10 er beløbet sikret. Svarer du senere forkert, går du hjem med det sikrede beløb. Svarer du forkert før spørgsmål 6, går du hjem med 0 kr."],
                 ["Stop", "Fra spørgsmål 2 kan du stoppe og tage det, du har vundet. Det skal ske, før du låser et svar."],
-                ["Livliner", "Hver livline kan bruges én gang. <b>To væk</b> (50:50) fjerner to forkerte svar. <b>Én væk</b> fjerner ét forkert svar. <b>Nyt spørgsmål</b> bytter spørgsmålet ud med et andet, der er lige så svært."]
+                ["Livliner", "Hver livline kan bruges én gang. <b>To væk</b> (50:50) fjerner to forkerte svar. <b>Spørg publikum</b> viser, hvor mange procent der ville vælge hvert svar. Publikum har oftest ret, men ikke altid. <b>Nyt spørgsmål</b> bytter spørgsmålet ud med et andet, der er lige så svært."]
             ],
             genvejeTitel: "Genveje",
             genveje: "<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> vælg svar &nbsp;·&nbsp; <kbd>Enter</kbd> lås og gå videre &nbsp;·&nbsp; <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> livliner &nbsp;·&nbsp; <kbd>S</kbd> stop &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>Esc</kbd> luk",
@@ -383,11 +394,11 @@
             nyRekord: "New record",
             livliner: {
                 halv: { navn: "Two gone", tip: "Removes two wrong answers (5)" },
-                fjern: { navn: "One gone", tip: "Removes one wrong answer (6)" },
+                publikum: { navn: "Ask the audience", tip: "Shows what the audience would answer (6)" },
                 byt: { navn: "New question", tip: "Swaps the question for another that is just as hard (7)" }
             },
             brugt: "The lifeline has been used.",
-            spaerret: "Cannot be used when only one wrong answer is left.",
+            spaerret: "Cannot be used now.",
             lydTil: "Sound is on. Click to turn it off (M)",
             lydFra: "Sound is off. Click to turn it on (M)",
             skiftSprog: "Skift til dansk",
@@ -406,7 +417,7 @@
             sForkert: function (svar) { return "Wrong. The correct answer is <b>" + svar + "</b>."; },
             sPasserTil: function (ord, b) { return "<b>" + ord + "</b> fits: “" + b + "”."; },
             sHalv: "Two wrong answers have been removed.",
-            sFjern: "One wrong answer has been removed.",
+            sPublikum: "The audience has voted. They are not always right.",
             sByt: "The question has been swapped.",
             sStop: function (kr) { return "If you answer wrong, you go home with <b>" + kr + "</b>"; },
 
@@ -423,7 +434,7 @@
                 ["The answer", "Choose an answer and press <b>Lock the answer</b>. Only then does it count, so you can still change your mind."],
                 ["Safe amounts", "At questions 5 and 10 the amount is safe. If you answer wrong later, you go home with the safe amount. If you answer wrong before question 6, you go home with 0 kr."],
                 ["Stop", "From question 2 you can stop and take what you have won. It must happen before you lock an answer."],
-                ["Lifelines", "Each lifeline can be used once. <b>Two gone</b> (50:50) removes two wrong answers. <b>One gone</b> removes one wrong answer. <b>New question</b> swaps the question for another that is just as hard."]
+                ["Lifelines", "Each lifeline can be used once. <b>Two gone</b> (50:50) removes two wrong answers. <b>Ask the audience</b> shows how many percent would choose each answer. The audience is usually right, but not always. <b>New question</b> swaps the question for another that is just as hard."]
             ],
             genvejeTitel: "Shortcuts",
             genveje: "<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> choose &nbsp;·&nbsp; <kbd>Enter</kbd> lock and continue &nbsp;·&nbsp; <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> lifelines &nbsp;·&nbsp; <kbd>S</kbd> stop &nbsp;·&nbsp; <kbd>M</kbd> sound &nbsp;·&nbsp; <kbd>H</kbd> tour &nbsp;·&nbsp; <kbd>Esc</kbd> close",

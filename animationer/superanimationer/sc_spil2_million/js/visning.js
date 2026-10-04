@@ -153,6 +153,17 @@
             k.classList.toggle("mat", tilstand.vist && i !== q.rigtig && !(S.laast && valgt));
             k.disabled = tilstand.stille || S.laast || !!S.fjernet[i] || i >= tilstand.afsloeret;
             k.setAttribute("aria-pressed", valgt ? "true" : "false");
+
+            /* publikums stemmer */
+            var st = k.querySelector(".stemmer");
+            var procent = S.publikum && !S.fjernet[i] ? S.publikum[i] : null;
+            st.hidden = procent === null;
+            if (procent !== null) {
+                st.querySelector("b").textContent = procent + " %";
+                st.querySelector("i").style.width = procent + "%";
+            } else {
+                st.querySelector("i").style.width = "0";
+            }
         }
     };
 

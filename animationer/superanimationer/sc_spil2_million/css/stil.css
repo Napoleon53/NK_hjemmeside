@@ -632,12 +632,45 @@ kbd {
 .svar:disabled { cursor: default; }
 
 .bogstav { flex-shrink: 0; color: var(--guld); font-size: 1.08rem; font-weight: 800; }
-.svartekst { min-width: 0; font-size: 1.1rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
+.svartekst { flex: 1 1 auto; min-width: 0; font-size: 1.1rem; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
 .svar.langt .svartekst { font-size: 0.98rem; }
 
 .svar:hover:not(:disabled) { background: linear-gradient(180deg, #ffffff 0%, #8fb2ff 50%, #ffffff 100%); }
 .svar:hover:not(:disabled) .rude-indre { background: linear-gradient(180deg, #2a4fc4 0%, #132a82 47%, #0c1c60 53%, #1c3aa6 100%); }
 .svar:focus-visible { outline: none; background: linear-gradient(180deg, var(--guld-lys), var(--guld) 50%, var(--guld-lys)); }
+
+/* Publikums stemmer: en lille soejle med procenten i */
+.stemmer {
+    position: relative;
+    flex: 0 0 88px;
+    height: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+
+.stemmer i {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: linear-gradient(180deg, #ffe17a, #e3a11a);
+    transition: width 0.7s ease;
+}
+
+.stemmer b {
+    position: relative;
+    display: block;
+    text-align: center;
+    font-size: 0.86rem;
+    line-height: 22px;
+    color: #ffffff;
+    text-shadow: 0 0 3px #000000, 0 1px 2px #000000;
+}
+
+.ll-soejler { width: 30px; height: 20px; fill: currentColor; }
 
 /* Svaret er ikke kommet frem endnu */
 .svar.venter .rude-indre > * { opacity: 0; }
