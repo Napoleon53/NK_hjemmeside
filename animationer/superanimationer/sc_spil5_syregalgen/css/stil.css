@@ -198,24 +198,60 @@ body {
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }
 
-.statuslinje {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 12px;
-    margin: 0 auto;
-    width: max-content;
-    max-width: calc(100% - 32px);
-    padding: 7px 16px;
+/* De forkerte bogstaver: seks pladser under ordet */
+.forkerte {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px 5px 14px;
     border-radius: 999px;
-    background-color: rgba(10, 12, 16, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.95rem;
-    text-align: center;
-    pointer-events: none;
+    background-color: rgba(10, 12, 16, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.statuslinje:empty { display: none; }
+.forkerte-tekst {
+    margin-right: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--tekst-svag);
+}
+
+.plads {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #16161b;
+}
+
+.plads.brugt { border-color: rgba(0, 0, 0, 0.3); box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5); }
+.plads.moerk { color: #ffffff; }
+.plads.ny { animation: vend 0.28s ease-out; }
+.plads.sidste { border-color: var(--roed); animation: sidste-plads 1.2s ease-out infinite; }
+
+@keyframes sidste-plads {
+    0%   { box-shadow: 0 0 0 0 rgba(224, 84, 70, 0.7); }
+    100% { box-shadow: 0 0 0 9px rgba(224, 84, 70, 0); }
+}
+
+/* Linjen til skaermlaesere. Den ses ikke. */
+.kun-oplaest {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
 
 /* ---------------------------------------------------------------------
    PANELET
@@ -471,6 +507,5 @@ kbd {
     .panel { border-left: none; border-top: 1px solid #1f1f27; overflow: visible; }
     .listenavn { display: none; }
     .tal { gap: 10px; font-size: 0.8rem; }
-    /* Karret fylder kun lidt her: linjen maa ikke daekke det */
-    .statuslinje { bottom: 6px; padding: 5px 12px; font-size: 0.85rem; max-width: calc(100% - 16px); }
+    .plads { width: 28px; height: 28px; font-size: 0.95rem; }
 }

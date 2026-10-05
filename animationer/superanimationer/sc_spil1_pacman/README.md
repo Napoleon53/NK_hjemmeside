@@ -97,45 +97,57 @@ bliver Labyrintmester, og mærket står på Mix i emnerne bagefter.
 | `js/lyd.js` | baggrundsmusikken: henter loopet, spiller det uden hak og følger pausen |
 | `js/app.js` | skærmene, knapperne, tastaturet og tegneløkken |
 | `sprites/titel.svg` | titlen på startskærmen (egen tegning) |
-| `musik/svaer.mp3` | musikken på Svær: et loop på 73 s klippet af brugerens Suno-sang |
-| `musik/kilde/` | den hele sang fra Suno og `byg_loop.py`, der klipper loopet (bruges ikke af spillet) |
+| `musik/mellem.mp3` | musikken på Mellem: et loop på 73 s af *Retro Maze Chase* |
+| `musik/svaer.mp3` | musikken på Svær: et loop på 143 s af *Matrix Clubbed to Death* |
+| `musik/kilde/` | de hele sange fra Suno og `byg_loop.py`, der klipper loopene (bruges ikke af spillet) |
 | `_selvtest.html` | balancen, reglerne, pausen, musikken, opgaverne, escaperoommet og sproget |
 
 ## Musikken
 
-Brugeren laver musikken i Suno (3. okt. 2026): orkestral big beat med arkadelyde, i
-stil med Clubbed to Death. Indtil videre har kun Svær en sang, *Retro Maze Chase*.
-Let og Mellem får deres egne senere; en sværhedsgrad uden linje i `D.MUSIK`
-(`js/data.js`) har ingen musik og ingen lydknap.
+Brugeren laver musikken i Suno: orkestral big beat i stil med Clubbed to Death.
+Mellem har *Retro Maze Chase* (lavet 3. okt. 2026 til Svær, flyttet til Mellem dagen
+efter), og Svær har *Matrix Clubbed to Death*, som brugeren fandt passede bedre til
+det sværeste niveau. Det er samme nummer, som Ionregn bruger (`Fast_music.mp3`). Let
+får sin egen senere; en sværhedsgrad uden linje i `D.MUSIK` (`js/data.js`) har ingen
+musik og ingen lydknap.
 
 Musikken spiller under opgaverne og på kortet Rigtigt. Den står stille sammen med
 spillet (pause, regler, rundvisning, skjult fane) og stopper på kortene Ingen liv
 tilbage og Tillykke og på startskærmen. Højttaleren i toplinjen eller M slår den til
-og fra, og valget huskes. Lydstyrken er `styrke` i `D.MUSIK`.
+og fra, og valget huskes. Lydstyrken er `styrke` i `D.MUSIK`; Sværs sang er 1,8 dB
+kraftigere end Mellems og står derfor lavere (0,33 mod 0,4), så de lyder lige højt.
 
-**Målt på sangen** (2:59, D-mol): tempoet er ca. 98,5 BPM og vandrer mellem 98,2 og
-98,7, altså ikke de 96, prompten bad om. De første 19,4 s er en stille intro uden
-bas, ved 154 s kommer et break, og sangen toner ud til sidst. Fra 19,4 s kører
-temaet i 30 takter, og ved 92,6 s begynder sangen selv forfra på temaet. Det stykke
-er loopet: 73,11 s.
+**Mellem, Retro Maze Chase** (2:59, D-mol): tempoet er ca. 98,5 BPM og vandrer
+mellem 98,2 og 98,7, altså ikke de 96, prompten bad om. De første 19,4 s er en
+stille intro uden bas, ved 154 s kommer et break, og sangen toner ud til sidst. Fra
+19,4 s kører temaet i 30 takter, og ved 92,6 s begynder sangen selv forfra på
+temaet. Det stykke er loopet: 73,11 s.
 
-**Sådan er loopet bygget** (`musik/kilde/byg_loop.py`): sømmen ligger 10 ms før
-temaets første slag, og loopets sidste 40 ms glider over i det, der i sangen ligger
-lige før temaet, så der ikke er noget knæk. Filen er periodisk: den begynder 0,5 s
-før loopet (med loopets slutning) og fortsætter 2 s efter det (med loopets
+**Svær, Matrix Clubbed to Death** (3:15, G-mol): tempoet er 144,02 BPM og ligger
+fast (under 4 ms fra et fast gitter). De første 33,4 s er en intro uden rytme, så
+skifter sangen mellem fulde og rolige stykker, og fra ca. 180 s slutter den med
+enkelte slag. Loopet går fra rytmens indsats ved 33,42 s til 176,73 s: 86 takter,
+143,31 s. De sidste to takter står på D (dominanten), og loopet begynder på G
+(tonika), ligesom sangens eget oplæg til indsatsen står på D.
+
+**Sådan er loopene bygget** (`musik/kilde/byg_loop.py`): sømmen ligger 10 ms før
+loopets første slag, og loopets sidste 40 ms glider over i det, der i sangen ligger
+lige før loopets start, så der ikke er noget knæk. Filen er periodisk: den begynder
+0,5 s før loopet (med loopets slutning) og fortsætter 2 s efter det (med loopets
 begyndelse). `js/lyd.js` lader Web Audio springe `laengde` tilbage, og fordi halen
 er magen til begyndelsen, kan springet ikke høres, heller ikke når en browsers
-mp3-afkoder forskyder lyden nogle millisekunder. En ny sang: mål de to slag, ret
-tallene øverst i `byg_loop.py`, kør den med kildefilen og den nye fil som
-argumenter, og skriv `start` og `laengde` fra den sidste linje ind i `D.MUSIK`.
+mp3-afkoder forskyder lyden nogle millisekunder. En ny sang: mål de to slag 1, kør
+`byg_loop.py` med kildefilen, den nye fil, de to tider og antallet af slag, og skriv
+`start` og `laengde` fra den sidste linje ind i `D.MUSIK`. Tallene for de to sange
+står øverst i scriptet.
 
 Åbnes spillet fra harddisken (file://), kan filen ikke hentes til Web Audio. Så
 spiller et almindeligt lydelement den, og springet tilbage kan give et lille hak.
 
-**Spøgelserne går ikke i takt med musikken.** De tager et skridt hvert 313 ms efter
-spillets eget ur (i praksis 317 ms ved 60 billeder i sekundet), og en ottendedel i
-sangen er ca. 305 ms. Skal de gå i takt, skal skridtet i `js/spil.js` styres af
-musikkens ur, og så ændres farten på Svær et par procent. Det er ikke gjort.
+**Spøgelserne går ikke i takt med musikken.** De tager et skridt efter spillets eget
+ur (Svær 313 ms, Mellem 500 ms), og slagene i sangene er 417 ms (Svær) og 609 ms
+(Mellem). Skal de gå i takt, skal skridtet i `js/spil.js` styres af musikkens ur, og
+så ændres farten. Det er ikke gjort.
 
 ## Opgaverne
 

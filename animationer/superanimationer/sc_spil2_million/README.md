@@ -54,6 +54,11 @@ under 20 %. Resten deles tilfældigt mellem de forkerte svar, der står tilbage.
 Brugerens fire tal gav 95 %; de sidste 5 % er lagt til den øverste linje. Hvor
 der længere nede står Én væk, gælder Spørg publikum.
 
+Tallene gælder spørgsmål 1. For hvert spørgsmål derefter falder den øverste
+linje med 3 procentpoint, og hver af de tre andre stiger med 1
+(`D.PUBLIKUM_TRIN`, brugerens ønske 4. okt. 2026). Ved spørgsmål 3 er det 54, 12,
+27 og 7 %, ved spørgsmål 15 er det 18, 24, 39 og 19 %.
+
 ## Spørgsmålene
 
 De står i `js/data.js`, ét pr. linje:

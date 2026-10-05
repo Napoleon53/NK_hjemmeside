@@ -56,21 +56,33 @@ kan sendes ud. Ingen knapper til præsentationen.
 krukker. En portion er 0,10 mol; den kan trækkes ned i glasset, eller man
 kan klikke på krukken. Luppen viser altid lige meget væske: én prik er
 0,05 M af en ion. Søjlerne viser saltets koncentration (grå) og hver ions,
-og en stiplet linje viser målet. Panelet viser skemaet, c = n / V og
-[ion] = tallet foran · c. De seks opgaver: NaCl (én til én), Na₂SO₄ (tre
+og en stiplet linje viser målet. Panelet har kun opgavekortet og
+opgavelisten. De seks opgaver: NaCl (én til én), Na₂SO₄ (tre
 spørgsmål i små trin), FeCl₃ (tre Cl⁻), K₃PO₄ (tre K⁺ i 0,50 L),
 Al₂(SO₄)₃ (gæt, hvilken ion der er flest af) og to salte med Na⁺ til
-[Na⁺] = 0,50 M. Forklaringen kommer, når glasset viser målet, og siger
-noget om netop det gæt. Er der kommet for meget i, siger linjen hvorfor
-og Start forfra.
+[Na⁺] = 0,50 M. Opgaveteksten er "Lav en opløsning, hvor [Cl⁻] = 0,30 M."
+Er der kommet for meget i, siger linjen hvorfor og Start forfra.
+
+**Beregningen i kortet** (brugerens ønske 4. okt. 2026: der foregik for
+meget i panelet, og beregningerne stod akavet i linjen). Kortet Glasset
+med skemaet og de løbende tal er taget ud. Når glasset viser målet, står
+beregningen under opgaveteksten, skrevet som skolens superberegning
+(`beregningHTML` i `js/sim_opl.js`): formlen først (c = n / V med
+brøkstreg), så tallene med enheder, det beregnede på venstre side,
+lighedstegnene under hinanden, opløsningsskemaet, [ion] = tallet foran ·
+c(salt) og til sidst en konklusion i ord (`konklusion` i `D.OPL`). Med to
+salte står c = n / V én gang, og skemaerne er udeladt. Linjen under
+beregningen roser kort og siger, hvordan et gæt gik; svarknapperne fra
+gættet er væk, når opgaven er løst.
 
 **Na₂SO₄ i små trin** (brugerens ønske 29. sept. 2026: "Der indgår 3
 forskellige størrelser og et antalsforhold"). Først kommer saltet i
 glasset (0,10 mol i 0,50 L), så tre spørgsmål med svarmuligheder, ét ad
 gangen (`spm` i `D.OPL`): c(Na₂SO₄) = n / V, hvor mange Na⁺ én Na₂SO₄
 giver, og [Na⁺]. Glasset viser kun det, der er svaret på: den grå søjle
-efter c, ionerne i luppen efter antallet og ionernes søjler efter [Na⁺];
-panelet viser n og V, men ? for resten. Et forkert svar bliver slået fra
+efter c, ionerne i luppen efter antallet og ionernes søjler efter [Na⁺].
+Beregningen i kortet vokser på samme måde: c(Na₂SO₄), så skemaet, så
+[Na⁺]. Linjen roser og siger det næste. Et forkert svar bliver slået fra
 og forklaret (0,10 M: det er stofmængden n). Mens spørgsmålene står, kan
 der ikke komme mere salt i, og Start forfra er væk.
 
@@ -84,7 +96,12 @@ opgave giver et nyt salt og nye tal. Tallene foran ionerne skrives i to
 felter i skemaet; beskeden ved en fejl kender fejlene (ladningen i stedet
 for antallet, O inde i sulfat-ionen, parentesen). Tavlen viser skemaet og
 de pæne beregninger, søjlerne kommer, når tallene er fundet, og luppen
-fyldes til sidst.
+fyldes til sidst. Opgaveteksten giver først tallene og siger så vejen:
+"Før ionernes aktuelle koncentrationer kan findes, skal
+opløsningsskemaet afstemmes." (brugerens ønske 4. okt. 2026: før stod
+"Find ionernes koncentrationer" først, selv om første trin er skemaet).
+På Svær skal c(salt) beregnes først, og baglæns nævner linjen c(salt) og
+den anden ion.
 
 **Blandinger.** To salte i ét glas (bidragene lægges sammen), samme
 rumfang, forskelligt rumfang og en ion, der kun er i det ene glas.
@@ -149,7 +166,8 @@ _sprites.html       udviklerværktøj: viser tegningerne alene
 `D.SALTE`: kationen og anionen og tallet foran hver i skemaet (`kk`, `ka`);
 formlen skal have parenteser om sammensatte ioner med et tal efter, fx
 `Al2(SO4)3`. **Opgaverne** står i `D.OPL` (fane 1; `spm` er spørgsmålene
-efter opløsningen), `D.NIV` (fane 2: saltene og tallene, der trækkes
+efter opløsningen, `regn` de ioner, beregningen viser, og `konklusion`
+dens sidste linje), `D.NIV` (fane 2: saltene og tallene, der trækkes
 blandt, og den første opgave `std`) og `D.BLAND` (fane 3: sæt af tal; V i
 mL, masserne i g). **Beskederne ved fejl** står i `js/tjek.js`
 (`T.afstem`, `regler` og `kandidater`).
@@ -163,11 +181,13 @@ svar, at masserne i fane 3's første opgave giver pæne tal, at 21 fejl i
 skemaet, formlerne og tallene giver den rigtige besked, at sproget holder
 reglerne, at alle tre faner kan gennemføres med musen og ved at skrive
 (også med gæt, spørgsmålene i små trin, for meget salt, hint og svar), at
-glasset på fane 1 først viser det, der er svaret på, at saltene først
-kommer i vandet og glassene først hældes sammen, når det er regnet, at
-Kemichael kun taler ved hint og svar og kan sendes ud, og at layoutet
-holder fra 520 × 380 til 1500 × 900. Sidst kørt 29. september 2026: ALT
-OK (100 påstande).
+glasset på fane 1 først viser det, der er svaret på, at beregningen i
+kortet har formlen, tallene med enheder og konklusionen (og først kommer,
+når opgaven er løst), at opgaveteksten på fane 2 nævner skemaet først, at
+saltene først kommer i vandet og glassene først hældes sammen, når det er
+regnet, at Kemichael kun taler ved hint og svar og kan sendes ud, og at
+layoutet holder fra 520 × 380 til 1500 × 900. Sidst kørt 4. oktober 2026:
+ALT OK (115 påstande).
 
 ## Forenklinger
 

@@ -61,16 +61,13 @@
     }
 
     /* ----- Tekst -------------------------------------------------------- */
+    /* Linjen ses ikke (brugerens valg 4. okt. 2026). Den laeses stadig op
+       af en skaermlaeser. */
     function saetStatus(t) { NK.saetTekst("status", t); }
 
     function skridtTekst() {
         var n = spil.skridtTilbage();
         return n > 1 ? n + " skridt tilbage." : "Sidste skridt.";
-    }
-
-    /* Saa meget af toenden er der i karret efter de forkerte bogstaver */
-    function syreTekst() {
-        return NK.Kar.maengdeTekst(NK.Kar.syreVedPh(7 - spil.runde.forkerte)) + " saltsyre i karret.";
     }
 
     /* ----- Ordet --------------------------------------------------------- */
@@ -195,8 +192,32 @@
         NK.saetTekst("tal-rekord", String(huske.rekord[liste.id] || 0));
     }
 
+    /* ----- De forkerte bogstaver under ordet ------------------------------
+       Seks pladser. Hvert forkert bogstav lander i den naeste, farvet som
+       karret efter det skridt (universalindikatoren fra pH 6 til 1). Naar
+       der kun er een tilbage, blinker den. */
+    var vistForkerte = 0;
+
+    function visForkerte() {
+        var r = spil.runde, boks = el("forkerte");
+        var bogstaver = r.gaettet.filter(function (b) { return r.ord.indexOf(b) < 0; });
+        var html = '<span class="forkerte-tekst">Forkerte</span>';
+        for (var i = 0; i < G.SKRIDT; i++) {
+            var brugt = i < r.forkerte, klasser = "plads";
+            if (brugt) klasser += " brugt" + (i >= 4 ? " moerk" : "") + (i >= vistForkerte ? " ny" : "");
+            else if (r.status === "spiller" && r.forkerte === G.SKRIDT - 1) klasser += " sidste";
+            var c = NK.Kar.indikator(6 - i).map(Math.round).join(", ");
+            html += '<span class="' + klasser + '"' + (brugt ? ' style="background-color: rgb(' + c + ')"' : "") + ">"
+                + (brugt ? (bogstaver[i] || "×") : "") + "</span>";
+        }
+        boks.innerHTML = html;
+        boks.setAttribute("aria-label", "Forkerte gæt: " + r.forkerte + " af " + G.SKRIDT);
+        vistForkerte = r.forkerte;
+    }
+
     function visAlt() {
         visOrd();
+        visForkerte();
         visTastatur();
         visKnap();
         visTal();
@@ -228,7 +249,7 @@
         } else if (svar.antal === 0) {
             kar.saetForkerte(spil.runde.forkerte);
             if (svar.ledetraad) visTekstkort("ledetraad");
-            saetStatus("Ingen " + svar.bogstav + ". " + syreTekst() + " " + (svar.ledetraad ? "Sidste skridt: se ledetråden." : skridtTekst()));
+            saetStatus("Ingen " + svar.bogstav + ". " + (svar.ledetraad ? "Sidste skridt: se ledetråden." : skridtTekst()));
         } else {
             saetStatus(svar.bogstav + " er med" + (svar.antal > 1 ? " " + svar.antal + " gange." : "."));
         }
@@ -254,7 +275,7 @@
         };
         kar.tab();
         visTekstkort("oploest");
-        saetStatus("Plask. Hele tønden er i karret: pH 1. Enter giver et nyt ord.");
+        saetStatus("Plask. Enter giver et nyt ord.");
     }
 
     /* ----- Omraaderne ---------------------------------------------------------- */

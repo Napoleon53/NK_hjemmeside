@@ -15,7 +15,8 @@
    * Efter et forkert molekyle staar spillet stille i 3 s, og saa ryddes
      skaermen. Efter tre forkerte er spillet slut.
    * Niveauerne naas ved en pointgraense (D.UDGAVER[..].niveauer). Kommer
-     der en ny stofklasse til, ryddes skaermen. Ellers stiger kun farten.
+     der en ny stofklasse til, ryddes skaermen. Ellers stiger kun tempoet
+     (fart og nyt pr. niveau).
    * Hjaelperne (fra niveau 2, én ad gangen) klikkes paa: katalysatoren
      giver halve point for alle molekyler paa skaermen og rydder den,
      inhibitoren bremser alt i 7 s, og +1 pause giver en pause mere.
@@ -61,7 +62,7 @@
         this.partikler = [];
         this.tid = 0;
         this.niveauStart = 0;
-        this.nytUr = D.NYT_HVERT + 500;
+        this.nytUr = this.niveauDef().nyt + 500;
         this.hjaelpUr = 0;
         this.naesteHjaelp = D.HJAELP.foerste;
         this.inhibitor = false;
@@ -233,7 +234,7 @@
     P.nytHvert = function () {
         var turbo = this.erTurbo(), foerste = this.niveau === this.foersteTurbo();
         var ramp = NK.klamp(this.tidPaaNiveau() / (foerste ? 15 : (turbo ? 1 : 5)), 0, 1);
-        var t = Math.max(D.NYT_MINDST, D.NYT_HVERT - this.niveau * D.NYT_PR_NIVEAU) + D.NYT_START * (1 - ramp);
+        var t = this.niveauDef().nyt + D.NYT_START * (1 - ramp);
         if (this.point > D.MESTER) t /= 1 + Math.floor((this.point - D.MESTER) / D.UENDELIG_TRIN) * 0.1;
         return t;
     };

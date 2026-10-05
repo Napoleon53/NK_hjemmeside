@@ -4,19 +4,18 @@
    Et literglas med vand og én eller to krukker med salt. Eleven
    traekker en portion (0,10 mol) fra en krukke ned i glasset (et klik
    paa krukken virker ogsaa). Luppen viser ionerne, og soejlerne viser
-   saltets koncentration (graa) og hver ions koncentration. Panelet
-   viser c = n / V og [ion] = tallet foran ionen · c.
+   saltets koncentration (graa) og hver ions koncentration.
 
    Seks opgaver: ram en ions koncentration, gaet foer du proever (hvem
    er flest), spoergsmaal i smaa trin efter opløsningen (to Na⁺) og to
    salte med en faelles ion. En opgave er loest, naar glasset viser
-   maalet, eller naar det sidste spoergsmaal er besvaret; saa forklarer
-   linjen i kortet.
+   maalet, eller naar det sidste spoergsmaal er besvaret; saa staar
+   beregningen i kortet under opgaven (beregningHTML).
 
    Spoergsmaalene (o.spm) kommer ét ad gangen, naar saltet er i glasset.
-   Glasset viser kun det, der er svaret paa: den graa soejle, ionerne i
-   luppen og ionernes soejler kommer, naar spoergsmaalet om dem er
-   besvaret.
+   Glasset og beregningen viser kun det, der er svaret paa: den graa
+   soejle, ionerne i luppen og ionernes soejler kommer, naar
+   spoergsmaalet om dem er besvaret.
    ===================================================================== */
 (function () {
     "use strict";
@@ -67,7 +66,6 @@
         this.spmFejl = [];
         this.spmOrden = o.spm ? o.spm.map(function (q) { return NK.bland(q.svar.map(function (s, j) { return j; })); }) : [];
         this.afsl = {};
-        this.visPanel();
     };
 
     /* Viser glasset det? Uden spoergsmaal viser det alt; med spoergsmaal
@@ -87,24 +85,73 @@
         this.fald = [];
         this.flyv = null;
         this.handlet = false;
-        this.visPanel();
         if (!this.faerdig) this.besked("Glasset har kun vand igen. " + this.trinLinje(), "");
     };
 
     P.promptHTML = function () {
         var o = this.opg, h = '<p class="maal-tekst">' + NK.html(o.tekst) + "</p>";
         if (o.valg) h += '<p class="opgave-spm">' + NK.html(o.valg.spm) + "</p>";
-        if (o.spm && (this.fase === "spm" || this.fase === "faerdig")) {
-            for (var i = 0; i < this.spmNr; i++) h += '<p class="spm-loest">✓ ' + NK.html(o.spm[i].kort) + "</p>";
-            if (this.fase === "spm") h += '<p class="spm-nu">' + NK.html(o.spm[this.spmNr].spm) + "</p>";
-        }
+        h += this.beregningHTML();
+        if (o.spm && this.fase === "spm") h += '<p class="spm-nu">' + NK.html(o.spm[this.spmNr].spm) + "</p>";
         return h;
+    };
+
+    /* ----- Beregningen i kortet ----------------------------------------------------
+       Skrevet som eleverne skal skrive den: formlen foerst, saa tallene med
+       enheder, det beregnede paa venstre side og til sidst en konklusion i
+       ord. Den kommer, naar opgaven er loest; med spoergsmaal kommer hver
+       del, naar spoergsmaalet om den er besvaret. */
+    function broek(t, n) { return '<span class="broek"><span>' + t + "</span><span>" + n + "</span></span>"; }
+
+    P.beregningHTML = function () {
+        var o = this.opg, g = this.glas, r = "";
+        var loest = this.fase === "faerdig";
+        if (!o.spm && !loest) return "";
+        var salte = o.salte.filter(function (s) { return g.n[s] > 0; });
+        var VL = K.to(g.V / 1000), ny = true;
+        /* led: det efter hvert lighedstegn; en smal linje deles kun foran et lighedstegn */
+        function raekke(v, led) {
+            var top = ny && r ? " sb-ny" : "";
+            ny = false;
+            r += '<span class="sb-v' + top + '">' + NK.html(v) + '</span><span class="sb-h' + top + '">' +
+                led.map(function (l) { return '<span class="sb-led">= ' + l + "</span>"; }).join(" ") + "</span>";
+        }
+        function c(s) { return "c(" + D.salt(s).formel + ")"; }
+        if (this.vist("salt")) {
+            if (salte.length > 1) raekke("c", [broek("n", "V")]);
+            salte.forEach(function (s) {
+                if (salte.length === 1) raekke(c(s), [broek("n", "V")]);
+                raekke(c(s), [broek(K.to(g.n[s]) + " mol", VL + " L"), "<b>" + K.to(g.cSalt(s)) + " M</b>"]);
+            });
+        }
+        if (this.vist("lup") && salte.length === 1) {
+            r += '<span class="sb-skema' + (r ? " sb-ny" : "") + '">' + NK.html(K.skema(D.salt(salte[0]))) + "</span>";
+        }
+        if (this.vist("ioner")) {
+            (o.regn || [o.maal.ion]).forEach(function (id) {
+                var ion = "[" + D.ion(id).t + "]", formel = [], tal = [];
+                salte.forEach(function (s) {
+                    var k = K.k(D.salt(s), id);
+                    if (!k) return;
+                    formel.push((k > 1 ? k + " · " : "") + c(s));
+                    tal.push((k > 1 ? k + " · " : "") + K.to(g.cSalt(s)) + " M");
+                });
+                var sum = "<b>" + K.to(g.ion(id)) + " M</b>";
+                ny = true;
+                raekke(ion, [NK.html(formel.join(" + "))]);
+                raekke(ion, tal.length > 1 || /·/.test(tal[0]) ? [NK.html(tal.join(" + ")), sum] : [sum]);
+            });
+        }
+        if (!r) return "";
+        return '<div class="superberegning"><span class="sb-etiket">Beregningen</span><div class="sb-gitter">' + r + "</div>" +
+            (loest ? '<p class="sb-konklusion">' + NK.html(o.konklusion) + "</p>" : "") + "</div>";
     };
 
     P.visKortEkstra = function () {
         var o = this.opg, mig = this, e = this.el.valg;
         if (o.spm) { this.visSpmKnapper(); return; }
-        if (!o.valg) { e.hidden = true; e.innerHTML = ""; return; }
+        /* Loest: linjen siger, hvordan gaettet gik, og beregningen har pladsen */
+        if (!o.valg || this.fase === "faerdig") { e.hidden = true; e.innerHTML = ""; return; }
         e.hidden = false;
         e.innerHTML = "";
         this.orden.forEach(function (j) {
@@ -171,11 +218,10 @@
         this.afsl[q.vis] = true;
         this.spmNr++;
         this.spmFejl = [];
-        this.visPanel();
         if (this.spmNr >= o.spm.length) {
             this.fase = "faerdig";
-            this.forklaring = NK.html(o.efter);
-            this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html(o.efter) : null);
+            this.forklaring = "";
+            this.trinLoest(maade === "svar" ? "svar" : "ok", maade === "svar" ? NK.html(q.efter) : null);
             return;
         }
         this.hjaelp = 0;
@@ -184,8 +230,9 @@
             this.brugtSvar = true;
             this.svarVis(NK.html(q.efter));
         } else {
+            /* Tallene staar i beregningen i kortet; linjen roser og siger det naeste */
             this.k.tie();
-            this.besked(NK.html(NK.tilfaeldig(D.ROS) + " " + q.efter + " " + this.trinLinje()), "god");
+            this.besked(NK.html(NK.tilfaeldig(D.ROS) + (q.note ? " " + q.note : "") + " " + this.trinLinje()), "god");
         }
         this.visKnap();
         this.fokus();
@@ -254,29 +301,23 @@
             this.spmNr = 0;
             this.spmFejl = [];
             this.visKort();
-            this.visPanel();
             this.trinLoest(this.maade, this.maade === "svar" ? NK.html(o.svar) : null);
             return true;
         }
+        /* Beregningen staar i kortet; linjen siger kun, hvordan gaettet gik, og roser */
         this.fase = "faerdig";
         var pre = "";
         if (o.valg && this.valgt !== null) {
             var s = o.valg.svar[this.valgt];
             pre = s.ok ? "Dit gæt holdt." : "Du gættede " + s.t + ". " + s.forkl;
         }
-        var efter = o.efter;
-        if (o.id === "begge") {
-            var cA = g.cSalt("NaCl"), cB = g.cSalt("Na2SO4");
-            efter = "[Na⁺] = " + K.to(cA) + " M + 2 · " + K.to(cB) + " M = " + K.to(g.ion("Na")) + " M. Na⁺ kommer fra begge salte, og bidragene lægges sammen.";
-        }
-        this.forklaring = NK.html((pre ? pre + " " : "") + efter);
+        this.forklaring = NK.html(pre);
         this.trinLoest(this.maade, this.maade === "svar" ? NK.html(o.svar) : null);
         return true;
     };
 
     P.efterHandling = function () {
         this.handlet = true;
-        this.visPanel();
         if (this.fase === "goer" && this.tjekMaal()) return;
         if (this.fase === "goer" && !this.auto) this.besked(NK.html(this.statusLinje()), "");
     };
@@ -294,7 +335,6 @@
         o.goer.forEach(function (g) { for (var i = 0; i < g[1]; i++) koe.push(g[0]); });
         this.auto = { koe: koe };
         this.svarVis(NK.html(o.svar));
-        this.visPanel();
         this.visKnap();
     };
 
@@ -404,44 +444,6 @@
             return;
         }
         this.kortBesked("Slip portionen over glasset.");
-    };
-
-    /* ----- Panelet ------------------------------------------------------------------- */
-    P.visPanel = function () {
-        var g = this.glas, o = this.opg, html = "", mig = this;
-        var VL = K.to(g.V / 1000);
-        o.salte.forEach(function (s) {
-            var st = D.salt(s);
-            if (!mig.vist("salt")) {
-                html += '<div class="regn-linje">n(' + NK.html(st.formel) + ") = " + K.to(g.n[s]) + " mol og V = " + VL + " L</div>" +
-                    '<div class="regn-linje">c(' + NK.html(st.formel) + ") = <b>?</b></div>";
-                return;
-            }
-            html += '<div class="regn-linje">c(' + NK.html(st.formel) + ") = n / V = " + K.to(g.n[s]) + " mol / " + VL + " L = <b>" +
-                K.to(g.cSalt(s)) + " M</b></div>";
-        });
-        g.ionListe().forEach(function (id) {
-            if (!mig.vist("ioner")) {
-                html += '<div class="regn-linje ion"><span class="prik" style="background:' + D.ion(id).farve + '"></span>[' +
-                    NK.html(D.ion(id).t) + "] = <b>?</b></div>";
-                return;
-            }
-            var dele = [];
-            o.salte.forEach(function (s) {
-                var k = K.k(D.salt(s), id);
-                if (k) dele.push((k > 1 ? k + " · " : "") + K.to(g.cSalt(s)) + " M");
-            });
-            var ion = D.ion(id).t;
-            var midt = dele.length > 1 || /·/.test(dele[0]) ? dele.join(" + ") + " = " : "";
-            html += '<div class="regn-linje ion"><span class="prik" style="background:' + D.ion(id).farve + '"></span>[' + NK.html(ion) + "] = " +
-                midt + "<b>" + K.to(g.ion(id)) + " M</b></div>";
-        });
-        NK.saetHTML("opl-regn", html);
-        NK.saetHTML("opl-skema", o.salte.map(function (s) {
-            var st = D.salt(s);
-            if (!mig.vist("lup")) return NK.html(st.formel + "(s) ⟶ ? " + D.ion(st.kat).t + "(aq) + ? " + D.ion(st.an).t + "(aq)");
-            return NK.html(K.skema(st));
-        }).join("<br>"));
     };
 
     /* ----- Layout ----------------------------------------------------------------------- */

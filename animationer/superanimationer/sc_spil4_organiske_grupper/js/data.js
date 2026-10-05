@@ -127,13 +127,19 @@
     ];
 
     /* ----- De to udgaver ------------------------------------------------------
-       Balancen er de gamle spils, tal for tal (brugerens egne tal):
-       fart = grundfart (70 enheder pr. s) gange fart pr. niveau, et nyt
-       molekyle hvert 2,2 s minus 0,22 s pr. niveau (mindst 0,6 s), 100 point
-       pr. rigtigt molekyle. Et niveau naas ved en pointgraense; ingen
-       indbygget pause mellem niveauerne. Med ny: stofklasser, der kommer
-       til (kortet med "Ny stofklasse" og skaermen ryddes). Uden ny:
-       turboniveauer, hvor kun farten stiger.
+       Pr. niveau: graense (point, hvor niveauet naas), fart (faldfarten er
+       grundfarten, 70 enheder pr. s, gange fart) og nyt (ms mellem
+       molekylerne). 100 point pr. rigtigt molekyle; ingen indbygget pause
+       mellem niveauerne. Med ny: stofklasser, der kommer til (kortet med
+       "Ny stofklasse" og skaermen ryddes). Uden ny: turboniveauer, hvor kun
+       tempoet stiger.
+       Graenserne, spandene og niveau 1, 2 og 10 er de gamle spils tal. Paa
+       niveau 3 til 9 er tempoet sat ned (4. okt. 2026): det stiger naesten
+       ikke, mens de nye stofklasser kommer (niveau 3 til 5), lidt paa niveau
+       6 og 7 og foerst derefter op til det gamle sluttempo. De gamle tal var
+       fart C 1,44 1,3 1,4 1,55 1,70 1,85 2,00 og B 1,2 1,3 1,4 1,55 1,70
+       1,85 2,00, og nyt 1760 1540 1320 1100 880 660 600 (2200 minus 220 pr.
+       niveau, mindst 600).
        Skaermen er 900 enheder hoej som den gamle paa en stor skaerm, saa
        faldtiden er den samme paa alle skaerme. */
     D.UDGAVER = {
@@ -143,16 +149,16 @@
             molekyler: C_MOL,
             turboPrTryk: 0.35,
             niveauer: [
-                { graense: 0, fart: 1.32, typer: ["alkan", "alken"] },
-                { graense: 1000, fart: 1.32, typer: ["alkan", "alken", "alkyn"], ny: ["alkyn"] },
-                { graense: 2500, fart: 1.44, typer: ["alken", "alkyn", "cycloalkan"], ny: ["cycloalkan"] },
-                { graense: 4500, fart: 1.3, typer: ["alkyn", "cycloalkan", "aromat"], ny: ["aromat"] },
-                { graense: 7000, fart: 1.4, typer: ["cycloalkan", "aromat", "alkohol", "syre"], ny: ["alkohol", "syre"] },
-                { graense: 10000, fart: 1.55, typer: ["alken", "alkyn", "cycloalkan", "aromat", "syre"] },
-                { graense: 13500, fart: 1.70, typer: ["alkan", "alkyn", "cycloalkan", "alkohol", "syre"] },
-                { graense: 17500, fart: 1.85, typer: ["alken", "cycloalkan", "aromat", "alkohol", "syre"] },
-                { graense: 22000, fart: 2.00, typer: ["alkan", "alken", "alkyn", "aromat", "syre"] },
-                { graense: 27000, fart: 2.15, typer: ["cycloalkan", "aromat", "alkohol", "syre", "alken"] }
+                { graense: 0, fart: 1.32, nyt: 2200, typer: ["alkan", "alken"] },
+                { graense: 1000, fart: 1.32, nyt: 1980, typer: ["alkan", "alken", "alkyn"], ny: ["alkyn"] },
+                { graense: 2500, fart: 1.32, nyt: 1900, typer: ["alken", "alkyn", "cycloalkan"], ny: ["cycloalkan"] },
+                { graense: 4500, fart: 1.3, nyt: 1850, typer: ["alkyn", "cycloalkan", "aromat"], ny: ["aromat"] },
+                { graense: 7000, fart: 1.35, nyt: 1800, typer: ["cycloalkan", "aromat", "alkohol", "syre"], ny: ["alkohol", "syre"] },
+                { graense: 10000, fart: 1.45, nyt: 1600, typer: ["alken", "alkyn", "cycloalkan", "aromat", "syre"] },
+                { graense: 13500, fart: 1.60, nyt: 1350, typer: ["alkan", "alkyn", "cycloalkan", "alkohol", "syre"] },
+                { graense: 17500, fart: 1.80, nyt: 1050, typer: ["alken", "cycloalkan", "aromat", "alkohol", "syre"] },
+                { graense: 22000, fart: 2.00, nyt: 800, typer: ["alkan", "alken", "alkyn", "aromat", "syre"] },
+                { graense: 27000, fart: 2.15, nyt: 600, typer: ["cycloalkan", "aromat", "alkohol", "syre", "alken"] }
             ],
             intro: [
                 "Molekylerne falder. Træk dem ned i den rigtige spand.",
@@ -166,16 +172,16 @@
             molekyler: B_MOL,
             turboPrTryk: 0.25,
             niveauer: [
-                { graense: 0, fart: 1.1, typer: ["alkan", "alkohol", "syre"] },
-                { graense: 1000, fart: 1.1, typer: ["alkan", "alkohol", "syre", "aromat"], ny: ["aromat"] },
-                { graense: 2500, fart: 1.2, typer: ["alkohol", "syre", "aromat", "amin"], ny: ["amin"] },
-                { graense: 4500, fart: 1.3, typer: ["syre", "amin", "keton", "aldehyd"], ny: ["aldehyd", "keton"] },
-                { graense: 7000, fart: 1.4, typer: ["keton", "aldehyd", "ester", "amin", "aromat"], ny: ["ester"] },
-                { graense: 10000, fart: 1.55, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
-                { graense: 13500, fart: 1.70, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
-                { graense: 17500, fart: 1.85, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
-                { graense: 22000, fart: 2.00, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
-                { graense: 27000, fart: 2.15, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] }
+                { graense: 0, fart: 1.1, nyt: 2200, typer: ["alkan", "alkohol", "syre"] },
+                { graense: 1000, fart: 1.1, nyt: 1980, typer: ["alkan", "alkohol", "syre", "aromat"], ny: ["aromat"] },
+                { graense: 2500, fart: 1.15, nyt: 1900, typer: ["alkohol", "syre", "aromat", "amin"], ny: ["amin"] },
+                { graense: 4500, fart: 1.2, nyt: 1850, typer: ["syre", "amin", "keton", "aldehyd"], ny: ["aldehyd", "keton"] },
+                { graense: 7000, fart: 1.25, nyt: 1800, typer: ["keton", "aldehyd", "ester", "amin", "aromat"], ny: ["ester"] },
+                { graense: 10000, fart: 1.35, nyt: 1600, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
+                { graense: 13500, fart: 1.50, nyt: 1350, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
+                { graense: 17500, fart: 1.75, nyt: 1050, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
+                { graense: 22000, fart: 2.00, nyt: 800, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] },
+                { graense: 27000, fart: 2.15, nyt: 600, typer: ["keton", "aldehyd", "ester", "amin", "aromat"] }
             ],
             intro: [
                 "Molekylerne falder. Træk dem ned i den rigtige spand.",
@@ -194,14 +200,11 @@
     };
     D.ATOMFARVE = { O: "#ff8a80", N: "#82b4ff" };
 
-    /* ----- Balancen (de gamle spils tal) -------------------------------------- */
+    /* ----- Balancen (de gamle spils tal; tempoet pr. niveau staar i niveauerne) -- */
     D.HOEJDE = 900;           /* scenens hoejde i enheder */
     D.MIN_HOEJDE = 640;       /* paa et lavt laerred; faldet skaleres med, saa tiden er den samme */
     D.MIN_BREDDE = 420;
     D.GRUNDFART = 70;         /* enheder pr. s paa fart 1 */
-    D.NYT_HVERT = 2200;       /* ms mellem molekyler paa niveau 1 */
-    D.NYT_PR_NIVEAU = 220;    /* ms hurtigere pr. niveau */
-    D.NYT_MINDST = 600;       /* hurtigst ét molekyle hvert 0,6 s */
     D.NYT_START = 1000;       /* ms ekstra lige efter et nyt niveau (glider ud) */
     D.POINT = 100;            /* pr. rigtigt molekyle, hele spillet */
     D.LIV = 3;

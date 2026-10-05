@@ -105,7 +105,13 @@ og trinlisten over den viser de færdige med ✓):
 1. **Dryp i glasset.** Træk flasken hen over urglasset (eller klik på
    glasset eller flasken). Den vender tuden nedad og drypper tre dråber, og
    farven breder sig fra dråben. På fane 1 er der fire flasker; den forkerte
-   flyver hjem med en besked om, hvilken der skal bruges.
+   flyver hjem med en besked om, hvilken der skal bruges. Det stof, der
+   dryppes i, skrives først i hæftet, når det er dryppet (brugerens ønske
+   4. oktober 2026: "der skal først skrives SO₃²⁻ og SO₄²⁻ så snart man har
+   tilsat sulfit"): på fane 1 står kun manganstoffet før dryppet, og sulfit
+   og sulfat kommer med dryppet; på fane 2 står stoffet i glasset (fx Fe²⁺),
+   og MnO₄⁻ kommer med dryppet. Svovlsyren i tredje reaktion sætter intet i
+   skemaet (`giver` i `D.FLASKE`); H⁺ kommer, når ladningen afstemmes.
 2. **Hvad blev mangan til?** Et spørgsmålstegn står, hvor manganstoffet skal
    stå, og under det tre formler. Farvekortet i panelet viser farverne. Et
    forkert valg streges ud og får en besked om farven.
@@ -282,7 +288,7 @@ kan gennemføres ved at skrive, med musen og med Vis svaret, at Kemichael
 siger én kort sætning, og at Læs mere åbner forklaringen (uden facit efter et
 hint), Kemichael inde og ude, sproget (også i alle forklaringerne) og
 layoutet fra 1100 × 700 til 1600 × 950.
-Sidst kørt: ALT OK (266 påstande), 3. oktober 2026.
+Sidst kørt: ALT OK (269 påstande), 4. oktober 2026.
 
 ## I menuen
 

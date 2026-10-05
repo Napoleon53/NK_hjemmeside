@@ -55,12 +55,13 @@
        Fane 1 har fire flasker: eleven fylder selv urglasset med
        kaliumpermanganat og natriumhydroxid (brugerens ønske 3. okt. 2026) og
        drypper så natriumsulfit og til sidst svovlsyre i. Fane 2 har
-       kaliumpermanganat. */
+       kaliumpermanganat. giver: den formel, flasken sætter i skemaet; den
+       skrives først, når der er dryppet (brugerens ønske 4. okt. 2026). */
     D.FLASKE = {
-        sulfit: { id: "sulfit", tekst: "Na₂SO₃", styrke: "0,1 M", navn: "natriumsulfit", farve: "vand" },
+        sulfit: { id: "sulfit", tekst: "Na₂SO₃", styrke: "0,1 M", navn: "natriumsulfit", farve: "vand", giver: "SO3 2-" },
         syre:   { id: "syre", tekst: "H₂SO₄", styrke: "2 M", navn: "svovlsyre", farve: "vand" },
         base:   { id: "base", tekst: "NaOH", styrke: "2 M", navn: "natriumhydroxid", farve: "vand" },
-        permanganat: { id: "permanganat", tekst: "KMnO₄", styrke: "0,02 M", navn: "kaliumpermanganat", farve: "violet" }
+        permanganat: { id: "permanganat", tekst: "KMnO₄", styrke: "0,02 M", navn: "kaliumpermanganat", farve: "violet", giver: "MnO4 -" }
     };
     D.FLASKER = { ug: ["permanganat", "base", "sulfit", "syre"], fl: ["permanganat"] };
 

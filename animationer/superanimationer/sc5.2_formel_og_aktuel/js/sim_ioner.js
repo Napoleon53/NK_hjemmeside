@@ -80,18 +80,23 @@
         this.vis = {};
     };
 
+    /* Opgavens tal foerst, saa vejen: det foerste trin staar foer det, der
+       skal findes til sidst (brugerens oenske 4. okt. 2026) */
     P.promptHTML = function () {
-        var o = this.opg, st = D.salt(o.salt), s;
+        var o = this.opg, st = D.salt(o.salt), s, vej;
         if (o.m !== undefined) {
-            s = K.g(o.m) + " g " + st.formel + " opløses, og der fyldes op til " + K.mL(o.V) + " mL. Find ionernes koncentrationer.";
+            s = K.g(o.m) + " g " + st.formel + " opløses, og der fyldes op til " + K.mL(o.V) + " mL.";
+            vej = "Før ionernes aktuelle koncentrationer kan findes, skal c(" + st.formel + ") beregnes og opløsningsskemaet afstemmes.";
         } else if (o.bag) {
             var g = o.bag === "kat" ? st.kat : st.an, a = o.bag === "kat" ? st.an : st.kat;
-            s = "I en opløsning af " + st.formel + " er [" + D.ion(g).t + "] = " + K.c(o.ionC) + " M. Find c(" + st.formel + ") og [" +
-                D.ion(a).t + "].";
+            s = "I en opløsning af " + st.formel + " er [" + D.ion(g).t + "] = " + K.c(o.ionC) + " M.";
+            vej = "Før c(" + st.formel + ") og [" + D.ion(a).t + "] kan findes, skal opløsningsskemaet afstemmes.";
         } else {
-            s = "En opløsning af " + st.formel + " har c(" + st.formel + ") = " + K.c(o.c) + " M. Find ionernes koncentrationer.";
+            s = "En opløsning af " + st.formel + " har c(" + st.formel + ") = " + K.c(o.c) + " M.";
+            vej = "Før ionernes aktuelle koncentrationer kan findes, skal opløsningsskemaet afstemmes.";
         }
-        return '<p class="maal-tekst">' + NK.html(s) + '</p><p class="opgave-spm">' + NK.html(st.navn) + "</p>";
+        return '<p class="maal-tekst">' + NK.html(s) + '</p><p class="opgave-spm">' + NK.html(st.navn) + '</p><p class="opgave-vej">' +
+            NK.html(vej) + "</p>";
     };
 
     P.data = function () {

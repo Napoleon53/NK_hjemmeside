@@ -37,8 +37,12 @@ Nyt:
   bogstav lukker hanen så meget ud, at pH falder med 1: 1,8 mL, 18 mL, 180 mL,
   1,8 L og 18 L i alt, altså ti gange så meget for hvert skridt. Først er det
   dråber, så en stråle, og ved det sjette løber resten ud. Så er syren fortyndet
-  ti gange til 0,1 M, pH er 1, og overfladen i karret er steget. Statuslinjen
-  skriver mængden efter hvert forkert bogstav. Tønden fyldes igen ved næste ord.
+  ti gange til 0,1 M, pH er 1, og overfladen i karret er steget. Tønden fyldes
+  igen ved næste ord. Mængderne står kun i hjælpen, ikke som tekst i scenen.
+* **De forkerte bogstaver** (4. okt. 2026) samles i seks pladser under ordet, farvet
+  som karret efter hvert skridt, og den sidste tomme plads blinker rødt. Det
+  afløser linjen med tekst nederst i scenen, som brugeren ville have væk. Linjen
+  findes stadig usynligt til skærmlæsere.
 * **Kemichael** kommer kun efter et plask, siger én replik og går igen (brugerens
   valg 24. sept. 2026). Han præsenterer ikke spillet, og der er intet tilbud om en
   præsentation. Plasket skrives i hans uheldsregnskab. Replikkerne er tørre og

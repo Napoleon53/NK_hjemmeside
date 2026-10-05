@@ -189,14 +189,23 @@
             return true;
         },
 
+        /* Sandsynligheden for hver linje i D.PUBLIKUM ved spoergsmaal nr (talt
+           fra 0): publikum bliver daarligere, jo laengere man kommer. */
+        publikumAndele: function (nr) {
+            return D.PUBLIKUM.map(function (k, i) {
+                return Math.max(0, k.andel + nr * D.PUBLIKUM_TRIN[i]);
+            });
+        },
+
         /* Publikums stemmer i procent, én pr. svar (0 for et fjernet svar).
            Foerst traekkes, hvor godt publikum rammer (D.PUBLIKUM), saa faar
            det rigtige svar et tal i det spaend, og resten deles tilfaeldigt
            mellem de forkerte svar, der staar tilbage. */
-        stemmer: function (rigtig, forkerte) {
+        stemmer: function (rigtig, forkerte, nr) {
+            var andele = Spil.publikumAndele(nr || 0);
             var r = Math.random(), sum = 0, k = D.PUBLIKUM[D.PUBLIKUM.length - 1];
             for (var i = 0; i < D.PUBLIKUM.length; i++) {
-                sum += D.PUBLIKUM[i].andel;
+                sum += andele[i];
                 if (r < sum) { k = D.PUBLIKUM[i]; break; }
             }
             var ud = [0, 0, 0, 0];
@@ -219,7 +228,7 @@
         /* Spoerg publikum */
         publikum: function (S) {
             if (!Spil.kan(S, "publikum")) return false;
-            S.publikum = Spil.stemmer(S.spoergsmaal[S.nr].rigtig, forkerteTilbage(S));
+            S.publikum = Spil.stemmer(S.spoergsmaal[S.nr].rigtig, forkerteTilbage(S), S.nr);
             S.livliner.publikum = true;
             return true;
         },

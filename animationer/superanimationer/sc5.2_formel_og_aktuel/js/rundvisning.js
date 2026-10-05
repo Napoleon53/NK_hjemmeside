@@ -20,8 +20,7 @@
             { sel: "#opl-anker-glas", titel: "Glasset", tekst: "Rumfanget står fast i hver opgave. Saltet deler sig i ioner, når det opløses." },
             { sel: "#opl-anker-zoom", titel: "Luppen", tekst: "Luppen viser altid lige meget væske. Én prik er 0,05 M af ionen." },
             { sel: "#opl-anker-soejler", titel: "Søjlerne", tekst: "Den grå søjle er saltets koncentration. De farvede er ionernes. Den stiplede linje er målet." },
-            { sel: "#opl-data", titel: "Tallene", tekst: "Opløsningsskemaet, c = n / V og ionernes koncentrationer, mens du arbejder." },
-            { sel: "#opl-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Nogle opgaver starter med et gæt, og nogle har spørgsmål, når saltet er opløst. Knappen giver et hint og derefter svaret." },
+            { sel: "#opl-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Nogle opgaver starter med et gæt, og nogle har spørgsmål, når saltet er opløst. Knappen giver et hint og derefter svaret. Når opgaven er løst, står beregningen her." },
             { sel: "#opl-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du har løst det." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Ionerne: regn ionernes koncentrationer ud. Blandinger: en ion, der kommer fra to salte." }
         ],

@@ -114,59 +114,65 @@
     /* ----- Fane 1: opløsningen ------------------------------------------------------------
        salte: krukkerne paa bordet. V: vandet i glasset (mL).
        maal: { ion, c } (den ion, der skal have koncentrationen c),
-             { portioner } (saa mange portioner) og evt. begge (alle salte i). */
+             { portioner } (saa mange portioner) og evt. begge (alle salte i).
+       regn: de ioner, beregningen i kortet viser (ellers maalets ion).
+       konklusion: beregningens sidste linje, i ord. */
     D.OPL = [
         { id: "nacl", titel: "Én til én", salte: ["NaCl"], V: 1000, maal: { ion: "Cl", c: 0.30 },
-          tekst: "Gør [Cl⁻] = 0,30 M.",
+          tekst: "Lav en opløsning, hvor [Cl⁻] = 0,30 M.",
           linje: "Træk en portion natriumchlorid fra krukken ned i glasset.",
           hint: "Hver portion er 0,10 mol, og glasset har 1,00 L. Hvor mange Cl⁻ giver hver NaCl?",
           svar: "NaCl ⟶ Na⁺ + Cl⁻. [Cl⁻] = c(NaCl) = 0,30 M. Det er tre portioner.",
           goer: [["NaCl", 3]],
-          efter: "Hver NaCl giver én Cl⁻, så [Cl⁻] = c(NaCl) = 0,30 M." },
-        { id: "na2so4", titel: "To Na⁺", salte: ["Na2SO4"], V: 500, maal: { portioner: 1 },
+          konklusion: "Den aktuelle koncentration af Cl⁻ er 0,30 M. Det er det samme som c(NaCl)." },
+        { id: "na2so4", titel: "To Na⁺", salte: ["Na2SO4"], V: 500, maal: { portioner: 1 }, regn: ["Na"],
           tekst: "Opløs en portion (0,10 mol) Na₂SO₄ i glasset med 0,50 L vand.",
           linje: "Træk en portion natriumsulfat ned i glasset.",
           hint: "Træk fra krukken, eller klik på den.",
           svar: "En portion Na₂SO₄ i 0,50 L.",
           goer: [["Na2SO4", 1]],
           /* Spoergsmaalene efter opløsningen, ét ad gangen. vis: det, glasset
-             viser, naar svaret er fundet (salt: den graa soejle, lup: ionerne i
-             luppen, ioner: ionernes soejler). */
+             og beregningen i kortet viser, naar svaret er fundet (salt: den
+             graa soejle og c(salt), lup: ionerne i luppen og skemaet, ioner:
+             ionernes soejler og [ion]). note: en saetning efter rosen.
+             efter: det, Kemichael siger ved Vis svaret. */
           spm: [
-              { spm: "Hvad er c(Na₂SO₄)?", vis: "salt", kort: "c(Na₂SO₄) = 0,20 M",
+              { spm: "Hvad er c(Na₂SO₄)?", vis: "salt",
                 hint: "Koncentrationen er stofmængde pr. liter. Du har 0,10 mol i 0,50 L.",
                 svar: [{ t: "0,20 M", ok: true },
                        { t: "0,10 M", forkl: "0,10 mol er stofmængden n. Koncentrationen er n / V, og rumfanget er 0,50 L." },
                        { t: "0,050 M", forkl: "Du har ganget med rumfanget. Koncentrationen er n / V = 0,10 mol / 0,50 L." }],
                 efter: "c(Na₂SO₄) = 0,10 mol / 0,50 L = 0,20 M." },
-              { spm: "Hvor mange Na⁺ giver én Na₂SO₄?", vis: "lup", kort: "Hver Na₂SO₄ giver 2 Na⁺",
+              { spm: "Hvor mange Na⁺ giver én Na₂SO₄?", vis: "lup",
                 hint: "Se på tallet efter Na i formlen Na₂SO₄.",
                 svar: [{ t: "2", ok: true },
                        { t: "1", forkl: "Tallet efter Na i Na₂SO₄ er 2. Der er to Na⁺ i hver." },
                        { t: "4", forkl: "4 hører til O inde i sulfat-ionen SO₄²⁻. Se på tallet efter Na." }],
+                note: "Luppen viser to Na⁺ for hver SO₄²⁻.",
                 efter: "Na₂SO₄ ⟶ 2 Na⁺ + SO₄²⁻. Luppen viser to Na⁺ for hver SO₄²⁻." },
-              { spm: "Hvad bliver [Na⁺]?", vis: "ioner", kort: "[Na⁺] = 0,40 M",
+              { spm: "Hvad bliver [Na⁺]?", vis: "ioner",
                 hint: "c(Na₂SO₄) = 0,20 M, og der er to Na⁺ for hver Na₂SO₄.",
                 svar: [{ t: "0,40 M", ok: true },
                        { t: "0,20 M", forkl: "Det er c(Na₂SO₄). Hver Na₂SO₄ giver to Na⁺, så [Na⁺] er dobbelt så stor." },
-                       { t: "0,10 M", forkl: "Der kommer flere ioner, ikke færre: to Na⁺ for hver Na₂SO₄." }] }
+                       { t: "0,10 M", forkl: "Der kommer flere ioner, ikke færre: to Na⁺ for hver Na₂SO₄." }],
+                efter: "[Na⁺] = 2 · 0,20 M = 0,40 M." }
           ],
-          efter: "Na₂SO₄ ⟶ 2 Na⁺ + SO₄²⁻. [Na⁺] = 2 · 0,20 M = 0,40 M, og [SO₄²⁻] = 0,20 M." },
+          konklusion: "Den aktuelle koncentration af Na⁺ er 0,40 M. Det er to gange c(Na₂SO₄)." },
         { id: "fecl3", titel: "Tre Cl⁻", salte: ["FeCl3"], V: 1000, maal: { ion: "Cl", c: 0.60 },
-          tekst: "Gør [Cl⁻] = 0,60 M.",
+          tekst: "Lav en opløsning, hvor [Cl⁻] = 0,60 M.",
           linje: "Træk jern(III)chlorid ned i glasset.",
           hint: "Hver FeCl₃ giver tre Cl⁻. Hvor stor skal c(FeCl₃) så være?",
           svar: "c(FeCl₃) = 0,60 M / 3 = 0,20 M. Det er to portioner i 1,00 L.",
           goer: [["FeCl3", 2]],
-          efter: "FeCl₃ ⟶ Fe³⁺ + 3 Cl⁻. [Cl⁻] = 3 · 0,20 M = 0,60 M. Der er tre gange så mange Cl⁻ som Fe³⁺." },
+          konklusion: "Den aktuelle koncentration af Cl⁻ er 0,60 M. Det er tre gange c(FeCl₃)." },
         { id: "k3po4", titel: "Tre K⁺", salte: ["K3PO4"], V: 500, maal: { ion: "K", c: 0.60 },
-          tekst: "Gør [K⁺] = 0,60 M.",
+          tekst: "Lav en opløsning, hvor [K⁺] = 0,60 M.",
           linje: "Træk kaliumphosphat ned i glasset.",
           hint: "Hver K₃PO₄ giver tre K⁺, og glasset har 0,50 L.",
           svar: "c(K₃PO₄) = 0,60 M / 3 = 0,20 M, og n = 0,20 M · 0,50 L = 0,10 mol. Det er én portion.",
           goer: [["K3PO4", 1]],
-          efter: "K₃PO₄ ⟶ 3 K⁺ + PO₄³⁻. [K⁺] = 3 · 0,20 M = 0,60 M, og [PO₄³⁻] = 0,20 M." },
-        { id: "al2so43", titel: "Hvem er flest?", salte: ["Al2(SO4)3"], V: 1000, maal: { portioner: 1 },
+          konklusion: "Den aktuelle koncentration af K⁺ er 0,60 M. Det er tre gange c(K₃PO₄)." },
+        { id: "al2so43", titel: "Hvem er flest?", salte: ["Al2(SO4)3"], V: 1000, maal: { portioner: 1 }, regn: ["Al", "SO4"],
           tekst: "Du opløser en portion (0,10 mol) Al₂(SO₄)₃ i 1,00 L.",
           valg: { spm: "Hvilken ion bliver der flest af?",
                   hint: "Tallet efter Al og tallet efter parentesen siger, hvor mange af hver ion der er i én formelenhed.",
@@ -177,14 +183,14 @@
           hint: "Træk fra krukken, eller klik på den.",
           svar: "En portion Al₂(SO₄)₃ i 1,00 L.",
           goer: [["Al2(SO4)3", 1]],
-          efter: "Al₂(SO₄)₃ ⟶ 2 Al³⁺ + 3 SO₄²⁻. Ladningerne går lige op: 2 · 3+ = 3 · 2−. [Al³⁺] = 0,20 M og [SO₄²⁻] = 0,30 M." },
+          konklusion: "Der er flest SO₄²⁻. Den aktuelle koncentration er 0,30 M mod 0,20 M for Al³⁺." },
         { id: "begge", titel: "To salte", salte: ["NaCl", "Na2SO4"], V: 1000, maal: { ion: "Na", c: 0.50, begge: true },
-          tekst: "Brug begge salte. Gør [Na⁺] = 0,50 M.",
+          tekst: "Lav en opløsning, hvor [Na⁺] = 0,50 M. Brug begge salte.",
           linje: "Der skal både natriumchlorid og natriumsulfat i.",
           hint: "Na⁺ kommer fra begge salte. NaCl giver én Na⁺, Na₂SO₄ giver to.",
           svar: "Fx tre portioner NaCl og én Na₂SO₄: [Na⁺] = 0,30 M + 2 · 0,10 M = 0,50 M.",
           goer: [["NaCl", 3], ["Na2SO4", 1]],
-          efter: "" }
+          konklusion: "Den aktuelle koncentration af Na⁺ er 0,50 M. Bidragene fra de to salte lægges sammen." }
     ];
 
     /* ----- Fane 2: ionerne, i tre niveauer --------------------------------------------------

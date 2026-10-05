@@ -24,7 +24,7 @@ skifte på siden, så C-menuen åbner C og B-menuen B.
    pause pr. spil, turboboost med fem tryk og de fem beskeder, hjælpelinjen de
    første 6 s af et nyt niveau, Stofgruppemester ved 14.000 point og den uendelige
    del bagefter, og i B den personlige rekord (uge og alle tider) og den fælles top
-   10. Balancen er tal for tal den gamle (se nedenfor).
+   10. Balancen er den gamle, bortset fra tempoet på niveau 3 til 9 (se nedenfor).
    Nyt: molekylerne tegnes af molekylemotoren som i bogen, gruppen, der afgør
    stofklassen, vises i spandens farve, når molekylet er sorteret, og et forkert
    molekyle giver et kort med gruppen og en linje, der passer til fejlen. En ny
@@ -41,17 +41,36 @@ skifte på siden, så C-menuen åbner C og B-menuen B.
    panelet er spillet (point, liv, niveau, knappen og turboboost), det sidste
    molekyle, stofklasserne og i B top 10.
 
-## Balancen (de gamle spils tal)
+## Balancen (de gamle spils tal, med roligere tempo på niveau 3 til 9)
 
 Alle tal står i `js/data.js`, og selvtesten sammenligner dem med tallene fra de
 gamle filer.
 
-* Grundfart 70 enheder pr. s gange fart pr. niveau. C: 1,32 1,32 1,44 1,3 1,4, så
-  turbo 1,55 1,70 1,85 2,00 2,15. B: 1,1 1,1 1,2 1,3 1,4, så samme turbo.
+**Tempoet, rettet 4. okt. 2026.** I de gamle spil steg tempoet jævnt fra niveau 2,
+så farten, de nye stofklasser og de flere spande kom på samme tid. Det sorterede
+dem fra, der gerne vil øve stofklasserne, men ikke er hurtige med musen. Nu stiger
+tempoet næsten ikke, mens de nye stofklasser kommer (niveau 3 til 5), lidt på
+niveau 6 og 7 og først derefter op til det gamle sluttempo på niveau 10. Niveau 1,
+2 og 10 er uændrede.
+
+| Niveau | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|--------|---|---|---|---|---|---|---|---|---|----|
+| ms mellem molekylerne | 2200 | 1980 | 1900 | 1850 | 1800 | 1600 | 1350 | 1050 | 800 | 600 |
+| før | 2200 | 1980 | 1760 | 1540 | 1320 | 1100 | 880 | 660 | 600 | 600 |
+| fart C | 1,32 | 1,32 | 1,32 | 1,3 | 1,35 | 1,45 | 1,60 | 1,80 | 2,00 | 2,15 |
+| før | 1,32 | 1,32 | 1,44 | 1,3 | 1,4 | 1,55 | 1,70 | 1,85 | 2,00 | 2,15 |
+| fart B | 1,1 | 1,1 | 1,15 | 1,2 | 1,25 | 1,35 | 1,50 | 1,75 | 2,00 | 2,15 |
+| før | 1,1 | 1,1 | 1,2 | 1,3 | 1,4 | 1,55 | 1,70 | 1,85 | 2,00 | 2,15 |
+
+Stofgruppemester (14.000 point) nås på niveau 7, hvor tempoet nu svarer til det
+gamle niveau 5. B's fælles top 10 har stadig resultater fra det gamle tempo.
+
+* Faldfarten er grundfarten, 70 enheder pr. s, gange fart pr. niveau (`fart`).
+  Tiden mellem molekylerne står pr. niveau (`nyt`). Niveau 6 til 10 er turbo.
 * Pointgrænser 0, 1000, 2500, 4500, 7000, 10000, 13500, 17500, 22000, 27000. 100
   point pr. molekyle.
-* Et molekyle hvert 2,2 s minus 0,22 s pr. niveau (mindst 0,6 s), 1 s ekstra lige
-  efter et nyt niveau, der glider ud over 5 s (turbo 1 s, første turbo 15 s).
+* 1 s ekstra mellem molekylerne lige efter et nyt niveau, der glider ud over 5 s
+  (turbo 1 s, første turbo 15 s).
   Farten glider fra 60 % til fuld over 10 s (turbo 2 s, første turbo 25 s). Hvert
   molekyle får 80 til 120 % af farten.
 * Hjælpere fra niveau 2, første efter 20 s, så hvert 25. til 45. s, én ad gangen.
@@ -145,7 +164,7 @@ Stofklasserne, reglerne og rundvisningen midt i et spil koster en pause.
 ## Test
 
 `_selvtest.html` gennem en lokal server med `animationer/` som rod. Sidst: ALT OK
-(25. sept. 2026).
+(4. okt. 2026).
 
 ## I menuen
 

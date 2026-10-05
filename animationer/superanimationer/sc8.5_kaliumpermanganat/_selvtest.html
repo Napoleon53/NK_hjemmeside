@@ -256,7 +256,10 @@ async function koerTest(W) {
     /* I hæftet: fane 2, sulfit i syre */
     NK.visFane("fane-fl");
     B.vaelg(idx(B, "S1"));
-    loesTrin(B); loesTrin(B); loesTrin(B);
+    paastand("fane 2: før dryppet står kun stoffet i glasset i hæftet (SO₃²⁻), ikke MnO₄⁻", !B.haefte.led[0].el.hidden && B.haefte.led[1].el.hidden);
+    loesTrin(B);
+    paastand("fane 2: med dryppet kommer MnO₄⁻ i hæftet", !B.haefte.led[1].el.hidden);
+    loesTrin(B); loesTrin(B);
     paastand("efter dryp, farven og oxidationstallene er man ved klammerne", B.aktivt() === "klammer", B.aktivt());
     loesTrin(B);
     skrivI(B, "g-ox", "4"); skrivI(B, "g-red", "2"); B.tjekTrin();
@@ -316,13 +319,14 @@ async function koerTest(W) {
     tik(A, 4);
     paastand("natriumhydroxid: skiltet siger MnO₄⁻, basisk, og nu skal der dryppes", A.bord.glas[0].tekst === "MnO₄⁻, basisk" && A.aktivt() === "dryp" &&
         A.bord.glas[0].farve[0] === D.FARVE.violet[0], A.bord.glas[0].tekst + " / " + A.aktivt());
-    paastand("begge reaktanter står i hæftet", !A.haefte.led[0].el.hidden && !A.haefte.led[1].el.hidden);
+    paastand("SO₃²⁻ står ikke i hæftet, før der er dryppet sulfit i (kun MnO₄⁻)", A.haefte.led[0].el.hidden && !A.haefte.led[1].el.hidden && A.haefte.skema.children[1].hidden === true);
     paastand("før dryppet er produkterne skjult", A.haefte.led.filter(function (L, i) { return A.opg.R.led[i].side === "h"; }).every(function (L) { return L.el.hidden; }));
     A.slipPaaGlas(0, 3);
     tik(A, 4);
     paastand("svovlsyren er den forkerte flaske nu: besked, og der drypper intet", !A.opg.dryppet && /natriumsulfit/.test(besked(A)), besked(A));
     loesTrin(A);
     paastand("efter dryppet er glasset grønt, og der står et spørgsmålstegn", A.bord.glas[0].farve[1] === D.FARVE.groen[1] && /\?/.test(A.haefte.skema.textContent));
+    paastand("med dryppet kommer SO₃²⁻ og SO₄²⁻ i hæftet", !A.haefte.led[0].el.hidden && !A.haefte.led[2].el.hidden && !A.haefte.skema.children[1].hidden);
     paastand("skiltet røber ikke manganstoffet, før eleven har valgt det", A.bord.glas[0].tekst === "Basisk", A.bord.glas[0].tekst);
     paastand("valget har tre formler, og MnO₄⁻ er ikke blandt dem", A.haefte.valg.children.length === 3 && !/MnO₄⁻/.test(A.haefte.valg.textContent));
     A.valgt("Mn 2+", "selv");

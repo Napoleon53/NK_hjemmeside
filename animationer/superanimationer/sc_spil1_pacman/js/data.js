@@ -89,15 +89,19 @@
 
     /* ----- Musikken ---------------------------------------------------------
        Én lydfil pr. svaerhedsgrad; en svaerhedsgrad uden linje har ingen
-       musik (Let og Mellem venter paa deres egne sange).
+       musik (Let venter paa sin egen sang). Mellem har Retro Maze Chase
+       (98,5 BPM), Svaer har Matrix Clubbed to Death (144 BPM).
        fil      lydfilen: et loop klippet med musik/kilde/byg_loop.py
        start    saa mange sekunder inde i filen begynder loopet
        laengde  loopets laengde i sekunder. Filen fortsaetter lidt laengere
                 med en kopi af loopets begyndelse, saa springet tilbage
                 ikke kan hoeres (js/lyd.js).
-       styrke   lydstyrken fra 0 til 1 */
+       styrke   lydstyrken fra 0 til 1. Svaers sang er 1,8 dB kraftigere
+                (-12,9 mod -14,7 LUFS), saa den staar lavere for at lyde
+                lige saa hoejt. */
     D.MUSIK = {
-        svaer: { fil: "musik/svaer.mp3", start: 0.5, laengde: 73.1127, styrke: 0.4 }
+        mellem: { fil: "musik/mellem.mp3", start: 0.5, laengde: 73.1127, styrke: 0.4 },
+        svaer:  { fil: "musik/svaer.mp3",  start: 0.5, laengde: 143.3134, styrke: 0.33 }
     };
 
     /* Mix: saa mange opgaver fra hvert af de andre emner */

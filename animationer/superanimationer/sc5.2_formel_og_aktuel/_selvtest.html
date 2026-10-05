@@ -251,10 +251,10 @@ function koerTest(W) {
     overskrift("4. Sproget");
     var tekster = [];
     D.OPL.forEach(function (o) {
-        tekster.push(o.titel, o.tekst, o.linje, o.hint, o.svar, o.efter);
+        tekster.push(o.titel, o.tekst, o.linje, o.hint, o.svar, o.konklusion);
         if (o.valg) { tekster.push(o.valg.spm, o.valg.hint); o.valg.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); }); }
         (o.spm || []).forEach(function (q) {
-            tekster.push(q.spm, q.hint, q.kort, q.efter || "");
+            tekster.push(q.spm, q.hint, q.note || "", q.efter || "");
             q.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); });
         });
     });
@@ -268,6 +268,9 @@ function koerTest(W) {
     paastand("ingen tankestreger", !/[–—]/.test(alt), (alt.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
     paastand("ingen 1+ eller 1−", !/(^|[^0-9,])1[+−-](\s|$)/.test(alt) && !/¹[⁺⁻]/.test(alt));
     paastand("ingen ord uden æ, ø og å", !ASCII_ORD.test(alt), (alt.match(ASCII_ORD) || [""])[0]);
+    paastand("opgaverne på fane 1 siger Lav en opløsning, ikke Gør", D.OPL.every(function (o) { return !/Gør /.test(o.tekst); }) &&
+        /^Lav en opløsning, hvor \[Cl⁻\] = 0,30 M\.$/.test(D.OPL[0].tekst), D.OPL[0].tekst);
+    paastand("hver opgave på fane 1 har en konklusion i ord", D.OPL.every(function (o) { return /aktuelle koncentration/.test(o.konklusion || ""); }));
 
     overskrift("5. Fane 1: opløsningen med musen");
     NK.visFane("fane-opl");
@@ -275,25 +278,38 @@ function koerTest(W) {
     function vaelgA(i) { A.vaelg(i, false); A.layout(); }
     function krukkePt(j) { var kr = A.lay.krukker[j || 0]; return { x: kr.cx, y: kr.y + kr.h / 2 }; }
     function portion(j) { var p = krukkePt(j); tryk(A, p.x, p.y); tik(A, 2); }
+    function prompt() { return d.getElementById("opl-prompt").textContent; }
+    /* Beregningen i kortet: teksten, med ét mellemrum mellem delene */
+    function beregning() {
+        var e = d.querySelector("#opl-prompt .superberegning");
+        if (!e) return "";
+        return [].map.call(e.querySelectorAll(".sb-v, .sb-led, .sb-skema, .sb-konklusion"), function (x) { return x.textContent; }).join(" ");
+    }
     vaelgA(0);
+    paastand("kortet Glasset er væk: panelet har kun opgaven og opgavelisten",
+        !d.getElementById("opl-data") && d.querySelectorAll("#fane-opl .panel > .kort").length === 2);
     portion(0);
     paastand("et klik på krukken giver en portion: [Cl⁻] = 0,10 M", Math.abs(A.glas.ion("Cl") - 0.1) < 1e-9 && /målet er 0,30 M/.test(besked(A)), besked(A));
+    paastand("før opgaven er løst, står der ingen beregning i kortet", beregning() === "", beregning());
     portion(0); portion(0);
     paastand("tre portioner NaCl: opgave 1 er løst med stjerne", A.faerdig && A.status[0].stjerne, besked(A));
+    paastand("beregningen står i kortet: formlen først, så tallene med enheder",
+        /c\(NaCl\) = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M/.test(beregning()) && d.querySelectorAll("#opl-prompt .superberegning .broek").length === 2,
+        beregning());
+    paastand("så skemaet, [Cl⁻] = c(NaCl) og en konklusion i ord",
+        /NaCl\(s\) ⟶ Na⁺\(aq\) \+ Cl⁻\(aq\) \[Cl⁻\] = c\(NaCl\) \[Cl⁻\] = 0,30 M Den aktuelle koncentration af Cl⁻ er 0,30 M\./.test(beregning()), beregning());
+    paastand("linjen roser kort og gentager ikke beregningen", D.ROS_OPGAVE.concat([D.FAERDIG.opl]).indexOf(besked(A)) >= 0, besked(A));
     function valgKnap(t) {
         return [].filter.call(d.querySelectorAll("#opl-valg .knap"), function (b) { return b.textContent === t; })[0];
     }
-    function prompt() { return d.getElementById("opl-prompt").textContent; }
-    function panel() { return d.getElementById("opl-data").textContent; }
     vaelgA(1);
     paastand("opgave 2 starter uden spørgsmål: først skal saltet i", d.getElementById("opl-valg").hidden && !/\?/.test(prompt()), prompt());
     portion(0);
     tik(A, 2);
     paastand("en portion Na₂SO₄: første spørgsmål er c(Na₂SO₄), og Start forfra er væk",
         A.fase === "spm" && /Hvad er c\(Na₂SO₄\)\?/.test(prompt()) && d.getElementById("opl-forfra").hidden, prompt());
-    paastand("glasset venter: ingen søjler, tom lup, og panelet viser n og V, men c = ?",
-        (A.vis.sNa2SO4 || 0) < 1e-3 && (A.vis.iNa || 0) < 1e-3 && A.part.antal(0) === 0 && /0,10 mol og V = 0,50 L/.test(panel()) &&
-        /c\(Na₂SO₄\) = \?/.test(panel()) && /\? Na⁺/.test(panel()), panel());
+    paastand("glasset venter: ingen søjler, tom lup og ingen beregning i kortet",
+        (A.vis.sNa2SO4 || 0) < 1e-3 && (A.vis.iNa || 0) < 1e-3 && A.part.antal(0) === 0 && beregning() === "", beregning());
     portion(0);
     paastand("mere salt kan ikke komme i, mens spørgsmålene står", Math.abs(A.glas.n.Na2SO4 - 0.1) < 1e-9 && /Svar på spørgsmålet/.test(besked(A)), besked(A));
     valgKnap("0,10 M").click();
@@ -302,20 +318,24 @@ function koerTest(W) {
     valgKnap("0,20 M").click();
     tik(A, 2);
     paastand("0,20 M: den grå søjle kommer, og næste spørgsmål er antallet af Na⁺",
-        Math.abs(A.vis.sNa2SO4 - 0.2) < 0.01 && (A.vis.iNa || 0) < 1e-3 && /Hvor mange Na⁺/.test(prompt()) && /✓ c\(Na₂SO₄\) = 0,20 M/.test(prompt()),
-        prompt());
+        Math.abs(A.vis.sNa2SO4 - 0.2) < 0.01 && (A.vis.iNa || 0) < 1e-3 && /Hvor mange Na⁺/.test(prompt()), prompt());
+    paastand("beregningen har c(Na₂SO₄) = n / V med tallene, men endnu ikke skemaet og [Na⁺]",
+        /c\(Na₂SO₄\) = 0,10 mol\s*0,50 L = 0,20 M/.test(beregning()) && !/⟶|\[Na⁺\]|aktuelle/.test(beregning()), beregning());
+    paastand("linjen roser og siger det næste, uden at gentage tallene", /næste spørgsmål/.test(besked(A)) && !/0,20 M/.test(besked(A)), besked(A));
     A.knap();
     paastand("Giv hint på spørgsmålet: tallet efter Na", /tallet efter Na/.test(A.k.tekst()), A.k.tekst());
     valgKnap("4").click();
     paastand("4: det hører til O i sulfat-ionen", /sulfat-ionen/.test(besked(A)), besked(A));
     valgKnap("2").click();
     tik(A, 2);
-    paastand("2: luppen viser ionerne, skemaet får tallene, og sidste spørgsmål er [Na⁺]",
-        A.part.antal(0) === 8 && A.part.antal(1) === 4 && /2 Na⁺\(aq\)/.test(panel()) && /Hvad bliver \[Na⁺\]\?/.test(prompt()), A.part.antal(0) + " " + prompt());
+    paastand("2: luppen viser ionerne, beregningen får skemaet, og sidste spørgsmål er [Na⁺]",
+        A.part.antal(0) === 8 && A.part.antal(1) === 4 && /Na₂SO₄\(s\) ⟶ 2 Na⁺\(aq\) \+ SO₄²⁻\(aq\)$/.test(beregning()) &&
+        /Hvad bliver \[Na⁺\]\?/.test(prompt()), A.part.antal(0) + " " + beregning());
     valgKnap("0,40 M").click();
     tik(A, 2);
-    paastand("0,40 M: opgave 2 er løst med stjerne, og ionernes søjler står", A.faerdig && A.status[1].stjerne && Math.abs(A.vis.iNa - 0.4) < 0.01 &&
-        /2 · 0,20 M = 0,40 M/.test(besked(A)), besked(A));
+    paastand("0,40 M: opgave 2 er løst med stjerne, og ionernes søjler står", A.faerdig && A.status[1].stjerne && Math.abs(A.vis.iNa - 0.4) < 0.01, besked(A));
+    paastand("beregningen slutter med [Na⁺] = 2 · c(Na₂SO₄), tallene og konklusionen",
+        /\[Na⁺\] = 2 · c\(Na₂SO₄\) \[Na⁺\] = 2 · 0,20 M = 0,40 M Den aktuelle koncentration af Na⁺ er 0,40 M\./.test(beregning()), beregning());
     vaelgA(1);
     A.knap(); A.knap();
     tik(A, 4);
@@ -341,6 +361,9 @@ function koerTest(W) {
     paastand("gættet står i linjen", /Dit gæt: SO₄²⁻/.test(besked(A)), besked(A));
     portion(0);
     paastand("Al₂(SO₄)₃: gættet holdt, [SO₄²⁻] = 0,30 M", A.faerdig && /Dit gæt holdt/.test(besked(A)) && Math.abs(A.glas.ion("SO4") - 0.3) < 1e-9, besked(A));
+    paastand("beregningen har begge ioner, og svarknapperne er væk",
+        /\[Al³⁺\] = 2 · 0,10 M = 0,20 M \[SO₄²⁻\] = 3 · c\(Al₂\(SO₄\)₃\) \[SO₄²⁻\] = 3 · 0,10 M = 0,30 M Der er flest SO₄²⁻\./.test(beregning()) &&
+        d.getElementById("opl-valg").hidden, beregning());
     vaelgA(5);
     for (i = 0; i < 5; i++) portion(0);
     paastand("kun NaCl til 0,50 M: brug begge salte", !A.faerdig && /Brug begge salte/.test(besked(A)), besked(A));
@@ -350,7 +373,10 @@ function koerTest(W) {
     paastand("fire NaCl og én Na₂SO₄: for meget, hver Na₂SO₄ giver 2 Na⁺", !A.faerdig && /giver 2 Na⁺/.test(besked(A)) && /Start forfra/.test(besked(A)), besked(A));
     d.getElementById("opl-forfra").click();
     portion(0); portion(0); portion(0); portion(1);
-    paastand("tre NaCl og én Na₂SO₄: [Na⁺] = 0,50 M, opgave 6 er løst", A.faerdig && /bidragene lægges sammen/.test(besked(A)), besked(A));
+    paastand("tre NaCl og én Na₂SO₄: [Na⁺] = 0,50 M, opgave 6 er løst", A.faerdig, besked(A));
+    paastand("to salte: c = n / V én gang, begge salte med tal, og bidragene lagt sammen",
+        /^c = n\s*V c\(NaCl\) = 0,30 mol\s*1,00 L = 0,30 M c\(Na₂SO₄\) = 0,10 mol\s*1,00 L = 0,10 M \[Na⁺\] = c\(NaCl\) \+ 2 · c\(Na₂SO₄\) \[Na⁺\] = 0,30 M \+ 2 · 0,10 M = 0,50 M Den aktuelle/.test(beregning()) &&
+        /lægges sammen\.$/.test(beregning()), beregning());
     paastand("alle seks er løst, og knappen går videre til Ionerne", A.antalLoest() === 6 && /Ionerne/.test(A.el.knap.textContent), A.el.knap.textContent);
     vaelgA(0);
     A.knap();
@@ -362,6 +388,18 @@ function koerTest(W) {
     overskrift("6. Fane 2: ionerne");
     NK.visFane("fane-ioner");
     B.tilpas(); B.layout();
+    function promptB() { return d.getElementById("ioner-prompt").textContent; }
+    B.gang = [0, 1, 0];
+    B.vaelg(0, false);
+    paastand("Let: opgaven siger, at skemaet skal afstemmes, før ionernes koncentrationer kan findes",
+        /c\(CaCl₂\) = 0,240 M\./.test(promptB()) && /Før ionernes aktuelle koncentrationer kan findes, skal opløsningsskemaet afstemmes\./.test(promptB()) &&
+        !/Find /.test(promptB()), promptB());
+    B.vaelg(1, false);
+    paastand("Middel baglæns: før c(Na₃PO₄) og [Na⁺] kan findes, skal skemaet afstemmes",
+        /Før c\(Na₃PO₄\) og \[Na⁺\] kan findes, skal opløsningsskemaet afstemmes\./.test(promptB()), promptB());
+    B.vaelg(2, false);
+    paastand("Svær: først c(Pb(NO₃)₂), så skemaet",
+        /skal c\(Pb\(NO₃\)₂\) beregnes og opløsningsskemaet afstemmes\./.test(promptB()), promptB());
     B.gang = [0, 0, 0];
     var loeste = [];
     [0, 1, 2].forEach(function (niv) {

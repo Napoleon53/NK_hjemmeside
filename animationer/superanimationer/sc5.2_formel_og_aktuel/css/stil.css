@@ -207,7 +207,6 @@ main { flex: 1; position: relative; min-height: 0; }
     gap: 8px;
 }
 
-.kort.maaling { border-left: 3px solid var(--groen); }
 .kort.opgavekort { border-left: 3px solid var(--lilla); }
 
 .kort > h2 .taeller {
@@ -556,22 +555,66 @@ select:focus-visible {
 .broek > span { padding: 0 3px; }
 .broek > span:first-child { border-bottom: 1.5px solid currentColor; }
 
-/* De paene beregninger paa fane 3 */
-.regn-linjer .note { margin: 0; }
-
-.regn-linje {
-    background-color: rgba(255, 255, 255, 0.045);
+/* ---------------------------------------------------------------------
+   BEREGNINGEN I KORTET paa fane 1, skrevet som eleverne skal skrive
+   den: formlen foerst, saa tallene med enheder, lighedstegnene under
+   hinanden og til sidst en konklusion i ord
+   --------------------------------------------------------------------- */
+.superberegning {
+    margin: 8px 0 2px;
+    padding: 8px 10px 9px;
+    border-left: 3px solid var(--groen);
     border-radius: var(--radius-lil);
-    padding: 7px 10px;
-    font-size: 0.92rem;
-    line-height: 1.5;
+    background-color: rgba(255, 255, 255, 0.045);
+}
+
+.sb-etiket {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--tekst-mat);
+}
+
+.sb-gitter {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    align-items: center;
+    gap: 5px 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
     color: var(--tekst);
     font-variant-numeric: tabular-nums;
 }
 
-.regn-linje + .regn-linje { margin-top: 5px; }
-.regn-linje b { color: #b8f0cf; }
-.regn-linje.svar b { color: #f5dd8a; }
+.sb-v { text-align: right; white-space: nowrap; }
+.sb-led { display: inline-block; white-space: nowrap; }
+.sb-h b { color: #b8f0cf; }
+.sb-skema { grid-column: 1 / -1; text-align: center; }
+.sb-ny { margin-top: 9px; }
+.superberegning .broek { font-size: 0.9em; margin: 0 2px; }
+
+.sb-konklusion {
+    margin: 10px 0 0;
+    padding-top: 8px;
+    border-top: 1px solid #3a3a47;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--tekst);
+}
+
+/* Det smalle panel: den laengste linje (to salte) skal kunne staa paa én linje */
+@media (max-width: 1320px) {
+    .superberegning { padding-left: 8px; padding-right: 8px; }
+    .sb-gitter { font-size: 0.92rem; }
+}
+
+/* Rosen, naar opgaven paa fane 1 er loest */
+#opl-kort.sejr .besked.god::before { content: "✓ "; font-weight: 700; }
 
 
 /* ---------------------------------------------------------------------
@@ -817,8 +860,7 @@ select:focus-visible {
 
 .valgrad.peg .knap:not(:disabled) { border-color: var(--gul); animation: peg 1s ease-out infinite; }
 
-/* Spoergsmaalene efter opløsningen paa fane 1: de besvarede med ✓, det aktuelle fremhaevet */
-.spm-loest { margin: 0 0 3px; font-size: 0.92rem; line-height: 1.4; color: #7ee0a8; }
+/* Spoergsmaalet efter opløsningen paa fane 1 (det besvarede staar i beregningen over det) */
 .opgavekort .spm-nu { margin: 6px 0 4px; font-size: 1.02rem; font-weight: 700; line-height: 1.4; color: var(--tekst); }
 
 /* Start forfra i Kemichaels baand, til venstre for knappen, der sender ham ud */
@@ -888,6 +930,5 @@ input.koef {
 input.koef:focus { border-style: solid; box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.6); }
 input.koef:disabled { opacity: 0.6; }
 
-.skemalinje { margin: 0 0 8px; font-size: 0.98rem; font-weight: 600; color: #e6ebf0; line-height: 1.6; }
-.regn-linje.ion { display: flex; align-items: center; gap: 7px; }
-.regn-linje .prik { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4); }
+/* Fane 2: vejen til svaret under opgavens tal (foerste trin foerst) */
+.opgave-vej { margin: 6px 0 2px; font-size: 0.95rem; line-height: 1.45; color: var(--tekst); }

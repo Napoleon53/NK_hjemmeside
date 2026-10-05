@@ -70,13 +70,6 @@
         return -Math.log(c / 2 + Math.sqrt(c * c / 4 + 1e-14)) / Math.LN10;
     }
 
-    /* 0,0018 bliver "1,8 mL", og 18,2 bliver "18 L" */
-    function maengdeTekst(liter) {
-        var ml = liter < 0.9995, v = ml ? liter * 1000 : liter;
-        var tal = v < 9.95 ? (Math.round(v * 10) / 10).toFixed(1).replace(".", ",") : String(Math.round(v));
-        return tal + (ml ? " mL" : " L");
-    }
-
     /* Klassekammeraterne. Hver ny, efter et plask, faar det naeste udseende. */
     var UDSEENDE = [
         { hud: "#f1c7a3", haar: "#6b4226", stil: "kort",      bluse: "#2a9d8f" },
@@ -1469,6 +1462,5 @@
     Kar.TOENDE = TOENDE;
     Kar.syreVedPh = syreVedPh;
     Kar.phVed = phVed;
-    Kar.maengdeTekst = maengdeTekst;
     NK.Kar = Kar;
 }());

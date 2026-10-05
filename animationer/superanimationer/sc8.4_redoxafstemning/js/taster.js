@@ -4,8 +4,9 @@
    En række taster på tavlen, så alle felter kan udfyldes med musen
    eller en finger: oxidationstallene som romertal, tal til
    koefficienter og elektroner, og tal med fortegn til ladningen.
-   Rækken står under det felt, der er valgt, og en lille hale peger op
-   på det. Tastaturet virker som før.
+   Rækken står under arket, flytter sig hen under det felt, der er
+   valgt, og en lille hale peger op mod det. Tastaturet virker som før.
+   I et trin uden felter er rækken usynlig, men beholder sin plads.
 
    Det valgte felt er det, der sidst blev klikket i. Det huskes, selv
    om feltet mister markøren, og glemmes, når trinnet skifter. Det
@@ -29,8 +30,7 @@
     var maerke = "";       /* opgave og trin: skifter det, glemmes det valgte felt */
 
     function felter() {
-        var a = NK.el("tavle").querySelectorAll("input[data-felt]"), b = NK.el("ab-valg").querySelectorAll("input[data-felt]");
-        return Array.prototype.slice.call(a).concat(Array.prototype.slice.call(b));
+        return Array.prototype.slice.call(NK.el("tavle").querySelectorAll("input[data-felt]"));
     }
 
     function feltEl(key) {
@@ -61,7 +61,7 @@
        intet valgt, står den midt under skemaet uden hale. */
     function placer() {
         var boks = NK.el("taster");
-        if (!boks || boks.hidden) return;
+        if (!boks || !slags) return;
         var el = valgt ? feltEl(valgt) : null, b = boks.offsetWidth;
         if (!el || !b) {
             boks.style.transform = "";
@@ -96,12 +96,14 @@
         slags = nySlags;
         frisk = true;
         if (valgt && !feltEl(valgt)) valgt = null;
-        if (slags !== tegnet) {
-            boks.innerHTML = slags ? raekkeHTML(slags) : "";
-            boks.className = "taster" + (slags ? " " + slags : "");
-            tegnet = slags;
+        /* Bruges tasterne ikke i trinnet (trin 2, færdig), bliver rækken
+           stående usynlig, så arket ikke flytter sig. */
+        var vis = slags || tegnet || "tal";
+        if (vis !== tegnet) {
+            boks.innerHTML = raekkeHTML(vis);
+            tegnet = vis;
         }
-        boks.hidden = !slags;
+        boks.className = "taster " + vis + (slags ? "" : " tom");
         maerkValgt();
         placer();
     }

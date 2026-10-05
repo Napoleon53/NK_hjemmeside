@@ -23,7 +23,8 @@
        at Let og Mellem er langsommere og mildere end den
      - at spoegelserne opfoerer sig som i den gamle: sovetid, skridt,
        nye spoegelser paa Svaer, og den lange soevn efter et forkert rum
-     - at musikken kun findes paa Svaer, foelger pausen og lydknappen
+     - at Mellem og Svaer har hver sin musik, og at den foelger pausen
+       og lydknappen
      - at pausen kan bruges frit paa Let og én gang i hvert spil paa
        Mellem og Svaer, ogsaa naar reglerne aabnes midt i en opgave
      - at alle opgaver har tre forskellige forkerte svar med et hint
@@ -641,14 +642,18 @@ function koer() {
     A.fraLink();
     paastand("#svaer&grundstoffer starter Grundstoffer på Svær", AS.skaerm === "spil" && AS.emne === "grundstoffer" && AS.svaerhed === "svaer" && AS.antal() === 32);
 
-    /* Musikken: kun Svaer har en sang; den foelger spillet og lydknappen.
-       Om loopet spiller uden hak, kan kun hoeres; her tjekkes styringen. */
-    var Ly = NK.Spillyd, lk = d.getElementById("lydknap"), MU = D.MUSIK.svaer;
-    paastand("kun Svær har musik", !!MU && !D.MUSIK.let && !D.MUSIK.mellem);
-    var hoved = new XMLHttpRequest();
-    try { hoved.open("HEAD", MU.fil, false); hoved.send(); } catch (e) { /* findes ikke */ }
-    paastand("lydfilen findes (" + MU.fil + ")", hoved.status === 200, hoved.status);
-    paastand("loopet er over 30 s, og styrken ligger mellem 0 og 1", MU.laengde > 30 && MU.start >= 0 && MU.styrke > 0 && MU.styrke <= 1);
+    /* Musikken: Mellem og Svaer har hver sin sang, Let har ingen; den
+       foelger spillet og lydknappen. Om loopet spiller uden hak, kan kun
+       hoeres; her tjekkes styringen. */
+    var Ly = NK.Spillyd, lk = d.getElementById("lydknap");
+    paastand("Mellem og Svær har musik, Let har ingen", !!D.MUSIK.mellem && !!D.MUSIK.svaer && !D.MUSIK.let);
+    paastand("de to har hver sin fil", D.MUSIK.mellem.fil !== D.MUSIK.svaer.fil);
+    ["mellem", "svaer"].forEach(function (k) {
+        var MU = D.MUSIK[k], hoved = new XMLHttpRequest();
+        try { hoved.open("HEAD", MU.fil, false); hoved.send(); } catch (e) { /* findes ikke */ }
+        paastand(k + ": lydfilen findes (" + MU.fil + ")", hoved.status === 200, hoved.status);
+        paastand(k + ": loopet er over 30 s, og styrken ligger mellem 0 og 1", MU.laengde > 30 && MU.start >= 0 && MU.styrke > 0 && MU.styrke <= 1);
+    });
     A.hud();
     var mt = Ly.tilstand();
     paastand("på Svær vises lydknappen, og musikken er ønsket under spillet", synlig("lydknap") && Ly.til() && mt.oensket === "svaer" && !mt.stille, JSON.stringify(mt));
@@ -667,13 +672,19 @@ function koer() {
     A.tilStart();
     paastand("på startskærmen er musikken stoppet, og knappen står der stadig på Svær", Ly.tilstand().oensket === null && synlig("lydknap"));
     A.vaelgSvaerhed("mellem");
-    paastand("på Mellem er der ingen lydknap", !synlig("lydknap"));
+    A.startEmne("ioner");
+    A.hud();
+    paastand("på Mellem spiller Mellems egen sang", AS.skaerm === "spil" && synlig("lydknap") && Ly.tilstand().oensket === "mellem");
+    A.tilStart();
+    A.vaelgSvaerhed("let");
+    paastand("på Let er der ingen lydknap", !synlig("lydknap"));
     A.startEmne("ioner");
     A.hud();
     paastand("og ingen musik under spillet", AS.skaerm === "spil" && Ly.tilstand().oensket === null && !synlig("lydknap"));
     tast("m");
     paastand("M gør ingenting uden lydknap", Ly.til());
     A.tilStart();
+    A.vaelgSvaerhed("mellem");
     w.location.hash = "";
 
     /* Tegningen i alle tilstande */

@@ -23,9 +23,10 @@
    bliver genkendt og får den rigtige besked, at alle reaktioner kan
    gennemføres med rigtige svar og med Vis svaret, at vægten er slået
    fra fra start og følger med, når den slås til, at alle felter kan
-   udfyldes med tasterne under dem, at Kemichael er væk, at sproget
-   overholder reglerne, og at skemaet står på én linje uden at dække
-   noget. Skal køres gennem en lokal server (iframen kan ikke læses fra
+   udfyldes med tasterne under arket, at arket står stille fra trin til
+   trin (stofferne, tasterne og knapperne flytter sig ikke), at
+   Kemichael er væk, at sproget overholder reglerne, og at skemaet står
+   på én linje uden at dække noget. Skal køres gennem en lokal server (iframen kan ikke læses fra
    file://); mappen henter ingen filer uden for sig selv.
    ===================================================================== */
 var linjer = [];
@@ -64,6 +65,18 @@ function koerAlt() {
     ro.textContent = "*{transition:none!important;animation:none!important}";
     d.head.appendChild(ro);
     function skrift() { return parseFloat(w.getComputedStyle(d.querySelector("#tavle .skema")).fontSize); }
+    /* Skemaet, som det ses på arket: uden de usynlige pladser og de skjulte 1-taller */
+    function skemaSomTekst() {
+        var sider = [[], []], side = 0;
+        Array.prototype.forEach.call(d.querySelectorAll("#tavle .skema .led, #tavle .skema .pil"), function (e) {
+            if (e.classList.contains("pil")) { side = 1; return; }
+            if (e.closest(".usynlig")) return;
+            var k = e.querySelector(".koeftal");
+            var tal = k && w.getComputedStyle(k).visibility !== "hidden" ? k.textContent + " " : "";
+            sider[side].push(tal + Array.prototype.map.call(e.querySelectorAll(".sym"), function (x) { return x.textContent; }).join(""));
+        });
+        return sider[0].join(" + ") + " ⟶ " + sider[1].join(" + ");
+    }
     function enLinje() {
         var b = d.querySelector("#tavle .skema").children, bund = b[0].offsetTop + b[0].offsetHeight;
         for (var j = 1; j < b.length; j++) if (Math.abs(b[j].offsetTop + b[j].offsetHeight - bund) > 6) return false;
@@ -140,7 +153,7 @@ function koerAlt() {
         var R = n.R;
         switch (n.trin) {
         case T.OX: R.led.forEach(function (l, i) { n.f.o[i] = X.ox(l.st.ox[l.st.ukendt]); }); n.tjek(); break;
-        case T.PAR: var L = n.parListe(); n.valgKlik(1, L[1].type); break;
+        case T.PAR: var L = n.parListe(); n.valgKlik(1, L[1].type); n.valgKlik(0, L[0].type); break;
         case T.E: n.f.eox = String(R.ox.delta); n.f.ered = "-" + R.red.delta; n.tjek(); break;
         case T.K: R.koef.forEach(function (v, i) { n.f.k[i] = String(v); }); n.tjek(); break;
         case T.LAD: n.f.lv = X.lad(R.ladning.v); n.f.lh = String(R.ladning.h); n.tjek(); break;
@@ -161,7 +174,9 @@ function koerAlt() {
     niv.valgKlik(0, forkert);
     paastand("trin 2: forkert valg forklarer, om tallet stiger eller falder", niv.trin === T.PAR && /(stiger|falder), så det er en/.test(besked(niv)) && !!niv.parFejl, besked(niv));
     niv.valgKlik(0, L[0].type);
-    paastand("trin 2: rigtigt valg forklarer begge par", niv.trin === T.E && /oxideres/.test(besked(niv)) && /reduceres/.test(besked(niv)));
+    paastand("trin 2: ét rigtigt valg er ikke nok; begge par skal have et navn", niv.trin === T.PAR && niv.parOk[0] && !niv.parOk[1] && besked(niv) === "");
+    niv.valgKlik(1, L[1].type);
+    paastand("trin 2: når begge er valgt, går det videre med et kort Rigtigt", niv.trin === T.E && besked(niv) === "Rigtigt.", besked(niv));
     niv.f.eox = "3"; niv.f.ered = "7"; niv.tjek();
     paastand("trin 3: et oxidationstal i stedet for forskellen", /forskellen/.test(besked(niv)), besked(niv));
     niv.f.eox = "5"; niv.f.ered = "1"; niv.tjek();
@@ -225,14 +240,14 @@ function koerAlt() {
                 if (n.trin === foer && !n.faerdig) { ustabil.push(R.id + " trin " + (foer + 1) + ": " + n.besked.tekst); break; }
             }
             if (!n.faerdig || n.vist) ikkeFaerdig.push(R.id);
-            var tavle = d.getElementById("tavle").textContent.replace(/\s+/g, " ").trim().replace(/ ?⟶ ?/, " ⟶ ");
-            var forvent = X.skemaTekst(R.slut).replace(/\s+/g, " ");
-            if (tavle.replace(/ /g, "") !== forvent.replace(/ /g, "")) forkertSlut.push(R.id + ": " + tavle);
+            var forvent = X.skemaTekst(R.slut), noten = d.querySelector("#tavle .tavle-note");
+            var staar = R.samme ? (noten ? noten.textContent.replace(/^Slået sammen: /, "") : "") : skemaSomTekst();
+            if (staar !== forvent) forkertSlut.push(R.id + ": " + staar);
             if (!R.miljoe && trinSet.indexOf(T.ION) >= 0) ustabil.push(R.id + " fik trin 6 uden miljø");
         });
     });
     paastand("alle 37 reaktioner kan afstemmes med rigtige svar på alle trin", ikkeFaerdig.length === 0 && ustabil.length === 0, ikkeFaerdig.concat(ustabil).join(" | "));
-    paastand("tavlen viser til sidst det færdige, sammenskrevne skema", forkertSlut.length === 0, forkertSlut.slice(0, 3).join(" | "));
+    paastand("arket viser til sidst det færdige skema (sammenskrevet under arket, når et stof står to gange)", forkertSlut.length === 0, forkertSlut.slice(0, 3).join(" | "));
     paastand("der er et hint på hvert trin i hver reaktion", hints.length === 0, hints.slice(0, 4).join(", "));
     var h = JSON.parse(w.localStorage.getItem("nk-sc8.4-loest")) || {};
     paastand("alle 37 er gemt som løst i browseren", alle.every(function (R) { return h[R.id] === "loest"; }));
@@ -254,6 +269,7 @@ function koerAlt() {
             while (!n.faerdig && g++ < 12) {
                 n.knap();
                 if (n.besked.klasse !== "gul" || !/^Hint: /.test(n.besked.tekst)) { svarFejl.push(R.id + " hint"); break; }
+                tekster.push(n.besked.tekst);
                 n.knap();
                 tekster.push(n.besked.tekst);
                 if (/undefined|NaN/.test(n.besked.tekst)) svarFejl.push(R.id + ": " + n.besked.tekst);
@@ -301,8 +317,9 @@ function koerAlt() {
     paastand("i trin 4: Fe²⁺ til venstre med 1 e⁻, Cr₂O₇²⁻ til højre med 2 · 3 = 6 e⁻", vd.fase === 3 && vd.v.tekst === "Fe²⁺" && vd.v.ePr === 1 && vd.h.tekst === "Cr₂O₇²⁻" && vd.h.ePr === 6);
     var vg = NK.vaegt, k;
     for (k = 0; k < 120; k++) vg.opdater(1 / 60, niv, 900, 420);
-    paastand("før eleven skriver noget: tomme skåle, vægten lige, intet facit under skemaet og ingen 1-taller i felterne",
-        vd.v.antal === 0 && vd.h.antal === 0 && Math.abs(vg.vinkel) < 0.01 && d.getElementById("kontrol").textContent === ""
+    paastand("før eleven skriver noget: tomme skåle, vægten lige, klammerne siger kun, hvad én enhed giver, og ingen 1-taller i felterne",
+        vd.v.antal === 0 && vd.h.antal === 0 && Math.abs(vg.vinkel) < 0.01
+        && Array.prototype.every.call(d.querySelectorAll("#tavle .klamme"), function (k2) { return / pr\. /.test(k2.textContent); })
         && !d.querySelector('#tavle .koeffelt[placeholder="1"]'));
     paastand("vægten står midt i scenen, nu hvor der ikke står en lærer ved siden af", Math.abs(vg.lay.cx - 450) < 1, String(vg.lay.cx));
     for (k = 0; k < 6; k++) niv.vaegtKlik("v", 1);
@@ -318,7 +335,6 @@ function koerAlt() {
     niv.vaegtKlik("h", -1);
     niv.vaegtKlik("h", -1);
     paastand("minus ned til tomt felt og ikke længere", niv.f.k[M4.red.v] === "" && d.querySelector('[data-felt="k' + M4.red.v + '"]').value === "");
-    paastand("kontrollen under skemaet er tom i trin 4, når vægten viser elektronerne", d.getElementById("kontrol").textContent === "");
     for (k = 0; k < 30; k++) niv.vaegtKlik("h", 1);
     var fr = w.document.createElement("canvas");
     fr.width = 900; fr.height = 420;
@@ -332,22 +348,49 @@ function koerAlt() {
     vknap.click();
     paastand("vægten kan slås fra igen, og tavlen fylder scenen igen", omr.hidden && !d.body.classList.contains("med-vaegt") && Math.abs(tramme.getBoundingClientRect().height - udenH) < 2);
     tilReaktion(niv, "M4"); til(niv, T.K);
-    paastand("uden vægten står elektronerne under skemaet i trin 4", /Én Fe²⁺ afgiver 1 e⁻/.test(d.getElementById("kontrol").textContent) && /Én Cr₂O₇²⁻ optager 2 · 3 e⁻ = 6 e⁻/.test(d.getElementById("kontrol").textContent), d.getElementById("kontrol").textContent);
+    paastand("uden vægten tæller klammerne elektronerne i trin 4", /afgiver 1 e⁻ pr\. Fe²⁺/.test(d.getElementById("tavle").textContent) && /optager 2 · 3 e⁻ = 6 e⁻ pr\. Cr₂O₇²⁻/.test(d.getElementById("tavle").textContent), d.getElementById("tavle").textContent);
 
-    /* ----- 7. Tavlen og tasterne ---------------------------------------------- */
-    overskrift("7. Tavlen og tasterne");
+    /* ----- 7. Arket og tasterne ----------------------------------------------- */
+    overskrift("7. Arket og tasterne");
     function ev(el, type) { el.dispatchEvent(new w.Event(type, { bubbles: true })); }
     function felt(key) { return d.querySelector('[data-felt="' + key + '"]'); }
     function vaelgFelt(key) { var el = felt(key); ev(el, "pointerdown"); ev(el, "focusin"); return el; }
     function tast(t) { var kn = d.querySelector('#taster .tast[data-tast="' + t + '"]'); if (kn) kn.click(); return !!kn; }
-    var ta = d.getElementById("taster"), tjek = d.getElementById("tjek"), kontrol = d.getElementById("kontrol"), hintknap = d.getElementById("opgaveknap");
+    var ta = d.getElementById("taster"), tjek = d.getElementById("tjek"), hintknap = d.getElementById("opgaveknap"), arket = d.getElementById("tavle");
     function tastNavne() { return Array.prototype.map.call(ta.querySelectorAll(".tast"), function (kn) { return kn.textContent; }); }
+    function klamme(nr) { return arket.querySelector('.klamme[data-par="' + nr + '"]'); }
+    function klTekst(nr) { return klamme(nr).textContent.replace(/\s+/g, " ").trim(); }
+    function forskel(navne, liste) {
+        var ud = [];
+        for (var i = 1; i < liste.length; i++) if (flyttet(liste[0], liste[i], 0) || nedeFlyttet(liste[0], liste[i])) ud.push(navne[i] + ": " + JSON.stringify(liste[i]));
+        return ud.length ? JSON.stringify(liste[0]) + " mod " + ud.join(" | ") : "";
+    }
+    function raekker() { return Array.prototype.map.call(arket.querySelectorAll(".rrk"), function (r) { return r.textContent.replace(/\s+/g, " ").trim(); }); }
     /* Halen på tasterækken peger på midten af feltet */
     function haleVed(key) {
         var r = ta.getBoundingClientRect(), f = felt(key).getBoundingClientRect();
         var hale = parseFloat(ta.style.getPropertyValue("--hale"));
         return !ta.classList.contains("uden-hale") && Math.abs(r.left + hale - (f.left + f.width / 2)) <= 3;
     }
+    /* Hvor står tingene? De fire stoffer, tasterne, knapperne og beskeden. */
+    function aftryk() {
+        var a = { fs: skrift(), led: [] };
+        for (var i = 0; i < 4; i++) {
+            var r = arket.querySelector('[data-led="' + i + '"] .atom.ukendt .sym').getBoundingClientRect();
+            a.led.push([Math.round(r.left), Math.round(r.top)]);
+        }
+        a.taster = Math.round(ta.getBoundingClientRect().top);
+        a.knapper = Math.round(d.querySelector(".ab-knapper").getBoundingClientRect().top);
+        a.besked = Math.round(d.getElementById("besked").getBoundingClientRect().top);
+        a.ark = Math.round(arket.getBoundingClientRect().height);
+        return a;
+    }
+    function flyttet(a, b, tol) {
+        var storst = 0;
+        for (var i = 0; i < 4; i++) storst = Math.max(storst, Math.abs(a.led[i][0] - b.led[i][0]), Math.abs(a.led[i][1] - b.led[i][1]));
+        return storst > tol || a.fs !== b.fs;
+    }
+    function nedeFlyttet(a, b) { return a.taster !== b.taster || a.knapper !== b.knapper || a.besked !== b.besked || a.ark !== b.ark; }
 
     paastand("Kemichael er ikke med: ingen figur, ingen præsentation og ingen filer uden for mappen",
         !NK.laerer && !NK.Laerer && !NK.Kemichael && !NK.Praesentation && !d.getElementById("tilbud") && !d.getElementById("spring-over")
@@ -359,8 +402,8 @@ function koerAlt() {
     niv = NK.niveauer.middel;
     tilReaktion(niv, "M1");
     var fsSk = skrift(), of = felt("o0").getBoundingClientRect();
-    paastand("skemaet er stort: mindst 56 px i trin 1 ved 1400 × 860 (før 33,6 px)", fsSk >= 56, fsSk + " px");
-    paastand("felterne er til at ramme: mindst 60 × 40 px", of.width >= 60 && of.height >= 40, Math.round(of.width) + " x " + Math.round(of.height));
+    paastand("skemaet er stort: mindst 40 px i trin 1 ved 1400 × 860 (den første udgave havde 33,6 px)", fsSk >= 40, fsSk + " px");
+    paastand("felterne er til at ramme: mindst 50 × 34 px", of.width >= 50 && of.height >= 34, Math.round(of.width) + " x " + Math.round(of.height));
     var ot = d.getElementById("opgavetekst"), spm = d.getElementById("ab-spm"), rammeTop = tramme.getBoundingClientRect().top;
     paastand("opgaven og trinnets spørgsmål står over tavlen med stor skrift",
         !!ot.closest(".scene") && !d.querySelector(".panel #opgavetekst") && ot.getBoundingClientRect().bottom <= rammeTop && spm.getBoundingClientRect().bottom <= rammeTop
@@ -375,10 +418,15 @@ function koerAlt() {
     hintknap.click();
     paastand("efter et forkert svar lyser hintknappen op, til hintet er givet", lyser && !hintknap.classList.contains("lys") && hintknap.textContent === "Vis svaret" && /^Hint: /.test(besked(niv)), besked(niv));
     tilReaktion(niv, "M1");
-    paastand("trin 1: tasterne er oxidationstallene fra −IV til +VII, og det første felt er valgt", !ta.hidden && tastNavne().join(" ") === "−IV −III −II −I 0 +I +II +III +IV +V +VI +VII"
+
+    /* Trin 1 */
+    var a1 = aftryk();
+    paastand("trin 1: tasterne er oxidationstallene fra −IV til +VII, og det første felt er valgt", !ta.classList.contains("tom") && tastNavne().join(" ") === "−IV −III −II −I 0 +I +II +III +IV +V +VI +VII"
         && NK.Taster.valgt() === "o0" && felt("o0").classList.contains("valgt"), tastNavne().join(" ") + " / " + NK.Taster.valgt());
-    var afstand = ta.getBoundingClientRect().top - d.querySelector("#tavle .skema").getBoundingClientRect().bottom;
-    paastand("tasterne står lige under skemaet, og halen peger på det valgte felt", afstand >= 0 && afstand < 40 && haleVed("o0"), Math.round(afstand) + " px");
+    var afstand = ta.getBoundingClientRect().top - arket.getBoundingClientRect().bottom;
+    paastand("tasterne står lige under arket, og halen peger mod det valgte felt", afstand >= 0 && afstand < 30 && haleVed("o0"), Math.round(afstand) + " px");
+    paastand("før trin 2 er der hverken klammer eller rækker at se, men pladsen er sat af", klTekst(0) === "" && klTekst(1) === "" && raekker().join("") === ""
+        && arket.querySelector(".klrk.oppe").offsetHeight >= 30 && arket.querySelector(".klrk.nede").offsetHeight >= 30 && arket.querySelectorAll(".rrk").length === 2);
     tast("+VII");
     paastand("et tryk skriver tallet i feltet og går videre til det næste tomme felt", niv.f.o[0] === "+VII" && felt("o0").value === "+VII" && NK.Taster.valgt() === "o1" && haleVed("o1"), niv.f.o[0] + " / " + NK.Taster.valgt());
     tast("+II"); tast("+II"); tast("+III");
@@ -386,31 +434,58 @@ function koerAlt() {
     paastand("et klik på et felt vælger det, og et nyt tryk afløser tallet", niv.f.o[0] === "−II" && NK.Taster.valgt() === "o0" && felt("o0").classList.contains("valgt"));
     tast("+VII");
     tjek.click();
-    paastand("trin 1 kan løses med tasterne alene", niv.trin === T.PAR, besked(niv));
-    paastand("trin 2 har fire knapper og ingen taster", ta.hidden && tjek.hidden && d.querySelectorAll("#ab-valg .valgknap").length === 4);
-    d.querySelector('#ab-valg .valgknap[data-par="0"][data-valg="' + niv.parListe()[0].type + '"]').click();
+    paastand("trin 1 kan løses med tasterne alene, og svaret er kun et kort Rigtigt", niv.trin === T.PAR && besked(niv) === "Rigtigt.", besked(niv));
 
-    paastand("trin 3: taltaster, og det første felt er valgt", niv.trin === T.E && tastNavne().join("") === "1234567890⌫" && NK.Taster.valgt() === "eox" && haleVed("eox"), tastNavne().join("") + " / " + NK.Taster.valgt());
-    tast("1"); vaelgFelt("ered"); tast("5");
+    /* Trin 2: en klamme pr. par, to knapper på hver */
+    var a2 = aftryk(), par = niv.parListe();
+    var k0 = klamme(0).getBoundingClientRect(), k1 = klamme(1).getBoundingClientRect(), skR = arket.querySelector(".skema").getBoundingClientRect();
+    function atomMidt(i) { var r = arket.querySelector('[data-led="' + i + '"] .atom.ukendt').getBoundingClientRect(); return r.left + r.width / 2; }
+    paastand("trin 2: en klamme over og en under skemaet, fra atomet før pilen til det samme atom efter",
+        k0.bottom <= skR.top + 0.3 * skrift() && k1.top >= skR.bottom - 6 && Math.abs(k0.left - atomMidt(par[0].v)) <= 3 && Math.abs(k0.right - atomMidt(par[0].h)) <= 3
+        && Math.abs(k1.left - atomMidt(par[1].v)) <= 3 && Math.abs(k1.right - atomMidt(par[1].h)) <= 3);
+    paastand("på hver klamme står to knapper, tasterne er væk, men beholder deres plads", klamme(0).querySelectorAll(".valgknap").length === 2 && klamme(1).querySelectorAll(".valgknap").length === 2
+        && ta.classList.contains("tom") && w.getComputedStyle(ta).visibility === "hidden" && tjek.hidden);
+    klamme(0).querySelector('.valgknap[data-valg="' + par[0].type + '"]').click();
+    var a2b = aftryk();
+    paastand("første valg farver sin klamme og skriver navnet, og resten af arket står, som det stod",
+        niv.trin === T.PAR && klamme(0).querySelectorAll(".valgknap").length === 0 && /^(Oxidation|Reduktion)$/.test(klTekst(0)) && klamme(0).classList.contains(par[0].type === "ox" ? "r-ox" : "r-red")
+        && klamme(1).querySelectorAll(".valgknap").length === 2 && !flyttet(a2, a2b, 0) && besked(niv) === "", klTekst(0) + " / " + besked(niv));
+    klamme(1).querySelector('.valgknap[data-valg="' + par[0].type + '"]').click();
+    paastand("samme navn på begge klammer får en forklaring", niv.trin === T.PAR && /(stiger|falder), så det er en/.test(besked(niv)) && !!klamme(1).querySelector(".valgknap.forkert"), besked(niv));
+    klamme(1).querySelector('.valgknap[data-valg="' + par[1].type + '"]').click();
+
+    /* Trin 3: feltet står på klammen */
+    var a3 = aftryk(), foerste = par[0].type === "ox" ? "eox" : "ered";
+    paastand("trin 3: på hver klamme står navnet og et felt, og feltet på den øverste er valgt",
+        niv.trin === T.E && !!klamme(0).querySelector("input") && !!klamme(1).querySelector("input") && /^Reduktion falder med pr\. atom$/.test(klTekst(0)) && /^Oxidation stiger med pr\. atom$/.test(klTekst(1))
+        && tastNavne().join("") === "1234567890⌫" && NK.Taster.valgt() === foerste, klTekst(0) + " | " + klTekst(1) + " / " + NK.Taster.valgt());
+    vaelgFelt("eox"); tast("1"); vaelgFelt("ered"); tast("5");
     tjek.click();
-    paastand("trin 3 kan løses med tasterne", niv.trin === T.K, besked(niv));
+    paastand("trin 3 kan løses med tasterne", niv.trin === T.K && besked(niv) === "Rigtigt.", besked(niv));
 
-    paastand("trin 4: det første felt er valgt, og under tasterne står kun, hvad én enhed afgiver og optager",
-        NK.Taster.valgt() === "k0" && /Én Fe²⁺ afgiver 1 e⁻/.test(kontrol.textContent) && /Én MnO₄⁻ optager 5 e⁻/.test(kontrol.textContent) && !kontrol.querySelector(".ktegn"), kontrol.textContent);
+    /* Trin 4: felterne kommer i de pladser, der har stået der fra start */
+    var a4 = aftryk();
+    paastand("trin 4: det første felt er valgt, og klammerne siger kun, hvad én enhed afgiver og optager",
+        NK.Taster.valgt() === "k0" && klTekst(1) === "Oxidation afgiver 1 e⁻ pr. Fe²⁺" && klTekst(0) === "Reduktion optager 5 e⁻ pr. MnO₄⁻", klTekst(0) + " | " + klTekst(1));
     tast("1"); tast("6");
     var toCifre = niv.f.k[0];
     tast("⌫");
     paastand("to cifre sættes efter hinanden, og ⌫ sletter det sidste", toCifre === "16" && niv.f.k[0] === "1", toCifre + " / " + niv.f.k[0]);
     vaelgFelt("k1"); tast("4");
-    paastand("elektronerne tælles med elevens egne tal: 4 · 1 e⁻ ≠ 1 · 5 e⁻", /4 Fe²⁺ afgiver 4 · 1 e⁻ = 4 e⁻/.test(kontrol.textContent) && /1 MnO₄⁻ optager 1 · 5 e⁻ = 5 e⁻/.test(kontrol.textContent)
-        && !!kontrol.querySelector(".ktegn.nej") && kontrol.querySelector(".ktegn").textContent === "≠", kontrol.textContent);
+    paastand("klammerne tæller elektronerne med elevens egne tal", klTekst(1) === "Oxidation afgiver 4 · 1 e⁻ = 4 e⁻" && klTekst(0) === "Reduktion optager 1 · 5 e⁻ = 5 e⁻", klTekst(0) + " | " + klTekst(1));
     vaelgFelt("k1"); tast("5");
-    paastand("et klik i feltet og et nyt ciffer afløser det gamle, og regnskabet bliver grønt", niv.f.k[1] === "5" && !!kontrol.querySelector(".ktegn.ok"), niv.f.k[1]);
+    paastand("et klik i feltet og et nyt ciffer afløser det gamle", niv.f.k[1] === "5" && klTekst(1) === "Oxidation afgiver 5 · 1 e⁻ = 5 e⁻", niv.f.k[1]);
     vaelgFelt("k2"); tast("1"); vaelgFelt("k3"); tast("5");
     tjek.click();
     paastand("trin 4 kan løses med tasterne", niv.trin === T.LAD, besked(niv));
 
-    paastand("trin 5: tasterne har også plus og minus", tastNavne().join("") === "+−1234567890⌫" && NK.Taster.valgt() === "lv", tastNavne().join(""));
+    /* Trin 5: ladningen i rækken under skemaet */
+    var a5 = aftryk();
+    paastand("trin 5: et felt under hver side af pilen, og tasterne har også plus og minus",
+        !!arket.querySelector(".regnskab .rc.v input") && !!arket.querySelector(".regnskab .rc.h input") && tastNavne().join("") === "+−1234567890⌫" && NK.Taster.valgt() === "lv", tastNavne().join(""));
+    paastand("fra trin 1 til trin 5 har intet flyttet sig: stofferne, skriften, tasterne, knapperne og beskeden står samme sted",
+        !flyttet(a1, a2, 0) && !flyttet(a1, a3, 0) && !flyttet(a1, a4, 0) && !flyttet(a1, a5, 0)
+        && !nedeFlyttet(a1, a2) && !nedeFlyttet(a1, a3) && !nedeFlyttet(a1, a4) && !nedeFlyttet(a1, a5), forskel(["1", "2", "3", "4", "5"], [a1, a2, a3, a4, a5]));
     tast("9"); tast("−");
     var medMinus = niv.f.lv;
     tast("+");
@@ -419,25 +494,66 @@ function koerAlt() {
     tjek.click();
     paastand("trin 5 kan løses med tasterne", niv.trin === T.ION, besked(niv));
 
-    paastand("trin 6: intet felt er valgt på forhånd, for siden er en del af svaret", NK.Taster.valgt() === null && !d.querySelector("#tavle input.valgt") && ta.classList.contains("uden-hale"));
+    /* Trin 6 og 7: skemaet bliver langt én gang, og derefter står det stille igen */
+    var a6 = aftryk();
+    paastand("trin 6: skriften bliver mindre én gang, højst halvanden gang, og resten af tavlen bliver stående", a6.fs < a1.fs && a1.fs <= a6.fs * 1.5 + 0.01 && !nedeFlyttet(a1, a6), a1.fs + " til " + a6.fs + " px");
+    paastand("trin 6: intet felt er valgt på forhånd, for siden er en del af svaret", NK.Taster.valgt() === null && !arket.querySelector("input.valgt") && ta.classList.contains("uden-hale"));
+    paastand("rækken under skemaet viser ladningen på hver side", /Ladning\s*\+9\s*≠\s*Ladning\s*\+17/.test(raekker()[0]), raekker()[0]);
     tast("8");
     paastand("en tast uden et valgt felt skriver ingenting og siger hvorfor", !niv.f.iv && !niv.f.ih && /Klik først på det felt/.test(d.getElementById("besked").textContent), d.getElementById("besked").textContent);
+    vaelgFelt("iv"); tast("6");
+    paastand("ladningen følger med, mens der skrives: +15 ≠ +17", /\+15\s*≠\s*Ladning\s*\+17/.test(raekker()[0]) && !!arket.querySelector(".rrk.nej"), raekker()[0]);
     vaelgFelt("iv"); tast("8");
+    paastand("og bliver grøn, når den er ens: +17 = +17", /\+17\s*=\s*Ladning\s*\+17/.test(raekker()[0]) && !!arket.querySelector(".rrk.ok"), raekker()[0]);
     tjek.click();
-    paastand("trin 7: heller ikke her er et felt valgt på forhånd", niv.trin === T.VAND && NK.Taster.valgt() === null);
+    var a7 = aftryk();
+    paastand("trin 7: heller ikke her er et felt valgt på forhånd, og rækken med O er kommet", niv.trin === T.VAND && NK.Taster.valgt() === null && /O\s*4\s*≠\s*O\s*0/.test(raekker()[1]), raekker()[1]);
     vaelgFelt("wh"); tast("4");
     tjek.click();
-    paastand("M1 kan afstemmes med tasterne alene, og den gule knap bliver til en grøn Ny opgave", niv.faerdig && !niv.vist && ta.hidden && tjek.hidden
-        && hintknap.textContent === "Ny opgave" && hintknap.classList.contains("groen") && !!hintknap.offsetWidth, hintknap.textContent);
+    var aSlut = aftryk();
+    paastand("fra trin 6 til det færdige skema står stofferne samme sted", !flyttet(a6, a7, 3) && !flyttet(a6, aSlut, 3) && !nedeFlyttet(a6, a7) && !nedeFlyttet(a6, aSlut), JSON.stringify(a6.led) + " mod " + JSON.stringify(aSlut.led));
+    paastand("M1 kan afstemmes med tasterne alene, og den gule knap bliver til en grøn Ny opgave", niv.faerdig && !niv.vist && ta.classList.contains("tom") && tjek.hidden
+        && hintknap.textContent === "Ny opgave" && hintknap.classList.contains("groen") && !!hintknap.offsetWidth && besked(niv) === "Rigtigt. Reaktionen er afstemt.", hintknap.textContent + " / " + besked(niv));
+    var ettaller = arket.querySelectorAll(".skema .koeftal.en");
+    paastand("det færdige skema står på arket: 1-tallerne er væk, og ladning, O og H er ens på begge sider",
+        ettaller.length === 2 && w.getComputedStyle(ettaller[0]).visibility === "hidden" && skemaSomTekst() === "MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ ⟶ Mn²⁺ + 5 Fe³⁺ + 4 H₂O"
+        && arket.querySelectorAll(".rrk.ok").length === 2 && /O\s*4\s*H\s*8\s*=\s*O\s*4\s*H\s*8/.test(raekker()[1]), skemaSomTekst() + " / " + raekker()[1]);
     var foerNr = niv.nr;
     hintknap.click();
     paastand("Ny opgave på tavlen går videre til næste reaktion", niv.nr !== foerNr && !niv.faerdig && !tjek.hidden && hintknap.textContent === "Giv hint" && !hintknap.classList.contains("groen"));
 
+    /* Et stof, der står to gange, og basisk miljø med OH⁻ efter pilen */
+    NK.visNiveau("svaer");
+    ns = NK.niveauer.svaer;
+    tilReaktion(ns, "S8");
+    var note = function () { var p = arket.querySelector(".tavle-note"); return p ? p.textContent : ""; };
+    var noteFoer = note();
+    til(ns, 99);
+    paastand("Pb²⁺ står to gange på arket, og det sammenskrevne skema står under det til sidst", /står to gange/.test(noteFoer) && note() === "Slået sammen: Pb + PbO₂ + 4 H⁺ ⟶ 2 Pb²⁺ + 2 H₂O", note());
+    tilReaktion(ns, "S1");
+    var b1 = aftryk();
+    til(ns, T.LAD);
+    var b5 = aftryk();
+    til(ns, T.ION);
+    var b6 = aftryk();
+    til(ns, 99);
+    var bSlut = aftryk();
+    paastand("også i basisk miljø: stille i trin 1 til 5 og igen fra trin 6", !flyttet(b1, b5, 0) && !nedeFlyttet(b1, b5) && !flyttet(b6, bSlut, 3) && !nedeFlyttet(b1, bSlut) && skemaSomTekst() === "2 MnO₄⁻ + I⁻ + H₂O ⟶ 2 MnO₂ + IO₃⁻ + 2 OH⁻",
+        skemaSomTekst());
+
+    NK.visNiveau("middel");
+    niv = NK.niveauer.middel;
+    tilReaktion(niv, "M1");
     d.getElementById("hjaelpknap").click();
     var stop = [], g2 = 0;
     while (NK.Rundvisning.aktiv() && g2++ < 12) { stop.push(d.getElementById("rv-titel").textContent + " " + d.getElementById("rv-tal").textContent); d.getElementById("rv-naeste").click(); }
-    paastand("? viser rundt: opgaven, tavlen, tasterne, knapperne, trinene, reaktionerne og elektronvægten",
-        stop.join(", ") === "Opgaven 1/7, Tavlen 2/7, Tasterne 3/7, Tjek og hint 4/7, Trinene 5/7, Reaktionerne 6/7, Elektronvægten 7/7", stop.join(", "));
+    paastand("? viser rundt: opgaven, arket, tasterne, knapperne, trinene, reaktionerne og elektronvægten",
+        stop.join(", ") === "Opgaven 1/7, Arket 2/7, Tasterne 3/7, Tjek og hint 4/7, Trinene 5/7, Reaktionerne 6/7, Elektronvægten 7/7", stop.join(", "));
+    til(niv, T.PAR);
+    d.getElementById("hjaelpknap").click();
+    stop = []; g2 = 0;
+    while (NK.Rundvisning.aktiv() && g2++ < 12) { stop.push(d.getElementById("rv-titel").textContent); d.getElementById("rv-naeste").click(); }
+    paastand("i trin 2 springer rundvisningen de usynlige taster over", stop.indexOf("Tasterne") < 0 && stop.length === 6, stop.join(", "));
 
     try { w.localStorage.removeItem("nk-sc8.4-ros"); w.localStorage.removeItem("nk-sc8.4-loest"); } catch (e) {}
     NK.visNiveau("let");
@@ -490,6 +606,19 @@ function koerAlt() {
                 if (a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1) ud.push("dækker " + (x.textContent || "et felt"));
             });
         });
+        /* Teksten på klammerne og tallene i rækkerne skal være på tavlen og må ikke stå oven i hinanden */
+        var ram = d.getElementById("tavleramme").getBoundingClientRect();
+        Array.prototype.forEach.call(d.querySelectorAll("#tavle .kl-tekst, #tavle .rc"), function (e) {
+            var r = e.getBoundingClientRect();
+            if (r.width && (r.left < ram.left - 1 || r.right > ram.right + 1)) ud.push("uden for tavlen: " + e.textContent);
+        });
+        Array.prototype.forEach.call(d.querySelectorAll("#tavle .rrk"), function (rk) {
+            var c = Array.prototype.filter.call(rk.querySelectorAll(".rc"), function (e) { return e.getBoundingClientRect().width > 0; });
+            for (var i = 0; i < c.length; i++) for (var j = i + 1; j < c.length; j++) {
+                var p = c[i].getBoundingClientRect(), q = c[j].getBoundingClientRect();
+                if (p.left < q.right - 1 && q.left < p.right - 1) ud.push("tal i rækken dækker hinanden");
+            }
+        });
         return ud;
     }
     var scene = d.getElementById("scene");
@@ -517,7 +646,7 @@ function koerAlt() {
                     mindst = Math.min(mindst, fs);
                     var ff = feltFejl();
                     if (ff.length) daekker.push(navn + ": " + ff[0]);
-                    if (!ta.hidden && ta.getBoundingClientRect().height > 70) toRaekker.push(navn);
+                    if (!ta.classList.contains("tom") && ta.getBoundingClientRect().height > 70) toRaekker.push(navn);
                     maalRul(navn);
                     rigtigt(n);
                 }

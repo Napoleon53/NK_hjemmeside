@@ -299,14 +299,22 @@
         var mig = this, g = this.opg, R = g.R, t = this.faerdig ? null : this.aktivt();
         var aktiv = t ? this.noegler(t).filter(function (k) { return !g.tal[k]; }) : [];
         var fylder = t === "bland";
+        /* Formlen for det stof, flasken drypper i (svovlsyre har ingen: H⁺
+           kommer først i skemaet, når ladningen afstemmes) */
+        var dryppes = D.FLASKE[g.def.flaske || D.FLASKER[this.cfg.navn][0]].giver || null;
         return {
             navn: this.kortLinje(),
             faerdig: this.faerdig,
             aktiv: aktiv,
             kendt: function (i) {
                 var l = R.led[i];
-                /* Mens urglasset fyldes, staar kun det i skemaet, der er i glasset */
-                if (l.side === "v") return !fylder || (i === R.red.v && !!g.iGlas.permanganat);
+                /* Skemaet foelger glasset (brugerens oenske 3. og 4. okt. 2026):
+                   mens urglasset fyldes, staar kun det, der er kommet i, og det
+                   stof, der dryppes i, skrives foerst, naar det er dryppet */
+                if (l.side === "v") {
+                    if (fylder) return i === R.red.v && !!g.iGlas.permanganat;
+                    return g.dryppet || l.st.f !== dryppes;
+                }
                 return g.dryppet && (i !== R.red.h || g.produkt);
             },
             ukendt: function (i) { return g.dryppet && i === R.red.h && !g.produkt; },

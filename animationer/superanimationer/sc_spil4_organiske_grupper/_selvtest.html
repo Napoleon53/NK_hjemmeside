@@ -19,7 +19,8 @@
    Aabner index.html i en iframe og kontrollerer det, man ikke kan se
    paa et skaermbillede: at molekylemotoren giver det navn og den
    stofklasse, der staar i data, at gruppen findes i hvert molekyle, at
-   balancen er de gamle spils tal for tal, et helt spil (rigtig, forkert,
+   balancen er de gamle spils tal bortset fra det roligere tempo paa
+   niveau 3 til 9, et helt spil (rigtig, forkert,
    niveauer, hjaelperne, turbo, pause, Stofgruppemester, slut), Kemi B
    med toplisten, knapperne og tasterne, escaperoommets segl og sproget.
    Skal koeres gennem en lokal server med animationer/ som rod.
@@ -154,7 +155,9 @@ function tests() {
     paastand("2-methylpropen: kun dobbeltbindingen", m.gruppe.bindinger.length === 1 && m.gruppe.bindinger[0].orden === 2);
 
     /* ----------------------------------------------------------------- */
-    overskrift("3. Balancen er de gamle spils, tal for tal");
+    overskrift("3. Balancen: de gamle spils tal, med roligere tempo på niveau 3 til 9");
+    /* Den gamle tid mellem molekylerne: 2200 ms minus 220 pr. niveau, mindst 600 */
+    function gammelNyt(i) { return Math.max(600, 2200 - 220 * i); }
     ["c", "b"].forEach(function (u) {
         var U = D.UDGAVER[u], G = GAMMEL[u], afvig = [];
         paastand(U.navn + ": ti niveauer", U.niveauer.length === G.niveauer.length);
@@ -163,10 +166,31 @@ function tests() {
             if (!n) { afvig.push("mangler " + (i + 1)); return; }
             var typer = g[2].map(function (t) { return NYT_NAVN[t] || t; });
             if (n.graense !== g[0]) afvig.push((i + 1) + ": grænse " + n.graense);
-            if (n.fart !== g[1]) afvig.push((i + 1) + ": fart " + n.fart);
             if (n.typer.join() !== typer.join()) afvig.push((i + 1) + ": " + n.typer.join("/"));
         });
-        paastand(U.navn + ": grænser, fart og spande pr. niveau", !afvig.length, afvig.join("; "));
+        paastand(U.navn + ": grænser og spande pr. niveau er de gamle", !afvig.length, afvig.join("; "));
+        /* Tempoet: fart (faldet) og nyt (ms mellem molekylerne) pr. niveau */
+        var N = U.niveauer, sidste = N.length - 1, tempo = [];
+        [0, 1, sidste].forEach(function (i) {
+            if (N[i].fart !== G.niveauer[i][1] || N[i].nyt !== gammelNyt(i)) tempo.push((i + 1) + ": " + N[i].fart + " og " + N[i].nyt);
+        });
+        paastand(U.navn + ": niveau 1, 2 og 10 har det gamle tempo (slutter på 2,15 og 600 ms)", !tempo.length, tempo.join("; "));
+        tempo = [];
+        for (var i = 2; i <= 6; i++) {
+            if (!(N[i].nyt > gammelNyt(i)) || N[i].fart > G.niveauer[i][1]) tempo.push((i + 1) + ": " + N[i].fart + " og " + N[i].nyt);
+        }
+        paastand(U.navn + ": niveau 3 til 7 er roligere end de gamle", !tempo.length, tempo.join("; "));
+        var sidsteNy = 0;
+        N.forEach(function (n, i) { if (n.ny) sidsteNy = i; });
+        paastand(U.navn + ": mens de nye stofklasser kommer, stiger tempoet højst 15 % (niveau 2 til " + (sidsteNy + 1) + ")",
+            N[1].nyt / N[sidsteNy].nyt <= 1.15 && N[sidsteNy].fart / N[1].fart <= 1.15,
+            (N[1].nyt / N[sidsteNy].nyt).toFixed(2) + " og " + (N[sidsteNy].fart / N[1].fart).toFixed(2));
+        tempo = [];
+        for (i = 1; i < N.length; i++) {
+            if (N[i].nyt > N[i - 1].nyt) tempo.push((i + 1) + ": sjældnere end niveauet før");
+            if (N[i - 1].nyt / N[i].nyt > 1.35 || N[i].fart / N[i - 1].fart > 1.2) tempo.push((i + 1) + ": for stort spring");
+        }
+        paastand(U.navn + ": molekylerne kommer aldrig sjældnere, og intet spring er over en tredjedel flere molekyler eller 20 % mere fart", !tempo.length, tempo.join("; "));
         paastand(U.navn + ": turboboost " + G.turbo * 100 + " % pr. tryk", U.turboPrTryk === G.turbo);
         var ny = [];
         U.niveauer.forEach(function (n, i) {
@@ -179,8 +203,8 @@ function tests() {
         paastand(U.navn + ": højst fem spande ad gangen", U.niveauer.every(function (n) { return n.typer.length <= 5; }));
         paastand(U.navn + ": alle stofklasser kommer med i et niveau", U.klasser.every(function (k) { return U.niveauer.some(function (n) { return n.typer.indexOf(k) >= 0; }); }));
     });
-    var tal = [["grundfart 70", D.GRUNDFART, 70], ["nyt molekyle hvert 2200 ms", D.NYT_HVERT, 2200], ["220 ms hurtigere pr. niveau", D.NYT_PR_NIVEAU, 220],
-        ["mindst 600 ms", D.NYT_MINDST, 600], ["1000 ms ekstra i starten af et niveau", D.NYT_START, 1000], ["100 point", D.POINT, 100], ["tre liv", D.LIV, 3],
+    var tal = [["grundfart 70", D.GRUNDFART, 70],
+        ["1000 ms ekstra i starten af et niveau", D.NYT_START, 1000], ["100 point", D.POINT, 100], ["tre liv", D.LIV, 3],
         ["3 s stilstand efter en fejl", D.LIV_PAUSE, 3], ["spand 120 høj", D.SPAND_HOEJDE, 120], ["greb 60", D.GREB, 60], ["hjælpelinje 6 s", D.HINT_TID, 6],
         ["mester ved 14.000", D.MESTER, 14000], ["10 % pr. 1000 point bagefter", D.UENDELIG_TRIN, 1000], ["én pause", D.PAUSER, 1],
         ["turbo 15 s", D.TURBO.tid, 15], ["højst fem turbo", D.TURBO.maks, 5], ["første hjælper efter 20 s", D.HJAELP.foerste, 20],
@@ -221,7 +245,8 @@ function tests() {
     S.opdater(0.3);
     paastand("det første molekyle kommer efter ca. et halvt sekund", S.ting.length === 1);
     var t = S.ting[0];
-    paastand("det falder med 60 % af fuld fart i starten (± 20 %)", t.vy >= 70 * 1.32 * 0.6 * 0.8 - 1 && t.vy <= 70 * 1.32 * 0.6 * 1.2 + 1, Math.round(t.vy));
+    /* Efter 0,6 s er farten gledet fra 60 til godt 62 % */
+    paastand("det falder med 60 % af fuld fart i starten (± 20 %)", t.vy >= 70 * 1.32 * 0.6 * 0.8 - 1 && t.vy <= 70 * 1.32 * 0.63 * 1.2 + 1, Math.round(t.vy));
     laeg(t, spand(t.m.klasse));
     paastand("den rigtige spand giver 100 point", S.point === 100 && S.rigtige === 1 && S.sorteret[t.m.klasse] === 1);
     paastand("det sidste molekyle er rigtigt", S.sidste && S.sidste.rigtig && S.sidste.m === t.m);
@@ -340,7 +365,11 @@ function tests() {
         var x = S.nytMolekyle(find("c", "cyclohexan"));
         x.vy = 90; x.x = S.spande[0].x + 30;
         var n = 0;
-        while (S.ting.indexOf(x) >= 0 && n < 5000) { S.opdater(0.01); n++; }
+        /* Kun testmolekylet: et andet kan lande forkert foerst og rydde skaermen */
+        while (S.ting.indexOf(x) >= 0 && n < 5000) {
+            S.opdater(0.01); n++;
+            S.ting = S.ting.filter(function (t) { return t === x; });
+        }
         return n * 0.01;
     }
     var pauser = S.pauser, livNu = S.liv, pointNu = S.point, niv = S.niveau;
@@ -364,7 +393,7 @@ function tests() {
     paastand("Spil videre fortsætter spillet", S.tilstand === "koerer");
     S.point = 16000;
     S.niveau = 6; S.niveauStart = S.tid - 30;
-    paastand("efter 14.000 kommer der 10 % flere molekyler pr. 1000 point", Math.abs(S.nytHvert() - Math.max(600, 2200 - 6 * 220) / 1.2) < 1e-6, S.nytHvert());
+    paastand("efter 14.000 kommer der 10 % flere molekyler pr. 1000 point", Math.abs(S.nytHvert() - S.niveauDef().nyt / 1.2) < 1e-6 && S.niveauDef().nyt === 1350, S.nytHvert());
 
     /* Slut */
     S.liv = 1;

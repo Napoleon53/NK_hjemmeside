@@ -41,13 +41,20 @@
     /* Hvor godt publikum rammer (brugerens tal 4. okt. 2026). andel er
        sandsynligheden, og fra/til er den procent, det rigtige svar faar.
        Resten deles tilfaeldigt mellem de forkerte svar. Brugerens fire tal
-       gav 95 %; de sidste 5 % er lagt til den oeverste linje. */
+       gav 95 %; de sidste 5 % er lagt til den oeverste linje.
+
+       Tallene gaelder spoergsmaal 1. For hvert spoergsmaal derefter falder
+       den oeverste linje med 3 procentpoint, og hver af de tre andre stiger
+       med 1 (D.PUBLIKUM_TRIN). Ved spoergsmaal 3 er det 54, 12, 27 og 7 %,
+       ved spoergsmaal 15 er det 18, 24, 39 og 19 %. */
     D.PUBLIKUM = [
         { andel: 0.60, fra: 50, til: 90 },
         { andel: 0.10, fra: 40, til: 50 },
         { andel: 0.25, fra: 20, til: 40 },
         { andel: 0.05, fra: 0, til: 20 }
     ];
+
+    D.PUBLIKUM_TRIN = [-0.03, 0.01, 0.01, 0.01];
 
     /* ----- Tempo (millisekunder) --------------------------------------- */
     D.TEMPO = {
@@ -344,7 +351,7 @@
                 ["Svaret", "Vælg et svar, og tryk <b>Lås svaret</b>. Først da gælder det, så du kan nå at vælge om."],
                 ["Sikre beløb", "Ved spørgsmål 5 og 10 er beløbet sikret. Svarer du senere forkert, går du hjem med det sikrede beløb. Svarer du forkert før spørgsmål 6, går du hjem med 0 kr."],
                 ["Stop", "Fra spørgsmål 2 kan du stoppe og tage det, du har vundet. Det skal ske, før du låser et svar."],
-                ["Livliner", "Hver livline kan bruges én gang. <b>To væk</b> (50:50) fjerner to forkerte svar. <b>Spørg publikum</b> viser, hvor mange procent der ville vælge hvert svar. Publikum har oftest ret, men ikke altid. <b>Nyt spørgsmål</b> bytter spørgsmålet ud med et andet, der er lige så svært."]
+                ["Livliner", "Hver livline kan bruges én gang. <b>To væk</b> (50:50) fjerner to forkerte svar. <b>Spørg publikum</b> viser, hvor mange procent der ville vælge hvert svar. Publikum har oftest ret ved de første spørgsmål og bliver mere usikre, jo sværere spørgsmålene bliver. <b>Nyt spørgsmål</b> bytter spørgsmålet ud med et andet, der er lige så svært."]
             ],
             genvejeTitel: "Genveje",
             genveje: "<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> vælg svar &nbsp;·&nbsp; <kbd>Enter</kbd> lås og gå videre &nbsp;·&nbsp; <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> livliner &nbsp;·&nbsp; <kbd>S</kbd> stop &nbsp;·&nbsp; <kbd>M</kbd> lyd &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>Esc</kbd> luk",
@@ -434,7 +441,7 @@
                 ["The answer", "Choose an answer and press <b>Lock the answer</b>. Only then does it count, so you can still change your mind."],
                 ["Safe amounts", "At questions 5 and 10 the amount is safe. If you answer wrong later, you go home with the safe amount. If you answer wrong before question 6, you go home with 0 kr."],
                 ["Stop", "From question 2 you can stop and take what you have won. It must happen before you lock an answer."],
-                ["Lifelines", "Each lifeline can be used once. <b>Two gone</b> (50:50) removes two wrong answers. <b>Ask the audience</b> shows how many percent would choose each answer. The audience is usually right, but not always. <b>New question</b> swaps the question for another that is just as hard."]
+                ["Lifelines", "Each lifeline can be used once. <b>Two gone</b> (50:50) removes two wrong answers. <b>Ask the audience</b> shows how many percent would choose each answer. The audience is usually right on the first questions and gets less certain as the questions get harder. <b>New question</b> swaps the question for another that is just as hard."]
             ],
             genvejeTitel: "Shortcuts",
             genveje: "<kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> choose &nbsp;·&nbsp; <kbd>Enter</kbd> lock and continue &nbsp;·&nbsp; <kbd>5</kbd> <kbd>6</kbd> <kbd>7</kbd> lifelines &nbsp;·&nbsp; <kbd>S</kbd> stop &nbsp;·&nbsp; <kbd>M</kbd> sound &nbsp;·&nbsp; <kbd>H</kbd> tour &nbsp;·&nbsp; <kbd>Esc</kbd> close",

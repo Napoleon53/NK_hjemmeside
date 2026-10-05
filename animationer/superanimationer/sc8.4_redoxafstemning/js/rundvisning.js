@@ -13,9 +13,8 @@
     var NK = window.NK;
 
     var SPM = { sel: "#opgavelinje, .ab-hoved", titel: "Opgaven", tekst: "Øverst står opgaven. Linjen under den siger, hvad trinnet spørger om." };
-    var TAVLE = { sel: "#tavle", titel: "Tavlen", tekst: "Reaktionen, der skal afstemmes. Oxidationstallene og koefficienterne skrives direkte i felterne her." };
+    var TAVLE = { sel: "#tavle", titel: "Arket", tekst: "Reaktionen, der skal afstemmes. Hvert trin lægger sit eget til: tal over atomerne, klammer ved parrene og tal foran stofferne." };
     var TASTER = { sel: "#taster", titel: "Tasterne", tekst: "Klik på et felt, og vælg tallet her. Du kan også skrive på tastaturet." };
-    var KONTROL = { sel: "#kontrol", titel: "Kontrollen", tekst: "Tallene, der skal være ens. De følger med, mens du skriver, og bliver grønne, når de passer." };
     var KNAPPER = { sel: ".ab-knapper", titel: "Tjek og hint", tekst: "Tjek svaret her. Sidder du fast, giver den gule knap først et hint, så svaret og til sidst en ny opgave." };
     var OPGAVE = { sel: "#opgavekort", titel: "Trinene", tekst: "De samme syv trin hver gang. Det blå trin er det, du er nået til." };
     var LISTE = { sel: "#listekort", titel: "Reaktionerne", tekst: "Alle reaktioner på denne sværhedsgrad. Grøn er løst, gul betyder, at svaret blev vist." };
@@ -25,9 +24,9 @@
     /* Et trin, der ikke kan ses lige nu (tasterne i trin 2, en tom
        kontrol), springes over. */
     var TURE = {
-        "let": [SPM, TAVLE, TASTER, KONTROL, KNAPPER, OPGAVE, LISTE, VAEGT, NIVEAU],
-        "middel": [SPM, TAVLE, TASTER, KONTROL, KNAPPER, OPGAVE, LISTE, VAEGT],
-        "svaer": [SPM, TAVLE, TASTER, KONTROL, KNAPPER, OPGAVE, LISTE, VAEGT]
+        "let": [SPM, TAVLE, TASTER, KNAPPER, OPGAVE, LISTE, VAEGT, NIVEAU],
+        "middel": [SPM, TAVLE, TASTER, KNAPPER, OPGAVE, LISTE, VAEGT],
+        "svaer": [SPM, TAVLE, TASTER, KNAPPER, OPGAVE, LISTE, VAEGT]
     };
 
     var trin = [];
@@ -38,7 +37,7 @@
         var liste = document.querySelectorAll(sel);
         var ud = [];
         for (var i = 0; i < liste.length; i++) {
-            if (liste[i].offsetWidth || liste[i].offsetHeight) ud.push(liste[i]);
+            if ((liste[i].offsetWidth || liste[i].offsetHeight) && window.getComputedStyle(liste[i]).visibility !== "hidden") ud.push(liste[i]);
         }
         return ud;
     }

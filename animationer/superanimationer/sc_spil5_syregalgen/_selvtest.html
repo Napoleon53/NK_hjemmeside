@@ -168,13 +168,20 @@ async function koer() {
     var maengder = [1, 2, 3, 4, 5, 6].map(function (n) { return Kar.syreVedPh(7 - n); });
     paastand("mængden efter hvert skridt giver pH 6, 5, 4, 3, 2 og 1", maengder.every(function (m, n) { return Math.abs(Kar.phVed(m) - (6 - n)) < 1e-6; }));
     paastand("hvert skridt kræver ca. ti gange så meget syre", maengder.every(function (m, n) { return n === 0 || (m / maengder[n - 1] > 9.9 && m / maengder[n - 1] < 11.1); }));
-    paastand("mængderne skrives 1,8 mL, 18 mL, 180 mL, 1,8 L, 18 L og 200 L", maengder.map(Kar.maengdeTekst).join("; ") === "1,8 mL; 18 mL; 180 mL; 1,8 L; 18 L; 200 L", maengder.map(Kar.maengdeTekst).join("; "));
+    var runde = maengder.map(function (m) { return Number(m.toPrecision(2)); }).join("; ");
+    paastand("mængderne er 1,8 mL, 18 mL, 180 mL, 1,8 L, 18 L og 200 L", runde === "0.0018; 0.018; 0.18; 1.8; 18; 200", runde);
 
     /* ------------------------------------------------------------- */
     overskrift("5 Knappen i trin og scenen");
     var d = w.document, app = NK.app;
     frem(w, 2);
     paastand("29 bogstaver på tastaturet", d.querySelectorAll("#tastatur .tast").length === 29);
+    function pladser(vaelger) { return d.querySelectorAll("#forkerte .plads" + (vaelger || "")); }
+    function pladsTekst() { return Array.prototype.map.call(pladser(".brugt"), function (p) { return p.textContent; }).join(""); }
+    paastand("seks tomme pladser til forkerte bogstaver under ordet", pladser().length === 6 && pladser(".brugt").length === 0);
+    var ordBund = d.getElementById("ordtavle").getBoundingClientRect().bottom, fk = d.getElementById("forkerte").getBoundingClientRect();
+    paastand("pladserne står i scenen under ordet", fk.top >= ordBund && fk.height >= 28 && fk.right <= d.getElementById("scene").getBoundingClientRect().right, fk.top + " / " + ordBund);
+    paastand("der står ingen tekst under scenen", d.getElementById("status").getBoundingClientRect().height <= 1 && d.querySelectorAll(".statuslinje").length === 0);
     paastand("knappen står på Vis ordet fra begyndelsen", /^Vis ordet/.test(d.getElementById("hovedknap").textContent));
     var fb = forkerteBogstaver(w);
     d.querySelector('#tastatur .tast[data-bogstav="' + fb[0] + '"]').click();
@@ -184,15 +191,16 @@ async function koer() {
     frem(w, 2.5);
     var kar = app.kar();
     paastand("to forkerte: pH 5,0 i karret", w.NK.Kar.phTekst(kar.ph) === "5,0", w.NK.Kar.phTekst(kar.ph));
-    paastand("to forkerte: 18 mL er løbet ud af tønden og landet i karret", Kar.maengdeTekst(kar.ude) === "18 mL" && kar.iKar === kar.ude, kar.ude + " / " + kar.iKar);
-    paastand("statuslinjen nævner mængden", /18 mL saltsyre i karret\. 4 skridt tilbage\./.test(d.getElementById("status").textContent), d.getElementById("status").textContent);
+    paastand("to forkerte: 18 mL er løbet ud af tønden og landet i karret", Math.abs(kar.ude - 0.018) < 0.0001 && kar.iKar === kar.ude, kar.ude + " / " + kar.iKar);
+    paastand("to forkerte: de to bogstaver står i de to første pladser", pladsTekst() === fb[0] + fb[1] && pladser(".sidste").length === 0, pladsTekst());
+    paastand("pladserne har karrets farver, den første gulgrøn", pladser(".brugt")[0].style.backgroundColor === "rgb(154, 205, 50)", pladser(".brugt")[0].style.backgroundColor);
     paastand("klassekammeraten står på skridt 2", Math.abs(kar.elev.x - w.NK.Kar.POS[2]) < 1, kar.elev.x);
     app.gaet(fb[2]); app.gaet(fb[3]);
     paastand("fire forkerte: stadig ingen ledetråd", d.getElementById("tekstkort").hidden);
     app.gaet(fb[4]);
     paastand("fem forkerte: ledetråden kommer af sig selv", !d.getElementById("tekstkort").hidden && d.getElementById("tekstkort").classList.contains("ledetraad") && app.spil().runde.forkerte === 5);
     paastand("ledetråden står i kortet", d.getElementById("tekstkort-tekst").textContent === app.spil().runde.post.ledetraad);
-    paastand("statuslinjen siger det", /18 L saltsyre i karret\. Sidste skridt: se ledetråden\./.test(d.getElementById("status").textContent), d.getElementById("status").textContent);
+    paastand("fem pladser er brugt, og den sidste blinker", pladser(".brugt").length === 5 && pladser(".sidste").length === 1 && pladser()[5].classList.contains("sidste"));
     frem(w, 3.5);
     paastand("fem forkerte: pH 2,0, og tønden er stadig over 90 % fuld", Kar.phTekst(kar.ph) === "2,0" && kar.ude / Kar.TOENDE < 0.1, Kar.phTekst(kar.ph) + ", " + kar.ude);
     paastand("knappen står stadig på Vis ordet", /^Vis ordet/.test(d.getElementById("hovedknap").textContent));
@@ -201,6 +209,7 @@ async function koer() {
     d.getElementById("hovedknap").click();
     paastand("Vis ordet taber runden, og knappen står på Næste ord", app.spil().runde.status === "tabt" && /^Næste ord/.test(d.getElementById("hovedknap").textContent));
     paastand("de manglende bogstaver står i rødt", d.querySelectorAll("#ordtavle .felt.mangler").length > 0);
+    paastand("alle seks pladser er brugt, den sidste uden bogstav", pladser(".brugt").length === 6 && pladsTekst() === fb.slice(0, 5).join("") + "×", pladsTekst());
     frem(w, 4.5);
     paastand("klassekammeraten er faldet i", kar.elev.tilstand === "vaek" || kar.elev.tilstand === "falder");
     paastand("tønden er tom, og karret står på pH 1,0", kar.ude === Kar.TOENDE && Kar.phTekst(kar.ph) === "1,0", kar.ude + ", " + Kar.phTekst(kar.ph));
@@ -217,6 +226,7 @@ async function koer() {
     var gammel = kar.elev;
     d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     paastand("Enter giver et nyt ord", app.spil().runde.status === "spiller" && app.spil().runde.gaettet.length === 0);
+    paastand("pladserne er tomme igen", pladser(".brugt").length === 0 && pladser().length === 6);
     paastand("en ny klassekammerat går ind", kar.elev !== gammel && kar.elev.tilstand === "ind");
     frem(w, 2);
     paastand("karret er neutralt igen", w.NK.Kar.phTekst(kar.ph) === "7,0");
@@ -224,7 +234,7 @@ async function koer() {
     /* Et hurtigt forkert gaet, mens toenden fyldes, skal stadig give draaber */
     app.spil().givOp(); kar.tab(); frem(w, 4); app.nytOrd(); frem(w, 0.2);
     app.gaet(forkerteBogstaver(w)[0]); frem(w, 2.5);
-    paastand("et hurtigt forkert gæt efter Næste ord giver stadig pH 6,0", Kar.phTekst(kar.ph) === "6,0" && Kar.maengdeTekst(kar.ude) === "1,8 mL", Kar.phTekst(kar.ph) + ", " + kar.ude);
+    paastand("et hurtigt forkert gæt efter Næste ord giver stadig pH 6,0", Kar.phTekst(kar.ph) === "6,0" && Math.abs(kar.ude - 0.00178) < 0.00001, Kar.phTekst(kar.ph) + ", " + kar.ude);
     app.spil().givOp(); kar.tab(); frem(w, 4); app.nytOrd(); frem(w, 2);
     paastand("tastaturet er låst op igen", d.querySelectorAll("#tastatur .tast:disabled").length === 0);
 
