@@ -10,14 +10,13 @@
      MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ → Mn²⁺ + 5 Fe³⁺ + 4 H₂O
 
    En draabe KMnO₄ lander som en lokal, lilla sky (lokal). Skyen blandes
-   ind i opløsningen, hurtigt naar der rystes og naar der er meget Fe²⁺,
+   ind i opløsningen, hurtigt naar der roeres og naar der er meget Fe²⁺,
    langsomt naer endepunktet. Det, der blandes ind, reagerer straks med
    Fe²⁺. Resten bliver som frit MnO₄⁻ og farver opløsningen lyserød.
 
-   Er der chlorid i kolben (saltsyre), oxiderer MnO₄⁻ ogsaa Cl⁻ til Cl₂:
-   en del af titranten gaar til chlorid (KLOR.andel), og overskuddet
-   forsvinder langsomt igen (KLOR.fald). Resultatet bliver for hoejt, og
-   farven er ikke blivende.
+   Under buretten staar kolben paa en magnetomroerer, som blander hver
+   draabe ind paa under et sekund. Saa er farven i hele kolben den, der
+   skal aflaeses, og endepunktet er den foerste draabe, der farver.
 
    Resultatet regnes som i laboratoriet:
      jernindhold = 5 · c · (V(slut) - V(start)) · M(Fe) / m(ståluld) · 100 %
@@ -37,8 +36,7 @@
     var KMNO4 = { c: 0.0200 };
 
     var SYRER = {
-        svovlsyre: { id: "svovlsyre", navn: "Svovlsyre", formel: "H₂SO₄", konc: "1 M", klorid: false },
-        saltsyre:  { id: "saltsyre", navn: "Saltsyre", formel: "HCl", konc: "2 M", klorid: true }
+        svovlsyre: { id: "svovlsyre", navn: "Svovlsyre", formel: "H₂SO₄", konc: "1 M" }
     };
 
     /* mL syre, der haeldes i kolben */
@@ -61,13 +59,16 @@
        kolben, naar flasken med KMnO₄ slippes der. */
     var GRAENSE = { lidtStaal: 0.06, megetStaal: 0.16, vejebaad: 0.25, kolbe: 200, kmno4IKolbe: 8 };
 
-    /* Blanding pr. sekund uden og med rystning. synlig: den intensitet,
-       hvor en svag lyserød farve kan ses. lilla og aubergine: overskud i
-       mL, hvor opløsningen er kraftigt lilla, og hvor laereren kommer.
-       blivende: sekunder farven skal holde. */
+    /* Blanding pr. sekund uden omroering og med (magnetomroereren eller
+       en haand, der ryster). synlig: den intensitet, hvor en svag lyserød
+       farve kan ses. lilla og aubergine: overskud i mL, hvor opløsningen
+       er kraftigt lilla, og hvor laereren kommer. blivende: sekunder
+       farven skal holde. */
     var TITRER = { blanding: 0.35, rystBlanding: 7, feFart: 6, synlig: 0.05, lilla: 0.6, aubergine: 3, blivende: 2.5 };
 
-    var KLOR = { andel: 0.07, fald: 0.06 };
+    /* Magnetomroereren: omdrejninger pr. sekund ved fuld fart, og hvor
+       hurtigt den kommer op i fart og gaar i staa igen (pr. sekund) */
+    var OMROERER = { omdr: 3.5, op: 2.5, ned: 5, fald: 0.45 };
 
     /* Rystning med musen: fart i tegneenheder pr. sekund */
     var RYST = { fuld: 500, amok: 2600, amokTid: 0.8, skvulp: 0.04 };
@@ -154,29 +155,16 @@
     }
 
     /* ----- Kolbens kemi ------------------------------------------------
-       kem = { nFeTot, opl, nFe2, nFe3, nLokal, nMnO4, nMn2, nKlor, ml,
-               syre (den foerste syre), syrer { navn: antal }, klorid }
-       o   = { temp, ryst (0-1) } */
+       kem = { nFeTot, opl, nFe2, nFe3, nLokal, nMnO4, nMn2, ml,
+               syre ("svovlsyre" eller null) }
+       o   = { temp, ryst (0-1: hvor kraftigt der roeres eller rystes) } */
     function nyKemi() {
-        return { nFeTot: 0, opl: 0, nFe2: 0, nFe3: 0, nLokal: 0, nMnO4: 0, nMn2: 0, nKlor: 0, ml: 0, syre: null, syrer: {}, klorid: false };
-    }
-
-    /* "svovlsyre", "saltsyre", "begge" eller null */
-    function syreId(kem) {
-        var s = kem.syrer || {};
-        if (s.svovlsyre && s.saltsyre) return "begge";
-        return kem.syre;
-    }
-
-    function syreNavn(id) {
-        if (id === "begge") return "Svovlsyre og saltsyre";
-        return SYRER[id] ? SYRER[id].navn : "Ingen syre";
+        return { nFeTot: 0, opl: 0, nFe2: 0, nFe3: 0, nLokal: 0, nMnO4: 0, nMn2: 0, ml: 0, syre: null };
     }
 
     function reager(kem, dt, o) {
         o = o || {};
         var syre = kem.syre ? SYRER[kem.syre] : null;
-        var klorid = kem.klorid || !!(syre && syre.klorid);
 
         /* Opløsning af stålulden */
         if (syre && kem.nFeTot > 0 && kem.opl < 1) {
@@ -195,11 +183,6 @@
             var m = kem.nLokal * (1 - Math.exp(-fart * dt));
             if (kem.nLokal < 1e-10) m = kem.nLokal;
             kem.nLokal -= m;
-            if (klorid) {
-                var tilKlor = m * KLOR.andel;
-                kem.nKlor += tilKlor;
-                m -= tilKlor;
-            }
             kem.nMnO4 += m;
         }
 
@@ -211,13 +194,6 @@
             kem.nFe3 += 5 * r;
             kem.nMn2 += r;
             if (kem.nFe2 < 1e-12) kem.nFe2 = 0;
-        }
-
-        /* Chlorid oxideres langsomt af overskuddet */
-        if (klorid && kem.nMnO4 > 0) {
-            var d = kem.nMnO4 * (1 - Math.exp(-KLOR.fald * dt));
-            kem.nMnO4 -= d;
-            kem.nKlor += d;
         }
         if (kem.nMnO4 < 1e-12) kem.nMnO4 = 0;
     }
@@ -243,6 +219,16 @@
         return (kem.nMnO4 + kem.nLokal) / KMNO4.c * 1000;
     }
 
+    /* Hvor meget af den lyserøde farve der ses (0-0,9). Farven slaar
+       tydeligt igennem lige ved TITRER.synlig, saa det, eleven ser, er
+       det samme som det, forsoeget regner for lyserødt: den foerste
+       draabe, der farver, er endepunktet. */
+    function lyserodAndel(I) {
+        var s = TITRER.synlig;
+        if (I < s) return 0.5 * NK.blod((I - 0.8 * s) / (0.2 * s));
+        return 0.5 + 0.4 * NK.klamp((I - s) / 0.2, 0, 1);
+    }
+
     /* Farven i kolben. Uden syre er der kun det, der er tilsat af KMnO₄. */
     function kolbeFarve(kem) {
         if (kem.ml <= 0) return null;
@@ -250,8 +236,9 @@
         var f = NK.blandFarve(FARVE.syre, FARVE.fe2, NK.klamp(kem.nFe2 / l / 0.04, 0, 1));
         f = NK.blandFarve(f, FARVE.fe3, NK.klamp(kem.nFe3 / l / 0.04, 0, 1) * 0.8);
         var I = intensitet(kem);
-        if (I > 0.004) {
-            f = NK.blandFarve(f, FARVE.lyserod, NK.klamp(I * 4, 0, 0.9));
+        var andel = lyserodAndel(I);
+        if (andel > 0) {
+            f = NK.blandFarve(f, FARVE.lyserod, andel);
             if (I > 0.6) f = NK.blandFarve(f, FARVE.lilla, NK.klamp((I - 0.6) / 3, 0, 1));
         }
         return f;
@@ -290,7 +277,7 @@
         BURET: BURET,
         GRAENSE: GRAENSE,
         TITRER: TITRER,
-        KLOR: KLOR,
+        OMROERER: OMROERER,
         RYST: RYST,
         KOLBE_AREAL: KOLBE_AREAL,
         FARVE: FARVE,
@@ -305,8 +292,6 @@
         jernprocent: jernprocent,
         mellemregning: mellemregning,
         nyKemi: nyKemi,
-        syreId: syreId,
-        syreNavn: syreNavn,
         reager: reager,
         tilsaet: tilsaet,
         intensitet: intensitet,

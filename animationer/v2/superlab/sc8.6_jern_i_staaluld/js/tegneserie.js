@@ -157,7 +157,8 @@
         return {
             p: p, ml: opt.ml === undefined ? 50 : opt.ml, farve: opt.farve || farve(opt),
             lokal: opt.lokal || 0, lokalX: p.x, jern: opt.jern || 0,
-            bobler: opt.bobler || [], boelge: opt.boelge || 0, hvirvel: 0, fremhaev: false
+            bobler: opt.bobler || [], boelge: opt.boelge || 0, hvirvel: 0, fremhaev: false,
+            magnet: !!opt.magnet, magnetVinkel: 0.5, roer: opt.magnet ? 1 : 0
         };
     }
 
@@ -176,10 +177,10 @@
     /* Titreropstillingen: stativ, buret og det, der staar under */
     function opstilling(ctx, V, opt) {
         opt = opt || {};
-        S.tegnStativ(ctx);
+        S.tegnStativ(ctx, { roer: opt.kolbe && opt.kolbe.magnet ? 1 : 0 });
         if (opt.affald !== undefined) S.tegnAffald(ctx, { p: S.HJEM.affald, ml: opt.affald }, 0);
         if (opt.kolbe) S.tegnKolbe(ctx, opt.kolbe, 0);
-        if (opt.plet) S.tegnPlet(ctx, { x: BU.x + 18, y: S.STATIV.y - 1, styrke: 1 });
+        if (opt.plet) S.tegnPlet(ctx, { x: BU.x + 18, y: S.FLISE.y + 1, styrke: 1 });
         S.tegnBuret(ctx, { V: V, fyldt: true, tragt: !!opt.tragt, aaben: !!opt.aaben }, 0);
         S.tegnKlemme(ctx);
         if (opt.draaber) S.tegnDraaber(ctx, [{ x: BU.x, y: BU.spids + 26, r: 2.4 }, { x: BU.x, y: BU.spids + 62, r: 2.4 }]);
@@ -224,7 +225,7 @@
             var vSlut = f.vSlut === null ? vStart : f.vSlut;
             var res = f.resultater.length ? f.resultater[f.resultater.length - 1] : null;
             /* Kolben kan vaere toemt efter beregningen: syren staar i resultatet */
-            var sid = res && f.gjort.beregn ? res.syre : M.syreId(kem);
+            var sid = res && f.gjort.beregn ? res.syre : kem.syre;
             var procent = res ? res.procent : (m > 0 ? M.jernprocent(m, vStart, vSlut) : 0);
             var t = M.mellemregning(m || 1, vStart, vSlut);
             var UNDER = S.UNDER_BURET;
@@ -237,16 +238,15 @@
                 }
             });
 
-            var foerste = kem.syre || "svovlsyre";
-            rude(container, ++nr, sid ? M.syreNavn(sid) + " hældes over stålulden i kolben." : "Stålulden kommer i kolben.", {
+            rude(container, ++nr, sid ? "Svovlsyre hældes over stålulden i kolben." : "Stålulden kommer i kolben.", {
                 udsnit: UDSNIT.skab,
                 tegn: function (ctx) {
                     var k = S.HJEM.kolbe;
                     S.tegnKolbe(ctx, kolbe(k, { ml: sid ? 40 : 0, jern: 0.9 }), 0);
                     if (!sid) return;
                     var fp = { x: k.x - 26, y: k.y - 30, v: 2.05 };
-                    flaske(ctx, foerste, fp);
-                    S.tegnStraale(ctx, NK.tilVerden(fp, S.ANKER[foerste], 23, 4), { x: k.x + 2, y: k.y + 96 }, M.FARVE.syre, 3, 0);
+                    flaske(ctx, "svovlsyre", fp);
+                    S.tegnStraale(ctx, NK.tilVerden(fp, S.ANKER.svovlsyre, 23, 4), { x: k.x + 2, y: k.y + 96 }, M.FARVE.syre, 3, 0);
                 }
             });
 
@@ -273,11 +273,11 @@
                 }
             });
 
-            rude(container, ++nr, "Hver dråbe MnO₄⁻ reagerer straks med Fe²⁺, så den lilla farve forsvinder: MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ → Mn²⁺ + 5 Fe³⁺ + 4 H₂O.", {
+            rude(container, ++nr, "Magnetomrøreren blander hver dråbe ind. MnO₄⁻ reagerer straks med Fe²⁺, så den lilla farve forsvinder: MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ → Mn²⁺ + 5 Fe³⁺ + 4 H₂O.", {
                 udsnit: UDSNIT.titrer,
                 tegn: function (ctx) {
                     var V = vStart + 0.6 * (vSlut - vStart);
-                    opstilling(ctx, V, { kolbe: kolbe(UNDER, { fe2: 0.5, fe3: 0.5, lokal: 3, ml: 60 }), draaber: true });
+                    opstilling(ctx, V, { kolbe: kolbe(UNDER, { fe2: 0.5, fe3: 0.5, lokal: 3, ml: 60, magnet: true }), draaber: true });
                 }
             });
 
@@ -285,7 +285,7 @@
             rude(container, ++nr, (lyserod ? "Når al Fe²⁺ er brugt, bliver den næste dråbe ikke omsat, og opløsningen bliver svagt lyserød. " : "Buretten aflæses igen. ") + "V(slut) = " + M.komma(vSlut, 2) + " mL.", {
                 udsnit: UDSNIT.titrer,
                 tegn: function (ctx) {
-                    opstilling(ctx, vSlut, { kolbe: kolbe(UNDER, { fe3: 1, I: f.aflaestI || 0, ml: 70 }) });
+                    opstilling(ctx, vSlut, { kolbe: kolbe(UNDER, { fe3: 1, I: f.aflaestI || 0, ml: 70, magnet: true }) });
                 },
                 oven: function (ctx, pt) {
                     var mp = pt(BU.x + 10, S.buretY(vSlut));
@@ -303,7 +303,7 @@
                 oven: function (ctx) {
                     tavle(ctx);
                     var L = { justering: "left", font: "600 13px 'Segoe UI', sans-serif" };
-                    etiket(ctx, "V = " + M.komma(t.V, 2) + " mL", 14, 24, L);
+                    etiket(ctx, "V(MnO₄⁻) = " + M.komma(t.V, 2) + " mL", 14, 24, L);
                     etiket(ctx, "n(MnO₄⁻) = " + M.videnskabelig(t.nMn, 2) + " mol", 14, 50, L);
                     etiket(ctx, "n(Fe²⁺) = 5 · n(MnO₄⁻) = " + M.videnskabelig(t.nFe, 2) + " mol", 14, 76, L);
                     etiket(ctx, "m(Fe) = " + M.komma(t.mFe, 4) + " g", 14, 102, L);
@@ -314,7 +314,7 @@
 
             /* Fejl og uheld: én roed rude for hver */
             var TIT = UDSNIT.titrer;
-            function underBuret(opt) { return kolbe(UNDER, opt); }
+            function underBuret(opt) { opt.magnet = true; return kolbe(UNDER, opt); }
             var FEJL = [
                 ["lidtStaal", "Kun " + M.komma(m, 3) + " g ståluld. Et lille forbrug af KMnO₄ giver en større relativ usikkerhed.", UDSNIT.vaegt, function (ctx) {
                     S.tegnVaegt(ctx, M.komma(m, 3) + " g", true);
@@ -327,14 +327,6 @@
                 ["vaegt", "Syren blev hældt ud over vægten i stedet for i kolben.", UDSNIT.vaegt, function (ctx) {
                     S.tegnVaegt(ctx, "0,000 g", true);
                     S.tegnSyrepyt(ctx, { x: S.VAEGT.vejeskaal.x, rx: 50, alfa: 1 });
-                }],
-                ["toSyrer", "Både svovlsyre og saltsyre kom i kolben. Chloridet fra saltsyren bruger også KMnO₄, så resultatet bliver for højt.", UDSNIT.skab, function (ctx) {
-                    var k = S.HJEM.kolbe;
-                    S.tegnKolbe(ctx, kolbe(k, { ml: 100, fe2: 0.3 }), 0);
-                    flaske(ctx, "svovlsyre", S.HJEM.svovlsyre);
-                    var fp = { x: k.x - 26, y: k.y - 30, v: 2.05 };
-                    flaske(ctx, "saltsyre", fp);
-                    S.tegnStraale(ctx, NK.tilVerden(fp, S.ANKER.saltsyre, 23, 4), { x: k.x + 2, y: k.y + 80 }, M.FARVE.syre, 3, 0);
                 }],
                 ["kmno4Kolbe", "KMnO₄ blev hældt direkte i kolben. Det reagerede med jernet uden at blive målt, så resultatet bliver for lavt.", UDSNIT.skab, function (ctx) {
                     var k = S.HJEM.kolbe;
@@ -371,16 +363,12 @@
                 ["lilla", "Opløsningen var kraftigt lilla ved aflæsningen. Der er tilsat for meget KMnO₄, så resultatet bliver for højt.", TIT, function (ctx) {
                     opstilling(ctx, vSlut, { kolbe: underBuret({ fe3: 1, I: 4, ml: 75 }) });
                 }],
-                ["klor", "Det lugtede af klor: MnO₄⁻ oxiderede også Cl⁻ fra saltsyren til Cl₂.", TIT, function (ctx) {
-                    opstilling(ctx, vSlut, { kolbe: underBuret({ fe3: 1, I: 0.3, ml: 70 }) });
-                    S.tegnDampe(ctx, [0, 1, 2, 3].map(function (i) { return { x: UNDER.x - 10 + i * 8, y: UNDER.y - 10 - i * 16, r: 8 + i * 3, liv: 1, alfa: 0.35, farve: "#c9e27a" }; }));
-                }],
-                ["falmer", "Den lyserøde farve forsvandt igen. Chlorid bruger langsomt overskuddet af MnO₄⁻.", TIT, function (ctx) {
-                    opstilling(ctx, vSlut, { kolbe: underBuret({ fe3: 1, I: 0.02, ml: 70 }) });
+                ["falmer", "Den lyserøde farve forsvandt igen. Der var stadig uopløst ståluld, som gav nyt Fe²⁺ og brugte overskuddet af MnO₄⁻.", TIT, function (ctx) {
+                    opstilling(ctx, vSlut, { kolbe: underBuret({ fe3: 1, I: 0.02, ml: 70, jern: 0.2 }) });
                 }],
                 ["skvulp", "Kolben blev rystet så voldsomt, at noget af opløsningen skvulpede ud. Det tabte jern gør resultatet for lavt.", TIT, function (ctx) {
                     var kp = { x: UNDER.x + 6, y: UNDER.y, v: 0.12 };
-                    opstilling(ctx, vStart + 8, { kolbe: kolbe(kp, { fe2: 0.5, fe3: 0.5, ml: 60, boelge: 6 }) });
+                    opstilling(ctx, vStart + 8, { kolbe: kolbe(kp, { fe2: 0.5, fe3: 0.5, ml: 60, boelge: 6, magnet: true }) });
                     ctx.fillStyle = "rgba(220, 225, 160, 0.9)";
                     [[-30, -20], [34, -34], [-50, 10], [48, 0], [20, -52]].forEach(function (d) {
                         ctx.beginPath();
@@ -391,7 +379,7 @@
                 ["overloeb", "Buretten blev fyldt, mens den var fuld, og løb over. Kemichael kom forbi.", UDSNIT.buret, function (ctx) {
                     opstilling(ctx, -2.5, { affald: 1, plet: true, tragt: true });
                 }],
-                ["spild", "Hanen var åben uden noget under buretten, og KMnO₄ løb ud på flisen.", TIT, function (ctx) {
+                ["spild", "Hanen var åben uden noget under buretten, og KMnO₄ løb ud på magnetomrøreren.", TIT, function (ctx) {
                     opstilling(ctx, vStart + 1, { aaben: true, plet: true });
                 }]
             ];
@@ -449,11 +437,10 @@
             tabel.appendChild(tr);
         }
         raekke("", function (x) { return "Forsøg " + x.nr; }, true);
-        raekke("Syre", function (x) { return M.syreNavn(x.syre); });
         raekke("m(ståluld)", function (x) { return M.komma(x.m, 3) + " g"; });
         raekke("V(start)", function (x) { return M.komma(x.vStart, 2) + " mL"; });
         raekke("V(slut)", function (x) { return M.komma(x.vSlut, 2) + " mL"; });
-        raekke("V(KMnO₄)", function (x) { return M.komma(x.vSlut - x.vStart, 2) + " mL"; });
+        raekke("V(MnO₄⁻)", function (x) { return M.komma(x.vSlut - x.vStart, 2) + " mL"; });
         raekke("Jernindhold", function (x) { return M.komma(x.procent, 1) + " %"; });
         div.appendChild(tabel);
 

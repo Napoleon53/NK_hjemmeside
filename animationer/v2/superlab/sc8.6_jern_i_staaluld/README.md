@@ -17,19 +17,26 @@ via `samling_alt.html?emne=c8.6` og er derfor ikke berørt af flytningen.
 ## Hvad viser den
 
 Eleven bestemmer jernindholdet i ståluld, som i laboratoriet: afvej ca. 0,1 g
-ståluld, opløs den i syre på varmepladen, fyld buretten med 0,0200 M
-kaliumpermanganat, aflæs den, titrer til en svag, blivende lyserød farve, aflæs
-igen og beregn jernindholdet i procent. Resultatet sammenlignes med, at ståluld
-typisk er 98,5 % jern.
+ståluld, opløs den i svovlsyre på varmepladen, fyld buretten med 0,0200 M
+kaliumpermanganat, aflæs den, stil kolben på magnetomrøreren, titrer til en
+svag, blivende lyserød farve, aflæs igen og beregn jernindholdet i procent.
+Resultatet sammenlignes med, at ståluld typisk er 98,5 % jern.
 
 * **En rigtig opstilling.** Et åbent laboratoriebord med ståluld og vægt, et
-  stinkskab med svovlsyre, saltsyre, kolbe og varmeplade, og en titreropstilling
-  med stativ, buret, hvid flise, affaldsbæger og flasken med KMnO₄. Genstandene
+  stinkskab med svovlsyre, kolbe og varmeplade, og en titreropstilling med
+  stativ, buret, magnetomrører, affaldsbæger og flasken med KMnO₄. Genstandene
   bruges ved at klikke på dem eller trække dem derhen, hvor de skal bruges.
-* **Eleven vælger syren.** Der er ingen forklaring før valget. Med svovlsyre
-  bliver resultatet omkring 98,5 %. Med saltsyre oxiderer permanganat også
-  chlorid: der bruges for meget KMnO₄, den lyserøde farve forsvinder igen, og
-  resultatet bliver over 100 %.
+* **Kun svovlsyre.** Flasken med saltsyre er taget ud 3. oktober 2026 (den
+  havde ikke direkte relevans for forsøget), og dermed også chloridets
+  bivirkning i modellen, Cl⁻ og Cl₂ i zoomboblen og quizspørgsmålet om valget
+  af syre.
+* **Magnetomrøreren.** Den står på stativets fod under buretten og er tegnet i
+  koden (`S.tegnOmroerer`); den hvide plade er dens overside. Når kolben
+  stilles under buretten, falder en magnet ned gennem halsen, og omrøreren går
+  i gang af sig selv: lampen lyser, magneten drejer, og væsken får en hvirvel.
+  Den blander hver dråbe ind på under et halvt sekund, så eleven ikke skal
+  ryste kolben, og farven i hele kolben er den, der aflæses. Tallene står i
+  `OMROERER` i `js/model.js`.
 * **Opløsningen kræver varme.** I kold syre opløses stålulden meget langsomt.
   På varmepladen tager det ca. 8 sekunder. Stilles kolben under buretten, før
   alt er opløst, bliver resultatet for lavt.
@@ -47,25 +54,26 @@ typisk er 98,5 % jern.
 * **Affaldsbægeret** kan trækkes under buretten eller stilles på bordet. Syre,
   KMnO₄ og kolben kan hældes ud i det. Tømmes kolben før beregningen, starter
   kolben forfra med ny ståluld; efter beregningen er det oprydning.
-* **Tilskuerioner.** Afbryderen i toplinjen viser SO₄²⁻ og Cl⁻ i zoomboblen.
+* **Tilskuerioner.** Afbryderen i toplinjen viser SO₄²⁻ i zoomboblen.
   Den er slået fra, når siden åbnes.
 * **Aflæsning.** Knappen **Aflæs** (tasten A) eller et klik på buretten aflæser
   den. Knappen blinker, når en aflæsning ventes: når der er tappet af til 0, og
   når den lyserøde farve bliver. Glemmes startaflæsningen, skriver Kemichael den
   op, når den første KMnO₄ lander i kolben. Stod menisken over nulstregen,
   skrives 0,00 mL, og resultatet bliver for lavt.
-* **Titreringen.** Hanen åbnes og lukkes med et klik, knappen **Dråbe** (tasten D)
-  giver én dråbe, og kolben rystes ved at tage fat i den og bevæge musen. Hver
-  dråbe lander som en lilla
-  sky. Så længe der er meget Fe²⁺, forsvinder skyen straks; tæt på endepunktet
-  bliver den hængende, især uden rystning. Endepunktet er nået, når farven har
-  holdt i 2,5 sekunder. Modellen står i `js/model.js`.
+* **Titreringen.** Hanen åbnes og lukkes med et klik, og knappen **Dråbe**
+  (tasten D) giver én dråbe. Hver dråbe lander som en lilla sky, som
+  magnetomrøreren straks blander ind. Så længe der er Fe²⁺, forsvinder farven;
+  den første dråbe, der farver hele opløsningen, er endepunktet. Farven slår
+  tydeligt igennem ved `TITRER.synlig` (`lyserodAndel` i `js/model.js`), så
+  det, eleven ser, er det samme som det, forsøget regner for lyserødt.
+  Endepunktet er nået, når farven har holdt i 2,5 sekunder.
 * **Zoomboblen følger indholdet.** Jernatomer i et metalgitter, syren der
   oxiderer jernet til Fe²⁺ og danner H₂, MnO₄⁻ der tager én elektron fra hver af
-  fem Fe²⁺ og bliver til Mn²⁺, overskud af MnO₄⁻ ved endepunktet, Cl₂ i saltsyre,
-  og burettens skala tæt på, når den skal aflæses.
+  fem Fe²⁺ og bliver til Mn²⁺, overskud af MnO₄⁻ ved endepunktet og burettens
+  skala tæt på, når den skal aflæses.
 * **Fri leg.** Træk og hæld udføres altid, også når det er forkert: syre før
-  stålulden, to syrer, KMnO₄ direkte i kolben, kolben under buretten før
+  stålulden, KMnO₄ direkte i kolben, kolben under buretten før
   nulstillingen, hanen åben efter startaflæsningen, buretten fyldt op midt i
   titreringen eller en aflæsning før endepunktet. Kun det, der fysisk ikke kan
   lade sig gøre, afvises: en fuld vejebåd eller kolbe og en menisk over
@@ -81,15 +89,19 @@ typisk er 98,5 % jern.
   til fejlen: brøkdel i stedet for procent, massen i gram, slutaflæsningen i
   stedet for det forbrugte volumen, glemt faktor 5, divideret med 5, mL i stedet
   for L, eller divisionen vendt om.
-* **Hjælp til beregningen.** Knappen åbner en guide i fem trin: forbrugt volumen,
-  n(MnO₄⁻), n(Fe²⁺), m(Fe) og jernindholdet. Hvert trin tjekkes mod elevens eget
-  svar i trinnet før, og små tal kan skrives som 0,000356 eller 3,56·10^-4.
+* **Hjælp til beregningen.** Knappen åbner en guide i fem trin: V(MnO₄⁻),
+  n(MnO₄⁻), n(Fe²⁺), m(Fe) og jernindholdet. Hvert trin står som et
+  regnestykke med størrelsen til venstre: formlen, tallene sat ind og elevens
+  resultat, fx `n(MnO₄⁻) = c(KMnO₄) · V(MnO₄⁻) = 0,0200 M · 0,01955 L = [ ] mol`.
+  Linjen med tallene kommer, når trinnet før er regnet (`guideTal` i
+  `js/app.js`); volumenet står i liter, og brøken i sidste trin har en rigtig
+  brøkstreg. Hvert trin tjekkes mod elevens eget svar i trinnet før, og små
+  tal kan skrives som 0,000356 eller 3,56·10^-4.
 * **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
   undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
 * **Flere forsøg.** Nyt forsøg starter forfra. Tidligere resultater bliver
   stående, så forsøgene kan sammenlignes.
-* **Quiz** med ti spørgsmål, låst op når jernindholdet er beregnet i et forsøg
-  med svovlsyre.
+* **Quiz** med ti spørgsmål, låst op når jernindholdet er beregnet.
 
 ## Påskeæggene
 
@@ -101,7 +113,8 @@ Læreren Kemichael er fælles for superanimationerne og står i
   damp af ørerne.
 * **Kolben rystes voldsomt** med musen (`RYST.amok` og `RYST.amokTid` i
   `js/model.js`): noget skvulper ud, og læreren kommer ("Det er en titrerkolbe.
-  Ikke en cocktailshaker."). Replikkerne skifter.
+  Ikke en cocktailshaker."). Replikkerne skifter. Kolben kan stadig tages og
+  rystes, selv om magnetomrøreren gør det unødvendigt; ingen tekst beder om det.
 * **Buretten løber over.** Fyldes den, mens den er fuld, kommer læreren og peger
   på regel 3 på plakaten. Pletten på bordet bliver stående resten af sessionen.
 * **Syre på vægten.** Syreflaskerne kan også slippes over vægten. Så løber
@@ -110,9 +123,9 @@ Læreren Kemichael er fælles for superanimationerne og står i
 * **Langt forbi endepunktet** (`TITRER.aubergine`): "Svagt lyserød. Ikke
   aubergine."
 * **Over 100 %.** Læreren er skeptisk, og tredje gang kommer et lille vink om
-  syren.
-* **Et godt resultat.** Ligger et resultat med svovlsyre mellem 96 og 100,5 %,
-  siger læreren "Rustfrit."
+  farven.
+* **Et godt resultat.** Ligger resultatet mellem 96 og 100,5 %, siger læreren
+  "Rustfrit."
 * **Glimt af Kemichaels baggrund** ved rystningen, auberginen og rosen og et
   regnskab over uheld, der følger browseren. Hvert glimt kommer én gang; se
   `../../kemichael/README.md`.
@@ -130,22 +143,22 @@ kaffekoppen ligger i `../../kemichael/sprites/`.
 | `vejebaad.svg` | vejebåd | bundens midte (32, 14) |
 | `kolbe.svg` | konisk kolbe 250 mL, som i sc2.6, tegnet 96 x 128 | åbningen (48, 2,5); inderside i `S.KOLBE_INDRE` |
 | `baegerglas.svg` | affaldsbægeret | tuden (68, 3); inderside i `S.BAEGER_INDRE` |
-| `flaske_svovlsyre.svg`, `flaske_saltsyre.svg` | 1 M H₂SO₄ med GHS07, 2 M HCl med GHS05 | åbningen (23, 4); låget tegnes i koden |
+| `flaske_svovlsyre.svg` | 1 M H₂SO₄ med GHS07 | åbningen (23, 4); låget tegnes i koden |
 | `flaske_kmno4.svg` | brun flaske med 0,0200 M KMnO₄ | åbningen (23, 4) |
 | `varmeplade.svg` | varmeplade | displayet x 10 til 40, lampen (52, 20) |
 | `haand.svg`, `lup.svg` | handske og lup | grebet (40, 46) |
 
-Buretten, stativet, flisen, væsker, ståluld i vejebåden og kolben, bobler,
-dråber, den lilla sky, dampe, pletten, lokalet, stinkskabet, lærerens ansigt og
-zoomboblen tegnes i koden. Ændres en sprite, skal tallene i `scene.js` passe.
+Buretten, stativet, magnetomrøreren og magneten, væsker, ståluld i vejebåden og
+kolben, bobler, dråber, den lilla sky, dampe, pletten, lokalet, stinkskabet,
+lærerens ansigt og zoomboblen tegnes i koden. Ændres en sprite, skal tallene i `scene.js` passe.
 
 ## Filer
 
 ```
 index.html          markup: scene, panel, beregning, intro, tegneserie, guide, teori, rundvisning
 ../../laboratoriet/ fælles for laboratorieforsøgene: kerne.js, rundvisning.js og grund.css
-css/stil.css        kun det særlige for forsøget: hanefart, afbryder, skema, guide. NB: decimaltal med PUNKTUM i CSS
-js/model.js         kemien og tallene: opløsning, titrering, farve, beregning, hints
+css/stil.css        kun det særlige for forsøget: hanefart, afbryder, skema, guide, brøk. NB: decimaltal med PUNKTUM i CSS
+js/model.js         kemien og tallene: opløsning, titrering, omrøring, farve, beregning, hints
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlæser SVG'erne og tegner dem drejet om et anker
 js/scene.js         tegnebordet (1000 x 600): mål, lokalet, udstyr, buret, væsker
@@ -164,9 +177,9 @@ _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ## At rette i den
 
 **Kemien og tallene** står i `js/model.js`: jernindholdet i stålulden
-(`STAALULD`), afvejningen (`AFVEJ`), syrerne (`SYRER`), opløsningens fart
-(`OPLOES`), buretten (`BURET`), blanding og endepunkt (`TITRER`), chloridets
-bivirkning (`KLOR`), rystningen (`RYST`) og tjekket af elevens svar.
+(`STAALULD`), afvejningen (`AFVEJ`), syren (`SYRER`), opløsningens fart
+(`OPLOES`), buretten (`BURET`), blanding og endepunkt (`TITRER`),
+magnetomrøreren (`OMROERER`), rystningen (`RYST`) og tjekket af elevens svar.
 
 **Trinene** står i `TRIN` øverst i `js/forsoeg.js` med tekst, hint og hvilken
 genstand hintet markerer. Hvornår et trin er gjort, afgøres i `trinGjort`.
@@ -184,8 +197,10 @@ tolerancer og hints for hvert af de fem trin.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kører forsøget igennem:
 at alle sprites indlæses, at modellen giver de forventede resultater, at
-buretten er let at nulstille, at forkerte handlinger udføres og noteres, at
-svovlsyre giver ca. 98,5 % og saltsyre over 103 %, at tegneserien bygges med
+buretten er let at nulstille, at magnetomrøreren går i gang af sig selv og
+blander en dråbe ind på under et sekund, at endepunktet nås uden at ryste
+kolben, at forkerte handlinger udføres og noteres, at resultatet bliver ca.
+98,5 %, at guiden viser størrelsen til venstre i hvert trin, at tegneserien bygges med
 de rigtige fejlruder og resultatskemaet, at beregningen og guiden
 godtager de rigtige svar og giver de rigtige hints, at zoomboblen tæller rigtigt,
 at påskeæggene kan gennemføres, at scenen kan tegnes i alle faser, og at der

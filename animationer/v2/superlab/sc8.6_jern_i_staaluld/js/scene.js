@@ -3,12 +3,13 @@
 
    Alt tegnes paa et tegnebord paa 1000 x 600 enheder, som skaleres og
    centreres i laerredet. Til venstre staar det aabne bord med stålulden
-   og vaegten. I midten er stinkskabet med de to syrer, kolben og
+   og vaegten. I midten er stinkskabet med svovlsyren, kolben og
    varmepladen. Til hoejre staar titreropstillingen: stativ, buret,
-   affaldsbaeger og flasken med kaliumpermanganat.
+   magnetomroerer, affaldsbaeger og flasken med kaliumpermanganat.
 
-   Genstandene er SVG-filer i sprites/. Buretten, stativet, vaesker,
-   ståluld, bobler og draaber tegnes her i koden.
+   Genstandene er SVG-filer i sprites/. Buretten, stativet,
+   magnetomroereren, vaesker, ståluld, bobler og draaber tegnes her i
+   koden.
 
    Filen indeholder kun maal og tegning. Tilstanden ligger i forsoeg.js.
    ===================================================================== */
@@ -31,7 +32,6 @@
         kolbe:        { x: 48, y: 2.5 },
         baegerglas:   { x: 68, y: 3 },
         svovlsyre:    { x: 23, y: 4 },
-        saltsyre:     { x: 23, y: 4 },
         kmno4:        { x: 23, y: 4 },
         haand:        { x: 40, y: 46 },
         papir:        { x: 36, y: 22 }
@@ -60,20 +60,22 @@
     S.BURET = { x: 888, top: 112, nul: 126, prMl: 3.8, kegle: 324, hane: 334, haneBund: 352, spids: 364, halv: 7 };
     S.BURET.bund = S.BURET.nul + 50 * S.BURET.prMl;
     S.STATIV = { stang: 824, top: 70, x0: 796, x1: 944, y: 492 };
-    S.FLISE = { x0: 842, x1: 934, y: 486 };
+    /* Magnetomroereren staar paa stativets fod under buretten. FLISE er
+       dens hvide plade: det, kolben staar paa, saa farveskiftet kan ses. */
+    S.OMROERER = { x0: 834, x1: 942, y: 482 };
+    S.FLISE = { x0: 843, x1: 933, y: S.OMROERER.y };
 
     S.HJEM = {
         staaluld:  staar("staaluld", 72),
         vejebaad:  { x: S.VAEGT.vejeskaal.x, y: S.VAEGT.vejeskaal.y, v: 0 },
         parkeret:  { x: 118, y: S.BORD, v: 0 },
         kolbe:     staar("kolbe", 604),
-        svovlsyre: staar("svovlsyre", 478),
-        saltsyre:  staar("saltsyre", 528),
+        svovlsyre: staar("svovlsyre", 496),
         kmno4:     staar("kmno4", 971),
         affald:    staar("baegerglas", S.BURET.x, S.FLISE.y),
         kaffekop:  staar("kaffekop", 122, S.HYLDE.y)
     };
-    S.AFFALD_PARKERET = staar("baegerglas", 806);
+    S.AFFALD_PARKERET = staar("baegerglas", 798);
     S.PAA_PLADE = staar("kolbe", S.PLADE.midt, S.PLADE.y);
     S.UNDER_BURET = staar("kolbe", S.BURET.x, S.FLISE.y);
 
@@ -397,15 +399,24 @@
         var x0 = Infinity, x1 = -Infinity, y1 = -Infinity;
         verden.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
         var boelge = opt.boelge || 0, tid = opt.tid || 0;
+        /* dyk: hvirvlen over en magnet, der roerer: { x, dybde, bredde } */
+        var dyk = opt.dyk && opt.dyk.dybde > 0.05 ? opt.dyk : null;
+        var skridt = dyk ? 2 : 4;
+        function flade(x) {
+            var y = niveau + Math.sin(x * 0.12 + tid * 10) * boelge + Math.sin(x * 0.05 - tid * 6.5) * boelge * 0.6;
+            if (dyk) {
+                var u = (x - dyk.x) / dyk.bredde;
+                y += dyk.dybde * Math.exp(-u * u);
+            }
+            return y;
+        }
 
         ctx.save();
         NK.polySti(ctx, verden);
         ctx.clip();
         ctx.beginPath();
         ctx.moveTo(x0 - 4, niveau);
-        for (var x = x0 - 4; x <= x1 + 6; x += 4) {
-            ctx.lineTo(x, niveau + Math.sin(x * 0.12 + tid * 10) * boelge + Math.sin(x * 0.05 - tid * 6.5) * boelge * 0.6);
-        }
+        for (var x = x0 - 4; x <= x1 + 6; x += skridt) ctx.lineTo(x, flade(x));
         ctx.lineTo(x1 + 6, y1 + 6);
         ctx.lineTo(x0 - 4, y1 + 6);
         ctx.closePath();
@@ -417,8 +428,13 @@
         ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
         ctx.lineWidth = 1.2;
         ctx.beginPath();
-        ctx.moveTo(x0, niveau);
-        ctx.lineTo(x1, niveau);
+        if (dyk) {
+            ctx.moveTo(x0, flade(x0));
+            for (x = x0 + skridt; x <= x1; x += skridt) ctx.lineTo(x, flade(x));
+        } else {
+            ctx.moveTo(x0, niveau);
+            ctx.lineTo(x1, niveau);
+        }
         ctx.stroke();
         ctx.restore();
         return niveau;
@@ -514,16 +530,39 @@
         }
     };
 
+    /* Magneten: en hvid, pilleformet stang, set fra siden. halv er den
+       halve laengde, som den ses lige nu. */
+    function magnetstang(ctx, halv) {
+        NK.rundtRekt(ctx, -halv, -2.7, 2 * halv, 5.4, 2.7);
+        ctx.fillStyle = "#f6f7f9";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(34, 42, 52, 0.6)";
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+        ctx.fillStyle = "rgba(34, 42, 52, 0.3)";
+        ctx.fillRect(-0.9, -2.7, 1.8, 5.4);
+    }
+
     /* ================================================================
        KOLBEN
        k: { p, ml, farve, lokal, lokalX, jern (0-1), bobler, boelge,
-            hvirvel, fremhaev }
+            hvirvel, fremhaev,
+            magnet (ligger der en magnet i kolben), magnetFald (0-1, mens
+            den falder ned gennem halsen), magnetVinkel, roer (0-1) }
        ================================================================ */
+    S.MAGNET = { halv: 13, y: 120 };
+
     S.tegnKolbe = function (ctx, k, tid) {
         var a = S.ANKER.kolbe;
         var verden = S.indreVerden(S.KOLBE_INDRE, k.p, a);
         var i;
-        var niveau = S.tegnVaeske(ctx, verden, k.ml * NK.Model.KOLBE_AREAL, k.farve, { boelge: k.boelge, tid: tid });
+        var roer = k.magnet ? (k.roer || 0) : 0;
+        var areal = k.ml * NK.Model.KOLBE_AREAL;
+        /* Hvirvlen over magneten: hoejst halvt saa dyb som vaesken */
+        var dybde = Math.min(7 * roer, areal / 73 * 0.5);
+        var niveau = S.tegnVaeske(ctx, verden, areal, k.farve, {
+            boelge: k.boelge, tid: tid, dyk: { x: k.p.x, dybde: dybde, bredde: 9 }
+        });
 
         ctx.save();
         NK.polySti(ctx, verden);
@@ -569,6 +608,27 @@
                 ctx.stroke();
             }
         }
+        if (k.magnet) {
+            var MG = S.MAGNET;
+            var fald = k.magnetFald === undefined ? 1 : k.magnetFald;
+            ctx.save();
+            if (fald < 1) {
+                /* Paa hoejkant ned gennem halsen; den vipper ned det sidste stykke */
+                ctx.translate(48, NK.lerp(16, MG.y - 8, fald * fald));
+                ctx.rotate(Math.PI / 2 * (1 - NK.klamp((fald - 0.7) / 0.3, 0, 1)));
+                magnetstang(ctx, MG.halv);
+            } else {
+                ctx.translate(48, MG.y);
+                if (roer > 0.05) {
+                    ctx.fillStyle = "rgba(246, 247, 249, " + (0.22 * roer).toFixed(3) + ")";
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, MG.halv, 3.4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                magnetstang(ctx, 3.2 + (MG.halv - 3.2) * Math.abs(Math.cos(k.magnetVinkel || 0)));
+            }
+            ctx.restore();
+        }
         ctx.restore();
 
         NK.Sprites.tegnPositur(ctx, "kolbe", k.p, a);
@@ -598,7 +658,8 @@
     /* ================================================================
        STATIV OG BURET
        ================================================================ */
-    S.tegnStativ = function (ctx) {
+    /* o: { roer (0-1): magnetomroererens fart } */
+    S.tegnStativ = function (ctx, o) {
         var T = S.STATIV;
         S.skygge(ctx, (T.x0 + T.x1) / 2, (T.x1 - T.x0) / 2, 0.3);
         NK.rundtRekt(ctx, T.x0, T.y, T.x1 - T.x0, S.BORD - T.y, 2);
@@ -616,12 +677,53 @@
         NK.rundtRekt(ctx, T.stang - 4, T.top, 8, T.y - T.top, 3);
         ctx.fill();
 
-        /* Hvid flise, saa farveskiftet kan ses */
-        var FL = S.FLISE;
-        ctx.fillStyle = "#f1f3f5";
-        ctx.fillRect(FL.x0, FL.y, FL.x1 - FL.x0, T.y - FL.y);
-        ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
-        ctx.fillRect(FL.x0, T.y - 1.5, FL.x1 - FL.x0, 1.5);
+        S.tegnOmroerer(ctx, o);
+    };
+
+    /* Magnetomroereren: et fladt, lyst hus paa stativets fod. Oversiden
+       er en hvid plade, saa farveskiftet kan ses. Paa forsiden sidder en
+       lampe, der lyser, naar den roerer, og en drejeknap. */
+    S.tegnOmroerer = function (ctx, o) {
+        var R = S.OMROERER, FL = S.FLISE;
+        var roer = o && o.roer ? NK.klamp(o.roer, 0, 1) : 0;
+        var midt = (R.y + 3 + S.BORD) / 2;
+        ctx.save();
+        var g = ctx.createLinearGradient(0, R.y, 0, S.BORD);
+        g.addColorStop(0, "#dde2e8");
+        g.addColorStop(1, "#a3acb8");
+        ctx.fillStyle = g;
+        NK.rundtRekt(ctx, R.x0, R.y, R.x1 - R.x0, S.BORD - R.y, 3);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(20, 24, 30, 0.45)";
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        ctx.fillStyle = "#fbfcfd";
+        ctx.fillRect(FL.x0, FL.y, FL.x1 - FL.x0, 3);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
+        ctx.fillRect(FL.x0, FL.y + 3, FL.x1 - FL.x0, 1);
+
+        if (roer > 0.02) NK.skaer(ctx, R.x0 + 9, midt, 7, "rgba(80, 230, 140, 0.9)", 0.7 * roer);
+        NK.kugle(ctx, R.x0 + 9, midt, 2.3, roer > 0.02 ? "#c8ffe0" : "#7d8794", roer > 0.02 ? "#1fae5c" : "#4d5560");
+        NK.tekst(ctx, "MAGNETOMRØRER", (R.x0 + R.x1) / 2 - 2, midt + 0.5, {
+            font: "800 7px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#39424e"
+        });
+
+        /* Drejeknappen: stregen peger opad, naar den er slukket */
+        ctx.translate(R.x1 - 11, midt);
+        ctx.fillStyle = "#2c333d";
+        ctx.beginPath();
+        ctx.arc(0, 0, 4.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.rotate(-0.6 + 2.2 * roer);
+        ctx.strokeStyle = "#f4f6f8";
+        ctx.lineWidth = 1.4;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(0, -0.6);
+        ctx.lineTo(0, -4);
+        ctx.stroke();
+        ctx.restore();
     };
 
     /* Klemmen tegnes foran buretten */

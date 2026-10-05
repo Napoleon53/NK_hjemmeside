@@ -82,7 +82,7 @@
         NK.saetTekst("serie-tekst", slut ? "Forsøget er slut." : "Låses op, når jernindholdet er beregnet.");
         NK.el("serieknap").classList.toggle("banker", slut && !serieSet);
 
-        quiz.saetLaast(!f.harSvovlsyreResultat());
+        quiz.saetLaast(!f.harResultat());
         sidsteSignatur = signatur();
     }
 
@@ -166,9 +166,34 @@
     /* ----- Guidet hjaelp til beregningen -------------------------------
        Hvert trin tjekkes mod elevens eget svar i trinnet foer, saa en
        lille afrunding ikke giver fejl senere. Sidste trin tjekkes mod det
-       rigtige resultat. */
+       rigtige resultat.
+
+       Et trin staar som et regnestykke: stoerrelsen til venstre, formlen,
+       tallene sat ind og elevens resultat, fx
+         n(MnO₄⁻) = c(KMnO₄) · V(MnO₄⁻)
+                  = 0,0200 M · 0,01955 L = [ ] mol
+       Linjen med tallene (guideTal) er tom, til de tal, trinnet bygger
+       paa, er fundet i trinnet foer. */
     var ANTAL_G = 5;
     var guide = { trin: 1 };
+
+    /* tekst: tallene sat ind i formlen. broek: [taeller, naevner], som
+       saettes foran teksten med en rigtig broekstreg. */
+    function guideTal(n, tekst, broek) {
+        var el = NK.el("g" + n + "-tal");
+        el.textContent = "";
+        if (broek) {
+            var b = document.createElement("span");
+            b.className = "broek";
+            broek.forEach(function (led) {
+                var s = document.createElement("span");
+                s.textContent = led;
+                b.appendChild(s);
+            });
+            el.appendChild(b);
+        }
+        if (tekst) el.appendChild(document.createTextNode(tekst));
+    }
 
     function guideVis() {
         for (var n = 1; n <= ANTAL_G; n++) {
@@ -184,11 +209,8 @@
         var t = forsoeg.jernTal();
         if (!t || forsoeg.gjort.beregn) return;
         guide = { trin: 1 };
-        NK.el("g1-tal").textContent = M.komma(t.vSlut, 2) + " mL − " + M.komma(t.vStart, 2) + " mL =";
-        NK.el("g2-tal").textContent = "0,0200 M · V =";
-        NK.el("g3-tal").textContent = "5 · n(MnO₄⁻) =";
-        NK.el("g4-tal").textContent = "n(Fe²⁺) · 55,85 g/mol =";
-        NK.el("g5-tal").textContent = "m(Fe) / " + M.komma(t.mStaal, 3) + " g · 100 % =";
+        guideTal(1, M.komma(t.vSlut, 2) + " mL − " + M.komma(t.vStart, 2) + " mL =");
+        for (var k = 2; k <= ANTAL_G; k++) guideTal(k, "");
         for (var n = 1; n <= ANTAL_G; n++) {
             var input = NK.el("g" + n + "-svar");
             input.value = "";
@@ -224,7 +246,7 @@
         } else if (n === 2) {
             var nMn = M.KMNO4.c * guide.V / 1000;
             if (!naer(v, nMn, 0.008)) {
-                if (naer(v, nMn * 1000, 0.01)) fejl = "Tallet er 1000 gange for stort. Regn volumen om til liter først.";
+                if (naer(v, nMn * 1000, 0.01)) fejl = "Tallet er 1000 gange for stort. Regn med volumen i liter.";
                 else fejl = "Gang koncentrationen med volumen i liter.";
             }
         } else if (n === 3) {
@@ -260,10 +282,11 @@
         }
         hint.hidden = true;
         input.classList.remove("forkert");
-        if (n === 1) { guide.V = v; NK.el("g2-tal").textContent = "0,0200 M · " + M.komma(v, 2) + " mL ="; }
-        if (n === 2) { guide.nMn = v; NK.el("g3-tal").textContent = "5 · " + M.videnskabelig(v, 3) + " mol ="; }
-        if (n === 3) { guide.nFe = v; NK.el("g4-tal").textContent = M.videnskabelig(v, 3) + " mol · 55,85 g/mol ="; }
-        if (n === 4) { guide.mFe = v; NK.el("g5-tal").textContent = M.komma(v, 4) + " g / " + M.komma(t.mStaal, 3) + " g · 100 % ="; }
+        /* Volumenet staar i liter i naeste trin, saa enhederne passer med M (mol/L) */
+        if (n === 1) { guide.V = v; guideTal(2, "0,0200 M · " + M.komma(v / 1000, 5) + " L ="); }
+        if (n === 2) { guide.nMn = v; guideTal(3, "5 · " + M.videnskabelig(v, 3) + " mol ="); }
+        if (n === 3) { guide.nFe = v; guideTal(4, M.videnskabelig(v, 3) + " mol · 55,85 g/mol ="); }
+        if (n === 4) { guide.mFe = v; guideTal(5, " · 100 % =", [M.komma(v, 4) + " g", M.komma(t.mStaal, 3) + " g"]); }
         if (n === 5) guide.procent = v;
         guide.trin = n + 1;
         guideVis();

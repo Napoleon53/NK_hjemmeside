@@ -99,7 +99,7 @@
 .beregn input:focus, .guide-regning input:focus { outline: 2px solid var(--gul); outline-offset: 1px; }
 .beregn input.forkert, .guide-regning input.forkert { border-color: var(--roed); }
 .guide-regning input:disabled { opacity: 0.5; }
-.guide-regning input { width: 116px; }
+.guide-regning input { width: 104px; }
 .overlay-boks .guide-note { margin: 10px 0 0 0; font-size: 0.8rem; color: var(--tekst-mat); }
 
 .knap.lille { width: 100%; margin-top: 10px; padding: 6px 10px; font-size: 0.8rem; }
@@ -138,20 +138,33 @@
 .guide li.aktiv .nr { background-color: var(--blaa); color: #ffffff; }
 .guide li.gjort .nr { background-color: var(--groen-mork); color: #ffffff; }
 
-.overlay-boks .guide-titel { margin: 1px 0 0 0; font-size: 0.92rem; font-weight: 700; color: var(--tekst); }
-.overlay-boks .guide-formel { margin: 2px 0 8px 0; font-size: 0.84rem; color: var(--tekst-mat); }
+.guide-boks { max-width: 640px; }
+.overlay-boks .guide-titel { margin: 1px 0 6px 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tekst-mat); }
 .overlay-boks .guide .hint { margin: 8px 0 0 0; }
 
+/* Et trin som regnestykke: stoerrelsen til venstre, og til hoejre for den
+   foerst formlen og saa tallene med elevens resultat, begge med = foran */
 .guide-regning {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 7px;
+    row-gap: 6px;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--tekst-svag);
     font-variant-numeric: tabular-nums;
 }
+
+.guide-vs { color: #ffffff; font-weight: 700; }
+.guide-formel { color: var(--tekst-svag); }
+.guide-linje { grid-column: 2; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.guide-tal:empty { display: none; }
+
+/* Broek med rigtig broekstreg */
+.broek { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.25; margin: 0 2px; }
+.broek > span:first-child { padding: 0 5px 2px; border-bottom: 1.5px solid currentColor; }
+.broek > span:last-child { padding: 2px 5px 0; }
 
 .guide-regning .knap { padding: 7px 12px; }
 .guide-boks .knapper { gap: 8px; }

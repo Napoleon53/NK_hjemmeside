@@ -15,7 +15,7 @@
     var B = S.BURET;
     var P = NK.Forsoeg.prototype;
 
-    var LAAG = { svovlsyre: "#2f6fae", saltsyre: "#2f8a52", kmno4: "#26262c" };
+    var LAAG = { svovlsyre: "#2f6fae", kmno4: "#26262c" };
 
     /* ----- Musens position paa tegnebordet ------------------------------ */
     P.tilBord = function (ev) {
@@ -34,7 +34,7 @@
         if (!g.kaffekop.skjult && S.inden("kaffekop", g.kaffekop.p, g.kaffekop.anker, pt.x, pt.y, 6)) return "kaffekop";
         if (Math.abs(pt.x - B.x) < 20 && pt.y > B.hane - 5 && pt.y < B.haneBund + 5) return "hane";
         if (Math.abs(pt.x - B.x) < 14 && pt.y > B.top - 26 && pt.y < B.kegle) return "buret";
-        var navne = ["kmno4", "svovlsyre", "saltsyre", "kolbe", "affald"];
+        var navne = ["kmno4", "svovlsyre", "kolbe", "affald"];
         for (var i = 0; i < navne.length; i++) {
             var gg = g[navne[i]];
             if (S.inden(gg.sprite, gg.p, gg.anker, pt.x, pt.y, 4)) return navne[i];
@@ -197,7 +197,8 @@
         k.niveau = S.tegnKolbe(ctx, {
             p: k.p, ml: kem.ml, farve: M.kolbeFarve(kem),
             lokal: M.lokalIntensitet(kem), lokalX: this.lokalX + (k.p.x - S.UNDER_BURET.x),
-            jern: jern, bobler: this.kolbeBobler, boelge: this.ryst * 1.5, hvirvel: this.ryst,
+            jern: jern, bobler: this.kolbeBobler, boelge: this.ryst * 1.5, hvirvel: this.blanding(),
+            magnet: k.magnet, magnetFald: this.magnetFald, magnetVinkel: this.magnetVinkel, roer: this.roer,
             fremhaev: this.markeret("kolbe")
         }, tid);
     };
@@ -256,15 +257,14 @@
         }
 
         /* Stinkskabet */
-        ["svovlsyre", "saltsyre"].forEach(function (navn) {
-            if (hjemme(g[navn])) {
-                S.skygge(ctx, g[navn].hjem.x, 22, 0.3);
-                this.tegnFlaske(ctx, navn);
-            } else {
-                oppe.push(function () { this.tegnFlaske(ctx, navn); });
-            }
-        }, this);
-        if (this.markeret("flasker")) S.tegnMarkering(ctx, { x: 455, y: 380, b: 96, h: 120 }, tid);
+        var sv = g.svovlsyre;
+        if (hjemme(sv)) {
+            S.skygge(ctx, sv.hjem.x, 22, 0.3);
+            this.tegnFlaske(ctx, "svovlsyre");
+            if (this.markeret("svovlsyre")) S.tegnMarkering(ctx, S.rekt("svovlsyre", sv.p, sv.anker, 0), tid);
+        } else {
+            oppe.push(function () { this.tegnFlaske(ctx, "svovlsyre"); });
+        }
 
         S.tegnVarmeplade(ctx, this.pladeTemp, this.pladeTaendt);
         var k = g.kolbe;
@@ -277,7 +277,7 @@
         }
 
         /* Titreropstillingen */
-        S.tegnStativ(ctx);
+        S.tegnStativ(ctx, { roer: this.roer });
         var af = g.affald;
         if (af.sted === "flytter" || af.sted === "traekkes") oppe.push(function () { this.tegnAf(ctx, tid); });
         else this.tegnAf(ctx, tid);

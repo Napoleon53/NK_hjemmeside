@@ -1,8 +1,8 @@
 /* =====================================================================
    quiz.js - quizkortet i panelet
 
-   Kortet er laast, indtil jernindholdet er beregnet i et forsoeg med
-   svovlsyre. Svarene blandes hver gang. Der er ét forsoeg pr.
+   Kortet er laast, indtil jernindholdet er beregnet i et forsoeg, hvor
+   stålulden er opløst i syren. Svarene blandes hver gang. Der er ét forsoeg pr.
    spoergsmaal, og begrundelsen vises bagefter, ogsaa naar svaret er
    rigtigt.
    ===================================================================== */
@@ -24,15 +24,15 @@
             forklaring: "Hvert Fe-atom afgiver to elektroner og bliver til Fe²⁺. To H⁺ optager elektronerne og bliver til H₂, som ses som bobler."
         },
         {
-            sp: "Hvorfor opløses stålulden i svovlsyre og ikke i saltsyre?",
+            sp: "Hvorfor står kolben på en magnetomrører under titreringen?",
             valg: [
-                "MnO₄⁻ kan også oxidere Cl⁻, så der bruges for meget KMnO₄",
-                "Saltsyre kan ikke opløse jern",
-                "Svovlsyre farver opløsningen lyserød ved endepunktet",
-                "Saltsyre fordamper under titreringen"
+                "Hver dråbe blandes straks ind, så farven viser, om der er Fe²⁺ tilbage",
+                "Omrøringen gør, at der bruges mindre KMnO₄",
+                "Magneten trækker jernet ud af opløsningen",
+                "Omrøringen varmer opløsningen op"
             ],
             rigtig: 0,
-            forklaring: "Permanganat oxiderer chloridioner til dichlor. Så bruges der mere KMnO₄, end jernet alene kræver, og resultatet bliver for højt. Sulfationen oxideres ikke."
+            forklaring: "Uden omrøring bliver dråben hængende som en lilla sky, selv om der er Fe²⁺ i resten af kolben. Med omrøring reagerer hver dråbe med det samme, og den første dråbe, der farver hele opløsningen, viser endepunktet."
         },
         {
             sp: "Hvordan ses endepunktet i titreringen?",
@@ -210,7 +210,7 @@
 
         if (this.tilstand === "laast") {
             NK.saetTekst("quiz-taeller", "");
-            tekst.textContent = "Låses op, når du har fundet jernindholdet i et forsøg med svovlsyre.";
+            tekst.textContent = "Låses op, når jernindholdet er beregnet.";
             knap.hidden = true;
         } else if (this.tilstand === "klar") {
             NK.saetTekst("quiz-taeller", n + " spørgsmål");

@@ -19,9 +19,9 @@
 
    Aabner index.html i en iframe og koerer forsoeget igennem med de
    samme funktioner, som klik, traek og knapper bruger: modellen,
-   raekkefoelgen, opløsningen, buretten, titreringen, iagttagelserne,
-   beregningen og den guidede hjaelp, paaskeaeggene, zoomboblen,
-   quizzen, sproget og ion-notationen.
+   raekkefoelgen, opløsningen, buretten, magnetomroereren, titreringen,
+   iagttagelserne, beregningen og den guidede hjaelp, paaskeaeggene,
+   zoomboblen, quizzen, sproget og ion-notationen.
    Skal aabnes gennem en lokal server (Chrome afviser iframes paa file://).
    ===================================================================== */
 var linjer = [];
@@ -131,8 +131,8 @@ function koerTest() {
     paastand("videnskabelig: 3,56·10⁻⁴", M.videnskabelig(3.56e-4) === "3,56·10⁻⁴");
     paastand("aflaesning med sidste ciffer 0 eller 5", M.aflaes(18.537) === 18.55 && M.aflaes(0.32) === 0.3);
     paastand("varm syre opløser hurtigere end kold", M.oploesFart(80) > 10 * M.oploesFart(22));
-    function ideel(syre) {
-        var k = M.nyKemi(); k.syre = syre; k.nFeTot = M.jernMol(0.105); k.opl = 1; k.nFe2 = k.nFeTot; k.ml = 50;
+    function ideel() {
+        var k = M.nyKemi(); k.syre = "svovlsyre"; k.nFeTot = M.jernMol(0.105); k.opl = 1; k.nFe2 = k.nFeTot; k.ml = 50;
         var V = 0, lys = 0;
         while (V < M.aekvivalens(k.nFeTot) * 0.9) { M.tilsaet(k, 1 / 60); V += 1 / 60; M.reager(k, 1 / 60, { ryst: 1 }); }
         for (var n = 0; n < 2000 && lys < M.TITRER.blivende; n++) {
@@ -141,9 +141,18 @@ function koerTest() {
         }
         return M.jernprocent(0.105, 0, M.aflaes(V));
     }
-    var idS = ideel("svovlsyre"), idH = ideel("saltsyre");
-    paastand("ideel titrering med svovlsyre: 98 til 99,5 %", idS > 98 && idS < 99.5, komma(idS) + " %");
-    paastand("saltsyre giver over 103 %", idH > 103, komma(idH) + " %");
+    var idS = ideel();
+    paastand("ideel titrering med omroering: 98 til 99,5 %", idS > 98 && idS < 99.5, komma(idS) + " %");
+    paastand("svovlsyre er den eneste syre", Object.keys(M.SYRER).join() === "svovlsyre" && !f.g.saltsyre && !NK.Sprites.FILER.saltsyre);
+    function skyTid(ryst) {
+        var k = M.nyKemi(); k.syre = "svovlsyre"; k.nFeTot = M.jernMol(0.105); k.opl = 1; k.nFe2 = 0; k.ml = 70;
+        M.tilsaet(k, M.BURET.draabe);
+        var s = 0;
+        while (M.lokalIntensitet(k) > 0.1 && s < 30) { M.reager(k, 1 / 60, { ryst: ryst }); s += 1 / 60; }
+        return s;
+    }
+    var skyMed = skyTid(1), skyUden = skyTid(0);
+    paastand("ved endepunktet er en draabe blandet ind paa under et halvt sekund med omroering", skyMed < 0.5 && skyUden > 5, komma(skyMed, 2) + " s mod " + komma(skyUden, 1) + " s uden");
     var T = function (s) { return M.tjek(s, 0.105, 0.35, 18.9).slags; };
     var mr = M.mellemregning(0.105, 0.35, 18.9);
     paastand("tjek: rigtigt svar", T(komma(mr.procent)) === "rigtig");
@@ -215,6 +224,10 @@ function koerTest() {
     paastand("kolben stilles under buretten", f.klik("kolbe") === true);
     adv(4);
     paastand("kolben staar under, og affaldsbaegeret er flyttet", f.g.kolbe.sted === "buret" && f.g.affald.sted === "bord");
+    paastand("affaldsbaegeret staar ved siden af magnetomroereren", f.g.affald.p.x - 32 + 36 <= NK.Scene.OMROERER.x0 + 0.5, komma(f.g.affald.p.x + 4, 0) + " mod " + NK.Scene.OMROERER.x0);
+    paastand("magneten er faldet ned i kolben, og omroereren koerer af sig selv", f.g.kolbe.magnet && f.magnetFald === 1 && f.omroererTaendt() && f.roer > 0.9, komma(f.roer, 2));
+    paastand("kolbens munding gaar fri af hanen", f.g.kolbe.p.y - 2.5 >= NK.Scene.BURET.haneBund + 1 && f.g.kolbe.p.y < NK.Scene.BURET.spids, komma(f.g.kolbe.p.y - 2.5 - NK.Scene.BURET.haneBund, 1) + " under hanen");
+    paastand("klik paa kolben siger, at omroereren roerer", (function () { var b = ""; var gl = f.vedBesked; f.vedBesked = function (x) { b = x; }; f.klik("kolbe"); f.vedBesked = gl; return /magnetomrøreren/.test(b); }()));
     tegnOk("kolben under buretten");
     var aek = M.aekvivalens(f.kem.nFeTot);
     f.klik("hane");
@@ -235,10 +248,14 @@ function koerTest() {
     f.klik("hane");
     vent(function () { return f.buret.V - f.vStart >= aek * 0.95; }, 30);
     f.klik("hane");
+    f.draabe(); adv(1.2);
+    paastand("taet paa endepunktet er draaben blandet ind efter et sekund", M.lokalIntensitet(f.kem) < 0.02 && M.intensitet(f.kem) < M.TITRER.synlig, komma(M.lokalIntensitet(f.kem), 3));
     i = 0;
-    while (!f.gjort.titrer && i++ < 300) { f.draabe(); f.arbejdKnap(true); adv(1); f.arbejdKnap(false); adv(2); }
+    var rystet = false;
+    while (!f.gjort.titrer && i++ < 300) { f.draabe(); adv(3); rystet = rystet || f.ryst > 0.01; }
     tegnOk("lyserød kolbe");
-    paastand("endepunktet er naaet", f.gjort.titrer && M.intensitet(f.kem) >= M.TITRER.synlig);
+    paastand("endepunktet er naaet uden at ryste kolben", f.gjort.titrer && !rystet && M.intensitet(f.kem) >= M.TITRER.synlig, i + " draaber");
+    paastand("hoejst to draaber for meget ved endepunktet", M.overskudMl(f.kem) <= 2 * M.BURET.draabe + 1e-9, komma(M.overskudMl(f.kem), 3) + " mL");
     adv(1.5);
     tegnOk("zoomboblen ved buretten");
     paastand("slutaflaesningen tages om ved endepunktet", f.klik("buret") === true && f.vSlut !== null && !f.iagttaget.ikkeLyserod);
@@ -257,21 +274,29 @@ function koerTest() {
     var G = NK.guide;
     G.aabn();
     paastand("guiden aabnes med trin 1 aktivt", d.getElementById("guide").classList.contains("vis") && G.tilstand().trin === 1 && d.getElementById("g2-svar").disabled);
+    function gTekst(n, kl) { return d.querySelector("#g" + n + " ." + kl).textContent.replace(/\s+/g, " ").trim(); }
+    var VS = ["V(MnO₄⁻)", "n(MnO₄⁻)", "n(Fe²⁺)", "m(Fe)", "Jernindhold"];
+    paastand("hvert trin har stoerrelsen til venstre og formlen med = foran", VS.every(function (vs, k) { return gTekst(k + 1, "guide-vs") === vs && /^= /.test(gTekst(k + 1, "guide-formel")); }), VS.map(function (vs, k) { return gTekst(k + 1, "guide-vs"); }).join(" | "));
+    paastand("trin 1 viser aflaesningerne sat ind", gTekst(1, "guide-tal") === M.komma(t.vSlut, 2) + " mL − " + M.komma(t.vStart, 2) + " mL =", gTekst(1, "guide-tal"));
+    paastand("de naeste trin har ingen tal, foer trinnet foer er regnet", [2, 3, 4, 5].every(function (n) { return gTekst(n, "guide-tal") === ""; }));
     function gSvar(n, v) { d.getElementById("g" + n + "-svar").value = v; G.tjek(n); return d.getElementById("g" + n + "-hint").hidden ? "" : d.getElementById("g" + n + "-hint").textContent; }
     paastand("guide 1: negativt volumen giver hint", /startaflæsningen fra/.test(gSvar(1, M.komma(-t.V, 2))));
     paastand("guide 1: rigtigt volumen", gSvar(1, M.komma(t.V, 2)) === "" && G.tilstand().trin === 2);
+    paastand("trin 2 faar volumenet sat ind i liter", gTekst(2, "guide-tal") === "0,0200 M · " + M.komma(t.V / 1000, 5) + " L =", gTekst(2, "guide-tal"));
     paastand("guide 2: mL i stedet for L giver hint", /1000/.test(gSvar(2, M.komma(M.KMNO4.c * t.V, 4))));
     paastand("guide 2: videnskabelig notation godtages", gSvar(2, M.videnskabelig(t.nMn, 3)) === "" && G.tilstand().trin === 3);
     paastand("guide 3: divideret med 5 giver hint", /Gang med 5/.test(gSvar(3, M.videnskabelig(t.nMn / 5, 3))));
     paastand("guide 3: rigtigt", gSvar(3, M.videnskabelig(t.nFe, 3)) === "" && G.tilstand().trin === 4);
     paastand("guide 4: divideret giver hint", /divideret/.test(gSvar(4, M.videnskabelig(t.nFe / M.M_FE, 3))));
     paastand("guide 4: rigtigt", gSvar(4, M.komma(t.mFe, 4)) === "" && G.tilstand().trin === 5);
+    var broek = d.querySelectorAll("#g5-tal .broek > span");
+    paastand("trin 5 viser masserne over og under en broekstreg", broek.length === 2 && broek[0].textContent === M.komma(t.mFe, 4) + " g" && broek[1].textContent === "0,105 g" && / · 100 % =$/.test(d.getElementById("g5-tal").textContent));
     paastand("guide 5: broekdel giver hint", /Gang med 100/.test(gSvar(5, M.komma(t.procent / 100, 4))));
     paastand("guide 5: rigtigt viser knappen", gSvar(5, M.komma(t.procent, 1)) === "" && !d.getElementById("guide-brug").hidden);
     G.brug();
     paastand("svaret fra guiden godtages", f.gjort.beregn && !d.getElementById("guide").classList.contains("vis"));
     NK.opdaterPanel();
-    paastand("quizzen er laast op efter svovlsyre", NK.quiz.tilstand === "klar");
+    paastand("quizzen er laast op", NK.quiz.tilstand === "klar");
     paastand("tegneserien er laast op", !d.getElementById("serieknap").hidden);
     var sr = serie();
     paastand("tegneserie uden fejl: syv ruder og resultatskemaet", sr.ruder === 8 && sr.fejl === 0 && !!sr.skema, sr.ruder + " ruder, " + sr.fejl + " fejl");
@@ -294,7 +319,7 @@ function koerTest() {
     tegnOk("zoomboblen med tilskuerioner");
     d.getElementById("tilskuer-skift").click();
 
-    overskrift("6. Fejlkilder og saltsyre");
+    overskrift("6. Fejlkilder");
     nyt();
     afvej();
     fyldOgAflaes();
@@ -321,16 +346,34 @@ function koerTest() {
     var lilla = helt("svovlsyre", { ekstra: 1.5 });
     paastand("for meget KMnO₄ giver et for hoejt resultat og noteres", lilla !== null && lilla > 101 && f.iagttaget.lilla, lilla && komma(lilla) + " %");
 
-    var hcl = helt("saltsyre");
-    paastand("saltsyre giver over 103 %", hcl !== null && hcl > 103, hcl && komma(hcl) + " %");
-    paastand("klorlugt noteret", f.iagttaget.klor);
-    svar(komma(hcl));
+    svar(komma(lilla));
     paastand("over 100 %: tegneserien siger det", f.gjort.beregn && /over 100 %/.test(serie().tekst));
     adv(0.5);
     paastand("over 100 %: laereren kommer", f.laerer.scene && f.laerer.scene.navn === "over100");
     vent(function () { return !f.laerer.scene; }, 15);
     adv(1);
-    tegnOk("zoomboblen med saltsyre");
+    tegnOk("zoomboblen efter for meget KMnO₄");
+
+    /* Uopløst ståluld under buretten: den lyserøde farve holder ikke */
+    nyt();
+    afvej();
+    fyldOgAflaes();
+    f.slipTil("svovlsyre", "kolbe"); adv(4.5);
+    vent(function () { return f.kem.opl >= 0.5; }, 300);
+    f.slipTil("kolbe", "buret"); adv(4);
+    f.saetHaneFart("hurtig");
+    f.klik("hane");
+    vent(function () { return M.overskudMl(f.kem) > 0.6; }, 60);
+    f.klik("hane");
+    vent(function () { return f.gjort.titrer; }, 10);
+    paastand("med uopløst ståluld kan farven holde et oejeblik", f.gjort.titrer && f.iagttaget.uoploest && f.kem.opl < 0.9, komma(f.kem.opl * 100) + " % opløst");
+    vent(function () { return f.iagttaget.falmer; }, 120);
+    paastand("farven forsvinder igen, og det noteres", f.iagttaget.falmer && M.intensitet(f.kem) < 0.03);
+    f.klik("buret");
+    svar(komma(f.jernTal().procent, 1));
+    paastand("tegneserien forklarer det med den uopløste ståluld", /uopløst ståluld, som gav nyt Fe²⁺/.test(serie().tekst));
+    vent(function () { return !f.laerer.scene; }, 20);
+    adv(1);
 
     overskrift("6b. Fejl, der faar lov at ske");
     function roligt(maks) { return vent(function () { return !f.laerer.scene && !f.handling && !f.bemaerkKoe.length; }, maks || 40); }
@@ -341,13 +384,14 @@ function koerTest() {
     paastand("for lidt ståluld: noteret, og laereren kommenterer uden at blokere", f.iagttaget.lidtStaal && f.laerer.scene && f.laerer.scene.navn === "bemaerk" && !f.laererOptaget());
     roligt();
     f.slipTil("svovlsyre", "kolbe"); adv(4.5);
-    f.slipTil("saltsyre", "kolbe"); adv(4.5);
-    paastand("to syrer: begge i kolben, og chlorid er med", f.kem.klorid && M.syreId(f.kem) === "begge" && Math.abs(f.kem.ml - 2 * M.SYRE_ML) < 0.01 && f.iagttaget.toSyrer);
+    f.slipTil("svovlsyre", "kolbe"); adv(4.5);
+    paastand("syren kan haeldes i to gange", f.kem.syre === "svovlsyre" && Math.abs(f.kem.ml - 2 * M.SYRE_ML) < 0.01);
+    paastand("der findes ingen saltsyre at traekke i", f.slipTil("saltsyre", "kolbe") === false && f.kanTraekke("saltsyre") === false);
     paastand("KMnO₄ kan haeldes direkte i kolben", f.slipTil("kmno4", "kolbe") === true);
     adv(4);
     paastand("KMnO₄ i kolben er noteret", f.iagttaget.kmno4Kolbe && f.kmno4Direkte > 7.9, komma(f.kmno4Direkte, 2) + " mL");
     roligt();
-    paastand("bemaerkningerne er vist én gang hver", f.bemaerket.toSyrer && f.bemaerket.kmno4Kolbe);
+    paastand("bemaerkningen er vist", !!f.bemaerket.kmno4Kolbe);
     paastand("kolben stilles under en tom buret", f.slipTil("kolbe", "buret") === true);
     adv(4);
     f.slipTil("kmno4", "buretTop"); adv(4.5);
@@ -363,16 +407,17 @@ function koerTest() {
     f.g.affald.sted = "bord";
     paastand("hanen aabnes uden noget under", f.klik("hane") === true);
     adv(1);
-    paastand("spild paa flisen: plet, og laereren kommer", f.iagttaget.spild && !!f.plet && f.laerer.scene && f.laerer.scene.navn === "spild");
+    paastand("spild paa omroererens plade: plet, og laereren kommer", f.iagttaget.spild && !!f.plet && f.laerer.scene && f.laerer.scene.navn === "spild");
     vent(function () { return !f.laerer.scene; }, 20);
     paastand("laereren har lukket hanen", !f.buret.aaben);
+    paastand("omroereren staar stille, naar kolben ikke staar paa den", !f.omroererTaendt() && f.roer === 0);
     f.g.kolbe.sted = "buret";
     f.klik("hane"); adv(2); f.klik("hane");
     paastand("slutaflaesningen noteres trods alt", f.klik("buret") === true && f.vSlut !== null);
     svar(komma(f.jernTal().procent, 1));
     paastand("jernindholdet kan beregnes", f.gjort.beregn);
     var sr2 = serie();
-    var antalFejl = ["lidtStaal", "toSyrer", "kmno4Kolbe", "ikkeNulstillet", "genfyldt", "spild"].filter(function (k) { return f.iagttaget[k]; }).length;
+    var antalFejl = ["lidtStaal", "kmno4Kolbe", "ikkeNulstillet", "genfyldt", "spild"].filter(function (k) { return f.iagttaget[k]; }).length;
     /* Ryddede laereren op undervejs, kommer der en rude med ham oveni */
     var oprydning = NK.Kemichael.uheldIForsoeget() ? 1 : 0;
     paastand("tegneserien har en roed rude for hver fejl", sr2.fejl >= antalFejl && sr2.ruder === 8 + sr2.fejl + oprydning, sr2.fejl + " fejlruder");
@@ -406,6 +451,7 @@ function koerTest() {
     adv(5);
     paastand("kolben er tom og tilbage, og stålulden skal afvejes igen", f.kem.ml === 0 && f.g.kolbe.sted === "hjem" && !f.gjort.afvej && f.mStaal === null && f.affaldMl > mlFoer + 40, komma(f.affaldMl, 1) + " mL");
     paastand("vejebaaden staar paa vaegten igen", Math.abs(f.g.vejebaad.p.x - f.g.vejebaad.hjem.x) < 1);
+    paastand("den toemte kolbe har ingen magnet i", !f.g.kolbe.magnet);
     tegnOk("affald med indhold");
     roligt();
 
@@ -483,6 +529,8 @@ function koerTest() {
     Object.keys(NK.Mikro.NAVNE).forEach(function (k) { tekster.push(NK.Mikro.NAVNE[k]); });
     var alt = tekster.join(" ");
     paastand("ingen tankestreger", !/[—–]/.test(alt));
+    paastand("saltsyre og chlorid naevnes ikke", !/saltsyre|chlorid|klor|Cl₂|Cl⁻/i.test(alt));
+    paastand("magnetomroereren naevnes i forloebet, teorien og quizzen", /magnetomrører/i.test(NK.TRIN.map(function (x) { return x.hint; }).join(" ")) && /Magnetomrøreren/.test(d.getElementById("teori").textContent) && NK.QUIZ.some(function (sp) { return /magnetomrører/.test(sp.sp); }));
     paastand("ingen ladning skrevet som 1+ eller 1−", !/[¹][⁺⁻]|[A-Za-z)\]₀-₉]1[+−-]/.test(alt));
     paastand("MnO₄⁻, H⁺ og Fe²⁺ i zoomboblen", NK.Mikro.NAVNE.mno4 === "MnO₄⁻" && NK.Mikro.NAVNE.h === "H⁺" && NK.Mikro.NAVNE.fe2 === "Fe²⁺");
 

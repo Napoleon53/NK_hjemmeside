@@ -20,7 +20,6 @@
         kolbe:        { fil: "kolbe.svg", b: 96, h: 128 },
         baegerglas:   { fil: "baegerglas.svg", b: 72, h: 90 },
         svovlsyre:    { fil: "flaske_svovlsyre.svg", b: 46, h: 120 },
-        saltsyre:     { fil: "flaske_saltsyre.svg", b: 46, h: 120 },
         kmno4:        { fil: "flaske_kmno4.svg", b: 46, h: 120 },
         varmeplade:   { fil: "varmeplade.svg", b: 90, h: 34 },
         haand:        { fil: "haand.svg", b: 96, h: 84 },

@@ -34,7 +34,7 @@
 
 <main class="forsoeg">
     <div class="scene" id="scene">
-        <canvas id="scene-laerred" aria-label="Laboratoriebord med ståluld og vægt, et stinkskab med svovlsyre, saltsyre, kolbe og varmeplade, og en titreropstilling med buret og kaliumpermanganat"></canvas>
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med ståluld og vægt, et stinkskab med svovlsyre, kolbe og varmeplade, og en titreropstilling med buret, magnetomrører og kaliumpermanganat"></canvas>
         <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
     </div>
 
@@ -66,7 +66,7 @@
                 <tr id="raekke-slut"><th>V(slut)</th><td id="v-slut"></td></tr>
             </table>
             <div class="beregn" id="beregn" hidden>
-                <label for="svar">Jernindhold</label>
+                <label for="svar">Jernindhold =</label>
                 <input id="svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false">
                 <span class="enhed">%</span>
                 <button class="knap blaa" id="tjek-knap" type="button">Tjek</button>
@@ -101,9 +101,9 @@
 
         <h3>Forsøget</h3>
         <ol class="intro-trin">
-            <li>Afvej ca. 0,1 g ståluld, og opløs den i syre på varmepladen.</li>
+            <li>Afvej ca. 0,1 g ståluld, og opløs den i svovlsyre på varmepladen.</li>
             <li>Fyld buretten med KMnO₄, og tap af, til menisken står på 0.</li>
-            <li>Titrer, til opløsningen er svagt og blivende lyserød, og aflæs buretten igen.</li>
+            <li>Stil kolben på magnetomrøreren. Titrer, til opløsningen er svagt og blivende lyserød, og aflæs buretten igen.</li>
             <li>Beregn jernindholdet.</li>
         </ol>
 
@@ -126,13 +126,13 @@
         <div class="ligning lille">Fe(s) + 2 H⁺(aq) → Fe²⁺(aq) + H₂(g)</div>
 
         <h3>Titrering</h3>
-        <p>Fe²⁺ titreres med kaliumpermanganat. Den lilla MnO₄⁻ reduceres til den næsten farveløse Mn²⁺. Når al Fe²⁺ er brugt, farver den næste dråbe opløsningen svagt og blivende lyserød.</p>
+        <p>Fe²⁺ titreres med kaliumpermanganat. Den lilla MnO₄⁻ reduceres til den næsten farveløse Mn²⁺. Magnetomrøreren blander hver dråbe ind med det samme. Når al Fe²⁺ er brugt, farver den næste dråbe opløsningen svagt og blivende lyserød.</p>
         <div class="ligning lille">MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ → Mn²⁺ + 5 Fe³⁺ + 4 H₂O</div>
 
         <h3>Beregning</h3>
-        <div class="ligning lille">n(Fe²⁺) = 5 · c(KMnO₄) · V(KMnO₄)</div>
+        <div class="ligning lille">n(Fe²⁺) = 5 · c(KMnO₄) · V(MnO₄⁻)</div>
         <div class="ligning lille">jernindhold = n(Fe²⁺) · M(Fe) / m(ståluld) · 100 %</div>
-        <p>V er forskellen mellem slutaflæsningen og startaflæsningen, regnet i liter. M(Fe) = 55,85 g/mol.</p>
+        <p>V(MnO₄⁻) er forskellen mellem slutaflæsningen og startaflæsningen, regnet i liter. M(Fe) = 55,85 g/mol.</p>
 
         <h3>Sikkerhed</h3>
         <p>Svovlsyre irriterer hud og øjne. Kaliumpermanganat er oxiderende og giver brune pletter. Brug briller, og tør spild op med det samme.</p>
@@ -144,7 +144,9 @@
 </div>
 
 <!-- ================================================================= -->
-<!-- Guidet hjaelp til beregningen: fem trin, der laases op ét ad gangen -->
+<!-- Guidet hjaelp til beregningen: fem trin, der laases op ét ad gangen.
+     Hvert trin er et regnestykke med stoerrelsen til venstre: formlen,
+     tallene sat ind (skrives af app.js) og elevens resultat. -->
 <div class="overlay" id="guide">
     <div class="overlay-boks guide-boks">
         <h2>Beregn jernindholdet</h2>
@@ -153,12 +155,16 @@
                 <span class="nr">1</span>
                 <div>
                     <p class="guide-titel">Forbrugt volumen</p>
-                    <p class="guide-formel">V = V(slut) − V(start)</p>
                     <div class="guide-regning">
-                        <span id="g1-tal"></span>
-                        <input id="g1-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Forbrugt volumen i mL">
-                        <span class="enhed">mL</span>
-                        <button class="knap blaa" id="g1-tjek" type="button">Tjek</button>
+                        <span class="guide-vs">V(MnO₄⁻)</span>
+                        <span class="guide-formel">= V(slut) − V(start)</span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g1-tal"></span>
+                            <input id="g1-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Forbrugt volumen i mL">
+                            <span class="enhed">mL</span>
+                            <button class="knap blaa" id="g1-tjek" type="button">Tjek</button>
+                        </div>
                     </div>
                     <p class="hint" id="g1-hint" hidden></p>
                 </div>
@@ -167,12 +173,16 @@
                 <span class="nr">2</span>
                 <div>
                     <p class="guide-titel">Stofmængden af MnO₄⁻</p>
-                    <p class="guide-formel">n(MnO₄⁻) = c · V, med V i liter</p>
                     <div class="guide-regning">
-                        <span id="g2-tal"></span>
-                        <input id="g2-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Stofmængden af permanganat i mol">
-                        <span class="enhed">mol</span>
-                        <button class="knap blaa" id="g2-tjek" type="button">Tjek</button>
+                        <span class="guide-vs">n(MnO₄⁻)</span>
+                        <span class="guide-formel">= c(KMnO₄) · V(MnO₄⁻)</span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g2-tal"></span>
+                            <input id="g2-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Stofmængden af permanganat i mol">
+                            <span class="enhed">mol</span>
+                            <button class="knap blaa" id="g2-tjek" type="button">Tjek</button>
+                        </div>
                     </div>
                     <p class="hint" id="g2-hint" hidden></p>
                 </div>
@@ -181,12 +191,16 @@
                 <span class="nr">3</span>
                 <div>
                     <p class="guide-titel">Stofmængden af Fe²⁺</p>
-                    <p class="guide-formel">n(Fe²⁺) = 5 · n(MnO₄⁻)</p>
                     <div class="guide-regning">
-                        <span id="g3-tal"></span>
-                        <input id="g3-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Stofmængden af jern(II) i mol">
-                        <span class="enhed">mol</span>
-                        <button class="knap blaa" id="g3-tjek" type="button">Tjek</button>
+                        <span class="guide-vs">n(Fe²⁺)</span>
+                        <span class="guide-formel">= 5 · n(MnO₄⁻)</span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g3-tal"></span>
+                            <input id="g3-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Stofmængden af jern(II) i mol">
+                            <span class="enhed">mol</span>
+                            <button class="knap blaa" id="g3-tjek" type="button">Tjek</button>
+                        </div>
                     </div>
                     <p class="hint" id="g3-hint" hidden></p>
                 </div>
@@ -195,12 +209,16 @@
                 <span class="nr">4</span>
                 <div>
                     <p class="guide-titel">Massen af jern</p>
-                    <p class="guide-formel">m(Fe) = n(Fe²⁺) · M(Fe), M(Fe) = 55,85 g/mol</p>
                     <div class="guide-regning">
-                        <span id="g4-tal"></span>
-                        <input id="g4-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen af jern i gram">
-                        <span class="enhed">g</span>
-                        <button class="knap blaa" id="g4-tjek" type="button">Tjek</button>
+                        <span class="guide-vs">m(Fe)</span>
+                        <span class="guide-formel">= n(Fe²⁺) · M(Fe)</span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g4-tal"></span>
+                            <input id="g4-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen af jern i gram">
+                            <span class="enhed">g</span>
+                            <button class="knap blaa" id="g4-tjek" type="button">Tjek</button>
+                        </div>
                     </div>
                     <p class="hint" id="g4-hint" hidden></p>
                 </div>
@@ -209,12 +227,16 @@
                 <span class="nr">5</span>
                 <div>
                     <p class="guide-titel">Jernindholdet i procent</p>
-                    <p class="guide-formel">jernindhold = m(Fe) / m(ståluld) · 100 %</p>
                     <div class="guide-regning">
-                        <span id="g5-tal"></span>
-                        <input id="g5-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Jernindholdet i procent">
-                        <span class="enhed">%</span>
-                        <button class="knap blaa" id="g5-tjek" type="button">Tjek</button>
+                        <span class="guide-vs">Jernindhold</span>
+                        <span class="guide-formel">= <span class="broek"><span>m(Fe)</span><span>m(ståluld)</span></span> · 100 %</span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g5-tal"></span>
+                            <input id="g5-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Jernindholdet i procent">
+                            <span class="enhed">%</span>
+                            <button class="knap blaa" id="g5-tjek" type="button">Tjek</button>
+                        </div>
                     </div>
                     <p class="hint" id="g5-hint" hidden></p>
                 </div>

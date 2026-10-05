@@ -12,9 +12,9 @@
      vaegt      syren haeldes ud over vaegten: laereren toerrer op
      aubergine  der titreres langt forbi endepunktet: laereren kigger ind
                 fra kanten
-     spild      KMnO₄ loeber ud paa flisen: laereren lukker hanen
+     spild      KMnO₄ loeber ud paa omroereren: laereren lukker hanen
      over100    et resultat over 100 %
-     ros        et godt resultat med svovlsyre: laereren siger "Rustfrit."
+     ros        et godt resultat: laereren siger "Rustfrit."
      bemaerk    en fejl, som laereren lader ske og kommenterer (BEMAERK),
                 ofte med et vink om et nyt forsoeg
 
@@ -64,7 +64,7 @@
     /* ----- Kolben rystes voldsomt --------------------------------------- */
     var RYST_SVAR = [
         "Det er en titrerkolbe. Ikke en cocktailshaker.",
-        "Blidt. Som en kop te.",
+        "Magnetomrøreren rører. Du behøver ikke hjælpe til.",
         "Jernet er opløst. Det skal ikke rystes ud af kolben.",
         "Hvis det skal skvulpe, kan du gå i svømmehallen.",
         "Imponerende. Der er stadig noget i kolben."
@@ -159,7 +159,7 @@
     var OVER100_SVAR = [
         "Over 100 % jern. Det er noget af en ståluld.",
         "Mere jern end ståluld. Igen.",
-        "Stadig over 100 %. Måske er det syren?"
+        "Stadig over 100 %. Svagt lyserød er nok."
     ];
 
     P.laererOver100 = function () {
@@ -203,7 +203,6 @@
     var BEMAERK = {
         lidtStaal:   { tekst: "Ca. 0,1 g, stod der. Det der er et fnug." },
         megetStaal:  { tekst: "Ca. 0,1 g. Det der er en hel pude." },
-        toSyrer:     { tekst: "Svovlsyre og saltsyre i samme kolbe. Modigt.", nyt: true },
         kmno4Kolbe:  { tekst: "Permanganat hører til i buretten. Ikke i kolben.", nyt: true },
         ingenSyre:   { tekst: "Uden syre er der intet opløst jern at titrere.", nyt: true },
         uoploest:    { tekst: "Stålulden er ikke opløst. Det jern tæller ikke med.", nyt: true },
@@ -254,7 +253,7 @@
         return true;
     };
 
-    /* ----- Uheld: KMnO₄ loeb ud paa flisen, fordi der ikke stod noget
+    /* ----- Uheld: KMnO₄ loeb ud paa omroereren, fordi der ikke stod noget
        under buretten. Laereren lukker hanen; pletten bliver staaende. */
     P.laererSpild = function () {
         var L = this.laerer;

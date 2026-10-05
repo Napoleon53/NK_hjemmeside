@@ -15,6 +15,10 @@
    havner i kolben, hvis den staar under buretten, og ellers i
    affaldsbaegeret.
 
+   Magnetomroereren: naar kolben stilles under buretten, falder en
+   magnet ned i den, og omroereren gaar i gang af sig selv (this.roer).
+   Den blander hver draabe ind, saa eleven ikke skal ryste kolben.
+
    Eleven maa gerne goere det forkerte. Traek og haeld udfoeres altid;
    kun det, der fysisk ikke kan lade sig goere, afvises. Et klik uden en
    bestemt betydning giver en kort vejledning. Fejlene noteres i
@@ -36,8 +40,8 @@
     var TRIN = [
         { id: "afvej", tekst: "Afvej ca. 0,1 g ståluld", mark: "staaluld",
           hint: "Klik på stålulden, til vægten viser ca. 0,1 g. Træk så vejebåden hen til kolben i stinkskabet." },
-        { id: "syre", tekst: "Tilsæt syre", mark: "flasker",
-          hint: "Træk en af de to syreflasker hen over kolben." },
+        { id: "syre", tekst: "Tilsæt svovlsyre", mark: "svovlsyre",
+          hint: "Træk flasken med svovlsyre hen over kolben." },
         { id: "oploes", tekst: "Opløs stålulden", mark: "kolbe",
           hint: "Træk kolben hen på varmepladen. Vent, til der ikke er mere ståluld og ikke flere bobler." },
         { id: "fyld", tekst: "Fyld buretten med KMnO₄", mark: "kmno4",
@@ -47,9 +51,9 @@
         { id: "start", tekst: "Aflæs V(start)", mark: "buret",
           hint: "Klik på knappen Aflæs eller på buretten. Aflæsningen skrives i skemaet." },
         { id: "under", tekst: "Stil kolben under buretten", mark: "kolbe",
-          hint: "Træk kolben hen under buretten." },
+          hint: "Træk kolben hen på magnetomrøreren under buretten." },
         { id: "titrer", tekst: "Titrer til en svag, blivende lyserød farve", mark: "hane",
-          hint: "Klik på hanen for at åbne og lukke den. Vælg Hane: Hurtig i starten. Tilsæt de sidste dråber én ad gangen med knappen Dråbe, og ryst kolben imellem ved at trække i den." },
+          hint: "Klik på hanen for at åbne og lukke den. Vælg Hane: Hurtig i starten. Tilsæt de sidste dråber én ad gangen med knappen Dråbe. Magnetomrøreren blander hver dråbe ind, så stop ved den første dråbe, der farver hele opløsningen." },
         { id: "slut", tekst: "Aflæs V(slut)", mark: "buret",
           hint: "Luk hanen, når den lyserøde farve bliver, og klik på knappen Aflæs." },
         { id: "beregn", tekst: "Beregn jernindholdet", mark: null,
@@ -58,9 +62,9 @@
     NK.TRIN = TRIN;
 
     /* Fejl og uheld, der noteres i this.iagttaget og vises i tegneserien:
-       lidtStaal, megetStaal, toSyrer, kmno4Kolbe, ingenSyre, uoploest,
+       lidtStaal, megetStaal, kmno4Kolbe, ingenSyre, uoploest,
        glemtStart, ikkeNulstillet, affaldTaelt, genfyldt, ikkeLyserod,
-       lilla, falmer, klor, skvulp, overloeb, vaegt og spild. */
+       lilla, falmer, skvulp, overloeb, vaegt og spild. */
 
     NK.Forsoeg = function (canvas) {
         this.canvas = canvas;
@@ -103,7 +107,7 @@
         this.traekMaal = null;
 
         /* mL KMnO₄ fra buretten i kolben efter startaflaesningen, i
-           affaldet efter den og paa flisen, og haeldt direkte i kolben.
+           affaldet efter den og paa omroererens plade, og haeldt direkte i kolben.
            aflaestI: den lyserøde intensitet ved slutaflaesningen. */
         this.kolbeEfterStart = 0;
         this.affaldEfterStart = 0;
@@ -119,14 +123,20 @@
         this.haneFart = "langsom";
         this.affaldMl = 0;
         this.affaldFarve = null;
-        this.laagT = { svovlsyre: 0, saltsyre: 0, kmno4: 0 };
+        this.laagT = { svovlsyre: 0, kmno4: 0 };
+
+        /* Magnetomroereren: farten 0-1 og magnetens vinkel. Magneten
+           kommer i kolben, naar den stilles under buretten (g.kolbe.magnet),
+           og falder ned gennem halsen (magnetFald 0-1). */
+        this.roer = 0;
+        this.magnetVinkel = 0;
+        this.magnetFald = 1;
 
         this.g = {
             staaluld:  genstand("staaluld", "staaluld", S.HJEM.staaluld),
             vejebaad:  genstand("vejebaad", "vejebaad", S.HJEM.vejebaad),
             kolbe:     genstand("kolbe", "kolbe", S.HJEM.kolbe),
             svovlsyre: genstand("svovlsyre", "svovlsyre", S.HJEM.svovlsyre),
-            saltsyre:  genstand("saltsyre", "saltsyre", S.HJEM.saltsyre),
             kmno4:     genstand("kmno4", "kmno4", S.HJEM.kmno4),
             affald:    genstand("affald", "baegerglas", S.HJEM.affald),
             kaffekop:  genstand("kaffekop", "kaffekop", S.HJEM.kaffekop)
@@ -134,6 +144,7 @@
         this.g.kaffekop.skjult = this.koppenVaek;
         this.g.kolbe.sted = "hjem";
         this.g.kolbe.niveau = null;
+        this.g.kolbe.magnet = false;
         this.g.affald.sted = "buret";
         this.g.affald.niveau = null;
         this.kolbeBobler = [];
@@ -297,8 +308,8 @@
             case "staaluld": return this.klikStaaluld();
             case "vejebaad": return this.klikVejebaad();
             case "kolbe": return this.klikKolbe();
-            case "svovlsyre": case "saltsyre":
-                this.besked(this.kem.syre ? "Der er allerede syre i kolben." : "Træk flasken hen over kolben.");
+            case "svovlsyre":
+                this.besked(this.kem.syre ? "Der er allerede svovlsyre i kolben." : "Træk flasken hen over kolben.");
                 return false;
             case "kmno4":
                 this.besked(this.vStart !== null ? "Buretten er fyldt." : "Træk flasken hen over tragten på buretten.");
@@ -406,7 +417,7 @@
     };
 
     /* ----- Traek med musen -------------------------------------------------
-       Vejebaaden, flaskerne og kolben kan traekkes hen til et maal. Zonerne
+       Vejebaaden, de to flasker og kolben kan traekkes hen til et maal. Zonerne
        er ellipser om maalets midte; det naermeste gyldige maal vinder. */
     P.maalZone = function (maal) {
         var k = this.g.kolbe;
@@ -433,11 +444,10 @@
         return null;
     };
 
-    /* Syreflaskerne kan ogsaa slippes over vaegten: et uheld (syrePaaVaegt) */
+    /* Syreflasken kan ogsaa slippes over vaegten: et uheld (syrePaaVaegt) */
     var MULIGE = {
         vejebaad: ["kolbe"],
         svovlsyre: ["kolbe", "vaegt", "affald"],
-        saltsyre: ["kolbe", "vaegt", "affald"],
         kmno4: ["buretTop", "kolbe", "affald"],
         kolbe: ["plade", "buret", "affald"],
         affald: ["buret", "bord"]
@@ -450,7 +460,7 @@
             case "vejebaad":
                 return !this.gjort.afvej && this.stykker.length > 0 && this.iFlugt === 0 &&
                     Math.abs(baad.p.x - baad.hjem.x) + Math.abs(baad.p.y - baad.hjem.y) < 2;
-            case "svovlsyre": case "saltsyre": case "kmno4":
+            case "svovlsyre": case "kmno4":
                 return true;
             case "kolbe":
                 /* Under buretten er et traek en rystning, saa laenge der titreres */
@@ -485,7 +495,7 @@
     P.slipTil = function (navn, maal) {
         switch (navn) {
             case "vejebaad": return maal === "kolbe" ? this.klikVejebaad(true) : false;
-            case "svovlsyre": case "saltsyre":
+            case "svovlsyre":
                 if (maal === "vaegt") return this.syrePaaVaegt(navn);
                 if (maal === "affald") return this.haeldIAffald(navn);
                 return maal === "kolbe" ? this.slipSyre(navn) : false;
@@ -508,8 +518,8 @@
     };
 
     /* ----- Syren --------------------------------------------------------- */
-    /* Syren haeldes altid i: ogsaa foer stålulden og ogsaa en syre mere.
-       Kun en fuld kolbe siger fra. */
+    /* Syren haeldes altid i: ogsaa foer stålulden og ogsaa en portion
+       mere. Kun en fuld kolbe siger fra. */
     P.slipSyre = function (navn) {
         if (this.kem.ml + M.SYRE_ML > M.GRAENSE.kolbe) { this.besked("Der er ikke plads til mere i kolben."); return false; }
         this.haeldSyre(navn);
@@ -636,6 +646,7 @@
         this.kolbeBobler = [];
         this.lyserodTid = 0;
         this.mikro = new NK.Mikro();
+        this.g.kolbe.magnet = false;
         if (!efter) {
             this.gjort.afvej = false;
             this.gjort.titrer = false;
@@ -645,7 +656,7 @@
             this.kolbeEfterStart = 0;
             this.kmno4Direkte = 0;
             this.aubergine = false;
-            ["lidtStaal", "megetStaal", "toSyrer", "kmno4Kolbe", "ingenSyre", "uoploest", "ikkeLyserod", "lilla", "falmer", "klor", "skvulp"].forEach(function (n) { delete this.iagttaget[n]; }, this);
+            ["lidtStaal", "megetStaal", "kmno4Kolbe", "ingenSyre", "uoploest", "ikkeLyserod", "lilla", "falmer", "skvulp"].forEach(function (n) { delete this.iagttaget[n]; }, this);
             this.stykker = [];
             this.g.vejebaad.p = kopi(this.g.vejebaad.hjem);
             this.maal("staal", null);
@@ -692,9 +703,6 @@
                 var kem = this.kem;
                 start = kem.ml;
                 if (!kem.syre) kem.syre = navn;
-                kem.syrer[navn] = (kem.syrer[navn] || 0) + 1;
-                if (M.SYRER[navn].klorid) kem.klorid = true;
-                if (kem.syrer.svovlsyre && kem.syrer.saltsyre) this.iagttag("toSyrer", true);
                 if (NK.Lyd) NK.Lyd.haeld(1.4);
                 this.aendret("syre");
             } },
@@ -714,7 +722,7 @@
         var k = this.g.kolbe;
         if (k.sted === "hjem" || k.sted === "plade") {
             if (!this.gjort.afvej) { this.besked("Kolben er tom. Afvej ståluld først."); this.markér("staaluld", 3); return false; }
-            if (!this.kem.syre) { this.besked("Tilsæt syre."); this.markér("flasker", 3); return false; }
+            if (!this.kem.syre) { this.besked("Tilsæt svovlsyre."); this.markér("svovlsyre", 3); return false; }
             if (this.kem.opl < M.OPLOES.faerdig) {
                 if (k.sted === "hjem") return this.tilPlade();
                 this.besked("Vent, til alt jernet er opløst.");
@@ -727,7 +735,7 @@
         }
         if (k.sted === "buret") {
             if (this.vSlut !== null) this.besked("Beregn jernindholdet i skemaet.");
-            else this.besked("Tag fat i kolben, og ryst den ved at trække i den.");
+            else this.besked("Kolben står på magnetomrøreren. Den rører selv rundt.");
         }
         return false;
     };
@@ -769,11 +777,40 @@
             { kald: function () {
                 k.sted = "buret";
                 this.lyserodTid = 0;
+                /* Magneten kommer i, og omroereren gaar i gang af sig selv */
+                if (!k.magnet) { k.magnet = true; this.magnetFald = 0; }
                 if (NK.Lyd) NK.Lyd.klirr();
                 this.aendret("under");
             } }
         ]), "under");
         return true;
+    };
+
+    /* Omroereren koerer, saa laenge kolben staar paa den med magneten i */
+    P.omroererTaendt = function () {
+        var k = this.g.kolbe;
+        return k.sted === "buret" && !!k.magnet && this.magnetFald >= 1;
+    };
+
+    P.opdaterOmroerer = function (dt) {
+        var k = this.g.kolbe, O = M.OMROERER;
+        if (k.magnet && this.magnetFald < 1) {
+            this.magnetFald = Math.min(1, this.magnetFald + dt / O.fald);
+            if (this.magnetFald >= 1) {
+                if (NK.Lyd) NK.Lyd.tik();
+                this.besked("Magnetomrøreren rører rundt i kolben.");
+            }
+        }
+        var taendt = this.omroererTaendt();
+        this.roer = NK.mod(this.roer, taendt ? 1 : 0, taendt ? O.op : O.ned, dt);
+        if (!taendt && this.roer < 0.01) this.roer = 0;
+        this.magnetVinkel += dt * O.omdr * Math.PI * 2 * this.roer;
+    };
+
+    /* Hvor kraftigt der blandes i kolben lige nu (0-1): omroereren eller
+       en haand, der ryster */
+    P.blanding = function () {
+        return Math.max(this.ryst, this.roer);
     };
 
     /* ----- Buretten -------------------------------------------------------- */
@@ -804,7 +841,7 @@
             { kald: function () {
                 this.straale = null;
                 if (overloeb) {
-                    if (!this.plet) this.plet = { x: B.x + 18, y: S.STATIV.y - 1, styrke: 0 };
+                    if (!this.plet) this.plet = { x: B.x + 18, y: S.FLISE.y + 1, styrke: 0 };
                     this.plet.maal = 1;
                     if (this.laererOverloeb) this.laererOverloeb();
                 }
@@ -964,12 +1001,11 @@
         if (svar.slags === "rigtig") {
             this.gjort.beregn = true;
             var procent = M.jernprocent(this.mStaal, this.vStart, this.vSlut);
-            var syre = M.syreId(this.kem);
-            this.resultater.push({ nr: this.forsoegNr, syre: syre, m: this.mStaal, vStart: this.vStart, vSlut: this.vSlut, procent: procent });
+            this.resultater.push({ nr: this.forsoegNr, syre: this.kem.syre, m: this.mStaal, vStart: this.vStart, vSlut: this.vSlut, procent: procent });
             if (NK.Lyd) NK.Lyd.succes();
             if (procent > 101 && this.laererOver100) this.laererOver100();
             else if (procent < 90 && this.laererBemaerk) this.laererBemaerk(procent < 0 ? "negativ" : (procent < 5 ? "nul" : "lavt"));
-            else if (syre === "svovlsyre" && procent >= 96 && procent <= 100.5 && this.laererRos) this.laererRos();
+            else if (procent >= 96 && procent <= 100.5 && this.laererRos) this.laererRos();
             this.aendret("beregn");
         } else {
             this.antalForkerte++;
@@ -978,8 +1014,9 @@
         return svar;
     };
 
-    P.harSvovlsyreResultat = function () {
-        return this.resultater.some(function (x) { return x.syre === "svovlsyre"; });
+    /* Quizzen laases op af et forsoeg, hvor stålulden er opløst i syren */
+    P.harResultat = function () {
+        return this.resultater.some(function (x) { return !!x.syre; });
     };
 
     /* ----- Zoomboblen ---------------------------------------------------- */
@@ -1007,8 +1044,9 @@
             maal = NK.tilVerden(k.p, k.anker, 48, 112);
             titel = "Kolben";
         } else {
+            /* Luppen sidder ude i siden, saa den ikke daekker magneten og hvirvlen */
             scene = "titrering";
-            maal = NK.tilVerden(k.p, k.anker, 48, 108);
+            maal = NK.tilVerden(k.p, k.anker, 74, 104);
             titel = "Kolben";
         }
         var nMnTot = kem.nFeTot / 5;
@@ -1018,8 +1056,7 @@
             reageret: nMnTot > 0 ? kem.nMn2 / nMnTot : 0,
             overskud: nMnTot > 0 ? (kem.nMnO4 + kem.nLokal) / nMnTot : 0,
             synlig: M.intensitet(kem) >= M.TITRER.synlig,
-            klor: nMnTot > 0 ? kem.nKlor / nMnTot : 0,
-            V: b.V, ryst: this.ryst
+            V: b.V, ryst: this.blanding()
         };
     };
 
@@ -1031,6 +1068,7 @@
 
         this.opdaterHandling(dt);
         this.opdaterArbejde(dt);
+        this.opdaterOmroerer(dt);
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
         if (this.mark) { this.mark.ur -= dt; if (this.mark.ur <= 0) this.mark = null; }
         if (this.buretFokusUr > 0) this.buretFokusUr -= dt;
@@ -1043,7 +1081,7 @@
         /* Kemien i kolben */
         if (kem.syre) {
             var oplFoer = kem.opl;
-            M.reager(kem, dt, { temp: this.temp, ryst: this.ryst });
+            M.reager(kem, dt, { temp: this.temp, ryst: this.blanding() });
             var fart = (kem.opl - oplFoer) / dt;
             if (fart > 0) {
                 this.draabeUr -= dt * NK.klamp(fart * 300, 0, 30);
@@ -1130,7 +1168,7 @@
     P.overflade = function (til) {
         if (til === "kolbe") { var k = this.g.kolbe; return k.niveau ? k.niveau : k.p.y + 110; }
         if (til === "affald") { var af = this.g.affald; return af.niveau ? af.niveau : af.p.y + 80; }
-        return S.BORD - 1;
+        return S.FLISE.y - 1;
     };
 
     /* Titreringen er begyndt uden startaflaesning: laereren skriver den op.
@@ -1161,9 +1199,9 @@
             this.tilAffald(ml, M.FARVE.kmno4);
             if (this.vStart !== null && this.vSlut === null) this.affaldEfterStart += ml;
         } else {
-            /* Uheld: intet under buretten. KMnO₄ loeber ud paa flisen. */
+            /* Uheld: intet under buretten. KMnO₄ loeber ud paa omroererens plade. */
             this.spildMl += ml;
-            if (!this.plet) this.plet = { x: B.x + 18, y: S.STATIV.y - 1, styrke: 0 };
+            if (!this.plet) this.plet = { x: B.x + 18, y: S.FLISE.y + 1, styrke: 0 };
             this.plet.maal = Math.max(this.plet.maal || 0, NK.klamp(this.spildMl / 1.5, 0.3, 1));
             if (this.spildMl > 0.3 && !this.iagttaget.spild) {
                 this.iagttag("spild");
@@ -1186,7 +1224,6 @@
                 this.aendret("titrer");
             }
             if (this.gjort.titrer && I < 0.03) this.iagttag("falmer");
-            if (kem.klorid && kem.nKlor > 2e-5) this.iagttag("klor");
             if (!this.aubergine && M.overskudMl(kem) > M.TITRER.aubergine && this.laererAubergine) {
                 if (this.laererAubergine()) this.aubergine = true;
             }

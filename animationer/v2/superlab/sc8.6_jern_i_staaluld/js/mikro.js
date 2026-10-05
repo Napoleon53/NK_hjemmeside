@@ -11,7 +11,7 @@
                 og bliver til Fe²⁺; to H⁺ bliver til H₂, som stiger op.
      titrering  en MnO₄⁻ kommer ind, fem Fe²⁺ afgiver hver én elektron,
                 og der dannes fem Fe³⁺ og én Mn²⁺. Naar Fe²⁺ er brugt op,
-                bliver MnO₄⁻ i opløsningen. I saltsyre dannes ogsaa Cl₂.
+                bliver MnO₄⁻ i opløsningen.
      buret      burettens skala og menisk tæt på
 
    20 jernatomer i boblen svarer til alt jernet i kolben. Der skal derfor
@@ -59,7 +59,6 @@
         this.h2 = [];
         this.mno4 = [];
         this.mn2 = [];
-        this.cl2 = [];
         this.hav = [];
         for (var i = 0; i < 16; i++) this.hav.push({ x: r(-50, 50), y: r(44, 82), vx: r(-30, 30), vy: r(-20, 20) });
         this.oplUr = 0;
@@ -73,7 +72,7 @@
     };
 
     /* ----- Tilstanden fra forsoeget -------------------------------------
-       s = { scene, syre, opl, reageret, overskud, synlig, klor, V, ryst } */
+       s = { scene, syre, opl, reageret, overskud, synlig, V, ryst } */
     P.opdater = function (dt, s) {
         this.s = s;
         if (s.scene !== this.scene) this.scene = s.scene;
@@ -101,7 +100,7 @@
             if (p.tilstand === "fast" || p.optaget) continue;
             this.flyt(p, dt, 14 * fart);
         }
-        var alle = [this.hplus, this.anioner, this.mn2, this.mno4, this.cl2];
+        var alle = [this.hplus, this.anioner, this.mn2, this.mno4];
         for (var l = 0; l < alle.length; l++) {
             for (i = 0; i < alle[l].length; i++) this.flyt(alle[l][i], dt, (l === 0 ? 24 : 12) * fart);
         }
@@ -126,9 +125,8 @@
         this.anioner = [];
         this.hplus = [];
         if (!syre) return;
-        var cl = syre === "saltsyre";
-        for (var i = 0; i < (cl ? 6 : 4); i++) {
-            this.anioner.push({ type: cl ? "cl" : "so4", x: r(-70, 70), y: r(-40, 30), vx: r(-20, 20), vy: r(-20, 20), a: r(0, 6), rad: cl ? 7 : 10 });
+        for (var i = 0; i < 4; i++) {
+            this.anioner.push({ x: r(-70, 70), y: r(-40, 30), vx: r(-20, 20), vy: r(-20, 20), a: r(0, 6), rad: 10 });
         }
         for (i = 0; i < 8; i++) this.hplus.push(this.nyH());
     };
@@ -200,13 +198,6 @@
         var maalFri = s.synlig && !this.haendelse && this.mn2.length >= maalMn ? NK.klamp(Math.round((s.overskud || 0) * N_MN), 1, 3) : 0;
         while (this.mno4.length < maalFri) this.mno4.push({ x: r(-50, 50), y: OVERFLADE + 10, vx: r(-20, 20), vy: r(10, 30), rad: 9, a: r(0, 6) });
         while (this.mno4.length > maalFri) this.mno4.pop();
-
-        /* Chlorid oxideret til dichlor */
-        var maalCl2 = this.syre === "saltsyre" ? Math.min(3, Math.floor((s.klor || 0) * 10 + 0.3)) : 0;
-        while (this.cl2.length < maalCl2) {
-            this.cl2.push({ x: r(-40, 40), y: r(-20, 50), vx: r(-20, 20), vy: r(-20, 20), rad: 9, a: r(0, 6) });
-            if (this.anioner.length > 2) this.anioner.splice(0, 2);
-        }
     };
 
     /* En fri partikel i vaesken */
@@ -242,8 +233,7 @@
     var FARVER = {
         fe: ["#eef2f6", "#6b737c"], fe2: ["#c6f0d4", "#2f8a5a"], fe3: ["#ffe39a", "#c47f16"],
         h: ["#ffffff", "#8fb2d6"], h2: ["#ffffff", "#aab8c6"], mn: ["#e2b4ff", "#6a1d8f"],
-        o: ["#ff9a90", "#b8332a"], s: ["#fff2a0", "#c9a21a"], mn2: ["#ffe3f0", "#c07aa0"],
-        cl: ["#f0f8b0", "#8f9a1a"], cl2: ["#f4f7a6", "#9aa51f"]
+        o: ["#ff9a90", "#b8332a"], s: ["#fff2a0", "#c9a21a"], mn2: ["#ffe3f0", "#c07aa0"]
     };
 
     function ion(ctx, x, y, rad, farve, tekst, str) {
@@ -276,12 +266,6 @@
     function tegnH2(ctx, x, y) {
         NK.kugle(ctx, x - 3, y, 3.6, FARVER.h2[0], FARVER.h2[1]);
         NK.kugle(ctx, x + 3, y, 3.6, FARVER.h2[0], FARVER.h2[1]);
-    }
-
-    function tegnCl2(ctx, x, y, a) {
-        var dx = Math.cos(a) * 4, dy = Math.sin(a) * 4;
-        NK.kugle(ctx, x - dx, y - dy, 5, FARVER.cl2[0], FARVER.cl2[1]);
-        NK.kugle(ctx, x + dx, y + dy, 5, FARVER.cl2[0], FARVER.cl2[1]);
     }
 
     P.tegnBuret = function (ctx) {
@@ -388,8 +372,7 @@
                 /* Tilskuerionerne vises kun, naar eleven har slaaet dem til */
                 for (i = 0; NK.visTilskuere && i < this.anioner.length; i++) {
                     p = this.anioner[i];
-                    if (p.type === "so4") tegnSO4(ctx, p.x, p.y, p.a);
-                    else ion(ctx, p.x, p.y, 7, FARVER.cl, "Cl⁻", 5.4);
+                    tegnSO4(ctx, p.x, p.y, p.a);
                 }
                 if (sc === "oploes") for (i = 0; i < this.hplus.length; i++) ion(ctx, this.hplus[i].x, this.hplus[i].y, 4, FARVER.h, "H⁺", 4);
                 for (i = 0; i < this.h2.length; i++) {
@@ -405,7 +388,6 @@
                 }
                 for (i = 0; i < this.mn2.length; i++) ion(ctx, this.mn2[i].x, this.mn2[i].y, 6.5, FARVER.mn2, "Mn²⁺", 4.6);
                 for (i = 0; i < this.mno4.length; i++) tegnMnO4(ctx, this.mno4[i].x, this.mno4[i].y, this.mno4[i].a);
-                for (i = 0; i < this.cl2.length; i++) tegnCl2(ctx, this.cl2[i].x, this.cl2[i].y, this.cl2[i].a);
                 var h = this.haendelse;
                 if (h) {
                     tegnMnO4(ctx, h.x, h.y, h.a + h.t);
@@ -469,16 +451,15 @@
         if (sc === "titrering") {
             if (this.mno4.length || this.haendelse) ud.push("mno4");
             if (this.mn2.length) ud.push("mn2");
-            if (this.cl2.length) ud.push("cl2");
         }
-        if (this.syre && NK.visTilskuere) ud.push(this.syre === "saltsyre" ? "cl" : "so4");
+        if (this.syre && NK.visTilskuere) ud.push("so4");
         return ud;
     };
 
     var NAVNE = {
         fe: "Fe", e: "Elektron", fe2: "Fe" + NK.ladningHaevet(2), fe3: "Fe" + NK.ladningHaevet(3),
-        h: "H" + NK.ladningHaevet(1), h2: "H₂", so4: "SO₄" + NK.ladningHaevet(-2), cl: "Cl" + NK.ladningHaevet(-1),
-        mno4: "MnO₄" + NK.ladningHaevet(-1), mn2: "Mn" + NK.ladningHaevet(2), cl2: "Cl₂"
+        h: "H" + NK.ladningHaevet(1), h2: "H₂", so4: "SO₄" + NK.ladningHaevet(-2),
+        mno4: "MnO₄" + NK.ladningHaevet(-1), mn2: "Mn" + NK.ladningHaevet(2)
     };
     NK.Mikro.NAVNE = NAVNE;
 
@@ -516,10 +497,8 @@
                 else if (t === "h") NK.kugle(ctx, 0, 0, 4, FARVER.h[0], FARVER.h[1]);
                 else if (t === "h2") tegnH2(ctx, 0, 0);
                 else if (t === "so4") tegnSO4(ctx, 0, 0, 0.4);
-                else if (t === "cl") NK.kugle(ctx, 0, 0, 6, FARVER.cl[0], FARVER.cl[1]);
                 else if (t === "mno4") tegnMnO4(ctx, 0, 0, 0.4);
                 else if (t === "mn2") NK.kugle(ctx, 0, 0, 5.5, FARVER.mn2[0], FARVER.mn2[1]);
-                else if (t === "cl2") tegnCl2(ctx, 0, 0, 0);
                 ctx.restore();
                 NK.tekst(ctx, NAVNE[t], cx + 22, cy + 0.5, { font: "600 10.5px 'Segoe UI', sans-serif", linje: "middle", farve: "#cfd6de" });
                 cx += bredder[i];
