@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pyrit og oxidationstal</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">FeS₂</span> Pyrit og oxidationstal</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-u" role="tab" aria-selected="true"><span class="nr">1</span>Udstillingen</button>
+        <button class="faneknap" data-fane="fane-p" role="tab" aria-selected="false"><span class="nr">2</span>Pyrit</button>
+        <button class="faneknap" data-fane="fane-r" role="tab" aria-selected="false"><span class="nr">3</span>Ristning</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: UDSTILLINGEN                                               -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-u" role="tabpanel" aria-label="Udstillingen">
+    <div class="scene kolonne">
+        <!-- Hylderne med de otte sten (js/sim_udstilling.js) -->
+        <div class="montre" id="u-montre"></div>
+
+        <!-- Skiltet: stenens formel med felter over atomerne, og tasterne -->
+        <div class="skilt" id="u-skilt">
+            <div class="sk-hoved">
+                <span class="sk-navn" id="u-sknavn"></span>
+                <span class="sk-spansk" id="u-skspansk"></span>
+                <span class="sk-klasse" id="u-skklasse"></span>
+            </div>
+            <div class="sk-formel" id="u-formel"></div>
+            <div class="sk-taster" id="u-taster" aria-label="Oxidationstal"></div>
+            <p class="sk-fakta" id="u-fakta"></p>
+        </div>
+
+        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, og knapperne -->
+        <div class="statuslinje" id="u-status">
+            <p class="st-tekst" id="u-besked" aria-live="polite"></p>
+            <button class="knap blaa tjekknap" id="u-tjek" type="button" title="Tjek svaret (Enter)">Tjek</button>
+            <button class="knap hjaelp" id="u-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="u-kort">
+            <h2><span id="u-titel">Sten</span><span class="taeller">sten <b id="u-nr">1</b>/<span id="u-antal">8</span></span></h2>
+            <p class="note-tekst" id="u-tekst"></p>
+        </div>
+
+        <div class="kort maaling" id="u-trappekort">
+            <h2>Oxidationstal i udstillingen</h2>
+            <div id="u-trappe"></div>
+        </div>
+
+        <div class="kort" id="u-opgaver">
+            <h2>Stenene <span class="taeller">løst <b id="u-loest">0</b>/8</span></h2>
+            <div class="opg-liste" id="u-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: PYRIT                                                      -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-p" role="tabpanel" aria-label="Pyrit">
+    <div class="scene kolonne">
+        <!-- Klippen med pyrit og baekken (js/scener.js) -->
+        <div class="strimmel" id="p-strimmel"></div>
+
+        <!-- Papiret: haeftet, arket med summen og arket med spoergsmaalene -->
+        <div class="papir" id="p-papir">
+            <div class="haefte" id="p-haefte"></div>
+            <div class="haefte ark" id="p-sumark" hidden></div>
+            <div class="haefte ark" id="p-spmark" hidden></div>
+        </div>
+
+        <div class="statuslinje" id="p-status">
+            <p class="st-tekst" id="p-besked" aria-live="polite"></p>
+            <button class="knap blaa tjekknap" id="p-tjek" type="button" title="Tjek svaret (Enter)">Tjek</button>
+            <button class="knap hjaelp" id="p-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="p-kort">
+            <h2><span id="p-titel">Opgave</span><span class="taeller">opgave <b id="p-nr">1</b>/<span id="p-antal">4</span></span></h2>
+            <p class="note-tekst" id="p-tekst"></p>
+            <div class="trinliste" id="p-trin"></div>
+        </div>
+
+        <div class="kort maaling" id="p-skemakort">
+            <h2>Reaktionsskemaerne</h2>
+            <div class="regn-linjer" id="p-skemaer"></div>
+        </div>
+
+        <div class="kort" id="p-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="p-loest">0</b>/4</span></h2>
+            <div class="opg-liste" id="p-liste"></div>
+            <button class="forfraknap" id="p-forfra" type="button" title="Begynd opgaven forfra (R)">Start forfra ↺</button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: RISTNING                                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-r" role="tabpanel" aria-label="Ristning">
+    <div class="scene kolonne">
+        <!-- Risteovnen og regnskyen (js/scener.js) -->
+        <div class="strimmel" id="r-strimmel"></div>
+
+        <div class="papir" id="r-papir">
+            <div class="haefte" id="r-haefte"></div>
+            <div class="haefte ark" id="r-sumark" hidden></div>
+            <div class="haefte ark" id="r-spmark" hidden></div>
+        </div>
+
+        <div class="statuslinje" id="r-status">
+            <p class="st-tekst" id="r-besked" aria-live="polite"></p>
+            <button class="knap blaa tjekknap" id="r-tjek" type="button" title="Tjek svaret (Enter)">Tjek</button>
+            <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort" id="r-kort">
+            <h2><span id="r-titel">Opgave</span><span class="taeller">opgave <b id="r-nr">1</b>/<span id="r-antal">3</span></span></h2>
+            <p class="note-tekst" id="r-tekst"></p>
+            <div class="trinliste" id="r-trin"></div>
+        </div>
+
+        <div class="kort maaling" id="r-skemakort">
+            <h2>Reaktionsskemaerne</h2>
+            <div class="regn-linjer" id="r-skemaer"></div>
+        </div>
+
+        <div class="kort" id="r-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="r-loest">0</b>/3</span></h2>
+            <div class="opg-liste" id="r-liste"></div>
+            <button class="forfraknap" id="r-forfra" type="button" title="Begynd opgaven forfra (R)">Start forfra ↺</button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Oxidationstal i mineraler</h2>
+        <p>Et grundstof har oxidationstallet 0. I en ion af ét atom er tallet ionens ladning. I en forbindelse er O −II og H +I, og summen af alle oxidationstal er stoffets ladning.</p>
+        <h3 class="teori-hoved">Hylderne</h3>
+        <p>Mineraler ordnes efter den negative ion. Sulfider har S²⁻, oxider har O²⁻, sulfater har SO₄²⁻, og carbonater har CO₃²⁻. Kender man den negative ions ladning, kan metallets oxidationstal regnes ud.</p>
+        <h3 class="teori-hoved">Pyrit</h3>
+        <p>Pyrit, FeS₂, står hos sulfiderne, men jern er Fe²⁺. Svovlatomerne sidder to og to som S₂²⁻, så S er −I og ikke −II.</p>
+        <h3 class="teori-hoved">Afstemning med klammer</h3>
+        <ol class="teori-trin">
+            <li>Skriv oxidationstallet over de atomer, der skifter.</li>
+            <li>Tegn en klamme fra atomet før pilen til det samme grundstof efter pilen. Skriv den samlede stigning ↑ eller det samlede fald ↓ for atomerne på klammen.</li>
+            <li>Find gangetal, så stigning i alt bliver lige så stor som fald i alt. Gangetallene bliver tallene foran formlerne.</li>
+            <li>Et stof, der følger med uden at skifte, får sit tal ved at tælle atomer.</li>
+            <li>Afstem ladningen med H⁺.</li>
+            <li>Afstem H med H₂O. Hvert H₂O har 2 H.</li>
+            <li>Tæl O på begge sider som kontrol.</li>
+        </ol>
+        <p>Stiger et oxidationstal, er atomet oxideret. Falder det, er atomet reduceret. I en redoxreaktion sker begge dele. Skifter intet atom oxidationstal, er det ikke en redoxreaktion.</p>
+        <h3 class="teori-hoved">Skrivemåden</h3>
+        <p>Oxidationstal skrives med romertal: +VI, −II og 0. Du kan også skrive +6 og −2. Pilen ved en klamme vendes med et klik eller med piletasterne.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> tjek &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> vend pilen &nbsp;·&nbsp; <kbd>R</kbd> start forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/redox.js"></script>
+<script src="js/formel.js"></script>
+<script src="js/mineraler.js"></script>
+<script src="js/scener.js"></script>
+<script src="js/haefte.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_udstilling.js"></script>
+<script src="js/sim_haefte.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

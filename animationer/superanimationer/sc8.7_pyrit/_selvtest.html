@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc8.7 Pyrit og oxidationstal</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:760px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at oxidationstallene rammer de kendte, at de
+   fem skemaer er afstemt i atomer og ladning med de mindste tal, at de
+   to skemaer for pyrit lagt sammen giver arbejdsarkets skema, at alle
+   sten og opgaver kan løses (ved at skrive og med Vis svaret), at de
+   typiske fejl får den rigtige besked, at der ikke står et facit før
+   tid, at opgaverne på fane 2 åbner én ad gangen, at tegningen følger
+   skemaerne, at rundvisningen finder sine mål, at sproget holder
+   reglerne, og at tingene kan være der fra 1100 × 650 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc8.7-u", "nk-sc8.7-p", "nk-sc8.7-r"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|loest|oeverst|haefte\w*|maerke\w*|raekke\w*|spoerg\w*|taelle\w*|laeg\w*|groen\w*|roed\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+/* Første indlæsning: gem elevens fremskridt, ryd det, og indlæs siden igen,
+   så fanerne begynder ved første opgave. Anden indlæsning: kør testen. */
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, X = NK.Redox;
+    var U = NK.sims["fane-u"], P = NK.sims["fane-p"], Rr = NK.sims["fane-r"];
+    NK.Haefte.FLYV_MS = 0;       /* tallene flyver ikke: testen venter ikke */
+
+    function linje(F) { return F.beskedTekst(); }
+    function roed(F) { return /skidt/.test(F.el.status.className); }
+    function groen(F) { return /god/.test(F.el.status.className); }
+    function gul(F) { return /gul|hint/.test(F.el.status.className); }
+    function saet(F, k, v) {
+        var i = F.inp(k);
+        if (!i) throw new Error("intet felt " + k);
+        i.value = String(v);
+        i.dispatchEvent(new W.Event("input", { bubbles: true }));
+    }
+    function synlig(e) { return !!e && !e.hidden && e.offsetWidth > 0; }
+
+    /* Løs den bid, eleven er ved, ved at skrive de rigtige tal */
+    function bid(F) {
+        var g = F.opg, R = g.R, t = F.aktivt();
+        if (g.type === "sum") {
+            var S = g.S;
+            if (t === "gang") { saet(F, "gang0", S.gange[0]); saet(F, "gang1", S.gange[1]); }
+            if (t === "sum") S.felter.forEach(function (x) { saet(F, x.noegle, x.n); });
+            if (t === "syre") saet(F, "syre", S.nSyre);
+            F.tjekTrin();
+            return t;
+        }
+        if (g.type === "spm") {
+            var j = 0;
+            D.SPM[g.nr].svar.forEach(function (x, n) { if (x.ok) j = n; });
+            F.spmValg(j, "selv");
+            if (F.mellem) F.knap();
+            return t;
+        }
+        switch (t) {
+        case "ox": F.noegler("ox").forEach(function (k) { if (g.tal[k]) return; var o = F.oxNoegle(k); saet(F, k, X.ox(o.st.ox[o.E])); }); break;
+        case "redox": F.valgt("nej", "selv"); return t;
+        case "for": F.noegler("for").forEach(function (k) { var i = +k.slice(3), K = F.ledK(i); saet(F, k, i === K.v ? K.pv : K.ph); }); break;
+        case "klammer": R.K.forEach(function (K, k) { g.pil[k] = K.op; saet(F, "kl" + k, K.tot); }); break;
+        case "gange": R.K.forEach(function (K, k) { saet(F, "g" + k, K.gange); }); break;
+        case "med": R.med.forEach(function (m) { saet(F, "for" + m.led, m.koef); }); break;
+        case "ladning": saet(F, "lad-v", R.ladning.v); saet(F, "lad-h", R.ladning.h); break;
+        case "ion": saet(F, "ion-" + R.ion.side, R.ion.antal); break;
+        case "brint": saet(F, "brint-v", R.foer.v.H || 0); saet(F, "brint-h", R.foer.h.H || 0); break;
+        case "vand": saet(F, "vand-" + R.vand.side, R.vand.antal); break;
+        }
+        F.tjekTrin();
+        return t;
+    }
+    function til(F, t) { var n = 0; while (!F.faerdig && F.aktivt() !== t && n++ < 30) bid(F); return !F.faerdig && F.aktivt() === t; }
+    function helt(F) { var n = 0; while (!F.faerdig && n++ < 30) bid(F); return !!F.faerdig; }
+    function medKnap(F) { for (var n = 0; n < 80 && !F.faerdig; n++) F.knap(); return !!F.faerdig; }
+    function nulstil(F) { F.status.forEach(function (s) { s.loest = false; s.stjerne = false; }); F.gem(); F.vaelg(0); }
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Oxidationstal");
+    function oxAf(f, E) { return X.stof(f).ox[E]; }
+    paastand("pyrit: Fe +II og S −I", oxAf("FeS2", "Fe") === 2 && oxAf("FeS2", "S") === -1);
+    paastand("sulfat: S +VI, og svovlsyre: S +VI", oxAf("SO4 2-", "S") === 6 && oxAf("H2SO4", "S") === 6);
+    paastand("Fe(OH)₃: Fe +III (parentesen tælles med)", oxAf("Fe(OH)3", "Fe") === 3 && X.stof("Fe(OH)3").el.O === 3 && X.stof("Fe(OH)3").el.H === 3);
+    paastand("sulfiderne: S −II, Zn +II, Hg +II", oxAf("ZnS", "S") === -2 && oxAf("ZnS", "Zn") === 2 && oxAf("HgS", "S") === -2 && oxAf("HgS", "Hg") === 2);
+    paastand("SO₂ og H₂SO₃: S +IV", oxAf("SO2", "S") === 4 && oxAf("H2SO3", "S") === 4);
+    paastand("hæmatit: Fe +III, gips: S +VI, malakit: Cu +II", oxAf("Fe2O3", "Fe") === 3 && oxAf("CaSO4", "S") === 6 && oxAf("Cu2(OH)2CO3", "Cu") === 2);
+    var mag = X.stof("FeO·Fe2O3").atomer.filter(function (a) { return a.s === "Fe"; });
+    paastand("magnetit: ét Fe +II og to Fe +III", mag.length === 2 && mag[0].ox === 2 && mag[0].antal === 1 && mag[1].ox === 3 && mag[1].antal === 2);
+    paastand("grundstofferne S, O₂ og Hg er 0, og Fe²⁺ er +II", oxAf("S", "S") === 0 && oxAf("O2", "O") === 0 && oxAf("Hg", "Hg") === 0 && oxAf("Fe 2+", "Fe") === 2);
+    var alleStoffer = [];
+    D.MINERALER.forEach(function (m) { alleStoffer.push(m.f); });
+    ["p", "r"].forEach(function (n) { D.OPGAVER[n].forEach(function (o) { if (o.type === "afstem") alleStoffer = alleStoffer.concat(o.v, o.h); }); });
+    alleStoffer.push("H2SO4", "H2O", "H +");
+    var skaeve = alleStoffer.filter(function (f) {
+        var st = X.stof(f), sum = 0;
+        st.atomer.forEach(function (a) { sum += a.ox * a.antal; });
+        return sum !== st.q || st.atomer.some(function (a) { return a.ox % 1 !== 0; });
+    });
+    paastand("i alle " + alleStoffer.length + " stoffer er oxidationstallene hele, og summen er ladningen", !skaeve.length, skaeve.join(", "));
+    paastand("felterne læser +VI, −II, -1, II, 6 og 0", X.laesOx("+VI") === 6 && X.laesOx("−II") === -2 && X.laesOx("-1") === -1 && X.laesOx("II") === 2 && X.laesOx("6") === 6 && X.laesOx("0") === 0);
+    paastand("tomt er intet svar, og vrøvl er ikke et tal", X.laesOx("") === null && isNaN(X.laesOx("abc")) && X.laesTal("") === null && isNaN(X.laesTal("to")));
+    paastand("oxidationstal skrives med romertal: +VI, −I og 0", X.ox(6) === "+VI" && X.ox(-1) === "−I" && X.ox(0) === "0");
+    paastand("en ladning på 1 skrives uden 1: H⁺ og Fe²⁺", X.stof("H +").tekst === "H⁺" && X.stof("Fe 2+").tekst === "Fe²⁺" && X.stof("SO4 2-").tekst === "SO₄²⁻");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("2. Skemaerne");
+    var KENDT = {
+        svovl: "2 FeS₂ + 7 O₂ + 2 H₂O ⟶ 2 Fe²⁺ + 4 SO₄²⁻ + 4 H⁺",
+        jern: "4 Fe²⁺ + O₂ + 10 H₂O ⟶ 4 Fe(OH)₃ + 8 H⁺",
+        zink: "2 ZnS + 3 O₂ ⟶ 2 ZnO + 2 SO₂",
+        cinnober: "HgS + O₂ ⟶ Hg + SO₂",
+        regn: "SO₂ + H₂O ⟶ H₂SO₃"
+    };
+    var RR = {};
+    ["p", "r"].forEach(function (n) { D.OPGAVER[n].forEach(function (o) { if (o.type === "afstem") RR[o.id] = X.reaktion(o); }); });
+    Object.keys(KENDT).forEach(function (id) {
+        var R = RR[id], s = R.slut, q = X.ladninger(R, R.koef, R.ion), skaev = [];
+        Object.keys(s.v).concat(Object.keys(s.h)).forEach(function (E) { if ((s.v[E] || 0) !== (s.h[E] || 0)) skaev.push(E); });
+        var t = X.termer(R), tal = t.v.concat(t.h).map(function (x) { return x.n; });
+        var faelles = tal.reduce(function (a, b) { return NK.gcd(a, b); });
+        var op = 0, ned = 0;
+        R.K.forEach(function (K) { if (K.op) op += K.gange * K.tot; else ned += K.gange * K.tot; });
+        paastand(id + ": " + X.skemaTekst(R), X.skemaTekst(R) === KENDT[id]);
+        paastand(id + ": atomer og ladning går op, tallene er de mindste, og stigning i alt = fald i alt",
+            !skaev.length && q.v === q.h && faelles === 1 && op === ned, skaev.join(",") + " q " + q.v + "/" + q.h + " gcd " + faelles + " op " + op + " ned " + ned);
+    });
+    var A = RR.svovl, B = RR.jern, C = RR.cinnober;
+    paastand("svovlet: S ↑14 (2 S · 7) og O ↓4 (2 O · 2), gangetal 2 og 7, 28 elektroner",
+        A.K[0].tot === 14 && A.K[0].op && A.K[1].tot === 4 && !A.K[1].op && A.K[0].gange === 2 && A.K[1].gange === 7 && A.elektroner === 28);
+    paastand("svovlet: klammen for O giver intet tal foran sulfat, og Fe²⁺ følger med ved at tælle Fe",
+        A.K[1].fri && A.koef[3] === 4 && A.med.length === 1 && A.med[0].koef === 2);
+    paastand("jernet: Fe ↑1 og O ↓4, gangetal 4 og 1", B.K[0].tot === 1 && B.K[1].tot === 4 && B.K[0].gange === 4 && B.K[1].gange === 1);
+    paastand("cinnober: S ↑6, Hg ↓2 og O ↓4, alle gangetal er 1, og S og Hg hører sammen",
+        C.K.length === 3 && C.K[0].tot === 6 && C.K[1].tot === 2 && C.K[2].tot === 4 && C.K.every(function (K) { return K.gange === 1; }) && C.grupper.length === 2 && C.grupper[0].K.length === 2);
+    paastand("i sur regn er der ingen klammer: intet atom skifter", RR.regn.K.length === 0 && oxAf("SO2", "S") === oxAf("H2SO3", "S"));
+    var sumDef = D.OPGAVER.p.filter(function (o) { return o.type === "sum"; })[0];
+    var SD = P.sumData(sumDef);
+    paastand("de to skemaer skal bruges 2 og 1 gang, så Fe²⁺ går ud", SD.gange[0] === 2 && SD.gange[1] === 1 && SD.samlet.vaek.length === 1 && SD.samlet.vaek[0].f === "Fe 2+" && SD.samlet.vaek[0].n === 4);
+    paastand("lagt sammen: 4 FeS₂ + 15 O₂ + 14 H₂O ⟶ 4 Fe(OH)₃ + 8 SO₄²⁻ + 16 H⁺", X.termTekst(SD.samlet) === "4 FeS₂ + 15 O₂ + 14 H₂O ⟶ 4 Fe(OH)₃ + 8 SO₄²⁻ + 16 H⁺", X.termTekst(SD.samlet));
+    paastand("med svovlsyre er det arbejdsarkets skema: 4 FeS₂ + 15 O₂ + 14 H₂O ⟶ 4 Fe(OH)₃ + 8 H₂SO₄", SD.slutTekst === "4 FeS₂ + 15 O₂ + 14 H₂O ⟶ 4 Fe(OH)₃ + 8 H₂SO₄", SD.slutTekst);
+    var nH = 0;
+    SD.samlet.h.forEach(function (x) { if (x.f === "H +") nH = x.n; });
+    paastand("der er to H⁺ for hver SO₄²⁻, så ionerne er præcis 8 H₂SO₄", SD.nSyre === 8 && nH === 16);
+    paastand("felterne i summen er de stoffer, der står i begge skemaer: O₂, H₂O og H⁺", SD.felter.map(function (x) { return x.f + "=" + x.led.join("+"); }).join(" ") === "O2=14+1 H2O=4+10 H +=8+8", SD.felter.map(function (x) { return x.f + "=" + x.led.join("+"); }).join(" "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Udstillingen");
+    W.NK.visFane("fane-u");
+    nulstil(U);
+    var paaHylde = [];
+    D.HYLDER.forEach(function (h) { h.forEach(function (g) { paaHylde = paaHylde.concat(g.sten); }); });
+    paastand("otte sten, og hver står ét sted på hylderne", D.MINERALER.length === 8 && paaHylde.length === 8 && D.MINERALER.every(function (m) { return paaHylde.indexOf(m.id) >= 0; }));
+    paastand("hver sten har en tegning", D.MINERALER.every(function (m) { return /^<svg/.test(NK.Mineraler[m.id] || ""); }));
+    paastand("den første sten er svovl, og den sidste er pyrit", U.opgaver[0].id === "svovl" && U.opgaver[7].id === "pyrit" && U.nr === 0);
+    paastand("intet facit før tid: feltet er tomt, og ingen sten har tal på hylden",
+        U.opg.felter.a0.inp.value === "" && Array.prototype.every.call(d.querySelectorAll(".st-tal"), function (e) { return e.textContent === ""; }));
+    paastand("tasterne er −II til +VI", Array.prototype.map.call(d.querySelectorAll("#u-taster .tast"), function (e) { return e.textContent; }).join(" ") === "−II −I 0 +I +II +III +IV +VI");
+    U.tast(2);
+    paastand("svovl: +II er forkert og giver en rød linje om grundstoffer", roed(U) && /Svovl står alene/.test(linje(U)) && !U.faerdig, linje(U));
+    U.knap();
+    paastand("knappen giver et hint, og linjen bliver gul", gul(U) && /Hint 1 af 2/.test(linje(U)), linje(U));
+    U.tast(0);
+    paastand("svovl: 0 er rigtigt, linjen er grøn, og stenen får sit tal på hylden",
+        U.faerdig && groen(U) && U.sten.svovl.classList.contains("loest") && U.sten.svovl.querySelector(".st-tal").textContent === "S 0", linje(U));
+    paastand("stenens historie står på skiltet, ikke i linjen", d.getElementById("u-fakta").textContent === D.MINERALER[0].fakta && linje(U).indexOf(D.MINERALER[0].fakta) < 0);
+    paastand("knappen er nu Næste opgave", /Næste opgave/.test(U.el.knap.textContent));
+    U.knap();
+    paastand("den næste sten er zinkblende med to felter", U.opg.m.id === "zinkblende" && U.feltNoegler.length === 2);
+    U.tast(-2); U.tast(-2);
+    paastand("zinkblende: Zn −II giver Tjek fortegnet, og S −II står med blæk", roed(U) && /Tjek fortegnet/.test(linje(U)) && !!U.opg.tal.a1 && !U.opg.tal.a0, linje(U));
+    U.tast(2);
+    paastand("zinkblende: Zn +II løser stenen", U.faerdig && U.sten.zinkblende.querySelector(".st-tal").textContent === "Zn +II · S −II");
+    U.vaelg(7);
+    paastand("pyrit: Fe står med blyant som +II, og kun S har et felt",
+        U.feltNoegler.length === 1 && U.pladser.a0.slags === "givet" && U.pladser.a0.tal.textContent === "+II" && /blyant/.test(U.pladser.a0.tal.className));
+    U.tast(-2);
+    paastand("pyrit: S −II får at vide, at Fe så skulle være +IV", roed(U) && /\+IV/.test(linje(U)) && /baglæns/.test(linje(U)), linje(U));
+    U.tast(-1);
+    paastand("pyrit: S −I er rigtigt", U.faerdig && /S er −I i pyrit/.test(linje(U)), linje(U));
+    U.vaelg(4);
+    paastand("magnetit er skrevet FeO·Fe₂O₃ med to felter til Fe", U.feltNoegler.length === 2 && d.getElementById("u-formel").textContent.replace(/[+−IV0-9]*$/, "").indexOf("·") > 0);
+    U.tast(2); U.tast(3);
+    paastand("magnetit: +II og +III", U.faerdig && U.sten.magnetit.querySelector(".st-tal").textContent === "Fe +II og +III");
+    U.vaelg(5);
+    paastand("gips: krystalvandet står efter formlen, og Ca og O er givet", /·2H₂O$/.test(d.getElementById("u-formel").textContent) && U.feltNoegler.length === 1);
+    U.tast(-2);
+    paastand("gips: S −II får at vide, at det kun gælder sulfider", roed(U) && /sulfid/.test(linje(U)), linje(U));
+    /* Alle otte ved at skrive, og alle otte med knappen */
+    nulstil(U);
+    var skrevet = D.MINERALER.every(function (m, i) {
+        U.vaelg(i);
+        U.feltNoegler.forEach(function (k) { U.opg.felter[k].inp.value = X.ox(U.pladser[k].a.ox); });
+        U.tjek();
+        return U.faerdig && U.status[i].stjerne;
+    });
+    paastand("alle otte sten kan løses ved at skrive, og de får en stjerne", skrevet && U.antalLoest() === 8);
+    paastand("efter den sidste sten går knappen videre til Pyrit", /Videre til Pyrit/.test(U.el.knap.textContent), U.el.knap.textContent);
+    function prikker(E, v) {
+        var raekker = d.querySelectorAll("#u-trappe .tr-raekke:not(.akse)");
+        var r = raekker[D.TRAPPE.raekker.indexOf(E)];
+        return r.querySelectorAll(".tr-celle")[v - D.TRAPPE.fra].querySelectorAll(".tr-prik").length;
+    }
+    paastand("trappen: svovl står på −II (2 sten), −I, 0 og +VI", prikker("S", -2) === 2 && prikker("S", -1) === 1 && prikker("S", 0) === 1 && prikker("S", 6) === 1 && prikker("S", 4) === 0);
+    paastand("trappen: jern står på +II (2 sten) og +III (2 sten)", prikker("Fe", 2) === 2 && prikker("Fe", 3) === 2);
+    nulstil(U);
+    var medHjaelp = D.MINERALER.every(function (m, i) { U.vaelg(i); return medKnap(U) && !U.status[i].stjerne; });
+    paastand("alle otte sten kan løses med Vis svaret, uden stjerne og med gul linje", medHjaelp && gul(U));
+    paastand("hvert hint er en trappe på 2 eller 3 trin", D.MINERALER.every(function (m) { return m.hint.length >= 2 && m.hint.length <= 3; }));
+    U.vaelg(7);
+    U.klikSten("pyrit"); U.klikSten("pyrit"); U.klikSten("pyrit");
+    paastand("tre klik på pyrit er et påskeæg", /narreguld/.test(linje(U)), linje(U));
+    nulstil(U);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Pyrit: hæftet");
+    W.NK.visFane("fane-p");
+    nulstil(P);
+    var H = P.haefte;
+    paastand("fire opgaver, og de tre sidste er låst fra start", P.opgaver.length === 4 && !P.laast(0) && P.laast(1) && P.laast(2) && P.laast(3) && P.chips[1].classList.contains("laast"));
+    P.chips[2].click();
+    paastand("et klik på en låst opgave skifter ikke opgave", P.nr === 0 && /åbner/.test(linje(P)), linje(P));
+    P.besked("", "");
+    paastand("svovlet har ni bidder", P.opg.trin.join(" ") === "ox for klammer gange med ladning ion brint vand", P.opg.trin.join(" "));
+    paastand("Fe i FeS₂ står med blyant som +II fra start", H.led[0].pladser.ox0_Fe.tal.textContent === "+II" && /blyant/.test(H.led[0].pladser.ox0_Fe.tal.className));
+    paastand("fem felter til oxidationstal: S, O, Fe, S og O", P.noegler("ox").join(" ") === "ox0_S ox1_O ox2_Fe ox3_S ox3_O", P.noegler("ox").join(" "));
+    paastand("intet facit før tid: ingen tal foran formlerne, ingen klammer og ingen rækker",
+        H.led.every(function (L) { return L.koefTal.textContent === ""; }) && H.etiket.every(function (e) { return e.hidden; }) &&
+        H.rad.lad.el.hidden && H.rad.brint.el.hidden && H.rad.ilt.el.hidden && H.ionv.hidden && H.vandv.hidden);
+    paastand("linjen øverst på papiret siger det næste skridt helt kort", H.navnEl.textContent === "Skriv oxidationstallene for S, O og Fe i skemaet", H.navnEl.textContent);
+    paastand("tegningen: klart vand og pH ca. 7", P.strimmel.getAttribute("data-trin") === "0");
+    saet(P, "ox0_S", "-2"); P.tjekTrin();
+    paastand("S i FeS₂ som −II: Fe skulle så være +IV", roed(P) && /\+IV/.test(linje(P)), linje(P));
+    saet(P, "ox0_S", "-1"); saet(P, "ox3_S", "8"); P.tjekTrin();
+    paastand("S i sulfat som +VIII: ionens ladning er glemt", roed(P) && /glemt ionens ladning/.test(linje(P)) && !!P.opg.tal.ox0_S, linje(P));
+    saet(P, "ox3_S", "+VI"); saet(P, "ox1_O", "-2"); P.tjekTrin();
+    paastand("O i O₂ som −II: et grundstof er 0", roed(P) && /grundstof/.test(linje(P)), linje(P));
+    paastand("bidden er ikke klaret, før alle fem felter er rigtige", P.aktivt() === "ox");
+    til(P, "for");
+    paastand("efter oxidationstallene: Fe skifter ikke, og nu skal der lige mange S", groen(P) && /Jernet skifter ikke/.test(linje(P)) && /lige mange S/.test(linje(P)), linje(P));
+    saet(P, "for3", 1); P.tjekTrin();
+    paastand("1 foran sulfat: der er 2 S i FeS₂", roed(P) && /2 S i FeS₂/.test(linje(P)), linje(P));
+    til(P, "klammer");
+    paastand("tallet fra forafstemningen står med blyant foran sulfat", H.led[3].koefTal.textContent === "2" && /blyant/.test(H.led[3].koefTal.className));
+    paastand("klammerne er fremme med en pil og et felt hver", !H.etiket[0].hidden && !H.etiket[1].hidden && H.svg.querySelectorAll(".hf-sti:not(.spids)").length === 2);
+    P.opg.pil[0] = false; saet(P, "kl0", 14); P.tjekTrin();
+    paastand("S med pilen ned: tallet bliver større, så pilen skal pege op", roed(P) && /pege op/.test(linje(P)), linje(P));
+    P.opg.pil[0] = true; saet(P, "kl0", 7); P.tjekTrin();
+    paastand("S ↑7: det er for ét S, gang med 2", roed(P) && /gang med 2/.test(linje(P)), linje(P));
+    saet(P, "kl0", 14); P.tjekTrin();
+    paastand("S ↑14 er rigtigt, og klammen får ordet oxidation", !!P.opg.tal.kl0 && !H.tag[0].hidden && H.tag[0].textContent === "oxidation" && P.aktivt() === "klammer");
+    saet(P, "kl1", "-2");
+    paastand("et minus i feltet vender pilen ned", P.opg.pil[1] === false && P.inp("kl1").value === "2");
+    P.tjekTrin();
+    paastand("O ↓2: det er for ét O", roed(P) && /gang med 2/.test(linje(P)), linje(P));
+    til(P, "gange");
+    saet(P, "g0", 2); saet(P, "g1", 3);
+    paastand("mens der skrives, følger = 28 og = 12 med, og de er ikke grønne", /28/.test(H.etiket[0].querySelector(".hf-prod").textContent) && /12/.test(H.etiket[1].querySelector(".hf-prod").textContent) && /vent/.test(H.etiket[0].querySelector(".hf-prod").className));
+    P.tjekTrin();
+    paastand("gangetal 2 og 3: stigning 28 og fald 12", roed(P) && /= 28/.test(linje(P)) && /= 12/.test(linje(P)), linje(P));
+    saet(P, "g0", 4); saet(P, "g1", 14); P.tjekTrin();
+    paastand("gangetal 4 og 14: kan deles med 2", roed(P) && /deles med 2/.test(linje(P)), linje(P));
+    saet(P, "g0", ""); P.tjekTrin();
+    paastand("et tomt felt er ikke 1", roed(P) && /Skriv et tal foran hver pil/.test(linje(P)), linje(P));
+    til(P, "med");
+    paastand("efter gangetallene står 2, 7 og 4 foran formlerne, men intet foran Fe²⁺",
+        H.led[0].koefTal.textContent === "2" && H.led[1].koefTal.textContent === "7" && H.led[3].koefTal.textContent === "4" && H.led[2].koefTal.textContent === "");
+    saet(P, "for2", 1); P.tjekTrin();
+    paastand("1 foran Fe²⁺: der er 2 Fe før pilen", roed(P) && /2 Fe før pilen/.test(linje(P)), linje(P));
+    til(P, "ladning");
+    saet(P, "lad-v", 0); saet(P, "lad-h", 4); P.tjekTrin();
+    paastand("ladningen +4 efter pilen: tjek fortegnene", roed(P) && /fortegnene/.test(linje(P)) && !!P.opg.tal["lad-v"], linje(P));
+    saet(P, "lad-h", 0); P.tjekTrin();
+    paastand("ladningen 0 efter pilen: husk tallene foran", roed(P) && /tallene foran/.test(linje(P)), linje(P));
+    til(P, "ion");
+    saet(P, "ion-v", 4); P.tjekTrin();
+    paastand("H⁺ før pilen: de skal på den side, hvor ladningen er lavest", roed(P) && /lavest/.test(linje(P)), linje(P));
+    saet(P, "ion-v", ""); saet(P, "ion-h", 3);
+    paastand("mens der skrives, viser rækken det nye tal: −4 → −1", /−1/.test(H.rad.lad.celle.h.textContent), H.rad.lad.celle.h.textContent);
+    P.tjekTrin();
+    paastand("3 H⁺: der er 1 for få", roed(P) && /1 H⁺ for få/.test(linje(P)), linje(P));
+    til(P, "brint");
+    saet(P, "brint-v", 0); saet(P, "brint-h", 0); P.tjekTrin();
+    paastand("0 H efter pilen: husk H i 4 H⁺", roed(P) && /4 H⁺/.test(linje(P)), linje(P));
+    til(P, "vand");
+    saet(P, "vand-v", 4); P.tjekTrin();
+    paastand("4 H₂O: der skal kun halvt så mange", roed(P) && /halvt så mange/.test(linje(P)), linje(P));
+    saet(P, "vand-v", ""); saet(P, "vand-h", 2); P.tjekTrin();
+    paastand("vand efter pilen: det skal på den side, der har færrest H", roed(P) && /færrest H/.test(linje(P)), linje(P));
+    saet(P, "vand-h", "");
+    paastand("opgaven kan løses helt ved at skrive", helt(P));
+    paastand("svovlet er afstemt: grøn linje, stjerne, O-rækken som kontrol (16 = 16) og grøn ramme",
+        groen(P) && P.status[0].stjerne && /16/.test(H.rad.ilt.celle.v.textContent) && /16/.test(H.rad.ilt.celle.h.textContent) && H.el.classList.contains("faerdig"));
+    paastand("tegningen: vandet er blevet surt (trin 1)", P.strimmel.getAttribute("data-trin") === "1");
+    paastand("skemaet står i panelet, og den næste opgave er åben", d.getElementById("p-skemaer").textContent.indexOf(KENDT.svovl) >= 0 && !P.laast(1) && P.laast(2));
+    paastand("knappen Tjek er væk, når opgaven er løst", P.el.tjek.hidden);
+    P.knap();
+    paastand("Næste opgave giver jernet med syv bidder", P.opg.def.id === "jern" && P.opg.trin.join(" ") === "ox klammer gange ladning ion brint vand", P.opg.trin.join(" "));
+    paastand("jernet kan løses med knappen alene, uden stjerne", medKnap(P) && P.status[1].loest && !P.status[1].stjerne);
+    paastand("tegningen: vandet er rustrødt (trin 2)", P.strimmel.getAttribute("data-trin") === "2");
+    paastand("efter Vis svaret står tallene med brunt blæk", H.el.querySelectorAll(".vist").length > 0);
+    P.vaelg(1);
+    paastand("jernet kan også løses ved at skrive (20 H efter pilen, 10 H₂O før)", helt(P) && P.opg.R.foer.h.H === 20 && P.opg.R.vand.antal === 10 && P.opg.R.vand.side === "v");
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Pyrit: summen og spørgsmålene");
+    P.knap();
+    paastand("den tredje opgave er arket med de to skemaer", P.opg.type === "sum" && synlig(P.sumEl) && !synlig(H.el));
+    paastand("summen og svovlsyren kan ikke ses endnu", P.sa.sum.hidden && P.sa.syre.hidden && P.sa.slut.hidden && P.sa.ganget.every(function (l) { return l.hidden; }));
+    saet(P, "gang0", 1); saet(P, "gang1", 1);
+    paastand("regnskabet følger elevens tal: 1 · 2 = 2 dannet og 1 · 4 = 4 brugt", /1 · 2 = 2/.test(P.sa.regnskab.textContent) && /1 · 4 = 4/.test(P.sa.regnskab.textContent), P.sa.regnskab.textContent);
+    P.tjekTrin();
+    paastand("1 og 1: de to tal skal være ens", roed(P) && /ens/.test(linje(P)), linje(P));
+    saet(P, "gang0", 4); saet(P, "gang1", 2); P.tjekTrin();
+    paastand("4 og 2: kan deles med 2", roed(P) && /deles med 2/.test(linje(P)), linje(P));
+    til(P, "sum");
+    paastand("de gangede skemaer står nu over stregen med Fe²⁺ streget ud", !P.sa.sum.hidden && P.sa.ganget.every(function (l) { return !l.hidden && l.querySelector(".vaek"); }));
+    saet(P, "sum-v-O2", 14); P.tjekTrin();
+    paastand("O₂ som 14: stoffet står i begge skemaer", roed(P) && /begge skemaer/.test(linje(P)), linje(P));
+    til(P, "syre");
+    saet(P, "syre", 16); P.tjekTrin();
+    paastand("16 H₂SO₄: hvert H₂SO₄ har 2 H", roed(P) && /2 H/.test(linje(P)), linje(P));
+    paastand("summen kan løses ved at skrive", helt(P));
+    paastand("det samlede skema står på arket og i panelet", P.sa.slut.textContent === SD.slutTekst && !P.sa.slut.hidden && d.getElementById("p-skemaer").textContent.indexOf(SD.slutTekst) >= 0);
+    P.knap();
+    paastand("den fjerde opgave er de fire spørgsmål", P.opg.type === "spm" && D.SPM.length === 4 && synlig(P.spmEl));
+    paastand("skemaet på arket har oxidationstallene over atomerne: −I, +VI, +II, +III, 0 og −II",
+        ["−I", "+VI", "+II", "+III", "0", "−II"].every(function (t) { return Array.prototype.some.call(P.spmEl.querySelectorAll(".hf-oxtal"), function (e) { return e.textContent === t; }); }));
+    paastand("der er ingen felter, så knappen Tjek er væk", P.el.tjek.hidden);
+    P.spmValg(1, "selv");
+    paastand("Kun S er forkert: Fe går også op", roed(P) && /\+III/.test(linje(P)) && P.opg.forkert[1], linje(P));
+    P.spmValg(0, "selv");
+    paastand("S og Fe er rigtigt: forklaringen står alene, og knappen er Næste spørgsmål", groen(P) && /Næste spørgsmål/.test(P.el.knap.textContent) && P.opg.nr === 0);
+    P.knap();
+    paastand("Næste spørgsmål går videre til spørgsmål 2", P.opg.nr === 1 && P.sp.spm.textContent === D.SPM[1].tekst);
+    paastand("hvert spørgsmål har ét rigtigt svar, to typiske fejl med forklaring og et hint",
+        D.SPM.every(function (s) { return s.svar.length === 3 && s.svar.filter(function (x) { return x.ok; }).length === 1 && s.svar.every(function (x) { return x.ok || x.f; }) && s.hint && s.rigtig; }));
+    paastand("spørgsmålene kan besvares til ende", helt(P) && P.status[3].loest);
+    paastand("efter den sidste opgave går knappen videre til Ristning", /Videre til Ristning/.test(P.el.knap.textContent), P.el.knap.textContent);
+    P.vaelg(2);
+    paastand("summen kan også løses med knappen alene", medKnap(P));
+    P.vaelg(3);
+    paastand("spørgsmålene kan også klares med knappen alene", medKnap(P));
+    nulstil(P);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Ristning");
+    W.NK.visFane("fane-r");
+    nulstil(Rr);
+    var HR = Rr.haefte;
+    paastand("tre opgaver, og ingen er låst", Rr.opgaver.length === 3 && !Rr.laast(1) && !Rr.laast(2));
+    paastand("zinkblende: fire bidder uden ladning, H⁺ og vand", Rr.opg.trin.join(" ") === "ox klammer gange med", Rr.opg.trin.join(" "));
+    paastand("Zn står med blyant på begge sider af pilen", HR.led[0].pladser.ox0_Zn.tal.textContent === "+II" && HR.led[2].pladser.ox2_Zn.tal.textContent === "+II");
+    paastand("tegningen: zinkblende på risten", Rr.strimmel.getAttribute("data-opgave") === "zink" && Rr.strimmel.getAttribute("data-trin") === "0");
+    til(Rr, "med");
+    saet(Rr, "for2", 3); Rr.tjekTrin();
+    paastand("3 ZnO: der er kun 2 Zn før pilen", roed(Rr) && /2 Zn før pilen/.test(linje(Rr)), linje(Rr));
+    paastand("zinkblende kan løses ved at skrive", helt(Rr));
+    paastand("uden ioner er der kun O-rækken til sidst: 6 = 6", !HR.rad.ilt.el.hidden && HR.rad.lad.el.hidden && HR.rad.brint.el.hidden && /6/.test(HR.rad.ilt.celle.v.textContent) && /6/.test(HR.rad.ilt.celle.h.textContent));
+    paastand("tegningen: zinkoxid og svovldioxid", Rr.strimmel.getAttribute("data-trin") === "1");
+    Rr.knap();
+    paastand("cinnober har tre klammer", Rr.opg.def.id === "cinnober" && HR.etiket.length === 3 && Rr.opg.trin.join(" ") === "ox klammer gange");
+    til(Rr, "gange");
+    saet(Rr, "g0", 1); saet(Rr, "g1", 2); saet(Rr, "g2", 1); Rr.tjekTrin();
+    paastand("S og Hg med hvert sit gangetal: de sidder i samme HgS", roed(Rr) && /samme HgS/.test(linje(Rr)), linje(Rr));
+    saet(Rr, "g0", 1); saet(Rr, "g1", 1); saet(Rr, "g2", 2); Rr.tjekTrin();
+    paastand("O med gangetal 2: stigning 6 og fald 2 + 8 = 10", roed(Rr) && /= 6/.test(linje(Rr)) && /= 10/.test(linje(Rr)), linje(Rr));
+    saet(Rr, "g0", 2); saet(Rr, "g1", 2); saet(Rr, "g2", 2); Rr.tjekTrin();
+    paastand("2, 2 og 2: kan deles med 2", roed(Rr) && /deles med 2/.test(linje(Rr)), linje(Rr));
+    paastand("cinnober: alle gangetal er 1, så skemaet var afstemt, som det stod", helt(Rr) && /afstemt, som det stod/.test(linje(Rr)), linje(Rr));
+    Rr.knap();
+    paastand("sur regn: to felter til S og så spørgsmålet om redox", Rr.opg.def.id === "regn" && Rr.opg.trin.join(" ") === "ox redox" && Rr.noegler("ox").join(" ") === "ox0_S ox2_S");
+    paastand("tegningen: regn over marmor", Rr.strimmel.getAttribute("data-opgave") === "regn");
+    til(Rr, "redox");
+    paastand("to svar under skemaet, og knappen Tjek er væk", HR.valg.querySelectorAll(".hf-valgknap").length === 2 && Rr.el.tjek.hidden);
+    Rr.valgt("ja", "selv");
+    paastand("Redoxreaktion er forkert: tallet er +IV før og efter", roed(Rr) && /\+IV/.test(linje(Rr)) && HR.valg.querySelector('[data-valg="ja"]').disabled, linje(Rr));
+    Rr.valgt("nej", "selv");
+    paastand("Ikke en redoxreaktion er rigtigt", Rr.faerdig && /ikke en redoxreaktion/.test(linje(Rr)) && /ikke en redoxreaktion/.test(HR.navnEl.textContent), linje(Rr));
+    nulstil(Rr);
+    paastand("alle tre kan løses med knappen alene", [0, 1, 2].every(function (i) { Rr.vaelg(i); return medKnap(Rr); }));
+    nulstil(Rr);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. Rundvisningen, teorien og tasterne");
+    ["fane-u", "fane-p", "fane-r"].forEach(function (id) {
+        W.NK.visFane(id);
+        NK.Rundvisning.start(id);
+        var titler = [], n = 0;
+        while (NK.Rundvisning.aktiv() && n++ < 12) { titler.push(d.getElementById("rv-titel").textContent); d.getElementById("rv-naeste").click(); }
+        var unikke = titler.filter(function (t, i) { return titler.indexOf(t) === i; });
+        paastand("rundvisningen på " + id + " finder alle sine mål (" + unikke.length + ")", unikke.length >= 4 && unikke.length === titler.length, titler.join(" | "));
+    });
+    d.getElementById("teoriknap").click();
+    paastand("Teori åbner teorien, og den åbner ikke af sig selv", d.getElementById("teori").classList.contains("vis"));
+    d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    paastand("Esc lukker den igen", !d.getElementById("teori").classList.contains("vis"));
+    d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "2", bubbles: true }));
+    paastand("på en fane med felter er 2 et svar, ikke et faneskift", d.querySelector(".fane.aktiv").id === "fane-r");
+    paastand("mappen henter kun filer inde fra sig selv", Array.prototype.every.call(d.querySelectorAll("script[src], link[href]"), function (e) { return !/^(\.\.|\/|https?:)/.test(e.getAttribute("src") || e.getAttribute("href")); }));
+    paastand("der er ingen lærer og intet lærred", !W.Kemichael && !d.querySelector("canvas"));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("8. Sproget");
+    var tekster = [];
+    (function saml(o) {
+        if (typeof o === "string") { tekster.push(o); return; }
+        if (o && typeof o === "object") Object.keys(o).forEach(function (k) { saml(o[k]); });
+    }(D));
+    function alleLinjer(F, antalOpg) {
+        var ud = [];
+        for (var i = 0; i < antalOpg; i++) {
+            F.vaelg(i);
+            for (var n = 0; n < 80 && !F.faerdig; n++) {
+                ud.push(F.trinLinje(), F.kortLinje ? F.kortLinje() : "");
+                ud = ud.concat(F.hintTrin());
+                F.knap();
+                ud.push(linje(F));
+            }
+        }
+        return ud;
+    }
+    W.NK.visFane("fane-u"); tekster = tekster.concat(alleLinjer(U, 8));
+    W.NK.visFane("fane-p"); tekster = tekster.concat(alleLinjer(P, 4));
+    W.NK.visFane("fane-r"); tekster = tekster.concat(alleLinjer(Rr, 3));
+    tekster.push(d.body.textContent);
+    nulstil(U); nulstil(P); nulstil(Rr);
+    var lange = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger i " + tekster.length + " tekster", !lange.length, lange[0]);
+    var ettaller = tekster.filter(function (t) { return /¹[⁺⁻]|\b1[+−](?![0-9I])/.test(t.replace(/\+1\b|−1\b/g, "")); });
+    paastand("ingen ladning skrevet som 1+ eller 1−", !ettaller.length, ettaller[0]);
+    var ascii = tekster.filter(function (t) { return t.length < 400 && ASCII_ORD.test(t); });
+    paastand("ingen ord uden æ, ø og å i det, eleven læser", !ascii.length, ascii[0]);
+    var ord = tekster.filter(function (t) { return t.length < 400 && /natronlud|montre|\bundefined\b|NaN|\[object/.test(t); });
+    paastand("ingen montre, ingen natronlud og ingen undefined eller NaN", !ord.length, ord[0]);
+    var dobbelt = tekster.filter(function (t) { return t.length < 400 && /\ber er\b|  |\.\.|, ,/.test(t); });
+    paastand("ingen dobbelte ord, mellemrum eller punktummer", !dobbelt.length, dobbelt[0]);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("9. Pladsen");
+    function inde(e, ramme2, luft) {
+        var a = e.getBoundingClientRect(), b = ramme2.getBoundingClientRect();
+        return a.width > 0 && a.left >= b.left - luft && a.right <= b.right + luft && a.top >= b.top - luft && a.bottom <= b.bottom + luft;
+    }
+    function overlap(a, b) {
+        var x = a.getBoundingClientRect(), y = b.getBoundingClientRect();
+        return x.left < y.right - 1 && x.right > y.left + 1 && x.top < y.bottom - 1 && x.bottom > y.top + 1;
+    }
+    [[1100, 650], [1300, 760], [1600, 950]].forEach(function (s) {
+        var navn = s[0] + " × " + s[1] + ": ";
+        ramme.style.width = s[0] + "px";
+        ramme.style.height = s[1] + "px";
+        void d.body.offsetWidth;
+        paastand(navn + "siden skal ikke rulles", d.documentElement.scrollHeight <= W.innerHeight + 1 && d.documentElement.scrollWidth <= W.innerWidth + 1);
+
+        W.NK.visFane("fane-u");
+        var skaevSten = D.MINERALER.filter(function (m, i) {
+            U.vaelg(i); U.tilpas();
+            var sk = d.getElementById("u-skilt");
+            return !inde(d.getElementById("u-formel"), sk, 1) || !inde(d.getElementById("u-taster"), sk, 1) || !inde(d.getElementById("u-fakta"), sk, 1) ||
+                overlap(d.getElementById("u-formel"), d.getElementById("u-taster")) || overlap(d.querySelector(".sk-hoved"), d.getElementById("u-formel"));
+        }).map(function (m) { return m.id; });
+        paastand(navn + "skiltets formel, taster og tekst kan være der for alle otte sten", !skaevSten.length, skaevSten.join(", "));
+        var felter = d.querySelectorAll("#u-formel .hf-felt:not([hidden])");
+        U.vaelg(4);
+        felter = d.querySelectorAll("#u-formel .hf-over");
+        var stoeder = false;
+        for (var a = 0; a < felter.length; a++) for (var b = a + 1; b < felter.length; b++) {
+            var fa = felter[a].firstElementChild, fb = felter[b].firstElementChild;
+            if (fa && fb && fa.offsetWidth && fb.offsetWidth && overlap(fa, fb)) stoeder = true;
+        }
+        paastand(navn + "felterne og tallene over magnetit støder ikke sammen", !stoeder);
+        var smaa = Array.prototype.filter.call(d.querySelectorAll("#u-montre .st-billede svg"), function (e) { return e.getBoundingClientRect().height < 30; });
+        paastand(navn + "stenene på hylderne er mindst 30 px høje", !smaa.length, smaa.length);
+        paastand(navn + "statuslinjen og knapperne kan ses", inde(U.el.knap, d.querySelector("#fane-u .scene"), 1) && inde(U.el.besked, d.querySelector("#fane-u .scene"), 1));
+
+        W.NK.visFane("fane-p");
+        nulstil(P);
+        var daarlig = [];
+        function tjekHaefte(F, hvor) {
+            var Hf = F.haefte, papir = F.papir, pr = papir.getBoundingClientRect();
+            /* Skemaets indhold: fra det første til det sidste synlige led */
+            var venstre = Infinity, hoejre = -Infinity, top = Infinity, bund = -Infinity;
+            Array.prototype.forEach.call(Hf.skema.children, function (c) {
+                var r = c.getBoundingClientRect();
+                if (c.hidden || !r.width) return;
+                venstre = Math.min(venstre, r.left); hoejre = Math.max(hoejre, r.right); top = Math.min(top, r.top); bund = Math.max(bund, r.bottom);
+            });
+            if (venstre < pr.left + Hf.margen() - 2) daarlig.push(hvor + ": skemaet går ind over margenen");
+            if (hoejre > pr.right + 1) daarlig.push(hvor + ": skemaet går ud over papiret med " + Math.round(hoejre - pr.right) + " px");
+            if (top < pr.top + 20 || bund > pr.bottom) daarlig.push(hvor + ": skemaet står for højt eller for lavt");
+            ["lad", "brint", "ilt"].forEach(function (r) { if (!Hf.rad[r].el.hidden && !inde(Hf.rad[r].el, papir, 1)) daarlig.push(hvor + ": rækken " + r); });
+            Hf.etiket.forEach(function (e, k) { if (!e.hidden && !inde(e, papir, 1)) daarlig.push(hvor + ": etiket " + k); });
+            if (!Hf.valg.hidden && !inde(Hf.valg, papir, 1)) daarlig.push(hvor + ": valget");
+            /* Tallene over atomerne i samme formel må ikke dække hinanden */
+            Hf.led.forEach(function (L) {
+                var p = Object.keys(L.pladser).map(function (k) { return L.pladser[k]; });
+                for (var i = 0; i < p.length; i++) for (var j = i + 1; j < p.length; j++) {
+                    var x = p[i].over.querySelector(".hf-felt:not([hidden])") || p[i].tal, y = p[j].over.querySelector(".hf-felt:not([hidden])") || p[j].tal;
+                    if (x.offsetWidth && y.offsetWidth && overlap(x, y)) daarlig.push(hvor + ": tallene over " + L.l.st.tekst);
+                }
+            });
+            if (Hf.fs < 17) daarlig.push(hvor + ": skriften er " + Hf.fs.toFixed(1) + " px");
+        }
+        [0, 1].forEach(function (i) {
+            P.vaelg(i); P.tilpas();
+            for (var n = 0; n < 30 && !P.faerdig; n++) {
+                tjekHaefte(P, P.opg.def.id + "/" + P.aktivt());
+                /* Felterne paa begge sider af pilen er det bredeste */
+                if (P.aktivt() === "vand") { saet(P, "vand-v", 10); saet(P, "vand-h", 10); tjekHaefte(P, P.opg.def.id + "/vand med tal"); saet(P, "vand-h", ""); }
+                bid(P);
+            }
+            tjekHaefte(P, P.opg.def.id + "/færdig");
+        });
+        paastand(navn + "hæftet på fane 2 kan være på papiret i alle bidder, og intet tal dækker et andet", !daarlig.length, daarlig.slice(0, 4).join("; "));
+        P.vaelg(2); P.tilpas();
+        var bred = [];
+        for (var n2 = 0; n2 < 6 && !P.faerdig; n2++) {
+            Array.prototype.forEach.call(P.sumEl.querySelectorAll(".sa-linje:not([hidden]), .sa-regnskab"), function (l) { if (!inde(l, P.papir, 1) || l.scrollWidth > l.parentNode.clientWidth + 1) bred.push(P.aktivt() + ": " + l.className); });
+            bid(P);
+        }
+        Array.prototype.forEach.call(P.sumEl.querySelectorAll(".sa-linje:not([hidden])"), function (l) { if (!inde(l, P.papir, 1)) bred.push("færdig: " + l.className); });
+        paastand(navn + "alle linjer på arket med summen kan være der", !bred.length, bred.slice(0, 3).join("; "));
+        P.vaelg(3); P.tilpas();
+        paastand(navn + "skemaet, spørgsmålet og svarene på det sidste ark kan være der",
+            inde(P.spmEl.querySelector(".sp-skema"), P.papir, 1) && inde(P.sp.spm, P.papir, 1) && inde(P.sp.svar, P.papir, 1) && P.spmEl.querySelector(".sp-skema").scrollWidth <= P.spmEl.querySelector(".sp-indhold").clientWidth + 1);
+        paastand(navn + "tegningen fylder mellem en syvendedel og en tredjedel af scenen",
+            P.strimmel.offsetHeight >= 96 && P.strimmel.offsetHeight <= d.querySelector("#fane-p .scene").offsetHeight / 3 && P.papir.clientHeight >= 220, P.strimmel.offsetHeight + " / " + P.papir.clientHeight);
+        nulstil(P);
+
+        W.NK.visFane("fane-r");
+        nulstil(Rr);
+        daarlig = [];
+        [0, 1, 2].forEach(function (i) {
+            Rr.vaelg(i); Rr.tilpas();
+            for (var n = 0; n < 30 && !Rr.faerdig; n++) { tjekHaefte(Rr, Rr.opg.def.id + "/" + Rr.aktivt()); bid(Rr); }
+            tjekHaefte(Rr, Rr.opg.def.id + "/færdig");
+        });
+        paastand(navn + "hæftet på fane 3 kan være på papiret, også med tre klammer", !daarlig.length, daarlig.slice(0, 4).join("; "));
+        nulstil(Rr);
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    W.NK.visFane("fane-u");
+}
+</script>
+</body>
+</html>
