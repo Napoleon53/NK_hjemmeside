@@ -8,6 +8,11 @@
    elektronerne gaar gennem metallet fra det mindst aedle til det mest
    aedle, og ionerne gaar ud i vandet.
 
+   Vandet loeber fra venstre mod hoejre. Sidder kobberroeret foerst,
+   har vandet kobberioner med, som saetter sig paa det andet roer og
+   tager elektroner fra det. Luppen viser dem fra maalet om vandets
+   retning (visIoner).
+
    Hvor meget vaeggen er taeret, regnes af K.roerpar og K.tab. Luppen
    foelger samme tal: en kolonne mister et atom, hver gang vaeggen der
    er blevet en fjerdedel tyndere.
@@ -58,8 +63,10 @@
         this.slut = false;
         this.hulT = 0;
         this.ventT = 0;
+        this.ionRest = 0.5;
         this.M = new NK.Mikro({
             kol: KOL, raek: RAEK, over: this.lay ? this.lay.over : 3.2, vand: "fuld", stroem: 0.9, o2: 5,
+            medIoner: this.visIoner() && K.ROER.ioner[this.a] ? this.a : null,
             metal: function (c) {
                 if (mig.plast && (c === KOL / 2 - 1 || c === KOL / 2)) return null;
                 return c < KOL / 2 ? mig.a : mig.b;
@@ -81,6 +88,12 @@
     };
 
     P.nulstilScene = function () { this.nyeRoer(); };
+
+    /* Det, vandet har med fra det foerste roer, ses i luppen fra maalet om vandets retning */
+    P.visIoner = function () {
+        if (!this.status) return false;
+        return this.erLoest("retning") || !!(this.opg && this.opg.o.id === "retning");
+    };
 
     P.visValg = function () {
         var mig = this;
@@ -110,7 +123,7 @@
     P.klarTilTid = function () {
         var g = this.opg;
         if (!g || g.fase === "gaet") return false;
-        if (g.fase === "spm") return this.t === 0;
+        if (g.fase === "spm") return this.t === 0 && (!g.o.spm.krav || this.opfylder(g.o.spm.krav));
         return this.opfylder(g.o.forsoeg.krav);
     };
 
@@ -170,10 +183,21 @@
     };
 
     /* ----- Maalene ---------------------------------------------------------------- */
+    /* Er det de rigtige metaller? orden: det foerste i par skal sidde til venstre */
+    P.rigtigeRoer = function (krav) {
+        if (this.a === krav.par[0] && this.b === krav.par[1]) return true;
+        return !krav.orden && this.a === krav.par[1] && this.b === krav.par[0];
+    };
+
     P.opfylder = function (krav) {
         if (krav.ens) return this.a === this.b && !this.plast;
-        var passer = (this.a === krav.par[0] && this.b === krav.par[1]) || (this.a === krav.par[1] && this.b === krav.par[0]);
-        return passer && this.plast === !!krav.plast;
+        return this.rigtigeRoer(krav) && this.plast === !!krav.plast;
+    };
+
+    P.vaelgLinje = function (krav) {
+        var m0 = D.Stort(K.navn(krav.par[0])), m1 = D.Stort(K.navn(krav.par[1]));
+        if (krav.orden) return "Vælg " + m0 + " til venstre rør og " + m1 + " til højre rør.";
+        return "Vælg " + m0 + " til det ene rør og " + m1 + " til det andet.";
     };
 
     P.nyOpgave = function (o) {
@@ -255,13 +279,14 @@
         if (this.slut) return "Tryk på Nye rør, og prøv igen.";
         if (this.opfylder(krav)) return "Tryk på Lad tiden gå øverst i scenen.";
         if (krav.ens) return "Vælg metal med knapperne under rørene, og tryk på Lad tiden gå.";
-        var passer = (this.a === krav.par[0] && this.b === krav.par[1]) || (this.a === krav.par[1] && this.b === krav.par[0]);
-        if (!passer) return "Vælg " + D.Stort(K.navn(krav.par[0])) + " til det ene rør og " + D.Stort(K.navn(krav.par[1])) + " til det andet.";
+        if (!this.rigtigeRoer(krav)) return this.vaelgLinje(krav);
         return krav.plast ? "Slå Plastmuffe til med kontakten øverst i scenen." : "Slå Plastmuffe fra med kontakten øverst i scenen.";
     };
 
     P.spmLinje = function () {
+        var krav = this.opg.o.spm.krav;
         if (this.koerer) return "Se i luppen, og vælg et svar i opgavekortet til højre.";
+        if (krav && !this.opfylder(krav)) return this.vaelgLinje(krav).replace(/\.$/, "") + ", og lad tiden gå.";
         if (this.t === 0) return "Tryk på Lad tiden gå, og se i luppen. Vælg så et svar i opgavekortet til højre.";
         return "";
     };
@@ -307,14 +332,21 @@
             if (this.ventT <= 0) {
                 var bedst = -1, bd = 99;
                 for (var c = 0; c < KOL; c++) {
-                    if (M.top[c] < this.dybde(c, this.t) && M.kanAfgive(c)) {
+                    if (M.top[c] + M.paaVej(c) < this.dybde(c, this.t) && M.kanAfgive(c)) {
                         var dk = this.kolonne(c).dk + M.top[c] * 0.5;
                         if (dk < bd) { bd = dk; bedst = c; }
                     }
                 }
                 if (bedst >= 0) {
-                    var kat = this.katodeFor(bedst);
-                    if (kat >= 0) { M.afgiv(bedst, kat); this.ventT = 0.28; }
+                    /* Saa stor en del af atomerne tages af en ion fra det foerste roer:
+                       delen samles op, og hver gang der er til en hel, kommer en ion */
+                    var kb = this.kolonne(bedst);
+                    if (M.medIoner) this.ionRest += K.ionDel(this.par, kb.side, kb.d);
+                    if (M.medIoner && this.ionRest >= 1 && M.sendIon(bedst)) { this.ionRest -= 1; this.ventT = 0.28; }
+                    else {
+                        var kat = this.katodeFor(bedst);
+                        if (kat >= 0) { M.afgiv(bedst, kat); this.ventT = 0.28; }
+                    }
                 }
             }
             if (this.t >= slut) this.forsoegSlut();
@@ -438,6 +470,31 @@
         }
         ctx.restore();
 
+        /* Vandets retning: en pil i hvert roer */
+        [0.2, 0.8].forEach(function (fx) {
+            var px = W * fx, lgd = 26;
+            ctx.save();
+            ctx.font = Tg.font("700", 13);
+            var tb = ctx.measureText("vand").width, vx = px - (tb + 8 + lgd) / 2;
+            NK.tekst(ctx, "vand", vx, y0 + 0.5, { font: Tg.font("700", 13), linje: "middle", farve: "#d5e9fb", kant: true });
+            ctx.strokeStyle = "#d5e9fb";
+            ctx.fillStyle = "#d5e9fb";
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = "round";
+            var ax = vx + tb + 8;
+            ctx.beginPath();
+            ctx.moveTo(ax, y0);
+            ctx.lineTo(ax + lgd - 7, y0);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(ax + lgd, y0);
+            ctx.lineTo(ax + lgd - 9, y0 - 5.5);
+            ctx.lineTo(ax + lgd - 9, y0 + 5.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        });
+
         /* Flangerne og muffen ved samlingen */
         function flange(x, m) {
             var F = K.METAL[m];
@@ -473,8 +530,8 @@
         /* Hullet: vandet sproejter ud ved samlingen */
         this.pyt = null;
         if (par.hul && t >= par.hul - 1e-6) {
-            var hx = lay.xJ + (par.side === "v" ? -lay.muffe - 16 : lay.muffe + 16);
-            var ret = par.side === "v" ? -1 : 1;
+            var hx = lay.xJ + (par.svag === "v" ? -lay.muffe - 16 : lay.muffe + 16);
+            var ret = par.svag === "v" ? -1 : 1;
             ctx.fillStyle = Tg.VAND;
             ctx.fillRect(hx - 5, y0 + Ri - 1, 10, vg + 3);
             ctx.strokeStyle = "rgba(120, 190, 250, 0.85)";
@@ -497,7 +554,7 @@
                 ctx.fill();
                 this.pyt = { x: hx + ret * 22, y: lay.gulv + 3, b: b };
             }
-            Tg.maerkat(ctx, "hul efter " + Math.round(par.hul) + " år", lay.xJ - ret * 16, y0 + Ro + 26,
+            Tg.maerkat(ctx, "hul efter " + D.aar(par.hul) + " år", lay.xJ - ret * 16, y0 + Ro + 16,
                 { farve: "#ffd7d2", bund: "rgba(120, 30, 22, 0.92)", justering: ret > 0 ? "right" : "left", px: 14 });
         }
     };
@@ -506,7 +563,7 @@
         var R = lay.lup, y = R.y + R.h - 16;
         Tg.maerkat(ctx, K.navn(this.a), R.x + 12, y, { justering: "left" });
         Tg.maerkat(ctx, K.navn(this.b), R.x + R.b - 12, y, { justering: "right" });
-        Tg.maerkat(ctx, "vand", R.x + 12, R.y + 18, { justering: "left", farve: "#a8d4f5" });
+        Tg.maerkat(ctx, "vand →", R.x + 12, R.y + 18, { justering: "left", farve: "#a8d4f5" });
         if (this.plast) Tg.maerkat(ctx, "plast", R.x + R.b / 2, y, { farve: "#2a2a22", bund: "rgba(217, 211, 191, 0.92)" });
     };
 

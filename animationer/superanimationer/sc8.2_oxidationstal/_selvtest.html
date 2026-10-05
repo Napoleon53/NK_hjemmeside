@@ -25,9 +25,12 @@
    besked, at alle opgaver kan gennemføres ved at skrive, med musen og
    med Vis svaret, at der ikke står et facit, før eleven har gjort noget,
    at spørgsmålet, feltet og Giv hint står samlet i scenen (ikke i
-   panelet), at parrene på fane 2 har pile, at Kemichael ikke blander sig
-   og kan sendes ud, at sproget holder reglerne, og at tavlen og molekylet
-   kan være på skærmen fra 1100 × 700 til 1600 × 950.
+   panelet), at parrene på fane 2 har pile, at forklaringen på fane 2 har
+   beregningen på sine egne linjer under formlen i ord, at Kemichael ikke
+   blander sig og kan sendes ud, at et klik på ham giver hintet (eller
+   ros, når opgaven er løst) og aldrig gør ham sur, at sproget holder
+   reglerne, og at tavlen og molekylet kan være på skærmen fra 1100 × 700
+   til 1600 × 950.
 
    Kræver en lokal server med animationer/ som rod (Kemichael hentes
    derfra). Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
@@ -192,7 +195,7 @@ function koerTest(W) {
             var omkring = a.frie + 2 * a.orden, maal = a.s === "H" ? 2 : 8;
             if (omkring !== maal && !(def.id === "so2" && a.s === "S")) oktetFejl.push(def.id + " " + a.s + " " + omkring);
         });
-        def.spoerg.forEach(function (s) { if (def.forklar.indexOf(O.ox(f[s])) < 0 && f[s] !== 0) forklarFejl.push(def.id + " " + s); });
+        if (/[=·]|\d − \d/.test(def.forklar) || !/\.$/.test(def.forklar)) forklarFejl.push(def.id);
         def.spoerg.forEach(function (s) { if (O.regelOx(m, s) !== f[s]) regelUens.push(def.id); });
     });
     paastand("alle 12 giver tabellens oxidationstal", ekFejl.length === 0, ekFejl.join(", "));
@@ -200,7 +203,7 @@ function koerTest(W) {
     paastand("atomer af samme grundstof har samme oxidationstal", ensFejl.length === 0, ensFejl.join(", "));
     paastand("elektronerne passer: valenselektroner minus ladningen, par på ledige sider", elFejl.length === 0, elFejl.join(", "));
     paastand("oktet om alle atomer (duet om H, S i SO₂ har 10 som i c8.3)", oktetFejl.length === 0, oktetFejl.join(", "));
-    paastand("forklaringen nævner det rigtige oxidationstal", forklarFejl.length === 0, forklarFejl.join(", "));
+    paastand("forklaringen i ord har ingen regnestykker inde i teksten", forklarFejl.length === 0, forklarFejl.join(", "));
     var uens = regelUens.filter(function (x, i, a) { return a.indexOf(x) === i; }).sort().join(",");
     paastand("reglerne giver noget andet end elektronerne netop for H₂O₂ og OF₂", uens === "h2o2,of2", uens);
     var oh = O.molekyle(D.MOLEKYLER[10]), nh4 = O.molekyle(D.MOLEKYLER[11]);
@@ -331,7 +334,8 @@ function koerTest(W) {
     tik(B, 0.2);
     paastand("første molekyle: H₂O, gæt på O og H", B.m.def.id === "h2o" && B.trin === "gaet" && Object.keys(B.gaetFelter).join() === "O,H");
     paastand("intet facit før tid: tomme gætfelter uden et muligt svar, intet regnskab",
-        B.gaetFelter.O.inp.value === "" && !/[0-9IV]/.test(B.gaetFelter.O.inp.placeholder) && /kommer, når/.test(NK.el("ek-regnskab").textContent));
+        B.gaetFelter.O.inp.value === "" && !/[0-9IV]/.test(B.gaetFelter.O.inp.placeholder) && /kommer, når/.test(NK.el("ek-regnskab").textContent) &&
+        NK.el("ek-forklar").hidden && NK.el("ek-forklar").textContent === "");
     function spm2() { return NK.el("ek-spm").textContent; }
     /* Pilene tegnes paa laerredet: taelles ved at lytte paa NK.Tegn.pil i ét billede */
     function pile() {
@@ -380,11 +384,38 @@ function koerTest(W) {
         /6 − 8 = −2/.test(NK.el("ek-regnskab").textContent) && d.querySelectorAll("#ek-regnskab .rs-rom")[1].textContent === "−II" &&
         /Summen: 2 · \(\+1\) \+ \(−2\) = 0/.test(NK.el("ek-regnskab").textContent.replace(/\s+/g, " ")), NK.el("ek-regnskab").textContent);
     paastand("gættet står grønt", B.gaetFelter.O.felt.classList.contains("ok") && B.gaetFelter.H.felt.classList.contains("ok"));
-    paastand("linjen siger, at gættet passede", /Dit gæt passede/.test(B.beskedTekst()), B.beskedTekst());
+    paastand("linjen siger, at gættet passede, og i ord, hvor parrene endte: ingen regnestykker i den",
+        /^Løst ✓\s*Dit gæt passede\. O har fået begge elektronpar, og hvert H har mistet sin elektron\.$/.test(B.beskedTekst()), B.beskedTekst());
+    /* Beregningen står for sig selv under linjen, på sine egne linjer */
+    var fk = NK.el("ek-forklar");
+    function fkCeller() { return Array.prototype.slice.call(fk.querySelectorAll(".fk-regn > span")); }
+    function fkRk() {
+        var c = fkCeller(), ud = [];
+        for (var i = 0; i < c.length; i += 8) {
+            ud.push(c.slice(i, i + 8).map(function (e) { return e.textContent; }).filter(function (t) { return t; }).join(" "));
+        }
+        return ud;
+    }
+    function midt(e) { var r = e.getBoundingClientRect(); return (r.left + r.right) / 2; }
+    var rk7 = fkRk(), c7 = fkCeller();
+    paastand("beregningen står for sig selv under linjen", !fk.hidden && fk.parentNode === B.el.arb &&
+        fk.getBoundingClientRect().top >= NK.el("ek-besked").getBoundingClientRect().bottom - 1, fk.textContent);
+    paastand("beregningen begynder med formlen i ord", rk7[0] === "oxidationstal = valenselektroner − elektroner nu", rk7[0]);
+    paastand("og har én linje pr. grundstof med tallene og konklusionen", rk7.length === 3 && rk7[1] === "O = 6 − 8 = −2 så O er −II" &&
+        rk7[2] === "H = 1 − 0 = +1 så H er +I", rk7.join(" | "));
+    paastand("linjerne står under hinanden", c7.length === 24 && c7[0].getBoundingClientRect().bottom <= c7[8].getBoundingClientRect().top + 1 &&
+        c7[8].getBoundingClientRect().bottom <= c7[16].getBoundingClientRect().top + 1);
+    paastand("tallene står lige under de ord, de hører til, og lighedstegnene under hinanden",
+        Math.abs(midt(c7[2]) - midt(c7[10])) < 1.5 && Math.abs(midt(c7[4]) - midt(c7[12])) < 1.5 &&
+        Math.abs(midt(c7[1]) - midt(c7[9])) < 1.5 && Math.abs(midt(c7[13]) - midt(c7[21])) < 1.5,
+        Math.round(midt(c7[2])) + " mod " + Math.round(midt(c7[10])));
+    var fkSmaa = c7.filter(function (e) { return e.textContent && parseFloat(W.getComputedStyle(e).fontSize) < 14; });
+    paastand("ingen tekst under 14 px i beregningen", fkSmaa.length === 0, fkSmaa.length);
     paastand("arbejdsfeltet viser svaret, og pilene er væk", spm2() === "✓ O er −II og H er +I i H₂O." && B.el.arb.classList.contains("loest") && pile() === 0, spm2());
 
     /* Påskeægget: et par sluppet over kaffen */
     B.vaelg(1);
+    paastand("et nyt molekyle: beregningen er væk igen", fk.hidden && fk.textContent === "");
     B.gaetFelter.Cl.inp.value = "-1";
     B.gaetTjek("Cl");
     var ku = B.enheder[0], kc = B.midte(ku), kop = B.k.lay.kop;
@@ -393,7 +424,7 @@ function koerTest(W) {
     paastand("påskeægget: parret over kaffen giver Kemichaels replik og bliver i bindingen", ku.hos === null && B.k.tekst() === D.KAFFE_PAR, B.k.tekst());
 
     /* Alle 12 med musen og rigtige gæt */
-    var ekIkke = [], stjerneIkke = [];
+    var ekIkke = [], stjerneIkke = [], fkFejl = [];
     D.MOLEKYLER.forEach(function (def, i) {
         B.vaelg(i);
         def.spoerg.forEach(function (s) { B.gaetFelter[s].inp.value = O.ox(FACIT_EK[def.id][s]); B.gaetTjek(s); });
@@ -405,16 +436,35 @@ function koerTest(W) {
         tik(B, 1.2);
         if (!B.faerdig) ekIkke.push(def.id);
         if (!B.status[i].stjerne) stjerneIkke.push(def.id);
+        /* Beregningen: én linje pr. grundstof, der spørges til, med det rigtige tal */
+        var rk = fkRk(), rg = {};
+        O.regnskab(B.m).forEach(function (r) { rg[r.s] = r; });
+        def.spoerg.forEach(function (s, n) {
+            var x = FACIT_EK[def.id][s];
+            var vent = s + " = " + rg[s].v + " − " + rg[s].nu + " = " + O.lad(x) + " så " + s + " er " + O.ox(x);
+            if (rk[n + 1] !== vent || rg[s].v - rg[s].nu !== x) fkFejl.push(def.id + " " + s + ": " + rk[n + 1]);
+        });
+        var sumRk = rk.filter(function (l) { return /^summen = /.test(l); });
+        if (sumRk.length !== (def.q ? 1 : 0)) fkFejl.push(def.id + " summen");
+        if (def.q && sumRk[0].indexOf(" = " + O.lad(def.q) + " det er ionens ladning") < 0) fkFejl.push(def.id + " summen: " + sumRk[0]);
+        if (rk.length !== 1 + def.spoerg.length + (def.q ? 1 : 0)) fkFejl.push(def.id + " linjer " + rk.length);
+        var note = fk.querySelector(".fk-note");
+        if ((note ? note.textContent : undefined) !== def.note) fkFejl.push(def.id + " noten");
+        if (/[=·]|\d − \d/.test(B.beskedTekst()) || B.beskedTekst().indexOf(def.forklar) < 0) fkFejl.push(def.id + " linjen: " + B.beskedTekst());
     });
     paastand("alle 12 kan løses ved at trække parrene", ekIkke.length === 0, ekIkke.join(", "));
+    paastand("beregningen for alle 12: hvert oxidationstal på sin egen linje, summen kun for ionerne, ingen regnestykker i linjen over",
+        fkFejl.length === 0, fkFejl.slice(0, 3).join(", "));
     paastand("rigtige gæt uden hjælp giver stjerne på alle 12", stjerneIkke.length === 0, stjerneIkke.join(", "));
     B.vaelg(8);
     B.gaetFelter.O.inp.value = "-2";
     B.gaetTjek("O");
     B.enheder.forEach(function (u) { B.tildel(u, u.b.mest === -1 ? u.b.a : u.b.mest); });
     tik(B, 1.2);
-    paastand("H₂O₂ med gættet −II: rødt gæt og forklaringen om O–O", B.gaetFelter.O.felt.classList.contains("forkert") &&
-        /Du gættede −II for O. Elektronerne giver −I/.test(B.beskedTekst()), B.beskedTekst());
+    paastand("H₂O₂ med gættet −II: rødt gæt, og linjen siger, hvad elektronerne giver", B.gaetFelter.O.felt.classList.contains("forkert") &&
+        /Du gættede −II for O\. Elektronerne giver −I\. Hvert O har fået elektronparret fra sit H, men parret mellem de to O er delt\.$/.test(B.beskedTekst()), B.beskedTekst());
+    paastand("beregningen for H₂O₂: 6 − 7 = −1, og under den, at reglen om −II ikke passer",
+        fkRk()[1] === "O = 6 − 7 = −1 så O er −I" && fk.querySelector(".fk-note").textContent === "Her passer reglen om −II ikke.", fkRk().join(" | "));
     paastand("parret mellem de to O er delt", B.enheder[1].hos === "delt");
 
     /* Hjælpen: Spring gættet over og Vis svaret */
@@ -449,7 +499,69 @@ function koerTest(W) {
     D.KEMICHAEL_SIGER_HINT = false;
     B.vaelg(0);
 
-    overskrift("9. Sproget");
+    overskrift("9. Et klik på Kemichael: et hint, eller ros når opgaven er løst");
+    function klikHam(sim) { var h = sim.k.lay.hoved; klik(sim, h.x + h.b / 2, h.y + h.h * 0.4); }
+    function facitTekst(sim, k) { return String(O.facit(sim.opg.st, k)); }
+    W.NK.visFane("fane-rg");
+    A.vaelg(0);
+    tik(A, 0.2);
+    paastand("han tier, til der klikkes på ham", !A.k.taler());
+    klikHam(A);
+    paastand("fane 1: et klik på ham giver hintet til det trin, eleven er ved (ladningen)", /^Hint: Ladningen står/.test(A.k.tekst()) &&
+        A.k.boble.classList.contains("hint"), A.k.tekst());
+    paastand("klikket tæller som Giv hint: knappen hedder Vis svaret, og pladsen efter formlen lyser",
+        A.el.knap.textContent === "Vis svaret" && A.hjaelp === 1 && NK.el("rg-formel").classList.contains("vis-lad"), A.el.knap.textContent);
+    var sur = [];
+    for (var kn = 0; kn < 8; kn++) {
+        klikHam(A);
+        tik(A, 0.4);
+        if (A.k.boble.classList.contains("skidt") || !/^Hint: Ladningen står/.test(A.k.tekst()) || A.k.u.vrede > 0.05 || A.k.u.skeptisk > 0.05) sur.push(kn + ": " + A.k.tekst());
+    }
+    paastand("otte klik mere: han bliver ikke sur og siger stadig hintet", sur.length === 0 && !A.brugtSvar, sur.slice(0, 2).join(" | "));
+    A.felter.ladning.value = "0";
+    A.tjek("ladning");
+    paastand("han tier igen, når trinet er løst", !A.k.taler());
+    klikHam(A);
+    paastand("på næste trin giver han hintet til O", /^Hint: O har næsten altid/.test(A.k.tekst()), A.k.tekst());
+    var nk = 0;
+    while (!A.faerdig && nk++ < 6) { var kk = A.aktivt(); A.felter[kk].value = facitTekst(A, kk); A.tjek(kk); }
+    paastand("opgaven er løst, og han tier", A.faerdig && !A.k.taler());
+    klikHam(A);
+    var ros1 = A.k.tekst();
+    paastand("løst: et klik på ham giver en kort ros", D.ROS_KEMICHAEL.indexOf(ros1) >= 0 && A.k.boble.classList.contains("god"), ros1);
+    klikHam(A);
+    paastand("et klik mere giver en anden ros, stadig venlig", D.ROS_KEMICHAEL.indexOf(A.k.tekst()) >= 0 && A.k.tekst() !== ros1 &&
+        A.k.boble.classList.contains("god"), A.k.tekst());
+    tik(A, 4);
+    paastand("rosen går væk af sig selv", !A.k.taler());
+    paastand("ingen af hans ros-linjer er lange", D.ROS_KEMICHAEL.every(function (t) { return t.length <= 40; }));
+    W.NK.visFane("fane-ek");
+    B.vaelg(1);
+    tik(B, 0.2);
+    klikHam(B);
+    paastand("fane 2, gættet: han giver hintet om reglerne, og knappen hedder Spring gættet over",
+        /^Hint: Brug reglerne fra fane 1/.test(B.k.tekst()) && B.el.knap.textContent === "Spring gættet over", B.k.tekst());
+    B.gaetFelter.Cl.inp.value = "-1";
+    B.gaetTjek("Cl");
+    paastand("han tier, når gættet er skrevet", !B.k.taler() && B.trin === "fordel");
+    klikHam(B);
+    paastand("fane 2, fordelingen: han giver hintet om det største tal", /^Hint: Elektronerne går til atomet med det største tal/.test(B.k.tekst()), B.k.tekst());
+    B.enheder.forEach(function (u) { B.tildel(u, u.b.mest === -1 ? u.b.a : u.b.mest); });
+    tik(B, 1.2);
+    paastand("han tier, når molekylet er løst", B.faerdig && !B.k.taler());
+    klikHam(B);
+    paastand("fane 2 løst: et klik på ham giver ros", D.ROS_KEMICHAEL.indexOf(B.k.tekst()) >= 0 && B.k.boble.classList.contains("god"), B.k.tekst());
+    tik(B, 4);
+    B.k.sendUd();
+    tik(B, 3);
+    B.vaelg(1);
+    klikHam(B);
+    paastand("ude: et klik på den tomme stol giver ingenting", !B.k.taler() && B.hjaelp === 0 && B.el.knap.textContent === "Giv hint");
+    B.k.hentInd();
+    tik(B, 4);
+    W.NK.visFane("fane-rg");
+
+    overskrift("10. Sproget");
     var tekster = [];
     (function saml(x) {
         if (typeof x === "string") tekster.push(x);
@@ -476,6 +588,9 @@ function koerTest(W) {
         tekster.push(B.trinLinje(), B.trinInfo().hint);
         B.springGaet();
         tekster.push(B.trinLinje(), B.trinInfo().hint, B.beskedTekst());
+        B.visFordeling();
+        tik(B, 1.2);
+        tekster.push(B.beskedTekst(), fkRk().join(" | "));
     });
     W.NK.visFane("fane-rg");
     var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
@@ -486,15 +601,26 @@ function koerTest(W) {
     paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).join(" | "));
     paastand("natriumhydroxid, ikke natronlud", !tekster.some(function (t) { return /natronlud/i.test(t); }));
 
-    overskrift("10. Layoutet");
+    overskrift("11. Layoutet");
     var ramme = document.getElementById("ramme");
-    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
-    var lFejl = [], knapFejl = [];
+    /* Den sidste størrelse er en lille bærbar (1366 × 768 med browserens bjælker): kun fane 2 */
+    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950], [1366, 650]];
+    var lFejl = [], knapFejl = [], bobleFejl = [];
     maal.forEach(function (m) {
         ramme.style.width = m[0] + "px";
         ramme.style.height = m[1] + "px";
         W.NK.visFane("fane-rg");
-        [5, 30, 13, 3].forEach(function (i) {
+        /* Kemichaels hint på to linjer dækker ikke knapperne i hjørnet */
+        A.vaelg(3);
+        A.tilpas(); A.layout();
+        ["ladning", "O", "H"].forEach(function (k) { A.felter[k].value = facitTekst(A, k); A.tjek(k); });
+        klikHam(A);
+        var bo = A.k.boble.getBoundingClientRect(), kk1 = A.k.knap.getBoundingClientRect(), kk2 = A.el.forfra.getBoundingClientRect();
+        if (!A.k.taler() || (bo.right > kk2.left && bo.bottom > Math.min(kk1.top, kk2.top) + 0.5)) bobleFejl.push(m.join("×") + " dækker knapperne");
+        if (A.k.tekstEl.scrollHeight > A.k.tekstEl.clientHeight + 1) bobleFejl.push(m.join("×") + " teksten er skåret");
+        if (parseFloat(W.getComputedStyle(A.k.boble).fontSize) < 13) bobleFejl.push(m.join("×") + " lille skrift");
+        if (bo.top < NK.el("rg-tavle").getBoundingClientRect().bottom - 1) bobleFejl.push(m.join("×") + " dækker tavlen");
+        (m[1] < 700 ? [] : [5, 30, 13, 3]).forEach(function (i) {
             A.vaelg(i);
             A.tilpas(); A.layout();
             var t = NK.el("rg-tavle");
@@ -533,13 +659,21 @@ function koerTest(W) {
             while (!B.regnVist && n2++ < 8) { B.knap(); tik(B, 1.2); }
             tik(B, 0.2);
             if (B.geo.by1 > arb.offsetTop + 2) lFejl.push(m.join("×") + " molekylet bag arbejdsfeltet til sidst " + def.id);
+            if (fk.hidden || fk.scrollWidth > fk.clientWidth + 1) lFejl.push(m.join("×") + " beregningen er for bred " + def.id);
+            var sidste = fk.querySelector(".fk-regn > span:last-child").getBoundingClientRect(), fr = fk.getBoundingClientRect();
+            if (sidste.right > fr.right + 1 || sidste.height > 34) lFejl.push(m.join("×") + " beregningen knækker " + def.id);
+            if (B.geo.F < 24 || B.geo.L < 50) lFejl.push(m.join("×") + " molekylet for lille til sidst " + def.id + " L " + Math.round(B.geo.L));
+            /* Knappen Næste opgave står på linjen med svaret, også på en smal scene */
+            var kr = B.el.knap.getBoundingClientRect(), sr = B.el.spm.getBoundingClientRect();
+            if (kr.top > sr.bottom - 4) lFejl.push(m.join("×") + " knappen er rykket ned " + def.id);
             if (arb.offsetTop < B.lay.tv.y + B.lay.hoved) lFejl.push(m.join("×") + " arbejdsfeltet for højt " + def.id);
         });
         var panel = d.querySelector("#fane-ek .panel");
         if (panel.scrollWidth > panel.clientWidth + 1) lFejl.push(m.join("×") + " panelet er for bredt");
     });
-    paastand("tavlen og molekylerne kan være der fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 4).join(", "));
+    paastand("tavlen og molekylerne kan være der fra 1100 × 700 til 1600 × 950 (fane 2 også ved 1366 × 650)", lFejl.length === 0, lFejl.slice(0, 6).join(", "));
     paastand("hintknappen står lige ved siden af feltet i alle størrelser", knapFejl.length === 0, knapFejl.slice(0, 4).join(", "));
+    paastand("Kemichaels hint på to linjer kan læses og dækker hverken knapperne i hjørnet eller tavlen", bobleFejl.length === 0, bobleFejl.slice(0, 4).join(", "));
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
     var smaa = [];

@@ -7,9 +7,10 @@
      afstem   et reaktionsskema afstemmes i smaa bidder:
                 ox        oxidationstallet over de maerkede atomer
                 redox     (kun Sur regn) er det en redoxreaktion?
+                klammer   stigning ↑ eller fald ↓ for ét atom ved hver klamme
                 for       (kun med indekstal) lige mange atomer paa klammen
-                klammer   stigning ↑ eller fald ↓ ved hver klamme
-                gange     gangetallene: stigning i alt = fald i alt
+                gange     gangetallene: stigning i alt = fald i alt, hvor
+                          antallet af atomer paa klammen taeller med
                 med       tallet foran det stof, der foelger med
                 ladning   ladningen foer og efter pilen
                 ion       H⁺
@@ -83,8 +84,11 @@
         var R = this.R[def.id];
         var trin = ["ox"];
         if (def.ikkeRedox) trin.push("redox");
+        /* Foerst stigning og fald for ét atom, saa tallene foran: saadan
+           skrives det i Danmark (brugerens oenske 5. okt. 2026) */
+        if (R.K.length) trin.push("klammer");
         if (R.forafstem) trin.push("for");
-        if (R.K.length) trin.push("klammer", "gange");
+        if (R.K.length) trin.push("gange");
         if (R.med.length) trin.push("med");
         if (R.miljoe) {
             trin.push("ladning");
@@ -163,6 +167,11 @@
         return this.opg.R.grupper.filter(function (G) { return G.K.length > 1; });
     };
 
+    /* De klammer, der har flere end ét atom: "2 S og 2 O" */
+    F.flereAtomer = function () {
+        return ogListe(this.opg.R.K.filter(function (K) { return K.antal > 1; }).map(function (K) { return K.antal + " " + K.E; }));
+    };
+
     /* Naeste skridt i hele saetninger (statuslinjen) */
     F.trinLinje = function () {
         var g = this.opg, t = this.aktivt();
@@ -183,9 +192,7 @@
             return "Der er " + Math.max(K.nV, K.nH) + " " + K.E + " i " + R.led[K.nV > K.nH ? K.v : K.h].st.tekst + ", men kun " +
                 Math.min(K.nV, K.nH) + " i " + foran.tekst + ". Skriv et tal foran " + foran.tekst + ", så der er lige mange " + K.E + ".";
         case "klammer":
-            var flere = R.K.filter(function (k) { return k.antal > 1; }).map(function (k) { return k.antal + " " + k.E; });
-            return "Klik på pilen ved hver klamme, så den peger op eller ned, og skriv, hvor meget tallet stiger eller falder." +
-                (flere.length ? " Tæl alle atomerne på klammen med: " + ogListe(flere) + "." : "");
+            return "Klik på pilen ved hver klamme, så den peger op eller ned, og skriv, hvor meget ét atom stiger eller falder.";
         case "gange":
             var b = this.bundne()[0];
             if (b) {
@@ -193,7 +200,9 @@
                 return "Skriv et gangetal foran hver pil, så stigning i alt bliver lige så stor som fald i alt. " +
                     ogListe(b.K.map(function (k) { return k.E; })) + " sidder i samme " + st.tekst + " og skal have samme tal.";
             }
-            return "Skriv et gangetal foran hver pil, så stigning gange tal bliver lige så meget som fald gange tal. Brug de mindste tal.";
+            var flere = this.flereAtomer();
+            return "Skriv et gangetal foran hver pil, så stigning i alt bliver lige så stor som fald i alt. Brug de mindste tal." +
+                (flere ? " Tallet efter prikken er antallet af atomer: " + flere + "." : "");
         case "med":
             var m = R.med[0];
             return m.E + " skifter ikke, men skal også gå op. Tæl " + m.E + " " + (R.led[m.led].side === "h" ? "før" : "efter") +
@@ -220,7 +229,7 @@
         case "for":
             K = this.forK();
             return "Skriv et tal foran " + R.led[K.pv > 1 ? K.v : K.h].st.tekst + ", så der er lige mange " + K.E;
-        case "klammer": return "Skriv stigningen ↑ eller faldet ↓ ved hver klamme";
+        case "klammer": return "Skriv stigningen ↑ eller faldet ↓ for ét atom ved hver klamme";
         case "gange": return "Skriv et gangetal foran hver pil, så stigning og fald bliver lige store";
         case "med": return "Skriv tallet foran " + R.led[R.med[0].led].st.tekst + ", så " + R.med[0].E + " går op";
         case "ladning": return "Skriv ladningen på hver side af pilen";
@@ -314,6 +323,9 @@
             pil: function (k) { return g.pil[k]; },
             pilLaast: function (k) { return !!g.tal["kl" + k]; },
             gange: this.naaet("gange"),
+            /* Er der flere atomer paa klammen, staar antallet mellem gangetallet
+               og pilen: 2 · 2 ↑7 (2 FeS₂ med 2 S, der hver stiger 7) */
+            antal: function (k) { return R.K[k].antal > 1 ? "· " + R.K[k].antal : ""; },
             prod: function (k) {
                 var K = R.K[k];
                 if (g.tal["g" + k]) return { tekst: "= " + g.tal["g" + k].v * K.tot, slags: "ok" };
@@ -536,7 +548,7 @@
             if (op === null && n === null) return;
             noget = true;
             var f = X.klammeFejl(K, op, n);
-            if (!f) { g.tal[noegle] = { v: K.tot, slags: "ok" }; return; }
+            if (!f) { g.tal[noegle] = { v: K.delta, slags: "ok" }; return; }
             if (!forste) forste = { k: noegle, tekst: f };
             mig.haefte.ryst(noegle);
         });
@@ -549,12 +561,13 @@
         this.haefte.fokus(mangler[0]);
     };
 
-    /* "2 · 14 = 28" eller "1 · 2 + 1 · 4 = 6" med de tal, eleven skrev */
+    /* "2 · 2 · 7 = 28" eller "1 · 2 + 1 · 2 · 2 = 6" med de tal, eleven skrev:
+       gangetal · atomer paa klammen · aendring pr. atom */
     function sumTekst(R, tal, op) {
         var dele = [], sum = 0;
         R.K.forEach(function (K, k) {
             if (K.op !== op) return;
-            dele.push(tal[k] + " · " + K.tot);
+            dele.push(tal[k] + (K.antal > 1 ? " · " + K.antal : "") + " · " + K.delta);
             sum += tal[k] * K.tot;
         });
         return dele.join(" + ") + " = " + sum;
@@ -805,8 +818,7 @@
         case "klammer":
             K = R.K.filter(function (k, i) { return !g.tal["kl" + i]; })[0];
             return [X.gaarTekst(K) + ". Går tallet op eller ned, og hvor mange trin?",
-                K.antal > 1 ? "Ét " + K.E + " flytter sig " + K.delta + " trin. Der er " + K.antal + " " + K.E + " på klammen, så gang med " + K.antal + "." :
-                    "Pilen peger op, når tallet bliver større. Tæl trinene fra " + X.ox(K.fra) + " til " + X.ox(K.til) + "."];
+                "Pilen peger op, når tallet bliver større. Tæl trinene fra " + X.ox(K.fra) + " til " + X.ox(K.til) + " for ét " + K.E + "."];
         case "gange":
             var op = R.grupper.filter(function (G) { return G.netto > 0; })[0], ned = R.grupper.filter(function (G) { return G.netto < 0; })[0];
             if (this.bundne().length) {
@@ -814,8 +826,13 @@
                 return ["Klammerne fra " + st.tekst + " skal have samme gangetal. Læg alle stigninger sammen og alle fald sammen.",
                     "Prøv med 1 foran alle pilene, og regn stigning i alt og fald i alt ud."];
             }
+            /* Foerst hvad én formel flytter (atomer · aendring), saa det faelles tal */
+            var prFormel = R.K.map(function (k) {
+                return "Én " + R.led[k.v].st.tekst + (k.op ? " stiger " : " falder ") + (k.antal > 1 ? k.antal + " · " + k.delta + " = " : "") + k.tot + ".";
+            }).join(" ");
             var faelles = op.gange * op.netto;
-            return ["Find det mindste tal, som både " + op.netto + " og " + (-ned.netto) + " går op i.",
+            return [prFormel,
+                "Find det mindste tal, som både " + op.netto + " og " + (-ned.netto) + " går op i.",
                 "Det mindste tal er " + faelles + ". Hvad skal " + op.netto + " ganges med for at give " + faelles + ", og hvad skal " + (-ned.netto) + " ganges med?"];
         case "med":
             var m = R.med[0], kilde = R.led.filter(function (l) { return l.side !== R.led[m.led].side && l.st.el[m.E]; })[0];
@@ -863,8 +880,8 @@
             });
             break;
         case "klammer":
-            R.K.forEach(function (K, k) { g.pil[k] = K.op; vis("kl" + k, K.tot); });
-            kort = R.K.map(function (K) { return K.E + " " + (K.op ? "stiger " : "falder ") + K.tot; }).join(", ") + ".";
+            R.K.forEach(function (K, k) { g.pil[k] = K.op; vis("kl" + k, K.delta); });
+            kort = "For ét atom: " + R.K.map(function (K) { return K.E + " " + (K.op ? "stiger " : "falder ") + K.delta; }).join(", ") + ".";
             break;
         case "gange":
             R.K.forEach(function (K, k) { vis("g" + k, K.gange); });

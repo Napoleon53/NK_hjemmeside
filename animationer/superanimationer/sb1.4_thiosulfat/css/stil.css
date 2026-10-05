@@ -854,3 +854,73 @@ button:focus-visible {
     .grafvalg .vt-etiket { display: none; }
     .svarfelt { width: 72px; }
 }
+
+/* Fane 1: koncentrationen i blandingen under noten */
+#kryds-konc-raekke { margin-top: 9px; }
+
+/* ---------------------------------------------------------------------
+   QUIZZEN (fane 1): prikker for rigtige svar og fejringen til sidst
+   --------------------------------------------------------------------- */
+.prikker { display: inline-flex; align-items: center; gap: 6px; }
+
+.prikker i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    border: 1px solid #5e5e70;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.prikker i.rigtig { background-color: var(--groen); border-color: #7ee0a8; }
+
+@keyframes prikhop {
+    0%, 100% { transform: translateY(0); }
+    45%      { transform: translateY(-6px); }
+}
+
+.prikker.alle i { animation: prikhop 0.5s ease-in-out 2; }
+.prikker.alle i:nth-child(2) { animation-delay: 0.07s; }
+.prikker.alle i:nth-child(3) { animation-delay: 0.14s; }
+.prikker.alle i:nth-child(4) { animation-delay: 0.21s; }
+.prikker.alle i:nth-child(5) { animation-delay: 0.28s; }
+
+/* Et forkert svar staar fuldt roedt ved siden af det rigtige */
+.valgknap.forkert:disabled { opacity: 0.9; }
+
+.kort.opgavekort.klaret { border-left-color: var(--groen); }
+
+.fejring {
+    margin: 0 0 10px;
+    padding: 9px 11px;
+    border-radius: var(--radius-lil);
+    border: 1px solid rgba(87, 209, 140, 0.55);
+    background-color: rgba(63, 174, 114, 0.16);
+    color: #7ee0a8;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.fejring::before { content: "\2605  "; color: var(--gul); }
+.fejring:empty { display: none; }
+
+.konfetti { position: fixed; width: 0; height: 0; z-index: 60; pointer-events: none; }
+
+.konfetti i {
+    position: absolute;
+    left: -4px;
+    top: -6px;
+    width: 8px;
+    height: 12px;
+    border-radius: 2px;
+    opacity: 0;
+    animation: konfetti 2.1s linear forwards;
+}
+
+@keyframes konfetti {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+    28%  { transform: translate(calc(var(--dx) * 0.75), var(--op)) rotate(calc(var(--rot) * 0.35)); opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6); }
+    80%  { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--ned)) rotate(var(--rot)); opacity: 0; }
+}

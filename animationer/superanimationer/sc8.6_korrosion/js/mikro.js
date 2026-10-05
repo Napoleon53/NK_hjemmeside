@@ -17,6 +17,9 @@
                    (O₂ + 2 H₂O + 4 e⁻ → 4 OH⁻)
      i draaben     Fe²⁺ + 2 OH⁻ → Fe(OH)₂, og for hver 4 Fe(OH)₂ kommer
                    ét O₂ mere og goer dem til rust (4 FeO(OH))
+     sendIon(c)    en ion, vandet har med fra det foerste roer (fane 1),
+                   lander paa kolonne c og tager 2 e⁻ fra atomet der:
+                   Cu²⁺ + Fe → Cu + Fe²⁺
 
    Taellerne i this.tael bruges af selvtesten: afgivet og optaget skal
    passe. Fanerne bestemmer, hvornaar der afgives; mikro.js goer det kun.
@@ -28,6 +31,7 @@
     var K = NK.Kemi;
 
     var LEVETID = 4.2;      /* sekunder, en ion ses i luppen paa fane 1, foer vandet har taget den */
+    var ANTAL_GAESTER = 3;  /* ioner fra det foerste roer, der foelger vandet gennem luppen */
 
     var FARVE = {
         e:    { f: "#f2c53d", k: "#8a6a10", t: "#2a2103" },
@@ -51,10 +55,11 @@
         this.faeldning = !!cfg.faeldning;
         this.antalO2 = cfg.o2 === undefined ? 6 : cfg.o2;
         this.antalN2 = cfg.n2 || 0;
+        this.medIoner = cfg.medIoner || null;    /* metallet, vandet har ioner med fra */
         this.metal = [];
         for (var c = 0; c < this.kol; c++) this.metal.push(cfg.metal(c));
         this.til = { vand: true, ilt: true, salt: false };
-        this.tael = { afgivet: 0, eAfgivet: 0, eOptaget: 0, o2: 0, oh: 0, feoh2: 0, rust: 0 };
+        this.tael = { afgivet: 0, eAfgivet: 0, eOptaget: 0, o2: 0, oh: 0, feoh2: 0, rust: 0, afsat: 0 };
         this.anodeX = this.kol / 2;
         this.nyPlade();
     }
@@ -70,6 +75,7 @@
         this.el = [];
         this.gas = [];
         this.salt = [];
+        this.gaest = [];
         this.dep = [];
         this.moeder = [];
         this.maerker = [];
@@ -78,6 +84,7 @@
         this.rustO2 = null;
         this.fyldGas();
         this.fyldSalt();
+        this.fyldGaester(true);
     };
 
     /* ----- Omraader ------------------------------------------------------------ */
@@ -217,6 +224,51 @@
         return true;
     };
 
+    /* ----- Ionerne, vandet har med fra det foerste roer --------------------------------
+       Tre ad gangen foelger vandet gennem luppen. foerste: de staar spredt
+       i vandet fra begyndelsen; ellers kommer en ny ind fra venstre. */
+    P.fyldGaester = function (foerste) {
+        if (!this.medIoner) return;
+        while (this.gaest.length < ANTAL_GAESTER) {
+            var p = this.vandPunkt();
+            this.gaest.push({ sym: this.medIoner, x: foerste ? p.x : 0.45, y: Math.min(p.y, -1), vx: 0, vy: 0, maal: null });
+        }
+    };
+
+    /* Saa mange ioner er paa vej ned til kolonne c */
+    P.paaVej = function (c) {
+        return this.gaest.filter(function (g) { return g.maal === c; }).length;
+    };
+
+    /* Den naermeste frie ion gaar ned til kolonne c */
+    P.sendIon = function (c) {
+        if (!this.kanAfgive(c)) return false;
+        var bedst = null, bd = 1e9;
+        this.gaest.forEach(function (g) {
+            if (g.maal !== null) return;
+            var d = Math.abs(g.x - (c + 0.5));
+            if (d < bd) { bd = d; bedst = g; }
+        });
+        if (!bedst) return false;
+        bedst.maal = c;
+        return true;
+    };
+
+    /* Ionen er fremme: den tager 2 e⁻ fra det oeverste atom og bliver
+       siddende som metal. Atomet gaar i vandet som en ion. */
+    P.saetAf = function (g) {
+        var c = g.maal;
+        fjern(this.gaest, g);
+        this.fyldGaester(false);
+        if (!this.kanAfgive(c)) return;
+        var r = this.top[c], x = c + 0.5;
+        this.top[c]++;
+        this.ion.push({ sym: this.metal[c], x: x, y: r + 0.5, vx: NK.r(-0.3, 0.3), vy: -1.6, alder: 0, fri: true, maal: null });
+        this.dep.push({ type: "metal", sym: g.sym, x: c + NK.r(0.35, 0.65), y: r - 0.26, ny: 0 });
+        this.tael.afsat++;
+        this.maerke(K.ion(g.sym) + " + 2 e⁻ → " + g.sym, x, r - 0.9, "#f0b98c");
+    };
+
     /* Elektroner, der er paa vej eller venter ved overfladen */
     P.elektronerUndervejs = function () {
         var n = this.el.length;
@@ -342,6 +394,21 @@
         }
         flyt(this.ion, 1.5);
         flyt(this.oh, 1.7);
+
+        /* Ionerne fra det foerste roer foelger vandet, til en af dem skal ned paa overfladen */
+        for (i = this.gaest.length - 1; i >= 0; i--) {
+            var gs = this.gaest[i];
+            if (gs.maal !== null) {
+                /* Foerst hen over kolonnen, saa lige ned */
+                var henne = Math.abs(gs.x - (gs.maal + 0.5)) < 0.05;
+                var punkt = henne ? { x: gs.maal + 0.5, y: this.top[gs.maal] - 0.5 } : { x: gs.maal + 0.5, y: Math.min(gs.y, -0.9) };
+                if (gaaTil(gs, punkt, 4.5, dt) && henne) this.saetAf(gs);
+                continue;
+            }
+            vandr(gs, dt, 1.2, vand, null, 0);
+            if (vand(gs.x + this.stroem * dt, gs.y)) gs.x += this.stroem * dt;
+            else if (gs.x > this.kol - 1) { gs.x = 0.45; gs.y = NK.r(-this.over + 0.8, -1.2); }
+        }
 
         /* Fe²⁺ + 2 OH⁻ → Fe(OH)₂ */
         for (i = this.moeder.length - 1; i >= 0; i--) {
@@ -544,7 +611,14 @@
 
         /* Det, der har lagt sig paa overfladen */
         this.dep.forEach(function (d2) {
-            var f = FARVE[d2.type], rr = s * 0.3 * (d2.ny !== undefined ? NK.pop(Math.min(1, d2.ny)) : 1);
+            var ny = d2.ny !== undefined ? NK.pop(Math.min(1, d2.ny)) : 1;
+            if (d2.type === "metal") {
+                /* Metal, der har sat sig: en ion fra det foerste roer */
+                var Fm = K.METAL[d2.sym];
+                kugle(ctx, X(d2.x), Y(d2.y), s * 0.36 * ny, { f: Fm.farve, k: Fm.kant, t: Fm.tekst }, s * 0.36 >= 11 ? d2.sym : "", 12);
+                return;
+            }
+            var f = FARVE[d2.type], rr = s * 0.3 * ny;
             ctx.beginPath();
             ctx.arc(X(d2.x), Y(d2.y), rr, 0, Math.PI * 2);
             ctx.fillStyle = f.f;
@@ -567,6 +641,9 @@
             kugle(ctx, X(q.x), Y(q.y), s * 0.52, { f: FARVE.ion[q.sym], k: "#1e3b2a", t: "#0e2416" }, K.ion(q.sym), px);
         });
         ctx.globalAlpha = 1;
+        this.gaest.forEach(function (q) {
+            kugle(ctx, X(q.x), Y(q.y), s * 0.52, { f: FARVE.ion[q.sym], k: "#1b4a5c", t: "#0b2530" }, K.ion(q.sym), px);
+        });
 
         /* Gassen */
         this.gas.forEach(function (q) {
@@ -589,7 +666,10 @@
             var a = mk.t < 0.3 ? mk.t / 0.3 : (mk.t > 1.9 ? Math.max(0, (2.6 - mk.t) / 0.7) : 1);
             ctx.save();
             ctx.globalAlpha = a;
-            NK.tekst(ctx, mk.tekst, X(mk.x), Y(mk.y) - mk.t * 9, {
+            /* Hele teksten skal kunne ses, ogsaa ved kanten */
+            ctx.font = "700 14px 'Segoe UI', sans-serif";
+            var halv = ctx.measureText(mk.tekst).width / 2 + 8;
+            NK.tekst(ctx, mk.tekst, NK.klamp(X(mk.x), R.x + halv, R.x + R.b - halv), Y(mk.y) - mk.t * 9, {
                 font: "700 14px 'Segoe UI', sans-serif", justering: "center", farve: mk.farve, kant: true
             });
             ctx.restore();

@@ -1354,6 +1354,65 @@ select:focus-visible {
 .rs-sum { margin: 6px 0 0; font-size: 0.9rem; font-weight: 600; color: var(--tekst); }
 .rs-vent { margin: 0; }
 
+/* ---------------------------------------------------------------------
+   SC8.2: beregningen under linjen paa fane 2, naar regnskabet er gjort
+   op. Formlen med ord oeverst, tallene lige under de ord, de hoerer til,
+   og lighedstegnene under hinanden (brugerens test 5. okt. 2026: et
+   regnestykke inde i teksten var indforstaaet og svaert at laese). Samme
+   opstilling bruges i teoriens eksempel.
+   --------------------------------------------------------------------- */
+.arb-forklar {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 7px 14px 8px;
+    border-left: 4px solid rgba(143, 240, 180, 0.6);
+    border-radius: 0 9px 9px 0;
+    background-color: rgba(255, 255, 255, 0.06);
+    overflow-x: auto;
+}
+
+.arb-forklar[hidden] { display: none; }
+.arb.svar .arb-forklar { border-left-color: rgba(242, 197, 61, 0.7); }
+
+.fk-note { margin: 0; font-size: 1rem; font-weight: 600; line-height: 1.35; color: #f7e4ab; }
+
+.fk-regn {
+    display: grid;
+    grid-template-columns: repeat(7, max-content) minmax(0, 1fr);
+    column-gap: 9px;
+    row-gap: 2px;
+    align-items: baseline;
+    font-size: 1.06rem;
+    font-weight: 700;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+    color: #ffffff;
+}
+
+.fk-regn > span { text-align: center; white-space: nowrap; }
+.fk-regn > .fk-v { text-align: right; }
+.fk-regn > .fk-ord { font-size: 0.94em; font-weight: 600; color: #b9c9c1; }
+.fk-regn > .fk-sum { grid-column: 3 / 6; }
+.fk-regn > .fk-saa { padding-left: 12px; text-align: left; font-weight: 600; color: #cfe0d8; }
+.fk-saa b { color: #8ff0b4; font-weight: 800; }
+.arb.svar .fk-saa b { color: #f5dd8a; }
+
+.eksempel .fk-regn { margin-top: 8px; font-size: 1rem; color: var(--tekst); }
+.eksempel .fk-regn > .fk-ord { color: var(--tekst-svag); }
+.eksempel .fk-regn > .fk-saa { color: var(--tekst); }
+
+/* Paa en smal eller lav scene: taettere, saa molekylet beholder pladsen */
+@media (max-width: 1320px), (max-height: 760px) {
+    .arb-forklar { gap: 3px; padding: 5px 12px 6px; }
+    .arb-forklar .fk-note { font-size: 0.95rem; }
+    .arb-forklar .fk-regn { font-size: 1rem; line-height: 1.25; column-gap: 7px; row-gap: 1px; }
+}
+
+/* Paa en smal scene er gaettet vaek, naar opgaven er loest: linjen under
+   siger, hvordan gaettet gik, og knappen bliver paa linjen (js/sim_elektroner.js) */
+.arb.smal.sejr .arb-felter { display: none; }
+
 /* Genvejene i teorien */
 kbd {
     display: inline-block;

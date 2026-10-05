@@ -1,14 +1,16 @@
 /* =====================================================================
    sim_udstilling.js - fane 1: Udstillingen
 
-   Otte sten staar paa hylder, ordnet efter den negative ion, som paa
-   Museo Geominero. Eleven klikker paa en sten og skriver
+   Otte sten staar paa hylder, ordnet efter den negative ion, som i en
+   mineralsamling. Eleven klikker paa en sten og skriver
    oxidationstallet over atomerne paa stenens skilt. Et tal med blyant
    er givet. Tasterne under formlen skriver i det valgte felt, og naar
    alle felter er fyldt, tjekkes svaret af sig selv.
 
-   Hver loest sten faar sine tal paa hylden og en prik paa trappen i
-   panelet, hvor svovl og jern har hver sin raekke fra −II til +VI.
+   Skiltet har stenens navn og stoffets danske navn (zinkblende er
+   zinksulfid). Har stoffets navn et oxidationstal i sig, kommer
+   tallet foerst paa, naar eleven har fundet det: jernoxid bliver til
+   jern(III)oxid. Hver loest sten faar sine tal paa hylden.
 
    Den sidste sten er pyrit: reglen for sulfid giver Fe +IV, men jern
    er +II, saa S bliver −I. Det er indgangen til fane 2.
@@ -119,7 +121,6 @@
         });
         var kl = D.KLASSER[m.klasse];
         NK.saetTekst("u-sknavn", m.navn);
-        NK.saetTekst("u-skspansk", m.spansk);
         NK.saetTekst("u-skklasse", kl.navn + (kl.ion ? " · " + kl.ion : ""));
         this.opg.valgt = this.feltNoegler[0];
         this.visFelter();
@@ -158,6 +159,10 @@
             p.tal.className = "hf-oxtal" + (fundet ? " " + fundet.slags : "");
         });
         NK.el("u-taster").classList.toggle("slukket", !!this.faerdig);
+        /* Stoffets navn: oxidationstallet kommer foerst i navnet, naar det er fundet */
+        var kemi = NK.el("u-skkemi"), loestNavn = this.faerdig && !!g.m.kemiLoest;
+        kemi.textContent = loestNavn ? g.m.kemiLoest : (g.m.kemi || "");
+        kemi.classList.toggle("fundet", loestNavn);
         var fakta = NK.el("u-fakta");
         fakta.textContent = this.faerdig ? g.m.fakta : "";
         this.skilt.classList.toggle("faerdig", !!this.faerdig);
@@ -185,46 +190,8 @@
         return ud.join(" · ");
     };
 
-    /* ----- Trappen i panelet: hvor svovl og jern staar i de loeste sten -------------------- */
-    P.visTrappe = function () {
-        var mig = this, T = D.TRAPPE, celler = {}, andre = [], navne = [];
-        this.opgaver.forEach(function (m, i) {
-            if (!mig.status[i].loest) return;
-            var st = X.stof(m.f), set = {};
-            navne.push('<span class="tr-navn"><i class="tr-prik" style="background:' + NK.MineralFarve[m.id] + '"></i>' + NK.html(m.navn) + "</span>");
-            st.atomer.forEach(function (a) {
-                var k = a.s + "|" + a.ox;
-                if (set[k] || a.s === "O" || a.s === "H" || a.s === "C") return;
-                set[k] = true;
-                if (T.raekker.indexOf(a.s) >= 0) (celler[k] = celler[k] || []).push(m);
-                else if (andre.indexOf(a.s + " " + X.ox(a.ox)) < 0) andre.push(a.s + " " + X.ox(a.ox));
-            });
-        });
-        var html = '<div class="trappe"><div class="tr-raekke akse"><span></span>';
-        var v;
-        for (v = T.fra; v <= T.til; v++) html += "<span>" + X.ox(v) + "</span>";
-        html += "</div>";
-        T.raekker.forEach(function (E) {
-            html += '<div class="tr-raekke"><b>' + E + "</b>";
-            for (v = T.fra; v <= T.til; v++) {
-                html += '<span class="tr-celle">';
-                (celler[E + "|" + v] || []).forEach(function (m) {
-                    html += '<i class="tr-prik" style="background:' + NK.MineralFarve[m.id] + '" title="' + NK.html(m.navn) + '"></i>';
-                });
-                html += "</span>";
-            }
-            html += "</div>";
-        });
-        html += "</div>";
-        if (navne.length) html += '<p class="tr-navne">' + navne.join("") + "</p>";
-        else html += '<p class="note-tekst">Hver sten, du løser, får en prik ved sit oxidationstal.</p>';
-        if (andre.length) html += '<p class="note-tekst">Metallerne: ' + NK.html(andre.join(" · ")) + "</p>";
-        NK.saetHTML("u-trappe", html);
-    };
-
     P.efterListe = function () {
         this.visSten();
-        this.visTrappe();
     };
 
     P.visKortEkstra = function () {

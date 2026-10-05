@@ -11,8 +11,10 @@
        panelet (brugerens test 3. okt. 2026: "Der skal ikke være en
        ordre-tekst oppe i højre hjørne", og hint-knappen skal staa lige
        ved siden af feltet).
-     * Kemichael ved katederet. Hintet staar i arbejdsfeltet; han siger
-       det kun selv, hvis D.KEMICHAEL_SIGER_HINT er sat.
+     * Kemichael ved katederet. Hintet fra knappen staar i arbejdsfeltet
+       (han siger det kun selv, hvis D.KEMICHAEL_SIGER_HINT er sat). Et
+       klik paa ham selv faar ham til at sige hintet, og er opgaven loest,
+       en kort ros (laererKlik).
      * musen i scenen: hold, traek og klik
 
    Fanen selv har: lavOpgave(nr), visSpm(), trinInfo()
@@ -41,7 +43,7 @@
             this.navn = navn;
             this.L = new NK.Laerred(el("laerred"));
             this.tid = 0;
-            this.k = new NK.RoligLaerer({ boble: navn + "-boble", knap: navn + "-kknap" });
+            this.k = new NK.RoligLaerer({ boble: navn + "-boble", knap: navn + "-kknap", vedKlik: function () { mig.laererKlik(); } });
             this.opgaver = opgaver;
             this.grupper = grupper;
             var gemt = NK.hent(NOEGLE, {}) || {};
@@ -299,6 +301,29 @@
         P.svarVis = function (html) {
             if (D.KEMICHAEL_SIGER_HINT && this.k.sig(html, "svar", { lukVedSkriv: true })) { this.besked("", ""); return; }
             this.besked(html, "svar");
+        };
+
+        /* Et klik paa Kemichael: han siger hintet til det trin, eleven er
+           ved, og det taeller som Giv hint (knappen hedder saa Vis svaret).
+           Er opgaven loest, roser han kort. Han bliver ikke sur af flere
+           klik: han siger hintet igen (brugerens test 5. okt. 2026). */
+        P.laererKlik = function () {
+            if (this.faerdig) {
+                var ros = D.ROS_KEMICHAEL;
+                this.rosNr = ((this.rosNr === undefined ? Math.floor(Math.random() * ros.length) : this.rosNr) + 1) % ros.length;
+                this.k.svar(NK.html(ros[this.rosNr]), "god", 3.5);
+                return;
+            }
+            var info = this.auto ? null : this.trinInfo();
+            if (!info) return;
+            if (this.hjaelp === 0) {
+                this.hjaelp = 1;
+                if (this.efterHint) this.efterHint();
+            }
+            this.pegHint = false;
+            this.k.sig("<b>Hint:</b> " + info.hint, "hint");
+            this.visKnap();
+            this.fokus();
         };
 
         /* K: Kemichael siger, hvor man er, og hvad man skal (henter ham, hvis

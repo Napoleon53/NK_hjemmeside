@@ -6,8 +6,12 @@
    foran sig, og han blander sig ikke. Spoergsmaalet, fejl, hint og ros
    staar i arbejdsfeltet paa tavlen, lige ved feltet (brugerens test 3.
    okt. 2026), saa han siger kun noget, naar eleven klikker paa ham eller
-   koppen eller trykker K. Med D.KEMICHAEL_SIGER_HINT siger han igen
-   hintet og svaret i boblen til hoejre for sig.
+   koppen eller trykker K. Et klik paa ham selv er at bede om hjaelp:
+   fanen (valg.vedKlik, se laererKlik i js/fane.js) lader ham sige hintet
+   til det trin, eleven er ved, eller en kort ros, naar opgaven er loest.
+   Han bliver ikke sur af at blive klikket paa (brugerens test 5. okt.
+   2026). Med D.KEMICHAEL_SIGER_HINT siger han ogsaa hintet og svaret fra
+   knappen i boblen til hoejre for sig.
 
    Knappen i scenens hjoerne sender ham ud. Saa staar katederet tomt med
    en seddel. Samme knap (eller et klik paa sedlen) henter ham igen. Valget gaelder begge faner og
@@ -16,12 +20,10 @@
    Figuren er den faelles fra ../../v2/kemichael/ (K.tegneserieFigur),
    saa han ser ud som alle andre steder. Det eneste, der bevaeger sig, er
    oejnene (han blinker), brynene og brillerne (han kigger op over dem,
-   naar han siger noget) og armen, naar eleven klikker paa koppen. Klik
-   paa ham giver et kort svar fra de faelles prik-puljer, som forsvinder
-   igen efter fire sekunder.
+   naar han siger noget) og armen, naar eleven klikker paa koppen.
 
    Brug (én pr. fane):
-     this.k = new NK.RoligLaerer({ boble: "kar-boble", knap: "kar-kknap" });
+     this.k = new NK.RoligLaerer({ boble: "kar-boble", knap: "kar-kknap", vedKlik: funktion });
      var baand = this.k.layout(W, H);   // { y, h }: det nederste baand
      this.k.sig(html, slags, valg);     // kun hint og svar; giver false, naar han er ude
      this.k.tie();                      // delopgaven er loest
@@ -65,18 +67,17 @@
         this.boble = NK.el(o.boble);
         this.tekstEl = this.boble ? this.boble.querySelector(".kb-tekst") : null;
         this.knap = o.knap ? NK.el(o.knap) : null;
+        this.vedKlik = o.vedKlik || null;
         this.linje = { html: "", slags: "" };
         this.midl = null;
         this.vist = null;
         this.lukVedSkriv = false;
-        this.u = { humoer: 0.15, skeptisk: 0, briller: 0, vrede: 0, roed: 0 };
+        this.u = { humoer: 0.15, skeptisk: 0, briller: 0, vrede: 0 };
         this.kig = 0;               /* sekunder, han endnu kigger op over brillerne */
         this.blinkNaeste = 2.5 + Math.random() * 3;
         this.blink = 0;
         this.arm = HAENGER;
         this.slurk = null;          /* { t } mens han drikker */
-        this.prik = 0;
-        this.prikTid = 0;
         this.tid = 0;
         this.lay = null;
         this.overKop = false;
@@ -148,9 +149,17 @@
             px -= 0.5;
             b.style.fontSize = px + "px";
         }
-        /* Halen peger paa munden, hvor boblen end er */
+        /* En boble paa flere linjer rykker lidt op, saa den ikke daekker
+           knapperne i scenens hjoerne */
         var r = b.offsetHeight || 40;
-        var hy = NK.klamp(lay.mund.y - lay.boble.y, 14, Math.max(14, r - 14));
+        var top = lay.boble.y;
+        if (this.knap && this.knap.offsetParent) {
+            var over = top + r + 4 - this.knap.offsetTop;
+            if (over > 0) top -= Math.min(over, 18);
+        }
+        b.style.top = Math.round(top) + "px";
+        /* Halen peger paa munden, hvor boblen end er */
+        var hy = NK.klamp(lay.mund.y - top, 14, Math.max(14, r - 14));
         b.style.setProperty("--hale", Math.round(hy) + "px");
     };
 
@@ -158,16 +167,28 @@
        sig: et hint eller svaret, som eleven har bedt om. Det staar, til
        delopgaven er loest (tie), eller, med valg.lukVedSkriv, til eleven
        begynder at skrive igen. Giver false, naar han er sendt ud; saa
-       skal fanen vise teksten et andet sted.
+       skal fanen vise teksten et andet sted. Bedes han om det samme én
+       gang til, blinker boblen kort, saa klikket ses.
        svar: et kort svar paa et klik paa ham eller koppen; det forsvinder
        efter sek sekunder. */
     P.sig = function (html, slags, valg) {
         if (faelles.ude || this.gaar > 0) return false;
+        var samme = !this.midl && !!html && !!this.vist && this.vist.html === html && this.taler();
         this.linje = { html: html || "", slags: slags || "" };
         this.lukVedSkriv = !!(valg && valg.lukVedSkriv);
         this.midl = null;
         this.vis(this.linje);
+        if (samme) this.blinkBoble();
         return true;
+    };
+
+    P.blinkBoble = function () {
+        var b = this.boble;
+        if (!b) return;
+        b.classList.add("skift");
+        void b.offsetWidth;
+        b.classList.remove("skift");
+        this.kig = 1.6;
     };
 
     P.tie = function () {
@@ -248,7 +269,6 @@
         this.synlig = NK.klamp(this.synlig + (maal > this.synlig ? 1 : -1) * dt / 0.45, 0, 1);
         if (faelles.ude && this.gaar <= 0 && !this.midl && this.vist && this.vist.html) this.vis({ html: "", slags: "" });
         this.kig = Math.max(0, this.kig - dt);
-        if (this.prikTid > 0) { this.prikTid -= dt; if (this.prikTid <= 0) this.prik = 0; }
         /* Blink */
         this.blinkNaeste -= dt;
         if (this.blinkNaeste <= 0) { this.blink = 0.13; this.blinkNaeste = 2.8 + Math.random() * 4; }
@@ -260,7 +280,6 @@
         ["humoer", "skeptisk", "vrede"].forEach(function (n) { mig.u[n] = NK.mod(mig.u[n], m[n], 4, dt); });
         var br = this.kig > 0 ? Math.max(m.briller, 0.55) : m.briller * 0.5;
         this.u.briller = NK.mod(this.u.briller, br, 5, dt);
-        this.u.roed = NK.mod(this.u.roed, this.prik >= 4 ? 0.6 : 0, 3, dt);
         /* Slurken: armen ned efter koppen, op til munden, og tilbage */
         if (this.slurk) {
             var s = this.slurk;
@@ -309,7 +328,7 @@
             var slurk = this.slurk;
             K.tegneserieFigur(ctx, {
                 x: lay.cx, gulv: lay.gulv, skala: s, arm: arm,
-                udtryk: { humoer: this.u.humoer, skeptisk: this.u.skeptisk, vrede: this.u.vrede, roed: this.u.roed,
+                udtryk: { humoer: this.u.humoer, skeptisk: this.u.skeptisk, vrede: this.u.vrede, roed: 0,
                     briller: this.u.briller, lukket: this.blink > 0 ? 1 : 0 },
                 haand: function (c, hd) {
                     if (!slurk || !slurk.iHaand) return;
@@ -391,22 +410,9 @@
     P.klik = function (pt) {
         var u = this.under(pt);
         if (u === "kop") { this.kaffe(); return true; }
-        if (u === "laerer") { this.prikket(); return true; }
+        if (u === "laerer") { if (this.gaar <= 0 && this.vedKlik) this.vedKlik(); return true; }
         if (u === "seddel") { this.hentInd(); return true; }
         return false;
-    };
-
-    /* Klik paa ham: stadig kortere svar fra de faelles puljer. Svaret
-       forsvinder efter fire sekunder. Efter 20 sekunder er det glemt. */
-    P.prikket = function () {
-        if (this.gaar > 0) return;
-        this.prik++;
-        this.prikTid = 20;
-        var t = null;
-        if (this.prik === 1 && K && K.glimt) t = K.glimt("navn");
-        if (!t && this.prik <= 4 && K && K.replik) t = K.replik("prik" + this.prik);
-        if (!t) t = D.PRIK_SIDST;
-        this.svar(NK.html(t), this.prik >= 3 ? "skidt" : "", 4);
     };
 
     /* Klik paa koppen: han drikker og siger noget om kaffen */

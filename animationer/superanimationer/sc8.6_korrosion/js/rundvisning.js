@@ -15,12 +15,12 @@
 
     var TURE = {
         "fane-r": [
-            { sel: "#r-anker-roer", titel: "Rørene", tekst: "To vandrør, skruet sammen på midten og skåret igennem, så vandet og rørenes væg kan ses." },
+            { sel: "#r-anker-roer", titel: "Rørene", tekst: "To vandrør, skruet sammen på midten og skåret igennem, så vandet og rørenes væg kan ses. Vandet løber fra venstre mod højre." },
             { sel: "#r-valg-v, #r-valg-h", titel: "Metallet", tekst: "Vælg, hvad hvert rør er lavet af: kobber, jern eller zink." },
             { sel: "#r-vaerktoej", titel: "Tiden", tekst: "Lad tiden gå lader 20 år gå. Går der hul på et rør, standser tiden." },
             { sel: "#r-anker-lup", titel: "Luppen", tekst: "Atomerne i rørenes væg ved samlingen, med vandet over. De gule kugler er elektroner." },
             { sel: "#r-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#r-kort", titel: "Opgaven", tekst: "Fem mål, ét ad gangen. Nogle begynder med et gæt." },
+            { sel: "#r-kort", titel: "Opgaven", tekst: "Seks mål, ét ad gangen. Nogle begynder med et gæt." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Skibet handler om offeranoder. Rusten viser, hvordan jern ruster, med reaktionsskemaer." }
         ],
         "fane-s": [

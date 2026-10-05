@@ -13,8 +13,8 @@
         "fane-kryds": [
             { sel: "#kryds-laerred", titel: "Forsøget", tekst: "Træk måleglasset med syre hen over bægerglasset. Uret starter, når syren rammer." },
             { sel: "#kryds-maaling", titel: "Uret", tekst: "Kig på krydset oppefra, og tryk Stop, når du ikke kan se det. Målingerne samles her." },
-            { sel: "#kryds-blanding", titel: "Blandingen", tekst: "Vælg, hvor meget Na₂S₂O₃ der er i glasset, og sammenlign kurverne for svovlet." },
-            { sel: "#kryds-opgavekort", titel: "Opgaven", tekst: "Start en opgave. Knappen giver et hint og derefter svaret." },
+            { sel: "#kryds-blanding", titel: "Blandingen", tekst: "Vælg, hvor meget Na₂S₂O₃ der er i glasset. Koncentrationen fordobles fra knap til knap." },
+            { sel: "#kryds-opgavekort", titel: "Quizzen", tekst: "Fem spørgsmål om forsøget. Knappen giver et hint og derefter svaret." },
             { sel: "#teoriknap", titel: "Teorien", tekst: "Reaktionen, og hvorfor 1/Δt er et mål for hastigheden." },
             { sel: ".faneknapper", titel: "Næste fane", tekst: "Koncentration: find ud af, hvad hastigheden afhænger af." }
         ],

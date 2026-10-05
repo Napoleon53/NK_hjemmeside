@@ -21,7 +21,9 @@
    se på et skærmbillede: at oxidationstallene rammer de kendte, at de
    fem skemaer er afstemt i atomer og ladning med de mindste tal, at de
    to skemaer for pyrit lagt sammen giver arbejdsarkets skema, at alle
-   sten og opgaver kan løses (ved at skrive og med Vis svaret), at de
+   sten og opgaver kan løses (ved at skrive og med Vis svaret), at
+   klammerne viser ændringen for ét atom og kun har pilespids efter
+   reaktionspilen, at de
    typiske fejl får den rigtige besked, at der ikke står et facit før
    tid, at opgaverne på fane 2 åbner én ad gangen, at tegningen følger
    skemaerne, at rundvisningen finder sine mål, at sproget holder
@@ -116,7 +118,7 @@ function koerTest(W) {
         case "ox": F.noegler("ox").forEach(function (k) { if (g.tal[k]) return; var o = F.oxNoegle(k); saet(F, k, X.ox(o.st.ox[o.E])); }); break;
         case "redox": F.valgt("nej", "selv"); return t;
         case "for": F.noegler("for").forEach(function (k) { var i = +k.slice(3), K = F.ledK(i); saet(F, k, i === K.v ? K.pv : K.ph); }); break;
-        case "klammer": R.K.forEach(function (K, k) { g.pil[k] = K.op; saet(F, "kl" + k, K.tot); }); break;
+        case "klammer": R.K.forEach(function (K, k) { g.pil[k] = K.op; saet(F, "kl" + k, K.delta); }); break;
         case "gange": R.K.forEach(function (K, k) { saet(F, "g" + k, K.gange); }); break;
         case "med": R.med.forEach(function (m) { saet(F, "for" + m.led, m.koef); }); break;
         case "ladning": saet(F, "lad-v", R.ladning.v); saet(F, "lad-h", R.ladning.h); break;
@@ -182,8 +184,9 @@ function koerTest(W) {
             !skaev.length && q.v === q.h && faelles === 1 && op === ned, skaev.join(",") + " q " + q.v + "/" + q.h + " gcd " + faelles + " op " + op + " ned " + ned);
     });
     var A = RR.svovl, B = RR.jern, C = RR.cinnober;
-    paastand("svovlet: S ↑14 (2 S · 7) og O ↓4 (2 O · 2), gangetal 2 og 7, 28 elektroner",
-        A.K[0].tot === 14 && A.K[0].op && A.K[1].tot === 4 && !A.K[1].op && A.K[0].gange === 2 && A.K[1].gange === 7 && A.elektroner === 28);
+    paastand("svovlet: ét S stiger 7 og ét O falder 2; med 2 atomer på hver klamme er det 14 og 4, gangetal 2 og 7, 28 elektroner",
+        A.K[0].delta === 7 && A.K[0].op && A.K[1].delta === 2 && !A.K[1].op && A.K[0].antal === 2 && A.K[1].antal === 2 &&
+        A.K[0].tot === 14 && A.K[1].tot === 4 && A.K[0].gange === 2 && A.K[1].gange === 7 && A.elektroner === 28);
     paastand("svovlet: klammen for O giver intet tal foran sulfat, og Fe²⁺ følger med ved at tælle Fe",
         A.K[1].fri && A.koef[3] === 4 && A.med.length === 1 && A.med[0].koef === 2);
     paastand("jernet: Fe ↑1 og O ↓4, gangetal 4 og 1", B.K[0].tot === 1 && B.K[1].tot === 4 && B.K[0].gange === 4 && B.K[1].gange === 1);
@@ -209,6 +212,10 @@ function koerTest(W) {
     paastand("otte sten, og hver står ét sted på hylderne", D.MINERALER.length === 8 && paaHylde.length === 8 && D.MINERALER.every(function (m) { return paaHylde.indexOf(m.id) >= 0; }));
     paastand("hver sten har en tegning", D.MINERALER.every(function (m) { return /^<svg/.test(NK.Mineraler[m.id] || ""); }));
     paastand("den første sten er svovl, og den sidste er pyrit", U.opgaver[0].id === "svovl" && U.opgaver[7].id === "pyrit" && U.nr === 0);
+    paastand("ingen spanske navne og ingen boks med oxidationstal i panelet",
+        !d.getElementById("u-trappekort") && !d.getElementById("u-skspansk") && D.MINERALER.every(function (m) { return m.spansk === undefined; }) && !/azufre|blenda|pirita|yeso/.test(d.body.textContent));
+    paastand("et navn med oxidationstal i (jern(III)oxid) står kun som navnet efter løsningen",
+        D.MINERALER.every(function (m) { return !m.kemiLoest || (!/\(/.test(m.kemi) && /\([IV,]+\)/.test(m.kemiLoest)); }) && D.MINERALER.filter(function (m) { return m.kemiLoest; }).length === 4);
     paastand("intet facit før tid: feltet er tomt, og ingen sten har tal på hylden",
         U.opg.felter.a0.inp.value === "" && Array.prototype.every.call(d.querySelectorAll(".st-tal"), function (e) { return e.textContent === ""; }));
     paastand("tasterne er −II til +VI", Array.prototype.map.call(d.querySelectorAll("#u-taster .tast"), function (e) { return e.textContent; }).join(" ") === "−II −I 0 +I +II +III +IV +VI");
@@ -234,6 +241,15 @@ function koerTest(W) {
     paastand("pyrit: S −II får at vide, at Fe så skulle være +IV", roed(U) && /\+IV/.test(linje(U)) && /baglæns/.test(linje(U)), linje(U));
     U.tast(-1);
     paastand("pyrit: S −I er rigtigt", U.faerdig && /S er −I i pyrit/.test(linje(U)), linje(U));
+    U.vaelg(3);
+    var kemiEl = d.getElementById("u-skkemi");
+    paastand("hematit: på skiltet står jernoxid, til tallet er fundet", kemiEl.textContent === "jernoxid" && !kemiEl.classList.contains("fundet"), kemiEl.textContent);
+    U.tast(3);
+    paastand("hematit: efter +III står der jern(III)oxid", U.faerdig && kemiEl.textContent === "jern(III)oxid" && kemiEl.classList.contains("fundet"), kemiEl.textContent);
+    U.vaelg(3);
+    paastand("vælges stenen igen, er tallet væk fra navnet igen", kemiEl.textContent === "jernoxid");
+    U.vaelg(1);
+    paastand("zinkblende hedder zinksulfid, og svovl har intet ekstra navn", kemiEl.textContent === "zinksulfid" && (U.vaelg(0), kemiEl.textContent === ""));
     U.vaelg(4);
     paastand("magnetit er skrevet FeO·Fe₂O₃ med to felter til Fe", U.feltNoegler.length === 2 && d.getElementById("u-formel").textContent.replace(/[+−IV0-9]*$/, "").indexOf("·") > 0);
     U.tast(2); U.tast(3);
@@ -252,13 +268,6 @@ function koerTest(W) {
     });
     paastand("alle otte sten kan løses ved at skrive, og de får en stjerne", skrevet && U.antalLoest() === 8);
     paastand("efter den sidste sten går knappen videre til Pyrit", /Videre til Pyrit/.test(U.el.knap.textContent), U.el.knap.textContent);
-    function prikker(E, v) {
-        var raekker = d.querySelectorAll("#u-trappe .tr-raekke:not(.akse)");
-        var r = raekker[D.TRAPPE.raekker.indexOf(E)];
-        return r.querySelectorAll(".tr-celle")[v - D.TRAPPE.fra].querySelectorAll(".tr-prik").length;
-    }
-    paastand("trappen: svovl står på −II (2 sten), −I, 0 og +VI", prikker("S", -2) === 2 && prikker("S", -1) === 1 && prikker("S", 0) === 1 && prikker("S", 6) === 1 && prikker("S", 4) === 0);
-    paastand("trappen: jern står på +II (2 sten) og +III (2 sten)", prikker("Fe", 2) === 2 && prikker("Fe", 3) === 2);
     nulstil(U);
     var medHjaelp = D.MINERALER.every(function (m, i) { U.vaelg(i); return medKnap(U) && !U.status[i].stjerne; });
     paastand("alle otte sten kan løses med Vis svaret, uden stjerne og med gul linje", medHjaelp && gul(U));
@@ -277,7 +286,7 @@ function koerTest(W) {
     P.chips[2].click();
     paastand("et klik på en låst opgave skifter ikke opgave", P.nr === 0 && /åbner/.test(linje(P)), linje(P));
     P.besked("", "");
-    paastand("svovlet har ni bidder", P.opg.trin.join(" ") === "ox for klammer gange med ladning ion brint vand", P.opg.trin.join(" "));
+    paastand("svovlet har ni bidder, og stigning og fald kommer før tallet foran sulfat", P.opg.trin.join(" ") === "ox klammer for gange med ladning ion brint vand", P.opg.trin.join(" "));
     paastand("Fe i FeS₂ står med blyant som +II fra start", H.led[0].pladser.ox0_Fe.tal.textContent === "+II" && /blyant/.test(H.led[0].pladser.ox0_Fe.tal.className));
     paastand("fem felter til oxidationstal: S, O, Fe, S og O", P.noegler("ox").join(" ") === "ox0_S ox1_O ox2_Fe ox3_S ox3_O", P.noegler("ox").join(" "));
     paastand("intet facit før tid: ingen tal foran formlerne, ingen klammer og ingen rækker",
@@ -292,28 +301,42 @@ function koerTest(W) {
     saet(P, "ox3_S", "+VI"); saet(P, "ox1_O", "-2"); P.tjekTrin();
     paastand("O i O₂ som −II: et grundstof er 0", roed(P) && /grundstof/.test(linje(P)), linje(P));
     paastand("bidden er ikke klaret, før alle fem felter er rigtige", P.aktivt() === "ox");
+    til(P, "klammer");
+    paastand("efter oxidationstallene: Fe skifter ikke, og nu kommer stigning og fald for ét atom", groen(P) && /Jernet skifter ikke/.test(linje(P)) && /ét atom/.test(linje(P)), linje(P));
+    paastand("klammerne er fremme med en pil og et felt hver, og der står stadig intet tal foran sulfat",
+        !H.etiket[0].hidden && !H.etiket[1].hidden && H.svg.querySelectorAll(".hf-sti:not(.spids)").length === 2 && H.led[3].koefTal.textContent === "");
+    /* Pilespidsen sidder kun paa atomet efter reaktionspilen */
+    var spidser = H.svg.querySelectorAll(".hf-sti.spids"), pilX = H.pil.getBoundingClientRect().right - H.el.getBoundingClientRect().left;
+    var spidsX = Array.prototype.map.call(spidser, function (s) { return parseFloat(/L([\d.]+)/.exec(s.getAttribute("d"))[1]); });
+    paastand("hver klamme har én pilespids, og den sidder efter reaktionspilen", spidser.length === 2 && spidsX.every(function (x) { return x > pilX; }), spidsX.join(", ") + " mod " + pilX);
+    var stiX = Array.prototype.map.call(H.svg.querySelectorAll(".hf-sti:not(.spids)"), function (s) { return parseFloat(/M([\d.]+)/.exec(s.getAttribute("d"))[1]); });
+    paastand("stregen går stadig op til atomet før reaktionspilen", stiX.length === 2 && stiX.every(function (x) { return x < pilX; }));
+    P.opg.pil[0] = false; saet(P, "kl0", 7); P.tjekTrin();
+    paastand("S med pilen ned: tallet bliver større, så pilen skal pege op", roed(P) && /pege op/.test(linje(P)), linje(P));
+    P.opg.pil[0] = true; saet(P, "kl0", 14); P.tjekTrin();
+    paastand("S ↑14: det er for 2 S tilsammen, ved klammen står ét atom", roed(P) && /2 S tilsammen/.test(linje(P)) && /ét S/.test(linje(P)), linje(P));
+    saet(P, "kl0", 6); P.tjekTrin();
+    paastand("S ↑6: det er et oxidationstal, ikke forskellen", roed(P) && /oxidationstal/.test(linje(P)), linje(P));
+    saet(P, "kl0", 7); P.tjekTrin();
+    paastand("S ↑7 er rigtigt, og klammen får ordet oxidation", !!P.opg.tal.kl0 && P.opg.tal.kl0.v === 7 && !H.tag[0].hidden && H.tag[0].textContent === "oxidation" && P.aktivt() === "klammer");
+    saet(P, "kl1", "-4");
+    paastand("et minus i feltet vender pilen ned", P.opg.pil[1] === false && P.inp("kl1").value === "4");
+    P.tjekTrin();
+    paastand("O ↓4: det er for 2 O tilsammen", roed(P) && /2 O tilsammen/.test(linje(P)), linje(P));
     til(P, "for");
-    paastand("efter oxidationstallene: Fe skifter ikke, og nu skal der lige mange S", groen(P) && /Jernet skifter ikke/.test(linje(P)) && /lige mange S/.test(linje(P)), linje(P));
+    paastand("under skemaet står nu 7 og 2, og først derefter kommer tallet foran sulfat",
+        H.etiket[0].querySelector(".hf-kltal").textContent === "7" && H.etiket[1].querySelector(".hf-kltal").textContent === "2" && /lige mange S/.test(linje(P)), linje(P));
     saet(P, "for3", 1); P.tjekTrin();
     paastand("1 foran sulfat: der er 2 S i FeS₂", roed(P) && /2 S i FeS₂/.test(linje(P)), linje(P));
-    til(P, "klammer");
-    paastand("tallet fra forafstemningen står med blyant foran sulfat", H.led[3].koefTal.textContent === "2" && /blyant/.test(H.led[3].koefTal.className));
-    paastand("klammerne er fremme med en pil og et felt hver", !H.etiket[0].hidden && !H.etiket[1].hidden && H.svg.querySelectorAll(".hf-sti:not(.spids)").length === 2);
-    P.opg.pil[0] = false; saet(P, "kl0", 14); P.tjekTrin();
-    paastand("S med pilen ned: tallet bliver større, så pilen skal pege op", roed(P) && /pege op/.test(linje(P)), linje(P));
-    P.opg.pil[0] = true; saet(P, "kl0", 7); P.tjekTrin();
-    paastand("S ↑7: det er for ét S, gang med 2", roed(P) && /gang med 2/.test(linje(P)), linje(P));
-    saet(P, "kl0", 14); P.tjekTrin();
-    paastand("S ↑14 er rigtigt, og klammen får ordet oxidation", !!P.opg.tal.kl0 && !H.tag[0].hidden && H.tag[0].textContent === "oxidation" && P.aktivt() === "klammer");
-    saet(P, "kl1", "-2");
-    paastand("et minus i feltet vender pilen ned", P.opg.pil[1] === false && P.inp("kl1").value === "2");
-    P.tjekTrin();
-    paastand("O ↓2: det er for ét O", roed(P) && /gang med 2/.test(linje(P)), linje(P));
     til(P, "gange");
+    paastand("tallet fra forafstemningen står med blyant foran sulfat", H.led[3].koefTal.textContent === "2" && /blyant/.test(H.led[3].koefTal.className));
+    paastand("antallet af atomer står mellem gangetallet og pilen: · 2 ved begge klammer",
+        H.etiket[0].querySelector(".hf-antal").textContent === "· 2" && H.etiket[1].querySelector(".hf-antal").textContent === "· 2" && /2 S og 2 O/.test(linje(P)), linje(P));
+    saet(P, "g0", 2); saet(P, "g1", 3);    til(P, "gange");
     saet(P, "g0", 2); saet(P, "g1", 3);
     paastand("mens der skrives, følger = 28 og = 12 med, og de er ikke grønne", /28/.test(H.etiket[0].querySelector(".hf-prod").textContent) && /12/.test(H.etiket[1].querySelector(".hf-prod").textContent) && /vent/.test(H.etiket[0].querySelector(".hf-prod").className));
     P.tjekTrin();
-    paastand("gangetal 2 og 3: stigning 28 og fald 12", roed(P) && /= 28/.test(linje(P)) && /= 12/.test(linje(P)), linje(P));
+    paastand("gangetal 2 og 3: stigning 2 · 2 · 7 = 28 og fald 3 · 2 · 2 = 12", roed(P) && /2 · 2 · 7 = 28/.test(linje(P)) && /3 · 2 · 2 = 12/.test(linje(P)), linje(P));
     saet(P, "g0", 4); saet(P, "g1", 14); P.tjekTrin();
     paastand("gangetal 4 og 14: kan deles med 2", roed(P) && /deles med 2/.test(linje(P)), linje(P));
     saet(P, "g0", ""); P.tjekTrin();
@@ -357,6 +380,7 @@ function koerTest(W) {
     paastand("efter Vis svaret står tallene med brunt blæk", H.el.querySelectorAll(".vist").length > 0);
     P.vaelg(1);
     paastand("jernet kan også løses ved at skrive (20 H efter pilen, 10 H₂O før)", helt(P) && P.opg.R.foer.h.H === 20 && P.opg.R.vand.antal === 10 && P.opg.R.vand.side === "v");
+    paastand("jernet: Fe har ét atom på klammen og O har to, så kun O har · 2", P.haefte.etiket[0].querySelector(".hf-antal").textContent === "" && P.haefte.etiket[1].querySelector(".hf-antal").textContent === "· 2");
 
     /* ------------------------------------------------------------------ */
     overskrift("5. Pyrit: summen og spørgsmålene");
@@ -417,10 +441,14 @@ function koerTest(W) {
     Rr.knap();
     paastand("cinnober har tre klammer", Rr.opg.def.id === "cinnober" && HR.etiket.length === 3 && Rr.opg.trin.join(" ") === "ox klammer gange");
     til(Rr, "gange");
+    paastand("cinnober: under skemaet står 6, 2 og 2 (pr. atom), tre pilespidser, og kun O har · 2",
+        [0, 1, 2].map(function (k) { return HR.etiket[k].querySelector(".hf-kltal").textContent; }).join(" ") === "6 2 2" && HR.svg.querySelectorAll(".hf-sti.spids").length === 3 &&
+        [0, 1, 2].map(function (k) { return HR.etiket[k].querySelector(".hf-antal").textContent; }).join("|") === "||· 2");
+    til(Rr, "gange");
     saet(Rr, "g0", 1); saet(Rr, "g1", 2); saet(Rr, "g2", 1); Rr.tjekTrin();
     paastand("S og Hg med hvert sit gangetal: de sidder i samme HgS", roed(Rr) && /samme HgS/.test(linje(Rr)), linje(Rr));
     saet(Rr, "g0", 1); saet(Rr, "g1", 1); saet(Rr, "g2", 2); Rr.tjekTrin();
-    paastand("O med gangetal 2: stigning 6 og fald 2 + 8 = 10", roed(Rr) && /= 6/.test(linje(Rr)) && /= 10/.test(linje(Rr)), linje(Rr));
+    paastand("O med gangetal 2: stigning 1 · 6 = 6 og fald 1 · 2 + 2 · 2 · 2 = 10", roed(Rr) && /1 · 6 = 6/.test(linje(Rr)) && /1 · 2 \+ 2 · 2 · 2 = 10/.test(linje(Rr)), linje(Rr));
     saet(Rr, "g0", 2); saet(Rr, "g1", 2); saet(Rr, "g2", 2); Rr.tjekTrin();
     paastand("2, 2 og 2: kan deles med 2", roed(Rr) && /deles med 2/.test(linje(Rr)), linje(Rr));
     paastand("cinnober: alle gangetal er 1, så skemaet var afstemt, som det stod", helt(Rr) && /afstemt, som det stod/.test(linje(Rr)), linje(Rr));

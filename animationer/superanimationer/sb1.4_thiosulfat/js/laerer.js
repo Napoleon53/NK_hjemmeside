@@ -155,8 +155,8 @@
         };
     }
 
-    /* Han staar mellem glasset og krydset set oppefra paa fane 1 og midt
-       paa grafen paa fane 2 og 3. */
+    /* Han staar mellem glasset og grafen paa fane 1 og midt paa grafen
+       paa fane 2 og 3. */
     kobl(NK.SimKryds.prototype, "kryds", "kryds-spring", 0.5);
     kobl(NK.SimKonc.prototype, "konc", "konc-spring", 0.55);
     kobl(NK.SimTemp.prototype, "temp", "temp-spring", 0.55);

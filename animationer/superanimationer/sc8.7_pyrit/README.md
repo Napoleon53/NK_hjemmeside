@@ -53,11 +53,16 @@ grundstoffer (svovl), sulfider (zinkblende, cinnober, pyrit), oxider
 (hematit, magnetit), sulfater (gips) og carbonater (malakit). Hyldekanten har
 et messingskilt med klassen og ionen.
 
-Et klik på en sten lægger den på skiltet under hylderne: navnet på dansk og
-spansk, som det står på museets skilte, klassen og formlen med et felt over
-de atomer, eleven skal finde. Et tal med blyant er givet. Tasterne under
-formlen (−II til +VI) skriver i det valgte felt, og når alle felter er fyldt,
-tjekkes svaret af sig selv. Tastaturet virker også (+2, +II, 2 og Enter).
+Et klik på en sten lægger den på skiltet under hylderne: stenens navn,
+stoffets danske navn (zinkblende er zinksulfid), klassen og formlen med et
+felt over de atomer, eleven skal finde. Et tal med blyant er givet. Tasterne
+under formlen (−II til +VI) skriver i det valgte felt, og når alle felter er
+fyldt, tjekkes svaret af sig selv. Tastaturet virker også (+2, +II, 2 og
+Enter).
+
+Har stoffets navn et oxidationstal i sig, står navnet uden tal, til eleven
+har fundet det: jernoxid bliver til jern(III)oxid, kviksølvsulfid til
+kviksølv(II)sulfid. Ellers ville navnet være facit.
 
 | Sten | Felter | Givet | Pointen |
 |------|--------|-------|---------|
@@ -70,9 +75,16 @@ tjekkes svaret af sig selv. Tastaturet virker også (+2, +II, 2 og Enter).
 | Malakit, Cu₂(OH)₂CO₃ | Cu | | to slags negative ioner |
 | Pyrit, FeS₂ | S | Fe | reglen for sulfid giver Fe +IV, så S er −I |
 
-En løst sten får sine tal på hylden, en sætning om stenen på skiltet og en
-prik på **trappen** i panelet, hvor svovl og jern har hver sin række fra −II
-til +VI. Trinnet +IV er tomt i udstillingen: det er svovlet i SO₂, som kommer på fane 3.
+En løst sten får sine tal på hylden og en sætning om stenen på skiltet.
+
+### Rettet efter brugerens første kig (5. oktober 2026)
+
+* "Du må gerne fjerne boksen med oxidationstal i udstillingen." Trappen i
+  panelet, hvor svovl og jern havde hver sin række fra −II til +VI, er væk.
+* "Du må også gerne fjerne de spanske navne, så animationen er mindre
+  indforstået. Skriv til gengæld gerne de danske navne." De spanske navne fra
+  museets skilte er væk. I stedet står stoffets danske navn. Det er læst som
+  det kemiske navn; stenenes navne var danske i forvejen.
 
 ## Fane 2: Pyrit
 
@@ -120,8 +132,11 @@ buste af marmor.
 Opskrivningen er den fra `sc8.5_kaliumpermanganat` (brugerens tegning):
 skemaet på ternet papir, oxidationstallet over de atomer, der skifter, en
 klamme under skemaet fra atomet før pilen til det samme grundstof efter, og
-midt på klammen, under reaktionspilen, gangetallet og stigningen eller
-faldet: "2 ↑14 = 28" og "7 ↓4 = 28". Under hver side står rækkerne Ladning,
+midt på klammen, under reaktionspilen, stigningen eller faldet for ét atom
+med gangetallet og antallet af atomer foran: "2 · 2 ↑7 = 28" og
+"7 · 2 ↓2 = 28" (2 FeS₂ med 2 S, der hver stiger 7). Klammen har kun en
+pilespids ved atomet efter reaktionspilen; før pilen går stregen op til
+atomet uden spids. Under hver side står rækkerne Ladning,
 H-atomer og til sidst O-atomer som kontrol. Vandet afstemmer H, og O er
 kontrollen. Det, eleven skriver, står med blåt blæk, det givne med blyant og
 et svar fra Vis svaret med brunt blæk.
@@ -130,12 +145,15 @@ Bidderne (linjen øverst på papiret siger det næste skridt helt kort,
 statuslinjen i hele sætninger):
 
 1. **Oxidationstal** i felterne over atomerne.
-2. **Lige mange atomer** (kun svovlet: 2 foran SO₄²⁻, med blyant).
-3. **Stigning og fald.** Pilen ved hver klamme vendes med et klik, med ↑ og
-   ↓ eller med + og − i feltet. Tallet er det samlede for atomerne på
-   klammen (2 S · 7 = ↑14).
-4. **Gangetal.** "= 28" følger med, mens der skrives, og bliver grønt, når
-   stigning i alt er lig fald i alt. Tallene flyver op foran formlerne.
+2. **Stigning og fald for ét atom.** Pilen ved hver klamme vendes med et
+   klik, med ↑ og ↓ eller med + og − i feltet. Tallet er ændringen for ét
+   atom: S ↑7 og O ↓2.
+3. **Lige mange atomer** (kun svovlet: 2 foran SO₄²⁻, med blyant). Tallet
+   foran kommer først nu, når ændringen pr. atom er fundet.
+4. **Gangetal.** Er der flere atomer på klammen, står antallet mellem
+   gangetallet og pilen ("· 2"). "= 28" følger med, mens der skrives, og
+   bliver grønt, når stigning i alt er lig fald i alt. Tallene flyver op
+   foran formlerne.
 5. **Resten af atomerne.** Et stof, der følger med uden at skifte (Fe²⁺ fra
    pyrit, ZnO), får sit tal ved at tælle.
 6. **Ladning** under hver side.
@@ -144,6 +162,14 @@ statuslinjen i hele sætninger):
 8. **H-atomer** under hver side.
 9. **Vand** på den side, der har færrest H. Til sidst kommer O-rækken af sig
    selv, og papiret får en grøn ramme.
+
+Brugeren 5. oktober 2026: "jeg plejer at lære eleverne at man viser stigningen
+pr atom. Dvs der bør stå 7 og 2 under skemaet (jeg ved at den nuværende metode
+også er rigtig, men det er bare ikke den traditionelle måde at gøre det på,
+på dansk). Dvs vi indsætter også først koefficienter foran S efter at vi har
+bestemt hvor meget hvert svovl falder med." Første udgave skrev 2 foran
+SO₄²⁻ først og det samlede tal (↑14 og ↓4) ved klammen. Samme dag: pilespids
+kun på produktsiden, her og i `sc8.5_kaliumpermanganat`.
 
 Nyt i forhold til sc8.5, fordi skemaerne her er anderledes bygget:
 
@@ -155,8 +181,10 @@ Nyt i forhold til sc8.5, fordi skemaerne her er anderledes bygget:
   i `js/data.js`) giver intet tal foran produktet.
 * Der kan være flere end to klammer, og klammer fra samme stof får samme
   gangetal (cinnober).
+* Ved klammen står ændringen for ét atom, ikke den samlede (sc8.5 skriver den
+  samlede i de fire reaktioner med indekstal).
 * Tomme felter tæller aldrig som et svar, og der står ingen tal foran
-  formlerne før gangetallene.
+  formlerne, før stigning og fald er fundet.
 
 ## Hjælpen
 
@@ -174,8 +202,8 @@ stjernen.
 | hematit | summen ikke delt (+VI) | +6 er for de to Fe tilsammen |
 | gips | S som −II | S er kun −II i et sulfid |
 | klammer | pilen den forkerte vej | Tallet bliver større, så pilen skal pege op |
-| klammer | ét atom i stedet for alle | Det er for ét S. Der er 2 S på klammen |
-| gangetal | ikke lige store | Stigning: 2 · 14 = 28. Fald: 3 · 4 = 12 |
+| klammer | alle atomer i stedet for ét (↑14) | Det er for 2 S tilsammen. Ved klammen står kun, hvor meget ét S stiger |
+| gangetal | ikke lige store | Stigning: 2 · 2 · 7 = 28. Fald: 3 · 2 · 2 = 12 |
 | gangetal | cinnober med forskellige tal ved S og Hg | S og Hg sidder i samme HgS |
 | følger med | 1 foran Fe²⁺ | der er 1 Fe efter pilen, men 2 Fe før pilen |
 | ladning | tallene foran glemt, fortegnet | hver sin |
@@ -231,7 +259,7 @@ js/mineraler.js       de otte sten som SVG
 js/scener.js          tegningerne over hæftet: bækken, risteovnen og regnen
 js/haefte.js          hæftet: skemaet, felterne, klammerne og rækkerne
 js/fane.js            det fælles: listen, knappen og statuslinjen
-js/sim_udstilling.js  fane 1: hylderne, skiltet, tasterne og trappen
+js/sim_udstilling.js  fane 1: hylderne, skiltet og tasterne
 js/sim_haefte.js      fane 2 og 3: bidderne, tjekkene, summen og spørgsmålene
 js/rundvisning.js     rundvisningen bag ?
 js/app.js             faneskift og tastatur
@@ -258,12 +286,13 @@ Påskeæg: tre klik på pyrit, når den ligger på skiltet.
 fra `file://`). Den tjekker oxidationstallene mod de kendte, at de fem
 skemaer er afstemt i atomer og ladning med de mindste tal, at de to skemaer
 for pyrit lagt sammen giver arbejdsarkets skema, at alle sten og opgaver kan
-løses ved at skrive og med Vis svaret, at de typiske fejl får den rigtige
-besked, at der ikke står et facit før tid, at opgaverne på fane 2 åbner én
-ad gangen, at tegningen følger skemaerne, rundvisningen, sproget og
-pladsen fra 1100 × 650 til 1600 × 950 (intet går ud over papiret, og intet
-tal dækker et andet).
-Sidst kørt: ALT OK (188 påstande), 5. oktober 2026.
+løses ved at skrive og med Vis svaret, at klammerne viser ændringen for ét
+atom og kun har pilespids efter reaktionspilen, at de typiske fejl får den
+rigtige besked, at der ikke står et facit før tid (heller ikke i stoffets
+navn), at opgaverne på fane 2 åbner én ad gangen, at tegningen følger
+skemaerne, rundvisningen, sproget og pladsen fra 1100 × 650 til 1600 × 950
+(intet går ud over papiret, og intet tal dækker et andet).
+Sidst kørt: ALT OK (199 påstande), 5. oktober 2026.
 
 ## I menuen
 

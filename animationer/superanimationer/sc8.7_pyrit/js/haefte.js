@@ -4,10 +4,12 @@
    Samme opskrivning som i sc8.5 (Kaliumpermanganat): skemaet staar paa
    ternet papir, oxidationstallet staar over de atomer, der skifter,
    en klamme gaar under skemaet fra atomet foer pilen til det samme
-   grundstof efter pilen, og midt paa klammen, under reaktionspilen,
-   staar gangetallet og stigningen (↑) eller faldet (↓): "2 ↑14" og
-   "7 ↓4". Under hver side staar ladningen, H-atomerne og til sidst
-   O-atomerne som kontrol.
+   grundstof efter pilen (kun dér har klammen en pilespids), og midt paa
+   klammen, under reaktionspilen, staar stigningen (↑) eller faldet (↓)
+   for ét atom med gangetallet og antallet af atomer foran:
+   "2 · 2 ↑7 = 28" og "7 · 2 ↓2 = 28" (2 FeS₂ med 2 S, der hver stiger 7).
+   Under hver side staar ladningen, H-atomerne og til sidst O-atomerne
+   som kontrol.
 
    Nyt i forhold til sc8.5: en formel kan have flere maerkede atomer
    (FeS₂ har Fe med blyant og S som felt), der kan vaere flere end to
@@ -153,6 +155,8 @@
             var g = lav("span", "hf-gange");
             g.appendChild(mig.lavFelt("g" + k, "g", "Gangetallet ved klammen for " + K.E));
             g.appendChild(lav("span", "hf-gtal"));
+            /* Antallet af atomer paa klammen, naar der er flere end ét: "· 2" */
+            g.appendChild(lav("span", "hf-antal"));
             e.appendChild(g);
             var knap = lav("button", "hf-pilknap", "↕");
             knap.type = "button";
@@ -202,6 +206,7 @@
          pil(k)         true (op), false (ned) eller null
          pilLaast(k)    stigningen eller faldet er fundet
          gange          gangetallene kan ses
+         antal(k)       teksten "· 2", naar der er flere atomer paa klammen
          prod(k)        teksten "= 28" ved klammen
          ekstra(slags, side)  "felt", "tal" eller "" (skjult)
          rad(r)         raekken kan ses
@@ -275,6 +280,7 @@
             var g = e.querySelector(".hf-gtal");
             g.textContent = gt ? String(gt.v) : "";
             g.className = "hf-gtal" + (gt ? " " + gt.slags : "");
+            gs.querySelector(".hf-antal").textContent = v.antal ? v.antal(k) : "";
             var pr = e.querySelector(".hf-prod");
             var prod = v.prod(k);
             pr.textContent = prod.tekst || "";
@@ -408,8 +414,10 @@
             sti.setAttribute("d", "M" + ra.cx.toFixed(1) + " " + top.toFixed(1) + " V" + y.toFixed(1) + " H" + rb.cx.toFixed(1) + " V" + top.toFixed(1));
             sti.setAttribute("class", "hf-sti " + K.type + fundet);
             svg.appendChild(sti);
-            /* Smaa pile op mod atomerne i begge ender */
-            [ra.cx, rb.cx].forEach(function (x) {
+            /* En lille pil op mod atomet efter reaktionspilen. Foer pilen gaar
+               stregen op til atomet uden spids, saa klammen laeses fra
+               reaktant til produkt (brugerens oenske 5. okt. 2026). */
+            [rb.cx].forEach(function (x) {
                 var sp = document.createElementNS(ns, "path");
                 var s = Math.max(4, fs * 0.12);
                 sp.setAttribute("d", "M" + (x - s).toFixed(1) + " " + (top + s * 1.5).toFixed(1) + " L" + x.toFixed(1) + " " + top.toFixed(1) +

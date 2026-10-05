@@ -43,10 +43,11 @@
             <div class="ligning lille">S₂O₃²⁻ + 2 H₃O⁺ → S + SO₂ + 3 H₂O</div>
             <div class="vaelger-raekke"><span class="vaelger-navn">Na₂S₂O₃</span>
                 <div class="segment" id="kryds-segment">
-                    <button type="button">40 mL</button><button type="button">30 mL</button><button type="button">20 mL</button>
+                    <button type="button">10 mL</button><button type="button">20 mL</button><button type="button">40 mL</button>
                 </div>
             </div>
             <p class="note" id="kryds-note"></p>
+            <div class="raekke" id="kryds-konc-raekke"><span>[S₂O₃²⁻] i blandingen</span><b id="kryds-konc">0,10 M</b></div>
         </div>
 
         <div class="kort" id="kryds-maaling">
@@ -55,14 +56,17 @@
             <table class="lilletabel" id="kryds-tabel"></table>
         </div>
 
-        <!-- Én knap, der aendrer sig: Start opgave -> Giv hint -> Vis svaret -> Ny opgave -->
+        <!-- Quizzen: fem spoergsmaal. Én knap, der aendrer sig:
+             Start quiz -> Giv hint -> Vis svaret -> Naeste spoergsmaal -> Videre til Koncentration.
+             Prikkerne viser, hvor mange der er rigtige (js/opgave.js). -->
         <div class="kort opgavekort" id="kryds-opgavekort">
-            <h2><span>Opgave</span><span class="hoved-hoejre"><span class="taeller">løst: <b id="kryds-loest">0</b></span><button class="afslut" id="kryds-afslut" type="button" hidden>Afslut</button></span></h2>
-            <p class="opgavetekst" id="kryds-opgavetekst" data-start="Lav et par målinger, og start så en opgave."></p>
+            <h2><span>Quiz</span><span class="hoved-hoejre"><span class="prikker" id="kryds-prikker" role="img" aria-label="0 af 5 rigtige"></span><button class="afslut" id="kryds-afslut" type="button" hidden>Afslut</button></span></h2>
+            <p class="opgavetekst" id="kryds-opgavetekst" data-start="Lav et par målinger, og start så quizzen."></p>
             <div class="valg" id="kryds-valg"></div>
             <p class="besked hint" id="kryds-hint"></p>
             <p class="besked" id="kryds-besked" aria-live="polite"></p>
-            <button class="knap stor blaa" id="kryds-opgaveknap" type="button">Start opgave</button>
+            <p class="fejring" id="kryds-fejring" aria-live="polite"></p>
+            <button class="knap stor blaa" id="kryds-opgaveknap" type="button">Start quiz</button>
         </div>
     </aside>
 </section>
@@ -97,7 +101,7 @@
     <aside class="panel">
         <div class="kort" id="konc-forsoeg">
             <h2>Nyt forsøg</h2>
-            <div class="stepper-raekke"><span class="vaelger-navn">Na₂S₂O₃ <small id="konc-thio-flaske">0,30 M</small></span>
+            <div class="stepper-raekke"><span class="vaelger-navn">Na₂S₂O₃ <small id="konc-thio-flaske">0,50 M</small></span>
                 <button class="trin" type="button" data-stof="thio" data-d="-5" aria-label="5 mL mindre Na₂S₂O₃">−</button><b id="konc-thio">20 mL</b><button class="trin" type="button" data-stof="thio" data-d="5" aria-label="5 mL mere Na₂S₂O₃">+</button>
             </div>
             <div class="stepper-raekke"><span class="vaelger-navn">HCl <small>1,0 M</small></span>

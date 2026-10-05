@@ -15,10 +15,10 @@
         "fane-u": [
             { sel: "#u-montre", titel: "Udstillingen", tekst: "Otte sten på to hylder. Klik på en sten for at arbejde med den." },
             { sel: ".hy-braet", titel: "Hylderne", tekst: "Stenene er ordnet efter den negative ion: sulfider har S²⁻, oxider har O²⁻. Det er din vigtigste oplysning." },
-            { sel: "#u-skilt", titel: "Skiltet", tekst: "Stenens formel. Skriv oxidationstallet i feltet over atomet. Et tal med blyant er givet." },
+            { sel: "#u-skilt", titel: "Skiltet", tekst: "Stenens navn, stoffets navn og formlen. Skriv oxidationstallet i feltet over atomet. Et tal med blyant er givet." },
             { sel: "#u-taster", titel: "Tasterne", tekst: "Et klik skriver tallet i det gule felt. Du kan også skrive +2 eller +II på tastaturet og trykke Enter." },
             { sel: "#u-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Den gule knap giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#u-trappekort", titel: "Trappen", tekst: "Hver løst sten får en prik ved det oxidationstal, svovl eller jern har i den." },
+            { sel: "#u-opgaver", titel: "Stenene", tekst: "De otte sten i rækkefølge. En løst sten bliver grøn. Du kan tage dem i den rækkefølge, du vil." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Pyrit viser, hvad der sker, når pyrit møder luft og vand. Ristning handler om zinkblende og cinnober." }
         ],
         "fane-p": [

@@ -23,12 +23,12 @@
 
     /* Metallerne i animationen. E: standardreduktionspotentialet i volt.
        egen: saa mange mm et roer af metallet taeres pr. aar i vand med
-       ilt, naar det sidder alene (jern ruster, zink langsomt, kobber
-       ikke i denne model). */
+       ilt, naar det sidder alene (jern ruster, zink langsomt, og kobber
+       saa langsomt, at det ikke kan ses paa 20 aar). */
     K.METAL = {
         Mg: { navn: "magnesium", E: -2.37, q: 2, egen: 0.02, farve: "#dfe4ea", kant: "#8a94a1", belaeg: "#f2f4f6", tekst: "#20242b" },
         Zn: { navn: "zink",      E: -0.76, q: 2, egen: 0.02, farve: "#a8c2d6", kant: "#56718a", belaeg: "#e6ebef", tekst: "#16222c" },
-        Fe: { navn: "jern",      E: -0.44, q: 2, egen: 0.05, farve: "#7b8695", kant: "#3d4551", belaeg: "#a9521f", tekst: "#ffffff" },
+        Fe: { navn: "jern",      E: -0.44, q: 2, egen: 0.06, farve: "#7b8695", kant: "#3d4551", belaeg: "#a9521f", tekst: "#ffffff" },
         Cu: { navn: "kobber",    E: 0.34,  q: 2, egen: 0,    farve: "#cf7b41", kant: "#7b4019", belaeg: "#4f9a86", tekst: "#2a1407" }
     };
 
@@ -54,39 +54,66 @@
     K.forskel = function (a, b) { return Math.abs(K.METAL[a].E - K.METAL[b].E); };
 
     /* ----- Fane 1: to roer --------------------------------------------------
-       vaeg: roerets vaeg i mm. aar: saa laenge loeber forsoeget.
-       G: mm pr. aar pr. volt ved samlingen. raekkevidde: hvor langt
-       fra samlingen den ekstra taering naar (del af roerets laengde). */
-    K.ROER = { vaeg: 2.5, aar: 20, G: 0.25, raekkevidde: 0.3, metaller: ["Cu", "Fe", "Zn"] };
+       Vandet loeber fra venstre mod hoejre, saa det venstre roer er det
+       foerste. vaeg: roerets vaeg i mm. aar: saa laenge loeber forsoeget.
+       Ved samlingen taeres det mindst aedle roer ekstra: samling mm pr.
+       aar plus G mm pr. aar pr. volt. ioner: metaller, som vandet tager
+       ioner med fra. Sidder saadan et roer foerst, saetter ionerne sig
+       paa det mindre aedle roer bagefter og tager elektroner fra det
+       (Cu²⁺ + Fe → Cu + Fe²⁺): saa mange mm pr. aar pr. volt.
+       raekkevidde: hvor langt fra samlingen den ekstra taering naar
+       (del af roerets laengde). */
+    K.ROER = { vaeg: 2.5, aar: 20, samling: 0.0455, G: 0.025, ioner: { Cu: 0.16 }, raekkevidde: 0.3, metaller: ["Cu", "Fe", "Zn"] };
 
-    /* a: venstre roer, b: hoejre roer, plast: en plastmuffe imellem.
-       Giver anoden (det roer, der taeres ekstra ved samlingen), farten
-       ved samlingen og hvert roers egen fart. Det aedle roer er
-       beskyttet, saa laenge det faar elektroner fra det andet. */
+    /* a: venstre roer (vandet kommer foerst hertil), b: hoejre roer,
+       plast: en plastmuffe imellem.
+       anode, katode, side og galv: elektronerne over samlingen. Det
+       aedle roer er beskyttet, saa laenge det faar elektroner fra det
+       andet. En plastmuffe standser dem.
+       ioner: { fra, side, fart }, naar vandet tager ioner med fra det
+       foerste roer hen til det andet. Dem standser plastmuffen ikke.
+       svag: den side, der taeres ekstra ved samlingen. hul: aaret, der
+       gaar hul, hvis det sker inden for de 20 aar. */
     K.roerpar = function (a, b, plast) {
         var R = K.ROER;
         var anode = plast ? null : K.mindstAedel(a, b);
         var katode = anode ? (anode === a ? b : a) : null;
-        var galv = anode ? R.G * K.forskel(a, b) : 0;
+        var galv = anode ? R.samling + R.G * K.forskel(a, b) : 0;
         var egen = { v: K.METAL[a].egen, h: K.METAL[b].egen };
         if (anode) {
             if (anode === a) egen.h = 0; else egen.v = 0;
         }
         var side = anode ? (anode === a ? "v" : "h") : null;
-        var fart = side ? egen[side] + galv : 0;
+        var ioner = null;
+        if (R.ioner[a] && K.mindstAedel(a, b) === b) ioner = { fra: a, side: "h", fart: R.ioner[a] * K.forskel(a, b) };
+        var svag = side || (ioner ? ioner.side : null);
+        var fart = svag ? egen[svag] + (side === svag ? galv : 0) + (ioner && ioner.side === svag ? ioner.fart : 0) : 0;
         var hul = fart > 0 ? R.vaeg / fart : Infinity;
+        if (Math.abs(hul - Math.round(hul)) < 1e-6) hul = Math.round(hul);      /* 19,9999… er 20 */
         return {
             a: a, b: b, plast: !!plast, anode: anode, katode: katode, side: side,
-            galv: galv, egen: egen, hul: hul <= R.aar ? hul : null
+            galv: galv, ioner: ioner, svag: svag, svagMetal: svag ? (svag === "v" ? a : b) : null,
+            egen: egen, hul: hul <= R.aar ? hul : null
         };
     };
 
     /* Saa mange mm er vaeggen taeret efter t aar. side: "v" eller "h".
        d: afstanden fra samlingen, 0 ved samlingen og 1 ved roerets ende. */
     K.tab = function (par, side, t, d) {
-        var mm = par.egen[side] * t;
-        if (par.side === side) mm += par.galv * t * Math.exp(-d / K.ROER.raekkevidde);
+        var mm = par.egen[side] * t, ekstra = 0;
+        if (par.side === side) ekstra += par.galv;
+        if (par.ioner && par.ioner.side === side) ekstra += par.ioner.fart;
+        mm += ekstra * t * Math.exp(-d / K.ROER.raekkevidde);
         return Math.min(mm, K.ROER.vaeg);
+    };
+
+    /* Saa stor en del af taeringen i afstanden d skyldes ionerne fra det
+       foerste roer (resten er elektroner, der gaar gennem metallet) */
+    K.ionDel = function (par, side, d) {
+        if (!par.ioner || par.ioner.side !== side) return 0;
+        var f = Math.exp(-d / K.ROER.raekkevidde);
+        var ioner = par.ioner.fart * f;
+        return ioner / (par.egen[side] + (par.side === side ? par.galv * f : 0) + ioner);
     };
 
     /* ----- Fane 2: skibet ------------------------------------------------------

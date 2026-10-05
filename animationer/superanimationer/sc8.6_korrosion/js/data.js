@@ -46,7 +46,7 @@
                     "Vælg Kobber og Jern, tryk på Lad tiden gå, og vent, til tiden standser."
                 ]
             },
-            loest: "Jernrøret blev tæret igennem ved samlingen efter 10 år. Kobberrøret er helt."
+            loest: "Jernrøret blev tæret igennem ved samlingen. Kobberrøret er helt."
         },
         {
             id: "elektroner", navn: "Elektronerne",
@@ -120,16 +120,55 @@
             loest: "Zink er mindre ædelt end jern. Nu er det zinkrøret, der afgiver elektroner, og jernrøret er beskyttet. Spændingsrækken i panelet viser, hvem der afgiver til hvem."
         },
         {
-            id: "plast", navn: "Plastmuffen",
-            opstil: { a: "Cu", b: "Fe", plast: false },
+            id: "retning", navn: "Vandets retning",
+            opstil: { a: "Fe", b: "Cu", plast: false },
+            gaet: {
+                tekst: "Vandet løber fra venstre mod højre. Med kobberrøret først går der hul i jernrøret efter 10 år. Nu er rørene byttet om, så vandet kommer gennem jernrøret først. Gæt, hvornår der går hul.",
+                svar: [
+                    { t: "Før der er gået 10 år" },
+                    { t: "Efter 10 år igen" },
+                    { t: "Senere end efter 10 år", ok: true }
+                ]
+            },
             forsoeg: {
-                tekst: "Et kobberrør skal samles med et jernrør, uden at jernrøret tæres igennem. Sæt en plastmuffe imellem med kontakten øverst i scenen, og lad de 20 år gå.",
-                krav: { par: ["Cu", "Fe"], plast: true },
+                tekst: "Tryk på Lad tiden gå, og se, hvor længe jernrøret holder, når vandet kommer gennem det først.",
+                krav: { par: ["Fe", "Cu"], orden: true, plast: false },
+                set: "Med jernrøret først gik der 20 år, dobbelt så længe.",
+                hint: [
+                    "Knappen Lad tiden gå står øverst i scenen.",
+                    "Jernrøret skal sidde til venstre og kobberrøret til højre. Pilene i rørene viser vandets retning.",
+                    "Vælg Jern til venstre rør og Kobber til højre rør, tryk på Lad tiden gå, og vent, til tiden standser."
+                ]
+            },
+            spm: {
+                tekst: "Sæt kobberrøret først igen, og lad tiden gå. Se i luppen, hvad vandet har med fra kobberrøret. Hvorfor går der hul hurtigere, når vandet kommer fra kobberrøret?",
+                krav: { par: ["Cu", "Fe"], orden: true, plast: false },
+                svar: [
+                    { t: "Vandet har elektroner med fra kobberrøret",
+                      f: "Elektronerne bliver i metallet. Se i luppen, hvad kuglerne med Cu²⁺ gør, når de lander på jernet." },
+                    { t: "Vandet har kobberioner med, og de tager elektroner fra jernet", ok: true },
+                    { t: "Vandet løber hurtigere, når det kommer fra kobberrøret",
+                      f: "Vandet løber lige hurtigt i begge rør. Se i luppen, hvad der lander på jernet." }
+                ],
+                hint: [
+                    "Vælg Kobber til venstre rør og Jern til højre rør, og tryk på Lad tiden gå.",
+                    "Følg en af kuglerne med Cu²⁺ i vandet. Hvor lander den, og hvad sker der med jernatomet under den?",
+                    "Kobber er mere ædelt end jern. En kobberion tager to elektroner fra et jernatom."
+                ]
+            },
+            loest: "Vandet tager lidt kobber med fra kobberrøret som Cu²⁺. På jernrøret tager hver kobberion to elektroner fra et jernatom: Cu²⁺ + Fe → Cu + Fe²⁺. Derfor skal vandet løbe gennem jernrøret først."
+        },
+        {
+            id: "plast", navn: "Plastmuffen",
+            opstil: { a: "Fe", b: "Cu", plast: false },
+            forsoeg: {
+                tekst: "Med jernrøret først gik der stadig hul efter 20 år. Sæt en plastmuffe mellem rørene med kontakten øverst i scenen, og lad de 20 år gå.",
+                krav: { par: ["Fe", "Cu"], orden: true, plast: true },
                 set: "Jernrøret holdt i alle 20 år.",
                 hint: [
                     "Kontakten Plastmuffe står øverst i scenen, til højre for Lad tiden gå.",
-                    "Rørene skal stadig være kobber og jern. Plastmuffen sidder imellem dem.",
-                    "Vælg Kobber og Jern, slå Plastmuffe til, og tryk på Lad tiden gå."
+                    "Jernrøret skal sidde til venstre, så vandet kommer gennem det først. Plastmuffen sidder mellem rørene.",
+                    "Vælg Jern til venstre rør og Kobber til højre rør, slå Plastmuffe til, og tryk på Lad tiden gå."
                 ]
             },
             spm: {
@@ -147,7 +186,7 @@
                     "Plast leder ikke strøm, så elektronerne kan ikke komme over i kobberet."
                 ]
             },
-            loest: "Plast leder ikke strøm. Elektronerne kan ikke komme fra jernet til kobberet, så jernrøret ruster kun langsomt, som om det sad alene. Sådan samler en VVS-montør rør af to forskellige metaller."
+            loest: "Plast leder ikke strøm. Elektronerne kan ikke komme fra jernet til kobberet, så jernrøret ruster kun langsomt, som om det sad alene. Sådan samler en VVS-montør de to slags rør: jernrøret først og plast imellem."
         }
     ];
 
@@ -156,10 +195,13 @@
         return D.Stort(K.navn(par.a)) + (par.plast ? " + plast + " : " + ") + K.navn(par.b);
     };
 
+    /* Aaret, som det staar paa tidslinjen: 10,2 er aar 10 */
+    D.aar = function (t) { return Math.floor(t + 1e-6); };
+
     D.roerResultat = function (par) {
-        if (par.anode) {
-            if (par.hul) return "hul i " + D.roeret(par.anode) + " efter " + Math.round(par.hul) + " år";
-            return D.roeret(par.anode) + " tæret ved samlingen";
+        if (par.svag) {
+            if (par.hul) return "hul i " + D.roeret(par.svagMetal) + " efter " + D.aar(par.hul) + " år";
+            return D.roeret(par.svagMetal) + " tæret ved samlingen";
         }
         var dele = [];
         [par.a, par.b].forEach(function (m) {
@@ -173,10 +215,22 @@
     D.roerForkert = function (krav, par) {
         if (krav.ens) {
             if (par.plast) return "Der sidder en plastmuffe imellem. Find to rør, der kan skrues direkte sammen.";
-            return D.Stort(D.roeret(par.anode)) + " er tæret mest ved samlingen. Prøv to andre rør.";
+            return D.Stort(D.roeret(par.svagMetal)) + " er tæret mest ved samlingen. Prøv to andre rør.";
         }
-        if (krav.plast && !par.plast) return D.Stort(D.roeret(par.anode || "Fe")) + " blev tæret ved samlingen. Sæt plastmuffen imellem, og prøv igen.";
-        return "Opgaven gælder et rør af " + K.navn(krav.par[0]) + " og et af " + K.navn(krav.par[1]) + ". Skift metal under rørene.";
+        var m0 = krav.par[0], m1 = krav.par[1];
+        if (!((par.a === m0 && par.b === m1) || (par.a === m1 && par.b === m0))) {
+            return "Opgaven gælder et rør af " + K.navn(m0) + " og et af " + K.navn(m1) + ". Skift metal under rørene.";
+        }
+        if (krav.orden && par.a !== m0) {
+            if (par.plast && par.ioner) {
+                return "Plastmuffen standser elektronerne, men vandet har stadig " + K.navn(par.ioner.fra) + "ioner med hen til " +
+                    D.roeret(par.b) + ". Sæt " + D.roeret(m0) + " til venstre.";
+            }
+            return "Vandet skal komme gennem " + D.roeret(m0) + " først. Vælg " + D.Stort(K.navn(m0)) + " til venstre rør og " +
+                D.Stort(K.navn(m1)) + " til højre rør.";
+        }
+        if (krav.plast && !par.plast) return D.Stort(D.roeret(par.svagMetal || "Fe")) + " blev tæret ved samlingen. Sæt plastmuffen imellem, og prøv igen.";
+        return "I denne opgave skal rørene skrues direkte sammen. Slå Plastmuffe fra med kontakten øverst i scenen.";
     };
 
     /* ----- Fane 2: Skibet ---------------------------------------------------------- */
@@ -446,7 +500,7 @@
     D.SPM_LINJE = "Vælg et svar i opgavekortet til højre.";
 
     D.FAERDIG = {
-        r: "Alle fem mål er løst. Fortsæt med Skibet.",
+        r: "Alle seks mål er løst. Fortsæt med Skibet.",
         s: "Alle fem mål er løst. Fortsæt med Rusten.",
         j: "Alle seks mål er løst."
     };

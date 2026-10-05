@@ -22,7 +22,7 @@
             { sel: "#rg-regn", titel: "Regnestykket", tekst: "Summen af oxidationstallene er stoffets ladning. Mellemregningerne står med almindelige tal." },
             { sel: "#rg-brikker", titel: "Atomerne", tekst: "Ét atom pr. brik. Er der to Cr, får hver sin brik, og de deler summen." },
             { sel: "#rg-opgaver", titel: "Stofferne", tekst: "De seks første gennemgås trin for trin. Et stof, du løser uden at se svaret, får en stjerne." },
-            { sel: "#rg-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Hjælpen får du med Giv hint ved feltet." },
+            { sel: "#rg-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Klik på ham, så giver han et hint." },
             { sel: "#rg-kknap", titel: "Send ham ud", tekst: "Så står katederet tomt. Samme knap henter ham igen." },
             { sel: ".faneknapper", titel: "Elektronerne", tekst: "Den anden fane viser, hvorfor reglerne virker, og hvornår de ikke gør." }
         ],

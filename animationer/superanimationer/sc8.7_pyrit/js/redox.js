@@ -8,11 +8,11 @@
    at skifte (Fe²⁺ fra pyrit, ZnO).
 
      1. oxidationstallet over de atomer, der skifter
-     2. staar grundstoffet ikke lige mange gange paa begge sider af en
-        klamme, saettes foerst et tal foran (FeS₂ ⟶ 2 SO₄²⁻)
-     3. klammen faar den samlede stigning (↑) eller det samlede fald (↓)
-        for atomerne paa klammen
-     4. gangetallene: stigning i alt = fald i alt, mindste tal. Klammer
+     2. klammen faar stigningen (↑) eller faldet (↓) for ét atom
+     3. staar grundstoffet ikke lige mange gange paa begge sider af en
+        klamme, saettes nu et tal foran (FeS₂ ⟶ 2 SO₄²⁻)
+     4. gangetallene: gangetal · atomer paa klammen · aendring pr. atom
+        skal give det samme for stigning og fald, mindste tal. Klammer
         fra samme stof faar samme gangetal.
      5. stoffer, der foelger med, faar deres tal ved at taelle atomer
      6. ladningen, H⁺, H-atomerne og vand. O er kontrollen til sidst.
@@ -396,25 +396,28 @@
         return K.E + " går fra " + ox(K.fra) + " til " + ox(K.til);
     }
 
-    /* Fejlen i en klamme: retning (true = op) og tallet n. Tom tekst = rigtigt. */
+    /* Fejlen i en klamme: retning (true = op) og tallet n. Ved klammen
+       staar stigningen eller faldet for ÉT atom, som man goer i Danmark
+       (brugerens oenske 5. okt. 2026); antallet af atomer kommer foerst
+       med ved gangetallene. Tom tekst = rigtigt. */
     function klammeFejl(K, op, n) {
         if (op === null) return "Klik på pilen ved " + K.E + ", så den peger op eller ned.";
-        if (n === null || isNaN(n)) return "Skriv, hvor meget " + K.E + " stiger eller falder, i feltet ved pilen.";
+        if (n === null || isNaN(n)) return "Skriv, hvor meget ét " + K.E + " stiger eller falder, i feltet ved pilen.";
         n = Math.abs(n);
         if (op !== K.op) {
             return gaarTekst(K) + ". Tallet bliver " + (K.op ? "større" : "mindre") + ", så pilen skal pege " + (K.op ? "op" : "ned") + ".";
         }
-        if (n === K.tot) return "";
-        if (K.antal > 1 && n === K.delta) {
-            return "Det er for ét " + K.E + ". Der er " + K.antal + " " + K.E + " på klammen, så gang med " + K.antal + ".";
+        if (n === K.delta) return "";
+        if (K.nV > 1 && n === K.delta * K.nV) {
+            return "Det er for " + K.nV + " " + K.E + " tilsammen. Ved klammen står kun, hvor meget ét " + K.E + " " + (K.op ? "stiger" : "falder") + ".";
         }
         if (n === Math.abs(K.fra) + Math.abs(K.til) && K.fra * K.til > 0) {
             return "Du har lagt tallene sammen. Hvor mange trin er der fra " + ox(K.fra) + " til " + ox(K.til) + "?";
         }
-        if ((n === Math.abs(K.til) || n === Math.abs(K.fra)) && n !== K.delta) {
+        if (n === Math.abs(K.til) || n === Math.abs(K.fra)) {
             return "Det er et oxidationstal. Skriv forskellen fra " + ox(K.fra) + " til " + ox(K.til) + ".";
         }
-        return gaarTekst(K) + ". Tæl trinene" + (K.antal > 1 ? ", og gang med de " + K.antal + " " + K.E + " på klammen." : ".");
+        return gaarTekst(K) + ". Tæl trinene.";
     }
 
     /* ----- Mellemregninger til ladning og H ------------------------------------------- */

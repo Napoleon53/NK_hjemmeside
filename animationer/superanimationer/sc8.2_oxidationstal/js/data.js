@@ -100,68 +100,83 @@
        spoerg: de grundstoffer, eleven gaetter paa.
        ekstra / mangler: det atom, der har ionens ekstra elektron, eller som
        mangler én.
-       forklar: teksten, naar regnskabet er gjort op. Tallene i den tjekkes
-       af selvtesten mod modellen. */
+       forklar: én kort saetning om, hvor elektronparrene endte, i ord og
+       uden regnestykker. Den staar i linjen i arbejdsfeltet. Beregningen
+       under linjen (oxidationstal = valenselektroner − elektroner nu, én
+       linje pr. grundstof i spoerg, og summen for en ion) bygges af
+       modellen i js/sim_elektroner.js, saa tallene ikke staar inde i
+       teksten (brugerens test 5. okt. 2026).
+       note: en kort slutbemaerkning, naar reglerne fra fane 1 ikke passer. */
     D.MOLEKYLER = [
         { id: "h2o", navn: "Vand", f: "H2O", q: 0, spoerg: ["O", "H"],
           atomer: [["H", -1, 0], ["O", 0, 0], ["H", 1, 0]],
           bindinger: [[0, 1, 1], [1, 2, 1]],
-          forklar: "O trækker parrene fra begge H. O har 6 valenselektroner og ender med 8: 6 − 8 = −2, så O er −II. Hvert H har mistet sin elektron: 1 − 0 = +1, så H er +I." },
+          forklar: "O har fået begge elektronpar, og hvert H har mistet sin elektron." },
         { id: "hcl", navn: "Hydrogenchlorid", f: "HCl", q: 0, spoerg: ["Cl"],
           atomer: [["H", 0, 0], ["Cl", 1, 0]],
           bindinger: [[0, 1, 1]],
-          forklar: "Cl trækker hårdere end H. Cl har 7 valenselektroner og ender med 8: 7 − 8 = −1, så Cl er −I." },
+          forklar: "Cl har fået elektronparret, og H har mistet sin elektron." },
         { id: "h2s", navn: "Hydrogensulfid", f: "H2S", q: 0, spoerg: ["S"],
           atomer: [["H", -1, 0], ["S", 0, 0], ["H", 1, 0]],
           bindinger: [[0, 1, 1], [1, 2, 1]],
-          forklar: "S trækker hårdere end H, ligesom O i vand. S ender med 8 i stedet for 6: 6 − 8 = −2, så S er −II." },
+          forklar: "S har fået begge elektronpar, ligesom O i vand." },
         { id: "so2", navn: "Svovldioxid", f: "SO2", q: 0, spoerg: ["S"],
           atomer: [["O", -1, 0], ["S", 0, 0], ["O", 1, 0]],
           bindinger: [[0, 1, 2], [1, 2, 2]],
-          forklar: "O tager alle fire elektroner i hver dobbeltbinding. S har kun sit frie par tilbage: 6 − 2 = +4, så S er +IV." },
+          forklar: "Hvert O har fået alle fire elektroner i sin dobbeltbinding. S har kun sit frie elektronpar tilbage." },
         { id: "ch3oh", navn: "Methanol", f: "CH3OH", q: 0, spoerg: ["C"],
           atomer: [["C", 0, 0], ["H", 0, -1], ["H", -1, 0], ["H", 0, 1], ["O", 1, 0], ["H", 2, 0]],
           bindinger: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1], [4, 5, 1]],
-          forklar: "C får parrene fra de tre H, men mister parret til O. C ender med 6: 4 − 6 = −2, så C er −II." },
+          forklar: "C har fået elektronparrene fra de tre H, men mistet parret til O." },
         { id: "c2h4", navn: "Ethen", f: "C2H4", q: 0, spoerg: ["C"],
           atomer: [["C", 0, 0], ["C", 1, 0], ["H", 0, -1], ["H", 0, 1], ["H", 1, -1], ["H", 1, 1]],
           bindinger: [[0, 1, 2], [0, 2, 1], [0, 3, 1], [1, 4, 1], [1, 5, 1]],
-          forklar: "Hvert C får parrene fra sine to H. Dobbeltbindingen mellem de to C deles ligeligt. C ender med 6: 4 − 6 = −2, så C er −II." },
+          forklar: "Hvert C har fået elektronparrene fra sine to H. Dobbeltbindingen mellem de to C er delt ligeligt." },
         { id: "h2", navn: "Hydrogen", f: "H2", q: 0, spoerg: ["H"],
           atomer: [["H", 0, 0], ["H", 1, 0]],
           bindinger: [[0, 1, 1]],
-          forklar: "To ens atomer trækker lige hårdt. Hvert H beholder sin egen elektron: 1 − 1 = 0. Et grundstof har altid 0." },
+          forklar: "To ens atomer trækker lige hårdt, så hvert H har beholdt sin egen elektron.",
+          note: "Et grundstof har altid oxidationstallet 0." },
         { id: "o2", navn: "Oxygen", f: "O2", q: 0, spoerg: ["O"],
           atomer: [["O", 0, 0], ["O", 1, 0]],
           bindinger: [[0, 1, 2]],
-          forklar: "Dobbeltbindingen deles ligeligt. Hvert O har sine 6 elektroner: 6 − 6 = 0. Reglen om −II gælder ikke for grundstoffet." },
+          forklar: "To ens atomer trækker lige hårdt, så dobbeltbindingen er delt ligeligt.",
+          note: "Reglen om −II gælder ikke for grundstoffet." },
         { id: "h2o2", navn: "Hydrogenperoxid", f: "H2O2", q: 0, spoerg: ["O"],
           atomer: [["H", -1, 0], ["O", 0, 0], ["O", 1, 0], ["H", 2, 0]],
           bindinger: [[0, 1, 1], [1, 2, 1], [2, 3, 1]],
-          forklar: "Parret mellem de to O deles. Hvert O får kun ét H's elektron og ender med 7: 6 − 7 = −1, så O er −I. Her passer reglen om −II ikke." },
+          forklar: "Hvert O har fået elektronparret fra sit H, men parret mellem de to O er delt.",
+          note: "Her passer reglen om −II ikke." },
         { id: "of2", navn: "Oxygendifluorid", f: "OF2", q: 0, spoerg: ["O"],
           atomer: [["F", -1, 0], ["O", 0, 0], ["F", 1, 0]],
           bindinger: [[0, 1, 1], [1, 2, 1]],
-          forklar: "F trækker hårdere end O. F tager begge par, og O ender med 4: 6 − 4 = +2, så O er +II. Her er O positiv." },
+          forklar: "F har fået begge elektronpar, så O har mistet to elektroner.",
+          note: "Her er O positiv, så reglen om −II passer ikke." },
         { id: "oh", navn: "Hydroxid-ion", f: "OH", q: -1, spoerg: ["O", "H"], ekstra: 0,
           atomer: [["O", 0, 0], ["H", 1, 0]],
           bindinger: [[0, 1, 1]],
-          forklar: "O får parret fra H og har den ekstra elektron, der gør ionen negativ. O ender med 8: 6 − 8 = −2, så O er −II, og H er +I. Summen (−2) + (+1) = −1 er ionens ladning." },
+          forklar: "O har fået elektronparret fra H og har også ionens ekstra elektron." },
         { id: "nh4", navn: "Ammonium-ion", f: "NH4", q: 1, spoerg: ["N", "H"], mangler: 0,
           atomer: [["N", 0, 0], ["H", 0, -1], ["H", 1, 0], ["H", 0, 1], ["H", -1, 0]],
           bindinger: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]],
-          forklar: "N mangler én af sine 5 elektroner, men får alle fire par. N ender med 8: 5 − 8 = −3, så N er −III, og hvert H er +I. Summen (−3) + 4 · (+1) = +1 er ionens ladning." }
+          forklar: "N har fået alle fire elektronpar. Ionen mangler én elektron." }
     ];
+
+    /* Ordene i beregningen under forklaringen paa fane 2 (og i teorien) */
+    D.REGN_ORD = { ox: "oxidationstal", v: "valenselektroner", nu: "elektroner nu", sum: "summen", ion: "det er ionens ladning" };
 
     /* ----- Replikkerne ---------------------------------------------------------------
        Spoergsmaalet, fejl, hint og ros staar i arbejdsfeltet i scenen, ved
        feltet. Kemichael blander sig ikke: han siger noget, naar han sendes
        ud eller hentes, naar der klikkes paa ham eller koppen, og ved K
-       (INTRO: hvor man er).
+       (INTRO: hvor man er). Et klik paa ham selv giver hintet til det
+       trin, eleven er ved, og er opgaven loest, en kort ros
+       (ROS_KEMICHAEL). Han bliver ikke sur af at blive klikket paa
+       (brugerens test 5. okt. 2026).
 
-       KEMICHAEL_SIGER_HINT: false, saa staar hintet og svaret i
+       KEMICHAEL_SIGER_HINT: false, saa staar hintet og svaret fra knappen i
        arbejdsfeltet lige ved feltet (brugerens test 3. okt. 2026). Med true
-       siger Kemichael dem i sin boble ved katederet, som foer. */
+       siger Kemichael ogsaa dem i sin boble ved katederet, som foer. */
     D.KEMICHAEL_SIGER_HINT = false;
 
     D.INTRO = {
@@ -174,6 +189,8 @@
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Den er i hus.", "Rigtigt regnet.", "Summen passer."];
+    /* Et klik paa Kemichael, naar opgaven er loest */
+    D.ROS_KEMICHAEL = ["Godt klaret.", "Flot arbejde.", "Det var rigtigt. Godt gået.", "Fint. Den er løst.", "Godt arbejde. Sådan skal det gøres."];
 
     D.UD_LINJE = "Fint. Jeg går på lærerværelset.";
     D.IND_LINJE = "Tilbage. Nogen havde taget min stol.";
@@ -185,7 +202,6 @@
         "Kaffen er min. Elektronerne må du gerne flytte.",
         "Stadig kold."
     ];
-    D.PRIK_SIDST = "Jeg sidder her bare. Tæl du.";
 
     /* Paaskeaegget: et elektronpar sluppet over hans kop */
     D.KAFFE_PAR = "Min kaffe er neutral. Lad den blive det.";

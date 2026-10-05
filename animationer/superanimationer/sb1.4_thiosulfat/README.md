@@ -5,7 +5,10 @@ et kryds under glasset forsvinder. Åbn `index.html`. Mappen henter kun filer in
 fra sig selv og fra Kemichael, og den virker også, når den åbnes direkte fra
 harddisken.
 
-Den er ny (24. sept. 2026) og i menuen fra 26. sept. 2026.
+Den er ny (24. sept. 2026) og i menuen fra 26. sept. 2026. Fane 1 er rettet
+5. okt. 2026 efter brugerens test: 0,50 M i flasken og blandinger, hvor
+koncentrationen fordobles, quiz med fem spørgsmål i stedet for opgavekortet, og
+krydset set oppefra lige over glasset med uret over grafen.
 
 ## Bestillingen
 
@@ -16,7 +19,7 @@ Den er ny (24. sept. 2026) og i menuen fra 26. sept. 2026.
    syre" (Basiskemi B, Xperimentér 1) som udgangspunkt. Med derfra: idéen (Δt,
    til krydset er væk, og 1/Δt som mål for hastigheden), en serie med thiosulfat,
    en med syren og en med temperaturen, og spørgsmålene om sammenhængene og
-   tommelfingerreglen. Vejledningen er ikke kopieret: her er det 0,30 M Na₂S₂O₃
+   tommelfingerreglen. Vejledningen er ikke kopieret: her er det 0,50 M Na₂S₂O₃
    og 1,0 M HCl, et bægerglas på 100 mL med 50 mL i alt, et kryds i stedet for en
    plet, syren hældes i til sidst, begge opløsninger står i vandbad i
    temperaturforsøget, og opgaverne er skrevet på ny.
@@ -24,8 +27,8 @@ Den er ny (24. sept. 2026) og i menuen fra 26. sept. 2026.
    hastighedsudtryk i almindelighed. b1.2 ejer energidiagrammet og forklaringen
    på, hvorfor temperaturen virker. b1.3 ejer katalyse. Temperaturen er med her
    som en måling (tommelfingerreglen), og teorien henviser til 1.2 for hvorfor.
-4. **Loftet:** 3 faner og én reaktion. Fane 1 har 3 blandinger og højst 5
-   målinger. Fane 2 og 3 har højst 8 forsøg i tabellen.
+4. **Loftet:** 3 faner og én reaktion. Fane 1 har 3 blandinger, højst 5
+   målinger og en quiz med 5 spørgsmål. Fane 2 og 3 har højst 8 forsøg i tabellen.
 5. **Layoutet:** scene plus panel på alle tre faner. På fane 2 og 3 står tabellen
    under grafen, som på sb1.1 fane 3.
 
@@ -42,23 +45,41 @@ Direkte links: `#krydset`, `#koncentration`, `#temperatur`.
 ### Fane 1: Krydset
 
 Bægerglasset med Na₂S₂O₃ og vand (45 mL) står på et papir med et kryds. Eleven
-trækker måleglasset med 5 mL HCl hen over glasset (eller klikker på det eller
-trykker Tilsæt syren). Uret starter, idet syren rammer. Til højre ses krydset
-oppefra, og væsken bliver mere og mere uklar. Eleven stopper selv uret: klik på
-stopuret, knappen Stop uret eller mellemrum.
+vælger 10, 20 eller 40 mL Na₂S₂O₃. Så er [S₂O₃²⁻] 0,10 M, 0,20 M eller 0,40 M i
+blandingen (står i panelet), og krydset er væk efter ca. 20 s, 10 s og 5 s:
+dobbelt koncentration, halv tid. Eleven trækker måleglasset med 5 mL HCl hen over
+glasset (eller klikker på det eller trykker Tilsæt syren). Uret starter, idet
+syren rammer. Eleven stopper selv uret: klik på stopuret, knappen Stop uret
+eller mellemrum.
+
+Scenen: krydset set oppefra ligger lige over bægerglasset, med to stiplede
+linjer ned til glassets kant, og væsken bliver mere og mere uklar. Uret står
+øverst til højre over grafen. Mellem krydset og glasset er der luft, så
+måleglasset kan hælde uden at dække. Tilbuddet om præsentationen står foroven i
+mellemrummet mellem krydset og uret (`tilpas` i `js/sim_kryds.js` sætter pladsen).
 
 Bagefter tegnes kurven for det dannede svovl med en stiplet streg, hvor krydset
 er væk. En god måling ender på stregen, et tryk for tidligt under den, et for
 sent over den, og linjen under scenen siger hvilket. Glemmer eleven uret, stopper
 det selv efter 2,5 gange den rigtige tid. Uret står stille efter stop, men
-reaktionen fortsætter, så glasset bliver ved med at blive uklart.
+reaktionen fortsætter, så glasset bliver ved med at blive uklart. Tabellen i
+panelet viser [S₂O₃²⁻], Δt og 1/Δt.
 
 Grænserne: for tidligt, når der er mere end 12 % kontrast tilbage (krydset ses
 svagt); for sent efter 1,3 gange den rigtige tid.
 
-Opgaverne: hvorfor krydset forsvinder, hvad der er det samme hver gang, hvor
-mange gange hurtigere (1/Δt), hvor meget thiosulfat der er brugt, og enheden på
-1/Δt.
+**Quizzen** (kortet hedder Quiz, ikke Opgave): fem spørgsmål, ét ad gangen:
+hvorfor krydset forsvinder, hvad der er det samme hver gang, hvor mange gange
+hurtigere (1/Δt), hvor meget thiosulfat der er brugt, og enheden på 1/Δt. Tallene
+er dem, forsøget bør give (0,10 M og 20 s, 0,20 M og 10 s, 0,40 M og 5 s). Hvert
+spørgsmål får ét svar. Et forkert svar viser forklaringen på fejlen og det
+rigtige svar, og spørgsmålet kommer igen til sidst, med nye tal, hvis det har
+flere sæt (`par` og `nr` i `D.KRYDS_OPGAVER`), ellers det samme. Vis svaret
+tæller som forkert. Prikkerne i kortets hoved viser de rigtige. Når alle fem er
+rigtige, kommer der konfetti og linjen "Alle 5 rigtige", og knappen hedder Videre
+til Koncentration. Den lille knap i hovedet hedder så Tag quizzen igen. Logikken
+står i `js/opgave.js` (quiz) og bruges kun på fane 1; fane 2 og 3 har stadig
+opgavekortet.
 
 ### Fane 2: Koncentration
 
@@ -70,7 +91,7 @@ skærmen. Hvert forsøg bliver en række i tabellen. Eleven skriver selv [S₂O�
 
 Et forkert tal får et svar på den typiske fejl: koncentrationen i flasken, delt
 med et forkert rumfang, vendt brøk eller den anden koncentration. Anden gang står
-hele beregningen, fx `[S₂O₃²⁻] = 0,30 M · 20 mL / 50 mL = 0,12 M`, og tallet
+hele beregningen, fx `[S₂O₃²⁻] = 0,50 M · 20 mL / 50 mL = 0,20 M`, og tallet
 udfyldes. Et tal, der er rigtigt afrundet til to betydende cifre, godkendes altid.
 
 Grafen viser 1/Δt mod [S₂O₃²⁻] eller [H₃O⁺] (knappen over grafen). Forsøg, hvor
@@ -83,7 +104,8 @@ fordi lyset går gennem mere eller mindre væske.
 
 ### Fane 3: Temperatur
 
-Samme blanding hver gang (20 mL Na₂S₂O₃, 5 mL HCl, 25 mL vand), fra 5 °C til
+Samme blanding hver gang (10 mL Na₂S₂O₃, 5 mL HCl, 35 mL vand: 0,10 M og 20 s
+ved 20 °C), fra 5 °C til
 60 °C i trin på 5 °C. Termometeret står ved glasset. Grafen viser 1/Δt mod
 temperaturen, og punkterne forbindes, så kurven ses blive stejlere.
 
@@ -96,12 +118,15 @@ Reaktionen: S₂O₃²⁻(aq) + 2 H₃O⁺(aq) → S(s) + SO₂(aq) + 3 H₂O(l)
   thiosulfat først bliver til HS₂O₃⁻ (pKs ≈ 1,7), som så falder fra hinanden. Det
   giver første orden i thiosulfat og en lille, ikke simpel afhængighed af syren,
   som skoleforsøg viser. Den rigtige mekanisme er mere indviklet.
-* **k ved 20 °C** er 7,5·10⁻⁴ s⁻¹, valgt så [S₂O₃²⁻] = 0,12 M og [H₃O⁺] = 0,10 M
-  tager ca. 20 s, som i skoleforsøg.
-* **Flasken** er 0,30 M Na₂S₂O₃ (`C_THIO`). Den var 0,15 M, men så tog fane 1 op
-  til 40 s; brugeren bad 24. sept. 2026 om lidt hurtigere forsøg. Nu tager de tre
-  blandinger på fane 1 ca. 10, 13 og 20 s. Alle tekster henter tallet fra modellen
-  (`M.THIO_TEKST`).
+* **k ved 20 °C** er 9,0·10⁻⁴ s⁻¹, valgt så [S₂O₃²⁻] = 0,10 M og [H₃O⁺] = 0,10 M
+  tager 20 s. Så er Δt · [S₂O₃²⁻] = 2,0 M·s: 0,20 M tager 10 s og 0,40 M 5 s.
+* **Flasken** er 0,50 M Na₂S₂O₃ (`C_THIO`), så V mL i 50 mL giver V/100 M. Den
+  var 0,15 M (fane 1 tog op til 40 s; brugeren bad 24. sept. 2026 om hurtigere
+  forsøg) og derefter 0,30 M med 40, 30 og 20 mL (0,24, 0,18 og 0,12 M). 5. okt.
+  2026 bad brugeren om nemmere koncentrationer, der fordobles. Flasken er fælles
+  for alle tre faner, så fane 2 har også fået de pæne tal, og fane 3 bruger nu
+  10 mL, så tiderne dér er de samme som før. Alle tekster henter tallet fra
+  modellen (`M.THIO_TEKST`).
 * **Temperaturen:** Arrhenius med Eₐ = 50 kJ/mol. Det giver × 1,97 fra 20 til
   30 °C; tommelfingerreglen svarer til ca. 50 kJ/mol ved stuetemperatur. Tallet er
   valgt, ikke målt for netop denne reaktion.
@@ -129,7 +154,7 @@ js/model.js           kemien: blandinger, hastigheden, forløbet og krydset
 js/data.js            Kemichaels replikker, blandingerne og opgaverne
 js/sprites.js         lageret til udstyret og Kemichaels sprites
 js/praesentation.js   tilbuddet Start præsentation / Nej tak (samme fil som sc1.2)
-js/opgave.js          opgavekortet med den ene knap (samme som sb1.1)
+js/opgave.js          opgavekortet med den ene knap (som sb1.1) og quizzen på fane 1
 js/glas.js            tegningen: bord, papir, glas, måleglas, termometer, krydset oppefra, stopur, akser
 js/raekke.js          det, fane 2 og 3 deler: forsøg med ur, der stopper selv, og grafens punkter
 js/sim_kryds.js       fane 1
@@ -144,20 +169,24 @@ _selvtest.html        udviklerværktøj, indgår ikke i animationen
 
 ## At rette i den
 
-**Opgaverne** står i `D.KRYDS_OPGAVER`, `D.KONC_OPGAVER` og `D.TEMP_OPGAVER` i
-`js/data.js`, i samme form som i sb1.1. Tallene i dem regnes af modellen.
+**Opgaverne** står i `D.KRYDS_OPGAVER` (quizzen på fane 1), `D.KONC_OPGAVER` og
+`D.TEMP_OPGAVER` i `js/data.js`, i samme form som i sb1.1. Tallene i dem regnes
+af modellen. Quizzen stiller alle spørgsmål i `D.KRYDS_OPGAVER`, så et sjette
+spørgsmål giver seks prikker.
 **Blandingerne** på fane 1 og 3 og grænserne for rumfang og temperatur står
 også i `js/data.js`. **Modellens tal** står øverst i `js/model.js`. Grænserne for
 for tidligt og for sent står øverst i `js/sim_kryds.js`.
 
 ## Selvtesten
 
-`_selvtest.html` skal åbnes gennem en lokal server. Den tjekker modellen (10 til 20 s på
-fane 1, 1/Δt proportional med [S₂O₃²⁻], lille virkning af syren, × 2 pr. 10 °C,
-krydset væk ved den samme mængde svovl, stofbalancen), tallene, at alle opgaver
-har præcis ét rigtigt svar, forløbet på fane 1 med knap, klik og træk, tidlige og
-sene tryk, tabellens svar på de typiske fejl på fane 2, fane 3, Kemichaels tilbud
-og præsentation og sproget. 24. sept. 2026: ALT OK.
+`_selvtest.html` skal åbnes gennem en lokal server. Den tjekker modellen (20, 10 og
+5 s på fane 1, 1/Δt proportional med [S₂O₃²⁻], lille virkning af syren, × 2 pr.
+10 °C, krydset væk ved den samme mængde svovl, stofbalancen), tallene, at alle
+opgaver har præcis ét rigtigt svar, at quizzens tal er forsøgets, scenens
+opstilling og forløbet på fane 1 med knap, klik og træk, tidlige og sene tryk,
+quizzen (forkert svar kommer igen, nye tal, fejringen, Videre til Koncentration),
+tabellens svar på de typiske fejl på fane 2, fane 3, Kemichaels tilbud og
+præsentation og sproget. 5. okt. 2026: ALT OK.
 
 ## Kemichael
 

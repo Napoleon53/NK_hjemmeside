@@ -71,7 +71,8 @@
 <section class="fane" id="fane-ek" role="tabpanel" aria-label="Elektronerne">
     <div class="scene">
         <canvas id="ek-laerred"></canvas>
-        <!-- Arbejdsfeltet nederst paa tavlen: gaettet, hvad der skal traekkes, og hjaelpen -->
+        <!-- Arbejdsfeltet nederst paa tavlen: gaettet, hvad der skal traekkes, og hjaelpen.
+             Naar regnskabet er gjort op, staar forklaringen med beregningen i ek-forklar. -->
         <div class="arb paa-scene" id="ek-arb">
             <div class="arb-rk">
                 <div class="arb-spm" id="ek-spm"></div>
@@ -79,6 +80,7 @@
                 <button class="knap hjaelp" id="ek-knap" type="button">Giv hint</button>
             </div>
             <p class="arb-besked" id="ek-besked" aria-live="polite"></p>
+            <div class="arb-forklar" id="ek-forklar" aria-live="polite" hidden></div>
         </div>
         <div class="anker" id="ek-anker-molekyle"></div>
         <div class="anker" id="ek-anker-en"></div>
@@ -119,9 +121,12 @@
         </ol>
         <div class="eksempel">
             <span class="eksempel-hoved">Eksempel: vand, <span class="f">H₂O</span></span>
-            O er mere elektronegativt end H (3,5 mod 2,1), så O får begge elektronpar.<br>
-            O havde 6 valenselektroner og har nu 8: 6 − 8 = −2, så O er −II.<br>
-            Hvert H havde 1 og har nu 0: 1 − 0 = +1, så H er +I.
+            O er mere elektronegativt end H (3,5 mod 2,1), så O får begge elektronpar.
+            <div class="fk-regn">
+                <span class="fk-v fk-ord">oxidationstal</span><span>=</span><span class="fk-ord">valenselektroner</span><span>−</span><span class="fk-ord">elektroner nu</span><span></span><span></span><span></span>
+                <span class="fk-v">O</span><span>=</span><span>6</span><span>−</span><span>8</span><span>=</span><span class="fk-res">−2</span><span class="fk-saa">så O er <b>−II</b></span>
+                <span class="fk-v">H</span><span>=</span><span>1</span><span>−</span><span>0</span><span>=</span><span class="fk-res">+1</span><span class="fk-saa">så H er <b>+I</b></span>
+            </div>
         </div>
         <p>Fanen Elektronerne viser det molekyle for molekyle.</p>
         <h3 class="teori-hoved">Reglerne: en genvej</h3>

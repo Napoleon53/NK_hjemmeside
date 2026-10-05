@@ -20,6 +20,14 @@
    Fanen kalder kortet.klaret(), naar en opgave uden svarknapper er loest.
    Den foerste loeste opgave fjerner ogsaa tilbuddet om Kemichaels
    praesentation (sim.afvisTilbud), for saa er eleven kommet i gang.
+
+   QUIZ (fane 1): new NK.Opgavekort(p, liste, sim, { videreTekst, videre })
+   Listens spoergsmaal stilles ét ad gangen, og hvert faar ét svar. Et
+   forkert svar (eller Vis svaret) viser det rigtige, og spoergsmaalet
+   kommer igen til sidst, med nye tal, hvis det har flere saet. Naar alle
+   er besvaret rigtigt, fejres det, og knappen foerer videre
+   (quiz.videre). Prikkerne i kortets hoved viser, hvor mange der er
+   rigtige. Elementer ud over de faelles: p-prikker og p-fejring.
    ===================================================================== */
 (function () {
     "use strict";
@@ -33,16 +41,32 @@
         ny:    { tekst: "Ny opgave",    klasse: "knap stor blaa banker" }
     };
 
-    NK.saetKnaptrin = function (id, trin) {
-        NK.saetTekst(id, KNAPTRIN[trin].tekst);
-        NK.saetKlasse(id, KNAPTRIN[trin].klasse);
+    /* Quizzen bruger de samme trin med sine egne ord */
+    var QUIZTRIN = {
+        start: { tekst: "Start quiz",       klasse: "knap stor blaa" },
+        hint:  KNAPTRIN.hint,
+        svar:  KNAPTRIN.svar,
+        ny:    { tekst: "Næste spørgsmål",  klasse: "knap stor blaa banker" },
+        slut:  { tekst: "Videre",           klasse: "knap stor groen" }
     };
 
-    /* p: forstavelsen paa elementernes id, fx "kurve" */
-    function Opgavekort(p, liste, sim) {
+    var KONFETTI = ["#f2c53d", "#57d18c", "#5fb6f0", "#c9a6ff", "#ff8a80", "#f0a830"];
+
+    NK.saetKnaptrin = function (id, trin, quiz) {
+        var t = (quiz ? QUIZTRIN : KNAPTRIN)[trin];
+        NK.saetTekst(id, trin === "slut" && quiz.videreTekst ? quiz.videreTekst : t.tekst);
+        NK.saetKlasse(id, t.klasse);
+    };
+
+    /* p: forstavelsen paa elementernes id, fx "kurve". quiz: se oeverst */
+    function Opgavekort(p, liste, sim, quiz) {
         this.p = p;
         this.liste = liste;
         this.sim = sim;
+        this.quiz = quiz || null;
+        this.koe = [];              /* quiz: de spoergsmaal, der mangler et rigtigt svar */
+        this.def = null;
+        this.rigtige = 0;
         this.trin = "start";
         this.opgave = null;
         this.antalLoest = 0;
@@ -51,13 +75,14 @@
         this.knapper = [];
         var mig = this;
         NK.el(p + "-opgaveknap").addEventListener("click", function () { mig.tryk(); });
-        NK.el(p + "-afslut").addEventListener("click", function () { mig.afslut(); });
+        NK.el(p + "-afslut").addEventListener("click", function () { mig.lilleKnap(); });
         this.vis();
     }
 
     var P = Opgavekort.prototype;
 
     P.tryk = function () {
+        if (this.trin === "slut") { if (this.quiz.videre) this.quiz.videre(); return; }
         if (this.trin === "start" || this.trin === "ny") { this.ny(); return; }
         if (this.trin === "hint") {
             this.saet("hint", "Hint: " + this.opgave.hint, "hint");
@@ -76,6 +101,7 @@
                 this.sim.visSvar(this.opgave);
                 this.saet("besked", this.opgave.rigtigTekst, "besked gul");
             }
+            if (this.quiz) this.koe.push(this.def);
             this.trin = "ny";
         }
         this.vis();
@@ -83,6 +109,10 @@
 
     P.valgNaeste = function () {
         var liste = this.liste, def;
+        if (this.quiz) {
+            if (!this.opgave) { this.koe = liste.slice(); this.rigtige = 0; }
+            return this.koe.shift();
+        }
         if (this.naesteNr < liste.length) {
             def = liste[this.naesteNr++];
         } else {
@@ -96,6 +126,7 @@
 
     P.ny = function () {
         var def = this.valgNaeste();
+        this.def = def;
         this.opgave = def.lav();
         this.opgave.id = def.id;
         this.opgave.vist = false;
@@ -135,6 +166,19 @@
             this.knapper[i].classList.add("rigtig");
             this.knapper.forEach(function (b) { b.disabled = true; });
             this.klaret("Rigtigt. " + v.forklaring);
+        } else if (this.quiz) {
+            /* Ét svar pr. spoergsmaal: det rigtige vises, og spoergsmaalet kommer igen */
+            var mig = this;
+            o.vist = true;
+            o.valg.forEach(function (x, j) {
+                if (x.rigtig) mig.knapper[j].classList.add("rigtig");
+                mig.knapper[j].disabled = true;
+            });
+            this.knapper[i].classList.add("forkert");
+            this.koe.push(this.def);
+            this.saet("besked", v.forklaring, "besked skidt");
+            this.trin = "ny";
+            this.vis();
         } else {
             this.knapper[i].classList.add("forkert");
             this.knapper[i].disabled = true;
@@ -147,15 +191,51 @@
         var o = this.opgave;
         if (!o || o.loest) return;
         o.loest = true;
-        if (!o.vist) this.antalLoest++;
+        if (!o.vist) { this.antalLoest++; this.rigtige++; }
         this.saet("besked", tekst || ("Rigtigt. " + (o.rigtigTekst || "")), "besked god");
-        this.trin = "ny";
+        this.trin = this.quiz && !this.koe.length ? "slut" : "ny";
         this.vis();
+        if (this.trin === "slut") this.fejr();
         if (this.sim.afvisTilbud) this.sim.afvisTilbud();
+    };
+
+    /* Quizzen er klaret: konfetti ud fra kortets hoved */
+    P.fejr = function () {
+        var kort = NK.el(this.p + "-opgavekort");
+        if (!kort) return;
+        var r = kort.getBoundingClientRect();
+        var boks = document.createElement("div");
+        boks.className = "konfetti";
+        boks.setAttribute("aria-hidden", "true");
+        boks.style.left = (r.left + r.width / 2) + "px";
+        boks.style.top = (r.top + 18) + "px";
+        for (var i = 0; i < 46; i++) {
+            var b = document.createElement("i"), v = NK.r(-Math.PI * 0.95, -Math.PI * 0.05), fart = NK.r(70, 210);
+            b.style.backgroundColor = KONFETTI[i % KONFETTI.length];
+            b.style.setProperty("--dx", (Math.cos(v) * fart * 1.15).toFixed(0) + "px");
+            b.style.setProperty("--op", (Math.sin(v) * fart).toFixed(0) + "px");
+            b.style.setProperty("--ned", NK.r(160, 340).toFixed(0) + "px");
+            b.style.setProperty("--rot", NK.r(-720, 720).toFixed(0) + "deg");
+            b.style.animationDelay = NK.r(0, 0.18).toFixed(2) + "s";
+            if (i % 3 === 0) b.style.borderRadius = "50%";
+            boks.appendChild(b);
+        }
+        document.body.appendChild(boks);
+        window.setTimeout(function () { if (boks.parentNode) boks.parentNode.removeChild(boks); }, 2600);
+    };
+
+    /* Den lille knap i kortets hoved: Afslut, eller quizzen forfra, naar den er klaret */
+    P.lilleKnap = function () {
+        var igen = this.trin === "slut";
+        this.afslut();
+        if (igen) this.ny();
     };
 
     P.afslut = function () {
         this.opgave = null;
+        this.def = null;
+        this.koe = [];
+        this.rigtige = 0;
         this.trin = "start";
         NK.el(this.p + "-valg").innerHTML = "";
         this.knapper = [];
@@ -176,10 +256,37 @@
     };
 
     P.vis = function () {
-        NK.saetKnaptrin(this.p + "-opgaveknap", this.trin);
+        NK.saetKnaptrin(this.p + "-opgaveknap", this.trin, this.quiz);
         NK.saetTekst(this.p + "-loest", String(this.antalLoest));
         NK.saetTekst(this.p + "-opgavetekst", this.opgave ? this.opgave.tekst : this.starttekst());
         NK.el(this.p + "-afslut").hidden = !this.opgave;
+        if (this.quiz) this.visQuiz();
+    };
+
+    /* Quiz: prikkerne, linjen med fejringen og den lille knap */
+    P.visQuiz = function () {
+        var n = this.liste.length, h = "", slut = this.trin === "slut";
+        for (var i = 0; i < n; i++) h += i < this.rigtige ? '<i class="rigtig"></i>' : "<i></i>";
+        NK.saetHTML(this.p + "-prikker", h);
+        var prikker = NK.el(this.p + "-prikker");
+        if (prikker) {
+            prikker.setAttribute("aria-label", this.rigtige + " af " + n + " rigtige");
+            prikker.classList.toggle("alle", slut);
+        }
+        NK.saetTekst(this.p + "-fejring", slut ? "Alle " + n + " rigtige. Godt klaret!" : "");
+        NK.saetTekst(this.p + "-afslut", slut ? "Tag quizzen igen" : "Afslut");
+        var kort = NK.el(this.p + "-opgavekort");
+        if (kort) kort.classList.toggle("klaret", slut);
+        if (this.opgave) this.rulTil();
+    };
+
+    /* Quiz: panelet ruller, saa hele kortet med svaret og knappen kan ses */
+    P.rulTil = function () {
+        var kort = NK.el(this.p + "-opgavekort"), panel = kort && kort.parentNode;
+        if (!panel || panel.scrollHeight <= panel.clientHeight + 1) return;
+        var k = kort.getBoundingClientRect(), r = panel.getBoundingClientRect();
+        if (k.bottom > r.bottom - 10) panel.scrollTop += Math.min(k.bottom - r.bottom + 12, k.top - r.top - 10);
+        else if (k.top < r.top + 10) panel.scrollTop -= r.top + 10 - k.top;
     };
 
     P.starttekst = function () {

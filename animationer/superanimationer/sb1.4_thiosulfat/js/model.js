@@ -33,13 +33,13 @@
     var NK = window.NK;
 
     var M = {
-        C_THIO: 0.30,      /* M, Na₂S₂O₃ i flasken (0,15 M foer 24.09.2026: fane 1 var for langsom) */
+        C_THIO: 0.50,      /* M, Na₂S₂O₃ i flasken (0,30 M foer 05.10.2026: 0,50 M giver paene tal, V mL i 50 mL er V/100 M) */
         C_SYRE: 1.0,       /* M, HCl i flasken */
         KS: 0.02,          /* M, syrestyrken for HS₂O₃⁻ (pKs ≈ 1,7) */
         EA: 50000,         /* J/mol */
         R: 8.314,          /* J/(mol·K) */
         T_REF: 20,         /* °C */
-        K_REF: 7.5e-4,     /* s⁻¹ ved 20 °C: [S₂O₃²⁻] = 0,12 M og [H₃O⁺] = 0,10 M giver ca. 20 s */
+        K_REF: 9.0e-4,     /* s⁻¹ ved 20 °C: [S₂O₃²⁻] = 0,10 M og [H₃O⁺] = 0,10 M giver 20 s, 0,20 M 10 s og 0,40 M 5 s */
         S_KRYDS: 1.5e-3,   /* M svovl, naar krydset er vaek med 50 mL i glasset */
         V_REF: 50,         /* mL */
         V_GLAS: 100,       /* mL, baegerglasset */

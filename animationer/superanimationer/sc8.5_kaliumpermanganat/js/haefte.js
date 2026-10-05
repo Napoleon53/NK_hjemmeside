@@ -469,8 +469,10 @@
                 sti.setAttribute("d", d);
                 sti.setAttribute("class", "hf-sti " + t + (v.pilLaast(t) ? " fundet" : ""));
                 svg.appendChild(sti);
-                /* Smaa pile op mod atomerne i begge ender */
-                [ra.cx, rb.cx].forEach(function (x) {
+                /* En lille pil op mod atomet efter reaktionspilen. Foer pilen gaar
+                   stregen op til atomet uden spids, saa klammen laeses fra
+                   reaktant til produkt (brugerens oenske 5. okt. 2026). */
+                [rb.cx].forEach(function (x) {
                     var sp = document.createElementNS(ns, "path");
                     var s = Math.max(4, fs * 0.12);
                     sp.setAttribute("d", "M" + (x - s).toFixed(1) + " " + (top + s * 1.5).toFixed(1) + " L" + x.toFixed(1) + " " + top.toFixed(1) +

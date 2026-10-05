@@ -99,7 +99,7 @@
         return this.forsoeg.filter(function (r) { return r.nr === nr; })[0] || null;
     };
 
-    /* Den paene beregning: [S₂O₃²⁻] = 0,30 M · 20 mL / 50 mL = 0,12 M */
+    /* Den paene beregning: [S₂O₃²⁻] = 0,50 M · 20 mL / 50 mL = 0,20 M */
     P.beregning = function (r, stof) {
         var s = STOF[stof];
         return s.navn + " = " + s.flaskeTekst + " · " + r[s.vol] + " mL / " + r.v + " mL = " + NK.bet(r[stof], 2) + " M";

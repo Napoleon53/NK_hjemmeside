@@ -22,9 +22,10 @@
    [S₂O₃²⁻], lille virkning af syren og en fordobling pr. ca. 10 °C, at
    krydset forsvinder ved den samme maengde svovl, at forloebet paa
    fane 1 kan gennemfoeres med knap, klik og traek, at tidlige og sene
-   tryk genkendes, at tabellen paa fane 2 svarer paa de typiske fejl,
-   at opgaverne har praecis ét rigtigt svar, Kemichaels tilbud og
-   sproget. Skal koeres gennem en lokal server (Chrome maa ikke kigge
+   tryk genkendes, quizzen paa fane 1 (fem spoergsmaal, et forkert
+   kommer igen, fejringen), at tabellen paa fane 2 svarer paa de
+   typiske fejl, at opgaverne har praecis ét rigtigt svar, Kemichaels
+   tilbud og sproget. Skal koeres gennem en lokal server (Chrome maa ikke kigge
    ind i en iframe paa file://).
    ===================================================================== */
 var linjer = [];
@@ -69,10 +70,13 @@ function koer() {
     overskrift("2. Modellen");
     var bl = M.blanding(40, 5, 5);
     paastand("flasken er " + M.THIO_TEKST + " Na₂S₂O₃, og 40 mL + 5 mL HCl + 5 mL vand giver [S₂O₃²⁻] = " + NK.bet(bl.c, 3) + " M og [H₃O⁺] = " + NK.bet(bl.h, 3) + " M",
-        M.C_THIO === 0.3 && naer(bl.c, M.C_THIO * 40 / 50) && naer(bl.h, 0.1) && bl.v === 50);
+        M.C_THIO === 0.5 && naer(bl.c, 0.4) && naer(bl.h, 0.1) && bl.v === 50);
     var t40 = M.tidTilKryds(40, 5, 5), t30 = M.tidTilKryds(30, 5, 15), t20 = M.tidTilKryds(20, 5, 25), t10 = M.tidTilKryds(10, 5, 35);
-    paastand("fane 1 ved 20 °C: 40 mL tager " + NK.tal(t40, 1) + " s, 30 mL " + NK.tal(t30, 1) + " s og 20 mL " + NK.tal(t20, 1) + " s (højst ca. 20 s)",
-        t40 > 9.5 && t40 < 11 && t20 > 19 && t20 < 21.5);
+    paastand("fane 1 ved 20 °C: 10 mL tager " + NK.tal(t10, 1) + " s, 20 mL " + NK.tal(t20, 1) + " s og 40 mL " + NK.tal(t40, 1) + " s (ca. 20, 10 og 5 s)",
+        t10 > 19.6 && t10 < 20.6 && t20 > 9.8 && t20 < 10.3 && t40 > 4.9 && t40 < 5.15);
+    var kc = D.KRYDS_BLANDINGER.map(function (ml) { return M.blanding(ml, D.SYRE_ML, D.GLAS_ML - ml); });
+    paastand("fane 1: koncentrationen fordobles fra blanding til blanding (" + kc.map(function (x) { return NK.bet(x.c, 2); }).join(", ") + " M), og der er 50 mL hver gang",
+        kc.length === 3 && naer(kc[0].c, 0.1) && naer(kc[1].c, 0.2) && naer(kc[2].c, 0.4) && kc.every(function (x) { return x.v === 50 && naer(x.h, 0.1); }));
     paastand("1/Δt proportional med [S₂O₃²⁻]: 20 mL giver " + NK.tal(t20 / t40, 2) + " gange tiden, 10 mL " + NK.tal(t10 / t40, 2),
         naer(t20 / t40, 2, 0.03) && naer(t10 / t40, 4, 0.05) && naer(t30 / t40, 4 / 3, 0.03));
     var h5 = M.tidTilKryds(20, 5, 25), h10 = M.tidTilKryds(20, 10, 20), h20 = M.tidTilKryds(20, 20, 10);
@@ -123,6 +127,21 @@ function koer() {
             paastand(par[0] + "/" + def.id + ": ét rigtigt svar, forskellige svar, forklaring og hint", ok, note);
         });
     });
+    /* Quizzens tal er dem, forsoeget boer give */
+    D.KRYDS_OPGAVER.forEach(function (x) { if (x.nr !== undefined) x.nr = 0; });
+    var tider = D.KRYDS_BLANDINGER.map(function (ml) { return Math.round(M.tidTilKryds(ml, D.SYRE_ML, D.GLAS_ML - ml)); });
+    var hur = D.KRYDS_OPGAVER.filter(function (x) { return x.id === "hurtigere"; })[0];
+    var ht = [hur.lav(), hur.lav(), hur.lav()];
+    function har(t, dele) { return dele.every(function (x) { return t.indexOf(x) >= 0; }); }
+    function detRigtige(o) { return o.valg.filter(function (v) { return v.rigtig; })[0].tekst; }
+    paastand("quiz, hastigheden: forsøgets tider (" + tider.join(", ") + " s) i tre sæt tal med svarene " + ht.map(detRigtige).join(", "),
+        tider.join() === "20,10,5" && har(ht[0].tekst, ["0,10 M", "20 s", "0,20 M", "10 s"]) && har(ht[1].tekst, ["0,20 M", "10 s", "0,40 M", "5 s"])
+        && har(ht[2].tekst, ["0,10 M", "20 s", "0,40 M", "5 s"]) && ht.map(detRigtige).join() === "2 gange,2 gange,4 gange");
+    var bru = D.KRYDS_OPGAVER.filter(function (x) { return x.id === "brugtOp"; })[0];
+    var bt = [bru.lav(), bru.lav()];
+    paastand("quiz, brugt thiosulfat: 0,10 M giver " + detRigtige(bt[0]) + " og 0,20 M " + detRigtige(bt[1]),
+        har(bt[0].tekst, ["10 mL", "0,10 M", "0,0015 M"]) && detRigtige(bt[0]) === "Ca. 1,5 %" && har(bt[1].tekst, ["20 mL", "0,20 M"]) && detRigtige(bt[1]) === "Ca. 0,75 %");
+    D.KRYDS_OPGAVER.forEach(function (x) { if (x.nr !== undefined) x.nr = 0; });
     D.KONC_OPGAVER.forEach(function (x) { if (x.nr !== undefined) x.nr = 0; });
     o = D.KONC_OPGAVER.filter(function (x) { return x.id === "beregn"; })[0].lav();
     var rig = o.valg.filter(function (v) { return v.rigtig; })[0];
@@ -138,6 +157,16 @@ function koer() {
     var K = S.kryds;
     K.maalinger = []; K.naesteNr = 1; K.valgt = 0; K.klar();
     K.tilpas();
+    var ly = K.lay;
+    paastand("krydset set oppefra ligger lige over glasset, og uret står over grafen",
+        Math.abs(ly.op.x - ly.bgX) < 1 && ly.op.y + ly.op.r < ly.bg.y && ly.op.y - ly.op.r > 30
+        && ly.ur.x > ly.graf.x0 && ly.ur.x < ly.graf.x1 && ly.ur.y + ly.ur.r < ly.graf.y0 && ly.ur.x - ly.ur.r > ly.op.x + ly.op.r);
+    var hs = K.haeldested(), kh = ly.mg.h / 260;
+    paastand("måleglasset hælder uden at dække krydset set oppefra", Math.hypot(hs.x - ly.op.x, hs.y - ly.op.y) > ly.op.r + 30 * kh
+        && Math.hypot(hs.x - 198 * kh - ly.op.x, hs.y + 140 * kh - ly.op.y) > ly.op.r);
+    paastand("de tre blandinger står på knapperne: " + D.KRYDS_BLANDINGER.join(", ") + " mL",
+        Array.prototype.map.call(d.querySelectorAll("#kryds-segment button"), function (k) { return k.textContent; }).join() === "10 mL,20 mL,40 mL"
+        && d.getElementById("kryds-konc").textContent === "0,10 M");
     paastand("knappen starter som Tilsæt syren, og linjen siger næste skridt",
         d.getElementById("kryds-knap").textContent.indexOf("Tilsæt syren") === 0 && d.getElementById("kryds-status").textContent.indexOf("Træk måleglasset") === 0);
     d.getElementById("kryds-knap").click();
@@ -152,7 +181,8 @@ function koer() {
     var m = K.stop(false);
     paastand("stop ved den rigtige tid: god måling, og punktet ligger på stregen", m && m.vurdering === "god" && naer(m.forl.svovl(m.dt), M.S_KRYDS, 0.02)
         && d.getElementById("kryds-status").className.indexOf("god") >= 0);
-    paastand("målingen står i tabellen med Δt og 1/Δt", d.querySelectorAll("#kryds-tabel tbody tr").length === 1
+    paastand("målingen står i tabellen med [S₂O₃²⁻], Δt og 1/Δt", d.querySelectorAll("#kryds-tabel tbody tr").length === 1
+        && d.querySelectorAll("#kryds-tabel tbody td")[1].textContent === "0,10"
         && d.getElementById("kryds-tabel").textContent.indexOf(NK.tal(m.dt, 1)) >= 0 && d.getElementById("kryds-tabel").textContent.indexOf(NK.bet(1 / m.dt, 3)) >= 0);
     var kFoer = K.kontrastNu(); K.koer(5);
     paastand("uret står stille, men glasset bliver ved med at blive uklart", K.t === m.dt && K.kontrastNu() < kFoer);
@@ -160,7 +190,8 @@ function koer() {
     d.getElementById("kryds-knap").click();
     paastand("Forfra: et nyt glas, målingen bliver stående", K.tilstand === "klar" && K.maalinger.length === 1 && K.kontrastNu() === 1);
     d.querySelectorAll("#kryds-segment button")[2].click();
-    paastand("20 mL Na₂S₂O₃ vælges i panelet", K.valgt === 2 && d.getElementById("kryds-note").textContent.indexOf("20 mL " + M.THIO_TEKST) === 0);
+    paastand("40 mL Na₂S₂O₃ vælges i panelet, og koncentrationen i blandingen står der", K.valgt === 2
+        && d.getElementById("kryds-note").textContent.indexOf("40 mL " + M.THIO_TEKST) === 0 && d.getElementById("kryds-konc").textContent === "0,40 M");
     K.startHaeld(); K.koer(0.6 + K.forl.dtKryds * 0.4);
     m = K.stop(false);
     paastand("for tidligt: genkendt, og punktet ligger under stregen", m.vurdering === "tidlig" && m.forl.svovl(m.dt) < 0.8 * M.S_KRYDS
@@ -202,17 +233,71 @@ function koer() {
     pil("pointerdown", K.lay.op.x, K.lay.op.y); pil("pointerup", K.lay.op.x, K.lay.op.y);
     paastand("et klik på krydset oppefra svarer", d.getElementById("kryds-status").textContent.indexOf("Oppefra ses krydset") === 0);
     paastand("højst " + D.MAKS_KRYDS + " målinger", K.maalinger.length === D.MAKS_KRYDS && d.querySelectorAll("#kryds-tabel tbody tr").length === D.MAKS_KRYDS);
+    /* Quizzen: fem spoergsmaal, ét svar til hvert, og et forkert kommer igen */
     var kort = K.kort;
-    kort.naesteNr = 0;
-    kort.tryk();
-    paastand("første opgave er hvorfor krydset forsvinder, med fire svar", kort.opgave.id === "hvorfor" && d.querySelectorAll("#kryds-valg .valgknap").length === 4);
-    var forkert = kort.opgave.valg.map(function (v, j) { return v.rigtig ? -1 : j; }).filter(function (j) { return j >= 0; })[0];
-    kort.knapper[forkert].click();
-    paastand("et forkert svar giver forklaringen på fejlen", d.getElementById("kryds-besked").textContent === kort.opgave.valg[forkert].forklaring);
-    var loest = kort.antalLoest;
-    kort.knapper[kort.opgave.valg.map(function (v) { return v.rigtig; }).indexOf(true)].click();
-    paastand("et rigtigt svar tæller og giver Ny opgave", kort.antalLoest === loest + 1 && d.getElementById("kryds-opgaveknap").textContent === "Ny opgave");
     kort.afslut();
+    D.KRYDS_OPGAVER.forEach(function (x) { if (x.nr !== undefined) x.nr = 0; });
+    function knapTekst() { return d.getElementById("kryds-opgaveknap").textContent; }
+    function prikker() { return d.querySelectorAll("#kryds-prikker i.rigtig").length; }
+    function beskedTekst() { return d.getElementById("kryds-besked").textContent; }
+    function svar(rigtig) {
+        var nr = kort.opgave.valg.map(function (v) { return v.rigtig; }).indexOf(rigtig);
+        kort.knapper[nr].click();
+        return nr;
+    }
+    paastand("kortet hedder Quiz, knappen Start quiz, og der er fem tomme prikker", d.querySelector("#kryds-opgavekort h2 span").textContent === "Quiz"
+        && knapTekst() === "Start quiz" && d.querySelectorAll("#kryds-prikker i").length === 5 && prikker() === 0
+        && d.getElementById("kryds-opgavekort").innerText.toLowerCase().indexOf("opgave") < 0);
+    kort.tryk();
+    paastand("første spørgsmål er hvorfor krydset forsvinder, med fire svar", kort.opgave.id === "hvorfor" && d.querySelectorAll("#kryds-valg .valgknap").length === 4);
+    var forkert = svar(false);
+    paastand("et forkert svar: forklaringen på fejlen, det rigtige svar vises, og der kan ikke svares igen",
+        beskedTekst() === kort.opgave.valg[forkert].forklaring && kort.knapper[forkert].classList.contains("forkert")
+        && d.querySelectorAll("#kryds-valg .valgknap.rigtig").length === 1 && kort.knapper.every(function (b) { return b.disabled; })
+        && prikker() === 0 && knapTekst() === "Næste spørgsmål");
+    kort.tryk();
+    paastand("knappen giver det næste spørgsmål", kort.opgave.id === "samme" && beskedTekst() === "");
+    svar(true);
+    paastand("et rigtigt svar giver en grøn prik og forklaringen", prikker() === 1 && beskedTekst().indexOf("Rigtigt. ") === 0 && knapTekst() === "Næste spørgsmål");
+    kort.tryk();
+    var t1 = kort.opgave.tekst;
+    paastand("spørgsmålet om hastigheden bruger forsøgets tal", kort.opgave.id === "hurtigere" && har(t1, ["0,10 M", "20 s", "0,20 M", "10 s"]));
+    kort.tryk();
+    paastand("knappen giver et hint og hedder så Vis svaret", d.getElementById("kryds-hint").textContent.indexOf("Hint: ") === 0 && knapTekst() === "Vis svaret");
+    kort.tryk();
+    paastand("Vis svaret viser svaret, men giver ingen prik", prikker() === 1 && d.querySelectorAll("#kryds-valg .valgknap.rigtig").length === 1
+        && beskedTekst().indexOf("Svaret er 2 gange.") === 0 && knapTekst() === "Næste spørgsmål");
+    kort.tryk(); svar(true);
+    kort.tryk(); svar(true);
+    paastand("efter de fem spørgsmål mangler to, og quizzen fortsætter", prikker() === 3 && kort.koe.length === 2 && knapTekst() === "Næste spørgsmål");
+    kort.tryk();
+    paastand("det forkerte spørgsmål kommer igen til sidst", kort.opgave.id === "hvorfor");
+    svar(true);
+    kort.tryk();
+    var t2 = kort.opgave.tekst;
+    paastand("spørgsmålet med tal kommer igen med nye tal", kort.opgave.id === "hurtigere" && t2 !== t1 && har(t2, ["0,20 M", "10 s", "0,40 M", "5 s"]));
+    svar(false);
+    paastand("forkert igen: stadig fire prikker", prikker() === 4 && knapTekst() === "Næste spørgsmål");
+    kort.tryk();
+    paastand("og et tredje sæt tal", kort.opgave.id === "hurtigere" && kort.opgave.tekst !== t1 && kort.opgave.tekst !== t2);
+    svar(true);
+    paastand("alle fem rigtige: fejring, fem grønne prikker og knappen Videre til Koncentration", kort.trin === "slut" && prikker() === 5
+        && d.getElementById("kryds-fejring").textContent.indexOf("Alle 5 rigtige") === 0 && w.getComputedStyle(d.getElementById("kryds-fejring")).display !== "none"
+        && knapTekst() === "Videre til Koncentration" && d.querySelectorAll(".konfetti i").length > 20);
+    d.getElementById("kryds-afslut").click();
+    paastand("Tag quizzen igen starter forfra", !!kort.opgave && kort.opgave.id === "hvorfor" && prikker() === 0
+        && d.getElementById("kryds-afslut").textContent === "Afslut" && d.getElementById("kryds-fejring").textContent === "");
+    d.getElementById("kryds-afslut").click();
+    paastand("Afslut fører tilbage til Start quiz", !kort.opgave && knapTekst() === "Start quiz" && d.querySelectorAll("#kryds-valg .valgknap").length === 0);
+    kort.tryk();
+    for (i = 0; i < 5; i++) { svar(true); if (i < 4) kort.tryk(); }
+    paastand("fem rigtige i træk slutter quizzen efter fem spørgsmål", kort.trin === "slut" && prikker() === 5);
+    d.getElementById("kryds-opgaveknap").click();
+    paastand("knappen fører videre til fane 2", d.getElementById("fane-konc").classList.contains("aktiv"));
+    NK.visFane("kryds");
+    kort.afslut();
+    Array.prototype.forEach.call(d.querySelectorAll(".konfetti"), function (e) { e.parentNode.removeChild(e); });
+    D.KRYDS_OPGAVER.forEach(function (x) { if (x.nr !== undefined) x.nr = 0; });
     K.maalinger = []; K.naesteNr = 1; K.valgt = 0; K.klar();
 
     overskrift("6. Fane 2: Koncentration");

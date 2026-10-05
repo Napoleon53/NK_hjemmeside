@@ -31,33 +31,63 @@ samlingsfilerne som en sc8.6 fil."
    oxidationstal; her afstemmes fire korte skemaer ved at tælle atomer og
    ladning. `sc4.8` ejer jern, der brænder i ilt. Forsøget med jern i ståluld
    er en titrering.
-4. **Loftet:** tre faner, fire metaller (magnesium, zink, jern, kobber), 16
-   mål (5 + 5 + 6) og fire reaktionsskemaer.
+4. **Loftet:** tre faner, fire metaller (magnesium, zink, jern, kobber), 17
+   mål (6 + 5 + 6) og fire reaktionsskemaer.
 5. **Layoutet:** scene plus panel, og scenen er stjernen på alle tre faner.
+
+### Tilføjelsen 5. oktober 2026: vandets retning
+
+Brugeren spurgte, hvor længe der går, før der er hul, når 2 m kobberrør
+efterfølges af 2 m jernrør, om det er anderledes med jernrøret først, og
+hvordan det er med 4 m jern og 4 m kobber, og bad om at få svaret bygget ind
+her: "Kan du ikke implementere denne viden i sc8.6". Svaret var forholdet
+mellem de fire: kobber først ca. en fjerdedel af jern alene, jern først ca.
+det halve, jern alene 1 og kobber alene 3 til 5 gange så længe eller mere.
+
+Claude valgte den mindste løsning uden at spørge: ingen ny fane og ingen ny
+knap. Vandet løber fra venstre mod højre på fane 1, rækkefølgen får betydning
+i modellen, og der er ét nyt mål (Vandets retning). Plastmuffen er nu sidste
+mål og har jernrøret først. Pointen er den samme sætning som før: kobberionen
+optager elektroner fra jernet, som er mindre ædelt. Reaktionen mellem metal og
+metalion ejer `sc8.1`; her bruges den kun.
 
 ## Fane 1: Rørene
 
 To vandrør i en kælder, skruet sammen på midten og skåret igennem, så vandet
-og rørenes væg kan ses. Eleven vælger metal under hvert rør (kobber, jern,
-zink) og trykker på Lad tiden gå. 20 år går på 16 sekunder. Det mindst ædle
+og rørenes væg kan ses. Vandet løber fra venstre mod højre (en pil i hvert
+rør), så det venstre rør er det første. Eleven vælger metal under hvert rør
+(kobber, jern, zink) og trykker på Lad tiden gå. 20 år går på 16 sekunder. Det mindst ædle
 rør tæres indefra, mest ved samlingen, og er forskellen stor nok, går der hul:
 vandet sprøjter ud, og tiden standser. Luppen over samlingen viser atomerne i
 rørenes væg med vandet over: et atom går i vandet som en ion og efterlader to
 elektroner, der går gennem metallet til det ædle rør, hvor ilt og vand optager
 dem og bliver til OH⁻.
 
-Fem mål:
+Sidder kobberrøret først, har vandet kobberioner med. Tre Cu²⁺ følger vandet
+gennem luppen, lander på jernet, tager to elektroner fra et jernatom og bliver
+siddende som kobber, mens jernatomet går i vandet som Fe²⁺. Luppen viser dem
+først fra målet om vandets retning (`visIoner` i `js/sim_roer.js`), så de to
+første mål kun handler om elektronerne.
 
-1. **Kobber og jern.** Et gæt først, så forsøget: hul i jernrøret efter 10 år.
+Seks mål:
+
+1. **Kobber og jern.** Et gæt først, så forsøget med kobberrøret først: hul i
+   jernrøret efter 10 år.
 2. **Elektronerne.** Hvilken vej går de? Fra jernet over i kobberet.
 3. **To ens rør.** Eleven finder selv to rør, hvor samlingen ikke tæres mere
    end resten, og svarer på hvorfor.
 4. **Zink og jern.** Et gæt først. Nu er det zinkrøret, der tæres, og
    jernrøret er beskyttet. Spændingsrækken kommer frem i panelet.
-5. **Plastmuffen.** Kontakten Plastmuffe kommer frem. Med plast imellem kan
-   elektronerne ikke komme over, og jernrøret ruster kun langsomt.
+5. **Vandets retning.** Rørene er byttet om, så jernrøret sidder først. Et
+   gæt, så forsøget: hullet kommer først efter 20 år. Så sætter eleven selv
+   kobberrøret først igen, ser kobberionerne i luppen og svarer på hvorfor.
+6. **Plastmuffen.** Kontakten Plastmuffe kommer frem. Med jernrøret først og
+   plast imellem kan elektronerne ikke komme over, og jernrøret ruster kun
+   langsomt. Med kobberrøret først og plast imellem går der hul efter 13 år,
+   for plasten standser ikke kobberionerne, og linjen siger det.
 
-Panelet husker de rør, der er prøvet, med resultatet.
+Panelet husker de rør, der er prøvet, med resultatet. Kobber + jern og
+Jern + kobber er to forskellige linjer.
 
 ## Fane 2: Skibet
 
@@ -127,11 +157,23 @@ under skibet.
 
 * **Farten er valgt, retningen er regnet.** Hvem der afgiver elektroner til
   hvem, følger af E° (Databogen, samme tal som sc8.1). Farten ved samlingen
-  er sat til rørets egen fart plus 0,25 mm pr. år pr. volt forskel, så
-  kobber + jern giver hul efter 10 år i en væg på 2,5 mm. I virkeligheden
-  afhænger farten også af arealerne, vandet og belægningerne.
-* **Det ædle rør er helt beskyttet** i modellen, og kobber tæres slet ikke.
-  Jern alene ruster 0,05 mm pr. år, zink 0,02.
+  er rørets egen fart plus 0,0455 mm pr. år plus 0,025 mm pr. år pr. volt
+  forskel. Sidder kobberrøret først, kommer der 0,16 mm pr. år pr. volt
+  oveni fra kobberionerne. Væggen er 2,5 mm. I virkeligheden afhænger farten
+  også af arealerne, vandet og belægningerne.
+* **Forholdet 1 : 2 : 4.** Tallene er valgt, så kobber først giver hul efter
+  10 år, jern først efter 20 år, og jern alene ville holde ca. 40 år (halvt
+  tæret efter de 20). Det svarer til det grove skøn for drikkevand: en
+  fjerdedel, det halve og 1. Rækkefølgen er sikker, årstallene er ikke.
+* **Kun kobber giver ioner med vandet.** Jernioner bliver til rust, før de
+  når frem, og zink er det mindst ædle af de tre. Derfor er rækkefølgen lige
+  meget for zink og jern. Kobberionerne virker med samme rækkevidde som
+  samlingen; i virkeligheden sætter de sig længere nede ad røret.
+* **Rørenes længde er ikke med.** I drikkevand når virkningen fra samlingen
+  kun få centimeter, så 2 m og 4 m rør giver næsten samme tid til hul.
+* **Det ædle rør er helt beskyttet** i modellen, og kobberrørets væg tegnes
+  ikke tyndere: kobber alene holder 3 til 5 gange så længe som jern, og det
+  kan ikke ses på 20 år. Jern alene ruster 0,06 mm pr. år, zink 0,02.
 * **Aluminium er ikke med.** Oxidlaget gør, at det i praksis opfører sig
   mere ædelt, end pladsen i spændingsrækken siger (i havvand er zink mindre
   ædelt end aluminium).
@@ -160,11 +202,12 @@ css/stil.css        grundlaget fra sc1.4 og sb4.4 og nederst tidsknappen,
                     kontakterne, metalvalget, tavlen og spændingsrækken.
                     NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, tekst og lærred (som sc1.4)
-js/kemi.js          modellen: metallerne og E°, rørene (K.roerpar, K.tab),
+js/kemi.js          modellen: metallerne og E°, rørene (K.roerpar, K.tab, K.ionDel),
                     skibet (K.sejl), rusten (K.rustFart) og skemaerne
 js/data.js          målene på de tre faner, beskederne og D.skemaFejl
 js/mikro.js         partikelbilledet: gitteret, vandet, elektronerne,
-                    ionerne, O₂ og rusten (luppen på fane 1, scenen på fane 3)
+                    ionerne, O₂, rusten og kobberionerne fra det første rør
+                    (luppen på fane 1, scenen på fane 3)
 js/tegning.js       farver, mærkater, zoomrammen og spændingsrækken til panelet
 js/fane.js          det fælles: listen, målenes dele, statuslinjen, knappen, musen
 js/sim_roer.js      fane 1
@@ -189,13 +232,14 @@ og `#rusten`.
 ## Selvtest
 
 `_selvtest.html` skal åbnes gennem en lokal server med `animationer/` som rod.
-Den tjekker spændingsrækken, tallene for rørene og skibet, at de fire skemaer
+Den tjekker spændingsrækken, tallene for rørene (også de to rækkefølger og
+kobberionerne i luppen) og skibet, at de fire skemaer
 er afstemt i atomer og ladning, at partikelbilledet følger skemaerne (afgivne
 elektroner = optagne, 4 OH⁻ pr. O₂, rust fire ad gangen), at jern kun ruster
-med både vand og ilt og tre gange så hurtigt med salt, alle 16 mål (selv, med
+med både vand og ilt og tre gange så hurtigt med salt, alle 17 mål (selv, med
 forkerte svar og med Vis svaret), at en klods kan trækkes ned på skroget,
-sproget og layoutet fra 1100 × 700 til 1600 × 950. Sidst kørt 3. oktober
-2026: ALT OK (115 påstande).
+sproget og layoutet fra 1100 × 700 til 1600 × 950. Sidst kørt 5. oktober
+2026: ALT OK (138 påstande).
 
 ## Menuen
 

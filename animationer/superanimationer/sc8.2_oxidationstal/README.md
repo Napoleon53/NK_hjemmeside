@@ -66,7 +66,40 @@ Derfor står alt, eleven skal læse og trykke på, nu samlet i et
 Opgavekortet i panelet er væk. Opgaven står som én linje øverst på tavlen
 med en gul streg foran ("Find oxidationstallet for C i CO₂"), og den lange
 forklaring til hvert trin er skåret væk: det, den sagde, er nu hintet.
-Kemichael siger ikke længere hintet (se Kemichael nedenfor).
+Kemichael siger ikke hintet af sig selv (se Kemichael nedenfor).
+
+## Beregningen på egne linjer og klik på Kemichael (brugerens test 5. oktober 2026)
+
+Brugeren: fane 1 og 2 virker fint, men forklaringen ved rigtigt svar på
+fane 2 var "lidt svær at læse": regnestykkerne stod inde i teksten ("O har 6
+valenselektroner og ender med 8: 6 − 8 = −2, så O er −II"), og det var
+"lidt indforstået". Ønsket: beregningerne skal være mindre indforståede og
+have deres egne linjer. Og: "Hvis man trykker på kemichael, så skal han
+automatisk give et hint (og ikke være sur). Hvis man allerede har løst
+opgaven skal han bare give lidt ros".
+
+* **Linjen** siger nu kun i ord, hvordan gættet gik, og hvor parrene endte
+  ("Dit gæt passede. O har fået begge elektronpar, og hvert H har mistet sin
+  elektron."). Der står ingen regnestykker i den.
+* **Beregningen** står under linjen i sin egen ramme (`#ek-forklar`,
+  `forklaringHTML` i `js/sim_elektroner.js`): øverst formlen i ord,
+  "oxidationstal = valenselektroner − elektroner nu", og under den én linje
+  pr. grundstof, der spørges til, med tallene lige under de ord, de hører
+  til, lighedstegnene under hinanden og konklusionen til sidst ("så O er
+  −II"). For en ion kommer summen som sidste linje ("det er ionens
+  ladning"). Tallene kommer fra modellen, ikke fra teksten i `js/data.js`.
+  En kort note under beregningen siger, når reglerne fra fane 1 ikke passer
+  (H₂, O₂, H₂O₂, OF₂). Teoriens eksempel med vand bruger samme opstilling.
+* På en smal eller lav skærm er beregningen sat tættere, og gættets brikker
+  er væk, når opgaven er løst (linjen siger, hvordan gættet gik), så knappen
+  Næste opgave bliver på linjen og molekylet beholder pladsen. Selvtesten
+  måler det ned til 1100 × 700 og 1366 × 650.
+* **Et klik på Kemichael** giver hintet til det trin, eleven er ved, i hans
+  boble, og det tæller som Giv hint (knappen hedder så Vis svaret, og på
+  fane 1 sker det samme som ved knappen: pladsen efter formlen lyser, eller
+  O og H sættes ind med gråt). Flere klik gør ham ikke sur; han siger hintet
+  igen. Er opgaven løst, giver han en kort ros (`D.ROS_KEMICHAEL`). De gamle
+  prik-svar ("Det er ikke en knap.", "Nu stopper du.") bruges ikke her.
 
 ## Fane 1: Reglerne
 
@@ -141,10 +174,12 @@ nederst på tavlen. Tre bidder:
    hvorfor.
 3. **Regnskabet:** hvert atom får en ring om sine elektroner og sit
    oxidationstal. Arbejdsfeltet viser svaret, gættet som en grøn eller rød
-   brik og forklaringen; panelet viser valenselektronerne, dem, atomet har
-   nu, og forskellen med almindelige tal og oxidationstallet med romertal
-   (6 − 7 = −1, −I). Bliver arbejdsfeltet højt af en lang forklaring,
-   rykker molekylet op, så det ikke står bag feltet.
+   brik, i ord hvor parrene endte, og under det beregningen på egne
+   linjer (se afsnittet om testen 5. oktober); panelet viser
+   valenselektronerne, dem, atomet har nu, og forskellen med almindelige
+   tal og oxidationstallet med romertal (6 − 7 = −1, −I) for alle
+   grundstofferne i molekylet. Arbejdsfeltet bliver højere af beregningen,
+   og molekylet rykker op, så det ikke står bag feltet.
 
 Reglerne og elektronerne giver forskellige tal for H₂O₂ og OF₂ (og
 selvtesten tjekker, at det kun er de to), så et gæt efter reglerne bliver
@@ -154,10 +189,15 @@ rødt netop dér. H₂ og O₂ passer med reglen om grundstoffer.
 
 Han sidder bag katederet (`NK.RoligLaerer` i `js/laerer.js`, som sc4.5 og
 sc5.1) og blander sig ikke. Efter testen 3. okt. 2026 står hintet og svaret
-i arbejdsfeltet ved feltet, så han siger dem ikke længere; han svarer, når
-der klikkes på ham eller koppen, og K får ham til at sige, hvor man er, og
-hvad man gør. Han kan stadig sendes ud. Skal han igen sige hintet og svaret
-i sin boble, sættes `D.KEMICHAEL_SIGER_HINT = true` i `js/data.js`.
+fra knappen i arbejdsfeltet ved feltet, så han siger dem ikke af sig selv.
+Efter testen 5. okt. 2026 er et klik på ham en måde at bede om hjælp på:
+han siger hintet til trinet (`laererKlik` i `js/fane.js`), eller en kort
+ros, når opgaven er løst, og han bliver ikke sur af flere klik. Et klik på
+koppen giver stadig en replik om kaffen, og K får ham til at sige, hvor man
+er, og hvad man gør. Han kan stadig sendes ud. Skal han også sige hintet og
+svaret fra knappen i sin boble, sættes `D.KEMICHAEL_SIGER_HINT = true` i
+`js/data.js`. En boble på to linjer rykker lidt op, så den ikke dækker
+knapperne i scenens hjørne.
 Båndet med katederet er lavere end i sc5.1 (0,16 af scenens højde), så
 tavlen får pladsen. Påskeæg: et elektronpar sluppet over hans kop ("Min
 kaffe er neutral. Lad den blive det.").
@@ -188,7 +228,7 @@ css/stil.css        alt udseende (grundlaget er sc5.1; nederst tavlen,
                     NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, hævet og sænket skrift, lærred (som sc5.1)
 js/data.js          grundstofferne, de 31 stoffer, de 12 molekyler med
-                    tegning og forklaring, og Kemichaels replikker
+                    tegning, forklaring i ord og note, og Kemichaels replikker
 js/ox.js            modellen: oxidationstal efter reglerne, læsning af
                     felterne, beskederne til fejlene og elektronregnskabet
 js/sprites.js       katederet (Kemichaels egne sprites kommer fra v2)
@@ -204,8 +244,9 @@ _selvtest.html      udviklerværktøj, se nedenfor
 ```
 
 Et nyt stof på fane 1 er én linje i `D.REGLER`. Et nyt molekyle på fane 2
-er atomerne i gitteret, bindingerne med orden og en forklaring i
-`D.MOLEKYLER`; de frie par regnes ud af valenselektronerne.
+er atomerne i gitteret, bindingerne med orden og en forklaring i ord (uden
+regnestykker) i `D.MOLEKYLER`; de frie par og beregningen under linjen
+regnes ud af valenselektronerne.
 
 ## Genveje
 
@@ -224,9 +265,11 @@ gennemføres ved at skrive, med musen og med Vis svaret, at der ikke står et
 facit, før eleven har gjort noget, at spørgsmålet, feltet og Giv hint står
 samlet i scenen og ikke i panelet, at hintknappen står lige ved siden af
 feltet, at arbejdsfeltet står stille, mens opgaven løses, at parrene på
-fane 2 har pile, Kemichael inde og ude, sproget og layoutet fra 1100 × 700
-til 1600 × 950.
-Sidst kørt: ALT OK (120 påstande), 3. oktober 2026.
+fane 2 har pile, at beregningen på fane 2 står på egne linjer under formlen
+i ord (og at linjen over ikke har regnestykker), Kemichael inde og ude, at
+et klik på ham giver hintet eller ros og aldrig gør ham sur, sproget og
+layoutet fra 1100 × 700 til 1600 × 950 (fane 2 også ved 1366 × 650).
+Sidst kørt: ALT OK (147 påstande), 5. oktober 2026.
 
 ## I menuen
 

@@ -45,10 +45,12 @@
     D.PEG = { kryds: "kryds-maaling", konc: "konc-forsoeg", temp: "temp-forsoeg" };
 
     /* ----- Fane 1: tre blandinger. Syren er altid 5 mL 1,0 M HCl, og
-       der er vand til 45 mL i glasset, saa der er 50 mL i alt. -------- */
+       der er vand til 45 mL i glasset, saa der er 50 mL i alt. Rumfanget
+       af Na₂S₂O₃ fordobles fra blanding til blanding: 0,10 M, 0,20 M og
+       0,40 M i glasset, og krydset er vaek efter ca. 20 s, 10 s og 5 s. */
     D.SYRE_ML = 5;
     D.GLAS_ML = 45;
-    D.KRYDS_BLANDINGER = [40, 30, 20];
+    D.KRYDS_BLANDINGER = [10, 20, 40];
     D.MAKS_KRYDS = 5;          /* maalinger, der bliver staaende */
 
     /* ----- Fane 2 og 3 --------------------------------------------------- */
@@ -56,7 +58,7 @@
     D.TRIN_ML = 5;
     D.MAKS_ML = 50;
     D.KONC_START = { thio: 20, syre: 5, vand: 25 };
-    D.TEMP_BLANDING = { thio: 20, syre: 5, vand: 25 };
+    D.TEMP_BLANDING = { thio: 10, syre: 5, vand: 35 };      /* 0,10 M: 20 s ved 20 °C */
     D.TEMP_MIN = 5;
     D.TEMP_MAKS = 60;
     D.TEMP_TRIN = 5;
@@ -66,8 +68,15 @@
     function molaer(v) { return NK.bet(v, 2) + " M"; }
     function dt(vThio, vSyre, vVand, T) { return M.tidTilKryds(vThio, vSyre, vVand, T); }
 
+    /* Fane 1: blandingen med ml mL Na₂S₂O₃ og tiden, som forsoeget boer give */
+    function krydsBlanding(ml) { return M.blanding(ml, D.SYRE_ML, D.GLAS_ML - ml); }
+    function krydsDt(ml) { return Math.round(dt(ml, D.SYRE_ML, D.GLAS_ML - ml)); }
+
     /* ================================================================
        FANE 1: KRYDSET
+       De fem spoergsmaal er quizzen (js/opgave.js). Tallene er dem,
+       forsoeget boer give. Har et spoergsmaal flere saet tal (par, nr),
+       faar eleven et nyt saet, naar det kommer igen.
        ================================================================ */
     D.KRYDS_OPGAVER = [
         {
@@ -112,19 +121,23 @@
         },
         {
             id: "hurtigere",
-            par: [[20, 40], [15, 45], [25, 50], [12, 36]],
+            /* To af de tre blandinger (plads i D.KRYDS_BLANDINGER): den langsomme og den hurtige */
+            par: [[0, 1], [1, 2], [0, 2]],
             nr: 0,
             lav: function () {
                 var p = this.par[this.nr++ % this.par.length];
-                var a = p[0], b = p[1], f = b / a;
+                var blA = krydsBlanding(D.KRYDS_BLANDINGER[p[0]]), blB = krydsBlanding(D.KRYDS_BLANDINGER[p[1]]);
+                var a = krydsDt(blA.vThio), b = krydsDt(blB.vThio), f = a / b;
+                var cA = molaer(blA.c), cB = molaer(blB.c);
                 return {
-                    tekst: "Blanding A tog " + a + " s, og blanding B tog " + b + " s. Hvor mange gange hurtigere gik A?",
+                    tekst: "Med " + cA + " S₂O₃²⁻ i glasset tog det " + a + " s, og med " + cB + " tog det " + b +
+                        " s. Hvor mange gange hurtigere gik reaktionen med " + cB + "?",
                     valg: [
                         { tekst: NK.faktor(f) + " gange", rigtig: true,
-                          forklaring: "Samme mængde svovl på kortere tid. 1/Δt er " + NK.bet(1 / a, 3) + " s⁻¹ mod " + NK.bet(1 / b, 3) + " s⁻¹: " + NK.faktor(f) + " gange større." },
-                        { tekst: NK.tal(a / b, 2) + " gange", rigtig: false,
-                          forklaring: "A brugte kortest tid, så A gik hurtigst. Kort tid betyder stor hastighed." },
-                        { tekst: (b - a) + " gange", rigtig: false,
+                          forklaring: "Samme mængde svovl på kortere tid. 1/Δt er " + NK.bet(1 / b, 2) + " s⁻¹ mod " + NK.bet(1 / a, 2) + " s⁻¹: " + NK.faktor(f) + " gange større." },
+                        { tekst: NK.tal(b / a, 2) + " gange", rigtig: false,
+                          forklaring: "Med " + cB + " gik der kortest tid, så den reaktion gik hurtigst. Kort tid betyder stor hastighed." },
+                        { tekst: (a - b) + " gange", rigtig: false,
                           forklaring: "Forskellen i sekunder siger ikke, hvor mange gange hurtigere. Sammenlign 1/Δt." },
                         { tekst: NK.faktor(f * f) + " gange", rigtig: false,
                           forklaring: "Hastigheden er proportional med 1/Δt, ikke med 1/Δt². 1/Δt bliver kun " + NK.faktor(f) + " gange større." }
@@ -136,22 +149,25 @@
         },
         {
             id: "brugtOp",
+            /* De to foerste blandinger: 1,5 % og 0,75 % */
+            nr: 0,
             lav: function () {
-                var bl = M.blanding(40, D.SYRE_ML, D.GLAS_ML - 40);
+                var bl = krydsBlanding(D.KRYDS_BLANDINGER[this.nr++ % 2]);
                 var pct = M.S_KRYDS / bl.c * 100;
+                var c = molaer(bl.c), sv = NK.bet(M.S_KRYDS, 2) + " M";
                 return {
-                    tekst: "Med 40 mL Na₂S₂O₃ er [S₂O₃²⁻] = " + NK.bet(bl.c, 3) + " M i glasset. Krydset er væk, når der er dannet " +
-                        NK.bet(M.S_KRYDS, 2) + " M svovl. Hvor meget af thiosulfatet er brugt?",
+                    tekst: "Med " + bl.vThio + " mL Na₂S₂O₃ er [S₂O₃²⁻] = " + c + " i glasset. Krydset er væk, når der er dannet " +
+                        sv + " svovl. Hvor meget af thiosulfatet er brugt?",
                     valg: [
-                        { tekst: "Ca. " + NK.tal(pct, 0) + " %", rigtig: true,
-                          forklaring: "Der dannes ét S pr. S₂O₃²⁻: " + NK.bet(M.S_KRYDS, 2) + " M af " + NK.bet(bl.c, 3) +
-                              " M er ca. " + NK.tal(pct, 0) + " %. Koncentrationen er næsten den samme under hele målingen." },
+                        { tekst: "Ca. " + NK.bet(pct, 2) + " %", rigtig: true,
+                          forklaring: "Der dannes ét S pr. S₂O₃²⁻: " + sv + " af " + c +
+                              " er ca. " + NK.bet(pct, 2) + " %. Koncentrationen er næsten den samme under hele målingen." },
                         { tekst: "Det hele", rigtig: false,
                           forklaring: "Så ville væsken være meget mere uklar. Krydset forsvinder allerede ved lidt svovl." },
                         { tekst: "Ca. halvdelen", rigtig: false,
-                          forklaring: "Del mængden af svovl med [S₂O₃²⁻]: " + NK.bet(M.S_KRYDS, 2) + " M / " + NK.bet(bl.c, 3) + " M." },
-                        { tekst: "Ca. " + NK.tal(pct * 10, 0) + " %", rigtig: false,
-                          forklaring: "Tjek kommaet: " + NK.bet(M.S_KRYDS, 2) + " M / " + NK.bet(bl.c, 3) + " M = " + NK.bet(M.S_KRYDS / bl.c, 2) + "." }
+                          forklaring: "Del mængden af svovl med [S₂O₃²⁻]: " + sv + " / " + c + "." },
+                        { tekst: "Ca. " + NK.bet(pct * 10, 2) + " %", rigtig: false,
+                          forklaring: "Tjek kommaet: " + sv + " / " + c + " = " + NK.bet(M.S_KRYDS / bl.c, 2) + "." }
                     ],
                     hint: "Der dannes ét S for hver S₂O₃²⁻, der reagerer. Del den dannede mængde med startkoncentrationen.",
                     opsaet: null
@@ -290,7 +306,7 @@
         },
         {
             id: "forudsig",
-            saet: [[40, 10], [40, 20], [30, 15]],
+            saet: [[40, 10], [40, 20], [20, 10]],
             nr: 0,
             lav: function () {
                 var p = this.saet[this.nr++ % this.saet.length];

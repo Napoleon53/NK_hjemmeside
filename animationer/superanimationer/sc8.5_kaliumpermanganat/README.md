@@ -120,7 +120,9 @@ og trinlisten over den viser de færdige med ✓):
 4. **Lige mange atomer** (kun med indekstal: C₂O₄²⁻ ⟶ CO₂, I⁻ ⟶ I₂ og
    Br⁻ ⟶ Br₂). Eleven skriver 2 foran den formel, der har færrest. Tallet
    står med blyant.
-5. **Stigning og fald.** Klammerne tegnes frem. Under pilen står ved hver
+5. **Stigning og fald.** Klammerne tegnes frem. Klammen har kun en pilespids
+   ved atomet efter reaktionspilen; før pilen går stregen op til atomet uden
+   spids (brugerens ønske 5. oktober 2026, som i `sc8.7_pyrit`). Under pilen står ved hver
    klamme en pil, der vendes med et klik, med ↑ og ↓ på tastaturet eller
    med + og − i feltet, og feltet til tallet. Tallet er det samlede for
    atomerne på klammen (H₂O₂ ⟶ O₂: 2 · 1 = ↑2). Når den er rigtig, bliver

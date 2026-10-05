@@ -60,8 +60,10 @@
     };
 
     /* ----- Fane 1: mineralerne i udstillingen ---------------------------------
-       hylde og plads siger, hvor stenen staar. spoerg er de atomer, eleven
-       skriver oxidationstal for; givet staar med blyant fra start. */
+       spoerg er de atomer, eleven skriver oxidationstal for; givet staar
+       med blyant fra start. kemi er stoffets danske navn. Har navnet et
+       oxidationstal i sig (jern(III)oxid), staar det i kemiLoest og vises
+       foerst, naar eleven selv har fundet tallet. */
     D.KLASSER = {
         grundstof: { navn: "Grundstoffer", ion: "" },
         sulfid: { navn: "Sulfider", ion: "S²⁻" },
@@ -76,35 +78,35 @@
     ];
 
     D.MINERALER = [
-        { id: "svovl", navn: "Svovl", spansk: "azufre", klasse: "grundstof", f: "S", spoerg: ["S"], givet: [],
+        { id: "svovl", navn: "Svovl", klasse: "grundstof", f: "S", spoerg: ["S"], givet: [],
           linje: "Svovl er et grundstof. Skriv oxidationstallet over S.",
           hint: ["Svovl står alene. Der er kun én slags atom, og stoffet har ingen ladning.", "Et grundstof har altid oxidationstallet 0."],
-          fakta: "Rent svovl er hverken oxideret eller reduceret. Det er nulpunktet på svovls trappe." },
-        { id: "zinkblende", navn: "Zinkblende", spansk: "blenda", klasse: "sulfid", f: "ZnS", spoerg: ["Zn", "S"], givet: [],
+          fakta: "Rent svovl er hverken oxideret eller reduceret. I de andre sten har svovl afgivet eller optaget elektroner." },
+        { id: "zinkblende", navn: "Zinkblende", kemi: "zinksulfid", klasse: "sulfid", f: "ZnS", spoerg: ["Zn", "S"], givet: [],
           linje: "Zinkblende er et sulfid. Skriv oxidationstallet over Zn og S.",
           hint: ["Stenen står hos sulfiderne. Sulfidionen er S²⁻.", "S er −II. Summen i ZnS skal være 0.", "Zn + (−2) = 0. Hvad er Zn?"],
           fakta: "Zinkblende er den vigtigste zinkmalm. På fane 3 rister du den i luft." },
-        { id: "cinnober", navn: "Cinnober", spansk: "cinabrio", klasse: "sulfid", f: "HgS", spoerg: ["Hg", "S"], givet: [],
+        { id: "cinnober", navn: "Cinnober", kemi: "kviksølvsulfid", kemiLoest: "kviksølv(II)sulfid", klasse: "sulfid", f: "HgS", spoerg: ["Hg", "S"], givet: [],
           linje: "Cinnober er også et sulfid. Skriv oxidationstallet over Hg og S.",
           hint: ["Stenen står hos sulfiderne. Sulfidionen er S²⁻.", "S er −II. Summen i HgS skal være 0.", "Hg + (−2) = 0. Hvad er Hg?"],
           fakta: "Cinnober er kviksølvmalm. Minen i Almadén i Spanien var i drift i over 2000 år." },
-        { id: "haematit", navn: "Hematit", spansk: "hematites", klasse: "oxid", f: "Fe2O3", spoerg: ["Fe"], givet: ["O"],
+        { id: "haematit", navn: "Hematit", kemi: "jernoxid", kemiLoest: "jern(III)oxid", klasse: "oxid", f: "Fe2O3", spoerg: ["Fe"], givet: ["O"],
           linje: "Hematit er et oxid, så O er −II. Skriv oxidationstallet over Fe.",
           hint: ["O er −II. Summen i Fe₂O₃ skal være 0.", "2 · Fe + 3 · (−2) = 0.", "2 · Fe = +6. Hvad er ét Fe?"],
           fakta: "Jern(III)oxid er rødt som pulver. Det er den samme farve som i rust." },
-        { id: "magnetit", navn: "Magnetit", spansk: "magnetita", klasse: "oxid", f: "FeO·Fe2O3", vis: "Fe₃O₄", spoerg: ["Fe"], givet: ["O"],
+        { id: "magnetit", navn: "Magnetit", kemi: "jernoxid", kemiLoest: "jern(II,III)oxid", klasse: "oxid", f: "FeO·Fe2O3", vis: "Fe₃O₄", spoerg: ["Fe"], givet: ["O"],
           linje: "Magnetit, Fe₃O₄, kan skrives FeO·Fe₂O₃. Skriv oxidationstallet over hvert Fe.",
           hint: ["Regn de to dele hver for sig. O er −II i dem begge.", "FeO: Fe + (−2) = 0. Fe₂O₃: 2 · Fe + 3 · (−2) = 0.", "Det første Fe skal give +2 alene. De to andre skal give +6 tilsammen."],
           fakta: "Magnetit har to slags jern: én Fe²⁺ for hver to Fe³⁺. Regnet under ét giver Fe₃O₄ ikke et helt tal." },
-        { id: "gips", navn: "Gips", spansk: "yeso", klasse: "sulfat", f: "CaSO4", efter: "·2H₂O", spoerg: ["S"], givet: ["Ca", "O"],
+        { id: "gips", navn: "Gips", kemi: "calciumsulfat", klasse: "sulfat", f: "CaSO4", efter: "·2H₂O", spoerg: ["S"], givet: ["Ca", "O"],
           linje: "Gips er et sulfat. Ca er +II og O er −II. Skriv oxidationstallet over S.",
           hint: ["Summen i CaSO₄ skal være 0. Krystalvandet, 2 H₂O, tæller ikke med.", "(+2) + S + 4 · (−2) = 0.", "S + (−6) = 0. Hvad er S?"],
           fakta: "I sulfat er svovl oxideret helt til tops, +VI. Det er det samme svovl som i svovlsyre." },
-        { id: "malakit", navn: "Malakit", spansk: "malaquita", klasse: "carbonat", f: "Cu2(OH)2CO3", spoerg: ["Cu"], givet: [],
+        { id: "malakit", navn: "Malakit", kemi: "basisk kobbercarbonat", kemiLoest: "basisk kobber(II)carbonat", klasse: "carbonat", f: "Cu2(OH)2CO3", spoerg: ["Cu"], givet: [],
           linje: "Malakit har to slags negative ioner: OH⁻ og CO₃²⁻. Skriv oxidationstallet over Cu.",
           hint: ["De to OH⁻ giver −2 i alt, og CO₃²⁻ giver −2. Summen af det hele skal være 0.", "2 · Cu + 2 · (−1) + (−2) = 0.", "2 · Cu = +4. Hvad er ét Cu?"],
           fakta: "Kobber(II) giver den grønne farve. Azurit er blå, men kobber er også +II der." },
-        { id: "pyrit", navn: "Pyrit", spansk: "pirita", klasse: "sulfid", f: "FeS2", spoerg: ["S"], givet: ["Fe"],
+        { id: "pyrit", navn: "Pyrit", kemi: "jern(II)disulfid", klasse: "sulfid", f: "FeS2", spoerg: ["S"], givet: ["Fe"],
           linje: "Pyrit står hos sulfiderne, men jern er +II i pyrit. Skriv oxidationstallet over S.",
           hint: ["Brug ikke reglen for sulfid her. Fe er +II, og summen i FeS₂ skal være 0.", "(+2) + 2 · S = 0.", "2 · S = −2. Hvad er ét S?"],
           fakta: "Svovlatomerne sidder to og to som S₂²⁻. Derfor er S −I i pyrit. På fane 2 møder pyritten luft og vand." }
@@ -112,9 +114,6 @@
 
     /* Tasterne under skiltet: de oxidationstal, mineralerne har brug for */
     D.TASTER = [-2, -1, 0, 1, 2, 3, 4, 6];
-
-    /* Trappen i panelet: grundstofferne, der faar en raekke hver */
-    D.TRAPPE = { fra: -2, til: 6, raekker: ["S", "Fe"] };
 
     D.PAASKEAEG = "Stadig ikke guld. Pyrit hedder narreguld af en grund.";
 

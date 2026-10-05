@@ -15,7 +15,11 @@
         saa paa atomet.
      3. Regnskabet: naar alle par er paa plads, faar hvert atom en ring om
         sine elektroner og sit oxidationstal (valenselektroner minus de
-        elektroner, det har nu), og gaettet sammenlignes.
+        elektroner, det har nu), og gaettet sammenlignes. Linjen i
+        arbejdsfeltet siger i ord, hvor parrene endte, og under den staar
+        beregningen paa sine egne linjer med formlen i ord oeverst
+        (brugerens test 5. okt. 2026: regnestykker inde i teksten var
+        indforstaaede og svaere at laese).
 
    Alt, eleven skal laese og trykke paa, staar i arbejdsfeltet i scenen
    (brugerens test 3. okt. 2026: opgaveteksten i panelets hjoerne var for
@@ -37,6 +41,7 @@
 
     function SimElektroner() {
         this.gaetEl = NK.el("ek-gaet");
+        this.forklarEl = NK.el("ek-forklar");
         this.startFane(D.MOLEKYLER, [{ id: "alle", titel: "Molekyler og ioner" }]);
         this.vaelg(0);
     }
@@ -87,6 +92,7 @@
         });
         this.bygGaet();
         this.visRegnskab();
+        this.visForklaring();
     };
 
     P.opgaveFaerdig = function () { return this.regnVist; };
@@ -331,6 +337,7 @@
         this.auto = false;
         this.visGaet();
         this.visRegnskab();
+        this.visForklaring();
         this.trinLoest(this.svarMaade || "selv", this.svarHTML);
         this.svarMaade = null;
     };
@@ -342,6 +349,8 @@
 
     P.stjerneNu = function () { return !this.brugtSvar && this.gaetRigtigt(); };
 
+    /* Linjen, naar opgaven er loest: hvordan gaettet gik, og i ord, hvor
+       parrene endte. Beregningen staar for sig selv under den (visForklaring). */
     P.slutLinje = function () {
         var mig = this, dele = [];
         var gaettet = this.spurgte().filter(function (s) { return mig.gaet[s] !== null && mig.gaet[s] !== undefined; });
@@ -356,6 +365,39 @@
         }
         dele.push(this.m.def.forklar);
         return NK.html(dele.join(" "));
+    };
+
+    /* ----- Beregningen under linjen i arbejdsfeltet -------------------------------------
+       En paen beregning: formlen med ord oeverst og én linje pr. grundstof,
+       der spoerges til, med tallene lige under de ord, de hoerer til, og
+       lighedstegnene under hinanden. For en ion kommer summen til sidst. */
+    P.forklaringHTML = function () {
+        var m = this.m, def = m.def, ord = D.REGN_ORD;
+        var rk = {};
+        O.regnskab(m).forEach(function (r) { rk[r.s] = r; });
+        var html = '<div class="fk-regn"><span class="fk-v fk-ord">' + ord.ox + '</span><span>=</span><span class="fk-ord">' + ord.v +
+            '</span><span>−</span><span class="fk-ord">' + ord.nu + "</span><span></span><span></span><span></span>";
+        this.spurgte().forEach(function (s) {
+            var r = rk[s];
+            html += '<span class="fk-v" style="color:' + D.GRUNDSTOF[s].farve + '">' + s + "</span><span>=</span><span>" + r.v +
+                "</span><span>−</span><span>" + r.nu + '</span><span>=</span><span class="fk-res">' + O.lad(r.ox) +
+                '</span><span class="fk-saa">' + NK.html("så " + s + " er ") + "<b>" + O.ox(r.ox) + "</b></span>";
+        });
+        if (m.q) {
+            var sum = this.sumTekst().split(" = ")[0];
+            html += '<span class="fk-v fk-ord">' + ord.sum + '</span><span>=</span><span class="fk-sum">' + NK.html(sum) +
+                '</span><span>=</span><span class="fk-res">' + O.lad(m.q) + '</span><span class="fk-saa">' + NK.html(ord.ion) + "</span>";
+        }
+        html += "</div>";
+        if (def.note) html += '<p class="fk-note">' + NK.html(def.note) + "</p>";
+        return html;
+    };
+
+    P.visForklaring = function () {
+        var e = this.forklarEl;
+        if (!e) return;
+        e.innerHTML = this.regnVist ? this.forklaringHTML() : "";
+        e.hidden = !this.regnVist;
     };
 
     /* ----- Regnskabet i panelet ---------------------------------------------------------- */
@@ -402,6 +444,9 @@
         arb.style.left = Math.round(tv.x + ramme + 10) + "px";
         arb.style.width = Math.round(tv.b - 2 * ramme - 20) + "px";
         arb.style.bottom = Math.round(H - bund) + "px";
+        /* Paa en smal scene er der ikke plads til baade gaettet og knappen
+           paa linjen, naar opgaven er loest (se .arb.smal.sejr i stilarket) */
+        arb.classList.toggle("smal", tv.b - 2 * ramme - 20 < (this.spurgte().length > 1 ? 720 : 620));
         var arbH = Math.max(ARB_H, arb.offsetHeight || 0);
         this.arbBrugt = arbH;
         var ind = { x: tv.x + ramme + 16, y: tv.y + ramme + hoved, b: tv.b - 2 * ramme - 32,

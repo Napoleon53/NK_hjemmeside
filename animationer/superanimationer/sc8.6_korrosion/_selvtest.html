@@ -19,7 +19,8 @@
 
    Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
    se på et skærmbillede: at spændingsrækken afgør, hvilket rør der
-   tæres, at tallene for rørene og skibet passer med modellen, at de
+   tæres, at vandets retning afgør, hvor hurtigt det går (kobberionerne
+   fra det første rør), at tallene for rørene og skibet passer med modellen, at de
    fire skemaer er afstemt i atomer og ladning, at partikelbilledet
    følger skemaerne (afgivne elektroner = optagne), at jern kun ruster
    med både vand og ilt og tre gange så hurtigt med salt, at alle mål
@@ -107,16 +108,23 @@ function koerTest(W) {
     /* ------------------------------------------------------------------ */
     overskrift("2. Rørene: modellen");
     var cufe = K.roerpar("Cu", "Fe", false), fecu = K.roerpar("Fe", "Cu", false), cuzn = K.roerpar("Cu", "Zn", false);
-    var znfe = K.roerpar("Zn", "Fe", false), fefe = K.roerpar("Fe", "Fe", false), cucu = K.roerpar("Cu", "Cu", false), plast = K.roerpar("Cu", "Fe", true);
-    paastand("kobber + jern: jernrøret tæres, hul efter ca. 10 år", cufe.anode === "Fe" && cufe.side === "h" && taet(cufe.hul, 10.2, 0.1), cufe.hul);
-    paastand("det er lige meget, hvilken side jernrøret sidder i", fecu.anode === "Fe" && fecu.side === "v" && taet(fecu.hul, cufe.hul, 1e-9));
+    var znfe = K.roerpar("Zn", "Fe", false), fefe = K.roerpar("Fe", "Fe", false), cucu = K.roerpar("Cu", "Cu", false);
+    var plast = K.roerpar("Fe", "Cu", true), cuplast = K.roerpar("Cu", "Fe", true);
+    paastand("kobberrøret først: jernrøret tæres, hul efter 10 år", cufe.anode === "Fe" && cufe.side === "h" && cufe.svagMetal === "Fe" && taet(cufe.hul, 10.0, 0.05), cufe.hul);
+    paastand("jernrøret først: stadig jernrøret, men hullet kommer først efter 20 år", fecu.anode === "Fe" && fecu.side === "v" && fecu.hul === 20 && fecu.ioner === null, fecu.hul);
+    paastand("forholdet er 1 : 2 : 4: kobber først, jern først, jern alene (ca. 40 år)", taet(fecu.hul / cufe.hul, 2, 0.01) && taet(K.ROER.vaeg / M.Fe.egen / cufe.hul, 4, 0.2), K.ROER.vaeg / M.Fe.egen);
+    paastand("med kobberrøret først står kobberionerne for halvdelen af tæringen ved samlingen", cufe.ioner && cufe.ioner.fra === "Cu" && cufe.ioner.side === "h" && taet(K.ionDel(cufe, "h", 0), 0.5, 0.01) && K.ionDel(fecu, "v", 0) === 0, K.ionDel(cufe, "h", 0));
     paastand("kobber + zink: zinkrøret tæres, og hurtigere end jern (større afstand i rækken)", cuzn.anode === "Zn" && cuzn.hul < cufe.hul, cuzn.hul);
     paastand("zink + jern: zinkrøret tæres, jernrøret er beskyttet, intet hul på 20 år", znfe.anode === "Zn" && znfe.hul === null && znfe.egen.h === 0);
-    paastand("zink + jern: zinkrørets væg er 2,0 mm tyndere ved samlingen efter 20 år", taet(K.tab(znfe, "v", 20, 0), 2.0, 0.01), K.tab(znfe, "v", 20, 0));
-    paastand("jern + jern: ingen anode, begge ruster 1,0 mm på 20 år, lige meget overalt",
-        fefe.anode === null && taet(K.tab(fefe, "v", 20, 0), 1.0, 1e-9) && taet(K.tab(fefe, "h", 20, 0.9), 1.0, 1e-9));
-    paastand("kobber + kobber: ingen tæring", K.tab(cucu, "v", 20, 0) === 0 && K.tab(cucu, "h", 20, 0) === 0);
-    paastand("plastmuffe: ingen anode, jernrøret ruster kun, som om det sad alene", plast.anode === null && plast.hul === null && taet(K.tab(plast, "h", 20, 0), 1.0, 1e-9));
+    paastand("zink + jern: rækkefølgen er lige meget, for vandet har ingen ioner med fra jern og zink", znfe.ioner === null && K.roerpar("Fe", "Zn", false).ioner === null && K.roerpar("Zn", "Cu", false).ioner === null &&
+        taet(K.tab(K.roerpar("Fe", "Zn", false), "h", 20, 0), K.tab(znfe, "v", 20, 0), 1e-9));
+    paastand("zink + jern: zinkrørets væg er 1,5 mm tyndere ved samlingen efter 20 år", taet(K.tab(znfe, "v", 20, 0), 1.47, 0.01), K.tab(znfe, "v", 20, 0));
+    paastand("jern + jern: ingen anode, begge ruster 1,2 mm på 20 år, lige meget overalt",
+        fefe.anode === null && fefe.svag === null && taet(K.tab(fefe, "v", 20, 0), 1.2, 1e-9) && taet(K.tab(fefe, "h", 20, 0.9), 1.2, 1e-9));
+    paastand("kobber + kobber: ingen tæring", K.tab(cucu, "v", 20, 0) === 0 && K.tab(cucu, "h", 20, 0) === 0 && cucu.ioner === null);
+    paastand("plastmuffe med jernrøret først: ingen anode, jernrøret ruster kun, som om det sad alene", plast.anode === null && plast.svag === null && plast.hul === null && taet(K.tab(plast, "v", 20, 0), 1.2, 1e-9));
+    paastand("plastmuffe med kobberrøret først: ingen elektroner over samlingen, men kobberionerne giver hul efter 13 år",
+        cuplast.anode === null && cuplast.galv === 0 && cuplast.svag === "h" && D.aar(cuplast.hul) === 13 && K.ionDel(cuplast, "h", 0) > 0.6, cuplast.hul);
     paastand("tæringen er størst ved samlingen og aftager væk fra den", K.tab(cufe, "h", 8, 0) > K.tab(cufe, "h", 8, 0.3) && K.tab(cufe, "h", 8, 0.3) > K.tab(cufe, "h", 8, 1));
     paastand("væggen kan ikke tæres mere end sin tykkelse", K.tab(cufe, "h", 20, 0) === K.ROER.vaeg);
 
@@ -212,6 +220,8 @@ function koerTest(W) {
         var Mk = R.M, org = Mk.afgiv;
         Mk.afgiv = function (c, k) { var ok = org.call(Mk, c, k); if (ok) afg.push([c, k]); return ok; };
     }
+    function sum(liste) { return liste.reduce(function (a, b) { return a + b; }, 0); }
+    function afsatKobber() { return R.M.dep.filter(function (p) { return p.type === "metal" && p.sym === "Cu"; }); }
     R.vaelg(0);
     paastand("mål 1 begynder med et gæt, og rørene er kobber og jern", R.opg.fase === "gaet" && R.a === "Cu" && R.b === "Fe");
     R.svarValg(0);
@@ -221,10 +231,11 @@ function koerTest(W) {
     koerF(R, 3);
     paastand("mens tiden går, står det i linjen, og knappen er låst", R.koerer && /Tiden går/.test(linje(R)) && R.tidknap.disabled);
     koerF(R, 9);
-    paastand("mål 1 løses af forsøget: hul i jernrøret efter 10 år", R.faerdig && R.slut && taet(R.t, 10.2, 0.1) && /efter 10 år/.test(linje(R)), linje(R));
+    paastand("mål 1 løses af forsøget: hul i jernrøret efter 10 år", R.faerdig && R.slut && taet(R.t, 10.0, 0.05) && /tæret igennem ved samlingen/.test(linje(R)), linje(R));
     paastand("gættet får sin dom", /Dit gæt holdt ikke/.test(linje(R)));
     paastand("luppen følger væggen: atomerne mangler nærmest samlingen", R.M.top[6] === 4 && R.M.top[6] >= R.M.top[8] && R.M.top[8] >= R.M.top[11] && R.M.top.slice(0, 6).every(function (t) { return t === 0; }), R.M.top.join(","));
     paastand("elektronerne går fra jernet over i kobberet", afg.length >= 10 && afg.every(function (p) { return p[0] >= 6 && p[1] < 6; }), afg.length);
+    paastand("kobberionerne vises ikke, før målet om vandets retning", !R.visIoner() && R.M.gaest.length === 0 && R.M.tael.afsat === 0);
     paastand("forsøget står under Rør, der er prøvet", /hul i jernrøret efter 10 år/.test(d.getElementById("r-proevet").textContent));
     R.vaelg(1);
     R.svarValg(1);
@@ -247,25 +258,69 @@ function koerTest(W) {
     R.tidKlik(); koerF(R, 18);
     paastand("mål 4: zinkrøret tæres, jernrøret er beskyttet", R.faerdig && R.par.anode === "Zn" && /Dit gæt holdt\./.test(linje(R)) && R.M.top.slice(6).every(function (t) { return t === 0; }) && R.M.top[5] > 0, R.M.top.join(","));
     paastand("spændingsrækken kommer frem i panelet", !d.getElementById("r-raekkekort").hidden && /Zink står til venstre for jern/.test(d.getElementById("r-raekke").textContent));
+
     R.vaelg(4);
-    paastand("mål 5: plastmuffen kommer frem", !R.plastknap.hidden && R.opg.fase === "forsoeg");
+    paastand("mål 5: vandets retning. Jernrøret sidder først, og der gættes", R.a === "Fe" && R.b === "Cu" && R.opg.fase === "gaet" && R.visIoner());
+    R.svarValg(2);
+    R.saetRoer("Cu", "Fe", false);
     R.tidKlik(); koerF(R, 12);
-    paastand("mål 5: uden muffe går der hul, og linjen siger det", roed(R) && /plastmuffen/i.test(linje(R)), linje(R));
+    paastand("mål 5: med kobberrøret først giver forsøget en rød linje om rækkefølgen", roed(R) && R.opg.fase === "forsoeg" && /gennem jernrøret først/.test(linje(R)) && /Jern til venstre rør/.test(linje(R)), linje(R));
+    R.saetRoer("Fe", "Cu", false);
+    lyt();
+    R.tidKlik(); koerF(R, 18);
+    paastand("mål 5: med jernrøret først går der hul efter 20 år, og så kommer spørgsmålet", R.opg.fase === "spm" && R.t === 20 && R.par.hul === 20 && R.par.svag === "v" &&
+        /dobbelt så længe/.test(linje(R)) && /Dit gæt holdt\./.test(linje(R)), linje(R));
+    paastand("med jernrøret først er der ingen kobberioner i luppen, kun elektroner over samlingen", R.M.gaest.length === 0 && R.M.tael.afsat === 0 && afg.length >= 10 &&
+        afg.every(function (p) { return p[0] < 6 && p[1] >= 6; }), afg.length);
+    paastand("linjen beder om kobberrøret først igen", /Vælg Kobber til venstre rør og Jern til højre rør/.test(linje(R)), linje(R));
+    paastand("under Rør, der er prøvet, står begge rækkefølger", /Kobber \+ jern\s*hul i jernrøret efter 10 år/.test(d.getElementById("r-proevet").textContent) &&
+        /Jern \+ kobber\s*hul i jernrøret efter 20 år/.test(d.getElementById("r-proevet").textContent), d.getElementById("r-proevet").textContent);
+    R.saetRoer("Cu", "Fe", false);
+    paastand("med kobberrøret først følger tre kobberioner vandet gennem luppen", R.M.gaest.length === 3 && R.M.gaest.every(function (g) { return g.sym === "Cu" && R.M.iVand(g.x, g.y); }) &&
+        /Lad tiden gå/.test(linje(R)), linje(R));
+    lyt();
+    R.tidKlik(); koerF(R, 13);
+    var afsat = afsatKobber();
+    paastand("kobberionerne sætter sig på jernrøret og bliver til kobber", R.M.tael.afsat >= 3 && afsat.length === R.M.tael.afsat && afsat.every(function (p) { return p.x >= 6; }), R.M.tael.afsat);
+    paastand("resten af jernatomerne afgiver stadig elektroner til kobberrøret", afg.length >= 3 && afg.every(function (p) { return p[0] >= 6 && p[1] < 6; }), afg.length);
+    paastand("hvert jernatom, der mangler, er taget af en kobberion eller har afgivet to elektroner", sum(R.M.top) === afg.length + R.M.tael.afsat && R.M.top[6] === 4, sum(R.M.top) + " = " + afg.length + " + " + R.M.tael.afsat);
+    paastand("der er stadig tre kobberioner i vandet, og de bliver i vandet", R.M.gaest.length === 3 && R.M.gaest.every(function (g) { return g.maal === null && g.x > 0.2 && g.x < 11.8 && g.y < 0; }),
+        JSON.stringify(R.M.gaest));
+    paastand("hullet kommer efter 10 år som før", R.slut && taet(R.t, 10.0, 0.05));
+    R.svarValg(0);
+    var roedRetning = roed(R) && /Elektronerne bliver i metallet/.test(linje(R));
+    R.svarValg(1);
+    paastand("mål 5: forkert svar rødt, rigtigt svar løser med skemaet", roedRetning && R.faerdig && /Cu²⁺ \+ Fe → Cu \+ Fe²⁺/.test(linje(R)), linje(R));
+
+    R.vaelg(5);
+    paastand("mål 6: plastmuffen kommer frem, og jernrøret sidder først", !R.plastknap.hidden && R.opg.fase === "forsoeg" && R.a === "Fe" && R.b === "Cu");
+    R.tidKlik(); koerF(R, 18);
+    paastand("mål 6: uden muffe går der hul, og linjen siger det", roed(R) && /plastmuffen/i.test(linje(R)), linje(R));
     R.saetRoer("Cu", "Fe", true);
     lyt();
     R.tidKlik(); koerF(R, 18);
-    paastand("mål 5: med plastmuffe holder jernrøret i 20 år", R.opg.fase === "spm" && R.t === 20 && R.par.hul === null);
-    paastand("med plastmuffe går ingen elektroner over samlingen", afg.length > 0 && afg.every(function (p) { return p[0] >= 7 && p[1] >= 7; }), JSON.stringify(afg));
+    paastand("mål 6: plastmuffe med kobberrøret først: kobberionerne giver hul efter 13 år, og linjen siger hvorfor", roed(R) && R.opg.fase === "forsoeg" && D.aar(R.t) === 13 &&
+        /kobberioner med hen til jernrøret/.test(linje(R)) && /hul i jernrøret efter 13 år/.test(d.getElementById("r-proevet").textContent), linje(R));
+    paastand("plasten standser elektronerne, men ikke kobberionerne", R.M.tael.afsat >= 3 && afg.every(function (p) { return p[0] >= 7 && p[1] >= 7; }), afg.length + " / " + R.M.tael.afsat);
+    R.saetRoer("Fe", "Cu", true);
+    lyt();
+    R.tidKlik(); koerF(R, 18);
+    paastand("mål 6: med plastmuffe og jernrøret først holder jernrøret i 20 år", R.opg.fase === "spm" && R.t === 20 && R.par.hul === null && /holdt i alle 20 år/.test(linje(R)), linje(R));
+    paastand("med plastmuffe går ingen elektroner over samlingen", afg.length > 0 && afg.every(function (p) { return p[0] <= 4 && p[1] <= 4; }) && R.M.tael.afsat === 0, JSON.stringify(afg));
     R.svarValg(1);
-    var roed5 = roed(R);
+    var roed6 = roed(R);
     R.svarValg(0);
-    paastand("mål 5: forkert svar rødt, rigtigt svar løser", roed5 && R.faerdig && R.antalLoest() === 5);
-    var svarOk = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(R, i) && /gul/.test(klasse(R)); });
-    paastand("alle fem mål kan løses med Vis svaret (gul linje)", svarOk);
+    paastand("mål 6: forkert svar rødt, rigtigt svar løser", roed6 && R.faerdig && /jernrøret først og plast imellem/.test(linje(R)) && R.antalLoest() === 6, linje(R));
+    var svarOk = [0, 1, 2, 3, 4, 5].every(function (i) { return visSvaret(R, i) && /gul/.test(klasse(R)); });
+    paastand("alle seks mål kan løses med Vis svaret (gul linje)", svarOk);
+    R.vaelg(4);
+    for (var n5 = 0; n5 < 6; n5++) R.knap();
+    paastand("Vis svaret i mål 5 stiller jernrøret først og viser hullet efter 20 år", R.opg.fase === "spm" && R.a === "Fe" && R.b === "Cu" && R.t === 20 && R.slut, R.opg.fase + " " + R.a + R.b + " " + R.t);
     R.vaelg(0); R.svarValg(1); R.tidKlik(); koerF(R, 14);
     R.tegn();
     R.klikScene({ x: R.pyt.x, y: R.pyt.y });
     paastand("påskeægget: et klik på vandpytten", /VVS/.test(linje(R)) && NK.paaskeaeg >= 1, linje(R));
+    paastand("når målet om vandets retning er løst, ses kobberionerne også i mål 1", R.visIoner() && R.M.gaest.length === 3);
 
     /* ------------------------------------------------------------------ */
     overskrift("7. Fane 2: Skibet");
@@ -408,7 +463,7 @@ function koerTest(W) {
     /* ------------------------------------------------------------------ */
     overskrift("9. Opgaverne og sproget");
     var opbyg = [];
-    [["r", D.R_MAAL, 5], ["s", D.S_MAAL, 5], ["j", D.J_MAAL, 6]].forEach(function (f) {
+    [["r", D.R_MAAL, 6], ["s", D.S_MAAL, 5], ["j", D.J_MAAL, 6]].forEach(function (f) {
         if (f[1].length !== f[2]) opbyg.push(f[0] + " antal");
         f[1].forEach(function (o) {
             ["forsoeg", "spm", "felter"].forEach(function (del) {
@@ -422,14 +477,17 @@ function koerTest(W) {
             if (!o.loest || !o.navn) opbyg.push(o.id + " tekst");
         });
     });
-    paastand("16 mål: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte", opbyg.length === 0, opbyg.join(", "));
+    paastand("17 mål: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte", opbyg.length === 0, opbyg.join(", "));
     var tekster = [];
     (function saml(x) {
         if (typeof x === "string") tekster.push(x);
         else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
     }(D));
     tekster.push(d.body.textContent);
-    tekster.push(D.SKIB.brugtOp("Mg"), D.SKIB.tiLoest(3), D.SKIB.tiLoest(5), D.roerResultat(cufe), D.roerResultat(fefe), D.roerResultat(znfe), D.roerNavn(plast));
+    tekster.push(D.SKIB.brugtOp("Mg"), D.SKIB.tiLoest(3), D.SKIB.tiLoest(5), D.roerResultat(cufe), D.roerResultat(fefe), D.roerResultat(znfe), D.roerNavn(plast),
+        D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, cuplast), D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: false }, cufe),
+        D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: false }, plast), D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, fecu),
+        D.roerForkert({ par: ["Zn", "Fe"], plast: false }, cufe), D.roerForkert({ ens: true }, cufe));
     var alt2 = tekster.join("\n");
     paastand("ingen tankestreger", !/[–—]/.test(alt2));
     paastand("ladning 1 skrives som + og −, aldrig 1+ og 1−", !/¹[⁺⁻]|(^|[^0-9,.])1[+−](?![0-9])/.test(alt2));
@@ -437,7 +495,12 @@ function koerTest(W) {
     paastand("æ, ø og å er skrevet rigtigt i teksterne", !m, m ? m[0] : "");
     paastand("propel, ikke skrue, og ingen natronlud", !/skruen|natronlud/i.test(alt2));
     paastand("rørenes resultater er hele sætningsled", D.roerResultat(cufe) === "hul i jernrøret efter 10 år" && D.roerResultat(znfe) === "zinkrøret tæret ved samlingen" &&
-        D.roerResultat(cucu) === "ingen tæring" && /samlingen holder/.test(D.roerResultat(fefe)), D.roerResultat(fefe));
+        D.roerResultat(cucu) === "ingen tæring" && /samlingen holder/.test(D.roerResultat(fefe)) && D.roerResultat(fecu) === "hul i jernrøret efter 20 år" &&
+        D.roerResultat(cuplast) === "hul i jernrøret efter 13 år" && /samlingen holder/.test(D.roerResultat(plast)), D.roerResultat(fefe));
+    paastand("beskederne om rækkefølgen og muffen", /Vandet skal komme gennem jernrøret først/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: false }, cufe)) &&
+        /Slå Plastmuffe fra/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: false }, plast)) &&
+        /Sæt plastmuffen imellem/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, fecu)) &&
+        /kobberioner med hen til jernrøret\. Sæt jernrøret til venstre/.test(D.roerForkert({ par: ["Fe", "Cu"], orden: true, plast: true }, cuplast)));
 
     /* ------------------------------------------------------------------ */
     overskrift("10. Layoutet");
@@ -450,7 +513,7 @@ function koerTest(W) {
         function over(a, b) { return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom; }
 
         NK.visFane("fane-r");
-        R.vaelg(4); R.tilpas(); R.layout();
+        R.vaelg(5); R.tilpas(); R.layout();
         var l = R.lay, scene = rk(d.querySelector("#fane-r .scene")), status = rk(d.getElementById("r-status"));
         if (l.lup.y + l.lup.h > l.roerY - l.Ro - 8) pr.push("luppen rører rørene");
         if (l.lup.x < 4 || l.lup.x + l.lup.b > l.W - 4) pr.push("luppen er for bred");

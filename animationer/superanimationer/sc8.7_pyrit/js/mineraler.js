@@ -103,11 +103,5 @@
         "</g></g>" +
         '<path d="M34 34 q10 -8 22 -6" stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>');
 
-    /* Stenens farve som en prik (trappen i panelet) */
-    NK.MineralFarve = {
-        svovl: "#f3d936", zinkblende: "#6d4429", cinnober: "#cc2630", pyrit: "#e2c05a",
-        haematit: "#7b3b33", magnetit: "#3a3c43", gips: "#e8eff2", malakit: "#2fa56a"
-    };
-
     NK.Mineraler = M;
 }());

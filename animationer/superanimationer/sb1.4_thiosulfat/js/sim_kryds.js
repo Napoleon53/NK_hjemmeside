@@ -6,6 +6,9 @@
    det eller tryk Tilsaet syren). Uret starter, idet syren rammer, og
    eleven stopper det selv, naar krydset ikke kan ses oppefra.
 
+   Scenen: krydset set oppefra ligger lige over baegerglasset, og uret
+   staar oeverst til hoejre over grafen.
+
    Bagefter vises kurven for det dannede svovl med en stiplet streg,
    hvor krydset forsvinder. Alle gode maalinger ender paa stregen: der
    er dannet den samme maengde svovl, saa 1/Δt er et maal for
@@ -44,7 +47,11 @@
         this.traek = null;
         this.tilbage = null;
         this.klar();
-        this.kort = new NK.Opgavekort("kryds", D.KRYDS_OPGAVER, this);
+        /* Quizzen: fem spoergsmaal, og knappen foerer til sidst videre til fane 2 */
+        this.kort = new NK.Opgavekort("kryds", D.KRYDS_OPGAVER, this, {
+            videreTekst: "Videre til Koncentration",
+            videre: function () { NK.visFane("konc"); }
+        });
         this.bind();
         if (this.laererStart) this.laererStart();
         this.bygTilbud();
@@ -253,7 +260,6 @@
         if (Math.hypot(p.x - su.x, p.y - su.y) < su.r * 1.15 || Tg.inde(p, { x: su.x - su.r * 0.25, y: su.y - su.r * 1.35, b: su.r * 0.5, h: su.r * 0.4 })) return "stopur";
         if (Math.hypot(p.x - lay.op.x, p.y - lay.op.y) < lay.op.r) return "oppefra";
         if (Tg.inde(p, { x: lay.bg.x, y: lay.bg.y, b: lay.bg.b, h: lay.bg.h })) return "baeger";
-        if (Math.hypot(p.x - lay.oeje.x, p.y - lay.oeje.y) < lay.oeje.r * 1.4) return "oeje";
         if (Tg.inde(p, this.mgRekt(), 6)) return "maaleglas";
         return null;
     };
@@ -275,7 +281,7 @@
             else if (tilst === "stoppet") this.forfra();
             return;
         }
-        if (hvad === "oppefra" || hvad === "oeje") {
+        if (hvad === "oppefra") {
             if (tilst === "klar") this.saetStatus("Oppefra ses krydset gennem den klare væske. Tilsæt syren.", "gul");
             else if (tilst === "koerer") this.saetStatus("Kig godt efter. Stop uret, når krydset er helt væk.", "gul");
             else this.blinkStatus();
@@ -326,6 +332,7 @@
         cv.addEventListener("pointerleave", function () { if (!mig.traek) mig.over = null; });
         NK.el("kryds-knap").addEventListener("click", function () { mig.hovedknap(); });
         Array.prototype.forEach.call(document.querySelectorAll("#kryds-segment button"), function (k, i) {
+            k.textContent = D.KRYDS_BLANDINGER[i] + " mL";
             k.addEventListener("click", function () { mig.vaelg(i); });
         });
         NK.el("kryds-spring").addEventListener("click", function () { mig.springIntro(); });
@@ -357,16 +364,17 @@
         });
         NK.saetTekst("kryds-note", ml + " mL " + M.THIO_TEKST + " Na₂S₂O₃ og " + (D.GLAS_ML - ml) + " mL vand i glasset. " +
             D.SYRE_ML + " mL 1,0 M HCl i måleglasset.");
+        NK.saetTekst("kryds-konc", NK.bet(this.blanding().c, 2) + " M");
         var knap = { klar: ["Tilsæt syren", "▶", "knap stor groen"], haelder: ["Stop uret", "■", "knap stor roed"],
             koerer: ["Stop uret", "■", "knap stor roed"], stoppet: ["Forfra", "↺", "knap stor blaa"] }[t];
         NK.saetHTML("kryds-knap", "<span>" + knap[0] + "</span><span class=\"tegn\">" + knap[1] + "</span>");
         NK.saetKlasse("kryds-knap", knap[2]);
 
-        var h = "<thead><tr><th>Nr.</th><th>Na₂S₂O₃</th><th>Δt / s</th><th>1/Δt / s⁻¹</th></tr></thead><tbody>";
+        var h = "<thead><tr><th>Nr.</th><th>[S₂O₃²⁻] / M</th><th>Δt / s</th><th>1/Δt / s⁻¹</th></tr></thead><tbody>";
         if (!this.maalinger.length) h += '<tr class="tom"><td colspan="4">Ingen målinger endnu.</td></tr>';
         this.maalinger.forEach(function (m) {
             h += '<tr><td><span class="nrchip" style="background-color:' + Tg.farve(m.nr) + '">' + m.nr + "</span></td>" +
-                "<td>" + m.ml + " mL</td><td><b>" + NK.tal(m.dt, 1) + "</b></td><td>" + NK.bet(1 / m.dt, 3) + "</td></tr>";
+                "<td>" + NK.bet(m.c, 2) + "</td><td><b>" + NK.tal(m.dt, 1) + "</b></td><td>" + NK.bet(1 / m.dt, 3) + "</td></tr>";
         });
         NK.saetHTML("kryds-tabel", h + "</tbody>");
         this.visUr();
@@ -377,36 +385,47 @@
         var ny = this.L.tilpas();
         if (!ny && this.lay) return;
         var W = this.L.b, H = this.L.h;
-        var bordY = Math.round(H * 0.7);
+        var bordY = Math.round(H * 0.74);
         var b = NK.klamp(Math.min(W * 0.26, H * 0.3), 130, 300);
         var cx = W * 0.27;
         /* Glasset staar paa papiret, og papiret ligger helt paa bordet */
         var staa = bordY + b * 0.17 + 10;
-        var urR = NK.klamp(Math.min(W * 0.06, H * 0.08), 38, 66);
-        var opR = NK.klamp(Math.min(W * 0.15, H * 0.2), 90, 180);
-        var opX = W - opR - 44, opY = 34 + opR;
+        /* Glassets maal til klik og haeldning (samme regning som Tegn.baeger) */
+        var k = b / 200;
+        var bg = { x: cx - b / 2, y: staa - 211 * k, b: b, h: 220 * k, indX0: cx - b / 2 + 21 * k, indX1: cx - b / 2 + 179 * k };
+        /* Krydset set oppefra ligger lige over glasset. Imellem er der luft,
+           saa maaleglasset kan haelde uden at daekke for det. */
+        var luft = Math.max(44, b * 0.26);
+        var opR = NK.klamp(Math.min((bg.y - luft - 46) / 2, cx - 14, W * 0.2), 56, 180);
+        /* Uret staar oeverst til hoejre, over grafen */
+        var gx0 = W * 0.58 + 40, gx1 = W - 36;
+        var urR = NK.klamp(Math.min(W * 0.07, H * 0.095), 40, 76);
+        var ur = { x: (gx0 + gx1) / 2, y: 22 + urR * 1.35, r: urR };
         var lay = {
             W: W, H: H, bordY: bordY,
             bgX: cx, bgY: staa, bgB: b,
-            ur: { x: Math.max(urR + 24, W * 0.08), y: urR * 1.45 + 18, r: urR },
-            op: { x: opX, y: opY, r: opR },
-            graf: { x0: W * 0.58 + 40, x1: W - 36, y0: opY + opR + 70, y1: H - 106 }
+            bg: bg,
+            ur: ur,
+            op: { x: cx, y: bg.y - luft - opR, r: opR },
+            graf: { x0: gx0, x1: gx1, y0: ur.y + urR + 96, y1: H - 106 }
         };
-        /* Glassets maal til klik og haeldning (samme regning som Tegn.baeger) */
-        var k = b / 200;
-        lay.bg = { x: cx - b / 2, y: lay.bgY - 211 * k, b: b, h: 220 * k, indX1: cx - b / 2 + 179 * k };
-        lay.oeje = { x: cx, y: lay.bg.y - Math.max(46, H * 0.08), r: Math.max(18, b * 0.1) };
         var mgH = b * 1.0;
         lay.mg = { x: cx + b / 2 + mgH * 0.23 + 34, y: staa - b * 0.04, h: mgH };
         if (lay.graf.y1 - lay.graf.y0 < 120) lay.graf.y0 = lay.graf.y1 - 120;
         this.lay = lay;
+        /* Tilbuddet om praesentationen og knappen, der springer den over,
+           staar foroven i mellemrummet mellem krydset set oppefra og uret */
+        var midt = Math.round((cx + opR * 0.72 + ur.x - urR * 0.8) / 2);
+        ["kryds-tilbud", "kryds-spring"].forEach(function (id) {
+            var e = NK.el(id);
+            if (e) e.style.left = midt + "px";
+        });
     };
 
     P.tegn = function () {
         var L = this.L, ctx = L.ctx, lay = this.lay;
         L.ryd();
         if (!lay) return;
-        var tilst = this.tilstand;
         var kontrast = this.kontrastNu();
 
         Tg.bord(ctx, lay.W, lay.H, lay.bordY);
@@ -424,28 +443,29 @@
             ctx.restore();
         }
 
-        /* Oejet og synslinjen ned gennem vaesken til krydset */
+        /* Krydset set oppefra, lige over glasset. To stiplede linjer fra
+           glassets kant viser, at det er glasset, man kigger ned i. */
+        var op = lay.op, vink = 0.62;
         ctx.save();
         ctx.setLineDash([6, 6]);
-        ctx.strokeStyle = "rgba(242, 197, 61, 0.55)";
+        ctx.strokeStyle = "rgba(242, 197, 61, 0.45)";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(lay.oeje.x, lay.oeje.y + lay.oeje.r * 0.7);
-        ctx.lineTo(lay.bgX, lay.bgY - 2);
+        ctx.moveTo(lay.bg.indX0, lay.bg.y + 2);
+        ctx.lineTo(op.x - Math.sin(vink) * op.r, op.y + Math.cos(vink) * op.r);
+        ctx.moveTo(lay.bg.indX1, lay.bg.y + 2);
+        ctx.lineTo(op.x + Math.sin(vink) * op.r, op.y + Math.cos(vink) * op.r);
         ctx.stroke();
         ctx.restore();
-        Tg.oeje(ctx, lay.oeje.x, lay.oeje.y, lay.oeje.r);
-
-        this.tegnMaaleglas(ctx);
-        this.tegnUr(ctx);
-
-        /* Krydset set oppefra */
-        NK.tekst(ctx, "SET OPPEFRA", lay.op.x, lay.op.y - lay.op.r - 12,
+        NK.tekst(ctx, "SET OPPEFRA", op.x, op.y - op.r - 12,
             { font: "700 13px " + SKRIFT, justering: "center", farve: "#9fa6af" });
-        Tg.oppefra(ctx, lay.op.x, lay.op.y, lay.op.r, {
+        Tg.oppefra(ctx, op.x, op.y, op.r, {
             vaeske: true, kontrast: kontrast, hvirvel: this.hvirvel, tid: this.tid,
             lys: this.over === "oppefra"
         });
+
+        this.tegnMaaleglas(ctx);
+        this.tegnUr(ctx);
 
         this.tegnGraf(ctx);
         if (this.laererTegnOver) this.laererTegnOver(ctx);
@@ -514,11 +534,19 @@
         ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(g.x0, ys); ctx.lineTo(g.x1, ys); ctx.stroke();
         ctx.restore();
-        NK.tekst(ctx, "krydset er væk", g.x0 + 8, ys - 8, { font: "600 13px " + SKRIFT, farve: "#f0ebd0" });
+        /* Under stregen til hoejre: der kommer ingen kurver og ingen punkter.
+           Paa en smal graf staar teksten paa to linjer, saa den gaar fri af
+           kurven for den langsomste blanding. */
+        (g.x1 - g.x0 < 300 ? ["krydset", "er væk"] : ["krydset er væk"]).forEach(function (linje, i) {
+            NK.tekst(ctx, linje, g.x1 - 4, ys + 18 + i * 16, { font: "600 13px " + SKRIFT, justering: "right", farve: "#f0ebd0" });
+        });
 
         if (!ms.length) {
-            NK.tekst(ctx, "Kurven kommer, når du har stoppet uret", (g.x0 + g.x1) / 2, (g.y0 + ys) / 2 + 6,
-                { font: "600 14px " + SKRIFT, justering: "center", farve: "#9fa6af" });
+            var tom = g.x1 - g.x0 < 290 ? ["Kurven kommer, når", "du har stoppet uret"] : ["Kurven kommer, når du har stoppet uret"];
+            tom.forEach(function (linje, i) {
+                NK.tekst(ctx, linje, (g.x0 + g.x1) / 2, (g.y0 + ys) / 2 + 6 + (i - (tom.length - 1) / 2) * 20,
+                    { font: "600 14px " + SKRIFT, justering: "center", farve: "#9fa6af" });
+            });
             return;
         }
         ms.forEach(function (m) {
