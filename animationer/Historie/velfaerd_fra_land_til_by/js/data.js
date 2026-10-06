@@ -127,8 +127,9 @@
             tekst: "I 1940 hører {l1940} af 100 til landbruget. Gæt, hvor mange det er i 1989.",
             valg: [25, 15, 5],
             maalAar: 1989,
-            start: "Vælg et gæt.",
-            laast: "Gæt først. Så låses årsskyderen op.",
+            spoerg: "Hvor mange af de 100 hører til landbruget i 1989?",
+            start: "Gæt først. Bagefter trækker du årsskyderen til 1989 og ser svaret.",
+            laast: "Gæt først. Så kommer årsskyderen frem.",
             efterGaet: "Træk årsskyderen helt til 1989, og se, om du gættede rigtigt.",
             ramt: "Du gættede rigtigt. I 1989 hører {l1989} af 100 til landbruget.",
             ikkeRamt: "Du gættede {gaet}. I 1989 hører kun {l1989} af 100 til landbruget."

@@ -45,7 +45,10 @@ overvældende", en svag elev skal nemmere kunne overskue den. Derfor:
   når det sidste erhverv er sorteret.
 * **Intet fast panel.** Opgavelisten er blevet til fem prikker i opgavelinjen.
   Kurven over sektorerne er et tilvalg bag knappen Kurve i toplinjen, og
-  knappen kommer først frem, når erhvervene er sorteret.
+  knappen kommer først frem, når erhvervene er sorteret. Er vinduet 1000 px
+  bredt eller mere, får kurven sin egen spalte til højre. Er det smallere (som
+  i samlingens ramme), lægger den sig oven på figuren som et kort, så scenen
+  ikke bliver klemt.
 * **Mindre på figuren.** Aksen, gitteret og noten under årstallet er væk.
   Uoplyst står gråt nederst uden egen overskrift.
 * **En pil viser, hvor man kan begynde.** Rækkefølgen er stadig fri.
@@ -63,7 +66,10 @@ Det skal ikke rulles tilbage uden brugerens ord.
    også, og det gør tasterne 1, 2 og 3. Uoplyst kan ikke sorteres. Et forkert
    svar får en forklaring, der passer til erhvervet og sektoren.
 2. **Gæt: landbruget i 1989.** Eleven gætter først (25, 15 eller 5) og trækker så
-   skyderen til 1989. Skyderen er låst, til der er gættet.
+   skyderen til 1989. Til der er gættet, står spørgsmålet på skyderens plads,
+   lige ved de tre svar, og rækken Landbrug er markeret. Så kommer skyderen frem.
+   (Brugerens rettelse 6. okt. 2026: spørgsmålet stod for langt fra knapperne,
+   og svage elever klikker, før de tænker.)
 3. **Industrien overhaler landbruget.** Find det første år (modellen siger 1955).
 4. **Halvdelen i den tertiære sektor.** Find det første år (1969).
 5. **Forklar faldet i landbruget.** Tre svar: det rigtige og to fejl, elever laver
@@ -133,15 +139,15 @@ uden for de intervaller, hintene nævner.
 
 ## Selvtest
 
-`_selvtest.html` siger ALT OK med godt 31.000 påstande: modellen (100 personer
+`_selvtest.html` siger ALT OK med godt 35.000 påstande: modellen (100 personer
 i alle 50 år, højst 1 fra figurens tal, jævne flytninger, faste pladser,
 svarene inden for de år, hintene nævner), teksterne (alle erhverv har
 forklaring, to hint og fejltekster, ingen tankestreger, hintene røber ikke
 sektoren), hele forløbet med mus, klik og tastatur, og roen: i starten er kun
 rækkerne og knappen fremme, intet flytter sig, når sektorerne og årsskyderen
 kommer frem, figuren står stille fra sorteringen er færdig til sidste opgave,
-intet skal rulles ved 1366 x 768, 1280 x 620 og 1069 x 620 (heller ikke med
-kurven slået til), ingen personer overlapper eller står uden for deres bane, og
+intet skal rulles ved 1366 x 768, 1280 x 620, 1069 x 620 og 883 x 620 (heller
+ikke med kurven slået til), ingen personer overlapper eller står uden for deres bane, og
 ingen læsbar tekst er under 12,4 px.
 
 ## Linjen til menuen
@@ -149,3 +155,12 @@ ingen læsbar tekst er under 12,4 px.
 Fra land til by 1940-1989: 100 personer viser, hvad befolkningen levede af.
 Sortér erhvervene i sektorer, træk i årsskyderen, og find året, hvor industrien
 overhaler landbruget.
+
+## Vinduet i samlingen
+
+I `samling_alt_historie.html` får animationen ca. 883 x 620 px, når begge menuer
+er åbne på en skærm på 1280 x 620 (målt af sessionen bag Finansministeren
+6. okt. 2026). Den størrelse er derfor med i selvtesten. Under 800 px falder
+siden tilbage til én spalte, hvor årslinjen må ombryde, og siden kan rulles.
+Grænsen stod først ved 900 px, og så ombrød årslinjen i samlingens vindue, når
+svarknapperne kom frem.

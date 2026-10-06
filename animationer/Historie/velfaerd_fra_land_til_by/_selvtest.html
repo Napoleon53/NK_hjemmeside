@@ -387,6 +387,13 @@
     ens(JSON.stringify(aftryk()), foerNaeste, "figuren flytter sig ikke, når årsskyderen kommer frem");
     ok(el("knap").hidden, "der er ingen hintknap til et gæt");
     ens(d.querySelectorAll("#valg [data-valg]").length, 3, "tre gæt at vælge imellem");
+    /* spørgsmålet står lige ved de tre gæt, og skyderen ses ikke endnu */
+    ok(kanSes(el("gaet-spm")) && el("gaet-spm").textContent === gaet.spoerg, "gættets spørgsmål står ved knapperne");
+    var spmKant = el("gaet-spm").getBoundingClientRect(), foersteGaet = d.querySelector('#valg [data-valg="0"]').getBoundingClientRect();
+    ok(foersteGaet.left - spmKant.right >= 0 && foersteGaet.left - spmKant.right <= 40, "spørgsmålet slutter højst 40 px fra det første gæt (" + Math.round(foersteGaet.left - spmKant.right) + ")");
+    ok(Math.abs((spmKant.top + spmKant.bottom) / 2 - (foersteGaet.top + foersteGaet.bottom) / 2) <= 12, "spørgsmålet står i højde med knapperne");
+    ok(!kanSes(el("skyder")), "skyderen ses ikke, før der er gættet");
+    ok(el("rk-landbrug").classList.contains("hintes"), "rækken Landbrug er markeret, mens der gættes");
     F.skyder(1980);
     ens(F.aar(), 1940, "skyderen er låst, til der er gættet");
     ok(el("skyderboks").classList.contains("laast"), "skyderen ser låst ud");
@@ -395,6 +402,8 @@
     d.querySelector('#valg [data-valg="1"]').click();
     ens(F.tilstand().gaet, 15, "gættet er gemt");
     ok(!el("skyderboks").classList.contains("laast"), "skyderen låses op efter gættet");
+    ok(kanSes(el("skyder")) && !kanSes(el("gaet-spm")), "efter gættet kommer skyderen frem, og spørgsmålet ved knapperne forsvinder");
+    ok(!el("rk-landbrug").classList.contains("hintes"), "markeringen af Landbrug forsvinder efter gættet");
     ok(d.querySelector('#valg [data-valg="1"]').classList.contains("valgt") && d.querySelector('#valg [data-valg="0"]').disabled, "gættet kan ikke ændres");
     tast("ArrowRight");
     ens(F.aar(), 1941, "pil til højre flytter et år frem");
@@ -579,7 +588,8 @@
         return ["#baand-p", "#aarslinje", "#trin", "#panel", "#kurveknap", "#tjek", "#valg"].filter(function (s) { return kanSes(d.querySelector(s)); });
     }
 
-    var stoerrelser = [[1366, 768], [1280, 620], [1069, 620]];
+    /* 883 x 620 er vinduet i samlingen, når begge menuer er åbne på en skærm på 1280 x 620 */
+    var stoerrelser = [[1366, 768], [1280, 620], [1069, 620], [883, 620]];
     for (i = 0; i < stoerrelser.length; i++) {
         var navn = stoerrelser[i][0] + " x " + stoerrelser[i][1];
         await aabn(stoerrelser[i][0], stoerrelser[i][1]);
@@ -613,7 +623,12 @@
         F.knap();
         ens(fremme(), ["#baand-p", "#aarslinje", "#trin", "#kurveknap", "#valg"], navn + ": med gættet kommer årsskyderen og de tre gæt");
         ens(JSON.stringify(aftryk()), ark, navn + ": intet flytter sig, når årsskyderen kommer frem");
-        F.valg(0); rulFrit(navn + " gæt"); F.skyder(1989); rulFrit(navn + " gæt afsløret"); personerIBanen(navn + " 1989");
+        var spmBoks = el("gaet-spm").getBoundingClientRect(), skyderBoks = el("skyderboks").getBoundingClientRect();
+        ok(kanSes(el("gaet-spm")) && el("gaet-spm").scrollHeight <= el("gaet-spm").clientHeight + 1 && spmBoks.width <= skyderBoks.width + 1, navn + ": gættets spørgsmål har plads ved knapperne");
+        rulFrit(navn + " før gættet");
+        F.valg(0);
+        ens(JSON.stringify(aftryk()), ark, navn + ": intet flytter sig, når der gættes");
+        rulFrit(navn + " gæt"); F.skyder(1989); rulFrit(navn + " gæt afsløret"); personerIBanen(navn + " 1989");
         F.knap(); F.skyder(1950); F.tjek(); rulFrit(navn + " find fejl");
         F.knap(); rulFrit(navn + " find hint 1"); F.knap(); rulFrit(navn + " find hint 2"); F.knap(); rulFrit(navn + " find svaret");
         F.knap(); F.skyder(sv.halvdel + 2); F.tjek(); rulFrit(navn + " halvdel fejl"); F.skyder(sv.halvdel); F.tjek(); rulFrit(navn + " halvdel"); personerIBanen(navn + " " + sv.halvdel);
@@ -665,6 +680,7 @@
         }
         ok(mindst >= 12.4, hvor + ": mindste skrift er " + mindst + " px (" + hvilken + ")");
     }
+    await aabn(883, 620, "#opgaver"); F.skiftKurve(); F.valg(0); F.skyder(1989); await skrift("883 x 620 opgaver med kurve");
     await aabn(1069, 620); await skrift("1069 x 620 start");
     F.knap(); await skrift("1069 x 620 sortering");
     await aabn(1069, 620, "#opgaver"); F.skiftKurve(); F.valg(0); F.skyder(1989); await skrift("1069 x 620 opgaver med kurve");

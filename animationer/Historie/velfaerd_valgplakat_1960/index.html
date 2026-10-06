@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kildeanalyse af en valgplakat</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-fase="spm">
+
+<header class="top">
+    <h1><span class="ikon">hv</span> Kildeanalyse af en valgplakat</h1>
+
+    <button class="ikonknap tekstknap" id="fagordknap" type="button" title="Fagord (T)">Fagord</button>
+</header>
+
+<main>
+<div class="scene" id="scene">
+
+    <!-- Kilden: plakaten og kildehenvisningen. Den gule ramme viser, hvor svaret kan ses (js/quiz.js). -->
+    <figure class="kilde">
+        <button class="plakat" id="plakat" type="button" title="Vis plakaten stor">
+            <img id="plakat-billede" alt="">
+            <span class="ring" id="ring" aria-hidden="true"></span>
+        </button>
+        <figcaption id="henvisning"></figcaption>
+    </figure>
+
+    <div class="arbejde" id="arbejde">
+
+        <!-- Fagordet for spørgsmålet. Prikkerne til højre viser, hvor langt eleven er. -->
+        <div class="spm-hoved">
+            <span class="opg-maerke" id="spm-ord"></span>
+            <ol class="trin" id="trin" aria-label="Spørgsmålene"></ol>
+        </div>
+
+        <h2 class="spm" id="spm"></h2>
+        <div class="valg" id="valg" role="group" aria-label="Svarmuligheder"></div>
+
+        <!-- Svaret på det, eleven vælger, og knappen videre. Står lige under svarene. -->
+        <div class="statuslinje" id="statuslinje">
+            <p class="st-tekst" id="besked" aria-live="polite"></p>
+            <button class="knap" id="forfra" type="button" hidden>Forfra</button>
+            <button class="knap hjaelp videre" id="knap" type="button" hidden></button>
+        </div>
+
+        <!-- Arket: hvert rigtigt svar bliver til en sætning i elevens analyse -->
+        <section class="analyse" id="analyse" aria-label="Din kildeanalyse">
+            <span class="etiket">Din kildeanalyse</span>
+            <p class="analyse-tekst" id="analyse-tekst"></p>
+            <div class="metode" id="metode" hidden>
+                <p id="metode-tekst"></p>
+                <ol id="metode-liste"></ol>
+            </div>
+        </section>
+    </div>
+
+    <div class="fejring" id="fejring" aria-hidden="true"></div>
+</div>
+</main>
+
+<!-- ================================================================= -->
+<!-- FAGORDENE (åbnes kun med knappen eller T)                          -->
+<!-- ================================================================= -->
+<div class="overlay" id="fagord">
+    <div class="overlay-boks">
+        <h2>Fagord</h2>
+        <dl class="ordliste">
+            <dt>Kilde</dt>
+            <dd>Noget fra fortiden, som historikere bruger til at undersøge fortiden, fx en plakat, et brev eller en lov.</dd>
+            <dt>Kildehenvisning</dt>
+            <dd>Oplysningen om, hvad kilden er, hvornår den er fra, og hvor den findes.</dd>
+            <dt>Afsender</dt>
+            <dd>Den, der står bag kilden.</dd>
+            <dt>Modtager</dt>
+            <dd>Dem, kilden er rettet til.</dd>
+            <dt>Budskab</dt>
+            <dd>Det, afsenderen vil have modtageren til at mene eller gøre.</dd>
+            <dt>Virkemiddel</dt>
+            <dd>Det, afsenderen bruger for at overbevise, fx billeder, farver og slogans.</dd>
+            <dt>Slogan</dt>
+            <dd>En kort sætning, der er let at huske.</dd>
+            <dt>Partisk</dt>
+            <dd>Afsenderen har en interesse i sagen og viser kun sin egen side.</dd>
+            <dt>Beskæftigelse</dt>
+            <dd>At folk har arbejde.</dd>
+            <dt>Kernefamilie</dt>
+            <dd>Far, mor og børn, der bor sammen.</dd>
+        </dl>
+
+        <h3>Om quizzen</h3>
+        <p>Plakaten er fra Arbejderbevægelsens Bibliotek og Arkiv. Quizzen er lavet efter en øvelse i kildeanalyse fra VUC Digital (vucdigital.dk).</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> vælg svar &nbsp;·&nbsp; <kbd>Enter</kbd> knappen &nbsp;·&nbsp; <kbd>T</kbd> fagord &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper" style="margin-top:16px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Plakaten i stor størrelse. Et klik lukker. -->
+<div class="overlay stor-lag" id="stor" title="Luk">
+    <img id="stor-billede" alt="">
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/quiz.js"></script>
+</body>
+</html>

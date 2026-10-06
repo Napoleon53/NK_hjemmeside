@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: Kildeanalyse af en valgplakat</title>
+<style>
+    body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 14px/1.5 Consolas, monospace; }
+    h1 { margin: 0 0 8px; font-size: 16px; }
+    pre { white-space: pre-wrap; }
+    iframe { display: block; margin-top: 12px; border: 1px solid #444; }
+</style>
+</head>
+<body>
+<h1>Selvtest: Kildeanalyse af en valgplakat</h1>
+<p>Kræver en lokal server (siden åbnes i en ramme). Sidste linje er ALT OK eller antallet af fejl.</p>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" title="Quizzen" style="width:883px;height:620px;"></iframe>
+
+<script>
+/* =====================================================================
+   Selvtesten tjekker det, man ikke kan se på et skærmbillede:
+     A  teksterne: hvert spørgsmål har ét rigtigt svar, hvert forkert svar
+        har en grund, og sproget følger reglerne
+     B  forløbet: forkert svar, rigtigt svar, videre, slut og forfra,
+        med mus og tastatur
+     C  roen: statuslinjen og arket står stille, mens eleven svarer, og
+        intet skal rulles i fire skærmstørrelser
+     D  skriften: ingen læsbar tekst under 12,4 px
+   ===================================================================== */
+(async function () {
+    "use strict";
+
+    var linjer = [], fejl = 0, antal = 0;
+    var ramme = document.getElementById("ramme");
+    var w, d, NK, D;
+
+    function ok(betingelse, tekst) {
+        antal++;
+        if (!betingelse) { fejl++; linjer.push("FEJL: " + tekst); }
+    }
+    function ens(a, b, tekst) { ok(JSON.stringify(a) === JSON.stringify(b), tekst + " (fik " + JSON.stringify(a) + ", ventede " + JSON.stringify(b) + ")"); }
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+    async function aabn(b, h) {
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        await new Promise(function (res) {
+            ramme.onload = res;
+            ramme.src = "index.html?t=" + Date.now() + "-" + Math.random();
+        });
+        w = ramme.contentWindow; d = w.document; NK = w.NK; D = NK.Data;
+        /* uden bevaegelse, saa maalene af felterne er de endelige */
+        var st = d.createElement("style");
+        st.textContent = "* { animation: none !important; transition: none !important; }";
+        d.head.appendChild(st);
+        var billede = d.getElementById("plakat-billede");
+        if (!billede.complete) await new Promise(function (res) { billede.onload = res; billede.onerror = res; });
+        await vent(30);
+    }
+
+    function el(id) { return d.getElementById(id); }
+    function S() { return NK.Quiz.tilstand; }
+    function fase() { return d.body.getAttribute("data-fase"); }
+    function synlig(e) { return !!e && w.getComputedStyle(e).visibility !== "hidden" && !!(e.offsetWidth || e.offsetHeight); }
+    function svarknap(i) { return d.querySelector('[data-svar="' + i + '"]'); }
+    function rigtigt(nr) { return D.SPM[nr].svar.findIndex(function (s) { return s.rigtig; }); }
+    function forkert(nr, k) { return D.SPM[nr].svar.map(function (s, i) { return s.rigtig ? -1 : i; }).filter(function (i) { return i >= 0; })[k || 0]; }
+    function tast(key) { d.dispatchEvent(new w.KeyboardEvent("keydown", { key: key, bubbles: true })); }
+    function ringVises() { return el("ring").classList.contains("vis"); }
+    function saetninger() { return d.querySelectorAll("#analyse-tekst .saet").length; }
+    function kasse(e) { var r = e.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), l: Math.round(r.left), r: Math.round(r.right), h: Math.round(r.height) }; }
+
+    try {
+        /* ---------------- A: teksterne ---------------------------------- */
+        await aabn(883, 620);
+
+        ens(D.SPM.length, 9, "A: ni spørgsmål");
+        ens(D.SPM.map(function (q) { return q.ord; }), ["Afsender", "Modtager", "Tid", "Emne", "Budskab", "Virkemidler", "Formål", "Situation", "Brug"], "A: fagordene i rækkefølge");
+
+        var alle = [D.PLAKAT.henvisning, D.PLAKAT.alt];
+        Object.keys(D.TEKST).forEach(function (n) { alle.push(D.TEKST[n]); });
+
+        D.SPM.forEach(function (q, nr) {
+            var navn = "A: spørgsmål " + (nr + 1) + " (" + q.ord + ")";
+            ok(/\?$/.test(q.spm), navn + " slutter med spørgsmålstegn");
+            ens(q.svar.filter(function (s) { return s.rigtig; }).length, 1, navn + " har ét rigtigt svar");
+            ok(q.svar.length >= 3 && q.svar.length <= 4, navn + " har 3 eller 4 svar");
+            ok(q.sted === null || q.sted === "henvisning" || !!D.STEDER[q.sted], navn + " peger på et sted, der findes");
+            ok(/[.!“]$/.test(q.saetning), navn + ": sætningen til analysen er en hel sætning");
+            ok(q.saetning.length <= 200, navn + ": sætningen til analysen er højst 200 tegn");
+            alle.push(q.spm, q.saetning);
+            var tekster = {};
+            q.svar.forEach(function (s) {
+                ok(!tekster[s.t], navn + ": svaret " + s.t + " står kun én gang");
+                tekster[s.t] = true;
+                ok(s.t.length <= 85, navn + ": svaret er højst 85 tegn (" + s.t + ")");
+                ok(!/[.?!]$/.test(s.t), navn + ": svaret slutter ikke med tegn (" + s.t + ")");
+                alle.push(s.t);
+                if (s.rigtig) {
+                    ok(!!s.fordi && s.fordi.length <= 105, navn + ": det rigtige svar har en kort begrundelse");
+                    ok(!s.fejl, navn + ": det rigtige svar har ingen fejltekst");
+                    alle.push(s.fordi || "");
+                } else {
+                    ok(!!s.fejl && s.fejl.length <= 125, navn + ": det forkerte svar har en kort grund (" + s.t + ")");
+                    ok(/[.?]$/.test(s.fejl || ""), navn + ": grunden er en hel sætning (" + s.t + ")");
+                    alle.push(s.fejl || "");
+                }
+            });
+        });
+
+        Object.keys(D.STEDER).forEach(function (n) {
+            var s = D.STEDER[n];
+            ok(s.length === 4 && s[0] >= 0 && s[1] >= 0 && s[0] + s[2] <= 100 && s[1] + s[3] <= 100, "A: stedet " + n + " ligger inden for plakaten");
+        });
+
+        alle.forEach(function (t) {
+            ok(!/[–—]/.test(t), "A: ingen tankestreg i: " + t);
+            ok(!/  /.test(t), "A: ingen dobbelt mellemrum i: " + t);
+            ok(!/"/.test(t), "A: danske anførselstegn i: " + t);
+        });
+
+        /* ---------------- B: forløbet ------------------------------------ */
+        ens(fase(), "spm", "B: starter med et spørgsmål");
+        ens(d.querySelectorAll("#trin .tr").length, 9, "B: ni prikker");
+        ens(d.querySelectorAll("#trin .tr.nu").length, 1, "B: én prik er den aktuelle");
+        ens(d.querySelector("#trin .tr.nu").textContent, "1", "B: den aktuelle prik er nr. 1");
+        ens(el("spm").textContent, D.SPM[0].spm, "B: første spørgsmål står i scenen");
+        ens(el("spm-ord").textContent, "Afsender", "B: fagordet står i mærket");
+        ens(d.querySelectorAll("#valg .svar").length, 4, "B: fire svar");
+        ok(el("knap").hidden, "B: knappen videre er skjult før svaret");
+        ok(el("forfra").hidden, "B: Forfra er skjult under quizzen");
+        ok(!ringVises(), "B: ingen ramme på plakaten før svaret");
+        ok(el("analyse-tekst").classList.contains("tom"), "B: arket er tomt fra start");
+        ens(saetninger(), 0, "B: ingen sætninger på arket fra start");
+        ok(el("plakat-billede").naturalWidth === 492 && el("plakat-billede").naturalHeight === 676, "B: plakaten er hentet (492 x 676)");
+        ens(el("henvisning").textContent, D.PLAKAT.henvisning, "B: kildehenvisningen står under plakaten");
+        ok(el("metode").hidden, "B: listen over spørgsmål er skjult under quizzen");
+
+        /* svarene står i blandet rækkefølge, men alle er der */
+        var paaSkaerm = Array.prototype.map.call(d.querySelectorAll("#valg .svar"), function (b) { return parseInt(b.getAttribute("data-svar"), 10); });
+        ens(paaSkaerm.slice().sort(), [0, 1, 2, 3], "B: alle fire svar er på skærmen");
+        ens(paaSkaerm, S().orden[0], "B: knapperne følger den blandede rækkefølge");
+
+        /* forkert svar */
+        var f0 = forkert(0);
+        svarknap(f0).click();
+        ok(svarknap(f0).disabled && svarknap(f0).classList.contains("forkert"), "B: det forkerte svar er streget og låst");
+        ok(el("statuslinje").classList.contains("roed"), "B: statuslinjen er rød efter et forkert svar");
+        ok(el("besked").textContent.indexOf(D.SPM[0].svar[f0].fejl) !== -1, "B: grunden til fejlen står i statuslinjen");
+        ok(el("besked").textContent.indexOf("Ikke endnu") === 0, "B: mærket Ikke endnu står forrest");
+        ok(ringVises(), "B: rammen viser, hvor eleven skal kigge");
+        ok(el("knap").hidden, "B: knappen videre er stadig skjult");
+        ens(saetninger(), 0, "B: et forkert svar giver ingen sætning");
+        ens(S().proevet.length, 1, "B: ét forkert svar er talt");
+        svarknap(f0).click();
+        ens(S().proevet.length, 1, "B: samme forkerte svar tælles ikke to gange");
+        ok(!svarknap(rigtigt(0)).disabled, "B: de andre svar kan stadig vælges");
+
+        /* rigtigt svar */
+        var r0 = rigtigt(0);
+        svarknap(r0).click();
+        ok(S().loest, "B: spørgsmålet er løst");
+        ok(svarknap(r0).classList.contains("rigtig"), "B: det rigtige svar er grønt");
+        ok(Array.prototype.every.call(d.querySelectorAll("#valg .svar"), function (b) { return b.disabled; }), "B: alle svar er låst, når spørgsmålet er løst");
+        ok(el("statuslinje").classList.contains("groen"), "B: statuslinjen er grøn");
+        ok(el("besked").textContent.indexOf("Rigtigt") === 0, "B: mærket Rigtigt står forrest");
+        ok(el("besked").textContent.indexOf(D.SPM[0].svar[r0].fordi) !== -1, "B: begrundelsen står i statuslinjen");
+        ok(!el("knap").hidden && el("knap").textContent === D.TEKST.naeste, "B: knappen Næste spørgsmål er fremme");
+        ens(saetninger(), 1, "B: det rigtige svar giver én sætning");
+        ens(d.querySelector("#analyse-tekst .saet").textContent, D.SPM[0].saetning, "B: sætningen er spørgsmålets");
+        ok(d.querySelector("#analyse-tekst .saet").classList.contains("ny"), "B: den nye sætning er markeret");
+        ok(d.querySelector("#trin .tr").classList.contains("loest"), "B: prik 1 er grøn");
+        ens(S().foerste[0], false, "B: spørgsmål 1 var ikke rigtigt i første forsøg");
+        ens(el("spm").textContent, D.SPM[0].spm, "B: spørgsmålet bliver stående, til eleven går videre");
+
+        /* videre */
+        el("knap").click();
+        ens(S().nr, 1, "B: knappen går til spørgsmål 2");
+        ens(el("spm").textContent, D.SPM[1].spm, "B: spørgsmål 2 står i scenen");
+        ok(el("knap").hidden, "B: knappen er skjult igen");
+        ok(!ringVises(), "B: rammen er væk ved det nye spørgsmål");
+        ens(d.querySelectorAll("#analyse-tekst .saet.ny").length, 0, "B: ingen sætning er markeret ved det nye spørgsmål");
+        ens(saetninger(), 1, "B: sætningen fra spørgsmål 1 står stadig på arket");
+        ok(!el("statuslinje").classList.contains("groen") && !el("statuslinje").classList.contains("roed"), "B: statuslinjen er neutral igen");
+        ens(el("besked").textContent, D.TEKST.start, "B: statuslinjen siger, hvad eleven skal");
+
+        /* tastatur: tal vælger svar efter plads, Enter går videre */
+        var plads = S().orden[1].indexOf(rigtigt(1));
+        tast(String(plads + 1));
+        ok(S().loest && S().nr === 1, "B: tallet vælger svaret på den plads");
+        ens(S().foerste[1], true, "B: spørgsmål 2 var rigtigt i første forsøg");
+        tast("Enter");
+        ens(S().nr, 2, "B: Enter går videre, når spørgsmålet er løst");
+        tast("Enter");
+        ens(S().nr, 2, "B: Enter går ikke videre før svaret");
+        ens(d.querySelectorAll("#valg .svar").length, 3, "B: spørgsmål 3 har tre svar");
+
+        /* kildehenvisningen lyser ved spørgsmålet om tid */
+        svarknap(rigtigt(2)).click();
+        ok(el("henvisning").classList.contains("lyser"), "B: kildehenvisningen lyser ved spørgsmålet om tid");
+        ok(!ringVises(), "B: ingen ramme på plakaten, når svaret står i kildehenvisningen");
+        el("knap").click();
+        ok(!el("henvisning").classList.contains("lyser"), "B: kildehenvisningen lyser ikke længere");
+
+        /* pop op: fagord og stor plakat */
+        tast("t");
+        ok(el("fagord").classList.contains("vis"), "B: T åbner fagordene");
+        tast("1");
+        ok(!S().loest && S().proevet.length === 0, "B: tal vælger ikke svar, mens fagordene er åbne");
+        tast("Escape");
+        ok(!el("fagord").classList.contains("vis"), "B: Esc lukker fagordene");
+        el("fagordknap").click();
+        ok(el("fagord").classList.contains("vis"), "B: knappen Fagord åbner fagordene");
+        d.querySelector("#fagord [data-luk]").click();
+        ok(!el("fagord").classList.contains("vis"), "B: Luk lukker fagordene");
+        el("plakat").click();
+        ok(el("stor").classList.contains("vis"), "B: et klik på plakaten viser den stor");
+        el("stor").click();
+        ok(!el("stor").classList.contains("vis"), "B: et klik lukker den store plakat");
+
+        /* resten: ulige spørgsmål får et forkert svar først */
+        for (var nr = 3; nr < 9; nr++) {
+            ens(S().nr, nr, "B: spørgsmål " + (nr + 1) + " er det aktuelle");
+            if (nr % 2 === 1) svarknap(forkert(nr, 1)).click();
+            svarknap(rigtigt(nr)).click();
+            ens(saetninger(), nr + 1, "B: " + (nr + 1) + " sætninger på arket");
+            ens(el("knap").textContent, nr === 8 ? D.TEKST.sidste : D.TEKST.naeste, "B: knappens tekst ved spørgsmål " + (nr + 1));
+            ens(ringVises(), !!D.STEDER[D.SPM[nr].sted], "B: rammen ved spørgsmål " + (nr + 1));
+            if (nr < 8) el("knap").click();
+        }
+
+        /* slut */
+        ens(fase(), "spm", "B: slutbilledet kommer først, når eleven trykker");
+        el("knap").click();
+        ens(fase(), "slut", "B: slut efter spørgsmål 9");
+        ok(S().slut, "B: tilstanden er slut");
+        ok(!synlig(el("spm")) && !synlig(el("valg")), "B: spørgsmål og svar er væk til slut");
+        ens(saetninger(), 9, "B: hele analysen står på arket");
+        ens(d.querySelectorAll("#analyse-tekst .saet.ny").length, 0, "B: ingen sætning er markeret til slut");
+        ens(el("analyse-tekst").textContent.trim(), NK.Quiz.analyseTekst(), "B: arket har den tekst, der kopieres");
+        ok(!el("metode").hidden && d.querySelectorAll("#metode-liste li").length === 9, "B: de ni fagord står under analysen");
+        ens(d.querySelectorAll("#trin .tr.loest").length, 9, "B: alle prikker er grønne");
+        /* rigtige i første forsøg: nr. 2, 3, 5, 7 og 9 */
+        ens(S().foerste, [false, true, true, false, true, false, true, false, true], "B: første forsøg pr. spørgsmål");
+        ok(el("besked").textContent.indexOf("5 af 9 rigtige i første forsøg.") !== -1, "B: resultatet står i statuslinjen");
+        ens(el("knap").textContent, D.TEKST.kopier, "B: knappen kopierer analysen");
+        ok(!el("forfra").hidden, "B: Forfra er fremme til slut");
+        ok(!ringVises(), "B: ingen ramme på plakaten til slut");
+        tast("1");
+        ens(fase(), "slut", "B: tal gør ingenting til slut");
+
+        /* forfra */
+        el("forfra").click();
+        ens(fase(), "spm", "B: Forfra starter quizzen igen");
+        ens(S().nr, 0, "B: første spørgsmål igen");
+        ens(saetninger(), 0, "B: arket er tomt igen");
+        ok(el("forfra").hidden && el("metode").hidden && el("knap").hidden, "B: slutbilledets knapper og liste er væk");
+        ens(S().foerste.length, 0, "B: tællingen er nulstillet");
+
+        /* alle rigtige i første forsøg */
+        for (nr = 0; nr < 9; nr++) { svarknap(rigtigt(nr)).click(); el("knap").click(); }
+        ok(el("besked").textContent.indexOf("Alle 9 rigtige i første forsøg.") !== -1, "B: alle rigtige i første forsøg");
+
+        /* ---------------- C: roen i fire skærmstørrelser ------------------ */
+        var maal = [[883, 620], [1280, 620], [1366, 768], [1600, 900]];
+        for (var m = 0; m < maal.length; m++) {
+            var bredde = maal[m][0], hoejde = maal[m][1], sted = "C " + bredde + "x" + hoejde + ": ";
+            await aabn(bredde, hoejde);
+            var scene = kasse(el("scene"));
+            ok(d.documentElement.scrollHeight <= hoejde && d.documentElement.scrollWidth <= bredde, sted + "siden ruller ikke");
+            ok(kasse(el("henvisning")).b <= scene.b, sted + "plakaten og kildehenvisningen kan ses hele");
+            ok(kasse(el("plakat")).h >= 380, sted + "plakaten er mindst 380 px høj");
+            var forhold = el("plakat").getBoundingClientRect().width / el("plakat").getBoundingClientRect().height;
+            ok(Math.abs(forhold - 492 / 676) < 0.01, sted + "plakaten har sit rigtige format");
+
+            for (nr = 0; nr < 9; nr++) {
+                var navn2 = sted + "spørgsmål " + (nr + 1) + ": ";
+                var foer = { st: kasse(el("statuslinje")), ark: kasse(el("analyse")), valg: kasse(el("valg")) };
+                ok(kasse(el("arbejde")).b <= scene.b, navn2 + "spalten holder sig i scenen");
+                ok(foer.ark.b <= scene.b && foer.ark.h >= 76, navn2 + "arket kan ses (" + foer.ark.h + " px)");
+                ok(Array.prototype.every.call(d.querySelectorAll("#valg .svar"), function (b) { return b.scrollWidth <= b.clientWidth + 1 && b.getBoundingClientRect().height <= 70; }), navn2 + "svarene er højst to linjer");
+
+                /* alle forkerte svar, så det rigtige: statuslinjen og arket må ikke flytte sig */
+                D.SPM[nr].svar.forEach(function (s, i) {
+                    if (s.rigtig) return;
+                    svarknap(i).click();
+                    ens(kasse(el("statuslinje")), foer.st, navn2 + "statuslinjen står stille ved forkert svar " + (i + 1));
+                    ens(kasse(el("analyse")), foer.ark, navn2 + "arket står stille ved forkert svar " + (i + 1));
+                    ok(el("besked").scrollHeight <= el("statuslinje").clientHeight, navn2 + "grunden kan være i statuslinjen");
+                });
+                svarknap(rigtigt(nr)).click();
+                ens(kasse(el("statuslinje")), foer.st, navn2 + "statuslinjen står stille ved det rigtige svar");
+                ens(kasse(el("analyse")), foer.ark, navn2 + "arket står stille ved det rigtige svar");
+                ens(kasse(el("valg")), foer.valg, navn2 + "svarene står stille");
+                ok(kasse(el("knap")).r <= kasse(el("statuslinje")).r && kasse(el("knap")).h < 60, navn2 + "knappen er i statuslinjen på én linje");
+
+                /* den nye sætning kan ses på arket uden at rulle */
+                var ny = d.querySelector("#analyse-tekst .saet.ny").getBoundingClientRect(), ark = el("analyse").getBoundingClientRect();
+                ok(ny.bottom <= ark.bottom + 1, navn2 + "den nye sætning kan ses på arket");
+
+                /* rammen ligger inden for plakaten */
+                if (D.STEDER[D.SPM[nr].sted]) {
+                    var ring = el("ring").getBoundingClientRect(), pl = el("plakat").getBoundingClientRect();
+                    ok(ring.left >= pl.left - 1 && ring.right <= pl.right + 1 && ring.top >= pl.top - 1 && ring.bottom <= pl.bottom + 1, navn2 + "rammen ligger på plakaten");
+                }
+                el("knap").click();
+            }
+
+            ens(fase(), "slut", sted + "slut");
+            ok(kasse(el("arbejde")).b <= scene.b, sted + "slutbilledet holder sig i scenen");
+            ok(kasse(el("statuslinje")).b <= scene.b, sted + "resultatet og knapperne kan ses");
+            ok(el("analyse").scrollHeight <= el("analyse").clientHeight + 1, sted + "hele analysen kan ses uden at rulle");
+            ok(d.documentElement.scrollHeight <= hoejde, sted + "slutbilledet ruller ikke");
+
+            /* ---------------- D: skriften ------------------------------- */
+            el("forfra").click();
+            var smaa = [];
+            Array.prototype.forEach.call(d.querySelectorAll("#scene *, .top *"), function (e) {
+                if (!synlig(e) || !e.childNodes.length) return;
+                var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+                if (harTekst && parseFloat(w.getComputedStyle(e).fontSize) < 12.4) smaa.push(e.className || e.tagName);
+            });
+            ens(smaa, [], sted + "D: ingen tekst under 12,4 px");
+        }
+
+        /* smalt vindue: plakaten øverst, og siden ruller */
+        await aabn(600, 800);
+        ok(kasse(el("arbejde")).t >= kasse(el("henvisning")).b, "C 600x800: arbejdet står under plakaten");
+        ok(d.documentElement.scrollWidth <= 600, "C 600x800: intet stikker ud til siden");
+
+    } catch (e) {
+        fejl++;
+        linjer.push("FEJL: testen stoppede: " + (e && e.stack ? e.stack : e));
+    }
+
+    linjer.push(antal + " påstande.");
+    linjer.push(fejl === 0 ? "ALT OK" : fejl + " FEJL");
+    document.getElementById("ud").textContent = linjer.join("\n");
+}());
+</script>
+</body>
+</html>

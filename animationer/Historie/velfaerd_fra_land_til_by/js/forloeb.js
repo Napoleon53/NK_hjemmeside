@@ -157,6 +157,12 @@
         el("skyder").value = aar;
         el("skyder").setAttribute("aria-valuetext", String(aar));
         el("skyderboks").classList.toggle("laast", skyderLaast());
+        /* Gaettet: til eleven har gaettet, staar spoergsmaalet paa skyderens plads,
+           lige ved de tre svar, og raekken, det handler om, er markeret. */
+        var venterGaet = iOpgave("gaet") && S.gaet === null;
+        el("skyderboks").classList.toggle("venter", venterGaet);
+        NK.saetTekst("gaet-spm", venterGaet ? opgave().spoerg : "");
+        if (iOpgave("gaet")) NK.Figur.marker(venterGaet ? M.erhvervNr("landbrug") : -1);
         if (iOpgave("find")) NK.saetTekst("tjek", T.tjek.replace("{aar}", aar));
     }
 
