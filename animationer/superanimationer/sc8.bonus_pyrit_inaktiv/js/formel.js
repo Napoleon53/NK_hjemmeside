@@ -12,7 +12,8 @@
                felt(noegle, atom) laver feltet (et element)
                spredt            true paa skiltet: atomerne faar luft, saa
                                  felterne ikke stoeder sammen
-   Giver { noegle: { over, sym, tal, atom, a, slags } }.
+   Giver { noegle: { over, sym, tal, atom, idx, a, slags } }. idx er det
+   lille tal efter atomet (S₂), hvis der er et.
 
    I haeftet staar formlen taet, som den skrives. Er der to maerkede
    atomer i samme formel, stikker det foerste tal ud til venstre og det
@@ -63,17 +64,21 @@
             over.appendChild(tal);
             atom.appendChild(over);
             var sym = lav("span", "hf-sym", d.s);
+            /* Det lille tal efter atomet har sit eget element, saa haeftet
+               kan pege paa det, naar atomerne skal taelles */
+            var lille = idx ? lav("span", "hf-idx", idx) : null;
             if (valg.spredt) {
                 var rk = lav("span", "hf-symrk");
                 rk.appendChild(sym);
-                if (idx) rk.appendChild(lav("span", "hf-idx", idx));
+                if (lille) rk.appendChild(lille);
                 atom.appendChild(rk);
+                boks.appendChild(atom);
             } else {
                 atom.appendChild(sym);
-                rest = idx;
+                boks.appendChild(atom);
+                if (lille) boks.appendChild(lille);
             }
-            boks.appendChild(atom);
-            pladser[noegle] = { over: over, sym: sym, tal: tal, atom: atom, a: d, slags: slags };
+            pladser[noegle] = { over: over, sym: sym, tal: tal, atom: atom, idx: lille, a: d, slags: slags };
         });
         rest += NK.ladningHaevet(st.q);
         toem();

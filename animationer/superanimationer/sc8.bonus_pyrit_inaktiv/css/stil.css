@@ -1,5 +1,5 @@
 /* =====================================================================
-   sc8.7 - Pyrit og oxidationstal
+   sc8.bonus (foer sc8.7) - Pyrit og oxidationstal
    Stilark. Rammen er sc8.6 og sc1.4 (toplinjen, panelet, statuslinjen
    og listen), haeftet er sc8.5. Nyt nederst (afsnittene SC8.7):
    udstillingen med hylderne og skiltet, strimlen
@@ -1238,12 +1238,53 @@ kbd {
 .hf-etiket.fundet.ox { color: var(--ox-f); }
 .hf-etiket.fundet.red { color: var(--red-f); }
 .hf-gange { display: inline-flex; align-items: center; gap: 0.2em; }
-/* Antallet af atomer paa klammen mellem gangetallet og pilen: 2 · 2 ↑7 */
-.hf-antal { font-family: var(--haand); font-weight: 700; line-height: 1; }
-.hf-antal:empty { display: none; }
-.hf-gtal, .hf-kltal { font-family: var(--haand); font-weight: 700; line-height: 1; }
-.hf-gtal:empty, .hf-kltal:empty { display: none; }
-.hf-gtal.vist, .hf-kltal.vist { color: var(--vist); }
+/* Antallet af atomer i formlen foer pilen, mellem gangetallet og pilen:
+   2 · 2 S ↑7. Eleven taeller dem selv, og imens lyser det lille tal i
+   formlen (S₂) gult. */
+.hf-antal { display: inline-flex; align-items: center; gap: 0.2em; }
+/* Atomet staar paa en lille brik med formlens skrift, saa "2 O" ikke
+   kan laeses som 20 */
+.hf-nsym {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.3em;
+    height: 1.3em;
+    padding: 0 0.16em;
+    border-radius: 0.28em;
+    background-color: #e6e8ec;
+    color: #202329;
+    font-size: 0.9em;
+    font-weight: 700;
+    line-height: 1;
+}
+.hf-etiket.fundet.ox .hf-nsym { background-color: #d8e8fa; }
+.hf-etiket.fundet.red .hf-nsym { background-color: #fbe2cf; }
+.hf-gtal, .hf-kltal, .hf-ntal { font-family: var(--haand); font-weight: 700; line-height: 1; }
+.hf-gtal:empty, .hf-kltal:empty, .hf-ntal:empty { display: none; }
+.hf-gtal.vist, .hf-kltal.vist, .hf-ntal.vist { color: var(--vist); }
+
+/* Det lille tal efter atomet faar en gul plet bag sig, mens der taelles.
+   Pletten ligger bag skriften (derfor isolation paa leddet). */
+.hf-led { isolation: isolate; }
+.hf-idx { position: relative; }
+.hf-idx.taeller::before {
+    content: "";
+    position: absolute;
+    left: -0.05em;
+    right: -0.05em;
+    bottom: 0.03em;
+    height: 0.66em;
+    border-radius: 0.2em;
+    background-color: #ffe27a;
+    z-index: -1;
+    animation: idx-lys 1.3s ease-in-out infinite;
+}
+
+@keyframes idx-lys {
+    0%, 100% { box-shadow: 0 0 0 0.05em rgba(217, 165, 32, 0.95); }
+    50%      { box-shadow: 0 0 0 0.2em rgba(217, 165, 32, 0.2); }
+}
 
 .hf-pilknap {
     width: 1.35em;

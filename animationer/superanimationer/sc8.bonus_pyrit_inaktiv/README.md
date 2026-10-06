@@ -1,12 +1,18 @@
-# sc8.7 Pyrit og oxidationstal
+# sc8.bonus Pyrit og oxidationstal (inaktiv)
+
+**Ikke i menuen.** Mappen hed `sc8.7_pyrit` og var c8.7 i menuen nogle timer
+den 5. oktober 2026. Samme dag tog brugeren den ud: "Animationen virkede
+fint, men den er stadig lidt for indforstået til at den skal være på
+hjemmesiden." Den forudsætter besøget på museet og arbejdsarket. Mappen er
+omdøbt, så nummeret 8.7 er ledigt, og den virker stadig, når `index.html`
+åbnes direkte.
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv og virker også, når den åbnes direkte fra harddisken.
 Der er ingen lærer og intet lærred: alt på skærmen er almindelige elementer.
 
 Den afløser intet. Den er bygget fra bunden ud fra arbejdsarket til Museo
-Geominero (2z's studietur til Madrid, 2026) og er i menuen fra 5. oktober
-2026 som c8.7.
+Geominero (2z's studietur til Madrid, 2026).
 
 ## Bestillingen (5. oktober 2026)
 
@@ -72,7 +78,7 @@ kviksølv(II)sulfid. Ellers ville navnet være facit.
 | Hematit, Fe₂O₃ | Fe | O | summen er 0, og den deles mellem to Fe |
 | Magnetit, FeO·Fe₂O₃ | Fe, Fe | O | to slags jern, +II og +III |
 | Gips, CaSO₄·2H₂O | S | Ca, O | svovl helt oppe på +VI |
-| Malakit, Cu₂(OH)₂CO₃ | Cu | | to slags negative ioner |
+| Malakit, Cu₂(OH)₂CO₃ | Cu | O, H, C | C er +IV, og summen er 0 |
 | Pyrit, FeS₂ | S | Fe | reglen for sulfid giver Fe +IV, så S er −I |
 
 En løst sten får sine tal på hylden og en sætning om stenen på skiltet.
@@ -85,6 +91,12 @@ En løst sten får sine tal på hylden og en sætning om stenen på skiltet.
   indforstået. Skriv til gengæld gerne de danske navne." De spanske navne fra
   museets skilte er væk. I stedet står stoffets danske navn. Det er læst som
   det kemiske navn; stenenes navne var danske i forvejen.
+
+Samme dag, senere: "I animationen sc8.7 med malakit, må du gerne skrive at
+oxidationtallet for C er +4, fordi ellers er den lidt svær at løse." C står
+nu med blyant som +IV, og O og H står der også (som i gips og hematit), så
+alle de tal, eleven skal bruge, er på skiltet. Hintene regner de to grupper
+ud hver for sig: (OH)₂ giver −2, og CO₃ giver −2.
 
 ## Fane 2: Pyrit
 
@@ -133,8 +145,8 @@ Opskrivningen er den fra `sc8.5_kaliumpermanganat` (brugerens tegning):
 skemaet på ternet papir, oxidationstallet over de atomer, der skifter, en
 klamme under skemaet fra atomet før pilen til det samme grundstof efter, og
 midt på klammen, under reaktionspilen, stigningen eller faldet for ét atom
-med gangetallet og antallet af atomer foran: "2 · 2 ↑7 = 28" og
-"7 · 2 ↓2 = 28" (2 FeS₂ med 2 S, der hver stiger 7). Klammen har kun en
+med gangetallet og antallet af atomer foran: "2 · 2 S ↑7 = 28" og
+"7 · 2 O ↓2 = 28" (2 FeS₂ med 2 S, der hver stiger 7). Klammen har kun en
 pilespids ved atomet efter reaktionspilen; før pilen går stregen op til
 atomet uden spids. Under hver side står rækkerne Ladning,
 H-atomer og til sidst O-atomer som kontrol. Vandet afstemmer H, og O er
@@ -149,19 +161,33 @@ statuslinjen i hele sætninger):
    klik, med ↑ og ↓ eller med + og − i feltet. Tallet er ændringen for ét
    atom: S ↑7 og O ↓2.
 3. **Lige mange atomer** (kun svovlet: 2 foran SO₄²⁻, med blyant). Tallet
-   foran kommer først nu, når ændringen pr. atom er fundet.
-4. **Gangetal.** Er der flere atomer på klammen, står antallet mellem
-   gangetallet og pilen ("· 2"). "= 28" følger med, mens der skrives, og
-   bliver grønt, når stigning i alt er lig fald i alt. Tallene flyver op
-   foran formlerne.
-5. **Resten af atomerne.** Et stof, der følger med uden at skifte (Fe²⁺ fra
+   foran kommer først nu, når ændringen pr. atom er fundet. Det lille 2-tal
+   efter S i FeS₂ lyser gult imens.
+4. **Tæl atomerne.** Har formlen før pilen flere af atomet (FeS₂ og O₂),
+   skriver eleven antallet i et felt foran pilen ved klammen, og det lille
+   tal i formlen lyser gult. Når tallet står der, læses etiketten
+   "2 S ↑7 = 14": det, én FeS₂ stiger i alt.
+5. **Gangetal.** Foran antallet: "2 · 2 S ↑7 = 28". Før der er skrevet
+   noget, står "= 14" og "= 4" ved de to klammer, så opgaven er at gøre de
+   to tal lige store. "= 28" følger med, mens der skrives, og bliver grønt,
+   når stigning i alt er lig fald i alt. Tallene flyver op foran formlerne.
+6. **Resten af atomerne.** Et stof, der følger med uden at skifte (Fe²⁺ fra
    pyrit, ZnO), får sit tal ved at tælle.
-6. **Ladning** under hver side.
-7. **H⁺** på den side, hvor ladningen er lavest. Rækken viser det nye tal
+7. **Ladning** under hver side.
+8. **H⁺** på den side, hvor ladningen er lavest. Rækken viser det nye tal
    efter en pil (−4 → 0), mens der skrives.
-8. **H-atomer** under hver side.
-9. **Vand** på den side, der har færrest H. Til sidst kommer O-rækken af sig
-   selv, og papiret får en grøn ramme.
+9. **H-atomer** under hver side.
+10. **Vand** på den side, der har færrest H. Til sidst kommer O-rækken af
+    sig selv, og papiret får en grøn ramme.
+
+Brugeren 5. oktober 2026, senere: "I fane 2, så er det jo lidt forvirrende
+den måde at svovl fra pyrit altid kommer i stks af 2. Måske kan du lave lidt
+ekstra hjælp indbygget." Før stod antallet som et bart "· 2" mellem
+gangetallet og pilen. Nu er det bid 4: eleven tæller selv, atomets symbol
+står på en lille brik ("2 S"), så "2 O" ikke læses som 20, og mellemtallet
+for én formel (14 og 4) står på papiret, før gangetallene skal findes. Er
+etiketterne bredere end reaktionspilen, får de samme venstre kant lige efter
+den sidste lodrette streg før pilen, så felterne står under hinanden.
 
 Brugeren 5. oktober 2026: "jeg plejer at lære eleverne at man viser stigningen
 pr atom. Dvs der bør stå 7 og 2 under skemaet (jeg ved at den nuværende metode
@@ -203,6 +229,8 @@ stjernen.
 | gips | S som −II | S er kun −II i et sulfid |
 | klammer | pilen den forkerte vej | Tallet bliver større, så pilen skal pege op |
 | klammer | alle atomer i stedet for ét (↑14) | Det er for 2 S tilsammen. Ved klammen står kun, hvor meget ét S stiger |
+| tæl atomerne | 1 S (talt i sulfat) | Tæl S i FeS₂ før pilen, ikke i SO₄²⁻ |
+| tæl atomerne | 7 S (stigningen) | 7 er, hvor meget ét S stiger. Her skal du tælle S i FeS₂ |
 | gangetal | ikke lige store | Stigning: 2 · 2 · 7 = 28. Fald: 3 · 2 · 2 = 12 |
 | gangetal | cinnober med forskellige tal ved S og Hg | S og Hg sidder i samme HgS |
 | følger med | 1 foran Fe²⁺ | der er 1 Fe efter pilen, men 2 Fe før pilen |
@@ -287,14 +315,21 @@ fra `file://`). Den tjekker oxidationstallene mod de kendte, at de fem
 skemaer er afstemt i atomer og ladning med de mindste tal, at de to skemaer
 for pyrit lagt sammen giver arbejdsarkets skema, at alle sten og opgaver kan
 løses ved at skrive og med Vis svaret, at klammerne viser ændringen for ét
-atom og kun har pilespids efter reaktionspilen, at de typiske fejl får den
+atom og kun har pilespids efter reaktionspilen, at atomerne tælles før
+gangetallene (og at det lille tal i formlen lyser imens), at C er givet i
+malakit, at de typiske fejl får den
 rigtige besked, at der ikke står et facit før tid (heller ikke i stoffets
 navn), at opgaverne på fane 2 åbner én ad gangen, at tegningen følger
 skemaerne, rundvisningen, sproget og pladsen fra 1100 × 650 til 1600 × 950
 (intet går ud over papiret, og intet tal dækker et andet).
-Sidst kørt: ALT OK (199 påstande), 5. oktober 2026.
+Sidst kørt: ALT OK (215 påstande), 5. oktober 2026.
 
-## I menuen
+## Ikke i menuen
 
-I menuen fra 5. oktober 2026 som c8.7 i `kemi-c-filer/samling_c8.html`
+Var i menuen 5. oktober 2026 som c8.7 i `kemi-c-filer/samling_c8.html`
 (knap 7, `data-emne="c8.7"`) og i `FEEDBACK_EMNER` i `samling_alt.html`.
+Begge dele er fjernet samme dag, og mappen er omdøbt fra `sc8.7_pyrit`.
+Skal den tilbage, skal den først gøres mindre indforstået (brugerens
+begrundelse), og så sættes knappen og linjen i `FEEDBACK_EMNER` ind igen.
+Elevens fremskridt huskes under `nk-sc8.bonus-u`, `-p` og `-r`. Afsnittene
+nederst i `css/stil.css` hedder stadig SC8.7.

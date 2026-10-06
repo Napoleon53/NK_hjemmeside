@@ -228,6 +228,7 @@
             <button class="tab-btn" data-beskrivelse="Byg en interaktiv tidslinje over opdagelsesrejserne fra Marco Polo til erobringen af Malaca." onclick="visKategori(this, 'Historie/samling_2.1_opdagelsesrejsende.html')" title="2.1: Kolonisering"><span class="btn-num">2.1</span><span class="btn-text">Kolonisering</span></button>
             <button class="tab-btn" data-beskrivelse="Sammenfattende quiz om enevælde, oplysningstid, den amerikanske og den franske revolution." onclick="visKategori(this, 'Historie/samling_2.2_revolutioner.html')" title="2.2: Revolutioner"><span class="btn-num">2.2</span><span class="btn-text">Revolutioner</span></button>
             <button class="tab-btn" data-beskrivelse="Markedssimulator, historiske scenarier og forståelsesquiz om udbud, efterspørgsel og Adam Smiths økonomiske liberalisme." onclick="visKategori(this, 'Historie/samling_2.3_ideologier.html')" title="2.3: Ideologier"><span class="btn-num">2.3</span><span class="btn-text">Ideologier</span></button>
+            <button class="tab-btn" data-beskrivelse="Velfærdsstaten 1950-1970: 100 personer flytter fra land til by, og du styrer økonomien som finansminister fra storkonflikten i 1956 til løn- og prisstoppet i 1963." onclick="visKategori(this, 'Historie/samling_2.3b_velfaerdsstaten.html')" title="2.3b: Velfærdsstaten"><span class="btn-num">2.3b</span><span class="btn-text">Velfærdsstaten</span></button>
 
         </div>
 
@@ -295,15 +296,17 @@
 
         // Kapitel-alias -> samlingsfil. Aliaset er kapitlets nummer (fx "2.1"),
         // mens en dybere emne-alias fra en indholdsfil (fx "2.1.1") matches via prefix.
+        // Nummeret kan have et bogstav (fx "2.3b", emnerne hedder så "2.3b.1").
         const KAPITEL_FILER = {
             '1.5': 'Historie/samling_1.5_middelalder.html',
             '2.1': 'Historie/samling_2.1_opdagelsesrejsende.html',
             '2.2': 'Historie/samling_2.2_revolutioner.html',
-            '2.3': 'Historie/samling_2.3_ideologier.html'
+            '2.3': 'Historie/samling_2.3_ideologier.html',
+            '2.3b': 'Historie/samling_2.3b_velfaerdsstaten.html'
         };
 
         function findSideFraEmne(emne) {
-            const match = emne.match(/^(\d+\.\d+)/);
+            const match = emne.match(/^(\d+\.\d+[a-z]?)/);
             if (match && KAPITEL_FILER[match[1]]) return KAPITEL_FILER[match[1]];
             return null;
         }

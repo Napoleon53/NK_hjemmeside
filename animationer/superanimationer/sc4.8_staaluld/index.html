@@ -32,34 +32,44 @@
         <div class="anker" id="forsoeg-anker-braender"></div>
         <div class="anker" id="forsoeg-anker-flaske"></div>
         <div class="anker" id="forsoeg-anker-zoom"></div>
-        <div class="anker" id="forsoeg-anker-laerer"></div>
-        <!-- Det gratis gaet: tre kort, som sim_forsoeg.js bygger ud fra D.GAET -->
-        <div class="gaet" id="forsoeg-gaet" hidden></div>
         <button class="forfraknap" id="forsoeg-forfra" type="button" title="En ny klump ståluld med samme masse (R)">Start forfra ↺</button>
-        <div class="kboble" id="forsoeg-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
-        <button class="kknap" id="forsoeg-kknap" type="button">Send Kemichael ud</button>
+
+        <!-- Statuslinjen: naeste skridt, fejl, hint og ros, feltet til det tal,
+             der skal aflaeses, og den ene knap (js/fane.js og js/sim_forsoeg.js) -->
+        <div class="statuslinje" id="forsoeg-status">
+            <p class="st-tekst" id="forsoeg-besked" aria-live="polite"></p>
+            <div class="felt st-felt" id="forsoeg-aflaes" hidden>
+                <span class="felt-pre" id="forsoeg-aflaesnavn">m(før) =</span>
+                <input id="forsoeg-tal" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før) i gram">
+                <span class="felt-efter">g</span>
+                <button type="button" class="felt-ok" id="forsoeg-talok" aria-label="Tjek tallet" tabindex="-1">↵</button>
+            </div>
+            <button class="knap hjaelp" id="forsoeg-knap" type="button">Giv hint</button>
+        </div>
+
+        <!-- Det gratis gaet: startskaermen, som sim_forsoeg.js bygger ud fra D.GAET.
+             Den daekker hele scenen, saa intet sker bag den, mens eleven svarer. -->
+        <div class="gaet" id="forsoeg-gaet" hidden></div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
         <div class="kort opgavekort" id="forsoeg-kort">
-            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">opgave <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">2</span></span></h2>
+            <h2><span id="forsoeg-titel">Opgave</span><span class="taeller">måling <b id="forsoeg-nr">1</b>/<span id="forsoeg-antal">2</span></span></h2>
             <div id="forsoeg-prompt"></div>
-            <p class="besked" id="forsoeg-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="forsoeg-knap" type="button">Giv hint</button></div>
         </div>
 
+        <!-- De tal, eleven har aflaest. Tallene skrives i feltet i statuslinjen. -->
         <div class="kort maaling" id="forsoeg-skema">
             <h2>Skemaet</h2>
             <table class="skema">
                 <thead><tr><th></th><th>m(før)</th><th>m(efter)</th></tr></thead>
                 <tbody>
                     <tr id="forsoeg-r0"><th>Måling 1</th>
-                        <td><div class="felt lille"><input id="forsoeg-f0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før), måling 1"><span class="felt-efter">g</span></div></td>
-                        <td><div class="felt lille"><input id="forsoeg-e0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(efter), måling 1"><span class="felt-efter">g</span></div></td></tr>
+                        <td><span class="celle" id="forsoeg-f0"></span></td>
+                        <td><span class="celle" id="forsoeg-e0"></span></td></tr>
                     <tr id="forsoeg-r1"><th>Måling 2</th>
-                        <td><div class="felt lille"><input id="forsoeg-f1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(før), måling 2"><span class="felt-efter">g</span></div></td>
-                        <td><div class="felt lille"><input id="forsoeg-e1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="m(efter), måling 2"><span class="felt-efter">g</span></div></td></tr>
+                        <td><span class="celle" id="forsoeg-f1"></span></td>
+                        <td><span class="celle" id="forsoeg-e1"></span></td></tr>
                 </tbody>
             </table>
             <p class="note" id="forsoeg-note"></p>
@@ -82,9 +92,8 @@
         <div class="anker" id="beregning-anker-opgave"></div>
         <div class="anker" id="beregning-anker-tavle"></div>
         <div class="anker" id="beregning-anker-soejler"></div>
-        <div class="anker" id="beregning-anker-laerer"></div>
-        <div class="kboble" id="beregning-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
-        <button class="kknap" id="beregning-kknap" type="button">Send Kemichael ud</button>
+        <!-- Omskifteren Let / Svær: hvilket reaktionsskema der regnes med (js/sim_beregning.js) -->
+        <div class="skift" id="beregning-skift"></div>
     </div>
 
     <aside class="panel">
@@ -93,8 +102,12 @@
             <div id="beregning-prompt"></div>
             <div class="raekker" id="beregning-raekker"></div>
             <div class="knaprad valgrad" id="beregning-valg" hidden></div>
-            <p class="besked" id="beregning-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="beregning-knap" type="button">Giv hint</button></div>
+            <!-- Linjen med naeste skridt, fejl og hint og den ene knap.
+                 sim_beregning.js flytter blokken hen under det trin, eleven er ved. -->
+            <div class="hjaelpblok" id="beregning-hjaelp">
+                <p class="besked" id="beregning-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="beregning-knap" type="button">Giv hint</button>
+            </div>
         </div>
 
         <div class="kort" id="beregning-opgaver">
@@ -127,7 +140,12 @@
         </div>
         <p>Forholdet er 2 : 2, altså 1 : 1, fordi der står 2 foran både Fe og FeO i reaktionsskemaet.</p>
         <p>Vægten viser mindre, end beregningen giver, fordi ilten ikke når ind til alt jernet. Luft er kun 21 % ilt, og stålulden går ud, før alt jernet har reageret. Ren ilt fra en flaske holder den gloende længere. Midt i klumpen og inderst i de tykkeste tråde bliver noget af jernet alligevel ikke til oxid. Gnister og stumper, der falder ned ved siden af vægten, trækker også ned.</p>
-        <p>I virkeligheden dannes en blanding af jernoxider, bl.a. Fe₃O₄ og Fe₂O₃. Animationen regner med FeO, så forholdet bliver 1 : 1.</p>
+        <p>I virkeligheden dannes en blanding af jernoxider, mest Fe₃O₄. Animationen regner først med FeO, så forholdet bliver 1 : 1. Omskifteren Svær på fanen Beregningen regner med Fe₃O₄.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Svær</span>
+            3 Fe(s) + 2 O₂(g) → Fe₃O₄(s)&nbsp;&nbsp;&nbsp;
+            n(Fe₃O₄) = <span class="broek"><span>n(Fe)</span><span>3</span></span>
+        </div>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -159,10 +177,8 @@
 <script src="js/kemi.js"></script>
 <script src="js/tjek.js"></script>
 <script src="js/sprites.js"></script>
-<script src="../../v2/kemichael/kemichael.js"></script>
-<script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
-<script src="js/laerer.js"></script>
+<script src="js/skema.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/regning.js"></script>
 <script src="js/sim_forsoeg.js"></script>

@@ -2,10 +2,8 @@
    app.js - binder de to faner sammen
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Kemichael praesenterer ikke fanerne: han
-   sidder ved katederet, introducerer det gratis gaet paa fane 1 og
-   siger ellers kun noget, naar eleven beder om et hint (den rolige
-   udgave fra sc4.5). K faar ham til at sige, hvor man er.
+   fane opdateres og tegnes. Der er ingen laerer i animationen: linjen
+   med hint-knappen siger, hvor man er (js/fane.js).
    ===================================================================== */
 (function () {
     "use strict";
@@ -33,7 +31,6 @@
         if (sims[id]) {
             sims[id].tilpas();
             sims[id].layout();
-            sims[id].startIntro(false);
             sims[id].fokus();
         }
     }
@@ -83,7 +80,6 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "k" || e.key === "K") { if (sim) sim.startIntro(true); return; }
         if (e.key === "1" || e.key === "2") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
@@ -125,11 +121,18 @@
 
         document.addEventListener("keydown", tastatur);
 
-        /* Linket kan vaelge fanen: index.html#beregning */
-        var ord = (window.location.hash || "").replace(/^#/, "").toLowerCase().split(/[^a-zæøå0-9]+/);
+        /* Linket kan vaelge fanen og reaktionsskemaet: index.html#beregning,
+           index.html#svaer (Svær paa Beregningen) og index.html#let */
+        var hash = (window.location.hash || "").replace(/^#/, "").toLowerCase();
+        try { hash = decodeURIComponent(hash); } catch (x) { /* som det staar */ }
+        var ord = hash.split(/[^a-zæøå0-9]+/);
         var navne = { forsoeg: "fane-forsoeg", "forsøg": "fane-forsoeg", beregning: "fane-beregning" };
+        var skemaer = { let: "let", svaer: "svaer", "svær": "svaer" };
         var oenske = faner[0];
-        ord.forEach(function (o) { if (navne[o]) oenske = navne[o]; });
+        ord.forEach(function (o) {
+            if (navne[o]) oenske = navne[o];
+            if (skemaer[o]) { sims["fane-beregning"].vaelgSkema(skemaer[o]); oenske = "fane-beregning"; }
+        });
         visFane(oenske);
 
         window.requestAnimationFrame(function (ts) {

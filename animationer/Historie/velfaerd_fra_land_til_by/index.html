@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fra land til by 1940-1989</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-fase="intro">
+
+<header class="top">
+    <h1><span class="ikon">100</span> Fra land til by 1940-1989</h1>
+
+    <!-- Kurven er et tilvalg: knappen kommer først frem, når erhvervene er sorteret -->
+    <button class="ikonknap tekstknap" id="kurveknap" type="button" title="Vis kurven over de tre sektorer (K)" aria-pressed="false" hidden>Kurve</button>
+    <button class="ikonknap tekstknap" id="fagordknap" type="button" title="Fagord (T)">Fagord</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane">
+    <div class="scene" id="scene">
+
+        <!-- Opgaven står over figuren. Prikkerne til højre viser, hvor langt eleven er. -->
+        <div class="opgavelinje" id="opgavelinje">
+            <span class="opg-maerke" id="opg-maerke"></span>
+            <p class="opg-tekst" id="opg-tekst"></p>
+            <ol class="trin" id="trin" aria-label="Opgaverne"></ol>
+        </div>
+
+        <!-- Figuren: én række pr. erhverv, og 100 personer i et lag ovenpå (js/figur.js) -->
+        <div class="bord" id="bord">
+            <div class="figur" id="figur">
+
+                <!-- De erhverv, der endnu ikke er sorteret. Uoplyst står nederst her, til resten er på plads. -->
+                <section class="baand usorteret" id="baand-x" data-baand="x">
+                    <header class="b-hoved">
+                        <span class="b-navn" id="x-navn"></span>
+                    </header>
+                    <div class="b-raekker"></div>
+                </section>
+
+                <section class="baand sektor" id="baand-p" data-baand="p">
+                    <header class="b-hoved">
+                        <span class="b-navn"></span><span class="b-def"></span>
+                        <span class="b-slip"></span>
+                        <span class="b-sum"><b></b> <span class="b-af"></span></span>
+                    </header>
+                    <div class="b-raekker"></div>
+                </section>
+
+                <section class="baand sektor" id="baand-s" data-baand="s">
+                    <header class="b-hoved">
+                        <span class="b-navn"></span><span class="b-def"></span>
+                        <span class="b-slip"></span>
+                        <span class="b-sum"><b></b> <span class="b-af"></span></span>
+                    </header>
+                    <div class="b-raekker"></div>
+                </section>
+
+                <section class="baand sektor" id="baand-t" data-baand="t">
+                    <header class="b-hoved">
+                        <span class="b-navn"></span><span class="b-def"></span>
+                        <span class="b-slip"></span>
+                        <span class="b-sum"><b></b> <span class="b-af"></span></span>
+                    </header>
+                    <div class="b-raekker"></div>
+                </section>
+
+                <!-- Uoplyst ender her, når alt andet er sorteret -->
+                <section class="baand udenfor" id="baand-u" data-baand="u">
+                    <div class="b-raekker"></div>
+                </section>
+
+                <div class="personer" id="personer" aria-hidden="true"></div>
+            </div>
+        </div>
+
+        <!-- Årsskyderen og det, eleven svarer med. Kommer frem, når erhvervene er sorteret. -->
+        <div class="aarslinje" id="aarslinje">
+            <b class="aar-tal" id="aar-tal">1940</b>
+            <div class="skyder" id="skyderboks">
+                <input type="range" id="skyder" min="1940" max="1989" step="1" value="1940" aria-label="År">
+                <div class="skyder-maerker" id="skyder-maerker" aria-hidden="true"></div>
+            </div>
+            <div class="svarfelt" id="svarfelt">
+                <button class="knap blaa" id="tjek" type="button" hidden></button>
+                <div class="valg" id="valg" role="group" aria-label="Svarmuligheder" hidden></div>
+            </div>
+        </div>
+
+        <!-- Statuslinjen: næste skridt, svaret på det, eleven gør, og den ene knap -->
+        <div class="statuslinje" id="statuslinje">
+            <p class="st-tekst" id="besked" aria-live="polite"></p>
+            <button class="knap hjaelp" id="knap" type="button">Videre →</button>
+        </div>
+
+        <div class="fejring" id="fejring" aria-hidden="true"></div>
+    </div>
+
+    <!-- Panelet er kun fremme, når eleven har slået kurven til -->
+    <aside class="panel" id="panel">
+        <div class="kort" id="kurvekort">
+            <h2>Sektorerne <span class="taeller">af 100</span></h2>
+            <svg id="kurve" viewBox="0 0 300 176" role="img" aria-label="De tre sektorer år for år"></svg>
+            <div class="kurve-forklaring">
+                <span class="kf p"><i></i>Primær <b id="kf-p"></b></span>
+                <span class="kf s"><i></i>Sekundær <b id="kf-s"></b></span>
+                <span class="kf t"><i></i>Tertiær <b id="kf-t"></b></span>
+            </div>
+            <p class="kurve-note" id="kurve-note"></p>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<!-- FAGORDENE (åbnes kun med knappen eller T)                          -->
+<!-- ================================================================= -->
+<div class="overlay" id="fagord">
+    <div class="overlay-boks">
+        <h2>Fagord</h2>
+        <dl class="ordliste">
+            <dt>Primær sektor</dt>
+            <dd>Skaffer råvarer, fx landbrug og fiskeri.</dd>
+            <dt>Sekundær sektor</dt>
+            <dd>Forarbejder råvarer til varer: industri, håndværk og byggeri.</dd>
+            <dt>Tertiær sektor</dt>
+            <dd>Handel og service, fx butikker, transport, administration, sundhed og undervisning.</dd>
+            <dt>Mekanisering</dt>
+            <dd>Maskiner overtager arbejde, som før blev gjort med håndkraft.</dd>
+            <dt>Urbanisering</dt>
+            <dd>Befolkningen flytter fra land til by.</dd>
+        </dl>
+
+        <h3>Om tallene</h3>
+        <p>Hver person er 1 % af befolkningen. Tallene er figur 8.1 i kapitel 8-alternativ: Befolkningens fordeling på erhverv i procent. Figuren har tal for 1940, 1950, 1960, 1970, 1981 og 1989. Det er de år, der står under årsskyderen. Mellem dem flytter personerne jævnt, ligesom de rette linjer i figuren.</p>
+        <p>Tallene er aflæst af figuren og afrundet til hele personer. Et erhverv kan derfor afvige med 1 fra figuren.</p>
+        <p>Personerne viser, hvordan fordelingen forskyder sig. Det er ikke de samme mennesker i 1940 og 1989.</p>
+
+        <h3>Kilde</h3>
+        <p>Figur 8.1 i kapitel 8-alternativ, del 1. Efter Peter Schroeder: Det 20. århundredes Danmarkshistorie (2007), s. 110. Figurens kilde er Udenrigsministeriet: Marshall-planen 50 år (1997).</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>←</kbd> <kbd>→</kbd> et år ad gangen &nbsp;·&nbsp; <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> sektor eller svar &nbsp;·&nbsp; <kbd>Enter</kbd> Tjek eller knappen &nbsp;·&nbsp; <kbd>K</kbd> kurve &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> fagord &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper" style="margin-top:16px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight på ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/6</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/model.js"></script>
+<script src="js/figur.js"></script>
+<script src="js/kurve.js"></script>
+<script src="js/forloeb.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

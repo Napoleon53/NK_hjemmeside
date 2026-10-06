@@ -122,7 +122,7 @@ og trinlisten over den viser de færdige med ✓):
    står med blyant.
 5. **Stigning og fald.** Klammerne tegnes frem. Klammen har kun en pilespids
    ved atomet efter reaktionspilen; før pilen går stregen op til atomet uden
-   spids (brugerens ønske 5. oktober 2026, som i `sc8.7_pyrit`). Under pilen står ved hver
+   spids (brugerens ønske 5. oktober 2026, som i `sc8.bonus_pyrit_inaktiv`). Under pilen står ved hver
    klamme en pil, der vendes med et klik, med ↑ og ↓ på tastaturet eller
    med + og − i feltet, og feltet til tallet. Tallet er det samlede for
    atomerne på klammen (H₂O₂ ⟶ O₂: 2 · 1 = ↑2). Når den er rigtig, bliver

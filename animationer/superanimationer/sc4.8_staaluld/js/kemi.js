@@ -1,7 +1,7 @@
 /* =====================================================================
    kemi.js - modellen og tallene
 
-   Klumpen af ståluld paa vaegten: 2 Fe + O₂ → 2 FeO. Vaegten er
+   Klumpen af ståluld paa vaegten regnes som 2 Fe + O₂ → 2 FeO. Vaegten er
    nulstillet med den varmefaste plade, saa den viser stålulden. Naar
    den braender, binder ilt fra luften sig til jernet, og vaegten viser
    jernet plus den ilt, der er bundet. Kun en del af jernet (udbyttet)
@@ -16,15 +16,40 @@
     var D = NK.Data;
     var K = {};
 
-    K.M_FE = D.M.Fe / 100;             /* 55,85 g/mol */
-    K.M_FEO = D.M.FeO / 100;           /* 71,85 g/mol */
-    K.FAKTOR = K.M_FEO / K.M_FE;       /* g FeO pr. g Fe: 1,286 */
+    K.M_FE = D.ATOMMASSE.Fe / 100;                              /* 55,85 g/mol */
+    K.M_FEO = (D.ATOMMASSE.Fe + D.ATOMMASSE.O) / 100;           /* 71,85 g/mol */
+    /* g FeO pr. g Fe: 1,286. Forsoeget paa fane 1 regner med FeO, uanset
+       hvilket reaktionsskema der er valgt paa fane 2. */
+    K.FAKTOR = K.M_FEO / K.M_FE;
+
+    /* ----- Reaktionsskemaerne paa fane 2 (D.SKEMA) --------------------------------
+       K.skema(id) giver skemaet med det, der regnes af det: molarmassen af
+       oxidet (M, Mtekst), det tal, stofmaengden af jern deles med (del),
+       g oxid pr. g jern (faktor) og skemaet som tekst (reaktion). */
+    var skemaer = {};
+    function led(k, formel) { return (k > 1 ? k + " " : "") + formel; }
+    K.skema = function (id) {
+        if (skemaer[id]) return skemaer[id];
+        var s = D.SKEMA[id];
+        if (!s) return K.skema(D.SKEMAER[0]);
+        var kFe = s.koef[0], kO2 = s.koef[1], kOx = s.koef[2], g = NK.gcd(kFe, kOx);
+        var M100 = s.fe * D.ATOMMASSE.Fe + s.o * D.ATOMMASSE.O;
+        var sk = { id: s.id, knap: s.knap, oxid: s.oxid, koef: s.koef, fe: s.fe, o: s.o,
+                   M: M100 / 100, Mtekst: NK.komma(M100),
+                   del: kFe / g,
+                   faktor: M100 * kOx / (kFe * D.ATOMMASSE.Fe),
+                   reaktion: led(kFe, "Fe") + " + " + led(kO2, "O₂") + " → " + led(kOx, s.oxid),
+                   /* Afstemt, og forholdet mellem Fe og oxidet kan forkortes til n : 1 */
+                   iOrden: kFe === kOx * s.fe && 2 * kO2 === kOx * s.o && kOx / g === 1 };
+        skemaer[id] = sk;
+        return sk;
+    };
 
     /* ----- Tal til tekst ------------------------------------------------------ */
     K.g2 = function (v) { return NK.tal2(v); };                       /* aflaest og regnet masse: 4,94 */
     K.mol = function (v) { return NK.betydende(v, 3); };              /* 0,0716 */
     K.pct = function (v) { return String(Math.round(v)); };           /* 81 */
-    K.Mtekst = function (id) { return NK.komma(D.M[id]); };           /* 55,85 */
+    K.MFeTekst = NK.komma(D.ATOMMASSE.Fe);                            /* 55,85 */
 
     /* Det, eleven ser og regner videre med: tre betydende cifre */
     K.r3 = function (v) { return parseFloat(NK.betydende(v, 3).replace(",", ".")); };
@@ -118,16 +143,18 @@
     K.udbytteAf = function (mf, me) { return NK.klamp((me - mf) / (mf * (K.FAKTOR - 1)), 0, 1); };
 
     /* ----- Facit til fane 2 ----------------------------------------------------------
-       o.tal: { mf, me }. Stofmaengden vises med tre betydende cifre, og
-       massen af FeO regnes med det tal, eleven ser (saa den paene
-       beregning passer: 0,0716 mol · 71,85 g/mol = 5,14 g). Udbyttet
-       regnes af det fulde tal. */
+       o.tal: { mf, me }, o.sk: reaktionsskemaet (K.skema). Stofmaengderne
+       vises med tre betydende cifre, og der regnes videre med det tal,
+       eleven ser (saa den paene beregning passer: 0,0716 mol · 71,85 g/mol
+       = 5,14 g). Udbyttet regnes af de fulde tal. */
     K.facit = function (o) {
-        var t = o.tal, f = {};
+        var t = o.tal, sk = o.sk || K.skema(D.SKEMAER[0]), f = {};
         f.n = t.mf / K.M_FE;
         f.nV = K.r3(f.n);
-        f.m = f.nV * K.M_FEO;
-        f.mTeori = t.mf * K.FAKTOR;
+        f.nOx = f.nV / sk.del;
+        f.nOxV = K.r3(f.nOx);
+        f.m = f.nOxV * sk.M;
+        f.mTeori = t.mf * sk.faktor;
         f.ilt = t.me - t.mf;
         f.iltTeori = f.mTeori - t.mf;
         f.pct = f.ilt / f.iltTeori * 100;

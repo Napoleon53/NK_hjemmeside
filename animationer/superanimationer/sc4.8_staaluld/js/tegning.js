@@ -4,10 +4,11 @@
    Rummet, bordet og tavlen (som sc4.11), vaegten (som sc4.5), den
    varmefaste plade, klumpen af ståluld, der gloeder og bliver sort,
    gnisterne, bunsenbraenderen med flammen og gasslangen, iltflasken
-   med slangen, stjernekasteren, luppen med jernatomerne og luften,
-   soejlerne paa fane 2 og regnestykket med broekstreger (som sc4.3). Funktionerne tegner én ting
-   et bestemt sted og husker intet selv, bortset fra de smaa systemer
-   (ulden, gnisterne og luppen), der hver hoerer til én klump. Fanerne
+   med slangen, luppen med jernatomerne og luften, pilen med skiltet
+   over det, der skal bruges nu, og paa fane 2 soejlerne og pilene i
+   maengdeberegningsskemaet. Funktionerne tegner én ting et bestemt
+   sted og husker intet selv, bortset fra de smaa systemer (ulden,
+   gnisterne og luppen), der hver hoerer til én klump. Fanerne
    bestemmer, hvor tingene staar.
    ===================================================================== */
 (function () {
@@ -114,8 +115,12 @@
         ctx.restore();
     };
 
-    /* En lille pil, der hopper over det, der skal bruges nu */
-    T.pegepil = function (ctx, x, y, tid) {
+    /* En lille pil, der hopper over det, der skal bruges nu. Med en tekst
+       faar den et gult skilt over sig, saa det staar i scenen, hvad et
+       klik goer (brugerens oenske 5. okt. 2026: det skal vaere oplagt, at
+       man trykker paa bunsenbraenderen). minX og maksX holder skiltet
+       inde i laerredet; pilen bliver staaende over tingen. */
+    T.pegepil = function (ctx, x, y, tid, tekst, minX, maksX) {
         var hop = Math.sin((tid || 0) * 5) * 5;
         ctx.save();
         ctx.fillStyle = "#f2c53d";
@@ -125,6 +130,33 @@
         ctx.lineTo(x + 9, y - 14 + hop);
         ctx.closePath();
         ctx.fill();
+        if (tekst) {
+            var px = 15, h = 30;
+            ctx.font = font("700", px);
+            var b = ctx.measureText(tekst).width + 24;
+            var sx = NK.klamp(x - b / 2, minX === undefined ? -Infinity : minX, (maksX === undefined ? Infinity : maksX) - b);
+            var sy = y - 14 - h + 1 + hop;
+            ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 2;
+            NK.rundtRekt(ctx, sx, sy, b, h, 8);
+            ctx.fill();
+            ctx.shadowColor = "transparent";
+            NK.tekst(ctx, tekst, sx + b / 2, sy + h / 2 + 1, { font: font("700", px), justering: "center", linje: "middle", farve: "#1b1b21" });
+        }
+        ctx.restore();
+    };
+
+    /* En gul ring, der pulserer om det, der skal klikkes paa nu */
+    T.ring = function (ctx, x, y, b, h, tid) {
+        var puls = 0.5 + 0.5 * Math.sin((tid || 0) * 5);
+        ctx.save();
+        ctx.strokeStyle = "rgba(242, 197, 61, " + (0.4 + 0.5 * puls).toFixed(3) + ")";
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = "rgba(242, 197, 61, 0.6)";
+        ctx.shadowBlur = 6 + 10 * puls;
+        NK.rundtRekt(ctx, x, y, b, h, 12);
+        ctx.stroke();
         ctx.restore();
     };
 
@@ -578,43 +610,6 @@
         ctx.restore();
     };
 
-    /* ----- Stjernekasteren (paaskeaegget) --------------------------------------------------- */
-    T.stjerneGeo = function (x, bund, h) {
-        var M = MAAL.stjernekaster, k = h / M.h, b = M.b * k;
-        var x0 = x - b / 2, y0 = bund - M.bund * k;
-        return { cx: x, x: x0, y: y0, b: b, h: h, spids: { x: x0 + M.spidsX * k, y: y0 + M.spidsY * k } };
-    };
-
-    T.stjernekaster = function (ctx, g, lys) {
-        if (lys) T.skaer(ctx, g.cx, g.y + g.h * 0.45, g.b * 1.2, g.h * 0.5);
-        NK.Sprites.tegn(ctx, "stjernekaster", g.x, g.y, g.b, g.h);
-    };
-
-    /* Stjernen i spidsen, mens den braender: straaler og et hvidt lys */
-    T.stjerneLys = function (ctx, x, y, tid, styrke) {
-        if (styrke <= 0) return;
-        ctx.save();
-        ctx.globalCompositeOperation = "lighter";
-        var g = ctx.createRadialGradient(x, y, 1, x, y, 26);
-        g.addColorStop(0, "rgba(255, 245, 210, " + (0.9 * styrke).toFixed(3) + ")");
-        g.addColorStop(1, "rgba(255, 200, 120, 0)");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(x, y, 26, 0, Math.PI * 2);
-        ctx.fill();
-        var r = froe(Math.floor(tid * 20));
-        ctx.strokeStyle = "rgba(255, 230, 170, " + (0.8 * styrke).toFixed(3) + ")";
-        ctx.lineWidth = 1.2;
-        for (var i = 0; i < 14; i++) {
-            var v = r() * Math.PI * 2, L = 10 + r() * 26;
-            ctx.beginPath();
-            ctx.moveTo(x + Math.cos(v) * 4, y + Math.sin(v) * 4);
-            ctx.lineTo(x + Math.cos(v) * L, y + Math.sin(v) * L);
-            ctx.stroke();
-        }
-        ctx.restore();
-    };
-
     /* ----- Luppen: overfladen af en ståltraad -----------------------------------------------
        Nederst i luppen ligger jernatomerne i fem raekker; den oeverste
        raekke er overfladen. Ovenover er luft: O₂ og N₂, der flyver rundt.
@@ -961,53 +956,57 @@
         ctx.restore();
     };
 
-    /* ----- Et regnestykke med rigtige broekstreger (tavlen paa fane 2, som sc4.3) ------------
-       dele: { t, matte, farve, fed } eller { top, bund, matte } (en broek).
-       (x, y): venstre ende af linjens midte. Broekens dele er lidt mindre. */
-    function delFont(d, px) {
-        if (d.matte) return T.matte(Math.round(px * 1.08), "600");
-        return font(d.fed ? "800" : "600", px);
-    }
-
-    function delBredde(ctx, d, px) {
-        if (d.top !== undefined) {
-            var bp = px * 0.9;
-            ctx.font = delFont(d, bp);
-            return Math.max(ctx.measureText(d.top).width, ctx.measureText(d.bund).width) + px * 0.35;
+    /* ----- Pilene i maengdeberegningsskemaet (som sc4.5) ---------------------------------------
+       En buet pil fra (x0, y0) til (x1, y1) med kontrolpunktet (kx, ky).
+       v.t (0-1) tegner den gradvist; spidsen kommer til sidst. */
+    T.rutePil = function (ctx, x0, y0, x1, y1, kx, ky, v) {
+        v = v || {};
+        var t = v.t === undefined ? 1 : NK.klamp(v.t, 0, 1);
+        if (t <= 0.01) return;
+        var farve = v.farve || "#2f6fc4";
+        ctx.save();
+        ctx.strokeStyle = farve;
+        ctx.lineWidth = 2.4;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        var n = 24;
+        ctx.moveTo(x0, y0);
+        for (var i = 1; i <= n * t; i++) {
+            var u = i / n;
+            ctx.lineTo((1 - u) * (1 - u) * x0 + 2 * (1 - u) * u * kx + u * u * x1,
+                       (1 - u) * (1 - u) * y0 + 2 * (1 - u) * u * ky + u * u * y1);
         }
-        ctx.font = delFont(d, px);
-        return ctx.measureText(d.t).width;
-    }
-
-    T.regnestykkeBredde = function (ctx, dele, px) {
-        var b = 0;
-        dele.forEach(function (d) { b += delBredde(ctx, d, px); });
-        return b;
+        ctx.stroke();
+        if (t >= 0.98) {
+            var vx = x1 - kx, vy = y1 - ky, l = Math.sqrt(vx * vx + vy * vy) || 1;
+            vx /= l; vy /= l;
+            ctx.fillStyle = farve;
+            ctx.beginPath();
+            ctx.moveTo(x1 + vx * 2, y1 + vy * 2);
+            ctx.lineTo(x1 - vx * 10 - vy * 5.5, y1 - vy * 10 + vx * 5.5);
+            ctx.lineTo(x1 - vx * 10 + vy * 5.5, y1 - vy * 10 - vx * 5.5);
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
     };
 
-    T.regnestykke = function (ctx, dele, x, y, px, farve) {
-        var xx = x;
-        dele.forEach(function (d) {
-            var b = delBredde(ctx, d, px);
-            if (d.top !== undefined) {
-                var bp = px * 0.9, cx = xx + b / 2;
-                NK.tekst(ctx, d.top, cx, y - px * 0.66, { font: delFont(d, bp), justering: "center", linje: "middle", farve: d.farve || farve });
-                NK.tekst(ctx, d.bund, cx, y + px * 0.72, { font: delFont(d, bp), justering: "center", linje: "middle", farve: d.farve || farve });
-                ctx.save();
-                ctx.strokeStyle = d.farve || farve;
-                ctx.lineWidth = Math.max(1.5, px * 0.08);
-                ctx.lineCap = "round";
-                ctx.beginPath();
-                ctx.moveTo(xx + px * 0.1, y);
-                ctx.lineTo(xx + b - px * 0.1, y);
-                ctx.stroke();
-                ctx.restore();
-            } else {
-                NK.tekst(ctx, d.t, xx, y + 1, { font: delFont(d, px), linje: "middle", farve: d.farve || farve });
-            }
-            xx += b;
-        });
-        return xx - x;
+    /* Det lille skilt paa en pil: hvad der regnes paa vejen */
+    T.pilEtiket = function (ctx, x, y, tekst, v) {
+        v = v || {};
+        var px = v.px || 13, farve = v.farve || "#2f6fc4";
+        ctx.save();
+        ctx.globalAlpha *= v.alfa === undefined ? 1 : v.alfa;
+        ctx.font = font("800", px);
+        var b = ctx.measureText(tekst).width + 12, h = px + 9;
+        ctx.fillStyle = "#ffffff";
+        NK.rundtRekt(ctx, x - b / 2, y - h / 2, b, h, 5);
+        ctx.fill();
+        ctx.strokeStyle = farve;
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        NK.tekst(ctx, tekst, x, y + 1, { font: font("800", px), justering: "center", linje: "middle", farve: farve });
+        ctx.restore();
     };
 
     NK.Tegn = T;

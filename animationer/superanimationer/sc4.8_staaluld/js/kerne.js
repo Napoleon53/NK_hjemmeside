@@ -72,21 +72,6 @@ window.NK = NK;
         return a + Math.random() * (b - a);
     };
 
-    /* ----- Positurer (bruges af ../../v2/kemichael/kemichael.js) --------------
-       En positur er { x, y, v }: hvor ankerpunktet staar, og hvor meget
-       genstanden er drejet om det. */
-    NK.tilVerden = function (p, anker, lx, ly) {
-        var c = Math.cos(p.v), s = Math.sin(p.v);
-        var dx = lx - anker.x, dy = ly - anker.y;
-        return { x: p.x + dx * c - dy * s, y: p.y + dx * s + dy * c };
-    };
-
-    NK.tilLokal = function (p, anker, wx, wy) {
-        var c = Math.cos(-p.v), s = Math.sin(-p.v);
-        var dx = wx - p.x, dy = wy - p.y;
-        return { x: dx * c - dy * s + anker.x, y: dx * s + dy * c + anker.y };
-    };
-
     /* ----- Haevet og saenket skrift ---------------------------------- */
     var HAEVET = {
         "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",

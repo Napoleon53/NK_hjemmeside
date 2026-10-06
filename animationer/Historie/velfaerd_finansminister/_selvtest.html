@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: Finansminister 1953-1963</title>
+<style>
+    body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 14px/1.5 Consolas, monospace; }
+    h1 { margin: 0 0 8px; font-size: 16px; }
+    pre { white-space: pre-wrap; }
+    iframe { display: block; margin-top: 12px; border: 1px solid #444; }
+</style>
+</head>
+<body>
+<h1>Selvtest: Finansminister 1953-1963</h1>
+<p>Kræver en lokal server (siden åbnes i en ramme). Sidste linje er ALT OK eller antallet af fejl.</p>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" title="Animationen" style="width:1280px;height:620px;"></iframe>
+
+<script>
+/* =====================================================================
+   Selvtesten tjekker det, man ikke kan se på et skærmbillede:
+     A  modellen: stillingerne i de fire år og første underskud i 1963
+     B  teksterne: alle kort har følge, pris og uddybning, og sproget
+        følger reglerne
+     C  forløbet: de fire trin (læs, vælg, valgt, afsløret), notatet bag
+        Læs mere og hele spillet med mus og tastatur
+     D  det rolige ark: ingen felter flytter sig fra trin til trin,
+        og intet skal rulles i tre skærmstørrelser
+     E  skriften: ingen læsbar tekst under 12,4 px
+   ===================================================================== */
+(async function () {
+    "use strict";
+
+    var linjer = [], fejl = 0, antal = 0;
+    var ramme = document.getElementById("ramme");
+    var w, d, NK, D, M;
+
+    function ok(betingelse, tekst) {
+        antal++;
+        if (!betingelse) { fejl++; linjer.push("FEJL: " + tekst); }
+    }
+    function ens(a, b, tekst) { ok(JSON.stringify(a) === JSON.stringify(b), tekst + " (fik " + JSON.stringify(a) + ", ventede " + JSON.stringify(b) + ")"); }
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+    async function aabn(b, h, hash, stille) {
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        await new Promise(function (res) {
+            ramme.onload = res;
+            ramme.src = "index.html?t=" + Date.now() + "-" + Math.random() + (hash || "");
+        });
+        w = ramme.contentWindow; d = w.document; NK = w.NK; D = NK.Data; M = NK.Model;
+        if (stille) {
+            /* uden bevaegelse, saa maalene af felterne er de endelige */
+            var st = d.createElement("style");
+            st.textContent = "* { animation: none !important; transition: none !important; }";
+            d.head.appendChild(st);
+        }
+        await vent(30);
+    }
+
+    function el(id) { return d.getElementById(id); }
+    function kort(k) { return d.querySelector('[data-kort="' + k + '"]'); }
+    function mere(k) { return d.querySelector('[data-mere="' + k + '"]'); }
+    function S() { return NK.Spil.tilstand(); }
+    function fase() { return d.body.getAttribute("data-fase"); }
+    function synlig(e) { return !!e && w.getComputedStyle(e).visibility !== "hidden" && !!(e.offsetWidth || e.offsetHeight); }
+    function trin() {
+        var ud = {};
+        D.IDER.forEach(function (id) { ud[id] = parseInt(d.querySelector('[data-maaler="' + id + '"]').getAttribute("data-trin"), 10); });
+        return ud;
+    }
+    function tast(key) { d.dispatchEvent(new w.KeyboardEvent("keydown", { key: key, bubbles: true })); }
+    function notatAabent() { return el("notat").classList.contains("vis"); }
+
+    try {
+        /* ---------------- A: modellen --------------------------------- */
+        await aabn(1280, 620);
+
+        ens(D.SITUATIONER.map(function (s) { return s.aar; }), [1956, 1958, 1961, 1963], "A: de fire år");
+        ens(M.start(0), { a: 4, p: 1, b: 2 }, "A: stillingen i 1956");
+        ens(M.start(1), { a: 3, p: 1, b: 1 }, "A: stillingen i 1958");
+        ens(M.start(2), { a: 1, p: 3, b: 2 }, "A: stillingen i 1961");
+        ens(M.start(3), { a: 1, p: 4, b: 3 }, "A: stillingen i 1963");
+        ens(M.slut(), { a: 1, p: 2, b: 1 }, "A: stillingen efter løn- og prisstoppet (overskud igen)");
+
+        /* Første underskud på betalingsbalancen kommer i 1963, ikke før */
+        ok(M.start(3).b >= 3, "A: underskud på betalingsbalancen i 1963");
+        ok(M.start(0).b <= 2 && M.start(1).b <= 2 && M.start(2).b <= 2, "A: intet underskud før 1963 på regeringens vej");
+        var bMaaler = D.MAALERE[2];
+        ok(/underskud/.test(bMaaler.niveau[3]) && !/underskud/.test(bMaaler.niveau[2]), "A: ordet underskud begynder ved trin 3");
+
+        var regPladser = [];
+        D.SITUATIONER.forEach(function (s, i) {
+            ok(s.valg.length === 3, "A: tre valg i " + s.aar);
+            ok(s.valg.filter(function (v) { return v.regering; }).length === 1, "A: netop ét regeringsvalg i " + s.aar);
+            regPladser.push(M.regering(i));
+            var st = M.start(i);
+            s.valg.forEach(function (v) {
+                /* ingen maaler maa ramme kanten, saa intet valg bliver klippet */
+                D.IDER.forEach(function (id) {
+                    var raa = st[id] + (v.virkning[id] || 0);
+                    ok(raa >= 0 && raa <= 5, "A: " + s.aar + " " + v.titel + ": måler " + id + " holder sig på skalaen");
+                });
+                ok(D.SLAGS[v.slags], "A: slagsen findes for " + v.titel);
+            });
+            /* de tre valg skal føre til tre forskellige stillinger */
+            var stillinger = s.valg.map(function (v, k) { return JSON.stringify(M.efter(i, k)); });
+            ok(new Set(stillinger).size === 3, "A: de tre valg i " + s.aar + " giver tre forskellige stillinger");
+        });
+        ok(new Set(regPladser).size >= 3, "A: regeringens valg står ikke altid på samme plads");
+        ens(D.DRIFT.length, D.SITUATIONER.length - 1, "A: en drift mellem hver situation");
+
+        /* ---------------- B: teksterne -------------------------------- */
+        var tekster = [];
+        D.SITUATIONER.forEach(function (s) {
+            ok(s.baggrund, "B: " + s.aar + " har en baggrund til notatet");
+            tekster.push(s.titel, s.avis.rubrik, s.avis.tekst, s.avis.stilling, s.spm, s.afsloer, s.baggrund);
+            ok(s.avis.rubrik.length <= 28, "B: rubrikken fylder én linje: " + s.avis.rubrik);
+            var laengder = [];
+            s.valg.forEach(function (v) {
+                ok(v.foelge && v.pris && v.titel && v.linje && v.maerke, "B: " + s.aar + " " + v.titel + " har alle tekster");
+                ok(v.mere && v.mere.hvad && v.mere.for && v.mere.imod, "B: " + s.aar + " " + v.titel + " har en uddybning med for og imod");
+                ok(!!v.gik === !!v.regering, "B: " + s.aar + " " + v.titel + ": kun regeringens valg har Sådan gik det");
+                ok(v.linje.length <= 46, "B: linjen på kortet er kort nok: " + v.linje);
+                ok(v.titel.length <= 30, "B: titlen er kort nok: " + v.titel);
+                tekster.push(v.titel, v.linje, v.foelge, v.pris, v.maerke, v.mere.hvad, v.mere.for, v.mere.imod);
+                if (v.gik) tekster.push(v.gik);
+                laengder.push(v.mere.hvad.length);
+                [v.foelge, v.pris, v.mere.hvad, v.mere.for, v.mere.imod, v.gik || "."].forEach(function (t) {
+                    ok(/[.?]$/.test(t), "B: sætningen slutter med punktum: " + t.slice(-30));
+                });
+            });
+            /* uddybningerne maa ikke roebe regeringens valg ved at vaere meget laengere */
+            ok(Math.max.apply(null, laengder) / Math.min.apply(null, laengder) <= 1.8, "B: de tre uddybninger i " + s.aar + " er nogenlunde lige lange (" + laengder.join(", ") + ")");
+            [s.avis.tekst, s.afsloer, s.baggrund].forEach(function (t) { ok(/[.?]$/.test(t), "B: sætningen slutter med punktum: " + t.slice(-30)); });
+        });
+        D.MAALERE.forEach(function (m) { tekster.push(m.navn, m.forklar, m.op, m.ned); tekster = tekster.concat(m.niveau); });
+        tekster.push(D.REGNSKAB.rubrik, D.REGNSKAB.tekst, D.REGNSKAB.stilling, D.REGNSKAB.eftertanke, D.TEKST.note, D.TEKST.noteFoer, D.TEKST.tom);
+        tekster.forEach(function (t) {
+            ok(!/[–—]/.test(t), "B: ingen tankestreg i: " + String(t).slice(0, 60));
+            ok(!/ {2}/.test(String(t)), "B: ingen dobbelt mellemrum i: " + String(t).slice(0, 60));
+        });
+        ok(!/[–—]/.test(d.body.innerText + el("fagord").textContent), "B: ingen tankestreg på siden");
+
+        /* ---------------- C: forløbet --------------------------------- */
+        /* Trin 1: avisen laeses, kortene ligger med bagsiden op */
+        ok(S().nr === 0 && S().fase === "laes" && fase() === "laes", "C: begynder i 1956 med at læse avisen");
+        ok(d.querySelectorAll(".valgkort").length === 3, "C: tre kort");
+        ok(!synlig(kort(0).querySelector(".vk-titel")), "C: kortene ligger med bagsiden op i læsetrinnet");
+        ok(!synlig(mere(0)), "C: Læs mere er skjult i læsetrinnet");
+        ok(synlig(el("avis-tekst")) && synlig(el("spm")), "C: avisen og spørgsmålet kan læses");
+        ok(el("foelge").classList.contains("tom"), "C: feltet med følgen er tomt fra start");
+        ok(d.querySelectorAll(".stempel").length === 0, "C: ingen stempler fra start");
+        ok(d.querySelectorAll(".m-tag:not(:empty)").length === 0, "C: ingen mærker på målerne fra start");
+        ens(trin(), M.start(0), "C: målerne viser stillingen i 1956");
+        ok(/Se dine muligheder/.test(el("knap").textContent), "C: knappen vender kortene");
+        ok(NK.Spil.aabnNotat(-1) === false && !notatAabent(), "C: notatet kan ikke åbnes, før kortene er vendt");
+        tast("l");
+        ok(!notatAabent(), "C: tasten L åbner heller ikke notatet før tid");
+
+        /* Trin 2: kortene vendes */
+        el("knap").click();
+        ok(S().fase === "vaelg" && fase() === "vaelg", "C: knappen vender kortene");
+        ok(synlig(kort(0).querySelector(".vk-titel")) && synlig(mere(0)), "C: kortene og Læs mere kan ses");
+        ok(S().mit.length === 0 && d.querySelectorAll(".stempel").length === 0, "C: at vende kortene er ikke et valg");
+        ok(/Læs mere om mulighederne/.test(el("knap").textContent), "C: knappen tilbyder at læse mere");
+
+        /* Notatet fra den store knap */
+        el("knap").click();
+        ok(notatAabent() && S().fase === "vaelg" && S().mit.length === 0, "C: knappen åbner notatet uden at vælge");
+        ok(d.querySelectorAll(".notat-kol").length === 3, "C: notatet har de tre muligheder");
+        ok(el("notat-baggrund").textContent === D.SITUATIONER[0].baggrund, "C: notatet har baggrunden");
+        ok(/lavtlønnede/.test(d.querySelector('[data-notat="2"] .n-hvad').textContent) && /sygelønsordning/.test(d.querySelector('[data-notat="2"] .n-hvad').textContent), "C: notatet fortæller, hvad mæglingsforslaget indeholdt");
+        ok(d.querySelectorAll(".notat-kol .n-linje.for").length === 3 && d.querySelectorAll(".notat-kol .n-linje.imod").length === 3, "C: hver mulighed har for og imod");
+        ok(el("notat-gik").hidden && el("notat-gik").textContent === "" && d.querySelectorAll("#notat .stempel").length === 0, "C: notatet røber ikke regeringens valg");
+        ok(/vælg selv/.test(el("notat-luk").textContent), "C: lukkeknappen sender eleven tilbage til valget");
+        tast("Escape");
+        ok(!notatAabent(), "C: Esc lukker notatet");
+
+        /* Laes mere paa et kort er ikke et valg */
+        mere(2).click();
+        ok(notatAabent() && S().mit.length === 0 && S().fase === "vaelg", "C: Læs mere på et kort åbner notatet uden at vælge");
+        ok(d.querySelector('[data-notat="2"]').classList.contains("fokus") && d.querySelectorAll(".notat-kol.fokus").length === 1, "C: det kort, der blev spurgt om, er fremhævet");
+        el("notat-luk").click();
+        ok(!notatAabent(), "C: knappen lukker notatet");
+        tast("l");
+        ok(notatAabent(), "C: tasten L åbner notatet");
+        tast("1");
+        ok(S().mit.length === 0, "C: tasterne vælger ikke bag et åbent notat");
+        tast("Escape");
+
+        /* Trin 3: eleven vaelger */
+        kort(1).click();
+        ok(S().fase === "valgt" && S().mit[0] === 1, "C: første klik på et kort er elevens valg");
+        ok(kort(1).querySelector(".stempel.mit"), "C: kortet får stemplet Dit valg");
+        ens(trin(), M.efter(0, 1), "C: målerne viser følgen af valget");
+        ok(el("f-foelge").textContent === D.SITUATIONER[0].valg[1].foelge, "C: følgen står i feltet");
+        ok(el("f-pris").textContent === D.SITUATIONER[0].valg[1].pris, "C: prisen står i feltet");
+        ok(el("f-reg-rk").hidden, "C: regeringens linje er skjult før afsløringen");
+        ok(d.querySelectorAll(".stempel.reg").length === 0, "C: regeringens valg er ikke afsløret endnu");
+        ok(d.querySelector('[data-maaler="a"] .m-tag').textContent === "stiger", "C: mærket siger, at arbejdsløsheden stiger");
+        ok(d.querySelector('[data-maaler="p"] .m-tag').textContent === "uændret", "C: mærket siger, at priserne er uændrede");
+        ok(/Hvad gjorde regeringen/.test(el("knap").textContent) && el("knap").classList.contains("lyser"), "C: knappen lyser, når eleven har valgt");
+
+        kort(0).click();
+        ok(S().vist === 0 && S().mit[0] === 1, "C: et klik på et andet kort ændrer ikke elevens valg");
+        ok(/^Et andet valg/.test(el("f-titel").textContent), "C: feltet siger, at det er et andet valg");
+        ens(trin(), M.efter(0, 0), "C: målerne viser det andet valg");
+        ok(/Dit valg er stadig/.test(el("besked").textContent), "C: statuslinjen minder om elevens eget valg");
+
+        mere(0).click();
+        ok(notatAabent() && d.querySelectorAll("#notat .stempel.mit").length === 1 && el("notat-gik").hidden && d.querySelectorAll("#notat .stempel.reg").length === 0, "C: notatet viser elevens valg, men ikke regeringens");
+        ok(el("notat-luk").textContent === "Luk", "C: lukkeknappen hedder Luk efter valget");
+        tast("Escape");
+
+        /* Trin 4: regeringens valg */
+        el("knap").click();
+        ok(S().fase === "afsloeret", "C: knappen afslører regeringens valg");
+        ok(kort(2).querySelector(".stempel.reg") && d.querySelectorAll("#valg .stempel.reg").length === 1, "C: regeringens kort er stemplet");
+        ok(kort(1).querySelector(".stempel.mit"), "C: elevens stempel sidder stadig");
+        ens(trin(), M.efter(0, 2), "C: målerne viser regeringens valg");
+        ok(!el("f-reg-rk").hidden && el("f-reg").textContent === D.SITUATIONER[0].afsloer, "C: regeringens begrundelse står i feltet");
+        ok(/Videre til 1958/.test(el("knap").textContent), "C: knappen fører videre til 1958");
+
+        mere(2).click();
+        var gik = el("notat-gik");
+        ok(!gik.hidden && /13\. april 1956/.test(gik.textContent) && /Regeringen valgte: Gør mæglingsforslaget til lov/.test(gik.textContent), "C: efter afsløringen fortæller notatet, hvordan det gik");
+        ok(d.querySelector('[data-notat="2"] .stempel.reg'), "C: notatet stempler regeringens valg efter afsløringen");
+        tast("Escape");
+
+        /* 1958: et klik paa et kort med bagsiden op vender kortene */
+        el("knap").click();
+        ok(S().nr === 1 && S().fase === "laes", "C: 1958 begynder med avisen");
+        ens(trin(), M.start(1), "C: målerne viser stillingen i 1958");
+        ok(/siden 1956: falder/.test(d.querySelector('[data-maaler="a"] .m-tag').textContent), "C: målerne viser, hvad der er sket siden 1956");
+        ok(el("foelge").classList.contains("tom") && d.querySelectorAll("#valg .stempel").length === 0, "C: den nye situation er ren");
+        ok(d.querySelectorAll(".aar.faerdig").length === 1, "C: 1956 er grøn i listen");
+        kort(0).click();
+        ok(S().fase === "vaelg" && S().mit[1] === undefined, "C: et klik på en bagside vender kortene og vælger ikke");
+
+        /* tastaturet: 2 vaelger kort 2, Enter er knappen */
+        tast("2");
+        ok(S().mit[1] === 1 && S().fase === "valgt", "C: tasten 2 vælger det midterste kort");
+        tast("Enter");
+        ok(S().fase === "afsloeret", "C: Enter er knappen");
+        ok(/Samme valg/i.test(el("besked").textContent), "C: statuslinjen siger, at valget var det samme som regeringens");
+        ok(kort(1).querySelectorAll(".stempel").length === 2, "C: kortet har begge stempler, når valget er det samme");
+
+        tast("Enter");                                        /* 1961 */
+        ok(S().nr === 2 && S().fase === "laes", "C: 1961 begynder med avisen");
+        tast("Enter");                                        /* vend */
+        ok(S().fase === "vaelg", "C: Enter vender kortene");
+        kort(M.regering(2)).click(); el("knap").click(); el("knap").click();
+        ok(S().nr === 3 && S().fase === "laes", "C: 1963 begynder");
+        ok(/underskud/.test(d.querySelector('[data-maaler="b"] .m-niveau').textContent), "C: betalingsbalancen viser underskud i 1963");
+        el("knap").click();
+        kort(M.regering(3)).click(); el("knap").click();
+        ok(/Se regnskabet/.test(el("knap").textContent), "C: sidste knap går til regnskabet");
+        el("knap").click();
+        ok(S().fase === "slut", "C: regnskabet er nået");
+        ok(!el("regnskab").hidden && el("foelge").hidden && el("valgdel").hidden, "C: regnskabet står i stedet for kortene");
+        ok(d.querySelectorAll("#regnskab-krop tr").length === 4, "C: regnskabet har fire rækker");
+        ok(d.querySelectorAll("#regnskab-krop tr.ens").length === 3, "C: tre af valgene var de samme som regeringens");
+        ok(/3 af 4/.test(el("besked").textContent), "C: statuslinjen tæller tre af fire");
+        ok(el("besked").textContent.indexOf(D.REGNSKAB.eftertanke) >= 0, "C: spørgsmålet til eftertanke står i statuslinjen");
+        ok(d.querySelectorAll("#regnskab-krop .r-pris").length === 4, "C: regnskabet viser prisen for hvert af regeringens valg");
+        ens(trin(), M.slut(), "C: målerne viser stillingen til sidst");
+        ok(d.querySelectorAll(".aar.faerdig").length === 4, "C: alle fire år er grønne");
+        ok(NK.Spil.aabnNotat(-1) === false, "C: intet notat i regnskabet");
+
+        el("knap").click();
+        ok(S().nr === 0 && S().fase === "laes" && S().mit.length === 0, "C: knappen til sidst begynder forfra");
+        ok(el("regnskab").hidden && !el("valgdel").hidden, "C: kortene er tilbage");
+
+        /* fagordene og rundvisningen */
+        tast("t");
+        ok(el("fagord").classList.contains("vis"), "C: T åbner fagordene");
+        tast("Escape");
+        ok(!el("fagord").classList.contains("vis"), "C: Esc lukker fagordene");
+        tast("?");
+        ok(!el("rundvisning").hidden, "C: ? starter rundvisningen");
+        tast("Escape");
+        ok(el("rundvisning").hidden, "C: Esc lukker rundvisningen");
+
+        /* forklaringen paa en maaler */
+        d.querySelector('[data-maaler="b"]').click();
+        ok(!el("m-forklaring").hidden && /Betalingsbalance/.test(el("m-forklaring").textContent), "C: et klik på en måler forklarer den");
+        d.querySelector('[data-maaler="b"]').click();
+        ok(el("m-forklaring").hidden, "C: et klik mere fjerner forklaringen");
+
+        /* direkte link til et aar */
+        await aabn(1280, 620, "#1961");
+        ok(S().nr === 2 && S().fase === "laes", "C: #1961 begynder i 1961");
+        ok(/sprunget over/.test(el("aarliste").textContent), "C: de sprungne år er markeret");
+
+        /* ---------------- D: det rolige ark --------------------------- */
+        /* 883 x 620 er vinduet i historiesamlingen med begge menuer aabne paa en lav skaerm */
+        var STR = [[1366, 768], [1280, 620], [1069, 620], [883, 620]];
+        function aftryk() {
+            var ud = {};
+            ["avis", "maalerboks", "valgdel", "foelge", "statuslinje"].forEach(function (id) {
+                var r = el(id).getBoundingClientRect();
+                ud[id] = [r.left, r.top, r.width, r.height].map(function (x) { return Math.round(x); });
+            });
+            var k = d.querySelectorAll(".valgkort");
+            for (var i = 0; i < k.length; i++) {
+                var r2 = k[i].getBoundingClientRect();
+                ud["kort" + i] = [r2.left, r2.top, r2.width, r2.height].map(function (x) { return Math.round(x); });
+            }
+            return JSON.stringify(ud);
+        }
+        function ruller() { var b = el("bord"); return b.scrollHeight - b.clientHeight; }
+
+        for (var si = 0; si < STR.length; si++) {
+            var b = STR[si][0], h = STR[si][1], navn = b + "x" + h;
+            await aabn(b, h, "", true);
+            for (var i = 0; i < D.SITUATIONER.length; i++) {
+                var aar = D.SITUATIONER[i].aar;
+                var foer = aftryk();
+                ok(ruller() <= 1, "D " + navn + ": " + aar + " kan ses uden at rulle (læsetrinnet)");
+                el("knap").click();
+                ok(aftryk() === foer, "D " + navn + ": " + aar + " intet flytter sig, når kortene vendes");
+
+                /* Laes mere maa ikke daekke kortets tekst */
+                for (var k = 0; k < 3; k++) {
+                    var rm = mere(k).getBoundingClientRect();
+                    var omt = d.createRange(); omt.selectNodeContents(kort(k).querySelector(".vk-titel"));
+                    var rt = omt.getBoundingClientRect();
+                    var rmk = kort(k).querySelector(".vk-maerke");
+                    var omr = d.createRange(); omr.selectNodeContents(rmk);
+                    var rmt = omr.getBoundingClientRect();
+                    ok(rm.bottom <= rt.top + 1 || rm.left >= rt.right, "D " + navn + ": " + aar + " Læs mere dækker ikke titlen på kort " + (k + 1) + " (" + Math.round(rm.bottom) + " mod " + Math.round(rt.top) + ")");
+                    ok(rm.left >= rmt.right - 1, "D " + navn + ": " + aar + " Læs mere dækker ikke mærket på kort " + (k + 1));
+                }
+
+                for (k = 0; k < 3; k++) {
+                    kort((k + 1) % 3).click();
+                    ok(aftryk() === foer, "D " + navn + ": " + aar + " intet flytter sig ved kort " + ((k + 1) % 3 + 1));
+                    ok(ruller() <= 1, "D " + navn + ": " + aar + " kan ses uden at rulle (kort " + ((k + 1) % 3 + 1) + ")");
+                }
+                el("knap").click();
+                ok(aftryk() === foer, "D " + navn + ": " + aar + " intet flytter sig ved afsløringen");
+                ok(ruller() <= 1, "D " + navn + ": " + aar + " kan ses uden at rulle (afsløret)");
+                for (k = 0; k < 3; k++) {
+                    kort(k).click();
+                    ok(aftryk() === foer, "D " + navn + ": " + aar + " intet flytter sig ved kort " + (k + 1) + " efter afsløringen");
+                }
+                /* stemplerne maa ikke raekke uden for scenen */
+                var st = d.querySelectorAll("#valg .stempel"), sc = el("bord").getBoundingClientRect();
+                for (var q = 0; q < st.length; q++) {
+                    var rs = st[q].getBoundingClientRect();
+                    ok(rs.top >= sc.top && rs.right <= sc.right, "D " + navn + ": " + aar + " stemplet er inde i scenen");
+                }
+
+                /* notatet med Saadan gik det: kan laeses uden at rulle paa de to brede skaerme */
+                NK.Spil.aabnNotat(-1);
+                var boks = d.querySelector("#notat .overlay-boks");
+                var over = boks.scrollHeight - boks.clientHeight;
+                if (b >= 1280) ok(over <= 1, "D " + navn + ": " + aar + " notatet kan læses uden at rulle (" + over + " px for meget)");
+                ok(boks.getBoundingClientRect().width <= b, "D " + navn + ": " + aar + " notatet er ikke bredere end skærmen");
+                tast("Escape");
+
+                el("knap").click();
+            }
+            ok(S().fase === "slut" && ruller() <= 1, "D " + navn + ": regnskabet kan ses uden at rulle");
+
+            /* ---------------- E: skriften ----------------------------- */
+            var alle = d.querySelectorAll(".scene *, .panel *, .top *");
+            var smaa = {};
+            for (var e = 0; e < alle.length; e++) {
+                var x = alle[e];
+                if (!x.offsetWidth || !x.offsetHeight) continue;
+                var egen = false;
+                for (var c = 0; c < x.childNodes.length; c++) if (x.childNodes[c].nodeType === 3 && x.childNodes[c].nodeValue.trim()) egen = true;
+                if (!egen) continue;
+                var px = parseFloat(w.getComputedStyle(x).fontSize);
+                if (px < 12.4) smaa[x.className || x.tagName] = px;
+            }
+            ok(Object.keys(smaa).length === 0, "E " + navn + ": ingen tekst under 12,4 px (" + JSON.stringify(smaa) + ")");
+        }
+
+        /* skriften i notatet */
+        await aabn(1280, 620, "", true);
+        el("knap").click(); kort(0).click(); el("knap").click(); NK.Spil.aabnNotat(-1);
+        var na = d.querySelectorAll("#notat *"), nsmaa = {};
+        for (var ne = 0; ne < na.length; ne++) {
+            var nx = na[ne];
+            if (!nx.offsetWidth || !nx.offsetHeight) continue;
+            var negen = false;
+            for (var nc = 0; nc < nx.childNodes.length; nc++) if (nx.childNodes[nc].nodeType === 3 && nx.childNodes[nc].nodeValue.trim()) negen = true;
+            if (negen && parseFloat(w.getComputedStyle(nx).fontSize) < 12.4) nsmaa[nx.className || nx.tagName] = parseFloat(w.getComputedStyle(nx).fontSize);
+        }
+        ok(Object.keys(nsmaa).length === 0, "E: ingen tekst under 12,4 px i notatet (" + JSON.stringify(nsmaa) + ")");
+    } catch (e) {
+        fejl++;
+        linjer.push("FEJL: selvtesten stoppede: " + (e && e.stack ? e.stack : e));
+    }
+
+    linjer.push(antal + " påstande");
+    linjer.push(fejl === 0 ? "ALT OK" : fejl + " FEJL");
+    document.getElementById("ud").textContent = linjer.join("\n");
+}());
+</script>
+</body>
+</html>

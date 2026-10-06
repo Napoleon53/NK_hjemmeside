@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finansminister 1953-1963</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-fase="vaelg">
+
+<header class="top">
+    <h1><span class="ikon">kr.</span> Finansminister 1953-1963</h1>
+    <p class="top-note">Socialdemokratiet har regeret siden 1953. Du styrer økonomien.</p>
+
+    <button class="ikonknap tekstknap" id="fagordknap" type="button" title="Fagord (T)">Fagord</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane">
+    <div class="scene" id="scene">
+
+        <div class="bord" id="bord">
+        <div class="ark" id="ark">
+
+            <!-- Venstre: situationen (avisen) og de tre muligheder -->
+            <article class="avis" id="avis">
+                <div class="avis-hoved">
+                    <span class="avis-navn">Dagens Nyt</span>
+                    <span class="avis-dato" id="avis-dato"></span>
+                </div>
+                <h2 class="avis-rubrik" id="avis-rubrik"></h2>
+                <p class="avis-tekst" id="avis-tekst"></p>
+                <p class="avis-stilling" id="avis-stilling"></p>
+            </article>
+
+            <!-- Højre: virkningen (målerne og følgen) -->
+            <div class="maalerboks" id="maalerboks">
+                <span class="etiket">Målerne</span>
+                <div class="maalere" id="maalere"></div>
+                <p class="maalernote" id="maalernote"></p>
+                <p class="m-forklaring" id="m-forklaring" hidden></p>
+            </div>
+
+            <div class="valgdel" id="valgdel">
+                <p class="spm" id="spm"></p>
+                <div class="valg" id="valg" role="group" aria-label="Dine tre muligheder"></div>
+            </div>
+
+            <!-- Følgen og prisen for det kort, målerne viser (js/spil.js) -->
+            <div class="foelge tom" id="foelge">
+                <p class="f-tom" id="f-tom">Følgen af dit valg står her, når du har valgt.</p>
+                <div class="f-indhold" id="f-indhold" hidden>
+                    <p class="f-titel" id="f-titel"></p>
+                    <div class="f-rk"><span class="f-m">Følgen</span><p id="f-foelge"></p></div>
+                    <div class="f-rk pris"><span class="f-m">Prisen</span><p id="f-pris"></p></div>
+                    <div class="f-rk reg" id="f-reg-rk" hidden><span class="f-m">Regeringen</span><p id="f-reg"></p></div>
+                </div>
+            </div>
+
+            <!-- Regnskabet til sidst: elevens valg ved siden af regeringens -->
+            <div class="regnskab" id="regnskab" hidden>
+                <table>
+                    <thead><tr><th>År</th><th>Dit valg</th><th>Regeringens valg</th><th>Prisen for regeringens valg</th></tr></thead>
+                    <tbody id="regnskab-krop"></tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+
+        <!-- Statuslinjen: næste skridt og den ene knap -->
+        <div class="statuslinje" id="statuslinje">
+            <p class="st-tekst" id="besked" aria-live="polite"></p>
+            <button class="knap hjaelp" id="knap" type="button">Hvad gjorde regeringen?</button>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="aarkort">
+            <h2>Årene <span class="taeller">færdige: <b id="aar-taeller">0 af 4</b></span></h2>
+            <ol class="aarliste" id="aarliste"></ol>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<!-- FAGORDENE (åbnes kun med knappen eller T)                          -->
+<!-- ================================================================= -->
+<div class="overlay" id="fagord">
+    <div class="overlay-boks">
+        <h2>Fagord</h2>
+        <dl class="ordliste">
+            <dt>Finanspolitik</dt>
+            <dd>Statens styring af økonomien gennem skatter og offentlige udgifter. Gas er lavere skat eller flere udgifter. Brems er højere skat eller færre udgifter.</dd>
+            <dt>Indkomstpolitik</dt>
+            <dd>Staten bestemmer, hvor meget lønninger og priser må stige.</dd>
+            <dt>Betalingsbalance</dt>
+            <dd>Landets indtægter fra og udgifter til udlandet. Underskud: flere udgifter end indtægter.</dd>
+            <dt>Valuta</dt>
+            <dd>Udenlandske penge, som landet skal bruge for at købe varer i udlandet.</dd>
+            <dt>Overenskomst</dt>
+            <dd>Aftale mellem fagforeninger og arbejdsgivere om løn og arbejdsvilkår.</dd>
+            <dt>Mæglingsforslag</dt>
+            <dd>En mæglers forslag til at løse en arbejdskonflikt. Kan gøres til lov.</dd>
+            <dt>Planøkonomi</dt>
+            <dd>Staten planlægger og styrer økonomien i stedet for markedet.</dd>
+        </dl>
+
+        <h3>Om målerne</h3>
+        <p>Målerne viser kun retningen. Bogen har ingen tal for, hvad de valg, regeringen ikke traf, ville have ført til. Deres følger er regnet efter de sammenhænge, kapitlet beskriver.</p>
+
+        <h3>Kilde</h3>
+        <p>Kapitel 8-alternativ, del 1. Skrevet efter Peter Schroeder: Det 20. århundredes Danmarkshistorie (2007), s. 109-120. Detaljerne bag Læs mere er fra Gyldendal og Politikens Danmarkshistorie og danmarkshistorien.dk.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> vælg kort &nbsp;·&nbsp; <kbd>Enter</kbd> knappen &nbsp;·&nbsp; <kbd>L</kbd> læs mere &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> fagord &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper" style="margin-top:16px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- NOTATET bag Læs mere: de tre muligheder side om side (js/spil.js)  -->
+<!-- ================================================================= -->
+<div class="overlay notat-lag" id="notat">
+    <div class="overlay-boks notat-boks">
+        <div class="notat-hoved">
+            <span class="etiket">Notat til ministeren</span>
+            <h2 id="notat-titel"></h2>
+        </div>
+        <p class="notat-baggrund" id="notat-baggrund"></p>
+        <div class="notat-kolonner" id="notat-kolonner"></div>
+        <p class="notat-gik" id="notat-gik" hidden></p>
+        <div class="knapper">
+            <button class="knap blaa" id="notat-luk" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rundvisningen: spotlight på ét element ad gangen - se js/rundvisning.js. -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/6</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/maaler.js"></script>
+<script src="js/spil.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

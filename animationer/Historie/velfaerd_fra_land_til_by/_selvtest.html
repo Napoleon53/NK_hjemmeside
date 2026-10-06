@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: Fra land til by 1940-1989</title>
+<style>
+    body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 14px/1.5 Consolas, monospace; }
+    h1 { margin: 0 0 8px; font-size: 16px; }
+    pre { white-space: pre-wrap; }
+    iframe { display: block; margin-top: 12px; border: 1px solid #444; }
+</style>
+</head>
+<body>
+<h1>Selvtest: Fra land til by 1940-1989</h1>
+<p>Kræver en lokal server (siden åbnes i en ramme). Sidste linje er ALT OK eller antallet af fejl.</p>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" title="Animationen" style="width:1280px;height:620px;"></iframe>
+
+<script>
+/* =====================================================================
+   Selvtesten tjekker det, man ikke kan se på et skærmbillede:
+     A  modellen: altid 100 personer, tallene i de seks år, jævne
+        flytninger, faste pladser og svarene på opgaverne
+     B  teksterne: alle erhverv og opgaver har det, de skal have, og
+        sproget følger reglerne
+     C  forløbet: starten, sorteringen med mus, klik og taster,
+        hint-trappen, gættet, de to find-opgaver, forklaringen og
+        slutningen
+     D  roen: kun det, trinnet har brug for, er fremme; figuren står
+        stille, når noget nyt kommer frem; intet skal rulles i tre
+        skærmstørrelser; personerne står i deres bane
+     E  skriften: ingen læsbar tekst under 12,4 px
+   ===================================================================== */
+(async function () {
+    "use strict";
+
+    var linjer = [], fejl = 0, antal = 0;
+    var ramme = document.getElementById("ramme");
+    var w, d, NK, D, M, F, G;
+
+    function ok(betingelse, tekst) {
+        antal++;
+        if (!betingelse) { fejl++; linjer.push("FEJL: " + tekst); }
+    }
+    function ens(a, b, tekst) { ok(JSON.stringify(a) === JSON.stringify(b), tekst + " (fik " + JSON.stringify(a) + ", ventede " + JSON.stringify(b) + ")"); }
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    function el(id) { return d.getElementById(id); }
+
+    async function aabn(b, h, hash) {
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        await new Promise(function (res) {
+            ramme.onload = res;
+            ramme.src = "index.html?t=" + Date.now() + "-" + Math.random() + (hash || "");
+        });
+        w = ramme.contentWindow; d = w.document; NK = w.NK; D = NK.Data; M = NK.Model; F = NK.Forloeb; G = NK.Figur;
+        /* uden bevægelse, så målene af felterne er de endelige */
+        var st = d.createElement("style");
+        st.textContent = "* { animation: none !important; transition: none !important; }";
+        d.head.appendChild(st);
+        await vent(40);
+        G.tilpas();
+    }
+
+    function fase() { return d.body.getAttribute("data-fase"); }
+    function statusFarve() { return el("statuslinje").className.replace("statuslinje", "").replace("ryster", "").trim(); }
+    function besked() { return el("besked").textContent; }
+    function knapTekst() { return el("knap").hidden ? "" : el("knap").textContent; }
+    function nr(id) { return M.erhvervNr(id); }
+    function kanSes(e) { return !!e && e.getClientRects().length > 0 && getComputedStyle(e).visibility !== "hidden"; }
+    function opg(id) { return D.OPGAVER.filter(function (o) { return o.id === id; })[0]; }
+
+    /* Ingen tomme pladsholdere og ingen tankestreger i det, eleven ser. */
+    function tekstOK(hvor) {
+        var t = el("opg-tekst").textContent + " | " + besked() + " | " + knapTekst() + " | " + el("opg-maerke").textContent;
+        ok(!/[{}]|undefined|null|NaN/.test(t), hvor + ": teksten har en tom pladsholder: " + t);
+        ok(!/[–—]/.test(t), hvor + ": teksten har en tankestreg: " + t);
+        ok(besked().length > 0, hvor + ": statuslinjen er tom");
+    }
+
+    /* ================================================================= */
+    /* A  MODELLEN                                                        */
+    /* ================================================================= */
+    await aabn(1280, 620);
+    var E = D.ERHVERV.length, aar, k, i;
+
+    for (aar = D.FOERSTE; aar <= D.SIDSTE; aar++) {
+        var a = M.antal(aar), sum = 0;
+        for (k = 0; k < E; k++) { sum += a[k]; ok(a[k] >= 0 && a[k] === Math.round(a[k]), aar + ": antallet i " + D.ERHVERV[k].id + " er ikke et helt tal over 0"); }
+        ens(sum, 100, aar + ": der skal være 100 personer");
+        ens(M.sektorSum(aar, "p") + M.sektorSum(aar, "s") + M.sektorSum(aar, "t") + M.sektorSum(aar, "u"), 100, aar + ": sektorerne skal give 100");
+
+        /* pladserne: hver person har sin egen plads, og en række er fyldt fra venstre */
+        var pl = M.pladser(aar), set = {}, pr = [];
+        for (k = 0; k < E; k++) pr.push(0);
+        ens(pl.length, 100, aar + ": 100 pladser");
+        for (i = 0; i < pl.length; i++) {
+            var noegle = pl[i].r + ":" + pl[i].s;
+            ok(!set[noegle], aar + ": to personer står på samme plads " + noegle);
+            set[noegle] = true;
+            pr[pl[i].r]++;
+            ok(pl[i].s < a[pl[i].r], aar + ": person " + i + " står uden for rækken");
+        }
+        ens(pr, a, aar + ": pladserne passer med antallene");
+    }
+
+    /* de seks år med tal: højst 1 fra figurens tal, skaleret til 100 */
+    for (i = 0; i < D.AAR.length; i++) {
+        var total = 0;
+        for (k = 0; k < E; k++) total += D.ERHVERV[k].tal[i];
+        ok(total > 95 && total < 101, D.AAR[i] + ": figurens tal giver " + total.toFixed(1) + ", ventede 95-101");
+        for (k = 0; k < E; k++) {
+            var skal = D.ERHVERV[k].tal[i] * 100 / total;
+            ok(Math.abs(M.antal(D.AAR[i])[k] - skal) < 1, D.AAR[i] + " " + D.ERHVERV[k].id + ": " + M.antal(D.AAR[i])[k] + " personer, figuren siger " + skal.toFixed(1));
+            ok(Math.abs(M.antal(D.AAR[i])[k] - D.ERHVERV[k].tal[i]) <= 1.5, D.AAR[i] + " " + D.ERHVERV[k].id + ": mere end 1,5 fra figurens tal");
+        }
+    }
+
+    /* mellem to år med tal går hvert erhverv og hver sektor kun én vej, og højst 4 flytter pr. år */
+    for (i = 0; i < D.AAR.length - 1; i++) {
+        var fra = D.AAR[i], til = D.AAR[i + 1];
+        for (k = 0; k < E; k++) {
+            var retning = Math.sign(M.antal(til)[k] - M.antal(fra)[k]);
+            for (aar = fra; aar < til; aar++) {
+                var skridt = M.antal(aar + 1)[k] - M.antal(aar)[k];
+                ok(skridt === 0 || Math.sign(skridt) === retning, aar + ": " + D.ERHVERV[k].id + " går den forkerte vej");
+            }
+        }
+        ["p", "s", "t", "u"].forEach(function (s) {
+            var ret = Math.sign(M.sektorSum(til, s) - M.sektorSum(fra, s));
+            for (var y = fra; y < til; y++) {
+                var sk = M.sektorSum(y + 1, s) - M.sektorSum(y, s);
+                ok(sk === 0 || Math.sign(sk) === ret, y + ": sektor " + s + " går den forkerte vej");
+            }
+        });
+    }
+    for (aar = D.FOERSTE + 1; aar <= D.SIDSTE; aar++) {
+        var foer = M.pladser(aar - 1), nu = M.pladser(aar), flyttet = 0;
+        for (i = 0; i < 100; i++) if (foer[i].r !== nu[i].r) flyttet++;
+        ens(flyttet, M.flytninger(aar).length, aar + ": kun de personer, der skifter erhverv, flytter");
+        ok(flyttet <= 4, aar + ": " + flyttet + " personer flytter på ét år");
+        for (i = 0; i < 100; i++) if (foer[i].r === nu[i].r) ok(foer[i].s === nu[i].s, aar + ": person " + i + " skifter plads uden at skifte erhverv");
+    }
+    ok(M.stoersteRaekke() <= G.PLADSER, "den længste række (" + M.stoersteRaekke() + ") skal kunne stå i banen (" + G.PLADSER + ")");
+
+    /* fortællingen i tallene */
+    ok(M.antalI(1940, "landbrug") >= 30, "landbruget i 1940 skal være mindst 30");
+    ok(M.antalI(1989, "landbrug") <= 6, "landbruget i 1989 skal være højst 6");
+    ok(M.antalI(1989, "administration") >= 37, "administrationen i 1989 skal være mindst 37");
+    ok(M.sektorSum(1940, "t") < 50 && M.sektorSum(1989, "t") > 60, "den tertiære sektor går fra under 50 til over 60");
+    for (aar = D.FOERSTE + 1; aar <= D.SIDSTE; aar++) ok(M.antalI(aar, "landbrug") <= M.antalI(aar - 1, "landbrug"), aar + ": landbruget vokser");
+
+    /* svarene: de år, hintene nævner */
+    var sv = M.svar;
+    ok(sv.overhaler > 1950 && sv.overhaler < 1960, "industrien skal overhale landbruget mellem 1950 og 1960, fik " + sv.overhaler);
+    ok(sv.halvdel > 1960 && sv.halvdel <= 1970, "halvdelen i den tertiære sektor skal ligge mellem 1960 og 1970, fik " + sv.halvdel);
+    ok(M.svarAar("overhaler") === sv.overhaler && M.svarAar("halvdel") === sv.halvdel, "Vis svaret stiller skyderen på svaret");
+    var findOpgaver = D.OPGAVER.filter(function (o) { return o.type === "find"; });
+    ens(findOpgaver.map(function (o) { return o.id; }), ["overhaler", "halvdel"], "de to find-opgaver");
+    findOpgaver.forEach(function (o) {
+        var rigtige = 0;
+        for (var y = D.FOERSTE; y <= D.SIDSTE; y++) {
+            var r = M.bedoem(o.id, y);
+            if (r.ok) rigtige++;
+            else ok(typeof o.svar[r.grund] === "string", o.id + " " + y + ": grunden " + r.grund + " har ingen tekst");
+        }
+        ens(rigtige, 1, o.id + ": præcis ét rigtigt år");
+        ok(M.bedoem(o.id, D.FOERSTE).ok === false, o.id + ": 1940 må ikke være svaret, for opgaven begynder dér");
+    });
+    var gaet = opg("gaet");
+    ok(gaet.valg.indexOf(M.antalI(1989, "landbrug")) >= 0, "det rigtige tal skal være blandt gættene");
+    ok(gaet.valg.every(function (v) { return v < M.antalI(1940, "landbrug"); }), "alle gæt skal være lavere end tallet i 1940");
+
+    /* ================================================================= */
+    /* B  TEKSTERNE                                                       */
+    /* ================================================================= */
+    var alleTekster = [];
+    (function saml(x) {
+        if (typeof x === "string") alleTekster.push(x);
+        else if (x && typeof x === "object") for (var n in x) saml(x[n]);
+    }([D.ERHVERV, D.SEKTORER, D.OPGAVER, D.TEKST]));
+    ok(alleTekster.length > 110, "der skal være mange tekster at tjekke, fandt " + alleTekster.length);
+    alleTekster.forEach(function (t) {
+        ok(!/[–—]/.test(t), "tankestreg i: " + t);
+        ok(!/\s\s/.test(t) && t === t.trim(), "dobbelt mellemrum eller luft i enden: " + t);
+    });
+    D.ERHVERV.forEach(function (e) {
+        ok(e.tal.length === D.AAR.length, e.id + ": seks tal");
+        ok(e.daekker && /\.$/.test(e.daekker), e.id + ": mangler forklaring på, hvad erhvervet dækker");
+        if (e.sektor === "u") return;
+        ok(/^[pst]$/.test(e.sektor), e.id + ": ukendt sektor");
+        ok(e.rigtig && /\.$/.test(e.rigtig), e.id + ": mangler teksten ved rigtigt svar");
+        ok(e.hint && e.hint.length === 2, e.id + ": to hint");
+        ["p", "s", "t"].forEach(function (s) {
+            if (s === e.sektor) ok(!e.forkert[s], e.id + ": har en fejltekst til sin egen sektor");
+            else ok(e.forkert[s] && /\.$/.test(e.forkert[s]), e.id + ": mangler fejlteksten til sektor " + s);
+        });
+        /* hintet må ikke sige sektorens navn */
+        e.hint.forEach(function (h) { ok(!/primær|sekundær|tertiær/i.test(h), e.id + ": hintet røber sektoren: " + h); });
+    });
+    ens(D.ERHVERV.filter(function (e) { return e.sektor === "p"; }).length, 1, "ét erhverv i den primære sektor");
+    ens(D.ERHVERV.filter(function (e) { return e.sektor === "s"; }).length, 2, "to erhverv i den sekundære sektor");
+    ens(D.ERHVERV.filter(function (e) { return e.sektor === "t"; }).length, 4, "fire erhverv i den tertiære sektor");
+    ens(D.OPGAVER.map(function (o) { return o.type; }), ["sorter", "gaet", "find", "find", "vaelg"], "opgavernes rækkefølge");
+    ok(D.OPGAVER.length <= 5, "højst fem opgaver");
+    D.OPGAVER.forEach(function (o) {
+        ok(o.titel && o.titel.length <= 34, o.id + ": titlen er for lang: " + o.titel);
+        ok(o.tekst && o.tekst.length <= 80, o.id + ": opgaveteksten skal kunne stå på én linje (" + o.tekst.length + " tegn)");
+        ok(o.start && o.start.length <= 90, o.id + ": startteksten er for lang (" + (o.start || "").length + " tegn)");
+        if (o.type === "find") {
+            ok(o.hint.length === 2 && o.svar.ok && o.svar.foer && o.svar.efter && o.forklaring, o.id + ": mangler hint, svartekster eller forklaring");
+        }
+        if (o.type === "vaelg") {
+            ens(o.valg.filter(function (v) { return v.rigtig; }).length, 1, o.id + ": præcis ét rigtigt svar");
+            o.valg.forEach(function (v) { ok(v.tekst.length <= 26 && v.svar, o.id + ": svaret er for langt til knappen eller mangler forklaring: " + v.tekst); });
+        }
+    });
+    ok(D.TEKST.intro.tekst.length <= 70 && D.TEKST.intro.besked.length <= 100, "starten skal være to korte linjer");
+
+    /* ================================================================= */
+    /* C  FORLØBET                                                        */
+    /* ================================================================= */
+    await aabn(1280, 620);
+
+    /* --- starten: kun rækkerne og knappen Videre --- */
+    ens(fase(), "intro", "siden begynder med starten");
+    ens(d.querySelectorAll(".raekke").length, 8, "otte rækker");
+    ens([].filter.call(d.querySelectorAll(".raekke"), kanSes).length, 8, "alle otte rækker kan ses fra start");
+    ens(d.querySelectorAll(".person").length, 100, "100 personer");
+    ok(!kanSes(el("baand-p")) && !kanSes(el("baand-s")) && !kanSes(el("baand-t")), "sektorerne er ikke fremme i starten");
+    ok(!kanSes(el("aarslinje")), "årsskyderen er ikke fremme i starten");
+    ok(!kanSes(el("trin")), "prikkerne er ikke fremme i starten");
+    ok(!kanSes(el("panel")) && el("kurveknap").hidden, "kurven og dens knap er ikke fremme i starten");
+    ens(knapTekst(), "Videre →", "knappen i starten er Videre");
+    ok(el("knap").classList.contains("lyser"), "Videre lyser");
+    ens(el("opg-tekst").textContent, D.TEKST.intro.tekst, "starten har sin egen linje");
+    tekstOK("start");
+    ok(!G.kanSortere(), "der kan ikke sorteres, før sektorerne er fremme");
+
+    /* et klik på en række i starten forklarer erhvervet */
+    function pegerpaa(type, maal, x, y) {
+        maal.dispatchEvent(new w.PointerEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, pointerId: 7, isPrimary: true, button: 0, buttons: type === "pointerup" ? 0 : 1, pointerType: "mouse" }));
+    }
+    function midt(e) { var r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+    function klikPaa(e) { var m = midt(e); pegerpaa("pointerdown", e, m.x, m.y); pegerpaa("pointerup", e, m.x, m.y); }
+    function tast(key) { d.dispatchEvent(new w.KeyboardEvent("keydown", { key: key, bubbles: true })); }
+
+    klikPaa(el("rk-transport"));
+    ok(besked().indexOf(D.ERHVERV[nr("transport")].daekker) >= 0, "et klik på en række i starten siger, hvad erhvervet dækker");
+    ens(G.valgt(), -1, "en række kan ikke vælges i starten");
+    var raekke = el("rk-landbrug"), a0 = midt(raekke.querySelector(".r-navn"));
+    pegerpaa("pointerdown", raekke, a0.x, a0.y); pegerpaa("pointermove", raekke, a0.x, a0.y + 60);
+    ok(!d.querySelector(".traek-spoeg"), "en række kan ikke trækkes i starten");
+    pegerpaa("pointerup", raekke, a0.x, a0.y + 60);
+    tast("ArrowRight"); F.skyder(1960); tast("1");
+    ens(F.aar(), 1940, "taster flytter ikke året i starten");
+    ens(fase(), "intro", "taster ændrer ikke starten");
+    var introArk = JSON.stringify(aftryk());
+
+    /* --- Videre: sektorerne kommer frem, og intet flytter sig --- */
+    tast("Enter");
+    ens(fase(), "sorter", "Enter trykker Videre");
+    ok(kanSes(el("baand-p")) && kanSes(el("baand-s")) && kanSes(el("baand-t")), "sektorerne kommer frem");
+    ok(kanSes(el("trin")), "prikkerne kommer frem");
+    ok(!kanSes(el("aarslinje")), "årsskyderen venter stadig");
+    ens(JSON.stringify(aftryk()), introArk, "rækkerne flytter sig ikke, når sektorerne kommer frem");
+    ens(d.querySelectorAll(".raekke.loes").length, 7, "syv erhverv skal sorteres");
+    ens(G.baandFor(nr("uoplyst")), "u", "Uoplyst skal ikke sorteres");
+    ok(el("rk-uoplyst").parentNode.parentNode === el("baand-x"), "Uoplyst står nederst blandt de usorterede");
+    ok(el("rk-landbrug").classList.contains("naeste"), "en pil viser, hvor eleven kan begynde");
+    ok(besked().indexOf("Landbrug mv.") >= 0, "statuslinjen siger, hvilket erhverv man kan begynde med");
+    ok(getComputedStyle(d.querySelector("#baand-p .b-sum")).display === "none", "sektorens sum er skjult før sorteringen");
+    ens(knapTekst(), "Giv hint", "knappen er Giv hint");
+    ens(d.querySelectorAll("#trin .tr").length, D.OPGAVER.length, "en prik pr. opgave");
+    ens(d.querySelectorAll("#trin .tr.nu").length, 1, "den aktuelle opgave er markeret");
+    tekstOK("sortering");
+
+    /* skyderen er ikke fremme: den kan ikke flyttes og giver ingen besked */
+    var foerBesked = besked();
+    F.skyder(1960); tast("ArrowRight");
+    ens(F.aar(), 1940, "året kan ikke flyttes under sorteringen");
+    ens(besked(), foerBesked, "en skjult skyder giver ingen besked");
+
+    /* forkert sektor: rækken bliver, og fejlen forklares */
+    F.proev(nr("transport"), "s");
+    ens(G.baandFor(nr("transport")), "x", "et forkert svar flytter ikke rækken");
+    ens(statusFarve(), "roed", "et forkert svar gør statuslinjen rød");
+    ok(besked().indexOf(D.ERHVERV[nr("transport")].forkert.s) >= 0, "fejlteksten passer til erhverv og sektor");
+    ok(el("knap").classList.contains("lyser-gul"), "hintknappen lyser efter en fejl");
+
+    /* træk med musen: Landbrug ned i Primær */
+    raekke = el("rk-landbrug"); a0 = midt(raekke.querySelector(".r-navn"));
+    var b0 = midt(el("baand-p"));
+    pegerpaa("pointerdown", raekke, a0.x, a0.y);
+    pegerpaa("pointermove", raekke, a0.x + 4, a0.y + 30);
+    ok(d.querySelector(".traek-spoeg"), "et mærke følger musen, mens rækken trækkes");
+    ok(kanSes(d.querySelector("#baand-p .b-slip")), "mens der trækkes, står der slip her på sektorerne");
+    pegerpaa("pointermove", raekke, b0.x, b0.y);
+    ok(el("baand-p").classList.contains("maal"), "målet lyser op, mens rækken holdes over det");
+    pegerpaa("pointerup", raekke, b0.x, b0.y);
+    ens(G.baandFor(nr("landbrug")), "p", "Landbrug kan trækkes ned i den primære sektor");
+    ok(!d.querySelector(".traek-spoeg"), "mærket forsvinder, når rækken slippes");
+    ok(!kanSes(d.querySelector("#baand-s .b-slip")), "slip her forsvinder igen");
+    ens(statusFarve(), "groen", "et rigtigt svar gør statuslinjen grøn");
+    ens(d.querySelectorAll('.person[data-s="p"]').length, M.antalI(1940, "landbrug"), "personerne i Landbrug får sektorens farve");
+    ok(el("rk-industri").classList.contains("naeste") && !el("rk-landbrug").classList.contains("naeste"), "pilen flytter til det næste erhverv");
+
+    /* slip ved siden af */
+    raekke = el("rk-handel"); a0 = midt(raekke.querySelector(".r-navn"));
+    var ved = midt(el("statuslinje"));
+    pegerpaa("pointerdown", raekke, a0.x, a0.y);
+    pegerpaa("pointermove", raekke, a0.x, a0.y + 40);
+    pegerpaa("pointerup", raekke, ved.x, ved.y);
+    ens(G.baandFor(nr("handel")), "x", "en række, der slippes ved siden af, bliver liggende");
+    ok(besked().indexOf(D.TEKST.ikkeBaand) >= 0, "et slip ved siden af giver en besked");
+
+    /* klik: først erhvervet, så sektoren */
+    klikPaa(el("rk-industri").querySelector(".r-navn"));
+    ens(G.valgt(), nr("industri"), "et klik vælger erhvervet");
+    ok(besked().indexOf(D.ERHVERV[nr("industri")].daekker) >= 0, "det valgte erhverv bliver forklaret");
+    el("baand-s").click();
+    ens(G.baandFor(nr("industri")), "s", "et klik på sektoren flytter det valgte erhverv");
+    ens(G.valgt(), -1, "valget ryddes, når erhvervet er flyttet");
+
+    /* et valgt erhverv og et klik på en række, der allerede ligger i en sektor: det er sektoren, der er ment */
+    klikPaa(el("rk-handel").querySelector(".r-navn"));
+    klikPaa(el("rk-landbrug"));
+    ok(statusFarve() === "roed" && besked().indexOf(D.ERHVERV[nr("handel")].forkert.p) >= 0, "et klik på en række i en sektor tæller som et klik på sektoren");
+    ens(G.baandFor(nr("handel")), "x", "handel hører ikke til den primære sektor");
+    G.vaelg(-1);
+
+    /* klik på en sektor uden valg, på Uoplyst og på en sorteret række */
+    el("baand-t").click();
+    ok(besked().indexOf(D.TEKST.vaelgFoerst) >= 0, "et klik på en sektor uden valg giver en besked");
+    klikPaa(el("rk-uoplyst"));
+    ok(besked().indexOf(D.TEKST.uoplystFast) >= 0, "et klik på Uoplyst forklarer, hvorfor den bliver stående");
+    klikPaa(el("rk-landbrug"));
+    ok(besked().indexOf(D.ERHVERV[nr("landbrug")].daekker) >= 0, "et klik på en sorteret række siger, hvad erhvervet dækker");
+
+    /* hint-trappen: to hint og så svaret, for det første usorterede erhverv */
+    var foerste = G.foersteLoese();
+    ens(D.ERHVERV[foerste].id, "byggeri", "hintet gælder det første usorterede erhverv");
+    F.knap();
+    ok(besked().indexOf(D.ERHVERV[foerste].hint[0]) >= 0 && statusFarve() === "gul", "første tryk giver hint 1");
+    ok(el("rk-byggeri").classList.contains("hintes"), "rækken, hintet handler om, er markeret");
+    ens(G.baandFor(foerste), "x", "et hint flytter ikke rækken");
+    F.knap();
+    ok(besked().indexOf(D.ERHVERV[foerste].hint[1]) >= 0, "andet tryk giver hint 2");
+    ens(knapTekst(), "Vis svaret", "efter to hint hedder knappen Vis svaret");
+    F.knap();
+    ens(G.baandFor(foerste), "s", "Vis svaret lægger erhvervet i den rigtige sektor");
+    ens(knapTekst(), "Giv hint", "trappen begynder forfra til det næste erhverv");
+    tekstOK("efter Vis svaret");
+
+    /* tastaturet: vælg og tryk 3 */
+    ["handel", "transport", "administration"].forEach(function (id) {
+        el("rk-" + id).querySelector(".r-navn").click();       /* klik uden mus, som Enter på navnet */
+        ens(G.valgt(), nr(id), id + " kan vælges med tastaturet");
+        tast("3");
+        ens(G.baandFor(nr(id)), "t", id + " lægges i den tertiære sektor med 3");
+    });
+    ok(!el("figur").classList.contains("sorteret"), "figuren er ikke sorteret, før det sidste erhverv er på plads");
+    ok(el("kurveknap").hidden, "knappen Kurve er ikke fremme, før alt er sorteret");
+    el("rk-service").querySelector(".r-navn").click(); tast("1");
+    ens(G.baandFor(nr("service")), "x", "service hører ikke til den primære sektor");
+    tast("3");
+    ok(G.altSorteret() && el("figur").classList.contains("sorteret"), "alle erhverv er sorteret");
+    ens(knapTekst(), "Næste opgave →", "når alt er sorteret, hedder knappen Næste opgave");
+    ok(getComputedStyle(el("baand-x")).display === "none", "feltet med de usorterede erhverv er væk");
+    ok(el("rk-uoplyst").parentNode.parentNode === el("baand-u") && kanSes(el("rk-uoplyst")), "Uoplyst ender under sektorerne");
+    ok(!d.querySelector(".raekke.naeste"), "pilen er væk, når alt er sorteret");
+    ["p", "s", "t"].forEach(function (s) {
+        ens(d.querySelector("#baand-" + s + " .b-sum b").textContent, String(M.sektorSum(1940, s)), "summen for sektor " + s + " står i overskriften");
+    });
+    ens(d.querySelectorAll('.person[data-s="n"]').length, 0, "alle personer har en sektorfarve");
+    ens(F.tilstand().loest[0], true, "sorteringen er løst");
+    ok(!el("kurveknap").hidden, "knappen Kurve kommer frem, når erhvervene er sorteret");
+    ok(!kanSes(el("panel")), "kurven er slået fra, til eleven selv slår den til");
+    ok(!kanSes(el("aarslinje")), "årsskyderen kommer først med næste opgave");
+    tekstOK("sorteret");
+    var foerNaeste = JSON.stringify(aftryk());
+
+    /* --- gættet: årsskyderen kommer frem --- */
+    F.knap();
+    ens(fase(), "gaet", "næste opgave er gættet");
+    ok(kanSes(el("aarslinje")), "årsskyderen kommer frem");
+    ens(JSON.stringify(aftryk()), foerNaeste, "figuren flytter sig ikke, når årsskyderen kommer frem");
+    ok(el("knap").hidden, "der er ingen hintknap til et gæt");
+    ens(d.querySelectorAll("#valg [data-valg]").length, 3, "tre gæt at vælge imellem");
+    F.skyder(1980);
+    ens(F.aar(), 1940, "skyderen er låst, til der er gættet");
+    ok(el("skyderboks").classList.contains("laast"), "skyderen ser låst ud");
+    ok(besked().indexOf(gaet.laast) >= 0, "en låst skyder giver en besked");
+    tekstOK("gæt");
+    d.querySelector('#valg [data-valg="1"]').click();
+    ens(F.tilstand().gaet, 15, "gættet er gemt");
+    ok(!el("skyderboks").classList.contains("laast"), "skyderen låses op efter gættet");
+    ok(d.querySelector('#valg [data-valg="1"]').classList.contains("valgt") && d.querySelector('#valg [data-valg="0"]').disabled, "gættet kan ikke ændres");
+    tast("ArrowRight");
+    ens(F.aar(), 1941, "pil til højre flytter et år frem");
+    tast("ArrowLeft"); tast("ArrowLeft");
+    ens(F.aar(), 1940, "pil til venstre stopper ved 1940");
+    el("skyder").value = 1975; el("skyder").dispatchEvent(new w.Event("input", { bubbles: true }));
+    ens(F.aar(), 1975, "skyderen flytter året");
+    ens(el("aar-tal").textContent, "1975", "året står ved skyderen");
+    ens(el("rk-landbrug").querySelector(".r-antal").textContent, String(M.antalI(1975, "landbrug")), "rækkens tal følger året");
+    ok(!F.tilstand().venter, "gættet er ikke afsløret før 1989");
+    F.skyder(1989);
+    ok(F.tilstand().venter && F.tilstand().loest[1], "gættet afsløres i 1989");
+    ok(besked().indexOf("15") >= 0 && besked().indexOf(String(M.antalI(1989, "landbrug"))) >= 0, "beskeden nævner gættet og tallet");
+    ens(knapTekst(), "Næste opgave →", "knappen går videre");
+    tekstOK("gæt afsløret");
+
+    /* --- kurven er et tilvalg --- */
+    el("kurveknap").click();
+    ok(d.body.classList.contains("med-kurve") && kanSes(el("panel")), "knappen Kurve slår kurven til");
+    ens(d.querySelectorAll("#kurve polyline").length, 3, "kurven har tre linjer");
+    ["p", "s", "t"].forEach(function (s) { ens(el("kf-" + s).textContent, String(M.sektorSum(1989, s)), "kurvens tal for sektor " + s); });
+    tast("k");
+    ok(!d.body.classList.contains("med-kurve") && !kanSes(el("panel")), "K slår kurven fra igen");
+
+    /* --- find: industrien overhaler landbruget --- */
+    F.knap();
+    ens(fase(), "find", "tredje opgave er en find-opgave");
+    ens(F.aar(), 1940, "en find-opgave begynder i 1940");
+    ok(!el("tjek").hidden && el("tjek").textContent === "Tjek år 1940", "Tjek-knappen viser året");
+    tekstOK("find 1");
+    F.skyder(1950); el("tjek").click();
+    ens(statusFarve(), "roed", "1950 er for tidligt");
+    ok(besked().indexOf("stadig størst") >= 0, "beskeden siger, at landbruget stadig er størst");
+    var lige = null;
+    for (aar = 1950; aar < sv.overhaler; aar++) if (M.antalI(aar, "industri") === M.antalI(aar, "landbrug")) lige = aar;
+    if (lige) { F.skyder(lige); F.tjek(); ok(besked().indexOf("står de lige") >= 0, lige + ": beskeden siger, at de står lige"); }
+    F.skyder(sv.overhaler + 3); F.tjek();
+    ok(besked().indexOf("året før") >= 0, "et for sent år får at vide, at det ikke er det første");
+    ok(!F.tilstand().venter, "forkerte år løser ikke opgaven");
+    F.knap(); ok(statusFarve() === "gul" && besked().indexOf(opg("overhaler").hint[0]) >= 0, "hint 1 til find-opgaven");
+    F.skyder(sv.overhaler); ens(el("tjek").textContent, "Tjek år " + sv.overhaler, "Tjek-knappen følger året");
+    tast("Enter");
+    ok(F.tilstand().venter && statusFarve() === "groen", "det rigtige år løser opgaven, også med Enter");
+    ok(el("tjek").hidden, "Tjek-knappen forsvinder, når opgaven er løst");
+    ok(besked().indexOf(opg("overhaler").forklaring) >= 0, "forklaringen står sammen med svaret");
+    tekstOK("find 1 løst");
+    var arkB = JSON.stringify(aftryk());
+    var stHoejde = el("statuslinje").offsetHeight;
+
+    /* --- find: halvdelen i den tertiære sektor (hint, hint, vis svaret) --- */
+    F.knap();
+    ens(F.aar(), 1940, "næste find-opgave begynder igen i 1940");
+    F.skyder(sv.halvdel - 1); F.tjek(); ok(besked().indexOf("ikke over halvdelen") >= 0, "året før er ikke over halvdelen");
+    F.skyder(sv.halvdel + 1); F.tjek(); ok(besked().indexOf("året før") >= 0, "året efter er ikke det første");
+    F.knap(); F.knap(); ens(knapTekst(), "Vis svaret", "efter to hint: Vis svaret");
+    F.knap();
+    ens(F.aar(), sv.halvdel, "Vis svaret stiller skyderen på svaret");
+    ok(F.tilstand().venter && statusFarve() === "gul", "Vis svaret løser opgaven og er gul");
+    ens(knapTekst(), "Næste opgave →", "der er én opgave tilbage");
+    tekstOK("halvdel vist");
+    stHoejde = Math.max(stHoejde, el("statuslinje").offsetHeight);
+
+    /* --- vælg forklaringen --- */
+    F.knap();
+    ens(fase(), "vaelg", "sidste opgave er forklaringen");
+    var forkerte = [], rigtigNr = -1;
+    opg("hvorfor").valg.forEach(function (v, n) { if (v.rigtig) rigtigNr = n; else forkerte.push(n); });
+    d.querySelector('#valg [data-valg="' + forkerte[0] + '"]').click();
+    ens(statusFarve(), "roed", "et forkert svar er rødt");
+    ok(besked().indexOf(opg("hvorfor").valg[forkerte[0]].svar) >= 0, "det forkerte svar får sin egen forklaring");
+    ok(d.querySelector('#valg [data-valg="' + forkerte[0] + '"]').disabled, "et forkert svar kan ikke vælges igen");
+    F.knap(); ok(statusFarve() === "gul", "hintet til forklaringen");
+    ens(knapTekst(), "Vis svaret", "efter hintet: Vis svaret");
+    d.querySelector('#valg [data-valg="' + rigtigNr + '"]').click();
+    ok(F.tilstand().venter && statusFarve() === "groen", "det rigtige svar løser opgaven");
+    ok(d.querySelector('#valg [data-valg="' + rigtigNr + '"]').classList.contains("rigtig"), "det rigtige svar er markeret");
+    ens(knapTekst(), "Afslut →", "efter sidste opgave hedder knappen Afslut");
+    tekstOK("forklaring løst");
+    stHoejde = Math.max(stHoejde, el("statuslinje").offsetHeight);
+    ens(JSON.stringify(aftryk()), arkB, "figuren står stille gennem alle opgaverne");
+
+    /* --- slut --- */
+    F.knap();
+    ens(fase(), "slut", "forløbet slutter");
+    ens(d.querySelectorAll("#trin .tr.loest").length, D.OPGAVER.length, "alle prikker er grønne");
+    ens(knapTekst(), "Start forfra", "knappen til sidst er Start forfra");
+    ok(!el("knap").classList.contains("lyser"), "Start forfra lyser ikke");
+    F.skyder(1962); ens(F.aar(), 1962, "skyderen er fri til sidst");
+    tekstOK("slut");
+    ens(JSON.stringify(aftryk()), arkB, "figuren står stille til sidst");
+    ens(el("statuslinje").offsetHeight, stHoejde, "statuslinjen har samme højde hele vejen");
+
+    F.knap();
+    ens(fase(), "intro", "Start forfra begynder forfra");
+    ens(d.querySelectorAll(".raekke.loes").length, 7, "erhvervene er usorterede igen");
+    ens(F.aar(), 1940, "året er 1940 igen");
+    ens(d.querySelectorAll("#trin .tr.loest").length, 0, "ingen opgaver er løst");
+    ok(el("kurveknap").hidden && !d.body.classList.contains("med-kurve"), "kurven er væk igen");
+    ens(JSON.stringify(aftryk()), introArk, "starten ser ud som første gang");
+
+    /* --- de to genveje --- */
+    await aabn(1280, 620, "#opgaver");
+    ens(fase(), "gaet", "#opgaver springer starten og sorteringen over");
+    ok(G.altSorteret() && !el("kurveknap").hidden && kanSes(el("aarslinje")), "#opgaver: erhvervene er sorteret, og skyderen er fremme");
+    await aabn(1280, 620, "#fri");
+    ens(fase(), "fri", "#fri er uden opgaver");
+    ok(el("knap").hidden && !kanSes(el("trin")), "#fri: ingen knap og ingen prikker");
+    F.skyder(1989); ens(F.aar(), 1989, "#fri: skyderen er fri");
+    tekstOK("fri");
+
+    /* --- fagord og rundvisning --- */
+    await aabn(1280, 620);
+    tast("t"); ok(el("fagord").classList.contains("vis"), "T åbner fagordene");
+    tast("Escape"); ok(!el("fagord").classList.contains("vis"), "Esc lukker fagordene");
+    function rundvisning() {
+        tast("h");
+        var trin = 0;
+        while (NK.Rundvisning.aktiv() && trin < 12) {
+            ok(el("rv-tekst").textContent.length > 10, "rundvisningens trin " + (trin + 1) + " har tekst");
+            var spot = el("rv-spot").getBoundingClientRect();
+            ok(spot.width > 20 && spot.height > 20, "rundvisningen peger på noget, der kan ses");
+            el("rv-naeste").click(); trin++;
+        }
+        return trin;
+    }
+    ens(rundvisning(), 3, "i starten viser rundvisningen kun de tre ting, der er fremme");
+    F.knap();
+    ens(rundvisning(), 4, "under sorteringen kommer sektorerne med");
+    await aabn(1280, 620, "#opgaver");
+    ens(rundvisning(), 6, "efter sorteringen er alle seks trin med");
+
+    /* ================================================================= */
+    /* D  ROEN                                                            */
+    /* ================================================================= */
+    function aftryk() {
+        var ud = [];
+        d.querySelectorAll(".raekke, .baand, #aarslinje, #statuslinje, #opgavelinje").forEach(function (e) {
+            if (!e.offsetWidth) return;
+            var r = e.getBoundingClientRect();
+            ud.push((e.id || e.className) + ":" + Math.round(r.left) + "," + Math.round(r.top) + "," + Math.round(r.width) + "," + Math.round(r.height));
+        });
+        return ud;
+    }
+    function rulFrit(hvor) {
+        var b = el("bord"), p = el("panel");
+        ok(b.scrollHeight <= b.clientHeight + 1, hvor + ": figuren skal rulles (" + b.scrollHeight + " > " + b.clientHeight + ")");
+        if (kanSes(p)) ok(p.scrollHeight <= p.clientHeight + 1, hvor + ": panelet skal rulles (" + p.scrollHeight + " > " + p.clientHeight + ")");
+        ok(d.documentElement.scrollWidth <= w.innerWidth, hvor + ": siden er bredere end vinduet");
+        var st = el("statuslinje"), tx = el("besked");
+        ok(tx.offsetHeight <= st.clientHeight, hvor + ": statusteksten er højere end statuslinjen");
+        var ol = el("opgavelinje");
+        ok(ol.scrollWidth <= ol.clientWidth + 1, hvor + ": opgaveteksten er bredere end linjen");
+        ok(el("opg-tekst").offsetHeight <= 34, hvor + ": opgaveteksten står på mere end én linje");
+        d.querySelectorAll(".r-navn").forEach(function (n) {
+            ok(n.scrollWidth <= n.clientWidth + 1, hvor + ": navnet er klippet: " + n.textContent);
+        });
+        if (!kanSes(el("aarslinje"))) return;
+        var al = el("aarslinje");
+        ok(al.scrollWidth <= al.clientWidth + 1, hvor + ": årslinjen er for bred");
+        ok(el("skyder").offsetWidth >= 150, hvor + ": skyderen er smallere end 150 px (" + el("skyder").offsetWidth + ")");
+        var aarUnder = [].slice.call(d.querySelectorAll(".s-aar")).filter(function (m) { return m.getClientRects().length; }).map(function (m) { return m.getBoundingClientRect(); });
+        ok(aarUnder.length >= 2, hvor + ": første og sidste år skal stå under skyderen");
+        for (var q = 1; q < aarUnder.length; q++) ok(aarUnder[q].left >= aarUnder[q - 1].right + 2, hvor + ": to årstal under skyderen overlapper");
+    }
+    function personerIBanen(hvor) {
+        var pl = M.pladser(F.aar()), pers = d.querySelectorAll(".person"), prRaekke = {};
+        for (var n = 0; n < pers.length; n++) {
+            var r = pers[n].getBoundingClientRect();
+            var bane = el("rk-" + D.ERHVERV[pl[n].r].id).querySelector(".r-bane").getBoundingClientRect();
+            ok(r.left >= bane.left - 1 && r.right <= bane.right + 1 && r.top >= bane.top - 1 && r.bottom <= bane.bottom + 1,
+                hvor + ": person " + n + " står uden for sin bane");
+            ok(r.width >= 6 && r.height >= 12, hvor + ": personen er for lille (" + r.width + " x " + r.height + ")");
+            (prRaekke[pl[n].r] = prRaekke[pl[n].r] || []).push(r);
+        }
+        for (var rk in prRaekke) {
+            var liste = prRaekke[rk].sort(function (x, y) { return x.left - y.left; });
+            for (var m = 1; m < liste.length; m++) ok(liste[m].left >= liste[m - 1].right + 1, hvor + ": to personer overlapper i række " + rk);
+        }
+    }
+    /* Hvor mange slags ting er fremme? Bruges til at holde starten enkel. */
+    function fremme() {
+        return ["#baand-p", "#aarslinje", "#trin", "#panel", "#kurveknap", "#tjek", "#valg"].filter(function (s) { return kanSes(d.querySelector(s)); });
+    }
+
+    var stoerrelser = [[1366, 768], [1280, 620], [1069, 620]];
+    for (i = 0; i < stoerrelser.length; i++) {
+        var navn = stoerrelser[i][0] + " x " + stoerrelser[i][1];
+        await aabn(stoerrelser[i][0], stoerrelser[i][1]);
+        ens(fremme(), [], navn + ": i starten er kun rækkerne, de to linjer og knappen fremme");
+        rulFrit(navn + " start");
+        personerIBanen(navn + " start");
+        var faestet = JSON.stringify(aftryk());
+        F.knap();
+        ens(fremme(), ["#baand-p", "#trin"], navn + ": under sorteringen kommer kun sektorerne og prikkerne til");
+        ens(JSON.stringify(aftryk()), faestet, navn + ": intet flytter sig, når sektorerne kommer frem");
+        rulFrit(navn + " sortering");
+
+        /* under sorteringen flytter kun den række, der sorteres */
+        F.proev(nr("transport"), "p");
+        ens(JSON.stringify(aftryk()), faestet, navn + ": en fejl flytter ingenting");
+        rulFrit(navn + " fejl");
+        F.knap(); F.knap();
+        ens(JSON.stringify(aftryk()), faestet, navn + ": et hint flytter ingenting");
+        rulFrit(navn + " hint");
+        ["landbrug", "industri", "byggeri", "handel", "transport", "administration"].forEach(function (id) {
+            F.proev(nr(id), D.ERHVERV[nr(id)].sektor);
+            rulFrit(navn + " sorteret " + id);
+        });
+        personerIBanen(navn + " midt i sorteringen");
+        F.proev(nr("service"), "t");
+        rulFrit(navn + " alt sorteret");
+        personerIBanen(navn + " alt sorteret");
+
+        /* gennem alle opgaverne med de længste tekster */
+        var ark = JSON.stringify(aftryk());
+        F.knap();
+        ens(fremme(), ["#baand-p", "#aarslinje", "#trin", "#kurveknap", "#valg"], navn + ": med gættet kommer årsskyderen og de tre gæt");
+        ens(JSON.stringify(aftryk()), ark, navn + ": intet flytter sig, når årsskyderen kommer frem");
+        F.valg(0); rulFrit(navn + " gæt"); F.skyder(1989); rulFrit(navn + " gæt afsløret"); personerIBanen(navn + " 1989");
+        F.knap(); F.skyder(1950); F.tjek(); rulFrit(navn + " find fejl");
+        F.knap(); rulFrit(navn + " find hint 1"); F.knap(); rulFrit(navn + " find hint 2"); F.knap(); rulFrit(navn + " find svaret");
+        F.knap(); F.skyder(sv.halvdel + 2); F.tjek(); rulFrit(navn + " halvdel fejl"); F.skyder(sv.halvdel); F.tjek(); rulFrit(navn + " halvdel"); personerIBanen(navn + " " + sv.halvdel);
+        F.knap(); rulFrit(navn + " forklaring");
+        F.valg(1); rulFrit(navn + " forklaring fejl"); F.knap(); rulFrit(navn + " forklaring hint"); F.valg(0); rulFrit(navn + " forklaring rigtig");
+        ens(fase(), "vaelg", navn + ": forklaringen er sidste opgave");
+        ens(JSON.stringify(aftryk()), ark, navn + ": figuren står stille fra sorteringen til sidste opgave");
+        F.knap(); rulFrit(navn + " slut");
+        for (aar = D.FOERSTE; aar <= D.SIDSTE; aar += 7) { F.skyder(aar); personerIBanen(navn + " " + aar); }
+        ens(JSON.stringify(aftryk()), ark, navn + ": figuren står stille, når året skifter");
+        ens(d.querySelectorAll(".s-maerke i").length, D.AAR.length, navn + ": alle seks år har en streg under skyderen");
+
+        /* med kurven slået til: stadig intet at rulle, og kurvens årstal overlapper ikke */
+        F.skyder(1989);
+        F.skiftKurve();
+        ok(kanSes(el("panel")), navn + ": kurven kan slås til");
+        rulFrit(navn + " med kurve");
+        personerIBanen(navn + " med kurve");
+        ["p", "s", "t"].forEach(function (s) { ens(el("kf-" + s).textContent, String(M.sektorSum(1989, s)), navn + ": kurvens tal for sektor " + s); });
+        var aarstal = [].slice.call(d.querySelectorAll("#kurve text")).filter(function (t) { return /^19/.test(t.textContent); }).map(function (t) { return t.getBoundingClientRect(); });
+        ok(aarstal.length >= 3, navn + ": kurven har mindst tre årstal");
+        for (k = 1; k < aarstal.length; k++) ok(aarstal[k].left >= aarstal[k - 1].right + 2, navn + ": to årstal under kurven overlapper");
+        ens(d.querySelectorAll("#kurve polyline").length, 3, navn + ": kurven har tre linjer");
+        F.skiftKurve();
+        ens(JSON.stringify(aftryk()), ark, navn + ": figuren står som før, når kurven slås fra igen");
+
+        /* med kurven til gennem de længste tekster */
+        await aabn(stoerrelser[i][0], stoerrelser[i][1], "#opgaver");
+        F.skiftKurve();
+        F.valg(0); F.skyder(1989); rulFrit(navn + " kurve: gæt afsløret");
+        F.knap(); F.knap(); F.knap(); F.knap(); rulFrit(navn + " kurve: find svaret");
+        F.knap(); F.knap(); F.knap(); F.knap(); rulFrit(navn + " kurve: halvdel svaret");
+        F.knap(); F.valg(2); rulFrit(navn + " kurve: forklaring fejl"); F.valg(0); rulFrit(navn + " kurve: forklaring rigtig");
+        ens(fase(), "vaelg", navn + ": kurve-gennemløbet når sidste opgave");
+    }
+
+    /* ================================================================= */
+    /* E  SKRIFTEN                                                        */
+    /* ================================================================= */
+    async function skrift(hvor) {
+        var mindst = 99, hvilken = "";
+        var tr = d.createTreeWalker(d.body, w.NodeFilter.SHOW_TEXT);
+        while (tr.nextNode()) {
+            var node = tr.currentNode, far = node.parentElement;
+            if (!node.textContent.trim() || !far || far.closest("script, style")) continue;
+            if (!far.getClientRects().length) continue;
+            var px = parseFloat(getComputedStyle(far).fontSize);
+            if (px < mindst) { mindst = px; hvilken = node.textContent.trim().slice(0, 30); }
+        }
+        ok(mindst >= 12.4, hvor + ": mindste skrift er " + mindst + " px (" + hvilken + ")");
+    }
+    await aabn(1069, 620); await skrift("1069 x 620 start");
+    F.knap(); await skrift("1069 x 620 sortering");
+    await aabn(1069, 620, "#opgaver"); F.skiftKurve(); F.valg(0); F.skyder(1989); await skrift("1069 x 620 opgaver med kurve");
+    el("fagordknap").click(); await skrift("1069 x 620 fagord");
+    await aabn(1366, 768, "#opgaver"); F.valg(0); F.skyder(1989); await skrift("1366 x 768 opgaver");
+
+    linjer.push("");
+    linjer.push(antal + " påstande tjekket.");
+    linjer.push(fejl ? fejl + " FEJL" : "ALT OK");
+    document.getElementById("ud").textContent = linjer.join("\n");
+}()).catch(function (e) {
+    document.getElementById("ud").textContent = "Selvtesten gik i stå: " + (e && e.stack || e) + "\n1 FEJL";
+});
+</script>
+</body>
+</html>

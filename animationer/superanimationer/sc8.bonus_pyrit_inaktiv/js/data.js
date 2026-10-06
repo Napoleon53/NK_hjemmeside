@@ -38,7 +38,7 @@
         "ZnS": { S: "ZnS er et sulfid. Sulfidionen er S²⁻, så S er −II.", Zn: "S er −II i et sulfid. Summen i ZnS skal være 0." },
         "HgS": { S: "HgS er et sulfid. Sulfidionen er S²⁻, så S er −II.", Hg: "S er −II i et sulfid. Summen i HgS skal være 0." },
         "CaSO4": { S: "Ca er +II og O er −II. Summen i CaSO₄ skal være 0." },
-        "Cu2(OH)2CO3": { Cu: "OH⁻ har ladningen −1 og CO₃²⁻ har ladningen −2. Summen af det hele skal være 0." }
+        "Cu2(OH)2CO3": { Cu: "C er +IV, O er −II og H er +I. Summen af det hele skal være 0." }
     };
 
     /* Svaret med ord, hvor det ikke er et regnestykke */
@@ -56,7 +56,7 @@
         "CaSO4|S|-2": "S er kun −II i et sulfid. Her sidder S sammen med O i sulfat, SO₄²⁻.",
         "CaSO4|S|8": "Fire O giver −8, men Ca giver +2. S skal kun give resten.",
         "Cu2(OH)2CO3|Cu|4": "+4 er for de to Cu tilsammen. Del med 2.",
-        "Cu2(OH)2CO3|Cu|1": "De negative ioner giver −4 i alt: 2 · (−1) fra OH⁻ og −2 fra CO₃²⁻."
+        "Cu2(OH)2CO3|Cu|1": "De to OH giver −2, og CO₃ giver −2 med C som +IV. De to Cu skal tilsammen give +4."
     };
 
     /* ----- Fane 1: mineralerne i udstillingen ---------------------------------
@@ -102,9 +102,9 @@
           linje: "Gips er et sulfat. Ca er +II og O er −II. Skriv oxidationstallet over S.",
           hint: ["Summen i CaSO₄ skal være 0. Krystalvandet, 2 H₂O, tæller ikke med.", "(+2) + S + 4 · (−2) = 0.", "S + (−6) = 0. Hvad er S?"],
           fakta: "I sulfat er svovl oxideret helt til tops, +VI. Det er det samme svovl som i svovlsyre." },
-        { id: "malakit", navn: "Malakit", kemi: "basisk kobbercarbonat", kemiLoest: "basisk kobber(II)carbonat", klasse: "carbonat", f: "Cu2(OH)2CO3", spoerg: ["Cu"], givet: [],
-          linje: "Malakit har to slags negative ioner: OH⁻ og CO₃²⁻. Skriv oxidationstallet over Cu.",
-          hint: ["De to OH⁻ giver −2 i alt, og CO₃²⁻ giver −2. Summen af det hele skal være 0.", "2 · Cu + 2 · (−1) + (−2) = 0.", "2 · Cu = +4. Hvad er ét Cu?"],
+        { id: "malakit", navn: "Malakit", kemi: "basisk kobbercarbonat", kemiLoest: "basisk kobber(II)carbonat", klasse: "carbonat", f: "Cu2(OH)2CO3", spoerg: ["Cu"], givet: ["O", "H", "C"],
+          linje: "Malakit er et carbonat. C er +IV, O er −II og H er +I. Skriv oxidationstallet over Cu.",
+          hint: ["Summen af alle oxidationstal i Cu₂(OH)₂CO₃ skal være 0. Regn de to grupper ud hver for sig.", "(OH)₂: 2 · (−2 + 1) = −2. CO₃: (+4) + 3 · (−2) = −2.", "2 · Cu + (−2) + (−2) = 0. Hvad er ét Cu?"],
           fakta: "Kobber(II) giver den grønne farve. Azurit er blå, men kobber er også +II der." },
         { id: "pyrit", navn: "Pyrit", kemi: "jern(II)disulfid", klasse: "sulfid", f: "FeS2", spoerg: ["S"], givet: ["Fe"],
           linje: "Pyrit står hos sulfiderne, men jern er +II i pyrit. Skriv oxidationstallet over S.",
@@ -212,7 +212,7 @@
     };
 
     D.TRIN_NAVN = {
-        ox: "Oxidationstal", "for": "Lige mange atomer", klammer: "Stigning og fald", gange: "Gangetal",
+        ox: "Oxidationstal", "for": "Lige mange atomer", klammer: "Stigning og fald", antal: "Tæl atomerne", gange: "Gangetal",
         med: "Resten af atomerne", ladning: "Ladning", ion: "H⁺", brint: "H-atomer", vand: "Vand",
         redox: "Redox eller ej", gang: "Gang skemaerne", sum: "Læg sammen", syre: "Svovlsyre"
     };

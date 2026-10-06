@@ -2,15 +2,20 @@
    sim_forsoeg.js - fane 1: forsoeget
 
    En klump ståluld ligger paa en varmefast plade paa vaegten, og vaegten
-   er nulstillet med pladen. Maaling 1 starter med et gratis gaet: tre
-   kort med billeder oven paa scenen (Lettere, Det samme, Tungere).
-   Kemichael introducerer gaettet fra sit hjoerne og tier, naar det er
-   valgt. Saa aflaeser eleven m(før), taender stålulden med
-   bunsenbraenderen, der holdes vandret (traek den hen, eller klik paa
-   den), venter, til vaegten staar stille, og aflaeser m(efter). Uden ilt
-   fra flasken gaar stålulden ud, foer alt jernet har reageret; klik paa
-   flasken, mens den gloeder, holder den i live. Tallene skriver eleven
-   selv i skemaet i panelet.
+   er nulstillet med pladen. Maaling 1 starter med et gratis gaet: en
+   rolig startskaerm, der daekker hele scenen, med en kort indledning,
+   spoergsmaalet og tre kort med billeder (Lettere, Det samme, Tungere).
+   Intet sker bag den, mens eleven svarer. Saa aflaeser eleven m(før),
+   taender stålulden med bunsenbraenderen (et klik, eller traek den hen,
+   saa flammen roerer ulden), venter, til vaegten staar stille, og
+   aflaeser m(efter). Uden ilt fra flasken gaar stålulden ud, foer alt
+   jernet har reageret; klik paa flasken, mens den gloeder, holder den i
+   live.
+
+   Statuslinjen nederst i scenen siger det naeste skridt og har feltet
+   til det tal, der skal aflaeses, og hint-knappen. En pil med et skilt
+   staar over det, der skal klikkes paa (Klik for at tænde, Klik for
+   mere ilt). Skemaet i panelet viser de tal, eleven har aflaest.
 
    Luppen viser overfladen af en ståltraad: O₂ fra luften saetter sig
    paa jernatomerne, og den inderste raekke naar ikke at reagere.
@@ -47,36 +52,38 @@
     }
 
     function SimForsoeg() {
+        var mig = this;
         this.over = null;
         this.gaet = null;
         this.gaetUd = 0;
         this.tael = 0;
-        this.stjerneT = 0;
+        this.feltFase = null;
         this.startFane(D.FORSOEG);
+        this.el.fane = NK.el("fane-forsoeg");
         this.el.gaet = NK.el("forsoeg-gaet");
         this.el.gaetLinje = NK.el("forsoeg-gaetlinje");
+        this.el.aflaes = NK.el("forsoeg-aflaes");
+        this.el.aflaesNavn = NK.el("forsoeg-aflaesnavn");
+        this.el.tal = NK.el("forsoeg-tal");
         this.bygGaet();
-        this.bindSkema();
-        this.introNu = true;
+        this.el.tal.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter") { ev.preventDefault(); mig.tjekFelt(); }
+        });
+        NK.el("forsoeg-talok").addEventListener("click", function () { mig.tjekFelt(); mig.fokus(); });
         this.vaelg(this.status[0].loest && !this.status[1].loest ? 1 : 0, false);
     }
 
     var P = SimForsoeg.prototype;
-    NK.Fane.paa(P, { navn: "forsoeg", naesteFane: "fane-beregning", naesteNavn: "Beregningen" });
+    NK.Fane.paa(P, { navn: "forsoeg", naesteFane: "fane-beregning", naesteNavn: "Beregningen", naesteTekst: "Næste måling →" });
 
-    /* Er en maaling gemt, vises den faerdig. Start forfra maaler igen.
-       Under gaettet introducerer Kemichael det fra sit hjoerne. */
+    /* Er en maaling gemt, vises den faerdig. Start forfra maaler igen. */
     var vaelgFaelles = P.vaelg;
     P.vaelg = function (i, nyeTal) {
         vaelgFaelles.call(this, i, nyeTal);
         if (this.gemtVist) this.besked("Målingen står i skemaet. Tryk på Start forfra for at måle igen.", "god");
-        this.introGaet();
         this.visSkema();
         this.visGaet();
-    };
-
-    P.introGaet = function () {
-        if (this.fase() === "valg") this.k.sig(NK.html(D.GAET.kemichael), "", {});
+        this.fokus();
     };
 
     /* ----- Opgaven -------------------------------------------------------------- */
@@ -119,15 +126,16 @@
         this.noteret = { mf: null, me: null };
         this.hurtig = false;
         this.auto = null;
-        this.holdSvar = 0;
         this.rosNaeste = "";
+        this.rosKlasse = "god";
+        this.holdSvar = "";
         this.sidsteFase = null;
         this.gemtVist = false;
+        this.feltFase = null;
         if (this.lay) this.layout();
     };
 
     P.harForfra = function () { return true; };
-    P.harNyeTal = function () { return false; };
 
     /* Start forfra: en ny klump med den samme masse (gaettet bliver) */
     P.forfra = function () {
@@ -136,9 +144,8 @@
         this.nyMaaling(m, null);
         this.sidsteFase = this.fase();
         this.hjaelp = 0;
+        this.pegKnap = false;
         this.brugtSvar = false;
-        this.k.tie();
-        this.introGaet();
         this.visKort();
         this.visListe();
         this.besked("En ny klump ståluld på vægten. " + this.trinLinje(), "");
@@ -154,11 +161,11 @@
     /* Under det gratis gaet er der ingen hint-knap */
     P.knapSkjult = function () { return this.fase() === "valg"; };
 
-    /* ----- Det gratis gaet -------------------------------------------------------------- */
+    /* ----- Det gratis gaet: startskaermen ------------------------------------------------- */
     P.bygGaet = function () {
         var mig = this, e = this.el.gaet, G = D.GAET;
-        e.innerHTML = '<span class="gaet-etiket">' + NK.html(G.etiket) + "</span><h2>" + NK.html(G.spm) + "</h2>" +
-            '<div class="gaet-kort"></div><p class="gaet-note">' + NK.html(G.note) + "</p>";
+        e.innerHTML = '<span class="gaet-etiket">' + NK.html(G.etiket) + '</span><p class="gaet-intro">' + NK.html(G.intro) +
+            "</p><h2>" + NK.html(G.spm) + '</h2><div class="gaet-kort"></div><p class="gaet-note">' + NK.html(G.note) + "</p>";
         var r = e.querySelector(".gaet-kort");
         G.svar.forEach(function (s) {
             var b = document.createElement("button");
@@ -173,9 +180,10 @@
         });
     };
 
+    /* Mens der gaettes, daekker startskaermen scenen, og panelet er daempet */
     P.visGaet = function () {
-        var e = this.el.gaet;
-        if (this.fase() === "valg") {
+        var e = this.el.gaet, valg = this.fase() === "valg";
+        if (valg) {
             e.hidden = false;
             e.classList.remove("vaek", "valgt");
             [].forEach.call(e.querySelectorAll(".gk"), function (b) { b.classList.remove("valgt"); b.disabled = false; });
@@ -183,6 +191,7 @@
         } else if (!(this.gaetUd > 0)) {
             e.hidden = true;
         }
+        this.el.fane.classList.toggle("gaetter", valg);
         this.visGaetLinje();
     };
 
@@ -197,8 +206,8 @@
         });
         /* Det valgte kort staar et ojeblik, saa glider det hele vaek */
         this.gaetUd = 1.0;
-        this.k.tie();
         this.rosNaeste = NK.html("Dit gæt: " + gaetSvar(id).t.toLowerCase() + ".");
+        this.rosKlasse = "";
         this.visGaetLinje();
     };
 
@@ -227,21 +236,25 @@
         var f = this.fase();
         if (f === "faerdig") return "";
         if (f === "foer" && this.klump.taendt) {
-            return "Stålulden er tændt, men m(før) står ikke i skemaet. Skriv den, hvis du nåede at se den, eller tryk på Start forfra.";
+            return "Stålulden er tændt, men m(før) mangler. Skriv den, hvis du nåede at se den, eller tryk på Start forfra.";
         }
         return D.LINJE[f];
     };
 
     P.slutLinje = function () { return this.forklaring; };
 
-    /* Fasen skifter: Kemichael tier (medmindre han lige har givet svaret),
-       og linjen siger det naeste skridt */
+    /* Fasen skifter: linjen siger det naeste skridt (efter en kort ros,
+       hvis eleven lige har aflaest rigtigt) */
     P.faseSkift = function (f) {
         this.hjaelp = 0;
-        if (this.holdSvar > 0) this.holdSvar--;
-        else this.k.tie();
-        if (f !== "faerdig") this.besked((this.rosNaeste ? this.rosNaeste + " " : "") + this.trinLinje(), this.rosNaeste ? "god" : "");
+        this.pegKnap = false;
+        if (f !== "faerdig") {
+            if (this.holdSvar) this.besked(this.holdSvar + " " + this.trinLinje(), "gul");
+            else this.besked((this.rosNaeste ? this.rosNaeste + " " : "") + this.trinLinje(), this.rosNaeste ? this.rosKlasse : "");
+        }
+        this.holdSvar = "";
         this.rosNaeste = "";
+        this.rosKlasse = "god";
         this.visKnap();
         this.visSkema();
         this.visGaet();
@@ -255,92 +268,84 @@
         return { hint: NK.html(D.HINT[f]), svar: function () { mig.visSvar(f); } };
     };
 
+    /* Svaret staar i linjen, ogsaa naar fasen skifter lige efter (holdSvar) */
     P.visSvar = function (f) {
         this.brugtSvar = true;
-        this.holdSvar = 1;
+        var maerke = '<span class="b-maerke">Svaret</span> ';
         if (f === "foer") {
-            this.svarVis(NK.html(D.SVAR.foer.replace("{m}", K.g2(this.proeve))));
+            this.holdSvar = maerke + NK.html(D.SVAR.foer.replace("{m}", K.g2(this.proeve)));
             this.noterFoer();
+            this.rosNaeste = "";
         } else if (f === "taend") {
-            this.svarVis(NK.html(D.SVAR.taend));
+            this.holdSvar = maerke + NK.html(D.SVAR.taend);
+            this.besked(this.holdSvar, "gul");
             this.flyvBraender();
         } else if (f === "vent") {
             this.hurtig = true;
-            this.svarVis(NK.html(D.SVAR.vent));
+            this.holdSvar = maerke + NK.html(D.SVAR.vent);
+            this.besked(this.holdSvar, "gul");
         } else if (f === "efter") {
-            this.holdSvar = 0;
             this.noterEfter("svar");
         }
     };
 
-    /* ----- Skemaet i panelet ------------------------------------------------------------ */
-    function inp(r, hvad) { return NK.el("forsoeg-" + hvad + r); }
+    /* ----- Skemaet i panelet og feltet i statuslinjen ------------------------------------ */
+    function celle(r, hvad) { return NK.el("forsoeg-" + hvad + r); }
 
-    P.bindSkema = function () {
-        var mig = this;
-        [0, 1].forEach(function (r) {
-            ["f", "e"].forEach(function (hvad) {
-                var e = inp(r, hvad);
-                e.addEventListener("keydown", function (ev) {
-                    if (ev.key === "Enter") { ev.preventDefault(); mig.tjekFelt(r, hvad); }
-                });
-                e.addEventListener("input", function () { mig.k.skriver(); });
-            });
-        });
-    };
-
-    /* Hvilke felter er aabne, og hvad staar der */
+    /* Skemaet viser de tal, eleven har aflaest; cellen, der mangler nu, har en ramme */
     P.visSkema = function () {
         var mig = this, f = this.fase();
         [0, 1].forEach(function (r) {
             var aktiv = r === mig.nr;
             var tal = aktiv ? mig.noteret : (NK.maalinger[r] || { mf: null, me: null });
             ["f", "e"].forEach(function (hvad) {
-                var e = inp(r, hvad), felt = e.parentNode;
-                var v = hvad === "f" ? tal.mf : tal.me;
-                var aaben = aktiv && v === null && f !== "valg" && f !== "faerdig" &&
-                    (hvad === "f" || (mig.noteret.mf !== null && (f === "vent" || f === "efter")));
-                if (v !== null && v !== undefined) {
-                    if (e.value !== K.g2(v)) e.value = K.g2(v);
-                } else if (!aaben && document.activeElement !== e) e.value = "";
-                e.disabled = !aaben;
-                felt.classList.toggle("ok", v !== null && v !== undefined);
-                felt.classList.toggle("aktiv", aaben);
-                felt.classList.toggle("laast", !aaben && (v === null || v === undefined));
+                var e = celle(r, hvad), v = hvad === "f" ? tal.mf : tal.me;
+                var har = v !== null && v !== undefined;
+                e.textContent = har ? K.g2(v) + " g" : "";
+                e.classList.toggle("ok", har);
+                e.classList.toggle("nu", aktiv && !har && ((hvad === "f" && f === "foer") || (hvad === "e" && f === "efter")));
             });
             NK.el("forsoeg-r" + r).classList.toggle("valgt", aktiv);
         });
         var m = this.noteret;
         NK.saetTekst("forsoeg-note", m && m.mf !== null && m.me !== null ?
             "Stålulden tog " + K.g2(m.me) + " g − " + K.g2(m.mf) + " g = " + K.g2(K.r2(m.me - m.mf)) + " g på." : "");
+        this.visFelt();
+    };
+
+    /* Feltet i statuslinjen er der kun, naar et tal skal aflaeses */
+    P.visFelt = function () {
+        var f = this.fase(), aaben = f === "foer" || f === "efter";
+        this.el.aflaes.hidden = !aaben;
+        if (!aaben) { this.feltFase = null; return; }
+        if (this.feltFase !== f) { this.el.tal.value = ""; this.feltFase = f; }
+        this.el.aflaesNavn.textContent = D.FELT[f] + " =";
+        this.el.tal.setAttribute("aria-label", D.FELT[f] + " i gram");
     };
 
     P.fokusFelt = function () {
-        var f = this.fase();
-        if (f === "foer") inp(this.nr, "f").focus({ preventScroll: true });
-        else if (f === "efter") inp(this.nr, "e").focus({ preventScroll: true });
+        if (!this.el.aflaes.hidden) this.el.tal.focus({ preventScroll: true });
     };
 
-    function ryst(e) {
-        var felt = e.parentNode;
+    P.rystFelt = function () {
+        var felt = this.el.aflaes;
         felt.classList.remove("ryst");
         void felt.offsetWidth;
         felt.classList.add("ryst");
-    }
+    };
 
-    P.tjekFelt = function (r, hvad) {
-        if (r !== this.nr || this.faerdig) return;
-        var e = inp(r, hvad);
-        if (this.fase() === "valg") { this.blokValg(); return; }
-        var raa = e.value;
-        if (!String(raa).trim()) { this.besked("Skriv tallet fra vægten.", "gul"); return; }
+    P.tjekFelt = function () {
+        var f = this.fase();
+        if (this.faerdig || (f !== "foer" && f !== "efter")) return;
+        var raa = this.el.tal.value;
+        if (!String(raa).trim()) { this.besked("Skriv tallet fra vægten i feltet.", "gul"); return; }
         var t = T.tal(raa);
-        if (!t) { ryst(e); this.besked("Skriv et tal, fx 4,00.", "skidt"); return; }
+        if (!t) { this.rystFelt(); this.besked("Skriv et tal, fx 4,25.", "skidt"); return; }
         var v = Math.round(t.v * 100);
         var nu = Math.round(this.klump.visning() * 100), m0 = Math.round(this.proeve * 100);
-        if (hvad === "f") {
+        if (f === "foer") {
             if (v === m0) { this.noterFoer(); return; }
-            ryst(e);
+            this.rystFelt();
             if (this.klump.taendt && v === nu) {
                 this.besked("Det er det, vægten viser nu. m(før) er massen, før stålulden brændte. Tryk på Start forfra, hvis du ikke nåede at se den.", "skidt");
             } else {
@@ -348,25 +353,16 @@
             }
             return;
         }
-        if (!this.klump.taendt) { ryst(e); this.besked("Stålulden er ikke tændt endnu.", "skidt"); return; }
-        var stille = this.klump.stille();
-        if (v === nu && stille) { this.noterEfter("ok"); return; }
-        ryst(e);
-        if (v === nu) {
-            this.besked("Stålulden gløder stadig, og vægten stiger. Vent, til den står stille.", "skidt");
-        } else if (v === m0) {
-            this.besked("Det er m(før). m(efter) er det, vægten viser, når stålulden er brændt.", "skidt");
-        } else if (!stille) {
-            this.besked("Vægten stiger stadig. Vent, til den står stille, og aflæs den så.", "skidt");
-        } else {
-            this.besked("Det står der ikke på vægten.", "skidt");
-        }
+        if (v === nu) { this.noterEfter("ok"); return; }
+        this.rystFelt();
+        if (v === m0) this.besked("Det er m(før). m(efter) er det, vægten viser nu, hvor stålulden er brændt.", "skidt");
+        else this.besked("Det står der ikke på vægten. Skriv tallet med to decimaler.", "skidt");
     };
 
     P.noterFoer = function () {
         this.noteret.mf = this.proeve;
-        if (!this.holdSvar) this.k.tie();
-        this.rosNaeste = NK.tilfaeldig(D.ROS);
+        this.rosNaeste = NK.tilfaeldig(D.ROS_AFLAEST);
+        this.rosKlasse = "god";
         this.visSkema();
     };
 
@@ -377,7 +373,7 @@
         NK.gemMaalinger();
         var s = o.gaet && this.gaet ? gaetSvar(this.gaet) : null;
         var dele = [];
-        if (s) dele.push(s.ok ? "Dit gæt holdt." : "Du gættede: " + s.t.toLowerCase() + ".");
+        if (s && s.ok) dele.push("Dit gæt holdt.");
         dele.push("Stålulden tog " + K.g2(K.r2(this.noteret.me - this.noteret.mf)) + " g på.");
         dele.push(s && !s.ok ? s.forkl : o.efter);
         if (this.klump.ude) dele.push(this.klump.brugtIlt ? "Den gik ud, før alt jernet havde reageret." : D.UDEN_ILT);
@@ -390,10 +386,10 @@
     };
 
     P.blokValg = function () {
-        this.kortBesked("Gæt først: klik på et af de tre billeder.");
+        this.kortBesked(D.LINJE.valg);
     };
 
-    /* ----- Bunsenbraenderen: traek den hen, saa flammen roerer ulden, eller klik paa den --
+    /* ----- Bunsenbraenderen: klik paa den, eller traek den hen, saa flammen roerer ulden ---
        Den holdes vandret med flammen mod hoejre (brugerens oenske 28. sept.
        2026). Roerer flammespidsen ulden, gaar den i brand. */
     P.brnHjem = function () {
@@ -495,8 +491,6 @@
         var fl = lay.flGeo;
         if (fl && pt.x >= fl.x0 - 4 && pt.x <= fl.x0 + fl.b + 4 && pt.y >= fl.y0 && pt.y <= lay.bordY) return "flaske";
         if (lay.dyse && Math.hypot(pt.x - lay.dyse.x - 6, pt.y - lay.dyse.y) < 12) return "flaske";
-        var st = lay.stjGeo;
-        if (st && pt.x >= st.x - 6 && pt.x <= st.x + st.b + 6 && pt.y >= st.y && pt.y <= lay.bordY) return "stjerne";
         if (this.paaUld(pt, 1.15)) return "uld";
         var z = lay.zoom;
         if (Math.hypot(pt.x - z.x, pt.y - z.y) < z.r) return "zoom";
@@ -539,13 +533,6 @@
             }
             return false;
         }
-        if (u === "stjerne") {
-            /* Den samme linje hver gang (brugerens oenske 28. sept. 2026) */
-            this.stjerneT = 4;
-            if (this.k.inde()) this.k.svar(NK.html(D.STJERNE), "", 4.5);
-            else this.kortBesked(D.STJERNE);
-            return false;
-        }
         if (u === "uld") {
             if (this.fase() === "valg") { this.blokValg(); return false; }
             this.kortBesked(!k.taendt ? "Ståluld er tynde tråde af jern. Tænd den med bunsenbrænderen." :
@@ -580,17 +567,19 @@
             return;
         }
         this.braenderHjem();
-        this.kortBesked("Hold flammen mod stålulden.");
+        this.kortBesked("Hold flammen mod stålulden, eller klik bare på brænderen.");
     };
 
     /* ----- Layout ----------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
+        var baand = this.baand();
         var Hs = baand.y;
         var lay = { W: W, H: H, Hs: Hs };
         var MA = NK.Sprites.MAAL;
-        lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.07, 16, 44));
+        /* Bordets forkant er hoej paa en hoej scene: saa staar tingene midt i
+           billedet, og en lang linje i statuslinjen daekker kun forkanten */
+        lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.12, 16, 88));
         var zr = Math.round(NK.klamp(Math.min(W * 0.14, Hs * 0.25), 52, 140));
         var kant = NK.klamp(W * 0.03, 14, 36);
         lay.zoom = { x: W - zr - kant, y: 0, r: zr };
@@ -599,13 +588,8 @@
         var vh = Tg.vaegtHoejde(vb);
         var fh = NK.klamp(Math.min(lay.bordY - 70, vb * 0.95), 110, 290), fb = fh * MA.iltflaske.b / MA.iltflaske.h;
         var bh = NK.klamp(Math.min(vb * 0.7, lay.bordY * 0.55), 90, 210), bbr = bh * MA.bunsen.b / MA.bunsen.h;
-        var sh = NK.klamp(vb * 0.6, 70, 140), sbr = sh * MA.stjernekaster.b / MA.stjernekaster.h;
         var gruppe = bbr + 30 + vb + 30 + fb;
-        var medPynt = hoejre - gruppe > sbr + 40;
-        if (medPynt) gruppe += sbr + 28;
         var x0 = Math.max(10, (hoejre - gruppe) / 2 + 6);
-        lay.stjGeo = medPynt ? Tg.stjerneGeo(x0 + sbr / 2, lay.bordY, sh) : null;
-        if (medPynt) x0 += sbr + 28;
         var hj = Tg.bunsenHjem(x0 + bbr / 2, lay.bordY, bh);
         lay.brn = { x: hj.x, y: hj.y, h: bh, b: bbr, x0: x0 };
         x0 += bbr + 30;
@@ -623,15 +607,15 @@
         lay.dyse = { x: lay.uld.cx + rx + 14 * k, y: lay.uld.cy - ry * 0.1 };
         lay.zoom.y = NK.klamp(lay.uld.cy - 20, zr + 38, lay.bordY - zr - 64);
         lay.lupPunkt = { x: lay.uld.cx + rx * 0.3, y: lay.uld.cy - ry * 0.35 };
+        /* Rammen om braenderen: fra flammens top til foden */
+        var flTop = Tg.bunsenMund(hj.x, hj.y, bh, 0).y - Tg.flammeLaengde(bh);
+        lay.brnRamme = { x: lay.brn.x0 - 6, y: flTop - 4, b: bbr + 12, h: lay.bordY - flTop + 4 };
         this.lay = lay;
         var fgTop = lay.bordY - fh;
         this.saetAnker("vaegt", lay.v.x - vb / 2, lay.uld.cy - ry - 8, vb, lay.bordY - (lay.uld.cy - ry - 8));
-        var flTop = Tg.bunsenMund(hj.x, hj.y, bh, 0).y - Tg.flammeLaengde(bh);
-        this.saetAnker("braender", lay.brn.x0 - 6, flTop, bbr + 12, lay.bordY - flTop);
+        this.saetAnker("braender", lay.brnRamme.x, lay.brnRamme.y, lay.brnRamme.b, lay.brnRamme.h);
         this.saetAnker("flaske", lay.fl.x - fb / 2 - 4, fgTop - 4, fb + 8, fh + 4);
         this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 30, 2 * zr, 2 * zr + 64);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
-        if (this.el.gaet) this.el.gaet.style.bottom = Math.round(H - baand.y) + "px";
         if (this.brn && !this.brn.holdt && !this.brn.flyv) { this.brn.x = lay.brn.x; this.brn.y = lay.brn.y; this.brn.v = 0; }
     };
 
@@ -639,21 +623,24 @@
     P.opdaterScene = function (dt) {
         var lay = this.lay;
         if (!lay) return;
-        var tf = this.hurtig ? 15 : 1;
-        this.opdaterBraender(dt);
-        this.klump.opdater(dt * tf);
-        if (this.hurtig && this.klump.stille()) this.hurtig = false;
-        var k = this.klump;
-        /* Gnisterne fra den gloedende front: faerre, naar gloeden doer */
-        var u = lay.uld, kilder = this.uld.frontPunkter(k.p, u.cx, u.cy, u.rx, u.ry);
-        var rate = k.braender() ? (k.ilt > 0 ? 70 : 24) * NK.klamp(kilder.length / this.uld.t.length * 5, 0.25, 1) *
-            NK.klamp(k.G * 1.5, 0.15, 1) : 0;
-        this.gnister.opdater(dt, rate, kilder);
-        this.lup.opdater(dt * (this.hurtig ? 3 : 1), k.reageret(), k.ilt > 0, k.braender());
-        /* Ilten fra flasken ses i gloeden og slangen; stjernekasteren braender ud */
-        this.iltVis = NK.mod(this.iltVis || 0, k.ilt > 0 ? 1 : 0, 6, dt);
-        if (this.stjerneT > 0) this.stjerneT = Math.max(0, this.stjerneT - dt);
-        /* Det gratis gaet glider vaek */
+        var f = this.fase();
+        /* Mens der gaettes, staar scenen stille bag startskaermen */
+        if (f !== "valg") {
+            var tf = this.hurtig ? 15 : 1;
+            this.opdaterBraender(dt);
+            this.klump.opdater(dt * tf);
+            if (this.hurtig && this.klump.stille()) this.hurtig = false;
+            var k = this.klump;
+            /* Gnisterne fra den gloedende front: faerre, naar gloeden doer */
+            var u = lay.uld, kilder = this.uld.frontPunkter(k.p, u.cx, u.cy, u.rx, u.ry);
+            var rate = k.braender() ? (k.ilt > 0 ? 70 : 24) * NK.klamp(kilder.length / this.uld.t.length * 5, 0.25, 1) *
+                NK.klamp(k.G * 1.5, 0.15, 1) : 0;
+            this.gnister.opdater(dt, rate, kilder);
+            this.lup.opdater(dt * (this.hurtig ? 3 : 1), k.reageret(), k.ilt > 0, k.braender());
+            /* Ilten fra flasken ses i gloeden og slangen */
+            this.iltVis = NK.mod(this.iltVis || 0, k.ilt > 0 ? 1 : 0, 6, dt);
+        }
+        /* Startskaermen glider vaek, naar der er gaettet */
         if (this.gaetUd > 0) {
             this.gaetUd -= dt;
             if (this.gaetUd < 0.5) this.el.gaet.classList.add("vaek");
@@ -663,7 +650,7 @@
         var auto = !!(this.brn.flyv || this.hurtig);
         if (auto !== !!this.auto) { this.auto = auto || null; this.visKnap(); }
         /* Fasen */
-        var f = this.fase();
+        f = this.fase();
         if (f !== this.sidsteFase) {
             this.sidsteFase = f;
             this.faseSkift(f);
@@ -674,24 +661,20 @@
     P.tegn = function () {
         var ctx = this.L.ctx, lay = this.lay;
         if (!lay) return;
+        var f = this.fase();
+        /* Bag startskaermen tegnes intet om */
+        if (f === "valg" && this.tegnet) return;
+        this.tegnet = true;
         var t = this.tid, k = this.klump, over = this.over;
         this.L.ryd();
         Tg.rum(ctx, lay.W, lay.Hs, lay.bordY + 12);
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.Hs);
-        var px = NK.klamp(lay.v.b * 0.06, 13, 15), ety = lay.bordY + 12 + (lay.Hs - lay.bordY - 12) / 2;
+        var px = NK.klamp(lay.v.b * 0.06, 13, 15), ety = lay.bordY + 12 + Math.min(13, (lay.Hs - lay.bordY - 12) / 2);
         var b = this.brnPos(), iHaanden = !!(b.holdt || b.flyv);
+        var peger = f === "taend" && !iHaanden;
 
         /* Gasslangen fra braenderen ud ad bordets venstre kant */
         Tg.gasslange(ctx, b.x, b.y, lay.brn.h, b.v, lay.bordY);
-
-        /* Stjernekasteren (paaskeaegget) */
-        if (lay.stjGeo) {
-            Tg.stjernekaster(ctx, lay.stjGeo, over === "stjerne");
-            if (this.stjerneT > 0) {
-                var sp = lay.stjGeo.spids;
-                Tg.stjerneLys(ctx, sp.x, sp.y + (4 - this.stjerneT) * 3, t, NK.klamp(this.stjerneT, 0, 1));
-            }
-        }
 
         /* Vaegten, pladen og ulden */
         var v = Tg.vaegt(ctx, lay.v.x, lay.bordY, lay.v.b, K.g2(k.visning()) + " g", { lys: over === "vaegt" ? 1 : 0 });
@@ -702,10 +685,12 @@
         Tg.uld(ctx, this.uld, u.cx, u.cy, u.rx, u.ry, { p: k.p, gloed: k.G, ilt: this.iltVis, tid: t, lys: over === "uld" });
         Tg.etiket(ctx, "Vægten", lay.v.x, ety, px);
 
-        /* Braenderen paa bordet (i haanden tegnes den til sidst, oven paa alt) */
+        /* Braenderen paa bordet (i haanden tegnes den til sidst, oven paa alt).
+           Naar den skal bruges, har den en gul ring, der pulserer. */
         if (!iHaanden) {
-            Tg.bunsen(ctx, b.x, b.y, lay.brn.h, b.v, t, over === "braender");
-            Tg.etiket(ctx, "Bunsenbrænder", lay.brn.x, ety, px);
+            if (peger) Tg.ring(ctx, lay.brnRamme.x, lay.brnRamme.y, lay.brnRamme.b, lay.brnRamme.h, t);
+            Tg.bunsen(ctx, b.x, b.y, lay.brn.h, b.v, t, over === "braender" || peger);
+            Tg.etiket(ctx, "Bunsenbrænder", lay.brn.x, ety, px, peger ? "#f2c53d" : undefined);
         }
 
         /* Iltflasken og slangen */
@@ -724,17 +709,12 @@
         /* Braenderen i haanden eller paa vej */
         if (iHaanden) Tg.bunsen(ctx, b.x, b.y, lay.brn.h, b.v, t, false);
 
-        /* Pilen over det, der skal bruges nu */
-        var f = this.fase();
+        /* Pilen over det, der skal bruges nu. Ved braenderen og iltflasken
+           staar der paa et skilt, hvad et klik goer. */
         if (f === "foer" && !k.taendt) Tg.pegepil(ctx, lay.v.x, v.disp.y - 8, t);
-        else if (f === "taend" && !iHaanden) {
-            var mund = Tg.bunsenMund(b.x, b.y, lay.brn.h, 0);
-            Tg.pegepil(ctx, mund.x, mund.y - Tg.flammeLaengde(lay.brn.h) - 8, t);
-        }
-        else if (f === "vent" && k.ilt <= 0 && !this.hurtig) Tg.pegepil(ctx, lay.flGeo.hjul.x, lay.flGeo.y0 - 10, t);
+        else if (peger) Tg.pegepil(ctx, lay.brn.x, lay.brnRamme.y - 6, t, D.SKILT.taend, 8, lay.W - 8);
+        else if (f === "vent" && k.ilt <= 0 && !this.hurtig) Tg.pegepil(ctx, lay.flGeo.hjul.x, lay.flGeo.y0 - 10, t, D.SKILT.ilt, 8, lay.W - 8);
         else if (f === "efter") Tg.pegepil(ctx, lay.v.x, v.disp.y - 8, t);
-
-        this.k.tegn(ctx);
     };
 
     NK.SimForsoeg = SimForsoeg;

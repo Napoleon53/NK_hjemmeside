@@ -18,14 +18,15 @@
    Udviklerværktøj. Indgår ikke i animationen og kan slettes.
 
    Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
-   se på et skærmbillede: at molarmasserne passer, at klumpen ender på
-   det, vægten skal vise, for alle klumper, at ilten gør det hurtigere,
-   at formlerne, mellemregningens felter og tallene genkendes med de
-   typiske fejl, at facit er pænt og kan skrives som svar, at det gratis
-   gæt vises først og kun på måling 1, at begge faner kan gennemføres
-   med musen og ved at skrive, at Kemichael kun introducerer gættet og
-   ellers taler ved hint og svar, at sproget holder reglerne, og at
-   layoutet holder fra 520 × 380 til 1500 × 900.
+   se på et skærmbillede: at molarmasserne og de to reaktionsskemaer
+   passer, at klumpen ender på det, vægten skal vise, for alle klumper,
+   at ilten gør det hurtigere, at formlerne, mellemregningens felter og
+   tallene genkendes med de typiske fejl i både Let og Svær, at facit er
+   pænt og kan skrives som svar, at startskærmen med det gratis gæt
+   dækker scenen, og at intet sker bag den, at begge faner kan
+   gennemføres med musen og ved at skrive, at der ikke er nogen lærer,
+   men hint på begge faner, at sproget holder reglerne, og at layoutet
+   holder fra 520 × 380 til 1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
@@ -47,7 +48,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc4.8-forsoeg", "nk-sc4.8-beregning", "nk-sc4.8-kemichael-ude", "nk-sc4.8-maalinger", "nk-kemichael"];
+var NOEGLER = ["nk-sc4.8-forsoeg", "nk-sc4.8-beregning", "nk-sc4.8-maalinger", "nk-sc4.8-skema"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -64,7 +65,7 @@ function koer() {
 }
 
 /* Ord, der er skrevet uden æ, ø og å, og som derfor ikke må nå eleven */
-var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|proeve\w*|vaegt\w*|Vaegt\w*|laerer\w*|forsoeg\w*|maaling\w*|Maaling\w*|staaluld\w*|braend\w*|gaet)\b/;
+var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|proeve\w*|vaegt\w*|Vaegt\w*|laerer\w*|forsoeg\w*|maaling\w*|Maaling\w*|staaluld\w*|braend\w*|gaet|svaer)\b/;
 
 function koerTest(W) {
     var d = W.document;
@@ -82,33 +83,45 @@ function koerTest(W) {
         for (var i = 1; i <= 8; i++) { mus(sim, "pointermove", x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * i / 8); tik(sim, 0.03); }
         mus(sim, "pointerup", x1, y1);
     }
-    function felt(r, hvad, tekst) {
-        var e = d.getElementById("forsoeg-" + hvad + r);
-        e.value = tekst;
-        enter(e);
-    }
     function besked(sim) { return sim.beskedTekst(); }
     function komma(v) { return NK.tal2(v); }
     function synlig(e) { return !!e && W.getComputedStyle(e).display !== "none"; }
+    /* De skilte, pegepilen tegner i det billede, fanen tegner nu */
+    function skilte(sim) {
+        var kald = [], orig = NK.Tegn.pegepil;
+        NK.Tegn.pegepil = function (ctx, x, y, t, tekst) { kald.push(tekst || ""); return orig.apply(this, arguments); };
+        try { sim.tegn(); } finally { NK.Tegn.pegepil = orig; }
+        return kald;
+    }
 
     overskrift("1. Indlæsning");
     paastand("NK findes", !!NK);
     if (!NK) return;
     var D = NK.Data, K = NK.Kemi, T = NK.Tjek;
-    paastand("data.js, kemi.js, tjek.js, regning.js og laerer.js er kørt", !!(D && D.GAET && K && K.Klump && T && T.formel && NK.Regning && NK.RoligLaerer));
+    paastand("data.js, kemi.js, tjek.js, regning.js og skema.js er kørt", !!(D && D.GAET && K && K.Klump && K.skema && T && T.formel && NK.Regning && NK.Skema));
     paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-forsoeg"] && NK.sims["fane-beregning"]));
-    var sprites = ["vaegt", "bunsen", "iltflaske", "stjernekaster", "lup", "kateder", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var sprites = ["vaegt", "bunsen", "iltflaske", "lup"];
     var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var billeder = [].slice.call(d.querySelectorAll("#forsoeg-gaet img"));
     paastand("de tre billeder til gættet er indlæst", billeder.length === 3 && billeder.every(function (b) { return b.complete && b.naturalWidth > 0; }));
     var A = NK.sims["fane-forsoeg"], B = NK.sims["fane-beregning"];
-    paastand("Kemichael sidder ved katederet på begge faner", [A, B].every(function (s) { return s.k instanceof NK.RoligLaerer; }));
+    var udefra = [].filter.call(d.querySelectorAll("script[src], link[href], img[src]"), function (e) {
+        return /\.\.\/|^https?:/.test(e.getAttribute("src") || e.getAttribute("href") || "");
+    });
+    paastand("mappen henter kun filer inde fra sig selv", udefra.length === 0, udefra.map(function (e) { return e.getAttribute("src") || e.getAttribute("href"); }).join(", "));
+    paastand("der er ingen lærer: ingen Kemichael, ingen taleboble og ingen knap, der sender ham ud",
+        !NK.Kemichael && !NK.RoligLaerer && !A.k && !B.k && !d.querySelector(".kboble") && !d.querySelector(".kknap") && !d.querySelector("[id$='anker-laerer']"));
+    paastand("stjernekasteren er væk", !NK.Sprites.MAAL.stjernekaster && !D.STJERNE && !NK.Tegn.stjernekaster);
     paastand("der er ingen tilbudsknapper til en præsentation", !d.querySelector(".tilbud") && !d.querySelector(".spring-over"));
-    if (!A.k.inde()) { A.k.hentInd(); tik(A, 4); B.k.opdater(4); }
 
     overskrift("2. Kemien");
-    paastand("M(Fe) = 55,85 g/mol og M(FeO) = 71,85 g/mol", K.Mtekst("Fe") === "55,85" && K.Mtekst("FeO") === "71,85");
+    var LET = K.skema("let"), SVAER = K.skema("svaer");
+    paastand("M(Fe) = 55,85 g/mol, M(FeO) = 71,85 g/mol og M(Fe₃O₄) = 231,55 g/mol", K.MFeTekst === "55,85" && LET.Mtekst === "71,85" && SVAER.Mtekst === "231,55",
+        K.MFeTekst + " " + LET.Mtekst + " " + SVAER.Mtekst);
+    paastand("Let: 2 Fe + O₂ → 2 FeO, afstemt, forholdet 1 : 1", LET.reaktion === "2 Fe + O₂ → 2 FeO" && LET.iOrden && LET.del === 1, LET.reaktion);
+    paastand("Svær: 3 Fe + 2 O₂ → Fe₃O₄, afstemt, stofmængden af jern deles med 3", SVAER.reaktion === "3 Fe + 2 O₂ → Fe₃O₄" && SVAER.iOrden && SVAER.del === 3, SVAER.reaktion);
+    paastand("alle reaktionsskemaer i D.SKEMA kan bruges", D.SKEMAER.every(function (id) { return K.skema(id).iOrden; }));
     /* Braend en klump til den staar stille: med ilt hele tiden, eller uden */
     function braend(m, u, medIlt) {
         var k = new K.Klump(m, u), t = 0;
@@ -140,13 +153,24 @@ function koerTest(W) {
     var ekstra = K.udbytteAf(D.EKSEMPEL[0].mf, D.EKSEMPEL[0].me);
     paastand("eksempel 1 er målt med ilt: udbyttet ligger inden for modellens", ekstra >= D.UDBYTTE.min && ekstra <= D.UDBYTTE.maks, ekstra.toFixed(3));
     paastand("eksempel 2 er målt uden ilt: 3,00 g med 80 % giver 3,41 g", braend(3, 0.8, false).visning() === D.EKSEMPEL[1].me, braend(3, 0.8, false).visning());
-    var f4 = K.facit({ tal: { mf: 4, me: 4.94 } });
-    paastand("4,00 g jern: n = 0,0716 mol, m(FeO) = 5,14 g, ca. 82 % reagerede",
-        K.mol(f4.n) === "0,0716" && K.g2(f4.m) === "5,14" && K.pct(f4.pct) === "82", K.mol(f4.n) + " " + K.g2(f4.m) + " " + K.pct(f4.pct));
+    var f4 = K.facit({ tal: { mf: 4, me: 4.94 }, sk: LET });
+    paastand("Let, 4,00 g jern: n = 0,0716 mol, m(FeO) = 5,14 g, ca. 82 % reagerede",
+        K.mol(f4.n) === "0,0716" && K.mol(f4.nOx) === "0,0716" && K.g2(f4.m) === "5,14" && K.pct(f4.pct) === "82", K.mol(f4.n) + " " + K.g2(f4.m) + " " + K.pct(f4.pct));
+    var f4s = K.facit({ tal: { mf: 4, me: 4.94 }, sk: SVAER });
+    paastand("Svær, 4,00 g jern: n(Fe₃O₄) = 0,0239 mol, m(Fe₃O₄) = 5,53 g, ca. 62 % reagerede",
+        K.mol(f4s.n) === "0,0716" && K.mol(f4s.nOx) === "0,0239" && K.g2(f4s.m) === "5,53" && K.pct(f4s.pct) === "62", K.mol(f4s.nOx) + " " + K.g2(f4s.m) + " " + K.pct(f4s.pct));
+    var over = [];
+    D.SKEMAER.forEach(function (id) {
+        D.KLUMPER.forEach(function (m) {
+            var f = K.facit({ tal: { mf: m, me: K.slutVisning(m, D.UDBYTTE.maks) }, sk: K.skema(id) });
+            if (!(f.pct > 30 && f.pct < 100 && f.m > K.slutVisning(m, D.UDBYTTE.maks))) over.push(id + " " + m + ": " + f.pct.toFixed(0));
+        });
+    });
+    paastand("i begge skemaer viser vægten altid mindre end det, der regnes ud", over.length === 0, over.join("; "));
 
     overskrift("3. Formlerne");
-    function f(id, s) { return T.formel(id, s); }
-    function ok(id, liste) { return liste.filter(function (s) { return !f(id, s).ok; }); }
+    function f(id, s, sk) { return T.formel(id, s, sk || LET); }
+    function ok(id, liste, sk) { return liste.filter(function (s) { return !f(id, s, sk).ok; }); }
     var ikke = ok("n_fe", ["n(Fe) = m(Fe)/M(Fe)", "n = m/M", "nFe = mFe/MFe", "n(Fe) = m(før)/M(Fe)", "m(Fe)/M(Fe)", "n(jern) = m(stålulden)/M(jern)", "n(Fe)=m(Fe):M(Fe)"]);
     paastand("n(Fe): syv skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
     paastand("m(Fe) = n(Fe) · M(Fe) godkendes med den isolerede vist", f("n_fe", "m(Fe) = n(Fe)·M(Fe)").ok && !!f("n_fe", "m(Fe) = n(Fe)·M(Fe)").note);
@@ -159,115 +183,166 @@ function koerTest(W) {
     paastand("m(Fe)/55,85: skriv molarmassen som M", /Skriv molarmassen/.test(f("n_fe", "m(Fe)/55,85").besked || ""));
     paastand("m(O) i en parentes: Fe eller FeO", /Fe eller FeO/.test(f("n_fe", "m(O)/M(Fe)").besked || ""));
     paastand("x/y kan ikke læses", /kan jeg ikke læse/.test(f("n_fe", "x/y").besked || ""));
-    ikke = ok("n_feo", ["n(FeO) = n(Fe)", "n = n(Fe)", "n(FeO) = 2/2 · n(Fe)", "nFeO = nFe", "n(jernoxid) = n(jern)"]);
-    paastand("n(FeO): fem skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
-    paastand("2 · n(Fe): forholdet er 2 : 2", /2 : 2/.test(f("n_feo", "2·n(Fe)").besked || ""));
-    paastand("n(FeO) = n: skriv hvilken stofmængde", /hvilken stofmængde/.test(f("n_feo", "n(FeO) = n").besked || ""));
-    paastand("m(Fe): det er en masse", /en masse/.test(f("n_feo", "m(Fe)").besked || ""));
-    ikke = ok("m_feo", ["m(FeO) = n(FeO)·M(FeO)", "m = n·M", "m = n*M", "m(FeO) = n(Fe) · M(FeO)", "mFeO = nFeO*MFeO", "m(FeO) = m(Fe) · M(FeO) / M(Fe)", "m(FeO)=M(FeO)*n(FeO)"]);
-    paastand("m(FeO): syv skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
-    paastand("n / M: ikke divideret", /ikke divideret/.test(f("m_feo", "n/M").besked || ""));
-    paastand("n(FeO) · M(Fe): molarmassen for FeO", /M\(FeO\)/.test(f("m_feo", "n(FeO)*M(Fe)").besked || ""));
-    paastand("m(efter): det, vægten viste", /vægten viste/.test(f("m_feo", "m(FeO) = m(efter)").besked || ""));
+    ikke = ok("n_ox", ["n(FeO) = n(Fe)", "n = n(Fe)", "n(FeO) = 2/2 · n(Fe)", "nFeO = nFe", "n(jernoxid) = n(jern)"]);
+    paastand("Let, n(FeO): fem skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
+    paastand("2 · n(Fe): forholdet er 2 : 2", /2 : 2/.test(f("n_ox", "2·n(Fe)").besked || ""));
+    paastand("n(FeO) = n: skriv hvilken stofmængde", /hvilken stofmængde/.test(f("n_ox", "n(FeO) = n").besked || ""));
+    paastand("m(Fe): det er en masse", /en masse/.test(f("n_ox", "m(Fe)").besked || ""));
+    ikke = ok("m_ox", ["m(FeO) = n(FeO)·M(FeO)", "m = n·M", "m = n*M", "m(FeO) = n(Fe) · M(FeO)", "mFeO = nFeO*MFeO", "m(FeO) = m(Fe) · M(FeO) / M(Fe)", "m(FeO)=M(FeO)*n(FeO)"]);
+    paastand("Let, m(FeO): syv skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
+    paastand("n / M: ikke divideret", /ikke divideret/.test(f("m_ox", "n/M").besked || ""));
+    paastand("n(FeO) · M(Fe): molarmassen for FeO", /M\(FeO\)/.test(f("m_ox", "n(FeO)*M(Fe)").besked || ""));
+    paastand("m(efter): det, vægten viste", /vægten viste/.test(f("m_ox", "m(FeO) = m(efter)").besked || ""));
+    paastand("Let, m(Fe₃O₄): produktet er FeO", /produktet FeO/.test(f("m_ox", "m(Fe3O4) = n(Fe3O4)·M(Fe3O4)").besked || ""), f("m_ox", "m(Fe3O4) = n(Fe3O4)·M(Fe3O4)").besked);
     paastand("et tomt felt tæller ikke som et svar", f("n_fe", "  ").tom);
+    ikke = ok("n_ox", ["n(Fe3O4) = n(Fe)/3", "n(Fe₃O₄) = 1/3 · n(Fe)", "n = n(Fe):3", "nFe3O4 = nFe/3", "n(jernoxid) = n(jern)/3", "n(Fe)·1/3", "n(Fe3O4) = n(Fe)·(1/3)"], SVAER);
+    paastand("Svær, n(Fe₃O₄): syv skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
+    paastand("Svær, 3 · n(Fe): divider med 3", /Divider stofmængden af jern med 3/.test(f("n_ox", "3·n(Fe)", SVAER).besked || ""), f("n_ox", "3·n(Fe)", SVAER).besked);
+    paastand("Svær, n(Fe₃O₄) = n(Fe): forholdet er ikke 1 : 1, men 3 : 1", /ikke 1 : 1/.test(f("n_ox", "n(Fe3O4) = n(Fe)", SVAER).besked || "") && /3 : 1/.test(f("n_ox", "n(Fe3O4) = n(Fe)", SVAER).besked || ""));
+    paastand("Svær, n(Fe) / 2: 2 er tallet foran O₂", /foran O₂/.test(f("n_ox", "n(Fe)/2", SVAER).besked || ""), f("n_ox", "n(Fe)/2", SVAER).besked);
+    paastand("Svær, n(FeO): produktet er Fe₃O₄", /produktet Fe₃O₄/.test(f("n_ox", "n(FeO) = n(Fe)/3", SVAER).besked || ""), f("n_ox", "n(FeO) = n(Fe)/3", SVAER).besked);
+    ikke = ok("m_ox", ["m(Fe3O4) = n(Fe3O4)·M(Fe3O4)", "m = n·M", "m(Fe₃O₄) = n(Fe)/3 · M(Fe₃O₄)", "mFe3O4 = nFe3O4*MFe3O4"], SVAER);
+    paastand("Svær, m(Fe₃O₄): fire skrivemåder godkendes", ikke.length === 0, ikke.join(" | "));
+    paastand("Svær, n(Fe) · M(Fe₃O₄): det er stofmængden af jern", /stofmængden af jern/.test(f("m_ox", "n(Fe)·M(Fe3O4)", SVAER).besked || ""), f("m_ox", "n(Fe)·M(Fe3O4)", SVAER).besked);
 
     overskrift("4. Mellemregningen, tallene og de pæne beregninger");
-    function opg(tal, kunTal) {
-        var o = { id: "m1", tal: tal, kunTal: !!kunTal, spm: true, trin: D.TRINLISTE };
+    function opg(tal, sk, kunTal) {
+        var o = { id: "m1", tal: tal, kunTal: !!kunTal, spm: true, trin: D.TRINLISTE, sk: sk || LET };
         o.facit = K.facit(o);
         return o;
     }
     var ikkeOk = [], grimme = [], ledIkke = [];
-    D.KLUMPER.forEach(function (m) {
-        [D.UDBYTTE.min, D.UDBYTTE.maks].forEach(function (u) {
-            var o = opg({ mf: m, me: K.slutVisning(m, u) });
-            o.trin.forEach(function (id) {
-                var ft = T.facitTekst(id, o);
-                if (!T.trin(id, ft, o).ok) ikkeOk.push(id + " " + ft);
-                var r = T.regning(id, o).join(" ");
-                if (/NaN|undefined|Infinity/.test(r) || (D.TRIN[id].op && !/=.*=.*=/.test(r))) grimme.push(id + ": " + r);
-                if (D.TRIN[id].op) {
-                    T.led(id, o).forEach(function (l, i) {
-                        var s = T.tjekLed(id, o, i, l.tekst, D.TRIN[id].op === "/" ? [i] : [0, 1]);
-                        if (!s.ok) ledIkke.push(id + "/" + i + " " + l.tekst + ": " + s.besked);
-                    });
-                }
+    D.SKEMAER.forEach(function (sid) {
+        var sk = K.skema(sid);
+        D.KLUMPER.forEach(function (m) {
+            [D.UDBYTTE.min, D.UDBYTTE.maks].forEach(function (u) {
+                var o = opg({ mf: m, me: K.slutVisning(m, u) }, sk);
+                o.trin.forEach(function (id) {
+                    var def = T.def(id, sk), ft = T.facitTekst(id, o);
+                    if (!T.trin(id, ft, o).ok) ikkeOk.push(sid + " " + id + " " + ft);
+                    var r = T.regning(id, o).join(" ");
+                    if (/NaN|undefined|Infinity|\{/.test(r) || (def.op && !/=.*=.*=/.test(r))) grimme.push(sid + " " + id + ": " + r);
+                    if (def.op) {
+                        T.led(id, o).forEach(function (l, i) {
+                            var s = T.tjekLed(id, o, i, l.tekst, def.op === "/" ? [i] : [0, 1]);
+                            if (!s.ok) ledIkke.push(sid + " " + id + "/" + i + " " + l.tekst + ": " + s.besked);
+                        });
+                    }
+                });
             });
         });
     });
-    paastand("facit i alle trin og for alle klumper godkendes, når det skrives som i feltet", ikkeOk.length === 0, ikkeOk.join("; "));
-    paastand("mellemregningens tal godkendes, når de skrives som på tavlen", ledIkke.length === 0, ledIkke.join("; "));
+    paastand("facit i alle trin, for alle klumper og i begge skemaer godkendes, når det skrives som i feltet", ikkeOk.length === 0, ikkeOk.join("; "));
+    paastand("mellemregningens tal godkendes, når de skrives som i regnestykket", ledIkke.length === 0, ledIkke.join("; "));
     paastand("alle beregninger har formel, tal og resultat", grimme.length === 0, grimme.join("; "));
     var o4 = opg({ mf: 4.00, me: 4.94 });
     paastand("n(Fe) = m(Fe) / M(Fe) = 4,00 g / 55,85 g/mol = 0,0716 mol", T.regning("n_fe", o4).join(" ") === "n(Fe) = m(Fe) / M(Fe) = 4,00 g / 55,85 g/mol = 0,0716 mol", T.regning("n_fe", o4).join(" "));
-    paastand("n(FeO) = n(Fe) = 0,0716 mol", T.regning("n_feo", o4).join(" ") === "n(FeO) = n(Fe) = 0,0716 mol", T.regning("n_feo", o4).join(" "));
-    paastand("m(FeO) = n(FeO) · M(FeO) = 0,0716 mol · 71,85 g/mol = 5,14 g", T.regning("m_feo", o4).join(" ") === "m(FeO) = n(FeO) · M(FeO) = 0,0716 mol · 71,85 g/mol = 5,14 g", T.regning("m_feo", o4).join(" "));
-    paastand("5,15 g (regnet med alle cifre) godkendes også", T.trin("m_feo", "5,15 g", o4).ok);
+    paastand("n(FeO) = n(Fe) = 0,0716 mol", T.regning("n_ox", o4).join(" ") === "n(FeO) = n(Fe) = 0,0716 mol", T.regning("n_ox", o4).join(" "));
+    paastand("m(FeO) = n(FeO) · M(FeO) = 0,0716 mol · 71,85 g/mol = 5,14 g", T.regning("m_ox", o4).join(" ") === "m(FeO) = n(FeO) · M(FeO) = 0,0716 mol · 71,85 g/mol = 5,14 g", T.regning("m_ox", o4).join(" "));
+    paastand("5,15 g (regnet med alle cifre) godkendes også", T.trin("m_ox", "5,15 g", o4).ok);
     paastand("tallet uden enhed: skriv enheden", /enheden/.test(T.trin("n_fe", "0,0716", o4).besked || ""));
     paastand("0,0716 g: forkert enhed", /ikke enheden/.test(T.trin("n_fe", "0,0716 g", o4).besked || ""));
     paastand("223 mol: ganget", /ganget/.test(T.trin("n_fe", "223,4 mol", o4).besked || ""));
     paastand("0,0557 mol: molarmassen af FeO", /FeO/.test(T.trin("n_fe", "0,0557 mol", o4).besked || ""));
     paastand("0,716 mol: tjek kommaet", /kommaet/.test(T.trin("n_fe", "0,716 mol", o4).besked || ""));
-    paastand("0,143 mol i trin 2: forholdet", /2 : 2/.test(T.trin("n_feo", "0,143 mol", o4).besked || ""));
-    paastand("4,94 g som massen af FeO: det, vægten viste", /vægten viste/.test(T.trin("m_feo", "4,94 g", o4).besked || ""));
+    paastand("0,143 mol i trin 2: forholdet", /2 : 2/.test(T.trin("n_ox", "0,143 mol", o4).besked || ""));
+    paastand("4,94 g som massen af FeO: det, vægten viste", /vægten viste/.test(T.trin("m_ox", "4,94 g", o4).besked || ""));
     paastand("felt over brøkstregen: 4,00 uden enhed", /enheden/.test(T.tjekLed("n_fe", o4, 0, "4,00", [0]).besked || ""));
     paastand("felt over brøkstregen: 55,85 g/mol er vendt om", /vendt om/.test(T.tjekLed("n_fe", o4, 0, "55,85 g/mol", [0]).besked || ""));
     paastand("felt over brøkstregen: 4,94 g er m(efter)", /m\(efter\)/.test(T.tjekLed("n_fe", o4, 0, "4,94 g", [0]).besked || ""));
     paastand("felt under brøkstregen: 71,85 g/mol er FeO", /FeO/.test(T.tjekLed("n_fe", o4, 1, "71,85 g/mol", [1]).besked || ""));
     paastand("hele brøken i ét felt: ét tal i hvert felt", /ét tal/.test(T.tjekLed("n_fe", o4, 0, "4,00 g / 55,85 g/mol", [0]).besked || ""));
-    paastand("gangestykket: tallene må byttes om", T.tjekLed("m_feo", o4, 0, "71,85 g/mol", [0, 1]).ok);
-    paastand("gangestykket: 55,85 g/mol er molarmassen af jern", /jern/.test(T.tjekLed("m_feo", o4, 0, "55,85 g/mol", [0, 1]).besked || ""));
+    paastand("gangestykket: tallene må byttes om", T.tjekLed("m_ox", o4, 0, "71,85 g/mol", [0, 1]).ok);
+    paastand("gangestykket: 55,85 g/mol er molarmassen af jern", /jern/.test(T.tjekLed("m_ox", o4, 0, "55,85 g/mol", [0, 1]).besked || ""));
+    var o4s = opg({ mf: 4.00, me: 4.94 }, SVAER);
+    paastand("Svær: n(Fe₃O₄) = n(Fe) / 3 = 0,0716 mol / 3 = 0,0239 mol", T.regning("n_ox", o4s).join(" ") === "n(Fe₃O₄) = n(Fe) / 3 = 0,0716 mol / 3 = 0,0239 mol", T.regning("n_ox", o4s).join(" "));
+    paastand("Svær: m(Fe₃O₄) = n(Fe₃O₄) · M(Fe₃O₄) = 0,0239 mol · 231,55 g/mol = 5,53 g",
+        T.regning("m_ox", o4s).join(" ") === "m(Fe₃O₄) = n(Fe₃O₄) · M(Fe₃O₄) = 0,0239 mol · 231,55 g/mol = 5,53 g", T.regning("m_ox", o4s).join(" "));
+    paastand("Svær: tallet 3 under brøkstregen har ingen enhed", T.tjekLed("n_ox", o4s, 1, "3", [1]).ok && /ingen enhed/.test(T.tjekLed("n_ox", o4s, 1, "3 mol", [1]).besked || ""));
+    paastand("Svær: 0,0716 mol under brøkstregen er vendt om", /vendt om/.test(T.tjekLed("n_ox", o4s, 1, "0,0716 mol", [1]).besked || ""), T.tjekLed("n_ox", o4s, 1, "0,0716 mol", [1]).besked);
+    paastand("Svær: 2 under brøkstregen: forholdet er 3 : 1", /3 : 1/.test(T.tjekLed("n_ox", o4s, 1, "2", [1]).besked || ""), T.tjekLed("n_ox", o4s, 1, "2", [1]).besked);
+    paastand("Svær: 0,0716 mol som n(Fe₃O₄): del den med 3", /Del den med 3/.test(T.trin("n_ox", "0,0716 mol", o4s).besked || ""), T.trin("n_ox", "0,0716 mol", o4s).besked);
+    paastand("Svær: 0,215 mol som n(Fe₃O₄): ganget", /ganget/.test(T.trin("n_ox", "0,215 mol", o4s).besked || ""));
+    paastand("Svær: 16,6 g som m(Fe₃O₄): det er stofmængden af jern", /stofmængden af jern/.test(T.trin("m_ox", "16,6 g", o4s).besked || ""), T.trin("m_ox", "16,6 g", o4s).besked);
+    paastand("Svær: 5,53 g godkendes, og 5,14 g (fra Let) gør ikke", T.trin("m_ox", "5,53 g", o4s).ok && !T.trin("m_ox", "5,14 g", o4s).ok);
 
     overskrift("5. Sproget");
     var tekster = [];
     D.FORSOEG.forEach(function (o) { tekster.push(o.titel, o.tekst, o.efter); });
-    tekster.push(D.GAET.etiket, D.GAET.spm, D.GAET.note, D.GAET.kemichael);
+    tekster.push(D.GAET.etiket, D.GAET.intro, D.GAET.spm, D.GAET.note);
     D.GAET.svar.forEach(function (s) { tekster.push(s.t, s.tekst, s.forkl || ""); });
-    ["LINJE", "HINT", "SVAR", "INTRO", "FAERDIG"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
+    ["LINJE", "HINT", "SVAR", "FELT", "SKILT", "FAERDIG", "CELLE"].forEach(function (n) { Object.keys(D[n]).forEach(function (k) { tekster.push(D[n][k]); }); });
     D.BEREGNING.forEach(function (o) { tekster.push(o.titel); });
-    Object.keys(D.TRIN).forEach(function (id) {
-        var t = D.TRIN[id];
-        tekster.push(t.navn, t.formelHint, t.talHint);
-        (t.indsaetHint || []).forEach(function (h) { tekster.push(h); });
+    D.RAEKKER.forEach(function (r) { tekster.push(r.navn); });
+    /* Trinnenes tekster og fejlbeskederne, som de staar i hvert skema */
+    var iSkema = [];
+    D.SKEMAER.forEach(function (sid) {
+        var sk = K.skema(sid);
+        iSkema.push(sk.knap, sk.reaktion);
+        D.TRINLISTE.forEach(function (id) {
+            var t = T.def(id, sk);
+            iSkema.push(t.navn, t.venstre, t.formelHint, t.talHint);
+            iSkema = iSkema.concat(t.led, t.indsaetHint);
+        });
+        var R = T.regler(sk);
+        Object.keys(R).forEach(function (id) { R[id].fejl.forEach(function (x) { iSkema.push(x[1]); }); });
     });
-    tekster.push(D.HVORFOR.spm, D.HVORFOR.hint, D.HVORFOR.efter, D.OVER_TAVLE);
+    tekster = tekster.concat(iSkema);
+    tekster.push(D.HVORFOR.spm, D.HVORFOR.hint, D.HVORFOR.efter, D.OVER_TAVLE, D.TAVLE_TITEL, D.KUN_TAL, D.EKSEMPEL_NOTE, D.SKEMA_TITEL, D.SKEMA_TIP, D.UDEN_ILT);
     D.HVORFOR.svar.forEach(function (s) { tekster.push(s.t, s.forkl || ""); });
-    Object.keys(T.REGLER).forEach(function (id) { T.REGLER[id].fejl.forEach(function (x) { tekster.push(x[1]); }); });
-    tekster = tekster.concat(D.ROS, D.ROS_OPGAVE, D.KAFFE, [D.STJERNE, D.UDEN_ILT, D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST]);
+    tekster = tekster.concat(D.ROS, D.ROS_AFLAEST);
     tekster.push(d.body.innerText, d.getElementById("teori").innerText);
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[–—]/.test(alt), (alt.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
     paastand("ingen 1+ eller 1−", !/(^|[^0-9,])1[+−-](\s|$)/.test(alt));
     paastand("ingen ord uden æ, ø og å", !ASCII_ORD.test(alt), (alt.match(ASCII_ORD) || [""])[0]);
-    paastand("Kemichaels linje til gættet er kort (højst 110 tegn)", D.GAET.kemichael.length <= 110, D.GAET.kemichael.length);
+    paastand("ingen tekst nævner Kemichael", !/kemichael|michael|lærerværelse/i.test(alt), (alt.match(/.{0,30}(kemichael|michael|lærerværelse).{0,30}/i) || [""])[0]);
+    paastand("oxidet og tallene fra reaktionsskemaet er sat ind i alle trin og fejlbeskeder", !/\{(ox|kfe|kox|del)\}/.test(iSkema.join("\n")),
+        (iSkema.join("\n").match(/.{0,20}\{(ox|kfe|kox|del)\}.{0,20}/) || [""])[0]);
+    paastand("indledningen til gættet er kort (højst 130 tegn)", D.GAET.intro.length <= 130, D.GAET.intro.length);
 
-    overskrift("6. Fane 1: det gratis gæt");
+    overskrift("6. Fane 1: startskærmen med det gratis gæt");
     NK.visFane("fane-forsoeg");
     A.tilpas(); A.layout();
     A.vaelg(0, false);
-    var gaet = d.getElementById("forsoeg-gaet");
-    paastand("måling 1 starter med det gratis gæt: tre kort over scenen", A.fase() === "valg" && synlig(gaet) && gaet.querySelectorAll(".gk").length === 3);
-    paastand("kortene ligger over scenen, ikke over Kemichaels bånd", Math.abs(parseFloat(gaet.style.bottom) - (A.L.h - A.k.lay.y)) < 2, gaet.style.bottom);
-    paastand("Kemichael introducerer hypotesen", A.k.taler() && /hypotese/.test(A.k.tekst()) && /gratis/.test(A.k.tekst()), A.k.tekst());
+    var gaet = d.getElementById("forsoeg-gaet"), scene = gaet.parentNode, fane1 = d.getElementById("fane-forsoeg");
+    paastand("måling 1 starter med det gratis gæt: tre kort", A.fase() === "valg" && synlig(gaet) && gaet.querySelectorAll(".gk").length === 3);
+    paastand("startskærmen har en kort indledning før spørgsmålet", !!gaet.querySelector(".gaet-intro") && gaet.querySelector(".gaet-intro").textContent === D.GAET.intro &&
+        gaet.querySelector("h2").textContent === D.GAET.spm);
+    var rg = gaet.getBoundingClientRect(), rs = scene.getBoundingClientRect();
+    paastand("startskærmen dækker hele scenen og er ikke gennemsigtig",
+        Math.abs(rg.top - rs.top) < 2 && Math.abs(rg.bottom - rs.bottom) < 2 && Math.abs(rg.left - rs.left) < 2 && Math.abs(rg.right - rs.right) < 2 &&
+        W.getComputedStyle(gaet).backgroundImage !== "none", W.getComputedStyle(gaet).backgroundImage);
+    paastand("panelet er dæmpet, mens der gættes", fane1.classList.contains("gaetter"));
+    var molFoer = JSON.stringify(A.lup.mol.map(function (m) { return [m.x, m.y]; }));
+    tik(A, 2);
+    paastand("intet sker bag startskærmen: luppen står stille, og stålulden er ikke tændt",
+        JSON.stringify(A.lup.mol.map(function (m) { return [m.x, m.y]; })) === molFoer && !A.klump.taendt && A.gnister.antal() === 0);
     paastand("der er ingen hint-knap under gættet", A.el.knap.hidden && !synlig(A.el.knap));
-    paastand("linjen i kortet siger: gæt først", /Gæt først/.test(besked(A)), besked(A));
+    paastand("linjen siger: gæt først", /Gæt først/.test(besked(A)), besked(A));
     var lay = A.lay;
     A.nedScene({ x: lay.brn.x, y: lay.brn.y });
     paastand("brænderen kan ikke bruges før gættet", !A.klump.taendt && /Gæt først/.test(besked(A)), besked(A));
     [].filter.call(gaet.querySelectorAll(".gk"), function (k) { return k.getAttribute("data-gaet") === "lettere"; })[0].click();
-    paastand("efter gættet tier Kemichael, og kortet med Lettere er markeret", !A.k.taler() && gaet.querySelector(".gk.valgt").getAttribute("data-gaet") === "lettere");
+    paastand("efter gættet er kortet med Lettere markeret", gaet.querySelector(".gk.valgt").getAttribute("data-gaet") === "lettere");
     tik(A, 1.3);
-    paastand("kortene forsvinder, og linjen siger: aflæs m(før)", !synlig(gaet) && /Dit gæt: lettere/.test(besked(A)) && /m\(før\)/.test(besked(A)), besked(A));
-    paastand("hint-knappen er tilbage", !A.el.knap.hidden);
+    paastand("startskærmen forsvinder, panelet lyser op, og linjen siger: aflæs vægten",
+        !synlig(gaet) && !fane1.classList.contains("gaetter") && /Dit gæt: lettere/.test(besked(A)) && /Aflæs vægten/.test(besked(A)), besked(A));
+    paastand("feltet til m(før) står i statuslinjen ved siden af hint-knappen",
+        !A.el.aflaes.hidden && /m\(før\)/.test(A.el.aflaesNavn.textContent) && A.el.aflaes.parentNode === A.el.status && A.el.knap.parentNode === A.el.status && !A.el.knap.hidden);
     paastand("gættet står under skemaet med billedet", /lettere/.test(d.getElementById("forsoeg-gaetlinje").textContent) && !!d.querySelector("#forsoeg-gaetlinje img"));
 
     overskrift("7. Fane 1: forsøget med musen");
-    felt(0, "f", "0,00");
-    paastand("et forkert tal for m(før) afvises", A.noteret.mf === null && /står der ikke/.test(besked(A)), besked(A));
-    felt(0, "f", komma(A.proeve) + " g");
+    function felt(tekst) { A.el.tal.value = tekst; enter(A.el.tal); }
+    felt("0,00");
+    paastand("et forkert tal for m(før) afvises: linjen bliver rød, og hint-knappen lyser",
+        A.noteret.mf === null && /står der ikke/.test(besked(A)) && A.el.status.classList.contains("skidt") && A.el.knap.classList.contains("peg"), besked(A));
+    felt(komma(A.proeve) + " g");
     tik(A, 0.1);
-    paastand("m(før) aflæst (også med g efter), og linjen siger: tænd", A.noteret.mf === A.proeve && /bunsenbrænderen/.test(besked(A)), besked(A));
-    paastand("m(efter) er lukket, før stålulden er tændt", d.getElementById("forsoeg-e0").disabled);
+    paastand("m(før) aflæst (også med g efter): tallet står i skemaet, og linjen siger: klik på bunsenbrænderen",
+        A.noteret.mf === A.proeve && /Klik på bunsenbrænderen/.test(besked(A)) && d.getElementById("forsoeg-f0").textContent === komma(A.proeve) + " g", besked(A));
+    paastand("feltet er væk, mens der ikke skal aflæses", A.el.aflaes.hidden && A.fase() === "taend");
+    paastand("over brænderen står skiltet: Klik for at tænde", skilte(A).indexOf(D.SKILT.taend) >= 0 && /Klik/.test(D.SKILT.taend), skilte(A).join("|"));
     var brn = A.brnPos();
     traek(A, brn.x, brn.y, brn.x, 30);
     paastand("brænderen vendes vandret, mens den holdes", A.brn.v > 1.0, A.brn.v.toFixed(2));
@@ -282,8 +357,8 @@ function koerTest(W) {
     paastand("den gløder, der kommer gnister, og vægten stiger", A.uld.frontAndel(A.klump.p) > 0 && A.gnister.antal() > 0 && A.klump.visning() > A.proeve,
         A.uld.frontAndel(A.klump.p).toFixed(2) + " " + A.gnister.antal() + " " + A.klump.visning());
     paastand("luppen: ilten sætter sig på jernatomerne", A.lup.reageret() > 0, A.lup.reageret());
-    felt(0, "e", komma(A.klump.visning()));
-    paastand("m(efter), mens den gløder: vent", A.noteret.me === null && /gløder stadig|stiger stadig/.test(besked(A)), besked(A));
+    paastand("mens den gløder: intet felt, linjen siger iltflasken, og over flasken står skiltet: Klik for mere ilt",
+        A.fase() === "vent" && A.el.aflaes.hidden && /iltflasken/.test(besked(A)) && skilte(A).indexOf(D.SKILT.ilt) >= 0, besked(A) + " " + skilte(A).join("|"));
     var rate0 = A.klump.rate;
     klik(A, A.lay.flGeo.x0 + A.lay.flGeo.b / 2, A.lay.flGeo.y0 + A.lay.flGeo.h * 0.6);
     tik(A, 0.2);
@@ -294,35 +369,41 @@ function koerTest(W) {
         tik(A, 0.25);
     }
     tik(A, 8);
-    paastand("vægten står stille, og linjen siger: aflæs m(efter)", A.fase() === "efter" && /m\(efter\)/.test(besked(A)), A.fase() + " " + besked(A));
+    paastand("vægten står stille: feltet til m(efter) kommer, og linjen siger: aflæs den",
+        A.fase() === "efter" && /Vægten står stille/.test(besked(A)) && !A.el.aflaes.hidden && /m\(efter\)/.test(A.el.aflaesNavn.textContent), A.fase() + " " + besked(A));
     paastand("med ilt hele vejen står vægten på det, modellen siger", A.klump.p === 1 && A.klump.visning() === K.slutVisning(A.proeve, A.klump.udbytte));
     var maks = Math.floor(NK.Tegn.LUP_ATOMER * A.klump.udbytte / 2) * 2;
     paastand("luppen: den inderste del af jernet har ikke reageret", A.lup.reageret() === maks && maks < NK.Tegn.LUP_ATOMER, A.lup.reageret() + " af " + NK.Tegn.LUP_ATOMER);
-    felt(0, "e", komma(A.proeve));
-    paastand("m(før) i m(efter)-feltet afvises", A.noteret.me === null && /Det er m\(før\)/.test(besked(A)), besked(A));
-    felt(0, "e", komma(A.klump.visning()));
-    paastand("måling 1 er løst, gættet forklares, og målingen er gemt", A.faerdig && /Du gættede: lettere/.test(besked(A)) && /tog .* g på/.test(besked(A)) &&
-        NK.maalinger[0] && NK.maalinger[0].me === A.klump.visning(), besked(A));
+    felt(komma(A.proeve));
+    paastand("m(før) i feltet til m(efter) afvises", A.noteret.me === null && /Det er m\(før\)/.test(besked(A)), besked(A));
+    felt(komma(A.klump.visning()));
+    paastand("måling 1 er løst, linjen forklarer, hvorfor gættet ikke holdt, og målingen er gemt", A.faerdig && /tog .* g på/.test(besked(A)) && /Brænde bliver lettere/.test(besked(A)) &&
+        /Løst/.test(besked(A)) && NK.maalinger[0] && NK.maalinger[0].me === A.klump.visning(), besked(A));
+    paastand("knappen går videre til næste måling", /Næste måling/.test(A.el.knap.textContent) && A.el.knap.classList.contains("videre"), A.el.knap.textContent);
     paastand("under skemaet: Den blev tungere", /Den blev tungere/.test(d.getElementById("forsoeg-gaetlinje").textContent));
-    paastand("skemaet viser, hvor meget stålulden tog på", /tog .* g på/.test(d.getElementById("forsoeg-note").textContent), d.getElementById("forsoeg-note").textContent);
+    paastand("skemaet viser begge tal, og hvor meget stålulden tog på", /tog .* g på/.test(d.getElementById("forsoeg-note").textContent) &&
+        d.getElementById("forsoeg-e0").textContent === komma(A.klump.visning()) + " g", d.getElementById("forsoeg-note").textContent);
+    paastand("listen viser måling 1 som løst med grønt", d.querySelectorAll("#forsoeg-liste .hyldelinje")[0].classList.contains("loest"));
     paastand("fane 2 regner nu på den egne måling", B.opg.tal.egen && B.opg.tal.mf === NK.maalinger[0].mf);
 
     /* Maaling 2 med hint og svar hele vejen */
     A.knap();
-    paastand("Næste opgave: måling 2 uden gæt og med en anden klump", A.nr === 1 && A.fase() === "foer" && !synlig(gaet) && A.proeve !== NK.maalinger[0].mf, A.fase());
+    paastand("Næste måling: måling 2 uden gæt og med en anden klump", A.nr === 1 && A.fase() === "foer" && !synlig(gaet) && A.proeve !== NK.maalinger[0].mf, A.fase());
     var svar = 0, set = {};
     while (!A.faerdig && svar++ < 60) {
         if (A.auto) { paastand("mens Vis svaret virker, kan knappen ikke trykkes", A.el.knap.disabled); tik(A, 2); continue; }
         var fa = A.fase();
         A.knap();
-        if (!set[fa]) paastand("Giv hint i fasen " + fa + ": Kemichael siger hintet", A.k.taler() && /Hint/.test(A.k.tekst()), A.k.tekst());
+        if (!set[fa]) paastand("Giv hint i fasen " + fa + ": hintet står i statuslinjen", /^\s*Hint/.test(besked(A)) && A.el.status.classList.contains("hint") && A.el.knap.textContent === "Vis svaret", besked(A));
         set[fa] = true;
         A.knap();
         tik(A, 1.5);
     }
+    paastand("alle fire faser har et hint", ["foer", "taend", "vent", "efter"].every(function (x) { return set[x]; }), Object.keys(set).join(","));
     paastand("Vis svaret hele vejen løser måling 2 uden stjerne", A.faerdig && !A.status[1].stjerne && NK.maalinger[1] !== null, besked(A));
     paastand("uden ilt gik den ud: vægten viser mindre end med ilt, og linjen siger det",
         A.klump.ude && A.klump.p < 1 && A.klump.visning() < K.slutVisning(A.proeve, A.klump.udbytte) && /Uden iltflasken/.test(besked(A)), besked(A));
+    paastand("efter sidste måling går knappen videre til Beregningen", /Beregningen/.test(A.el.knap.textContent), A.el.knap.textContent);
 
     /* Start forfra og tænd, før m(før) er skrevet */
     A.forfra();
@@ -330,8 +411,8 @@ function koerTest(W) {
     klik(A, A.lay.brn.x, A.lay.brn.y);
     tik(A, 2);
     paastand("et klik på brænderen: den flyver selv hen og tænder", A.klump.taendt, besked(A));
-    paastand("tændt uden m(før): linjen siger det", /m\(før\) står ikke i skemaet/.test(besked(A)), besked(A));
-    felt(1, "f", komma(A.proeve));
+    paastand("tændt uden m(før): linjen siger det, og feltet til m(før) står der stadig", /m\(før\) mangler/.test(besked(A)) && !A.el.aflaes.hidden && /m\(før\)/.test(A.el.aflaesNavn.textContent), besked(A));
+    felt(komma(A.proeve));
     paastand("m(før) kan stadig skrives, hvis man så den", A.noteret.mf === A.proeve);
     tik(A, 60);
     var pUde = A.klump.p;
@@ -340,27 +421,21 @@ function koerTest(W) {
     paastand("gået ud: brænderen kan ikke tænde den igen, og det siges", A.klump.ude && A.klump.p === pUde && /kan ikke tændes igen/.test(besked(A)), besked(A));
     klik(A, A.lay.flGeo.x0 + A.lay.flGeo.b / 2, A.lay.flGeo.y0 + A.lay.flGeo.h * 0.6);
     paastand("gået ud: iltflasken siger, at ilten skal på, mens den gløder", A.klump.ilt === 0 && /mens den gløder/.test(besked(A)), besked(A));
-    if (A.lay.stjGeo) {
-        klik(A, A.lay.stjGeo.x + A.lay.stjGeo.b / 2, A.lay.stjGeo.y + A.lay.stjGeo.h * 0.3);
-        var t1 = A.k.tekst();
-        tik(A, 0.5);
-        klik(A, A.lay.stjGeo.x + A.lay.stjGeo.b / 2, A.lay.stjGeo.y + A.lay.stjGeo.h * 0.3);
-        paastand("påskeægget: stjernekasteren tænder, og Kemichael siger det samme hver gang: gnisterne er jern",
-            A.stjerneT > 0 && t1 === D.STJERNE && A.k.tekst() === D.STJERNE && /jern/.test(D.STJERNE), A.k.tekst());
-    }
 
-    overskrift("8. Fane 2: beregningen");
+    overskrift("8. Fane 2: skemaet og beregningen (Let)");
     NK.visFane("fane-beregning");
+    B.vaelgSkema("let");
     B.tilpas(); B.layout();
-    var FORMLER = { n_fe: "n(Fe) = m(Fe)/M(Fe)", n_feo: "n(FeO) = n(Fe)", m_feo: "m(FeO) = n(FeO)·M(FeO)" };
+    var FORMLER = { let: { n_fe: "n(Fe) = m(Fe)/M(Fe)", n_ox: "n(FeO) = n(Fe)", m_ox: "m(FeO) = n(FeO)·M(FeO)" },
+                    svaer: { n_fe: "n(Fe) = m(Fe)/M(Fe)", n_ox: "n(Fe3O4) = n(Fe)/3", m_ox: "m(Fe3O4) = n(Fe3O4)·M(Fe3O4)" } };
     function loesB(i, omvendt) {
         B.vaelg(i, false);
         var R = B.regning, n = 0, t;
         while ((t = R.aktivt()) && n++ < 30) {
-            if (t.fase === "formel") { t.input.value = FORMLER[t.id]; R.tjek(); }
+            if (t.fase === "formel") { t.input.value = FORMLER[B.variant][t.id]; R.tjek(); }
             else if (t.fase === "indsaet") {
                 var led = T.led(t.id, B.opg);
-                var byt = omvendt && D.TRIN[t.id].op === "*";
+                var byt = omvendt && T.def(t.id, B.opg.sk).op === "*";
                 t.inputs[0].value = led[byt ? 1 : 0].tekst; t.inputs[1].value = led[byt ? 0 : 1].tekst;
                 R.tjek();
             } else { t.input.value = T.facitTekst(t.id, B.opg); R.tjek(); }
@@ -368,22 +443,43 @@ function koerTest(W) {
         tik(B, 1);
     }
     B.vaelg(0, false);
+    var kortB = d.getElementById("beregning-kort"), blok = d.getElementById("beregning-hjaelp");
     paastand("måling 1 har tre trin, og det første starter med formlen", B.regning.felter.length === 3 && B.regning.aktivt().fase === "formel");
-    paastand("Kemichael siger intet, når opgaven vælges", !B.k.taler());
-    paastand("over tavlen står spørgsmålet", !!B.lay.ot && B.lay.ot.linjer.join(" ") === D.OVER_TAVLE);
+    paastand("over tavlen står spørgsmålet med FeO", !!B.lay.ot && B.lay.ot.linjer.join(" ") === D.OVER_TAVLE.replace("{ox}", "FeO"), B.lay.ot.linjer.join(" "));
+    var S = B.skema;
+    paastand("skemaet på tavlen: m(Fe) er målingen, og de to molarmasser står under hvert sit stof",
+        S.celle("fe_m").tekst === komma(B.opg.tal.mf) + " g" && S.celle("fe_m").slags === "kendt" && S.celle("fe_M").tekst === "55,85 g/mol" && S.celle("ox_M").tekst === "71,85 g/mol",
+        S.celle("fe_m").tekst + " " + S.celle("fe_M").tekst + " " + S.celle("ox_M").tekst);
+    paastand("skemaet: de tre celler, der regnes, står med spørgsmålstegn, og den første er den, man er ved",
+        S.celle("fe_n").slags === "aktiv" && S.celle("ox_n").slags === "laast" && S.celle("ox_m").slags === "laast" && S.celle("o2_m").slags === "tom");
+    paastand("skemaet har ingen pile, før noget er regnet", Object.keys(S.pile).length === 0);
+    paastand("linjen og hint-knappen står lige under det trin, man er ved", blok.parentNode === d.querySelector("#beregning-raekker .raekke.aktiv") &&
+        B.el.knap.parentNode === blok && /Trin 1 af 3/.test(besked(B)), besked(B));
+    paastand("et klik på en celle i skemaet forklarer den", /Molarmassen af jern/.test(B.celleTekst("fe_M")) && /trin 1/.test(B.celleTekst("fe_n")) && /FeO/.test(B.celleTekst("ox_M")), B.celleTekst("fe_n"));
     B.knap();
-    paastand("Giv hint i formlen: halvdelen af formlen", /n\(Fe\) = m\(Fe\) \/ …/.test(B.k.tekst()), B.k.tekst());
+    paastand("Giv hint i formlen: halvdelen af formlen, i linjen under feltet", /Hint/.test(besked(B)) && /n\(Fe\) = m\(Fe\) \/ …/.test(besked(B)) && B.el.besked.classList.contains("hint"), besked(B));
     B.knap();
-    paastand("Vis svaret: formlen, og så mellemregningen", /Formlen/.test(B.k.tekst()) && B.regning.aktivt().fase === "indsaet", B.k.tekst());
+    paastand("Vis svaret: formlen, og så mellemregningen", /Svaret/.test(besked(B)) && /Formlen/.test(besked(B)) && B.regning.aktivt().fase === "indsaet", besked(B));
     B.knap();
-    paastand("Giv hint i mellemregningen: tallet over brøkstregen", /Over brøkstregen står massen af stålulden: 4,00 g|Over brøkstregen/.test(B.k.tekst()), B.k.tekst());
+    paastand("Giv hint i mellemregningen: tallet over brøkstregen med tal og enhed", /Over brøkstregen/.test(besked(B)) && besked(B).indexOf(komma(B.opg.tal.mf) + " g") >= 0 && !/[{}]/.test(besked(B)), besked(B));
     var fB = B.regning.aktivt();
     fB.inputs[0].value = "55,85 g/mol";
     enter(fB.inputs[0]);
-    paastand("molarmassen over brøkstregen: vendt om", /vendt om/.test(besked(B)), besked(B));
+    paastand("molarmassen over brøkstregen: vendt om, linjen er rød, og hint-knappen lyser",
+        /vendt om/.test(besked(B)) && B.el.besked.classList.contains("skidt") && B.el.knap.classList.contains("peg"), besked(B));
+    var R1 = B.regning;
+    R1.aktivt().inputs[0].value = T.led("n_fe", B.opg)[0].tekst; R1.aktivt().inputs[1].value = T.led("n_fe", B.opg)[1].tekst; R1.tjek();
+    R1.aktivt().input.value = T.facitTekst("n_fe", B.opg); R1.tjek();
+    tik(B, 1);
+    paastand("trin 1 løst: n(Fe) står i skemaet, pilen ÷ M er tegnet, og det næste spørgsmålstegn er det, man er ved",
+        S.celle("fe_n").slags === "ok" && S.celle("fe_n").tekst === T.facitTekst("n_fe", B.opg) && S.pile.n_fe === 1 && S.celle("ox_n").slags === "aktiv", S.celle("fe_n").slags + " " + S.pile.n_fe);
+    paastand("trin 1 er grønt i panelet, og linjen er flyttet ned under trin 2",
+        d.querySelectorAll("#beregning-raekker .raekke")[0].classList.contains("loest") && blok.parentNode === d.querySelectorAll("#beregning-raekker .raekke")[1]);
     loesB(0, true);
     paastand("efter tre trin kommer spørgsmålet med tre svar", !B.faerdig && B.spmAabent() && d.querySelectorAll("#beregning-valg .knap").length === 3 && /Vælg et af svarene/.test(besked(B)), besked(B));
-    paastand("søjlen Regnet ud står der nu", B.s.teori === true);
+    paastand("skemaet er fyldt ud med alle tre pile, og søjlen Regnet ud står der", S.pile.n_fe === 1 && S.pile.n_ox === 1 && S.pile.m_ox === 1 &&
+        S.celle("ox_m").tekst === T.facitTekst("m_ox", B.opg) && S.celle("ox_m").slags === "ok" && B.s.teori === true);
+    paastand("linjen og knappen står nu nederst i kortet, under svarene", blok.parentNode === kortB && blok.previousElementSibling === d.getElementById("beregning-valg"));
     d.querySelectorAll("#beregning-valg .knap")[0].click();
     paastand("et forkert svar forklares, og knappen låses", !B.faerdig && /3000/.test(besked(B)) && d.querySelectorAll("#beregning-valg .knap")[0].disabled, besked(B));
     d.querySelectorAll("#beregning-valg .knap")[1].click();
@@ -394,23 +490,63 @@ function koerTest(W) {
     loesB(1, false);
     paastand("måling 2 kan løses, og slutlinjen sammenligner med måling 1", B.faerdig && /måling 1/.test(besked(B)), besked(B));
     paastand("efter sidste opgave går knappen tilbage til Forsøget", /Forsøget/.test(B.el.knap.textContent), B.el.knap.textContent);
+    var pctLet = K.facit({ tal: NK.maaling(0), sk: LET }).pct;
 
-    overskrift("9. Kemichael");
+    overskrift("9. Fane 2: omskifteren Svær");
+    var skift = d.getElementById("beregning-skift"), knapper = skift.querySelectorAll(".niveauknap");
+    paastand("omskifteren har Let og Svær, og Let er valgt", knapper.length === 2 && knapper[0].textContent === "Let" && knapper[1].textContent === "Svær" &&
+        knapper[0].classList.contains("aktiv") && !knapper[1].classList.contains("aktiv"));
+    knapper[1].click();
+    tik(B, 0.2);
+    paastand("Svær: reaktionsskemaet er 3 Fe + 2 O₂ → Fe₃O₄, og spørgsmålet over tavlen følger med",
+        B.variant === "svaer" && B.opg.sk.reaktion === "3 Fe + 2 O₂ → Fe₃O₄" && /Fe₃O₄/.test(B.lay.ot.linjer.join(" ")) && knapper[1].classList.contains("aktiv"), B.lay.ot.linjer.join(" "));
+    paastand("Svær har sine egne opgaver: ingen er løst endnu, og regnestykket er begyndt forfra", B.antalLoest() === 0 && B.regning.k === 0 && !B.faerdig && d.getElementById("beregning-loest").textContent === "0");
+    paastand("Svær: molarmassen af Fe₃O₄ står i skemaet", S.celle("ox_M").tekst === "231,55 g/mol", S.celle("ox_M").tekst);
+    B.vaelg(0, false);
+    var R2 = B.regning;
+    R2.aktivt().input.value = FORMLER.svaer.n_fe; R2.tjek();
+    R2.aktivt().inputs[0].value = T.led("n_fe", B.opg)[0].tekst; R2.aktivt().inputs[1].value = T.led("n_fe", B.opg)[1].tekst; R2.tjek();
+    R2.aktivt().input.value = T.facitTekst("n_fe", B.opg); R2.tjek();
+    R2.aktivt().input.value = "n(Fe3O4) = n(Fe)";
+    R2.tjek();
+    paastand("Svær, trin 2: n(Fe₃O₄) = n(Fe) afvises med forholdet 3 : 1", R2.aktivt().fase === "formel" && /3 : 1/.test(besked(B)), besked(B));
+    B.knap();
+    paastand("Svær, hint til trin 2: forholdet 3 : 1, og formlen begynder n(Fe₃O₄) = n(Fe) / …", /3 : 1/.test(besked(B)) && /n\(Fe₃O₄\) = n\(Fe\) \/ …/.test(besked(B)) && !/[{}]/.test(besked(B)), besked(B));
+    R2.aktivt().input.value = FORMLER.svaer.n_ox; R2.tjek();
+    paastand("Svær, trin 2 har en brøk, hvor feltet under stregen kun skal have et tal",
+        R2.aktivt().fase === "indsaet" && R2.aktivt().inputs[0].placeholder === "tal og enhed" && R2.aktivt().inputs[1].placeholder === "tal");
+    R2.aktivt().inputs[0].value = T.led("n_ox", B.opg)[0].tekst; R2.aktivt().inputs[1].value = "3 mol"; R2.tjek();
+    paastand("Svær: 3 mol under brøkstregen: tallet har ingen enhed", /ingen enhed/.test(besked(B)), besked(B));
+    R2.aktivt().inputs[1].value = "3"; R2.tjek();
+    R2.aktivt().input.value = T.facitTekst("n_ox", B.opg); R2.tjek();
+    tik(B, 1);
+    paastand("Svær, trin 2 løst: pilen på tværs er tegnet, og n(Fe₃O₄) er en tredjedel af n(Fe)",
+        S.pile.n_ox === 1 && S.celle("ox_n").slags === "ok" && T.naer(B.opg.facit.nOx * 3, B.opg.facit.nV, 1e-9), S.celle("ox_n").tekst);
+    loesB(0, false);
+    d.querySelectorAll("#beregning-valg .knap")[1].click();
+    var pctSvaer = B.opg.facit.pct;
+    paastand("Svær, måling 1 kan løses: der regnes mere ud end i Let, så en mindre del af jernet har reageret",
+        B.faerdig && B.status[0].stjerne && pctSvaer < pctLet && /Regnet ud: /.test(besked(B)), pctSvaer.toFixed(0) + " mod " + pctLet.toFixed(0) + ". " + besked(B));
+    var gemtB = NK.hent("nk-sc4.8-beregning", {});
+    paastand("de løste opgaver gemmes for hvert skema for sig, og valget af skema huskes", !!gemtB.m1 && !!gemtB.m2 && !!gemtB.m1_svaer && !gemtB.m2_svaer && NK.hent("nk-sc4.8-skema", "") === "svaer",
+        Object.keys(gemtB).join(","));
+    loesB(1, true);
+    paastand("Svær, måling 2 kan løses", B.faerdig && B.antalLoest() === 2, besked(B));
+    knapper[0].click();
+    paastand("tilbage på Let: begge opgaver er stadig løst der", B.variant === "let" && B.antalLoest() === 2 && /FeO\?/.test(B.lay.ot.linjer.join(" ")));
+
+    overskrift("10. Hjælpen uden lærer");
     B.vaelg(0, false);
     var fr = B.regning.aktivt();
     fr.input.value = "m*M";
     enter(fr.input);
-    paastand("en forkert formel står i kortet, ikke hos Kemichael", !B.k.taler() && /ganget/.test(besked(B)), besked(B));
-    B.k.sendUd();
-    tik(B, 3);
-    paastand("sendt ud: knappen hedder Hent Kemichael på begge faner", [A, B].every(function (s) { return s.k.knap.textContent === "Hent Kemichael"; }));
-    B.knap();
-    paastand("hintet står i kortet, når han er ude", /Hint:/.test(besked(B)) && !B.k.taler(), besked(B));
-    B.k.hentInd();
-    tik(B, 4);
-    paastand("hentet ind igen", B.k.inde() && B.k.knap.textContent === "Send Kemichael ud");
+    paastand("en forkert formel forklares i linjen lige under feltet", /ganget/.test(besked(B)) && B.el.besked.parentNode.parentNode === d.querySelector("#beregning-raekker .raekke.aktiv"), besked(B));
+    paastand("fane 1 har statuslinjen i scenen med teksten og den ene knap; fane 2 har linjen i kortet",
+        !!A.el.status && A.el.status.parentNode === scene && A.el.besked.parentNode === A.el.status && !B.el.status && kortB.contains(B.el.knap));
+    paastand("der er én knap til hjælp på hver fane", d.querySelectorAll("#fane-forsoeg .knap.hjaelp, #fane-forsoeg .knap.videre").length === 1 &&
+        d.querySelectorAll("#fane-beregning .knap.hjaelp, #fane-beregning .knap.videre").length === 1);
 
-    overskrift("10. Layout");
+    overskrift("11. Layout");
     var ramme = window.document.getElementById("ramme");
     var str = [[520, 380], [800, 600], [1100, 700], [1300, 820], [1500, 900]];
     var problemer = [];
@@ -427,31 +563,52 @@ function koerTest(W) {
                 if (L.zoom.x + L.zoom.r > Wc + 1) problemer.push(navn + " luppen");
                 if (L.fl.x + L.fl.b / 2 > L.zoom.x - L.zoom.r + 4) problemer.push(navn + " flasken rammer luppen");
                 if (L.brn.x + L.brn.b / 2 > L.v.x - L.v.b / 2) problemer.push(navn + " brænderen rammer vægten");
-                if (NK.Tegn.bunsenMund(L.brn.x, L.brn.y, L.brn.h, 0).y - NK.Tegn.flammeLaengde(L.brn.h) < 0) problemer.push(navn + " flammen");
+                if (L.brnRamme.y - 46 < 0) problemer.push(navn + " skiltet over brænderen");
                 if (L.uld.cy - L.uld.ry < 20) problemer.push(navn + " stålulden");
                 if (L.bordY - L.fl.h < 0) problemer.push(navn + " flasken");
                 if (L.zoom.y - L.zoom.r < 26) problemer.push(navn + " luppens titel");
+                if (L.Hs !== Hc - 76) problemer.push(navn + " statuslinjens bånd " + (Hc - L.Hs));
+                if (L.bordY > L.Hs - 14) problemer.push(navn + " bordets forkant");
             } else {
+                var SL = sim.skema.lay;
                 if (L.tavle.x + L.tavle.b > Wc || L.tavle.h < 120) problemer.push(navn + " tavlen " + Math.round(L.tavle.h));
                 if (L.tavle.y + L.tavle.h + 10 > L.bordY - L.sh) problemer.push(navn + " tavlen rammer søjlerne");
                 if (L.soejler[2].x + L.soejler[2].b / 2 > Wc) problemer.push(navn + " søjlerne");
+                if (SL.x0 < L.tavle.x || SL.x0 + SL.samlet > L.tavle.x + L.tavle.b + 1) problemer.push(navn + " skemaet er bredere end tavlen");
+                if (SL.bund + SL.rh * 0.9 > L.tavle.y + L.tavle.h + 1) problemer.push(navn + " pilen under skemaet");
+                if (SL.feltB < 60 || SL.feltPx < 13) problemer.push(navn + " cellerne " + SL.feltB + "/" + SL.feltPx);
+                /* Spoergsmaalet over tavlen maa ikke ligge under omskifteren */
+                var sk = d.getElementById("beregning-skift"), ctx = sim.L.ctx, bredest = 0;
+                ctx.font = "600 " + L.ot.px + "px 'Segoe UI', sans-serif";
+                L.ot.linjer.forEach(function (l) { bredest = Math.max(bredest, ctx.measureText(l).width); });
+                if (30 + bredest > sk.offsetLeft - 2) problemer.push(navn + " spørgsmålet rammer omskifteren " + Math.round(30 + bredest) + " > " + sk.offsetLeft);
+                if (L.ot.px < 12) problemer.push(navn + " spørgsmålets skrift " + L.ot.px);
             }
             try { sim.tegn(); } catch (e) { problemer.push(navn + " tegn: " + e.message); }
             if (!(Hc > 100)) problemer.push(navn + " højde " + Hc);
         });
     });
-    /* Gaettets kort skal kunne ses helt, ogsaa paa en lille skaerm */
+    /* Statuslinjen: tekst, felt og knap paa én linje ved 1100 × 700 */
+    ramme.style.width = "1100px";
+    ramme.style.height = "700px";
+    NK.visFane("fane-forsoeg");
+    A.forfra();
+    A.tilpas(); A.layout();
+    var rf = A.el.aflaes.getBoundingClientRect(), rk = A.el.knap.getBoundingClientRect(), rt = A.el.besked.getBoundingClientRect();
+    if (A.el.aflaes.hidden) problemer.push("1100×700 feltet mangler");
+    else if (Math.abs(rf.top + rf.height / 2 - (rk.top + rk.height / 2)) > 8 || rk.top > rt.bottom) problemer.push("1100×700 statuslinjen ombryder");
+    if (A.el.status.offsetHeight > 80) problemer.push("1100×700 statuslinjen er " + A.el.status.offsetHeight + " px høj");
+    /* Startskaermens kort skal kunne ses helt, ogsaa paa en lille skaerm */
     A.gaet = null;
     A.status[0].loest = false;
-    NK.visFane("fane-forsoeg");
     A.vaelg(0, false);
-    [[800, 600], [1300, 820]].forEach(function (s) {
+    [[800, 600], [1100, 700], [1300, 820]].forEach(function (s) {
         ramme.style.width = s[0] + "px";
         ramme.style.height = s[1] + "px";
         A.tilpas(); A.layout();
         var g = d.getElementById("forsoeg-gaet");
-        if (!synlig(g)) problemer.push(s[0] + "×" + s[1] + " gættet vises ikke");
-        else if (g.scrollHeight > g.clientHeight + 2) problemer.push(s[0] + "×" + s[1] + " gættets kort er for høje");
+        if (!synlig(g)) problemer.push(s[0] + "×" + s[1] + " startskærmen vises ikke");
+        else if (g.scrollHeight > g.clientHeight + 2) problemer.push(s[0] + "×" + s[1] + " startskærmens kort er for høje");
     });
     ramme.style.width = "1300px";
     ramme.style.height = "820px";

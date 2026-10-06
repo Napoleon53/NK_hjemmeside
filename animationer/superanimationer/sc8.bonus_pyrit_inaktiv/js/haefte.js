@@ -7,7 +7,9 @@
    grundstof efter pilen (kun dér har klammen en pilespids), og midt paa
    klammen, under reaktionspilen, staar stigningen (↑) eller faldet (↓)
    for ét atom med gangetallet og antallet af atomer foran:
-   "2 · 2 ↑7 = 28" og "7 · 2 ↓2 = 28" (2 FeS₂ med 2 S, der hver stiger 7).
+   "2 · 2 S ↑7 = 28" og "7 · 2 O ↓2 = 28" (2 FeS₂ med 2 S, der hver
+   stiger 7). Antallet af atomer taeller eleven selv, og imens lyser det
+   lille tal i formlen (S₂).
    Under hver side staar ladningen, H-atomerne og til sidst O-atomerne
    som kontrol.
 
@@ -25,6 +27,7 @@
      ox<led>_<E>     oxidationstallet over atomet E i led nr.
      for<led>        tallet foran et led (forafstemning og det, der foelger med)
      kl<k>, g<k>     stigningen eller faldet og gangetallet ved klamme k
+     n<k>            antallet af atomer i formlen foer pilen ved klamme k
      lad-v, lad-h    ladningen foer og efter pilen
      ion-v, ion-h    H⁺ foer og efter pilen
      brint-v, brint-h  H-atomerne foer og efter pilen
@@ -155,9 +158,15 @@
             var g = lav("span", "hf-gange");
             g.appendChild(mig.lavFelt("g" + k, "g", "Gangetallet ved klammen for " + K.E));
             g.appendChild(lav("span", "hf-gtal"));
-            /* Antallet af atomer paa klammen, naar der er flere end ét: "· 2" */
-            g.appendChild(lav("span", "hf-antal"));
+            g.appendChild(lav("span", "hf-prik", "·"));
             e.appendChild(g);
+            /* Antallet af atomer i formlen foer pilen, naar der er flere end
+               ét: "2 S". Eleven taeller dem selv (bidden antal). */
+            var an = lav("span", "hf-antal");
+            an.appendChild(mig.lavFelt("n" + k, "n", "Antallet af " + K.E + " i " + R.led[K.v].st.tekst));
+            an.appendChild(lav("span", "hf-ntal"));
+            an.appendChild(lav("span", "hf-nsym", K.E));
+            e.appendChild(an);
             var knap = lav("button", "hf-pilknap", "↕");
             knap.type = "button";
             knap.title = "Klik for at vende pilen";
@@ -206,7 +215,8 @@
          pil(k)         true (op), false (ned) eller null
          pilLaast(k)    stigningen eller faldet er fundet
          gange          gangetallene kan ses
-         antal(k)       teksten "· 2", naar der er flere atomer paa klammen
+         antal(k)       antallet af atomer ("2 S") staar ved klammen
+         taeller(k)     hvor det lille tal i formlen lyser: "v", "vh" eller ""
          prod(k)        teksten "= 28" ved klammen
          ekstra(slags, side)  "felt", "tal" eller "" (skjult)
          rad(r)         raekken kan ses
@@ -280,7 +290,22 @@
             var g = e.querySelector(".hf-gtal");
             g.textContent = gt ? String(gt.v) : "";
             g.className = "hf-gtal" + (gt ? " " + gt.slags : "");
-            gs.querySelector(".hf-antal").textContent = v.antal ? v.antal(k) : "";
+            /* Antallet af atomer: "2 S" foran pilen, og en prik efter gangetallet */
+            var medAntal = !!(v.antal && v.antal(k));
+            var an = e.querySelector(".hf-antal");
+            an.hidden = !medAntal;
+            gs.querySelector(".hf-prik").hidden = !medAntal;
+            saetFelt("n" + k);
+            var nt = v.tal("n" + k);
+            var ntal = an.querySelector(".hf-ntal");
+            ntal.textContent = nt ? String(nt.v) : "";
+            ntal.className = "hf-ntal" + (nt ? " " + nt.slags : "");
+            /* Det lille tal i formlen lyser, mens atomerne taelles */
+            var hvor = v.taeller ? v.taeller(k) : "";
+            [["v", K.v], ["h", K.h]].forEach(function (x) {
+                var pl = mig.led[x[1]].pladser["ox" + x[1] + "_" + K.E];
+                if (pl && pl.idx) pl.idx.classList.toggle("taeller", hvor.indexOf(x[0]) >= 0);
+            });
             var pr = e.querySelector(".hf-prod");
             var prod = v.prod(k);
             pr.textContent = prod.tekst || "";
@@ -402,6 +427,20 @@
         while (svg.firstChild) svg.removeChild(svg.firstChild);
         var sidsteY = bund + vs * 0.1;
 
+        /* Etiketterne staar midt under reaktionspilen. Er den bredeste for
+           bred til det, faar de alle samme venstre kant lige efter den
+           sidste lodrette streg foer pilen, saa ingen etiket daekker en
+           streg, og felterne staar under hinanden. */
+        var lodV = -Infinity, lodH = Infinity, bredest = 0;
+        R.K.forEach(function (K, k) {
+            var a = mig.led[K.v].pladser["ox" + K.v + "_" + K.E], b = mig.led[K.h].pladser["ox" + K.h + "_" + K.E];
+            if (a) lodV = Math.max(lodV, rect(a.sym, o).cx);
+            if (b) lodH = Math.min(lodH, rect(b.sym, o).cx);
+            if (v.klammer) bredest = Math.max(bredest, mig.etiket[k].offsetWidth);
+        });
+        var luft = fs * 0.4;
+        var kant = pil.cx - bredest / 2 < lodV + luft || pil.cx + bredest / 2 > lodH - luft ? lodV + luft : null;
+
         R.K.forEach(function (K, k) {
             var y = bund + vs * (0.62 + 1.5 * k);
             sidsteY = y;
@@ -428,10 +467,11 @@
             /* Etiketten midt under reaktionspilen, og ordet oxidation eller
                reduktion lige under den */
             var e = mig.etiket[k];
-            e.style.left = pil.cx.toFixed(1) + "px";
+            var ex = kant === null ? pil.cx : kant + e.offsetWidth / 2;
+            e.style.left = ex.toFixed(1) + "px";
             e.style.top = y.toFixed(1) + "px";
             var tg = mig.tag[k];
-            tg.style.left = pil.cx.toFixed(1) + "px";
+            tg.style.left = ex.toFixed(1) + "px";
             tg.style.top = (y + fs * 0.42 + 3).toFixed(1) + "px";
         });
 

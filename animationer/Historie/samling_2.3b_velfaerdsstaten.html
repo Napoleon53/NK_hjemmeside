@@ -62,12 +62,9 @@
         /* Titlen i headeren */
         .header-text {
             font-weight: bold;
-            font-size: 0.85em;
-            letter-spacing: 0.5px;
+            font-size: 0.9em;
+            letter-spacing: 1px;
             white-space: nowrap;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         /* Skjul teksten når menuen er lukket */
@@ -95,12 +92,11 @@
         .header-actions {
             display: flex;
             align-items: center;
-            flex-shrink: 0;
+            gap: 2px;
         }
 
-        .header-actions .toggle-btn {
-            font-size: 18px;
-            padding: 3px;
+        .link-btn {
+            font-size: 16px;
         }
 
         .sidebar.collapsed .link-btn {
@@ -260,30 +256,6 @@
             text-decoration: underline;
         }
 
-
-        /* Fuld skaerm: sidepanelet skjules helt, naar en superanimation vises,
-           og knappen i oeverste venstre hjoerne gendanner det */
-        .sidebar.skjult { width: 0; border-right: none; }
-        .gendan-knap {
-            position: absolute;
-            left: 10px;
-            top: 10px;
-            z-index: 5;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            background-color: rgba(26, 37, 47, 0.75);
-            color: #ffffff;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        .gendan-knap:hover { background-color: rgba(52, 152, 219, 0.9); }
-        .content-area.fuld .gendan-knap { display: flex; }
-
     </style>
 </head>
 <body>
@@ -291,25 +263,19 @@
     <div class="main-layout">
         <div class="sidebar" id="sidebarMenu">
             <div class="sidebar-header">
-                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Redox</span>
+                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">2.3b Velfærd</span>
                 <div class="header-actions">
                     <button class="toggle-btn link-btn" onclick="kopierLink(this)" title="Kopiér link til denne animation">🔗</button>
                     <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
-                    <button class="toggle-btn fuld-btn" onclick="fuldSkaerm(true)" title="Fuld skærm: skjul panelet">⛶</button>
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="c8.1" data-beskrivelse="Sæt metalstænger i opløsninger af metalioner, stil spændingsrækken op ud fra forsøgene, og forudsig nye reaktioner." onclick="visAnimation(this, '../superanimationer/sc8.1_spaendingsraekken/index.html')" title="Spændingsrækken"><span class="btn-num">1</span><span class="btn-text">Spændingsrækken</span></button>
-            <button class="tab-btn" data-emne="c8.2" data-beskrivelse="Bestem oxidationstal med reglerne trin for trin, og se i elektronprikformler, hvor elektronerne ender, også i undtagelserne H₂O₂ og OF₂." onclick="visAnimation(this, '../superanimationer/sc8.2_oxidationstal/index.html')" title="Oxidationstal"><span class="btn-num">2</span><span class="btn-text">Oxidationstal</span></button>
-            <button class="tab-btn" data-emne="c8.3" data-beskrivelse="Afstem redoxreaktioner trin for trin med oxidationstal, elektroner, ladning og vand." onclick="visAnimation(this, '../superanimationer/sc8.4_redoxafstemning/index.html')" title="Afstem redoxreaktioner"><span class="btn-num">3</span><span class="btn-text">Afstem Redox</span></button>
-            <button class="tab-btn" data-emne="c8.4" data-beskrivelse="Afstem kaliumpermanganats reaktioner i surt, neutralt og basisk miljø, og find manganstoffet ud fra farven." onclick="visAnimation(this, '../superanimationer/sc8.5_kaliumpermanganat/index.html')" title="Kaliumpermanganat"><span class="btn-num">4</span><span class="btn-text">Kaliumpermanganat</span></button>
-            <button class="tab-btn" data-emne="c8.5" data-beskrivelse="Afvej ståluld, opløs den i syre, titrer med kaliumpermanganat og beregn jernindholdet." onclick="visAnimation(this, '../v2/superlab/sc8.6_jern_i_staaluld/index.html')" title="Forsøg: Jern i ståluld"><span class="btn-num">5</span><span class="btn-text">Jern i ståluld</span></button>
-            <button class="tab-btn" data-emne="c8.6" data-beskrivelse="Se, hvorfor rør af to metaller tæres ved samlingen, beskyt et skib med offeranoder, og afstem skemaerne for, hvordan jern ruster med vand, ilt og salt." onclick="visAnimation(this, '../superanimationer/sc8.6_korrosion/index.html')" title="Korrosion"><span class="btn-num">6</span><span class="btn-text">Korrosion</span></button>
+            <button class="tab-btn" data-emne="2.3b.1" data-beskrivelse="100 personer viser, hvad befolkningen levede af fra 1940 til 1989. Sortér erhvervene i sektorer, træk i årsskyderen, og find året, hvor industrien overhaler landbruget." onclick="visAnimation(this, 'velfaerd_fra_land_til_by/index.html')" title="Fra land til by 1940-1989"><span class="btn-num">1</span><span class="btn-text">Fra land til by</span></button>
+            <button class="tab-btn" data-emne="2.3b.2" data-beskrivelse="Du styrer økonomien gennem fire år fra storkonflikten i 1956 til løn- og prisstoppet i 1963. Læs avisen, vælg selv, se prisen, og sammenlign med regeringens valg." onclick="visAnimation(this, 'velfaerd_finansminister/index.html')" title="Finansminister 1953-1963"><span class="btn-num">2</span><span class="btn-text">Finansminister</span></button>
 
         </div>
 
         <div class="content-area">
-            <button class="gendan-knap" id="gendanKnap" onclick="fuldSkaerm(false)" title="Vis samlingen">☰</button>
             <div class="startside" id="startside">
                 <div class="startside-grid" id="startsideGrid"></div>
             </div>
@@ -323,8 +289,6 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
-            // Ingen automatisk fuld skaerm: menuen bliver staaende, indtil man selv
-            // trykker paa knappen i panelets hoved.
 
             var alleKnapper = document.querySelectorAll('.tab-btn');
             alleKnapper.forEach(btn => btn.classList.remove('active'));
@@ -335,7 +299,6 @@
             document.getElementById('visningsVindue').style.display = 'none';
             document.getElementById('startside').style.display = 'block';
             document.getElementById('sidebarMenu').classList.remove('collapsed');
-            fuldSkaerm(false);
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         }
 
@@ -354,29 +317,6 @@
         }
         byggStartside();
 
-        // Fuld skaerm: laboratorieforsoegene (superanimationer) faar hele vinduet.
-        // Sidepanelet skjules, og knappen i hjoernet gendanner det. Det ydre panel
-        // (samling_alt) faar besked, saa det ogsaa skjuler sit.
-        function fuldSkaerm(til) {
-            var menu = document.getElementById('sidebarMenu');
-            menu.classList.toggle('skjult', til);
-            if (!til) menu.classList.remove('collapsed');
-            document.querySelector('.content-area').classList.toggle('fuld', til);
-            if (window.parent !== window) {
-                window.parent.postMessage(til ? 'fuldSkaerm' : 'gendanPanel', '*');
-            }
-            markerFuldSkaerm();
-        }
-
-        // Animationen faar klassen samling-fuld paa <html> i fuld skaerm, saa den kan
-        // give plads til knappen i hjoernet. Saettes igen, hver gang en side er indlaest.
-        function markerFuldSkaerm() {
-            var iframe = document.getElementById('visningsVindue');
-            var til = document.querySelector('.content-area').classList.contains('fuld');
-            try { iframe.contentDocument.documentElement.classList.toggle('samling-fuld', til); } catch (e) {}
-        }
-        document.getElementById('visningsVindue').addEventListener('load', markerFuldSkaerm);
-
         function toggleMenu() {
             var menu = document.getElementById('sidebarMenu');
             menu.classList.toggle('collapsed');
@@ -385,7 +325,7 @@
         function kopierLink(btn) {
             var forrigeTekst = btn.textContent;
             var aktivKnap = document.querySelector('.tab-btn.active');
-            var url = new URL('../samling_alt.html', window.location.href);
+            var url = new URL('../samling_alt_historie.html', window.location.href);
             if (aktivKnap) {
                 url.search = '?emne=' + encodeURIComponent(aktivKnap.getAttribute('data-emne'));
             } else {
@@ -415,11 +355,9 @@
                 if (aliasKnap) {
                     aliasKnap.click();
                 } else {
-                    // Gamle numre findes via mappenavnet. c8.6 var Jern i ståluld før
-                    // omnummereringen 26. sept. 2026 og er fra 3. okt. 2026 Korrosion.
                     knapper.forEach(knap => {
-                        if (knap.getAttribute('onclick').includes(emneFil) && !document.querySelector('.tab-btn.active')) {
-                            knap.click();
+                        if (knap.getAttribute('onclick').includes(emneFil)) {
+                            visAnimation(knap, emneFil);
                         }
                     });
                 }

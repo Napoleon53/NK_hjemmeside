@@ -1,40 +1,26 @@
 /* =====================================================================
-   rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
+   rundvisning.js - spotlight-rundvisning på hjælpeknappen
 
-   Viser rundt paa den fane, man staar paa: ét element ad gangen med en
-   kort tekst. Fane 1 slutter med at pege paa den anden fane. Samme kode
-   som i sc1.1, sc4.5, sc5.1 og sc4.11; kun TURE er ny.
+   Viser rundt: ét element ad gangen med en kort tekst. Samme kode som i
+   superanimationerne; kun TUR er ny.
 
-   Hvert trin er en CSS-selector plus en titel og en kort tekst. Dele af
-   laerredet har et usynligt felt oven paa sig, som fanen selv flytter paa
-   plads (saetAnker i fane.js og sim_*.js).
+   Hvert trin er en CSS-selector (kan være flere, kommasepareret) plus
+   en titel og en kort tekst.
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
 
-    var TURE = {
-        "fane-forsoeg": [
-            { sel: "#forsoeg-anker-vaegt", titel: "Vægten", tekst: "Stålulden ligger på en varmefast plade, og vægten er nulstillet med pladen. Den viser altså kun stålulden." },
-            { sel: "#forsoeg-anker-braender", titel: "Bunsenbrænderen", tekst: "Klik på brænderen, så tænder den stålulden. Du kan også trække den hen, så flammen rører stålulden." },
-            { sel: "#forsoeg-anker-flaske", titel: "Iltflasken", tekst: "I luft går stålulden ud, før alt jernet har reageret. Klik på flasken, mens den gløder, så mere af jernet når at reagere." },
-            { sel: "#forsoeg-anker-zoom", titel: "Luppen", tekst: "Overfladen af en ståltråd. Ilten fra luften sætter sig på jernatomerne. Nitrogen reagerer ikke." },
-            { sel: "#forsoeg-status", titel: "Linjen", tekst: "Her står, hvad du skal nu. Når et tal skal aflæses på vægten, skriver du det i feltet her. Knappen giver et hint og derefter svaret." },
-            { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Dine tal for m(før) og m(efter) i begge målinger. De bruges på fanen Beregningen." },
-            { sel: "#forsoeg-forfra", titel: "Start forfra", tekst: "En ny klump ståluld på vægten." },
-            { sel: ".faneknapper", titel: "Beregningen", tekst: "Regn ud, hvad stålulden højst kan komme til at veje, og sammenlign med det, vægten viste." }
-        ],
-        "fane-beregning": [
-            { sel: "#beregning-anker-opgave", titel: "Opgaven", tekst: "Her står, hvad du skal finde." },
-            { sel: "#beregning-anker-tavle", titel: "Skemaet på tavlen", tekst: "Reaktionsskemaet med masse, molarmasse og stofmængde under hvert stof. Tallene, du kender, står der. De tre spørgsmålstegn regner du ud, ét ad gangen." },
-            { sel: "#beregning-raekker", titel: "Regnestykket", tekst: "Skriv først formlen, så tallene med enheder over og under brøkstregen, og til sidst resultatet med enhed." },
-            { sel: "#beregning-hjaelp", titel: "Linjen og hint", tekst: "Linjen siger, hvad du skal nu. Knappen giver et hint og derefter svaret." },
-            { sel: "#beregning-skift", titel: "Let eller Svær", tekst: "Let regner med FeO. Svær regner med Fe₃O₄, som er det oxid, der mest dannes. Så er forholdet ikke 1 : 1." },
-            { sel: "#beregning-anker-soejler", titel: "Søjlerne", tekst: "Stålulden før, det vægten viste bagefter, og det, du regner ud. Den røde del er ilten." },
-            { sel: "#beregning-opgaver", titel: "Opgaverne", tekst: "De to målinger fra forsøget. Har du ikke målt selv, bruges et eksempel." }
-        ]
-    };
+    var TUR = [
+        { sel: "#figur", titel: "De 100 personer", tekst: "Hver række er et erhverv, og rækkens længde viser, hvor mange af de 100 der hører til det." },
+        { sel: ".baand.sektor", titel: "De tre sektorer", tekst: "Træk hvert erhverv ned i den sektor, det hører til. Når alle er sorteret, står sektorens sum til højre." },
+        { sel: "#aarslinje", titel: "Årsskyderen", tekst: "Træk i skyderen, eller brug piletasterne. Tallene under skyderen er de år, figuren har tal for." },
+        { sel: "#opgavelinje", titel: "Opgaven", tekst: "Her står, hvad du skal. Prikkerne til højre viser, hvor langt du er." },
+        { sel: "#statuslinje", titel: "Hjælpen", tekst: "Her står næste skridt og svaret på det, du gør. Knappen giver et hint, hvis du sidder fast." },
+        { sel: "#kurveknap", titel: "Kurven", tekst: "Slå kurven til, hvis du vil se de tre sektorer år for år." }
+    ];
+
     var trin = [];
     var trinNr = 0;
     var erAktiv = false;
@@ -43,7 +29,10 @@
         var liste = document.querySelectorAll(sel);
         var ud = [];
         for (var i = 0; i < liste.length; i++) {
-            if (liste[i].offsetWidth || liste[i].offsetHeight) ud.push(liste[i]);
+            /* Det, der foerst kommer frem i et senere trin, vises ikke rundt. */
+            if (!(liste[i].offsetWidth || liste[i].offsetHeight)) continue;
+            if (window.getComputedStyle(liste[i]).visibility === "hidden") continue;
+            ud.push(liste[i]);
         }
         return ud;
     }
@@ -122,8 +111,8 @@
         plasserBoks(rect);
     }
 
-    function start(faneId) {
-        var liste = TURE[faneId];
+    function start() {
+        var liste = TUR;
         if (!liste || !liste.length) return;
         trin = liste;
         trinNr = 0;

@@ -9,6 +9,9 @@
                 redox     (kun Sur regn) er det en redoxreaktion?
                 klammer   stigning ↑ eller fald ↓ for ét atom ved hver klamme
                 for       (kun med indekstal) lige mange atomer paa klammen
+                antal     (kun med indekstal) eleven taeller atomerne i
+                          formlen foer pilen: 2 S i FeS₂ og 2 O i O₂. Saa
+                          staar der "2 S ↑7 = 14" ved klammen
                 gange     gangetallene: stigning i alt = fald i alt, hvor
                           antallet af atomer paa klammen taeller med
                 med       tallet foran det stof, der foelger med
@@ -88,6 +91,10 @@
            skrives det i Danmark (brugerens oenske 5. okt. 2026) */
         if (R.K.length) trin.push("klammer");
         if (R.forafstem) trin.push("for");
+        /* Svovl fra pyrit kommer to ad gangen, og oxygen goer det samme:
+           eleven taeller atomerne i formlen, foer gangetallene skal findes
+           (brugerens oenske 5. okt. 2026) */
+        if (R.K.some(function (K) { return K.antal > 1; })) trin.push("antal");
         if (R.K.length) trin.push("gange");
         if (R.med.length) trin.push("med");
         if (R.miljoe) {
@@ -167,9 +174,24 @@
         return this.opg.R.grupper.filter(function (G) { return G.K.length > 1; });
     };
 
-    /* De klammer, der har flere end ét atom: "2 S og 2 O" */
-    F.flereAtomer = function () {
-        return ogListe(this.opg.R.K.filter(function (K) { return K.antal > 1; }).map(function (K) { return K.antal + " " + K.E; }));
+    /* De klammer, der har flere end ét atom foer pilen (FeS₂ og O₂) */
+    F.antalK = function () {
+        return this.opg.R.K.filter(function (K) { return K.antal > 1; });
+    };
+
+    /* Formlen foer pilen ved en klamme: "FeS₂" (med tallet foran, hvis der er et) */
+    F.formelK = function (K) {
+        return (K.pv > 1 ? K.pv + " " : "") + this.opg.R.led[K.v].st.tekst;
+    };
+
+    /* "én FeS₂ stiger 14, og én O₂ falder 4": det, atomerne i én formel flytter tilsammen */
+    F.prFormel = function () {
+        var mig = this;
+        var dele = this.antalK().map(function (K) {
+            return "én " + mig.formelK(K) + (K.op ? " stiger " : " falder ") + K.tot;
+        });
+        var s = dele.length > 1 ? dele.slice(0, -1).join(", ") + ", og " + dele[dele.length - 1] : dele.join("");
+        return s ? s.charAt(0).toUpperCase() + s.slice(1) + "." : "";
     };
 
     /* Naeste skridt i hele saetninger (statuslinjen) */
@@ -193,6 +215,11 @@
                 Math.min(K.nV, K.nH) + " i " + foran.tekst + ". Skriv et tal foran " + foran.tekst + ", så der er lige mange " + K.E + ".";
         case "klammer":
             return "Klik på pilen ved hver klamme, så den peger op eller ned, og skriv, hvor meget ét atom stiger eller falder.";
+        case "antal":
+            var mig = this;
+            return "Klammen viser, hvad ét atom gør. Skriv, " + ogListe(this.antalK().map(function (k) {
+                return "hvor mange " + k.E + " der er i " + mig.formelK(k);
+            })) + ".";
         case "gange":
             var b = this.bundne()[0];
             if (b) {
@@ -200,9 +227,7 @@
                 return "Skriv et gangetal foran hver pil, så stigning i alt bliver lige så stor som fald i alt. " +
                     ogListe(b.K.map(function (k) { return k.E; })) + " sidder i samme " + st.tekst + " og skal have samme tal.";
             }
-            var flere = this.flereAtomer();
-            return "Skriv et gangetal foran hver pil, så stigning i alt bliver lige så stor som fald i alt. Brug de mindste tal." +
-                (flere ? " Tallet efter prikken er antallet af atomer: " + flere + "." : "");
+            return "Skriv et gangetal foran hver pil, så stigning i alt bliver lige så stor som fald i alt. Brug de mindste tal.";
         case "med":
             var m = R.med[0];
             return m.E + " skifter ikke, men skal også gå op. Tæl " + m.E + " " + (R.led[m.led].side === "h" ? "før" : "efter") +
@@ -230,6 +255,10 @@
             K = this.forK();
             return "Skriv et tal foran " + R.led[K.pv > 1 ? K.v : K.h].st.tekst + ", så der er lige mange " + K.E;
         case "klammer": return "Skriv stigningen ↑ eller faldet ↓ for ét atom ved hver klamme";
+        case "antal":
+            var mig = this;
+            var spm = ogListe(this.antalK().map(function (k) { return "hvor mange " + k.E + " er der i " + mig.formelK(k); }));
+            return spm.charAt(0).toUpperCase() + spm.slice(1) + "?";
         case "gange": return "Skriv et gangetal foran hver pil, så stigning og fald bliver lige store";
         case "med": return "Skriv tallet foran " + R.led[R.med[0].led].st.tekst + ", så " + R.med[0].E + " går op";
         case "ladning": return "Skriv ladningen på hver side af pilen";
@@ -262,6 +291,9 @@
             });
             return ud;
         case "klammer": return R.K.map(function (K, k) { return "kl" + k; });
+        case "antal":
+            R.K.forEach(function (K, k) { if (K.antal > 1) ud.push("n" + k); });
+            return ud;
         case "gange": return R.K.map(function (K, k) { return "g" + k; });
         case "med": return R.med.map(function (m) { return "for" + m.led; });
         case "ladning": return ["lad-v", "lad-h"];
@@ -324,16 +356,33 @@
             pilLaast: function (k) { return !!g.tal["kl" + k]; },
             gange: this.naaet("gange"),
             /* Er der flere atomer paa klammen, staar antallet mellem gangetallet
-               og pilen: 2 · 2 ↑7 (2 FeS₂ med 2 S, der hver stiger 7) */
-            antal: function (k) { return R.K[k].antal > 1 ? "· " + R.K[k].antal : ""; },
-            prod: function (k) {
+               og pilen: 2 · 2 S ↑7 (2 FeS₂ med 2 S, der hver stiger 7) */
+            antal: function (k) { return R.K[k].antal > 1 && mig.naaet("antal"); },
+            /* Det lille tal i formlen lyser, mens eleven taeller atomerne */
+            taeller: function (k) {
                 var K = R.K[k];
+                if (t === "antal") return K.antal > 1 && !g.tal["n" + k] ? "v" : "";
+                if (t === "for") return mig.forK() === K ? "vh" : "";
+                return "";
+            },
+            /* Foer gangetallet staar det, atomerne i én formel flytter
+               tilsammen (2 S ↑7 = 14). Det regnes af elevens egne tal. */
+            prod: function (k) {
+                var K = R.K[k], v;
                 if (g.tal["g" + k]) return { tekst: "= " + g.tal["g" + k].v * K.tot, slags: "ok" };
-                if (t !== "gange") return { tekst: "" };
-                var v = mig.skrevet("g" + k);
-                if (v === null || v <= 0) return { tekst: "" };
-                var s = mig.gangeSum();
-                return { tekst: "= " + v * K.tot, slags: s.alle && s.op === s.ned ? "lige" : "vent" };
+                if (t === "gange") {
+                    v = mig.skrevet("g" + k);
+                    if (v !== null && v > 0) {
+                        var s = mig.gangeSum();
+                        return { tekst: "= " + v * K.tot, slags: s.alle && s.op === s.ned ? "lige" : "vent" };
+                    }
+                }
+                if (K.antal > 1 && g.tal["n" + k]) return { tekst: "= " + g.tal["n" + k].v * K.delta };
+                if (K.antal > 1 && t === "antal") {
+                    v = mig.skrevet("n" + k);
+                    if (v !== null && v > 0) return { tekst: "= " + v * K.delta, slags: "vent" };
+                }
+                return { tekst: "" };
             },
             ekstra: function (slags, side) {
                 if (!R.miljoe || !mig.naaet(slags)) return "";
@@ -454,6 +503,7 @@
         case "redox": this.kortBesked("Vælg et af de to svar under skemaet.", 3); return;
         case "for": this.tjekFor(); return;
         case "klammer": this.tjekKlammer(); return;
+        case "antal": this.tjekAntal(); return;
         case "gange": this.tjekGange(); return;
         case "med": this.tjekMed(); return;
         case "ladning": this.tjekLad(); return;
@@ -559,6 +609,25 @@
         if (!noget) { this.fejlLinje("Klik på pilen ved klammen, så den peger op eller ned, og skriv tallet ved siden af."); this.haefte.fokus(mangler[0]); return; }
         this.godLinje(mangler.length > 1 ? "Nu de andre klammer." : "Nu den sidste klamme.");
         this.haefte.fokus(mangler[0]);
+    };
+
+    /* Atomerne i formlen foer pilen: FeS₂ har 2 S, og O₂ har 2 O. Det er
+       dem, der goer, at én formel flytter mere end ét atom. */
+    F.tjekAntal = function () {
+        var mig = this, R = this.opg.R;
+        function K(k) { return R.K[+k.slice(1)]; }
+        this.tjekHver("antal",
+            function (k) { return mig.laest(k); },
+            function (k) { return K(k).antal; },
+            function (k, v) {
+                var x = K(k), st = mig.formelK(x), efter = R.led[x.h].st;
+                if (isNaN(v) || v < 1) return "Skriv antallet af " + x.E + " i " + st + " som et helt tal.";
+                if (v === x.delta && v !== x.antal) return v + " er, hvor meget ét " + x.E + (x.op ? " stiger" : " falder") + ". Her skal du tælle " + x.E + " i " + st + ".";
+                if (v === efter.el[x.E]) return "Tæl " + x.E + " i " + st + " før pilen, ikke i " + efter.tekst + ".";
+                return "Se på det lille tal efter " + x.E + " i " + st + ". Det viser, hvor mange " + x.E + " der er.";
+            },
+            "Skriv antallet af atomer i feltet ved klammen.",
+            function () { return mig.prFormel(); });
     };
 
     /* "2 · 2 · 7 = 28" eller "1 · 2 + 1 · 2 · 2 = 6" med de tal, eleven skrev:
@@ -819,6 +888,10 @@
             K = R.K.filter(function (k, i) { return !g.tal["kl" + i]; })[0];
             return [X.gaarTekst(K) + ". Går tallet op eller ned, og hvor mange trin?",
                 "Pilen peger op, når tallet bliver større. Tæl trinene fra " + X.ox(K.fra) + " til " + X.ox(K.til) + " for ét " + K.E + "."];
+        case "antal":
+            K = R.K.filter(function (k, i) { return k.antal > 1 && !g.tal["n" + i]; })[0];
+            return ["Det lille tal efter et atom i en formel viser, hvor mange der er af det.",
+                "Se på det lille tal efter " + K.E + " i " + this.formelK(K) + ". Det lyser gult i skemaet."];
         case "gange":
             var op = R.grupper.filter(function (G) { return G.netto > 0; })[0], ned = R.grupper.filter(function (G) { return G.netto < 0; })[0];
             if (this.bundne().length) {
@@ -882,6 +955,10 @@
         case "klammer":
             R.K.forEach(function (K, k) { g.pil[k] = K.op; vis("kl" + k, K.delta); });
             kort = "For ét atom: " + R.K.map(function (K) { return K.E + " " + (K.op ? "stiger " : "falder ") + K.delta; }).join(", ") + ".";
+            break;
+        case "antal":
+            R.K.forEach(function (K, k) { if (K.antal > 1) vis("n" + k, K.antal); });
+            kort = ogListe(this.antalK().map(function (K) { return mig.formelK(K) + " har " + K.antal + " " + K.E; })) + ".";
             break;
         case "gange":
             R.K.forEach(function (K, k) { vis("g" + k, K.gange); });

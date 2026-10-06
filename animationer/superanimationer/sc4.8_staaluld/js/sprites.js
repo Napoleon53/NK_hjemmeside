@@ -5,9 +5,7 @@
    siden aabnes direkte fra harddisken (file://). Er en fil ikke klar
    endnu, springes den bare over i det billede.
 
-   ../../v2/kemichael/kemichael.js tilfoejer laererens sprites (og
-   kaffekoppen) med deres egen mappe, derfor startes indlaesningen foerst
-   fra app.js.
+   Indlaesningen startes fra app.js.
 
    MAAL er de koordinater, der staar i kommentaren oeverst i hver
    SVG-fil. Aendres en fil, skal tallene her foelge med. _sprites.html
@@ -30,12 +28,8 @@
         bunsen: { b: 80, h: 190, mundX: 40, mundY: 18, bund: 186, grebX: 40, grebY: 100, slangeX: 1, slangeY: 184 },
         /* Iltflasken: udtaget (15, 21), haandhjulet (40, 10), bunden y 218 */
         iltflaske: { b: 80, h: 220, bund: 218, udtagX: 15, udtagY: 21, hjulX: 40, hjulY: 10 },
-        /* Stjernekasteren (paaskeaegget): spidsen (20, 5), bunden y 158 */
-        stjernekaster: { b: 40, h: 160, bund: 158, spidsX: 20, spidsY: 5 },
         /* Luppen (som sc2.1) */
-        lup: { b: 140, h: 140, midtX: 52, midtY: 52, r: 38 },
-        /* Kemichaels kateder (som sc4.5) */
-        kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 }
+        lup: { b: 140, h: 140, midtX: 52, midtY: 52, r: 38 }
     };
 
     var FILER = {};
@@ -43,9 +37,8 @@
         FILER[navn] = { fil: navn + ".svg", b: MAAL[navn].b, h: MAAL[navn].h };
     });
 
-    /* Har en post sin egen mappe, hentes filen derfra. */
     function indlaes(navn, f) {
-        var sti = (f.mappe || MAPPE) + f.fil;
+        var sti = MAPPE + f.fil;
         var post = { img: new Image(), klar: false };
         lager[navn] = post;
         post.img.addEventListener("load", function () { post.klar = true; });
@@ -80,20 +73,6 @@
             if (h === undefined) h = b * f.h / f.b;
             ctx.drawImage(p.img, x, y, b, h);
             return true;
-        },
-
-        /* Tegner spritet drejet om ankerpunktet, der staar i positur p. */
-        tegnPositur: function (ctx, navn, p, anker, alfa, skala) {
-            var f = FILER[navn];
-            if (!f) return;
-            var k = skala || 1;
-            ctx.save();
-            if (alfa !== undefined) ctx.globalAlpha *= NK.klamp(alfa, 0, 1);
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.v);
-            ctx.scale(k, k);
-            NK.Sprites.tegn(ctx, navn, -anker.x, -anker.y, f.b, f.h);
-            ctx.restore();
         }
     };
 }());
