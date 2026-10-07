@@ -99,14 +99,27 @@
   .kort{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 16px 16px; margin-bottom:14px;}
   .kort p.tekst{margin:0 0 12px; font-size:.92rem; max-width:70ch;}
 
-  /* Spillerlisten */
-  .spillerliste{list-style:none; margin:12px 0 0; padding:0;}
+  /* Start-knappen staar i kortets hoved, saa den ikke forsvinder under en lang liste */
+  .korthoved{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; margin-bottom:10px;}
+  .korthoved .sub-label{margin-bottom:0;}
+
+  /* Spillerlisten: fyldes oppefra og ned i tre spalter. --r3 og --r2 er antallet af
+     raekker ved tre og to spalter og saettes sammen med listen. */
+  .spillerliste{
+    list-style:none; margin:12px 0 0; padding:0;
+    display:grid; grid-auto-flow:column; column-gap:22px;
+    grid-template-columns:repeat(3, minmax(0,1fr)); grid-template-rows:repeat(var(--r3, 8), auto);
+  }
   .spillerliste li{display:flex; align-items:center; gap:8px; padding:3px 0; border-top:1px solid #edf0f3;}
   .spillerliste .nr{flex:none; width:26px; text-align:right; font-size:.85rem; color:var(--muted);}
   .spillerliste input{flex:1 1 auto; min-width:0; border-color:transparent; background:transparent;}
   .spillerliste input:hover, .spillerliste input:focus{border-color:var(--border); background:#fff;}
   .spillerliste li.udgaaet input{text-decoration:line-through; color:var(--muted);}
+  .spillerliste button{flex:none; white-space:nowrap;}
+  .spillerliste li.dublet input{border-color:var(--warn); background:#fffbeb;}
+  .besked button{margin-left:8px;}
   .nulstil{margin-top:26px;}
+  .nulstil .skille{flex:1 1 20px;}
 
   /* En runde */
   .rundevalg{margin-bottom:12px;}
@@ -132,7 +145,7 @@
   .braet-hoved > span{font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
   .braet-hoved .midt{text-align:center;}
   .brik{
-    flex:none; width:.72em; height:.72em; margin:0 .35em;
+    display:inline-block; flex:none; width:.72em; height:.72em; margin:0 .35em;
     border-radius:50%; border:1.5px solid var(--ink); background:#fff;
   }
   .brik.sort{background:var(--ink);}
@@ -146,7 +159,21 @@
   .resultat button:last-child{border-radius:0 8px 8px 0;}
   .resultat button:hover{background:#eef1f4;}
   .resultat button.valgt{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .res-tekst{display:none;}             /* resultatet som tekst, kun paa udskriften */
   .status{margin:0 0 12px; font-size:.92em; font-weight:600;}
+
+  /* Stillingen ved siden af runden, kun paa storskaerm */
+  .sidekort{display:none;}
+  .ministilling{list-style:none; margin:0; padding:0;}
+  .ministilling li{
+    display:grid; grid-template-columns:1.7em minmax(0,1fr) auto; gap:.5em;
+    padding:.2em 0; border-top:1px solid #edf0f3; break-inside:avoid;
+  }
+  .ministilling .plads{text-align:right; color:var(--muted);}
+  .ministilling .tekst{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ministilling .pt{font-weight:700; font-variant-numeric:tabular-nums;}
+  .ministilling li.udgaaet{color:var(--muted);}
+  .ministilling.to-spalter{columns:2; column-gap:1.4em;}
 
   /* Stillingen */
   .tabel-omslag{overflow-x:auto;}
@@ -157,25 +184,62 @@
   .stilling td.point{font-weight:700;}
   .stilling tr.udgaaet td{color:var(--muted);}
   .vinder-linje{margin:0 0 12px; font-size:1.05em; font-weight:700; color:var(--accent-dark);}
+  /* Krydstabellen maa gerne blive bredere end resten, saa alle runder kan ses uden at rulle. */
+  #krydskort{width:max-content; min-width:100%; max-width:calc(100vw - 48px);}
+  .krydstabel{font-size:.88em;}
+  .krydstabel .kres{display:inline-block; min-width:1.1em; font-weight:700;}
+  .krydstabel .over{color:var(--muted);}
+  .row + .kort{margin-top:18px;}
 
-  /* Storskaerm: til projektoren. Alt kan stadig betjenes. */
+  /* Storskaerm: til projektoren. Alt kan stadig betjenes. Skriften i kortene saenkes
+     af tilpasStorskaerm, til de kan vaere paa skaermen. */
   body.storskaerm{padding:18px 30px 30px;}
   body.storskaerm .top .muted, body.storskaerm .tilbage, body.storskaerm .skjul-stor{display:none !important;}
   body.storskaerm h1{font-size:2rem;}
   body.storskaerm .panel{max-width:none; font-size:1.45rem;}
-  body.storskaerm .braetter.mange{columns:2; column-gap:44px;}
-  body.storskaerm .har-mange .braet-hoved{display:none;}
+  body.storskaerm .status{font-size:1rem; margin-bottom:8px;}
+  /* taet: raekkerne rykker sammen, foer skriften saenkes */
+  .kort.taet h2{margin-bottom:.25em;}
+  .kort.taet .braet{padding-top:.14em; padding-bottom:.14em;}
+  .kort.taet .braet-hoved{padding-bottom:.1em;}
+  .kort.taet .resultat button{padding:.16em 0;}
+  .kort.taet .ministilling li{padding:.04em 0;}
+  .kort.taet .stilling th, .kort.taet .stilling td{padding-top:.14em; padding-bottom:.14em;}
+  .kort.taet .vinder-linje{margin-bottom:.3em;}
+  body.storskaerm .rundelayout.med-side{
+    display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr); gap:18px; align-items:start;
+    margin-bottom:14px;
+  }
+  body.storskaerm .rundelayout.med-side .kort{display:block; margin-bottom:0;}
+  /* Er der for mange braetter til det, staar de i to spalter uden stillingen ved siden af. */
+  body.storskaerm .rundelayout:not(.med-side) .braetter{columns:2; column-gap:44px;}
+  body.storskaerm .rundelayout:not(.med-side) .braet-hoved{display:none;}
 
+  @media (max-width:860px){
+    .spillerliste{grid-template-columns:repeat(2, minmax(0,1fr)); grid-template-rows:repeat(var(--r2, 8), auto);}
+  }
+  @media (max-width:560px){
+    .spillerliste{display:block;}
+  }
   @media (max-width:520px){
     body{padding:16px 14px 50px;}
     .fane{padding:8px 12px;}
     .braet{--midt:7.4em; grid-template-columns:1.6em minmax(0,1fr) var(--midt) minmax(0,1fr); gap:.4em; padding:.4em .2em;}
     .to-knapper .braet{--midt:5em;}
   }
+  /* Udskrift: kun den fane, der er aaben, uden knapper. */
   @media print{
-    body{background:#fff; padding:0;}
-    .faner, .tilbage, .row, .hjaelp, .rundevalg, .top .muted{display:none !important;}
-    .kort{border-color:#bbb;}
+    body, body.storskaerm{background:#fff; padding:0;}
+    .faner, .tilbage, .row, .hjaelp, .rundevalg, .status, .top .muted, .sidekort, .skjul-print{display:none !important;}
+    .panel, body.storskaerm .panel{max-width:none; font-size:12pt;}
+    .kort{border:0; padding:0; font-size:12pt !important;}
+    body.storskaerm .rundelayout{display:block;}
+    body.storskaerm .rundelayout .braetter{columns:auto;}
+    body.storskaerm .rundelayout .braet-hoved{display:grid;}
+    .braet:focus{background:none; border-color:transparent; border-top-color:#edf0f3; border-radius:0;}
+    .resultat{display:none;}
+    .res-tekst{display:block; text-align:center; font-weight:700;}
+    .res-tekst:empty{height:1.3em; margin:0 1.2em; border-bottom:1px solid #777;}
   }
 </style>
 </head>
@@ -204,25 +268,35 @@
   </div>
 
   <div class="kort">
-    <span class="sub-label">Spillere <span id="antal"></span></span>
+    <div class="korthoved">
+      <span class="sub-label">Spillere <span id="antal"></span></span>
+      <div class="row" id="foer-start">
+        <span class="muted" id="startinfo"></span>
+        <button type="button" class="btn-primary" id="start">Start turnering</button>
+      </div>
+    </div>
     <div class="row">
       <input type="text" id="nyspiller" class="bred" maxlength="60" placeholder="Navn" aria-label="Navn p&aring; ny spiller">
       <button type="button" class="btn-secondary" id="tilfoej">Tilf&oslash;j</button>
     </div>
     <p class="hjaelp">Tryk Enter efter hvert navn. En hel liste kan s&aelig;ttes ind p&aring; &eacute;n gang med &eacute;t navn pr. linje.</p>
+    <p class="type-info" id="efter-start" hidden>Turneringen er i gang. Nye spillere kommer med fra n&aelig;ste runde. En spiller, der g&aring;r, kan tr&aelig;kkes ud og sidder s&aring; over resten af turneringen.</p>
+    <p class="besked" id="dubletbesked" hidden>
+      <span id="dublettekst"></span>
+      <button type="button" class="btn-secondary btn-small" id="fjerndubletter">Fjern dubletterne</button>
+    </p>
     <ol class="spillerliste" id="spillerliste"></ol>
   </div>
 
-  <div class="row" id="foer-start">
-    <button type="button" class="btn-primary" id="start">Start turnering</button>
-    <span class="muted" id="startinfo"></span>
-  </div>
-  <p class="type-info" id="efter-start" hidden>Turneringen er i gang. Nye spillere kommer med fra n&aelig;ste runde. En spiller, der g&aring;r, kan tr&aelig;kkes ud og sidder s&aring; over resten af turneringen.</p>
-
   <div class="row nulstil">
+    <button type="button" class="btn-secondary btn-small" id="gemfil">Gem som fil</button>
+    <button type="button" class="btn-secondary btn-small" id="hentfil">Hent fra fil</button>
+    <input type="file" id="filvalg" accept=".json,application/json" hidden>
+    <span class="skille"></span>
     <button type="button" class="btn-secondary btn-small" id="forfra" hidden>Begynd forfra med samme spillere</button>
     <button type="button" class="btn-secondary btn-small" id="ryd">Ryd alt</button>
   </div>
+  <p class="hjaelp">En gemt fil kan hentes ind igen p&aring; denne eller en anden computer.</p>
 </section>
 
 <section class="panel" id="panel-spil" role="tabpanel" aria-labelledby="fane-spil" hidden>
@@ -249,11 +323,17 @@
 
 <section class="panel" id="panel-runder" role="tabpanel" aria-labelledby="fane-runder" hidden>
   <div class="chip-list rundevalg" id="rundevalg"></div>
-  <div class="kort" id="rundekort">
-    <h2 id="rundetitel"></h2>
-    <div class="braet braet-hoved" id="braethoved" aria-hidden="true"></div>
-    <ol class="braetter" id="braetter"></ol>
-    <p class="hjaelp skjul-stor" id="tasthjaelp"></p>
+  <div class="rundelayout" id="rundelayout">
+    <div class="kort" id="rundekort">
+      <h2 id="rundetitel"></h2>
+      <div class="braet braet-hoved" id="braethoved" aria-hidden="true"></div>
+      <ol class="braetter" id="braetter"></ol>
+      <p class="hjaelp skjul-stor" id="tasthjaelp"></p>
+    </div>
+    <div class="kort sidekort" id="sidekort">
+      <h2>Stilling</h2>
+      <ol class="ministilling" id="ministilling"></ol>
+    </div>
   </div>
   <p class="status" id="rundestatus"></p>
   <div class="row">
@@ -261,11 +341,12 @@
     <button type="button" class="btn-primary" id="tilstilling" hidden>Se stillingen</button>
     <button type="button" class="btn-secondary btn-small" id="ekstra" hidden>Spil en ekstra runde</button>
     <button type="button" class="btn-secondary btn-small" id="sletrunde"></button>
+    <button type="button" class="btn-secondary btn-small" id="udskrivrunde">Udskriv runden</button>
   </div>
 </section>
 
 <section class="panel" id="panel-stilling" role="tabpanel" aria-labelledby="fane-stilling" hidden>
-  <div class="kort">
+  <div class="kort" id="stillingkort">
     <h2 id="stillingtitel"></h2>
     <p class="vinder-linje" id="vinder" hidden></p>
     <div class="tabel-omslag">
@@ -278,7 +359,18 @@
   </div>
   <div class="row">
     <button type="button" class="btn-secondary btn-small" id="kopier">Kopier stilling</button>
+    <button type="button" class="btn-secondary btn-small" id="udskrivstilling">Udskriv stillingen</button>
     <span class="kvittering" id="kvittering" hidden>Stillingen er kopieret.</span>
+  </div>
+  <div class="kort skjul-stor skjul-print" id="krydskort">
+    <h2>Krydstabel</h2>
+    <div class="tabel-omslag">
+      <table class="stilling krydstabel">
+        <thead id="krydshoved"></thead>
+        <tbody id="krydskrop"></tbody>
+      </table>
+    </div>
+    <p class="hjaelp" id="krydshjaelp"></p>
   </div>
 </section>
 
@@ -311,6 +403,14 @@
   var KNUDEGRAENSE = 200000;              // loft over soegningen efter den bedste parring
   var UDSYN_MAKS = 10;                    // op til saa mange pladser ses der frem til de sidste runder
   var UDSYNSBUDGET = 300000;              // loft over den soegning
+
+  var RESULTATTEKST = { a:'1-0', u:'½-½', b:'0-1' };
+
+  // Storskaerm
+  var STOR_SKRIFT = 23, MINDSTE_SKRIFT = 13;   // px: skriften saenkes fra den store mod den mindste
+  var BUNDLUFT = 30;                           // px fri plads nederst paa skaermen
+  var SIDE_MAKS_BRAETTER = 14;                 // flere braetter end det: to spalter uden stilling ved siden af
+  var SIDE_EN_SPALTE = 12;                     // flere spillere end det: stillingen ved siden af i to spalter
 
   var t = tomTurnering();
   var fane = 'spillere';
@@ -668,21 +768,52 @@
   function gem(){
     try { window.localStorage.setItem(NOEGLE, JSON.stringify(t)); } catch (e) {}
   }
+  // Gennemser data fra browseren eller en fil. Returnerer en turnering, der kun
+  // indeholder det, siden selv kunne have gemt, eller null, hvis noget ikke passer.
+  function laes(d){
+    if (!d || !Array.isArray(d.spillere) || !Array.isArray(d.runder)) return null;
+    var ny = tomTurnering(), kendte = {}, i, j, p, k, runde;
+    function erSpiller(id){ return typeof id === 'number' && kendte[id] === true; }
+
+    if (typeof d.navn === 'string') ny.navn = d.navn.slice(0, 80);
+    for (i = 0; i < SPIL.length; i++){ if (SPIL[i].id === d.spil) ny.spil = d.spil; }
+    if (d.andet){ ny.andet.uafgjort = !!d.andet.uafgjort; ny.andet.sider = !!d.andet.sider; }
+    if (d.antalRunder >= 1 && d.antalRunder <= 99) ny.antalRunder = Math.floor(d.antalRunder);
+
+    for (i = 0; i < d.spillere.length; i++){
+      p = d.spillere[i];
+      if (!p || typeof p.id !== 'number' || p.id < 1 || p.id % 1 !== 0 || kendte[p.id]) return null;
+      kendte[p.id] = true;
+      ny.spillere.push({ id:p.id, navn:typeof p.navn === 'string' ? p.navn.slice(0, 60) : '', aktiv:p.aktiv !== false });
+      ny.naesteId = Math.max(ny.naesteId, p.id + 1);
+    }
+    if (typeof d.naesteId === 'number' && d.naesteId % 1 === 0 && d.naesteId > ny.naesteId) ny.naesteId = d.naesteId;
+    for (i = 0; i < d.runder.length; i++){
+      if (!Array.isArray(d.runder[i]) || !d.runder[i].length) return null;
+      runde = [];
+      for (j = 0; j < d.runder[i].length; j++){
+        k = d.runder[i][j];
+        if (!k || !erSpiller(k.a) || (k.b !== null && !erSpiller(k.b)) || k.a === k.b) return null;
+        runde.push({ a:k.a, b:k.b,
+                     res:k.b !== null && (k.res === 'a' || k.res === 'b' || k.res === 'u') ? k.res : null });
+      }
+      if (!antalPartier(runde)) return null;
+      ny.runder.push(runde);
+    }
+    return ny;
+  }
   function hent(){
     try {
-      var d = JSON.parse(window.localStorage.getItem(NOEGLE));
-      if (!d || !Array.isArray(d.spillere) || !Array.isArray(d.runder)) return;
-      var ny = tomTurnering();
-      ny.navn = typeof d.navn === 'string' ? d.navn : '';
-      ny.spil = typeof d.spil === 'string' ? d.spil : 'skak';
-      if (d.andet){ ny.andet.uafgjort = !!d.andet.uafgjort; ny.andet.sider = !!d.andet.sider; }
-      ny.antalRunder = d.antalRunder >= 1 ? Math.floor(d.antalRunder) : 5;
-      ny.spillere = d.spillere;
-      ny.runder = d.runder;
-      ny.naesteId = d.naesteId >= 1 ? d.naesteId : 1;
-      for (var i = 0; i < ny.spillere.length; i++){ ny.naesteId = Math.max(ny.naesteId, ny.spillere[i].id + 1); }
-      t = ny;
+      var ny = laes(JSON.parse(window.localStorage.getItem(NOEGLE)));
+      if (ny) t = ny;
     } catch (e) {}
+  }
+  function filnavn(){
+    var d = new Date();
+    function to(n){ return (n < 10 ? '0' : '') + n; }
+    return (t.navn.trim() || 'Turnering').replace(/[\\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim() + ' ' +
+      d.getFullYear() + '-' + to(d.getMonth() + 1) + '-' + to(d.getDate()) + ' kl ' +
+      to(d.getHours()) + '.' + to(d.getMinutes()) + '.json';
   }
 
   /* ------------------------------------------------------------------ visning */
@@ -704,6 +835,33 @@
     if (fane === 'stilling') tegnStilling();
   }
 
+  // Navne, der staar mere end en gang. alle: id paa hver spiller med et saadant navn.
+  // ekstra: id paa de senere forekomster, som kan fjernes, fordi de ikke har spillet.
+  function dubletter(){
+    var foerste = Object.create(null), svar = { navne:[], alle:{}, ekstra:[] }, i, n, p;
+    for (i = 0; i < t.spillere.length; i++){
+      p = t.spillere[i];
+      n = p.navn.replace(/\s+/g, ' ').trim().toLowerCase();
+      if (!n) continue;
+      if (!(n in foerste)){ foerste[n] = p; continue; }
+      if (!svar.alle[foerste[n].id]){ svar.alle[foerste[n].id] = true; svar.navne.push(foerste[n].navn.trim()); }
+      svar.alle[p.id] = true;
+      if (!harSpillet(p.id)) svar.ekstra.push(p.id);
+    }
+    return svar;
+  }
+  function tegnDubletter(){
+    var d = dubletter(), li = $('spillerliste').children, i;
+    for (i = 0; i < li.length; i++){
+      li[i].classList.toggle('dublet', d.alle[li[i].getAttribute('data-id')] === true);
+    }
+    $('dubletbesked').hidden = !d.navne.length;
+    $('dublettekst').textContent = d.navne.length === 1
+      ? 'Navnet ' + d.navne[0] + ' står der mere end én gang.'
+      : 'Disse navne står der mere end én gang: ' + d.navne.join(', ') + '.';
+    $('fjerndubletter').hidden = !d.ekstra.length;
+  }
+
   function tegnSpillere(){
     var startet = t.runder.length > 0, html = '', i, p;
     for (i = 0; i < t.spillere.length; i++){
@@ -713,11 +871,14 @@
         '<input type="text" maxlength="60" value="' + esc(p.navn) + '" aria-label="Navn på spiller ' + (i + 1) + '">' +
         (harSpillet(p.id)
           ? '<button type="button" class="btn-secondary btn-small" data-handling="aktiv">' +
-            (p.aktiv ? 'Træk ud' : 'Sæt ind igen') + '</button>'
+            (p.aktiv ? 'Træk ud' : 'Med igen') + '</button>'
           : '<button type="button" class="btn-secondary btn-small" data-handling="fjern">Fjern</button>') +
         '</li>';
     }
     $('spillerliste').innerHTML = html;
+    $('spillerliste').style.setProperty('--r3', Math.max(8, Math.ceil(t.spillere.length / 3)));
+    $('spillerliste').style.setProperty('--r2', Math.max(8, Math.ceil(t.spillere.length / 2)));
+    tegnDubletter();
     $('antal').textContent = t.spillere.length ? '(' + t.spillere.length + ')' : '';
     if ($('tnavn').value !== t.navn) $('tnavn').value = t.navn;
     $('foer-start').hidden = startet;
@@ -806,12 +967,25 @@
           (s.uafgjort ? knap(k, 'u', '½-½', s.uafgjort) : '') +
           knap(k, 'b', '0-1', navn(k.b) + ' vinder') +
         '</span>' +
+        '<span class="res-tekst">' + (RESULTATTEKST[k.res] || '') + '</span>' +
         '<span class="navn' + udfald(k, 'b') + '">' + brik(s, 1) + spillerHtml(k.b) + '</span>' +
         '</li>';
     }
     $('braetter').innerHTML = html;
-    $('braetter').className = 'braetter' + (antal > 8 ? ' mange' : '');
-    $('rundekort').className = 'kort' + (antal > 8 ? ' har-mange' : '') + (s.uafgjort ? '' : ' to-knapper');
+    $('rundekort').className = 'kort' + (s.uafgjort ? '' : ' to-knapper');
+
+    // Stillingen lige nu, som storskaermen viser ved siden af runden.
+    var liste = rangliste(t.spillere, statistik(t.spillere, t.runder));
+    html = '';
+    for (i = 0; i < liste.length; i++){
+      html += '<li' + (liste[i].sp.aktiv ? '' : ' class="udgaaet"') + '>' +
+        '<span class="plads">' + liste[i].plads + '</span>' +
+        '<span class="tekst">' + esc(navn(liste[i].sp.id)) + '</span>' +
+        '<span class="pt">' + pointtekst(liste[i].st.point) + '</span></li>';
+    }
+    $('ministilling').innerHTML = html;
+    $('ministilling').className = 'ministilling' + (liste.length > SIDE_EN_SPALTE ? ' to-spalter' : '');
+    $('rundelayout').className = 'rundelayout' + (antal <= SIDE_MAKS_BRAETTER ? ' med-side' : '');
 
     $('tasthjaelp').textContent = 'Taster: ← ' + (s.sider ? s.sider[0].toLowerCase() : 'venstre spiller') +
       ' vinder, → ' + (s.sider ? s.sider[1].toLowerCase() : 'højre spiller') + ' vinder' +
@@ -831,6 +1005,39 @@
     $('ekstra').hidden = !faerdig;
     $('sletrunde').hidden = !sidste;
     $('sletrunde').textContent = 'Slet runde ' + (visRunde + 1);
+    tilpasStorskaerm();
+  }
+
+  // Storskaerm: saenker skriften i et kort, til det kan vaere over det, der staar
+  // under det (under px), uden at siden skal rulles.
+  function skaler(kort, under){
+    var str = STOR_SKRIFT, i;
+    function fylder(){   // kortets hoejde i forhold til pladsen; over 1 er for meget
+      var plads = window.innerHeight - under - (kort.getBoundingClientRect().top + window.pageYOffset);
+      return plads > 0 ? kort.offsetHeight / plads : 99;
+    }
+    kort.classList.remove('taet');
+    kort.style.fontSize = str + 'px';
+    if (fylder() <= 1) return;
+    kort.classList.add('taet');
+    for (i = 0; i < 4 && str > MINDSTE_SKRIFT && fylder() > 1; i++){
+      str = Math.max(MINDSTE_SKRIFT, Math.floor(str / fylder()));
+      kort.style.fontSize = str + 'px';
+    }
+  }
+  function tilpasStorskaerm(){
+    var kort = [$('rundekort'), $('sidekort'), $('stillingkort')], under, i;
+    for (i = 0; i < kort.length; i++){ kort[i].style.fontSize = ''; kort[i].classList.remove('taet'); }
+    if (!document.body.classList.contains('storskaerm')) return;
+    if (fane === 'runder'){
+      under = $('panel-runder').getBoundingClientRect().bottom - $('rundelayout').getBoundingClientRect().bottom + BUNDLUFT;
+      skaler($('rundekort'), under);
+      skaler($('sidekort'), under);
+    }
+    if (fane === 'stilling'){
+      under = $('panel-stilling').getBoundingClientRect().bottom - $('stillingkort').getBoundingClientRect().bottom + BUNDLUFT;
+      skaler($('stillingkort'), under);
+    }
   }
 
   function tegnStilling(){
@@ -874,6 +1081,42 @@
         ' med ' + pointtekst(liste[0].st.point) + ' point.';
     }
     $('kvittering').hidden = true;
+    tegnKrydstabel(s, liste);
+    tilpasStorskaerm();
+  }
+
+  // En raekke pr. spiller og en kolonne pr. runde: spillerens resultat og modstanderen.
+  function tegnKrydstabel(s, liste){
+    var opslag = [], html, r, i, k, x, p;
+    for (r = 0; r < t.runder.length; r++){
+      opslag.push({});
+      for (i = 0; i < t.runder[r].length; i++){
+        k = t.runder[r][i];
+        if (k.b === null){ opslag[r][k.a] = { over:true }; continue; }
+        opslag[r][k.a] = { modst:k.b, side:0, res:k.res === 'a' ? '1' : k.res === 'b' ? '0' : k.res === 'u' ? '½' : '' };
+        opslag[r][k.b] = { modst:k.a, side:1, res:k.res === 'b' ? '1' : k.res === 'a' ? '0' : k.res === 'u' ? '½' : '' };
+      }
+    }
+    html = '<tr><th class="tal">Plads</th><th>Spiller</th>';
+    for (r = 0; r < t.runder.length; r++){ html += '<th>Runde ' + (r + 1) + '</th>'; }
+    $('krydshoved').innerHTML = html + '<th class="tal">Point</th></tr>';
+
+    html = '';
+    for (i = 0; i < liste.length; i++){
+      x = liste[i];
+      html += '<tr' + (x.sp.aktiv ? '' : ' class="udgaaet"') + '><td class="tal">' + x.plads + '</td>' +
+        '<td>' + esc(navn(x.sp.id)) + '</td>';
+      for (r = 0; r < t.runder.length; r++){
+        p = opslag[r][x.sp.id];
+        html += !p ? '<td></td>' :
+          p.over ? '<td><span class="kres">1</span><span class="over">sidder over</span></td>' :
+          '<td><span class="kres">' + p.res + '</span>' + brik(s, p.side) + esc(navn(p.modst)) + '</td>';
+      }
+      html += '<td class="tal point">' + pointtekst(x.st.point) + '</td></tr>';
+    }
+    $('krydskrop').innerHTML = html;
+    $('krydshjaelp').textContent = 'Hver celle viser spillerens resultat i runden og modstanderen.' +
+      (s.id === 'skak' ? ' Prikken viser spillerens egen farve.' : '');
   }
 
   function stillingSomTekst(){
@@ -949,6 +1192,7 @@
   function storskaerm(til){
     document.body.classList.toggle('storskaerm', til);
     $('storskaerm').textContent = til ? 'Luk storskærm' : 'Storskærm';
+    tilpasStorskaerm();
     try {
       if (til && document.documentElement.requestFullscreen){
         var loefte = document.documentElement.requestFullscreen();
@@ -969,7 +1213,9 @@
   });
   document.addEventListener('fullscreenchange', function(){
     if (!document.fullscreenElement && document.body.classList.contains('storskaerm')) storskaerm(false);
+    else tilpasStorskaerm();
   });
+  window.addEventListener('resize', tilpasStorskaerm);
 
   // Spillere
   $('tnavn').addEventListener('input', function(){
@@ -995,6 +1241,13 @@
     var id = Number(e.target.parentNode.getAttribute('data-id'));
     for (var i = 0; i < t.spillere.length; i++){ if (t.spillere[i].id === id) t.spillere[i].navn = e.target.value; }
     gem();
+    tegnDubletter();
+  });
+  $('fjerndubletter').addEventListener('click', function(){
+    var ekstra = dubletter().ekstra;
+    t.spillere = t.spillere.filter(function(p){ return ekstra.indexOf(p.id) < 0; });
+    gem();
+    tegnSpillere();
   });
   $('spillerliste').addEventListener('click', function(e){
     var handling = e.target.getAttribute('data-handling');
@@ -1022,6 +1275,39 @@
     t = tomTurnering();
     gem();
     tegn();
+  });
+
+  // Fil: hele turneringen som en fil, der kan hentes ind igen her eller paa en anden computer.
+  $('gemfil').addEventListener('click', function(){
+    var link = document.createElement('a');
+    var adresse = URL.createObjectURL(new Blob(
+      [JSON.stringify({ format:'mg-turnering', version:1, turnering:t }, null, 1)], { type:'application/json' }));
+    link.href = adresse;
+    link.download = filnavn();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.setTimeout(function(){ URL.revokeObjectURL(adresse); }, 1000);
+  });
+  $('hentfil').addEventListener('click', function(){ $('filvalg').click(); });
+  $('filvalg').addEventListener('change', function(){
+    var felt = this, fil = felt.files[0], laeser = new FileReader();
+    if (!fil) return;
+    laeser.onload = function(){
+      var ny = null;
+      try {
+        var d = JSON.parse(laeser.result);
+        ny = laes(d && d.turnering ? d.turnering : d);
+      } catch (e) {}
+      felt.value = '';
+      if (!ny){ window.alert('Filen kan ikke læses som en turnering.'); return; }
+      if ((t.spillere.length || t.runder.length) &&
+          !window.confirm('Erstat den nuværende turnering med den fra filen?')) return;
+      t = ny;
+      gem();
+      skiftFane(t.runder.length ? 'runder' : 'spillere');
+    };
+    laeser.readAsText(fil);
   });
 
   // Spil
@@ -1098,6 +1384,9 @@
     gem();
     skiftFane(t.runder.length ? 'runder' : 'spillere');
   });
+
+  $('udskrivrunde').addEventListener('click', function(){ window.print(); });
+  $('udskrivstilling').addEventListener('click', function(){ window.print(); });
 
   // Stilling
   $('kopier').addEventListener('click', function(){
