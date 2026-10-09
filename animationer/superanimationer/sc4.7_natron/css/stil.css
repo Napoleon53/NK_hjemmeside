@@ -606,57 +606,7 @@ select:focus-visible {
 .valgrad .knap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.22); border-color: var(--gul); }
 
 /* ---------------------------------------------------------------------
-   KEMICHAELS TALEBOBLE: staar fast til hoejre for ham ved katederet
-   og skifter kun, naar der er noget nyt (js/laerer.js)
-   --------------------------------------------------------------------- */
-.kboble {
-    --hale: 30px;
-    position: absolute;
-    z-index: 4;
-    background-color: #fffdf6;
-    color: #1f2328;
-    border: 2px solid #2a2f36;
-    border-left-width: 5px;
-    border-radius: 12px;
-    padding: 7px 14px 8px 12px;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.38;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-    overflow: hidden;
-    transition: opacity 0.22s ease, border-color 0.3s ease;
-}
-
-.kboble::before,
-.kboble::after {
-    content: "";
-    position: absolute;
-    top: var(--hale);
-    width: 0;
-    height: 0;
-    border-style: solid;
-    transform: translateY(-50%);
-}
-
-/* Halen: en trekant, der peger mod hans mund */
-.kboble::before { left: -15px; border-width: 8px 12px 8px 0; border-color: transparent #2a2f36 transparent transparent; }
-.kboble::after  { left: -9px;  border-width: 6px 9px 6px 0;  border-color: transparent #fffdf6 transparent transparent; }
-
-.kboble { overflow: visible; }
-.kb-tekst { max-height: inherit; overflow: hidden; }
-.kboble.skift { opacity: 0.25; transition: none; }
-
-.kboble.god   { border-left-color: var(--groen); }
-.kboble.skidt { border-left-color: var(--roed); }
-.kboble.hint  { border-left-color: var(--gul); }
-.kboble.svar  { border-left-color: #e0b43a; }
-
-.kboble b { color: #000000; }
-.kboble .broek { font-size: 0.8em; }
-
-/* ---------------------------------------------------------------------
-   LINJEN I OPGAVEKORTET: naeste skridt, fejl og ros (Kemichael blander
-   sig ikke) og knappen, der sender Kemichael ud
+   LINJEN I OPGAVEKORTET: naeste skridt, fejl, ros, hint og svar
    --------------------------------------------------------------------- */
 .opgavekort .besked {
     margin: 8px 0 0;
@@ -669,27 +619,39 @@ select:focus-visible {
 
 .opgavekort .besked.god   { border-left-color: var(--groen); }
 .opgavekort .besked.skidt { border-left-color: var(--roed); }
-.opgavekort .besked.gul   { border-left-color: var(--gul); }
+.opgavekort .besked.gul   { border-left-color: var(--gul); background-color: rgba(242, 197, 61, 0.1); color: #f7e4ab; }
 .opgavekort .besked .broek { font-size: 0.8em; }
 
-.kknap {
-    position: absolute;
-    right: 12px;
-    bottom: 10px;
-    z-index: 5;
-    background-color: rgba(20, 20, 28, 0.85);
-    color: var(--tekst-svag);
-    border: 1px solid #4a4a58;
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-family: inherit;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
+/* ---------------------------------------------------------------------
+   HJAELPEKNAPPEN: gul, saa den ses, uden at man leder. Giv hint er
+   fyldt, Vis svaret kun et omrids. Efter et forkert svar lyser knappen
+   stille op (klassen peg), til den er brugt.
+   --------------------------------------------------------------------- */
+.knap.hjaelp {
+    border: 2px solid #c79a12;
+    background-color: #ffdf6b;
+    color: #33290a;
+    font-size: 1rem;
+    font-weight: 700;
 }
 
-.kknap:hover { color: var(--tekst); border-color: #6e6e80; background-color: var(--panel-3); }
-.kknap.ude { color: var(--gul); border-color: rgba(242, 197, 61, 0.6); }
+.knaprad .knap.hjaelp { padding: 9px 8px; }
+.knap.hjaelp:hover:not(:disabled) { background-color: #ffd23e; border-color: #a67f08; }
+
+.knap.hjaelp.svar {
+    border-color: rgba(242, 197, 61, 0.7);
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #f7e4ab;
+}
+
+.knap.hjaelp.svar:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); color: #fff6d8; }
+
+@keyframes knap-peg {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+    50%      { box-shadow: 0 0 0 6px rgba(242, 197, 61, 0.32); }
+}
+
+.knap.hjaelp.peg { animation: knap-peg 1.9s ease-in-out infinite; }
 
 /* ---------------------------------------------------------------------
    SC5.1: talraekkerne, regnetrinene (som sc7.4), gaettet og Start forfra
@@ -815,10 +777,10 @@ select:focus-visible {
 
 .valgrad.peg .knap:not(:disabled) { border-color: var(--gul); animation: peg 1s ease-out infinite; }
 
-/* Start forfra i Kemichaels baand, til venstre for knappen, der sender ham ud */
+/* Start forfra: nederst til hoejre i scenen */
 .forfraknap {
     position: absolute;
-    right: 172px;
+    right: 12px;
     bottom: 10px;
     z-index: 5;
     background-color: rgba(20, 20, 28, 0.85);

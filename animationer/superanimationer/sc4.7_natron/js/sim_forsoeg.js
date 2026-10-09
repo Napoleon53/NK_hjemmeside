@@ -117,13 +117,12 @@
         this.sprojtSet = false;
         this.hurtig = null;
         this.auto = null;
-        this.holdSvar = 0;
+        this.holdSvar = "";
         this.rosNaeste = "";
         this.rosKlasse = "";
         this.sidsteFase = null;
         this.gemtVist = false;
         this.skemaSig = "";
-        this.kageVip = 0;
     };
 
     P.harForfra = function () { return true; };
@@ -136,7 +135,6 @@
         this.sidsteFase = this.fase();
         this.hjaelp = 0;
         this.brugtSvar = false;
-        this.k.tie();
         this.visKort();
         this.visListe();
         this.besked("En ny digel med " + K.g2(this.proeve) + " g natron. " + this.trinLinje(), "");
@@ -194,10 +192,9 @@
         if (maade === "svar") {
             /* Der er intet rigtigt gaet her: forsoeget skal afgoere det */
             this.brugtSvar = false;
-            this.svarVis(NK.html("Et gæt er et gæt. Jeg har valgt " + s.t + " for dig. Forsøget afgør det."));
-            this.holdSvar = 1;
+            this.holdSvar = NK.html("Et gæt er et gæt. " + s.t + " er valgt for dig. Forsøget afgør det.");
+            this.svarVis(this.holdSvar);
         } else {
-            this.k.tie();
             this.rosNaeste = "Forsøget afgør det.";
             this.rosKlasse = "neutral";
         }
@@ -239,12 +236,17 @@
 
     P.slutLinje = function () { return this.forklaring; };
 
+    /* holdSvar: det svar, eleven lige har bedt om. Det bliver staaende i linjen
+       foran det naeste skridt, til fasen skifter igen. */
     P.faseSkift = function (f) {
         this.hjaelp = 0;
-        if (this.holdSvar > 0) this.holdSvar--;
-        else this.k.tie();
+        var holdt = this.holdSvar;
+        this.holdSvar = "";
         var klasse = this.rosNaeste ? (this.rosKlasse === "neutral" ? "" : (this.rosKlasse || "god")) : "";
-        if (f !== "faerdig") this.besked((this.rosNaeste ? this.rosNaeste + " " : "") + this.trinLinje(), klasse);
+        if (f !== "faerdig") {
+            if (holdt) this.besked(holdt + " " + this.trinLinje(), "gul");
+            else this.besked((this.rosNaeste ? this.rosNaeste + " " : "") + this.trinLinje(), klasse);
+        }
         this.rosNaeste = "";
         this.rosKlasse = "";
         this.visKnap();
@@ -271,11 +273,11 @@
     P.visSvar = function (f) {
         var d = this.d;
         this.brugtSvar = true;
-        this.holdSvar = 1;
         var tekst = D.SVAR[f] ? D.SVAR[f].replace("{m}", K.g2(d.visning() === null ? this.proeve : d.visning())) : "";
-        if (f === "foer") { this.svarVis(NK.html(tekst)); this.noter("svar"); return; }
-        if (f === "vej") { this.holdSvar = 0; this.noter("svar"); return; }
-        this.svarVis(NK.html(tekst));
+        if (f === "vej") { this.holdSvar = ""; this.noter("svar"); return; }
+        this.holdSvar = NK.html(tekst);
+        this.svarVis(this.holdSvar);
+        if (f === "foer") { this.noter("svar"); return; }
         if (f === "flyt" || f === "igen") {
             this.startFlyt("trefod");
             if (f === "igen") this.auto = { slags: "taend", fl: d.reageret() > 0.6 ? "hoej" : "lav" };
@@ -348,7 +350,6 @@
             inp.addEventListener("keydown", function (ev) {
                 if (ev.key === "Enter") { ev.preventDefault(); mig.tjekFelt(); }
             });
-            inp.addEventListener("input", function () { mig.k.skriver(); });
             if (havdeFokus) inp.focus({ preventScroll: true });
         }
         var m = this.vejninger.length ? this.vejninger[this.vejninger.length - 1] : null;
@@ -411,7 +412,6 @@
         this.sidstVejet = d.opv;
         this.maxT = d.T;
         if (f === "foer") {
-            if (!this.holdSvar) this.k.tie();
             this.rosNaeste = NK.tilfaeldig(D.ROS);
             this.visSkema();
             this.visKort();
@@ -419,7 +419,6 @@
         }
         var ens = forrige && this.vejninger.length >= 3 && Math.abs(forrige.m - m) < D.KONSTANT.tol;
         if (ens && varmTil >= 200) { this.slut(maade); return; }
-        if (!this.holdSvar) this.k.tie();
         /* Massen er ikke konstant endnu: linjen siger, hvor meget den faldt */
         var fald = K.r2(forrige.m - m);
         this.rosKlasse = "gul";
@@ -497,9 +496,8 @@
         if (z && Math.hypot(pt.x - z.x, pt.y - z.y) < z.r) return "zoom";
         var g = lay.graf;
         if (g && pt.x >= g.x && pt.x <= g.x + g.b && pt.y >= g.y && pt.y <= g.y + g.h) return "graf";
-        var gl = lay.glasR, kg = lay.kageR;
+        var gl = lay.glasR;
         if (gl && pt.x >= gl.x && pt.x <= gl.x + gl.b && pt.y >= gl.y && pt.y <= gl.y + gl.h) return "glas";
-        if (kg && pt.x >= kg.x && pt.x <= kg.x + kg.b && pt.y >= kg.y && pt.y <= kg.y + kg.h) return "kage";
         return null;
     };
 
@@ -530,16 +528,7 @@
         if (u === "zoom") this.kortBesked(NK.dommen ? "Luppen: to HCO₃⁻ bliver til CO₃²⁻, CO₂ og H₂O. CO₂ og H₂O forsvinder op i luften, og Na⁺ bliver." :
             "Luppen viser natronen: Na⁺ og HCO₃⁻. Gas forsvinder, og det, der bliver tilbage, står som ?.");
         if (u === "graf") this.kortBesked("Grafen viser de masser, du har skrevet i skemaet. Når massen er konstant, bliver kurven vandret.");
-        if (u === "glas" || u === "kage") {
-            var t;
-            if (u === "kage") {
-                this.kageNr = ((this.kageNr === undefined ? -1 : this.kageNr) + 1) % D.KAGE.length;
-                t = D.KAGE[this.kageNr];
-                this.kageVip = 1;
-            } else t = D.KRUKKE;
-            if (this.k.inde()) this.k.svar(NK.html(t), "", 4.5);
-            else this.kortBesked(t);
-        }
+        if (u === "glas") this.kortBesked(D.KRUKKE);
         return false;
     };
 
@@ -587,8 +576,7 @@
     /* ----- Layout ----------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.1, 40, 54));
         /* Hoejre spalte: luppen og grafen */
@@ -632,7 +620,6 @@
         this.saetAnker("vaegt", lay.vaegt.x - vb / 2, lay.vaegt.top - th * 0.4, vb, vh + th * 0.4);
         this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 26, 2 * zr, 2 * zr + 56);
         this.saetAnker("graf", lay.graf.x, lay.graf.y, lay.graf.b, lay.graf.h);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* ----- Opdater ----------------------------------------------------------------------- */
@@ -670,7 +657,6 @@
         this.damp.opdater(dt, this.faerdig ? 0 : d.gas);
         this.korn.opdater(dt, (lay.bordY - (dg.bund - Tg.digelHoejde(dg.b) * 0.87)) / dg.b);
         this.lup.opdater(dt * (tf > 1 ? 3 : 1), d.reageret(), !!NK.dommen);
-        if (this.kageVip) this.kageVip = Math.max(0, this.kageVip - dt * 1.5);
         var auto = !!(this.hurtig || (this.auto && this.auto.slags === "varm") || this.flyt);
         if (auto !== !!this.autoKnap) { this.autoKnap = auto; this.visKnap(); }
         /* Fasen */
@@ -780,13 +766,6 @@
         Tg.graf(ctx, lay.graf, { serier: [{ punkter: gd.punkter, farve: "#f2a93d" }], linjer: gd.linjer, yMax: gd.yMax, xMax: gd.xMax,
             fremhaev: NK.dommen && gd.linjer ? D.RIGTIG : null });
 
-        this.k.tegn(ctx);
-        /* Kagen paa Kemichaels kateder (paaskeaegget) */
-        var kl = this.k.lay;
-        if (kl) {
-            var kbr = NK.klamp(kl.desk.b * 0.2, 34, 60);
-            lay.kageR = Tg.kage(ctx, kl.desk.x + kl.desk.b * 0.57, kl.bordY + 2, kbr, this.over === "kage", Math.sin(this.kageVip * 14) * 0.1 * this.kageVip);
-        }
     };
 
     NK.SimForsoeg = SimForsoeg;

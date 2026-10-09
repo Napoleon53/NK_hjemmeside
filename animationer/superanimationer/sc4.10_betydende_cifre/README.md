@@ -2,8 +2,7 @@
 
 Superanimation om betydende cifre: hvor præcist et tal er kendt, hvordan det
 afrundes, og hvordan kommaet flyttes med tierpotenser og enheder. Åbn
-`index.html`. Mappen henter kun filer inde fra sig selv, bortset fra Kemichael
-(`../../v2/kemichael/kemichael.js` og `../kemichael/superanimation.js`). Ingen
+`index.html`. Mappen henter kun filer inde fra sig selv. Ingen
 `fetch` og ingen moduler, så den virker fra harddisken.
 
 Den afløser `animationer/kemi-c-filer/c4.10_quiz_betydendecifre_notation.html`
@@ -31,14 +30,14 @@ Den afløser `animationer/kemi-c-filer/c4.10_quiz_betydendecifre_notation.html`
    gamle og er det heller ikke her.
 4. **Loftet:** 4 faner, én opgave ad gangen med ét tal eller to faktorer,
    højst 7 tegn i et tal, der skal afrundes, 10 opgaver i en runde, de fem
-   typer fra den gamle og ét sprite (katederet fra sc4.5).
+   typer fra den gamle og ingen sprites.
 5. **Layoutet:** scene plus panel. Scenen er ternet papir med spørgsmålet,
-   tavlen med cifrene som brikker, svarfeltet og linjen under det, og nederst
-   Kemichaels bånd. Panelet har opgavekortet (runden som ti streger, én knap)
+   tavlen med cifrene som brikker, svarfeltet og linjen under det. Panelet har opgavekortet (runden som ti streger, én knap)
    og listen over rundens opgaver med facit.
 
 Brugerens valg (25. sept. 2026): fanerne Tæl cifrene, Afrund, Flyt kommaet og
-Blandet, og den rolige Kemichael ved katederet som i `sc4.5`. Efter første
+Blandet. 9. okt. 2026: Kemichael ved katederet er taget helt ud (han hører
+til i laboratoriet), og hintknappen er gul. Efter første
 udgave samme dag: Flyt kommaet før Afrund (afrunding kræver somme tider
 videnskabelig notation), den uskrevne regel om tal mellem 0,01 og 100 (se
 nedenfor) og flere enhedsomregninger. Loftet for enheder er derfor fem slags
@@ -187,18 +186,14 @@ Et rigtigt svar får også en forklaring: "Det næste ciffer er 6, så der runde
 op." Et svar som 46 · 10³ godkendes med en note om, at der i videnskabelig
 notation står ét ciffer foran kommaet.
 
-## Kemichael
+## Hjælpen
 
-Den rolige udgave fra `sc4.5` (`js/laerer.js`, samme fil med sin egen nøgle i
-browseren): han sidder bag sit kateder nederst til venstre og siger kun noget
-ved Giv hint (står, til opgaven er løst) og Vis svaret. Fejl, ros og næste
-skridt står i linjen under svarfeltet. Knappen "Send Kemichael ud" sender ham
-på lærerværelset; så står hintene i linjen, og samme knap eller sedlen på
-katederet henter ham. <kbd>K</kbd> får ham til at sige, hvor man er.
-Kaffekoppen og et klik på ham virker som i sc4.5 med egne kaffereplikker.
-
-Påskeæg: et klik på kommaet, når cifrene skal tælles ("Kommaet er ikke et
-ciffer."), og 10 af 10 i Blandet ("Med to betydende cifre.").
+Den gule knap i opgavekortet: Giv hint skriver hintet i linjen under
+svarfeltet (den står, til opgaven er løst), og knappen bliver til Vis svaret
+(kun et omrids), der skriver svaret i felterne og forklaringen i linjen.
+Fejl, ros og næste skridt står i samme linje. Efter et forkert svar lyser den
+gule knap stille op. Der er ingen Kemichael: scenen er ren DOM uden lærred
+og sprites.
 
 ## Forenklinger
 
@@ -228,11 +223,9 @@ ciffer."), og 10 af 10 i Blandet ("Med to betydende cifre.").
 index.html          toplinje, scene, panel, teori og rundvisning
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, hævet skrift, lærred (som sc4.5)
-js/data.js          fanerne, runden og Kemichaels replikker
+js/data.js          fanerne, runden og linjerne under svarfeltet
 js/cifre.js         modellen: tal som cifre, afrunding, skrivemåder,
                     opgaverne, tjekket med beskederne, hint og svar
-js/sprites.js       katederet (sprites/kateder.svg, samme som sc4.5)
-js/laerer.js        Kemichael ved katederet (NK.RoligLaerer fra sc4.5)
 js/fane.js          én fane: runden, tavlen, svarfeltet, kommaet, der
                     hopper, knappen og panelet
 js/rundvisning.js   rundvisningen bag ?
@@ -244,24 +237,23 @@ _selvtest.html      udviklerværktøj, se nedenfor
 
 <kbd>1</kbd> til <kbd>4</kbd> fane · <kbd>Enter</kbd> tjek og næste ·
 <kbd>R</kbd> ny runde · <kbd>H</kbd> rundvisning · <kbd>T</kbd> teori ·
-<kbd>K</kbd> Kemichael · <kbd>Esc</kbd> luk. Direkte links: `#tael`,
+<kbd>Esc</kbd> luk. Direkte links: `#tael`,
 `#afrund`, `#komma`, `#blandet`.
 
 ## Selvtest
 
-`_selvtest.html` skal åbnes gennem en lokal server med `animationer/` som rod
-(Kemichael hentes derfra). Den tjekker fanernes rækkefølge, tællingen og afrundingen mod faste
+`_selvtest.html` skal åbnes gennem en lokal server. Den tjekker fanernes rækkefølge, tællingen og afrundingen mod faste
 eksempler (også 1,005 og 100 422), at 1500 opgaver af hver type har et gyldigt
 facit, der godkendes (enhederne på alle fire niveauer), hvad hvert niveau
 indeholder, at de typiske fejl får den rigtige besked uden facit, at
 en hel runde kan gennemføres på alle fire faner (og kommaet hopper færdigt),
 at Meget svær først låses op af tre klarede niveauer, svarknapperne
 (almindeligt tal som start, låst, når opgaven siger det, eksponentfeltet
-hævet, `e` skifter), hint, Vis svaret og tomme svar, at Kemichael kun taler
-ved hint og svar og kan sendes ud, sproget, og at tallene står på én linje
+hævet, `e` skifter), hint, Vis svaret og tomme svar, at hint og svar kun
+kommer fra den gule knap, og at den lyser op efter en fejl, sproget, og at tallene står på én linje
 fra 900 til 1400 px, også løste enhedsopgaver på Svær og Meget svær.
 Elevens gemte valg, rekord og klarede niveauer lægges tilbage bagefter.
-Sidst kørt: ALT OK (127 påstande), 27. september 2026.
+Sidst kørt: ALT OK (125 påstande), 9. oktober 2026.
 
 ## I menuen
 

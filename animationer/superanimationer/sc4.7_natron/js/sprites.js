@@ -5,10 +5,6 @@
    siden aabnes direkte fra harddisken (file://). Er en fil ikke klar
    endnu, springes den bare over i det billede.
 
-   ../../v2/kemichael/kemichael.js tilfoejer laererens sprites (og
-   kaffekoppen) med deres egen mappe, derfor startes indlaesningen foerst
-   fra app.js.
-
    MAAL er de koordinater, der staar i kommentaren oeverst i hver
    SVG-fil. Aendres en fil, skal tallene her foelge med. _sprites.html
    viser dem alle alene.
@@ -32,20 +28,17 @@
         digel: { b: 90, h: 76, randY: 10, indRx: 35, indRy: 6.5, bund: 74 },
         /* Tangen: kaeberne i (6, 22) */
         tang: { b: 180, h: 44, kaebeX: 6, kaebeY: 22 },
-        /* Natronglasset og kagen: de staar paa y 101 og 68 */
+        /* Natronglasset: det staar paa y 101 */
         natron: { b: 80, h: 104, bund: 101 },
-        kage: { b: 120, h: 72, bund: 68 },
         /* Vaegten (som sc4.5) */
         vaegt: { b: 240, h: 130, skaalX: 120, skaalY: 13, skaalB: 156, dispV: 72, dispH: 168, dispTop: 68, dispBund: 94, bund: 128 },
         /* Luppen (som sc2.1) */
-        lup: { b: 140, h: 140, midtX: 52, midtY: 52, r: 38 },
-        /* Kemichaels kateder (som sc4.5) */
-        kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 }
+        lup: { b: 140, h: 140, midtX: 52, midtY: 52, r: 38 }
     };
 
     /* Filerne. Trefoden har to filer med samme maal. */
     var FILER = {};
-    ["bunsen", "digel", "tang", "natron", "kage", "vaegt", "lup", "kateder"].forEach(function (navn) {
+    ["bunsen", "digel", "tang", "natron", "vaegt", "lup"].forEach(function (navn) {
         FILER[navn] = { fil: navn + ".svg", b: MAAL[navn].b, h: MAAL[navn].h };
     });
     FILER.trefod_bag = { fil: "trefod_bag.svg", b: MAAL.trefod.b, h: MAAL.trefod.h };

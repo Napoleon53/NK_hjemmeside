@@ -2,10 +2,8 @@
    app.js - binder de to faner sammen
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Kemichael praesenterer ikke med knapper her:
-   han sidder ved katederet og siger kun noget, naar eleven beder om et
-   hint eller svaret (den rolige Kemichael fra sc4.5, brugerens valg
-   25. sept. 2026). K faar ham til at sige, hvor man er.
+   fane opdateres og tegnes. Ingen praesentation: linjen i opgavekortet
+   siger, hvor man er, og hvad man goer.
    ===================================================================== */
 (function () {
     "use strict";
@@ -82,7 +80,6 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "k" || e.key === "K") { if (sim) sim.startIntro(true); return; }
         if (e.key === "1" || e.key === "2") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }

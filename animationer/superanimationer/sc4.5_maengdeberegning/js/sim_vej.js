@@ -67,11 +67,10 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
-        var baand = this.k.layout(W, H);
-        lay.baand = baand;
         var kant = NK.klamp(W * 0.014, 8, 16);
-        var top = baand.y;
-        lay.bordY = Math.round(top - NK.klamp(H * 0.035, 10, 26));
+        /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
+        var top = H;
+        lay.bordY = Math.round(top - NK.klamp(H * 0.06, 18, 44));
         /* Tavlen oeverst. Skemaet skal have hoved, tre raekker og plads til pilen paa tvaers */
         var tH = NK.klamp(top * 0.5, 190, 380);
         lay.tavle = { x: kant + 6, y: NK.klamp(H * 0.02, 8, 18), b: W - 2 * kant - 12, h: tH };
@@ -104,8 +103,6 @@
         this.lay = lay;
         this.saetAnker("skema", lay.tavle.x, lay.tavle.y, lay.tavle.b, tH);
         this.saetAnker("vaegte", kant, zoneTop, W - 2 * kant, lay.bordY - zoneTop + 10);
-        this.saetAnker("boble", this.k.lay.boble.x, this.k.lay.boble.y, this.k.lay.boble.b, this.k.lay.boble.h);
-        this.saetAnker("laerer", this.k.lay.desk.x, baand.y, this.k.lay.desk.b, baand.h);
     };
 
     /* ----- Scenen foelger skemaet ------------------------------------------------------ */
@@ -155,7 +152,7 @@
         Tg.rum(ctx, lay.W, lay.H, lay.bordY + 6);
         Tg.tavle(ctx, lay.tavle);
         this.skema.tegn(ctx, this.tid);
-        Tg.bord(ctx, 0, lay.W, lay.bordY, lay.baand.y);
+        Tg.bord(ctx, 0, lay.W, lay.bordY, lay.H);
 
         /* Krukkerne */
         Tg.krukke(ctx, lay.krukkeV.x, lay.krukkeV.y, lay.jh, stK, { fremhaev: fh === this.jK + "_n" ? puls : 0 });
@@ -184,8 +181,6 @@
             var felt = this.skema.feltRekt(this.jK + "_n");
             if (felt) Tg.buePil(ctx, vV.x + vV.b * 0.35, vV.y - lay.pose * 0.9, felt.cx, felt.y + felt.h + 6, this.tid);
         }
-
-        this.k.tegn(ctx);
     };
 
     /* Poserne: paa vaegten til venstre (fase 1), paa vej gennem pilen

@@ -744,7 +744,42 @@
             span.classList.toggle('udenfor', antal > 0 && antal < 20);
         }
 
+        // Formularen vælger selv det kapitel og den animation, der er åben. Før stod
+        // den altid på første kapitel og "generelt", så feedback blev sendt under det
+        // forkerte emne (6. okt. 2026). Kapitlerne i menuen og i FEEDBACK_EMNER står i
+        // samme rækkefølge. Vælger eleven selv noget andet, bliver det stående, til en
+        // anden animation åbnes.
+        var feedbackSidstValgt = null;
+
+        function aabenAnimation() {
+            var generelt = FEEDBACK_EMNER.length - 1;
+            var vindue = document.getElementById('visningsVindue');
+            var kap = -1, nr = '';
+            Array.prototype.forEach.call(document.querySelectorAll('#sidebarMenu .tab-btn:not(.feedback-btn)'), function(knap, i) {
+                if (knap.classList.contains('active')) kap = i;
+            });
+            if (kap < 0 || kap >= generelt || vindue.style.display === 'none') return { kap: generelt, nr: '' };
+            try {
+                var indre = vindue.contentDocument;
+                var aktiv = indre.querySelector('.tab-btn.active .btn-num');
+                var indreVindue = indre.getElementById('visningsVindue');
+                if (aktiv && (!indreVindue || indreVindue.style.display !== 'none')) nr = aktiv.textContent.trim();
+            } catch (e) { /* åbnet fra harddisken: kun kapitlet kan ses */ }
+            return { kap: kap, nr: nr };
+        }
+
         function visFeedback() {
+            var nu = aabenAnimation();
+            var noegle = nu.kap + '/' + nu.nr;
+            if (noegle !== feedbackSidstValgt) {
+                feedbackSidstValgt = noegle;
+                document.getElementById('feedbackKapitel').value = nu.kap;
+                opdaterFeedbackAnimationer();
+                var sel = document.getElementById('feedbackAnimation');
+                Array.prototype.forEach.call(sel.options, function(opt) {
+                    if (nu.nr && opt.value.indexOf(nu.nr + '. ') === 0) sel.value = opt.value;
+                });
+            }
             document.getElementById('feedbackOverlay').classList.add('vis');
             document.body.style.overflow = 'hidden';
         }

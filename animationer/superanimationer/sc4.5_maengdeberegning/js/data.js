@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - stofferne, reaktionerne, opgaverne og Kemichaels replikker
+   data.js - stofferne, reaktionerne, opgaverne og linjerne i opgavekortet
 
    Alt, der kan staa som data, staar her. Molarmasserne regnes af
    atommasserne i hundrededele (heltal), saa 2 · 1,01 + 16,00 giver
@@ -225,12 +225,10 @@
     D.BEGR_MAKS = 6;
 
     /* ======================================================================
-       LINJEN I OPGAVEKORTET OG KEMICHAEL VED KATEDERET
+       LINJEN I OPGAVEKORTET
        Kortet siger, hvor man er (INTRO), naeste skridt, fejl og ros
-       (ROS, ROS_OPGAVE, FAERDIG). Kemichael blander sig ikke: han siger kun
-       noget, naar eleven beder om et hint, og naar han sendes ud eller
-       hentes (UD_LINJE, IND_LINJE) eller klikkes paa (KAFFE, PRIK_SIDST).
-       Hoejst ca. 60 tegn pr. saetning, ingen teori.
+       (ROS, ROS_OPGAVE, FAERDIG). Hint og svar staar i samme linje, naar
+       eleven beder om dem. Hoejst ca. 60 tegn pr. saetning, ingen teori.
        ====================================================================== */
     D.INTRO = {
         vej: "Fra gram til gram går vejen over mol.",
@@ -246,22 +244,6 @@
 
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst. Pænt skrevet."];
-
-    /* Naar han sendes ud, og naar han hentes igen */
-    D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Kaffen derude var ikke bedre.";
-
-    /* Klik paa koppen: han drikker og siger noget om kaffen */
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Den er fra i morges. Tror jeg.",
-        "Kaffen er min. Mængdeberegningen er din.",
-        "Nogen har fortyndet den.",
-        "Fjerde kop i dag. Den regner jeg ikke på.",
-        "Stadig kold. Men det er min."
-    ];
-    /* Klik paa ham, naar prik-puljerne er brugt op */
-    D.PRIK_SIDST = "Jeg sidder her bare. Regn du.";
 
     NK.Data = D;
 }());

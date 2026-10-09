@@ -2,7 +2,7 @@
    data.js - stofferne, opgaverne og replikkerne
 
    Alt, en laerer kan have lyst til at rette i, staar her: atommasserne,
-   stofferne, de fire fanes opgaver med tallene og det, Kemichael siger.
+   stofferne, de fire fanes opgaver med tallene og linjerne i opgavekortet.
    Kemien og tallene regnes i kemi.js; tegningen kender kun resultatet.
 
    Stoerrelser med et ord i saenket skrift skrives "V_før", "c_efter"
@@ -70,9 +70,13 @@
 
     /* ----- Fane 1: karret ------------------------------------------------------------
        start: n i mol og V i mL, naar opgaven begynder.
+       tekst: opgaven, som den staar paa kortet oeverst i scenen. linje: det
+       foerste skridt; i en opgave med et gaet er det kortets tekst, naar der
+       er gaettet.
        valg: et gaet, der kommer foer eleven proever (det rigtige har ok).
+       den: det, svarenes "Den" staar for, naar gaettet staar alene paa kortet.
        maal: det, karret skal vise (c i M og/eller V i mL).
-       svar: det, Kemichael siger ved Vis svaret, og handlingerne, karret
+       svar: det, linjen i kortet siger ved Vis svaret, og handlingerne, karret
        saa goer fra start: ["stof", skefulde] eller ["vand", mL]. */
     D.SKEFULD = 0.10;         /* mol pr. skefuld */
     D.TRYK = 50;              /* mL pr. tryk paa en hane */
@@ -80,31 +84,31 @@
     D.KAR = [
         { id: "stof", titel: "Mere stof", tekst: "Gør opløsningen 0,40 M.",
           start: { n: 0, V: 500 }, maal: { c: 0.40 },
-          linje: "Træk en skefuld kobber(II)sulfat fra krukken ned i karret.",
+          linje: "Klik på krukken, eller træk en skefuld kobber(II)sulfat ned i karret.",
           hint: "Hver skefuld er 0,10 mol, og karret har 0,50 L. Hvor mange mol giver 0,40 M?",
           svar: "n = c · V = 0,40 M · 0,50 L = 0,20 mol. Det er to skefulde.",
           goer: [["stof", 1], ["stof", 1]],
           efter: "c = 0,20 mol / 0,50 L = 0,40 M. Mere stof giver en højere koncentration." },
         { id: "vand", titel: "Mere vand", tekst: "Du hælder vand i, til der er dobbelt så meget.",
           start: { n: 0.20, V: 400 }, maal: { V: 800, c: 0.25 },
-          valg: { spm: "Hvad sker der med koncentrationen?",
+          valg: { spm: "Hvad sker der med koncentrationen?", den: "koncentrationen",
                   hint: "c = n / V. Stofmængden er den samme. Hvad sker der med en brøk, når nævneren bliver dobbelt så stor?",
                   svar: [{ t: "Den bliver halvt så stor", ok: true },
                          { t: "Den bliver dobbelt så stor", forkl: "Vandet gør ikke stoffet mere. Den samme stofmængde fordeler sig i dobbelt så meget vand." },
                          { t: "Den er den samme", forkl: "Stofmængden er den samme, men den fordeler sig i dobbelt så meget vand." }] },
-          linje: "Prøv det: hæld vand i fra hanen, til karret viser 0,80 L.",
+          linje: "Hold vandhanens blå knap nede, til karret viser 0,80 L.",
           hint: "Hold musen nede på den blå knap på hanen. Hvert tryk giver 0,05 L.",
           svar: "Hanen giver vand, til karret viser 0,80 L.",
           goer: [["vand", 400]],
           efter: "c = 0,20 mol / 0,80 L = 0,25 M. Dobbelt så meget vand giver det halve." },
         { id: "tap", titel: "Tap ud", tekst: "Du tapper halvdelen af opløsningen ud.",
           start: { n: 0.30, V: 600 }, maal: { V: 300, c: 0.50 },
-          valg: { spm: "Hvad sker der med koncentrationen i karret?",
+          valg: { spm: "Hvad sker der med koncentrationen i karret?", den: "koncentrationen i karret",
                   hint: "Det, der løber ud, er den samme opløsning, som bliver tilbage. Der forsvinder både stof og vand.",
                   svar: [{ t: "Den er den samme", ok: true },
                          { t: "Den bliver halvt så stor", forkl: "Der forsvinder stof, men der forsvinder også lige så meget vand." },
                          { t: "Den bliver dobbelt så stor", forkl: "Der kommer hverken stof eller vand til. Det, der er tilbage, er den samme opløsning." }] },
-          linje: "Prøv det: tap ud ved den røde hane forneden, til karret viser 0,30 L.",
+          linje: "Hold den røde hane nede, til karret viser 0,30 L.",
           hint: "Hold musen nede på den røde hane. Hvert tryk tapper 0,05 L.",
           svar: "Hanen tapper ud, til karret viser 0,30 L.",
           goer: [["tap", 300]],
@@ -142,7 +146,10 @@
        i tabellen, etiket, prikker, enhed: enhederne, der gaar ud).
        foer: en handling, eleven goer, foer spoergsmaalet (haeld: hael V mL
        fra et glas til et andet, saml: haeld flere glas i ét, vand: vand
-       fra sproejteflasken op til mL). regn: regnestykket over glassene. */
+       fra sproejteflasken op til mL). regn: regnestykket over spoergsmaalet.
+       Alt det staar paa kortet oeverst i scenen: linje (og efter en
+       handling foer.efter) som indledning, tekst som spoergsmaalet, svarene
+       side om side og efter som forklaringen paa det groenne kort. */
     D.PRIK_GLAS = 0.01;
 
     D.GLAS = [
@@ -257,7 +264,7 @@
           glas: [{ navn: "A", V: 200, n: 0.10, kendt: "nVc" }],
           prikker: true, sproejte: true,
           spm: [
-              { foer: { slags: "vand", glas: 0, til: 400, linje: "Klik på sprøjteflasken for at hælde vand i glas A, til der er 0,40 L.",
+              { foer: { slags: "vand", glas: 0, til: 400, linje: "Klik på sprøjteflasken for at hælde vand i glas A op til 0,40 L.",
                         hint: "Klik på sprøjteflasken til højre på bordet.", efter: "Der er hældt vand i glas A. Nu er der 0,40 L.",
                         kendt: [{ glas: 0, n: false, c: false }] },
                 tekst: "Hvad er stofmængden i glasset nu?",
@@ -287,7 +294,7 @@
                        { t: "L", forkl: "L er rumfangets enhed. mol/L · L = mol." },
                        { t: "mol/L", forkl: "mol/L er det samme som M, koncentrationens enhed. mol/L · L = mol." }],
                 hint: "Skriv M som mol/L. Hvad går ud, når der ganges med L?",
-                efter: "n = 0,10 mol. Enhederne: M · L = mol/L · L = mol.",
+                efter: "M betyder mol/L. Ganges mol/L med L, går L ud. Stofmængden har enheden mol.",
                 vis: { enhed: "n", n: [0] } },
               { regn: "c = n / V = 0,10 mol / 0,40 L = 0,25 ?", tekst: "Glas B: hvilken enhed får koncentrationen?",
                 svar: [{ t: "M", ok: true },
@@ -295,7 +302,7 @@
                        { t: "L", forkl: "L er rumfangets enhed. mol / L = mol/L = M." },
                        { t: "mol · L", forkl: "Der er delt med L, ikke ganget. mol / L = mol/L = M." }],
                 hint: "Der deles mol med L. Hvad står der så?",
-                efter: "c = 0,25 M. Enhederne: mol / L = mol/L = M.",
+                efter: "mol delt med L er mol/L, og mol/L skrives M. Koncentrationen har enheden M.",
                 vis: { enhed: "c", c: [1] } },
               { regn: "V = n / c = 0,10 mol / 0,50 M = 0,20 ?", tekst: "Glas A: hvilken enhed får rumfanget?",
                 svar: [{ t: "L", ok: true },
@@ -303,7 +310,7 @@
                        { t: "M", forkl: "M er koncentrationens enhed. mol / (mol/L) = L." },
                        { t: "mol²/L", forkl: "Der er delt med M, ikke ganget. mol / (mol/L) = L." }],
                 hint: "Skriv M som mol/L. mol går ud, når mol deles med mol/L.",
-                efter: "V = 0,20 L. Enhederne: mol / M = mol / (mol/L) = L.",
+                efter: "M betyder mol/L. Deles mol med mol/L, går mol ud. Rumfanget har enheden L.",
                 vis: { enhed: "V" } }
           ] },
         { id: "blandet", titel: "To forskellige glas",
@@ -450,9 +457,12 @@
 
     /* ----- Replikkerne ------------------------------------------------------------------
        Linjen i opgavekortet siger, hvor man er (INTRO), naeste skridt,
-       fejl og ros. Kemichael blander sig ikke: han siger kun noget ved
-       Giv hint og Vis svaret, naar han sendes ud eller hentes, og naar der
-       klikkes paa ham eller koppen. */
+       fejl og ros, og hintet eller svaret, naar eleven beder om det. */
+    /* Fane 1: de gule skilte ved det, der skal bruges, og linjen, naar eleven
+       klikker paa forsoeget, foer der er gaettet */
+    D.SKILT = { krukke: "Klik: en skefuld", vand: "Hold nede: vand", tap: "Hold nede: tap ud" };
+    D.GAET_LINJE = "Gæt først. Vælg et af de tre svar på det gule kort.";
+
     D.INTRO = {
         kar: "Koncentrationen er stofmængde pr. liter.",
         glas: "Stofmængden er alt stoffet i glasset. Koncentrationen er stof pr. liter.",
@@ -467,18 +477,6 @@
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
-
-    D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Kaffen derude var ikke bedre.";
-
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Nogen har fortyndet den.",
-        "Den er fra i morges. Tror jeg.",
-        "Kaffen er min. Koncentrationen er din.",
-        "Stadig kold. Men det er min."
-    ];
-    D.PRIK_SIDST = "Jeg sidder her bare. Regn du.";
 
     NK.Data = D;
 }());

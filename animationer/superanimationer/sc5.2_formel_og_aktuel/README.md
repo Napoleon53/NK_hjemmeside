@@ -4,8 +4,7 @@ Superanimation om ionerne i en saltopløsning: et salt giver sine ioner i
 det forhold, formlen angiver, så [ion] = tallet foran ionen ·
 c(salt). Kommer en ion fra to salte, lægges bidragene sammen, og blander
 man to opløsninger, lægges stofmængderne sammen. Åbn `index.html`. Mappen
-henter kun filer inde fra sig selv, bortset fra Kemichael
-(`../../v2/kemichael/kemichael.js` og `../kemichael/superanimation.js`).
+henter kun filer inde fra sig selv.
 Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
 ## Bestillingen
@@ -37,12 +36,17 @@ Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 4. **Loftet:** 3 faner og 15 salte. Fane 1: 6 opgaver, højst 2 krukker og
    5 søjler. Fane 2: 3 niveauer med nye opgaver hver gang. Fane 3: 4
    opgaver med 4 sæt tal hver, højst 3 glas.
-5. **Layoutet:** scene plus panel som `sc5.1`, med den rolige Kemichael ved
-   katederet i et bånd nederst i scenen.
+5. **Layoutet:** scene plus panel som `sc5.1`.
 
-Den rolige Kemichael er brugt som i sc5.1 (brugerens valg for emne 5): han
-siger kun noget ved Giv hint og Vis svaret, tier, når trinnet er løst, og
-kan sendes ud. Ingen knapper til præsentationen.
+9. okt. 2026 (brugerens valg): Kemichael ved katederet er taget helt ud
+(han hører til i laboratoriet). Scenen har fået hans bånd, og hintknappen
+er gul, så eleven altid kan finde hjælpen selv.
+
+**Hint og svar.** Den gule knap i opgavekortet er hjælpen: Giv hint skriver
+hintet i linjen lige over knappen, og knappen bliver til Vis svaret (kun et
+omrids, så den ikke frister), der skriver svaret og næste skridt i samme
+linje. Efter et forkert svar lyser den gule knap stille op, til linjen
+skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
 
 ## Hvad den viser
 
@@ -130,7 +134,7 @@ V(samlet) og (NaCl) er etiketter. **Tallet** er rigtigt, når det højst er
 Direkte links: `index.html#ioner` og `index.html#bland`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
-<kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichael siger, hvor man er ·
+<kbd>H</kbd> rundvisning ·
 <kbd>R</kbd> start forfra eller nye tal · <kbd>Enter</kbd> tjek feltet eller
 næste opgave · <kbd>Esc</kbd> luk.
 
@@ -140,14 +144,13 @@ næste opgave · <kbd>Esc</kbd> luk.
 index.html          markup for de tre faner, teorien og rundvisningen
 css/stil.css        alt udseende (som sc5.1 plus skemaet med felter). NB: decimaltal med PUNKTUM i CSS
 sprites/            literglasset (nyt); bægerglasset, vægten og vejebåden (som sc5.1), flasken
-                    (som sc7.2), krukken og katederet (som sc4.5), spatlen og luppen (som sc2.1)
+                    (som sc7.2), krukken (som sc4.5), spatlen og luppen (som sc2.1)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.5)
 js/data.js          atommasserne, ionerne, saltene, opgaverne og niveauerne, regnetrinene og replikkerne
 js/kemi.js          glasset på fane 1, opløsningsskemaet og facit på fane 2 og 3
 js/tjek.js          skemaet, formlen og tallet i hvert trin, de typiske fejl og de pæne beregninger
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, bordet, tavlen, krukken, spatlen, vægten, glassene, flasken, søjlerne og luppen
-js/laerer.js        Kemichael ved katederet (som sc4.5)
 js/fane.js          det, fanerne deler (som sc5.1, plus niveauerne på fane 2)
 js/regning.js       regnetrinene i kortet (skemaet, formlen og tallet) og tavlen
 js/sim_opl.js       fane 1
@@ -185,9 +188,10 @@ glasset på fane 1 først viser det, der er svaret på, at beregningen i
 kortet har formlen, tallene med enheder og konklusionen (og først kommer,
 når opgaven er løst), at opgaveteksten på fane 2 nævner skemaet først, at
 saltene først kommer i vandet og glassene først hældes sammen, når det er
-regnet, at Kemichael kun taler ved hint og svar og kan sendes ud, og at
-layoutet holder fra 520 × 380 til 1500 × 900. Sidst kørt 4. oktober 2026:
-ALT OK (115 påstande).
+regnet, at hint og svar kun kommer fra den gule knap og står i
+opgavekortet, at knappen lyser op efter en fejl, og at
+layoutet holder fra 520 × 380 til 1500 × 900. Sidst kørt 9. oktober 2026:
+ALT OK (116 påstande).
 
 ## Forenklinger
 

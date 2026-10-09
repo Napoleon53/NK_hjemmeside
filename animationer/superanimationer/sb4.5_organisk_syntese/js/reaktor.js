@@ -1,25 +1,23 @@
 /* =====================================================================
-   reaktor.js - hylden, kolben og tavlen (det samme paa begge faner)
+   reaktor.js - lagerets flasker, kolben og tavlen
 
-   Eleven laegger to stoffer i kolben (klik paa et kort paa hylden eller
-   traek det op i en plads), taender for svovlsyre (H⁺) og varme og
+   Eleven laegger to stoffer i kolben (klik paa en flaske paa lageret eller
+   traek den hen paa en plads), taender for svovlsyre (H⁺) og varme og
    trykker Start. Saa haeldes stofferne i, og NK.Kemi.reaktion afgoer,
    hvad der sker. Tavlen (js/morf.js) viser det med strukturformler.
 
      * Kan stofferne reagere, men mangler der H⁺ eller varme, sker der
        intet: blandingen bliver i kolben, til eleven har rettet det.
      * Kan de ikke reagere, haeldes blandingen ud.
-     * Er der et produkt, kommer det paa hylden under Lavet.
+     * Er der et produkt, kommer det paa lageret.
 
-   Fanen (ejeren) bestemmer, hvor mange der er af hvert stof (fane 1:
-   uendeligt af raavarerne; fane 2: lageret), og faar besked om udfaldet:
+   Ejeren (js/fabrik.js) har lageret og faar besked om udfaldet:
 
-     ejer.antal(id)            hvor mange der er (Infinity = uendeligt)
+     ejer.antal(id)            hvor mange portioner der er
      ejer.brug(id)             et stof haeldes i kolben
-     ejer.nyt(stof)            et produkt kommer paa hylden
+     ejer.nyt(stof)            et produkt kommer paa lageret
      ejer.udfald(u, fase)      fase "start" og "slut"
-     ejer.grupper()            hyldens grupper: [{ titel, ids }]
-     ejer.kortEkstra(s, el)    fx pris og en koebeknap (fane 2)
+     ejer.lagerIds()           de stoffer, der skal staa en flaske af
      ejer.mangler(id)          eleven klikker paa et stof, der er sluppet op
      ejer.aendret()            pladserne eller kontakterne er aendret
    ===================================================================== */
@@ -119,46 +117,29 @@
         });
     };
 
-    /* ----- Hylden ---------------------------------------------------------------- */
+    /* ----- Lageret ---------------------------------------------------------------
+       Én flaske pr. stof, eleven har. Fanen bestemmer raekkefoelgen. */
     P.bygHylde = function () {
         var mig = this, h = this.el.hylde;
         h.innerHTML = "";
         this.kort = {};
-        this.ejer.grupper().forEach(function (g) {
-            if (!g.ids.length && !g.tom) return;
-            var boks = document.createElement("div");
-            boks.className = "hylde-gruppe " + (g.klasse || "");
-            boks.innerHTML = '<div class="hg-navn">' + NK.html(g.titel) + "</div>";
-            var raekke = document.createElement("div");
-            raekke.className = "hg-kort";
-            if (!g.ids.length) raekke.innerHTML = '<span class="hg-tom">' + NK.html(g.tom) + "</span>";
-            g.ids.forEach(function (id) {
-                var s = K.stof(id);
-                if (!s) return;
-                /* Et udsolgt kort (Fabrikken) kan ikke bruges; et klik siger hvorfor */
-                var udsolgt = g.udsolgt ? g.udsolgt[id] : null;
-                var kort = document.createElement("div");
-                kort.className = "stofkort k-" + s.klasse + (udsolgt ? " udsolgt" : "");
-                kort.setAttribute("data-id", id);
-                var brug = document.createElement("button");
-                brug.type = "button";
-                brug.className = "sk-brug";
-                brug.title = udsolgt ? "Udsolgt" : "Læg " + s.navn + " i kolben";
-                brug.innerHTML = '<span class="sk-navn">' + NK.html(s.navn) + "</span>" +
-                    '<span class="sk-formel">' + (s.ikon && !s.hylde ? s.ikon + " " : "") + NK.html(s.formel || "") + "</span>" +
-                    (udsolgt ? '<span class="sk-udsolgt">Udsolgt</span>' : '<span class="sk-antal" hidden></span>');
-                kort.appendChild(brug);
-                raekke.appendChild(kort);
-                if (udsolgt) {
-                    brug.addEventListener("click", function () { mig.ejer.mangler(id, udsolgt); });
-                    return;
-                }
-                mig.koblKort(brug, id);
-                if (mig.ejer.kortEkstra) mig.ejer.kortEkstra(s, kort);
-                mig.kort[id] = kort;
-            });
-            boks.appendChild(raekke);
-            h.appendChild(boks);
+        var ids = this.ejer.lagerIds();
+        if (!ids.length) h.innerHTML = '<p class="hylde-tom">Lageret er tomt. Køb stoffer i butikken.</p>';
+        ids.forEach(function (id) {
+            var s = K.stof(id);
+            if (!s) return;
+            var f = document.createElement("button");
+            f.type = "button";
+            f.className = "flaske k-" + s.klasse;
+            f.setAttribute("data-id", id);
+            f.title = "Læg " + s.navn + " i kolben";
+            f.innerHTML = '<span class="fl-prop"></span><span class="fl-krop">' +
+                '<span class="sk-navn">' + NK.html(s.navn) + "</span>" +
+                '<span class="sk-formel">' + (s.ikon && !s.hylde ? s.ikon + " " : "") + NK.html(s.formel || "") + "</span></span>" +
+                '<span class="sk-antal" hidden></span>';
+            h.appendChild(f);
+            mig.koblKort(f, id);
+            mig.kort[id] = f;
         });
         this.visAntal();
     };
@@ -220,7 +201,7 @@
             return;
         }
         if (this.plads[i] === null) {
-            this.ejer.besked("Klik på et stof på hylden, eller træk det herop.", "kort");
+            this.ejer.besked("Klik på en flaske på lageret, eller træk den herhen.", "kort");
             return;
         }
         this.plads[i] = null;
@@ -389,7 +370,7 @@
         this.tavle.spring();
     };
 
-    /* ----- Traek fra hylden ---------------------------------------------------------- */
+    /* ----- Traek fra lageret --------------------------------------------------------- */
     P.koblKort = function (knap, id) {
         var mig = this;
         knap.addEventListener("pointerdown", function (e) {

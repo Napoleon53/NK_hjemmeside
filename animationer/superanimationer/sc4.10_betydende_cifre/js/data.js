@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - fanerne, runderne og Kemichaels replikker
+   data.js - fanerne, runderne og linjerne under svarfeltet
 
    Opgaverne selv laves af js/cifre.js. Her staar kun, hvilke typer hver
    fane bruger, og de faste saetninger. Hoejst ca. 60 tegn pr. replik,
@@ -83,32 +83,6 @@
 
     /* Paaskeaeg: alle ti rigtige i foerste forsoeg i Blandet */
     D.TI_AF_TI = "10 af 10. Med to betydende cifre.";
-
-    /* ----- Kemichael ved katederet -----------------------------------------------
-       Han siger kun noget ved Giv hint, Vis svaret og K, og naar han sendes
-       ud eller hentes (UD_LINJE, IND_LINJE) eller klikkes paa (KAFFE,
-       PRIK_SIDST). */
-    D.KEMICHAEL = {
-        tael: "Tæl cifrene. Kommaet er ikke et af dem.",
-        afrund: "Afrund. Ikke mere præcist, end du ved.",
-        komma: "Kommaet flytter sig. Cifrene bliver.",
-        blandet: "Ti opgaver. Jeg tæller med."
-    };
-
-    D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Pausen blev rundet ned.";
-
-    /* Klik paa koppen: han drikker og siger noget om kaffen */
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Den er fra i morges. Plus minus en time.",
-        "Kaffen er min. Cifrene er dine.",
-        "Fjerde kop i dag. Det tal er præcist.",
-        "Nogen har fortyndet den. Med tre betydende cifre.",
-        "Stadig kold. Men det er min."
-    ];
-    /* Klik paa ham, naar prik-puljerne er brugt op */
-    D.PRIK_SIDST = "Jeg sidder her bare. Tæl du.";
 
     NK.Data = D;
 }());

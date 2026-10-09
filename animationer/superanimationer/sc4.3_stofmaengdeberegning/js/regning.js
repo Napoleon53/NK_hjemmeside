@@ -180,7 +180,6 @@
         inp.addEventListener("keydown", function (e) {
             if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
         });
-        inp.addEventListener("input", function () { if (mig.fane.k) mig.fane.k.skriver(); });
         fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
         f.feltEl = fe;
         f.input = inp;
@@ -225,7 +224,6 @@
                 });
                 inp.addEventListener("input", function () {
                     f.tekst[i] = inp.value;
-                    if (mig.fane.k) mig.fane.k.skriver();
                 });
                 f.inputs[i] = inp;
             }
@@ -520,34 +518,28 @@
         P2.trinLinje = function () { return this.regning.trinTekst(); };
         P2.opgaveFaerdig = function () { return this.regning.faerdig(); };
 
-        /* Et trin er gaaet videre: Kemichael roser kort, naar en hel linje
-           er rigtig (del), eller siger det svar, han blev bedt om, og
-           linjen siger det naeste skridt */
-        P2.videre = function (vistHTML, godHTML, del) {
+        /* Et trin er gaaet videre: linjen viser det svar, eleven bad om,
+           eller siger, hvad der er rigtigt, og det naeste skridt */
+        P2.videre = function (vistHTML, godHTML) {
             this.hjaelp = 0;
             this.trekant = null;
             var trin = this.trinLinje();
-            if (vistHTML) {
-                if (this.k.sig(vistHTML, "svar", { lukVedSkriv: true })) this.besked(trin, "");
-                else this.besked(vistHTML + " " + trin, "gul");
-            } else {
-                if (del) this.kRos(del); else this.k.tie();
-                this.besked(godHTML + " " + trin, "god");
-            }
+            if (vistHTML) this.besked(vistHTML + " " + trin, "gul");
+            else this.besked(godHTML + " " + trin, "god");
             this.visKnap();
             this.fokus();
         };
 
         P2.formelOk = function (vist, note, formelHTML) {
             this.videre(vist ? "<b>Formlen:</b> " + formelHTML : null,
-                note ? NK.html(note) + " <b>" + formelHTML + "</b>." : D.DEL_OK.formel, "formel");
+                note ? NK.html(note) + " <b>" + formelHTML + "</b>." : D.DEL_OK.formel);
             if (this.efterFormel) this.efterFormel();
         };
 
         P2.ledOk = function () { this.videre(null, "Rigtigt."); };
 
         P2.indsaetOk = function (vist, html) {
-            this.videre(vist ? "<b>Mellemregningen:</b> " + html : null, D.DEL_OK.indsaet, "indsaet");
+            this.videre(vist ? "<b>Mellemregningen:</b> " + html : null, D.DEL_OK.indsaet);
         };
 
         P2.regnLoest = function (id, maade) {

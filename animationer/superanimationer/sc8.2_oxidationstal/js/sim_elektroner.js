@@ -181,7 +181,7 @@
             inp.addEventListener("keydown", function (e) {
                 if (e.key === "Enter") { e.preventDefault(); mig.gaetTjek(s); }
             });
-            inp.addEventListener("input", function () { felt.classList.remove("ryst"); mig.k.skriver(); });
+            inp.addEventListener("input", function () { felt.classList.remove("ryst"); });
             felt.appendChild(inp);
             felt.appendChild(svar);
             rk.appendChild(navn);
@@ -433,9 +433,9 @@
 
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
         var kant = NK.klamp(W * 0.025, 10, 30), top = NK.klamp(H * 0.03, 8, 22);
-        var tv = { x: kant, y: top, b: W - 2 * kant, h: Math.max(180, baand.y - top - NK.klamp(H * 0.025, 8, 18)) };
+        /* Under tavlen er der en smal stribe til knappen Start forfra */
+        var tv = { x: kant, y: top, b: W - 2 * kant, h: Math.max(180, H - top - NK.klamp(H * 0.06, 40, 48)) };
         var ramme = NK.klamp(tv.b * 0.012, 7, 12);
         var hoved = 34;
         /* Arbejdsfeltet: spoergsmaalet, gaettet og knappen */
@@ -451,7 +451,7 @@
         this.arbBrugt = arbH;
         var ind = { x: tv.x + ramme + 16, y: tv.y + ramme + hoved, b: tv.b - 2 * ramme - 32,
             h: Math.max(120, bund - arbH - 8 - (tv.y + ramme + hoved)) };
-        this.lay = { W: W, H: H, baand: baand, tv: tv, ramme: ramme, ind: ind, hoved: hoved };
+        this.lay = { W: W, H: H, tv: tv, ramme: ramme, ind: ind, hoved: hoved };
         this.geometri();
         this.snap = true;
         var g = this.geo;
@@ -459,7 +459,6 @@
         /* Tallet ved det foerste atom, til rundvisningen */
         var p0 = g.pos[0], epx = this.enPx();
         this.saetAnker("en", p0.x + p0.hb + g.F * 0.06 - 4, p0.y + g.F * 0.3 - 3, epx * 2 + 8, epx * 1.2 + 6);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* Skriftstoerrelsen paa elektronegativiteten ved atomerne */
@@ -677,7 +676,6 @@
         }
         var maal = this.naermest(u, pt);
         if (maal >= 0) { this.tildel(u, maal); return; }
-        if (this.k.inde() && this.k.under(pt) === "kop") { this.k.svar(NK.html(D.KAFFE_PAR), "", 4); return; }
         this.kortBesked("Slip parret tæt på et af de to atomer, det sidder imellem.", 4);
     };
 
@@ -718,7 +716,7 @@
     P.tegn = function () {
         var ctx = this.L.ctx, lay = this.lay, g = this.geo, m = this.m, mig = this;
         if (!lay || !g) return;
-        T.vaeg(ctx, lay.W, lay.baand.y);
+        T.vaeg(ctx, lay.W, lay.H);
         T.tavle(ctx, lay.tv, lay.ramme);
         this.tegnHoved(ctx);
 
@@ -831,7 +829,6 @@
             });
         }
 
-        this.k.tegn(ctx);
     };
 
     P.tegnEnhed = function (ctx, u) {

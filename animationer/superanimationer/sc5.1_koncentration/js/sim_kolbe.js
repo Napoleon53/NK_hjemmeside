@@ -165,8 +165,7 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.07, 16, 44));
         var kh = NK.klamp(Math.min(Hs * 0.58, W * 0.42), 150, 330);
@@ -186,7 +185,6 @@
         this.kolbeGeo();
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("bord", 10, lay.bordY - kh * 1.1, W - 20, kh * 1.1);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* Kolbens stoerrelse foelger rumfanget (den tredjedel potens, som glas goer) */
@@ -254,7 +252,6 @@
             var x = NK.lerp(skaal.x, kg.cx, u), y = NK.lerp(skaal.y - 10, kg.hals.y - 8, u) - Math.sin(u * Math.PI) * 60;
             Tg.pulver(ctx, x, y, 26, 11, st, 6);
         }
-        this.k.tegn(ctx);
     };
 
     NK.SimKolbe = SimKolbe;

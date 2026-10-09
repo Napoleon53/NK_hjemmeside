@@ -23,7 +23,7 @@
    bidden. Tomme felter tæller som ikke besvaret, og luppen og
    regnskabet viser kun tal, eleven selv har skrevet.
 
-   NK.Fane.paa (js/fane.js) giver listen, knappen, linjen og Kemichael.
+   NK.Fane.paa (js/fane.js) giver listen, knappen og linjen.
    Her er det, der er særligt for afstemningen.
    ===================================================================== */
 (function () {
@@ -452,7 +452,6 @@
     /* ----- Hvad eleven goer i hæftet ---------------------------------------------------------- */
     F.input = function (k, inp) {
         var g = this.opg;
-        this.k.skriver();
         if (k.indexOf("kl-") === 0) {
             /* Et fortegn eller en pil i feltet vender pilen */
             var s = inp.value, t = k.slice(3), ny = s;
@@ -475,7 +474,6 @@
         var g = this.opg;
         if (this.aktivt() !== "klammer" || g.tal["kl-" + t]) return;
         g.pil[t] = g.pil[t] === true ? false : true;
-        this.k.skriver();
         this.visHaefte();
         this.haefte.fokus("kl-" + t);
     };
@@ -498,8 +496,7 @@
         var r = this.bord.slip(pt);
         if (r.klik) { this.slipPaaGlas(0, r.flaske); return; }
         if (r.glas !== undefined) { this.slipPaaGlas(r.glas, r.flaske); return; }
-        if (this.k.under(pt) === "kop") this.k.svar(NK.html(D.KAFFE_FLASKE[this.cfg.navn]), "skidt", 4);
-        else if (this.aktivt() === "dryp" || this.aktivt() === "bland") this.kortBesked("Slip flasken over urglasset.", 4);
+        if (this.aktivt() === "dryp" || this.aktivt() === "bland") this.kortBesked("Slip flasken over urglasset.", 4);
         this.bord.hjem(r.flaske);
     };
 
@@ -933,10 +930,10 @@
     };
 
     /* ----- Hjaelpen: Giv hint og Vis svaret ----------------------------------------------------
-       Kemichael siger én kort saetning i almindelige ord. Den grundige
-       forklaring ligger bag knappen Laes mere (js/forklaring.js), saa en
-       svag elev ikke faar hele regnestykket i boblen (brugerens oenske
-       26. sept. 2026). */
+       Linjen i opgavekortet siger én kort saetning i almindelige ord. Den
+       grundige forklaring ligger bag knappen Laes mere (js/forklaring.js),
+       saa en svag elev ikke faar hele regnestykket paa én gang (brugerens
+       oenske 26. sept. 2026). */
     var LAES_MERE = ' <button class="laes-mere" type="button">Læs mere</button>';
 
     F.trinInfo = function () {
@@ -993,8 +990,8 @@
         this.forklaringNu = { trin: this.aktivt(), medSvar: false };
     };
 
-    /* Vis svaret: resten af bidden udfyldes med brunt blaek, og Kemichael siger
-       kort, hvad der kom ud. Laes mere regner det hele ud. */
+    /* Vis svaret: resten af bidden udfyldes med brunt blaek, og linjen i kortet
+       siger kort, hvad der kom ud. Laes mere regner det hele ud. */
     F.visSvar = function (t) {
         var mig = this, g = this.opg, R = g.R, OX = R.ox, RED = R.red, kort = "";
         function vis(k, v) { if (!g.tal[k]) g.tal[k] = { v: v, slags: "vist" }; }
@@ -1047,7 +1044,7 @@
         this.loesTrin("svar", "", NK.html(kort) + LAES_MERE);
     };
 
-    /* Laes mere: Kemichaels forklaring i fuld skaerm */
+    /* Laes mere: den grundige forklaring i fuld skaerm */
     F.visForklaring = function () {
         var f = this.forklaringNu;
         if (!f || !this.opg) return;
@@ -1078,24 +1075,24 @@
     /* ----- Scenen ---------------------------------------------------------------------------- */
     F.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
+        /* Under haeftet er der en smal stribe til knappen Start forfra */
+        var bund = H - Math.round(NK.klamp(H * 0.055, 38, 46));
         var m = Math.round(NK.klamp(H * 0.016, 6, 14));
-        var tilraadig = baand.y - m;
+        var tilraadig = bund - m;
         var bordH = Math.round(NK.klamp(tilraadig * 0.36, 150, 236));
         this.bord.layout(0, m, W, bordH);
         var kant = Math.round(NK.klamp(W * 0.025, 10, 28));
         var hb = Math.min(W - 2 * kant, 1180);
         var hx = Math.round((W - hb) / 2), hy = m + bordH + 2;
-        var hh = Math.round(baand.y - hy - NK.klamp(H * 0.018, 6, 14));
+        var hh = Math.round(bund - hy);
         var e = this.haefte.el;
         e.style.left = hx + "px";
         e.style.top = hy + "px";
         e.style.width = Math.round(hb) + "px";
         e.style.height = hh + "px";
         this.haefte.tilpas(hb, hh);
-        this.lay = { W: W, H: H, baand: baand };
+        this.lay = { W: W, H: H };
         var bl = this.bord.lay, g0 = bl.glas[0], g1 = bl.glas[bl.glas.length - 1];
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
         /* Rundvisningens felt over bordet: fra den første flaske til glasset */
         var venstre = bl.hjem[0].x - 32 * bl.flaske.s - 8;
         this.saetAnker("bord", venstre, bl.y, g1.cx + g1.b * 0.7 - venstre, bordH);
@@ -1110,9 +1107,8 @@
         if (!lay || !this.bord.lay) return;
         var bag = this.bord.lay.bagkant;
         NK.Tegn.vaeg(ctx, lay.W, bag);
-        NK.Tegn.bord(ctx, lay.W, bag, lay.baand.y);
+        NK.Tegn.bord(ctx, lay.W, bag, lay.H);
         this.bord.tegn(ctx);
-        this.k.tegn(ctx);
         this.bord.tegnFlaske(ctx);
     };
 

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Addition og plastik</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">C=C</span> Addition og plastik</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-a" role="tab" aria-selected="true"><span class="nr">1</span>Addition</button>
+        <button class="faneknap" data-fane="fane-b" role="tab" aria-selected="false"><span class="nr">2</span>Bromvand</button>
+        <button class="faneknap" data-fane="fane-p" role="tab" aria-selected="false"><span class="nr">3</span>Plastik</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: ADDITION                                                   -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-a" role="tabpanel" aria-label="Addition">
+    <div class="scene">
+        <canvas id="a-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js). Oeverst
+             gaettet, opgaven eller spoergsmaalet; nederst hint, forklaringen til
+             et forkert svar og hjaelpeknappen. -->
+        <div class="scenekort" id="a-skort">
+            <div class="sk-ind" id="a-ind"></div>
+            <div class="sk-bund" id="a-status">
+                <p class="st-tekst" id="a-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="a-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <button class="forfraknap hjoerne" id="a-forfra" type="button" title="Læg et nyt molekyle klar (R)">Nyt molekyle ↺</button>
+        <div class="anker" id="a-anker-mol"></div>
+        <div class="anker" id="a-anker-hylde"></div>
+
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="a-regnkort" hidden>
+            <h2>Det har du prøvet</h2>
+            <div id="a-regnskab"></div>
+        </div>
+
+        <div class="kort" id="a-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="a-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="a-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: BROMVAND                                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-b" role="tabpanel" aria-label="Bromvand">
+    <div class="scene">
+        <canvas id="b-laerred"></canvas>
+        <div class="scenekort" id="b-skort">
+            <div class="sk-ind" id="b-ind"></div>
+            <div class="sk-bund" id="b-status">
+                <p class="st-tekst" id="b-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="b-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="b-anker-lup"></div>
+        <div class="anker" id="b-anker-glas"></div>
+
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="b-glaskort">
+            <h2>De fem glas</h2>
+            <div id="b-glassene"></div>
+        </div>
+
+        <div class="kort" id="b-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="b-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="b-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: PLASTIK                                                    -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-p" role="tabpanel" aria-label="Plastik">
+    <div class="scene">
+        <canvas id="p-laerred"></canvas>
+        <!-- Zoom ud: kommer med det tredje maal og staar under scenekortet (js/sim_plastik.js) -->
+        <div class="vaerktoej" id="p-vaerktoej" hidden>
+            <button class="tidknap" id="p-zoom" type="button" title="Se hele kæden, eller se dit stykke igen">Zoom ud</button>
+        </div>
+        <div class="scenekort" id="p-skort">
+            <div class="sk-ind" id="p-ind"></div>
+            <div class="sk-bund" id="p-status">
+                <p class="st-tekst" id="p-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="p-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <button class="forfraknap hjoerne" id="p-forfra" type="button" title="Begynd på en ny kæde til opgaven (R)">Ny kæde ↺</button>
+        <div class="anker" id="p-anker-kaede"></div>
+        <div class="anker" id="p-anker-pulje"></div>
+
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="p-kaedekort">
+            <h2>Kæden</h2>
+            <div id="p-kaede"></div>
+        </div>
+
+        <div class="kort" id="p-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="p-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="p-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Addition og plastik</h2>
+        <p>En alkan har kun enkeltbindinger og så mange hydrogenatomer, som der er plads til. Den er mættet. En alken har en dobbeltbinding mellem to carbonatomer og er umættet.</p>
+        <h3 class="teori-hoved">Addition</h3>
+        <p>Dobbeltbindingen kan åbne sig, så hvert af de to carbonatomer får en ledig plads. Her sætter to nye atomer sig på. Der dannes kun ét stof.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Ethen og brom</span>
+            C₂H₄ + Br₂ → C₂H₄Br₂
+        </div>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Ethen og hydrogen</span>
+            C₂H₄ + H₂ → C₂H₆
+        </div>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Ethen og vand</span>
+            C₂H₄ + H₂O → C₂H₅OH
+        </div>
+        <h3 class="teori-hoved">Bromvand</h3>
+        <p>Bromvand er vand med lidt opløst brom og er orange. Rystes det med en alken, forsvinder farven, fordi brom bliver brugt i additionen. Rystes det med en alkan, flytter farven op i det øverste lag. Brom er upolært og opløses bedst i carbonhydridet, men det reagerer ikke.</p>
+        <p>Benzen tegnes med tre dobbeltbindinger, men ringen er særlig stabil. Benzen affarver ikke bromvand.</p>
+        <p>En alkan kan godt reagere med brom i stærkt lys. Det er en substitution, hvor et hydrogenatom bliver skiftet ud, og der dannes to stoffer.</p>
+        <h3 class="teori-hoved">Plastik</h3>
+        <p>Mange tusinde ethenmolekyler kan sætte sig sammen til én lang kæde. Dobbeltbindingerne åbner sig, og carbonatomerne binder sig til nabomolekylerne. Reaktionen kaldes en polymerisation, og den lange kæde kaldes en polymer. Stoffet hedder polyethen.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/glas.js"></script>
+<script src="js/lup.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_addition.js"></script>
+<script src="js/sim_bromvand.js"></script>
+<script src="js/sim_plastik.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

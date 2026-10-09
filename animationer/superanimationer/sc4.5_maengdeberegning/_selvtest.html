@@ -23,8 +23,8 @@
    hundrededele, at massen er bevaret, at det begrænsende stof er det
    rigtige for alle tal, "Nye tal" kan trække, at tjekket giver den
    rigtige besked ved de typiske fejl, at sproget holder reglerne, at
-   alle tre faner kan gennemføres ved at skrive i felterne, at Kemichael
-   sidder stille med boblen fast i båndet, og at layoutet holder fra
+   alle tre faner kan gennemføres ved at skrive i felterne, at hint og
+   svar står i opgavekortet ved den gule knap, og at layoutet holder fra
    520 × 380 til 1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
@@ -47,7 +47,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc4.5-vej", "nk-sc4.5-skema", "nk-sc4.5-begr", "nk-sc4.5-skema-frit", "nk-sc4.5-kemichael-ude", "nk-kemichael"];
+var NOEGLER = ["nk-sc4.5-vej", "nk-sc4.5-skema", "nk-sc4.5-begr", "nk-sc4.5-skema-frit"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -114,17 +114,17 @@ function koerTest(W) {
     paastand("NK findes", !!NK);
     if (!NK) return;
     var D = NK.Data, T = NK.Tjek;
-    paastand("data.js, tjek.js og skema.js er kørt", !!(D && D.REAKTIONER && T && T.nFraM && NK.Skema && NK.RoligLaerer));
+    paastand("data.js, tjek.js og skema.js er kørt", !!(D && D.REAKTIONER && T && T.nFraM && NK.Skema));
     paastand("alle tre faner er bygget", !!(NK.sims && NK.sims["fane-vej"] && NK.sims["fane-skema"] && NK.sims["fane-begr"]));
-    var sprites = ["vaegt", "vejebaad", "pulverglas", "skaal_fod", "skaal_arm", "skaal_skaal", "kateder", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var sprites = ["vaegt", "vejebaad", "pulverglas", "skaal_fod", "skaal_arm", "skaal_skaal"];
     var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
     paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var V = NK.sims["fane-vej"], S = NK.sims["fane-skema"], B = NK.sims["fane-begr"];
-    paastand("Kemichael sidder ved katederet på alle tre faner", !!(V.k && S.k && B.k && V.k instanceof NK.RoligLaerer));
+    paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.RoligLaerer && !NK.Kemichael && !V.k && !d.querySelector(".kboble, .kknap"));
     paastand("der er ingen tilbudsknapper (brugerens valg)", !d.querySelector(".tilbud") && !d.querySelector(".spring-over"));
-    /* Har eleven sendt ham ud i denne browser, hentes han, så testen starter ens */
-    if (!V.k.inde()) { V.k.hentInd(); tik(V, 4); S.k.opdater(4); B.k.opdater(4); }
-    paastand("hver fane har knappen Send Kemichael ud", [V, S, B].every(function (s) { return s.k.knap && s.k.knap.textContent === "Send Kemichael ud"; }));
+    paastand("hver fane har den gule hintknap", [V, S, B].every(function (s) {
+        return s.el.knap.textContent === "Giv hint" && s.el.knap.classList.contains("hjaelp") && !s.el.knap.classList.contains("svar");
+    }));
 
     overskrift("2. Kemien");
     var ikkeAfstemt = D.REAKTIONER.filter(function (r) { return !D.afstemt(r, r.led.map(function (l) { return l.k; })).ok; });
@@ -257,7 +257,7 @@ function koerTest(W) {
     var replikker = [].concat(
         Object.keys(D.INTRO).map(function (k) { return D.INTRO[k]; }),
         Object.keys(D.FAERDIG).map(function (k) { return D.FAERDIG[k]; }),
-        D.ROS, D.ROS_OPGAVE, D.KAFFE, [D.PRIK_SIDST]);
+        D.ROS, D.ROS_OPGAVE);
     var tekster = replikker.concat(
         D.VEJ.map(function (o) { return o.tekst; }), D.SKEMA.map(function (o) { return o.tekst; }), D.BEGR.map(function (o) { return o.tekst; }),
         Object.keys(D.AFSTEM_HINT).map(function (k) { return D.AFSTEM_HINT[k]; }));
@@ -267,34 +267,24 @@ function koerTest(W) {
     paastand("ingen tankestreger på siden", !/[–—]/.test(krop));
     paastand("ingen 1+ eller 1− nogen steder", !tekster.concat([krop]).some(function (t) { return /[A-Za-z]1[+−]|¹[⁺⁻]/.test(t); }));
     var lange = replikker.filter(function (t) { return t.length > 62; });
-    paastand("Kemichaels faste replikker er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
+    paastand("de faste linjer i opgavekortet er højst ca. 60 tegn", lange.length === 0, lange.join(" | "));
     var ascii = tekster.concat([krop]).filter(function (t) { return ASCII_ORD.test(t); });
     paastand("ingen ord uden æ, ø og å i det, eleven ser", ascii.length === 0, ascii.map(function (t) { return t.match(ASCII_ORD)[0]; }).join(", "));
     paastand("teorien er lukket fra start", !d.getElementById("teori").classList.contains("vis"));
 
-    /* Alle linjer, Kemichael og opgavekortet siger undervejs, samles og tjekkes til sidst */
-    var sagt = [], talteSelv = 0;
+    /* Alle linjer, opgavekortet siger undervejs, samles og tjekkes til sidst */
+    var sagt = [], hintUbedt = 0;
     [V, S, B].forEach(function (sim) {
-        var sig = sim.k.sig, svar = sim.k.svar, besked = sim.besked;
-        sim.k.sig = function (h, s, v) { sagt.push(h); return sig.call(this, h, s, v); };
-        sim.k.svar = function (h, s, t) { sagt.push(h); return svar.call(this, h, s, t); };
+        var besked = sim.besked;
         sim.besked = function (h, kl) { sagt.push(h); return besked.call(this, h, kl); };
     });
     function klik(sel) { var e = d.querySelector(sel); if (e) e.click(); return !!e; }
     function kort(sim) { return sim.beskedTekst(); }
     function kortKlasse(sim) { return sim.el.besked.className; }
-    function skrivLidt(sim) {
-        var t = sim.skema.naeste(), c = t && sim.skema.celle(t);
-        if (!c || !c.input) return false;
-        c.input.value = "1";
-        c.input.dispatchEvent(new W.Event("input", { bubbles: true }));
-        return true;
-    }
-
     overskrift("6. Vejen kan gennemføres");
     klik('[data-fane="fane-vej"]');
     paastand("linjen i kortet siger, hvor man er, og næste skridt", kort(V).indexOf(D.INTRO.vej) === 0 && /Skriv stofmængden af/.test(kort(V)), kort(V));
-    paastand("Kemichael er tavs, når fanen åbnes", !V.k.taler() && !S.k.taler() && !B.k.taler());
+    paastand("der står intet hint, når fanen åbnes", [V, S, B].every(function (s) { return !/Hint:/.test(kort(s)); }));
     var alleVej = true, pileVej = true, poserVej = true, vaegtVej = true;
     D.VEJ.forEach(function (o, i) {
         V.vaelg(i, false);
@@ -303,9 +293,9 @@ function koerTest(W) {
         var t0 = V.skema.naeste();
         skrivI(V, t0, komma(V.x.m * D.stof(o.kendt).Mv, 2));
         if (!V.skema.erAaben(t0) || V.skema.celle(t0).status !== "ukendt" || kortKlasse(V).indexOf("skidt") < 0 || !/ganget/.test(kort(V))) alleVej = false;
-        if (V.k.taler()) talteSelv++;
+        if (/Hint:/.test(kort(V)) || !V.el.knap.classList.contains("peg")) hintUbedt++;
         var rest = loesAlt(V);
-        if (V.k.taler()) talteSelv++;
+        if (/Hint:/.test(kort(V)) || V.el.knap.classList.contains("peg")) hintUbedt++;
         if (rest !== null || !V.faerdig) alleVej = false;
         if (V.skema.pile.length !== 3) pileVej = false;
         tik(V, 3);
@@ -315,7 +305,7 @@ function koerTest(W) {
     });
     paastand("alle fire opgaver kan løses ved at skrive i felterne, ét felt ad gangen", alleVej);
     paastand("m · M giver en rød linje i kortet, og feltet bliver åbent", alleVej);
-    paastand("Kemichael blander sig ikke ved fejl eller rigtige svar", talteSelv === 0, talteSelv);
+    paastand("en fejl giver intet hint af sig selv, men hintknappen lyser op, til opgaven går videre", hintUbedt === 0, hintUbedt);
     paastand("de tre pile for vejen kommer frem (/ M, forholdet, · M)", pileVej);
     paastand("poserne ender på vægten til højre", poserVej);
     paastand("vægten til højre viser den søgte masse, den til venstre 0,00 g", vaegtVej);
@@ -324,26 +314,26 @@ function koerTest(W) {
     paastand("kortet siger den afsluttende linje, når alle er løst", sagt.some(function (h) { return h.indexOf(D.FAERDIG.vej) >= 0; }));
     paastand("beregningerne står som pæne beregninger med enheder", /n\(Fe₂O₃\) = .*159,70 g\/mol.*= <b>/.test(NK.el("vej-linjer").innerHTML) &&
         /m\(Fe\) = n\(Fe\) · M\(Fe\) = [\d,]+ mol · 55,85 g\/mol = <b>/.test(NK.el("vej-linjer").innerHTML));
-    /* Hint og svar på knappen: Kemichael taler kun her */
+    /* Hint og svar på den gule knap: begge står i linjen i opgavekortet */
     V.vaelg(0, true);
     var t1 = V.skema.naeste();
     V.knap();
-    var hintOk = V.skema.fremhaev === t1 && V.k.taler() && V.k.boble.className.indexOf("hint") >= 0 && V.el.knap.textContent === "Vis svaret";
+    var hintOk = V.skema.fremhaev === t1 && /^Hint:/.test(kort(V)) && kortKlasse(V).indexOf("gul") >= 0 &&
+        V.el.knap.textContent === "Vis svaret" && V.el.knap.classList.contains("svar");
     tik(V, 30);
-    var hintStaar = V.k.taler();
+    var hintStaar = /^Hint:/.test(kort(V));
     V.knap();
-    var svarOk = V.skema.celle(t1).status === "svar" && V.el.knap.textContent === "Giv hint" && V.k.taler() && V.k.boble.className.indexOf("svar") >= 0;
-    skrivLidt(V);
-    var svarLukker = !V.k.taler();
+    var svarOk = V.skema.celle(t1).status === "svar" && V.el.knap.textContent === "Giv hint" && !V.el.knap.classList.contains("svar") &&
+        kortKlasse(V).indexOf("gul") >= 0 && /n\(Fe\) = /.test(kort(V)) && /skriv/i.test(kort(V));
+    var svarTekst = kort(V);
     V.knap();
     var t2 = V.skema.naeste();
     skrivI(V, t2, rigtigTekst(V, t2));
-    var hintLukker = !V.k.taler();
+    var hintLukker = !/Hint:/.test(kort(V)) && kortKlasse(V).indexOf("gul") < 0;
     loesAlt(V);
-    paastand("Giv hint: Kemichael siger hintet, skemaet lyser op, og knappen bliver til Vis svaret", hintOk);
+    paastand("Giv hint: hintet står i kortet, skemaet lyser op, og knappen bliver til Vis svaret", hintOk, kort(V));
     paastand("hintet står, til delopgaven er løst", hintStaar);
-    paastand("Vis svaret udfylder feltet, og han viser beregningen", svarOk);
-    paastand("svaret lukker, når eleven skriver igen", svarLukker);
+    paastand("Vis svaret udfylder feltet, og beregningen og næste skridt står i kortet", svarOk, svarTekst);
     paastand("et hint lukker, når delopgaven er løst", hintLukker);
     paastand("en opgave, hvor svaret er vist, beholder sin stjerne fra før", V.status[0].stjerne);
     V.el.knap.click();
@@ -358,7 +348,7 @@ function koerTest(W) {
             if (inputs("skema") !== 0 || S.skema.koefEl.length !== S.opg.r.led.length) alleSkema = false;
             S.skema.koefEl.forEach(function (e) { e.input.value = "1"; });
             enter(S.skema.koefEl[0].input);
-            if (S.opg.afstemt || kortKlasse(S).indexOf("skidt") < 0 || S.k.taler()) alleSkema = false;
+            if (S.opg.afstemt || kortKlasse(S).indexOf("skidt") < 0) alleSkema = false;
         }
         if (o.massebevarelse) { tik(S, 3); if (Math.abs(S.vinkel) < 0.03) vinkelFoer = false; }
         if (loesAlt(S) !== null || !S.faerdig) alleSkema = false;
@@ -414,53 +404,20 @@ function koerTest(W) {
     B.vaelgBegr(forkertJ, "gaet");
     tik(B, B.reaktionTid() + 0.3);
     var linje = kort(B);
-    paastand("et forkert valg giver en forklaring og næste skridt i kortet", /slap op/.test(linje) && /Skriv|skriv/.test(linje) && kortKlasse(B).indexOf("skidt") >= 0 && !B.k.taler(), linje);
+    paastand("et forkert valg giver en forklaring og næste skridt i kortet", /slap op/.test(linje) && /Skriv|skriv/.test(linje) && kortKlasse(B).indexOf("skidt") >= 0, linje);
     paastand("et forkert valg koster stjernen", B.brugtSvar === true);
     loesAlt(B);
     paastand("begrundelsen for valget står i beregningerne", /slipper op først/.test(NK.el("begr-linjer").innerHTML));
     paastand("knappen efter sidste opgave starter forfra med nye tal", B.el.knap.textContent.indexOf("Forfra med nye tal") === 0);
 
-    overskrift("9. Kemichael ved katederet");
+    overskrift("9. Linjerne undervejs");
     var alleSagt = sagt.map(function (h) { var e = d.createElement("div"); e.innerHTML = h; return e.textContent; });
     var sagtStreg = alleSagt.filter(function (t) { return /[–—]/.test(t) || ASCII_ORD.test(t) || /undefined|NaN|null/.test(t); });
     paastand("alle " + alleSagt.length + " linjer undervejs er uden tankestreger, ASCII-ord og huller", sagtStreg.length === 0, sagtStreg.slice(0, 3).join(" | "));
-    var k = B.k;
+    paastand("ingen linje nævner Kemichael", !alleSagt.concat([d.body.innerText]).some(function (t) { return /Kemichael|kateder|lærerværelse/i.test(t); }));
     B.vaelg(0, true);
-    tik(B, 1);
-    k.klik({ x: k.lay.cx, y: k.lay.bordY - 20 });
-    var prik = k.tekst();
-    tik(B, 5);
-    paastand("et klik på ham giver et kort svar, og bagefter tier han", prik !== "" && !k.taler(), prik);
-    k.klik({ x: k.lay.kop.x, y: k.lay.kop.y - 4 });
-    var slurk = !!k.slurk;
-    tik(B, 1.2);
-    var armOp = Math.abs(k.arm - NK.Kemichael.HAENGER) > 1;
-    tik(B, 4.5);
-    paastand("et klik på koppen: han drikker og stiller den igen", slurk && armOp && !k.slurk && Math.abs(k.arm - NK.Kemichael.HAENGER) < 1e-9);
     W.document.dispatchEvent(new W.KeyboardEvent("keydown", { key: "k", bubbles: true }));
-    paastand("K: han siger, hvor man er, og næste skridt", k.tekst().indexOf(D.INTRO.begr) === 0, k.tekst());
-    skrivLidt(B);
-    paastand("K-linjen lukker, når eleven skriver", !k.taler());
-    /* Send ud og hent ind */
-    k.knap.click();
-    var farvel = k.tekst();
-    tik(B, 2.6);
-    paastand("Send Kemichael ud: han siger farvel og er væk", farvel === D.UD_LINJE && !k.taler() && k.synlig === 0 && !k.inde(), farvel);
-    paastand("knappen hedder nu Hent Kemichael, også på de andre faner", k.knap.textContent === "Hent Kemichael" && V.k.knap.textContent === "Hent Kemichael" && !S.k.inde());
-    paastand("valget huskes i browseren", W.localStorage.getItem("nk-sc4.5-kemichael-ude") === "true");
-    B.knap();
-    paastand("uden ham står hintet i opgavekortet", !k.taler() && /Hint:/.test(kort(B)) && kortKlasse(B).indexOf("gul") >= 0, kort(B));
-    B.knap();
-    paastand("uden ham står svaret også i opgavekortet", !k.taler() && B.skema.celle(B.opg.trin[0]).status === "svar", kort(B));
-    k.klik({ x: k.lay.seddel.x + k.lay.seddel.b / 2, y: k.lay.seddel.y + k.lay.seddel.h / 2 });
-    var goddag = k.tekst();
-    tik(B, 4);
-    paastand("sedlen på katederet henter ham igen", k.inde() && goddag === D.IND_LINJE && k.synlig === 1 && !k.taler(), goddag);
-    k.knap.click();
-    tik(B, 2.6);
-    k.knap.click();
-    tik(B, 4);
-    paastand("knappen henter ham også, og så giver han hint igen", k.inde() && (function () { B.vaelg(1, true); B.knap(); return k.taler(); }()));
+    paastand("tasten K gør ikke noget mere", !/Hint:/.test(kort(B)) && B.el.knap.textContent === "Giv hint");
 
     overskrift("10. Rundvisningen");
     ["fane-vej", "fane-skema", "fane-begr"].forEach(function (id) {
@@ -495,7 +452,7 @@ function koerTest(W) {
             if (id === "fane-begr") sim.vaelg(1, false);
             sim.tilpas();
             sim.layout();
-            var lay = sim.lay, Wc = lay.W, Hc = lay.H, sl = sim.skema.lay, kl = sim.k.lay;
+            var lay = sim.lay, Wc = lay.W, Hc = lay.H, sl = sim.skema.lay;
             function inde(r, navn) {
                 if (r.x < -1 || r.y < -1 || r.x + r.b > Wc + 1 || r.y + r.h > Hc + 1) problemer.push(id + ": " + navn + " uden for");
             }
@@ -508,20 +465,10 @@ function koerTest(W) {
                 if (sl.midter[j] - sl.midter[j - 1] < sl.feltB + 2) problemer.push(id + ": felterne overlapper");
             }
             if (sl.feltH < 26) problemer.push(id + ": felterne er for lave");
-            /* Kemichael og boblen i båndet under bordet */
-            var boble = kl.boble;
-            inde({ x: boble.x, y: boble.y, b: Math.min(boble.b, sim.k.boble.offsetWidth || boble.b), h: boble.h }, "boblen");
-            over({ x: boble.x, y: boble.y, b: boble.b, h: boble.h }, lay.tavle, "boblen over tavlen");
-            if (kl.y < lay.bordY) problemer.push(id + ": båndet går op over bordet");
-            var te = sim.k.tekstEl;
-            if (te.scrollHeight > te.clientHeight + 2) problemer.push(id + ": teksten er ikke i boblen");
-            if (kl.s < 0.28) problemer.push(id + ": Kemichael er for lille");
-            /* Knappen, der sender ham ud: i båndet, fri af katederet */
-            var kk = sim.k.knap, sr = sim.L.canvas.getBoundingClientRect(), kr = kk.getBoundingClientRect();
-            var knapR = { x: kr.left - sr.left, y: kr.top - sr.top, b: kr.width, h: kr.height };
-            inde(knapR, "knappen Send Kemichael ud");
-            if (knapR.y < kl.y) problemer.push(id + ": knappen står over båndet");
-            over(knapR, kl.desk, "knappen over katederet");
+            /* Bordet står nederst i scenen, og hintknappen kan ses i panelet */
+            if (lay.bordY > Hc - 12 || lay.bordY < lay.tavle.y + lay.tavle.h) problemer.push(id + ": bordet står forkert");
+            var kn = sim.el.knap.getBoundingClientRect();
+            if (kn.width < 100 || kn.height < 30) problemer.push(id + ": hintknappen er for lille");
             if (id === "fane-vej") {
                 var vV = { x: lay.vaegtV.x - lay.vb / 2, y: lay.bordY - lay.vh, b: lay.vb, h: lay.vh };
                 var vH = { x: lay.vaegtH.x - lay.vb / 2, y: lay.bordY - lay.vh, b: lay.vb, h: lay.vh };

@@ -21,11 +21,13 @@
    se på et skærmbillede: at molekylemotoren giver stofferne deres navne,
    at reglerne giver den rigtige ester, syre eller keton for alle par (og
    at esteren er syre + alkohol − vand, atom for atom), at der skal
-   svovlsyre og varme til, at de forkerte par ikke reagerer, at alle ti
-   ordrer kan løses med hinttrappen og Vis svaret, at Fabrikkens penge
-   passer gennem de fem første ordrer, at tavlen kan bygges for alle
-   reaktioner i fire skærmstørrelser, at et stof kan trækkes op i
-   kolben, at sproget holder reglerne, og at skriften ikke er for lille.
+   svovlsyre og varme til, at de forkerte par ikke reagerer, at første
+   ordre kan købes, laves og leveres med klik, at pengene, serien,
+   titlerne, tilbuddet og udstyret passer gennem de ti første ordrer, at
+   esterkortet kun viser det, eleven har lavet, at tavlen, layoutet og
+   butikken kan være der i fire skærmstørrelser, at en flaske kan trækkes
+   hen på kolben, at sproget holder reglerne, og at skriften ikke er for
+   lille.
 
    iframen skal åbnes gennem en lokal server (rod: animationer/, fordi
    molekylemotoren ligger i ../../molekylemotor/). Testen gemmer elevens
@@ -48,7 +50,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sb4.5-rk", "nk-sb4.5-fabrik"];
+var NOEGLER = ["nk-sb4.5-fabrik2"];
 var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|traek\w*|aendr\w*|toem\w*|koeb\w*|soelv|loes\w*|aabn\w*|haeld\w*|kroner)\b/;
 
 function koer() {
@@ -79,7 +81,6 @@ function atomer(mol) {
 function koerTest(W) {
     var d = W.document;
     var NK = W.NK, D = NK.Data, K = NK.Kemi;
-    var S1 = NK.sims["fane-rk"], S2 = NK.sims["fane-fb"];
     var BET = { hplus: true, varme: true };
     var tekster = [];
 
@@ -95,9 +96,9 @@ function koerTest(W) {
     paastand("motoren giver alle " + D.STOFFER.length + " stoffer deres navn", navnFejl.length === 0, navnFejl.join(", "));
     paastand("alkoholer, syrer og oxidationsmiddel har den rigtige klasse", klasseFejl.length === 0, klasseFejl.join(", "));
     var hylde = D.STOFFER.filter(function (x) { return x.hylde; });
-    paastand("hylden har 7 alkoholer, 3 syrer og kaliumpermanganat", hylde.length === 11 &&
+    paastand("butikken fører 7 alkoholer, 3 syrer og kaliumpermanganat", hylde.length === 11 &&
         hylde.filter(function (x) { return /ol$/.test(x.navn); }).length === 7, hylde.length);
-    paastand("alle stoffer på hylden har en pris", hylde.every(function (x) { return x.pris > 0; }));
+    paastand("alle varer i butikken har en pris", hylde.every(function (x) { return x.pris > 0; }));
 
     /* ------------------------------------------------------------------ */
     overskrift("2. Esterne");
@@ -175,155 +176,244 @@ function koerTest(W) {
     tekster.push(K.reaktion("ethanol", "ethanol", BET).tekst, K.reaktion("methansyre", "permanganat", { varme: true }).tekst);
 
     /* ------------------------------------------------------------------ */
-    overskrift("4. Duftene og ruterne");
+    overskrift("4. Duftene og ordrerne");
+    var F = D.FABRIK;
     var rFejl = [];
     Object.keys(D.DUFTE).forEach(function (n) { if (!K.rute(n) && ["methansyre", "ethansyre", "diethylether"].indexOf(n) < 0) rFejl.push(n); });
     paastand("alle stoffer med duft kan laves", rFejl.length === 0, rFejl.join(", "));
-    var oF = [];
-    D.ORDRER.forEach(function (o) {
-        var r = K.rute(o.maal);
-        if (!r) { oF.push(o.id + " ingen rute"); return; }
-        var raa = r.type === "ox" || r.syre.hylde;
-        if (o.gruppe === "let" && !raa) oF.push(o.id + " er ikke let");
-        if (o.gruppe === "middel" && r.type === "ester" && r.syre.hylde) oF.push(o.id + " er let");
-        if (!D.BRUG[o.maal]) oF.push(o.id + " mangler brug");
-    });
-    paastand("ordrerne passer til grupperne Let, Middel og Svær", oF.length === 0, oF.join(", "));
     var fK = [];
-    D.FABRIK.faste.concat(D.FABRIK.tilfaeldige).forEach(function (o) {
+    F.faste.concat(F.tilfaeldige).forEach(function (o) {
         var s = K.stofEfterNavn(o.maal);
         if (!K.rute(o.maal)) fK.push(o.maal + " rute");
         if (!s || !s.vaerdi) fK.push(o.maal + " pris");
         if (!D.KUNDER[o.kunde]) fK.push(o.kunde);
         if (!D.BRUG[o.maal]) fK.push(o.maal + " brug");
     });
-    paastand("Fabrikkens ordrer kan laves og har kunde, pris og brug", fK.length === 0, fK.slice(0, 4).join(", "));
+    paastand("alle ordrer kan laves og har kunde, pris og brug", fK.length === 0, fK.slice(0, 4).join(", "));
+    var letF = F.faste.slice(0, 4).filter(function (o) { var r = K.rute(o.maal); return r.type !== "ester" || !r.syre.hylde; });
+    paastand("de fire første ordrer kan laves af det, butikken fører", F.faste.length === 10 && letF.length === 0, letF.map(function (o) { return o.maal; }).join());
 
     /* ------------------------------------------------------------------ */
-    overskrift("5. Reaktoren: alle ti ordrer");
-    NK.visFane("fane-rk");
-    var R1 = S1.R;
-    S1.nulstil();
-    var trinF = [], loestF = [];
-    D.ORDRER.forEach(function (o, i) {
-        S1.vaelg(i);
-        var h = S1.hintNu();
-        if (h.trin.length !== 3) trinF.push(o.id);
-        h.trin.forEach(function (t) { tekster.push(t); });
-        for (var n = 0; n < 3 && !S1.faerdig; n++) {
-            S1.knap(); S1.knap(); S1.knap(); S1.knap();
-            tekster.push(S1.beskedTekst());
-            R1.start();
-            R1.spring();
-            tekster.push(S1.beskedTekst());
-            S1.nulstilHjaelp();
-        }
-        if (!S1.faerdig) loestF.push(o.id + ": " + S1.beskedTekst().slice(0, 60));
-    });
-    paastand("hvert hint er en trappe på tre trin", trinF.length === 0, trinF.join(", "));
-    paastand("alle ti ordrer kan løses med Vis svaret og Start", loestF.length === 0, loestF.slice(0, 2).join(" | "));
-    paastand("med svaret vist giver de ingen stjerne", S1.status.every(function (s) { return s.loest && !s.stjerne; }));
-    paastand("knappen går videre til Fabrikken efter sidste ordre", S1.knapVidere() === "Videre til Fabrikken →");
+    overskrift("5. Første ordre som en elev");
+    var S = NK.sim, R = S.R, B = S.butik;
+    function forfra() {
+        S.bekraeft = 1; S.nulstil();
+        S.boers = { maal: "intet", pct: 0, t: 0 };
+        S.tilbud = { id: "", t: 0 };
+        S.visAlt();
+    }
+    function koeb(id) { var pris = S.stofPris(id), k = {}; k[id] = 1; S.koeb(k, pris); return pris; }
+    function tekst(id) { return d.getElementById(id).textContent; }
+    forfra();
+    paastand("fabrikken starter med 300 kr., tre ordrer og et tomt lager", S.penge === 300 && S.ordrer.length === 3 && !!d.querySelector("#fb-hylde .hylde-tom"));
+    paastand("de tre første ordrer er ethylethanoat, propylethanoat og pentylethanoat",
+        S.ordrer.map(function (o) { return o.maal; }).join() === "ethylethanoat,propylethanoat,pentylethanoat");
+    var linje0 = S.beskedTekst();
+    S.opdater(0.016);
+    paastand("med tomt lager peger linjen og døren på butikken", /butikken/.test(linje0) && d.getElementById("fb-butikknap").classList.contains("peg"), linje0);
+    d.getElementById("fb-butikknap").click();
+    paastand("butikken åbner med 11 varer, én udsolgt og 3 slags udstyr", d.getElementById("butik").classList.contains("vis") &&
+        d.querySelectorAll("#bu-reoler .vare:not(.udsolgt):not(.udstyrsvare)").length === 11 &&
+        d.querySelectorAll("#bu-reoler .vare.udsolgt").length === 1 && d.querySelectorAll("#bu-reoler .udstyrsvare").length === 3);
+    d.querySelector("#bu-reoler .vare.udsolgt").click();
+    paastand("butansyre er udsolgt, og ekspedienten siger hvorfor", /Butansyre fører jeg ikke/.test(tekst("bu-boble")) && !B.kurv.butansyre);
+    tekster.push(tekst("bu-boble"));
+    d.querySelector("#bu-reoler .vare[data-id=ethanol]").click();
+    d.querySelector("#bu-reoler .vare[data-id=ethansyre]").click();
+    paastand("to klik lægger ethanol og ethansyre i kurven: 55 kr.", B.ialt() === 55 && tekst("bu-ialt") === "55 kr" && d.querySelectorAll("#bu-linjer .kurv-linje").length === 2);
+    B.laeg("salicylsyre"); B.laeg("salicylsyre");
+    d.getElementById("bu-betal").click();
+    paastand("en kurv, der koster mere end kassen, kan ikke betales", S.penge === 300 && d.getElementById("butik").classList.contains("vis") && /Tag noget ud/.test(tekst("bu-boble")), tekst("bu-boble"));
+    tekster.push(tekst("bu-boble"));
+    d.querySelector("#bu-linjer .kurv-linje:last-child .kl-minus").click();
+    d.querySelector("#bu-linjer .kurv-linje:last-child .kl-minus").click();
+    paastand("minus i kurven tager varen ud igen", !B.kurv.salicylsyre && B.ialt() === 55);
+    d.getElementById("bu-betal").click();
+    paastand("Betal trækker 55 kr., stiller flaskerne på lageret og lukker butikken", S.penge === 245 && S.antal("ethanol") === 1 && S.antal("ethansyre") === 1 &&
+        !d.getElementById("butik").classList.contains("vis") && d.querySelectorAll("#fb-hylde .flaske").length === 2);
+    d.querySelector("#fb-hylde .flaske[data-id=ethanol]").click();
+    var linje1 = S.beskedTekst();
+    d.querySelector("#fb-hylde .flaske[data-id=ethansyre]").click();
+    var linje2 = S.beskedTekst();
+    paastand("linjen siger næste skridt efter hvert klik", /et stof mere/.test(linje1) && /svovlsyre og varme/.test(linje2), linje1 + " | " + linje2);
+    d.getElementById("fb-start").click(); R.spring();
+    paastand("Start uden svovlsyre og varme: Ikke endnu, og blandingen bliver i kolben", /Ikke endnu/.test(S.beskedTekst()) && R.iKolben && S.leveret === 0);
+    paastand("hintknappen lyser stille efter fejlen", d.getElementById("fb-knap").classList.contains("peg"));
+    d.getElementById("fb-hplus").click(); d.getElementById("fb-varme").click();
+    d.getElementById("fb-start").click(); R.spring();
+    paastand("med svovlsyre og varme bliver ordren leveret: 180 kr. og 50 kr. for et nyt stof", S.leveret === 1 && S.penge === 245 + 180 + 50 &&
+        S.tjent === 230 && /Leveret/.test(S.beskedTekst()) && /esterkortet/.test(S.beskedTekst()), S.penge + " " + S.beskedTekst());
+    tekster.push(S.beskedTekst());
+    paastand("serien står på 1, og esteren er på esterkortet", S.serie === 1 && S.kendt.ethylethanoat === 1 && tekst("fb-korttal") === "1" && tekst("fb-seriebonus") === "+10 %");
+    S.lager.butansyre = 1; R.bygHylde();
+    paastand("det, eleven selv har lavet, står forrest på lageret", d.querySelector("#fb-hylde .flaske").getAttribute("data-id") === "butansyre");
+    S.lager.butansyre = 0; R.bygHylde();
+    paastand("den leverede ester står ikke på lageret, og en ny kunde er kommet", !d.querySelector("#fb-hylde [data-id='p:ethylethanoat']") &&
+        S.ordrer.length === 3 && S.ordrer[0].maal === "ethylmethanoat");
+    /* Et forkert par haeldes ud og bryder serien */
+    koeb("ethansyre"); koeb("methansyre");
+    R.laeg("ethansyre", 0); R.laeg("methansyre", 1); R.start(); R.spring();
+    paastand("to syrer bliver hældt ud, og serien er brudt", !R.iKolben && R.plads[0] === null && /To syrer/.test(S.beskedTekst()) && /Serien er brudt/.test(S.beskedTekst()) && S.serie === 0);
+    tekster.push(S.beskedTekst());
 
-    /* Første ordre som en elev: klik på kortene, og linjen siger næste skridt */
-    S1.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
-    S1.nulstil();
-    S1.vaelg(0);
-    var linje0 = S1.beskedTekst();
-    d.querySelector("#rk-hylde [data-id=ethanol] .sk-brug").click();
-    var linje1 = S1.beskedTekst();
-    d.querySelector("#rk-hylde [data-id=ethansyre] .sk-brug").click();
-    var linje2 = S1.beskedTekst();
-    paastand("første ordre: linjen siger næste skridt efter hvert klik", /hylden/.test(linje0) && /et stof mere/.test(linje1) && /svovlsyre og varme/.test(linje2),
-        linje0 + " | " + linje1 + " | " + linje2);
-    d.getElementById("rk-start").click(); R1.spring();
-    paastand("Start uden svovlsyre og varme: Ikke endnu, og blandingen bliver i kolben", /Ikke endnu/.test(S1.beskedTekst()) && R1.iKolben && !S1.faerdig);
-    paastand("knappen lyser stille efter fejlen", d.getElementById("rk-knap").classList.contains("peg"));
-    d.getElementById("rk-hplus").click(); d.getElementById("rk-varme").click();
-    d.getElementById("rk-start").click(); R1.spring();
-    paastand("med svovlsyre og varme bliver ordren leveret med stjerne", S1.faerdig && S1.status[0].stjerne && /Leveret/.test(S1.beskedTekst()));
-    paastand("esteren står under Lavet på hylden", !!d.querySelector("#rk-hylde .g-lavet [data-id='p:ethylethanoat']"));
-    /* Et forkert par hældes ud */
-    R1.laeg("ethansyre", 0); R1.laeg("methansyre", 1); R1.start(); R1.spring();
-    paastand("to syrer bliver hældt ud, og kolben er tom igen", !R1.iKolben && R1.plads[0] === null && /To syrer/.test(S1.beskedTekst()));
-
-    /* Træk et kort op i en plads med musen (PointerEvents) */
-    S1.nulstil();
-    var kort = d.querySelector("#rk-hylde [data-id=butan1ol] .sk-brug"), pl = d.getElementById("rk-plads1");
+    /* Traek en flaske hen paa en plads med musen (PointerEvents) */
+    koeb("butan1ol");
+    var kort = d.querySelector("#fb-hylde .flaske[data-id=butan1ol]"), pl = d.getElementById("fb-plads1");
     var a = kort.getBoundingClientRect(), b = pl.getBoundingClientRect();
     function pe(type, el, x, y) { el.dispatchEvent(new W.PointerEvent(type, { bubbles: true, clientX: x, clientY: y, button: 0, pointerId: 1 })); }
     pe("pointerdown", kort, a.left + 10, a.top + 10);
     pe("pointermove", d, a.left + 40, a.top + 40);
     pe("pointermove", d, b.left + 20, b.top + 20);
     pe("pointerup", d, b.left + 20, b.top + 20);
-    paastand("et stof kan trækkes op i plads 2", R1.plads[1] === "butan1ol" && R1.plads[0] === null, JSON.stringify(R1.plads));
+    paastand("en flaske kan trækkes hen på plads 2", R.plads[1] === "butan1ol" && R.plads[0] === null, JSON.stringify(R.plads));
 
     /* ------------------------------------------------------------------ */
-    overskrift("6. Fabrikken");
-    NK.visFane("fane-fb");
-    var R2 = S2.R;
-    S2.bekraeft = 1; S2.nulstil();
-    paastand("fabrikken starter med 300 kr. og tre ordrer", S2.penge === 300 && S2.ordrer.length === 3);
-    paastand("de tre første ordrer er de gamle missioner", S2.ordrer.map(function (o) { return o.maal; }).join() === "ethylethanoat,propylethanoat,pentylethanoat");
-    S2.mangler("butansyre", D.FABRIK.udsolgt[0].grund);
-    paastand("butansyre er udsolgt og siger hvorfor", /fører ikke butansyre/.test(S2.beskedTekst()));
-    S2.boers = { maal: "intet", pct: 0, t: 0 };
-    var foer = S2.penge, betalt = 0, brugt = 0, lev = 0;
-    var raekke = D.FABRIK.faste.map(function (f) { return f.maal; });
-    raekke.forEach(function (maal) {
-        var i = S2.ordrer.map(function (o) { return o.maal; }).indexOf(maal);
+    overskrift("6. Pengene: de ti første ordrer");
+    forfra();
+    var brugt = 0, lev = 0, ventet = 0, serie = 0, mindst = 300, trinF = [];
+    F.faste.forEach(function (f) {
+        var maal = f.maal;
+        var i = S.ordrer.map(function (o) { return o.maal; }).indexOf(maal);
         if (i < 0) return;
-        S2.vaelgOrdre(i);
+        S.vaelgOrdre(i);
+        var h0 = S.hintNu();
+        if (h0.trin.length !== 3) trinF.push(maal);
         for (var n = 0; n < 3; n++) {
-            if (S2.ordrer.map(function (o) { return o.maal; }).indexOf(maal) < 0 && n) break;
-            var h = S2.hintNu();
+            var h = S.hintNu();
             if (!h.svar) break;
+            h.trin.forEach(function (t) { tekster.push(t); });
             h.svar.forEach(function (id) {
-                if (S2.antal(id) - R2.reserveret(id) > 0) return;
-                var s = K.stof(id);
-                if (s.hylde) { brugt += s.pris; S2.koebStof(id); }
+                if (S.antal(id) - R.reserveret(id) > 0) return;
+                if (K.stof(id).hylde) brugt += koeb(id);
             });
-            R2.laeg(h.svar[0], 0); R2.laeg(h.svar[1], 1); R2.saetBet(h.hplus, h.varme);
-            var p0 = S2.penge;
-            R2.start(); R2.spring();
-            if (S2.penge > p0) { betalt += S2.penge - p0; lev++; break; }
+            mindst = Math.min(mindst, S.penge);
+            R.laeg(h.svar[0], 0); R.laeg(h.svar[1], 1); R.saetBet(h.hplus, h.varme);
+            var l0 = S.leveret;
+            R.start(); R.spring();
+            tekster.push(S.beskedTekst());
+            if (S.leveret > l0) {
+                var v = K.stofEfterNavn(maal).vaerdi;
+                ventet += v + Math.round(v * Math.min(serie, F.serieMax) * F.seriePct / 100) + F.nyBonus;
+                serie++; lev++;
+                break;
+            }
         }
-        tekster.push(S2.beskedTekst());
     });
-    paastand("de fem første ordrer kan leveres", lev === 5, lev);
-    paastand("pengene passer: start − køb + betaling", S2.penge === foer - brugt + betalt, S2.penge + " ≠ " + (foer - brugt + betalt));
-    paastand("de fem ordrer betaler 2080 kr. uden børs", betalt === 180 + 250 + 400 + 450 + 800, betalt);
-    paastand("titlen stiger med pengene", S2.titelNr >= 1, S2.titelNr);
-    /* Børsen */
-    var o0 = S2.ordrer[0];
-    S2.boers = { maal: o0.maal, pct: 50, t: 0 };
-    paastand("børsen giver 50 % mere på sin duft", S2.pris(o0) === Math.round(K.stofEfterNavn(o0.maal).vaerdi * 1.5 / 10) * 10);
-    /* Tom kasse: banken låner */
-    S2.penge = 5; S2.lager = {}; S2.tjekLaan();
-    paastand("med tom kasse og tomt lager låner banken 200 kr.", S2.penge === 205);
-    /* Forfra kræver to tryk */
-    S2.bekraeft = 0; S2.penge = 999;
-    S2.nulstil();
-    var efterEt = S2.penge;
-    S2.nulstil();
-    paastand("Forfra kræver to tryk", efterEt === 999 && S2.penge === 300);
-    S2.bekraeft = 0;
+    paastand("hvert hint er en trappe på tre trin", trinF.length === 0, trinF.join(", "));
+    paastand("de ti første ordrer kan leveres med hintenes opskrift", lev === 10, lev);
+    paastand("kassen går aldrig i minus undervejs", mindst >= 0, mindst);
+    paastand("det tjente er priserne, seriens 10 % pr. levering (højst 50 %) og 50 kr. pr. nyt stof", S.tjent === ventet && S.serie === 10, S.tjent + " ≠ " + ventet);
+    paastand("pengene passer: start − køb + tjent", S.penge === 300 - brugt + S.tjent, S.penge + " ≠ " + (300 - brugt + S.tjent));
+    var titelVentet = 0;
+    F.titler.forEach(function (t, i) { if (S.tjent >= t.fra) titelVentet = i; });
+    paastand("titlen følger det tjente", S.titelNr === titelVentet && S.titelNr >= 2 && tekst("fb-titel") === F.titler[titelVentet].titel, S.titelNr + " " + S.tjent);
+    paastand("efter de ti faste ordrer kommer der tilfældige, og ingen er ens", S.fasteNr === 10 && S.ordrer.length === 3 &&
+        S.ordrer.map(function (o) { return o.maal; }).filter(function (m, i, l) { return l.indexOf(m) === i; }).length === 3);
+
+    /* Forfremmelsen */
+    forfra();
+    S.tjent = 990;
+    var op = S.tjen(20);
+    paastand("ved 1000 kr. tjent bliver eleven laborant", op === true && S.titelNr === 1);
+    S.fejrTitel();
+    paastand("skiltet viser titlen og det udstyr, den giver adgang til", !d.getElementById("forfremmelse").hidden && tekst("ff-titel") === "Laborant" && /Reklameskilt/.test(tekst("ff-note")));
+    tekster.push(tekst("ff-note"));
+    d.getElementById("forfremmelse").click();
+
+    /* Boersen, tilbud og udstyr */
+    forfra();
+    var o0 = S.ordrer[0];
+    S.boers = { maal: o0.maal, pct: 50, t: 0 };
+    paastand("børsen giver 50 % mere på sin duft", S.pris(o0) === 270, S.pris(o0));
+    S.boers = { maal: "intet", pct: 0, t: 0 };
+    S.udstyr.vandudskiller = 1;
+    paastand("vandudskilleren giver 25 % mere for estere, men ikke for propanon", S.pris({ maal: "ethylethanoat" }) === 230 && S.pris({ maal: "propanon" }) === 90,
+        S.pris({ maal: "ethylethanoat" }));
+    S.udstyr = {};
+    S.tilbud = { id: "ethanol", t: 0 };
+    var pTilbud = S.stofPris("ethanol");
+    S.udstyr.kundekort = 1;
+    paastand("dagens tilbud sætter ethanol ned til 18 kr., og kundekortet giver 20 % oveni", pTilbud === 18 && S.stofPris("ethanol") === 14 && S.stofPris("methanol") === 12,
+        pTilbud + " " + S.stofPris("ethanol"));
+    S.udstyr = {}; S.tilbud = { id: "", t: 0 };
+    S.aabnButik();
+    B.laeg("skilt");
+    paastand("reklameskiltet kan ikke købes som lærling", !B.kurv.skilt && /laborant/.test(tekst("bu-boble")), tekst("bu-boble"));
+    tekster.push(tekst("bu-boble"));
+    S.titelNr = 1; S.penge = 500; B.vis();
+    d.querySelector("#bu-reoler .udstyrsvare[data-id=skilt]").click();
+    d.getElementById("bu-betal").click();
+    paastand("som laborant køber eleven skiltet for 400 kr. og får en fjerde kunde", S.udstyr.skilt === 1 && S.penge === 100 && S.ordrer.length === 4 &&
+        d.querySelectorAll("#fb-ordrer .ordrekort").length === 4 && d.querySelectorAll("#fb-udstyr .ud-plads.ejet").length === 1);
+    tekster.push(S.beskedTekst());
+
+    /* Lever fra lageret */
+    var o1 = S.ordrer[1], s1 = K.stofEfterNavn(o1.maal);
+    S.lager[s1.id] = 1; S.visOrdrer();
+    var lk = d.querySelector("#fb-ordrer .ordrekort:nth-child(2) .ok-lever");
+    var p1 = S.penge;
+    if (lk) lk.click();
+    paastand("et stof, der står på lageret, kan leveres med knappen på ordren", !!lk && S.penge === p1 + s1.vaerdi && !S.lager[s1.id] && S.leveret === 1, S.penge - p1);
+    tekster.push(S.beskedTekst());
+
+    /* Vis svaret bryder serien */
+    S.serie = 3; S.visSerie();
+    S.knap(); S.knap(); S.knap(); S.knap();
+    paastand("Vis svaret bryder serien", S.serie === 0 && /Svaret/.test(S.beskedTekst()));
+    tekster.push(S.beskedTekst());
+
+    /* Tom kasse: banken laaner */
+    S.penge = 5; S.lager = {}; S.tjekLaan();
+    paastand("med tom kasse og tomt lager låner banken 200 kr.", S.penge === 205);
+    tekster.push(S.beskedTekst());
+
+    /* Fabrikken huskes */
+    S.gem();
+    var gemtNu = JSON.parse(W.localStorage.getItem("nk-sb4.5-fabrik2") || "{}");
+    paastand("fabrikken gemmes i browseren med penge, udstyr og esterkort", gemtNu.penge === 205 && gemtNu.udstyr && gemtNu.udstyr.skilt === 1 && !!gemtNu.kendt);
+
+    /* Forfra kraever to tryk */
+    S.bekraeft = 0; S.penge = 999;
+    S.nulstil();
+    var efterEt = S.penge;
+    S.nulstil();
+    paastand("Forfra kræver to tryk og rydder udstyr, serie og esterkort", efterEt === 999 && S.penge === 300 && !S.udstyr.skilt && S.ordrer.length === 3 && Object.keys(S.kendt).length === 0);
+    S.bekraeft = 0;
     d.getElementById("fb-forfra").textContent = "Forfra ↺";
 
+    /* Esterkortet */
+    forfra();
+    var EK = S.kortet;
+    paastand("esterkortet har 49 estere og 3 særlige stoffer", EK.ialt === 52 && d.querySelectorAll("#fb-kortmini > i").length === 49 &&
+        d.querySelectorAll("#fb-kortmini .ek-mini-saer i").length === 3, EK.ialt);
+    var pe1 = K.reaktion("ethansyre", "pentan1ol", BET).produkt;
+    var foerste = EK.opdag(pe1), anden = EK.opdag(pe1);
+    paastand("et stof er kun nyt første gang", foerste === true && anden === false && EK.antal() === 1);
+    paastand("syrer og aldehyder er ikke på kortet", EK.opdag(K.stof("butansyre")) === false);
+    d.getElementById("fb-kortknap").click();
+    var celler = d.querySelectorAll("#ek-gitter td");
+    var kendte = d.querySelectorAll("#ek-gitter td.kendt");
+    paastand("det store kort viser kun det, eleven har lavet: 1 navn og 48 spørgsmålstegn", d.getElementById("esterkort").classList.contains("vis") &&
+        celler.length === 49 && kendte.length === 1 && /pentylethanoat/.test(kendte[0].textContent) && d.querySelectorAll("#ek-gitter td.ukendt").length === 48);
+    paastand("navnet står i alkoholens og syrens farve", !!kendte[0].querySelector(".t-alk") && kendte[0].querySelector(".t-syre").textContent === "ethanoat");
+
     /* ------------------------------------------------------------------ */
-    overskrift("7. Tavlen");
+    overskrift("7. Tavlen og layoutet");
     var ramme = document.getElementById("ramme");
-    var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
+    var maal = [[1100, 650], [1300, 820], [1500, 900], [1600, 950]];
     var par = [["ethansyre", "ethanol", BET], ["pentansyre", "pentan1ol", BET], ["salicylsyre", "methanol", BET], ["ethansyre", "salicylsyre", BET],
         ["octan1ol", "permanganat", { varme: true }], ["propan2ol", "permanganat", { varme: true }], ["methanol", "permanganat", { varme: true }],
         ["ethansyre", "ethanol", {}], ["ethanol", "ethanol", BET], ["methansyre", "permanganat", { varme: true }], ["methansyre", "ethansyre", BET]];
-    var tF = [], skalaMin = {};
-    NK.visFane("fane-rk");
+    var tF = [], skalaMin = {}, lF = [], tavleMaal = {};
+    /* Lageret fyldt, saa flaskerne staar i to raekker */
+    D.STOFFER.forEach(function (x) { if (x.hylde) S.lager[x.id] = 1; });
+    S.lager.butansyre = 1;
+    R.bygHylde();
     maal.forEach(function (m) {
         ramme.style.width = m[0] + "px";
         ramme.style.height = m[1] + "px";
-        R1.tilpas();
-        var T = R1.tavle;
+        R.tilpas();
+        var T = R.tavle;
         par.forEach(function (p) {
             var u = K.reaktion(p[0], p[1], p[2]);
             T.vis({ type: "udfald", udfald: u });
@@ -338,29 +428,40 @@ function koerTest(W) {
             });
             if (T.plan.s) skalaMin[m[0]] = Math.min(skalaMin[m[0]] || 99, T.plan.s);
         });
+        tavleMaal[m[0]] = T.L.b + "×" + T.L.h;
+        var sc = d.querySelector(".scene"), p = d.querySelector(".panel"), top = d.querySelector(".top");
+        if (p.scrollWidth > p.clientWidth + 1) lF.push(m.join("×") + " panelet er for bredt");
+        if (top.scrollWidth > top.clientWidth + 1) lF.push(m.join("×") + " toplinjen er for bred");
+        var st = d.querySelector(".statuslinje").getBoundingClientRect(), r = sc.getBoundingClientRect();
+        if (st.bottom > r.bottom + 1) lF.push(m.join("×") + " statuslinjen er skåret af");
+        var kb = d.querySelector(".kolbe").getBoundingClientRect();
+        if (kb.height < 200) lF.push(m.join("×") + " kolben er " + Math.round(kb.height) + " px");
+        var tv = d.getElementById("fb-tavleboks").getBoundingClientRect();
+        if (tv.width < 320 || tv.height < 200) lF.push(m.join("×") + " tavlen er " + Math.round(tv.width) + "×" + Math.round(tv.height));
+        if (tv.width > 600 || tv.height > 390) lF.push(m.join("×") + " tavlen er for stor");
+        var bt = d.querySelector(".betjening").getBoundingClientRect(), rk = d.getElementById("fb-reaktor").getBoundingClientRect();
+        if (bt.top < rk.top - 1 || bt.bottom > rk.bottom + 1) lF.push(m.join("×") + " knapperne ved kolben er skåret af");
     });
-    paastand("tavlen kan bygges for alle slags reaktioner fra 1100 × 700 til 1600 × 950", tF.length === 0, tF.slice(0, 3).join(", "));
-    paastand("bindingerne er mindst 19 px lange ved 1100 × 700 og 24 px fra 1300 × 820", skalaMin[1100] >= 19 &&
-        skalaMin[1300] >= 24 && skalaMin[1500] >= 24 && skalaMin[1600] >= 24, JSON.stringify(skalaMin).replace(/(\.\d)\d+/g, "$1"));
-    /* Layoutet: intet stikker ud */
-    var lF = [];
+    paastand("tavlen kan bygges for alle slags reaktioner fra 1100 × 650 til 1600 × 950", tF.length === 0, tF.slice(0, 3).join(", "));
+    paastand("bindingerne er mindst 15 px lange ved 1100 × 650 og 21 px fra 1300 × 820", skalaMin[1100] >= 15 &&
+        skalaMin[1300] >= 21 && skalaMin[1500] >= 21 && skalaMin[1600] >= 21, JSON.stringify(skalaMin).replace(/(\.\d)\d+/g, "$1") + " " + JSON.stringify(tavleMaal));
+    paastand("toplinje, panel, statuslinje, kolbe og tavle kan være der i alle fire størrelser med to rækker flasker", lF.length === 0, lF.slice(0, 4).join(", "));
+    /* Butikken kan vaere paa skaermen */
+    var bF = [];
+    S.aabnButik(); B.laeg("ethanol"); B.laeg("ethansyre"); B.laeg("permanganat"); B.laeg("pentan1ol");
     maal.forEach(function (m) {
         ramme.style.width = m[0] + "px";
         ramme.style.height = m[1] + "px";
-        ["fane-rk", "fane-fb"].forEach(function (f) {
-            NK.visFane(f);
-            var sc = d.querySelector("#" + f + " .scene"), p = d.querySelector("#" + f + " .panel");
-            if (p.scrollWidth > p.clientWidth + 1) lF.push(m.join("×") + " " + f + " panelet er for bredt");
-            var st = d.querySelector("#" + f + " .statuslinje").getBoundingClientRect(), r = sc.getBoundingClientRect();
-            if (st.bottom > r.bottom + 1) lF.push(m.join("×") + " " + f + " statuslinjen er skåret af");
-            var kb = d.querySelector("#" + f + " .kolbe").getBoundingClientRect();
-            if (kb.height < 140) lF.push(m.join("×") + " " + f + " kolben er " + Math.round(kb.height) + " px");
-        });
+        var bu = d.querySelector(".butik").getBoundingClientRect();
+        if (bu.left < 0 || bu.top < 0 || bu.right > m[0] || bu.bottom > m[1]) bF.push(m.join("×") + " butikken stikker ud");
+        var be = d.getElementById("bu-betal").getBoundingClientRect();
+        if (be.bottom > bu.bottom || be.height < 20) bF.push(m.join("×") + " Betal kan ikke ses");
+        var re = d.getElementById("bu-reoler");
+        if (m[1] >= 820 && re.scrollHeight > re.clientHeight + 1) bF.push(m.join("×") + " reolerne skal rulles");
     });
-    paastand("panel, statuslinje og kolbe kan være der i alle fire størrelser", lF.length === 0, lF.slice(0, 3).join(", "));
+    paastand("butikken og Betal kan være på skærmen i alle fire størrelser", bF.length === 0, bF.slice(0, 3).join(", "));
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
-    NK.visFane("fane-rk");
 
     /* ------------------------------------------------------------------ */
     overskrift("8. Sproget og skriften");
@@ -368,7 +469,8 @@ function koerTest(W) {
         if (typeof x === "string") tekster.push(x);
         else if (Array.isArray(x)) x.forEach(saml);
         else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
-    }({ DUFTE: D.DUFTE, BRUG: D.BRUG, KUNDER: D.KUNDER, ORDRER: D.ORDRER, GRUPPER: D.GRUPPER, FAERDIG: D.FAERDIG, U: D.FABRIK.udsolgt }));
+    }({ DUFTE: D.DUFTE, BRUG: D.BRUG, KUNDER: D.KUNDER, U: F.udsolgt, T: F.titler, UD: F.udstyr }));
+    S.kortet.aabn();
     tekster.push(d.body.textContent);
     var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
     paastand("ingen tankestreger", tanke.length === 0, tanke.slice(0, 2).join(" | "));
@@ -377,19 +479,19 @@ function koerTest(W) {
     var ascii = tekster.filter(function (t) { return ASCII_ORD.test(t); });
     paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).map(function (t) { return t.match(ASCII_ORD)[0]; }).join(" | "));
     var smaa = [];
-    d.querySelectorAll(".panel *, .hylde *, .statuslinje *, .reaktor *, .ordrelinje").forEach(function (e) {
-        if (!e.childNodes.length || !e.textContent.trim() || e.offsetParent === null) return;
+    d.querySelectorAll(".top *, .panel *, .lager *, .statuslinje *, .reaktor *, .ordrelinje, .butik *, .ek-boks *").forEach(function (e) {
+        if (!e.childNodes.length || !e.textContent.trim() || !e.getClientRects().length) return;
         var egen = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
         if (!egen) return;
         var px = parseFloat(W.getComputedStyle(e).fontSize);
         if (px < 11.5) smaa.push(e.className + " " + px);
     });
-    paastand("ingen tekst under 11,5 px i hylden, kolben, panelet og statuslinjen", smaa.length === 0, smaa.slice(0, 4).join(", "));
+    paastand("ingen tekst under 11,5 px i toplinjen, lageret, kolben, panelet, butikken og esterkortet", smaa.length === 0, smaa.slice(0, 4).join(", "));
 
     /* Ryd op */
-    S1.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
-    S1.nulstil();
-    S1.vaelg(0);
+    d.getElementById("butik").classList.remove("vis");
+    d.getElementById("esterkort").classList.remove("vis");
+    forfra();
 }
 </script>
 </body>

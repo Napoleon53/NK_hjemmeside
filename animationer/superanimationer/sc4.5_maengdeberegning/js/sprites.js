@@ -3,10 +3,7 @@
 
    Sprites hentes med <img>, ikke med fetch, saa de ogsaa virker, naar
    siden aabnes direkte fra harddisken (file://). Er en fil ikke klar
-   endnu, springes den bare over i det billede.
-
-   ../../v2/kemichael/kemichael.js tilfoejer laererens sprites (og
-   kaffekoppen) med deres egen mappe, derfor startes indlaesningen foerst
+   endnu, springes den bare over i det billede. Indlaesningen startes
    fra app.js.
 
    MAAL er de koordinater, der staar i kommentaren oeverst i hver
@@ -33,9 +30,7 @@
         /* Skaalvaegten paa fane 2: foden med knivsaeggen, armen og en skaal */
         skaal_fod: { b: 200, h: 300, aegX: 100, aegY: 36, skalaY: 232, bund: 296 },
         skaal_arm: { b: 400, h: 40, midtX: 200, midtY: 20, krogV: 12, krogH: 388 },
-        skaal_skaal: { b: 160, h: 170, krogX: 80, krogY: 6, fladeY: 146, fladeB: 148 },
-        /* Kemichaels kateder: bordpladens overflade og forsiden */
-        kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 }
+        skaal_skaal: { b: 160, h: 170, krogX: 80, krogY: 6, fladeY: 146, fladeB: 148 }
     };
 
     var FILER = {};

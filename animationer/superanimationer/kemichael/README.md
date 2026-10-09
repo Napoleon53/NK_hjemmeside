@@ -99,5 +99,6 @@ får stadig ingen præsentation (se `../README.md` under "Kemichael").
 | `navn` | holder koppen op: "Der står mit navn på. BEDSTE LÆRER." |
 | `tager` | tager koppen og går uden et ord |
 
-`sc4.5_maengdeberegning` (den rolige Kemichael) og `sc7.1` (hydronen i kaffen)
-har deres egne kaffe-replikker i `js/data.js`.
+`sc7.1` (hydronen i kaffen) har sine egne kaffe-replikker i `js/data.js`.
+Den rolige Kemichael ved katederet (`sc4.5` og ni andre) er taget ud 9. okt.
+2026; se "Kemichael" i `../README.md`.

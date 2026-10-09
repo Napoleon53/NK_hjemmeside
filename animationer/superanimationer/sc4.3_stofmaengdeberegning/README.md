@@ -3,8 +3,7 @@
 Superanimation om formlen n = m / M: stofmængden er massen delt med
 molarmassen, og enhederne viser det, g / (g/mol) = mol. Den træner både at
 huske formlen med navne og enheder og at regne med den. Åbn `index.html`.
-Mappen henter kun filer inde fra sig selv, bortset fra Kemichael
-(`../../v2/kemichael/kemichael.js` og `../kemichael/superanimation.js`).
+Mappen henter kun filer inde fra sig selv.
 Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
 ## Bestillingen
@@ -26,13 +25,15 @@ Ingen `fetch` og ingen moduler, så den virker fra harddisken.
    `sc4.5`, så eleven genkender dem.
 4. **Loftet:** 3 faner. Formlen: 6 opgaver, højst 8 brikker. Vægten: 6
    opgaver med 4 sæt tal hver, 9 stoffer i alt. Hurtigrunden: 12 spørgsmål.
-5. **Layoutet:** scene plus panel som `sc5.1`, med den rolige Kemichael ved
-   katederet i et bånd nederst i scenen.
+5. **Layoutet:** scene plus panel som `sc5.1`.
 
 Brugerens valg (25. sept. 2026): de tre faner Formlen, Vægten og
 Hurtigrunden; molarmassen står på krukkens etiket; formeltrekanten kommer
-kun som det andet hint, når formlen skal vendes; den rolige Kemichael som i
-sc4.5 (han taler kun ved Giv hint og Vis svaret og kan sendes ud).
+kun som det andet hint, når formlen skal vendes.
+
+9. okt. 2026 (brugerens valg): Kemichael ved katederet er taget helt ud
+(han hører til i laboratoriet). Scenen har fået hans bånd, og hintknappen
+er gul, så eleven altid kan finde hjælpen selv.
 
 Rettet efter brugerens test 27. sept. 2026: opgaveteksten på Formlen står
 over tavlen (i kortet blev den overset), første opgave hedder Introduktion,
@@ -45,8 +46,8 @@ svaret. Hurtigrunden siger "tidsstraf" uden tal.
 Rettet efter brugerens test 29. sept. 2026: det skal være tydeligt, når en
 opgave eller en del er rigtig. En løst opgave er grøn i listen (✓ i cirklen,
 ★ hvis den er løst uden Vis svaret), og kortets overskrift får "✓ Løst".
-Kemichael siger en kort ros, når en del er rigtig ("Rigtig formel. Godt."),
-og linjen i kortet siger det samme foran næste skridt. På Formlen får en
+Linjen i kortet siger i grønt, at delen er rigtig ("Formlen er rigtig."),
+foran næste skridt. På Formlen får en
 rigtig del en grøn ramme med ✓ på tavlen. På Vægten forvirrede "skriv
 formlen" under "Hvor mange mol er det?": nu står de tre trin (Formlen ›
 Tallene ind › Resultatet) over regnestykket med det aktuelle i gult, linjen
@@ -139,13 +140,11 @@ spørgsmålet kommer igen tre spørgsmål senere. Et hint koster 5 s. Teksten
 siger kun "tidsstraf", ikke hvor meget (brugerens ønske 27. sept. 2026).
 Den bedste tid huskes i browseren.
 
-**Kemichael ved katederet.** Som i sc4.5 og sc5.1: han sidder stille nederst
-til venstre og siger kun noget ved Giv hint (til trinnet er løst) og Vis
-svaret. Når en del er rigtig (formlen, navnene, enhederne, mellemregningen,
-resultatet), siger han en kort ros, som selv går igen efter godt 3 s
-(`D.ROS_K`, brugerens ønske 29. sept. 2026). Knappen Send Kemichael ud
-sender ham på lærerværelset; så står hintene i opgavekortet. <kbd>K</kbd>
-får ham til at sige, hvor man er.
+**Hint og svar.** Den gule knap i opgavekortet er hjælpen: Giv hint skriver
+hintet i linjen lige over knappen, og knappen bliver (efter Vis trekanten, når formlen skal vendes) til Vis svaret (kun et
+omrids, så den ikke frister), der skriver svaret og næste skridt i samme
+linje. Efter et forkert svar lyser den gule knap stille op, til linjen
+skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
 
 **Påskeæg:** to hurtige klik på mol-brikken (opgave 3), eller "muldvarp" som
 enhed i opgave 6, får en muldvarp op af bunken. På engelsk hedder begge en
@@ -155,7 +154,7 @@ Direkte links: `index.html#vaegt` og `index.html#hurtig`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner (i Hurtigrunden svarer
 1 til 4, mens runden kører) · <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning ·
-<kbd>K</kbd> Kemichael siger, hvor man er · <kbd>R</kbd> runden forfra, nye
+<kbd>R</kbd> runden forfra, nye
 tal eller ny runde · <kbd>Enter</kbd> tjek feltet eller næste opgave ·
 <kbd>Esc</kbd> luk.
 
@@ -164,7 +163,7 @@ tal eller ny runde · <kbd>Enter</kbd> tjek feltet eller næste opgave ·
 ```
 index.html          markup for de tre faner, teorien og rundvisningen
 css/stil.css        alt udseende (kopi af sc5.1 plus teoriens tabel). NB: decimaltal med PUNKTUM i CSS
-sprites/            krukken, vægten, vejebåden og katederet (som sc4.5)
+sprites/            krukken, vægten og vejebåden (som sc4.5)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc5.1)
 js/data.js          atommasserne, stofferne, opgaverne, regnetrinene med hint, spørgsmålene og replikkerne
 js/tjek.js          enhederne (potenser af g, mol og L), formlerne, mellemregningens tal, tallene med enhed,
@@ -172,9 +171,8 @@ js/tjek.js          enhederne (potenser af g, mol og L), formlerne, mellemregnin
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, tavlen, krukken, vægten, poserne, brikkerne, pladserne,
                     teksten over tavlen, regnestykker med brøkstreger, trekanten, linjen med enhederne og muldvarpen
-js/laerer.js        Kemichael ved katederet (som sc4.5 og sc5.1)
-js/fane.js          det, fanerne deler: opgavelisten, knappen med trekanten, linjen i kortet,
-                    Kemichael og musen
+js/fane.js          det, fanerne deler: opgavelisten, den gule knap med trekanten, linjen i kortet
+                    (også hint og svar) og musen
 js/regning.js       regnestykket i kortet (formel, mellemregning i brøkfelter, resultat) og tavlen på Vægten
 js/sim_formel.js    fane 1
 js/sim_vaegt.js     fane 2
@@ -216,13 +214,14 @@ forskellige svar og det rigtige facit, at sproget holder reglerne, at alle
 seks opgaver på Formlen kan løses med musen (træk og klik, med fejl, låste
 brikker, hint, trekanten og muldvarpen), og at teksten står over tavlen, at mellemregningens felter genkender tallene med de typiske fejl, at alle seks opgaver på Vægten kan
 løses ved at skrive, og at scenen gør det, der er regnet, at en hel
-Hurtigrunde kan køres med en fejl, der kommer igen, at Kemichael kun taler
-ved hint og svar, roser kort, når en del er rigtig, og kan sendes ud, at
+Hurtigrunde kan køres med en fejl, der kommer igen, at hint og svar kun
+kommer fra den gule knap og står i opgavekortet, at knappen lyser op efter
+en fejl, at kortet siger til, når en del er rigtig, at
 en løst opgave er grøn i listen, at Vægten har linjen med de tre trin, et
 bredere panel og større felter, og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 29. september 2026: ALT OK (150 påstande).
+bagefter. Sidst kørt 9. oktober 2026: ALT OK (148 påstande).
 
 ## Forenklinger
 

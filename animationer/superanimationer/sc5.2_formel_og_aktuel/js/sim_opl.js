@@ -181,7 +181,6 @@
             this.brugtSvar = true;
             this.svarVis(NK.html("Den rigtige: " + s.t + ". Prøv det."));
         } else {
-            this.k.tie();
             this.besked(NK.html("Dit gæt: " + s.t + ". " + o.linje), "");
         }
         this.visKort();
@@ -210,7 +209,6 @@
         var o = this.opg, q = o.spm[this.spmNr], s = q.svar[j];
         if (!s.ok) {
             if (this.spmFejl.indexOf(j) < 0) this.spmFejl.push(j);
-            this.k.tie();
             this.besked(NK.html(s.forkl + " Prøv et af de andre."), "skidt");
             this.visKort();
             return;
@@ -231,7 +229,6 @@
             this.svarVis(NK.html(q.efter));
         } else {
             /* Tallene staar i beregningen i kortet; linjen roser og siger det naeste */
-            this.k.tie();
             this.besked(NK.html(NK.tilfaeldig(D.ROS) + (q.note ? " " + q.note : "") + " " + this.trinLinje()), "god");
         }
         this.visKnap();
@@ -449,8 +446,7 @@
     /* ----- Layout ----------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.07, 16, 44));
         var colB = Math.round(NK.klamp(W * 0.36, 210, 400));
@@ -479,7 +475,6 @@
         this.saetAnker("krukke", lay.krukker[0].x, lay.krukker[0].y, x - 18, krH);
         this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 30, 2 * zr, 2 * zr + 90);
         this.saetAnker("soejler", lay.soejler.x, lay.soejler.y, lay.soejler.b, lay.soejler.h);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* ----- Opdater ----------------------------------------------------------------------- */
@@ -594,7 +589,6 @@
         maks = Math.ceil(maks / 0.2) * 0.2;
         Tg.soejler(ctx, lay.soejler, s, maks);
 
-        this.k.tegn(ctx);
     };
 
     NK.SimOpl = SimOpl;

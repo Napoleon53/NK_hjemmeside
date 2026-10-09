@@ -312,6 +312,66 @@
         ctx.restore();
     };
 
+    /* En gul ring, der breder sig ud fra det, der skal bruges nu */
+    T.pulsring = function (ctx, x, y, r, tid) {
+        var f = (tid * 0.9) % 1;
+        ctx.save();
+        ctx.strokeStyle = "rgba(255, 223, 107, " + (0.85 * (1 - f)) + ")";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(x, y, r + 3 + 11 * f, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(255, 223, 107, 0.9)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(x, y, r + 2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+    };
+
+    /* Et gult skilt ved det, der skal bruges: hvad et klik goer (som sc4.8).
+       (x, y) er spidsen, der peger paa tingen. side: "over" (skiltet staar
+       over tingen) eller "hoejre" (til hoejre for den). W: laerredets
+       bredde, saa skiltet bliver inden for det. Giver skiltets felt tilbage,
+       saa et klik paa skiltet taeller som et klik paa tingen. */
+    T.skilt = function (ctx, tekst, x, y, side, W, tid) {
+        var hop = Math.sin(tid * 4.5) * 3;
+        ctx.save();
+        ctx.font = font("700", 15);
+        var b = Math.ceil(ctx.measureText(tekst).width) + 24, h = 30, sp = 10;
+        var rx, ry;
+        if (side === "hoejre") { rx = x + sp + 3 + hop; ry = y - h / 2; }
+        else { rx = x - b / 2; ry = y - sp - 3 - h + hop; }
+        rx = NK.klamp(rx, 6, Math.max(6, W - b - 6));
+        ry = Math.max(4, ry);
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 2;
+        ctx.fillStyle = "#ffdf6b";
+        ctx.beginPath();
+        if (side === "hoejre") {
+            ctx.moveTo(rx - sp, y);
+            ctx.lineTo(rx + 1, y - 8);
+            ctx.lineTo(rx + 1, y + 8);
+        } else {
+            var px = NK.klamp(x, rx + 14, rx + b - 14);
+            ctx.moveTo(px, ry + h + sp);
+            ctx.lineTo(px - 8, ry + h - 1);
+            ctx.lineTo(px + 8, ry + h - 1);
+        }
+        ctx.closePath();
+        ctx.fill();
+        NK.rundtRekt(ctx, rx, ry, b, h, 8);
+        ctx.fill();
+        ctx.shadowColor = "transparent";
+        ctx.fillStyle = "#33290a";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(tekst, rx + b / 2, ry + h / 2 + 1);
+        ctx.restore();
+        return { x: rx - (side === "hoejre" ? sp : 0), y: ry, b: b + (side === "hoejre" ? sp : 0), h: h + (side === "hoejre" ? 0 : sp) };
+    };
+
     /* ----- Krukken med stoffet (som sc4.5) --------------------------------------------
        (x, y): midten af bunden, h: hoejden. v.linje3 er den nederste linje
        paa etiketten (standard: molarmassen). v.lys: musen er over den. */

@@ -192,7 +192,7 @@
         "Br -": "#e0b99a", "Br2": "#d9722a"
     };
 
-    /* ----- Kemichael ------------------------------------------------------------- */
+    /* ----- Linjerne i opgavekortet ------------------------------------------------ */
     D.INTRO = {
         ug: "Ét urglas og fire flasker. Fyld glasset, dryp i, og afstem det, der sker.",
         fl: "Permanganat dryppes i andre stoffer. Afstem på samme måde, med klammer under skemaet."
@@ -203,26 +203,6 @@
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Afstemt.", "Færdig.", "Den er i hus.", "Skemaet går op."];
-
-    D.UD_LINJE = "Fint. Jeg går på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Nogen havde taget min stol.";
-
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Den er fra i morges. Den er vist oxideret.",
-        "Nogen har fortyndet den.",
-        "Kaffen er min. Urglassene må du gerne bruge.",
-        "Stadig kold."
-    ];
-    D.PRIK_SIDST = "Jeg sidder her bare. Afstem du.";
-    /* Skiltet ved ham, når musen holdes over ham: et klik giver hintet */
-    D.KLIK_HINT = "Klik for et hint";
-
-    /* Påskeægget: flasken sluppet over hans kop */
-    D.KAFFE_FLASKE = {
-        ug: "Sulfit i kaffen? Den er reduceret nok i forvejen.",
-        fl: "Ikke permanganat i kaffen. Den er oxideret nok."
-    };
 
     NK.Data = D;
 }());

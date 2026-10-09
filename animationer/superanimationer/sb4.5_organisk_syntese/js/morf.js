@@ -802,8 +802,15 @@
         var plan = this.plan;
         this.tegnBraet(ctx, W, H, plan ? plan.titel : "");
         if (!plan) {
-            tekst(ctx, "Læg to stoffer i kolben.", W / 2, H / 2 - 12, rgba(FARVE.svag, 0.9), 17, "600");
-            tekst(ctx, "Her på tavlen kan du se, hvad der sker med molekylerne.", W / 2, H / 2 + 16, rgba(FARVE.svag, 0.7), 14, "600");
+            /* Paa en smal tavle staar den lange linje paa to linjer */
+            var smal = W < 460;
+            tekst(ctx, "Læg to stoffer i kolben.", W / 2, H / 2 - (smal ? 22 : 12), rgba(FARVE.svag, 0.9), 17, "600");
+            if (smal) {
+                tekst(ctx, "Her på tavlen kan du se,", W / 2, H / 2 + 6, rgba(FARVE.svag, 0.7), 14, "600");
+                tekst(ctx, "hvad der sker med molekylerne.", W / 2, H / 2 + 26, rgba(FARVE.svag, 0.7), 14, "600");
+            } else {
+                tekst(ctx, "Her på tavlen kan du se, hvad der sker med molekylerne.", W / 2, H / 2 + 16, rgba(FARVE.svag, 0.7), 14, "600");
+            }
             return;
         }
         var t = this.t;

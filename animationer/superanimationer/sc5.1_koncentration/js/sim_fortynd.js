@@ -378,8 +378,7 @@
     /* ----- Layout ------------------------------------------------------------------------------------ */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.06, 14, 40));
         var zr = Math.round(NK.klamp(Math.min(Hs * 0.11, W * 0.075), 44, 88));
@@ -402,7 +401,6 @@
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("lupper", lay.z1.x - zr, lay.z1.y - zr - 24, lay.z2.x + zr - lay.z1.x + zr, 2 * zr + 90);
         this.saetAnker("bord", 8, topBund - 10, W - 16, lay.bordY - topBund + 20);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* Pipetterne, kolberne og glasset paa bordet */
@@ -545,7 +543,6 @@
             tekst: K.c(c1) + " M", forklar: false });
         Tg.zoom(ctx, lay.z2.x, lay.z2.y, zr, { part: this.part2, st: ST, farve: Tg.vaeske(ST, c2), titel: titel2,
             tekst: c2 > 0 ? K.c(c2) + " M" : "tom", forklar: false });
-        this.k.tegn(ctx);
     };
 
     NK.SimFortynd = SimFortynd;

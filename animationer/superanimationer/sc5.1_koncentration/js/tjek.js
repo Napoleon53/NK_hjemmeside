@@ -752,7 +752,7 @@
     /* Standardteksterne i mellemregningen (i formlens raekkefoelge) */
     T.ledTekster = function (id, o) { return T.led(id, o).map(function (l) { return l.tekst; }); };
 
-    /* Hele beregningen som HTML (til Vis svaret og Kemichaels boble) */
+    /* Hele beregningen som HTML (til Vis svaret) */
     T.regningHTML = function (id, o, tekster) {
         var v = NK.sub(venstre(id, o)) + " = ";
         if (!D.TRIN[id].op) return v + NK.html(D.molarLed(D.stof(o.stof))) + " = <b>" + NK.html(T.facitTekst(id, o)) + "</b>";

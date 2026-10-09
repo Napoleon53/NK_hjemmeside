@@ -1,7 +1,7 @@
 /* =====================================================================
    sc8.5 - Kaliumpermanganat
    Stilark. Samme udtryk som de andre superanimationer (grundlaget er sc8.2
-   med den rolige Kemichael). Nyt nederst: haeftet med skemaet, klammerne
+   med den gule hjaelpeknap). Nyt nederst: haeftet med skemaet, klammerne
    og raekkerne, trinlisten og farvekortet.
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
    dansk komma. Dansk komma bruges kun i tekst, som brugeren laeser.
@@ -606,57 +606,7 @@ select:focus-visible {
 .valgrad .knap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.22); border-color: var(--gul); }
 
 /* ---------------------------------------------------------------------
-   KEMICHAELS TALEBOBLE: staar fast til hoejre for ham ved katederet
-   og skifter kun, naar der er noget nyt (js/laerer.js)
-   --------------------------------------------------------------------- */
-.kboble {
-    --hale: 30px;
-    position: absolute;
-    z-index: 4;
-    background-color: #fffdf6;
-    color: #1f2328;
-    border: 2px solid #2a2f36;
-    border-left-width: 5px;
-    border-radius: 12px;
-    padding: 7px 14px 8px 12px;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.38;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-    overflow: hidden;
-    transition: opacity 0.22s ease, border-color 0.3s ease;
-}
-
-.kboble::before,
-.kboble::after {
-    content: "";
-    position: absolute;
-    top: var(--hale);
-    width: 0;
-    height: 0;
-    border-style: solid;
-    transform: translateY(-50%);
-}
-
-/* Halen: en trekant, der peger mod hans mund */
-.kboble::before { left: -15px; border-width: 8px 12px 8px 0; border-color: transparent #2a2f36 transparent transparent; }
-.kboble::after  { left: -9px;  border-width: 6px 9px 6px 0;  border-color: transparent #fffdf6 transparent transparent; }
-
-.kboble { overflow: visible; }
-.kb-tekst { max-height: inherit; overflow: hidden; }
-.kboble.skift { opacity: 0.25; transition: none; }
-
-.kboble.god   { border-left-color: var(--groen); }
-.kboble.skidt { border-left-color: var(--roed); }
-.kboble.hint  { border-left-color: var(--gul); }
-.kboble.svar  { border-left-color: #e0b43a; }
-
-.kboble b { color: #000000; }
-.kboble .broek { font-size: 0.8em; }
-
-/* ---------------------------------------------------------------------
-   LINJEN I OPGAVEKORTET: naeste skridt, fejl og ros (Kemichael blander
-   sig ikke) og knappen, der sender Kemichael ud
+   LINJEN I OPGAVEKORTET: naeste skridt, fejl, ros, hint og svar
    --------------------------------------------------------------------- */
 .opgavekort .besked {
     margin: 8px 0 0;
@@ -669,27 +619,8 @@ select:focus-visible {
 
 .opgavekort .besked.god   { border-left-color: var(--groen); }
 .opgavekort .besked.skidt { border-left-color: var(--roed); }
-.opgavekort .besked.gul   { border-left-color: var(--gul); }
+.opgavekort .besked.gul   { border-left-color: var(--gul); background-color: rgba(242, 197, 61, 0.1); color: #f7e4ab; }
 .opgavekort .besked .broek { font-size: 0.8em; }
-
-.kknap {
-    position: absolute;
-    right: 12px;
-    bottom: 10px;
-    z-index: 5;
-    background-color: rgba(20, 20, 28, 0.85);
-    color: var(--tekst-svag);
-    border: 1px solid #4a4a58;
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-family: inherit;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.kknap:hover { color: var(--tekst); border-color: #6e6e80; background-color: var(--panel-3); }
-.kknap.ude { color: var(--gul); border-color: rgba(242, 197, 61, 0.6); }
 
 /* ---------------------------------------------------------------------
    SC5.1: talraekkerne, regnetrinene (som sc7.4), gaettet og Start forfra
@@ -815,10 +746,10 @@ select:focus-visible {
 
 .valgrad.peg .knap:not(:disabled) { border-color: var(--gul); animation: peg 1s ease-out infinite; }
 
-/* Start forfra i Kemichaels baand, til venstre for knappen, der sender ham ud */
+/* Start forfra: nederst til hoejre i scenen, under haeftet */
 .forfraknap {
     position: absolute;
-    right: 172px;
+    right: 12px;
     bottom: 10px;
     z-index: 5;
     background-color: rgba(20, 20, 28, 0.85);
@@ -1250,6 +1181,14 @@ kbd {
 .hf-knap.svar { background-color: #fff6d6; color: #6a4a00; }
 .hf-knap.svar:hover:not(:disabled) { background-color: #ffeeb0; border-color: #a67f08; }
 
+/* Efter et forkert svar lyser hintknappen stille op, til den er brugt */
+@keyframes knap-peg {
+    0%, 100% { box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(199, 154, 18, 0); }
+    50%      { box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25), 0 0 0 7px rgba(199, 154, 18, 0.4); }
+}
+
+.hf-knap.hint.peg { animation: knap-peg 1.9s ease-in-out infinite; }
+
 .hf-knap.naeste {
     padding: 12px 28px;
     border-color: var(--blaa);
@@ -1332,7 +1271,7 @@ kbd {
 
 
 /* ---------------------------------------------------------------------
-   SC8.5: knappen Laes mere og Kemichaels forklaring i fuld skaerm
+   SC8.5: knappen Laes mere og forklaringen i fuld skaerm
    (js/forklaring.js)
    --------------------------------------------------------------------- */
 .laes-mere {

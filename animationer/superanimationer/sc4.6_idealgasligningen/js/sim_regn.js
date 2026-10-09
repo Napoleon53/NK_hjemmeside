@@ -29,7 +29,6 @@
     function SimRegn() {
         this.navn = "regn";
         this.L = new NK.Laerred(NK.el("regn-laerred"));
-        this.k = new NK.RoligLaerer({ boble: "regn-boble", knap: "regn-kknap" });
         this.part = new G.Partikler();
         this.tid = 0;
         this.lay = null;
@@ -171,7 +170,6 @@
         this.faerdig = false;
         this.glimt = {};
         this.visP = 0;
-        this.k.tie();
         this.bygListe();
         this.bygRaekker();
         this.visKort();
@@ -272,7 +270,6 @@
                 inp.addEventListener("keydown", function (e) {
                     if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
                 });
-                inp.addEventListener("input", function () { mig.k.skriver(); });
                 fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
                 t.input = inp;
             }
@@ -300,12 +297,13 @@
     };
 
     P.visKnap = function () {
-        var tekst, klasse = "knap";
+        var tekst, klasse = "knap hjaelp";
         if (this.faerdig) {
             klasse = "knap blaa banker";
             tekst = this.naesteUloeste() >= 0 ? "Næste opgave →" : "Forfra med nye tal ↺";
         } else {
             tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            if (this.hjaelp > 0) klasse += " svar";
         }
         this.el.knap.textContent = tekst;
         this.el.knap.className = klasse;
@@ -373,7 +371,6 @@
         if (vist) {
             this.svarVis("<b>Formlen:</b> " + this.formelHTML(t) + ".");
         } else {
-            this.k.tie();
             this.besked((isoleret ? "Rigtig formel." : "Rigtig sammenhæng. Isoleret: " + this.formelHTML(t) + ".") +
                 " " + this.trinLinje(), "god");
         }
@@ -399,7 +396,6 @@
         if (maade === "svar") {
             this.svarVis(this.regnHTML(j) + ".");
         } else {
-            this.k.tie();
             if (!this.faerdig) this.naesteLinje(NK.tilfaeldig(D.ROS), "god");
         }
         this.bygRaekker();
@@ -435,10 +431,12 @@
         this.besked((foer ? foer + " " : "") + this.trinLinje(), slags || "");
     };
 
+    /* Efter et forkert svar lyser hintknappen stille op, til linjen skifter igen */
     P.besked = function (html, klasse) {
         this.fast = { html: html || "", klasse: klasse || "" };
         this.kortT = 0;
         this.visBesked(this.fast);
+        this.el.knap.classList.toggle("peg", klasse === "skidt" && !this.faerdig && this.hjaelp === 0);
     };
 
     P.kortBesked = function (html, sek) {
@@ -453,7 +451,7 @@
 
     P.beskedTekst = function () { return this.el.besked.textContent; };
 
-    /* ----- Hint og svar: Kemichael, eller kortet, naar han er ude ------------------------- */
+    /* ----- Hint og svar: i linjen i kortet, naar eleven beder om det ---------------------- */
     P.hint = function (t) {
         if (t.id === "T") return "Idealgasligningen regner med temperaturen i kelvin. 0 °C er 273 K.";
         if (t.id === "t") return "Træk 273 fra temperaturen i kelvin.";
@@ -476,19 +474,10 @@
         return l.slice(0, -1).join(", ") + " og " + l[l.length - 1];
     }
 
-    P.hjaelpVis = function (html, slags) {
-        if (!this.k.sig(html, slags)) this.besked(html + " " + this.trinLinje(), "gul");
-    };
+    P.hjaelpVis = function (html) { this.besked(html + " " + this.trinLinje(), "gul"); };
 
     P.svarVis = function (html) {
-        var inde = this.k.sig(html, "svar", { lukVedSkriv: true });
-        if (this.faerdig) {
-            this.besked((inde ? "" : html + " ") + NK.html(this.slutTekst()), "gul");
-            return;
-        }
-        var trin = this.trinLinje();
-        if (inde) this.besked(trin, "");
-        else this.besked(html + " " + trin, "gul");
+        this.besked(html + " " + (this.faerdig ? NK.html(this.slutTekst()) : this.trinLinje()), "gul");
     };
 
     P.knap = function () {
@@ -502,7 +491,7 @@
         if (!t) return;
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.hjaelpVis("<b>Hint:</b> " + NK.html(this.hint(t)), "hint");
+            this.hjaelpVis("<b>Hint:</b> " + NK.html(this.hint(t)));
             this.visKnap();
             this.fokus();
             return;
@@ -510,13 +499,6 @@
         this.brugtSvar = true;
         if (t.fase === "formel") { this.formelOk(true, true); return; }
         this.trinLoest(this.o.i, "svar");
-    };
-
-    P.startIntro = function (tving) {
-        if (!tving) return;
-        if (!this.k.inde()) { this.k.hentInd(); return; }
-        var t = this.faerdig ? "" : this.trinLinje();
-        this.k.sig(NK.html(D.INTRO.regn + (t ? " " + t : "")), "", { lukVedSkriv: true });
     };
 
     P.fokus = function () {
@@ -546,10 +528,10 @@
 
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var lay = { W: W, H: H, baandY: baand.y };
+        var lay = { W: W, H: H };
         var top = 12;
-        lay.bordY = Math.round(baand.y - NK.klamp((baand.y - top) * 0.05, 12, 34));
+        /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
+        lay.bordY = Math.round(H - NK.klamp((H - top) * 0.05, 12, 34));
         var arbH = lay.bordY - top;
         var vb = NK.klamp(W * 0.44, 240, 460);
         var cylB = Math.round(NK.klamp(Math.min(vb * 0.4, arbH * 0.36), 78, 160));
@@ -580,7 +562,6 @@
         var c = lay.cyl;
         this.saetAnker("cylinder", Math.min(c.x, lay.mano.cx - r * 1.3) - 4, c.y - 6, c.x + c.b - Math.min(c.x, lay.mano.cx - r * 1.3) + 8, lay.bordY - c.y + 6);
         this.saetAnker("tavle", tv.x - 8, tv.y - 8, tv.b + 16, tv.h + 16);
-        this.saetAnker("laerer", 0, baand.y, Math.min(W, 360), baand.h);
     };
 
     /* Skriften paa tavlen: saa stor som muligt, uden at teksten loeber over */
@@ -659,14 +640,12 @@
         var mig = this, c = this.L.canvas;
         c.addEventListener("pointermove", function (e) {
             var pt = mig.L.punkt(e);
-            var lu = mig.k.hover(pt);
-            mig.over = lu ? null : mig.under(pt);
-            c.style.cursor = lu || mig.over ? "pointer" : "default";
+            mig.over = mig.under(pt);
+            c.style.cursor = mig.over ? "pointer" : "default";
         });
-        c.addEventListener("pointerleave", function () { mig.k.hover(null); mig.over = null; c.style.cursor = "default"; });
+        c.addEventListener("pointerleave", function () { mig.over = null; c.style.cursor = "default"; });
         c.addEventListener("click", function (e) {
             var pt = mig.L.punkt(e);
-            if (mig.k.klik(pt)) return;
             var u = mig.under(pt);
             if (u) mig.klikScene(u);
             mig.fokus();
@@ -682,7 +661,6 @@
             this.kortT -= dt;
             if (this.kortT <= 0) { this.kortT = 0; this.visBesked(this.fast); }
         }
-        this.k.opdater(dt);
         for (var s in this.glimt) this.glimt[s] = Math.max(0, this.glimt[s] - dt);
         var pMaal = this.kendt("p") ? this.o.k.p : 0;
         this.visP = NK.mod(this.visP, pMaal, 3.5, dt);
@@ -697,7 +675,7 @@
         if (!lay) return;
         var c = this.L.ctx, o = this.o, k = o.k, g = o.givet;
         this.L.ryd("#16171d");
-        Tg.baggrund(c, lay.W, lay.H, lay.bordY, lay.baandY);
+        Tg.baggrund(c, lay.W, lay.H, lay.bordY);
         Tg.tavle(c, lay.tavle);
         var cyl = lay.cyl, ind = Tg.indre(cyl), sk = this.skala();
         var ms = Tg.manometerStr(lay.mano);
@@ -745,7 +723,6 @@
             skjult: !this.kendt("p"), lys: this.over === "p" });
         Tg.skilt(c, lay.mano.cx, ms.y - 14, this.kendt("p") ? "p = " + G.fmt("p", k.p) : "p = ?",
             this.kendt("p") ? (this.kendtRegnet("p") ? "fundet" : "moerk") : "ukendt", "midt", lay.W);
-        this.k.tegn(c);
     };
 
     NK.SimRegn = SimRegn;

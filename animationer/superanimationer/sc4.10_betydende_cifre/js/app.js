@@ -3,10 +3,10 @@
 
    Faneskift, teorien, tastaturgenveje, svarfeltet og tegneloekken. Der
    er én scene og ét panel; kun den aktive fane (NK.aktivFane) tegner sig
-   og opdateres. Laerredet bag scenen har kun Kemichaels baand forneden.
-   Han praesenterer ikke med knapper: han sidder ved katederet og siger
-   kun noget ved Giv hint og Vis svaret (brugerens valg 25. sept. 2026).
-   K faar ham til at sige, hvor man er.
+   og opdateres. Scenen er ren DOM: der er intet laerred. Ingen
+   praesentation og ingen Kemichael (brugerens valg 9. okt. 2026): hint
+   og svar staar i linjen under svarfeltet, naar eleven beder om dem med
+   den gule knap.
    ===================================================================== */
 (function () {
     "use strict";
@@ -16,7 +16,6 @@
     var C = NK.Cifre;
 
     var faner = {};
-    var laerred = null, laerer = null;
     var sidsteTid = 0;
 
     function el(id) { return NK.el(id); }
@@ -35,7 +34,6 @@
         }
         document.body.setAttribute("data-fane", id);
         if (NK.Rundvisning) NK.Rundvisning.luk();
-        if (laerer) laerer.tie();
         faner[id].vis();
         faner[id].fokus();
     }
@@ -52,27 +50,9 @@
         el("teori").classList.add("vis");
     }
 
-    /* ----- Layout: Kemichaels baand forneden, arbejdet over det ---------- */
-    function layout() {
-        var baand = laerer ? laerer.layout(laerred.b, laerred.h) : { y: laerred.h, h: 0 };
-        el("scene").style.setProperty("--baand", Math.round(baand.h) + "px");
-        var a = el("anker-laerer");
-        if (laerer && laerer.lay) {
-            var d = laerer.lay.desk;
-            a.style.left = Math.round(d.x) + "px";
-            a.style.top = Math.round(baand.y) + "px";
-            a.style.width = Math.round(d.b) + "px";
-            a.style.height = Math.round(baand.h) + "px";
-        }
-    }
-
     /* ----- Tegneloekken ------------------------------------------------- */
     function trin(dt) {
-        if (laerred.tilpas()) layout();
         if (NK.aktivFane) NK.aktivFane.opdater(dt);
-        if (laerer) laerer.opdater(dt);
-        laerred.ryd();
-        if (laerer) laerer.tegn(laerred.ctx);
     }
     NK.trin = trin;           /* selvtesten kan koere tiden frem */
 
@@ -100,13 +80,11 @@
             return;
         }
         if (e.key >= "1" && e.key <= "4") { visFane(D.FANE_RAEKKE[parseInt(e.key, 10) - 1]); return; }
-        if (e.key === "k" || e.key === "K") { f.kemichael(); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(f.id); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
         if (e.key === "r" || e.key === "R") {
             f.nyRunde();
             f.saetBesked("Ny runde. " + NK.html(D.INTRO[f.id]), "");
-            if (laerer) laerer.tie();
             f.vis();
             f.animerNy();
             f.fokus();
@@ -159,23 +137,7 @@
 
     /* ----- Opstart --------------------------------------------------------- */
     function start() {
-        NK.Sprites.start();
-        laerred = new NK.Laerred(el("laerred"));
-        if (NK.RoligLaerer && NK.Kemichael) {
-            laerer = new NK.RoligLaerer({ boble: "boble", knap: "kknap" });
-            /* Sendes han ud midt i et hint, flytter hintet ned i linjen */
-            NK.RoligLaerer.vedSkift = function (ude) {
-                var f = NK.aktivFane;
-                if (!ude || !f) return;
-                if (f.loest && f.vist) f.saetBesked(C.svar(f.opg), "gul");
-                else if (!f.loest && f.hjaelp) f.saetBesked("<b>Hint:</b> " + C.hint(f.opg), "gul");
-            };
-        } else {
-            el("kknap").hidden = true;
-        }
-        NK.laerer = laerer;
-
-        D.FANE_RAEKKE.forEach(function (id) { faner[id] = new NK.Fane(id, laerer); });
+        D.FANE_RAEKKE.forEach(function (id) { faner[id] = new NK.Fane(id); });
         NK.faner = faner;            /* saa de kan pilles ved fra konsollen og selvtesten */
         NK.visFane = visFane;
 
@@ -223,22 +185,6 @@
         el("hjaelpknap").addEventListener("click", function () { lukAlle(); NK.Rundvisning.start(NK.aktivFane.id); });
         el("teoriknap").addEventListener("click", aabnTeori);
         document.addEventListener("keydown", tastatur);
-
-        /* Musen paa laerredet: Kemichael, koppen og sedlen */
-        var cv = el("laerred");
-        cv.addEventListener("click", function (e) {
-            var pt = laerred.punkt(e);
-            if (laerer && laerer.klik(pt)) return;
-            NK.aktivFane.fokus();
-        });
-        cv.addEventListener("pointermove", function (e) {
-            var u = laerer ? laerer.hover(laerred.punkt(e)) : null;
-            cv.style.cursor = u ? "pointer" : "default";
-        });
-        cv.addEventListener("pointerleave", function () { if (laerer) laerer.hover(null); cv.style.cursor = "default"; });
-
-        laerred.tilpas();
-        layout();
 
         /* Man kan linke direkte til en fane med  index.html#afrund  */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();

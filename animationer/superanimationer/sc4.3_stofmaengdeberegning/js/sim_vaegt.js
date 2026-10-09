@@ -265,8 +265,7 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h, o = this.opg;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.1, 30, 50));
         /* Tavlen faar den hoejde, regnestykket skal bruge (broeker er
@@ -313,7 +312,6 @@
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("bord", 8, lay.bordY - objH - 8, W - 16, objH + 8);
         this.saetAnker("poser", px0, lay.bordY - lay.poseS * 1.2, px1 - px0, lay.poseS * 1.2 + 30);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     P.krukkeFor = function (st) {
@@ -419,7 +417,6 @@
             var x = NK.lerp(f.x0, f.x1, u), y = NK.lerp(f.y0, f.y1, u) - Math.sin(u * Math.PI) * 50;
             Tg.pulver(ctx, x, y, 22, 9, f.st, 6);
         }
-        this.k.tegn(ctx);
     };
 
     NK.SimVaegt = SimVaegt;

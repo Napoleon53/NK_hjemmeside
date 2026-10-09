@@ -34,22 +34,20 @@
         <div class="anker" id="kar-anker-krukke"></div>
         <div class="anker" id="kar-anker-haner"></div>
         <div class="anker" id="kar-anker-zoom"></div>
-        <div class="anker" id="kar-anker-laerer"></div>
+        <!-- Hele opgaven staar paa ét kort oeverst i scenen (eleverne klikker, foer de
+             laeser, og de kigger ikke ud i siden): gaettet, det, der skal goeres, linjen
+             med hint og fejl, forklaringen og knappen Naeste opgave -->
+        <div class="scenekort opgave" id="kar-skort">
+            <div id="kar-ind" aria-live="polite"></div>
+            <div class="kt-bund tom" id="kar-status">
+                <p class="kt-besked" id="kar-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="kar-knap" type="button">Giv hint</button>
+            </div>
+        </div>
         <button class="forfraknap" id="kar-forfra" type="button" title="Karret som ved opgavens start (R)">Start forfra ↺</button>
-        <div class="kboble" id="kar-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
-        <button class="kknap" id="kar-kknap" type="button">Send Kemichael ud</button>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste opgave -->
-        <div class="kort opgavekort" id="kar-kort">
-            <h2><span id="kar-titel">Opgave</span><span class="taeller">opgave <b id="kar-nr">1</b>/<span id="kar-antal">5</span></span></h2>
-            <div id="kar-prompt"></div>
-            <div class="knaprad valgrad" id="kar-valg" hidden></div>
-            <p class="besked" id="kar-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="kar-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="kar-data">
             <h2>Karret</h2>
             <div class="talraekke"><span>Stofmængde, n</span><span class="tal" id="kar-n"></span></div>
@@ -72,27 +70,23 @@
 <section class="fane" id="fane-glas" role="tabpanel" aria-label="c eller n?">
     <div class="scene">
         <canvas id="glas-laerred"></canvas>
-        <div class="anker" id="glas-anker-over"></div>
         <div class="anker" id="glas-anker-glassene"></div>
         <div class="anker" id="glas-anker-lupper"></div>
         <div class="anker" id="glas-anker-glas0"></div>
         <div class="anker" id="glas-anker-glas1"></div>
         <div class="anker" id="glas-anker-glas2"></div>
-        <div class="anker" id="glas-anker-laerer"></div>
+        <!-- Spoergsmaalet med svarene staar paa kortet oeverst i scenen, ikke i panelet -->
+        <div class="scenekort spm" id="glas-skort">
+            <div id="glas-ind" aria-live="polite"></div>
+            <div class="kt-bund tom" id="glas-status">
+                <p class="kt-besked" id="glas-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="glas-knap" type="button">Giv hint</button>
+            </div>
+        </div>
         <button class="forfraknap" id="glas-forfra" type="button" title="Opgaven forfra (R)">Start forfra ↺</button>
-        <div class="kboble" id="glas-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
-        <button class="kknap" id="glas-kknap" type="button">Send Kemichael ud</button>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="glas-kort">
-            <h2><span id="glas-titel">Opgave</span><span class="taeller">opgave <b id="glas-nr">1</b>/<span id="glas-antal">8</span></span></h2>
-            <div id="glas-prompt"></div>
-            <div class="knaprad valgrad" id="glas-valg" hidden></div>
-            <p class="besked" id="glas-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="glas-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="glas-data">
             <h2>Glassene</h2>
             <div id="glas-tabel"></div>
@@ -114,9 +108,6 @@
         <canvas id="kolbe-laerred"></canvas>
         <div class="anker" id="kolbe-anker-tavle"></div>
         <div class="anker" id="kolbe-anker-bord"></div>
-        <div class="anker" id="kolbe-anker-laerer"></div>
-        <div class="kboble" id="kolbe-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
-        <button class="kknap" id="kolbe-kknap" type="button">Send Kemichael ud</button>
     </div>
 
     <aside class="panel">
@@ -125,7 +116,7 @@
             <div id="kolbe-prompt"></div>
             <div class="raekker" id="kolbe-raekker"></div>
             <p class="besked" id="kolbe-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="kolbe-knap" type="button">Giv hint</button></div>
+            <div class="knaprad"><button class="knap hjaelp" id="kolbe-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="kolbe-opgaver">
@@ -145,10 +136,7 @@
         <div class="anker" id="fortynd-anker-tavle"></div>
         <div class="anker" id="fortynd-anker-lupper"></div>
         <div class="anker" id="fortynd-anker-bord"></div>
-        <div class="anker" id="fortynd-anker-laerer"></div>
         <button class="forfraknap" id="fortynd-forfra" type="button" title="Tøm kolberne (R)">Start forfra ↺</button>
-        <div class="kboble" id="fortynd-boble" aria-live="polite" hidden><div class="kb-tekst"></div></div>
-        <button class="kknap" id="fortynd-kknap" type="button">Send Kemichael ud</button>
     </div>
 
     <aside class="panel">
@@ -157,7 +145,7 @@
             <div id="fortynd-prompt"></div>
             <div class="raekker" id="fortynd-raekker"></div>
             <p class="besked" id="fortynd-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="fortynd-knap" type="button">Giv hint</button></div>
+            <div class="knaprad"><button class="knap hjaelp" id="fortynd-knap" type="button">Giv hint</button></div>
         </div>
 
         <div class="kort" id="fortynd-opgaver">
@@ -231,10 +219,7 @@
 <script src="js/kemi.js"></script>
 <script src="js/tjek.js"></script>
 <script src="js/sprites.js"></script>
-<script src="../../v2/kemichael/kemichael.js"></script>
-<script src="../kemichael/superanimation.js"></script>
 <script src="js/tegning.js"></script>
-<script src="js/laerer.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/regning.js"></script>
 <script src="js/sim_kar.js"></script>

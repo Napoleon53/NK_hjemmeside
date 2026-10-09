@@ -29,19 +29,19 @@
     Tg.kortTal = kortTal;
 
     /* ----- Rummet ------------------------------------------------------------ */
-    Tg.baggrund = function (ctx, W, H, bordY, baandY) {
+    Tg.baggrund = function (ctx, W, H, bordY) {
         var g = ctx.createLinearGradient(0, 0, 0, bordY);
         g.addColorStop(0, "#1c1d25");
         g.addColorStop(1, "#16171d");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, bordY);
         /* Laboratoriebordet, som udstyret staar paa */
-        var b = ctx.createLinearGradient(0, bordY, 0, baandY);
+        var b = ctx.createLinearGradient(0, bordY, 0, H);
         b.addColorStop(0, "#3a3b45");
         b.addColorStop(0.08, "#2c2d36");
         b.addColorStop(1, "#23242c");
         ctx.fillStyle = b;
-        ctx.fillRect(0, bordY, W, baandY - bordY);
+        ctx.fillRect(0, bordY, W, H - bordY);
         ctx.fillStyle = "rgba(255, 255, 255, 0.10)";
         ctx.fillRect(0, bordY, W, 1.5);
     };

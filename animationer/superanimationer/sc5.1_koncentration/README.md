@@ -3,8 +3,7 @@
 Superanimation om stofmængdekoncentration: c = n / V. Mere stof giver en
 højere koncentration, mere vand en lavere, og ved fortynding er
 stofmængden den samme; kun rumfanget skifter. Åbn `index.html`. Mappen
-henter kun filer inde fra sig selv, bortset fra Kemichael
-(`../../v2/kemichael/kemichael.js` og `../kemichael/superanimation.js`).
+henter kun filer inde fra sig selv.
 Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
 ## Bestillingen
@@ -32,12 +31,13 @@ Ingen `fetch` og ingen moduler, så den virker fra harddisken.
    to haner, højst 24 Cu²⁺ i luppen. Fane 2: 8 opgaver, højst 3 bægerglas på
    1 L og højst 40 prikker i et glas. Fane 3: 6 opgaver med 3 eller 4 sæt tal
    hver. Fane 4: 5 opgaver, 3 pipetter og 3 målekolber.
-5. **Layoutet:** scene plus panel som `sc4.5`, med den rolige Kemichael ved
-   katederet i et bånd nederst i scenen.
+5. **Layoutet:** scene plus panel som `sc4.5`.
 
-Brugerens valg (25. sept. 2026): den rolige Kemichael som i sc4.5. Han
-blander sig ikke: han siger kun noget ved Giv hint og Vis svaret, tier, når
-trinnet er løst, og kan sendes ud. Ingen knapper til præsentationen.
+Ingen knapper til præsentationen (brugerens valg 25. sept. 2026).
+
+9. okt. 2026 (brugerens valg): Kemichael ved katederet er taget helt ud
+(han hører til i laboratoriet). Scenen har fået hans bånd, og hintknappen
+er gul, så eleven altid kan finde hjælpen selv.
 
 Brugerens tilbagemelding 29. sept. 2026 og valgene bagefter:
 
@@ -60,6 +60,25 @@ Brugerens tilbagemelding 3. okt. 2026 (fane 2):
 * 0,50 M betyder "0,50 mol pr. liter vand" (brugerens ordlyd).
 * Hælder man først og tænker bagefter, var tallene væk. Nu står tallene fra
   før under de nye i tabellen, og etiketten bliver på et tomt glas.
+
+En elevs tilbagemelding 6. okt. 2026 (fane 1) og brugerens ja 9. okt. 2026:
+
+* Eleven ønskede pile, der viser, hvor man skal gøre noget, fx når der skal
+  vand i. Den lille pil fra før er afløst af gule skilte med, hvad et klik
+  gør, og de bliver stående, til karret viser målet.
+* Gættet i opgave 2 og 3 står på et gult kort midt i scenen som i `sc7.5`
+  (brugerens regel: eleverne klikker, før de læser).
+
+Brugerens tilbagemelding 9. okt. 2026 (senere samme dag, fane 1 og 2):
+
+* Spørgsmålet stod ude i siden, der foregik for meget på skærmen, og
+  eleverne kigger ikke af sig selv ud i siden. Nu står hele opgaven på ét
+  kort øverst i scenen som i `sc7.5`: det, der skal gøres, spørgsmålet med
+  svarene side om side, hint og fejl, forklaringen til det rigtige svar og
+  knappen videre. Panelets opgavekort er væk på fane 1 og 2; panelet har kun
+  tallene og opgavelisten. Teksten på væggen på fane 2 er væk (den er
+  kortets første linje). Fane 3 og 4 er ikke rørt: dér står opgaven ved de
+  felter, eleven skriver i.
 
 ## Hvad den viser
 
@@ -84,19 +103,54 @@ viser målet, og siger noget om netop det gæt. Hanen stopper selv, når karret
 viser det rumfang, opgaven beder om. Er der kommet for meget i, siger linjen
 Start forfra.
 
+Opgaven står på kortet øverst i scenen (`#kar-skort`, `kortData` i
+`js/sim_kar.js`, `visSceneKort` i `js/fane.js`, stilen nederst i
+`css/stil.css`): mærket Opgave 1, opgavens sætning, og under en streg linjen
+med første skridt og den gule knap. Efter en handling siger linjen, hvor
+langt karret er fra målet. Når karret viser målet, bliver kortet grønt med
+forklaringen og knappen Næste opgave, og den gule knap er væk. Hanen, karret
+og luppen begynder under den plads, kortet har fået (`ZONE` i
+`js/sim_kar.js`, `kortZone` i `js/fane.js`), så intet flytter sig, når
+kortet skifter.
+
+Gættet står samme sted som et stort gult kort: mærket Gæt først, opgavens
+sætning, spørgsmålet med stor skrift og de tre svar som store knapper.
+Spørgsmålet står kun dér. Imens er scenen dæmpet, hintknappen er kun et
+omrids, og et klik i scenen får kortet til at blinke (`gaetBlink`). Når der
+er gættet, står det, der skal gøres, på kortet med gættet under (Dit gæt:
+koncentrationen bliver dobbelt så stor; `den` i `D.KAR` gør sætningen hel),
+og gættet bliver grønt eller rødt, når karret har vist svaret.
+
+Det, der skal bruges nu, har et gult skilt med, hvad et klik gør (Klik: en
+skefuld, Hold nede: vand, Hold nede: tap ud; teksterne står i `D.SKILT`) og
+en gul ring. Skiltene følger det, der mangler (`mangler` i `js/sim_kar.js`):
+for lav koncentration giver skilt ved krukken, for høj ved vandhanen, og er
+koncentrationen rigtig, men rumfanget for stort, ved den røde hane. I opgave
+4 og 5 står der skilte ved både krukken og vandhanen fra start. Skiltene
+bliver stående, til karret viser målet, og en skefuld, der er på vej ned,
+tæller med, så skiltet ikke lokker til en for meget. Et klik på et skilt
+tæller som et klik på tingen. Kan karret ikke reddes med stof, vand eller
+hanen, er skiltene væk, og Start forfra lyser gult. Der er ingen skilte, mens
+der gættes, og mens karret selv viser svaret.
+
 **c eller n?** Otte opgaver med bægerglas på 1 L med kobber(II)sulfat. Hver
 prik i et glas er 0,01 mol, så antallet af prikker er stofmængden. Over hvert
 glas er en lup, der altid viser lige meget væske, så ionerne i den følger
 koncentrationen. Under hvert glas står navnet og, når den er kendt,
 stofmængden; panelet har en tabel med n, V og c for hvert glas, hvor det, der
-skal findes, er et gult ?. Spørgsmålene står i kortet med svarknapper
-(blandet rækkefølge); handler de om et glas, kan man også klikke på glasset.
-Et forkert svar bliver rødt og forklaret, og så prøver man igen (ingen
-stjerne). Et rigtigt svar får scenen til at vise det: prikkerne tælles én ad
-gangen, tallet kommer i tabellen, etiketten kommer på glasset, eller
-enhederne streges ud. Forklaringen står i linjen, og spørgsmålet bliver
-stående, til eleven trykker Næste spørgsmål (knappen i kortet; Enter gør
-det samme). Opgaverne:
+skal findes, er et gult ?. Spørgsmålet står på kortet øverst i scenen
+(`#glas-skort`, `kortData` i `js/sim_glas.js`): en indledning (det, der er i
+glassene, eller det, der lige er hældt), spørgsmålet og svarene som knapper
+side om side (blandet rækkefølge, uden bogstaver foran, for glassene hedder
+A, B og C); handler de om et glas, kan man også klikke på glasset. Skal
+eleven hælde først, står det på kortet, hvad der skal klikkes på. Et forkert
+svar bliver rødt og forklaret i kortets nederste linje (mærket Ikke endnu),
+og så prøver man igen (ingen stjerne). Et rigtigt svar får scenen til at
+vise det: prikkerne tælles én ad gangen, tallet kommer i tabellen, etiketten
+kommer på glasset, eller enhederne streges ud. Kortet bliver grønt med
+svaret og forklaringen, og det næste spørgsmål kommer først, når eleven
+trykker Næste spørgsmål på kortet (Enter gør det samme). Der står ingen
+tekst på væggen og ingen linje nederst. Opgaverne:
 
 1. Samme stofmængde: 0,20 mol i 0,40 L og i 0,80 L. Største n? (lige meget),
    største c? (A).
@@ -112,7 +166,8 @@ det samme). Opgaverne:
 6. Vand i glasset: sprøjteflasken fylder op til 0,40 L. n er den samme, c
    halveres (0,25 mol er en lokker).
 7. Enhederne: n = c · V, c = n / V og V = n / c med enheden som spørgsmål.
-   Enhederne streges ud under regnestykket (mol/L · L = mol).
+   Regnestykket står på kortet over spørgsmålet med et gult ? som enhed, og
+   når svaret er rigtigt, streges enhederne ud under det (mol/L · L = mol).
 8. To forskellige glas: 0,20 M · 0,40 L og 0,40 M · 0,10 L. Højest c, men
    ikke mest stof; B hældes i A, og c bliver 0,24 M (0,60 M og gennemsnittet
    0,30 M er lokkere).
@@ -174,16 +229,18 @@ ganget i stedet for divideret, et glemt tal i formlen (Na₂CO₃), V_efter i
 stedet for vandet, kommaet flyttet, lille m og "tæt på". Hintene giver
 formlens begyndelse (c = n / …), det første tal og enhedsregningen.
 
-**Kemichael ved katederet.** Som i sc4.5: han sidder stille nederst til
-venstre og siger kun noget ved Giv hint (til trinnet er løst) og Vis svaret
-(til eleven skriver igen). Knappen Send Kemichael ud sender ham på
-lærerværelset; så står hintene i opgavekortet. <kbd>K</kbd> får ham til at
-sige, hvor man er.
+**Hint og svar.** Den gule knap er hjælpen. På fane 1 og 2 sidder den på
+kortet i scenen i samme række som linjen, på fane 3 og 4 i opgavekortet i
+panelet: Giv hint skriver hintet i linjen ved knappen, og knappen bliver til
+Vis svaret (kun et omrids, så den ikke frister), der skriver svaret og næste
+skridt i samme linje. Efter et forkert svar lyser den gule knap stille op,
+til linjen skifter igen. Der er ingen Kemichael og ingen knapper til
+præsentationen.
 
 Direkte links: `index.html#glas`, `index.html#kolbe` og `index.html#fortynd`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> faner · <kbd>T</kbd> teori ·
-<kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichael siger, hvor man er ·
+<kbd>H</kbd> rundvisning ·
 <kbd>R</kbd> start forfra eller nye tal · <kbd>Enter</kbd> tjek feltet eller
 næste opgave · <kbd>Esc</kbd> luk.
 
@@ -193,23 +250,23 @@ næste opgave · <kbd>Esc</kbd> luk.
 index.html          markup for de fire faner, teorien og rundvisningen
 css/stil.css        alt udseende (grundlaget er sc4.5's, regnestykket sc4.3's). NB: decimaltal med PUNKTUM i CSS
 sprites/            karret, vandhanen, målekolben, pipetten, bægerglasset og bægerglasset på 1 L (nye);
-                    flasken (som sc7.2), sprøjteflasken (som sc7.4), krukken, vægten, vejebåden og
-                    katederet (som sc4.5), spatlen og luppen (som sc2.1)
+                    flasken (som sc7.2), sprøjteflasken (som sc7.4), krukken, vægten og vejebåden
+                    (som sc4.5), spatlen og luppen (som sc2.1)
 js/kerne.js         NK-navnerum, hævet og sænket skrift (også V_før), hukommelse, lærred, tal (som sc4.5)
 js/data.js          atommasserne, stofferne, de fire fanes opgaver og tal, regnetrinene og replikkerne
 js/kemi.js          karret (c = n / V, udtapning, det, der ligger på bunden), facit og tal som tekst
 js/tjek.js          formlen i felterne, tallene med enheder, resultatet, de typiske fejl, hintene
                     og de pæne beregninger (også med brøkstreger til tavlen)
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
-js/tegning.js       rummet, bordet, tavlen, karret, hanerne, vasken, krukken, vægten, kolben,
+js/tegning.js       rummet, bordet, tavlen, karret, hanerne, vasken, krukken, skiltene, vægten, kolben,
                     pipetten, glassene (også hældende), prikkerne, flasken, spatlen og luppen med
                     ionerne, tekst med sænket før og efter, regnestykker med brøkstreger og
                     linjen med enhederne, der streges ud
-js/laerer.js        Kemichael ved katederet (som sc4.5)
-js/fane.js          det, fanerne deler: opgavelisten, knappen, linjen i kortet, Kemichael og musen
+js/fane.js          det, fanerne deler: opgavelisten, scenekortet på fane 1 og 2 (kortHTML, visSceneKort, kortZone),
+                    den gule knap, linjen ved knappen (også hint og svar) og musen
 js/regning.js       regnestykket i kortet (skabelon, bogstaver, tal med enheder, resultat) og tavlen på fane 3 og 4
-js/sim_kar.js       fane 1
-js/sim_glas.js      fane 2
+js/sim_kar.js       fane 1 med kortet i scenen (kortData), gættet og skiltene
+js/sim_glas.js      fane 2 med kortet i scenen (kortData, regnHTML)
 js/sim_kolbe.js     fane 3
 js/sim_fortynd.js   fane 4
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
@@ -225,7 +282,9 @@ molarmasser regnes af dem og formlen. **Stofferne** står i `D.STOFFER` med
 navn, pulverets farve, opløsningens farve (null er farveløs) og ionerne i
 luppen. **Opgaverne** står i `D.KAR`, `D.GLAS`, `D.KOLBE` og `D.FORTYND`. På
 fane 1 er `start` n i mol og V i mL, `maal` det, karret skal vise, og `goer`
-det, karret gør ved Vis svaret. På fane 2 har hver opgave sine glas (V i mL
+det, karret gør ved Vis svaret. `tekst` er opgaven på kortet og `linje`
+første skridt; i en opgave med et gæt er `linje` kortets tekst, når der er
+gættet. På fane 2 har hver opgave sine glas (V i mL
 og n eller c), `kendt` (det, tabellen viser fra start), `etiket`, `prikker`
 og spørgsmålene i `spm` med `svar` (det rigtige har `ok`), `hint`, `efter`,
 `vis` (det, scenen viser bagefter), `foer` (en handling først: hæld, saml
@@ -234,8 +293,15 @@ står i `D.ENHEDSLINJE`. På fane 3 og 4 er `tal` de sæt tal, opgaven kan have
 (det første bruges først; Nye tal trækker et andet), og V står altid i mL.
 **Regnetrinene** (navn, venstreside, enhed, skabelon `op`, bogstaverne `led`,
 reglen for rumfangets enhed og hintet til formlen) står i `D.TRIN`.
-**Replikkerne** står i `D.INTRO`, `D.FAERDIG`, `D.ROS`, `D.ROS_OPGAVE` og
-`D.KAFFE`.
+**Replikkerne** står i `D.INTRO`, `D.FAERDIG`, `D.ROS` og `D.ROS_OPGAVE`
+(fane 1 og 2 bruger kun `D.FAERDIG`: kortet siger resten).
+
+**Teksterne på kortet** (fane 1 og 2) skal kunne være på den plads, kortet
+har fået: `ZONE` i `js/sim_kar.js` og `js/sim_glas.js` (højden i px på en
+almindelig og på en lav skærm). Bliver en tekst længere, så kør selvtesten;
+den måler kortet i alle opgavernes tilstande på fire skærme. Et tal og dets
+enhed og et helt regnestykke deles ikke over to linjer (`fast` i
+`js/fane.js`).
 
 **Formlernes regler** (hvad trinnet finder, hvad man kender, de typiske
 fejl) står i `F` i `js/tjek.js`, **talfejlene** i `kandidater`, og
@@ -251,11 +317,19 @@ brøken vendt om), at sproget holder reglerne (også ingen V₁ og V₂), at all
 fire faner kan gennemføres med musen og ved at skrive (også med forkerte
 svar, hint, svar, en forkert masse og en forkert fortynding), at prikkerne i
 glassene passer med stofmængden, også efter hældning, at svaret ikke vises,
-mens der hældes, at Kemichael kun taler ved hint og svar og kan sendes ud og
-hentes, og at layoutet holder fra 520 × 380 til 1500 × 900. Den kræver en
+mens der hældes, at hint og svar kun kommer fra den gule knap og står ved
+den, at knappen lyser op efter en fejl, at opgaven på fane 1 og 2 står på
+kortet i scenen og ikke i panelet (spørgsmålet, svarene side om side,
+forklaringen og knappen videre), at gættet på fane 1 står på kortet og kun
+dér, at et klik i scenen før gættet ikke gør noget ud over at få kortet til
+at blinke, at skiltene følger det, der mangler, og kan klikkes, at linjen
+ikke beder om Start forfra, mens der tappes ud, at layoutet holder fra
+520 × 380 til 1500 × 900, uden at kortet dækker karret, hanen eller
+lupperne, og at kortet aldrig er højere end sin plads på 1100 × 620,
+1280 × 720, 1366 × 768 og 1500 × 900. Den kræver en
 lokal server eller Chrome med `--allow-file-access-from-files` og lægger
-elevens gemte fremskridt tilbage bagefter. Sidst kørt 29. september 2026:
-ALT OK (124 påstande).
+elevens gemte fremskridt tilbage bagefter. Sidst kørt 9. oktober 2026:
+ALT OK (172 påstande).
 
 ## Forenklinger
 

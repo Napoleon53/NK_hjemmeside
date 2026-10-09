@@ -3,8 +3,7 @@
 Superanimation om mængdeberegningsskemaet: fra gram til gram går vejen
 altid over mol, og kender man to masser, bestemmer det stof, der slipper op
 først, hvor meget der dannes. Åbn `index.html`. Mappen henter kun filer inde
-fra sig selv, bortset fra Kemichael (`../../v2/kemichael/kemichael.js`).
-Ingen `fetch` og ingen moduler, så den virker fra harddisken.
+fra sig selv. Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
 ## Bestillingen
 
@@ -17,8 +16,7 @@ Ingen `fetch` og ingen moduler, så den virker fra harddisken.
    og knappen Nye tal, afstemning først, felter der låses op ét ad gangen og
    en fri udgave (den gamle "øvet-tilstand"), valget af det begrænsende stof,
    massebevarelsen og mellemregningerne som pæne beregninger. Ud: konfettien.
-   Mentorboksen er blevet til linjen i opgavekortet, og hintene giver
-   Kemichael.
+   Mentorboksen er blevet til linjen i opgavekortet, hvor hintene også står.
 3. **Naboerne:** `c1.4` ejer afstemning, `sc4.1` molarmassen alene, `sc4.2`
    m = n · M og N, `c4.3` n = m / M alene og `sc4.4` forholdet i mol. Her
    bruges de sammen. `c4.10` ejer betydende cifre.
@@ -26,12 +24,12 @@ Ingen `fetch` og ingen moduler, så den virker fra harddisken.
    4 poser pr. side. Fane 2: 5 opgaver, skålvægten i 2 af dem. Fane 3: 6
    opgaver, højst 6 poser af hvert stof.
 5. **Layoutet:** scene plus panel som `sc4.1`, `sc4.2` og `sc4.4`. Tavlen med
-   skemaet er stjernen; under den et bord, og nederst Kemichaels bånd.
+   skemaet er stjernen; under den et bord, der går ned til scenens bund.
 
-Brugerens valg (25. sept. 2026): tre faner og den rolige Kemichael ved
-katederet uden knapper til præsentationen. Efter første udgave samme dag:
-han blander sig ikke, medmindre eleven trykker Giv hint, han tier, når
-delopgaven er løst, og han kan sendes ud.
+Brugerens valg (25. sept. 2026): tre faner uden knapper til præsentationen.
+9. okt. 2026: Kemichael ved katederet er taget helt ud (han hører til i
+laboratoriet), scenen har fået hans bånd, og hintknappen er blevet gul, så
+eleven altid kan finde hjælpen selv.
 
 ## Hvad den viser
 
@@ -77,32 +75,17 @@ til gram går vejen over mol. Skriv stofmængden af Fe.", og bagefter fejlen
 (rød), rosen (grøn) og hvad der skete. Et klik på en vægt eller en pose giver
 et kort svar i samme linje, som forsvinder igen efter fire sekunder.
 
-**Kemichael ved katederet.** Han sidder stille bag sit kateder nederst til
-venstre med kaffen foran sig og blander sig ikke. Han siger kun noget, når
-eleven trykker Giv hint (så står hintet i hans boble, til delopgaven er løst)
-eller Vis svaret (så viser han beregningen, til eleven skriver igen). Boblen
-står fast til højre for ham og kører ikke ind over scenen. Han blinker,
-kigger op over brillerne, når han siger noget, og ser skeptisk ud ved svaret.
-Figuren er den fælles fra `v2/kemichael` (`K.tegneserieFigur`), så han ser ud
-som alle andre steder, men han går ikke ind og ud. Klik på ham giver et kort
-svar fra de fælles prik-puljer, der forsvinder efter fire sekunder. Klik på
-koppen: han drikker (armen henter koppen og løfter den til munden) og siger
-noget om kaffen; første gang "Kold. Som altid." fra de fælles glimt.
-
-**Send ham ud.** Knappen Send Kemichael ud nederst til højre i scenen: han
-siger "Fint. Jeg er på lærerværelset." og forsvinder med kaffen, og på
-katederet står en seddel. Hint og svar står så i opgavekortet i stedet.
-Knappen (nu Hent Kemichael) eller et klik på sedlen henter ham igen. Valget
-gælder alle tre faner og huskes i browseren.
-
-Der er ingen knapper til præsentationen (Start præsentation / Nej tak).
-Linjen i opgavekortet siger, hvor man er. <kbd>K</kbd> får Kemichael til at
-sige det (og henter ham, hvis han er ude).
+**Hint og svar.** Den gule knap i opgavekortet er hjælpen: Giv hint skriver
+hintet i linjen lige over knappen og lader det, hintet handler om, lyse op i
+skemaet; knappen bliver så til Vis svaret (kun et omrids, så den ikke
+frister), der udfylder feltet og skriver beregningen og næste skridt i
+linjen. Efter et forkert svar lyser den gule knap stille op, til linjen
+skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
 
 Direkte links: `index.html#skema` og `index.html#begr`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
-<kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichael siger, hvor man er ·
+<kbd>H</kbd> rundvisning ·
 <kbd>R</kbd> nye tal · <kbd>Enter</kbd> tjek feltet eller næste opgave ·
 <kbd>Esc</kbd> luk.
 
@@ -119,7 +102,7 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
   molarmassen, tallet efter et grundstof glemt, massen skrevet af og kommaet.
 * **Fotosyntesen** er ny: produktet er kendt, og en reaktant skal findes.
 * **Magnesium og saltsyre** er flyttet til fane 3 sammen med fem andre.
-* **Hjælpen er én knap:** Giv hint, så Vis svaret. En opgave, der er løst
+* **Hjælpen er én gul knap:** Giv hint, så Vis svaret. En opgave, der er løst
   uden at se svaret, får en stjerne.
 
 ## Filer
@@ -127,15 +110,13 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 ```
 index.html          markup for de tre faner, teorien og rundvisningen
 css/stil.css        alt udseende (grundlaget er sc4.4's). NB: decimaltal med PUNKTUM i CSS
-sprites/            katederet (nyt), vægten, vejebåden og pulverglasset (som sc4.2),
-                    skålvægten (som sc4.1)
+sprites/            vægten, vejebåden og pulverglasset (som sc4.2), skålvægten (som sc4.1)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.4)
 js/data.js          atommasserne, stofferne, reaktionerne, opgaverne og replikkerne
 js/tjek.js          tjek af molarmasser, stofmængder, masser og koefficienter; beskederne ved fejl
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, tavlen, krukken, vægten, pulveret, posen med 1 mol, pilene og skålvægten
 js/skema.js         skemaet på tavlen: modellen for hver celle, felterne, pilene, hint og beregninger
-js/laerer.js        Kemichael ved katederet, boblen og knappen, der sender ham ud
 js/fane.js          det, fanerne deler: opgavelisten, knappen, tjekket, linjen i kortet og hintene
 js/sim_vej.js       fane 1
 js/sim_skema.js     fane 2
@@ -157,8 +138,8 @@ skålvægten skal hver masse gøre det), `spoerg` er felterne i den rækkefølge
 de låses op. Fane 3 har `std`, tallene første gang, og "Nye tal" trækker
 blandt dem, `muligeTal` i `sim_begr.js` giver (1 til 3 hele sæt, 0,5 til 2
 mol til overs, højst `D.BEGR_MAKS` poser). **Hintet til afstemningen** står i
-`D.AFSTEM_HINT`, **Kemichaels replikker** i `D.INTRO`, `D.FAERDIG`, `D.ROS`,
-`D.ROS_OPGAVE` og `D.KAFFE`.
+`D.AFSTEM_HINT`, **linjerne i opgavekortet** i `D.INTRO`, `D.FAERDIG`, `D.ROS`
+og `D.ROS_OPGAVE`.
 
 **Fejlbeskederne** står i `js/tjek.js`. Et tal godkendes, når det højst er
 1 % fra facit (molarmassen 0,3 %).
@@ -168,14 +149,14 @@ afstemt med de mindste hele tal, at de 22 molarmasser passer med tabellen,
 at masserne går op i hele hundrededele, at massen er bevaret for alle tal,
 at det begrænsende stof er det rigtige for alle tal og for 30 træk med nye
 tal, at 18 typiske fejl giver den rigtige besked, at sproget holder
-reglerne (også alle linjer, Kemichael siger undervejs), at alle tre faner
+reglerne (også alle linjer, opgavekortet siger undervejs), at alle tre faner
 kan gennemføres ved at skrive i felterne (også frit og bagfra, med hint og
 svar og med et forkert valg), at vægtene og skålvægten ender rigtigt, at
-Kemichael kun taler ved hint og svar og tier igen, at han kan sendes ud og
-hentes igen (også med sedlen), og at layoutet holder fra 520 × 380
+hint og svar kun kommer, når eleven trykker på den gule knap, at knappen
+lyser op efter en fejl, og at layoutet holder fra 520 × 380
 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files`. Den lægger elevens gemte fremskridt tilbage
-bagefter. Sidst kørt 25. september 2026: ALT OK (111 påstande).
+bagefter. Sidst kørt 9. oktober 2026: ALT OK (101 påstande).
 
 ## Forenklinger
 

@@ -18,12 +18,10 @@
         "fane-rg": [
             { sel: "#rg-trin", titel: "Trinene", tekst: "De seks første stoffer løses i trin: ladningen, O, H og til sidst det ukendte." },
             { sel: "#rg-formel", titel: "Formlen", tekst: "Oxidationstallet står over atomet med romertal. Det gule ? viser, hvilket atom du er ved." },
-            { sel: "#rg-arb", titel: "Her svarer du", tekst: "Spørgsmålet, feltet og Tjek. Giv hint hjælper dig videre, og næste tryk viser svaret." },
+            { sel: "#rg-arb", titel: "Her svarer du", tekst: "Spørgsmålet, feltet og Tjek. Sidder du fast, så tryk på den gule knap: Giv hint hjælper dig videre, og næste tryk viser svaret." },
             { sel: "#rg-regn", titel: "Regnestykket", tekst: "Summen af oxidationstallene er stoffets ladning. Mellemregningerne står med almindelige tal." },
             { sel: "#rg-brikker", titel: "Atomerne", tekst: "Ét atom pr. brik. Er der to Cr, får hver sin brik, og de deler summen." },
             { sel: "#rg-opgaver", titel: "Stofferne", tekst: "De seks første gennemgås trin for trin. Et stof, du løser uden at se svaret, får en stjerne." },
-            { sel: "#rg-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Klik på ham, så giver han et hint." },
-            { sel: "#rg-kknap", titel: "Send ham ud", tekst: "Så står katederet tomt. Samme knap henter ham igen." },
             { sel: ".faneknapper", titel: "Elektronerne", tekst: "Den anden fane viser, hvorfor reglerne virker, og hvornår de ikke gør." }
         ],
         "fane-ek": [

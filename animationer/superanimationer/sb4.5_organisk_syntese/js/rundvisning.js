@@ -1,9 +1,8 @@
 /* =====================================================================
    rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
 
-   Viser rundt paa den fane, man staar paa: ét element ad gangen med en
-   kort tekst. Fane 1 slutter med at pege paa den anden fane. Samme kode
-   som i sc1.4; kun TURE er ny.
+   Viser rundt: ét element ad gangen med en kort tekst. Samme kode som i
+   sc1.4; kun TURE er ny.
 
    Hvert trin er en CSS-selector plus en titel og en kort tekst. Dele af
    laerredet har et usynligt felt oven paa sig, som fanen selv flytter paa
@@ -15,24 +14,19 @@
     var NK = window.NK;
 
     var TURE = {
-        "fane-rk": [
-            { sel: "#rk-ordrelinje", titel: "Ordren", tekst: "Kunden vil have ét bestemt stof. Navnet siger, hvad det skal laves af." },
-            { sel: "#rk-hylde", titel: "Hylden", tekst: "Alkoholerne, syrerne og kaliumpermanganat. Klik på et stof, eller træk det op i kolben. Det, du laver, kommer under Lavet." },
-            { sel: "#rk-reaktor .pladser", titel: "Kolben", tekst: "Her er plads til to stoffer. Et klik på en plads tager stoffet af igen." },
-            { sel: "#rk-reaktor .betingelser", titel: "Svovlsyre og varme", tekst: "Svovlsyre er katalysator. Varmepladen koger blandingen, og tilbagesvaleren over kolben holder dampen inde." },
-            { sel: "#rk-start", titel: "Start", tekst: "Stofferne hældes i, og du ser, hvad der sker. Enter gør det samme." },
-            { sel: "#rk-tavleboks", titel: "Tavlen", tekst: "Molekylerne med strukturformler. Orange atomer kommer fra syren, blå fra alkoholen og lilla fra permanganaten. Et klik på tavlen springer animationen over." },
-            { sel: "#rk-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#rk-opgaver", titel: "Ordrerne", tekst: "Ti ordrer fra let til svær. En ordre, du leverer uden at se svaret, får en stjerne." },
-            { sel: ".faneknapper", titel: "Fabrikken", tekst: "I den anden fane koster stofferne penge, og kunderne betaler for det, du leverer." }
-        ],
         "fane-fb": [
-            { sel: "#fb-kasse", titel: "Kassen", tekst: "Du starter med 300 kr. Ved 3000 kr. er du fabrikschef." },
-            { sel: "#fb-hylde", titel: "Grossisten", tekst: "Køb en portion med + på kortet. Tallet er, hvor mange du har. Grossisten fører ikke butansyre." },
-            { sel: "#fb-kunder", titel: "Kunderne", tekst: "Tre ordrer ad gangen. Det, du laver, bliver leveret af sig selv. Klik på en ordre for at få hint til den." },
+            { sel: "#fb-kunder", titel: "Kunderne", tekst: "Hver kunde vil have ét bestemt stof. Navnet siger, hvad det skal laves af. Klik på en ordre for at få hint til den." },
+            { sel: "#fb-butikknap", titel: "Butikken", tekst: "Her køber du alkoholer, syrer og kaliumpermanganat. Læg varerne i kurven, og betal. Butikken fører ikke butansyre." },
+            { sel: ".lager-reol", titel: "Lageret", tekst: "Det, du har købt eller lavet. Klik på en flaske, eller træk den over i kolben. Tallet er, hvor mange portioner du har." },
+            { sel: "#fb-reaktor .pladser", titel: "Kolben", tekst: "Der er plads til to stoffer. Et klik på en plads tager stoffet af igen." },
+            { sel: "#fb-reaktor .betingelser", titel: "Svovlsyre og varme", tekst: "Svovlsyre er katalysator. Varmepladen koger blandingen, og tilbagesvaleren over kolben holder dampen inde." },
+            { sel: "#fb-start", titel: "Start", tekst: "Stofferne hældes i, og du ser, hvad der sker. Det, kunderne har bestilt, bliver leveret af sig selv. En blanding, der ikke kan reagere, bliver hældt ud." },
+            { sel: "#fb-tavleboks", titel: "Tavlen", tekst: "Molekylerne med strukturformler. Orange atomer kommer fra syren, blå fra alkoholen og lilla fra permanganaten. Et klik på tavlen springer animationen over." },
+            { sel: "#fb-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#fb-kasse, #fb-titelfelt", titel: "Kassen og titlen", tekst: "Du starter med 300 kr. som lærling. Titlen følger det, fabrikken har tjent i alt, og giver adgang til udstyr i butikken." },
+            { sel: "#fb-seriefelt", titel: "Serien", tekst: "Hver levering i træk giver 10 % oveni, højst 50 %. En blanding, der må hældes ud, bryder serien. Det gør Vis svaret også." },
             { sel: "#fb-boerskort", titel: "Børsen", tekst: "Hvert halve minut er der høj efterspørgsel på en ny duft. Den ordre giver mere." },
-            { sel: "#fb-reaktor", titel: "Kolben", tekst: "Den samme som i Reaktoren. En blanding, der ikke kan reagere, bliver hældt ud, og pengene er tabt." },
-            { sel: "#fb-status", titel: "Linjen forneden", tekst: "Her står, hvad der skete. Knappen giver hint til den ordre, du har valgt." },
+            { sel: "#fb-kortknap", titel: "Esterkortet", tekst: "Alle de estere, du har lavet. Første gang du laver et nyt stof, får du 50 kr. Klik for at se kortet." },
             { sel: "#fb-forfra", titel: "Forfra", tekst: "Starter fabrikken forfra med 300 kr. Tryk to gange." }
         ]
     };

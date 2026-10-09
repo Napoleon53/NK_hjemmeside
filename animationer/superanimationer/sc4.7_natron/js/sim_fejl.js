@@ -102,7 +102,6 @@
             this.brugtSvar = true;
             this.svarVis(NK.html("Den rigtige: " + D.FEJL_SVAR[j].t.toLowerCase() + ". Se forsøgene."));
         } else {
-            this.k.tie();
         }
         this.start();
     };
@@ -258,8 +257,7 @@
        til stoerre opstillinger. */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.08, 26, 48));
         lay.px = NK.klamp(Math.min(W / 58, Hs / 30), 12, 17);
@@ -293,7 +291,6 @@
         var a = lay.st[0], b = lay.st[1];
         this.saetAnker("g1", a.skilt.x, a.skilt.y, a.skilt.b, lay.bordY - a.skilt.y + 10);
         this.saetAnker("g2", b.skilt.x, b.skilt.y, b.skilt.b, lay.bordY - b.skilt.y + 10);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* ----- Tegn --------------------------------------------------------------------- */
@@ -376,7 +373,6 @@
             Tg.trefodFor(ctx, op);
             mig.skilt(ctx, st, g, i, maxTid);
         });
-        this.k.tegn(ctx);
     };
 
     NK.SimFejl = SimFejl;

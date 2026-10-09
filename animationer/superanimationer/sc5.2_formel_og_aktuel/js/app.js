@@ -2,10 +2,8 @@
    app.js - binder de tre faner sammen
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Kemichael praesenterer ikke med knapper her:
-   han sidder ved katederet, og hans foerste linje paa en fane siger, hvor
-   man er, og hvad man goer (brugerens valg 25. sept. 2026, som sc4.5 og sc5.1). K viser den
-   igen.
+   fane opdateres og tegnes. Ingen praesentation: linjen i opgavekortet
+   siger, hvor man er, og hvad man goer.
    ===================================================================== */
 (function () {
     "use strict";
@@ -33,7 +31,6 @@
         if (sims[id]) {
             sims[id].tilpas();
             sims[id].layout();
-            sims[id].startIntro(false);
             sims[id].fokus();
         }
     }
@@ -83,7 +80,6 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "k" || e.key === "K") { if (sim) sim.startIntro(true); return; }
         if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }

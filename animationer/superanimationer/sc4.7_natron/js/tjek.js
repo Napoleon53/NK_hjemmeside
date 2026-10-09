@@ -601,7 +601,7 @@
     };
 
     /* ----- Regnestykket med rigtige broekstreger ---------------------------------------
-       Som HTML (i kortet og Kemichaels boble) og som dele til tavlen. Et
+       Som HTML (i kortet) og som dele til tavlen. Et
        symbol som n(NaHCO₃) skrives med bogstavet i kursiv. */
     function broekHTML(a, b) { return '<span class="broek"><span>' + a + "</span><span>" + b + "</span></span>"; }
     function symHTML(s) {

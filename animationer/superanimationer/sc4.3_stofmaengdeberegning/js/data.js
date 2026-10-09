@@ -3,8 +3,8 @@
 
    Alt, en laerer kan have lyst til at rette i, staar her: atommasserne,
    stofferne, de seks opgaver paa Formlen, de seks opgaver paa Vaegten,
-   spoergsmaalene til Hurtigrunden og det, Kemichael siger. Enhederne og
-   formlerne tjekkes i tjek.js; tegningen kender kun resultatet.
+   spoergsmaalene til Hurtigrunden og linjerne i opgavekortet. Enhederne
+   og formlerne tjekkes i tjek.js; tegningen kender kun resultatet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -199,7 +199,7 @@
     /* De tre skridt i hvert regnestykke, som de staar i linjen over det */
     D.TRINBAR = ["Formlen", "Tallene ind", "Resultatet"];
 
-    /* Trekanten: Kemichaels ord, naar den kommer frem */
+    /* Trekanten: linjen i kortet, naar den kommer frem */
     D.TREKANT = "Dæk det over, du vil finde. Det, der er tilbage, er formlen: ved siden af hinanden ganges, over hinanden deles.";
 
     /* ----- Fane 3: Hurtigrunden ---------------------------------------------------
@@ -265,9 +265,7 @@
 
     /* ----- Replikkerne ------------------------------------------------------------------
        Linjen i opgavekortet siger, hvor man er (INTRO), naeste skridt,
-       fejl og ros. Kemichael blander sig ikke: han siger kun noget ved
-       Giv hint og Vis svaret, en kort ros, naar en del er rigtig, naar
-       han sendes ud eller hentes, og naar der klikkes paa ham eller koppen. */
+       fejl og ros, og hintet eller svaret, naar eleven beder om det. */
     D.INTRO = {
         formel: "Formlen for stofmængden bygges af brikker.",
         vaegt: "Vægten deler stoffet i portioner på 1 mol.",
@@ -282,36 +280,13 @@
 
     /* En del er rigtig (brugerens oenske 29. sept. 2026: det skal vaere
        tydeligt, at man har skrevet den rigtige formel). Linjen i kortet
-       siger DEL_OK foran naeste skridt, og Kemichael siger en kort ros
-       (ROS_K), der selv gaar igen efter ROS_TID sekunder. enhed1 er én
-       enhed skrevet i sidste opgave paa Formlen, indsaet mellemregningen
-       og tal resultatet paa Vaegten. */
+       siger DEL_OK foran naeste skridt. enhed1 er én enhed skrevet i
+       sidste opgave paa Formlen, indsaet mellemregningen og tal
+       resultatet paa Vaegten. */
     D.DEL_OK = {
         formel: "Formlen er rigtig.", navn: "Navnene er rigtige.", enhed: "Enhederne er rigtige.",
         enhed1: "Enheden er rigtig.", indsaet: "Mellemregningen er rigtig.", tal: "Resultatet er rigtigt."
     };
-    D.ROS_K = {
-        formel: ["Rigtig formel. Godt.", "Flot. Formlen er rigtig.", "Rigtig formel. Den skal du bruge tit."],
-        navn: ["Rigtige navne. Godt.", "Flot. Navnene er rigtige."],
-        enhed: ["Rigtige enheder. Godt.", "Flot. Enhederne er rigtige."],
-        enhed1: ["Rigtig enhed.", "Ja. Den enhed er rigtig."],
-        indsaet: ["Rigtige tal på de rigtige pladser.", "Flot. Mellemregningen er rigtig."],
-        tal: ["Rigtigt resultat, og med enhed. Godt.", "Flot. Resultatet er rigtigt."]
-    };
-    D.ROS_TID = 3.2;
-
-    D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Kaffen derude var ikke bedre.";
-
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Én kop. Hvor mange mol, vil jeg ikke vide.",
-        "Den er fra i morges. Tror jeg.",
-        "Massen er den samme. Varmen er væk.",
-        "Stadig kold. Men det er min."
-    ];
-    D.PRIK_SIDST = "Jeg sidder her bare. Byg du.";
-
     /* Paaskeaegget: to klik paa mol-brikken */
     D.MULDVARP = "Forkert slags mol. På engelsk hedder begge en mole.";
 

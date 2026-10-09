@@ -282,7 +282,6 @@
             });
             inp.addEventListener("input", function () {
                 f.bogst[i] = inp.value;
-                if (mig.fane.k) mig.fane.k.skriver();
             });
             f.inputs[i] = inp;
             f.delEl[i] = del;
@@ -324,7 +323,6 @@
         inp.addEventListener("keydown", function (e) {
             if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
         });
-        inp.addEventListener("input", function () { if (mig.fane.k) mig.fane.k.skriver(); });
         fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
         f.feltEl = fe;
         f.input = inp;
@@ -360,7 +358,6 @@
                 });
                 inp.addEventListener("input", function () {
                     f.tekst[i] = inp.value;
-                    if (mig.fane.k) mig.fane.k.skriver();
                 });
                 f.inputs[i] = inp;
             }
@@ -661,16 +658,14 @@
         P2.trinLinje = function () { return this.regning.trinTekst(); };
         P2.opgaveFaerdig = function () { return this.regning.faerdig(); };
 
-        /* Et trin er gaaet videre: Kemichael tier (eller siger det svar, han
-           blev bedt om), og linjen siger det naeste skridt */
+        /* Et trin er gaaet videre: linjen viser det svar, eleven bad om, og
+           siger det naeste skridt */
         P2.videre = function (vistHTML, godHTML) {
             this.hjaelp = 0;
             var trin = this.trinLinje();
             if (vistHTML) {
-                if (this.k.sig(vistHTML, "svar", { lukVedSkriv: true })) this.besked(trin, "");
-                else this.besked(vistHTML + " " + trin, "gul");
+                this.besked(vistHTML + " " + trin, "gul");
             } else {
-                this.k.tie();
                 this.besked(godHTML + " " + trin, "god");
             }
             this.visKnap();

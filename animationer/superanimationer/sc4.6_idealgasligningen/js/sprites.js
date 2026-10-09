@@ -5,13 +5,9 @@
    siden aabnes direkte fra harddisken (file://). Er en fil ikke klar
    endnu, springes den bare over i det billede.
 
-   ../../v2/kemichael/kemichael.js tilfoejer laererens sprites (og
-   kaffekoppen) med deres egen mappe, derfor startes indlaesningen foerst
-   fra app.js.
-
    MAAL er de koordinater, der staar i kommentaren oeverst i hver
    SVG-fil. Aendres en fil, skal tallene her foelge med. _sprites.html
-   viser dem alle alene. Katederet er det samme som i sc4.5.
+   viser dem alle alene.
    Cylinderen, stemplet og partiklerne tegnes i js/tegning.js, fordi de
    skifter stoerrelse med gassen.
    ===================================================================== */
@@ -34,9 +30,7 @@
         /* Varmepladen: pladen foroven, displayet og de to knapper */
         varmeplade: { b: 260, h: 60, pladeV: 10, pladeH: 250, pladeTop: 1,
                       dispV: 80, dispH: 180, dispTop: 18, dispBund: 46,
-                      koelX: 40, varmX: 220, knapY: 32, knapR: 12 },
-        /* Kemichaels kateder: bordpladens overflade og forsiden */
-        kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 }
+                      koelX: 40, varmX: 220, knapY: 32, knapR: 12 }
     };
 
     var FILER = {};

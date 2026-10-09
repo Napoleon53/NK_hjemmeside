@@ -23,8 +23,7 @@
             { sel: "#stempel-anker-manometer", titel: "Manometeret", tekst: "Viser trykket i gassen. Klik på stemplet for at låse det, så volumen ikke kan ændre sig." },
             { sel: "#stempel-kort", titel: "Opgaven", tekst: "Vælg først, hvad du tror, der sker. Prøv det så. Linjen i kortet siger, hvad du skal nu." },
             { sel: "#stempel-anker-graf", titel: "Grafen", tekst: "Tryk mod volumen. Kurven viser alle p og V ved den temperatur og stofmængde, gassen har nu." },
-            { sel: "#stempel-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du har løst det." },
-            { sel: "#stempel-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
+            { sel: "#stempel-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret." },
             { sel: ".faneknapper", titel: "Beregningen", tekst: "På fane 2 regner du med idealgasligningen." }
         ],
         "fane-regn": [
@@ -32,7 +31,7 @@
             { sel: "#regn-anker-cylinder", titel: "Cylinderen", tekst: "Opgavens gas. Det, du skal finde, er dækket, til du har regnet det ud." },
             { sel: "#regn-anker-tavle", titel: "Tavlen", tekst: "Beregningerne, som de skal skrives, med enheder. R står i hjørnet." },
             { sel: "#regn-opgaver", titel: "Opgaverne", tekst: "Let: temperaturen i kelvin. Middel: temperaturen i °C. Svær: massen er med. Nye tal giver samme opgave med andre tal." },
-            { sel: "#regn-anker-laerer", titel: "Kemichael", tekst: "Giv hint siger, hvad du kender. Vis svaret viser formlen eller beregningen." }
+            { sel: "#regn-knap", titel: "Giv hint", tekst: "Den gule knap. Giv hint siger, hvad du kender. Vis svaret viser formlen eller beregningen." }
         ]
     };
     var trin = [];

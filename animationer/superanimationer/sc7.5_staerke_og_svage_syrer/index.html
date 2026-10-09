@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stærke og svage syrer</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">H⁺</span> Stærke og svage syrer</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-g" role="tab" aria-selected="true"><span class="nr">1</span>To glas</button>
+        <button class="faneknap" data-fane="fane-s" role="tab" aria-selected="false"><span class="nr">2</span>Stærk eller svag?</button>
+        <button class="faneknap" data-fane="fane-f" role="tab" aria-selected="false"><span class="nr">3</span>Fortyndet?</button>
+    </div>
+
+    <button class="ikonknap tekstknap phknap" id="phknap" type="button" aria-pressed="false" title="Vis pH i glassene (P)">pH-meter</button>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: TO GLAS                                                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-g" role="tabpanel" aria-label="To glas">
+    <div class="scene">
+        <canvas id="g-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js). Oeverst
+             gaettet, opgaven eller spoergsmaalet; nederst hint, forklaringen til
+             et forkert svar og hjaelpeknappen. -->
+        <div class="scenekort" id="g-skort">
+            <div class="sk-ind" id="g-ind"></div>
+            <div class="sk-bund" id="g-status">
+                <p class="st-tekst" id="g-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="g-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="g-anker-lup"></div>
+        <div class="anker" id="g-anker-glas"></div>
+        <div class="anker" id="g-anker-skaal"></div>
+
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="g-regnkort" hidden>
+            <h2>Talt i lupperne</h2>
+            <div id="g-regnskab"></div>
+        </div>
+
+        <div class="kort" id="g-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="g-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="g-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: STÆRK ELLER SVAG?                                          -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-s" role="tabpanel" aria-label="Stærk eller svag?">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js). Oeverst
+             gaettet, opgaven eller spoergsmaalet; nederst hint, forklaringen til
+             et forkert svar og hjaelpeknappen. -->
+        <div class="scenekort" id="s-skort">
+            <div class="sk-ind" id="s-ind"></div>
+            <div class="sk-bund" id="s-status">
+                <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="s-anker-lup"></div>
+        <div class="anker" id="s-anker-glas"></div>
+
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="s-glaskort">
+            <h2>De fem glas</h2>
+            <div id="s-glassene"></div>
+        </div>
+
+        <div class="kort" id="s-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="s-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="s-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FORTYNDET?                                                 -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-f" role="tabpanel" aria-label="Fortyndet?">
+    <div class="scene">
+        <canvas id="f-laerred"></canvas>
+        <!-- Fortyndingen: staar mellem de to glas (js/sim_fortynd.js) -->
+        <div class="vaerktoej midt" id="f-vaerktoej">
+            <button class="tidknap" id="f-fortynd" type="button" title="Fortynd saltsyren 10 gange">Fortynd<br>10 gange ▶</button>
+            <button class="forfraknap" id="f-forfra" type="button" title="Ny saltsyre til opgaven (R)">Ny saltsyre ↺</button>
+        </div>
+        <!-- Tavlen i det sidste maal: to ord til hver flaske -->
+        <div class="skematavle ordtavle" id="f-tavle" hidden></div>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js). Oeverst
+             gaettet, opgaven eller spoergsmaalet; nederst hint, forklaringen til
+             et forkert svar og hjaelpeknappen. -->
+        <div class="scenekort" id="f-skort">
+            <div class="sk-ind" id="f-ind"></div>
+            <div class="sk-bund" id="f-status">
+                <p class="st-tekst" id="f-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="f-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="f-anker-lup"></div>
+        <div class="anker" id="f-anker-glas"></div>
+
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling" id="f-glaskort">
+            <h2>De to glas</h2>
+            <div id="f-toglas"></div>
+        </div>
+
+        <div class="kort" id="f-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="f-loest">0</b>/5</span></h2>
+            <div class="opg-liste" id="f-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Stærke og svage syrer</h2>
+        <p>En syre afgiver en hydron, H⁺, til et vandmolekyle. Vandmolekylet bliver til en oxoniumion, H₃O⁺. Det er oxoniumionerne, der gør opløsningen sur, og som får kalk til at bruse.</p>
+        <h3 class="teori-hoved">Stærk syre</h3>
+        <p>I en stærk syre afgiver alle molekyler deres hydron. Reaktionen går helt til ende og skrives med enkeltpil.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Saltsyre</span>
+            HCl + H₂O → Cl⁻ + H₃O⁺
+        </div>
+        <h3 class="teori-hoved">Svag syre</h3>
+        <p>I en svag syre afgiver kun få molekyler deres hydron. Reaktionen går også baglæns: syrens ion tager en hydron tilbage fra en oxoniumion. De to reaktioner sker lige ofte, og derfor skrives der dobbeltpil.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eddikesyre</span>
+            CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺
+        </div>
+        <p>I 0,10 M eddikesyre har omkring 1 ud af 100 molekyler afgivet en hydron. I myresyre er det 4 ud af 100 og i citronsyre 8 ud af 100.</p>
+        <h3 class="teori-hoved">Stærk er ikke det samme som koncentreret</h3>
+        <p>Stærk og svag fortæller, hvor stor en del af molekylerne der afgiver en hydron. Koncentreret og fortyndet fortæller, hvor meget syre der er i hver liter. En stærk syre kan godt være fortyndet, og en svag syre kan godt være koncentreret.</p>
+        <h3 class="teori-hoved">Luppen</h3>
+        <p>Luppen viser et rum, hvor der ved 0,10 M er hældt 100 syremolekyler i. Et helt molekyle er gråt med hydronen på som en lille orange kugle. Har det afgivet hydronen, er det blåt med et minus, og hydronen sidder på et vandmolekyle: en rød kugle med plus, H₃O⁺. I samme rum er der omkring 55.000 vandmolekyler. De er ikke tegnet.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>P</kbd> pH-meter &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/lup.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/glas.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_glas.js"></script>
+<script src="js/sim_styrke.js"></script>
+<script src="js/sim_fortynd.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

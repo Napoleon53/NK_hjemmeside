@@ -22,7 +22,7 @@
     T.KRIDT = "#e9eee9";
     T.KRIDT_SVAG = "#9fb1a9";
 
-    /* ----- Vaeggen (Kemichaels baand tegner gulvet) ---------------------------- */
+    /* ----- Vaeggen ---------------------------------------------------------------- */
     T.vaeg = function (ctx, W, bund) {
         var g = ctx.createLinearGradient(0, 0, 0, bund);
         g.addColorStop(0, "#262833");

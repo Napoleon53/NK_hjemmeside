@@ -20,10 +20,9 @@
             { sel: "#formel-anker-bunke", titel: "Brikkerne", tekst: "Træk en brik op på en plads på tavlen. Du kan også klikke på en brik og så på pladsen." },
             { sel: "#formel-anker-formel", titel: "Formlen", tekst: "Formlen tjekkes, når alle dens pladser er fyldt. Det, der sidder rigtigt, bliver siddende." },
             { sel: "#formel-anker-skema", titel: "Skemaet", tekst: "Navnet og enheden for n, m og M. I nogle opgaver skal du selv sætte dem på." },
-            { sel: "#formel-kort", titel: "Kortet", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt. Knappen giver et hint og derefter svaret. Når formlen skal vendes, kommer trekanten som andet hint." },
+            { sel: "#formel-kort", titel: "Kortet", tekst: "Linjen i kortet siger, hvad du skal nu, og hvad der gik galt." },
+            { sel: "#formel-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret. Når formlen skal vendes, kommer trekanten som andet hint." },
             { sel: "#formel-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. Hjælpen forsvinder opgave for opgave, og til sidst skriver du det hele selv. En løst opgave bliver grøn." },
-            { sel: "#formel-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og siger kort til, når en del er rigtig." },
-            { sel: "#formel-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Vægten: regn med formlen, og se stoffet blive delt i poser på 1 mol. Hurtigrunden: tolv spørgsmål på tid." }
         ],
         "fane-vaegt": [

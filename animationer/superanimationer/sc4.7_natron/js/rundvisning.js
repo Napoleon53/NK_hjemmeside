@@ -23,8 +23,7 @@
             { sel: "#forsoeg-skema", titel: "Vejningerne", tekst: "Skriv startmassen og hver vejning. Massen er konstant, når to vejninger i træk giver det samme." },
             { sel: "#forsoeg-anker-zoom", titel: "Luppen", tekst: "Natronen består af Na⁺ og HCO₃⁻. Gas forsvinder. Det, der bliver tilbage, står som ?, til du har fundet det på fanen Hypoteserne." },
             { sel: "#forsoeg-anker-graf", titel: "Grafen", tekst: "Dine vejninger. Kurven bliver vandret, når massen er konstant." },
-            { sel: "#forsoeg-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du er videre." },
-            { sel: "#forsoeg-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
+            { sel: "#forsoeg-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#journalknap", titel: "Journalen", tekst: "Dit gæt, dine vejninger, beregningerne og konklusionen på én side, som kan udskrives." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Hypoteserne: regn ud, hvad diglen skal veje i hver hypotese. Fejlkilder: hvad sker der, når noget går galt?" }
         ],

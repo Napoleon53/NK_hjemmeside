@@ -5,10 +5,6 @@
    siden aabnes direkte fra harddisken (file://). Er en fil ikke klar
    endnu, springes den bare over i det billede.
 
-   ../../v2/kemichael/kemichael.js tilfoejer laererens sprites (og
-   kaffekoppen) med deres egen mappe, derfor startes indlaesningen foerst
-   fra app.js.
-
    MAAL er de koordinater, der staar i kommentaren oeverst i hver
    SVG-fil. Aendres en fil, skal tallene her foelge med. _sprites.html
    viser dem alle alene.
@@ -49,9 +45,7 @@
         vejebaad: { b: 120, h: 36, indV: 16, indH: 104, indBund: 14, bund: 34 },
         /* Spatlen og luppen (som sc2.1) */
         spatel: { b: 160, h: 40, bladX: 22, bladY: 20, spidsX: 3, endeX: 157 },
-        lup: { b: 140, h: 140, midtX: 52, midtY: 52, r: 38 },
-        /* Kemichaels kateder (som sc4.5) */
-        kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 }
+        lup: { b: 140, h: 140, midtX: 52, midtY: 52, r: 38 }
     };
 
     var FILER = {};

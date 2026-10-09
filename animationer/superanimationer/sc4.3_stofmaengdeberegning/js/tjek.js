@@ -477,7 +477,7 @@
     };
 
     /* ----- Regnestykket med rigtige broekstreger ---------------------------------------
-       Som HTML (i kortet og Kemichaels boble) og som dele til tavlen:
+       Som HTML (i kortet) og som dele til tavlen:
        { t, matte, farve, fed } for tekst og { top, bund, matte } for en broek. */
     function broekHTML(a, b) { return '<span class="broek"><span>' + a + "</span><span>" + b + "</span></span>"; }
 

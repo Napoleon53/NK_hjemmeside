@@ -153,14 +153,13 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
-        var baand = this.k.layout(W, H);
-        lay.baand = baand;
         var kant = NK.klamp(W * 0.014, 8, 16);
         var vaegt = this.x && this.x.o.massebevarelse;
         lay.vaegt = vaegt;
-        lay.bordY = Math.round(baand.y - NK.klamp(H * 0.035, 10, 26));
+        /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
+        lay.bordY = Math.round(H - NK.klamp(H * 0.06, 18, 44));
         var top = NK.klamp(H * 0.02, 8, 18);
-        var tH = vaegt ? NK.klamp((lay.bordY - top) * 0.6, 200, 420) : NK.klamp(lay.bordY - top - 18, 200, 460);
+        var tH = vaegt ? NK.klamp((lay.bordY - top) * 0.6, 200, 420) : NK.klamp(lay.bordY - top - 18, 200, 600);
         lay.tavle = { x: kant + 6, y: top, b: W - 2 * kant - 12, h: tH };
         var ind = NK.klamp(lay.tavle.b * 0.03, 8, 22);
         this.skema.layout({ x: lay.tavle.x + ind, y: lay.tavle.y + ind * 0.6, b: lay.tavle.b - 2 * ind, h: tH - ind * 1.2 }, this.L.ctx);
@@ -187,8 +186,6 @@
         }
         this.lay = lay;
         this.saetAnker("skema", lay.tavle.x, lay.tavle.y, lay.tavle.b, tH);
-        this.saetAnker("boble", this.k.lay.boble.x, this.k.lay.boble.y, this.k.lay.boble.b, this.k.lay.boble.h);
-        this.saetAnker("laerer", this.k.lay.desk.x, baand.y, this.k.lay.desk.b, baand.h);
     };
 
     /* ----- Tid -------------------------------------------------------------------------------- */
@@ -210,9 +207,8 @@
         Tg.rum(ctx, lay.W, lay.H, lay.bordY + 6);
         Tg.tavle(ctx, lay.tavle);
         this.skema.tegn(ctx, this.tid);
-        Tg.bord(ctx, 0, lay.W, lay.bordY, lay.baand.y);
+        Tg.bord(ctx, 0, lay.W, lay.bordY, lay.H);
         if (lay.vaegt) this.tegnVaegt(ctx);
-        this.k.tegn(ctx);
     };
 
     P.tegnVaegt = function (ctx) {

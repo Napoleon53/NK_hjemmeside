@@ -5,10 +5,6 @@
    siden aabnes direkte fra harddisken (file://). Er en fil ikke klar
    endnu, springes den bare over i det billede.
 
-   ../../v2/kemichael/kemichael.js tilfoejer laererens sprites (og
-   kaffekoppen) med deres egen mappe, derfor startes indlaesningen foerst
-   fra app.js.
-
    MAAL er de koordinater, der staar i kommentaren oeverst i hver
    SVG-fil. Aendres en fil, skal tallene her foelge med. _sprites.html
    viser dem alle alene. Alle fire er som i sc4.5 og sc5.1.
@@ -26,9 +22,7 @@
         pulverglas: { b: 100, h: 130, indV: 10, indH: 90, indTop: 34, indBund: 126, indR: 9,
                       etiketV: 12, etiketH: 88, etiketTop: 54, etiketBund: 108 },
         vaegt: { b: 240, h: 130, skaalX: 120, skaalY: 13, skaalB: 156, dispV: 72, dispH: 168, dispTop: 68, dispBund: 94, bund: 128 },
-        vejebaad: { b: 120, h: 36, indV: 16, indH: 104, indBund: 14, bund: 34 },
-        /* Kemichaels kateder */
-        kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 }
+        vejebaad: { b: 120, h: 36, indV: 16, indH: 104, indBund: 14, bund: 34 }
     };
 
     var FILER = {};

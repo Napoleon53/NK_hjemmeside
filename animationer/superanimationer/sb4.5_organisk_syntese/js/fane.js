@@ -1,11 +1,11 @@
 /* =====================================================================
-   fane.js - det, de to faner har til faelles
+   fane.js - statuslinjen og hinttrappen
 
    Der er ingen laerer i denne animation (som sc1.4_afstemning og
    sc_spil9_kemikort). Al hjaelp staar i statuslinjen nederst i scenen,
    lige under kolben og tavlen, og hjaelpeknappen sidder i samme linje.
 
-   NK.Fane.paa(P, navn) laegger de faelles metoder paa fanens prototype:
+   NK.Fane.paa(P, navn) laegger metoderne paa spillets prototype:
 
      * statuslinjen: naeste skridt, fejl, hint og ros, med farve efter
        hvad der skete, og et ryst ved en fejl
@@ -15,7 +15,7 @@
        vej, NK.Kemi.rute finder (syre og alkohol, og om syren skal laves
        ved oxidation)
 
-   Fanen selv har: maalNu(), trinLinje(), visSvar(), knapVidere(),
+   Spillet selv har: maalNu(), trinLinje(), visSvar(), knapVidere(),
    faerdigNu().
    ===================================================================== */
 (function () {
@@ -24,13 +24,13 @@
     var NK = window.NK;
     var K = NK.Kemi;
 
-    /* Hinttrappen til et stof. koeb: fanen med penge (stofferne skal koebes) */
-    function hintTekster(maalNavn, harStof, koeb) {
+    /* Hinttrappen til et stof */
+    function hintTekster(maalNavn, harStof) {
         var r = K.rute(maalNavn);
         var maal = K.stofEfterNavn(maalNavn);
         var vis = maal ? maal.navn : maalNavn;
-        var lg = koeb ? "Køb " : "Læg ";
-        var lgEfter = koeb ? " (+ på kortene), og læg dem i kolben." : " i kolben.";
+        var lg = "Køb ";
+        var lgEfter = " i butikken, og læg dem i kolben.";
         if (!r) return { trin: ["Prøv dig frem med to stoffer."], svar: null };
         if (r.type === "ox") {
             if (r.keton) {
@@ -72,7 +72,7 @@
             return {
                 trin: [
                     "En ester laves af en carboxylsyre og en alkohol. " + cap(alkDel) + " kommer fra alkoholen, og " + syreDel + " kommer fra syren.",
-                    cap(syreDel) + " kommer fra " + syreNavn + ". Den står ikke på hylden, men den kan laves ved at oxidere en alkohol med lige så mange C.",
+                    cap(syreDel) + " kommer fra " + syreNavn + ". Butikken har den ikke, men den kan laves ved at oxidere en alkohol med lige så mange C.",
                     lg + r.syreFra.navn + " og kaliumpermanganat" + lgEfter + " Tænd for varmen, og tryk Start. Brug så " + syreNavn + " og " + r.alk.navn + " til esteren."
                 ],
                 svar: [r.syreFra.id, "permanganat"], hplus: false, varme: true, foerst: true
@@ -113,7 +113,7 @@
             var maal = this.maalNu();
             if (!maal) return { trin: [], svar: null };
             var mig = this;
-            return hintTekster(maal, function (id) { return mig.antal(id) > 0; }, !!this.koeb);
+            return hintTekster(maal, function (id) { return mig.antal(id) > 0; });
         };
 
         P.visKnap = function () {
@@ -211,9 +211,9 @@
         P.standardTrin = function (foerste) {
             var p = this.R.plads, n = (p[0] ? 1 : 0) + (p[1] ? 1 : 0);
             if (this.R.iKolben) return "Blandingen står i kolben. Ret det, der mangler, og tryk Start igen.";
-            if (n === 0) return foerste ? "Klik på et stof på hylden, eller træk det op i kolben." : "Find de to stoffer, og læg dem i kolben.";
+            if (n === 0) return "Find de to stoffer, og læg dem i kolben.";
             if (n === 1) return "Læg et stof mere i kolben.";
-            if (foerste && !(this.R.bet.hplus && this.R.bet.varme)) return "Tænd for svovlsyre og varme under kolben, og tryk Start.";
+            if (foerste && !(this.R.bet.hplus && this.R.bet.varme)) return "Tænd for svovlsyre og varme, og tryk Start.";
             return "Tryk Start.";
         };
     }

@@ -16,21 +16,20 @@
 
     var TURE = {
         "fane-kar": [
+            { sel: "#kar-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst. Linjen under den siger, hvor langt karret er fra målet. To opgaver starter med et gæt på et gult kort." },
             { sel: "#kar-anker-krukke", titel: "Krukken", tekst: "Træk en skefuld kobber(II)sulfat ned i karret, eller klik på krukken. En skefuld er 0,10 mol." },
-            { sel: "#kar-anker-haner", titel: "Hanerne", tekst: "Hold musen nede på den blå knap for at hælde vand i, og på den røde hane for at tappe ud. Hvert tryk er 0,05 L." },
+            { sel: "#kar-anker-haner", titel: "Hanerne", tekst: "Hold musen nede på den blå knap for at hælde vand i, og på den røde hane for at tappe ud. Hvert tryk er 0,05 L. Et gult skilt viser, hvad der mangler." },
             { sel: "#kar-anker-zoom", titel: "Luppen", tekst: "Luppen viser altid lige meget væske. Antallet af ioner i den følger koncentrationen." },
             { sel: "#kar-data", titel: "Tallene", tekst: "Stofmængden, rumfanget og c = n / V, mens du arbejder i karret." },
-            { sel: "#kar-kort", titel: "Opgaven", tekst: "Linjen i kortet siger, hvad du skal nu. Nogle opgaver starter med et gæt. Knappen giver et hint og derefter svaret." },
-            { sel: "#kar-anker-laerer", titel: "Kemichael", tekst: "Han blander sig ikke. Han giver hintet, når du trykker Giv hint, og tier, når du har løst det." },
-            { sel: "#kar-kknap", titel: "Send ham ud", tekst: "Så står hintene i opgavekortet i stedet. Samme knap henter ham igen." },
+            { sel: "#kar-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap på kortet. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#kar-forfra", titel: "Start forfra", tekst: "Karret, som det var, da opgaven begyndte." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "c eller n?: forskellen på stofmængde og koncentration. Målekolben: regn en opløsning ud, før den laves. Fortynding: der kommer vand til, men ikke stof." }
         ],
         "fane-glas": [
+            { sel: "#glas-skort", titel: "Spørgsmålet", tekst: "Spørgsmålet står på kortet øverst. Klik på et svar. Handler spørgsmålet om et glas, kan du også klikke på glasset. Et forkert svar bliver forklaret." },
             { sel: "#glas-anker-glassene", titel: "Glassene", tekst: "Hver prik i et glas er 0,01 mol kobber(II)sulfat. Tæl prikkerne, så har du stofmængden n." },
             { sel: "#glas-anker-lupper", titel: "Lupperne", tekst: "En lup viser altid lige meget væske. Flere ioner i luppen betyder en højere koncentration c." },
-            { sel: "#glas-anker-over", titel: "Teksten på væggen", tekst: "Hvad der er i glassene, og hvad du skal gøre. Nogle gange skal du hælde, før spørgsmålet kommer." },
-            { sel: "#glas-kort", titel: "Spørgsmålet", tekst: "Vælg et svar. Når spørgsmålet handler om et glas, kan du også klikke på glasset. Et forkert svar bliver forklaret." },
+            { sel: "#glas-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap på kortet. Først får du et hint, og et tryk mere viser svaret." },
             { sel: "#glas-data", titel: "Tabellen", tekst: "Det, du ved om glassene. Et spørgsmålstegn er noget, du skal finde." },
             { sel: "#glas-opgaver", titel: "Opgaverne", tekst: "Otte opgaver. En opgave, du løser uden forkerte svar og uden at se svaret, får en stjerne." }
         ],

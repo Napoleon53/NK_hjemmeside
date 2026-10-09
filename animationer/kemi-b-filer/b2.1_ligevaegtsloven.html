@@ -1194,7 +1194,7 @@
                 <li><strong>🧪 Kemikalier</strong> – koncentrationerne. Pas på: der er flere stoffer end
                 dem, der hører til i brøken.</li>
                 <li><strong>✖️ Operatorer</strong> – gangeprikken · sætter to led sammen. Tallet 1 bruges,
-                når nævneren skal være tom. Plus og minus hører aldrig hjemme i en reaktionsbrøk.</li>
+                når nævneren skal være tom. 1² er også 1. Plus og minus hører aldrig hjemme i en reaktionsbrøk.</li>
                 <li><strong>🔢 Opløftede tal</strong> – placeres lige efter det stof, de hører til.</li>
             </ul>
             <p>Rækkefølgen af leddene betyder ingenting: [A]·[B] og [B]·[A] er lige gode.</p>
@@ -1343,10 +1343,14 @@
         function parseExpression(tokens) {
             if (tokens.length === 0) return { ok: true, terms: [] };
 
-            // "1" må kun stå helt alene
+            // "1" må kun stå alene. Med en eksponent (1²) er det stadig 1: det er rigtigt
+            // regnet, når stoffet, der er udeladt, har en koefficient (elev, 6. okt. 2026).
             if (tokens.some(t => t.value === "1")) {
                 if (tokens.length === 1) return { ok: true, terms: [] };
-                return { ok: false, msg: "Tallet 1 kan kun stå alene – ikke sammen med andre brikker." };
+                if (tokens.length === 2 && tokens[0].value === "1" && tokens[1].cat === "exp") {
+                    return { ok: true, terms: [], oneExp: tokens[1].value };
+                }
+                return { ok: false, msg: "Tallet 1 kan kun stå alene, ikke sammen med stoffer eller gangeprikker." };
             }
 
             const terms = [];
@@ -1884,7 +1888,7 @@
                 const denOK = canonical(den.terms) === canonical(expDen);
 
                 if (numOK && denOK) {
-                    this.handleCorrectAnswer(level);
+                    this.handleCorrectAnswer(level, den.oneExp ? "1" + den.oneExp + " = 1, så nævneren er 1." : "");
                 } else if (!numOK) {
                     this.showError(diffMessage(num.terms, expNum, "tælleren"));
                 } else {
@@ -1892,7 +1896,7 @@
                 }
             }
 
-            handleCorrectAnswer(level) {
+            handleCorrectAnswer(level, note) {
                 this.isLevelCompleted = true;
 
                 // Point gives kun første gang opgaven løses
@@ -1905,7 +1909,7 @@
                 this.saveState();
                 this.updateNav();
 
-                this.elFeedback.textContent = "✔ Korrekt! +" + POINTS_PER_LEVEL + " point";
+                this.elFeedback.textContent = "✔ Korrekt! +" + POINTS_PER_LEVEL + " point" + (note ? ". " + note : "");
                 this.elFeedback.className = "feedback-success";
                 this.elFeedback.style.opacity = "1";
 

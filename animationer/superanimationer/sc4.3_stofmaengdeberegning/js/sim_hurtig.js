@@ -121,7 +121,6 @@
         this.antal = this.koe.length;
         this.prikker = this.koe.map(function () { return 0; });
         this.tilstand = "koerer";
-        this.k.tie();
         this.naeste();
         this.besked(this.trinLinje(), "");
         this.visKnap();
@@ -133,7 +132,6 @@
         if (!this.koe.length) { this.slut(); return; }
         this.nuv = this.koe.shift();
         if (this.nuv.forkert) this.nuv.igen = true;
-        this.k.tie();
         var idx = NK.bland(this.nuv.svar.map(function (s, i) { return i; }));
         var q = this.nuv;
         this.valg = idx.map(function (i) { return { tekst: q.svar[i], ok: i === 0, fejl: q.fejl[i] }; });
@@ -144,7 +142,6 @@
     P.svar = function (i) {
         if (this.tilstand !== "koerer" || this.pause > 0 || !this.valg[i]) return;
         var v = this.valg[i], q = this.nuv;
-        this.k.tie();
         if (v.ok) {
             this.rigtige++;
             if (!q.forkert) this.prikker[q.nr] = 1;
@@ -200,7 +197,7 @@
             e.className = "knap blaa banker";
         } else {
             e.textContent = this.hjaelp === 0 ? "Giv hint (koster tid)" : "Vis svaret";
-            e.className = "knap";
+            e.className = this.hjaelp === 0 ? "knap hjaelp" : "knap hjaelp svar";
         }
         e.disabled = false;
     };
@@ -212,12 +209,11 @@
             this.hjaelp = 1;
             this.straf += D.STRAF_HINT;
             this.strafT = 1.2;
-            this.hjaelpVis("<b>Hint:</b> " + NK.html(this.nuv.hint), "hint");
+            this.hjaelpVis("<b>Hint:</b> " + NK.html(this.nuv.hint));
         } else {
             var ret = 0;
             this.valg.forEach(function (v, j) { if (v.ok) ret = j; });
             this.forkert(-1, "<b>Svaret:</b> " + NK.html(this.nuv.svar[0]) + ". " + NK.html(this.nuv.forkl));
-            this.k.sig("<b>Svaret:</b> " + NK.html(this.nuv.svar[0]) + ".", "svar");
         }
         this.visKnap();
         this.visTal();
@@ -307,9 +303,8 @@
 
     P.layout = function () {
         var W = this.L.b, H = this.L.h, ctx = this.L.ctx;
-        var baand = this.k.layout(W, H);
-        var R = { x: 16, y: 16, b: W - 32, h: Math.max(160, baand.y - 16 - 24) };
-        var lay = { W: W, H: H, Hs: baand.y, tavle: R };
+        var R = { x: 16, y: 16, b: W - 32, h: Math.max(160, H - 16 - 24) };
+        var lay = { W: W, H: H, Hs: H, tavle: R };
         lay.bh = Math.round(NK.klamp(Math.min(R.h * 0.16, R.b * 0.1), 42, 78));
         lay.spmPx = NK.klamp(Math.min(R.h * 0.1, R.b / 20), 18, 40);
         var bh = lay.bh;
@@ -336,7 +331,6 @@
         this.lay = lay;
         this.saetAnker("tavle", R.x, R.y, R.b, R.h);
         this.saetAnker("svar", R.x + 20, y0 - bh * 0.35, R.b - 40, bh * 2.4);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* ----- Tegn ----------------------------------------------------------------------- */
@@ -363,7 +357,6 @@
             var s = lay.start;
             Tg.brik(ctx, { x: s.x, y: s.y, b: s.b, h: s.h, tekst: this.tilstand === "klar" ? "Start" : "Ny runde", slags: "sym_start" },
                 { over: this.over === "start" });
-            this.k.tegn(ctx);
             return;
         }
 
@@ -418,7 +411,6 @@
             NK.tekst(ctx, String(i + 1), v.r.x + 9, v.r.y + 13, { font: Tg.font("700", 12), linje: "middle", farve: "#7b8594" });
             ctx.restore();
         });
-        this.k.tegn(ctx);
     };
 
     NK.SimHurtig = SimHurtig;

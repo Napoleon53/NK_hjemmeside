@@ -2,10 +2,8 @@
    app.js - binder de tre faner sammen
 
    Faneskift, teorien, journalen, tastaturgenveje og tegneloekken. Kun
-   den aktive fane opdateres og tegnes. Kemichael praesenterer ikke med
-   knapper her: han sidder ved katederet og siger kun noget, naar eleven
-   beder om et hint (den rolige udgave fra sc4.5). K faar ham til at
-   sige, hvor man er.
+   den aktive fane opdateres og tegnes. Ingen praesentation: linjen i
+   opgavekortet siger, hvor man er, og hvad man goer.
 
    Journalen samler elevens gaet, vejningerne, de forventede masser,
    dommen og et maerke (ingen fejl eller snydebevis) paa én side, der
@@ -39,7 +37,6 @@
         if (sims[id]) {
             sims[id].tilpas();
             sims[id].layout();
-            sims[id].startIntro(false);
             if (id === "fane-hypoteser") sims[id].nyMaaling();
             sims[id].fokus();
         }
@@ -144,7 +141,6 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "k" || e.key === "K") { if (sim) sim.startIntro(true); return; }
         if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }

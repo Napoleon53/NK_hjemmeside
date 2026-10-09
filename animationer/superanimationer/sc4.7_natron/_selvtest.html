@@ -24,8 +24,8 @@
    eksemplet er regnet af modellen, at de seks fejlkilder går den
    rigtige vej, at afstemningen, formlerne og tallene genkendes med de
    typiske fejl, at alle tre faner kan gennemføres med musen og ved at
-   skrive, at journalen samler det hele, at Kemichael kun taler ved hint
-   og svar og kan sendes ud, at sproget holder reglerne, og at layoutet
+   skrive, at journalen samler det hele, at hint og svar står i
+   opgavekortet ved den gule knap, at sproget holder reglerne, og at layoutet
    holder fra 520 × 380 til 1500 × 900.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
@@ -48,8 +48,8 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc4.7-forsoeg", "nk-sc4.7-hypoteser", "nk-sc4.7-fejl", "nk-sc4.7-kemichael-ude", "nk-sc4.7-maaling",
-    "nk-sc4.7-gaet", "nk-sc4.7-dommen", "nk-sc4.7-journal", "nk-kemichael"];
+var NOEGLER = ["nk-sc4.7-forsoeg", "nk-sc4.7-hypoteser", "nk-sc4.7-fejl", "nk-sc4.7-maaling",
+    "nk-sc4.7-gaet", "nk-sc4.7-dommen", "nk-sc4.7-journal"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -96,7 +96,11 @@ function koerTest(W) {
         if (B.el.snyd) { B.el.snyd.disabled = false; B.el.snyd.textContent = "Snyd (udfyld alt)"; }
     }
     nulstilAlt();
-    if (NK.laerer && NK.laerer.baggrundsliv) NK.laerer.baggrundsliv(false);
+    paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.RoligLaerer && !NK.Kemichael && !d.querySelector(".kboble, .kknap"));
+    paastand("hver fane har den gule hintknap", ["forsoeg", "hypoteser", "fejl"].every(function (n) {
+        var k = d.getElementById(n + "-knap");
+        return k && k.classList.contains("hjaelp");
+    }));
 
     /* ================================================================ */
     overskrift("1. Kemien og tallene");
@@ -244,7 +248,7 @@ function koerTest(W) {
     ["A", "B", "C"].forEach(function (h) { ["n_p", "m_p"].forEach(function (id) { T.regler(id, h).fejl.forEach(function (x) { tekster.push(x[1]); }); }); });
     T.regler("n_nat", null).fejl.forEach(function (x) { tekster.push(x[1]); });
     D.FEJL.forEach(function (o) { tekster.push(o.titel, o.kort, o.tekst, o.hint, o.forkl); Object.keys(o.fejl).forEach(function (k) { tekster.push(o.fejl[k]); }); });
-    tekster = tekster.concat(D.ROS, D.ROS_OPGAVE, D.KAFFE, D.KAGE, [D.KRUKKE, D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST, D.FEJL_SPM, D.FEJL_1, D.SNYD_LINJE]);
+    tekster = tekster.concat(D.ROS, D.ROS_OPGAVE, [D.KRUKKE, D.FEJL_SPM, D.FEJL_1]);
     tekster.push(d.body.innerText);
     var alt = tekster.join("\n");
     paastand("ingen tankestreger", !/[–—]/.test(alt), (alt.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
@@ -361,10 +365,10 @@ function koerTest(W) {
     NK.visFane("fane-hypoteser");
     B.vaelg(0, false);
     paastand("opgave 1 regner på elevens egen måling", B.maal.egen && B.maal.mf === 5.21 && !/eksempel/.test(d.getElementById("hypoteser-prompt").textContent));
-    paastand("Kemichael siger intet, når opgaven vælges", !B.k.taler());
+    paastand("der står intet hint, når opgaven vælges", !/Hint:/.test(besked(B)) && !B.el.knap.classList.contains("peg"));
     function skrivAktivt(t) { var e = B.regning.aktivtInput(); e.value = t; enter(e); return besked(B); }
     skrivAktivt("M/m");
-    paastand("forkert formel: beskeden står i kortet, og han tier", /vendt/.test(besked(B)) && !B.k.taler(), besked(B));
+    paastand("forkert formel: beskeden står i kortet, og den gule knap lyser op", /vendt/.test(besked(B)) && !/Hint:/.test(besked(B)) && B.el.knap.classList.contains("peg"), besked(B));
     skrivAktivt("n = m/M");
     var fe = B.regning.aktivt();
     fe.inputs[0].value = "5,21 g"; enter(fe.inputs[0]);
@@ -386,7 +390,7 @@ function koerTest(W) {
     B.knap();
     paastand("hypotese B: kort udgave, massens formel står der", B.opg.id === "B" && B.opg.kort);
     B.knap();
-    paastand("Giv hint i afstemningen: Kemichael siger hintet", B.k.taler() && /Na/.test(B.k.tekst()), B.k.tekst());
+    paastand("Giv hint i afstemningen: hintet står i kortet", /^Hint:.*Na/.test(besked(B)) && B.el.knap.textContent === "Vis svaret" && B.el.knap.classList.contains("svar"), besked(B));
     B.knap();
     paastand("Vis svaret afstemmer skemaet", B.regning.loest("afstem"));
     B.regning.loesAlt();
@@ -446,17 +450,15 @@ function koerTest(W) {
     paastand("Kør igen kører de samme to forsøg", (function () { d.getElementById("fejl-forfra").click(); var ok = C.koerer; for (var q = 0; q < 200 && C.koerer; q++) tik(C, 1); return ok && !C.koerer && C.res; }()));
 
     /* ================================================================ */
-    overskrift("11. Kemichael");
+    overskrift("11. Hjælpen");
     NK.visFane("fane-hypoteser");
     B.vaelg(0, false);
-    B.k.sendUd();
-    tik(B, 3);
-    paastand("sendt ud: knappen hedder Hent Kemichael på alle faner", [A, B, C].every(function (s) { return s.k.knap.textContent === "Hent Kemichael"; }));
     B.knap();
-    paastand("hintet står i kortet, når han er ude", /Hint:/.test(besked(B)) && !B.k.taler(), besked(B));
-    B.k.hentInd();
-    tik(B, 4);
-    paastand("hentet ind igen", B.k.inde() && B.k.knap.textContent === "Send Kemichael ud");
+    paastand("Giv hint: hintet står i kortet, lige over knappen", /^Hint:/.test(besked(B)) && B.el.besked.className.indexOf("gul") >= 0, besked(B));
+    B.knap();
+    paastand("Vis svaret: svaret og næste skridt står i kortet, og knappen er Giv hint igen", B.el.besked.className.indexOf("gul") >= 0 && !/Hint:/.test(besked(B)) &&
+        B.el.knap.textContent === "Giv hint" && !B.el.knap.classList.contains("svar"), besked(B));
+    paastand("siden nævner ikke Kemichael", !/Kemichael|kateder|lærerværelse/i.test(d.body.innerText));
 
     /* ================================================================ */
     overskrift("12. Layout");

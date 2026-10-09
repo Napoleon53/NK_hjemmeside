@@ -2,8 +2,8 @@
    data.js - saltene, ionerne, opgaverne og replikkerne
 
    Alt, en laerer kan have lyst til at rette i, staar her: atommasserne,
-   ionerne og saltene, de tre fanes opgaver med tallene og det, Kemichael
-   siger. Kemien og tallene regnes i kemi.js.
+   ionerne og saltene, de tre fanes opgaver med tallene og linjerne i
+   opgavekortet. Kemien og tallene regnes i kemi.js.
    ===================================================================== */
 (function () {
     "use strict";
@@ -135,7 +135,7 @@
              og beregningen i kortet viser, naar svaret er fundet (salt: den
              graa soejle og c(salt), lup: ionerne i luppen og skemaet, ioner:
              ionernes soejler og [ion]). note: en saetning efter rosen.
-             efter: det, Kemichael siger ved Vis svaret. */
+             efter: det, linjen i kortet siger ved Vis svaret. */
           spm: [
               { spm: "Hvad er c(Na₂SO₄)?", vis: "salt",
                 hint: "Koncentrationen er stofmængde pr. liter. Du har 0,10 mol i 0,50 L.",
@@ -290,17 +290,6 @@
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
-
-    D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Kaffen derude var ikke bedre.";
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Nogen har fortyndet den.",
-        "Den er fra i morges. Tror jeg.",
-        "Kaffen er min. Ionerne er dine.",
-        "Stadig kold. Men det er min."
-    ];
-    D.PRIK_SIDST = "Jeg sidder her bare. Regn du.";
 
     NK.Data = D;
 }());

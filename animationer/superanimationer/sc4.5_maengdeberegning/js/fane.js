@@ -1,18 +1,16 @@
 /* =====================================================================
    fane.js - det, de tre faner har til faelles
 
-   Hver fane er et skema paa en tavle, en scene omkring det og Kemichael
-   ved katederet. Denne fil laegger de faelles metoder paa fanens
-   prototype med NK.Fane.paa(P, valg):
+   Hver fane er et skema paa en tavle og en scene omkring det. Denne fil
+   laegger de faelles metoder paa fanens prototype med NK.Fane.paa(P, valg):
 
      * opgavelisten i panelet med loest og stjerne (huskes i browseren)
      * knappen i opgavekortet: Giv hint, Vis svaret, Naeste opgave
      * tjekket af felterne i skemaet og afstemningen
      * beregningerne i panelet, som de skal skrives
-     * linjen i opgavekortet: hvor man er, naeste skridt, fejl og ros
-     * Kemichael, der kun siger noget, naar eleven beder om et hint, og
-       tier igen, naar delopgaven er loest. Er han sendt ud, staar hintet
-       i opgavekortet i stedet.
+     * linjen i opgavekortet: hvor man er, naeste skridt, fejl og ros,
+       og hintet eller svaret, naar eleven beder om det med den gule knap
+       (ingen Kemichael: brugerens valg 9. okt. 2026)
 
    Fanen selv har: lavSpec(nr, nyeTal) (opgaven til NK.Skema.lavOpgave),
    layout(), tegn(), opdaterScene(dt) og kroge som efterLoest(id, maade).
@@ -35,14 +33,12 @@
             this.navn = navn;
             this.L = new NK.Laerred(el("laerred"));
             this.tid = 0;
-            this.k = new NK.RoligLaerer({ boble: navn + "-boble", knap: navn + "-kknap" });
             this.skema = new NK.Skema({
                 vaert: el("felter"), navn: navn,
                 kald: {
                     tjek: function (id) { mig.tjekCelle(id); },
                     afstem: function () { mig.tjekAfstem(); },
-                    klik: function (id) { mig.klikLaast(id); },
-                    skriver: function () { mig.k.skriver(); }
+                    klik: function (id) { mig.klikLaast(id); }
                 }
             });
             this.opgaver = valg.opgaver;
@@ -123,7 +119,6 @@
             this.visKort();
             this.visLinjer();
             this.visListe();
-            this.k.tie();
             this.naesteLinje(this.introNu ? D.INTRO[navn] : "", "");
             this.introNu = false;
             this.fokus();
@@ -148,7 +143,7 @@
         };
 
         P.visKnap = function () {
-            var tekst, klasse = "knap";
+            var tekst, klasse = "knap hjaelp";
             if (this.faerdig) {
                 klasse = "knap blaa banker";
                 var naeste = this.naesteUloeste();
@@ -157,6 +152,7 @@
                 else tekst = "Forfra med nye tal ↺";
             } else {
                 tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+                if (this.hjaelp > 0) klasse += " svar";
             }
             this.el.knap.textContent = tekst;
             this.el.knap.className = klasse;
@@ -196,10 +192,10 @@
             if (!t) return;
             if (this.hjaelp === 0) {
                 this.hjaelp = 1;
-                if (t === "valg") this.hjaelpVis("<b>Hint:</b> " + this.valgHint(), "hint");
+                if (t === "valg") this.hjaelpVis("<b>Hint:</b> " + this.valgHint());
                 else {
                     this.skema.fremhaev = t === "afstem" ? null : t;
-                    this.hjaelpVis("<b>Hint:</b> " + this.skema.hintHTML(t), "hint");
+                    this.hjaelpVis("<b>Hint:</b> " + this.skema.hintHTML(t));
                 }
                 this.visKnap();
                 this.fokus();
@@ -243,9 +239,8 @@
             this.ekstra.push({ trin: "afstem", html: "Afstemt: " + NK.html(D.skema(this.opg.r)), svar: maade === "svar" });
             this.visLinjer();
             if (this.efterAfstem) this.efterAfstem(maade);
-            /* Delopgaven er loest: Kemichael tier, eller viser det svar, han blev bedt om */
             if (maade === "svar") this.svarVis("Afstemt: " + NK.html(D.skema(this.opg.r)) + ".");
-            else { this.k.tie(); this.naesteLinje(NK.tilfaeldig(D.ROS), "god"); }
+            else this.naesteLinje(NK.tilfaeldig(D.ROS), "god");
             this.visKnap();
             this.fokus();
         };
@@ -257,7 +252,6 @@
             this.visLinjer();
             if (this.efterLoest) this.efterLoest(id, maade);
             if (maade === "svar") this.svarVis(this.skema.regnHTML(id) + ".");
-            else this.k.tie();
             if (this.skema.faerdig()) this.opgaveLoest();
             else if (maade !== "svar") this.naesteLinje(NK.tilfaeldig(D.ROS), "god");
             this.visKnap();
@@ -291,12 +285,15 @@
         };
 
         /* ----- Linjen i opgavekortet ---------------------------------------------
-           besked: den faste linje (naeste skridt, fejl, ros). kortBesked: et
-           svar paa et klik i scenen, der forsvinder igen efter sek sekunder. */
+           besked: den faste linje (naeste skridt, fejl, ros, hint og svar).
+           Efter et forkert svar lyser hintknappen stille op, til linjen
+           skifter igen. kortBesked: et svar paa et klik i scenen, der
+           forsvinder igen efter sek sekunder. */
         P.besked = function (html, klasse) {
             this.fast = { html: html || "", klasse: klasse || "" };
             this.kortT = 0;
             this.visBesked(this.fast);
+            this.el.knap.classList.toggle("peg", klasse === "skidt" && !this.faerdig && this.hjaelp === 0);
         };
 
         P.kortBesked = function (html, sek) {
@@ -326,28 +323,15 @@
             this.besked((foer ? foer + " " : "") + t, slags || "");
         };
 
-        /* ----- Kemichael: kun naar eleven beder om det ---------------------------
-           hjaelpVis: et hint. Han siger det, eller, hvis han er sendt ud, staar
-           det i opgavekortet. svarVis: svaret efter Vis svaret; det lukker,
-           naar eleven begynder at skrive igen. */
-        P.hjaelpVis = function (html, slags) {
-            if (!this.k.sig(html, slags)) this.besked(html, "gul");
-        };
+        /* ----- Hint og svar: kun naar eleven beder om det -------------------------
+           Begge staar i linjen i opgavekortet, lige over knappen. Efter svaret
+           staar naeste skridt i samme linje. */
+        P.hjaelpVis = function (html) { this.besked(html, "gul"); };
 
         P.svarVis = function (html) {
             var trin = this.skema.faerdig() ? "" : this.trinLinje();
-            if (this.k.sig(html, "svar", { lukVedSkriv: true })) this.besked(trin, "");
-            else this.besked(html + (trin ? " " + trin : ""), "gul");
+            this.besked(html + (trin ? " " + trin : ""), "gul");
         };
-
-        /* K: han siger, hvor man er, og hvad man skal (henter ham, hvis han er ude) */
-        P.startIntro = function (tving) {
-            if (!tving) return;
-            if (!this.k.inde()) { this.k.hentInd(); return; }
-            var t = this.faerdig ? "" : this.trinLinje();
-            this.k.sig(D.INTRO[navn] + (t ? " " + t : ""), "", { lukVedSkriv: true });
-        };
-        P.springIntro = function () { };
 
         /* ----- Beregningerne i panelet ----------------------------------------- */
         P.visLinjer = function () {
@@ -398,7 +382,6 @@
                 if (this.kortT <= 0) { this.kortT = 0; this.visBesked(this.fast); }
             }
             this.skema.opdater(dt);
-            this.k.opdater(dt);
             if (this.opdaterScene) this.opdaterScene(dt);
         };
 
@@ -407,13 +390,12 @@
             var mig = this, c = this.L.canvas;
             c.addEventListener("pointermove", function (e) {
                 var pt = mig.L.punkt(e);
-                var u = mig.k.hover(pt) || (mig.overScene ? mig.overScene(pt) : null);
+                var u = mig.overScene ? mig.overScene(pt) : null;
                 c.style.cursor = u ? "pointer" : "default";
             });
-            c.addEventListener("pointerleave", function () { mig.k.hover(null); if (mig.overScene) mig.overScene(null); c.style.cursor = "default"; });
+            c.addEventListener("pointerleave", function () { if (mig.overScene) mig.overScene(null); c.style.cursor = "default"; });
             c.addEventListener("click", function (e) {
                 var pt = mig.L.punkt(e);
-                if (mig.k.klik(pt)) return;
                 if (mig.klikScene && mig.klikScene(pt)) return;
                 mig.fokus();
             });

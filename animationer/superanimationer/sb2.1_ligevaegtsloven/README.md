@@ -121,7 +121,10 @@ linjen siger, at reaktionen løber begge veje på én gang.
   at reglen gøres finere.
 * [H₂]·[H₂]·[H₂] er matematisk [H₂]³, men godtages ikke: et stof skrives én
   gang med en eksponent.
-* En tom nævner og nævneren 1 er lige gode, når intet skal med.
+* En tom nævner og nævneren 1 er lige gode, når intet skal med. 1 med en
+  eksponent (1²) godtages også, og linjen siger, at 1² = 1 (en elevs
+  tilbagemelding 6. oktober 2026: 2 H₂O(l) giver 1² efter reglen om tallet
+  foran). Den gamle b2.1 gør det samme.
 
 ## Filer
 
@@ -165,7 +168,7 @@ skrives, træk og slip med rigtige pointer-hændelser (også en brik, der lander
 mellem to andre), at hver tavle på fane 2 har netop sin fejl, og at alle
 andre dele er rigtige, quizzen, sproget og layoutet fra 1100 × 700 til
 1600 × 950.
-Sidst kørt: ALT OK (80 påstande), 2. oktober 2026.
+Sidst kørt: ALT OK (83 påstande), 9. oktober 2026.
 
 ## Til menuen
 

@@ -10,8 +10,8 @@
 
    Opgaverne er forudsigelser: eleven vaelger foerst, hvad der sker, og
    proever det saa. Modellen afgoer svaret, og et forkert gaet faar en
-   forklaring, ikke en afvisning. Kemichael sidder ved katederet og
-   siger kun noget, naar eleven beder om et hint eller svaret.
+   forklaring, ikke en afvisning. Hint og svar staar i linjen i
+   opgavekortet, naar eleven beder om dem med den gule knap.
    ===================================================================== */
 (function () {
     "use strict";
@@ -33,7 +33,6 @@
     function SimStempel() {
         this.navn = "stempel";
         this.L = new NK.Laerred(NK.el("stempel-laerred"));
-        this.k = new NK.RoligLaerer({ boble: "stempel-boble", knap: "stempel-kknap" });
         this.g = new G.Stempel();
         this.part = new G.Partikler();
         this.Vvist = this.g.V;
@@ -230,7 +229,6 @@
         this.bygValg();
         this.visKort();
         this.visPrikker();
-        this.k.tie();
         this.naesteLinje();
     };
 
@@ -285,12 +283,13 @@
     };
 
     P.visKnap = function () {
-        var tekst, klasse = "knap";
+        var tekst, klasse = "knap hjaelp";
         if (this.fase === "faerdig") {
             klasse = "knap blaa banker";
             tekst = this.naesteUloeste(this.nr) >= 0 ? "Næste opgave →" : "Videre til Beregningen →";
         } else {
             tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
+            if (this.hjaelp > 0) klasse += " svar";
         }
         this.el.knap.textContent = tekst;
         this.el.knap.className = klasse;
@@ -333,7 +332,6 @@
         this.valgt = j;
         if (vist) this.brugtSvar = true;
         this.hjaelp = 0;
-        if (!vist) this.k.tie();
         if (!o.handling) {
             this.afslut(!!o.valg[j].ok, "");
             return;
@@ -423,7 +421,6 @@
             (res ? " " + res : "") + " " + (!ok && v.svar ? v.svar + " " + o.hvorfor : o.hvorfor);
         if (alle && !this.rostAlt) { this.rostAlt = true; tekst += " " + D.FAERDIG.stempel; }
         this.gem();
-        this.k.tie();
         this.bygValg();
         this.visKort();
         this.visPrikker();
@@ -442,7 +439,7 @@
         var o = this.opg();
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            this.hjaelpVis("<b>Hint:</b> " + NK.html(this.fase === "valg" ? o.hint : o.proevHint), "hint");
+            this.hjaelpVis("<b>Hint:</b> " + NK.html(this.fase === "valg" ? o.hint : o.proevHint));
             this.visKnap();
             return;
         }
@@ -454,7 +451,6 @@
             this.vaelgSvar(rigtig, true);
         } else {
             if (this.afviger(o) && !this.udfoert(o)) { this.anvendStart(o); this.base = this.g.kopi(); }
-            this.k.tie();
             this.startAuto();
         }
         this.visKnap();
@@ -501,11 +497,13 @@
         if (!this.auto) this.visKnap();
     };
 
-    /* ----- Linjen i opgavekortet og Kemichael (som i sc4.5) -------------------------------- */
+    /* ----- Linjen i opgavekortet (som i sc4.5) ----------------------------------------------
+       Efter et forkert svar lyser hintknappen stille op, til linjen skifter igen. */
     P.besked = function (html, klasse) {
         this.fast = { html: html || "", klasse: klasse || "" };
         this.kortT = 0;
         this.visBesked(this.fast);
+        this.el.knap.classList.toggle("peg", klasse === "skidt" && this.fase !== "faerdig" && this.hjaelp === 0);
     };
 
     P.kortBesked = function (html, sek) {
@@ -521,20 +519,10 @@
 
     P.beskedTekst = function () { return this.el.besked.textContent; };
 
-    P.hjaelpVis = function (html, slags) {
-        if (!this.k.sig(html, slags)) this.besked(html + " " + this.trinLinje(), "gul");
-    };
+    /* Hint og svar: i linjen i kortet, naar eleven beder om det */
+    P.hjaelpVis = function (html) { this.besked(html + " " + this.trinLinje(), "gul"); };
 
-    P.svarVis = function (html) {
-        if (!this.k.sig(html, "svar")) this.besked("<b>Svar:</b> " + html, "gul");
-    };
-
-    P.startIntro = function (tving) {
-        if (!tving) return;
-        if (!this.k.inde()) { this.k.hentInd(); return; }
-        var t = this.fase === "faerdig" ? "" : this.trinLinje();
-        this.k.sig(NK.html(D.INTRO.stempel + (t ? " " + t : "")), "");
-    };
+    P.svarVis = function (html) { this.besked("<b>Svar:</b> " + html, "gul"); };
 
     P.fokus = function () { };
     P.enter = function () { if (this.fase === "faerdig") this.knap(); };
@@ -550,10 +538,10 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var gammel = this.lay;
-        var baand = this.k.layout(W, H);
-        var lay = { W: W, H: H, baandY: baand.y };
+        var lay = { W: W, H: H };
         var top = 12;
-        lay.bordY = Math.round(baand.y - NK.klamp((baand.y - top) * 0.05, 12, 34));
+        /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
+        lay.bordY = Math.round(H - NK.klamp((H - top) * 0.05, 12, 34));
         var arbH = lay.bordY - top;
         var cylB = Math.round(NK.klamp(Math.min(W * 0.2, arbH * 0.42), 104, 230));
         var cx = Math.round(W * 0.46);
@@ -608,7 +596,6 @@
         this.saetAnker("hylde", lay.hylde.x, lay.hylde.y - S.LOD_MAKS * lodH - 6, lay.hylde.b, S.LOD_MAKS * lodH + 30);
         if (lay.graf) this.saetAnker("graf", lay.graf.x, lay.graf.y, lay.graf.b, lay.graf.h);
         else this.saetAnker("graf", 0, 0, 0, 0);
-        this.saetAnker("laerer", 0, baand.y, Math.min(W, 360), baand.h);
     };
 
     P.saetAnker = function (id, x, y, b, h) {
@@ -723,7 +710,6 @@
         var mig = this, c = this.L.canvas;
         c.addEventListener("pointerdown", function (e) {
             var pt = mig.L.punkt(e);
-            if (mig.k.under(pt)) return;
             var u = mig.under(pt);
             if (u === "hylde" || u === "stempelLod") {
                 mig.traek = { fra: u === "hylde" ? "hylde" : "stempel", start: pt, x: pt.x, y: pt.y, flyttet: false, id: e.pointerId };
@@ -741,14 +727,12 @@
                 c.style.cursor = "grabbing";
                 return;
             }
-            var lu = mig.k.hover(pt);
-            mig.over = lu ? null : mig.under(pt);
-            c.style.cursor = lu || (mig.over && mig.over !== "gas") ? "pointer" : "default";
+            mig.over = mig.under(pt);
+            c.style.cursor = mig.over && mig.over !== "gas" ? "pointer" : "default";
             if (mig.over === "hylde" || mig.over === "stempelLod") c.style.cursor = "grab";
         });
         c.addEventListener("pointerleave", function () {
             if (mig.traek) return;
-            mig.k.hover(null);
             mig.over = null;
             mig.mus = null;
             c.style.cursor = "default";
@@ -778,7 +762,6 @@
         c.addEventListener("click", function (e) {
             var pt = mig.L.punkt(e);
             if (mig.ignorerKlik) { mig.ignorerKlik = false; return; }   /* klaret af pointerup */
-            if (mig.k.klik(pt)) return;
             var u = mig.under(pt);
             if (u) mig.klikScene(u);
         });
@@ -802,7 +785,6 @@
             this.ventAeg -= dt;
             if (this.ventAeg <= 0) this.kortBesked(D.SCENE.aeg224, 6);
         }
-        this.k.opdater(dt);
         this.koerAuto(dt);
         this.Vvist = NK.mod(this.Vvist, this.g.V, 3.2, dt);
         this.ventil = Math.max(0, this.ventil - dt);
@@ -833,7 +815,7 @@
         if (!lay) return;
         var c = this.L.ctx, g = this.g;
         this.L.ryd("#16171d");
-        Tg.baggrund(c, lay.W, lay.H, lay.bordY, lay.baandY);
+        Tg.baggrund(c, lay.W, lay.H, lay.bordY);
         var cyl = lay.cyl, ind = Tg.indre(cyl);
         var fs = Tg.flaskeStr(lay.flaske);
         var dyse = { x: lay.flaske.x + lay.flaske.b - (fs.dyse.x - lay.flaske.x), y: fs.dyse.y };
@@ -892,9 +874,8 @@
         /* Et lille vink ved det, musen er over */
         if (this.over && !this.traek && this.mus) {
             var v = this.vink(this.over);
-            if (v) Tg.skilt(c, NK.klamp(this.mus.x + 14, 8, lay.W - 190), NK.klamp(this.mus.y - 22, 14, lay.baandY - 14), v, "moerk");
+            if (v) Tg.skilt(c, NK.klamp(this.mus.x + 14, 8, lay.W - 190), NK.klamp(this.mus.y - 22, 14, lay.H - 14), v, "moerk");
         }
-        this.k.tegn(c);
     };
 
     /* Etiketten paa den spejlvendte flaske skal kunne laeses */

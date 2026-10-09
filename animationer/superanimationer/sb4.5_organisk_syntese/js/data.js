@@ -4,7 +4,7 @@
    Kemien er regler i js/kemi.js, ikke en liste af opskrifter: enhver
    carboxylsyre og enhver alkohol giver en ester, og en alkohol kan
    oxideres. Her staar kun det, reglerne ikke kan regne ud: hvad der
-   staar paa hylden, hvad det koster, hvordan det lugter, og hvad
+   butikken foerer, hvad det koster, hvordan det lugter, og hvad
    kunderne vil have.
 
    Navnene er de navne, molekylemotoren (../../molekylemotor/) giver.
@@ -16,8 +16,8 @@
     var NK = window.NK;
 
     /* ----- Stofferne ------------------------------------------------------
-       hylde: true  staar paa hylden fra start (raavarer)
-       pris         kr. pr. portion i Fabrikken
+       hylde: true  kan koebes i butikken (raavarer)
+       pris         kr. pr. portion
        formel       som paa flasken (den gamle animations skrivemaade)
        De andre stoffer kan kun laves: syrerne ved oxidation af en primaer
        alkohol og propanon af propan-2-ol. Estrene laves af reglerne og
@@ -48,8 +48,7 @@
     ];
 
     /* ----- Dufte og vaerdi ---------------------------------------------------
-       Noeglen er motorens navn. vaerdi er den pris, en kunde betaler i
-       Fabrikken (de gamle tal, hvor de fandtes). Duftene er de kendte fra
+       Noeglen er motorens navn. vaerdi er den pris, en kunde betaler (de gamle tal, hvor de fandtes). Duftene er de kendte fra
        lærebøgerne; en ester uden duft her "dufter af frugt". */
     var DUFTE = {
         "methylethanoat":          { duft: "lim", ikon: "🧴", vaerdi: 120 },
@@ -103,39 +102,39 @@
         "methylethanoat": "til hurtigtørrende lim"
     };
 
-    /* ----- Fane 1: ti ordrer ------------------------------------------------- */
-    var ORDRER = [
-        { id: "o1",  gruppe: "let",    kunde: "neglesalon", maal: "ethylethanoat",           kort: "Neglelak" },
-        { id: "o2",  gruppe: "let",    kunde: "slik",       maal: "propylethanoat",          kort: "Pære" },
-        { id: "o3",  gruppe: "let",    kunde: "slik",       maal: "pentylethanoat",          kort: "Banan" },
-        { id: "o4",  gruppe: "let",    kunde: "bager",      maal: "ethylmethanoat",          kort: "Rom" },
-        { id: "o5",  gruppe: "middel", kunde: "juice",      maal: "ethylbutanoat",           kort: "Ananas" },
-        { id: "o6",  gruppe: "middel", kunde: "neglesalon", maal: "propanon",                kort: "Acetone" },
-        { id: "o7",  gruppe: "middel", kunde: "slik",       maal: "pentylbutanoat",          kort: "Abrikos" },
-        { id: "o8",  gruppe: "svaer",  kunde: "parfume",    maal: "pentylpentanoat",         kort: "Æble" },
-        { id: "o9",  gruppe: "svaer",  kunde: "fysio",      maal: "methyl-2-hydroxybenzoat", kort: "Vintergrøn" },
-        { id: "o10", gruppe: "svaer",  kunde: "apotek",     maal: "2-(acetyloxy)benzoesyre", kort: "Aspirin" }
-    ];
+    /* ----- Fabrikken ------------------------------------------------------------
+       De ti foerste ordrer kommer i fast raekkefoelge fra let til svaer
+       (de tre foerste kan laves af det, butikken foerer; fra den femte skal
+       syren eller ketonen laves ved oxidation). Derefter kommer der
+       tilfaeldige ordrer fra listen.
 
-    var GRUPPER = [
-        { id: "let", titel: "Let: alt står på hylden" },
-        { id: "middel", titel: "Middel: lav et stof først" },
-        { id: "svaer", titel: "Svær" }
-    ];
-
-    /* ----- Fane 2: Fabrikken ---------------------------------------------------
-       De fem foerste ordrer er den gamle animations missioner i samme
-       raekkefoelge. Derefter kommer der tilfaeldige ordrer fra listen. */
+       titler      efter hvor meget fabrikken har tjent i alt (ikke kassen,
+                   saa udstyr kan koebes uden at miste titlen)
+       udstyr      koebes i butikken; titel er den titel, der skal til
+       serie       leveringer i traek uden en blanding, der maa haeldes ud:
+                   seriePct procent oveni pr. levering, hoejst serieMax trin
+       nyBonus     foerste gang et stof paa esterkortet bliver lavet */
     var FABRIK = {
         start: 300,
-        maal: 3000,
         laan: 200,
         boersSek: 30,
+        tilbudSek: 60,
+        tilbudPct: 30,
+        rabatPct: 20,
+        esterPct: 25,
+        seriePct: 10,
+        serieMax: 5,
+        nyBonus: 50,
         faste: [
             { kunde: "neglesalon", maal: "ethylethanoat" },
             { kunde: "slik", maal: "propylethanoat" },
             { kunde: "slik", maal: "pentylethanoat" },
+            { kunde: "bager", maal: "ethylmethanoat" },
             { kunde: "juice", maal: "ethylbutanoat" },
+            { kunde: "neglesalon", maal: "propanon" },
+            { kunde: "slik", maal: "pentylbutanoat" },
+            { kunde: "parfume", maal: "pentylpentanoat" },
+            { kunde: "fysio", maal: "methyl-2-hydroxybenzoat" },
             { kunde: "apotek", maal: "2-(acetyloxy)benzoesyre" }
         ],
         tilfaeldige: [
@@ -153,14 +152,31 @@
             { kunde: "apotek", maal: "2-(acetyloxy)benzoesyre" },
             { kunde: "lim", maal: "methylethanoat" }
         ],
-        /* Grossisten foerer ikke butansyre (brugt i to af ordrerne) */
-        udsolgt: [{ id: "butansyre", grund: "Grossisten fører ikke butansyre. Den lugter af opkast. Lav den selv." }],
+        /* Butikken foerer ikke butansyre (brugt i to af ordrerne) */
+        udsolgt: [{ id: "butansyre", grund: "Butansyre fører jeg ikke. Den lugter af opkast. Lav den selv." }],
         titler: [
             { fra: 0, titel: "Lærling" },
             { fra: 1000, titel: "Laborant" },
-            { fra: 2000, titel: "Kemiker" },
-            { fra: 3000, titel: "Fabrikschef" }
+            { fra: 2500, titel: "Kemiker" },
+            { fra: 5000, titel: "Fabrikschef" }
+        ],
+        udstyr: [
+            { id: "kundekort", navn: "Kundekort", ikon: "💳", pris: 250, titel: 0,
+              tekst: "20 % rabat på alle kemikalier." },
+            { id: "skilt", navn: "Reklameskilt", ikon: "📣", pris: 400, titel: 1,
+              tekst: "Fire kunder ad gangen i stedet for tre." },
+            { id: "vandudskiller", navn: "Vandudskiller", ikon: "💧", pris: 600, titel: 2,
+              tekst: "Fjerner vandet, så ligevægten forskydes mod esteren. Estere giver 25 % mere." }
         ]
+    };
+
+    /* ----- Esterkortet ------------------------------------------------------------
+       Alle estere af de syv alkoholer og de syv syrer (7 x 7) og tre
+       saerlige stoffer. Navnene regnes ud af reglerne i js/kemi.js. */
+    var ESTERKORT = {
+        alkoholer: ["methanol", "ethanol", "propan1ol", "propan2ol", "butan1ol", "pentan1ol", "octan1ol"],
+        syrer: ["methansyre", "ethansyre", "propansyre", "butansyre", "pentansyre", "octansyre", "salicylsyre"],
+        saerlige: ["2-(acetyloxy)benzoesyre", "propanon", "diethylether"]
     };
 
     /* Kolbens farve: alt er farveloest bortset fra permanganaten */
@@ -170,20 +186,13 @@
         klar: "rgba(200, 225, 245, 0.30)"
     };
 
-    var FAERDIG = {
-        rk: "Alle ti ordrer er leveret. I Fabrikken køber du selv stofferne.",
-        fb: ""
-    };
-
     NK.Data = {
         STOFFER: STOFFER,
         DUFTE: DUFTE,
         KUNDER: KUNDER,
         BRUG: BRUG,
-        ORDRER: ORDRER,
-        GRUPPER: GRUPPER,
         FABRIK: FABRIK,
-        FARVER: FARVER,
-        FAERDIG: FAERDIG
+        ESTERKORT: ESTERKORT,
+        FARVER: FARVER
     };
 }());

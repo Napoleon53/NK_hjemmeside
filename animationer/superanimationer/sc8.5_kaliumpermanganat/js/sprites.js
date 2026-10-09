@@ -5,13 +5,9 @@
    siden aabnes direkte fra harddisken (file://). Er en fil ikke klar
    endnu, springes den bare over i det billede.
 
-   ../../v2/kemichael/kemichael.js tilfoejer laererens sprites (og
-   kaffekoppen) med deres egen mappe, derfor startes indlaesningen foerst
-   fra app.js.
-
    MAAL er de koordinater, der staar i kommentaren oeverst i hver
    SVG-fil. Aendres en fil, skal tallene her foelge med. Her er kun
-   katederet, urglasset og draabeflasken; vaesken, draaberne, luppen og
+   urglasset og draabeflasken; vaesken, draaberne, luppen og
    partiklerne tegnes i kode (js/tegning.js).
    ===================================================================== */
 (function () {
@@ -23,8 +19,6 @@
     var MAPPE = "sprites/";
 
     var MAAL = {
-        /* Kemichaels kateder (som sc4.5 og sc5.1) */
-        kateder: { b: 300, h: 130, flade: 22, pladeTop: 18, front: 32, laerer: 80, kop: 150 },
         /* Urglasset: kanten (110, 22), vaeskens overflade (110, 30) rx 84 ry 13, bunden y 72 */
         urglas: { b: 220, h: 84, cx: 110, kant: 22, vy: 30, vrx: 84, vry: 13, bund: 72 },
         /* Draabeflasken: tudens spids (32, 1), etiketten x 8-56, y 66-104 */

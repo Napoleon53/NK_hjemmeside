@@ -139,8 +139,7 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.06, 14, 40));
         var zr = Math.round(NK.klamp(Math.min(Hs * 0.13, W * 0.09), 44, 92));
@@ -157,7 +156,6 @@
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("soejler", lay.soejler.x, lay.soejler.y, lay.soejler.b, lay.soejler.h);
         this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 26, 2 * zr, 2 * zr + 60);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* ----- Opdater og tegn -------------------------------------------------------------- */
@@ -195,7 +193,6 @@
         var z = lay.zoom, alle = this.regning.faerdig();
         Tg.zoom(ctx, z.x, z.y, z.r, { part: this.part, st: st, farve: Tg.vaeske(st, f.c), titel: "Luppen",
             tekst: alle ? "" : "?", forklar: alle });
-        this.k.tegn(ctx);
     };
 
     NK.SimIoner = SimIoner;

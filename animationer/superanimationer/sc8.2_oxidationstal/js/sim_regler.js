@@ -298,7 +298,6 @@
             });
             inp.addEventListener("input", function () {
                 mig.feltBoks.classList.remove("fejl");
-                mig.k.skriver();
                 mig.visOver();
                 mig.visRegn();
             });
@@ -423,14 +422,14 @@
         if (k && this.felter[k] && document.activeElement !== this.felter[k]) this.felter[k].focus();
     };
 
-    /* ----- Scenen: vaeggen, og tavlen placeret over Kemichaels baand ---------------- */
+    /* ----- Scenen: vaeggen og tavlen. Under tavlen er der en smal stribe til
+       knappen Start forfra. ---------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var lay = { W: W, H: H, baand: baand };
+        var lay = { W: W, H: H };
         var kant = NK.klamp(W * 0.03, 12, 34), top = NK.klamp(H * 0.035, 10, 26);
         var b = Math.min(W - 2 * kant, 1000);
-        var h = Math.max(160, baand.y - top - NK.klamp(H * 0.03, 10, 22));
+        var h = Math.max(160, H - top - NK.klamp(H * 0.06, 40, 48));
         lay.tavle = { x: Math.round((W - b) / 2), y: top, b: Math.round(b), h: Math.round(h) };
         var t = this.tavle, stak = this.stak;
         t.style.left = lay.tavle.x + "px";
@@ -458,14 +457,12 @@
         /* Det, der er tilovers, deles over og under (linjen mere er stadig sat af) */
         stak.style.marginTop = Math.max(0, Math.round((indre - 24 - stak.offsetHeight) * 0.4)) + "px";
         this.lay = lay;
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     P.tegn = function () {
         var ctx = this.L.ctx, lay = this.lay;
         if (!lay) return;
-        NK.Tegn.vaeg(ctx, lay.W, lay.baand.y);
-        this.k.tegn(ctx);
+        NK.Tegn.vaeg(ctx, lay.W, lay.H);
     };
 
     P.klikScene = function () {};

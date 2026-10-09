@@ -2,10 +2,8 @@
    app.js - binder de to faner sammen (som sc8.2)
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Kemichael praesenterer ikke med knapper her:
-   han sidder ved katederet, og linjen i opgavekortet siger, hvor man er,
-   og hvad man goer (brugerens valg 25. sept. 2026, som sc4.5 og sc5.1).
-   K faar ham til at sige det.
+   fane opdateres og tegnes. Ingen praesentation: linjen i opgavekortet
+   siger, hvor man er, og hvad man goer.
    ===================================================================== */
 (function () {
     "use strict";
@@ -83,7 +81,6 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "k" || e.key === "K") { if (sim) sim.startIntro(true); return; }
         if (e.key === "1" || e.key === "2") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
@@ -123,7 +120,7 @@
         NK.el("hjaelpknap").addEventListener("click", function () { lukAlle(); NK.Rundvisning.start(aktivFane); });
         NK.el("teoriknap").addEventListener("click", aabnTeori);
 
-        /* Laes mere i Kemichaels boble eller i opgavekortet: hans forklaring i fuld skaerm */
+        /* Laes mere i opgavekortet: den grundige forklaring i fuld skaerm */
         document.addEventListener("click", function (e) {
             var k = e.target && e.target.closest ? e.target.closest(".laes-mere") : null;
             if (!k) return;

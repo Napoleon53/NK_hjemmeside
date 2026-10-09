@@ -11,10 +11,9 @@
        panelet (brugerens test 3. okt. 2026: "Der skal ikke være en
        ordre-tekst oppe i højre hjørne", og hint-knappen skal staa lige
        ved siden af feltet).
-     * Kemichael ved katederet. Hintet fra knappen staar i arbejdsfeltet
-       (han siger det kun selv, hvis D.KEMICHAEL_SIGER_HINT er sat). Et
-       klik paa ham selv faar ham til at sige hintet, og er opgaven loest,
-       en kort ros (laererKlik).
+     * hint og svar fra den gule knap staar i arbejdsfeltet. Giv hint er
+       fyldt gul, Vis svaret kun et omrids. Ingen Kemichael (brugerens
+       valg 9. okt. 2026).
      * musen i scenen: hold, traek og klik
 
    Fanen selv har: lavOpgave(nr), visSpm(), trinInfo()
@@ -43,7 +42,6 @@
             this.navn = navn;
             this.L = new NK.Laerred(el("laerred"));
             this.tid = 0;
-            this.k = new NK.RoligLaerer({ boble: navn + "-boble", knap: navn + "-kknap", vedKlik: function () { mig.laererKlik(); } });
             this.opgaver = opgaver;
             this.grupper = grupper;
             var gemt = NK.hent(NOEGLE, {}) || {};
@@ -141,7 +139,6 @@
             this.visKort();
             this.layout();
             this.visListe();
-            this.k.tie();
             this.fokus();
         };
 
@@ -167,6 +164,7 @@
             } else {
                 var info = this.trinInfo();
                 tekst = (info && info.svarNavn) || "Vis svaret";
+                klasse += " svar";
             }
             this.el.knap.textContent = tekst;
             this.el.knap.className = klasse;
@@ -214,7 +212,6 @@
         P.trinLoest = function (maade, svarHTML, rosHTML) {
             this.hjaelp = 0;
             this.pegHint = false;
-            this.k.tie();
             if (maade === "svar") this.brugtSvar = true;
             if (this.opgaveFaerdig()) this.opgaveLoest(maade, svarHTML);
             else if (maade === "svar" && svarHTML) this.svarVis(svarHTML);
@@ -227,7 +224,6 @@
         P.nytTrin = function (linje, slags) {
             this.hjaelp = 0;
             this.pegHint = false;
-            this.k.tie();
             this.besked(linje || "", slags || "");
             this.visKort();
             this.fokus();
@@ -240,7 +236,7 @@
             s.stjerne = s.stjerne || (this.stjerneNu ? this.stjerneNu() : !this.brugtSvar);
             var alle = this.antalLoest() === this.opgaver.length;
             var dele = [];
-            if (maade === "svar" && svarHTML && !(D.KEMICHAEL_SIGER_HINT && this.k.sig(svarHTML, "svar", { lukVedSkriv: true }))) dele.push(svarHTML);
+            if (maade === "svar" && svarHTML) dele.push(svarHTML);
             var linje = this.slutLinje ? this.slutLinje(maade) : "";
             if (linje) dele.push(linje);
             /* Maerket siger Loest; en ros kommer kun, naar der ikke staar andet */
@@ -293,47 +289,9 @@
         };
 
         /* ----- Hint og svar: staar i arbejdsfeltet, ved feltet --------------------- */
-        P.hjaelpVis = function (html, slags) {
-            if (D.KEMICHAEL_SIGER_HINT && this.k.sig("<b>Hint:</b> " + html, slags)) { this.besked("", ""); return; }
-            this.besked(html, "hint");
-        };
+        P.hjaelpVis = function (html) { this.besked(html, "hint"); };
 
-        P.svarVis = function (html) {
-            if (D.KEMICHAEL_SIGER_HINT && this.k.sig(html, "svar", { lukVedSkriv: true })) { this.besked("", ""); return; }
-            this.besked(html, "svar");
-        };
-
-        /* Et klik paa Kemichael: han siger hintet til det trin, eleven er
-           ved, og det taeller som Giv hint (knappen hedder saa Vis svaret).
-           Er opgaven loest, roser han kort. Han bliver ikke sur af flere
-           klik: han siger hintet igen (brugerens test 5. okt. 2026). */
-        P.laererKlik = function () {
-            if (this.faerdig) {
-                var ros = D.ROS_KEMICHAEL;
-                this.rosNr = ((this.rosNr === undefined ? Math.floor(Math.random() * ros.length) : this.rosNr) + 1) % ros.length;
-                this.k.svar(NK.html(ros[this.rosNr]), "god", 3.5);
-                return;
-            }
-            var info = this.auto ? null : this.trinInfo();
-            if (!info) return;
-            if (this.hjaelp === 0) {
-                this.hjaelp = 1;
-                if (this.efterHint) this.efterHint();
-            }
-            this.pegHint = false;
-            this.k.sig("<b>Hint:</b> " + info.hint, "hint");
-            this.visKnap();
-            this.fokus();
-        };
-
-        /* K: Kemichael siger, hvor man er, og hvad man skal (henter ham, hvis
-           han er ude) */
-        P.startIntro = function (tving) {
-            if (!tving) return;
-            if (!this.k.inde()) { this.k.hentInd(); return; }
-            var t = this.faerdig ? "" : this.trinLinje();
-            this.k.sig(NK.html(D.INTRO[navn] + (t ? " " + t : "")), "", { lukVedSkriv: true });
-        };
+        P.svarVis = function (html) { this.besked(html, "svar"); };
 
         /* ----- Fokus og taster ---------------------------------------------------- */
         P.fokus = function () {
@@ -368,13 +326,11 @@
                 this.kortT -= dt;
                 if (this.kortT <= 0) { this.kortT = 0; this.visBesked(this.fast); }
             }
-            this.k.opdater(dt);
             if (this.opdaterScene) this.opdaterScene(dt);
         };
 
         /* ----- Musen ------------------------------------------------------------
-           Et tryk i scenen gaar foerst til Kemichael, saa til fanen (nedScene).
-           Holder fanen tag i noget (et elektronpar), faar den ogsaa
+           Et tryk i scenen gaar til fanen (nedScene). Holder fanen tag i noget (et elektronpar), faar den ogsaa
            flytningerne og slippet, ogsaa uden for laerredet. */
         P.koblMus = function () {
             var mig = this, c = this.L.canvas;
@@ -382,17 +338,16 @@
             c.addEventListener("pointermove", function (e) {
                 var pt = mig.L.punkt(e);
                 if (mig.greb && mig.flytScene) { mig.flytScene(pt); return; }
-                var u = mig.k.hover(pt) || (mig.overScene ? mig.overScene(pt) : null);
+                var u = mig.overScene ? mig.overScene(pt) : null;
                 c.style.cursor = u === "greb" ? "grab" : (u ? "pointer" : "default");
             });
             c.addEventListener("pointerleave", function () {
-                if (!mig.greb) { mig.k.hover(null); if (mig.overScene) mig.overScene(null); c.style.cursor = "default"; }
+                if (!mig.greb) { if (mig.overScene) mig.overScene(null); c.style.cursor = "default"; }
             });
             c.addEventListener("pointerdown", function (e) {
                 if (e.button !== undefined && e.button !== 0) return;
                 mig.slapNetop = false;
                 var pt = mig.L.punkt(e);
-                if (mig.k.under(pt)) return;
                 if (mig.nedScene && mig.nedScene(pt)) {
                     mig.greb = true;
                     c.style.cursor = "grabbing";
@@ -412,7 +367,6 @@
             c.addEventListener("click", function (e) {
                 var pt = mig.L.punkt(e);
                 if (mig.slapNetop) { mig.slapNetop = false; return; }
-                if (mig.k.klik(pt)) return;
                 if (mig.klikScene) mig.klikScene(pt);
                 mig.fokus();
             });

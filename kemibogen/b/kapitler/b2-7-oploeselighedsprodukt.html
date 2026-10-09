@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>B2.7 Opløselighedsprodukt – Kemibogen B</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../opgaver/b2-7-opgaver.html" rel="next">
+<link href="../opgaver/b2-6-opgaver.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c5b521a4b695ac0295f8557d600138dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b2-1-kemisk-ligevaegt.html">Kapitel B2: Kemisk ligevægt</a></li><li class="breadcrumb-item"><a href="../kapitler/b2-7-oploeselighedsprodukt.html">B2.7 Opløselighedsprodukt</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen B</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B1: Reaktionshastighed</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-1-reaktionshastighed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.1 Reaktionshastighed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-2-koncentration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.2 Koncentration og sammenstød</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-3-aktiveringsenergi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.3 Aktiveringsenergi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-4-temperatur.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.4 Temperatur</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-5-katalysatorer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.5 Katalysatorer og enzymer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.5</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel B2: Kemisk ligevægt</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-1-kemisk-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.1 Kemisk ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-2-ligevaegtsloven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.2 Ligevægtsloven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-3-ligevaegtsberegninger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.3 Beregninger med ligevægtskonstanten</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-4-ikke-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.4 Når blandingen ikke er i ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-5-indgreb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.5 Indgreb i en ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-6-temperatur-og-rumfang.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.6 Temperatur og rumfang</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-7-oploeselighedsprodukt.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">B2.7 Opløselighedsprodukt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B9: Spektroskopi</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-1-lys-og-farver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B9.1 Lys og farver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-2-absorptionsspektre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B9.2 Absorptionsspektre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-3-lambert-beers-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B9.3 Lambert-Beers lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-4-standardkurven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B9.4 Standardkurven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#fra-to-klare-opløsninger-til-et-gult-bundfald" id="toc-fra-to-klare-opløsninger-til-et-gult-bundfald" class="nav-link active" data-scroll-target="#fra-to-klare-opløsninger-til-et-gult-bundfald">Fra to klare opløsninger til et gult bundfald</a></li>
+  <li><a href="#en-mættet-opløsning" id="toc-en-mættet-opløsning" class="nav-link" data-scroll-target="#en-mættet-opløsning">En mættet opløsning</a></li>
+  <li><a href="#opløselighedsproduktet" id="toc-opløselighedsproduktet" class="nav-link" data-scroll-target="#opløselighedsproduktet">Opløselighedsproduktet</a></li>
+  <li><a href="#fra-opløselighedsprodukt-til-opløselighed" id="toc-fra-opløselighedsprodukt-til-opløselighed" class="nav-link" data-scroll-target="#fra-opløselighedsprodukt-til-opløselighed">Fra opløselighedsprodukt til opløselighed</a></li>
+  <li><a href="#når-saltet-giver-to-ens-ioner" id="toc-når-saltet-giver-to-ens-ioner" class="nav-link" data-scroll-target="#når-saltet-giver-to-ens-ioner">Når saltet giver to ens ioner</a></li>
+  <li><a href="#kommer-der-bundfald" id="toc-kommer-der-bundfald" class="nav-link" data-scroll-target="#kommer-der-bundfald">Kommer der bundfald?</a></li>
+  <li><a href="#temperaturen-og-de-gyldne-krystaller" id="toc-temperaturen-og-de-gyldne-krystaller" class="nav-link" data-scroll-target="#temperaturen-og-de-gyldne-krystaller">Temperaturen og de gyldne krystaller</a></li>
+  <li><a href="#indgreb-i-en-opløselighedsligevægt" id="toc-indgreb-i-en-opløselighedsligevægt" class="nav-link" data-scroll-target="#indgreb-i-en-opløselighedsligevægt">Indgreb i en opløselighedsligevægt</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b2-1-kemisk-ligevaegt.html">Kapitel B2: Kemisk ligevægt</a></li><li class="breadcrumb-item"><a href="../kapitler/b2-7-oploeselighedsprodukt.html">B2.7 Opløselighedsprodukt</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-b-oploeselighedsprodukt" class="quarto-section-identifier">B2.7 Opløselighedsprodukt</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Det skal du kunne">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Det skal du kunne
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>forklare, hvad en mættet opløsning og et salts opløselighed er</li>
+<li>opskrive opløselighedsproduktet for et salt</li>
+<li>beregne et salts opløselighed ud fra opløselighedsproduktet</li>
+<li>afgøre med <em>Y</em> og <em>K</em><sub>o</sub>, om der dannes bundfald, når to opløsninger blandes</li>
+</ul>
+</div>
+</div>
+<p>Hælder man en opløsning af bly(II)nitrat sammen med en opløsning af kaliumiodid, bliver den klare væske med det samme gul og uklar. Der er dannet et fast stof, selv om begge opløsninger var klare. Med ligevægtsloven kan man forudsige, hvornår det sker, og hvor meget salt der kan være opløst i vandet.</p>
+<section id="fra-to-klare-opløsninger-til-et-gult-bundfald" class="level2">
+<h2 class="anchored" data-anchor-id="fra-to-klare-opløsninger-til-et-gult-bundfald">Fra to klare opløsninger til et gult bundfald</h2>
+<p>Bly(II)nitrat, Pb(NO<sub>3</sub>)<sub>2</sub>, og kaliumiodid, KI, er begge letopløselige salte. I vand er de delt helt i ioner. Når de to opløsninger blandes, mødes bly(II)ioner og iodidioner. De danner saltet bly(II)iodid, PbI<sub>2</sub>, som er <strong>tungtopløseligt</strong>. Det samler sig som et fast stof i væsken og kaldes et <strong>bundfald</strong>. Reaktionen kaldes en <strong>fældningsreaktion</strong>. Fældningsreaktioner og fældningstabellen er forklaret i <a href="../../c/kapitler/2-4-faeldningsreaktioner.html">afsnit 2.4 i bogen til C-niveau</a>.</p>
+<div id="fig-blyiodid-faeldning" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-blyiodid-faeldning-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/blyiodid-faeldning.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Øverst det, man ser, når de to opløsninger blandes. Nederst det, der sker med ionerne."><img src="../figurer/blyiodid-faeldning.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-blyiodid-faeldning-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Øverst det, man ser, når de to opløsninger blandes. Nederst det, der sker med ionerne.
+</figcaption>
+</figure>
+</div>
+<div class="reaktion">
+<p>Pb<sup>2+</sup>(aq) + 2 I<sup>−</sup>(aq) → PbI<sub>2</sub>(s)</p>
+</div>
+<p>Kaliumionerne og nitrationerne reagerer ikke. De bliver i opløsningen og kaldes tilskuerioner. Derfor er de ikke med i reaktionsskemaet. Sådan et reaktionsskema kaldes et ionskema, og i afsnit 2.4 kan du se trin for trin, hvordan det skrives op.</p>
+</section>
+<section id="en-mættet-opløsning" class="level2">
+<h2 class="anchored" data-anchor-id="en-mættet-opløsning">En mættet opløsning</h2>
+<p>Tungtopløseligt betyder ikke uopløseligt. I bundfaldet sidder bly(II)ionerne og iodidionerne i et iongitter, som du kender fra bogen til C-niveau, afsnit 2.3. Ioner i gitterets overflade slipper hele tiden fri og går i opløsning. Samtidig sætter ioner fra opløsningen sig tilbage på gitteret. Reaktionen går altså begge veje, og efter kort tid er der en dynamisk ligevægt mellem det faste salt og ionerne i opløsningen:</p>
+<div class="reaktion">
+<p>PbI<sub>2</sub>(s) ⇌ Pb<sup>2+</sup>(aq) + 2 I<sup>−</sup>(aq)</p>
+</div>
+<p>Det er fældningsreaktionen skrevet den anden vej. Ligevægten kaldes en <strong>opløselighedsligevægt</strong>.</p>
+<div id="fig-maettet-oploesning" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-maettet-oploesning-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/maettet-oploesning.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: I en mættet opløsning forlader ioner iongitteret lige så hurtigt, som andre ioner sætter sig på det."><img src="../figurer/maettet-oploesning.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-maettet-oploesning-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: I en mættet opløsning forlader ioner iongitteret lige så hurtigt, som andre ioner sætter sig på det.
+</figcaption>
+</figure>
+</div>
+<p>En opløsning, der er i ligevægt med det faste salt, kaldes <strong>mættet</strong>. Den indeholder så meget opløst salt, som vandet kan rumme ved den temperatur. Saltets <strong>opløselighed</strong> er den mængde salt, der er opløst i en mættet opløsning. Den angives i mol pr. liter eller i gram pr. 100 mL.</p>
+</section>
+<section id="opløselighedsproduktet" class="level2">
+<h2 class="anchored" data-anchor-id="opløselighedsproduktet">Opløselighedsproduktet</h2>
+<p>Reaktionsbrøken for opløselighedsligevægten skrives op efter reglerne fra <a href="../kapitler/b2-2-ligevaegtsloven.html">afsnit B2.2</a>. Det faste salt er ikke med, så der står ikke noget under brøkstregen:</p>
+<p><span class="math display">\[
+Y = [\mathrm{Pb^{2+}}] \cdot [\mathrm{I^-}]^{2}
+\]</span></p>
+<p>I en mættet opløsning er der ligevægt, og reaktionsbrøken er lig med ligevægtskonstanten. For en opløselighedsligevægt kaldes ligevægtskonstanten <strong>opløselighedsproduktet</strong>, og den har symbolet <em>K</em><sub>o</sub>. Navnet kommer af, at udtrykket er et produkt af koncentrationer.</p>
+<p><span class="math display">\[
+K_\mathrm{o} = [\mathrm{Pb^{2+}}] \cdot [\mathrm{I^-}]^{2}
+\]</span></p>
+<p>For bly(II)iodid er <em>K</em><sub>o</sub> = 1,79&nbsp;·&nbsp;10<sup>−8</sup> M<sup>3</sup> ved 20 °C. Enheden er M<sup>3</sup>, fordi der ganges tre koncentrationer med hinanden.</p>
+<p>Tabellen viser opløselighedsproduktet for nogle tungtopløselige salte ved stuetemperatur.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 46%">
+<col style="width: 28%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Opløselighedsligevægt</th>
+<th style="text-align: left;">Opløselighedsprodukt</th>
+<th style="text-align: left;"><em>K</em><sub>o</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">AgCl(s) ⇌ Ag<sup>+</sup>(aq) + Cl<sup>−</sup>(aq)</td>
+<td style="text-align: left;">[Ag<sup>+</sup>] · [Cl<sup>−</sup>]</td>
+<td style="text-align: left;">1,8&nbsp;·&nbsp;10<sup>−10</sup> M<sup>2</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BaSO<sub>4</sub>(s) ⇌ Ba<sup>2+</sup>(aq) + SO<sub>4</sub><sup>2−</sup>(aq)</td>
+<td style="text-align: left;">[Ba<sup>2+</sup>] · [SO<sub>4</sub><sup>2−</sup>]</td>
+<td style="text-align: left;">1,08&nbsp;·&nbsp;10<sup>−10</sup> M<sup>2</sup></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CaCO<sub>3</sub>(s) ⇌ Ca<sup>2+</sup>(aq) + CO<sub>3</sub><sup>2−</sup>(aq)</td>
+<td style="text-align: left;">[Ca<sup>2+</sup>] · [CO<sub>3</sub><sup>2−</sup>]</td>
+<td style="text-align: left;">3,4&nbsp;·&nbsp;10<sup>−9</sup> M<sup>2</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PbI<sub>2</sub>(s) ⇌ Pb<sup>2+</sup>(aq) + 2 I<sup>−</sup>(aq)</td>
+<td style="text-align: left;">[Pb<sup>2+</sup>] · [I<sup>−</sup>]<sup>2</sup></td>
+<td style="text-align: left;">1,79&nbsp;·&nbsp;10<sup>−8</sup> M<sup>3</sup></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PbCl<sub>2</sub>(s) ⇌ Pb<sup>2+</sup>(aq) + 2 Cl<sup>−</sup>(aq)</td>
+<td style="text-align: left;">[Pb<sup>2+</sup>] · [Cl<sup>−</sup>]<sup>2</sup></td>
+<td style="text-align: left;">1,7&nbsp;·&nbsp;10<sup>−5</sup> M<sup>3</sup></td>
+</tr>
+</tbody>
+</table>
+<p>Jo mindre <em>K</em><sub>o</sub> er, jo mindre salt kan der være opløst i vandet.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Sammenlign kun salte af samme type">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Sammenlign kun salte af samme type
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><em>K</em><sub>o</sub> for AgCl og BaSO<sub>4</sub> kan sammenlignes direkte, fordi begge salte bliver til to ioner. <em>K</em><sub>o</sub> for AgCl og PbI<sub>2</sub> har forskellig enhed og kan ikke sammenlignes direkte. Så må man beregne opløseligheden af hvert salt.</p>
+</div>
+</div>
+</section>
+<section id="fra-opløselighedsprodukt-til-opløselighed" class="level2">
+<h2 class="anchored" data-anchor-id="fra-opløselighedsprodukt-til-opløselighed">Fra opløselighedsprodukt til opløselighed</h2>
+<p>Opløseligheden beregnes med et skema som i <a href="../kapitler/b2-3-ligevaegtsberegninger.html">afsnit B2.3</a>. Skemaet skrives op under hele reaktionsskemaet, også det faste salt.</p>
+<p>Den ubekendte kaldes <em>x</em>. Her står <em>x</em> for den stofmængdekoncentration af saltet, der går i opløsning. Fra start er der ikke opløst noget salt. Når opløsningen er blevet mættet, er der opløst <em>x</em> mol salt i hver liter. <em>x</em> er altså ændringen i stofmængdekoncentrationen af opløst salt, og det er netop saltets opløselighed i mol pr. liter.</p>
+<p>Ligningerne er så enkle, at de kan løses uden et CAS-værktøj. Eksemplerne viser alle trin.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: opløseligheden af sølvchlorid">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: opløseligheden af sølvchlorid
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For sølvchlorid er <em>K</em><sub>o</sub> = 1,8&nbsp;·&nbsp;10<sup>−10</sup> M<sup>2</sup>. Hvad er opløseligheden af sølvchlorid, og hvor mange milligram kan der opløses i 1,00 L vand?</p>
+<p><strong>Reaktionsskemaet</strong></p>
+<div class="reaktion">
+<p>AgCl(s) ⇌ Ag<sup>+</sup>(aq) + Cl<sup>−</sup>(aq)</p>
+</div>
+<p><strong>Hvad er x?</strong></p>
+<p><em>x</em> er ændringen i stofmængdekoncentrationen af opløst AgCl. Fra start er der ikke opløst noget AgCl, og i den mættede opløsning er der opløst <em>x</em> mol AgCl pr. liter.</p>
+<p>Hver formelenhed AgCl, der går i opløsning, giver én Ag<sup>+</sup> og én Cl<sup>−</sup>. Når der opløses <em>x</em> mol AgCl pr. liter, stiger [Ag<sup>+</sup>] derfor med <em>x</em>, og [Cl<sup>−</sup>] stiger også med <em>x</em>.</p>
+<p><strong>Skemaet</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">AgCl(s)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">Ag<sup>+</sup>(aq)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">Cl<sup>−</sup>(aq)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">fast stof</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">opløses</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">fast stof</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p>Det faste AgCl er ikke med i reaktionsbrøken, så der står ingen koncentration i dets kolonne.</p>
+<p><strong>Ligningen</strong></p>
+<p>Udtrykkene fra rækken Ligevægt sættes ind i opløselighedsproduktet.</p>
+<p><span class="math display">\[
+K_\mathrm{o} = [\mathrm{Ag^+}] \cdot [\mathrm{Cl^-}]
+\]</span></p>
+<p><span class="math display">\[
+1{,}8 \cdot 10^{-10}\ \mathrm{M^2} = x \cdot x
+\]</span></p>
+<p><strong>Løsningen trin for trin</strong></p>
+<p>De to <em>x</em> ganges sammen:</p>
+<p><span class="math display">\[
+x^{2} = 1{,}8 \cdot 10^{-10}\ \mathrm{M^2}
+\]</span></p>
+<p>Så tages kvadratroden på begge sider. Kun den positive løsning kan bruges, fordi en koncentration ikke kan være negativ.</p>
+<p><span class="math display">\[
+x = \sqrt{1{,}8 \cdot 10^{-10}\ \mathrm{M^2}} = 1{,}3 \cdot 10^{-5}\ \mathrm{M}
+\]</span></p>
+<p><strong>Fra stofmængde til masse</strong></p>
+<p>I 1,00 L er der opløst 1,3&nbsp;·&nbsp;10<sup>−5</sup> mol. Molarmassen for AgCl er 143,32 g/mol.</p>
+<p><span class="math display">\[
+m = n \cdot M = 1{,}3 \cdot 10^{-5}\ \mathrm{mol} \cdot 143{,}32\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}0019\ \mathrm{g}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Opløseligheden af sølvchlorid er 1,3&nbsp;·&nbsp;10<sup>−5</sup> M. Der kan kun opløses omkring 1,9 mg i en hel liter vand.</p>
+</div>
+</div>
+</section>
+<section id="når-saltet-giver-to-ens-ioner" class="level2">
+<h2 class="anchored" data-anchor-id="når-saltet-giver-to-ens-ioner">Når saltet giver to ens ioner</h2>
+<p>Bly(II)chlorid, PbCl<sub>2</sub>, har samme slags formel som bly(II)iodid. Hver formelenhed giver én bly(II)ion og to chloridioner. Det skal med i skemaet.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: opløseligheden af bly(II)chlorid">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: opløseligheden af bly(II)chlorid
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For bly(II)chlorid er <em>K</em><sub>o</sub> = 1,7&nbsp;·&nbsp;10<sup>−5</sup> M<sup>3</sup>. Hvad er saltets opløselighed, og hvad er koncentrationerne af ionerne i en mættet opløsning?</p>
+<p><strong>Reaktionsskemaet</strong></p>
+<div class="reaktion">
+<p>PbCl<sub>2</sub>(s) ⇌ Pb<sup>2+</sup>(aq) + 2 Cl<sup>−</sup>(aq)</p>
+</div>
+<p><strong>Hvad er x?</strong></p>
+<p><em>x</em> er ændringen i stofmængdekoncentrationen af opløst PbCl<sub>2</sub>. Fra start er der ikke opløst noget PbCl<sub>2</sub>. Når opløsningen er blevet mættet, er der opløst <em>x</em> mol PbCl<sub>2</sub> pr. liter. <em>x</em> er derfor også saltets opløselighed.</p>
+<p>Reaktionsskemaet viser, hvad det betyder for ionerne. Hver formelenhed PbCl<sub>2</sub>, der går i opløsning, giver én Pb<sup>2+</sup> og to Cl<sup>−</sup>. Når der opløses <em>x</em> mol PbCl<sub>2</sub> pr. liter, stiger [Pb<sup>2+</sup>] derfor med <em>x</em>, mens [Cl<sup>−</sup>] stiger med 2<em>x</em>.</p>
+<p><strong>Skemaet</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">PbCl<sub>2</sub>(s)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">Pb<sup>2+</sup>(aq)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">2 Cl<sup>−</sup>(aq)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">fast stof</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">opløses</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+2<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">fast stof</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">2<em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p>Det faste PbCl<sub>2</sub> er ikke med i reaktionsbrøken, så der står ingen koncentration i dets kolonne.</p>
+<p><strong>Ligningen</strong></p>
+<p>Udtrykkene fra rækken Ligevægt sættes ind i opløselighedsproduktet.</p>
+<p><span class="math display">\[
+K_\mathrm{o} = [\mathrm{Pb^{2+}}] \cdot [\mathrm{Cl^-}]^{2}
+\]</span></p>
+<p><span class="math display">\[
+1{,}7 \cdot 10^{-5}\ \mathrm{M^3} = x \cdot (2x)^{2}
+\]</span></p>
+<p><strong>Løsningen trin for trin</strong></p>
+<p>Først udregnes parentesen. Både 2-tallet og <em>x</em> skal sættes i anden:</p>
+<p><span class="math display">\[
+(2x)^{2} = 2^{2} \cdot x^{2} = 4x^{2}
+\]</span></p>
+<p>Det sættes ind i ligningen, og <em>x</em> ganges sammen med <em>x</em><sup>2</sup>:</p>
+<p><span class="math display">\[
+1{,}7 \cdot 10^{-5}\ \mathrm{M^3} = x \cdot 4x^{2} = 4x^{3}
+\]</span></p>
+<p>Begge sider divideres med 4:</p>
+<p><span class="math display">\[
+x^{3} = \frac{1{,}7 \cdot 10^{-5}\ \mathrm{M^3}}{4} = 4{,}25 \cdot 10^{-6}\ \mathrm{M^3}
+\]</span></p>
+<p>Til sidst opløftes begge sider til potensen 1/3, så <em>x</em> står alene:</p>
+<p><span class="math display">\[
+x = \left(4{,}25 \cdot 10^{-6}\ \mathrm{M^3}\right)^{\frac{1}{3}} = 0{,}016\ \mathrm{M}
+\]</span></p>
+<p>På lommeregneren tastes (4,25E−6)^(1/3).</p>
+<p><strong>Koncentrationerne af ionerne</strong></p>
+<p><span class="math display">\[
+[\mathrm{Pb^{2+}}] = x = 0{,}016\ \mathrm{M}
+\]</span></p>
+<p><span class="math display">\[
+[\mathrm{Cl^-}] = 2x = 2 \cdot 0{,}016\ \mathrm{M} = 0{,}032\ \mathrm{M}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Opløseligheden af bly(II)chlorid er 0,016 M. I den mættede opløsning er [Pb<sup>2+</sup>] = 0,016 M og [Cl<sup>−</sup>] = 0,032 M.</p>
+</div>
+</div>
+<p>Et CAS-værktøj giver samme resultat, men ligningen kan altså løses uden.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Pas på 2-tallet">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Pas på 2-tallet
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Koefficienten 2 bruges to gange. Koncentrationen af ionen er 2<em>x</em>, og den skal sættes i anden: (2<em>x</em>)<sup>2</sup> = 4<em>x</em><sup>2</sup>. En typisk fejl er at skrive <em>x</em> · <em>x</em><sup>2</sup>.</p>
+</div>
+</div>
+</section>
+<section id="kommer-der-bundfald" class="level2">
+<h2 class="anchored" data-anchor-id="kommer-der-bundfald">Kommer der bundfald?</h2>
+<p>Når to opløsninger blandes, kan man beregne reaktionsbrøken for blandingen og sammenligne den med <em>K</em><sub>o</sub>. Det er samme fremgangsmåde som i <a href="../kapitler/b2-4-ikke-ligevaegt.html">afsnit B2.4</a>.</p>
+<div id="fig-y-mod-ko" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-y-mod-ko-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/y-mod-ko.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Reaktionsbrøken afgør, om opløsningen er umættet, mættet eller overmættet."><img src="../figurer/y-mod-ko.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-y-mod-ko-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Reaktionsbrøken afgør, om opløsningen er umættet, mættet eller overmættet.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 22%">
+<col style="width: 63%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Opløsningen er</th>
+<th style="text-align: left;">Det sker der</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>Y</em>&nbsp;&lt;&nbsp;<em>K</em><sub>o</sub></td>
+<td style="text-align: left;">umættet</td>
+<td style="text-align: left;">Der dannes ikke bundfald. Der kan opløses mere salt.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>Y</em>&nbsp;=&nbsp;<em>K</em><sub>o</sub></td>
+<td style="text-align: left;">mættet</td>
+<td style="text-align: left;">Der er ligevægt.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>Y</em>&nbsp;&gt;&nbsp;<em>K</em><sub>o</sub></td>
+<td style="text-align: left;">overmættet</td>
+<td style="text-align: left;">Der dannes bundfald, indtil <em>Y</em> igen er lig med <em>K</em><sub>o</sub>.</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: bly(II)nitrat og kaliumiodid">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: bly(II)nitrat og kaliumiodid
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>50,0 mL 0,020 M Pb(NO<sub>3</sub>)<sub>2</sub> blandes med 50,0 mL 0,020 M KI ved 20 °C. Dannes der bundfald af bly(II)iodid?</p>
+<p><strong>Trin 1: koncentrationerne i blandingen</strong></p>
+<p>Blandingens rumfang er 100,0 mL. Hver opløsning fylder nu 2 gange så meget som før, så begge koncentrationer er blevet halvt så store. Én formelenhed Pb(NO<sub>3</sub>)<sub>2</sub> giver én Pb<sup>2+</sup>, og én formelenhed KI giver én I<sup>−</sup>.</p>
+<p>[Pb<sup>2+</sup>] = 0,010 M og [I<sup>−</sup>] = 0,010 M</p>
+<p><strong>Trin 2: reaktionsbrøken</strong></p>
+<p><span class="math display">\[
+Y = [\mathrm{Pb^{2+}}] \cdot [\mathrm{I^-}]^{2} = 0{,}010\ \mathrm{M} \cdot (0{,}010\ \mathrm{M})^{2} = 1{,}0 \cdot 10^{-6}\ \mathrm{M^3}
+\]</span></p>
+<p><strong>Trin 3: sammenlign med opløselighedsproduktet</strong></p>
+<p><em>Y</em> = 1,0&nbsp;·&nbsp;10<sup>−6</sup> M<sup>3</sup> er større end <em>K</em><sub>o</sub> = 1,79&nbsp;·&nbsp;10<sup>−8</sup> M<sup>3</sup>.</p>
+<p><strong>Konklusion</strong></p>
+<p>Blandingen er overmættet, så der dannes bundfald af bly(II)iodid.</p>
+</div>
+</div>
+<p>Havde begge opløsninger kun været 0,0020 M, ville koncentrationerne i blandingen være 0,0010 M. Så er <em>Y</em> = 0,0010 M · (0,0010 M)<sup>2</sup> = 1,0&nbsp;·&nbsp;10<sup>−9</sup> M<sup>3</sup>, som er mindre end <em>K</em><sub>o</sub>. Blandingen ville være umættet og forblive klar.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Husk fortyndingen">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Husk fortyndingen
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Når to opløsninger hældes sammen, bliver rumfanget større, og begge stoffer bliver fortyndet. Brug altid koncentrationerne i blandingen og ikke koncentrationerne i de to glas.</p>
+</div>
+</div>
+</section>
+<section id="temperaturen-og-de-gyldne-krystaller" class="level2">
+<h2 class="anchored" data-anchor-id="temperaturen-og-de-gyldne-krystaller">Temperaturen og de gyldne krystaller</h2>
+<p>Opløselighedsproduktet er en ligevægtskonstant og ændrer sig derfor med temperaturen, som du lærte i <a href="../kapitler/b2-6-temperatur-og-rumfang.html">afsnit B2.6</a>. For bly(II)iodid bliver <em>K</em><sub>o</sub> større, når temperaturen stiger.</p>
+<div id="fig-gyldenregn" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gyldenregn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/gyldenregn.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figur&nbsp;4: Bundfaldet af bly(II)iodid opløses ved opvarmning og kommer igen som krystaller under afkølingen."><img src="../figurer/gyldenregn.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gyldenregn-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;4: Bundfaldet af bly(II)iodid opløses ved opvarmning og kommer igen som krystaller under afkølingen.
+</figcaption>
+</figure>
+</div>
+<p>Varmes blandingen med det gule bundfald op, går bundfaldet i opløsning, og væsken bliver klar. Køles den langsomt ned igen, bliver <em>K</em><sub>o</sub> mindre, og bly(II)iodid udfældes som små, glinsende krystaller. De daler ned gennem væsken som gylden regn.</p>
+</section>
+<section id="indgreb-i-en-opløselighedsligevægt" class="level2">
+<h2 class="anchored" data-anchor-id="indgreb-i-en-opløselighedsligevægt">Indgreb i en opløselighedsligevægt</h2>
+<p>En mættet opløsning med bundfald er en ligevægt, og den kan forskydes ligesom ligevægtene i <a href="../kapitler/b2-5-indgreb.html">afsnit B2.5</a>.</p>
+<ul>
+<li>Tilsættes der ekstra iodid til en mættet opløsning af bly(II)iodid, bliver <em>Y</em> større end <em>K</em><sub>o</sub>. Ligevægten forskydes mod venstre, og der dannes mere bundfald.</li>
+<li>Tilsættes der mere vand, bliver begge koncentrationer mindre. Så er <em>Y</em> mindre end <em>K</em><sub>o</sub>, og mere af bundfaldet går i opløsning.</li>
+<li>Tilsættes der mere fast bly(II)iodid, sker der ingenting. Det faste salt er ikke med i reaktionsbrøken.</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Prøv selv
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I det virtuelle laboratorium <a href="https://kemiformler.dk/animationer/v2/superlab/sc2.7_blyiodid/index.html">Opløselighed af blyiodid</a> kan du selv afveje bly(II)nitrat og kaliumiodid, varme blandingen op og se, hvornår krystallerne kommer igen. I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc2.4_faeldningsreaktioner/index.html">Fældningsreaktioner</a> kan du øve dig i at opskrive fældningsreaktioner.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Kort sagt
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Et tungtopløseligt salt danner bundfald, men en lille del af saltet er altid opløst.</li>
+<li>I en mættet opløsning er der ligevægt mellem det faste salt og ionerne i opløsningen.</li>
+<li>Opløselighedsproduktet, <em>K</em><sub>o</sub>, er ligevægtskonstanten for opløselighedsligevægten. Det faste salt er ikke med.</li>
+<li>I beregninger er <em>x</em> ændringen i stofmængdekoncentrationen af opløst salt. Det er saltets opløselighed i mol pr. liter.</li>
+<li>Er <em>Y</em> større end <em>K</em><sub>o</sub> i en blanding, dannes der bundfald. Er <em>Y</em> mindre end <em>K</em><sub>o</sub>, forbliver blandingen klar.</li>
+</ul>
+</div>
+</div>
+<div class="til-opgaver">
+<p><strong>Opgaver:</strong> <a href="../opgaver/b2-7-opgaver.html">Opgaver til B2.7</a> har både almindelige opgaver og opgaver med fødevaretema.</p>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../opgaver/b2-6-opgaver.html" class="pagination-link" aria-label="Opgaver til B2.6">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Opgaver til B2.6</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../opgaver/b2-7-opgaver.html" class="pagination-link" aria-label="Opgaver til B2.7">
+        <span class="nav-page-text">Opgaver til B2.7</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

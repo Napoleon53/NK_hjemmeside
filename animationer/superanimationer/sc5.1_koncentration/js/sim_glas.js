@@ -12,13 +12,18 @@
    giver (brugerens oenske 29. sept. 2026: mere traening i forskellen paa
    c og n, gerne med animationer).
 
+   Spoergsmaalet staar med svarene side om side paa kortet oeverst i
+   scenen, ikke i panelet (brugerens oenske 9. okt. 2026: eleverne kigger
+   ikke ud i siden; kortData og js/fane.js). Der staar ingen tekst paa
+   vaeggen mere: indledningen er kortets foerste linje.
+
    Et rigtigt svar faar scenen til at vise det: prikkerne taelles, tallet
    kommer i tabellen, etiketten kommer paa glasset, eller enhederne
-   streges ud. Et forkert svar forklares og kan ikke vaelges igen.
+   streges ud paa kortet. Et forkert svar forklares og kan ikke vaelges igen.
 
-   Efter et rigtigt svar bliver forklaringen staaende, og knappen i kortet
-   bliver til Naeste spoergsmaal: det naeste kommer foerst, naar eleven
-   selv gaar videre. Det, tabellen viste, foer der blev haeldt, staar som
+   Efter et rigtigt svar bliver kortet groent med svaret og forklaringen,
+   og kortets knap hedder Naeste spoergsmaal: det naeste kommer foerst, naar
+   eleven selv gaar videre. Det, tabellen viste, foer der blev haeldt, staar som
    en lille linje under de tal, der har aendret sig, og etiketten bliver
    paa et glas, der er haeldt tomt (brugerens oenske 3. okt. 2026).
    ===================================================================== */
@@ -30,42 +35,25 @@
     var K = NK.Kemi;
     var Tg = NK.Tegn;
     var ST = D.stof("CuSO4");
+    /* Pladsen til kortet oeverst i scenen: almindelig skaerm og lav skaerm */
+    var ZONE = [206, 176];
 
     function SimGlas() {
         this.over = null;
         this.startFane(D.GLAS);
-        this.el.valg = NK.el("glas-valg");
         this.el.tabel = NK.el("glas-tabel");
         this.introNu = true;
         this.vaelg(0, false);
     }
 
     var P = SimGlas.prototype;
-    NK.Fane.paa(P, { navn: "glas", naesteFane: "fane-kolbe", naesteNavn: "Målekolben" });
+    NK.Fane.paa(P, { navn: "glas", naesteFane: "fane-kolbe", naesteNavn: "Målekolben", zone: ZONE });
 
     function cAf(g) { return g.V > 0 ? g.n / (g.V / 1000) : 0; }
     function antalPrikker(n) { return Math.round(n / D.PRIK_GLAS + 1e-9); }
     function talTekst(g, h) {
         return h === "n" ? K.to(g.n) + " mol" : (h === "V" ? K.to(g.V / 1000) + " L" : K.to(cAf(g)) + " M");
     }
-
-    /* Knappen i kortet: mens fanen venter efter et rigtigt svar, gaar den
-       videre til det naeste spoergsmaal */
-    var faellesKnap = P.knap, faellesVisKnap = P.visKnap;
-
-    P.visKnap = function () {
-        faellesVisKnap.call(this);
-        if (!this.venter || this.faerdig) return;
-        this.el.knap.textContent = "Næste spørgsmål →";
-        this.el.knap.className = "knap blaa banker";
-    };
-
-    P.knap = function () {
-        if (this.venter && !this.faerdig) { this.naesteSpm(); return; }
-        faellesKnap.call(this);
-    };
-
-    P.enter = function () { if (this.faerdig || this.venter) this.knap(); };
 
     /* ----- Opgaven -------------------------------------------------------------- */
     P.lavOpgave = function (i) {
@@ -98,6 +86,7 @@
         this.samlet = [];
         this.samletFaerdig = 0;
         this.venter = false;
+        this.rigtigMaade = "ok";
         this.foerSpm = -1;
         this.overLinje = spec.linje || "";
         this.startSpm();
@@ -115,8 +104,7 @@
         this.brugtSvar = false;
         this.lavOpgave(this.nr);
         this.visKort();
-        this.k.tie();
-        this.besked("Opgaven er startet forfra. " + this.trinLinje(), "");
+        this.besked("Opgaven er startet forfra.", "");
     };
 
     P.spm = function () { return this.opg.spm[this.spmNr]; };
@@ -127,6 +115,7 @@
         this.fase = s.foer ? "handling" : "spm";
         this.forkerte = [];
         this.rigtig = null;
+        this.rigtigMaade = "ok";
         if (s.foer) this.overLinje = s.foer.linje;
         /* Svarene blandes, saa det rigtige ikke altid staar samme sted; glassene
            staar i orden (A, B, C) */
@@ -162,36 +151,46 @@
         }
     };
 
-    /* ----- Kortet ------------------------------------------------------------------- */
-    P.promptHTML = function () {
-        var s = this.spm(), n = this.opg.spm.length;
-        var nr = n > 1 ? '<p class="opgave-spm">Spørgsmål ' + (this.spmNr + 1) + " af " + n + "</p>" : "";
-        if (this.faerdig) return nr + '<p class="maal-tekst">' + NK.html(s.tekst) + "</p>";
-        if (this.fase === "handling") return nr + '<p class="maal-tekst">' + NK.html(s.foer.linje) + "</p>";
-        return nr + '<p class="maal-tekst">' + NK.html(s.tekst) + "</p>";
+    /* ----- Kortet oeverst i scenen ---------------------------------------------------
+       Spoergsmaal: indledningen (det, der er i glassene, eller det, der lige
+       er haeldt), spoergsmaalet og svarene. Handling: det, eleven skal klikke
+       paa. Rigtigt svar: svaret, forklaringen og knappen videre. */
+    P.kortData = function () {
+        var s = this.spm(), mig = this, n = this.opg.spm.length;
+        if (this.faerdig || this.venter) {
+            var gul = this.rigtigMaade === "svar";
+            return { slags: "loest", gul: gul, chip: gul ? "Svaret" : "Rigtigt ✓", svaret: s.regn ? "" : s.svar[this.rigtig].t,
+                     foer: this.regnHTML(s, true), videre: this.videreTekst(),
+                     html: NK.html(s.efter) + (this.faerdig && this.slutEkstra ? " " + NK.html(this.slutEkstra) : "") };
+        }
+        if (this.fase === "handling") return { slags: "opgave", chip: "Opgave " + (this.nr + 1), tekst: s.foer.linje };
+        return { slags: "spm", chip: n > 1 ? "Spørgsmål " + (this.spmNr + 1) + " af " + n : "Spørgsmål",
+                 intro: s.regn ? "" : this.overLinje, foer: this.regnHTML(s, false), tekst: s.tekst,
+                 svar: this.orden.map(function (j) {
+                     var forkert = mig.forkerte.indexOf(j) >= 0;
+                     return { j: j, t: s.svar[j].t, forkert: forkert, rigtig: mig.rigtig === j, laast: forkert || mig.rigtig !== null };
+                 }) };
     };
 
-    P.visKortEkstra = function () {
-        var s = this.spm(), mig = this, e = this.el.valg;
-        if (this.fase === "handling") { e.hidden = true; e.innerHTML = ""; }
-        else {
-            e.hidden = false;
-            e.innerHTML = "";
-            this.orden.forEach(function (j) {
-                var x = s.svar[j];
-                var b = document.createElement("button");
-                b.type = "button";
-                b.className = "knap";
-                b.textContent = x.t;
-                if (mig.forkerte.indexOf(j) >= 0) { b.disabled = true; b.classList.add("forkert"); }
-                if (mig.rigtig === j) { b.disabled = true; b.classList.add("rigtig"); }
-                if (mig.rigtig !== null && mig.rigtig !== j) b.disabled = true;
-                b.addEventListener("click", function () { mig.vaelgSvar(j, "ok"); });
-                e.appendChild(b);
-            });
+    P.kortValg = function (j) { this.vaelgSvar(j, "ok"); };
+
+    /* Regnestykket i opgaven Enhederne: enheden er et gult ?, til svaret er
+       rigtigt. Saa staar enheden der, og linjen under viser, hvad der gaar ud. */
+    P.regnHTML = function (s, loest) {
+        if (!s.regn) return "";
+        var del = s.regn.lastIndexOf("?");
+        var html = '<p class="kt-regn">' + NK.html(s.regn.slice(0, del)) +
+            (loest ? '<b class="kt-enhed">' + NK.html(s.svar[this.rigtig].t) + "</b>" : '<span class="kt-ukendt">?</span>') + "</p>";
+        if (loest && this.enhed) {
+            html += '<p class="kt-enheder">Enhederne: ' + this.enhed.dele.map(function (d) {
+                var t = NK.html(d.t);
+                return d.s ? '<span class="streg">' + t + "</span>" : (d.fed ? "<b>" + t + "</b>" : t);
+            }).join("") + "</p>";
         }
-        this.visTabel();
+        return html;
     };
+
+    P.visKortEkstra = function () { this.visTabel(); };
 
     /* Tabellen med glassenes tal: det, der ikke er kendt endnu, er et ? */
     P.visTabel = function () {
@@ -228,9 +227,8 @@
         if (!x.ok) {
             this.forkerte.push(j);
             this.brugtSvar = true;
-            this.k.tie();
             if (x.glas !== undefined) this.glas[x.glas].blink = 0.9;
-            this.besked(NK.html(x.forkl || "Det passer ikke.") + " Prøv igen.", "skidt");
+            this.fejlLinje(NK.html(x.forkl || "Det passer ikke."));
             this.visKort();
             return;
         }
@@ -240,6 +238,7 @@
     P.rigtigSvar = function (j, maade) {
         var s = this.spm(), mig = this, vis = s.vis || {};
         this.rigtig = j;
+        this.rigtigMaade = maade;
         this.hjaelp = 0;
         if (maade === "svar") { this.brugtSvar = true; this.maade = "svar"; }
         /* Det, scenen viser efter svaret */
@@ -250,20 +249,17 @@
         if (vis.tael) this.startTael(vis.tael);
         if (vis.enhed) this.enhed = { dele: D.ENHEDSLINJE[vis.enhed], t: 0 };
         var sidste = this.spmNr >= this.opg.spm.length - 1;
-        var svarHTML = NK.html("Svaret: " + s.svar[j].t + ". " + s.efter);
         if (sidste) {
             this.fase = "faerdig";
             this.forklaring = NK.html(s.efter);
-            this.visKort();
-            this.trinLoest(maade, maade === "svar" ? svarHTML : null);
+            this.trinLoest(maade, null);
             return;
         }
-        /* Forklaringen bliver staaende ved det besvarede spoergsmaal, til eleven
-           selv gaar videre med knappen (ikke ros og et nyt spoergsmaal paa én gang) */
+        /* Svaret og forklaringen staar paa det groenne kort, til eleven selv gaar
+           videre med kortets knap (ikke ros og et nyt spoergsmaal paa én gang) */
         this.venter = true;
+        this.besked("", "");
         this.visKort();
-        if (maade === "svar") this.svarVis(svarHTML);
-        else { this.k.tie(); this.besked(NK.html(s.efter), "god"); }
     };
 
     P.naesteSpm = function () {
@@ -271,7 +267,6 @@
         this.spmNr++;
         this.startSpm();
         this.visKort();
-        this.k.tie();
         this.besked(this.trinLinje(), "");
     };
 
@@ -294,12 +289,9 @@
 
     P.opgaveFaerdig = function () { return this.fase === "faerdig"; };
 
-    P.trinLinje = function () {
-        if (this.faerdig || this.venter) return "";
-        var s = this.spm();
-        if (this.fase === "handling") return s.foer.linje;
-        return s.hvem ? "Vælg et svar i kortet, eller klik på et glas." : "Vælg et svar i kortet.";
-    };
+    /* Kortet siger selv, hvad der skal goeres: linjen under er kun til hint,
+       fejl og det, et klik i scenen svarer */
+    P.trinLinje = function () { return ""; };
 
     P.slutLinje = function () { return this.forklaring; };
 
@@ -314,7 +306,7 @@
     P.goerHandling = function (auto) {
         var s = this.spm(), f = s.foer, mig = this;
         if (this.fase !== "handling" || this.travl()) return;
-        if (auto) { this.auto = true; this.k.tie(); this.visKnap(); }
+        if (auto) { this.auto = true; this.visKnap(); }
         this.skjulFoer();
         if (f.slags === "haeld") this.haeld(f.fra, f.til, f.V, function () { mig.handlingFaerdig(); });
         else if (f.slags === "vand") this.vand(f.glas, f.til, function () { mig.handlingFaerdig(); });
@@ -373,9 +365,10 @@
         });
         this.fase = "spm";
         this.auto = false;
+        /* Det, der lige er sket, er indledningen til spoergsmaalet paa kortet */
         this.overLinje = f.efter;
+        this.besked("", "");
         this.visKort();
-        this.besked(NK.html(f.efter) + " " + this.trinLinje(), "");
     };
 
     /* Glas i haelder V mL over i glas m: det loeftes, flyttes over m, haelder
@@ -490,7 +483,6 @@
                 if (!this.koe.length) { this.visKnap(); this.visTabel(); }
             }
         }
-        if (this.enhed) this.enhed.t = Math.min(1, this.enhed.t + dt / 1.8);
         this.glas.forEach(function (g) {
             if (!mig.flytter(g)) g.prikVis = NK.mod(g.prikVis, g.prikMaal, 4, dt);
             g.prikker.forEach(function (p) {
@@ -586,23 +578,18 @@
     /* ----- Layout ------------------------------------------------------------------------ */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.075, 24, 42));
         var o = this.opg;
-        lay.overB = W - 36;
-        var overPx = NK.klamp(W / 50, 15, 20);
-        lay.overPx = overPx;
-        var overH = Math.round(overPx * 1.38 * 2);
-        lay.regnY = 12 + overH + 6;
-        var regnH = o.spm.some(function (s) { return s.regn; }) ? Math.round(NK.klamp(Hs * 0.16, 64, 92)) : 0;
-        lay.regnH = regnH;
-        var top = lay.regnY + regnH + 4;
+        /* Kortet med spoergsmaalet har pladsen oeverst; lupperne begynder under det */
+        lay.zone = this.kortZone();
+        var top = 10 + lay.zone + 2;
+        lay.top = top;
         var nG = o.glas.length, spPlads = o.sproejte ? 1 : 0;
         var ghV = (lay.bordY - top - 42) / (227 / 240 + 0.5);
         var ghH = (W - 36) / ((nG + 0.75 * spPlads) * 0.75 * 1.45 + 0.1);
-        var gh = NK.klamp(Math.min(ghV, ghH, 290), 100, 290);
+        var gh = NK.klamp(Math.min(ghV, ghH, 290), 70, 290);
         lay.gh = gh;
         var sp = null;
         if (o.sproejte) {
@@ -615,7 +602,7 @@
         var gb = gh * 180 / 240;
         lay.glas = [];
         lay.lup = [];
-        var zr = Math.round(NK.klamp(Math.min(gh * 0.25, slot * 0.4), 28, 74));
+        var zr = Math.round(NK.klamp(Math.min(gh * 0.25, slot * 0.4), 18, 74));
         for (var i = 0; i < nG; i++) {
             var cx = x0 + slot * (i + 0.5);
             var geo = Tg.glas1Geo(cx - gb / 2, lay.bordY, gh);
@@ -630,8 +617,6 @@
         this.saetAnker("glassene", lay.glas[0].x0, lay.lup[0].y - zr, lay.glas[nG - 1].x0 + lay.glas[nG - 1].b - lay.glas[0].x0,
             lay.bordY + 24 - lay.lup[0].y + zr);
         this.saetAnker("lupper", lay.glas[0].x0, lay.lup[0].y - zr - 4, lay.glas[nG - 1].x0 + lay.glas[nG - 1].b - lay.glas[0].x0, 2 * zr + 30);
-        this.saetAnker("over", 12, 8, W - 24, overH + 8 + regnH);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* ----- Tegn ----------------------------------------------------------------------------- */
@@ -643,31 +628,6 @@
         this.L.ryd();
         Tg.rum(ctx, lay.W, lay.Hs, lay.bordY + 12);
         Tg.bord(ctx, 0, lay.W, lay.bordY, lay.Hs);
-
-        /* Teksten paa vaeggen */
-        if (this.overLinje) {
-            var ot = Tg.overTavle(ctx, this.overLinje, lay.overB - 14, lay.overPx, 13);
-            Tg.tegnOverTavle(ctx, ot, 18, 12);
-        }
-        /* Regnestykket og enhederne (opgaven Enhederne) */
-        var s = this.spm();
-        if (lay.regnH && s.regn) {
-            var rpx = NK.klamp(lay.regnH * 0.3, 16, 26);
-            var ry = lay.regnY + rpx * 0.8;
-            var tekst = s.regn, del = tekst.lastIndexOf("?");
-            var foer = tekst.slice(0, del);
-            var enh = this.rigtig !== null ? s.svar[this.rigtig].t : "?";
-            ctx.font = Tg.font("700", rpx);
-            var bF = ctx.measureText(foer).width;
-            NK.tekst(ctx, foer, 30, ry, { font: Tg.font("700", rpx), linje: "middle", farve: "#e6ebf0" });
-            NK.tekst(ctx, enh, 30 + bF, ry, { font: Tg.font("800", rpx), linje: "middle", farve: this.rigtig !== null ? "#7ee0a8" : "#f2c53d" });
-            if (this.enhed) {
-                var epx = NK.klamp(rpx * 0.85, 14, 22);
-                NK.tekst(ctx, "Enhederne:", 30, ry + rpx * 1.5, { font: Tg.font("600", epx), linje: "middle", farve: "#9fb3c8" });
-                ctx.font = Tg.font("600", epx);
-                Tg.enhedslinje(ctx, 30 + ctx.measureText("Enhederne: ").width, ry + rpx * 1.5, this.enhed.dele, epx, this.enhed.t);
-            }
-        }
 
         /* Lupperne over glassene */
         this.glas.forEach(function (g, i) {
@@ -690,7 +650,10 @@
                 var nu = Math.min(g.tael.orden.length, Math.floor(g.tael.t * g.tael.hast));
                 t += "   n = " + K.to(nu * D.PRIK_GLAS) + " mol";
             } else if (g.kendt.n && g.V > 0) t += "   n = " + K.to(g.n) + " mol";
-            NK.tekst(ctx, t, gg.cx, lay.bordY + 12 + (lay.Hs - lay.bordY - 12) / 2 + 1, { font: Tg.font("700", fpx), justering: "center",
+            /* Det sidste navn viger for knappen Start forfra i hjoernet */
+            ctx.font = Tg.font("700", fpx);
+            var tx = Math.min(gg.cx, lay.W - 142 - ctx.measureText(t).width / 2);
+            NK.tekst(ctx, t, tx, lay.bordY + 12 + (lay.Hs - lay.bordY - 12) / 2 + 1, { font: Tg.font("700", fpx), justering: "center",
                 linje: "middle", farve: g.tael ? "#f2c53d" : "#dfe6ee" });
         });
 
@@ -754,7 +717,6 @@
             ctx.fill();
             ctx.restore();
         }
-        this.k.tegn(ctx);
     };
 
     P.pil = function () {
@@ -767,5 +729,6 @@
         return { x: gg.cx, y: gg.y0 + 6 };
     };
 
+    SimGlas.ZONE = ZONE;
     NK.SimGlas = SimGlas;
 }());

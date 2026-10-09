@@ -1,8 +1,7 @@
 # sc8.5 Kaliumpermanganat
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
-filer inde fra sig selv, bortset fra Kemichael, som hentes fra
-`../../v2/kemichael/` og `../kemichael/superanimation.js`. Den virker også,
+filer inde fra sig selv. Den virker også,
 når den åbnes direkte fra harddisken.
 
 Den afløser `animationer/kemi-c-filer/c8.5_kaliumpermanganat_oxidationstal.html`
@@ -36,8 +35,9 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
    hinanden, fane 2 ét urglas og 14 reaktioner. Mangan reduceres i alle, og
    hver reaktion har to reaktanter og to produkter før afstemningen.
 5. **Layoutet:** scene plus panel. Øverst i scenen laboratoriebordet med
-   flaskerne, urglasset og luppen, under det hæftet på ternet papir, nederst
-   Kemichael ved katederet. Panelet har opgavekortet, farvekortet og listen.
+   flaskerne, urglasset og luppen, under det hæftet på ternet papir og en
+   smal stribe til Start forfra (Kemichael ved katederet sad nederst til
+   9. okt. 2026). Panelet har opgavekortet, farvekortet og listen.
    Den ene knap stod først i opgavekortet; fra 3. oktober står den på papiret.
 
 ### Rettet efter brugerens første test (26. september 2026)
@@ -53,9 +53,8 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
 * "Michaels forklaringer er lidt overvældende for en svag elev [...] Måske
   kan han give en kort forklaring og linke sin tekniske forklaring i et
   læs-mere-teori-afsnit, hvor man fik det på en full screen med mere tekst
-  og pænere stillet op." Kemichael siger nu én kort sætning ved Giv hint og
-  Vis svaret, og knappen Læs mere åbner hans forklaring i fuld skærm (se
-  Hjælpen).
+  og pænere stillet op." Hint og svar er nu én kort sætning, og knappen
+  Læs mere åbner forklaringen i fuld skærm (se Hjælpen).
 
 ### Rettet efter brugerens anden test (3. oktober 2026)
 
@@ -71,8 +70,9 @@ atomerne, en klamme fra Fe til Fe og en fra Mn til Mn under skemaet med
   permanganat, manganat, brunsten og mangan(II)ion. Brugeren skrev
   mangan(III)ion; Mn²⁺ er mangan(II)ion.
 * "Kan det ikke være sådan, at han giver et hint, når man trykker på ham."
-  Et klik på Kemichael giver hintet til bidden (det samme som Giv hint).
-  Svaret giver han kun på knappen, så et klik aldrig koster stjernen.
+  Sådan var det, til Kemichael blev taget helt ud 9. okt. 2026 (brugerens
+  valg: han hører til i laboratoriet). Hintet kommer nu kun fra den gule knap
+  på papiret og står i opgavekortet.
 * "En ultrakort midlertidig beskrivelse til hvert trin (gerne med samme
   skrifttype og placering, som der hvor der står Lidt sulfit). Fx: Skriv
   oxidationstallene for S og Mn i skemaet." Linjen øverst i hæftet viser nu
@@ -152,18 +152,17 @@ til der er dryppet (se `feedback-ingen-facit-foer-tid` i noterne).
 
 Den ene knap står på papiret i scenen: Giv hint → Vis svaret (Dryp for mig
 ved dryppet, det koster ikke stjernen) i papirets nederste højre hjørne, og
-Næste opgave midt i hæftet (`placerKnap` i `js/haefte.js`). Et klik på
-Kemichael giver også hintet, men aldrig svaret. Kemichael siger én kort sætning i
-almindelige ord, fx "Se på SO₃²⁻. Alle tallene skal give ionens ladning, −2.
+Næste opgave midt i hæftet (`placerKnap` i `js/haefte.js`). Efter et forkert
+svar lyser knappen stille op. Hintet og svaret står i linjen i opgavekortet
+som én kort sætning i almindelige ord, fx "Se på SO₃²⁻. Alle tallene skal give ionens ladning, −2.
 Hvad skal S så være?" eller "Her er tallene. S går fra +IV til +VI, og Mn
-går fra +VII til +VI." Bagefter står knappen **Læs mere**, der åbner hans
-forklaring i fuld skærm (`js/forklaring.js`): et kort pr. stof eller klamme
+går fra +VII til +VI." Bagefter står knappen **Læs mere**, der åbner
+forklaringen i fuld skærm (`js/forklaring.js`): et kort pr. stof eller klamme
 med regnestykket linje for linje (almindelige tal i mellemregningerne,
 romertal i svaret, som sc8.2), tallinjen fra før til efter, to
 gangetabeller, tabeller med ladning og H pr. formel. Efter et hint viser
 forklaringen opstillingen og et spørgsmål (gult) i stedet for resultatet;
-efter Vis svaret er det hele regnet ud (grønt). Er Kemichael sendt ud, står
-den korte sætning og Læs mere i opgavekortet.
+efter Vis svaret er det hele regnet ud (grønt).
 
 Et forkert svar får en besked, der passer til fejlen
 (`X.oxFejl` og `X.klammeFejl` i `js/redox.js`, `ladFejl`, `iltFejl` og
@@ -229,17 +228,6 @@ afstemt med de mindste tal.
   gul. Væsken tegnes mod en lys bund, som om klinken skinner igennem.
 * Luppen viser elektronregnskabet, ikke H⁺, OH⁻ og vand.
 
-## Kemichael
-
-Den rolige udgave fra sc8.2 (`NK.RoligLaerer` i `js/laerer.js`): han sidder
-bag katederet, siger kun noget ved Giv hint og Vis svaret, tier, når bidden
-er løst, og kan sendes ud (så står hintene i opgavekortet). Et klik på ham
-giver hintet til bidden; holdes musen over ham, står der "Klik for et hint".
-Er skemaet afstemt, svarer han som ellers på et prik. Ingen Start
-præsentation / Nej tak. K får ham til at sige, hvor man er, og hvad man gør.
-Påskeæg: flasken sluppet over hans kop ("Sulfit i kaffen? Den er reduceret
-nok i forvejen." / "Ikke permanganat i kaffen. Den er oxideret nok.").
-
 ## Filer
 
 ```
@@ -250,15 +238,14 @@ js/kerne.js         NK-navnerum, hævet og sænket skrift, lærred (som sc8.2)
 js/data.js          reaktionerne, farverne, farvekortet og replikkerne
 js/redox.js         modellen: oxidationstal, klammer, gangetal, afstemning
                     og beskederne til klammerne
-js/sprites.js       katederet, urglasset og dråbeflasken
+js/sprites.js       urglasset og dråbeflasken
 js/tegning.js       bordet, klinken, væsken, flasken, dråberne og luppen
-js/laerer.js        Kemichael ved katederet (som sc8.2, egen nøgle)
-js/fane.js          det fælles: listen, knappen, linjen, musen og klikket
-                    på Kemichael (som sc8.2)
+js/fane.js          det fælles: listen, knappen, linjen (også hint og svar)
+                    og musen (som sc8.2)
 js/haefte.js        hæftet: skemaet, felterne, klammerne (SVG), rækkerne, den
                     korte linje øverst og knappen på papiret
 js/bord.js          bordet: glassene, flasken, dryppet og luppen
-js/forklaring.js    Kemichaels forklaring bag Læs mere (kort, tallinje,
+js/forklaring.js    forklaringen bag Læs mere (kort, tallinje,
                     gangetabeller og tabeller)
 js/sim.js           de to faner: bidderne, tjekkene, det tomme urglas og
                     låsen på fane 1, skiltet under glasset, hint og Vis svaret
@@ -271,26 +258,25 @@ _selvtest.html      udviklerværktøj, se nedenfor
 ## Genveje
 
 <kbd>1</kbd> <kbd>2</kbd> fane · <kbd>R</kbd> start forfra · <kbd>H</kbd>
-rundvisning · <kbd>T</kbd> teori · <kbd>K</kbd> Kemichael · <kbd>Enter</kbd>
+rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd>
 tjek · <kbd>↑</kbd> <kbd>↓</kbd> vend pilen · <kbd>Esc</kbd> luk. Direkte
 links: `#urglas` og `#flere`.
 
 ## Selvtest
 
-`_selvtest.html` skal åbnes gennem en lokal server med `animationer/` som rod
-(Kemichael hentes derfra). Den tjekker de 17 skemaer mod de kendte (også
+`_selvtest.html` skal åbnes gennem en lokal server. Den tjekker de 17 skemaer mod de kendte (også
 tegningens), klammerne og gangetallene, at felterne læser romertal og tal,
 beskederne til de typiske fejl, at der ikke står et facit før tid, at
 eleven selv fylder det tomme urglas (i begge rækkefølger), at skiltet under
 glasset følger med, at reaktionerne i glasset på fane 1 åbner én ad gangen
 og kræver den rigtige flaske, at knappen står på papiret uden at dække
-noget, at den korte linje følger bidderne, at et klik på Kemichael giver
-hintet og aldrig svaret, at pilen kan vendes med klik, taster og fortegn, at alle reaktioner
-kan gennemføres ved at skrive, med musen og med Vis svaret, at Kemichael
-siger én kort sætning, og at Læs mere åbner forklaringen (uden facit efter et
-hint), Kemichael inde og ude, sproget (også i alle forklaringerne) og
+noget, at den korte linje følger bidderne, at hintknappen lyser op efter
+en fejl, at pilen kan vendes med klik, taster og fortegn, at alle reaktioner
+kan gennemføres ved at skrive, med musen og med Vis svaret, at hint og svar
+er én kort sætning i opgavekortet, og at Læs mere åbner forklaringen (uden
+facit efter et hint), sproget (også i alle forklaringerne) og
 layoutet fra 1100 × 700 til 1600 × 950.
-Sidst kørt: ALT OK (269 påstande), 4. oktober 2026.
+Sidst kørt: ALT OK (266 påstande), 9. oktober 2026.
 
 ## I menuen
 

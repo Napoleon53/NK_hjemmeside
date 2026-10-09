@@ -114,6 +114,9 @@
         for (i = 0; i < tok.length; i++) if (tok[i].k === "tegn" && tok[i].v === "1") ener.push(i);
         if (ener.length) {
             if (tok.length === 1) return { ok: true, led: [], en: true };
+            /* 1 med en eksponent (1²) er stadig 1: saadan regner eleven, naar det
+               udeladte stof har et tal foran (elev, 6. okt. 2026) */
+            if (tok.length === 2 && ener[0] === 0 && tok[1].k === "eks") return { ok: true, led: [], en: true, enEks: tok[1].v };
             return fejl("en", ener[0]);
         }
         var led = [], venter = true;            /* venter: der skal komme et stof nu */
@@ -179,12 +182,13 @@
             return { ok: false, kode: "tom", z: "num", rod: [], tekst: "Brøken er tom." };
         }
 
-        var z, i, a, r, en = {};
+        var z, i, a, r, en = {}, enEks = {};
         for (z in sider) {
             r = B.laes(sider[z]);
             if (!r.ok) return syntaks(r.fejl, z, sider[z]);
             laest[z] = r.led;
             en[z] = !!r.en;
+            enEks[z] = r.enEks;
         }
 
         /* Hele broeken vendt: taeller og naevner er byttet om */
@@ -231,7 +235,7 @@
             /* Manglende stoffer */
             var FL = F[z];
             if (!L.length && FL.length) {
-                return { ok: false, kode: "tom-side", z: z, rod: en[z] ? [{ z: z, i: 0 }] : [],
+                return { ok: false, kode: "tom-side", z: z, rod: en[z] ? (enEks[z] ? [{ z: z, i: 0 }, { z: z, i: 1 }] : [{ z: z, i: 0 }]) : [],
                     tekst: en[z] ? "Der står 1 i " + ZN[z] + ", men der er stoffer, der skal med." :
                         (z === "num" ? "Tælleren" : "Nævneren") + " er tom." };
             }
@@ -250,7 +254,8 @@
                 }
             }
         }
-        return { ok: true };
+        /* enEks: eleven skrev 1 med en eksponent; linjen siger, at det er 1 */
+        return enEks.den ? { ok: true, enEks: enEks.den } : { ok: true };
     };
 
     /* Leddet og dets eksponent, som skal have en roed ring */

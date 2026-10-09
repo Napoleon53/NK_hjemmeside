@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc7.5 Stærke og svage syrer</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:760px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen rammer Databogens syrekonstanter,
+   at luppen viser det antal oxoniumioner, modellen siger (100 i
+   saltsyre, omkring 1 i eddikesyre), at den svage syre bytter hydroner
+   frem og tilbage uden at antallet løber, at kalken bruser efter
+   [H₃O⁺], at alle mål på de tre faner kan løses (selv, med forkerte
+   svar og med Vis svaret), at opgaven står på kortet øverst i scenen
+   og ikke i panelet (gættet, det, eleven skal gøre, og spørgsmålene),
+   at et klik på forsøget før gættet får kortet til at blinke, at
+   kortet aldrig dækker lupperne eller glassene, at sproget holder
+   reglerne, og at tingene kan være der fra 1100 × 620 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc7.5-g", "nk-sc7.5-s", "nk-sc7.5-f"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|haeld\w*|staerk\w*|oeverst|loest|proev\w*|baeger\w*|vaeske\w*|maal|gaet\w*|spoerg\w*|taet|faa|saa|naar)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+/* Første indlæsning: gem elevens fremskridt, ryd det, og indlæs siden igen,
+   så fanerne begynder ved første mål. Anden indlæsning: kør testen. */
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 1200); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Kør en fane sek sekunder */
+function koerF(F, sek) { for (var t = 0; t < sek; t += 1 / 60) F.opdater(1 / 60); }
+function taet(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kemi;
+    var G = NK.sims["fane-g"], S = NK.sims["fane-s"], F = NK.sims["fane-f"];
+    /* Det, eleven faar at vide: forklaringen til et loest maal (og til et rigtigt
+       svar med et spoergsmaal til) staar paa kortet oeverst, alt andet i linjen forneden */
+    /* statuslinje er beskeden i kortets nederste raekke (hint, fejl, klik); kortT er
+       kortets hovedtekst (opgaven, spoergsmaalet eller forklaringen) */
+    function statuslinje(X) { return X.el.besked.hidden ? "" : X.beskedTekst(); }
+    function kortT(X) { var e = X.el.skort.querySelector(".sk-tekst"); return e ? e.textContent : ""; }
+    function linje(X) { return X.faerdig || X.venter ? kortT(X) : statuslinje(X); }
+    function videre(X) { return X.el.skort.querySelector(".sk-videre"); }
+    function klasse(X) { return X.el.status.className; }
+    function roed(X) { return /skidt/.test(klasse(X)); }
+    function groen(X) { return X.el.skort.classList.contains("loest") && !X.el.skort.classList.contains("svar"); }
+    function knaptekst(X) { return X.el.knap.textContent; }
+    /* Tryk på hjælpeknappen, til målet er løst (hint, hint, hint, Vis svaret ...) */
+    function visSvaret(X, i) {
+        X.vaelg(i);
+        for (var n = 0; n < 24 && !X.faerdig; n++) { X.knap(); koerF(X, 0.1); }
+        return X.faerdig;
+    }
+    function rigtigt(X) { var del = X.opg.o[X.opg.fase], j = -1; del.svar.forEach(function (s, i) { if (s.ok) j = i; }); return j; }
+    function forkert(X) { var del = X.opg.o[X.opg.fase], j = -1; del.svar.forEach(function (s, i) { if (!s.ok && j < 0) j = i; }); return j; }
+    /* En rigtig mus på lærredet (syntetiske hændelser) */
+    function mus(X, type, x, y) {
+        var r = X.L.canvas.getBoundingClientRect();
+        var e = new W.PointerEvent(type, { bubbles: true, cancelable: true, clientX: r.left + x, clientY: r.top + y, button: 0, pointerId: 1 });
+        X.L.canvas.dispatchEvent(e);
+    }
+    function klik(X, x, y) {
+        mus(X, "pointermove", x, y); mus(X, "pointerdown", x, y); mus(X, "pointerup", x, y);
+        var r = X.L.canvas.getBoundingClientRect();
+        X.L.canvas.dispatchEvent(new W.MouseEvent("click", { bubbles: true, clientX: r.left + x, clientY: r.top + y }));
+    }
+    function glasMidt(g) { var m = g.maal(); return { x: g.x, y: (m.flade + m.indBund) / 2 }; }
+
+    /* ------------------------------------------------------------------ */
+    overskrift("1. Modellen: hvor stor en del afgiver en hydron");
+    paastand("pKs fra Databogen: eddikesyre 4,76, myresyre 3,75, citronsyre 3,13", K.SYRE.eddike.pKs === 4.76 && K.SYRE.myre.pKs === 3.75 && K.SYRE.citron.pKs === 3.13);
+    paastand("saltsyre og salpetersyre er stærke, de tre andre svage", K.erStaerk("HCl") && K.erStaerk("HNO3") && !K.erStaerk("eddike") && !K.erStaerk("myre") && !K.erStaerk("citron"));
+    paastand("stærk syre: [H₃O⁺] = c", K.oxonium("HCl", 0.10) === 0.10 && K.oxonium("HNO3", 0.010) === 0.010);
+    var xe = K.oxonium("eddike", 0.10), Kse = K.Ks("eddike");
+    paastand("svag syre: x² / (c − x) = Ks", taet(xe * xe / (0.10 - xe) / Kse, 1, 1e-9), xe);
+    paastand("0,10 M eddikesyre: 1,3 % har afgivet en hydron, pH 2,88", taet(K.andel("eddike", 0.10), 0.0131, 0.0002) && K.pHTekst("eddike", 0.10) === "2,88", K.andel("eddike", 0.10));
+    paastand("0,10 M myresyre: 4,1 %, og citronsyre: 8,2 %", taet(K.andel("myre", 0.10), 0.0413, 0.0005) && taet(K.andel("citron", 0.10), 0.0825, 0.0006), K.andel("myre", 0.10) + " / " + K.andel("citron", 0.10));
+    paastand("pH i saltsyre: 1,00 ved 0,10 M, så 2,00, 3,00 og 4,00", K.TRIN.map(function (c) { return K.pHTekst("HCl", c); }).join(" ") === "1,00 2,00 3,00 4,00", K.TRIN.map(function (c) { return K.pHTekst("HCl", c); }).join(" "));
+    paastand("fortyndingen går 0,10 › 0,010 › 0,0010 › 0,00010 M", K.TRIN.map(K.konc).join(" › ") === "0,10 M › 0,010 M › 0,0010 M › 0,00010 M", K.TRIN.map(K.konc).join(" › "));
+    var lh = K.iLup("HCl", 0.10), le = K.iLup("eddike", 0.10), lm = K.iLup("myre", 0.10), lc = K.iLup("citron", 0.10);
+    paastand("luppen ved 0,10 M: saltsyre 100 delte af 100, eddikesyre 1, myresyre 4, citronsyre 8",
+        lh.haeldt === 100 && lh.delte === 100 && lh.hele === 0 && le.delte === 1 && le.hele === 99 && lm.delte === 4 && lc.delte === 8, [lh.delte, le.delte, lm.delte, lc.delte].join(","));
+    paastand("luppen med fortyndet saltsyre: 10, 1 og 0 molekyler, alle delte",
+        K.iLup("HCl", 0.010).haeldt === 10 && K.iLup("HCl", 0.010).delte === 10 && K.iLup("HCl", 0.0010).haeldt === 1 && K.iLup("HCl", 0.0010).delte === 1 && K.iLup("HCl", 0.00010).haeldt === 0);
+    paastand("luppens rum er 1,66 · 10⁻²¹ L med ca. 55.000 vandmolekyler", taet(K.LUP_L, 1.66e-21, 0.01e-21) && K.VAND_I_LUP === 55000, K.LUP_L + " / " + K.VAND_I_LUP);
+    paastand("brusen følger [H₃O⁺]: 1 i 0,10 M saltsyre, 0,013 i eddikesyre", K.brus("HCl", 0.10) === 1 && taet(K.brus("eddike", 0.10), 0.0131, 0.0002));
+    paastand("saltsyre fortyndet 100 gange bruser omtrent som 0,10 M eddikesyre (inden for en faktor 1,5)",
+        K.brus("eddike", 0.10) / K.brus("HCl", 0.0010) > 1 && K.brus("eddike", 0.10) / K.brus("HCl", 0.0010) < 1.5, K.brus("eddike", 0.10) / K.brus("HCl", 0.0010));
+    paastand("myresyre bruser mere end eddikesyre, og citronsyre mere end myresyre", K.brus("myre", 0.10) > K.brus("eddike", 0.10) && K.brus("citron", 0.10) > K.brus("myre", 0.10));
+    paastand("skemaerne: enkeltpil for den stærke, dobbeltpil for den svage",
+        K.skema("HCl") === "HCl + H₂O → Cl⁻ + H₃O⁺" && K.skema("eddike") === "CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺" && K.skema("HNO3") === "HNO₃ + H₂O → NO₃⁻ + H₃O⁺", K.skema("eddike"));
+    var afstemt = Object.keys(K.SYRE).every(function (id) { return D.S_MAAL.concat(D.G_MAAL).every(function (o) { return o.loest.indexOf(K.SYRE[id].formel + " + H₂O") < 0 || o.loest.indexOf(K.skema(id)) >= 0; }); });
+    paastand("skemaerne i teksterne er modellens skemaer", afstemt);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("2. Luppen: partiklerne følger modellen");
+    function koerL(L, sek, hvert) { for (var t = 0; t < sek; t += 1 / 60) { L.opdater(1 / 60); if (hvert) hvert(); } }
+    var L1 = new NK.Lup({ syre: "HCl", b: 400, h: 280 });
+    var a1 = L1.antal();
+    koerL(L1, 20);
+    var a1b = L1.antal();
+    paastand("saltsyre: 100 chloridioner, 100 oxoniumioner og ingen hele molekyler, også efter 20 s",
+        a1.haeldt === 100 && a1.hele === 0 && a1.ox === 100 && a1b.hele === 0 && a1b.ox === 100 && L1.byt === 0, JSON.stringify(a1b));
+    var L2 = new NK.Lup({ syre: "eddike", b: 400, h: 280 });
+    var a2 = L2.antal(), min = 99, max = 0, sumfejl = 0, ude = 0;
+    koerL(L2, 90, function () {
+        var a = L2.antal();
+        min = Math.min(min, a.delte); max = Math.max(max, a.delte);
+        if (a.haeldt !== 100 || a.ox !== a.delte) sumfejl++;
+        L2.enh.concat(L2.ox).forEach(function (p) { if (p.x < -0.5 || p.x > 400.5 || p.y < -0.5 || p.y > 280.5) ude++; });
+    });
+    paastand("eddikesyre: 99 hele molekyler, 1 acetation og 1 oxoniumion", a2.hele === 99 && a2.delte === 1 && a2.ox === 1, JSON.stringify(a2));
+    paastand("eddikesyre: hydroner byttes frem og tilbage (mindst 5 gange på 90 s)", L2.byt >= 5, L2.byt);
+    paastand("antallet af delte bliver ved 1 (kortvarigt 2 under et bytte) og når aldrig 0", min === 1 && max === 2, min + " til " + max);
+    paastand("der er altid 100 molekyler, og én oxoniumion for hvert delt molekyle", sumfejl === 0, sumfejl);
+    paastand("partiklerne bliver i vinduet", ude === 0, ude);
+    var L3 = new NK.Lup({ syre: "eddike", b: 400, h: 280 });
+    L3.bytter = false;
+    var stille = true;
+    koerL(L3, 30, function () { if (L3.antal().delte !== 1) stille = false; });
+    paastand("med byttet slået fra står antallet stille på 1 (målet, hvor eleven tæller)", stille && L3.byt === 0);
+    var L4 = new NK.Lup({ syre: "citron", b: 400, h: 280 }), min4 = 99, max4 = 0;
+    koerL(L4, 60, function () { var a = L4.antal(); min4 = Math.min(min4, a.delte); max4 = Math.max(max4, a.delte); });
+    paastand("citronsyre: 8 delte (kortvarigt 9), aldrig i nærheden af alle", min4 === 8 && max4 <= 9 && L4.byt >= 8, min4 + " til " + max4 + ", byt " + L4.byt);
+    L1.saet("HCl", 0.010); koerL(L1, 1.2);
+    var f1 = L1.antal();
+    L1.saet("HCl", 0.0010); koerL(L1, 1.2);
+    var f2 = L1.antal();
+    L1.saet("HCl", 0.00010); koerL(L1, 1.2);
+    var f3 = L1.antal();
+    paastand("en fortynding fjerner ni tiendedele af partiklerne: 10 + 10, så 1 + 1, så ingen",
+        f1.haeldt === 10 && f1.ox === 10 && f2.haeldt === 1 && f2.ox === 1 && f3.haeldt === 0 && f3.ox === 0 && L1.enh.length === 0, JSON.stringify([f1, f2, f3]));
+    var o2 = L2.ox[0], hit = L2.ved(o2.x, o2.y), hel = L2.enh.filter(function (e) { return !e.delt; })[0];
+    paastand("et klik rammer partiklen under musen", hit && hit.slags === "ox" && L2.ved(-50, -50) === null && !!L2.ved(hel.x, hel.y));
+    L2.saetMaal(320, 240);
+    paastand("partiklerne følger med, når vinduet skifter størrelse", L2.enh.concat(L2.ox).every(function (p) { return p.x >= 0 && p.x <= 320 && p.y >= 0 && p.y <= 240; }) && L2.s < 1);
+    var FO = NK.Lup.FORM;
+    paastand("formen følger stoffet: HCl og Cl⁻ er kugler, eddikesyre, myresyre og citronsyre er aflange",
+        FO.HCl.slags === "kugle" && FO.eddike.slags === "pille" && FO.myre.slags === "pille" && FO.citron.slags === "pille" && FO.eddike.l > FO.myre.l && FO.citron.l > FO.eddike.l && FO.HNO3.slags === "trekant");
+    var Lk = new NK.Lup({ syre: "eddike", b: 400, h: 280 }), ek = Lk.enh.filter(function (e) { return !e.delt; })[0], kn = Lk.knopVed(ek);
+    paastand("hydronen sidder uden på det hele molekyle, for enden af det",
+        taet(Math.hypot(kn.x - ek.x, kn.y - ek.y), Lk.F.arm + Lk.F.knop * 0.55, 0.01) && Lk.F.arm === FO.eddike.l && Lk.F.kant >= Lk.F.arm + Lk.F.knop);
+    paastand("klikteksterne: oxoniumion, chloridion, acetation og et helt molekyle",
+        /oxoniumion, H₃O⁺/.test(D.partikel("ox", "HCl", true)) && /^En chloridion, Cl⁻/.test(D.partikel("ion", "HCl", true)) && /^En acetation, CH₃COO⁻/.test(D.partikel("ion", "eddike", true)) &&
+        /^Citronsyrens ion, C₆H₇O₇⁻/.test(D.partikel("ion", "citron", true)) && /helt molekyle eddikesyre, CH₃COOH\. Den lille orange kugle er hydronen/.test(D.partikel("hel", "eddike", true)) &&
+        !/Cl|HNO|CH/.test(D.partikel("ion", "HNO3", false) + D.partikel("hel", "HNO3", false)), D.partikel("ion", "citron", true));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("3. Glasset: kalken bruser efter [H₃O⁺]");
+    function glasEfter(syre, c, sek, kalk) {
+        var g = new NK.Glas({ id: "t", syre: syre, c: c });
+        g.plads(300, 500, 180);
+        if (kalk) g.kalkI(true);
+        for (var t = 0; t < sek; t += 1 / 60) g.opdater(1 / 60);
+        return g;
+    }
+    function rate(syre, c, sek) { return glasEfter(syre, c, sek, true).lavet / sek; }
+    var rH = rate("HCl", 0.10, 10), rE = rate("eddike", 0.10, 120), rF = rate("HCl", 0.0010, 120);
+    paastand("0,10 M saltsyre: 60 bobler i sekundet", taet(rH, 60, 1), rH.toFixed(1));
+    paastand("0,10 M eddikesyre: under 1 boble i sekundet (0,79)", taet(rE, 0.79, 0.03), rE.toFixed(2));
+    paastand("saltsyre fortyndet 100 gange: også under 1 boble i sekundet (0,60)", taet(rF, 0.60, 0.03), rF.toFixed(2));
+    var tom = glasEfter("HCl", 0.10, 3, false);
+    paastand("uden kalk kommer der ingen bobler", tom.bobler.length === 0 && tom.skum.length === 0 && tom.bruset === 0);
+    var gT = new NK.Glas({ id: "t", syre: "HCl" });
+    gT.plads(300, 500, 180);
+    gT.kalkI(false);
+    gT.opdater(0.2);
+    var falder = gT.bobler.length === 0 && gT.kalkT < 1;
+    for (var tt = 0; tt < 60; tt++) gT.opdater(1 / 60);
+    paastand("kalken falder først til bunds, og så begynder det at bruse", falder && gT.kalkT === 1 && gT.bobler.length > 5, gT.bobler.length);
+    var mT = gT.maal();
+    paastand("boblerne bliver i væsken", gT.bobler.every(function (b) { return b.y <= mT.indBund && b.y >= mT.flade - 6 && b.x > mT.indV && b.x < mT.indH; }));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("4. Fane 1: To glas");
+    NK.visFane("fane-g");
+    G.vaelg(0); G.tilpas(); G.layout();
+    var gkG = d.getElementById("g-skort");
+    paastand("startbilledet: to glas uden kalk, skålen, ingen lupper og intet regnskab",
+        G.harKalk() === 0 && !G.aaben[0] && !G.aaben[1] && G.opg.fase === "gaet" && d.getElementById("g-regnkort").hidden);
+    paastand("al tekst står på kortet øverst: der er ingen linje nederst i scenen, og scenen går helt til bunds",
+        !d.querySelector(".statuslinje") && gkG.contains(G.el.status) && gkG.contains(G.el.besked) && gkG.contains(G.el.knap) && G.baand().h === 0 && G.baand().y === G.L.h &&
+        G.glas[0].bund > G.L.h - 40 && gkG.getBoundingClientRect().bottom < G.L.canvas.getBoundingClientRect().top + G.glas[0].maal().y0, Math.round(gkG.getBoundingClientRect().bottom));
+    paastand("gættet står på det gule kort midt i scenen med tre svar, ikke i panelet",
+        gkG.classList.contains("gaet") && gkG.offsetHeight > 150 && gkG.querySelectorAll("[data-valg]").length === 3 && /Gæt først/i.test(gkG.textContent) && /I hvilket glas bruser kalken mest\?/.test(gkG.textContent) &&
+        !d.getElementById("g-kort") && !d.getElementById("g-prompt") && d.querySelectorAll("#fane-g .panel [data-valg]").length === 0, gkG.textContent);
+    paastand("under gættet er hjælpeknappen kun et lille omrids, Spring gættet over, og kortet har ingen besked",
+        knaptekst(G) === "Spring gættet over" && /svar/.test(G.el.knap.className) && /lille/.test(G.el.knap.className) && statuslinje(G) === "" && G.el.besked.hidden, knaptekst(G));
+    var p0 = glasMidt(G.glas[0]);
+    klik(G, p0.x, p0.y);
+    paastand("et klik på et glas før gættet: ingen kalk, kortet blinker og siger Gæt først", G.harKalk() === 0 && gkG.classList.contains("blink") && statuslinje(G) === D.GAET_LINJE && !G.el.besked.hidden, statuslinje(G));
+    gkG.classList.remove("blink");
+    var sk0 = G.lay.skaal;
+    klik(G, sk0.x + sk0.b / 2, sk0.y + sk0.h / 2);
+    paastand("et klik på skålen før gættet gør det samme, og kalken kan ikke trækkes endnu", !G.traek && G.harKalk() === 0 && gkG.classList.contains("blink"));
+    koerF(G, 5.5);
+    paastand("beskeden på kortet forsvinder igen efter nogle sekunder", statuslinje(G) === "" && G.el.besked.hidden);
+    gkG.querySelector('[data-valg="1"]').click();
+    paastand("et svar på kortet er gættet, og kortet viser nu, hvad der skal gøres", G.opg.gaet === 1 && !gkG.classList.contains("gaet") && gkG.classList.contains("opgave") &&
+        /^Opgave 1/i.test(kortT(G)) && /Træk et stykke kalk/.test(kortT(G)) && /Dit gæt:\s*I glasset med eddikesyre/.test(gkG.textContent) && gkG.querySelectorAll("[data-valg]").length === 0, gkG.textContent);
+    paastand("efter gættet er hjælpeknappen fyldt gul, og skiltet peger på skålen",
+        knaptekst(G) === "Giv et hint" && !/svar/.test(G.el.knap.className) && !G.el.knap.hidden && G.opg.fase === "forsoeg" && G.peger() === "skaal" && statuslinje(G) === "", statuslinje(G));
+    /* Træk et stykke kalk fra skålen over i saltsyren */
+    var sk = G.lay.skaal;
+    mus(G, "pointermove", sk.x + sk.b / 2, sk.y + sk.h / 2);
+    mus(G, "pointerdown", sk.x + sk.b / 2, sk.y + sk.h / 2);
+    var holdt = !!G.traek;
+    mus(G, "pointermove", p0.x, p0.y - 40);
+    mus(G, "pointerup", p0.x, p0.y - 40);
+    paastand("kalken kan trækkes fra skålen ned i et glas, og kortet siger, hvad der mangler",
+        holdt && G.glas[0].kalk && !G.glas[1].kalk && statuslinje(G) === "Kom også et stykke kalk i glasset med eddikesyre.", statuslinje(G));
+    var p1 = glasMidt(G.glas[1]);
+    klik(G, p1.x, p1.y);
+    paastand("et klik på det andet glas virker også", G.glas[1].kalk && G.harKalk() === 2);
+    koerF(G, 1.0);
+    paastand("målet er ikke nået, før eleven har set det bruse", !G.faerdig && statuslinje(G) === "Se, hvor meget kalken bruser i de to glas.", statuslinje(G));
+    koerF(G, 3.0);
+    paastand("mål 1: løst, gættet holdt ikke, og forklaringen står på det grønne kort øverst",
+        G.faerdig && gkG.classList.contains("loest") && /^Løst ✓/.test(kortT(G)) && /Dit gæt holdt ikke\./.test(kortT(G)) && /bruser kraftigt i saltsyren/.test(kortT(G)), kortT(G));
+    paastand("når opgaven er løst, er kortets nederste række og hjælpeknappen væk", G.el.status.hidden && G.el.knap.hidden && statuslinje(G) === "");
+    paastand("kortet leder videre: knappen Næste opgave står på det", !!videre(G) && videre(G).textContent === "Næste opgave →" && gkG.offsetHeight <= G.kortZone(), gkG.offsetHeight);
+    paastand("saltsyren bruser langt mere end eddikesyren", G.glas[0].bobler.length > 20 && G.glas[1].bobler.length <= 2, G.glas[0].bobler.length + " / " + G.glas[1].bobler.length);
+    videre(G).click();
+    paastand("mål 2 begynder med kalk i glassene og uden lupper, og hjælpen er tilbage på kortet",
+        G.opg.o.id === "lup-hcl" && G.harKalk() === 2 && !G.aaben[0] && !G.aaben[1] && G.peger() === 0 && /Klik på glasset med saltsyre/.test(kortT(G)) && !G.el.status.hidden && !G.el.knap.hidden, kortT(G));
+    klik(G, p0.x, p0.y);
+    paastand("et klik på saltsyren åbner luppen over den", G.aaben[0] && !G.aaben[1]);
+    koerF(G, 1.5);
+    paastand("så kommer spørgsmålet samme sted: på kortet øverst i scenen med tre svarknapper",
+        G.opg.fase === "spm" && gkG.classList.contains("spm") && /^Spørgsmål/i.test(kortT(G)) && /stadig hele/.test(kortT(G)) && gkG.querySelectorAll(".sk-knap[data-valg]").length === 3 && gkG.offsetHeight <= G.kortZone() && statuslinje(G) === "", gkG.offsetHeight);
+    paastand("lupperne begynder under den plads, kortet har fået sat af", G.lay.sigY - 16 >= 10 + G.kortZone() && G.lay.lup[0].y > G.lay.sigY);
+    gkG.querySelector('.sk-knap[data-valg="' + forkert(G) + '"]').click();
+    paastand("et forkert svar: forklaringen står i rødt på kortet under svarene, svaret bliver rødt, og hintknappen lyser op",
+        roed(G) && /^Ikke endnu/.test(statuslinje(G)) && /gråt med en lille orange hydron/.test(statuslinje(G)) && /peg/.test(G.el.knap.className) &&
+        gkG.querySelectorAll(".sk-knap.forkert:disabled").length === 1 && gkG.offsetHeight <= G.kortZone() &&
+        G.el.status.getBoundingClientRect().top >= gkG.querySelector(".sk-svar").getBoundingClientRect().bottom, statuslinje(G));
+    gkG.querySelector('.sk-knap[data-valg="' + rigtigt(G) + '"]').click();
+    paastand("det rigtige svar: kortet bliver grønt med svaret, forklaringen og knappen Næste opgave",
+        gkG.classList.contains("loest") && !gkG.classList.contains("svar") && /^Rigtigt ✓/.test(kortT(G)) && gkG.querySelector(".sk-svaret").textContent === "Ingen er hele." &&
+        /100 oxoniumioner/.test(kortT(G)) && gkG.querySelectorAll(".sk-knap").length === 0 && videre(G).textContent === "Næste opgave →" && G.el.status.hidden, kortT(G));
+    paastand("mål 2: løst, og panelet husker tallene", G.faerdig && !d.getElementById("g-regnkort").hidden && /0 af 100/.test(d.getElementById("g-regnskab").textContent));
+    videre(G).click();
+    paastand("mål 3: luppen over saltsyren er blevet, og eddikesyrens antal står stille", G.opg.o.id === "lup-eddike" && G.aaben[0] && !G.aaben[1] && G.lup[1].bytter === false);
+    klik(G, p1.x, p1.y);
+    koerF(G, 1.5);
+    paastand("luppen over eddikesyren: 1 oxoniumion, 99 hele", G.aaben[1] && G.opg.fase === "spm" && G.lup[1].antal().delte === 1 && G.lup[1].antal().hele === 99);
+    paastand("ingen ring om oxoniumionen før hintet", G.ringI(1) === null);
+    G.el.knap.click(); G.el.knap.click();
+    paastand("andet hint står på kortet og sætter en gul ring om den røde oxoniumion",
+        G.hjaelp === 2 && G.ringI(1) === G.lup[1].ox[0] && /^Hint 2 af 3/.test(statuslinje(G)) && /gul ring/.test(statuslinje(G)) && /hint/.test(klasse(G)) && gkG.offsetHeight <= G.kortZone(), statuslinje(G));
+    paastand("knappen tæller hintene", knaptekst(G) === "Næste hint (3 af 3)", knaptekst(G));
+    G.svarValg(rigtigt(G));
+    paastand("mål 3: løst", G.faerdig && /1 ud af 100/.test(kortT(G)) && /99 af 100/.test(d.getElementById("g-regnskab").textContent));
+    videre(G).click();
+    paastand("mål 4: nu bytter eddikesyren hydroner", G.opg.o.id === "balance" && G.lup[1].bytter === true && G.opg.fase === "forsoeg");
+    var byt0 = G.lup[1].byt;
+    koerF(G, 14);
+    paastand("et bytte er set inden for 14 s: det, eleven så, står alene på det grønne kort med knappen Næste spørgsmål",
+        G.lup[1].byt > byt0 && G.venter && G.opg.fase === "forsoeg" && gkG.classList.contains("loest") && /^Godt ✓/.test(kortT(G)) && /tog en hydron tilbage/.test(kortT(G)) &&
+        videre(G).textContent === "Næste spørgsmål →" && G.peger() === null, kortT(G));
+    videre(G).click();
+    paastand("så kommer spørgsmålet om hydronerne", G.opg.fase === "spm" && gkG.classList.contains("spm") && /flytter hydronerne hele tiden/.test(kortT(G)), kortT(G));
+    G.svarValg(forkert(G));
+    var roed4 = roed(G);
+    G.svarValg(rigtigt(G));
+    paastand("mål 4: løst, med dobbeltpilen i forklaringen", roed4 && G.faerdig && kortT(G).indexOf(K.skema("eddike")) >= 0, kortT(G));
+    videre(G).click();
+    G.svarValg(1);
+    var roed5 = roed(G) && /ingen hele HCl-molekyler/.test(statuslinje(G));
+    G.svarValg(rigtigt(G));
+    paastand("mål 5: løst, og ordene stærk og svag er sat på", roed5 && G.faerdig && /stærk syre/.test(kortT(G)) && /svag syre/.test(kortT(G)) && /Alle fem opgaver om de to glas er løst\./.test(kortT(G)), kortT(G));
+    paastand("kortets knap går videre til fane 2", videre(G).textContent === "Videre til Stærk eller svag? →", videre(G).textContent);
+    paastand("alle fem mål er grønne i listen", d.querySelectorAll("#g-liste .opg-chip.loest").length === 5 && d.getElementById("g-loest").textContent === "5");
+    var svarG = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(G, i) && G.el.skort.classList.contains("svar"); });
+    paastand("alle fem mål kan også løses med Vis svaret (gult kort med mærket Svaret)", svarG && /^Svaret/.test(kortT(G)), kortT(G));
+    G.vaelg(1);
+    for (var n1 = 0; n1 < 3; n1++) G.knap();
+    paastand("Vis svaret er kun et gult omrids, Giv et hint er fyldt", /svar/.test(G.el.knap.className) && knaptekst(G) === "Vis svaret");
+    G.vaelg(2);
+    G.forfra();
+    paastand("tasten R stiller glassene op til opgaven igen", G.harKalk() === 2 && G.aaben[0] && !G.aaben[1]);
+    G.vaelg(3); G.tilpas(); G.layout();
+    var lo = G.lup[1].ox[0], Rl = G.lay.lup[1];
+    klik(G, Rl.x + lo.x, Rl.y + lo.y);
+    var kliktekst = statuslinje(G);
+    klik(G, Rl.x + G.lup[1].ox[0].x, Rl.y + G.lup[1].ox[0].y);
+    klik(G, Rl.x + G.lup[1].ox[0].x, Rl.y + G.lup[1].ox[0].y);
+    paastand("et klik på en partikel siger på kortet, hvad den er, og tre klik på oxoniumionen er et påskeæg", /oxoniumion, H₃O⁺/.test(kliktekst) && statuslinje(G) === D.PAASKE.ox, kliktekst + " | " + statuslinje(G));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("5. Fane 2: Stærk eller svag?");
+    NK.visFane("fane-s");
+    S.vaelg(0); S.tilpas(); S.layout();
+    var gkS = d.getElementById("s-skort");
+    paastand("startbilledet: fem glas med kalk, ingen navne og ingen lup, og kortet siger Klik på glas A",
+        S.glas.length === 5 && S.glas.every(function (g) { return g.kalk; }) && S.valgt === -1 && S.navngivet.every(function (n) { return !n; }) && S.peger() === 0 && /Klik på glas A\.$/.test(kortT(S)) && statuslinje(S) === "", kortT(S));
+    paastand("panelet kalder alle fem glas ukendte", (d.getElementById("s-glassene").textContent.match(/ukendt/g) || []).length === 5);
+    var gp = S.glas.map(glasMidt);
+    klik(S, gp[1].x, gp[1].y);
+    koerF(S, 2);
+    paastand("et klik på et andet glas viser det i luppen, og kortet siger, at opgaven gælder glas A",
+        S.valgt === 1 && S.opg.fase === "forsoeg" && S.lup.syre === "eddike" && statuslinje(S) === "Luppen viser glas B. Klik på glas A.", statuslinje(S));
+    klik(S, gp[0].x, gp[0].y);
+    koerF(S, 1.5);
+    paastand("glas A i luppen: 100 delte, og spørgsmålet stærk eller svag står på kortet med to svar",
+        S.valgt === 0 && S.opg.fase === "spm" && S.lup.antal().delte === 100 && S.skemaNu() === null && gkS.classList.contains("spm") && gkS.querySelectorAll(".sk-knap").length === 2 && !gkS.querySelector(".sk-skema") && statuslinje(S) === "");
+    S.svarValg(forkert(S));
+    paastand("forkert: forklaringen på kortet peger på de grå molekyler", roed(S) && /grå molekyler/.test(statuslinje(S)), statuslinje(S));
+    S.svarValg(rigtigt(S));
+    paastand("rigtigt: forklaringen står alene på det grønne kort, glasset får sit navn, og kortets knap er Næste spørgsmål",
+        S.venter && !S.faerdig && gkS.classList.contains("loest") && /^Rigtigt ✓En stærk syre\. /.test(kortT(S)) && /salpetersyre, HNO₃\.$/.test(kortT(S)) && videre(S).textContent === "Næste spørgsmål →" &&
+        S.el.knap.hidden && S.el.status.hidden && gkS.querySelectorAll(".sk-knap").length === 0 && S.navngivet[0] && /Salpetersyre/.test(d.getElementById("s-glassene").textContent), kortT(S));
+    S.svarValg(1);
+    paastand("mens forklaringen står der, kan der ikke svares igen", S.venter && S.opg.fase === "spm");
+    videre(S).click();
+    paastand("så kommer pilen: skemaet står på kortet med et spørgsmålstegn",
+        S.opg.fase === "spm2" && S.skemaNu() === "?" && gkS.querySelectorAll(".sk-knap").length === 2 && /→/.test(gkS.textContent) && /⇌/.test(gkS.textContent) &&
+        !!gkS.querySelector(".sk-skema") && gkS.querySelector(".sk-pil").textContent === "?" && /HNO₃ \+ H₂O/.test(gkS.querySelector(".sk-skema").textContent) && gkS.offsetHeight <= S.kortZone(), gkS.offsetHeight);
+    S.svarValg(forkert(S));
+    var roedPil = roed(S) && /hele molekyler/.test(statuslinje(S));
+    S.svarValg(rigtigt(S));
+    paastand("mål 1: løst med enkeltpil, og hele skemaet står i forklaringen på kortet", roedPil && S.faerdig && S.skemaNu() === "→" && !gkS.querySelector(".sk-skema") &&
+        /^Rigtigt ✓→ enkeltpil\. /.test(kortT(S)) && kortT(S).indexOf(K.skema("HNO3")) >= 0 && /stærk →/.test(d.getElementById("s-glassene").textContent), kortT(S));
+    videre(S).click();
+    paastand("mål 2 begynder med lukket lup", S.opg.o.id === "b" && S.valgt === -1 && S.peger() === 1);
+    klik(S, gp[1].x, gp[1].y); koerF(S, 1.5);
+    S.svarValg(rigtigt(S)); videre(S).click();
+    S.svarValg(0);
+    var roedB = roed(S);
+    S.svarValg(rigtigt(S));
+    paastand("mål 2: eddikesyre er svag og skrives med dobbeltpil", roedB && S.faerdig && S.skemaNu() === "⇌" && kortT(S).indexOf(K.skema("eddike")) >= 0, kortT(S));
+    videre(S).click();
+    klik(S, gp[2].x, gp[2].y); koerF(S, 1.5);
+    paastand("mål 3 har tre svar, og Midt imellem er forkert", S.opg.o.spm.svar.length === 3 && S.lup.antal().delte >= 8 && S.lup.antal().delte <= 9);
+    S.svarValg(2);
+    var roedC = roed(S) && /kun stærk, når alle/.test(statuslinje(S));
+    S.svarValg(rigtigt(S)); videre(S).click(); S.svarValg(rigtigt(S));
+    paastand("mål 3: citronsyre er svag", roedC && S.faerdig && /Citronsyre er en svag syre/.test(kortT(S)), kortT(S));
+    videre(S).click();
+    paastand("mål 4: glas D har fået sin etiket, og gættet står på det gule kort, hvor luppen ellers er",
+        S.opg.o.id === "d" && S.opg.fase === "gaet" && S.navngivet[3] && !S.navngivet[4] && S.valgt === -1 && S.peger() === -1 && gkS.classList.contains("gaet") && gkS.querySelectorAll("[data-valg]").length === 3 && /saltsyre, HCl/.test(gkS.textContent));
+    klik(S, gp[3].x, gp[3].y);
+    paastand("luppen for glas D åbner ikke før gættet, og kortet blinker", S.valgt === -1 && /Gæt først/.test(statuslinje(S)) && /Så åbner luppen\./.test(statuslinje(S)) && gkS.classList.contains("blink"), statuslinje(S));
+    gkS.classList.remove("blink");
+    klik(S, gp[0].x, gp[0].y);
+    paastand("heller ikke et andet glas åbner luppen under gættet", S.valgt === -1 && gkS.classList.contains("blink"));
+    koerF(S, 5.5);
+    gkS.querySelector('[data-valg="2"]').click();
+    var vaekS = !gkS.classList.contains("gaet");
+    klik(S, gp[3].x, gp[3].y); koerF(S, 1.5);
+    paastand("mål 4: løst, gættet holdt", vaekS && S.faerdig && /Dit gæt holdt\./.test(kortT(S)) && S.lup.antal().hele === 0, kortT(S));
+    videre(S).click();
+    S.svarValg(0);
+    klik(S, gp[4].x, gp[4].y); koerF(S, 1.5);
+    paastand("mål 5: gættet holdt ikke; dommen og det, luppen viser, står alene på kortet, før spørgsmålet kommer",
+        S.venter && S.opg.fase === "forsoeg" && /^Forsøget ✓Dit gæt holdt ikke\. I luppen for glas E/.test(kortT(S)) && S.lup.antal().delte >= 4 && S.lup.antal().delte <= 5 && videre(S).textContent === "Næste spørgsmål →", kortT(S));
+    videre(S).click();
+    paastand("spørgsmålet om glas B og glas E: begge glas har navn og ring", S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4] && /Glas E er myresyre/.test(kortT(S)));
+    S.svarValg(1);
+    var roedE = roed(S) && /ikke lige svage/.test(statuslinje(S));
+    S.svarValg(rigtigt(S));
+    paastand("mål 5: løst, og alle fem glas har navn", roedE && S.faerdig && S.navngivet.every(function (n) { return n; }) && /Alle fem glas/.test(kortT(S)) && videre(S).textContent === "Videre til Fortyndet? →", kortT(S));
+    paastand("kalken bruser mest i de stærke syrer og mere i myresyre end i eddikesyre",
+        S.glas[0].bobler.length > 20 && S.glas[3].bobler.length > 20 && S.glas[0].brus() === 1 && S.glas[4].brus() > S.glas[1].brus() && S.glas[2].brus() > S.glas[4].brus());
+    var svarS = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(S, i) && S.el.skort.classList.contains("svar"); });
+    paastand("alle fem mål kan også løses med Vis svaret", svarS);
+    S.vaelg(0);
+    klik(S, gp[0].x, gp[0].y); koerF(S, 1.5);
+    var Rs = S.lay.lup, pS = S.lup.enh[0];
+    klik(S, Rs.x + pS.x, Rs.y + pS.y);
+    paastand("et løst glas kendes ved navn, også når målet tages igen", S.navngivet[0] && /nitration, NO₃⁻|oxoniumion/.test(statuslinje(S)), statuslinje(S));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("6. Fane 3: Fortyndet?");
+    NK.visFane("fane-f");
+    F.vaelg(0); F.tilpas(); F.layout();
+    var gkF = d.getElementById("f-skort");
+    paastand("startbilledet: to glas på 0,10 M med kalk og gættet på det gule kort; lupperne og knappen Fortynd venter",
+        F.trin === 0 && F.glas[1].c === 0.10 && F.glas.every(function (g) { return g.kalk; }) && F.opg.fase === "gaet" && F.tavle.hidden && gkF.classList.contains("gaet") && gkF.querySelectorAll("[data-valg]").length === 3 &&
+        F.vaerktoej.hidden && F.lupVed({ x: F.lay.lup[0].x + 20, y: F.lay.lup[0].y + 20 }) === -1 && F.lup[1].antal().delte === 100);
+    F.fortynd();
+    paastand("der kan ikke fortyndes før gættet", F.trin === 0 && !F.fort && /Gæt først/.test(statuslinje(F)) && gkF.classList.contains("blink"), statuslinje(F));
+    gkF.classList.remove("blink");
+    var pF = glasMidt(F.glas[1]);
+    klik(F, pF.x, pF.y);
+    paastand("et klik på et glas før gættet får kortet til at blinke", gkF.classList.contains("blink") && /Gæt først/.test(statuslinje(F)));
+    koerF(F, 5.5);
+    gkF.querySelector('[data-valg="0"]').click();
+    paastand("efter gættet kommer lupperne og de to knapper mellem glassene frem, og knappen Fortynd banker",
+        !gkF.classList.contains("gaet") && F.opg.fase === "forsoeg" && !F.vaerktoej.hidden && /banker/.test(F.knapF.className) && F.vaerktoej.contains(F.el.forfra) &&
+        F.lupVed({ x: F.lay.lup[0].x + 20, y: F.lay.lup[0].y + 20 }) === 0 && /Tryk på knappen Fortynd 10 gange mellem glassene/.test(kortT(F)) && statuslinje(F) === "", kortT(F));
+    F.knapF.click();
+    koerF(F, 0.4);
+    var midt = F.fort && F.glas[1].niveau < 0.8 && /hældes fra/.test(statuslinje(F)) && F.knapF.disabled;
+    koerF(F, 1.0);
+    var fyld = F.fort && F.trin === 1 && /fyldes op med vand/.test(statuslinje(F));
+    koerF(F, 1.0);
+    paastand("en fortynding: kortet siger, at ni tiendedele hældes fra, og at der fyldes op med vand", midt && fyld && !F.fort && F.glas[1].niveau === 1 && F.glas[1].c === 0.010 && statuslinje(F) === "", statuslinje(F));
+    paastand("luppen har nu 10 oxoniumioner, og panelet siger det samme", F.lup[1].antal().ox === 10 && /0,010 M/.test(d.getElementById("f-toglas").textContent) && /10 gange/.test(d.getElementById("f-toglas").textContent));
+    koerF(F, 1.8);
+    paastand("mål 1: løst, gættet holdt ikke", F.faerdig && /Dit gæt holdt ikke\./.test(kortT(F)) && /10 i luppen over saltsyren mod omkring 1 i luppen over eddikesyren/.test(kortT(F)), kortT(F));
+    videre(F).click();
+    paastand("mål 2 fortsætter med den fortyndede saltsyre", F.opg.o.id === "lige" && F.trin === 1 && /^Saltsyren er nu 0,010 M\. Fortynd saltsyren igen/.test(statuslinje(F)), statuslinje(F));
+    F.fortynd(); koerF(F, 2.2);
+    F.fortynd(); koerF(F, 2.2);
+    paastand("for meget: efter tre fortyndinger er luppen tom, og kortet sender eleven tilbage", F.trin === 3 && F.opg.fase === "forsoeg" && !F.venter && F.lup[1].antal().haeldt === 0 && /Ny saltsyre/.test(statuslinje(F)) && F.knapF.disabled, statuslinje(F));
+    F.fortynd();
+    paastand("en fjerde fortynding får en besked", F.trin === 3 && /allerede fortyndet 1000 gange/.test(statuslinje(F)), statuslinje(F));
+    F.el.forfra.click();
+    paastand("Ny saltsyre begynder forfra med 0,10 M", F.trin === 0 && F.glas[1].c === 0.10 && F.lup[1].antal().ox === 100 && !F.knapF.disabled);
+    F.fortynd(); koerF(F, 2.2); F.fortynd(); koerF(F, 2.2);
+    koerF(F, 1.8);
+    paastand("to fortyndinger: 0,0010 M og 1 oxoniumion i hver lup; det står alene på det grønne kort",
+        F.trin === 2 && F.venter && F.lup[1].antal().ox === 1 && F.lup[1].antal().hele === 0 && F.lup[0].antal().delte >= 1 &&
+        /^Godt ✓Nu er der 1 oxoniumion i luppen over saltsyren og omkring 1 i luppen over eddikesyren/.test(kortT(F)) && videre(F).textContent === "Næste spørgsmål →", kortT(F));
+    videre(F).click();
+    paastand("så kommer spørgsmålet om fortyndingen", F.opg.fase === "spm" && /Hvor mange gange er saltsyren fortyndet i alt\?/.test(kortT(F)), kortT(F));
+    F.svarValg(0);
+    var roedF = roed(F) && /ganges/.test(statuslinje(F));
+    F.svarValg(rigtigt(F));
+    paastand("mål 2: løst, 100 gange", roedF && F.faerdig && /100 gange/.test(kortT(F)) && /100 gange/.test(d.getElementById("f-toglas").textContent), kortT(F));
+    videre(F).click();
+    paastand("mål 3 stiller saltsyren på 0,0010 M", F.opg.o.id === "svag" && F.trin === 2);
+    F.fortynd(); koerF(F, 2.3);
+    paastand("fortynder eleven videre, siger kortet, hvad spørgsmålet gælder", F.trin === 3 && /gælder saltsyre på 0,0010 M/.test(statuslinje(F)), statuslinje(F));
+    F.forfra();
+    paastand("Ny saltsyre giver 0,0010 M igen i dette mål", F.trin === 2 && F.lup[1].antal().ox === 1);
+    F.svarValg(0);
+    var roed3 = roed(F) && /hele HCl-molekyler/.test(statuslinje(F));
+    F.svarValg(rigtigt(F));
+    paastand("mål 3: saltsyren er fortyndet, ikke svag", roed3 && F.faerdig && /fortyndet, ikke svag/.test(kortT(F)), kortT(F));
+    videre(F).click();
+    F.svarValg(1);
+    var roed4f = roed(F) && /hele eddikesyremolekyler/.test(statuslinje(F));
+    F.svarValg(rigtigt(F));
+    paastand("mål 4: eddikesyren er mest koncentreret", roed4f && F.faerdig && /mest koncentreret, selv om eddikesyre er en svag syre/.test(kortT(F)), kortT(F));
+    videre(F).click();
+    paastand("mål 5: tavlen med fire flasker er fremme under kortet, og lupperne, glassene og knapperne er væk", F.opg.o.id === "ord" && !F.tavle.hidden && F.vaerktoej.hidden && d.getElementById("f-anker-glas").hidden &&
+        F.tavle.getBoundingClientRect().top >= gkF.getBoundingClientRect().bottom + 4 && /Vælg to ord/.test(kortT(F)) && F.tavle.querySelectorAll(".ord-raekke").length === 4 && F.tavle.querySelectorAll(".ordknap.valgt").length === 0);
+    F.tavle.querySelector("#f-tjek").click();
+    paastand("en tom tavle er intet svar", roed(F) && statuslinje(F).indexOf(D.ORD_MANGLER) >= 0 && F.tavle.querySelectorAll(".ord-raekke.forkert").length === 4, statuslinje(F));
+    function ord(r, g, v) { F.tavle.querySelector('.ordknap[data-r="' + r + '"][data-g="' + g + '"][data-v="' + (v ? 1 : 0) + '"]').click(); }
+    D.ORD.forEach(function (o, r) { ord(r, "s", true); ord(r, "k", o.konc); });
+    F.tavle.querySelector("#f-tjek").click();
+    paastand("den typiske fejl (fortyndet saltsyre er stadig stærk, men eddikesyre er ikke): rækken bliver rød med forklaring",
+        roed(F) && /^Ikke endnu\s+Eddikesyre 0,0010 M: stærk og svag handler om, hvilken syre det er/.test(statuslinje(F)) && F.tavle.querySelectorAll(".ord-raekke.forkert").length === 2 &&
+        F.tavle.getBoundingClientRect().top >= gkF.getBoundingClientRect().bottom + 4, statuslinje(F));
+    D.ORD.forEach(function (o, r) { ord(r, "s", K.erStaerk(o.syre)); ord(r, "k", !o.konc); });
+    F.tavle.querySelector("#f-tjek").click();
+    paastand("forkert koncentration: forklaringen handler om mængden i hver liter", roed(F) && /hvor meget syre der er i hver liter/.test(statuslinje(F)), statuslinje(F));
+    D.ORD.forEach(function (o, r) { ord(r, "k", o.konc); });
+    var tavleTop = F.tavle.getBoundingClientRect().top;
+    F.enter();
+    paastand("mål 5: løst med Enter, tavlen får sit stempel", F.faerdig && /RIGTIGT/.test(F.tavle.textContent) && F.tavle.querySelectorAll(".ordknap.valgt").length === 8 && /Alle fem opgaver om fortynding er løst/.test(kortT(F)) && videre(F).textContent === "Start forfra ↺", kortT(F));
+    paastand("tavlen blev stående, da kortet fik forklaringen, og kortet leder videre", F.tavle.getBoundingClientRect().top === tavleTop && /^Løst ✓/.test(kortT(F)) && gkF.offsetHeight <= F.kortZone(), gkF.offsetHeight);
+    var svarF = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(F, i) && F.el.skort.classList.contains("svar"); });
+    paastand("alle fem mål kan også løses med Vis svaret", svarF);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("7. pH-metret er et tilvalg");
+    paastand("pH-metret er slået fra fra start", NK.visPH === false && !d.getElementById("phknap").classList.contains("til"));
+    d.getElementById("phknap").click();
+    paastand("knappen slår det til", NK.visPH === true && d.getElementById("phknap").getAttribute("aria-pressed") === "true");
+    d.getElementById("phknap").click();
+    paastand("og fra igen", NK.visPH === false);
+
+    /* ------------------------------------------------------------------ */
+    overskrift("8. Opgaverne og sproget");
+    var opbyg = [];
+    [["g", D.G_MAAL], ["s", D.S_MAAL], ["f", D.F_MAAL]].forEach(function (f) {
+        if (f[1].length !== 5) opbyg.push(f[0] + " antal");
+        f[1].forEach(function (o) {
+            ["forsoeg", "spm", "spm2", "felter"].forEach(function (del) {
+                if (o[del] && (!o[del].hint || o[del].hint.length !== 3)) opbyg.push(o.id + " " + del + " hint");
+            });
+            ["spm", "spm2"].forEach(function (del) {
+                if (!o[del]) return;
+                if (o[del].svar.filter(function (s) { return s.ok; }).length !== 1) opbyg.push(o.id + " ét rigtigt svar");
+                if (o[del].svar.some(function (s) { return !s.ok && !s.f; })) opbyg.push(o.id + " forklaring mangler");
+            });
+            if (o.spm2 && !o.spm.godt) opbyg.push(o.id + " forklaring til første svar mangler");
+            if (o.gaet && (o.gaet.svar.filter(function (s) { return s.ok; }).length !== 1 || !o.forsoeg)) opbyg.push(o.id + " gæt");
+            if (o.gaet && (!o.gaet.intro || !/\?$/.test(o.gaet.tekst) || o.gaet.tekst.length > 60 || o.gaet.svar.length !== 3)) opbyg.push(o.id + " gættets indledning og korte spørgsmål");
+            ["spm", "spm2"].forEach(function (del) {
+                if (!o[del]) return;
+                if (o[del].tekst.length > 118) opbyg.push(o.id + " " + del + " spørgsmålet er for langt til kortet: " + o[del].tekst.length);
+                o[del].svar.forEach(function (sv) { if (sv.t.length > 46) opbyg.push(o.id + " svaret er for langt til kortet: " + sv.t); });
+            });
+            if (o.forsoeg && o.forsoeg.tekst.length > 150) opbyg.push(o.id + " forsøgets tekst er for lang til kortet");
+            if (!o.loest || !o.navn) opbyg.push(o.id + " tekst");
+        });
+    });
+    paastand("15 mål: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte, og teksterne er korte nok til kortet", opbyg.length === 0, opbyg.join(", "));
+    /* Intet er indforstaaet: hver tekst paa kortet naevner selv det glas, den syre
+       eller den lup, den handler om, og begynder ikke midt i en tanke */
+    var indf = [];
+    [D.G_MAAL, D.S_MAAL, D.F_MAAL].forEach(function (liste) {
+        liste.forEach(function (o) {
+            ["gaet", "forsoeg", "spm", "spm2", "felter"].forEach(function (del) {
+                if (!o[del]) return;
+                var t = (o[del].intro ? o[del].intro + " " : "") + o[del].tekst;
+                if (/\b(Også her|Klik nu|Her er|Hvor mange af dem\?$)/.test(t) || /^(Også|Og |Men |Nu |Så |Her )/.test(t)) indf.push(o.id + " " + del + " begynder indforstået");
+                if (!/saltsyre|eddikesyre|myresyre|citronsyre|salpetersyre|glas [A-E]|flasker/i.test(t)) indf.push(o.id + " " + del + " nævner ikke, hvad den handler om");
+            });
+            if (/\b(den|det|de) (her|der)\b/.test(o.loest)) indf.push(o.id + " forklaringen peger uden at nævne");
+        });
+    });
+    paastand("intet er indforstået: hver tekst på kortet nævner selv det glas eller den syre, den handler om", indf.length === 0, indf.join(", "));
+    G.vaelg(1); G.aabn(0, true); koerF(G, 0.2);
+    var om1 = G.opg.fase === "spm" && G.omNu().join() === "0";
+    G.vaelg(2); G.aabn(1, true); koerF(G, 0.2);
+    var om2 = G.opg.fase === "spm" && G.omNu().join() === "1";
+    G.svarValg(rigtigt(G));
+    var om3 = G.omNu().length === 0;
+    S.vaelg(4);
+    S.svarValg(1); S.vaelgGlas(4); koerF(S, 1.5);
+    S.knap();
+    var om4 = S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4];
+    F.vaelg(2);
+    var om5 = F.omNu().join() === "1";
+    paastand("det glas, spørgsmålet handler om, har en gul ring, og ringen er væk, når spørgsmålet er besvaret", om1 && om2 && om3 && om4 && om5, [om1, om2, om3, om4, om5].join());
+    paastand("teksterne bruger luppens nye former: ingen piller om partiklerne", !/\bpille/i.test(JSON.stringify([D.G_MAAL, D.S_MAAL, D.F_MAAL])));
+    var pladser = {};
+    [D.G_MAAL, D.S_MAAL, D.F_MAAL].forEach(function (liste) { liste.forEach(function (o) { ["gaet", "spm"].forEach(function (del) { if (o[del] && o[del].svar.length === 3) o[del].svar.forEach(function (s, j) { if (s.ok) pladser[j] = (pladser[j] || 0) + 1; }); }); }); });
+    paastand("det rigtige svar står ikke altid samme sted", pladser[0] >= 2 && pladser[1] >= 2 && pladser[2] >= 2, JSON.stringify(pladser));
+    paastand("fane 2 passer med modellen: A og D er stærke, B, C og E svage", D.GLAS.map(function (g) { return K.erStaerk(g.syre) ? "s" : "v"; }).join("") === "svvsv" &&
+        D.S_MAAL.every(function (o) { if (!o.spm2) return true; var ok = o.spm2.svar.filter(function (s) { return s.ok; })[0].t; return ok.indexOf(K.pil(D.GLAS[o.glas].syre)) === 0; }));
+    paastand("tavlen har alle fire kombinationer", D.ORD.map(function (o) { return (K.erStaerk(o.syre) ? "s" : "v") + (o.konc ? "k" : "f"); }).sort().join(" ") === "sf sk vf vk");
+    var tekster = [];
+    (function saml(x) {
+        if (typeof x === "string") tekster.push(x);
+        else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
+    }(D));
+    tekster.push(d.body.textContent);
+    Object.keys(K.SYRE).forEach(function (id) { ["ox", "ion", "hel"].forEach(function (sl) { tekster.push(D.partikel(sl, id, true), D.partikel(sl, id, false)); }); });
+    D.ORD.forEach(function (o, r) { tekster.push(D.ordFejl(r, "s"), D.ordFejl(r, "k")); });
+    [0, 1, 2, 3, 4].forEach(function (i) { G.vaelg(i); tekster.push(linje(G)); S.vaelg(i); tekster.push(linje(S)); F.vaelg(i); tekster.push(linje(F)); });
+    var alt2 = tekster.join("\n");
+    paastand("ingen tankestreger", !/[–—]/.test(alt2));
+    paastand("ladning 1 skrives som + og −, aldrig 1+ og 1−", !/¹[⁺⁻]|(^|[^0-9,.])1[+−](?![0-9])/.test(alt2));
+    var m = alt2.match(ASCII_ORD);
+    paastand("æ, ø og å er skrevet rigtigt i teksterne", !m, m ? m[0] : "");
+    paastand("bogens ord: hydron og oxoniumion, ingen natronlud, proton eller hydroniumion", /hydron/.test(alt2) && /oxoniumion/.test(alt2) && !/natronlud|proton|hydronium|H\+-ion/i.test(alt2));
+    paastand("ingen lærer i animationen", !/kemichael/i.test(alt2) && !d.querySelector('script[src*="kemichael"]') && !NK.Laerer);
+    paastand("mappen henter kun sine egne filer", Array.prototype.every.call(d.querySelectorAll("script[src], link[href], img[src]"), function (e) { var u = e.getAttribute("src") || e.getAttribute("href"); return !/^(\.\.|\/|https?:)/.test(u); }));
+    paastand("de tre sprites er indlæst", NK.Sprites.klar("baegerglas") && NK.Sprites.klar("kalk") && NK.Sprites.klar("kalkskaal"));
+    paastand("rundvisningen har trin til alle tre faner", ["fane-g", "fane-s", "fane-f"].every(function (id) { NK.visFane(id); NK.Rundvisning.start(id); var ok = NK.Rundvisning.aktiv(); NK.Rundvisning.luk(); return ok; }));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("9. Layoutet");
+    var stoerrelser = [[1100, 620], [1100, 700], [1300, 760], [1600, 950]];
+    stoerrelser.forEach(function (st2) {
+        ramme.style.width = st2[0] + "px";
+        ramme.style.height = st2[1] + "px";
+        var navn = st2[0] + " × " + st2[1] + ": ", pr = [], lav = st2[1] < 660;
+        function rk(e) { return e.getBoundingClientRect(); }
+        function overR(a, b) { return a.x < b.x + b.b && b.x < a.x + a.b && a.y < b.y + b.h && b.y < a.y + a.h; }
+        function glasR(g) { var mm = g.maal(); return { x: mm.x0, y: mm.y0, b: g.b, h: mm.h }; }
+        var top = rk(d.querySelector("header.top"));
+        if (top.height > 64) pr.push("toplinjen brækker over to linjer " + Math.round(top.height));
+
+        /* Kortet oeverst i scenen: gennem alle maal og alle deres dele. Et gaet maa
+           fylde ned til glassene; alt andet skal blive inden for den plads, der er
+           sat af over lupperne, saa lupperne aldrig er daekket. */
+        [["fane-g", G, "fane 1"], ["fane-s", S, "fane 2"], ["fane-f", F, "fane 3"]].forEach(function (x) {
+            var X = x[1];
+            NK.visFane(x[0]);
+            X.opgaver.forEach(function (o, i) {
+                X.vaelg(i); X.tilpas(); X.layout();
+                var maal = function (hvad) {
+                    var e = X.el.skort, kort = rk(e), sc = rk(d.querySelector("#" + x[0] + " .scene")), topG = 1e9;
+                    var hvor = x[2] + " mål " + (i + 1) + " (" + X.opg.fase + (X.faerdig ? ", løst" : "") + (hvad ? ", " + hvad : "") + "): ";
+                    X.glas.forEach(function (g) { topG = Math.min(topG, sc.top + g.maal().y0); });
+                    if (kort.left < sc.left + 4 || kort.right > sc.right - 4 || kort.top < sc.top + 4) pr.push(hvor + "kortet uden for scenen");
+                    if (kort.width < 520) pr.push(hvor + "kortet er for smalt " + Math.round(kort.width));
+                    if (X.gaetNu()) {
+                        if (kort.bottom > topG - 6) pr.push(hvor + "gætkortet dækker glassene " + Math.round(kort.bottom - sc.top) + " mod " + Math.round(topG - sc.top));
+                        Array.prototype.forEach.call(e.querySelectorAll(".gk-knap"), function (k) { if (rk(k).height < 44 || rk(k).height > 130) pr.push(hvor + "svarknap " + Math.round(rk(k).height)); });
+                    } else {
+                        if (e.offsetHeight > X.kortZone()) pr.push(hvor + "kortet er højere end sin plads " + e.offsetHeight + " mod " + X.kortZone());
+                        Array.prototype.forEach.call(e.querySelectorAll(".sk-knap"), function (k) { if (rk(k).height < 28) pr.push(hvor + "svarknap for lav " + Math.round(rk(k).height)); });
+                    }
+                    if (!X.el.knap.hidden && rk(X.el.knap).height < 28) pr.push(hvor + "hjælpeknappen er for lav");
+                };
+                var set = {};
+                for (var n = 0; n < 40; n++) {
+                    maal("");
+                    if (X.faerdig) break;
+                    /* Hvert forkert svar giver en forklaring i kortets nederste raekke: maal den ogsaa */
+                    var fn = X.opg.fase + X.opg.fi;
+                    if (!X.venter && !set[fn] && (X.opg.fase === "spm" || X.opg.fase === "spm2")) {
+                        set[fn] = true;
+                        X.opg.o[X.opg.fase].svar.forEach(function (sv, j) { if (!sv.ok) { X.svarValg(j); maal("forkert svar " + (j + 1)); } });
+                    }
+                    X.knap();
+                    koerF(X, 0.05);
+                }
+            });
+        });
+
+        /* Fane 1 og 3: to glas og to lupper */
+        [["fane-g", G, 4], ["fane-f", F, 1]].forEach(function (x) {
+            var id = x[0], X = x[1];
+            NK.visFane(id);
+            X.vaelg(x[2]); X.tilpas(); X.layout();
+            var l = X.lay, navnF = id === "fane-g" ? "fane 1 " : "fane 3 ";
+            if (overR(l.lup[0], l.lup[1])) pr.push(navnF + "lupperne overlapper");
+            if (l.sigY - 17 < 10 + X.kortZone()) pr.push(navnF + "signaturen ligger under kortet");
+            l.lup.forEach(function (R, i) {
+                if (R.x < 6 || R.x + R.b > l.W - 6) pr.push(navnF + "lup " + i + " uden for scenen");
+                if (R.y < l.sigY + 16) pr.push(navnF + "signaturen rører luppen");
+                if (R.h < (lav ? 130 : 190) || R.b < 290) pr.push(navnF + "luppen er for lille " + Math.round(R.b) + " × " + Math.round(R.h));
+                if (R.y + R.h > glasR(X.glas[i]).y - 16) pr.push(navnF + "luppen rører glasset");
+                if (X.lup[i].s < 0.72 || X.lup[i].or * 2 < 7.5) pr.push(navnF + "partiklerne er for små " + X.lup[i].s.toFixed(2));
+            });
+            if (overR(glasR(X.glas[0]), glasR(X.glas[1]))) pr.push(navnF + "glassene overlapper");
+            X.glas.forEach(function (g) { var r = glasR(g); if (r.x < 4 || r.x + r.b > l.W - 4 || g.bund > l.Hs - 20) pr.push(navnF + "glas uden for scenen"); if (g.b < (lav ? 92 : 108)) pr.push(navnF + "glasset er for lille " + Math.round(g.b)); });
+            if (id === "fane-g") {
+                var s = l.skaal;
+                if (s.x < glasR(X.glas[0]).x + X.glas[0].b + 6 || s.x + s.b > glasR(X.glas[1]).x - 6) pr.push("fane 1 skålen rører et glas");
+                if (s.b < 80) pr.push("fane 1 skålen er for lille " + Math.round(s.b));
+            } else {
+                var sc = rk(d.querySelector("#fane-f .scene")), kn = rk(X.knapF);
+                var g0 = glasR(X.glas[0]), g1 = glasR(X.glas[1]);
+                if (kn.left < sc.left + g0.x + g0.b + 2 || kn.right > sc.left + g1.x - 2) pr.push("fane 3 knappen Fortynd rører et glas " + Math.round(kn.left - sc.left - g0.x - g0.b) + "/" + Math.round(sc.left + g1.x - kn.right));
+                if (kn.top < sc.top + l.lup[0].y + l.lup[0].h + 4) pr.push("fane 3 knappen dækker luppen");
+                X.vaelg(4); X.tilpas(); X.layout();
+                var tv = rk(X.tavle);
+                if (tv.top < sc.top + 10 + X.kortZone() + 4) pr.push("fane 3 tavlen ligger under kortets plads");
+                if (tv.bottom > sc.bottom - 6) pr.push("fane 3 tavlen når ud over scenen " + Math.round(tv.bottom) + " mod " + Math.round(sc.bottom));
+                var brudt = false;
+                Array.prototype.forEach.call(X.tavle.querySelectorAll(".ord-raekke"), function (r) { if (rk(r).height > 60) brudt = true; });
+                if (brudt) pr.push("fane 3 en række på tavlen brækker over");
+                X.vaelg(0);
+            }
+        });
+
+        /* Fane 2: fem glas og én lup */
+        NK.visFane("fane-s");
+        S.vaelg(2); S.tilpas(); S.layout();
+        S.vaelgGlas(2);
+        var ls = S.lay, R2 = ls.lup;
+        for (var i = 0; i < 4; i++) if (overR(glasR(S.glas[i]), glasR(S.glas[i + 1]))) pr.push("fane 2 glassene overlapper");
+        S.glas.forEach(function (g) { var r = glasR(g); if (r.x < 2 || r.x + r.b > ls.W - 2) pr.push("fane 2 glas uden for scenen"); if (g.b < 84) pr.push("fane 2 glasset er for lille " + Math.round(g.b)); });
+        if (R2.x < 6 || R2.x + R2.b > ls.W - 6) pr.push("fane 2 luppen uden for scenen");
+        if (ls.sigY - 17 < 10 + S.kortZone() || R2.y < ls.sigY + 16) pr.push("fane 2 signaturen har ikke plads");
+        if (R2.h < (lav ? 130 : 190)) pr.push("fane 2 luppen er for lav " + Math.round(R2.h));
+        if (R2.y + R2.h > glasR(S.glas[0]).y - 16) pr.push("fane 2 luppen rører glassene");
+        if (S.glas[0].bund > ls.Hs - 20) pr.push("fane 2 glassene når ned i statuslinjen");
+
+        /* Statuslinjen og panelet */
+        ["g", "s", "f"].forEach(function (nv) {
+            NK.visFane("fane-" + nv);
+            if (!d.getElementById(nv + "-skort").contains(d.getElementById(nv + "-status"))) pr.push(nv + " kortets nederste række er ikke på kortet");
+            var liste = rk(d.getElementById(nv + "-opgaver")), panel = rk(d.querySelector("#fane-" + nv + " .panel"));
+            if (liste.right > panel.right + 1 || panel.width < 280) pr.push(nv + " panelet er for smalt " + Math.round(panel.width));
+            Array.prototype.forEach.call(d.querySelectorAll("#fane-" + nv + " .panel .talraekke"), function (r) { if (rk(r).height > 44) pr.push(nv + " en række i panelet brækker over"); });
+        });
+        paastand(navn + "tingene kan være der på alle tre faner, og kortet dækker aldrig lupperne", pr.length === 0, pr.join("; "));
+    });
+    ramme.style.width = "";
+    ramme.style.height = "";
+    G.vaelg(0); S.vaelg(0); F.vaelg(0);
+    NK.visFane("fane-g");
+}
+</script>
+</body>
+</html>

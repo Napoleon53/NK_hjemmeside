@@ -14,7 +14,8 @@
 
    Knappen i opgavekortet er Giv hint, Vis svaret og Naeste opgave (til
    sidst Ny runde). Tjek staar ved svarfeltet, og Enter goer det samme.
-   Kemichael siger kun noget ved Giv hint og Vis svaret (js/laerer.js).
+   Hint og svar staar i linjen under svarfeltet. Efter et forkert svar
+   lyser den gule knap stille op, til linjen skifter igen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -40,10 +41,9 @@
     function nuller(n) { return n > 0 ? new Array(n + 1).join("0") : ""; }
     function el(id) { return NK.el(id); }
 
-    function Fane(id, laerer) {
+    function Fane(id) {
         this.id = id;
         this.def = D.FANER[id];
-        this.k = laerer;
         var gemt = NK.hent(NOEGLE_VALG, {}) || {};
         this.valg = this.def.valg ? (gemt[id] || this.def.valg[0].id) : null;
         this.niveau = this.def.niveauer ? (gemt[id + "-niveau"] || "let") : null;
@@ -90,7 +90,6 @@
             this.lavOpgave();
             this.saetBesked(this.opg.type === "tael" && this.id !== "tael" ? NK.html(D.INTRO.tael) : "", "");
         }
-        if (this.k) this.k.tie();
         this.vis();
         this.animerNy();
         this.fokus();
@@ -115,7 +114,6 @@
         this.nyRunde();
         var navn = this.def.valg.filter(function (x) { return x.id === v; })[0].navn;
         this.saetBesked("Ny runde: " + NK.html(navn.toLowerCase()) + ".", "");
-        if (this.k) this.k.tie();
         this.vis();
         this.animerNy();
         this.fokus();
@@ -136,7 +134,6 @@
         NK.gem(NOEGLE_VALG, gemt);
         this.nyRunde();
         this.saetBesked("Ny runde: enheder, " + NK.html(def.navn.toLowerCase()) + ".", "");
-        if (this.k) this.k.tie();
         this.vis();
         this.animerNy();
         this.fokus();
@@ -180,8 +177,7 @@
         if (this.loest) { this.naeste(); return; }
         if (this.hjaelp === 0) {
             this.hjaelp = 1;
-            var h = "<b>Hint:</b> " + C.hint(this.opg);
-            if (!(this.k && this.k.sig(h, "hint"))) this.saetBesked(h, "gul");
+            this.saetBesked("<b>Hint:</b> " + C.hint(this.opg), "gul");
             this.visPanel();
             this.fokus();
             return;
@@ -211,11 +207,8 @@
                 this.mant = C.skillerum(C.almindelig(o.facit));
                 this.eksp = "";
             }
-            var s = C.svar(o);
-            if (this.k && this.k.sig(s, "svar")) this.saetBesked("Svaret står hos Kemichael. Tryk Næste opgave, når du har set det.", "gul");
-            else this.saetBesked(s, "gul");
+            this.saetBesked(C.svar(o), "gul");
         } else {
-            if (this.k) this.k.tie();
             this.saetBesked(NK.tilfaeldig(D.ROS) + " " + r.besked + (r.note ? " " + r.note : ""), "god");
         }
         this.startHop();
@@ -494,12 +487,14 @@
     };
 
     /* ----- Linjen under svarfeltet -----------------------------------------------------
-       saetBesked: den faste linje (naeste skridt, fejl, ros). kortBesked:
-       et svar paa et klik, der forsvinder igen efter sek sekunder. */
+       saetBesked: den faste linje (naeste skridt, fejl, ros, hint og svar).
+       Efter et forkert svar lyser hintknappen stille op. kortBesked: et
+       svar paa et klik, der forsvinder igen efter sek sekunder. */
     P.saetBesked = function (html, klasse) {
         this.fast = { html: html || "", klasse: klasse || "" };
         this.kortT = 0;
         this.visBesked();
+        if (this.aktiv()) el("opgaveknap").classList.toggle("peg", klasse === "skidt" && !this.loest && this.hjaelp === 0);
     };
 
     P.kortBesked = function (html, sek) {
@@ -572,7 +567,7 @@
         var knap = el("opgaveknap");
         if (this.loest) knap.textContent = r.slut ? "Ny runde ↺" : "Næste opgave →";
         else knap.textContent = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-        knap.className = "knap stor" + (this.loest ? " blaa banker" : "");
+        knap.className = "knap stor" + (this.loest ? " blaa banker" : " hjaelp" + (this.hjaelp ? " svar" : ""));
 
         NK.saetTekst("rigtige", String(this.rigtige()));
         var lh = r.log.map(function (l, n) {
@@ -617,7 +612,6 @@
         if (this.loest) return;
         this.mant = mant;
         this.eksp = eksp;
-        if (this.k) this.k.skriver();
         this.visMaaler();
     };
 
@@ -632,13 +626,6 @@
         if (!this.aktiv() || document.querySelector(".overlay.vis") || (NK.Rundvisning && NK.Rundvisning.aktiv())) return;
         if (this.loest) { el("tjek").focus(); return; }
         if (this.erIndtastning()) el("svar-m").focus();
-    };
-
-    /* K: han siger, hvor man er (henter ham, hvis han er ude) */
-    P.kemichael = function () {
-        if (!this.k) return;
-        if (!this.k.inde()) { this.k.hentInd(); return; }
-        this.k.sig(NK.html(D.KEMICHAEL[this.id]), "", { lukVedSkriv: true });
     };
 
     NK.Fane = Fane;

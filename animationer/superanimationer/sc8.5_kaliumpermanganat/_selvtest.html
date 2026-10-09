@@ -26,13 +26,13 @@
    før eleven har gjort noget, at eleven selv fylder det tomme urglas på
    fane 1, at reaktionerne i glasset åbner én ad gangen, at knappen står
    på papiret, at den korte linje øverst i hæftet følger bidderne, at et
-   klik på Kemichael giver hintet, at Kemichael kun siger én kort sætning ved hint og svar,
-   at Læs mere åbner hans forklaring (uden facit efter et hint), at
-   han kan sendes ud, at sproget holder reglerne, og at hæftet og bordet
+   hint og svar er én kort sætning i opgavekortet, at Læs mere åbner
+   forklaringen (uden facit efter et hint), at den gule knap lyser op
+   efter en fejl, at sproget holder reglerne, og at hæftet og bordet
    kan være på skærmen fra 1100 × 700 til 1600 × 950.
 
-   Kræver en lokal server med animationer/ som rod (Kemichael hentes
-   derfra). Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   Kræver en lokal server. Testen gemmer elevens fremskridt og lægger det
+   tilbage bagefter.
    ===================================================================== */
 var linjer = [];
 var fejl = 0, antal = 0;
@@ -52,7 +52,7 @@ function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc8.5-ug", "nk-sc8.5-fl", "nk-sc8.5-kemichael-ude", "nk-kemichael"];
+var NOEGLER = ["nk-sc8.5-ug", "nk-sc8.5-fl"];
 
 async function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -116,7 +116,6 @@ async function koerTest(W) {
         var kl = S.haefte.navnEl.textContent;
         linjer0[kl] = kl.length;
         tekster.push(S.beskedTekst());
-        if (S.k.taler()) tekster.push(S.k.tekst());
         tekster.push(d.getElementById(S.navn + "-prompt").textContent);
         tekster.push(S.haefte.el.textContent);
     }
@@ -176,12 +175,11 @@ async function koerTest(W) {
     paastand("data.js, redox.js, haefte.js, bord.js, forklaring.js og sim.js er kørt",
         !!(D && D.REAKTIONER && X && X.reaktion && NK.Haefte && NK.Bord && NK.Forklaring && NK.SimUrglas && NK.SimFlere));
     paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-ug"] && NK.sims["fane-fl"]));
-    var mangler = ["kateder", "urglas", "draabeflaske", "kaffekop", "laererKrop"].filter(function (n) { return !NK.Sprites.klar(n); });
-    paastand("sprites og Kemichael er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    var mangler = ["urglas", "draabeflaske"].filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var A = NK.sims["fane-ug"], B = NK.sims["fane-fl"];
-    paastand("Kemichael sidder ved katederet på begge faner (den rolige udgave)", [A, B].every(function (s) { return s.k instanceof NK.RoligLaerer; }));
+    paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.RoligLaerer && !NK.Kemichael && !A.k && !d.querySelector(".kboble, .kknap"));
     paastand("der er ingen tilbudsknapper", !d.querySelector(".tilbud"));
-    if (!A.k.inde()) { A.k.hentInd(); tik(A, 3); }
     /* Siden husker løste opgaver fra før; testen starter forfra */
     [A, B].forEach(function (S) { S.status.forEach(function (st) { st.loest = false; st.stjerne = false; }); S.rostAlt = false; S.visListe(); });
     paastand("3 reaktioner på fane 1 og 14 på fane 2", A.opgaver.length === 3 && B.opgaver.length === 14);
@@ -332,6 +330,8 @@ async function koerTest(W) {
     A.valgt("Mn 2+", "selv");
     paastand("et forkert valg: besked om farven, og knappen bliver streget ud", /Glasset er grønt/.test(besked(A)) && A.aktivt() === "produkt" &&
         !!A.haefte.valg.querySelector(".forkert"), besked(A));
+    paastand("efter fejlen lyser den gule hintknap op, og der står intet hint", A.el.knap.classList.contains("peg") && A.el.knap.textContent === "Giv hint" &&
+        !/^Hint/.test(besked(A)));
     loesTrin(A);
     paastand("efter valget siger skiltet MnO₄²⁻, basisk", A.bord.glas[0].tekst === "MnO₄²⁻, basisk", A.bord.glas[0].tekst);
     paastand("den korte linje: Skriv oxidationstallene for S og Mn i skemaet", A.haefte.navnEl.textContent === "Skriv oxidationstallene for S og Mn i skemaet", A.haefte.navnEl.textContent);
@@ -399,18 +399,22 @@ async function koerTest(W) {
     paastand("alle på fane 2 er løst", B.antalLoest() === 14);
     paastand("farvekortet har manganens oxidationstal", A.kendtOx["MnO4 -"] === 7 && A.kendtOx["Mn 2+"] === 2 && A.kendtOx["MnO2"] === 4 && A.kendtOx["MnO4 2-"] === 6);
 
-    overskrift("8. Kemichael: kort, og Læs mere åbner forklaringen");
+    overskrift("8. Hint og svar: kort, og Læs mere åbner forklaringen");
+    /* Det, Vis svaret siger, uden næste skridt, der står efter det i linjen */
+    var svarSagt = "", svarVis0 = B.svarVis;
+    B.svarVis = function (h) { var e = d.createElement("div"); e.innerHTML = h; svarSagt = e.textContent; return svarVis0.call(this, h); };
     NK.visFane("fane-fl");
     var iOx = idx(B, "F9");
     B.vaelg(iOx);
     B.knap();
-    paastand("Giv hint ved dryppet: Kemichael siger det kort", B.k.taler() && /flasken/.test(B.k.tekst()) && B.k.tekst().length < 90, B.k.tekst());
+    paastand("Giv hint ved dryppet: hintet står kort i opgavekortet", /^Hint/.test(besked(B)) && /flasken/.test(besked(B)) && besked(B).length < 90 &&
+        d.getElementById("fl-besked").className.indexOf("gul") >= 0, besked(B));
     B.knap(); tik(B, 4);
     paastand("Dryp for mig drypper og koster ikke stjernen", B.aktivt() === "produkt" && !B.brugtSvar);
     loesTrin(B);
     B.knap();
-    var boble = d.getElementById("fl-boble");
-    paastand("hint ved oxidationstallene er én kort sætning med Læs mere", B.k.taler() && B.k.tekst().length < 130 && !!boble.querySelector(".laes-mere"), B.k.tekst());
+    var boble = d.getElementById("fl-besked");      /* linjen i opgavekortet, hvor hint og svar står */
+    paastand("hint ved oxidationstallene er én kort sætning med Læs mere", /^Hint/.test(besked(B)) && besked(B).length < 130 && !!boble.querySelector(".laes-mere"), besked(B));
     boble.querySelector(".laes-mere").click();
     var fx = d.getElementById("forklaring");
     paastand("Læs mere åbner forklaringen i fuld skærm", fx.classList.contains("vis"));
@@ -420,7 +424,8 @@ async function koerTest(W) {
     d.querySelector("#forklaring [data-luk]").click();
     paastand("forklaringen lukker igen", !fx.classList.contains("vis"));
     B.knap();
-    paastand("Vis svaret: én kort sætning, ikke regnestykkerne", B.k.taler() && B.k.tekst().length < 130 && !/·/.test(B.k.tekst()), B.k.tekst());
+    paastand("Vis svaret: én kort sætning, ikke regnestykkerne, og Læs mere står i kortet", svarSagt.length > 10 && svarSagt.length < 130 && !/·/.test(svarSagt) &&
+        besked(B).indexOf(svarSagt) === 0 && !!boble.querySelector(".laes-mere"), svarSagt);
     boble.querySelector(".laes-mere").click();
     var ind = d.getElementById("fx-indhold").textContent;
     paastand("Læs mere efter svaret regner det hele ud med almindelige tal i mellemregningerne", /2 · C \+ 4 · \(−2\) = −2/.test(ind) && /C = \+6 : 2 = \+3/.test(ind) && /er \+III/.test(ind), ind.slice(0, 160));
@@ -430,7 +435,7 @@ async function koerTest(W) {
     while (!B.faerdig && runder < 40) {
         var tt = B.aktivt();
         B.knap(); saml(B);
-        paastand("hint i " + tt + " er kort og har Læs mere", B.k.tekst().length < 140 && !!boble.querySelector(".laes-mere"), B.k.tekst());
+        paastand("hint i " + tt + " er kort og har Læs mere", /^Hint/.test(besked(B)) && besked(B).length < 140 && !!boble.querySelector(".laes-mere"), besked(B));
         B.visForklaring(); tekster.push(fx.textContent);
         paastand("forklaringen efter hintet i " + tt + " har indhold", d.querySelectorAll("#fx-indhold .fx-kort").length > 0);
         d.querySelector("#forklaring [data-luk]").click();
@@ -443,13 +448,8 @@ async function koerTest(W) {
     paastand("oxalat kan gennemføres med Vis svaret", !!B.faerdig);
     paastand("Vis svaret tæller som brugt svar", B.brugtSvar === true);
     paastand("tallene fra Vis svaret står med brunt blæk", !!B.haefte.el.querySelector(".hf-oxtal.vist"));
-    B.vaelg(idx(B, "F10"));
-    loesTrin(B);
-    B.k.sendUd(); tik(B, 3);
-    B.knap();
-    paastand("sendt ud: hintet står i opgavekortet med Læs mere", !B.k.taler() && /Hint/.test(besked(B)) && !!d.querySelector("#fl-besked .laes-mere"), besked(B));
-    B.k.hentInd(); tik(B, 4);
-    paastand("hentet ind igen", B.k.inde());
+    B.svarVis = svarVis0;
+    paastand("siden nævner ikke Kemichael", !/Kemichael|kateder|lærerværelse/i.test(d.body.innerText + " " + fx.textContent));
 
     /* Alle forklaringer skal kunne laves og holde sproget */
     alle.forEach(function (R) {
@@ -512,7 +512,7 @@ async function koerTest(W) {
     klikGlas();
     paastand("et klik på glasset drypper med den rigtige flaske", A.opg.dryppet);
 
-    overskrift("9b. Knappen på papiret, klik på Kemichael og farvekortet");
+    overskrift("9b. Knappen på papiret og farvekortet");
     var knap = d.getElementById("ug-knap");
     function iHjoernet(S) {
         var kr = S.el.knap.getBoundingClientRect(), hr = S.haefte.el.getBoundingClientRect();
@@ -534,17 +534,10 @@ async function koerTest(W) {
     paastand("knappen står på papiret, ikke i panelet", knap.parentNode === A.haefte.el && !d.querySelector("#ug-kort .knap") && !d.querySelector("#fl-kort .knap"));
     paastand("Giv hint står i papirets nederste højre hjørne", knap.textContent === "Giv hint" && knap.classList.contains("hint") && iHjoernet(A));
     loesTrin(A);
-    var hoved = A.k.lay.hoved;
-    function klikLaerer() {
-        A.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + hoved.x + hoved.b / 2, clientY: r.top + hoved.y + hoved.h / 2, bubbles: true }));
-    }
-    paastand("før klikket siger Kemichael ingenting", !A.k.taler() && A.hjaelp === 0);
-    klikLaerer();
-    paastand("et klik på Kemichael giver hintet til bidden", A.k.taler() && /^Hint: Se på SO₃²⁻/.test(A.k.tekst()) && A.hjaelp === 1 && A.aktivt() === "ox", A.k.tekst());
+    paastand("før der trykkes, står der intet hint", !/^Hint/.test(besked(A)) && A.hjaelp === 0);
+    knap.click();
+    paastand("Giv hint giver hintet til bidden i opgavekortet", /^Hint: Se på SO₃²⁻/.test(besked(A)) && A.hjaelp === 1 && A.aktivt() === "ox", besked(A));
     paastand("knappen hedder nu Vis svaret og står stadig i hjørnet", knap.textContent === "Vis svaret" && knap.classList.contains("svar") && iHjoernet(A));
-    klikLaerer();
-    paastand("et klik mere på ham viser ikke svaret og koster ikke stjernen", A.aktivt() === "ox" && !A.brugtSvar && A.hjaelp === 1 && !A.opg.tal.ox0);
-    paastand("skiltet ved ham siger Klik for et hint", A.k.hoverTekst === "Klik for et hint");
     await loesHele(A);
     paastand("afstemt: Næste opgave står midt i hæftet", knap.textContent === "Næste opgave →" && knap.classList.contains("naeste") && knap.classList.contains("midt") && (function () {
         var kr = knap.getBoundingClientRect(), hr = A.haefte.el.getBoundingClientRect();
@@ -553,8 +546,6 @@ async function koerTest(W) {
     }()));
     paastand("Næste opgave dækker ikke skemaet, klammerne eller rækkerne", knapFri(A), knapNote(A));
     paastand("den korte linje siger, at skemaet er afstemt", A.haefte.navnEl.textContent === "Lidt sulfit: afstemt ✓", A.haefte.navnEl.textContent);
-    paastand("afstemt: skiltet ved Kemichael er væk, og et klik giver hans sædvanlige svar", A.k.hoverTekst === "" && (klikLaerer(), A.k.taler() && !/^Hint/.test(A.k.tekst())), A.k.tekst());
-    tekster.push(A.k.tekst());
     tik(A, 5);
     var fk = d.getElementById("ug-farvekort").textContent;
     paastand("farvekortet har navnene permanganat, manganat, brunsten og mangan(II)ion", ["permanganat", "manganat", "brunsten", "mangan(II)ion"].every(function (x) { return fk.indexOf(x) >= 0; }), fk);
@@ -565,8 +556,8 @@ async function koerTest(W) {
 
     overskrift("10. Sproget");
     D.REAKTIONER.forEach(function (x) { tekster.push(x.tekst, x.kontekst || "", x.navn, x.obs || ""); });
-    Object.keys(D.INTRO).forEach(function (k) { tekster.push(D.INTRO[k], D.FAERDIG[k], D.KAFFE_FLASKE[k]); });
-    tekster = tekster.concat(D.KAFFE, D.ROS, D.ROS_OPGAVE, [D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST, D.KLIK_HINT]);
+    Object.keys(D.INTRO).forEach(function (k) { tekster.push(D.INTRO[k], D.FAERDIG[k]); });
+    tekster = tekster.concat(D.ROS, D.ROS_OPGAVE);
     D.MANGAN.forEach(function (x) { tekster.push(x.navn, x.tekst, x.ord); });
     Object.keys(D.FLASKE).forEach(function (k) { tekster.push(D.FLASKE[k].navn); });
     tekster.push(d.getElementById("teori").textContent);

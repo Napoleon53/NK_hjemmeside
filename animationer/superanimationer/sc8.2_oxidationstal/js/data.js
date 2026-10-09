@@ -165,46 +165,14 @@
     /* Ordene i beregningen under forklaringen paa fane 2 (og i teorien) */
     D.REGN_ORD = { ox: "oxidationstal", v: "valenselektroner", nu: "elektroner nu", sum: "summen", ion: "det er ionens ladning" };
 
-    /* ----- Replikkerne ---------------------------------------------------------------
+    /* ----- Linjerne i arbejdsfeltet ---------------------------------------------------
        Spoergsmaalet, fejl, hint og ros staar i arbejdsfeltet i scenen, ved
-       feltet. Kemichael blander sig ikke: han siger noget, naar han sendes
-       ud eller hentes, naar der klikkes paa ham eller koppen, og ved K
-       (INTRO: hvor man er). Et klik paa ham selv giver hintet til det
-       trin, eleven er ved, og er opgaven loest, en kort ros
-       (ROS_KEMICHAEL). Han bliver ikke sur af at blive klikket paa
-       (brugerens test 5. okt. 2026).
-
-       KEMICHAEL_SIGER_HINT: false, saa staar hintet og svaret fra knappen i
-       arbejdsfeltet lige ved feltet (brugerens test 3. okt. 2026). Med true
-       siger Kemichael ogsaa dem i sin boble ved katederet, som foer. */
-    D.KEMICHAEL_SIGER_HINT = false;
-
-    D.INTRO = {
-        rg: "Her finder du oxidationstal med reglerne, ét trin ad gangen.",
-        ek: "Hvert elektronpar går til det atom, der trækker hårdest."
-    };
+       feltet (brugerens test 3. okt. 2026). */
     D.FAERDIG = {
         rg: "Alle 31. Summen er ladningen, hver gang.",
         ek: "Alle 12. Reglerne er en genvej. Elektronerne er grunden."
     };
     D.ROS = ["Rigtigt.", "Den sidder.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Den er i hus.", "Rigtigt regnet.", "Summen passer."];
-    /* Et klik paa Kemichael, naar opgaven er loest */
-    D.ROS_KEMICHAEL = ["Godt klaret.", "Flot arbejde.", "Det var rigtigt. Godt gået.", "Fint. Den er løst.", "Godt arbejde. Sådan skal det gøres."];
-
-    D.UD_LINJE = "Fint. Jeg går på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Nogen havde taget min stol.";
-
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Den er fra i morges. Den er vist oxideret.",
-        "Nogen har fortyndet den.",
-        "Kaffen er min. Elektronerne må du gerne flytte.",
-        "Stadig kold."
-    ];
-
-    /* Paaskeaegget: et elektronpar sluppet over hans kop */
-    D.KAFFE_PAR = "Min kaffe er neutral. Lad den blive det.";
-
     NK.Data = D;
 }());

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="30" viewBox="0 0 44 30">
+  <!-- Et stykke kalk (marmor). Ligger paa bunden af glasset: undersiden
+       er ved y 28, midten ved x 22. Boblerne kommer fra oversiden
+       (y 4-10). -->
+  <path d="M4 20 L8 9 L17 3 L29 4 L39 11 L41 21 L34 28 L11 28 Z" fill="#e9e6df" stroke="#8f8b82" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M8 9 L17 3 L20 13 L11 17 Z" fill="#fbfaf6"/>
+  <path d="M20 13 L29 4 L39 11 L31 18 Z" fill="#f3f1ea"/>
+  <path d="M11 17 L20 13 L31 18 L34 28 L11 28 L4 20 Z" fill="#d5d1c8"/>
+  <path d="M31 18 L39 11 L41 21 L34 28 Z" fill="#c4c0b6"/>
+  <path d="M8 9 L17 3 L29 4 L39 11 L41 21 L34 28 L11 28 L4 20 Z" fill="none" stroke="#8f8b82" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M13 22 L22 20 M24 9 L30 10" stroke="#b3aea3" stroke-width="1" stroke-linecap="round"/>
+</svg>

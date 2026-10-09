@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>B9.4 Standardkurven – Kemibogen B</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../opgaver/b9-4-opgaver.html" rel="next">
+<link href="../opgaver/b9-3-opgaver.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-c5b521a4b695ac0295f8557d600138dc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b9-1-lys-og-farver.html">Kapitel B9: Spektroskopi</a></li><li class="breadcrumb-item"><a href="../kapitler/b9-4-standardkurven.html">B9.4 Standardkurven</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen B</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B1: Reaktionshastighed</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-1-reaktionshastighed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.1 Reaktionshastighed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-2-koncentration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.2 Koncentration og sammenstød</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-3-aktiveringsenergi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.3 Aktiveringsenergi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-4-temperatur.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.4 Temperatur</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-5-katalysatorer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.5 Katalysatorer og enzymer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.5</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B2: Kemisk ligevægt</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-1-kemisk-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.1 Kemisk ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-2-ligevaegtsloven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.2 Ligevægtsloven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-3-ligevaegtsberegninger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.3 Beregninger med ligevægtskonstanten</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-4-ikke-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.4 Når blandingen ikke er i ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-5-indgreb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.5 Indgreb i en ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-6-temperatur-og-rumfang.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.6 Temperatur og rumfang</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-7-oploeselighedsprodukt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.7 Opløselighedsprodukt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel B9: Spektroskopi</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-1-lys-og-farver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B9.1 Lys og farver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-2-absorptionsspektre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B9.2 Absorptionsspektre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-3-lambert-beers-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B9.3 Lambert-Beers lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b9-4-standardkurven.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">B9.4 Standardkurven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b9-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B9.4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#fremgangsmåden" id="toc-fremgangsmåden" class="nav-link active" data-scroll-target="#fremgangsmåden">Fremgangsmåden</a></li>
+  <li><a href="#standardopløsninger" id="toc-standardopløsninger" class="nav-link" data-scroll-target="#standardopløsninger">Standardopløsninger</a></li>
+  <li><a href="#målingerne" id="toc-målingerne" class="nav-link" data-scroll-target="#målingerne">Målingerne</a></li>
+  <li><a href="#standardkurven" id="toc-standardkurven" class="nav-link" data-scroll-target="#standardkurven">Standardkurven</a></li>
+  <li><a href="#prøvens-koncentration" id="toc-prøvens-koncentration" class="nav-link" data-scroll-target="#prøvens-koncentration">Prøvens koncentration</a></li>
+  <li><a href="#tilbage-til-sodavanden" id="toc-tilbage-til-sodavanden" class="nav-link" data-scroll-target="#tilbage-til-sodavanden">Tilbage til sodavanden</a></li>
+  <li><a href="#hældningen-og-ekstinktionskoefficienten" id="toc-hældningen-og-ekstinktionskoefficienten" class="nav-link" data-scroll-target="#hældningen-og-ekstinktionskoefficienten">Hældningen og ekstinktionskoefficienten</a></li>
+  <li><a href="#det-lineære-område" id="toc-det-lineære-område" class="nav-link" data-scroll-target="#det-lineære-område">Det lineære område</a></li>
+  <li><a href="#stoffer-uden-farve" id="toc-stoffer-uden-farve" class="nav-link" data-scroll-target="#stoffer-uden-farve">Stoffer uden farve</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b9-1-lys-og-farver.html">Kapitel B9: Spektroskopi</a></li><li class="breadcrumb-item"><a href="../kapitler/b9-4-standardkurven.html">B9.4 Standardkurven</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-b-standardkurven" class="quarto-section-identifier">B9.4 Standardkurven</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Det skal du kunne">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Det skal du kunne
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>forklare, hvad standardopløsninger og en standardkurve er</li>
+<li>beregne koncentrationen i en standardopløsning med fortyndingsformlen</li>
+<li>afgøre, om en række målinger følger Lambert-Beers lov</li>
+<li>finde koncentrationen i en prøve ved at aflæse standardkurven og ved at regne</li>
+<li>finde ekstinktionskoefficienten ud fra standardkurvens hældning</li>
+</ul>
+</div>
+</div>
+<p>Hvor meget farvestof er der i en rød sodavand? Det står ikke på flasken, men det kan måles. Man sammenligner sodavandens absorbans med absorbansen af opløsninger, hvor man kender koncentrationen. Metoden kaldes spektrofotometrisk analyse. Den bruges også til at kontrollere drikkevand, fødevarer og blodprøver.</p>
+<section id="fremgangsmåden" class="level2">
+<h2 class="anchored" data-anchor-id="fremgangsmåden">Fremgangsmåden</h2>
+<ol type="1">
+<li>Stil spektrofotometeret på λ<sub>max</sub> for det farvede stof.</li>
+<li>Nulstil med en blindprøve.</li>
+<li>Mål absorbansen af en række standardopløsninger.</li>
+<li>Tegn standardkurven.</li>
+<li>Mål absorbansen af prøven.</li>
+<li>Find prøvens koncentration med standardkurven.</li>
+</ol>
+<p>Resten af afsnittet følger ét eksempel: det røde farvestof E129 i en sodavand. Der måles ved 504 nm i kuvetter med lysvejen 1,00 cm. Koncentrationerne står i mikromolær, µM, som du mødte i <a href="../kapitler/b9-3-lambert-beers-lov.html">afsnit B9.3</a>. 1 µM er 10<sup>−6</sup> M.</p>
+</section>
+<section id="standardopløsninger" class="level2">
+<h2 class="anchored" data-anchor-id="standardopløsninger">Standardopløsninger</h2>
+<p>En <strong>standardopløsning</strong> er en opløsning, hvor man kender koncentrationen af det farvede stof præcist. Man laver en hel række af dem med stigende koncentration.</p>
+<p>Standardopløsningerne laves ved at fortynde en <strong>stamopløsning</strong>. Det er en opløsning med en højere koncentration, som man også kender præcist. Koncentrationen efter fortyndingen beregnes med fortyndingsformlen fra <a href="../../c/kapitler/5-1-koncentration.html">bogen til C-niveau, afsnit 5.1</a>:</p>
+<p><span class="math display">\[
+c_{\text{før}} \cdot V_{\text{før}} = c_{\text{efter}} \cdot V_{\text{efter}}
+\]</span></p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: koncentrationen i standard 1">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: koncentrationen i standard 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Stamopløsningen af E129 har koncentrationen 100 µM. Med en pipette overføres 5,00 mL stamopløsning til en målekolbe på 100,0 mL. Kolben fyldes op til mærket med vand. Hvad er koncentrationen af E129 i kolben?</p>
+<p><strong>Kendte størrelser</strong></p>
+<p><em>c</em><sub>før</sub> = 100 µM, <em>V</em><sub>før</sub> = 5,00 mL og <em>V</em><sub>efter</sub> = 100,0 mL</p>
+<p><strong>Formel</strong></p>
+<p><span class="math display">\[
+c_{\text{efter}} = \frac{c_{\text{før}} \cdot V_{\text{før}}}{V_{\text{efter}}}
+\]</span></p>
+<p><strong>Beregning</strong></p>
+<p><span class="math display">\[
+c_{\text{efter}} = \frac{100\ \text{µM} \cdot 5{,}00\ \mathrm{mL}}{100{,}0\ \mathrm{mL}} = 5{,}00\ \text{µM}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Standard 1 har koncentrationen 5,00 µM.</p>
+</div>
+</div>
+<p>De andre standardopløsninger laves på samme måde med mere stamopløsning.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Standard</th>
+<th style="text-align: center;">Stamopløsning</th>
+<th style="text-align: center;">Samlet rumfang</th>
+<th style="text-align: center;">Koncentration af E129</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">5,00 mL</td>
+<td style="text-align: center;">100,0 mL</td>
+<td style="text-align: center;">5,00 µM</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">10,0 mL</td>
+<td style="text-align: center;">100,0 mL</td>
+<td style="text-align: center;">10,0 µM</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">15,0 mL</td>
+<td style="text-align: center;">100,0 mL</td>
+<td style="text-align: center;">15,0 µM</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">20,0 mL</td>
+<td style="text-align: center;">100,0 mL</td>
+<td style="text-align: center;">20,0 µM</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">25,0 mL</td>
+<td style="text-align: center;">100,0 mL</td>
+<td style="text-align: center;">25,0 µM</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="målingerne" class="level2">
+<h2 class="anchored" data-anchor-id="målingerne">Målingerne</h2>
+<p>Først nulstilles spektrofotometeret med blindprøven, som her er rent vand. Derefter måles absorbansen af de fem standardopløsninger og af prøven. Alle målinger laves ved samme bølgelængde og i samme slags kuvette.</p>
+<div id="fig-standardraekke" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-standardraekke-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/standardraekke.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Blindprøven, de fem standardopløsninger og prøven med den absorbans, spektrofotometeret viser."><img src="../figurer/standardraekke.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-standardraekke-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Blindprøven, de fem standardopløsninger og prøven med den absorbans, spektrofotometeret viser.
+</figcaption>
+</figure>
+</div>
+<p>Sodavanden er for kraftigt farvet til at blive målt direkte. Derfor er prøven fortyndet: 10,0 mL sodavand er fyldt op til 100,0 mL med vand.</p>
+</section>
+<section id="standardkurven" class="level2">
+<h2 class="anchored" data-anchor-id="standardkurven">Standardkurven</h2>
+<p><strong>Standardkurven</strong> er en graf med koncentrationen på den vandrette akse og absorbansen på den lodrette. Hver standardopløsning giver ét punkt.</p>
+<div id="fig-standardkurve" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-standardkurve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/standardkurve.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Standardkurven for E129. Prøvens absorbans føres vandret ud til linjen og lodret ned til aksen."><img src="../figurer/standardkurve.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-standardkurve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Standardkurven for E129. Prøvens absorbans føres vandret ud til linjen og lodret ned til aksen.
+</figcaption>
+</figure>
+</div>
+<p>Ifølge Lambert-Beers lov er <span class="math inline">\(A = \varepsilon \cdot l \cdot c\)</span>. Bølgelængden og kuvetten er de samme i alle målingerne, så <span class="math inline">\(\varepsilon \cdot l\)</span> er et fast tal. Punkterne skal derfor ligge på en ret linje gennem (0, 0):</p>
+<p><span class="math display">\[
+A = a \cdot c
+\]</span></p>
+<p>Tallet <em>a</em> er linjens hældning, og <span class="math inline">\(a = \varepsilon \cdot l\)</span>.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Følger målingerne Lambert-Beers lov?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Følger målingerne Lambert-Beers lov?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ja, når punkterne ligger på en ret linje, der går gennem (0, 0). Så er absorbansen ligefrem proportional med koncentrationen. Det er dét, du skal skrive, når en opgave beder dig vise, at Lambert-Beers lov er opfyldt.</p>
+</div>
+</div>
+<p>Hældningen findes ved at aflæse et punkt på linjen langt fra (0, 0). Ved 25,0 µM går linjen gennem absorbansen 0,650:</p>
+<p><span class="math display">\[
+a = \frac{A}{c} = \frac{0{,}650}{25{,}0\ \text{µM}} = 0{,}0260\ \text{µM}^{-1}
+\]</span></p>
+<p>Enheden µM<sup>−1</sup> læses “pr. mikromolær”. Standardkurven har altså ligningen <em>A</em> = 0,0260 µM<sup>−1</sup> · <em>c</em>.</p>
+<section id="med-et-regneark" class="level3">
+<h3 class="anchored" data-anchor-id="med-et-regneark">Med et regneark</h3>
+<p>I praksis taster man målingerne ind i et regneark og lader det tegne den bedste rette linje gennem punkterne. Det kaldes lineær regression. Regnearket skriver linjens ligning ved grafen. Her bliver den</p>
+<p><span class="math display">\[
+y = 0{,}0260x + 0{,}0002
+\]</span></p>
+<p>hvor <em>y</em> er absorbansen, og <em>x</em> er koncentrationen i µM. Tallet foran <em>x</em> er hældningen. Det sidste tal skulle være 0 ifølge Lambert-Beers lov, og det er det næsten.</p>
+<p>Regnearket kan også vise tallet <em>R</em><sup>2</sup>. Jo tættere <em>R</em><sup>2</sup> er på 1, jo bedre ligger punkterne på linjen.</p>
+</section>
+</section>
+<section id="prøvens-koncentration" class="level2">
+<h2 class="anchored" data-anchor-id="prøvens-koncentration">Prøvens koncentration</h2>
+<p>Prøven har absorbansen 0,338. Koncentrationen kan findes på to måder.</p>
+<p><strong>Ved aflæsning:</strong> Gå vandret ud fra 0,338 på den lodrette akse, til du rammer linjen. Gå derefter lodret ned til den vandrette akse. Dér står koncentrationen, som er omkring 13 µM.</p>
+<p><strong>Ved beregning:</strong> Ligningen <span class="math inline">\(A = a \cdot c\)</span> løses for <em>c</em>.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: koncentrationen i prøven">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: koncentrationen i prøven
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Kendte størrelser</strong></p>
+<p><em>A</em> = 0,338 og <em>a</em> = 0,0260 µM<sup>−1</sup></p>
+<p><strong>Formel</strong></p>
+<p><span class="math display">\[
+c = \frac{A}{a}
+\]</span></p>
+<p><strong>Beregning</strong></p>
+<p><span class="math display">\[
+c = \frac{0{,}338}{0{,}0260\ \text{µM}^{-1}} = 13{,}0\ \text{µM}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Koncentrationen af E129 i prøven er 13,0 µM. Det passer med aflæsningen på grafen.</p>
+</div>
+</div>
+</section>
+<section id="tilbage-til-sodavanden" class="level2">
+<h2 class="anchored" data-anchor-id="tilbage-til-sodavanden">Tilbage til sodavanden</h2>
+<p>De 13,0 µM er koncentrationen i den fortyndede prøve. Sodavanden selv er mere koncentreret. Fortyndingsformlen bruges igen, denne gang for at finde koncentrationen før fortyndingen.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: koncentrationen i sodavanden">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: koncentrationen i sodavanden
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Kendte størrelser</strong></p>
+<p><em>c</em><sub>efter</sub> = 13,0 µM, <em>V</em><sub>før</sub> = 10,0 mL og <em>V</em><sub>efter</sub> = 100,0 mL</p>
+<p><strong>Formel</strong></p>
+<p><span class="math display">\[
+c_{\text{før}} = \frac{c_{\text{efter}} \cdot V_{\text{efter}}}{V_{\text{før}}}
+\]</span></p>
+<p><strong>Beregning</strong></p>
+<p><span class="math display">\[
+c_{\text{før}} = \frac{13{,}0\ \text{µM} \cdot 100{,}0\ \mathrm{mL}}{10{,}0\ \mathrm{mL}} = 130\ \text{µM}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Koncentrationen af E129 i sodavanden er 130 µM. Det er 1,30 · 10<sup>−4</sup> M.</p>
+</div>
+</div>
+<p>På en varedeklaration står indholdet i milligram pr. liter. I 1,00 L sodavand er der 1,30 · 10<sup>−4</sup> mol E129, og molarmassen for E129 er 496,41 g/mol:</p>
+<p><span class="math display">\[
+m = n \cdot M = 1{,}30 \cdot 10^{-4}\ \mathrm{mol} \cdot 496{,}41\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}0645\ \mathrm{g}
+\]</span></p>
+<p>Sodavanden indeholder altså 64,5 mg E129 pr. liter.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Husk fortyndingen">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Husk fortyndingen
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Standardkurven giver koncentrationen i den opløsning, der stod i kuvetten. Er prøven fortyndet, før den blev målt, skal du regne tilbage til den oprindelige opløsning.</p>
+</div>
+</div>
+</section>
+<section id="hældningen-og-ekstinktionskoefficienten" class="level2">
+<h2 class="anchored" data-anchor-id="hældningen-og-ekstinktionskoefficienten">Hældningen og ekstinktionskoefficienten</h2>
+<p>Standardkurvens hældning er <span class="math inline">\(a = \varepsilon \cdot l\)</span>. Ekstinktionskoefficienten findes derfor ved at dividere hældningen med lysvejen:</p>
+<p><span class="math display">\[
+\varepsilon = \frac{a}{l} = \frac{0{,}0260\ \text{µM}^{-1}}{1{,}00\ \mathrm{cm}} = 0{,}0260\ \text{µM}^{-1} \cdot \mathrm{cm^{-1}}
+\]</span></p>
+<p>Når lysvejen er 1,00 cm, har ekstinktionskoefficienten samme tal som hældningen. Det er kun enheden, der er forskellig.</p>
+<p>Enheden på ekstinktionskoefficienten følger enheden på den vandrette akse.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 29%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Koncentrationen på den vandrette akse</th>
+<th style="text-align: center;">Enheden på hældningen</th>
+<th style="text-align: center;">Enheden på <em>ε</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">M</td>
+<td style="text-align: center;">M<sup>−1</sup></td>
+<td style="text-align: center;">M<sup>−1</sup> · cm<sup>−1</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">mM</td>
+<td style="text-align: center;">mM<sup>−1</sup></td>
+<td style="text-align: center;">mM<sup>−1</sup> · cm<sup>−1</sup></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">µM</td>
+<td style="text-align: center;">µM<sup>−1</sup></td>
+<td style="text-align: center;">µM<sup>−1</sup> · cm<sup>−1</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">mg/L</td>
+<td style="text-align: center;">L/mg</td>
+<td style="text-align: center;">L/(mg · cm)</td>
+</tr>
+</tbody>
+</table>
+<p>Der går en million µM på 1 M. Regnet pr. M bliver tallet derfor en million gange større: 0,0260 µM<sup>−1</sup> · cm<sup>−1</sup> er det samme som 2,60 · 10<sup>4</sup> M<sup>−1</sup> · cm<sup>−1</sup>. Det er værdien fra tabellen i afsnit B9.3.</p>
+</section>
+<section id="det-lineære-område" class="level2">
+<h2 class="anchored" data-anchor-id="det-lineære-område">Det lineære område</h2>
+<p>Lambert-Beers lov gælder kun for fortyndede opløsninger. Laver man standardopløsninger med højere og højere koncentration, begynder punkterne at ligge under den rette linje.</p>
+<div id="fig-lineaert-omraade" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lineaert-omraade-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/lineaert-omraade.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Ved høje koncentrationer bøjer standardkurven af."><img src="../figurer/lineaert-omraade.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lineaert-omraade-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Ved høje koncentrationer bøjer standardkurven af.
+</figcaption>
+</figure>
+</div>
+<p>Den del af grafen, hvor punkterne ligger på den rette linje, kaldes det <strong>lineære område</strong>. Kun dér kan standardkurven bruges.</p>
+<p>Prøvens absorbans skal ligge mellem den laveste og den højeste standardopløsning. Er den for høj, fortynder man prøven og måler igen. Derfor blev sodavanden fortyndet, før den blev målt.</p>
+</section>
+<section id="stoffer-uden-farve" class="level2">
+<h2 class="anchored" data-anchor-id="stoffer-uden-farve">Stoffer uden farve</h2>
+<p>Mange stoffer er farveløse og kan ikke måles direkte med synligt lys. Så tilsætter man et reagens, der omdanner stoffet til et farvet stof.</p>
+<p>Nitrit, NO<sub>2</sub><sup>−</sup>, i drikkevand er et eksempel. Nitrit er farveløs. Tilsætter man to reagenser, sulfanilamid og et koblingsreagens, bliver hver nitrition til ét molekyle af et rødt farvestof. Jo mere nitrit vandet indeholder, jo mere rød bliver opløsningen.</p>
+<p>Standardopløsningerne laves af nitrit og får tilsat de samme reagenser som prøven. Så kan standardkurven tegnes med koncentrationen af nitrit på den vandrette akse. Blindprøven indeholder vand og reagenser, men ingen nitrit.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Prøv selv
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sb9.4_spektrofotometri/index.html">Spektrofotometri</a> kan du selv måle standardopløsninger og finde indholdet af farvestof i en sodavand, af nitrit i vand og af to farvestoffer i den samme sodavand. I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sb9.3_lambert_beer/index.html#kurve">Lambert-Beers lov</a> kan du lægge linjen gennem punkterne og aflæse en prøve.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Kort sagt
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Standardopløsninger har kendte koncentrationer. De laves ved at fortynde en stamopløsning.</li>
+<li>Standardkurven viser absorbansen som funktion af koncentrationen. Følger målingerne Lambert-Beers lov, ligger punkterne på en ret linje gennem (0, 0).</li>
+<li>Linjen har ligningen <span class="math inline">\(A = a \cdot c\)</span>, og hældningen er <span class="math inline">\(a = \varepsilon \cdot l\)</span>.</li>
+<li>Prøvens koncentration aflæses på standardkurven eller beregnes som <span class="math inline">\(c = A / a\)</span>.</li>
+<li>Er prøven fortyndet, regnes der tilbage med fortyndingsformlen.</li>
+<li>Standardkurven kan kun bruges i det lineære område. Er prøvens absorbans for høj, fortyndes prøven.</li>
+</ul>
+</div>
+</div>
+<div class="til-opgaver">
+<p><strong>Opgaver:</strong> <a href="../opgaver/b9-4-opgaver.html">Opgaver til B9.4</a> har både almindelige opgaver og opgaver med fødevaretema.</p>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../opgaver/b9-3-opgaver.html" class="pagination-link" aria-label="Opgaver til B9.3">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Opgaver til B9.3</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../opgaver/b9-4-opgaver.html" class="pagination-link" aria-label="Opgaver til B9.4">
+        <span class="nav-page-text">Opgaver til B9.4</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

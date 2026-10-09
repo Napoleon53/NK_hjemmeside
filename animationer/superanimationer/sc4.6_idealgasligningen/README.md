@@ -2,8 +2,7 @@
 
 Superanimation om idealgasligningen: tryk, volumen, stofmængde og
 temperatur hænger sammen i p · V = n · R · T. Åbn `index.html`. Mappen
-henter kun filer inde fra sig selv, bortset fra Kemichael
-(`../../v2/kemichael/kemichael.js` og `../kemichael/superanimation.js`).
+henter kun filer inde fra sig selv.
 Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
 ## Bestillingen
@@ -25,13 +24,14 @@ Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 4. **Loftet:** 2 faner. Fane 1: én cylinder, højst 80 molekyler
    (40 pr. mol, 0,25 til 2,00 mol), 3 lodder og 7 forudsigelser. Fane 2:
    12 opgaver (4 Let, 4 Middel, 4 Svær) med nye tal.
-5. **Layoutet:** scene plus panel som `sc4.5`. Cylinderen er stjernen;
-   nederst Kemichaels bånd med katederet.
+5. **Layoutet:** scene plus panel som `sc4.5`. Cylinderen er stjernen.
 
-Brugerens valg (25. sept. 2026): de to faner Stemplet og Beregningen, og
-den rolige Kemichael fra `sc4.5` (han blander sig kun, når eleven beder
-om et hint eller svaret, og kan sendes ud). Ingen knapper til
-præsentationen.
+Brugerens valg (25. sept. 2026): de to faner Stemplet og Beregningen.
+Ingen knapper til præsentationen.
+
+9. okt. 2026 (brugerens valg): Kemichael ved katederet er taget helt ud
+(han hører til i laboratoriet). Scenen har fået hans bånd, og hintknappen
+er gul, så eleven altid kan finde hjælpen selv.
 
 ## Hvad den viser
 
@@ -101,21 +101,19 @@ brøkstregen eller mangler, kommaet, n = m · M og brøken vendt om, 273
 trukket fra i stedet for lagt til, og svaret i °C, når der spørges om
 kelvin.
 
-**Kemichael ved katederet** (som `sc4.5`): han sidder stille bag sit
-kateder nederst til venstre og siger kun noget ved Giv hint (til
-delopgaven er løst) og Vis svaret. Knappen Send Kemichael ud sender ham på
-lærerværelset (seddel på katederet); så står hintene i opgavekortet.
-Valget gælder begge faner og huskes i browseren. Klik på ham og koppen
-giver korte svar. <kbd>K</kbd> får ham til at sige, hvor man er.
+**Hint og svar.** Den gule knap i opgavekortet er hjælpen: Giv hint skriver
+hintet i linjen lige over knappen, og knappen bliver til Vis svaret (kun et
+omrids, så den ikke frister), der skriver svaret og næste skridt i samme
+linje. Efter et forkert svar lyser den gule knap stille op, til linjen
+skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
 
 **Påskeæg:** stil gassen på 1,00 mol, 0 °C, uden lodder og med frit
-stempel: 22,4 L, tallet fra de gamle lærebøger. Er alle lodder på, er
-"kaffekoppen ikke et lod".
+stempel: 22,4 L, tallet fra de gamle lærebøger.
 
 Direkte link til fane 2: `index.html#regn`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>T</kbd> teori ·
-<kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichael siger, hvor man er ·
+<kbd>H</kbd> rundvisning ·
 <kbd>R</kbd> opgaven forfra (fane 2: nye tal) · <kbd>Enter</kbd> tjek
 feltet eller næste opgave · <kbd>Esc</kbd> luk.
 
@@ -137,14 +135,13 @@ feltet eller næste opgave · <kbd>Esc</kbd> luk.
 ```
 index.html          markup for de to faner, teorien og rundvisningen
 css/stil.css        alt udseende (grundlaget er sc4.5's, felterne sc7.4's). NB: decimaltal med PUNKTUM i CSS
-sprites/            loddet, manometeret, gasflasken og varmepladen (nye) og katederet (som sc4.5)
+sprites/            loddet, manometeret, gasflasken og varmepladen
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.5)
 js/data.js          konstanterne, forudsigelserne, regneopgaverne og replikkerne
 js/gas.js           modellen: idealgasligningen, stemplet, opgavernes trin og facit, molekylerne
 js/tjek.js          formlerne (fortolker og regner efter), tallene og beskederne ved fejl
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       cylinderen, manometeret, varmepladen, flasken, hylden, skiltene, grafen og tavlen
-js/laerer.js        Kemichael ved katederet (NK.RoligLaerer, som sc4.5)
 js/sim_stempel.js   fane 1
 js/sim_regn.js      fane 2
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
@@ -163,8 +160,8 @@ mol, 3 lodder à 1 bar, 40 molekyler pr. mol). **Forudsigelserne** står i
 skal prøves (`handling`), hint og forklaring. **Regneopgaverne** står i
 `D.REGN`: de kendte tal første gang (`std`), listerne, nye tal trækkes fra
 (`tal`), og teksten med {n}, {T} osv. Trinene og facit regnes af
-`js/gas.js`; intet facit er skrevet i hånden. **Kemichaels replikker**
-står i `D.INTRO`, `D.FAERDIG`, `D.ROS`, `D.KAFFE` og de korte svar fra
+`js/gas.js`; intet facit er skrevet i hånden. **Linjerne i opgavekortet**
+står i `D.INTRO`, `D.FAERDIG` og `D.ROS`, og de korte svar fra
 scenen i `D.SCENE`.
 
 **Fejlbeskederne** står i `js/tjek.js`.
@@ -177,11 +174,11 @@ af formlerne godkendes og de typiske forkerte afvises med den rigtige
 besked, de typiske regnefejl, sproget (også alt, der siges undervejs),
 at formlen ikke står på siden uden for teorien, at alle syv
 forudsigelser og alle tolv opgaver kan gennemføres, også med forkert gæt,
-to ting på én gang, åbnet lås, hint og Vis svaret, at Kemichael kun
-taler, når eleven beder om det, og at layoutet holder fra 520 × 380 til
+to ting på én gang, åbnet lås, hint og Vis svaret, at hint og svar kun
+kommer fra den gule knap og står i opgavekortet, og at layoutet holder fra 520 × 380 til
 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt
-tilbage bagefter. Sidst kørt 25. september 2026: ALT OK (143 påstande).
+tilbage bagefter. Sidst kørt 9. oktober 2026: ALT OK (141 påstande).
 
 ## Forenklinger
 

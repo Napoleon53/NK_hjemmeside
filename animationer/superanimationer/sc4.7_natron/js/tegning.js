@@ -3,7 +3,7 @@
 
    Rummet, bordet og tavlen (som sc4.3), vaegten (som sc4.5), braenderen
    med flammen, trefoden, diglen med pulveret, tangen, damp og korn, der
-   sproejter, natronglasset og kagen, luppen med ionerne, grafen over
+   sproejter, natronglasset, luppen med ionerne, grafen over
    massen, skemaet med elevens tal og atomtaellingen paa tavlen.
    Funktionerne tegner én ting et bestemt sted og husker intet selv,
    bortset fra de smaa partikelsystemer (damp, korn og luppen), der hver
@@ -460,22 +460,11 @@
     };
     NK.Korn = Korn;
 
-    /* ----- Natronglasset og kagen (pynt og paaskeaeg paa fane 1) ------------------------ */
+    /* ----- Natronglasset (pynt paa fane 1; et klik siger, hvad natron er) ----------------- */
     T.glas = function (ctx, cx, y, b, lys) {
         var M = MAAL.natron, h = M.h * b / M.b;
         if (lys) T.skaer(ctx, cx, y - h * 0.5, b * 0.7, h * 0.6);
         NK.Sprites.tegn(ctx, "natron", cx - b / 2, y - M.bund * b / M.b, b, h);
-        return { x: cx - b / 2, y: y - h, b: b, h: h };
-    };
-
-    T.kage = function (ctx, cx, y, b, lys, vip) {
-        var M = MAAL.kage, h = M.h * b / M.b;
-        if (lys) T.skaer(ctx, cx, y - h * 0.5, b * 0.62, h * 0.7);
-        ctx.save();
-        ctx.translate(cx, y);
-        ctx.rotate(vip || 0);
-        NK.Sprites.tegn(ctx, "kage", -b / 2, -M.bund * b / M.b, b, h);
-        ctx.restore();
         return { x: cx - b / 2, y: y - h, b: b, h: h };
     };
 

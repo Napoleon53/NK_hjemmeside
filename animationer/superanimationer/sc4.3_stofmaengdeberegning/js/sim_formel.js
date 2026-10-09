@@ -382,7 +382,6 @@
                     '<button type="button" class="felt-ok" aria-label="Tjek svaret" tabindex="-1"' + fra + '>↵</button>';
                 var inp = fe.querySelector("input");
                 inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); mig.skrivTjek(); } });
-                inp.addEventListener("input", function () { mig.k.skriver(); });
                 fe.querySelector(".felt-ok").addEventListener("click", function () { mig.skrivTjek(); });
                 f.input = inp;
             }
@@ -454,8 +453,7 @@
         var lay = this.lay;
         if (!lay) return;
         this.muldvarp = { x: b ? b.hx + b.b / 2 : x, y: lay.tray.y + lay.tray.h - 6, t: 0 };
-        if (!this.k.inde()) this.kortBesked(NK.html(D.MULDVARP), 4);
-        else this.k.svar(NK.html(D.MULDVARP), "", 4);
+        this.kortBesked(NK.html(D.MULDVARP), 4);
     };
 
     /* ----- Musen ------------------------------------------------------------------ */
@@ -601,13 +599,12 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h, r = this.runde, ctx = this.L.ctx, mig = this;
-        var baand = this.k.layout(W, H);
         /* Opgavens tekst over tavlen, saa tavlen under den */
-        var opg = Tg.overTavle(ctx, r.tekst, W - 32 - 14, NK.klamp(Math.min(W / 44, baand.y / 26), 15, 20), 15);
+        var opg = Tg.overTavle(ctx, r.tekst, W - 32 - 14, NK.klamp(Math.min(W / 44, H / 26), 15, 20), 15);
         var opgY = 12;
         var ry = opgY + opg.h + 16;
-        var R = { x: 16, y: ry, b: W - 32, h: Math.max(160, baand.y - ry - 24) };
-        var lay = { W: W, H: H, Hs: baand.y, tavle: R, opg: opg, opgY: opgY };
+        var R = { x: 16, y: ry, b: W - 32, h: Math.max(160, H - ry - 24) };
+        var lay = { W: W, H: H, Hs: H, tavle: R, opg: opg, opgY: opgY };
         var navne = RAEKKER.map(function (s) { return FACIT_NAVN[s]; });
         var enheder = RAEKKER.map(function (s) { return D.ENHED_TEKST[s]; });
         this.brikker.forEach(function (b) {
@@ -713,7 +710,6 @@
         this.saetAnker("formel", R.x, R.y, tx0 - R.x - 8, topH);
         this.saetAnker("skema", tx0 - 6, R.y + 4, R.x + R.b - tx0 + 2, topH - 4);
         this.saetAnker("bunke", lay.tray.x, lay.tray.y, lay.tray.b, lay.tray.h);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* ----- Tegn ----------------------------------------------------------------------- */
@@ -894,7 +890,6 @@
                 ctx.restore();
             }
         }
-        this.k.tegn(ctx);
     };
 
     NK.SimFormel = SimFormel;

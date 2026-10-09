@@ -251,7 +251,6 @@
         NK.forventetFor = m.mf;
         this.gem();
         if (this.el.snyd) { this.el.snyd.disabled = true; this.el.snyd.textContent = "Snydt. Det står i journalen."; }
-        if (this.k.inde()) this.k.svar(NK.html(D.SNYD_LINJE), "skidt", 4);
         this.vaelg(D.HYPOTESER.length - 1, false);
     };
 
@@ -285,8 +284,7 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.03, 8, 16));
         var smal = W < 620;
@@ -302,7 +300,6 @@
         this.lay = lay;
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("graf", lay.graf.x, lay.graf.y, lay.graf.b, lay.graf.h);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* Handlingen paa én linje over tavlen */
@@ -384,7 +381,6 @@
                 yMax: Math.ceil(m.mf + 0.3), xMax: xMax, titel: m.egen ? "Din digel" : "Eksemplet",
                 fremhaev: this.opg.dom && this.faerdig ? this.valgt : null });
         }
-        this.k.tegn(ctx);
     };
 
     NK.SimHypoteser = SimHypoteser;

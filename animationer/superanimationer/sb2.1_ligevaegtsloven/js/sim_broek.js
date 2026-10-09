@@ -120,7 +120,7 @@
         var d = B.dom(o, a.num, a.den);
         if (d.ok) {
             this.rod = [];
-            this.loest("selv", this.svarTekst(), "Rigtigt ✓");
+            this.loest("selv", this.svarTekst() + (d.enEks ? " " + NK.html("1" + NK.haevet(d.enEks) + " = 1, så nævneren er 1.") : ""), "Rigtigt ✓");
             return;
         }
         this.rod = d.rod || [];

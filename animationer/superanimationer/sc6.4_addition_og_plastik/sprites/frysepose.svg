@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="180" viewBox="0 0 150 180">
+  <!-- Frysepose af polyethen med lynlaas og aerter. Bruges paa fane 3,
+       naar der er zoomet ud. -->
+  <defs>
+    <linearGradient id="pose" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f4fd" stop-opacity="0.34"/>
+      <stop offset="0.5" stop-color="#cfe6f7" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#e8f4fd" stop-opacity="0.28"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Aerterne i bunden -->
+  <g fill="#7fc46a" stroke="#4f9140" stroke-width="1">
+    <circle cx="38" cy="150" r="9"/><circle cx="58" cy="154" r="9"/><circle cx="78" cy="151" r="9"/>
+    <circle cx="98" cy="154" r="9"/><circle cx="116" cy="149" r="9"/><circle cx="48" cy="136" r="9"/>
+    <circle cx="68" cy="138" r="9"/><circle cx="88" cy="136" r="9"/><circle cx="107" cy="137" r="9"/>
+    <circle cx="58" cy="121" r="9"/><circle cx="78" cy="123" r="9"/><circle cx="97" cy="121" r="9"/>
+  </g>
+
+  <!-- Posen -->
+  <path d="M20 14 Q18 14 18 18 L16 160 Q16 170 26 170 L124 170 Q134 170 134 160 L132 18 Q132 14 130 14 Z"
+        fill="url(#pose)" stroke="#d6eaf8" stroke-opacity="0.8" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- Lynlaasen -->
+  <rect x="18" y="24" width="114" height="7" rx="3.5" fill="#6fb6e8" fill-opacity="0.75"/>
+  <rect x="18" y="35" width="114" height="2" fill="#d6eaf8" fill-opacity="0.45"/>
+
+  <!-- Genskin og folder -->
+  <path d="M30 46 Q26 100 30 158" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="3" stroke-linecap="round"/>
+  <path d="M118 50 Q122 90 119 120" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2" stroke-linecap="round"/>
+</svg>

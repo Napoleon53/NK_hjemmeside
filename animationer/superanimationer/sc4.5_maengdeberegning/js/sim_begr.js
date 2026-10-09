@@ -167,15 +167,8 @@
         this.visKnap();
         this.skema.byg();
         var L = D.stof(this.x.L).formel, E = D.stof(this.x.E).formel;
-        /* Valget er delopgaven: Kemichael tier, medmindre han blev bedt om svaret */
-        if (maade === "svar") {
-            var svar = L + " slipper op først, og " + E + " er til overs. Se poserne.";
-            if (!this.k.sig(svar, "svar", { lukVedSkriv: true })) this.besked(svar, "gul");
-            else this.besked("Se, hvad der sker.", "");
-        } else {
-            this.k.tie();
-            this.besked(rigtig ? "Rigtigt gættet. Se poserne reagere i hele sæt." : "Se, hvad der sker.", rigtig ? "god" : "");
-        }
+        if (maade === "svar") this.besked(L + " slipper op først, og " + E + " er til overs. Se poserne.", "gul");
+        else this.besked(rigtig ? "Rigtigt gættet. Se poserne reagere i hele sæt." : "Se, hvad der sker.", rigtig ? "god" : "");
     };
 
     /* Efter reaktionen: forklaringen og naeste skridt */
@@ -212,11 +205,10 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var lay = { W: W, H: H };
-        var baand = this.k.layout(W, H);
-        lay.baand = baand;
         var kant = NK.klamp(W * 0.014, 8, 16);
-        lay.bordY = Math.round(baand.y - NK.klamp(H * 0.035, 10, 26));
-        var tH = NK.klamp(baand.y * 0.56, 190, 400);
+        /* Bordet staar nederst i scenen: forkanten gaar helt ned til bunden */
+        lay.bordY = Math.round(H - NK.klamp(H * 0.06, 18, 44));
+        var tH = NK.klamp(H * 0.56, 190, 400);
         lay.tavle = { x: kant + 6, y: NK.klamp(H * 0.02, 8, 18), b: W - 2 * kant - 12, h: tH };
         var ind = NK.klamp(lay.tavle.b * 0.03, 8, 22);
         this.skema.layout({ x: lay.tavle.x + ind, y: lay.tavle.y + ind * 0.6, b: lay.tavle.b - 2 * ind, h: tH - ind * 1.2 }, this.L.ctx);
@@ -235,8 +227,6 @@
         this.lay = lay;
         this.saetAnker("skema", lay.tavle.x, lay.tavle.y, lay.tavle.b, tH);
         this.saetAnker("bord", kant, zoneTop, W - 2 * kant, lay.bordY - zoneTop + 8);
-        this.saetAnker("boble", this.k.lay.boble.x, this.k.lay.boble.y, this.k.lay.boble.b, this.k.lay.boble.h);
-        this.saetAnker("laerer", this.k.lay.desk.x, baand.y, this.k.lay.desk.b, baand.h);
     };
 
     /* ----- Tid ---------------------------------------------------------------------------------- */
@@ -259,9 +249,8 @@
         Tg.rum(ctx, lay.W, lay.H, lay.bordY + 6);
         Tg.tavle(ctx, lay.tavle);
         this.skema.tegn(ctx, this.tid);
-        Tg.bord(ctx, 0, lay.W, lay.bordY, lay.baand.y);
+        Tg.bord(ctx, 0, lay.W, lay.bordY, lay.H);
         this.tegnBord(ctx);
-        this.k.tegn(ctx);
     };
 
     /* Pladserne for et stofs poser: tre pr. raekke */

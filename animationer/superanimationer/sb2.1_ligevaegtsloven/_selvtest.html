@@ -173,6 +173,10 @@ function koerTest(W) {
     paastand("eksponent på en koefficient 1", kode(nh3, "NH3 ^2", "N2 ^2 · H2 ^3") === "eksponent");
     paastand("1 i nævneren, når intet skal med", B.dom(kalk, T("Ca^2+ · CO3^2-"), T("1")).ok);
     paastand("tom nævner, når intet skal med", B.dom(kalk, T("Ca^2+ · CO3^2-"), T("")).ok);
+    var auto = opg("autoprotolyse"), e2 = B.dom(auto, T("H3O^+ · OH^-"), T("1 ^2"));
+    paastand("1² i nævneren er 1, når intet skal med (2 H₂O(l))", e2.ok && e2.enEks === 2 && !B.dom(auto, T("H3O^+ · OH^-"), T("1")).enEks);
+    paastand("1² i nævneren, når der skal stoffer i den, er stadig en fejl", kode(nh3, "NH3 ^2", "1 ^2") === "tom-side" && dom(nh3, "NH3 ^2", "1 ^2").rod.length === 2);
+    paastand("1 efter en eksponent eller med et stof godtages ikke", kode(kalk, "Ca^2+ · CO3^2-", "^2 1") === "en" && kode(kalk, "Ca^2+ · CO3^2-", "1 ^2 ^3") === "en");
     var ent = dom(nh3, "1", "N2 · H2 ^3");
     paastand("1 i tælleren alene", ent.kode === "tom-side" && /Der står 1/.test(ent.tekst));
     paastand("tom nævner, når der skal noget i den", kode(nh3, "NH3 ^2", "") === "tom-side");

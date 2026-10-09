@@ -1,47 +1,22 @@
 /* =====================================================================
-   app.js - binder de to faner sammen (som sc1.4_afstemning)
+   app.js - starter spillet (som sc1.4_afstemning, men uden faner)
 
-   Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Der er ingen laerer: hjaelpen staar i
-   statuslinjen nederst i scenen (som sc1.4).
+   Overlays (teorien, butikken og esterkortet), tastaturgenveje og
+   tegneloekken. Der er ingen laerer: hjaelpen staar i statuslinjen
+   nederst i scenen (som sc1.4).
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
 
-    var sims = {};
-    var faner = ["fane-rk", "fane-fb"];
-    var aktivFane = faner[0];
+    var sim = null;
     var sidsteTid = 0;
-
-    /* ----- Faner ------------------------------------------------------ */
-    function visFane(id) {
-        var afsnit = document.querySelectorAll(".fane");
-        var knapper = document.querySelectorAll(".faneknap");
-        var i;
-        for (i = 0; i < afsnit.length; i++) afsnit[i].classList.toggle("aktiv", afsnit[i].id === id);
-        for (i = 0; i < knapper.length; i++) {
-            var valgt = knapper[i].getAttribute("data-fane") === id;
-            knapper[i].classList.toggle("aktiv", valgt);
-            knapper[i].setAttribute("aria-selected", valgt ? "true" : "false");
-        }
-        aktivFane = id;
-        if (NK.Rundvisning) NK.Rundvisning.luk();
-        if (sims[id]) {
-            sims[id].tilpas();
-            sims[id].layout();
-            sims[id].fokus();
-        }
-    }
-    /* Fanerne kan selv gaa videre til den naeste (knappen efter sidste opgave) */
-    NK.visFane = visFane;
 
     /* ----- Overlays ---------------------------------------------------- */
     function lukAlle() {
         var aabne = document.querySelectorAll(".overlay.vis");
         for (var i = 0; i < aabne.length; i++) aabne[i].classList.remove("vis");
-        var sim = sims[aktivFane];
         if (sim && sim.fokus) sim.fokus();
     }
 
@@ -57,18 +32,18 @@
         if (!isFinite(dt) || dt < 0) dt = 0;
         if (dt > 0.1) dt = 0.1;                    /* undgaa spring efter faneskift */
 
-        var sim = sims[aktivFane];
         if (sim) {
             sim.tilpas();
             sim.opdater(dt * NK.tid.skala);
             sim.tegn();
         }
+        NK.Fx.opdater(dt);
+        NK.Fx.tegn();
         window.requestAnimationFrame(loekke);
     }
 
     /* ----- Tastatur ------------------------------------------------------ */
     function tastatur(e) {
-        var sim = sims[aktivFane];
         if (e.key === "Escape") {
             lukAlle();
             if (NK.Rundvisning) NK.Rundvisning.luk();
@@ -80,10 +55,10 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "1" || e.key === "2") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
-        if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
+        if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start("fane-fb"); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
-        if (e.key === "r" || e.key === "R") { if (sim) sim.nulstil(); return; }
+        if (e.key === "b" || e.key === "B") { if (sim) sim.aabnButik(); return; }
+        if (e.key === "e" || e.key === "E") { if (sim) sim.kortet.aabn(); return; }
         if (e.key === "Enter" && sim && sim.enter) {
             if (e.target && e.target.tagName === "BUTTON") return;
             e.preventDefault();
@@ -93,16 +68,10 @@
 
     /* ----- Opstart --------------------------------------------------------- */
     function start() {
-
-        sims["fane-rk"] = new NK.SimReaktor();
-        sims["fane-fb"] = new NK.SimFabrik();
-        NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen og selvtesten */
-
-        var knapper = document.querySelectorAll(".faneknap");
-        function bindFane(knap) {
-            knap.addEventListener("click", function () { visFane(knap.getAttribute("data-fane")); });
-        }
-        for (var i = 0; i < knapper.length; i++) bindFane(knapper[i]);
+        var i;
+        NK.Fx.start();
+        sim = new NK.Fabrik();
+        NK.sim = sim;                /* saa modellen kan pilles ved fra konsollen og selvtesten */
 
         var lukKnapper = document.querySelectorAll("[data-luk]");
         for (i = 0; i < lukKnapper.length; i++) lukKnapper[i].addEventListener("click", lukAlle);
@@ -112,15 +81,13 @@
         }
         for (i = 0; i < overlays.length; i++) bindBaggrund(overlays[i]);
 
-        NK.el("hjaelpknap").addEventListener("click", function () { lukAlle(); NK.Rundvisning.start(aktivFane); });
+        NK.el("hjaelpknap").addEventListener("click", function () { lukAlle(); NK.Rundvisning.start("fane-fb"); });
         NK.el("teoriknap").addEventListener("click", aabnTeori);
 
         document.addEventListener("keydown", tastatur);
 
-        /* Man kan linke direkte til en fane med  index.html#fabrikken  */
-        var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
-        var HASH = { reaktor: "fane-rk", reaktoren: "fane-rk", fabrik: "fane-fb", fabrikken: "fane-fb" };
-        visFane(HASH[oenske] || faner[0]);
+        sim.tilpas();
+        sim.layout();
 
         window.requestAnimationFrame(function (ts) {
             sidsteTid = ts;

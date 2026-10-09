@@ -1,10 +1,10 @@
 /* =====================================================================
-   forklaring.js - Kemichaels grundige forklaring bag "Læs mere"
+   forklaring.js - den grundige forklaring bag "Læs mere"
 
-   Kemichael siger kun én kort sætning, når eleven beder om et hint
-   eller svaret (brugerens ønske 26. sept. 2026: de lange regnestykker i
-   boblen var for meget for en svag elev). Knappen "Læs mere" åbner hans
-   forklaring i fuld skærm, stillet op i kort med regnestykket linje for
+   Linjen i opgavekortet siger kun én kort sætning, når eleven beder om
+   et hint eller svaret (brugerens ønske 26. sept. 2026: de lange
+   regnestykker var for meget for en svag elev). Knappen "Læs mere" åbner
+   forklaringen i fuld skærm, stillet op i kort med regnestykket linje for
    linje, tabeller, en tallinje og gangetabeller.
 
    NK.Forklaring.lav(R, trin, medSvar, ekstra) giver { titel, skema, html }.

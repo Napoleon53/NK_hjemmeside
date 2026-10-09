@@ -1,5 +1,5 @@
 /* =====================================================================
-   data.js - konstanterne, opgaverne og Kemichaels replikker
+   data.js - konstanterne, opgaverne og linjerne i opgavekortet
 
    Alt, der kan staa som data, staar her. Svarene regnes af modellen i
    js/gas.js; intet facit er skrevet i haanden. Enhederne er dem fra
@@ -256,11 +256,9 @@
     };
 
     /* ======================================================================
-       LINJEN I OPGAVEKORTET OG KEMICHAEL VED KATEDERET
-       Kortet siger, hvor man er, naeste skridt, fejl og ros. Kemichael
-       blander sig ikke: han siger kun noget, naar eleven beder om et hint
-       eller svaret, naar han sendes ud eller hentes (UD_LINJE, IND_LINJE)
-       eller klikkes paa (KAFFE, PRIK_SIDST). K faar ham til at sige INTRO.
+       LINJEN I OPGAVEKORTET
+       Kortet siger, hvor man er (INTRO), naeste skridt, fejl og ros, og
+       hintet eller svaret, naar eleven beder om det.
        Hoejst ca. 60 tegn pr. saetning, ingen teori.
        ====================================================================== */
     D.INTRO = {
@@ -276,27 +274,12 @@
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst. Pænt skrevet."];
 
-    /* Naar han sendes ud, og naar han hentes igen */
-    D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Kaffen derude var ikke bedre.";
-
-    /* Klik paa koppen: han drikker og siger noget om kaffen */
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Den er ved stuetemperatur. Desværre.",
-        "Kaffen er min. Gassen er din.",
-        "Nogen har fortyndet den.",
-        "Stadig kold. Men det er min."
-    ];
-    /* Klik paa ham, naar prik-puljerne er brugt op */
-    D.PRIK_SIDST = "Jeg sidder her bare. Skru du.";
-
     /* Korte svar i opgavekortet, naar der sker noget i scenen */
     D.SCENE = {
         stop: "Stemplet står mod stoppet. Nu stiger trykket i stedet.",
         nMaks: "Cylinderen tager højst 2,00 mol.",
         nMin: "Der skal være lidt gas i cylinderen. 0,25 mol er det mindste.",
-        lodMaks: "Der er ikke flere lodder. Kaffekoppen er ikke et lod.",
+        lodMaks: "Der er ikke flere lodder.",
         lodMin: "Der ligger ingen lodder på stemplet.",
         tMaks: "Varmepladen kan ikke blive varmere.",
         tMin: "Kølingen kan ikke blive koldere.",

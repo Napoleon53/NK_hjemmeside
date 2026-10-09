@@ -26,14 +26,13 @@
    med Vis svaret, at der ikke står et facit, før eleven har gjort noget,
    at spørgsmålet, feltet og Giv hint står samlet i scenen (ikke i
    panelet), at parrene på fane 2 har pile, at forklaringen på fane 2 har
-   beregningen på sine egne linjer under formlen i ord, at Kemichael ikke
-   blander sig og kan sendes ud, at et klik på ham giver hintet (eller
-   ros, når opgaven er løst) og aldrig gør ham sur, at sproget holder
+   beregningen på sine egne linjer under formlen i ord, at hint og svar
+   kun kommer fra den gule knap og står i arbejdsfeltet, at sproget holder
    reglerne, og at tavlen og molekylet kan være på skærmen fra 1100 × 700
    til 1600 × 950.
 
-   Kræver en lokal server med animationer/ som rod (Kemichael hentes
-   derfra). Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   Kræver en lokal server. Testen gemmer elevens fremskridt og lægger det
+   tilbage bagefter.
    ===================================================================== */
 var linjer = [];
 var fejl = 0, antal = 0;
@@ -52,7 +51,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc8.2-rg", "nk-sc8.2-ek", "nk-sc8.2-kemichael-ude", "nk-kemichael"];
+var NOEGLER = ["nk-sc8.2-rg", "nk-sc8.2-ek"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -115,16 +114,14 @@ function koerTest(W) {
     paastand("NK findes", !!NK);
     if (!NK) return;
     var D = NK.Data, O = NK.Ox;
-    paastand("data.js, ox.js, fane.js og laerer.js er kørt", !!(D && D.REGLER && D.MOLEKYLER && O && O.stof && O.molekyle && NK.Fane && NK.RoligLaerer));
+    paastand("data.js, ox.js og fane.js er kørt", !!(D && D.REGLER && D.MOLEKYLER && O && O.stof && O.molekyle && NK.Fane));
     paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-rg"] && NK.sims["fane-ek"]));
-    var sprites = ["kateder", "kaffekop", "laererKrop"];
-    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
-    paastand("katederet og Kemichaels sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var A = NK.sims["fane-rg"], B = NK.sims["fane-ek"];
-    paastand("Kemichael sidder ved katederet på begge faner", [A, B].every(function (s) { return s.k instanceof NK.RoligLaerer; }));
-    paastand("der er ingen tilbudsknapper (den rolige Kemichael)", !d.querySelector(".tilbud") && !d.querySelector(".spring-over"));
-    if (!A.k.inde()) { A.k.hentInd(); tik(A, 4); B.k.opdater(4); }
-    paastand("hver fane har knappen Send Kemichael ud", [A, B].every(function (s) { return s.k.knap && s.k.knap.textContent === "Send Kemichael ud"; }));
+    paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.RoligLaerer && !NK.Kemichael && !NK.Sprites && !A.k && !d.querySelector(".kboble, .kknap"));
+    paastand("der er ingen tilbudsknapper", !d.querySelector(".tilbud") && !d.querySelector(".spring-over"));
+    paastand("hintknappen er fyldt gul på begge faner", [A, B].every(function (s) {
+        return s.el.knap.textContent === "Giv hint" && s.el.knap.classList.contains("hjaelp") && !s.el.knap.classList.contains("svar");
+    }));
     paastand("31 stoffer på fane 1 og 12 molekyler på fane 2", D.REGLER.length === 31 && D.MOLEKYLER.length === 12);
 
     overskrift("2. Reglerne: oxidationstallene passer med tabellen");
@@ -246,7 +243,7 @@ function koerTest(W) {
     A.knap();
     paastand("hintet til ladningen står ved feltet og peger på pladsen efter formlen", /^Hint/.test(A.beskedTekst()) && /efter formlen/.test(A.beskedTekst()) &&
         A.el.arb.classList.contains("hint") && NK.el("rg-formel").classList.contains("vis-lad") && !!d.querySelector("#rg-formel .tv-lad.tom"), A.beskedTekst());
-    paastand("Kemichael siger ikke hintet, og knappen hedder nu Vis svaret", !A.k.taler() && A.el.knap.textContent === "Vis svaret" && !A.el.knap.classList.contains("peg"));
+    paastand("knappen hedder nu Vis svaret og er kun et omrids", A.el.knap.textContent === "Vis svaret" && A.el.knap.classList.contains("svar") && !A.el.knap.classList.contains("peg"));
     A.felter.ladning.value = "0";
     A.tjek("ladning");
     paastand("ladningen 0 er rigtig: spørgsmålet skifter til O, og et gult ? står over O", A.aktivt() === "O" && arbFelt() === A.felter.O &&
@@ -308,15 +305,15 @@ function koerTest(W) {
     A.knap();
     paastand("hintet sætter O ind med gråt og viser regnestykket", !skjult("rg-regn") && !!A.slots.O.querySelector(".tv-ox.graa") &&
         /2 · \(−2\)/.test(led()), led());
-    paastand("hintet står i arbejdsfeltet ved feltet, og Kemichael tier", /^Hint/.test(A.beskedTekst()) && /O giver/.test(A.beskedTekst()) && !A.k.taler(), A.beskedTekst());
+    paastand("hintet står i arbejdsfeltet ved feltet", /^Hint/.test(A.beskedTekst()) && /O giver/.test(A.beskedTekst()), A.beskedTekst());
     A.felter.X.value = "+4";
     A.tjek("X");
-    paastand("Kemichael tier, når opgaven er løst", !A.k.taler());
+    paastand("hintet er væk, når opgaven er løst", !/^Hint/.test(A.beskedTekst()), A.beskedTekst());
     A.vaelg(1);
     A.knap();
     A.knap();
     paastand("Vis svaret skriver ladningen gult og svaret i arbejdsfeltet", !!A.slots.ladning.querySelector(".tv-ox.vist") &&
-        /^Svaret/.test(A.beskedTekst()) && /Ladningen er \+1/.test(A.beskedTekst()) && !A.k.taler(), A.beskedTekst());
+        /^Svaret/.test(A.beskedTekst()) && /Ladningen er \+1/.test(A.beskedTekst()), A.beskedTekst());
     A.vaelg(5);
     var nn = 0;
     while (!A.faerdig && nn++ < 12) A.knap();
@@ -413,15 +410,8 @@ function koerTest(W) {
     paastand("ingen tekst under 14 px i beregningen", fkSmaa.length === 0, fkSmaa.length);
     paastand("arbejdsfeltet viser svaret, og pilene er væk", spm2() === "✓ O er −II og H er +I i H₂O." && B.el.arb.classList.contains("loest") && pile() === 0, spm2());
 
-    /* Påskeægget: et par sluppet over kaffen */
     B.vaelg(1);
     paastand("et nyt molekyle: beregningen er væk igen", fk.hidden && fk.textContent === "");
-    B.gaetFelter.Cl.inp.value = "-1";
-    B.gaetTjek("Cl");
-    var ku = B.enheder[0], kc = B.midte(ku), kop = B.k.lay.kop;
-    traek(B, kc.x, kc.y, kop.x, kop.y - kop.h * 0.5);
-    tik(B, 0.3);
-    paastand("påskeægget: parret over kaffen giver Kemichaels replik og bliver i bindingen", ku.hos === null && B.k.tekst() === D.KAFFE_PAR, B.k.tekst());
 
     /* Alle 12 med musen og rigtige gæt */
     var ekIkke = [], stjerneIkke = [], fkFejl = [];
@@ -482,84 +472,36 @@ function koerTest(W) {
     B.knap();
     paastand("efter Spring gættet over: Intet gæt, og parrene skal fordeles", B.trin === "fordel" && /Intet gæt/.test(B.gaetFelter.S.svar.textContent));
 
-    overskrift("8. Kemichael sendes ud og hentes");
-    B.k.sendUd();
-    tik(B, 3);
-    paastand("ude: knappen hedder Hent Kemichael på begge faner", A.k.knap.textContent === "Hent Kemichael" && B.k.knap.textContent === "Hent Kemichael");
-    B.vaelg(0);
-    B.knap();
-    paastand("ude: hintet står i arbejdsfeltet som ellers", /^Hint/.test(B.beskedTekst()) && !B.k.taler(), B.beskedTekst());
-    B.k.hentInd();
-    tik(B, 4);
-    paastand("hentet ind igen", B.k.inde() && A.k.inde());
-    D.KEMICHAEL_SIGER_HINT = true;
-    B.vaelg(0);
-    B.knap();
-    paastand("med D.KEMICHAEL_SIGER_HINT siger Kemichael hintet i sin boble", /Hint/.test(B.k.tekst()) && B.beskedTekst() === "", B.k.tekst());
-    D.KEMICHAEL_SIGER_HINT = false;
-    B.vaelg(0);
-
-    overskrift("9. Et klik på Kemichael: et hint, eller ros når opgaven er løst");
-    function klikHam(sim) { var h = sim.k.lay.hoved; klik(sim, h.x + h.b / 2, h.y + h.h * 0.4); }
+    overskrift("8. Hjælpen kommer kun fra den gule knap");
     function facitTekst(sim, k) { return String(O.facit(sim.opg.st, k)); }
+    W.NK.visFane("fane-ek");
+    B.vaelg(0);
+    paastand("fane 2: der står intet hint, før der trykkes", !/^Hint/.test(B.beskedTekst()) && B.hjaelp === 0);
+    B.knap();
+    paastand("fane 2: Giv hint skriver hintet i arbejdsfeltet", /^Hint/.test(B.beskedTekst()) && B.el.arb.classList.contains("hint"), B.beskedTekst());
+    B.vaelg(0);
     W.NK.visFane("fane-rg");
     A.vaelg(0);
     tik(A, 0.2);
-    paastand("han tier, til der klikkes på ham", !A.k.taler());
-    klikHam(A);
-    paastand("fane 1: et klik på ham giver hintet til det trin, eleven er ved (ladningen)", /^Hint: Ladningen står/.test(A.k.tekst()) &&
-        A.k.boble.classList.contains("hint"), A.k.tekst());
-    paastand("klikket tæller som Giv hint: knappen hedder Vis svaret, og pladsen efter formlen lyser",
-        A.el.knap.textContent === "Vis svaret" && A.hjaelp === 1 && NK.el("rg-formel").classList.contains("vis-lad"), A.el.knap.textContent);
-    var sur = [];
-    for (var kn = 0; kn < 8; kn++) {
-        klikHam(A);
-        tik(A, 0.4);
-        if (A.k.boble.classList.contains("skidt") || !/^Hint: Ladningen står/.test(A.k.tekst()) || A.k.u.vrede > 0.05 || A.k.u.skeptisk > 0.05) sur.push(kn + ": " + A.k.tekst());
-    }
-    paastand("otte klik mere: han bliver ikke sur og siger stadig hintet", sur.length === 0 && !A.brugtSvar, sur.slice(0, 2).join(" | "));
+    A.felter.ladning.value = "3";
+    A.tjek("ladning");
+    paastand("fane 1: et forkert svar giver intet hint af sig selv, men den gule knap lyser op", !/^Hint/.test(A.beskedTekst()) &&
+        A.el.knap.classList.contains("peg") && A.el.knap.textContent === "Giv hint", A.beskedTekst());
+    A.knap();
+    paastand("fane 1: Giv hint giver hintet til det trin, eleven er ved (ladningen)", /^Hint/.test(A.beskedTekst()) && /Ladningen står/.test(A.beskedTekst()) &&
+        A.el.knap.textContent === "Vis svaret" && !A.el.knap.classList.contains("peg"), A.beskedTekst());
     A.felter.ladning.value = "0";
     A.tjek("ladning");
-    paastand("han tier igen, når trinet er løst", !A.k.taler());
-    klikHam(A);
-    paastand("på næste trin giver han hintet til O", /^Hint: O har næsten altid/.test(A.k.tekst()), A.k.tekst());
+    paastand("hintet er væk, når trinet er løst, og knappen er Giv hint igen", !/^Hint/.test(A.beskedTekst()) && A.el.knap.textContent === "Giv hint" &&
+        !A.el.knap.classList.contains("svar"), A.beskedTekst());
+    A.knap();
+    paastand("på næste trin er hintet det til O", /O har næsten altid/.test(A.beskedTekst()), A.beskedTekst());
     var nk = 0;
     while (!A.faerdig && nk++ < 6) { var kk = A.aktivt(); A.felter[kk].value = facitTekst(A, kk); A.tjek(kk); }
-    paastand("opgaven er løst, og han tier", A.faerdig && !A.k.taler());
-    klikHam(A);
-    var ros1 = A.k.tekst();
-    paastand("løst: et klik på ham giver en kort ros", D.ROS_KEMICHAEL.indexOf(ros1) >= 0 && A.k.boble.classList.contains("god"), ros1);
-    klikHam(A);
-    paastand("et klik mere giver en anden ros, stadig venlig", D.ROS_KEMICHAEL.indexOf(A.k.tekst()) >= 0 && A.k.tekst() !== ros1 &&
-        A.k.boble.classList.contains("god"), A.k.tekst());
-    tik(A, 4);
-    paastand("rosen går væk af sig selv", !A.k.taler());
-    paastand("ingen af hans ros-linjer er lange", D.ROS_KEMICHAEL.every(function (t) { return t.length <= 40; }));
-    W.NK.visFane("fane-ek");
-    B.vaelg(1);
-    tik(B, 0.2);
-    klikHam(B);
-    paastand("fane 2, gættet: han giver hintet om reglerne, og knappen hedder Spring gættet over",
-        /^Hint: Brug reglerne fra fane 1/.test(B.k.tekst()) && B.el.knap.textContent === "Spring gættet over", B.k.tekst());
-    B.gaetFelter.Cl.inp.value = "-1";
-    B.gaetTjek("Cl");
-    paastand("han tier, når gættet er skrevet", !B.k.taler() && B.trin === "fordel");
-    klikHam(B);
-    paastand("fane 2, fordelingen: han giver hintet om det største tal", /^Hint: Elektronerne går til atomet med det største tal/.test(B.k.tekst()), B.k.tekst());
-    B.enheder.forEach(function (u) { B.tildel(u, u.b.mest === -1 ? u.b.a : u.b.mest); });
-    tik(B, 1.2);
-    paastand("han tier, når molekylet er løst", B.faerdig && !B.k.taler());
-    klikHam(B);
-    paastand("fane 2 løst: et klik på ham giver ros", D.ROS_KEMICHAEL.indexOf(B.k.tekst()) >= 0 && B.k.boble.classList.contains("god"), B.k.tekst());
-    tik(B, 4);
-    B.k.sendUd();
-    tik(B, 3);
-    B.vaelg(1);
-    klikHam(B);
-    paastand("ude: et klik på den tomme stol giver ingenting", !B.k.taler() && B.hjaelp === 0 && B.el.knap.textContent === "Giv hint");
-    B.k.hentInd();
-    tik(B, 4);
-    W.NK.visFane("fane-rg");
+    paastand("opgaven er løst, og knappen er blå", A.faerdig && A.el.knap.classList.contains("blaa") && !A.el.knap.classList.contains("hjaelp"));
+    paastand("siden nævner ikke Kemichael", !/Kemichael|kateder|lærerværelse/i.test(d.body.innerText));
+    d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "k", bubbles: true }));
+    paastand("tasten K gør ikke noget mere", A.faerdig && !/^Hint/.test(A.beskedTekst()));
 
     overskrift("10. Sproget");
     var tekster = [];
@@ -605,21 +547,16 @@ function koerTest(W) {
     var ramme = document.getElementById("ramme");
     /* Den sidste størrelse er en lille bærbar (1366 × 768 med browserens bjælker): kun fane 2 */
     var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950], [1366, 650]];
-    var lFejl = [], knapFejl = [], bobleFejl = [];
+    var lFejl = [], knapFejl = [], forfraFejl = [];
     maal.forEach(function (m) {
         ramme.style.width = m[0] + "px";
         ramme.style.height = m[1] + "px";
         W.NK.visFane("fane-rg");
-        /* Kemichaels hint på to linjer dækker ikke knapperne i hjørnet */
+        /* Start forfra står under tavlen og dækker den ikke */
         A.vaelg(3);
         A.tilpas(); A.layout();
-        ["ladning", "O", "H"].forEach(function (k) { A.felter[k].value = facitTekst(A, k); A.tjek(k); });
-        klikHam(A);
-        var bo = A.k.boble.getBoundingClientRect(), kk1 = A.k.knap.getBoundingClientRect(), kk2 = A.el.forfra.getBoundingClientRect();
-        if (!A.k.taler() || (bo.right > kk2.left && bo.bottom > Math.min(kk1.top, kk2.top) + 0.5)) bobleFejl.push(m.join("×") + " dækker knapperne");
-        if (A.k.tekstEl.scrollHeight > A.k.tekstEl.clientHeight + 1) bobleFejl.push(m.join("×") + " teksten er skåret");
-        if (parseFloat(W.getComputedStyle(A.k.boble).fontSize) < 13) bobleFejl.push(m.join("×") + " lille skrift");
-        if (bo.top < NK.el("rg-tavle").getBoundingClientRect().bottom - 1) bobleFejl.push(m.join("×") + " dækker tavlen");
+        var ff = A.el.forfra.getBoundingClientRect(), tvl = NK.el("rg-tavle").getBoundingClientRect();
+        if (ff.top < tvl.bottom - 1) forfraFejl.push(m.join("×") + " fane 1");
         (m[1] < 700 ? [] : [5, 30, 13, 3]).forEach(function (i) {
             A.vaelg(i);
             A.tilpas(); A.layout();
@@ -673,7 +610,7 @@ function koerTest(W) {
     });
     paastand("tavlen og molekylerne kan være der fra 1100 × 700 til 1600 × 950 (fane 2 også ved 1366 × 650)", lFejl.length === 0, lFejl.slice(0, 6).join(", "));
     paastand("hintknappen står lige ved siden af feltet i alle størrelser", knapFejl.length === 0, knapFejl.slice(0, 4).join(", "));
-    paastand("Kemichaels hint på to linjer kan læses og dækker hverken knapperne i hjørnet eller tavlen", bobleFejl.length === 0, bobleFejl.slice(0, 4).join(", "));
+    paastand("Start forfra står under tavlen i alle størrelser", forfraFejl.length === 0, forfraFejl.slice(0, 4).join(", "));
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
     var smaa = [];

@@ -3,9 +3,8 @@
 
    Alt, en laerer kan have lyst til at rette i, staar her: atommasserne,
    de tre hypoteser, proeverne paa fane 1, digelens opvarmning,
-   regnetrinene paa fane 2, de seks fejlkilder paa fane 3 og det,
-   Kemichael siger. Kemien regnes i kemi.js; tegningen kender kun
-   resultatet.
+   regnetrinene paa fane 2, de seks fejlkilder paa fane 3 og linjerne i
+   opgavekortet. Kemien regnes i kemi.js; tegningen kender kun resultatet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -252,9 +251,8 @@
 
     /* ----- Replikkerne ------------------------------------------------------------------
        Linjen i opgavekortet siger, hvor man er (INTRO), naeste skridt,
-       fejl og ros. Kemichael blander sig ikke: han siger kun noget ved
-       Giv hint og Vis svaret, naar han sendes ud eller hentes, og naar der
-       klikkes paa ham, koppen, kagen eller krukken. */
+       fejl og ros, og hintet eller svaret, naar eleven beder om det. Et
+       klik paa krukken giver en kort linje (KRUKKE). */
     D.INTRO = {
         forsoeg: "Natron varmes i en digel. Noget forsvinder, og noget bliver tilbage.",
         hypoteser: "Tre hypoteser om, hvad der bliver tilbage. Regn ud, hvad hver af dem skal veje.",
@@ -268,27 +266,7 @@
     D.ROS = ["Rigtigt.", "Den sidder.", "Godt regnet.", "Præcis.", "Ja.", "Fint."];
     D.ROS_OPGAVE = ["Opgaven er løst.", "Færdig.", "Den er i hus.", "Løst."];
 
-    D.UD_LINJE = "Fint. Jeg er på lærerværelset.";
-    D.IND_LINJE = "Tilbage. Kaffen derude var ikke bedre.";
-
-    D.KAFFE = [
-        "Kold. Som altid.",
-        "Nogen har kommet natron i. Den skummer.",
-        "Kaffe er sur. Natron ville gøre den flad. Hold dig fra den.",
-        "Den er fra i morges. Tror jeg.",
-        "Stadig kold. Men det er min."
-    ];
-    D.PRIK_SIDST = "Jeg sidder her bare. Vej du.";
-
-    /* Paaskeaegget: kagen paa bordet. Krukken svarer ogsaa. */
-    D.KAGE = [
-        "Natron i dejen. CO₂ og vand får den til at hæve.",
-        "Hullerne er gassen. Resten er soda. Og sukker.",
-        "Den er fra lærerværelset. Den var ikke til dig."
-    ];
     D.KRUKKE = "Natron, natriumhydrogencarbonat. Det står også i bagepulver.";
-
-    D.SNYD_LINJE = "Noteret. Det står i journalen nu.";
 
     NK.Data = D;
 }());

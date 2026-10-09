@@ -96,7 +96,6 @@
                 inp.addEventListener("keydown", function (e) {
                     if (e.key === "Enter") { e.preventDefault(); mig.tjek(); }
                 });
-                inp.addEventListener("input", function () { if (mig.fane.k) mig.fane.k.skriver(); });
                 fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
                 f.input = inp;
             }
@@ -131,7 +130,6 @@
                     if (j === 0 && !ind[1].value.trim()) { ind[1].focus(); return; }
                     mig.tjek();
                 });
-                inp.addEventListener("input", function () { if (mig.fane.k) mig.fane.k.skriver(); });
             });
             fe.querySelector(".felt-ok").addEventListener("click", function () { mig.tjek(); });
         }
@@ -323,11 +321,8 @@
         P2.formelOk = function (vist, note, formel) {
             this.hjaelp = 0;
             if (vist) {
-                var h = "<b>Formlen:</b> " + NK.html(formel) + ".";
-                if (this.k.sig(h, "svar", { lukVedSkriv: true })) this.besked("Regn nu tallet ud.", "");
-                else this.besked(h + " Regn nu tallet ud.", "gul");
+                this.besked("<b>Formlen:</b> " + NK.html(formel) + ". Regn nu tallet ud.", "gul");
             } else {
-                this.k.tie();
                 this.besked((note ? NK.html(note) + " <b>" + NK.html(formel) + "</b>." : "Rigtig formel.") + " Regn nu tallet ud.", "god");
             }
             this.visKnap();

@@ -478,7 +478,7 @@
     };
 
     /* Draaberne og flasken tegnes til sidst, saa flasken kan holdes hen over
-       katederet (og Kemichaels kop) */
+       alt andet i scenen */
     P.tegnFlaske = function (ctx) {
         var f = this.flaske, lay = this.lay;
         if (!lay) return;

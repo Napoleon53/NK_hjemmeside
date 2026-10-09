@@ -212,8 +212,7 @@
     /* ----- Layout -------------------------------------------------------------------- */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
-        var baand = this.k.layout(W, H);
-        var Hs = baand.y;
+        var Hs = H;
         var lay = { W: W, H: H, Hs: Hs };
         var samme = this.opg && this.opg.id === "samme";
         lay.bordY = Math.round(Hs - NK.klamp(Hs * 0.08, 20, 48));
@@ -223,7 +222,8 @@
         /* Den foerste opgave har syv trin, saa tavlen er hoejere */
         lay.tavle = { x: tx, y: 16, b: W - tx - 18, h: Math.round(samme ? NK.klamp(Hs * 0.5, 180, 380) : NK.klamp(Hs * 0.42, 160, 320)) };
         var top = Math.max(lay.zoom.y + zr + 70, lay.tavle.y + lay.tavle.h + 22);
-        var gh = NK.klamp((lay.bordY - top) * 0.95, 90, 220);
+        /* Glassene fylder hoejden ud, men tre glas skal kunne staa ved siden af hinanden */
+        var gh = NK.klamp(Math.min((lay.bordY - top) * 0.95, W * 0.33), 90, 220);
         var gb = gh * 160 / 200;
         lay.vaegtA = lay.vaegtB = null;
         if (samme) {
@@ -246,7 +246,6 @@
         this.saetAnker("tavle", lay.tavle.x, lay.tavle.y, lay.tavle.b, lay.tavle.h);
         this.saetAnker("glas", 10, top - 10, W - 20, lay.bordY - top + 40);
         this.saetAnker("zoom", lay.zoom.x - zr, lay.zoom.y - zr - 26, 2 * zr, 2 * zr + 60);
-        this.saetAnker("laerer", 0, baand.y, W * 0.45, baand.h);
     };
 
     /* Vaegten: midten cx, bordet y, bredden b; skaalen og vejebaaden */
@@ -354,7 +353,6 @@
         var st = { ioner: ioner.map(function (id) { return D.ion(id); }) };
         Tg.zoom(ctx, z.x, z.y, z.r, { part: this.part, st: st, farve: this.farve("mix"), titel: o.id === "samme" ? "Glasset" : "Blandingen",
             tekst: s.vist ? "" : "?", forklar: s.vist });
-        this.k.tegn(ctx);
     };
 
     NK.SimBland = SimBland;

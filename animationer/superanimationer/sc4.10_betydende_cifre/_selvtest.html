@@ -22,11 +22,11 @@
    hvor kommatal i maskinen snyder), at alle opgaver, generatorerne kan
    lave, har et gyldigt facit, at de typiske fejl får den rigtige
    besked, at en hel runde kan gennemføres på alle fire faner med rigtige
-   svar, hint og Vis svaret, at kommaet hopper færdigt, at Kemichael
-   kun taler, når han bliver bedt om det, og kan sendes ud, at sproget
+   svar, hint og Vis svaret, at kommaet hopper færdigt, at hint og svar
+   står i linjen under svarfeltet ved den gule knap, at sproget
    overholder reglerne, og at tallene kan være på tavlen. Skal køres
-   gennem en lokal server med animationer/ som rod (Kemichael hentes
-   derfra). Elevens gemte valg og rekord lægges tilbage bagefter.
+   gennem en lokal server. Elevens gemte valg og rekord lægges tilbage
+   bagefter.
    ===================================================================== */
 var linjer = [];
 var fejl = 0, antal = 0;
@@ -42,7 +42,7 @@ function vis() {
     document.getElementById("ud").innerHTML = linjer.join("\n");
 }
 
-var NOEGLER = ["nk-sc4.10-valg", "nk-sc4.10-rekord", "nk-sc4.10-kemichael-ude", "nk-sc4.10-enheder"];
+var NOEGLER = ["nk-sc4.10-valg", "nk-sc4.10-rekord", "nk-sc4.10-enheder"];
 var gemt = {};
 try { NOEGLER.forEach(function (k) { gemt[k] = localStorage.getItem(k); localStorage.removeItem(k); }); } catch (e) {}
 function laegTilbage() {
@@ -67,7 +67,7 @@ function koerAlt() {
     paastand("fire faner er bygget (tael, afrund, komma, blandet)", !!(NK.faner && NK.faner.tael && NK.faner.afrund && NK.faner.komma && NK.faner.blandet));
     var raekke = Array.prototype.map.call(d.querySelectorAll(".faneknap"), function (b) { return b.getAttribute("data-fane"); }).join(",");
     paastand("rækkefølgen er Tæl cifrene, Flyt kommaet, Afrund, Blandet (også tasterne 1 til 4)", raekke === "tael,komma,afrund,blandet" && NK.Data.FANE_RAEKKE.join(",") === raekke, raekke);
-    paastand("Kemichael ved katederet findes", !!NK.laerer && !!NK.Kemichael);
+    paastand("Kemichael er ikke med (brugerens valg 9. okt. 2026)", !NK.laerer && !NK.RoligLaerer && !NK.Kemichael && !d.querySelector(".kboble, .kknap, canvas"));
     function el(id) { return d.getElementById(id); }
     function tid(sek) { for (var i = 0; i < Math.round(sek * 60); i++) NK.trin(1 / 60); }
 
@@ -408,28 +408,29 @@ function koerAlt() {
     b0.click();
     paastand("et klik på en brik vælger den (og viser antallet)", b0.getAttribute("data-i") !== null && /Valgt/.test(el("valgt-info").textContent));
 
-    /* ----- 6. Kemichael ------------------------------------------------------------ */
-    overskrift("6. Kemichael taler kun, når han bliver bedt om det");
+    /* ----- 6. Hjælpen --------------------------------------------------------------- */
+    overskrift("6. Hint og svar kommer kun, når eleven beder om dem");
     NK.visFane("komma");
     f = NK.aktivFane;
     f.nyRunde(); f.vis();
     tid(1);
-    paastand("han siger intet, når fanen åbnes", el("boble").hidden);
+    var hk = el("opgaveknap");
+    paastand("hintknappen er gul, og der står intet hint, når fanen åbnes", hk.textContent === "Giv hint" && hk.classList.contains("hjaelp") &&
+        !hk.classList.contains("svar") && !/Hint/.test(el("besked").textContent));
     skrivFelt("1", ""); f.tjek(); tid(0.5);
-    paastand("han siger intet ved et forkert svar", el("boble").hidden);
+    paastand("et forkert svar giver intet hint af sig selv, men den gule knap lyser op", !/Hint/.test(el("besked").textContent) && hk.classList.contains("peg"));
     f.knap(); tid(0.3);
-    paastand("Giv hint: hintet står i hans boble", !el("boble").hidden && /Hint/.test(el("boble").textContent));
+    paastand("Giv hint: hintet står i linjen under svaret, og knappen bliver til Vis svaret", /^Hint/.test(el("besked").textContent) &&
+        el("besked").className.indexOf("gul") >= 0 && hk.textContent === "Vis svaret" && hk.classList.contains("svar") && !hk.classList.contains("peg"));
     loesRigtigt(f); tid(0.3);
-    paastand("opgaven løst: han tier igen", el("boble").hidden);
+    paastand("opgaven løst: hintet er væk, og knappen er blå", !/Hint/.test(el("besked").textContent) && hk.classList.contains("blaa") && !hk.classList.contains("hjaelp"));
     f.naeste();
-    el("kknap").click(); tid(3);
-    paastand("Send Kemichael ud: knappen hedder Hent Kemichael", el("kknap").textContent === "Hent Kemichael");
-    f.knap(); tid(0.3);
-    paastand("ude: hintet står i linjen under svaret", el("boble").hidden && /Hint/.test(el("besked").textContent));
-    el("kknap").click(); tid(0.5);
-    paastand("hentet ind igen", el("kknap").textContent === "Send Kemichael ud" && NK.laerer.inde());
+    f.knap(); f.knap(); tid(0.3);
+    paastand("Vis svaret: svaret står i linjen under svarfeltet", f.loest && f.vist && el("besked").className.indexOf("gul") >= 0 &&
+        el("besked").textContent.length > 5 && !/Kemichael/.test(el("besked").textContent), el("besked").textContent);
+    f.naeste();
     d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "k" })); tid(0.3);
-    paastand("K: han siger, hvor man er", !el("boble").hidden && el("boble").textContent.length > 5);
+    paastand("tasten K gør ikke noget mere", !/Hint/.test(el("besked").textContent) && hk.textContent === "Giv hint");
 
     /* ----- 7. Sproget -------------------------------------------------------------- */
     overskrift("7. Sproget");
@@ -448,7 +449,7 @@ function koerAlt() {
     paastand("ingen tankestreger (– og —)", !/[–—]/.test(alt), (alt.match(/.{0,30}[–—].{0,30}/) || [""])[0]);
     paastand("ingen udråbstegn", !/!/.test(alt), (alt.match(/.{0,30}!.{0,10}/) || [""])[0]);
     paastand("ingen 1+ eller 1− som ladning", !/[A-Za-z][¹1][⁺⁻+−]/.test(alt));
-    paastand("replikkerne er højst ca. 60 tegn", [D.UD_LINJE, D.IND_LINJE, D.PRIK_SIDST].concat(D.KAFFE, D.KOMMA, Object.keys(D.KEMICHAEL).map(function (x) { return D.KEMICHAEL[x]; })).every(function (s) { return s.length <= 62; }));
+    paastand("replikkerne er højst ca. 60 tegn", D.KOMMA.every(function (s) { return s.length <= 62; }));
 
     /* ----- 8. Layout --------------------------------------------------------------- */
     overskrift("8. Tallene kan være på tavlen");

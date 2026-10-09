@@ -3,8 +3,7 @@
 Superanimation om natronforsøget: natron varmes i en digel, gas
 forsvinder, og massen, der er tilbage, afgør, hvilken af tre
 reaktioner der sker. Åbn `index.html`. Mappen henter kun filer inde fra
-sig selv, bortset fra Kemichael (`../../v2/kemichael/kemichael.js` og
-`../kemichael/superanimation.js`). Ingen `fetch` og ingen moduler, så den
+sig selv. Ingen `fetch` og ingen moduler, så den
 virker fra harddisken.
 
 ## Bestillingen
@@ -34,14 +33,14 @@ virker fra harddisken.
    knapper, 1 vægt, 1 lup med 8 Na⁺ og 8 HCO₃⁻, 1 graf, højst 10
    vejninger. Fane 2: 5 opgaver (natronen, hypotese A, B og C, dommen).
    Fane 3: 6 fejlkilder, 2 grupper.
-5. **Layoutet:** scene plus panel som `sc4.11`, med den rolige Kemichael
-   ved katederet i et bånd nederst i scenen.
+5. **Layoutet:** scene plus panel som `sc4.11`.
 
-Claude valgte selv faner, tal og den tredje hypotese (27. sept. 2026), og
-den rolige Kemichael som i resten af emne 4, fordi animationen mest er
-regning. Han blander sig ikke: han siger kun noget ved Giv hint og Vis
-svaret, tier, når trinnet er løst, og kan sendes ud. Ingen knapper til
-præsentationen.
+Claude valgte selv faner, tal og den tredje hypotese (27. sept. 2026).
+Ingen knapper til præsentationen.
+
+9. okt. 2026 (brugerens valg): Kemichael ved katederet er taget helt ud
+(han hører til i laboratoriet). Scenen har fået hans bånd, og hintknappen
+er gul, så eleven altid kan finde hjælpen selv.
 
 Det er en superanimation, ikke en superlab-animation: diglen står klar
 med natron, der er ingen flasker, uheld eller oprydning. Sprøjtet er en
@@ -128,12 +127,18 @@ de forventede masser, konklusionen og et mærke: snydebevis, eller "uden
 en eneste fejl", hvis eleven har regnet alt uden fejl og uden Vis svaret.
 Den kan udskrives eller gemmes som PDF.
 
-**Påskeæg:** kagen på Kemichaels kateder. Et klik giver en tør bemærkning
-om natron i dejen. Natronglasset svarer også.
+**Hint og svar.** Den gule knap i opgavekortet er hjælpen: Giv hint skriver
+hintet i linjen lige over knappen, og knappen bliver til Vis svaret (kun et
+omrids, så den ikke frister), der skriver svaret og næste skridt i samme
+linje. Efter et forkert svar lyser den gule knap stille op, til linjen
+skifter igen. Der er ingen Kemichael og ingen knapper til præsentationen.
+
+Et klik på natronglasset giver en kort linje om, hvad natron er. Kagen på
+katederet (påskeægget) forsvandt sammen med Kemichael 9. okt. 2026.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>J</kbd>
-journal · <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning · <kbd>K</kbd>
-Kemichael siger, hvor man er · <kbd>R</kbd> start forfra eller kør igen ·
+journal · <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning ·
+<kbd>R</kbd> start forfra eller kør igen ·
 <kbd>Enter</kbd> tjek feltet eller næste opgave · <kbd>Esc</kbd> luk.
 Link til en fane: `index.html#hypoteser`, `index.html#fejl`.
 
@@ -144,7 +149,7 @@ index.html          markup for de tre faner, teorien, journalen og rundvisningen
 css/stil.css        alt udseende (kopi af sc4.11; nyt nederst: skemaerne, regnestykket som sc4.3,
                     afstemningen, snydeknappen og journalen med udskrift). NB: decimaltal med PUNKTUM i CSS
 sprites/            bunsen, trefod_bag og trefod_for (trefoden i to lag, så diglen står i trekanten),
-                    digel, tang, natron og kage (nye); vægten og katederet (som sc4.5), luppen (som sc2.1)
+                    digel, tang og natron (nye); vægten (som sc4.5), luppen (som sc2.1)
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.11)
 js/data.js          atommasserne, stofferne, hypoteserne, prøverne, flammen og opvarmningen, regnetrinene,
                     fejlkilderne og replikkerne
@@ -156,8 +161,7 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, bordet og tavlen, vægten, brænderen med flammen og knapperne, trefoden,
                     diglen med pulveret, tangen, damp og korn, luppen med ionerne, grafen, skemaet og
                     atomtællingen, regnestykket med brøkstreger og kuglerne i dommen
-js/laerer.js        Kemichael ved katederet (som sc4.11 og sc4.5)
-js/fane.js          det, fanerne deler: opgavelisten, knappen, linjen i kortet, Kemichael og musen
+js/fane.js          det, fanerne deler: opgavelisten, den gule knap, linjen i kortet (også hint og svar) og musen
 js/regning.js       regnetrinene i kortet og tavlen på fane 2
 js/sim_forsoeg.js   fane 1 og målingen, som fane 2 bruger
 js/sim_hypoteser.js fane 2
@@ -203,10 +207,10 @@ vejning, ændringen i skemaet, konstant masse) og med Vis svaret hele
 vejen med sprøjt, fane 2 med startmassen fra en digel, der ikke er
 færdig, dommen, der venter, ved at skrive og med hint og svar, dommen,
 journalen og snydebeviset, fane 3 uden graf med spørgsmålet, alle seks,
-uret og tempoet, Kemichael og layoutet (også skiltene på fane 3) fra
+uret og tempoet, hjælpen fra den gule knap og layoutet (også skiltene på fane 3) fra
 520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
 `--allow-file-access-from-files` og lægger elevens gemte fremskridt
-tilbage bagefter. Sidst kørt 29. september 2026: ALT OK (89 påstande).
+tilbage bagefter. Sidst kørt 9. oktober 2026: ALT OK (91 påstande).
 
 ## Forenklinger
 
