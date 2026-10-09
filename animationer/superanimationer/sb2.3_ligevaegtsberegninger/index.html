@@ -29,22 +29,24 @@
 <section class="fane aktiv" id="fane-bh" role="tabpanel" aria-label="Beholderen">
     <div class="scene">
         <div class="bh-arbejde" id="bh-arbejde">
-            <p class="opgavelinje" id="bh-linje"></p>
+            <!-- Maalet og tekstboksen (naeste skridt, fejl, hint og ros) staar samlet over beholderen -->
+            <div class="opgavekasse" id="bh-kasse">
+                <p class="opgavelinje" id="bh-linje"></p>
+                <div class="tekstboks" id="bh-status">
+                    <p class="st-tekst" id="bh-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="bh-knap" type="button">Giv et hint</button>
+                </div>
+            </div>
             <div class="laerred-ramme"><canvas id="bh-laerred"></canvas></div>
             <div class="bh-skyder">
                 <label for="bh-x" class="bh-xlab"><b>x = <span id="bh-xtal">0,000</span> M</b><span class="bh-xdef" id="bh-xdef"></span></label>
                 <input type="range" id="bh-x" min="0" max="0.2" step="0.001" value="0">
+                <button class="forfraknap" id="bh-forfra" type="button" title="Samme mål forfra (R)">Forfra ↺</button>
             </div>
             <div class="bh-under">
                 <div class="bh-skema" id="bh-skema"></div>
                 <div class="bh-y" id="bh-y"></div>
             </div>
-        </div>
-
-        <div class="statuslinje" id="bh-status">
-            <p class="st-tekst" id="bh-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="bh-forfra" type="button" title="Samme mål forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="bh-knap" type="button">Giv et hint</button>
         </div>
     </div>
 
@@ -67,7 +69,10 @@
 <section class="fane" id="fane-ux" role="tabpanel" aria-label="Uden x">
     <div class="scene">
         <div class="arbejde" id="ux-arbejde">
-            <p class="opgavelinje" id="ux-linje"></p>
+            <div class="linje-rad">
+                <p class="opgavelinje" id="ux-linje"></p>
+                <button class="forfraknap" id="ux-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            </div>
             <div class="tavle" id="ux-tavle">
                 <div class="tv-navn" id="ux-navn"></div>
                 <div class="tv-stempel" id="ux-stempel" hidden></div>
@@ -77,13 +82,12 @@
                 </div>
                 <ol class="delbar" id="ux-delbar" aria-label="Opgavens dele"></ol>
                 <div class="regn-dele" id="ux-dele"></div>
+                <!-- Tekstboksen: js/regn.js flytter den ind i den del, eleven er ved -->
+                <div class="tekstboks" id="ux-status">
+                    <p class="st-tekst" id="ux-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="ux-knap" type="button">Giv et hint</button>
+                </div>
             </div>
-        </div>
-
-        <div class="statuslinje" id="ux-status">
-            <p class="st-tekst" id="ux-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="ux-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="ux-knap" type="button">Giv et hint</button>
         </div>
     </div>
 
@@ -106,7 +110,10 @@
 <section class="fane" id="fane-mx" role="tabpanel" aria-label="Med x">
     <div class="scene">
         <div class="arbejde" id="mx-arbejde">
-            <p class="opgavelinje" id="mx-linje"></p>
+            <div class="linje-rad">
+                <p class="opgavelinje" id="mx-linje"></p>
+                <button class="forfraknap" id="mx-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            </div>
             <div class="tavle" id="mx-tavle">
                 <div class="tv-navn" id="mx-navn"></div>
                 <div class="tv-stempel" id="mx-stempel" hidden></div>
@@ -116,13 +123,12 @@
                 </div>
                 <ol class="delbar" id="mx-delbar" aria-label="Opgavens dele"></ol>
                 <div class="regn-dele" id="mx-dele"></div>
+                <!-- Tekstboksen: js/regn.js flytter den ind i den del, eleven er ved -->
+                <div class="tekstboks" id="mx-status">
+                    <p class="st-tekst" id="mx-besked" aria-live="polite"></p>
+                    <button class="knap hjaelp" id="mx-knap" type="button">Giv et hint</button>
+                </div>
             </div>
-        </div>
-
-        <div class="statuslinje" id="mx-status">
-            <p class="st-tekst" id="mx-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="mx-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="mx-knap" type="button">Giv et hint</button>
         </div>
     </div>
 

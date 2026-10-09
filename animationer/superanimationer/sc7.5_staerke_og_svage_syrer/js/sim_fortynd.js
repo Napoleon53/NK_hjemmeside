@@ -59,24 +59,21 @@
     };
 
     P.fortynd = function () {
-        if (this.fort) return;
-        if (this.erTavle()) return;
-        if (this.gaetNu()) { this.gaetBlink(); return; }
-        if (this.trin >= K.TRIN.length - 1) {
-            this.kortBesked("Saltsyren er allerede fortyndet 1000 gange. Tryk på Ny saltsyre for at begynde forfra med 0,10 M saltsyre.", 6);
-            return;
-        }
+        if (this.fort || this.erTavle()) return;
+        /* Laasen: der fortyndes kun i et forsoeg, der beder om det */
+        if (this.spaer()) return;
+        if (this.knapF.disabled) { this.kortBlink(); return; }
         this.fort = { t: 0, skiftet: false };
         this.setT = 0;
         this.nulstilHjaelp();
         this.visVaerktoej();
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
     };
 
+    /* Ny saltsyre: kun i et forsoeg (knappen er skjult ellers; tasten R goer intet) */
     P.nulstilScene = function () {
+        if (!this.iForsoeg()) return;
         var op = this.opg.o.opstil;
         this.saetTrin(op && op.trin !== undefined && this.opg.o.id !== "ti" ? op.trin : 0);
-        if (this.erTavle()) this.byggTavle();
         this.visPanel();
         this.visVaerktoej();
     };
@@ -94,25 +91,16 @@
 
     P.nyFase = function () { this.visVaerktoej(); };
 
+    /* Naar kortet er groent og venter paa Naeste spoergsmaal, er knapperne vaek */
+    P.efterDel = function () { this.visVaerktoej(); };
+
     P.efterOpgave = function () { this.byggTavle(); this.visPanel(); this.visVaerktoej(); };
 
+    /* Kun det, kortets opgavetekst og maerket over glasset ikke selv siger */
     P.sceneLinje = function () {
-        var g = this.opg, o = g.o, krav = o.forsoeg ? o.forsoeg.krav : 0;
-        if (g.fase === "felter") return "";
-        if (this.fort) return this.fort.t < FORT_SEK * SKIFT ? "Ni tiendedele af saltsyren hældes fra." : "Glasset med saltsyre fyldes op med vand til 100 mL.";
-        if (this.trin > krav && o.id === "ti") return "Saltsyren er fortyndet mere end 10 gange. Tryk på Ny saltsyre, og fortynd saltsyren kun én gang.";
-        if (this.trin > krav) return "Nu er saltsyren " + K.konc(K.TRIN[this.trin]) + ", og saltsyren har færre oxoniumioner end eddikesyren. Tryk på Ny saltsyre, og prøv igen.";
-        /* Ellers kun det, kortets opgavetekst ikke selv siger */
-        if (this.trin === krav || this.trin === 0) return "";
-        return "Saltsyren er nu " + K.konc(K.TRIN[this.trin]) + ". Fortynd saltsyren igen, hvis den stadig har flest røde oxoniumioner.";
-    };
-
-    /* Spoergsmaalene om de to glas gaelder saltsyre, der er fortyndet 100 gange */
-    P.spmLinje = function () {
-        var op = this.opg.o.opstil;
-        if (op && op.trin !== undefined && this.trin !== op.trin && !this.fort) {
-            return "Spørgsmålet gælder saltsyre på " + K.konc(K.TRIN[op.trin]) + ". Tryk på Ny saltsyre, og vælg så et svar på det gule kort.";
-        }
+        var g = this.opg, o = g.o;
+        if (g.fase !== "forsoeg" || this.fort) return "";
+        if (this.trin > o.forsoeg.krav) return "Saltsyren har nu færre oxoniumioner end eddikesyren. Tryk på Ny saltsyre, og prøv igen.";
         return "";
     };
 
@@ -193,14 +181,16 @@
 
     /* ----- Knappen og panelet ------------------------------------------------------------ */
     P.visVaerktoej = function () {
-        /* Under gaettet staar kortet, hvor lupperne er, og knappen venter */
-        this.vaerktoej.hidden = this.erTavle() || this.gaetNu();
+        /* Knapperne Fortynd og Ny saltsyre er kun fremme i et forsoeg, der bruger dem.
+           Under et gaet staar kortet, hvor lupperne er. */
+        var g = this.opg, i = this.iForsoeg();
+        this.vaerktoej.hidden = !i;
         NK.el("f-anker-lup").hidden = this.erTavle() || this.gaetNu();
         NK.el("f-anker-glas").hidden = this.erTavle();
-        this.knapF.disabled = !!this.fort || this.trin >= K.TRIN.length - 1;
-        var g = this.opg;
-        var mangler = !this.faerdig && !this.venter && g && g.fase === "forsoeg" && !this.fort && this.trin < g.o.forsoeg.krav;
-        this.knapF.classList.toggle("banker", !!mangler);
+        var krav = i ? g.o.forsoeg.krav : 0;
+        /* I den foerste opgave skal der kun fortyndes én gang */
+        this.knapF.disabled = !i || !!this.fort || this.trin >= K.TRIN.length - 1 || (g.o.id === "ti" && this.trin >= krav);
+        this.knapF.classList.toggle("banker", i && !this.fort && this.trin < krav);
     };
 
     P.visPanel = function () {
@@ -356,13 +346,9 @@
             if (hit) this.kortBesked(D.partikel(hit.slags, this.lup[i].syre, true), 6);
             return;
         }
+        /* Et klik paa et glas saetter intet i gang: kortet blinker, saa eleven ser, hvad der skal goeres */
         for (var j = 0; j < this.glas.length && !this.erTavle(); j++) {
-            if (!this.glas[j].rammer(pt)) continue;
-            if (this.gaetNu()) { this.gaetBlink(); return; }
-            var g = this.glas[j];
-            this.kortBesked("Glasset med " + K.navn(g.syre) + ", " + K.konc(g.c) + ". Luppen over glasset viser et lille rum i " + K.navn(g.syre) + "n." +
-                (j === 1 && !this.erTavle() ? " Knappen Fortynd 10 gange står mellem glassene." : ""), 5);
-            return;
+            if (this.glas[j].rammer(pt)) { this.kortBlink(); return; }
         }
     };
 

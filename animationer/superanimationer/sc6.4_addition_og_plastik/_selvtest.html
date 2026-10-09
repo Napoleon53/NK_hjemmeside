@@ -24,7 +24,9 @@
    siger, at alle opgaver på de tre faner kan løses (selv med mus og
    klik, med forkerte svar og med Vis svaret), at startbilledet kun
    viser det, første trin har brug for, at al tekst står på kortet øverst
-   i scenen, at intet er indforstået, at sproget holder reglerne, og at
+   i scenen, at scenen er låst uden for et forsøg (under et gæt, under et
+   spørgsmål, og når kortet er grønt), at kun det, opgaven beder om, kan
+   sættes i gang, at intet er indforstået, at teksterne er korte, og at
    tingene kan være der fra 1100 × 620 til 1600 × 950 (kortet måles i
    alle dele af alle opgaver, også med hvert hint og hvert forkert svar).
 
@@ -249,49 +251,52 @@ function koerTest(W) {
     overskrift("4. Fane 1: Addition");
     NK.visFane("fane-a");
     A.vaelg(0); A.tilpas(); A.layout(); koerF(A, 0.2);
-    var kA = A.el.skort;
+    var kA = A.el.skort, ffA = d.getElementById("a-forfra");
+    function blinker(X) { var j = X.el.skort.classList.contains("blink"); X.el.skort.classList.remove("blink"); return j; }
     paastand("startbilledet: ethen midt i scenen, kun brom på hylden, intet produkt og intet i panelet",
         A.stof === "ethen" && !A.produkt && !A.reak && A.opg.fase === "gaet" && A.kanBruges("Br2") && !A.kanBruges("H2") && !A.kanBruges("H2O") && d.getElementById("a-regnkort").hidden);
-    paastand("gættet står på det gule kort øverst med tre svar", kA.classList.contains("gaet") && kA.querySelectorAll(".gk-knap[data-valg]").length === 3 && /Gæt først/i.test(kA.textContent) && /Hvor mange stoffer/.test(kA.textContent), kA.textContent);
+    paastand("gættet står på det gule kort øverst med tre svar, og der er hverken hintknap eller anden tekst", kA.classList.contains("gaet") && kA.querySelectorAll(".gk-knap[data-valg]").length === 3 && /Gæt først/i.test(kA.textContent) && /Hvor mange stoffer/.test(kA.textContent) && A.el.knap.hidden && statuslinje(A) === "" && ffA.hidden, kA.textContent);
+    paastand("der står ingen tekst nederst i scenen: statuslinjen findes ikke, og scenen går helt til bunds", !d.querySelector(".statuslinje") && A.baand().h === 0 && A.lay.Hs === A.L.h);
     var Bb = A.lay.brik.Br2, bx = Bb.x + Bb.b / 2, by = Bb.y + Bb.h / 2;
     klik(A, bx, by);
-    paastand("et klik på brommolekylet før gættet: ingen reaktion, og kortet blinker", !A.reak && !A.produkt && !A.traek && kA.classList.contains("blink") && /Gæt først/.test(linje(A)), linje(A));
-    kA.classList.remove("blink");
+    paastand("låsen under et gæt: et klik på brommolekylet starter intet, og kortet blinker", !A.reak && !A.produkt && !A.traek && blinker(A));
     var mp = A.maalPunkt();
     klik(A, mp.x, mp.y);
-    paastand("et klik på ethen før gættet får også kortet til at blinke", kA.classList.contains("blink"));
-    koerF(A, 5.5);
+    paastand("et klik på ethen før gættet får også kortet til at blinke", blinker(A));
     kA.querySelector('[data-valg="1"]').click();
     koerF(A, 0.6);
-    paastand("et svar på kortet er gættet, og opgaven står samme sted", A.opg.gaet === 1 && A.opg.fase === "forsoeg" && kA.classList.contains("opgave") && /Træk brommolekylet/.test(kortT(A)) && /Dit gæt:\s*To stoffer/.test(kA.textContent), kA.textContent);
-    paastand("det gule skilt peger på brommolekylet, og den gule hintknap står på kortet uden anden tekst", A.peger() === "Br2" && statuslinje(A) === "" && !A.el.knap.hidden && knaptekst(A) === "Giv et hint" && A.el.skort.contains(A.el.knap), statuslinje(A));
-    paastand("der står ingen tekst nederst i scenen: statuslinjen findes ikke, og scenen går helt til bunds", !d.querySelector(".statuslinje") && A.baand().h === 0 && A.lay.Hs === A.L.h);
+    paastand("et svar på kortet er gættet, og opgaven står samme sted med den gule hintknap", A.opg.gaet === 1 && A.iForsoeg() && kA.classList.contains("opgave") && /Træk brommolekylet/.test(kortT(A)) && /Dit gæt:\s*To stoffer/.test(kA.textContent) &&
+        A.peger() === "Br2" && statuslinje(A) === "" && !A.el.knap.hidden && knaptekst(A) === "Giv et hint" && kA.contains(A.el.knap), kA.textContent);
     mp = A.maalPunkt();
     mus(A, "pointermove", bx, by);
     mus(A, "pointerdown", bx, by);
     var holdt = !!A.traek && A.traek.reagens === "Br2";
     mus(A, "pointermove", mp.x, mp.y - 20);
     mus(A, "pointerup", mp.x, mp.y - 20);
-    paastand("brommolekylet kan trækkes fra hylden hen til dobbeltbindingen", holdt && !!A.reak && A.reak.reagens === "Br2" && !A.reak.afvist && !A.traek);
+    paastand("i forsøget kan brommolekylet trækkes fra hylden hen til dobbeltbindingen", holdt && !!A.reak && A.reak.reagens === "Br2" && !A.reak.afvist && !A.traek);
     koerF(A, 1.5);
     var fig = A.figur(), dob = fig.bindinger[0];
     paastand("undervejs åbner dobbeltbindingen sig, og hvert carbonatom får en ledig plads", dob.s > 1 && dob.s < 2 && fig.pladser.length === 2 && fig.pladser[0].alfa > 0.3 && /åbner sig/.test(linje(A)), dob.s + " " + linje(A));
     koerF(A, 2.6);
-    paastand("opgave 1: løst. Kortet er grønt med forklaringen og knappen Næste opgave", A.faerdig && A.produkt === "Br2" && kA.classList.contains("loest") && /Dit gæt holdt ikke\./.test(kortT(A)) && /1,2-dibromethan/.test(kortT(A)) && /addition/.test(kortT(A)) && !!videre(A) && videre(A).textContent === "Næste opgave →", kortT(A));
+    paastand("opgave 1: løst. Kortet er grønt med forklaringen og knappen Næste opgave", A.faerdig && A.produkt === "Br2" && kA.classList.contains("loest") && /Dit gæt holdt ikke\./.test(kortT(A)) && /1,2-dibromethan/.test(kortT(A)) && /addition/.test(kortT(A)) && !!videre(A) && videre(A).textContent === "Næste opgave →" && A.el.knap.hidden, kortT(A));
     var rigP = A.rigNu(), valP = K.valens(rigP.atomer, rigP.bindinger);
     paastand("produktet i scenen: fire bindinger på hvert carbonatom og to bromatomer", valP[0] === 4 && valP[1] === 4 && rigP.atomer.filter(function (a) { return a.el === "Br"; }).length === 2);
     paastand("panelet husker reaktionsskemaet", !d.getElementById("a-regnkort").hidden && d.getElementById("a-regnskab").textContent.indexOf(K.skema("ethen", "Br2")) >= 0, d.getElementById("a-regnskab").textContent);
+    klik(A, bx, by);
+    koerF(A, 0.3);
+    paastand("låsen, når kortet er grønt: et klik på brommolekylet starter intet, og knappen Næste opgave blinker", !A.reak && !A.traek && A.produkt === "Br2" && blinker(A));
     videre(A).click();
     koerF(A, 0.2);
     paastand("opgave 2 begynder med 1,2-dibromethan i scenen, et spørgsmål på kortet og en gul ring om molekylet", A.opg.o.id === "bindinger" && A.produkt === "Br2" && A.opg.fase === "spm" && kA.classList.contains("spm") && svarknapper(A).length === 3 && A.omNu().join() === "mol");
     klik(A, bx, by);
-    paastand("et molekyle mere kan ikke sætte sig på produktet", !!A.reak && A.reak.afvist === true);
-    koerF(A, 2.2);
-    paastand("det kommer tilbage til hylden, og linjen siger hvorfor", !A.reak && A.produkt === "Br2" && /Dobbeltbindingen er brugt/.test(linje(A)) && /1,2-dibromethan/.test(linje(A)), linje(A));
+    A.nulstil();
+    paastand("låsen under et spørgsmål: intet kan trækkes, tasten R ændrer ikke scenen, og kortet blinker", !A.reak && !A.traek && A.produkt === "Br2" && blinker(A));
     A.svarValg(forkert(A));
-    paastand("et forkert svar: rød forklaring, svaret bliver rødt på kortet, og hintknappen lyser op", roed(A) && /Tæl stregerne/.test(linje(A)) && /peg/.test(A.el.knap.className) && kA.querySelectorAll(".sk-knap.forkert").length === 1, linje(A));
+    paastand("et forkert svar: rød forklaring på kortet, svaret bliver rødt, og hintknappen lyser op", roed(A) && /Tæl stregerne/.test(linje(A)) && /peg/.test(A.el.knap.className) && kA.querySelectorAll(".sk-knap.forkert").length === 1 && kA.contains(A.el.besked), linje(A));
     A.svarValg(rigtigt(A));
     paastand("det rigtige svar: forklaringen står alene, og knappen er Næste spørgsmål", A.venter && !A.faerdig && /enkeltbinding/.test(kortT(A)) && videre(A).textContent === "Næste spørgsmål →" && A.omNu().length === 0, kortT(A));
+    klik(A, bx, by);
+    paastand("låsen, mens kortet venter på Næste spørgsmål", !A.reak && !A.traek && blinker(A));
     videre(A).click();
     A.svarValg(0);
     var roed2 = roed(A);
@@ -299,22 +304,25 @@ function koerTest(W) {
     paastand("opgave 2: løst. Et carbonatom har altid fire bindinger", roed2 && A.faerdig && /altid fire bindinger/.test(kortT(A)), kortT(A));
     A.knap();
     koerF(A, 0.2);
-    paastand("opgave 3: nyt ethen, og hydrogen er kommet på hylden", A.opg.o.id === "hydrogen" && A.stof === "ethen" && !A.produkt && A.kanBruges("H2") && !A.kanBruges("H2O") && A.peger() === "H2");
+    paastand("opgave 3: nyt ethen, hydrogen er kommet på hylden, og knappen Nyt molekyle er ikke fremme", A.opg.o.id === "hydrogen" && A.stof === "ethen" && !A.produkt && A.kanBruges("H2") && !A.kanBruges("H2O") && A.peger() === "H2" && ffA.hidden);
     klik(A, bx, by);
     koerF(A, 3.8);
-    paastand("bruger eleven brom i stedet, sker additionen, og linjen sender eleven tilbage", A.produkt === "Br2" && !A.faerdig && A.opg.fase === "forsoeg" && /Du brugte brom/.test(linje(A)) && /Nyt molekyle/.test(linje(A)) && /hydrogenmolekylet/.test(linje(A)), linje(A));
-    d.getElementById("a-forfra").click();
-    paastand("Nyt molekyle lægger et nyt ethen klar", A.stof === "ethen" && !A.produkt && A.peger() === "H2" && statuslinje(A) === "");
+    paastand("bruger eleven brom i stedet, sker additionen, og kortet siger, hvad der skal gøres; knappen Nyt molekyle kommer frem og banker",
+        A.produkt === "Br2" && !A.faerdig && A.iForsoeg() && /Det var brom, og produktet er 1,2-dibromethan/.test(linje(A)) && /Nyt molekyle/.test(linje(A)) && /hydrogenmolekylet/.test(linje(A)) && !ffA.hidden && /banker/.test(ffA.className), linje(A));
+    klik(A, bx, by);
+    paastand("på et produkt kan intet sætte sig: kortet blinker", !A.reak && A.produkt === "Br2" && blinker(A));
+    ffA.click();
+    koerF(A, 0.1);
+    paastand("Nyt molekyle lægger et nyt ethen klar og forsvinder igen", A.stof === "ethen" && !A.produkt && A.peger() === "H2" && statuslinje(A) === "" && ffA.hidden);
     var Bh = A.lay.brik.H2;
     mp = A.maalPunkt();
     traek(A, Bh.x + Bh.b / 2, Bh.y + Bh.h / 2, mp.x + 10, mp.y);
     koerF(A, 3.8);
-    frem(A);
-    paastand("hydrogen på ethen giver ethan, og spørgsmålet kommer", A.produkt === "H2" && A.opg.fase === "spm" && K.produkt(A.stof, A.produkt).navn === "ethan" && /mættet eller umættet/.test(kortT(A)), kortT(A));
+    paastand("hydrogen på ethen giver ethan, og spørgsmålet kommer med det samme", A.produkt === "H2" && A.opg.fase === "spm" && !A.venter && K.produkt(A.stof, A.produkt).navn === "ethan" && /mættet eller umættet/.test(kortT(A)), kortT(A));
     A.svarValg(forkert(A));
     var roed3 = roed(A) && /dobbeltbinding i ethan/.test(linje(A));
     A.svarValg(rigtigt(A));
-    paastand("opgave 3: løst. Et umættet stof er blevet mættet", roed3 && A.faerdig && /mættet stof/.test(kortT(A)), kortT(A));
+    paastand("opgave 3: løst. Et umættet stof er blevet mættet", roed3 && A.faerdig && /mættet/.test(kortT(A)) && /C₂H₆/.test(kortT(A)), kortT(A));
     A.knap();
     koerF(A, 0.2);
     var Bv = A.lay.brik.H2O;
@@ -322,7 +330,6 @@ function koerTest(W) {
     klik(A, Bv.x + Bv.b / 2, Bv.y + Bv.h / 2);
     paastand("et klik på vandmolekylet sender det selv af sted", !!A.reak && A.reak.reagens === "H2O");
     koerF(A, 3.8);
-    frem(A);
     var rigV = A.rigNu(), oV = rigV.atomer.filter(function (a) { return a.el === "O"; });
     paastand("vand på ethen giver ethanol med OH på det ene carbonatom", A.produkt === "H2O" && oV.length === 1 && A.opg.fase === "spm" && d.getElementById("a-regnskab").textContent.indexOf("C₂H₄ + H₂O → C₂H₅OH") >= 0);
     A.svarValg(0);
@@ -331,11 +338,9 @@ function koerTest(W) {
     paastand("opgave 4: løst. Vand sætter sig på som H og OH", roed4 && A.faerdig && /ethanol, C₂H₅OH/.test(kortT(A)), kortT(A));
     A.knap();
     koerF(A, 0.3);
-    paastand("opgave 5: ethan i scenen og et nyt gæt på kortet; knappen hedder Spring gættet over, og Nyt molekyle er væk imens", A.opg.o.id === "ethan" && A.stof === "ethan" && A.opg.fase === "gaet" && kA.classList.contains("gaet") && A.omNu().join() === "mol" && knaptekst(A) === "Spring gættet over" && d.getElementById("a-forfra").hidden, knaptekst(A));
+    paastand("opgave 5: ethan i scenen og et nyt gæt på kortet med en gul ring om ethan", A.opg.o.id === "ethan" && A.stof === "ethan" && A.opg.fase === "gaet" && kA.classList.contains("gaet") && A.omNu().join() === "mol" && A.el.knap.hidden);
     klik(A, bx, by);
-    paastand("brom kan ikke trækkes hen til ethan før gættet", !A.reak && kA.classList.contains("blink"));
-    kA.classList.remove("blink");
-    koerF(A, 5.5);
+    paastand("brom kan ikke trækkes hen til ethan før gættet", !A.reak && blinker(A));
     kA.querySelector('[data-valg="2"]').click();
     koerF(A, 0.4);
     mp = A.maalPunkt();
@@ -344,17 +349,15 @@ function koerTest(W) {
     koerF(A, 2.2);
     paastand("brom kan ikke sætte sig på ethan: det kommer tilbage, og opgaven er løst", afv && A.faerdig && !A.produkt && /Dit gæt holdt\./.test(kortT(A)) && /ingen dobbeltbinding/.test(kortT(A)) && /ethan \+ brom/.test(d.getElementById("a-regnskab").textContent), kortT(A));
     A.vaelg(4); A.svarValg(0); koerF(A, 0.3);
-    var forfraFrem = !d.getElementById("a-forfra").hidden;
     A.reager("H2", { x: 200, y: 400 }); koerF(A, 2.2);
     var andet = /Hydrogen kan ikke sætte sig på ethan/.test(linje(A)) && /Prøv også med brom/.test(linje(A)) && !A.faerdig;
     A.reager("H2O", { x: 200, y: 400 }); koerF(A, 2.2);
     A.reager("H2", { x: 200, y: 400 }); koerF(A, 2.2);
-    paastand("hydrogen og vand kan heller ikke, og tredje forsøg er et påskeæg", forfraFrem && andet && linje(A) === D.PAASKE.ethan && !A.faerdig, linje(A));
+    paastand("hydrogen og vand kan heller ikke, og tredje forsøg er et påskeæg", andet && linje(A) === D.PAASKE.ethan && !A.faerdig, linje(A));
     A.vaelg(5); koerF(A, 0.2);
     paastand("opgave 6: propen i scenen", A.stof === "propen" && A.peger() === "Br2" && /propen/.test(kortT(A)));
     klik(A, bx, by);
     koerF(A, 3.8);
-    frem(A);
     A.svarValg(1);
     var roed6 = roed(A) && /HBr/.test(linje(A));
     A.svarValg(rigtigt(A));
@@ -367,8 +370,8 @@ function koerTest(W) {
     mp = A.maalPunkt();
     klik(A, mp.x, mp.y + 0.3 * A.u);
     paastand("et klik på molekylet siger, hvad det er", /Ethen, C₂H₄/.test(linje(A)) && /dobbeltbinding/.test(linje(A)), linje(A));
-    traek(A, bx, by, 30, 200);
-    paastand("slippes molekylet ved siden af, siger linjen, hvor det skal hen", !A.reak && /Slip brommolekylet oven på molekylet/.test(linje(A)), linje(A));
+    traek(A, bx, by, 30, 300);
+    paastand("slippes molekylet ved siden af, siger kortet, hvor det skal hen", !A.reak && /Slip brommolekylet oven på molekylet/.test(linje(A)), linje(A));
 
     /* ------------------------------------------------------------------ */
     overskrift("5. Fane 2: Bromvand");
@@ -378,11 +381,18 @@ function koerTest(W) {
     function glasMidt(g) { var m = g.maal(); return { x: g.x, y: (m.yOlie + m.bundY) / 2 }; }
     var gp = B.glas.map(glasMidt);
     paastand("startbilledet: fem glas, der ikke er rystet, ingen navne og ingen lup",
-        B.glas.length === 5 && B.glas.every(function (g) { return g.m === 0; }) && B.navngivet.every(function (n) { return !n; }) && B.lupNu() === -1 && B.peger() === 0 && kB.classList.contains("opgave") && /glas A/.test(kortT(B)));
+        B.glas.length === 5 && B.glas.every(function (g) { return g.m === 0; }) && B.navngivet.every(function (n) { return !n; }) && B.lupNu() === -1 && B.peger() === 0 && kB.classList.contains("opgave") && /glas A/.test(kortT(B)) && !d.getElementById("b-forfra"));
     paastand("panelet kalder alle fem glas ukendte", (d.getElementById("b-glassene").textContent.match(/ukendt/g) || []).length === 5 && (d.getElementById("b-glassene").textContent.match(/ikke rystet/g) || []).length === 5);
     klik(B, gp[1].x, gp[1].y);
-    koerF(B, 3.2);
-    paastand("et klik på et andet glas ryster det, men opgaven gælder stadig glas A", B.glas[1].m === 1 && B.set[1] && B.opg.fase === "forsoeg" && !B.venter && B.peger() === 0 && /glas A/.test(kortT(B)), kortT(B));
+    koerF(B, 0.5);
+    paastand("kun det, opgaven beder om: et klik på glas B ryster det ikke; kortet blinker og siger, hvilket glas opgaven handler om",
+        B.glas[1].m === 0 && !B.glas[1].rystes() && !B.traek && blinker(B) && /Glas B hører til en anden opgave\. Denne opgave handler om glas A\./.test(linje(B)), linje(B));
+    klik(B, gp[3].x, gp[3].y); koerF(B, 0.5);
+    klik(B, gp[4].x, gp[4].y); koerF(B, 0.5);
+    paastand("glas D og E kan ikke rystes, før deres gæt er stillet", B.glas[3].m === 0 && B.glas[4].m === 0 && !B.set[3] && !B.set[4]);
+    klik(B, gp[2].x, gp[2].y);
+    paastand("fjerde klik på et glas uden for opgaven er et påskeæg", linje(B) === D.PAASKE.ryst && B.glas[2].m === 0, linje(B));
+    koerF(B, 6.5);
     klik(B, gp[0].x, gp[0].y);
     koerF(B, 0.6);
     paastand("et klik på glas A ryster det", B.glas[0].rystes() && B.peger() === -1);
@@ -390,9 +400,16 @@ function koerTest(W) {
     var venterLag = /Vent, til de to lag i glas A har skilt sig igen/.test(linje(B));
     koerF(B, 1.5);
     paastand("det, eleven så, står alene på det grønne kort med knappen Næste spørgsmål", venterLag && B.venter && B.opg.fase === "forsoeg" && kB.classList.contains("loest") && /^Godt ✓/.test(kortT(B)) && /Den orange farve i glas A er væk\./.test(kortT(B)) && videre(B).textContent === "Næste spørgsmål →" && B.el.knap.hidden, kortT(B));
+    klik(B, gp[0].x, gp[0].y); koerF(B, 0.3);
+    var laastA = !B.glas[0].rystes() && blinker(B);
+    klik(B, gp[2].x, gp[2].y); koerF(B, 0.3);
+    paastand("låsen, mens kortet venter: hverken glas A eller et andet glas kan rystes", laastA && B.glas[2].m === 0 && !B.glas[2].rystes() && blinker(B));
     frem(B);
     paastand("glas A er rystet: farven er væk, og spørgsmålet kommer med en gul ring om glas A", B.glas[0].faerdig() && B.glas[0].farver().vand < 0.01 && B.opg.fase === "spm" && B.omNu().join() === "0" && /Glas A/.test(kortT(B)) && statuslinje(B) === "", kortT(B));
     paastand("panelet siger, hvad der skete, men glasset har ikke fået navn endnu", /farven forsvandt/.test(d.getElementById("b-glassene").textContent) && !B.navngivet[0] && B.lupNu() === -1);
+    klik(B, gp[0].x, gp[0].y); koerF(B, 0.3);
+    B.nulstil();
+    paastand("låsen under et spørgsmål: glasset kan ikke rystes igen, og tasten R giver ikke et nyt glas", !B.glas[0].rystes() && B.glas[0].m === 1 && blinker(B));
     B.svarValg(1);
     var roedB1 = roed(B) && /Begge lag i glas A er farveløse/.test(linje(B));
     B.svarValg(rigtigt(B));
@@ -408,9 +425,15 @@ function koerTest(W) {
     var Rl = B.lay.lup, m0 = B.mikro.mol[0];
     klik(B, Rl.x + m0.fx * Rl.b, Rl.y + m0.fy * Rl.h);
     paastand("et klik på et molekyle i luppen siger, hvad det er", /1,2-dibromhexan, C₆H₁₂Br₂/.test(linje(B)), linje(B));
+    klik(B, gp[1].x, gp[1].y); koerF(B, 0.3);
+    paastand("låsen, når kortet er grønt: glas B kan ikke rystes endnu", B.glas[1].m === 0 && !B.glas[1].rystes() && blinker(B));
     B.knap();
     koerF(B, 0.2);
     paastand("opgave 2 begynder med et friskt glas B og lukket lup", B.opg.o.id === "b" && B.glas[1].m === 0 && !B.set[1] && B.lupNu() === -1 && B.peger() === 1);
+    klik(B, gp[0].x, gp[0].y); koerF(B, 0.3);
+    paastand("et klik på det færdige glas A ryster det ikke, men viser det i luppen og siger, hvad det er",
+        !B.glas[0].rystes() && B.lupNu() === 0 && /Glas A er hex-1-en\. Den orange farve i glas A er væk\. Denne opgave handler om glas B\./.test(linje(B)), linje(B));
+    blinker(B);
     /* Ryst glas B med musen: tag fat og flyt op og ned */
     mus(B, "pointermove", gp[1].x, gp[1].y);
     mus(B, "pointerdown", gp[1].x, gp[1].y);
@@ -420,8 +443,9 @@ function koerTest(W) {
     mus(B, "pointerup", gp[1].x, gp[1].y);
     paastand("glasset kan tages med musen og rystes", holdtB && midtB >= 1 && !B.glas[1].holdt, midtB);
     koerF(B, 1.8);
+    var setB = B.venter && /Farven i glas B er flyttet op i det øverste lag\./.test(kortT(B));
     frem(B);
-    paastand("glas B er rystet: farven er flyttet op i det øverste lag", B.opg.fase === "spm" && B.glas[1].farver().olie > 0.8 && /flyttede op/.test(d.getElementById("b-glassene").textContent) && B.omNu().join() === "1");
+    paastand("glas B er rystet: farven er flyttet op i det øverste lag", setB && B.opg.fase === "spm" && B.glas[1].farver().olie > 0.8 && /flyttede op/.test(d.getElementById("b-glassene").textContent) && B.omNu().join() === "1");
     B.svarValg(0);
     var roedB3 = roed(B) && /brommet er ikke brugt/.test(linje(B));
     B.svarValg(rigtigt(B)); frem(B);
@@ -433,6 +457,13 @@ function koerTest(W) {
     paastand("i luppen er brom ikke brugt i hexan", B.mikro.antal().reageret === 0 && B.mikro.antal().frie === 4);
     B.knap();
     koerF(B, 0.2);
+    mus(B, "pointermove", gp[2].x, gp[2].y); mus(B, "pointerdown", gp[2].x, gp[2].y);
+    mus(B, "pointermove", gp[2].x, gp[2].y - 60); mus(B, "pointermove", gp[2].x, gp[2].y);
+    mus(B, "pointerup", gp[2].x, gp[2].y);
+    koerF(B, 0.3);
+    paastand("rystes glasset for lidt med musen, siger kortet, at det skal rystes mere", B.glas[2].m > 0 && B.glas[2].m < 1 && /Glas C er ikke rystet nok endnu/.test(linje(B)), B.glas[2].m + " " + linje(B));
+    B.nulstil();
+    paastand("i forsøget giver tasten R et friskt glas", B.glas[2].m === 0 && B.iForsoeg());
     klik(B, gp[2].x, gp[2].y); koerF(B, 3.2); frem(B);
     B.svarValg(1);
     var roedC = roed(B) && /dobbeltbinding/.test(linje(B));
@@ -441,11 +472,10 @@ function koerTest(W) {
     B.knap();
     koerF(B, 0.3);
     paastand("opgave 4: glas D har fået sin etiket, gættet står på kortet med en tegning af ringen, og glasset har en gul ring",
-        B.opg.o.id === "d" && B.opg.fase === "gaet" && B.navngivet[3] && !B.navngivet[4] && kB.classList.contains("gaet") && !!kB.querySelector(".gk-figur") && kB.querySelectorAll(".gk-figur line").length === 6 && B.omNu().join() === "3" && B.peger() === -1);
+        B.opg.o.id === "d" && B.opg.fase === "gaet" && B.navngivet[3] && !B.navngivet[4] && kB.classList.contains("gaet") && !!kB.querySelector(".gk-figur") && kB.querySelectorAll(".gk-figur line").length === 6 && B.omNu().join() === "3" && B.peger() === -1 && B.glas[3].m === 0);
     klik(B, gp[3].x, gp[3].y);
-    paastand("glas D kan ikke rystes før gættet: kortet blinker", B.glas[3].m === 0 && !B.glas[3].rystes() && !B.traek && kB.classList.contains("blink") && /Gæt først/.test(linje(B)), linje(B));
-    kB.classList.remove("blink");
-    koerF(B, 5.5);
+    koerF(B, 0.3);
+    paastand("glas D kan ikke rystes før gættet: kortet blinker", B.glas[3].m === 0 && !B.glas[3].rystes() && !B.traek && blinker(B));
     kB.querySelector('[data-valg="0"]').click();
     koerF(B, 0.3);
     klik(B, gp[3].x, gp[3].y); koerF(B, 3.2);
@@ -464,26 +494,11 @@ function koerTest(W) {
     klik(B, gp[4].x, gp[4].y); koerF(B, 3.2);
     paastand("opgave 5: løst. Benzen affarver ikke bromvand, og gættet holdt", B.faerdig && /Dit gæt holdt\./.test(kortT(B)) && /Benzen affarver ikke bromvand/.test(kortT(B)) && /Alle fem glas/.test(kortT(B)) && videre(B).textContent === "Videre til Plastik →", kortT(B));
     paastand("panelet har alle fem navne og domme", ["hex-1-en", "hexan", "cyclohexen", "cyclohexan", "benzen"].every(function (n) { return d.getElementById("b-glassene").textContent.indexOf(n) >= 0; }) && (d.getElementById("b-glassene").textContent.match(/umættet/g) || []).length === 2 && /ikke som en alken/.test(d.getElementById("b-glassene").textContent), d.getElementById("b-glassene").textContent);
-    klik(B, gp[4].x, gp[4].y); koerF(B, 0.2);
-    var igen = linje(B);
-    koerF(B, 3.2);
-    klik(B, gp[4].x, gp[4].y); koerF(B, 3.2); klik(B, gp[4].x, gp[4].y); koerF(B, 3.2); klik(B, gp[4].x, gp[4].y); koerF(B, 0.2);
-    paastand("et klik på et rystet glas ryster det igen og siger, hvad der skete; mange klik er et påskeæg", /Glas E er rystet før/.test(igen) && /kræftfremkaldende/.test(igen) && linje(B) === D.PAASKE.ryst, igen + " | " + linje(B));
-    koerF(B, 3.2);
+    B.vaelg(0); koerF(B, 0.2);
+    klik(B, gp[4].x, gp[4].y); koerF(B, 0.3);
+    paastand("et klik på det færdige glas med benzen siger, at benzen ikke bruges i skolens laboratorium", /Glas E er benzen/.test(linje(B)) && /kræftfremkaldende/.test(linje(B)) && !B.glas[4].rystes(), linje(B));
     var svarB = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(B, i) && B.el.skort.classList.contains("svar") && B.glas[i].m === 1 && B.navngivet[i]; });
     paastand("alle fem opgaver kan også løses med Vis svaret", svarB);
-    B.vaelg(1); klik(B, gp[1].x, gp[1].y); koerF(B, 3.2); frem(B);
-    B.nulstil();
-    paastand("tasten R stiller et friskt glas til opgaven, og kortet siger, hvad spørgsmålet gælder", B.opg.fase === "spm" && B.glas[1].m === 0 && /Spørgsmålet gælder glas B, når det er rystet/.test(linje(B)), linje(B));
-    mus(B, "pointermove", gp[2].x, gp[2].y); mus(B, "pointerdown", gp[2].x, gp[2].y);
-    mus(B, "pointermove", gp[2].x, gp[2].y - 60); mus(B, "pointermove", gp[2].x, gp[2].y);
-    mus(B, "pointerup", gp[2].x, gp[2].y);
-    B.vaelg(2);
-    mus(B, "pointermove", gp[2].x, gp[2].y); mus(B, "pointerdown", gp[2].x, gp[2].y);
-    mus(B, "pointermove", gp[2].x, gp[2].y - 60); mus(B, "pointermove", gp[2].x, gp[2].y);
-    mus(B, "pointerup", gp[2].x, gp[2].y);
-    koerF(B, 0.3);
-    paastand("rystes glasset for lidt med musen, siger kortet, at det skal rystes mere", B.glas[2].m > 0 && B.glas[2].m < 1 && /Glas C er ikke rystet nok endnu/.test(linje(B)), B.glas[2].m + " " + linje(B));
 
     /* ------------------------------------------------------------------ */
     overskrift("6. Fane 3: Plastik");
@@ -491,7 +506,7 @@ function koerTest(W) {
     P.vaelg(0); P.tilpas(); P.layout(); koerF(P, 0.3);
     var kP = P.el.skort;
     paastand("startbilledet: seks ethenmolekyler og ikke andet (ingen kæde, ingen knap Zoom ud, intet brom)",
-        P.led === 0 && P.pulje.length === 6 && P.pulje.every(function (p) { return p.til; }) && P.vaerktoej.hidden && !P.erUdsnit() && !P.harBrom() && P.peger() === "pulje" && /ethenmolekyle/.test(kortT(P)));
+        P.led === 0 && P.pulje.length === 6 && P.pulje.every(function (p) { return p.til; }) && P.vaerktoej.hidden && !P.erUdsnit() && !P.harBrom() && P.peger() === "pulje" && /ethenmolekyle/.test(kortT(P)) && !d.getElementById("p-forfra"));
     var p0 = P.pulje[0], p1 = P.pulje[1];
     traek(P, p0.x, p0.y, p1.x - 10, p1.y + 4);
     paastand("et ethenmolekyle kan trækkes hen oven på et andet", !!P.saml && P.saml.efter === 2 && !P.pulje[0].til && !P.pulje[1].til);
@@ -500,17 +515,24 @@ function koerTest(W) {
     paastand("undervejs åbner dobbeltbindingerne sig", Lm.length === 2 && Lm[0].e > 0 && Lm[0].e < 1 && /åbner sig/.test(linje(P)), linje(P));
     koerF(P, 1.0);
     var setP = P.venter && /^Godt ✓/.test(kortT(P)) && /To ethenmolekyler har sat sig sammen/.test(kortT(P));
-    frem(P);
-    paastand("to ethenmolekyler er blevet til en kæde på 2 (det står på kortet), og spørgsmålet kommer", setP && P.led === 2 && !P.saml && P.opg.fase === "spm" && P.omNu().join() === "kaede" && /dobbeltbindingerne/.test(kortT(P)), kortT(P));
     koerF(P, 1.5);
     paastand("der kommer nye ethenmolekyler, når nogle er brugt", P.pulje.every(function (p) { return p.til; }));
+    klik(P, P.pulje[3].x, P.pulje[3].y); koerF(P, 0.3);
+    paastand("låsen, mens kortet venter: et klik sætter ikke et molekyle mere på", setP && P.led === 2 && !P.saml && !P.traek && blinker(P));
+    frem(P);
+    paastand("to ethenmolekyler er blevet til en kæde på 2 (det står på kortet), og spørgsmålet kommer", P.led === 2 && !P.saml && P.opg.fase === "spm" && P.omNu().join() === "kaede" && /dobbeltbindinger/.test(kortT(P)), kortT(P));
+    klik(P, P.pulje[3].x, P.pulje[3].y); koerF(P, 0.3);
+    P.nulstil();
+    paastand("låsen under et spørgsmål: kæden kan ikke ændres", P.led === 2 && !P.saml && blinker(P));
     P.svarValg(0);
     var roedP1 = roed(P) && /én streg/.test(linje(P));
     P.svarValg(rigtigt(P));
     paastand("opgave 1: løst. Kæden har en ledig plads i hver ende", roedP1 && P.faerdig && /ledig plads i hver ende/.test(kortT(P)), kortT(P));
+    klik(P, P.pulje[3].x, P.pulje[3].y); koerF(P, 0.3);
+    paastand("låsen, når kortet er grønt", P.led === 2 && !P.saml && blinker(P));
     P.knap();
     koerF(P, 0.3);
-    paastand("opgave 2 fortsætter med kæden på 2", P.opg.o.id === "kaede" && P.led === 2 && P.peger() === "pulje" && /Kæden er lavet af 2 ethenmolekyler/.test(linje(P)), linje(P));
+    paastand("opgave 2 fortsætter med kæden på 2", P.opg.o.id === "kaede" && P.led === 2 && P.peger() === "pulje" && P.iForsoeg());
     var L2 = P.leddene(), pp = P.pulje[3];
     traek(P, pp.x, pp.y, L2[0].x1 - 1.2 * P.uK, P.cyK);
     var venstre = !!P.saml && P.saml.skift === 1;
@@ -519,19 +541,19 @@ function koerTest(W) {
     klik(P, pp.x, pp.y);
     var hoejre = !!P.saml && P.saml.skift === 0;
     koerF(P, 1.2);
-    paastand("et molekyle kan sættes på i venstre ende ved at trække og i højre ende med et klik", venstre && hoejre && P.led === 4, P.led);
+    paastand("et molekyle kan sættes på i venstre ende ved at trække og i højre ende med et klik; kortet tæller med", venstre && hoejre && P.led === 4 && /Kæden er lavet af 4 ethenmolekyler\./.test(linje(P)), P.led + " " + linje(P));
     traek(P, P.pulje[0].x, P.pulje[0].y, 40, P.lay.kTop + 30);
-    paastand("slippes molekylet ved siden af, siger linjen, hvor det skal hen", P.led === 4 && !P.saml && /ved en af kædens ender/.test(linje(P)), linje(P));
+    paastand("slippes molekylet ved siden af, siger kortet, hvor det skal hen", P.led === 4 && !P.saml && /ved en af kædens ender/.test(linje(P)), linje(P));
     koerF(P, 1.6);
     klik(P, P.pulje[0].x, P.pulje[0].y); koerF(P, 1.6);
     klik(P, P.pulje[1].x, P.pulje[1].y); koerF(P, 1.6);
-    frem(P);
-    paastand("kæden på 6: spørgsmålet om atomerne kommer", P.led === 6 && P.opg.fase === "spm" && /6 ethenmolekyler/.test(kortT(P)), kortT(P));
-    paastand("panelet tæller ethenmolekylerne, men viser ikke atomerne før svaret", /Ethenmolekyler i kæden\s*6/.test(d.getElementById("p-kaede").textContent) && !/Carbonatomer/.test(d.getElementById("p-kaede").textContent), d.getElementById("p-kaede").textContent);
+    var set6 = P.venter && /Kæden er lavet af 6 ethenmolekyler\./.test(kortT(P));
     klik(P, P.pulje[2].x, P.pulje[2].y); koerF(P, 1.6);
-    paastand("sætter eleven et til på, siger linjen, hvad spørgsmålet gælder", P.led === 7 && /gælder en kæde af 6/.test(linje(P)), linje(P));
-    d.getElementById("p-forfra").click();
-    paastand("Ny kæde giver kæden på 6 igen", P.led === 6);
+    paastand("kæden på 6 står på det grønne kort, og den kan ikke blive længere", set6 && P.led === 6 && !P.saml);
+    blinker(P);
+    frem(P);
+    paastand("spørgsmålet om atomerne kommer", P.opg.fase === "spm" && /6 ethenmolekyler/.test(kortT(P)), kortT(P));
+    paastand("panelet tæller ethenmolekylerne, men viser ikke atomerne før svaret", /Ethenmolekyler i kæden\s*6/.test(d.getElementById("p-kaede").textContent) && !/Carbonatomer/.test(d.getElementById("p-kaede").textContent), d.getElementById("p-kaede").textContent);
     P.svarValg(1);
     var roedP2 = roed(P) && /ikke kommet hydrogenatomer til/.test(linje(P));
     P.svarValg(rigtigt(P));
@@ -542,27 +564,28 @@ function koerTest(W) {
         P.opg.o.id === "polymer" && P.erUdsnit() && !P.vaerktoej.hidden && /banker/.test(P.zoomKnap.className) && P.zoomKnap.textContent === "Zoom ud" && P.puljeVed({ x: P.pulje[0].x, y: P.pulje[0].y }) === -1);
     P.zoomKnap.click();
     koerF(P, 0.8);
-    var midtZ = P.zoom > 0.2 && P.zoom < 0.8 && P.opg.fase === "forsoeg";
+    var midtZ = P.zoom > 0.2 && P.zoom < 0.8 && P.iForsoeg();
     koerF(P, 2.4);
-    frem(P);
     var st = P.stykke();
-    paastand("zoomet ud: én lang kæde med elevens stykke som en lille del, og spørgsmålet kommer", midtZ && P.zoom === 1 && P.opg.fase === "spm" && P.zoomKnap.textContent === "Zoom ind" && P.lang.p.length === 1500 && st.til - st.fra === 2 && K.LANG_KAEDE === 5000, (st.til - st.fra) + " punkter");
+    paastand("zoomet ud: én lang kæde med elevens stykke som en lille del; det står på det grønne kort, og knappen Zoom ud er væk igen",
+        midtZ && P.zoom === 1 && P.venter && /Den lange streg er én kæde i polyethen/.test(kortT(P)) && P.vaerktoej.hidden && P.lang.p.length === 1500 && st.til - st.fra === 2 && K.LANG_KAEDE === 5000, kortT(P));
     paastand("den lange kæde bliver i sit felt", P.lang.p.every(function (q) { return q[0] >= 0 && q[0] <= P.lay.lang.b && q[1] >= 0 && q[1] <= P.lay.lang.h; }));
+    P.skiftZoom();
+    paastand("låsen: der kan ikke zoomes, mens kortet venter", P.zoomMaal === 1 && blinker(P));
+    frem(P);
     P.svarValg(1);
     var roedP3 = roed(P) && /samme molekylformel/.test(linje(P));
     P.svarValg(rigtigt(P));
-    paastand("opgave 3: løst. Polymer, polymerisation og polyethen", roedP3 && P.faerdig && /polymer/.test(kortT(P)) && /polymerisation/.test(kortT(P)) && /polyethen/.test(kortT(P)), kortT(P));
+    paastand("opgave 3: løst. Polymer, polymerisation og polyethen", roedP3 && P.faerdig && P.zoom === 1 && /polymer/.test(kortT(P)) && /polymerisation/.test(kortT(P)) && /polyethen/.test(kortT(P)), kortT(P));
     P.knap();
     koerF(P, 0.3);
     var Bp = P.lay.brom;
-    paastand("opgave 4: zoomet ind igen, gættet på kortet, og brommolekylet ligger klar; Zoom ud og Ny kæde er væk imens", P.opg.o.id === "frysepose" && P.zoom === 0 && P.opg.fase === "gaet" && kP.classList.contains("gaet") && P.harBrom() && P.bromVed({ x: Bp.x + 10, y: Bp.y + 10 }) && P.vaerktoej.hidden && d.getElementById("p-forfra").hidden);
+    paastand("opgave 4: zoomet ind igen, gættet på kortet, og brommolekylet ligger klar; knappen Zoom ud er væk", P.opg.o.id === "frysepose" && P.zoom === 0 && P.opg.fase === "gaet" && kP.classList.contains("gaet") && P.harBrom() && P.bromVed({ x: Bp.x + 10, y: Bp.y + 10 }) && P.vaerktoej.hidden && P.omNu().join() === "kaede");
     klik(P, Bp.x + Bp.b / 2, Bp.y + Bp.h / 2);
-    paastand("brom kan ikke trækkes hen til kæden før gættet", !P.afvis && !P.traek && kP.classList.contains("blink"));
-    kP.classList.remove("blink");
-    koerF(P, 5.5);
+    paastand("brom kan ikke trækkes hen til kæden før gættet", !P.afvis && !P.traek && blinker(P));
     kP.querySelector('[data-valg="0"]').click();
     koerF(P, 0.4);
-    paastand("efter gættet peger skiltet på brommolekylet, og opgaven står på kortet", P.opg.fase === "forsoeg" && P.peger() === "brom" && /Træk brommolekylet, Br₂, fra bunden af scenen hen til kæden/.test(kortT(P)) && !d.getElementById("p-forfra").hidden, kortT(P));
+    paastand("efter gættet peger skiltet på brommolekylet, og opgaven står på kortet", P.iForsoeg() && P.peger() === "brom" && /Træk brommolekylet hen til kæden af polyethen/.test(kortT(P)), kortT(P));
     Bp = P.lay.brom;
     traek(P, Bp.x + Bp.b / 2, Bp.y + Bp.h / 2, P.lay.W / 2, P.cyK - 10);
     var afvP = !!P.afvis;
@@ -570,7 +593,7 @@ function koerTest(W) {
     paastand("brom kan ikke sætte sig på kæden: opgave 4 er løst, og gættet holdt ikke", afvP && P.faerdig && /Dit gæt holdt ikke\./.test(kortT(P)) && /kun enkeltbindinger/.test(kortT(P)) && /frysepose/.test(kortT(P)), kortT(P));
     P.knap();
     koerF(P, 0.3);
-    paastand("opgave 5: spørgsmålet om udsnittet med en gul ring om kæden", P.opg.o.id === "udsnit" && P.opg.fase === "spm" && P.omNu().join() === "kaede" && svarknapper(P).length === 3);
+    paastand("opgave 5: spørgsmålet om udsnittet med en gul ring om kæden; brommolekylet og Zoom ud er væk", P.opg.o.id === "udsnit" && P.opg.fase === "spm" && P.omNu().join() === "kaede" && svarknapper(P).length === 3 && !P.harBrom() && P.vaerktoej.hidden && P.zoom === 0);
     P.svarValg(0);
     var roedP5 = roed(P) && /kun enkeltbindinger/.test(linje(P));
     P.svarValg(rigtigt(P));
@@ -579,38 +602,110 @@ function koerTest(W) {
     P.led = K.MAX_LED; P.uK = P.uFor(P.led);
     var fuld = P.saetPaa(0, { x: 100, y: 100 }, false);
     paastand("der er plads til 8 ethenmolekyler på skærmen; det niende får en besked", K.MAX_LED === 8 && fuld === false && P.led === 8 && linje(P) === D.P_FULD, linje(P));
-    var svarP = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(P, i) && P.el.skort.classList.contains("svar"); });
-    paastand("alle fem opgaver kan også løses med Vis svaret", svarP);
     P.vaelg(0); koerF(P, 0.3);
     klik(P, P.pulje[2].x, P.pulje[2].y);
     paastand("uden kæde sætter et klik molekylet sammen med det nærmeste", !!P.saml && P.saml.efter === 2);
     koerF(P, 1.5);
+    P.nulstil();
+    var svarP = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(P, i) && P.el.skort.classList.contains("svar"); });
+    paastand("alle fem opgaver kan også løses med Vis svaret", svarP);
 
     /* ------------------------------------------------------------------ */
-    overskrift("7. Opgaverne og sproget");
+    overskrift("7. Låsen: scenen kan kun bruges i et forsøg");
+    /* Brugeren 9. okt. 2026: "nogle gange er det muligt at starte animationen inden
+       man har fået spørgsmålet". Testen går gennem alle dele af alle opgaver med
+       hjælpeknappen og klikker på hver ting i scenen. Uden for et forsøg må et
+       aftryk af scenen ikke ændre sig, og kortet skal blinke. */
+    function aftryk(X) {
+        if (X === A) return [A.stof, A.produkt, !!A.reak, !!A.traek].join("|");
+        if (X === B) return B.glas.map(function (g) { return g.m.toFixed(2) + (g.rystes() ? "r" : ""); }).join("|") + "|" + !!B.traek;
+        return [P.led, !!P.saml, P.zoomMaal, !!P.afvis, !!P.traek].join("|");
+    }
+    function ting(X) {
+        var ud = [];
+        if (X === A) {
+            K.REAGENSER.forEach(function (r) { if (A.kanBruges(r)) { var b = A.lay.brik[r]; ud.push({ x: b.x + b.b / 2, y: b.y + b.h / 2, navn: K.REAGENS[r].navn }); } });
+        } else if (X === B) {
+            B.glas.forEach(function (g, i) { var q = glasMidt(g); ud.push({ x: q.x, y: q.y, navn: "glas " + D.GLAS[i].b }); });
+        } else {
+            if (!P.erUdsnit()) P.pulje.forEach(function (q, i) { if (q.til) ud.push({ x: q.x, y: q.y, navn: "ethenmolekyle " + (i + 1) }); });
+            if (P.harBrom()) { var b2 = P.lay.brom; ud.push({ x: b2.x + b2.b / 2, y: b2.y + b2.h / 2, navn: "brom" }); }
+        }
+        return ud;
+    }
+    var huller = [], proevet = 0, tilstande = {};
+    [["fane-a", A, "fane 1"], ["fane-b", B, "fane 2"], ["fane-p", P, "fane 3"]].forEach(function (x) {
+        var X = x[1];
+        NK.visFane(x[0]);
+        X.opgaver.forEach(function (o, i) {
+            X.vaelg(i); X.tilpas(); X.layout(); koerF(X, 0.3);
+            for (var n = 0; n < 40; n++) {
+                if (!X.iForsoeg()) {
+                    var tilstand = X.faerdig ? "løst" : (X.venter ? "venter" : X.opg.fase);
+                    tilstande[tilstand] = true;
+                    koerF(X, 1.5);          /* lad tingene falde til ro paa deres pladser foerst */
+                    ting(X).forEach(function (t) {
+                        var foer = aftryk(X);
+                        X.el.skort.classList.remove("blink");
+                        klik(X, t.x, t.y);
+                        koerF(X, 0.4);
+                        proevet++;
+                        if (aftryk(X) !== foer) huller.push(x[2] + " opgave " + (i + 1) + " (" + tilstand + "): et klik på " + t.navn + " satte noget i gang");
+                        else if (!X.el.skort.classList.contains("blink")) huller.push(x[2] + " opgave " + (i + 1) + " (" + tilstand + "): kortet blinkede ikke ved et klik på " + t.navn);
+                    });
+                    X.el.skort.classList.remove("blink");
+                }
+                if (X.faerdig) break;
+                X.knap();
+                koerF(X, 0.15);
+            }
+        });
+        X.vaelg(0);
+    });
+    paastand("i alle dele af alle 16 opgaver: uden for et forsøg sætter et klik på tingene i scenen intet i gang, og kortet blinker (" + proevet + " klik)",
+        huller.length === 0 && proevet > 100 && tilstande.gaet && tilstande.spm && tilstande.venter && tilstande["løst"], huller.slice(0, 6).join("; ") + " | " + proevet + " klik, " + Object.keys(tilstande).join(","));
+    paastand("knapperne i scenen er kun fremme, når de skal bruges: Zoom ud i opgaven Zoom ud, Nyt molekyle efter et forkert molekyle",
+        (function () {
+            var ok = true;
+            NK.visFane("fane-p");
+            P.opgaver.forEach(function (o, i) { P.vaelg(i); koerF(P, 0.2); if (!P.vaerktoej.hidden !== (o.id === "polymer")) ok = false; });
+            NK.visFane("fane-a");
+            A.opgaver.forEach(function (o, i) { A.vaelg(i); koerF(A, 0.2); if (!d.getElementById("a-forfra").hidden) ok = false; });
+            A.vaelg(0); P.vaelg(0);
+            return ok;
+        }()));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("8. Opgaverne og sproget");
     var opbyg = [];
     var FANER = [["a", D.A_MAAL, 6], ["b", D.B_MAAL, 5], ["p", D.P_MAAL, 5]];
     FANER.forEach(function (f) {
         if (f[1].length !== f[2]) opbyg.push(f[0] + " antal");
         f[1].forEach(function (o) {
+            function lang(hvad, t, max) { if (t && t.length > max) opbyg.push(o.id + " " + hvad + " er for lang: " + t.length + " mod " + max); }
             ["forsoeg", "spm", "spm2"].forEach(function (del) {
                 if (o[del] && (!o[del].hint || o[del].hint.length !== 3)) opbyg.push(o.id + " " + del + " hint");
+                if (o[del]) o[del].hint.forEach(function (h) { lang(del + " hint", h, 100); });
             });
             ["spm", "spm2"].forEach(function (del) {
                 if (!o[del]) return;
                 if (o[del].svar.filter(function (s) { return s.ok; }).length !== 1) opbyg.push(o.id + " ét rigtigt svar");
                 if (o[del].svar.some(function (s) { return !s.ok && !s.f; })) opbyg.push(o.id + " forklaring mangler");
-                if (o[del].tekst.length > 118) opbyg.push(o.id + " " + del + " spørgsmålet er for langt til kortet: " + o[del].tekst.length);
-                o[del].svar.forEach(function (sv) { if (sv.t.length > 46) opbyg.push(o.id + " svaret er for langt til kortet: " + sv.t); });
+                lang(del, o[del].tekst, 105);
+                lang(del + " forklaring", o[del].godt, 160);
+                o[del].svar.forEach(function (sv) { lang(del + " svar", sv.t, 34); lang(del + " forklaring til forkert svar", sv.f, 110); });
             });
             if (o.spm2 && !o.spm.godt) opbyg.push(o.id + " forklaring til første svar mangler");
             if (o.gaet && (o.gaet.svar.filter(function (s) { return s.ok; }).length !== 1 || !o.forsoeg)) opbyg.push(o.id + " gæt");
-            if (o.gaet && (!o.gaet.intro || !/\?$/.test(o.gaet.tekst) || o.gaet.tekst.length > 60 || o.gaet.svar.length !== 3)) opbyg.push(o.id + " gættets indledning og korte spørgsmål");
-            if (o.forsoeg && o.forsoeg.tekst.length > 150) opbyg.push(o.id + " forsøgets tekst er for lang til kortet: " + o.forsoeg.tekst.length);
+            if (o.gaet && (!o.gaet.intro || !/\?$/.test(o.gaet.tekst) || o.gaet.svar.length !== 3)) opbyg.push(o.id + " gættets indledning og spørgsmål");
+            if (o.gaet) { lang("gæt", o.gaet.tekst, 60); lang("gættets indledning", o.gaet.intro, 100); o.gaet.svar.forEach(function (sv) { lang("gæt svar", sv.t, 34); }); }
+            if (o.forsoeg) { lang("forsøg", o.forsoeg.tekst, 95); lang("set", o.forsoeg.set, 160); }
+            lang("forklaring", o.loest, 160);
             if (!o.loest || !o.navn) opbyg.push(o.id + " tekst");
         });
     });
-    paastand("16 opgaver: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte, og teksterne er korte nok til kortet", opbyg.length === 0, opbyg.join(", "));
+    paastand("16 opgaver: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte", opbyg.filter(function (x) { return !/for lang/.test(x); }).length === 0, opbyg.join(", "));
+    paastand("teksterne er korte: spørgsmål højst 105 tegn, svar 34, forsøg 95, hint 100, forkert svar 110 og forklaring 160", opbyg.filter(function (x) { return /for lang/.test(x); }).length === 0, opbyg.filter(function (x) { return /for lang/.test(x); }).join(", "));
     /* Intet er indforstaaet: hver tekst paa kortet naevner selv det molekyle, det
        glas eller den kaede, den handler om, og begynder ikke midt i en tanke */
     var indf = [];
@@ -645,7 +740,8 @@ function koerTest(W) {
         else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { if (!/^(id|om|krav|figur|stof)$/.test(k)) saml(x[k]); });
     }(D));
     tekster.push(d.body.textContent);
-    Object.keys(K.STOF).forEach(function (s) { K.REAGENSER.forEach(function (r) { tekster.push(D.afvist(K.STOF[s].navn, K.REAGENS[r].navn), D.afvistProdukt(K.REAGENS[r].navn, "ethan")); }); });
+    Object.keys(K.STOF).forEach(function (s) { K.REAGENSER.forEach(function (r) { tekster.push(D.afvist(K.STOF[s].navn, K.REAGENS[r].navn), D.andet(K.REAGENS[r].navn, "ethan", "brom", "dobbeltbindingen i ethen")); }); });
+    D.GLAS.forEach(function (g) { tekster.push(D.andetGlas(g.b, "A", "", ""), D.andetGlas(g.b, "A", K.VAESKE[g.stof].navn, D.set(g.b, "flyttede"))); });
     Object.keys(K.VAESKE).forEach(function (id) { tekster.push(D.lupStof(K.VAESKE[id], false)); if (K.VAESKE[id].produkt) tekster.push(D.lupStof(K.VAESKE[id], true)); });
     D.GLAS.forEach(function (g) { tekster.push(D.set(g.b, "forsvandt"), D.set(g.b, "flyttede")); });
     [0, 1, 2, 3, 4, 5].forEach(function (i) { A.vaelg(i); tekster.push(linje(A), A.el.skort.textContent); if (i < 5) { B.vaelg(i); tekster.push(linje(B), B.el.skort.textContent); P.vaelg(i); tekster.push(linje(P), P.el.skort.textContent); } });
@@ -663,7 +759,7 @@ function koerTest(W) {
     paastand("fremskridtet gemmes under animationens egen nøgle", NOEGLER.every(function (n) { return W.localStorage.getItem(n) !== null; }) && W.localStorage.getItem("nk-sc7.5-g") === gemtAndre);
 
     /* ------------------------------------------------------------------ */
-    overskrift("8. Layoutet");
+    overskrift("9. Layoutet");
     var stoerrelser = [[1100, 620], [1100, 700], [1300, 760], [1600, 950]];
     stoerrelser.forEach(function (st2) {
         ramme.style.width = st2[0] + "px";
@@ -727,14 +823,15 @@ function koerTest(W) {
             if (l.W / 2 - 2.3 * u < 4) pr.push(hvor + "molekylet er for bredt");
             K.REAGENSER.forEach(function (r) { var Bk = l.brik[r]; if (Bk.x < 4 || Bk.x + Bk.b > l.W - 4 || Bk.y + Bk.h > l.Hs - 2 || Bk.h < 70) pr.push(hvor + "brikken " + r + " uden for hylden"); });
             if (l.brik.H2.x < l.brik.Br2.x + l.brik.Br2.b + 8 || l.brik.H2O.x < l.brik.H2.x + l.brik.H2.b + 8) pr.push(hvor + "brikkerne overlapper");
-            /* Nyt molekyle staar til hoejre under kortets plads og roerer ikke molekylet */
-            var ff = d.getElementById("a-forfra"), scA = rk(d.querySelector("#fane-a .scene"));
-            if (!x[1]) {
-                var fr = rk(ff);
-                if (ff.hidden || fr.top - scA.top < 10 + A.kortZone() || fr.right > scA.right - 4) pr.push(hvor + "knappen Nyt molekyle ligger forkert");
-                if (fr.left - scA.left < l.W / 2 + 2.3 * u && fr.bottom - scA.top > A.cy - (K.SVAEV + K.OH + 0.3) * u) pr.push(hvor + "knappen Nyt molekyle dækker molekylet");
-            } else if (!ff.hidden) pr.push(hvor + "knappen Nyt molekyle er fremme under gættet");
         });
+        /* Nyt molekyle kommer kun frem efter et forkert molekyle: til hoejre under kortets plads, uden at roere molekylet */
+        A.vaelg(2); A.tilpas(); A.layout(); koerF(A, 0.2);
+        A.reager("Br2", { x: 100, y: A.lay.hylde.y }); koerF(A, 3.8);
+        var ff = d.getElementById("a-forfra"), scA = rk(d.querySelector("#fane-a .scene")), fr = rk(ff);
+        if (ff.hidden || fr.top - scA.top < rk(A.el.skort).bottom - scA.top + 2 || fr.right > scA.right - 4) pr.push("fane 1 knappen Nyt molekyle ligger forkert");
+        if (fr.left - scA.left < A.lay.W / 2 + 2.3 * A.u && fr.bottom - scA.top > A.cy - 1.4 * A.u) pr.push("fane 1 knappen Nyt molekyle dækker molekylet");
+        if (rk(A.el.skort).height > A.kortZone()) pr.push("fane 1 kortet er for højt med linjen om et forkert molekyle " + Math.round(rk(A.el.skort).height));
+        A.vaelg(0);
 
         /* Fane 2: glassene, luppen og gaettet */
         NK.visFane("fane-b");
@@ -769,10 +866,8 @@ function koerTest(W) {
         if (P.cyK + 1.4 * uK > P.lay.yPulje) pr.push("fane 3 kæden rører de løse molekyler");
         P.pulje.forEach(function (p) { if (p.y - 1.1 * P.uP < P.lay.yPulje - 2 || p.y + 1.1 * P.uP > P.lay.Hs) pr.push("fane 3 de løse molekyler ligger uden for båndet"); });
         P.vaelg(2); P.tilpas(); P.layout(); koerF(P, 0.3);
-        var zk = rk(P.zoomKnap), nk = rk(d.getElementById("p-forfra"));
-        if (zk.top - scP.top < 10 + P.kortZone() || zk.left < scP.left + 4) pr.push("fane 3 knappen Zoom ud ligger under kortet");
-        if (nk.top - scP.top < 10 + P.kortZone() || nk.right > scP.right - 4 || nk.left < zk.right + 20) pr.push("fane 3 knappen Ny kæde ligger forkert");
-        if (nk.bottom - scP.top > P.cyK - 1.4 * P.uK + 2 && nk.left - scP.left < P.lay.W / 2 + (2 * 6 + 0.9) * P.uK / 2) pr.push("fane 3 knappen Ny kæde dækker kæden");
+        var zk = rk(P.zoomKnap);
+        if (P.vaerktoej.hidden || zk.top - scP.top < 10 + P.kortZone() || zk.left < scP.left + 4) pr.push("fane 3 knappen Zoom ud ligger under kortet");
         if (zk.bottom - scP.top > P.cyK - 1.4 * P.uK + 2 && zk.right - scP.left > P.lay.W / 2 - (2 * 6 + 0.9) * P.uK / 2) pr.push("fane 3 knappen Zoom ud dækker kæden");
         var Lg = P.lay.lang, Po = P.lay.pose;
         if (Lg.b < 300 || Lg.h < 150) pr.push("fane 3 den lange kæde har for lidt plads " + Math.round(Lg.b) + " × " + Math.round(Lg.h));

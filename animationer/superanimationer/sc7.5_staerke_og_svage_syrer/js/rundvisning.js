@@ -15,9 +15,9 @@
 
     var TURE = {
         "fane-g": [
-            { sel: "#g-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu. Et gæt og et spørgsmål har gule svarknapper på kortet. Når svaret er rigtigt, står forklaringen på kortet. Det glas, opgaven handler om, har en gul ring." },
-            { sel: "#g-anker-glas", titel: "De to glas", tekst: "Saltsyre og eddikesyre med samme koncentration, 0,10 M. Et klik på et glas åbner luppen over det." },
-            { sel: "#g-anker-skaal", titel: "Kalken", tekst: "Træk et stykke kalk fra skålen ned i et glas. Jo flere oxoniumioner der er i glasset, jo mere bruser det." },
+            { sel: "#g-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu. Et gæt og et spørgsmål har gule svarknapper på kortet. Når svaret er rigtigt, står forklaringen på kortet. Blinker kortet, skal du først gøre det, kortet siger." },
+            { sel: "#g-anker-glas", titel: "De to glas", tekst: "Saltsyre og eddikesyre med samme koncentration, 0,10 M. Når opgaven beder om det, åbner et klik på glasset luppen over det." },
+            { sel: "#g-anker-skaal", titel: "Kalken", tekst: "I den første opgave trækker du et stykke kalk fra skålen ned i hvert glas. Jo flere oxoniumioner der er i glasset, jo mere bruser det." },
             { sel: "#g-anker-lup", titel: "Lupperne", tekst: "Hver lup viser et lille rum i glasset, hvor der er hældt 100 syremolekyler i. Mærkerne over luppen viser, hvad partiklerne er. Klik på et mærke eller en partikel for at læse mere." },
             { sel: "#g-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },
             { sel: "#g-opgaver", titel: "Opgaverne", tekst: "Fem opgaver, én ad gangen. En løst opgave bliver grøn på listen, og du kan altid vælge en opgave igen." },
@@ -26,14 +26,14 @@
         ],
         "fane-s": [
             { sel: "#s-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu, og stiller spørgsmålene om glasset med gule svarknapper. Det glas, opgaven handler om, har en gul ring." },
-            { sel: "#s-anker-glas", titel: "De fem glas", tekst: "Fem syrer med samme koncentration, 0,10 M, og et stykke kalk i hver. Klik på et glas for at se det i luppen." },
-            { sel: "#s-anker-lup", titel: "Luppen", tekst: "Luppen viser det glas, du sidst har klikket på. Et helt molekyle er gråt med en lille orange hydron på, et molekyle, der har afgivet hydronen, er blåt, og de røde kugler er oxoniumioner." },
+            { sel: "#s-anker-glas", titel: "De fem glas", tekst: "Fem syrer med samme koncentration, 0,10 M, og et stykke kalk i hver. Klik på det glas, opgaven nævner, for at se det i luppen." },
+            { sel: "#s-anker-lup", titel: "Luppen", tekst: "Luppen viser det glas, opgaven handler om. Et helt molekyle er gråt med en lille orange hydron på, et molekyle, der har afgivet hydronen, er blåt, og de røde kugler er oxoniumioner." },
             { sel: "#s-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },
             { sel: "#s-glaskort", titel: "De fem glas", tekst: "Her samles det, du har fundet ud af om hvert glas. Glasset får sit navn, når du har afgjort, om syren er stærk eller svag." }
         ],
         "fane-f": [
             { sel: "#f-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu. Et gæt og et spørgsmål har gule svarknapper på kortet. Det glas, opgaven handler om, har en gul ring." },
-            { sel: "#f-anker-glas", titel: "De to glas", tekst: "Til venstre 0,10 M eddikesyre. Til højre saltsyre, som du kan fortynde. Sedlen på glasset viser koncentrationen." },
+            { sel: "#f-anker-glas", titel: "De to glas", tekst: "Til venstre 0,10 M eddikesyre. Til højre saltsyre, som du fortynder, når opgaven beder om det. Sedlen på glasset viser koncentrationen." },
             { sel: "#f-vaerktoej", titel: "Fortynd 10 gange", tekst: "Knappen Fortynd 10 gange hælder ni tiendedele af saltsyren fra og fylder op med vand, så koncentrationen bliver 10 gange mindre. Knappen Ny saltsyre begynder forfra med 0,10 M saltsyre." },
             { sel: "#f-anker-lup", titel: "Lupperne", tekst: "De to lupper viser lige store rum. Sammenlign antallet af røde oxoniumioner og antallet af syremolekyler." },
             { sel: "#f-tavle", titel: "Tavlen", tekst: "Vælg to ord til hver flaske, og tryk på Tjek." },

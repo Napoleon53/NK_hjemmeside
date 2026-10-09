@@ -22,24 +22,25 @@
        eller et set staar det, eleven saa, alene paa det groenne kort,
        foer spoergsmaalet kommer. Panelet har intet opgavekort.
      * kortets nederste raekke (x-status: besked, kortBesked, fejlLinje,
-       visBund): hint, forklaringen til et forkert svar, det, fanen har at
-       tilfoeje til opgaveteksten (sceneLinje, spmLinje), og svaret paa et
-       klik i scenen. Raekken ryster ved en fejl. Det var statuslinjen
+       visBund): hint, forklaringen til et forkert svar og svaret paa et
+       klik paa en partikel. Fanen kan tilfoeje en linje (sceneLinje), men
+       kun naar opgaveteksten ikke er nok: hold teksten nede. Raekken
+       ryster ved en fejl. Det var statuslinjen
        nederst i scenen, indtil brugeren bad om at faa al tekst samlet
        over animationen.
      * hjaelpeknappen i samme raekke: Giv et hint > Naeste hint > Vis
        svaret. Den er gul (Vis svaret kun et gult omrids) og lyser stille
-       op, naar eleven lige har svaret forkert. Under et gaet er den et
-       lille omrids, Spring gaettet over. Naar maalet er loest, er den
-       vaek: kortets groenne knap foerer videre.
+       op, naar eleven lige har svaret forkert. Under et gaet og naar
+       maalet er loest, er den vaek: gaettet er gratis, og kortets groenne
+       knap foerer videre.
      * musen i scenen
 
    Fanen selv SKAL have:
      nyOpgave(o)        stil scenen op til maalet
      layout()           regn pladserne ud. this.baand().y er scenens bund
                         (der er intet baand nederst), og this.kortZone() er
-                        den plads, kortet har faaet sat af oeverst (218 px,
-                        200 px paa lave skaerme): det, eleven skal se paa,
+                        den plads, kortet har faaet sat af oeverst (198 px,
+                        172 px paa lave skaerme): det, eleven skal se paa,
                         begynder under 10 + kortZone() + 8, saa kortet
                         aldrig daekker det, heller ikke med et hint i
      tegn(), opdaterScene(dt)
@@ -47,10 +48,14 @@
                         som en hel saetning, der selv naevner tingen (intet
                         indforstaaet). Giv "", naar opgaveteksten er nok
      forsoegSvar(o)     goer forsoeget for eleven (Vis svaret)
-     musen: overScene, nedScene, flytScene, opScene, klikScene. Under et
-                        gaet (this.gaetNu()) udfoeres handlinger i forsoeget
-                        ikke: kald this.gaetBlink() i stedet, og skjul det,
-                        der foerst skal bruges bagefter
+     musen: overScene, nedScene, flytScene, opScene, klikScene. LAASEN:
+                        eleven maa kun saette noget i gang, mens kortet
+                        viser et forsoeg, og kun det, opgaven beder om.
+                        Begynd alt, der saetter noget i gang, med
+                        if (this.spaer()) return; (kortet blinker under et
+                        gaet, og naar det er groent og venter paa Naeste),
+                        kald this.kortBlink() ved et klik paa det forkerte,
+                        og skjul knapper, der ikke hoerer til opgaven
 
    Fanen KAN have: nyFase(fase), efterDel(), efterOpgave(), efterGaet(),
    spmLinje(), nulstilScene(), fokusFelt(), enter(), felterSvar(o) (kraeves,
@@ -69,11 +74,11 @@
    x-knap. I panelet: x-liste og x-loest. En knap x-forfra er valgfri og
    staar ved det, den nulstiller.
 
-   Teksterne i js/data.js skal passe paa kortet: gaettets tekst hoejst 60
-   tegn, et spoergsmaal hoejst 118, et svar hoejst 46 og et forsoeg hoejst
-   150. Selvtesten taeller og maaler kortets hoejde i alle dele af alle
-   maal paa fire skaermstoerrelser. D.GAET_LINJE og D.FAERDIG[navn] skal
-   findes.
+   Teksterne i js/data.js skal vaere korte: gaettets tekst hoejst 60 tegn,
+   et spoergsmaal hoejst 105, et svar hoejst 34, et forsoeg hoejst 95, et
+   hint hoejst 100 og forklaringen til det rigtige svar hoejst 160.
+   Selvtesten taeller og maaler kortets hoejde i alle dele af alle maal
+   paa fire skaermstoerrelser. D.FAERDIG[navn] skal findes.
    ===================================================================== */
 (function () {
     "use strict";
@@ -250,7 +255,7 @@
            gaet. Lupperne begynder under den, saa intet flytter sig, naar et
            spoergsmaal kommer. Lave skaerme har et mindre kort (se stilarket). */
         P.kortZone = function () {
-            return window.innerHeight <= 720 ? 200 : 218;
+            return window.innerHeight <= 720 ? 172 : 198;
         };
 
         P.kortHTML = function () {
@@ -300,15 +305,32 @@
             return html;
         };
 
-        /* Eleven klikkede paa forsoeget, foer der var gaettet: kortet blinker */
-        P.gaetBlink = function (ekstra) {
+        /* Kortet blinker: eleven klikkede paa forsoeget, men skal foerst goere det,
+           kortet siger (gaette, trykke Naeste, eller det, opgaven beder om) */
+        P.kortBlink = function () {
             var e = this.el.skort;
-            if (e) {
-                e.classList.remove("blink");
-                void e.offsetWidth;
-                e.classList.add("blink");
-            }
-            this.kortBesked(D.GAET_LINJE + (ekstra ? " " + ekstra : ""), 5, "gul");
+            if (!e) return;
+            e.classList.remove("blink");
+            void e.offsetWidth;
+            e.classList.add("blink");
+        };
+
+        P.gaetBlink = function () { this.kortBlink(); };
+
+        /* Laasen (brugeren 9. okt. 2026: "nogle gange er det muligt at starte
+           animationen inden man har faaet spoergsmaalet"). Eleven kan kun saette
+           noget i gang i scenen, mens kortet viser et forsoeg. Under et gaet, og
+           naar kortet er groent og venter paa Naeste, blinker kortet i stedet.
+           Fanen kalder spaer() foerst i alt, der saetter noget i gang:
+           if (this.spaer()) return; */
+        P.iForsoeg = function () {
+            return !this.faerdig && !this.venter && !!this.opg && this.opg.fase === "forsoeg";
+        };
+
+        P.spaer = function () {
+            if (this.iForsoeg()) return false;
+            this.kortBlink();
+            return true;
         };
 
         /* Videre til maalets naeste del. Giver true, hvis der ikke er flere. */
@@ -426,9 +448,8 @@
                 /* Kortets groenne knap foerer videre; hjaelpeknappen er vaek imens */
                 tekst = this.videreTekst();
             } else if (this.opg.fase === "gaet") {
-                /* Under et gaet er kortet det eneste fyldte gule: kun et lille omrids */
-                tekst = "Spring gættet over";
-                klasse += " svar lille";
+                /* Under et gaet er der ingen hjaelpeknap: gaettet er gratis */
+                tekst = "Giv et hint";
             } else {
                 var h = this.hintNu();
                 if (this.hjaelp === 0) tekst = "Giv et hint";
@@ -444,7 +465,7 @@
         /* Kortets nederste raekke: beskeden og hjaelpeknappen. Naar maalet er loest,
            er raekken vaek, medmindre et klik i scenen lige har faaet et svar. */
         P.visBund = function () {
-            var slut = this.faerdig || this.venter;
+            var slut = this.faerdig || this.venter || this.gaetNu();
             var b = this.nuB || this.fast || { html: "", klasse: "" };
             var harTekst = !!b.html;
             if (this.el.besked) this.el.besked.hidden = !harTekst;
@@ -594,7 +615,9 @@
 
         /* Knappen Forfra og tasten R: fanen nulstiller scenen, maalet bliver */
         P.forfra = function () {
-            if (this.nulstilScene) this.nulstilScene();
+            /* Har fanen ikke sin egen nulstilling, begynder opgaven forfra */
+            if (!this.nulstilScene) { this.vaelg(this.nr); return; }
+            this.nulstilScene();
             this.nulstilHjaelp();
             if (!this.faerdig && !this.venter) this.naesteLinje("", "");
         };

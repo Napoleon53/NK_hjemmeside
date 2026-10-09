@@ -1387,7 +1387,7 @@ kbd {
      .spm     et spoergsmaal med svarene som knapper side om side
      .loest   maalet er loest
    Kortet er centreret med margin, ikke med transform. Hoejden uden for
-   gaettet maa ikke overstige kortZone() i js/fane.js (218 px, 200 px paa
+   gaettet maa ikke overstige kortZone() i js/fane.js (198 px, 172 px paa
    lave skaerme); selvtesten maaler det, ogsaa med et hint eller en
    forklaring til et forkert svar i kortets nederste raekke.
    --------------------------------------------------------------------- */
@@ -1541,8 +1541,7 @@ kbd {
 .sk-bund.peger .st-tekst { color: #cfe6fa; }
 .sk-bund.ryster { animation: st-ryst 0.4s ease-in-out 1; }
 
-/* Under et gaet: kun et lille omrids, der springer gaettet over */
-.knap.hjaelp.lille { min-width: 0; padding: 5px 12px; font-size: 0.82rem; font-weight: 600; }
+/* Under et gaet er raekken vaek: gaettet er gratis, og der er ingen hjaelpeknap */
 .scenekort.gaet .sk-bund { margin-top: 10px; padding-top: 0; border-top: 0; }
 
 /* Gaettet: stoerre, og det eneste fyldte gule paa skaermen */
@@ -1609,6 +1608,22 @@ kbd {
 }
 
 .scenekort.gaet.blink { animation: gk-blink 1s ease-in-out 1, gk-puls 2.2s ease-in-out 1s infinite; }
+
+/* Laasen: eleven klikkede paa forsoeget, men skal foerst goere det, kortet siger.
+   Kortet blinker tre gange; er det groent, er det knappen Naeste, der blinker. */
+@keyframes sk-blink {
+    0%, 33%, 66%  { box-shadow: 0 0 0 12px rgba(242, 197, 61, 0.5); }
+    16%, 50%, 100% { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); }
+}
+
+@keyframes sk-blink-knap {
+    0%, 33%, 66%  { box-shadow: 0 0 0 10px rgba(126, 224, 168, 0.75); background-color: var(--groen); }
+    16%, 50%, 100% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); background-color: var(--groen-mork); }
+}
+
+.scenekort.opgave.blink,
+.scenekort.spm.blink { animation: sk-blink 1s ease-in-out 1; }
+.scenekort.loest.blink .sk-videre { animation: sk-blink-knap 1s ease-in-out 1, bank-groen 1.7s ease-out 1s infinite; }
 
 /* Lave skaerme (rammen i menuen paa en baerbar): kortet fylder mindre */
 @media (max-height: 720px) {

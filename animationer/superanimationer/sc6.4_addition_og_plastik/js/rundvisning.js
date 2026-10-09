@@ -18,7 +18,7 @@
             { sel: "#a-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålene, forklaringen og hintene. Den gule knap giver ét hint ad gangen og til sidst svaret. Der er seks opgaver, og den første begynder med et gæt." },
             { sel: "#a-anker-mol", titel: "Molekylet", tekst: "Molekylet er tegnet som strukturformel. To streger mellem to carbonatomer er en dobbeltbinding." },
             { sel: "#a-anker-hylde", titel: "Hylden", tekst: "Træk et molekyle fra hylden hen til dobbeltbindingen. Så åbner den sig, og molekylets to dele sætter sig på hver sit carbonatom." },
-            { sel: "#a-forfra", titel: "Nyt molekyle", tekst: "Lægger et nyt molekyle klar, så du kan prøve igen." },
+            { sel: "#a-forfra", titel: "Nyt molekyle", tekst: "Kommer frem, når du har brugt et andet molekyle end det, opgaven beder om. Den lægger et nyt molekyle klar." },
             { sel: "#a-regnkort", titel: "Det har du prøvet", tekst: "Her samles reaktionsskemaerne for de additioner, du har lavet." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "På fane 2 bruger du bromvand til at afgøre, om et stof er mættet eller umættet. På fane 3 sætter du ethenmolekyler sammen til plastik." }
         ],
@@ -33,7 +33,6 @@
             { sel: "#p-anker-pulje", titel: "Ethenmolekylerne", tekst: "Træk et ethenmolekyle hen til et andet eller hen til en af kædens ender. Der kommer hele tiden nye." },
             { sel: "#p-anker-kaede", titel: "Kæden", tekst: "Hvert farvet felt kommer fra ét ethenmolekyle. De gule, stiplede cirkler i enderne er ledige pladser." },
             { sel: "#p-vaerktoej", titel: "Zoom ud", tekst: "Viser en hel kæde i polyethen. Dit stykke er den lille gule streg." },
-            { sel: "#p-forfra", titel: "Ny kæde", tekst: "Begynder forfra på kæden til den opgave, du er ved." },
             { sel: "#p-kaedekort", titel: "Kæden", tekst: "Her står, hvor mange ethenmolekyler kæden er lavet af." }
         ]
     };

@@ -13,26 +13,26 @@
 
     var TURE = {
         "fane-bh": [
+            { sel: "#bh-kasse", titel: "Målet og tekstboksen", tekst: "Øverst står målet. Under det står, hvad du skal nu, og hvad der gik galt. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#bh-laerred", titel: "Beholderen og grafen", tekst: "Til venstre er molekylerne i en lukket beholder. Til højre er reaktionsbrøken Y som funktion af x. Den gule linje er K." },
             { sel: ".bh-skyder", titel: "x", tekst: "Skyderen bestemmer x: hvor meget af stoffet der er omsat. Du kan også trække på grafen." },
             { sel: "#bh-skema", titel: "Skemaet", tekst: "Start, ændring og ligevægt for hvert stof. Tallene følger skyderen. I nogle mål skriver du selv udtrykkene med x." },
             { sel: "#bh-y", titel: "Y og K", tekst: "Reaktionsbrøken regnet med koncentrationerne i skemaet. Ved ligevægt er Y = K." },
-            { sel: "#bh-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
             { sel: "#bh-opgaver", titel: "Målene", tekst: "Otte mål på tre reaktioner. Et mål, du når uden at se svaret, får en stjerne." },
             { sel: ".faneknapper", titel: "Opgaverne", tekst: "På fanerne Uden x og Med x regner du de rigtige opgaver." }
         ],
         "fane-ux": [
-            { sel: "#ux-hoved", titel: "Opgaven", tekst: "Reaktionsskemaet og de tal, der er oplyst. Klik på et tal for at sætte det ind i det felt, du står i." },
+            { sel: "#ux-hoved", titel: "Opgaven", tekst: "Reaktionsskemaet. Når ligevægtsloven er skrevet rigtigt, kommer opgavens tal frem under det. Klik på et tal for at sætte det ind i det felt, du står i." },
             { sel: "#ux-delbar", titel: "Delene", tekst: "Opgaven regnes i dele. Den gule er den, du er ved." },
-            { sel: "#ux-dele", titel: "Tavlen", tekst: "Skriv i felterne, og tryk Tjek eller Enter. En løst del bliver til én linje, som den skal stå i din besvarelse." },
-            { sel: "#ux-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#ux-dele", titel: "Tavlen", tekst: "Skriv i felterne, og tryk Tjek eller Enter. En løst del bliver stående, som den skal stå i din besvarelse." },
+            { sel: "#ux-status", titel: "Tekstboksen", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#ux-opgaver", titel: "Opgaverne", tekst: "Fem opgaver: tre, hvor Kc skal findes, og to med en ukendt koncentration. Når en opgave er løst, står hele besvarelsen i kortet ovenover." }
         ],
         "fane-mx": [
-            { sel: "#mx-hoved", titel: "Opgaven", tekst: "Reaktionsskemaet og de tal, der er oplyst. Klik på et tal for at sætte det ind i det felt, du står i." },
+            { sel: "#mx-hoved", titel: "Opgaven", tekst: "Reaktionsskemaet. Når ligevægtsloven er skrevet rigtigt, kommer opgavens tal frem under det. Klik på et tal for at sætte det ind i det felt, du står i." },
             { sel: "#mx-delbar", titel: "Delene", tekst: "Ligevægtsloven, hvad x er, skemaet, ligningen, CAS, løsningen og koncentrationerne. Den gule er den, du er ved." },
             { sel: "#mx-dele", titel: "Tavlen", tekst: "Skriv i felterne, og tryk Tjek eller Enter. Skemaet bliver stående, så du kan bruge det i ligningen og til at prøve løsningerne." },
-            { sel: "#mx-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#mx-status", titel: "Tekstboksen", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#mx-opgaver", titel: "Opgaverne", tekst: "Otte opgaver i Let, Middel og Svær. Når en opgave er løst, står hele besvarelsen og kurven fra start til ligevægt i kortet ovenover." }
         ]
     };

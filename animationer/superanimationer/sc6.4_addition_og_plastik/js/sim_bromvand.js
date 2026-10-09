@@ -29,6 +29,7 @@
         this.mikroGlas = -1;
         this.traek = null;
         this.over = -1;
+        this.andetKlik = 0;       /* klik paa glas, opgaven ikke handler om */
         this.startFane(D.B_MAAL);
         this.visPanel();
     }
@@ -45,6 +46,7 @@
             this.opgaver.forEach(function (x, i) { if (mig.status[i].loest) mig.navngivet[x.glas] = true; });
         }
         this.traek = null;
+        this.andetKlik = 0;
         this.glas[o.glas].nulstil();
         this.set[o.glas] = false;
         if (o.kendt) this.navngivet[o.glas] = true;
@@ -63,6 +65,8 @@
     };
 
     P.nulstilScene = function () {
+        /* Et friskt glas (tasten R) hoerer til forsoeget */
+        if (!this.iForsoeg()) return;
         var i = this.opg.o.glas;
         this.traek = null;
         this.glas[i].nulstil();
@@ -98,13 +102,6 @@
         if (gl.m >= 1) return "Vent, til de to lag i glas " + b + " har skilt sig igen.";
         if (gl.m > 0) return "Glas " + b + " er ikke rystet nok endnu. Ryst glas " + b + " lidt mere.";
         return "";
-    };
-
-    /* Spoergsmaalene gaelder glasset, naar det er rystet */
-    P.spmLinje = function () {
-        var o = this.opg.o, gl = this.glas[o.glas];
-        if (gl.m >= 1) return "";
-        return "Spørgsmålet gælder glas " + D.GLAS[o.glas].b + ", når det er rystet. Klik på glasset." + D.SAA_SVAR;
     };
 
     P.forsoegSvar = function (o) {
@@ -173,7 +170,7 @@
             this.mikro.opdater(dt);
         }
         NK.el("b-anker-lup").hidden = lup < 0;
-        if (this.faerdig || this.venter || g.fase !== "forsoeg") return;
+        if (!this.iForsoeg()) return;
         var i = g.o.glas;
         if (this.glas[i].faerdig()) {
             this.vaelgGlas(i);
@@ -184,7 +181,7 @@
     /* Det glas, der skal rystes nu, eller -1 */
     P.peger = function () {
         var g = this.opg;
-        if (this.faerdig || this.venter || g.fase !== "forsoeg") return -1;
+        if (!this.iForsoeg()) return -1;
         var gl = this.glas[g.o.glas];
         return gl.m > 0 || gl.rystes() ? -1 : g.o.glas;
     };
@@ -246,17 +243,33 @@
         this.over = -1;
         if (!pt || !this.lay) return null;
         var i = this.glasVed(pt);
-        if (i >= 0) { this.over = i; return this.gaetNu() ? "klik" : "greb"; }
+        if (i >= 0) { this.over = i; return this.iForsoeg() && i === this.opg.o.glas ? "greb" : "klik"; }
         return this.lupVed(pt) ? "klik" : null;
     };
 
     P.nedScene = function (pt) {
-        if (this.gaetNu()) return false;          /* gaettet foerst: klikket faar kortet til at blinke */
         var i = this.glasVed(pt);
         if (i < 0 || this.glas[i].auto > 0) return false;
+        /* Laasen: et glas kan kun rystes, mens kortet viser et forsoeg, og kun det
+           glas, opgaven handler om. Ellers blinker kortet. */
+        if (this.spaer()) return false;
+        if (i !== this.opg.o.glas) { this.andetGlas(i); return false; }
+        if (this.glas[i].m >= 1) return false;
         this.traek = { i: i, x0: pt.x, y0: pt.y, x: pt.x, y: pt.y, vej: 0 };
         this.glas[i].holdt = true;
         return true;
+    };
+
+    /* Et klik paa et glas, opgaven ikke handler om: det bliver ikke rystet */
+    P.andetGlas = function (i) {
+        var g = D.GLAS[i], navn = this.glasNavn(i), rystet = !!navn && this.glas[i].m >= 1;
+        this.kortBlink();
+        this.andetKlik++;
+        if (this.andetKlik >= 4) { this.andetKlik = 0; this.kortBesked(D.PAASKE.ryst, 6); return; }
+        /* et glas, der er faerdigt, kan ses i luppen igen */
+        if (rystet) this.vaelgGlas(i);
+        this.kortBesked(D.andetGlas(g.b, D.GLAS[this.opg.o.glas].b, rystet ? navn : "", rystet ? D.set(g.b, K.udfald(g.stof)) : "") +
+            (rystet && g.stof === "benzen" ? " " + D.GLAS_KLIK.benzen : ""), 7);
     };
 
     P.flytScene = function (pt) {
@@ -279,30 +292,20 @@
         if (t.vej < 8) { this.klikGlas(t.i); return; }
         this.vaelgGlas(t.i);
         this.nulstilHjaelp();
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+        if (this.iForsoeg()) this.naesteLinje("", "");
     };
 
     /* Et klik paa et glas ryster det */
     P.klikGlas = function (i) {
-        var gl = this.glas[i], g = D.GLAS[i], rystetFoer = gl.m >= 1;
-        if (!gl.klikRyst()) return;
+        if (!this.iForsoeg() || i !== this.opg.o.glas) return;
+        if (!this.glas[i].klikRyst()) return;
         this.vaelgGlas(i);
         this.nulstilHjaelp();
-        if (rystetFoer) {
-            if (gl.rystN >= 4) { this.kortBesked(D.PAASKE.ryst, 6); return; }
-            var hvad = D.set(g.b, K.udfald(g.stof));
-            this.kortBesked("Glas " + g.b + " er rystet før. " + hvad + (g.stof === "benzen" && this.navngivet[i] ? " " + D.GLAS_KLIK.benzen : ""), 7);
-            return;
-        }
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+        this.naesteLinje("", "");
     };
 
     P.klikScene = function (pt) {
         if (!this.lay) return;
-        if (this.gaetNu()) {
-            if (this.glasVed(pt) >= 0) this.gaetBlink("Så ryster du glasset.");
-            return;
-        }
         var hit = this.lupVed(pt);
         if (!hit) return;
         var v = K.VAESKE[D.GLAS[this.lupNu()].stof];

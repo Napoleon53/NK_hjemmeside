@@ -54,8 +54,8 @@ tage fat i det.
 
 ### Mønsteret fulgte med undervejs
 
-Mens animationen blev bygget, gav brugeren fire tilbagemeldinger på
-`sc7.5_staerke_og_svage_syrer`, og de gælder også her:
+Mens animationen blev bygget, og samme aften, gav brugeren seks
+tilbagemeldinger på `sc7.5_staerke_og_svage_syrer`, og de gælder også her:
 
 * Opgaven, spørgsmålene og svarene står på ét kort øverst i scenen, ikke i
   panelet.
@@ -67,6 +67,16 @@ Mens animationen blev bygget, gav brugeren fire tilbagemeldinger på
 * Al tekst er samlet over animationen: der er ingen statuslinje nederst.
   Hint, forklaringen til et forkert svar og hintknappen er kortets nederste
   række.
+* Forsøget er låst, til opgaven står der ("nogle gange er det muligt at
+  starte animationen inden man har fået spørgsmålet"): eleven kan kun sætte
+  noget i gang, mens kortet viser et forsøg, og kun det, opgaven beder om.
+  Under et gæt, under et spørgsmål, og når kortet er grønt, blinker kortet i
+  stedet (`this.spaer()` i `js/fane.js`, kaldt først i fanernes `nedScene`).
+  Knapperne Zoom ud og Nyt molekyle er kun fremme, når de skal bruges.
+* Lidt tekst på kortet ("stadig en smule for meget tekst"): et forsøg er
+  højst 95 tegn, et spørgsmål 105, et svar 34, et hint 100, forklaringen til
+  et forkert svar 110 og til det rigtige 160. Under et gæt er der ingen
+  hintknap.
 
 `js/fane.js` og grundlaget i `css/stil.css` er taget fra sc7.5. Ændres
 mønsteret dér, hentes de to filer derfra igen. Det, der er rettet i
@@ -84,8 +94,13 @@ tegningen på gætkortet (`figur`).
   opgave 6.4.5 (læg atomerne sammen).
 * **Zoom ud og fryseposen på fane 3**, og at brom ikke kan sætte sig på
   kæden (opgave 6.4.mad.2).
-* **Fane 2 har ingen knap til et nyt glas.** Tasten R og et klik på
-  opgaven i listen stiller et friskt glas frem.
+* **Kun fane 1 har en knap til at begynde forfra** (Nyt molekyle), og den
+  kommer først frem, når eleven har brugt et andet molekyle end det,
+  opgaven beder om. Ellers er det tasten R (kun i et forsøg) og et klik på
+  opgaven i listen.
+* **Et forkert molekyle i et forsøg giver sit produkt** (brom i opgaven om
+  hydrogen giver 1,2-dibromethan) i stedet for at blive afvist. Det er en
+  fejl inden for opgaven, og kortet siger, hvad der skete.
 
 ## Fane 1: Addition (`#addition`)
 
@@ -111,9 +126,8 @@ panelet husker skemaerne. Seks opgaver:
 6. **Propen.** Brom på propen, og formlen for produktet (C₃H₆Br₂).
 
 Bruger eleven et andet molekyle end det, opgaven beder om, sker additionen
-alligevel, og kortet siger, hvad produktet blev, og at Nyt molekyle lægger
-et nyt klar. Et molekyle, der slippes på et produkt, kommer tilbage:
-dobbeltbindingen er brugt.
+alligevel, kortet siger, hvad produktet blev, og knappen Nyt molekyle kommer
+frem og banker. Uden for et forsøg kan intet trækkes: kortet blinker.
 
 ## Fane 2: Bromvand (`#bromvand`)
 
@@ -121,7 +135,10 @@ Fem reagensglas med prop, A til E (`D.GLAS`). Nederst orange bromvand,
 øverst et farveløst carbonhydrid. Et klik ryster glasset i halvandet
 sekund; man kan også tage fat i det og ryste det med musen. Lagene blandes
 og skiller igen. Med en alken er farven væk, ellers er den flyttet op i det
-øverste lag.
+øverste lag. Kun det glas, opgaven handler om, kan rystes, og kun i
+forsøget; et klik på et andet glas får kortet til at blinke og sige, hvilket
+glas opgaven handler om (et færdigt glas vises i luppen igen). Så kan glas D
+og E ikke rystes, før deres gæt er stillet.
 
 * **Glas A, B og C** (hex-1-en, hexan, cyclohexen): eleven ryster, ser,
   svarer på, hvor brommet er blevet af, og afgør, om stoffet er mættet
@@ -157,14 +174,16 @@ Panelet samler, hvad der skete i hvert glas.
 
 Kortet øverst har al tekst. Kortets nederste række viser hint (tre trin og
 til sidst svaret), forklaringen til et forkert svar og svaret på et klik i
-scenen, og dér sidder den gule hintknap. Det, der skal trækkes i eller
+scenen, og dér sidder den gule hintknap (ikke under et gæt: gættet er
+gratis). Det, der skal trækkes i eller
 klikkes på, har en gul ring, der pulserer, og et lille gult skilt. Det, et
 spørgsmål handler om, har en rolig gul ring. Et gæt står stort og gult, og
-et klik på forsøget før gættet får kortet til at blinke. Teorien ligger bag
+et klik på forsøget uden for et forsøg får kortet til at blinke (er kortet
+grønt, er det knappen Næste, der blinker). Teorien ligger bag
 knappen Teori, rundvisningen bag `?`.
 
 Påskeæg: tredje gang noget trækkes hen til ethan i opgave 5, og fjerde
-klik på et glas, der er rystet.
+klik på et glas, opgaven ikke handler om.
 
 ## Modellen og forenklingerne
 
@@ -248,10 +267,12 @@ bindinger før og efter, at kun alkenerne affarver bromvand, at brommet
 aldrig forsvinder i regnskabet, at luppen viser det, modellen siger, alle
 16 opgaver (selv med mus og klik, med forkerte svar og med Vis svaret), at
 startbilledet på hver fane kun viser det, første trin har brug for, at der
-ikke står tekst nederst i scenen, at intet er indforstået, sproget og
-layoutet fra 1100 × 620 til 1600 × 950 (kortets højde i alle dele af alle
-opgaver, også med hvert hint og hvert forkert svar). Sidst kørt 9. oktober
-2026: ALT OK (148 påstande).
+ikke står tekst nederst i scenen, låsen (et gennemløb af alle dele af alle
+opgaver, der klikker på hver ting i scenen: uden for et forsøg må intet
+ændre sig, og kortet skal blinke), at intet er indforstået, at teksterne
+holder længderne, sproget og layoutet fra 1100 × 620 til 1600 × 950
+(kortets højde i alle dele af alle opgaver, også med hvert hint og hvert
+forkert svar). Sidst kørt 9. oktober 2026: ALT OK (161 påstande).
 
 ## Menuen
 

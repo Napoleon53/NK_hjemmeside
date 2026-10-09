@@ -160,15 +160,16 @@ Sådan blev det (Claudes udformning):
   forklaringen til et forkert svar (rød, lige under svarknapperne), det,
   fanen har at tilføje til opgaveteksten, og svaret på et klik i scenen.
   Scenen går helt til bunds (`baand()` giver højden 0).
-- **Kortets plads** (`kortZone`) er 218 px (200 px på lave skærme): det, der
-  før var kortets plads plus statuslinjens højde. Lupperne er lige så store
-  som før.
+* **Kortets plads** (`kortZone`) blev 218 px (200 px på lave skærme): det, der
+  før var kortets plads plus statuslinjens højde. (Siden sat ned til 198 og
+  172 px, se næste tilføjelse.)
 * **Kun det, kortet ikke selv siger.** Linjer som "Vælg et svar på kortet" og
   "Gæt først i opgavekortet" er væk; `sceneLinje` giver en tom tekst, når
   opgaveteksten er nok.
-* **Hintknappen** sidder i kortets nederste række. Under et gæt er den et
-  lille omrids, Spring gættet over. Når opgaven er løst, er rækken væk, og
-  kortets grønne knap fører videre.
+* **Hintknappen** sidder i kortets nederste række. Under et gæt er den væk
+  (først var den et lille omrids, Spring gættet over; taget ud i næste
+  tilføjelse). Når opgaven er løst, er rækken væk, og kortets grønne knap
+  fører videre.
 * **Efter et forsøg** med et gæt eller en iagttagelse (`set`) står det, eleven
   så, alene på det grønne kort med knappen Næste spørgsmål (mærket Godt ✓,
   eller Forsøget ✓, når gættet ikke holdt). Før stod det i linjen forneden.
@@ -178,6 +179,47 @@ Sådan blev det (Claudes udformning):
 * Mærker, der sidder på tingene selv (sedlen på glasset, det gule skilt "Klik
   for at se i luppen", "Kalk" under skålen, skiltene i luppen), er blevet i
   scenen.
+
+### Tilføjelsen 9. oktober 2026: mindre tekst, og en lås på forsøget
+
+Brugeren: "Fint arbejde. Men der er stadig en smule for meget tekst, og nogle
+gange er det muligt at starte animationen inden man har fået spørgsmålet."
+
+Sådan blev det (Claudes udformning):
+
+* **Låsen.** Eleven kan kun sætte noget i gang i scenen, mens kortet viser et
+  forsøg, og kun det, opgaven beder om. Under et gæt, mens et spørgsmål står
+  på kortet, og mens kortet er grønt og venter på Næste, sker der intet ved
+  et klik på et glas, skålen eller en knap: kortet blinker i stedet (er det
+  grønt, er det knappen Næste, der blinker). Koden er `iForsoeg()`, `spaer()`
+  og `kortBlink()` i `js/fane.js`; hver fane begynder det, der sætter noget i
+  gang, med `if (this.spaer()) return;`.
+  * Fane 1: luppen over et glas åbner kun i den opgave, der beder om netop
+    det glas (`forsoeg.aabn` i `js/data.js`). Før kunne begge lupper åbnes,
+    så snart kalken var i.
+  * Fane 2: kun opgavens glas kan vises i luppen. Før kunne eleven klikke
+    rundt mellem alle fem glas, også mens et spørgsmål om et andet glas stod
+    på kortet.
+  * Fane 3: knapperne Fortynd og Ny saltsyre er kun fremme i et forsøg. Før
+    kunne saltsyren fortyndes videre under spørgsmålene, så tallene i
+    spørgsmålet ikke længere passede med glasset. I den første opgave lukker
+    knappen efter én fortynding.
+  * Fane 1, Hydroner frem og tilbage: det første bytte venter 5 sekunder, så
+    opgaven kan læses først.
+  * At se nærmere på det, der allerede er fremme, er altid i orden: et klik
+    på en partikel i en lup eller på et mærke i signaturen.
+* **Mindre tekst.** Alle tekster på kortet er skrevet kortere, og linjer, der
+  gentog kortet, er væk ("Gæt først ...", "Se, hvor meget kalken bruser ...",
+  "Luppen viser glas B. Klik på glas A." og linjerne under en fortynding;
+  mærket over glasset siger stadig "9 tiendedele hældes fra"). Grænserne, som
+  selvtesten tæller: et spørgsmål højst 105 tegn (før 118), et svar 34 (før
+  46), et forsøg 95 (før 150), et hint 100, forklaringen til et forkert svar
+  110 og forklaringen til det rigtige 160. Navnet på glasset eller syren er
+  blevet i hver tekst (intet indforstået).
+* **Under et gæt** er der kun gættet på kortet: knappen Spring gættet over er
+  væk.
+* **Kortets plads** (`kortZone`) er sat ned til 198 px (172 px på lave
+  skærme), så lupperne er blevet 20 til 28 px højere.
 
 ### Valg, brugeren ikke har taget stilling til
 
@@ -254,9 +296,11 @@ nederste række viser hint og forklaringen til et forkert svar; den bliver rød
 og ryster ved en fejl. Den gule knap i samme linje giver ét
 hint ad gangen (tre trin) og til sidst svaret: Giv et hint er fyldt gul, Vis
 svaret kun et gult omrids, og knappen lyser stille op efter et forkert svar.
-Det, der skal klikkes på eller trækkes i, har en gul ring og et lille gult
-skilt. Koden til kortet er `visKort`, `kortHTML`, `slutNu`, `videreTekst`,
-`kortZone` og `gaetBlink` i `js/fane.js`. Teorien ligger bag knappen Teori, rundvisningen bag `?`.
+Under et gæt er knappen væk. Det, der skal klikkes på eller trækkes i, har en
+gul ring og et lille gult skilt, og alt andet i scenen er låst, til kortet
+viser et forsøg (et klik får kortet til at blinke). Koden til kortet er
+`visKort`, `kortHTML`, `slutNu`, `videreTekst`, `kortZone`, `kortBlink`,
+`iForsoeg` og `spaer` i `js/fane.js`. Teorien ligger bag knappen Teori, rundvisningen bag `?`.
 
 Et klik på en partikel i en lup eller på et mærke i signaturen siger, hvad
 den er. Påskeæg: tre klik på den
@@ -335,7 +379,7 @@ tit der byttes, i `interval` i `js/lup.js`.
 
 ## Genveje
 
-<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>R</kbd> forfra (stil opgaven op igen) ·
+<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>R</kbd> forfra (stil opgaven op igen; på fane 3 ny saltsyre, kun i et forsøg) ·
 <kbd>P</kbd> pH-meter · <kbd>Enter</kbd> tjek tavlen · <kbd>H</kbd>
 rundvisning · <kbd>T</kbd> teori · <kbd>Esc</kbd> luk. Direkte links:
 `#glas`, `#styrke` og `#fortynd`.
@@ -349,14 +393,16 @@ skaber molekyler, at kalken bruser efter [H₃O⁺], alle 15 mål (selv med mus
 og klik, med forkerte svar og med Vis svaret), at startbilledet på hver fane
 kun viser det, første trin har brug for, at opgaven står på kortet i scenen
 og ikke i panelet, at forklaringen til et løst mål står på det grønne kort
-med knappen videre, at der ingen tekst står nederst i scenen, at et klik på forsøget
-før gættet får kortet til at blinke, at formen følger stoffet, at intet er
+med knappen videre, at der ingen tekst står nederst i scenen, at låsen holder
+(i alle dele af alle 15 mål prøves et klik på hvert glas, skålen og knapperne:
+uden for et forsøg må intet flytte sig, og kortet skal blinke), at teksterne
+holder længdegrænserne, at formen følger stoffet, at intet er
 indforstået (hver tekst på kortet nævner et glas eller en syre), at glasset,
 spørgsmålet handler om, har en ring, sproget og layoutet fra 1100 × 620 til
 1600 × 950 (kortet måles i alle dele af alle 15 mål: et gæt må ikke dække
 glassene, og alt andet må ikke være højere end sin plads over lupperne).
 Kortets højde måles også med hvert hint og hvert forkert svar. Sidst kørt
-9. oktober 2026: ALT OK (147 påstande).
+9. oktober 2026: ALT OK (157 påstande).
 
 ## Menuen
 

@@ -36,7 +36,7 @@ Bestillingen herunder er skrevet af Claude ud fra det, som ved sb2.1.
    diskriminanten (nu CAS), kvadratrodsmetoden, point og stribe,
    partikelbaggrunden, boksen Hjælp (afløst af `?`) og søjlediagrammet for
    niveau 1. Nyt: fane 1 Beholderen, CAS-vinduet, skemaet og ligningen med
-   elevens egne udtryk, prøv en løsning i skemaet, statuslinjen med hinttrappen
+   elevens egne udtryk, prøv en løsning i skemaet, tekstboksen med hinttrappen
    og hele besvarelsen i panelet, når en opgave er løst.
 3. **Naboerne:** sb2.1 ejer at skrive reaktionsbrøken (her skrives
    ligevægtsloven blot i to felter, og fejlene får sb2.1's beskeder), b2.2 ejer
@@ -45,12 +45,52 @@ Bestillingen herunder er skrevet af Claude ud fra det, som ved sb2.1.
    tiden.
 4. **Loftet:** tre faner. Fane 1 har 3 reaktioner, 8 mål og højst 30 molekyler
    (1 molekyle = 0,010 eller 0,020 M). Fane 2 har 5 opgaver, fane 3 har 8.
-5. **Layoutet:** scene plus panel som sb2.1. Fane 1: beholderen og grafen på ét
-   lærred, skyderen under, skemaet og Y nederst. Fane 2 og 3: opgavens handling
-   over tavlen, tavlen med delene, panelet med opgaven, listen og bagefter hele
-   besvarelsen.
+5. **Layoutet:** scene plus panel som sb2.1. Fane 1: målet og tekstboksen i en
+   kasse øverst, beholderen og grafen på ét lærred, skyderen under, skemaet og
+   Y nederst. Fane 2 og 3: opgavens handling over tavlen, tavlen med delene
+   (tekstboksen står i den del, eleven er ved), panelet med opgaven, listen og
+   bagefter hele besvarelsen.
 
-Kemichael er ikke med. Hjælpen står i statuslinjen som i `sc1.4_afstemning`.
+Kemichael er ikke med. Hjælpen står i tekstboksen: næste skridt, fejl, hint og
+ros, og den gule hintknap i samme boks (hinttrappen er som i
+`sc1.4_afstemning`).
+
+## Rettelser 9. oktober 2026
+
+Brugeren efter brug: "Måske skal der først oplyses stofmængder, når man har
+opskrevet ligevægtsloven korrekt. Når man har beregnet de aktuelle
+koncentration før ligevægt (skriv gerne før ligevægt), så skal beregningerne
+stå på sine egne linjer. Igen som før så undgå at lave en tekstlinje med hint
+helt nederst i animationen. Byg hellere tekstboksen ind, så den er naturligt
+mere synlig".
+
+* **Tallene kommer efter ligevægtsloven.** Rækken Oplyst på tavlen (fane 2 og
+  3) er skjult, mens ligevægtsloven skrives, og kommer frem med et gult glimt,
+  når den er rigtig. Pladsen er sat af, så intet flytter sig, og tekstboksen
+  siger, at tallene nu står under reaktionsskemaet. Det gælder alle tre
+  opgavetyper, ikke kun stofmængderne. Opgaveteksten i panelet har stadig
+  tallene (det er opgaven, som den ville stå på papir).
+* **Beregningerne på egne linjer.** Koncentrationerne står med én beregning pr.
+  linje og lighedstegnene under hinanden, formlen c = n / V øverst (fane 2),
+  både mens eleven regner, og når delen er løst, og også i besvarelsen i
+  panelet. Fane 3's koncentrationer med x sat ind står på samme måde.
+  Etiketten er **Koncentrationerne ved ligevægt**, ikke "før ligevægt":
+  opgaverne oplyser stofmængderne ved ligevægt (ellers ville brøken give Y og
+  ikke K<sub>c</sub>). Claudes valg; brugeren er gjort opmærksom på det.
+* **Ingen tekstlinje nederst.** Statuslinjen i bunden af scenen er væk.
+  Tekstboksen (næste skridt, fejl, hint, ros og den gule knap) står på fane 1 i
+  en kasse øverst sammen med målet, og på fane 2 og 3 øverst i den del af
+  tavlen, eleven er ved, lige over felterne. Når en opgave er løst, står
+  svaret og knappen Næste opgave i en grøn boks nederst på tavlen. På fane 1
+  står forklaringen til målet (`slut` i `D.MAAL`) i den grønne boks i stedet
+  for i panelet, og linjen under målet siger kun det, målet ikke selv siger.
+  Giv et hint er fyldt gul, Vis svaret et omrids. Forfra står ved
+  opgavelinjen (fane 2 og 3) og ved skyderen (fane 1).
+* **Fundet undervejs:** med en bredere skrift end Segoe UI (Linux) var skemaet
+  med fire stoffer på fane 1 for bredt, så sidste kolonne blev skåret af. Nu
+  står tallet under udtrykket, når skemaet ikke kan være der (`tilpasSkema`).
+  På en lav skærm må beholderen blive lavere (140 px), når CAS' løsninger
+  fylder forneden, og kan det stadig ikke være der, kan fane 1 rulles.
 
 ## Fane 1: Beholderen
 
@@ -76,8 +116,9 @@ Påskeægget: et klik på låget tager det af, og gassen slipper ud.
 ## Fane 2: Uden x
 
 Den gamles niveau 1. Kc ud fra stofmængder (NOCl, NH₃, vandgas):
-ligevægtsloven › c = n / V (formlen først, så tallene) › tallene ind i
-ligevægtsloven › resultatet og enheden. En ukendt koncentration (phosgen,
+ligevægtsloven › c = n / V (formlen først, så tallene, én beregning pr. linje)
+› tallene ind i ligevægtsloven › resultatet og enheden. Rumfanget og
+stofmængderne står først på tavlen, når ligevægtsloven er rigtig. En ukendt koncentration (phosgen,
 SO₃): ligevægtsloven › Kc og de kendte tal ind, et bogstav for den ukendte ›
 CAS › afgør, hvilken løsning der kan bruges (SO₃ giver ±0,100) › svaret.
 
@@ -99,7 +140,7 @@ phosgen, iod) og to positive (vandgas, HBr, vandgas med forskellig start).
    sat ind med > 0 eller < 0. Kan bruges eller Forkast; et Forkast kræver et
    klik på den koncentration, der bliver negativ. Det er begrundelsen, og den
    står bagefter som "x = −0,128 M forkastes, fordi [SO₂] = −0,128 M < 0."
-7. **Koncentrationerne** med x sat ind, og kontrollen med Kc.
+7. **Koncentrationerne** med x sat ind, én pr. linje, og kontrollen med Kc.
 
 Udtrykkene tjekkes ved at regne dem ud for seks værdier af x, så 2x, 2·x og
 x + x er det samme, og "0,200 M − x" og "0,2-x" er det samme.
@@ -117,6 +158,8 @@ forkastede løsning.
 
 Hintet er en trappe på tre trin (hvad man ser på › hvad der står › svaret),
 og knappen viser til sidst svaret. Et stof, hintet handler om, lyser gult.
+Beskederne og hintet står i tekstboksen ved det, eleven arbejder med, aldrig
+nederst i scenen.
 
 ## Forenklinger
 
@@ -144,8 +187,9 @@ js/data.js          stofferne, de tre reaktioner og otte mål på fane 1, de
 js/model.js         ligevægtsloven, Kc's enhed, parseren til elevens udtryk,
                     pladserne a + b·x, polynomierne og CAS, dommen over
                     ligevægtsloven (efter sb2.1) og hinttrappen til den
-js/fane.js          det fælles: listen, statuslinjen, knappen og skemaet
-js/regn.js          fane 2 og 3: delene, felterne, tjek, hint og svar
+js/fane.js          det fælles: listen, tekstboksen, knappen og skemaet
+js/regn.js          fane 2 og 3: delene, felterne, tjek, hint og svar;
+                    flytter tekstboksen med den del, eleven er ved
 js/sim_beholder.js  fane 1: molekylerne, grafen, skyderen og målene
 js/rundvisning.js   rundvisningen bag ?
 js/app.js           faneskift, tastatur og løkken
@@ -172,7 +216,13 @@ igennem med én typisk fejl i hver del, at alle kan løses med Vis svaret
 alene, at alle otte mål på fane 1 kan nås, at molekylerne passer med x,
 sproget og layoutet i 1100 × 700, 1440 × 860 og 1600 × 950 (skriften på
 tavlen er mindst 16 px; er der ikke plads, rulles den del frem, eleven er ved).
-Sidst kørt: ALT OK (397 påstande), 2. oktober 2026.
+Fra 9. oktober 2026 også: at opgavens tal er skjult, til ligevægtsloven er
+rigtig, og kommer på den plads, der var sat af; at tekstboksen står øverst i
+den del, eleven er ved, og i en boks nederst på tavlen, når opgaven er løst;
+at hver beregning af en koncentration står på sin egen linje med
+lighedstegnene under hinanden; at der ingen statuslinje er; og at fane 1 kan
+være i scenen med et hint og med forklaringen i tekstboksen.
+Sidst kørt: ALT OK (599 påstande), 9. oktober 2026 (Linux, headless Chrome).
 
 ## Til menuen
 

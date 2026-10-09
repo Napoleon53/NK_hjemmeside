@@ -1,9 +1,10 @@
 /* =====================================================================
    sb2.3 - Ligevægtsberegninger
-   Stilark. Grundlaget er sb2.1 (sc1.4 med statuslinjen). Nyt nederst:
-   fane 1 med beholderen, skyderen og skemaet, og regnestykket paa
-   tavlen paa fane 2 og 3 (felterne fra sb9.3, skemaet, CAS og
-   loesningerne).
+   Stilark. Grundlaget er sb2.1 (sc1.4). Nyt nederst: fane 1 med
+   beholderen, skyderen og skemaet, og regnestykket paa tavlen paa fane 2
+   og 3 (felterne fra sb9.3, skemaet, CAS og loesningerne). Der er ingen
+   statuslinje nederst i scenen: tekstboksen er bygget ind i
+   arbejdsomraadet (se TEKSTBOKSEN).
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
    dansk komma. Dansk komma bruges kun i tekst, som brugeren laeser.
    ===================================================================== */
@@ -155,8 +156,8 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .fane.aktiv { display: grid; }
 
-/* Scenen: vaeggen fra sc1.4 tegnet med CSS, tavlen og bakken ovenpaa og
-   statuslinjen nederst. Skriften paa tavlen foelger scenens stoerrelse. */
+/* Scenen: vaeggen fra sc1.4 tegnet med CSS og tavlen ovenpaa. Skriften
+   paa tavlen foelger scenens stoerrelse. */
 .scene {
     position: relative;
     min-width: 0;
@@ -467,31 +468,36 @@ kbd {
 .rundvisning-knapper .knap { flex: 1; justify-content: center; }
 
 /* ---------------------------------------------------------------------
-   STATUSLINJEN nederst i scenen (som sc1.4): naeste skridt, fejl, hint og
-   ros, og den ene knap. Her staar den i scenens kolonne, ikke oven paa
-   et laerred.
+   TEKSTBOKSEN: naeste skridt, fejl, hint og ros, og den ene gule knap.
+   Den er bygget ind i arbejdsomraadet (brugeren 9. oktober 2026: ingen
+   tekstlinje med hint nederst i scenen): paa fane 1 i kassen over
+   beholderen sammen med maalet, paa fane 2 og 3 oeverst i den del af
+   tavlen, eleven er ved. Pladsen til to linjer er sat af, saa intet
+   flytter sig, naar en fejl eller et hint kommer.
    --------------------------------------------------------------------- */
-.statuslinje {
-    position: relative;
-    flex: 0 0 auto;
-    z-index: 4;
+.tekstboks {
+    --tb-fs: 1rem;
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: 68px;
-    padding: 10px 14px;
-    border-top: 1px solid #33343f;
-    border-left: 5px solid #4a4a58;
-    background-color: #191a21;
+    min-height: calc(var(--tb-fs) * 2.9 + 14px);
+    padding: 7px 8px 7px 12px;
+    border-left: 5px solid #66727d;
+    border-radius: 9px;
+    background-color: rgba(0, 0, 0, 0.3);
+    font-size: var(--tb-fs);
+    text-align: left;
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .st-tekst {
     flex: 1;
+    min-width: 0;
     margin: 0;
-    font-size: 1rem;
+    font-size: 1em;
+    font-weight: 500;
     line-height: 1.45;
-    color: #cfd6de;
+    color: #dfe5ec;
 }
 
 .st-tekst:empty::before { content: "\00a0"; }
@@ -504,7 +510,7 @@ kbd {
     padding: 2px 9px;
     border-radius: 999px;
     background-color: rgba(255, 255, 255, 0.1);
-    font-size: 0.82rem;
+    font-size: 0.82em;
     font-weight: 800;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -512,24 +518,24 @@ kbd {
     vertical-align: 1px;
 }
 
-.b-maerke.stor { font-size: 0.95rem; padding: 3px 12px; }
+.b-maerke.stor { font-size: 0.95em; padding: 3px 12px; }
 
-.statuslinje.skidt { border-left-color: var(--roed); background-color: #231a1c; }
-.statuslinje.skidt .st-tekst { color: #ffb3aa; }
-.statuslinje.skidt .b-maerke { background-color: rgba(224, 84, 70, 0.3); color: #ffd7d2; }
+.tekstboks.skidt { border-left-color: var(--roed); background-color: rgba(224, 84, 70, 0.17); }
+.tekstboks.skidt .st-tekst { color: #ffc4bc; }
+.tekstboks.skidt .b-maerke { background-color: rgba(224, 84, 70, 0.35); color: #ffe1dd; }
 
-.statuslinje.god { border-left-color: var(--groen); background-color: #17241e; }
-.statuslinje.god .st-tekst { color: #b8f0cf; }
-.statuslinje.god .b-maerke { background-color: rgba(63, 174, 114, 0.35); color: #d6ffe8; }
+.tekstboks.god { border-left-color: var(--groen); background-color: rgba(63, 174, 114, 0.17); }
+.tekstboks.god .st-tekst { color: #c6f4d9; }
+.tekstboks.god .b-maerke { background-color: rgba(63, 174, 114, 0.4); color: #e2fff0; }
 
-.statuslinje.hint,
-.statuslinje.gul { border-left-color: var(--gul); background-color: #23201a; }
-.statuslinje.hint .st-tekst,
-.statuslinje.gul .st-tekst { color: #f7e4ab; }
-.statuslinje.hint .b-maerke,
-.statuslinje.gul .b-maerke { background-color: rgba(242, 197, 61, 0.3); color: #fff2cc; }
+.tekstboks.hint,
+.tekstboks.gul { border-left-color: var(--gul); background-color: rgba(242, 197, 61, 0.13); }
+.tekstboks.hint .st-tekst,
+.tekstboks.gul .st-tekst { color: #f9eabb; }
+.tekstboks.hint .b-maerke,
+.tekstboks.gul .b-maerke { background-color: rgba(242, 197, 61, 0.3); color: #fff2cc; }
 
-.statuslinje.peger { border-left-color: var(--blaa); }
+.tekstboks.peger { border-left-color: var(--blaa); }
 
 @keyframes st-ryst {
     0%, 100% { transform: translateX(0); }
@@ -539,33 +545,45 @@ kbd {
     80% { transform: translateX(2px); }
 }
 
-.statuslinje.ryster { animation: st-ryst 0.4s ease-in-out 1; }
+.tekstboks.ryster { animation: st-ryst 0.4s ease-in-out 1; }
 
-/* Hjaelpeknappen: stor nok til at oejet finder den af sig selv */
-.statuslinje .knap {
+/* Hjaelpeknappen: stor nok til at oejet finder den af sig selv, og lige
+   bred med alle sine tekster, saa teksten ved siden af ikke ombrydes paa
+   ny, hver gang knappen skifter */
+.tekstboks .knap {
     flex: 0 0 auto;
     justify-content: center;
-    min-width: 190px;
-    padding: 12px 20px;
-    font-size: 0.98rem;
+    min-width: 12.6em;
+    padding: 0.62em 0.9em;
+    font-size: 0.95em;
     font-weight: 700;
+    white-space: nowrap;
 }
 
+/* Giv et hint er fyldt gul, Vis svaret kun et omrids (README, Kemichael) */
 .knap.hjaelp {
+    border: 2px solid #c79a12;
+    background-color: #ffdf6b;
+    color: #33290a;
+}
+
+.knap.hjaelp:hover:not(:disabled) { background-color: #ffd23e; border-color: #a67f08; }
+
+.knap.hjaelp.svar {
+    border-color: rgba(242, 197, 61, 0.7);
     background-color: rgba(242, 197, 61, 0.12);
-    border-color: rgba(242, 197, 61, 0.65);
     color: #f7e4ab;
 }
 
-.knap.hjaelp:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); color: #fff6d8; }
+.knap.hjaelp.svar:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); color: #fff6d8; }
 
 /* Efter et forkert svar peger knappen stille paa sig selv */
 @keyframes knap-peg {
     0%, 100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
-    50% { box-shadow: 0 0 0 5px rgba(242, 197, 61, 0.22); }
+    50% { box-shadow: 0 0 0 6px rgba(242, 197, 61, 0.32); }
 }
 
-.knap.hjaelp.peg { animation: knap-peg 1.9s ease-in-out infinite; border-color: var(--gul); }
+.knap.hjaelp.peg { animation: knap-peg 1.9s ease-in-out infinite; }
 
 .knap.videre {
     background-color: var(--groen-mork);
@@ -637,8 +655,19 @@ kbd {
 .opg-chip.stjerne .oc-m { color: var(--gul); }
 
 /* ---------------------------------------------------------------------
-   OPGAVELINJEN over tavlen og TAVLEN (farverne fra sc1.4)
+   OPGAVELINJEN over tavlen (med Forfra ved siden af) og TAVLEN (farverne
+   fra sc1.4)
    --------------------------------------------------------------------- */
+.linje-rad {
+    width: min(100%, 1000px);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.linje-rad .opgavelinje { flex: 1; min-width: 0; width: auto; }
+.linje-rad .forfraknap { margin-top: 2px; }
+
 .opgavelinje {
     width: min(100%, 1000px);
     margin: 0;
@@ -892,6 +921,8 @@ kbd {
 /* ---------------------------------------------------------------------
    FANE 1: BEHOLDEREN
    --------------------------------------------------------------------- */
+/* Er skaermen for lav til det hele, kan der rulles, saa intet bliver
+   skaaret af */
 .bh-arbejde {
     flex: 1;
     min-height: 0;
@@ -899,9 +930,25 @@ kbd {
     flex-direction: column;
     gap: 8px;
     padding: 10px 16px 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d5c transparent;
 }
 
 .bh-arbejde .opgavelinje { width: 100%; font-size: max(16px, min(2.2cqw, 3cqh)); }
+
+/* Maalet og tekstboksen samlet over beholderen */
+.opgavekasse {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid #3c3f4d;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.22);
+}
 
 .laerred-ramme {
     position: relative;
@@ -966,6 +1013,13 @@ kbd {
 
 .bh-ice { font-size: 0.98rem; }
 .bh-celle { display: inline-flex; align-items: center; gap: 4px; }
+
+/* Er skemaet for bredt til sin plads (fire stoffer, eller en bredere
+   skrift end Segoe UI), staar tallet under udtrykket: tilpasSkema i
+   js/sim_beholder.js saetter klassen */
+.bh-skema.stak .bh-celle { flex-direction: column; gap: 0; line-height: 1.15; }
+.bh-skema.stak .bh-celle .bh-lig { display: none; }
+.bh-skema.stak .bh-celle .bh-u { font-size: 0.86em; color: #b5c6be; }
 .bh-ice .ice-in { width: 4.8em; }
 .bh-ice th, .bh-ice td { padding: 3px 7px; }
 .bh-u { color: #dfe8e3; }
@@ -1069,6 +1123,17 @@ kbd {
     color: #dfe8e3;
 }
 
+/* Tallene kommer foerst, naar ligevaegtsloven er skrevet rigtigt
+   (brugeren 9. oktober 2026). Pladsen er sat af, saa intet flytter sig. */
+.ot-raekke.skjult { visibility: hidden; }
+
+@keyframes ot-ny {
+    0% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.9); background-color: rgba(242, 197, 61, 0.5); }
+    100% { box-shadow: 0 0 0 9px rgba(242, 197, 61, 0); }
+}
+
+.ot-raekke.ny .ot-tal { animation: ot-ny 0.8s ease-out 2; }
+
 .ot-etiket {
     font-size: max(12.5px, calc(var(--fs) * 0.36));
     font-weight: 700;
@@ -1127,6 +1192,45 @@ kbd {
 
 .rb { padding: calc(var(--fs) * 0.14) calc(var(--fs) * 0.4); border-radius: 10px; }
 .rb.aktiv { background-color: rgba(255, 255, 255, 0.03); box-shadow: inset 0 0 0 2px rgba(242, 197, 61, 0.35); padding-top: calc(var(--fs) * 0.3); padding-bottom: calc(var(--fs) * 0.3); }
+
+/* Tekstboksen staar oeverst i den del, eleven er ved, og alene i en
+   boks nederst, naar opgaven er loest */
+#ux-tavle .tekstboks, #mx-tavle .tekstboks { --tb-fs: max(16px, calc(var(--fs) * 0.56)); }
+.rb.aktiv > .tekstboks { margin-bottom: calc(var(--fs) * 0.3); }
+.rb.slut { padding-left: 0; padding-right: 0; }
+.rb.slut > .tekstboks { min-height: 0; }
+
+/* Beregninger paa hver sin linje med lighedstegnene under hinanden:
+   venstresiden, =, udtrykket og = resultatet i hver sin kolonne */
+.regn { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: calc(var(--fs) * 0.14); }
+.regn.midt { align-items: center; }
+
+.regn-etiket {
+    font-size: max(12.5px, calc(var(--fs) * 0.36));
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8fa39a;
+}
+
+.regn-gitter {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    justify-content: start;
+    align-items: center;
+    gap: calc(var(--fs) * 0.16) 0.4em;
+    font-size: max(15px, calc(var(--fs) * 0.62));
+    font-weight: 600;
+    line-height: 1.3;
+    color: #dfe8e3;
+}
+
+.regn.midt .regn-gitter { font-size: max(16px, calc(var(--fs) * 0.68)); font-weight: 700; color: #e9eee9; }
+.rg-v { justify-self: end; white-space: nowrap; padding: 0 3px; border-radius: 6px; }
+.rg-v.lys { box-shadow: 0 0 0 2px var(--gul); }
+.rg-m, .rg-r { justify-self: start; display: inline-flex; align-items: center; gap: 0.35em; white-space: nowrap; }
+.regn-gitter sub { font-size: 0.7em; }
+.regn .kontrol { font-size: max(15px, calc(var(--fs) * 0.57)); font-weight: 600; line-height: 1.35; }
 
 .rb-linje {
     display: flex;
@@ -1355,11 +1459,8 @@ span.lsn-x { cursor: default; }
 .bh-rod.brug { border-color: #5fcf92; background-color: rgba(63, 174, 114, 0.2); }
 
 /* Koncentrationerne */
-.konc { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: calc(var(--fs) * 0.3) calc(var(--fs) * 0.6); }
-.konc .rb-linje { width: 100%; justify-content: center; }
-.konc-x { font-size: calc(var(--fs) * 0.66); font-weight: 700; color: #9fd3f7; }
-.konc-liste { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(var(--fs) * 0.25) calc(var(--fs) * 0.7); }
-.konc-rad { display: flex; align-items: center; gap: 0.35em; font-size: max(16px, calc(var(--fs) * 0.68)); font-weight: 700; }
+.konc { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: calc(var(--fs) * 0.3) calc(var(--fs) * 0.6); }
+.konc-x { width: 100%; text-align: center; font-size: calc(var(--fs) * 0.66); font-weight: 700; color: #9fd3f7; }
 .konc-lab { display: inline-flex; align-items: center; gap: 0.3em; white-space: nowrap; padding: 0 3px; border-radius: 6px; }
 .konc-lab.lys { box-shadow: 0 0 0 2px var(--gul); }
 .konc .tjekknap { font-size: max(15px, calc(var(--fs) * 0.55)); }
@@ -1379,6 +1480,12 @@ span.lsn-x { cursor: default; }
 .fk-linje b { color: #b8f0cf; }
 .fk-linje .cas-mini { font-size: 0.92em; }
 .fk-skema { margin: 2px 0 8px; overflow-x: auto; }
+.fk-blok { margin: 0 0 7px; overflow-x: auto; }
+.fk-blok .regn { gap: 3px; }
+.fk-blok .regn-etiket { font-size: 0.72rem; }
+.fk-blok .regn-gitter { gap: 4px 0.35em; font-size: 0.9rem; font-weight: 400; color: #dde3ea; }
+.fk-blok .kontrol { font-size: 0.86rem; font-weight: 400; }
+.fk-blok .rs-maerke { display: none; }
 .fk-skema .ice { font-size: 0.82rem; color: #dde3ea; }
 .fk-skema .ice th, .fk-skema .ice td { padding: 2px 6px; }
 .fk-skema .ice th { color: #dde3ea; }
@@ -1400,7 +1507,8 @@ button:focus-visible {
     .top { gap: 10px; padding: 8px 12px; }
     .faneknap { padding: 7px 10px; font-size: 0.82rem; gap: 6px; }
     .faneknap .nr { width: 17px; height: 17px; font-size: 0.65rem; }
-    .statuslinje .knap { min-width: 160px; padding: 11px 14px; }
+    .tekstboks { gap: 10px; }
+    .tekstboks .knap { min-width: 11.6em; padding-left: 0.6em; padding-right: 0.6em; }
 }
 
 @media (max-width: 860px) {
@@ -1416,6 +1524,15 @@ button:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* Fane 1 i en lav scene: mindre luft om kassen og tekstboksen, og
+   beholderen maa blive lavere, naar CAS' loesninger fylder forneden */
+@container (max-height: 700px) {
+    .laerred-ramme { min-height: 140px; }
+    .bh-arbejde { gap: 6px; padding: 8px 12px 6px; }
+    .opgavekasse { gap: 4px; padding: 6px 8px; }
+    .bh-arbejde .tekstboks { padding-top: 5px; padding-bottom: 5px; }
 }
 
 /* Fane 1 i en smal scene: tallet staar under udtrykket i skemaet */

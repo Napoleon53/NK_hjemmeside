@@ -99,6 +99,7 @@
         this.bygSkema();
         this.bygY();
         this.opdaterTal();
+        this.tilpasSkema();
     };
 
     P.promptHTML = function () {
@@ -106,7 +107,6 @@
         var html = '<p class="note-tekst">' + NK.html(m.tekst) + "</p>";
         html += '<p class="spm"><span class="rx-navn">' + NK.html(this.rx.navn) + ", " + NK.html(this.rx.T) + ":</span> " +
             NK.html(M.skemaTekst(this.rx)) + ", K = " + NK.html(M.kTekst(this.rx)) + "</p>";
-        if (this.faerdig) html += '<div class="forklaring"><p>' + NK.html(m.slut) + "</p></div>";
         return html;
     };
 
@@ -130,7 +130,7 @@
         if (m.type === "ligevaegt") {
             var Y = M.Y(this.rx, this.x);
             if (Math.abs(this.x - this.xEq) <= 0.0015 || Math.abs(Y - this.rx.K) <= 0.04 * this.rx.K) {
-                this.loest("ok", NK.html("Y = K ved x = " + t3(this.x) + " M."), "Ligevægt ✓");
+                this.loest("ok", NK.html(m.slut), "Ligevægt ✓");
             }
         }
     };
@@ -356,7 +356,7 @@
             if (!this.naaet) { this.kortBesked("Træk først x helt op, så langt det kan komme.", 3); return; }
             var c = M.vaerdi(M.plads(this.rx, a.s), this.x);
             if (Math.abs(c) < 1e-9) {
-                this.loest("ok", NK.html(M.skriv(a.s) + " er brugt op ved x = " + t3(this.xMax) + " M."), "Rigtigt ✓");
+                this.loest("ok", NK.html(m.slut), "Rigtigt ✓");
                 return;
             }
             this.fejlLinje("Der er stadig " + t3(c) + " M " + M.skriv(a.s) + ". Find det stof, der er 0 i rækken Ligevægt.");
@@ -422,7 +422,7 @@
         this.forkastet = i;
         var b = NK.el("bh-roedder").querySelectorAll(".bh-rod");
         for (var j = 0; j < b.length; j++) b[j].classList.toggle(j === i ? "forkast" : "brug", true);
-        this.loest("ok", NK.html("x = " + NK.tal(r) + " M forkastes: " + M.kon(d.neg) + " = " + M.indsatTekst(this.rx, d.neg, r) + " < 0."), "Forkastet ✓");
+        this.loest("ok", NK.html(this.maal().slut), "Forkastet ✓");
     };
 
     /* ----- Tjek af felterne (maal med udtryk) ------------------------------------------------ */
@@ -446,10 +446,10 @@
         });
         if (!forste) {
             m.raekker.forEach(function (r) { mig.kendt[r] = true; });
-            this.loest("ok", "", "Rigtigt ✓");
+            this.loest("ok", NK.html(m.slut), "Rigtigt ✓");
             return;
         }
-        if (nogen) { this.bygSkema(); this.opdaterTal(); }
+        if (nogen) { this.bygSkema(); this.opdaterTal(); this.tilpasSkema(); }
         this.hintS = forste.s;
         this.visLys();
         if (forste.svar.tom) this.besked(NK.html(forste.svar.besked), "gul");
@@ -467,20 +467,23 @@
     P.efterOpgave = function () {
         this.bygSkema();
         this.opdaterTal();
+        this.tilpasSkema();
         var k = NK.el("bh-cas");
         if (k) k.disabled = true;
     };
 
-    /* ----- Linjen, hint og svar ------------------------------------------------------------ */
+    /* ----- Tekstboksen, hint og svar ---------------------------------------------------------
+       Maalet staar lige over tekstboksen, saa linjen siger kun, hvor og
+       hvordan: det, maalet ikke selv siger. */
     P.trinLinje = function () {
-        var m = this.maal(), rx = this.rx;
-        if (m.type === "ligevaegt") return "Træk i x med skyderen eller på grafen. Y skal være lig med K. Y står under skemaet.";
+        var m = this.maal();
+        if (m.type === "ligevaegt") return "Træk i skyderen eller på grafen. Y og K står nederst til højre i scenen.";
         if (m.type === "udtryk") {
-            return m.raekker.length > 1 ? "Skriv ændringen og ligevægtskoncentrationen med x i felterne. Tallet efter = følger skyderen." :
-                "Skriv ændringerne med x i felterne. Træk lidt i x, og se, hvad der sker i beholderen.";
+            return m.raekker.length > 1 ? "Skriv i felterne i skemaet. Tallet efter = i hvert felt følger skyderen." :
+                "Skriv ændringerne i felterne i skemaets række Ændring.";
         }
         if (m.type === "forkast") {
-            if (!this.roedder) return "Ved ligevægt er Y = K. Det er en ligning i x. Tryk Løs ligningen med CAS.";
+            if (!this.roedder) return "Ved ligevægt er Y = K. Det er en ligning med x. Knappen Løs ligningen med CAS står nederst til højre.";
             return "Klik på den løsning, der ikke kan bruges. På grafen er det grå område kemisk umuligt.";
         }
         if (!this.naaet) return "Træk x så langt op, som det kan komme.";
@@ -536,7 +539,7 @@
         var m = this.maal(), rx = this.rx, mig = this;
         if (m.type === "ligevaegt") {
             this.saetX(Math.round(this.xEq * 1000) / 1000);
-            this.loest("svar", NK.html("Ligevægten ligger ved x = " + t3(this.xEq) + " M."));
+            this.loest("svar", NK.html(m.slut));
             return;
         }
         if (m.type === "udtryk") {
@@ -547,21 +550,19 @@
                 });
                 mig.kendt[r] = true;
             });
-            this.loest("svar", "");
+            this.loest("svar", NK.html(m.slut));
             return;
         }
         if (m.type === "forkast") {
             if (!this.roedder) this.koerCas();
             var i = this.roedder.map(function (q) { return M.dom(rx, q).ok; }).indexOf(false);
             this.forkastet = i;
-            var r = this.roedder[i], d = M.dom(rx, r);
-            this.loest("svar", NK.html("x = " + NK.tal(r) + " M forkastes: " + M.kon(d.neg) + " = " + M.indsatTekst(rx, d.neg, r) + " < 0."));
+            this.loest("svar", NK.html(m.slut));
             return;
         }
         this.saetX(this.xMax);
         this.naaet = true;
-        var op = M.alle(rx).filter(function (b) { return Math.abs(M.vaerdi(M.plads(rx, b.s), mig.xMax)) < 1e-9; })[0];
-        this.loest("svar", NK.html(M.skriv(op.s) + " er brugt op ved x = " + t3(this.xMax) + " M."));
+        this.loest("svar", NK.html(m.slut));
     };
 
     P.enter = function () {
@@ -642,7 +643,15 @@
 
     /* ----- Tegning ------------------------------------------------------------------------- */
     P.tilpas = function () {
+        this.tilpasSkema();
         this.laerred.tilpas();
+    };
+
+    /* Er skemaet for bredt til sin plads, staar tallet under udtrykket */
+    P.tilpasSkema = function () {
+        var w = NK.el("bh-skema");
+        w.classList.remove("stak");
+        if (w.scrollWidth > w.clientWidth + 1) w.classList.add("stak");
     };
 
     P.opdater = function (dt) {

@@ -25,7 +25,7 @@
         if (!b) {
             fejl++;
             var hvor = "";
-            try { var a = W().document.querySelector(".fane.aktiv .statuslinje"); hvor = a ? " [" + a.className + ": " + a.textContent.trim().slice(0, 120) + "]" : ""; } catch (e) { /* intet */ }
+            try { var a = W().document.querySelector(".fane.aktiv .tekstboks"); hvor = a ? " [" + a.className + ": " + a.textContent.trim().slice(0, 120) + "]" : ""; } catch (e) { /* intet */ }
             linjer.push("FEJL: " + tekst + hvor);
         } else linjer.push("ok   " + tekst);
         ud.textContent = linjer.join("\n") + "\n…";
@@ -232,18 +232,55 @@
         }
     }
 
+    /* Tekstboksen staar oeverst i den del, eleven er ved */
+    function boksVedDelen(navn) {
+        var d = W().document, boks = d.getElementById(navn + "-status");
+        var akt = d.querySelector("#" + navn + "-dele .rb.aktiv");
+        return !!akt && akt.firstElementChild === boks && d.getElementById(navn + "-tavle").contains(boks);
+    }
+
+    /* Beregningerne i en del: hver venstreside paa sin egen linje og
+       lighedstegnene under hinanden */
+    function linjerI(blok) {
+        var v = blok.querySelectorAll(".regn-gitter .rg-v"), l = blok.querySelectorAll(".regn-gitter .rg-l");
+        var egne = true, under = true, i;
+        for (i = 1; i < v.length; i++) if (v[i].getBoundingClientRect().top < v[i - 1].getBoundingClientRect().bottom - 1) egne = false;
+        for (i = 1; i < l.length; i++) if (Math.abs(l[i].getBoundingClientRect().left - l[0].getBoundingClientRect().left) > 1.5) under = false;
+        return { antal: v.length, egne: egne, under: under, etiket: (blok.querySelector(".regn-etiket") || {}).textContent || "" };
+    }
+
     function regnAlle(navn) {
-        var s = sim(navn), D = W().NK.Data;
+        var s = sim(navn), D = W().NK.Data, M = W().NK.Model, dok = W().document;
         var liste = navn === "ux" ? D.UX : D.MX;
         W().NK.visFane("fane-" + navn);
+        var op = dok.getElementById(navn + "-oplyst"), tv = dok.getElementById(navn + "-tavle");
+        var boks = dok.getElementById(navn + "-status"), knap = dok.getElementById(navn + "-knap");
+        function opTop() { return op.getBoundingClientRect().top - tv.getBoundingClientRect().top; }
         liste.forEach(function (o, i) {
             s.vaelg(i);
+            ok(W().getComputedStyle(op).visibility === "hidden", o.id + ": opgavens tal er skjult, mens ligevægtsloven skrives");
+            ok(op.offsetHeight > 10, o.id + ": pladsen til tallene er sat af (" + op.offsetHeight + " px)");
+            var top0 = opTop();
             var vagt = 0;
             while (!s.faerdig && vagt++ < 30) {
                 var d = s.del(), k = s.k, fase = JSON.stringify(s.fase);
+                ok(boksVedDelen(navn), o.id + " " + d + ": tekstboksen står øverst i den del, eleven er ved");
                 facitDel(navn, s, d);
                 if (!s.faerdig && s.k === k && JSON.stringify(s.fase) === fase) { ok(false, o.id + ": delen " + d + " kom ikke videre (" + s.beskedTekst() + ")"); break; }
+                if (d === "lov") {
+                    ok(W().getComputedStyle(op).visibility === "visible" && /står nu under reaktionsskemaet/.test(s.beskedTekst()),
+                        o.id + ": tallene kommer frem, når ligevægtsloven er rigtig, og tekstboksen siger det");
+                    ok(Math.abs(opTop() - top0) < 1.5, o.id + ": tallene kommer på den plads, der var sat af");
+                }
+                if (d === "konc" && s.k > k) {
+                    var lj = linjerI(dok.querySelector("#" + navn + "-dele .rb-konc"));
+                    var n = s.type === "kc" ? Object.keys(o.n).length + 1 : M.alle(o).length;
+                    ok(lj.antal === n && lj.egne && lj.under, o.id + ": hver beregning af en koncentration står på sin egen linje med lighedstegnene under hinanden (" + lj.antal + " linjer)");
+                    ok(/^Koncentrationerne ved ligevægt/.test(lj.etiket), o.id + ": beregningerne har etiketten Koncentrationerne ved ligevægt");
+                }
             }
+            ok(boks.parentNode.classList.contains("slut") && boks.parentNode === dok.getElementById(navn + "-dele").lastElementChild && /videre/.test(knap.className),
+                o.id + ": svaret og knappen videre står i en boks nederst på tavlen");
             ok(s.faerdig && s.status[i].loest && s.status[i].stjerne, o.id + ": løst med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
             ok(!W().document.getElementById(navn + "-stempel").hidden, o.id + ": stemplet Løst står på tavlen");
             if (s.type === "x") ok(!!W().document.getElementById(navn + "-kurve"), o.id + ": kurven fra start til ligevægt står i panelet");
@@ -254,8 +291,17 @@
     function svarAlle(navn) {
         var s = sim(navn);
         W().NK.visFane("fane-" + navn);
+        var knap = W().document.getElementById(navn + "-knap");
         s.opgaver.forEach(function (o, i) {
             s.vaelg(i);
+            if (i === 0) {
+                ok(/hjaelp/.test(knap.className) && !/svar/.test(knap.className) && W().getComputedStyle(knap).backgroundColor === "rgb(255, 223, 107)",
+                    navn + ": Giv et hint er fyldt gul");
+                var t = 0;
+                while (knap.textContent !== "Vis svaret" && t++ < 5) s.knap();
+                ok(/svar/.test(knap.className), navn + ": Vis svaret er kun et omrids");
+                s.vaelg(i);
+            }
             var vagt = 0;
             while (!s.faerdig && vagt++ < 80) { s.knap(); noter(s); }
             ok(s.faerdig && s.brugtSvarNogen, o.id + ": kan løses med Vis svaret alene (" + vagt + " tryk)");
@@ -301,7 +347,15 @@
                 s.klikStof(M.alle(rx)[1]); noter(s);
             }
             ok(s.faerdig && s.status[i].stjerne, m.id + ": nået med stjerne (" + s.beskedTekst().slice(0, 60) + ")");
+            ok(s.beskedTekst().indexOf(m.slut) >= 0 && !W().document.querySelector("#bh-prompt .forklaring"),
+                m.id + ": forklaringen står i tekstboksen over beholderen, ikke i panelet");
         });
+        var kasse = W().document.getElementById("bh-kasse"), boks = W().document.getElementById("bh-status");
+        ok(kasse.contains(boks) && kasse.contains(W().document.getElementById("bh-linje")) && kasse.contains(W().document.getElementById("bh-knap")),
+            "fane 1: målet, tekstboksen og hintknappen står i samme kasse");
+        ok(kasse.getBoundingClientRect().bottom <= W().document.getElementById("bh-laerred").getBoundingClientRect().top + 1,
+            "fane 1: kassen med tekstboksen står over beholderen");
+        ok(!W().document.querySelector(".statuslinje"), "der er ingen statuslinje nederst i scenen");
         /* Molekylerne passer med x */
         s.vaelg(4);
         s.saetX(0.16);
@@ -362,7 +416,7 @@
         for (var i = 0; i < 6 && s.del() !== "valg"; i++) facitDel("mx", s, s.del());
         s.proev(0);
         await sov(200);
-        ok(synlig(d.querySelector("#mx-dele .rb.aktiv")), w + "×" + h + ": løsningerne kan ses, når den første er sat ind i skemaet");
+        ok(synlig(d.querySelector("#mx-dele .rb.aktiv")), w + "×" + h + ": løsningerne og tekstboksen kan ses, når den første er sat ind i skemaet");
         ok(synlig(d.querySelector("#mx-dele .ice-lig")), w + "×" + h + ": rækken Ligevægt kan ses samtidig");
         W().NK.visFane("fane-bh");
         var b = sim("bh");
@@ -376,12 +430,41 @@
         b.vaelg(3);
         await sov(200);
         ok(c.clientHeight >= 200, w + "×" + h + ": beholderen og grafen er mindst 200 px høje (" + c.clientHeight + ")");
-        var sc = d.querySelector("#fane-bh .scene");
+        /* Fane 1 ruller, hvis den ikke kan vaere der: maal derfor arbejdsomraadet */
+        var sc = d.getElementById("bh-arbejde");
         ok(sc.scrollHeight <= sc.clientHeight + 2, w + "×" + h + ": fane 1 kan være i scenen");
+        /* Et hint paa flere linjer og forklaringen maa ikke skubbe skemaet ud */
+        b.knap(); b.knap();
+        await sov(200);
+        ok(/Hint 2/.test(b.beskedTekst()) && sc.scrollHeight <= sc.clientHeight + 2 && c.clientHeight >= 200, w + "×" + h + ": fane 1 kan være i scenen med et hint i tekstboksen (" + c.clientHeight + ")");
+        b.knap(); b.knap();
+        await sov(200);
+        ok(b.faerdig && sc.scrollHeight <= sc.clientHeight + 2 && c.clientHeight >= 200, w + "×" + h + ": fane 1 kan være i scenen med forklaringen i tekstboksen (" + c.clientHeight + ")");
+        var bk = d.getElementById("bh-knap").getBoundingClientRect(), bb = d.getElementById("bh-status").getBoundingClientRect();
+        ok(bk.right <= bb.right + 1 && bk.bottom <= bb.bottom + 1 && bk.top >= bb.top - 1, w + "×" + h + ": knappen Næste mål står inde i tekstboksen");
+        /* Med CAS' loesninger fylder det nederste mest. Paa den mindste skaerm
+           kan det ikke vaere der; saa skal der kunne rulles, saa intet er skaaret af */
+        b.vaelg(2);
+        b.koerCas();
+        await sov(200);
+        var rul = sc.scrollHeight > sc.clientHeight + 2;
+        ok(!rul || W().getComputedStyle(sc).overflowY === "auto", w + "×" + h + ": fane 1 med CAS' løsninger " + (rul ? "kan rulles (mangler " + (sc.scrollHeight - sc.clientHeight) + " px)" : "kan være i scenen"));
         W().NK.visFane("fane-ux");
         var u = sim("ux");
         u.vaelg(1);
         ok(d.getElementById("ux-tavle").scrollWidth <= d.getElementById("ux-tavle").clientWidth + 2, w + "×" + h + ": ligevægtsloven med felter er ikke for bred");
+        var uk = d.getElementById("ux-knap").getBoundingClientRect(), ub = d.getElementById("ux-status").getBoundingClientRect();
+        ok(uk.right <= ub.right + 1 && uk.left > ub.left + 150, w + "×" + h + ": hintknappen står til højre i tekstboksen, og der er plads til teksten");
+        /* Vandgas med fire stoffer: alle fire beregninger og Tjek kan ses */
+        u.vaelg(2);
+        facitDel("ux", u, "lov");
+        skriv("ux", "kn.formel", "n/V"); u.tjek();
+        await sov(200);
+        u.tilpas();
+        var ua = d.getElementById("ux-arbejde"), akt = d.querySelector("#ux-dele .rb.aktiv");
+        var ra = ua.getBoundingClientRect(), rk = akt.getBoundingClientRect();
+        ok(rk.top >= ra.top - 2 && rk.bottom <= ra.bottom + 2, w + "×" + h + ": de fire beregninger af koncentrationen kan ses sammen med tekstboksen");
+        ok(d.getElementById("ux-tavle").scrollWidth <= d.getElementById("ux-tavle").clientWidth + 2, w + "×" + h + ": beregningerne er ikke for brede");
     }
 
     async function koer() {

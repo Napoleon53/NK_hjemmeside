@@ -61,10 +61,10 @@
     P.efterOpgave = function () { this.visPanel(); };
 
     P.nulstilScene = function () {
-        var op = this.opg.o.opstil || {};
-        this.stof = op.stof || "ethen";
-        /* i et maal, der kun er et spoergsmaal om produktet, ligger produktet klar */
-        this.produkt = this.opg.o.forsoeg ? null : (op.produkt || null);
+        /* Nyt molekyle (og tasten R) hoerer til forsoeget */
+        if (!this.iForsoeg()) return;
+        this.stof = (this.opg.o.opstil || {}).stof || "ethen";
+        this.produkt = null;
         this.reak = null;
         this.traek = null;
         this.setT = 0;
@@ -93,16 +93,7 @@
         }
         if (!this.produkt || this.produkt === krav) return "";
         var r = krav === "afvist" ? "Br2" : krav;
-        return "Du brugte " + K.REAGENS[this.produkt].navn + ", og produktet er " + K.produkt(this.stof, this.produkt).navn +
-            ". Tryk på Nyt molekyle, og træk " + K.REAGENS[r].navn + "molekylet hen til dobbeltbindingen i " + sNavn + ".";
-    };
-
-    /* Spoergsmaalene gaelder det produkt, maalet har lavet */
-    P.spmLinje = function () {
-        var o = this.opg.o, krav = (o.opstil && o.opstil.produkt) || this.kravNu();
-        if (!krav || krav === "afvist" || this.reak || this.produkt === krav) return "";
-        return "Spørgsmålet gælder produktet af " + K.STOF[this.stof].navn + " og " + K.REAGENS[krav].navn + ". " +
-            (this.produkt ? "Tryk på Nyt molekyle, og træk " : "Træk ") + K.REAGENS[krav].navn + "molekylet hen til dobbeltbindingen i " + K.STOF[this.stof].navn + "." + D.SAA_SVAR;
+        return D.andet(K.REAGENS[this.produkt].navn, K.produkt(this.stof, this.produkt).navn, K.REAGENS[r].navn, "dobbeltbindingen i " + sNavn);
     };
 
     P.forsoegSvar = function (o) {
@@ -134,26 +125,25 @@
     /* ----- Reaktionen ------------------------------------------------------------------- */
     /* Et molekyle fra hylden er sluppet over molekylet (eller klikket paa) */
     P.reager = function (reagens, fra) {
-        if (this.reak) return;
+        if (this.reak || !this.iForsoeg()) return;
         this.nulstilHjaelp();
         var r = K.REAGENS[reagens], s = K.STOF[this.stof];
-        if (this.produkt) {
-            this.reak = { reagens: reagens, t: 0, fra: fra, afvist: true, tekst: D.afvistProdukt(r.navn, K.produkt(this.stof, this.produkt).navn) };
-        } else if (!K.kanAddere(this.stof)) {
-            this.reak = { reagens: reagens, t: 0, fra: fra, afvist: true, tekst: D.afvist(s.navn, r.navn), tael: true };
+        /* Dobbeltbindingen er brugt: linjen paa kortet siger, at et nyt molekyle skal laegges klar */
+        if (this.produkt) { this.kortBlink(); return; }
+        if (!K.kanAddere(this.stof)) {
+            this.reak = { reagens: reagens, t: 0, fra: fra, afvist: true, tekst: D.afvist(s.navn, r.navn) };
         } else {
             this.reak = { reagens: reagens, t: 0, fra: fra, afvist: false, rig: K.rig(this.stof, reagens) };
         }
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+        this.naesteLinje("", "");
     };
 
     P.reakSlut = function () {
         var rk = this.reak;
         this.reak = null;
         if (rk.afvist) {
-            if (!rk.tael) { this.kortBesked(rk.tekst, 7); return; }
             /* ethan: intet kan saette sig paa */
-            var maalet = !this.faerdig && !this.venter && this.opg.fase === "forsoeg" && this.kravNu() === "afvist";
+            var maalet = this.iForsoeg() && this.kravNu() === "afvist";
             this.afvistN++;
             this.husk(this.stof + "+" + rk.reagens);
             this.visPanel();
@@ -166,7 +156,7 @@
         this.setT = 0;
         this.husk(this.stof + "+" + rk.reagens);
         this.visPanel();
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+        if (this.iForsoeg()) this.naesteLinje("", "");
     };
 
     /* ----- Scenen -------------------------------------------------------------------- */
@@ -181,11 +171,9 @@
         lay.bund = lay.hylde.y - 14;
         lay.bh = baand.h;
         this.lay = lay;
-        /* Nyt molekyle staar til hoejre lige under kortets plads; under et gaet er der intet at laegge klar */
-        if (this.el.forfra) {
-            this.el.forfra.style.top = (10 + this.kortZone() + 8) + "px";
-            this.el.forfra.hidden = this.gaetNu();
-        }
+        /* Nyt molekyle staar til hoejre lige under kortets plads */
+        if (this.el.forfra) this.el.forfra.style.top = (10 + this.kortZone() + 8) + "px";
+        this.visForfra();
         this.maalMol();
         if (!this.u) { this.u = lay.uMaal; this.cy = lay.cyMaal; }
         var u = lay.uMaal;
@@ -222,6 +210,7 @@
         if (this.baand().h !== lay.bh) { this.layout(); lay = this.lay; }
         this.maalMol();
         if (this.snap) { this.snap = false; this.u = lay.uMaal; this.cy = lay.cyMaal; }
+        this.visForfra();
         this.u = NK.mod(this.u, lay.uMaal, 9, dt);
         this.cy = NK.mod(this.cy, lay.cyMaal, 9, dt);
         if (Math.abs(this.u - lay.uMaal) < 0.05) this.u = lay.uMaal;
@@ -231,7 +220,7 @@
             this.reak.t += dt / (this.reak.afvist ? AFVIS_SEK : REAK_SEK);
             if (this.reak.t >= 1) this.reakSlut();
         }
-        if (this.faerdig || this.venter || g.fase !== "forsoeg" || this.reak) return;
+        if (!this.iForsoeg() || this.reak) return;
         var krav = this.kravNu();
         if (krav !== "afvist" && this.produkt === krav) {
             this.setT += dt;
@@ -239,10 +228,23 @@
         }
     };
 
+    /* Knappen Nyt molekyle er kun fremme, naar den skal bruges: eleven har i et
+       forsoeg brugt et andet molekyle end det, opgaven beder om. Saa banker den. */
+    P.skalHaveNyt = function () {
+        return this.iForsoeg() && !this.reak && !!this.produkt && this.produkt !== this.kravNu();
+    };
+
+    P.visForfra = function () {
+        var e = this.el.forfra, vis = this.skalHaveNyt();
+        if (!e || e.hidden === !vis) return;
+        e.hidden = !vis;
+        e.classList.toggle("banker", vis);
+    };
+
     /* Det molekyle paa hylden, der skal traekkes nu, eller null */
     P.peger = function () {
         var g = this.opg;
-        if (this.faerdig || this.venter || g.fase !== "forsoeg" || this.reak || this.traek) return null;
+        if (!this.iForsoeg() || this.reak || this.traek) return null;
         var krav = this.kravNu();
         if (krav === "afvist") return this.afvistSet ? null : "Br2";
         return this.produkt ? null : krav;
@@ -429,14 +431,16 @@
         this.over = null;
         if (!pt || !this.lay) return null;
         var r = this.brikVed(pt);
-        if (r) { this.over = r; return this.gaetNu() || this.reak ? "klik" : "greb"; }
+        if (r) { this.over = r; return this.iForsoeg() && !this.reak ? "greb" : "klik"; }
         return this.molVed(pt) ? "klik" : null;
     };
 
     P.nedScene = function (pt) {
-        if (this.gaetNu() || this.reak) return false;       /* gaettet foerst: klikket faar kortet til at blinke */
+        if (this.reak) return false;
         var r = this.brikVed(pt);
         if (!r) return false;
+        /* Laasen: et molekyle kan kun traekkes, mens kortet viser et forsoeg. Ellers blinker kortet. */
+        if (this.spaer()) return false;
         this.traek = { reagens: r, x: pt.x, y: pt.y, x0: pt.x, y0: pt.y };
         return true;
     };
@@ -460,19 +464,14 @@
     };
 
     P.klikScene = function (pt) {
-        if (!this.lay) return;
-        var paaBrik = this.brikVed(pt), paaMol = this.molVed(pt);
-        if (this.gaetNu()) {
-            if (paaBrik || paaMol) this.gaetBlink();
-            return;
-        }
-        if (!paaMol || this.reak) return;
+        if (!this.lay || this.reak || !this.molVed(pt)) return;
+        if (this.gaetNu()) { this.kortBlink(); return; }
         var s = K.STOF[this.stof];
         if (this.produkt) {
             var p = K.produkt(this.stof, this.produkt);
             this.kortBesked(K.Stort(p.navn) + ", " + p.formel + ". Dobbeltbindingen er blevet til en enkeltbinding, og der er kun dette ene produkt.", 6);
         } else if (s.dobbelt) {
-            this.kortBesked(K.Stort(s.navn) + ", " + s.formel + ". De to streger mellem carbonatomerne er en dobbeltbinding. Træk et molekyle fra hylden hen til den.", 6);
+            this.kortBesked(K.Stort(s.navn) + ", " + s.formel + ". De to streger mellem carbonatomerne er en dobbeltbinding.", 6);
         } else {
             this.kortBesked(K.Stort(s.navn) + ", " + s.formel + ". Der er kun enkeltbindinger, og hvert carbonatom har fire bindinger.", 6);
         }

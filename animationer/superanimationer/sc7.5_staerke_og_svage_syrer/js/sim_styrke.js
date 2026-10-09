@@ -67,8 +67,6 @@
         this.visPanel();
     };
 
-    P.nulstilScene = function () { this.valgt = -1; this.valgtT = 0; };
-
     P.vaelgGlas = function (i) {
         if (this.valgt === i) return;
         this.valgt = i;
@@ -78,19 +76,6 @@
     };
 
     P.bogstav = function (i) { return D.GLAS[i].b; };
-
-    P.sceneLinje = function () {
-        var o = this.opg.o;
-        /* Kun det, kortets opgavetekst ikke selv siger */
-        if (this.valgt >= 0 && this.valgt !== o.glas) return "Luppen viser glas " + this.bogstav(this.valgt) + ". Klik på glas " + this.bogstav(o.glas) + ".";
-        return "";
-    };
-
-    P.spmLinje = function () {
-        var o = this.opg.o;
-        if (this.valgt !== o.glas) return "Klik på glas " + this.bogstav(o.glas) + ", så luppen viser det. Vælg så et svar på det gule kort.";
-        return "";
-    };
 
     P.forsoegSvar = function (o) { this.vaelgGlas(o.glas); this.valgtT = SET_SEK; };
 
@@ -197,8 +182,7 @@
             ctx.strokeStyle = "#3d4150";
             ctx.stroke();
             ctx.restore();
-            NK.tekst(ctx, "Luppen", R.x + R.b / 2, R.y + R.h / 2 - 6, { font: Tg.font("700", 17), justering: "center", farve: "#6f7682" });
-            NK.tekst(ctx, "Klik på et glas for at se i det", R.x + R.b / 2, R.y + R.h / 2 + 18, { font: Tg.font("600", 14), justering: "center", farve: "#6f7682" });
+            NK.tekst(ctx, "Luppen", R.x + R.b / 2, R.y + R.h / 2 + 6, { font: Tg.font("700", 17), justering: "center", farve: "#6f7682" });
         }
 
         if (peger >= 0) {
@@ -221,13 +205,15 @@
 
     P.overScene = function (pt) {
         if (!pt || !this.lay) return null;
-        if (this.glasVed(pt) >= 0 || (this.valgt >= 0 && Tg.signaturVed(this.sig, pt))) return "klik";
+        if (this.iForsoeg() && this.glasVed(pt) === this.opg.o.glas && this.valgt !== this.opg.o.glas) return "klik";
+        if (this.valgt >= 0 && Tg.signaturVed(this.sig, pt)) return "klik";
         if (this.iLup(pt) && this.lup.ved(pt.x - this.lay.lup.x, pt.y - this.lay.lup.y)) return "klik";
         return null;
     };
 
     P.klikScene = function (pt) {
         if (!this.lay) return;
+        /* At se naermere paa det, luppen viser, er altid i orden */
         var sl = this.valgt >= 0 ? Tg.signaturVed(this.sig, pt) : null;
         if (sl) { this.kortBesked(D.partikel(sl, this.lup.syre, this.navngivet[this.valgt]), 7); return; }
         if (this.iLup(pt)) {
@@ -237,13 +223,11 @@
         }
         var i = this.glasVed(pt);
         if (i < 0) return;
-        var g = this.opg;
-        /* Gaettet kommer foer luppen: kortet staar, hvor luppen ellers er */
-        if (this.gaetNu()) { this.gaetBlink("Så åbner luppen."); return; }
-        if (this.valgt === i) { this.kortBesked("Luppen viser allerede glas " + this.bogstav(i) + ".", 3); return; }
+        /* Laasen: et glas kan kun aabnes i luppen, naar opgaven beder om netop det glas */
+        if (this.spaer()) return;
+        if (i !== this.opg.o.glas || this.valgt === i) { this.kortBlink(); return; }
         this.vaelgGlas(i);
         this.nulstilHjaelp();
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
     };
 
     NK.SimStyrke = SimStyrke;

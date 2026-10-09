@@ -3,7 +3,13 @@
 
    En opgave regnes i dele, der staar under hinanden paa tavlen. Den del,
    eleven er ved, har felter; en loest del klappes sammen til én linje,
-   som den skal staa i besvarelsen. Skemaet bliver staaende som tabel.
+   som den skal staa i besvarelsen. Skemaet bliver staaende som tabel,
+   og beregningerne af koncentrationerne staar paa hver sin linje.
+
+   Tekstboksen (naeste skridt, fejl, hint og den gule knap) staar oeverst
+   i den del, eleven er ved, og alene i en boks nederst, naar opgaven er
+   loest. Opgavens tal (raekken Oplyst) kommer foerst frem, naar
+   ligevaegtsloven er skrevet rigtigt (brugeren 9. oktober 2026).
 
      Uden x, Kc:      Ligevægtsloven › Koncentrationerne › Indsæt
      Uden x, ukendt:  Ligevægtsloven › Indsæt › CAS › Svaret
@@ -52,6 +58,38 @@
         return liste.map(function (l) { return faktorTekst(fn(l), l.e, liste.length > 1); }).join(" · ");
     }
 
+    /* Beregninger paa hver sin linje med lighedstegnene under hinanden
+       (brugeren 9. oktober 2026). raekker: { v: venstresiden, m: udtrykket,
+       r: "= resultatet" (kan mangle), s: stoffet }, som HTML eller som
+       elementer. maerke: ✓ eller ↩ efter etiketten. */
+    var KONC_ETIKET = "Koncentrationerne ved ligevægt";
+
+    function regneBlok(etiket, raekker, klasse, maerke) {
+        var w = el("div", "regn" + (klasse ? " " + klasse : ""));
+        w.appendChild(el("span", "regn-etiket", NK.html(etiket) + (maerke || "")));
+        var g = el("div", "regn-gitter");
+        function celle(kl, indhold) {
+            var c = el("span", kl);
+            if (typeof indhold === "string") c.innerHTML = indhold;
+            else if (indhold) c.appendChild(indhold);
+            return c;
+        }
+        raekker.forEach(function (r) {
+            var v = celle("rg-v", r.v);
+            if (r.s) v.setAttribute("data-s", r.s);
+            g.appendChild(v);
+            g.appendChild(celle("rg-l", "="));
+            g.appendChild(celle("rg-m", r.m));
+            g.appendChild(celle("rg-r", r.r));
+        });
+        w.appendChild(g);
+        return w;
+    }
+
+    function maerkeHTML(vist) {
+        return ' <span class="rs-maerke' + (vist ? " svar" : "") + '">' + (vist ? "↩" : "✓") + "</span>";
+    }
+
     /* ===================================================================
        Tjek af de enkelte felter. Svar: { ok } | { tom, besked } | { besked }
        =================================================================== */
@@ -67,7 +105,7 @@
         if (!c0) return { besked: "Der er intet " + navnet(s) + " fra start. Skriv 0." };
         var andre = M.alle(o).filter(function (a) { return a.s !== s && M.c0(o, a.s) && M.ens(v, M.c0(o, a.s), 0.005); });
         if (andre.length) return { besked: NK.tal(v) + " M er startkoncentrationen af " + navnet(andre[0].s) + ", ikke af " + navnet(s) + "." };
-        return { besked: "Find startkoncentrationen af " + navnet(s) + " i opgaven over tavlen." };
+        return { besked: "Find startkoncentrationen af " + navnet(s) + " under Oplyst på tavlen." };
     }
 
     function brugX(u) {
@@ -156,7 +194,7 @@
         var v = u.f(0);
         if (M.ens(v, o.K, 0.005)) return { ok: true };
         if (M.ens(v, 1 / o.K, 0.005)) return { besked: "Det er 1/Kc. Skriv Kc's værdi fra opgaven." };
-        return { besked: "Kc's værdi står i opgaven over tavlen." };
+        return { besked: "Kc's værdi står under Oplyst på tavlen." };
     }
 
     /* Et tal, der skal ramme en koncentration (fane 2 og svaret) */
@@ -245,8 +283,28 @@
         });
     };
 
+    /* Opgavens tal kommer foerst frem, naar ligevaegtsloven er skrevet
+       rigtigt (brugeren 9. oktober 2026): foer det er der ikke noget felt
+       til et tal. Pladsen er sat af, saa intet flytter sig. */
+    F.visOplyst = function () {
+        var rad = NK.el(this.N + "-oplyst");
+        var skjul = this.dele[this.k] === "lov";
+        rad.classList.toggle("ny", !skjul && rad.classList.contains("skjult"));
+        rad.classList.toggle("skjult", skjul);
+        if (skjul) rad.setAttribute("aria-hidden", "true");
+        else rad.removeAttribute("aria-hidden");
+    };
+
+    /* Det, raekken Oplyst viser, sagt i ord, naar den kommer frem */
+    F.oplystTekst = function () {
+        var hvad = this.type === "kc" ? "Rumfanget og stofmængderne" :
+            (this.type === "ukendt" ? "Kc og de kendte koncentrationer" :
+                "Kc og " + (Object.keys(this.o.c0).length > 1 ? "startkoncentrationerne" : "startkoncentrationen"));
+        return hvad + " står nu under reaktionsskemaet.";
+    };
+
     /* Et klik paa et stof i reaktionsskemaet: i ligevaegtsloven skrives
-       koncentrationen; ellers siger linjen, hvad stoffet er */
+       koncentrationen; ellers siger tekstboksen, hvad stoffet er */
     F.klikArt = function (a) {
         if (!this.faerdig && this.dele[this.k] === "lov") { this.indsaet(M.kon(a.s)); return; }
         var t = M.skriv(a.s) + " står " + (a.side === "r" ? "før pilen. Det er en reaktant." : "efter pilen. Det er et produkt.");
@@ -366,6 +424,11 @@
     F.render = function () {
         var mig = this;
         this.felter = [];
+        /* Tekstboksen flyttes med den del, eleven er ved: loeft den ud,
+           foer delene ryddes */
+        var boks = this.el.status;
+        if (boks.parentNode) boks.parentNode.removeChild(boks);
+        this.visOplyst();
         var bar = NK.el(this.N + "-delbar");
         var html = "";
         this.dele.forEach(function (d, i) {
@@ -388,9 +451,15 @@
                     blok.appendChild(l);
                 } else blok.appendChild(linje);
             } else {
+                blok.appendChild(boks);
                 blok.appendChild(this["aktiv_" + navn]());
             }
             this.deleEl.appendChild(blok);
+        }
+        if (this.faerdig) {
+            var slut = el("div", "rb slut");
+            slut.appendChild(boks);
+            this.deleEl.appendChild(slut);
         }
 
         var stempel = NK.el(this.N + "-stempel");
@@ -561,7 +630,7 @@
 
     F.tjek_lov = function () {
         var d = M.lovDom(this.o, this.v["lov.num"], this.v["lov.den"]);
-        if (d.ok) { this.delOk("lov", false, "Ligevægtsloven er rigtig."); return; }
+        if (d.ok) { this.delOk("lov", false, "Ligevægtsloven er rigtig. " + this.oplystTekst()); return; }
         this.hintS = null;
         this.fejlSvar({ tom: d.tom, besked: d.tekst }, "lov." + d.z);
     };
@@ -572,7 +641,7 @@
         var f = M.lovFelter(this.o);
         this.v["lov.num"] = f.num;
         this.v["lov.den"] = f.den;
-        this.delOk("lov", true, "Ligevægtsloven.");
+        this.delOk("lov", true, "Ligevægtsloven. " + this.oplystTekst());
     };
 
     F.trin_lov = function () {
@@ -784,7 +853,7 @@
         if (r === "start") {
             var nul = alle.filter(function (b) { return !M.c0(o, b.s); }).map(function (b) { return M.skriv(b.s); });
             return { s: a.s, trin: [
-                "Startkoncentrationerne står i opgaven over tavlen. Klik på et tal under Oplyst for at sætte det ind.",
+                "Startkoncentrationerne står under Oplyst på tavlen. Klik på et tal for at sætte det ind.",
                 nul.length ? "Der er intet " + nul.join(" og intet ") + " fra start. Skriv 0." : "Alle stofferne er der fra start.",
                 "Start: " + alle.map(function (b) { return M.skriv(b.s) + " " + NK.tal(M.c0(o, b.s)); }).join(", ") + "."
             ] };
@@ -1140,63 +1209,61 @@
         var mig = this, o = this.o, x = M.xFacit(o);
         var w = el("div", "konc");
         w.appendChild(el("div", "konc-x", "x = " + NK.html(NK.tal(x)) + " M"));
-        var liste = el("div", "konc-liste");
-        M.alle(o).forEach(function (a) {
-            var r = el("div", "konc-rad");
-            var lab = el("span", "konc-lab", NK.html(M.kon(a.s)) + " =");
-            lab.setAttribute("data-s", a.s);
-            r.appendChild(lab);
-            r.appendChild(mig.input("kx." + a.s, "rs-in", "", "Ligevægtskoncentrationen af " + M.skriv(a.s)));
-            r.appendChild(el("span", "rs-enhed", "M"));
-            liste.appendChild(r);
-        });
-        w.appendChild(liste);
+        w.appendChild(regneBlok(KONC_ETIKET, M.alle(o).map(function (a) {
+            return { v: NK.html(M.kon(a.s)), s: a.s, m: mig.feltMedEnhed("kx." + a.s, "Ligevægtskoncentrationen af " + M.skriv(a.s)) };
+        }), "midt"));
         w.appendChild(this.tjekKnap());
         return w;
+    };
+
+    /* Et talfelt med enheden M efter (foran staar "= ", naar der er et
+       udtryk foer feltet) */
+    F.feltMedEnhed = function (key, etiket, lig) {
+        var f = document.createDocumentFragment();
+        if (lig) f.appendChild(T("= "));
+        f.appendChild(this.input(key, "rs-in", "", etiket));
+        f.appendChild(el("span", "rs-enhed", "M"));
+        return f;
     };
 
     F.aktivKoncN = function () {
         var mig = this, o = this.o;
         var w = el("div", "konc");
+        /* Formlen er foerste linje i beregningen; stofferne faar hver sin
+           linje under den, naar formlen er rigtig */
         if (this.fase.konc === "formel") {
-            var rad = el("div", "rs-rad");
-            rad.appendChild(el("span", "rs-v", "c ="));
-            rad.appendChild(this.input("kn.formel", "rs-in formel", "formlen", "Formlen for koncentrationen"));
-            rad.appendChild(this.tjekKnap());
-            w.appendChild(rad);
+            w.appendChild(regneBlok(KONC_ETIKET, [{ v: "c", m: this.input("kn.formel", "rs-in formel", "formlen", "Formlen for koncentrationen") }], "midt"));
+            w.appendChild(this.tjekKnap());
             return w;
         }
-        w.appendChild(el("div", "rb-linje", "c = " + broekHTML("n", "V") + ' <span class="rs-maerke' + (this.vist.formel ? " svar" : "") + '">' + (this.vist.formel ? "↩" : "✓") + "</span>"));
-        var liste = el("div", "konc-liste");
+        var raekker = [{ v: "c", m: broekHTML("n", "V") + maerkeHTML(this.vist.formel) }];
         Object.keys(o.n).forEach(function (s) {
-            var r = el("div", "konc-rad");
-            var lab = el("span", "konc-lab", NK.html(M.kon(s)) + " = " + broekHTML(NK.tal(o.n[s]) + " mol", NK.tal(o.V) + " L") + " =");
-            lab.setAttribute("data-s", s);
-            r.appendChild(lab);
-            r.appendChild(mig.input("kn." + s, "rs-in", "", "Koncentrationen af " + M.skriv(s)));
-            r.appendChild(el("span", "rs-enhed", "M"));
-            liste.appendChild(r);
+            raekker.push({ v: NK.html(M.kon(s)), s: s, m: broekHTML(NK.tal(o.n[s]) + " mol", NK.tal(o.V) + " L"),
+                r: mig.feltMedEnhed("kn." + s, "Koncentrationen af " + M.skriv(s), true) });
         });
-        w.appendChild(liste);
+        w.appendChild(regneBlok(KONC_ETIKET, raekker, "midt"));
         w.appendChild(this.tjekKnap());
         return w;
     };
 
     F.linje_konc = function () {
-        var o = this.o;
+        var o = this.o, raekker;
         if (this.type === "kc") {
             var c = M.cAfN(o);
-            return "c = " + broekHTML("n", "V") + ": &nbsp;" + Object.keys(o.n).map(function (s) {
-                return NK.html(M.kon(s)) + " = " + broekHTML(NK.tal(o.n[s]) + " mol", NK.tal(o.V) + " L") + " = " + NK.tal(c[s]) + " M";
-            }).join(", &nbsp;");
+            raekker = [{ v: "c", m: broekHTML("n", "V") }];
+            Object.keys(o.n).forEach(function (s) {
+                raekker.push({ v: NK.html(M.kon(s)), s: s, m: broekHTML(NK.tal(o.n[s]) + " mol", NK.tal(o.V) + " L"), r: "= " + NK.tal(c[s]) + " M" });
+            });
+            return regneBlok(KONC_ETIKET, raekker, "", maerkeHTML(this.vist.konc));
         }
         var x = M.xFacit(o), ceq = M.ceq(o, x);
-        var linjer = M.alle(o).map(function (a) {
+        raekker = M.alle(o).map(function (a) {
             var ind = M.indsatTekst(o, a.s, x);
-            var vis = ind === NK.tal(x) + " M" ? ind : ind + " = " + NK.tal(ceq[a.s]) + " M";
-            return NK.html(M.kon(a.s)) + " = " + NK.html(vis);
-        }).join(", &nbsp;");
-        return linjer + '<br><span class="kontrol">Kontrol: ' + this.kontrolHTML() + "</span>";
+            return { v: NK.html(M.kon(a.s)), s: a.s, m: NK.html(ind), r: ind === NK.tal(x) + " M" ? "" : "= " + NK.html(NK.tal(ceq[a.s]) + " M") };
+        });
+        var w = regneBlok(KONC_ETIKET, raekker, "", maerkeHTML(this.vist.konc));
+        w.appendChild(el("div", "kontrol", "Kontrol: " + NK.kc(this.kontrolHTML())));
+        return w;
     };
 
     /* Kc regnet af de afrundede koncentrationer, som eleven ville goere */
@@ -1668,6 +1735,7 @@
                 }
                 var l = mig["linje_" + d]();
                 if (typeof l === "string") html += '<p class="fk-linje">' + l + "</p>";
+                else html += '<div class="fk-blok">' + l.outerHTML + "</div>";
             });
             if (this.type === "x") {
                 html += '<span class="fk-hoved">Fra start til ligevægt</span><canvas class="kurve" id="' + this.N + '-kurve"></canvas>';

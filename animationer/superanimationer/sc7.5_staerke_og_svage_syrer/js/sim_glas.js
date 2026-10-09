@@ -48,9 +48,11 @@
         /* I eddikesyren staar antallet stille, til eleven har talt */
         var bytter = this.idx(o.id) >= this.idx("balance");
         this.lup[1].bytter = bytter;
-        this.lup[1].hast = o.id === "balance" ? 2.4 : 1;
+        this.lup[1].hast = o.id === "balance" ? 2 : 1;
         if (!bytter) this.lup[1].saet("eddike", K.C0, true);
-        if (o.id === "balance") this.lup[1].vent = 1.6;
+        /* Det foerste bytte venter 5 sekunder (vent taeller dobbelt saa hurtigt
+           ned med hast 2), saa eleven har naaet at laese opgaven */
+        if (o.id === "balance") { this.lup[1].skift = null; this.lup[1].vent = 10; }
         this.byt0 = this.lup[1].byt;
         this.aeg = 0;
         this.visAnkre();
@@ -60,8 +62,6 @@
     P.nyFase = function () { this.byt0 = this.lup[1].byt; };
 
     P.efterOpgave = function () { this.visPanel(); };
-
-    P.nulstilScene = function () { this.nyOpgave(this.opg.o); };
 
     P.aabn = function (i, straks) {
         if (!this.aaben[i]) this.aabenT[i] = 0;
@@ -78,24 +78,10 @@
 
     P.harKalk = function () { return this.glas.filter(function (g) { return g.kalk; }).length; };
 
-    /* Lupperne kommer foerst frem, naar kalken er proevet */
-    P.kanLup = function () { return this.erLoest("kalk") || this.idx(this.opg.o.id) > 0; };
-
     P.sceneLinje = function () {
         var id = this.opg.o.id, n = this.harKalk();
         /* Kun det, kortets opgavetekst ikke selv siger */
-        if (id === "kalk") {
-            if (n === 1) return "Kom også et stykke kalk i glasset med " + K.navn(this.glas[this.glas[0].kalk ? 1 : 0].syre) + ".";
-            return n === 2 ? "Se, hvor meget kalken bruser i de to glas." : "";
-        }
-        if (id === "balance" && !this.aaben[1]) return "Klik på glasset med eddikesyre, så luppen over eddikesyren åbner.";
-        return "";
-    };
-
-    P.spmLinje = function () {
-        var id = this.opg.o.id;
-        if (id === "lup-hcl" && !this.aaben[0]) return "Klik på glasset med saltsyre, så luppen viser det. Vælg så et svar på det gule kort.";
-        if ((id === "lup-eddike" || id === "balance") && !this.aaben[1]) return "Klik på glasset med eddikesyre, så luppen viser det. Vælg så et svar på det gule kort.";
+        if (id === "kalk" && n === 1) return "Kom også et stykke kalk i glasset med " + K.navn(this.glas[this.glas[0].kalk ? 1 : 0].syre) + ".";
         return "";
     };
 
@@ -177,8 +163,8 @@
         var g = this.opg;
         if (this.faerdig || this.venter || g.fase !== "forsoeg") return null;
         if (g.o.id === "kalk") return this.harKalk() < 2 ? "skaal" : null;
-        if (g.o.id === "lup-hcl") return this.aaben[0] ? null : 0;
-        return this.aaben[1] ? null : 1;
+        var a = g.o.forsoeg.aabn;
+        return a !== undefined && !this.aaben[a] ? a : null;
     };
 
     /* ----- Tegning ------------------------------------------------------------------- */
@@ -261,16 +247,21 @@
 
     P.overScene = function (pt) {
         if (!pt || !this.lay) return null;
-        if (this.gaetNu()) return this.iSkaal(pt) || this.glasVed(pt) >= 0 ? "klik" : null;
-        if (this.iSkaal(pt) && this.harKalk() < 2) return "greb";
-        if (this.glasVed(pt) >= 0 || this.sigVed(pt)) return "klik";
+        var f = this.iForsoeg() ? this.opg.o.forsoeg : null;
+        if (f && this.opg.o.id === "kalk") {
+            if (this.iSkaal(pt) && this.harKalk() < 2) return "greb";
+            if (this.glasVed(pt) >= 0) return "klik";
+        }
+        if (f && f.aabn !== undefined && this.glasVed(pt) === f.aabn && !this.aaben[f.aabn]) return "klik";
+        if (this.sigVed(pt)) return "klik";
         var i = this.lupVed(pt);
         if (i >= 0 && this.lup[i].ved(pt.x - this.lay.lup[i].x, pt.y - this.lay.lup[i].y)) return "klik";
         return null;
     };
 
     P.nedScene = function (pt) {
-        if (this.gaetNu()) return false;          /* gaettet foerst: klikket faar kortet til at blinke */
+        /* Kalken kan kun traekkes i forsoeget med kalk; ellers faar klikket kortet til at blinke */
+        if (!this.iForsoeg() || this.opg.o.id !== "kalk") return false;
         if (!this.iSkaal(pt) || this.harKalk() >= 2) return false;
         this.traek = { x: pt.x, y: pt.y, x0: pt.x, y0: pt.y };
         return true;
@@ -293,14 +284,13 @@
             }
         }
         if (i >= 0) { this.kalkNed(i); return; }
-        if (Math.hypot(pt.x - t.x0, pt.y - t.y0) < 8) this.kortBesked("Skålen med kalk. Træk et stykke kalk hen over et glas, og slip. Et klik på et glas virker også.", 6);
-        else this.kortBesked("Slip kalken over et af de to glas.", 4);
+        /* Sluppet ved siden af: skiltet ved skaalen siger, hvad der skal ske */
+        this.kortBlink();
     };
 
     P.kalkNed = function (i) {
         var g = this.glas[i];
-        if (this.gaetNu()) { this.gaetBlink(); return; }
-        if (!g.kalkI(false)) { this.kortBesked("Der ligger allerede et stykke kalk i glasset med " + K.navn(g.syre) + ".", 4); return; }
+        if (!g.kalkI(false)) { this.kortBlink(); return; }
         this.visAnkre();
         this.nulstilHjaelp();
         if (!this.faerdig) this.naesteLinje("", "");
@@ -308,10 +298,7 @@
 
     P.klikScene = function (pt) {
         if (!this.lay) return;
-        if (this.gaetNu()) {
-            if (this.iSkaal(pt) || this.glasVed(pt) >= 0) this.gaetBlink();
-            return;
-        }
+        /* At se naermere paa det, der allerede er fremme, er altid i orden */
         var sg = this.sigVed(pt);
         if (sg) { this.kortBesked(D.partikel(sg.slags, sg.syre, true), 7); return; }
         var i = this.lupVed(pt);
@@ -326,17 +313,17 @@
             return;
         }
         i = this.glasVed(pt);
-        if (i < 0) return;
-        var g = this.glas[i];
-        if (!g.kalk) { this.kalkNed(i); return; }
-        if (!this.kanLup()) {
-            this.kortBesked("Glasset med " + K.navn(g.syre) + ". Boblerne er carbondioxid, CO₂, fra kalken.", 5);
+        if (i < 0 && !this.iSkaal(pt)) return;
+        /* Laasen: kun i et forsoeg, og kun det, opgaven beder om */
+        if (this.spaer()) return;
+        var f = this.opg.o.forsoeg;
+        if (this.opg.o.id === "kalk" && i >= 0) { this.kalkNed(i); return; }
+        if (i >= 0 && f.aabn === i && !this.aaben[i]) {
+            this.aabn(i, false);
+            this.nulstilHjaelp();
             return;
         }
-        if (this.aaben[i]) { this.kortBesked("Luppen over glasset med " + K.navn(g.syre) + " viser et lille rum i " + K.navn(g.syre) + "n.", 5); return; }
-        this.aabn(i, false);
-        this.nulstilHjaelp();
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+        this.kortBlink();
     };
 
     NK.SimGlas = SimGlas;

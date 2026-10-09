@@ -25,8 +25,10 @@
    [H₃O⁺], at alle mål på de tre faner kan løses (selv, med forkerte
    svar og med Vis svaret), at opgaven står på kortet øverst i scenen
    og ikke i panelet (gættet, det, eleven skal gøre, og spørgsmålene),
-   at et klik på forsøget før gættet får kortet til at blinke, at
-   kortet aldrig dækker lupperne eller glassene, at sproget holder
+   at eleven kun kan sætte noget i gang, mens kortet viser et forsøg
+   (under et gæt, et spørgsmål og en forklaring blinker kortet i
+   stedet), at kortet aldrig dækker lupperne eller glassene, at
+   teksterne er korte, at sproget holder
    reglerne, og at tingene kan være der fra 1100 × 620 til 1600 × 950.
 
    Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
@@ -195,7 +197,7 @@ function koerTest(W) {
         taet(Math.hypot(kn.x - ek.x, kn.y - ek.y), Lk.F.arm + Lk.F.knop * 0.55, 0.01) && Lk.F.arm === FO.eddike.l && Lk.F.kant >= Lk.F.arm + Lk.F.knop);
     paastand("klikteksterne: oxoniumion, chloridion, acetation og et helt molekyle",
         /oxoniumion, H₃O⁺/.test(D.partikel("ox", "HCl", true)) && /^En chloridion, Cl⁻/.test(D.partikel("ion", "HCl", true)) && /^En acetation, CH₃COO⁻/.test(D.partikel("ion", "eddike", true)) &&
-        /^Citronsyrens ion, C₆H₇O₇⁻/.test(D.partikel("ion", "citron", true)) && /helt molekyle eddikesyre, CH₃COOH\. Den lille orange kugle er hydronen/.test(D.partikel("hel", "eddike", true)) &&
+        /^Citronsyrens ion, C₆H₇O₇⁻/.test(D.partikel("ion", "citron", true)) && /helt molekyle eddikesyre, CH₃COOH\. Den orange kugle er hydronen/.test(D.partikel("hel", "eddike", true)) &&
         !/Cl|HNO|CH/.test(D.partikel("ion", "HNO3", false) + D.partikel("hel", "HNO3", false)), D.partikel("ion", "citron", true));
 
     /* ------------------------------------------------------------------ */
@@ -237,17 +239,16 @@ function koerTest(W) {
     paastand("gættet står på det gule kort midt i scenen med tre svar, ikke i panelet",
         gkG.classList.contains("gaet") && gkG.offsetHeight > 150 && gkG.querySelectorAll("[data-valg]").length === 3 && /Gæt først/i.test(gkG.textContent) && /I hvilket glas bruser kalken mest\?/.test(gkG.textContent) &&
         !d.getElementById("g-kort") && !d.getElementById("g-prompt") && d.querySelectorAll("#fane-g .panel [data-valg]").length === 0, gkG.textContent);
-    paastand("under gættet er hjælpeknappen kun et lille omrids, Spring gættet over, og kortet har ingen besked",
-        knaptekst(G) === "Spring gættet over" && /svar/.test(G.el.knap.className) && /lille/.test(G.el.knap.className) && statuslinje(G) === "" && G.el.besked.hidden, knaptekst(G));
+    paastand("under gættet er der kun gættet på kortet: ingen hjælpeknap og ingen ekstra linje",
+        G.el.knap.hidden && G.el.status.hidden && statuslinje(G) === "" && !/Spring/.test(gkG.textContent), gkG.textContent);
     var p0 = glasMidt(G.glas[0]);
     klik(G, p0.x, p0.y);
-    paastand("et klik på et glas før gættet: ingen kalk, kortet blinker og siger Gæt først", G.harKalk() === 0 && gkG.classList.contains("blink") && statuslinje(G) === D.GAET_LINJE && !G.el.besked.hidden, statuslinje(G));
+    paastand("et klik på et glas før gættet: ingen kalk, kortet blinker, og der kommer ingen ekstra tekst", G.harKalk() === 0 && gkG.classList.contains("blink") && statuslinje(G) === "" && G.el.status.hidden, statuslinje(G));
     gkG.classList.remove("blink");
     var sk0 = G.lay.skaal;
     klik(G, sk0.x + sk0.b / 2, sk0.y + sk0.h / 2);
     paastand("et klik på skålen før gættet gør det samme, og kalken kan ikke trækkes endnu", !G.traek && G.harKalk() === 0 && gkG.classList.contains("blink"));
-    koerF(G, 5.5);
-    paastand("beskeden på kortet forsvinder igen efter nogle sekunder", statuslinje(G) === "" && G.el.besked.hidden);
+    gkG.classList.remove("blink");
     gkG.querySelector('[data-valg="1"]').click();
     paastand("et svar på kortet er gættet, og kortet viser nu, hvad der skal gøres", G.opg.gaet === 1 && !gkG.classList.contains("gaet") && gkG.classList.contains("opgave") &&
         /^Opgave 1/i.test(kortT(G)) && /Træk et stykke kalk/.test(kortT(G)) && /Dit gæt:\s*I glasset med eddikesyre/.test(gkG.textContent) && gkG.querySelectorAll("[data-valg]").length === 0, gkG.textContent);
@@ -266,25 +267,34 @@ function koerTest(W) {
     klik(G, p1.x, p1.y);
     paastand("et klik på det andet glas virker også", G.glas[1].kalk && G.harKalk() === 2);
     koerF(G, 1.0);
-    paastand("målet er ikke nået, før eleven har set det bruse", !G.faerdig && statuslinje(G) === "Se, hvor meget kalken bruser i de to glas.", statuslinje(G));
+    paastand("målet er ikke nået, før eleven har set det bruse, og kortet gentager ikke opgaven", !G.faerdig && statuslinje(G) === "", statuslinje(G));
     koerF(G, 3.0);
     paastand("mål 1: løst, gættet holdt ikke, og forklaringen står på det grønne kort øverst",
         G.faerdig && gkG.classList.contains("loest") && /^Løst ✓/.test(kortT(G)) && /Dit gæt holdt ikke\./.test(kortT(G)) && /bruser kraftigt i saltsyren/.test(kortT(G)), kortT(G));
     paastand("når opgaven er løst, er kortets nederste række og hjælpeknappen væk", G.el.status.hidden && G.el.knap.hidden && statuslinje(G) === "");
     paastand("kortet leder videre: knappen Næste opgave står på det", !!videre(G) && videre(G).textContent === "Næste opgave →" && gkG.offsetHeight <= G.kortZone(), gkG.offsetHeight);
     paastand("saltsyren bruser langt mere end eddikesyren", G.glas[0].bobler.length > 20 && G.glas[1].bobler.length <= 2, G.glas[0].bobler.length + " / " + G.glas[1].bobler.length);
+    gkG.classList.remove("blink");
+    klik(G, p0.x, p0.y);
+    paastand("mens kortet er grønt, åbner et klik på et glas ingen lup: knappen Næste opgave blinker", !G.aaben[0] && !G.aaben[1] && G.faerdig && gkG.classList.contains("blink") && gkG.classList.contains("loest"));
     videre(G).click();
     paastand("mål 2 begynder med kalk i glassene og uden lupper, og hjælpen er tilbage på kortet",
         G.opg.o.id === "lup-hcl" && G.harKalk() === 2 && !G.aaben[0] && !G.aaben[1] && G.peger() === 0 && /Klik på glasset med saltsyre/.test(kortT(G)) && !G.el.status.hidden && !G.el.knap.hidden, kortT(G));
+    gkG.classList.remove("blink");
+    klik(G, p1.x, p1.y);
+    paastand("opgaven beder om saltsyren: et klik på eddikesyren åbner ingen lup, og kortet blinker", !G.aaben[0] && !G.aaben[1] && gkG.classList.contains("blink") && statuslinje(G) === "");
     klik(G, p0.x, p0.y);
     paastand("et klik på saltsyren åbner luppen over den", G.aaben[0] && !G.aaben[1]);
     koerF(G, 1.5);
     paastand("så kommer spørgsmålet samme sted: på kortet øverst i scenen med tre svarknapper",
         G.opg.fase === "spm" && gkG.classList.contains("spm") && /^Spørgsmål/i.test(kortT(G)) && /stadig hele/.test(kortT(G)) && gkG.querySelectorAll(".sk-knap[data-valg]").length === 3 && gkG.offsetHeight <= G.kortZone() && statuslinje(G) === "", gkG.offsetHeight);
     paastand("lupperne begynder under den plads, kortet har fået sat af", G.lay.sigY - 16 >= 10 + G.kortZone() && G.lay.lup[0].y > G.lay.sigY);
+    gkG.classList.remove("blink");
+    klik(G, p1.x, p1.y);
+    paastand("mens spørgsmålet om saltsyren står på kortet, kan luppen over eddikesyren ikke åbnes", !G.aaben[1] && G.opg.fase === "spm" && gkG.classList.contains("blink"));
     gkG.querySelector('.sk-knap[data-valg="' + forkert(G) + '"]').click();
     paastand("et forkert svar: forklaringen står i rødt på kortet under svarene, svaret bliver rødt, og hintknappen lyser op",
-        roed(G) && /^Ikke endnu/.test(statuslinje(G)) && /gråt med en lille orange hydron/.test(statuslinje(G)) && /peg/.test(G.el.knap.className) &&
+        roed(G) && /^Ikke endnu/.test(statuslinje(G)) && /gråt med en orange hydron/.test(statuslinje(G)) && /peg/.test(G.el.knap.className) &&
         gkG.querySelectorAll(".sk-knap.forkert:disabled").length === 1 && gkG.offsetHeight <= G.kortZone() &&
         G.el.status.getBoundingClientRect().top >= gkG.querySelector(".sk-svar").getBoundingClientRect().bottom, statuslinje(G));
     gkG.querySelector('.sk-knap[data-valg="' + rigtigt(G) + '"]').click();
@@ -307,12 +317,14 @@ function koerTest(W) {
     videre(G).click();
     paastand("mål 4: nu bytter eddikesyren hydroner", G.opg.o.id === "balance" && G.lup[1].bytter === true && G.opg.fase === "forsoeg");
     var byt0 = G.lup[1].byt;
-    koerF(G, 14);
+    koerF(G, 4.5);
+    paastand("det første bytte venter, til eleven har nået at læse opgaven (mindst 4,5 s)", G.lup[1].byt === byt0 && !G.lup[1].skift && G.opg.fase === "forsoeg" && !G.venter);
+    koerF(G, 9.5);
     paastand("et bytte er set inden for 14 s: det, eleven så, står alene på det grønne kort med knappen Næste spørgsmål",
         G.lup[1].byt > byt0 && G.venter && G.opg.fase === "forsoeg" && gkG.classList.contains("loest") && /^Godt ✓/.test(kortT(G)) && /tog en hydron tilbage/.test(kortT(G)) &&
         videre(G).textContent === "Næste spørgsmål →" && G.peger() === null, kortT(G));
     videre(G).click();
-    paastand("så kommer spørgsmålet om hydronerne", G.opg.fase === "spm" && gkG.classList.contains("spm") && /flytter hydronerne hele tiden/.test(kortT(G)), kortT(G));
+    paastand("så kommer spørgsmålet om hydronerne", G.opg.fase === "spm" && gkG.classList.contains("spm") && /altid omkring 1 oxoniumion i luppen over eddikesyren\?/.test(kortT(G)), kortT(G));
     G.svarValg(forkert(G));
     var roed4 = roed(G);
     G.svarValg(rigtigt(G));
@@ -346,17 +358,21 @@ function koerTest(W) {
     S.vaelg(0); S.tilpas(); S.layout();
     var gkS = d.getElementById("s-skort");
     paastand("startbilledet: fem glas med kalk, ingen navne og ingen lup, og kortet siger Klik på glas A",
-        S.glas.length === 5 && S.glas.every(function (g) { return g.kalk; }) && S.valgt === -1 && S.navngivet.every(function (n) { return !n; }) && S.peger() === 0 && /Klik på glas A\.$/.test(kortT(S)) && statuslinje(S) === "", kortT(S));
+        S.glas.length === 5 && S.glas.every(function (g) { return g.kalk; }) && S.valgt === -1 && S.navngivet.every(function (n) { return !n; }) && S.peger() === 0 && /Klik på glas A for at se i luppen\.$/.test(kortT(S)) && statuslinje(S) === "", kortT(S));
     paastand("panelet kalder alle fem glas ukendte", (d.getElementById("s-glassene").textContent.match(/ukendt/g) || []).length === 5);
     var gp = S.glas.map(glasMidt);
     klik(S, gp[1].x, gp[1].y);
     koerF(S, 2);
-    paastand("et klik på et andet glas viser det i luppen, og kortet siger, at opgaven gælder glas A",
-        S.valgt === 1 && S.opg.fase === "forsoeg" && S.lup.syre === "eddike" && statuslinje(S) === "Luppen viser glas B. Klik på glas A.", statuslinje(S));
+    paastand("opgaven beder om glas A: et klik på glas B åbner ikke luppen, og kortet blinker",
+        S.valgt === -1 && S.opg.fase === "forsoeg" && gkS.classList.contains("blink") && statuslinje(S) === "", statuslinje(S));
+    gkS.classList.remove("blink");
     klik(S, gp[0].x, gp[0].y);
     koerF(S, 1.5);
     paastand("glas A i luppen: 100 delte, og spørgsmålet stærk eller svag står på kortet med to svar",
         S.valgt === 0 && S.opg.fase === "spm" && S.lup.antal().delte === 100 && S.skemaNu() === null && gkS.classList.contains("spm") && gkS.querySelectorAll(".sk-knap").length === 2 && !gkS.querySelector(".sk-skema") && statuslinje(S) === "");
+    klik(S, gp[1].x, gp[1].y);
+    paastand("mens spørgsmålet om glas A står på kortet, kan luppen ikke flyttes til et andet glas", S.valgt === 0 && S.lup.syre === "HNO3" && gkS.classList.contains("blink"));
+    gkS.classList.remove("blink");
     S.svarValg(forkert(S));
     paastand("forkert: forklaringen på kortet peger på de grå molekyler", roed(S) && /grå molekyler/.test(statuslinje(S)), statuslinje(S));
     S.svarValg(rigtigt(S));
@@ -364,7 +380,8 @@ function koerTest(W) {
         S.venter && !S.faerdig && gkS.classList.contains("loest") && /^Rigtigt ✓En stærk syre\. /.test(kortT(S)) && /salpetersyre, HNO₃\.$/.test(kortT(S)) && videre(S).textContent === "Næste spørgsmål →" &&
         S.el.knap.hidden && S.el.status.hidden && gkS.querySelectorAll(".sk-knap").length === 0 && S.navngivet[0] && /Salpetersyre/.test(d.getElementById("s-glassene").textContent), kortT(S));
     S.svarValg(1);
-    paastand("mens forklaringen står der, kan der ikke svares igen", S.venter && S.opg.fase === "spm");
+    klik(S, gp[2].x, gp[2].y);
+    paastand("mens forklaringen står der, kan der ikke svares igen, og et klik på et glas får knappen Næste spørgsmål til at blinke", S.venter && S.opg.fase === "spm" && S.valgt === 0 && gkS.classList.contains("blink"));
     videre(S).click();
     paastand("så kommer pilen: skemaet står på kortet med et spørgsmålstegn",
         S.opg.fase === "spm2" && S.skemaNu() === "?" && gkS.querySelectorAll(".sk-knap").length === 2 && /→/.test(gkS.textContent) && /⇌/.test(gkS.textContent) &&
@@ -393,11 +410,10 @@ function koerTest(W) {
     paastand("mål 4: glas D har fået sin etiket, og gættet står på det gule kort, hvor luppen ellers er",
         S.opg.o.id === "d" && S.opg.fase === "gaet" && S.navngivet[3] && !S.navngivet[4] && S.valgt === -1 && S.peger() === -1 && gkS.classList.contains("gaet") && gkS.querySelectorAll("[data-valg]").length === 3 && /saltsyre, HCl/.test(gkS.textContent));
     klik(S, gp[3].x, gp[3].y);
-    paastand("luppen for glas D åbner ikke før gættet, og kortet blinker", S.valgt === -1 && /Gæt først/.test(statuslinje(S)) && /Så åbner luppen\./.test(statuslinje(S)) && gkS.classList.contains("blink"), statuslinje(S));
+    paastand("luppen for glas D åbner ikke før gættet, og kortet blinker uden ekstra tekst", S.valgt === -1 && statuslinje(S) === "" && S.el.knap.hidden && gkS.classList.contains("blink"), statuslinje(S));
     gkS.classList.remove("blink");
     klik(S, gp[0].x, gp[0].y);
     paastand("heller ikke et andet glas åbner luppen under gættet", S.valgt === -1 && gkS.classList.contains("blink"));
-    koerF(S, 5.5);
     gkS.querySelector('[data-valg="2"]').click();
     var vaekS = !gkS.classList.contains("gaet");
     klik(S, gp[3].x, gp[3].y); koerF(S, 1.5);
@@ -408,7 +424,7 @@ function koerTest(W) {
     paastand("mål 5: gættet holdt ikke; dommen og det, luppen viser, står alene på kortet, før spørgsmålet kommer",
         S.venter && S.opg.fase === "forsoeg" && /^Forsøget ✓Dit gæt holdt ikke\. I luppen for glas E/.test(kortT(S)) && S.lup.antal().delte >= 4 && S.lup.antal().delte <= 5 && videre(S).textContent === "Næste spørgsmål →", kortT(S));
     videre(S).click();
-    paastand("spørgsmålet om glas B og glas E: begge glas har navn og ring", S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4] && /Glas E er myresyre/.test(kortT(S)));
+    paastand("spørgsmålet om glas B og glas E: begge glas har navn og ring", S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4] && /Glas E, myresyre/.test(kortT(S)) && /Glas B, eddikesyre/.test(kortT(S)), kortT(S));
     S.svarValg(1);
     var roedE = roed(S) && /ikke lige svage/.test(statuslinje(S));
     S.svarValg(rigtigt(S));
@@ -432,33 +448,38 @@ function koerTest(W) {
         F.trin === 0 && F.glas[1].c === 0.10 && F.glas.every(function (g) { return g.kalk; }) && F.opg.fase === "gaet" && F.tavle.hidden && gkF.classList.contains("gaet") && gkF.querySelectorAll("[data-valg]").length === 3 &&
         F.vaerktoej.hidden && F.lupVed({ x: F.lay.lup[0].x + 20, y: F.lay.lup[0].y + 20 }) === -1 && F.lup[1].antal().delte === 100);
     F.fortynd();
-    paastand("der kan ikke fortyndes før gættet", F.trin === 0 && !F.fort && /Gæt først/.test(statuslinje(F)) && gkF.classList.contains("blink"), statuslinje(F));
+    paastand("der kan ikke fortyndes før gættet: kortet blinker uden ekstra tekst", F.trin === 0 && !F.fort && statuslinje(F) === "" && F.el.knap.hidden && gkF.classList.contains("blink"), statuslinje(F));
     gkF.classList.remove("blink");
     var pF = glasMidt(F.glas[1]);
     klik(F, pF.x, pF.y);
-    paastand("et klik på et glas før gættet får kortet til at blinke", gkF.classList.contains("blink") && /Gæt først/.test(statuslinje(F)));
-    koerF(F, 5.5);
+    paastand("et klik på et glas før gættet får kortet til at blinke", gkF.classList.contains("blink") && statuslinje(F) === "");
     gkF.querySelector('[data-valg="0"]').click();
     paastand("efter gættet kommer lupperne og de to knapper mellem glassene frem, og knappen Fortynd banker",
         !gkF.classList.contains("gaet") && F.opg.fase === "forsoeg" && !F.vaerktoej.hidden && /banker/.test(F.knapF.className) && F.vaerktoej.contains(F.el.forfra) &&
-        F.lupVed({ x: F.lay.lup[0].x + 20, y: F.lay.lup[0].y + 20 }) === 0 && /Tryk på knappen Fortynd 10 gange mellem glassene/.test(kortT(F)) && statuslinje(F) === "", kortT(F));
+        F.lupVed({ x: F.lay.lup[0].x + 20, y: F.lay.lup[0].y + 20 }) === 0 && /Tryk på Fortynd 10 gange, og sammenlign luppen over saltsyren/.test(kortT(F)) && statuslinje(F) === "", kortT(F));
     F.knapF.click();
     koerF(F, 0.4);
-    var midt = F.fort && F.glas[1].niveau < 0.8 && /hældes fra/.test(statuslinje(F)) && F.knapF.disabled;
+    var midt = F.fort && F.glas[1].niveau < 0.8 && statuslinje(F) === "" && F.knapF.disabled;
     koerF(F, 1.0);
-    var fyld = F.fort && F.trin === 1 && /fyldes op med vand/.test(statuslinje(F));
+    var fyld = F.fort && F.trin === 1 && statuslinje(F) === "";
     koerF(F, 1.0);
-    paastand("en fortynding: kortet siger, at ni tiendedele hældes fra, og at der fyldes op med vand", midt && fyld && !F.fort && F.glas[1].niveau === 1 && F.glas[1].c === 0.010 && statuslinje(F) === "", statuslinje(F));
+    paastand("en fortynding: ni tiendedele hældes fra, og der fyldes op med vand (mærket står over glasset, kortet får ingen ekstra tekst)", midt && fyld && !F.fort && F.glas[1].niveau === 1 && F.glas[1].c === 0.010 && statuslinje(F) === "", statuslinje(F));
+    F.knapF.click(); koerF(F, 0.2);
+    paastand("opgaven beder om én fortynding: knappen Fortynd er lukket bagefter", F.trin === 1 && !F.fort && F.knapF.disabled && !/banker/.test(F.knapF.className));
     paastand("luppen har nu 10 oxoniumioner, og panelet siger det samme", F.lup[1].antal().ox === 10 && /0,010 M/.test(d.getElementById("f-toglas").textContent) && /10 gange/.test(d.getElementById("f-toglas").textContent));
     koerF(F, 1.8);
-    paastand("mål 1: løst, gættet holdt ikke", F.faerdig && /Dit gæt holdt ikke\./.test(kortT(F)) && /10 i luppen over saltsyren mod omkring 1 i luppen over eddikesyren/.test(kortT(F)), kortT(F));
+    paastand("mål 1: løst, gættet holdt ikke", F.faerdig && /Dit gæt holdt ikke\./.test(kortT(F)) && /stadig flest oxoniumioner: 10 mod omkring 1/.test(kortT(F)), kortT(F));
+    gkF.classList.remove("blink");
+    F.fortynd();
+    paastand("mens kortet er grønt, er knapperne Fortynd og Ny saltsyre væk, og der kan ikke fortyndes", F.vaerktoej.hidden && F.trin === 1 && !F.fort && gkF.classList.contains("blink"));
     videre(F).click();
-    paastand("mål 2 fortsætter med den fortyndede saltsyre", F.opg.o.id === "lige" && F.trin === 1 && /^Saltsyren er nu 0,010 M\. Fortynd saltsyren igen/.test(statuslinje(F)), statuslinje(F));
+    paastand("mål 2 fortsætter med den fortyndede saltsyre, og knapperne er fremme igen", F.opg.o.id === "lige" && F.trin === 1 && /^Opgave 2Fortynd saltsyren, til saltsyren har lige så få oxoniumioner/.test(kortT(F)) && statuslinje(F) === "" && !F.vaerktoej.hidden && !F.knapF.disabled, kortT(F));
     F.fortynd(); koerF(F, 2.2);
     F.fortynd(); koerF(F, 2.2);
     paastand("for meget: efter tre fortyndinger er luppen tom, og kortet sender eleven tilbage", F.trin === 3 && F.opg.fase === "forsoeg" && !F.venter && F.lup[1].antal().haeldt === 0 && /Ny saltsyre/.test(statuslinje(F)) && F.knapF.disabled, statuslinje(F));
+    gkF.classList.remove("blink");
     F.fortynd();
-    paastand("en fjerde fortynding får en besked", F.trin === 3 && /allerede fortyndet 1000 gange/.test(statuslinje(F)), statuslinje(F));
+    paastand("en fjerde fortynding sker ikke: kortet blinker", F.trin === 3 && !F.fort && gkF.classList.contains("blink") && /Ny saltsyre/.test(statuslinje(F)), statuslinje(F));
     F.el.forfra.click();
     paastand("Ny saltsyre begynder forfra med 0,10 M", F.trin === 0 && F.glas[1].c === 0.10 && F.lup[1].antal().ox === 100 && !F.knapF.disabled);
     F.fortynd(); koerF(F, 2.2); F.fortynd(); koerF(F, 2.2);
@@ -466,18 +487,25 @@ function koerTest(W) {
     paastand("to fortyndinger: 0,0010 M og 1 oxoniumion i hver lup; det står alene på det grønne kort",
         F.trin === 2 && F.venter && F.lup[1].antal().ox === 1 && F.lup[1].antal().hele === 0 && F.lup[0].antal().delte >= 1 &&
         /^Godt ✓Nu er der 1 oxoniumion i luppen over saltsyren og omkring 1 i luppen over eddikesyren/.test(kortT(F)) && videre(F).textContent === "Næste spørgsmål →", kortT(F));
+    gkF.classList.remove("blink");
+    F.fortynd(); koerF(F, 0.3);
+    paastand("mens det, eleven så, står på det grønne kort, kan der ikke fortyndes videre", F.vaerktoej.hidden && F.trin === 2 && !F.fort && F.venter && gkF.classList.contains("blink"));
     videre(F).click();
-    paastand("så kommer spørgsmålet om fortyndingen", F.opg.fase === "spm" && /Hvor mange gange er saltsyren fortyndet i alt\?/.test(kortT(F)), kortT(F));
+    paastand("så kommer spørgsmålet om fortyndingen, og knapperne Fortynd og Ny saltsyre er væk imens", F.opg.fase === "spm" && /Hvor mange gange er saltsyren fortyndet\?/.test(kortT(F)) && F.vaerktoej.hidden, kortT(F));
+    gkF.classList.remove("blink");
+    F.fortynd(); koerF(F, 0.3);
+    paastand("under spørgsmålet kan der ikke fortyndes: glasset bliver på 0,0010 M, og kortet blinker", F.trin === 2 && !F.fort && F.glas[1].c === 0.0010 && gkF.classList.contains("blink"));
     F.svarValg(0);
     var roedF = roed(F) && /ganges/.test(statuslinje(F));
     F.svarValg(rigtigt(F));
     paastand("mål 2: løst, 100 gange", roedF && F.faerdig && /100 gange/.test(kortT(F)) && /100 gange/.test(d.getElementById("f-toglas").textContent), kortT(F));
     videre(F).click();
     paastand("mål 3 stiller saltsyren på 0,0010 M", F.opg.o.id === "svag" && F.trin === 2);
+    gkF.classList.remove("blink");
     F.fortynd(); koerF(F, 2.3);
-    paastand("fortynder eleven videre, siger kortet, hvad spørgsmålet gælder", F.trin === 3 && /gælder saltsyre på 0,0010 M/.test(statuslinje(F)), statuslinje(F));
+    paastand("i et mål med kun et spørgsmål er knapperne væk, og saltsyren kan ikke fortyndes videre", F.trin === 2 && !F.fort && F.vaerktoej.hidden && gkF.classList.contains("blink") && statuslinje(F) === "", statuslinje(F));
     F.forfra();
-    paastand("Ny saltsyre giver 0,0010 M igen i dette mål", F.trin === 2 && F.lup[1].antal().ox === 1);
+    paastand("tasten R ændrer heller ikke saltsyren under et spørgsmål", F.trin === 2 && F.lup[1].antal().ox === 1 && F.opg.fase === "spm");
     F.svarValg(0);
     var roed3 = roed(F) && /hele HCl-molekyler/.test(statuslinje(F));
     F.svarValg(rigtigt(F));
@@ -533,17 +561,29 @@ function koerTest(W) {
             });
             if (o.spm2 && !o.spm.godt) opbyg.push(o.id + " forklaring til første svar mangler");
             if (o.gaet && (o.gaet.svar.filter(function (s) { return s.ok; }).length !== 1 || !o.forsoeg)) opbyg.push(o.id + " gæt");
-            if (o.gaet && (!o.gaet.intro || !/\?$/.test(o.gaet.tekst) || o.gaet.tekst.length > 60 || o.gaet.svar.length !== 3)) opbyg.push(o.id + " gættets indledning og korte spørgsmål");
+            if (o.gaet && (!o.gaet.intro || o.gaet.intro.length > 115 || !/\?$/.test(o.gaet.tekst) || o.gaet.tekst.length > 60 || o.gaet.svar.length !== 3)) opbyg.push(o.id + " gættets indledning og korte spørgsmål");
+            if (o.gaet) o.gaet.svar.forEach(function (sv) { if (sv.t.length > 34) opbyg.push(o.id + " gættets svar er for langt: " + sv.t); });
             ["spm", "spm2"].forEach(function (del) {
                 if (!o[del]) return;
-                if (o[del].tekst.length > 118) opbyg.push(o.id + " " + del + " spørgsmålet er for langt til kortet: " + o[del].tekst.length);
-                o[del].svar.forEach(function (sv) { if (sv.t.length > 46) opbyg.push(o.id + " svaret er for langt til kortet: " + sv.t); });
+                if (o[del].tekst.length > 105) opbyg.push(o.id + " " + del + " spørgsmålet er for langt til kortet: " + o[del].tekst.length);
+                o[del].svar.forEach(function (sv) {
+                    if (sv.t.length > 34) opbyg.push(o.id + " svaret er for langt til kortet: " + sv.t);
+                    if (sv.f && sv.f.length > 110) opbyg.push(o.id + " forklaringen til et forkert svar er for lang: " + sv.f.length);
+                });
+                if (o[del].godt && o[del].godt.length > 110) opbyg.push(o.id + " forklaringen til det første svar er for lang");
             });
-            if (o.forsoeg && o.forsoeg.tekst.length > 150) opbyg.push(o.id + " forsøgets tekst er for lang til kortet");
+            ["forsoeg", "spm", "spm2", "felter"].forEach(function (del) {
+                if (o[del]) o[del].hint.forEach(function (h) { if (h.length > 100) opbyg.push(o.id + " " + del + " et hint er for langt: " + h.length); });
+            });
+            if (o.forsoeg && o.forsoeg.tekst.length > 95) opbyg.push(o.id + " forsøgets tekst er for lang til kortet: " + o.forsoeg.tekst.length);
+            if (o.forsoeg && o.forsoeg.set && o.forsoeg.set.length > 110) opbyg.push(o.id + " det, eleven så, er for langt");
+            if (o.felter && o.felter.tekst.length > 95) opbyg.push(o.id + " tavlens tekst er for lang");
+            if (o.loest && o.loest.length > 160) opbyg.push(o.id + " forklaringen til det rigtige svar er for lang: " + o.loest.length);
             if (!o.loest || !o.navn) opbyg.push(o.id + " tekst");
         });
     });
-    paastand("15 mål: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte, og teksterne er korte nok til kortet", opbyg.length === 0, opbyg.join(", "));
+    paastand("15 mål: hver del har tre hint, hvert spørgsmål ét rigtigt svar og en forklaring til de forkerte", opbyg.filter(function (t) { return !/lang/.test(t); }).length === 0, opbyg.join(", "));
+    paastand("teksterne er korte: spørgsmål højst 105 tegn, svar 34, forsøg 95, hint 100, forkert svar 110 og forklaringen 160", opbyg.filter(function (t) { return /lang/.test(t); }).length === 0, opbyg.join(", "));
     /* Intet er indforstaaet: hver tekst paa kortet naevner selv det glas, den syre
        eller den lup, den handler om, og begynder ikke midt i en tanke */
     var indf = [];
@@ -553,7 +593,7 @@ function koerTest(W) {
                 if (!o[del]) return;
                 var t = (o[del].intro ? o[del].intro + " " : "") + o[del].tekst;
                 if (/\b(Også her|Klik nu|Her er|Hvor mange af dem\?$)/.test(t) || /^(Også|Og |Men |Nu |Så |Her )/.test(t)) indf.push(o.id + " " + del + " begynder indforstået");
-                if (!/saltsyre|eddikesyre|myresyre|citronsyre|salpetersyre|glas [A-E]|flasker/i.test(t)) indf.push(o.id + " " + del + " nævner ikke, hvad den handler om");
+                if (!/saltsyre|eddikesyre|myresyre|citronsyre|salpetersyre|glas [A-E]|de to glas|flasker/i.test(t)) indf.push(o.id + " " + del + " nævner ikke, hvad den handler om");
             });
             if (/\b(den|det|de) (her|der)\b/.test(o.loest)) indf.push(o.id + " forklaringen peger uden at nævne");
         });
@@ -600,7 +640,62 @@ function koerTest(W) {
     paastand("rundvisningen har trin til alle tre faner", ["fane-g", "fane-s", "fane-f"].every(function (id) { NK.visFane(id); NK.Rundvisning.start(id); var ok = NK.Rundvisning.aktiv(); NK.Rundvisning.luk(); return ok; }));
 
     /* ------------------------------------------------------------------ */
-    overskrift("9. Layoutet");
+    overskrift("9. Låsen: forsøget kan kun sættes i gang, mens kortet viser et forsøg");
+    /* Gennem alle dele af alle mål: uden for et forsøg prøves et klik på hvert
+       glas, på skålen og på knapperne. I et forsøg prøves kun det, opgaven ikke
+       beder om. Intet må flytte sig, og kortet skal blinke. */
+    var laas = [], laasN = 0;
+    [["fane-g", G, "fane 1"], ["fane-s", S, "fane 2"], ["fane-f", F, "fane 3"]].forEach(function (x) {
+        var X = x[1];
+        NK.visFane(x[0]);
+        function aftryk() {
+            if (X === G) return G.harKalk() + "|" + G.aaben.join();
+            if (X === S) return String(S.valgt);
+            return F.trin + "|" + (F.fort ? 1 : 0) + "|" + F.glas[1].c;
+        }
+        X.opgaver.forEach(function (o, i) {
+            X.vaelg(i); X.tilpas(); X.layout();
+            for (var n = 0; n < 40; n++) {
+                var hvor = x[2] + " mål " + (i + 1) + " (" + (X.faerdig ? "løst" : (X.venter ? "venter" : X.opg.fase)) + ")";
+                if (!(X === F && F.erTavle())) {
+                    var laast = !X.iForsoeg(), foer = aftryk(), proevet = 0;
+                    X.el.skort.classList.remove("blink");
+                    X.glas.forEach(function (g, j) {
+                        if (!laast) {
+                            if (X === G && (o.id === "kalk" || o.forsoeg.aabn === j)) return;
+                            if (X === S && o.glas === j) return;
+                        }
+                        var p = glasMidt(g);
+                        klik(X, p.x, p.y);
+                        proevet++;
+                    });
+                    if (X === G && laast) {
+                        var skl = G.lay.skaal;
+                        klik(G, skl.x + skl.b / 2, skl.y + skl.h / 2);
+                        mus(G, "pointerdown", skl.x + skl.b / 2, skl.y + skl.h / 2);
+                        if (G.traek) laas.push(hvor + ": kalken kan trækkes");
+                        mus(G, "pointerup", skl.x + skl.b / 2, skl.y + skl.h / 2);
+                        proevet++;
+                    }
+                    if (X === F && laast) {
+                        if (!F.vaerktoej.hidden) laas.push(hvor + ": knapperne Fortynd og Ny saltsyre er fremme");
+                        F.fortynd(); F.knapF.click(); F.el.forfra.click();
+                        proevet++;
+                    }
+                    if (aftryk() !== foer) laas.push(hvor + ": scenen ændrede sig " + foer + " til " + aftryk());
+                    if (proevet && !X.el.skort.classList.contains("blink")) laas.push(hvor + ": kortet blinker ikke");
+                    laasN += proevet;
+                }
+                if (X.faerdig) break;
+                X.knap();
+                koerF(X, 0.05);
+            }
+        });
+    });
+    paastand("i alle 15 mål: uden for et forsøg sætter et klik på et glas, skålen eller Fortynd intet i gang, og kortet blinker (" + laasN + " klik prøvet)", laas.length === 0 && laasN > 150, laas.join("; "));
+
+    /* ------------------------------------------------------------------ */
+    overskrift("10. Layoutet");
     var stoerrelser = [[1100, 620], [1100, 700], [1300, 760], [1600, 950]];
     stoerrelser.forEach(function (st2) {
         ramme.style.width = st2[0] + "px";

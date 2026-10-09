@@ -71,7 +71,8 @@
     /* ----- Maalene ------------------------------------------------------------------ */
     /* Fra maalet Zoom ud er kaeden et udsnit af en lang kaede */
     P.erUdsnit = function () { return this.idx(this.opg.o.id) >= this.idx("polymer"); };
-    P.harBrom = function () { return this.idx(this.opg.o.id) >= this.idx("frysepose"); };
+    /* Brommolekylet hoerer kun til opgaven Fryseposen */
+    P.harBrom = function () { return this.opg.o.id === "frysepose"; };
 
     P.nyOpgave = function (o) {
         var op = o.opstil;
@@ -94,14 +95,14 @@
     P.efterOpgave = function () { this.visPanel(); this.visVaerktoej(); };
 
     P.nulstilScene = function () {
-        var o = this.opg.o, op = o.opstil;
+        /* Ny kaede (og tasten R) hoerer til forsoeget */
+        if (!this.iForsoeg()) return;
+        var op = this.opg.o.opstil;
         this.saml = null;
         this.traek = null;
         this.afvis = null;
         this.zoomMaal = 0;
-        if (op && op.led !== undefined && !(o.id === "to" && this.opg.fase !== "forsoeg")) this.led = op.led;
-        else if (o.id === "to") this.led = 2;
-        else this.led = this.opg.fase === "forsoeg" ? 2 : 6;
+        this.led = op && op.led !== undefined ? op.led : 2;
         this.pulje.forEach(function (p) { p.til = true; p.alfa = 1; p.vent = 0; });
         this.visPanel();
         this.visVaerktoej();
@@ -117,20 +118,9 @@
        den lange streg er, naar der er zoomet ud. */
     P.sceneLinje = function () {
         var krav = this.kravNu();
-        if (krav === "zoom") return this.zoomMaal ? "Den lange streg er én kæde i polyethen. Det lille gule stykke er kæden på 6 ethenmolekyler." : "";
-        if (krav === "afvist") return this.zoomMaal && !this.afvis ? "Tryk på Zoom ind, og træk brommolekylet hen til kæden af polyethen." : "";
+        if (typeof krav !== "number") return "";
         if (this.saml) return "Dobbeltbindingen i ethen åbner sig, og ethenmolekylet binder sig til sin nabo.";
-        if (this.led === 0) return "";
-        if (this.led < krav) return "Kæden er lavet af " + this.led + " ethenmolekyler.";
-        if (this.led > krav) return "Kæden er lavet af " + this.led + " ethenmolekyler. Tryk på Ny kæde, og stop ved " + krav + ".";
-        return "";
-    };
-
-    P.spmLinje = function () {
-        var o = this.opg.o, sidst = "" + D.SAA_SVAR;
-        if (o.id === "to" && this.led < 2 && !this.saml) return "Spørgsmålet gælder to ethenmolekyler, der har sat sig sammen. Træk et ethenmolekyle hen oven på et andet." + sidst;
-        if (o.id === "kaede" && this.led !== 6 && !this.saml) return "Spørgsmålet gælder en kæde af 6 ethenmolekyler. Tryk på Ny kæde." + sidst;
-        if (o.id === "udsnit" && this.zoomMaal) return "Tryk på Zoom ind, så du kan se felterne i kæden." + sidst;
+        if (this.led > 2 && this.led < krav) return "Kæden er lavet af " + this.led + " ethenmolekyler.";
         return "";
     };
 
@@ -148,24 +138,22 @@
 
     /* ----- Zoom ------------------------------------------------------------------------ */
     P.skiftZoom = function () {
-        if (this.gaetNu()) { this.gaetBlink(); return; }
+        /* Laasen: knappen hoerer til forsoeget i opgaven Zoom ud */
+        if (this.spaer()) return;
+        if (this.kravNu() !== "zoom") { this.kortBlink(); return; }
         this.zoomMaal = this.zoomMaal ? 0 : 1;
         this.zoomT = 0;
         this.nulstilHjaelp();
         this.visVaerktoej();
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+        this.naesteLinje("", "");
     };
 
     P.visVaerktoej = function () {
-        var g = this.opg;
-        /* knappen kommer med det maal, der bruger den, og venter under et gaet */
-        this.vaerktoej.hidden = !this.erUdsnit() || this.gaetNu();
+        /* Knappen Zoom ud er kun fremme i det forsoeg, den hoerer til */
+        var krav = this.iForsoeg() ? this.kravNu() : null;
+        this.vaerktoej.hidden = krav !== "zoom";
         this.zoomKnap.textContent = this.zoomMaal ? "Zoom ind" : "Zoom ud";
-        var mangler = !this.faerdig && !this.venter && g && g.fase === "forsoeg" && this.kravNu() === "zoom" && !this.zoomMaal;
-        var tilbage = !this.faerdig && g && this.zoomMaal && ((g.fase === "forsoeg" && this.kravNu() === "afvist") || g.o.id === "udsnit");
-        /* Ny kaede staar til hoejre lige under kortets plads; under et gaet er den vaek */
-        if (this.el.forfra) this.el.forfra.hidden = this.gaetNu();
-        this.zoomKnap.classList.toggle("banker", !!(mangler || tilbage));
+        this.zoomKnap.classList.toggle("banker", krav === "zoom" && !this.zoomMaal);
     };
 
     /* ----- Panelet --------------------------------------------------------------------- */
@@ -233,7 +221,7 @@
        venstre: paa kaedens venstre ende. makker: det andet molekyle, naar der
        endnu ikke er nogen kaede. */
     P.saetPaa = function (i, fra, venstre, makker) {
-        if (this.saml) return false;
+        if (this.saml || !this.iForsoeg() || typeof this.kravNu() !== "number") return false;
         if (this.led >= K.MAX_LED) { this.kortBesked(D.P_FULD, 7); return false; }
         var p = this.pulje[i];
         this.nulstilHjaelp();
@@ -246,7 +234,7 @@
             this.saml = { t: 0, foer: this.led, efter: this.led + 1, skift: venstre ? 1 : 0, ind: [{ fra: fra, k: venstre ? 0 : this.led }] };
         }
         p.til = false; p.vent = NY_SEK + SAML_SEK;
-        if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+        this.naesteLinje("", "");
         return true;
     };
 
@@ -272,7 +260,6 @@
         lay.kTop = 10 + this.kortZone() + 8;
         lay.kBund = lay.yPulje - 10;
         this.vaerktoej.style.top = lay.kTop + "px";
-        if (this.el.forfra) this.el.forfra.style.top = lay.kTop + "px";
         /* Brommolekylets brik: midt i baandet forneden */
         var bb = NK.klamp(W * 0.22, 130, 180), bh = Math.min(ph - 8, 100);
         lay.brom = { x: W / 2 - bb / 2, y: Hs - bh - 12, b: bb, h: bh };
@@ -384,7 +371,7 @@
                 this.saml = null;
                 this.uK = this.uFor(this.led);
                 this.visPanel();
-                if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+                if (this.iForsoeg()) this.naesteLinje("", "");
             }
         }
         if (this.zoom !== this.zoomMaal) {
@@ -396,17 +383,16 @@
             if (this.afvis.t >= 1) {
                 this.afvis = null;
                 this.bromSet = true;
-                if (!this.faerdig && !this.venter && g.fase === "forsoeg" && this.kravNu() === "afvist") { this.forsoegKlaret(""); this.visVaerktoej(); return; }
-                this.kortBesked(D.P_BROM, 6);
+                if (this.iForsoeg() && this.kravNu() === "afvist") { this.forsoegKlaret(""); this.visVaerktoej(); return; }
             }
         }
 
-        if (this.faerdig || this.venter || g.fase !== "forsoeg") return;
+        if (!this.iForsoeg()) return;
         var krav = this.kravNu();
         if (krav === "zoom") {
             if (this.zoom >= 1) {
                 this.zoomT += dt;
-                if (this.zoomT >= SET_SEK) { this.forsoegKlaret(""); this.visVaerktoej(); }
+                if (this.zoomT >= SET_SEK) { this.forsoegKlaret(g.o.forsoeg.set || ""); this.visVaerktoej(); }
             }
         } else if (krav !== "afvist") {
             if (!this.saml && this.led === krav) { this.forsoegKlaret(g.o.forsoeg.set || ""); this.visVaerktoej(); }
@@ -416,7 +402,7 @@
     /* Det, der skal bruges nu: "pulje", "brom" eller null */
     P.peger = function () {
         var g = this.opg;
-        if (this.faerdig || this.venter || g.fase !== "forsoeg" || this.traek || this.saml || this.afvis) return null;
+        if (!this.iForsoeg() || this.traek || this.saml || this.afvis) return null;
         var krav = this.kravNu();
         if (krav === "zoom") return null;
         if (krav === "afvist") return this.zoom < 0.05 ? "brom" : null;
@@ -675,18 +661,29 @@
     P.overScene = function (pt) {
         this.over = null;
         if (!pt || !this.lay) return null;
+        var krav = this.iForsoeg() ? this.kravNu() : null;
         var i = this.puljeVed(pt);
-        if (i >= 0) { this.over = i; return this.saml ? "klik" : "greb"; }
-        if (this.bromVed(pt)) { this.over = "brom"; return this.gaetNu() || this.afvis ? "klik" : "greb"; }
+        if (i >= 0) { this.over = i; return typeof krav === "number" && !this.saml ? "greb" : "klik"; }
+        if (this.bromVed(pt)) { this.over = "brom"; return krav === "afvist" && !this.afvis ? "greb" : "klik"; }
         return this.kaedeVed(pt) ? "klik" : null;
     };
 
     P.nedScene = function (pt) {
-        if (this.gaetNu() || this.saml || this.afvis) return false;
-        var i = this.puljeVed(pt);
-        if (i >= 0) { this.traek = { slags: "ethen", i: i, x: pt.x, y: pt.y, x0: pt.x, y0: pt.y }; return true; }
-        if (this.bromVed(pt)) { this.traek = { slags: "brom", x: pt.x, y: pt.y, x0: pt.x, y0: pt.y }; return true; }
-        return false;
+        if (this.saml || this.afvis) return false;
+        var i = this.puljeVed(pt), brom = this.bromVed(pt);
+        if (i < 0 && !brom) return false;
+        /* Laasen: molekylerne kan kun traekkes, mens kortet viser det forsoeg, de
+           hoerer til. Ellers blinker kortet. */
+        if (this.spaer()) return false;
+        var krav = this.kravNu();
+        if (i >= 0) {
+            if (typeof krav !== "number") { this.kortBlink(); return false; }
+            this.traek = { slags: "ethen", i: i, x: pt.x, y: pt.y, x0: pt.x, y0: pt.y };
+            return true;
+        }
+        if (krav !== "afvist") { this.kortBlink(); return false; }
+        this.traek = { slags: "brom", x: pt.x, y: pt.y, x0: pt.x, y0: pt.y };
+        return true;
     };
 
     P.flytScene = function (pt) {
@@ -703,7 +700,7 @@
             if (klik || this.kaedeVed(pt, true)) {
                 this.nulstilHjaelp();
                 this.afvis = { t: 0, fra: klik ? { x: B.x + B.b / 2, y: B.y + B.h * 0.4 } : { x: pt.x, y: pt.y } };
-                if (!this.faerdig && !this.venter) this.naesteLinje("", "");
+                this.naesteLinje("", "");
             } else this.kortBesked("Slip brommolekylet oven på kæden.", 5);
             return;
         }
@@ -726,17 +723,13 @@
 
     P.klikScene = function (pt) {
         if (!this.lay) return;
-        if (this.gaetNu()) {
-            if (this.bromVed(pt) || this.kaedeVed(pt)) this.gaetBlink();
-            return;
-        }
         if (this.zoom > 0.5) {
-            this.kortBesked("Én kæde i polyethen er lavet af mange tusinde ethenmolekyler. Tryk på Zoom ind for at se dit stykke igen.", 6);
+            this.kortBesked("Den lange streg er én kæde i polyethen: mange tusinde ethenmolekyler efter hinanden.", 6);
             return;
         }
-        if (this.kaedeVed(pt) && !this.saml) {
-            this.kortBesked("Kæden er lavet af " + this.led + " ethenmolekyler. Hvert farvet felt kommer fra ét af dem, og der er kun enkeltbindinger mellem carbonatomerne.", 7);
-        }
+        if (!this.kaedeVed(pt) || this.saml) return;
+        if (this.gaetNu()) { this.kortBlink(); return; }
+        this.kortBesked("Kæden er lavet af " + this.led + " ethenmolekyler. Hvert farvet felt kommer fra ét af dem, og der er kun enkeltbindinger mellem carbonatomerne.", 7);
     };
 
     NK.SimPlastik = SimPlastik;

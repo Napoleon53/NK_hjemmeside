@@ -1,17 +1,22 @@
 /* =====================================================================
    fane.js - det, de tre faner har til faelles (som sb2.1 og sc1.4)
 
-   Der er ingen laerer i denne animation. Al hjaelp staar i statuslinjen
-   nederst i scenen, og hjaelpeknappen sidder i samme linje.
+   Der er ingen laerer i denne animation. Al hjaelp staar i tekstboksen,
+   og den gule hjaelpeknap sidder i samme boks. Tekstboksen er bygget ind
+   i arbejdsomraadet (brugeren 9. oktober 2026: ingen tekstlinje nederst
+   i scenen): paa fane 1 i kassen over beholderen sammen med maalet, paa
+   fane 2 og 3 oeverst i den del af tavlen, eleven er ved (js/regn.js
+   flytter den).
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
 
      * listen i panelet: opgaverne i grupper, med loest og stjerne
        (huskes i browseren)
-     * statuslinjen: naeste skridt, fejl, hint og ros, med farve efter
+     * tekstboksen: naeste skridt, fejl, hint og ros, med farve efter
        hvad der skete, og et ryst ved en fejl
      * den ene knap: Giv et hint > Naeste hint > Vis svaret > Naeste opgave.
-       Den lyser stille op, naar eleven lige har svaret forkert.
+       Giv et hint er fyldt gul, Vis svaret kun et omrids, og knappen
+       lyser stille op, naar eleven lige har svaret forkert.
 
    NK.Tavle.reaktion tegner reaktionsskemaet (som sb2.1). Et stof, hintet
    handler om, lyser gult alle steder i fanen, hvor det har data-s.
@@ -158,7 +163,7 @@
         /* Hinttrappen for den tilstand, eleven staar i lige nu */
         P.hintNu = function () {
             var h = this.hintTrin();
-            return h && h.trin && h.trin.length ? h : { s: null, trin: ["Læs linjen her igen, og prøv det, den siger."] };
+            return h && h.trin && h.trin.length ? h : { s: null, trin: ["Læs teksten her igen, og prøv det, den siger."] };
         };
 
         P.visKnap = function () {
@@ -174,7 +179,7 @@
                 klasse = "knap hjaelp";
                 if (this.hjaelp === 0) tekst = "Giv et hint";
                 else if (this.hjaelp < h.trin.length) tekst = "Næste hint (" + (this.hjaelp + 1) + " af " + h.trin.length + ")";
-                else tekst = "Vis svaret";
+                else { tekst = "Vis svaret"; klasse += " svar"; }
                 if (this.pegKnap) klasse += " peg";
             }
             this.el.knap.textContent = tekst;
@@ -264,8 +269,8 @@
             if (this.efterOpgave) this.efterOpgave();
         };
 
-        /* ----- Statuslinjen nederst i scenen ---------------------------------------
-           besked: den faste linje. kortBesked: et svar paa et klik i scenen,
+        /* ----- Tekstboksen ------------------------------------------------------------
+           besked: den faste tekst. kortBesked: et svar paa et klik i scenen,
            der forsvinder igen efter sek sekunder. */
         P.besked = function (html, klasse) {
             this.fast = { html: html || "", klasse: klasse || "" };
@@ -282,7 +287,7 @@
             var e = this.el.besked;
             if (!e) return;
             e.innerHTML = NK.kc(b.html);
-            if (this.el.status) this.el.status.className = "statuslinje" + (b.klasse ? " " + b.klasse : "");
+            if (this.el.status) this.el.status.className = "tekstboks" + (b.klasse ? " " + b.klasse : "");
         };
 
         P.beskedTekst = function () { return this.el.besked ? this.el.besked.textContent : ""; };
