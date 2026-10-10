@@ -33,7 +33,8 @@
     var aar = D.FOERSTE;
     var valgt = -1;
     var rk = 30, skridt = 14, gab = 4, pb = 10, ph = 20;
-    var traek = null;               /* { k, id, x0, y0, igang, spoeg, kan } */
+    var traek = null;               /* { k, id, x0, y0, sidst, igang, spoeg, kan } */
+    var vindueBundet = false;
 
     function el(id) { return NK.el(id); }
     function saet(e, t) { if (e && e.textContent !== t) e.textContent = t; }
@@ -279,56 +280,88 @@
         }
     }
 
+    /* Rydder alt, et traek kan have efterladt: maerket ved musen, den nedtonede
+       raekke og de lysende maal. Der ryddes efter alle maerker og ikke kun det
+       aktuelle, saa et maerke aldrig kan blive haengende i figuren. */
     function slutTraek() {
-        if (!traek) return;
-        if (traek.spoeg && traek.spoeg.parentNode) traek.spoeg.parentNode.removeChild(traek.spoeg);
-        raekker[traek.k].classList.remove("traekkes");
+        var gamle = document.querySelectorAll(".traek-spoeg");
+        for (var i = 0; i < gamle.length; i++) gamle[i].parentNode.removeChild(gamle[i]);
+        for (var k = 0; k < E; k++) raekker[k].classList.remove("traekkes");
         figur.classList.remove("traekker");
         visMaal(null);
         traek = null;
     }
 
+    /* Et traek foelger én mus eller finger (pointerId). Bevaegelse og slip foelges
+       paa vinduet og ikke paa raekken, saa traekket ogsaa slutter rigtigt, naar
+       raekken har mistet grebet om musen. */
+    function bevaegTraek(ev) {
+        if (!traek || ev.pointerId !== traek.id) return;
+        traek.sidst = Date.now();
+        if (!traek.kan) return;
+        var k = traek.k;
+        if (!traek.igang) {
+            if (Math.abs(ev.clientX - traek.x0) + Math.abs(ev.clientY - traek.y0) < 7) return;
+            traek.igang = true;
+            var s = document.createElement("div");
+            s.className = "traek-spoeg";
+            s.innerHTML = NK.html(D.ERHVERV[k].navn) + " <b>" + antalFelter[k].textContent + "</b>";
+            document.body.appendChild(s);
+            traek.spoeg = s;
+            raekker[k].classList.add("traekkes");
+            figur.classList.add("traekker");
+        }
+        traek.spoeg.style.left = (ev.clientX + 14) + "px";
+        traek.spoeg.style.top = (ev.clientY + 10) + "px";
+        visMaal(baandUnder(ev.clientX, ev.clientY));
+    }
+
+    function slipTraek(ev) {
+        if (!traek || ev.pointerId !== traek.id) return;
+        var k = traek.k, varIgang = traek.igang;
+        var maalId = varIgang ? baandUnder(ev.clientX, ev.clientY) : null;
+        slutTraek();
+        if (varIgang) {
+            if (maalId) NK.Figur.paaSlip(k, maalId);
+            else NK.Figur.paaForbi(k);
+        } else if (raekker[k].contains(ev.target)) {
+            NK.Figur.paaKlikRaekke(k);
+        }
+    }
+
+    /* Et nyt tryk fra den samme mus eller finger betyder, at det forrige traek
+       aldrig blev sluppet. Det samme goer et traek, der har staaet stille laenge. */
+    function nytTryk(ev) {
+        if (traek && (ev.pointerId === traek.id || Date.now() - traek.sidst >= 1500)) slutTraek();
+    }
+
+    function bindVindue() {
+        if (vindueBundet) return;
+        vindueBundet = true;
+        window.addEventListener("pointerdown", nytTryk, true);
+        window.addEventListener("pointermove", bevaegTraek);
+        window.addEventListener("pointerup", slipTraek);
+        window.addEventListener("pointercancel", function (ev) { if (traek && ev.pointerId === traek.id) slutTraek(); });
+        window.addEventListener("blur", function () { if (traek) slutTraek(); });
+        document.addEventListener("visibilitychange", function () { if (document.hidden && traek) slutTraek(); });
+    }
+
     function bindRaekke(r, k) {
         r.addEventListener("pointerdown", function (ev) {
             if (ev.button !== undefined && ev.button !== 0) return;
-            traek = { k: k, id: ev.pointerId, x0: ev.clientX, y0: ev.clientY, igang: false, spoeg: null, kan: !erSorteret(k) && NK.Figur.kanSortere() };
+            if (traek && traek.igang) return;       /* en anden finger overtager ikke et traek, der er i gang */
+            slutTraek();
+            traek = { k: k, id: ev.pointerId, x0: ev.clientX, y0: ev.clientY, sidst: Date.now(), igang: false, spoeg: null, kan: !erSorteret(k) && NK.Figur.kanSortere() };
             if (traek.kan && r.setPointerCapture) {
                 try { r.setPointerCapture(ev.pointerId); } catch (fejl) { /* aeldre browsere */ }
             }
         });
 
-        r.addEventListener("pointermove", function (ev) {
-            if (!traek || traek.k !== k || !traek.kan) return;
-            if (!traek.igang) {
-                if (Math.abs(ev.clientX - traek.x0) + Math.abs(ev.clientY - traek.y0) < 7) return;
-                traek.igang = true;
-                var s = document.createElement("div");
-                s.className = "traek-spoeg";
-                s.innerHTML = NK.html(D.ERHVERV[k].navn) + " <b>" + antalFelter[k].textContent + "</b>";
-                document.body.appendChild(s);
-                traek.spoeg = s;
-                r.classList.add("traekkes");
-                figur.classList.add("traekker");
-            }
-            traek.spoeg.style.left = (ev.clientX + 14) + "px";
-            traek.spoeg.style.top = (ev.clientY + 10) + "px";
-            visMaal(baandUnder(ev.clientX, ev.clientY));
+        /* Grebet om musen er tabt uden et slip (et systemvindue, et vinduesskift):
+           traekket er slut. Efter et almindeligt slip er der ikke noget at rydde. */
+        r.addEventListener("lostpointercapture", function (ev) {
+            if (traek && traek.k === k && traek.id === ev.pointerId) slutTraek();
         });
-
-        r.addEventListener("pointerup", function (ev) {
-            if (!traek || traek.k !== k) return;
-            var varIgang = traek.igang;
-            var maalId = varIgang ? baandUnder(ev.clientX, ev.clientY) : null;
-            slutTraek();
-            if (varIgang) {
-                if (maalId) NK.Figur.paaSlip(k, maalId);
-                else NK.Figur.paaForbi(k);
-            } else {
-                NK.Figur.paaKlikRaekke(k);
-            }
-        });
-
-        r.addEventListener("pointercancel", slutTraek);
 
         /* Tastatur: Enter eller mellemrum paa navnet giver et klik uden mus. */
         r.addEventListener("click", function (ev) {
@@ -353,6 +386,7 @@
         bygRaekker();
         bygPersoner();
         bindBaand();
+        bindVindue();
         figur.style.setProperty("--rk", rk + "px");
         nulstil(false);
     }

@@ -314,6 +314,80 @@
     ens(G.baandFor(nr("handel")), "x", "en række, der slippes ved siden af, bliver liggende");
     ok(besked().indexOf(D.TEKST.ikkeBaand) >= 0, "et slip ved siden af giver en besked");
 
+    /* --- et afbrudt træk efterlader ikke noget mærke (fejlen fra 6. okt. 2026) --- */
+    function peger(type, maal, x, y, id) {
+        maal.dispatchEvent(new w.PointerEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, pointerId: id, isPrimary: id === 7, button: 0, buttons: type === "pointerup" ? 0 : 1, pointerType: "touch" }));
+    }
+    function maerker() { return d.querySelectorAll(".traek-spoeg").length; }
+    function rent(hvor) {
+        ens(maerker(), 0, hvor + ": intet mærke hænger");
+        ens(d.querySelectorAll(".raekke.traekkes").length, 0, hvor + ": ingen række er nedtonet");
+        ok(!el("figur").classList.contains("traekker") && !d.querySelector(".baand.maal"), hvor + ": ingen sektor står som mål");
+    }
+    function begynd(r, p) { peger("pointerdown", r, p.x, p.y, 7); peger("pointermove", r, p.x, p.y + 50, 7); }
+    raekke = el("rk-handel"); a0 = midt(raekke.querySelector(".r-navn"));
+    var anden = el("rk-transport"), a1 = midt(anden.querySelector(".r-navn"));
+
+    /* rækken mister grebet om musen uden et slip */
+    begynd(raekke, a0);
+    ens(maerker(), 1, "mærket er fremme under trækket");
+    raekke.dispatchEvent(new w.PointerEvent("lostpointercapture", { bubbles: true, pointerId: 7 }));
+    rent("tabt greb");
+    peger("pointermove", raekke, a0.x, a0.y + 90, 7);
+    rent("bevægelse efter tabt greb");
+
+    /* et træk, der aldrig bliver sluppet, og så et nyt tryk på en anden række */
+    begynd(raekke, a0);
+    peger("pointerdown", anden, a1.x, a1.y, 7);
+    rent("nyt tryk efter et træk uden slip");
+    peger("pointermove", anden, a1.x, a1.y + 50, 7);
+    ens(maerker(), 1, "det nye træk har ét mærke");
+    ok(d.querySelector(".traek-spoeg").textContent.indexOf("Transport") >= 0, "mærket hører til det nye træk");
+    peger("pointerup", anden, ved.x, ved.y, 7);
+    rent("efter det nye træk");
+
+    /* et træk uden slip, og så et tryk et helt andet sted */
+    begynd(raekke, a0);
+    peger("pointerdown", el("statuslinje"), ved.x, ved.y, 7);
+    rent("tryk uden for rækkerne efter et træk uden slip");
+    peger("pointerup", el("statuslinje"), ved.x, ved.y, 7);
+
+    /* to fingre: den anden finger overtager ikke trækket og efterlader ikke noget */
+    begynd(raekke, a0);
+    peger("pointerdown", anden, a1.x, a1.y, 8);
+    ens(maerker(), 1, "to fingre: stadig ét mærke");
+    ok(d.querySelector(".traek-spoeg").textContent.indexOf("Handel") >= 0, "to fingre: mærket hører stadig til den første finger");
+    peger("pointermove", anden, a1.x, a1.y + 40, 8);
+    peger("pointerup", anden, a1.x, a1.y + 40, 8);
+    ens(maerker(), 1, "to fingre: den anden finger slutter ikke trækket");
+    ens(G.valgt(), -1, "to fingre: den anden finger vælger ikke en række");
+    peger("pointerup", raekke, ved.x, ved.y, 7);
+    rent("to fingre sluppet");
+    ens(G.baandFor(nr("handel")), "x", "to fingre: rækken ligger, hvor den lå");
+
+    /* vinduet mister fokus midt i et træk, og et træk bliver afbrudt af systemet */
+    begynd(raekke, a0);
+    w.dispatchEvent(new w.Event("blur"));
+    rent("vinduet mister fokus");
+    begynd(raekke, a0);
+    peger("pointercancel", raekke, a0.x, a0.y + 50, 7);
+    rent("trækket afbrydes");
+
+    /* slippet kommer ikke til rækken selv, men et andet sted i vinduet */
+    begynd(raekke, a0);
+    peger("pointerup", el("statuslinje"), ved.x, ved.y, 7);
+    rent("slip uden for rækken");
+    ens(G.baandFor(nr("handel")), "x", "slip uden for rækken: rækken bliver liggende");
+
+    /* og et almindeligt træk virker stadig bagefter */
+    begynd(raekke, a0);
+    var tMidt = midt(el("baand-t"));
+    peger("pointermove", raekke, tMidt.x, tMidt.y, 7);
+    ok(el("baand-t").classList.contains("maal"), "målet lyser stadig op efter de afbrudte træk");
+    peger("pointerup", raekke, ved.x, ved.y, 7);
+    rent("sluppet ved siden af");
+    G.vaelg(-1);
+
     /* klik: først erhvervet, så sektoren */
     klikPaa(el("rk-industri").querySelector(".r-navn"));
     ens(G.valgt(), nr("industri"), "et klik vælger erhvervet");

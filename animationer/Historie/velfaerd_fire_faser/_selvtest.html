@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: Velfærdsstatens fire faser</title>
+<style>
+    body { margin: 0; padding: 16px; background: #111; color: #ddd; font: 14px/1.5 Consolas, monospace; }
+    h1 { margin: 0 0 8px; font-size: 16px; }
+    pre { white-space: pre-wrap; }
+    iframe { display: block; margin-top: 12px; border: 1px solid #444; }
+</style>
+</head>
+<body>
+<h1>Selvtest: Velfærdsstatens fire faser</h1>
+<p>Kræver en lokal server (siden åbnes i en ramme). Sidste linje er ALT OK eller antallet af fejl.</p>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" title="Animationen" style="width:883px;height:620px;"></iframe>
+
+<script>
+/* =====================================================================
+   Selvtesten tjekker det, man ikke kan se på et skærmbillede:
+     A  teksterne: hver opgave har det, den skal have, sproget følger
+        reglerne, og intet røber et ord, eleven skal skrive
+     B  ordene: stavefejl, varianter og de svar, der er tæt på
+     C  forløbet: start, skriv, vælg, grundforklaringer, hint, svar,
+        felt for felt, fasen samlet, gemt skema, forfra og ankre
+     D  roen: intet flytter sig, mens eleven svarer, og intet skal
+        rulles i fire skærmstørrelser
+     E  skriften: ingen læsbar tekst under 12,4 px
+   ===================================================================== */
+(async function () {
+    "use strict";
+
+    var NOEGLE = "nk.velfaerd_fire_faser.v1";
+    var linjer = [], fejl = 0, antal = 0;
+    var ramme = document.getElementById("ramme");
+    var w, d, NK, D, F, T;
+
+    function ok(betingelse, tekst) {
+        antal++;
+        if (!betingelse) { fejl++; linjer.push("FEJL: " + tekst); }
+    }
+    function ens(a, b, tekst) { ok(JSON.stringify(a) === JSON.stringify(b), tekst + " (fik " + JSON.stringify(a) + ", ventede " + JSON.stringify(b) + ")"); }
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    function liste(q) { return Array.prototype.slice.call(d.querySelectorAll(q)); }
+
+    /* behold: det gemte skema slettes ikke før åbningen */
+    async function aabn(b, h, anker, behold) {
+        if (!behold) window.localStorage.removeItem(NOEGLE);
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        await new Promise(function (res) { ramme.onload = res; ramme.src = "about:blank"; });
+        await new Promise(function (res) {
+            ramme.onload = res;
+            ramme.src = "index.html?t=" + Date.now() + "-" + Math.random() + (anker ? "#" + anker : "");
+        });
+        w = ramme.contentWindow; d = w.document; NK = w.NK; D = NK.Data; F = NK.Forloeb; T = D.TEKST;
+        /* uden bevægelse, så målene af felterne er de endelige */
+        var st = d.createElement("style");
+        st.textContent = "* { animation: none !important; transition: none !important; }";
+        d.head.appendChild(st);
+        await vent(30);
+    }
+
+    function el(id) { return d.getElementById(id); }
+    function S() { return F.tilstand; }
+    function fase() { return d.body.getAttribute("data-fase"); }
+    function synlig(e) { return !!e && w.getComputedStyle(e).visibility !== "hidden" && !!(e.offsetWidth || e.offsetHeight); }
+    function kasse(e) { var r = e.getBoundingClientRect(); return { t: Math.round(r.top), b: Math.round(r.bottom), l: Math.round(r.left), r: Math.round(r.right) }; }
+    function tast(key, maal) { (maal || d).dispatchEvent(new w.KeyboardEvent("keydown", { key: key, bubbles: true, cancelable: true })); }
+    function opg() { return F.FLAD[S().f][S().nr]; }
+    function skriv(tekst) { el("ord").value = tekst; el("skriv").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true })); }
+    function svarknap(i) { return d.querySelector('#valg [data-svar="' + i + '"]'); }
+    function kort(f) { return d.querySelector('#faser [data-fase="' + f + '"]'); }
+    function besked() { return el("besked").textContent; }
+    function farve(navn) { return el("statuslinje").classList.contains(navn); }
+    function gemt() { return JSON.parse(window.localStorage.getItem(NOEGLE)); }
+    function linjeTekst(o) { return (o.fed ? o.fed + " " : "") + o.linje; }
+
+    function muligheder(o) {
+        return o.type === "vaelg" ? o.svar.map(function (s) { return !!s.rigtig; }) : D.FORKLARINGER.map(function (g) { return g.id === o.rigtig; });
+    }
+    function rigtigt(o) { return muligheder(o).indexOf(true); }
+    function forkerte(o) { var a = []; muligheder(o).forEach(function (r, i) { if (!r) a.push(i); }); return a; }
+
+    /* Løser den aktuelle opgave rigtigt i første forsøg. */
+    function loes() { var o = opg().o; if (o.type === "skriv") skriv(o.svar); else svarknap(rigtigt(o)).click(); }
+    function loesFase() { var vagt = 0; while (fase() === "felt" && vagt++ < 100) { loes(); el("knap").click(); } }
+
+    function smaaSkrift(sted) {
+        var smaa = [];
+        liste("#scene *, .top *, .overlay.vis *").forEach(function (e) {
+            if (!synlig(e) || !e.childNodes.length) return;
+            var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+            if (harTekst && parseFloat(w.getComputedStyle(e).fontSize) < 12.4) smaa.push(e.className || e.tagName);
+        });
+        ens(smaa, [], sted + "E: ingen tekst under 12,4 px");
+    }
+
+    /* Pladsen for alt det, der skal stå stille, mens eleven svarer. */
+    function aftryk() {
+        var dele = {
+            sted: kasse(d.querySelector(".sted")),
+            spm: kasse(el("spm")),
+            svar: kasse(el("skriv").hidden ? el("valg") : el("skriv")),
+            st: kasse(el("statuslinje")),
+            ark: kasse(el("ark")),
+            linjer: liste("#linjer .linje").map(kasse)
+        };
+        if (!el("udsagn").hidden) dele.udsagn = kasse(el("udsagn"));
+        return dele;
+    }
+
+    try {
+        await aabn(883, 620);
+        var N = NK.Svar.normaliser;
+
+        /* ================= A: teksterne ================================= */
+        ens(D.FASER.length, 4, "A: fire faser");
+        ens(D.RAEKKER.length, 4, "A: fire rækker i skemaet");
+        ens(D.RAEKKER.map(function (r) { return r.navn; }), ["Velfærdstiltag", "Samfundet", "Den politiske situation", "Kobling til grundforklaringer"], "A: rækkerne hedder som i skemaet");
+        ens(D.FASER.map(function (f) { return f.navn; }), ["Første begrænsede velfærdsordninger", "Socialreformens epoke", "Den gyldne velfærdsperiode", "Velfærdsstaten under pres"], "A: faserne hedder som i skemaet");
+        ens(F.FLAD.map(function (l) { return l.length; }), [15, 13, 13, 14], "A: antal opgaver pr. fase");
+
+        var alle = [D.TITEL], skrevne = 0;
+        Object.keys(T).forEach(function (n) { alle.push(T[n]); });
+        D.RAEKKER.forEach(function (r) { alle.push(r.navn, r.kort); });
+        D.FORKLARINGER.forEach(function (g) { alle.push(g.navn); });
+
+        D.FASER.forEach(function (fasen, f) {
+            alle.push(fasen.aar, fasen.kort, fasen.navn);
+            ens(fasen.felter.length, 4, "A: " + (f + 1) + ". fase har fire felter");
+            ok(fasen.kort.length <= 12, "A: " + (f + 1) + ". fase har et kort navn til mærket");
+
+            fasen.felter.forEach(function (felt, r) {
+                var feltnavn = "A: " + (f + 1) + ". fase, " + D.RAEKKER[r].navn;
+                ok(felt.length >= 3 && felt.length <= 4, feltnavn + " har 3 eller 4 opgaver");
+                var foer = "";
+
+                felt.forEach(function (o, i) {
+                    var navn = feltnavn + ", opgave " + (i + 1);
+                    ok(["skriv", "vaelg", "forklar"].indexOf(o.type) !== -1, navn + " har en kendt type");
+                    ok(!!o.linje && /[.]$/.test(o.linje), navn + ": linjen til feltet slutter med punktum");
+                    ok(linjeTekst(o).length <= 130, navn + ": linjen til feltet er højst 130 tegn (" + linjeTekst(o).length + ")");
+                    ok(!o.fed || !/[.]$/.test(o.fed), navn + ": det fede slutter ikke med punktum");
+                    alle.push(o.linje, o.fed || "", o.spm || "", o.udsagn || "", o.hint || "", o.fordi || "");
+
+                    if (o.type === "skriv") {
+                        skrevne++;
+                        ens(o.spm.split("{hul}").length, 2, navn + " har ét hul");
+                        ok(o.spm.length <= 125, navn + ": sætningen er højst 125 tegn (" + o.spm.length + ")");
+                        ok(/[.]$/.test(o.spm), navn + ": sætningen slutter med punktum");
+                        ok(!/\s/.test(o.svar) && o.svar.length >= 5, navn + ": svaret er ét ord på mindst 5 bogstaver");
+                        ok(!!o.hint && o.hint.length <= 95, navn + " har et kort hint");
+                        ok(!!o.fordi && o.fordi.length <= 90, navn + " har en kort begrundelse");
+                        ok(N(o.spm).indexOf(N(o.svar)) === -1, navn + ": sætningen røber ikke ordet");
+                        ok(N(o.hint).indexOf(N(o.svar)) === -1, navn + ": hintet røber ikke ordet");
+                        ok(N(foer).indexOf(N(o.svar)) === -1, navn + ": linjerne før i feltet røber ikke ordet " + o.svar);
+
+                        var b = NK.Svar.bedoem(o, o.svar);
+                        ok(b.rigtig && b.praecis, navn + ": svaret selv er rigtigt");
+                        (o.godtag || []).forEach(function (g) {
+                            var bg = NK.Svar.bedoem(o, g);
+                            ok(bg.rigtig && bg.praecis, navn + ": " + g + " tæller som rigtigt");
+                        });
+                        ok(NK.Svar.bedoem(o, o.svar.toUpperCase()).rigtig, navn + ": store bogstaver er ligegyldige");
+                        ok(!NK.Svar.bedoem(o, "banan").rigtig, navn + ": et tilfældigt ord er forkert");
+                        (o.naesten || []).forEach(function (n) {
+                            ok(n.t.length <= 125 && /[.?]$/.test(n.t), navn + ": forklaringen til " + n.ord[0] + " er en kort, hel sætning");
+                            alle.push(n.t);
+                            n.ord.forEach(function (ord) {
+                                var bn = NK.Svar.bedoem(o, ord);
+                                ok(!bn.rigtig && bn.naesten === n.t, navn + ": " + ord + " er forkert og får sin egen forklaring");
+                            });
+                        });
+                    } else if (o.type === "vaelg") {
+                        ok(/\?$/.test(o.spm), navn + " slutter med spørgsmålstegn");
+                        ok(o.spm.length <= 90, navn + ": spørgsmålet er højst 90 tegn");
+                        ok(o.svar.length >= 3 && o.svar.length <= 4, navn + " har 3 eller 4 svar");
+                        ens(o.svar.filter(function (s) { return s.rigtig; }).length, 1, navn + " har ét rigtigt svar");
+                        var set = {};
+                        o.svar.forEach(function (s) {
+                            ok(!set[s.t], navn + ": svaret " + s.t + " står kun én gang");
+                            set[s.t] = true;
+                            ok(s.t.length <= 85, navn + ": svaret er højst 85 tegn (" + s.t + ")");
+                            ok(!/[.?!]$/.test(s.t), navn + ": svaret slutter ikke med tegn (" + s.t + ")");
+                            alle.push(s.t);
+                            if (s.rigtig) {
+                                ok(!!s.fordi && s.fordi.length <= 90 && !s.fejl, navn + ": det rigtige svar har en kort begrundelse");
+                                alle.push(s.fordi || "");
+                            } else {
+                                ok(!!s.fejl && s.fejl.length <= 125 && /[.?]$/.test(s.fejl), navn + ": det forkerte svar har en kort grund (" + s.t + ")");
+                                alle.push(s.fejl || "");
+                            }
+                        });
+                    } else {
+                        ok(["f", "k", "i"].indexOf(o.rigtig) !== -1, navn + " peger på en grundforklaring");
+                        ok(!!o.udsagn !== !!o.spm, navn + " har enten et udsagn eller sit eget spørgsmål");
+                        ok(!o.udsagn || (o.udsagn.length <= 125 && /[.]$/.test(o.udsagn)), navn + ": udsagnet er kort og slutter med punktum");
+                        ok(!!o.fordi && o.fordi.length <= 95, navn + " har en kort begrundelse");
+                        ens(Object.keys(o.fejl).sort(), ["f", "k", "i"].filter(function (x) { return x !== o.rigtig; }).sort(), navn + " har en grund til hver af de to andre");
+                        Object.keys(o.fejl).forEach(function (n) {
+                            ok(o.fejl[n].length <= 125 && /[.?]$/.test(o.fejl[n]), navn + ": grunden til " + n + " er en kort, hel sætning");
+                            alle.push(o.fejl[n]);
+                        });
+                        var forklaring = D.FORKLARINGER.filter(function (g) { return g.id === o.rigtig; })[0];
+                        ens(o.fed, forklaring.navn + ":", navn + ": linjen begynder med forklaringens navn");
+                    }
+                    foer += " " + linjeTekst(o);
+                });
+
+                if (r === 3) {
+                    ok(felt.every(function (o) { return o.type === "forklar"; }), feltnavn + " består af grundforklaringer");
+                    ens(felt.map(function (o) { return o.rigtig; }).sort(), ["f", "i", "k"], feltnavn + " bruger hver grundforklaring én gang");
+                }
+            });
+        });
+        ens(skrevne, 23, "A: 23 ord skal skrives");
+
+        alle.forEach(function (t) {
+            ok(!/[–—]/.test(t), "A: ingen tankestreg i: " + t);
+            ok(!/  /.test(t), "A: ingen dobbelt mellemrum i: " + t);
+            ok(!/"/.test(t), "A: danske anførselstegn i: " + t);
+        });
+
+        /* ================= B: ordene ===================================== */
+        ens(N("  Det Universelle  princip. "), "universelleprincip", "B: artikel, mellemrum og punktum tæller ikke");
+        ens(N("Skøn"), N("skoen"), "B: ø og oe er det samme");
+        ens(N("Kanslergade-forliget"), "kanslergadeforliget", "B: bindestreg tæller ikke");
+        ens(NK.Svar.afstand("hojre", "hoejre"), 1, "B: ét manglende bogstav er én fejl");
+        ens(NK.Svar.afstand("stuaning", "stauning"), 1, "B: to ombyttede bogstaver er én fejl");
+        ens([NK.Svar.taales(4), NK.Svar.taales(5), NK.Svar.taales(7), NK.Svar.taales(8)], [0, 1, 1, 2], "B: stavefejl, der tåles, efter ordets længde");
+
+        var skoen = D.FASER[0].felter[0][2], hoejre = D.FASER[0].felter[2][0], jord = D.FASER[3].felter[2][0], frp = D.FASER[3].felter[2][1], ret = D.FASER[1].felter[0][1];
+        ens(skoen.svar, "skønsprincippet", "B: opgaven om skønsprincippet står, hvor testen venter den");
+        ens(NK.Svar.bedoem(skoen, "skoen"), { tom: false, rigtig: true, praecis: true, naesten: null }, "B: skoen er rigtigt");
+        ens(NK.Svar.bedoem(skoen, "Skønsprincipet"), { tom: false, rigtig: true, praecis: false, naesten: null }, "B: en stavefejl tåles, men er ikke præcis");
+        ok(NK.Svar.bedoem(skoen, "retsprincippet").naesten !== null, "B: retsprincippet får sin egen forklaring ved skønsprincippet");
+        ok(NK.Svar.bedoem(skoen, "   ").tom, "B: et tomt felt er ikke et svar");
+        ens(hoejre.svar, "Højre", "B: opgaven om Højre står, hvor testen venter den");
+        ok(NK.Svar.bedoem(hoejre, "hojre").rigtig && !NK.Svar.bedoem(hoejre, "hojre").praecis, "B: hojre er rigtigt med en stavefejl");
+        ok(!NK.Svar.bedoem(hoejre, "venstre").rigtig, "B: venstre er forkert");
+        ok(NK.Svar.bedoem(jord, "jordskælvsvalget").praecis, "B: jordskælvsvalget tæller som jordskredsvalget");
+        ok(NK.Svar.bedoem(frp, "fremskridspartiet").rigtig, "B: fremskridspartiet er rigtigt med en stavefejl");
+        ok(NK.Svar.bedoem(ret, "ret").rigtig && !NK.Svar.bedoem(ret, "rat").rigtig, "B: korte ord skal staves rigtigt");
+
+        /* ================= C: forløbet =================================== */
+        ens(fase(), "start", "C: starter med de fire faser");
+        ok(synlig(el("start")) && !synlig(el("felt")) && !synlig(el("skema")), "C: kun startbilledet er fremme");
+        ens(liste("#faser .fasekort").length, 4, "C: fire faser på startbilledet");
+        ens(liste("#faser .fasekort.anbefalet").length, 1, "C: én fase er markeret");
+        ok(kort(0).classList.contains("anbefalet"), "C: første fase er markeret fra start");
+        ens(liste("#faser .fk-gaa").map(function (e) { return e.textContent; }), [T.begynd, T.begynd, T.begynd, T.begynd], "C: alle fire faser kan begyndes");
+        ens(liste("#faser .fk-felter i.on").length, 0, "C: ingen felter er udfyldt fra start");
+        ok(el("faserknap").hidden, "C: knappen Faserne ses ikke på startbilledet");
+        ok(el("skemaknap").hidden, "C: Se dit skema ses ikke, før en fase er udfyldt");
+        ens(el("start-besked").textContent, T.startNy, "C: statuslinjen siger, hvad eleven skal");
+        ens(el("intro1").textContent, T.intro1, "C: indledningen står på startbilledet");
+        smaaSkrift("C start: ");
+
+        /* ----- første opgave: et ord skal skrives ----- */
+        kort(0).click();
+        ens(fase(), "felt", "C: et klik på fasen åbner første opgave");
+        ok(synlig(el("felt")) && !synlig(el("start")) && !synlig(el("skema")), "C: kun opgaven og feltet er fremme");
+        ok(!el("faserknap").hidden, "C: knappen Faserne er fremme");
+        ens([el("sted-fase").textContent, el("sted-navn").textContent], [D.FASER[0].kort, D.FASER[0].navn], "C: fasen står over opgaven");
+        ens(liste("#raekker .rk").map(function (e) { return e.className; }), ["rk nu", "rk", "rk", "rk"], "C: første felt er det aktuelle");
+        ens(el("opg-nr").textContent, "Opgave 1 af 4", "C: opgavens nummer");
+        var o1 = opg().o;
+        ens(o1.type, "skriv", "C: første opgave er et ord, der skal skrives");
+        ok(!el("skriv").hidden && el("valg").hidden && el("udsagn").hidden, "C: kun skrivefeltet er fremme");
+        ok(el("knap").hidden, "C: knappen videre er skjult før svaret");
+        ens(besked(), T.skrivStart, "C: statuslinjen siger, hvad eleven skal skrive");
+        ens(el("ark-etiket").textContent, D.RAEKKER[0].navn, "C: feltet har rækkens navn");
+        ens(liste("#linjer .linje").map(function (e) { return e.className; }), ["linje nu", "linje", "linje", "linje"], "C: feltet har fire tomme linjer");
+        ok(liste("#linjer .l-tekst").every(function (e) { return w.getComputedStyle(e).visibility === "hidden"; }), "C: linjerne kan ikke læses, før opgaven er løst");
+        ok(w.getComputedStyle(d.querySelector("#hul .hul-ord")).visibility === "hidden", "C: ordet i hullet kan ikke ses");
+        ok(el("spm").innerText.toLowerCase().indexOf(o1.svar.toLowerCase()) === -1, "C: sætningen viser ikke ordet");
+        ok(el("ark").innerText.toLowerCase().indexOf("sygekasser") === -1, "C: feltet viser ikke linjen");
+        ok(d.activeElement === el("ord"), "C: markøren står i skrivefeltet");
+        smaaSkrift("C skriv: ");
+
+        skriv("   ");
+        ens(besked(), T.tom, "C: et tomt felt giver en besked");
+        ens(S().plet[0], -1, "C: et tomt felt tæller ikke som forsøg");
+
+        skriv("banan");
+        ok(farve("roed") && besked().indexOf("Ikke endnu") === 0 && besked().indexOf(T.forkert) !== -1, "C: et forkert ord giver Ikke endnu");
+        ok(!S().loest && S().plet[0] === 0, "C: det forkerte ord er talt");
+        ok(el("hint").classList.contains("lyser"), "C: hintknappen lyser efter et forkert ord");
+        ens(gemt().plet[0], 0, "C: det forkerte forsøg er gemt");
+
+        skriv(o1.naesten[1].ord[0]);
+        ok(besked().indexOf(o1.naesten[1].t) !== -1, "C: et ord, der er tæt på, får sin egen forklaring");
+
+        el("hint").click();
+        ok(farve("gul") && besked().indexOf("Hint") === 0 && besked().indexOf(o1.hint) !== -1, "C: første hint står i statuslinjen");
+        ens(el("hint").textContent, T.hintMere, "C: knappen tilbyder et hint mere");
+        el("hint").click();
+        ok(besked().indexOf("Ordet begynder med S og har 10 bogstaver.") !== -1, "C: andet hint er bogstav og længde");
+        ens(el("hint").textContent, T.vis, "C: knappen tilbyder svaret");
+        ok(!S().loest, "C: hint løser ikke opgaven");
+
+        skriv("Sygekaser");
+        ok(S().loest, "C: ordet er rigtigt trods en stavefejl");
+        ok(farve("groen") && besked().indexOf("Rigtigt") === 0, "C: statuslinjen er grøn");
+        ok(besked().indexOf("Det staves sygekasser.") !== -1 && besked().indexOf(o1.fordi) !== -1, "C: stavemåden og begrundelsen står i statuslinjen");
+        ok(el("hul").classList.contains("fyldt") && w.getComputedStyle(d.querySelector("#hul .hul-ord")).visibility === "visible", "C: ordet står i hullet");
+        ok(el("ord").disabled, "C: skrivefeltet er låst");
+        ok(!synlig(el("tjek")) && !synlig(el("hint")), "C: Tjek og hint er væk, når opgaven er løst");
+        ok(!el("knap").hidden && el("knap").textContent === T.naeste, "C: knappen Næste er fremme");
+        ens(liste("#linjer .linje").map(function (e) { return e.className; }), ["linje loest ny", "linje", "linje", "linje"], "C: første linje er skrevet og markeret");
+        ens(d.querySelector("#linjer .linje.ny").textContent, linjeTekst(o1), "C: linjen er opgavens");
+        ens([S().frem[0], S().foerste[0][0]], [1, false], "C: opgaven er løst, men ikke i første forsøg");
+        ens(gemt().frem[0], 1, "C: fremskridtet er gemt");
+        ens(liste("#raekker .rk")[0].className, "rk nu", "C: feltet er ikke færdigt endnu");
+
+        /* ----- anden opgave: vælg et svar ----- */
+        tast("Enter");
+        ens(S().nr, 1, "C: Enter går videre, når opgaven er løst");
+        var o2 = opg().o;
+        ens(o2.type, "vaelg", "C: anden opgave har svarknapper");
+        ok(el("skriv").hidden && !el("valg").hidden, "C: kun svarknapperne er fremme");
+        ens(el("opg-nr").textContent, "Opgave 2 af 4", "C: opgavens nummer er talt op");
+        ens(liste("#valg .svar").map(function (b) { return parseInt(b.getAttribute("data-svar"), 10); }), S().orden, "C: svarene står i den blandede rækkefølge");
+        ens(S().orden.slice().sort(), [0, 1, 2, 3], "C: alle fire svar er med");
+        ens(liste("#linjer .linje").map(function (e) { return e.className; }), ["linje loest", "linje nu", "linje", "linje"], "C: første linje står stadig i feltet");
+        ens(besked(), T.vaelgStart, "C: statuslinjen er neutral igen");
+        ok(el("knap").hidden, "C: knappen er skjult igen");
+        tast("Enter");
+        ens(S().nr, 1, "C: Enter går ikke videre før svaret");
+
+        var f2 = forkerte(o2)[0];
+        svarknap(f2).click();
+        ok(svarknap(f2).disabled && svarknap(f2).classList.contains("forkert"), "C: det forkerte svar er streget og låst");
+        ok(farve("roed") && besked().indexOf(o2.svar[f2].fejl) !== -1, "C: grunden til fejlen står i statuslinjen");
+        svarknap(f2).click();
+        ens(S().proevet.length, 1, "C: samme forkerte svar tælles ikke to gange");
+        tast(String(S().orden.indexOf(rigtigt(o2)) + 1));
+        ok(S().loest && svarknap(rigtigt(o2)).classList.contains("rigtig"), "C: tallet vælger svaret på den plads");
+        ok(liste("#valg .svar").every(function (b) { return b.disabled; }), "C: alle svar er låst, når opgaven er løst");
+        ok(farve("groen") && besked().indexOf(o2.svar[rigtigt(o2)].fordi) !== -1, "C: begrundelsen står i statuslinjen");
+        ens(S().foerste[0][1], false, "C: opgave 2 var ikke rigtig i første forsøg");
+        smaaSkrift("C vælg: ");
+        el("knap").click();
+
+        /* ----- tredje opgave: tastatur, fagord og Vis svaret ----- */
+        var o3 = opg().o;
+        ens(o3.type, "skriv", "C: tredje opgave er et ord");
+        tast("t", el("ord"));
+        ok(!el("fagord").classList.contains("vis"), "C: T i skrivefeltet åbner ikke fagordene");
+        tast("t");
+        ok(el("fagord").classList.contains("vis"), "C: T åbner fagordene");
+        smaaSkrift("C fagord: ");
+        var boks = d.querySelector("#fagord .overlay-boks");
+        ok(boks.scrollHeight <= boks.clientHeight + 1, "C: fagordene kan ses uden at rulle ved 883 x 620");
+        tast("Escape");
+        ok(!el("fagord").classList.contains("vis"), "C: Esc lukker fagordene");
+        el("fagordknap").click();
+        ok(el("fagord").classList.contains("vis"), "C: knappen Fagord åbner fagordene");
+        d.querySelector("#fagord [data-luk]").click();
+        ok(!el("fagord").classList.contains("vis"), "C: Luk lukker fagordene");
+
+        el("hint").click(); el("hint").click(); el("hint").click();
+        ok(S().loest, "C: tredje tryk på hintknappen viser svaret");
+        ok(farve("gul") && besked().indexOf("Svaret") === 0 && besked().indexOf(o3.fordi) !== -1, "C: statuslinjen siger Svaret");
+        ok(el("hul").classList.contains("vist") && el("ord").value === o3.svar, "C: svaret står i hullet og i feltet");
+        ens(S().foerste[0][2], false, "C: et vist svar tæller ikke som første forsøg");
+        el("knap").click();
+
+        /* ----- fjerde opgave: sidste i feltet ----- */
+        loes();
+        ens(el("knap").textContent, T.naesteFelt, "C: efter feltets sidste opgave hedder knappen Næste felt");
+        ens(S().foerste[0][3], true, "C: opgave 4 var rigtig i første forsøg");
+        ens(liste("#raekker .rk").map(function (e) { return e.className; }), ["rk loest", "rk", "rk", "rk"], "C: første felt er grønt");
+        ens(liste("#linjer .linje.loest").length, 4, "C: hele feltet er skrevet");
+        el("knap").click();
+        ens([opg().r, opg().i], [1, 0], "C: næste felt begynder med opgave 1");
+        ens(el("ark-etiket").textContent, D.RAEKKER[1].navn, "C: feltet har skiftet række");
+        ens(liste("#raekker .rk").map(function (e) { return e.className; }), ["rk loest", "rk nu", "rk", "rk"], "C: andet felt er det aktuelle");
+        ens(liste("#linjer .linje.loest").length, 0, "C: det nye felt er tomt");
+
+        /* ----- felt 2 og 3 ----- */
+        var vagt = 0;
+        while (opg().r < 3 && vagt++ < 50) { loes(); el("knap").click(); }
+
+        /* ----- felt 4: grundforklaringerne ----- */
+        var o4 = opg().o;
+        ens([opg().r, o4.type], [3, "forklar"], "C: fjerde felt er grundforklaringerne");
+        ok(!el("udsagn").hidden && el("udsagn").textContent === o4.udsagn, "C: udsagnet står over spørgsmålet");
+        ens(el("spm").textContent, T.spmForklar, "C: spørgsmålet til udsagnet");
+        ens(liste("#valg .bog").map(function (b) { return b.textContent; }), ["F", "K", "I"], "C: de tre grundforklaringer står i fast rækkefølge");
+        ens(liste("#valg .svar span:last-child").map(function (b) { return b.textContent; }), D.FORKLARINGER.map(function (g) { return g.navn; }), "C: knapperne har forklaringernes navne");
+        ens(besked(), T.forklarStart, "C: statuslinjen siger, hvad eleven skal vælge");
+        smaaSkrift("C forklar: ");
+        var fk = forkerte(o4)[0];
+        svarknap(fk).click();
+        ok(farve("roed") && besked().indexOf(o4.fejl[D.FORKLARINGER[fk].id]) !== -1, "C: den forkerte forklaring får sin egen grund");
+        svarknap(rigtigt(o4)).click();
+        ok(farve("groen") && besked().indexOf(o4.fordi) !== -1, "C: den rigtige forklaring får sin begrundelse");
+        el("knap").click();
+        loes(); el("knap").click();
+        var o5 = opg().o;
+        ok(el("udsagn").hidden && el("spm").textContent === o5.spm, "C: sidste opgave har sit eget spørgsmål og intet udsagn");
+        loes();
+        ens(el("knap").textContent, T.faseSlut, "C: efter fasens sidste opgave hedder knappen Se fasen samlet");
+        ens(fase(), "felt", "C: skemaet kommer først, når eleven trykker");
+        ens(liste("#raekker .rk.loest").length, 4, "C: alle fire felter er grønne");
+
+        /* ----- fasen samlet ----- */
+        el("knap").click();
+        ens(fase(), "skema", "C: fasen vises samlet");
+        ok(synlig(el("skema")) && !synlig(el("felt")) && !synlig(el("start")), "C: kun skemaet er fremme");
+        ens(S().viser, [0], "C: skemaet viser kun den fase, der er udfyldt");
+        ens([liste("#skema-tabel thead th").length, liste("#skema-tabel tbody tr").length, liste("#skema-tabel td li").length], [2, 4, 15], "C: én kolonne, fire rækker og 15 linjer");
+        ens(liste("#skema-tabel tbody th").map(function (e) { return e.textContent; }), D.RAEKKER.map(function (r) { return r.navn; }), "C: rækkerne har skemaets navne");
+        ens(el("skema-besked").textContent, "1. fase er udfyldt. 11 af 15 rigtige i første forsøg.", "C: resultatet for fasen");
+        ok(!el("skema-videre").hidden && el("skema-videre").textContent === T.naesteFase, "C: knappen Næste fase er fremme");
+        ok(!el("skema-kopier").hidden && el("skema-igen").hidden && el("skema-forfra").hidden, "C: kun Kopiér og Næste fase er fremme");
+        ok(F.skemaTekst().indexOf(D.TITEL) === 0 && F.skemaTekst().indexOf("- " + linjeTekst(o1)) !== -1, "C: skemaet kan kopieres som tekst");
+        ok(F.skemaHTML().indexOf("<table") !== -1 && F.skemaHTML().indexOf(D.FASER[0].navn) !== -1, "C: skemaet kan kopieres som tabel");
+        smaaSkrift("C skema: ");
+
+        el("skema-videre").click();
+        ens([fase(), S().f, S().nr], ["felt", 1, 0], "C: Næste fase åbner anden fase");
+        ens(el("sted-fase").textContent, D.FASER[1].kort, "C: anden fase står over opgaven");
+
+        /* ----- et forkert svar huskes, når eleven går ud og ind ----- */
+        skriv("banan");
+        ens(S().plet[1], 0, "C: det forkerte ord i anden fase er talt");
+        el("faserknap").click();
+        ens(fase(), "start", "C: Faserne går tilbage til startbilledet");
+        ok(kort(0).classList.contains("faerdig") && kort(0).querySelector(".fk-gaa").textContent === T.faerdig, "C: første fase er færdig");
+        ens(kort(0).querySelectorAll(".fk-felter i.on").length, 4, "C: første fase har fire grønne felter");
+        ok(kort(1).classList.contains("anbefalet") && !kort(0).classList.contains("anbefalet"), "C: anden fase er nu markeret");
+        ok(!el("skemaknap").hidden, "C: Se dit skema er fremme");
+        ens(el("start-besked").textContent, T.startGemt, "C: statuslinjen siger, at skemaet er gemt");
+
+        await aabn(883, 620, "", true);
+        ens(S().frem, [15, 0, 0, 0], "C: skemaet er husket efter en genindlæsning");
+        ens(S().plet[1], 0, "C: det forkerte forsøg er husket");
+        ok(kort(0).classList.contains("faerdig"), "C: første fase er stadig færdig");
+        kort(1).click();
+        loes();
+        ens(S().foerste[1][0], false, "C: opgaven tæller ikke som første forsøg efter ud og ind");
+        el("faserknap").click();
+        ok(kort(1).classList.contains("igang") && kort(1).querySelector(".fk-gaa").textContent === T.fortsaet, "C: anden fase kan fortsættes");
+        ens(kort(1).querySelector(".fk-status").textContent, "0 af 4 felter", "C: anden fase har ingen færdige felter");
+
+        /* ----- Se dit skema og Lav fasen igen ----- */
+        el("skemaknap").click();
+        ens([fase(), S().viser], ["skema", [0]], "C: Se dit skema viser de færdige faser");
+        ens(el("skema-besked").textContent, "1. fase: 11 af 15 rigtige i første forsøg.", "C: resultatet står ved skemaet");
+        ok(el("skema-videre").hidden && !el("skema-igen").hidden, "C: Lav fasen igen er fremme, Næste fase er ikke");
+        el("faserknap").click();
+        kort(0).click();
+        ens([fase(), S().viser], ["skema", [0]], "C: et klik på en færdig fase viser den");
+        el("skema-igen").click();
+        ens(el("skema-igen").textContent, T.sikker, "C: første tryk på Lav fasen igen spørger");
+        ens(S().frem[0], 15, "C: første tryk sletter ikke noget");
+        el("skema-igen").click();
+        ens([fase(), S().f, S().nr, S().frem[0]], ["felt", 0, 0, 0], "C: andet tryk begynder fasen forfra");
+        ens(gemt().frem[0], 0, "C: det er gemt, at fasen er begyndt forfra");
+
+        /* ----- hele skemaet ----- */
+        loesFase();
+        ens(el("skema-besked").textContent, "1. fase er udfyldt. 15 af 15 rigtige i første forsøg.", "C: alle rigtige i første forsøg");
+        el("skema-videre").click();
+        ens([S().f, S().nr], [1, 1], "C: anden fase fortsætter, hvor eleven slap");
+        loesFase(); el("skema-videre").click();
+        loesFase(); el("skema-videre").click();
+        ens(S().f, 3, "C: fjerde fase er den sidste");
+        loesFase();
+        ens([fase(), S().efter], ["skema", 3], "C: fjerde fase vises samlet");
+        ens(el("skema-videre").textContent, T.seHele, "C: knappen hedder nu Se hele skemaet");
+        el("skema-videre").click();
+        ens(S().viser, [0, 1, 2, 3], "C: hele skemaet vises");
+        ens([liste("#skema-tabel thead th").length, liste("#skema-tabel td").length, liste("#skema-tabel td li").length], [5, 16, 55], "C: fire kolonner, 16 felter og 55 linjer");
+        ens(liste("#skema-tabel .s-aar").map(function (e) { return e.textContent; }), D.FASER.map(function (f) { return f.aar; }), "C: kolonnerne har fasernes årstal");
+        ens(el("skema-besked").textContent, "Hele skemaet er udfyldt. 54 af 55 rigtige i første forsøg.", "C: det samlede resultat");
+        ok(!el("skema-forfra").hidden && el("skema-igen").hidden && el("skema-videre").hidden, "C: Forfra er fremme til slut");
+        ens(F.skemaTekst().split("\n").filter(function (l) { return l.indexOf("- ") === 0; }).length, 55, "C: alle 55 linjer er med i teksten, der kopieres");
+        smaaSkrift("C hele skemaet: ");
+
+        el("faserknap").click();
+        ens(el("start-besked").textContent, T.startAlle, "C: startbilledet siger, at skemaet er udfyldt");
+        ens(liste("#faser .fasekort.anbefalet").length, 0, "C: ingen fase er markeret, når alt er udfyldt");
+        ok(el("skemaknap").classList.contains("videre"), "C: Se dit skema er fremhævet");
+        el("skemaknap").click();
+        ens(S().viser, [0, 1, 2, 3], "C: Se dit skema viser alle fire faser");
+        el("skema-forfra").click();
+        ens([el("skema-forfra").textContent, S().frem[3]], [T.sikker, 14], "C: første tryk på Forfra spørger");
+        el("skema-forfra").click();
+        ens([fase(), S().frem], ["start", [0, 0, 0, 0]], "C: andet tryk sletter skemaet");
+        ens(gemt().frem, [0, 0, 0, 0], "C: det tomme skema er gemt");
+        ok(el("skemaknap").hidden && kort(0).classList.contains("anbefalet"), "C: startbilledet er som første gang");
+
+        /* ----- ankre ----- */
+        await aabn(883, 620, "facit");
+        ens([fase(), S().viser], ["skema", [0, 1, 2, 3]], "C: #facit viser hele skemaet");
+        ens(el("skema-besked").textContent, T.facit, "C: #facit har sin egen tekst");
+        ok(el("skema-videre").hidden && el("skema-igen").hidden && el("skema-forfra").hidden, "C: #facit har kun Kopiér");
+        ens(S().frem, [0, 0, 0, 0], "C: #facit udfylder ikke elevens skema");
+        el("faserknap").click();
+        ens(fase(), "start", "C: fra #facit kan man gå til faserne");
+        ok(el("skemaknap").hidden, "C: efter #facit er elevens skema stadig tomt");
+        await aabn(883, 620, "3");
+        ens([fase(), S().f, S().nr], ["felt", 2, 0], "C: #3 går lige til tredje fase");
+
+        /* ================= D: roen i fire skærmstørrelser ================= */
+        var maal = [[883, 620], [1280, 620], [1366, 768], [1600, 900]];
+        for (var m = 0; m < maal.length; m++) {
+            var bredde = maal[m][0], hoejde = maal[m][1], sted = "D " + bredde + "x" + hoejde + ": ";
+            await aabn(bredde, hoejde);
+            var scene = kasse(el("scene"));
+            var ruller = function () { return d.documentElement.scrollHeight > hoejde || d.documentElement.scrollWidth > bredde; };
+
+            /* startbilledet */
+            ok(!ruller(), sted + "startbilledet ruller ikke");
+            var kasser = liste("#faser .fasekort").map(kasse);
+            ok(kasser.every(function (k) { return k.t === kasser[0].t && k.b === kasser[0].b; }), sted + "de fire faser er lige høje");
+            ok(kasser[3].r <= scene.r && kasse(d.querySelector(".intro")).t >= scene.t && kasse(d.querySelector(".start-linje")).b <= scene.b, sted + "startbilledet holder sig i scenen");
+            ok(liste("#faser .fasekort").every(function (k) { return k.scrollHeight <= k.clientHeight + 1 && k.scrollWidth <= k.clientWidth + 1; }), sted + "teksten kan være på kortene");
+            smaaSkrift(sted + "start: ");
+
+            for (var f = 0; f < 4; f++) {
+                F.gaaTil(f);
+                var runder = 0;
+                while (fase() === "felt" && runder++ < 100) {
+                    var p = opg(), o = p.o, navn = sted + (f + 1) + ". fase, felt " + (p.r + 1) + ", opgave " + (p.i + 1) + ": ";
+                    var foer = aftryk();
+                    var passer = function (hvad) {
+                        ens(aftryk(), foer, navn + "intet flytter sig ved " + hvad);
+                        ok(el("besked").scrollHeight <= el("statuslinje").clientHeight, navn + "teksten kan være i statuslinjen ved " + hvad);
+                    };
+
+                    ok(kasse(el("opgave")).b <= scene.b, navn + "opgaven holder sig i scenen");
+                    ok(kasse(el("ark")).b <= scene.b && el("ark").scrollHeight <= el("ark").clientHeight + 1, navn + "feltet kan ses helt");
+                    ok(kasse(el("raekker")).r <= scene.r + 1 && d.querySelector(".sted").getBoundingClientRect().height < 40, navn + "stedet står på én linje");
+                    ok(!ruller(), navn + "siden ruller ikke");
+
+                    if (o.type === "skriv") {
+                        ok(el("skriv").getBoundingClientRect().height < 60 && kasse(el("hint")).r <= kasse(el("opgave")).r + 1, navn + "felt, Tjek og hint står på én linje");
+                        skriv("banan"); passer("et forkert ord");
+                        (o.naesten || []).forEach(function (n) { skriv(n.ord[0]); passer("ordet " + n.ord[0]); });
+                        el("hint").click(); passer("første hint");
+                        el("hint").click(); passer("andet hint");
+                        /* med en stavefejl, så den længste tekst (Det staves ...) bliver målt */
+                        skriv(o.svar.charAt(0) + o.svar);
+                        ok(S().loest && besked().indexOf("Det staves " + o.svar + ".") !== -1, navn + "ordet er rigtigt med et bogstav for meget");
+                    } else {
+                        ok(liste("#valg .svar").every(function (b) { return b.scrollWidth <= b.clientWidth + 1 && b.getBoundingClientRect().height <= 70; }), navn + "svarene er højst to linjer");
+                        forkerte(o).forEach(function (i) { svarknap(i).click(); passer("forkert svar " + (i + 1)); });
+                        svarknap(rigtigt(o)).click();
+                    }
+                    passer("det rigtige svar");
+                    ok(kasse(el("knap")).r <= kasse(el("statuslinje")).r && el("knap").getBoundingClientRect().height < 60, navn + "knappen er i statuslinjen på én linje");
+                    var ny = d.querySelector("#linjer .linje.ny").getBoundingClientRect(), ark = el("ark").getBoundingClientRect();
+                    ok(ny.bottom <= ark.bottom + 1 && ny.top >= ark.top, navn + "den nye linje kan ses i feltet");
+                    el("knap").click();
+                }
+
+                /* fasen samlet */
+                ens(fase(), "skema", sted + (f + 1) + ". fase vises samlet");
+                var rul = el("skema-rul");
+                ok(rul.scrollHeight <= rul.clientHeight + 1, sted + (f + 1) + ". fase kan ses samlet uden at rulle (" + rul.scrollHeight + " mod " + rul.clientHeight + ")");
+                ok(rul.scrollWidth <= rul.clientWidth + 1, sted + (f + 1) + ". fase er ikke bredere end papiret");
+                ok(liste("#skema-tabel td, #skema-tabel th").every(function (c) { return c.scrollWidth <= c.clientWidth + 1; }), sted + (f + 1) + ". fase: ingen ord stikker ud af felterne");
+                ok(kasse(d.querySelector(".skema-linje")).b <= scene.b && !ruller(), sted + (f + 1) + ". fase: knapperne kan ses, og siden ruller ikke");
+                ok(d.querySelector(".skema-linje").getBoundingClientRect().height < 80, sted + (f + 1) + ". fase: resultat og knapper står på én linje");
+                smaaSkrift(sted + "fasen samlet: ");
+            }
+
+            /* hele skemaet */
+            el("skema-videre").click();
+            ens(S().viser.length, 4, sted + "hele skemaet vises");
+            ok(el("skema-rul").scrollWidth <= el("skema-rul").clientWidth + 1, sted + "hele skemaet er ikke bredere end papiret");
+            ok(liste("#skema-tabel td, #skema-tabel th").every(function (c) { return c.scrollWidth <= c.clientWidth + 1; }), sted + "hele skemaet: ingen ord stikker ud af felterne");
+            ok(kasse(d.querySelector(".skema-linje")).b <= scene.b && !ruller(), sted + "hele skemaet: knapperne kan ses, og siden ruller ikke");
+            ok(d.querySelector(".skema-linje").getBoundingClientRect().height < 80, sted + "hele skemaet: resultat og knapper står på én linje");
+            smaaSkrift(sted + "hele skemaet: ");
+        }
+
+        /* smalt vindue: feltet står under opgaven, og siden ruller */
+        await aabn(600, 800);
+        ok(d.documentElement.scrollWidth <= 600, "D 600x800: startbilledet stikker ikke ud til siden");
+        F.gaaTil(0);
+        ok(kasse(el("ark")).t >= kasse(el("opgave")).b, "D 600x800: feltet står under opgaven");
+        ok(d.documentElement.scrollWidth <= 600, "D 600x800: opgaven stikker ikke ud til siden");
+
+    } catch (e) {
+        fejl++;
+        linjer.push("FEJL: testen stoppede: " + (e && e.stack ? e.stack : e));
+    }
+
+    window.localStorage.removeItem(NOEGLE);
+    linjer.push(antal + " påstande.");
+    linjer.push(fejl === 0 ? "ALT OK" : fejl + " FEJL");
+    document.getElementById("ud").textContent = linjer.join("\n");
+}());
+</script>
+</body>
+</html>

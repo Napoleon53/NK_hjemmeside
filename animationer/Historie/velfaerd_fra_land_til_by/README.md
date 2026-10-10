@@ -150,6 +150,13 @@ intet skal rulles ved 1366 x 768, 1280 x 620, 1069 x 620 og 883 x 620 (heller
 ikke med kurven slået til), ingen personer overlapper eller står uden for deres bane, og
 ingen læsbar tekst er under 12,4 px.
 
+Den tjekker også de afbrudte træk (rettet 6. okt. 2026, da mærket ved musen
+kunne blive hængende midt i figuren): rækken mister grebet om musen, et nyt
+tryk kommer uden et slip, to fingre rører hver sin række, vinduet mister fokus.
+Bagefter må der ikke være noget mærke, ingen nedtonet række og ingen sektor, der
+står som mål. Et træk følger én mus eller finger, og bevægelse og slip følges på
+vinduet og ikke på rækken (`bindVindue` i `js/figur.js`).
+
 ## Linjen til menuen
 
 Fra land til by 1940-1989: 100 personer viser, hvad befolkningen levede af.

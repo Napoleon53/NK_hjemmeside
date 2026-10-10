@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velfærdsstatens fire faser</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-fase="start">
+
+<header class="top">
+    <h1><span class="ikon">4</span> Velfærdsstatens fire faser</h1>
+
+    <!-- Tilbage til de fire faser. Ses ikke på startbilledet. -->
+    <button class="ikonknap tekstknap" id="faserknap" type="button" title="Tilbage til de fire faser" hidden>← Faserne</button>
+    <button class="ikonknap tekstknap" id="fagordknap" type="button" title="Fagord (T)">Fagord</button>
+</header>
+
+<main>
+<div class="scene" id="scene">
+
+    <!-- ============================================================= -->
+    <!-- START: de fire faser på en tidslinje                           -->
+    <!-- ============================================================= -->
+    <section class="start" id="start">
+        <div class="intro">
+            <h2 id="intro1"></h2>
+            <p id="intro2"></p>
+        </div>
+
+        <ol class="faser" id="faser" aria-label="De fire faser"></ol>
+
+        <div class="statuslinje start-linje">
+            <p class="st-tekst" id="start-besked"></p>
+            <button class="knap hjaelp" id="skemaknap" type="button" hidden></button>
+        </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- FELTET: én opgave ad gangen til venstre, feltet til højre      -->
+    <!-- ============================================================= -->
+    <section class="felt" id="felt">
+
+        <!-- Hvor eleven er: fasen og de fire felter i fasen -->
+        <div class="sted">
+            <span class="opg-maerke" id="sted-fase"></span>
+            <span class="sted-navn" id="sted-navn"></span>
+            <ol class="raekker" id="raekker" aria-label="Fasens fire felter"></ol>
+        </div>
+
+        <div class="arbejde">
+            <div class="opgave" id="opgave">
+                <span class="opg-nr" id="opg-nr"></span>
+
+                <!-- Udsagnet, der skal kobles til en grundforklaring (kun i det fjerde felt) -->
+                <blockquote class="udsagn" id="udsagn" hidden></blockquote>
+
+                <h2 class="spm" id="spm"></h2>
+
+                <!-- Nøgleordet skrives her. Tjek og Giv hint står lige ved feltet. -->
+                <form class="skriv" id="skriv" autocomplete="off" hidden>
+                    <input id="ord" type="text" maxlength="40" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Ordet, der mangler">
+                    <button class="knap blaa" id="tjek" type="submit"></button>
+                    <button class="knap hjaelp" id="hint" type="button"></button>
+                </form>
+
+                <div class="valg" id="valg" role="group" aria-label="Svarmuligheder" hidden></div>
+
+                <!-- Svaret på det, eleven gør, og knappen videre -->
+                <div class="statuslinje" id="statuslinje">
+                    <p class="st-tekst" id="besked" aria-live="polite"></p>
+                    <button class="knap hjaelp videre" id="knap" type="button" hidden></button>
+                </div>
+            </div>
+
+            <!-- Feltet i skemaet: hver løst opgave lægger sin linje. Pladsen er sat af fra start. -->
+            <section class="ark" id="ark" aria-label="Feltet i skemaet">
+                <div class="ark-hoved">
+                    <span class="etiket" id="ark-etiket"></span>
+                    <span class="ark-fase" id="ark-fase"></span>
+                </div>
+                <ol class="linjer" id="linjer"></ol>
+            </section>
+        </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- SKEMAET: de faser, der er udfyldt, som kolonner                -->
+    <!-- ============================================================= -->
+    <section class="skema" id="skema">
+        <div class="skema-rul" id="skema-rul">
+            <span class="etiket" id="skema-titel"></span>
+            <table class="skema-tabel" id="skema-tabel"></table>
+        </div>
+
+        <div class="statuslinje groen skema-linje">
+            <p class="st-tekst" id="skema-besked"></p>
+            <button class="knap" id="skema-forfra" type="button" hidden></button>
+            <button class="knap" id="skema-igen" type="button" hidden></button>
+            <button class="knap hjaelp" id="skema-kopier" type="button"></button>
+            <button class="knap hjaelp videre" id="skema-videre" type="button" hidden></button>
+        </div>
+    </section>
+
+    <div class="fejring" id="fejring" aria-hidden="true"></div>
+</div>
+</main>
+
+<!-- ================================================================= -->
+<!-- FAGORDENE (åbnes kun med knappen eller T)                          -->
+<!-- ================================================================= -->
+<div class="overlay" id="fagord">
+    <div class="overlay-boks">
+        <h2>Fagord</h2>
+
+        <h3>De tre grundforklaringer</h3>
+        <dl class="ordliste">
+            <dt>Funktionalistisk</dt>
+            <dd>Samfundet ændrer sig, fx når folk flytter til byen. Så opstår der nye behov, som staten må løse.</dd>
+            <dt>Konfliktteoretisk</dt>
+            <dd>De, der har magten, frygter uro og revolution. Hjælpen skal holde ro i samfundet.</dd>
+            <dt>Politisk-ideologisk</dt>
+            <dd>Partier og bevægelser har idéer om, hvordan samfundet bør være, og får dem gennemført.</dd>
+        </dl>
+
+        <h3>De tre slags erhverv</h3>
+        <dl class="ordliste">
+            <dt>Primære</dt>
+            <dd>Landbrug, fiskeri og skovbrug.</dd>
+            <dt>Sekundære</dt>
+            <dd>Industri, håndværk og byggeri.</dd>
+            <dt>Tertiære</dt>
+            <dd>Handel, transport og service, både privat og offentlig.</dd>
+        </dl>
+
+        <h3>Om skemaet</h3>
+        <p>Skemaet har fire faser og fire felter i hver fase. Det, du har udfyldt, gemmes på denne computer, så du kan fortsætte senere. Tal og årstal er fra Peter Schroeder: Det 20. århundredes Danmarkshistorie (2007).</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> vælg svar &nbsp;·&nbsp; <kbd>Enter</kbd> tjek og videre &nbsp;·&nbsp; <kbd>T</kbd> fagord &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper" style="margin-top:16px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/svar.js"></script>
+<script src="js/forloeb.js"></script>
+</body>
+</html>
