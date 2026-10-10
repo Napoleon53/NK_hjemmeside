@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>A1.7 Puffersystemer og fordelingsdiagrammer – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../opgaver/a1-7-opgaver.html" rel="next">
+<link href="../opgaver/a1-6-opgaver.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html">A1.7 Puffersystemer og fordelingsdiagrammer</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#pufferligningen" id="toc-pufferligningen" class="nav-link active" data-scroll-target="#pufferligningen">Pufferligningen</a></li>
+  <li><a href="#når-en-syre-og-en-base-blandes" id="toc-når-en-syre-og-en-base-blandes" class="nav-link" data-scroll-target="#når-en-syre-og-en-base-blandes">Når en syre og en base blandes</a></li>
+  <li><a href="#når-der-tilsættes-syre-eller-base-til-et-puffersystem" id="toc-når-der-tilsættes-syre-eller-base-til-et-puffersystem" class="nav-link" data-scroll-target="#når-der-tilsættes-syre-eller-base-til-et-puffersystem">Når der tilsættes syre eller base til et puffersystem</a></li>
+  <li><a href="#syrebrøk-og-basebrøk" id="toc-syrebrøk-og-basebrøk" class="nav-link" data-scroll-target="#syrebrøk-og-basebrøk">Syrebrøk og basebrøk</a></li>
+  <li><a href="#fordelingsdiagrammet" id="toc-fordelingsdiagrammet" class="nav-link" data-scroll-target="#fordelingsdiagrammet">Fordelingsdiagrammet</a></li>
+  <li><a href="#vælg-det-rigtige-puffersystem" id="toc-vælg-det-rigtige-puffersystem" class="nav-link" data-scroll-target="#vælg-det-rigtige-puffersystem">Vælg det rigtige puffersystem</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html">A1.7 Puffersystemer og fordelingsdiagrammer</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-a-puffere-og-fordelingsdiagrammer" class="quarto-section-identifier">A1.7 Puffersystemer og fordelingsdiagrammer</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Det skal du kunne">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Det skal du kunne
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>beregne pH i et puffersystem med pufferligningen</li>
+<li>beregne pH i en blanding af en svag syre og en stærk base</li>
+<li>beregne, hvor meget pH i et puffersystem ændrer sig, når der tilsættes stærk syre eller stærk base</li>
+<li>beregne syrebrøken og basebrøken ved en bestemt pH</li>
+<li>aflæse et fordelingsdiagram</li>
+</ul>
+</div>
+</div>
+<p>Dit blod har pH 7,4, og det holder den værdi, selv om du spiser en citron eller løber en tur, så musklerne danner mælkesyre. Det skyldes puffersystemer. I dette afsnit regner du på puffersystemer, og du lærer at læse det diagram, der viser, hvor meget af et stof der findes som syre og som base ved hver pH.</p>
+<section id="pufferligningen" class="level2">
+<h2 class="anchored" data-anchor-id="pufferligningen">Pufferligningen</h2>
+<p>Et <strong>puffersystem</strong> er en opløsning, der indeholder både en svag syre og dens korresponderende base i mængder, der ligner hinanden. Syren fanger tilsat base, og basen fanger tilsat syre, så pH næsten ikke ændrer sig. Det står i <a href="../../b/kapitler/b6-7-puffersystemer.html">afsnit B6.7</a>.</p>
+<p>pH i et puffersystem findes ved at løse udtrykket for <em>K</em><sub>s</sub> for [H<sub>3</sub>O<sup>+</sup>] og tage −log på begge sider. Det giver <strong>pufferligningen</strong>:</p>
+<p><span class="math display">\[
+\mathrm{pH} = \mathrm{p}K_\mathrm{s} + \log\left(\frac{[\mathrm{B}]}{[\mathrm{S}]}\right)
+\]</span></p>
+<p>Syren og basen er opløst i det samme volumen, så man kan regne med stofmængder i stedet for koncentrationer:</p>
+<p><span class="math display">\[
+\mathrm{pH} = \mathrm{p}K_\mathrm{s} + \log\left(\frac{n_\mathrm{b}}{n_\mathrm{s}}\right)
+\]</span></p>
+<p>Er der lige meget syre og base, er brøken 1, og pH = p<em>K</em><sub>s</sub>.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: et puffersystem af ammonium og ammoniak">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: et puffersystem af ammonium og ammoniak
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>0,10 mol ammoniumchlorid og 0,20 mol ammoniak opløses i vand til 1,00 L. Hvad er pH? For ammonium er p<em>K</em><sub>s</sub> = 9,25.</p>
+<p><strong>Kendte størrelser</strong></p>
+<p>Syren er NH<sub>4</sub><sup>+</sup>, og basen er NH<sub>3</sub>. <em>n</em><sub>s</sub> = 0,10 mol og <em>n</em><sub>b</sub> = 0,20 mol.</p>
+<p><strong>Beregning</strong></p>
+<p><span class="math display">\[
+\mathrm{pH} = \mathrm{p}K_\mathrm{s} + \log\left(\frac{n_\mathrm{b}}{n_\mathrm{s}}\right) = 9{,}25 + \log\left(\frac{0{,}20\ \mathrm{mol}}{0{,}10\ \mathrm{mol}}\right) = 9{,}55
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>pH er 9,55. Det er højere end p<em>K</em><sub>s</sub>, fordi der er mest af basen.</p>
+</div>
+</div>
+</section>
+<section id="når-en-syre-og-en-base-blandes" class="level2">
+<h2 class="anchored" data-anchor-id="når-en-syre-og-en-base-blandes">Når en syre og en base blandes</h2>
+<p>I mange opgaver bliver en svag syre blandet med en stærk base, eller en svag base med en stærk syre. Så er der to skridt:</p>
+<ol type="1">
+<li><strong>Reaktionen.</strong> En stærk base reagerer fuldstændigt med en svag syre. Lav en mængdeberegning i mmol, og find ud af, hvad der er i opløsningen bagefter.</li>
+<li><strong>Ligevægten.</strong> Beregn pH ud fra det, der er tilbage.</li>
+</ol>
+<div id="fig-a1-blanding-udfald" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-blanding-udfald-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-blanding-udfald.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Det, der er tilbage efter reaktionen, bestemmer, hvordan pH skal beregnes."><img src="../figurer/a1-blanding-udfald.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-blanding-udfald-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Det, der er tilbage efter reaktionen, bestemmer, hvordan pH skal beregnes.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 44%">
+<col style="width: 28%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Efter reaktionen er der</th>
+<th style="text-align: left;">Opløsningen er</th>
+<th style="text-align: left;">pH findes med</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">både syre og korresponderende base</td>
+<td style="text-align: left;">et puffersystem</td>
+<td style="text-align: left;">pufferligningen</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">kun den korresponderende base</td>
+<td style="text-align: left;">en opløsning af en svag base</td>
+<td style="text-align: left;">SÆL-skema og <em>K</em><sub>b</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">overskud af hydroxid</td>
+<td style="text-align: left;">en opløsning af en stærk base</td>
+<td style="text-align: left;">pOH = −log[OH<sup>−</sup>]</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: ethansyre og natriumhydroxid">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: ethansyre og natriumhydroxid
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>50,0 mL 0,200 M ethansyre blandes med 30,0 mL 0,100 M natriumhydroxid. Hvad er pH i blandingen? For ethansyre er p<em>K</em><sub>s</sub> = 4,76.</p>
+<p><strong>Trin 1: stofmængderne</strong></p>
+<p><span class="math display">\[
+n(\mathrm{CH_3COOH}) = c \cdot V = 0{,}200\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0500\ \mathrm{L} = 0{,}0100\ \mathrm{mol} = 10{,}0\ \mathrm{mmol}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{OH^-}) = c \cdot V = 0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0300\ \mathrm{L} = 0{,}00300\ \mathrm{mol} = 3{,}00\ \mathrm{mmol}
+\]</span></p>
+<p><strong>Trin 2: reaktionen</strong></p>
+<p>Hydroxidionerne tager hver en hydron fra et molekyle ethansyre. Reaktionen går helt til ende.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CH<sub>3</sub>COOH</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">OH<sup>−</sup></th>
+<th style="text-align: center;">→</th>
+<th style="text-align: center;">CH<sub>3</sub>COO<sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Før</td>
+<td style="text-align: center;">10,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">3,00 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−3,00 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−3,00 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+3,00 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Efter</td>
+<td style="text-align: center;">7,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">3,00 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Trin 3: hvad er der i opløsningen?</strong></p>
+<p>Der er både ethansyre og ethanoat. Det er et puffersystem.</p>
+<p><strong>Trin 4: pH</strong></p>
+<p><span class="math display">\[
+\mathrm{pH} = \mathrm{p}K_\mathrm{s} + \log\left(\frac{n_\mathrm{b}}{n_\mathrm{s}}\right) = 4{,}76 + \log\left(\frac{3{,}00\ \mathrm{mmol}}{7{,}0\ \mathrm{mmol}}\right) = 4{,}39
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>pH i blandingen er 4,39.</p>
+</div>
+</div>
+<p>Skemaet med rækkerne Før, Ændring og Efter ligner et SÆL-skema, men det er ikke en ligevægtsberegning. Reaktionen mellem en svag syre og hydroxid går til ende, så der er ikke noget <em>x</em>. Ligevægten kommer først bagefter, og den tager pufferligningen sig af.</p>
+</section>
+<section id="når-der-tilsættes-syre-eller-base-til-et-puffersystem" class="level2">
+<h2 class="anchored" data-anchor-id="når-der-tilsættes-syre-eller-base-til-et-puffersystem">Når der tilsættes syre eller base til et puffersystem</h2>
+<p>Samme to skridt bruges, når et puffersystem får tilsat en stærk syre eller en stærk base.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: saltsyre i et puffersystem">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: saltsyre i et puffersystem
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Et puffersystem indeholder 25,0 mmol ethansyre og 25,0 mmol ethanoat i 100 mL. Der tilsættes 5,0 mmol saltsyre. Hvad er pH før og efter?</p>
+<p><strong>Før tilsætningen</strong></p>
+<p>Der er lige meget syre og base, så pH = p<em>K</em><sub>s</sub> = 4,76.</p>
+<p><strong>Reaktionen</strong></p>
+<p>Oxoniumionerne fra saltsyren reagerer med puffersystemets base.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CH<sub>3</sub>COO<sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>3</sub>O<sup>+</sup></th>
+<th style="text-align: center;">→</th>
+<th style="text-align: center;">CH<sub>3</sub>COOH</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Før</td>
+<td style="text-align: center;">25,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">5,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">25,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−5,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−5,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+5,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Efter</td>
+<td style="text-align: center;">20,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">30,0 mmol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Efter tilsætningen</strong></p>
+<p><span class="math display">\[
+\mathrm{pH} = 4{,}76 + \log\left(\frac{20{,}0\ \mathrm{mmol}}{30{,}0\ \mathrm{mmol}}\right) = 4{,}58
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>pH falder fra 4,76 til 4,58. Havde de 5,0 mmol saltsyre været tilsat til 100 mL rent vand, var pH faldet fra 7,00 til 1,30.</p>
+</div>
+</div>
+</section>
+<section id="syrebrøk-og-basebrøk" class="level2">
+<h2 class="anchored" data-anchor-id="syrebrøk-og-basebrøk">Syrebrøk og basebrøk</h2>
+<p>Pufferligningen fortæller også, hvordan et stof fordeler sig mellem syreform og baseform ved en bestemt pH. Løses den for forholdet mellem base og syre, får man</p>
+<p><span class="math display">\[
+\frac{n_\mathrm{b}}{n_\mathrm{s}} = 10^{\,\mathrm{pH} - \mathrm{p}K_\mathrm{s}}
+\]</span></p>
+<p>Den del af stoffet, der findes som syre, kaldes <strong>syrebrøken</strong>, <em>x</em><sub>s</sub>. Den del, der findes som base, kaldes <strong>basebrøken</strong>, <em>x</em><sub>b</sub>:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{n_\mathrm{s}}{n_\mathrm{s} + n_\mathrm{b}} \qquad\qquad x_\mathrm{b} = \frac{n_\mathrm{b}}{n_\mathrm{s} + n_\mathrm{b}}
+\]</span></p>
+<p>De to brøker er tal mellem 0 og 1, og tilsammen giver de 1. Sættes forholdet fra pufferligningen ind, kan syrebrøken beregnes direkte ud fra pH:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,\mathrm{pH} - \mathrm{p}K_\mathrm{s}}} \qquad\qquad x_\mathrm{b} = 1 - x_\mathrm{s}
+\]</span></p>
+<p>Syrebrøken og basebrøken har et lille s og et lille b efter <em>x</em>. De skal ikke forveksles med den ubekendte <em>x</em> i et SÆL-skema.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: ethansyre ved pH 5,00">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: ethansyre ved pH 5,00
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Hvor stor en del af ethansyren i en opløsning med pH 5,00 findes som syre, og hvor stor en del findes som ethanoat? For ethansyre er p<em>K</em><sub>s</sub> = 4,76.</p>
+<p><strong>Forholdet mellem base og syre</strong></p>
+<p><span class="math display">\[
+\frac{n_\mathrm{b}}{n_\mathrm{s}} = 10^{\,5{,}00 - 4{,}76} = 10^{\,0{,}24} = 1{,}74
+\]</span></p>
+<p><strong>Syrebrøken og basebrøken</strong></p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 1{,}74} = 0{,}365 \qquad\qquad x_\mathrm{b} = 1 - 0{,}365 = 0{,}635
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Ved pH 5,00 findes 36,5 % som ethansyre og 63,5 % som ethanoat.</p>
+</div>
+</div>
+</section>
+<section id="fordelingsdiagrammet" class="level2">
+<h2 class="anchored" data-anchor-id="fordelingsdiagrammet">Fordelingsdiagrammet</h2>
+<p>Tegnes syrebrøken og basebrøken som funktion af pH, får man et <strong>fordelingsdiagram</strong>. I læreplanen og i opgaverne til den skriftlige prøve kaldes det et bjerrumdiagram. Det er det samme diagram.</p>
+<div id="fig-a1-fordeling-to-maader" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-fordeling-to-maader-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-fordeling-to-maader.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Fordelingsdiagrammet for ethansyre tegnet på de to måder, du kan møde."><img src="../figurer/a1-fordeling-to-maader.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-fordeling-to-maader-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Fordelingsdiagrammet for ethansyre tegnet på de to måder, du kan møde.
+</figcaption>
+</figure>
+</div>
+<p>Diagrammet findes i to udgaver. Den ene har to kurver, én for syren og én for basen. Den anden har kun én kurve, som deler diagrammet i to områder. Her aflæses syrebrøken på aksen til venstre og basebrøken på aksen til højre, hvor tallene går den modsatte vej.</p>
+<p>Tre ting kan læses af diagrammet:</p>
+<ul>
+<li><strong>p<em>K</em><sub>s</sub></strong> er den pH, hvor syrebrøken og basebrøken begge er 0,50. I udgaven med to kurver er det der, hvor kurverne krydser.</li>
+<li><strong>Under p<em>K</em><sub>s</sub></strong> findes stoffet mest som syre. To pH-enheder under p<em>K</em><sub>s</sub> er 99 % på syreform.</li>
+<li><strong>Over p<em>K</em><sub>s</sub></strong> findes stoffet mest som base. To pH-enheder over p<em>K</em><sub>s</sub> er 99 % på baseform.</li>
+</ul>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">pH i forhold til p<em>K</em><sub>s</sub></th>
+<th style="text-align: center;">Syrebrøk, <em>x</em><sub>s</sub></th>
+<th style="text-align: center;">Basebrøk, <em>x</em><sub>b</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2 under</td>
+<td style="text-align: center;">0,99</td>
+<td style="text-align: center;">0,01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1 under</td>
+<td style="text-align: center;">0,91</td>
+<td style="text-align: center;">0,09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lig med p<em>K</em><sub>s</sub></td>
+<td style="text-align: center;">0,50</td>
+<td style="text-align: center;">0,50</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1 over</td>
+<td style="text-align: center;">0,09</td>
+<td style="text-align: center;">0,91</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2 over</td>
+<td style="text-align: center;">0,01</td>
+<td style="text-align: center;">0,99</td>
+</tr>
+</tbody>
+</table>
+<section id="sådan-aflæser-du" class="level3">
+<h3 class="anchored" data-anchor-id="sådan-aflæser-du">Sådan aflæser du</h3>
+<p>Gå lodret op fra den pH, opgaven spørger til, indtil du rammer kurven. Gå derfra vandret ud til aksen, og aflæs brøken.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: benzoesyre i sodavand og i mælk">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: benzoesyre i sodavand og i mælk
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Benzoesyre bruges som konserveringsmiddel. Det er kun syreformen, der hæmmer bakterier og svampe. Figuren viser fordelingsdiagrammet for benzoesyre. Hvor stor en del findes som syre ved pH 3,0, som i en sodavand, og ved pH 6,5, som i mælk?</p>
+<div id="fig-a1-fordeling-aflaes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-fordeling-aflaes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-fordeling-aflaes.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Syrebrøken for benzoesyre aflæses ved pH 3,0 og ved pH 6,5."><img src="../figurer/a1-fordeling-aflaes.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-fordeling-aflaes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Syrebrøken for benzoesyre aflæses ved pH 3,0 og ved pH 6,5.
+</figcaption>
+</figure>
+</div>
+<p><strong>Aflæsning</strong></p>
+<p>Ved pH 3,0 aflæses syrebrøken til 0,94. Ved pH 6,5 aflæses den til under 0,01.</p>
+<p><strong>Kontrol ved beregning</strong></p>
+<p>For benzoesyre er p<em>K</em><sub>s</sub> = 4,20.</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,3{,}0 - 4{,}20}} = 0{,}94 \qquad\qquad x_\mathrm{s} = \frac{1}{1 + 10^{\,6{,}5 - 4{,}20}} = 0{,}005
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>I en sodavand med pH 3,0 er 94 % af benzoesyren på syreform, så den virker. I mælk med pH 6,5 er kun 0,5 % på syreform. Benzoesyre er derfor kun et brugbart konserveringsmiddel i sure fødevarer.</p>
+</div>
+</div>
+<p>Formen betyder også noget for, hvor et stof opløses. Syreformen af en carboxylsyre er uladet, og baseformen er en ion. Ionen opløses bedst i vand, og den uladede form opløses bedst i fedt. Det er baggrunden for log <em>D</em> i <a href="../../b/kapitler/b8-4-log-p-og-log-d.html">afsnit B8.4</a>.</p>
+</section>
+</section>
+<section id="vælg-det-rigtige-puffersystem" class="level2">
+<h2 class="anchored" data-anchor-id="vælg-det-rigtige-puffersystem">Vælg det rigtige puffersystem</h2>
+<p>Et puffersystem virker bedst, når der er nok af både syren og basen. Det er der i området fra én pH-enhed under til én pH-enhed over p<em>K</em><sub>s</sub>. Skal man lave en puffer med en bestemt pH, vælger man derfor en syre med p<em>K</em><sub>s</sub> tæt på den ønskede pH, og forholdet mellem base og syre findes med formlen <span class="math inline">\(n_\mathrm{b} / n_\mathrm{s} = 10^{\,\mathrm{pH} - \mathrm{p}K_\mathrm{s}}\)</span> fra før.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Til den skriftlige prøve">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Til den skriftlige prøve
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>I opgaverne hedder fordelingsdiagrammet et bjerrumdiagram.</li>
+<li>Aflæs så præcist, som akserne tillader, og skriv, hvad du har aflæst.</li>
+<li>Skriv, hvilket stof der er syren, og hvilket der er basen, før du bruger pufferligningen.</li>
+<li>Lav altid mængdeberegningen i mmol, før du beregner pH i en blanding.</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Prøv selv
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I <a href="https://kemiformler.dk/animationer/superanimationer/sb3.2_titreringssimulator/index.html#fordeling">Titreringssimulatoren</a> viser fanen Fordelingen, hvor meget af et stof der findes på syreform og på baseform ved hver pH. Prøv med ethansyre og med ammoniak, og se, hvor kurverne krydser.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Kort sagt
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>pH i et puffersystem beregnes med pufferligningen: pH = p<em>K</em><sub>s</sub> + log(<em>n</em><sub>b</sub> / <em>n</em><sub>s</sub>).</li>
+<li>Blandes en svag syre med en stærk base, laver man først en mængdeberegning og ser, hvad der er tilbage. Derefter beregnes pH.</li>
+<li>Syrebrøken er den del af stoffet, der findes som syre, og basebrøken er den del, der findes som base. Tilsammen giver de 1.</li>
+<li>Et fordelingsdiagram viser syrebrøken og basebrøken som funktion af pH. Til den skriftlige prøve hedder det et bjerrumdiagram.</li>
+<li>Ved pH = p<em>K</em><sub>s</sub> er begge brøker 0,50. Under p<em>K</em><sub>s</sub> er der mest syre, og over p<em>K</em><sub>s</sub> er der mest base.</li>
+</ul>
+</div>
+</div>
+<div class="til-opgaver">
+<p><strong>Opgaver:</strong> <a href="../opgaver/a1-7-opgaver.html">Opgaver til A1.7</a> har både almindelige opgaver og opgaver i eksamensstil.</p>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../opgaver/a1-6-opgaver.html" class="pagination-link" aria-label="Opgaver til A1.6">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Opgaver til A1.6</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../opgaver/a1-7-opgaver.html" class="pagination-link" aria-label="Opgaver til A1.7">
+        <span class="nav-page-text">Opgaver til A1.7</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

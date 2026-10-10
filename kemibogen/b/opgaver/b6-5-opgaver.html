@@ -1,0 +1,2762 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til B6.5 – Kemibogen B</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/b6-6-ph-i-baser.html" rel="next">
+<link href="../kapitler/b6-5-ph-i-syrer.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b6-1-syre-basereaktioner.html">Kapitel B6: Syrer og baser</a></li><li class="breadcrumb-item"><a href="../opgaver/b6-5-opgaver.html">Opgaver til B6.5</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen B</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B1: Reaktionshastighed</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-1-reaktionshastighed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.1 Reaktionshastighed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-2-koncentration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.2 Koncentration og sammenstød</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-3-aktiveringsenergi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.3 Aktiveringsenergi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-4-temperatur.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.4 Temperatur</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-5-katalysatorer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.5 Katalysatorer og enzymer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.5</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B2: Kemisk ligevægt</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-1-kemisk-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.1 Kemisk ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-2-ligevaegtsloven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.2 Ligevægtsloven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-3-ligevaegtsberegninger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.3 Beregninger med ligevægtskonstanten</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-4-ikke-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.4 Når blandingen ikke er i ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-5-indgreb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.5 Indgreb i en ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-6-temperatur-og-rumfang.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.6 Temperatur og rumfang</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-7-oploeselighedsprodukt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.7 Opløselighedsprodukt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B3: Intermolekylære bindinger og isomeri</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-1-stofklasser.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.1 Stofklasser og funktionelle grupper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-2-intermolekylaere-bindinger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.2 Intermolekylære bindinger</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-3-strukturisomeri.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.3 Strukturisomeri</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-4-stereoisomeri.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.4 Stereoisomeri</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B4: Funktionelle grupper</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-1-carbonhydriders-reaktioner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.1 Carbonhydriders reaktioner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-2-alkoholer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.2 Alkoholer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-3-aldehyder-og-ketoner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.3 Aldehyder og ketoner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-4-carboxylsyrer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.4 Carboxylsyrer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-5-estere.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.5 Estere</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-6-aminer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.6 Aminer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-7-overblik.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.7 Overblik: reaktionstyper og test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B5: Spektroskopi</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-1-lys-og-farver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.1 Lys og farver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-2-absorptionsspektre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.2 Absorptionsspektre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-3-lambert-beers-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.3 Lambert-Beers lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-4-standardkurven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.4 Standardkurven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel B6: Syrer og baser</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-1-syre-basereaktioner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.1 Syre-basereaktioner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-2-vands-selvionisering-og-ph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.2 Vands selvionisering og pH</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-3-syrestyrke.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.3 Syrestyrke</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-4-basestyrke.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.4 Basestyrke</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-5-ph-i-syrer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.5 pH i opløsninger af syrer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-5-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til B6.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-6-ph-i-baser.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.6 pH i opløsninger af baser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-7-puffersystemer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.7 Puffersystemer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-8-titrering-af-svag-syre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.8 Titrering af en svag syre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B7: Fødevarer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-1-monosaccharider.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.1 Monosaccharider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-2-ringslutning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.2 Ringslutning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-3-disaccharider-og-polysaccharider.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.3 Disaccharider og polysaccharider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-4-fehlings-test.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.4 Fehlings test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-5-fedtstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.5 Fedtstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-6-iodtal-og-forsaebning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.6 Iodtal og forsæbning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-7-aminosyrer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.7 Aminosyrer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-8-proteiner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.8 Proteiner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B8: Medicin</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-1-laegemidler-og-receptorer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.1 Lægemidler og receptorer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-2-kiralitet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.2 Kiralitet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-3-syrer-og-baser-i-kroppen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.3 Lægemidler som syrer og baser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-4-log-p-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.4 Log <em>P</em> og log <em>D</em></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-5-fremstilling-af-acetylsalicylsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.5 Fremstilling af acetylsalicylsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-6-tlc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.6 TLC</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-7-hvor-meget-virksomt-stof.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.7 Hvor meget virksomt stof?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../videre-til-a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kemi A</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-b6.5.1-vælg-fremgangsmåden" id="toc-opgave-b6.5.1-vælg-fremgangsmåden" class="nav-link active" data-scroll-target="#opgave-b6.5.1-vælg-fremgangsmåden">Opgave B6.5.1: Vælg fremgangsmåden</a></li>
+  <li><a href="#opgave-b6.5.2-ph-i-stærke-syrer" id="toc-opgave-b6.5.2-ph-i-stærke-syrer" class="nav-link" data-scroll-target="#opgave-b6.5.2-ph-i-stærke-syrer">Opgave B6.5.2: pH i stærke syrer</a></li>
+  <li><a href="#opgave-b6.5.3-skemaet-med-start-ændring-og-ligevægt" id="toc-opgave-b6.5.3-skemaet-med-start-ændring-og-ligevægt" class="nav-link" data-scroll-target="#opgave-b6.5.3-skemaet-med-start-ændring-og-ligevægt">Opgave B6.5.3: Skemaet med start, ændring og ligevægt</a></li>
+  <li><a href="#opgave-b6.5.4-genvejen-for-en-svag-syre" id="toc-opgave-b6.5.4-genvejen-for-en-svag-syre" class="nav-link" data-scroll-target="#opgave-b6.5.4-genvejen-for-en-svag-syre">Opgave B6.5.4: Genvejen for en svag syre</a></li>
+  <li><a href="#opgave-b6.5.5-løs-ligningen-trin-for-trin" id="toc-opgave-b6.5.5-løs-ligningen-trin-for-trin" class="nav-link" data-scroll-target="#opgave-b6.5.5-løs-ligningen-trin-for-trin">Opgave B6.5.5: Løs ligningen trin for trin</a></li>
+  <li><a href="#opgave-b6.5.6-holder-genvejen" id="toc-opgave-b6.5.6-holder-genvejen" class="nav-link" data-scroll-target="#opgave-b6.5.6-holder-genvejen">Opgave B6.5.6: Holder genvejen?</a></li>
+  <li><a href="#opgave-b6.5.7-samme-koncentration-forskellig-ph" id="toc-opgave-b6.5.7-samme-koncentration-forskellig-ph" class="nav-link" data-scroll-target="#opgave-b6.5.7-samme-koncentration-forskellig-ph">Opgave B6.5.7: Samme koncentration, forskellig pH</a></li>
+  <li><a href="#opgave-b6.5.8-fortynding-af-en-stærk-og-en-svag-syre" id="toc-opgave-b6.5.8-fortynding-af-en-stærk-og-en-svag-syre" class="nav-link" data-scroll-target="#opgave-b6.5.8-fortynding-af-en-stærk-og-en-svag-syre">Opgave B6.5.8: Fortynding af en stærk og en svag syre</a></li>
+  <li><a href="#opgave-b6.5.9-find-fejlen" id="toc-opgave-b6.5.9-find-fejlen" class="nav-link" data-scroll-target="#opgave-b6.5.9-find-fejlen">Opgave B6.5.9: Find fejlen</a></li>
+  <li><a href="#opgaver-med-fødevaretema" id="toc-opgaver-med-fødevaretema" class="nav-link" data-scroll-target="#opgaver-med-fødevaretema">Opgaver med fødevaretema</a></li>
+  <li><a href="#opgave-b6.5.mad.1-eddike-og-lage" id="toc-opgave-b6.5.mad.1-eddike-og-lage" class="nav-link" data-scroll-target="#opgave-b6.5.mad.1-eddike-og-lage">Opgave B6.5.mad.1: Eddike og lage</a></li>
+  <li><a href="#opgave-b6.5.mad.2-phosphorsyre-i-cola" id="toc-opgave-b6.5.mad.2-phosphorsyre-i-cola" class="nav-link" data-scroll-target="#opgave-b6.5.mad.2-phosphorsyre-i-cola">Opgave B6.5.mad.2: Phosphorsyre i cola</a></li>
+  <li><a href="#opgave-b6.5.mad.3-c-vitamin-i-et-glas-vand" id="toc-opgave-b6.5.mad.3-c-vitamin-i-et-glas-vand" class="nav-link" data-scroll-target="#opgave-b6.5.mad.3-c-vitamin-i-et-glas-vand">Opgave B6.5.mad.3: C-vitamin i et glas vand</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b6-1-syre-basereaktioner.html">Kapitel B6: Syrer og baser</a></li><li class="breadcrumb-item"><a href="../opgaver/b6-5-opgaver.html">Opgaver til B6.5</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til B6.5</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/b6-5-ph-i-syrer.html">B6.5 pH i opløsninger af syrer</a>. Prøv selv, før du åbner hjælpen under opgaven.</p>
+<section id="opgave-b6.5.1-vælg-fremgangsmåden" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.1-vælg-fremgangsmåden">Opgave B6.5.1: Vælg fremgangsmåden</h2>
+<p>Afgør for hver opløsning, om syren er stærk, middelstærk eller svag. Skriv også, hvordan pH skal beregnes: med pH = −log <em>c</em><sub>s</sub>, med ligningen <em>K</em><sub>s</sub> = <em>x</em><sup>2</sup> / (<em>c</em><sub>s</sub> − <em>x</em>) eller med genvejen for en svag syre. <em>x</em> angiver her den koncentration af syren, der har afgivet en hydron.</p>
+<ol type="a">
+<li>0,010 M salpetersyre, HNO<sub>3</sub>, med p<em>K</em><sub>s</sub> = −1,4</li>
+<li>0,10 M hydrogenfluorid, HF, med p<em>K</em><sub>s</sub> = 3,17</li>
+<li>0,050 M ethansyre, CH<sub>3</sub>COOH, med p<em>K</em><sub>s</sub> = 4,76</li>
+<li>0,020 M saltsyre, HCl, med p<em>K</em><sub>s</sub> = −7</li>
+<li>0,10 M phosphorsyre, H<sub>3</sub>PO<sub>4</sub>, med p<em>K</em><sub>s</sub> = 2,15</li>
+<li>0,10 M ammoniumchlorid, NH<sub>4</sub>Cl, hvor syren er NH<sub>4</sub><sup>+</sup> med p<em>K</em><sub>s</sub> = 9,25</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug <a href="../kapitler/b6-5-ph-i-syrer.html#fig-b6-hvilken-formel">rutediagrammet i afsnit B6.5</a>. Det første spørgsmål er, om p<em>K</em><sub>s</sub> er under 0.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>En stærk syre har p<em>K</em><sub>s</sub> under 0, en middelstærk har p<em>K</em><sub>s</sub> mellem 0 og 4, og en svag har p<em>K</em><sub>s</sub> over 4. Genvejen er pH = ½ · (p<em>K</em><sub>s</sub> − log <em>c</em><sub>s</sub>), og den må kun bruges for svage syrer.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Stærk syre. pH = −log <em>c</em><sub>s</sub>.</li>
+<li>Middelstærk syre. Ligningen <em>K</em><sub>s</sub> = <em>x</em><sup>2</sup> / (<em>c</em><sub>s</sub> − <em>x</em>) skal løses.</li>
+<li>Svag syre. Genvejen pH = ½ · (p<em>K</em><sub>s</sub> − log <em>c</em><sub>s</sub>) kan bruges.</li>
+<li>Stærk syre. pH = −log <em>c</em><sub>s</sub>.</li>
+<li>Middelstærk syre. Ligningen skal løses.</li>
+<li>Svag syre. Genvejen kan bruges.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.2-ph-i-stærke-syrer" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.2-ph-i-stærke-syrer">Opgave B6.5.2: pH i stærke syrer</h2>
+<ol type="a">
+<li>Beregn pH i 0,010 M saltsyre.</li>
+<li>Beregn pH i 0,0035 M salpetersyre.</li>
+<li>Beregn pH i 0,25 M saltsyre.</li>
+<li>En opløsning af saltsyre har pH 2,30. Hvad er syrens formelle koncentration?</li>
+<li>Forklar, hvorfor [H<sub>3</sub>O<sup>+</sup>] er lig med <em>c</em><sub>s</sub> i en stærk syre.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Saltsyre og salpetersyre er stærke syrer. Brug formlen pH = −log <em>c</em><sub>s</sub> fra afsnittet <em>Stærke syrer</em>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål d skal du gå den anden vej: [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> M, og i en stærk syre er <em>c</em><sub>s</sub> lig med [H<sub>3</sub>O<sup>+</sup>].</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>I 0,010 M saltsyre er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = -\log c_\mathrm{s} = -\log(0{,}010) = 2{,}00
+\]</span></p>
+<ol start="2" type="a">
+<li>I 0,0035 M salpetersyre er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = -\log c_\mathrm{s} = -\log(0{,}0035) = 2{,}46
+\]</span></p>
+<ol start="3" type="a">
+<li>I 0,25 M saltsyre er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = -\log c_\mathrm{s} = -\log(0{,}25) = 0{,}60
+\]</span></p>
+<ol start="4" type="a">
+<li>Den formelle koncentration er lig med koncentrationen af oxoniumioner:</li>
+</ol>
+<p><span class="math display">\[
+c_\mathrm{s} = [\mathrm{H_3O^+}] = 10^{-\mathrm{pH}}\ \mathrm{M} = 10^{-2{,}30}\ \mathrm{M} = 5{,}0 \cdot 10^{-3}\ \mathrm{M}
+\]</span></p>
+<ol start="5" type="a">
+<li>En stærk syre reagerer fuldstændigt med vand. Hvert syremolekyle giver én oxoniumion, så der er lige så mange oxoniumioner, som der blev opløst syremolekyler.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.3-skemaet-med-start-ændring-og-ligevægt" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.3-skemaet-med-start-ændring-og-ligevægt">Opgave B6.5.3: Skemaet med start, ændring og ligevægt</h2>
+<p>En opløsning af hydrogenfluorid, HF, har den formelle koncentration 0,050 M. For hydrogenfluorid er <em>K</em><sub>s</sub> = 6,76 · 10<sup>−4</sup> M.</p>
+<ol type="a">
+<li>Skriv reaktionsskemaet for hydrogenfluorids reaktion med vand.</li>
+<li>Skriv en sætning, der fortæller, hvad <em>x</em> angiver.</li>
+<li>Udfyld de ni felter med spørgsmålstegn i skemaet.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">HF</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">F<sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>3</sub>O<sup>+</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">?</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">?</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">?</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">?</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">?</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">?</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">?</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">?</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">?</td>
+</tr>
+</tbody>
+</table>
+<ol start="4" type="a">
+<li>Sæt udtrykkene fra rækken Ligevægt ind i syrestyrkekonstanten, og skriv ligningen op. Du skal ikke løse den endnu.</li>
+<li>Hvilke to koncentrationer er lig med <em>x</em>, når ligningen er løst?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Skemaet er stillet op med bogstaver i afsnittet <em>Syrer, der ikke er stærke</em>. Skriv 0,050 M i stedet for <em>c</em><sub>s</sub>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>x</em> angiver her den koncentration af hydrogenfluorid, der har afgivet en hydron. Fra start er der kun hydrogenfluorid. Der forsvinder <em>x</em> af syren, og der dannes <em>x</em> af hver af de to ioner. Vand er opløsningsmidlet og får ingen tal. Syrestyrkekonstanten er <em>K</em><sub>s</sub> = [F<sup>−</sup>] · [H<sub>3</sub>O<sup>+</sup>] / [HF].</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Reaktionen er en ligevægt:</li>
+</ol>
+<div class="reaktion">
+<p>HF(aq) + H<sub>2</sub>O(l) ⇌ F<sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<ol start="2" type="a">
+<li><p><em>x</em> angiver her den koncentration af hydrogenfluorid, der har afgivet en hydron, fra start og frem til ligevægt.</p></li>
+<li><p>Skemaet:</p></li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">HF</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">F<sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>3</sub>O<sup>+</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">0,050&nbsp;M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0&nbsp;M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0&nbsp;M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,050&nbsp;M − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+</tr>
+</tbody>
+</table>
+<ol start="4" type="a">
+<li>Ligningen er</li>
+</ol>
+<p><span class="math display">\[
+6{,}76 \cdot 10^{-4}\ \mathrm{M} = \frac{x^{2}}{0{,}050\ \mathrm{M} - x}
+\]</span></p>
+<ol start="5" type="a">
+<li>[F<sup>−</sup>] og [H<sub>3</sub>O<sup>+</sup>] er begge lig med <em>x</em>. Det er [H<sub>3</sub>O<sup>+</sup>], der skal bruges til at beregne pH.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.4-genvejen-for-en-svag-syre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.4-genvejen-for-en-svag-syre">Opgave B6.5.4: Genvejen for en svag syre</h2>
+<p>Beregn pH i de tre opløsninger med genvejen pH = ½ · (p<em>K</em><sub>s</sub> − log <em>c</em><sub>s</sub>), og svar på det sidste spørgsmål.</p>
+<ol type="a">
+<li>0,050 M ethansyre med p<em>K</em><sub>s</sub> = 4,76</li>
+<li>0,070 M ascorbinsyre med p<em>K</em><sub>s</sub> = 4,17</li>
+<li>0,14 M ammoniumchlorid, hvor syren er NH<sub>4</sub><sup>+</sup> med p<em>K</em><sub>s</sub> = 9,25</li>
+<li>Hvorfor må genvejen bruges for alle tre syrer?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se eksemplet <em>pH i ethansyre</em> i afsnittet <em>Genvejen for svage syrer</em>. Beregn først log <em>c</em><sub>s</sub>. Tallet er negativt, så minus og minus giver plus.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I spørgsmål a er log(0,050) = −1,30. Så står der ½ · (4,76 + 1,30). Læg de to tal sammen, før du ganger med en halv.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>For 0,050 M ethansyre er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (\mathrm{p}K_\mathrm{s} - \log c_\mathrm{s}) = \tfrac{1}{2} \cdot (4{,}76 - \log(0{,}050)) = \tfrac{1}{2} \cdot (4{,}76 + 1{,}30) = 3{,}03
+\]</span></p>
+<ol start="2" type="a">
+<li>For 0,070 M ascorbinsyre er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (4{,}17 - \log(0{,}070)) = \tfrac{1}{2} \cdot (4{,}17 + 1{,}15) = 2{,}66
+\]</span></p>
+<ol start="3" type="a">
+<li>For 0,14 M ammonium er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (9{,}25 - \log(0{,}14)) = \tfrac{1}{2} \cdot (9{,}25 + 0{,}85) = 5{,}05
+\]</span></p>
+<ol start="4" type="a">
+<li>Alle tre syrer er svage, for p<em>K</em><sub>s</sub> er over 4. Så er det kun en lille del af syren, der har afgivet en hydron. Den del hedder <em>x</em> i ligningen <em>K</em><sub>s</sub> = <em>x</em><sup>2</sup> / (<em>c</em><sub>s</sub> − <em>x</em>), og den er så lille, at <em>x</em> kan undværes i nævneren.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.5-løs-ligningen-trin-for-trin" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.5-løs-ligningen-trin-for-trin">Opgave B6.5.5: Løs ligningen trin for trin</h2>
+<p>I opgave B6.5.3 fandt du ligningen for 0,050 M hydrogenfluorid:</p>
+<p><span class="math display">\[
+6{,}76 \cdot 10^{-4}\ \mathrm{M} = \frac{x^{2}}{0{,}050\ \mathrm{M} - x}
+\]</span></p>
+<p><em>x</em> angiver her den koncentration af hydrogenfluorid, der har afgivet en hydron, fra start og frem til ligevægt. Løs ligningen uden et CAS-værktøj.</p>
+<ol type="a">
+<li>Gang med nævneren på begge sider, og saml alle led på samme side, så ligningen får formen <em>x</em><sup>2</sup> + <em>b</em> · <em>x</em> + <em>c</em> = 0.</li>
+<li>Beregn diskriminanten.</li>
+<li>Find den positive løsning.</li>
+<li>Beregn pH.</li>
+<li>Beregn omdannelsesgraden. Passer genvejen for en svag syre her?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Følg eksemplet <em>pH i methansyre</em> i afsnittet <em>Syrer, der ikke er stærke</em> linje for linje. Udelad enheden M i mellemregningerne.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Efter første trin står der 6,76 · 10<sup>−4</sup> · (0,050 − <em>x</em>) = <em>x</em><sup>2</sup>. Når parentesen er ganget ud, er <em>a</em> = 1, <em>b</em> = 6,76 · 10<sup>−4</sup> og <em>c</em> = −3,38 · 10<sup>−5</sup>. Diskriminanten er <em>d</em> = <em>b</em><sup>2</sup> − 4<em>ac</em>, og den positive løsning er <em>x</em> = (−<em>b</em> + √<em>d</em>) / (2<em>a</em>). Omdannelsesgraden er [F<sup>−</sup>] / <em>c</em><sub>s</sub>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Reaktionsskemaet og skemaet med start, ændring og ligevægt står i facit til opgave B6.5.3. I mellemregningerne er enheden M udeladt. Først ganges med nævneren på begge sider:</li>
+</ol>
+<p><span class="math display">\[
+6{,}76 \cdot 10^{-4} \cdot (0{,}050 - x) = x^{2}
+\]</span></p>
+<p>Parentesen ganges ud, og alle led flyttes over på samme side:</p>
+<p><span class="math display">\[
+x^{2} + 6{,}76 \cdot 10^{-4} \cdot x - 3{,}38 \cdot 10^{-5} = 0
+\]</span></p>
+<ol start="2" type="a">
+<li>Det er en andengradsligning med <em>a</em> = 1, <em>b</em> = 6,76 · 10<sup>−4</sup> og <em>c</em> = −3,38 · 10<sup>−5</sup>. Diskriminanten er</li>
+</ol>
+<p><span class="math display">\[
+d = b^{2} - 4ac = (6{,}76 \cdot 10^{-4})^{2} + 4 \cdot 3{,}38 \cdot 10^{-5} = 1{,}36 \cdot 10^{-4}
+\]</span></p>
+<ol start="3" type="a">
+<li>Kun løsningen med plus foran kvadratroden er positiv:</li>
+</ol>
+<p><span class="math display">\[
+x = \frac{-b + \sqrt{d}}{2a} = \frac{-6{,}76 \cdot 10^{-4} + \sqrt{1{,}36 \cdot 10^{-4}}}{2} = 5{,}49 \cdot 10^{-3}
+\]</span></p>
+<p>Den anden løsning er negativ og kan ikke bruges, fordi en koncentration ikke kan være negativ.</p>
+<ol start="4" type="a">
+<li>Koncentrationen af oxoniumioner er lig med <em>x</em>:</li>
+</ol>
+<p><span class="math display">\[
+[\mathrm{H_3O^+}] = x = 5{,}49 \cdot 10^{-3}\ \mathrm{M}
+\]</span></p>
+<p><span class="math display">\[
+\mathrm{pH} = -\log\,[\mathrm{H_3O^+}] = -\log(5{,}49 \cdot 10^{-3}) = 2{,}26
+\]</span></p>
+<p>Opløsningen har pH 2,26.</p>
+<ol start="5" type="a">
+<li>Koncentrationen af basen, F<sup>−</sup>, er også lig med <em>x</em>:</li>
+</ol>
+<p><span class="math display">\[
+\alpha = \frac{[\mathrm{F^-}]}{c_\mathrm{s}} = \frac{5{,}49 \cdot 10^{-3}\ \mathrm{M}}{0{,}050\ \mathrm{M}} = 0{,}11 = 11\ \%
+\]</span></p>
+<p>Omdannelsesgraden er over 5 %, så genvejen passer ikke godt her. Hydrogenfluorid er en middelstærk syre.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.6-holder-genvejen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.6-holder-genvejen">Opgave B6.5.6: Holder genvejen?</h2>
+<p>To opløsninger af ethansyre har de formelle koncentrationer 0,20 M og 0,0020 M. For ethansyre er p<em>K</em><sub>s</sub> = 4,76 og <em>K</em><sub>s</sub> = 1,74 · 10<sup>−5</sup> M.</p>
+<ol type="a">
+<li>Beregn pH i begge opløsninger med genvejen for en svag syre.</li>
+<li>Beregn [H<sub>3</sub>O<sup>+</sup>] i begge opløsninger ud fra de to pH-værdier.</li>
+<li>Beregn omdannelsesgraden i begge opløsninger.</li>
+<li>I hvilken af de to opløsninger passer genvejen?</li>
+<li>Opstil ligningen <em>K</em><sub>s</sub> = <em>x</em><sup>2</sup> / (<em>c</em><sub>s</sub> − <em>x</em>) for den fortyndede opløsning, og løs den med et CAS-værktøj. <em>x</em> angiver her den koncentration af ethansyre, der har afgivet en hydron. Beregn også pH.</li>
+<li>Hvor stor er forskellen mellem de to pH-værdier for den fortyndede opløsning?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Genvejen er pH = ½ · (p<em>K</em><sub>s</sub> − log <em>c</em><sub>s</sub>). Omdannelsesgraden er [B] / <em>c</em><sub>s</sub>, og [B] er lige så stor som [H<sub>3</sub>O<sup>+</sup>]. Læs afsnittet <em>Hvornår må genvejen bruges?</em></p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>[H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> M. Genvejen passer, når omdannelsesgraden er under omkring 5 %. I spørgsmål e er ligningen 1,74 · 10<sup>−5</sup> = <em>x</em><sup>2</sup> / (0,0020 − <em>x</em>). <em>x</em> angiver her den koncentration af ethansyre, der har afgivet en hydron, og kun den positive løsning kan bruges.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>For 0,20 M ethansyre er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (\mathrm{p}K_\mathrm{s} - \log c_\mathrm{s}) = \tfrac{1}{2} \cdot (4{,}76 - \log(0{,}20)) = \tfrac{1}{2} \cdot (4{,}76 + 0{,}70) = 2{,}73
+\]</span></p>
+<p>For 0,0020 M ethansyre er</p>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (4{,}76 - \log(0{,}0020)) = \tfrac{1}{2} \cdot (4{,}76 + 2{,}70) = 3{,}73
+\]</span></p>
+<ol start="2" type="a">
+<li>I 0,20 M ethansyre er</li>
+</ol>
+<p><span class="math display">\[
+[\mathrm{H_3O^+}] = 10^{-\mathrm{pH}}\ \mathrm{M} = 10^{-2{,}73}\ \mathrm{M} = 1{,}86 \cdot 10^{-3}\ \mathrm{M}
+\]</span></p>
+<p>I 0,0020 M ethansyre er</p>
+<p><span class="math display">\[
+[\mathrm{H_3O^+}] = 10^{-3{,}73}\ \mathrm{M} = 1{,}86 \cdot 10^{-4}\ \mathrm{M}
+\]</span></p>
+<ol start="3" type="a">
+<li>Koncentrationen af basen, CH<sub>3</sub>COO<sup>−</sup>, er lige så stor som [H<sub>3</sub>O<sup>+</sup>]. I 0,20 M ethansyre er</li>
+</ol>
+<p><span class="math display">\[
+\alpha = \frac{[\mathrm{CH_3COO^-}]}{c_\mathrm{s}} = \frac{1{,}86 \cdot 10^{-3}\ \mathrm{M}}{0{,}20\ \mathrm{M}} = 0{,}0093 = 0{,}93\ \%
+\]</span></p>
+<p>I 0,0020 M ethansyre er</p>
+<p><span class="math display">\[
+\alpha = \frac{1{,}86 \cdot 10^{-4}\ \mathrm{M}}{0{,}0020\ \mathrm{M}} = 0{,}093 = 9{,}3\ \%
+\]</span></p>
+<ol start="4" type="a">
+<li><p>Genvejen passer i 0,20 M ethansyre, hvor omdannelsesgraden er langt under 5 %. I 0,0020 M ethansyre er den over 5 %, så her er genvejen ikke helt præcis.</p></li>
+<li><p>Reaktionsskemaet er</p></li>
+</ol>
+<div class="reaktion">
+<p>CH<sub>3</sub>COOH(aq) + H<sub>2</sub>O(l) ⇌ CH<sub>3</sub>COO<sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<p><em>x</em> angiver her den koncentration af ethansyre, der har afgivet en hydron, fra start og frem til ligevægt.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CH<sub>3</sub>COOH</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">CH<sub>3</sub>COO<sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>3</sub>O<sup>+</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">0,0020&nbsp;M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0&nbsp;M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0&nbsp;M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,0020&nbsp;M − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+1{,}74 \cdot 10^{-5}\ \mathrm{M} = \frac{x^{2}}{0{,}0020\ \mathrm{M} - x}
+\]</span></p>
+<p>CAS-værktøjet giver to løsninger:</p>
+<p><span class="math display">\[
+x = 1{,}78 \cdot 10^{-4} \quad \text{eller} \quad x = -1{,}95 \cdot 10^{-4}
+\]</span></p>
+<p>Den negative løsning kan ikke bruges, fordi en koncentration ikke kan være negativ. Altså er [H<sub>3</sub>O<sup>+</sup>] = 1,78 · 10<sup>−4</sup> M.</p>
+<p><span class="math display">\[
+\mathrm{pH} = -\log\,[\mathrm{H_3O^+}] = -\log(1{,}78 \cdot 10^{-4}) = 3{,}75
+\]</span></p>
+<ol start="6" type="a">
+<li>Forskellen er 3,75 − 3,73 = 0,02. Genvejen giver altså en pH-værdi, der er en smule for lav. Forskellen bliver større, jo mere opløsningen fortyndes.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.7-samme-koncentration-forskellig-ph" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.7-samme-koncentration-forskellig-ph">Opgave B6.5.7: Samme koncentration, forskellig pH</h2>
+<p>Figuren viser pH i fire opløsninger. De indeholder saltsyre, hydrogenfluorid, ethansyre og ammoniumchlorid, og alle fire har koncentrationen 0,050 M.</p>
+<div id="fig-b6-opg-5-fire-syrer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b6-opg-5-fire-syrer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b6-opg-5-fire-syrer.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: pH i fire syreopløsninger til opgave B6.5.7."><img src="../figurer/b6-opg-5-fire-syrer.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b6-opg-5-fire-syrer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: pH i fire syreopløsninger til opgave B6.5.7.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Hvilken syre er der i hver af de fire opløsninger? Brug p<em>K</em><sub>s</sub>-værdierne −7 for HCl, 3,17 for HF, 4,76 for CH<sub>3</sub>COOH og 9,25 for NH<sub>4</sub><sup>+</sup>.</li>
+<li>Forklar, hvordan du kan afgøre det uden at regne.</li>
+<li>Kontrollér dit svar for saltsyre med en beregning.</li>
+<li>Hvor mange gange større er [H<sub>3</sub>O<sup>+</sup>] i opløsning B end i opløsning A?</li>
+<li>De fire opløsninger indeholder lige mange mol syre pr. liter. Forklar, hvorfor de alligevel ikke har samme pH.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Jo lavere p<em>K</em><sub>s</sub> er, jo stærkere er syren. Sammenlign med <a href="../kapitler/b6-5-ph-i-syrer.html#fig-b6-ph-fire-syrer">figuren med fire syrer i afsnit B6.5</a>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Når koncentrationen er den samme, giver den stærkeste syre den laveste pH. Til spørgsmål d: Beregn [H<sub>3</sub>O<sup>+</sup>] i de to opløsninger med [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> M, og divider det største tal med det mindste.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Opløsning B er saltsyre, opløsning D er hydrogenfluorid, opløsning A er ethansyre, og opløsning C er ammoniumchlorid.</p></li>
+<li><p>De fire opløsninger har samme koncentration. Så giver den stærkeste syre den laveste pH. Syren med den laveste p<em>K</em><sub>s</sub> hører derfor til den laveste pH, og syren med den højeste p<em>K</em><sub>s</sub> hører til den højeste pH.</p></li>
+<li><p>Saltsyre er en stærk syre:</p></li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = -\log c_\mathrm{s} = -\log(0{,}050) = 1{,}30
+\]</span></p>
+<p>Det passer med opløsning B.</p>
+<ol start="4" type="a">
+<li>I opløsning B er [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−1,30</sup> M = 0,050 M. I opløsning A er [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−3,03</sup> M = 9,3 · 10<sup>−4</sup> M.</li>
+</ol>
+<p><span class="math display">\[
+\frac{0{,}050\ \mathrm{M}}{9{,}3 \cdot 10^{-4}\ \mathrm{M}} = 54
+\]</span></p>
+<p>Koncentrationen af oxoniumioner er 54 gange større i saltsyren end i ethansyren.</p>
+<ol start="5" type="a">
+<li>Syrerne er ikke lige stærke. I saltsyre har alle molekyler afgivet en hydron. I de tre andre opløsninger er reaktionen med vand en ligevægt, og jo svagere syren er, jo mindre en del af den har afgivet en hydron.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.8-fortynding-af-en-stærk-og-en-svag-syre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.8-fortynding-af-en-stærk-og-en-svag-syre">Opgave B6.5.8: Fortynding af en stærk og en svag syre</h2>
+<p>Figuren viser pH for to syrer, A og B, ved fire koncentrationer. Den ene er saltsyre, og den anden er ethansyre. For hvert trin mod højre er opløsningen fortyndet 10 gange.</p>
+<div id="fig-b6-opg-5-fortynding" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b6-opg-5-fortynding-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b6-opg-5-fortynding.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: pH for to syrer ved fire koncentrationer til opgave B6.5.8."><img src="../figurer/b6-opg-5-fortynding.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b6-opg-5-fortynding-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: pH for to syrer ved fire koncentrationer til opgave B6.5.8.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Aflæs pH for syre A ved de fire koncentrationer.</li>
+<li>Aflæs pH for syre B ved de fire koncentrationer.</li>
+<li>Hvor meget stiger pH for hver af de to syrer, når opløsningen fortyndes 10 gange?</li>
+<li>Hvilken af de to syrer er saltsyre? Begrund svaret.</li>
+<li>Beregn pH i 0,010 M saltsyre og i 0,010 M ethansyre, og sammenlign med figuren. For ethansyre er p<em>K</em><sub>s</sub> = 4,76.</li>
+<li>Forklar, hvorfor pH stiger mindre for den svage syre.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>De stiplede linjer i figuren viser de halve pH-enheder. Læs det sidste stykke i afsnittet <em>Samme koncentration, forskellig pH</em> om fortynding.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For en stærk syre er pH = −log <em>c</em><sub>s</sub>, så pH stiger med 1, når koncentrationen bliver 10 gange mindre. Til spørgsmål f: Hvad sker der med omdannelsesgraden, når en svag syre fortyndes? Se <a href="../kapitler/b6-3-syrestyrke.html#fig-b6-omdannelsesgrad">figuren med omdannelsesgraden i afsnit B6.3</a>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Syre A har pH 1,0, 2,0, 3,0 og 4,0.</p></li>
+<li><p>Syre B har pH omkring 2,9, 3,4, 3,9 og 4,5.</p></li>
+<li><p>For syre A stiger pH med 1,0 for hver fortynding. For syre B stiger pH kun med omkring 0,5.</p></li>
+<li><p>Syre A er saltsyre. I en stærk syre er [H<sub>3</sub>O<sup>+</sup>] lig med <em>c</em><sub>s</sub>, så pH stiger med præcis 1, når opløsningen fortyndes 10 gange. Syre A har også den laveste pH ved alle fire koncentrationer.</p></li>
+<li><p>For 0,010 M saltsyre er</p></li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = -\log c_\mathrm{s} = -\log(0{,}010) = 2{,}00
+\]</span></p>
+<p>For 0,010 M ethansyre er</p>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (\mathrm{p}K_\mathrm{s} - \log c_\mathrm{s}) = \tfrac{1}{2} \cdot (4{,}76 - \log(0{,}010)) = \tfrac{1}{2} \cdot (4{,}76 + 2{,}00) = 3{,}38
+\]</span></p>
+<p>Begge værdier passer med figuren.</p>
+<ol start="6" type="a">
+<li>Når en svag syre fortyndes, forskydes ligevægten mod højre, og omdannelsesgraden stiger. En større del af syren afgiver en hydron, og det modvirker noget af fortyndingen. Koncentrationen af oxoniumioner falder derfor ikke 10 gange, men kun omkring 3 gange, og det svarer til en halv pH-enhed.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.9-find-fejlen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.9-find-fejlen">Opgave B6.5.9: Find fejlen</h2>
+<p>Tre elever har beregnet pH i 0,020 M ethansyre. For ethansyre er p<em>K</em><sub>s</sub> = 4,76.</p>
+<ul>
+<li>Elev 1: pH = −log(0,020) = 1,70</li>
+<li>Elev 2: pH = ½ · (4,76 − log(0,020)) = 3,23</li>
+<li>Elev 3: pH = ½ · (4,76 + log(0,020)) = 1,53</li>
+</ul>
+<ol type="a">
+<li>Hvilken elev har regnet rigtigt?</li>
+<li>Hvilken fejl har elev 1 lavet?</li>
+<li>Hvilken fejl har elev 3 lavet?</li>
+<li>Formlen, som elev 1 har brugt, passer kun, hvis alle syremolekyler har afgivet en hydron. Beregn, hvor stor en del af molekylerne der har gjort det.</li>
+<li>Hvilken koncentration skal saltsyre have for at få samme pH som 0,020 M ethansyre?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs boksen <em>Den hyppigste fejl</em> i afsnit B6.5, og sammenlign de tre beregninger med genvejen pH = ½ · (p<em>K</em><sub>s</sub> − log <em>c</em><sub>s</sub>).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål d: Beregn [H<sub>3</sub>O<sup>+</sup>] ud fra den rigtige pH-værdi, og divider med <em>c</em><sub>s</sub>. Det er omdannelsesgraden. Til spørgsmål e: I en stærk syre er <em>c</em><sub>s</sub> lig med [H<sub>3</sub>O<sup>+</sup>].</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Elev 2. Ethansyre er en svag syre, så genvejen skal bruges.</p></li>
+<li><p>Elev 1 har brugt formlen pH = −log <em>c</em><sub>s</sub>. Den gælder kun for stærke syrer, og ethansyre er en svag syre.</p></li>
+<li><p>Elev 3 har brugt genvejen, men har skrevet plus foran log <em>c</em><sub>s</sub>. Der skal stå minus. Da log(0,020) = −1,70, bliver tallet trukket fra i stedet for lagt til, og pH bliver alt for lav.</p></li>
+<li><p>Den rigtige pH-værdi er 3,23.</p></li>
+</ol>
+<p><span class="math display">\[
+[\mathrm{H_3O^+}] = 10^{-\mathrm{pH}}\ \mathrm{M} = 10^{-3{,}23}\ \mathrm{M} = 5{,}89 \cdot 10^{-4}\ \mathrm{M}
+\]</span></p>
+<p><span class="math display">\[
+\alpha = \frac{[\mathrm{CH_3COO^-}]}{c_\mathrm{s}} = \frac{5{,}89 \cdot 10^{-4}\ \mathrm{M}}{0{,}020\ \mathrm{M}} = 0{,}029 = 2{,}9\ \%
+\]</span></p>
+<p>Kun 2,9 % af molekylerne har afgivet en hydron.</p>
+<ol start="5" type="a">
+<li>I en stærk syre er <em>c</em><sub>s</sub> lig med [H<sub>3</sub>O<sup>+</sup>]. Saltsyren skal derfor have koncentrationen 5,9 · 10<sup>−4</sup> M. Det er 34 gange mindre end ethansyrens koncentration.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-med-fødevaretema" class="level2 tema">
+<h2 class="tema anchored" data-anchor-id="opgaver-med-fødevaretema">Opgaver med fødevaretema</h2>
+<p>Eddike, cola og C-vitamin er alle sure, men syrerne i dem er langt fra lige stærke.</p>
+</section>
+<section id="opgave-b6.5.mad.1-eddike-og-lage" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.mad.1-eddike-og-lage">Opgave B6.5.mad.1: Eddike og lage</h2>
+<p>Husholdningseddike indeholder 5 % ethansyre. Det svarer til en formel koncentration på 0,83 M. For ethansyre er p<em>K</em><sub>s</sub> = 4,76.</p>
+<ol type="a">
+<li>Er ethansyre en stærk, en middelstærk eller en svag syre? Hvilken fremgangsmåde skal du bruge?</li>
+<li>Beregn pH i eddiken.</li>
+<li>Til en lage til syltede agurker fortyndes eddiken 10 gange. Hvad er koncentrationen i lagen, og hvad er pH?</li>
+<li>Hvor meget steg pH ved fortyndingen? Hvor meget ville pH være steget, hvis syren havde været stærk?</li>
+<li>Beregn omdannelsesgraden i eddiken.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ethansyre har p<em>K</em><sub>s</sub> over 4. Brug <a href="../kapitler/b6-5-ph-i-syrer.html#fig-b6-hvilken-formel">rutediagrammet i afsnit B6.5</a>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Genvejen er pH = ½ · (p<em>K</em><sub>s</sub> − log <em>c</em><sub>s</sub>). Når eddiken fortyndes 10 gange, bliver koncentrationen 10 gange mindre. Til spørgsmål e: [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> M, og omdannelsesgraden er [H<sub>3</sub>O<sup>+</sup>] divideret med <em>c</em><sub>s</sub>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Ethansyre er en svag syre, fordi p<em>K</em><sub>s</sub> er over 4. Genvejen for en svag syre kan bruges.</p></li>
+<li><p>I eddiken er</p></li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (\mathrm{p}K_\mathrm{s} - \log c_\mathrm{s}) = \tfrac{1}{2} \cdot (4{,}76 - \log(0{,}83)) = \tfrac{1}{2} \cdot (4{,}76 + 0{,}08) = 2{,}42
+\]</span></p>
+<ol start="3" type="a">
+<li>Koncentrationen i lagen er 0,083 M.</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (4{,}76 - \log(0{,}083)) = \tfrac{1}{2} \cdot (4{,}76 + 1{,}08) = 2{,}92
+\]</span></p>
+<ol start="4" type="a">
+<li><p>pH steg fra 2,42 til 2,92. Det er 0,50. For en stærk syre ville pH være steget med 1.</p></li>
+<li><p>I eddiken er [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−2,42</sup> M = 3,80 · 10<sup>−3</sup> M.</p></li>
+</ol>
+<p><span class="math display">\[
+\alpha = \frac{[\mathrm{CH_3COO^-}]}{c_\mathrm{s}} = \frac{3{,}80 \cdot 10^{-3}\ \mathrm{M}}{0{,}83\ \mathrm{M}} = 0{,}0046 = 0{,}46\ \%
+\]</span></p>
+<p>Under en halv procent af ethansyremolekylerne i eddiken har afgivet en hydron.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.mad.2-phosphorsyre-i-cola" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.mad.2-phosphorsyre-i-cola">Opgave B6.5.mad.2: Phosphorsyre i cola</h2>
+<p>Cola er sur, fordi den er tilsat phosphorsyre, H<sub>3</sub>PO<sub>4</sub>. I en cola er den formelle koncentration af phosphorsyre 0,0055 M. For phosphorsyres første trin er p<em>K</em><sub>s</sub> = 2,15 og <em>K</em><sub>s</sub> = 7,08 · 10<sup>−3</sup> M. Regn kun med det første trin, altså som om phosphorsyre var en monohydron syre.</p>
+<ol type="a">
+<li>Er phosphorsyre en stærk, en middelstærk eller en svag syre? Hvilken fremgangsmåde skal du bruge?</li>
+<li>Skriv reaktionsskemaet, forklar, hvad <em>x</em> angiver, og lav skemaet med start, ændring og ligevægt.</li>
+<li>Opstil ligningen, og løs den med et CAS-værktøj.</li>
+<li>Beregn pH i colaen.</li>
+<li>Beregn omdannelsesgraden, og forklar, hvorfor genvejen for en svag syre ville give et forkert resultat her.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>p<em>K</em><sub>s</sub> ligger mellem 0 og 4. Opgaven løses på samme måde som eksemplet <em>pH i methansyre</em> i afsnit B6.5. Når phosphorsyre afgiver sin første hydron, bliver den til H<sub>2</sub>PO<sub>4</sub><sup>−</sup>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>x</em> angiver her den koncentration af phosphorsyre, der har afgivet en hydron. Rækken Ligevægt er 0,0055 M − <em>x</em> for H<sub>3</sub>PO<sub>4</sub> og <em>x</em> for hver af de to ioner. Ligningen bliver 7,08 · 10<sup>−3</sup> = <em>x</em><sup>2</sup> / (0,0055 − <em>x</em>). Kun den positive løsning kan bruges. Omdannelsesgraden er <em>x</em> divideret med <em>c</em><sub>s</sub>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Phosphorsyre er en middelstærk syre, fordi p<em>K</em><sub>s</sub> ligger mellem 0 og 4. Ligningen <em>K</em><sub>s</sub> = <em>x</em><sup>2</sup> / (<em>c</em><sub>s</sub> − <em>x</em>) skal løses.</p></li>
+<li><p>Reaktionsskemaet er</p></li>
+</ol>
+<div class="reaktion">
+<p>H<sub>3</sub>PO<sub>4</sub>(aq) + H<sub>2</sub>O(l) ⇌ H<sub>2</sub>PO<sub>4</sub><sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<p><em>x</em> angiver her den koncentration af phosphorsyre, der har afgivet en hydron, fra start og frem til ligevægt.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">H<sub>3</sub>PO<sub>4</sub></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">H<sub>2</sub>PO<sub>4</sub><sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>3</sub>O<sup>+</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">0,0055&nbsp;M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0&nbsp;M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0&nbsp;M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,0055&nbsp;M − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="a">
+<li>Ligningen er</li>
+</ol>
+<p><span class="math display">\[
+7{,}08 \cdot 10^{-3}\ \mathrm{M} = \frac{x^{2}}{0{,}0055\ \mathrm{M} - x}
+\]</span></p>
+<p>CAS-værktøjet giver to løsninger:</p>
+<p><span class="math display">\[
+x = 3{,}63 \cdot 10^{-3} \quad \text{eller} \quad x = -1{,}07 \cdot 10^{-2}
+\]</span></p>
+<p>Den negative løsning kan ikke bruges, fordi en koncentration ikke kan være negativ. Altså er [H<sub>3</sub>O<sup>+</sup>] = 3,63 · 10<sup>−3</sup> M.</p>
+<ol start="4" type="a">
+<li>I colaen er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = -\log\,[\mathrm{H_3O^+}] = -\log(3{,}63 \cdot 10^{-3}) = 2{,}44
+\]</span></p>
+<p>Colaen har pH 2,44. Det passer godt med, at cola har pH omkring 2,5.</p>
+<ol start="5" type="a">
+<li>Koncentrationen af basen, H<sub>2</sub>PO<sub>4</sub><sup>−</sup>, er lig med <em>x</em>:</li>
+</ol>
+<p><span class="math display">\[
+\alpha = \frac{[\mathrm{H_2PO_4^-}]}{c_\mathrm{s}} = \frac{3{,}63 \cdot 10^{-3}\ \mathrm{M}}{0{,}0055\ \mathrm{M}} = 0{,}66 = 66\ \%
+\]</span></p>
+<p>Genvejen bygger på, at <em>x</em> er meget mindre end <em>c</em><sub>s</sub>. Her har to tredjedele af syren afgivet en hydron, så <em>x</em> kan slet ikke undværes i nævneren.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b6.5.mad.3-c-vitamin-i-et-glas-vand" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b6.5.mad.3-c-vitamin-i-et-glas-vand">Opgave B6.5.mad.3: C-vitamin i et glas vand</h2>
+<p>C-vitamin er ascorbinsyre, C<sub>6</sub>H<sub>8</sub>O<sub>6</sub>. Molarmassen er 176,12 g/mol, og p<em>K</em><sub>s</sub> = 4,17. Du rører 1,00 g rent C-vitaminpulver ud i vand, så opløsningen fylder 100 mL.</p>
+<ol type="a">
+<li>Beregn stofmængden af ascorbinsyre.</li>
+<li>Beregn den formelle koncentration af ascorbinsyre.</li>
+<li>Beregn pH i opløsningen med genvejen for en svag syre.</li>
+<li>Beregn omdannelsesgraden, og vurdér, om genvejen måtte bruges.</li>
+<li>Appelsinjuice har pH omkring 3,7. Hvor mange gange større er koncentrationen af oxoniumioner i opløsningen af C-vitamin?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-34-contents" aria-controls="callout-34" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-34" class="callout-34-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug <em>n</em> = <em>m</em> / <em>M</em> og derefter <em>c</em> = <em>n</em> / <em>V</em>. Husk at regne volumenet om til liter.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-35-contents" aria-controls="callout-35" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-35" class="callout-35-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Genvejen er pH = ½ · (p<em>K</em><sub>s</sub> − log <em>c</em><sub>s</sub>). Til spørgsmål d: [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−pH</sup> M, og omdannelsesgraden er [H<sub>3</sub>O<sup>+</sup>] divideret med <em>c</em><sub>s</sub>. Til spørgsmål e: Én pH-enhed svarer til en faktor 10 i koncentration.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-36-contents" aria-controls="callout-36" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-36" class="callout-36-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Stofmængden er</li>
+</ol>
+<p><span class="math display">\[
+n = \frac{m}{M} = \frac{1{,}00\ \mathrm{g}}{176{,}12\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 5{,}68 \cdot 10^{-3}\ \mathrm{mol}
+\]</span></p>
+<ol start="2" type="a">
+<li>Volumenet er 100 mL = 0,100 L.</li>
+</ol>
+<p><span class="math display">\[
+c_\mathrm{s} = \frac{n}{V} = \frac{5{,}68 \cdot 10^{-3}\ \mathrm{mol}}{0{,}100\ \mathrm{L}} = 0{,}0568\ \mathrm{M}
+\]</span></p>
+<ol start="3" type="a">
+<li>Ascorbinsyre er en svag syre, fordi p<em>K</em><sub>s</sub> er over 4.</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = \tfrac{1}{2} \cdot (\mathrm{p}K_\mathrm{s} - \log c_\mathrm{s}) = \tfrac{1}{2} \cdot (4{,}17 - \log(0{,}0568)) = \tfrac{1}{2} \cdot (4{,}17 + 1{,}25) = 2{,}71
+\]</span></p>
+<ol start="4" type="a">
+<li>I opløsningen er [H<sub>3</sub>O<sup>+</sup>] = 10<sup>−2,71</sup> M = 1,95 · 10<sup>−3</sup> M.</li>
+</ol>
+<p><span class="math display">\[
+\alpha = \frac{1{,}95 \cdot 10^{-3}\ \mathrm{M}}{0{,}0568\ \mathrm{M}} = 0{,}034 = 3{,}4\ \%
+\]</span></p>
+<p>Omdannelsesgraden er under 5 %, så genvejen måtte bruges.</p>
+<ol start="5" type="a">
+<li>Forskellen i pH er 3,7 − 2,71, altså omkring 1. Én pH-enhed svarer til en faktor 10. Koncentrationen af oxoniumioner er derfor omkring 10 gange større i opløsningen af C-vitamin end i appelsinjuicen.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/b6-5-ph-i-syrer.html" class="pagination-link" aria-label="B6.5 pH i opløsninger af syrer">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">B6.5 pH i opløsninger af syrer</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/b6-6-ph-i-baser.html" class="pagination-link" aria-label="B6.6 pH i opløsninger af baser">
+        <span class="nav-page-text">B6.6 pH i opløsninger af baser</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

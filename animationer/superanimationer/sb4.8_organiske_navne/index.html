@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navne på organiske stoffer</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">-ol</span> Navne på organiske stoffer</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-n" role="tab" aria-selected="true"><span class="nr">1</span>Giv navnet</button>
+        <button class="faneknap" data-fane="fane-t" role="tab" aria-selected="false"><span class="nr">2</span>Tegn molekylet</button>
+        <button class="faneknap" data-fane="fane-g" role="tab" aria-selected="false"><span class="nr">3</span>Flere grupper</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: GIV NAVNET                                                 -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-n" role="tabpanel" aria-label="Giv navnet">
+    <div class="scene">
+        <canvas id="n-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js). Oeverst
+             trinnet, navnets dele og brikkerne; nederst hint, forklaringen til et
+             forkert svar og hjaelpeknappen. -->
+        <div class="scenekort" id="n-skort">
+            <div class="sk-ind" id="n-ind"></div>
+            <div class="sk-bund" id="n-status">
+                <p class="st-tekst" id="n-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="n-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="n-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort klassekort">
+            <h2>Stofklasser <span class="taeller">vælg, hvad der er med</span></h2>
+            <div class="klasser"></div>
+            <p class="klasse-note" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="n-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="n-loest">0</b>/<span id="n-ialt">0</span></span></h2>
+            <div class="opg-liste" id="n-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: TEGN MOLEKYLET                                             -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-t" role="tabpanel" aria-label="Tegn molekylet">
+    <div class="scene">
+        <canvas id="t-laerred"></canvas>
+        <div class="scenekort" id="t-skort">
+            <div class="sk-ind" id="t-ind"></div>
+            <div class="sk-bund" id="t-status">
+                <p class="st-tekst" id="t-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="t-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <!-- Vaerktoejerne ligger oeverst paa whiteboardet (js/sim_tegn.js) -->
+        <div class="tegnevaerktoej" id="t-vaerktoej">
+            <span class="vt-gruppe" id="t-vt"></span>
+            <span class="vt-gruppe vt-hoejre">
+                <button type="button" class="vtknap let" id="t-fortryd" title="Fortryd det sidste (Ctrl+Z)">↶ Fortryd</button>
+                <button type="button" class="vtknap let" id="t-ryd" title="Ryd tavlen og begynd forfra (R)">Ryd tavlen</button>
+            </span>
+        </div>
+        <div class="anker" id="t-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort klassekort">
+            <h2>Stofklasser <span class="taeller">vælg, hvad der er med</span></h2>
+            <div class="klasser"></div>
+            <p class="klasse-note" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="t-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="t-loest">0</b>/<span id="t-ialt">0</span></span></h2>
+            <div class="opg-liste" id="t-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FLERE GRUPPER                                              -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-g" role="tabpanel" aria-label="Flere grupper">
+    <div class="scene">
+        <canvas id="g-laerred"></canvas>
+        <div class="scenekort" id="g-skort">
+            <div class="sk-ind" id="g-ind"></div>
+            <div class="sk-bund" id="g-status">
+                <p class="st-tekst" id="g-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="g-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="g-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort klassekort">
+            <h2>Stofklasser <span class="taeller">vælg, hvad der er med</span></h2>
+            <div class="klasser"></div>
+            <p class="klasse-note" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="g-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="g-loest">0</b>/<span id="g-ialt">0</span></span></h2>
+            <div class="opg-liste" id="g-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Navne på organiske stoffer</h2>
+        <p>Et systematisk navn er en opskrift på molekylet. Det har tre dele: forled, stamme og endelse.</p>
+        <div class="eksempel navneeksempel">
+            <span class="ne-del" style="--delfarve:#f0a35a">4-methyl<small>forled</small></span><span class="ne-del" style="--delfarve:#8ab8ff">pentan<small>stamme</small></span><span class="ne-del" style="--delfarve:#4fd6b8">-2-ol<small>endelse</small></span>
+        </div>
+        <h3 class="teori-hoved">Sådan finder du navnet</h3>
+        <p>1. Find den længste carbonkæde, som den funktionelle gruppe sidder på. Antallet af carbonatomer giver stammen: methan, ethan, propan, butan, pentan, hexan.<br>
+           2. Nummerér kæden fra den ende, der giver gruppen det laveste tal.<br>
+           3. Sæt endelsen på. Tallet foran endelsen viser, hvor gruppen sidder.<br>
+           4. Skriv sidegrupperne foran med deres tal.</p>
+        <h3 class="teori-hoved">Endelserne</h3>
+        <table class="teoritabel">
+            <tr><th>Stofklasse</th><th>Gruppe</th><th>Endelse</th><th>Eksempel</th></tr>
+            <tr><td>Alkohol</td><td>−OH</td><td>-ol</td><td>butan-2-ol</td></tr>
+            <tr><td>Aldehyd</td><td>−CHO, C=O for enden af kæden</td><td>-al</td><td>butanal</td></tr>
+            <tr><td>Keton</td><td>C=O inde i kæden</td><td>-on</td><td>pentan-2-on</td></tr>
+            <tr><td>Carboxylsyre</td><td>−COOH</td><td>-syre</td><td>butansyre</td></tr>
+            <tr><td>Ester</td><td>−COO−</td><td>-oat</td><td>ethylethanoat</td></tr>
+            <tr><td>Amin</td><td>−NH₂</td><td>-amin</td><td>ethylamin</td></tr>
+        </table>
+        <p>I et aldehyd og en carboxylsyre er carbonatomet i gruppen altid nummer 1. Derfor står der intet tal foran endelsen.</p>
+        <h3 class="teori-hoved">Estere og aminer</h3>
+        <p>Navnet på en ester har to dele. Først kommer alkoholens del med endelsen -yl, og derefter syrens del med endelsen -oat. Syrens del er den, der har C=O. En simpel amin får navn efter carbonkæderne på nitrogenatomet: ethylamin, dimethylamin.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> ryd tavlen &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/trivialnavne.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="../../molekylemotor/js/navnlaeser.js"></script>
+<script src="../../molekylemotor/js/tavle.js"></script>
+<script src="../../molekylemotor/js/tegnebraet.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_navn.js"></script>
+<script src="js/sim_tegn.js"></script>
+<script src="js/sim_grupper.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

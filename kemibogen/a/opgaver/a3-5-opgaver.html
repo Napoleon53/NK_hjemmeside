@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A3.5 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a3-6-polaritet-og-log-d.html" rel="next">
+<link href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-5-opgaver.html">Opgaver til A3.5</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a3.5.1-find-det-asymmetriske-carbonatom" id="toc-opgave-a3.5.1-find-det-asymmetriske-carbonatom" class="nav-link active" data-scroll-target="#opgave-a3.5.1-find-det-asymmetriske-carbonatom">Opgave A3.5.1: Find det asymmetriske carbonatom</a></li>
+  <li><a href="#opgave-a3.5.2-asymmetriske-carbonatomer-i-tre-naturstoffer" id="toc-opgave-a3.5.2-asymmetriske-carbonatomer-i-tre-naturstoffer" class="nav-link" data-scroll-target="#opgave-a3.5.2-asymmetriske-carbonatomer-i-tre-naturstoffer">Opgave A3.5.2: Asymmetriske carbonatomer i tre naturstoffer</a></li>
+  <li><a href="#opgave-a3.5.3-optisk-aktiv-eller-ej" id="toc-opgave-a3.5.3-optisk-aktiv-eller-ej" class="nav-link" data-scroll-target="#opgave-a3.5.3-optisk-aktiv-eller-ej">Opgave A3.5.3: Optisk aktiv eller ej?</a></li>
+  <li><a href="#opgave-a3.5.4-polarimeterets-dele" id="toc-opgave-a3.5.4-polarimeterets-dele" class="nav-link" data-scroll-target="#opgave-a3.5.4-polarimeterets-dele">Opgave A3.5.4: Polarimeterets dele</a></li>
+  <li><a href="#opgave-a3.5.5-beregn-drejningen" id="toc-opgave-a3.5.5-beregn-drejningen" class="nav-link" data-scroll-target="#opgave-a3.5.5-beregn-drejningen">Opgave A3.5.5: Beregn drejningen</a></li>
+  <li><a href="#opgave-a3.5.6-beregn-koncentrationen" id="toc-opgave-a3.5.6-beregn-koncentrationen" class="nav-link" data-scroll-target="#opgave-a3.5.6-beregn-koncentrationen">Opgave A3.5.6: Beregn koncentrationen</a></li>
+  <li><a href="#opgave-a3.5.7-hvilken-spejlbilledisomer" id="toc-opgave-a3.5.7-hvilken-spejlbilledisomer" class="nav-link" data-scroll-target="#opgave-a3.5.7-hvilken-spejlbilledisomer">Opgave A3.5.7: Hvilken spejlbilledisomer?</a></li>
+  <li><a href="#opgave-a3.5.8-honning-i-polarimeteret" id="toc-opgave-a3.5.8-honning-i-polarimeteret" class="nav-link" data-scroll-target="#opgave-a3.5.8-honning-i-polarimeteret">Opgave A3.5.8: Honning i polarimeteret</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a3.5.eks.1-limonen-i-appelsinolie" id="toc-opgave-a3.5.eks.1-limonen-i-appelsinolie" class="nav-link" data-scroll-target="#opgave-a3.5.eks.1-limonen-i-appelsinolie">Opgave A3.5.eks.1: Limonen i appelsinolie</a></li>
+  <li><a href="#opgave-a3.5.eks.2-invertsukker" id="toc-opgave-a3.5.eks.2-invertsukker" class="nav-link" data-scroll-target="#opgave-a3.5.eks.2-invertsukker">Opgave A3.5.eks.2: Invertsukker</a></li>
+  <li><a href="#opgave-a3.5.eks.3-adrenalin" id="toc-opgave-a3.5.eks.3-adrenalin" class="nav-link" data-scroll-target="#opgave-a3.5.eks.3-adrenalin">Opgave A3.5.eks.3: Adrenalin</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-5-opgaver.html">Opgaver til A3.5</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A3.5</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html">A3.5 Optisk aktivitet og polarimeteret</a>. Prøv selv, før du åbner hjælpen under opgaven. De specifikke drejninger for sukkerarterne, carvon og menthol står i tabellen i afsnit A3.5.</p>
+<section id="opgave-a3.5.1-find-det-asymmetriske-carbonatom" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.1-find-det-asymmetriske-carbonatom">Opgave A3.5.1: Find det asymmetriske carbonatom</h2>
+<p>Et asymmetrisk carbonatom har fire forskellige grupper på sig. Tabellen viser seks små molekyler.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Formel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">alanin, en aminosyre i proteiner</td>
+<td style="text-align: left;">CH<sub>3</sub>CH(NH<sub>2</sub>)COOH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B</td>
+<td style="text-align: left;">propan-2-ol, som bruges i håndsprit</td>
+<td style="text-align: left;">CH<sub>3</sub>CH(OH)CH<sub>3</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">butan-2-ol</td>
+<td style="text-align: left;">CH<sub>3</sub>CH(OH)CH<sub>2</sub>CH<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D</td>
+<td style="text-align: left;">glycerol, som fedtstoffer er bygget af</td>
+<td style="text-align: left;">HOCH<sub>2</sub>CH(OH)CH<sub>2</sub>OH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">E</td>
+<td style="text-align: left;">æblesyre fra æbler</td>
+<td style="text-align: left;">HOOCCH(OH)CH<sub>2</sub>COOH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">glycin, den mindste aminosyre</td>
+<td style="text-align: left;">H<sub>2</sub>NCH<sub>2</sub>COOH</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Afgør for hvert af de seks stoffer, om molekylet har et asymmetrisk carbonatom.</li>
+<li>Skriv de fire grupper, der sidder på det asymmetriske carbonatom, for hvert af de stoffer, der har et.</li>
+<li>Forklar for hvert af de andre stoffer, hvorfor molekylet ikke har noget asymmetrisk carbonatom.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug fremgangsmåden for asymmetriske carbonatomer fra <a href="../../b/kapitler/b3-4-stereoisomeri.html">afsnit B3.4</a>. Se kun på carbonatomer med fire enkeltbindinger. Carbonatomet i en carboxylgruppe, −COOH, har en dobbeltbinding til oxygen og kan ikke være asymmetrisk. Spring også de carbonatomer over, der står som CH<sub>3</sub> eller CH<sub>2</sub> i formlen. De har mindst to ens hydrogenatomer.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I fem af de seks formler er der kun ét carbonatom tilbage: det, der står som CH i formlen. Skriv dets fire grupper op. I alanin, CH<sub>3</sub>CH(NH<sub>2</sub>)COOH, er grupperne −H, −CH<sub>3</sub>, −NH<sub>2</sub> og −COOH. I propan-2-ol, CH<sub>3</sub>CH(OH)CH<sub>3</sub>, er grupperne −H, −OH, −CH<sub>3</sub> og −CH<sub>3</sub>.</p>
+<p>Husk, at en gruppe er hele den del af molekylet, der sidder på bindingen. Grupperne −CH<sub>3</sub> og −CH<sub>2</sub>CH<sub>3</sub> er forskellige, selv om begge begynder med et carbonatom.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 11%">
+<col style="width: 7%">
+<col style="width: 75%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Stof</th>
+<th style="text-align: center;">Asymmetrisk carbonatom?</th>
+<th style="text-align: left;">Grupperne på det midterste carbonatom</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">alanin</td>
+<td style="text-align: center;">ja</td>
+<td style="text-align: left;">−H, −CH<sub>3</sub>, −NH<sub>2</sub> og −COOH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B</td>
+<td style="text-align: left;">propan-2-ol</td>
+<td style="text-align: center;">nej</td>
+<td style="text-align: left;">−H, −OH, −CH<sub>3</sub> og −CH<sub>3</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">butan-2-ol</td>
+<td style="text-align: center;">ja</td>
+<td style="text-align: left;">−H, −OH, −CH<sub>3</sub> og −CH<sub>2</sub>CH<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D</td>
+<td style="text-align: left;">glycerol</td>
+<td style="text-align: center;">nej</td>
+<td style="text-align: left;">−H, −OH, −CH<sub>2</sub>OH og −CH<sub>2</sub>OH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">E</td>
+<td style="text-align: left;">æblesyre</td>
+<td style="text-align: center;">ja</td>
+<td style="text-align: left;">−H, −OH, −COOH og −CH<sub>2</sub>COOH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">glycin</td>
+<td style="text-align: center;">nej</td>
+<td style="text-align: left;">−H, −H, −NH<sub>2</sub> og −COOH</td>
+</tr>
+</tbody>
+</table>
+<p>Alanin, butan-2-ol og æblesyre har hver ét asymmetrisk carbonatom, fordi de fire grupper på carbonatomet er forskellige.</p>
+<p>Propan-2-ol har to ens methylgrupper på det midterste carbonatom. Glycerol har to ens grupper, −CH<sub>2</sub>OH, på det midterste carbonatom. Glycin har to ens hydrogenatomer på carbonatomet mellem aminogruppen og carboxylgruppen. I alle seks molekyler er de øvrige carbonatomer enten CH<sub>3</sub>, CH<sub>2</sub> eller carbonatomet i en carboxylgruppe, og ingen af dem kan være asymmetriske.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.2-asymmetriske-carbonatomer-i-tre-naturstoffer" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.2-asymmetriske-carbonatomer-i-tre-naturstoffer">Opgave A3.5.2: Asymmetriske carbonatomer i tre naturstoffer</h2>
+<p>Figuren viser tre naturstoffer. Linalool findes i lavendel, thymol findes i timian, og efedrin findes i planten ledris (Ephedra).</p>
+<div id="fig-a3-opg-5-naturstoffer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-5-naturstoffer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-5-naturstoffer.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Linalool, thymol og efedrin."><img src="../figurer/a3-opg-5-naturstoffer.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-5-naturstoffer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Linalool, thymol og efedrin.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Find de asymmetriske carbonatomer i linalool, thymol og efedrin. Skriv, hvor mange der er i hvert molekyle.</li>
+<li>Skriv de fire grupper, der sidder på det asymmetriske carbonatom i linalool.</li>
+<li>Hvilke af de tre stoffer kan være optisk aktive? Begrund svaret.</li>
+<li>Hvor mange stereoisomerer kan der højst være af efedrin?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I en zigzagformel er hvert knæk og hver ende et carbonatom, og hydrogenatomerne på carbon er ikke tegnet. Et asymmetrisk carbonatom har fire enkeltbindinger til fire forskellige grupper. Carbonatomerne i benzenringen i thymol og efedrin kan ikke være asymmetriske, og det kan carbonatomerne i de to dobbeltbindinger i linalool heller ikke.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Linalool: se på carbonatomet med hydroxygruppen. Der er tegnet fire bindinger på carbonatomet, så det har ingen hydrogenatomer.</p>
+<p>Thymol: se på sidegruppen med tre carbonatomer. Carbonatomet, der sidder på benzenringen, har to grene, som begge er CH<sub>3</sub>.</p>
+<p>Efedrin: se på de to carbonatomer i kæden mellem benzenringen og nitrogenatomet. Skriv de fire grupper op for hvert af dem, og husk hydrogenatomet, som ikke er tegnet.</p>
+<p>Til spørgsmål d: med <em>n</em> asymmetriske carbonatomer kan der højst være 2<sup><em>n</em></sup> stereoisomerer. Det står i <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html">afsnit A3.2</a>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div id="fig-a3-opg-5-naturstoffer-facit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-5-naturstoffer-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-5-naturstoffer-facit.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: De asymmetriske carbonatomer i linalool og efedrin er mærket med en stjerne. Thymol har ingen."><img src="../figurer/a3-opg-5-naturstoffer-facit.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-5-naturstoffer-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: De asymmetriske carbonatomer i linalool og efedrin er mærket med en stjerne. Thymol har ingen.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li><p>Linalool har ét asymmetrisk carbonatom, thymol har ingen, og efedrin har to.</p></li>
+<li><p>Det asymmetriske carbonatom i linalool er carbonatomet med hydroxygruppen. De fire grupper er hydroxygruppen, −OH, methylgruppen, −CH<sub>3</sub>, gruppen −CH=CH<sub>2</sub> med dobbeltbindingen for enden af kæden og resten af kæden, −CH<sub>2</sub>CH<sub>2</sub>CH=C(CH<sub>3</sub>)<sub>2</sub>.</p></li>
+<li><p>Linalool og efedrin kan være optisk aktive. Begge molekyler har asymmetriske carbonatomer, så de findes som spejlbilledisomerer, der drejer planpolariseret lys hver sin vej. Thymol er ikke optisk aktivt. I sidegruppen med tre carbonatomer har det midterste carbonatom to ens methylgrupper, methylgruppen på ringen har tre ens hydrogenatomer, og resten af carbonatomerne i thymol sidder i benzenringen. Thymol har derfor ingen asymmetriske carbonatomer.</p></li>
+<li><p>Efedrin har to asymmetriske carbonatomer. Det ene har grupperne −H, −OH, benzenringen og resten af kæden. Det andet har grupperne −H, −CH<sub>3</sub>, −NH−CH<sub>3</sub> og resten af molekylet med hydroxygruppen og benzenringen. Der kan derfor højst være 2<sup>2</sup> = 4 stereoisomerer af efedrin.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.3-optisk-aktiv-eller-ej" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.3-optisk-aktiv-eller-ej">Opgave A3.5.3: Optisk aktiv eller ej?</h2>
+<p>Seks prøver undersøges i et polarimeter.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 69%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Prøve</th>
+<th style="text-align: left;">Indhold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">A</td>
+<td style="text-align: left;">ren (−)-menthol opløst i ethanol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">B</td>
+<td style="text-align: left;">lige meget (+)-carvon og (−)-carvon opløst i ethanol</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">propan-2-ol, CH<sub>3</sub>CH(OH)CH<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">D</td>
+<td style="text-align: left;">glucose opløst i vand</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">E</td>
+<td style="text-align: left;">en blanding med 80 % (+)-limonen og 20 % (−)-limonen opløst i ethanol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">F</td>
+<td style="text-align: left;">rent vand</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Afgør for hver prøve, om den drejer det planpolariserede lys. Skriv også, om prøven er højredrejende eller venstredrejende, hvis den drejer lyset.</li>
+<li>Forklar, hvorfor prøve B ikke drejer lyset, selv om hvert molekyle carvon er kiralt.</li>
+<li>Polarimeteret viser 0° for både prøve B og prøve C. Forklar forskellen på de to prøver.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et stof er kun optisk aktivt, hvis molekylerne er kirale. Fortegnet i navnet fortæller, hvilken vej stoffet drejer lyset: (+) er højredrejende, og (−) er venstredrejende. Vand og ethanol har ingen asymmetriske carbonatomer og drejer ikke lyset. For glucose kan du se fortegnet på den specifikke drejning i tabellen i afsnit A3.5.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>To spejlbilledisomerer drejer lyset lige meget, men hver sin vej. I prøve B er der lige meget af (+)-carvon og (−)-carvon. I prøve E er der mere (+)-limonen end (−)-limonen, så de to drejninger ophæver ikke hinanden helt.</p>
+<p>Du kan begynde forklaringerne sådan: “I en racemisk blanding af carvon er der lige mange molekyler af …” og “Propan-2-ol har ingen asymmetriske carbonatomer, så …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Tabellen viser svaret for hver af de seks prøver.</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 56%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Prøve</th>
+<th style="text-align: left;">Drejer prøven lyset?</th>
+<th style="text-align: left;">Begrundelse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">A</td>
+<td style="text-align: left;">ja, venstredrejende</td>
+<td style="text-align: left;">(−)-menthol er kun den ene spejlbilledisomer</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">B</td>
+<td style="text-align: left;">nej</td>
+<td style="text-align: left;">en racemisk blanding af carvon</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">nej</td>
+<td style="text-align: left;">propan-2-ol har ingen asymmetriske carbonatomer</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">D</td>
+<td style="text-align: left;">ja, højredrejende</td>
+<td style="text-align: left;">glucose har den specifikke drejning +52,7 ° · mL/(g · dm)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">E</td>
+<td style="text-align: left;">ja, højredrejende</td>
+<td style="text-align: left;">der er mest (+)-limonen i blandingen</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">F</td>
+<td style="text-align: left;">nej</td>
+<td style="text-align: left;">vand er ikke kiralt</td>
+</tr>
+</tbody>
+</table>
+<p>Prøve E drejer lyset mindre end ren (+)-limonen med samme koncentration, fordi (−)-limonen ophæver drejningen fra en lige så stor mængde (+)-limonen.</p>
+<ol start="2" type="a">
+<li><p>Prøve B er en racemisk blanding af carvon. De to spejlbilledisomerer drejer lyset præcis lige meget, men hver sin vej. Når der er lige mange molekyler af (+)-carvon og (−)-carvon, ophæver de to drejninger hinanden, og den samlede drejning er 0°.</p></li>
+<li><p>I prøve B er alle molekylerne kirale, og drejningen er kun 0°, fordi der er lige meget af de to spejlbilledisomerer af carvon. I prøve C har molekylerne af propan-2-ol slet ingen asymmetriske carbonatomer, så propan-2-ol findes ikke som spejlbilledisomerer og kan aldrig dreje lyset. Polarimeteret kan altså ikke alene vise, om en prøve er en racemisk blanding eller et stof, der ikke er kiralt.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.4-polarimeterets-dele" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.4-polarimeterets-dele">Opgave A3.5.4: Polarimeterets dele</h2>
+<p>Figuren viser et polarimeter. De fem dele er mærket med numre.</p>
+<div id="fig-a3-opg-5-polarimeter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-5-polarimeter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-5-polarimeter.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Et polarimeter med fem dele, der er mærket 1 til 5."><img src="../figurer/a3-opg-5-polarimeter.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-5-polarimeter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Et polarimeter med fem dele, der er mærket 1 til 5.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Skriv navnet på hver af de fem dele.</li>
+<li>Forklar, hvad del 2 gør ved lyset.</li>
+<li>Røret fyldes med rent vand. Hvor mange grader skal del 4 drejes, før der kommer mest muligt lys igennem? Begrund svaret.</li>
+<li>Røret fyldes nu med en opløsning af et sukkerstof. Del 4 skal drejes 12° med uret, set mod lyskilden, før der igen kommer mest muligt lys igennem. Skriv drejningen med fortegn, og afgør, om sukkerstoffet er højredrejende eller venstredrejende.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Følg lyset fra venstre mod højre gennem polarimeteret. Lyset kommer fra lyskilden, går gennem det første polarisationsfilter, gennem røret med prøven og gennem det andet polarisationsfilter, som kan drejes. De to polarisationsfiltre har hvert sit navn i afsnit A3.5.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Almindeligt lys svinger i alle retninger på tværs af lysets vej. Efter polarisatoren svinger lyset kun i én retning.</p>
+<p>Kun et optisk aktivt stof drejer lysets svingningsretning. Tænk over, om vandmolekylet er kiralt. Drejes lyset med uret, set mod lyskilden, skrives drejningen med plus.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Del 1 er lyskilden. Del 2 er polarisatoren, det første polarisationsfilter. Del 3 er røret med prøven. Del 4 er analysatoren, det polarisationsfilter, der kan drejes. Del 5 er øjet, som ser, hvor meget lys der kommer igennem.</p></li>
+<li><p>Polarisatoren lader kun de bølger slippe igennem, der svinger i én bestemt retning. Før polarisatoren svinger lyset i alle retninger på tværs af lysets vej. Efter polarisatoren er lyset planpolariseret.</p></li>
+<li><p>Analysatoren skal drejes 0°. Vandmolekylet er ikke kiralt, så vand er ikke optisk aktivt og drejer ikke det planpolariserede lys. Lyset svinger i samme retning efter røret som før røret.</p></li>
+<li><p>Drejningen er α = +12°. Lyset er drejet med uret, set mod lyskilden, så sukkerstoffet er højredrejende.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.5-beregn-drejningen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.5-beregn-drejningen">Opgave A3.5.5: Beregn drejningen</h2>
+<p>Den specifikke drejning er +52,7 ° · mL/(g · dm) for glucose og −92,4 ° · mL/(g · dm) for fructose.</p>
+<ol type="a">
+<li>15,0 g glucose opløses i vand, så opløsningen fylder 250 mL. Beregn massekoncentrationen af glucose i g/mL.</li>
+<li>Glucoseopløsningen hældes i et polarimeterrør, der er 10,0 cm langt. Beregn drejningen.</li>
+<li>En opløsning indeholder 8,00 g fructose pr. 100 mL. Beregn drejningen i et polarimeterrør, der er 20,0 cm langt.</li>
+<li>Fructoseopløsningen fortyndes med vand til det dobbelte rumfang. Hvad bliver drejningen i røret på 20,0 cm nu?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Formlen for specifik drejning løses for drejningen: α = [α] · <span class="math inline">\(l\)</span> · <em>c</em>. Rørets længde skal stå i decimeter, og 10 cm er 1 dm. Massekoncentrationen skal stå i gram pr. milliliter: divider massen af sukkeret i gram med opløsningens rumfang i milliliter.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For glucoseopløsningen er <span class="math inline">\(l\)</span> = 10,0 cm = 1,00 dm. For fructoseopløsningen er <span class="math inline">\(l\)</span> = 20,0 cm = 2,00 dm og <em>c</em> = 8,00 g / 100 mL = 0,0800 g/mL. Den specifikke drejning for fructose er negativ, så drejningen bliver negativ.</p>
+<p>Når fructoseopløsningen fortyndes til det dobbelte rumfang, bliver massekoncentrationen halvt så stor.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Massekoncentrationen af glucose er massen divideret med opløsningens rumfang:</li>
+</ol>
+<p><span class="math display">\[
+c = \frac{15{,}0\ \mathrm{g}}{250\ \mathrm{mL}} = 0{,}0600\ \dfrac{\mathrm{g}}{\mathrm{mL}}
+\]</span></p>
+<ol start="2" type="a">
+<li>Rørets længde er <span class="math inline">\(l\)</span> = 10,0 cm = 1,00 dm.</li>
+</ol>
+<p><span class="math display">\[
+\alpha = [\alpha] \cdot l \cdot c = 52{,}7\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 1{,}00\ \mathrm{dm} \cdot 0{,}0600\ \dfrac{\mathrm{g}}{\mathrm{mL}} = 3{,}16^{\circ}
+\]</span></p>
+<p>Polarimeteret viser +3,16° for glucoseopløsningen.</p>
+<ol start="3" type="a">
+<li>For fructoseopløsningen er <em>c</em> = 8,00 g / 100 mL = 0,0800 g/mL og <span class="math inline">\(l\)</span> = 20,0 cm = 2,00 dm.</li>
+</ol>
+<p><span class="math display">\[
+\alpha = -92{,}4\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 2{,}00\ \mathrm{dm} \cdot 0{,}0800\ \dfrac{\mathrm{g}}{\mathrm{mL}} = -14{,}8^{\circ}
+\]</span></p>
+<p>Polarimeteret viser −14,8° for fructoseopløsningen. Fructose er venstredrejende.</p>
+<ol start="4" type="a">
+<li>Når fructoseopløsningen fortyndes til det dobbelte rumfang, bliver massekoncentrationen halvt så stor, 0,0400 g/mL. Drejningen bliver derfor også halvt så stor:</li>
+</ol>
+<p><span class="math display">\[
+\alpha = -92{,}4\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 2{,}00\ \mathrm{dm} \cdot 0{,}0400\ \dfrac{\mathrm{g}}{\mathrm{mL}} = -7{,}39^{\circ}
+\]</span></p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.6-beregn-koncentrationen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.6-beregn-koncentrationen">Opgave A3.5.6: Beregn koncentrationen</h2>
+<p>På et hospital får en patient glucose gennem et drop. Opløsningen skal indeholde 50 g glucose pr. liter. En laborant kontrollerer opløsningen i et polarimeter med et rør på 20,0 cm og måler drejningen +5,27°. Den specifikke drejning for glucose er +52,7 ° · mL/(g · dm).</p>
+<ol type="a">
+<li>Omregn rørets længde til decimeter.</li>
+<li>Beregn massekoncentrationen af glucose i opløsningen i g/mL.</li>
+<li>Omregn massekoncentrationen til gram pr. liter, og afgør, om opløsningen til droppet har den rigtige koncentration.</li>
+<li>En opløsning af (−)-menthol i ethanol drejer lyset −1,25° i et rør på 1,00 dm. Den specifikke drejning for (−)-menthol er −50 ° · mL/(g · dm). Beregn massekoncentrationen af menthol i g/mL.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Formlen for specifik drejning løses for massekoncentrationen: <em>c</em> = α / ([α] · <span class="math inline">\(l\)</span>). Længden skal stå i decimeter, og resultatet får enheden g/mL.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For glucoseopløsningen er <span class="math inline">\(l\)</span> = 20,0 cm = 2,00 dm. Der er 1000 mL i 1 L, så en massekoncentration i g/mL ganges med 1000 for at blive til g/L.</p>
+<p>For menthol er både drejningen og den specifikke drejning negative. Minus divideret med minus giver plus, så massekoncentrationen bliver positiv.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Rørets længde er <span class="math inline">\(l\)</span> = 20,0 cm = 2,00 dm.</p></li>
+<li><p>Massekoncentrationen af glucose beregnes med formlen for specifik drejning:</p></li>
+</ol>
+<p><span class="math display">\[
+c = \frac{\alpha}{[\alpha] \cdot l} = \frac{5{,}27^{\circ}}{52{,}7\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 2{,}00\ \mathrm{dm}} = 0{,}0500\ \dfrac{\mathrm{g}}{\mathrm{mL}}
+\]</span></p>
+<ol start="3" type="a">
+<li>Der er 1000 mL i 1 L:</li>
+</ol>
+<p><span class="math display">\[
+c = 0{,}0500\ \dfrac{\mathrm{g}}{\mathrm{mL}} \cdot 1000\ \dfrac{\mathrm{mL}}{\mathrm{L}} = 50{,}0\ \dfrac{\mathrm{g}}{\mathrm{L}}
+\]</span></p>
+<p>Opløsningen indeholder 50,0 g glucose pr. liter. Opløsningen til droppet har den rigtige koncentration.</p>
+<ol start="4" type="a">
+<li>For opløsningen af (−)-menthol er</li>
+</ol>
+<p><span class="math display">\[
+c = \frac{-1{,}25^{\circ}}{-50\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 1{,}00\ \mathrm{dm}} = 0{,}025\ \dfrac{\mathrm{g}}{\mathrm{mL}}
+\]</span></p>
+<p>Opløsningen indeholder 0,025 g menthol pr. milliliter.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.7-hvilken-spejlbilledisomer" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.7-hvilken-spejlbilledisomer">Opgave A3.5.7: Hvilken spejlbilledisomer?</h2>
+<p>En laborant har fire flasker, der alle er mærket carvon. Fra hver flaske opløses 2,00 g i ethanol, så opløsningen fylder 50,0 mL. Drejningen måles i et polarimeterrør på 1,00 dm. Den specifikke drejning er +61 ° · mL/(g · dm) for (+)-carvon fra kommen og −61 ° · mL/(g · dm) for (−)-carvon fra grøn mynte.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Flaske</th>
+<th style="text-align: center;">Drejning, α</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">+2,44°</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">B</td>
+<td style="text-align: center;">−2,44°</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">0,00°</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">D</td>
+<td style="text-align: center;">−1,22°</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn massekoncentrationen af carvon i de fire opløsninger.</li>
+<li>Beregn den specifikke drejning for indholdet i hver af de fire flasker.</li>
+<li>Afgør for hver flaske, hvilken spejlbilledisomer af carvon den indeholder, og om indholdet er rent.</li>
+<li>Hvilken flaske dufter af kommen, og hvilken dufter af grøn mynte?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Massekoncentrationen af carvon er den samme i alle fire opløsninger: massen i gram divideret med rumfanget i milliliter. Den specifikke drejning er [α] = α / (<span class="math inline">\(l\)</span> · <em>c</em>). Behold fortegnet på drejningen.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign hver beregnet specifik drejning med tabelværdierne for carvon, +61 og −61 ° · mL/(g · dm). Brug tabellen sidst i afsnit A3.5: lig med tabelværdien betyder kun den ene spejlbilledisomer, 0 betyder en racemisk blanding, og en værdi mellem 0 og tabelværdien betyder en blanding med mest af den ene form.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Massekoncentrationen af carvon er den samme i alle fire opløsninger:</li>
+</ol>
+<p><span class="math display">\[
+c = \frac{2{,}00\ \mathrm{g}}{50{,}0\ \mathrm{mL}} = 0{,}0400\ \dfrac{\mathrm{g}}{\mathrm{mL}}
+\]</span></p>
+<ol start="2" type="a">
+<li>For flaske A er den specifikke drejning</li>
+</ol>
+<p><span class="math display">\[
+[\alpha] = \frac{\alpha}{l \cdot c} = \frac{2{,}44^{\circ}}{1{,}00\ \mathrm{dm} \cdot 0{,}0400\ \dfrac{\mathrm{g}}{\mathrm{mL}}} = 61{,}0\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}}
+\]</span></p>
+<p>De tre andre flasker beregnes på samme måde:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Flaske</th>
+<th style="text-align: center;">Drejning, α</th>
+<th style="text-align: center;">Specifik drejning, [α], i ° · mL/(g · dm)</th>
+<th style="text-align: left;">Indhold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">+2,44°</td>
+<td style="text-align: center;">+61,0</td>
+<td style="text-align: left;">ren (+)-carvon</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">B</td>
+<td style="text-align: center;">−2,44°</td>
+<td style="text-align: center;">−61,0</td>
+<td style="text-align: left;">ren (−)-carvon</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">0,00°</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: left;">en racemisk blanding af carvon</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">D</td>
+<td style="text-align: center;">−1,22°</td>
+<td style="text-align: center;">−30,5</td>
+<td style="text-align: left;">en blanding med mest (−)-carvon</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="a">
+<li><p>Flaske A har samme specifikke drejning som tabelværdien for (+)-carvon, så flaske A indeholder ren (+)-carvon. Flaske B har tabelværdien for (−)-carvon og indeholder ren (−)-carvon. Flaske C drejer ikke lyset, selv om carvon er kiralt, så flaske C indeholder en racemisk blanding med lige meget af de to spejlbilledisomerer. Flaske D har en specifik drejning mellem 0 og −61 ° · mL/(g · dm). Flaske D indeholder en blanding med mest (−)-carvon og er ikke ren.</p></li>
+<li><p>Flaske A dufter af kommen, fordi (+)-carvon er den form, der findes i kommen. Flaske B dufter af grøn mynte, fordi (−)-carvon er den form, der findes i grøn mynte.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.8-honning-i-polarimeteret" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.8-honning-i-polarimeteret">Opgave A3.5.8: Honning i polarimeteret</h2>
+<p>Honning består mest af de to sukkerarter fructose og glucose. En honning indeholder 38,0 masseprocent fructose og 31,0 masseprocent glucose. Resten er mest vand, som ikke drejer lyset.</p>
+<p>20,0 g af honningen opløses i vand, så opløsningen fylder 100 mL. Opløsningen hældes i et polarimeterrør på 20,0 cm. I en blanding lægges de enkelte stoffers drejninger sammen. Den specifikke drejning er −92,4 ° · mL/(g · dm) for fructose og +52,7 ° · mL/(g · dm) for glucose.</p>
+<ol type="a">
+<li>Beregn den drejning, polarimeteret viser, og afgør, om honningen er højredrejende eller venstredrejende.</li>
+<li>Billig honning kan være blandet op med sirup, som indeholder saccharose. Saccharose har den specifikke drejning +66,5 ° · mL/(g · dm). Forklar, hvordan polarimeteret kan afsløre, at en honning er blandet op med saccharose.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Beregn først massen af fructose og massen af glucose i de 20,0 g honning ud fra de to masseprocenter. Beregn derefter massekoncentrationen af hver sukkerart i opløsningen på 100 mL. Rørets længde skal omregnes til decimeter.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Der er 0,380 · 20,0 g = 7,60 g fructose og 0,310 · 20,0 g = 6,20 g glucose i de 20,0 g honning. Beregn drejningen fra fructose og drejningen fra glucose hver for sig med α = [α] · <span class="math inline">\(l\)</span> · <em>c</em>, og læg de to drejninger sammen med fortegn.</p>
+<p>Til spørgsmål b kan du begynde sådan: “Saccharose er højredrejende, så en honning med saccharose i …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Masserne af de to sukkerarter i 20,0 g honning er</li>
+</ol>
+<p><span class="math display">\[
+m(\text{fructose}) = 0{,}380 \cdot 20{,}0\ \mathrm{g} = 7{,}60\ \mathrm{g} \qquad m(\text{glucose}) = 0{,}310 \cdot 20{,}0\ \mathrm{g} = 6{,}20\ \mathrm{g}
+\]</span></p>
+<p>Opløsningen fylder 100 mL, så massekoncentrationerne er 0,0760 g/mL for fructose og 0,0620 g/mL for glucose. Rørets længde er <span class="math inline">\(l\)</span> = 20,0 cm = 2,00 dm.</p>
+<p>Drejningen fra fructose:</p>
+<p><span class="math display">\[
+\alpha = -92{,}4\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 2{,}00\ \mathrm{dm} \cdot 0{,}0760\ \dfrac{\mathrm{g}}{\mathrm{mL}} = -14{,}04^{\circ}
+\]</span></p>
+<p>Drejningen fra glucose:</p>
+<p><span class="math display">\[
+\alpha = 52{,}7\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 2{,}00\ \mathrm{dm} \cdot 0{,}0620\ \dfrac{\mathrm{g}}{\mathrm{mL}} = 6{,}53^{\circ}
+\]</span></p>
+<p>Den samlede drejning er summen af de to:</p>
+<p><span class="math display">\[
+\alpha = -14{,}04^{\circ} + 6{,}53^{\circ} = -7{,}51^{\circ}
+\]</span></p>
+<p>Polarimeteret viser −7,51°. Honningen er venstredrejende, fordi drejningen fra fructose er større end drejningen fra glucose.</p>
+<ol start="2" type="a">
+<li>Saccharose er højredrejende. Hvis noget af honningen er skiftet ud med saccharose, er der mindre fructose til at dreje lyset mod venstre og mere sukker, der drejer lyset mod højre. Drejningen bliver derfor mindre negativ end −7,51°, og med meget saccharose bliver den positiv. En honningopløsning, der drejer lyset for lidt mod venstre, kan altså være blandet op med saccharose.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med de konkrete atomer, bindinger og grupper, med beregninger med enheder og med en konklusion.</p>
+</section>
+<section id="opgave-a3.5.eks.1-limonen-i-appelsinolie" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.eks.1-limonen-i-appelsinolie">Opgave A3.5.eks.1: Limonen i appelsinolie</h2>
+<p>Limonen giver appelsinskal dens duft. Appelsinolie presses af skallerne og består næsten kun af limonen. Limonen har molekylformlen C<sub>10</sub>H<sub>16</sub>. Figuren viser strukturen, hvor carbonatomerne i ringen er nummereret. Limonen fra appelsinskal er højredrejende, og ren (+)-limonen har den specifikke drejning +124 ° · mL/(g · dm).</p>
+<div id="fig-a3-opg-5-limonen" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-5-limonen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-5-limonen.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figur&nbsp;4: Strukturen af limonen. Carbonatomerne i ringen har numrene 1 til 6."><img src="../figurer/a3-opg-5-limonen.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-5-limonen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;4: Strukturen af limonen. Carbonatomerne i ringen har numrene 1 til 6.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Beregn antallet af dobbeltbindingsækvivalenter for limonen, og vis, at resultatet passer med strukturen.</li>
+<li>Argumentér for, at limonen er optisk aktivt.</li>
+<li>2,00 g appelsinolie opløses i ethanol, så opløsningen fylder 25,0 mL. I et polarimeterrør på 10,0 cm måles drejningen +9,42°. Beregn den specifikke drejning for appelsinolien.</li>
+<li>Vurdér, om appelsinolien er ren (+)-limonen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Dobbeltbindingsækvivalenterne beregnes med formlen fra <a href="../kapitler/a3-1-elementaranalyse.html">afsnit A3.1</a>: DBE = (2 · C + 2 + N − H) / 2. Hver dobbeltbinding og hver ring tæller 1.</p>
+<p>Et stof er optisk aktivt, når molekylet har et asymmetrisk carbonatom. Led efter et carbonatom i limonen med fire enkeltbindinger og fire forskellige grupper. Et carbonatom i en ring har to grupper, der er ringen selv: den ene vej rundt og den anden vej rundt.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på carbonatom nr. 4 i limonen. Gå fra carbonatom nr. 4 rundt i ringen begge veje, og skriv, hvad du møder: den ene vej kommer du til carbonatom nr. 3 og derefter til dobbeltbindingen, og den anden vej kommer du til carbonatom nr. 5 og nr. 6, før du når dobbeltbindingen.</p>
+<p>Du kan begynde argumentet sådan: “Carbonatom nr. 4 i limonen har fire forskellige grupper: …” og slutte med “Limonen findes derfor som to spejlbilledisomerer, som …”</p>
+<p>Til beregningen: <em>c</em> = 2,00 g / 25,0 mL, <span class="math inline">\(l\)</span> = 10,0 cm = 1,00 dm og [α] = α / (<span class="math inline">\(l\)</span> · <em>c</em>). Sammenlign resultatet med +124 ° · mL/(g · dm).</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Limonen har molekylformlen C<sub>10</sub>H<sub>16</sub>:</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 10 + 2 + 0 - 16}{2} = 3
+\]</span></p>
+<p>Det passer med strukturen. Limonen har en dobbeltbinding mellem carbonatom nr. 1 og nr. 2 i ringen, en dobbeltbinding i sidegruppen på carbonatom nr. 4 og én ring. Det giver 2 + 1 = 3 dobbeltbindingsækvivalenter.</p>
+<ol start="2" type="a">
+<li>Carbonatom nr. 4 i limonen har fire enkeltbindinger til fire forskellige grupper:</li>
+</ol>
+<ul>
+<li>et hydrogenatom</li>
+<li>sidegruppen med dobbeltbindingen, −C(CH<sub>3</sub>)=CH<sub>2</sub></li>
+<li>ringen den ene vej rundt, hvor carbonatom nr. 3 er en CH<sub>2</sub>-gruppe, som sidder direkte på dobbeltbindingen ved carbonatom nr. 2</li>
+<li>ringen den anden vej rundt, hvor carbonatom nr. 5 er en CH<sub>2</sub>-gruppe, som sidder på endnu en CH<sub>2</sub>-gruppe, carbonatom nr. 6.</li>
+</ul>
+<p>De to veje rundt i ringen er forskellige, fordi dobbeltbindingen ikke ligger lige langt fra carbonatom nr. 4 de to veje. Carbonatom nr. 4 er derfor et asymmetrisk carbonatom. Limonen findes som to spejlbilledisomerer, som drejer planpolariseret lys lige meget, men i hver sin retning. Limonen er altså optisk aktivt.</p>
+<ol start="3" type="a">
+<li>Massekoncentrationen af appelsinolie er</li>
+</ol>
+<p><span class="math display">\[
+c = \frac{2{,}00\ \mathrm{g}}{25{,}0\ \mathrm{mL}} = 0{,}0800\ \dfrac{\mathrm{g}}{\mathrm{mL}}
+\]</span></p>
+<p>Rørets længde er <span class="math inline">\(l\)</span> = 10,0 cm = 1,00 dm.</p>
+<p><span class="math display">\[
+[\alpha] = \frac{\alpha}{l \cdot c} = \frac{9{,}42^{\circ}}{1{,}00\ \mathrm{dm} \cdot 0{,}0800\ \dfrac{\mathrm{g}}{\mathrm{mL}}} = 118\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}}
+\]</span></p>
+<p>Den specifikke drejning for appelsinolien er +118 ° · mL/(g · dm).</p>
+<ol start="4" type="a">
+<li>Appelsinolien drejer lyset samme vej som (+)-limonen, men den specifikke drejning er lidt mindre end tabelværdien +124 ° · mL/(g · dm):</li>
+</ol>
+<p><span class="math display">\[
+\frac{118}{124} = 0{,}95
+\]</span></p>
+<p>Appelsinolien drejer lyset 95 % så meget som ren (+)-limonen. Olien er altså ikke helt ren (+)-limonen. Omkring 5 % af olien må være andre stoffer, som ikke drejer lyset mod højre, eller en smule (−)-limonen. Langt det meste af appelsinolien er (+)-limonen.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.eks.2-invertsukker" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.eks.2-invertsukker">Opgave A3.5.eks.2: Invertsukker</h2>
+<p>Når saccharose koges med vand og lidt syre, fx citronsaft, spaltes den til glucose og fructose. Det sker, når man koger marmelade og karameller. Blandingen af glucose og fructose kaldes invertsukker. Glucose og fructose har samme molekylformel, C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>.</p>
+<div class="reaktion">
+<p>C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>(aq) + H<sub>2</sub>O(l) → C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>(aq) + C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>(aq)</p>
+</div>
+<p>13,7 g saccharose opløses i vand, så opløsningen fylder 100 mL, og der tilsættes en dråbe syre som katalysator. Drejningen måles i et polarimeterrør på 10,0 cm to gange: lige efter at opløsningen er lavet, og igen, når al saccharosen har reageret. Opløsningens rumfang ændrer sig ikke under reaktionen. De specifikke drejninger er +66,5 ° · mL/(g · dm) for saccharose, +52,7 ° · mL/(g · dm) for glucose og −92,4 ° · mL/(g · dm) for fructose.</p>
+<ol type="a">
+<li>Angiv reaktionstypen for reaktionen mellem saccharose og vand. Begrund svaret.</li>
+<li>Beregn drejningen, lige efter at opløsningen af saccharose er lavet.</li>
+<li>Beregn drejningen, når al saccharosen har reageret.</li>
+<li>Foreslå en kemisk test, der også kan vise, at saccharosen har reageret. Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionstypen finder du med spørgsmålene i <a href="../kapitler/a3-3-reaktionstyper.html">afsnit A3.3</a>: se på, om vand er en reaktant, og om ét molekyle bliver til to.</p>
+<p>Før reaktionen er saccharose det eneste stof, der drejer lyset. Efter reaktionen er der både glucose og fructose i opløsningen, og de to drejninger lægges sammen. Beregn først stofmængden af saccharose. Reaktionsskemaet viser, at 1 mol saccharose giver 1 mol glucose og 1 mol fructose.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Molarmassen er 342,30 g/mol for saccharose, C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>, og 180,16 g/mol for både glucose og fructose, C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>. Beregn massen af glucose og massen af fructose, der dannes af 13,7 g saccharose, og divider med 100 mL. Brug α = [α] · <span class="math inline">\(l\)</span> · <em>c</em> for hver sukkerart med <span class="math inline">\(l\)</span> = 1,00 dm.</p>
+<p>Til spørgsmål d: Fehlings test giver rødt bundfald med et reducerende sukker. Slå op i <a href="../../b/kapitler/b7-4-fehlings-test.html">afsnit B7.4</a>, hvilke af de tre sukkerarter saccharose, glucose og fructose der er reducerende.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Reaktionen er en hydrolyse. Ét molekyle saccharose bliver delt i to mindre molekyler, glucose og fructose, og vand er en reaktant. Det er bindingen C−O−C mellem de to ringe i saccharose, glykosidbindingen, der bliver spaltet. Vandmolekylet giver −OH til den ene ring og −H til oxygenatomet på den anden.</p></li>
+<li><p>Massekoncentrationen af saccharose er <em>c</em> = 13,7 g / 100 mL = 0,137 g/mL, og rørets længde er <span class="math inline">\(l\)</span> = 10,0 cm = 1,00 dm.</p></li>
+</ol>
+<p><span class="math display">\[
+\alpha = [\alpha] \cdot l \cdot c = 66{,}5\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 1{,}00\ \mathrm{dm} \cdot 0{,}137\ \dfrac{\mathrm{g}}{\mathrm{mL}} = 9{,}11^{\circ}
+\]</span></p>
+<p>Før reaktionen viser polarimeteret +9,11°.</p>
+<ol start="3" type="a">
+<li>Stofmængden af saccharose er</li>
+</ol>
+<p><span class="math display">\[
+n = \frac{m}{M} = \frac{13{,}7\ \mathrm{g}}{342{,}30\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}0400\ \mathrm{mol}
+\]</span></p>
+<p>Reaktionsskemaet viser, at 1 mol saccharose giver 1 mol glucose og 1 mol fructose. Der dannes altså 0,0400 mol glucose og 0,0400 mol fructose. De to sukkerarter har samme molarmasse, så der dannes samme masse af hver:</p>
+<p><span class="math display">\[
+m = n \cdot M = 0{,}0400\ \mathrm{mol} \cdot 180{,}16\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 7{,}21\ \mathrm{g}
+\]</span></p>
+<p>Massekoncentrationen er derfor 7,21 g / 100 mL = 0,0721 g/mL for både glucose og fructose.</p>
+<p>Drejningen fra glucose:</p>
+<p><span class="math display">\[
+\alpha = 52{,}7\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 1{,}00\ \mathrm{dm} \cdot 0{,}0721\ \dfrac{\mathrm{g}}{\mathrm{mL}} = 3{,}80^{\circ}
+\]</span></p>
+<p>Drejningen fra fructose:</p>
+<p><span class="math display">\[
+\alpha = -92{,}4\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 1{,}00\ \mathrm{dm} \cdot 0{,}0721\ \dfrac{\mathrm{g}}{\mathrm{mL}} = -6{,}66^{\circ}
+\]</span></p>
+<p>Den samlede drejning:</p>
+<p><span class="math display">\[
+\alpha = 3{,}80^{\circ} - 6{,}66^{\circ} = -2{,}86^{\circ}
+\]</span></p>
+<p>Når al saccharosen har reageret, viser polarimeteret −2,86°. Drejningen har skiftet fortegn fra plus til minus, fordi fructose drejer lyset mere mod venstre, end glucose drejer lyset mod højre. Det er derfor, blandingen kaldes invertsukker: at invertere betyder at vende om.</p>
+<ol start="4" type="a">
+<li>Fehlings test kan bruges. Saccharose er ikke et reducerende sukker, så før reaktionen er Fehlings test negativ, og væsken bliver ved med at være blå. Glucose og fructose er reducerende sukkerarter. Når saccharosen har reageret, reducerer glucose og fructose kobber(II)ionerne, og der dannes et rødt bundfald af kobber(I)oxid. Et rødt bundfald viser altså, at saccharosen er blevet hydrolyseret.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.5.eks.3-adrenalin" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.5.eks.3-adrenalin">Opgave A3.5.eks.3: Adrenalin</h2>
+<p>Adrenalin er et hormon, som binyrerne sender ud i blodet, når du bliver bange eller anstrenger dig. Adrenalin bruges også som lægemiddel ved hjertestop og ved voldsomme allergiske reaktioner. I industrien kan adrenalin fremstilles af stoffet adrenalon, som reagerer med dihydrogen. Figuren viser reaktionen. Det adrenalin, kroppen selv laver, er venstredrejende og har den specifikke drejning −52 ° · mL/(g · dm).</p>
+<div id="fig-a3-opg-5-adrenalin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-5-adrenalin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-5-adrenalin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figur&nbsp;5: Adrenalon reagerer med dihydrogen og bliver til adrenalin."><img src="../figurer/a3-opg-5-adrenalin.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-5-adrenalin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;5: Adrenalon reagerer med dihydrogen og bliver til adrenalin.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv reaktionstypen for reaktionen mellem adrenalon og dihydrogen. Begrund svaret.</li>
+<li>Argumentér for, at adrenalin er optisk aktivt, og at adrenalon ikke er optisk aktivt.</li>
+<li>0,500 g af produktet fra reaktionen opløses i fortyndet saltsyre, så opløsningen fylder 25,0 mL. I et polarimeterrør på 2,00 dm måles drejningen 0,00°. Beregn den drejning, opløsningen ville have, hvis produktet var ren (−)-adrenalin, og forklar måleresultatet.</li>
+<li>Foreslå en test, der kan vise, om der er adrenalon tilbage i produktet. Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find det sted, hvor adrenalon og adrenalin er forskellige: carbonatomet lige til højre for benzenringen. Bestem oxidationstallet for det carbonatom i adrenalon og i adrenalin ved at tælle bindinger, som i <a href="../kapitler/a3-3-reaktionstyper.html">afsnit A3.3</a>. Husk, at ordet addition kun bruges om dobbeltbindinger mellem to carbonatomer.</p>
+<p>Se på det samme carbonatom, når du skal afgøre, om adrenalon og adrenalin har et asymmetrisk carbonatom.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I adrenalon har carbonatomet ved benzenringen en dobbeltbinding til oxygen og to bindinger til carbon. I adrenalin har carbonatomet én binding til oxygen, én til hydrogen og to til carbon.</p>
+<p>Du kan begynde argumentet sådan: “Carbonatomet med hydroxygruppen i adrenalin har fire forskellige grupper: …” og “I adrenalon har det samme carbonatom en dobbeltbinding til oxygen, så …”</p>
+<p>Til beregningen: <em>c</em> = 0,500 g / 25,0 mL og α = [α] · <span class="math inline">\(l\)</span> · <em>c</em>. Tænk over, hvilken slags blanding der har drejningen 0°, selv om molekylerne er kirale.</p>
+<p>Til testen: adrenalon har en funktionel gruppe, som adrenalin ikke har. Find testen for den gruppe i <a href="../kapitler/a3-4-kemisk-analyse.html">afsnit A3.4</a>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Reaktionen er en reduktion. Carbonylgruppen, C=O, ved benzenringen i adrenalon er blevet til en hydroxygruppe, −OH, i adrenalin. I adrenalon har carbonatomet en dobbeltbinding til oxygen, som tæller +2, og to bindinger til carbon, som tæller 0. Oxidationstallet er +II. I adrenalin har carbonatomet én binding til oxygen, som tæller +1, én binding til hydrogen, som tæller −1, og to bindinger til carbon. Oxidationstallet er 0. Oxidationstallet for carbonatomet er faldet fra +II til 0, så adrenalon er blevet reduceret. Reaktionen kaldes ikke en addition, fordi dobbeltbindingen ikke sidder mellem to carbonatomer.</p></li>
+<li><p>I adrenalin har carbonatomet med hydroxygruppen fire enkeltbindinger til fire forskellige grupper: et hydrogenatom, hydroxygruppen, −OH, benzenringen med de to hydroxygrupper og gruppen −CH<sub>2</sub>−NH−CH<sub>3</sub>. Carbonatomet er derfor asymmetrisk. Adrenalin findes som to spejlbilledisomerer, som drejer planpolariseret lys lige meget i hver sin retning, så adrenalin er optisk aktivt.</p></li>
+</ol>
+<p>I adrenalon har det samme carbonatom en dobbeltbinding til oxygen og kun tre grupper, så carbonatomet kan ikke være asymmetrisk. De andre carbonatomer i adrenalon sidder i benzenringen eller har mindst to ens hydrogenatomer, nemlig CH<sub>2</sub>-gruppen og CH<sub>3</sub>-gruppen. Adrenalon har altså ingen asymmetriske carbonatomer, findes ikke som spejlbilledisomerer og er ikke optisk aktivt.</p>
+<ol start="3" type="a">
+<li>Massekoncentrationen af produktet er</li>
+</ol>
+<p><span class="math display">\[
+c = \frac{0{,}500\ \mathrm{g}}{25{,}0\ \mathrm{mL}} = 0{,}0200\ \dfrac{\mathrm{g}}{\mathrm{mL}}
+\]</span></p>
+<p>Var produktet ren (−)-adrenalin, ville drejningen være</p>
+<p><span class="math display">\[
+\alpha = [\alpha] \cdot l \cdot c = -52\ \dfrac{^{\circ} \cdot \mathrm{mL}}{\mathrm{g \cdot dm}} \cdot 2{,}00\ \mathrm{dm} \cdot 0{,}0200\ \dfrac{\mathrm{g}}{\mathrm{mL}} = -2{,}1^{\circ}
+\]</span></p>
+<p>Polarimeteret viser 0,00° og ikke −2,1°. Produktet er altså ikke ren (−)-adrenalin. Molekylerne af adrenalin er kirale, så en drejning på 0° betyder, at produktet er en racemisk blanding med lige meget (−)-adrenalin og (+)-adrenalin. De to spejlbilledisomerer drejer lyset lige meget hver sin vej, og drejningerne ophæver hinanden. Det passer med, at adrenalon ikke er kiralt: hydrogenatomet kan sætte sig på carbonatomet i carbonylgruppen fra begge sider, og der dannes lige meget af de to spejlbilledisomerer af adrenalin.</p>
+<ol start="4" type="a">
+<li>DNPH kan bruges. Adrenalon har en carbonylgruppe og er en keton, så adrenalon reagerer med DNPH og giver et gult eller orange bundfald. Adrenalin har ingen carbonylgruppe og giver ikke noget bundfald. Dannes der et bundfald, når produktet testes med DNPH, er der adrenalon tilbage i produktet. Dannes der intet bundfald, har al adrenalon reageret. Jern(III)chlorid kan ikke bruges, fordi både adrenalon og adrenalin har hydroxygrupper på benzenringen og derfor reagerer ens.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="pagination-link" aria-label="A3.5 Optisk aktivitet og polarimeteret">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A3.5 Optisk aktivitet og polarimeteret</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="pagination-link" aria-label="A3.6 Polaritet og log D">
+        <span class="nav-page-text">A3.6 Polaritet og log D</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

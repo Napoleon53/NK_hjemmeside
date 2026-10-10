@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>A1.2 Gasligevægte – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../opgaver/a1-2-opgaver.html" rel="next">
+<link href="../opgaver/a1-1-opgaver.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../kapitler/a1-2-gasligevaegte.html">A1.2 Gasligevægte</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#fra-koncentration-til-partialtryk" id="toc-fra-koncentration-til-partialtryk" class="nav-link active" data-scroll-target="#fra-koncentration-til-partialtryk">Fra koncentration til partialtryk</a></li>
+  <li><a href="#ligevægtsloven-med-partialtryk" id="toc-ligevægtsloven-med-partialtryk" class="nav-link" data-scroll-target="#ligevægtsloven-med-partialtryk">Ligevægtsloven med partialtryk</a></li>
+  <li><a href="#hvilken-vej-går-reaktionen" id="toc-hvilken-vej-går-reaktionen" class="nav-link" data-scroll-target="#hvilken-vej-går-reaktionen">Hvilken vej går reaktionen?</a></li>
+  <li><a href="#heterogene-ligevægte" id="toc-heterogene-ligevægte" class="nav-link" data-scroll-target="#heterogene-ligevægte">Heterogene ligevægte</a></li>
+  <li><a href="#fra-kc-til-kp" id="toc-fra-kc-til-kp" class="nav-link" data-scroll-target="#fra-kc-til-kp">Fra <em>K</em><sub>c</sub> til <em>K</em><sub>p</sub></a></li>
+  <li><a href="#kun-temperaturen-ændrer-kp" id="toc-kun-temperaturen-ændrer-kp" class="nav-link" data-scroll-target="#kun-temperaturen-ændrer-kp">Kun temperaturen ændrer <em>K</em><sub>p</sub></a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../kapitler/a1-2-gasligevaegte.html">A1.2 Gasligevægte</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-a-gasligevaegte" class="quarto-section-identifier">A1.2 Gasligevægte</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Det skal du kunne">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Det skal du kunne
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>opskrive reaktionsbrøken for en gasligevægt med partialtryk</li>
+<li>beregne ligevægtskonstanten ud fra partialtrykkene ved ligevægt og angive dens enhed</li>
+<li>afgøre med <em>Y</em> og <em>K</em><sub>p</sub>, hvilken vej en gasblanding reagerer</li>
+<li>opskrive ligevægtsloven for en heterogen ligevægt</li>
+<li>forklare forskellen på <em>K</em><sub>c</sub> og <em>K</em><sub>p</sub> og regne fra den ene til den anden</li>
+</ul>
+</div>
+</div>
+<p>På en fabrik, der laver ammoniak, måler man ikke koncentrationer i reaktoren. Man måler tryk. Det er meget lettere at sætte et manometer på en beholder end at finde ud af, hvor mange mol der er pr. liter. Derfor skriver man ligevægtsloven for gasser op med partialtryk.</p>
+<section id="fra-koncentration-til-partialtryk" class="level2">
+<h2 class="anchored" data-anchor-id="fra-koncentration-til-partialtryk">Fra koncentration til partialtryk</h2>
+<p>I bogen til B-niveau, <a href="../../b/kapitler/b2-2-ligevaegtsloven.html">afsnit B2.2</a>, skrev du reaktionsbrøken op med koncentrationer. For ligevægten</p>
+<div class="reaktion">
+<p>N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g)</p>
+</div>
+<p>er reaktionsbrøken med koncentrationer</p>
+<p><span class="math display">\[
+Y = \frac{[\mathrm{NO_2}]^{2}}{[\mathrm{N_2O_4}]}
+\]</span></p>
+<p>I <a href="../kapitler/a1-1-partialtryk.html">afsnit A1.1</a> så du, at partialtrykket af en gas er proportionalt med gassens koncentration, når temperaturen er fast. Man kan derfor lige så godt sætte partialtryk ind i brøken:</p>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{NO_2})^{2}}{p(\mathrm{N_2O_4})}
+\]</span></p>
+<p>Reglerne er de samme som før. Produkterne står over brøkstregen, reaktanterne står under, og hvert partialtryk opløftes til stoffets koefficient.</p>
+<div id="fig-a1-kp-broek" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-kp-broek-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-kp-broek.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Reaktionsbrøken med partialtryk skrives af efter reaktionsskemaet."><img src="../figurer/a1-kp-broek.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-kp-broek-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Reaktionsbrøken med partialtryk skrives af efter reaktionsskemaet.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="ligevægtsloven-med-partialtryk" class="level2">
+<h2 class="anchored" data-anchor-id="ligevægtsloven-med-partialtryk">Ligevægtsloven med partialtryk</h2>
+<p>Ved ligevægt har reaktionsbrøken en fast værdi ved en bestemt temperatur. Når brøken er skrevet med partialtryk, kaldes værdien <em>K</em><sub>p</sub>:</p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{NO_2})^{2}}{p(\mathrm{N_2O_4})}
+\]</span></p>
+<p>Ligevægtskonstanten fra B-niveau, som er skrevet med koncentrationer, kaldes <em>K</em><sub>c</sub>, når de to skal holdes ude fra hinanden.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Brøken skrives med</th>
+<th style="text-align: left;">Enhed for N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>K</em><sub>c</sub></td>
+<td style="text-align: left;">stofmængdekoncentrationer</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>K</em><sub>p</sub></td>
+<td style="text-align: left;">partialtryk</td>
+<td style="text-align: left;">bar</td>
+</tr>
+</tbody>
+</table>
+<p>De to konstanter beskriver den samme ligevægt, men de har hver sin talværdi og hver sin enhed.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Enheden afslører konstanten">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Enheden afslører konstanten
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I mange opgaver står der bare <em>K</em>. Se på enheden. Står der bar i enheden, skal ligevægtsloven skrives med partialtryk. Står der M, skal den skrives med koncentrationer.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: beregn ligevægtskonstanten">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: beregn ligevægtskonstanten
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I en lukket beholder ved 25 °C er der ligevægt mellem N<sub>2</sub>O<sub>4</sub> og NO<sub>2</sub>. Partialtrykkene er <em>p</em>(N<sub>2</sub>O<sub>4</sub>) = 0,60 bar og <em>p</em>(NO<sub>2</sub>) = 0,30 bar. Hvad er ligevægtskonstanten?</p>
+<p><strong>Formel</strong></p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{NO_2})^{2}}{p(\mathrm{N_2O_4})}
+\]</span></p>
+<p><strong>Beregning</strong></p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{(0{,}30\ \mathrm{bar})^{2}}{0{,}60\ \mathrm{bar}} = 0{,}15\ \mathrm{bar}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Ligevægtskonstanten er 0,15 bar ved 25 °C.</p>
+</div>
+</div>
+<p>Enheden findes ved at regne med enhederne i brøken, ligesom du gjorde med M i afsnit B2.2.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 36%">
+<col style="width: 46%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Ligevægt</th>
+<th style="text-align: left;">Ligevægtsloven</th>
+<th style="text-align: left;">Enhed for <em>K</em><sub>p</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g)</td>
+<td style="text-align: left;"><span class="math inline">\(K_\mathrm{p} = \dfrac{p(\mathrm{NO_2})^{2}}{p(\mathrm{N_2O_4})}\)</span></td>
+<td style="text-align: left;">bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H<sub>2</sub>(g) + I<sub>2</sub>(g) ⇌ 2 HI(g)</td>
+<td style="text-align: left;"><span class="math inline">\(K_\mathrm{p} = \dfrac{p(\mathrm{HI})^{2}}{p(\mathrm{H_2}) \cdot p(\mathrm{I_2})}\)</span></td>
+<td style="text-align: left;">ingen enhed</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g)</td>
+<td style="text-align: left;"><span class="math inline">\(K_\mathrm{p} = \dfrac{p(\mathrm{NH_3})^{2}}{p(\mathrm{N_2}) \cdot p(\mathrm{H_2})^{3}}\)</span></td>
+<td style="text-align: left;">bar<sup>−2</sup></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="hvilken-vej-går-reaktionen" class="level2">
+<h2 class="anchored" data-anchor-id="hvilken-vej-går-reaktionen">Hvilken vej går reaktionen?</h2>
+<p>Reaktionsbrøken kan regnes ud for enhver gasblanding, også når den ikke er i ligevægt. Sammenligningen med ligevægtskonstanten er den samme som i <a href="../../b/kapitler/b2-4-ikke-ligevaegt.html">afsnit B2.4</a>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Det sker der</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>Y</em> &lt; <em>K</em><sub>p</sub></td>
+<td style="text-align: left;">Reaktionen forløber mod højre, indtil <em>Y</em> = <em>K</em><sub>p</sub>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>Y</em> = <em>K</em><sub>p</sub></td>
+<td style="text-align: left;">Blandingen er i ligevægt.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>Y</em> &gt; <em>K</em><sub>p</sub></td>
+<td style="text-align: left;">Reaktionen forløber mod venstre, indtil <em>Y</em> = <em>K</em><sub>p</sub>.</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: ammoniak i en reaktor">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: ammoniak i en reaktor
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For ligevægten N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g) er <em>K</em><sub>p</sub> = 1,6 · 10<sup>−4</sup> bar<sup>−2</sup> ved 400 °C. En reaktor ved 400 °C indeholder en blanding med partialtrykkene <em>p</em>(N<sub>2</sub>) = 10 bar, <em>p</em>(H<sub>2</sub>) = 30 bar og <em>p</em>(NH<sub>3</sub>) = 5,0 bar. Bliver der dannet mere ammoniak?</p>
+<p><strong>Trin 1: reaktionsbrøken</strong></p>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{NH_3})^{2}}{p(\mathrm{N_2}) \cdot p(\mathrm{H_2})^{3}}
+\]</span></p>
+<p><strong>Trin 2: sæt tallene ind</strong></p>
+<p><span class="math display">\[
+Y = \frac{(5{,}0\ \mathrm{bar})^{2}}{10\ \mathrm{bar} \cdot (30\ \mathrm{bar})^{3}} = 9{,}3 \cdot 10^{-5}\ \mathrm{bar^{-2}}
+\]</span></p>
+<p><strong>Trin 3: sammenlign med ligevægtskonstanten</strong></p>
+<p><em>Y</em> = 9,3 · 10<sup>−5</sup> bar<sup>−2</sup> er mindre end <em>K</em><sub>p</sub> = 1,6 · 10<sup>−4</sup> bar<sup>−2</sup>.</p>
+<p><strong>Konklusion</strong></p>
+<p><em>Y</em> &lt; <em>K</em><sub>p</sub>, så reaktionen forløber mod højre. Der bliver dannet mere ammoniak, indtil reaktionsbrøken er vokset til 1,6 · 10<sup>−4</sup> bar<sup>−2</sup>.</p>
+</div>
+</div>
+</section>
+<section id="heterogene-ligevægte" class="level2">
+<h2 class="anchored" data-anchor-id="heterogene-ligevægte">Heterogene ligevægte</h2>
+<p>I ligevægtene ovenfor er alle stofferne gasser. Når alle stoffer er i samme fase, kaldes ligevægten <strong>homogen</strong>. Er stofferne i mere end én fase, fx et fast stof og en gas, kaldes ligevægten <strong>heterogen</strong>.</p>
+<p>Når kalk brændes til brændt kalk, er to af de tre stoffer faste:</p>
+<div class="reaktion">
+<p>CaCO<sub>3</sub>(s) ⇌ CaO(s) + CO<sub>2</sub>(g)</p>
+</div>
+<p>Faste stoffer er ikke med i reaktionsbrøken. Det lærte du i afsnit B2.2. Et fast stof er lige tæt pakket, uanset om der er lidt eller meget af det, så det har ikke en koncentration, der kan ændre sig. Det samme gælder en ren væske. Ligevægtsloven for kalkbrændingen er derfor meget kort:</p>
+<p><span class="math display">\[
+K_\mathrm{p} = p(\mathrm{CO_2})
+\]</span></p>
+<p>Ved 800 °C er <em>K</em><sub>p</sub> = 0,24 bar. I en lukket ovn ved 800 °C bliver partialtrykket af CO<sub>2</sub> altså 0,24 bar, og det er lige meget, om der ligger 1 gram eller 1 ton kalk i ovnen. Der skal bare være noget af begge de faste stoffer.</p>
+<div id="fig-a1-heterogen" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-heterogen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-heterogen.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Partialtrykket af carbondioxid over kalken afhænger ikke af, hvor meget fast stof der er."><img src="../figurer/a1-heterogen.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-heterogen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Partialtrykket af carbondioxid over kalken afhænger ikke af, hvor meget fast stof der er.
+</figcaption>
+</figure>
+</div>
+<div class="callout callout-style-default callout-important callout-titled" title="Reglen for heterogene ligevægte">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Reglen for heterogene ligevægte
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Kun gasser, mærket (g), og opløste stoffer, mærket (aq), er med i reaktionsbrøken. Faste stoffer, mærket (s), og rene væsker, mærket (l), er ikke med.</p>
+</div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 56%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Heterogen ligevægt</th>
+<th style="text-align: left;">Ligevægtsloven</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">CaCO<sub>3</sub>(s) ⇌ CaO(s) + CO<sub>2</sub>(g)</td>
+<td style="text-align: left;"><span class="math inline">\(K_\mathrm{p} = p(\mathrm{CO_2})\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C(s) + CO<sub>2</sub>(g) ⇌ 2 CO(g)</td>
+<td style="text-align: left;"><span class="math inline">\(K_\mathrm{p} = \dfrac{p(\mathrm{CO})^{2}}{p(\mathrm{CO_2})}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NH<sub>4</sub>Cl(s) ⇌ NH<sub>3</sub>(g) + HCl(g)</td>
+<td style="text-align: left;"><span class="math inline">\(K_\mathrm{p} = p(\mathrm{NH_3}) \cdot p(\mathrm{HCl})\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H<sub>2</sub>O(l) ⇌ H<sub>2</sub>O(g)</td>
+<td style="text-align: left;"><span class="math inline">\(K_\mathrm{p} = p(\mathrm{H_2O})\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Den sidste linje i tabellen er vand, der fordamper i en lukket beholder. Ligevægtskonstanten er vanddampens partialtryk over vandet. Det kaldes vands damptryk og er 0,032 bar ved 25 °C.</p>
+<p>Du kender allerede to andre slags heterogene ligevægte. Opløselighedsligevægten mellem et fast salt og dets ioner i vand er heterogen. Den vender tilbage i <a href="../kapitler/a1-5-oploeselighedsligevaegte.html">afsnit A1.5</a>. Fordelingsligevægten, hvor et stof fordeler sig mellem vand og octan-1-ol, er også heterogen, fordi der er to væskelag. Den står i <a href="../../b/kapitler/b8-4-log-p-og-log-d.html">afsnit B8.4</a>.</p>
+</section>
+<section id="fra-kc-til-kp" class="level2">
+<h2 class="anchored" data-anchor-id="fra-kc-til-kp">Fra <em>K</em><sub>c</sub> til <em>K</em><sub>p</sub></h2>
+<p>Nogle gange kender man <em>K</em><sub>c</sub>, men skal regne med partialtryk, eller omvendt. Sammenhængen findes ved at sætte <em>p</em>(A) = [A] · <em>R</em> · <em>T</em> ind i brøken. For N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g) giver det</p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{NO_2})^{2}}{p(\mathrm{N_2O_4})} = \frac{\left([\mathrm{NO_2}] \cdot R \cdot T\right)^{2}}{[\mathrm{N_2O_4}] \cdot R \cdot T} = \frac{[\mathrm{NO_2}]^{2}}{[\mathrm{N_2O_4}]} \cdot R \cdot T = K_\mathrm{c} \cdot R \cdot T
+\]</span></p>
+<p>Der står <em>R</em> · <em>T</em> to gange over brøkstregen og én gang under. Derfor bliver der ét <em>R</em> · <em>T</em> tilbage. For enhver gasligevægt gælder</p>
+<p><span class="math display">\[
+K_\mathrm{p} = K_\mathrm{c} \cdot (R \cdot T)^{\Delta n}
+\]</span></p>
+<p>Her er Δ<em>n</em> antallet af gasmolekyler til højre i reaktionsskemaet minus antallet til venstre. For N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g) er Δ<em>n</em> = 2 − 1 = 1. Er der lige mange gasmolekyler på begge sider, er Δ<em>n</em> = 0, og så har <em>K</em><sub>p</sub> og <em>K</em><sub>c</sub> samme værdi.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: fra partialtryk til koncentrationer">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Eksempel: fra partialtryk til koncentrationer
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g) er <em>K</em><sub>p</sub> = 0,15 bar ved 25 °C. Hvad er <em>K</em><sub>c</sub>?</p>
+<p><strong>Kendte størrelser</strong></p>
+<p><em>K</em><sub>p</sub> = 0,15 bar, <em>T</em> = (273 + 25) K = 298 K og Δ<em>n</em> = 1</p>
+<p><strong>Beregning</strong></p>
+<p>Formlen løses for <em>K</em><sub>c</sub>:</p>
+<p><span class="math display">\[
+K_\mathrm{c} = \frac{K_\mathrm{p}}{R \cdot T} = \frac{0{,}15\ \mathrm{bar}}{0{,}0831\ \dfrac{\mathrm{L \cdot bar}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K}} = 6{,}1 \cdot 10^{-3}\ \dfrac{\mathrm{mol}}{\mathrm{L}}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p><em>K</em><sub>c</sub> er 6,1 · 10<sup>−3</sup> M ved 25 °C.</p>
+</div>
+</div>
+</section>
+<section id="kun-temperaturen-ændrer-kp" class="level2">
+<h2 class="anchored" data-anchor-id="kun-temperaturen-ændrer-kp">Kun temperaturen ændrer <em>K</em><sub>p</sub></h2>
+<p>Alt det, du lærte om ligevægtskonstanten på B-niveau, gælder også for <em>K</em><sub>p</sub>. En stor <em>K</em><sub>p</sub> betyder, at ligevægten er forskudt mod højre. Tryk, rumfang og katalysatorer ændrer ikke <em>K</em><sub>p</sub>. Det gør kun temperaturen, så temperaturen skal altid oplyses sammen med konstanten.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Til den skriftlige prøve">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Vigtigt</span>Til den skriftlige prøve
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Skriv ligevægtsloven op med formler, før du sætter tal ind.</li>
+<li>Brug partialtryk, når konstanten har bar i enheden, og koncentrationer, når den har M.</li>
+<li>Lad faste stoffer og rene væsker ude af brøken, og skriv, at du gør det.</li>
+<li>Skriv enheden på ligevægtskonstanten.</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Prøv selv
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sb2.1_ligevaegtsloven/index.html">Ligevægtsloven</a> kan du bygge reaktionsbrøken for tolv reaktioner. Animationen bruger koncentrationer, men reglerne for brøken er de samme, når den skrives med partialtryk.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Kort sagt
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>For gasser kan reaktionsbrøken skrives med partialtryk i stedet for koncentrationer.</li>
+<li>Ligevægtskonstanten hedder <em>K</em><sub>p</sub>, når den er skrevet med partialtryk, og <em>K</em><sub>c</sub>, når den er skrevet med koncentrationer.</li>
+<li>Enheden for <em>K</em><sub>p</sub> findes ved at regne med bar i brøken.</li>
+<li>Er <em>Y</em> mindre end <em>K</em><sub>p</sub>, forløber reaktionen mod højre. Er <em>Y</em> større, forløber den mod venstre.</li>
+<li>I en heterogen ligevægt er faste stoffer og rene væsker ikke med i reaktionsbrøken.</li>
+<li>Sammenhængen mellem de to konstanter er <em>K</em><sub>p</sub> = <em>K</em><sub>c</sub> · (<em>R</em> · <em>T</em>)<sup>Δ<em>n</em></sup>.</li>
+</ul>
+</div>
+</div>
+<div class="til-opgaver">
+<p><strong>Opgaver:</strong> <a href="../opgaver/a1-2-opgaver.html">Opgaver til A1.2</a> har både almindelige opgaver og opgaver i eksamensstil.</p>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../opgaver/a1-1-opgaver.html" class="pagination-link" aria-label="Opgaver til A1.1">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Opgaver til A1.1</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../opgaver/a1-2-opgaver.html" class="pagination-link" aria-label="Opgaver til A1.2">
+        <span class="nav-page-text">Opgaver til A1.2</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

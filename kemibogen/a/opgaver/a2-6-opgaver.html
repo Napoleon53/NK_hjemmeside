@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A2.6 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a3-1-elementaranalyse.html" rel="next">
+<link href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-6-opgaver.html">Opgaver til A2.6</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a2.6.1-ioddamp-over-fast-iod" id="toc-opgave-a2.6.1-ioddamp-over-fast-iod" class="nav-link active" data-scroll-target="#opgave-a2.6.1-ioddamp-over-fast-iod">Opgave A2.6.1: Ioddamp over fast iod</a></li>
+  <li><a href="#opgave-a2.6.2-chlor-af-hydrogenchlorid" id="toc-opgave-a2.6.2-chlor-af-hydrogenchlorid" class="nav-link" data-scroll-target="#opgave-a2.6.2-chlor-af-hydrogenchlorid">Opgave A2.6.2: Chlor af hydrogenchlorid</a></li>
+  <li><a href="#opgave-a2.6.3-to-linjer" id="toc-opgave-a2.6.3-to-linjer" class="nav-link" data-scroll-target="#opgave-a2.6.3-to-linjer">Opgave A2.6.3: To linjer</a></li>
+  <li><a href="#opgave-a2.6.4-ethen-af-ethan" id="toc-opgave-a2.6.4-ethen-af-ethan" class="nav-link" data-scroll-target="#opgave-a2.6.4-ethen-af-ethan">Opgave A2.6.4: Ethen af ethan</a></li>
+  <li><a href="#opgave-a2.6.5-den-brune-gas" id="toc-opgave-a2.6.5-den-brune-gas" class="nav-link" data-scroll-target="#opgave-a2.6.5-den-brune-gas">Opgave A2.6.5: Den brune gas</a></li>
+  <li><a href="#opgave-a2.6.6-ammoniumchlorid-i-varmen" id="toc-opgave-a2.6.6-ammoniumchlorid-i-varmen" class="nav-link" data-scroll-target="#opgave-a2.6.6-ammoniumchlorid-i-varmen">Opgave A2.6.6: Ammoniumchlorid i varmen</a></li>
+  <li><a href="#opgave-a2.6.7-læsket-kalk" id="toc-opgave-a2.6.7-læsket-kalk" class="nav-link" data-scroll-target="#opgave-a2.6.7-læsket-kalk">Opgave A2.6.7: Læsket kalk</a></li>
+  <li><a href="#opgave-a2.6.8-holder-antagelsen" id="toc-opgave-a2.6.8-holder-antagelsen" class="nav-link" data-scroll-target="#opgave-a2.6.8-holder-antagelsen">Opgave A2.6.8: Holder antagelsen?</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a2.6.eks.1-methanol-af-carbonmonoxid-og-hydrogen" id="toc-opgave-a2.6.eks.1-methanol-af-carbonmonoxid-og-hydrogen" class="nav-link" data-scroll-target="#opgave-a2.6.eks.1-methanol-af-carbonmonoxid-og-hydrogen">Opgave A2.6.eks.1: Methanol af carbonmonoxid og hydrogen</a></li>
+  <li><a href="#opgave-a2.6.eks.2-zink-af-zinkoxid" id="toc-opgave-a2.6.eks.2-zink-af-zinkoxid" class="nav-link" data-scroll-target="#opgave-a2.6.eks.2-zink-af-zinkoxid">Opgave A2.6.eks.2: Zink af zinkoxid</a></li>
+  <li><a href="#opgave-a2.6.eks.3-trykkogeren" id="toc-opgave-a2.6.eks.3-trykkogeren" class="nav-link" data-scroll-target="#opgave-a2.6.eks.3-trykkogeren">Opgave A2.6.eks.3: Trykkogeren</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-6-opgaver.html">Opgaver til A2.6</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A2.6</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html">A2.6 Ligevægtskonstanten og temperaturen</a>. Prøv selv, før du åbner hjælpen under opgaven. Du skal bruge et regneark eller et CAS-værktøj til den lineære regression.</p>
+<section id="opgave-a2.6.1-ioddamp-over-fast-iod" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.1-ioddamp-over-fast-iod">Opgave A2.6.1: Ioddamp over fast iod</h2>
+<p>Fast iod, I<sub>2</sub>, afgiver en violet damp, når det varmes op. I en lukket beholder indstiller der sig en ligevægt mellem fast iod og ioddamp:</p>
+<div class="reaktion">
+<p>I<sub>2</sub>(s) ⇌ I<sub>2</sub>(g)</p>
+</div>
+<p>For reaktionen er Δ<em>H</em><sup>⊖</sup> = 62,4 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 144,6 J/(mol · K).</p>
+<ol type="a">
+<li>Beregn ln <em>K</em> ved 80 °C med van ’t Hoff-ligningen.</li>
+<li>Beregn ligevægtskonstanten ved 80 °C.</li>
+<li>Opskriv ligevægtsloven, og angiv partialtrykket af ioddamp over fast iod ved 80 °C.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug van ’t Hoff-ligningen, ln <em>K</em> = −Δ<em>H</em><sup>⊖</sup> / <em>R</em> · 1/<em>T</em> + Δ<em>S</em><sup>⊖</sup> / <em>R</em>, på ligevægten mellem fast iod og ioddamp. Regn temperaturen om til kelvin, og regn Δ<em>H</em><sup>⊖</sup> om til J/mol, så enheden passer med <em>R</em> = 8,314 J/(mol · K).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>T</em> = (273 + 80) K = 353 K, og Δ<em>H</em><sup>⊖</sup> = 62,4 kJ/mol = 62 400 J/mol. De to led i van ’t Hoff-ligningen bliver −21,26 og 17,39. Læg dem sammen, og brug derefter funktionen e<sup>x</sup> på lommeregneren eller i CAS-værktøjet til at finde ligevægtskonstanten. Fast iod er ikke med i ligevægtsloven, så <em>K</em><sub>p</sub> = <em>p</em>(I<sub>2</sub>).</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Kendte størrelser for I<sub>2</sub>(s) ⇌ I<sub>2</sub>(g): Δ<em>H</em><sup>⊖</sup> = 62,4 kJ/mol = 62 400 J/mol, Δ<em>S</em><sup>⊖</sup> = 144,6 J/(mol · K), <em>R</em> = 8,314 J/(mol · K) og <em>T</em> = (273 + 80) K = 353 K.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta H^{\ominus}}{R} \cdot \frac{1}{T} + \frac{\Delta S^{\ominus}}{R}
+\]</span></p>
+<p><span class="math display">\[
+\ln K = -\frac{62\,400\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 353\ \mathrm{K}} + \frac{144{,}6\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}} = -3{,}869
+\]</span></p>
+<ol start="2" type="a">
+<li>Ligevægtskonstanten er</li>
+</ol>
+<p><span class="math display">\[
+K = e^{-3{,}869} = 0{,}021
+\]</span></p>
+<ol start="3" type="a">
+<li>Fast iod er ikke med i reaktionsbrøken, så ligevægtsloven er <em>K</em><sub>p</sub> = <em>p</em>(I<sub>2</sub>). Enheden er bar. Partialtrykket af ioddamp over fast iod er derfor 0,021 bar ved 80 °C.</li>
+</ol>
+<p>Beregningen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen. Ved 25 °C giver den samme beregning 4,1 · 10<sup>−4</sup> bar. Reaktionen er endoterm, så opvarmning forskyder ligevægten mod højre, og der kommer mere ioddamp.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.2-chlor-af-hydrogenchlorid" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.2-chlor-af-hydrogenchlorid">Opgave A2.6.2: Chlor af hydrogenchlorid</h2>
+<p>Hydrogenchlorid er et biprodukt i den kemiske industri. Med oxygen kan hydrogenchlorid laves om til chlor:</p>
+<div class="reaktion">
+<p>4 HCl(g) + O<sub>2</sub>(g) ⇌ 2 Cl<sub>2</sub>(g) + 2 H<sub>2</sub>O(g)</p>
+</div>
+<p>En graf over ln <em>K</em> som funktion af 1/<em>T</em> for reaktionen er en ret linje med forskriften</p>
+<p><span class="math display">\[
+\ln K = 1{,}376 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{T} - 15{,}52
+\]</span></p>
+<ol type="a">
+<li>Angiv hældningen <em>a</em> og skæringen <em>b</em> i forskriften.</li>
+<li>Bestem Δ<em>H</em><sup>⊖</sup> for reaktionen i kJ/mol.</li>
+<li>Bestem Δ<em>S</em><sup>⊖</sup> for reaktionen i J/(mol · K).</li>
+<li>Forklar, hvordan fortegnene på Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> passer med grafen og med reaktionsskemaet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign forskriften for reaktionen mellem hydrogenchlorid og oxygen med van ’t Hoff-ligningen, ln <em>K</em> = −Δ<em>H</em><sup>⊖</sup> / <em>R</em> · 1/<em>T</em> + Δ<em>S</em><sup>⊖</sup> / <em>R</em>. Tallet foran 1/<em>T</em> er hældningen <em>a</em>, og det sidste tal er skæringen <em>b</em>. Så er Δ<em>H</em><sup>⊖</sup> = −<em>a</em> · <em>R</em> og Δ<em>S</em><sup>⊖</sup> = <em>b</em> · <em>R</em>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I forskriften for reaktionen mellem hydrogenchlorid og oxygen er hældningen <em>a</em> = 1,376 · 10<sup>4</sup> K, og skæringen er <em>b</em> = −15,52. Husk minusset i Δ<em>H</em><sup>⊖</sup> = −<em>a</em> · <em>R</em>. Resultatet kommer i J/mol og skal divideres med 1000 for at blive til kJ/mol.</p>
+<p>Du kan begynde forklaringen sådan: “Hældningen er positiv, så linjen … mod højre, og Δ<em>H</em><sup>⊖</sup> er … Reaktionen er altså … I reaktionsskemaet er der … gasmolekyler til venstre og … til højre, så entropien …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>I forskriften for 4 HCl(g) + O<sub>2</sub>(g) ⇌ 2 Cl<sub>2</sub>(g) + 2 H<sub>2</sub>O(g) er hældningen <em>a</em> = 1,376 · 10<sup>4</sup> K, og skæringen med <em>y</em>-aksen er <em>b</em> = −15,52. Skæringen har ingen enhed.</p></li>
+<li><p>Tilvæksten i entalpi er</p></li>
+</ol>
+<p><span class="math display">\[
+\Delta H^{\ominus} = -a \cdot R = -1{,}376 \cdot 10^{4}\ \mathrm{K} \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = -1{,}144 \cdot 10^{5}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = −114,4 kJ/mol.</p>
+<ol start="3" type="a">
+<li>Tilvæksten i entropi er</li>
+</ol>
+<p><span class="math display">\[
+\Delta S^{\ominus} = b \cdot R = -15{,}52 \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = -129{,}0\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}
+\]</span></p>
+<ol start="4" type="a">
+<li>Hældningen er positiv, så linjen stiger mod højre. En positiv hældning betyder en negativ Δ<em>H</em><sup>⊖</sup>, og reaktionen mellem hydrogenchlorid og oxygen er altså exoterm. I reaktionsskemaet er der 4 + 1 = 5 gasmolekyler til venstre og 2 + 2 = 4 til højre. Der bliver færre gasmolekyler, så entropien falder, og det passer med, at Δ<em>S</em><sup>⊖</sup> er negativ.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.3-to-linjer" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.3-to-linjer">Opgave A2.6.3: To linjer</h2>
+<p>Figuren viser ln <em>K</em> som funktion af 1/<em>T</em> for to reaktioner, reaktion A og reaktion B.</p>
+<div id="fig-a2-opg-6-to-linjer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a2-opg-6-to-linjer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a2-opg-6-to-linjer.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Figuren viser ln K som funktion af 1/T for reaktion A og reaktion B."><img src="../figurer/a2-opg-6-to-linjer.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a2-opg-6-to-linjer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Figuren viser ln <em>K</em> som funktion af 1/<em>T</em> for reaktion A og reaktion B.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Hvilken af de to reaktioner er exoterm, og hvilken er endoterm? Begrund svaret.</li>
+<li>Hvad sker der med ligevægtskonstanten for hver af de to reaktioner, når temperaturen stiger?</li>
+<li>Aflæs ln <em>K</em> for reaktion A ved 500 K, og beregn ligevægtskonstanten.</li>
+<li>Aflæs to punkter på linjen for reaktion B, beregn hældningen, og bestem Δ<em>H</em><sup>⊖</sup> for reaktion B.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på, om linjen for reaktion A og linjen for reaktion B stiger eller falder mod højre. Hældningen er <em>a</em> = −Δ<em>H</em><sup>⊖</sup> / <em>R</em>, så en positiv hældning betyder en negativ Δ<em>H</em><sup>⊖</sup>. Husk, at <em>x</em>-aksen viser 1/<em>T</em>: en høj temperatur ligger til venstre i figuren.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>500 K svarer til 1/<em>T</em> = 1/(500 K) = 2,0 · 10<sup>−3</sup> K<sup>−1</sup>. Find den værdi på <em>x</em>-aksen, og gå op til linjen for reaktion A. Til hældningen for reaktion B kan du bruge de to yderste punkter. Hældningen er forskellen i ln <em>K</em> divideret med forskellen i 1/<em>T</em>.</p>
+<p>Du kan begynde begrundelsen sådan: “Linjen for reaktion A … mod højre, så hældningen er …, og Δ<em>H</em><sup>⊖</sup> er … Reaktion A er derfor …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Linjen for reaktion A stiger mod højre, så hældningen er positiv. Hældningen er −Δ<em>H</em><sup>⊖</sup> / <em>R</em>, så Δ<em>H</em><sup>⊖</sup> er negativ, og reaktion A er exoterm. Linjen for reaktion B falder mod højre, så hældningen er negativ. Δ<em>H</em><sup>⊖</sup> er derfor positiv, og reaktion B er endoterm.</p></li>
+<li><p>Når temperaturen stiger, bliver 1/<em>T</em> mindre, og man bevæger sig mod venstre i figuren. For reaktion A bliver ln <em>K</em> mindre mod venstre, så ligevægtskonstanten bliver mindre, når temperaturen stiger. For reaktion B bliver ln <em>K</em> større mod venstre, så ligevægtskonstanten bliver større, når temperaturen stiger. Det passer med reglen fra B-niveau: opvarmning forskyder en ligevægt i den endoterme retning.</p></li>
+<li><p>500 K svarer til 1/<em>T</em> = 1/(500 K) = 2,0 · 10<sup>−3</sup> K<sup>−1</sup>. Ved den værdi aflæses ln <em>K</em> = 4,0 på linjen for reaktion A.</p></li>
+</ol>
+<p><span class="math display">\[
+K = e^{4{,}0} = 55
+\]</span></p>
+<p>Ligevægtskonstanten for reaktion A er 55 ved 500 K.</p>
+<ol start="4" type="a">
+<li>På linjen for reaktion B aflæses punkterne (1,0 · 10<sup>−3</sup> K<sup>−1</sup>; 3,0) og (2,0 · 10<sup>−3</sup> K<sup>−1</sup>; −1,0).</li>
+</ol>
+<p><span class="math display">\[
+a = \frac{-1{,}0 - 3{,}0}{2{,}0 \cdot 10^{-3}\ \mathrm{K^{-1}} - 1{,}0 \cdot 10^{-3}\ \mathrm{K^{-1}}} = -4{,}0 \cdot 10^{3}\ \mathrm{K}
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = -a \cdot R = -(-4{,}0 \cdot 10^{3}\ \mathrm{K}) \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = 3{,}3 \cdot 10^{4}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p>For reaktion B er Δ<em>H</em><sup>⊖</sup> = 33 kJ/mol. Den er positiv, og det passer med, at reaktion B er endoterm.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.4-ethen-af-ethan" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.4-ethen-af-ethan">Opgave A2.6.4: Ethen af ethan</h2>
+<p>Ethen til plast fremstilles ved at varme ethan op til en høj temperatur:</p>
+<div class="reaktion">
+<p>C<sub>2</sub>H<sub>6</sub>(g) ⇌ C<sub>2</sub>H<sub>4</sub>(g) + H<sub>2</sub>(g)</p>
+</div>
+<p>Tabellen viser ligevægtskonstanten ved fem temperaturer.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><em>T</em> i K</th>
+<th style="text-align: center;"><em>K</em><sub>p</sub> i bar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">900</td>
+<td style="text-align: center;">0,0246</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1000</td>
+<td style="text-align: center;">0,152</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1100</td>
+<td style="text-align: center;">0,681</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1200</td>
+<td style="text-align: center;">2,36</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1300</td>
+<td style="text-align: center;">6,78</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn 1/<em>T</em> og ln <em>K</em> for hver af de fem temperaturer.</li>
+<li>Afbild ln <em>K</em> som funktion af 1/<em>T</em> i et regneark, og find forskriften for linjen ved lineær regression.</li>
+<li>Bestem Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> for reaktionen.</li>
+<li>Kommentér fortegnene på Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup>.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Følg de fem trin i afsnit A2.6 under overskriften “Fra graf til Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup>”. Skriv tabellen for dannelsen af ethen af ethan ind i et regneark, og lav to nye kolonner, én med 1/<em>T</em> og én med ln <em>K</em>. Lad regnearket regne de to kolonner ud, så alle cifre kommer med i regressionen.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I tabellen for dannelsen af ethen af ethan er <em>K</em><sub>p</sub> = 0,0246 bar ved 900 K. Så er 1/<em>T</em> = 1,111 · 10<sup>−3</sup> K<sup>−1</sup> og ln <em>K</em> = ln(0,0246) = −3,71. I regnearket skal 1/<em>T</em> være <em>x</em>-værdier, og ln <em>K</em> skal være <em>y</em>-værdier. Hældningen bliver cirka −1,64 · 10<sup>4</sup> K. Brug Δ<em>H</em><sup>⊖</sup> = −<em>a</em> · <em>R</em> og Δ<em>S</em><sup>⊖</sup> = <em>b</em> · <em>R</em>.</p>
+<p>Du kan begynde kommentaren sådan: “Δ<em>H</em><sup>⊖</sup> er …, så reaktionen er … Det passer med, at linjen … Δ<em>S</em><sup>⊖</sup> er …, og det passer med, at ét gasmolekyle bliver til …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Ligevægtskonstanten for C<sub>2</sub>H<sub>6</sub>(g) ⇌ C<sub>2</sub>H<sub>4</sub>(g) + H<sub>2</sub>(g) sættes ind i ln <em>K</em> som tal uden enhed.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><em>T</em> i K</th>
+<th style="text-align: center;"><em>K</em><sub>p</sub> i bar</th>
+<th style="text-align: center;">1/<em>T</em> i K<sup>−1</sup></th>
+<th style="text-align: center;">ln <em>K</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">900</td>
+<td style="text-align: center;">0,0246</td>
+<td style="text-align: center;">1,111 · 10<sup>−3</sup></td>
+<td style="text-align: center;">−3,71</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1000</td>
+<td style="text-align: center;">0,152</td>
+<td style="text-align: center;">1,000 · 10<sup>−3</sup></td>
+<td style="text-align: center;">−1,88</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1100</td>
+<td style="text-align: center;">0,681</td>
+<td style="text-align: center;">0,9091 · 10<sup>−3</sup></td>
+<td style="text-align: center;">−0,38</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1200</td>
+<td style="text-align: center;">2,36</td>
+<td style="text-align: center;">0,8333 · 10<sup>−3</sup></td>
+<td style="text-align: center;">0,86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1300</td>
+<td style="text-align: center;">6,78</td>
+<td style="text-align: center;">0,7692 · 10<sup>−3</sup></td>
+<td style="text-align: center;">1,91</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li>Lineær regression på de fem punkter giver forskriften</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -1{,}644 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{T} + 14{,}56
+\]</span></p>
+<p>Her er <em>y</em> = ln <em>K</em> og <em>x</em> = 1/<em>T</em>. Hældningen er <em>a</em> = −1,644 · 10<sup>4</sup> K, og skæringen er <em>b</em> = 14,56. Tabellen ovenfor viser afrundede tal. Taster du dem ind i stedet for at lade regnearket regne 1/<em>T</em> og ln <em>K</em> ud, kan de sidste cifre i forskriften blive lidt anderledes.</p>
+<ol start="3" type="a">
+<li>Tilvæksten i entalpi er</li>
+</ol>
+<p><span class="math display">\[
+\Delta H^{\ominus} = -a \cdot R = -(-1{,}644 \cdot 10^{4}\ \mathrm{K}) \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = 1{,}367 \cdot 10^{5}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p>Tilvæksten i entropi er</p>
+<p><span class="math display">\[
+\Delta S^{\ominus} = b \cdot R = 14{,}56 \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = 121{,}1\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = 136,7 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 121,1 J/(mol · K).</p>
+<ol start="4" type="a">
+<li>Δ<em>H</em><sup>⊖</sup> er positiv, så dannelsen af ethen af ethan er endoterm. Det passer med, at linjen falder mod højre, og med at ligevægtskonstanten vokser, når temperaturen stiger. Δ<em>S</em><sup>⊖</sup> er positiv, så entropien stiger. Det passer med reaktionsskemaet, hvor ét gasmolekyle bliver til to. Bestemmelsen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> er de samme ved alle fem temperaturer. Tabelværdierne giver 136,4 kJ/mol og 120,8 J/(mol · K).</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.5-den-brune-gas" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.5-den-brune-gas">Opgave A2.6.5: Den brune gas</h2>
+<p>Nitrogendioxid, NO<sub>2</sub>, er en brun gas. Ved høj temperatur spaltes nitrogendioxid til to farveløse gasser:</p>
+<div class="reaktion">
+<p>2 NO<sub>2</sub>(g) ⇌ 2 NO(g) + O<sub>2</sub>(g)</p>
+</div>
+<p>I en graf over ln <em>K</em> som funktion af 1/<em>T</em> for reaktionen har linjen forskriften</p>
+<p><span class="math display">\[
+\ln K = -1{,}398 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{T} + 17{,}63
+\]</span></p>
+<ol type="a">
+<li>Beregn ln <em>K</em> ved 450 °C.</li>
+<li>Beregn ligevægtskonstanten ved 450 °C, og angiv enheden.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Forskriften for spaltningen af NO<sub>2</sub> skal have temperaturen i kelvin. Regn først 450 °C om til kelvin, og sæt derefter <em>T</em> ind i forskriften.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>T</em> = (273 + 450) K = 723 K. Det første led i forskriften bliver −1,398 · 10<sup>4</sup> K / 723 K = −19,34. Ligevægtskonstanten for spaltningen af NO<sub>2</sub> er e opløftet til ln <em>K</em>. Enheden får du af ligevægtsloven <em>K</em><sub>p</sub> = <em>p</em>(NO)<sup>2</sup> · <em>p</em>(O<sub>2</sub>) / <em>p</em>(NO<sub>2</sub>)<sup>2</sup>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Temperaturen regnes om til kelvin: <em>T</em> = (273 + 450) K = 723 K. Den sættes ind i forskriften for spaltningen af NO<sub>2</sub>.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -1{,}398 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{723\ \mathrm{K}} + 17{,}63 = -1{,}706
+\]</span></p>
+<ol start="2" type="a">
+<li>Ligevægtskonstanten er</li>
+</ol>
+<p><span class="math display">\[
+K = e^{-1{,}706} = 0{,}18
+\]</span></p>
+<p>Ligevægtsloven er</p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{NO})^{2} \cdot p(\mathrm{O_2})}{p(\mathrm{NO_2})^{2}}
+\]</span></p>
+<p>Der står bar<sup>2</sup> · bar over brøkstregen og bar<sup>2</sup> under, så enheden er bar. Ligevægtskonstanten for spaltningen af NO<sub>2</sub> er <em>K</em><sub>p</sub> = 0,18 bar ved 450 °C.</p>
+<p>Sætter man 450 ind i forskriften uden at regne om til kelvin, får man ln <em>K</em> = −13,44 og <em>K</em> = 1,5 · 10<sup>−6</sup>. Det er forkert. Tjek altid, om temperaturen er opgivet i kelvin eller i grader celsius.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.6-ammoniumchlorid-i-varmen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.6-ammoniumchlorid-i-varmen">Opgave A2.6.6: Ammoniumchlorid i varmen</h2>
+<p>Ammoniumchlorid, NH<sub>4</sub>Cl, er et hvidt salt. Varmes saltet op, spaltes det til to gasser:</p>
+<div class="reaktion">
+<p>NH<sub>4</sub>Cl(s) ⇌ NH<sub>3</sub>(g) + HCl(g)</p>
+</div>
+<p>En graf over Δ<em>G</em><sup>⊖</sup> som funktion af <em>T</em> for reaktionen er en ret linje med forskriften</p>
+<p><span class="math display">\[
+\Delta G^{\ominus} = -0{,}2851\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot T + 176{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<ol type="a">
+<li>Bestem Δ<em>S</em><sup>⊖</sup> for reaktionen i J/(mol · K).</li>
+<li>Bestem Δ<em>H</em><sup>⊖</sup> for reaktionen.</li>
+<li>Beregn den temperatur, hvor Δ<em>G</em><sup>⊖</sup> = 0.</li>
+<li>Hvad er ligevægtskonstanten ved den temperatur, hvor Δ<em>G</em><sup>⊖</sup> = 0, og hvad sker der med ligevægtskonstanten ved højere temperaturer?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign forskriften for spaltningen af ammoniumchlorid med Δ<em>G</em><sup>⊖</sup> = Δ<em>H</em><sup>⊖</sup> − <em>T</em> · Δ<em>S</em><sup>⊖</sup>. Hældningen er −Δ<em>S</em><sup>⊖</sup>, og skæringen med <em>y</em>-aksen er Δ<em>H</em><sup>⊖</sup>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I forskriften for spaltningen af ammoniumchlorid er hældningen <em>a</em> = −0,2851 kJ/(mol · K), så Δ<em>S</em><sup>⊖</sup> = 0,2851 kJ/(mol · K). Gang med 1000 for at få J/(mol · K). Når Δ<em>G</em><sup>⊖</sup> = 0, er <em>T</em> = Δ<em>H</em><sup>⊖</sup> / Δ<em>S</em><sup>⊖</sup>, og de to tal skal have samme energienhed. Til spørgsmål d kan du sætte Δ<em>G</em><sup>⊖</sup> = 0 ind i Δ<em>G</em><sup>⊖</sup> = −<em>R</em> · <em>T</em> · ln <em>K</em>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>I en graf over Δ<em>G</em><sup>⊖</sup> som funktion af <em>T</em> er hældningen <em>a</em> = −Δ<em>S</em><sup>⊖</sup>. For spaltningen af ammoniumchlorid er Δ<em>S</em><sup>⊖</sup> = −<em>a</em> = 0,2851 kJ/(mol · K) = 285,1 J/(mol · K). Δ<em>S</em><sup>⊖</sup> er positiv, og det passer med reaktionsskemaet: der er ingen gasmolekyler til venstre og to til højre.</p></li>
+<li><p>Skæringen med <em>y</em>-aksen er <em>b</em> = Δ<em>H</em><sup>⊖</sup>. Altså er Δ<em>H</em><sup>⊖</sup> = 176,2 kJ/mol. Spaltningen af ammoniumchlorid er endoterm.</p></li>
+<li><p>Når Δ<em>G</em><sup>⊖</sup> = 0, er</p></li>
+</ol>
+<p><span class="math display">\[
+T = \frac{\Delta H^{\ominus}}{\Delta S^{\ominus}} = \frac{176{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}}{0{,}2851\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}}} = 618\ \mathrm{K}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> = 0 ved 618 K. Det svarer til 345 °C.</p>
+<ol start="4" type="a">
+<li>Sættes Δ<em>G</em><sup>⊖</sup> = 0 ind i Δ<em>G</em><sup>⊖</sup> = −<em>R</em> · <em>T</em> · ln <em>K</em>, får man ln <em>K</em> = 0 og dermed <em>K</em> = 1. Ligevægtsloven er <em>K</em><sub>p</sub> = <em>p</em>(NH<sub>3</sub>) · <em>p</em>(HCl), så ved 618 K er <em>K</em><sub>p</sub> = 1 bar<sup>2</sup>. Ved højere temperaturer er Δ<em>G</em><sup>⊖</sup> negativ, og ligevægtskonstanten er større end 1. Ligevægtskonstanten vokser med temperaturen, fordi spaltningen af ammoniumchlorid er endoterm.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.7-læsket-kalk" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.7-læsket-kalk">Opgave A2.6.7: Læsket kalk</h2>
+<p>Læsket kalk er calciumhydroxid, Ca(OH)<sub>2</sub>. Varmes læsket kalk op, afgiver den vanddamp og bliver til brændt kalk, CaO:</p>
+<div class="reaktion">
+<p>Ca(OH)<sub>2</sub>(s) ⇌ CaO(s) + H<sub>2</sub>O(g)</p>
+</div>
+<p>For reaktionen er Δ<em>H</em><sup>⊖</sup> = 108,5 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 143,5 J/(mol · K).</p>
+<ol type="a">
+<li>Opskriv ligevægtsloven for reaktionen.</li>
+<li>Beregn den temperatur, hvor <em>K</em><sub>p</sub> = 1 bar.</li>
+<li>Beregn den temperatur, hvor <em>K</em><sub>p</sub> = 0,10 bar.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionen er Ca(OH)<sub>2</sub>(s) ⇌ CaO(s) + H<sub>2</sub>O(g). Sæt den ønskede værdi af ligevægtskonstanten ind i van ’t Hoff-ligningen, ln <em>K</em> = −Δ<em>H</em><sup>⊖</sup> / <em>R</em> · 1/<em>T</em> + Δ<em>S</em><sup>⊖</sup> / <em>R</em>, og løs ligningen for <em>T</em>. Ligevægtskonstanten sættes ind som tal uden enhed. Husk, at ln(1) = 0.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For læsket kalk er ligevægtsloven <em>K</em><sub>p</sub> = <em>p</em>(H<sub>2</sub>O). Når <em>K</em> = 1, er ln <em>K</em> = 0, og så bliver <em>T</em> = Δ<em>H</em><sup>⊖</sup> / Δ<em>S</em><sup>⊖</sup>. For andre værdier af <em>K</em> kan van ’t Hoff-ligningen løses for <em>T</em>. Det giver <em>T</em> = Δ<em>H</em><sup>⊖</sup> / (Δ<em>S</em><sup>⊖</sup> − <em>R</em> · ln <em>K</em>). Du kan også lade CAS-værktøjet løse ligningen, fx <code>solve(ln(0.10) = 143.5/8.314 - 108500/(8.314*T), T)</code>. Regn Δ<em>H</em><sup>⊖</sup> om til J/mol først.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De to faste stoffer er ikke med i reaktionsbrøken. Ligevægtsloven er</li>
+</ol>
+<p><span class="math display">\[
+K_\mathrm{p} = p(\mathrm{H_2O})
+\]</span></p>
+<ol start="2" type="a">
+<li>Kendte størrelser: Δ<em>H</em><sup>⊖</sup> = 108,5 kJ/mol = 108 500 J/mol og Δ<em>S</em><sup>⊖</sup> = 143,5 J/(mol · K). Når <em>K</em> = 1, er ln <em>K</em> = 0. Van ’t Hoff-ligningen bliver</li>
+</ol>
+<p><span class="math display">\[
+0 = -\frac{\Delta H^{\ominus}}{R \cdot T} + \frac{\Delta S^{\ominus}}{R} \qquad\Rightarrow\qquad T = \frac{\Delta H^{\ominus}}{\Delta S^{\ominus}}
+\]</span></p>
+<p><span class="math display">\[
+T = \frac{108\,500\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{143{,}5\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}} = 756\ \mathrm{K}
+\]</span></p>
+<p>Ligevægtskonstanten er 1 bar ved 756 K. Det svarer til 483 °C. Ved den temperatur er partialtrykket af vanddamp over læsket kalk 1 bar.</p>
+<ol start="3" type="a">
+<li>Van ’t Hoff-ligningen løses for <em>T</em>:</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta H^{\ominus}}{R \cdot T} + \frac{\Delta S^{\ominus}}{R} \qquad\Rightarrow\qquad \frac{\Delta H^{\ominus}}{R \cdot T} = \frac{\Delta S^{\ominus}}{R} - \ln K \qquad\Rightarrow\qquad T = \frac{\Delta H^{\ominus}}{\Delta S^{\ominus} - R \cdot \ln K}
+\]</span></p>
+<p>Ligevægtskonstanten sættes ind som tallet 0,10.</p>
+<p><span class="math display">\[
+T = \frac{108\,500\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{143{,}5\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} - 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot \ln(0{,}10)} = 667\ \mathrm{K}
+\]</span></p>
+<p>Ligevægtskonstanten er 0,10 bar ved 667 K. Det svarer til 394 °C. Temperaturen er lavere end i spørgsmål b, og det passer med, at reaktionen er endoterm: en lavere temperatur giver en mindre ligevægtskonstant.</p>
+<p>Begge beregninger antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.8-holder-antagelsen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.8-holder-antagelsen">Opgave A2.6.8: Holder antagelsen?</h2>
+<p>Ligevægtskonstanten for dannelsen af ammoniak, N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g), er målt ved fire temperaturer.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><em>t</em> i °C</th>
+<th style="text-align: center;"><em>K</em><sub>p</sub> i bar<sup>−2</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">350</td>
+<td style="text-align: center;">6,9 · 10<sup>−4</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">400</td>
+<td style="text-align: center;">1,6 · 10<sup>−4</sup></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">450</td>
+<td style="text-align: center;">4,2 · 10<sup>−5</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">500</td>
+<td style="text-align: center;">1,4 · 10<sup>−5</sup></td>
+</tr>
+</tbody>
+</table>
+<p>Figuren viser målingerne i en graf over ln <em>K</em> som funktion af 1/<em>T</em>. Regressionslinjen har forskriften</p>
+<p><span class="math display">\[
+\ln K = 1{,}256 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{T} - 27{,}43
+\]</span></p>
+<div id="fig-a2-opg-6-ammoniak" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a2-opg-6-ammoniak-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a2-opg-6-ammoniak.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Figuren viser de målte værdier af ln K for dannelsen af ammoniak som funktion af 1/T og regressionslinjen gennem punkterne."><img src="../figurer/a2-opg-6-ammoniak.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a2-opg-6-ammoniak-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Figuren viser de målte værdier af ln <em>K</em> for dannelsen af ammoniak som funktion af 1/<em>T</em> og regressionslinjen gennem punkterne.
+</figcaption>
+</figure>
+</div>
+<p>Tabellen Termodynamiske data gælder ved 25 °C. Tabelværdierne giver Δ<em>H</em><sup>⊖</sup> = −91,8 kJ/mol og Δ<em>S</em><sup>⊖</sup> = −198,1 J/(mol · K) for dannelsen af ammoniak.</p>
+<ol type="a">
+<li>Bestem Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> for dannelsen af ammoniak ud fra forskriften.</li>
+<li>Sammenlign de to værdier fra grafen med tabelværdierne.</li>
+<li>Forklar, hvorfor værdierne fra grafen afviger fra tabelværdierne.</li>
+<li>Beregn ligevægtskonstanten ved 400 °C med forskriften. Med tabelværdierne giver van ’t Hoff-ligningen 6,0 · 10<sup>−4</sup> bar<sup>−2</sup> ved 400 °C. Vurdér, hvilken af de to beregninger der passer bedst med målingen ved 400 °C.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For dannelsen af ammoniak er Δ<em>H</em><sup>⊖</sup> = −<em>a</em> · <em>R</em> og Δ<em>S</em><sup>⊖</sup> = <em>b</em> · <em>R</em>, hvor <em>a</em> er hældningen og <em>b</em> er skæringen i forskriften. Tænk derefter over, hvilken temperatur tabelværdierne gælder ved, og hvilke temperaturer målingerne er lavet ved.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Fra forskriften får du Δ<em>H</em><sup>⊖</sup> = −104,4 kJ/mol og Δ<em>S</em><sup>⊖</sup> = −228,1 J/(mol · K) for dannelsen af ammoniak.</p>
+<p>Du kan begynde forklaringen sådan: “Tabelværdierne gælder ved … Målingerne er lavet mellem … Van ’t Hoff-ligningen bygger på den antagelse, at … Antagelsen passer ikke helt, fordi …”</p>
+<p>Du kan begynde vurderingen sådan: “Forskriften giver <em>K</em><sub>p</sub> = … ved 400 °C, og den målte værdi er … Tabelværdierne giver en værdi, der er … gange for stor. Derfor …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Hældningen er <em>a</em> = 1,256 · 10<sup>4</sup> K, og skæringen er <em>b</em> = −27,43.</li>
+</ol>
+<p><span class="math display">\[
+\Delta H^{\ominus} = -a \cdot R = -1{,}256 \cdot 10^{4}\ \mathrm{K} \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = -1{,}044 \cdot 10^{5}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+\Delta S^{\ominus} = b \cdot R = -27{,}43 \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = -228{,}1\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}
+\]</span></p>
+<p>Grafen giver Δ<em>H</em><sup>⊖</sup> = −104,4 kJ/mol og Δ<em>S</em><sup>⊖</sup> = −228,1 J/(mol · K).</p>
+<ol start="2" type="a">
+<li><p>Fortegnene er de samme som i tabellen: reaktionen er exoterm, og entropien falder. Tallene er ikke de samme. Δ<em>H</em><sup>⊖</sup> fra grafen er 12,6 kJ/mol mere negativ end tabelværdien på −91,8 kJ/mol. Δ<em>S</em><sup>⊖</sup> fra grafen er 30,0 J/(mol · K) mere negativ end tabelværdien på −198,1 J/(mol · K).</p></li>
+<li><p>Tabelværdierne gælder ved 25 °C. Målingerne er lavet mellem 350 °C og 500 °C. Van ’t Hoff-ligningen bygger på den antagelse, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen. Antagelsen passer ikke helt, fordi Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ændrer sig lidt, når temperaturen ændrer sig. Grafen viser de værdier, der gælder i det område, hvor målingerne er lavet, og de er altså ikke helt de samme som ved 25 °C.</p></li>
+<li><p>Temperaturen regnes om til kelvin: <em>T</em> = (273 + 400) K = 673 K.</p></li>
+</ol>
+<p><span class="math display">\[
+\ln K = 1{,}256 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{673\ \mathrm{K}} - 27{,}43 = -8{,}767
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-8{,}767} = 1{,}6 \cdot 10^{-4}
+\]</span></p>
+<p>Forskriften giver <em>K</em><sub>p</sub> = 1,6 · 10<sup>−4</sup> bar<sup>−2</sup> ved 400 °C. Det er det samme som den målte værdi. Tabelværdierne giver 6,0 · 10<sup>−4</sup> bar<sup>−2</sup>, og det er næsten fire gange for meget. Forskriften passer bedst, fordi den bygger på målinger i det temperaturområde, der regnes i. Tabelværdierne rammer den rigtige størrelsesorden, men ikke det præcise tal, når temperaturen ligger langt fra 25 °C.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med reaktionsskema, formel, beregning med enheder og en konklusion.</p>
+</section>
+<section id="opgave-a2.6.eks.1-methanol-af-carbonmonoxid-og-hydrogen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.eks.1-methanol-af-carbonmonoxid-og-hydrogen">Opgave A2.6.eks.1: Methanol af carbonmonoxid og hydrogen</h2>
+<p>Methanol kan bruges som brændstof til skibe i stedet for olie. Methanol fremstilles af carbonmonoxid og hydrogen over en katalysator:</p>
+<div class="reaktion">
+<p>CO(g) + 2 H<sub>2</sub>(g) ⇌ CH<sub>3</sub>OH(g)</p>
+</div>
+<p>Figuren viser ln <em>K</em> som funktion af 1/<em>T</em> for reaktionen ved fem temperaturer mellem 450 K og 650 K. Regressionslinjen har forskriften</p>
+<p><span class="math display">\[
+\ln K = 1{,}089 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{T} - 26{,}37
+\]</span></p>
+<div id="fig-a2-opg-6-methanol" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a2-opg-6-methanol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a2-opg-6-methanol.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Figuren viser ln K som funktion af 1/T for dannelsen af methanol af carbonmonoxid og hydrogen."><img src="../figurer/a2-opg-6-methanol.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a2-opg-6-methanol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Figuren viser ln <em>K</em> som funktion af 1/<em>T</em> for dannelsen af methanol af carbonmonoxid og hydrogen.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Argumentér ud fra grafen for, at dannelsen af methanol er exoterm.</li>
+<li>Bestem Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> for reaktionen.</li>
+<li>Beregn ligevægtskonstanten ved 250 °C.</li>
+<li>Forklar fortegnet på Δ<em>S</em><sup>⊖</sup> ud fra reaktionsskemaet, og vurdér, om en højere temperatur giver mere eller mindre methanol ved ligevægt.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på, om linjen for dannelsen af methanol stiger eller falder mod højre, og brug, at hældningen er <em>a</em> = −Δ<em>H</em><sup>⊖</sup> / <em>R</em>. Skæringen er <em>b</em> = Δ<em>S</em><sup>⊖</sup> / <em>R</em>. Til spørgsmål c skal temperaturen regnes om til kelvin, før den sættes ind i forskriften.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I forskriften for dannelsen af methanol er hældningen <em>a</em> = 1,089 · 10<sup>4</sup> K, og skæringen er <em>b</em> = −26,37. Brug Δ<em>H</em><sup>⊖</sup> = −<em>a</em> · <em>R</em> og Δ<em>S</em><sup>⊖</sup> = <em>b</em> · <em>R</em>. Ved 250 °C er <em>T</em> = (273 + 250) K = 523 K.</p>
+<p>Du kan begynde argumentet sådan: “Linjen … mod højre, så hældningen er … Hældningen er −Δ<em>H</em><sup>⊖</sup> / <em>R</em>, så Δ<em>H</em><sup>⊖</sup> er …”</p>
+<p>Du kan begynde vurderingen sådan: “Når temperaturen stiger, bliver 1/<em>T</em> …, og ln <em>K</em> bliver … Ligevægtskonstanten bliver altså …, og der er … methanol ved ligevægt.”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er CO(g) + 2 H<sub>2</sub>(g) ⇌ CH<sub>3</sub>OH(g).</p>
+<ol type="a">
+<li><p>Linjen stiger mod højre, så hældningen er positiv. Ifølge van ’t Hoff-ligningen er hældningen <em>a</em> = −Δ<em>H</em><sup>⊖</sup> / <em>R</em>. Gaskonstanten er positiv, så en positiv hældning betyder, at Δ<em>H</em><sup>⊖</sup> er negativ. Dannelsen af methanol er derfor exoterm.</p></li>
+<li><p>Hældningen er <em>a</em> = 1,089 · 10<sup>4</sup> K, og skæringen er <em>b</em> = −26,37.</p></li>
+</ol>
+<p><span class="math display">\[
+\Delta H^{\ominus} = -a \cdot R = -1{,}089 \cdot 10^{4}\ \mathrm{K} \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = -9{,}054 \cdot 10^{4}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+\Delta S^{\ominus} = b \cdot R = -26{,}37 \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = -219{,}2\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = −90,5 kJ/mol og Δ<em>S</em><sup>⊖</sup> = −219,2 J/(mol · K). Bestemmelsen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen, og det passer med, at punkterne ligger på en ret linje.</p>
+<ol start="3" type="a">
+<li>Temperaturen regnes om til kelvin: <em>T</em> = (273 + 250) K = 523 K.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = 1{,}089 \cdot 10^{4}\ \mathrm{K} \cdot \frac{1}{523\ \mathrm{K}} - 26{,}37 = -5{,}548
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-5{,}548} = 3{,}9 \cdot 10^{-3}
+\]</span></p>
+<p>Ligevægtsloven er</p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{CH_3OH})}{p(\mathrm{CO}) \cdot p(\mathrm{H_2})^{2}}
+\]</span></p>
+<p>Der står bar over brøkstregen og bar · bar<sup>2</sup> under, så enheden er bar<sup>−2</sup>. Ligevægtskonstanten er <em>K</em><sub>p</sub> = 3,9 · 10<sup>−3</sup> bar<sup>−2</sup> ved 250 °C.</p>
+<ol start="4" type="a">
+<li>I reaktionsskemaet er der 1 + 2 = 3 gasmolekyler til venstre og ét til højre. Der bliver færre gasmolekyler, så entropien falder, og Δ<em>S</em><sup>⊖</sup> er negativ.</li>
+</ol>
+<p>Når temperaturen stiger, bliver 1/<em>T</em> mindre, og ln <em>K</em> bliver mindre, fordi linjen stiger mod højre. Ligevægtskonstanten bliver altså mindre, og der er mindre methanol ved ligevægt. Det passer med, at opvarmning forskyder en ligevægt i den endoterme retning, som her er mod venstre. En høj temperatur giver derfor et dårligere udbytte af methanol. Fabrikken kan alligevel ikke vælge en meget lav temperatur, fordi reaktionen så bliver for langsom.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.eks.2-zink-af-zinkoxid" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.eks.2-zink-af-zinkoxid">Opgave A2.6.eks.2: Zink af zinkoxid</h2>
+<p>Zink bruges til at beskytte stål mod rust. Zink udvindes af zinkoxid, som varmes op sammen med carbon. Ved de høje temperaturer i ovnen dannes zink som en gas:</p>
+<div class="reaktion">
+<p>ZnO(s) + C(s) ⇌ Zn(g) + CO(g)</p>
+</div>
+<p>Tabellen viser Δ<em>G</em><sup>⊖</sup> for reaktionen ved fem temperaturer.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><em>T</em> i K</th>
+<th style="text-align: center;">Δ<em>G</em><sup>⊖</sup> i kJ/mol</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1000</td>
+<td style="text-align: center;">61,2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1100</td>
+<td style="text-align: center;">30,3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1200</td>
+<td style="text-align: center;">−0,8</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">1300</td>
+<td style="text-align: center;">−31,6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">1400</td>
+<td style="text-align: center;">−62,6</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Opskriv ligevægtsloven for reaktionen.</li>
+<li>Bestem Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> for reaktionen ved lineær regression.</li>
+<li>Bestem den laveste temperatur, hvor reaktionen er spontan ved standardtilstand.</li>
+<li>Beregn ligevægtskonstanten ved 1000 °C.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Afbild Δ<em>G</em><sup>⊖</sup> for reaktionen mellem zinkoxid og carbon som funktion af <em>T</em> i et regneark, og lav lineær regression. Sammenlign forskriften med Δ<em>G</em><sup>⊖</sup> = Δ<em>H</em><sup>⊖</sup> − <em>T</em> · Δ<em>S</em><sup>⊖</sup>: hældningen er −Δ<em>S</em><sup>⊖</sup>, og skæringen er Δ<em>H</em><sup>⊖</sup>. Reaktionen er spontan ved standardtilstand, når Δ<em>G</em><sup>⊖</sup> er negativ.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Regressionen giver hældningen <em>a</em> = −0,3095 kJ/(mol · K) og skæringen <em>b</em> = 370,7 kJ/mol. Grænsen for, hvornår reaktionen mellem zinkoxid og carbon er spontan, ligger ved Δ<em>G</em><sup>⊖</sup> = 0, altså ved <em>T</em> = Δ<em>H</em><sup>⊖</sup> / Δ<em>S</em><sup>⊖</sup>. Til spørgsmål d: regn 1000 °C om til kelvin, beregn Δ<em>G</em><sup>⊖</sup> med forskriften, og brug ln <em>K</em> = −Δ<em>G</em><sup>⊖</sup> / (<em>R</em> · <em>T</em>).</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er ZnO(s) + C(s) ⇌ Zn(g) + CO(g).</p>
+<ol type="a">
+<li>De to faste stoffer er ikke med i reaktionsbrøken. Ligevægtsloven er</li>
+</ol>
+<p><span class="math display">\[
+K_\mathrm{p} = p(\mathrm{Zn}) \cdot p(\mathrm{CO})
+\]</span></p>
+<ol start="2" type="a">
+<li>Δ<em>G</em><sup>⊖</sup> afbildes som funktion af <em>T</em>. Lineær regression på de fem punkter giver forskriften</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = -0{,}3095\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot T + 370{,}7\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Her er <em>y</em> = Δ<em>G</em><sup>⊖</sup> og <em>x</em> = <em>T</em>. Forskriften sammenlignes med Δ<em>G</em><sup>⊖</sup> = Δ<em>H</em><sup>⊖</sup> − <em>T</em> · Δ<em>S</em><sup>⊖</sup>. Hældningen er <em>a</em> = −Δ<em>S</em><sup>⊖</sup>, så Δ<em>S</em><sup>⊖</sup> = 0,3095 kJ/(mol · K) = 309,5 J/(mol · K). Skæringen er <em>b</em> = Δ<em>H</em><sup>⊖</sup>, så Δ<em>H</em><sup>⊖</sup> = 370,7 kJ/mol.</p>
+<p>Δ<em>H</em><sup>⊖</sup> er positiv, så reaktionen mellem zinkoxid og carbon er endoterm. Δ<em>S</em><sup>⊖</sup> er positiv, og det passer med reaktionsskemaet: der er ingen gasmolekyler til venstre og to til højre. Bestemmelsen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen, og det passer med, at punkterne ligger på en ret linje.</p>
+<ol start="3" type="a">
+<li>Reaktionen er spontan ved standardtilstand, når Δ<em>G</em><sup>⊖</sup> er negativ. Grænsen ligger, hvor Δ<em>G</em><sup>⊖</sup> = 0:</li>
+</ol>
+<p><span class="math display">\[
+T = \frac{\Delta H^{\ominus}}{\Delta S^{\ominus}} = \frac{370{,}7\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}}{0{,}3095\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}}} = 1198\ \mathrm{K}
+\]</span></p>
+<p>Linjen falder, så Δ<em>G</em><sup>⊖</sup> er negativ over 1198 K. Reaktionen er altså spontan ved standardtilstand, når temperaturen er over 1198 K. Det svarer til 925 °C.</p>
+<ol start="4" type="a">
+<li>Temperaturen regnes om til kelvin: <em>T</em> = (273 + 1000) K = 1273 K.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = -0{,}3095\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot 1273\ \mathrm{K} + 370{,}7\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -23{,}3\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> regnes om til joule: −23,3 kJ/mol = −23 300 J/mol.</p>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{-23\,300\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 1273\ \mathrm{K}} = 2{,}201
+\]</span></p>
+<p><span class="math display">\[
+K = e^{2{,}201} = 9{,}0
+\]</span></p>
+<p>Enheden er bar · bar = bar<sup>2</sup>. Ligevægtskonstanten er <em>K</em><sub>p</sub> = 9,0 bar<sup>2</sup> ved 1000 °C. Den er større end 1, og det passer med, at 1000 °C ligger over den temperatur, hvor Δ<em>G</em><sup>⊖</sup> skifter fortegn.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.6.eks.3-trykkogeren" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.6.eks.3-trykkogeren">Opgave A2.6.eks.3: Trykkogeren</h2>
+<p>I en trykkoger er låget spændt fast, så trykket i gryden bliver højere end i køkkenet. Vand koger, når vands damptryk er lige så stort som trykket over vandet. I en trykkoger koger vandet derfor ved en højere temperatur, og maden bliver hurtigere mør. Fordampningen af vand er en ligevægt:</p>
+<div class="reaktion">
+<p>H<sub>2</sub>O(l) ⇌ H<sub>2</sub>O(g)</p>
+</div>
+<p>Tabellen viser vands damptryk ved fem temperaturer.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><em>t</em> i °C</th>
+<th style="text-align: center;"><em>p</em>(H<sub>2</sub>O) i bar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">80</td>
+<td style="text-align: center;">0,474</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">0,702</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">1,014</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">110</td>
+<td style="text-align: center;">1,434</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">120</td>
+<td style="text-align: center;">1,987</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Opskriv ligevægtsloven for fordampningen af vand, og angiv ligevægtskonstanten ved 100 °C.</li>
+<li>Bestem Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> for fordampningen af vand ved lineær regression.</li>
+<li>I trykkogeren er trykket 1,80 bar. Bestem den temperatur, vandet koger ved i trykkogeren.</li>
+<li>Tabelværdierne ved 25 °C giver Δ<em>H</em><sup>⊖</sup> = 44,0 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 118,8 J/(mol · K) for fordampningen af vand. Vurdér antagelsen om, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Flydende vand er en ren væske og er ikke med i ligevægtsloven. Ligevægtskonstanten er derfor lig med damptrykket. Regn hver temperatur om til kelvin, beregn 1/<em>T</em> og ln <em>K</em>, og lav lineær regression med 1/<em>T</em> som <em>x</em>-værdier og ln <em>K</em> som <em>y</em>-værdier.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Regressionen giver cirka <em>a</em> = −4970 K og <em>b</em> = 13,34. Brug Δ<em>H</em><sup>⊖</sup> = −<em>a</em> · <em>R</em> og Δ<em>S</em><sup>⊖</sup> = <em>b</em> · <em>R</em>. Vandet i trykkogeren koger, når <em>K</em><sub>p</sub> = 1,80 bar. Sæt ln(1,80) ind på venstre side i forskriften, og løs ligningen for <em>T</em>.</p>
+<p>Du kan begynde vurderingen sådan: “Regressionen giver Δ<em>H</em><sup>⊖</sup> = …, og tabelværdien ved 25 °C er … Forskellen viser, at Δ<em>H</em><sup>⊖</sup> … med temperaturen. Antagelsen passer derfor …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er H<sub>2</sub>O(l) ⇌ H<sub>2</sub>O(g).</p>
+<ol type="a">
+<li>En ren væske er ikke med i reaktionsbrøken. Ligevægtsloven er</li>
+</ol>
+<p><span class="math display">\[
+K_\mathrm{p} = p(\mathrm{H_2O})
+\]</span></p>
+<p>Ligevægtskonstanten er altså vands damptryk. Ved 100 °C er <em>K</em><sub>p</sub> = 1,014 bar.</p>
+<ol start="2" type="a">
+<li>Hver temperatur regnes om til kelvin med <em>T</em> = (273 + <em>t</em>/°C) K. Ligevægtskonstanten sættes ind i ln <em>K</em> som tal uden enhed.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><em>t</em> i °C</th>
+<th style="text-align: center;"><em>T</em> i K</th>
+<th style="text-align: center;"><em>K</em><sub>p</sub> i bar</th>
+<th style="text-align: center;">1/<em>T</em> i K<sup>−1</sup></th>
+<th style="text-align: center;">ln <em>K</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">80</td>
+<td style="text-align: center;">353</td>
+<td style="text-align: center;">0,474</td>
+<td style="text-align: center;">2,833 · 10<sup>−3</sup></td>
+<td style="text-align: center;">−0,747</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">363</td>
+<td style="text-align: center;">0,702</td>
+<td style="text-align: center;">2,755 · 10<sup>−3</sup></td>
+<td style="text-align: center;">−0,354</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">373</td>
+<td style="text-align: center;">1,014</td>
+<td style="text-align: center;">2,681 · 10<sup>−3</sup></td>
+<td style="text-align: center;">0,014</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">110</td>
+<td style="text-align: center;">383</td>
+<td style="text-align: center;">1,434</td>
+<td style="text-align: center;">2,611 · 10<sup>−3</sup></td>
+<td style="text-align: center;">0,360</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">120</td>
+<td style="text-align: center;">393</td>
+<td style="text-align: center;">1,987</td>
+<td style="text-align: center;">2,545 · 10<sup>−3</sup></td>
+<td style="text-align: center;">0,687</td>
+</tr>
+</tbody>
+</table>
+<p>Lineær regression på de fem punkter giver forskriften</p>
+<p><span class="math display">\[
+\ln K = -4970\ \mathrm{K} \cdot \frac{1}{T} + 13{,}34
+\]</span></p>
+<p>Her er <em>y</em> = ln <em>K</em> og <em>x</em> = 1/<em>T</em>. Hældningen er <em>a</em> = −4970 K, og skæringen er <em>b</em> = 13,34. Tabellen ovenfor viser afrundede tal. Taster du dem ind i stedet for at lade regnearket regne 1/<em>T</em> og ln <em>K</em> ud, kan de sidste cifre i forskriften blive lidt anderledes.</p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = -a \cdot R = -(-4970\ \mathrm{K}) \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = 4{,}132 \cdot 10^{4}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+\Delta S^{\ominus} = b \cdot R = 13{,}34 \cdot 8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} = 110{,}9\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = 41,3 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 110,9 J/(mol · K). Δ<em>H</em><sup>⊖</sup> er positiv, så fordampningen af vand er endoterm. Det passer med, at linjen falder mod højre. Δ<em>S</em><sup>⊖</sup> er positiv, og det passer med, at en væske bliver til en gas.</p>
+<ol start="3" type="a">
+<li>Vandet koger, når damptrykket er lige så stort som trykket i trykkogeren, altså når <em>K</em><sub>p</sub> = 1,80 bar. Forskriften løses for <em>T</em>:</li>
+</ol>
+<p><span class="math display">\[
+\ln K = a \cdot \frac{1}{T} + b \qquad\Rightarrow\qquad T = \frac{a}{\ln K - b}
+\]</span></p>
+<p>Ligevægtskonstanten sættes ind som tallet 1,80.</p>
+<p><span class="math display">\[
+T = \frac{-4970\ \mathrm{K}}{\ln(1{,}80) - 13{,}34} = 390\ \mathrm{K}
+\]</span></p>
+<p>Vandet i trykkogeren koger ved 390 K. Det svarer til 117 °C. Maden bliver altså 17 grader varmere end i en almindelig gryde, og derfor bliver den hurtigere mør.</p>
+<ol start="4" type="a">
+<li>Regressionen giver Δ<em>H</em><sup>⊖</sup> = 41,3 kJ/mol mellem 80 °C og 120 °C. Tabelværdien ved 25 °C er 44,0 kJ/mol. Forskellen er 2,7 kJ/mol, og det er cirka 6 % af tabelværdien. Δ<em>S</em><sup>⊖</sup> er 110,9 J/(mol · K) fra regressionen og 118,8 J/(mol · K) i tabellen. Både Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> bliver altså lidt mindre, når temperaturen stiger.</li>
+</ol>
+<p>Antagelsen passer derfor ikke helt. Den er god inden for et lille temperaturområde: de fem punkter mellem 80 °C og 120 °C ligger næsten præcist på en ret linje. Over et større temperaturområde, fra 25 °C til 120 °C, giver antagelsen en afvigelse på nogle procent.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="pagination-link" aria-label="A2.6 Ligevægtskonstanten og temperaturen">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A2.6 Ligevægtskonstanten og temperaturen</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a3-1-elementaranalyse.html" class="pagination-link" aria-label="A3.1 Elementaranalyse">
+        <span class="nav-page-text">A3.1 Elementaranalyse</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,2428 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A1.8 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a2-1-energi-og-entalpi.html" rel="next">
+<link href="../kapitler/a1-8-titrering-af-phosphorsyre.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../opgaver/a1-8-opgaver.html">Opgaver til A1.8</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a1.8.1-de-to-trin-for-oxalsyre" id="toc-opgave-a1.8.1-de-to-trin-for-oxalsyre" class="nav-link active" data-scroll-target="#opgave-a1.8.1-de-to-trin-for-oxalsyre">Opgave A1.8.1: De to trin for oxalsyre</a></li>
+  <li><a href="#opgave-a1.8.2-hvilken-form-ved-hvilken-ph" id="toc-opgave-a1.8.2-hvilken-form-ved-hvilken-ph" class="nav-link" data-scroll-target="#opgave-a1.8.2-hvilken-form-ved-hvilken-ph">Opgave A1.8.2: Hvilken form ved hvilken pH?</a></li>
+  <li><a href="#opgave-a1.8.3-fordelingsdiagram-for-oxalsyre" id="toc-opgave-a1.8.3-fordelingsdiagram-for-oxalsyre" class="nav-link" data-scroll-target="#opgave-a1.8.3-fordelingsdiagram-for-oxalsyre">Opgave A1.8.3: Fordelingsdiagram for oxalsyre</a></li>
+  <li><a href="#opgave-a1.8.4-ph-i-0100-m-phosphorsyre" id="toc-opgave-a1.8.4-ph-i-0100-m-phosphorsyre" class="nav-link" data-scroll-target="#opgave-a1.8.4-ph-i-0100-m-phosphorsyre">Opgave A1.8.4: pH i 0,100 M phosphorsyre</a></li>
+  <li><a href="#opgave-a1.8.5-hvor-ligger-ækvivalenspunkterne" id="toc-opgave-a1.8.5-hvor-ligger-ækvivalenspunkterne" class="nav-link" data-scroll-target="#opgave-a1.8.5-hvor-ligger-ækvivalenspunkterne">Opgave A1.8.5: Hvor ligger ækvivalenspunkterne?</a></li>
+  <li><a href="#opgave-a1.8.6-titrerkurve-for-maleinsyre" id="toc-opgave-a1.8.6-titrerkurve-for-maleinsyre" class="nav-link" data-scroll-target="#opgave-a1.8.6-titrerkurve-for-maleinsyre">Opgave A1.8.6: Titrerkurve for maleinsyre</a></li>
+  <li><a href="#opgave-a1.8.7-en-indikator-til-hvert-ækvivalenspunkt" id="toc-opgave-a1.8.7-en-indikator-til-hvert-ækvivalenspunkt" class="nav-link" data-scroll-target="#opgave-a1.8.7-en-indikator-til-hvert-ækvivalenspunkt">Opgave A1.8.7: En indikator til hvert ækvivalenspunkt</a></li>
+  <li><a href="#opgave-a1.8.8-to-spring-og-en-base-med-to-trin" id="toc-opgave-a1.8.8-to-spring-og-en-base-med-to-trin" class="nav-link" data-scroll-target="#opgave-a1.8.8-to-spring-og-en-base-med-to-trin">Opgave A1.8.8: To spring og en base med to trin</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a1.8.eks.1-phosphorsyre-i-rustfjerner" id="toc-opgave-a1.8.eks.1-phosphorsyre-i-rustfjerner" class="nav-link" data-scroll-target="#opgave-a1.8.eks.1-phosphorsyre-i-rustfjerner">Opgave A1.8.eks.1: Phosphorsyre i rustfjerner</a></li>
+  <li><a href="#opgave-a1.8.eks.2-sulfit-i-vin" id="toc-opgave-a1.8.eks.2-sulfit-i-vin" class="nav-link" data-scroll-target="#opgave-a1.8.eks.2-sulfit-i-vin">Opgave A1.8.eks.2: Sulfit i vin</a></li>
+  <li><a href="#opgave-a1.8.eks.3-soda-i-vaskepulver" id="toc-opgave-a1.8.eks.3-soda-i-vaskepulver" class="nav-link" data-scroll-target="#opgave-a1.8.eks.3-soda-i-vaskepulver">Opgave A1.8.eks.3: Soda i vaskepulver</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../opgaver/a1-8-opgaver.html">Opgaver til A1.8</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A1.8</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html">A1.8 Titrering af phosphorsyre</a>. Prøv selv, før du åbner hjælpen under opgaven. I opgave A1.8.4 og opgave A1.8.eks.1 skal du bruge et CAS-værktøj til at løse en ligning.</p>
+<section id="opgave-a1.8.1-de-to-trin-for-oxalsyre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.1-de-to-trin-for-oxalsyre">Opgave A1.8.1: De to trin for oxalsyre</h2>
+<p>Oxalsyre, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>, findes i rabarber og spinat. Molekylet har to carboxylgrupper, HOOC−COOH, og oxalsyre er derfor en dihydron syre. De to p<em>K</em><sub>s</sub>-værdier for oxalsyre er 1,25 og 4,27.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for første trin og for andet trin, når oxalsyre afgiver sine hydroner til vand.</li>
+<li>De tre former hedder oxalsyre, hydrogenoxalat og oxalat. Hvilket navn hører til hvilken formel?</li>
+<li>Hvilken af de to p<em>K</em><sub>s</sub>-værdier hører til første trin? Begrund svaret.</li>
+<li>Hvilken af de tre former af oxalsyre er en amfolyt? Begrund svaret.</li>
+<li>Kulsyre, H<sub>2</sub>CO<sub>3</sub>, er også en dihydron syre. Skriv formlerne for de tre former af kulsyre, og angiv, hvilken af dem der er en amfolyt.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Polyhydrone syrer</em>. Oxalsyre afgiver sine hydroner én ad gangen, ligesom phosphorsyre gør. Skriv ét reaktionsskema for hvert trin, hvor syren afgiver én hydron til et vandmolekyle.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I første trin bliver H<sub>2</sub>C<sub>2</sub>O<sub>4</sub> til HC<sub>2</sub>O<sub>4</sub><sup>−</sup>. I andet trin bliver HC<sub>2</sub>O<sub>4</sub><sup>−</sup> til C<sub>2</sub>O<sub>4</sub><sup>2−</sup>. Navnet hydrogenoxalat fortæller, at ionen stadig har ét hydrogenatom, som kan afgives. En amfolyt er en partikel, der både kan afgive og optage en hydron.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De to trin for oxalsyre er</li>
+</ol>
+<div class="reaktion">
+<p>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>(aq) + H<sub>2</sub>O(l) ⇌ HC<sub>2</sub>O<sub>4</sub><sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<div class="reaktion">
+<p>HC<sub>2</sub>O<sub>4</sub><sup>−</sup>(aq) + H<sub>2</sub>O(l) ⇌ C<sub>2</sub>O<sub>4</sub><sup>2−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<ol start="2" type="a">
+<li><p>H<sub>2</sub>C<sub>2</sub>O<sub>4</sub> er oxalsyre, HC<sub>2</sub>O<sub>4</sub><sup>−</sup> er hydrogenoxalat, og C<sub>2</sub>O<sub>4</sub><sup>2−</sup> er oxalat.</p></li>
+<li><p>Første trin har p<em>K</em><sub>s</sub> = 1,25, og andet trin har p<em>K</em><sub>s</sub> = 4,27. Andet trin er svagest, fordi det er sværere at fjerne en positiv hydron fra hydrogenoxalat, som i forvejen er en negativ ion. En svagere syre har en større p<em>K</em><sub>s</sub>.</p></li>
+<li><p>Hydrogenoxalat, HC<sub>2</sub>O<sub>4</sub><sup>−</sup>, er en amfolyt. Ionen kan afgive en hydron og blive til oxalat, C<sub>2</sub>O<sub>4</sub><sup>2−</sup>, og den kan optage en hydron og blive til oxalsyre, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>.</p></li>
+<li><p>De tre former af kulsyre er H<sub>2</sub>CO<sub>3</sub>, HCO<sub>3</sub><sup>−</sup> og CO<sub>3</sub><sup>2−</sup>. Den midterste form, hydrogencarbonat, HCO<sub>3</sub><sup>−</sup>, er en amfolyt.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.2-hvilken-form-ved-hvilken-ph" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.2-hvilken-form-ved-hvilken-ph">Opgave A1.8.2: Hvilken form ved hvilken pH?</h2>
+<p>Phosphorsyre har p<em>K</em><sub>s</sub>-værdierne 2,15, 7,20 og 12,35. De fire former af phosphorsyre er H<sub>3</sub>PO<sub>4</sub>, H<sub>2</sub>PO<sub>4</sub><sup>−</sup>, HPO<sub>4</sub><sup>2−</sup> og PO<sub>4</sub><sup>3−</sup>.</p>
+<ol type="a">
+<li>Udfyld tabellen under spørgsmålene.</li>
+<li>Ved hvilke tre pH-værdier er der lige meget af to former af phosphorsyre? Hvilke to former er det ved hver pH-værdi?</li>
+<li>Ved pH 6,00 er det kun to af de fire former af phosphorsyre, der betyder noget. Hvilke to er det? Begrund svaret.</li>
+<li>Beregn, hvor stor en del af stoffet der findes på hver af de to former ved pH 6,00.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">pH</th>
+<th style="text-align: left;">Den form af phosphorsyre, der er mest af</th>
+<th style="text-align: left;">Begrundelse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1,0</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4,5</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">10,0</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">13,5</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Fordelingsdiagrammet for phosphorsyre</em>. Sammenlign hver pH-værdi med de tre p<em>K</em><sub>s</sub>-værdier for phosphorsyre. Under 2,15 er der mest H<sub>3</sub>PO<sub>4</sub>. Hver gang pH kommer over en p<em>K</em><sub>s</sub>-værdi, er den næste form den, der er mest af.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>pH 6,00 ligger mellem 2,15 og 7,20 og tættest på 7,20. De to former, der betyder noget, er derfor syren og basen i andet trin, H<sub>2</sub>PO<sub>4</sub><sup>−</sup> og HPO<sub>4</sub><sup>2−</sup>. Brug syrebrøken <em>x</em><sub>s</sub> = 1 / (1 + 10<sup>pH&nbsp;−&nbsp;p<em>K</em><sub>s</sub></sup>) med p<em>K</em><sub>s</sub> = 7,20 som i <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html">afsnit A1.7</a>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Tabellen:</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">pH</th>
+<th style="text-align: left;">Den form af phosphorsyre, der er mest af</th>
+<th style="text-align: left;">Begrundelse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1,0</td>
+<td style="text-align: left;">H<sub>3</sub>PO<sub>4</sub></td>
+<td style="text-align: left;">pH er lavere end 2,15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4,5</td>
+<td style="text-align: left;">H<sub>2</sub>PO<sub>4</sub><sup>−</sup></td>
+<td style="text-align: left;">pH ligger mellem 2,15 og 7,20</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">10,0</td>
+<td style="text-align: left;">HPO<sub>4</sub><sup>2−</sup></td>
+<td style="text-align: left;">pH ligger mellem 7,20 og 12,35</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">13,5</td>
+<td style="text-align: left;">PO<sub>4</sub><sup>3−</sup></td>
+<td style="text-align: left;">pH er højere end 12,35</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Der er lige meget af to former, når pH er lig med en af de tre p<em>K</em><sub>s</sub>-værdier. Ved pH 2,15 er der lige meget H<sub>3</sub>PO<sub>4</sub> og H<sub>2</sub>PO<sub>4</sub><sup>−</sup>. Ved pH 7,20 er der lige meget H<sub>2</sub>PO<sub>4</sub><sup>−</sup> og HPO<sub>4</sub><sup>2−</sup>. Ved pH 12,35 er der lige meget HPO<sub>4</sub><sup>2−</sup> og PO<sub>4</sub><sup>3−</sup>.</p></li>
+<li><p>Ved pH 6,00 er det H<sub>2</sub>PO<sub>4</sub><sup>−</sup> og HPO<sub>4</sub><sup>2−</sup>. pH 6,00 ligger 3,85 pH-enheder over p<em>K</em><sub>s</sub> for første trin, så der er næsten ingen H<sub>3</sub>PO<sub>4</sub> tilbage. pH 6,00 ligger 6,35 pH-enheder under p<em>K</em><sub>s</sub> for tredje trin, så der er næsten ingen PO<sub>4</sub><sup>3−</sup>.</p></li>
+<li><p>H<sub>2</sub>PO<sub>4</sub><sup>−</sup> er syren, og HPO<sub>4</sub><sup>2−</sup> er basen i andet trin, som har p<em>K</em><sub>s</sub> = 7,20.</p></li>
+</ol>
+<p><span class="math display">\[
+\frac{n_\mathrm{b}}{n_\mathrm{s}} = 10^{\,6{,}00 - 7{,}20} = 10^{-1{,}20} = 0{,}0631
+\]</span></p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 0{,}0631} = 0{,}941 \qquad\qquad x_\mathrm{b} = 1 - 0{,}941 = 0{,}059
+\]</span></p>
+<p>Ved pH 6,00 findes 94,1 % som H<sub>2</sub>PO<sub>4</sub><sup>−</sup> og 5,9 % som HPO<sub>4</sub><sup>2−</sup>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.3-fordelingsdiagram-for-oxalsyre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.3-fordelingsdiagram-for-oxalsyre">Opgave A1.8.3: Fordelingsdiagram for oxalsyre</h2>
+<p>Oxalsyre er en dihydron syre. De tre former er oxalsyre, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>, hydrogenoxalat, HC<sub>2</sub>O<sub>4</sub><sup>−</sup>, og oxalat, C<sub>2</sub>O<sub>4</sub><sup>2−</sup>. Figuren viser fordelingsdiagrammet for oxalsyre. De tre kurver er mærket A, B og C.</p>
+<div id="fig-a1-opg-8-oxalsyre" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-opg-8-oxalsyre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-opg-8-oxalsyre.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Fordelingsdiagrammet for oxalsyre i opgave A1.8.3 med de tre kurver A, B og C."><img src="../figurer/a1-opg-8-oxalsyre.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-opg-8-oxalsyre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Fordelingsdiagrammet for oxalsyre i opgave A1.8.3 med de tre kurver A, B og C.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Hvilken af de tre former af oxalsyre hører til kurve A, til kurve B og til kurve C? Begrund svaret.</li>
+<li>Aflæs de to p<em>K</em><sub>s</sub>-værdier for oxalsyre på fordelingsdiagrammet.</li>
+<li>Hvilke former af oxalsyre findes ved pH 2,0, og hvor stor en del udgør hver af dem?</li>
+<li>Hvilke former af oxalsyre findes ved pH 5,0, og hvor stor en del udgør hver af dem? Kontrollér aflæsningen ved beregning. Tabelværdien for andet trin er p<em>K</em><sub>s</sub> = 4,27.</li>
+<li>Aflæs den pH, hvor der er mest hydrogenoxalat. Sammenlign den aflæste pH med de to p<em>K</em><sub>s</sub>-værdier.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Fordelingsdiagrammet for phosphorsyre</em>. Den form af oxalsyre, der har flest hydroner, er der mest af ved lav pH. To nabokurver krydser ved p<em>K</em><sub>s</sub> for det trin, der forbinder de to former.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Gå lodret op fra pH 2,0, og aflæs hver af de kurver, du rammer, på aksen til venstre. Gør det samme ved pH 5,0. Ved pH 5,0 er de to former syren og basen i andet trin, så aflæsningen kan kontrolleres med <em>x</em><sub>s</sub> = 1 / (1 + 10<sup>pH&nbsp;−&nbsp;p<em>K</em><sub>s</sub></sup>) og p<em>K</em><sub>s</sub> = 4,27.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Kurve A er oxalsyre, H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>. Det er formen med flest hydroner, og den er der mest af ved lav pH. Kurve B er hydrogenoxalat, HC<sub>2</sub>O<sub>4</sub><sup>−</sup>, som er der mest af mellem de to p<em>K</em><sub>s</sub>-værdier. Kurve C er oxalat, C<sub>2</sub>O<sub>4</sub><sup>2−</sup>, som er der mest af ved høj pH.</p></li>
+<li><p>Kurve A og kurve B krydser midt mellem pH 1,0 og pH 1,5. Første trin har altså p<em>K</em><sub>s</sub> omkring 1,25. Kurve B og kurve C krydser ved pH omkring 4,3, og det er p<em>K</em><sub>s</sub> for andet trin. Tabelværdierne for oxalsyre er 1,25 og 4,27.</p></li>
+<li><p>Ved pH 2,0 aflæses kurve A til omkring 0,15 og kurve B til omkring 0,85. Kurve C ligger under 0,01. Ved pH 2,0 findes altså 15 % som oxalsyre og 85 % som hydrogenoxalat.</p></li>
+<li><p>Ved pH 5,0 aflæses kurve B til omkring 0,16 og kurve C til omkring 0,84. Kurve A ligger på 0. Ved pH 5,0 findes altså 16 % som hydrogenoxalat og 84 % som oxalat.</p></li>
+</ol>
+<p>Hydrogenoxalat er syren, og oxalat er basen i andet trin.</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,5{,}0 - 4{,}27}} = 0{,}16 \qquad\qquad x_\mathrm{b} = 1 - 0{,}16 = 0{,}84
+\]</span></p>
+<p>Beregningen passer med aflæsningen.</p>
+<ol start="5" type="a">
+<li>Kurve B har sit højeste punkt ved pH omkring 2,8. Det er midt mellem de to p<em>K</em><sub>s</sub>-værdier, 1,25 og 4,27. Her findes omkring 94 % som hydrogenoxalat. Kurven for hydrogenoxalat når ikke helt op på 1, fordi de to p<em>K</em><sub>s</sub>-værdier for oxalsyre kun ligger 3 pH-enheder fra hinanden.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.4-ph-i-0100-m-phosphorsyre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.4-ph-i-0100-m-phosphorsyre">Opgave A1.8.4: pH i 0,100 M phosphorsyre</h2>
+<p>En opløsning af phosphorsyre har den formelle koncentration 0,100 M. For første trin er p<em>K</em><sub>s</sub> = 2,15, så <em>K</em><sub>s</sub> = 10<sup>−2,15</sup> M = 7,08 · 10<sup>−3</sup> M.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for phosphorsyres første trin.</li>
+<li>Lav et SÆL-skema for første trin, opstil ligningen, og løs den med et CAS-værktøj.</li>
+<li>Beregn pH i 0,100 M phosphorsyre.</li>
+<li>Beregn omdannelsesgraden for phosphorsyre i opløsningen.</li>
+<li>Opløsningen fortyndes, så den formelle koncentration af phosphorsyre bliver 0,0100 M. Beregn pH og omdannelsesgraden i den fortyndede opløsning. Hvad sker der med omdannelsesgraden, når phosphorsyre fortyndes?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>pH i en opløsning af phosphorsyre</em>, og følg eksemplet med 0,0500 M phosphorsyre. Det er kun første trin, der betyder noget for pH, så phosphorsyre regnes, som om den var monohydron.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>x</em> angiver her den koncentration af H<sub>3</sub>PO<sub>4</sub>, der har afgivet én hydron. Rækken Ligevægt bliver 0,100 M − <em>x</em> for H<sub>3</sub>PO<sub>4</sub> og <em>x</em> for både H<sub>2</sub>PO<sub>4</sub><sup>−</sup> og H<sub>3</sub>O<sup>+</sup>. Ligningen er 7,08 · 10<sup>−3</sup> = <em>x</em> · <em>x</em> / (0,100 − <em>x</em>). Omdannelsesgraden er <em>x</em> delt med den formelle koncentration af phosphorsyre.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>I første trin afgiver phosphorsyre én hydron til vand:</li>
+</ol>
+<div class="reaktion">
+<p>H<sub>3</sub>PO<sub>4</sub>(aq) + H<sub>2</sub>O(l) ⇌ H<sub>2</sub>PO<sub>4</sub><sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<ol start="2" type="a">
+<li><em>x</em> angiver her den koncentration af H<sub>3</sub>PO<sub>4</sub>, der har afgivet én hydron, fra start og frem til ligevægt.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">H<sub>3</sub>PO<sub>4</sub></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">H<sub>2</sub>PO<sub>4</sub><sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>3</sub>O<sup>+</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">0,100 M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,100 M − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+7{,}08 \cdot 10^{-3}\ \mathrm{M} = \frac{x \cdot x}{0{,}100\ \mathrm{M} - x}
+\]</span></p>
+<p>CAS-værktøjet giver <em>x</em> = 0,0233 eller <em>x</em> = −0,0304. En koncentration kan ikke være negativ, så den negative løsning forkastes. Altså er [H<sub>3</sub>O<sup>+</sup>] = 0,0233 M.</p>
+<p>Tjek: 0,0233 M · 0,0233 M / (0,100 M − 0,0233 M) = 7,08 · 10<sup>−3</sup> M.</p>
+<ol start="3" type="a">
+<li>pH i opløsningen er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{pH} = -\log(0{,}0233) = 1{,}63
+\]</span></p>
+<p>pH i 0,100 M phosphorsyre er 1,63.</p>
+<ol start="4" type="a">
+<li>Omdannelsesgraden for phosphorsyre er</li>
+</ol>
+<p><span class="math display">\[
+\alpha = \frac{x}{c_\mathrm{s}} = \frac{0{,}0233\ \mathrm{M}}{0{,}100\ \mathrm{M}} = 0{,}233
+\]</span></p>
+<p>23,3 % af molekylerne af phosphorsyre har afgivet en hydron.</p>
+<ol start="5" type="a">
+<li><em>x</em> angiver her den koncentration af H<sub>3</sub>PO<sub>4</sub>, der har afgivet én hydron i den fortyndede opløsning, fra start og frem til ligevægt. Skemaet er det samme som i spørgsmål b, men med 0,0100 M i rækken Start.</li>
+</ol>
+<p><span class="math display">\[
+7{,}08 \cdot 10^{-3}\ \mathrm{M} = \frac{x \cdot x}{0{,}0100\ \mathrm{M} - x}
+\]</span></p>
+<p>CAS-værktøjet giver <em>x</em> = 5,59 · 10<sup>−3</sup> eller <em>x</em> = −0,0127. Den negative løsning forkastes, så [H<sub>3</sub>O<sup>+</sup>] = 5,59 · 10<sup>−3</sup> M.</p>
+<p><span class="math display">\[
+\mathrm{pH} = -\log(5{,}59 \cdot 10^{-3}) = 2{,}25 \qquad\qquad \alpha = \frac{5{,}59 \cdot 10^{-3}\ \mathrm{M}}{0{,}0100\ \mathrm{M}} = 0{,}559
+\]</span></p>
+<p>pH i 0,0100 M phosphorsyre er 2,25, og omdannelsesgraden er 0,559. Omdannelsesgraden for phosphorsyre stiger altså fra 23,3 % til 55,9 %, når opløsningen fortyndes 10 gange.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.5-hvor-ligger-ækvivalenspunkterne" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.5-hvor-ligger-ækvivalenspunkterne">Opgave A1.8.5: Hvor ligger ækvivalenspunkterne?</h2>
+<p>30,0 mL 0,0400 M phosphorsyre titreres med 0,100 M natriumhydroxid.</p>
+<ol type="a">
+<li>Beregn stofmængden af phosphorsyre i kolben i mmol.</li>
+<li>Hvor mange mL natriumhydroxid er der tilsat i første ækvivalenspunkt?</li>
+<li>Hvor mange mL natriumhydroxid er der tilsat i andet ækvivalenspunkt?</li>
+<li>Udfyld tabellen under spørgsmålene.</li>
+<li>Ved hvilket af de fem volumener i tabellen er pH lig med 7,20? Begrund svaret.</li>
+<li>Ved hvilket volumen skulle det tredje ækvivalenspunkt ligge? Kan det tredje ækvivalenspunkt ses på titrerkurven?</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Tilsat natriumhydroxid</th>
+<th style="text-align: left;">Det er der i kolben</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0 mL</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6,0 mL</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">12,0 mL</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">18,0 mL</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">24,0 mL</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Titreringen</em>. Hydroxidionerne fjerner hydronerne fra phosphorsyre én ad gangen. Første ækvivalenspunkt er nået, når der er tilsat lige så mange mol hydroxid, som der var mol phosphorsyre fra start. Andet ækvivalenspunkt kræver dobbelt så meget hydroxid.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Der er 1,20 mmol phosphorsyre i kolben. Volumenet af natriumhydroxid findes med <em>V</em> = <em>n</em> / <em>c</em>. Sammenlign hvert volumen i tabellen med de to ækvivalenspunkter, og brug tabellen under titrerkurven for phosphorsyre i afsnittet. Midt mellem to ækvivalenspunkter er der lige meget af syren og basen i det trin.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Stofmængden af phosphorsyre er</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{H_3PO_4}) = c \cdot V = 0{,}0400\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0300\ \mathrm{L} = 0{,}00120\ \mathrm{mol} = 1{,}20\ \mathrm{mmol}
+\]</span></p>
+<ol start="2" type="a">
+<li>I første ækvivalenspunkt har hver H<sub>3</sub>PO<sub>4</sub> reageret med én OH<sup>−</sup>, så der er tilsat 1,20 mmol hydroxid.</li>
+</ol>
+<p><span class="math display">\[
+V = \frac{n}{c} = \frac{0{,}00120\ \mathrm{mol}}{0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}}} = 0{,}0120\ \mathrm{L} = 12{,}0\ \mathrm{mL}
+\]</span></p>
+<ol start="3" type="a">
+<li><p>I andet ækvivalenspunkt har hver H<sub>3</sub>PO<sub>4</sub> reageret med to OH<sup>−</sup>, så der er tilsat 2,40 mmol hydroxid. Det svarer til 24,0 mL natriumhydroxid.</p></li>
+<li><p>Tabellen:</p></li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Tilsat natriumhydroxid</th>
+<th style="text-align: left;">Det er der i kolben</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0 mL</td>
+<td style="text-align: left;">H<sub>3</sub>PO<sub>4</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6,0 mL</td>
+<td style="text-align: left;">H<sub>3</sub>PO<sub>4</sub> og H<sub>2</sub>PO<sub>4</sub><sup>−</sup>: et puffersystem</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">12,0 mL</td>
+<td style="text-align: left;">H<sub>2</sub>PO<sub>4</sub><sup>−</sup>: første ækvivalenspunkt</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">18,0 mL</td>
+<td style="text-align: left;">lige meget H<sub>2</sub>PO<sub>4</sub><sup>−</sup> og HPO<sub>4</sub><sup>2−</sup>: et puffersystem</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">24,0 mL</td>
+<td style="text-align: left;">HPO<sub>4</sub><sup>2−</sup>: andet ækvivalenspunkt</td>
+</tr>
+</tbody>
+</table>
+<ol start="5" type="a">
+<li><p>Ved 18,0 mL. Det er andet halvækvivalenspunkt, midt mellem de to ækvivalenspunkter. Her er der lige meget H<sub>2</sub>PO<sub>4</sub><sup>−</sup> og HPO<sub>4</sub><sup>2−</sup>, så pH er lig med p<em>K</em><sub>s</sub> for andet trin, som er 7,20. Ved 6,0 mL, som er første halvækvivalenspunkt, er pH omkring 2,4. Det er lidt højere end p<em>K</em><sub>s</sub> = 2,15 for første trin, fordi phosphorsyre er en middelstærk syre.</p></li>
+<li><p>Det tredje ækvivalenspunkt skulle ligge ved 3 · 12,0 mL = 36,0 mL. Det kan ikke ses på titrerkurven. HPO<sub>4</sub><sup>2−</sup> er en meget svag syre med p<em>K</em><sub>s</sub> = 12,35, så reaktionen mellem HPO<sub>4</sub><sup>2−</sup> og hydroxid går ikke til ende, og der kommer ikke noget spring.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.6-titrerkurve-for-maleinsyre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.6-titrerkurve-for-maleinsyre">Opgave A1.8.6: Titrerkurve for maleinsyre</h2>
+<p>Maleinsyre er en dihydron carboxylsyre med formlen HOOC−CH=CH−COOH. I denne opgave skrives maleinsyre som H<sub>2</sub>A. 20,0 mL af en opløsning af maleinsyre titreres med 0,100 M natriumhydroxid. Figuren viser titrerkurven.</p>
+<div id="fig-a1-opg-8-maleinsyre" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-opg-8-maleinsyre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-opg-8-maleinsyre.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Titrerkurven for 20,0 mL af opløsningen af maleinsyre i opgave A1.8.6, der titreres med 0,100 M natriumhydroxid."><img src="../figurer/a1-opg-8-maleinsyre.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-opg-8-maleinsyre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Titrerkurven for 20,0 mL af opløsningen af maleinsyre i opgave A1.8.6, der titreres med 0,100 M natriumhydroxid.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Aflæs volumenet af natriumhydroxid og pH i de to ækvivalenspunkter.</li>
+<li>Beregn koncentrationen af maleinsyre i de 20,0 mL ud fra første ækvivalenspunkt.</li>
+<li>Beregn koncentrationen af maleinsyre i de 20,0 mL ud fra andet ækvivalenspunkt. Passer de to resultater med hinanden?</li>
+<li>Aflæs pH i første halvækvivalenspunkt og i andet halvækvivalenspunkt.</li>
+<li>Tabelværdierne for maleinsyre er p<em>K</em><sub>s</sub> = 1,92 for første trin og p<em>K</em><sub>s</sub> = 6,23 for andet trin. Hvilken af de to aflæsninger fra spørgsmål d passer bedst med tabelværdien? Forklar hvorfor.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Det kan kurven fortælle</em>. Et ækvivalenspunkt ligger midt på et spring. I første ækvivalenspunkt har hvert molekyle maleinsyre reageret med én hydroxidion, og i andet ækvivalenspunkt har hvert molekyle maleinsyre reageret med to hydroxidioner.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Første halvækvivalenspunkt ligger ved det halve af volumenet i første ækvivalenspunkt. Andet halvækvivalenspunkt ligger midt mellem de to ækvivalenspunkter. Til spørgsmål e kan du begynde sådan:</p>
+<ul>
+<li>Aflæsningen i … halvækvivalenspunkt passer bedst, fordi …</li>
+<li>Første trin for maleinsyre har p<em>K</em><sub>s</sub> = 1,92, og derfor er maleinsyre en … syre.</li>
+<li>En del af molekylerne af maleinsyre har …, og derfor er der ikke lige meget H<sub>2</sub>A og HA<sup>−</sup> i første halvækvivalenspunkt.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Første ækvivalenspunkt ligger ved 8,0 mL natriumhydroxid, hvor pH er omkring 4,2. Andet ækvivalenspunkt ligger ved 16,0 mL natriumhydroxid, hvor pH er omkring 9,3.</p></li>
+<li><p>I første ækvivalenspunkt er der tilsat</p></li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{OH^-}) = c \cdot V = 0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0080\ \mathrm{L} = 0{,}00080\ \mathrm{mol}
+\]</span></p>
+<p>Hvert molekyle maleinsyre har reageret med én hydroxidion, så de 20,0 mL indeholdt 0,00080 mol maleinsyre.</p>
+<p><span class="math display">\[
+c(\mathrm{H_2A}) = \frac{n}{V} = \frac{0{,}00080\ \mathrm{mol}}{0{,}0200\ \mathrm{L}} = 0{,}040\ \mathrm{M}
+\]</span></p>
+<ol start="3" type="a">
+<li>I andet ækvivalenspunkt er der tilsat</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{OH^-}) = c \cdot V = 0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0160\ \mathrm{L} = 0{,}00160\ \mathrm{mol}
+\]</span></p>
+<p>Hvert molekyle maleinsyre har reageret med to hydroxidioner.</p>
+<p><span class="math display">\[
+n(\mathrm{H_2A}) = \tfrac{1}{2} \cdot 0{,}00160\ \mathrm{mol} = 0{,}00080\ \mathrm{mol} \qquad\qquad c(\mathrm{H_2A}) = \frac{0{,}00080\ \mathrm{mol}}{0{,}0200\ \mathrm{L}} = 0{,}040\ \mathrm{M}
+\]</span></p>
+<p>De to ækvivalenspunkter giver samme resultat. Koncentrationen af maleinsyre er 0,040 M.</p>
+<ol start="4" type="a">
+<li><p>Første halvækvivalenspunkt ligger ved 4,0 mL, hvor pH aflæses til omkring 2,2. Andet halvækvivalenspunkt ligger ved 12,0 mL, midt mellem de to ækvivalenspunkter, hvor pH aflæses til omkring 6,2.</p></li>
+<li><p>Aflæsningen i andet halvækvivalenspunkt passer bedst. Her er pH omkring 6,2, og tabelværdien er 6,23. I første halvækvivalenspunkt er pH omkring 2,2, og det er 0,3 højere end tabelværdien 1,92. Første trin for maleinsyre har p<em>K</em><sub>s</sub> = 1,92, så maleinsyre er en middelstærk syre. En del af molekylerne af maleinsyre har afgivet deres hydron til vand af sig selv, og derfor er der ikke lige meget H<sub>2</sub>A og HA<sup>−</sup> efter 4,0 mL. Reglen pH = p<em>K</em><sub>s</sub> i halvækvivalenspunktet passer bedst for svage syrer, og aflæsningen i første halvækvivalenspunkt giver kun en omtrentlig værdi.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.7-en-indikator-til-hvert-ækvivalenspunkt" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.7-en-indikator-til-hvert-ækvivalenspunkt">Opgave A1.8.7: En indikator til hvert ækvivalenspunkt</h2>
+<p>25,0 mL 0,0600 M svovlsyrling, H<sub>2</sub>SO<sub>3</sub>, titreres med 0,100 M natriumhydroxid. Svovlsyrling er en dihydron syre, og titrerkurven har to spring:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 26%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Spring</th>
+<th style="text-align: center;">Tilsat natriumhydroxid</th>
+<th style="text-align: center;">Springet går fra</th>
+<th style="text-align: center;">Springet går til</th>
+<th style="text-align: center;">pH i ækvivalenspunktet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">første</td>
+<td style="text-align: center;">15,0 mL</td>
+<td style="text-align: center;">pH 3,5</td>
+<td style="text-align: center;">pH 5,7</td>
+<td style="text-align: center;">4,6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">andet</td>
+<td style="text-align: center;">30,0 mL</td>
+<td style="text-align: center;">pH 8,7</td>
+<td style="text-align: center;">pH 11,0</td>
+<td style="text-align: center;">9,8</td>
+</tr>
+</tbody>
+</table>
+<p>Du kan vælge mellem seks indikatorer:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Indikator</th>
+<th style="text-align: center;">Omslagsområde</th>
+<th style="text-align: left;">Farveskift, når pH stiger</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">methylorange</td>
+<td style="text-align: center;">3,1 til 4,4</td>
+<td style="text-align: left;">rød til gul</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bromcresolgrønt</td>
+<td style="text-align: center;">3,8 til 5,4</td>
+<td style="text-align: left;">gul til blå</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">methylrødt</td>
+<td style="text-align: center;">4,4 til 6,2</td>
+<td style="text-align: left;">rød til gul</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bromthymolblåt</td>
+<td style="text-align: center;">6,0 til 7,6</td>
+<td style="text-align: left;">gul til blå</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">phenolphthalein</td>
+<td style="text-align: center;">8,2 til 10,0</td>
+<td style="text-align: left;">farveløs til lyserød</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">thymolphthalein</td>
+<td style="text-align: center;">9,3 til 10,5</td>
+<td style="text-align: left;">farveløs til blå</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Hvilken indikator passer bedst til første ækvivalenspunkt for svovlsyrling? Begrund valget.</li>
+<li>Hvilken indikator passer bedst til andet ækvivalenspunkt for svovlsyrling? Begrund valget.</li>
+<li>En elev bruger methylrødt til første ækvivalenspunkt og stopper, når opløsningen er blevet helt gul. Har eleven tilsat for meget eller for lidt natriumhydroxid? Begrund svaret.</li>
+<li>En anden elev bruger bromthymolblåt. Forklar, hvorfor farven skifter langsomt over mange mL, og hvorfor bromthymolblåt ikke kan vise nogen af de to ækvivalenspunkter.</li>
+<li>En tredje elev bruger kun thymolphthalein, og opløsningen bliver blå efter 30,0 mL natriumhydroxid. Hvor mange hydroxidioner har hvert molekyle svovlsyrling reageret med? Vis, at elevens måling giver koncentrationen 0,0600 M for svovlsyrling.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Valg af indikator</em>. En indikator skal skifte farve inde i det spring, den skal vise. Sammenlign hvert omslagsområde med de to spring på titrerkurven for svovlsyrling.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Første spring går fra pH 3,5 til pH 5,7. Find den indikator, hvor hele omslagsområdet ligger mellem de to tal. Gør det samme for andet spring fra pH 8,7 til pH 11,0. Til spørgsmål c og d kan du begynde sådan:</p>
+<ul>
+<li>Methylrødt er først helt gul ved pH …, og det er … end toppen af første spring. Derfor …</li>
+<li>Omslagsområdet for bromthymolblåt ligger mellem … og …, og dér er kurven …, fordi kolben indeholder et puffersystem af …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Bromcresolgrønt. Omslagsområdet fra 3,8 til 5,4 ligger helt inde i første spring, som går fra pH 3,5 til pH 5,7. Methylorange begynder at skifte farve ved pH 3,1, og det er lidt før springet.</p></li>
+<li><p>Thymolphthalein. Omslagsområdet fra 9,3 til 10,5 ligger helt inde i andet spring, som går fra pH 8,7 til pH 11,0. Phenolphthalein begynder at skifte farve ved pH 8,2, og det er lidt før springet.</p></li>
+<li><p>Eleven har tilsat for meget natriumhydroxid. Methylrødt er først helt gul ved pH 6,2, og det er højere end toppen af første spring ved pH 5,7. Opløsningen er altså kommet forbi første ækvivalenspunkt, før farveskiftet er færdigt. Den beregnede koncentration af svovlsyrling bliver for høj.</p></li>
+<li><p>Omslagsområdet for bromthymolblåt går fra pH 6,0 til pH 7,6. Det ligger mellem de to spring, omkring p<em>K</em><sub>s</sub> = 7,20 for andet trin. Her er titrerkurven flad, fordi kolben indeholder et puffersystem af HSO<sub>3</sub><sup>−</sup> og SO<sub>3</sub><sup>2−</sup>. Der skal derfor tilsættes mange mL natriumhydroxid, før pH er steget fra 6,0 til 7,6, og farven skifter langsomt. Farveskiftet sker midt mellem de to ækvivalenspunkter og viser ingen af dem.</p></li>
+<li><p>Thymolphthalein viser andet ækvivalenspunkt. Her har hvert molekyle svovlsyrling reageret med to hydroxidioner.</p></li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{OH^-}) = c \cdot V = 0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0300\ \mathrm{L} = 0{,}00300\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{H_2SO_3}) = \tfrac{1}{2} \cdot 0{,}00300\ \mathrm{mol} = 0{,}00150\ \mathrm{mol} \qquad\qquad c(\mathrm{H_2SO_3}) = \frac{0{,}00150\ \mathrm{mol}}{0{,}0250\ \mathrm{L}} = 0{,}0600\ \mathrm{M}
+\]</span></p>
+<p>Koncentrationen af svovlsyrling er 0,0600 M.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.8-to-spring-og-en-base-med-to-trin" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.8-to-spring-og-en-base-med-to-trin">Opgave A1.8.8: To spring og en base med to trin</h2>
+<p>Første spørgsmål handler om phosphorsyre. De fire næste handler om en titrering, hvor 40,0 mL 0,0500 M natriumcarbonat, Na<sub>2</sub>CO<sub>3</sub>, titreres med 0,100 M saltsyre. Carbonationen, CO<sub>3</sub><sup>2−</sup>, er en dihydron base. For kulsyre er p<em>K</em><sub>s</sub> = 6,35, og for hydrogencarbonat er p<em>K</em><sub>s</sub> = 10,33.</p>
+<ol type="a">
+<li>Phosphorsyre har tre hydroner, men titrerkurven for phosphorsyre har kun to spring. Forklar hvorfor.</li>
+<li>Opskriv reaktionsskemaerne for de to trin i titreringen af natriumcarbonat med saltsyre.</li>
+<li>Ved hvilke volumener af saltsyre ligger de to ækvivalenspunkter, og hvad indeholder kolben i hvert af dem?</li>
+<li>Hvad er pH, når der er tilsat 10,0 mL saltsyre, og når der er tilsat 30,0 mL saltsyre? Begrund svaret.</li>
+<li>Beskriv med ord, hvordan titrerkurven for natriumcarbonat ser ud. Hvor begynder kurven, hvilken vej går den, og hvor er den flad?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Hvorfor er der kun to spring?</em> og afsnittet <em>En base med to trin</em>. Oxoniumionerne fra saltsyren reagerer først med carbonat og derefter med hydrogencarbonat.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Kolben indeholder 2,00 mmol carbonat. Du kan begynde dine forklaringer sådan:</p>
+<ul>
+<li>HPO<sub>4</sub><sup>2−</sup> er en meget … syre med p<em>K</em><sub>s</sub> = …, og derfor kan hydroxidionerne ikke …</li>
+<li>Reaktionen mellem HPO<sub>4</sub><sup>2−</sup> og OH<sup>−</sup> er en …, som ikke …, og derfor kommer der ikke …</li>
+<li>Efter 10,0 mL saltsyre er der lige meget … og … i kolben, og derfor er pH lig med p<em>K</em><sub>s</sub> for …</li>
+<li>Titrerkurven for natriumcarbonat begynder ved en … pH, fordi carbonat er en …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Det tredje trin er reaktionen mellem HPO<sub>4</sub><sup>2−</sup> og hydroxid. HPO<sub>4</sub><sup>2−</sup> er en meget svag syre med p<em>K</em><sub>s</sub> = 12,35, og den holder så godt fast på den sidste hydron, at hydroxidionerne ikke kan fjerne den helt. Reaktionen er en ligevægt, som ikke går til ende. En del af den tilsatte hydroxid bliver derfor i opløsningen, pH stiger jævnt, og der kommer ikke noget tredje spring.</p></li>
+<li><p>De to trin i titreringen af natriumcarbonat er</p></li>
+</ol>
+<div class="reaktion">
+<p>CO<sub>3</sub><sup>2−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq) → HCO<sub>3</sub><sup>−</sup>(aq) + H<sub>2</sub>O(l)</p>
+</div>
+<div class="reaktion">
+<p>HCO<sub>3</sub><sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq) → H<sub>2</sub>CO<sub>3</sub>(aq) + H<sub>2</sub>O(l)</p>
+</div>
+<ol start="3" type="a">
+<li>Kolben indeholder</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{CO_3^{2-}}) = c \cdot V = 0{,}0500\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0400\ \mathrm{L} = 0{,}00200\ \mathrm{mol} = 2{,}00\ \mathrm{mmol}
+\]</span></p>
+<p>Første trin bruger 2,00 mmol oxoniumioner, og det svarer til 20,0 mL 0,100 M saltsyre. Andet trin bruger 2,00 mmol mere. Første ækvivalenspunkt ligger derfor ved 20,0 mL, hvor kolben indeholder hydrogencarbonat, HCO<sub>3</sub><sup>−</sup>. Andet ækvivalenspunkt ligger ved 40,0 mL, hvor kolben indeholder kulsyre, H<sub>2</sub>CO<sub>3</sub>.</p>
+<ol start="4" type="a">
+<li>10,0 mL er første halvækvivalenspunkt. Halvdelen af carbonationerne er lavet om til hydrogencarbonat, så der er lige meget af syren HCO<sub>3</sub><sup>−</sup> og basen CO<sub>3</sub><sup>2−</sup>. Derfor er pH lig med p<em>K</em><sub>s</sub> for hydrogencarbonat, altså 10,33.</li>
+</ol>
+<p>30,0 mL er andet halvækvivalenspunkt, midt mellem de to ækvivalenspunkter. Her er der lige meget af syren H<sub>2</sub>CO<sub>3</sub> og basen HCO<sub>3</sub><sup>−</sup>. Derfor er pH lig med p<em>K</em><sub>s</sub> for kulsyre, altså 6,35.</p>
+<ol start="5" type="a">
+<li>Titrerkurven for natriumcarbonat begynder ved en høj pH, omkring 11,5, fordi carbonat er en base. Kurven går nedad, fordi der tilsættes syre. Den er flad omkring pH 10,33, hvor kolben indeholder et puffersystem af HCO<sub>3</sub><sup>−</sup> og CO<sub>3</sub><sup>2−</sup>, og falder så i et spring ved 20,0 mL. Derefter er kurven flad igen omkring pH 6,35, hvor kolben indeholder et puffersystem af H<sub>2</sub>CO<sub>3</sub> og HCO<sub>3</sub><sup>−</sup>, og falder i et nyt spring ved 40,0 mL. Efter andet spring er pH lav, fordi der er overskud af saltsyre.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med reaktionsskema, formel, beregning med enheder og en konklusion.</p>
+</section>
+<section id="opgave-a1.8.eks.1-phosphorsyre-i-rustfjerner" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.eks.1-phosphorsyre-i-rustfjerner">Opgave A1.8.eks.1: Phosphorsyre i rustfjerner</h2>
+<p>Mange rustfjernere indeholder phosphorsyre, H<sub>3</sub>PO<sub>4</sub>. Syren opløser rusten og efterlader et tyndt lag jernphosphat, som beskytter jernet. En fabrik vil kontrollere indholdet af phosphorsyre i en rustfjerner. 5,00 g rustfjerner fortyndes med vand til 250,0 mL i en målekolbe. 25,0 mL af den fortyndede opløsning titreres med 0,100 M natriumhydroxid, mens pH måles. Titrerkurven har to spring, og første ækvivalenspunkt ligger ved 14,0 mL natriumhydroxid.</p>
+<p>For første trin af phosphorsyre er p<em>K</em><sub>s</sub> = 2,15. Molarmassen af phosphorsyre er 97,99 g/mol.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for den reaktion, der sker i kolben frem til første ækvivalenspunkt.</li>
+<li>Bestem koncentrationen af phosphorsyre i den fortyndede opløsning.</li>
+<li>Beregn masseprocenten af phosphorsyre i rustfjerneren.</li>
+<li>Beregn pH i den fortyndede opløsning, før titreringen begynder.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I første ækvivalenspunkt har hvert molekyle phosphorsyre reageret med én hydroxidion. Beregn stofmængden af hydroxid i de 14,0 mL, og find derfra stofmængden og koncentrationen af phosphorsyre i de 25,0 mL.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål c: Hele målekolben på 250,0 mL indeholder den phosphorsyre, der var i de 5,00 g rustfjerner. Find stofmængden med <em>n</em> = <em>c</em> · <em>V</em> og massen med <em>m</em> = <em>n</em> · <em>M</em>. Til spørgsmål d: Lav et SÆL-skema for første trin af phosphorsyre, hvor <em>x</em> er den koncentration af H<sub>3</sub>PO<sub>4</sub>, der har afgivet én hydron. <em>K</em><sub>s</sub> = 10<sup>−2,15</sup> M.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Frem til første ækvivalenspunkt fjerner hydroxidionerne den første hydron fra phosphorsyre:</li>
+</ol>
+<div class="reaktion">
+<p>H<sub>3</sub>PO<sub>4</sub>(aq) + OH<sup>−</sup>(aq) → H<sub>2</sub>PO<sub>4</sub><sup>−</sup>(aq) + H<sub>2</sub>O(l)</p>
+</div>
+<ol start="2" type="a">
+<li>I første ækvivalenspunkt er der tilsat</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{OH^-}) = c \cdot V = 0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0140\ \mathrm{L} = 0{,}00140\ \mathrm{mol}
+\]</span></p>
+<p>Forholdet mellem phosphorsyre og hydroxid er 1 : 1 i første ækvivalenspunkt, så de 25,0 mL indeholdt 0,00140 mol phosphorsyre.</p>
+<p><span class="math display">\[
+c(\mathrm{H_3PO_4}) = \frac{n}{V} = \frac{0{,}00140\ \mathrm{mol}}{0{,}0250\ \mathrm{L}} = 0{,}0560\ \mathrm{M}
+\]</span></p>
+<p>Koncentrationen af phosphorsyre i den fortyndede opløsning er 0,0560 M.</p>
+<ol start="3" type="a">
+<li>Målekolben med 250,0 mL fortyndet opløsning indeholder al phosphorsyren fra de 5,00 g rustfjerner.</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{H_3PO_4}) = c \cdot V = 0{,}0560\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}2500\ \mathrm{L} = 0{,}0140\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{H_3PO_4}) = n \cdot M = 0{,}0140\ \mathrm{mol} \cdot 97{,}99\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 1{,}37\ \mathrm{g}
+\]</span></p>
+<p><span class="math display">\[
+\text{masseprocent} = \frac{1{,}37\ \mathrm{g}}{5{,}00\ \mathrm{g}} \cdot 100\ \% = 27{,}4\ \%
+\]</span></p>
+<p>Rustfjerneren indeholder 27,4 % phosphorsyre.</p>
+<ol start="4" type="a">
+<li>Før titreringen indeholder kolben 0,0560 M phosphorsyre. Det er kun første trin, der betyder noget for pH:</li>
+</ol>
+<div class="reaktion">
+<p>H<sub>3</sub>PO<sub>4</sub>(aq) + H<sub>2</sub>O(l) ⇌ H<sub>2</sub>PO<sub>4</sub><sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<p><span class="math display">\[
+K_\mathrm{s} = \frac{[\mathrm{H_2PO_4^-}] \cdot [\mathrm{H_3O^+}]}{[\mathrm{H_3PO_4}]} = 10^{-2{,}15}\ \mathrm{M} = 7{,}08 \cdot 10^{-3}\ \mathrm{M}
+\]</span></p>
+<p><em>x</em> angiver her den koncentration af H<sub>3</sub>PO<sub>4</sub>, der har afgivet én hydron, fra start og frem til ligevægt.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">H<sub>3</sub>PO<sub>4</sub></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">H<sub>2</sub>PO<sub>4</sub><sup>−</sup></th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>3</sub>O<sup>+</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start</td>
+<td style="text-align: center;">0,0560 M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0 M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,0560 M − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+7{,}08 \cdot 10^{-3}\ \mathrm{M} = \frac{x \cdot x}{0{,}0560\ \mathrm{M} - x}
+\]</span></p>
+<p>CAS-værktøjet giver <em>x</em> = 0,0167 eller <em>x</em> = −0,0238. En koncentration kan ikke være negativ, så den negative løsning forkastes. Altså er [H<sub>3</sub>O<sup>+</sup>] = 0,0167 M.</p>
+<p><span class="math display">\[
+\mathrm{pH} = -\log(0{,}0167) = 1{,}78
+\]</span></p>
+<p>pH i den fortyndede opløsning af rustfjerner er 1,78, før titreringen begynder.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.eks.2-sulfit-i-vin" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.eks.2-sulfit-i-vin">Opgave A1.8.eks.2: Sulfit i vin</h2>
+<p>Vin tilsættes sulfit som konserveringsmiddel, og på etiketten står der “indeholder sulfitter”. På varedeklarationer hedder stofferne E 220 til E 228. I vinen findes sulfit som de tre former af den dihydrone syre svovlsyrling: H<sub>2</sub>SO<sub>3</sub>, HSO<sub>3</sub><sup>−</sup> og SO<sub>3</sub><sup>2−</sup>. Det er især formen H<sub>2</sub>SO<sub>3</sub>, der hæmmer bakterier og gærceller. For svovlsyrling er p<em>K</em><sub>s</sub> = 1,85 for første trin og p<em>K</em><sub>s</sub> = 7,20 for andet trin. En hvidvin har pH 3,50.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaerne for de to trin, hvor svovlsyrling afgiver sine hydroner til vand.</li>
+<li>Argumentér ud fra de to p<em>K</em><sub>s</sub>-værdier for, hvilken af de tre former af svovlsyrling der er mest af i hvidvinen.</li>
+<li>Beregn, hvor stor en del af stoffet der findes som H<sub>2</sub>SO<sub>3</sub> i hvidvinen med pH 3,50.</li>
+<li>En anden vin har pH 3,20 og er tilsat lige så meget sulfit som hvidvinen med pH 3,50. Vurdér, hvilken af de to vine der er bedst beskyttet mod bakterier og gærceller.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign vinens pH med de to p<em>K</em><sub>s</sub>-værdier for svovlsyrling. Under 1,85 er der mest H<sub>2</sub>SO<sub>3</sub>, mellem 1,85 og 7,20 er der mest HSO<sub>3</sub><sup>−</sup>, og over 7,20 er der mest SO<sub>3</sub><sup>2−</sup>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved pH 3,50 er der næsten ingen SO<sub>3</sub><sup>2−</sup>, så du kan regne med første trin alene. H<sub>2</sub>SO<sub>3</sub> er syren, og HSO<sub>3</sub><sup>−</sup> er basen. Den del, der findes som H<sub>2</sub>SO<sub>3</sub>, er syrebrøken <em>x</em><sub>s</sub> = 1 / (1 + 10<sup>pH&nbsp;−&nbsp;p<em>K</em><sub>s</sub></sup>) med p<em>K</em><sub>s</sub> = 1,85. Til spørgsmål d kan du begynde sådan:</p>
+<ul>
+<li>I vinen med pH 3,20 findes … % som H<sub>2</sub>SO<sub>3</sub>, og i vinen med pH 3,50 findes … %.</li>
+<li>Det er H<sub>2</sub>SO<sub>3</sub>, der …, og derfor er vinen med pH … bedst beskyttet.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De to trin for svovlsyrling er</li>
+</ol>
+<div class="reaktion">
+<p>H<sub>2</sub>SO<sub>3</sub>(aq) + H<sub>2</sub>O(l) ⇌ HSO<sub>3</sub><sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<div class="reaktion">
+<p>HSO<sub>3</sub><sup>−</sup>(aq) + H<sub>2</sub>O(l) ⇌ SO<sub>3</sub><sup>2−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<ol start="2" type="a">
+<li><p>Vinens pH på 3,50 ligger mellem de to p<em>K</em><sub>s</sub>-værdier. pH er 1,65 pH-enheder højere end p<em>K</em><sub>s</sub> = 1,85 for første trin, så næsten al H<sub>2</sub>SO<sub>3</sub> har afgivet sin første hydron. pH er 3,70 pH-enheder lavere end p<em>K</em><sub>s</sub> = 7,20 for andet trin, så næsten ingen HSO<sub>3</sub><sup>−</sup> har afgivet den anden hydron. Der er derfor mest af den midterste form, hydrogensulfit, HSO<sub>3</sub><sup>−</sup>.</p></li>
+<li><p>Ved pH 3,50 er der næsten ingen SO<sub>3</sub><sup>2−</sup>, så der regnes med første trin alene. H<sub>2</sub>SO<sub>3</sub> er syren, og HSO<sub>3</sub><sup>−</sup> er basen.</p></li>
+</ol>
+<p><span class="math display">\[
+\frac{n_\mathrm{b}}{n_\mathrm{s}} = 10^{\,\mathrm{pH} - \mathrm{p}K_\mathrm{s}} = 10^{\,3{,}50 - 1{,}85} = 10^{\,1{,}65} = 44{,}7
+\]</span></p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 44{,}7} = 0{,}0219
+\]</span></p>
+<p>I hvidvinen med pH 3,50 findes 2,19 % som H<sub>2</sub>SO<sub>3</sub>. Resten findes som HSO<sub>3</sub><sup>−</sup>.</p>
+<ol start="4" type="a">
+<li>I vinen med pH 3,20 er</li>
+</ol>
+<p><span class="math display">\[
+\frac{n_\mathrm{b}}{n_\mathrm{s}} = 10^{\,3{,}20 - 1{,}85} = 10^{\,1{,}35} = 22{,}4 \qquad\qquad x_\mathrm{s} = \frac{1}{1 + 22{,}4} = 0{,}043
+\]</span></p>
+<p>I vinen med pH 3,20 findes 4,3 % som H<sub>2</sub>SO<sub>3</sub>, og i vinen med pH 3,50 findes 2,2 %. De to vine er tilsat lige meget sulfit, så vinen med pH 3,20 indeholder omkring dobbelt så meget H<sub>2</sub>SO<sub>3</sub>. Det er H<sub>2</sub>SO<sub>3</sub>, der hæmmer bakterier og gærceller, og derfor er vinen med pH 3,20 bedst beskyttet. Jo lavere pH vinen har, jo mindre sulfit skal der til.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.8.eks.3-soda-i-vaskepulver" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.8.eks.3-soda-i-vaskepulver">Opgave A1.8.eks.3: Soda i vaskepulver</h2>
+<p>Soda er natriumcarbonat, Na<sub>2</sub>CO<sub>3</sub>. Mange vaskepulvere indeholder soda, fordi det gør vaskevandet basisk. For at bestemme indholdet af soda opløses 2,00 g vaskepulver i vand, og opløsningen fyldes op til 100,0 mL i en målekolbe. 25,0 mL af opløsningen titreres med 0,100 M saltsyre. Figuren viser titrerkurven. Det antages, at natriumcarbonat er det eneste stof i vaskepulveret, der reagerer med saltsyre. Molarmassen af natriumcarbonat er 105,99 g/mol.</p>
+<div id="fig-a1-opg-8-soda" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-opg-8-soda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-opg-8-soda.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Titrerkurven for 25,0 mL af opløsningen af vaskepulver i opgave A1.8.eks.3, der titreres med 0,100 M saltsyre."><img src="../figurer/a1-opg-8-soda.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-opg-8-soda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Titrerkurven for 25,0 mL af opløsningen af vaskepulver i opgave A1.8.eks.3, der titreres med 0,100 M saltsyre.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Indikator</th>
+<th style="text-align: center;">Omslagsområde</th>
+<th style="text-align: left;">Farveskift, når pH stiger</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">methylorange</td>
+<td style="text-align: center;">3,1 til 4,4</td>
+<td style="text-align: left;">rød til gul</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">methylrødt</td>
+<td style="text-align: center;">4,4 til 6,2</td>
+<td style="text-align: left;">rød til gul</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">bromthymolblåt</td>
+<td style="text-align: center;">6,0 til 7,6</td>
+<td style="text-align: left;">gul til blå</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">phenolphthalein</td>
+<td style="text-align: center;">8,2 til 10,0</td>
+<td style="text-align: left;">farveløs til lyserød</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Aflæs de to ækvivalenspunkter på titrerkurven.</li>
+<li>Bestem masseprocenten af natriumcarbonat i vaskepulveret ud fra andet ækvivalenspunkt.</li>
+<li>Bestem ud fra titrerkurven p<em>K</em><sub>s</sub> for hydrogencarbonat og p<em>K</em><sub>s</sub> for kulsyre.</li>
+<li>Angiv, hvilken af de fire indikatorer i tabellen der er egnet til andet ækvivalenspunkt, og begrund valget.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Titrerkurven for natriumcarbonat falder i to spring, og hvert ækvivalenspunkt ligger midt på et spring. I første trin bliver carbonat til hydrogencarbonat, og i andet trin bliver hydrogencarbonat til kulsyre. I andet ækvivalenspunkt har hver carbonation reageret med to oxoniumioner.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål b: Stofmængden af carbonat i de 25,0 mL er det halve af stofmængden af oxoniumioner i andet ækvivalenspunkt. Målekolben på 100,0 mL indeholder fire gange så meget carbonat som de 25,0 mL. Til spørgsmål c: Aflæs pH i de to halvækvivalenspunkter. Det første ligger ved det halve af volumenet i første ækvivalenspunkt, og det andet ligger midt mellem de to ækvivalenspunkter.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Første ækvivalenspunkt ligger ved 9,0 mL saltsyre, hvor pH er omkring 8,3. Andet ækvivalenspunkt ligger ved 18,0 mL saltsyre, hvor pH er omkring 4,0.</p></li>
+<li><p>I titreringen reagerer carbonat med oxoniumioner i to trin:</p></li>
+</ol>
+<div class="reaktion">
+<p>CO<sub>3</sub><sup>2−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq) → HCO<sub>3</sub><sup>−</sup>(aq) + H<sub>2</sub>O(l)</p>
+</div>
+<div class="reaktion">
+<p>HCO<sub>3</sub><sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq) → H<sub>2</sub>CO<sub>3</sub>(aq) + H<sub>2</sub>O(l)</p>
+</div>
+<p>I andet ækvivalenspunkt er der tilsat</p>
+<p><span class="math display">\[
+n(\mathrm{H_3O^+}) = c \cdot V = 0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0180\ \mathrm{L} = 0{,}00180\ \mathrm{mol}
+\]</span></p>
+<p>Hver carbonation har reageret med to oxoniumioner, så forholdet mellem carbonat og oxonium er 1 : 2.</p>
+<p><span class="math display">\[
+n(\mathrm{CO_3^{2-}}) = \tfrac{1}{2} \cdot 0{,}00180\ \mathrm{mol} = 0{,}000900\ \mathrm{mol}
+\]</span></p>
+<p>Det er stofmængden i de 25,0 mL. Målekolben med 100,0 mL indeholder fire gange så meget:</p>
+<p><span class="math display">\[
+n(\mathrm{Na_2CO_3}) = 4 \cdot 0{,}000900\ \mathrm{mol} = 0{,}00360\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{Na_2CO_3}) = n \cdot M = 0{,}00360\ \mathrm{mol} \cdot 105{,}99\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}382\ \mathrm{g}
+\]</span></p>
+<p><span class="math display">\[
+\text{masseprocent} = \frac{0{,}382\ \mathrm{g}}{2{,}00\ \mathrm{g}} \cdot 100\ \% = 19{,}1\ \%
+\]</span></p>
+<p>Vaskepulveret indeholder 19,1 % natriumcarbonat.</p>
+<ol start="3" type="a">
+<li>Første halvækvivalenspunkt ligger ved 4,5 mL saltsyre. Her er halvdelen af carbonationerne lavet om til hydrogencarbonat, så der er lige meget af syren HCO<sub>3</sub><sup>−</sup> og basen CO<sub>3</sub><sup>2−</sup>, og pH er lig med p<em>K</em><sub>s</sub> for hydrogencarbonat. pH aflæses til omkring 10,3. Altså er p<em>K</em><sub>s</sub> omkring 10,3 for hydrogencarbonat.</li>
+</ol>
+<p>Andet halvækvivalenspunkt ligger ved 13,5 mL saltsyre, midt mellem de to ækvivalenspunkter. Her er der lige meget af syren H<sub>2</sub>CO<sub>3</sub> og basen HCO<sub>3</sub><sup>−</sup>, og pH er lig med p<em>K</em><sub>s</sub> for kulsyre. pH aflæses til mellem 6,3 og 6,4. Altså er p<em>K</em><sub>s</sub> omkring 6,35 for kulsyre.</p>
+<p>Tabelværdierne er 10,33 for hydrogencarbonat og 6,35 for kulsyre, så aflæsningerne passer.</p>
+<ol start="4" type="a">
+<li>Methylorange er egnet. Andet spring på titrerkurven går fra omkring pH 5 til omkring pH 3, og omslagsområdet for methylorange fra 3,1 til 4,4 ligger inde i springet. I titreringen falder pH, så methylorange skifter fra gul til rød i andet ækvivalenspunkt. Methylrødt begynder at skifte farve allerede ved pH 6,2, og det er længe før andet ækvivalenspunkt. Bromthymolblåt og phenolphthalein skifter farve ved endnu højere pH.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="pagination-link" aria-label="A1.8 Titrering af phosphorsyre">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A1.8 Titrering af phosphorsyre</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a2-1-energi-og-entalpi.html" class="pagination-link" aria-label="A2.1 Energi og entalpi">
+        <span class="nav-page-text">A2.1 Energi og entalpi</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

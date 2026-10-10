@@ -1,6 +1,6 @@
 # Molekylemotoren
 
-Fælles kode til at tegne og navngive molekyler. Den bruges af fire sider:
+Fælles kode til at tegne og navngive molekyler. Den bruges af seks sider:
 
 * `../superanimationer/tegnebraet/`: tegnebrættet til rapporter
 * `../superanimationer/sc6.2_zigzagformler/`: quizzerne om zigzagformler, navne
@@ -11,6 +11,14 @@ Fælles kode til at tegne og navngive molekyler. Den bruges af fire sider:
   produkterne bygges som grafer og navngives af motoren, og tavlen tegner
   atomerne, mens de flytter sig (molekyle, navngivning, smiles, trivialnavne,
   layout og struktur; ikke tavlen)
+* `../superanimationer/sb4.7_spejlbilledeisomeri/`: zigzagformlerne på fanen Find
+  C-atomet (molekyle, navngivning, smiles, layout og struktur)
+* `../superanimationer/sb4.8_organiske_navne/`: navne på alkoholer, aldehyder,
+  ketoner, carboxylsyrer, estere og aminer. Molekylerne bygges af navnet
+  (navnelæseren), tegnes af struktur, og på fanen Tegn molekylet tegner eleven på
+  tavlen, og navngivningen er facit. Animationen lægger sin egen `klik` på sin
+  tavle (et klik på O eller N med Kæde sætter et carbonatom på); motoren er ikke
+  ændret
 
 Koden lå i sc6.2 indtil 25. september 2026. Da fik tegnebrættet sin egen side, og
 motoren blev flyttet hertil, så den ikke skal kopieres fra mappe til mappe. Den

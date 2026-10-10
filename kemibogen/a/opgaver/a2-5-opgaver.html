@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A2.5 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" rel="next">
+<link href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-5-opgaver.html">Opgaver til A2.5</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a2.5.1-to-størrelser-med-næsten-samme-navn" id="toc-opgave-a2.5.1-to-størrelser-med-næsten-samme-navn" class="nav-link active" data-scroll-target="#opgave-a2.5.1-to-størrelser-med-næsten-samme-navn">Opgave A2.5.1: To størrelser med næsten samme navn</a></li>
+  <li><a href="#opgave-a2.5.2-fire-gasser-i-en-beholder" id="toc-opgave-a2.5.2-fire-gasser-i-en-beholder" class="nav-link" data-scroll-target="#opgave-a2.5.2-fire-gasser-i-en-beholder">Opgave A2.5.2: Fire gasser i en beholder</a></li>
+  <li><a href="#opgave-a2.5.3-methanol-ved-25-c" id="toc-opgave-a2.5.3-methanol-ved-25-c" class="nav-link" data-scroll-target="#opgave-a2.5.3-methanol-ved-25-c">Opgave A2.5.3: Methanol ved 25 °C</a></li>
+  <li><a href="#opgave-a2.5.4-ethansyre-og-methansyre" id="toc-opgave-a2.5.4-ethansyre-og-methansyre" class="nav-link" data-scroll-target="#opgave-a2.5.4-ethansyre-og-methansyre">Opgave A2.5.4: Ethansyre og methansyre</a></li>
+  <li><a href="#opgave-a2.5.5-hydrogen-af-naturgas" id="toc-opgave-a2.5.5-hydrogen-af-naturgas" class="nav-link" data-scroll-target="#opgave-a2.5.5-hydrogen-af-naturgas">Opgave A2.5.5: Hydrogen af naturgas</a></li>
+  <li><a href="#opgave-a2.5.6-to-regler-samme-svar" id="toc-opgave-a2.5.6-to-regler-samme-svar" class="nav-link" data-scroll-target="#opgave-a2.5.6-to-regler-samme-svar">Opgave A2.5.6: To regler, samme svar</a></li>
+  <li><a href="#opgave-a2.5.7-kalkvand" id="toc-opgave-a2.5.7-kalkvand" class="nav-link" data-scroll-target="#opgave-a2.5.7-kalkvand">Opgave A2.5.7: Kalkvand</a></li>
+  <li><a href="#opgave-a2.5.8-vands-damptryk" id="toc-opgave-a2.5.8-vands-damptryk" class="nav-link" data-scroll-target="#opgave-a2.5.8-vands-damptryk">Opgave A2.5.8: Vands damptryk</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a2.5.eks.1-ammoniak-til-kunstgødning" id="toc-opgave-a2.5.eks.1-ammoniak-til-kunstgødning" class="nav-link" data-scroll-target="#opgave-a2.5.eks.1-ammoniak-til-kunstgødning">Opgave A2.5.eks.1: Ammoniak til kunstgødning</a></li>
+  <li><a href="#opgave-a2.5.eks.2-nitrogenoxid-fra-en-bilmotor" id="toc-opgave-a2.5.eks.2-nitrogenoxid-fra-en-bilmotor" class="nav-link" data-scroll-target="#opgave-a2.5.eks.2-nitrogenoxid-fra-en-bilmotor">Opgave A2.5.eks.2: Nitrogenoxid fra en bilmotor</a></li>
+  <li><a href="#opgave-a2.5.eks.3-natron-i-skabet-og-i-ovnen" id="toc-opgave-a2.5.eks.3-natron-i-skabet-og-i-ovnen" class="nav-link" data-scroll-target="#opgave-a2.5.eks.3-natron-i-skabet-og-i-ovnen">Opgave A2.5.eks.3: Natron i skabet og i ovnen</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-5-opgaver.html">Opgaver til A2.5</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A2.5</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html">A2.5 Gibbs-energi og ligevægt</a>. Prøv selv, før du åbner hjælpen under opgaven. Tabelværdierne står i tabellen <a href="../bilag/termodynamiske-data.html">Termodynamiske data</a>.</p>
+<section id="opgave-a2.5.1-to-størrelser-med-næsten-samme-navn" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.1-to-størrelser-med-næsten-samme-navn">Opgave A2.5.1: To størrelser med næsten samme navn</h2>
+<p>Tabellen viser Δ<em>G</em><sup>⊖</sup> ved 25 °C for tre reaktioner mellem gasser.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Reaktionsskema</th>
+<th style="text-align: left;">Δ<em>G</em><sup>⊖</sup> ved 25 °C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">2 NO<sub>2</sub>(g) ⇌ N<sub>2</sub>O<sub>4</sub>(g)</td>
+<td style="text-align: left;">−4,7 kJ/mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>4</sub>(g) + H<sub>2</sub>(g) ⇌ C<sub>2</sub>H<sub>6</sub>(g)</td>
+<td style="text-align: left;">−100,4 kJ/mol</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">3 O<sub>2</sub>(g) ⇌ 2 O<sub>3</sub>(g)</td>
+<td style="text-align: left;">326,4 kJ/mol</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Afgør for hver af de tre reaktioner, om ligevægtskonstanten ved 25 °C er større end 1 eller mindre end 1.</li>
+<li>Hvilken af de tre reaktioner har den største ligevægtskonstant, og hvilken har den mindste? Begrund svaret uden at regne.</li>
+<li>En elev siger: “Δ<em>G</em><sup>⊖</sup> er positiv for reaktion 3, så der kan slet ikke dannes ozon, O<sub>3</sub>, af dioxygen.” Forklar, hvad der er galt med elevens udsagn.</li>
+<li>En beholder ved 25 °C indeholder kun NO<sub>2</sub> fra start. Reaktion 1 forløber, indtil der er ligevægt. Hvilken af de to størrelser Δ<em>G</em> og Δ<em>G</em><sup>⊖</sup> ændrer sig undervejs, og hvilken værdi har Δ<em>G</em>, når der er ligevægt?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For hver af de tre reaktioner i tabellen er Δ<em>G</em><sup>⊖</sup> et fast tal ved 25 °C. Fortegnet på Δ<em>G</em><sup>⊖</sup> fortæller, om reaktionens ligevægtskonstant er større eller mindre end 1. Sammenhængen står i tabellen i afsnit A2.5 under overskriften “Ved ligevægt er Δ<em>G</em> = 0”. Δ<em>G</em> uden standardtegn er et øjebliksbillede af den blanding, der er i beholderen lige nu.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Formlen ln <em>K</em> = −Δ<em>G</em><sup>⊖</sup> / (<em>R</em> · <em>T</em>) viser, at en meget negativ Δ<em>G</em><sup>⊖</sup> giver en meget stor ligevægtskonstant, og at en meget positiv Δ<em>G</em><sup>⊖</sup> giver en meget lille ligevægtskonstant.</p>
+<p>Du kan begynde forklaringen i spørgsmål c sådan: “En positiv Δ<em>G</em><sup>⊖</sup> betyder ikke, at … Den betyder, at ligevægtskonstanten for dannelsen af ozon er …”</p>
+<p>Du kan begynde svaret i spørgsmål d sådan: “Mens NO<sub>2</sub> reagerer, ændrer … sig, fordi partialtrykkene … Ved ligevægt er Δ<em>G</em> = …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Reaktion 1, 2 NO<sub>2</sub>(g) ⇌ N<sub>2</sub>O<sub>4</sub>(g), har en negativ Δ<em>G</em><sup>⊖</sup>. Ligevægtskonstanten er derfor større end 1, og ligevægten er forskudt mod højre. Reaktion 2, C<sub>2</sub>H<sub>4</sub>(g) + H<sub>2</sub>(g) ⇌ C<sub>2</sub>H<sub>6</sub>(g), har også en negativ Δ<em>G</em><sup>⊖</sup>, så ligevægtskonstanten er større end 1. Reaktion 3, 3 O<sub>2</sub>(g) ⇌ 2 O<sub>3</sub>(g), har en positiv Δ<em>G</em><sup>⊖</sup>. Ligevægtskonstanten er derfor mindre end 1, og ligevægten er forskudt mod venstre.</p></li>
+<li><p>Reaktion 2 med ethen og hydrogen har den største ligevægtskonstant, fordi Δ<em>G</em><sup>⊖</sup> = −100,4 kJ/mol er den mest negative af de tre værdier. Reaktion 3 med ozon har den mindste ligevægtskonstant, fordi Δ<em>G</em><sup>⊖</sup> = 326,4 kJ/mol er positiv og meget stor. Det følger af ln <em>K</em> = −Δ<em>G</em><sup>⊖</sup> / (<em>R</em> · <em>T</em>): jo mindre Δ<em>G</em><sup>⊖</sup> er, jo større er ln <em>K</em>. Regner man efter, er ligevægtskonstanterne 6,7 bar<sup>−1</sup> for reaktion 1, 4,0 · 10<sup>17</sup> bar<sup>−1</sup> for reaktion 2 og 6,1 · 10<sup>−58</sup> bar<sup>−1</sup> for reaktion 3.</p></li>
+<li><p>En positiv Δ<em>G</em><sup>⊖</sup> betyder ikke, at der slet ikke sker noget. Den betyder, at ligevægtskonstanten for dannelsen af ozon er mindre end 1, så ligevægten er forskudt mod venstre, altså mod O<sub>2</sub>. Δ<em>G</em><sup>⊖</sup> gælder for standardtilstanden, hvor både O<sub>2</sub> og O<sub>3</sub> har partialtrykket 1 bar. I ren dioxygen er der slet ingen ozon. Så er reaktionsbrøken mindre end ligevægtskonstanten, og Δ<em>G</em> for den blanding er negativ. Der dannes derfor en lille smule ozon, indtil <em>Y</em> = <em>K</em>. Ligevægtskonstanten er bare så lille, at mængden af ozon er forsvindende.</p></li>
+<li><p>Det er Δ<em>G</em>, der ændrer sig. Δ<em>G</em> afhænger af partialtrykkene af NO<sub>2</sub> og N<sub>2</sub>O<sub>4</sub> i beholderen, og de ændrer sig, mens reaktionen forløber. Δ<em>G</em><sup>⊖</sup> er hele tiden −4,7 kJ/mol, fordi den hører til standardtilstanden ved 25 °C. Fra start er Δ<em>G</em> negativ, og reaktionen forløber mod højre. Undervejs bliver Δ<em>G</em> mindre og mindre negativ. Når der er ligevægt, er Δ<em>G</em> = 0.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.2-fire-gasser-i-en-beholder" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.2-fire-gasser-i-en-beholder">Opgave A2.5.2: Fire gasser i en beholder</h2>
+<p>Carbonmonoxid og vanddamp kan reagere og danne carbondioxid og hydrogen. Industrien bruger reaktionen, når der skal fremstilles hydrogen:</p>
+<div class="reaktion">
+<p>CO(g) + H<sub>2</sub>O(g) ⇌ CO<sub>2</sub>(g) + H<sub>2</sub>(g)</p>
+</div>
+<p>Ved 500 K er Δ<em>G</em><sup>⊖</sup> = −20,2 kJ/mol for reaktionen. En beholder ved 500 K indeholder en blanding med partialtrykkene <em>p</em>(CO) = 0,10 bar, <em>p</em>(H<sub>2</sub>O) = 0,20 bar, <em>p</em>(CO<sub>2</sub>) = 3,0 bar og <em>p</em>(H<sub>2</sub>) = 4,0 bar.</p>
+<ol type="a">
+<li>Opskriv reaktionsbrøken, og beregn <em>Y</em> for blandingen.</li>
+<li>Beregn Δ<em>G</em> for blandingen.</li>
+<li>Afgør, hvilken vej reaktionen forløber.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsbrøken skrives af efter reaktionsskemaet: partialtrykkene af CO<sub>2</sub> og H<sub>2</sub> står over brøkstregen, og partialtrykkene af CO og H<sub>2</sub>O står under. Sæt partialtrykkene ind som tal uden enhed. Brug derefter Δ<em>G</em> = Δ<em>G</em><sup>⊖</sup> + <em>R</em> · <em>T</em> · ln <em>Y</em>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsbrøken for blandingen af de fire gasser er <em>Y</em> = 600. Δ<em>G</em><sup>⊖</sup> står i kJ/mol, så gaskonstanten skal regnes om til kJ: <em>R</em> = 8,314 · 10<sup>−3</sup> kJ/(mol · K). Temperaturen står allerede i kelvin. Er Δ<em>G</em> negativ, forløber reaktionen mod højre. Er Δ<em>G</em> positiv, forløber reaktionen mod venstre.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Reaktionsbrøken for CO(g) + H<sub>2</sub>O(g) ⇌ CO<sub>2</sub>(g) + H<sub>2</sub>(g) er</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{CO_2}) \cdot p(\mathrm{H_2})}{p(\mathrm{CO}) \cdot p(\mathrm{H_2O})} = \frac{3{,}0 \cdot 4{,}0}{0{,}10 \cdot 0{,}20} = 600
+\]</span></p>
+<p>Partialtrykkene er sat ind som talværdien i bar, så <em>Y</em> er et tal uden enhed.</p>
+<ol start="2" type="a">
+<li>Gaskonstanten regnes om til kJ: <em>R</em> = 8,314 J/(mol · K) = 8,314 · 10<sup>−3</sup> kJ/(mol · K).</li>
+</ol>
+<p><span class="math display">\[
+\Delta G = \Delta G^{\ominus} + R \cdot T \cdot \ln Y = -20{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} + 8{,}314 \cdot 10^{-3}\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot 500\ \mathrm{K} \cdot \ln(600) = 6{,}4\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<ol start="3" type="a">
+<li>Δ<em>G</em> = 6,4 kJ/mol. Den er positiv, så reaktionen forløber mod venstre. Der dannes CO og H<sub>2</sub>O, selv om Δ<em>G</em><sup>⊖</sup> er negativ. Det skyldes, at blandingen indeholder meget CO<sub>2</sub> og H<sub>2</sub> og kun lidt CO og H<sub>2</sub>O.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.3-methanol-ved-25-c" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.3-methanol-ved-25-c">Opgave A2.5.3: Methanol ved 25 °C</h2>
+<p>Methanol kan fremstilles af carbonmonoxid og hydrogen:</p>
+<div class="reaktion">
+<p>CO(g) + 2 H<sub>2</sub>(g) ⇌ CH<sub>3</sub>OH(g)</p>
+</div>
+<p>Brug tabellen <a href="../bilag/termodynamiske-data.html">Termodynamiske data</a>.</p>
+<ol type="a">
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 25 °C ud fra tabelværdierne for <em>G</em><sup>⊖</sup>.</li>
+<li>Beregn ln <em>K</em> og derefter ligevægtskonstanten ved 25 °C.</li>
+<li>Opskriv ligevægtsloven, og angiv ligevægtskonstanten med enhed.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>G</em><sup>⊖</sup> er summen af <em>G</em><sup>⊖</sup> for produkterne minus summen af <em>G</em><sup>⊖</sup> for reaktanterne. Methanol er en gas i reaktionen, så brug værdien for CH<sub>3</sub>OH(g) og ikke værdien for CH<sub>3</sub>OH(l). Hydrogen er et grundstof, så <em>G</em><sup>⊖</sup> for H<sub>2</sub>(g) er 0.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>G</em><sup>⊖</sup> for dannelsen af methanol bliver −25,1 kJ/mol. Regn den om til −25 100 J/mol, og brug ln <em>K</em> = −Δ<em>G</em><sup>⊖</sup> / (<em>R</em> · <em>T</em>) med <em>T</em> = 298 K. Ligevægtskonstanten er <em>K</em> = e opløftet til ln <em>K</em>. Enheden finder du i ligevægtsloven: der står bar over brøkstregen og bar · bar<sup>2</sup> under.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er CO(g) + 2 H<sub>2</sub>(g) ⇌ CH<sub>3</sub>OH(g). Tabelværdierne er</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CO(g)</th>
+<th style="text-align: center;">H<sub>2</sub>(g)</th>
+<th style="text-align: center;">CH<sub>3</sub>OH(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>G</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−137,2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−162,3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Tilvæksten i Gibbs-energi ved standardtilstand er</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = G^{\ominus}(\mathrm{CH_3OH(g)}) - G^{\ominus}(\mathrm{CO(g)}) - 2 \cdot G^{\ominus}(\mathrm{H_2(g)}) = \left((-162{,}3) - (-137{,}2) - 2 \cdot 0\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -25{,}1\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> er negativ, så dannelsen af methanol er spontan ved 25 °C og standardtilstand.</p>
+<ol start="2" type="a">
+<li>Δ<em>G</em><sup>⊖</sup> regnes om til joule, så enheden passer med gaskonstanten: −25,1 kJ/mol = −25 100 J/mol. Temperaturen er <em>T</em> = (273 + 25) K = 298 K.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{-25\,100\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K}} = 10{,}131
+\]</span></p>
+<p><span class="math display">\[
+K = e^{10{,}131} = 2{,}5 \cdot 10^{4}
+\]</span></p>
+<ol start="3" type="a">
+<li>Ligevægtsloven er</li>
+</ol>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{CH_3OH})}{p(\mathrm{CO}) \cdot p(\mathrm{H_2})^{2}}
+\]</span></p>
+<p>Der står bar over brøkstregen og bar · bar<sup>2</sup> under, så enheden er bar<sup>−2</sup>. Ligevægtskonstanten er <em>K</em><sub>p</sub> = 2,5 · 10<sup>4</sup> bar<sup>−2</sup> ved 25 °C. Den er meget større end 1, og det passer med, at Δ<em>G</em><sup>⊖</sup> er negativ. Ligevægten er forskudt mod højre, altså mod methanol.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.4-ethansyre-og-methansyre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.4-ethansyre-og-methansyre">Opgave A2.5.4: Ethansyre og methansyre</h2>
+<p>Ethansyre (eddikesyre) er syren i eddike. Når ethansyre opløses i vand, afgiver nogle af molekylerne en hydron til vand:</p>
+<div class="reaktion">
+<p>CH<sub>3</sub>COOH(aq) + H<sub>2</sub>O(l) ⇌ CH<sub>3</sub>COO<sup>−</sup>(aq) + H<sub>3</sub>O<sup>+</sup>(aq)</p>
+</div>
+<p>Ved 25 °C er syrestyrkekonstanten <em>K</em><sub>s</sub> = 1,7 · 10<sup>−5</sup> M for ethansyre. For methansyre (myresyre), HCOOH, er <em>K</em><sub>s</sub> = 1,8 · 10<sup>−4</sup> M ved 25 °C.</p>
+<ol type="a">
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 25 °C for ethansyres reaktion med vand.</li>
+<li>Kommentér fortegnet på Δ<em>G</em><sup>⊖</sup> for ethansyres reaktion med vand.</li>
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 25 °C for methansyres reaktion med vand.</li>
+<li>Hvilken af de to syrer er den stærkeste, og hvordan kan det ses på de to værdier af Δ<em>G</em><sup>⊖</sup>?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug Δ<em>G</em><sup>⊖</sup> = −<em>R</em> · <em>T</em> · ln <em>K</em> for både ethansyre og methansyre. Syrestyrkekonstanten er ligevægtskonstanten for syrens reaktion med vand. Den sættes ind som tal uden enhed, og temperaturen skal stå i kelvin. Resultatet kommer i J/mol, fordi <em>R</em> = 8,314 J/(mol · K).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For ethansyre er ln(1,7 · 10<sup>−5</sup>) = −10,98. Minus gange minus giver plus, så Δ<em>G</em><sup>⊖</sup> bliver positiv. Regn resultatet om til kJ/mol ved at dividere med 1000.</p>
+<p>Du kan begynde kommentaren sådan: “Δ<em>G</em><sup>⊖</sup> er positiv, så ligevægtskonstanten er … end 1. Ligevægten er forskudt mod …, og det passer med, at ethansyre er en … syre.”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Temperaturen er <em>T</em> = (273 + 25) K = 298 K. Syrestyrkekonstanten for ethansyre sættes ind som tal uden enhed.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = -R \cdot T \cdot \ln K = -8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K} \cdot \ln\left(1{,}7 \cdot 10^{-5}\right) = 2{,}72 \cdot 10^{4}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p>For ethansyres reaktion med vand er Δ<em>G</em><sup>⊖</sup> = 27,2 kJ/mol.</p>
+<ol start="2" type="a">
+<li><p>Δ<em>G</em><sup>⊖</sup> er positiv, så ligevægtskonstanten er mindre end 1. Ligevægten er forskudt langt mod venstre, altså mod CH<sub>3</sub>COOH. Kun en lille del af ethansyremolekylerne afgiver en hydron, og det passer med, at ethansyre er en svag syre.</p></li>
+<li><p>Syrestyrkekonstanten for methansyre sættes ind på samme måde.</p></li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = -8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K} \cdot \ln\left(1{,}8 \cdot 10^{-4}\right) = 2{,}14 \cdot 10^{4}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p>For methansyres reaktion med vand er Δ<em>G</em><sup>⊖</sup> = 21,4 kJ/mol.</p>
+<ol start="4" type="a">
+<li>Methansyre er den stærkeste af de to syrer, fordi methansyre har den største <em>K</em><sub>s</sub>. Det ses også på Δ<em>G</em><sup>⊖</sup>: 21,4 kJ/mol for methansyre er mindre end 27,2 kJ/mol for ethansyre. Jo mindre Δ<em>G</em><sup>⊖</sup> er, jo større er ligevægtskonstanten, og jo stærkere er syren.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.5-hydrogen-af-naturgas" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.5-hydrogen-af-naturgas">Opgave A2.5.5: Hydrogen af naturgas</h2>
+<p>Det meste hydrogen fremstilles i dag af naturgas. Methan reagerer med vanddamp ved en høj temperatur:</p>
+<div class="reaktion">
+<p>CH<sub>4</sub>(g) + H<sub>2</sub>O(g) ⇌ CO(g) + 3 H<sub>2</sub>(g)</p>
+</div>
+<p>For reaktionen er Δ<em>H</em><sup>⊖</sup> = 205,9 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 214,7 J/(mol · K).</p>
+<ol type="a">
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 800 °C.</li>
+<li>Beregn ligevægtskonstanten ved 800 °C, og angiv enheden.</li>
+<li>Hvilken antagelse bygger beregningen på?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Opgaven om methan og vanddamp har to trin. Beregn først Δ<em>G</em><sup>⊖</sup> ved 800 °C med Δ<em>G</em><sup>⊖</sup> = Δ<em>H</em><sup>⊖</sup> − <em>T</em> · Δ<em>S</em><sup>⊖</sup>. Beregn derefter ligevægtskonstanten med ln <em>K</em> = −Δ<em>G</em><sup>⊖</sup> / (<em>R</em> · <em>T</em>). Temperaturen skal stå i kelvin begge steder.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>T</em> = (273 + 800) K = 1073 K, og Δ<em>S</em><sup>⊖</sup> = 214,7 J/(mol · K) = 0,2147 kJ/(mol · K). Δ<em>G</em><sup>⊖</sup> for reaktionen mellem methan og vanddamp bliver −24,5 kJ/mol ved 800 °C. Regn den om til J/mol, før du sætter den ind i formlen for ln <em>K</em>. Enheden for ligevægtskonstanten finder du ved at skrive ligevægtsloven op: partialtrykket af H<sub>2</sub> står i tredje potens over brøkstregen.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Kendte størrelser: Δ<em>H</em><sup>⊖</sup> = 205,9 kJ/mol, Δ<em>S</em><sup>⊖</sup> = 214,7 J/(mol · K) = 0,2147 kJ/(mol · K) og <em>T</em> = (273 + 800) K = 1073 K.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = \Delta H^{\ominus} - T \cdot \Delta S^{\ominus} = 205{,}9\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} - 1073\ \mathrm{K} \cdot 0{,}2147\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} = -24{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> = −24,5 kJ/mol ved 800 °C. Den er negativ, så reaktionen mellem methan og vanddamp er spontan ved 800 °C og standardtilstand.</p>
+<ol start="2" type="a">
+<li>Δ<em>G</em><sup>⊖</sup> regnes om til joule: −24,5 kJ/mol = −24 500 J/mol.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{-24\,500\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 1073\ \mathrm{K}} = 2{,}746
+\]</span></p>
+<p><span class="math display">\[
+K = e^{2{,}746} = 16
+\]</span></p>
+<p>Ligevægtsloven er</p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{CO}) \cdot p(\mathrm{H_2})^{3}}{p(\mathrm{CH_4}) \cdot p(\mathrm{H_2O})}
+\]</span></p>
+<p>Der står bar · bar<sup>3</sup> over brøkstregen og bar · bar under, så enheden er bar<sup>2</sup>. Ligevægtskonstanten er <em>K</em><sub>p</sub> = 16 bar<sup>2</sup> ved 800 °C.</p>
+<ol start="3" type="a">
+<li>Beregningen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen. De to værdier gælder ved 25 °C, og 800 °C er langt derfra, så resultatet er et skøn.</li>
+</ol>
+<p>Ved 25 °C er Δ<em>G</em><sup>⊖</sup> = 141,9 kJ/mol, og ligevægtskonstanten er forsvindende lille. Reaktionen er endoterm, og entropien stiger, fordi to gasmolekyler bliver til fire. Derfor er reaktionen kun spontan ved høje temperaturer, og derfor skal reaktoren være så varm.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.6-to-regler-samme-svar" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.6-to-regler-samme-svar">Opgave A2.5.6: To regler, samme svar</h2>
+<p>I en højovn reagerer glødende carbon med carbondioxid og danner carbonmonoxid:</p>
+<div class="reaktion">
+<p>C(s) + CO<sub>2</sub>(g) ⇌ 2 CO(g)</p>
+</div>
+<p>Ved 1000 K er <em>K</em><sub>p</sub> = 2,0 bar. En beholder ved 1000 K indeholder fast carbon og en gasblanding med partialtrykkene <em>p</em>(CO<sub>2</sub>) = 0,50 bar og <em>p</em>(CO) = 1,5 bar.</p>
+<ol type="a">
+<li>Beregn reaktionsbrøken for gasblandingen, og afgør med <em>Y</em> og <em>K</em><sub>p</sub>, hvilken vej reaktionen forløber.</li>
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 1000 K ud fra ligevægtskonstanten.</li>
+<li>Beregn Δ<em>G</em> for gasblandingen, og afgør ud fra fortegnet, hvilken vej reaktionen forløber.</li>
+<li>Sammenlign svarene i spørgsmål a og c.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Carbon er et fast stof og er ikke med i reaktionsbrøken. Reaktionsbrøken er derfor <em>Y</em> = <em>p</em>(CO)<sup>2</sup> / <em>p</em>(CO<sub>2</sub>). Sammenlign <em>Y</em> med <em>K</em><sub>p</sub>, som du gjorde i afsnit A1.2. Brug derefter Δ<em>G</em><sup>⊖</sup> = −<em>R</em> · <em>T</em> · ln <em>K</em> og til sidst Δ<em>G</em> = Δ<em>G</em><sup>⊖</sup> + <em>R</em> · <em>T</em> · ln <em>Y</em>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsbrøken for blandingen af CO<sub>2</sub> og CO er 4,5 bar, og den er større end <em>K</em><sub>p</sub>. Δ<em>G</em><sup>⊖</sup> bliver −5,76 kJ/mol ved 1000 K. I beregningen af Δ<em>G</em> sættes <em>Y</em> ind som tallet 4,5, og gaskonstanten regnes om til 8,314 · 10<sup>−3</sup> kJ/(mol · K). De to regler skal give samme retning. Gør de ikke det, er der en regnefejl.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Carbon er et fast stof og er ikke med i reaktionsbrøken.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{CO})^{2}}{p(\mathrm{CO_2})} = \frac{(1{,}5\ \mathrm{bar})^{2}}{0{,}50\ \mathrm{bar}} = 4{,}5\ \mathrm{bar}
+\]</span></p>
+<p><em>Y</em> = 4,5 bar er større end <em>K</em><sub>p</sub> = 2,0 bar. Reaktionen forløber derfor mod venstre, indtil <em>Y</em> = <em>K</em><sub>p</sub>.</p>
+<ol start="2" type="a">
+<li>Ligevægtskonstanten sættes ind som tal uden enhed.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = -R \cdot T \cdot \ln K = -8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 1000\ \mathrm{K} \cdot \ln(2{,}0) = -5{,}76 \cdot 10^{3}\ \dfrac{\mathrm{J}}{\mathrm{mol}}
+\]</span></p>
+<p>Ved 1000 K er Δ<em>G</em><sup>⊖</sup> = −5,76 kJ/mol.</p>
+<ol start="3" type="a">
+<li>Gaskonstanten regnes om til kJ: <em>R</em> = 8,314 · 10<sup>−3</sup> kJ/(mol · K). Reaktionsbrøken sættes ind som tal uden enhed.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G = \Delta G^{\ominus} + R \cdot T \cdot \ln Y = -5{,}76\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} + 8{,}314 \cdot 10^{-3}\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot 1000\ \mathrm{K} \cdot \ln(4{,}5) = 6{,}7\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em> = 6,7 kJ/mol. Den er positiv, så reaktionen forløber mod venstre.</p>
+<ol start="4" type="a">
+<li>Reglen med <em>Y</em> og <em>K</em><sub>p</sub> og reglen med fortegnet på Δ<em>G</em> giver samme svar: reaktionen forløber mod venstre, og der dannes CO<sub>2</sub> og carbon. De to regler hænger sammen gennem Δ<em>G</em> = <em>R</em> · <em>T</em> · ln(<em>Y</em> / <em>K</em>). Her er <em>Y</em> / <em>K</em> = 4,5 / 2,0 = 2,25. Brøken er større end 1, så logaritmen er positiv, og Δ<em>G</em> er positiv.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.7-kalkvand" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.7-kalkvand">Opgave A2.5.7: Kalkvand</h2>
+<p>En mættet opløsning af calciumhydroxid kaldes kalkvand. I kalkvand er der ligevægt mellem fast calciumhydroxid og ionerne i opløsningen:</p>
+<div class="reaktion">
+<p>Ca(OH)<sub>2</sub>(s) ⇌ Ca<sup>2+</sup>(aq) + 2 OH<sup>−</sup>(aq)</p>
+</div>
+<p>Brug tabellen <a href="../bilag/termodynamiske-data.html">Termodynamiske data</a>.</p>
+<ol type="a">
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 25 °C for opløsningen af calciumhydroxid.</li>
+<li>Beregn opløselighedsproduktet <em>K</em><sub>o</sub> for calciumhydroxid ved 25 °C, og angiv enheden.</li>
+<li>Tabellen i <a href="../kapitler/a1-5-oploeselighedsligevaegte.html">afsnit A1.5</a> har <em>K</em><sub>o</sub> = 5,0 · 10<sup>−6</sup> M<sup>3</sup> for calciumhydroxid. Sammenlign den værdi med din egen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Calciumhydroxid står under Faste stoffer i tabellen, og de to ioner står under Ioner i vandig opløsning. Husk koefficienten 2 foran OH<sup>−</sup>. Δ<em>G</em><sup>⊖</sup> er summen af <em>G</em><sup>⊖</sup> for produkterne minus <em>G</em><sup>⊖</sup> for reaktanten.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>G</em><sup>⊖</sup> for opløsningen af calciumhydroxid bliver 29,5 kJ/mol = 29 500 J/mol. Brug ln <em>K</em> = −Δ<em>G</em><sup>⊖</sup> / (<em>R</em> · <em>T</em>) med <em>T</em> = 298 K. Opløselighedsproduktet er <em>K</em><sub>o</sub> = [Ca<sup>2+</sup>] · [OH<sup>−</sup>]<sup>2</sup>, og det giver enheden.</p>
+<p>Du kan begynde sammenligningen sådan: “De to værdier af <em>K</em><sub>o</sub> har samme …, men de er ikke … Forskellen kan skyldes, at …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er Ca(OH)<sub>2</sub>(s) ⇌ Ca<sup>2+</sup>(aq) + 2 OH<sup>−</sup>(aq). Tabelværdierne er</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">Ca(OH)<sub>2</sub>(s)</th>
+<th style="text-align: center;">Ca<sup>2+</sup>(aq)</th>
+<th style="text-align: center;">OH<sup>−</sup>(aq)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>G</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−897,5</td>
+<td style="text-align: center;">−553,6</td>
+<td style="text-align: center;">−157,2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Tilvæksten i Gibbs-energi ved standardtilstand er</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = G^{\ominus}(\mathrm{Ca^{2+}(aq)}) + 2 \cdot G^{\ominus}(\mathrm{OH^{-}(aq)}) - G^{\ominus}(\mathrm{Ca(OH)_2(s)}) = \left((-553{,}6) + 2 \cdot (-157{,}2) - (-897{,}5)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = 29{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> er positiv. Opløsningen af calciumhydroxid er altså ikke spontan ved standardtilstand, hvor [Ca<sup>2+</sup>] og [OH<sup>−</sup>] begge er 1 M.</p>
+<ol start="2" type="a">
+<li>Δ<em>G</em><sup>⊖</sup> regnes om til joule: 29,5 kJ/mol = 29 500 J/mol. Temperaturen er <em>T</em> = (273 + 25) K = 298 K.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{29\,500\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K}} = -11{,}907
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-11{,}907} = 6{,}7 \cdot 10^{-6}
+\]</span></p>
+<p>Ligevægtsloven er <em>K</em><sub>o</sub> = [Ca<sup>2+</sup>] · [OH<sup>−</sup>]<sup>2</sup>. Det faste stof er ikke med. Enheden er M · M<sup>2</sup> = M<sup>3</sup>, så <em>K</em><sub>o</sub> = 6,7 · 10<sup>−6</sup> M<sup>3</sup> ved 25 °C. Opløselighedsproduktet er meget mindre end 1, og det passer med, at Δ<em>G</em><sup>⊖</sup> er positiv, og at calciumhydroxid er tungtopløseligt.</p>
+<ol start="3" type="a">
+<li>De to værdier af <em>K</em><sub>o</sub>, 6,7 · 10<sup>−6</sup> M<sup>3</sup> og 5,0 · 10<sup>−6</sup> M<sup>3</sup>, har samme størrelsesorden, men de er ikke helt ens. En ligevægtskonstant er meget følsom over for Δ<em>G</em><sup>⊖</sup>, fordi Δ<em>G</em><sup>⊖</sup> står i en eksponent. <em>K</em><sub>o</sub> = 5,0 · 10<sup>−6</sup> M<sup>3</sup> svarer til Δ<em>G</em><sup>⊖</sup> = 30,2 kJ/mol. En forskel på 0,7 kJ/mol er altså nok til at give de to forskellige værdier, og tabeller afrunder forskelligt.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.8-vands-damptryk" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.8-vands-damptryk">Opgave A2.5.8: Vands damptryk</h2>
+<p>Hældes der vand i et glas med låg, fordamper noget af vandet, indtil der er ligevægt mellem væsken og vanddampen over den:</p>
+<div class="reaktion">
+<p>H<sub>2</sub>O(l) ⇌ H<sub>2</sub>O(g)</p>
+</div>
+<p>Partialtrykket af vanddamp ved ligevægt kaldes vands damptryk. Brug tabellen <a href="../bilag/termodynamiske-data.html">Termodynamiske data</a>.</p>
+<ol type="a">
+<li>Beregn vands damptryk ved 25 °C.</li>
+<li>I et klasseværelse ved 25 °C er partialtrykket af vanddamp i luften 0,015 bar. I vindueskarmen står en skål med vand. Beregn Δ<em>G</em> for fordampningen af vand i klasseværelset, og afgør, om vandet i skålen fordamper.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Skriv ligevægtsloven for H<sub>2</sub>O(l) ⇌ H<sub>2</sub>O(g) op. En ren væske er ikke med i reaktionsbrøken, så ligevægtskonstanten er lig med partialtrykket af vanddamp. Beregn Δ<em>G</em><sup>⊖</sup> ud fra tabelværdierne for H<sub>2</sub>O(g) og H<sub>2</sub>O(l), og beregn derefter ligevægtskonstanten.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>G</em><sup>⊖</sup> for fordampningen af vand er 8,5 kJ/mol ved 25 °C. Ligevægtsloven er <em>K</em><sub>p</sub> = <em>p</em>(H<sub>2</sub>O), så ligevægtskonstanten er selve damptrykket i bar. I klasseværelset er reaktionsbrøken <em>Y</em> = 0,015, og Δ<em>G</em> = Δ<em>G</em><sup>⊖</sup> + <em>R</em> · <em>T</em> · ln <em>Y</em>. Er Δ<em>G</em> negativ, forløber fordampningen mod højre.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er H<sub>2</sub>O(l) ⇌ H<sub>2</sub>O(g). Tabelværdierne er</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">H<sub>2</sub>O(l)</th>
+<th style="text-align: center;">H<sub>2</sub>O(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>G</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−237,1</td>
+<td style="text-align: center;">−228,6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Tilvæksten i Gibbs-energi ved standardtilstand er</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = G^{\ominus}(\mathrm{H_2O(g)}) - G^{\ominus}(\mathrm{H_2O(l)}) = \left((-228{,}6) - (-237{,}1)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = 8{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> er positiv. Fordampningen af vand er altså ikke spontan ved 25 °C og standardtilstand, hvor vanddampen har partialtrykket 1 bar.</p>
+<p>Δ<em>G</em><sup>⊖</sup> regnes om til joule: 8,5 kJ/mol = 8500 J/mol. Temperaturen er <em>T</em> = (273 + 25) K = 298 K.</p>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{8500\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K}} = -3{,}431
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-3{,}431} = 0{,}032
+\]</span></p>
+<p>En ren væske er ikke med i reaktionsbrøken, så ligevægtsloven er <em>K</em><sub>p</sub> = <em>p</em>(H<sub>2</sub>O). Vands damptryk er derfor 0,032 bar ved 25 °C. Det er den værdi, der står i afsnit A1.2.</p>
+<ol start="2" type="a">
+<li>I klasseværelset er reaktionsbrøken <em>Y</em> = <em>p</em>(H<sub>2</sub>O) = 0,015, når partialtrykket sættes ind som tal uden enhed. Gaskonstanten regnes om til kJ: <em>R</em> = 8,314 · 10<sup>−3</sup> kJ/(mol · K).</li>
+</ol>
+<p><span class="math display">\[
+\Delta G = \Delta G^{\ominus} + R \cdot T \cdot \ln Y = 8{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} + 8{,}314 \cdot 10^{-3}\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K} \cdot \ln(0{,}015) = -1{,}9\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em> = −1,9 kJ/mol. Den er negativ, så fordampningen forløber mod højre, og vandet i skålen fordamper. Reglen med <em>Y</em> og <em>K</em> giver det samme, fordi 0,015 bar er mindre end damptrykket på 0,032 bar. Δ<em>G</em><sup>⊖</sup> er positiv, men vandet fordamper alligevel, fordi luften indeholder mindre vanddamp, end der er ved ligevægt.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med reaktionsskema, formel, beregning med enheder og en konklusion.</p>
+</section>
+<section id="opgave-a2.5.eks.1-ammoniak-til-kunstgødning" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.eks.1-ammoniak-til-kunstgødning">Opgave A2.5.eks.1: Ammoniak til kunstgødning</h2>
+<p>Kunstgødning med nitrogen laves af ammoniak, og en stor del af verdens fødevarer dyrkes med kunstgødning. Ammoniak fremstilles af nitrogen og hydrogen i en reaktor ved høj temperatur og højt tryk:</p>
+<div class="reaktion">
+<p>N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g)</p>
+</div>
+<p>For reaktionen er Δ<em>H</em><sup>⊖</sup> = −91,8 kJ/mol og Δ<em>S</em><sup>⊖</sup> = −198,1 J/(mol · K). I en reaktor ved 450 °C er partialtrykkene <em>p</em>(N<sub>2</sub>) = 30 bar, <em>p</em>(H<sub>2</sub>) = 90 bar og <em>p</em>(NH<sub>3</sub>) = 30 bar.</p>
+<ol type="a">
+<li>Opskriv reaktionsbrøken for dannelsen af ammoniak.</li>
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 450 °C.</li>
+<li>Beregn ligevægtskonstanten ved 450 °C.</li>
+<li>Beregn Δ<em>G</em> for blandingen i reaktoren, og afgør, hvilken vej reaktionen forløber.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Spørgsmål b og c hænger sammen. Beregn først Δ<em>G</em><sup>⊖</sup> for dannelsen af ammoniak ved 450 °C med Δ<em>G</em><sup>⊖</sup> = Δ<em>H</em><sup>⊖</sup> − <em>T</em> · Δ<em>S</em><sup>⊖</sup>, og brug derefter ln <em>K</em> = −Δ<em>G</em><sup>⊖</sup> / (<em>R</em> · <em>T</em>). Spørgsmål d handler om Δ<em>G</em> uden standardtegn, altså om den blanding af N<sub>2</sub>, H<sub>2</sub> og NH<sub>3</sub>, der er i reaktoren lige nu. Dér skal du bruge Δ<em>G</em> = Δ<em>G</em><sup>⊖</sup> + <em>R</em> · <em>T</em> · ln <em>Y</em>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>T</em> = (273 + 450) K = 723 K, og Δ<em>S</em><sup>⊖</sup> = −198,1 J/(mol · K) = −0,1981 kJ/(mol · K). Pas på de to minusser, når −<em>T</em> · Δ<em>S</em><sup>⊖</sup> regnes ud. Δ<em>G</em><sup>⊖</sup> for dannelsen af ammoniak bliver 51,4 kJ/mol ved 450 °C. Reaktionsbrøken for blandingen i reaktoren er <em>Y</em> = 30<sup>2</sup> / (30 · 90<sup>3</sup>) = 4,12 · 10<sup>−5</sup>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g).</p>
+<ol type="a">
+<li>Reaktionsbrøken er</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{NH_3})^{2}}{p(\mathrm{N_2}) \cdot p(\mathrm{H_2})^{3}}
+\]</span></p>
+<ol start="2" type="a">
+<li>Kendte størrelser: Δ<em>H</em><sup>⊖</sup> = −91,8 kJ/mol, Δ<em>S</em><sup>⊖</sup> = −198,1 J/(mol · K) = −0,1981 kJ/(mol · K) og <em>T</em> = (273 + 450) K = 723 K.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = \Delta H^{\ominus} - T \cdot \Delta S^{\ominus} = -91{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} - 723\ \mathrm{K} \cdot (-0{,}1981)\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} = 51{,}4\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> = 51,4 kJ/mol ved 450 °C. Den er positiv, så dannelsen af ammoniak er ikke spontan ved 450 °C og standardtilstand. Entropien falder, fordi fire gasmolekyler bliver til to, og ved den høje temperatur vejer leddet −<em>T</em> · Δ<em>S</em><sup>⊖</sup> tungere end Δ<em>H</em><sup>⊖</sup>. Beregningen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen.</p>
+<ol start="3" type="a">
+<li>Δ<em>G</em><sup>⊖</sup> regnes om til joule: 51,4 kJ/mol = 51 400 J/mol.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{51\,400\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 723\ \mathrm{K}} = -8{,}551
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-8{,}551} = 1{,}9 \cdot 10^{-4}
+\]</span></p>
+<p>I ligevægtsloven står der bar<sup>2</sup> over brøkstregen og bar · bar<sup>3</sup> under, så enheden er bar<sup>−2</sup>. Ligevægtskonstanten er <em>K</em><sub>p</sub> = 1,9 · 10<sup>−4</sup> bar<sup>−2</sup> ved 450 °C.</p>
+<ol start="4" type="a">
+<li>Partialtrykkene sættes ind i reaktionsbrøken som tal uden enhed.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{30^{2}}{30 \cdot 90^{3}} = 4{,}12 \cdot 10^{-5}
+\]</span></p>
+<p>Gaskonstanten regnes om til kJ: <em>R</em> = 8,314 · 10<sup>−3</sup> kJ/(mol · K).</p>
+<p><span class="math display">\[
+\Delta G = \Delta G^{\ominus} + R \cdot T \cdot \ln Y = 51{,}4\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} + 8{,}314 \cdot 10^{-3}\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot 723\ \mathrm{K} \cdot \ln\left(4{,}12 \cdot 10^{-5}\right) = -9{,}3\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em> = −9,3 kJ/mol for blandingen i reaktoren. Den er negativ, så reaktionen forløber mod højre, og der dannes mere ammoniak. Det sker, selv om Δ<em>G</em><sup>⊖</sup> er positiv, fordi de høje partialtryk af N<sub>2</sub> og H<sub>2</sub> gør reaktionsbrøken meget lille. Reglen med <em>Y</em> og <em>K</em> giver det samme: 4,12 · 10<sup>−5</sup> bar<sup>−2</sup> er mindre end 1,9 · 10<sup>−4</sup> bar<sup>−2</sup>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.eks.2-nitrogenoxid-fra-en-bilmotor" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.eks.2-nitrogenoxid-fra-en-bilmotor">Opgave A2.5.eks.2: Nitrogenoxid fra en bilmotor</h2>
+<p>Luft består mest af nitrogen og oxygen. Ved almindelige temperaturer reagerer de to gasser ikke med hinanden. I cylinderen i en bilmotor kan temperaturen nå op på 2300 K, og dér dannes der nitrogenoxid, NO:</p>
+<div class="reaktion">
+<p>N<sub>2</sub>(g) + O<sub>2</sub>(g) ⇌ 2 NO(g)</p>
+</div>
+<p>Nitrogenoxid fra udstødningen er med til at danne smog og syreregn. For reaktionen er Δ<em>H</em><sup>⊖</sup> = 182,6 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 24,8 J/(mol · K).</p>
+<ol type="a">
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 25 °C ud fra tabellen <a href="../bilag/termodynamiske-data.html">Termodynamiske data</a>.</li>
+<li>Beregn ligevægtskonstanten ved 25 °C, og kommentér værdien.</li>
+<li>Beregn ligevægtskonstanten ved 2300 K.</li>
+<li>Udstødningsgassen køles hurtigt ned. I udstødningen ved 25 °C er <em>p</em>(N<sub>2</sub>) = 0,75 bar, <em>p</em>(O<sub>2</sub>) = 0,050 bar og <em>p</em>(NO) = 1,0 · 10<sup>−3</sup> bar. Beregn Δ<em>G</em> for blandingen, og argumentér for, at en katalysator kan fjerne nitrogenoxid fra udstødningen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved 25 °C kan Δ<em>G</em><sup>⊖</sup> beregnes direkte af tabelværdierne for <em>G</em><sup>⊖</sup>. N<sub>2</sub>(g) og O<sub>2</sub>(g) er grundstoffer, så deres <em>G</em><sup>⊖</sup> er 0. Ved 2300 K skal du først beregne Δ<em>G</em><sup>⊖</sup> med Δ<em>G</em><sup>⊖</sup> = Δ<em>H</em><sup>⊖</sup> − <em>T</em> · Δ<em>S</em><sup>⊖</sup> og derefter ligevægtskonstanten.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>G</em><sup>⊖</sup> for dannelsen af NO er 175,2 kJ/mol ved 25 °C og 125,6 kJ/mol ved 2300 K. I udstødningen er reaktionsbrøken <em>Y</em> = <em>p</em>(NO)<sup>2</sup> / (<em>p</em>(N<sub>2</sub>) · <em>p</em>(O<sub>2</sub>)).</p>
+<p>Du kan begynde argumentet sådan: “Δ<em>G</em> for udstødningsgassen er …, så reaktionen forløber spontant mod … Det betyder, at NO kan blive til … Reaktionen er meget langsom ved 25 °C, og en katalysator …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er N<sub>2</sub>(g) + O<sub>2</sub>(g) ⇌ 2 NO(g). Tabelværdierne er</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">N<sub>2</sub>(g)</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">NO(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>G</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">87,6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Tilvæksten i Gibbs-energi ved standardtilstand er</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = 2 \cdot G^{\ominus}(\mathrm{NO(g)}) - G^{\ominus}(\mathrm{N_2(g)}) - G^{\ominus}(\mathrm{O_2(g)}) = \left(2 \cdot 87{,}6 - 0 - 0\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = 175{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> er positiv og stor. Dannelsen af NO er ikke spontan ved 25 °C og standardtilstand.</p>
+<ol start="2" type="a">
+<li>Δ<em>G</em><sup>⊖</sup> regnes om til joule: 175,2 kJ/mol = 175 200 J/mol. Temperaturen er <em>T</em> = (273 + 25) K = 298 K.</li>
+</ol>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{175\,200\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K}} = -70{,}714
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-70{,}714} = 1{,}9 \cdot 10^{-31}
+\]</span></p>
+<p>I ligevægtsloven, <em>K</em><sub>p</sub> = <em>p</em>(NO)<sup>2</sup> / (<em>p</em>(N<sub>2</sub>) · <em>p</em>(O<sub>2</sub>)), står der bar<sup>2</sup> både over og under brøkstregen, så ligevægtskonstanten har ingen enhed. Ved 25 °C er <em>K</em><sub>p</sub> = 1,9 · 10<sup>−31</sup>. Ligevægtskonstanten er forsvindende lille, så ligevægten er forskudt helt mod venstre. Derfor reagerer luftens nitrogen og oxygen ikke med hinanden ved almindelige temperaturer.</p>
+<ol start="3" type="a">
+<li>Kendte størrelser: Δ<em>H</em><sup>⊖</sup> = 182,6 kJ/mol, Δ<em>S</em><sup>⊖</sup> = 24,8 J/(mol · K) = 0,0248 kJ/(mol · K) og <em>T</em> = 2300 K.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = \Delta H^{\ominus} - T \cdot \Delta S^{\ominus} = 182{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} - 2300\ \mathrm{K} \cdot 0{,}0248\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} = 125{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> regnes om til joule: 125,6 kJ/mol = 125 600 J/mol.</p>
+<p><span class="math display">\[
+\ln K = -\frac{125\,600\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 2300\ \mathrm{K}} = -6{,}568
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-6{,}568} = 1{,}4 \cdot 10^{-3}
+\]</span></p>
+<p>Ved 2300 K er <em>K</em><sub>p</sub> = 1,4 · 10<sup>−3</sup>. Beregningen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen. Ligevægtskonstanten er stadig mindre end 1, men den er cirka 10<sup>28</sup> gange større end ved 25 °C. Det passer med, at reaktionen er endoterm. I den varme cylinder dannes der derfor en lille, men mærkbar mængde NO.</p>
+<ol start="4" type="a">
+<li>Partialtrykkene sættes ind i reaktionsbrøken som tal uden enhed.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{NO})^{2}}{p(\mathrm{N_2}) \cdot p(\mathrm{O_2})} = \frac{(1{,}0 \cdot 10^{-3})^{2}}{0{,}75 \cdot 0{,}050} = 2{,}67 \cdot 10^{-5}
+\]</span></p>
+<p>Gaskonstanten regnes om til kJ: <em>R</em> = 8,314 · 10<sup>−3</sup> kJ/(mol · K). Ved 25 °C er Δ<em>G</em><sup>⊖</sup> = 175,2 kJ/mol.</p>
+<p><span class="math display">\[
+\Delta G = \Delta G^{\ominus} + R \cdot T \cdot \ln Y = 175{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} + 8{,}314 \cdot 10^{-3}\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K} \cdot \ln\left(2{,}67 \cdot 10^{-5}\right) = 149{,}1\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em> = 149,1 kJ/mol for udstødningsgassen ved 25 °C. Den er positiv, så reaktionen forløber spontant mod venstre. NO kan altså blive til N<sub>2</sub> og O<sub>2</sub> af sig selv. Termodynamikken fortæller kun, at reaktionen kan forløbe. Den fortæller ikke, hvor hurtigt det går, og ved 25 °C er reaktionen så langsom, at NO slipper ud med udstødningen. En katalysator får en reaktion til at gå hurtigere uden at ændre Δ<em>G</em>. Fordi omdannelsen af NO til N<sub>2</sub> og O<sub>2</sub> er spontan, kan en katalysator derfor fjerne NO fra udstødningen.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.5.eks.3-natron-i-skabet-og-i-ovnen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.5.eks.3-natron-i-skabet-og-i-ovnen">Opgave A2.5.eks.3: Natron i skabet og i ovnen</h2>
+<p>Natron er natriumhydrogencarbonat, NaHCO<sub>3</sub>. Natron kan stå i køkkenskabet i årevis. I den varme ovn spaltes natron, og gasserne får kagen til at hæve:</p>
+<div class="reaktion">
+<p>2 NaHCO<sub>3</sub>(s) ⇌ Na<sub>2</sub>CO<sub>3</sub>(s) + CO<sub>2</sub>(g) + H<sub>2</sub>O(g)</p>
+</div>
+<p>For reaktionen er Δ<em>H</em><sup>⊖</sup> = 135,6 kJ/mol og Δ<em>S</em><sup>⊖</sup> = 334,2 J/(mol · K).</p>
+<ol type="a">
+<li>Opskriv ligevægtsloven for spaltningen af natron.</li>
+<li>Beregn Δ<em>G</em><sup>⊖</sup> ved 25 °C ud fra tabellen <a href="../bilag/termodynamiske-data.html">Termodynamiske data</a>, og beregn ligevægtskonstanten ved 25 °C.</li>
+<li>I et køkkenskab ved 25 °C er <em>p</em>(CO<sub>2</sub>) = 4,2 · 10<sup>−4</sup> bar og <em>p</em>(H<sub>2</sub>O) = 0,020 bar. Beregn Δ<em>G</em> for spaltningen af natron i skabet, og forklar, hvorfor natron kan holde sig i skabet.</li>
+<li>Beregn ligevægtskonstanten ved 180 °C, og forklar, hvorfor natron får kagen til at hæve i ovnen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>De to faste stoffer, NaHCO<sub>3</sub> og Na<sub>2</sub>CO<sub>3</sub>, er ikke med i ligevægtsloven. Ved 25 °C beregnes Δ<em>G</em><sup>⊖</sup> af tabelværdierne for <em>G</em><sup>⊖</sup>. Husk koefficienten 2 foran NaHCO<sub>3</sub>. Ved 180 °C skal du bruge Δ<em>G</em><sup>⊖</sup> = Δ<em>H</em><sup>⊖</sup> − <em>T</em> · Δ<em>S</em><sup>⊖</sup> med de to værdier fra opgaveteksten.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ligevægtsloven for spaltningen af natron er <em>K</em><sub>p</sub> = <em>p</em>(CO<sub>2</sub>) · <em>p</em>(H<sub>2</sub>O). Δ<em>G</em><sup>⊖</sup> er 36,0 kJ/mol ved 25 °C. I køkkenskabet er reaktionsbrøken <em>Y</em> = 4,2 · 10<sup>−4</sup> · 0,020. Ved 180 °C er <em>T</em> = 453 K, og Δ<em>G</em><sup>⊖</sup> bliver −15,8 kJ/mol.</p>
+<p>Du kan begynde forklaringerne sådan: “I skabet er Δ<em>G</em> …, så reaktionen forløber mod …” og “I ovnen er ligevægtskonstanten …, og reaktionsbrøken kan ikke blive så stor, fordi …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er 2 NaHCO<sub>3</sub>(s) ⇌ Na<sub>2</sub>CO<sub>3</sub>(s) + CO<sub>2</sub>(g) + H<sub>2</sub>O(g).</p>
+<ol type="a">
+<li>De to faste stoffer er ikke med i reaktionsbrøken. Ligevægtsloven er</li>
+</ol>
+<p><span class="math display">\[
+K_\mathrm{p} = p(\mathrm{CO_2}) \cdot p(\mathrm{H_2O})
+\]</span></p>
+<p>Enheden er bar<sup>2</sup>.</p>
+<ol start="2" type="a">
+<li>Tabelværdierne er</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">NaHCO<sub>3</sub>(s)</th>
+<th style="text-align: center;">Na<sub>2</sub>CO<sub>3</sub>(s)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>G</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−851,7</td>
+<td style="text-align: center;">−1044,4</td>
+<td style="text-align: center;">−394,4</td>
+<td style="text-align: center;">−228,6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta G^{\ominus} = G^{\ominus}(\mathrm{Na_2CO_3(s)}) + G^{\ominus}(\mathrm{CO_2(g)}) + G^{\ominus}(\mathrm{H_2O(g)}) - 2 \cdot G^{\ominus}(\mathrm{NaHCO_3(s)})
+\]</span></p>
+<p><span class="math display">\[
+\Delta G^{\ominus} = \left((-1044{,}4) + (-394{,}4) + (-228{,}6) - 2 \cdot (-851{,}7)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = 36{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> er positiv, så spaltningen af natron er ikke spontan ved 25 °C og standardtilstand.</p>
+<p>Δ<em>G</em><sup>⊖</sup> regnes om til joule: 36,0 kJ/mol = 36 000 J/mol. Temperaturen er <em>T</em> = (273 + 25) K = 298 K.</p>
+<p><span class="math display">\[
+\ln K = -\frac{\Delta G^{\ominus}}{R \cdot T} = -\frac{36\,000\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K}} = -14{,}530
+\]</span></p>
+<p><span class="math display">\[
+K = e^{-14{,}530} = 4{,}9 \cdot 10^{-7}
+\]</span></p>
+<p>Ved 25 °C er <em>K</em><sub>p</sub> = 4,9 · 10<sup>−7</sup> bar<sup>2</sup>.</p>
+<ol start="3" type="a">
+<li>Partialtrykkene i køkkenskabet sættes ind i reaktionsbrøken som tal uden enhed.</li>
+</ol>
+<p><span class="math display">\[
+Y = p(\mathrm{CO_2}) \cdot p(\mathrm{H_2O}) = 4{,}2 \cdot 10^{-4} \cdot 0{,}020 = 8{,}4 \cdot 10^{-6}
+\]</span></p>
+<p>Gaskonstanten regnes om til kJ: <em>R</em> = 8,314 · 10<sup>−3</sup> kJ/(mol · K).</p>
+<p><span class="math display">\[
+\Delta G = \Delta G^{\ominus} + R \cdot T \cdot \ln Y = 36{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} + 8{,}314 \cdot 10^{-3}\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} \cdot 298\ \mathrm{K} \cdot \ln\left(8{,}4 \cdot 10^{-6}\right) = 7{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em> = 7,0 kJ/mol for spaltningen af natron i skabet. Den er positiv, så reaktionen forløber ikke mod højre. Reglen med <em>Y</em> og <em>K</em> giver det samme: <em>Y</em> = 8,4 · 10<sup>−6</sup> bar<sup>2</sup> er større end <em>K</em><sub>p</sub> = 4,9 · 10<sup>−7</sup> bar<sup>2</sup>. Luften i skabet indeholder altså mere CO<sub>2</sub> og vanddamp, end der er ved ligevægt. Reaktionen kan heller ikke forløbe mod venstre, så længe der ikke er noget Na<sub>2</sub>CO<sub>3</sub> i skabet. Derfor sker der ingenting, og natron kan holde sig i skabet.</p>
+<ol start="4" type="a">
+<li>Kendte størrelser: Δ<em>H</em><sup>⊖</sup> = 135,6 kJ/mol, Δ<em>S</em><sup>⊖</sup> = 334,2 J/(mol · K) = 0,3342 kJ/(mol · K) og <em>T</em> = (273 + 180) K = 453 K.</li>
+</ol>
+<p><span class="math display">\[
+\Delta G^{\ominus} = \Delta H^{\ominus} - T \cdot \Delta S^{\ominus} = 135{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} - 453\ \mathrm{K} \cdot 0{,}3342\ \dfrac{\mathrm{kJ}}{\mathrm{mol \cdot K}} = -15{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>G</em><sup>⊖</sup> regnes om til joule: −15,8 kJ/mol = −15 800 J/mol.</p>
+<p><span class="math display">\[
+\ln K = -\frac{-15\,800\ \dfrac{\mathrm{J}}{\mathrm{mol}}}{8{,}314\ \dfrac{\mathrm{J}}{\mathrm{mol \cdot K}} \cdot 453\ \mathrm{K}} = 4{,}195
+\]</span></p>
+<p><span class="math display">\[
+K = e^{4{,}195} = 66
+\]</span></p>
+<p>Ved 180 °C er <em>K</em><sub>p</sub> = 66 bar<sup>2</sup>. Beregningen antager, at Δ<em>H</em><sup>⊖</sup> og Δ<em>S</em><sup>⊖</sup> ikke afhænger af temperaturen.</p>
+<p>Ligevægtskonstanten er over 100 millioner gange større ved 180 °C end ved 25 °C. Det passer med, at spaltningen er endoterm. Trykket i en ovn er cirka 1 bar, så <em>p</em>(CO<sub>2</sub>) · <em>p</em>(H<sub>2</sub>O) kan højst blive 0,5 bar · 0,5 bar = 0,25 bar<sup>2</sup>. Reaktionsbrøken er derfor altid mindre end 66 bar<sup>2</sup>, og reaktionen forløber mod højre, til al natron er spaltet. CO<sub>2</sub> og vanddamp danner bobler i dejen, og kagen hæver.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="pagination-link" aria-label="A2.5 Gibbs-energi og ligevægt">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A2.5 Gibbs-energi og ligevægt</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="pagination-link" aria-label="A2.6 Ligevægtskonstanten og temperaturen">
+        <span class="nav-page-text">A2.6 Ligevægtskonstanten og temperaturen</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,2583 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til B8.6 – Kemibogen B</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/b8-7-hvor-meget-virksomt-stof.html" rel="next">
+<link href="../kapitler/b8-6-tlc.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b8-1-laegemidler-og-receptorer.html">Kapitel B8: Medicin</a></li><li class="breadcrumb-item"><a href="../opgaver/b8-6-opgaver.html">Opgaver til B8.6</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen B</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B1: Reaktionshastighed</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-1-reaktionshastighed.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.1 Reaktionshastighed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-2-koncentration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.2 Koncentration og sammenstød</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-3-aktiveringsenergi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.3 Aktiveringsenergi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-4-temperatur.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.4 Temperatur</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b1-5-katalysatorer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B1.5 Katalysatorer og enzymer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B1.5</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B2: Kemisk ligevægt</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-1-kemisk-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.1 Kemisk ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-2-ligevaegtsloven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.2 Ligevægtsloven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-3-ligevaegtsberegninger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.3 Beregninger med ligevægtskonstanten</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-4-ikke-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.4 Når blandingen ikke er i ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-5-indgreb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.5 Indgreb i en ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-6-temperatur-og-rumfang.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.6 Temperatur og rumfang</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b2-7-oploeselighedsprodukt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B2.7 Opløselighedsprodukt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b2-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B2.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B3: Intermolekylære bindinger og isomeri</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-1-stofklasser.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.1 Stofklasser og funktionelle grupper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-2-intermolekylaere-bindinger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.2 Intermolekylære bindinger</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-3-strukturisomeri.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.3 Strukturisomeri</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b3-4-stereoisomeri.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B3.4 Stereoisomeri</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B3.4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B4: Funktionelle grupper</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-1-carbonhydriders-reaktioner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.1 Carbonhydriders reaktioner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-2-alkoholer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.2 Alkoholer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-3-aldehyder-og-ketoner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.3 Aldehyder og ketoner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-4-carboxylsyrer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.4 Carboxylsyrer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-5-estere.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.5 Estere</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-6-aminer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.6 Aminer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b4-7-overblik.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B4.7 Overblik: reaktionstyper og test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b4-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B4.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B5: Spektroskopi</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-1-lys-og-farver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.1 Lys og farver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-2-absorptionsspektre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.2 Absorptionsspektre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-3-lambert-beers-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.3 Lambert-Beers lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b5-4-standardkurven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B5.4 Standardkurven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b5-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B5.4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B6: Syrer og baser</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-1-syre-basereaktioner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.1 Syre-basereaktioner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-2-vands-selvionisering-og-ph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.2 Vands selvionisering og pH</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-3-syrestyrke.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.3 Syrestyrke</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-4-basestyrke.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.4 Basestyrke</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-5-ph-i-syrer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.5 pH i opløsninger af syrer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-6-ph-i-baser.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.6 pH i opløsninger af baser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-7-puffersystemer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.7 Puffersystemer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b6-8-titrering-af-svag-syre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B6.8 Titrering af en svag syre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b6-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B6.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel B7: Fødevarer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-1-monosaccharider.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.1 Monosaccharider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-2-ringslutning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.2 Ringslutning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-3-disaccharider-og-polysaccharider.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.3 Disaccharider og polysaccharider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-4-fehlings-test.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.4 Fehlings test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-5-fedtstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.5 Fedtstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-6-iodtal-og-forsaebning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.6 Iodtal og forsæbning</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-7-aminosyrer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.7 Aminosyrer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b7-8-proteiner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B7.8 Proteiner</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b7-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B7.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel B8: Medicin</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-1-laegemidler-og-receptorer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.1 Lægemidler og receptorer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-2-kiralitet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.2 Kiralitet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-3-syrer-og-baser-i-kroppen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.3 Lægemidler som syrer og baser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-4-log-p-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.4 Log <em>P</em> og log <em>D</em></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-5-fremstilling-af-acetylsalicylsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.5 Fremstilling af acetylsalicylsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-6-tlc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.6 TLC</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-6-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til B8.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/b8-7-hvor-meget-virksomt-stof.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">B8.7 Hvor meget virksomt stof?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/b8-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til B8.7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../videre-til-a.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kemi A</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-b8.6.1-delene-i-en-tlc-opstilling" id="toc-opgave-b8.6.1-delene-i-en-tlc-opstilling" class="nav-link active" data-scroll-target="#opgave-b8.6.1-delene-i-en-tlc-opstilling">Opgave B8.6.1: Delene i en TLC-opstilling</a></li>
+  <li><a href="#opgave-b8.6.2-beregn-rf-værdier" id="toc-opgave-b8.6.2-beregn-rf-værdier" class="nav-link" data-scroll-target="#opgave-b8.6.2-beregn-rf-værdier">Opgave B8.6.2: Beregn <em>R</em><sub>f</sub>-værdier</a></li>
+  <li><a href="#opgave-b8.6.3-mål-på-en-tlc-plade" id="toc-opgave-b8.6.3-mål-på-en-tlc-plade" class="nav-link" data-scroll-target="#opgave-b8.6.3-mål-på-en-tlc-plade">Opgave B8.6.3: Mål på en TLC-plade</a></li>
+  <li><a href="#opgave-b8.6.4-tegn-en-tlc-plade" id="toc-opgave-b8.6.4-tegn-en-tlc-plade" class="nav-link" data-scroll-target="#opgave-b8.6.4-tegn-en-tlc-plade">Opgave B8.6.4: Tegn en TLC-plade</a></li>
+  <li><a href="#opgave-b8.6.5-find-fejlene" id="toc-opgave-b8.6.5-find-fejlene" class="nav-link" data-scroll-target="#opgave-b8.6.5-find-fejlene">Opgave B8.6.5: Find fejlene</a></li>
+  <li><a href="#opgave-b8.6.6-hvilket-stof-løber-længst" id="toc-opgave-b8.6.6-hvilket-stof-løber-længst" class="nav-link" data-scroll-target="#opgave-b8.6.6-hvilket-stof-løber-længst">Opgave B8.6.6: Hvilket stof løber længst?</a></li>
+  <li><a href="#opgave-b8.6.7-hvad-er-der-i-tabletterne" id="toc-opgave-b8.6.7-hvad-er-der-i-tabletterne" class="nav-link" data-scroll-target="#opgave-b8.6.7-hvad-er-der-i-tabletterne">Opgave B8.6.7: Hvad er der i tabletterne?</a></li>
+  <li><a href="#opgave-b8.6.8-følg-en-reaktion-med-tlc" id="toc-opgave-b8.6.8-følg-en-reaktion-med-tlc" class="nav-link" data-scroll-target="#opgave-b8.6.8-følg-en-reaktion-med-tlc">Opgave B8.6.8: Følg en reaktion med TLC</a></li>
+  <li><a href="#opgaver-med-fødevaretema" id="toc-opgaver-med-fødevaretema" class="nav-link" data-scroll-target="#opgaver-med-fødevaretema">Opgaver med fødevaretema</a></li>
+  <li><a href="#opgave-b8.6.mad.1-farvestoffer-i-chokoladelinser" id="toc-opgave-b8.6.mad.1-farvestoffer-i-chokoladelinser" class="nav-link" data-scroll-target="#opgave-b8.6.mad.1-farvestoffer-i-chokoladelinser">Opgave B8.6.mad.1: Farvestoffer i chokoladelinser</a></li>
+  <li><a href="#opgave-b8.6.mad.2-de-grønne-og-gule-farvestoffer-i-spinat" id="toc-opgave-b8.6.mad.2-de-grønne-og-gule-farvestoffer-i-spinat" class="nav-link" data-scroll-target="#opgave-b8.6.mad.2-de-grønne-og-gule-farvestoffer-i-spinat">Opgave B8.6.mad.2: De grønne og gule farvestoffer i spinat</a></li>
+  <li><a href="#opgave-b8.6.mad.3-koffein-i-kaffe-cola-og-energidrik" id="toc-opgave-b8.6.mad.3-koffein-i-kaffe-cola-og-energidrik" class="nav-link" data-scroll-target="#opgave-b8.6.mad.3-koffein-i-kaffe-cola-og-energidrik">Opgave B8.6.mad.3: Koffein i kaffe, cola og energidrik</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/b8-1-laegemidler-og-receptorer.html">Kapitel B8: Medicin</a></li><li class="breadcrumb-item"><a href="../opgaver/b8-6-opgaver.html">Opgaver til B8.6</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til B8.6</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/b8-6-tlc.html">B8.6 TLC</a>. Prøv selv, før du åbner hjælpen under opgaven.</p>
+<section id="opgave-b8.6.1-delene-i-en-tlc-opstilling" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.1-delene-i-en-tlc-opstilling">Opgave B8.6.1: Delene i en TLC-opstilling</h2>
+<p>Figuren viser en TLC-plade, der står i et kar med løbevæske. Fem dele af opstillingen er mærket med bogstaver.</p>
+<div id="fig-b8-opg-6-opstilling" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-opstilling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-opstilling.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: En TLC-opstilling til opgave B8.6.1. Fem dele er mærket med bogstaverne A til E."><img src="../figurer/b8-opg-6-opstilling.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-opstilling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: En TLC-opstilling til opgave B8.6.1. Fem dele er mærket med bogstaverne A til E.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Skriv det rigtige ord ved hvert bogstav. Vælg mellem låg, løbevæske, startlinje, TLC-plade og væskefront.</li>
+<li>Hvilken af de fem dele er den stationære fase, og hvilken er den mobile fase?</li>
+<li>Hvad hedder det stof, som laget på en TLC-plade for det meste er lavet af? Er laget polært eller upolært?</li>
+<li>Startlinjen ligger over løbevæskens overflade. Forklar, hvorfor det er vigtigt.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign opstillingen med <a href="../kapitler/b8-6-tlc.html#fig-b8-tlc-opstilling">figuren med en TLC-plade i et kar</a>. Ordene stationær fase og mobil fase er forklaret i afsnittet <em>Chromatografi</em> i afsnit B8.6.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Stationær betyder, at noget står stille. Mobil betyder, at noget bevæger sig. Se efter, hvad der står stille, og hvad der bevæger sig, mens TLC-pladen står i karret. Til spørgsmål c: Laget på en TLC-plade har mange OH-grupper på overfladen. Til spørgsmål d: Tænk på, hvad der sker med en prøve på startlinjen, hvis den kommer ned i løbevæsken. Du kan begynde sådan: <em>Hvis startlinjen lå under væskens overflade, ville prøverne …</em></p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>A er låget, B er TLC-pladen, C er væskefronten, D er startlinjen, og E er løbevæsken.</li>
+<li>Den stationære fase er laget på TLC-pladen (B). Den mobile fase er løbevæsken (E), som suges op gennem laget.</li>
+<li>Laget er for det meste kiselgel, som er et fint, hvidt pulver af SiO<sub>2</sub>. Overfladen er dækket af OH-grupper, så laget er polært.</li>
+<li>Ligger startlinjen under løbevæskens overflade, bliver prøverne skyllet ud i løbevæsken. Så løber de ikke op ad pladen, og pletterne bliver svage eller kommer slet ikke.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.2-beregn-rf-værdier" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.2-beregn-rf-værdier">Opgave B8.6.2: Beregn <em>R</em><sub>f</sub>-værdier</h2>
+<p>På en TLC-plade er væskefronten løbet 6,0 cm fra startlinjen. Tabellen viser, hvor langt tre pletter er løbet fra startlinjen.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Plet</th>
+<th style="text-align: center;">Plettens afstand fra startlinjen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2,1 cm</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4,5 cm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0,9 cm</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn <em>R</em><sub>f</sub>-værdien for plet 1.</li>
+<li>Beregn <em>R</em><sub>f</sub>-værdien for plet 2 og for plet 3.</li>
+<li>Forklar, hvorfor en <em>R</em><sub>f</sub>-værdi ikke har nogen enhed.</li>
+<li>En elev regner <em>R</em><sub>f</sub>-værdien for plet 1 ud til 2,9. Hvilken fejl har eleven lavet? Hvordan kan du se med det samme, at 2,9 ikke kan være en <em>R</em><sub>f</sub>-værdi?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>R</em><sub>f</sub>-værdien er plettens afstand fra startlinjen divideret med væskefrontens afstand fra startlinjen. Se <a href="../kapitler/b8-6-tlc.html#fig-b8-tlc-rf">figuren med <em>R</em><sub>f</sub>-værdien</a>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For plet 1 er plettens afstand 2,1 cm, og væskefrontens afstand er 6,0 cm. Sæt de to tal ind i brøken for <em>R</em><sub>f</sub>-værdien med plettens afstand øverst. Til spørgsmål c: Se på enhederne i tælleren og i nævneren. Du kan begynde sådan: <em>Begge afstande måles i … , og derfor …</em> Til spørgsmål d: En plet kan ikke løbe længere end væskefronten.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><em>R</em><sub>f</sub>-værdien for plet 1 er</li>
+</ol>
+<p><span class="math display">\[R_\mathrm{f} = \frac{2{,}1\ \mathrm{cm}}{6{,}0\ \mathrm{cm}} = 0{,}35\]</span></p>
+<ol start="2" type="a">
+<li><em>R</em><sub>f</sub>-værdien for plet 2 er</li>
+</ol>
+<p><span class="math display">\[R_\mathrm{f} = \frac{4{,}5\ \mathrm{cm}}{6{,}0\ \mathrm{cm}} = 0{,}75\]</span></p>
+<p><em>R</em><sub>f</sub>-værdien for plet 3 er</p>
+<p><span class="math display">\[R_\mathrm{f} = \frac{0{,}9\ \mathrm{cm}}{6{,}0\ \mathrm{cm}} = 0{,}15\]</span></p>
+<p>Plet 1 har altså <em>R</em><sub>f</sub>-værdien 0,35, plet 2 har 0,75, og plet 3 har 0,15.</p>
+<ol start="3" type="a">
+<li>Begge afstande måles i centimeter. Enheden står både i tælleren og i nævneren og går ud. Tilbage er der et tal uden enhed.</li>
+<li>Eleven har byttet om på de to afstande og divideret væskefrontens afstand med plettens afstand: 6,0 cm divideret med 2,1 cm giver 2,9. En plet kan ikke løbe længere end væskefronten, så en <em>R</em><sub>f</sub>-værdi er altid et tal mellem 0 og 1.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.3-mål-på-en-tlc-plade" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.3-mål-på-en-tlc-plade">Opgave B8.6.3: Mål på en TLC-plade</h2>
+<p>Figuren viser en TLC-plade med tre pletter. Ved siden af pladen ligger en lineal med nulpunktet ud for startlinjen.</p>
+<div id="fig-b8-opg-6-lineal" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-lineal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-lineal.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: En TLC-plade med tre pletter til opgave B8.6.3. Linealen viser afstanden fra startlinjen i centimeter."><img src="../figurer/b8-opg-6-lineal.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-lineal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: En TLC-plade med tre pletter til opgave B8.6.3. Linealen viser afstanden fra startlinjen i centimeter.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Aflæs på linealen, hvor langt væskefronten er løbet fra startlinjen.</li>
+<li>Aflæs, hvor langt hver af de tre pletter er løbet fra startlinjen. Afstanden måles til midten af pletten.</li>
+<li>Beregn <em>R</em><sub>f</sub>-værdien for hver af de tre pletter.</li>
+<li>Hvilken af de tre pletter kommer fra det stof, der hænger bedst fast på pladen? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>De stiplede linjer går fra væskefronten og fra midten af hver plet hen til linealen. Hver lille streg på linealen er 1 mm, altså 0,1 cm.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Væskefronten ligger ud for 5,0 cm på linealen. Linjen fra plet 1 rammer linealen to små streger over tallet 1, så plet 1 er løbet 1,2 cm. <em>R</em><sub>f</sub>-værdien er plettens afstand divideret med væskefrontens afstand. Til spørgsmål d: Et stof, der hænger godt fast på pladen, løber kort. Du kan begynde sådan: <em>Plet … har den laveste R<sub>f</sub>-værdi, så det stof …</em></p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Væskefronten er løbet 5,0 cm fra startlinjen.</p></li>
+<li><p>Plet 1 er løbet 1,2 cm, plet 2 er løbet 2,6 cm, og plet 3 er løbet 4,3 cm.</p></li>
+<li><p><em>R</em><sub>f</sub>-værdien for plet 1 er</p></li>
+</ol>
+<p><span class="math display">\[R_\mathrm{f} = \frac{1{,}2\ \mathrm{cm}}{5{,}0\ \mathrm{cm}} = 0{,}24\]</span></p>
+<p>De to andre <em>R</em><sub>f</sub>-værdier beregnes på samme måde:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Plet</th>
+<th style="text-align: center;">Plettens afstand</th>
+<th style="text-align: center;">Væskefrontens afstand</th>
+<th style="text-align: center;"><em>R</em><sub>f</sub>-værdi</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1,2 cm</td>
+<td style="text-align: center;">5,0 cm</td>
+<td style="text-align: center;">0,24</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">2,6 cm</td>
+<td style="text-align: center;">5,0 cm</td>
+<td style="text-align: center;">0,52</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">4,3 cm</td>
+<td style="text-align: center;">5,0 cm</td>
+<td style="text-align: center;">0,86</td>
+</tr>
+</tbody>
+</table>
+<ol start="4" type="a">
+<li>Plet 1. Den har den laveste <em>R</em><sub>f</sub>-værdi og er altså løbet kortest. Stoffet i plet 1 hænger bedst fast på den polære plade, og det er derfor det mest polære af de tre stoffer.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.4-tegn-en-tlc-plade" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.4-tegn-en-tlc-plade">Opgave B8.6.4: Tegn en TLC-plade</h2>
+<p>På en TLC-plade med en bestemt løbevæske har stof X <em>R</em><sub>f</sub>-værdien 0,40, og stof Y har <em>R</em><sub>f</sub>-værdien 0,80.</p>
+<ol type="a">
+<li>Væskefronten løber 5,0 cm fra startlinjen. Hvor langt løber pletten fra stof X, og hvor langt løber pletten fra stof Y?</li>
+<li>Tegn TLC-pladen med startlinje, væskefront og tre baner: én med stof X, én med stof Y og én med en blanding af stof X og stof Y.</li>
+<li>Forsøget gentages med en længere plade af samme slags og med den samme løbevæske. Nu løber væskefronten 7,5 cm. Hvor langt løber de to pletter på den lange plade?</li>
+<li>Har stof X og stof Y fået nye <em>R</em><sub>f</sub>-værdier på den lange plade? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Formlen for <em>R</em><sub>f</sub>-værdien kan vendes om, så den giver plettens afstand fra startlinjen: plettens afstand = <em>R</em><sub>f</sub> · væskefrontens afstand.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For stof X er plettens afstand 0,40 · 5,0 cm. Tegn startlinjen forneden på pladen og væskefronten 5,0 cm højere oppe, og mål pletternes afstande op fra startlinjen. I banen med blandingen skal der være to pletter: én i samme højde som pletten fra stof X og én i samme højde som pletten fra stof Y. Til spørgsmål d kan du begynde sådan: <em>R<sub>f</sub>-værdien er et forhold mellem to afstande. Når fronten løber længere, løber pletten …</em></p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Pletten fra stof X løber</li>
+</ol>
+<p><span class="math display">\[\text{plettens afstand} = R_\mathrm{f} \cdot \text{væskefrontens afstand} = 0{,}40 \cdot 5{,}0\ \mathrm{cm} = 2{,}0\ \mathrm{cm}\]</span></p>
+<p>Pletten fra stof Y løber</p>
+<p><span class="math display">\[\text{plettens afstand} = 0{,}80 \cdot 5{,}0\ \mathrm{cm} = 4{,}0\ \mathrm{cm}\]</span></p>
+<ol start="2" type="a">
+<li>TLC-pladen kan se sådan ud:</li>
+</ol>
+<div id="fig-b8-opg-6-tegn-facit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-tegn-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-tegn-facit.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Facit til opgave B8.6.4. Blandingen giver to pletter: én i samme højde som stof X og én i samme højde som stof Y."><img src="../figurer/b8-opg-6-tegn-facit.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-tegn-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Facit til opgave B8.6.4. Blandingen giver to pletter: én i samme højde som stof X og én i samme højde som stof Y.
+</figcaption>
+</figure>
+</div>
+<ol start="3" type="a">
+<li>På den lange plade løber pletten fra stof X</li>
+</ol>
+<p><span class="math display">\[\text{plettens afstand} = 0{,}40 \cdot 7{,}5\ \mathrm{cm} = 3{,}0\ \mathrm{cm}\]</span></p>
+<p>Pletten fra stof Y løber</p>
+<p><span class="math display">\[\text{plettens afstand} = 0{,}80 \cdot 7{,}5\ \mathrm{cm} = 6{,}0\ \mathrm{cm}\]</span></p>
+<ol start="4" type="a">
+<li>Nej. <em>R</em><sub>f</sub>-værdien afhænger af pladen og løbevæsken, og de er de samme som før. Pletterne løber længere på den lange plade, men det gør væskefronten også. Pletten fra stof X løber stadig 40 % af væskefrontens afstand, og pletten fra stof Y løber stadig 80 %.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.5-find-fejlene" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.5-find-fejlene">Opgave B8.6.5: Find fejlene</h2>
+<p>Malte vil undersøge en hovedpinetablet med TLC. Han har skrevet ned, hvad han gjorde:</p>
+<ol type="1">
+<li>Jeg tegnede startlinjen med kuglepen halvanden centimeter fra pladens nederste kant.</li>
+<li>Jeg satte en stor plet af hver prøve på startlinjen, så pletterne var lette at se.</li>
+<li>Jeg hældte løbevæske i karret og stillede pladen ned i karret.</li>
+<li>Da løbevæsken næsten var nået til toppen af pladen, tog jeg pladen op og lagde den til tørre.</li>
+<li>Dagen efter lagde jeg pladen under en lampe med ultraviolet lys og målte, hvor langt pletterne og væskefronten var løbet.</li>
+</ol>
+<p>Figuren viser Maltes opstilling, mens løbevæsken er på vej op ad TLC-pladen.</p>
+<div id="fig-b8-opg-6-fejl" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-fejl-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-fejl.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figur&nbsp;4: Maltes opstilling til opgave B8.6.5, mens løbevæsken er på vej op ad TLC-pladen."><img src="../figurer/b8-opg-6-fejl.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-fejl-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;4: Maltes opstilling til opgave B8.6.5, mens løbevæsken er på vej op ad TLC-pladen.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Malte har lavet fem fejl. Find dem i hans beskrivelse og i figuren.</li>
+<li>Forklar for hver af de fem fejl, hvad der går galt med forsøget.</li>
+<li>Skriv for hver af de fem fejl, hvad Malte skulle have gjort i stedet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs de fem trin i afsnittet <em>Sådan gør man</em> i afsnit B8.6, og sammenlign dem med Maltes beskrivelse ét trin ad gangen. Sammenlign derefter figuren med Maltes opstilling med <a href="../kapitler/b8-6-tlc.html#fig-b8-tlc-opstilling">figuren med en TLC-plade i et kar</a>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se efter disse fem ting i Maltes forsøg:</p>
+<ul>
+<li>Hvad er startlinjen tegnet med?</li>
+<li>Hvor store er pletterne på startlinjen?</li>
+<li>Hvor ligger startlinjen i forhold til løbevæskens overflade?</li>
+<li>Er der låg på karret?</li>
+<li>Hvornår fandt Malte ud af, hvor langt væskefronten var løbet?</li>
+</ul>
+<p>Til fejlen med startlinjen: Tænk på, hvad vandet gjorde ved den sorte tusch på kaffefilteret i indledningen til afsnit B8.6.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Tabellen viser de fem fejl i Maltes forsøg med TLC.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 42%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Fejl</th>
+<th style="text-align: left;">Hvad går der galt?</th>
+<th style="text-align: left;">Hvad skulle Malte have gjort?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Startlinjen er tegnet med kuglepen.</td>
+<td style="text-align: left;">Blækket er en blanding af farvestoffer, som kan opløses i løbevæsken. Farvestofferne løber med op ad pladen og blander sig med prøverne.</td>
+<td style="text-align: left;">Tegn startlinjen med blyant. En blyantsstreg opløses ikke i løbevæsken.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pletterne på startlinjen er for store.</td>
+<td style="text-align: left;">Store pletter breder sig ud på vej op ad pladen og flyder sammen. Så bliver stofferne ikke skilt ordentligt ad, og det er svært at finde midten af en plet.</td>
+<td style="text-align: left;">Sæt en lille plet af hver prøve, højst 2 mm bred.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Startlinjen ligger under løbevæskens overflade.</td>
+<td style="text-align: left;">Prøverne bliver skyllet ud i løbevæsken i stedet for at løbe op ad pladen.</td>
+<td style="text-align: left;">Hæld kun lidt løbevæske i karret, så væskens overflade ligger under startlinjen.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Der er ikke låg på karret.</td>
+<td style="text-align: left;">Løbevæsken fordamper fra karret og fra pladen. Så løber væsken ujævnt op ad pladen, og <em>R</em><sub>f</sub>-værdierne bliver upålidelige.</td>
+<td style="text-align: left;">Læg låg på karret, så dampen bliver i karret.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Væskefronten blev ikke tegnet, da pladen blev taget op.</td>
+<td style="text-align: left;">Løbevæsken fordamper hurtigt fra pladen. Dagen efter kan Malte ikke se, hvor langt væskefronten nåede, og så kan han ikke beregne <em>R</em><sub>f</sub>-værdier.</td>
+<td style="text-align: left;">Tegn en streg ved væskefronten, straks pladen er taget op.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.6-hvilket-stof-løber-længst" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.6-hvilket-stof-løber-længst">Opgave B8.6.6: Hvilket stof løber længst?</h2>
+<p>Paracetamol og ibuprofen opløses hver for sig, og de to opløsninger sættes på hver sin bane på en TLC-plade med kiselgel. Zigzagformlerne for de to stoffer står i <a href="../kapitler/b8-1-laegemidler-og-receptorer.html#fig-b8-laegemidler">figuren med tre smertestillende lægemidler</a>. Da pladen er løbet, har den ene plet <em>R</em><sub>f</sub>-værdien 0,38, og den anden plet har <em>R</em><sub>f</sub>-værdien 0,75.</p>
+<ol type="a">
+<li>Hvilke funktionelle grupper har paracetamol, og hvilken funktionel gruppe har ibuprofen?</li>
+<li>Find O−H og N−H i de to molekyler. Hvilken slags binding kan O−H og N−H danne til OH-grupperne på pladen?</li>
+<li>Hvilket af de to stoffer er mest polært? Begrund svaret.</li>
+<li>Hvilket af de to stoffer har <em>R</em><sub>f</sub>-værdien 0,38, og hvilket har <em>R</em><sub>f</sub>-værdien 0,75? Begrund svaret.</li>
+<li>Løbevæsken skiftes ud med en løbevæske, der er mere polær. Hvad sker der med de to <em>R</em><sub>f</sub>-værdier?</li>
+<li>Med ren heptan som løbevæske bliver begge pletter stående på startlinjen. Forklar hvorfor, og foreslå, hvordan løbevæsken kan ændres.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>De funktionelle grupper i paracetamol og ibuprofen er fremhævet i figuren med tre smertestillende lægemidler i afsnit B8.1. Se derefter <a href="../kapitler/b8-6-tlc.html#fig-b8-tlc-polaritet">figuren med den polære plade</a>: et polært stof hænger fast på TLC-pladen og løber kort.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Tæl de polære grupper og carbonatomerne i paracetamol og i ibuprofen. Jo flere carbonatomer der er for hver polær gruppe, jo mere upolært er molekylet. Du kan også sammenligne log <em>P</em> for de to stoffer i <a href="../kapitler/b8-4-log-p-og-log-d.html#fig-b8-logp-skala">figuren med log P</a>. Du kan begynde dine sætninger sådan:</p>
+<ul>
+<li>Paracetamol har … polære grupper og … carbonatomer, mens ibuprofen har …</li>
+<li>Det mest polære stof danner flest … til pladen og løber derfor …</li>
+<li>En mere polær løbevæske er bedre til at …, så begge pletter …</li>
+<li>Heptan er …, og derfor kan heptan ikke …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Paracetamol har en hydroxygruppe, der sidder på benzenringen, og en amidgruppe. Ibuprofen har en carboxylgruppe.</li>
+<li>Paracetamol har O−H i hydroxygruppen og N−H i amidgruppen. Ibuprofen har O−H i carboxylgruppen. O−H og N−H kan danne hydrogenbindinger til OH-grupperne på pladen.</li>
+<li>Paracetamol er mest polært. Molekylet har to polære grupper og kun 8 carbonatomer. Ibuprofen har én polær gruppe og 13 carbonatomer, så det meste af molekylet er upolært. Det passer med, at log <em>P</em> er omkring 0,5 for paracetamol og omkring 4 for ibuprofen.</li>
+<li>Paracetamol har <em>R</em><sub>f</sub>-værdien 0,38, og ibuprofen har <em>R</em><sub>f</sub>-værdien 0,75. Paracetamol danner flest hydrogenbindinger til den polære plade. Det hænger derfor bedst fast og løber kortest. Ibuprofen bindes svagere til pladen og følger længere med løbevæsken.</li>
+<li>Begge <em>R</em><sub>f</sub>-værdier bliver højere. En mere polær løbevæske er bedre til at trække stofferne løs fra pladen, så begge pletter løber længere.</li>
+<li>Heptan er en upolær væske. Den kan ikke trække paracetamol og ibuprofen løs fra den polære plade, så begge stoffer bliver hængende på startlinjen. Løbevæsken skal gøres mere polær. Det kan man gøre ved at blande heptan med en mere polær væske, fx ethylethanoat eller ethanol. Man prøver sig frem, til pletterne ligger spredt midt på pladen.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.7-hvad-er-der-i-tabletterne" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.7-hvad-er-der-i-tabletterne">Opgave B8.6.7: Hvad er der i tabletterne?</h2>
+<p>To hovedpinetabletter, tablet X og tablet Y, knuses og opløses hver for sig. Opløsningerne sættes på en TLC-plade sammen med tre kendte stoffer: paracetamol, koffein og ibuprofen. Figuren viser pladen under ultraviolet lys.</p>
+<div id="fig-b8-opg-6-tabletter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-tabletter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-tabletter.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figur&nbsp;5: En TLC-plade til opgave B8.6.7 med tre kendte stoffer og to hovedpinetabletter."><img src="../figurer/b8-opg-6-tabletter.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-tabletter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;5: En TLC-plade til opgave B8.6.7 med tre kendte stoffer og to hovedpinetabletter.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Opløsningerne af de fem prøver er farveløse. Forklar, hvorfor pletterne på TLC-pladen kan ses under ultraviolet lys.</li>
+<li>Hvor mange pletter giver tablet X, og hvor mange giver tablet Y? Hvad fortæller antallet af pletter om de to tabletter?</li>
+<li>Hvilke af de tre kendte stoffer kan tablet X indeholde, og hvilke kan tablet Y indeholde?</li>
+<li>Kan du være helt sikker på, at pletten fra tablet Y er ibuprofen? Hvad kan man gøre for at blive mere sikker?</li>
+<li>På pakken med tablet X står der, hvor mange milligram der er af hvert virksomt stof i en tablet. Kan TLC-pladen vise, om tallene passer? Brug ordene kvalitativ og kvantitativ i dit svar.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign højden af pletterne i bane 4 og bane 5 med højden af pletterne i bane 1, 2 og 3. Se, hvordan pladen med en hovedpinetablet bliver læst i afsnittet <em>At læse en plade</em> i afsnit B8.6.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Du kan begynde dine sætninger sådan:</p>
+<ul>
+<li>Under ultraviolet lys lyser TLC-pladen …, og et stof, der absorberer ultraviolet lys, ses som …</li>
+<li>Flere pletter i samme bane betyder, at prøven er …</li>
+<li>Den øverste plet fra tablet X er løbet lige så langt som …</li>
+<li>To forskellige stoffer kan godt …, så man gentager forsøget med …</li>
+<li>TLC viser, hvilke stoffer …, men ikke …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>TLC-pladen lyser grønt under ultraviolet lys. Hvor der ligger et stof, som absorberer det ultraviolette lys, lyser pladen ikke, og stoffet ses som en mørk plet. Paracetamol og ibuprofen har en benzenring, og stoffer med en benzenring absorberer ultraviolet lys. Koffein har ingen benzenring, men molekylet har andre ringe med dobbeltbindinger, og koffein absorberer også ultraviolet lys.</li>
+<li>Tablet X giver to pletter, så den indeholder mindst to stoffer. Tablet Y giver én plet, så pladen viser kun ét stof i tablet Y. Hjælpestofferne i en tablet giver ingen plet, hvis de ikke absorberer ultraviolet lys.</li>
+<li>Den øverste plet fra tablet X er løbet lige så langt som paracetamol, og den nederste er løbet lige så langt som koffein. Tablet X kan altså indeholde paracetamol og koffein, men ikke ibuprofen. Pletten fra tablet Y er løbet lige så langt som ibuprofen. Tablet Y kan altså indeholde ibuprofen, men hverken paracetamol eller koffein.</li>
+<li>Nej. To forskellige stoffer kan godt løbe lige langt på en TLC-plade. Man kan gentage forsøget med en anden løbevæske. Løber pletten fra tablet Y stadig lige så langt som ibuprofen, er det meget sandsynligt, at tablet Y indeholder ibuprofen.</li>
+<li>Nej. TLC er en kvalitativ metode. TLC-pladen viser, hvilke stoffer der er i tablet X, men ikke hvor mange milligram der er af hvert stof. Det kræver en kvantitativ metode.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.8-følg-en-reaktion-med-tlc" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.8-følg-en-reaktion-med-tlc">Opgave B8.6.8: Følg en reaktion med TLC</h2>
+<p>En kemiker laver stoffet B ud fra stoffet A.</p>
+<div class="reaktion">
+<p>A → B</p>
+</div>
+<p>Kemikeren tager en lille prøve af reaktionsblandingen efter 0, 10 og 30 minutter for at se, hvornår reaktionen er færdig. De tre prøver sættes på en TLC-plade ved siden af rent A. Figuren viser pladen under ultraviolet lys.</p>
+<div id="fig-b8-opg-6-reaktion" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-reaktion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-reaktion.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Figur&nbsp;6: En TLC-plade til opgave B8.6.8 med rent A og tre prøver fra reaktionsblandingen."><img src="../figurer/b8-opg-6-reaktion.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-reaktion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;6: En TLC-plade til opgave B8.6.8 med rent A og tre prøver fra reaktionsblandingen.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Hvorfor sætter kemikeren rent A på TLC-pladen i bane 1?</li>
+<li>Hvilke pletter på TLC-pladen kommer fra produktet B? Begrund svaret.</li>
+<li>Hvilke af de to stoffer A og B er der i reaktionsblandingen efter 0 minutter, efter 10 minutter og efter 30 minutter?</li>
+<li>Pletten fra A er mindre efter 10 minutter end efter 0 minutter. Hvad fortæller det?</li>
+<li>Er reaktionen løbet til ende efter 10 minutter? Er den løbet til ende efter 30 minutter? Begrund svaret.</li>
+<li>Hvilket af de to stoffer er mest polært, A eller B? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Alle pletter, der er løbet lige så langt som pletten fra rent A i bane 1, er stoffet A. Læs punktet <em>Er reaktionen færdig?</em> i afsnittet <em>At læse en plade</em> i afsnit B8.6.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Du kan begynde dine sætninger sådan:</p>
+<ul>
+<li>Pletten fra rent A viser, hvor langt … løber på TLC-pladen.</li>
+<li>Den nederste plet er der ikke efter 0 minutter, så den må komme fra …</li>
+<li>Reaktionen er løbet til ende, når pletten fra … er …</li>
+<li>Det stof, der løber kortest, hænger bedst fast på den polære plade og er derfor …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Pletten fra rent A viser, hvor langt reaktanten A løber på TLC-pladen. Så kan kemikeren se, hvilke pletter fra reaktionsblandingen der er A.</li>
+<li>De nederste pletter i bane 3 og bane 4 kommer fra B. De er ikke løbet lige så langt som A, og der er ingen plet i den højde efter 0 minutter, hvor reaktionen ikke er begyndt. Stoffet i de nederste pletter er altså dannet ved reaktionen.</li>
+<li>Efter 0 minutter er der kun A i reaktionsblandingen. Efter 10 minutter er der både A og B. Efter 30 minutter er der kun B.</li>
+<li>Der er blevet mindre af A i reaktionsblandingen, fordi en del af A er omdannet til B.</li>
+<li>Efter 10 minutter er reaktionen ikke løbet til ende, for pletten fra A er der stadig. Efter 30 minutter er pletten fra A væk, så reaktionen er løbet til ende.</li>
+<li>B er mest polært. Pletten fra B er løbet kortest, så B hænger bedst fast på den polære plade.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-med-fødevaretema" class="level2 tema">
+<h2 class="tema anchored" data-anchor-id="opgaver-med-fødevaretema">Opgaver med fødevaretema</h2>
+<p>Med chromatografi kan du også undersøge mad og drikke: farvestofferne i slik og spinat og koffeinen i kaffe, cola og energidrik.</p>
+</section>
+<section id="opgave-b8.6.mad.1-farvestoffer-i-chokoladelinser" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.mad.1-farvestoffer-i-chokoladelinser">Opgave B8.6.mad.1: Farvestoffer i chokoladelinser</h2>
+<p>Chokoladelinser har en skal af sukker, som er farvet med farvestoffer. En elev drypper en dråbe vand på en rød, en gul, en blå, en grøn og en brun chokoladelinse, så farven fra skallen bliver opløst. En lille plet af hver farvet dråbe sættes på en TLC-plade. Figuren viser pladen, da den er løbet.</p>
+<div id="fig-b8-opg-6-farver" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-farver-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-farver.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Figur&nbsp;7: En TLC-plade til opgave B8.6.mad.1 med farvestofferne fra fem chokoladelinser."><img src="../figurer/b8-opg-6-farver.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-farver-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;7: En TLC-plade til opgave B8.6.mad.1 med farvestofferne fra fem chokoladelinser.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Pletterne på TLC-pladen med farvestoffer kan ses uden en lampe med ultraviolet lys. Forklar hvorfor.</li>
+<li>Hvilke af de fem chokoladelinser er farvet med ét farvestof, og hvilke er farvet med en blanding af farvestoffer?</li>
+<li>Hvilke farvestoffer er der i skallen på den grønne chokoladelinse? Hvilke farvestoffer er der i skallen på den brune?</li>
+<li>Væskefronten er løbet 6,0 cm fra startlinjen, og pletten med det blå farvestof er løbet 4,5 cm. Beregn <em>R</em><sub>f</sub>-værdien for det blå farvestof.</li>
+<li>Hvilket af de tre farvestoffer hænger bedst fast på TLC-pladen? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et rent stof giver én plet på en TLC-plade. Flere pletter i samme bane betyder en blanding. Sammenlign pletterne fra den grønne og den brune chokoladelinse med pletterne fra den røde, den gule og den blå.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et farvestof absorberer synligt lys, som du lærte i <a href="../kapitler/b5-2-absorptionsspektre.html">afsnit B5.2</a>. <em>R</em><sub>f</sub>-værdien er plettens afstand fra startlinjen divideret med væskefrontens afstand fra startlinjen. Det farvestof, der hænger bedst fast på TLC-pladen, løber kortest. Til spørgsmål a kan du begynde sådan: <em>Et farvestof absorberer … lys, og derfor kan øjet …</em></p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Farvestofferne absorberer synligt lys og er derfor farvede. Pletterne kan ses med det blotte øje. Lampen med ultraviolet lys bruges kun til farveløse stoffer.</p></li>
+<li><p>Den røde, den gule og den blå chokoladelinse giver hver én plet. De er farvet med ét farvestof. Den grønne og den brune chokoladelinse giver flere pletter. De er farvet med en blanding af farvestoffer.</p></li>
+<li><p>Den grønne chokoladelinse giver en gul og en blå plet. De to pletter er løbet lige så langt som pletterne fra den gule og den blå chokoladelinse. Skallen er altså farvet med det gule og det blå farvestof. Den brune chokoladelinse giver en rød, en gul og en blå plet. Skallen er farvet med alle tre farvestoffer.</p></li>
+<li><p><em>R</em><sub>f</sub>-værdien for det blå farvestof er</p></li>
+</ol>
+<p><span class="math display">\[R_\mathrm{f} = \frac{4{,}5\ \mathrm{cm}}{6{,}0\ \mathrm{cm}} = 0{,}75\]</span></p>
+<ol start="5" type="a">
+<li>Det røde farvestof. Den røde plet er løbet kortest og har den laveste <em>R</em><sub>f</sub>-værdi, så det røde farvestof hænger bedst fast på TLC-pladen.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.mad.2-de-grønne-og-gule-farvestoffer-i-spinat" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.mad.2-de-grønne-og-gule-farvestoffer-i-spinat">Opgave B8.6.mad.2: De grønne og gule farvestoffer i spinat</h2>
+<p>Spinatblade knuses med lidt propanon, så bladenes farvestoffer bliver opløst. En plet af den grønne væske sættes på en TLC-plade. Ved siden af sættes en plet, der er lavet på samme måde af gulerod. Løbevæsken er upolær. Den består af heptan med lidt propanon. Figuren viser pladen, da den er løbet.</p>
+<div id="fig-b8-opg-6-spinat" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-b8-opg-6-spinat-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/b8-opg-6-spinat.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Figur&nbsp;8: En TLC-plade til opgave B8.6.mad.2 med farvestofferne fra gulerod og fra spinat."><img src="../figurer/b8-opg-6-spinat.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-b8-opg-6-spinat-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;8: En TLC-plade til opgave B8.6.mad.2 med farvestofferne fra gulerod og fra spinat.
+</figcaption>
+</figure>
+</div>
+<p>Tabellen viser fire farvestoffer, som findes i spinat.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 21%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Farvestof</th>
+<th style="text-align: left;">Farve</th>
+<th style="text-align: left;">Molekylformel</th>
+<th style="text-align: left;">Polære grupper</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">caroten</td>
+<td style="text-align: left;">orange</td>
+<td style="text-align: left;">C<sub>40</sub>H<sub>56</sub></td>
+<td style="text-align: left;">ingen</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lutein</td>
+<td style="text-align: left;">gul</td>
+<td style="text-align: left;">C<sub>40</sub>H<sub>56</sub>O<sub>2</sub></td>
+<td style="text-align: left;">to OH-grupper</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">klorofyl a</td>
+<td style="text-align: left;">blågrøn</td>
+<td style="text-align: left;">C<sub>55</sub>H<sub>72</sub>MgN<sub>4</sub>O<sub>5</sub></td>
+<td style="text-align: left;">to estergrupper og en ketongruppe</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">klorofyl b</td>
+<td style="text-align: left;">gulgrøn</td>
+<td style="text-align: left;">C<sub>55</sub>H<sub>70</sub>MgN<sub>4</sub>O<sub>6</sub></td>
+<td style="text-align: left;">de samme som klorofyl a og desuden en aldehydgruppe</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Hvor mange farvestoffer viser TLC-pladen, at der er i spinat?</li>
+<li>Guleroden giver kun én plet, og den kommer fra caroten. Hvilket farvestof er der i hver af de fire pletter fra spinat? Brug banen med gulerod og farverne i tabellen.</li>
+<li>Forklar ud fra molekylformlen, hvorfor caroten er upolært, og hvorfor pletten med caroten løber næsten lige så langt som væskefronten.</li>
+<li>Lutein ligner caroten, men har to OH-grupper. Forklar, hvorfor pletten med lutein løber meget kortere end pletten med caroten.</li>
+<li>Forklar, hvorfor klorofyl b løber lidt kortere end klorofyl a.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign pletten fra gulerod med de fire pletter fra spinat. Den plet fra spinat, der har samme farve og er løbet lige så langt som pletten fra gulerod, er det samme farvestof. Brug farverne i tabellen til de tre andre pletter.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>På en polær TLC-plade løber upolære stoffer langt og polære stoffer kort. Et stof med O−H kan danne hydrogenbindinger til OH-grupperne på pladen. Du kan begynde dine sætninger sådan:</p>
+<ul>
+<li>Caroten består kun af …, og bindingerne C−C og C−H er …</li>
+<li>OH-grupperne i lutein kan danne … til pladen, så lutein …</li>
+<li>Klorofyl b har en … mere end klorofyl a, og den gruppe er …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Banen med spinat har fire pletter, så pladen viser fire farvestoffer i spinat.</li>
+<li>Plet 1 er caroten. Den er orange og er løbet lige så langt som pletten fra gulerod. Plet 2 er blågrøn og kommer fra klorofyl a. Plet 3 er gulgrøn og kommer fra klorofyl b. Plet 4 er gul og kommer fra lutein.</li>
+<li>Caroten består kun af carbon og hydrogen. Bindingerne C−C og C−H er upolære, så molekylet er upolært. Caroten kan ikke danne hydrogenbindinger til OH-grupperne på pladen, og det opløses godt i den upolære løbevæske. Caroten følger derfor med løbevæsken næsten helt op til væskefronten.</li>
+<li>De to OH-grupper i lutein kan danne hydrogenbindinger til OH-grupperne på pladen. Lutein hænger derfor meget bedre fast på pladen end caroten og løber kortere.</li>
+<li>Klorofyl b har en aldehydgruppe mere end klorofyl a. Aldehydgruppen er polær, og dens oxygenatom kan tage imod en hydrogenbinding fra en OH-gruppe på pladen. Klorofyl b hænger derfor lidt bedre fast på pladen end klorofyl a og løber lidt kortere.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-b8.6.mad.3-koffein-i-kaffe-cola-og-energidrik" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-b8.6.mad.3-koffein-i-kaffe-cola-og-energidrik">Opgave B8.6.mad.3: Koffein i kaffe, cola og energidrik</h2>
+<p>En elev vil undersøge, om fire drikke indeholder koffein. Først trækkes koffeinen ud af hver drik med et organisk opløsningsmiddel. Derefter sættes en plet af hvert udtræk på en TLC-plade ved siden af en plet med ren koffein. Koffein er farveløs, så pladen ses under ultraviolet lys. Væskefronten er løbet 6,0 cm fra startlinjen.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Bane</th>
+<th style="text-align: left;">Prøve</th>
+<th style="text-align: left;">Pletternes afstand fra startlinjen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">ren koffein</td>
+<td style="text-align: left;">2,7 cm</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">kaffe</td>
+<td style="text-align: left;">0,6 cm, 2,7 cm og 4,2 cm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">cola</td>
+<td style="text-align: left;">2,7 cm</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">energidrik</td>
+<td style="text-align: left;">1,5 cm og 2,7 cm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">koffeinfri kaffe</td>
+<td style="text-align: left;">0,6 cm og 4,2 cm</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn <em>R</em><sub>f</sub>-værdien for ren koffein.</li>
+<li>Hvilke af de fire drikke giver en plet, der er løbet lige så langt som ren koffein? Hvad fortæller det om de drikke?</li>
+<li>Hvad viser TLC-pladen om den koffeinfri kaffe? Hvad kan pletterne ved 0,6 cm og 4,2 cm komme fra?</li>
+<li>Pletten fra cola ved 2,7 cm er meget mindre og svagere end pletten fra kaffe ved 2,7 cm. Hvad tyder det på? Kan TLC-pladen vise, hvor mange milligram koffein der er i et glas cola?</li>
+<li>Eleven gentager forsøget med en anden løbevæske. Nu får ren koffein <em>R</em><sub>f</sub>-værdien 0,15. Hvilken af de to løbevæsker er mest polær? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>R</em><sub>f</sub>-værdien er plettens afstand fra startlinjen divideret med væskefrontens afstand fra startlinjen. Find derefter de baner i tabellen, der har en plet i samme afstand fra startlinjen som pletten fra ren koffein.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Pletten fra ren koffein er løbet 2,7 cm, og væskefronten er løbet 6,0 cm. Til spørgsmål d: TLC er en kvalitativ metode. Til spørgsmål e: En mere polær løbevæske er bedre til at trække et stof løs fra TLC-pladen. Du kan begynde dine sætninger sådan:</p>
+<ul>
+<li>Kaffe, cola og energidrik har alle en plet ved …, så de kan indeholde …</li>
+<li>I banen med koffeinfri kaffe mangler pletten ved …, og det viser, at …</li>
+<li>En svag plet tyder på, at der er …, men TLC viser ikke …</li>
+<li>Koffein løber længst med den løbevæske, der er mest …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><em>R</em><sub>f</sub>-værdien for ren koffein er</li>
+</ol>
+<p><span class="math display">\[R_\mathrm{f} = \frac{2{,}7\ \mathrm{cm}}{6{,}0\ \mathrm{cm}} = 0{,}45\]</span></p>
+<ol start="2" type="a">
+<li><p>Kaffe, cola og energidrik har alle en plet ved 2,7 cm. De tre drikke indeholder altså et stof, der løber lige så langt som koffein, og det er sandsynligvis koffein. Koffeinfri kaffe har ingen plet ved 2,7 cm.</p></li>
+<li><p>Der er ingen plet i samme afstand fra startlinjen som pletten fra ren koffein. TLC-pladen viser altså ingen koffein i den koffeinfri kaffe. Der kan godt være en smule koffein tilbage, men så er der for lidt til, at pletten kan ses. Pletterne ved 0,6 cm og 4,2 cm findes både i kaffe og i koffeinfri kaffe. De kommer fra to andre stoffer i kaffe, som også absorberer ultraviolet lys.</p></li>
+<li><p>Det tyder på, at der er mindre koffein i udtrækket af cola end i udtrækket af kaffe. TLC-pladen kan ikke vise, hvor mange milligram koffein der er i et glas cola. TLC er en kvalitativ metode, som viser, hvilke stoffer der er i en prøve. Mængden skal findes med en kvantitativ metode.</p></li>
+<li><p>Den første løbevæske er mest polær. Med den løber koffein længst og får <em>R</em><sub>f</sub>-værdien 0,45. En mere polær løbevæske er bedre til at trække koffein løs fra den polære plade, så pletten løber længere.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/b8-6-tlc.html" class="pagination-link" aria-label="B8.6 TLC">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">B8.6 TLC</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/b8-7-hvor-meget-virksomt-stof.html" class="pagination-link" aria-label="B8.7 Hvor meget virksomt stof?">
+        <span class="nav-page-text">B8.7 Hvor meget virksomt stof?</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

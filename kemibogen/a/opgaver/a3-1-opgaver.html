@@ -1,0 +1,2762 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A3.1 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" rel="next">
+<link href="../kapitler/a3-1-elementaranalyse.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-1-opgaver.html">Opgaver til A3.1</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a3.1.1-empirisk-formel-og-molekylformel" id="toc-opgave-a3.1.1-empirisk-formel-og-molekylformel" class="nav-link active" data-scroll-target="#opgave-a3.1.1-empirisk-formel-og-molekylformel">Opgave A3.1.1: Empirisk formel og molekylformel</a></li>
+  <li><a href="#opgave-a3.1.2-nikotin-trin-for-trin" id="toc-opgave-a3.1.2-nikotin-trin-for-trin" class="nav-link" data-scroll-target="#opgave-a3.1.2-nikotin-trin-for-trin">Opgave A3.1.2: Nikotin trin for trin</a></li>
+  <li><a href="#opgave-a3.1.3-fra-empirisk-formel-til-molekylformel" id="toc-opgave-a3.1.3-fra-empirisk-formel-til-molekylformel" class="nav-link" data-scroll-target="#opgave-a3.1.3-fra-empirisk-formel-til-molekylformel">Opgave A3.1.3: Fra empirisk formel til molekylformel</a></li>
+  <li><a href="#opgave-a3.1.4-når-tallene-ikke-bliver-hele" id="toc-opgave-a3.1.4-når-tallene-ikke-bliver-hele" class="nav-link" data-scroll-target="#opgave-a3.1.4-når-tallene-ikke-bliver-hele">Opgave A3.1.4: Når tallene ikke bliver hele</a></li>
+  <li><a href="#opgave-a3.1.5-forbrændingsanalyse-af-menthol" id="toc-opgave-a3.1.5-forbrændingsanalyse-af-menthol" class="nav-link" data-scroll-target="#opgave-a3.1.5-forbrændingsanalyse-af-menthol">Opgave A3.1.5: Forbrændingsanalyse af menthol</a></li>
+  <li><a href="#opgave-a3.1.6-dobbeltbindingsækvivalenter" id="toc-opgave-a3.1.6-dobbeltbindingsækvivalenter" class="nav-link" data-scroll-target="#opgave-a3.1.6-dobbeltbindingsækvivalenter">Opgave A3.1.6: Dobbeltbindingsækvivalenter</a></li>
+  <li><a href="#opgave-a3.1.7-tæl-i-strukturformlen" id="toc-opgave-a3.1.7-tæl-i-strukturformlen" class="nav-link" data-scroll-target="#opgave-a3.1.7-tæl-i-strukturformlen">Opgave A3.1.7: Tæl i strukturformlen</a></li>
+  <li><a href="#opgave-a3.1.8-zingeron-fra-ingefær" id="toc-opgave-a3.1.8-zingeron-fra-ingefær" class="nav-link" data-scroll-target="#opgave-a3.1.8-zingeron-fra-ingefær">Opgave A3.1.8: Zingeron fra ingefær</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a3.1.eks.1-sorbinsyre-i-ost-og-brød" id="toc-opgave-a3.1.eks.1-sorbinsyre-i-ost-og-brød" class="nav-link" data-scroll-target="#opgave-a3.1.eks.1-sorbinsyre-i-ost-og-brød">Opgave A3.1.eks.1: Sorbinsyre i ost og brød</a></li>
+  <li><a href="#opgave-a3.1.eks.2-limonen-i-appelsinskal" id="toc-opgave-a3.1.eks.2-limonen-i-appelsinskal" class="nav-link" data-scroll-target="#opgave-a3.1.eks.2-limonen-i-appelsinskal">Opgave A3.1.eks.2: Limonen i appelsinskal</a></li>
+  <li><a href="#opgave-a3.1.eks.3-phenylalanin" id="toc-opgave-a3.1.eks.3-phenylalanin" class="nav-link" data-scroll-target="#opgave-a3.1.eks.3-phenylalanin">Opgave A3.1.eks.3: Phenylalanin</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-1-opgaver.html">Opgaver til A3.1</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A3.1</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a3-1-elementaranalyse.html">A3.1 Elementaranalyse</a>. Prøv selv, før du åbner hjælpen under opgaven. Brug atommasserne C 12,01 g/mol, H 1,008 g/mol, N 14,01 g/mol og O 16,00 g/mol.</p>
+<section id="opgave-a3.1.1-empirisk-formel-og-molekylformel" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.1-empirisk-formel-og-molekylformel">Opgave A3.1.1: Empirisk formel og molekylformel</h2>
+<p>Tabellen viser molekylformlen for otte stoffer.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Molekylformel</th>
+<th style="text-align: left;">Empirisk formel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">benzen</td>
+<td style="text-align: left;">C<sub>6</sub>H<sub>6</sub></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">butan</td>
+<td style="text-align: left;">C<sub>4</sub>H<sub>10</sub></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ethanol</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>6</sub>O</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hydrogenperoxid</td>
+<td style="text-align: left;">H<sub>2</sub>O<sub>2</sub></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mælkesyre i yoghurt</td>
+<td style="text-align: left;">C<sub>3</sub>H<sub>6</sub>O<sub>3</sub></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vinsyre i druer</td>
+<td style="text-align: left;">C<sub>4</sub>H<sub>6</sub>O<sub>6</sub></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">citronsyre i citroner</td>
+<td style="text-align: left;">C<sub>6</sub>H<sub>8</sub>O<sub>7</sub></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nikotin i tobak</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>14</sub>N<sub>2</sub></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Skriv den empiriske formel for hvert af de otte stoffer.</li>
+<li>Hvilke af de otte stoffer har en empirisk formel, der er den samme som molekylformlen?</li>
+<li>Ethansyre har molekylformlen C<sub>2</sub>H<sub>4</sub>O<sub>2</sub>. Forklar, hvorfor en elementaranalyse ikke kan skelne ethansyre fra mælkesyre, og hvad man også skal kende for at skelne de to stoffer.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Den empiriske formel viser det enkleste forhold mellem atomerne. Find det største tal, som alle de små tal i molekylformlen kan divideres med. I benzen, C<sub>6</sub>H<sub>6</sub>, kan begge tal divideres med 6.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Kan de små tal i molekylformlen kun divideres med 1, er den empiriske formel den samme som molekylformlen. I citronsyre, C<sub>6</sub>H<sub>8</sub>O<sub>7</sub>, er tallene 6, 8 og 7. De har ikke noget fælles tal at dividere med, fordi 7 er et ulige tal.</p>
+<p>Til spørgsmål c: find først den empiriske formel for ethansyre, C<sub>2</sub>H<sub>4</sub>O<sub>2</sub>. Du kan begynde sådan: “Ethansyre og mælkesyre har begge den empiriske formel …, så masseprocenterne af carbon, hydrogen og oxygen er …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De empiriske formler er</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Molekylformel</th>
+<th style="text-align: center;">Divideret med</th>
+<th style="text-align: left;">Empirisk formel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">benzen</td>
+<td style="text-align: left;">C<sub>6</sub>H<sub>6</sub></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">CH</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">butan</td>
+<td style="text-align: left;">C<sub>4</sub>H<sub>10</sub></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>5</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ethanol</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>6</sub>O</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>6</sub>O</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">hydrogenperoxid</td>
+<td style="text-align: left;">H<sub>2</sub>O<sub>2</sub></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">HO</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mælkesyre</td>
+<td style="text-align: left;">C<sub>3</sub>H<sub>6</sub>O<sub>3</sub></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">CH<sub>2</sub>O</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vinsyre</td>
+<td style="text-align: left;">C<sub>4</sub>H<sub>6</sub>O<sub>6</sub></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>3</sub>O<sub>3</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">citronsyre</td>
+<td style="text-align: left;">C<sub>6</sub>H<sub>8</sub>O<sub>7</sub></td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">C<sub>6</sub>H<sub>8</sub>O<sub>7</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nikotin</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>14</sub>N<sub>2</sub></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">C<sub>5</sub>H<sub>7</sub>N</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Ethanol og citronsyre har en empirisk formel, der er den samme som molekylformlen. I ethanol er der kun ét oxygenatom, og i citronsyre har tallene 6, 8 og 7 ikke noget fælles tal at dividere med.</p></li>
+<li><p>Ethansyre, C<sub>2</sub>H<sub>4</sub>O<sub>2</sub>, og mælkesyre, C<sub>3</sub>H<sub>6</sub>O<sub>3</sub>, har begge den empiriske formel CH<sub>2</sub>O. Forholdet mellem carbon, hydrogen og oxygen er derfor det samme i de to stoffer, og en elementaranalyse giver de samme masseprocenter for ethansyre og mælkesyre: 40,00 % carbon, 6,71 % hydrogen og 53,29 % oxygen. For at skelne de to stoffer skal man også kende molarmassen. Den er 60,05 g/mol for ethansyre og 90,08 g/mol for mælkesyre.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.2-nikotin-trin-for-trin" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.2-nikotin-trin-for-trin">Opgave A3.1.2: Nikotin trin for trin</h2>
+<p>Nikotin er det stof i tobaksplanten, der gør rygere afhængige. Nikotin indeholder 74,03 % carbon, 8,70 % hydrogen og 17,27 % nitrogen, målt i masseprocent.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>m</em> i g</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>M</em> i g/mol</td>
+<td style="text-align: center;">12,01</td>
+<td style="text-align: center;">1,008</td>
+<td style="text-align: center;">14,01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> = <em>m</em> / <em>M</em> i mol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med den mindste stofmængde</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Hvor mange gram carbon, hydrogen og nitrogen er der i 100 g nikotin? Skriv masserne i tabellens første række.</li>
+<li>Beregn stofmængden af hvert grundstof, og udfyld resten af tabellen.</li>
+<li>Opskriv den empiriske formel for nikotin.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I 100 g nikotin er masseprocenterne lig med masserne i gram. 74,03 % carbon svarer altså til 74,03 g carbon.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Stofmængden af carbon i 100 g nikotin er</p>
+<p><span class="math display">\[
+n(\mathrm{C}) = \frac{m}{M} = \frac{74{,}03\ \mathrm{g}}{12{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 6{,}164\ \mathrm{mol}
+\]</span></p>
+<p>Beregn stofmængderne af hydrogen og nitrogen på samme måde. Den mindste af de tre stofmængder er stofmængden af nitrogen. Divider alle tre stofmængder med stofmængden af nitrogen.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>og b. I 100 g nikotin er der 74,03 g C, 8,70 g H og 17,27 g N.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>m</em> i g</td>
+<td style="text-align: center;">74,03</td>
+<td style="text-align: center;">8,70</td>
+<td style="text-align: center;">17,27</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>M</em> i g/mol</td>
+<td style="text-align: center;">12,01</td>
+<td style="text-align: center;">1,008</td>
+<td style="text-align: center;">14,01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> = <em>m</em> / <em>M</em> i mol</td>
+<td style="text-align: center;">6,164</td>
+<td style="text-align: center;">8,631</td>
+<td style="text-align: center;">1,233</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med 1,233 mol</td>
+<td style="text-align: center;">5,00</td>
+<td style="text-align: center;">7,00</td>
+<td style="text-align: center;">1,00</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="a">
+<li>Forholdet mellem carbon, hydrogen og nitrogen i nikotin er 5 : 7 : 1. Den empiriske formel for nikotin er C<sub>5</sub>H<sub>7</sub>N.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.3-fra-empirisk-formel-til-molekylformel" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.3-fra-empirisk-formel-til-molekylformel">Opgave A3.1.3: Fra empirisk formel til molekylformel</h2>
+<p>Molekylformlen er den empiriske formel ganget med et helt tal. Tabellen viser den empiriske formel og molarmassen for fire naturstoffer.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Empirisk formel</th>
+<th style="text-align: center;">Molarmasse i g/mol</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">mælkesyre i yoghurt</td>
+<td style="text-align: left;">CH<sub>2</sub>O</td>
+<td style="text-align: center;">90,08</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nikotin i tobak</td>
+<td style="text-align: left;">C<sub>5</sub>H<sub>7</sub>N</td>
+<td style="text-align: center;">162,2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">kanelaldehyd i kanel</td>
+<td style="text-align: left;">C<sub>9</sub>H<sub>8</sub>O</td>
+<td style="text-align: center;">132,2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">squalen i olivenolie</td>
+<td style="text-align: left;">C<sub>3</sub>H<sub>5</sub></td>
+<td style="text-align: center;">410,7</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn formelmassen for hver af de fire empiriske formler.</li>
+<li>Bestem molekylformlen for hvert af de fire stoffer.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Formelmassen for en empirisk formel beregnes som en molarmasse: læg atommasserne sammen. For CH<sub>2</sub>O er formelmassen 12,01 g/mol + 2 · 1,008 g/mol + 16,00 g/mol.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Divider stoffets molarmasse med formelmassen for den empiriske formel. Resultatet er et helt tal, og det tal skal alle de små tal i den empiriske formel ganges med. For mælkesyre er</p>
+<p><span class="math display">\[
+\frac{M}{M_\mathrm{emp}} = \frac{90{,}08\ \dfrac{\mathrm{g}}{\mathrm{mol}}}{30{,}03\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 3{,}00
+\]</span></p>
+<p>Den empiriske formel CH<sub>2</sub>O skal altså ganges med 3.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Formelmasserne for de fire empiriske formler er</li>
+</ol>
+<p><span class="math display">\[
+M_\mathrm{emp}(\mathrm{CH_2O}) = \left(12{,}01 + 2 \cdot 1{,}008 + 16{,}00\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 30{,}03\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+M_\mathrm{emp}(\mathrm{C_5H_7N}) = \left(5 \cdot 12{,}01 + 7 \cdot 1{,}008 + 14{,}01\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 81{,}12\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+M_\mathrm{emp}(\mathrm{C_9H_8O}) = \left(9 \cdot 12{,}01 + 8 \cdot 1{,}008 + 16{,}00\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 132{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+M_\mathrm{emp}(\mathrm{C_3H_5}) = \left(3 \cdot 12{,}01 + 5 \cdot 1{,}008\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 41{,}07\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<ol start="2" type="a">
+<li>Molarmassen divideres med formelmassen for den empiriske formel:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: center;"><em>M</em> i g/mol</th>
+<th style="text-align: center;"><em>M</em><sub>emp</sub> i g/mol</th>
+<th style="text-align: center;"><em>M</em> / <em>M</em><sub>emp</sub></th>
+<th style="text-align: left;">Molekylformel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">mælkesyre</td>
+<td style="text-align: center;">90,08</td>
+<td style="text-align: center;">30,03</td>
+<td style="text-align: center;">3,00</td>
+<td style="text-align: left;">C<sub>3</sub>H<sub>6</sub>O<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nikotin</td>
+<td style="text-align: center;">162,2</td>
+<td style="text-align: center;">81,12</td>
+<td style="text-align: center;">2,00</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>14</sub>N<sub>2</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">kanelaldehyd</td>
+<td style="text-align: center;">132,2</td>
+<td style="text-align: center;">132,2</td>
+<td style="text-align: center;">1,00</td>
+<td style="text-align: left;">C<sub>9</sub>H<sub>8</sub>O</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">squalen</td>
+<td style="text-align: center;">410,7</td>
+<td style="text-align: center;">41,07</td>
+<td style="text-align: center;">10,00</td>
+<td style="text-align: left;">C<sub>30</sub>H<sub>50</sub></td>
+</tr>
+</tbody>
+</table>
+<p>For kanelaldehyd er molarmassen lig med formelmassen, så molekylformlen for kanelaldehyd er den samme som den empiriske formel. For squalen skal den empiriske formel C<sub>3</sub>H<sub>5</sub> ganges med 10.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.4-når-tallene-ikke-bliver-hele" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.4-når-tallene-ikke-bliver-hele">Opgave A3.1.4: Når tallene ikke bliver hele</h2>
+<p>Når stofmængderne er divideret med den mindste af dem, er tallene ikke altid hele. Så skal de ganges op.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Forholdet C : H : O efter divisionen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">stof 1</td>
+<td style="text-align: left;">1,00 : 1,50 : 1,50</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">stof 2</td>
+<td style="text-align: left;">1,00 : 2,67 : 1,00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">stof 3</td>
+<td style="text-align: left;">1,00 : 1,50 : 1,25</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Hvilket tal skal forholdet ganges med for hvert af de tre stoffer i tabellen? Opskriv de tre empiriske formler.</li>
+</ol>
+<p>Kaffesyre findes i kaffebønner og i mange frugter. Kaffesyre indeholder 60,00 % carbon og 4,48 % hydrogen, målt i masseprocent. Resten er oxygen.</p>
+<ol start="2" type="a">
+<li>Bestem den empiriske formel for kaffesyre.</li>
+<li>Molarmassen for kaffesyre er 180,2 g/mol. Bestem molekylformlen for kaffesyre.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et tal, der ender på ,50, er et antal halve og skal ganges med 2. Et tal, der ender på ,33 eller ,67, er et antal tredjedele og skal ganges med 3. Et tal, der ender på ,25 eller ,75, er et antal fjerdedele og skal ganges med 4. Alle tallene i forholdet skal ganges med det samme tal. I stof 3 er der både et tal, der ender på ,50, og et tal, der ender på ,25.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I kaffesyre er masseprocenten af oxygen 100 % − 60,00 % − 4,48 % = 35,52 %. Regn derefter på 100 g kaffesyre, som indeholder 60,00 g C, 4,48 g H og 35,52 g O. Beregn de tre stofmængder med <em>n</em> = <em>m</em> / <em>M</em>, og divider med den mindste af dem. Forholdet bliver 2,25 : 2,00 : 1,00. Det må ikke afrundes til 2 : 2 : 1.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Forholdene ganges op, til alle tallene er hele:</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Forholdet C : H : O</th>
+<th style="text-align: center;">Ganges med</th>
+<th style="text-align: center;">Helt forhold</th>
+<th style="text-align: left;">Empirisk formel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">stof 1</td>
+<td style="text-align: left;">1,00 : 1,50 : 1,50</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">2 : 3 : 3</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>3</sub>O<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">stof 2</td>
+<td style="text-align: left;">1,00 : 2,67 : 1,00</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3 : 8 : 3</td>
+<td style="text-align: left;">C<sub>3</sub>H<sub>8</sub>O<sub>3</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">stof 3</td>
+<td style="text-align: left;">1,00 : 1,50 : 1,25</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4 : 6 : 5</td>
+<td style="text-align: left;">C<sub>4</sub>H<sub>6</sub>O<sub>5</sub></td>
+</tr>
+</tbody>
+</table>
+<p>I stof 3 er det ikke nok at gange med 2, for så bliver 1,25 til 2,50. Stof 1 kunne være vinsyre fra druer, stof 2 glycerol og stof 3 æblesyre fra æbler.</p>
+<ol start="2" type="a">
+<li>Masseprocenten af oxygen i kaffesyre er 100 % − 60,00 % − 4,48 % = 35,52 %. I 100 g kaffesyre er der 60,00 g C, 4,48 g H og 35,52 g O.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>m</em> i g</td>
+<td style="text-align: center;">60,00</td>
+<td style="text-align: center;">4,48</td>
+<td style="text-align: center;">35,52</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> = <em>m</em> / <em>M</em> i mol</td>
+<td style="text-align: center;">4,996</td>
+<td style="text-align: center;">4,444</td>
+<td style="text-align: center;">2,220</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> divideret med 2,220 mol</td>
+<td style="text-align: center;">2,25</td>
+<td style="text-align: center;">2,00</td>
+<td style="text-align: center;">1,00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ganget med 4</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<p>Tallet 2,25 er ni fjerdedele, så alle tre tal ganges med 4. Den empiriske formel for kaffesyre er C<sub>9</sub>H<sub>8</sub>O<sub>4</sub>.</p>
+<ol start="3" type="a">
+<li>Formelmassen for den empiriske formel C<sub>9</sub>H<sub>8</sub>O<sub>4</sub> er</li>
+</ol>
+<p><span class="math display">\[
+M_\mathrm{emp} = \left(9 \cdot 12{,}01 + 8 \cdot 1{,}008 + 4 \cdot 16{,}00\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 180{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+\frac{M}{M_\mathrm{emp}} = \frac{180{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}}{180{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 1{,}00
+\]</span></p>
+<p>Molarmassen er lig med formelmassen, så molekylformlen for kaffesyre er den samme som den empiriske formel: C<sub>9</sub>H<sub>8</sub>O<sub>4</sub>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.5-forbrændingsanalyse-af-menthol" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.5-forbrændingsanalyse-af-menthol">Opgave A3.1.5: Forbrændingsanalyse af menthol</h2>
+<p>Menthol giver pebermynte den kølende smag. Menthol består af carbon, hydrogen og oxygen. Når 0,600 g menthol brændes i ren oxygen, dannes der 1,690 g CO<sub>2</sub> og 0,692 g H<sub>2</sub>O.</p>
+<ol type="a">
+<li>Beregn stofmængden og massen af carbon i de 0,600 g menthol.</li>
+<li>Beregn stofmængden og massen af hydrogen i de 0,600 g menthol.</li>
+<li>Beregn massen og stofmængden af oxygen i de 0,600 g menthol.</li>
+<li>Bestem den empiriske formel for menthol.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Alt carbon i mentholprøven ender som CO<sub>2</sub>, og alt hydrogen ender som H<sub>2</sub>O. Hvert mol CO<sub>2</sub> indeholder ét mol C, så <em>n</em>(C) = <em>n</em>(CO<sub>2</sub>). Hvert mol H<sub>2</sub>O indeholder to mol H, så <em>n</em>(H) = 2 · <em>n</em>(H<sub>2</sub>O). Molarmasserne er 44,01 g/mol for CO<sub>2</sub> og 18,02 g/mol for H<sub>2</sub>O.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Oxygen i menthol kan ikke findes ud fra CO<sub>2</sub> og H<sub>2</sub>O, fordi der er tilført oxygen udefra. Massen af oxygen i mentholprøven er resten af prøvens masse:</p>
+<p><span class="math display">\[
+m(\mathrm{O}) = m(\text{prøve}) - m(\mathrm{C}) - m(\mathrm{H})
+\]</span></p>
+<p>Regn massen af oxygen om til en stofmængde. Divider til sidst de tre stofmængder med den mindste af dem.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Alt carbon i de 0,600 g menthol er endt som CO<sub>2</sub>:</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{C}) = n(\mathrm{CO_2}) = \frac{1{,}690\ \mathrm{g}}{44{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}03840\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{C}) = 0{,}03840\ \mathrm{mol} \cdot 12{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}4612\ \mathrm{g}
+\]</span></p>
+<ol start="2" type="a">
+<li>Alt hydrogen i de 0,600 g menthol er endt som H<sub>2</sub>O:</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{H}) = 2 \cdot n(\mathrm{H_2O}) = 2 \cdot \frac{0{,}692\ \mathrm{g}}{18{,}02\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}07680\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{H}) = 0{,}07680\ \mathrm{mol} \cdot 1{,}008\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}0774\ \mathrm{g}
+\]</span></p>
+<ol start="3" type="a">
+<li>Resten af mentholprøvens masse er oxygen:</li>
+</ol>
+<p><span class="math display">\[
+m(\mathrm{O}) = 0{,}600\ \mathrm{g} - 0{,}4612\ \mathrm{g} - 0{,}0774\ \mathrm{g} = 0{,}0614\ \mathrm{g}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{O}) = \frac{0{,}0614\ \mathrm{g}}{16{,}00\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}00384\ \mathrm{mol}
+\]</span></p>
+<ol start="4" type="a">
+<li>Den mindste stofmængde er stofmængden af oxygen.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> i mol</td>
+<td style="text-align: center;">0,03840</td>
+<td style="text-align: center;">0,07680</td>
+<td style="text-align: center;">0,00384</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med 0,00384 mol</td>
+<td style="text-align: center;">10,0</td>
+<td style="text-align: center;">20,0</td>
+<td style="text-align: center;">1,00</td>
+</tr>
+</tbody>
+</table>
+<p>Forholdet mellem carbon, hydrogen og oxygen i menthol er 10 : 20 : 1. Den empiriske formel for menthol er C<sub>10</sub>H<sub>20</sub>O.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.6-dobbeltbindingsækvivalenter" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.6-dobbeltbindingsækvivalenter">Opgave A3.1.6: Dobbeltbindingsækvivalenter</h2>
+<p>Antallet af dobbeltbindingsækvivalenter, DBE, kan beregnes ud fra molekylformlen.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Molekylformel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">hexan i benzin</td>
+<td style="text-align: left;">C<sub>6</sub>H<sub>14</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ethyn i svejsegas</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>2</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mælkesyre i yoghurt</td>
+<td style="text-align: left;">C<sub>3</sub>H<sub>6</sub>O<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">chlorethen, som plasten PVC laves af</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>3</sub>Cl</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">adrenalin i kroppen</td>
+<td style="text-align: left;">C<sub>9</sub>H<sub>13</sub>NO<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nikotin i tobak</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>14</sub>N<sub>2</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">carvon i kommen</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>14</sub>O</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn antallet af dobbeltbindingsækvivalenter for hvert af de syv stoffer.</li>
+<li>Hvilke af de syv stoffer kan ikke indeholde en benzenring? Begrund svaret.</li>
+<li>Carvon har én ring, men ringen er ikke en benzenring. Hvor mange dobbeltbindinger er der i et molekyle carvon?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug formlen for dobbeltbindingsækvivalenter fra afsnit A3.1:</p>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot \mathrm{C} + 2 + \mathrm{N} - \mathrm{H}}{2}
+\]</span></p>
+<p>C, N og H er antallet af carbonatomer, nitrogenatomer og hydrogenatomer i molekylformlen. Oxygen tæller ikke med. Et halogenatom som chlor tæller som et hydrogenatom, så i chlorethen, C<sub>2</sub>H<sub>3</sub>Cl, skal du sætte H = 4.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>En benzenring er én ring og tre dobbeltbindinger. Den tæller derfor 4 dobbeltbindingsækvivalenter. Et stof med færre end 4 dobbeltbindingsækvivalenter kan ikke indeholde en benzenring.</p>
+<p>Du kan begynde begrundelsen i spørgsmål b sådan: “En benzenring tæller … dobbeltbindingsækvivalenter, og hexan har kun …, så hexan kan ikke …”</p>
+<p>En ring tæller 1, og en dobbeltbinding tæller 1. Træk carvons ene ring fra det antal dobbeltbindingsækvivalenter, du har beregnet for carvon.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>For hexan, C<sub>6</sub>H<sub>14</sub>, er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 6 + 2 + 0 - 14}{2} = 0
+\]</span></p>
+<p>For adrenalin, C<sub>9</sub>H<sub>13</sub>NO<sub>3</sub>, er</p>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 9 + 2 + 1 - 13}{2} = 4
+\]</span></p>
+<p>De andre stoffer beregnes på samme måde:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Molekylformel</th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">N</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">DBE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">hexan</td>
+<td style="text-align: left;">C<sub>6</sub>H<sub>14</sub></td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ethyn</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>2</sub></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mælkesyre</td>
+<td style="text-align: left;">C<sub>3</sub>H<sub>6</sub>O<sub>3</sub></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">chlorethen</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>3</sub>Cl</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">3 + 1 = 4</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">adrenalin</td>
+<td style="text-align: left;">C<sub>9</sub>H<sub>13</sub>NO<sub>3</sub></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">nikotin</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>14</sub>N<sub>2</sub></td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">carvon</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>14</sub>O</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Hexan, ethyn, mælkesyre og chlorethen kan ikke indeholde en benzenring. En benzenring tæller 4 dobbeltbindingsækvivalenter, og de fire stoffer har kun 0, 2, 1 og 1. Ethyn har 2, fordi molekylet har en tripelbinding. Adrenalin, nikotin og carvon har 4 eller flere, så de kan have en benzenring, men tallet alene viser ikke, om de har en.</p></li>
+<li><p>Carvon har 4 dobbeltbindingsækvivalenter. Ringen tæller 1, så der er 4 − 1 = 3 dobbeltbindinger i et molekyle carvon. To af dem er dobbeltbindinger mellem carbonatomer, og den tredje er en carbonylgruppe, C=O. Carvon viser, at 4 dobbeltbindingsækvivalenter ikke altid betyder en benzenring.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.7-tæl-i-strukturformlen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.7-tæl-i-strukturformlen">Opgave A3.1.7: Tæl i strukturformlen</h2>
+<p>Antallet af dobbeltbindingsækvivalenter kan også tælles direkte i en strukturformel. <a href="#fig-a3-opg-1-tre-strukturer" class="quarto-xref">Figur&nbsp;<span>1</span></a> viser tre naturstoffer.</p>
+<div id="fig-a3-opg-1-tre-strukturer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-1-tre-strukturer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-1-tre-strukturer.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Menthol fra mynte, eugenol fra nellike og kanelaldehyd fra kanel."><img src="../figurer/a3-opg-1-tre-strukturer.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-1-tre-strukturer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Menthol fra mynte, eugenol fra nellike og kanelaldehyd fra kanel.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Tæl atomerne i hver af de tre strukturformler, og opskriv molekylformlen for menthol, for eugenol og for kanelaldehyd.</li>
+<li>Beregn antallet af dobbeltbindingsækvivalenter for menthol, eugenol og kanelaldehyd ud fra de tre molekylformler.</li>
+<li>Tæl ringe og dobbeltbindinger i hver strukturformel, og vis, at tallene passer med dine beregninger.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Strukturformlerne for menthol, eugenol og kanelaldehyd er zigzagformler. I en zigzagformel er hvert knæk og hver ende et carbonatom. Hvert carbonatom har fire bindinger, og de bindinger, der ikke er tegnet, går til hydrogenatomer. I en benzenring har et carbonatom med en sidegruppe ingen hydrogenatomer, og hvert af de andre carbonatomer i benzenringen har ét.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Menthol har 6 carbonatomer i ringen og 4 carbonatomer i sidegrupperne, i alt 10. Tæl hydrogenatomerne i menthol på samme måde, og husk hydrogenatomet i hydroxygruppen.</p>
+<p>Når du tæller dobbeltbindingsækvivalenter i en strukturformel, tæller hver ring 1 og hver dobbeltbinding 1. En benzenring tæller 4, fordi den er én ring og tre dobbeltbindinger. Husk dobbeltbindingen i carbonylgruppen, C=O, i kanelaldehyd.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Menthol</th>
+<th style="text-align: left;">Eugenol</th>
+<th style="text-align: left;">Kanelaldehyd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Molekylformel</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>20</sub>O</td>
+<td style="text-align: left;">C<sub>10</sub>H<sub>12</sub>O<sub>2</sub></td>
+<td style="text-align: left;">C<sub>9</sub>H<sub>8</sub>O</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DBE beregnet ud fra molekylformlen</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ringe i strukturformlen</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1 benzenring</td>
+<td style="text-align: left;">1 benzenring</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dobbeltbindinger i strukturformlen</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">3 i benzenringen og 1 C=C i sidekæden</td>
+<td style="text-align: left;">3 i benzenringen, 1 C=C og 1 C=O i sidekæden</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DBE talt i strukturformlen</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1 + 3 + 1 = 5</td>
+<td style="text-align: left;">1 + 3 + 1 + 1 = 6</td>
+</tr>
+</tbody>
+</table>
+<p>Beregningerne ud fra molekylformlerne er</p>
+<p><span class="math display">\[
+\mathrm{DBE}(\text{menthol}) = \frac{2 \cdot 10 + 2 + 0 - 20}{2} = 1
+\]</span></p>
+<p><span class="math display">\[
+\mathrm{DBE}(\text{eugenol}) = \frac{2 \cdot 10 + 2 + 0 - 12}{2} = 5
+\]</span></p>
+<p><span class="math display">\[
+\mathrm{DBE}(\text{kanelaldehyd}) = \frac{2 \cdot 9 + 2 + 0 - 8}{2} = 6
+\]</span></p>
+<p>For alle tre stoffer giver beregningen det samme tal, som man tæller i strukturformlen. Menthol har kun sin ring. Eugenol har en benzenring, som tæller 4, og en dobbeltbinding mellem to carbonatomer i sidekæden. Kanelaldehyd har en benzenring, en dobbeltbinding mellem to carbonatomer og en carbonylgruppe.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.8-zingeron-fra-ingefær" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.8-zingeron-fra-ingefær">Opgave A3.1.8: Zingeron fra ingefær</h2>
+<p>Zingeron giver varmebehandlet ingefær en sød og krydret smag. Zingeron består af carbon, hydrogen og oxygen. Når 0,400 g zingeron brændes i ren oxygen, dannes der 0,997 g CO<sub>2</sub> og 0,260 g H<sub>2</sub>O. Molarmassen for zingeron er 194,2 g/mol.</p>
+<ol type="a">
+<li>Bestem molekylformlen for zingeron.</li>
+<li>Beregn antallet af dobbeltbindingsækvivalenter i zingeron, og forklar, hvad tallet fortæller om strukturen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find først den empiriske formel for zingeron. Beregn stofmængden og massen af carbon ud fra massen af CO<sub>2</sub> og stofmængden og massen af hydrogen ud fra massen af H<sub>2</sub>O. Massen af oxygen i zingeronprøven er resten af de 0,400 g.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Når de tre stofmængder for zingeron er divideret med den mindste af dem, bliver forholdet C : H : O = 3,67 : 4,67 : 1,00. Tal, der ender på ,67, er et antal tredjedele, så forholdet skal ganges med 3.</p>
+<p>Beregn derefter formelmassen for den empiriske formel, og divider molarmassen 194,2 g/mol med den.</p>
+<p>Du kan begynde forklaringen i spørgsmål b sådan: “En benzenring tæller 4 dobbeltbindingsækvivalenter. Zingeron har …, så molekylet kan have …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Carbon i de 0,400 g zingeron:</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{C}) = n(\mathrm{CO_2}) = \frac{0{,}997\ \mathrm{g}}{44{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}02265\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{C}) = 0{,}02265\ \mathrm{mol} \cdot 12{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}2720\ \mathrm{g}
+\]</span></p>
+<p>Hydrogen i de 0,400 g zingeron:</p>
+<p><span class="math display">\[
+n(\mathrm{H}) = 2 \cdot n(\mathrm{H_2O}) = 2 \cdot \frac{0{,}260\ \mathrm{g}}{18{,}02\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}02886\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{H}) = 0{,}02886\ \mathrm{mol} \cdot 1{,}008\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}0291\ \mathrm{g}
+\]</span></p>
+<p>Oxygen er resten af zingeronprøvens masse:</p>
+<p><span class="math display">\[
+m(\mathrm{O}) = 0{,}400\ \mathrm{g} - 0{,}2720\ \mathrm{g} - 0{,}0291\ \mathrm{g} = 0{,}0989\ \mathrm{g}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{O}) = \frac{0{,}0989\ \mathrm{g}}{16{,}00\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}00618\ \mathrm{mol}
+\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> i mol</td>
+<td style="text-align: center;">0,02265</td>
+<td style="text-align: center;">0,02886</td>
+<td style="text-align: center;">0,00618</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med 0,00618 mol</td>
+<td style="text-align: center;">3,67</td>
+<td style="text-align: center;">4,67</td>
+<td style="text-align: center;">1,00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ganget med 3</td>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">3</td>
+</tr>
+</tbody>
+</table>
+<p>Tallene 3,67 og 4,67 er elleve og fjorten tredjedele, så alle tre tal ganges med 3. Den empiriske formel for zingeron er C<sub>11</sub>H<sub>14</sub>O<sub>3</sub>. Formelmassen er</p>
+<p><span class="math display">\[
+M_\mathrm{emp} = \left(11 \cdot 12{,}01 + 14 \cdot 1{,}008 + 3 \cdot 16{,}00\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 194{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p>Formelmassen er lig med molarmassen, 194,2 g/mol. Molekylformlen for zingeron er derfor den samme som den empiriske formel: C<sub>11</sub>H<sub>14</sub>O<sub>3</sub>.</p>
+<ol start="2" type="a">
+<li>For zingeron, C<sub>11</sub>H<sub>14</sub>O<sub>3</sub>, er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 11 + 2 + 0 - 14}{2} = 5
+\]</span></p>
+<p>Zingeron har 5 dobbeltbindingsækvivalenter. En benzenring tæller 4, så zingeron kan have en benzenring. Så er der 1 tilbage, og den kan være en dobbeltbinding eller en ring mere. Tallet viser ikke, hvilken af mulighederne der er den rigtige. Det kræver andre analyser. Zingeron har faktisk en benzenring og en carbonylgruppe, C=O.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med de konkrete atomer, bindinger og grupper, med beregninger med enheder og med en konklusion.</p>
+</section>
+<section id="opgave-a3.1.eks.1-sorbinsyre-i-ost-og-brød" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.eks.1-sorbinsyre-i-ost-og-brød">Opgave A3.1.eks.1: Sorbinsyre i ost og brød</h2>
+<p>Sorbinsyre er et konserveringsmiddel, der hæmmer skimmelsvampe i ost, brød og vin. På varedeklarationen står stoffet som E 200. Navnet kommer af røn, <em>Sorbus</em>, fordi stoffet første gang blev fremstillet ud fra rønnebær. Sorbinsyre er en monohydron syre, som består af carbon, hydrogen og oxygen.</p>
+<p>En elementaranalyse viser, at sorbinsyre indeholder 64,27 % carbon, 7,19 % hydrogen og 28,54 % oxygen, målt i masseprocent.</p>
+<ol type="a">
+<li>Bestem den empiriske formel for sorbinsyre.</li>
+</ol>
+<p>For at finde molarmassen opløses 0,224 g sorbinsyre i en blanding af vand og ethanol. Opløsningen titreres med 0,100 M natriumhydroxid. Ækvivalenspunktet ligger ved 20,0 mL.</p>
+<ol start="2" type="a">
+<li>Beregn molarmassen for sorbinsyre.</li>
+<li>Bestem molekylformlen for sorbinsyre.</li>
+<li>Beregn antallet af dobbeltbindingsækvivalenter i sorbinsyre. Sorbinsyre er en carboxylsyre med en uforgrenet carbonkæde uden ringe og uden tripelbindinger. Forklar, hvad antallet af dobbeltbindingsækvivalenter så fortæller om strukturen af sorbinsyre.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Regn på 100 g sorbinsyre, og find stofmængden af carbon, hydrogen og oxygen. Divider med den mindste stofmængde.</p>
+<p>Sorbinsyre er monohydron. I ækvivalenspunktet har hvert molekyle sorbinsyre derfor reageret med én OH<sup>−</sup>, så <em>n</em>(sorbinsyre) = <em>n</em>(OH<sup>−</sup>). Det er den samme beregning som for molarmassen af en ukendt syre i afsnit A1.8.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Stofmængden af hydroxid i ækvivalenspunktet er <em>n</em>(OH<sup>−</sup>) = <em>c</em> · <em>V</em>, hvor <em>V</em> skal stå i liter. Molarmassen for sorbinsyre er <em>M</em> = <em>m</em> / <em>n</em>. Divider derefter molarmassen med formelmassen for den empiriske formel.</p>
+<p>Carboxylgruppen, −COOH, indeholder en dobbeltbinding, C=O. Du kan begynde forklaringen i spørgsmål d sådan: “Carboxylgruppen i sorbinsyre tæller … dobbeltbindingsækvivalent. De … andre må være …, fordi sorbinsyre hverken har ringe eller tripelbindinger.”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>I 100 g sorbinsyre er der 64,27 g C, 7,19 g H og 28,54 g O.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>m</em> i g</td>
+<td style="text-align: center;">64,27</td>
+<td style="text-align: center;">7,19</td>
+<td style="text-align: center;">28,54</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>M</em> i g/mol</td>
+<td style="text-align: center;">12,01</td>
+<td style="text-align: center;">1,008</td>
+<td style="text-align: center;">16,00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> = <em>m</em> / <em>M</em> i mol</td>
+<td style="text-align: center;">5,351</td>
+<td style="text-align: center;">7,133</td>
+<td style="text-align: center;">1,784</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med 1,784 mol</td>
+<td style="text-align: center;">3,00</td>
+<td style="text-align: center;">4,00</td>
+<td style="text-align: center;">1,00</td>
+</tr>
+</tbody>
+</table>
+<p>Forholdet mellem carbon, hydrogen og oxygen er 3 : 4 : 1. Den empiriske formel for sorbinsyre er C<sub>3</sub>H<sub>4</sub>O.</p>
+<ol start="2" type="a">
+<li>Stofmængden af hydroxid i ækvivalenspunktet er</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{OH^-}) = c \cdot V = 0{,}100\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0200\ \mathrm{L} = 0{,}00200\ \mathrm{mol}
+\]</span></p>
+<p>Sorbinsyre er monohydron, så hvert molekyle sorbinsyre har reageret med én OH<sup>−</sup>. Altså er <em>n</em>(sorbinsyre) = 0,00200 mol.</p>
+<p><span class="math display">\[
+M = \frac{m}{n} = \frac{0{,}224\ \mathrm{g}}{0{,}00200\ \mathrm{mol}} = 112\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p>Molarmassen for sorbinsyre er 112 g/mol.</p>
+<ol start="3" type="a">
+<li>Formelmassen for den empiriske formel C<sub>3</sub>H<sub>4</sub>O er</li>
+</ol>
+<p><span class="math display">\[
+M_\mathrm{emp} = \left(3 \cdot 12{,}01 + 4 \cdot 1{,}008 + 16{,}00\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 56{,}06\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+\frac{M}{M_\mathrm{emp}} = \frac{112\ \dfrac{\mathrm{g}}{\mathrm{mol}}}{56{,}06\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 2{,}00
+\]</span></p>
+<p>Den empiriske formel skal ganges med 2. Molekylformlen for sorbinsyre er C<sub>6</sub>H<sub>8</sub>O<sub>2</sub>.</p>
+<ol start="4" type="a">
+<li>For sorbinsyre, C<sub>6</sub>H<sub>8</sub>O<sub>2</sub>, er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 6 + 2 + 0 - 8}{2} = 3
+\]</span></p>
+<p>Sorbinsyre har 3 dobbeltbindingsækvivalenter. Carboxylgruppen, −COOH, har en dobbeltbinding mellem carbon og oxygen, og den tæller 1. Sorbinsyre har ingen ringe og ingen tripelbindinger, så de 2 andre dobbeltbindingsækvivalenter må være to dobbeltbindinger mellem carbonatomer i kæden. Det passer med strukturen af sorbinsyre, som er CH<sub>3</sub>CH=CHCH=CHCOOH: seks carbonatomer i en kæde med to C=C og en carboxylgruppe i enden.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.eks.2-limonen-i-appelsinskal" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.eks.2-limonen-i-appelsinskal">Opgave A3.1.eks.2: Limonen i appelsinskal</h2>
+<p>Limonen giver appelsinskal sin duft. Stoffet er en farveløs væske, som koger ved 176 °C. En elev vil bestemme molekylformlen for limonen.</p>
+<p>Når 0,500 g limonen brændes i ren oxygen, dannes der 1,615 g CO<sub>2</sub> og 0,529 g H<sub>2</sub>O.</p>
+<ol type="a">
+<li>Beregn massen af carbon og massen af hydrogen i de 0,500 g limonen, og argumentér for, at limonen ikke indeholder oxygen.</li>
+<li>Bestem den empiriske formel for limonen.</li>
+</ol>
+<p>Derefter sprøjtes 0,300 g limonen ind i en lufttom beholder på 1,00 L. Beholderen varmes op til 200 °C, så al limonen bliver til gas. Trykket i beholderen måles til 0,0866 bar.</p>
+<ol start="3" type="a">
+<li>Beregn molarmassen for limonen, og bestem molekylformlen.</li>
+</ol>
+<p><a href="#fig-a3-opg-1-limonen" class="quarto-xref">Figur&nbsp;<span>2</span></a> viser strukturen af limonen.</p>
+<div id="fig-a3-opg-1-limonen" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-1-limonen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-1-limonen.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Strukturen af limonen."><img src="../figurer/a3-opg-1-limonen.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-1-limonen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Strukturen af limonen.
+</figcaption>
+</figure>
+</div>
+<ol start="4" type="a">
+<li>Beregn antallet af dobbeltbindingsækvivalenter i limonen ud fra molekylformlen, og vis, at tallet passer med strukturen i figuren.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Beregn massen af carbon ud fra massen af CO<sub>2</sub> og massen af hydrogen ud fra massen af H<sub>2</sub>O, som i en almindelig forbrændingsanalyse. Læg de to masser sammen, og sammenlign med de 0,500 g limonen, der blev brændt.</p>
+<p>Molarmassen findes med idealgasligningen fra afsnit A1.1, <em>p</em> · <em>V</em> = <em>n</em> · <em>R</em> · <em>T</em>, med <em>R</em> = 0,0831 L · bar/(mol · K). Husk at regne temperaturen om til kelvin.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Der er færre mol carbon end hydrogen i limonen. Divideres stofmængden af hydrogen med stofmængden af carbon, bliver forholdet C : H = 1,00 : 1,60. Tallet 1,60 er otte femtedele, så begge tal skal ganges med 5.</p>
+<p>Du kan begynde argumentet i spørgsmål a sådan: “Carbon og hydrogen vejer tilsammen …, og limonenprøven vejede …, så …”</p>
+<p>Isolér stofmængden i idealgasligningen: <em>n</em> = <em>p</em> · <em>V</em> / (<em>R</em> · <em>T</em>). Molarmassen for limonen er derefter <em>M</em> = <em>m</em> / <em>n</em> med <em>m</em> = 0,300 g.</p>
+<p>Du kan begynde svaret på spørgsmål d sådan: “I strukturen af limonen er der … ring og … dobbeltbindinger mellem carbonatomer. Det giver i alt …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Carbon i de 0,500 g limonen:</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{C}) = n(\mathrm{CO_2}) = \frac{1{,}615\ \mathrm{g}}{44{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}03670\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{C}) = 0{,}03670\ \mathrm{mol} \cdot 12{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}4408\ \mathrm{g}
+\]</span></p>
+<p>Hydrogen i de 0,500 g limonen:</p>
+<p><span class="math display">\[
+n(\mathrm{H}) = 2 \cdot n(\mathrm{H_2O}) = 2 \cdot \frac{0{,}529\ \mathrm{g}}{18{,}02\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}05871\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{H}) = 0{,}05871\ \mathrm{mol} \cdot 1{,}008\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}0592\ \mathrm{g}
+\]</span></p>
+<p>Tilsammen vejer carbon og hydrogen</p>
+<p><span class="math display">\[
+m(\mathrm{C}) + m(\mathrm{H}) = 0{,}4408\ \mathrm{g} + 0{,}0592\ \mathrm{g} = 0{,}5000\ \mathrm{g}
+\]</span></p>
+<p>Det er hele prøvens masse på 0,500 g. Der er altså ikke noget tilbage til oxygen, så limonen består kun af carbon og hydrogen. Limonen er et carbonhydrid.</p>
+<ol start="2" type="a">
+<li>Den mindste stofmængde er stofmængden af carbon.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> i mol</td>
+<td style="text-align: center;">0,03670</td>
+<td style="text-align: center;">0,05871</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med 0,03670 mol</td>
+<td style="text-align: center;">1,00</td>
+<td style="text-align: center;">1,60</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ganget med 5</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">8</td>
+</tr>
+</tbody>
+</table>
+<p>Tallet 1,60 er otte femtedele, så begge tal ganges med 5. Den empiriske formel for limonen er C<sub>5</sub>H<sub>8</sub>.</p>
+<ol start="3" type="a">
+<li>Temperaturen er <em>T</em> = (273 + 200) K = 473 K. Stofmængden af limonen i beholderen findes med idealgasligningen:</li>
+</ol>
+<p><span class="math display">\[
+n = \frac{p \cdot V}{R \cdot T} = \frac{0{,}0866\ \mathrm{bar} \cdot 1{,}00\ \mathrm{L}}{0{,}0831\ \dfrac{\mathrm{L \cdot bar}}{\mathrm{mol \cdot K}} \cdot 473\ \mathrm{K}} = 0{,}002203\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+M = \frac{m}{n} = \frac{0{,}300\ \mathrm{g}}{0{,}002203\ \mathrm{mol}} = 136\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p>Formelmassen for den empiriske formel C<sub>5</sub>H<sub>8</sub> er</p>
+<p><span class="math display">\[
+M_\mathrm{emp} = \left(5 \cdot 12{,}01 + 8 \cdot 1{,}008\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 68{,}11\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p><span class="math display">\[
+\frac{M}{M_\mathrm{emp}} = \frac{136\ \dfrac{\mathrm{g}}{\mathrm{mol}}}{68{,}11\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 2{,}00
+\]</span></p>
+<p>Molarmassen for limonen er 136 g/mol. Den empiriske formel skal ganges med 2, så molekylformlen for limonen er C<sub>10</sub>H<sub>16</sub>.</p>
+<ol start="4" type="a">
+<li>For limonen, C<sub>10</sub>H<sub>16</sub>, er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 10 + 2 + 0 - 16}{2} = 3
+\]</span></p>
+<p>I strukturen af limonen er der én ring med seks carbonatomer. Ringen tæller 1. Der er en dobbeltbinding mellem to carbonatomer i ringen og en dobbeltbinding mellem to carbonatomer i sidegruppen med tre carbonatomer. De tæller 1 hver. I alt er det 1 + 1 + 1 = 3 dobbeltbindingsækvivalenter, og det passer med beregningen ud fra molekylformlen. Strukturen har også 10 carbonatomer og 16 hydrogenatomer, som molekylformlen C<sub>10</sub>H<sub>16</sub> kræver.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.1.eks.3-phenylalanin" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.1.eks.3-phenylalanin">Opgave A3.1.eks.3: Phenylalanin</h2>
+<p>Phenylalanin er en aminosyre, som findes i proteinerne i mælk, kød og æg. Sødestoffet aspartam bliver til phenylalanin i kroppen. Derfor står der “indeholder en phenylalaninkilde” på sodavand med aspartam. Phenylalanin består af carbon, hydrogen, nitrogen og oxygen.</p>
+<p>Når 0,750 g phenylalanin brændes i ren oxygen, dannes der 1,798 g CO<sub>2</sub> og 0,450 g H<sub>2</sub>O. En analyse for sig viser, at phenylalanin indeholder 8,48 % nitrogen, målt i masseprocent.</p>
+<ol type="a">
+<li>Beregn massen af nitrogen i de 0,750 g phenylalanin.</li>
+<li>Bestem den empiriske formel for phenylalanin.</li>
+<li>Molarmassen for phenylalanin er 165,2 g/mol. Bestem molekylformlen, og beregn antallet af dobbeltbindingsækvivalenter.</li>
+</ol>
+<p><a href="#fig-a3-opg-1-phenylalanin" class="quarto-xref">Figur&nbsp;<span>3</span></a> viser strukturen af phenylalanin.</p>
+<div id="fig-a3-opg-1-phenylalanin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-1-phenylalanin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-1-phenylalanin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Strukturen af phenylalanin."><img src="../figurer/a3-opg-1-phenylalanin.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-1-phenylalanin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Strukturen af phenylalanin.
+</figcaption>
+</figure>
+</div>
+<ol start="4" type="a">
+<li>Argumentér for, at strukturen i figuren passer både med molekylformlen for phenylalanin og med antallet af dobbeltbindingsækvivalenter.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Massen af nitrogen er 8,48 % af de 0,750 g phenylalanin. Carbon og hydrogen findes ud fra masserne af CO<sub>2</sub> og H<sub>2</sub>O. Massen af oxygen i phenylalaninprøven er det, der er tilbage, når masserne af carbon, hydrogen og nitrogen er trukket fra de 0,750 g.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Regn de fire masser for phenylalanin om til stofmængder. Den mindste stofmængde er stofmængden af nitrogen, så alle fire stofmængder skal divideres med den. I formlen for dobbeltbindingsækvivalenter tæller hvert nitrogenatom med: DBE = (2 · C + 2 + N − H) / 2.</p>
+<p>Til spørgsmål d: tæl carbonatomer, hydrogenatomer, nitrogenatomer og oxygenatomer i strukturen. Du kan begynde anden del sådan: “Benzenringen i phenylalanin tæller … dobbeltbindingsækvivalenter, og carboxylgruppen har en …, som tæller …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Massen af nitrogen i de 0,750 g phenylalanin er</li>
+</ol>
+<p><span class="math display">\[
+m(\mathrm{N}) = 0{,}750\ \mathrm{g} \cdot \frac{8{,}48}{100} = 0{,}0636\ \mathrm{g}
+\]</span></p>
+<ol start="2" type="a">
+<li>Carbon i de 0,750 g phenylalanin:</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{C}) = n(\mathrm{CO_2}) = \frac{1{,}798\ \mathrm{g}}{44{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}04085\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{C}) = 0{,}04085\ \mathrm{mol} \cdot 12{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}4906\ \mathrm{g}
+\]</span></p>
+<p>Hydrogen i de 0,750 g phenylalanin:</p>
+<p><span class="math display">\[
+n(\mathrm{H}) = 2 \cdot n(\mathrm{H_2O}) = 2 \cdot \frac{0{,}450\ \mathrm{g}}{18{,}02\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}04994\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{H}) = 0{,}04994\ \mathrm{mol} \cdot 1{,}008\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}0503\ \mathrm{g}
+\]</span></p>
+<p>Nitrogen i de 0,750 g phenylalanin:</p>
+<p><span class="math display">\[
+n(\mathrm{N}) = \frac{0{,}0636\ \mathrm{g}}{14{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}004540\ \mathrm{mol}
+\]</span></p>
+<p>Oxygen er resten af phenylalaninprøvens masse:</p>
+<p><span class="math display">\[
+m(\mathrm{O}) = 0{,}750\ \mathrm{g} - 0{,}4906\ \mathrm{g} - 0{,}0503\ \mathrm{g} - 0{,}0636\ \mathrm{g} = 0{,}1455\ \mathrm{g}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{O}) = \frac{0{,}1455\ \mathrm{g}}{16{,}00\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}00909\ \mathrm{mol}
+\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">N</th>
+<th style="text-align: center;">O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> i mol</td>
+<td style="text-align: center;">0,04085</td>
+<td style="text-align: center;">0,04994</td>
+<td style="text-align: center;">0,004540</td>
+<td style="text-align: center;">0,00909</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med 0,004540 mol</td>
+<td style="text-align: center;">9,00</td>
+<td style="text-align: center;">11,00</td>
+<td style="text-align: center;">1,00</td>
+<td style="text-align: center;">2,00</td>
+</tr>
+</tbody>
+</table>
+<p>Forholdet er 9 : 11 : 1 : 2. Den empiriske formel for phenylalanin er C<sub>9</sub>H<sub>11</sub>NO<sub>2</sub>.</p>
+<ol start="3" type="a">
+<li>Formelmassen for den empiriske formel C<sub>9</sub>H<sub>11</sub>NO<sub>2</sub> er</li>
+</ol>
+<p><span class="math display">\[
+M_\mathrm{emp} = \left(9 \cdot 12{,}01 + 11 \cdot 1{,}008 + 14{,}01 + 2 \cdot 16{,}00\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 165{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p>Formelmassen er lig med molarmassen, 165,2 g/mol. Molekylformlen for phenylalanin er derfor den samme som den empiriske formel: C<sub>9</sub>H<sub>11</sub>NO<sub>2</sub>. Antallet af dobbeltbindingsækvivalenter er</p>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 9 + 2 + 1 - 11}{2} = 5
+\]</span></p>
+<ol start="4" type="a">
+<li>Strukturen af phenylalanin har 6 carbonatomer i benzenringen og 3 carbonatomer i sidekæden, i alt 9. Benzenringen har 5 hydrogenatomer. I sidekæden er der 2 hydrogenatomer på det første carbonatom, 1 på det næste, 2 i aminogruppen, −NH<sub>2</sub>, og 1 i carboxylgruppen, −COOH. Det er 5 + 2 + 1 + 2 + 1 = 11 hydrogenatomer. Der er 1 nitrogenatom i aminogruppen og 2 oxygenatomer i carboxylgruppen. Strukturen passer altså med molekylformlen C<sub>9</sub>H<sub>11</sub>NO<sub>2</sub>.</li>
+</ol>
+<p>Benzenringen er én ring og tre dobbeltbindinger, og den tæller 4 dobbeltbindingsækvivalenter. Carboxylgruppen har en dobbeltbinding mellem carbon og oxygen, C=O, som tæller 1. I alt er det 4 + 1 = 5, og det passer med beregningen ud fra molekylformlen.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a3-1-elementaranalyse.html" class="pagination-link" aria-label="A3.1 Elementaranalyse">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A3.1 Elementaranalyse</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="pagination-link" aria-label="A3.2 Funktionelle grupper i naturstoffer">
+        <span class="nav-page-text">A3.2 Funktionelle grupper i naturstoffer</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

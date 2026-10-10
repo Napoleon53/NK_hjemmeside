@@ -693,7 +693,7 @@
     "href": "kapitler/1-3-elektronskaller.html#sådan-fordeles-elektronerne",
     "title": "1.3 Elektronskaller og det periodiske system",
     "section": "Sådan fordeles elektronerne",
-    "text": "Sådan fordeles elektronerne\nElektronerne fylder skallerne op indefra. For de første 20 grundstoffer gælder to regler:\n\nDen inderste skal fyldes først, og derefter den næste.\nDer kan højst være 8 elektroner i den yderste skal.\n\nChlor har atomnummer 17 og dermed 17 elektroner. De første 2 er i 1. skal, de næste 8 er i 2. skal, og de sidste 7 er i 3. skal.\n\n\n\n\n\n\nFigur 2: Chloratomet tegnet efter skalmodellen.\n\n\n\nI stedet for at tegne atomet kan man skrive antallet af elektroner i hver skal i en parentes. Det kaldes atomets elektronstruktur. Chlors elektronstruktur er (2, 8, 7).\nRegel 2 betyder, at en ny skal bliver taget i brug, når den yderste skal har fået 8 elektroner. Det sker, selv om der er plads til 18 i 3. skal. Argon har 8 elektroner i 3. skal. Kalium har én elektron mere, og den begynder derfor på 4. skal.\n\n\n\n\n\n\nFigur 3: Når den yderste skal har 8 elektroner, begynder den næste elektron på en ny skal.\n\n\n\n\n\n\n\n\n\nNoteEksempel: elektronstrukturen for magnesium\n\n\n\nMagnesium har atomnummer 12. Atomet har derfor 12 elektroner.\n\nDer er plads til 2 elektroner i 1. skal. Så er der 10 tilbage.\nDer er plads til 8 elektroner i 2. skal. Så er der 2 tilbage.\nDe sidste 2 elektroner er i 3. skal.\n\nElektronstrukturen er (2, 8, 2).\n\n\nEfter de første 20 grundstoffer bliver mønstret mere indviklet, fordi 3. skal begynder at blive fyldt længere op. Jern har for eksempel elektronstrukturen (2, 8, 14, 2). Den slags elektronstrukturer skal du ikke kunne regne ud. De kan slås op i det periodiske system bagest i bogen.",
+    "text": "Sådan fordeles elektronerne\nElektronerne fylder skallerne op indefra. For de første 20 grundstoffer gælder to regler:\n\nDen inderste skal fyldes først, og derefter den næste.\nDer kan højst være 8 elektroner i den yderste skal.\n\nChlor har atomnummer 17 og dermed 17 elektroner. De første 2 er i 1. skal, de næste 8 er i 2. skal, og de sidste 7 er i 3. skal.\n\n\n\n\n\n\nFigur 2: Chloratomet tegnet efter skalmodellen.\n\n\n\nI stedet for at tegne atomet kan man skrive antallet af elektroner i hver skal i en parentes. Det kaldes atomets elektronstruktur. Chlors elektronstruktur er (2, 8, 7).\nRegel 2 forklarer, hvornår en ny skal bliver taget i brug. Når den yderste skal har 8 elektroner, begynder den næste elektron på en ny skal. Det gælder også for 3. skal, selv om den har plads til 18 elektroner. Argon har elektronstrukturen (2, 8, 8). Kalium har én elektron mere, og den sidder i 4. skal. Kaliums elektronstruktur er derfor (2, 8, 8, 1).\n\n\n\n\n\n\nFigur 3: Når den yderste skal har 8 elektroner, begynder den næste elektron på en ny skal.\n\n\n\n\n\n\n\n\n\nNoteEksempel: elektronstrukturen for magnesium\n\n\n\nMagnesium har atomnummer 12. Atomet har derfor 12 elektroner.\n\nDer er plads til 2 elektroner i 1. skal. Så er der 10 tilbage.\nDer er plads til 8 elektroner i 2. skal. Så er der 2 tilbage.\nDe sidste 2 elektroner er i 3. skal.\n\nElektronstrukturen er (2, 8, 2).\n\n\nEfter de første 20 grundstoffer bliver mønstret mere indviklet, fordi 3. skal begynder at blive fyldt længere op. Jern har for eksempel elektronstrukturen (2, 8, 14, 2). Den slags elektronstrukturer skal du ikke kunne regne ud. De kan slås op i det periodiske system bagest i bogen.",
     "crumbs": [
       "Kapitel 1: Kemi og atomet",
       "1.3 Elektronskaller og det periodiske system"
@@ -2299,7 +2299,7 @@
     "href": "kapitler/2-4-faeldningsreaktioner.html#fældningstabellen",
     "title": "2.4 Fældningsreaktioner",
     "section": "Fældningstabellen",
-    "text": "Fældningstabellen\nFældningstabellen viser, om en positiv og en negativ ion danner et letopløseligt salt (L) eller et tungtopløseligt salt (T).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNO3−\nCl−\nBr−\nI−\nOH−\nSO42−\nCO32−\nPO43−\n\n\n\n\nNa+\nL\nL\nL\nL\nL\nL\nL\nL\n\n\nK+\nL\nL\nL\nL\nL\nL\nL\nL\n\n\nNH4+\nL\nL\nL\nL\n÷\nL\nL\nL\n\n\nMg2+\nL\nL\nL\nL\nT\nL\nT\nT\n\n\nCa2+\nL\nL\nL\nL\nT\nT\nT\nT\n\n\nBa2+\nL\nL\nL\nL\nL\nT\nT\nT\n\n\nAl3+\nL\nL\nL\nL\nT\nL\n÷\nT\n\n\nFe2+\nL\nL\nL\nL\nT\nL\nT\nT\n\n\nFe3+\nL\nL\nL\n÷\nT\nL\n÷\nT\n\n\nCu2+\nL\nL\nL\n÷\nT\nL\nT\nT\n\n\nAg+\nL\nT\nT\nT\n÷\nT\nT\nT\n\n\nPb2+\nL\nT\nT\nT\nT\nT\nT\nT\n\n\n\n\nFind den positive ion i venstre side og den negative ion øverst. Står der T, hvor de to mødes, danner ionerne et tungtopløseligt salt. Tegnet ÷ betyder, at saltet ikke findes.\nTabellen står også bagest i bogen i bilaget Fældningstabellen. Dér står ionernes navne og bundfaldenes farver også.\nLæg mærke til to ting: Alle salte med Na+, K+ og NO3− er letopløselige. De tre ioner er derfor aldrig med i et bundfald.",
+    "text": "Fældningstabellen\nFældningstabellen viser, om en positiv og en negativ ion danner et letopløseligt salt (L) eller et tungtopløseligt salt (T).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNO3−\nCl−\nBr−\nI−\nOH−\nSO42−\nCO32−\nPO43−\n\n\n\n\nNa+\nL\nL\nL\nL\nL\nL\nL\nL\n\n\nK+\nL\nL\nL\nL\nL\nL\nL\nL\n\n\nNH4+\nL\nL\nL\nL\n÷\nL\nL\nL\n\n\nMg2+\nL\nL\nL\nL\nT\nL\nT\nT\n\n\nCa2+\nL\nL\nL\nL\nT\nT\nT\nT\n\n\nBa2+\nL\nL\nL\nL\nL\nT\nT\nT\n\n\nAl3+\nL\nL\nL\nL\nT\nL\n÷\nT\n\n\nFe2+\nL\nL\nL\nL\nT\nL\nT\nT\n\n\nFe3+\nL\nL\nL\n÷\nT\nL\n÷\nT\n\n\nCu2+\nL\nL\nL\n÷\nT\nL\nT\nT\n\n\nAg+\nL\nT\nT\nT\n÷\nT\nT\nT\n\n\nPb2+\nL\nT\nT\nT\nT\nT\nT\nT\n\n\n\n\nFind den positive ion i venstre side og den negative ion øverst. Står der T, hvor de to mødes, danner ionerne et tungtopløseligt salt. Tegnet ÷ betyder, at saltet ikke findes.\nTabellen står også bagest i bogen som bilaget Fældningstabellen.\nLæg mærke til to ting: Alle salte med Na+, K+ og NO3− er letopløselige. De tre ioner er derfor aldrig med i et bundfald.",
     "crumbs": [
       "Kapitel 2: Ioner og ionforbindelser",
       "2.4 Fældningsreaktioner"
@@ -11517,7 +11517,7 @@
     "href": "videre-til-b.html",
     "title": "Kemi B",
     "section": "",
-    "text": "Her slutter bogen til C-niveau. Kapitlerne til B-niveau ligger i en bog for sig, som er bygget op på samme måde.\n\nFortsæt i: Kemibogen B\n\nBogen til B-niveau har indtil videre tre kapitler:\n\nKapitel B1: Reaktionshastighed handler om, hvor hurtigt reaktioner forløber, og hvad koncentration, temperatur og katalysatorer betyder for farten.\nKapitel B2: Kemisk ligevægt handler om reaktioner, der går begge veje, om ligevægtsloven, om hvordan en ligevægt kan forskydes, og om tungtopløselige salte.\nKapitel B9: Spektroskopi handler om lys og farver, om absorptionsspektre, om Lambert-Beers lov og om, hvordan en standardkurve bruges til at måle koncentrationen af et farvet stof.",
+    "text": "Her slutter bogen til C-niveau. Kapitlerne til B-niveau ligger i en bog for sig, som er bygget op på samme måde.\n\nFortsæt i: Kemibogen B\n\nBogen til B-niveau har otte kapitler:\n\nKapitel B1: Reaktionshastighed handler om, hvor hurtigt reaktioner forløber, og hvad koncentration, temperatur og katalysatorer betyder for farten.\nKapitel B2: Kemisk ligevægt handler om reaktioner, der går begge veje, om ligevægtsloven, om hvordan en ligevægt kan forskydes, og om tungtopløselige salte.\nKapitel B3: Intermolekylære bindinger og isomeri handler om de organiske stofklasser, om bindingerne mellem molekyler og om isomeri: stoffer med samme molekylformel, der er bygget forskelligt.\nKapitel B4: Funktionelle grupper handler om alkoholer, aldehyder, ketoner, carboxylsyrer, estere og aminer og om reaktionstyperne substitution, addition, elimination, kondensation og hydrolyse.\nKapitel B5: Spektroskopi handler om lys og farver, om absorptionsspektre, om Lambert-Beers lov og om, hvordan en standardkurve bruges til at måle koncentrationen af et farvet stof.\nKapitel B6: Syrer og baser handler om syrers og basers styrke, om beregning af pH i opløsninger af syrer og baser, om puffersystemer og om titrering af en svag syre.\nKapitel B7: Fødevarer handler om de tre næringsstoffer i maden: om kulhydrater fra glucose til stivelse og Fehlings test, om fedtstoffer, iodtal og forsæbning og om aminosyrer og proteiner.\nKapitel B8: Medicin handler om lægemidler: om receptorer, agonister og antagonister, om kiralitet, om lægemidler som syrer og baser, om log P og log D, om fremstillingen af acetylsalicylsyre og om, hvordan TLC og spektrofotometri bruges til at kontrollere et lægemiddel.",
     "crumbs": [
       "Kemi B"
     ]
@@ -11549,7 +11549,18 @@
     "href": "bilag/grundstoffer.html#det-viser-farverne",
     "title": "Bilag A: Det periodiske system",
     "section": "Det viser farverne",
-    "text": "Det viser farverne\n\n\n\nKnap\nFarverne viser\nLæs mere\n\n\n\n\nGrupper\nhovedgrupper, undergrupper og de to rækker nederst\nafsnit 1.3\n\n\nMetaller\nmetaller, halvmetaller og ikke-metaller\nafsnit 1.1\n\n\nTilstand\nom grundstoffet er fast, flydende eller en gas ved 25 °C\n\n\n\nElektronegativitet\nhvor kraftigt atomet trækker i de fælles elektroner i en binding\nafsnit 3.3\n\n\n\nBogen bruger kun elektronegativiteten for grundstofferne i hovedgruppe 1 til 7 i periode 1 til 5. Derfor har de andre grundstoffer ingen farve, når knappen Elektronegativitet er valgt.",
+    "text": "Det viser farverne\n\n\n\nKnap\nFarverne viser\nLæs mere\n\n\n\n\nMetaller\nmetaller, halvmetaller og ikke-metaller\nafsnit 1.1\n\n\nGrupper\nde grupper, der har deres eget navn, fx halogener og ædelgasser\nafsnit 1.3\n\n\nTilstand\nom grundstoffet er fast, flydende eller en gas ved 25 °C\n\n\n\nElektronegativitet\nhvor kraftigt atomet trækker i de fælles elektroner i en binding\nafsnit 3.3\n\n\n\nBogen bruger kun elektronegativiteten for grundstofferne i hovedgruppe 1 til 7 i periode 1 til 5. Derfor har de andre grundstoffer ingen farve, når knappen Elektronegativitet er valgt.\nNår knappen Grupper er valgt, står der under systemet en sætning om den gruppe, det valgte grundstof hører til.",
+    "crumbs": [
+      "Bilag",
+      "<span class='chapter-number'>A</span>  <span class='chapter-title'>Det periodiske system</span>"
+    ]
+  },
+  {
+    "objectID": "bilag/grundstoffer.html#grupper-med-egne-navne",
+    "href": "bilag/grundstoffer.html#grupper-med-egne-navne",
+    "title": "Bilag A: Det periodiske system",
+    "section": "Grupper med egne navne",
+    "text": "Grupper med egne navne\nNogle grupper af grundstoffer ligner hinanden så meget, at de har fået et fælles navn. De fire første står også i afsnit 1.3.\n\n\n\n\n\n\n\n\nNavn\nHvor i systemet\nDet kendetegner dem\n\n\n\n\nalkalimetaller\nhovedgruppe 1, men ikke hydrogen\nDe har 1 elektron i yderste skal og danner ioner med ladningen 1+. De er bløde metaller, som reagerer voldsomt med vand.\n\n\njordalkalimetaller\nhovedgruppe 2\nDe har 2 elektroner i yderste skal og danner ioner med ladningen 2+.\n\n\nhalogener\nhovedgruppe 7\nDe har 7 elektroner i yderste skal og danner ioner med ladningen 1−.\n\n\nædelgasser\nhovedgruppe 8\nDe har en særlig stabil elektronstruktur og reagerer næsten ikke med andre stoffer.\n\n\nundergrupper\nmellem hovedgruppe 2 og 3\nDe er alle metaller. Mange af dem kan danne flere forskellige ioner.\n\n\nsjældne jordarter\nscandium, yttrium og lanthanoiderne\nDe er 17 metaller, som bruges i stærke magneter, skærme og batterier.\n\n\nactinoider\nden nederste række\nDe er radioaktive metaller. Uran og plutonium bruges i kernekraftværker.",
     "crumbs": [
       "Bilag",
       "<span class='chapter-number'>A</span>  <span class='chapter-title'>Det periodiske system</span>"
@@ -11637,7 +11648,7 @@
     "href": "bilag/faeldningstabel.html",
     "title": "Bilag C: Fældningstabellen",
     "section": "",
-    "text": "Sådan bruger du fældningstabellen\nFældningstabellen viser, om en positiv og en negativ ion danner et letopløseligt salt (L) eller et tungtopløseligt salt (T). Den kaldes også en opløselighedstabel. I afsnit 2.4 lærer du at bruge tabellen til at forudsige, om der kommer et bundfald.\nBly(II)ionen, Pb2+, og iodid, I−, mødes i et felt med T. De to ioner danner derfor et bundfald. Bundfaldet er bly(II)iodid, PbI2.\nAlle salte med Na+, K+ og NO3− er letopløselige. De tre ioner er derfor aldrig med i et bundfald.",
+    "text": "Sådan bruger du fældningstabellen\nFældningstabellen viser, om en positiv og en negativ ion danner et letopløseligt salt (L) eller et tungtopløseligt salt (T). Den kaldes også en opløselighedstabel. I afsnit 2.4 lærer du at bruge tabellen til at forudsige, om der kommer et bundfald.\nBly(II)ionen, Pb2+, og iodid, I−, mødes i et felt med T. De to ioner danner derfor et bundfald. Bundfaldet er bly(II)iodid, PbI2.\nAlle salte med Na+, K+ og NO3− er letopløselige. De tre ioner er derfor aldrig med i et bundfald.\nIonernes navne står også i bilaget Ioner og deres navne.",
     "crumbs": [
       "Bilag",
       "<span class='chapter-number'>C</span>  <span class='chapter-title'>Fældningstabellen</span>"
@@ -11648,40 +11659,7 @@
     "href": "bilag/faeldningstabel.html#sådan-bruger-du-fældningstabellen",
     "title": "Bilag C: Fældningstabellen",
     "section": "",
-    "text": "Find den positive ion i venstre side af tabellen.\nFind den negative ion øverst i tabellen.\nLæs bogstavet i det felt, hvor rækken og kolonnen mødes.",
-    "crumbs": [
-      "Bilag",
-      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Fældningstabellen</span>"
-    ]
-  },
-  {
-    "objectID": "bilag/faeldningstabel.html#sec-faeldning-ioner",
-    "href": "bilag/faeldningstabel.html#sec-faeldning-ioner",
-    "title": "Bilag C: Fældningstabellen",
-    "section": "Ionerne i fældningstabellen",
-    "text": "Ionerne i fældningstabellen\n\n\n\nPositiv ion\nNavn\nNegativ ion\nNavn\n\n\n\n\nNa+\nnatriumion\nNO3−\nnitrat\n\n\nK+\nkaliumion\nCl−\nchlorid\n\n\nNH4+\nammoniumion\nBr−\nbromid\n\n\nMg2+\nmagnesiumion\nI−\niodid\n\n\nCa2+\ncalciumion\nOH−\nhydroxid\n\n\nBa2+\nbariumion\nSO42−\nsulfat\n\n\nAl3+\naluminiumion\nCO32−\ncarbonat\n\n\nFe2+\njern(II)ion\nPO43−\nphosphat\n\n\nFe3+\njern(III)ion\n\n\n\n\nCu2+\nkobber(II)ion\n\n\n\n\nAg+\nsølv(I)ion\n\n\n\n\nPb2+\nbly(II)ion\n\n\n\n\n\nSaltets navn er den positive ions navn uden ordet ion, fulgt af den negative ions navn. Sølv(I)ion og chlorid giver sølv(I)chlorid. Det kan du læse mere om i afsnit 2.3. Flere ioner står i bilaget Ioner og deres navne.",
-    "crumbs": [
-      "Bilag",
-      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Fældningstabellen</span>"
-    ]
-  },
-  {
-    "objectID": "bilag/faeldningstabel.html#bundfaldets-farve",
-    "href": "bilag/faeldningstabel.html#bundfaldets-farve",
-    "title": "Bilag C: Fældningstabellen",
-    "section": "Bundfaldets farve",
-    "text": "Bundfaldets farve\nDe fleste bundfald er hvide. Bundfaldene i tabellen herunder har en farve, som kan bruges til at genkende dem.\n\n\n\nBundfald\nNavn\nFarve\n\n\n\n\nAgBr\nsølv(I)bromid\nlysegult\n\n\nAgI\nsølv(I)iodid\ngult\n\n\nAg2CO3\nsølv(I)carbonat\nlysegult\n\n\nAg3PO4\nsølv(I)phosphat\ngult\n\n\nPbI2\nbly(II)iodid\ngult\n\n\nFe(OH)2\njern(II)hydroxid\ngrønt\n\n\nFeCO3\njern(II)carbonat\ngråhvidt\n\n\nFe(OH)3\njern(III)hydroxid\nrødbrunt\n\n\nFePO4\njern(III)phosphat\ngulhvidt\n\n\nCu(OH)2\nkobber(II)hydroxid\nlyseblåt\n\n\nCuCO3\nkobber(II)carbonat\nblågrønt\n\n\nCu3(PO4)2\nkobber(II)phosphat\nlyseblåt",
-    "crumbs": [
-      "Bilag",
-      "<span class='chapter-number'>C</span>  <span class='chapter-title'>Fældningstabellen</span>"
-    ]
-  },
-  {
-    "objectID": "bilag/faeldningstabel.html#salte-der-ikke-findes",
-    "href": "bilag/faeldningstabel.html#salte-der-ikke-findes",
-    "title": "Bilag C: Fældningstabellen",
-    "section": "Salte, der ikke findes",
-    "text": "Salte, der ikke findes\nTegnet ÷ står ved seks par af ioner. De to ioner i parret danner ikke et salt med hinanden. De reagerer i stedet på en anden måde.\n\n\n\n\n\n\n\nIoner\nDet sker der i stedet\n\n\n\n\nNH4+ og OH−\nDer dannes ammoniak og vand. Det kan lugtes.\n\n\nAg+ og OH−\nDer dannes brunt sølv(I)oxid, Ag2O.\n\n\nAl3+ og CO32−\nDer dannes Al(OH)3 og bobler af CO2.\n\n\nFe3+ og CO32−\nDer dannes rødbrunt Fe(OH)3 og bobler af CO2.\n\n\nFe3+ og I−\nIonerne reagerer og bliver til Fe2+ og I2.\n\n\nCu2+ og I−\nIonerne reagerer og bliver til CuI og I2.\n\n\n\n\n\n\n\n\n\nTipPrøv selv\n\n\n\nI animationen Fældningsreaktioner kan du øve dig i at bruge fældningstabellen.",
+    "text": "Find den positive ion i venstre side af tabellen.\nFind den negative ion øverst i tabellen.\nLæs bogstavet i det felt, hvor rækken og kolonnen mødes.\n\n\n\n\n\n\n\n\n\n\nTipPrøv selv\n\n\n\nI animationen Fældningsreaktioner kan du øve dig i at bruge fældningstabellen.",
     "crumbs": [
       "Bilag",
       "<span class='chapter-number'>C</span>  <span class='chapter-title'>Fældningstabellen</span>"

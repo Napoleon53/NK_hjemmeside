@@ -1,0 +1,2847 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A3.4 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" rel="next">
+<link href="../kapitler/a3-4-kemisk-analyse.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-4-opgaver.html">Opgaver til A3.4</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a3.4.1-test-og-funktionel-gruppe" id="toc-opgave-a3.4.1-test-og-funktionel-gruppe" class="nav-link active" data-scroll-target="#opgave-a3.4.1-test-og-funktionel-gruppe">Opgave A3.4.1: Test og funktionel gruppe</a></li>
+  <li><a href="#opgave-a3.4.2-hvad-ser-man" id="toc-opgave-a3.4.2-hvad-ser-man" class="nav-link" data-scroll-target="#opgave-a3.4.2-hvad-ser-man">Opgave A3.4.2: Hvad ser man?</a></li>
+  <li><a href="#opgave-a3.4.3-dibromvand-og-propen" id="toc-opgave-a3.4.3-dibromvand-og-propen" class="nav-link" data-scroll-target="#opgave-a3.4.3-dibromvand-og-propen">Opgave A3.4.3: Dibromvand og propen</a></li>
+  <li><a href="#opgave-a3.4.4-tollens-test-med-butanal" id="toc-opgave-a3.4.4-tollens-test-med-butanal" class="nav-link" data-scroll-target="#opgave-a3.4.4-tollens-test-med-butanal">Opgave A3.4.4: Tollens’ test med butanal</a></li>
+  <li><a href="#opgave-a3.4.5-vælg-en-test" id="toc-opgave-a3.4.5-vælg-en-test" class="nav-link" data-scroll-target="#opgave-a3.4.5-vælg-en-test">Opgave A3.4.5: Vælg en test</a></li>
+  <li><a href="#opgave-a3.4.6-tre-glas-uden-etiket" id="toc-opgave-a3.4.6-tre-glas-uden-etiket" class="nav-link" data-scroll-target="#opgave-a3.4.6-tre-glas-uden-etiket">Opgave A3.4.6: Tre glas uden etiket</a></li>
+  <li><a href="#opgave-a3.4.7-et-ukendt-stof-med-formlen-c4h8o" id="toc-opgave-a3.4.7-et-ukendt-stof-med-formlen-c4h8o" class="nav-link" data-scroll-target="#opgave-a3.4.7-et-ukendt-stof-med-formlen-c4h8o">Opgave A3.4.7: Et ukendt stof med formlen C<sub>4</sub>H<sub>8</sub>O</a></li>
+  <li><a href="#opgave-a3.4.8-fem-flasker" id="toc-opgave-a3.4.8-fem-flasker" class="nav-link" data-scroll-target="#opgave-a3.4.8-fem-flasker">Opgave A3.4.8: Fem flasker</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a3.4.eks.1-nellike-og-anis" id="toc-opgave-a3.4.eks.1-nellike-og-anis" class="nav-link" data-scroll-target="#opgave-a3.4.eks.1-nellike-og-anis">Opgave A3.4.eks.1: Nellike og anis</a></li>
+  <li><a href="#opgave-a3.4.eks.2-appelsin-og-kommen" id="toc-opgave-a3.4.eks.2-appelsin-og-kommen" class="nav-link" data-scroll-target="#opgave-a3.4.eks.2-appelsin-og-kommen">Opgave A3.4.eks.2: Appelsin og kommen</a></li>
+  <li><a href="#opgave-a3.4.eks.3-vanilje-der-har-stået-længe" id="toc-opgave-a3.4.eks.3-vanilje-der-har-stået-længe" class="nav-link" data-scroll-target="#opgave-a3.4.eks.3-vanilje-der-har-stået-længe">Opgave A3.4.eks.3: Vanilje, der har stået længe</a></li>
+  <li><a href="#opgave-a3.4.eks.4-tre-glas-med-kanelstoffer" id="toc-opgave-a3.4.eks.4-tre-glas-med-kanelstoffer" class="nav-link" data-scroll-target="#opgave-a3.4.eks.4-tre-glas-med-kanelstoffer">Opgave A3.4.eks.4: Tre glas med kanelstoffer</a></li>
+  <li><a href="#opgave-a3.4.eks.5-duften-af-nyslået-græs" id="toc-opgave-a3.4.eks.5-duften-af-nyslået-græs" class="nav-link" data-scroll-target="#opgave-a3.4.eks.5-duften-af-nyslået-græs">Opgave A3.4.eks.5: Duften af nyslået græs</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-4-opgaver.html">Opgaver til A3.4</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A3.4</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a3-4-kemisk-analyse.html">A3.4 Kemisk analyse</a>. Prøv selv, før du åbner hjælpen under opgaven.</p>
+<section id="opgave-a3.4.1-test-og-funktionel-gruppe" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.1-test-og-funktionel-gruppe">Opgave A3.4.1: Test og funktionel gruppe</h2>
+<p>En kemisk test viser, om et stof har en bestemt funktionel gruppe. Tabellen har syv test fra afsnit A3.4. De to sidste kolonner er tomme.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Test</th>
+<th style="text-align: left;">Det ser man, når testen er positiv</th>
+<th style="text-align: left;">Testen påviser</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dibromvand</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tollens’ test</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fehlings test</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DNPH</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dichromat i sur opløsning</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">natron</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">jern(III)chlorid</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>Det, man ser, står her i tilfældig rækkefølge:</p>
+<ul>
+<li>bobler af CO<sub>2</sub></li>
+<li>lilla farve</li>
+<li>sølvspejl på glasset</li>
+<li>den orange farve forsvinder</li>
+<li>rødt bundfald</li>
+<li>farven skifter fra orange til grøn</li>
+<li>gult eller orange bundfald</li>
+</ul>
+<p>Det, testene påviser, står her i tilfældig rækkefølge:</p>
+<ul>
+<li>phenol</li>
+<li>aldehyd eller keton</li>
+<li>carboxylsyre</li>
+<li>C=C eller C≡C</li>
+<li>aldehyd</li>
+<li>aldehyd, også i reducerende sukker</li>
+<li>primær eller sekundær alkohol og aldehyd</li>
+</ul>
+<ol type="a">
+<li>Udfyld tabellens to tomme kolonner med udtrykkene fra de to lister.</li>
+<li>Dibromvand og dichromat er begge orange, før testen begynder. Beskriv forskellen på en positiv test med dibromvand og en positiv test med dichromat.</li>
+<li>Hvilke af de syv test er positive for et aldehyd?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Alle syv test står i tabellen først i afsnit A3.4. Begynd med de test, du kender fra B-niveau: dibromvand påviser dobbeltbindinger mellem carbonatomer, og natron bobler med carboxylsyrer.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Tre af testene danner noget fast: Tollens’ test giver et sølvspejl, Fehlings test giver et rødt bundfald, og DNPH giver et gult eller orange bundfald. De fire andre test viser sig som en farve, der forsvinder eller skifter, eller som bobler.</p>
+<p>Til spørgsmål c: et aldehyd har en carbonylgruppe, og et aldehyd kan oxideres til en carboxylsyre. Find de test, der påviser en carbonylgruppe, og de test, hvor reagenset oxiderer stoffet.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Den udfyldte tabel:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 62%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Test</th>
+<th style="text-align: left;">Det ser man, når testen er positiv</th>
+<th style="text-align: left;">Testen påviser</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dibromvand</td>
+<td style="text-align: left;">den orange farve forsvinder</td>
+<td style="text-align: left;">C=C eller C≡C</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tollens’ test</td>
+<td style="text-align: left;">sølvspejl på glasset</td>
+<td style="text-align: left;">aldehyd</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fehlings test</td>
+<td style="text-align: left;">rødt bundfald</td>
+<td style="text-align: left;">aldehyd, også i reducerende sukker</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DNPH</td>
+<td style="text-align: left;">gult eller orange bundfald</td>
+<td style="text-align: left;">aldehyd eller keton</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dichromat i sur opløsning</td>
+<td style="text-align: left;">farven skifter fra orange til grøn</td>
+<td style="text-align: left;">primær eller sekundær alkohol og aldehyd</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">natron</td>
+<td style="text-align: left;">bobler af CO<sub>2</sub></td>
+<td style="text-align: left;">carboxylsyre</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">jern(III)chlorid</td>
+<td style="text-align: left;">lilla farve</td>
+<td style="text-align: left;">phenol</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Ved en positiv test med dibromvand forsvinder den orange farve, og væsken bliver farveløs. Ved en positiv test med dichromat forsvinder den orange farve også, men væsken bliver grøn, fordi der dannes chrom(III)ioner.</p></li>
+<li><p>Fire test er positive for et aldehyd: Tollens’ test (sølvspejl), Fehlings test (rødt bundfald), DNPH (gult eller orange bundfald) og dichromat i sur opløsning (farven skifter fra orange til grøn). DNPH reagerer med carbonylgruppen i aldehydet. I de tre andre test bliver aldehydet oxideret til en carboxylsyre eller til carboxylsyrens ion.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.2-hvad-ser-man" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.2-hvad-ser-man">Opgave A3.4.2: Hvad ser man?</h2>
+<p>Tabellen viser tolv forsøg. I hvert forsøg bliver ét stof testet med ét reagens. Phenol, C<sub>6</sub>H<sub>5</sub>OH, er den enkleste phenol: en benzenring med en hydroxygruppe.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 61%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Test</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">pent-2-en, CH<sub>3</sub>CH=CHCH<sub>2</sub>CH<sub>3</sub></td>
+<td style="text-align: left;">dibromvand</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">pentan, CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>CH<sub>2</sub>CH<sub>3</sub></td>
+<td style="text-align: left;">dibromvand</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">ethanal, CH<sub>3</sub>CHO</td>
+<td style="text-align: left;">Fehlings test</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">butanon, CH<sub>3</sub>COCH<sub>2</sub>CH<sub>3</sub></td>
+<td style="text-align: left;">Tollens’ test</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">butanon, CH<sub>3</sub>COCH<sub>2</sub>CH<sub>3</sub></td>
+<td style="text-align: left;">DNPH</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">ethylethanoat, CH<sub>3</sub>COOCH<sub>2</sub>CH<sub>3</sub></td>
+<td style="text-align: left;">DNPH</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">propansyre, CH<sub>3</sub>CH<sub>2</sub>COOH</td>
+<td style="text-align: left;">natron</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">8</td>
+<td style="text-align: left;">phenol, C<sub>6</sub>H<sub>5</sub>OH</td>
+<td style="text-align: left;">natron</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">9</td>
+<td style="text-align: left;">phenol, C<sub>6</sub>H<sub>5</sub>OH</td>
+<td style="text-align: left;">jern(III)chlorid</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">10</td>
+<td style="text-align: left;">butan-2-ol, CH<sub>3</sub>CH(OH)CH<sub>2</sub>CH<sub>3</sub></td>
+<td style="text-align: left;">dichromat i sur opløsning</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">11</td>
+<td style="text-align: left;">2-methylbutan-2-ol, (CH<sub>3</sub>)<sub>2</sub>C(OH)CH<sub>2</sub>CH<sub>3</sub></td>
+<td style="text-align: left;">dichromat i sur opløsning</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">12</td>
+<td style="text-align: left;">ethylamin, CH<sub>3</sub>CH<sub>2</sub>NH<sub>2</sub>, opløst i vand</td>
+<td style="text-align: left;">pH-papir</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Skriv for hvert af de tolv forsøg, hvad man ser, og om testen er positiv eller negativ.</li>
+<li>Butanon og ethylethanoat har begge en C=O. Forklar, hvorfor kun butanon giver bundfald med DNPH.</li>
+<li>Propansyre og phenol er begge syrer. Forklar, hvorfor kun propansyre bobler med natron.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find først den funktionelle gruppe i hvert af de tolv stoffer, og bestem stofklassen: alken, alkan, aldehyd, keton, ester, carboxylsyre, phenol, alkohol eller amin. Slå derefter op i tabellen først i afsnit A3.4, om testen påviser netop den gruppe.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Er testen negativ, ser man ingenting: reagenset beholder den farve, det havde. Dibromvand og dichromat er orange, og jern(III)chlorid er svagt gul.</p>
+<p>Butan-2-ol er en sekundær alkohol, og 2-methylbutan-2-ol er en tertiær alkohol.</p>
+<p>Du kan begynde forklaringerne sådan: “I ethylethanoat sidder C=O sammen med et oxygenatom i en …” og “Phenol er en meget svagere syre end propansyre, fordi p<em>K</em><sub>s</sub> for en phenol er omkring …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Resultaterne af de tolv forsøg:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 34%">
+<col style="width: 50%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Stof og test</th>
+<th style="text-align: left;">Det ser man</th>
+<th style="text-align: left;">Testen er</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">pent-2-en og dibromvand</td>
+<td style="text-align: left;">den orange farve forsvinder</td>
+<td style="text-align: left;">positiv</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">pentan og dibromvand</td>
+<td style="text-align: left;">farven bliver ved med at være orange</td>
+<td style="text-align: left;">negativ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">ethanal og Fehlings test</td>
+<td style="text-align: left;">den blå væske giver et rødt bundfald</td>
+<td style="text-align: left;">positiv</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">butanon og Tollens’ test</td>
+<td style="text-align: left;">intet sølvspejl</td>
+<td style="text-align: left;">negativ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">butanon og DNPH</td>
+<td style="text-align: left;">gult eller orange bundfald</td>
+<td style="text-align: left;">positiv</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">ethylethanoat og DNPH</td>
+<td style="text-align: left;">intet bundfald</td>
+<td style="text-align: left;">negativ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">propansyre og natron</td>
+<td style="text-align: left;">bobler af CO<sub>2</sub></td>
+<td style="text-align: left;">positiv</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">8</td>
+<td style="text-align: left;">phenol og natron</td>
+<td style="text-align: left;">ingen bobler</td>
+<td style="text-align: left;">negativ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">9</td>
+<td style="text-align: left;">phenol og jern(III)chlorid</td>
+<td style="text-align: left;">farven skifter fra svagt gul til lilla</td>
+<td style="text-align: left;">positiv</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">10</td>
+<td style="text-align: left;">butan-2-ol og dichromat</td>
+<td style="text-align: left;">farven skifter fra orange til grøn</td>
+<td style="text-align: left;">positiv</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">11</td>
+<td style="text-align: left;">2-methylbutan-2-ol og dichromat</td>
+<td style="text-align: left;">farven bliver ved med at være orange</td>
+<td style="text-align: left;">negativ</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">12</td>
+<td style="text-align: left;">ethylamin og pH-papir</td>
+<td style="text-align: left;">pH-papiret bliver blåt</td>
+<td style="text-align: left;">opløsningen er basisk</td>
+</tr>
+</tbody>
+</table>
+<p>Pent-2-en har en C=C, som dibrom adderer til. Pentan har kun enkeltbindinger. Ethanal er et aldehyd, og butanon er en keton. Butan-2-ol er en sekundær alkohol og kan oxideres af dichromat. 2-methylbutan-2-ol er en tertiær alkohol og kan ikke oxideres. Ethylamin er en amin og derfor en base.</p>
+<ol start="2" type="a">
+<li><p>I butanon sidder C=O mellem to carbonatomer. Det er carbonylgruppen i en keton, og den reagerer med DNPH. I ethylethanoat sidder C=O sammen med et oxygenatom i en estergruppe, −COO−. DNPH reagerer kun med carbonylgruppen i aldehyder og ketoner, så esteren ethylethanoat giver intet bundfald.</p></li>
+<li><p>Propansyre er en carboxylsyre, og carboxylsyrer har p<em>K</em><sub>s</sub> på 4 til 5. Propansyre afgiver en hydron til hydrogencarbonationen i natron, og der dannes CO<sub>2</sub>, som bobler op. Phenol er en meget svagere syre med p<em>K</em><sub>s</sub> omkring 10. Phenol er for svag en syre til at reagere med natron, så der kommer ingen bobler.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.3-dibromvand-og-propen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.3-dibromvand-og-propen">Opgave A3.4.3: Dibromvand og propen</h2>
+<p>Propen, CH<sub>2</sub>=CHCH<sub>3</sub>, er en gas, som bruges til at lave plasten polypropylen. Når propen bobler gennem dibromvand, forsvinder den orange farve.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for reaktionen mellem propen og dibrom. Brug strukturformler.</li>
+<li>Angiv reaktionstypen, og begrund svaret ud fra bindingerne i propen og i produktet.</li>
+<li>Forklar, hvorfor den orange farve forsvinder.</li>
+<li>Propan, CH<sub>3</sub>CH<sub>2</sub>CH<sub>3</sub>, bobler gennem dibromvand. Hvad ser man? Begrund svaret.</li>
+<li>Buta-1,3-dien, CH<sub>2</sub>=CH−CH=CH<sub>2</sub>, har to dobbeltbindinger. Hvor mange dibrommolekyler kan ét molekyle buta-1,3-dien højst reagere med?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug det generelle reaktionsskema for dibromvand i afsnit A3.4: R−CH=CH−R + Br<sub>2</sub> → R−CHBr−CHBr−R. I propen sidder dobbeltbindingen mellem carbonatom nr. 1 og carbonatom nr. 2.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Dobbeltbindingen i propen bliver til en enkeltbinding, og de to bromatomer sætter sig på hver sit af de to carbonatomer, der før havde dobbeltbindingen. Methylgruppen, −CH<sub>3</sub>, er uændret.</p>
+<p>Du kan begynde begrundelsen sådan: “Dobbeltbindingen mellem carbonatom nr. 1 og nr. 2 i propen er blevet til …, og hvert af de to carbonatomer har fået …”</p>
+<p>Den orange farve i dibromvand skyldes Br<sub>2</sub>-molekylerne.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Reaktionsskemaet for propen og dibrom:</li>
+</ol>
+<div class="reaktion">
+<p>CH<sub>2</sub>=CHCH<sub>3</sub> + Br<sub>2</sub> → CH<sub>2</sub>BrCHBrCH<sub>3</sub></p>
+</div>
+<p>Produktet hedder 1,2-dibrompropan.</p>
+<ol start="2" type="a">
+<li><p>Reaktionen er en addition. Dobbeltbindingen mellem carbonatom nr. 1 og nr. 2 i propen er blevet til en enkeltbinding, og hvert af de to carbonatomer har fået et bromatom. De to reaktanter er blevet til ét produkt.</p></li>
+<li><p>Den orange farve skyldes Br<sub>2</sub>-molekylerne i dibromvandet. Når dibrom adderer til dobbeltbindingen i propen, bliver Br<sub>2</sub> brugt. Produktet 1,2-dibrompropan er farveløst, så farven forsvinder.</p></li>
+<li><p>Farven bliver ved med at være orange. Propan har kun enkeltbindinger mellem carbonatomerne, så dibrom har ingen dobbeltbinding at addere til. Testen er negativ.</p></li>
+<li><p>Ét molekyle buta-1,3-dien kan højst reagere med to dibrommolekyler, ét for hver af de to dobbeltbindinger. Produktet er CH<sub>2</sub>Br−CHBr−CHBr−CH<sub>2</sub>Br.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.4-tollens-test-med-butanal" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.4-tollens-test-med-butanal">Opgave A3.4.4: Tollens’ test med butanal</h2>
+<p>Butanal, CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>CHO, er et aldehyd. I Tollens’ test giver butanal et sølvspejl på glasset.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for reaktionen mellem butanal og sølvioner i basisk opløsning.</li>
+<li>Bestem oxidationstallet for carbonatomet i aldehydgruppen i butanal og for det samme carbonatom i produktet.</li>
+<li>Bestem oxidationstallet for sølv før og efter reaktionen.</li>
+<li>Vis, at carbonatomet afgiver lige så mange elektroner, som sølvionerne optager.</li>
+<li>Butanon, CH<sub>3</sub>COCH<sub>2</sub>CH<sub>3</sub>, giver ikke noget sølvspejl. Forklar hvorfor.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug det generelle reaktionsskema for Tollens’ test i afsnit A3.4: R−CHO + 2 Ag<sup>+</sup> + 3 OH<sup>−</sup> → R−COO<sup>−</sup> + 2 Ag(s) + 2 H<sub>2</sub>O. I butanal er R gruppen CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>−.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Oxidationstallet for et carbonatom findes ved at tælle bindingerne, som i afsnit A3.3: hver binding til H tæller −1, hver binding til O tæller +1, en dobbeltbinding til O tæller +2, og bindinger til andre carbonatomer tæller 0.</p>
+<p>Carbonatomet i aldehydgruppen i butanal har en dobbeltbinding til O, en binding til H og en binding til et carbonatom. I produktet har det samme carbonatom en dobbeltbinding til O, en enkeltbinding til O og en binding til et carbonatom.</p>
+<p>Stiger et oxidationstal med 2, har atomet afgivet 2 elektroner.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Reaktionsskemaet for butanal i Tollens’ test:</li>
+</ol>
+<div class="reaktion">
+<p>CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>CHO + 2 Ag<sup>+</sup> + 3 OH<sup>−</sup> → CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>COO<sup>−</sup> + 2 Ag(s) + 2 H<sub>2</sub>O</p>
+</div>
+<p>Ladningerne passer: til venstre er ladningen 2 · (+1) + 3 · (−1) = −1, og til højre er den −1.</p>
+<ol start="2" type="a">
+<li><p>I butanal har carbonatomet i aldehydgruppen en dobbeltbinding til O (+2), en binding til H (−1) og en binding til et carbonatom (0). Oxidationstallet er +I. I produktet, butanoationen, har carbonatomet en dobbeltbinding til O (+2), en enkeltbinding til O (+1) og en binding til et carbonatom (0). Oxidationstallet er +III.</p></li>
+<li><p>Sølv har oxidationstallet +I i sølvionen, Ag<sup>+</sup>, og 0 i frit sølv, Ag(s).</p></li>
+<li><p>Elektronregnskabet for butanal og sølvionerne:</p></li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Atom</th>
+<th style="text-align: center;">Oxidationstal før</th>
+<th style="text-align: center;">Oxidationstal efter</th>
+<th style="text-align: center;">Ændring pr. atom</th>
+<th style="text-align: center;">Antal atomer</th>
+<th style="text-align: left;">Elektroner i alt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">C i aldehydgruppen</td>
+<td style="text-align: center;">+I</td>
+<td style="text-align: center;">+III</td>
+<td style="text-align: center;">stiger 2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">afgiver 2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ag</td>
+<td style="text-align: center;">+I</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">falder 1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">optager 2</td>
+</tr>
+</tbody>
+</table>
+<p>Carbonatomet i aldehydgruppen afgiver 2 elektroner, og de to sølvioner optager 1 elektron hver. Derfor står der 2 Ag<sup>+</sup> i reaktionsskemaet. Butanal bliver oxideret, og sølvionerne bliver reduceret, så reaktionen er en redoxreaktion.</p>
+<ol start="5" type="a">
+<li>I butanon sidder carbonylgruppen inde i kæden. Carbonatomet i carbonylgruppen har to carbonatomer som naboer og intet hydrogenatom. Det kan ikke få en binding mere til oxygen uden at bryde en binding mellem to carbonatomer, så butanon kan ikke oxideres af sølvionerne. Sølvionerne bliver derfor ikke reduceret til sølv, og der dannes intet sølvspejl.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.5-vælg-en-test" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.5-vælg-en-test">Opgave A3.4.5: Vælg en test</h2>
+<p>De to stoffer i hvert par skal skelnes fra hinanden med en kemisk test. Foreslå for hvert par en test, der kan skelne mellem de to stoffer. Begrund valget, og skriv, hvad man ser med hvert af de to stoffer.</p>
+<ol type="a">
+<li>propanal, CH<sub>3</sub>CH<sub>2</sub>CHO, og propanon, CH<sub>3</sub>COCH<sub>3</sub></li>
+<li>propan-1-ol, CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>OH, og 2-methylpropan-2-ol, (CH<sub>3</sub>)<sub>3</sub>COH</li>
+<li>hex-1-en, CH<sub>2</sub>=CHCH<sub>2</sub>CH<sub>2</sub>CH<sub>2</sub>CH<sub>3</sub>, og hexan, CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>CH<sub>2</sub>CH<sub>2</sub>CH<sub>3</sub></li>
+<li>ethansyre, CH<sub>3</sub>COOH, og ethanol, CH<sub>3</sub>CH<sub>2</sub>OH</li>
+<li>phenol, C<sub>6</sub>H<sub>5</sub>OH, hvor hydroxygruppen sidder på en benzenring, og cyclohexanol, C<sub>6</sub>H<sub>11</sub>OH, hvor hydroxygruppen sidder på en ring uden dobbeltbindinger</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug de fire trin fra afsnit A3.4: find de funktionelle grupper i begge stoffer, find en gruppe, som kun det ene stof har, vælg testen for den gruppe, og skriv, hvad man ser med hvert af de to stoffer.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Stofklasserne i de fem par er:</p>
+<ul>
+<li>a: propanal er et aldehyd, og propanon er en keton</li>
+<li>b: propan-1-ol er en primær alkohol, og 2-methylpropan-2-ol er en tertiær alkohol</li>
+<li>c: hex-1-en er et alken, og hexan er en alkan</li>
+<li>d: ethansyre er en carboxylsyre, og ethanol er en alkohol</li>
+<li>e: phenol hører til stofklassen phenoler, og cyclohexanol er en alkohol.</li>
+</ul>
+<p>Skriv svaret med denne opbygning: “Testen er … Den påviser … Med propanal ser man …, fordi … Med propanon ser man …, fordi …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Forslag til en test for hvert af de fem par:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 15%">
+<col style="width: 40%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Par</th>
+<th style="text-align: left;">Test</th>
+<th style="text-align: left;">Det ser man med det første stof</th>
+<th style="text-align: left;">Det ser man med det andet stof</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">a</td>
+<td style="text-align: left;">Tollens’ test</td>
+<td style="text-align: left;">propanal: sølvspejl</td>
+<td style="text-align: left;">propanon: intet sølvspejl</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">b</td>
+<td style="text-align: left;">dichromat i sur opløsning</td>
+<td style="text-align: left;">propan-1-ol: farven skifter fra orange til grøn</td>
+<td style="text-align: left;">2-methylpropan-2-ol: farven bliver ved med at være orange</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c</td>
+<td style="text-align: left;">dibromvand</td>
+<td style="text-align: left;">hex-1-en: den orange farve forsvinder</td>
+<td style="text-align: left;">hexan: farven bliver ved med at være orange</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">d</td>
+<td style="text-align: left;">natron</td>
+<td style="text-align: left;">ethansyre: bobler af CO<sub>2</sub></td>
+<td style="text-align: left;">ethanol: ingen bobler</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">e</td>
+<td style="text-align: left;">jern(III)chlorid</td>
+<td style="text-align: left;">phenol: lilla farve</td>
+<td style="text-align: left;">cyclohexanol: ingen farveændring</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li><p>Propanal har en aldehydgruppe, som bliver oxideret af sølvionerne i Tollens’ test. Propanon er en keton og kan ikke oxideres på den måde. Fehlings test kan også bruges: propanal giver rødt bundfald, og propanon giver intet. DNPH kan ikke bruges, for propanal og propanon har begge en carbonylgruppe og giver begge gult bundfald.</p></li>
+<li><p>Propan-1-ol er en primær alkohol og bliver oxideret af dichromat, så der dannes grønne chrom(III)ioner. 2-methylpropan-2-ol er en tertiær alkohol. Carbonatomet med hydroxygruppen har intet hydrogenatom, så 2-methylpropan-2-ol kan ikke oxideres.</p></li>
+<li><p>Hex-1-en har en dobbeltbinding mellem carbonatom nr. 1 og nr. 2, og dibrom adderer til den. Hexan har kun enkeltbindinger og reagerer ikke med dibromvand.</p></li>
+<li><p>Ethansyre har en carboxylgruppe og er en syre. Ethansyre reagerer med natron, og der dannes CO<sub>2</sub>. Ethanol er ikke en syre i vand. pH-papir kan også bruges: det bliver rødt i ethansyre og skifter ikke farve i ethanol.</p></li>
+<li><p>I phenol sidder hydroxygruppen direkte på benzenringen, og jern(III)ioner giver en lilla farve med phenoler. I cyclohexanol sidder hydroxygruppen på en ring uden dobbeltbindinger. Cyclohexanol er en alkohol og giver ingen farve med jern(III)chlorid.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.6-tre-glas-uden-etiket" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.6-tre-glas-uden-etiket">Opgave A3.4.6: Tre glas uden etiket</h2>
+<p>Tre glas er mærket 1, 2 og 3. De indeholder pentan-2-ol, pentan-2-on og pentansyre, men ikke i den rækkefølge.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Navn</th>
+<th style="text-align: left;">Strukturformel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">pentan-2-ol</td>
+<td style="text-align: left;">CH<sub>3</sub>CH(OH)CH<sub>2</sub>CH<sub>2</sub>CH<sub>3</sub></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">pentan-2-on</td>
+<td style="text-align: left;">CH<sub>3</sub>COCH<sub>2</sub>CH<sub>2</sub>CH<sub>3</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">pentansyre</td>
+<td style="text-align: left;">CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>CH<sub>2</sub>COOH</td>
+</tr>
+</tbody>
+</table>
+<p>Fra hvert glas tages tre små prøver. Den første prøve testes med dichromat i sur opløsning, den anden med DNPH og den tredje med natron. Figuren viser de ni reagensglas efter testene.</p>
+<div id="fig-a3-opg-4-tre-glas" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-tre-glas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-tre-glas.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Resultaterne af de tre test på prøver fra glas 1, glas 2 og glas 3."><img src="../figurer/a3-opg-4-tre-glas.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-tre-glas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Resultaterne af de tre test på prøver fra glas 1, glas 2 og glas 3.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Lav en tabel over de ni resultater, og skriv for hvert resultat, om testen er positiv eller negativ.</li>
+<li>Bestem, hvilket stof der er i hvert af de tre glas. Begrund svaret for hvert glas.</li>
+<li>Prøven fra glas 3 blev grøn med dichromat. Angiv navn og strukturformel for det stof, der blev dannet i prøven.</li>
+<li>To af de tre test havde været nok til at finde indholdet af alle tre glas. Forklar hvorfor.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find først stofklassen for hvert af de tre stoffer: pentan-2-ol er en sekundær alkohol, pentan-2-on er en keton, og pentansyre er en carboxylsyre. Find derefter i tabellen i afsnit A3.4, hvilken af de tre test der er positiv for hver stofklasse.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Dichromat i sur opløsning bliver grøn med en primær eller sekundær alkohol. DNPH giver gult bundfald med en keton. Natron bobler med en carboxylsyre. Hvert af de tre stoffer er altså positivt i netop én af de tre test.</p>
+<p>Du kan begynde begrundelsen sådan: “Prøven fra glas 1 giver gult bundfald med DNPH. Det viser, at stoffet har en …”</p>
+<p>Til spørgsmål c: en sekundær alkohol bliver oxideret til en keton.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De ni resultater:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Test</th>
+<th style="text-align: left;">Glas 1</th>
+<th style="text-align: left;">Glas 2</th>
+<th style="text-align: left;">Glas 3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dichromat i sur opløsning</td>
+<td style="text-align: left;">orange: negativ</td>
+<td style="text-align: left;">orange: negativ</td>
+<td style="text-align: left;">grøn: positiv</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DNPH</td>
+<td style="text-align: left;">gult bundfald: positiv</td>
+<td style="text-align: left;">intet bundfald: negativ</td>
+<td style="text-align: left;">intet bundfald: negativ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">natron</td>
+<td style="text-align: left;">ingen bobler: negativ</td>
+<td style="text-align: left;">bobler: positiv</td>
+<td style="text-align: left;">ingen bobler: negativ</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li>Glas 1 indeholder pentan-2-on. Prøven giver gult bundfald med DNPH, så stoffet har en carbonylgruppe, og pentan-2-on er den eneste keton blandt de tre stoffer.</li>
+</ol>
+<p>Glas 2 indeholder pentansyre. Prøven bobler med natron, så stoffet er en carboxylsyre. Boblerne er CO<sub>2</sub>.</p>
+<p>Glas 3 indeholder pentan-2-ol. Prøven får dichromat til at skifte fra orange til grøn, så stoffet bliver oxideret. Pentan-2-ol er en sekundær alkohol og kan oxideres. Ketonen pentan-2-on og carboxylsyren pentansyre bliver ikke oxideret af dichromat.</p>
+<ol start="3" type="a">
+<li><p>Pentan-2-ol er en sekundær alkohol og bliver oxideret til en keton. Der blev dannet pentan-2-on, CH<sub>3</sub>COCH<sub>2</sub>CH<sub>2</sub>CH<sub>3</sub>. Det er det samme stof, som er i glas 1.</p></li>
+<li><p>Der er tre glas og tre stoffer. Når to af glassene er fundet med to test, må det sidste glas indeholde det sidste stof. Med DNPH og natron findes fx pentan-2-on i glas 1 og pentansyre i glas 2, og så må glas 3 indeholde pentan-2-ol. Den tredje test er en kontrol.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.7-et-ukendt-stof-med-formlen-c4h8o" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.7-et-ukendt-stof-med-formlen-c4h8o">Opgave A3.4.7: Et ukendt stof med formlen C<sub>4</sub>H<sub>8</sub>O</h2>
+<p>Et ukendt stof har molekylformlen C<sub>4</sub>H<sub>8</sub>O. Stoffet giver gult bundfald med DNPH, og stoffet giver sølvspejl i Tollens’ test.</p>
+<ol type="a">
+<li>Beregn antallet af dobbeltbindingsækvivalenter for C<sub>4</sub>H<sub>8</sub>O.</li>
+<li>Forklar, hvad hver af de to test viser om stoffet.</li>
+<li>Forklar, hvorfor stoffet hverken kan have en dobbeltbinding mellem to carbonatomer eller en ring.</li>
+<li>To stoffer passer med alle oplysningerne. Tegn strukturformlerne for de to stoffer, og navngiv dem.</li>
+<li>Et andet stof med molekylformlen C<sub>4</sub>H<sub>8</sub>O giver gult bundfald med DNPH, men intet sølvspejl i Tollens’ test. Tegn strukturformlen, og navngiv stoffet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Antallet af dobbeltbindingsækvivalenter beregnes med formlen fra afsnit A3.1: DBE = (2 · C + 2 + N − H) / 2. I C<sub>4</sub>H<sub>8</sub>O er der 4 carbonatomer, 8 hydrogenatomer og ingen nitrogenatomer. Oxygen tæller ikke med.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>DNPH viser en carbonylgruppe, C=O, i et aldehyd eller en keton. Tollens’ test viser, om carbonylgruppen sidder i et aldehyd. En C=O tæller som én dobbeltbindingsækvivalent.</p>
+<p>I et aldehyd sidder gruppen −CHO for enden af kæden. De tre andre carbonatomer i C<sub>4</sub>H<sub>8</sub>O kan sidde på to måder: i en lige kæde eller med en forgrening.</p>
+<p>Du kan begynde forklaringen i spørgsmål c sådan: “Stoffet har én dobbeltbindingsækvivalent, og den er brugt på …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Antallet af dobbeltbindingsækvivalenter for C<sub>4</sub>H<sub>8</sub>O er</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 4 + 2 + 0 - 8}{2} = 1
+\]</span></p>
+<p>Molekylet har én dobbeltbinding eller én ring.</p>
+<ol start="2" type="a">
+<li><p>Det gule bundfald med DNPH viser, at stoffet har en carbonylgruppe, C=O. Stoffet er et aldehyd eller en keton. Sølvspejlet i Tollens’ test viser, at stoffet er et aldehyd. Stoffet har altså en aldehydgruppe, −CHO.</p></li>
+<li><p>Stoffet har én dobbeltbindingsækvivalent, og den er brugt på dobbeltbindingen i aldehydgruppens C=O. Der er derfor ingen dobbeltbindingsækvivalent tilbage til en C=C eller en ring.</p></li>
+<li><p>De to aldehyder med formlen C<sub>4</sub>H<sub>8</sub>O er butanal, CH<sub>3</sub>CH<sub>2</sub>CH<sub>2</sub>CHO, og 2-methylpropanal, (CH<sub>3</sub>)<sub>2</sub>CHCHO. De to test kan ikke skelne mellem dem, fordi begge stoffer har en aldehydgruppe.</p></li>
+<li><p>Stoffet har en carbonylgruppe, men er ikke et aldehyd. Det er en keton. Den eneste keton med formlen C<sub>4</sub>H<sub>8</sub>O er butanon, CH<sub>3</sub>COCH<sub>2</sub>CH<sub>3</sub>.</p></li>
+</ol>
+<p>Figuren viser strukturformlerne for butanal, 2-methylpropanal og butanon.</p>
+<div id="fig-a3-opg-4-c4h8o" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-c4h8o-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-c4h8o.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Butanal og 2-methylpropanal er de to aldehyder med formlen C4H8O. Butanon er den eneste keton."><img src="../figurer/a3-opg-4-c4h8o.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-c4h8o-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Butanal og 2-methylpropanal er de to aldehyder med formlen C<sub>4</sub>H<sub>8</sub>O. Butanon er den eneste keton.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.8-fem-flasker" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.8-fem-flasker">Opgave A3.4.8: Fem flasker</h2>
+<p>På en hylde står fem flasker, som har mistet deres etiketter. De indeholder butan-1-ol, 2-methylpropan-2-ol, butanal, butanon og butansyre. Du har fire reagenser: natron, DNPH, Tollens’ reagens og dichromat i sur opløsning.</p>
+<ol type="a">
+<li>Foreslå en rækkefølge af test, der kan vise, hvad der er i hver af de fem flasker. Skriv for hver test, hvilke flasker du tester, hvad man ser, og hvad det viser.</li>
+<li>Forklar, hvorfor dichromat i sur opløsning ikke kan bruges som den eneste test til at finde flasken med butan-1-ol.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Skriv først stofklassen for hvert af de fem stoffer: butan-1-ol er en primær alkohol, 2-methylpropan-2-ol er en tertiær alkohol, butanal er et aldehyd, butanon er en keton, og butansyre er en carboxylsyre. Skriv derefter for hvert stof, hvilke af de fire test der er positive.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Begynd med en test, hvor kun ét af de fem stoffer er positivt. Når en flaske er fundet, skal den ikke testes igen.</p>
+<p>Natron er kun positiv for butansyre. DNPH er positiv for butanal og butanon. Tollens’ test er kun positiv for butanal. Dichromat i sur opløsning er positiv for både butan-1-ol og butanal. 2-methylpropan-2-ol er negativ i alle fire test.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>En rækkefølge, der virker:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 12%">
+<col style="width: 17%">
+<col style="width: 35%">
+<col style="width: 32%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Trin</th>
+<th style="text-align: left;">Test</th>
+<th style="text-align: left;">Flasker, der testes</th>
+<th style="text-align: left;">Det ser man</th>
+<th style="text-align: left;">Det viser</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">natron</td>
+<td style="text-align: left;">alle fem</td>
+<td style="text-align: left;">bobler af CO<sub>2</sub> i én flaske</td>
+<td style="text-align: left;">flasken indeholder carboxylsyren butansyre</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">DNPH</td>
+<td style="text-align: left;">de fire andre</td>
+<td style="text-align: left;">gult bundfald i to flasker, intet i to</td>
+<td style="text-align: left;">de to med bundfald har en carbonylgruppe: butanal og butanon. De to uden er alkoholerne</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Tollens’ test</td>
+<td style="text-align: left;">de to med gult bundfald</td>
+<td style="text-align: left;">sølvspejl i den ene</td>
+<td style="text-align: left;">flasken med sølvspejl indeholder aldehydet butanal. Den anden indeholder ketonen butanon</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">dichromat i sur opløsning</td>
+<td style="text-align: left;">de to uden bundfald</td>
+<td style="text-align: left;">farven skifter fra orange til grøn i den ene</td>
+<td style="text-align: left;">flasken med grøn farve indeholder den primære alkohol butan-1-ol. Den anden indeholder den tertiære alkohol 2-methylpropan-2-ol</td>
+</tr>
+</tbody>
+</table>
+<p>Andre rækkefølger kan også bruges. Det vigtige er, at butanal er fundet, før de sidste flasker testes med dichromat. 2-methylpropan-2-ol er negativ i alle test og findes som den flaske, der er tilbage.</p>
+<ol start="2" type="a">
+<li>Dichromat i sur opløsning oxiderer både primære alkoholer og aldehyder. Butan-1-ol bliver oxideret til butanal og videre til butansyre, og butanal bliver oxideret til butansyre. Farven skifter derfor fra orange til grøn i to af de fem flasker, og testen kan ikke vise, hvilken af de to der indeholder butan-1-ol. Derfor skal butanal først findes med DNPH og Tollens’ test.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med de konkrete atomer, bindinger og grupper, med beregninger med enheder og med en konklusion.</p>
+</section>
+<section id="opgave-a3.4.eks.1-nellike-og-anis" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.eks.1-nellike-og-anis">Opgave A3.4.eks.1: Nellike og anis</h2>
+<p>Eugenol giver nelliker deres duft, og tandlæger bruger stoffet, fordi det bedøver svagt. Anethol giver anis og fennikel deres smag. Figuren viser de to stoffer.</p>
+<div id="fig-a3-opg-4-eugenol-anethol" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-eugenol-anethol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-eugenol-anethol.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Eugenol fra nelliker og anethol fra anis."><img src="../figurer/a3-opg-4-eugenol-anethol.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-eugenol-anethol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Eugenol fra nelliker og anethol fra anis.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv de funktionelle grupper i eugenol og i anethol, og angiv de stofklasser, grupperne placerer hvert af de to stoffer i.</li>
+<li>Foreslå en test, der kan skelne mellem eugenol og anethol. Begrund svaret, og beskriv, hvad man ser med hvert af stofferne.</li>
+<li>Forklar, hvorfor dibromvand ikke kan bruges til at skelne mellem eugenol og anethol.</li>
+<li>En elev vil vise, at eugenol er en syre, og drysser natron i en prøve af eugenol. Der kommer ingen bobler. Forklar resultatet af testen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find først alle oxygenatomer i eugenol og i anethol, og se, hvad de er bundet til: et oxygenatom med et hydrogenatom på er en hydroxygruppe, og et oxygenatom mellem to carbonatomer er en ethergruppe. Find derefter dobbeltbindingerne mellem carbonatomer uden for benzenringen.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Eugenol har en hydroxygruppe, der sidder direkte på benzenringen. Anethol har ingen hydroxygruppe. Find i tabellen i afsnit A3.4 den test, der påviser en hydroxygruppe på en benzenring.</p>
+<p>Du kan begynde svarene sådan: “Eugenol er en phenol, fordi hydroxygruppen sidder … Med eugenol ser man … Med anethol ser man …” og “Både eugenol og anethol har en dobbeltbinding mellem to carbonatomer i …”</p>
+<p>Til spørgsmål d: sammenlign p<em>K</em><sub>s</sub> for en phenol med p<em>K</em><sub>s</sub> for en carboxylsyre i afsnit A3.2.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De funktionelle grupper i eugenol og anethol:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 75%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Funktionel gruppe</th>
+<th style="text-align: left;">Stofklasse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">eugenol</td>
+<td style="text-align: left;">hydroxygruppe, −OH, på benzenringen</td>
+<td style="text-align: left;">phenol</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">eugenol</td>
+<td style="text-align: left;">ethergruppe, −O−CH<sub>3</sub>, på benzenringen</td>
+<td style="text-align: left;">ether</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">eugenol</td>
+<td style="text-align: left;">dobbeltbinding mellem de to yderste carbonatomer i sidekæden</td>
+<td style="text-align: left;">alken</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">anethol</td>
+<td style="text-align: left;">ethergruppe, −O−CH<sub>3</sub>, på benzenringen</td>
+<td style="text-align: left;">ether</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">anethol</td>
+<td style="text-align: left;">dobbeltbinding mellem de to carbonatomer i sidekæden nærmest benzenringen</td>
+<td style="text-align: left;">alken</td>
+</tr>
+</tbody>
+</table>
+<p>Dobbeltbindingerne i benzenringen tæller ikke som alkener.</p>
+<ol start="2" type="a">
+<li>Testen er jern(III)chlorid, som påviser phenoler. Eugenol har en hydroxygruppe, der sidder direkte på benzenringen, så eugenol er en phenol. Anethol har ingen hydroxygruppe. Oxygenatomet i anethol sidder i en ethergruppe, og en ether reagerer ikke med jern(III)ioner.</li>
+</ol>
+<p>Der sættes nogle dråber jern(III)chlorid til en prøve af hvert stof. Med eugenol skifter farven fra svagt gul til en kraftig lilla eller blålig farve. Testen er positiv. Med anethol sker der ingen farveændring, og væsken er stadig svagt gul. Testen er negativ.</p>
+<p>Jern(III)chlorid kan altså skelne mellem eugenol og anethol.</p>
+<ol start="3" type="a">
+<li><p>Dibromvand bliver affarvet af stoffer med en dobbeltbinding mellem to carbonatomer. Eugenol har en C=C yderst i sidekæden, −CH<sub>2</sub>−CH=CH<sub>2</sub>, og anethol har en C=C i sidekæden ved siden af benzenringen, −CH=CH−CH<sub>3</sub>. Dibrom adderer til dobbeltbindingen i begge stoffer, så den orange farve forsvinder i begge prøver. Eugenol er desuden en phenol, og en phenol kan også affarve dibromvand ved en substitution på benzenringen. Testen er positiv for både eugenol og anethol og kan derfor ikke skelne mellem dem.</p></li>
+<li><p>Natron bobler med carboxylsyrer. Boblerne er CO<sub>2</sub>, som dannes, når syren afgiver en hydron til hydrogencarbonationen i natron. Eugenol har ingen carboxylgruppe. Eugenol er en phenol, og en phenol er en meget svagere syre end en carboxylsyre: p<em>K</em><sub>s</sub> er omkring 10 for en phenol og 4 til 5 for en carboxylsyre. Eugenol er for svag en syre til at reagere med natron, så der dannes ingen CO<sub>2</sub>.</p></li>
+</ol>
+<p>Testen viser altså kun, at eugenol ikke er en carboxylsyre. Den viser ikke, at eugenol slet ikke er en syre.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.eks.2-appelsin-og-kommen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.eks.2-appelsin-og-kommen">Opgave A3.4.eks.2: Appelsin og kommen</h2>
+<p>Limonen er det stof, der dufter, når man skræller en appelsin. Carvon giver kommen sin smag. Figuren viser de to stoffer, som har samme carbonskelet.</p>
+<div id="fig-a3-opg-4-limonen-carvon" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-limonen-carvon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-limonen-carvon.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figur&nbsp;4: Limonen fra appelsinskal og carvon fra kommen."><img src="../figurer/a3-opg-4-limonen-carvon.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-limonen-carvon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;4: Limonen fra appelsinskal og carvon fra kommen.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv de funktionelle grupper i limonen og i carvon.</li>
+<li>Bestem molekylformlen for limonen, og vis, at antallet af dobbeltbindingsækvivalenter passer med strukturen.</li>
+<li>Et glas uden etiket indeholder enten limonen eller carvon. En prøve fra glasset affarver dibromvand, og en anden prøve fra glasset giver orange bundfald med DNPH. Hvilket af stofferne er i glasset? Begrund svaret, og forklar, hvorfor kun den ene af de to test afgør det.</li>
+<li>Limonen reagerer med dibrom i overskud. Opskriv reaktionsskemaet med strukturformler, og angiv reaktionstypen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I en zigzagformel er hvert hjørne og hver ende af en streg et carbonatom, og hvert carbonatom har fire bindinger. De bindinger, der ikke er tegnet, går til hydrogenatomer. Tæl carbonatomerne i limonen først, og tæl derefter hydrogenatomerne på hvert carbonatom.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Limonen har 10 carbonatomer: 6 i ringen, 1 i methylgruppen og 3 i sidegruppen. Både limonen og carvon har to dobbeltbindinger mellem carbonatomer, én i ringen og én i sidegruppen. Carvon har også en C=O i ringen.</p>
+<p>Du kan begynde begrundelsen i spørgsmål c sådan: “Det orange bundfald med DNPH viser, at stoffet har en … Dibromvand bliver affarvet af både limonen og carvon, fordi …”</p>
+<p>Til spørgsmål d: der er to dobbeltbindinger i limonen, og hver af dem reagerer med ét dibrommolekyle.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Limonen har to dobbeltbindinger mellem carbonatomer. Den ene sidder i ringen, mellem carbonatomet med methylgruppen og dets nabo. Den anden sidder i sidegruppen, hvor det yderste carbonatom er en =CH<sub>2</sub>-gruppe. Limonen er et alken og har ingen andre funktionelle grupper.</li>
+</ol>
+<p>Carvon har de samme to dobbeltbindinger mellem carbonatomer. Carvon har også en carbonylgruppe, C=O, i ringen. Carbonatomet i carbonylgruppen har to carbonatomer som naboer, så carvon er en keton.</p>
+<ol start="2" type="a">
+<li>Limonen har 10 carbonatomer: 6 i ringen, 1 i methylgruppen og 3 i sidegruppen. Hydrogenatomerne tælles på hvert carbonatom: i ringen er der 1 + 2 + 1 + 2 + 2 = 8, fordi carbonatomet med methylgruppen ikke har nogen. Methylgruppen har 3, og sidegruppen har 2 + 3 = 5. Det giver 8 + 3 + 5 = 16 hydrogenatomer. Molekylformlen for limonen er C<sub>10</sub>H<sub>16</sub>.</li>
+</ol>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 10 + 2 + 0 - 16}{2} = 3
+\]</span></p>
+<p>Strukturen har én ring og to dobbeltbindinger mellem carbonatomer. Det er 1 + 2 = 3 dobbeltbindingsækvivalenter, så beregningen passer med strukturen.</p>
+<ol start="3" type="a">
+<li>Glasset indeholder carvon. Det orange bundfald med DNPH viser, at stoffet har en carbonylgruppe i et aldehyd eller en keton. Carvon har en carbonylgruppe i ringen, og limonen har ingen oxygenatomer. Limonen ville ikke give noget bundfald med DNPH.</li>
+</ol>
+<p>Dibromvand afgør ikke noget. Både limonen og carvon har to dobbeltbindinger mellem carbonatomer, som dibrom kan addere til, så den orange farve forsvinder med begge stoffer. Det er altså kun testen med DNPH, der viser, at glasset indeholder carvon.</p>
+<ol start="4" type="a">
+<li>Hver af de to dobbeltbindinger i limonen reagerer med ét dibrommolekyle, så ét limonenmolekyle reagerer med to dibrommolekyler.</li>
+</ol>
+<div id="fig-a3-opg-4-limonen-dibrom" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-limonen-dibrom-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-limonen-dibrom.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figur&nbsp;5: Limonen adderer to dibrommolekyler, ét til hver dobbeltbinding."><img src="../figurer/a3-opg-4-limonen-dibrom.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-limonen-dibrom-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;5: Limonen adderer to dibrommolekyler, ét til hver dobbeltbinding.
+</figcaption>
+</figure>
+</div>
+<p>Reaktionen er en addition. Begge dobbeltbindinger mellem carbonatomer er blevet til enkeltbindinger, og hvert af de fire carbonatomer har fået et bromatom. Produktet har molekylformlen C<sub>10</sub>H<sub>16</sub>Br<sub>4</sub>.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.eks.3-vanilje-der-har-stået-længe" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.eks.3-vanilje-der-har-stået-længe">Opgave A3.4.eks.3: Vanilje, der har stået længe</h2>
+<p>Vanillin er smagsstoffet i vanilje. Når vanilje står længe i luft, bliver lidt af vanillinen omdannet til vanillinsyre. Figuren viser de to stoffer.</p>
+<div id="fig-a3-opg-4-vanillin-vanillinsyre" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-vanillin-vanillinsyre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-vanillin-vanillinsyre.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Figur&nbsp;6: Vanillin og vanillinsyre."><img src="../figurer/a3-opg-4-vanillin-vanillinsyre.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-vanillin-vanillinsyre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;6: Vanillin og vanillinsyre.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv de funktionelle grupper i vanillin og i vanillinsyre.</li>
+<li>Forklar, hvorfor jern(III)chlorid ikke kan bruges til at skelne mellem vanillin og vanillinsyre.</li>
+<li>Foreslå en test, der kan skelne mellem vanillin og vanillinsyre. Begrund svaret, og beskriv, hvad man ser med hvert af stofferne.</li>
+<li>Vanillin giver et sølvspejl i Tollens’ test. Forklar resultatet af testen: angiv reaktionstypen, vis med oxidationstal, hvad der sker med aldehydgruppen og med sølvionerne, og angiv, hvilken gruppe aldehydgruppen bliver til.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign vanillin og vanillinsyre gruppe for gruppe. Tre af grupperne er de samme i de to molekyler. Den fjerde gruppe er forskellig, og det er den, en test skal påvise.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Både vanillin og vanillinsyre har en hydroxygruppe direkte på benzenringen og en ethergruppe, −O−CH<sub>3</sub>. Vanillin har desuden en aldehydgruppe, −CHO, og vanillinsyre har en carboxylgruppe, −COOH.</p>
+<p>Du kan begynde svarene sådan: “Jern(III)chlorid påviser phenoler, og både vanillin og vanillinsyre har …” og “Testen er … Med vanillinsyre ser man …, fordi … Med vanillin ser man …, fordi …”</p>
+<p>Til spørgsmål d: carbonatomet i aldehydgruppen i vanillin har en dobbeltbinding til O, en binding til H og en binding til et carbonatom i benzenringen.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De funktionelle grupper i vanillin og vanillinsyre:</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Funktionel gruppe</th>
+<th style="text-align: left;">Stofklasse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">vanillin</td>
+<td style="text-align: left;">hydroxygruppe, −OH, på benzenringen</td>
+<td style="text-align: left;">phenol</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vanillin</td>
+<td style="text-align: left;">ethergruppe, −O−CH<sub>3</sub></td>
+<td style="text-align: left;">ether</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vanillin</td>
+<td style="text-align: left;">aldehydgruppe, −CHO</td>
+<td style="text-align: left;">aldehyd</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vanillinsyre</td>
+<td style="text-align: left;">hydroxygruppe, −OH, på benzenringen</td>
+<td style="text-align: left;">phenol</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">vanillinsyre</td>
+<td style="text-align: left;">ethergruppe, −O−CH<sub>3</sub></td>
+<td style="text-align: left;">ether</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vanillinsyre</td>
+<td style="text-align: left;">carboxylgruppe, −COOH</td>
+<td style="text-align: left;">carboxylsyre</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Jern(III)chlorid påviser phenoler. Både vanillin og vanillinsyre har en hydroxygruppe, der sidder direkte på benzenringen, så begge stoffer er phenoler. Begge giver derfor en farve med jern(III)chlorid, og testen kan ikke vise, hvilket af de to stoffer en prøve indeholder.</p></li>
+<li><p>Testen er natron, som påviser carboxylsyrer. Vanillinsyre har en carboxylgruppe, −COOH. Vanillin har ingen carboxylgruppe, men en aldehydgruppe, −CHO.</p></li>
+</ol>
+<p>Der drysses natron i en prøve af hvert stof. Med vanillinsyre kommer der bobler af CO<sub>2</sub>, fordi carboxylgruppen afgiver en hydron til hydrogencarbonationen. Testen er positiv. Med vanillin kommer der ingen bobler. Vanillin har godt nok en hydroxygruppe på benzenringen, men en phenol er for svag en syre til at reagere med natron. Testen er negativ.</p>
+<p>Natron kan altså skelne mellem vanillin og vanillinsyre. Tollens’ test og DNPH kan også bruges, fordi kun vanillin har en aldehydgruppe: vanillin giver sølvspejl i Tollens’ test og gult eller orange bundfald med DNPH, og vanillinsyre giver ingen af delene.</p>
+<ol start="4" type="a">
+<li>Reaktionen er en redoxreaktion. Aldehydgruppen i vanillin bliver oxideret, og sølvionerne bliver reduceret.</li>
+</ol>
+<p>Carbonatomet i aldehydgruppen i vanillin har en dobbeltbinding til O (+2), en binding til H (−1) og en binding til et carbonatom i benzenringen (0). Oxidationstallet er +I. Efter reaktionen har carbonatomet en dobbeltbinding til O (+2), en enkeltbinding til O (+1) og en binding til carbonatomet i benzenringen (0). Oxidationstallet er steget fra +I til +III.</p>
+<p>Hver sølvion, Ag<sup>+</sup>, optager én elektron og bliver til frit sølv, Ag. Oxidationstallet for sølv falder fra +I til 0. Carbonatomet afgiver 2 elektroner, så der bruges 2 sølvioner for hvert vanillinmolekyle. Det frie sølv sætter sig på glasset som et sølvspejl.</p>
+<p>Aldehydgruppen, −CHO, bliver til en carboxylatgruppe, −COO<sup>−</sup>, fordi opløsningen er basisk. Produktet er altså ionen af vanillinsyre.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.eks.4-tre-glas-med-kanelstoffer" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.eks.4-tre-glas-med-kanelstoffer">Opgave A3.4.eks.4: Tre glas med kanelstoffer</h2>
+<p>Kanelaldehyd giver kanel sin smag. Kanelplanten danner også kanelsyre og kanelalkohol, som har samme carbonskelet som kanelaldehyd. Figuren viser de tre stoffer. Tre glas uden etiket indeholder hver ét af de tre stoffer.</p>
+<div id="fig-a3-opg-4-kanel-tre" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-kanel-tre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-kanel-tre.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Figur&nbsp;7: De tre stoffer A, B og C har samme carbonskelet."><img src="../figurer/a3-opg-4-kanel-tre.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-kanel-tre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;7: De tre stoffer A, B og C har samme carbonskelet.
+</figcaption>
+</figure>
+</div>
+<p>En prøve fra det ene af de tre glas giver disse resultater:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Test</th>
+<th style="text-align: left;">Det ser man</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DNPH</td>
+<td style="text-align: left;">intet bundfald</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">natron</td>
+<td style="text-align: left;">ingen bobler</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dichromat i sur opløsning</td>
+<td style="text-align: left;">farven skifter fra orange til grøn</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Angiv de funktionelle grupper i hvert af de tre stoffer A, B og C.</li>
+<li>Forklar, hvorfor dibromvand ikke kan bruges til at skelne mellem de tre stoffer.</li>
+<li>Argumentér ud fra testresultaterne for, hvilket af stofferne A, B og C der er i glasset.</li>
+<li>En elev vil finde glasset med kanelalkohol ved kun at teste de tre glas med dichromat i sur opløsning. Vurdér elevens plan.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-34-contents" aria-controls="callout-34" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-34" class="callout-34-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>De tre stoffer A, B og C har alle en benzenring og en dobbeltbinding mellem to carbonatomer i kæden. Forskellen sidder for enden af kæden. Find den gruppe, der sidder for enden af kæden i hvert af de tre stoffer.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-35-contents" aria-controls="callout-35" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-35" class="callout-35-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Gå de tre testresultater igennem ét ad gangen, og skriv for hvert resultat, hvilke af stofferne A, B og C det udelukker: “Der kommer intet bundfald med DNPH, så stoffet har ikke en … Det udelukker …”</p>
+<p>Til spørgsmål d: dichromat i sur opløsning oxiderer primære og sekundære alkoholer, og dichromat oxiderer også aldehyder. Hvor mange af de tre glas vil blive grønne?</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-36-contents" aria-controls="callout-36" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-36" class="callout-36-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De tre stoffer har alle en dobbeltbinding mellem to carbonatomer i kæden, så de er alle alkener. Benzenringens dobbeltbindinger tæller ikke som alkener. For enden af kæden sidder der en gruppe, som er forskellig i de tre stoffer:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 60%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Gruppen for enden af kæden</th>
+<th style="text-align: left;">Stofklasse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">A, kanelaldehyd</td>
+<td style="text-align: left;">aldehydgruppe, −CHO</td>
+<td style="text-align: left;">aldehyd</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B, kanelsyre</td>
+<td style="text-align: left;">carboxylgruppe, −COOH</td>
+<td style="text-align: left;">carboxylsyre</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C, kanelalkohol</td>
+<td style="text-align: left;">hydroxygruppe, −OH, på et carbonatom med ét carbonatom som nabo</td>
+<td style="text-align: left;">primær alkohol</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Dibromvand bliver affarvet af stoffer med en dobbeltbinding mellem to carbonatomer. Kanelaldehyd, kanelsyre og kanelalkohol har alle den samme dobbeltbinding mellem de to carbonatomer i kæden ved siden af benzenringen. Dibrom adderer til dobbeltbindingen i alle tre stoffer, så den orange farve forsvinder i alle tre glas. Testen giver samme resultat for A, B og C og kan ikke skelne mellem dem.</p></li>
+<li><p>Der kommer intet bundfald med DNPH. Stoffet har altså ikke en carbonylgruppe i et aldehyd eller en keton. Det udelukker A, kanelaldehyd, som har en aldehydgruppe.</p></li>
+</ol>
+<p>Der kommer ingen bobler med natron. Stoffet er altså ikke en carboxylsyre. Det udelukker B, kanelsyre, som har en carboxylgruppe.</p>
+<p>Dichromat skifter fra orange til grøn. Stoffet bliver altså oxideret. Det passer med C, kanelalkohol, som er en primær alkohol: carbonatomet med hydroxygruppen har to hydrogenatomer og kan oxideres.</p>
+<p>Glasset indeholder C, kanelalkohol.</p>
+<ol start="4" type="a">
+<li>Planen kan ikke lade sig gøre. Dichromat i sur opløsning oxiderer den primære alkohol kanelalkohol, hvor carbonatomet i −CH<sub>2</sub>OH har oxidationstallet −I. Men dichromat oxiderer også aldehydet kanelaldehyd, hvor carbonatomet i −CHO stiger fra +I til +III og bliver til en carboxylgruppe. Farven skifter derfor fra orange til grøn både i glasset med kanelalkohol og i glasset med kanelaldehyd, og eleven kan ikke se, hvilket af de to glas der indeholder kanelalkohol.</li>
+</ol>
+<p>Eleven skal bruge en test mere, fx DNPH eller Tollens’ test. Glasset, der bliver grønt med dichromat, men ikke giver bundfald med DNPH og ikke giver sølvspejl i Tollens’ test, indeholder kanelalkohol.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.4.eks.5-duften-af-nyslået-græs" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.4.eks.5-duften-af-nyslået-græs">Opgave A3.4.eks.5: Duften af nyslået græs</h2>
+<p>Når en græsplæne bliver slået, danner de overskårne blade et stof, der dufter af nyslået græs. Stoffet kaldes her stof X. Det består af carbon, hydrogen og oxygen.</p>
+<p>En elementaranalyse viser, at stof X indeholder 71,95 % carbon, 12,08 % hydrogen og 15,98 % oxygen, målt i masseprocent. Molarmassen er 100,2 g/mol.</p>
+<p>Figuren viser fire stoffer, A, B, C og D, som alle har samme molekylformel som stof X.</p>
+<div id="fig-a3-opg-4-stof-x" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-4-stof-x-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-4-stof-x.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Figur&nbsp;8: Fire stoffer med samme molekylformel som stof X."><img src="../figurer/a3-opg-4-stof-x.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-4-stof-x-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;8: Fire stoffer med samme molekylformel som stof X.
+</figcaption>
+</figure>
+</div>
+<p>Tre prøver af stof X bliver testet:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Test</th>
+<th style="text-align: left;">Det ser man</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dibromvand</td>
+<td style="text-align: left;">den orange farve forsvinder</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DNPH</td>
+<td style="text-align: left;">intet bundfald</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">dichromat i sur opløsning</td>
+<td style="text-align: left;">farven skifter fra orange til grøn</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Bestem den empiriske formel for stof X.</li>
+<li>Bestem molekylformlen for stof X, og beregn antallet af dobbeltbindingsækvivalenter.</li>
+<li>Argumentér ud fra testresultaterne for, hvilket af stofferne A, B, C og D der er stof X.</li>
+<li>Opskriv reaktionsskemaet for reaktionen mellem stof X og dibrom, og angiv reaktionstypen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-37-contents" aria-controls="callout-37" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-37" class="callout-37-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug fremgangsmåden fra afsnit A3.1: regn på 100 g af stof X, find stofmængden af carbon, hydrogen og oxygen med <em>n</em> = <em>m</em> / <em>M</em>, og divider de tre stofmængder med den mindste af dem.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-38-contents" aria-controls="callout-38" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-38" class="callout-38-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I 100 g af stof X er der 71,95 g C, 12,08 g H og 15,98 g O. Molekylformlen findes ved at dividere molarmassen, 100,2 g/mol, med formelmassen for den empiriske formel.</p>
+<p>Til spørgsmål c: find først den funktionelle gruppe i hvert af de fire stoffer A, B, C og D. Gå derefter de tre testresultater igennem ét ad gangen, og skriv, hvilke af de fire stoffer hvert resultat udelukker: “Der kommer intet bundfald med DNPH, så stof X har ikke en … Det udelukker …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-39-contents" aria-controls="callout-39" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-39" class="callout-39-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>I 100 g af stof X er der 71,95 g C, 12,08 g H og 15,98 g O.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C</th>
+<th style="text-align: center;">H</th>
+<th style="text-align: center;">O</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>m</em> i g</td>
+<td style="text-align: center;">71,95</td>
+<td style="text-align: center;">12,08</td>
+<td style="text-align: center;">15,98</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>M</em> i g/mol</td>
+<td style="text-align: center;">12,01</td>
+<td style="text-align: center;">1,008</td>
+<td style="text-align: center;">16,00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>n</em> = <em>m</em> / <em>M</em> i mol</td>
+<td style="text-align: center;">5,991</td>
+<td style="text-align: center;">11,984</td>
+<td style="text-align: center;">0,999</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>n</em> divideret med 0,999 mol</td>
+<td style="text-align: center;">6,00</td>
+<td style="text-align: center;">12,00</td>
+<td style="text-align: center;">1,00</td>
+</tr>
+</tbody>
+</table>
+<p>Den mindste stofmængde er 0,999 mol. Divideres de tre stofmængder med den, bliver forholdet 6 : 12 : 1. Den empiriske formel for stof X er C<sub>6</sub>H<sub>12</sub>O.</p>
+<ol start="2" type="a">
+<li>Den empiriske formel C<sub>6</sub>H<sub>12</sub>O har formelmassen</li>
+</ol>
+<p><span class="math display">\[
+M_\mathrm{emp} = \left(6 \cdot 12{,}01 + 12 \cdot 1{,}008 + 16{,}00\right)\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 100{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}
+\]</span></p>
+<p>Molarmassen divideres med formelmassen:</p>
+<p><span class="math display">\[
+\frac{M}{M_\mathrm{emp}} = \frac{100{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}}{100{,}2\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 1{,}00
+\]</span></p>
+<p>Molekylformlen er den samme som den empiriske formel. Stof X har molekylformlen C<sub>6</sub>H<sub>12</sub>O.</p>
+<p><span class="math display">\[
+\mathrm{DBE} = \frac{2 \cdot 6 + 2 + 0 - 12}{2} = 1
+\]</span></p>
+<p>Stof X har én dobbeltbinding eller én ring.</p>
+<ol start="3" type="a">
+<li>Alle fire stoffer har én dobbeltbindingsækvivalent: A har en C=O i en aldehydgruppe, B har en C=O i en keton, C har en ring, og D har en dobbeltbinding mellem to carbonatomer.</li>
+</ol>
+<p>Dibromvand bliver affarvet. Stof X har altså en dobbeltbinding mellem to carbonatomer. Det passer kun med D. I A og B er dobbeltbindingen en C=O, og C har kun enkeltbindinger.</p>
+<p>Der kommer intet bundfald med DNPH. Stof X har altså ikke en carbonylgruppe i et aldehyd eller en keton. Det udelukker A, som er et aldehyd, og B, som er en keton.</p>
+<p>Dichromat skifter fra orange til grøn. Stof X bliver altså oxideret. Det passer med en primær eller sekundær alkohol, altså C eller D. Aldehydet A ville også blive oxideret af dichromat, men A er udelukket af testen med DNPH. D har en hydroxygruppe på det yderste carbonatom i kæden og er en primær alkohol.</p>
+<p>Alle tre resultater passer med D, og ingen af de tre andre stoffer passer med dem alle. Stof X er D, hex-3-en-1-ol. Figuren viser cis-formen, som er den, planterne danner. Stoffet kaldes også bladalkohol.</p>
+<ol start="4" type="a">
+<li>Dibrom adderer til dobbeltbindingen mellem carbonatom nr. 3 og nr. 4 i hex-3-en-1-ol:</li>
+</ol>
+<div class="reaktion">
+<p>CH<sub>3</sub>CH<sub>2</sub>CH=CHCH<sub>2</sub>CH<sub>2</sub>OH + Br<sub>2</sub> → CH<sub>3</sub>CH<sub>2</sub>CHBrCHBrCH<sub>2</sub>CH<sub>2</sub>OH</p>
+</div>
+<p>Reaktionen er en addition. Dobbeltbindingen mellem de to carbonatomer er blevet til en enkeltbinding, og hvert af de to carbonatomer har fået et bromatom. Hydroxygruppen er uændret.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a3-4-kemisk-analyse.html" class="pagination-link" aria-label="A3.4 Kemisk analyse">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A3.4 Kemisk analyse</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="pagination-link" aria-label="A3.5 Optisk aktivitet og polarimeteret">
+        <span class="nav-page-text">A3.5 Optisk aktivitet og polarimeteret</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

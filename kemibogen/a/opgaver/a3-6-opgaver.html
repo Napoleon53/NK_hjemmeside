@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A3.6 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../bilag/termodynamiske-data.html" rel="next">
+<link href="../kapitler/a3-6-polaritet-og-log-d.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-6-opgaver.html">Opgaver til A3.6</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a3.6.1-polaritetsanalyse-af-thymol" id="toc-opgave-a3.6.1-polaritetsanalyse-af-thymol" class="nav-link active" data-scroll-target="#opgave-a3.6.1-polaritetsanalyse-af-thymol">Opgave A3.6.1: Polaritetsanalyse af thymol</a></li>
+  <li><a href="#opgave-a3.6.2-fordelingsligevægten-for-koffein" id="toc-opgave-a3.6.2-fordelingsligevægten-for-koffein" class="nav-link" data-scroll-target="#opgave-a3.6.2-fordelingsligevægten-for-koffein">Opgave A3.6.2: Fordelingsligevægten for koffein</a></li>
+  <li><a href="#opgave-a3.6.3-fordelingskonstant-eller-fordelingsforhold" id="toc-opgave-a3.6.3-fordelingskonstant-eller-fordelingsforhold" class="nav-link" data-scroll-target="#opgave-a3.6.3-fordelingskonstant-eller-fordelingsforhold">Opgave A3.6.3: Fordelingskonstant eller fordelingsforhold?</a></li>
+  <li><a href="#opgave-a3.6.4-log-d-for-en-syre" id="toc-opgave-a3.6.4-log-d-for-en-syre" class="nav-link" data-scroll-target="#opgave-a3.6.4-log-d-for-en-syre">Opgave A3.6.4: Log <em>D</em> for en syre</a></li>
+  <li><a href="#opgave-a3.6.5-log-d-for-en-base" id="toc-opgave-a3.6.5-log-d-for-en-base" class="nav-link" data-scroll-target="#opgave-a3.6.5-log-d-for-en-base">Opgave A3.6.5: Log <em>D</em> for en base</a></li>
+  <li><a href="#opgave-a3.6.6-aflæs-og-skitsér-kurver-for-log-d" id="toc-opgave-a3.6.6-aflæs-og-skitsér-kurver-for-log-d" class="nav-link" data-scroll-target="#opgave-a3.6.6-aflæs-og-skitsér-kurver-for-log-d">Opgave A3.6.6: Aflæs og skitsér kurver for log <em>D</em></a></li>
+  <li><a href="#opgave-a3.6.7-vanillin-i-skilletragten" id="toc-opgave-a3.6.7-vanillin-i-skilletragten" class="nav-link" data-scroll-target="#opgave-a3.6.7-vanillin-i-skilletragten">Opgave A3.6.7: Vanillin i skilletragten</a></li>
+  <li><a href="#opgave-a3.6.8-rækkefølgen-i-chromatografi" id="toc-opgave-a3.6.8-rækkefølgen-i-chromatografi" class="nav-link" data-scroll-target="#opgave-a3.6.8-rækkefølgen-i-chromatografi">Opgave A3.6.8: Rækkefølgen i chromatografi</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a3.6.eks.1-ibuprofen" id="toc-opgave-a3.6.eks.1-ibuprofen" class="nav-link" data-scroll-target="#opgave-a3.6.eks.1-ibuprofen">Opgave A3.6.eks.1: Ibuprofen</a></li>
+  <li><a href="#opgave-a3.6.eks.2-efedrin" id="toc-opgave-a3.6.eks.2-efedrin" class="nav-link" data-scroll-target="#opgave-a3.6.eks.2-efedrin">Opgave A3.6.eks.2: Efedrin</a></li>
+  <li><a href="#opgave-a3.6.eks.3-kanelsyre-og-kanelaldehyd" id="toc-opgave-a3.6.eks.3-kanelsyre-og-kanelaldehyd" class="nav-link" data-scroll-target="#opgave-a3.6.eks.3-kanelsyre-og-kanelaldehyd">Opgave A3.6.eks.3: Kanelsyre og kanelaldehyd</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a3-1-elementaranalyse.html">Kapitel A3: Organisk kemi og naturstoffer</a></li><li class="breadcrumb-item"><a href="../opgaver/a3-6-opgaver.html">Opgaver til A3.6</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A3.6</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a3-6-polaritet-og-log-d.html">A3.6 Polaritet og log D</a>. Prøv selv, før du åbner hjælpen under opgaven.</p>
+<section id="opgave-a3.6.1-polaritetsanalyse-af-thymol" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.1-polaritetsanalyse-af-thymol">Opgave A3.6.1: Polaritetsanalyse af thymol</h2>
+<p>Thymol giver timian dens duft og bruges i mundskyl, fordi det dræber bakterier. Figuren viser strukturen af thymol.</p>
+<div id="fig-a3-opg-6-thymol" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-thymol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-thymol.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Strukturen af thymol."><img src="../figurer/a3-opg-6-thymol.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-thymol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Strukturen af thymol.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv de polære bindinger i thymol.</li>
+<li>Angiv de upolære dele af thymol, og tæl carbonatomerne i dem.</li>
+<li>Vurdér, om thymol samlet er mest polært eller mest upolært. Brug tommelfingerreglen om, at én polær gruppe kan trække omkring fire carbonatomer med ned i vand.</li>
+<li>For thymol er log <em>P</em> = 3,3. Forklar, hvad tallet fortæller, og om det passer med din polaritetsanalyse.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug tabellen med polære og upolære dele i afsnit A3.6. Bindingerne O−H og C−O er polære. Bindingerne C−C og C−H er upolære, så benzenringen og carbonkæderne er upolære. I en zigzagformel er hvert knæk og hver ende et carbonatom.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Thymol har én polær gruppe: hydroxygruppen på benzenringen. Tæl carbonatomerne i benzenringen og i de to sidegrupper, og sammenlign med de omkring fire carbonatomer, én polær gruppe kan bære.</p>
+<p>Log <em>P</em> er logaritmen til fordelingskonstanten, så <em>P</em> = 10<sup>log&nbsp;<em>P</em></sup>. Fordelingskonstanten fortæller, hvor mange gange større koncentrationen af thymol er i octan-1-ol end i vand.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>De polære bindinger i thymol er bindingen O−H og bindingen C−O i hydroxygruppen på benzenringen. Hydroxygruppen kan danne hydrogenbindinger til vand.</p></li>
+<li><p>De upolære dele af thymol er benzenringen med 6 carbonatomer, methylgruppen med 1 carbonatom og sidegruppen med 3 carbonatomer. I alt er der 10 carbonatomer, og bindingerne C−C og C−H mellem dem er upolære.</p></li>
+<li><p>Thymol har én polær gruppe, som kan trække omkring fire carbonatomer med ned i vand, men molekylet har 10 carbonatomer. De upolære dele vejer tungest, så thymol er overvejende upolært. Thymol opløses dårligt i vand og godt i fedt og olie.</p></li>
+<li><p>Fordelingskonstanten for thymol er</p></li>
+</ol>
+<p><span class="math display">\[
+P = 10^{3{,}3} = 2{,}0 \cdot 10^{3}
+\]</span></p>
+<p>Når thymol fordeler sig mellem octan-1-ol og vand, er koncentrationen af thymol altså omkring 2000 gange så stor i octan-1-ol som i vandet. Det passer med polaritetsanalysen: thymol er overvejende upolært og foretrækker det upolære lag.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.2-fordelingsligevægten-for-koffein" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.2-fordelingsligevægten-for-koffein">Opgave A3.6.2: Fordelingsligevægten for koffein</h2>
+<p>Koffein fra kaffe rystes med vand og octan-1-ol i en skilletragt. Når fordelingsligevægten har indstillet sig, er koncentrationen af koffein 0,0100 M i vandlaget og 0,0079 M i laget af octan-1-ol.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for fordelingsligevægten for koffein.</li>
+<li>Opskriv udtrykket for fordelingskonstanten, og beregn fordelingskonstanten for koffein.</li>
+<li>Beregn log <em>P</em> for koffein.</li>
+<li>Udfyld tabellen.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: center;">log <em>P</em></th>
+<th style="text-align: center;"><em>P</em></th>
+<th style="text-align: left;">Hvor er koncentrationen størst?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ethanol</td>
+<td style="text-align: center;">−0,3</td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">morfin</td>
+<td style="text-align: center;">0,9</td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lidocain</td>
+<td style="text-align: center;">2,4</td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ibuprofen</td>
+<td style="text-align: center;">4,0</td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Fordelingsligevægten for koffein har koffein i vand til venstre og koffein i octan-1-ol til højre. Fordelingskonstanten er koncentrationen af koffein i octan-1-ol divideret med koncentrationen af koffein i vand. Se, hvordan ligevægten og konstanten er skrevet op for stoffet HA i afsnit A3.6.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Log <em>P</em> er logaritmen til fordelingskonstanten. Den omvendte vej er <em>P</em> = 10<sup>log&nbsp;<em>P</em></sup>, på samme måde som [H<sub>3</sub>O<sup>+</sup>] findes ud fra pH. For morfin er <em>P</em> = 10<sup>0,9</sup>.</p>
+<p>Er <em>P</em> større end 1, er koncentrationen størst i octan-1-ol. Er <em>P</em> mindre end 1, er koncentrationen størst i vandet.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Fordelingsligevægten for koffein er</li>
+</ol>
+<div class="reaktion">
+<p>koffein(aq) ⇌ koffein(octan-1-ol)</p>
+</div>
+<ol start="2" type="a">
+<li>Fordelingskonstanten er koncentrationen af koffein i octan-1-ol divideret med koncentrationen af koffein i vand:</li>
+</ol>
+<p><span class="math display">\[
+K_\mathrm{F} = P = \frac{[\mathrm{koffein(octan\text{-}1\text{-}ol)}]}{[\mathrm{koffein(aq)}]} = \frac{0{,}0079\ \mathrm{M}}{0{,}0100\ \mathrm{M}} = 0{,}79
+\]</span></p>
+<ol start="3" type="a">
+<li>Log <em>P</em> for koffein er</li>
+</ol>
+<p><span class="math display">\[
+\log P = \log(0{,}79) = -0{,}10
+\]</span></p>
+<p>Fordelingskonstanten er lidt mindre end 1, og log <em>P</em> er lidt mindre end 0. Der er næsten lige meget koffein i de to lag, men lidt mere i vandet.</p>
+<ol start="4" type="a">
+<li>Fordelingskonstanten findes som <em>P</em> = 10<sup>log&nbsp;<em>P</em></sup>.</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 9%">
+<col style="width: 62%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: center;">log <em>P</em></th>
+<th style="text-align: center;"><em>P</em></th>
+<th style="text-align: left;">Hvor er koncentrationen størst?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ethanol</td>
+<td style="text-align: center;">−0,3</td>
+<td style="text-align: center;">0,50</td>
+<td style="text-align: left;">i vandet, dobbelt så stor som i octan-1-ol</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">morfin</td>
+<td style="text-align: center;">0,9</td>
+<td style="text-align: center;">7,9</td>
+<td style="text-align: left;">i octan-1-ol, 8 gange så stor som i vandet</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lidocain</td>
+<td style="text-align: center;">2,4</td>
+<td style="text-align: center;">2,5 · 10<sup>2</sup></td>
+<td style="text-align: left;">i octan-1-ol, 250 gange så stor som i vandet</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ibuprofen</td>
+<td style="text-align: center;">4,0</td>
+<td style="text-align: center;">1,0 · 10<sup>4</sup></td>
+<td style="text-align: left;">i octan-1-ol, 10 000 gange så stor som i vandet</td>
+</tr>
+</tbody>
+</table>
+<p>Tallene gælder for den uladede form af hvert stof.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.3-fordelingskonstant-eller-fordelingsforhold" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.3-fordelingskonstant-eller-fordelingsforhold">Opgave A3.6.3: Fordelingskonstant eller fordelingsforhold?</h2>
+<p>Fordelingskonstanten, <em>K</em><sub>F</sub> eller <em>P</em>, og fordelingsforholdet, <em>D</em>, ligner hinanden, men de er ikke det samme.</p>
+<ol type="a">
+<li>Udfyld tabellen med ja eller nej.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">Fordelingskonstanten, <em>K</em><sub>F</sub> eller <em>P</em></th>
+<th style="text-align: center;">Fordelingsforholdet, <em>D</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Tæller kun den uladede form af stoffet med</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tæller alle former af stoffet med</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Afhænger af vandlagets pH</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Er en ligevægtskonstant</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li>Koffein har ingen grupper, der afgiver eller optager en hydron mellem pH 1 og pH 13. For koffein er log <em>P</em> = −0,1. Hvad er log <em>D</em> for koffein ved pH 2,0 og ved pH 9,0? Begrund svaret.</li>
+<li>For syren acetylsalicylsyre er p<em>K</em><sub>s</sub> = 3,5 og log <em>P</em> = 1,2. Ved pH 6,5, som i tyndtarmen, er log <em>D</em> = −1,8. Forklar, hvorfor log <em>D</em> er mindre end log <em>P</em> ved pH 6,5.</li>
+<li>Kan log <em>D</em> for et stof blive større end stoffets log <em>P</em>? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet “Fordelingsforholdet” i afsnit A3.6. Fordelingskonstanten gælder for én bestemt form af stoffet, den uladede. Fordelingsforholdet er forholdet mellem stoffets formelle koncentration i de to lag, og i den formelle koncentration tæller både syreformen og baseformen med.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For en syre er <em>D</em> = <em>K</em><sub>F</sub> · <em>x</em><sub>s</sub>, hvor syrebrøken, <em>x</em><sub>s</sub>, er den del af stoffet i vandlaget, der er på den uladede syreform. En brøk kan højst være 1.</p>
+<p>Du kan begynde forklaringen om acetylsalicylsyre sådan: “Ved pH 6,5 er pH meget højere end p<em>K</em><sub>s</sub> for acetylsalicylsyre, så næsten al acetylsalicylsyre i vandlaget er på …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Tabellen viser forskellene på fordelingskonstanten og fordelingsforholdet.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">Fordelingskonstanten, <em>K</em><sub>F</sub> eller <em>P</em></th>
+<th style="text-align: center;">Fordelingsforholdet, <em>D</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Tæller kun den uladede form af stoffet med</td>
+<td style="text-align: center;">ja</td>
+<td style="text-align: center;">nej</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tæller alle former af stoffet med</td>
+<td style="text-align: center;">nej</td>
+<td style="text-align: center;">ja</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Afhænger af vandlagets pH</td>
+<td style="text-align: center;">nej</td>
+<td style="text-align: center;">ja</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Er en ligevægtskonstant</td>
+<td style="text-align: center;">ja</td>
+<td style="text-align: center;">nej</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Log <em>D</em> for koffein er −0,1 ved både pH 2,0 og pH 9,0. Koffein hverken afgiver eller optager en hydron ved de to pH-værdier, så koffein findes kun på én form, som er uladet. Når der kun er én form, er <em>D</em> = <em>P</em> ved alle pH-værdier, og log <em>D</em> = log <em>P</em> = −0,1.</p></li>
+<li><p>Acetylsalicylsyre er en syre med p<em>K</em><sub>s</sub> = 3,5. Ved pH 6,5 er pH meget højere end p<em>K</em><sub>s</sub>, så næsten al acetylsalicylsyre i vandlaget er på baseformen, som er en negativ ion. Ionen bliver i vandet, og kun den lille del, der er på den uladede syreform, kan gå over i octan-1-ol. Fordelingsforholdet tæller begge former i vandlaget med, så <em>D</em> bliver meget mindre end <em>P</em>. Forskellen mellem log <em>P</em> = 1,2 og log <em>D</em> = −1,8 er 3,0, så <em>D</em> er 1000 gange mindre end <em>P</em>. Det svarer til, at syrebrøken for acetylsalicylsyre er 0,001 ved pH 6,5.</p></li>
+<li><p>Nej. For en syre er <em>D</em> = <em>K</em><sub>F</sub> · <em>x</em><sub>s</sub>, og for en base er <em>D</em> = <em>K</em><sub>F</sub> · <em>x</em><sub>b</sub>. En syrebrøk eller basebrøk kan højst være 1, så <em>D</em> kan højst blive lig med <em>K</em><sub>F</sub>. Log <em>D</em> kan derfor højst blive lig med log <em>P</em>, og det sker, når hele stoffet er på den uladede form.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.4-log-d-for-en-syre" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.4-log-d-for-en-syre">Opgave A3.6.4: Log <em>D</em> for en syre</h2>
+<p>Sorbinsyre, CH<sub>3</sub>CH=CHCH=CHCOOH, findes i rønnebær og bruges som konserveringsmiddel i vin og ost. Kun den uladede syreform af sorbinsyre kan gå gennem cellemembranen i en skimmelsvamp og standse svampens vækst. For sorbinsyre er p<em>K</em><sub>s</sub> = 4,76 og log <em>P</em> = 1,3.</p>
+<ol type="a">
+<li>Beregn syrebrøken for sorbinsyre ved pH 3,5, som i vin, og ved pH 5,5, som i ost.</li>
+<li>Beregn log <em>D</em> for sorbinsyre ved pH 3,5 og ved pH 5,5.</li>
+<li>I hvilken af de to fødevarer virker sorbinsyre bedst som konserveringsmiddel? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Syrebrøken for sorbinsyre beregnes med formlen fra <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html">afsnit A1.7</a>: <em>x</em><sub>s</sub> = 1 / (1 + 10<sup>pH&nbsp;−&nbsp;p<em>K</em><sub>s</sub></sup>). For en syre er log <em>D</em> = log <em>P</em> + log <em>x</em><sub>s</sub>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Regn først eksponenten ud for sorbinsyre. Ved pH 3,5 er pH − p<em>K</em><sub>s</sub> = 3,5 − 4,76 = −1,26. Ved pH 5,5 er pH − p<em>K</em><sub>s</sub> = 5,5 − 4,76 = 0,74.</p>
+<p>Logaritmen til en brøk mellem 0 og 1 er negativ, så log <em>D</em> bliver mindre end log <em>P</em>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Syrebrøken for sorbinsyre ved pH 3,5:</li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,3{,}5 - 4{,}76}} = 0{,}948
+\]</span></p>
+<p>Syrebrøken for sorbinsyre ved pH 5,5:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,5{,}5 - 4{,}76}} = 0{,}154
+\]</span></p>
+<ol start="2" type="a">
+<li>Ved pH 3,5:</li>
+</ol>
+<p><span class="math display">\[
+\log D = \log P + \log x_\mathrm{s} = 1{,}3 + \log(0{,}948) = 1{,}3 - 0{,}02 = 1{,}3
+\]</span></p>
+<p>Ved pH 5,5:</p>
+<p><span class="math display">\[
+\log D = 1{,}3 + \log(0{,}154) = 1{,}3 - 0{,}81 = 0{,}5
+\]</span></p>
+<ol start="3" type="a">
+<li>Sorbinsyre virker bedst i vin. Ved pH 3,5 er 95 % af sorbinsyren på den uladede syreform, og log <em>D</em> er 1,3, næsten lig med log <em>P</em>. Ved pH 5,5 i ost er kun 15 % af sorbinsyren på syreformen. Resten er på baseformen, som er en ion og ikke kan gå gennem svampens cellemembran, og log <em>D</em> er faldet til 0,5. Der skal derfor mere sorbinsyre til i ost end i vin for at få samme virkning.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.5-log-d-for-en-base" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.5-log-d-for-en-base">Opgave A3.6.5: Log <em>D</em> for en base</h2>
+<p>Lidocain er det lokalbedøvende middel, tandlægen sprøjter ind ved en tand. Lidocain er en base med en aminogruppe. Den korresponderende syre har p<em>K</em><sub>s</sub> = 7,9, og for lidocain er log <em>P</em> = 2,4. Lidocain skal gennem nervecellens membran for at virke.</p>
+<ol type="a">
+<li>Hvilken form af lidocain er uladet: syreformen eller baseformen?</li>
+<li>Beregn basebrøken og log <em>D</em> for lidocain ved pH 7,4, som er pH i rask væv.</li>
+<li>I betændt væv kan pH falde til omkring 6,0. Beregn basebrøken og log <em>D</em> for lidocain ved pH 6,0.</li>
+<li>Tandlæger oplever, at bedøvelsen virker dårligere i betændt væv. Forklar hvorfor.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>En aminogruppe optager en hydron og bliver positivt ladet. For en base som lidocain er det derfor baseformen, der kan gå over i octan-1-ol. Basebrøken beregnes med <em>x</em><sub>b</sub> = 1 / (1 + 10<sup>p<em>K</em><sub>s</sub>&nbsp;−&nbsp;pH</sup>), og for en base er log <em>D</em> = log <em>P</em> + log <em>x</em><sub>b</sub>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Regn først eksponenten ud for lidocain. Ved pH 7,4 er p<em>K</em><sub>s</sub> − pH = 7,9 − 7,4 = 0,5. Ved pH 6,0 er p<em>K</em><sub>s</sub> − pH = 7,9 − 6,0 = 1,9.</p>
+<p>Du kan begynde forklaringen sådan: “I betændt væv er pH lavere, så en større del af lidocain er på …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Baseformen af lidocain er uladet. Syreformen har optaget en hydron på aminogruppen og er en positiv ion.</p></li>
+<li><p>Ved pH 7,4:</p></li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{b} = \frac{1}{1 + 10^{\,7{,}9 - 7{,}4}} = 0{,}240
+\]</span></p>
+<p><span class="math display">\[
+\log D = \log P + \log x_\mathrm{b} = 2{,}4 + \log(0{,}240) = 2{,}4 - 0{,}62 = 1{,}8
+\]</span></p>
+<ol start="3" type="a">
+<li>Ved pH 6,0:</li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{b} = \frac{1}{1 + 10^{\,7{,}9 - 6{,}0}} = 0{,}0124
+\]</span></p>
+<p><span class="math display">\[
+\log D = 2{,}4 + \log(0{,}0124) = 2{,}4 - 1{,}91 = 0{,}5
+\]</span></p>
+<ol start="4" type="a">
+<li>I rask væv med pH 7,4 er 24 % af lidocain på den uladede baseform, og log <em>D</em> er 1,8. I betændt væv med pH 6,0 er kun omkring 1 % af lidocain på baseformen. Resten er på syreformen, som er en positiv ion og ikke kan gå gennem nervecellens membran. Log <em>D</em> er faldet fra 1,8 til 0,5, så lidocain har meget sværere ved at komme ind i nervecellen. Derfor virker bedøvelsen dårligere i betændt væv.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.6-aflæs-og-skitsér-kurver-for-log-d" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.6-aflæs-og-skitsér-kurver-for-log-d">Opgave A3.6.6: Aflæs og skitsér kurver for log <em>D</em></h2>
+<p>Figuren viser log <em>D</em> som funktion af pH for to lægemidler, stof A og stof B. De to stoffer er blandt de fire i tabellen. For baserne er p<em>K</em><sub>s</sub> den korresponderende syres p<em>K</em><sub>s</sub>.</p>
+<div id="fig-a3-opg-6-to-kurver" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-to-kurver-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-to-kurver.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Log D som funktion af pH for stof A og stof B."><img src="../figurer/a3-opg-6-to-kurver.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-to-kurver-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Log <em>D</em> som funktion af pH for stof A og stof B.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Syre eller base</th>
+<th style="text-align: center;">p<em>K</em><sub>s</sub></th>
+<th style="text-align: center;">log <em>P</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">salicylsyre</td>
+<td style="text-align: left;">syre</td>
+<td style="text-align: center;">3,0</td>
+<td style="text-align: center;">2,3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ibuprofen</td>
+<td style="text-align: left;">syre</td>
+<td style="text-align: center;">4,4</td>
+<td style="text-align: center;">4,0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">lidocain</td>
+<td style="text-align: left;">base</td>
+<td style="text-align: center;">7,9</td>
+<td style="text-align: center;">2,4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">amfetamin</td>
+<td style="text-align: left;">base</td>
+<td style="text-align: center;">9,9</td>
+<td style="text-align: center;">1,8</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Afgør for stof A og for stof B, om stoffet er en syre eller en base. Begrund svaret ud fra kurvens form.</li>
+<li>Aflæs log <em>P</em> for stof A og for stof B.</li>
+<li>Aflæs p<em>K</em><sub>s</sub> for stof A og for den korresponderende syre til stof B.</li>
+<li>Hvilke to stoffer i tabellen er stof A og stof B?</li>
+<li>Paracetamol er en svag syre med p<em>K</em><sub>s</sub> = 9,5 og log <em>P</em> = 0,5. Skitsér kurven for log <em>D</em> for paracetamol fra pH 0 til pH 14.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Brug tabellen over kurven for en syre og kurven for en base i afsnit A3.6. Kurven er vandret, hvor stoffet er uladet: ved lav pH for en syre og ved høj pH for en base. På det vandrette stykke er log <em>D</em> = log <em>P</em>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Kurven knækker omkring p<em>K</em><sub>s</sub>. Læg en lineal langs det vandrette stykke og en langs det skrå stykke. De to linjer skærer hinanden ved pH = p<em>K</em><sub>s</sub>.</p>
+<p>Til skitsen af kurven for paracetamol: tegn en vandret linje i højden log <em>P</em> = 0,5 fra pH 0 til p<em>K</em><sub>s</sub> = 9,5. Derfra falder kurven med 1 for hver pH-enhed opad. Rund hjørnet ved knækket.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Stof A er en syre. Kurven for stof A er vandret ved lav pH, hvor en syre er uladet, og falder ved høj pH, hvor syren er blevet til en negativ ion. Stof B er en base. Kurven for stof B er vandret ved høj pH, hvor en base er uladet, og falder ved lav pH, hvor basen har optaget en hydron og er en positiv ion.</p></li>
+<li><p>På det vandrette stykke er log <em>D</em> = log <em>P</em>. For stof A er log <em>P</em> omkring 2,3, og for stof B er log <em>P</em> omkring 1,8.</p></li>
+<li><p>Kurven for stof A knækker omkring pH 3, så p<em>K</em><sub>s</sub> for stof A er omkring 3. Kurven for stof B knækker omkring pH 10, så p<em>K</em><sub>s</sub> for den korresponderende syre til stof B er omkring 10.</p></li>
+<li><p>Stof A er salicylsyre, som er en syre med p<em>K</em><sub>s</sub> = 3,0 og log <em>P</em> = 2,3. Stof B er amfetamin, som er en base med p<em>K</em><sub>s</sub> = 9,9 og log <em>P</em> = 1,8.</p></li>
+<li><p>Kurven for paracetamol er vandret i højden 0,5 fra pH 0 til omkring pH 9, knækker omkring pH 9,5 og falder derefter med 1 for hver pH-enhed. Ved pH 14 er log <em>D</em> omkring −4.</p></li>
+</ol>
+<div id="fig-a3-opg-6-paracetamol-kurve" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-paracetamol-kurve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-paracetamol-kurve.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: Log D som funktion af pH for paracetamol."><img src="../figurer/a3-opg-6-paracetamol-kurve.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-paracetamol-kurve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: Log <em>D</em> som funktion af pH for paracetamol.
+</figcaption>
+</figure>
+</div>
+<p>Paracetamol er uladet ved alle de pH-værdier, der findes i kroppen, fordi p<em>K</em><sub>s</sub> er så høj som 9,5.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.7-vanillin-i-skilletragten" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.7-vanillin-i-skilletragten">Opgave A3.6.7: Vanillin i skilletragten</h2>
+<p>Vanillin giver vanilje dens smag. Vanillin har en hydroxygruppe på en benzenring og er derfor en svag syre. Aldehydgruppen på ringen gør vanillin til en stærkere syre end de fleste phenoler: p<em>K</em><sub>s</sub> = 7,4. For vanillin er log <em>P</em> = 1,2.</p>
+<p>Figuren viser vanillin og to skilletragte med et organisk opløsningsmiddel øverst og vand nederst. I tragt 1 har vandlaget pH 4,0, og i tragt 2 har vandlaget pH 10,4. Regn med, at vanillin fordeler sig mellem det organiske opløsningsmiddel og vand på samme måde som mellem octan-1-ol og vand.</p>
+<div id="fig-a3-opg-6-vanillin-tragte" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-vanillin-tragte-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-vanillin-tragte.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figur&nbsp;4: Vanillin og to skilletragte, hvor vandlaget har pH 4,0 og pH 10,4."><img src="../figurer/a3-opg-6-vanillin-tragte.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-vanillin-tragte-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;4: Vanillin og to skilletragte, hvor vandlaget har pH 4,0 og pH 10,4.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Hvilken form er vanillin mest på ved pH 4,0, og hvilken form er vanillin mest på ved pH 10,4?</li>
+<li>Beregn log <em>D</em> for vanillin ved pH 4,0 og ved pH 10,4.</li>
+<li>I hvilket af lagene A og B er der mest vanillin i tragt 1? I hvilket af lagene C og D er der mest vanillin i tragt 2?</li>
+<li>Et vaniljeudtræk indeholder vanillin og et fedtstof, som er neutralt og upolært. Beskriv, hvordan vanillin kan skilles fra fedtstoffet med en skilletragt.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign pH med p<em>K</em><sub>s</sub> for vanillin, som er 7,4. Er pH lavere end p<em>K</em><sub>s</sub>, sidder hydronen på hydroxygruppen, og vanillin er på den uladede syreform. Er pH højere end p<em>K</em><sub>s</sub>, er hydronen afgivet, og vanillin er en negativ ion. Vanillin er en syre, så log <em>D</em> = log <em>P</em> + log <em>x</em><sub>s</sub>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved pH 4,0 er pH − p<em>K</em><sub>s</sub> = 4,0 − 7,4 = −3,4, og ved pH 10,4 er pH − p<em>K</em><sub>s</sub> = 10,4 − 7,4 = 3,0. Er log <em>D</em> over 0, er der mest vanillin i det organiske lag. Er log <em>D</em> under 0, er der mest vanillin i vandlaget.</p>
+<p>Til spørgsmål d: fedtstoffet har ingen syre- eller basegruppe, så fedtstoffet bliver i det organiske lag ved alle pH-værdier. Du kan begynde sådan: “Vaniljeudtrækket rystes med et organisk opløsningsmiddel og vand med pH …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Ved pH 4,0 er pH lavere end p<em>K</em><sub>s</sub> = 7,4, så vanillin er mest på syreformen med −OH på benzenringen. Syreformen er uladet. Ved pH 10,4 er pH højere end p<em>K</em><sub>s</sub>, så vanillin er mest på baseformen med −O<sup>−</sup> på benzenringen. Baseformen er en negativ ion.</p></li>
+<li><p>Ved pH 4,0:</p></li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,4{,}0 - 7{,}4}} = 1{,}00
+\]</span></p>
+<p><span class="math display">\[
+\log D = \log P + \log x_\mathrm{s} = 1{,}2 + \log(1{,}00) = 1{,}2
+\]</span></p>
+<p>Ved pH 10,4:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,10{,}4 - 7{,}4}} = 1{,}0 \cdot 10^{-3}
+\]</span></p>
+<p><span class="math display">\[
+\log D = 1{,}2 + \log\left(1{,}0 \cdot 10^{-3}\right) = 1{,}2 - 3{,}0 = -1{,}8
+\]</span></p>
+<ol start="3" type="a">
+<li><p>I tragt 1 er log <em>D</em> = 1,2, som er over 0, så der er mest vanillin i det organiske lag, lag A. I tragt 2 er log <em>D</em> = −1,8, som er under 0, så der er mest vanillin i vandlaget, lag D.</p></li>
+<li><p>Vaniljeudtrækket rystes i en skilletragt med et organisk opløsningsmiddel og vand, der er gjort basisk til omkring pH 10,4. Ved pH 10,4 er vanillin en negativ ion med log <em>D</em> = −1,8 og går over i vandlaget. Fedtstoffet er neutralt og upolært og bliver i det organiske lag. Vandlaget med vanillin tappes af. Derefter gøres vandlaget surt, fx til pH 4,0. Så er vanillin igen på den uladede syreform med log <em>D</em> = 1,2. Vandlaget rystes med en ny portion organisk opløsningsmiddel, og vanillin går over i det organiske lag. Til sidst kan opløsningsmidlet dampes af, så der er ren vanillin tilbage.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.8-rækkefølgen-i-chromatografi" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.8-rækkefølgen-i-chromatografi">Opgave A3.6.8: Rækkefølgen i chromatografi</h2>
+<p>Et laboratorium kontrollerer smertestillende tabletter. En prøve indeholder de tre lægemidler acetylsalicylsyre, paracetamol og ibuprofen. De tre stoffer skal skilles ad ved chromatografi med en upolær stationær fase og en vandig mobil fase.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Syre eller base</th>
+<th style="text-align: center;">p<em>K</em><sub>s</sub></th>
+<th style="text-align: center;">log <em>P</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">acetylsalicylsyre</td>
+<td style="text-align: left;">syre med en carboxylgruppe</td>
+<td style="text-align: center;">3,5</td>
+<td style="text-align: center;">1,2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">paracetamol</td>
+<td style="text-align: left;">svag syre med en phenolgruppe</td>
+<td style="text-align: center;">9,5</td>
+<td style="text-align: center;">0,5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ibuprofen</td>
+<td style="text-align: left;">syre med en carboxylgruppe</td>
+<td style="text-align: center;">4,4</td>
+<td style="text-align: center;">4,0</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Bestem den rækkefølge, de tre stoffer kommer ud af kolonnen i, når den mobile fase har pH 3,0.</li>
+<li>Bestem den rækkefølge, de tre stoffer kommer ud af kolonnen i, når den mobile fase har pH 7,0.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Med en upolær stationær fase hænger upolære stoffer længst fast. Det stof, der har den laveste log <em>D</em> ved den mobile fases pH, kommer derfor først ud, og stoffet med den højeste log <em>D</em> kommer sidst ud. Du skal altså finde log <em>D</em> for acetylsalicylsyre, paracetamol og ibuprofen ved pH 3,0 og ved pH 7,0.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For paracetamol er både pH 3,0 og pH 7,0 langt under p<em>K</em><sub>s</sub> = 9,5, så paracetamol er uladet, og log <em>D</em> = log <em>P</em> = 0,5. For acetylsalicylsyre og ibuprofen skal du beregne syrebrøken, <em>x</em><sub>s</sub> = 1 / (1 + 10<sup>pH&nbsp;−&nbsp;p<em>K</em><sub>s</sub></sup>), og log <em>D</em> = log <em>P</em> + log <em>x</em><sub>s</sub> ved begge pH-værdier.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Paracetamol har p<em>K</em><sub>s</sub> = 9,5. Både pH 3,0 og pH 7,0 ligger langt under p<em>K</em><sub>s</sub>, så paracetamol er på den uladede syreform, og log <em>D</em> = log <em>P</em> = 0,5 ved begge pH-værdier.</p>
+<p>Acetylsalicylsyre ved pH 3,0:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,3{,}0 - 3{,}5}} = 0{,}760 \qquad\qquad \log D = 1{,}2 + \log(0{,}760) = 1{,}2 - 0{,}12 = 1{,}1
+\]</span></p>
+<p>Acetylsalicylsyre ved pH 7,0:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,7{,}0 - 3{,}5}} = 3{,}2 \cdot 10^{-4} \qquad\qquad \log D = 1{,}2 + \log\left(3{,}2 \cdot 10^{-4}\right) = 1{,}2 - 3{,}5 = -2{,}3
+\]</span></p>
+<p>Ibuprofen ved pH 3,0:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,3{,}0 - 4{,}4}} = 0{,}962 \qquad\qquad \log D = 4{,}0 + \log(0{,}962) = 4{,}0 - 0{,}02 = 4{,}0
+\]</span></p>
+<p>Ibuprofen ved pH 7,0:</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,7{,}0 - 4{,}4}} = 2{,}5 \cdot 10^{-3} \qquad\qquad \log D = 4{,}0 + \log\left(2{,}5 \cdot 10^{-3}\right) = 4{,}0 - 2{,}6 = 1{,}4
+\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: center;">log <em>D</em> ved pH 3,0</th>
+<th style="text-align: center;">log <em>D</em> ved pH 7,0</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">acetylsalicylsyre</td>
+<td style="text-align: center;">1,1</td>
+<td style="text-align: center;">−2,3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">paracetamol</td>
+<td style="text-align: center;">0,5</td>
+<td style="text-align: center;">0,5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ibuprofen</td>
+<td style="text-align: center;">4,0</td>
+<td style="text-align: center;">1,4</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li><p>Ved pH 3,0 kommer paracetamol først ud, derefter acetylsalicylsyre og til sidst ibuprofen. Alle tre stoffer er mest på den uladede form, så rækkefølgen er den samme som for log <em>P</em>. Ibuprofen er mest upolært og hænger længst fast på den upolære stationære fase.</p></li>
+<li><p>Ved pH 7,0 kommer acetylsalicylsyre først ud, derefter paracetamol og til sidst ibuprofen. Acetylsalicylsyre er nu næsten helt på baseformen, som er en negativ ion. Ionen foretrækker den vandige mobile fase og bliver ikke hængende. Ibuprofen er også mest på baseformen, men den uladede form af ibuprofen er så upolær, at log <em>D</em> stadig er den højeste af de tre. Ibuprofen kommer derfor stadig sidst ud, men hurtigere end ved pH 3,0.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med de konkrete atomer, bindinger og grupper, med beregninger med enheder og med en konklusion.</p>
+</section>
+<section id="opgave-a3.6.eks.1-ibuprofen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.eks.1-ibuprofen">Opgave A3.6.eks.1: Ibuprofen</h2>
+<p>Ibuprofen er et smertestillende lægemiddel, som også dæmper betændelse. Tabletten går i opløsning i mavesækken, men det meste ibuprofen optages først i tyndtarmen. For at blive optaget skal ibuprofen gennem cellemembranerne i tarmvæggen. Ibuprofen er en syre med p<em>K</em><sub>s</sub> = 4,4, og log <em>P</em> = 4,0.</p>
+<p>Den første figur viser strukturen af ibuprofen og log <em>D</em> som funktion af pH. Den anden figur viser et fordelingsdiagram (bjerrumdiagram) for ibuprofen.</p>
+<div id="fig-a3-opg-6-ibuprofen" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-ibuprofen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-ibuprofen.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figur&nbsp;5: Strukturen af ibuprofen og log D for ibuprofen som funktion af pH."><img src="../figurer/a3-opg-6-ibuprofen.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-ibuprofen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;5: Strukturen af ibuprofen og log <em>D</em> for ibuprofen som funktion af pH.
+</figcaption>
+</figure>
+</div>
+<div id="fig-a3-opg-6-ibuprofen-fordeling" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-ibuprofen-fordeling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-ibuprofen-fordeling.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Figur&nbsp;6: Fordelingsdiagram (bjerrumdiagram) for ibuprofen."><img src="../figurer/a3-opg-6-ibuprofen-fordeling.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-ibuprofen-fordeling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;6: Fordelingsdiagram (bjerrumdiagram) for ibuprofen.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Lav en polaritetsanalyse af ibuprofen.</li>
+<li>Beregn log <em>D</em> for ibuprofen ved pH 6,5, som er pH i tyndtarmen.</li>
+<li>Forklar forløbet af kurven for log <em>D</em> ud fra strukturen af ibuprofen og ibuprofens fordelingsdiagram (bjerrumdiagram).</li>
+<li>Vurdér, om ibuprofen kan optages fra tyndtarmen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>En polaritetsanalyse af ibuprofen nævner de polære bindinger, de upolære dele og hvad der vejer tungest. Ibuprofen har én funktionel gruppe med oxygen, carboxylgruppen. Resten af molekylet er carbon og hydrogen.</p>
+<p>Ibuprofen er en syre, så log <em>D</em> = log <em>P</em> + log <em>x</em><sub>s</sub> med <em>x</em><sub>s</sub> = 1 / (1 + 10<sup>pH&nbsp;−&nbsp;p<em>K</em><sub>s</sub></sup>).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved pH 6,5 er pH − p<em>K</em><sub>s</sub> = 6,5 − 4,4 = 2,1 for ibuprofen.</p>
+<p>Forklar kurven i tre dele, som i afsnit A3.6 under “Sådan forklarer du en kurve”: det vandrette stykke, knækket og det skrå stykke. Du kan begynde sådan: “Ved pH under 3 viser fordelingsdiagrammet, at ibuprofen er på …”, “Kurven knækker omkring pH 4,4, hvor …” og “Ved pH over 6 er ibuprofen på …”</p>
+<p>Til vurderingen: se på fortegnet på log <em>D</em> ved pH 6,5.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>De polære bindinger i ibuprofen sidder alle i carboxylgruppen, −COOH: bindingen C=O, bindingen C−O og bindingen O−H. Carboxylgruppen kan danne hydrogenbindinger til vand. Resten af ibuprofen er upolært: benzenringen med 6 carbonatomer, sidegruppen med 4 carbonatomer til venstre for ringen og carbonatomet mellem ringen og carboxylgruppen med dets methylgruppe, i alt 2 carbonatomer. Bindingerne C−C og C−H i de 12 carbonatomer er upolære. Én polær gruppe kan trække omkring fire carbonatomer med ned i vand, og carboxylgruppen i ibuprofen skal bære 12. Den uladede form af ibuprofen er derfor overvejende upolær. Det passer med, at log <em>P</em> = 4,0: koncentrationen af uladet ibuprofen er 10 000 gange så stor i octan-1-ol som i vand.</p></li>
+<li><p>Syrebrøken for ibuprofen ved pH 6,5 er</p></li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,6{,}5 - 4{,}4}} = 7{,}9 \cdot 10^{-3}
+\]</span></p>
+<p><span class="math display">\[
+\log D = \log P + \log x_\mathrm{s} = 4{,}0 + \log\left(7{,}9 \cdot 10^{-3}\right) = 4{,}0 - 2{,}1 = 1{,}9
+\]</span></p>
+<p>Ved pH 6,5 er log <em>D</em> = 1,9 for ibuprofen. Det passer med kurven.</p>
+<ol start="3" type="a">
+<li>Den gruppe i ibuprofen, der er en syre, er carboxylgruppen.</li>
+</ol>
+<p>Det vandrette stykke: Ved pH under 3 viser fordelingsdiagrammet, at syrebrøken er tæt på 1. Ibuprofen er på syreformen med −COOH, som er uladet. Hele stoffet kan gå over i octan-1-ol, så log <em>D</em> = log <em>P</em> = 4,0. Værdien er høj, fordi den uladede form er overvejende upolær.</p>
+<p>Knækket: Kurven knækker omkring pH 4,4, som er p<em>K</em><sub>s</sub> for ibuprofen. I fordelingsdiagrammet skærer de to kurver hinanden ved pH 4,4, hvor halvdelen af ibuprofen er på syreformen, og halvdelen er på baseformen.</p>
+<p>Det skrå stykke: Ved pH over 6 viser fordelingsdiagrammet, at syrebrøken er tæt på 0. Ibuprofen er næsten helt på baseformen med −COO<sup>−</sup>. Baseformen er en negativ ion, som er meget mere polær end syreformen og bliver i vandet. Hver gang pH stiger med 1, bliver syrebrøken 10 gange mindre, og log <em>D</em> falder med 1. Ved pH 8,4 er log <em>D</em> = 0, og over pH 8,4 er der mest ibuprofen i vandet.</p>
+<ol start="4" type="a">
+<li>Ved pH 6,5 er under 1 % af ibuprofen på den uladede syreform. Alligevel er log <em>D</em> = 1,9, altså over 0, så ibuprofen foretrækker stadig det upolære lag. Det skyldes, at den uladede form er så upolær, at selv en lille syrebrøk giver et fordelingsforhold på 10<sup>1,9</sup>, som er omkring 80. Ibuprofen kan altså godt optages fra tyndtarmen. Hver gang et uladet molekyle ibuprofen går gennem cellemembranen, indstiller syre-baseligevægten i tarmen sig igen, og der dannes nye uladede molekyler.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.eks.2-efedrin" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.eks.2-efedrin">Opgave A3.6.eks.2: Efedrin</h2>
+<p>Efedrin findes i planten ledris (Ephedra), som i flere tusind år har været brugt mod astma og forkølelse. Efedrin er en base. Den korresponderende syre har p<em>K</em><sub>s</sub> = 9,6, og for efedrin er log <em>P</em> = 1,1. Figuren viser strukturen af efedrin og log <em>D</em> som funktion af pH.</p>
+<div id="fig-a3-opg-6-efedrin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-efedrin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-efedrin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Figur&nbsp;7: Strukturen af efedrin og log D for efedrin som funktion af pH."><img src="../figurer/a3-opg-6-efedrin.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-efedrin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;7: Strukturen af efedrin og log <em>D</em> for efedrin som funktion af pH.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv de to funktionelle grupper i efedrin, og angiv, hvilken af dem der gør efedrin til en base.</li>
+<li>Beregn log <em>D</em> for efedrin ved pH 7,4, som er pH i blodet.</li>
+<li>Forklar forløbet af kurven for log <em>D</em> ud fra strukturen af efedrin.</li>
+<li>Efedrin skal trækkes ud af tørrede, knuste plantedele, som også indeholder neutrale, upolære stoffer som voks. Foreslå, hvordan efedrin kan skilles fra de neutrale stoffer ved ekstraktion. Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find de atomer i efedrin, der ikke er carbon eller hydrogen. Tabellen over syrer og baser i molekylet i <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html">afsnit A3.2</a> viser, hvilke grupper der kan optage en hydron.</p>
+<p>Efedrin er en base, så log <em>D</em> = log <em>P</em> + log <em>x</em><sub>b</sub> med <em>x</em><sub>b</sub> = 1 / (1 + 10<sup>p<em>K</em><sub>s</sub>&nbsp;−&nbsp;pH</sup>).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved pH 7,4 er p<em>K</em><sub>s</sub> − pH = 9,6 − 7,4 = 2,2 for efedrin.</p>
+<p>Forklar kurven i tre dele: det vandrette stykke ved høj pH, knækket og det skrå stykke ved lav pH. Du kan begynde sådan: “Ved pH over 11 er efedrin på baseformen, som er …”, “Kurven knækker omkring pH 9,6, hvor …” og “Ved pH under 8 har aminogruppen i efedrin …”</p>
+<p>Til ekstraktionen: de neutrale stoffer bliver i det organiske lag ved alle pH-værdier. Find en pH, hvor efedrin går over i vandlaget, og en pH, hvor efedrin går over i det organiske lag.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Efedrin har en hydroxygruppe, −OH, på carbonkæden og en aminogruppe, −NH−, mellem to carbonatomer. Det er aminogruppen, der gør efedrin til en base. Nitrogenatomet kan optage en hydron, så aminogruppen bliver til −NH<sub>2</sub><sup>+</sup>−. Hydroxygruppen sidder på en carbonkæde og ikke på benzenringen, så efedrin er en alkohol og ikke en phenol, og hydroxygruppen er hverken syre eller base i vand.</p></li>
+<li><p>Basebrøken for efedrin ved pH 7,4 er</p></li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{b} = \frac{1}{1 + 10^{\,9{,}6 - 7{,}4}} = 6{,}3 \cdot 10^{-3}
+\]</span></p>
+<p><span class="math display">\[
+\log D = \log P + \log x_\mathrm{b} = 1{,}1 + \log\left(6{,}3 \cdot 10^{-3}\right) = 1{,}1 - 2{,}2 = -1{,}1
+\]</span></p>
+<p>Ved pH 7,4 er log <em>D</em> = −1,1 for efedrin. Det passer med kurven.</p>
+<ol start="3" type="a">
+<li>Det vandrette stykke: Ved pH over 11 er efedrin på baseformen, som er uladet. Her er log <em>D</em> = log <em>P</em> = 1,1. Den uladede form har to polære grupper, hydroxygruppen med bindingerne O−H og C−O og aminogruppen med bindingerne N−H og C−N. De skal bære 10 carbonatomer: benzenringen og fire carbonatomer uden for ringen. De upolære dele vejer lidt tungere end de polære, og derfor er log <em>P</em> positiv, men ikke særlig høj.</li>
+</ol>
+<p>Knækket: Kurven knækker omkring pH 9,6, som er p<em>K</em><sub>s</sub> for den korresponderende syre til efedrin. Ved pH 9,6 har halvdelen af molekylerne optaget en hydron på aminogruppen.</p>
+<p>Det skrå stykke: Ved pH under 8 har aminogruppen i næsten alle molekyler optaget en hydron. Efedrin er på syreformen med −NH<sub>2</sub><sup>+</sup>−, som er en positiv ion. Ionen er meget mere polær end baseformen og bliver i vandet. Hver gang pH falder med 1, bliver basebrøken 10 gange mindre, og log <em>D</em> falder med 1. Under pH 8,5 er log <em>D</em> negativ, og der er mest efedrin i vandet.</p>
+<ol start="4" type="a">
+<li>Plantedelene rystes i en skilletragt med et organisk opløsningsmiddel og surt vand med pH omkring 2. Ved pH 2 er efedrin på syreformen, som er en positiv ion, og log <em>D</em> er omkring 1,1 − 7,6 = −6,5. Efedrin går derfor over i vandlaget. De neutrale, upolære stoffer har ingen gruppe, der kan optage en hydron, så de bliver i det organiske lag ved alle pH-værdier. Vandlaget med efedrin tappes af.</li>
+</ol>
+<p>Derefter gøres vandlaget basisk til pH omkring 12. Ved pH 12 er efedrin på den uladede baseform, og log <em>D</em> = log <em>P</em> = 1,1. Vandlaget rystes med en ny portion organisk opløsningsmiddel, og efedrin går over i det organiske lag. Når opløsningsmidlet dampes af, er efedrin tilbage uden de neutrale stoffer.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a3.6.eks.3-kanelsyre-og-kanelaldehyd" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a3.6.eks.3-kanelsyre-og-kanelaldehyd">Opgave A3.6.eks.3: Kanelsyre og kanelaldehyd</h2>
+<p>Kanelaldehyd giver kanel dens smag. Når kanelolie står længe i luft, bliver noget af kanelaldehyden oxideret til kanelsyre. Figuren viser de to stoffer og log <em>D</em> som funktion af pH for dem begge. For kanelsyre er p<em>K</em><sub>s</sub> = 4,4 og log <em>P</em> = 2,1. For kanelaldehyd er log <em>P</em> = 1,9.</p>
+<div id="fig-a3-opg-6-kanel" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a3-opg-6-kanel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a3-opg-6-kanel.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Figur&nbsp;8: Kanelsyre og kanelaldehyd og log D som funktion af pH for de to stoffer."><img src="../figurer/a3-opg-6-kanel.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a3-opg-6-kanel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;8: Kanelsyre og kanelaldehyd og log <em>D</em> som funktion af pH for de to stoffer.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv, hvilket af de to stoffer der er en syre i vand. Begrund svaret ud fra strukturerne.</li>
+<li>Beregn log <em>D</em> for kanelsyre ved pH 8,0.</li>
+<li>Forklar forløbet af de to kurver for log <em>D</em> ud fra strukturerne af kanelsyre og kanelaldehyd.</li>
+<li>Foreslå, hvordan kanelsyre kan fjernes fra en gammel kanelolie ved ekstraktion. Begrund svaret med værdier for log <em>D</em>.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign de funktionelle grupper for enden af kæden i kanelsyre og i kanelaldehyd. Tabellen over syrer og baser i molekylet i <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html">afsnit A3.2</a> viser, hvilke grupper der kan afgive en hydron.</p>
+<p>Kanelsyre er en syre, så log <em>D</em> = log <em>P</em> + log <em>x</em><sub>s</sub> med <em>x</em><sub>s</sub> = 1 / (1 + 10<sup>pH&nbsp;−&nbsp;p<em>K</em><sub>s</sub></sup>).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved pH 8,0 er pH − p<em>K</em><sub>s</sub> = 8,0 − 4,4 = 3,6 for kanelsyre.</p>
+<p>Et stof uden syre-baseegenskaber har kun én form, og så er <em>D</em> = <em>P</em> ved alle pH-værdier. Du kan begynde forklaringen sådan: “Kanelaldehyd har ingen gruppe, der kan afgive eller optage en hydron, så …” og “Kanelsyre har en carboxylgruppe. Ved pH under 3 …”</p>
+<p>Til ekstraktionen: find på figuren en pH, hvor de to kurver ligger langt fra hinanden, og hvor log <em>D</em> er negativ for kanelsyre og positiv for kanelaldehyd.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Kanelsyre er en syre i vand. Kanelsyre har en carboxylgruppe, −COOH, for enden af kæden, og carboxylgruppen kan afgive en hydron og blive til −COO<sup>−</sup>. Kanelaldehyd har en aldehydgruppe, −CHO, for enden af kæden. Hydrogenatomet i aldehydgruppen sidder på et carbonatom og kan ikke afgives som en hydron, så kanelaldehyd er hverken syre eller base i vand.</p></li>
+<li><p>Syrebrøken for kanelsyre ved pH 8,0 er</p></li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,8{,}0 - 4{,}4}} = 2{,}5 \cdot 10^{-4}
+\]</span></p>
+<p><span class="math display">\[
+\log D = \log P + \log x_\mathrm{s} = 2{,}1 + \log\left(2{,}5 \cdot 10^{-4}\right) = 2{,}1 - 3{,}6 = -1{,}5
+\]</span></p>
+<p>Ved pH 8,0 er log <em>D</em> = −1,5 for kanelsyre.</p>
+<ol start="3" type="a">
+<li>Kanelaldehyd har ingen gruppe, der kan afgive eller optage en hydron, så kanelaldehyd findes kun på én form, som er uladet. Derfor er <em>D</em> = <em>P</em> ved alle pH-værdier, og kurven for kanelaldehyd er en vandret linje i højden log <em>P</em> = 1,9. Værdien er positiv, fordi kanelaldehyd har 9 carbonatomer i benzenringen og kæden og kun én polær gruppe, carbonylgruppen i aldehydgruppen.</li>
+</ol>
+<p>Kanelsyre har en carboxylgruppe. Ved pH under 3 er kanelsyre på syreformen med −COOH, som er uladet, og log <em>D</em> = log <em>P</em> = 2,1. Kurven er vandret og ligger tæt på kurven for kanelaldehyd, fordi de to uladede molekyler har samme upolære benzenring og kæde. Kurven for kanelsyre knækker omkring pH 4,4, som er p<em>K</em><sub>s</sub>, hvor halvdelen af kanelsyren har afgivet en hydron. Ved pH over 6 er kanelsyre næsten helt på baseformen med −COO<sup>−</sup>. Baseformen er en negativ ion, som er meget mere polær og bliver i vandet, og log <em>D</em> falder med 1 for hver pH-enhed. Over pH 6,5 er log <em>D</em> for kanelsyre negativ.</p>
+<ol start="4" type="a">
+<li>Kanelolien opløses i et organisk opløsningsmiddel, der ikke kan blandes med vand, og rystes i en skilletragt med vand med pH omkring 8, fx en opløsning af natron. Ved pH 8,0 er log <em>D</em> = −1,5 for kanelsyre, så kanelsyre går over i vandlaget som den negative ion. For kanelaldehyd er log <em>D</em> = 1,9 ved alle pH-værdier, så kanelaldehyd bliver i det organiske lag. Vandlaget med kanelsyren tappes af, og kanelaldehyden er tilbage i det organiske lag. Ekstraktionen kan gentages med en ny portion basisk vand, så den sidste kanelsyre også fjernes. Surt vand kan ikke bruges, for ved pH under 3 har kanelsyre og kanelaldehyd næsten samme log <em>D</em>, og begge stoffer bliver i det organiske lag.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="pagination-link" aria-label="A3.6 Polaritet og log D">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A3.6 Polaritet og log D</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../bilag/termodynamiske-data.html" class="pagination-link" aria-label="Termodynamiske data">
+        <span class="nav-page-text">Termodynamiske data</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

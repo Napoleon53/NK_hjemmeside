@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A1.4 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a1-5-oploeselighedsligevaegte.html" rel="next">
+<link href="../kapitler/a1-4-ny-ligevaegt.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../opgaver/a1-4-opgaver.html">Opgaver til A1.4</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a1.4.1-lige-efter-indgrebet" id="toc-opgave-a1.4.1-lige-efter-indgrebet" class="nav-link active" data-scroll-target="#opgave-a1.4.1-lige-efter-indgrebet">Opgave A1.4.1: Lige efter indgrebet</a></li>
+  <li><a href="#opgave-a1.4.2-hvilken-vej-bliver-ligevægten-forskudt" id="toc-opgave-a1.4.2-hvilken-vej-bliver-ligevægten-forskudt" class="nav-link" data-scroll-target="#opgave-a1.4.2-hvilken-vej-bliver-ligevægten-forskudt">Opgave A1.4.2: Hvilken vej bliver ligevægten forskudt?</a></li>
+  <li><a href="#opgave-a1.4.3-skemaet-efter-et-indgreb" id="toc-opgave-a1.4.3-skemaet-efter-et-indgreb" class="nav-link" data-scroll-target="#opgave-a1.4.3-skemaet-efter-et-indgreb">Opgave A1.4.3: Skemaet efter et indgreb</a></li>
+  <li><a href="#opgave-a1.4.4-en-reaktant-tilsættes" id="toc-opgave-a1.4.4-en-reaktant-tilsættes" class="nav-link" data-scroll-target="#opgave-a1.4.4-en-reaktant-tilsættes">Opgave A1.4.4: En reaktant tilsættes</a></li>
+  <li><a href="#opgave-a1.4.5-et-produkt-fjernes" id="toc-opgave-a1.4.5-et-produkt-fjernes" class="nav-link" data-scroll-target="#opgave-a1.4.5-et-produkt-fjernes">Opgave A1.4.5: Et produkt fjernes</a></li>
+  <li><a href="#opgave-a1.4.6-rumfanget-fordobles" id="toc-opgave-a1.4.6-rumfanget-fordobles" class="nav-link" data-scroll-target="#opgave-a1.4.6-rumfanget-fordobles">Opgave A1.4.6: Rumfanget fordobles</a></li>
+  <li><a href="#opgave-a1.4.7-vand-fjernes-fra-en-estersyntese" id="toc-opgave-a1.4.7-vand-fjernes-fra-en-estersyntese" class="nav-link" data-scroll-target="#opgave-a1.4.7-vand-fjernes-fra-en-estersyntese">Opgave A1.4.7: Vand fjernes fra en estersyntese</a></li>
+  <li><a href="#opgave-a1.4.8-aflæs-et-indgreb-på-en-kurve" id="toc-opgave-a1.4.8-aflæs-et-indgreb-på-en-kurve" class="nav-link" data-scroll-target="#opgave-a1.4.8-aflæs-et-indgreb-på-en-kurve">Opgave A1.4.8: Aflæs et indgreb på en kurve</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a1.4.eks.1-pærearoma" id="toc-opgave-a1.4.eks.1-pærearoma" class="nav-link" data-scroll-target="#opgave-a1.4.eks.1-pærearoma">Opgave A1.4.eks.1: Pærearoma</a></li>
+  <li><a href="#opgave-a1.4.eks.2-ammoniakken-tages-ud" id="toc-opgave-a1.4.eks.2-ammoniakken-tages-ud" class="nav-link" data-scroll-target="#opgave-a1.4.eks.2-ammoniakken-tages-ud">Opgave A1.4.eks.2: Ammoniakken tages ud</a></li>
+  <li><a href="#opgave-a1.4.eks.3-brun-gas-i-en-cylinder" id="toc-opgave-a1.4.eks.3-brun-gas-i-en-cylinder" class="nav-link" data-scroll-target="#opgave-a1.4.eks.3-brun-gas-i-en-cylinder">Opgave A1.4.eks.3: Brun gas i en cylinder</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a1-1-partialtryk.html">Kapitel A1: Ligevægte fortsat</a></li><li class="breadcrumb-item"><a href="../opgaver/a1-4-opgaver.html">Opgaver til A1.4</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A1.4</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a1-4-ny-ligevaegt.html">A1.4 Indgreb og ny ligevægt</a>. Prøv selv, før du åbner hjælpen under opgaven. Du skal bruge et CAS-værktøj til at løse ligningerne.</p>
+<section id="opgave-a1.4.1-lige-efter-indgrebet" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.1-lige-efter-indgrebet">Opgave A1.4.1: Lige efter indgrebet</h2>
+<p>En beholder indeholder phosgen, COCl<sub>2</sub>, carbonmonoxid og chlor i ligevægt. Partialtrykkene er <em>p</em>(COCl<sub>2</sub>) = 0,80 bar, <em>p</em>(CO) = 0,40 bar og <em>p</em>(Cl<sub>2</sub>) = 0,60 bar. Temperaturen ændres ikke.</p>
+<p>Tabellen viser fem indgreb. Hvert indgreb bliver gjort i ligevægtsblandingen med de tre partialtryk i første række. Find de tre partialtryk lige efter hvert indgreb, altså før ligevægten når at blive forskudt.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 60%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Indgreb</th>
+<th style="text-align: center;"><em>p</em>(COCl<sub>2</sub>)</th>
+<th style="text-align: center;"><em>p</em>(CO)</th>
+<th style="text-align: center;"><em>p</em>(Cl<sub>2</sub>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Før indgrebet</td>
+<td style="text-align: center;">0,80 bar</td>
+<td style="text-align: center;">0,40 bar</td>
+<td style="text-align: center;">0,60 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">a. Der pumpes CO ind, så <em>p</em>(CO) stiger med 0,30 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">b. Rumfanget halveres</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c.&nbsp;Rumfanget fordobles</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">d.&nbsp;Rumfanget bliver en tredjedel så stort</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">e. Halvdelen af Cl<sub>2</sub> fjernes</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Når et stof bliver pumpet ind eller fjernet, er det kun partialtrykket af det ene stof, der ændrer sig lige efter indgrebet. Når rumfanget ændres, ændrer alle tre partialtryk sig på én gang.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Halveres rumfanget, bliver hvert partialtryk 2 gange så stort. Fordobles rumfanget, bliver hvert partialtryk halvt så stort. Bliver rumfanget en tredjedel så stort, bliver hvert partialtryk 3 gange så stort. Det følger af idealgasligningen: <em>p</em> = <em>n</em> · <em>R</em> · <em>T</em> / <em>V</em>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 60%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Indgreb</th>
+<th style="text-align: center;"><em>p</em>(COCl<sub>2</sub>)</th>
+<th style="text-align: center;"><em>p</em>(CO)</th>
+<th style="text-align: center;"><em>p</em>(Cl<sub>2</sub>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Før indgrebet</td>
+<td style="text-align: center;">0,80 bar</td>
+<td style="text-align: center;">0,40 bar</td>
+<td style="text-align: center;">0,60 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">a. Der pumpes CO ind, så <em>p</em>(CO) stiger med 0,30 bar</td>
+<td style="text-align: center;">0,80 bar</td>
+<td style="text-align: center;">0,70 bar</td>
+<td style="text-align: center;">0,60 bar</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">b. Rumfanget halveres</td>
+<td style="text-align: center;">1,60 bar</td>
+<td style="text-align: center;">0,80 bar</td>
+<td style="text-align: center;">1,20 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">c.&nbsp;Rumfanget fordobles</td>
+<td style="text-align: center;">0,40 bar</td>
+<td style="text-align: center;">0,20 bar</td>
+<td style="text-align: center;">0,30 bar</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">d.&nbsp;Rumfanget bliver en tredjedel så stort</td>
+<td style="text-align: center;">2,40 bar</td>
+<td style="text-align: center;">1,20 bar</td>
+<td style="text-align: center;">1,80 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">e. Halvdelen af Cl<sub>2</sub> fjernes</td>
+<td style="text-align: center;">0,80 bar</td>
+<td style="text-align: center;">0,40 bar</td>
+<td style="text-align: center;">0,30 bar</td>
+</tr>
+</tbody>
+</table>
+<p>I indgreb a og e ændrer kun ét partialtryk sig, fordi partialtrykket af en gas kun afhænger af stofmængden af netop den gas. I indgreb b, c og d har alle tre gasser fået et nyt rumfang, så alle tre partialtryk ændrer sig lige mange gange.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.2-hvilken-vej-bliver-ligevægten-forskudt" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.2-hvilken-vej-bliver-ligevægten-forskudt">Opgave A1.4.2: Hvilken vej bliver ligevægten forskudt?</h2>
+<p>Svovldioxid og oxygen danner svovltrioxid:</p>
+<div class="reaktion">
+<p>2 SO<sub>2</sub>(g) + O<sub>2</sub>(g) ⇌ 2 SO<sub>3</sub>(g)</p>
+</div>
+<p>Ved en bestemt temperatur er <em>K</em><sub>p</sub> = 4,0 bar<sup>−1</sup>. En beholder indeholder de tre gasser i ligevægt ved denne temperatur. Partialtrykkene er <em>p</em>(SO<sub>2</sub>) = 1,0 bar, <em>p</em>(O<sub>2</sub>) = 1,0 bar og <em>p</em>(SO<sub>3</sub>) = 2,0 bar.</p>
+<ol type="a">
+<li>Opskriv reaktionsbrøken, og vis ved en beregning, at blandingen er i ligevægt.</li>
+</ol>
+<p>Hvert af de tre indgreb i spørgsmål b, c og d bliver gjort i denne ligevægtsblanding. Find partialtrykkene lige efter indgrebet, beregn reaktionsbrøken, og afgør, hvilken vej ligevægten bliver forskudt.</p>
+<ol start="2" type="a">
+<li>Der pumpes O<sub>2</sub> ind, så <em>p</em>(O<sub>2</sub>) stiger til 2,0 bar.</li>
+<li>Rumfanget halveres.</li>
+<li>Rumfanget fordobles.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsbrøken for dannelsen af SO<sub>3</sub> er <em>Y</em> = <em>p</em>(SO<sub>3</sub>)<sup>2</sup> / (<em>p</em>(SO<sub>2</sub>)<sup>2</sup> · <em>p</em>(O<sub>2</sub>)). Find først de tre partialtryk lige efter indgrebet. Sæt dem ind i reaktionsbrøken, og sammenlign <em>Y</em> med <em>K</em><sub>p</sub> = 4,0 bar<sup>−1</sup>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Lige efter indgrebet i spørgsmål b er <em>p</em>(SO<sub>2</sub>) = 1,0 bar, <em>p</em>(O<sub>2</sub>) = 2,0 bar og <em>p</em>(SO<sub>3</sub>) = 2,0 bar. Lige efter indgrebet i spørgsmål c er alle tre partialtryk 2 gange så store, som de var før indgrebet. Er <em>Y</em> mindre end <em>K</em><sub>p</sub>, bliver ligevægten forskudt mod højre. Er <em>Y</em> større end <em>K</em><sub>p</sub>, bliver ligevægten forskudt mod venstre.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Reaktionsbrøken er</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{SO_3})^{2}}{p(\mathrm{SO_2})^{2} \cdot p(\mathrm{O_2})} = \frac{(2{,}0\ \mathrm{bar})^{2}}{(1{,}0\ \mathrm{bar})^{2} \cdot 1{,}0\ \mathrm{bar}} = 4{,}0\ \mathrm{bar^{-1}}
+\]</span></p>
+<p><em>Y</em> er lig med <em>K</em><sub>p</sub>, så blandingen er i ligevægt.</p>
+<ol start="2" type="a">
+<li>Lige efter indgrebet er <em>p</em>(SO<sub>2</sub>) = 1,0 bar, <em>p</em>(O<sub>2</sub>) = 2,0 bar og <em>p</em>(SO<sub>3</sub>) = 2,0 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{(2{,}0\ \mathrm{bar})^{2}}{(1{,}0\ \mathrm{bar})^{2} \cdot 2{,}0\ \mathrm{bar}} = 2{,}0\ \mathrm{bar^{-1}}
+\]</span></p>
+<p><em>Y</em> = 2,0 bar<sup>−1</sup> er mindre end <em>K</em><sub>p</sub> = 4,0 bar<sup>−1</sup>. Ligevægten bliver forskudt mod højre, så der bliver brugt noget af det tilsatte O<sub>2</sub>.</p>
+<ol start="3" type="a">
+<li>Lige efter indgrebet er <em>p</em>(SO<sub>2</sub>) = 2,0 bar, <em>p</em>(O<sub>2</sub>) = 2,0 bar og <em>p</em>(SO<sub>3</sub>) = 4,0 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{(4{,}0\ \mathrm{bar})^{2}}{(2{,}0\ \mathrm{bar})^{2} \cdot 2{,}0\ \mathrm{bar}} = 2{,}0\ \mathrm{bar^{-1}}
+\]</span></p>
+<p><em>Y</em> = 2,0 bar<sup>−1</sup> er mindre end <em>K</em><sub>p</sub> = 4,0 bar<sup>−1</sup>. Ligevægten bliver forskudt mod højre. Det er den side, der har færrest gasmolekyler: tre molekyler til venstre bliver til to molekyler til højre.</p>
+<ol start="4" type="a">
+<li>Lige efter indgrebet er <em>p</em>(SO<sub>2</sub>) = 0,50 bar, <em>p</em>(O<sub>2</sub>) = 0,50 bar og <em>p</em>(SO<sub>3</sub>) = 1,0 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{(1{,}0\ \mathrm{bar})^{2}}{(0{,}50\ \mathrm{bar})^{2} \cdot 0{,}50\ \mathrm{bar}} = 8{,}0\ \mathrm{bar^{-1}}
+\]</span></p>
+<p><em>Y</em> = 8,0 bar<sup>−1</sup> er større end <em>K</em><sub>p</sub> = 4,0 bar<sup>−1</sup>. Ligevægten bliver forskudt mod venstre. Det er den side, der har flest gasmolekyler.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.3-skemaet-efter-et-indgreb" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.3-skemaet-efter-et-indgreb">Opgave A1.4.3: Skemaet efter et indgreb</h2>
+<p>En beholder indeholder SO<sub>2</sub>, O<sub>2</sub> og SO<sub>3</sub> i ligevægt ved en bestemt temperatur, hvor <em>K</em><sub>p</sub> = 4,0 bar<sup>−1</sup>:</p>
+<div class="reaktion">
+<p>2 SO<sub>2</sub>(g) + O<sub>2</sub>(g) ⇌ 2 SO<sub>3</sub>(g)</p>
+</div>
+<p>Partialtrykkene er <em>p</em>(SO<sub>2</sub>) = 1,0 bar, <em>p</em>(O<sub>2</sub>) = 1,0 bar og <em>p</em>(SO<sub>3</sub>) = 2,0 bar. Nu pumpes der SO<sub>3</sub> ind i beholderen, så <em>p</em>(SO<sub>3</sub>) stiger til 3,0 bar.</p>
+<ol type="a">
+<li>Beregn reaktionsbrøken lige efter indgrebet, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Forklar med ord, hvad <em>x</em> står for efter indgrebet.</li>
+<li>Udfyld SÆL-skemaet. Du skal ikke beregne <em>x</em>.</li>
+<li>Opstil den ligning, der skal løses. Du skal ikke løse ligningen.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">2 SO<sub>2</sub>(g)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">2 SO<sub>3</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter indgrebet)</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Rækken Start er blandingen lige efter indgrebet: <em>p</em>(SO<sub>2</sub>) = 1,0 bar, <em>p</em>(O<sub>2</sub>) = 1,0 bar og <em>p</em>(SO<sub>3</sub>) = 3,0 bar. Beregn <em>Y</em> med de tre tal. Retningen afgør, hvilke stoffer der får plus, og hvilke der får minus, i rækken Ændring.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>Y</em> er større end <em>K</em><sub>p</sub>, så ligevægten bliver forskudt mod venstre. Der bliver dannet SO<sub>2</sub> og O<sub>2</sub>, og der bliver brugt SO<sub>3</sub>. Lad <em>x</em> høre til O<sub>2</sub>, fordi O<sub>2</sub> har koefficienten 1. Du kan begynde forklaringen sådan: “<em>x</em> angiver her det partialtryk af O<sub>2</sub>, der bliver …, fra indgrebet og frem til …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Lige efter indgrebet er <em>p</em>(SO<sub>2</sub>) = 1,0 bar, <em>p</em>(O<sub>2</sub>) = 1,0 bar og <em>p</em>(SO<sub>3</sub>) = 3,0 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{SO_3})^{2}}{p(\mathrm{SO_2})^{2} \cdot p(\mathrm{O_2})} = \frac{(3{,}0\ \mathrm{bar})^{2}}{(1{,}0\ \mathrm{bar})^{2} \cdot 1{,}0\ \mathrm{bar}} = 9{,}0\ \mathrm{bar^{-1}}
+\]</span></p>
+<p><em>Y</em> = 9,0 bar<sup>−1</sup> er større end <em>K</em><sub>p</sub> = 4,0 bar<sup>−1</sup>. Ligevægten bliver forskudt mod venstre.</p>
+<ol start="2" type="a">
+<li><p><em>x</em> angiver her det partialtryk af O<sub>2</sub>, der bliver dannet, fra indgrebet og frem til den nye ligevægt. Der dannes dobbelt så meget SO<sub>2</sub>, og der bliver brugt dobbelt så meget SO<sub>3</sub>.</p></li>
+<li><p>Skemaet ser sådan ud:</p></li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">2 SO<sub>2</sub>(g)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">2 SO<sub>3</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter indgrebet)</td>
+<td style="text-align: center;">1,0 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,0 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">3,0 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">+2<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−2<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">1,0 bar + 2<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,0 bar + <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">3,0 bar − 2<em>x</em></td>
+</tr>
+</tbody>
+</table>
+<ol start="4" type="a">
+<li>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven.</li>
+</ol>
+<p><span class="math display">\[
+4{,}0\ \mathrm{bar^{-1}} = \frac{(3{,}0\ \mathrm{bar} - 2x)^{2}}{(1{,}0\ \mathrm{bar} + 2x)^{2} \cdot (1{,}0\ \mathrm{bar} + x)}
+\]</span></p>
+<p>Vil du tjekke ligningen, giver et CAS-værktøj kun én løsning, <em>x</em> = 0,138. Så er <em>p</em>(SO<sub>2</sub>) = 1,28 bar, <em>p</em>(O<sub>2</sub>) = 1,14 bar og <em>p</em>(SO<sub>3</sub>) = 2,72 bar ved den nye ligevægt.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.4-en-reaktant-tilsættes" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.4-en-reaktant-tilsættes">Opgave A1.4.4: En reaktant tilsættes</h2>
+<p>En beholder ved 250 °C indeholder PCl<sub>5</sub>, PCl<sub>3</sub> og Cl<sub>2</sub> i ligevægt:</p>
+<div class="reaktion">
+<p>PCl<sub>5</sub>(g) ⇌ PCl<sub>3</sub>(g) + Cl<sub>2</sub>(g)</p>
+</div>
+<p>Ved 250 °C er <em>K</em><sub>p</sub> = 1,05 bar. Partialtrykkene er <em>p</em>(PCl<sub>5</sub>) = 0,60 bar, <em>p</em>(PCl<sub>3</sub>) = 0,90 bar og <em>p</em>(Cl<sub>2</sub>) = 0,70 bar. Nu pumpes der ekstra PCl<sub>5</sub> ind i beholderen, så <em>p</em>(PCl<sub>5</sub>) stiger til 1,00 bar.</p>
+<ol type="a">
+<li>Beregn reaktionsbrøken lige efter indgrebet, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Forklar med ord, hvad <em>x</em> står for efter indgrebet, og lav SÆL-skemaet.</li>
+<li>Opstil ligningen, og løs den med et CAS-værktøj.</li>
+<li>Beregn de tre partialtryk ved den nye ligevægt, og tjek resultatet med reaktionsbrøken.</li>
+<li>Hvor meget af det tilsatte PCl<sub>5</sub> er blevet omdannet? Passer resultatet med Le Chateliers princip?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Følg de fire trin i afsnit A1.4. Lige efter indgrebet er <em>p</em>(PCl<sub>5</sub>) = 1,00 bar, mens <em>p</em>(PCl<sub>3</sub>) = 0,90 bar og <em>p</em>(Cl<sub>2</sub>) = 0,70 bar er uændrede. De tre tal står i rækken Start.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>Y</em> er mindre end <em>K</em><sub>p</sub>, så ligevægten bliver forskudt mod højre. Lad <em>x</em> være det partialtryk af PCl<sub>5</sub>, der bliver omdannet efter indgrebet. Rækken Ligevægt er 1,00 bar − <em>x</em> for PCl<sub>5</sub>, 0,90 bar + <em>x</em> for PCl<sub>3</sub> og 0,70 bar + <em>x</em> for Cl<sub>2</sub>.</p>
+<p>Til spørgsmål e kan du begynde sådan: “Der blev tilsat … bar PCl<sub>5</sub>. Forskydningen brugte … bar af det igen. Det passer med Le Chateliers princip, fordi …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Lige efter indgrebet er <em>p</em>(PCl<sub>5</sub>) = 1,00 bar, <em>p</em>(PCl<sub>3</sub>) = 0,90 bar og <em>p</em>(Cl<sub>2</sub>) = 0,70 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{PCl_3}) \cdot p(\mathrm{Cl_2})}{p(\mathrm{PCl_5})} = \frac{0{,}90\ \mathrm{bar} \cdot 0{,}70\ \mathrm{bar}}{1{,}00\ \mathrm{bar}} = 0{,}63\ \mathrm{bar}
+\]</span></p>
+<p><em>Y</em> = 0,63 bar er mindre end <em>K</em><sub>p</sub> = 1,05 bar. Ligevægten bliver forskudt mod højre.</p>
+<ol start="2" type="a">
+<li><em>x</em> angiver her det partialtryk af PCl<sub>5</sub>, der bliver omdannet, fra indgrebet og frem til den nye ligevægt. Der dannes lige så meget PCl<sub>3</sub> og lige så meget Cl<sub>2</sub>.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">PCl<sub>5</sub>(g)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">PCl<sub>3</sub>(g)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">Cl<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter indgrebet)</td>
+<td style="text-align: center;">1,00 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,90 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,70 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">1,00 bar − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,90 bar + <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,70 bar + <em>x</em></td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="a">
+<li>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven.</li>
+</ol>
+<p><span class="math display">\[
+1{,}05\ \mathrm{bar} = \frac{(0{,}90\ \mathrm{bar} + x) \cdot (0{,}70\ \mathrm{bar} + x)}{1{,}00\ \mathrm{bar} - x}
+\]</span></p>
+<p>CAS-værktøjet giver <em>x</em> = 0,150 eller <em>x</em> = −2,80. Den negative løsning forkastes, fordi den giver negative partialtryk af PCl<sub>3</sub> og Cl<sub>2</sub>. Altså er <em>x</em> = 0,150 bar.</p>
+<ol start="4" type="a">
+<li>Ved den nye ligevægt er <em>p</em>(PCl<sub>5</sub>) = 1,00 bar − 0,150 bar = 0,85 bar, <em>p</em>(PCl<sub>3</sub>) = 0,90 bar + 0,150 bar = 1,05 bar, og <em>p</em>(Cl<sub>2</sub>) = 0,70 bar + 0,150 bar = 0,85 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{1{,}05\ \mathrm{bar} \cdot 0{,}85\ \mathrm{bar}}{0{,}85\ \mathrm{bar}} = 1{,}05\ \mathrm{bar}
+\]</span></p>
+<p>Reaktionsbrøken giver <em>K</em><sub>p</sub>, så resultatet passer.</p>
+<ol start="5" type="a">
+<li>Der blev tilsat 0,40 bar PCl<sub>5</sub>, og forskydningen mod højre brugte 0,15 bar af det igen. Det passer med Le Chateliers princip: forskydningen modvirker indgrebet, men den ophæver det ikke. Partialtrykket af PCl<sub>5</sub> ender på 0,85 bar, som er højere end de 0,60 bar før indgrebet.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.5-et-produkt-fjernes" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.5-et-produkt-fjernes">Opgave A1.4.5: Et produkt fjernes</h2>
+<p>Carbonmonoxid og vanddamp danner carbondioxid og hydrogen:</p>
+<div class="reaktion">
+<p>CO(g) + H<sub>2</sub>O(g) ⇌ CO<sub>2</sub>(g) + H<sub>2</sub>(g)</p>
+</div>
+<p>Ved en bestemt temperatur er <em>K</em><sub>p</sub> = 9,0. En beholder indeholder de fire gasser i ligevægt ved denne temperatur. Partialtrykkene er <em>p</em>(CO) = 0,40 bar, <em>p</em>(H<sub>2</sub>O) = 0,50 bar, <em>p</em>(CO<sub>2</sub>) = 1,20 bar og <em>p</em>(H<sub>2</sub>) = 1,50 bar. Nu fjernes det meste af carbondioxiden fra beholderen, så <em>p</em>(CO<sub>2</sub>) falder til 0,30 bar.</p>
+<ol type="a">
+<li>Beregn reaktionsbrøken lige efter indgrebet, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Forklar med ord, hvad <em>x</em> står for efter indgrebet, og lav SÆL-skemaet.</li>
+<li>Opstil ligningen, og løs den med et CAS-værktøj.</li>
+<li>Vælg den løsning, der kan bruges, og beregn de fire partialtryk ved den nye ligevægt.</li>
+<li>Sammenlign partialtrykket af CO før indgrebet og ved den nye ligevægt. Hvad har indgrebet betydet for mængden af CO i beholderen?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Lige efter indgrebet er <em>p</em>(CO<sub>2</sub>) = 0,30 bar, mens partialtrykkene af CO, H<sub>2</sub>O og H<sub>2</sub> er uændrede. Reaktionsbrøken er <em>Y</em> = <em>p</em>(CO<sub>2</sub>) · <em>p</em>(H<sub>2</sub>) / (<em>p</em>(CO) · <em>p</em>(H<sub>2</sub>O)).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>Y</em> er mindre end <em>K</em><sub>p</sub>, så ligevægten bliver forskudt mod højre. Lad <em>x</em> være det partialtryk af CO, der bliver omdannet efter indgrebet. Rækken Ligevægt er 0,40 bar − <em>x</em> for CO, 0,50 bar − <em>x</em> for H<sub>2</sub>O, 0,30 bar + <em>x</em> for CO<sub>2</sub> og 1,50 bar + <em>x</em> for H<sub>2</sub>. Begge løsninger til ligningen er positive, så du skal sætte dem ind i udtrykket for <em>p</em>(CO).</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Lige efter indgrebet er <em>p</em>(CO) = 0,40 bar, <em>p</em>(H<sub>2</sub>O) = 0,50 bar, <em>p</em>(CO<sub>2</sub>) = 0,30 bar og <em>p</em>(H<sub>2</sub>) = 1,50 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{CO_2}) \cdot p(\mathrm{H_2})}{p(\mathrm{CO}) \cdot p(\mathrm{H_2O})} = \frac{0{,}30\ \mathrm{bar} \cdot 1{,}50\ \mathrm{bar}}{0{,}40\ \mathrm{bar} \cdot 0{,}50\ \mathrm{bar}} = 2{,}25
+\]</span></p>
+<p><em>Y</em> = 2,25 er mindre end <em>K</em><sub>p</sub> = 9,0. Ligevægten bliver forskudt mod højre, så der bliver dannet CO<sub>2</sub> igen.</p>
+<ol start="2" type="a">
+<li><em>x</em> angiver her det partialtryk af CO, der bliver omdannet, fra indgrebet og frem til den nye ligevægt. Der bliver omdannet lige så meget H<sub>2</sub>O, og der dannes lige så meget CO<sub>2</sub> og lige så meget H<sub>2</sub>.</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CO(g)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>O(g)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">H<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter indgrebet)</td>
+<td style="text-align: center;">0,40 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,50 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,30 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,50 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,40 bar − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,50 bar − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,30 bar + <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,50 bar + <em>x</em></td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="a">
+<li>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven.</li>
+</ol>
+<p><span class="math display">\[
+9{,}0 = \frac{(0{,}30\ \mathrm{bar} + x) \cdot (1{,}50\ \mathrm{bar} + x)}{(0{,}40\ \mathrm{bar} - x) \cdot (0{,}50\ \mathrm{bar} - x)}
+\]</span></p>
+<p>CAS-værktøjet giver <em>x</em> = 0,156 eller <em>x</em> = 1,08.</p>
+<ol start="4" type="a">
+<li>Begge løsninger er positive. Men med <em>x</em> = 1,08 bar bliver <em>p</em>(CO) = 0,40 bar − 1,08 bar = −0,68 bar, og et partialtryk kan ikke være negativt. Altså er <em>x</em> = 0,156 bar.</li>
+</ol>
+<p>Ved den nye ligevægt er <em>p</em>(CO) = 0,40 bar − 0,156 bar = 0,244 bar, <em>p</em>(H<sub>2</sub>O) = 0,50 bar − 0,156 bar = 0,344 bar, <em>p</em>(CO<sub>2</sub>) = 0,30 bar + 0,156 bar = 0,456 bar, og <em>p</em>(H<sub>2</sub>) = 1,50 bar + 0,156 bar = 1,656 bar.</p>
+<p><span class="math display">\[
+Y = \frac{0{,}456\ \mathrm{bar} \cdot 1{,}656\ \mathrm{bar}}{0{,}244\ \mathrm{bar} \cdot 0{,}344\ \mathrm{bar}} = 9{,}0
+\]</span></p>
+<p>Reaktionsbrøken giver <em>K</em><sub>p</sub>, så resultatet passer. Med to decimaler er <em>p</em>(CO) = 0,24 bar, <em>p</em>(H<sub>2</sub>O) = 0,34 bar, <em>p</em>(CO<sub>2</sub>) = 0,46 bar og <em>p</em>(H<sub>2</sub>) = 1,66 bar.</p>
+<ol start="5" type="a">
+<li>Partialtrykket af CO er faldet fra 0,40 bar til 0,24 bar. Da carbondioxiden blev fjernet, blev ligevægten forskudt mod højre, og der blev brugt CO. Indgrebet har altså gjort mængden af CO i beholderen mindre og mængden af H<sub>2</sub> større.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.6-rumfanget-fordobles" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.6-rumfanget-fordobles">Opgave A1.4.6: Rumfanget fordobles</h2>
+<p>En cylinder med et stempel indeholder SO<sub>2</sub>Cl<sub>2</sub>, SO<sub>2</sub> og Cl<sub>2</sub> i ligevægt:</p>
+<div class="reaktion">
+<p>SO<sub>2</sub>Cl<sub>2</sub>(g) ⇌ SO<sub>2</sub>(g) + Cl<sub>2</sub>(g)</p>
+</div>
+<p>Ved den temperatur, cylinderen holdes på, er <em>K</em><sub>p</sub> = 2,4 bar. Partialtrykkene er <em>p</em>(SO<sub>2</sub>Cl<sub>2</sub>) = 0,80 bar, <em>p</em>(SO<sub>2</sub>) = 1,60 bar og <em>p</em>(Cl<sub>2</sub>) = 1,20 bar. Nu trækkes stemplet ud, så rumfanget bliver dobbelt så stort.</p>
+<ol type="a">
+<li>Beregn totaltrykket før indgrebet.</li>
+<li>Find de tre partialtryk og totaltrykket lige efter indgrebet.</li>
+<li>Beregn reaktionsbrøken lige efter indgrebet, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Beregn de tre partialtryk ved den nye ligevægt.</li>
+<li>Beregn totaltrykket ved den nye ligevægt, og sammenlign de tre totaltryk: før indgrebet, lige efter indgrebet og ved den nye ligevægt.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Når rumfanget bliver dobbelt så stort, bliver alle tre partialtryk halvt så store lige efter indgrebet. De halverede partialtryk står i rækken Start i SÆL-skemaet. Totaltrykket er hver gang summen af de tre partialtryk.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Lige efter indgrebet er <em>p</em>(SO<sub>2</sub>Cl<sub>2</sub>) = 0,40 bar, <em>p</em>(SO<sub>2</sub>) = 0,80 bar og <em>p</em>(Cl<sub>2</sub>) = 0,60 bar. <em>Y</em> er mindre end <em>K</em><sub>p</sub>, så ligevægten bliver forskudt mod højre. Lad <em>x</em> være det partialtryk af SO<sub>2</sub>Cl<sub>2</sub>, der bliver omdannet efter indgrebet. Rækken Ligevægt er 0,40 bar − <em>x</em> for SO<sub>2</sub>Cl<sub>2</sub>, 0,80 bar + <em>x</em> for SO<sub>2</sub> og 0,60 bar + <em>x</em> for Cl<sub>2</sub>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Totaltrykket før indgrebet er</li>
+</ol>
+<p><span class="math display">\[
+p_\mathrm{total} = 0{,}80\ \mathrm{bar} + 1{,}60\ \mathrm{bar} + 1{,}20\ \mathrm{bar} = 3{,}60\ \mathrm{bar}
+\]</span></p>
+<ol start="2" type="a">
+<li><p>Alle tre partialtryk bliver halvt så store, når rumfanget bliver dobbelt så stort. Lige efter indgrebet er <em>p</em>(SO<sub>2</sub>Cl<sub>2</sub>) = 0,40 bar, <em>p</em>(SO<sub>2</sub>) = 0,80 bar og <em>p</em>(Cl<sub>2</sub>) = 0,60 bar. Totaltrykket er 0,40 bar + 0,80 bar + 0,60 bar = 1,80 bar.</p></li>
+<li><p>Reaktionsbrøken lige efter indgrebet er</p></li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{SO_2}) \cdot p(\mathrm{Cl_2})}{p(\mathrm{SO_2Cl_2})} = \frac{0{,}80\ \mathrm{bar} \cdot 0{,}60\ \mathrm{bar}}{0{,}40\ \mathrm{bar}} = 1{,}2\ \mathrm{bar}
+\]</span></p>
+<p><em>Y</em> = 1,2 bar er mindre end <em>K</em><sub>p</sub> = 2,4 bar. Ligevægten bliver forskudt mod højre, altså mod den side, der har flest gasmolekyler.</p>
+<ol start="4" type="a">
+<li><em>x</em> angiver her det partialtryk af SO<sub>2</sub>Cl<sub>2</sub>, der bliver omdannet, fra indgrebet og frem til den nye ligevægt. Der dannes lige så meget SO<sub>2</sub> og lige så meget Cl<sub>2</sub>.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">SO<sub>2</sub>Cl<sub>2</sub>(g)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">SO<sub>2</sub>(g)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">Cl<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter indgrebet)</td>
+<td style="text-align: center;">0,40 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,80 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,60 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,40 bar − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,80 bar + <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,60 bar + <em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+2{,}4\ \mathrm{bar} = \frac{(0{,}80\ \mathrm{bar} + x) \cdot (0{,}60\ \mathrm{bar} + x)}{0{,}40\ \mathrm{bar} - x}
+\]</span></p>
+<p>CAS-værktøjet giver <em>x</em> = 0,122 eller <em>x</em> = −3,92. Den negative løsning forkastes, fordi den giver negative partialtryk af SO<sub>2</sub> og Cl<sub>2</sub>. Altså er <em>x</em> = 0,122 bar.</p>
+<p>Ved den nye ligevægt er <em>p</em>(SO<sub>2</sub>Cl<sub>2</sub>) = 0,40 bar − 0,122 bar = 0,278 bar, <em>p</em>(SO<sub>2</sub>) = 0,80 bar + 0,122 bar = 0,922 bar, og <em>p</em>(Cl<sub>2</sub>) = 0,60 bar + 0,122 bar = 0,722 bar.</p>
+<p><span class="math display">\[
+Y = \frac{0{,}922\ \mathrm{bar} \cdot 0{,}722\ \mathrm{bar}}{0{,}278\ \mathrm{bar}} = 2{,}4\ \mathrm{bar}
+\]</span></p>
+<p>Reaktionsbrøken giver <em>K</em><sub>p</sub>, så resultatet passer.</p>
+<ol start="5" type="a">
+<li>Totaltrykket ved den nye ligevægt er</li>
+</ol>
+<p><span class="math display">\[
+p_\mathrm{total} = 0{,}278\ \mathrm{bar} + 0{,}922\ \mathrm{bar} + 0{,}722\ \mathrm{bar} = 1{,}92\ \mathrm{bar}
+\]</span></p>
+<p>Før indgrebet var totaltrykket 3,60 bar. Lige efter indgrebet var totaltrykket faldet til 1,80 bar. Forskydningen mod højre laver ét molekyle om til to og får totaltrykket til at stige lidt igen, til 1,92 bar. Indgrebet bliver altså modvirket, men ikke ophævet.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.7-vand-fjernes-fra-en-estersyntese" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.7-vand-fjernes-fra-en-estersyntese">Opgave A1.4.7: Vand fjernes fra en estersyntese</h2>
+<p>Ethansyre og ethanol danner esteren ethylethanoat og vand:</p>
+<div class="reaktion">
+<p>CH<sub>3</sub>COOH + CH<sub>3</sub>CH<sub>2</sub>OH ⇌ CH<sub>3</sub>COOCH<sub>2</sub>CH<sub>3</sub> + H<sub>2</sub>O</p>
+</div>
+<p>Ligevægtskonstanten er <em>K</em><sub>c</sub> = 4,0, og vand er med i reaktionsbrøken. 1,50 mol ethansyre og 1,50 mol ethanol bliver blandet. Da ligevægten har indstillet sig, indeholder blandingen 0,50 mol ethansyre, 0,50 mol ethanol, 1,00 mol ester og 1,00 mol vand. Nu tilsættes der et tørremiddel, som binder 0,90 mol af vandet. Der er så kun 0,10 mol frit vand i blandingen.</p>
+<ol type="a">
+<li>Forklar, hvorfor stofmængder kan sættes direkte ind i reaktionsbrøken for dannelsen af esteren.</li>
+<li>Beregn reaktionsbrøken lige efter indgrebet, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Forklar med ord, hvad <em>x</em> står for efter indgrebet, og lav SÆL-skemaet med stofmængder.</li>
+<li>Opstil ligningen, løs den med et CAS-værktøj, og vælg den løsning, der kan bruges.</li>
+<li>Hvor mange mol ester er der ved den nye ligevægt? Beregn udbyttet af ester i procent af de 1,50 mol før og efter indgrebet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Læs afsnittet <em>Et indgreb i en opløsning</em> i afsnit A1.4. Lige efter indgrebet indeholder blandingen 0,50 mol ethansyre, 0,50 mol ethanol, 1,00 mol ester og 0,10 mol vand. Det vand, tørremidlet har bundet, tæller ikke med.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål a kan du begynde sådan: “Alle fire stoffer deler det samme volumen. I reaktionsbrøken står der to koncentrationer over brøkstregen og to under, så …”</p>
+<p><em>Y</em> er mindre end <em>K</em><sub>c</sub>, så ligevægten bliver forskudt mod højre. Lad <em>x</em> være den stofmængde ethansyre, der bliver omdannet efter indgrebet. Rækken Ligevægt er 0,50 mol − <em>x</em> for ethansyre, 0,50 mol − <em>x</em> for ethanol, 1,00 mol + <em>x</em> for ester og 0,10 mol + <em>x</em> for vand.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Alle fire stoffer er opløst i den samme væske og deler det samme volumen. I reaktionsbrøken står der to koncentrationer over brøkstregen og to under, så volumenet går ud af brøken. Derfor giver stofmængderne samme resultat som koncentrationerne.</p></li>
+<li><p>Lige efter indgrebet er der 0,50 mol ethansyre, 0,50 mol ethanol, 1,00 mol ester og 0,10 mol vand.</p></li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{n(\text{ester}) \cdot n(\mathrm{H_2O})}{n(\text{syre}) \cdot n(\text{alkohol})} = \frac{1{,}00\ \mathrm{mol} \cdot 0{,}10\ \mathrm{mol}}{0{,}50\ \mathrm{mol} \cdot 0{,}50\ \mathrm{mol}} = 0{,}40
+\]</span></p>
+<p><em>Y</em> = 0,40 er mindre end <em>K</em><sub>c</sub> = 4,0. Ligevægten bliver forskudt mod højre, så der dannes mere ester og mere vand.</p>
+<ol start="3" type="a">
+<li><em>x</em> angiver her den stofmængde ethansyre, der bliver omdannet, fra indgrebet og frem til den nye ligevægt. Der bliver omdannet lige så meget ethanol, og der dannes lige så meget ester og lige så meget vand.</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">syre</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">alkohol</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">ester</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">vand</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter indgrebet)</td>
+<td style="text-align: center;">0,50 mol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,50 mol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,00 mol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,10 mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,50 mol − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,50 mol − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,00 mol + <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,10 mol + <em>x</em></td>
+</tr>
+</tbody>
+</table>
+<ol start="4" type="a">
+<li>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven.</li>
+</ol>
+<p><span class="math display">\[
+4{,}0 = \frac{(1{,}00\ \mathrm{mol} + x) \cdot (0{,}10\ \mathrm{mol} + x)}{(0{,}50\ \mathrm{mol} - x) \cdot (0{,}50\ \mathrm{mol} - x)}
+\]</span></p>
+<p>CAS-værktøjet giver <em>x</em> = 0,200 eller <em>x</em> = 1,50. Der er kun 0,50 mol ethansyre, så <em>x</em> = 1,50 mol forkastes. Altså er <em>x</em> = 0,200 mol.</p>
+<ol start="5" type="a">
+<li>Ved den nye ligevægt er der 1,00 mol + 0,200 mol = 1,20 mol ester. Der er 0,30 mol ethansyre, 0,30 mol ethanol og 0,30 mol frit vand.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{1{,}20\ \mathrm{mol} \cdot 0{,}30\ \mathrm{mol}}{0{,}30\ \mathrm{mol} \cdot 0{,}30\ \mathrm{mol}} = 4{,}0
+\]</span></p>
+<p>Reaktionsbrøken giver <em>K</em><sub>c</sub>, så resultatet passer. Før indgrebet var udbyttet 1,00 mol / 1,50 mol = 67 %. Efter indgrebet er udbyttet 1,20 mol / 1,50 mol = 80 %. Når vandet bliver fjernet, dannes der altså mere ester.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.8-aflæs-et-indgreb-på-en-kurve" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.8-aflæs-et-indgreb-på-en-kurve">Opgave A1.4.8: Aflæs et indgreb på en kurve</h2>
+<p>En beholder ved 250 °C indeholder PCl<sub>5</sub>, PCl<sub>3</sub> og Cl<sub>2</sub>:</p>
+<div class="reaktion">
+<p>PCl<sub>5</sub>(g) ⇌ PCl<sub>3</sub>(g) + Cl<sub>2</sub>(g)</p>
+</div>
+<p>Ved 250 °C er <em>K</em><sub>p</sub> = 1,05 bar. Figuren viser partialtrykkene af de tre gasser som funktion af tiden. Undervejs bliver der gjort et indgreb.</p>
+<div id="fig-a1-opg-4-indgreb-kurve" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a1-opg-4-indgreb-kurve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a1-opg-4-indgreb-kurve.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Partialtrykkene af PCl5, PCl3 og Cl2 i beholderen som funktion af tiden."><img src="../figurer/a1-opg-4-indgreb-kurve.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a1-opg-4-indgreb-kurve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Partialtrykkene af PCl<sub>5</sub>, PCl<sub>3</sub> og Cl<sub>2</sub> i beholderen som funktion af tiden.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Aflæs de tre partialtryk i de første sekunder, og vis med reaktionsbrøken, at blandingen er i ligevægt.</li>
+<li>Hvornår bliver indgrebet gjort, og hvad er indgrebet? Begrund svaret ud fra kurverne.</li>
+<li>Hvilken vej bliver ligevægten forskudt efter indgrebet? Begrund svaret ud fra kurverne.</li>
+<li>Aflæs de tre partialtryk ved den nye ligevægt, og tjek aflæsningen med reaktionsbrøken.</li>
+<li>Passer forløbet med Le Chateliers princip? Forklar.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find det sted på figuren, hvor en kurve springer lodret. Se efter, om det er én kurve eller alle tre kurver, der springer. Bliver et stof pumpet ind, springer kun kurven for det ene stof. Bliver rumfanget ændret, springer alle tre kurver på samme tid.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Du kan begynde dine sætninger sådan:</p>
+<ul>
+<li>Indgrebet bliver gjort efter … sekunder, fordi …</li>
+<li>Kun kurven for … springer, så indgrebet er, at …</li>
+<li>Efter indgrebet stiger partialtrykket af …, og partialtrykkene af … falder. Derfor bliver ligevægten forskudt mod …</li>
+<li>Le Chateliers princip siger, at forskydningen formindsker virkningen af indgrebet. På figuren ser man, at partialtrykket af … først stiger til … bar og derefter …</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>I de første sekunder er <em>p</em>(PCl<sub>5</sub>) = 0,60 bar, <em>p</em>(PCl<sub>3</sub>) = 0,90 bar og <em>p</em>(Cl<sub>2</sub>) = 0,70 bar.</li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{PCl_3}) \cdot p(\mathrm{Cl_2})}{p(\mathrm{PCl_5})} = \frac{0{,}90\ \mathrm{bar} \cdot 0{,}70\ \mathrm{bar}}{0{,}60\ \mathrm{bar}} = 1{,}05\ \mathrm{bar}
+\]</span></p>
+<p><em>Y</em> er lig med <em>K</em><sub>p</sub>, og de tre kurver er vandrette. Blandingen er altså i ligevægt.</p>
+<ol start="2" type="a">
+<li><p>Indgrebet bliver gjort efter 20 sekunder. Her springer partialtrykket af Cl<sub>2</sub> fra 0,70 bar til 1,00 bar, mens kurverne for PCl<sub>5</sub> og PCl<sub>3</sub> ikke springer. Indgrebet er altså, at der bliver pumpet Cl<sub>2</sub> ind i beholderen. Var rumfanget blevet ændret, ville alle tre kurver være sprunget på samme tid.</p></li>
+<li><p>Ligevægten bliver forskudt mod venstre. Efter indgrebet stiger partialtrykket af PCl<sub>5</sub>, og partialtrykkene af PCl<sub>3</sub> og Cl<sub>2</sub> falder. Der bliver altså dannet PCl<sub>5</sub> af PCl<sub>3</sub> og Cl<sub>2</sub>. Det passer med reaktionsbrøken lige efter indgrebet: <em>Y</em> = 0,90 bar · 1,00 bar / 0,60 bar = 1,5 bar, som er større end <em>K</em><sub>p</sub> = 1,05 bar.</p></li>
+<li><p>Ved den nye ligevægt er <em>p</em>(PCl<sub>5</sub>) omkring 0,70 bar, <em>p</em>(PCl<sub>3</sub>) omkring 0,80 bar og <em>p</em>(Cl<sub>2</sub>) omkring 0,90 bar.</p></li>
+</ol>
+<p><span class="math display">\[
+Y = \frac{0{,}80\ \mathrm{bar} \cdot 0{,}90\ \mathrm{bar}}{0{,}70\ \mathrm{bar}} = 1{,}03\ \mathrm{bar}
+\]</span></p>
+<p>Det er tæt på <em>K</em><sub>p</sub> = 1,05 bar. Den lille forskel kommer af, at partialtrykkene kun kan aflæses med to decimaler på figuren.</p>
+<ol start="5" type="a">
+<li>Ja. Indgrebet fik partialtrykket af Cl<sub>2</sub> til at stige med 0,30 bar, fra 0,70 bar til 1,00 bar. Forskydningen mod venstre bruger Cl<sub>2</sub>, så partialtrykket af Cl<sub>2</sub> falder igen med omkring 0,10 bar. Forskydningen formindsker altså virkningen af indgrebet, som Le Chateliers princip siger. Indgrebet bliver ikke ophævet: partialtrykket af Cl<sub>2</sub> ender på omkring 0,90 bar, som er højere end de 0,70 bar før indgrebet.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med reaktionsskema, formel, beregning med enheder og en konklusion.</p>
+</section>
+<section id="opgave-a1.4.eks.1-pærearoma" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.eks.1-pærearoma">Opgave A1.4.eks.1: Pærearoma</h2>
+<p>Esteren pentylethanoat dufter af pære og bruges som aromastof i slik og sodavand. Pentylethanoat fremstilles af ethansyre og pentan-1-ol:</p>
+<div class="reaktion">
+<p>CH<sub>3</sub>COOH + CH<sub>3</sub>(CH<sub>2</sub>)<sub>4</sub>OH ⇌ CH<sub>3</sub>COO(CH<sub>2</sub>)<sub>4</sub>CH<sub>3</sub> + H<sub>2</sub>O</p>
+</div>
+<p>Ved den temperatur, der bruges, er <em>K</em><sub>c</sub> = 4,0, og vand er med i reaktionsbrøken. Alle fire stoffer er opløst i den samme væske, så der kan regnes med stofmængder i stedet for koncentrationer.</p>
+<p>En virksomhed blander 1,20 mol ethansyre med 1,20 mol pentan-1-ol. Da ligevægten har indstillet sig, indeholder blandingen 0,40 mol ethansyre, 0,40 mol pentan-1-ol, 0,80 mol pentylethanoat og 0,80 mol vand. For at få mere ester tilsætter virksomheden nu 0,60 mol pentan-1-ol mere.</p>
+<ol type="a">
+<li>Opskriv reaktionsbrøken for reaktionen, og vis ved en beregning, at blandingen er i ligevægt, før der tilsættes mere pentan-1-ol.</li>
+<li>Beregn reaktionsbrøken lige efter tilsætningen, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Beregn stofmængden af pentylethanoat ved den nye ligevægt.</li>
+<li>Vurdér, om resultatet passer med Le Chateliers princip. Inddrag udbyttet af pentylethanoat før og efter tilsætningen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Lige efter tilsætningen er der 0,40 mol + 0,60 mol = 1,00 mol pentan-1-ol. Stofmængderne af ethansyre, pentylethanoat og vand er uændrede. De fire stofmængder står i rækken Start i SÆL-skemaet.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>Y</em> er mindre end <em>K</em><sub>c</sub>, så ligevægten bliver forskudt mod højre. Lad <em>x</em> være den stofmængde ethansyre, der bliver omdannet efter tilsætningen. Rækken Ligevægt er 0,40 mol − <em>x</em> for ethansyre, 1,00 mol − <em>x</em> for pentan-1-ol og 0,80 mol + <em>x</em> for både pentylethanoat og vand. Udbyttet af pentylethanoat er stofmængden af ester divideret med de 1,20 mol, der højst kan dannes af 1,20 mol ethansyre.</p>
+<p>Til spørgsmål d kan du begynde sådan: “Der blev tilsat … mol pentan-1-ol. Forskydningen brugte … mol af det igen. Det passer med Le Chateliers princip, fordi …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Reaktionsbrøken før tilsætningen</strong></p>
+<p><span class="math display">\[
+Y = \frac{[\text{ester}] \cdot [\mathrm{H_2O}]}{[\text{syre}] \cdot [\text{alkohol}]}
+\]</span></p>
+<p>Volumenet går ud af brøken, så stofmængderne sættes ind.</p>
+<p><span class="math display">\[
+Y = \frac{0{,}80\ \mathrm{mol} \cdot 0{,}80\ \mathrm{mol}}{0{,}40\ \mathrm{mol} \cdot 0{,}40\ \mathrm{mol}} = 4{,}0
+\]</span></p>
+<p><em>Y</em> er lig med <em>K</em><sub>c</sub> = 4,0, så blandingen er i ligevægt før tilsætningen.</p>
+<p><strong>b. Lige efter tilsætningen</strong></p>
+<p>Lige efter tilsætningen er der 0,40 mol ethansyre, 1,00 mol pentan-1-ol, 0,80 mol pentylethanoat og 0,80 mol vand.</p>
+<p><span class="math display">\[
+Y = \frac{0{,}80\ \mathrm{mol} \cdot 0{,}80\ \mathrm{mol}}{0{,}40\ \mathrm{mol} \cdot 1{,}00\ \mathrm{mol}} = 1{,}6
+\]</span></p>
+<p><em>Y</em> = 1,6 er mindre end <em>K</em><sub>c</sub> = 4,0. Ligevægten bliver forskudt mod højre, så der dannes mere pentylethanoat.</p>
+<p><strong>c.&nbsp;Den nye ligevægt</strong></p>
+<p><em>x</em> angiver her den stofmængde ethansyre, der bliver omdannet, fra tilsætningen og frem til den nye ligevægt. Der bliver omdannet lige så meget pentan-1-ol, og der dannes lige så meget pentylethanoat og lige så meget vand.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">syre</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">alkohol</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">ester</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">vand</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter tilsætningen)</td>
+<td style="text-align: center;">0,40 mol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,00 mol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,80 mol</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,80 mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">0,40 mol − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">1,00 mol − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,80 mol + <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,80 mol + <em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven.</p>
+<p><span class="math display">\[
+4{,}0 = \frac{(0{,}80\ \mathrm{mol} + x) \cdot (0{,}80\ \mathrm{mol} + x)}{(0{,}40\ \mathrm{mol} - x) \cdot (1{,}00\ \mathrm{mol} - x)}
+\]</span></p>
+<p>Ligningen løses med et CAS-værktøj. Der er to løsninger: <em>x</em> = 0,142 eller <em>x</em> = 2,26. Begge løsninger er positive. Men der er kun 0,40 mol ethansyre, så med <em>x</em> = 2,26 mol ville stofmængden af ethansyre blive negativ. Altså er <em>x</em> = 0,142 mol.</p>
+<p><span class="math display">\[
+n(\text{ester}) = 0{,}80\ \mathrm{mol} + 0{,}142\ \mathrm{mol} = 0{,}942\ \mathrm{mol}
+\]</span></p>
+<p>Tjek: Der er 0,40 mol − 0,142 mol = 0,258 mol ethansyre og 1,00 mol − 0,142 mol = 0,858 mol pentan-1-ol.</p>
+<p><span class="math display">\[
+Y = \frac{0{,}942\ \mathrm{mol} \cdot 0{,}942\ \mathrm{mol}}{0{,}258\ \mathrm{mol} \cdot 0{,}858\ \mathrm{mol}} = 4{,}0
+\]</span></p>
+<p>Ved den nye ligevægt er der 0,94 mol pentylethanoat.</p>
+<p><strong>d.&nbsp;Le Chateliers princip</strong></p>
+<p>Der blev tilsat 0,60 mol pentan-1-ol. Forskydningen mod højre brugte 0,14 mol af det igen, så stofmængden af pentan-1-ol endte på 0,86 mol. Det er mindre end de 1,00 mol lige efter tilsætningen, men mere end de 0,40 mol før. Forskydningen har altså formindsket virkningen af indgrebet uden at ophæve det, og det passer med Le Chateliers princip.</p>
+<p>Udbyttet af pentylethanoat er steget fra 0,80 mol / 1,20 mol = 67 % til 0,942 mol / 1,20 mol = 79 %. Et overskud af alkoholen giver altså mere ester.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.eks.2-ammoniakken-tages-ud" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.eks.2-ammoniakken-tages-ud">Opgave A1.4.eks.2: Ammoniakken tages ud</h2>
+<p>Ammoniak til kunstgødning fremstilles af nitrogen og hydrogen:</p>
+<div class="reaktion">
+<p>N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g)</p>
+</div>
+<p>Ved 400 °C er <em>K</em><sub>p</sub> = 1,6 · 10<sup>−4</sup> bar<sup>−2</sup>. I et ammoniakanlæg fjerner man ammoniakken fra gasblandingen undervejs, så der kan dannes ny ammoniak.</p>
+<p>En reaktor ved 400 °C indeholder de tre gasser i ligevægt. Partialtrykkene er <em>p</em>(N<sub>2</sub>) = 20 bar, <em>p</em>(H<sub>2</sub>) = 50 bar og <em>p</em>(NH<sub>3</sub>) = 20 bar. Nu fjernes tre fjerdedele af ammoniakken, så <em>p</em>(NH<sub>3</sub>) falder til 5,0 bar. Partialtrykkene af nitrogen og hydrogen er uændrede lige efter indgrebet, og temperaturen er stadig 400 °C.</p>
+<ol type="a">
+<li>Opskriv ligevægtsloven for reaktionen.</li>
+<li>Beregn reaktionsbrøken lige efter indgrebet, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Beregn partialtrykket af ammoniak ved den nye ligevægt.</li>
+<li>Vurdér, om resultatet passer med Le Chateliers princip.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Lige efter indgrebet er <em>p</em>(N<sub>2</sub>) = 20 bar, <em>p</em>(H<sub>2</sub>) = 50 bar og <em>p</em>(NH<sub>3</sub>) = 5,0 bar. De tre tal sættes ind i reaktionsbrøken og står i rækken Start i SÆL-skemaet. Husk eksponenterne 3 og 2 i reaktionsbrøken for dannelsen af ammoniak.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>Y</em> er mindre end <em>K</em><sub>p</sub>, så ligevægten bliver forskudt mod højre. Lad <em>x</em> være det partialtryk af N<sub>2</sub>, der bliver omdannet efter indgrebet. Så bliver der omdannet 3<em>x</em> af H<sub>2</sub>, og der dannes 2<em>x</em> af NH<sub>3</sub>. Rækken Ligevægt er 20 bar − <em>x</em> for N<sub>2</sub>, 50 bar − 3<em>x</em> for H<sub>2</sub> og 5,0 bar + 2<em>x</em> for NH<sub>3</sub>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Ligevægtsloven</strong></p>
+<p><span class="math display">\[
+K_\mathrm{p} = \frac{p(\mathrm{NH_3})^{2}}{p(\mathrm{N_2}) \cdot p(\mathrm{H_2})^{3}}
+\]</span></p>
+<p><strong>b. Lige efter indgrebet</strong></p>
+<p>Lige efter indgrebet er <em>p</em>(N<sub>2</sub>) = 20 bar, <em>p</em>(H<sub>2</sub>) = 50 bar og <em>p</em>(NH<sub>3</sub>) = 5,0 bar.</p>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{NH_3})^{2}}{p(\mathrm{N_2}) \cdot p(\mathrm{H_2})^{3}} = \frac{(5{,}0\ \mathrm{bar})^{2}}{20\ \mathrm{bar} \cdot (50\ \mathrm{bar})^{3}} = 1{,}0 \cdot 10^{-5}\ \mathrm{bar^{-2}}
+\]</span></p>
+<p><em>Y</em> = 1,0 · 10<sup>−5</sup> bar<sup>−2</sup> er mindre end <em>K</em><sub>p</sub> = 1,6 · 10<sup>−4</sup> bar<sup>−2</sup>. Ligevægten bliver forskudt mod højre, så der dannes ny ammoniak.</p>
+<p><strong>c.&nbsp;Den nye ligevægt</strong></p>
+<p><em>x</em> angiver her det partialtryk af N<sub>2</sub>, der bliver omdannet, fra indgrebet og frem til den nye ligevægt. Der bliver omdannet 3 gange så meget H<sub>2</sub>, og der dannes dobbelt så meget NH<sub>3</sub>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">N<sub>2</sub>(g)</th>
+<th style="text-align: center;">+</th>
+<th style="text-align: center;">3 H<sub>2</sub>(g)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">2 NH<sub>3</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter indgrebet)</td>
+<td style="text-align: center;">20 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">50 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">5,0 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">−<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−3<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">+2<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">20 bar − <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">50 bar − 3<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">5,0 bar + 2<em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven.</p>
+<p><span class="math display">\[
+1{,}6 \cdot 10^{-4}\ \mathrm{bar^{-2}} = \frac{(5{,}0\ \mathrm{bar} + 2x)^{2}}{(20\ \mathrm{bar} - x) \cdot (50\ \mathrm{bar} - 3x)^{3}}
+\]</span></p>
+<p>Ligningen løses med et CAS-værktøj. Der er to løsninger: <em>x</em> = 3,70 eller <em>x</em> = 61,7. Begge løsninger er positive. Men med <em>x</em> = 61,7 bar bliver <em>p</em>(N<sub>2</sub>) = 20 bar − 61,7 bar = −41,7 bar, og et partialtryk kan ikke være negativt. Altså er <em>x</em> = 3,70 bar.</p>
+<p><span class="math display">\[
+p(\mathrm{NH_3}) = 5{,}0\ \mathrm{bar} + 2 \cdot 3{,}70\ \mathrm{bar} = 12{,}4\ \mathrm{bar}
+\]</span></p>
+<p>Tjek: De andre partialtryk er <em>p</em>(N<sub>2</sub>) = 20 bar − 3,70 bar = 16,3 bar og <em>p</em>(H<sub>2</sub>) = 50 bar − 3 · 3,70 bar = 38,9 bar.</p>
+<p><span class="math display">\[
+Y = \frac{(12{,}4\ \mathrm{bar})^{2}}{16{,}3\ \mathrm{bar} \cdot (38{,}9\ \mathrm{bar})^{3}} = 1{,}6 \cdot 10^{-4}\ \mathrm{bar^{-2}}
+\]</span></p>
+<p>Partialtrykket af ammoniak er 12 bar ved den nye ligevægt.</p>
+<p><strong>d.&nbsp;Le Chateliers princip</strong></p>
+<p>Indgrebet fik partialtrykket af ammoniak til at falde med 15 bar, fra 20 bar til 5,0 bar. Forskydningen mod højre danner ny ammoniak, så partialtrykket af ammoniak stiger igen med 7,4 bar, til 12,4 bar. Forskydningen har altså formindsket virkningen af indgrebet, men den har ikke ophævet det, for 12,4 bar er stadig mindre end de 20 bar før indgrebet. Det passer med Le Chateliers princip. Samtidig er der brugt nitrogen og hydrogen, så der i alt er dannet mere ammoniak, end hvis ammoniakken var blevet i reaktoren.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a1.4.eks.3-brun-gas-i-en-cylinder" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a1.4.eks.3-brun-gas-i-en-cylinder">Opgave A1.4.eks.3: Brun gas i en cylinder</h2>
+<p>Nitrogendioxid, NO<sub>2</sub>, er en brun og giftig gas, som blandt andet dannes i bilmotorer. I en lukket beholder er nitrogendioxid i ligevægt med den farveløse gas dinitrogentetraoxid, N<sub>2</sub>O<sub>4</sub>:</p>
+<div class="reaktion">
+<p>N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g)</p>
+</div>
+<p>Ved 25 °C er <em>K</em><sub>p</sub> = 0,15 bar. En gennemsigtig cylinder med et stempel har rumfanget 60 mL og indeholder de to gasser i ligevægt ved 25 °C. Partialtrykkene er <em>p</em>(N<sub>2</sub>O<sub>4</sub>) = 0,68 bar og <em>p</em>(NO<sub>2</sub>) = 0,32 bar. Stemplet trykkes hurtigt ind, så rumfanget bliver 20 mL, og temperaturen holdes på 25 °C. Lige efter sammenpresningen er gassen tydeligt mørkere brun end før. I løbet af få sekunder bliver gassen lidt lysere igen.</p>
+<ol type="a">
+<li>Beregn partialtrykkene af de to gasser lige efter sammenpresningen.</li>
+<li>Beregn reaktionsbrøken lige efter sammenpresningen, og afgør, hvilken vej ligevægten bliver forskudt.</li>
+<li>Beregn partialtrykkene af de to gasser og det samlede tryk ved den nye ligevægt.</li>
+<li>Forklar de to farveskift, og vurdér, om resultatet passer med Le Chateliers princip.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Rumfanget går fra 60 mL til 20 mL, så rumfanget bliver en tredjedel så stort. Begge partialtryk bliver derfor 3 gange så store lige efter sammenpresningen. De to nye partialtryk står i rækken Start i SÆL-skemaet.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><em>Y</em> er større end <em>K</em><sub>p</sub>, så ligevægten bliver forskudt mod venstre. Lad <em>x</em> være det partialtryk af N<sub>2</sub>O<sub>4</sub>, der bliver dannet efter sammenpresningen. Rækken Ligevægt er 2,04 bar + <em>x</em> for N<sub>2</sub>O<sub>4</sub> og 0,96 bar − 2<em>x</em> for NO<sub>2</sub>.</p>
+<p>Til spørgsmål d kan du begynde sådan: “Gassen bliver mørkere, fordi partialtrykket af den brune gas NO<sub>2</sub> …” og “Gassen bliver lysere igen, fordi ligevægten bliver forskudt mod …, så …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Lige efter sammenpresningen</strong></p>
+<p>Rumfanget bliver en tredjedel så stort, så begge partialtryk bliver 3 gange så store.</p>
+<p><em>p</em>(N<sub>2</sub>O<sub>4</sub>) = 3 · 0,68 bar = 2,04 bar og <em>p</em>(NO<sub>2</sub>) = 3 · 0,32 bar = 0,96 bar</p>
+<p><strong>b. Reaktionsbrøken og retningen</strong></p>
+<p><span class="math display">\[
+Y = \frac{p(\mathrm{NO_2})^{2}}{p(\mathrm{N_2O_4})} = \frac{(0{,}96\ \mathrm{bar})^{2}}{2{,}04\ \mathrm{bar}} = 0{,}45\ \mathrm{bar}
+\]</span></p>
+<p><em>Y</em> = 0,45 bar er større end <em>K</em><sub>p</sub> = 0,15 bar. Ligevægten bliver forskudt mod venstre, altså mod den side, der har færrest gasmolekyler.</p>
+<p><strong>c.&nbsp;Den nye ligevægt</strong></p>
+<p><em>x</em> angiver her det partialtryk af N<sub>2</sub>O<sub>4</sub>, der bliver dannet, fra sammenpresningen og frem til den nye ligevægt. Der bliver brugt dobbelt så meget NO<sub>2</sub>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">N<sub>2</sub>O<sub>4</sub>(g)</th>
+<th style="text-align: center;">⇌</th>
+<th style="text-align: center;">2 NO<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Start (lige efter sammenpresningen)</td>
+<td style="text-align: center;">2,04 bar</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,96 bar</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ændring</td>
+<td style="text-align: center;">+<em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">−2<em>x</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ligevægt</td>
+<td style="text-align: center;">2,04 bar + <em>x</em></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">0,96 bar − 2<em>x</em></td>
+</tr>
+</tbody>
+</table>
+<p>Udtrykkene fra rækken Ligevægt sættes ind i ligevægtsloven.</p>
+<p><span class="math display">\[
+0{,}15\ \mathrm{bar} = \frac{(0{,}96\ \mathrm{bar} - 2x)^{2}}{2{,}04\ \mathrm{bar} + x}
+\]</span></p>
+<p>Ligningen løses med et CAS-værktøj. Der er to løsninger: <em>x</em> = 0,191 eller <em>x</em> = 0,807. Begge løsninger er positive. Men med <em>x</em> = 0,807 bar bliver <em>p</em>(NO<sub>2</sub>) = 0,96 bar − 2 · 0,807 bar = −0,65 bar, og et partialtryk kan ikke være negativt. Altså er <em>x</em> = 0,191 bar.</p>
+<p><em>p</em>(N<sub>2</sub>O<sub>4</sub>) = 2,04 bar + 0,191 bar = 2,231 bar og <em>p</em>(NO<sub>2</sub>) = 0,96 bar − 2 · 0,191 bar = 0,578 bar</p>
+<p><span class="math display">\[
+Y = \frac{(0{,}578\ \mathrm{bar})^{2}}{2{,}231\ \mathrm{bar}} = 0{,}15\ \mathrm{bar}
+\]</span></p>
+<p>Reaktionsbrøken giver <em>K</em><sub>p</sub>, så resultatet passer. Det samlede tryk er</p>
+<p><span class="math display">\[
+p_\mathrm{total} = 2{,}231\ \mathrm{bar} + 0{,}578\ \mathrm{bar} = 2{,}81\ \mathrm{bar}
+\]</span></p>
+<p>Ved den nye ligevægt er <em>p</em>(N<sub>2</sub>O<sub>4</sub>) = 2,23 bar og <em>p</em>(NO<sub>2</sub>) = 0,58 bar, og det samlede tryk er 2,81 bar.</p>
+<p><strong>d.&nbsp;Farveskiftene og Le Chateliers princip</strong></p>
+<p>Gassen bliver mørkere lige efter sammenpresningen, fordi partialtrykket af den brune gas NO<sub>2</sub> bliver 3 gange så stort, fra 0,32 bar til 0,96 bar. De samme NO<sub>2</sub>-molekyler er presset sammen på mindre plads. Gassen bliver lidt lysere igen, fordi ligevægten bliver forskudt mod venstre, så brun NO<sub>2</sub> bliver lavet om til farveløs N<sub>2</sub>O<sub>4</sub>. Partialtrykket af NO<sub>2</sub> falder fra 0,96 bar til 0,58 bar. Det er stadig mere end de 0,32 bar før sammenpresningen, så gassen ender mørkere, end den var fra start.</p>
+<p>Det samlede tryk var 0,68 bar + 0,32 bar = 1,00 bar før sammenpresningen og 2,04 bar + 0,96 bar = 3,00 bar lige efter. Forskydningen mod venstre laver to molekyler om til ét og får det samlede tryk til at falde til 2,81 bar. Forskydningen formindsker altså virkningen af indgrebet uden at ophæve det, og det passer med Le Chateliers princip.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a1-4-ny-ligevaegt.html" class="pagination-link" aria-label="A1.4 Indgreb og ny ligevægt">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A1.4 Indgreb og ny ligevægt</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="pagination-link" aria-label="A1.5 Opløselighedsligevægte">
+        <span class="nav-page-text">A1.5 Opløselighedsligevægte</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

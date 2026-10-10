@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A2.1 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" rel="next">
+<link href="../kapitler/a2-1-energi-og-entalpi.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-1-opgaver.html">Opgaver til A2.1</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a2.1.1-exoterm-eller-endoterm" id="toc-opgave-a2.1.1-exoterm-eller-endoterm" class="nav-link active" data-scroll-target="#opgave-a2.1.1-exoterm-eller-endoterm">Opgave A2.1.1: Exoterm eller endoterm</a></li>
+  <li><a href="#opgave-a2.1.2-aflæs-et-entalpidiagram" id="toc-opgave-a2.1.2-aflæs-et-entalpidiagram" class="nav-link" data-scroll-target="#opgave-a2.1.2-aflæs-et-entalpidiagram">Opgave A2.1.2: Aflæs et entalpidiagram</a></li>
+  <li><a href="#opgave-a2.1.3-vend-og-gang" id="toc-opgave-a2.1.3-vend-og-gang" class="nav-link" data-scroll-target="#opgave-a2.1.3-vend-og-gang">Opgave A2.1.3: Vend og gang</a></li>
+  <li><a href="#opgave-a2.1.4-varmen-fra-et-magnesiumbånd" id="toc-opgave-a2.1.4-varmen-fra-et-magnesiumbånd" class="nav-link" data-scroll-target="#opgave-a2.1.4-varmen-fra-et-magnesiumbånd">Opgave A2.1.4: Varmen fra et magnesiumbånd</a></li>
+  <li><a href="#opgave-a2.1.5-to-forsøg-i-et-kalorimeter" id="toc-opgave-a2.1.5-to-forsøg-i-et-kalorimeter" class="nav-link" data-scroll-target="#opgave-a2.1.5-to-forsøg-i-et-kalorimeter">Opgave A2.1.5: To forsøg i et kalorimeter</a></li>
+  <li><a href="#opgave-a2.1.6-kaliumnitrat-i-vand" id="toc-opgave-a2.1.6-kaliumnitrat-i-vand" class="nav-link" data-scroll-target="#opgave-a2.1.6-kaliumnitrat-i-vand">Opgave A2.1.6: Kaliumnitrat i vand</a></li>
+  <li><a href="#opgave-a2.1.7-hvor-varmt-bliver-vandet" id="toc-opgave-a2.1.7-hvor-varmt-bliver-vandet" class="nav-link" data-scroll-target="#opgave-a2.1.7-hvor-varmt-bliver-vandet">Opgave A2.1.7: Hvor varmt bliver vandet?</a></li>
+  <li><a href="#opgave-a2.1.8-hvorfor-bliver-tallet-for-lille" id="toc-opgave-a2.1.8-hvorfor-bliver-tallet-for-lille" class="nav-link" data-scroll-target="#opgave-a2.1.8-hvorfor-bliver-tallet-for-lille">Opgave A2.1.8: Hvorfor bliver tallet for lille?</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a2.1.eks.1-selvopvarmende-dåse" id="toc-opgave-a2.1.eks.1-selvopvarmende-dåse" class="nav-link" data-scroll-target="#opgave-a2.1.eks.1-selvopvarmende-dåse">Opgave A2.1.eks.1: Selvopvarmende dåse</a></li>
+  <li><a href="#opgave-a2.1.eks.2-sved-køler-kroppen" id="toc-opgave-a2.1.eks.2-sved-køler-kroppen" class="nav-link" data-scroll-target="#opgave-a2.1.eks.2-sved-køler-kroppen">Opgave A2.1.eks.2: Sved køler kroppen</a></li>
+  <li><a href="#opgave-a2.1.eks.3-hydrogen-fra-vindmøllestrøm" id="toc-opgave-a2.1.eks.3-hydrogen-fra-vindmøllestrøm" class="nav-link" data-scroll-target="#opgave-a2.1.eks.3-hydrogen-fra-vindmøllestrøm">Opgave A2.1.eks.3: Hydrogen fra vindmøllestrøm</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-1-opgaver.html">Opgaver til A2.1</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A2.1</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a2-1-energi-og-entalpi.html">A2.1 Energi og entalpi</a>. Prøv selv, før du åbner hjælpen under opgaven. Vands specifikke varmekapacitet er 4,18 J/(g · K).</p>
+<section id="opgave-a2.1.1-exoterm-eller-endoterm" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.1-exoterm-eller-endoterm">Opgave A2.1.1: Exoterm eller endoterm</h2>
+<p>Her er fire beskrivelser af reaktioner:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 72%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Beskrivelse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Et stearinlys brænder og varmer luften omkring flammen.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">En brusetablet med citronsyre og natriumhydrogencarbonat lægges i et glas vand. Vandet bliver koldere, mens tabletten bruser.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">En håndvarmer med jernpulver bliver varm, når jernet reagerer med oxygen fra luften.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">Kalksten bliver til brændt kalk i en ovn. Reaktionen går i stå, hvis ovnen holder op med at tilføre varme.</td>
+</tr>
+</tbody>
+</table>
+<p>Og her er fire reaktionsskemaer med Δ<em>H</em>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Reaktion</th>
+<th style="text-align: left;">Δ<em>H</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">2 H<sub>2</sub>O<sub>2</sub>(l) → 2 H<sub>2</sub>O(l) + O<sub>2</sub>(g)</td>
+<td style="text-align: left;">−196,0 kJ/mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">N<sub>2</sub>(g) + O<sub>2</sub>(g) → 2 NO(g)</td>
+<td style="text-align: left;">+182,6 kJ/mol</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">C<sub>2</sub>H<sub>4</sub>(g) + H<sub>2</sub>(g) → C<sub>2</sub>H<sub>6</sub>(g)</td>
+<td style="text-align: left;">−136,4 kJ/mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">8</td>
+<td style="text-align: left;">N<sub>2</sub>O<sub>4</sub>(g) → 2 NO<sub>2</sub>(g)</td>
+<td style="text-align: left;">+57,2 kJ/mol</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Afgør for hver af beskrivelserne 1 til 4, om reaktionen er exoterm eller endoterm.</li>
+<li>Afgør ud fra fortegnet på Δ<em>H</em>, om hver af reaktionerne 5 til 8 er exoterm eller endoterm.</li>
+<li>Se på brusetabletten i glasset med vand (nr. 2). Hvad er systemet, og hvad er omgivelserne? Forklar, hvorfor vandet bliver koldere.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på, hvad der sker med omgivelserne. Bliver omgivelserne varmere, har systemet afgivet varme, og reaktionen er exoterm. Bliver omgivelserne koldere, eller skal der hele tiden tilføres varme, har systemet optaget varme, og reaktionen er endoterm.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Er Δ<em>H</em> negativ, er reaktionen exoterm. Er Δ<em>H</em> positiv, er reaktionen endoterm.</p>
+<p>Systemet er de stoffer, der reagerer. I glasset med brusetabletten er det citronsyre og natriumhydrogencarbonat. Du kan begynde forklaringen sådan: “Vandet bliver koldere, fordi systemet …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Beskrivelserne:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 25%">
+<col style="width: 54%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Svar</th>
+<th style="text-align: left;">Begrundelse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">exoterm</td>
+<td style="text-align: left;">Stearinlyset afgiver varme til luften.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">endoterm</td>
+<td style="text-align: left;">Vandet bliver koldere, så reaktionen i brusetabletten har optaget varme fra vandet.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">exoterm</td>
+<td style="text-align: left;">Håndvarmeren afgiver varme til hånden.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">endoterm</td>
+<td style="text-align: left;">Kalkstenen optager varme fra ovnen, så længe reaktionen forløber.</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Reaktion 5 og 7 har negativ Δ<em>H</em> og er exoterme. Reaktion 6 og 8 har positiv Δ<em>H</em> og er endoterme.</p></li>
+<li><p>Systemet er de stoffer, der reagerer: citronsyre og natriumhydrogencarbonat og de stoffer, som citronsyre og natriumhydrogencarbonat bliver til. Omgivelserne er alt det andet: vandet, glasset, luften og hånden, der holder glasset. Reaktionen i brusetabletten er endoterm. Vandet bliver koldere, fordi systemet optager varme fra vandet.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.2-aflæs-et-entalpidiagram" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.2-aflæs-et-entalpidiagram">Opgave A2.1.2: Aflæs et entalpidiagram</h2>
+<p>Methanol, CH<sub>3</sub>OH, kan fremstilles af carbonmonoxid og hydrogen:</p>
+<div class="reaktion">
+<p>CO(g) + 2 H<sub>2</sub>(g) → CH<sub>3</sub>OH(g)</p>
+</div>
+<p>Figuren viser et entalpidiagram for reaktionen. Aksen viser entalpien i kJ pr. mol reaktion. Nulpunktet på aksen er valgt tilfældigt, fordi man kun kan måle forskelle i entalpi.</p>
+<div id="fig-a2-opg-1-methanol" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a2-opg-1-methanol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a2-opg-1-methanol.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Entalpidiagram for reaktionen CO(g) + 2 H2(g) → CH3OH(g)."><img src="../figurer/a2-opg-1-methanol.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a2-opg-1-methanol-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Entalpidiagram for reaktionen CO(g) + 2 H<sub>2</sub>(g) → CH<sub>3</sub>OH(g).
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Aflæs entalpien for reaktanterne og entalpien for produktet.</li>
+<li>Beregn Δ<em>H</em> for reaktionen.</li>
+<li>Er reaktionen exoterm eller endoterm? Begrund svaret både ud fra fortegnet på Δ<em>H</em> og ud fra diagrammet.</li>
+<li>Angiv Δ<em>H</em> for den modsatte reaktion, CH<sub>3</sub>OH(g) → CO(g) + 2 H<sub>2</sub>(g), og beskriv, hvordan entalpidiagrammet for den modsatte reaktion ser ud.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Tilvæksten i entalpi er slutværdien minus startværdien: Δ<em>H</em> = <em>H</em><sub>slut</sub> − <em>H</em><sub>start</sub>. Slutværdien er entalpien for produktet CH<sub>3</sub>OH, og startværdien er entalpien for reaktanterne CO og H<sub>2</sub>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktanterne CO og H<sub>2</sub> ligger ud for 120 kJ/mol på aksen, og produktet CH<sub>3</sub>OH ligger ud for 30 kJ/mol. Når reaktionsskemaet vendes om, bytter start og slut plads, og Δ<em>H</em> skifter fortegn.</p>
+<p>Du kan begynde begrundelsen sådan: “I diagrammet ligger produktet CH<sub>3</sub>OH … end reaktanterne, så systemet har …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Reaktanterne CO(g) + 2 H<sub>2</sub>(g) har entalpien 120 kJ/mol. Produktet CH<sub>3</sub>OH(g) har entalpien 30 kJ/mol.</p></li>
+<li><p>Tilvæksten i entalpi er slutværdien minus startværdien:</p></li>
+</ol>
+<p><span class="math display">\[
+\Delta H = H_\mathrm{slut} - H_\mathrm{start} = 30\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} - 120\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -90\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<ol start="3" type="a">
+<li><p>Dannelsen af methanol er exoterm. Δ<em>H</em> er negativ. I diagrammet ligger produktet CH<sub>3</sub>OH lavere end reaktanterne CO og H<sub>2</sub>, så systemet har afgivet 90 kJ til omgivelserne for hvert mol reaktion.</p></li>
+<li><p>Den modsatte reaktion, CH<sub>3</sub>OH(g) → CO(g) + 2 H<sub>2</sub>(g), har Δ<em>H</em> = +90 kJ/mol, fordi Δ<em>H</em> skifter fortegn, når reaktionsskemaet vendes. I entalpidiagrammet for den modsatte reaktion er CH<sub>3</sub>OH reaktanten ved 30 kJ/mol, og CO og H<sub>2</sub> er produkterne ved 120 kJ/mol. Pilen peger opad, og reaktionen er endoterm.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.3-vend-og-gang" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.3-vend-og-gang">Opgave A2.1.3: Vend og gang</h2>
+<p>Nitrogenoxid, NO, fra bilers udstødning reagerer med oxygen i luften og danner den brune gas nitrogendioxid, NO<sub>2</sub>:</p>
+<div class="reaktion">
+<p>2 NO(g) + O<sub>2</sub>(g) → 2 NO<sub>2</sub>(g)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em> = −116,2 kJ/mol</p>
+</div>
+<p>Angiv Δ<em>H</em> med fortegn og enhed for hver af de fire reaktioner.</p>
+<ol type="a">
+<li>2 NO<sub>2</sub>(g) → 2 NO(g) + O<sub>2</sub>(g)</li>
+<li>NO(g) + ½ O<sub>2</sub>(g) → NO<sub>2</sub>(g)</li>
+<li>4 NO(g) + 2 O<sub>2</sub>(g) → 4 NO<sub>2</sub>(g)</li>
+<li>NO<sub>2</sub>(g) → NO(g) + ½ O<sub>2</sub>(g)</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Der gælder to regler. Vendes reaktionsskemaet om, skifter Δ<em>H</em> fortegn. Ganges reaktionsskemaet med et tal, ganges Δ<em>H</em> med det samme tal. Sammenlign hvert reaktionsskema med det oprindelige, 2 NO(g) + O<sub>2</sub>(g) → 2 NO<sub>2</sub>(g).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I spørgsmål a er reaktionsskemaet for NO og O<sub>2</sub> vendt om. I spørgsmål b er det ganget med ½. I spørgsmål c er det ganget med 2. I spørgsmål d er det både vendt om og ganget med ½.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Reaktionsskemaet 2 NO(g) + O<sub>2</sub>(g) → 2 NO<sub>2</sub>(g) er vendt om, så Δ<em>H</em> skifter fortegn: Δ<em>H</em> = +116,2 kJ/mol.</p></li>
+<li><p>Reaktionsskemaet 2 NO(g) + O<sub>2</sub>(g) → 2 NO<sub>2</sub>(g) er ganget med ½, så Δ<em>H</em> også ganges med ½:</p></li>
+</ol>
+<p><span class="math display">\[
+\Delta H = \frac{1}{2} \cdot \left(-116{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = -58{,}1\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<ol start="3" type="a">
+<li>Reaktionsskemaet 2 NO(g) + O<sub>2</sub>(g) → 2 NO<sub>2</sub>(g) er ganget med 2, så Δ<em>H</em> også ganges med 2:</li>
+</ol>
+<p><span class="math display">\[
+\Delta H = 2 \cdot \left(-116{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = -232{,}4\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<ol start="4" type="a">
+<li>Reaktionsskemaet 2 NO(g) + O<sub>2</sub>(g) → 2 NO<sub>2</sub>(g) er både vendt om og ganget med ½. Δ<em>H</em> skifter fortegn og ganges med ½: Δ<em>H</em> = +58,1 kJ/mol.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.4-varmen-fra-et-magnesiumbånd" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.4-varmen-fra-et-magnesiumbånd">Opgave A2.1.4: Varmen fra et magnesiumbånd</h2>
+<p>Magnesium brænder med en kraftig, hvid flamme:</p>
+<div class="reaktion">
+<p>Mg(s) + ½ O<sub>2</sub>(g) → MgO(s)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em> = −601,6 kJ/mol</p>
+</div>
+<p>Et magnesiumbånd vejer 1,50 g og brænder helt op.</p>
+<ol type="a">
+<li>Beregn stofmængden af magnesium i magnesiumbåndet.</li>
+<li>Beregn den varme, der afgives, når magnesiumbåndet brænder.</li>
+<li>Beregn massen af det magnesium, der skal brænde, for at der afgives 100 kJ.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>H</em> = −601,6 kJ/mol betyder, at der afgives 601,6 kJ, når 1 mol magnesium brænder, fordi magnesium har koefficienten 1 i reaktionsskemaet. Find først stofmængden af magnesium med <em>n</em> = <em>m</em> / <em>M</em>. Molarmassen for magnesium er 24,31 g/mol.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Stofmængden af magnesium er 0,0617 mol. Gang stofmængden med Δ<em>H</em> for at finde varmen. I spørgsmål c går du den modsatte vej: del 100 kJ med 601,6 kJ/mol for at finde stofmængden af magnesium, og regn derefter stofmængden om til masse med <em>m</em> = <em>n</em> · <em>M</em>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Stofmængden af magnesium er</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{Mg}) = \frac{m}{M} = \frac{1{,}50\ \mathrm{g}}{24{,}31\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}0617\ \mathrm{mol}
+\]</span></p>
+<ol start="2" type="a">
+<li>Magnesium har koefficienten 1 i reaktionsskemaet, så reaktionen forløber 0,0617 mol gange.</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{Mg}) \cdot \Delta H = 0{,}0617\ \mathrm{mol} \cdot \left(-601{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = -37{,}1\ \mathrm{kJ}
+\]</span></p>
+<p>Fortegnet er negativt, så systemet afgiver varme. Magnesiumbåndet afgiver 37,1 kJ, når det brænder.</p>
+<ol start="3" type="a">
+<li>Først findes den stofmængde af magnesium, der afgiver 100 kJ:</li>
+</ol>
+<p><span class="math display">\[
+n(\mathrm{Mg}) = \frac{100\ \mathrm{kJ}}{601{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}} = 0{,}166\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{Mg}) = n \cdot M = 0{,}166\ \mathrm{mol} \cdot 24{,}31\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 4{,}04\ \mathrm{g}
+\]</span></p>
+<p>Der skal brænde 4,04 g magnesium, for at der afgives 100 kJ.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.5-to-forsøg-i-et-kalorimeter" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.5-to-forsøg-i-et-kalorimeter">Opgave A2.1.5: To forsøg i et kalorimeter</h2>
+<p>To forskellige reaktioner foregår i vand i et kalorimeter af skumplast. Temperaturen i vandet måles før og efter reaktionen:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Forsøg</th>
+<th style="text-align: center;">Masse af vandet</th>
+<th style="text-align: center;">Temperatur før</th>
+<th style="text-align: center;">Temperatur efter</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">150,0 g</td>
+<td style="text-align: center;">21,3 °C</td>
+<td style="text-align: center;">33,8 °C</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">200,0 g</td>
+<td style="text-align: center;">22,4 °C</td>
+<td style="text-align: center;">18,9 °C</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn Δ<em>T</em> for vandet i forsøg 1 og i forsøg 2. Husk fortegnet.</li>
+<li>Beregn varmen, <em>q</em>, for vandet i forsøg 1 og i forsøg 2.</li>
+<li>Forklar, hvad fortegnet på <em>q</em> fortæller i forsøg 2.</li>
+<li>I hvilket af de to forsøg er reaktionen exoterm?</li>
+<li>I et tredje forsøg optager 250,0 g vand 10,0 kJ varme fra en reaktion. Beregn, hvor meget temperaturen i vandet stiger.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>T</em> er sluttemperaturen minus starttemperaturen. Falder temperaturen i vandet, er Δ<em>T</em> negativ. Varmen findes med <em>q</em> = <em>m</em> · <em>c</em> · Δ<em>T</em>, hvor <em>c</em> = 4,18 J/(g · K) for vand.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I forsøg 1 er Δ<em>T</em> = 12,5 K, og i forsøg 2 er Δ<em>T</em> = −3,5 K. <em>q</em> er den varme, vandet har optaget. Du kan begynde forklaringen sådan: “Når <em>q</em> er negativ, har vandet …”</p>
+<p>I spørgsmål e skal du isolere Δ<em>T</em> i formlen: Δ<em>T</em> = <em>q</em> / (<em>m</em> · <em>c</em>). Regn først 10,0 kJ om til joule.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>I forsøg 1 er Δ<em>T</em> = 33,8 °C − 21,3 °C = 12,5 K. I forsøg 2 er Δ<em>T</em> = 18,9 °C − 22,4 °C = −3,5 K.</p></li>
+<li><p>Varmen for vandet i forsøg 1:</p></li>
+</ol>
+<p><span class="math display">\[
+q = m \cdot c \cdot \Delta T = 150{,}0\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}} \cdot 12{,}5\ \mathrm{K} = 7{,}84 \cdot 10^{3}\ \mathrm{J}
+\]</span></p>
+<p>Varmen for vandet i forsøg 2:</p>
+<p><span class="math display">\[
+q = m \cdot c \cdot \Delta T = 200{,}0\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}} \cdot (-3{,}5\ \mathrm{K}) = -2{,}93 \cdot 10^{3}\ \mathrm{J}
+\]</span></p>
+<p>Der er 1000 J i 1 kJ. I forsøg 1 er <em>q</em> = 7,84 kJ, og i forsøg 2 er <em>q</em> = −2,93 kJ.</p>
+<ol start="3" type="a">
+<li><p>Når <em>q</em> er negativ, har vandet afgivet varme. I forsøg 2 har vandet afgivet 2,93 kJ til de stoffer, der reagerer.</p></li>
+<li><p>Reaktionen i forsøg 1 er exoterm. Vandet har optaget 7,84 kJ, og den varme har systemet afgivet. Reaktionen i forsøg 2 er endoterm, fordi systemet har optaget varme fra vandet.</p></li>
+<li><p>Varmen regnes om til joule: 10,0 kJ = 10,0 · 10<sup>3</sup> J. Δ<em>T</em> isoleres i <em>q</em> = <em>m</em> · <em>c</em> · Δ<em>T</em>:</p></li>
+</ol>
+<p><span class="math display">\[
+\Delta T = \frac{q}{m \cdot c} = \frac{10{,}0 \cdot 10^{3}\ \mathrm{J}}{250{,}0\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}}} = 9{,}57\ \mathrm{K}
+\]</span></p>
+<p>Temperaturen i vandet stiger 9,57 K, altså 9,57 °C.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.6-kaliumnitrat-i-vand" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.6-kaliumnitrat-i-vand">Opgave A2.1.6: Kaliumnitrat i vand</h2>
+<p>Kaliumnitrat, KNO<sub>3</sub>, bruges i gødning og til saltning af kød. I et kalorimeter opløses 10,11 g kaliumnitrat i 100,0 g vand. Temperaturen i vandet falder fra 21,6 °C til 13,7 °C.</p>
+<div class="reaktion">
+<p>KNO<sub>3</sub>(s) → K<sup>+</sup>(aq) + NO<sub>3</sub><sup>−</sup>(aq)</p>
+</div>
+<ol type="a">
+<li>Beregn den varme, <em>q</em>, som vandet har optaget. Husk fortegnet.</li>
+<li>Beregn stofmængden af kaliumnitrat.</li>
+<li>Beregn Δ<em>H</em> for opløsningen af kaliumnitrat.</li>
+<li>Er opløsningen af kaliumnitrat exoterm eller endoterm? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Følg de tre trin fra eksemplet med calciumchlorid i afsnit A2.1: varmen, stofmængden og tilvæksten i entalpi. Temperaturen i vandet falder, så Δ<em>T</em> er negativ. Molarmassen for KNO<sub>3</sub> er 101,11 g/mol.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>T</em> = 13,7 °C − 21,6 °C = −7,9 K. Derfor bliver <em>q</em> negativ: vandet har afgivet varme til kaliumnitrat. Brug derefter Δ<em>H</em> = −<em>q</em> / <em>n</em>. Minus foran et negativt tal giver plus.</p>
+<p>Du kan begynde begrundelsen sådan: “Fortegnet på Δ<em>H</em> er …, så opløsningen af kaliumnitrat er …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Varmen</strong></p>
+<p>Temperaturen i vandet ændrer sig med Δ<em>T</em> = 13,7 °C − 21,6 °C = −7,9 K.</p>
+<p><span class="math display">\[
+q = m \cdot c \cdot \Delta T = 100{,}0\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}} \cdot (-7{,}9\ \mathrm{K}) = -3{,}30 \cdot 10^{3}\ \mathrm{J}
+\]</span></p>
+<p>Der er 1000 J i 1 kJ, så <em>q</em> = −3,30 kJ. Fortegnet er negativt, fordi vandet har afgivet 3,30 kJ.</p>
+<p><strong>b. Stofmængden</strong></p>
+<p>Molarmassen for KNO<sub>3</sub> er (39,10 + 14,01 + 3 · 16,00) g/mol = 101,11 g/mol.</p>
+<p><span class="math display">\[
+n(\mathrm{KNO_3}) = \frac{m}{M} = \frac{10{,}11\ \mathrm{g}}{101{,}11\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}1000\ \mathrm{mol}
+\]</span></p>
+<p><strong>c.&nbsp;Tilvæksten i entalpi</strong></p>
+<p><span class="math display">\[
+\Delta H = -\frac{q}{n} = -\frac{-3{,}30\ \mathrm{kJ}}{0{,}1000\ \mathrm{mol}} = +33\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p><strong>d.&nbsp;Konklusion</strong></p>
+<p>Δ<em>H</em> = +33 kJ/mol for opløsningen af kaliumnitrat. Fortegnet er positivt, fordi temperaturen i vandet faldt. Opløsningen af kaliumnitrat er endoterm: kaliumnitrat optager varme fra vandet, når det går i opløsning.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.7-hvor-varmt-bliver-vandet" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.7-hvor-varmt-bliver-vandet">Opgave A2.1.7: Hvor varmt bliver vandet?</h2>
+<p>Lithiumchlorid, LiCl, afgiver varme, når det opløses i vand:</p>
+<div class="reaktion">
+<p>LiCl(s) → Li<sup>+</sup>(aq) + Cl<sup>−</sup>(aq)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em> = −37,0 kJ/mol</p>
+</div>
+<p>I et kalorimeter opløses 4,24 g lithiumchlorid i 150,0 g vand. Vandet er 20,0 °C fra start.</p>
+<ol type="a">
+<li>Beregn stofmængden af lithiumchlorid.</li>
+<li>Beregn den varme, vandet optager, når lithiumchlorid opløses.</li>
+<li>Beregn temperaturstigningen og sluttemperaturen i vandet. Antag, at al varmen bliver i vandet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Opgaven med lithiumchlorid går den modsatte vej af eksemplet med calciumchlorid i afsnit A2.1. Du kender Δ<em>H</em> og skal finde temperaturen. Begynd med stofmængden af lithiumchlorid. Molarmassen for LiCl er 42,39 g/mol.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Formlen Δ<em>H</em> = −<em>q</em> / <em>n</em> kan skrives om til <em>q</em> = −<em>n</em> · Δ<em>H</em>. Det giver den varme, vandet optager. Regn varmen om fra kJ til J, og isolér Δ<em>T</em> i <em>q</em> = <em>m</em> · <em>c</em> · Δ<em>T</em>, så Δ<em>T</em> = <em>q</em> / (<em>m</em> · <em>c</em>). Sluttemperaturen er starttemperaturen plus Δ<em>T</em>.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Stofmængden</strong></p>
+<p><span class="math display">\[
+n(\mathrm{LiCl}) = \frac{m}{M} = \frac{4{,}24\ \mathrm{g}}{42{,}39\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}100\ \mathrm{mol}
+\]</span></p>
+<p><strong>b. Varmen</strong></p>
+<p>Formlen Δ<em>H</em> = −<em>q</em> / <em>n</em> skrives om, så <em>q</em> står alene:</p>
+<p><span class="math display">\[
+q = -n \cdot \Delta H = -0{,}100\ \mathrm{mol} \cdot \left(-37{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = 3{,}70\ \mathrm{kJ}
+\]</span></p>
+<p>Vandet optager 3,70 kJ, når lithiumchlorid opløses. Der er 1000 J i 1 kJ, så <em>q</em> = 3,70 · 10<sup>3</sup> J.</p>
+<p><strong>c.&nbsp;Temperaturen</strong></p>
+<p><span class="math display">\[
+\Delta T = \frac{q}{m \cdot c} = \frac{3{,}70 \cdot 10^{3}\ \mathrm{J}}{150{,}0\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}}} = 5{,}90\ \mathrm{K}
+\]</span></p>
+<p>Temperaturen i vandet stiger 5,90 K. Sluttemperaturen er 20,0 °C + 5,9 °C = 25,9 °C.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.8-hvorfor-bliver-tallet-for-lille" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.8-hvorfor-bliver-tallet-for-lille">Opgave A2.1.8: Hvorfor bliver tallet for lille?</h2>
+<p>En elev vil måle Δ<em>H</em> for opløsningen af lithiumchlorid:</p>
+<div class="reaktion">
+<p>LiCl(s) → Li<sup>+</sup>(aq) + Cl<sup>−</sup>(aq)</p>
+</div>
+<p>Eleven hælder 150,0 g vand i et bæger af skumplast uden låg og måler temperaturen. Efter 60 sekunder tilsætter eleven 4,24 g lithiumchlorid, som er 0,100 mol, og rører rundt. Figuren viser temperaturen i bægeret. Temperaturen stiger fra 20,0 °C til 25,2 °C, og eleven beregner Δ<em>H</em> = −33 kJ/mol. Tabelværdien er Δ<em>H</em> = −37,0 kJ/mol.</p>
+<div id="fig-a2-opg-1-lithiumchlorid" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a2-opg-1-lithiumchlorid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a2-opg-1-lithiumchlorid.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Temperaturen i bægeret med vand som funktion af tiden. Lithiumchlorid tilsættes efter 60 sekunder."><img src="../figurer/a2-opg-1-lithiumchlorid.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a2-opg-1-lithiumchlorid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Temperaturen i bægeret med vand som funktion af tiden. Lithiumchlorid tilsættes efter 60 sekunder.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Hvad er systemet, og hvad er omgivelserne i elevens forsøg?</li>
+<li>Se på kurven, efter at temperaturen har været højest. Forklar, hvad kurven viser om bægeret, og hvorfor det gør talværdien af den målte Δ<em>H</em> for lille.</li>
+<li>I beregningen med <em>q</em> = <em>m</em> · <em>c</em> · Δ<em>T</em> bruger eleven kun massen af vandet. Forklar, hvorfor det også gør talværdien af den målte Δ<em>H</em> for lille.</li>
+<li>Foreslå to ændringer af forsøget, som vil give en Δ<em>H</em> tættere på tabelværdien.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Tænk på, hvor varmen fra opløsningen af lithiumchlorid ender. Beregningen tæller kun den varme med, som har varmet vandet op. Al anden varme mangler i <em>q</em>, og så bliver talværdien af Δ<em>H</em> = −<em>q</em> / <em>n</em> for lille.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Du kan begynde svarene sådan:</p>
+<ul>
+<li>“Systemet er …, og omgivelserne er …”</li>
+<li>“Efter den højeste temperatur falder kurven. Det viser, at bægeret hele tiden … Derfor når temperaturen i vandet ikke så højt op, som den …”</li>
+<li>“Varmen fra lithiumchlorid varmer ikke kun vandet op, men også … Den varme er ikke med i <em>q</em>, så …”</li>
+<li>“Resultatet kommer tættere på tabelværdien, hvis eleven …”</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Systemet er de stoffer, der reagerer: lithiumchlorid og de ioner, lithiumchlorid bliver til, Li<sup>+</sup> og Cl<sup>−</sup>. Omgivelserne er alt det andet: vandet, bægeret af skumplast, termometeret og luften i lokalet.</p></li>
+<li><p>Efter den højeste temperatur falder kurven jævnt. Det viser, at bægeret hele tiden afgiver varme til luften. Bægeret afgiver også varme, mens lithiumchlorid opløses. Derfor når temperaturen i vandet ikke så højt op, som den ville gøre i et helt tæt bæger. Temperaturstigningen bliver for lille, så <em>q</em> bliver for lille, og talværdien af Δ<em>H</em> = −<em>q</em> / <em>n</em> bliver for lille. Hvis al varmen var blevet i vandet, var temperaturen steget 5,9 K. Eleven måler kun 5,2 K.</p></li>
+<li><p>Varmen fra opløsningen af lithiumchlorid varmer ikke kun vandet op, men også det opløste lithiumchlorid, bægeret og termometeret. Den varme er ikke med i <em>q</em>, når eleven kun regner med massen af vandet. Derfor bliver <em>q</em> for lille, og talværdien af Δ<em>H</em> bliver for lille.</p></li>
+<li><p>Eleven kan fx lægge låg på bægeret, sætte to bægre af skumplast uden på hinanden eller bruge en termokande, så mindre varme slipper ud. Eleven kan også blive ved med at måle temperaturen, efter at den har været højest, og forlænge den faldende del af kurven tilbage til 60 sekunder, hvor lithiumchlorid blev tilsat. Så findes den temperatur, vandet ville have fået uden varmetab.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med reaktionsskema, formel, beregning med enheder og en konklusion.</p>
+</section>
+<section id="opgave-a2.1.eks.1-selvopvarmende-dåse" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.eks.1-selvopvarmende-dåse">Opgave A2.1.eks.1: Selvopvarmende dåse</h2>
+<p>En selvopvarmende dåse kan varme suppe uden et komfur. Uden om suppen ligger et kammer med calciumoxid (brændt kalk) og en pose med vand. Når man trykker på dåsens bund, går posen i stykker, og calciumoxid reagerer med vandet:</p>
+<div class="reaktion">
+<p>CaO(s) + H<sub>2</sub>O(l) → Ca(OH)<sub>2</sub>(s)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em> = −64,5 kJ/mol</p>
+</div>
+<p>En dåse indeholder 50,0 g calciumoxid og 300 g suppe. Suppen er 20,0 °C fra start og har samme specifikke varmekapacitet som vand, 4,18 J/(g · K).</p>
+<ol type="a">
+<li>Begrund ud fra Δ<em>H</em>, at reaktionen mellem calciumoxid og vand kan bruges til at varme suppen.</li>
+<li>Beregn den varme, der afgives, når 50,0 g calciumoxid reagerer med vand.</li>
+<li>Beregn den temperatur, suppen får, hvis al varmen fra reaktionen ender i suppen.</li>
+<li>I et forsøg med dåsen bliver suppen kun 48,0 °C. Beregn, hvor stor en del af varmen fra reaktionen suppen har optaget, og giv to grunde til, at suppen ikke optager al varmen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på fortegnet på Δ<em>H</em> for reaktionen mellem calciumoxid og vand. Find derefter stofmængden af calciumoxid med <em>n</em> = <em>m</em> / <em>M</em>. Molarmassen for CaO er 56,08 g/mol. Calciumoxid har koefficienten 1 i reaktionsskemaet.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Stofmængden af calciumoxid er 0,892 mol, og varmen findes ved at gange stofmængden med Δ<em>H</em>. Til spørgsmål c: regn varmen om til joule, og brug Δ<em>T</em> = <em>q</em> / (<em>m</em> · <em>c</em>) med massen af suppen. Til spørgsmål d: beregn den varme, suppen har optaget, med <em>q</em> = <em>m</em> · <em>c</em> · Δ<em>T</em>, og del den med varmen fra reaktionen.</p>
+<p>Du kan begynde begrundelsen i spørgsmål a sådan: “Δ<em>H</em> er …, så reaktionen mellem calciumoxid og vand er … Derfor …” Og i spørgsmål d sådan: “Varmen fra reaktionen varmer også …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Fortegnet på Δ<em>H</em></strong></p>
+<p>Δ<em>H</em> = −64,5 kJ/mol er negativ, så reaktionen mellem calciumoxid og vand er exoterm. Systemet er calciumoxid og vandet fra posen, og suppen er en del af omgivelserne. En exoterm reaktion afgiver varme til omgivelserne, så suppen bliver varmet op.</p>
+<p><strong>b. Varmen fra 50,0 g calciumoxid</strong></p>
+<p><span class="math display">\[
+n(\mathrm{CaO}) = \frac{m}{M} = \frac{50{,}0\ \mathrm{g}}{56{,}08\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 0{,}892\ \mathrm{mol}
+\]</span></p>
+<p>Calciumoxid har koefficienten 1 i reaktionsskemaet, så reaktionen forløber 0,892 mol gange.</p>
+<p><span class="math display">\[
+n(\mathrm{CaO}) \cdot \Delta H = 0{,}892\ \mathrm{mol} \cdot \left(-64{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = -57{,}5\ \mathrm{kJ}
+\]</span></p>
+<p>Fortegnet er negativt, så systemet afgiver varme. Der afgives 57,5 kJ, når 50,0 g calciumoxid reagerer med vand.</p>
+<p><strong>c.&nbsp;Suppens temperatur</strong></p>
+<p>Suppen optager <em>q</em> = 57,5 kJ = 57,5 · 10<sup>3</sup> J, hvis al varmen ender i suppen.</p>
+<p><span class="math display">\[
+\Delta T = \frac{q}{m \cdot c} = \frac{57{,}5 \cdot 10^{3}\ \mathrm{J}}{300\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}}} = 45{,}9\ \mathrm{K}
+\]</span></p>
+<p>Suppen får temperaturen 20,0 °C + 45,9 °C = 65,9 °C, hvis al varmen fra reaktionen ender i suppen.</p>
+<p><strong>d.&nbsp;Den del af varmen, suppen optager</strong></p>
+<p>I forsøget stiger suppens temperatur med Δ<em>T</em> = 48,0 °C − 20,0 °C = 28,0 K.</p>
+<p><span class="math display">\[
+q = m \cdot c \cdot \Delta T = 300\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}} \cdot 28{,}0\ \mathrm{K} = 3{,}51 \cdot 10^{4}\ \mathrm{J}
+\]</span></p>
+<p>Suppen har optaget 3,51 · 10<sup>4</sup> J = 35,1 kJ.</p>
+<p><span class="math display">\[
+\frac{35{,}1\ \mathrm{kJ}}{57{,}5\ \mathrm{kJ}} = 0{,}61 = 61\ \%
+\]</span></p>
+<p>Suppen har optaget 61 % af varmen fra reaktionen. Resten af varmen er endt andre steder. Varmen fra reaktionen varmer også det calciumhydroxid, der dannes, det vand i kammeret, der ikke reagerer, og selve dåsen. Desuden afgiver dåsen varme til luften og til hånden, der holder den.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.eks.2-sved-køler-kroppen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.eks.2-sved-køler-kroppen">Opgave A2.1.eks.2: Sved køler kroppen</h2>
+<p>Når du løber, danner musklerne varme. Kroppen kommer af med varmen ved at svede. Sved er næsten kun vand, og huden bliver kølet, når vandet fordamper:</p>
+<div class="reaktion">
+<p>H<sub>2</sub>O(l) → H<sub>2</sub>O(g)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em> = +44,0 kJ/mol</p>
+</div>
+<p>En løber danner omkring 2500 kJ varme på en times løb.</p>
+<ol type="a">
+<li>Angiv, om fordampningen af vand er exoterm eller endoterm, og forklar, hvorfor huden bliver kold, når sveden fordamper.</li>
+<li>Beregn den varme, der skal til for at fordampe 150 g vand.</li>
+<li>Beregn massen af det vand, der skal fordampe fra huden for at fjerne 2500 kJ varme fra kroppen.</li>
+<li>Løberen vejer 70 kg. Beregn, hvor meget løberens temperatur ville stige på en time, hvis kroppen slet ikke kunne komme af med de 2500 kJ. Regn, som om kroppen var 70 kg vand, og vurdér resultatet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Fortegnet på Δ<em>H</em> for fordampningen af vand er positivt. Systemet er det vand, der fordamper, og huden hører til omgivelserne. Til beregningerne skal du bruge molarmassen for vand, som er 18,02 g/mol.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål b: find stofmængden af vand, og gang den med 44,0 kJ/mol. Til spørgsmål c går du den modsatte vej: del 2500 kJ med 44,0 kJ/mol, og regn stofmængden af vand om til masse. Til spørgsmål d: brug Δ<em>T</em> = <em>q</em> / (<em>m</em> · <em>c</em>) med <em>q</em> i joule og massen af kroppen i gram.</p>
+<p>Du kan begynde forklaringen i spørgsmål a sådan: “Fordampningen er endoterm, så vandet optager varme fra …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Exoterm eller endoterm</strong></p>
+<p>Δ<em>H</em> = +44,0 kJ/mol er positiv, så fordampningen af vand er endoterm. Systemet er det vand, der fordamper, og huden hører til omgivelserne. Vandet optager varme fra huden, når det fordamper, og derfor bliver huden kold.</p>
+<p><strong>b. Varmen til at fordampe 150 g vand</strong></p>
+<p><span class="math display">\[
+n(\mathrm{H_2O}) = \frac{m}{M} = \frac{150\ \mathrm{g}}{18{,}02\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 8{,}32\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{H_2O}) \cdot \Delta H = 8{,}32\ \mathrm{mol} \cdot 44{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = 366\ \mathrm{kJ}
+\]</span></p>
+<p>Der skal 366 kJ til for at fordampe 150 g vand.</p>
+<p><strong>c.&nbsp;Massen af det vand, der skal fordampe</strong></p>
+<p>Først findes den stofmængde af vand, der optager 2500 kJ, når vandet fordamper:</p>
+<p><span class="math display">\[
+n(\mathrm{H_2O}) = \frac{2500\ \mathrm{kJ}}{44{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}} = 56{,}8\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{H_2O}) = n \cdot M = 56{,}8\ \mathrm{mol} \cdot 18{,}02\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 1{,}02 \cdot 10^{3}\ \mathrm{g}
+\]</span></p>
+<p>Der skal fordampe 1,02 kg vand fra huden. Det svarer til omkring 1 liter sved på en time.</p>
+<p><strong>d.&nbsp;Temperaturen uden afkøling</strong></p>
+<p>Varmen regnes om til joule, og massen af kroppen regnes om til gram: <em>q</em> = 2500 kJ = 2500 · 10<sup>3</sup> J, og <em>m</em> = 70 kg = 70 · 10<sup>3</sup> g.</p>
+<p><span class="math display">\[
+\Delta T = \frac{q}{m \cdot c} = \frac{2500 \cdot 10^{3}\ \mathrm{J}}{70 \cdot 10^{3}\ \mathrm{g} \cdot 4{,}18\ \dfrac{\mathrm{J}}{\mathrm{g \cdot K}}} = 8{,}5\ \mathrm{K}
+\]</span></p>
+<p>Løberens temperatur ville stige 8,5 °C, fra 37 °C til over 45 °C. Det kan et menneske ikke overleve. Resultatet viser, at kroppen skal af med næsten al varmen, mens man løber, og at fordampningen af sved er nødvendig. Derfor skal en løber drikke vand, så kroppen kan blive ved med at svede.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.1.eks.3-hydrogen-fra-vindmøllestrøm" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.1.eks.3-hydrogen-fra-vindmøllestrøm">Opgave A2.1.eks.3: Hydrogen fra vindmøllestrøm</h2>
+<p>Når vindmøllerne laver mere strøm, end der bliver brugt, kan strømmen bruges til at spalte vand til hydrogen og oxygen ved elektrolyse. Hydrogen kan gemmes og senere brændes som brændstof. For reaktionen mellem hydrogen og oxygen gælder:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Reaktion</th>
+<th style="text-align: left;">Δ<em>H</em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">2 H<sub>2</sub>(g) + O<sub>2</sub>(g) → 2 H<sub>2</sub>O(l)</td>
+<td style="text-align: left;">−571,6 kJ/mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">2 H<sub>2</sub>(g) + O<sub>2</sub>(g) → 2 H<sub>2</sub>O(g)</td>
+<td style="text-align: left;">−483,6 kJ/mol</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for elektrolysen, hvor flydende vand spaltes til hydrogen og oxygen, og angiv Δ<em>H</em> for elektrolysen.</li>
+<li>Beregn den energi, der mindst skal tilføres for at fremstille 1,00 kg hydrogen ved elektrolyse af flydende vand.</li>
+<li>Beregn den varme, der afgives, når 1,00 kg hydrogen brænder, og vandet dannes som vanddamp.</li>
+<li>Beregn, hvor stor en del af energien fra spørgsmål b der afgives igen i spørgsmål c, og forklar, hvor resten af energien er blevet af.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Elektrolysen af flydende vand er den modsatte reaktion af reaktion 1. Når reaktionsskemaet vendes om, skifter Δ<em>H</em> fortegn. Find stofmængden af hydrogen i 1,00 kg. Molarmassen for H<sub>2</sub> er 2,016 g/mol.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Der er 496 mol H<sub>2</sub> i 1,00 kg hydrogen. Hydrogen har koefficienten 2 i reaktionsskemaerne, så Δ<em>H</em> gælder for 2 mol H<sub>2</sub>. Reaktionen forløber derfor 496 mol / 2 = 248 mol gange. Gang 248 mol med Δ<em>H</em> for elektrolysen i spørgsmål b og med Δ<em>H</em> for reaktion 2 i spørgsmål c.</p>
+<p>Du kan begynde forklaringen i spørgsmål d sådan: “Elektrolysen begynder med flydende vand, men forbrændingen slutter med …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Elektrolysen</strong></p>
+<p>Elektrolysen af flydende vand er reaktion 1 vendt om, så Δ<em>H</em> skifter fortegn:</p>
+<div class="reaktion">
+<p>2 H<sub>2</sub>O(l) → 2 H<sub>2</sub>(g) + O<sub>2</sub>(g)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em> = +571,6 kJ/mol</p>
+</div>
+<p>Δ<em>H</em> er positiv, så elektrolysen er endoterm. Energien tilføres som strøm.</p>
+<p><strong>b. Energien til 1,00 kg hydrogen</strong></p>
+<p><span class="math display">\[
+n(\mathrm{H_2}) = \frac{m}{M} = \frac{1{,}00 \cdot 10^{3}\ \mathrm{g}}{2{,}016\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 496\ \mathrm{mol}
+\]</span></p>
+<p>Hydrogen har koefficienten 2 i reaktionsskemaet, så Δ<em>H</em> gælder for 2 mol H<sub>2</sub>. Reaktionen skal forløbe 496 mol / 2 = 248 mol gange.</p>
+<p><span class="math display">\[
+248\ \mathrm{mol} \cdot 571{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = 1{,}42 \cdot 10^{5}\ \mathrm{kJ}
+\]</span></p>
+<p>Der skal mindst tilføres 1,42 · 10<sup>5</sup> kJ for at fremstille 1,00 kg hydrogen ved elektrolyse af flydende vand.</p>
+<p><strong>c.&nbsp;Varmen fra 1,00 kg hydrogen</strong></p>
+<p>Når hydrogen brænder, og vandet dannes som vanddamp, gælder reaktion 2. Reaktionen forløber 248 mol gange.</p>
+<p><span class="math display">\[
+248\ \mathrm{mol} \cdot \left(-483{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = -1{,}20 \cdot 10^{5}\ \mathrm{kJ}
+\]</span></p>
+<p>Fortegnet er negativt, så systemet afgiver varme. Der afgives 1,20 · 10<sup>5</sup> kJ, når 1,00 kg hydrogen brænder og danner vanddamp.</p>
+<p><strong>d.&nbsp;Den del af energien, der afgives igen</strong></p>
+<p><span class="math display">\[
+\frac{1{,}20 \cdot 10^{5}\ \mathrm{kJ}}{1{,}42 \cdot 10^{5}\ \mathrm{kJ}} = 0{,}85 = 85\ \%
+\]</span></p>
+<p>Forbrændingen afgiver 85 % af den energi, elektrolysen brugte. Elektrolysen begynder med flydende vand, men forbrændingen slutter med vanddamp. Det koster energi at få vand til at fordampe, og den energi sidder stadig i vanddampen. Forskellen mellem reaktion 1 og reaktion 2 er 571,6 kJ/mol − 483,6 kJ/mol = 88,0 kJ/mol for 2 mol vand, altså 44,0 kJ for hvert mol vand, der er damp i stedet for væske. De sidste 15 % af energien afgives først, hvis vanddampen fortættes til flydende vand.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a2-1-energi-og-entalpi.html" class="pagination-link" aria-label="A2.1 Energi og entalpi">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A2.1 Energi og entalpi</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="pagination-link" aria-label="A2.2 Standardentalpi og Hess' lov">
+        <span class="nav-page-text">A2.2 Standardentalpi og Hess’ lov</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

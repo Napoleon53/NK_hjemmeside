@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A2.2 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a2-3-entropi.html" rel="next">
+<link href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-20c69f999f33b1a0b809482ade914e4a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-2-opgaver.html">Opgaver til A2.2</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#opgave-a2.2.1-nul-eller-ikke-nul" id="toc-opgave-a2.2.1-nul-eller-ikke-nul" class="nav-link active" data-scroll-target="#opgave-a2.2.1-nul-eller-ikke-nul">Opgave A2.2.1: Nul eller ikke nul</a></li>
+  <li><a href="#opgave-a2.2.2-skriv-udtrykket-op" id="toc-opgave-a2.2.2-skriv-udtrykket-op" class="nav-link" data-scroll-target="#opgave-a2.2.2-skriv-udtrykket-op">Opgave A2.2.2: Skriv udtrykket op</a></li>
+  <li><a href="#opgave-a2.2.3-natron-i-ovnen" id="toc-opgave-a2.2.3-natron-i-ovnen" class="nav-link" data-scroll-target="#opgave-a2.2.3-natron-i-ovnen">Opgave A2.2.3: Natron i ovnen</a></li>
+  <li><a href="#opgave-a2.2.4-fra-ammoniak-til-nitrogenoxid" id="toc-opgave-a2.2.4-fra-ammoniak-til-nitrogenoxid" class="nav-link" data-scroll-target="#opgave-a2.2.4-fra-ammoniak-til-nitrogenoxid">Opgave A2.2.4: Fra ammoniak til nitrogenoxid</a></li>
+  <li><a href="#opgave-a2.2.5-vand-som-væske-eller-som-damp" id="toc-opgave-a2.2.5-vand-som-væske-eller-som-damp" class="nav-link" data-scroll-target="#opgave-a2.2.5-vand-som-væske-eller-som-damp">Opgave A2.2.5: Vand som væske eller som damp</a></li>
+  <li><a href="#opgave-a2.2.6-fra-kalksten-til-læsket-kalk" id="toc-opgave-a2.2.6-fra-kalksten-til-læsket-kalk" class="nav-link" data-scroll-target="#opgave-a2.2.6-fra-kalksten-til-læsket-kalk">Opgave A2.2.6: Fra kalksten til læsket kalk</a></li>
+  <li><a href="#opgave-a2.2.7-magnesium-brænder-i-carbondioxid" id="toc-opgave-a2.2.7-magnesium-brænder-i-carbondioxid" class="nav-link" data-scroll-target="#opgave-a2.2.7-magnesium-brænder-i-carbondioxid">Opgave A2.2.7: Magnesium brænder i carbondioxid</a></li>
+  <li><a href="#opgave-a2.2.8-standardentalpien-for-sukker" id="toc-opgave-a2.2.8-standardentalpien-for-sukker" class="nav-link" data-scroll-target="#opgave-a2.2.8-standardentalpien-for-sukker">Opgave A2.2.8: Standardentalpien for sukker</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#opgave-a2.2.eks.1-energien-i-druesukker" id="toc-opgave-a2.2.eks.1-energien-i-druesukker" class="nav-link" data-scroll-target="#opgave-a2.2.eks.1-energien-i-druesukker">Opgave A2.2.eks.1: Energien i druesukker</a></li>
+  <li><a href="#opgave-a2.2.eks.2-bioethanol-og-propan" id="toc-opgave-a2.2.eks.2-bioethanol-og-propan" class="nav-link" data-scroll-target="#opgave-a2.2.eks.2-bioethanol-og-propan">Opgave A2.2.eks.2: Bioethanol og propan</a></li>
+  <li><a href="#opgave-a2.2.eks.3-skinner-svejses-med-thermit" id="toc-opgave-a2.2.eks.3-skinner-svejses-med-thermit" class="nav-link" data-scroll-target="#opgave-a2.2.eks.3-skinner-svejses-med-thermit">Opgave A2.2.eks.3: Skinner svejses med thermit</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../kapitler/a2-1-energi-og-entalpi.html">Kapitel A2: Termodynamik</a></li><li class="breadcrumb-item"><a href="../opgaver/a2-2-opgaver.html">Opgaver til A2.2</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A2.2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html">A2.2 Standardentalpi og Hess’ lov</a>. Prøv selv, før du åbner hjælpen under opgaven. Standardentalpierne slår du op i tabellen <a href="../bilag/termodynamiske-data.html">Termodynamiske data</a>.</p>
+<section id="opgave-a2.2.1-nul-eller-ikke-nul" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.1-nul-eller-ikke-nul">Opgave A2.2.1: Nul eller ikke nul</h2>
+<p>Her er ti stoffer: N<sub>2</sub>(g), CO<sub>2</sub>(g), Fe(s), H<sub>2</sub>O(l), O<sub>3</sub>(g), Cl<sub>2</sub>(g), C(s) som grafit, NaCl(s), I<sub>2</sub>(g) og I<sub>2</sub>(s).</p>
+<ol type="a">
+<li>Afgør uden at slå op, hvilke af de ti stoffer der har standardentalpien <em>H</em><sup>⊖</sup> = 0. Tjek bagefter svaret i tabellen Termodynamiske data.</li>
+<li>Ozon, O<sub>3</sub>(g), og iod som gas, I<sub>2</sub>(g), er grundstoffer. Forklar, hvorfor ozon og iod som gas alligevel ikke har <em>H</em><sup>⊖</sup> = 0.</li>
+<li>Slå <em>H</em><sup>⊖</sup> op for H<sub>2</sub>O(l) og for H<sub>2</sub>O(g). Hvilken af de to former af vand har den laveste entalpi? Forklar forskellen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et grundstof i sin mest stabile form har <em>H</em><sup>⊖</sup> = 0. Stil to spørgsmål til hvert stof: Er stoffet et grundstof? Og er det den form, grundstoffet har ved 25 °C og 1 bar?</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Oxygen findes i luften som O<sub>2</sub>, og iod er et fast stof ved 25 °C. Du kan begynde forklaringerne sådan:</p>
+<ul>
+<li>“Ozon er et grundstof, men ozon er ikke …”</li>
+<li>“Flydende vand har lavere entalpi end vanddamp, fordi det koster energi at …”</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Fem af stofferne er grundstoffer i deres mest stabile form og har <em>H</em><sup>⊖</sup> = 0: N<sub>2</sub>(g), Fe(s), Cl<sub>2</sub>(g), C(s) som grafit og I<sub>2</sub>(s). De fem andre har en standardentalpi, der ikke er 0:</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(l)</th>
+<th style="text-align: center;">NaCl(s)</th>
+<th style="text-align: center;">O<sub>3</sub>(g)</th>
+<th style="text-align: center;">I<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−393,5</td>
+<td style="text-align: center;">−285,8</td>
+<td style="text-align: center;">−411,2</td>
+<td style="text-align: center;">142,7</td>
+<td style="text-align: center;">62,4</td>
+</tr>
+</tbody>
+</table>
+<p>CO<sub>2</sub>, H<sub>2</sub>O og NaCl er kemiske forbindelser og ikke grundstoffer.</p>
+<ol start="2" type="a">
+<li><p>Ozon er et grundstof, men ozon er ikke den mest stabile form af oxygen. Det er O<sub>2</sub>(g). Det koster energi at danne O<sub>3</sub> af O<sub>2</sub>, og derfor er <em>H</em><sup>⊖</sup> for O<sub>3</sub>(g) positiv. Iod er et fast stof ved 25 °C, så den mest stabile form af iod er I<sub>2</sub>(s). Det koster energi at gøre fast iod til gas, og derfor er <em>H</em><sup>⊖</sup> for I<sub>2</sub>(g) positiv.</p></li>
+<li><p><em>H</em><sup>⊖</sup> er −285,8 kJ/mol for H<sub>2</sub>O(l) og −241,8 kJ/mol for H<sub>2</sub>O(g). Flydende vand har den laveste entalpi. Forskellen er 44,0 kJ/mol. Det er den energi, det koster at få 1 mol flydende vand til at fordampe, fordi hydrogenbindingerne mellem vandmolekylerne skal brydes.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.2-skriv-udtrykket-op" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.2-skriv-udtrykket-op">Opgave A2.2.2: Skriv udtrykket op</h2>
+<p>Her er to reaktioner:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Reaktion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">NH<sub>3</sub>(g) + HCl(g) → NH<sub>4</sub>Cl(s)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Fe<sub>2</sub>O<sub>3</sub>(s) + 3 CO(g) → 2 Fe(s) + 3 CO<sub>2</sub>(g)</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Opskriv udtrykket for Δ<em>H</em><sup>⊖</sup> for reaktion 1 med formler. Du skal ikke sætte tal ind.</li>
+<li>Opskriv udtrykket for Δ<em>H</em><sup>⊖</sup> for reaktion 2 med formler. Husk koefficienterne.</li>
+<li>Ét af leddene i udtrykket for reaktion 2 er 0. Hvilket led er det, og hvorfor er det 0?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Δ<em>H</em><sup>⊖</sup> er summen af produkternes standardentalpier minus summen af reaktanternes. Skriv hvert stof som <em>H</em><sup>⊖</sup> med stoffets formel og tilstandsform i en parentes, fx <em>H</em><sup>⊖</sup>(NH<sub>3</sub>(g)).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I reaktion 1 er NH<sub>4</sub>Cl(s) det eneste produkt, og NH<sub>3</sub>(g) og HCl(g) er reaktanterne. I reaktion 2 skal hver standardentalpi ganges med stoffets koefficient: 2 foran Fe(s), 3 foran CO<sub>2</sub>(g) og 3 foran CO(g). Sæt en parentes om produkterne og en parentes om reaktanterne.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Udtrykket for reaktion 1 mellem ammoniak og hydrogenchlorid:</li>
+</ol>
+<p><span class="math display">\[
+\Delta H^{\ominus} = H^{\ominus}(\mathrm{NH_4Cl(s)}) - \left(H^{\ominus}(\mathrm{NH_3(g)}) + H^{\ominus}(\mathrm{HCl(g)})\right)
+\]</span></p>
+<ol start="2" type="a">
+<li>Udtrykket for reaktion 2 mellem jern(III)oxid og carbonmonoxid:</li>
+</ol>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(2 \cdot H^{\ominus}(\mathrm{Fe(s)}) + 3 \cdot H^{\ominus}(\mathrm{CO_2(g)})\right) - \left(H^{\ominus}(\mathrm{Fe_2O_3(s)}) + 3 \cdot H^{\ominus}(\mathrm{CO(g)})\right)
+\]</span></p>
+<ol start="3" type="a">
+<li>Leddet 2 · <em>H</em><sup>⊖</sup>(Fe(s)) er 0. Jern er et grundstof, og fast jern er jerns mest stabile form, så <em>H</em><sup>⊖</sup>(Fe(s)) = 0.</li>
+</ol>
+<p>Vil du regne efter med tabelværdierne, er Δ<em>H</em><sup>⊖</sup> = −176,2 kJ/mol for reaktion 1 og Δ<em>H</em><sup>⊖</sup> = −24,8 kJ/mol for reaktion 2.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.3-natron-i-ovnen" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.3-natron-i-ovnen">Opgave A2.2.3: Natron i ovnen</h2>
+<p>Natron er natriumhydrogencarbonat, NaHCO<sub>3</sub>. Natron får en kage til at hæve, fordi natron spaltes i den varme ovn og danner gasserne vanddamp og carbondioxid:</p>
+<div class="reaktion">
+<p>2 NaHCO<sub>3</sub>(s) → Na<sub>2</sub>CO<sub>3</sub>(s) + H<sub>2</sub>O(g) + CO<sub>2</sub>(g)</p>
+</div>
+<ol type="a">
+<li>Find standardentalpierne for de fire stoffer i tabellen Termodynamiske data, og skriv dem i en tabel sammen med stoffernes koefficienter.</li>
+<li>Opskriv udtrykket for Δ<em>H</em><sup>⊖</sup> med formler.</li>
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for spaltningen af natron.</li>
+<li>Kommentér resultatet. Er spaltningen af natron exoterm eller endoterm, og hvordan passer det med, at natron først virker i den varme ovn?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Følg eksemplet med methan i afsnit A2.2: tabelværdier, formel, beregning og konklusion. Pas på tilstandsformerne, når du slår op. Vandet i reaktionsskemaet for natron er vanddamp, H<sub>2</sub>O(g).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>NaHCO<sub>3</sub>(s) har koefficienten 2, så standardentalpien for NaHCO<sub>3</sub>(s) skal ganges med 2. Sæt en parentes om hvert negativt tal, når du sætter ind.</p>
+<p>Du kan begynde kommentaren sådan: “Fortegnet på Δ<em>H</em><sup>⊖</sup> er …, så spaltningen af natron er … Det passer med, at …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Reaktionsskemaet</strong></p>
+<div class="reaktion">
+<p>2 NaHCO<sub>3</sub>(s) → Na<sub>2</sub>CO<sub>3</sub>(s) + H<sub>2</sub>O(g) + CO<sub>2</sub>(g)</p>
+</div>
+<p><strong>a. Tabelværdier</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">NaHCO<sub>3</sub>(s)</th>
+<th style="text-align: center;">Na<sub>2</sub>CO<sub>3</sub>(s)</th>
+<th style="text-align: center;">H<sub>2</sub>O(g)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−950,8</td>
+<td style="text-align: center;">−1130,7</td>
+<td style="text-align: center;">−241,8</td>
+<td style="text-align: center;">−393,5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>b. Formel</strong></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(H^{\ominus}(\mathrm{Na_2CO_3(s)}) + H^{\ominus}(\mathrm{H_2O(g)}) + H^{\ominus}(\mathrm{CO_2(g)})\right) - 2 \cdot H^{\ominus}(\mathrm{NaHCO_3(s)})
+\]</span></p>
+<p><strong>c.&nbsp;Beregning</strong></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left((-1130{,}7) + (-241{,}8) + (-393{,}5) - 2 \cdot (-950{,}8)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = +135{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p><strong>d.&nbsp;Kommentar</strong></p>
+<p>Δ<em>H</em><sup>⊖</sup> = +135,6 kJ/mol. Fortegnet er positivt, så spaltningen af natron er endoterm. Der optages 135,6 kJ, hver gang 2 mol NaHCO<sub>3</sub> spaltes. Det passer med, at natron først virker i den varme ovn: natron skal have tilført varme, for at spaltningen kan forløbe.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.4-fra-ammoniak-til-nitrogenoxid" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.4-fra-ammoniak-til-nitrogenoxid">Opgave A2.2.4: Fra ammoniak til nitrogenoxid</h2>
+<p>Salpetersyre til kunstgødning fremstilles af ammoniak. I det første trin ledes ammoniak og luft hen over et net af platin, og ammoniak reagerer med oxygen:</p>
+<div class="reaktion">
+<p>4 NH<sub>3</sub>(g) + 5 O<sub>2</sub>(g) → 4 NO(g) + 6 H<sub>2</sub>O(g)</p>
+</div>
+<p>Nettet af platin varmes op, før reaktionen sættes i gang. Derefter holder nettet sig selv glødende, så længe der ledes ammoniak og luft hen over det.</p>
+<ol type="a">
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for reaktionen ud fra tabelværdier. Vis en tabel med værdier og koefficienter, udtrykket med formler og udtrykket med tal.</li>
+<li>Kommentér resultatet i forhold til oplysningen om, at nettet af platin holder sig selv glødende.</li>
+<li>Beregn, hvor meget varme der afgives for hvert mol ammoniak, der reagerer.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Slå <em>H</em><sup>⊖</sup> op for NH<sub>3</sub>(g), O<sub>2</sub>(g), NO(g) og H<sub>2</sub>O(g). Pas på to ting: NO(g) har en positiv standardentalpi, og vandet er vanddamp. Hver standardentalpi ganges med stoffets koefficient.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Udtrykket er Δ<em>H</em><sup>⊖</sup> = (4 · <em>H</em><sup>⊖</sup>(NO(g)) + 6 · <em>H</em><sup>⊖</sup>(H<sub>2</sub>O(g))) − (4 · <em>H</em><sup>⊖</sup>(NH<sub>3</sub>(g)) + 5 · <em>H</em><sup>⊖</sup>(O<sub>2</sub>(g))). Ammoniak har koefficienten 4, så Δ<em>H</em><sup>⊖</sup> gælder for 4 mol NH<sub>3</sub>.</p>
+<p>Du kan begynde kommentaren sådan: “Fortegnet på Δ<em>H</em><sup>⊖</sup> er …, så reaktionen mellem ammoniak og oxygen er … Det passer med, at nettet …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Beregning af Δ<em>H</em><sup>⊖</sup></strong></p>
+<div class="reaktion">
+<p>4 NH<sub>3</sub>(g) + 5 O<sub>2</sub>(g) → 4 NO(g) + 6 H<sub>2</sub>O(g)</p>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">NH<sub>3</sub>(g)</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">NO(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−45,9</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">91,3</td>
+<td style="text-align: center;">−241,8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">6</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(4 \cdot H^{\ominus}(\mathrm{NO(g)}) + 6 \cdot H^{\ominus}(\mathrm{H_2O(g)})\right) - \left(4 \cdot H^{\ominus}(\mathrm{NH_3(g)}) + 5 \cdot H^{\ominus}(\mathrm{O_2(g)})\right)
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(4 \cdot 91{,}3 + 6 \cdot (-241{,}8) - 4 \cdot (-45{,}9) - 5 \cdot 0\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -902{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p><strong>b. Kommentar</strong></p>
+<p>Δ<em>H</em><sup>⊖</sup> = −902,0 kJ/mol. Fortegnet er negativt, så reaktionen mellem ammoniak og oxygen er exoterm. Der afgives 902,0 kJ, hver gang 4 mol NH<sub>3</sub> reagerer. Det passer med, at nettet af platin holder sig selv glødende: reaktionen afgiver så meget varme, at nettet ikke behøver at blive varmet op udefra.</p>
+<p><strong>c.&nbsp;Varmen for hvert mol ammoniak</strong></p>
+<p>Ammoniak har koefficienten 4 i reaktionsskemaet, så Δ<em>H</em><sup>⊖</sup> deles med 4:</p>
+<p><span class="math display">\[
+\frac{-902{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}}{4} = -225{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Der afgives 225,5 kJ for hvert mol ammoniak, der reagerer.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.5-vand-som-væske-eller-som-damp" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.5-vand-som-væske-eller-som-damp">Opgave A2.2.5: Vand som væske eller som damp</h2>
+<p>Methanol, CH<sub>3</sub>OH, bruges som brændstof i nogle nye containerskibe. Når methanol brænder, dannes der carbondioxid og vand:</p>
+<div class="reaktion">
+<p>2 CH<sub>3</sub>OH(l) + 3 O<sub>2</sub>(g) → 2 CO<sub>2</sub>(g) + 4 H<sub>2</sub>O</p>
+</div>
+<p>Vandet kan dannes som væske, H<sub>2</sub>O(l), eller som damp, H<sub>2</sub>O(g).</p>
+<ol type="a">
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for forbrændingen af methanol, når vandet dannes som væske.</li>
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for forbrændingen af methanol, når vandet dannes som damp.</li>
+<li>Forklar, hvorfor forbrændingen af methanol afgiver mindst varme, når vandet dannes som damp.</li>
+<li>Brug de to resultater til at beregne Δ<em>H</em><sup>⊖</sup> for fordampningen af vand, H<sub>2</sub>O(l) → H<sub>2</sub>O(g). Tjek resultatet med tabelværdierne for H<sub>2</sub>O(l) og H<sub>2</sub>O(g).</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>De to beregninger er ens, bortset fra standardentalpien for vand. Brug <em>H</em><sup>⊖</sup>(H<sub>2</sub>O(l)) = −285,8 kJ/mol i spørgsmål a og <em>H</em><sup>⊖</sup>(H<sub>2</sub>O(g)) = −241,8 kJ/mol i spørgsmål b. Methanol er en væske, så slå CH<sub>3</sub>OH(l) op.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Den eneste forskel på de to reaktioner er, at 4 mol vand er damp i stedet for væske. Træk resultatet med flydende vand fra resultatet med vanddamp, og del med 4. Så har du Δ<em>H</em><sup>⊖</sup> for fordampningen af 1 mol vand.</p>
+<p>Du kan begynde forklaringen sådan: “Det koster energi at få vand til at …, og den energi …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Vandet dannes som væske</strong></p>
+<div class="reaktion">
+<p>2 CH<sub>3</sub>OH(l) + 3 O<sub>2</sub>(g) → 2 CO<sub>2</sub>(g) + 4 H<sub>2</sub>O(l)</p>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CH<sub>3</sub>OH(l)</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(l)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−239,2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−393,5</td>
+<td style="text-align: center;">−285,8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(2 \cdot H^{\ominus}(\mathrm{CO_2(g)}) + 4 \cdot H^{\ominus}(\mathrm{H_2O(l)})\right) - \left(2 \cdot H^{\ominus}(\mathrm{CH_3OH(l)}) + 3 \cdot H^{\ominus}(\mathrm{O_2(g)})\right)
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(2 \cdot (-393{,}5) + 4 \cdot (-285{,}8) - 2 \cdot (-239{,}2) - 3 \cdot 0\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -1451{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Når vandet dannes som væske, er Δ<em>H</em><sup>⊖</sup> = −1451,8 kJ/mol for forbrændingen af methanol.</p>
+<p><strong>b. Vandet dannes som damp</strong></p>
+<div class="reaktion">
+<p>2 CH<sub>3</sub>OH(l) + 3 O<sub>2</sub>(g) → 2 CO<sub>2</sub>(g) + 4 H<sub>2</sub>O(g)</p>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CH<sub>3</sub>OH(l)</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−239,2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−393,5</td>
+<td style="text-align: center;">−241,8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(2 \cdot H^{\ominus}(\mathrm{CO_2(g)}) + 4 \cdot H^{\ominus}(\mathrm{H_2O(g)})\right) - \left(2 \cdot H^{\ominus}(\mathrm{CH_3OH(l)}) + 3 \cdot H^{\ominus}(\mathrm{O_2(g)})\right)
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(2 \cdot (-393{,}5) + 4 \cdot (-241{,}8) - 2 \cdot (-239{,}2) - 3 \cdot 0\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -1275{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Når vandet dannes som damp, er Δ<em>H</em><sup>⊖</sup> = −1275,8 kJ/mol for forbrændingen af methanol.</p>
+<p><strong>c.&nbsp;Forklaring</strong></p>
+<p>Begge fortegn er negative, så forbrændingen af methanol er exoterm i begge tilfælde. Der afgives 1451,8 kJ, når vandet dannes som væske, men kun 1275,8 kJ, når vandet dannes som damp. Det koster energi at få vand til at fordampe, og den energi bliver i vanddampen i stedet for at blive afgivet som varme.</p>
+<p><strong>d.&nbsp;Fordampningen af vand</strong></p>
+<p>Den eneste forskel på de to reaktioner er, at 4 mol vand er damp i stedet for væske. Forskellen mellem de to resultater deles derfor med 4:</p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \frac{(-1275{,}8) - (-1451{,}8)}{4}\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = +44{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Tjek med tabelværdierne for reaktionen H<sub>2</sub>O(l) → H<sub>2</sub>O(g):</p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = H^{\ominus}(\mathrm{H_2O(g)}) - H^{\ominus}(\mathrm{H_2O(l)}) = \left((-241{,}8) - (-285{,}8)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = +44{,}0\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Fordampningen af vand har Δ<em>H</em><sup>⊖</sup> = +44,0 kJ/mol. Fortegnet er positivt, så fordampningen af vand er endoterm. De to beregninger giver det samme.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.6-fra-kalksten-til-læsket-kalk" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.6-fra-kalksten-til-læsket-kalk">Opgave A2.2.6: Fra kalksten til læsket kalk</h2>
+<p>Mørtel til murværk laves af læsket kalk, Ca(OH)<sub>2</sub>. Læsket kalk fremstilles af kalksten, CaCO<sub>3</sub>, i to trin. Først brændes kalkstenen til brændt kalk, CaO, og derefter tilsættes der vand:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Reaktion</th>
+<th style="text-align: left;">Δ<em>H</em><sup>⊖</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">CaCO<sub>3</sub>(s) → CaO(s) + CO<sub>2</sub>(g)</td>
+<td style="text-align: left;">+179,2 kJ/mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">CaO(s) + H<sub>2</sub>O(l) → Ca(OH)<sub>2</sub>(s)</td>
+<td style="text-align: left;">−64,5 kJ/mol</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Læg reaktion 1 og reaktion 2 sammen, og opskriv reaktionsskemaet for den samlede reaktion. Hvilket stof går ud?</li>
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for den samlede reaktion med Hess’ lov.</li>
+<li>Er den samlede reaktion fra kalksten til læsket kalk exoterm eller endoterm?</li>
+<li>Tjek resultatet ved at beregne Δ<em>H</em><sup>⊖</sup> for den samlede reaktion ud fra tabelværdier.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktion 1 med kalksten og reaktion 2 med brændt kalk kan lægges sammen som ligninger. Skriv alle reaktanter fra reaktion 1 og reaktion 2 til venstre for pilen og alle produkter til højre. Et stof, der står på begge sider af pilen, går ud.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>CaO(s) er produkt i reaktion 1 og reaktant i reaktion 2, så CaO(s) går ud. Den samlede reaktion er CaCO<sub>3</sub>(s) + H<sub>2</sub>O(l) → Ca(OH)<sub>2</sub>(s) + CO<sub>2</sub>(g). Når to reaktionsskemaer lægges sammen, lægges deres Δ<em>H</em><sup>⊖</sup> også sammen.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Den samlede reaktion</strong></p>
+<p>Reaktion 1 og reaktion 2 lægges sammen. CaO(s) står på begge sider af pilen og går ud:</p>
+<div class="reaktion">
+<p>CaCO<sub>3</sub>(s) + H<sub>2</sub>O(l) → Ca(OH)<sub>2</sub>(s) + CO<sub>2</sub>(g)</p>
+</div>
+<p><strong>b. Hess’ lov</strong></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = 179{,}2\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} + \left(-64{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = +114{,}7\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p><strong>c.&nbsp;Exoterm eller endoterm</strong></p>
+<p>Δ<em>H</em><sup>⊖</sup> = +114,7 kJ/mol for den samlede reaktion fra kalksten til læsket kalk. Fortegnet er positivt, så den samlede reaktion er endoterm. Reaktion 2 mellem brændt kalk og vand afgiver varme, men brændingen af kalksten i reaktion 1 optager mere varme.</p>
+<p><strong>d.&nbsp;Tjek med tabelværdier</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CaCO<sub>3</sub>(s)</th>
+<th style="text-align: center;">H<sub>2</sub>O(l)</th>
+<th style="text-align: center;">Ca(OH)<sub>2</sub>(s)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−1207,6</td>
+<td style="text-align: center;">−285,8</td>
+<td style="text-align: center;">−985,2</td>
+<td style="text-align: center;">−393,5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(H^{\ominus}(\mathrm{Ca(OH)_2(s)}) + H^{\ominus}(\mathrm{CO_2(g)})\right) - \left(H^{\ominus}(\mathrm{CaCO_3(s)}) + H^{\ominus}(\mathrm{H_2O(l)})\right)
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left((-985{,}2) + (-393{,}5) - (-1207{,}6) - (-285{,}8)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = +114{,}7\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Tabelværdierne giver også Δ<em>H</em><sup>⊖</sup> = +114,7 kJ/mol. Det er Hess’ lov: Δ<em>H</em><sup>⊖</sup> er den samme, uanset om kalksten bliver til læsket kalk i ét trin eller i to.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.7-magnesium-brænder-i-carbondioxid" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.7-magnesium-brænder-i-carbondioxid">Opgave A2.2.7: Magnesium brænder i carbondioxid</h2>
+<p>En brand i magnesium kan ikke slukkes med en CO<sub>2</sub>-slukker. Magnesium brænder videre i carbondioxid og danner hvidt magnesiumoxid og sort carbon:</p>
+<div class="reaktion">
+<p>2 Mg(s) + CO<sub>2</sub>(g) → 2 MgO(s) + C(s)</p>
+</div>
+<p>To andre reaktioner er kendt:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Reaktion</th>
+<th style="text-align: left;">Δ<em>H</em><sup>⊖</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Mg(s) + ½ O<sub>2</sub>(g) → MgO(s)</td>
+<td style="text-align: left;">−601,6 kJ/mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">C(s) + O<sub>2</sub>(g) → CO<sub>2</sub>(g)</td>
+<td style="text-align: left;">−393,5 kJ/mol</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Én af de to reaktioner skal ganges med et tal, og den anden skal vendes om. Opskriv de to nye reaktionsskemaer med hver sin Δ<em>H</em><sup>⊖</sup>.</li>
+<li>Læg de to nye reaktionsskemaer sammen, og vis, at summen er reaktionen mellem magnesium og carbondioxid.</li>
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for reaktionen mellem magnesium og carbondioxid, og kommentér resultatet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på den søgte reaktion, 2 Mg(s) + CO<sub>2</sub>(g) → 2 MgO(s) + C(s). Der skal stå 2 Mg til venstre, og CO<sub>2</sub> skal være en reaktant. Sammenlign med reaktion 1 og reaktion 2: Hvor mange Mg er der i reaktion 1? På hvilken side står CO<sub>2</sub> i reaktion 2?</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktion 1 ganges med 2, så Δ<em>H</em><sup>⊖</sup> for reaktion 1 også ganges med 2. Reaktion 2 vendes om, så Δ<em>H</em><sup>⊖</sup> for reaktion 2 skifter fortegn. Når de to nye reaktionsskemaer lægges sammen, står O<sub>2</sub> på begge sider af pilen og går ud.</p>
+<p>Du kan begynde kommentaren sådan: “Fortegnet på Δ<em>H</em><sup>⊖</sup> er …, så reaktionen mellem magnesium og carbondioxid er … Det passer med, at …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. De to nye reaktionsskemaer</strong></p>
+<p>Reaktion 1 ganges med 2, fordi der skal stå 2 Mg i den søgte reaktion. Δ<em>H</em><sup>⊖</sup> ganges også med 2:</p>
+<div class="reaktion">
+<p>2 Mg(s) + O<sub>2</sub>(g) → 2 MgO(s)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em><sup>⊖</sup> = −1203,2 kJ/mol</p>
+</div>
+<p>Reaktion 2 vendes om, fordi CO<sub>2</sub> skal være en reaktant i den søgte reaktion. Δ<em>H</em><sup>⊖</sup> skifter fortegn:</p>
+<div class="reaktion">
+<p>CO<sub>2</sub>(g) → C(s) + O<sub>2</sub>(g)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em><sup>⊖</sup> = +393,5 kJ/mol</p>
+</div>
+<p><strong>b. Summen</strong></p>
+<p>De to nye reaktionsskemaer lægges sammen. O<sub>2</sub>(g) står på begge sider af pilen og går ud:</p>
+<div class="reaktion">
+<p>2 Mg(s) + CO<sub>2</sub>(g) → 2 MgO(s) + C(s)</p>
+</div>
+<p>Summen er reaktionen mellem magnesium og carbondioxid.</p>
+<p><strong>c.&nbsp;Δ<em>H</em><sup>⊖</sup> og kommentar</strong></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = 2 \cdot \left(-601{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) + 393{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -809{,}7\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = −809,7 kJ/mol for reaktionen mellem magnesium og carbondioxid. Fortegnet er negativt, så reaktionen er exoterm. Det passer med, at magnesium brænder videre i carbondioxid: reaktionen afgiver meget varme, og derfor kan en CO<sub>2</sub>-slukker ikke slukke en brand i magnesium.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.8-standardentalpien-for-sukker" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.8-standardentalpien-for-sukker">Opgave A2.2.8: Standardentalpien for sukker</h2>
+<p>Sukker er stoffet saccharose, C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>. Saccharose står ikke i tabellen Termodynamiske data. Energien i en fødevare måles ved at brænde fødevaren i ren oxygen i et lukket kalorimeter. For forbrændingen af saccharose har man målt:</p>
+<div class="reaktion">
+<p>C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>(s) + 12 O<sub>2</sub>(g) → 12 CO<sub>2</sub>(g) + 11 H<sub>2</sub>O(l)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em><sup>⊖</sup> = −5640 kJ/mol</p>
+</div>
+<p>Beregn standardentalpien, <em>H</em><sup>⊖</sup>, for saccharose.</p>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Opskriv udtrykket for Δ<em>H</em><sup>⊖</sup> for forbrændingen af saccharose med formler. I udtrykket kender du Δ<em>H</em><sup>⊖</sup> og standardentalpierne for O<sub>2</sub>(g), CO<sub>2</sub>(g) og H<sub>2</sub>O(l). Kun <em>H</em><sup>⊖</sup> for saccharose er ukendt.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Udtrykket er Δ<em>H</em><sup>⊖</sup> = (12 · <em>H</em><sup>⊖</sup>(CO<sub>2</sub>(g)) + 11 · <em>H</em><sup>⊖</sup>(H<sub>2</sub>O(l))) − (<em>H</em><sup>⊖</sup>(C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>(s)) + 12 · <em>H</em><sup>⊖</sup>(O<sub>2</sub>(g))). Isolér <em>H</em><sup>⊖</sup> for saccharose: læg <em>H</em><sup>⊖</sup>(C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>(s)) til på begge sider, og træk Δ<em>H</em><sup>⊖</sup> fra på begge sider.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>Reaktionsskemaet</strong></p>
+<div class="reaktion">
+<p>C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>(s) + 12 O<sub>2</sub>(g) → 12 CO<sub>2</sub>(g) + 11 H<sub>2</sub>O(l)</p>
+</div>
+<p><strong>Tabelværdier</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>(s)</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(l)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">ukendt</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−393,5</td>
+<td style="text-align: center;">−285,8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">11</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Formel</strong></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(12 \cdot H^{\ominus}(\mathrm{CO_2(g)}) + 11 \cdot H^{\ominus}(\mathrm{H_2O(l)})\right) - \left(H^{\ominus}(\mathrm{C_{12}H_{22}O_{11}(s)}) + 12 \cdot H^{\ominus}(\mathrm{O_2(g)})\right)
+\]</span></p>
+<p>Standardentalpien for saccharose isoleres:</p>
+<p><span class="math display">\[
+H^{\ominus}(\mathrm{C_{12}H_{22}O_{11}(s)}) = 12 \cdot H^{\ominus}(\mathrm{CO_2(g)}) + 11 \cdot H^{\ominus}(\mathrm{H_2O(l)}) - 12 \cdot H^{\ominus}(\mathrm{O_2(g)}) - \Delta H^{\ominus}
+\]</span></p>
+<p><strong>Beregning</strong></p>
+<p><span class="math display">\[
+H^{\ominus}(\mathrm{C_{12}H_{22}O_{11}(s)}) = \left(12 \cdot (-393{,}5) + 11 \cdot (-285{,}8) - 12 \cdot 0 - (-5640)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -2226\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p><strong>Konklusion</strong></p>
+<p>Standardentalpien for saccharose er <em>H</em><sup>⊖</sup> = −2226 kJ/mol. Fortegnet er negativt. Det betyder, at saccharose har lavere entalpi end de grundstoffer, saccharose består af: carbon, hydrogen og oxygen.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med reaktionsskema, formel, beregning med enheder og en konklusion.</p>
+</section>
+<section id="opgave-a2.2.eks.1-energien-i-druesukker" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.eks.1-energien-i-druesukker">Opgave A2.2.eks.1: Energien i druesukker</h2>
+<p>Druesukker er glucose, C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>. I kroppens celler reagerer glucose med oxygen og bliver til carbondioxid og vand. Reaktionen giver energi til blandt andet musklerne. På en varedeklaration regner man med, at kulhydrater giver 17 kJ pr. gram.</p>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for reaktionen mellem glucose og oxygen. Glucose er et fast stof, og vandet dannes som væske.</li>
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for reaktionen ud fra tabelværdier, og kommentér resultatet.</li>
+<li>Beregn den energi, der afgives pr. gram glucose, og vurdér resultatet i forhold til varedeklarationens 17 kJ pr. gram.</li>
+<li>Planter danner glucose ved fotosyntese, som er den modsatte reaktion. Angiv Δ<em>H</em><sup>⊖</sup> for fotosyntesen, og argumentér for, at planten skal have tilført energi, for at fotosyntesen kan forløbe.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Afstem reaktionsskemaet C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>(s) + O<sub>2</sub>(g) → CO<sub>2</sub>(g) + H<sub>2</sub>O(l). Begynd med carbon, tag så hydrogen, og slut med oxygen. Slå derefter <em>H</em><sup>⊖</sup> op for de fire stoffer i tabellen Termodynamiske data.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>(s) + 6 O<sub>2</sub>(g) → 6 CO<sub>2</sub>(g) + 6 H<sub>2</sub>O(l). Til spørgsmål c: del talværdien af Δ<em>H</em><sup>⊖</sup> med molarmassen for glucose, som er 180,16 g/mol. Til spørgsmål d: når reaktionsskemaet vendes om, skifter Δ<em>H</em><sup>⊖</sup> fortegn.</p>
+<p>Du kan begynde vurderingen i spørgsmål c sådan: “Beregningen giver … kJ pr. gram glucose. Det er lidt … end 17 kJ pr. gram, fordi …” Og argumentet i spørgsmål d sådan: “Fortegnet på Δ<em>H</em><sup>⊖</sup> for fotosyntesen er …, så fotosyntesen er …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Reaktionsskemaet</strong></p>
+<div class="reaktion">
+<p>C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>(s) + 6 O<sub>2</sub>(g) → 6 CO<sub>2</sub>(g) + 6 H<sub>2</sub>O(l)</p>
+</div>
+<p><strong>b. Δ<em>H</em><sup>⊖</sup> for reaktionen</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>(s)</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(l)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−1273,3</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−393,5</td>
+<td style="text-align: center;">−285,8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">6</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(6 \cdot H^{\ominus}(\mathrm{CO_2(g)}) + 6 \cdot H^{\ominus}(\mathrm{H_2O(l)})\right) - \left(H^{\ominus}(\mathrm{C_6H_{12}O_6(s)}) + 6 \cdot H^{\ominus}(\mathrm{O_2(g)})\right)
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(6 \cdot (-393{,}5) + 6 \cdot (-285{,}8) - (-1273{,}3) - 6 \cdot 0\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -2802{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = −2802,5 kJ/mol. Fortegnet er negativt, så reaktionen mellem glucose og oxygen er exoterm. Der afgives 2802,5 kJ for hvert mol glucose, der reagerer. Det passer med, at glucose giver kroppen energi.</p>
+<p><strong>c.&nbsp;Energien pr. gram glucose</strong></p>
+<p>Molarmassen for glucose er (6 · 12,01 + 12 · 1,008 + 6 · 16,00) g/mol = 180,16 g/mol. Der afgives 2802,5 kJ for hvert mol glucose:</p>
+<p><span class="math display">\[
+\frac{2802{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}}{180{,}16\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 15{,}6\ \dfrac{\mathrm{kJ}}{\mathrm{g}}
+\]</span></p>
+<p>Glucose giver 15,6 kJ pr. gram. Det er tæt på varedeklarationens 17 kJ pr. gram, men lidt mindre. Tallet 17 kJ pr. gram er en afrundet gennemsnitsværdi, som bruges for alle kulhydrater. Stivelse giver lidt mere energi pr. gram end glucose, så gennemsnittet ligger over værdien for glucose.</p>
+<p><strong>d.&nbsp;Fotosyntesen</strong></p>
+<p>Fotosyntesen er reaktionen mellem glucose og oxygen vendt om, så Δ<em>H</em><sup>⊖</sup> skifter fortegn:</p>
+<div class="reaktion">
+<p>6 CO<sub>2</sub>(g) + 6 H<sub>2</sub>O(l) → C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>(s) + 6 O<sub>2</sub>(g)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em><sup>⊖</sup> = +2802,5 kJ/mol</p>
+</div>
+<p>Fortegnet er positivt, så fotosyntesen er endoterm. Produkterne glucose og oxygen har 2802,5 kJ højere entalpi end reaktanterne carbondioxid og vand for hvert mol glucose. Den energi skal planten have tilført, og den kommer fra sollyset.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.eks.2-bioethanol-og-propan" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.eks.2-bioethanol-og-propan">Opgave A2.2.eks.2: Bioethanol og propan</h2>
+<p>Bioethanol fremstilles ved at lade gær omdanne sukker fra planter til ethanol. I Danmark er benzinen blandet med bioethanol. Propan er et fossilt brændstof, som sælges i gasflasker. I en motor og i en gasbrænder dannes vandet som damp. For forbrændingen af propan gælder:</p>
+<div class="reaktion">
+<p>C<sub>3</sub>H<sub>8</sub>(g) + 5 O<sub>2</sub>(g) → 3 CO<sub>2</sub>(g) + 4 H<sub>2</sub>O(g)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em><sup>⊖</sup> = −2043,9 kJ/mol</p>
+</div>
+<ol type="a">
+<li>Opskriv reaktionsskemaet for den fuldstændige forbrænding af flydende ethanol, CH<sub>3</sub>CH<sub>2</sub>OH(l), når vandet dannes som damp.</li>
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for forbrændingen af ethanol ud fra tabelværdier, og kommentér resultatet.</li>
+<li>Beregn for hvert af de to brændstoffer ethanol og propan den varme, der afgives pr. gram brændstof.</li>
+<li>Beregn for hvert af de to brændstoffer massen af den carbondioxid, der dannes, når forbrændingen afgiver 1000 kJ. Vurdér, hvad resultatet betyder for klimaet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ethanol har to carbonatomer og seks hydrogenatomer, så der dannes 2 CO<sub>2</sub> og 3 H<sub>2</sub>O for hvert ethanolmolekyle. Afstem til sidst oxygen, og husk, at ethanol selv indeholder ét oxygenatom. Slå <em>H</em><sup>⊖</sup> op for CH<sub>3</sub>CH<sub>2</sub>OH(l), O<sub>2</sub>(g), CO<sub>2</sub>(g) og H<sub>2</sub>O(g).</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Reaktionsskemaet er CH<sub>3</sub>CH<sub>2</sub>OH(l) + 3 O<sub>2</sub>(g) → 2 CO<sub>2</sub>(g) + 3 H<sub>2</sub>O(g). Til spørgsmål c: del talværdien af Δ<em>H</em><sup>⊖</sup> med brændstoffets molarmasse. Molarmassen er 46,07 g/mol for ethanol og 44,09 g/mol for propan. Til spørgsmål d: del 1000 kJ med talværdien af Δ<em>H</em><sup>⊖</sup>. Så har du, hvor mange mol gange reaktionen forløber. Gang med koefficienten for CO<sub>2</sub>, og regn om til masse med molarmassen 44,01 g/mol for CO<sub>2</sub>.</p>
+<p>Du kan begynde vurderingen sådan: “Ethanol danner … carbondioxid end propan for den samme varme. Men carbonatomerne i bioethanol kommer fra …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Reaktionsskemaet</strong></p>
+<div class="reaktion">
+<p>CH<sub>3</sub>CH<sub>2</sub>OH(l) + 3 O<sub>2</sub>(g) → 2 CO<sub>2</sub>(g) + 3 H<sub>2</sub>O(g)</p>
+</div>
+<p><strong>b. Δ<em>H</em><sup>⊖</sup> for forbrændingen af ethanol</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">CH<sub>3</sub>CH<sub>2</sub>OH(l)</th>
+<th style="text-align: center;">O<sub>2</sub>(g)</th>
+<th style="text-align: center;">CO<sub>2</sub>(g)</th>
+<th style="text-align: center;">H<sub>2</sub>O(g)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">−277,6</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−393,5</td>
+<td style="text-align: center;">−241,8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(2 \cdot H^{\ominus}(\mathrm{CO_2(g)}) + 3 \cdot H^{\ominus}(\mathrm{H_2O(g)})\right) - \left(H^{\ominus}(\mathrm{CH_3CH_2OH(l)}) + 3 \cdot H^{\ominus}(\mathrm{O_2(g)})\right)
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(2 \cdot (-393{,}5) + 3 \cdot (-241{,}8) - (-277{,}6) - 3 \cdot 0\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -1234{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = −1234,8 kJ/mol. Fortegnet er negativt, så forbrændingen af ethanol er exoterm. Der afgives 1234,8 kJ for hvert mol ethanol, der brænder. Det passer med, at ethanol kan bruges som brændstof.</p>
+<p><strong>c.&nbsp;Varmen pr. gram brændstof</strong></p>
+<p>Molarmassen for ethanol er (2 · 12,01 + 6 · 1,008 + 16,00) g/mol = 46,07 g/mol. Molarmassen for propan er (3 · 12,01 + 8 · 1,008) g/mol = 44,09 g/mol.</p>
+<p>Ethanol:</p>
+<p><span class="math display">\[
+\frac{1234{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}}{46{,}07\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 26{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{g}}
+\]</span></p>
+<p>Propan:</p>
+<p><span class="math display">\[
+\frac{2043{,}9\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}}{44{,}09\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 46{,}4\ \dfrac{\mathrm{kJ}}{\mathrm{g}}
+\]</span></p>
+<p>Ethanol afgiver 26,8 kJ pr. gram, og propan afgiver 46,4 kJ pr. gram. Et gram propan giver altså omkring 1,7 gange så meget varme som et gram ethanol.</p>
+<p><strong>d.&nbsp;Carbondioxid for 1000 kJ</strong></p>
+<p>Ethanol: forbrændingen af ethanol skal forløbe så mange mol gange, at der afgives 1000 kJ. For hver gang dannes der 2 CO<sub>2</sub>.</p>
+<p><span class="math display">\[
+n(\text{reaktion}) = \frac{1000\ \mathrm{kJ}}{1234{,}8\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}} = 0{,}8098\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{CO_2}) = 2 \cdot 0{,}8098\ \mathrm{mol} = 1{,}620\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{CO_2}) = n \cdot M = 1{,}620\ \mathrm{mol} \cdot 44{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 71{,}3\ \mathrm{g}
+\]</span></p>
+<p>Propan: for hver gang forbrændingen af propan forløber, dannes der 3 CO<sub>2</sub>.</p>
+<p><span class="math display">\[
+n(\text{reaktion}) = \frac{1000\ \mathrm{kJ}}{2043{,}9\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}} = 0{,}4893\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{CO_2}) = 3 \cdot 0{,}4893\ \mathrm{mol} = 1{,}468\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{CO_2}) = n \cdot M = 1{,}468\ \mathrm{mol} \cdot 44{,}01\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 64{,}6\ \mathrm{g}
+\]</span></p>
+<p>Når forbrændingen afgiver 1000 kJ, danner ethanol 71,3 g carbondioxid, og propan danner 64,6 g carbondioxid. Ethanol danner altså lidt mere carbondioxid end propan for den samme varme. Alligevel er bioethanol bedst for klimaet. Carbonatomerne i bioethanol kommer fra planter, som har optaget den samme mængde carbondioxid fra luften, mens de voksede. Carbonatomerne i propan kommer fra undergrunden, så forbrændingen af propan øger mængden af carbondioxid i luften.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="opgave-a2.2.eks.3-skinner-svejses-med-thermit" class="level2">
+<h2 class="anchored" data-anchor-id="opgave-a2.2.eks.3-skinner-svejses-med-thermit">Opgave A2.2.eks.3: Skinner svejses med thermit</h2>
+<p>Når to jernbaneskinner skal svejses sammen ude på sporet, bruger man thermit. Thermit er en blanding af aluminiumpulver og jern(III)oxid. Når blandingen antændes, dannes der jern, som er så varmt, at det er flydende og løber ned mellem de to skinner:</p>
+<div class="reaktion">
+<p>2 Al(s) + Fe<sub>2</sub>O<sub>3</sub>(s) → Al<sub>2</sub>O<sub>3</sub>(s) + 2 Fe(s)</p>
+</div>
+<p>For reaktionerne mellem de to metaller og oxygen gælder:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Reaktion</th>
+<th style="text-align: left;">Δ<em>H</em><sup>⊖</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">4 Al(s) + 3 O<sub>2</sub>(g) → 2 Al<sub>2</sub>O<sub>3</sub>(s)</td>
+<td style="text-align: left;">−3351,4 kJ/mol</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">4 Fe(s) + 3 O<sub>2</sub>(g) → 2 Fe<sub>2</sub>O<sub>3</sub>(s)</td>
+<td style="text-align: left;">−1648,4 kJ/mol</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn Δ<em>H</em><sup>⊖</sup> for reaktionen mellem aluminium og jern(III)oxid ud fra tabelværdier, og kommentér resultatet.</li>
+<li>Vis med Hess’ lov, at reaktion 1 og reaktion 2 giver den samme Δ<em>H</em><sup>⊖</sup> for reaktionen mellem aluminium og jern(III)oxid.</li>
+<li>Beregn den varme, der afgives, når der dannes 1,00 kg jern.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Aluminium og jern er grundstoffer i deres mest stabile form, så <em>H</em><sup>⊖</sup> er 0 for Al(s) og for Fe(s). Slå <em>H</em><sup>⊖</sup> op for Fe<sub>2</sub>O<sub>3</sub>(s) og Al<sub>2</sub>O<sub>3</sub>(s). Til spørgsmål b: sammenlign reaktion 1 og reaktion 2 med den søgte reaktion. Der skal stå 2 Al til venstre og 2 Fe til højre.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål b: reaktion 1 ganges med ½. Reaktion 2 vendes om og ganges med ½. Når de to nye reaktionsskemaer lægges sammen, går 1½ O<sub>2</sub> ud. Til spørgsmål c: find stofmængden af jern med molarmassen 55,85 g/mol. Jern har koefficienten 2 i reaktionsskemaet, så reaktionen forløber halvt så mange mol gange, som der dannes mol jern.</p>
+<p>Du kan begynde kommentaren sådan: “Fortegnet på Δ<em>H</em><sup>⊖</sup> er …, så reaktionen mellem aluminium og jern(III)oxid er … Det passer med, at jernet …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><strong>a. Δ<em>H</em><sup>⊖</sup> ud fra tabelværdier</strong></p>
+<div class="reaktion">
+<p>2 Al(s) + Fe<sub>2</sub>O<sub>3</sub>(s) → Al<sub>2</sub>O<sub>3</sub>(s) + 2 Fe(s)</p>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">Al(s)</th>
+<th style="text-align: center;">Fe<sub>2</sub>O<sub>3</sub>(s)</th>
+<th style="text-align: center;">Al<sub>2</sub>O<sub>3</sub>(s)</th>
+<th style="text-align: center;">Fe(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>H</em><sup>⊖</sup> i kJ/mol</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−824,2</td>
+<td style="text-align: center;">−1675,7</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Koefficient</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left(H^{\ominus}(\mathrm{Al_2O_3(s)}) + 2 \cdot H^{\ominus}(\mathrm{Fe(s)})\right) - \left(2 \cdot H^{\ominus}(\mathrm{Al(s)}) + H^{\ominus}(\mathrm{Fe_2O_3(s)})\right)
+\]</span></p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \left((-1675{,}7) + 2 \cdot 0 - 2 \cdot 0 - (-824{,}2)\right)\ \dfrac{\mathrm{kJ}}{\mathrm{mol}} = -851{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Δ<em>H</em><sup>⊖</sup> = −851,5 kJ/mol. Fortegnet er negativt, så reaktionen mellem aluminium og jern(III)oxid er exoterm. Der afgives 851,5 kJ, hver gang der dannes 2 mol jern. Det passer med, at jernet bliver så varmt, at det smelter.</p>
+<p><strong>b. Hess’ lov</strong></p>
+<p>Reaktion 1 ganges med ½, fordi der skal stå 2 Al i den søgte reaktion. Δ<em>H</em><sup>⊖</sup> ganges også med ½:</p>
+<div class="reaktion">
+<p>2 Al(s) + 1½ O<sub>2</sub>(g) → Al<sub>2</sub>O<sub>3</sub>(s)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em><sup>⊖</sup> = −1675,7 kJ/mol</p>
+</div>
+<p>Reaktion 2 vendes om, fordi Fe<sub>2</sub>O<sub>3</sub> skal være en reaktant, og ganges med ½. Δ<em>H</em><sup>⊖</sup> skifter fortegn og ganges med ½:</p>
+<div class="reaktion">
+<p>Fe<sub>2</sub>O<sub>3</sub>(s) → 2 Fe(s) + 1½ O<sub>2</sub>(g)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Δ<em>H</em><sup>⊖</sup> = +824,2 kJ/mol</p>
+</div>
+<p>De to nye reaktionsskemaer lægges sammen. 1½ O<sub>2</sub>(g) står på begge sider af pilen og går ud, og summen er 2 Al(s) + Fe<sub>2</sub>O<sub>3</sub>(s) → Al<sub>2</sub>O<sub>3</sub>(s) + 2 Fe(s).</p>
+<p><span class="math display">\[
+\Delta H^{\ominus} = \frac{1}{2} \cdot \left(-3351{,}4\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) - \frac{1}{2} \cdot \left(-1648{,}4\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = -851{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}
+\]</span></p>
+<p>Hess’ lov giver Δ<em>H</em><sup>⊖</sup> = −851,5 kJ/mol for reaktionen mellem aluminium og jern(III)oxid. Det er den samme værdi som i spørgsmål a.</p>
+<p><strong>c.&nbsp;Varmen, når der dannes 1,00 kg jern</strong></p>
+<p><span class="math display">\[
+n(\mathrm{Fe}) = \frac{m}{M} = \frac{1{,}00 \cdot 10^{3}\ \mathrm{g}}{55{,}85\ \dfrac{\mathrm{g}}{\mathrm{mol}}} = 17{,}9\ \mathrm{mol}
+\]</span></p>
+<p>Jern har koefficienten 2 i reaktionsskemaet, så Δ<em>H</em><sup>⊖</sup> gælder for 2 mol jern. Reaktionen forløber 17,9 mol / 2 = 8,95 mol gange.</p>
+<p><span class="math display">\[
+8{,}95\ \mathrm{mol} \cdot \left(-851{,}5\ \dfrac{\mathrm{kJ}}{\mathrm{mol}}\right) = -7{,}62 \cdot 10^{3}\ \mathrm{kJ}
+\]</span></p>
+<p>Fortegnet er negativt, så systemet afgiver varme. Der afgives 7,62 · 10<sup>3</sup> kJ, når der dannes 1,00 kg jern.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+// Temaopgaver kan klappes sammen.
+//
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+document.addEventListener("DOMContentLoaded", function () {
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+  if (!temaer.length) return;
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+  function husk(id, aaben) {
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+  }
+  function husket(id) {
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+
+  var alle = temaer.map(function (tema) {
+    var h2 = tema.querySelector("h2");
+    var indhold = document.createElement("div");
+    indhold.className = "tema-indhold";
+    indhold.id = tema.id + "-opgaver";
+    var opgaver = [];
+    var naeste = tema.nextElementSibling;
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+      var flyt = naeste;
+      naeste = naeste.nextElementSibling;
+      indhold.appendChild(flyt);
+      opgaver.push(flyt);
+    }
+    tema.appendChild(indhold);
+
+    var antal = document.createElement("span");
+    antal.className = "tema-antal";
+    antal.textContent = opgaver.length + " opgaver";
+    h2.appendChild(antal);
+    h2.setAttribute("role", "button");
+    h2.setAttribute("tabindex", "0");
+    h2.setAttribute("aria-controls", indhold.id);
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+    t.saet = function (aaben, gem) {
+      t.aaben = aaben;
+      indhold.classList.toggle("lukket", !aaben);
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+      opgaver.forEach(function (o) {
+        var li = tocPunkt(o.id);
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+      });
+      var punkt = document.getElementById("toc-" + tema.id);
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+      if (gem) husk(tema.id, aaben);
+    };
+    h2.addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+      t.saet(!t.aaben, true);
+    });
+    h2.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+    });
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+    var punkt = document.getElementById("toc-" + tema.id);
+    if (punkt) {
+      punkt.classList.add("tema-punkt");
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+    }
+
+    t.saet(alleAabne || husket(tema.id), false);
+    return t;
+  });
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+  function aabnTilAnker() {
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!id) return;
+    var maal = document.getElementById(id);
+    if (!maal) return;
+    alle.forEach(function (t) {
+      if (!t.aaben && t.indhold.contains(maal)) {
+        t.saet(true, false);
+        maal.scrollIntoView();
+      }
+    });
+  }
+  aabnTilAnker();
+  window.addEventListener("hashchange", aabnTilAnker);
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+  var venter = false;
+  function retMarkering() {
+    venter = false;
+    alle.forEach(function (t) {
+      var punkt = document.getElementById("toc-" + t.tema.id);
+      if (!punkt) return;
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+        var link = document.getElementById("toc-" + o.id);
+        return link && link.classList.contains("active");
+      });
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+    });
+  }
+  window.addEventListener("scroll", function () {
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+  }, { passive: true });
+});
+</script>
+<script>
+// Trin for trin.
+//
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+// (eller teksten fra trinets egenskab knap="...")
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+document.addEventListener("DOMContentLoaded", function () {
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+      return el.classList.contains("trin");
+    });
+    if (trin.length < 2) return;
+
+    var stak = document.createElement("div");
+    stak.className = "trin-stak";
+    boks.insertBefore(stak, trin[0]);
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+    var bjaelke = document.createElement("div");
+    bjaelke.className = "trin-bjaelke";
+    function knap(tekst, klasse, label) {
+      var k = document.createElement("button");
+      k.type = "button";
+      k.className = klasse;
+      k.textContent = tekst;
+      if (label) k.setAttribute("aria-label", label);
+      bjaelke.appendChild(k);
+      return k;
+    }
+    var nu = 0, visAlle = false;
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+    var numre = trin.map(function (t, k) {
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+      return n;
+    });
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+    var alle = knap("Vis alle trin", "trin-alle");
+    boks.insertBefore(bjaelke, stak);
+
+    function vis() {
+      boks.classList.toggle("alle", visAlle);
+      trin.forEach(function (t, k) {
+        t.classList.toggle("vist", k === nu);
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+        else numre[k].removeAttribute("aria-current");
+      });
+      forrige.disabled = visAlle || nu === 0;
+      naeste.disabled = visAlle || nu === trin.length - 1;
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+    }
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+    // Piletasterne bladrer, når en af knapperne har fokus
+    bjaelke.addEventListener("keydown", function (e) {
+      if (visAlle) return;
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+    });
+
+    boks.classList.add("aktiv");
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+    vis();
+  });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="pagination-link" aria-label="A2.2 Standardentalpi og Hess' lov">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A2.2 Standardentalpi og Hess’ lov</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a2-3-entropi.html" class="pagination-link" aria-label="A2.3 Entropi">
+        <span class="nav-page-text">A2.3 Entropi</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
