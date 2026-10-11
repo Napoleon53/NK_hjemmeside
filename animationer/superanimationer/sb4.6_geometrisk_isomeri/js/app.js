@@ -2,8 +2,8 @@
    app.js - binder de tre faner sammen (som sc1.4)
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Der er ingen laerer: hjaelpen staar i
-   statuslinjen nederst i scenen.
+   fane opdateres og tegnes. Der er ingen laerer: al tekst staar paa
+   kortet oeverst i scenen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -11,7 +11,8 @@
     var NK = window.NK;
 
     var sims = {};
-    var faner = ["fane-dr", "fane-pr", "fane-sp"];
+    /* Raekkefoelgen i toplinjen: E og Z er den sidste fane, fordi den er ekstra */
+    var faner = ["fane-dr", "fane-sp", "fane-pr"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
 
@@ -122,7 +123,7 @@
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
         var HASH = { drej: "fane-dr", dobbeltbinding: "fane-dr", dobbeltbindingen: "fane-dr",
                      prioritet: "fane-pr", prioriteten: "fane-pr", ez: "fane-pr",
-                     spil: "fane-sp", spillet: "fane-sp" };
+                     spil: "fane-sp", spillet: "fane-sp", cis: "fane-sp", cistrans: "fane-sp" };
         visFane(HASH[oenske] || faner[0]);
 
         window.requestAnimationFrame(function (ts) {

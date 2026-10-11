@@ -247,4 +247,73 @@
     };
 
     NK.EZ = EZ;
+
+    /* =====================================================================
+       Cis og trans: det, spillet handler om fra start (brugeren 10. okt.
+       2026; E og Z er et tilvalg). Reglen er den klassiske: de to C-atomer
+       har en gruppe, der er ens. Sidder de to ens grupper paa samme side af
+       dobbeltbindingen, er det cis, ellers trans. Har et C-atom to ens
+       grupper, er der kun én form.
+       ===================================================================== */
+    var CT = {};
+    CT.PALET = ["H", "CH3", "C2H5", "Cl", "Br", "F", "COOH"];
+
+    /* type: cis, trans, ingen (et C-atom har to ens grupper) eller uden
+       (ingen gruppe er ens paa de to C-atomer; bruges ikke i spillet).
+       par: de to pladser med den ens gruppe */
+    CT.analyser = function (pos) {
+        var r = { pos: pos.slice(), ensV: pos[0] === pos[1], ensH: pos[2] === pos[3], par: null };
+        if (r.ensV || r.ensH) { r.type = "ingen"; return r; }
+        var kand = [[0, 2, "cis"], [1, 3, "cis"], [0, 3, "trans"], [1, 2, "trans"]].filter(function (k) {
+            return pos[k[0]] === pos[k[1]];
+        });
+        if (!kand.length) { r.type = "uden"; return r; }
+        /* Er begge par ens (som i but-2-en), peges der paa det, der ikke er H */
+        kand.sort(function (a, b) { return (pos[a[0]] === "H" ? 1 : 0) - (pos[b[0]] === "H" ? 1 : 0); });
+        r.type = kand[0][2];
+        r.par = [kand[0][0], kand[0][1]];
+        return r;
+    };
+
+    CT.dom = function (r) {
+        if (r.type === "ingen") {
+            var side = r.ensV ? 0 : 2;
+            return "Det " + (side === 0 ? "venstre" : "højre") + " C-atom har to ens grupper (" + D.tekst(r.pos[side]) + " og " +
+                D.tekst(r.pos[side + 1]) + "). Så er der ingen cis/trans-isomeri.";
+        }
+        var a = D.tekst(r.pos[r.par[0]]);
+        return r.type === "cis" ?
+            "De to " + a + " sidder på samme side af dobbeltbindingen. Det er cis." :
+            "De to " + a + " sidder på hver sin side af dobbeltbindingen. Det er trans.";
+    };
+
+    CT.fejl = function (r, svar) {
+        if (r.type !== "ingen" && svar === "ingen") {
+            return "Begge C-atomer har to forskellige grupper, så der findes to former. " + CT.dom(r);
+        }
+        return CT.dom(r);
+    };
+
+    CT.tilfaeldigt = function (type) {
+        var ids = CT.PALET;
+        /* H er den hyppigste gruppe, som i de molekyler, eleverne moeder */
+        function anden(udenom) {
+            var x;
+            do { x = Math.random() < 0.5 ? "H" : NK.tilfaeldig(ids); } while (x === udenom);
+            return x;
+        }
+        if (type === "ingen") {
+            var x = NK.tilfaeldig(ids), y = NK.tilfaeldig(ids);
+            var ens = [x, x], forsk = [y, anden(y)];
+            return Math.random() < 0.5 ? ens.concat(forsk) : forsk.concat(ens);
+        }
+        var a = NK.tilfaeldig(ids), b = anden(a), c = Math.random() < 0.5 ? b : anden(a);
+        var oppe = Math.random() < 0.5;
+        var venstre = oppe ? [a, b] : [b, a];
+        var sammeSide = type === "cis";
+        var hoejre = (oppe === sammeSide) ? [a, c] : [c, a];
+        return venstre.concat(hoejre);
+    };
+
+    NK.CT = CT;
 }());

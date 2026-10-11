@@ -41,6 +41,12 @@ window.NK = NK;
         return a;
     };
 
+    /* Pladsen oeverst i scenen til kortet med al teksten (fane.js og spillet) */
+    NK.kortZone = function (kort) {
+        var h = kort ? kort.offsetHeight : 0;
+        return 12 + Math.max(h, 164) + 6;
+    };
+
     NK.tilfaeldig = function (liste) {
         return liste[Math.floor(Math.random() * liste.length)];
     };

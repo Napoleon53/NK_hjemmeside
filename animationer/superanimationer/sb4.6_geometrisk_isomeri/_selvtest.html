@@ -23,8 +23,10 @@
    at byg-opgavernes facit opfylder kravene, at beskederne passer til de
    typiske fejl (cis-fælden og størrelsesfælden), at alle opgaver kan
    løses selv og med Vis svaret, at hinttrapperne har tre trin, fane 1
-   (drejningen, byttet og omridset), spillets point og fælder, sproget og
-   layoutet fra 1100 × 700 til 1600 × 950.
+   (drejningen og bytteopgavernes tre skridt med A og B), cis og trans
+   for alle molekyler, spillets point og fælder i begge emner, sproget,
+   at al tekst står på kortet øverst i scenen, og layoutet fra 1100 × 700
+   til 1600 × 950.
 
    Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
    fremskridt og lægger det tilbage bagefter.
@@ -46,7 +48,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sb4.6-dr", "nk-sb4.6-pr", "nk-sb4.6-rekord"];
+var NOEGLER = ["nk-sb4.6-dr", "nk-sb4.6-pr", "nk-sb4.6-rekord", "nk-sb4.6-rekord-ct"];
 var ASCII_ORD = /\b(foer|faerdig|naeste|Naeste|gaa|staa|paa|foerst|hoejre|laerer\w*|traek\w*|aendr\w*|vaelg|loest|saet)\b/;
 
 function koer() {
@@ -167,11 +169,11 @@ function koerTest(W) {
 
     PR.vaelg(3);
     PR.klikGruppe(0);
-    paastand("et forkert klik giver en rød statuslinje", PR.el.status.classList.contains("skidt"));
+    paastand("et forkert klik giver et rødt kort", PR.el.status.classList.contains("skidt"));
     paastand("og knappen lyser stille", PR.el.knap.classList.contains("peg"));
     paastand("forkert klik viser atomnumrene på den side", PR.zVist.v);
     PR.klikGruppe(1);
-    paastand("rigtigt klik giver grønt og næste skridt", PR.el.status.classList.contains("god") && /højre/.test(PR.beskedTekst()));
+    paastand("rigtigt klik giver grønt, og kortet viser næste skridt", PR.el.status.classList.contains("god") && /Trin 2 af 3.*højre/.test(d.getElementById("pr-prompt").textContent));
     PR.svarEZ("Z");
     paastand("et forkert E/Z-svar løser ikke opgaven", !PR.faerdig);
     PR.svarEZ("E");
@@ -222,34 +224,102 @@ function koerTest(W) {
             return foer.atomer.some(function (s) { return s.id === a.id && Math.hypot(s.p[0] - a.p[0], s.p[1] - a.p[1], s.p[2] - a.p[2]) < 0.3; });
         });
     }
+    function synlige() {
+        return Array.prototype.filter.call(DR.valg.querySelectorAll("button"), function (b) { return !DR.valg.hidden && !b.hidden; })
+            .map(function (b) { return b.textContent; }).join("|");
+    }
+    function promptDR() { return d.getElementById("dr-prompt").textContent; }
     [3, 4, 5].forEach(function (i) {
         var o = D.DREJ[i];
-        paastand(o.navn + ": byttet uden at vende passer ikke med omridset", !sammenligning(o, false));
-        paastand(o.navn + ": vendt passer det " + (o.svar === "samme" ? "" : "ikke ") + "med omridset", sammenligning(o, true) === (o.svar === "samme"));
+        paastand(o.navn + ": B byttet uden at vende ligner ikke A", !sammenligning(o, false));
+        paastand(o.navn + ": B vendt om ligner " + (o.svar === "samme" ? "" : "ikke ") + "A", sammenligning(o, true) === (o.svar === "samme"));
         DR.vaelg(i);
+        paastand(o.navn + ": trin 1 har ingen knapper under molekylerne", synlige() === "" && /Trin 1 af 3/.test(promptDR()), synlige());
+        DR.vend();
         DR.svarByt(o.svar);
-        paastand(o.navn + ": svar før byttet godtages ikke", !DR.faerdig);
+        paastand(o.navn + ": vend og svar før byttet gør ingenting", !DR.faerdig && !DR.vendt && DR.psiMaal === 0);
         DR.startByt();
         for (var k = 0; k < 120; k++) DR.opdater(1 / 60);
-        paastand(o.navn + ": grupperne har byttet plads", DR.byttet && DR.venstre[0] === o.v[1]);
-        DR.svarByt(o.svar === "samme" ? "nyt" : "samme");
-        paastand(o.navn + ": det forkerte svar giver en rød linje", !DR.faerdig && DR.el.status.classList.contains("skidt"));
+        paastand(o.navn + ": grupperne har byttet plads i B", DR.byttet && DR.venstre[0] === o.v[1]);
+        paastand(o.navn + ": trin 2 har kun knappen Vend B om", /^Vend B om/.test(synlige()) && synlige().indexOf("|") < 0 && /Trin 2 af 3/.test(promptDR()), synlige());
         DR.svarByt(o.svar);
-        paastand(o.navn + ": det rigtige svar løser den", DR.faerdig);
+        paastand(o.navn + ": svar før B er vendt gør ingenting", !DR.faerdig);
+        DR.vend();
+        for (k = 0; k < 200; k++) DR.opdater(1 / 60);
+        paastand(o.navn + ": B er vendt om", DR.vendt && Math.abs(DR.psi - Math.PI) < 0.01);
+        paastand(o.navn + ": trin 3 har kun de to svar", synlige() === "Samme stof|Nyt stof" && /Trin 3 af 3/.test(promptDR()), synlige());
+        DR.svarByt(o.svar === "samme" ? "nyt" : "samme");
+        paastand(o.navn + ": det forkerte svar giver et rødt kort", !DR.faerdig && DR.el.status.classList.contains("skidt"));
+        DR.svarByt(o.svar);
+        paastand(o.navn + ": det rigtige svar løser den, og kortet er grønt uden skridt", DR.faerdig && DR.el.status.classList.contains("god") && promptDR() === "");
     });
+    DR.vaelg(0);
+    paastand("en drej-opgave har ingen knapper under molekylet", synlige() === "");
     DR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
     var drSvar = true, drTre = true;
     D.DREJ.forEach(function (o, i) {
         DR.vaelg(i);
-        if (DR.hintTrin().length !== 3) drTre = false;
-        for (var n2 = 0; n2 < 6 && !DR.faerdig; n2++) DR.knap();
-        for (var k2 = 0; k2 < 600 && !DR.faerdig; k2++) DR.opdater(1 / 60);
+        if (DR.hintTrin().length < 2) drTre = false;
+        for (var n2 = 0; n2 < 40 && !DR.faerdig; n2++) {
+            DR.knap();
+            for (var k2 = 0; k2 < 200 && !DR.faerdig; k2++) DR.opdater(1 / 60);
+        }
         if (!DR.faerdig || DR.status[i].stjerne) drSvar = false;
     });
-    paastand("hinttrapperne på fane 1 har tre trin", drTre);
+    paastand("hinttrapperne på fane 1 har mindst to trin", drTre);
     paastand("Vis svaret løser alle seks uden stjerne", drSvar);
 
     /* ----------------------------------------------------------------- */
+    overskrift("Cis og trans");
+    var CT = NK.CT, ctFejl = 0, ctTal = { cis: 0, trans: 0, ingen: 0, uden: 0 };
+    CT.PALET.forEach(function (a) { CT.PALET.forEach(function (b) { CT.PALET.forEach(function (c) { CT.PALET.forEach(function (e) {
+        var r = CT.analyser([a, b, c, e]), forvent;
+        if (a === b || c === e) forvent = "ingen";
+        else if (a === c || b === e) forvent = "cis";
+        else if (a === e || b === c) forvent = "trans";
+        else forvent = "uden";
+        ctTal[r.type]++;
+        if (r.type !== forvent) ctFejl++;
+        if ((r.type === "cis" || r.type === "trans") && (r.pos[r.par[0]] !== r.pos[r.par[1]] || CT.dom(r).indexOf(r.type) < 0)) ctFejl++;
+    }); }); }); });
+    paastand("cis og trans passer med en uafhængig udregning for alle molekyler", ctFejl === 0, ctFejl + " forkerte");
+    paastand("cis og trans er lige hyppige", ctTal.cis === ctTal.trans && ctTal.cis > 0, ctTal.cis + " og " + ctTal.trans);
+    paastand("cis-but-2-en er cis og peger på de to CH₃", CT.analyser(["CH3", "H", "CH3", "H"]).type === "cis" && /De to CH₃/.test(CT.dom(CT.analyser(["CH3", "H", "CH3", "H"]))));
+    paastand("trans-1,2-dichlorethen er trans", CT.analyser(["Cl", "H", "H", "Cl"]).type === "trans");
+    paastand("propen har ingen cis/trans-isomeri", CT.analyser(["CH3", "H", "H", "H"]).type === "ingen" && /højre C-atom/.test(CT.dom(CT.analyser(["CH3", "H", "H", "H"]))));
+    var ctTilf = true;
+    ["cis", "trans", "ingen"].forEach(function (t) {
+        for (var n6 = 0; n6 < 300; n6++) {
+            var m6 = CT.tilfaeldigt(t);
+            if (CT.analyser(m6).type !== t || m6.every(function (x) { return x === "H"; })) ctTilf = false;
+        }
+    });
+    paastand("tilfældige molekyler til cis og trans har den ønskede slags", ctTilf);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 2: spillet med cis og trans");
+    NK.visFane("fane-sp");
+    function svarKnapper() { return Array.prototype.map.call(SP.el.valg.querySelectorAll("button"), function (b) { return b.textContent; }).join("|"); }
+    paastand("spillet begynder med cis og trans", SP.emne === "ct" && svarKnapper() === "cis|trans|Ingen cis/trans-isomeri", svarKnapper());
+    paastand("før start er knappen Start spillet fremme og svarene slukket", !SP.el.knap.hidden && SP.knapper.cis.disabled);
+    SP.start();
+    var ctIngen = SP.molekyler.filter(function (m) { return CT.analyser(m).type === "ingen"; }).length;
+    var ctCis = SP.molekyler.filter(function (m) { return CT.analyser(m).type === "cis"; }).length;
+    paastand("15 molekyler: 6 cis, 6 trans og 3 uden cis/trans-isomeri", SP.molekyler.length === 15 && ctIngen === 3 && ctCis === 6, ctCis + " cis, " + ctIngen + " ingen");
+    paastand("under et molekyle er knappen på kortet væk, og kortet har spørgsmålet", SP.el.knap.hidden && /cis, trans/.test(d.getElementById("sp-prompt").textContent));
+    for (var n7 = 0; n7 < 15; n7++) { SP.svar(SP.r.type); SP.naeste(); }
+    paastand("15 rigtige og lynhurtige giver 1500 point", SP.score === 1500 && SP.tilstand === "slut");
+    SP.start();
+    while (SP.r.type === "ingen") SP.naeste();
+    SP.svar(SP.r.type === "cis" ? "trans" : "cis");
+    paastand("et forkert svar giver et rødt kort med det rigtige svar og Næste molekyle", SP.tilstand === "svar" && SP.el.status.classList.contains("skidt") &&
+        new RegExp("Det er " + SP.r.type).test(SP.beskedTekst()) && !SP.el.knap.hidden && SP.autoT <= 0, SP.beskedTekst());
+    paastand("tasten C svarer kun, mens der spilles", SP.tast("c") === true && SP.tilstand === "svar");
+
+    /* ----------------------------------------------------------------- */
+    overskrift("Fane 2: spillet med E og Z (tilvalget)");
+    SP.saetEmne("ez");
+    paastand("E og Z giver knapperne E, Z og Ingen E/Z-isomeri og begynder forfra", svarKnapper() === "E|Z|Ingen E/Z-isomeri" && SP.tilstand === "start", svarKnapper());    /* ----------------------------------------------------------------- */
     overskrift("Fane 3: spillet");
     NK.visFane("fane-sp");
     var tilf = true;
@@ -277,7 +347,16 @@ function koerTest(W) {
     SP.naeste();
     SP.svar(SP.r.type === "E" ? "Z" : "E");
     paastand("et forkert svar nulstiller stimen og venter på Næste", SP.stime === 0 && SP.tilstand === "svar" && SP.autoT <= 0);
-    paastand("og forklaringen står i en rød linje", SP.el.status.classList.contains("skidt"));
+    paastand("og forklaringen står på et rødt kort", SP.el.status.classList.contains("skidt"));
+    PR.status.forEach(function (s) { s.loest = true; });
+    NK.visFane("fane-pr");
+    SP.saetEmne("ct");
+    PR.vaelg(0);
+    PR.svarEZ("Z");
+    PR.knap();
+    paastand("efter alle tolv på E og Z-fanen fører knappen til spillet med E og Z", SP.emne === "ez" && d.getElementById("fane-sp").classList.contains("aktiv"));
+    PR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    SP.saetEmne("ct");
 
     /* ----------------------------------------------------------------- */
     overskrift("Sproget");
@@ -289,7 +368,8 @@ function koerTest(W) {
     })(D);
     D.PALET.forEach(function (a) { D.PALET.forEach(function (b) { tekster.push(EZ.hvorfor(a, b)); }); });
     D.PRIO.forEach(function (o, i) { PR.vaelg(i); tekster.push(PR.promptHTML(), PR.trinLinje()); PR.hintTrin().forEach(function (t) { tekster.push(t); }); });
-    D.DREJ.forEach(function (o, i) { DR.vaelg(i); tekster.push(DR.promptHTML(), DR.trinLinje()); DR.hintTrin().forEach(function (t) { tekster.push(t); }); });
+    D.DREJ.forEach(function (o, i) { DR.vaelg(i); tekster.push(DR.promptHTML()); DR.hintTrin().forEach(function (t) { tekster.push(t); }); });
+    CT.PALET.forEach(function (a) { CT.PALET.forEach(function (b) { var rr = CT.analyser([a, "H", b, "Cl"]); if (rr.type !== "uden") tekster.push(CT.dom(rr), CT.fejl(rr, "ingen")); }); });
     [a3, a4, a5, a6].forEach(function (r) { ["E", "Z", "ingen"].forEach(function (s) { tekster.push(EZ.fejl(r, s), EZ.dom(r)); }); });
     tekster.push(d.body.innerText);
     var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
@@ -310,18 +390,53 @@ function koerTest(W) {
             sim.layout();
             var valg = d.querySelector("#" + f + " .scene-valg");
             var status = d.querySelector("#" + f + " .statuslinje");
+            var scene = d.querySelector("#" + f + " .scene").getBoundingClientRect();
+            var anker = d.querySelector("#" + f + " .anker").getBoundingClientRect();
+            var rs = status.getBoundingClientRect();
+            paastand(m[0] + " × " + m[1] + " " + f + ": kortet står øverst i scenen, over figuren", rs.top - scene.top < 20 && rs.bottom <= anker.top + 1, Math.round(rs.bottom) + " mod " + Math.round(anker.top));
             var ok = true;
             if (valg && !valg.hidden && valg.children.length) {
-                var rv = valg.getBoundingClientRect(), rs = status.getBoundingClientRect();
-                ok = rv.bottom <= rs.top + 1;
+                var rv = valg.getBoundingClientRect();
+                ok = rv.top >= rs.bottom && rv.bottom <= scene.bottom + 1 && rv.top >= anker.bottom - 1;
             }
-            paastand(m[0] + " × " + m[1] + " " + f + ": knapperne står over statuslinjen", ok);
+            paastand(m[0] + " × " + m[1] + " " + f + ": knapperne står under figuren", ok);
+            paastand(m[0] + " × " + m[1] + " " + f + ": figuren er mindst 250 px høj", anker.height >= 250, Math.round(anker.height));
             var panel = d.querySelector("#" + f + " .panel");
             paastand(m[0] + " × " + m[1] + " " + f + ": panelet har plads uden at rulle", panel.scrollHeight <= panel.clientHeight + 2);
         });
     });
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
+    /* Kortets hoejde er sat af fra start: ingen tekst maa goere det hoejere */
+    var H0 = 166, hoejest = 0, hvor = "";
+    function maal(sim, navn) {
+        var h = sim.el.status.offsetHeight;
+        if (h > hoejest) { hoejest = h; hvor = navn + ": " + sim.el.besked.textContent.slice(0, 50); }
+    }
+    NK.visFane("fane-dr");
+    DR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    D.DREJ.forEach(function (o, i) {
+        DR.vaelg(i);
+        for (var n8 = 0; n8 < 40 && !DR.faerdig; n8++) {
+            DR.knap(); maal(DR, o.navn);
+            for (var k8 = 0; k8 < 200 && !DR.faerdig; k8++) DR.opdater(1 / 60);
+            maal(DR, o.navn);
+        }
+        if (o.slags === "byt") { DR.vaelg(i); DR.startByt(); for (var k9 = 0; k9 < 120; k9++) DR.opdater(1 / 60); DR.vend(); DR.svarByt(o.svar === "samme" ? "nyt" : "samme"); maal(DR, o.navn + " forkert"); }
+    });
+    paastand("fane 1: kortet bliver aldrig højere end pladsen, der er sat af", hoejest <= H0, hoejest + " px ved " + hvor);
+    hoejest = 0;
+    NK.visFane("fane-pr");
+    D.PRIO.forEach(function (o, i) {
+        PR.vaelg(i);
+        for (var n9 = 0; n9 < 40 && !PR.faerdig; n9++) { PR.knap(); maal(PR, o.navn); }
+        if (o.slags === "afgoer") { PR.vaelg(i); ["E", "Z", "ingen"].forEach(function (s) { if (!PR.faerdig && s !== PR.r.type) { PR.svarEZ(s); maal(PR, o.navn + " svar " + s); } }); }
+    });
+    paastand("E og Z-fanen: kortet bliver højst én linje højere end pladsen, der er sat af", hoejest <= H0 + 24, hoejest + " px ved " + hvor);
+    PR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    DR.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
+    paastand("der er ingen tekst nederst i scenen: kortet er det eneste tekstfelt", d.querySelectorAll(".scene .st-tekst").length === 3 && !d.querySelector(".panel .opgavekort"));
+
     var smaa = [];
     d.querySelectorAll(".panel *, .statuslinje *, .scene-valg *").forEach(function (e) {
         if (!e.offsetWidth) return;

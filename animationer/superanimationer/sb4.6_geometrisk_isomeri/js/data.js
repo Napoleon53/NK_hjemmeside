@@ -56,33 +56,26 @@
     D.DREJ = [
         { id: "d1", navn: "Butan", slags: "drej", binding: 1,
           v: ["CH3", "H", "H"], h: ["CH3", "H", "H"], drej: 180,
-          maal: "Træk i den højre halvdel, så de to CH₃ kommer til at stå på samme side.",
-          trin: "Tag fat i den højre CH₃ med musen, og træk den op." },
+          maal: "Træk i den højre halvdel af butan, så de to CH₃ står på samme side." },
         { id: "d2", navn: "But-2-en", slags: "drej", binding: 2,
           v: ["CH3", "H"], h: ["H", "CH3"], drej: 0,
-          maal: "Prøv det samme med but-2-en. Træk den højre CH₃ op, så de to CH₃ står på samme side.",
-          trin: "Tag fat i den højre CH₃ nederst, og træk den op." },
+          maal: "Prøv det samme med but-2-en: træk den højre CH₃ op på samme side som den venstre." },
         { id: "d3", navn: "1,2-dichlorethen", slags: "to", binding: 2,
           a: { v: ["Cl", "H"], h: ["Cl", "H"] }, b: { v: ["Cl", "H"], h: ["H", "Cl"] },
           kog: [60, 48], smelt: [-81, -49],
-          maal: "Her er to molekyler med formlen C₂H₂Cl₂. Er A og B det samme stof?",
-          trin: "Se på, hvor de to Cl sidder. Vælg så et svar under molekylerne." },
+          maal: "A og B har begge formlen C₂H₂Cl₂. Er A og B det samme stof?" },
+        /* byt: A er molekylet, B er en kopi, hvor eleven bytter de to grupper til
+           venstre og vender molekylet. foer og efter: navnene, naar B er et nyt stof */
         { id: "d4", navn: "Propen", slags: "byt", binding: 2,
-          v: ["CH3", "H"], h: ["H", "H"], svar: "samme",
-          maal: "Byt om på CH₃ og H til venstre. Er det så et nyt stof?",
-          trin: "Træk CH₃ til venstre ned på H, så de bytter plads." },
+          v: ["CH3", "H"], h: ["H", "H"], svar: "samme" },
         { id: "d5", navn: "But-2-en", slags: "byt", binding: 2,
-          v: ["CH3", "H"], h: ["CH3", "H"], svar: "nyt",
-          maal: "Byt om på CH₃ og H til venstre. Er det så et nyt stof?",
-          trin: "Træk CH₃ til venstre ned på H, så de bytter plads." },
+          v: ["CH3", "H"], h: ["CH3", "H"], svar: "nyt", foer: "cis-but-2-en", efter: "trans-but-2-en" },
         { id: "d6", navn: "2-methylbut-2-en", slags: "byt", binding: 2,
-          v: ["CH3", "H"], h: ["CH3", "CH3"], svar: "samme",
-          maal: "Byt om på CH₃ og H til venstre. Er det så et nyt stof?",
-          trin: "Træk CH₃ til venstre ned på H, så de bytter plads." }
+          v: ["CH3", "H"], h: ["CH3", "CH3"], svar: "samme" }
     ];
     D.DREJ_GRUPPER = [
         { id: "drej", titel: "Drej" },
-        { id: "byt", titel: "Byt og vend" }
+        { id: "byt", titel: "Byt og sammenlign" }
     ];
     D.DREJ[0].gruppe = D.DREJ[1].gruppe = D.DREJ[2].gruppe = "drej";
     D.DREJ[3].gruppe = D.DREJ[4].gruppe = D.DREJ[5].gruppe = "byt";
@@ -135,8 +128,8 @@
     };
 
     D.FAERDIG = {
-        dr: "Alle seks. Der er kun to former, når begge C-atomer har to forskellige grupper.",
-        pr: "Alle tolv. Du kan bestemme E og Z ud fra prioriteterne."
+        dr: "Alle seks er løst. Der er kun to former, når begge C-atomer har to forskellige grupper.",
+        pr: "Alle tolv er løst. Du kan bestemme E og Z ud fra prioriteterne."
     };
     D.ROS = ["Rigtigt.", "Sådan.", "Det passer.", "Godt set."];
 

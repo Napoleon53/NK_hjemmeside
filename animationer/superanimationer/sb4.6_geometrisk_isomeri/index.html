@@ -13,8 +13,8 @@
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-dr" role="tab" aria-selected="true"><span class="nr">1</span>Dobbeltbindingen</button>
-        <button class="faneknap" data-fane="fane-pr" role="tab" aria-selected="false"><span class="nr">2</span>Prioriteten</button>
-        <button class="faneknap" data-fane="fane-sp" role="tab" aria-selected="false"><span class="nr">3</span>E eller Z?</button>
+        <button class="faneknap" data-fane="fane-sp" role="tab" aria-selected="false"><span class="nr">2</span>Cis eller trans?</button>
+        <button class="faneknap" data-fane="fane-pr" role="tab" aria-selected="false"><span class="nr">3</span>E og Z (ekstra)</button>
     </div>
 
     <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -33,19 +33,24 @@
         <!-- Knapperne til opgaven (js/sim_drej.js) -->
         <div class="scene-valg" id="dr-valg" hidden></div>
 
+        <!-- Kortet med al teksten: opgaven, skridtet, hint, fejl og forklaring (js/fane.js) -->
         <div class="statuslinje" id="dr-status">
-            <p class="st-tekst" id="dr-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="dr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="dr-knap" type="button">Giv et hint</button>
+            <div class="sk-hoved">
+                <span class="sk-titel" id="dr-titel">Opgave</span>
+                <span class="taeller">opgave <b id="dr-nr">1</b> af <span id="dr-antal">6</span></span>
+                <button class="forfraknap" id="dr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            </div>
+            <div class="sk-krop">
+                <div class="sk-tekst">
+                    <div id="dr-prompt"></div>
+                    <p class="st-tekst" id="dr-besked" aria-live="polite"></p>
+                </div>
+                <button class="knap hjaelp" id="dr-knap" type="button">Giv et hint</button>
+            </div>
         </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="dr-kort">
-            <h2><span id="dr-titel">Opgave</span><span class="taeller">opgave <b id="dr-nr">1</b>/<span id="dr-antal">6</span></span></h2>
-            <div id="dr-prompt"></div>
-        </div>
-
         <div class="kort" id="dr-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="dr-loest">0</b>/6</span></h2>
             <div class="opg-liste" id="dr-liste"></div>
@@ -54,28 +59,33 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 2: PRIORITETEN                                                -->
+<!-- FANE 3: E OG Z (ekstra): prioriteten                               -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-pr" role="tabpanel" aria-label="Prioriteten">
+<section class="fane" id="fane-pr" role="tabpanel" aria-label="E og Z (ekstra)">
     <div class="scene">
         <canvas id="pr-laerred"></canvas>
         <div class="anker" id="pr-anker-tavle"></div>
         <div class="anker" id="pr-anker-palet"></div>
         <div class="scene-valg" id="pr-valg"></div>
 
+        <!-- Kortet med al teksten: opgaven, skridtet, hint, fejl og forklaring (js/fane.js) -->
         <div class="statuslinje" id="pr-status">
-            <p class="st-tekst" id="pr-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="pr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="pr-knap" type="button">Giv et hint</button>
+            <div class="sk-hoved">
+                <span class="sk-titel" id="pr-titel">Opgave</span>
+                <span class="taeller">opgave <b id="pr-nr">1</b> af <span id="pr-antal">12</span></span>
+                <button class="forfraknap" id="pr-forfra" type="button" title="Samme opgave forfra (R)">Forfra ↺</button>
+            </div>
+            <div class="sk-krop">
+                <div class="sk-tekst">
+                    <div id="pr-prompt"></div>
+                    <p class="st-tekst" id="pr-besked" aria-live="polite"></p>
+                </div>
+                <button class="knap hjaelp" id="pr-knap" type="button">Giv et hint</button>
+            </div>
         </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="pr-kort">
-            <h2><span id="pr-titel">Opgave</span><span class="taeller">opgave <b id="pr-nr">1</b>/<span id="pr-antal">12</span></span></h2>
-            <div id="pr-prompt"></div>
-        </div>
-
         <div class="kort maaling" id="pr-zkort">
             <h2>Atomnumre</h2>
             <div class="zliste">
@@ -92,31 +102,46 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 3: SPILLET                                                    -->
+<!-- FANE 2: SPILLET (cis og trans; E og Z som tilvalg)                 -->
 <!-- ================================================================= -->
-<section class="fane" id="fane-sp" role="tabpanel" aria-label="E eller Z?">
+<section class="fane" id="fane-sp" role="tabpanel" aria-label="Cis eller trans?">
     <div class="scene">
         <canvas id="sp-laerred"></canvas>
         <div class="anker" id="sp-anker-tavle"></div>
-        <div class="scene-valg" id="sp-valg">
-            <button class="valgknap stor-bogstav" type="button" data-svar="E" title="E: på hver sin side (tast E)">E</button>
-            <button class="valgknap stor-bogstav" type="button" data-svar="Z" title="Z: på samme side (tast Z)">Z</button>
-            <button class="valgknap" type="button" data-svar="ingen" title="Tast I">Ingen E/Z-isomeri</button>
-        </div>
+        <!-- Svarknapperne bygges efter emnet (js/sim_spil.js) -->
+        <div class="scene-valg" id="sp-valg"></div>
 
+        <!-- Kortet med al teksten: spørgsmålet og forklaringen efter et svar -->
         <div class="statuslinje" id="sp-status">
-            <p class="st-tekst" id="sp-besked" aria-live="polite"></p>
-            <button class="knap videre" id="sp-knap" type="button">Start spillet</button>
+            <div class="sk-hoved">
+                <span class="sk-titel" id="sp-titel">Cis eller trans?</span>
+                <span class="taeller" id="sp-taeller"></span>
+            </div>
+            <div class="sk-krop">
+                <div class="sk-tekst">
+                    <div id="sp-prompt"></div>
+                    <p class="st-tekst" id="sp-besked" aria-live="polite"></p>
+                </div>
+                <button class="knap videre" id="sp-knap" type="button">Start spillet</button>
+            </div>
         </div>
     </div>
 
     <aside class="panel">
+        <div class="kort" id="sp-emnekort">
+            <h2>Spillet handler om</h2>
+            <div class="emnevalg">
+                <button class="emneknap aktiv" type="button" data-emne="ct" aria-pressed="true">cis og trans</button>
+                <button class="emneknap" type="button" data-emne="ez" aria-pressed="false">E og Z <span>ekstra</span></button>
+            </div>
+        </div>
+
         <div class="kort maaling" id="sp-pointkort">
             <h2>Point</h2>
             <div class="pointgitter">
                 <div><span class="pg-etiket">Point</span><span class="pg-tal" id="sp-score">0</span></div>
                 <div><span class="pg-etiket">Stime</span><span class="pg-tal" id="sp-stime">0</span></div>
-                <div><span class="pg-etiket">Molekyle</span><span class="pg-tal" id="sp-runde">–</span></div>
+                <div><span class="pg-etiket">Molekyle</span><span class="pg-tal" id="sp-runde">0/15</span></div>
                 <div><span class="pg-etiket">Rekord</span><span class="pg-tal" id="sp-rekord">0</span></div>
             </div>
             <p class="note-tekst" style="margin-top:10px;">Rigtigt svar: 50 point. Bonus: under 2 s +50, under 3 s +30, under 4 s +20, under 10 s +10.</p>
@@ -141,22 +166,23 @@
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
     <div class="overlay-boks">
-        <h2>Geometrisk isomeri (E/Z)</h2>
+        <h2>Geometrisk isomeri</h2>
         <p>En enkeltbinding kan drejes frit. En dobbeltbinding kan ikke: så skulle den ene af de to bindinger brydes. Derfor kan grupperne på hver side af en dobbeltbinding sidde på to måder, og det er to forskellige stoffer med hver sit kogepunkt.</p>
         <p>Det kræver, at begge C-atomer i dobbeltbindingen har to forskellige grupper. Har det ene C-atom to ens grupper, fx to H, er der kun én form.</p>
-        <h3 class="teori-hoved">Prioriteten på hvert C-atom</h3>
+        <h3 class="teori-hoved">Cis og trans</h3>
+        <p>Find den gruppe, der sidder på begge C-atomer. <b>cis</b>: de to ens grupper sidder på samme side af dobbeltbindingen. <b>trans</b>: de sidder på hver sin side.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel: but-2-en</span>
+            Begge C-atomer har CH₃ og H. Sidder de to CH₃ på samme side, er det cis-but-2-en. Sidder de på hver sin side, er det trans-but-2-en.
+        </div>
+        <h3 class="teori-hoved">E og Z (ekstra)</h3>
+        <p>Cis og trans kan kun bruges, når de to C-atomer har en gruppe, der er ens. E og Z virker altid. På hvert C-atom finder man den gruppe, der har højest prioritet:</p>
         <ol class="teori-trin">
             <li>Se på det atom, der sidder direkte på C-atomet. Det højeste atomnummer vinder: Br (35) slår Cl (17), og Cl slår C (6).</li>
             <li>Er det det samme atom, ser man på de atomer, der sidder på det, det største først. CH₂CH₃ har C, H, H og slår CH₃ med H, H, H. En C=O tæller som to O.</li>
         </ol>
-        <h3 class="teori-hoved">E og Z</h3>
-        <p><b>Z</b> (zusammen, sammen): de to grupper med højest prioritet sidder på samme side af dobbeltbindingen. <b>E</b> (entgegen, modsat): de sidder på hver sin side.</p>
-        <div class="eksempel">
-            <span class="eksempel-hoved">Eksempel: but-2-en</span>
-            På begge C-atomer slår CH₃ (C, 6) H (1). Sidder de to CH₃ på samme side, er det (Z)-but-2-en. Det kaldes også cis-but-2-en.
-        </div>
-        <p>Cis og trans bruges kun, når de to C-atomer har en gruppe, der er ens. E og Z virker altid, og Z er ikke altid det samme som cis: sidder to CH₃ på samme side, men vinder Br over CH₃ på det ene C-atom, er det E.</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>E</kbd> <kbd>Z</kbd> <kbd>I</kbd> svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p><b>Z</b> (zusammen, sammen): de to grupper med højest prioritet sidder på samme side af dobbeltbindingen. <b>E</b> (entgegen, modsat): de sidder på hver sin side. Z er ikke altid det samme som cis: sidder to CH₃ på samme side, men vinder Br over CH₃ på det ene C-atom, er det E.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>C</kbd> <kbd>T</kbd> <kbd>I</kbd> svar (<kbd>E</kbd> <kbd>Z</kbd> <kbd>I</kbd> med E og Z) &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>

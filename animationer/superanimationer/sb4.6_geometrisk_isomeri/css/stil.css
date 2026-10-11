@@ -605,36 +605,49 @@ select:focus-visible {
 .valgrad .knap { background-color: rgba(242, 197, 61, 0.1); border-color: rgba(242, 197, 61, 0.6); }
 .valgrad .knap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.22); border-color: var(--gul); }
 /* ---------------------------------------------------------------------
-   STATUSLINJEN nederst i scenen: naeste skridt, fejl, hint og ros, og
-   den ene knap. Den staar der, hvor eleven kigger, saa der ikke skal
-   ledes efter teksten i et hjoerne (brugerens valg 30. sept. 2026).
+   KORTET oeverst i scenen med al teksten: opgavens navn, skridtet, og
+   under det én linje til hint, fejl og forklaring, og den ene knap
+   (brugeren 10. okt. 2026: teksten samlet ét sted). Klassen hedder
+   statuslinje som i sc1.4, hvor linjen stod nederst i scenen. Hoejden er
+   sat af fra start (NK.kortZone i js/kerne.js), saa figuren staar stille.
    --------------------------------------------------------------------- */
 .statuslinje {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 14px;
+    right: 14px;
+    top: 12px;
     z-index: 4;
     display: flex;
-    align-items: center;
-    gap: 12px;
-    min-height: 68px;
-    padding: 10px 14px;
-    border-top: 1px solid #33343f;
-    border-left: 5px solid #4a4a58;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 164px;
+    padding: 9px 14px 12px;
+    border: 1px solid #33343f;
+    border-left: 5px solid var(--lilla);
+    border-radius: var(--radius);
     background-color: #191a21;
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
+.sk-hoved { display: flex; align-items: center; gap: 12px; }
+.sk-titel { font-size: 0.95rem; font-weight: 700; color: var(--gul); }
+.sk-hoved .taeller { margin-right: auto; font-size: 0.82rem; color: var(--tekst-mat); }
+.sk-hoved .taeller b { color: var(--tekst); }
+.sk-krop { flex: 1; display: flex; align-items: center; gap: 14px; }
+.sk-tekst { flex: 1; min-width: 0; }
+.sk-tekst .maal-tekst { margin: 0 0 4px; }
+.sk-tekst .note-tekst { margin: 0; }
+.statuslinje.sejr { animation: glimt 0.9s ease-out 2; }
+.statuslinje .knap[hidden] { display: none; }
+
 .st-tekst {
-    flex: 1;
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.45;
     color: #cfd6de;
 }
 
-.st-tekst:empty::before { content: "\00a0"; }
+.st-tekst:empty { display: none; }
 
 /* Maerket forrest i linjen: Hint 2 af 3, Ikke endnu, Afstemt */
 .b-maerke {
@@ -684,8 +697,8 @@ select:focus-visible {
 .statuslinje .knap {
     flex: 0 0 auto;
     justify-content: center;
-    min-width: 190px;
-    padding: 12px 20px;
+    min-width: 168px;
+    padding: 12px 16px;
     font-size: 0.98rem;
     font-weight: 700;
 }
@@ -1241,14 +1254,14 @@ kbd {
 .optaelknap.til::before { background-color: var(--blaa); box-shadow: inset 16px 0 0 -14px #ffffff; }
 
 /* ---------------------------------------------------------------------
-   SB4.6: knapperne i scenen lige over statuslinjen (E, Z, Ingen, Vend,
-   Tjek). Oejnene er i scenen, saa svaret gives der.
+   SB4.6: knapperne nederst i scenen, under figuren (cis, trans, E, Z,
+   Ingen, Vend B om, Tjek). Kun dem, der hoerer til skridtet, er fremme.
    --------------------------------------------------------------------- */
 .scene-valg {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 80px;
+    bottom: 12px;
     z-index: 3;
     display: flex;
     justify-content: center;
@@ -1257,6 +1270,8 @@ kbd {
     padding: 0 16px;
     pointer-events: none;
 }
+
+.scene-valg[hidden], .valgknap[hidden] { display: none; }
 
 .valgknap {
     pointer-events: auto;
@@ -1293,7 +1308,26 @@ kbd {
 .trinliste li.ok { color: #7ee0a8; }
 .trinliste li::marker { color: var(--gul); font-weight: 700; }
 
-/* Atomnumrene i panelet paa fane 2 */
+/* Valget mellem cis og trans og E og Z i spillets panel */
+.emnevalg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.emneknap {
+    padding: 10px 8px;
+    border: 2px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    background-color: rgba(255, 255, 255, 0.04);
+    color: var(--tekst-svag);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.emneknap span { display: block; font-size: 0.76rem; font-weight: 600; color: var(--tekst-mat); }
+.emneknap:hover { border-color: #6e6e80; color: var(--tekst); }
+.emneknap.aktiv { border-color: var(--gul); background-color: rgba(242, 197, 61, 0.14); color: #fff2cc; }
+
+/* Atomnumrene i panelet paa E og Z-fanen */
 .zliste { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 
 .zliste span {

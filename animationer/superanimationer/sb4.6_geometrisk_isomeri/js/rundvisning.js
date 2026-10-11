@@ -15,24 +15,24 @@
 
     var TURE = {
         "fane-dr": [
+            { sel: "#dr-status", titel: "Kortet", tekst: "Her står det, du skal nu, og hvad der skete. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#dr-anker-model", titel: "Molekylet", tekst: "To C-atomer og deres grupper som kugler. Tag fat i en kugle med musen, og træk." },
-            { sel: "#dr-kort", titel: "Opgaven", tekst: "Hvad du skal prøve med molekylet." },
-            { sel: "#dr-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der skete. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
             { sel: "#dr-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. En opgave, du løser uden at se svaret, får en stjerne." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Prioriteten: E eller Z ud fra atomnumrene. Spillet: 15 molekyler på tid." }
+            { sel: ".faneknapper", titel: "De andre faner", tekst: "Cis eller trans?: 15 molekyler på tid. E og Z er ekstra." }
         ],
         "fane-pr": [
+            { sel: "#pr-status", titel: "Kortet", tekst: "Her står det skridt, du er ved, og hvad der gik galt. Den gule knap giver ét hint ad gangen." },
             { sel: "#pr-anker-tavle", titel: "Tavlen", tekst: "Molekylet som i bogen. Klik på den gruppe, der vinder på hvert C-atom." },
             { sel: "#pr-valg", titel: "Svaret", tekst: "E, Z eller Ingen E/Z-isomeri. Tasterne E, Z og I virker også." },
             { sel: "#pr-zkort", titel: "Atomnumrene", tekst: "Det atom, der sidder på C-atomet, afgør prioriteten. Det højeste atomnummer vinder." },
-            { sel: "#pr-status", titel: "Linjen forneden", tekst: "Næste skridt, og hvad der gik galt. Knappen giver ét hint ad gangen." },
             { sel: "#pr-opgaver", titel: "Opgaverne", tekst: "Otte molekyler fra let til svær, og fire, hvor du bygger molekylet selv." }
         ],
         "fane-sp": [
+            { sel: "#sp-status", titel: "Kortet", tekst: "Spørgsmålet, og efter hvert svar forklaringen. Efter en fejl venter spillet, til du trykker Næste." },
             { sel: "#sp-anker-tavle", titel: "Tavlen", tekst: "Et nyt molekyle hver gang. Stregen forneden viser, hvor lang tid du har brugt." },
-            { sel: "#sp-valg", titel: "Svaret", tekst: "E, Z eller Ingen E/Z-isomeri. Tasterne E, Z og I virker også." },
-            { sel: "#sp-pointkort", titel: "Point", tekst: "50 point for et rigtigt svar, og op til 50 i bonus for et hurtigt svar." },
-            { sel: "#sp-status", titel: "Linjen forneden", tekst: "Efter hvert svar står forklaringen her. Efter en fejl venter spillet, til du trykker Næste." }
+            { sel: "#sp-valg", titel: "Svaret", tekst: "Svar med knapperne under tavlen, eller med tasterne C, T og I." },
+            { sel: "#sp-emnekort", titel: "Cis og trans eller E og Z", tekst: "Spillet handler om cis og trans. Her kan du skifte til E og Z, som er ekstra." },
+            { sel: "#sp-pointkort", titel: "Point", tekst: "50 point for et rigtigt svar, og op til 50 i bonus for et hurtigt svar." }
         ]
     };
     var trin = [];

@@ -1,22 +1,28 @@
 /* =====================================================================
    fane.js - det, fane 1 og 2 har til faelles (som sc1.4)
 
-   Der er ingen laerer. Al hjaelp staar i statuslinjen nederst i scenen,
-   lige under det, eleven arbejder med, og hjaelpeknappen sidder i samme
-   linje (brugerens valg i sc1.4, 30. sept. 2026).
+   Der er ingen laerer. Al tekst staar paa ét kort oeverst i scenen
+   (brugeren 10. okt. 2026: eleverne blev forvirrede af, at opgaven stod
+   i panelet og beskederne nederst). Kortet har opgavens navn, det skridt,
+   eleven er ved, én linje til hint, fejl og forklaring, og den gule
+   hjaelpeknap. Er opgaven loest, er kortet groent med forklaringen og
+   knappen Naeste opgave. Kortet har klassen statuslinje fra sc1.4, saa
+   farverne og id'erne er de samme.
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
 
      * listen i panelet: opgaverne i grupper, med loest og stjerne
        (huskes i browseren)
-     * statuslinjen: naeste skridt, fejl, hint og ros, med farve efter
-       hvad der skete, og et ryst ved en fejl
+     * kortet: skridtet (promptHTML), og under det fejl, hint og ros, med
+       farve efter hvad der skete, og et ryst ved en fejl
      * den ene knap: Giv et hint > Naeste hint > Vis svaret > Naeste opgave.
        Den lyser stille op, naar eleven lige har svaret forkert.
      * musen i scenen: hold, traek og klik
 
-   Fanen selv har: lavOpgave(nr), promptHTML(), hintTrin(), visSvar(),
-   trinLinje(), layout(), tegn(), opdaterScene(dt) og musen i scenen:
+   Fanen selv har: lavOpgave(nr), promptHTML() (det skridt, eleven er
+   ved), hintTrin(), visSvar(), layout(), tegn(), opdaterScene(dt),
+   visValg() (hvilke knapper under figuren, der hoerer til skridtet) og
+   musen i scenen:
    overScene, nedScene, flytScene, opScene, klikScene.
    ===================================================================== */
 (function () {
@@ -46,7 +52,7 @@
             });
             this.hjaelp = 0;          /* hvor mange hint eleven har bedt om */
             this.pegKnap = false;     /* knappen lyser stille efter en fejl */
-            this.el = { knap: el("knap"), liste: el("liste"), kort: el("kort"),
+            this.el = { knap: el("knap"), liste: el("liste"), kort: el("status"),
                 besked: el("besked"), status: el("status"), forfra: el("forfra") };
             this.fast = { html: "", klasse: "" };
             this.kortT = 0;
@@ -142,15 +148,16 @@
             NK.saetTekst(navn + "-titel", o.navn);
             NK.saetTekst(navn + "-nr", String(this.nr + 1));
             NK.saetTekst(navn + "-antal", String(this.opgaver.length));
-            NK.saetHTML(navn + "-prompt", this.promptHTML());
+            NK.saetHTML(navn + "-prompt", this.faerdig ? "" : this.promptHTML());
             this.el.kort.classList.toggle("sejr", this.faerdig);
+            if (this.visValg) this.visValg();
             this.visKnap();
         };
 
         /* Hinttrappen for den tilstand, eleven staar i lige nu */
         P.hintNu = function () {
             var h = this.hintTrin();
-            return h && h.length ? h : ["Læs opgaven over scenen igen."];
+            return h && h.length ? h : ["Læs opgaven på kortet igen."];
         };
 
         P.visKnap = function () {
@@ -189,8 +196,10 @@
             if (this.faerdig) {
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) this.vaelg(naeste);
-                else if (valg.naesteFane && NK.visFane) NK.visFane(valg.naesteFane);
-                else this.vaelg(0);
+                else if (valg.naesteFane && NK.visFane) {
+                    if (valg.foerNaeste) valg.foerNaeste();
+                    NK.visFane(valg.naesteFane);
+                } else this.vaelg(0);
                 return;
             }
             var h = this.hintNu();
@@ -241,7 +250,7 @@
             if (this.efterOpgave) this.efterOpgave();
         };
 
-        /* ----- Statuslinjen nederst i scenen ---------------------------------------
+        /* ----- Linjen paa kortet under skridtet -------------------------------------
            besked: den faste linje. kortBesked: et svar paa et klik i scenen,
            der forsvinder igen efter sek sekunder. */
         P.besked = function (html, klasse) {
@@ -259,19 +268,24 @@
             var e = this.el.besked;
             if (!e) return;
             e.innerHTML = b.html;
-            if (this.el.status) this.el.status.className = "statuslinje" + (b.klasse ? " " + b.klasse : "");
+            if (this.el.status) {
+                this.el.status.className = "statuslinje" + (b.klasse ? " " + b.klasse : "") +
+                    (this.faerdig ? " sejr" : "");
+            }
         };
 
         P.beskedTekst = function () { return this.el.besked ? this.el.besked.textContent : ""; };
 
+        /* Et nyt skridt: linjen toemmes, og kortet viser skridtet */
         P.naesteLinje = function (foer, slags) {
-            var t = this.faerdig ? "" : this.trinLinje();
-            this.besked((foer ? foer + " " : "") + NK.html(t), slags || "");
+            this.besked(foer || "", slags || "");
+            this.visKort();
         };
 
-        /* Et rigtigt delskridt: en kort groen linje og saa naeste skridt */
+        /* Et rigtigt delskridt: en kort groen linje under det naeste skridt */
         P.godLinje = function (tekst) {
-            this.besked('<span class="b-maerke">✓</span> ' + NK.html(tekst) + " " + NK.html(this.trinLinje()), "god");
+            this.besked('<span class="b-maerke">✓</span> ' + NK.html(tekst), "god");
+            this.visKort();
         };
 
         /* Et forkert svar: beskeden, et ryst og en knap, der lyser stille */
@@ -300,7 +314,7 @@
         /* R og Start forfra: samme opgave fra begyndelsen */
         P.nulstil = function () { this.vaelg(this.nr); };
 
-        /* Ogsaa naar statuslinjen bliver hoejere af en lang besked */
+        /* Ogsaa naar kortet bliver hoejere af en lang besked */
         P.tilpas = function () {
             var h = this.el.status ? this.el.status.offsetHeight : 0;
             if (this.L.tilpas() || !this.lay || h !== this._baandH) {
@@ -318,13 +332,9 @@
             e.style.height = Math.round(Math.max(1, h)) + "px";
         };
 
-        /* Baandet, som statuslinjen fylder nederst i scenen */
-        P.baand = function () {
-            var e = this.el.status;
-            var h = e ? e.offsetHeight : 0;
-            if (!h) h = 68;
-            return { y: this.L.h - h, h: h };
-        };
+        /* Pladsen oeverst i scenen til kortet. Den er sat af fra start, saa
+           figuren ikke flytter sig, naar der kommer et hint */
+        P.kortZone = function () { return NK.kortZone(this.el.status); };
 
         /* ----- Tegneloekken ------------------------------------------------------- */
         P.opdater = function (dt) {
