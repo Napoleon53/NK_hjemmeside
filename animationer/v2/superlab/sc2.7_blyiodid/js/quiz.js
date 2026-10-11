@@ -1,7 +1,7 @@
 /* =====================================================================
    quiz.js - quizkortet i panelet
 
-   Kortet er laast, indtil der er tre maalinger. Svarene blandes hver
+   Kortet er laast, indtil Ko er beregnet. Svarene blandes hver
    gang. Der er ét forsoeg pr. spoergsmaal, og begrundelsen vises
    bagefter, ogsaa naar svaret er rigtigt.
    ===================================================================== */
@@ -18,82 +18,77 @@
             forklaring: "Pb²⁺ og I⁻ danner det tungtopløselige salt PbI₂. KNO₃ er letopløseligt og bliver i opløsningen."
         },
         {
-            sp: "Hvilket reaktionsskema beskriver fældningen?",
+            sp: "Hvilket reaktionsskema beskriver ligevægten mellem bundfaldet og opløsningen?",
             valg: [
-                "Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)",
-                "Pb²⁺(aq) + I⁻(aq) → PbI(s)",
-                "Pb⁺(aq) + I⁻(aq) → PbI(s)",
-                "K⁺(aq) + NO₃⁻(aq) → KNO₃(s)"
+                "PbI₂(s) ⇌ Pb²⁺(aq) + 2 I⁻(aq)",
+                "PbI₂(s) ⇌ Pb²⁺(aq) + I⁻(aq)",
+                "PbI₂(s) ⇌ Pb²⁺(aq) + I₂²⁻(aq)",
+                "Pb(NO₃)₂(s) ⇌ Pb²⁺(aq) + 2 NO₃⁻(aq)"
             ],
             rigtig: 0,
-            forklaring: "Pb²⁺ har to positive ladninger, og I⁻ har én negativ. Der skal to I⁻ til hver Pb²⁺, før PbI₂ er neutral."
+            forklaring: "Bundfaldet er PbI₂. Én formelenhed giver én Pb²⁺ og to I⁻, så atomer og ladninger går op."
         },
         {
-            sp: "Hvilke ioner er tilskuerioner?",
-            valg: ["K⁺ og NO₃⁻", "Pb²⁺ og I⁻", "K⁺ og I⁻", "Pb²⁺ og NO₃⁻"],
-            rigtig: 0,
-            forklaring: "K⁺ og NO₃⁻ er i opløsningen både før og efter fældningen. De deltager ikke i reaktionen."
-        },
-        {
-            sp: "Hvorfor forsvinder bundfaldet, når vandet varmes op?",
+            sp: "Hvordan ser udtrykket for opløselighedsproduktet for PbI₂ ud?",
             valg: [
-                "Opløseligheden af PbI₂ stiger med temperaturen",
-                "PbI₂ fordamper",
-                "PbI₂ reagerer med vandet og bliver til et nyt stof",
-                "Omrøringen knuser krystallerne, så de ikke kan ses"
+                "Kₒ = [Pb²⁺] · [I⁻]²",
+                "Kₒ = [Pb²⁺] · [I⁻]",
+                "Kₒ = [Pb²⁺] · 2 · [I⁻]",
+                "Kₒ = [Pb²⁺] · [I⁻]² / [PbI₂]"
             ],
             rigtig: 0,
-            forklaring: "I varmt vand kan der opløses mere PbI₂. Ved en bestemt temperatur er der plads til det hele, og ionerne er frie i opløsningen igen."
+            forklaring: "Koefficienten 2 foran I⁻ bliver til en eksponent. PbI₂ er et fast stof og indgår ikke i udtrykket."
         },
         {
-            sp: "Hvad er de glinsende krystaller, der kommer ved afkøling?",
+            sp: "Hvorfor kan Kₒ beregnes netop ved den temperatur, hvor de første krystaller kommer?",
             valg: [
-                "PbI₂, der krystalliserer, fordi opløseligheden falder",
-                "Is, der dannes i det kolde vand",
-                "KNO₃, der fældes ud",
-                "Urenheder fra bægerglasset"
+                "Opløsningen er netop mættet, og alt stoffet er stadig opløst",
+                "Alt PbI₂ er fældet ud ved den temperatur",
+                "Vandet er varmest ved den temperatur",
+                "Koncentrationerne af Pb²⁺ og I⁻ er lige store ved den temperatur"
             ],
             rigtig: 0,
-            forklaring: "Når temperaturen falder, kan der ikke længere være så meget PbI₂ opløst. Ionerne samles igen til krystaller af PbI₂."
+            forklaring: "Lige når krystallerne kommer, er reaktionsbrøken Y lig med Kₒ. Koncentrationerne kendes, fordi alt det afvejede stof stadig er opløst."
         },
         {
-            sp: "Hvorfor afvejes samme masse Pb(NO₃)₂ og KI?",
+            sp: "I en opløsning er Y = [Pb²⁺] · [I⁻]² større end Kₒ. Hvad sker der?",
             valg: [
-                "M(Pb(NO₃)₂) er næsten det dobbelte af M(KI), så der bliver dobbelt så mange mol KI",
-                "Fordi massen er bevaret i en kemisk reaktion",
-                "Fordi de to stoffer har samme molare masse",
-                "Fordi der så dannes mest KNO₃"
+                "Der fældes PbI₂, til Y er lig med Kₒ",
+                "Der opløses mere PbI₂, til Y er lig med Kₒ",
+                "Der sker ingenting, for opløsningen er umættet",
+                "Kₒ stiger, til den er lig med Y"
             ],
             rigtig: 0,
-            forklaring: "Reaktionen kræver 2 mol KI pr. mol Pb(NO₃)₂. M(Pb(NO₃)₂) = 331,2 g/mol og M(KI) = 166,0 g/mol, så samme masse giver netop dobbelt så mange mol KI."
+            forklaring: "Opløsningen er overmættet. Ionerne samles til fast PbI₂, så koncentrationerne falder, til Y er lig med Kₒ."
         },
         {
-            sp: "Der bruges 0,100 g Pb(NO₃)₂ og 0,100 g KI. Hvor meget PbI₂ kan der højst dannes? M(PbI₂) = 461,0 g/mol.",
-            valg: ["0,139 g", "0,100 g", "0,200 g", "0,278 g"],
+            sp: "Hvilken enhed har Kₒ for PbI₂?",
+            valg: ["M³", "M²", "M", "g pr. 100 mL"],
             rigtig: 0,
-            forklaring: "n(Pb(NO₃)₂) = 0,100 g / 331,2 g/mol = 0,302 mmol. Der dannes 0,302 mmol PbI₂, og 0,302 mmol · 461,0 g/mol = 0,139 g."
+            forklaring: "Kₒ = [Pb²⁺] · [I⁻]². Det er M · M², altså M³."
         },
         {
-            sp: "Der er 0,139 g PbI₂ i 100 mL vand. Ved afkøling kommer de første krystaller ved 52 °C. Hvad fortæller det?",
+            sp: "Der er opløst 3,0·10⁻⁴ mol Pb(NO₃)₂ i 100 mL vand. Hvad er [Pb²⁺]?",
+            valg: ["3,0·10⁻³ M", "3,0·10⁻⁴ M", "3,0·10⁻⁵ M", "3,0·10⁻⁶ M"],
+            rigtig: 0,
+            forklaring: "c = n / V = 3,0·10⁻⁴ mol / 0,100 L = 3,0·10⁻³ M. Volumen skal regnes i liter."
+        },
+        {
+            sp: "I en mættet opløsning er [Pb²⁺] = 3,0·10⁻³ M og [I⁻] = 6,0·10⁻³ M. Hvad er Kₒ?",
+            valg: ["1,1·10⁻⁷ M³", "1,8·10⁻⁵ M³", "3,6·10⁻⁵ M³", "4,3·10⁻⁷ M³"],
+            rigtig: 0,
+            forklaring: "Kₒ = [Pb²⁺] · [I⁻]² = 3,0·10⁻³ M · (6,0·10⁻³ M)² = 1,1·10⁻⁷ M³. [I⁻] sættes i anden og ganges ikke med 2 først."
+        },
+        {
+            sp: "Med mere stof i glasset kommer de første krystaller ved en højere temperatur. Hvad fortæller det om Kₒ for PbI₂?",
             valg: [
-                "Opløseligheden af PbI₂ ved 52 °C er ca. 0,139 g pr. 100 mL",
-                "PbI₂ smelter ved 52 °C",
-                "Ved 52 °C kan der ikke opløses PbI₂",
-                "Opløseligheden er 0,139 g pr. 100 mL ved alle temperaturer"
+                "Kₒ stiger med temperaturen",
+                "Kₒ falder med temperaturen",
+                "Kₒ er den samme ved alle temperaturer",
+                "Kₒ afhænger af, hvor meget stof der er i glasset"
             ],
             rigtig: 0,
-            forklaring: "Når de første krystaller kommer, er opløsningen netop mættet med 0,139 g PbI₂. Det er et punkt på opløselighedskurven."
-        },
-        {
-            sp: "Opløseligheden af PbI₂ er 0,069 g pr. 100 mL ved 20 °C. Er PbI₂ tungtopløseligt?",
-            valg: [
-                "Ja, det er under 1 g pr. 100 mL",
-                "Nej, fordi det kan opløses i varmt vand",
-                "Nej, fordi der opløses lidt",
-                "Ja, fordi det er gult"
-            ],
-            rigtig: 0,
-            forklaring: "Grænsen er 1 g pr. 100 mL. PbI₂ ligger langt under, selv om opløseligheden stiger meget, når vandet varmes op."
+            forklaring: "Mere stof giver en større reaktionsbrøk. Opløsningen er mættet ved en højere temperatur, så Kₒ er større dér. En ligevægtskonstant afhænger af temperaturen, ikke af mængden af stof."
         },
         {
             sp: "Hvor skal resterne fra forsøget hen?",
@@ -204,11 +199,11 @@
 
         if (this.tilstand === "laast") {
             NK.saetTekst("quiz-taeller", "");
-            tekst.textContent = "Låses op, når der er tre målinger.";
+            tekst.textContent = "Låses op, når Kₒ er beregnet.";
             knap.hidden = true;
         } else if (this.tilstand === "klar") {
             NK.saetTekst("quiz-taeller", n + " spørgsmål");
-            tekst.textContent = "Tre målinger er noteret.";
+            tekst.textContent = "Kₒ er beregnet.";
             NK.saetTekst("quiz-knap-tekst", "Start quiz");
             knap.hidden = false;
         } else if (this.tilstand === "sp") {

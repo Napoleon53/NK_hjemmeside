@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Opløselighed af blyiodid</title>
+<title>Opløselighedsprodukt for blyiodid</title>
 <link rel="stylesheet" href="../../laboratoriet/css/grund.css">
 <link rel="stylesheet" href="css/stil.css">
 </head>
 <body>
 
 <header class="top">
-    <h1><span class="ikon">⚗</span> Opløselighed af blyiodid <span class="undertitel">PbI₂ ved opvarmning og afkøling</span></h1>
+    <h1><span class="ikon">⚗</span> Opløselighedsprodukt for blyiodid <span class="undertitel">Bestem Kₒ for PbI₂</span></h1>
 
     <div class="top-hoejre">
         <button class="knap topknap" id="forfraknap" type="button" title="Start forsøget forfra">Start forfra</button>
@@ -44,6 +44,26 @@
             <p class="hint" id="hint-tekst" hidden></p>
         </div>
 
+        <div class="kort" id="maal-kort">
+            <h2><span>Beregning</span> <span class="taeller" id="maal-nr">Måling 1</span></h2>
+            <table class="maaleskema">
+                <tr id="raekke-pb"><th>m(Pb(NO₃)₂)</th><td id="m-pb"></td></tr>
+                <tr id="raekke-ki"><th>m(KI)</th><td id="m-ki"></td></tr>
+                <tr id="raekke-vol"><th>V(opløsning)</th><td>0,100 L</td></tr>
+                <tr id="raekke-temp"><th>T(første krystaller)</th><td id="t-krystal"></td></tr>
+            </table>
+            <div class="beregn" id="beregn" hidden>
+                <label for="svar">Kₒ(PbI₂) =</label>
+                <input id="svar" type="text" autocomplete="off" spellcheck="false" aria-describedby="svar-note">
+                <span class="enhed">M³</span>
+                <button class="knap blaa" id="tjek-knap" type="button">Tjek</button>
+            </div>
+            <p class="skrivenote" id="svar-note" hidden>Et tal som 4,5 · 10⁻⁶ skrives 4,5·10^-6 eller 0,0000045.</p>
+            <button class="knap lille" id="hjaelp-beregn" type="button" hidden><span>Hjælp til beregningen</span><span class="tegn">?</span></button>
+            <p class="hint" id="beregn-hint" hidden></p>
+            <p class="besked god" id="beregn-svar" hidden></p>
+        </div>
+
         <div class="kort" id="serie-kort">
             <h2>Tegneserie</h2>
             <p class="besked" id="serie-tekst">Låses op, når forsøget er slut.</p>
@@ -64,16 +84,17 @@
 <!-- ================================================================= -->
 <div class="overlay" id="intro">
     <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
-        <h2 id="intro-titel">Opløselighed af blyiodid</h2>
-        <p class="intro-formaal">Pb(NO₃)₂ og KI danner et gult bundfald af PbI₂. Forsøget måler, hvordan opløseligheden af PbI₂ afhænger af temperaturen.</p>
+        <h2 id="intro-titel">Opløselighedsprodukt for blyiodid</h2>
+        <p class="intro-formaal">Pb(NO₃)₂ og KI danner et gult bundfald af PbI₂. Forsøget bestemmer opløselighedsproduktet Kₒ for PbI₂.</p>
 
         <h3>Forsøget</h3>
         <ol class="intro-trin">
             <li>Afvej Pb(NO₃)₂ og KI, og hæld dem i 100 mL vand.</li>
             <li>Varm op under omrøring, til bundfaldet er væk.</li>
             <li>Sluk for varmen, og notér temperaturen, når de første krystaller kommer.</li>
-            <li>Gentag med mere stof, og aflever resterne.</li>
+            <li>Beregn Kₒ ud fra dine masser, og aflever resterne.</li>
         </ol>
+        <p>Én måling er nok. Du kan tilsætte mere stof og finde Kₒ ved en højere temperatur, hvis du vil.</p>
 
         <h3>Uheld</h3>
         <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
@@ -88,28 +109,139 @@
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
     <div class="overlay-boks">
-        <h2>Opløselighed af blyiodid</h2>
+        <h2>Opløselighedsprodukt for blyiodid</h2>
 
         <h3>Fældning</h3>
-        <p>Pb(NO₃)₂ og KI er letopløselige salte. I vandet findes ionerne Pb²⁺, NO₃⁻, K⁺ og I⁻. Pb²⁺ og I⁻ danner det tungtopløselige salt PbI₂, der fældes som et gult bundfald:</p>
-        <div class="ligning">Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)</div>
-        <p>K⁺ og NO₃⁻ er tilskuerioner.</p>
+        <p>Pb(NO₃)₂ og KI er letopløselige salte. I vandet findes ionerne Pb²⁺, NO₃⁻, K⁺ og I⁻. Pb²⁺ og I⁻ danner det tungtopløselige salt PbI₂, der fældes som et gult bundfald. K⁺ og NO₃⁻ er tilskuerioner.</p>
 
-        <h3>Samme masse</h3>
-        <p>Der skal to I⁻ til hver Pb²⁺. M(Pb(NO₃)₂) = 331,2 g/mol er næsten det dobbelte af M(KI) = 166,0 g/mol. Samme masse af de to stoffer giver derfor dobbelt så mange mol KI som Pb(NO₃)₂:</p>
-        <div class="ligning lille">Pb(NO₃)₂ + 2 KI → PbI₂ + 2 KNO₃</div>
+        <h3>Ligevægt og opløselighedsprodukt</h3>
+        <p>Mellem bundfaldet og ionerne i opløsningen er der en ligevægt:</p>
+        <div class="ligning">PbI₂(s) ⇌ Pb²⁺(aq) + 2 I⁻(aq)</div>
+        <p>Ligevægtskonstanten kaldes opløselighedsproduktet. Det faste stof indgår ikke, og koefficienten 2 bliver til en eksponent:</p>
+        <div class="ligning">Kₒ = [Pb²⁺] · [I⁻]²</div>
+        <p>Reaktionsbrøken Y har samme udtryk. Er Y mindre end Kₒ, er opløsningen umættet, og alt er opløst. Er Y lig med Kₒ, er opløsningen mættet. Er Y større end Kₒ, fældes der PbI₂, til Y igen er lig med Kₒ.</p>
 
-        <h3>Opløselighed og temperatur</h3>
-        <p>Opløseligheden er den største masse af et stof, der kan opløses i 100 mL vand. For PbI₂ er den 0,069 g ved 20 °C og 0,41 g ved 100 °C. Ved opvarmning opløses bundfaldet. Ved afkøling falder opløseligheden, og PbI₂ krystalliserer igen som glinsende, gule flager. Når de første krystaller kommer, er opløsningen netop mættet, og massen af PbI₂ pr. 100 mL er opløseligheden ved den temperatur.</p>
+        <h3>De første krystaller</h3>
+        <p>Kₒ for PbI₂ stiger med temperaturen. Ved opvarmning bliver Kₒ større end Y, og bundfaldet opløses. Ved afkøling falder Kₒ. Når de første krystaller kommer, er Kₒ netop nået ned på Y. Opløsningen er mættet, og alt stoffet er stadig opløst. Reaktionsbrøken er derfor Kₒ ved den temperatur.</p>
 
         <h3>Beregning</h3>
-        <p>Stofmængden af Pb(NO₃)₂ er n = m / M. Der dannes lige så mange mol PbI₂, og massen er m(PbI₂) = n · 461,0 g/mol.</p>
+        <p>Stofmængden findes af massen, n = m / M, med M(Pb(NO₃)₂) = 331,2 g/mol og M(KI) = 166,0 g/mol. Hver formelenhed Pb(NO₃)₂ giver én Pb²⁺, og hver formelenhed KI giver én I⁻. Koncentrationen er c = n / V med V = 0,100 L. De to koncentrationer sættes ind i udtrykket for Kₒ.</p>
+
+        <h3>Samme masse</h3>
+        <p>Der skal to I⁻ til hver Pb²⁺. M(Pb(NO₃)₂) er næsten det dobbelte af M(KI). Samme masse af de to stoffer giver derfor dobbelt så mange mol KI som Pb(NO₃)₂.</p>
 
         <h3>Sikkerhed</h3>
         <p>Pb(NO₃)₂ er giftigt, brandnærende og kan skade forplantningsevnen. Brug handsker, og undgå spild. Resterne indeholder bly og afleveres som tungmetalaffald.</p>
 
         <div class="knapper">
             <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Guidet hjaelp til beregningen: fem trin, der laases op ét ad gangen.
+     Hvert trin er et regnestykke med stoerrelsen til venstre: formlen,
+     tallene sat ind (skrives af app.js) og elevens resultat. -->
+<div class="overlay" id="guide">
+    <div class="overlay-boks guide-boks">
+        <h2>Beregn Kₒ for PbI₂</h2>
+        <ol class="guide">
+            <li id="g1">
+                <span class="nr">1</span>
+                <div>
+                    <p class="guide-titel">Stofmængden af Pb(NO₃)₂</p>
+                    <div class="guide-regning">
+                        <span class="guide-vs">n(Pb(NO₃)₂)</span>
+                        <span class="guide-formel">= <span class="broek"><span>m(Pb(NO₃)₂)</span><span>M(Pb(NO₃)₂)</span></span></span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g1-tal"></span>
+                            <input id="g1-svar" type="text" autocomplete="off" spellcheck="false" aria-label="Stofmængden af bly(II)nitrat i mol">
+                            <span class="enhed">mol</span>
+                            <button class="knap blaa" id="g1-tjek" type="button">Tjek</button>
+                        </div>
+                    </div>
+                    <p class="hint" id="g1-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g2">
+                <span class="nr">2</span>
+                <div>
+                    <p class="guide-titel">Koncentrationen af Pb²⁺</p>
+                    <div class="guide-regning">
+                        <span class="guide-vs">[Pb²⁺]</span>
+                        <span class="guide-formel">= <span class="broek"><span>n(Pb(NO₃)₂)</span><span>V</span></span></span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g2-tal"></span>
+                            <input id="g2-svar" type="text" autocomplete="off" spellcheck="false" aria-label="Koncentrationen af blyioner i M">
+                            <span class="enhed">M</span>
+                            <button class="knap blaa" id="g2-tjek" type="button">Tjek</button>
+                        </div>
+                    </div>
+                    <p class="hint" id="g2-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g3">
+                <span class="nr">3</span>
+                <div>
+                    <p class="guide-titel">Stofmængden af KI</p>
+                    <div class="guide-regning">
+                        <span class="guide-vs">n(KI)</span>
+                        <span class="guide-formel">= <span class="broek"><span>m(KI)</span><span>M(KI)</span></span></span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g3-tal"></span>
+                            <input id="g3-svar" type="text" autocomplete="off" spellcheck="false" aria-label="Stofmængden af kaliumiodid i mol">
+                            <span class="enhed">mol</span>
+                            <button class="knap blaa" id="g3-tjek" type="button">Tjek</button>
+                        </div>
+                    </div>
+                    <p class="hint" id="g3-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g4">
+                <span class="nr">4</span>
+                <div>
+                    <p class="guide-titel">Koncentrationen af I⁻</p>
+                    <div class="guide-regning">
+                        <span class="guide-vs">[I⁻]</span>
+                        <span class="guide-formel">= <span class="broek"><span>n(KI)</span><span>V</span></span></span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g4-tal"></span>
+                            <input id="g4-svar" type="text" autocomplete="off" spellcheck="false" aria-label="Koncentrationen af iodidioner i M">
+                            <span class="enhed">M</span>
+                            <button class="knap blaa" id="g4-tjek" type="button">Tjek</button>
+                        </div>
+                    </div>
+                    <p class="hint" id="g4-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g5">
+                <span class="nr">5</span>
+                <div>
+                    <p class="guide-titel">Opløselighedsproduktet</p>
+                    <div class="guide-regning">
+                        <span class="guide-vs">Kₒ</span>
+                        <span class="guide-formel">= [Pb²⁺] · [I⁻]²</span>
+                        <div class="guide-linje">
+                            <span>=</span>
+                            <span class="guide-tal" id="g5-tal"></span>
+                            <input id="g5-svar" type="text" autocomplete="off" spellcheck="false" aria-label="Opløselighedsproduktet i M i tredje">
+                            <span class="enhed">M³</span>
+                            <button class="knap blaa" id="g5-tjek" type="button">Tjek</button>
+                        </div>
+                    </div>
+                    <p class="hint" id="g5-hint" hidden></p>
+                </div>
+            </li>
+        </ol>
+        <p class="guide-note">Et tal som 4,5 · 10⁻⁶ skrives 4,5·10^-6 eller 0,0000045.</p>
+        <div class="knapper">
+            <button class="knap" id="guide-luk" type="button">Luk</button>
+            <button class="knap blaa" id="guide-brug" type="button" hidden>Skriv svaret i panelet</button>
         </div>
     </div>
 </div>

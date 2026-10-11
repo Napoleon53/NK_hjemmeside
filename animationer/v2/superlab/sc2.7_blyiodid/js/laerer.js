@@ -12,7 +12,8 @@
                laereren toerrer op
      koger     vandet har kogt et stykke tid: laereren kigger ind fra
                kanten og siger til
-     ros       tre maalinger er noteret
+     ros       den foerste Ko er regnet rigtigt, og igen hvis eleven
+               vaelger at lave tre maalinger
 
    Glimt af baggrunden: vejleder (spildet), laege (punkterne paa kurven)
    og regnskabet over uheld (spildet og det varme glas).
@@ -33,21 +34,29 @@
     P.laererNytEkstra = function () {
         this.laerer.baerer = null;
         this.laerer.rost = false;
+        this.laerer.rostKurve = false;
     };
 
-    /* ----- Ros ---------------------------------------------------------- */
-    P.laererRos = function (paaKurven) {
+    /* ----- Ros ----------------------------------------------------------
+       slags "ko": den foerste Ko er regnet rigtigt. slags "kurve": der er
+       tre maalinger (den valgfri del). paaKurven: ligger maalingerne ved
+       tabelvaerdierne? Han kommer hoejst én gang for hver slags. */
+    P.laererRos = function (slags, paaKurven) {
         var L = this.laerer;
-        if (L.rost || L.scene) return;
-        L.rost = true;
+        var flag = slags === "ko" ? "rost" : "rostKurve";
+        if (L[flag] || L.scene) return;
+        L[flag] = true;
+        var replik = slags === "ko"
+            ? (paaKurven ? "Flot. Kₒ passer med tabellen." : "Regnet rigtigt. Sammenlign med tabelværdien.")
+            : (paaKurven ? "Flot. Punkterne ligger på kurven." : "Tre målinger. Sammenlign med kurven.");
         this.laererKoer("ros", [
             { udtryk: { vrede: 0, humoer: paaKurven ? 0.9 : 0.3, roed: 0 } },
             { gaa: 150 },
             { tid: 0.3 },
-            { sig: paaKurven ? "Flot. Punkterne ligger på kurven." : "Tre målinger. Sammenlign med kurven.", vis: 2.6, tid: 2.6,
+            { sig: replik, vis: 2.6, tid: 2.6,
               hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
             { kald: function () { this.laerer.nik = 0; } }
-        ].concat(paaKurven ? K.glimtTrin("laege") : [], K.ros(), [
+        ].concat(slags === "kurve" && paaKurven ? K.glimtTrin("laege") : [], slags === "ko" ? K.ros() : [], [
             { gaa: UDE }
         ]), false);
     };

@@ -6,8 +6,11 @@
    haelder det i, afvejer samme masse KI og haelder det i. Der dannes
    gult PbI2. Ved opvarmning forsvinder bundfaldet. Ved afkoeling kommer
    krystallerne igen (gyldne regn), og eleven noterer temperaturen, naar
-   de foerste krystaller kommer. Med ca. 0,050 g mere af hvert stof
-   maales igen, til der er tre punkter paa opløselighedskurven.
+   de foerste krystaller kommer. Ved den temperatur er opløsningen netop
+   maettet, og eleven beregner opløselighedsproduktet Ko ud fra masserne
+   og de 100 mL vand (tjekSvar). Én maaling er nok. Med ca. 0,050 g mere
+   af hvert stof kan der maales igen ved en hoejere temperatur, men det
+   er valgfrit.
 
    En tilsaetning (this.tils) er Pb(NO3)2 og derefter KI. En maaling
    kan noteres, naar opløsningen har vaeret helt klar efter
@@ -16,7 +19,8 @@
    Alle iagttagelser gemmes i logbogen med glassets tilstand, saa
    tegneserien kan tegne dem til sidst.
 
-   Trinene (TRIN) er de syv ting, eleven skal naa. Et trin er gjort,
+   Trinene (TRIN) er det, eleven skal naa. Trinnet med valgfri: true
+   taeller ikke med og bliver aldrig det aktuelle trin. Et trin er gjort,
    naar tilstanden siger det, ikke naar en knap er trykket. Genstandene
    flyttes af smaa koreografier (koer): en liste af trin, der enten
    flytter en genstand, venter og goer noget undervejs, eller kalder en
@@ -50,7 +54,9 @@
           hint: "Tænd for varmen og omrøringen med knapperne på varmepladen. Hold øje med glasset og luppen." },
         { id: "maal1", tekst: "Sluk varmen, og notér temperaturen, når der kommer krystaller", mark: "varme",
           hint: "Sluk for varmen og omrøringen. Klik på termometret, så snart de første krystaller kommer." },
-        { id: "maal3", tekst: "Tilsæt ca. 0,050 g af hvert stof, og mål igen, til der er tre målinger", mark: "pbGlas",
+        { id: "beregn", tekst: "Beregn opløselighedsproduktet Kₒ for PbI₂", mark: null,
+          hint: "Da de første krystaller kom, var opløsningen netop mættet. Find [Pb²⁺] og [I⁻] ud fra masserne og de 100 mL vand, og sæt dem ind i Kₒ = [Pb²⁺] · [I⁻]². Knappen Hjælp til beregningen tager det i fem trin." },
+        { id: "flere", valgfri: true, tekst: "Valgfrit: tilsæt ca. 0,050 g af hvert stof, og find Kₒ ved en højere temperatur", mark: "pbGlas",
           hint: "Afvej ca. 0,050 g Pb(NO₃)₂ og samme masse KI, og hæld dem i. Varm op, til bundfaldet er væk, sluk varmen, og notér temperaturen, når der kommer krystaller." },
         { id: "affald", tekst: "Aflever resterne", mark: "dunk",
           hint: "Resterne indeholder bly. Klik på dunken til tungmetalaffald." }
@@ -67,8 +73,9 @@
         regn:        { tekst: "Ved afkøling kommer der glinsende, gule krystaller, der daler ned gennem væsken.", farve: M.FARVE.pbi2 },
         koger:       { tekst: "Vandet koger, men der er stadig bundfald.", farve: M.FARVE.pbi2 },
         maaling:     { tekst: "Måling {n}: de første krystaller kom ved {T} °C.", farve: null },
-        kurve:       { tekst: "De tre punkter ligger på opløselighedskurven for PbI₂.", farve: null },
-        kurve_afvig: { tekst: "Nogle punkter ligger langt fra kurven. Temperaturen skal noteres, lige når de første krystaller kommer.", farve: null },
+        beregnet:    { tekst: "Måling {n}: Kₒ for PbI₂ er beregnet til {K} M³ ved {T} °C.", farve: null },
+        kurve:       { tekst: "De tre målinger ligger på kurven med tabelværdierne for Kₒ.", farve: null },
+        kurve_afvig: { tekst: "Nogle målinger ligger langt fra kurven med tabelværdierne. Temperaturen skal noteres, lige når de første krystaller kommer.", farve: null },
         spild:       { tekst: "Der blev spildt {stof} på bordet.", farve: { r: 244, g: 243, b: 238, a: 1 } },
         varmt:       { tekst: "Bægerglasset blev taget op over 50 °C, og der skvulpede lidt ud.", farve: { r: 240, g: 206, b: 90, a: 1 } },
         affald:      { tekst: "Resterne er afleveret som tungmetalaffald.", farve: null }
@@ -173,18 +180,42 @@
             case "ki": return n > 0 || !!(t && t.ki !== null) || !!gj.affald;
             case "klar": return n > 0 || !!(t && t.klarSet) || !!gj.affald;
             case "maal1": return n >= 1;
-            case "maal3": return n >= 3;
+            case "beregn": return this.erBeregnet();
+            case "flere": return n >= 2;
             default: return !!gj[id];
         }
     };
 
+    /* Det valgfri trin bliver aldrig det aktuelle */
     P.aktueltTrin = function () {
-        for (var i = 0; i < TRIN.length; i++) if (!this.trinGjort(TRIN[i].id)) return TRIN[i];
+        for (var i = 0; i < TRIN.length; i++) if (!TRIN[i].valgfri && !this.trinGjort(TRIN[i].id)) return TRIN[i];
         return null;
     };
 
-    P.maalingerFaerdige = function () {
-        return this.maalinger.length >= 3;
+    /* Er der noteret mindst én temperatur? Mere kraeves ikke. */
+    P.harMaaling = function () {
+        return this.maalinger.length >= 1;
+    };
+
+    /* Har eleven regnet Ko rigtigt for mindst én maaling? */
+    P.erBeregnet = function () {
+        return this.maalinger.some(function (m) { return m.beregnet; });
+    };
+
+    /* Den maaling, kortet Beregning arbejder med: den seneste */
+    P.aktuelMaaling = function () {
+        return this.maalinger.length ? this.maalinger[this.maalinger.length - 1] : null;
+    };
+
+    /* Forsoeget er slut, naar Ko er beregnet og resterne er afleveret */
+    P.erSlut = function () {
+        return !!this.gjort.affald && this.erBeregnet();
+    };
+
+    /* Er en ny tilsaetning i gang, som endnu ikke er maalt? */
+    P.maalerIgen = function () {
+        var t = this.tils, baad = this.g.vejebaad;
+        return this.maalinger.length >= 1 && !this.gjort.affald && (!!baad.stof || !!(t && !t.noteret));
     };
 
     P.travl = function () {
@@ -213,7 +244,13 @@
         if (!trin) return null;
         var mark = trin.mark, tekst = trin.hint;
         var baad = this.g.vejebaad, t = this.tils, b = this.b;
-        switch (trin.id) {
+        var id = trin.id;
+        /* Er eleven i gang med en ekstra maaling, hjaelper hintet med den */
+        if ((id === "beregn" || id === "affald") && this.maalerIgen()) {
+            id = "maal1";
+            tekst = TRIN.filter(function (x) { return x.id === "flere"; })[0].hint;
+        }
+        switch (id) {
             case "pb":
                 if (baad.stof === "pb") mark = this.baadMark(this.maalMasse(), M.SPATEL.tolerance, "pbGlas");
                 break;
@@ -224,7 +261,6 @@
                 mark = this.varme ? (this.omroer ? "baegerglas" : "omroer") : "varme";
                 break;
             case "maal1":
-            case "maal3":
                 if (b.koger && b.fast > 1e-6) {
                     tekst = "Der er for meget stof til 100 mL vand. Start forfra, og brug mindre.";
                     mark = null;
@@ -278,7 +314,7 @@
         if (this.vedBesked) this.vedBesked(tekst, slags || "info");
     };
 
-    /* erstat: { n, T, stof } saettes ind i teksten */
+    /* erstat: { n, T, K, stof } saettes ind i teksten */
     P.iagttag = function (noegle, erstat) {
         var id = noegle + (erstat && erstat.n ? erstat.n : "");
         if (this.iagttaget[id]) return;
@@ -286,7 +322,7 @@
         var i = IAGTTAGELSER[noegle];
         var tekst = i.tekst;
         if (erstat) {
-            tekst = tekst.replace("{n}", erstat.n).replace("{T}", erstat.T).replace("{stof}", erstat.stof);
+            tekst = tekst.replace("{n}", erstat.n).replace("{T}", erstat.T).replace("{K}", erstat.K).replace("{stof}", erstat.stof);
         }
         var b = this.b;
         this.logbog.push({
@@ -652,7 +688,7 @@
             this.markér(t && t.pb !== null ? "kiGlas" : "pbGlas");
             return false;
         }
-        if (t.noteret) { this.besked("Temperaturen er noteret. Tilsæt mere stof for en ny måling."); return false; }
+        if (t.noteret) { this.besked("Temperaturen er noteret. Beregn Kₒ. En ny måling kræver mere stof."); return false; }
         if (!t.klarSet) {
             this.besked("Varm først op under omrøring, til bundfaldet er væk.");
             this.markér(this.varme ? "omroer" : "varme");
@@ -664,7 +700,10 @@
             return false;
         }
         var T = Math.round(b.T * 10) / 10;
-        var m = { nr: this.maalinger.length + 1, pb: b.pb, ki: b.ki, pbi2: M.pbi2Masse(b.pb, b.ki), T: T };
+        /* Y er reaktionsbroeken med alt stoffet opløst. Ved den noterede
+           temperatur er opløsningen netop maettet, saa Y er elevens Ko. */
+        var m = { nr: this.maalinger.length + 1, pb: b.pb, ki: b.ki, pbi2: M.pbi2Masse(b.pb, b.ki), T: T,
+                  Y: M.ionprodukt(b.pb, b.ki), beregnet: false, forkerte: 0, svar: null };
         this.maalinger.push(m);
         t.noteret = true;
         if (NK.Lyd) NK.Lyd.succes();
@@ -674,22 +713,48 @@
             var mig = this;
             var afvig = this.maalinger.some(function (x) { return mig.afvigelse(x) > 6; });
             this.iagttag(afvig ? "kurve_afvig" : "kurve");
-            if (this.laererRos) this.laererRos(!afvig);
+            if (this.laererRos) this.laererRos("kurve", !afvig);
         }
         this.aendret("maaling");
         return true;
     };
 
-    /* Hvor mange grader maalingen ligger fra kurven */
+    /* Hvor mange grader maalingen ligger fra den temperatur, hvor
+       reaktionsbroeken er lig med tabelvaerdien for Ko */
     P.afvigelse = function (m) {
-        return Math.abs(m.T - M.maetningsTemp(m.pbi2));
+        return Math.abs(m.T - M.maetningsTempY(m.Y));
+    };
+
+    /* ----- Beregningen af Ko ---------------------------------------------- */
+    /* Elevens svar for den seneste maaling. Returnerer { slags, ... } fra
+       M.tjekKo, eller null, hvis der ikke er noget at regne paa. */
+    P.tjekSvar = function (tekst) {
+        var m = this.aktuelMaaling();
+        if (!m || m.beregnet) return null;
+        var svar = M.tjekKo(tekst, m.pb, m.ki);
+        if (svar.slags === "tom" || svar.slags === "ikketal") return svar;
+        if (svar.slags !== "rigtig") {
+            m.forkerte++;
+            svar.forkerte = m.forkerte;
+            if (NK.Lyd && NK.Lyd.fejl) NK.Lyd.fejl();
+            return svar;
+        }
+        var foerste = !this.erBeregnet();
+        m.beregnet = true;
+        m.svar = svar.vaerdi;
+        if (NK.Lyd) NK.Lyd.succes();
+        this.iagttag("beregnet", { n: m.nr, T: M.komma(m.T, 1), K: M.videnskabelig(m.Y, 2) });
+        this.besked(this.gjort.affald ? "Kₒ er beregnet. Forsøget er slut." : "Kₒ er beregnet rigtigt.", "god");
+        if (foerste && this.laererRos) this.laererRos("ko", this.afvigelse(m) <= 6);
+        this.aendret("beregnet");
+        return svar;
     };
 
     /* ----- Affald --------------------------------------------------------- */
     P.proevAffald = function () {
         var b = this.b;
         if (this.gjort.affald) { this.besked("Resterne er afleveret."); return false; }
-        if (!this.maalingerFaerdige()) { this.besked("Lav tre målinger først."); return false; }
+        if (!this.harMaaling()) { this.besked("Notér først temperaturen, hvor de første krystaller kommer."); return false; }
         if (b.T > 50) {
             this.varmtGlas();
             return true;
@@ -759,7 +824,7 @@
             { kald: function () {
                 this.gjort.affald = true;
                 this.iagttag("affald");
-                this.besked("Resterne er afleveret. Forsøget er slut.", "god");
+                this.besked(this.erBeregnet() ? "Resterne er afleveret. Forsøget er slut." : "Resterne er afleveret. Beregn Kₒ for at afslutte forsøget.", "god");
                 if (NK.Lyd) NK.Lyd.succes();
                 this.aendret("affald");
             } }

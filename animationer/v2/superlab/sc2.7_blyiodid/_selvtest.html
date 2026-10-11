@@ -19,7 +19,8 @@
 
    Aabner index.html i en iframe og koerer forsoeget igennem med de
    samme funktioner, som klik og knapper bruger: modellen, afvejningen,
-   raekkefoelgen, tre maalinger ved afkoeling, graenserne, tegneserien,
+   raekkefoelgen, maalingen ved afkoeling, beregningen af Ko med den
+   trinvise hjaelp, de valgfri ekstra maalinger, graenserne, tegneserien,
    paaskeaeggene, quizzen, sproget og ion-notationen. Skal aabnes gennem
    en lokal server (Chrome afviser iframes paa file://).
    ===================================================================== */
@@ -97,7 +98,7 @@ function koerTest() {
     paastand("opløsningen af Pb(NO3)2 og KI er afstemt", M.afstemt(M.REAKTIONER.oploesPb) && M.afstemt(M.REAKTIONER.oploesKI));
     paastand("formler med ladning", M.formel("Pb2+") === "Pb²⁺" && M.formel("I-") === "I⁻" && M.formel("K+") === "K⁺" && M.formel("NO3-") === "NO₃⁻");
     paastand("ligningen skrives med pil og faser", M.ligning(M.REAKTIONER.faeldning, true) === "Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)", M.ligning(M.REAKTIONER.faeldning, true));
-    function naer(a, b, pct) { return Math.abs(a - b) <= b * pct; }
+    function naer(a, b, pct) { return Math.abs(a - b) <= Math.abs(b) * pct; }
     paastand("opløseligheden passer med tabelvaerdierne", naer(M.oploeselighed(0), 0.044, 0.03) && naer(M.oploeselighed(20), 0.069, 0.03) && naer(M.oploeselighed(100), 0.41, 0.03),
         komma(M.oploeselighed(0)) + " / " + komma(M.oploeselighed(20)) + " / " + komma(M.oploeselighed(100)));
     paastand("maetningstemperaturen er den omvendte funktion", Math.abs(M.maetningsTemp(M.oploeselighed(63)) - 63) < 1e-9);
@@ -111,11 +112,45 @@ function koerTest() {
     for (i = 0; i < 6000; i++) M.skridtTemp(tb, 1 / 60, 1);
     paastand("vandet koger ved 100 °C og bliver ikke varmere", tb.T === 100 && tb.koger);
 
-    overskrift("3. Afvejning og tre maalinger");
+    overskrift("2b. Opløselighedsproduktet");
+    paastand("Ko ved 20 °C er 1,3 · 10^-8 M^3", naer(M.ko(20), 1.33e-8, 0.03), M.videnskabelig(M.ko(20), 2));
+    var s50 = M.oploeselighed(50) * 10 / M.MOLMASSE.PbI2;
+    paastand("Ko(T) = 4 s^3 med s i mol/L", naer(M.ko(50), 4 * s50 * s50 * s50, 1e-9));
+    paastand("Ko stiger med temperaturen", M.ko(20) < M.ko(50) && M.ko(50) < M.ko(80));
+    paastand("maetningstemperaturen for Y er den omvendte funktion af Ko", Math.abs(M.maetningsTempY(M.ko(63)) - 63) < 1e-9);
+    var b1 = M.beregning(0.1, 0.1);
+    paastand("0,100 g af hvert stof: 3,02 · 10^-3 M Pb2+ og 6,02 · 10^-3 M I-", naer(b1.cPb, 3.02e-3, 0.002) && naer(b1.cI, 6.02e-3, 0.002),
+        M.videnskabelig(b1.cPb, 2) + " / " + M.videnskabelig(b1.cI, 2));
+    paastand("og reaktionsbroeken 1,10 · 10^-7 M^3", naer(b1.Y, 1.096e-7, 0.005) && M.videnskabelig(b1.Y, 2) === "1,10·10⁻⁷", M.videnskabelig(b1.Y, 2));
+    var stoek = 0.1 * M.MOLMASSE.KI * 2 / M.MOLMASSE["Pb(NO3)2"];
+    paastand("med forholdet 1 : 2 er bundfaldet det samme som efter opløseligheden i gram",
+        Math.abs(M.ligevaegt({ pb: 0.1, ki: stoek, T: 20 }) - (M.pbi2Masse(0.1, stoek) - M.oploeselighed(20))) < 1e-6,
+        komma(M.ligevaegt({ pb: 0.1, ki: stoek, T: 20 })) + " g");
+    var tM = M.maetningsTempY(b1.Y);
+    paastand("intet bundfald over maetningstemperaturen, bundfald under", M.ligevaegt({ pb: 0.1, ki: 0.1, T: tM + 0.5 }) === 0 && M.ligevaegt({ pb: 0.1, ki: 0.1, T: tM - 0.5 }) > 0, komma(tM, 1) + " °C");
+    paastand("overskud af KI giver mere bundfald (faelles ion)", M.ligevaegt({ pb: 0.1, ki: 0.11, T: 40 }) > M.ligevaegt({ pb: 0.1, ki: 0.1, T: 40 }));
+    paastand("elevens tal laeses med komma og potens",
+        naer(M.tal("1,09·10^-7"), 1.09e-7, 1e-9) && naer(M.tal("1,09·10⁻⁷ M³"), 1.09e-7, 1e-9) && naer(M.tal("0,000000109"), 1.09e-7, 1e-9)
+        && naer(M.tal("1.09e-7"), 1.09e-7, 1e-9) && naer(M.tal("3,02 · 10^-4 mol"), 3.02e-4, 1e-9) && isNaN(M.tal("abc")) && isNaN(M.tal("")));
+    function slags(v) { return M.tjekKo(String(v), 0.1, 0.1).slags; }
+    paastand("rigtig Ko godtages, ogsaa afrundet", slags("1,1·10^-7") === "rigtig" && slags(b1.Y) === "rigtig" && slags("1,09e-7") === "rigtig");
+    paastand("de typiske fejl genkendes",
+        slags(b1.cPb * b1.cI) === "udenAnden" && slags(b1.cPb * 2 * b1.cI) === "gangeTo" && slags(b1.cPb * 4 * b1.cI * b1.cI) === "dobbeltI"
+        && slags(b1.nPb * b1.nI * b1.nI) === "mol" && slags(b1.Y * 1e-9) === "ml" && slags(b1.Y * 100) === "potens",
+        [slags(b1.cPb * b1.cI), slags(b1.cPb * 2 * b1.cI), slags(b1.cPb * 4 * b1.cI * b1.cI), slags(b1.nPb * b1.nI * b1.nI), slags(b1.Y * 1e-9), slags(b1.Y * 100)].join(" / "));
+    paastand("tomt felt og tekst er ikke et forkert svar", slags("") === "tom" && slags("ved ikke") === "ikketal" && slags("5,5·10^-7") === "forkert");
+
+    /* Tal skrevet, som en elev ville skrive dem */
+    function skriv4(x) { var e = Math.floor(Math.log(x) / Math.LN10); return (x / Math.pow(10, e)).toFixed(3).replace(".", ",") + "·10^" + e; }
+    function felt(id) { return d.getElementById(id); }
+    function svarIPanel(v) { felt("svar").value = v; NK.tjekSvar(); }
+
+    overskrift("3. Afvejning og én maaling");
     frisk();
     paastand("stof afvises uden vand", f.klik("pbGlas") === false && !f.handling);
     paastand("varmen afvises med tomt glas", f.klik("varme") === false && !f.varme);
     paastand("termometret afviser uden stof", f.klik("termometer") === false);
+    paastand("resterne kan ikke afleveres uden en maaling", f.klik("dunk") === false && !f.gjort.affald);
     paastand("vand haeldes i", klik("maaleglas") === true);
     roligt();
     paastand("baegerglasset har 100 mL vand", f.b.vand && f.g.maaleglas.vandAreal === 0 && f.trinGjort("vand"));
@@ -140,6 +175,7 @@ function koerTest() {
     paastand("ca. 0,100 g Pb(NO3)2 afvejes", afvej("pbGlas", SP.foerste, SP.tolerance), komma(baad()));
     paastand("vaegten viser tre decimaler", M.komma(baad(), 3).length === 5);
     paastand("Pb(NO3)2 haeldes i", haeld() && Math.abs(f.b.pb - 0.1) <= 0.0101 && f.tils.pb === f.b.pb && f.iagttaget.pb_oploest, komma(f.b.pb));
+    paastand("massen staar i kortet Beregning", felt("m-pb").textContent === komma(f.b.pb) + " g" && felt("m-ki").textContent === "" && felt("beregn").hidden, felt("m-pb").textContent);
     paastand("mere Pb(NO3)2 afvises, foer KI er i", klik("pbGlas") === false);
     klik("kiGlas"); roligt();
     paastand("forkert masse KI afvises", f.klik("vejebaad") === false);
@@ -155,21 +191,70 @@ function koerTest() {
     adv(1);
     paastand("krystallen i luppen er vaek", f.mikro.fastAntal() === 0);
     paastand("i den klare opløsning kan der ikke noteres", f.klik("termometer") === false);
-    paastand("noter-knappen vises", !d.getElementById("noter-knap").hidden);
+    paastand("noter-knappen vises", !felt("noter-knap").hidden);
     f.klik("varme"); f.klik("omroer");
     t = vent(function () { return f.b.fast > 1e-6; }, 40);
-    var tSat = M.maetningsTemp(M.pbi2Masse(f.b.pb, f.b.ki));
-    paastand("de foerste krystaller kommer ved maetningstemperaturen", Math.abs(f.b.T - tSat) < 1.5 && f.iagttaget.regn, komma(f.b.T, 1) + " °C mod " + komma(tSat, 1) + " °C efter " + t + " s");
+    var tSat = M.maetningsTempY(M.ionprodukt(f.b.pb, f.b.ki));
+    paastand("de foerste krystaller kommer, naar reaktionsbroeken er lig med Ko", Math.abs(f.b.T - tSat) < 1.5 && f.iagttaget.regn, komma(f.b.T, 1) + " °C mod " + komma(tSat, 1) + " °C efter " + t + " s");
     paastand("temperaturen noteres", f.klik("termometer") === true && f.maalinger.length === 1 && f.trinGjort("maal1"));
     paastand("samme maaling kan ikke noteres igen", f.klik("termometer") === false);
+    var m1 = f.maalinger[0], c1 = M.beregning(m1.pb, m1.ki);
+    paastand("maalingen har reaktionsbroeken ved den noterede temperatur", naer(m1.Y, c1.Y, 1e-12) && naer(M.ko(m1.T), m1.Y, 0.15), M.videnskabelig(m1.Y, 2) + " mod tabellens " + M.videnskabelig(M.ko(m1.T), 2));
+
+    overskrift("3b. Beregningen af Ko");
+    paastand("beregningen er det aktuelle trin", f.aktueltTrin().id === "beregn" && !f.trinGjort("beregn"));
+    paastand("kortet viser masserne og temperaturen, og feltet er aabent",
+        felt("m-pb").textContent === komma(m1.pb) + " g" && felt("m-ki").textContent === komma(m1.ki) + " g" && felt("t-krystal").textContent === komma(m1.T, 1) + " °C"
+        && !felt("beregn").hidden && !felt("hjaelp-beregn").hidden && felt("maal-nr").textContent === "Måling 1");
+    paastand("quizzen og tegneserien er laast", NK.quiz.tilstand === "laast" && felt("serieknap").hidden);
+    svarIPanel("");
+    paastand("et tomt felt taeller ikke som forkert", m1.forkerte === 0 && !felt("beregn-hint").hidden);
+    svarIPanel(skriv4(c1.cPb * c1.cI));
+    paastand("uden i anden: hintet siger det", m1.forkerte === 1 && !m1.beregnet && felt("beregn-hint").textContent.indexOf("i anden") > 0, felt("beregn-hint").textContent);
+    svarIPanel(skriv4(c1.nPb * c1.nI * c1.nI));
+    paastand("stofmaengder i stedet for koncentrationer: hintet siger det", m1.forkerte === 2 && felt("beregn-hint").textContent.indexOf("stofmængder") > 0);
+    svarIPanel("5,5·10^-7");
+    paastand("efter flere forkerte svar staar hele vejen i hintet", m1.forkerte === 3 && felt("beregn-hint").textContent.indexOf("Hjælp til beregningen") > 0);
+
+    NK.guide.aabn();
+    paastand("den trinvise hjaelp aabner med elevens masse", felt("guide").classList.contains("vis") && felt("g1-tal").textContent.indexOf(komma(m1.pb) + " g") === 0 && felt("g2-svar").disabled, felt("g1-tal").textContent);
+    function trin(n, v) { felt("g" + n + "-svar").value = v; NK.guide.tjek(n); }
+    trin(1, skriv4(m1.pb * 331.2));
+    paastand("trin 1: ganget i stedet for divideret giver et hint", NK.guide.tilstand().trin === 1 && felt("g1-hint").textContent.indexOf("ganget") > 0);
+    trin(1, skriv4(c1.nPb));
+    paastand("trin 1: stofmaengden af Pb(NO3)2", NK.guide.tilstand().trin === 2 && !felt("g2-svar").disabled && felt("g2-tal").textContent.indexOf("mol") > 0, felt("g2-tal").textContent);
+    trin(2, skriv4(c1.nPb / 100));
+    paastand("trin 2: volumen i mL giver et hint om liter", NK.guide.tilstand().trin === 2 && felt("g2-hint").textContent.indexOf("liter") > 0);
+    trin(2, skriv4(c1.cPb));
+    trin(3, skriv4(c1.nI * 2));
+    paastand("trin 3: ganget med 2 giver et hint", NK.guide.tilstand().trin === 3 && felt("g3-hint").textContent.indexOf("ganges med 2") > 0);
+    trin(3, skriv4(c1.nI));
+    trin(4, skriv4(c1.cI));
+    paastand("trin 5 har elevens egne koncentrationer", NK.guide.tilstand().trin === 5 && felt("g5-tal").textContent.indexOf("M · (") > 0 && felt("g5-tal").textContent.indexOf("M)²") > 0, felt("g5-tal").textContent);
+    trin(5, skriv4(c1.cPb * c1.cI));
+    paastand("trin 5: uden i anden giver et hint", NK.guide.tilstand().trin === 5 && felt("g5-hint").textContent.indexOf("i anden") > 0);
+    trin(5, skriv4(c1.Y));
+    paastand("alle fem trin er regnet", NK.guide.tilstand().trin === 6 && !felt("guide-brug").hidden);
+    NK.guide.brug();
+    paastand("svaret skrives i panelet og er rigtigt", m1.beregnet && f.erBeregnet() && f.trinGjort("beregn") && !felt("guide").classList.contains("vis"));
+    paastand("kortet viser den beregnede Ko, og feltet er vaek", !felt("beregn-svar").hidden && felt("beregn-svar").textContent.indexOf(M.videnskabelig(m1.Y, 2)) > 0 && felt("beregn").hidden, felt("beregn-svar").textContent);
+    paastand("quizzen er laast op, og laereren roser", NK.quiz.tilstand !== "laast" && f.laerer.rost && f.iagttaget.beregnet1);
+    paastand("naeste trin er resterne, ikke flere maalinger", f.aktueltTrin().id === "affald" && !f.trinGjort("flere"));
+    paastand("tegneserien er stadig laast", felt("serieknap").hidden);
+    vent(function () { return !f.laererOptaget(); }, 25);
+
+    overskrift("3c. Valgfrit: flere maalinger");
     paastand("maaling 2: ca. 0,050 g af hvert stof", tilsaet(SP.senere) && Math.abs(f.tilsaetninger[1].pb - 0.05) <= 0.0101, f.tilsaetninger.length > 1 ? komma(f.tilsaetninger[1].pb) : "");
-    paastand("maaling 2 noteres", maal() && f.maalinger.length === 2, f.maalinger.length === 2 ? komma(f.maalinger[1].T, 1) + " °C" : "");
+    paastand("kortet skifter til maaling 2 med masserne i alt", felt("maal-nr").textContent === "Måling 2" && felt("m-pb").textContent === komma(f.b.pb) + " g" && felt("t-krystal").textContent === "" && felt("beregn-svar").hidden);
+    paastand("maaling 2 noteres", maal() && f.maalinger.length === 2 && f.trinGjort("flere"), f.maalinger.length === 2 ? komma(f.maalinger[1].T, 1) + " °C" : "");
+    paastand("feltet aabner igen for maaling 2", !felt("beregn").hidden && felt("svar").value === "");
+    svarIPanel(skriv4(f.maalinger[1].Y));
+    paastand("Ko for maaling 2 regnes", f.maalinger[1].beregnet && f.iagttaget.beregnet2);
     paastand("maaling 3", tilsaet(SP.senere) && maal() && f.maalinger.length === 3, f.maalinger.length === 3 ? komma(f.maalinger[2].T, 1) + " °C" : "");
     var afvig = f.maalinger.map(function (m) { return f.afvigelse(m); });
-    paastand("alle tre punkter ligger paa kurven", afvig.every(function (a) { return a < 3; }), afvig.map(function (a) { return a.toFixed(1); }).join(" / "));
-    paastand("temperaturen stiger med massen", f.maalinger[0].T < f.maalinger[1].T && f.maalinger[1].T < f.maalinger[2].T);
-    paastand("kurven er noteret, quizzen er laast op, og laereren roser", f.iagttaget.kurve && NK.quiz.tilstand !== "laast" && f.laerer.rost);
-    paastand("tegneserien er laast", d.getElementById("serieknap").hidden);
+    paastand("alle tre maalinger ligger paa kurven", afvig.every(function (a) { return a < 3; }), afvig.map(function (a) { return a.toFixed(1); }).join(" / "));
+    paastand("temperaturen og Ko stiger med massen", f.maalinger[0].T < f.maalinger[1].T && f.maalinger[1].T < f.maalinger[2].T && f.maalinger[0].Y < f.maalinger[1].Y && f.maalinger[1].Y < f.maalinger[2].Y);
+    paastand("kurven er noteret, og laereren roser igen", f.iagttaget.kurve && f.laerer.rostKurve);
     paastand("det varme glas kan tages op", f.b.T > 50 && f.klik("dunk") === true);
     adv(1);
     paastand("der skvulper lidt ud, og uheldet er noteret", !!f.skvulp && f.iagttaget.varmt && f.b.vand && !f.gjort.affald);
@@ -181,25 +266,48 @@ function koerTest() {
     paastand("glasset koeler af til under 50 °C", f.b.T < 50, t + " s");
     paastand("resterne afleveres", klik("dunk") === true);
     roligt();
-    paastand("forsoeget er slut, glasset er tomt", f.gjort.affald && !f.b.vand && f.b.pb === 0 && f.aktueltTrin() === null);
+    paastand("forsoeget er slut, glasset er tomt", f.gjort.affald && f.erSlut() && !f.b.vand && f.b.pb === 0 && f.aktueltTrin() === null);
     paastand("alle trin er gjort", NK.TRIN.every(function (tr) { return f.trinGjort(tr.id); }));
+    paastand("kortet viser stadig den sidste maaling", felt("maal-nr").textContent === "Måling 3" && felt("m-pb").textContent === komma(f.maalinger[2].pb) + " g");
 
     overskrift("4. Tegneserien");
-    paastand("tegneserien er laast op", !d.getElementById("serieknap").hidden);
+    paastand("tegneserien er laast op", !felt("serieknap").hidden);
     NK.aabnSerie();
     var ruder = d.querySelectorAll("#serie-ruder .rude");
     /* En rude pr. iagttagelse, en med maalingerne og en med oprydningen,
        hvis laereren har ryddet op undervejs */
     var forventet = f.logbog.filter(function (e) { return !!NK.Tegneserie.RUDER[e.noegle]; }).length + 1
         + (NK.Kemichael.uheldIForsoeget() ? 1 : 0);
-    paastand("én rude pr. iagttagelse og én med maalingerne", ruder.length === forventet && ruder.length >= 8 && d.getElementById("tegneserie").classList.contains("vis"), ruder.length + " ruder");
+    paastand("én rude pr. iagttagelse og én med maalingerne", ruder.length === forventet && ruder.length >= 8 && felt("tegneserie").classList.contains("vis"), ruder.length + " ruder");
     var sidste = ruder[ruder.length - 1];
     var raekker = sidste ? sidste.querySelectorAll("table.maalinger tr") : [];
     paastand("sidste rude har tabellen med tre maalinger og grafen", raekker.length === 4 && !!sidste.querySelector("canvas"));
     paastand("masserne staar med tre decimaler", raekker.length === 4 && /^\d,\d{3} g$/.test(raekker[1].children[1].textContent), raekker.length ? raekker[1].children[1].textContent : "");
-    paastand("ruderne har elevens temperaturer", d.getElementById("serie-ruder").textContent.indexOf(komma(f.maalinger[0].T, 1) + " °C") >= 0);
-    d.getElementById("serie-luk").click();
-    paastand("tegneserien lukkes", !d.getElementById("tegneserie").classList.contains("vis"));
+    paastand("sidste kolonne er Ko", raekker.length === 4 && raekker[1].children[4].textContent === M.videnskabelig(f.maalinger[0].Y, 2), raekker.length ? raekker[1].children[4].textContent : "");
+    paastand("konklusionen har elevens Ko og tabelvaerdien", sidste.textContent.indexOf("Tabelværdien") > 0 && sidste.textContent.indexOf("stiger med temperaturen") > 0);
+    paastand("grafens akse passer til det stoerste punkt", NK.Graf.aksetop(f.maalinger) >= f.maalinger[2].Y / 1e-7, String(NK.Graf.aksetop(f.maalinger)));
+    paastand("ruderne har elevens temperaturer", felt("serie-ruder").textContent.indexOf(komma(f.maalinger[0].T, 1) + " °C") >= 0);
+    felt("serie-luk").click();
+    paastand("tegneserien lukkes", !felt("tegneserie").classList.contains("vis"));
+
+    overskrift("4b. Én maaling er nok");
+    frisk();
+    klik("maaleglas"); roligt();
+    paastand("vand, stof og én maaling", tilsaet(SP.foerste) && maal() && f.maalinger.length === 1);
+    t = vent(function () { return f.b.T < 50; }, 120);
+    paastand("resterne kan afleveres foer beregningen", klik("dunk") === true);
+    roligt();
+    paastand("forsoeget er ikke slut, foer Ko er beregnet", f.gjort.affald && !f.erSlut() && f.aktueltTrin().id === "beregn" && felt("serieknap").hidden && !felt("beregn").hidden,
+        felt("serie-tekst").textContent);
+    paastand("der kan ikke maales mere, naar resterne er afleveret", f.klik("pbGlas") === false);
+    svarIPanel(skriv4(f.maalinger[0].Y));
+    paastand("med Ko beregnet er forsoeget slut efter én maaling", f.erSlut() && f.aktueltTrin() === null && !felt("serieknap").hidden && !f.trinGjort("flere"));
+    paastand("taelleren regner ikke det valgfri trin med", felt("forloeb-taeller").textContent === "7/7", felt("forloeb-taeller").textContent);
+    NK.aabnSerie();
+    ruder = d.querySelectorAll("#serie-ruder .rude");
+    sidste = ruder[ruder.length - 1];
+    paastand("tegneserien har én maaling i tabellen og tabelvaerdien i teksten", sidste.querySelectorAll("table.maalinger tr").length === 2 && sidste.textContent.indexOf("Tabelværdien") > 0 && sidste.textContent.indexOf("stiger med temperaturen") < 0);
+    felt("serie-luk").click();
 
     overskrift("5. Graenser");
     frisk();

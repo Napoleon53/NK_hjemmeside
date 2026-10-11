@@ -19,3 +19,128 @@
 
 .knap.groen { background-color: var(--groen-mork); border-color: var(--groen); }
 .knap.groen:hover:not(:disabled) { background-color: var(--groen); }
+
+/* Det valgfri trin i forloebet: ingen nummer, afdaempet */
+.trinliste li.valgfri { opacity: 0.75; font-size: 0.86em; }
+.trinliste li.valgfri .nr { background: none; border: 1px dashed #5a5a68; color: var(--tekst-mat); }
+.trinliste li.valgfri.gjort { opacity: 1; }
+
+/* ---------------------------------------------------------------------
+   MAALESKEMA OG BEREGNING (samme moenster som sc8.6 Jern i ståluld)
+   --------------------------------------------------------------------- */
+.maaleskema { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.maaleskema th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 5px 0; }
+.maaleskema td {
+    text-align: right;
+    font-weight: 700;
+    color: var(--tekst);
+    font-variant-numeric: tabular-nums;
+    padding: 5px 4px;
+    min-width: 80px;
+    border-radius: 4px;
+}
+.maaleskema td:empty::after { content: "…"; color: var(--tekst-mat); font-weight: 400; }
+.maaleskema tr + tr th, .maaleskema tr + tr td { border-top: 1px solid #3a3a47; }
+.maaleskema tr.ny td { animation: noteret 1.4s ease-out; }
+
+@keyframes noteret {
+    from { background-color: rgba(63, 174, 114, 0.45); }
+    to   { background-color: transparent; }
+}
+
+.beregn { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.beregn[hidden] { display: none; }
+.beregn label { flex: 1; font-size: 0.86rem; font-weight: 700; color: var(--tekst); white-space: nowrap; }
+.beregn .enhed { color: var(--tekst-svag); font-weight: 600; }
+.beregn .knap { padding: 7px 12px; }
+
+.beregn input,
+.guide-regning input {
+    width: 112px;
+    padding: 7px 8px;
+    background-color: #16161c;
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    text-align: right;
+}
+
+.skrivenote { margin: 6px 0 0 0; font-size: 0.78rem; color: var(--tekst-mat); }
+.skrivenote[hidden] { display: none; }
+.beregn input:focus, .guide-regning input:focus { outline: 2px solid var(--gul); outline-offset: 1px; }
+.beregn input.forkert, .guide-regning input.forkert { border-color: var(--roed); }
+.guide-regning input:disabled { opacity: 0.5; }
+.overlay-boks .guide-note { margin: 10px 0 0 0; font-size: 0.8rem; color: var(--tekst-mat); }
+
+#beregn-svar { margin-top: 10px; }
+#beregn-svar[hidden] { display: none; }
+.knap.lille { width: 100%; margin-top: 10px; padding: 6px 10px; font-size: 0.8rem; }
+.knap.lille[hidden] { display: none; }
+
+/* ----- Guidet hjaelp til beregningen --------------------------------- */
+.guide { list-style: none; margin: 12px 0 0 0; padding: 0; display: grid; gap: 10px; }
+
+.guide > li {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    border: 1px solid #3a3a47;
+    background-color: rgba(0, 0, 0, 0.18);
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.guide > li.laast { opacity: 0.45; }
+.guide > li.aktiv { border-color: var(--blaa); }
+.guide > li.gjort { border-color: var(--groen-mork); }
+
+.guide .nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--tekst-svag);
+}
+
+.guide li.aktiv .nr { background-color: var(--blaa); color: #ffffff; }
+.guide li.gjort .nr { background-color: var(--groen-mork); color: #ffffff; }
+
+.guide-boks { max-width: 660px; }
+.overlay-boks .guide-titel { margin: 1px 0 6px 0; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tekst-mat); }
+.overlay-boks .guide .hint { margin: 8px 0 0 0; }
+
+/* Et trin som regnestykke: stoerrelsen til venstre, og til hoejre for den
+   foerst formlen og saa tallene med elevens resultat, begge med = foran */
+.guide-regning {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 7px;
+    row-gap: 6px;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--tekst-svag);
+    font-variant-numeric: tabular-nums;
+}
+
+.guide-vs { color: #ffffff; font-weight: 700; }
+.guide-formel { color: var(--tekst-svag); }
+.guide-linje { grid-column: 2; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.guide-tal:empty { display: none; }
+
+/* Broek med rigtig broekstreg */
+.broek { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.25; margin: 0 2px; }
+.broek > span:first-child { padding: 0 5px 2px; border-bottom: 1.5px solid currentColor; }
+.broek > span:last-child { padding: 2px 5px 0; }
+
+.guide-regning .knap { padding: 7px 12px; }
+.guide-boks .knapper { gap: 8px; }
+.guide-boks .knapper .knap[hidden] { display: none; }

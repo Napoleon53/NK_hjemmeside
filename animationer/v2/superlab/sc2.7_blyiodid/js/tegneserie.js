@@ -5,7 +5,8 @@
    iagttagelse i logbogen bliver en rude: et lille laerred med et udsnit
    af bordet, tegnet med de samme funktioner som scenen, og en kort
    tekst. Ruderne bruger elevens egne tal: masserne og temperaturerne.
-   Sidste rude er maalingerne med tabel og graf.
+   Sidste rude er maalingerne med tabel og graf: Ko ved den noterede
+   temperatur ved siden af tabelvaerdierne.
    ===================================================================== */
 (function () {
     "use strict";
@@ -207,7 +208,7 @@
         var tabel = document.createElement("table");
         tabel.className = "maalinger";
         var hoved = document.createElement("tr");
-        ["Nr.", "Pb(NO₃)₂", "KI", "PbI₂", "Temp."].forEach(function (t) {
+        ["Nr.", "Pb(NO₃)₂", "KI", "Temp.", "Kₒ i M³"].forEach(function (t) {
             var th = document.createElement("th");
             th.textContent = t;
             hoved.appendChild(th);
@@ -215,7 +216,7 @@
         tabel.appendChild(hoved);
         f.maalinger.forEach(function (m) {
             var tr = document.createElement("tr");
-            [String(m.nr), M.komma(m.pb, 3) + " g", M.komma(m.ki, 3) + " g", M.komma(m.pbi2, 3) + " g", grader(m.T)].forEach(function (t) {
+            [String(m.nr), M.komma(m.pb, 3) + " g", M.komma(m.ki, 3) + " g", grader(m.T), M.videnskabelig(m.Y, 2)].forEach(function (t) {
                 var td = document.createElement("td");
                 td.textContent = t;
                 tr.appendChild(td);
@@ -268,7 +269,8 @@
             sp.className = "nr";
             sp.textContent = String(++nr);
             p.appendChild(sp);
-            p.appendChild(document.createTextNode("Målingerne. Masserne er i alt i 100 mL vand, og temperaturen er noteret, da de første krystaller kom."));
+            var flere = f.maalinger.length > 1;
+            p.appendChild(document.createTextNode((flere ? "Målingerne." : "Målingen.") + " Masserne er i alt i 100 mL vand, og temperaturen er noteret, da de første krystaller kom. Dér var opløsningen netop mættet, så Kₒ = [Pb²⁺] · [I⁻]²."));
             sidste.appendChild(p);
             sidste.appendChild(maalingTabel(f));
             var canvas = document.createElement("canvas");
@@ -279,12 +281,16 @@
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             NK.Graf.tegn(ctx, B, 190, { maalinger: f.maalinger, visKurve: true });
             sidste.appendChild(canvas);
-            var konklusion = f.logbog.filter(function (e) { return e.noegle === "kurve" || e.noegle === "kurve_afvig"; })[0];
-            if (konklusion) {
-                var pk = document.createElement("p");
-                pk.textContent = konklusion.tekst + " Opløseligheden af PbI₂ stiger med temperaturen.";
-                sidste.appendChild(pk);
-            }
+            /* Konklusionen: elevens Ko ved siden af tabelvaerdien ved samme
+               temperatur, og med flere maalinger at Ko stiger med temperaturen */
+            var m1 = f.maalinger[0];
+            var pk = document.createElement("p");
+            var tekstK = "Måling 1 giver Kₒ = " + M.videnskabelig(m1.Y, 2) + " M³ ved " + grader(m1.T) + ". Tabelværdien ved den temperatur er " + M.videnskabelig(M.ko(m1.T), 2) + " M³.";
+            if (flere) tekstK += " Kₒ for PbI₂ stiger med temperaturen.";
+            var kurve = f.logbog.filter(function (e) { return e.noegle === "kurve" || e.noegle === "kurve_afvig"; })[0];
+            if (kurve) tekstK += " " + kurve.tekst;
+            pk.textContent = tekstK;
+            sidste.appendChild(pk);
             container.appendChild(sidste);
         }
     };

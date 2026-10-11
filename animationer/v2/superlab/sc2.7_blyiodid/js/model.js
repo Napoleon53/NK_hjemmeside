@@ -9,8 +9,16 @@
 
    Opløseligheden af PbI2 stiger kraftigt med temperaturen. Bundfaldet
    forsvinder ved opvarmning og kommer igen som glinsende krystaller ved
-   afkoeling (gyldne regn). Den temperatur, hvor de foerste krystaller
-   kommer ved afkoeling, giver et punkt paa opløselighedskurven.
+   afkoeling (gyldne regn). Ved den temperatur, hvor de foerste krystaller
+   kommer, er opløsningen netop maettet, og reaktionsbroeken er lig med
+   opløselighedsproduktet:
+
+     PbI2(s)  <=>  Pb2+(aq) + 2 I-(aq)        Ko = [Pb2+] * [I-]^2
+
+   Forsoeget er paa B-niveau (ligevaegt): eleven beregner Ko ud fra sine
+   egne masser og de 100 mL vand. Bundfaldet i glasset foelger derfor
+   ionproduktet og ikke kun massen af PbI2, saa den Ko, eleven regner,
+   er den, glasset opfoerte sig efter.
 
    M(Pb(NO3)2) = 331,2 g/mol er naesten praecis 2 * M(KI) = 332,0 g/mol.
    Samme masse af de to stoffer giver derfor stofmaengdeforholdet 1 : 2.
@@ -147,6 +155,34 @@
         return Math.min(pb / MOLMASSE["Pb(NO3)2"], ki / (2 * MOLMASSE.KI)) * MOLMASSE.PbI2;
     }
 
+    /* ----- Opløselighedsproduktet ---------------------------------------
+       Tabelkurven s(T) er i g PbI2 pr. 100 mL. I en maettet opløsning af
+       rent PbI2 er [Pb2+] = s og [I-] = 2s i mol/L, saa Ko(T) = 4 s^3.
+       Det giver 1,3 * 10^-8 M^3 ved 20 °C. */
+    function ko(T) {
+        var s = oploeselighed(T) * 10 / MOLMASSE.PbI2;
+        return 4 * s * s * s;
+    }
+
+    /* Stofmaengder i mol og koncentrationer i mol/L, hvis alt er opløst.
+       pb og ki er masserne i gram i de 100 mL vand. */
+    function beregning(pb, ki) {
+        var V = VAND.mL / 1000;
+        var nPb = pb / MOLMASSE["Pb(NO3)2"], nI = ki / MOLMASSE.KI;
+        var cPb = nPb / V, cI = nI / V;
+        return { V: V, nPb: nPb, nI: nI, cPb: cPb, cI: cI, Y: cPb * cI * cI };
+    }
+
+    /* Reaktionsbroeken, naar alt er opløst */
+    function ionprodukt(pb, ki) {
+        return beregning(pb, ki).Y;
+    }
+
+    /* Den temperatur, hvor reaktionsbroeken Y netop er lig med Ko */
+    function maetningsTempY(Y) {
+        return Math.log(Y / ko(0)) / (3 * OPL.k);
+    }
+
     /* Temperaturen i glasset. effekt: pladens varme 0-1. */
     function skridtTemp(b, dt, effekt) {
         b.T += (effekt * VARME.fart - VARME.koeling * (b.T - VAND.stue)) * dt;
@@ -154,9 +190,19 @@
         b.koger = effekt * VARME.fart > VARME.koeling * (VAND.kog - VAND.stue) && b.T >= VAND.kog - 0.05;
     }
 
-    /* Bundfaldet i glasset, b.fast i gram, naermer sig ligevaegten. */
+    /* Bundfaldet i glasset, b.fast i gram, naermer sig ligevaegten. Der
+       faeldes x mol/L PbI2, til (cPb - x) * (cI - 2x)^2 = Ko(T). Venstre
+       side falder, naar x stiger, saa x findes ved at halvere intervallet. */
     function ligevaegt(b) {
-        return Math.max(0, pbi2Masse(b.pb, b.ki) - oploeselighed(b.T) * VAND.mL / 100);
+        var c = beregning(b.pb, b.ki), K = ko(b.T);
+        if (c.Y <= K) return 0;
+        var lav = 0, hoej = Math.min(c.cPb, c.cI / 2), x, rest;
+        for (var i = 0; i < 60; i++) {
+            x = (lav + hoej) / 2;
+            rest = c.cI - 2 * x;
+            if ((c.cPb - x) * rest * rest > K) lav = x; else hoej = x;
+        }
+        return lav * c.V * MOLMASSE.PbI2;
     }
 
     function skridtBundfald(b, dt, omroert) {
@@ -173,6 +219,54 @@
     /* Tal med dansk komma: komma(0.1, 2) giver "0,10" */
     function komma(x, dec) {
         return x.toFixed(dec === undefined ? 2 : dec).replace(".", ",");
+    }
+
+    /* Smaa tal som 3,02·10⁻⁴. d er antallet af decimaler i tallet foran. */
+    function videnskabelig(x, d) {
+        if (d === undefined) d = 2;
+        if (!x) return "0";
+        var e = Math.floor(Math.log(Math.abs(x)) / Math.LN10);
+        var m = Number((x / Math.pow(10, e)).toFixed(d));
+        if (Math.abs(m) >= 10) { m = Number((m / 10).toFixed(d)); e++; }
+        if (e === 0) return komma(m, d);
+        return komma(m, d) + "·10" + NK.haevet(String(e).replace("-", "−"));
+    }
+
+    /* Tal skrevet af eleven: 0,000302 · 3,02·10^-4 · 3,02·10⁻⁴ · 3.02e-4 */
+    var HAEVET_TIL = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-", "⁺": "+" };
+
+    function tal(tekst) {
+        var s = String(tekst === undefined || tekst === null ? "" : tekst)
+            .replace(/\s/g, "").replace(/[−–]/g, "-").replace(/M(\^?3|³)?$/, "").replace(/mol$/, "");
+        s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+/g, function (run) {
+            return "^" + run.split("").map(function (c) { return HAEVET_TIL[c]; }).join("");
+        });
+        s = s.replace(",", ".");
+        var m = /^([-+]?\d*\.?\d+)(?:(?:[·*×x]10\^?|[eE])([-+]?\d+))?$/.exec(s);
+        if (!m) return NaN;
+        return parseFloat(m[1]) * (m[2] !== undefined ? Math.pow(10, parseInt(m[2], 10)) : 1);
+    }
+
+    function naer(v, x, rel) {
+        return Math.abs(v - x) <= Math.abs(x) * rel;
+    }
+
+    /* Elevens Ko mod tallene i glasset. slags: tom | rigtig | eller den
+       fejl, tallet svarer til, saa hintet kan passe til fejlen. */
+    function tjekKo(tekst, pb, ki) {
+        var v = tal(tekst), c = beregning(pb, ki);
+        if (!String(tekst || "").replace(/\s/g, "")) return { slags: "tom" };
+        if (isNaN(v)) return { slags: "ikketal" };
+        if (naer(v, c.Y, 0.03)) return { slags: "rigtig", vaerdi: v };
+        if (naer(v, c.cPb * c.cI, 0.03)) return { slags: "udenAnden" };
+        if (naer(v, c.cPb * 2 * c.cI, 0.03)) return { slags: "gangeTo" };
+        if (naer(v, c.cPb * 4 * c.cI * c.cI, 0.03)) return { slags: "dobbeltI" };
+        if (naer(v, c.nPb * c.nI * c.nI, 0.03)) return { slags: "mol" };
+        if (naer(v, c.Y * 1e-9, 0.03)) return { slags: "ml" };
+        if (naer(v, 4 * c.cPb * c.cPb * c.cPb, 0.03)) return { slags: "rigtig", vaerdi: v };
+        if (v > 0 && Math.abs(Math.log(v / c.Y) / Math.LN10 - Math.round(Math.log(v / c.Y) / Math.LN10)) < 0.02
+            && Math.round(Math.log(v / c.Y) / Math.LN10) !== 0) return { slags: "potens" };
+        return { slags: "forkert" };
     }
 
     NK.Model = {
@@ -194,9 +288,17 @@
         oploeselighed: oploeselighed,
         maetningsTemp: maetningsTemp,
         pbi2Masse: pbi2Masse,
+        ko: ko,
+        beregning: beregning,
+        ionprodukt: ionprodukt,
+        maetningsTempY: maetningsTempY,
         skridtTemp: skridtTemp,
         ligevaegt: ligevaegt,
         skridtBundfald: skridtBundfald,
-        komma: komma
+        komma: komma,
+        videnskabelig: videnskabelig,
+        tal: tal,
+        naer: naer,
+        tjekKo: tjekKo
     };
 }());

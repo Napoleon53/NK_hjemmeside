@@ -1,10 +1,12 @@
 /* =====================================================================
    graf.js - grafen med maalingerne
 
-   Vandret: temperaturen 0-100 °C. Lodret: g PbI2 pr. 100 mL vand, 0 til
-   0,45. Maalingerne er gule punkter med nummer, og den blaa kurve er
-   opløseligheden efter tabelvaerdierne. Grafen tegnes i tegneseriens
-   sidste rude.
+   Vandret: temperaturen 0-100 °C. Lodret: opløselighedsproduktet Ko for
+   PbI2 i enheden 10⁻⁷ M³. Maalingerne er gule punkter med nummer: den
+   noterede temperatur og reaktionsbroeken i glasset, som er elevens Ko.
+   Den blaa kurve er Ko efter tabelvaerdierne. Aksen gaar til 10, 20
+   eller 30 efter det stoerste punkt. Grafen tegnes i tegneseriens sidste
+   rude.
    ===================================================================== */
 (function () {
     "use strict";
@@ -12,15 +14,23 @@
     var NK = window.NK;
     var M = NK.Model;
 
-    var Y_MAKS = 0.45;
-    var PAD = { v: 36, h: 12, o: 18, n: 26 };
+    var ENHED = 1e-7;
+    var PAD = { v: 30, h: 12, o: 18, n: 26 };
+
+    /* Aksens top: 10, 20 eller 30 gange 10⁻⁷ M³ */
+    function aksetop(maalinger) {
+        var stoerst = 0;
+        maalinger.forEach(function (m) { stoerst = Math.max(stoerst, m.Y / ENHED); });
+        return stoerst > 18 ? 30 : (stoerst > 9 ? 20 : 10);
+    }
 
     /* v = { maalinger, visKurve } */
     function tegn(ctx, b, h, v) {
         var o = { x0: PAD.v, x1: b - PAD.h, y0: PAD.o, y1: h - PAD.n };
+        var top = aksetop(v.maalinger), skridt = top / 5;
         var i, x, y;
         function tilX(T) { return o.x0 + (o.x1 - o.x0) * NK.klamp(T, 0, 100) / 100; }
-        function tilY(g) { return o.y1 - (o.y1 - o.y0) * NK.klamp(g, 0, Y_MAKS) / Y_MAKS; }
+        function tilY(k) { return o.y1 - (o.y1 - o.y0) * NK.klamp(k, 0, top) / top; }
 
         ctx.save();
         ctx.fillStyle = "#1c2027";
@@ -30,7 +40,7 @@
         ctx.lineWidth = 1;
         ctx.beginPath();
         for (i = 0; i <= 100; i += 20) { x = Math.round(tilX(i)) + 0.5; ctx.moveTo(x, o.y0); ctx.lineTo(x, o.y1); }
-        for (i = 0; i <= 4; i++) { y = Math.round(tilY(i / 10)) + 0.5; ctx.moveTo(o.x0, y); ctx.lineTo(o.x1, y); }
+        for (i = 0; i <= 5; i++) { y = Math.round(tilY(i * skridt)) + 0.5; ctx.moveTo(o.x0, y); ctx.lineTo(o.x1, y); }
         ctx.stroke();
         ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
         ctx.beginPath();
@@ -41,9 +51,9 @@
 
         var font = "600 10px 'Segoe UI', sans-serif";
         for (i = 0; i <= 100; i += 20) NK.tekst(ctx, String(i), tilX(i), o.y1 + 9, { font: font, farve: "#9fa6af", linje: "middle", justering: "center" });
-        for (i = 0; i <= 4; i++) NK.tekst(ctx, i === 0 ? "0" : M.komma(i / 10, 1), o.x0 - 5, tilY(i / 10), { font: font, farve: "#9fa6af", linje: "middle", justering: "right" });
+        for (i = 0; i <= 5; i++) NK.tekst(ctx, String(i * skridt), o.x0 - 5, tilY(i * skridt), { font: font, farve: "#9fa6af", linje: "middle", justering: "right" });
         NK.tekst(ctx, "°C", o.x1, o.y1 + 20, { font: font, farve: "#c8ced6", linje: "middle", justering: "right" });
-        NK.tekst(ctx, "g PbI₂ pr. 100 mL", o.x0 + 4, 8, { font: font, farve: "#c8ced6", linje: "middle" });
+        NK.tekst(ctx, "Kₒ i 10⁻⁷ M³", o.x0 + 4, 8, { font: font, farve: "#c8ced6", linje: "middle" });
 
         if (v.visKurve) {
             ctx.save();
@@ -55,18 +65,20 @@
             ctx.beginPath();
             for (i = 0; i <= 100; i += 2) {
                 x = tilX(i);
-                y = o.y1 - (o.y1 - o.y0) * M.oploeselighed(i) / Y_MAKS;
+                y = o.y1 - (o.y1 - o.y0) * (M.ko(i) / ENHED) / top;
                 if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
             ctx.stroke();
             ctx.restore();
-            NK.tekst(ctx, "Tabelværdier", tilX(56), tilY(M.oploeselighed(56)) - 12, { font: "700 10px 'Segoe UI', sans-serif", farve: "#7cc1f0", linje: "middle", justering: "right" });
+            /* Teksten staar til venstre for kurven, hvor den er naaet halvt op */
+            var tT = M.maetningsTempY(top * 0.5 * ENHED);
+            NK.tekst(ctx, "Tabelværdier", tilX(tT) - 8, tilY(top * 0.5) - 6, { font: "700 10px 'Segoe UI', sans-serif", farve: "#7cc1f0", linje: "middle", justering: "right" });
         }
 
         for (i = 0; i < v.maalinger.length; i++) {
             var m = v.maalinger[i];
             x = tilX(m.T);
-            y = tilY(m.pbi2);
+            y = tilY(m.Y / ENHED);
             ctx.fillStyle = "#f2c53d";
             ctx.strokeStyle = "#1c2027";
             ctx.lineWidth = 1.5;
@@ -79,5 +91,5 @@
         ctx.restore();
     }
 
-    NK.Graf = { tegn: tegn };
+    NK.Graf = { tegn: tegn, aksetop: aksetop };
 }());
