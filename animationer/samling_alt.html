@@ -598,6 +598,11 @@
         window.addEventListener('load', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const emneFil = urlParams.get('emne');
+            // Forsøget med PbI₂ er flyttet fra C2 til B2 Ligevægt (11. okt. 2026). Gamle links sendes videre.
+            if (emneFil && emneFil.toLowerCase() === 'c2.7') {
+                window.location.replace('samling_alt_b.html?emne=b2.7');
+                return;
+            }
             let emneSide = urlParams.get('side') || (emneFil ? findSideFraEmne(emneFil) : null);
 
             if (emneSide) {
@@ -688,7 +693,7 @@
             ]},
             { navn: 'C2: Ionforbindelser', animationer: [
                 { nr: 1, navn: 'Salt i vand' }, { nr: 2, navn: 'Saltbyggeren' }, { nr: 3, navn: 'Kemikalielageret' },
-                { nr: 4, navn: 'Fældningsreaktioner' }, { nr: 5, navn: 'Forsøg: Fældning' }, { nr: 6, navn: 'Forsøg: Cu+Br₂' }, { nr: 7, navn: 'Forsøg: PbI₂' }
+                { nr: 4, navn: 'Fældningsreaktioner' }, { nr: 5, navn: 'Forsøg: Fældning' }, { nr: 6, navn: 'Forsøg: Cu+Br₂' }
             ]},
             { navn: 'C3: Molekyler', animationer: [
                 { nr: 1, navn: 'Elektronprikformler' }, { nr: 2, navn: 'Molekylers opbygning' }, { nr: 3, navn: 'Polære molekyler' },

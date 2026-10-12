@@ -48,7 +48,7 @@ viser de gamle udgaver.
 | `superlab/sc1.3_knaldgas` | ja | ældre sidelayout |
 | `superlab/sc2.5_faeldning` | ja | ældre sidelayout og ældre udgave af Kemichael |
 | `superlab/sc2.6_kobber_dibrom` | ja | |
-| `superlab/sc2.7_blyiodid` | ja | gammel kode; Kemi C viser den |
+| `superlab/sc2.7_blyiodid` | ja | gammel kode; flyttet 11. okt. 2026 fra Kemi C til Kemi B, B2 Ligevægt knap 7 (`b2.7`), og lagt om til at bestemme Kₒ; mappenavnet er uændret |
 | `superlab/sc6.8_substitution` | ja | |
 | `superlab/sc6.9_fedt_i_chips` | ja | |
 | `superlab/sc8.6_jern_i_staaluld` | ja | |
@@ -99,8 +99,8 @@ Kravene gælder begge slags.
   (sb3.2), og farven i kolben følger mængden af Br₂ i zoomboblen (sc2.6). Det
   makroskopiske, partikelniveauet og symbolerne hænger sammen.
 * Tallene har en kilde: Databogen, tabelværdier, rigtige kernemasser.
-* Forenklinger er valgt med vilje, passer til niveauet (Kₒ hører ikke til
-  C-niveau i sc2.7) og står i animationens README.
+* Forenklinger er valgt med vilje, passer til niveauet (sc2.7 regner med Kₒ,
+  fordi forsøget hører til ligevægt i kemi B) og står i animationens README.
 
 **6. Gerne lidt humoristisk.** Humoren gør det sjovt at blive og prøve igen,
 men den må aldrig stå i vejen for pointen.

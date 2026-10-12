@@ -1,0 +1,3984 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A6.1 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a6-2-enzymkinetik.html" rel="next">
+<link href="../kapitler/a6-1-enzymer.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-3f3984edc0ba659cca0ab16fe06864cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../indledninger/kapitel-a6.html">Kapitel A6: Enzymer og biokemi</a></li><li class="breadcrumb-item"><a href="../opgaver/a6-1-opgaver.html">Opgaver til A6.1</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="quarto-sidebar-header"><div class="sidebar-header-item">
+<div class="niveauer">
+<p><a href="../../c/index.html">Kemi C</a> <a href="../../b/index.html">Kemi B</a> <span class="her">Kemi A</span></p>
+</div>
+</div></div>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A1</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A2</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Naturstoffer og elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A3</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A4: Kemisk binding og spektroskopi</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-1-atomorbitaler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.1 Atomorbitaler og det periodiske system</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-2-hybridisering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.2 Hybridisering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-3-dobbelt-og-tripelbindinger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.3 Dobbelt- og tripelbindinger</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-4-molekyler-der-svinger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.4 Molekyler, der svinger</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-5-ir-spektret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.5 IR-spektret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-6-tolkning-af-ir-spektre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.6 Tolkning af IR-spektre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-7-grundideen-i-nmr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.7 Grundideen i <sup>1</sup>H-NMR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-8-antal-signaler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.8 Antal signaler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.8</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-9-kemisk-skift.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.9 Kemisk skift</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-9-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.9</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-10-integralkurven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.10 Integralkurven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-10-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.10</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-11-kobling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.11 Kobling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-11-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.11</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-12-flere-grupper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.12 Flere grupper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-12-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.12</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-13-fra-spektrum-til-struktur.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.13 Fra spektrum til struktur</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-13-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.13</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A5: Reaktionskinetik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-1-reaktionshastighed-og-hastighedsudtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.1 Reaktionshastighed og hastighedsudtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-2-foerste-orden.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.2 Første orden</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-3-nulte-og-anden-orden.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.3 Nulte og anden orden</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-4-arrhenius-ligningen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.4 Arrhenius-ligningen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-5-reaktionsmekanismer-og-katalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.5 Reaktionsmekanismer og katalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-6-nucleofil-substitution.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.6 Nucleofil substitution</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A5</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A6: Enzymer og biokemi</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-1-enzymer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.1 Enzymer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-1-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A6.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-2-enzymkinetik.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.2 Enzymkinetik</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-3-metaller-i-kroppen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.3 Metaller i kroppen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-4-redoxtitrering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.4 Redoxtitrering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-5-chromatografi-med-tal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.5 Chromatografi med tal</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A7: DNA's kemi</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-1-nucleotider.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.1 Nucleotider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-2-dna-strengen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.2 DNA-strengen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-3-baseparring.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.3 Baseparring og dobbeltspiralen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-4-naar-dna-smelter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.4 Når DNA smelter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-5-pcr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.5 PCR: kopiering i et reagensglas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-6-fra-dna-til-protein.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.6 Fra DNA til protein</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-7-skader-og-laegemidler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.7 Skader på DNA og lægemidler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/stikordsregister.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stikordsregister</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#A6.1.1" id="toc-A6.1.1" class="nav-link active" data-scroll-target="#A6.1.1">Opgave A6.1.1: Urease og urinstof</a></li>
+  <li><a href="#A6.1.2" id="toc-A6.1.2" class="nav-link" data-scroll-target="#A6.1.2">Opgave A6.1.2: Hvad kan gruppen?</a></li>
+  <li><a href="#A6.1.3" id="toc-A6.1.3" class="nav-link" data-scroll-target="#A6.1.3">Opgave A6.1.3: Den stærkeste binding</a></li>
+  <li><a href="#A6.1.4" id="toc-A6.1.4" class="nav-link" data-scroll-target="#A6.1.4">Opgave A6.1.4: Ladning og pH</a></li>
+  <li><a href="#A6.1.5" id="toc-A6.1.5" class="nav-link" data-scroll-target="#A6.1.5">Opgave A6.1.5: Phenylalanin i et aktivt center</a></li>
+  <li><a href="#A6.1.6" id="toc-A6.1.6" class="nav-link" data-scroll-target="#A6.1.6">Opgave A6.1.6: Et enzyms pH-optimum</a></li>
+  <li><a href="#A6.1.7" id="toc-A6.1.7" class="nav-link" data-scroll-target="#A6.1.7">Opgave A6.1.7: Frisk ananas i gelé</a></li>
+  <li><a href="#A6.1.8" id="toc-A6.1.8" class="nav-link" data-scroll-target="#A6.1.8">Opgave A6.1.8: Kompetitiv eller non-kompetitiv?</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#A6.1.eks.1" id="toc-A6.1.eks.1" class="nav-link" data-scroll-target="#A6.1.eks.1">Opgave A6.1.eks.1: Signalstoffet GABA</a></li>
+  <li><a href="#A6.1.eks.2" id="toc-A6.1.eks.2" class="nav-link" data-scroll-target="#A6.1.eks.2">Opgave A6.1.eks.2: Malonat hæmmer et enzym</a></li>
+  <li><a href="#A6.1.eks.3" id="toc-A6.1.eks.3" class="nav-link" data-scroll-target="#A6.1.eks.3">Opgave A6.1.eks.3: Trypsin klipper efter lysin</a></li>
+  <li><a href="#A6.1.eks.4" id="toc-A6.1.eks.4" class="nav-link" data-scroll-target="#A6.1.eks.4">Opgave A6.1.eks.4: Et statin mod kolesterol</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../indledninger/kapitel-a6.html">Kapitel A6: Enzymer og biokemi</a></li><li class="breadcrumb-item"><a href="../opgaver/a6-1-opgaver.html">Opgaver til A6.1</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A6.1</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a6-1-enzymer.html">A6.1 Enzymer</a>. Prøv selv, før du åbner hjælpen under opgaven.</p>
+<section id="A6.1.1" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.1">Opgave A6.1.1: Urease og urinstof</h2>
+<p>Bakterien <em>Helicobacter pylori</em> kan leve i den sure mavesæk, fordi den har enzymet urease. Urease får urinstof til at reagere med vand:</p>
+<div class="reaktion">
+<p>CO(NH<sub>2</sub>)<sub>2</sub>(aq) + H<sub>2</sub>O(l) → 2 NH<sub>3</sub>(aq) + CO<sub>2</sub>(aq)</p>
+</div>
+<p>Ammoniakken neutraliserer mavesyren lige omkring bakterien.</p>
+<ol type="a">
+<li>Hvad er substratet for urease?</li>
+<li>Hvad kaldes det sted på urease, hvor urinstof sætter sig?</li>
+<li>Hvad kaldes urease og urinstof tilsammen, mens urinstof sidder på enzymet?</li>
+<li>Opskriv de to trin i reaktionen med bogstaverne E, S, ES og P.</li>
+<li>Hvordan kan man se af de to trin, at urease er en katalysator?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Urease er enzymet, E. Det stof, et enzym arbejder på, kaldes substratet, S. Ordene står under overskriften “Enzym og substrat” i afsnit A6.1.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I det første trin sætter urinstof sig på urease. Det trin kan gå begge veje. I det andet trin bliver urinstof til produkterne ammoniak og carbondioxid, og urease er fri igen. En katalysator bruges i ét trin og bliver dannet igen i et senere trin.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Substratet er urinstof, CO(NH<sub>2</sub>)<sub>2</sub>. Det er det stof, urease binder og omdanner.</p></li>
+<li><p>Stedet kaldes det aktive center. Det er en lomme i urease, som er dannet af den måde, kæden af aminosyrer er foldet på.</p></li>
+<li><p>Urease og urinstof kaldes tilsammen et enzym-substrat-kompleks, ES.</p></li>
+<li><p>De to trin er</p></li>
+</ol>
+<div class="reaktion">
+<p>E + S ⇌ ES</p>
+</div>
+<div class="reaktion">
+<p>ES → E + P</p>
+</div>
+<p>E er urease, S er urinstof, ES er enzym-substrat-komplekset, og P er produkterne ammoniak og carbondioxid.</p>
+<ol start="5" type="a">
+<li>Urease, E, bruges i det første trin og bliver dannet igen i det andet trin. Urease bliver altså ikke brugt op, og det er kendetegnet for en katalysator. Enzym-substrat-komplekset, ES, bliver dannet i det første trin og brugt i det andet. Det er et mellemprodukt.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.2" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.2">Opgave A6.1.2: Hvad kan gruppen?</h2>
+<p>Tabellen viser seks grupper, som kan sidde på et substrat eller på en sidekæde i et enzym.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Gruppe</th>
+<th style="text-align: left;">Navn</th>
+<th style="text-align: left;">Formel</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">A</td>
+<td style="text-align: left;">hydroxygruppe</td>
+<td style="text-align: left;">−OH</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">B</td>
+<td style="text-align: left;">methylgruppe</td>
+<td style="text-align: left;">−CH<sub>3</sub></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">carboxylatgruppe</td>
+<td style="text-align: left;">−COO<sup>−</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">D</td>
+<td style="text-align: left;">aminogruppe, der har optaget en hydron</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">E</td>
+<td style="text-align: left;">carbonylgruppe i en keton</td>
+<td style="text-align: left;">C=O</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">F</td>
+<td style="text-align: left;">benzenring</td>
+<td style="text-align: left;">−C<sub>6</sub>H<sub>5</sub></td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Hvilke af de seks grupper har en ladning?</li>
+<li>Hvilke af de seks grupper har et hydrogenatom, der sidder på O eller N?</li>
+<li>Hvilke af de seks grupper kan kun danne londonbindinger?</li>
+<li>Carbonylgruppen har ikke noget hydrogenatom på oxygenatomet. Forklar, hvordan en carbonylgruppe alligevel kan være med i en hydrogenbinding.</li>
+<li>Hvilken binding er den stærkeste, to carbonylgrupper kan danne med hinanden?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på formlerne for de seks grupper i tabellen. En ladning ses som et plus eller et minus. En hydrogenbinding kræver et hydrogenatom, der sidder på O eller N, i den ene gruppe og et O eller N i den anden gruppe.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Methylgruppen og benzenringen består kun af carbon og hydrogen. Sådan en gruppe er upolær.</p>
+<p>Du kan begynde svaret om carbonylgruppen sådan: “En hydrogenbinding kræver to ting: … Carbonylgruppen har …, så den anden gruppe skal have …”</p>
+<p>To carbonylgrupper er begge polære, men ingen af dem har et hydrogenatom på O eller N.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Gruppe C, −COO<sup>−</sup>, er negativt ladet, og gruppe D, −NH<sub>3</sub><sup>+</sup>, er positivt ladet. De to grupper kan danne en ion-ionbinding med hinanden.</p></li>
+<li><p>Gruppe A, −OH, har et hydrogenatom på O. Gruppe D, −NH<sub>3</sub><sup>+</sup>, har hydrogenatomer på N.</p></li>
+<li><p>Gruppe B, methylgruppen, og gruppe F, benzenringen, kan kun danne londonbindinger. De består kun af carbon og hydrogen og er upolære. De fire andre grupper danner også londonbindinger, men de kan desuden danne stærkere bindinger.</p></li>
+<li><p>En hydrogenbinding kræver et hydrogenatom, der sidder på O eller N, i den ene gruppe og et O eller N i den anden gruppe. Carbonylgruppen har et oxygenatom. Den kan derfor danne en hydrogenbinding til en gruppe, der har hydrogenatomet, fx en hydroxygruppe: O−H ··· O=C.</p></li>
+<li><p>To carbonylgrupper kan danne en dipol-dipolbinding med hinanden. Begge grupper er polære, men ingen af dem har et hydrogenatom på O eller N. Derfor kan de ikke danne en hydrogenbinding med hinanden.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.3" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.3">Opgave A6.1.3: Den stærkeste binding</h2>
+<p>Et substrat sidder i det aktive center på et enzym ved pH 7. Tabellen viser syv par af grupper, som ligger tæt på hinanden.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Par</th>
+<th style="text-align: left;">Gruppe i substratet</th>
+<th style="text-align: left;">Gruppe i enzymet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: left;">sidekæden i glutaminsyre (Glu)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">−OH</td>
+<td style="text-align: left;">sidekæden i threonin (Thr)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">−CH<sub>2</sub>−CH<sub>3</sub></td>
+<td style="text-align: left;">sidekæden i leucin (Leu)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">−OH</td>
+<td style="text-align: left;">sidekæden i valin (Val)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">−COO<sup>−</sup></td>
+<td style="text-align: left;">sidekæden i serin (Ser)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">C=O i en keton</td>
+<td style="text-align: left;">sidekæden i asparagin (Asn)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">C=O i en keton</td>
+<td style="text-align: left;">en gruppe C=O i enzymets peptidkæde</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Skriv for par 1 til 6, hvilken gruppe sidekæden har ved pH 7.</li>
+<li>Angiv for hvert af de syv par den stærkeste binding, de to grupper kan danne med hinanden.</li>
+<li>Hvilket af de syv par holder stærkest sammen?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find de seks aminosyrer i tabellen under overskriften “Hvilke sidekæder kan hvad?” i afsnit A6.1. Tabellen viser, hvilken gruppe hver sidekæde har ved pH 7.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Stil de samme fire spørgsmål til hvert par af grupper, i denne rækkefølge:</p>
+<ol type="1">
+<li>Er den ene gruppe positivt ladet og den anden negativt ladet? Så er det en ion-ionbinding.</li>
+<li>Har den ene gruppe et hydrogenatom på O eller N, og har den anden et O eller N? Så er det en hydrogenbinding.</li>
+<li>Er begge grupper polære, uden at de kan danne en hydrogenbinding med hinanden? Så er det en dipol-dipolbinding.</li>
+<li>Er en af grupperne upolær? Så er der kun londonbindinger.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>og b.</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 29%">
+<col style="width: 37%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Par</th>
+<th style="text-align: left;">Gruppe i substratet</th>
+<th style="text-align: left;">Gruppe i enzymet ved pH 7</th>
+<th style="text-align: left;">Stærkeste binding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: left;">−COO<sup>−</sup> i glutaminsyre</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">−OH</td>
+<td style="text-align: left;">−OH i threonin</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">−CH<sub>2</sub>−CH<sub>3</sub></td>
+<td style="text-align: left;">carbonkæden i leucin</td>
+<td style="text-align: left;">londonbindinger</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">−OH</td>
+<td style="text-align: left;">carbonkæden i valin</td>
+<td style="text-align: left;">londonbindinger</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">−COO<sup>−</sup></td>
+<td style="text-align: left;">−OH i serin</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">C=O i en keton</td>
+<td style="text-align: left;">−CO−NH<sub>2</sub> i asparagin</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">C=O i en keton</td>
+<td style="text-align: left;">C=O i peptidkæden</td>
+<td style="text-align: left;">dipol-dipolbinding</td>
+</tr>
+</tbody>
+</table>
+<p>Par 4: Hydroxygruppen er polær, men sidekæden i valin er upolær. En upolær gruppe kan kun danne londonbindinger.</p>
+<p>Par 5: Kun den ene af de to grupper er ladet, så det er ikke en ion-ionbinding. Hydrogenatomet i serins hydroxygruppe danner en hydrogenbinding til et oxygenatom i carboxylatgruppen.</p>
+<p>Par 6: Et hydrogenatom på N i amidgruppen danner en hydrogenbinding til oxygenatomet i ketonens carbonylgruppe.</p>
+<p>Par 7: Ingen af de to carbonylgrupper har et hydrogenatom på O eller N. Begge er polære, så bindingen er en dipol-dipolbinding.</p>
+<ol start="3" type="a">
+<li>Par 1 holder stærkest sammen. Ion-ionbindingen er den stærkeste af de fire slags intermolekylære bindinger.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.4" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.4">Opgave A6.1.4: Ladning og pH</h2>
+<p>Sidekæden i asparaginsyre har en carboxylgruppe med p<em>K</em><sub>s</sub> omkring 4. Sidekæden i lysin har en aminogruppe med p<em>K</em><sub>s</sub> omkring 10,5.</p>
+<ol type="a">
+<li>Angiv, hvilken form hver af de to sidekæder har ved pH 2, ved pH 7 og ved pH 12.</li>
+<li>Ved hvilken af de tre pH-værdier kan sidekæden i asparaginsyre og sidekæden i lysin danne en ion-ionbinding med hinanden?</li>
+<li>I et enzym holder sidekæden i asparaginsyre fast på en positivt ladet gruppe i substratet. Forklar, hvad der sker med bindingen, når pH sænkes fra 7 til 2.</li>
+<li>Sidekæden i serin har en hydroxygruppe. Har hydroxygruppen en ladning ved nogen af de tre pH-værdier?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sammenlign pH med p<em>K</em><sub>s</sub> for sidekæden. Er pH lavere end p<em>K</em><sub>s</sub>, har gruppen sin hydron på. Er pH højere end p<em>K</em><sub>s</sub>, har gruppen afgivet hydronen. Tabellen under overskriften “pH ændrer ladningerne” i afsnit A6.1 viser de to former af carboxylgruppen og af aminogruppen.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Carboxylgruppen i asparaginsyre er −COOH med hydronen på og −COO<sup>−</sup> uden. Aminogruppen i lysin er −NH<sub>3</sub><sup>+</sup> med hydronen på og −NH<sub>2</sub> uden. En ion-ionbinding kræver, at den ene gruppe er negativ, og at den anden er positiv.</p>
+<p>Du kan begynde forklaringen sådan: “Ved pH 7 er sidekæden i asparaginsyre på formen …, fordi pH er … end p<em>K</em><sub>s</sub>. Ved pH 2 er sidekæden på formen …, og derfor …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Formerne er</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Sidekæde</th>
+<th style="text-align: center;">pH 2</th>
+<th style="text-align: center;">pH 7</th>
+<th style="text-align: center;">pH 12</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">asparaginsyre, p<em>K</em><sub>s</sub> omkring 4</td>
+<td style="text-align: center;">−COOH</td>
+<td style="text-align: center;">−COO<sup>−</sup></td>
+<td style="text-align: center;">−COO<sup>−</sup></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">lysin, p<em>K</em><sub>s</sub> omkring 10,5</td>
+<td style="text-align: center;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: center;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: center;">−NH<sub>2</sub></td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Ved pH 7. Kun dér er sidekæden i asparaginsyre negativt ladet, samtidig med at sidekæden i lysin er positivt ladet. Ved pH 2 er carboxylgruppen uden ladning, og ved pH 12 er aminogruppen uden ladning.</p></li>
+<li><p>Ved pH 7 er sidekæden i asparaginsyre på formen −COO<sup>−</sup>, fordi pH er højere end p<em>K</em><sub>s</sub>. Den danner en ion-ionbinding til den positivt ladede gruppe i substratet. Ved pH 2 er pH lavere end p<em>K</em><sub>s</sub>, så carboxylgruppen har optaget en hydron og er på formen −COOH uden ladning. Ion-ionbindingen forsvinder. Substratet sidder dårligere fast, og enzymet arbejder langsommere.</p></li>
+<li><p>Nej. Hydroxygruppen i serin afgiver ikke sin hydron i vand og optager heller ikke en hydron. Den er −OH uden ladning ved både pH 2, pH 7 og pH 12, og den kan danne hydrogenbindinger ved alle tre pH-værdier.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.5" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.5">Opgave A6.1.5: Phenylalanin i et aktivt center</h2>
+<p>Phenylalanin er en aminosyre, som vi får fra proteinerne i maden. I leveren omdanner et enzym phenylalanin til aminosyren tyrosin. Virker enzymet ikke, får man sygdommen PKU (Føllings sygdom), som nyfødte i Danmark bliver undersøgt for.</p>
+<p>Ved pH 7 er phenylalanin en amfoion, C<sub>6</sub>H<sub>5</sub>−CH<sub>2</sub>−CH(NH<sub>3</sub><sup>+</sup>)−COO<sup>−</sup>. Figuren viser phenylalanin i enzymets aktive center. Tegningen er forenklet.</p>
+<div id="fig-a6-opg-1-phenylalanin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-phenylalanin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-phenylalanin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Phenylalanin i et aktivt center med tre sidekæder. Bindingerne har numrene 1, 2 og 3."><img src="../figurer/a6-opg-1-phenylalanin.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-phenylalanin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: Phenylalanin i et aktivt center med tre sidekæder. Bindingerne har numrene 1, 2 og 3.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv for hver af bindingerne 1, 2 og 3, hvilken slags binding det er, og hvilke to grupper den er imellem.</li>
+<li>Hvilken af de tre bindinger er den stærkeste?</li>
+<li>Stoffet 3-phenylpropanoat, C<sub>6</sub>H<sub>5</sub>−CH<sub>2</sub>−CH<sub>2</sub>−COO<sup>−</sup>, ligner phenylalanin, men mangler gruppen −NH<sub>3</sub><sup>+</sup>. Forklar, hvorfor 3-phenylpropanoat sidder dårligere fast i det aktive center end phenylalanin.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Se på én binding ad gangen i figuren med phenylalanin. Find gruppen i phenylalanin og gruppen i sidekæden. Er de to grupper ladede med hver sit fortegn? Har den ene et hydrogenatom på O eller N og den anden et O eller N? Eller er en af dem upolær?</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Binding 1 går mellem benzenringen i phenylalanin og sidekæden i leucin. Begge består kun af carbon og hydrogen. Binding 2 går mellem −NH<sub>3</sub><sup>+</sup> i phenylalanin og −COO<sup>−</sup> i glutaminsyre. Binding 3 går mellem −COO<sup>−</sup> i phenylalanin og −OH i serin. Her er kun den ene gruppe ladet.</p>
+<p>Du kan begynde forklaringen sådan: “3-phenylpropanoat mangler gruppen …, så binding nummer … kan ikke dannes. De to andre bindinger …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Bindingerne mellem phenylalanin og de tre sidekæder er</li>
+</ol>
+<div id="fig-a6-opg-1-phenylalanin-facit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-phenylalanin-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-phenylalanin-facit.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: Bindingerne mellem phenylalanin og de tre sidekæder i det aktive center."><img src="../figurer/a6-opg-1-phenylalanin-facit.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-phenylalanin-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: Bindingerne mellem phenylalanin og de tre sidekæder i det aktive center.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Gruppe i phenylalanin</th>
+<th style="text-align: left;">Gruppe i enzymet</th>
+<th style="text-align: left;">Binding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">benzenringen</td>
+<td style="text-align: left;">den upolære sidekæde i leucin</td>
+<td style="text-align: left;">londonbindinger</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: left;">−COO<sup>−</sup> i glutaminsyre</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">−COO<sup>−</sup></td>
+<td style="text-align: left;">hydroxygruppen, −OH, i serin</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+</tbody>
+</table>
+<p>Benzenringen og sidekæden i leucin er begge upolære og kan kun danne londonbindinger. Gruppen −NH<sub>3</sub><sup>+</sup> er positivt ladet, og gruppen −COO<sup>−</sup> i glutaminsyre er negativt ladet, så de danner en ion-ionbinding. Ved binding 3 er kun den ene gruppe ladet. Hydrogenatomet i serins hydroxygruppe danner en hydrogenbinding til et oxygenatom i carboxylatgruppen i phenylalanin.</p>
+<ol start="2" type="a">
+<li><p>Binding 2 er den stærkeste. Ion-ionbindingen er stærkere end hydrogenbindingen, og londonbindingerne er de svageste.</p></li>
+<li><p>3-phenylpropanoat mangler gruppen −NH<sub>3</sub><sup>+</sup>, så ion-ionbindingen til −COO<sup>−</sup> i glutaminsyre, binding 2, kan ikke dannes. 3-phenylpropanoat kan stadig danne londonbindinger til sidekæden i leucin og en hydrogenbinding til hydroxygruppen i serin. Men den stærkeste af de tre bindinger mangler, og derfor sidder 3-phenylpropanoat dårligere fast end phenylalanin.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.6" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.6">Opgave A6.1.6: Et enzyms pH-optimum</h2>
+<p>I det aktive center på et enzym sidder sidekæderne fra en asparaginsyre og en lysin. De holder begge fast på substratet med en ion-ionbinding. Tabellen viser enzymets aktivitet ved forskellige pH-værdier. Aktiviteten er angivet i procent af den højeste aktivitet.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">pH</th>
+<th style="text-align: center;">2</th>
+<th style="text-align: center;">3</th>
+<th style="text-align: center;">4</th>
+<th style="text-align: center;">5</th>
+<th style="text-align: center;">6</th>
+<th style="text-align: center;">7</th>
+<th style="text-align: center;">8</th>
+<th style="text-align: center;">9</th>
+<th style="text-align: center;">10</th>
+<th style="text-align: center;">11</th>
+<th style="text-align: center;">12</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Aktivitet i %</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">90</td>
+<td style="text-align: center;">99</td>
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">99</td>
+<td style="text-align: center;">96</td>
+<td style="text-align: center;">75</td>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">3</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Angiv enzymets pH-optimum.</li>
+<li>Ved hvilken pH er aktiviteten 50 % i den sure ende af tabellen? Sammenlign med p<em>K</em><sub>s</sub> for sidekæden i asparaginsyre.</li>
+<li>Forklar, hvorfor enzymets aktivitet falder, når pH bliver lavere end 5.</li>
+<li>Forklar, hvorfor enzymets aktivitet falder, når pH bliver højere end 9.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et enzyms pH-optimum er den pH, hvor aktiviteten er højest. Til forklaringerne skal du bruge p<em>K</em><sub>s</sub> for de to sidekæder: omkring 4 for carboxylgruppen i asparaginsyre og omkring 10,5 for aminogruppen i lysin.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved pH 7 er sidekæden i asparaginsyre −COO<sup>−</sup>, og sidekæden i lysin er −NH<sub>3</sub><sup>+</sup>. Begge kan danne en ion-ionbinding til substratet. Når pH er lig med p<em>K</em><sub>s</sub>, er halvdelen af grupperne på hver form.</p>
+<p>Du kan begynde forklaringerne sådan: “Når pH nærmer sig 4, optager flere og flere af sidekæderne i asparaginsyre …, så de bliver til … Så forsvinder …” og “Når pH nærmer sig 10,5, afgiver flere og flere af sidekæderne i lysin …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Enzymets pH-optimum er 7, hvor aktiviteten er 100 %. Fra pH 6 til pH 8 er aktiviteten næsten lige så høj.</p></li>
+<li><p>Aktiviteten er 50 % ved pH 4. Det er p<em>K</em><sub>s</sub> for sidekæden i asparaginsyre. Når pH er lig med p<em>K</em><sub>s</sub>, er halvdelen af sidekæderne på formen −COO<sup>−</sup>, og halvdelen er på formen −COOH. Kun halvdelen af enzymmolekylerne kan altså danne ion-ionbindingen til substratet, og aktiviteten er det halve.</p></li>
+<li><p>Når pH bliver lavere end 5, nærmer pH sig p<em>K</em><sub>s</sub> for sidekæden i asparaginsyre. Flere og flere af sidekæderne optager en hydron og bliver til −COOH uden ladning. Så forsvinder ion-ionbindingen mellem asparaginsyre og substratet. Substratet sidder dårligere fast, og aktiviteten falder. Ved pH 2 er næsten alle sidekæderne i asparaginsyre uden ladning, og aktiviteten er kun 1 %.</p></li>
+<li><p>Når pH bliver højere end 9, nærmer pH sig p<em>K</em><sub>s</sub> for sidekæden i lysin. Flere og flere af sidekæderne afgiver en hydron og bliver til −NH<sub>2</sub> uden ladning. Så forsvinder ion-ionbindingen mellem lysin og substratet, og aktiviteten falder. Mellem pH 10 og pH 11 falder aktiviteten fra 75 % til 25 %, og midt imellem ligger p<em>K</em><sub>s</sub> = 10,5.</p></li>
+</ol>
+<p>Ved meget lav og meget høj pH mister enzymet desuden sin foldning og denaturerer.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.7" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.7">Opgave A6.1.7: Frisk ananas i gelé</h2>
+<p>Gelé stivner, fordi proteinet gelatine danner et net af lange kæder, som holder på vandet. Frisk ananas indeholder enzymet bromelain, som spalter proteiner. Ananas på dåse er blevet varmet kraftigt op på fabrikken, så den kan holde sig. I et forsøg laves tre skåle med gelé.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Skål</th>
+<th style="text-align: left;">Tilsat</th>
+<th style="text-align: left;">Efter 4 timer i køleskab</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">ingenting</td>
+<td style="text-align: left;">geléen er stivnet</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">frisk ananas</td>
+<td style="text-align: left;">geléen er flydende</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">ananas fra dåse</td>
+<td style="text-align: left;">geléen er stivnet</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Hvad er substratet for bromelain i forsøget?</li>
+<li>Forklar, hvorfor geléen med frisk ananas ikke stivner.</li>
+<li>Forklar, hvorfor geléen med ananas fra dåse stivner.</li>
+<li>Hvilke bindinger i bromelain bliver brudt ved opvarmningen, og hvilke bliver ikke brudt?</li>
+<li>Frisk ananas blandes med en opløsning af gelatine ved 5 °C og ved 30 °C. Ved hvilken af de to temperaturer spalter bromelain gelatinen hurtigst? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Bromelain er et enzym, og gelatine er et protein. Bromelain klipper peptidkæderne i gelatine i mindre stykker. Tænk over, hvad der sker med et enzym, når det bliver varmet kraftigt op. Det står under overskriften “Temperatur” i afsnit A6.1.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Du kan begynde forklaringerne sådan: “Bromelain spalter …, så kæderne bliver for korte til …” og “Ved opvarmningen er bromelain blevet …, så det aktive center …”</p>
+<p>Bromelain er selv et protein. Foldningen holdes af svage bindinger mellem sidekæderne. Aminosyrerne i kæden holdes sammen af peptidbindinger, som er elektronparbindinger.</p>
+<p>Ved lave temperaturer følger et enzym Arrhenius-ligningen ligesom andre katalysatorer.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Substratet for bromelain er proteinet gelatine.</p></li>
+<li><p>Bromelain i den friske ananas spalter peptidkæderne i gelatine i mindre stykker. De korte stykker kan ikke danne det net, som holder på vandet. Derfor bliver geléen i skål 2 ved med at være flydende.</p></li>
+<li><p>Ved opvarmningen på fabrikken er bromelain blevet denatureret. De svage bindinger, der holder proteinet foldet, er rystet fra hinanden, og det aktive center har mistet sin form. Gelatine passer ikke længere i det aktive center og bliver ikke spaltet. Geléen i skål 3 stivner derfor ligesom geléen uden ananas i skål 1.</p></li>
+<li><p>Ved opvarmningen brydes de svage bindinger, der holder bromelain foldet: hydrogenbindinger, ion-ionbindinger og londonbindinger. Peptidbindingerne mellem aminosyrerne er elektronparbindinger, og de bliver ikke brudt. Kæden er hel, og rækkefølgen af aminosyrer er den samme. Det er kun formen, der er væk.</p></li>
+<li><p>Bromelain spalter gelatinen hurtigst ved 30 °C. Ved så lave temperaturer er bromelain ikke denatureret, og aktiviteten stiger med temperaturen, som Arrhenius-ligningen siger. Ved 30 °C har en større del af sammenstødene energi nok til at komme over aktiveringsenergien end ved 5 °C.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.8" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.8">Opgave A6.1.8: Kompetitiv eller non-kompetitiv?</h2>
+<p>Her er fire inhibitorer.</p>
+<ul>
+<li><span id="ord-inhibitor-a" class="fagord-anker"><strong>Inhibitor A:</strong></span> Sulfonamider er lægemidler mod bakterier. Et sulfonamid ligner stoffet 4-aminobenzoat, som bakterier bruger, når de danner vitaminet folsyre. Sulfonamidet sætter sig i det aktive center på det enzym, der skulle have bundet 4-aminobenzoat.</li>
+<li><span id="ord-inhibitor-b" class="fagord-anker"><strong>Inhibitor B:</strong></span> Cadmiumioner, Cd<sup>2+</sup>, findes i tobaksrøg. De binder sig til SH-grupper i cystein flere steder på et enzym, og enzymet skifter form.</li>
+<li><span id="ord-inhibitor-c" class="fagord-anker"><strong>Inhibitor C:</strong></span> Stoffet X hæmmer et enzym. Når koncentrationen af substrat gøres 20 gange større, er hæmningen næsten væk.</li>
+<li><span id="ord-inhibitor-d" class="fagord-anker"><strong>Inhibitor D:</strong></span> Stoffet Y hæmmer et enzym. Når koncentrationen af substrat gøres 20 gange større, er enzymet hæmmet lige så meget som før.</li>
+</ul>
+<ol type="a">
+<li>Afgør for hver af de fire inhibitorer, om den er en kompetitiv eller en non-kompetitiv inhibitor. Begrund svarene.</li>
+<li>Forklar, hvorfor mere substrat hjælper mod en kompetitiv inhibitor, men ikke mod en non-kompetitiv inhibitor.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>En kompetitiv inhibitor ligner substratet og sætter sig i enzymets aktive center. En non-kompetitiv inhibitor sætter sig et andet sted på enzymet og ændrer enzymets form. Find i beskrivelsen af sulfonamidet og af cadmiumionerne det sted, inhibitoren sætter sig.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For stoffet X og stoffet Y står der ikke, hvor inhibitoren sætter sig. Brug i stedet, hvad der sker, når der kommer mere substrat. En kompetitiv inhibitor konkurrerer med substratet om pladsen i det aktive center.</p>
+<p>Du kan begynde forklaringen sådan: “Når der er meget substrat, er det oftest et molekyle af …, der når først til det aktive center, så …” og “En non-kompetitiv inhibitor sidder …, og derfor …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Inhibitor A, sulfonamidet, er en kompetitiv inhibitor. Sulfonamidet ligner substratet 4-aminobenzoat og sætter sig i enzymets aktive center.</li>
+</ol>
+<p>Inhibitor B, cadmiumionerne, er en non-kompetitiv inhibitor. Cadmiumionerne sætter sig andre steder på enzymet end i det aktive center og ændrer enzymets form.</p>
+<p>Inhibitor C, stoffet X, er en kompetitiv inhibitor. Hæmningen forsvinder næsten, når der er meget substrat. Stoffet X konkurrerer altså med substratet om pladsen i det aktive center.</p>
+<p>Inhibitor D, stoffet Y, er en non-kompetitiv inhibitor. Mere substrat hjælper ikke, så stoffet Y sidder et andet sted på enzymet end substratet.</p>
+<ol start="2" type="a">
+<li>En kompetitiv inhibitor og substratet konkurrerer om den samme plads i det aktive center. Når der er meget substrat, er det oftest et substratmolekyle, der når først til det aktive center, så inhibitoren betyder mindre. En non-kompetitiv inhibitor sidder et andet sted på enzymet og ændrer enzymets form, så det aktive center virker dårligere. Substratet kan ikke skubbe inhibitoren væk, og derfor hjælper det ikke at tilsætte mere substrat.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner dem, du møder til den skriftlige prøve i kemi A. Skriv for hver binding både bindingens navn og de to grupper, den er imellem.</p>
+</section>
+<section id="A6.1.eks.1" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.eks.1">Opgave A6.1.eks.1: Signalstoffet GABA</h2>
+<p>GABA (4-aminobutansyre) er et signalstof i hjernen, som dæmper nervecellernes aktivitet. Når GABA har virket, bliver det nedbrudt af et enzym. Nogle lægemidler mod epilepsi hæmmer enzymet, så der bliver mere GABA i hjernen.</p>
+<p>GABA har to p<em>K</em><sub>s</sub>-værdier: 4,0 for carboxylgruppen og 10,6 for gruppen −NH<sub>3</sub><sup>+</sup>. Ved pH 7,4 findes GABA på formen <sup>+</sup>H<sub>3</sub>N−CH<sub>2</sub>−CH<sub>2</sub>−CH<sub>2</sub>−COO<sup>−</sup>. Figuren viser GABA i enzymets aktive center. Tegningen er forenklet.</p>
+<div id="fig-a6-opg-1-gaba" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-gaba-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-gaba.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: GABA i et aktivt center med tre sidekæder. Bindingerne har numrene 1, 2 og 3."><img src="../figurer/a6-opg-1-gaba.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-gaba-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: GABA i et aktivt center med tre sidekæder. Bindingerne har numrene 1, 2 og 3.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv de typer af intermolekylære bindinger, der kan være mellem GABA og enzymets sidekæder ved 1, 2 og 3.</li>
+<li>Begrund ud fra de to p<em>K</em><sub>s</sub>-værdier, at GABA ved pH 7,4 findes på formen <sup>+</sup>H<sub>3</sub>N−CH<sub>2</sub>−CH<sub>2</sub>−CH<sub>2</sub>−COO<sup>−</sup>.</li>
+<li>Forklar, hvorfor GABA bindes dårligere til enzymet, hvis pH sænkes til 2,0.</li>
+<li>For at komme fra blodet ind i hjernen skal et stof gennem cellemembraner, som er upolære indeni. Vurdér ud fra en polaritetsanalyse, om GABA let kommer gennem en cellemembran ved pH 7,4.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find for hvert nummer i figuren gruppen i GABA og gruppen i sidekæden. Skriv bindingens navn og de to grupper.</p>
+<p>Sammenlign pH 7,4 med hver af de to p<em>K</em><sub>s</sub>-værdier for GABA. Er pH højere end p<em>K</em><sub>s</sub>, har gruppen afgivet sin hydron. Er pH lavere end p<em>K</em><sub>s</sub>, har gruppen hydronen på.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved 1 sidder −NH<sub>3</sub><sup>+</sup> i GABA over for −COO<sup>−</sup> i glutaminsyre. Ved 2 sidder carbonkæden i GABA over for benzenringen i phenylalanin. Ved 3 sidder −COO<sup>−</sup> i GABA over for −NH<sub>3</sub><sup>+</sup> i lysin.</p>
+<p>Ved pH 2,0 skal du se på alle fire ladede grupper: de to i GABA og de to i sidekæderne. Sidekæden i glutaminsyre har p<em>K</em><sub>s</sub> omkring 4, og sidekæden i lysin har p<em>K</em><sub>s</sub> omkring 10,5. Du kan begynde sådan: “Ved pH 2,0 er pH lavere end p<em>K</em><sub>s</sub> for …, så … bliver til … Derfor kan …”</p>
+<p>En polaritetsanalyse af GABA nævner de polære grupper, de upolære dele og hvad der vejer tungest. En ladet gruppe er meget polær.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Bindingerne mellem GABA og de tre sidekæder er</li>
+</ol>
+<div id="fig-a6-opg-1-gaba-facit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-gaba-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-gaba-facit.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figur&nbsp;4: Bindingerne mellem GABA og de tre sidekæder i det aktive center."><img src="../figurer/a6-opg-1-gaba-facit.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-gaba-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;4: Bindingerne mellem GABA og de tre sidekæder i det aktive center.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Gruppe i GABA</th>
+<th style="text-align: left;">Gruppe i enzymet</th>
+<th style="text-align: left;">Binding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: left;">−COO<sup>−</sup> i glutaminsyre</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">carbonkæden</td>
+<td style="text-align: left;">benzenringen i phenylalanin</td>
+<td style="text-align: left;">londonbindinger</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">−COO<sup>−</sup></td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup> i lysin</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+</tbody>
+</table>
+<p>Ved 1 og 3 er den ene gruppe positivt ladet og den anden negativt ladet, så de tiltrækker hinanden med en ion-ionbinding. Carbonkæden i GABA og benzenringen i phenylalanin er begge upolære og kan kun danne londonbindinger.</p>
+<ol start="2" type="a">
+<li>Carboxylgruppen i GABA har p<em>K</em><sub>s</sub> = 4,0. pH 7,4 er 3,4 højere end p<em>K</em><sub>s</sub>, så carboxylgruppen har afgivet sin hydron og er på formen −COO<sup>−</sup>. Basebrøken er</li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{b} = \frac{1}{1 + 10^{\,4{,}0 - 7{,}4}} = 0{,}9996
+\]</span></p>
+<p>Gruppen −NH<sub>3</sub><sup>+</sup> i GABA har p<em>K</em><sub>s</sub> = 10,6. pH 7,4 er 3,2 lavere end p<em>K</em><sub>s</sub>, så gruppen har sin hydron på. Syrebrøken er</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,7{,}4 - 10{,}6}} = 0{,}9994
+\]</span></p>
+<p>Over 99,9 % af carboxylgrupperne er altså på formen −COO<sup>−</sup>, og over 99,9 % af aminogrupperne er på formen −NH<sub>3</sub><sup>+</sup>. GABA findes derfor som amfoionen <sup>+</sup>H<sub>3</sub>N−CH<sub>2</sub>−CH<sub>2</sub>−CH<sub>2</sub>−COO<sup>−</sup> ved pH 7,4.</p>
+<ol start="3" type="a">
+<li>Ved pH 2,0 er pH lavere end p<em>K</em><sub>s</sub> for begge carboxylgrupper. Carboxylgruppen i GABA, som har p<em>K</em><sub>s</sub> = 4,0, optager en hydron og bliver til −COOH. Sidekæden i glutaminsyre, som har p<em>K</em><sub>s</sub> omkring 4, bliver også til −COOH. Ingen af de to grupper har længere en ladning. Grupperne −NH<sub>3</sub><sup>+</sup> i GABA og i lysin er uændrede.</li>
+</ol>
+<p>Ved 1 sidder −NH<sub>3</sub><sup>+</sup> i GABA nu over for −COOH i glutaminsyre, og ved 3 sidder −COOH i GABA over for −NH<sub>3</sub><sup>+</sup> i lysin. Ingen af de to ion-ionbindinger kan dannes. Grupperne kan i stedet danne hydrogenbindinger, som er svagere. Londonbindingerne ved 2 er uændrede. GABA sidder derfor dårligere fast i det aktive center, og enzymet arbejder langsommere.</p>
+<ol start="4" type="a">
+<li>Ved pH 7,4 har GABA to ladede grupper, −NH<sub>3</sub><sup>+</sup> og −COO<sup>−</sup>. De er meget polære og danner hydrogenbindinger til vand. Den upolære del af GABA er kun de tre CH<sub>2</sub>-grupper. Én ladet gruppe kan trække langt flere end fire carbonatomer med ned i vand, og GABA har to ladede grupper til fire carbonatomer. GABA er derfor meget polært ved pH 7,4 og foretrækker vand frem for det upolære indre af en cellemembran. GABA kommer altså ikke let gennem en cellemembran.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.eks.2" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.eks.2">Opgave A6.1.eks.2: Malonat hæmmer et enzym</h2>
+<p>I cellernes mitokondrier omdanner enzymet succinatdehydrogenase stoffet succinat. Det er et af trinene, når cellen forbrænder næringsstoffer. Succinat er den ion, butandisyre danner ved cellens pH: <sup>−</sup>OOC−CH<sub>2</sub>−CH<sub>2</sub>−COO<sup>−</sup>.</p>
+<p>Figuren viser succinat i enzymets aktive center. Tegningen er forenklet. Sidekæden i arginin (Arg) ender i gruppen −C(NH<sub>2</sub>)<sub>2</sub><sup>+</sup>, som er positivt ladet.</p>
+<div id="fig-a6-opg-1-succinat" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-succinat-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-succinat.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figur&nbsp;5: Succinat i et aktivt center med fire sidekæder. Bindingerne har numrene 1, 2, 3 og 4."><img src="../figurer/a6-opg-1-succinat.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-succinat-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;5: Succinat i et aktivt center med fire sidekæder. Bindingerne har numrene 1, 2, 3 og 4.
+</figcaption>
+</figure>
+</div>
+<p>Stoffet malonat, <sup>−</sup>OOC−CH<sub>2</sub>−COO<sup>−</sup>, hæmmer enzymet. I et forsøg måles starthastigheden <em>v</em><sub>0</sub> ved tre koncentrationer af succinat, først uden malonat og derefter med malonat. Koncentrationen af malonat er den samme i de tre målinger med malonat.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">[succinat] i mM</th>
+<th style="text-align: center;">0,50</th>
+<th style="text-align: center;">5,0</th>
+<th style="text-align: center;">50</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>v</em><sub>0</sub> uden malonat i µM/min</td>
+<td style="text-align: center;">33</td>
+<td style="text-align: center;">84</td>
+<td style="text-align: center;">98</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>v</em><sub>0</sub> med malonat i µM/min</td>
+<td style="text-align: center;">9,0</td>
+<td style="text-align: center;">51</td>
+<td style="text-align: center;">91</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Angiv de typer af intermolekylære bindinger, der kan være mellem succinat og enzymets sidekæder ved 1, 2, 3 og 4.</li>
+<li>Forklar ud fra strukturerne af succinat og malonat, hvorfor malonat kan sætte sig i enzymets aktive center.</li>
+<li>Undersøg, om måleresultaterne passer med, at malonat er en kompetitiv inhibitor.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find for hvert nummer i figuren gruppen i succinat og gruppen i sidekæden. Ved 3 og 4 er det den samme gruppe i succinat, men to forskellige sidekæder.</p>
+<p>Sammenlign formlerne for succinat og malonat. Hvilke grupper har de to ioner til fælles?</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ved 3 i figuren med succinat er kun den ene af de to grupper ladet. Ved 1 og 4 er begge grupper ladede.</p>
+<p>Du kan begynde forklaringen sådan: “Malonat har ligesom succinat to …, og de kan danne … til …”</p>
+<p>Beregn for hver af de tre koncentrationer af succinat, hvor mange procent af starthastigheden der er tilbage, når der er malonat i opløsningen. En kompetitiv inhibitor betyder mindre, når der er meget substrat.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Bindingerne mellem succinat og de fire sidekæder er</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 37%">
+<col style="width: 35%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Gruppe i succinat</th>
+<th style="text-align: left;">Gruppe i enzymet</th>
+<th style="text-align: left;">Binding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">−COO<sup>−</sup> til venstre</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup> i lysin</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">carbonkæden, −CH<sub>2</sub>−CH<sub>2</sub>−</td>
+<td style="text-align: left;">methylgruppen i alanin</td>
+<td style="text-align: left;">londonbindinger</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">−COO<sup>−</sup> til højre</td>
+<td style="text-align: left;">hydroxygruppen, −OH, i threonin</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">−COO<sup>−</sup> til højre</td>
+<td style="text-align: left;">−C(NH<sub>2</sub>)<sub>2</sub><sup>+</sup> i arginin</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+</tbody>
+</table>
+<p>Ved 1 og 4 er carboxylatgruppen negativt ladet og sidekæden positivt ladet, så bindingen er en ion-ionbinding. Carbonkæden i succinat og methylgruppen i alanin er upolære og kan kun danne londonbindinger. Ved 3 er kun carboxylatgruppen ladet. Hydrogenatomet i threonins hydroxygruppe danner en hydrogenbinding til et oxygenatom i carboxylatgruppen.</p>
+<ol start="2" type="a">
+<li><p>Malonat har ligesom succinat to carboxylatgrupper, −COO<sup>−</sup>, og en kort carbonkæde imellem dem. Malonat er kun én CH<sub>2</sub>-gruppe kortere end succinat. De to carboxylatgrupper i malonat kan derfor danne ion-ionbindinger til de positivt ladede sidekæder i lysin og arginin og en hydrogenbinding til hydroxygruppen i threonin, ligesom succinat gør. Malonat ligner altså substratet så meget, at det kan sætte sig i det aktive center og optage pladsen for succinat.</p></li>
+<li><p>For hver koncentration af succinat beregnes, hvor stor en del af starthastigheden der er tilbage med malonat.</p></li>
+</ol>
+<p>Ved 0,50 mM succinat:</p>
+<p><span class="math display">\[
+\text{andel tilbage} = \frac{9{,}0\ \dfrac{\mathrm{\mu M}}{\mathrm{min}}}{33\ \dfrac{\mathrm{\mu M}}{\mathrm{min}}} = 0{,}27 = 27\ \%
+\]</span></p>
+<p>Ved 5,0 mM succinat:</p>
+<p><span class="math display">\[
+\text{andel tilbage} = \frac{51\ \dfrac{\mathrm{\mu M}}{\mathrm{min}}}{84\ \dfrac{\mathrm{\mu M}}{\mathrm{min}}} = 0{,}61 = 61\ \%
+\]</span></p>
+<p>Ved 50 mM succinat:</p>
+<p><span class="math display">\[
+\text{andel tilbage} = \frac{91\ \dfrac{\mathrm{\mu M}}{\mathrm{min}}}{98\ \dfrac{\mathrm{\mu M}}{\mathrm{min}}} = 0{,}93 = 93\ \%
+\]</span></p>
+<p>Ved den laveste koncentration af succinat er kun 27 % af starthastigheden tilbage. Ved den højeste er 93 % tilbage. Jo mere succinat der er, jo mindre betyder malonat. Det passer med, at malonat er en kompetitiv inhibitor: malonat og succinat konkurrerer om pladsen i det aktive center, og når der er meget succinat, er det oftest succinat, der når først. Med en non-kompetitiv inhibitor ville det ikke hjælpe at tilsætte mere succinat, og der ville være omtrent samme procentdel tilbage ved alle tre koncentrationer.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.eks.3" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.eks.3">Opgave A6.1.eks.3: Trypsin klipper efter lysin</h2>
+<p>Trypsin er et enzym i tyndtarmen, som spalter proteinerne fra maden. Trypsin klipper peptidkæden over lige efter aminosyrerne lysin og arginin. Sidekæden fra lysin passer ned i en lomme i trypsins aktive center, og i bunden af lommen sidder en asparaginsyre. Trypsin arbejder bedst omkring pH 8.</p>
+<p>Figuren viser sidekæden fra en lysin i det protein, der skal spaltes. Sidekæden sidder i lommen i trypsin. Tegningen er forenklet. Regn med p<em>K</em><sub>s</sub> = 4,0 for sidekæden i asparaginsyre og p<em>K</em><sub>s</sub> = 10,5 for sidekæden i lysin.</p>
+<div id="fig-a6-opg-1-trypsin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-trypsin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-trypsin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Figur&nbsp;6: Sidekæden fra lysin i lommen i trypsin med tre af trypsins sidekæder. Bindingerne har numrene 1, 2 og 3."><img src="../figurer/a6-opg-1-trypsin.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-trypsin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;6: Sidekæden fra lysin i lommen i trypsin med tre af trypsins sidekæder. Bindingerne har numrene 1, 2 og 3.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv de typer af intermolekylære bindinger, der kan være mellem sidekæden fra lysin og trypsins sidekæder ved 1, 2 og 3.</li>
+<li>Beregn, hvor stor en del af sidekæderne i asparaginsyre der er på formen −COO<sup>−</sup> ved pH 3,0.</li>
+<li>Forklar, hvorfor trypsin binder sidekæden fra lysin dårligere både ved pH 3,0 og ved pH 12,0 end ved pH 8.</li>
+<li>Trypsin klipper ikke efter aminosyren phenylalanin, som har sidekæden −CH<sub>2</sub>−C<sub>6</sub>H<sub>5</sub>. Forklar hvorfor.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find for hvert nummer i figuren gruppen i sidekæden fra lysin og gruppen i trypsins sidekæde. Ved 2 og 3 er det den samme gruppe i lysin, men to forskellige sidekæder i trypsin.</p>
+<p>Formen −COO<sup>−</sup> er baseformen af sidekæden i asparaginsyre. Den del, der er på baseform, er basebrøken, <em>x</em><sub>b</sub> = 1 / (1 + 10<sup>p<em>K</em><sub>s</sub>&nbsp;−&nbsp;pH</sup>), fra <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html">afsnit A1.7</a>.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For sidekæden i asparaginsyre er p<em>K</em><sub>s</sub> − pH = 4,0 − 3,0 = 1,0 ved pH 3,0.</p>
+<p>Du kan begynde forklaringen om pH sådan: “Ved pH 8 er sidekæden i asparaginsyre …, og sidekæden fra lysin er …, så de danner … Ved pH 3,0 er de fleste sidekæder i asparaginsyre … Ved pH 12,0 er de fleste sidekæder fra lysin …”</p>
+<p>Sammenlign sidekæden fra phenylalanin med sidekæden fra lysin. Hvilke af de tre bindinger i figuren kan sidekæden fra phenylalanin danne?</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Bindingerne mellem sidekæden fra lysin og de tre sidekæder i trypsin er</li>
+</ol>
+<div id="fig-a6-opg-1-trypsin-facit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-trypsin-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-trypsin-facit.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Figur&nbsp;7: Bindingerne mellem sidekæden fra lysin og de tre sidekæder i trypsin."><img src="../figurer/a6-opg-1-trypsin-facit.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-trypsin-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;7: Bindingerne mellem sidekæden fra lysin og de tre sidekæder i trypsin.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 48%">
+<col style="width: 29%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Gruppe i sidekæden fra lysin</th>
+<th style="text-align: left;">Gruppe i trypsin</th>
+<th style="text-align: left;">Binding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">carbonkæden, fire CH<sub>2</sub>-grupper</td>
+<td style="text-align: left;">sidekæden i valin</td>
+<td style="text-align: left;">londonbindinger</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: left;">hydroxygruppen, −OH, i serin</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup></td>
+<td style="text-align: left;">−COO<sup>−</sup> i asparaginsyre</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+</tbody>
+</table>
+<p>Carbonkæden og sidekæden i valin er upolære og kan kun danne londonbindinger. Ved 2 er kun den ene gruppe ladet. Et hydrogenatom på N i gruppen −NH<sub>3</sub><sup>+</sup> danner en hydrogenbinding til oxygenatomet i serins hydroxygruppe. Ved 3 er gruppen −NH<sub>3</sub><sup>+</sup> positivt ladet og gruppen −COO<sup>−</sup> negativt ladet, så de danner en ion-ionbinding.</p>
+<ol start="2" type="a">
+<li>Formen −COO<sup>−</sup> er baseformen af sidekæden i asparaginsyre. Basebrøken ved pH 3,0 er</li>
+</ol>
+<p><span class="math display">\[
+x_\mathrm{b} = \frac{1}{1 + 10^{\,4{,}0 - 3{,}0}} = 0{,}091
+\]</span></p>
+<p>Ved pH 3,0 er 9,1 % af sidekæderne i asparaginsyre på formen −COO<sup>−</sup>. Resten er på formen −COOH.</p>
+<ol start="3" type="a">
+<li>Ved pH 8 er pH langt over p<em>K</em><sub>s</sub> = 4,0 for sidekæden i asparaginsyre, så den er på formen −COO<sup>−</sup>. pH er også langt under p<em>K</em><sub>s</sub> = 10,5 for sidekæden fra lysin, så den er på formen −NH<sub>3</sub><sup>+</sup>. De to grupper danner ion-ionbindingen ved 3.</li>
+</ol>
+<p>Ved pH 3,0 er kun 9,1 % af sidekæderne i asparaginsyre negativt ladede. I de fleste molekyler af trypsin er gruppen −COOH uden ladning, og ion-ionbindingen ved 3 kan ikke dannes.</p>
+<p>Ved pH 12,0 er pH højere end p<em>K</em><sub>s</sub> = 10,5 for sidekæden fra lysin. Syrebrøken er</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,12{,}0 - 10{,}5}} = 0{,}031
+\]</span></p>
+<p>Kun 3,1 % af sidekæderne fra lysin er på formen −NH<sub>3</sub><sup>+</sup>. Resten har afgivet en hydron og er på formen −NH<sub>2</sub> uden ladning, så ion-ionbindingen ved 3 kan heller ikke dannes her.</p>
+<p>Ved både pH 3,0 og pH 12,0 mangler altså den stærkeste af de tre bindinger. Sidekæden fra lysin sidder dårligere fast i lommen, og trypsin arbejder langsommere. Det passer med, at trypsin har sit pH-optimum mellem de to p<em>K</em><sub>s</sub>-værdier.</p>
+<ol start="4" type="a">
+<li>Sidekæden fra phenylalanin, −CH<sub>2</sub>−C<sub>6</sub>H<sub>5</sub>, består kun af carbon og hydrogen og er upolær. Den har ingen ladning og kan ikke danne en ion-ionbinding til −COO<sup>−</sup> i asparaginsyre. Den har heller ikke noget O eller N og kan ikke danne en hydrogenbinding til hydroxygruppen i serin. Sidekæden fra phenylalanin kan kun danne londonbindinger, som er de svageste. Den sidder derfor meget dårligere fast i lommen end sidekæden fra lysin, og trypsin klipper ikke efter phenylalanin.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A6.1.eks.4" class="level2">
+<h2 class="anchored" data-anchor-id="A6.1.eks.4">Opgave A6.1.eks.4: Et statin mod kolesterol</h2>
+<p>For meget kolesterol i blodet øger risikoen for blodpropper. Statiner er lægemidler, som sænker blodets indhold af kolesterol. De hæmmer et enzym i leveren, som kroppen bruger, når den danner kolesterol. En del af statinmolekylet ligner enzymets substrat og sætter sig i det aktive center.</p>
+<p>Den aktive form af statinet simvastatin kan ved pH 7,4 skrives R−CH(OH)−CH<sub>2</sub>−CH(OH)−CH<sub>2</sub>−COO<sup>−</sup>. R er resten af molekylet. Den består mest af ringe og carbonkæder og er overvejende upolær. Figuren viser den aktive form af simvastatin i enzymets aktive center. Tegningen er forenklet.</p>
+<div id="fig-a6-opg-1-statin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-statin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-statin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-8" title="Figur&nbsp;8: Den aktive form af simvastatin i et aktivt center med fire sidekæder. Bindingerne har numrene 1, 2, 3 og 4."><img src="../figurer/a6-opg-1-statin.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-statin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;8: Den aktive form af simvastatin i et aktivt center med fire sidekæder. Bindingerne har numrene 1, 2, 3 og 4.
+</figcaption>
+</figure>
+</div>
+<p>I tabletten er simvastatin en ester. Carboxylgruppen har reageret med hydroxygruppen ved 2 i figuren og dannet en ring. Esteren har derfor hverken gruppen −COO<sup>−</sup> eller hydroxygruppen ved 2. I kroppen reagerer esteren med vand og bliver til den aktive form.</p>
+<ol type="a">
+<li>Angiv de typer af intermolekylære bindinger, der kan være mellem den aktive form af simvastatin og enzymets sidekæder ved 1, 2, 3 og 4.</li>
+<li>Forklar, hvorfor esteren binder dårligere til enzymet end den aktive form af simvastatin.</li>
+<li>Angiv reaktionstypen for den reaktion, hvor esteren bliver til den aktive form af simvastatin.</li>
+<li>Carboxylgruppen i den aktive form af simvastatin har p<em>K</em><sub>s</sub> = 4,5. Vurdér, hvilken af de to former af simvastatin der lettest kommer gennem en cellemembran ved pH 7,4.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-34-contents" aria-controls="callout-34" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-34" class="callout-34-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Find for hvert nummer i figuren gruppen i simvastatin og gruppen i sidekæden. Ved 2 er sidekæden i asparaginsyre ladet, men hydroxygruppen i simvastatin er det ikke.</p>
+<p>Esteren af simvastatin mangler to af de grupper, den aktive form har. Se på, hvilke af de fire bindinger i figuren de to grupper er med i.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-35-contents" aria-controls="callout-35" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-35" class="callout-35-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Du kan begynde forklaringen sådan: “Esteren af simvastatin har ingen gruppe −COO<sup>−</sup>, så bindingen ved … kan ikke dannes. Esteren har heller ingen hydroxygruppe ved 2, så …”</p>
+<p>Reaktionstyperne står i <a href="../kapitler/a3-3-reaktionstyper.html">afsnit A3.3</a>. Esteren reagerer med vand, og en estergruppe bliver til en carboxylgruppe og en hydroxygruppe.</p>
+<p>Kun den uladede form af et stof kommer let gennem en cellemembran. Sammenlign pH 7,4 med p<em>K</em><sub>s</sub> = 4,5 for carboxylgruppen i den aktive form af simvastatin. Esteren har ingen gruppe, der er en syre eller en base.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-36-contents" aria-controls="callout-36" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-36" class="callout-36-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Bindingerne mellem den aktive form af simvastatin og de fire sidekæder er</li>
+</ol>
+<div id="fig-a6-opg-1-statin-facit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a6-opg-1-statin-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a6-opg-1-statin-facit.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-9" title="Figur&nbsp;9: Bindingerne mellem den aktive form af simvastatin og de fire sidekæder i det aktive center."><img src="../figurer/a6-opg-1-statin-facit.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a6-opg-1-statin-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;9: Bindingerne mellem den aktive form af simvastatin og de fire sidekæder i det aktive center.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 40%">
+<col style="width: 33%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Gruppe i simvastatin</th>
+<th style="text-align: left;">Gruppe i enzymet</th>
+<th style="text-align: left;">Binding</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">den upolære del, R</td>
+<td style="text-align: left;">den upolære sidekæde i leucin</td>
+<td style="text-align: left;">londonbindinger</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">hydroxygruppen, −OH</td>
+<td style="text-align: left;">−COO<sup>−</sup> i asparaginsyre</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">hydroxygruppen, −OH</td>
+<td style="text-align: left;">−CO−NH<sub>2</sub> i asparagin</td>
+<td style="text-align: left;">hydrogenbinding</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">−COO<sup>−</sup></td>
+<td style="text-align: left;">−NH<sub>3</sub><sup>+</sup> i lysin</td>
+<td style="text-align: left;">ion-ionbinding</td>
+</tr>
+</tbody>
+</table>
+<p>Ved 1 er begge dele upolære og kan kun danne londonbindinger. Ved 2 er kun sidekæden ladet, så det er ikke en ion-ionbinding. Hydrogenatomet i hydroxygruppen danner en hydrogenbinding til et oxygenatom i carboxylatgruppen. Ved 3 har både hydroxygruppen og amidgruppen, −CO−NH<sub>2</sub>, hydrogenatomer på O eller N, og begge har et O eller N, så de danner en hydrogenbinding. Ved 4 er carboxylatgruppen negativt ladet og gruppen −NH<sub>3</sub><sup>+</sup> positivt ladet, så de danner en ion-ionbinding.</p>
+<ol start="2" type="a">
+<li><p>Esteren af simvastatin har ingen gruppe −COO<sup>−</sup>. Estergruppen har ingen ladning, så ion-ionbindingen til −NH<sub>3</sub><sup>+</sup> i lysin ved 4 kan ikke dannes. Gruppen −NH<sub>3</sub><sup>+</sup> kan i stedet danne en hydrogenbinding til et oxygenatom i estergruppen, men den er svagere. Esteren har heller ingen hydroxygruppe ved 2. Oxygenatomet sidder der stadig, men det har ikke noget hydrogenatom, og det har carboxylatgruppen i asparaginsyre heller ikke. Hydrogenbindingen ved 2 kan derfor ikke dannes. Esteren mangler altså hydrogenbindingen ved 2 og ion-ionbindingen ved 4, som er den stærkeste af de fire bindinger. Derfor binder esteren dårligere til enzymet end den aktive form.</p></li>
+<li><p>Reaktionen er en hydrolyse. Esteren reagerer med vand, og estergruppen bliver spaltet til en carboxylgruppe og en hydroxygruppe. Fordi de to grupper sidder i det samme molekyle, bliver ringen åbnet, og der dannes kun ét produkt.</p></li>
+<li><p>Esteren af simvastatin har ingen gruppe, der er en syre eller en base. Den er uladet ved alle pH-værdier, og den er overvejende upolær: uden for R har den kun estergruppen og én hydroxygruppe som polære grupper.</p></li>
+</ol>
+<p>Den aktive form af simvastatin har en carboxylgruppe med p<em>K</em><sub>s</sub> = 4,5. Ved pH 7,4 er syrebrøken</p>
+<p><span class="math display">\[
+x_\mathrm{s} = \frac{1}{1 + 10^{\,7{,}4 - 4{,}5}} = 1{,}3 \cdot 10^{-3}
+\]</span></p>
+<p>Kun 0,13 % af den aktive form er uladet. Resten er en negativ ion, som er meget mere polær og bliver i vandet. For en syre er log <em>D</em> = log <em>P</em> + log <em>x</em><sub>s</sub>, og</p>
+<p><span class="math display">\[
+\log x_\mathrm{s} = \log\left(1{,}3 \cdot 10^{-3}\right) = -2{,}9
+\]</span></p>
+<p>For den aktive form af simvastatin er log <em>D</em> altså 2,9 lavere end log <em>P</em> ved pH 7,4. For esteren er log <em>D</em> lig med log <em>P</em>, fordi esteren ikke har nogen ladet form.</p>
+<p>Esteren kommer derfor lettest gennem en cellemembran ved pH 7,4. Det passer med, at simvastatin gives som ester: esteren optages let, og i kroppen dannes den aktive form, som binder godt til enzymet.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+
+// Temaopgaver kan klappes sammen.
+
+//
+
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+
+  if (!temaer.length) return;
+
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+
+
+  function husk(id, aaben) {
+
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+
+  }
+
+  function husket(id) {
+
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+
+  }
+
+  function tocPunkt(id) {
+
+    var link = document.getElementById("toc-" + id);
+
+    return link ? link.closest("li") : null;
+
+  }
+
+
+
+  var alle = temaer.map(function (tema) {
+
+    var h2 = tema.querySelector("h2");
+
+    var indhold = document.createElement("div");
+
+    indhold.className = "tema-indhold";
+
+    indhold.id = tema.id + "-opgaver";
+
+    var opgaver = [];
+
+    var naeste = tema.nextElementSibling;
+
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+
+      var flyt = naeste;
+
+      naeste = naeste.nextElementSibling;
+
+      indhold.appendChild(flyt);
+
+      opgaver.push(flyt);
+
+    }
+
+    tema.appendChild(indhold);
+
+
+
+    var antal = document.createElement("span");
+
+    antal.className = "tema-antal";
+
+    antal.textContent = opgaver.length + " opgaver";
+
+    h2.appendChild(antal);
+
+    h2.setAttribute("role", "button");
+
+    h2.setAttribute("tabindex", "0");
+
+    h2.setAttribute("aria-controls", indhold.id);
+
+
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+
+    t.saet = function (aaben, gem) {
+
+      t.aaben = aaben;
+
+      indhold.classList.toggle("lukket", !aaben);
+
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+
+      opgaver.forEach(function (o) {
+
+        var li = tocPunkt(o.id);
+
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+
+      });
+
+      var punkt = document.getElementById("toc-" + tema.id);
+
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+
+      if (gem) husk(tema.id, aaben);
+
+    };
+
+    h2.addEventListener("click", function (e) {
+
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+
+      t.saet(!t.aaben, true);
+
+    });
+
+    h2.addEventListener("keydown", function (e) {
+
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+
+    });
+
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+
+    var punkt = document.getElementById("toc-" + tema.id);
+
+    if (punkt) {
+
+      punkt.classList.add("tema-punkt");
+
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+
+    }
+
+
+
+    t.saet(alleAabne || husket(tema.id), false);
+
+    return t;
+
+  });
+
+  // Til stil/lektielinks.html, som åbner og skjuler temaer, når siden kun viser udvalgte opgaver
+
+  window.kemibogenTemaer = alle;
+
+
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+
+  function aabnTilAnker() {
+
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+
+    if (!id) return;
+
+    var maal = document.getElementById(id);
+
+    if (!maal) return;
+
+    alle.forEach(function (t) {
+
+      if (!t.aaben && t.indhold.contains(maal)) {
+
+        t.saet(true, false);
+
+        maal.scrollIntoView();
+
+      }
+
+    });
+
+  }
+
+  aabnTilAnker();
+
+  window.addEventListener("hashchange", aabnTilAnker);
+
+
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+
+  var venter = false;
+
+  function retMarkering() {
+
+    venter = false;
+
+    alle.forEach(function (t) {
+
+      var punkt = document.getElementById("toc-" + t.tema.id);
+
+      if (!punkt) return;
+
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+
+        var link = document.getElementById("toc-" + o.id);
+
+        return link && link.classList.contains("active");
+
+      });
+
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+
+    });
+
+  }
+
+  window.addEventListener("scroll", function () {
+
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+
+  }, { passive: true });
+
+});
+
+</script>
+
+<script>
+
+// Trin for trin.
+
+//
+
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+
+// (eller teksten fra trinets egenskab knap="...")
+
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+
+      return el.classList.contains("trin");
+
+    });
+
+    if (trin.length < 2) return;
+
+
+
+    var stak = document.createElement("div");
+
+    stak.className = "trin-stak";
+
+    boks.insertBefore(stak, trin[0]);
+
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+
+
+    var bjaelke = document.createElement("div");
+
+    bjaelke.className = "trin-bjaelke";
+
+    function knap(tekst, klasse, label) {
+
+      var k = document.createElement("button");
+
+      k.type = "button";
+
+      k.className = klasse;
+
+      k.textContent = tekst;
+
+      if (label) k.setAttribute("aria-label", label);
+
+      bjaelke.appendChild(k);
+
+      return k;
+
+    }
+
+    var nu = 0, visAlle = false;
+
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+
+    var numre = trin.map(function (t, k) {
+
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+
+      return n;
+
+    });
+
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+
+    var alle = knap("Vis alle trin", "trin-alle");
+
+    boks.insertBefore(bjaelke, stak);
+
+
+
+    function vis() {
+
+      boks.classList.toggle("alle", visAlle);
+
+      trin.forEach(function (t, k) {
+
+        t.classList.toggle("vist", k === nu);
+
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+
+        else numre[k].removeAttribute("aria-current");
+
+      });
+
+      forrige.disabled = visAlle || nu === 0;
+
+      naeste.disabled = visAlle || nu === trin.length - 1;
+
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+
+    }
+
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+
+    // Piletasterne bladrer, når en af knapperne har fokus
+
+    bjaelke.addEventListener("keydown", function (e) {
+
+      if (visAlle) return;
+
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+
+    });
+
+
+
+    boks.classList.add("aktiv");
+
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+
+    vis();
+
+  });
+
+});
+
+</script>
+
+<script>
+
+// Figurer, man kan pege på (en boks med klassen "pegefigur" om figuren i .qmd-filen).
+
+//
+
+// Figurprogrammet (vaerktoej/lav_figurer.py) har lagt de dele af figuren, man kan pege på, i
+
+// grupper med klassen "peg" og skrevet en titel og en forklaring på hver gruppe (funktionen peg).
+
+// Dette script henter figuren ind i siden og viser forklaringen i et felt lige under figuren,
+
+// når man peger på en del, trykker på den eller går til den med tabulatortasten og piletasterne.
+
+// Et klik holder forklaringen fast. Nogle dele har "med": så bliver de dele, der hører sammen
+
+// med den, stående, mens resten af figuren bliver bleg (fx vejen gennem et rutediagram).
+
+// En del kan også have hjælpestreger med klassen "peg-kun-fremme", som kun ses, mens man peger på den.
+
+// Uden JavaScript, og når siden skrives ud, er figuren det samme billede som før.
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  var bokse = document.querySelectorAll(".pegefigur");
+
+  if (!bokse.length || !window.fetch || !window.DOMParser) return;
+
+
+
+  var SVG = "http://www.w3.org/2000/svg";
+
+  var BEROERING = window.matchMedia && window.matchMedia("(hover: none)").matches;
+
+  var STANDARD = "Peg på en del af figuren for at se mere.";
+
+  var oensket = /[?&]peg=([^&#]+)/.exec(location.search);   // "?peg=Zn" vælger delen Zn (til gennemsyn som billede)
+
+  oensket = oensket ? decodeURIComponent(oensket[1]) : null;
+
+
+
+  function el(navn, klasse) {
+
+    var e = document.createElement(navn);
+
+    if (klasse) e.className = klasse;
+
+    return e;
+
+  }
+
+  // Forklaringerne bruger figurprogrammets skrivemåde: _{2} er sænket og ^{2+} er hævet skrift.
+
+  // En størrelse mellem to stjerner, *K*, bliver kursiv som i bogens tekst.
+
+  function rig(s) {
+
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+
+            .replace(/_\{([^}]*)\}/g, "<sub>$1</sub>").replace(/\^\{([^}]*)\}/g, "<sup>$1</sup>")
+
+            .replace(/\*([^*\s](?:[^*]*[^*\s])?)\*/g, "<em>$1</em>");
+
+  }
+
+  function ren(s) { return s.replace(/[_^]\{([^}]*)\}/g, "$1").replace(/\*([^*\s](?:[^*]*[^*\s])?)\*/g, "$1"); }
+
+  function ord(s) { return (s || "").split(/\s+/).filter(Boolean); }
+
+
+
+  var loebenr = 0;
+
+  Array.prototype.forEach.call(bokse, function (boks) {
+
+    var billede = boks.querySelector("img");
+
+    if (!billede || !/\.svg([?#]|$)/.test(billede.getAttribute("src") || "")) return;
+
+    fetch(billede.src).then(function (svar) {
+
+      if (!svar.ok) throw new Error("figuren kunne ikke hentes");
+
+      return svar.text();
+
+    }).then(function (kilde) { byg(boks, billede, kilde); })
+
+      .catch(function () { /* Kan figuren ikke hentes, står billedet der bare som før */ });
+
+  });
+
+
+
+  function byg(boks, billede, kilde) {
+
+    // Navne inde i figuren (fx farveovergange) får et forled, så to figurer på samme side ikke deler navn
+
+    var forled = "pf" + (++loebenr) + "-";
+
+    kilde = kilde.replace(/(\s)id="([^"]+)"/g, '$1id="' + forled + '$2"')
+
+                 .replace(/url\(#([^)]+)\)/g, "url(#" + forled + "$1)")
+
+                 .replace(/href="#([^"]+)"/g, 'href="#' + forled + '$1"');
+
+    var svg = new DOMParser().parseFromString(kilde, "image/svg+xml").documentElement;
+
+    if (!svg || svg.nodeName.toLowerCase() !== "svg") return;
+
+    svg = document.importNode(svg, true);
+
+    var grupper = Array.prototype.slice.call(svg.querySelectorAll("g.peg"));
+
+    if (!grupper.length) return;
+
+
+
+    var vejledning = svg.querySelector("g.peg-vejledning");
+
+    var start = vejledning ? vejledning.getAttribute("data-tekst") : STANDARD;
+
+    if (BEROERING) start = start.replace(/^Peg på/, "Tryk på");
+
+    var titel = svg.querySelector("title");
+
+    if (titel) svg.removeChild(titel);   // ellers viser browseren figurens beskrivelse som en gul boble
+
+    var maal = (svg.getAttribute("viewBox") || "").split(/\s+/).map(Number);
+
+    svg.removeAttribute("width");
+
+    svg.removeAttribute("height");
+
+    svg.setAttribute("role", "group");
+
+    svg.setAttribute("class", "peg-svg");
+
+    if (maal.length === 4 && maal[2] > 0) svg.style.width = maal[2] + "px";
+
+
+
+    // Figuren ind i siden i stedet for billedet, og feltet med forklaringen lige under den
+
+    var ramme = el("div", "peg-ramme");
+
+    var gammel = billede.closest("a") || billede;
+
+    gammel.parentNode.replaceChild(ramme, gammel);
+
+    ramme.appendChild(svg);
+
+    var info = el("div", "peg-info");
+
+    info.setAttribute("aria-live", "polite");
+
+    var figur = ramme.closest("figure");
+
+    var billedtekst = figur && figur.querySelector("figcaption");
+
+    if (billedtekst && billedtekst.parentNode === figur) figur.insertBefore(info, billedtekst);
+
+    else ramme.parentNode.insertBefore(info, ramme.nextSibling);
+
+
+
+    // Alle forklaringerne ligger oven på hinanden i feltet, og kun én er synlig. Så er feltet
+
+    // hele tiden lige så højt som den længste forklaring, og siden hopper ikke, når man peger.
+
+    function kort(overskrift, tekst, klasse) {
+
+      var k = el("div", "peg-kort" + (klasse ? " " + klasse : ""));
+
+      if (overskrift) { var t = el("p", "peg-titel"); t.innerHTML = rig(overskrift); k.appendChild(t); }
+
+      (tekst || "").split("\n").forEach(function (afsnit) {
+
+        if (!afsnit.trim()) return;
+
+        var p = el("p"); p.innerHTML = rig(afsnit); k.appendChild(p);
+
+      });
+
+      info.appendChild(k);
+
+      return k;
+
+    }
+
+    var startkort = kort(null, start, "peg-vejledning");
+
+
+
+    var dele = grupper.map(function (g, i) {
+
+      var d = { g: g, nr: i, titel: g.getAttribute("data-titel") || "", tekst: g.getAttribute("data-tekst") || "",
+
+                noegle: g.getAttribute("data-noegle"), i: ord(g.getAttribute("data-i")), med: ord(g.getAttribute("data-med")) };
+
+      d.kort = kort(d.titel, d.tekst);
+
+      g.setAttribute("role", "button");
+
+      g.setAttribute("tabindex", i === 0 ? "0" : "-1");
+
+      g.setAttribute("aria-label", ren(d.titel + (d.tekst ? ". " + d.tekst.replace(/\n/g, " ") : "")));
+
+      return d;
+
+    });
+
+    // De dele, der bliver stående fremme sammen med en del: dem, den nævner i "med", ved navn eller ved gruppe
+
+    dele.forEach(function (d) {
+
+      d.venner = !d.med.length ? [] : dele.filter(function (a) {
+
+        return a !== d && (d.med.indexOf(a.noegle) >= 0 || a.i.some(function (s) { return d.med.indexOf(s) >= 0; }));
+
+      });
+
+    });
+
+
+
+    // Hver del får et usynligt felt, der fanger musen (også mellem bogstaverne), og en ramme til fremhævning
+
+    var maalt = false;
+
+    function maalOp() {
+
+      if (maalt) return;
+
+      // Har delen en flade med klassen "peg-maal", er det den, der bestemmer feltets størrelse
+
+      var kasser = dele.map(function (d) {
+
+        try { return (d.g.querySelector(".peg-maal") || d.g).getBBox(); } catch (e) { return null; }
+
+      });
+
+      if (!kasser.some(function (b) { return b && b.width > 0; })) return;   // figuren er skjult lige nu
+
+      maalt = true;
+
+      dele.forEach(function (d, i) {
+
+        var b = kasser[i];
+
+        if (!b || !b.width) return;
+
+        var luft = 2.5;
+
+        [["peg-felt", true], ["peg-kant", false]].forEach(function (r) {
+
+          var rekt = document.createElementNS(SVG, "rect");
+
+          rekt.setAttribute("x", (b.x - luft).toFixed(1));
+
+          rekt.setAttribute("y", (b.y - luft).toFixed(1));
+
+          rekt.setAttribute("width", (b.width + 2 * luft).toFixed(1));
+
+          rekt.setAttribute("height", (b.height + 2 * luft).toFixed(1));
+
+          rekt.setAttribute("rx", "7");
+
+          rekt.setAttribute("class", r[0]);
+
+          if (r[1]) d.g.insertBefore(rekt, d.g.firstChild); else d.g.appendChild(rekt);
+
+        });
+
+      });
+
+    }
+
+    maalOp();
+
+    svg.addEventListener("pointerover", maalOp);
+
+    svg.addEventListener("focusin", maalOp);
+
+
+
+    var fast = null, vist;
+
+    function vis(d) {
+
+      if (d === vist) return;
+
+      vist = d;
+
+      startkort.classList.toggle("peg-vist", !d);
+
+      dele.forEach(function (a) {
+
+        a.kort.classList.toggle("peg-vist", a === d);
+
+        a.g.classList.toggle("peg-fremme", a === d);
+
+        a.g.classList.toggle("peg-lys", !!d && (a === d || d.venner.indexOf(a) >= 0));
+
+      });
+
+      svg.classList.toggle("peg-daemp", !!d && d.venner.length > 0);
+
+    }
+
+    function fastgoer(d) {
+
+      if (fast) { fast.g.classList.remove("peg-valgt"); fast.g.setAttribute("aria-pressed", "false"); }
+
+      fast = d;
+
+      if (d) {
+
+        d.g.classList.add("peg-valgt");
+
+        d.g.setAttribute("aria-pressed", "true");
+
+        dele.forEach(function (a) { a.g.setAttribute("tabindex", a === d ? "0" : "-1"); });
+
+      }
+
+      vis(d);
+
+    }
+
+
+
+    dele.forEach(function (d) {
+
+      d.g.addEventListener("pointerenter", function () { vis(d); });
+
+      d.g.addEventListener("focus", function () { vis(d); });
+
+      d.g.addEventListener("click", function (e) { fastgoer(fast === d ? null : d); e.stopPropagation(); });
+
+      d.g.addEventListener("keydown", function (e) {
+
+        if (e.key === "Enter" || e.key === " ") { fastgoer(fast === d ? null : d); e.preventDefault(); return; }
+
+        if (e.key === "Escape") { fastgoer(null); return; }
+
+        var trin = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
+
+        if (!trin) return;
+
+        var naeste = dele[d.nr + trin];
+
+        if (naeste) {
+
+          dele.forEach(function (a) { a.g.setAttribute("tabindex", a === naeste ? "0" : "-1"); });
+
+          naeste.g.focus();
+
+        }
+
+        e.preventDefault();
+
+      });
+
+    });
+
+    svg.addEventListener("pointerleave", function () { vis(fast); });
+
+    svg.addEventListener("focusout", function (e) { if (!svg.contains(e.relatedTarget)) vis(fast); });
+
+    svg.addEventListener("click", function () { fastgoer(null); });   // et klik ved siden af slipper forklaringen
+
+
+
+    boks.classList.add("peg-aktiv");
+
+    vis(null);
+
+    if (oensket) {
+
+      var valgt = dele.filter(function (d) { return d.noegle === oensket; })[0];
+
+      if (valgt) fastgoer(valgt);
+
+    }
+
+  }
+
+});
+
+</script>
+
+<script>
+// Lektielinks på opgavesiderne. Se noter/repetition.md.
+//
+// Hver opgave har sit nummer som anker (stil/lektielinks.lua), så adressen til opgave 7.2.3 er
+// .../opgaver/7-2-opgaver.html#7.2.3. Dette script gør tre ting:
+// 1. Ved hver opgave står en lille knap, der kopierer adressen til opgaven.
+// 2. Linjen "Lav et link til udvalgte opgaver" øverst på siden sætter et felt ved hver opgave.
+//    Bjælken nederst kopierer så en adresse, der ender på ?opgaver=7.2.1,7.2.3,7.2.5.
+// 3. Åbnes siden med sådan en adresse, vises kun de valgte opgaver, og en linje øverst siger det.
+//    Numrene må også skrives kort, når de hører til siden selv: ?opgaver=1,3,mad.2.
+// Et gammelt link med opgavens titel i ankeret (#opgave-7.2.3-titel) sendes videre til det nye.
+// Uden JavaScript og på print er siden uændret.
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main");
+  if (!main) return;
+
+  var NUMMER = /^[A-Za-z]?\d+\.\d+\.[A-Za-z0-9.]+$/;
+  var opgaver = [], efterNr = Object.create(null);
+  Array.prototype.forEach.call(main.querySelectorAll("section.level2"), function (s) {
+    if (!NUMMER.test(s.id)) return;
+    var h2 = s.querySelector("h2");
+    if (!h2) return;
+    var o = { nr: s.id, sektion: s, h2: h2, felt: null };
+    opgaver.push(o);
+    efterNr[s.id.toLowerCase()] = o;
+  });
+  if (!opgaver.length) return;
+  document.body.classList.add("ll-side");
+
+  var side = location.href.split("#")[0].split("?")[0];
+  // Det, alle sidens numre begynder med: "7.2." på siden med opgaverne til afsnit 7.2
+  var forstavelse = opgaver[0].nr.replace(/^([A-Za-z]?\d+\.\d+\.).*$/, "$1");
+
+  function el(navn, klasse, tekst) {
+    var e = document.createElement(navn);
+    if (klasse) e.className = klasse;
+    if (tekst) e.textContent = tekst;
+    return e;
+  }
+  function knap(klasse, tekst) {
+    var k = el("button", klasse, tekst);
+    k.type = "button";
+    return k;
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+  function remse(numre) {
+    if (numre.length < 2) return numre.join("");
+    return numre.slice(0, -1).join(", ") + " og " + numre[numre.length - 1];
+  }
+  function kopier(tekst, faerdig) {
+    function iHaanden() {
+      var felt = el("textarea", "ll-kopifelt");
+      felt.value = tekst;
+      felt.setAttribute("readonly", "");
+      document.body.appendChild(felt);
+      felt.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(felt);
+      faerdig(ok);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tekst).then(function () { faerdig(true); }, iHaanden);
+    } else {
+      iHaanden();
+    }
+  }
+
+  // ----- Gamle links ------------------------------------------------------------------------
+  function gammeltAnker() {
+    var anker = location.hash;
+    try { anker = decodeURIComponent(anker); } catch (e) {}
+    var m = /^#opgave-([a-z]?\d+\.\d+\.(?:[a-z]+\.)?\d+)(?:-|$)/i.exec(anker);
+    var o = m && efterNr[m[1].toLowerCase()];
+    if (o) location.replace("#" + o.nr);
+  }
+  gammeltAnker();
+  window.addEventListener("hashchange", gammeltAnker);
+
+  // ----- 1. Knappen ved hver opgave ------------------------------------------------------------
+  opgaver.forEach(function (o) {
+    var k = knap("ll-knap");
+    var ikon = el("i", "bi bi-link-45deg");
+    ikon.setAttribute("aria-hidden", "true");
+    var tekst = el("span", "ll-knaptekst", "Kopiér link");
+    k.appendChild(ikon);
+    k.appendChild(tekst);
+    k.title = "Kopiér link til opgave " + o.nr;
+    k.setAttribute("aria-label", k.title);
+    var ur = null;
+    k.addEventListener("click", function () {
+      kopier(side + "#" + o.nr, function (ok) {
+        tekst.textContent = ok ? "Link kopieret" : side + "#" + o.nr;
+        k.classList.add("ll-kopieret");
+        clearTimeout(ur);
+        ur = setTimeout(function () {
+          tekst.textContent = "Kopiér link";
+          k.classList.remove("ll-kopieret");
+        }, ok ? 2200 : 12000);
+      });
+    });
+    o.h2.appendChild(k);
+
+    // Feltet, der kun ses, mens læreren vælger opgaver
+    var valg = el("label", "ll-valg");
+    o.felt = el("input");
+    o.felt.type = "checkbox";
+    o.felt.setAttribute("aria-label", "Vælg opgave " + o.nr);
+    valg.appendChild(o.felt);
+    o.h2.insertBefore(valg, o.h2.firstChild);
+    o.felt.addEventListener("change", opdaterBjaelke);
+  });
+
+  // ----- 2. Vælg opgaver ---------------------------------------------------------------------
+  var foerste = main.querySelector("section.level2");
+  var start = el("div", "ll-start");
+  var startKnap = knap("ll-startknap");
+  var startIkon = el("i", "bi bi-link-45deg");
+  startIkon.setAttribute("aria-hidden", "true");
+  startKnap.appendChild(startIkon);
+  startKnap.appendChild(document.createTextNode(" Lav et link til udvalgte opgaver"));
+  start.appendChild(startKnap);
+  foerste.parentNode.insertBefore(start, foerste);
+
+  var bjaelke = el("div", "ll-bjaelke");
+  bjaelke.hidden = true;
+  bjaelke.setAttribute("role", "region");
+  bjaelke.setAttribute("aria-label", "Link til udvalgte opgaver");
+  var status = el("span", "ll-status");
+  status.setAttribute("role", "status");
+  var kopierKnap = knap("ll-kopier", "Kopiér link");
+  var lukKnap = knap("ll-luk", "Luk");
+  var adresse = el("input", "ll-adresse");
+  adresse.type = "text";
+  adresse.readOnly = true;
+  adresse.hidden = true;
+  adresse.setAttribute("aria-label", "Linket til de valgte opgaver");
+  bjaelke.appendChild(status);
+  bjaelke.appendChild(kopierKnap);
+  bjaelke.appendChild(lukKnap);
+  bjaelke.appendChild(adresse);
+  document.body.appendChild(bjaelke);
+
+  function valgte() {
+    return opgaver.filter(function (o) { return o.felt.checked; });
+  }
+  function link() {
+    return side + "?opgaver=" + valgte().map(function (o) { return o.nr; }).join(",");
+  }
+  function opdaterBjaelke() {
+    var v = valgte();
+    kopierKnap.disabled = !v.length;
+    adresse.hidden = true;
+    opgaver.forEach(function (o) { o.sektion.classList.toggle("ll-med", o.felt.checked); });
+    if (!v.length) {
+      status.textContent = "Sæt flueben ved de opgaver, linket skal vise.";
+    } else {
+      status.textContent = (v.length === 1 ? "Valgt: opgave " : "Valgt: ") + remse(v.map(function (o) { return o.nr; })) + ".";
+    }
+  }
+  function startVaelger() {
+    var viste = udvalg;
+    if (udvalg) fjernUdvalg();
+    opgaver.forEach(function (o) { o.felt.checked = !!viste && viste.indexOf(o) >= 0; });
+    document.body.classList.add("ll-vaelger");
+    start.hidden = true;
+    bjaelke.hidden = false;
+    opdaterBjaelke();
+  }
+  function lukVaelger() {
+    document.body.classList.remove("ll-vaelger");
+    opgaver.forEach(function (o) { o.felt.checked = false; o.sektion.classList.remove("ll-med"); });
+    start.hidden = false;
+    bjaelke.hidden = true;
+  }
+  startKnap.addEventListener("click", startVaelger);
+  lukKnap.addEventListener("click", lukVaelger);
+  kopierKnap.addEventListener("click", function () {
+    var v = valgte();
+    if (!v.length) return;
+    var adr = link();
+    kopier(adr, function (ok) {
+      adresse.value = adr;
+      adresse.hidden = false;
+      status.textContent = (ok ? "Linket er kopieret. " : "Kopiér linket herunder. ") +
+        "Det viser kun opgave " + remse(v.map(function (o) { return o.nr; })) + ".";
+      if (!ok) { adresse.focus(); adresse.select(); }
+    });
+  });
+
+  // ----- 3. Siden åbnet med udvalgte opgaver ---------------------------------------------------
+  var udvalg = null;
+  var banner = el("div", "ll-banner");
+  banner.hidden = true;
+  var bannerTekst = el("span", "ll-bannertekst");
+  var visAlle = knap("ll-alle", "Vis alle opgaver");
+  banner.appendChild(bannerTekst);
+  banner.appendChild(visAlle);
+  start.parentNode.insertBefore(banner, start);
+
+  function laesUdvalg() {
+    var m = /[?&]opgaver=([^&#]*)/.exec(location.search);
+    if (!m) return null;
+    var tekst = m[1];
+    try { tekst = decodeURIComponent(tekst); } catch (e) {}
+    var fundne = [];
+    tekst.split(/[,;_\s+]+/).forEach(function (del) {
+      if (!del) return;
+      var o = efterNr[del.toLowerCase()] || efterNr[(forstavelse + del).toLowerCase()];
+      if (o && fundne.indexOf(o) < 0) fundne.push(o);
+    });
+    // i sidens rækkefølge
+    fundne.sort(function (a, b) { return opgaver.indexOf(a) - opgaver.indexOf(b); });
+    return fundne.length ? fundne : null;
+  }
+
+  function skjul(sektion, id, skjult) {
+    sektion.classList.toggle("ll-skjult", skjult);
+    var li = tocPunkt(id);
+    if (li) li.classList.toggle("ll-skjult", skjult);
+  }
+
+  function visUdvalg(liste) {
+    udvalg = liste;
+    document.body.classList.add("ll-udvalg");
+    opgaver.forEach(function (o) { skjul(o.sektion, o.nr, liste.indexOf(o) < 0); });
+    // Et tema vises kun, når en af dets opgaver er valgt, og så er det åbent (stil/temaer.html).
+    (window.kemibogenTemaer || []).forEach(function (t) {
+      var nogen = t.opgaver.some(function (s) { return !s.classList.contains("ll-skjult"); });
+      skjul(t.tema, t.tema.id, !nogen);
+      if (nogen) t.saet(true, false);
+    });
+    bannerTekst.textContent = "Her vises kun opgave " + remse(liste.map(function (o) { return o.nr; })) + ".";
+    banner.hidden = false;
+  }
+
+  function fjernUdvalg() {
+    udvalg = null;
+    document.body.classList.remove("ll-udvalg");
+    opgaver.forEach(function (o) { skjul(o.sektion, o.nr, false); });
+    (window.kemibogenTemaer || []).forEach(function (t) { skjul(t.tema, t.tema.id, false); });
+    banner.hidden = true;
+    if (window.history && history.replaceState) history.replaceState(null, "", side + location.hash);
+  }
+  visAlle.addEventListener("click", fjernUdvalg);
+
+  var fraAdressen = laesUdvalg();
+  if (fraAdressen) visUdvalg(fraAdressen);
+});
+</script>
+<script>
+// Repetitionssider (sider med "body-classes: repetition"). Se noter/repetition.md.
+//
+// Punkterne under "Det skal du kunne" bliver til en tjekliste: hvert punkt får et felt, og
+// fluebenene huskes på den computer eller telefon, eleven sidder ved. Øverst står, hvor mange
+// punkter der er sat flueben ved. Uden JavaScript og på print er punkterne en liste med tomme felter.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.body.classList.contains("repetition")) return;
+  var main = document.querySelector("main");
+  if (!main) return;
+  var lister = main.querySelectorAll(".rep-kan");
+  if (!lister.length) return;
+
+  function husk(noegle, sat) {
+    try {
+      if (sat) localStorage.setItem(noegle, "1"); else localStorage.removeItem(noegle);
+    } catch (e) {}
+  }
+  function husket(noegle) {
+    try { return localStorage.getItem(noegle) === "1"; } catch (e) { return false; }
+  }
+  // Et punkt kendes på afsnittet og sin tekst, så fluebenet følger punktet, selv om rækkefølgen ændres.
+  function tal(tekst) {
+    var h = 0;
+    for (var i = 0; i < tekst.length; i++) h = (h * 31 + tekst.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(36);
+  }
+
+  var felter = [];
+  Array.prototype.forEach.call(lister, function (liste) {
+    var sektion = liste.closest("section.level2");
+    var afsnit = sektion ? sektion.id : "";
+    Array.prototype.forEach.call(liste.querySelectorAll("li"), function (li) {
+      var noegle = "kemibogen-kan-" + afsnit + "-" + tal(li.textContent.replace(/\s+/g, " ").trim());
+      var maerke = document.createElement("label");
+      maerke.className = "rep-punkt";
+      var felt = document.createElement("input");
+      felt.type = "checkbox";
+      felt.checked = husket(noegle);
+      var tekst = document.createElement("span");
+      while (li.firstChild) tekst.appendChild(li.firstChild);
+      maerke.appendChild(felt);
+      maerke.appendChild(tekst);
+      li.appendChild(maerke);
+      li.classList.toggle("rep-sat", felt.checked);
+      felt.addEventListener("change", function () {
+        husk(noegle, felt.checked);
+        li.classList.toggle("rep-sat", felt.checked);
+        opdater();
+      });
+      felter.push({ felt: felt, li: li, noegle: noegle });
+    });
+    liste.classList.add("rep-aktiv");
+  });
+  if (!felter.length) return;
+
+  var linje = document.createElement("div");
+  linje.className = "rep-status";
+  var tekst = document.createElement("span");
+  tekst.setAttribute("role", "status");
+  var nulstil = document.createElement("button");
+  nulstil.type = "button";
+  nulstil.className = "rep-nulstil";
+  nulstil.textContent = "Fjern fluebenene";
+  linje.appendChild(tekst);
+  linje.appendChild(nulstil);
+  var foerste = main.querySelector("section.level2");
+  foerste.parentNode.insertBefore(linje, foerste);
+
+  function opdater() {
+    var sat = felter.filter(function (f) { return f.felt.checked; }).length;
+    tekst.textContent = "Du har sat flueben ved " + sat + " af " + felter.length + " punkter.";
+    nulstil.hidden = sat === 0;
+    linje.classList.toggle("rep-alle", sat === felter.length);
+  }
+  nulstil.addEventListener("click", function () {
+    felter.forEach(function (f) {
+      f.felt.checked = false;
+      f.li.classList.remove("rep-sat");
+      husk(f.noegle, false);
+    });
+    opdater();
+  });
+  opdater();
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a6-1-enzymer.html" class="pagination-link" aria-label="A6.1 Enzymer">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A6.1 Enzymer</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a6-2-enzymkinetik.html" class="pagination-link" aria-label="A6.2 Enzymkinetik">
+        <span class="nav-page-text">A6.2 Enzymkinetik</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

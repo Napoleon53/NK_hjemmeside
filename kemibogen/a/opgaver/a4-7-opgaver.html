@@ -1,0 +1,3767 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da" xml:lang="da"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Opgaver til A4.7 – Kemibogen A</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../kapitler/a4-8-antal-signaler.html" rel="next">
+<link href="../kapitler/a4-7-grundideen-i-nmr.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-3f3984edc0ba659cca0ab16fe06864cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Ingen resultater",
+    "search-matching-documents-text": "Matchende dokumenter",
+    "search-copy-link-title": "Kopier link for at søge",
+    "search-hide-matches-text": "Skjul yderligere resultater",
+    "search-more-match-text": "andet resultat i dette dokument",
+    "search-more-matches-text": "andre resultater i dette dokument",
+    "search-clear-button-title": "Ryd",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Fortryd",
+    "search-submit-button-title": "Indsend",
+    "search-label": "Søg"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked opgaver quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../indledninger/kapitel-a4.html">Kapitel A4: Kemisk binding og spektroskopi</a></li><li class="breadcrumb-item"><a href="../opgaver/a4-7-opgaver.html">Opgaver til A4.7</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Skift sidebjælke" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Søg" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto"><div class="quarto-sidebar-header"><div class="sidebar-header-item">
+<div class="niveauer">
+<p><a href="../../c/index.html">Kemi C</a> <a href="../../b/index.html">Kemi B</a> <span class="her">Kemi A</span></p>
+</div>
+</div></div>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Kemibogen A</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Søg"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Forord</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A1: Ligevægte fortsat</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-1-partialtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.1 Partialtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-2-gasligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.2 Gasligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-3-sael-skemaet.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.3 SÆL-skemaet med gasser</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-4-ny-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.4 Indgreb og ny ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-5-oploeselighedsligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.5 Opløselighedsligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-6-syre-baseligevaegte.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.6 Syre-baseligevægte</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-7-puffere-og-fordelingsdiagrammer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.7 Puffersystemer og fordelingsdiagrammer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a1-8-titrering-af-phosphorsyre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1.8 Titrering af phosphorsyre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a1-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A1.8</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A1</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A2: Termodynamik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-1-energi-og-entalpi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.1 Energi og entalpi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-2-standardentalpi-og-hess-lov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.2 Standardentalpi og Hess’ lov</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-3-entropi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.3 Entropi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-4-gibbs-energi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.4 Gibbs-energi</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-5-gibbs-energi-og-ligevaegt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.5 Gibbs-energi og ligevægt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a2-6-ligevaegtskonstanten-og-temperaturen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A2.6 Ligevægtskonstanten og temperaturen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a2-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A2.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A2</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A3: Organisk kemi og naturstoffer</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-1-elementaranalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.1 Naturstoffer og elementaranalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-2-funktionelle-grupper-i-naturstoffer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.2 Funktionelle grupper i naturstoffer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-3-reaktionstyper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.3 Reaktionstyper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-4-kemisk-analyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.4 Kemisk analyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-5-optisk-aktivitet-og-polarimeteret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.5 Optisk aktivitet og polarimeteret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a3-6-polaritet-og-log-d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A3.6 Polaritet og log D</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a3-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A3.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A3</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A4: Kemisk binding og spektroskopi</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-1-atomorbitaler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.1 Atomorbitaler og det periodiske system</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-2-hybridisering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.2 Hybridisering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-3-dobbelt-og-tripelbindinger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.3 Dobbelt- og tripelbindinger</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-4-molekyler-der-svinger.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.4 Molekyler, der svinger</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-5-ir-spektret.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.5 IR-spektret</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-6-tolkning-af-ir-spektre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.6 Tolkning af IR-spektre</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-7-grundideen-i-nmr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.7 Grundideen i <sup>1</sup>H-NMR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-7-opgaver.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Opgaver til A4.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-8-antal-signaler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.8 Antal signaler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-8-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.8</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-9-kemisk-skift.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.9 Kemisk skift</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-9-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.9</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-10-integralkurven.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.10 Integralkurven</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-10-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.10</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-11-kobling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.11 Kobling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-11-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.11</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-12-flere-grupper.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.12 Flere grupper</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-12-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.12</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a4-13-fra-spektrum-til-struktur.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A4.13 Fra spektrum til struktur</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a4-13-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A4.13</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A4</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A5: Reaktionskinetik</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-1-reaktionshastighed-og-hastighedsudtryk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.1 Reaktionshastighed og hastighedsudtryk</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-2-foerste-orden.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.2 Første orden</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-3-nulte-og-anden-orden.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.3 Nulte og anden orden</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-4-arrhenius-ligningen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.4 Arrhenius-ligningen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-5-reaktionsmekanismer-og-katalyse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.5 Reaktionsmekanismer og katalyse</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a5-6-nucleofil-substitution.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A5.6 Nucleofil substitution</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a5-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A5.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A5</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A6: Enzymer og biokemi</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-1-enzymer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.1 Enzymer</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-2-enzymkinetik.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.2 Enzymkinetik</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-3-metaller-i-kroppen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.3 Metaller i kroppen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-4-redoxtitrering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.4 Redoxtitrering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a6-5-chromatografi-med-tal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A6.5 Chromatografi med tal</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a6-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A6.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A6</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../indledninger/kapitel-a7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kapitel A7: DNA's kemi</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-1-nucleotider.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.1 Nucleotider</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-1-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-2-dna-strengen.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.2 DNA-strengen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-2-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-3-baseparring.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.3 Baseparring og dobbeltspiralen</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-3-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-4-naar-dna-smelter.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.4 Når DNA smelter</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-4-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-5-pcr.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.5 PCR: kopiering i et reagensglas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-5-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-6-fra-dna-til-protein.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.6 Fra DNA til protein</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-6-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.6</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../kapitler/a7-7-skader-og-laegemidler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A7.7 Skader på DNA og lægemidler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../opgaver/a7-7-opgaver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Opgaver til A7.7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/kapitel-a7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til kapitel A7</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../repetition/kapitel-a7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Repetition af kapitel A7</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Bilag</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Skift sektion">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/termodynamiske-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Termodynamiske data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/stikordsregister.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stikordsregister</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">På denne side</h2>
+   
+  <ul class="collapse">
+  <li><a href="#A4.7.1" id="toc-A4.7.1" class="nav-link active" data-scroll-target="#A4.7.1">Opgave A4.7.1: Hydrogenkernen i magnetfeltet</a></li>
+  <li><a href="#A4.7.2" id="toc-A4.7.2" class="nav-link" data-scroll-target="#A4.7.2">Opgave A4.7.2: Godt eller dårligt skærmet?</a></li>
+  <li><a href="#A4.7.3" id="toc-A4.7.3" class="nav-link" data-scroll-target="#A4.7.3">Opgave A4.7.3: Elektronegative naboer</a></li>
+  <li><a href="#A4.7.4" id="toc-A4.7.4" class="nav-link" data-scroll-target="#A4.7.4">Opgave A4.7.4: TMS, aksens nulpunkt</a></li>
+  <li><a href="#A4.7.5" id="toc-A4.7.5" class="nav-link" data-scroll-target="#A4.7.5">Opgave A4.7.5: Læs aksen</a></li>
+  <li><a href="#A4.7.6" id="toc-A4.7.6" class="nav-link" data-scroll-target="#A4.7.6">Opgave A4.7.6: Fra hertz til ppm</a></li>
+  <li><a href="#A4.7.7" id="toc-A4.7.7" class="nav-link" data-scroll-target="#A4.7.7">Opgave A4.7.7: Det samme stof på to spektrometre</a></li>
+  <li><a href="#A4.7.8" id="toc-A4.7.8" class="nav-link" data-scroll-target="#A4.7.8">Opgave A4.7.8: IR eller NMR?</a></li>
+  <li><a href="#opgaver-i-eksamensstil" id="toc-opgaver-i-eksamensstil" class="nav-link" data-scroll-target="#opgaver-i-eksamensstil">Opgaver i eksamensstil</a></li>
+  <li><a href="#A4.7.eks.1" id="toc-A4.7.eks.1" class="nav-link" data-scroll-target="#A4.7.eks.1">Opgave A4.7.eks.1: MR-scanneren</a></li>
+  <li><a href="#A4.7.eks.2" id="toc-A4.7.eks.2" class="nav-link" data-scroll-target="#A4.7.eks.2">Opgave A4.7.eks.2: Et nyt spektrometer</a></li>
+  <li><a href="#A4.7.eks.3" id="toc-A4.7.eks.3" class="nav-link" data-scroll-target="#A4.7.eks.3">Opgave A4.7.eks.3: Et opløsningsmiddel med to signaler</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../indledninger/kapitel-a4.html">Kapitel A4: Kemisk binding og spektroskopi</a></li><li class="breadcrumb-item"><a href="../opgaver/a4-7-opgaver.html">Opgaver til A4.7</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Opgaver til A4.7</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Opgaverne hører til afsnit <a href="../kapitler/a4-7-grundideen-i-nmr.html">A4.7 Grundideen i <sup>1</sup>H-NMR</a>. Prøv selv, før du åbner hjælpen under opgaven.</p>
+<section id="A4.7.1" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.1">Opgave A4.7.1: Hydrogenkernen i magnetfeltet</h2>
+<p>Figuren viser to hydrogenkerner, A og B, i et stærkt magnetfelt. De grå pile viser magnetfeltets retning. Den røde pil gennem hver hydrogenkerne viser, hvilken vej kernen peger.</p>
+<div id="fig-a4-opg-7-to-stillinger" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a4-opg-7-to-stillinger-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a4-opg-7-to-stillinger.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: To hydrogenkerner, A og B, i et stærkt magnetfelt."><img src="../figurer/a4-opg-7-to-stillinger.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a4-opg-7-to-stillinger-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;1: To hydrogenkerner, A og B, i et stærkt magnetfelt.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Hvilken af de to hydrogenkerner peger med feltet, og hvilken peger mod feltet?</li>
+<li>Hvilken af de to hydrogenkerner har den højeste energi?</li>
+<li>Prøven bliver ramt af en radiobølge med præcis den rigtige frekvens. Hvilken af de to hydrogenkerner kan absorbere radiobølgen, og hvad sker der med kernen?</li>
+<li>Hvad sker der med hydrogenkernerne, hvis radiobølgens frekvens er lidt for lav?</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>En hydrogenkerne opfører sig som en lillebitte magnet. I et stærkt magnetfelt har den kun to muligheder: den kan pege med feltet eller mod feltet. Sammenlign den røde pil gennem hver hydrogenkerne med de grå pile, der viser magnetfeltets retning.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Det kræver energi at vende en hydrogenkerne, så den peger mod feltet. En hydrogenkerne, der peger mod feltet, har derfor mere energi end en hydrogenkerne, der peger med feltet.</p>
+<p>Energien kan komme fra en radiobølge, men kun hvis radiobølgen har præcis den rigtige frekvens. Det kaldes resonans. En gynge kommer også kun højere op, hvis man skubber i den rigtige takt.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Hydrogenkerne A peger med feltet, for den røde pil gennem kernen peger samme vej som de grå pile. Hydrogenkerne B peger mod feltet.</p></li>
+<li><p>Hydrogenkerne B har den højeste energi. Det kræver energi at vende en hydrogenkerne, så den peger mod feltet.</p></li>
+<li><p>Hydrogenkerne A kan absorbere radiobølgen. Energien fra radiobølgen vender hydrogenkerne A, så den peger mod feltet ligesom hydrogenkerne B.</p></li>
+<li><p>Der sker ingenting. En hydrogenkerne absorberer kun en radiobølge, der har præcis den rigtige frekvens. Et NMR-spektrometer måler netop, hvilke frekvenser hydrogenkernerne i prøven absorberer.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.2" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.2">Opgave A4.7.2: Godt eller dårligt skærmet?</h2>
+<p>Figuren viser to hydrogenkerner i det samme magnetfelt. De blå prikker er elektroner. Hydrogenkerne 1 har mange elektroner omkring sig, og hydrogenkerne 2 har få.</p>
+<div id="fig-a4-opg-7-to-kerner" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a4-opg-7-to-kerner-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a4-opg-7-to-kerner.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figur&nbsp;2: To hydrogenkerner med mange og med få elektroner omkring sig."><img src="../figurer/a4-opg-7-to-kerner.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a4-opg-7-to-kerner-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;2: To hydrogenkerner med mange og med få elektroner omkring sig.
+</figcaption>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 63%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Hydrogenkerne 1</th>
+<th style="text-align: left;">Hydrogenkerne 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Elektroner omkring kernen</td>
+<td style="text-align: left;">mange</td>
+<td style="text-align: left;">få</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kernen er (godt eller dårligt) skærmet</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kernen mærker et (svagere eller stærkere) magnetfelt</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kernen absorberer ved en (lavere eller højere) frekvens</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Det kemiske skift er (lavt eller højt)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Signalet står (til højre eller til venstre) i spektret</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Udfyld tabellen. Vælg mellem de to muligheder i parentesen i hver række.</li>
+<li>Forklar, hvordan elektronerne skærmer en hydrogenkerne mod magnetfeltet.</li>
+<li>Den ene af de to hydrogenkerner sidder tæt på et oxygenatom i sit molekyle. Hvilken af de to hydrogenkerner er det? Begrund svaret.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Elektronerne omkring en hydrogenkerne skærmer kernen mod magnetfeltet. Jo flere elektroner der er omkring hydrogenkernen, jo bedre er den skærmet, og jo svagere et magnetfelt mærker den.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Frekvensen følger magnetfeltet: jo stærkere et felt hydrogenkernen mærker, jo højere er den frekvens, kernen absorberer ved. En høj frekvens giver et højt kemisk skift, og et højt kemisk skift står til venstre i spektret.</p>
+<p>Til spørgsmål c: oxygen er elektronegativt og trækker elektroner til sig. Du kan begynde sådan: “Oxygenatomet trækker elektroner væk fra hydrogenkernen, så hydrogenkernen får …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Den udfyldte tabel:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 63%">
+<col style="width: 18%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Hydrogenkerne 1</th>
+<th style="text-align: left;">Hydrogenkerne 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Elektroner omkring kernen</td>
+<td style="text-align: left;">mange</td>
+<td style="text-align: left;">få</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kernen er (godt eller dårligt) skærmet</td>
+<td style="text-align: left;">godt</td>
+<td style="text-align: left;">dårligt</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kernen mærker et (svagere eller stærkere) magnetfelt</td>
+<td style="text-align: left;">svagere</td>
+<td style="text-align: left;">stærkere</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kernen absorberer ved en (lavere eller højere) frekvens</td>
+<td style="text-align: left;">lavere</td>
+<td style="text-align: left;">højere</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Det kemiske skift er (lavt eller højt)</td>
+<td style="text-align: left;">lavt</td>
+<td style="text-align: left;">højt</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Signalet står (til højre eller til venstre) i spektret</td>
+<td style="text-align: left;">til højre</td>
+<td style="text-align: left;">til venstre</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Elektronerne bevæger sig i magnetfeltet og danner selv et lille magnetfelt, som peger den modsatte vej. Hydrogenkernen mærker derfor et lidt svagere magnetfelt end det, magneten laver.</p></li>
+<li><p>Det er hydrogenkerne 2. Oxygen er elektronegativt og trækker elektroner væk fra hydrogenkernen. Hydrogenkernen får få elektroner omkring sig og bliver dårligt skærmet.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.3" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.3">Opgave A4.7.3: Elektronegative naboer</h2>
+<p>Fire stoffer har hver en methylgruppe. Methylgruppen er bundet til et carbonatom, et nitrogenatom, et oxygenatom eller et fluoratom. Tabellen viser atomernes elektronegativitet, som du kender fra <a href="../../c/kapitler/3-3-polaritet.html">afsnit 3.3</a> i bogen til C-niveau.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Formel</th>
+<th style="text-align: left;">Methylgruppen er bundet til</th>
+<th style="text-align: center;">Elektronegativitet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">methanol</td>
+<td style="text-align: left;">CH<sub>3</sub>−OH</td>
+<td style="text-align: left;">oxygen</td>
+<td style="text-align: center;">3,5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ethan</td>
+<td style="text-align: left;">CH<sub>3</sub>−CH<sub>3</sub></td>
+<td style="text-align: left;">carbon</td>
+<td style="text-align: center;">2,5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">fluormethan</td>
+<td style="text-align: left;">CH<sub>3</sub>−F</td>
+<td style="text-align: left;">fluor</td>
+<td style="text-align: center;">4,0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">methylamin</td>
+<td style="text-align: left;">CH<sub>3</sub>−NH<sub>2</sub></td>
+<td style="text-align: left;">nitrogen</td>
+<td style="text-align: center;">3,0</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Skriv de fire stoffer i rækkefølge efter, hvor godt hydrogenkernerne i methylgruppen er skærmet. Begynd med stoffet med den bedste skærmning.</li>
+<li>Signalerne fra de fire methylgrupper ligger ved 0,9 ppm, 2,5 ppm, 3,4 ppm og 4,3 ppm. Hvilket kemisk skift hører til hvilket stof?</li>
+<li>Tegn en akse fra 5 til 0 ppm, og sæt de fire signaler ind med stoffets formel over hvert signal. Husk aksens retning.</li>
+<li>Forklar med ordene elektronegativitet, elektroner og skærmning, hvorfor signalet fra methylgruppen i fluormethan ligger længst til venstre.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et elektronegativt atom trækker elektroner til sig. Jo højere elektronegativitet methylgruppens nabo har, jo flere elektroner trækker naboen væk fra methylgruppens hydrogenkerner, og jo dårligere er hydrogenkernerne skærmet.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Carbon har den laveste elektronegativitet af de fire naboatomer, så hydrogenkernerne i methylgruppen i ethan er bedst skærmet. Godt skærmede hydrogenkerner giver et lavt kemisk skift.</p>
+<p>På aksen i et NMR-spektrum står 0 ppm til højre, og det kemiske skift vokser mod venstre.</p>
+<p>Du kan begynde forklaringen i spørgsmål d sådan: “Fluor har den højeste elektronegativitet af de fire naboatomer, så fluoratomet trækker …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Rækkefølgen fra den bedste til den dårligste skærmning er: ethan, methylamin, methanol, fluormethan. Det er samme rækkefølge som naboatomernes elektronegativitet: 2,5 for carbon, 3,0 for nitrogen, 3,5 for oxygen og 4,0 for fluor.</p></li>
+<li><p>Jo dårligere hydrogenkernerne er skærmet, jo højere er det kemiske skift:</p></li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Stof</th>
+<th style="text-align: left;">Formel</th>
+<th style="text-align: center;">Kemisk skift for methylgruppen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ethan</td>
+<td style="text-align: left;">CH<sub>3</sub>−CH<sub>3</sub></td>
+<td style="text-align: center;">0,9 ppm</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">methylamin</td>
+<td style="text-align: left;">CH<sub>3</sub>−NH<sub>2</sub></td>
+<td style="text-align: center;">2,5 ppm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">methanol</td>
+<td style="text-align: left;">CH<sub>3</sub>−OH</td>
+<td style="text-align: center;">3,4 ppm</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fluormethan</td>
+<td style="text-align: left;">CH<sub>3</sub>−F</td>
+<td style="text-align: center;">4,3 ppm</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="a">
+<li>Aksen har 0 ppm til højre. Signalet fra ethan står længst til højre, og signalet fra fluormethan står længst til venstre:</li>
+</ol>
+<div id="fig-a4-opg-7-fire-methyl" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a4-opg-7-fire-methyl-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a4-opg-7-fire-methyl.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figur&nbsp;3: De fire methylgruppers signaler på aksen i et NMR-spektrum."><img src="../figurer/a4-opg-7-fire-methyl.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a4-opg-7-fire-methyl-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;3: De fire methylgruppers signaler på aksen i et NMR-spektrum.
+</figcaption>
+</figure>
+</div>
+<ol start="4" type="a">
+<li>Fluor har den højeste elektronegativitet af de fire naboatomer. Fluoratomet trækker derfor flest elektroner væk fra methylgruppen. Hydrogenkernerne i fluormethan har færrest elektroner omkring sig, så de har den dårligste skærmning. Dårligt skærmede hydrogenkerner absorberer ved en høj frekvens og får et højt kemisk skift, og et højt kemisk skift står til venstre på aksen.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.4" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.4">Opgave A4.7.4: TMS, aksens nulpunkt</h2>
+<p>Aksen i et NMR-spektrum har sit nulpunkt ved signalet fra stoffet TMS, tetramethylsilan, Si(CH<sub>3</sub>)<sub>4</sub>. Lidt TMS sættes til prøven, før spektret måles. Silicium har elektronegativiteten 1,8, og carbon har elektronegativiteten 2,5.</p>
+<ol type="a">
+<li>Hvor mange hydrogenatomer har et molekyle TMS, og hvor mange signaler giver TMS?</li>
+<li>Hvilket kemisk skift har signalet fra TMS, og i hvilken side af spektret står signalet?</li>
+<li>Forklar ud fra de to elektronegativiteter, hvorfor hydrogenkernerne i TMS er bedre skærmet end hydrogenkernerne i ethan, CH<sub>3</sub>−CH<sub>3</sub>.</li>
+<li>Giv to grunde til, at TMS er et godt nulpunkt for aksen.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I TMS sidder fire methylgrupper på det samme siliciumatom. Tæl hydrogenatomerne, og tænk over, om de fire methylgrupper har de samme omgivelser. Hydrogenatomer med de samme omgivelser giver tilsammen ét signal.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål c: se på det atom, methylgruppen sidder på. I TMS er det et siliciumatom med elektronegativiteten 1,8. I ethan er det et carbonatom med elektronegativiteten 2,5. Hvilket af de to atomer holder dårligst på sine elektroner?</p>
+<p>Til spørgsmål d: tænk på, hvor mange signaler TMS giver, og på, hvor signalet fra TMS ligger i forhold til signalerne fra andre stoffer.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>TMS har fire methylgrupper med tre hydrogenatomer i hver, altså 12 hydrogenatomer. De fire methylgrupper sidder på det samme siliciumatom og har de samme omgivelser. De 12 hydrogenatomer er derfor ens, og TMS giver ét signal.</p></li>
+<li><p>Signalet fra TMS har det kemiske skift 0 ppm. Det står længst til højre i spektret.</p></li>
+<li><p>Silicium har en lavere elektronegativitet (1,8) end carbon (2,5). I TMS trækker carbonatomerne i methylgrupperne derfor elektroner til sig fra siliciumatomet. I ethan sidder methylgruppen på et andet carbonatom med samme elektronegativitet, og ingen af de to carbonatomer får ekstra elektroner. Hydrogenkernerne i TMS har altså flere elektroner omkring sig end hydrogenkernerne i ethan, og de er bedre skærmet.</p></li>
+<li><p>TMS giver kun ét signal, fordi de 12 hydrogenatomer er ens. Og hydrogenkernerne i TMS er så godt skærmet, at signalet ligger længere til højre end næsten alle andre signaler. Signalet fra TMS ligger derfor ikke oven i signalerne fra det stof, man undersøger.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.5" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.5">Opgave A4.7.5: Læs aksen</h2>
+<p>Figuren viser et tegnet NMR-spektrum med fire signaler, A, B, C og D. Spektret hører ikke til et bestemt stof. Det er tegnet, så du kan øve dig i at læse aksen.</p>
+<div id="fig-a4-opg-7-akse" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a4-opg-7-akse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a4-opg-7-akse.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figur&nbsp;4: Et tegnet NMR-spektrum med fire signaler."><img src="../figurer/a4-opg-7-akse.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a4-opg-7-akse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;4: Et tegnet NMR-spektrum med fire signaler.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Aflæs det kemiske skift for hvert af de fire signaler A, B, C og D.</li>
+<li>Hvor kommer det lille signal ved 0 ppm fra?</li>
+<li>Hvilket af signalerne A, B, C og D kommer fra de bedst skærmede hydrogenkerner, og hvilket kommer fra de dårligst skærmede hydrogenkerner?</li>
+<li>Hvilket af signalerne A, B, C og D kommer fra de hydrogenkerner, der absorberer ved den højeste frekvens?</li>
+<li>En elev skriver: “Signal C ligger længst til venstre, så signal C har det laveste kemiske skift, og hydrogenkernerne er godt skærmet.” Ret elevens sætning.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Aksen i et NMR-spektrum læses fra højre mod venstre. Nulpunktet står til højre, og det kemiske skift vokser mod venstre. Der er 1 ppm mellem tallene på aksen, og den korte streg midt mellem to tal er en halv ppm.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et signal til højre i et NMR-spektrum har et lavt kemisk skift og kommer fra hydrogenkerner, der er godt skærmet. Et signal til venstre har et højt kemisk skift og kommer fra hydrogenkerner, der er dårligt skærmet.</p>
+<p>Dårligt skærmede hydrogenkerner mærker et stærkere magnetfelt og absorberer ved en højere frekvens.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De fire kemiske skift:</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Signal</th>
+<th style="text-align: center;">Kemisk skift</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">4,0 ppm</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">B</td>
+<td style="text-align: center;">1,0 ppm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">7,0 ppm</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">D</td>
+<td style="text-align: center;">2,5 ppm</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Signalet ved 0 ppm kommer fra TMS, som er sat til prøven. TMS er aksens nulpunkt.</p></li>
+<li><p>Signal B ved 1,0 ppm kommer fra de bedst skærmede hydrogenkerner, for signal B står længst til højre af de fire. Signal C ved 7,0 ppm kommer fra de dårligst skærmede hydrogenkerner, for signal C står længst til venstre.</p></li>
+<li><p>Signal C ved 7,0 ppm. De dårligst skærmede hydrogenkerner mærker det stærkeste magnetfelt og absorberer derfor ved den højeste frekvens.</p></li>
+<li><p>Den rettede sætning: “Signal C ligger længst til venstre, så signal C har det højeste kemiske skift, og hydrogenkernerne er dårligt skærmet.”</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.6" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.6">Opgave A4.7.6: Fra hertz til ppm</h2>
+<p>Et NMR-spektrum er målt på et spektrometer med frekvensen 400 MHz. Tre signaler ligger 360 Hz, 840 Hz og 1480 Hz fra signalet fra TMS.</p>
+<ol type="a">
+<li>Beregn det kemiske skift for hvert af de tre signaler.</li>
+<li>Hvilket af de tre signaler står længst til venstre i spektret?</li>
+<li>Forklar, hvorfor enheden for det kemiske skift er ppm.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Det kemiske skift, δ, er signalets afstand fra TMS i hertz divideret med spektrometrets frekvens i megahertz:</p>
+<p><span class="math display">\[
+\delta = \dfrac{\text{signalets afstand fra TMS i Hz}}{\text{spektrometrets frekvens i MHz}}
+\]</span></p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>For det første signal skal du dividere 360 Hz med 400 MHz. Resultatet får enheden ppm.</p>
+<p>Til spørgsmål c: en megahertz er en million hertz. Hvor stor en del af en megahertz er en hertz?</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Spektrometrets frekvens er 400 MHz. Det kemiske skift beregnes med formlen</li>
+</ol>
+<p><span class="math display">\[
+\delta = \dfrac{\text{signalets afstand fra TMS i Hz}}{\text{spektrometrets frekvens i MHz}}
+\]</span></p>
+<p>Signalet 360 Hz fra TMS:</p>
+<p><span class="math display">\[
+\delta = \dfrac{360\ \mathrm{Hz}}{400\ \mathrm{MHz}} = 0{,}90\ \mathrm{ppm}
+\]</span></p>
+<p>Signalet 840 Hz fra TMS:</p>
+<p><span class="math display">\[
+\delta = \dfrac{840\ \mathrm{Hz}}{400\ \mathrm{MHz}} = 2{,}10\ \mathrm{ppm}
+\]</span></p>
+<p>Signalet 1480 Hz fra TMS:</p>
+<p><span class="math display">\[
+\delta = \dfrac{1480\ \mathrm{Hz}}{400\ \mathrm{MHz}} = 3{,}70\ \mathrm{ppm}
+\]</span></p>
+<p>De tre kemiske skift er 0,90 ppm, 2,10 ppm og 3,70 ppm.</p>
+<ol start="2" type="a">
+<li><p>Signalet ved 3,70 ppm står længst til venstre, for det kemiske skift vokser mod venstre på aksen.</p></li>
+<li><p>En megahertz er en million hertz. En hertz divideret med en megahertz er derfor en milliontedel, og ppm betyder milliontedele (<em>parts per million</em>).</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.7" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.7">Opgave A4.7.7: Det samme stof på to spektrometre</h2>
+<p>Propanon, CH<sub>3</sub>−CO−CH<sub>3</sub>, giver ét signal i et NMR-spektrum. To laboratorier måler hver et spektrum af propanon.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Laboratorium</th>
+<th style="text-align: center;">Spektrometrets frekvens</th>
+<th style="text-align: center;">Signalets afstand fra TMS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">100 MHz</td>
+<td style="text-align: center;">217 Hz</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">400 MHz</td>
+<td style="text-align: center;">868 Hz</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Beregn det kemiske skift for signalet fra propanon på hvert af de to spektrometre.</li>
+<li>Hvor mange gange større er signalets afstand fra TMS i hertz på spektrometret med 400 MHz end på spektrometret med 100 MHz? Sammenlign med forholdet mellem de to frekvenser.</li>
+<li>Et tredje laboratorium har et spektrometer med frekvensen 600 MHz. Beregn, hvor mange hertz signalet fra propanon ligger fra signalet fra TMS på det spektrometer.</li>
+<li>Forklar, hvorfor tabeller over NMR-signaler angiver det kemiske skift i ppm og ikke signalets afstand fra TMS i hertz.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-19-contents" aria-controls="callout-19" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-19" class="callout-19-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Det kemiske skift, δ, er signalets afstand fra TMS i hertz divideret med spektrometrets frekvens i megahertz. Regn de to laboratorier hver for sig, og sammenlign de to kemiske skift for propanon.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-20-contents" aria-controls="callout-20" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-20" class="callout-20-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål c skal formlen for det kemiske skift bruges den anden vej: signalets afstand fra TMS i hertz er det kemiske skift i ppm ganget med spektrometrets frekvens i megahertz. En ppm af en megahertz er en hertz.</p>
+<p>Du kan begynde forklaringen i spørgsmål d sådan: “Signalets afstand fra TMS i hertz afhænger af …, men det kemiske skift i ppm er …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-21-contents" aria-controls="callout-21" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-21" class="callout-21-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Det kemiske skift er signalets afstand fra TMS i hertz divideret med spektrometrets frekvens i megahertz.</li>
+</ol>
+<p>Laboratorium 1:</p>
+<p><span class="math display">\[
+\delta = \dfrac{217\ \mathrm{Hz}}{100\ \mathrm{MHz}} = 2{,}17\ \mathrm{ppm}
+\]</span></p>
+<p>Laboratorium 2:</p>
+<p><span class="math display">\[
+\delta = \dfrac{868\ \mathrm{Hz}}{400\ \mathrm{MHz}} = 2{,}17\ \mathrm{ppm}
+\]</span></p>
+<p>Signalet fra propanon har det kemiske skift 2,17 ppm på begge spektrometre.</p>
+<ol start="2" type="a">
+<li>Forholdet mellem de to afstande og forholdet mellem de to frekvenser:</li>
+</ol>
+<p><span class="math display">\[
+\text{forhold mellem afstandene} = \dfrac{868\ \mathrm{Hz}}{217\ \mathrm{Hz}} = 4{,}00
+\]</span></p>
+<p><span class="math display">\[
+\text{forhold mellem frekvenserne} = \dfrac{400\ \mathrm{MHz}}{100\ \mathrm{MHz}} = 4{,}00
+\]</span></p>
+<p>Signalets afstand fra TMS i hertz er 4 gange større på spektrometret med 400 MHz, og frekvensen er også 4 gange større. Derfor giver divisionen det samme kemiske skift.</p>
+<ol start="3" type="a">
+<li>Signalets afstand fra TMS i hertz er det kemiske skift ganget med spektrometrets frekvens:</li>
+</ol>
+<p><span class="math display">\[
+\text{afstand fra TMS} = \delta \cdot \text{frekvens} = 2{,}17\ \mathrm{ppm} \cdot 600\ \mathrm{MHz} = 1302\ \mathrm{Hz}
+\]</span></p>
+<p>På spektrometret med frekvensen 600 MHz ligger signalet fra propanon 1302 Hz fra signalet fra TMS.</p>
+<ol start="4" type="a">
+<li>Signalets afstand fra TMS i hertz afhænger af spektrometret: jo stærkere magnet, jo større afstand. Det kemiske skift i ppm er det samme på alle spektrometre. En tabel med kemiske skift i ppm kan derfor bruges, uanset hvilket spektrometer spektret er målt på.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.8" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.8">Opgave A4.7.8: IR eller NMR?</h2>
+<p>I kapitel A4 har du mødt to slags spektre: IR-spektret og NMR-spektret. Tabellen har otte udsagn. Hvert udsagn passer på én af de to metoder.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 94%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Udsagn</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Prøven står i et stærkt magnetfelt.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Stoffet absorberer infrarødt lys.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Hydrogenkerner absorberer radiobølger.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">Bindingerne i molekylet svinger kraftigere, når strålingen er absorberet.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">Den vandrette akse viser bølgetallet i cm<sup>−1</sup>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">Den vandrette akse viser det kemiske skift i ppm.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">Spektret viser især, hvilke funktionelle grupper stoffet har.</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">8</td>
+<td style="text-align: left;">Spektret viser især, hvordan hydrogenatomerne sidder i molekylet.</td>
+</tr>
+</tbody>
+</table>
+<ol type="a">
+<li>Skriv for hvert udsagn, om det passer på IR-spektroskopi eller på NMR-spektroskopi.</li>
+<li>Propan-1-ol, CH<sub>3</sub>−CH<sub>2</sub>−CH<sub>2</sub>−OH, og propan-2-ol, CH<sub>3</sub>−CH(OH)−CH<sub>3</sub>, er isomerer. Forklar, hvorfor IR-spektrene af propan-1-ol og propan-2-ol ligner hinanden over 1500 cm<sup>−1</sup>.</li>
+<li>Forklar, hvorfor NMR-spektrene af propan-1-ol og propan-2-ol ikke ligner hinanden.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-22-contents" aria-controls="callout-22" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-22" class="callout-22-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>I IR-spektroskopi absorberer stoffet infrarødt lys, og bindingerne i molekylet kommer til at svinge kraftigere. I NMR-spektroskopi står prøven i et stærkt magnetfelt, og hydrogenkernerne absorberer radiobølger.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-23-contents" aria-controls="callout-23" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-23" class="callout-23-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål b: find de funktionelle grupper i propan-1-ol og i propan-2-ol, og slå deres bånd op i tabellen over IR-bånd i <a href="../kapitler/a4-5-ir-spektret.html">afsnit A4.5</a>.</p>
+<p>Til spørgsmål c: i et NMR-spektrum giver hydrogenatomer med forskellige omgivelser hvert sit signal. Du kan begynde sådan: “I propan-1-ol sidder hydroxygruppen …, og i propan-2-ol sidder hydroxygruppen … Hydrogenatomerne har derfor …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-24-contents" aria-controls="callout-24" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-24" class="callout-24-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>De otte udsagn:</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 86%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Nr.</th>
+<th style="text-align: left;">Udsagn</th>
+<th style="text-align: left;">Metode</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: left;">Prøven står i et stærkt magnetfelt.</td>
+<td style="text-align: left;">NMR</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: left;">Stoffet absorberer infrarødt lys.</td>
+<td style="text-align: left;">IR</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: left;">Hydrogenkerner absorberer radiobølger.</td>
+<td style="text-align: left;">NMR</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: left;">Bindingerne i molekylet svinger kraftigere, når strålingen er absorberet.</td>
+<td style="text-align: left;">IR</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: left;">Den vandrette akse viser bølgetallet i cm<sup>−1</sup>.</td>
+<td style="text-align: left;">IR</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">6</td>
+<td style="text-align: left;">Den vandrette akse viser det kemiske skift i ppm.</td>
+<td style="text-align: left;">NMR</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">7</td>
+<td style="text-align: left;">Spektret viser især, hvilke funktionelle grupper stoffet har.</td>
+<td style="text-align: left;">IR</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">8</td>
+<td style="text-align: left;">Spektret viser især, hvordan hydrogenatomerne sidder i molekylet.</td>
+<td style="text-align: left;">NMR</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="a">
+<li><p>Propan-1-ol og propan-2-ol er begge alkoholer med en hydroxygruppe og en mættet carbonkæde. Begge stoffer har derfor et bredt O−H-bånd ved 3640 til 3160 cm<sup>−1</sup> og C−H-bånd fra sp<sup>3</sup>-carbon ved 2960 til 2850 cm<sup>−1</sup>. Ingen af de to stoffer har andre bånd over 1500 cm<sup>−1</sup>. Et IR-spektrum viser de funktionelle grupper, og de er de samme i de to stoffer.</p></li>
+<li><p>I et NMR-spektrum giver hydrogenatomer med forskellige omgivelser hvert sit signal. I propan-1-ol sidder hydroxygruppen for enden af carbonkæden, og i propan-2-ol sidder hydroxygruppen på det midterste carbonatom. Hydrogenatomerne har derfor ikke de samme omgivelser i de to molekyler, og signalerne kommer til at ligge forskellige steder. Et NMR-spektrum viser altså, hvordan hydrogenatomerne sidder i molekylet, og det gør et IR-spektrum ikke.</p></li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="opgaver-i-eksamensstil" class="level2 tema eksamen">
+<h2 class="tema eksamen anchored" data-anchor-id="opgaver-i-eksamensstil">Opgaver i eksamensstil</h2>
+<p>Opgaverne ligner delopgaverne i den skriftlige prøve i kemi A. Skriv svarene, som du ville gøre til prøven: med beregninger med enheder og med forklaringer, der nævner de konkrete atomer og grupper.</p>
+</section>
+<section id="A4.7.eks.1" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.eks.1">Opgave A4.7.eks.1: MR-scanneren</h2>
+<p>En MR-scanner på et hospital bygger på samme princip som et NMR-spektrometer. Patienten ligger i et stærkt magnetfelt, og scanneren sender radiobølger ind i kroppen. I en almindelig MR-scanner har radiobølgerne en frekvens omkring 64 MHz.</p>
+<p>De to største signaler kommer fra hydrogenkernerne i vand, H<sub>2</sub>O, og fra hydrogenkernerne i CH<sub>2</sub>-grupperne i fedtets lange carbonkæder. Figuren viser de to signaler på samme slags akse som i et NMR-spektrum. Signalet fra vand ligger ved 4,7 ppm, og signalet fra fedt ligger ved 1,3 ppm.</p>
+<div id="fig-a4-opg-7-mr" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a4-opg-7-mr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a4-opg-7-mr.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figur&nbsp;5: Signalerne fra hydrogenkernerne i kroppens vand og fedt."><img src="../figurer/a4-opg-7-mr.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a4-opg-7-mr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;5: Signalerne fra hydrogenkernerne i kroppens vand og fedt.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv, hvilke atomkerner en MR-scanner måler på, og hvad radiobølgerne gør ved kernerne.</li>
+<li>Angiv, hvilket af de to signaler der kommer fra de bedst skærmede hydrogenkerner.</li>
+<li>Forklar forskellen i skærmning ud fra de atomer, hydrogenatomerne er bundet til i vand og i en CH<sub>2</sub>-gruppe.</li>
+<li>Beregn afstanden i hertz mellem signalet fra vand og signalet fra fedt i en MR-scanner med frekvensen 64 MHz.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-25-contents" aria-controls="callout-25" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-25" class="callout-25-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>En MR-scanner måler på de samme atomkerner som et <sup>1</sup>H-NMR-spektrometer. I magnetfeltet kan en hydrogenkerne pege med feltet eller mod feltet, og en radiobølge med den rigtige frekvens kan vende kernen.</p>
+<p>Til spørgsmål b: godt skærmede hydrogenkerner har et lavt kemisk skift, og deres signal står til højre på aksen.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-26-contents" aria-controls="callout-26" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-26" class="callout-26-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål c: i vand er hydrogenatomerne bundet til et oxygenatom med elektronegativiteten 3,5. I en CH<sub>2</sub>-gruppe er hydrogenatomerne bundet til et carbonatom med elektronegativiteten 2,5. Hydrogen har elektronegativiteten 2,1. Du kan begynde sådan: “Oxygenatomet i vand trækker kraftigt i elektronerne, så hydrogenkernerne i vand …”</p>
+<p>Til spørgsmål d: find først forskellen mellem de to kemiske skift i ppm. Afstanden i hertz er forskellen i ppm ganget med scannerens frekvens i megahertz.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-27-contents" aria-controls="callout-27" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-27" class="callout-27-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>En MR-scanner måler på hydrogenkerner, altså kernerne i hydrogenatomerne i kroppens vand og fedt. I magnetfeltet peger en hydrogenkerne enten med feltet eller mod feltet. En radiobølge med præcis den rigtige frekvens bliver absorberet og vender en hydrogenkerne, så den peger mod feltet.</p></li>
+<li><p>Signalet fra fedt ved 1,3 ppm kommer fra de bedst skærmede hydrogenkerner. Det har det laveste kemiske skift og står længst til højre.</p></li>
+<li><p>I vand er hydrogenatomerne bundet direkte til et oxygenatom. Oxygen har elektronegativiteten 3,5 og trækker kraftigt elektroner væk fra hydrogenkernerne. Hydrogenkernerne i vand har få elektroner omkring sig og er dårligt skærmet.</p></li>
+</ol>
+<p>I en CH<sub>2</sub>-gruppe i fedt er hydrogenatomerne bundet til et carbonatom, og carbonatomets naboer er andre carbonatomer. Carbon har elektronegativiteten 2,5, som kun er lidt højere end hydrogens 2,1. Hydrogenkernerne i CH<sub>2</sub>-gruppen beholder flere elektroner omkring sig og er godt skærmet.</p>
+<ol start="4" type="a">
+<li>Forskellen mellem de to kemiske skift er</li>
+</ol>
+<p><span class="math display">\[
+\text{forskel} = 4{,}7\ \mathrm{ppm} - 1{,}3\ \mathrm{ppm} = 3{,}4\ \mathrm{ppm}
+\]</span></p>
+<p>Afstanden i hertz er forskellen i ppm ganget med scannerens frekvens:</p>
+<p><span class="math display">\[
+\text{afstand} = 3{,}4\ \mathrm{ppm} \cdot 64\ \mathrm{MHz} = 218\ \mathrm{Hz}
+\]</span></p>
+<p>Der er omkring 218 Hz mellem signalet fra vand og signalet fra fedt. Det er meget lidt i forhold til radiobølgernes frekvens på 64 MHz, som er 64 millioner hertz.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.eks.2" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.eks.2">Opgave A4.7.eks.2: Et nyt spektrometer</h2>
+<p>Et laboratorium har i mange år brugt et NMR-spektrometer med frekvensen 200 MHz. Nu har laboratoriet købt et nyt spektrometer med en stærkere magnet og frekvensen 500 MHz. For at afprøve det nye spektrometer måler en laborant det samme stof på begge spektrometre.</p>
+<p>Stoffet er 3,3-dimethylbutan-2-on, (CH<sub>3</sub>)<sub>3</sub>C−CO−CH<sub>3</sub>, som giver to signaler, A og B. På det gamle spektrometer ligger signal A 230 Hz fra signalet fra TMS, og signal B ligger 428 Hz fra signalet fra TMS.</p>
+<ol type="a">
+<li>Beregn det kemiske skift for signal A og for signal B ud fra målingen på det gamle spektrometer.</li>
+<li>Beregn, hvor mange hertz signal A og signal B ligger fra signalet fra TMS på det nye spektrometer.</li>
+<li>Forklar, hvorfor laboratoriet kan bruge de samme tabeller over kemiske skift til det nye spektrometer som til det gamle.</li>
+<li>Beregn afstanden i hertz mellem signal A og signal B på hvert af de to spektrometre, og vurdér, hvad laboratoriet vinder ved den stærkere magnet.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-28-contents" aria-controls="callout-28" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-28" class="callout-28-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Det kemiske skift, δ, er signalets afstand fra TMS i hertz divideret med spektrometrets frekvens i megahertz. Det gamle spektrometer har frekvensen 200 MHz.</p>
+<p>Det kemiske skift for et signal er det samme på alle spektrometre. Brug det til spørgsmål b.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-29-contents" aria-controls="callout-29" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-29" class="callout-29-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål b: signalets afstand fra TMS i hertz er det kemiske skift i ppm ganget med spektrometrets frekvens i megahertz. Det nye spektrometer har frekvensen 500 MHz.</p>
+<p>Til spørgsmål d: afstanden mellem signal A og signal B er forskellen mellem de to signalers afstande fra TMS. Du kan begynde vurderingen sådan: “På det nye spektrometer ligger signal A og signal B … hertz fra hinanden, og på det gamle … To signaler, der ligger tæt på hinanden, bliver derfor …”</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-30-contents" aria-controls="callout-30" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-30" class="callout-30-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Det gamle spektrometer har frekvensen 200 MHz. Det kemiske skift er signalets afstand fra TMS i hertz divideret med spektrometrets frekvens i megahertz.</li>
+</ol>
+<p>Signal A:</p>
+<p><span class="math display">\[
+\delta = \dfrac{230\ \mathrm{Hz}}{200\ \mathrm{MHz}} = 1{,}15\ \mathrm{ppm}
+\]</span></p>
+<p>Signal B:</p>
+<p><span class="math display">\[
+\delta = \dfrac{428\ \mathrm{Hz}}{200\ \mathrm{MHz}} = 2{,}14\ \mathrm{ppm}
+\]</span></p>
+<p>Signal A ligger ved 1,15 ppm, og signal B ligger ved 2,14 ppm.</p>
+<ol start="2" type="a">
+<li>De kemiske skift er de samme på det nye spektrometer. Signalets afstand fra TMS i hertz er det kemiske skift ganget med spektrometrets frekvens, som nu er 500 MHz.</li>
+</ol>
+<p>Signal A:</p>
+<p><span class="math display">\[
+\text{afstand fra TMS} = \delta \cdot \text{frekvens} = 1{,}15\ \mathrm{ppm} \cdot 500\ \mathrm{MHz} = 575\ \mathrm{Hz}
+\]</span></p>
+<p>Signal B:</p>
+<p><span class="math display">\[
+\text{afstand fra TMS} = \delta \cdot \text{frekvens} = 2{,}14\ \mathrm{ppm} \cdot 500\ \mathrm{MHz} = 1070\ \mathrm{Hz}
+\]</span></p>
+<p>På det nye spektrometer ligger signal A 575 Hz fra signalet fra TMS, og signal B ligger 1070 Hz fra signalet fra TMS.</p>
+<ol start="3" type="a">
+<li><p>Det kemiske skift er signalets afstand fra TMS divideret med spektrometrets frekvens. En stærkere magnet gør både afstanden og frekvensen større, og de vokser lige meget. Det kemiske skift i ppm er derfor det samme på de to spektrometre: signal A ligger ved 1,15 ppm og signal B ved 2,14 ppm på dem begge. Tabellerne angiver kemiske skift i ppm, så de gælder for alle spektrometre.</p></li>
+<li><p>Afstanden mellem signal A og signal B på det gamle spektrometer:</p></li>
+</ol>
+<p><span class="math display">\[
+\text{afstand} = 428\ \mathrm{Hz} - 230\ \mathrm{Hz} = 198\ \mathrm{Hz}
+\]</span></p>
+<p>Afstanden mellem signal A og signal B på det nye spektrometer:</p>
+<p><span class="math display">\[
+\text{afstand} = 1070\ \mathrm{Hz} - 575\ \mathrm{Hz} = 495\ \mathrm{Hz}
+\]</span></p>
+<p>På det nye spektrometer ligger de to signaler 2,5 gange så langt fra hinanden målt i hertz. Signalerne bliver altså spredt mere ud. Laboratoriet vinder, at to signaler, der ligger tæt på hinanden, er lettere at skelne fra hinanden på det nye spektrometer. De kemiske skift ændrer sig ikke, så spektrene kan stadig sammenlignes med de gamle spektre og med tabellerne.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="A4.7.eks.3" class="level2">
+<h2 class="anchored" data-anchor-id="A4.7.eks.3">Opgave A4.7.eks.3: Et opløsningsmiddel med to signaler</h2>
+<p>Dimethoxymethan, CH<sub>3</sub>−O−CH<sub>2</sub>−O−CH<sub>3</sub>, er en farveløs væske, som bruges som opløsningsmiddel, blandt andet i lim og maling. Figuren viser stoffets formel og NMR-spektrum. De to methylgrupper har de samme omgivelser og giver tilsammen ét signal. CH<sub>2</sub>-gruppen giver det andet signal. Signal A ligger ved 3,36 ppm, og signal B ligger ved 4,57 ppm.</p>
+<div id="fig-a4-opg-7-dimethoxymethan" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a4-opg-7-dimethoxymethan-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a4-opg-7-dimethoxymethan.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Figur&nbsp;6: Dimethoxymethan og stoffets NMR-spektrum."><img src="../figurer/a4-opg-7-dimethoxymethan.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a4-opg-7-dimethoxymethan-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;6: Dimethoxymethan og stoffets NMR-spektrum.
+</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>Angiv, hvilket af signalerne A og B der kommer fra de dårligst skærmede hydrogenkerner.</li>
+<li>I propan, CH<sub>3</sub>−CH<sub>2</sub>−CH<sub>3</sub>, ligger begge signaler under 1,5 ppm. Forklar, hvorfor begge signaler fra dimethoxymethan ligger længere til venstre end signalerne fra propan.</li>
+<li>Bestem, hvilket af signalerne A og B der hører til methylgrupperne, og hvilket der hører til CH<sub>2</sub>-gruppen. Begrund svaret ud fra det antal oxygenatomer, hver gruppe er bundet til.</li>
+<li>Spektret er målt på et spektrometer med frekvensen 300 MHz. Beregn afstanden i hertz mellem signal A og signal B.</li>
+</ol>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 1">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-31-contents" aria-controls="callout-31" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 1
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-31" class="callout-31-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Et signal til venstre i et NMR-spektrum har et højt kemisk skift og kommer fra hydrogenkerner, der er dårligt skærmet.</p>
+<p>Oxygen har elektronegativiteten 3,5, og carbon har 2,5. Et elektronegativt atom i nærheden trækker elektroner væk fra hydrogenkernerne, så de bliver dårligere skærmet.</p>
+</div>
+</div>
+</div>
+<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp 2">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-32-contents" aria-controls="callout-32" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hjælp 2
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-32" class="callout-32-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Til spørgsmål c: tæl, hvor mange oxygenatomer hvert carbonatom i dimethoxymethan er bundet til. Hver methylgruppe sidder på ét oxygenatom. CH<sub>2</sub>-gruppen sidder mellem to oxygenatomer. Du kan begynde sådan: “CH<sub>2</sub>-gruppen er bundet til … oxygenatomer, som begge trækker elektroner væk, så …”</p>
+<p>Til spørgsmål d: find forskellen mellem de to kemiske skift i ppm, og gang med spektrometrets frekvens i megahertz.</p>
+</div>
+</div>
+</div>
+<div class="facit callout callout-style-default callout-note callout-titled" title="Facit">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-33-contents" aria-controls="callout-33" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Facit
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-33" class="callout-33-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><p>Signal B ved 4,57 ppm kommer fra de dårligst skærmede hydrogenkerner. Signal B har det højeste kemiske skift og står længst til venstre.</p></li>
+<li><p>I propan er hydrogenatomerne kun omgivet af carbon og hydrogen, og ingen atomer trækker i elektronerne. Hydrogenkernerne i propan er derfor godt skærmet. I dimethoxymethan sidder alle tre grupper direkte på et oxygenatom. Oxygen er elektronegativt og trækker elektroner væk fra hydrogenkernerne. De bliver dårligere skærmet, absorberer ved en højere frekvens og får et højere kemisk skift.</p></li>
+<li><p>Signal A ved 3,36 ppm hører til de to methylgrupper, og signal B ved 4,57 ppm hører til CH<sub>2</sub>-gruppen. Hver methylgruppe er bundet til ét oxygenatom. CH<sub>2</sub>-gruppen er bundet til to oxygenatomer, som begge trækker elektroner væk. Hydrogenkernerne i CH<sub>2</sub>-gruppen er derfor dårligst skærmet og giver signalet længst til venstre.</p></li>
+</ol>
+<div id="fig-a4-opg-7-dimethoxymethan-facit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a4-opg-7-dimethoxymethan-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="../figurer/a4-opg-7-dimethoxymethan-facit.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-7" title="Figur&nbsp;7: Dimethoxymethan med farvede ringe: de to methylgrupper giver signal A, og CH2-gruppen giver signal B."><img src="../figurer/a4-opg-7-dimethoxymethan-facit.svg" class="img-fluid figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a4-opg-7-dimethoxymethan-facit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figur&nbsp;7: Dimethoxymethan med farvede ringe: de to methylgrupper giver signal A, og CH<sub>2</sub>-gruppen giver signal B.
+</figcaption>
+</figure>
+</div>
+<ol start="4" type="a">
+<li>Forskellen mellem de to kemiske skift er</li>
+</ol>
+<p><span class="math display">\[
+\text{forskel} = 4{,}57\ \mathrm{ppm} - 3{,}36\ \mathrm{ppm} = 1{,}21\ \mathrm{ppm}
+\]</span></p>
+<p>Afstanden i hertz er forskellen i ppm ganget med spektrometrets frekvens:</p>
+<p><span class="math display">\[
+\text{afstand} = 1{,}21\ \mathrm{ppm} \cdot 300\ \mathrm{MHz} = 363\ \mathrm{Hz}
+\]</span></p>
+<p>Der er 363 Hz mellem signal A og signal B på spektrometret med frekvensen 300 MHz.</p>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+
+// Temaopgaver kan klappes sammen.
+
+//
+
+// På opgavesiderne indleder en overskrift som "Opgaver med klimatema {.tema}" et tema.
+
+// Dette script gør overskriften til en knap og skjuler temaets opgaver, til man klikker.
+
+// Indholdslisten i højre side følger med, så kun de åbne temaers opgaver står der.
+
+// Et klik på temaets navn i indholdslisten åbner og lukker også temaet.
+
+// Et tema, man har åbnet, bliver ved med at være åbent på de andre opgavesider.
+
+// Uden JavaScript, og når siden skrives ud, vises alle opgaver som almindelig tekst.
+
+// Sættes "?temaer=aabne" efter sidens adresse, er alle temaer åbne fra start.
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  var temaer = Array.prototype.slice.call(document.querySelectorAll("body.opgaver main section.level2.tema"));
+
+  if (!temaer.length) return;
+
+  var alleAabne = /[?&]temaer=aabne/.test(location.search);
+
+
+
+  function husk(id, aaben) {
+
+    try { localStorage.setItem("kemibogen-tema-" + id, aaben ? "1" : "0"); } catch (e) {}
+
+  }
+
+  function husket(id) {
+
+    try { return localStorage.getItem("kemibogen-tema-" + id) === "1"; } catch (e) { return false; }
+
+  }
+
+  function tocPunkt(id) {
+
+    var link = document.getElementById("toc-" + id);
+
+    return link ? link.closest("li") : null;
+
+  }
+
+
+
+  var alle = temaer.map(function (tema) {
+
+    var h2 = tema.querySelector("h2");
+
+    var indhold = document.createElement("div");
+
+    indhold.className = "tema-indhold";
+
+    indhold.id = tema.id + "-opgaver";
+
+    var opgaver = [];
+
+    var naeste = tema.nextElementSibling;
+
+    while (naeste && naeste.matches("section.level2") && !naeste.classList.contains("tema")) {
+
+      var flyt = naeste;
+
+      naeste = naeste.nextElementSibling;
+
+      indhold.appendChild(flyt);
+
+      opgaver.push(flyt);
+
+    }
+
+    tema.appendChild(indhold);
+
+
+
+    var antal = document.createElement("span");
+
+    antal.className = "tema-antal";
+
+    antal.textContent = opgaver.length + " opgaver";
+
+    h2.appendChild(antal);
+
+    h2.setAttribute("role", "button");
+
+    h2.setAttribute("tabindex", "0");
+
+    h2.setAttribute("aria-controls", indhold.id);
+
+
+
+    var t = { tema: tema, h2: h2, indhold: indhold, opgaver: opgaver, aaben: false };
+
+    t.saet = function (aaben, gem) {
+
+      t.aaben = aaben;
+
+      indhold.classList.toggle("lukket", !aaben);
+
+      h2.setAttribute("aria-expanded", aaben ? "true" : "false");
+
+      opgaver.forEach(function (o) {
+
+        var li = tocPunkt(o.id);
+
+        if (li) li.classList.toggle("tema-skjult", !aaben);
+
+      });
+
+      var punkt = document.getElementById("toc-" + tema.id);
+
+      if (punkt) punkt.classList.toggle("tema-aaben", aaben);
+
+      if (gem) husk(tema.id, aaben);
+
+    };
+
+    h2.addEventListener("click", function (e) {
+
+      if (e.target.closest("a")) return;          // ankerlinket ved overskriften
+
+      t.saet(!t.aaben, true);
+
+    });
+
+    h2.addEventListener("keydown", function (e) {
+
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); t.saet(!t.aaben, true); }
+
+    });
+
+    // Et klik på temaet i indholdslisten åbner det og lukker det igen
+
+    var punkt = document.getElementById("toc-" + tema.id);
+
+    if (punkt) {
+
+      punkt.classList.add("tema-punkt");
+
+      punkt.setAttribute("title", "Klik for at åbne eller lukke temaet");
+
+      punkt.addEventListener("click", function () { t.saet(!t.aaben, true); });
+
+    }
+
+
+
+    t.saet(alleAabne || husket(tema.id), false);
+
+    return t;
+
+  });
+
+  // Til stil/lektielinks.html, som åbner og skjuler temaer, når siden kun viser udvalgte opgaver
+
+  window.kemibogenTemaer = alle;
+
+
+
+  // Et link til en opgave inde i et lukket tema åbner temaet først
+
+  function aabnTilAnker() {
+
+    var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+
+    if (!id) return;
+
+    var maal = document.getElementById(id);
+
+    if (!maal) return;
+
+    alle.forEach(function (t) {
+
+      if (!t.aaben && t.indhold.contains(maal)) {
+
+        t.saet(true, false);
+
+        maal.scrollIntoView();
+
+      }
+
+    });
+
+  }
+
+  aabnTilAnker();
+
+  window.addEventListener("hashchange", aabnTilAnker);
+
+
+
+  // Indholdslisten: peger Quarto på en skjult opgave, markeres temaet i stedet
+
+  var venter = false;
+
+  function retMarkering() {
+
+    venter = false;
+
+    alle.forEach(function (t) {
+
+      var punkt = document.getElementById("toc-" + t.tema.id);
+
+      if (!punkt) return;
+
+      var skjultAktiv = !t.aaben && t.opgaver.some(function (o) {
+
+        var link = document.getElementById("toc-" + o.id);
+
+        return link && link.classList.contains("active");
+
+      });
+
+      punkt.classList.toggle("tema-aktiv", skjultAktiv);
+
+    });
+
+  }
+
+  window.addEventListener("scroll", function () {
+
+    if (!venter) { venter = true; requestAnimationFrame(retMarkering); }
+
+  }, { passive: true });
+
+});
+
+</script>
+
+<script>
+
+// Trin for trin.
+
+//
+
+// En boks med klassen "trinvis" indeholder flere bokse med klassen "trin". Dette script
+
+// viser ét trin ad gangen og sætter knapper over: Forrige, Næste, et nummer for hvert trin
+
+// (eller teksten fra trinets egenskab knap="...")
+
+// og "Vis alle trin". Alle trin ligger oven på hinanden, så boksen ikke skifter højde.
+
+// Uden JavaScript, og når siden skrives ud, står trinnene bare under hinanden.
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  Array.prototype.forEach.call(document.querySelectorAll(".trinvis"), function (boks) {
+
+    var trin = Array.prototype.filter.call(boks.children, function (el) {
+
+      return el.classList.contains("trin");
+
+    });
+
+    if (trin.length < 2) return;
+
+
+
+    var stak = document.createElement("div");
+
+    stak.className = "trin-stak";
+
+    boks.insertBefore(stak, trin[0]);
+
+    trin.forEach(function (t) { stak.appendChild(t); });
+
+
+
+    var bjaelke = document.createElement("div");
+
+    bjaelke.className = "trin-bjaelke";
+
+    function knap(tekst, klasse, label) {
+
+      var k = document.createElement("button");
+
+      k.type = "button";
+
+      k.className = klasse;
+
+      k.textContent = tekst;
+
+      if (label) k.setAttribute("aria-label", label);
+
+      bjaelke.appendChild(k);
+
+      return k;
+
+    }
+
+    var nu = 0, visAlle = false;
+
+    var forrige = knap("‹ Forrige", "trin-forrige", "Forrige trin");
+
+    var numre = trin.map(function (t, k) {
+
+      var tekst = t.getAttribute("data-knap") || String(k + 1);
+
+      var n = knap(tekst, "trin-nr", /^\d+$/.test(tekst) ? "Trin " + tekst : tekst);
+
+      n.addEventListener("click", function () { nu = k; visAlle = false; vis(); });
+
+      return n;
+
+    });
+
+    var naeste = knap("Næste ›", "trin-naeste", "Næste trin");
+
+    var alle = knap("Vis alle trin", "trin-alle");
+
+    boks.insertBefore(bjaelke, stak);
+
+
+
+    function vis() {
+
+      boks.classList.toggle("alle", visAlle);
+
+      trin.forEach(function (t, k) {
+
+        t.classList.toggle("vist", k === nu);
+
+        numre[k].classList.toggle("aktiv", !visAlle && k === nu);
+
+        if (!visAlle && k === nu) numre[k].setAttribute("aria-current", "step");
+
+        else numre[k].removeAttribute("aria-current");
+
+      });
+
+      forrige.disabled = visAlle || nu === 0;
+
+      naeste.disabled = visAlle || nu === trin.length - 1;
+
+      alle.textContent = visAlle ? "Vis ét trin ad gangen" : "Vis alle trin";
+
+    }
+
+    forrige.addEventListener("click", function () { if (nu > 0) { nu--; vis(); } });
+
+    naeste.addEventListener("click", function () { if (nu < trin.length - 1) { nu++; vis(); } });
+
+    alle.addEventListener("click", function () { visAlle = !visAlle; vis(); });
+
+    // Piletasterne bladrer, når en af knapperne har fokus
+
+    bjaelke.addEventListener("keydown", function (e) {
+
+      if (visAlle) return;
+
+      if (e.key === "ArrowRight" && nu < trin.length - 1) { nu++; vis(); e.preventDefault(); }
+
+      if (e.key === "ArrowLeft" && nu > 0) { nu--; vis(); e.preventDefault(); }
+
+    });
+
+
+
+    boks.classList.add("aktiv");
+
+    if (/[?&]trin=alle/.test(location.search)) visAlle = true;
+
+    vis();
+
+  });
+
+});
+
+</script>
+
+<script>
+
+// Figurer, man kan pege på (en boks med klassen "pegefigur" om figuren i .qmd-filen).
+
+//
+
+// Figurprogrammet (vaerktoej/lav_figurer.py) har lagt de dele af figuren, man kan pege på, i
+
+// grupper med klassen "peg" og skrevet en titel og en forklaring på hver gruppe (funktionen peg).
+
+// Dette script henter figuren ind i siden og viser forklaringen i et felt lige under figuren,
+
+// når man peger på en del, trykker på den eller går til den med tabulatortasten og piletasterne.
+
+// Et klik holder forklaringen fast. Nogle dele har "med": så bliver de dele, der hører sammen
+
+// med den, stående, mens resten af figuren bliver bleg (fx vejen gennem et rutediagram).
+
+// En del kan også have hjælpestreger med klassen "peg-kun-fremme", som kun ses, mens man peger på den.
+
+// Uden JavaScript, og når siden skrives ud, er figuren det samme billede som før.
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  var bokse = document.querySelectorAll(".pegefigur");
+
+  if (!bokse.length || !window.fetch || !window.DOMParser) return;
+
+
+
+  var SVG = "http://www.w3.org/2000/svg";
+
+  var BEROERING = window.matchMedia && window.matchMedia("(hover: none)").matches;
+
+  var STANDARD = "Peg på en del af figuren for at se mere.";
+
+  var oensket = /[?&]peg=([^&#]+)/.exec(location.search);   // "?peg=Zn" vælger delen Zn (til gennemsyn som billede)
+
+  oensket = oensket ? decodeURIComponent(oensket[1]) : null;
+
+
+
+  function el(navn, klasse) {
+
+    var e = document.createElement(navn);
+
+    if (klasse) e.className = klasse;
+
+    return e;
+
+  }
+
+  // Forklaringerne bruger figurprogrammets skrivemåde: _{2} er sænket og ^{2+} er hævet skrift.
+
+  // En størrelse mellem to stjerner, *K*, bliver kursiv som i bogens tekst.
+
+  function rig(s) {
+
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+
+            .replace(/_\{([^}]*)\}/g, "<sub>$1</sub>").replace(/\^\{([^}]*)\}/g, "<sup>$1</sup>")
+
+            .replace(/\*([^*\s](?:[^*]*[^*\s])?)\*/g, "<em>$1</em>");
+
+  }
+
+  function ren(s) { return s.replace(/[_^]\{([^}]*)\}/g, "$1").replace(/\*([^*\s](?:[^*]*[^*\s])?)\*/g, "$1"); }
+
+  function ord(s) { return (s || "").split(/\s+/).filter(Boolean); }
+
+
+
+  var loebenr = 0;
+
+  Array.prototype.forEach.call(bokse, function (boks) {
+
+    var billede = boks.querySelector("img");
+
+    if (!billede || !/\.svg([?#]|$)/.test(billede.getAttribute("src") || "")) return;
+
+    fetch(billede.src).then(function (svar) {
+
+      if (!svar.ok) throw new Error("figuren kunne ikke hentes");
+
+      return svar.text();
+
+    }).then(function (kilde) { byg(boks, billede, kilde); })
+
+      .catch(function () { /* Kan figuren ikke hentes, står billedet der bare som før */ });
+
+  });
+
+
+
+  function byg(boks, billede, kilde) {
+
+    // Navne inde i figuren (fx farveovergange) får et forled, så to figurer på samme side ikke deler navn
+
+    var forled = "pf" + (++loebenr) + "-";
+
+    kilde = kilde.replace(/(\s)id="([^"]+)"/g, '$1id="' + forled + '$2"')
+
+                 .replace(/url\(#([^)]+)\)/g, "url(#" + forled + "$1)")
+
+                 .replace(/href="#([^"]+)"/g, 'href="#' + forled + '$1"');
+
+    var svg = new DOMParser().parseFromString(kilde, "image/svg+xml").documentElement;
+
+    if (!svg || svg.nodeName.toLowerCase() !== "svg") return;
+
+    svg = document.importNode(svg, true);
+
+    var grupper = Array.prototype.slice.call(svg.querySelectorAll("g.peg"));
+
+    if (!grupper.length) return;
+
+
+
+    var vejledning = svg.querySelector("g.peg-vejledning");
+
+    var start = vejledning ? vejledning.getAttribute("data-tekst") : STANDARD;
+
+    if (BEROERING) start = start.replace(/^Peg på/, "Tryk på");
+
+    var titel = svg.querySelector("title");
+
+    if (titel) svg.removeChild(titel);   // ellers viser browseren figurens beskrivelse som en gul boble
+
+    var maal = (svg.getAttribute("viewBox") || "").split(/\s+/).map(Number);
+
+    svg.removeAttribute("width");
+
+    svg.removeAttribute("height");
+
+    svg.setAttribute("role", "group");
+
+    svg.setAttribute("class", "peg-svg");
+
+    if (maal.length === 4 && maal[2] > 0) svg.style.width = maal[2] + "px";
+
+
+
+    // Figuren ind i siden i stedet for billedet, og feltet med forklaringen lige under den
+
+    var ramme = el("div", "peg-ramme");
+
+    var gammel = billede.closest("a") || billede;
+
+    gammel.parentNode.replaceChild(ramme, gammel);
+
+    ramme.appendChild(svg);
+
+    var info = el("div", "peg-info");
+
+    info.setAttribute("aria-live", "polite");
+
+    var figur = ramme.closest("figure");
+
+    var billedtekst = figur && figur.querySelector("figcaption");
+
+    if (billedtekst && billedtekst.parentNode === figur) figur.insertBefore(info, billedtekst);
+
+    else ramme.parentNode.insertBefore(info, ramme.nextSibling);
+
+
+
+    // Alle forklaringerne ligger oven på hinanden i feltet, og kun én er synlig. Så er feltet
+
+    // hele tiden lige så højt som den længste forklaring, og siden hopper ikke, når man peger.
+
+    function kort(overskrift, tekst, klasse) {
+
+      var k = el("div", "peg-kort" + (klasse ? " " + klasse : ""));
+
+      if (overskrift) { var t = el("p", "peg-titel"); t.innerHTML = rig(overskrift); k.appendChild(t); }
+
+      (tekst || "").split("\n").forEach(function (afsnit) {
+
+        if (!afsnit.trim()) return;
+
+        var p = el("p"); p.innerHTML = rig(afsnit); k.appendChild(p);
+
+      });
+
+      info.appendChild(k);
+
+      return k;
+
+    }
+
+    var startkort = kort(null, start, "peg-vejledning");
+
+
+
+    var dele = grupper.map(function (g, i) {
+
+      var d = { g: g, nr: i, titel: g.getAttribute("data-titel") || "", tekst: g.getAttribute("data-tekst") || "",
+
+                noegle: g.getAttribute("data-noegle"), i: ord(g.getAttribute("data-i")), med: ord(g.getAttribute("data-med")) };
+
+      d.kort = kort(d.titel, d.tekst);
+
+      g.setAttribute("role", "button");
+
+      g.setAttribute("tabindex", i === 0 ? "0" : "-1");
+
+      g.setAttribute("aria-label", ren(d.titel + (d.tekst ? ". " + d.tekst.replace(/\n/g, " ") : "")));
+
+      return d;
+
+    });
+
+    // De dele, der bliver stående fremme sammen med en del: dem, den nævner i "med", ved navn eller ved gruppe
+
+    dele.forEach(function (d) {
+
+      d.venner = !d.med.length ? [] : dele.filter(function (a) {
+
+        return a !== d && (d.med.indexOf(a.noegle) >= 0 || a.i.some(function (s) { return d.med.indexOf(s) >= 0; }));
+
+      });
+
+    });
+
+
+
+    // Hver del får et usynligt felt, der fanger musen (også mellem bogstaverne), og en ramme til fremhævning
+
+    var maalt = false;
+
+    function maalOp() {
+
+      if (maalt) return;
+
+      // Har delen en flade med klassen "peg-maal", er det den, der bestemmer feltets størrelse
+
+      var kasser = dele.map(function (d) {
+
+        try { return (d.g.querySelector(".peg-maal") || d.g).getBBox(); } catch (e) { return null; }
+
+      });
+
+      if (!kasser.some(function (b) { return b && b.width > 0; })) return;   // figuren er skjult lige nu
+
+      maalt = true;
+
+      dele.forEach(function (d, i) {
+
+        var b = kasser[i];
+
+        if (!b || !b.width) return;
+
+        var luft = 2.5;
+
+        [["peg-felt", true], ["peg-kant", false]].forEach(function (r) {
+
+          var rekt = document.createElementNS(SVG, "rect");
+
+          rekt.setAttribute("x", (b.x - luft).toFixed(1));
+
+          rekt.setAttribute("y", (b.y - luft).toFixed(1));
+
+          rekt.setAttribute("width", (b.width + 2 * luft).toFixed(1));
+
+          rekt.setAttribute("height", (b.height + 2 * luft).toFixed(1));
+
+          rekt.setAttribute("rx", "7");
+
+          rekt.setAttribute("class", r[0]);
+
+          if (r[1]) d.g.insertBefore(rekt, d.g.firstChild); else d.g.appendChild(rekt);
+
+        });
+
+      });
+
+    }
+
+    maalOp();
+
+    svg.addEventListener("pointerover", maalOp);
+
+    svg.addEventListener("focusin", maalOp);
+
+
+
+    var fast = null, vist;
+
+    function vis(d) {
+
+      if (d === vist) return;
+
+      vist = d;
+
+      startkort.classList.toggle("peg-vist", !d);
+
+      dele.forEach(function (a) {
+
+        a.kort.classList.toggle("peg-vist", a === d);
+
+        a.g.classList.toggle("peg-fremme", a === d);
+
+        a.g.classList.toggle("peg-lys", !!d && (a === d || d.venner.indexOf(a) >= 0));
+
+      });
+
+      svg.classList.toggle("peg-daemp", !!d && d.venner.length > 0);
+
+    }
+
+    function fastgoer(d) {
+
+      if (fast) { fast.g.classList.remove("peg-valgt"); fast.g.setAttribute("aria-pressed", "false"); }
+
+      fast = d;
+
+      if (d) {
+
+        d.g.classList.add("peg-valgt");
+
+        d.g.setAttribute("aria-pressed", "true");
+
+        dele.forEach(function (a) { a.g.setAttribute("tabindex", a === d ? "0" : "-1"); });
+
+      }
+
+      vis(d);
+
+    }
+
+
+
+    dele.forEach(function (d) {
+
+      d.g.addEventListener("pointerenter", function () { vis(d); });
+
+      d.g.addEventListener("focus", function () { vis(d); });
+
+      d.g.addEventListener("click", function (e) { fastgoer(fast === d ? null : d); e.stopPropagation(); });
+
+      d.g.addEventListener("keydown", function (e) {
+
+        if (e.key === "Enter" || e.key === " ") { fastgoer(fast === d ? null : d); e.preventDefault(); return; }
+
+        if (e.key === "Escape") { fastgoer(null); return; }
+
+        var trin = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
+
+        if (!trin) return;
+
+        var naeste = dele[d.nr + trin];
+
+        if (naeste) {
+
+          dele.forEach(function (a) { a.g.setAttribute("tabindex", a === naeste ? "0" : "-1"); });
+
+          naeste.g.focus();
+
+        }
+
+        e.preventDefault();
+
+      });
+
+    });
+
+    svg.addEventListener("pointerleave", function () { vis(fast); });
+
+    svg.addEventListener("focusout", function (e) { if (!svg.contains(e.relatedTarget)) vis(fast); });
+
+    svg.addEventListener("click", function () { fastgoer(null); });   // et klik ved siden af slipper forklaringen
+
+
+
+    boks.classList.add("peg-aktiv");
+
+    vis(null);
+
+    if (oensket) {
+
+      var valgt = dele.filter(function (d) { return d.noegle === oensket; })[0];
+
+      if (valgt) fastgoer(valgt);
+
+    }
+
+  }
+
+});
+
+</script>
+
+<script>
+// Lektielinks på opgavesiderne. Se noter/repetition.md.
+//
+// Hver opgave har sit nummer som anker (stil/lektielinks.lua), så adressen til opgave 7.2.3 er
+// .../opgaver/7-2-opgaver.html#7.2.3. Dette script gør tre ting:
+// 1. Ved hver opgave står en lille knap, der kopierer adressen til opgaven.
+// 2. Linjen "Lav et link til udvalgte opgaver" øverst på siden sætter et felt ved hver opgave.
+//    Bjælken nederst kopierer så en adresse, der ender på ?opgaver=7.2.1,7.2.3,7.2.5.
+// 3. Åbnes siden med sådan en adresse, vises kun de valgte opgaver, og en linje øverst siger det.
+//    Numrene må også skrives kort, når de hører til siden selv: ?opgaver=1,3,mad.2.
+// Et gammelt link med opgavens titel i ankeret (#opgave-7.2.3-titel) sendes videre til det nye.
+// Uden JavaScript og på print er siden uændret.
+document.addEventListener("DOMContentLoaded", function () {
+  var main = document.querySelector("main");
+  if (!main) return;
+
+  var NUMMER = /^[A-Za-z]?\d+\.\d+\.[A-Za-z0-9.]+$/;
+  var opgaver = [], efterNr = Object.create(null);
+  Array.prototype.forEach.call(main.querySelectorAll("section.level2"), function (s) {
+    if (!NUMMER.test(s.id)) return;
+    var h2 = s.querySelector("h2");
+    if (!h2) return;
+    var o = { nr: s.id, sektion: s, h2: h2, felt: null };
+    opgaver.push(o);
+    efterNr[s.id.toLowerCase()] = o;
+  });
+  if (!opgaver.length) return;
+  document.body.classList.add("ll-side");
+
+  var side = location.href.split("#")[0].split("?")[0];
+  // Det, alle sidens numre begynder med: "7.2." på siden med opgaverne til afsnit 7.2
+  var forstavelse = opgaver[0].nr.replace(/^([A-Za-z]?\d+\.\d+\.).*$/, "$1");
+
+  function el(navn, klasse, tekst) {
+    var e = document.createElement(navn);
+    if (klasse) e.className = klasse;
+    if (tekst) e.textContent = tekst;
+    return e;
+  }
+  function knap(klasse, tekst) {
+    var k = el("button", klasse, tekst);
+    k.type = "button";
+    return k;
+  }
+  function tocPunkt(id) {
+    var link = document.getElementById("toc-" + id);
+    return link ? link.closest("li") : null;
+  }
+  function remse(numre) {
+    if (numre.length < 2) return numre.join("");
+    return numre.slice(0, -1).join(", ") + " og " + numre[numre.length - 1];
+  }
+  function kopier(tekst, faerdig) {
+    function iHaanden() {
+      var felt = el("textarea", "ll-kopifelt");
+      felt.value = tekst;
+      felt.setAttribute("readonly", "");
+      document.body.appendChild(felt);
+      felt.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(felt);
+      faerdig(ok);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tekst).then(function () { faerdig(true); }, iHaanden);
+    } else {
+      iHaanden();
+    }
+  }
+
+  // ----- Gamle links ------------------------------------------------------------------------
+  function gammeltAnker() {
+    var anker = location.hash;
+    try { anker = decodeURIComponent(anker); } catch (e) {}
+    var m = /^#opgave-([a-z]?\d+\.\d+\.(?:[a-z]+\.)?\d+)(?:-|$)/i.exec(anker);
+    var o = m && efterNr[m[1].toLowerCase()];
+    if (o) location.replace("#" + o.nr);
+  }
+  gammeltAnker();
+  window.addEventListener("hashchange", gammeltAnker);
+
+  // ----- 1. Knappen ved hver opgave ------------------------------------------------------------
+  opgaver.forEach(function (o) {
+    var k = knap("ll-knap");
+    var ikon = el("i", "bi bi-link-45deg");
+    ikon.setAttribute("aria-hidden", "true");
+    var tekst = el("span", "ll-knaptekst", "Kopiér link");
+    k.appendChild(ikon);
+    k.appendChild(tekst);
+    k.title = "Kopiér link til opgave " + o.nr;
+    k.setAttribute("aria-label", k.title);
+    var ur = null;
+    k.addEventListener("click", function () {
+      kopier(side + "#" + o.nr, function (ok) {
+        tekst.textContent = ok ? "Link kopieret" : side + "#" + o.nr;
+        k.classList.add("ll-kopieret");
+        clearTimeout(ur);
+        ur = setTimeout(function () {
+          tekst.textContent = "Kopiér link";
+          k.classList.remove("ll-kopieret");
+        }, ok ? 2200 : 12000);
+      });
+    });
+    o.h2.appendChild(k);
+
+    // Feltet, der kun ses, mens læreren vælger opgaver
+    var valg = el("label", "ll-valg");
+    o.felt = el("input");
+    o.felt.type = "checkbox";
+    o.felt.setAttribute("aria-label", "Vælg opgave " + o.nr);
+    valg.appendChild(o.felt);
+    o.h2.insertBefore(valg, o.h2.firstChild);
+    o.felt.addEventListener("change", opdaterBjaelke);
+  });
+
+  // ----- 2. Vælg opgaver ---------------------------------------------------------------------
+  var foerste = main.querySelector("section.level2");
+  var start = el("div", "ll-start");
+  var startKnap = knap("ll-startknap");
+  var startIkon = el("i", "bi bi-link-45deg");
+  startIkon.setAttribute("aria-hidden", "true");
+  startKnap.appendChild(startIkon);
+  startKnap.appendChild(document.createTextNode(" Lav et link til udvalgte opgaver"));
+  start.appendChild(startKnap);
+  foerste.parentNode.insertBefore(start, foerste);
+
+  var bjaelke = el("div", "ll-bjaelke");
+  bjaelke.hidden = true;
+  bjaelke.setAttribute("role", "region");
+  bjaelke.setAttribute("aria-label", "Link til udvalgte opgaver");
+  var status = el("span", "ll-status");
+  status.setAttribute("role", "status");
+  var kopierKnap = knap("ll-kopier", "Kopiér link");
+  var lukKnap = knap("ll-luk", "Luk");
+  var adresse = el("input", "ll-adresse");
+  adresse.type = "text";
+  adresse.readOnly = true;
+  adresse.hidden = true;
+  adresse.setAttribute("aria-label", "Linket til de valgte opgaver");
+  bjaelke.appendChild(status);
+  bjaelke.appendChild(kopierKnap);
+  bjaelke.appendChild(lukKnap);
+  bjaelke.appendChild(adresse);
+  document.body.appendChild(bjaelke);
+
+  function valgte() {
+    return opgaver.filter(function (o) { return o.felt.checked; });
+  }
+  function link() {
+    return side + "?opgaver=" + valgte().map(function (o) { return o.nr; }).join(",");
+  }
+  function opdaterBjaelke() {
+    var v = valgte();
+    kopierKnap.disabled = !v.length;
+    adresse.hidden = true;
+    opgaver.forEach(function (o) { o.sektion.classList.toggle("ll-med", o.felt.checked); });
+    if (!v.length) {
+      status.textContent = "Sæt flueben ved de opgaver, linket skal vise.";
+    } else {
+      status.textContent = (v.length === 1 ? "Valgt: opgave " : "Valgt: ") + remse(v.map(function (o) { return o.nr; })) + ".";
+    }
+  }
+  function startVaelger() {
+    var viste = udvalg;
+    if (udvalg) fjernUdvalg();
+    opgaver.forEach(function (o) { o.felt.checked = !!viste && viste.indexOf(o) >= 0; });
+    document.body.classList.add("ll-vaelger");
+    start.hidden = true;
+    bjaelke.hidden = false;
+    opdaterBjaelke();
+  }
+  function lukVaelger() {
+    document.body.classList.remove("ll-vaelger");
+    opgaver.forEach(function (o) { o.felt.checked = false; o.sektion.classList.remove("ll-med"); });
+    start.hidden = false;
+    bjaelke.hidden = true;
+  }
+  startKnap.addEventListener("click", startVaelger);
+  lukKnap.addEventListener("click", lukVaelger);
+  kopierKnap.addEventListener("click", function () {
+    var v = valgte();
+    if (!v.length) return;
+    var adr = link();
+    kopier(adr, function (ok) {
+      adresse.value = adr;
+      adresse.hidden = false;
+      status.textContent = (ok ? "Linket er kopieret. " : "Kopiér linket herunder. ") +
+        "Det viser kun opgave " + remse(v.map(function (o) { return o.nr; })) + ".";
+      if (!ok) { adresse.focus(); adresse.select(); }
+    });
+  });
+
+  // ----- 3. Siden åbnet med udvalgte opgaver ---------------------------------------------------
+  var udvalg = null;
+  var banner = el("div", "ll-banner");
+  banner.hidden = true;
+  var bannerTekst = el("span", "ll-bannertekst");
+  var visAlle = knap("ll-alle", "Vis alle opgaver");
+  banner.appendChild(bannerTekst);
+  banner.appendChild(visAlle);
+  start.parentNode.insertBefore(banner, start);
+
+  function laesUdvalg() {
+    var m = /[?&]opgaver=([^&#]*)/.exec(location.search);
+    if (!m) return null;
+    var tekst = m[1];
+    try { tekst = decodeURIComponent(tekst); } catch (e) {}
+    var fundne = [];
+    tekst.split(/[,;_\s+]+/).forEach(function (del) {
+      if (!del) return;
+      var o = efterNr[del.toLowerCase()] || efterNr[(forstavelse + del).toLowerCase()];
+      if (o && fundne.indexOf(o) < 0) fundne.push(o);
+    });
+    // i sidens rækkefølge
+    fundne.sort(function (a, b) { return opgaver.indexOf(a) - opgaver.indexOf(b); });
+    return fundne.length ? fundne : null;
+  }
+
+  function skjul(sektion, id, skjult) {
+    sektion.classList.toggle("ll-skjult", skjult);
+    var li = tocPunkt(id);
+    if (li) li.classList.toggle("ll-skjult", skjult);
+  }
+
+  function visUdvalg(liste) {
+    udvalg = liste;
+    document.body.classList.add("ll-udvalg");
+    opgaver.forEach(function (o) { skjul(o.sektion, o.nr, liste.indexOf(o) < 0); });
+    // Et tema vises kun, når en af dets opgaver er valgt, og så er det åbent (stil/temaer.html).
+    (window.kemibogenTemaer || []).forEach(function (t) {
+      var nogen = t.opgaver.some(function (s) { return !s.classList.contains("ll-skjult"); });
+      skjul(t.tema, t.tema.id, !nogen);
+      if (nogen) t.saet(true, false);
+    });
+    bannerTekst.textContent = "Her vises kun opgave " + remse(liste.map(function (o) { return o.nr; })) + ".";
+    banner.hidden = false;
+  }
+
+  function fjernUdvalg() {
+    udvalg = null;
+    document.body.classList.remove("ll-udvalg");
+    opgaver.forEach(function (o) { skjul(o.sektion, o.nr, false); });
+    (window.kemibogenTemaer || []).forEach(function (t) { skjul(t.tema, t.tema.id, false); });
+    banner.hidden = true;
+    if (window.history && history.replaceState) history.replaceState(null, "", side + location.hash);
+  }
+  visAlle.addEventListener("click", fjernUdvalg);
+
+  var fraAdressen = laesUdvalg();
+  if (fraAdressen) visUdvalg(fraAdressen);
+});
+</script>
+<script>
+// Repetitionssider (sider med "body-classes: repetition"). Se noter/repetition.md.
+//
+// Punkterne under "Det skal du kunne" bliver til en tjekliste: hvert punkt får et felt, og
+// fluebenene huskes på den computer eller telefon, eleven sidder ved. Øverst står, hvor mange
+// punkter der er sat flueben ved. Uden JavaScript og på print er punkterne en liste med tomme felter.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.body.classList.contains("repetition")) return;
+  var main = document.querySelector("main");
+  if (!main) return;
+  var lister = main.querySelectorAll(".rep-kan");
+  if (!lister.length) return;
+
+  function husk(noegle, sat) {
+    try {
+      if (sat) localStorage.setItem(noegle, "1"); else localStorage.removeItem(noegle);
+    } catch (e) {}
+  }
+  function husket(noegle) {
+    try { return localStorage.getItem(noegle) === "1"; } catch (e) { return false; }
+  }
+  // Et punkt kendes på afsnittet og sin tekst, så fluebenet følger punktet, selv om rækkefølgen ændres.
+  function tal(tekst) {
+    var h = 0;
+    for (var i = 0; i < tekst.length; i++) h = (h * 31 + tekst.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(36);
+  }
+
+  var felter = [];
+  Array.prototype.forEach.call(lister, function (liste) {
+    var sektion = liste.closest("section.level2");
+    var afsnit = sektion ? sektion.id : "";
+    Array.prototype.forEach.call(liste.querySelectorAll("li"), function (li) {
+      var noegle = "kemibogen-kan-" + afsnit + "-" + tal(li.textContent.replace(/\s+/g, " ").trim());
+      var maerke = document.createElement("label");
+      maerke.className = "rep-punkt";
+      var felt = document.createElement("input");
+      felt.type = "checkbox";
+      felt.checked = husket(noegle);
+      var tekst = document.createElement("span");
+      while (li.firstChild) tekst.appendChild(li.firstChild);
+      maerke.appendChild(felt);
+      maerke.appendChild(tekst);
+      li.appendChild(maerke);
+      li.classList.toggle("rep-sat", felt.checked);
+      felt.addEventListener("change", function () {
+        husk(noegle, felt.checked);
+        li.classList.toggle("rep-sat", felt.checked);
+        opdater();
+      });
+      felter.push({ felt: felt, li: li, noegle: noegle });
+    });
+    liste.classList.add("rep-aktiv");
+  });
+  if (!felter.length) return;
+
+  var linje = document.createElement("div");
+  linje.className = "rep-status";
+  var tekst = document.createElement("span");
+  tekst.setAttribute("role", "status");
+  var nulstil = document.createElement("button");
+  nulstil.type = "button";
+  nulstil.className = "rep-nulstil";
+  nulstil.textContent = "Fjern fluebenene";
+  linje.appendChild(tekst);
+  linje.appendChild(nulstil);
+  var foerste = main.querySelector("section.level2");
+  foerste.parentNode.insertBefore(linje, foerste);
+
+  function opdater() {
+    var sat = felter.filter(function (f) { return f.felt.checked; }).length;
+    tekst.textContent = "Du har sat flueben ved " + sat + " af " + felter.length + " punkter.";
+    nulstil.hidden = sat === 0;
+    linje.classList.toggle("rep-alle", sat === felter.length);
+  }
+  nulstil.addEventListener("click", function () {
+    felter.forEach(function (f) {
+      f.felt.checked = false;
+      f.li.classList.remove("rep-sat");
+      husk(f.noegle, false);
+    });
+    opdater();
+  });
+  opdater();
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Kopieret!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Kopieret!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../kapitler/a4-7-grundideen-i-nmr.html" class="pagination-link" aria-label="A4.7 Grundideen i ^1^H-NMR">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">A4.7 Grundideen i <sup>1</sup>H-NMR</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../kapitler/a4-8-antal-signaler.html" class="pagination-link" aria-label="A4.8 Antal signaler">
+        <span class="nav-page-text">A4.8 Antal signaler</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
