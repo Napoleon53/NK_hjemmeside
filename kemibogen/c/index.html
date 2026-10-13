@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3f3984edc0ba659cca0ab16fe06864cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -877,6 +877,17 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./bilag/sikkerhed.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Sikkerhed i laboratoriet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fagord/bilag.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til bilaget om sikkerhed</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./fagord/stikordsregister.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Stikordsregister</span></a>
   </div>
@@ -938,7 +949,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Materialet er gratis. Det må frit deles og bruges sammen med AI.</p>
 <section id="sådan-er-bogen-bygget-op" class="level2">
 <h2 class="anchored" data-anchor-id="sådan-er-bogen-bygget-op">Sådan er bogen bygget op</h2>
-<p>Bogen er delt i kapitler, og hvert kapitel er delt i afsnit med numre som 1.1 og 1.2. Hvert kapitel begynder med en kort indledning, som fortæller, hvad kapitlet handler om, og hvad du finder ud af i hvert afsnit. Hvert afsnit begynder med boksen <em>Det skal du kunne</em> og slutter med boksen <em>Kort sagt</em>. Nye fagord står med <span id="ord-fed-skrift" class="fagord-anker"><strong>fed skrift</strong></span>, første gang de bliver forklaret. Hvert kapitel slutter med en fagordliste og en repetitionsside. På repetitionssiden er kapitlets <em>Det skal du kunne</em> og <em>Kort sagt</em> samlet, og nederst er der en øveprøve uden hjælpemidler.</p>
+<p>Bogen er delt i kapitler, og hvert kapitel er delt i afsnit med numre som 1.1 og 1.2. Hvert kapitel begynder med en kort indledning, som fortæller, hvad kapitlet handler om, og hvad du finder ud af i hvert afsnit. Hvert afsnit begynder med boksen <em>Det skal du kunne</em> og slutter med boksen <em>Kort sagt</em>. Nye fagord står med <span id="ord-fed-skrift" class="fagord-anker"><strong>fed skrift</strong></span>, første gang de bliver forklaret. Møder du et fagord igen og har glemt, hvad det betyder, så hold musen over ordet, eller tryk på det på en telefon. Så kommer forklaringen frem. Hvert kapitel slutter med en fagordliste og en repetitionsside. På repetitionssiden er kapitlets <em>Det skal du kunne</em> og <em>Kort sagt</em> samlet, og nederst er der en øveprøve uden hjælpemidler.</p>
 <p>Bogen har indtil videre otte kapitler:</p>
 <ul>
 <li><span id="ord-kapitel-1-kemi-og-atomet" class="fagord-anker"><strong><a href="./indledninger/kapitel-1.html">Kapitel 1: Kemi og atomet</a></strong></span> handler om stoffer, atomets opbygning, elektronernes skaller og reaktionsskemaer.</li>
@@ -1012,12 +1023,13 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="bilag" class="level2">
 <h2 class="anchored" data-anchor-id="bilag">Bilag</h2>
-<p>Bagest i bogen er der fire bilag til at slå op i:</p>
+<p>Bagest i bogen er der fem bilag til at slå op i:</p>
 <ul>
 <li><a href="./bilag/grundstoffer.html">Det periodiske system</a> med alle grundstoffernes navne, atomnumre, atommasser og elektronstrukturer. Klik på et grundstof for at se mere om det.</li>
 <li><a href="./bilag/ioner.html">Ioner og deres navne</a> med de ioner, bogen bruger.</li>
 <li><a href="./bilag/faeldningstabel.html">Fældningstabellen</a>, som viser, hvilke salte der er tungtopløselige. Peg på en ion for at se dens navn.</li>
 <li><a href="./bilag/formler.html">Formler og enheder</a> med bogens formler samlet ét sted.</li>
+<li><a href="./bilag/sikkerhed.html">Sikkerhed i laboratoriet</a> med de ni faresymboler, H-sætninger og P-sætninger, sikkerhedsvurdering før et forsøg og bortskaffelse af affaldet.</li>
 </ul>
 
 
@@ -2132,6 +2144,137 @@ document.addEventListener("DOMContentLoaded", function () {
     opdater();
   });
   opdater();
+});
+</script>
+<script>
+// Fagord med forklaring, når man peger på dem (prøve i C-bogen, 12. okt. 2026). Se noter/fagord.md.
+//
+// stil/fagordpeg.lua har mærket fagordene i teoriafsnittenes tekst (span.fagord-peg) og lagt deres
+// forklaringer sidst på siden. Ordene ser ud som resten af teksten. Dette script viser forklaringen
+// i en lille boks ved ordet, når musen hviler på ordet et øjeblik, og når man trykker på det (telefon
+// og tablet). Boksen har fagordet, forklaringen fra fagordlisten og et link til det afsnit, hvor ordet
+// blev indført. Esc, et tryk ved siden af og rulning på en telefon lukker den.
+// Uden JavaScript og på print er ordene almindelig tekst.
+document.addEventListener("DOMContentLoaded", function () {
+  var kilde = document.getElementById("fagord-peg-data");
+  var main = document.querySelector("main");
+  if (!kilde || !main) return;
+  var data;
+  try { data = JSON.parse(kilde.textContent); } catch (e) { return; }
+
+  // Musen skal hvile så længe på et ord, før boksen kommer. Så dukker den ikke op, bare fordi
+  // musen bliver ført hen over teksten.
+  var VENT = 400;
+
+  var boble = document.createElement("div");
+  boble.className = "fagord-boble";
+  boble.id = "fagord-boble";
+  boble.setAttribute("role", "tooltip");
+  boble.hidden = true;
+  var titel = document.createElement("strong");
+  titel.className = "fb-ord";
+  var forklaring = document.createElement("span");
+  forklaring.className = "fb-tekst";
+  var link = document.createElement("a");
+  link.className = "fb-link";
+  boble.appendChild(titel);
+  boble.appendChild(forklaring);
+  boble.appendChild(link);
+  document.body.appendChild(boble);
+
+  var aktiv = null;       // det ord, boksen hører til lige nu
+  var ur = null;
+  var peger = "mouse";    // mus, finger eller pen: afgør, om et tryk skal åbne og lukke boksen
+
+  function ordVed(maal) {
+    return maal && maal.closest ? maal.closest("span.fagord-peg") : null;
+  }
+
+  function placer(el) {
+    var r = el.getBoundingClientRect();
+    var b = boble.getBoundingClientRect();
+    var bredde = document.documentElement.clientWidth;
+    var venstre = Math.min(Math.max(8, r.left), bredde - b.width - 8);
+    var top = r.bottom + 7;
+    // Er der ikke plads under ordet, står boksen over det.
+    if (top + b.height > window.innerHeight - 8 && r.top - b.height - 7 > 8) top = r.top - b.height - 7;
+    boble.style.left = Math.round(venstre + window.scrollX) + "px";
+    boble.style.top = Math.round(top + window.scrollY) + "px";
+  }
+
+  function skjul() {
+    clearTimeout(ur);
+    if (aktiv) {
+      aktiv.classList.remove("fb-aktiv");
+      aktiv.removeAttribute("aria-describedby");
+    }
+    aktiv = null;
+    boble.hidden = true;
+  }
+
+  function vis(el) {
+    var d = data[el.getAttribute("data-fagord")];
+    if (!d) return;
+    if (aktiv && aktiv !== el) skjul();
+    clearTimeout(ur);
+    titel.innerHTML = d.ord;
+    forklaring.innerHTML = d.forklaring;
+    link.textContent = "Indført i afsnit " + d.afsnit;
+    link.href = d.maal;
+    boble.hidden = false;
+    placer(el);
+    el.classList.add("fb-aktiv");
+    el.setAttribute("aria-describedby", boble.id);
+    aktiv = el;
+  }
+
+  function snart(fn, ms) {
+    clearTimeout(ur);
+    ur = setTimeout(fn, ms);
+  }
+
+  document.addEventListener("pointerdown", function (e) { peger = e.pointerType || "mouse"; }, true);
+
+  main.addEventListener("mouseover", function (e) {
+    var el = ordVed(e.target);
+    if (!el || peger !== "mouse") return;
+    if (el === aktiv) { clearTimeout(ur); return; }
+    snart(function () { vis(el); }, VENT);
+  });
+  main.addEventListener("mouseout", function (e) {
+    var el = ordVed(e.target);
+    if (!el || peger !== "mouse") return;
+    if (e.relatedTarget && el.contains(e.relatedTarget)) return;
+    snart(skjul, 260);
+  });
+  // Et tryk viser boksen med det samme. Med en finger lukker et tryk mere den igen.
+  main.addEventListener("click", function (e) {
+    var el = ordVed(e.target);
+    if (!el) return;
+    e.stopPropagation();
+    if (peger !== "mouse" && aktiv === el) skjul(); else vis(el);
+  });
+
+  // Musen må gerne flytte fra ordet ind i boksen, så man kan trykke på linket.
+  boble.addEventListener("mouseenter", function () { clearTimeout(ur); });
+  boble.addEventListener("mouseleave", function () { snart(skjul, 260); });
+  boble.addEventListener("click", function (e) { e.stopPropagation(); });
+
+  document.addEventListener("click", skjul);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") skjul(); });
+  // Ruller siden, lukker boksen på en telefon. Med musen følger den med ordet.
+  var venter = false;
+  window.addEventListener("scroll", function () {
+    if (!aktiv) return;
+    if (peger !== "mouse") { skjul(); return; }
+    if (venter) return;
+    venter = true;
+    requestAnimationFrame(function () {
+      venter = false;
+      if (aktiv) placer(aktiv);
+    });
+  }, { passive: true });
+  window.addEventListener("resize", skjul);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

@@ -218,6 +218,11 @@ function tests() {
     var n2 = B.fraHash(B.link(god).replace(/^[^#]*#/, "#"));
     paastand("et link med sættet i giver sættet tilbage", !!B.saet(n2) && B.saet(n2).navn === "Prøve");
     B.slet(n2);
+    var n3 = B.fraHash(B.link(god).replace(/^[^#]*#/, "#") + "&vendespil");
+    paastand("et link med sættet og fanen (#kort=...&vendespil) giver også sættet", !!B.saet(n3) && B.saet(n3).navn === "Prøve");
+    B.slet(n3);
+    paastand("fanen alene foran sættet (#vendespil&kort=...) virker også",
+        (function () { var n = B.fraHash("#vendespil&" + B.link(god).replace(/^[^#]*#/, "")); var ok = !!B.saet(n); B.slet(n); return ok; }()));
     B.nyRekord("i:ioner", "vend8", 60000);
     paastand("rekorden gemmes", B.rekord("i:ioner", "vend8") === 60000);
     paastand("en dårligere tid bliver ikke rekord", B.nyRekord("i:ioner", "vend8", 70000) === false);

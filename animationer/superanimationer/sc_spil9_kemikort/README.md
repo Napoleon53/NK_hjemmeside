@@ -112,6 +112,16 @@ SO₄²⁻<TAB>sulfation
   **Kopiér til Quizlet**, **Gem som fil**, **Kopiér link** (linket har hele sættet i sig, `#kort=...`;
   fra harddisken peger det på kemiformler.dk), **Kopiér vejledning til AI** og
   **Nyt sæt**.
+* Et link med sættet i kan også vælge fanen: `index.html#kort=...&vendespil`
+  (brugerens valg 12. okt. 2026: "Det vil være fint at åbne direkte i
+  vendespil"). Fanen står efter sættet, delt af `&`, som i `#ioner&parring`.
+* **Kemibogen åbner spillet sådan.** Knappen "Kort og godt" på bogens
+  fagordlister (`kemibogen/`, kilden er `NK_Undervisning/Kemibogen/stil/fagord.html`)
+  laver et sæt af kapitlets fagord og åbner `#kort=...&vendespil`. Bogen regner
+  med 90 tegn pr. side, mindst 4 kort og linkets form. Ændres `MAKS_TEGN`,
+  `MINDST`, `tilLink` eller `fraLink` i `js/tekstformat.js`, eller flyttes
+  mappen, skal bogens `stil/fagord.html` og `vaerktoej/tjek_fagord.py` rettes
+  med, og bogen lægges på hjemmesiden igen.
 * Retter man i et indbygget sæt, bliver det gemt som et nyt, eget sæt. De
   indbyggede kan ikke slettes.
 * Egne sæt og rekorder ligger i den browser, de er lavet i (`localStorage`),

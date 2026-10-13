@@ -7,7 +7,9 @@
 
    Linket kan pege paa et indbygget saet og en fane: index.html#ioner
    eller index.html#ioner&parring. Et link med #kort=... har hele saettet
-   i sig (se js/bibliotek.js).
+   i sig (se js/bibliotek.js) og kan ogsaa have fanen med:
+   index.html#kort=...&vendespil. Saadan aabner Kemibogens fagordlister
+   spillet.
    ===================================================================== */
 (function () {
     "use strict";

@@ -7,7 +7,8 @@
 
    Det valgte saet huskes. Et link med #ioner vaelger et indbygget saet,
    og et link med #kort=... har selve saettet i sig; det gemmes blandt de
-   egne og vaelges.
+   egne og vaelges. Fanen kan komme med i begge slags link (#ioner&parring,
+   #kort=...&vendespil); den laeser js/app.js.
 
    Rekorderne (vendespil og parring) hoerer til saettet og gemmes under et
    fingeraftryk af teksten, saa en rettelse i saettet ikke arver en rekord
@@ -121,7 +122,13 @@
     /* Laeser linket. Giver noeglen til det valgte saet, eller null. */
     B.fraHash = function (hash) {
         var h = String(hash || "").replace(/^#/, "");
-        var m = /^kort=(.+)$/.exec(h);
+        /* Fanen kan staa efter saettet: #kort=...&vendespil. Koden for
+           saettet har kun bogstaver, tal, - og _, saa et & er aldrig en
+           del af den. */
+        var m = null;
+        h.split("&").forEach(function (d) {
+            if (!m) m = /^kort=(.+)$/.exec(d);
+        });
         if (m) {
             var t = F.fraLink(m[1]);
             if (t && F.fraTekst(t).saet) return B.somIndbygget(t) || B.gem(t);

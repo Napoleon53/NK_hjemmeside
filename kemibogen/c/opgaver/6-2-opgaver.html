@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-3f3984edc0ba659cca0ab16fe06864cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -876,6 +876,17 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../bilag/formler.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Formler og enheder</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bilag/sikkerhed.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Sikkerhed i laboratoriet</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../fagord/bilag.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fagord til bilaget om sikkerhed</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -3290,6 +3301,137 @@ document.addEventListener("DOMContentLoaded", function () {
     opdater();
   });
   opdater();
+});
+</script>
+<script>
+// Fagord med forklaring, når man peger på dem (prøve i C-bogen, 12. okt. 2026). Se noter/fagord.md.
+//
+// stil/fagordpeg.lua har mærket fagordene i teoriafsnittenes tekst (span.fagord-peg) og lagt deres
+// forklaringer sidst på siden. Ordene ser ud som resten af teksten. Dette script viser forklaringen
+// i en lille boks ved ordet, når musen hviler på ordet et øjeblik, og når man trykker på det (telefon
+// og tablet). Boksen har fagordet, forklaringen fra fagordlisten og et link til det afsnit, hvor ordet
+// blev indført. Esc, et tryk ved siden af og rulning på en telefon lukker den.
+// Uden JavaScript og på print er ordene almindelig tekst.
+document.addEventListener("DOMContentLoaded", function () {
+  var kilde = document.getElementById("fagord-peg-data");
+  var main = document.querySelector("main");
+  if (!kilde || !main) return;
+  var data;
+  try { data = JSON.parse(kilde.textContent); } catch (e) { return; }
+
+  // Musen skal hvile så længe på et ord, før boksen kommer. Så dukker den ikke op, bare fordi
+  // musen bliver ført hen over teksten.
+  var VENT = 400;
+
+  var boble = document.createElement("div");
+  boble.className = "fagord-boble";
+  boble.id = "fagord-boble";
+  boble.setAttribute("role", "tooltip");
+  boble.hidden = true;
+  var titel = document.createElement("strong");
+  titel.className = "fb-ord";
+  var forklaring = document.createElement("span");
+  forklaring.className = "fb-tekst";
+  var link = document.createElement("a");
+  link.className = "fb-link";
+  boble.appendChild(titel);
+  boble.appendChild(forklaring);
+  boble.appendChild(link);
+  document.body.appendChild(boble);
+
+  var aktiv = null;       // det ord, boksen hører til lige nu
+  var ur = null;
+  var peger = "mouse";    // mus, finger eller pen: afgør, om et tryk skal åbne og lukke boksen
+
+  function ordVed(maal) {
+    return maal && maal.closest ? maal.closest("span.fagord-peg") : null;
+  }
+
+  function placer(el) {
+    var r = el.getBoundingClientRect();
+    var b = boble.getBoundingClientRect();
+    var bredde = document.documentElement.clientWidth;
+    var venstre = Math.min(Math.max(8, r.left), bredde - b.width - 8);
+    var top = r.bottom + 7;
+    // Er der ikke plads under ordet, står boksen over det.
+    if (top + b.height > window.innerHeight - 8 && r.top - b.height - 7 > 8) top = r.top - b.height - 7;
+    boble.style.left = Math.round(venstre + window.scrollX) + "px";
+    boble.style.top = Math.round(top + window.scrollY) + "px";
+  }
+
+  function skjul() {
+    clearTimeout(ur);
+    if (aktiv) {
+      aktiv.classList.remove("fb-aktiv");
+      aktiv.removeAttribute("aria-describedby");
+    }
+    aktiv = null;
+    boble.hidden = true;
+  }
+
+  function vis(el) {
+    var d = data[el.getAttribute("data-fagord")];
+    if (!d) return;
+    if (aktiv && aktiv !== el) skjul();
+    clearTimeout(ur);
+    titel.innerHTML = d.ord;
+    forklaring.innerHTML = d.forklaring;
+    link.textContent = "Indført i afsnit " + d.afsnit;
+    link.href = d.maal;
+    boble.hidden = false;
+    placer(el);
+    el.classList.add("fb-aktiv");
+    el.setAttribute("aria-describedby", boble.id);
+    aktiv = el;
+  }
+
+  function snart(fn, ms) {
+    clearTimeout(ur);
+    ur = setTimeout(fn, ms);
+  }
+
+  document.addEventListener("pointerdown", function (e) { peger = e.pointerType || "mouse"; }, true);
+
+  main.addEventListener("mouseover", function (e) {
+    var el = ordVed(e.target);
+    if (!el || peger !== "mouse") return;
+    if (el === aktiv) { clearTimeout(ur); return; }
+    snart(function () { vis(el); }, VENT);
+  });
+  main.addEventListener("mouseout", function (e) {
+    var el = ordVed(e.target);
+    if (!el || peger !== "mouse") return;
+    if (e.relatedTarget && el.contains(e.relatedTarget)) return;
+    snart(skjul, 260);
+  });
+  // Et tryk viser boksen med det samme. Med en finger lukker et tryk mere den igen.
+  main.addEventListener("click", function (e) {
+    var el = ordVed(e.target);
+    if (!el) return;
+    e.stopPropagation();
+    if (peger !== "mouse" && aktiv === el) skjul(); else vis(el);
+  });
+
+  // Musen må gerne flytte fra ordet ind i boksen, så man kan trykke på linket.
+  boble.addEventListener("mouseenter", function () { clearTimeout(ur); });
+  boble.addEventListener("mouseleave", function () { snart(skjul, 260); });
+  boble.addEventListener("click", function (e) { e.stopPropagation(); });
+
+  document.addEventListener("click", skjul);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") skjul(); });
+  // Ruller siden, lukker boksen på en telefon. Med musen følger den med ordet.
+  var venter = false;
+  window.addEventListener("scroll", function () {
+    if (!aktiv) return;
+    if (peger !== "mouse") { skjul(); return; }
+    if (venter) return;
+    venter = true;
+    requestAnimationFrame(function () {
+      venter = false;
+      if (aktiv) placer(aktiv);
+    });
+  }, { passive: true });
+  window.addEventListener("resize", skjul);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
