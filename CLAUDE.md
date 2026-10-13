@@ -177,6 +177,12 @@ sync; denne er færdig.
   `~/NK_Undervisning/Kemibogen` med `bash vaerktoej/laeg_paa_hjemmesiden.sh`.
   Brugeren 9. okt. 2026: "Uden links dertil indtil videre", så lav ingen links
   til bogen fra resten af sitet, før brugeren beder om det.
+- `kompendier/` er en kopi af siden, hvor en lærer sætter sit eget kompendium
+  til Kemibogen sammen og får en PDF til print (kemiformler.dk/kompendier). Ret
+  ikke i mappen: den skrives over fra `NK_Undervisning/Kemibogen` med
+  `python kompendier/laeg_paa_hjemmesiden.py`. Brugeren 13. okt. 2026: siden skal
+  ligge på hjemmesiden, men "det behøver ikke blive aktivt", så lav ingen links
+  til den fra resten af sitet, før brugeren beder om det.
 
 ## Løbende opdatering
 

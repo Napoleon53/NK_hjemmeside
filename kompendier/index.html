@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Byg dit kompendium · Kemibogen</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f766e'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h9' stroke='white' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --groen: #0f766e;
+    --groen-moerk: #0b5e58;
+    --blaek: #14201f;
+    --daempet: #556766;
+    --lys: #eef4f3;
+    --kant: #c3d6d4;
+    --bund: #f5f8f7;
+    --roed: #b3372a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 15px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--blaek);
+    background: var(--bund);
+  }
+  .top { background: #fff; border-bottom: 1px solid var(--kant); }
+  .top div, .side { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+  .top div { padding-top: 18px; padding-bottom: 16px; }
+  .maerke { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--groen); }
+  h1 { margin: 2px 0 2px; font-size: 26px; line-height: 1.2; }
+  .top p.under { margin: 0; color: var(--daempet); }
+
+  .side { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; align-items: start; padding-top: 20px; padding-bottom: 40px; }
+
+  .gruppe { background: #fff; border: 1px solid var(--kant); border-radius: 8px; margin-bottom: 16px; }
+  .gruppe > h2 { margin: 0; padding: 11px 16px 0; font-size: 13px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--groen); }
+  .gruppe > p.hjaelp { margin: 2px 16px 0; color: var(--daempet); font-size: 14px; }
+  .raekker { margin-top: 8px; }
+  .raekke { border-top: 1px solid var(--lys); padding: 11px 16px 12px; }
+
+  label.kryds { display: flex; align-items: baseline; gap: 10px; cursor: pointer; }
+  label.kryds input { width: 17px; height: 17px; margin: 0; accent-color: var(--groen); flex: none; position: relative; top: 2px; }
+  label.kryds .navn { font-weight: 600; font-size: 16px; }
+  label.kryds .let { font-weight: 400; font-size: 15px; }
+  .omfang { margin-left: auto; padding-left: 12px; color: var(--daempet); font-size: 14px; white-space: nowrap; }
+
+  .indryk { margin-left: 27px; }
+  .overskrifter { margin: 3px 0 0; color: var(--daempet); font-size: 13.5px; }
+  .opgaver { display: flex; align-items: center; gap: 10px; margin-top: 9px; flex-wrap: wrap; }
+  .opgaver > span { font-size: 14px; font-weight: 600; }
+  .trin { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; flex: 1 1 380px; }
+  .trin label { position: relative; cursor: pointer; }
+  .trin input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .trin span { display: block; border: 1px solid var(--kant); border-radius: 6px; padding: 5px 6px 6px; text-align: center; background: #fff; line-height: 1.25; }
+  .trin b { display: block; font-size: 14.5px; }
+  .trin small { display: block; font-size: 13px; color: var(--daempet); }
+  .trin input:checked + span { background: var(--groen); border-color: var(--groen); color: #fff; }
+  .trin input:checked + span small { color: #d9efec; }
+  .trin input:focus-visible + span { outline: 2px solid var(--blaek); outline-offset: 2px; }
+  .trin label:hover span { border-color: var(--groen); }
+  .slukket .indryk { opacity: 0.45; }
+
+  .egne { padding: 0 16px 12px; }
+  .egne ul { list-style: none; margin: 0 0 8px; padding: 0; }
+  .egne li { display: flex; align-items: baseline; gap: 10px; padding: 5px 0; border-top: 1px solid var(--lys); }
+  .egne li .fil { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .egne li.fejl .fil { color: var(--roed); }
+  .knap-lille { font: inherit; font-size: 14px; border: 1px solid var(--kant); background: #fff; color: var(--blaek); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .knap-lille:hover { border-color: var(--groen); color: var(--groen-moerk); }
+  .egne input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .egne input[type=file]:focus-visible + .knap-lille { outline: 2px solid var(--blaek); outline-offset: 2px; }
+  .egne p { margin: 6px 0 0; color: var(--daempet); font-size: 13.5px; }
+
+  .kurv { position: sticky; top: 14px; background: #fff; border: 1px solid var(--kant); border-radius: 8px; padding: 12px 16px 16px; }
+  .kurv h2 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--groen); }
+  .tal { margin: 2px 0 0; font-size: 34px; font-weight: 700; line-height: 1.15; }
+  .tal small { font-size: 17px; font-weight: 600; }
+  .ark { margin: 0 0 10px; color: var(--daempet); font-size: 14px; }
+  .oversigt { list-style: none; margin: 0 0 14px; padding: 8px 0 0; border-top: 1px solid var(--lys); font-size: 14px; }
+  .oversigt li { display: flex; gap: 10px; padding: 2px 0; }
+  .oversigt li span:last-child { margin-left: auto; color: var(--daempet); white-space: nowrap; }
+  .knap { display: block; width: 100%; font: inherit; font-size: 17px; font-weight: 600; color: #fff; background: var(--groen); border: 0; border-radius: 7px; padding: 11px 14px; cursor: pointer; }
+  .knap:hover { background: var(--groen-moerk); }
+  .knap:disabled { background: #9fb5b3; cursor: default; }
+  .knap:focus-visible { outline: 2px solid var(--blaek); outline-offset: 2px; }
+  .klar { margin-top: 12px; padding: 10px 12px 12px; background: var(--lys); border-radius: 7px; }
+  .klar p { margin: 0 0 8px; font-weight: 600; }
+  .klar div { display: flex; gap: 8px; }
+  .klar a { flex: 1; text-align: center; text-decoration: none; font-weight: 600; color: var(--groen-moerk); background: #fff; border: 1px solid var(--groen); border-radius: 6px; padding: 7px 8px; }
+  .klar a:hover { background: var(--groen); color: #fff; }
+  .besked { margin: 12px 0 0; color: var(--roed); font-size: 14px; }
+  [hidden] { display: none !important; }
+
+  @media (max-width: 860px) {
+    .side { grid-template-columns: minmax(0, 1fr); }
+    .kurv { position: sticky; bottom: 0; top: auto; border-radius: 8px 8px 0 0; box-shadow: 0 -4px 14px rgba(20, 32, 31, 0.12); }
+    .kurv .oversigt { display: none; }
+    .tal { font-size: 26px; display: inline-block; margin-right: 10px; }
+    .ark { display: inline-block; }
+    .trin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <p class="maerke">Kemibogen · Kemi C</p>
+    <h1>Byg dit kompendium</h1>
+    <p class="under" id="kapitel"></p>
+  </div>
+</header>
+
+<main class="side" id="side">
+  <div>
+    <section class="gruppe">
+      <h2>Fagligt fokus</h2>
+      <p class="hjaelp">Hvert afsnit, du vælger, får sider til noter med bogens overskrifter. Vælg selv, hvor mange opgaver der skal med.</p>
+      <div class="raekker" id="afsnit"></div>
+    </section>
+
+    <section class="gruppe">
+      <h2>Øvelsesvejledninger</h2>
+      <div class="raekker" id="oevelser"></div>
+      <div class="egne">
+        <ul id="egne"></ul>
+        <input type="file" id="fil" accept="application/pdf,.pdf" multiple>
+        <label for="fil" class="knap-lille">Tilføj din egen vejledning (PDF)</label>
+        <p>Din fil bliver på din egen computer. Den sendes ingen steder hen.</p>
+      </div>
+    </section>
+
+    <section class="gruppe">
+      <h2>Forside og bilag</h2>
+      <div class="raekker" id="andet"></div>
+    </section>
+  </div>
+
+  <aside class="kurv">
+    <h2>Dit kompendium</h2>
+    <p class="tal" aria-live="polite"><span id="sider">0</span> <small id="sideord">sider</small></p>
+    <p class="ark" id="ark"></p>
+    <ol class="oversigt" id="oversigt"></ol>
+    <button class="knap" id="lav" type="button">Lav PDF</button>
+    <div class="klar" id="klar" hidden>
+      <p id="klartekst"></p>
+      <div>
+        <a id="aabn" target="_blank" rel="noopener">Åbn PDF</a>
+        <a id="gem">Gem PDF</a>
+      </div>
+    </div>
+    <p class="besked" id="besked" hidden></p>
+  </aside>
+</main>
+
+<noscript><p style="max-width:1100px;margin:20px auto;padding:0 20px">Siden skal bruge JavaScript for at sætte kompendiet sammen.</p></noscript>
+
+<script src="pdf-lib.min.js"></script>
+<script src="data/kapitel-2.js"></script>
+<script src="saml.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var KAPITEL = '2';
+  var NIVEAUNAVNE = { ingen: 'Ingen', lav: 'Få', mellem: 'Mellem', mange: 'Mange' };
+  var data = window.KOMPENDIER && window.KOMPENDIER[KAPITEL];
+  var $ = function (id) { return document.getElementById(id); };
+
+  if (!data || !window.Kompendium || !window.PDFLib) {
+    $('side').innerHTML = '<p>Siden mangler sine filer. Delene laves med kompendier/lav_kompendium.py.</p>';
+    return;
+  }
+
+  var valg = hentValg();
+  var egne = [];       // lærerens egne vejledninger: { navn, sider, bytes } eller { navn, fejl }
+  var adresse = null;  // den færdige PDF
+
+  function del(id) {
+    return data.dele.filter(function (d) { return d.id === id; })[0];
+  }
+  function sider(n) { return n + (n === 1 ? ' side' : ' sider'); }
+  function tekst(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // ---- Valgene gemmes i browseren, så de er der næste gang ----
+  function hentValg() {
+    var v = Kompendium.standardvalg(data);
+    try {
+      var gemt = JSON.parse(localStorage.getItem('kemibogen-kompendium-' + KAPITEL) || 'null');
+      if (gemt) {
+        v.forside = gemt.forside !== false;
+        v.indhold = gemt.indhold !== false;
+        data.afsnit.forEach(function (a) {
+          var g = gemt.afsnit && gemt.afsnit[a.nr];
+          if (!g) return;
+          v.afsnit[a.nr].med = g.med !== false;
+          if (g.opgaver === 'ingen' || a.opgaver[g.opgaver]) v.afsnit[a.nr].opgaver = g.opgaver;
+        });
+        data.oevelser.forEach(function (id) { if (gemt.oevelser && id in gemt.oevelser) v.oevelser[id] = !!gemt.oevelser[id]; });
+        data.bilag.forEach(function (id) { if (gemt.bilag && id in gemt.bilag) v.bilag[id] = !!gemt.bilag[id]; });
+      }
+    } catch (e) { /* uden gemte valg bruges standardvalgene */ }
+    return v;
+  }
+  function gemValg() {
+    try { localStorage.setItem('kemibogen-kompendium-' + KAPITEL, JSON.stringify(valg)); } catch (e) { /* ikke vigtigt */ }
+  }
+
+  // ---- Siden bygges ud fra delene ----
+  function kryds(id, navn, omfang, sat, let_) {
+    return '<label class="kryds"><input type="checkbox" id="' + id + '"' + (sat ? ' checked' : '') + '>' +
+      '<span class="' + (let_ ? 'let' : 'navn') + '">' + tekst(navn) + '</span><span class="omfang">' + tekst(omfang) + '</span></label>';
+  }
+
+  function byg() {
+    $('kapitel').textContent = 'Kapitel ' + data.kapitel + ': ' + data.titel;
+    document.title = 'Byg dit kompendium til kapitel ' + data.kapitel + ' · Kemibogen';
+
+    $('afsnit').innerHTML = data.afsnit.map(function (a) {
+      var trin = ['ingen'].concat(Kompendium.NIVEAUER.filter(function (n) { return a.opgaver[n]; })).map(function (n) {
+        var d = n === 'ingen' ? null : del(a.opgaver[n]);
+        return '<label><input type="radio" name="opgaver-' + a.nr + '" value="' + n + '"' + (valg.afsnit[a.nr].opgaver === n ? ' checked' : '') + '>' +
+          '<span><b>' + NIVEAUNAVNE[n] + '</b><small>' + (d ? d.opgaver + ' opgaver · ' + sider(d.sider) : 'kun noter') + '</small></span></label>';
+      }).join('');
+      return '<div class="raekke" data-afsnit="' + a.nr + '">' +
+        kryds('afsnit-' + a.nr, a.titel, 'Noter · ' + sider(del(a.noter).sider), valg.afsnit[a.nr].med) +
+        '<div class="indryk"><p class="overskrifter">' + a.overskrifter.map(tekst).join(' · ') + '</p>' +
+        '<div class="opgaver" role="radiogroup" aria-label="Opgaver til ' + tekst(a.titel) + '"><span>Opgaver</span><div class="trin">' + trin + '</div></div></div></div>';
+    }).join('');
+
+    $('oevelser').innerHTML = data.oevelser.map(function (id) {
+      return '<div class="raekke">' + kryds('del-' + id, del(id).titel, sider(del(id).sider), valg.oevelser[id], true) + '</div>';
+    }).join('');
+
+    var sidst = data.bilag[data.bilag.length - 1];
+    $('andet').innerHTML =
+      '<div class="raekke">' + kryds('forside', 'Forside med plads til navn og klasse', sider(1), valg.forside, true) + '</div>' +
+      '<div class="raekke">' + kryds('indhold', 'Indholdsfortegnelse', sider(1), valg.indhold, true) + '</div>' +
+      data.bilag.map(function (id) {
+        var navn = del(id).titel.replace(/^Bilag: /, '') + (id === sidst && /periodesystem/.test(id) ? ' som sidste side' : '');
+        return '<div class="raekke">' + kryds('del-' + id, navn, sider(del(id).sider), valg.bilag[id], true) + '</div>';
+      }).join('');
+  }
+
+  // ---- Oversigten til højre følger valgene ----
+  function gode() {
+    return egne.filter(function (e) { return !e.fejl; });
+  }
+
+  function opdater() {
+    var plan = Kompendium.plan(data, valg, gode());
+    $('sider').textContent = plan.sider;
+    $('sideord').textContent = plan.sider === 1 ? 'side' : 'sider';
+    $('ark').textContent = plan.sider ? Math.ceil(plan.sider / 2) + ' ark, når der printes på begge sider' : 'Vælg, hvad kompendiet skal indeholde';
+    $('oversigt').innerHTML = plan.poster.map(function (p) {
+      var sidste = p.side + p.sider - 1;
+      return '<li><span>' + tekst(p.slags === 'egen' ? p.navn : p.titel) + '</span><span>s. ' + p.side + (sidste > p.side ? '–' + sidste : '') + '</span></li>';
+    }).join('');
+    $('lav').disabled = plan.sider === 0;
+    data.afsnit.forEach(function (a) {
+      document.querySelector('[data-afsnit="' + a.nr + '"]').classList.toggle('slukket', !valg.afsnit[a.nr].med);
+    });
+    // Et nyt valg gør den PDF, der lige er lavet, forældet.
+    $('klar').hidden = true;
+    $('besked').hidden = true;
+    if (adresse) { URL.revokeObjectURL(adresse); adresse = null; }
+    gemValg();
+  }
+
+  function tegnEgne() {
+    $('egne').innerHTML = egne.map(function (e, i) {
+      return '<li class="' + (e.fejl ? 'fejl' : '') + '"><span class="fil">' + tekst(e.navn) + '</span>' +
+        '<span class="omfang">' + tekst(e.fejl || sider(e.sider)) + '</span>' +
+        '<button type="button" class="knap-lille" data-fjern="' + i + '">Fjern</button></li>';
+    }).join('');
+  }
+
+  // ---- Hændelser ----
+  document.addEventListener('change', function (h) {
+    var el = h.target;
+    if (el.type === 'radio' && el.name.indexOf('opgaver-') === 0) {
+      // Vælger man opgaver i et afsnit, der er slået fra, kommer afsnittet med.
+      var nr = el.name.slice(8);
+      valg.afsnit[nr].opgaver = el.value;
+      valg.afsnit[nr].med = true;
+      $('afsnit-' + nr).checked = true;
+    } else if (el.type === 'checkbox') {
+      if (el.id.indexOf('afsnit-') === 0) valg.afsnit[el.id.slice(7)].med = el.checked;
+      else if (el.id === 'forside' || el.id === 'indhold') valg[el.id] = el.checked;
+      else if (el.id.indexOf('del-') === 0) {
+        var id = el.id.slice(4);
+        (id in valg.oevelser ? valg.oevelser : valg.bilag)[id] = el.checked;
+      }
+    } else if (el.id === 'fil') {
+      laesFiler(el.files);
+      el.value = '';
+      return;
+    } else {
+      return;
+    }
+    opdater();
+  });
+
+  document.addEventListener('click', function (h) {
+    var fjern = h.target.getAttribute && h.target.getAttribute('data-fjern');
+    if (fjern !== null && fjern !== undefined) {
+      egne.splice(Number(fjern), 1);
+      tegnEgne();
+      opdater();
+    }
+  });
+
+  function laesFiler(filer) {
+    Array.prototype.forEach.call(filer, function (fil) {
+      var post = { navn: fil.name };
+      egne.push(post);
+      fil.arrayBuffer().then(function (buffer) {
+        post.bytes = new Uint8Array(buffer);
+        return PDFLib.PDFDocument.load(post.bytes, { ignoreEncryption: true });
+      }).then(function (dok) {
+        if (dok.isEncrypted) post.fejl = 'er beskyttet med kodeord';
+        else post.sider = dok.getPageCount();
+      }).catch(function () {
+        post.fejl = 'kan ikke læses som PDF';
+      }).then(function () {
+        tegnEgne();
+        opdater();
+      });
+    });
+    tegnEgne();
+  }
+
+  $('lav').addEventListener('click', function () {
+    var knap = $('lav');
+    var plan = Kompendium.plan(data, valg, gode());
+    knap.disabled = true;
+    knap.textContent = 'Laver PDF …';
+    $('besked').hidden = true;
+    Kompendium.saml(PDFLib, data, valg, gode()).then(function (bytes) {
+      if (adresse) URL.revokeObjectURL(adresse);
+      adresse = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+      $('aabn').href = adresse;
+      $('gem').href = adresse;
+      $('gem').download = 'Kompendium til kapitel ' + data.kapitel + '.pdf';
+      $('klartekst').textContent = 'Kompendiet er klar: ' + sider(plan.sider) + '.';
+      $('klar').hidden = false;
+    }).catch(function (fejl) {
+      $('besked').textContent = 'PDF\'en kunne ikke laves. ' + (fejl && fejl.message ? fejl.message : '');
+      $('besked').hidden = false;
+    }).then(function () {
+      knap.disabled = false;
+      knap.textContent = 'Lav PDF';
+    });
+  });
+
+  byg();
+  opdater();
+})();
+</script>
+</body>
+</html>
