@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -77,6 +77,35 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -763,14 +792,38 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -908,7 +961,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#8.3.2" id="toc-8.3.2" class="nav-link" data-scroll-target="#8.3.2">Opgave 8.3.2: Molekyler</a></li>
   <li><a href="#8.3.3" id="toc-8.3.3" class="nav-link" data-scroll-target="#8.3.3">Opgave 8.3.3: Sammensatte ioner</a></li>
   <li><a href="#8.3.4" id="toc-8.3.4" class="nav-link" data-scroll-target="#8.3.4">Opgave 8.3.4: Syrer og salte</a></li>
-  <li><a href="#8.3.5" id="toc-8.3.5" class="nav-link" data-scroll-target="#8.3.5">Opgave 8.3.5: De tre særlige stoffer</a></li>
+  <li><a href="#8.3.5" id="toc-8.3.5" class="nav-link" data-scroll-target="#8.3.5">Opgave 8.3.5: Hydrogen, oxygen og hydrogenperoxid</a></li>
   <li><a href="#8.3.6" id="toc-8.3.6" class="nav-link" data-scroll-target="#8.3.6">Opgave 8.3.6: Stiger eller falder?</a></li>
   <li><a href="#8.3.7" id="toc-8.3.7" class="nav-link" data-scroll-target="#8.3.7">Opgave 8.3.7: Hvad oxideres, og hvad reduceres?</a></li>
   <li><a href="#8.3.8" id="toc-8.3.8" class="nav-link" data-scroll-target="#8.3.8">Opgave 8.3.8: Redoxreaktion eller ej?</a></li>
@@ -950,7 +1003,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Opgaverne hører til afsnit <a href="../kapitler/8-3-oxidationstal.html">8.3 Oxidationstal</a>. Prøv selv, før du åbner hjælpen under opgaven. Hav tabellen med de fem regler fremme.</p>
+<p>Opgaverne hører til afsnit <a href="../kapitler/8-3-oxidationstal.html">8.3 Oxidationstal</a>. Prøv selv, før du åbner hjælpen under opgaven. Hav tabellen med de tre regler fremme.</p>
 <section id="8.3.1" class="level2">
 <h2 class="anchored" data-anchor-id="8.3.1">Opgave 8.3.1: Grundstoffer og simple ioner</h2>
 <p>Skriv oxidationstallet for hvert stof.</p>
@@ -974,7 +1027,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Du skal kun bruge regel 1 og regel 2.</p>
+<p>Læs de to punkter lige under tabellen med reglerne.</p>
 </div>
 </div>
 </div>
@@ -1040,7 +1093,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Begynd med hydrogen (+I) og oxygen (−II). Det sidste atom findes med regel 5: summen skal være 0 i et molekyle.</p>
+<p>Begynd med hydrogen (+I) og oxygen (−II). Det sidste atom findes med regel 3: summen skal være 0 i et molekyle.</p>
 </div>
 </div>
 </div>
@@ -1056,7 +1109,14 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I NH<sub>3</sub> giver de tre hydrogenatomer 3 · (+1) = +3. Nitrogen skal derfor have −3, så summen bliver 0.</p>
+<p>I NH<sub>3</sub> står N for oxidationstallet for nitrogen, og H står for oxidationstallet for hydrogen. Summen skal være 0:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{N} + 3 \cdot \mathrm{H} &amp;= \text{ladning} \\
+\mathrm{N} + 3 \cdot 1 &amp;= 0 \\
+\mathrm{N} &amp;= -3
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1121,7 +1181,14 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I NO<sub>3</sub><sup>−</sup> giver de tre oxygenatomer 3 · (−2) = −6. Summen skal være −1, så nitrogen har −1 + 6 = +5.</p>
+<p>I NO<sub>3</sub><sup>−</sup> står N for oxidationstallet for nitrogen, og O står for oxidationstallet for oxygen. Summen skal være ionens ladning, −1:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{N} + 3 \cdot \mathrm{O} &amp;= \text{ladning} \\
+\mathrm{N} + 3 \cdot (-2) &amp;= -1 \\
+\mathrm{N} &amp;= 5
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1186,7 +1253,15 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I Fe<sub>2</sub>O<sub>3</sub> giver de tre oxygenatomer −6. De to jernatomer skal tilsammen give +6, så hvert jernatom har +3.</p>
+<p>I Fe<sub>2</sub>O<sub>3</sub> står Fe for oxidationstallet for jern, og O står for oxidationstallet for oxygen. Summen skal være 0:</p>
+<p><span class="math display">\[
+\begin{aligned}
+2 \cdot \mathrm{Fe} + 3 \cdot \mathrm{O} &amp;= \text{ladning} \\
+2 \cdot \mathrm{Fe} + 3 \cdot (-2) &amp;= 0 \\
+2 \cdot \mathrm{Fe} &amp;= 6 \\
+\mathrm{Fe} &amp;= 3
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1214,7 +1289,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 <section id="8.3.5" class="level2">
-<h2 class="anchored" data-anchor-id="8.3.5">Opgave 8.3.5: De tre særlige stoffer</h2>
+<h2 class="anchored" data-anchor-id="8.3.5">Opgave 8.3.5: Hydrogen, oxygen og hydrogenperoxid</h2>
 <ol type="a">
 <li>Hvad er oxidationstallet for hydrogen i H<sub>2</sub>?</li>
 <li>Hvad er oxidationstallet for oxygen i O<sub>2</sub>?</li>
@@ -1233,7 +1308,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Læs boksen <em>Tre stoffer, hvor reglerne ser anderledes ud</em> i afsnit 8.3.</p>
+<p>Læs om grundstoffer lige under tabellen med reglerne og boksen <em>Hydrogenperoxid er en undtagelse</em> i afsnit 8.3.</p>
 </div>
 </div>
 </div>
@@ -1249,7 +1324,13 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I H<sub>2</sub>O<sub>2</sub> har hydrogen +I som normalt. De to hydrogenatomer giver +2, så de to oxygenatomer skal tilsammen give −2.</p>
+<p>I H<sub>2</sub>O<sub>2</sub> har hydrogen +I som normalt. O står for oxidationstallet for oxygen, og H står for oxidationstallet for hydrogen:</p>
+<p><span class="math display">\[
+\begin{aligned}
+2 \cdot \mathrm{O} + 2 \cdot \mathrm{H} &amp;= \text{ladning} \\
+2 \cdot \mathrm{O} + 2 \cdot 1 &amp;= 0
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1505,7 +1586,14 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-26" class="callout-26-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I nitrit giver de to oxygenatomer −4. Nitrogen skal have −1 + 4 = +3.</p>
+<p>I nitrit, NO<sub>2</sub><sup>−</sup>, står N for oxidationstallet for nitrogen, og O står for oxidationstallet for oxygen:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{N} + 2 \cdot \mathrm{O} &amp;= \text{ladning} \\
+\mathrm{N} + 2 \cdot (-2) &amp;= -1 \\
+\mathrm{N} &amp;= 3
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1567,7 +1655,14 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-29" class="callout-29-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I ethanol giver hydrogen 6 · (+1) = +6, og oxygen giver −2. De to carbonatomer skal tilsammen give −4.</p>
+<p>I ethanol, C<sub>2</sub>H<sub>6</sub>O, står C, H og O for oxidationstallene for carbon, hydrogen og oxygen. For carbon er det gennemsnittet:</p>
+<p><span class="math display">\[
+\begin{aligned}
+2 \cdot \mathrm{C} + 6 \cdot \mathrm{H} + \mathrm{O} &amp;= \text{ladning} \\
+2 \cdot \mathrm{C} + 6 \cdot 1 + (-2) &amp;= 0 \\
+2 \cdot \mathrm{C} &amp;= -4
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1616,7 +1711,13 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-31" class="callout-31-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I glucose giver hydrogen 12 · (+1) = +12, og oxygen giver 6 · (−2) = −12. Se, hvad der bliver tilbage til carbon.</p>
+<p>I glucose, C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>, står C, H og O for oxidationstallene for carbon, hydrogen og oxygen. For carbon er det gennemsnittet:</p>
+<p><span class="math display">\[
+\begin{aligned}
+6 \cdot \mathrm{C} + 12 \cdot \mathrm{H} + 6 \cdot \mathrm{O} &amp;= \text{ladning} \\
+6 \cdot \mathrm{C} + 12 \cdot 1 + 6 \cdot (-2) &amp;= 0
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1684,7 +1785,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-34" class="callout-34-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Brug regel 1 og regel 2 i tabellen i afsnit 8.3.</p>
+<p>Læs de to punkter lige under tabellen med reglerne i afsnit 8.3.</p>
 </div>
 </div>
 </div>
@@ -1766,7 +1867,15 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-38" class="callout-38-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I CH<sub>4</sub> giver fire hydrogenatomer +4 i alt. Carbon skal derfor have −IV. I N<sub>2</sub>O giver oxygenatomet −2, og det skal deles mellem to nitrogenatomer.</p>
+<p>I CH<sub>4</sub> står C for oxidationstallet for carbon, og H står for oxidationstallet for hydrogen:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{C} + 4 \cdot \mathrm{H} &amp;= \text{ladning} \\
+\mathrm{C} + 4 \cdot 1 &amp;= 0 \\
+\mathrm{C} &amp;= -4
+\end{aligned}
+\]</span></p>
+<p>I N<sub>2</sub>O giver oxygenatomet −2, og det skal deles mellem to nitrogenatomer.</p>
 </div>
 </div>
 </div>
@@ -1831,7 +1940,13 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-41" class="callout-41-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I SO<sub>4</sub><sup>2−</sup> giver fire oxygenatomer −8 i alt. Summen skal være −2, så svovl skal have +VI. I HCO<sub>3</sub><sup>−</sup> skal du også regne hydrogenatomet med.</p>
+<p>Svovl i SO<sub>4</sub><sup>2−</sup> er eksemplet i afsnit 8.3. I HCO<sub>3</sub><sup>−</sup> skal du også regne hydrogenatomet med:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{C} + \mathrm{H} + 3 \cdot \mathrm{O} &amp;= \text{ladning} \\
+\mathrm{C} + 1 + 3 \cdot (-2) &amp;= -1
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -1959,7 +2074,13 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <div id="callout-47" class="callout-47-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>I Li<sub>2</sub>O<sub>2</sub> giver to lithiumatomer +2 i alt. Summen skal være 0, så de to oxygenatomer skal give −2 tilsammen.</p>
+<p>I Li<sub>2</sub>O<sub>2</sub> står O for oxidationstallet for oxygen, og Li står for oxidationstallet for lithium, som er +I:</p>
+<p><span class="math display">\[
+\begin{aligned}
+2 \cdot \mathrm{O} + 2 \cdot \mathrm{Li} &amp;= \text{ladning} \\
+2 \cdot \mathrm{O} + 2 \cdot 1 &amp;= 0
+\end{aligned}
+\]</span></p>
 </div>
 </div>
 </div>
@@ -3417,6 +3538,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -80,6 +80,35 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -766,14 +795,38 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1027,7 +1080,10 @@ Figur&nbsp;1: Magnesium afgiver elektroner, og oxygen optager dem.
 <p>O<sub>2</sub> + 4 e<sup>−</sup> → 2 O<sup>2−</sup></p>
 </div>
 <p>Et oxygenmolekyle består af to atomer, og hvert atom optager 2 <span class="fagord-peg" data-fagord="elektron">elektroner</span>. Derfor skal <span class="fagord-peg" data-fagord="molekyle">molekylet</span> have 4 <span class="fagord-peg" data-fagord="elektron">elektroner</span>.</p>
-<p>Tjek altid <span class="fagord-peg" data-fagord="ladning">ladningen</span> i en <span class="fagord-peg" data-fagord="delreaktion">delreaktion</span>, for den skal være den samme på begge sider af pilen. I <span class="fagord-peg" data-fagord="oxidation">oxidationen</span> er <span class="fagord-peg" data-fagord="ladning">ladningen</span> 0 til venstre, og til højre er den (2+) + (2−) = 0.</p>
+<p>Tjek altid <span class="fagord-peg" data-fagord="ladning">ladningen</span> i en <span class="fagord-peg" data-fagord="delreaktion">delreaktion</span>, for den skal være den samme på begge sider af pilen. I <span class="fagord-peg" data-fagord="oxidation">oxidationen</span> er <span class="fagord-peg" data-fagord="ladning">ladningen</span> 0 til venstre, og til højre er den også 0:</p>
+<p><span class="math display">\[
+\text{ladning til højre} = (+2) + 2 \cdot (-1) = 0
+\]</span></p>
 </section>
 <section id="lige-mange-elektroner" class="level2">
 <h2 class="anchored" data-anchor-id="lige-mange-elektroner">Lige mange elektroner</h2>
@@ -1069,7 +1125,10 @@ Figur&nbsp;2: Den samlede reaktion med oxidationen over skemaet og reduktionen u
 <p><span id="ord-trin-3-den-samlede-reaktion" class="fagord-anker"><strong>Trin 3: den samlede reaktion</strong></span></p>
 <p>2 Al + 3 Cl<sub>2</sub> → 2 Al<sup>3+</sup> + 6 Cl<sup>−</sup></p>
 <p><span id="ord-tjek" class="fagord-anker"><strong>Tjek</strong></span></p>
-<p><span class="fagord-peg" data-fagord="ladning">Ladningen</span> er 0 til venstre. Til højre er den 2 · (3+) + 6 · (1−) = 0.</p>
+<p><span class="fagord-peg" data-fagord="ladning">Ladningen</span> er 0 til venstre, fordi der kun er atomer og <span class="fagord-peg" data-fagord="molekyle">molekyler</span> uden <span class="fagord-peg" data-fagord="ladning">ladning</span>. Til højre er den også 0:</p>
+<p><span class="math display">\[
+\text{ladning til højre} = 2 \cdot (+3) + 6 \cdot (-1) = 0
+\]</span></p>
 </div>
 </div>
 </section>
@@ -1078,19 +1137,6 @@ Figur&nbsp;2: Den samlede reaktion med oxidationen over skemaet og reduktionen u
 <p>Det stof, der optager <span class="fagord-peg" data-fagord="elektron">elektronerne</span>, får det andet stof til at blive oxideret og kaldes derfor et <span id="ord-oxidationsmiddel" class="fagord-anker"><strong>oxidationsmiddel</strong></span>. Oxygen, chlor og brom er kraftige oxidationsmidler.</p>
 <p>Det stof, der afgiver <span class="fagord-peg" data-fagord="elektron">elektronerne</span>, kaldes et <span id="ord-reduktionsmiddel" class="fagord-anker"><strong>reduktionsmiddel</strong></span>. <span class="fagord-peg" data-fagord="metal">Metaller</span> som magnesium, aluminium og natrium er kraftige reduktionsmidler.</p>
 <p>Ordet <span class="fagord-peg" data-fagord="oxidation">oxidation</span> kommer af oxygen, fordi det oprindelig betød, at et stof reagerede med oxygen, som når noget brænder eller <span class="fagord-peg" data-fagord="rust">ruster</span>. I dag bruges ordet om alle reaktioner, hvor et stof afgiver <span class="fagord-peg" data-fagord="elektron">elektroner</span>, også når der slet ikke er oxygen med.</p>
-<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Prøv selv
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc8.1_spaendingsraekken/index.html">Spændingsrækken</a> kan du se <span class="fagord-peg" data-fagord="elektron">elektronerne</span> flytte fra et <span class="fagord-peg" data-fagord="metal">metal</span> til en <span class="fagord-peg" data-fagord="ion">ion</span>, når en metalstang sænkes ned i en <span class="fagord-peg" data-fagord="opløsning">opløsning</span>.</p>
-</div>
-</div>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1111,11 +1157,11 @@ Figur&nbsp;2: Den samlede reaktion med oxidationen over skemaet og reduktionen u
 </div>
 </div>
 <div class="til-opgaver">
-<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/8-1-opgaver.html">Opgaver til 8.1</a> har almindelige opgaver og opgaver med fødevaretema og klimatema.</p>
+<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/8-1-opgaver.html">Opgaver til 8.1</a></p>
 </div>
 
 
-<script type="application/json" id="fagord-peg-data">{"afstemt":{"afsnit":"6.3","forklaring":"Siges om et reaktionsskema med lige mange atomer af hver slags på begge\nsider af pilen. Det klares med koefficienter foran formlerne.","maal":"../kapitler/6-3-alkaners-reaktioner.html#ord-afstemt","ord":"afstemt"},"delreaktion":{"afsnit":"8.1","forklaring":"Skema, der kun viser det ene stof, som enten afgiver eller optager\nelektroner. Elektronerne skrives med som e<sup>−<\/sup>.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-delreaktioner","ord":"delreaktion"},"elektron":{"afsnit":"1.2","forklaring":"Partikel uden om atomets kerne. Den har ladningen −1 og vejer næsten\ningenting.","maal":"../kapitler/1-2-atomet.html#ord-elektroner","ord":"elektron"},"hovedgruppe":{"afsnit":"1.3","forklaring":"Lodret kolonne, hvor atomerne har lige mange elektroner i yderste skal.\nDer er 8 af dem i det periodiske system.","maal":"../kapitler/1-3-elektronskaller.html#ord-hovedgrupper","ord":"hovedgruppe"},"ion":{"afsnit":"2.1","forklaring":"Atom, der har afgivet eller optaget elektroner og derfor har en ladning.","maal":"../kapitler/2-1-ioner.html#ord-ion","ord":"ion"},"ionforbindelse":{"afsnit":"2.3","forklaring":"Stof, der består af positive og negative partikler, som tiltrækker\nhinanden. Dannes typisk af et metal og et ikke-metal.","maal":"../kapitler/2-3-ionforbindelser.html#ord-ionforbindelse","ord":"ionforbindelse"},"ladning":{"afsnit":"2.1","forklaring":"Viser, hvor mange elektroner en ion har afgivet eller optaget. Skrives\nhævet efter atomsymbolet, for eksempel 2+ i Mg<sup>2+<\/sup>.","maal":"../kapitler/2-1-ioner.html#sådan-skrives-en-ion","ord":"ladning"},"metal":{"afsnit":"1.1","forklaring":"Blankt grundstof, der leder strøm og varme godt, for eksempel jern og\nkobber.","maal":"../kapitler/1-1-hvad-er-kemi.html#ord-metaller","ord":"metal"},"molekyle":{"afsnit":"3.1","forklaring":"Gruppe af atomer, der holdes sammen af elektronparbindinger. Kun\nikke-metaller danner dem.","maal":"../kapitler/3-1-molekyler.html#ord-molekyle","ord":"molekyle"},"opløsning":{"afsnit":"5.1","forklaring":"Blanding, hvor et stof har fordelt sig jævnt i en væske. Salt, der er\nrørt ud i vand, er et eksempel.","maal":"../kapitler/5-1-koncentration.html#ord-oploesning","ord":"opløsning"},"oxidation":{"afsnit":"8.1","forklaring":"Det, der sker, når et stof afgiver elektroner. Magnesium gør det, når\ndet brænder og bliver til Mg<sup>2+<\/sup>.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-oxidation","ord":"oxidation"},"oxidationsmiddel":{"afsnit":"8.1","forklaring":"Stof, der optager elektroner fra et andet stof. Oxygen, chlor og brom er\nkraftige eksempler.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-oxidationsmiddel","ord":"oxidationsmiddel"},"redoxreaktion":{"afsnit":"8.1","forklaring":"Elektroner flytter fra ét stof til et andet. Det ene stof afgiver dem,\nog det andet optager dem samtidig.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-redoxreaktion","ord":"redoxreaktion"},"reduktion":{"afsnit":"8.1","forklaring":"Det, der sker, når et stof optager elektroner. Oxygen gør det og bliver\ntil O<sup>2−<\/sup>, når magnesium brænder.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-reduktion","ord":"reduktion"},"reduktionsmiddel":{"afsnit":"8.1","forklaring":"Stof, der afgiver elektroner til et andet stof. Metaller som magnesium,\naluminium og natrium er kraftige eksempler.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-reduktionsmiddel","ord":"reduktionsmiddel"},"rust":{"afsnit":"8.5","forklaring":"Rødbrunt stof, der dannes, når jern reagerer med vand og oxygen. Det er\nporøst og skaller af.","maal":"../kapitler/8-5-korrosion.html#sådan-ruster-jern","ord":"rust"}}</script>
+<script type="application/json" id="fagord-peg-data">{"afstemt":{"afsnit":"6.3","forklaring":"Siges om et reaktionsskema med lige mange atomer af hver slags på begge\nsider af pilen. Det klares med koefficienter foran formlerne.","maal":"../kapitler/6-3-alkaners-reaktioner.html#ord-afstemt","ord":"afstemt"},"delreaktion":{"afsnit":"8.1","forklaring":"Skema, der kun viser det ene stof, som enten afgiver eller optager\nelektroner. Elektronerne skrives med som e<sup>−<\/sup>.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-delreaktioner","ord":"delreaktion"},"elektron":{"afsnit":"1.2","forklaring":"Partikel uden om atomets kerne. Den har ladningen −1 og vejer næsten\ningenting.","maal":"../kapitler/1-2-atomet.html#ord-elektroner","ord":"elektron"},"hovedgruppe":{"afsnit":"1.3","forklaring":"Lodret kolonne, hvor atomerne har lige mange elektroner i yderste skal.\nDer er 8 af dem i det periodiske system.","maal":"../kapitler/1-3-elektronskaller.html#ord-hovedgrupper","ord":"hovedgruppe"},"ion":{"afsnit":"2.1","forklaring":"Atom, der har afgivet eller optaget elektroner og derfor har en ladning.","maal":"../kapitler/2-1-ioner.html#ord-ion","ord":"ion"},"ionforbindelse":{"afsnit":"2.3","forklaring":"Stof, der består af positive og negative partikler, som tiltrækker\nhinanden. Dannes typisk af et metal og et ikke-metal.","maal":"../kapitler/2-3-ionforbindelser.html#ord-ionforbindelse","ord":"ionforbindelse"},"ladning":{"afsnit":"2.1","forklaring":"Viser, hvor mange elektroner en ion har afgivet eller optaget. Skrives\nhævet efter atomsymbolet, for eksempel 2+ i Mg<sup>2+<\/sup>.","maal":"../kapitler/2-1-ioner.html#sådan-skrives-en-ion","ord":"ladning"},"metal":{"afsnit":"1.1","forklaring":"Blankt grundstof, der leder strøm og varme godt, for eksempel jern og\nkobber.","maal":"../kapitler/1-1-hvad-er-kemi.html#ord-metaller","ord":"metal"},"molekyle":{"afsnit":"3.1","forklaring":"Gruppe af atomer, der holdes sammen af elektronparbindinger. Kun\nikke-metaller danner dem.","maal":"../kapitler/3-1-molekyler.html#ord-molekyle","ord":"molekyle"},"oxidation":{"afsnit":"8.1","forklaring":"Det, der sker, når et stof afgiver elektroner. Magnesium gør det, når\ndet brænder og bliver til Mg<sup>2+<\/sup>.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-oxidation","ord":"oxidation"},"oxidationsmiddel":{"afsnit":"8.1","forklaring":"Stof, der optager elektroner fra et andet stof. Oxygen, chlor og brom er\nkraftige eksempler.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-oxidationsmiddel","ord":"oxidationsmiddel"},"redoxreaktion":{"afsnit":"8.1","forklaring":"Elektroner flytter fra ét stof til et andet. Det ene stof afgiver dem,\nog det andet optager dem samtidig.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-redoxreaktion","ord":"redoxreaktion"},"reduktion":{"afsnit":"8.1","forklaring":"Det, der sker, når et stof optager elektroner. Oxygen gør det og bliver\ntil O<sup>2−<\/sup>, når magnesium brænder.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-reduktion","ord":"reduktion"},"reduktionsmiddel":{"afsnit":"8.1","forklaring":"Stof, der afgiver elektroner til et andet stof. Metaller som magnesium,\naluminium og natrium er kraftige eksempler.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-reduktionsmiddel","ord":"reduktionsmiddel"},"rust":{"afsnit":"8.5","forklaring":"Rødbrunt stof, der dannes, når jern reagerer med vand og oxygen. Det er\nporøst og skaller af.","maal":"../kapitler/8-5-korrosion.html#sådan-ruster-jern","ord":"rust"}}</script>
 </section>
 
 </main> <!-- /main -->
@@ -2357,6 +2403,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

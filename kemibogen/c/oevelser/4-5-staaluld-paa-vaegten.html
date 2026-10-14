@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -795,14 +795,38 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -936,14 +960,9 @@ window.Quarto = {
     <h2 id="toc-title">På denne side</h2>
    
   <ul class="collapse">
-  <li><a href="#teori" id="toc-teori" class="nav-link active" data-scroll-target="#teori">Teori</a></li>
-  <li><a href="#apparatur-og-kemikalier" id="toc-apparatur-og-kemikalier" class="nav-link" data-scroll-target="#apparatur-og-kemikalier">Apparatur og kemikalier</a></li>
-  <li><a href="#sikkerhed" id="toc-sikkerhed" class="nav-link" data-scroll-target="#sikkerhed">Sikkerhed</a></li>
-  <li><a href="#før-forsøget" id="toc-før-forsøget" class="nav-link" data-scroll-target="#før-forsøget">Før forsøget</a></li>
-  <li><a href="#fremgangsmåde" id="toc-fremgangsmåde" class="nav-link" data-scroll-target="#fremgangsmåde">Fremgangsmåde</a></li>
+  <li><a href="#fremgangsmåde" id="toc-fremgangsmåde" class="nav-link active" data-scroll-target="#fremgangsmåde">Fremgangsmåde</a></li>
   <li><a href="#resultater" id="toc-resultater" class="nav-link" data-scroll-target="#resultater">Resultater</a></li>
   <li><a href="#efterbehandling" id="toc-efterbehandling" class="nav-link" data-scroll-target="#efterbehandling">Efterbehandling</a></li>
-  <li><a href="#oprydning" id="toc-oprydning" class="nav-link" data-scroll-target="#oprydning">Oprydning</a></li>
   </ul>
 </nav>
     </div>
@@ -969,7 +988,6 @@ window.Quarto = {
 </header>
 
 
-<p>Øvelsen hører til afsnit <a href="../kapitler/4-5-maengdeberegning.html">4.5 Mængdeberegning</a>. Læs afsnittet, før du går i laboratoriet.</p>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Formål">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -983,26 +1001,11 @@ window.Quarto = {
 <p>Du skal undersøge, hvad der sker med massen, når ståluld brænder. Bagefter skal du sammenligne din måling med en mængdeberegning.</p>
 </div>
 </div>
-<section id="teori" class="level2">
-<h2 class="anchored" data-anchor-id="teori">Teori</h2>
-<p>Ståluld er tynde tråde af stål, og stål er næsten rent jern. Når jern brænder, reagerer det med oxygen fra luften. Der dannes et jernoxid, som er et fast stof. I øvelsen regner du med, at der dannes jern(II)oxid, FeO.</p>
+<p>Ståluld er næsten rent jern. Når jern brænder, reagerer det med oxygen fra luften og bliver til et jernoxid, som er et fast stof. I øvelsen regner du med, at der dannes jern(II)oxid, FeO.</p>
 <div class="reaktion">
 <p>2 Fe(s) + O<sub>2</sub>(g) → 2 FeO(s)</p>
 </div>
-</section>
-<section id="apparatur-og-kemikalier" class="level2">
-<h2 class="anchored" data-anchor-id="apparatur-og-kemikalier">Apparatur og kemikalier</h2>
-<ul>
-<li>en porcelænsskål</li>
-<li>en vægt, der viser to decimaler</li>
-<li>en trefod med trådnet</li>
-<li>en bunsenbrænder</li>
-<li>en digeltang</li>
-<li>1 til 2 g ståluld</li>
-</ul>
-</section>
-<section id="sikkerhed" class="level2">
-<h2 class="anchored" data-anchor-id="sikkerhed">Sikkerhed</h2>
+<p><span id="ord-apparatur-og-kemikalier" class="fagord-anker"><strong>Apparatur og kemikalier:</strong></span> porcelænsskål, vægt, trefod med trådnet, bunsenbrænder, digeltang og 1 til 2 g ståluld.</p>
 <div class="callout callout-style-default callout-important callout-titled" title="Sikkerhed">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1013,18 +1016,9 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<ul>
-<li>Brug sikkerhedsbriller, og sæt langt hår op.</li>
-<li>Stålulden gløder og kan sende gnister ud. Fjern papir og andet, der kan brænde, fra bordet.</li>
-<li>Skålen er meget varm, også længe efter at stålulden er holdt op med at gløde. Flyt den kun med digeltangen.</li>
-</ul>
+<p>Brug sikkerhedsbriller, og sæt langt hår op. Stålulden kan sende gnister ud, så fjern papir og andet, der kan brænde, fra bordet. Skålen er meget varm længe efter, at stålulden er holdt op med at gløde, og må kun flyttes med digeltangen.</p>
 </div>
 </div>
-</section>
-<section id="før-forsøget" class="level2">
-<h2 class="anchored" data-anchor-id="før-forsøget">Før forsøget</h2>
-<p>Hvad tror du, der sker med massen, når stålulden brænder? Bliver massen større, bliver den mindre, eller er den uændret? Skriv dit gæt og en kort begrundelse, før du går i gang.</p>
-</section>
 <section id="fremgangsmåde" class="level2">
 <h2 class="anchored" data-anchor-id="fremgangsmåde">Fremgangsmåde</h2>
 <div id="fig-oevelse-staaluld" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1038,14 +1032,12 @@ Figur&nbsp;1: Stålulden vejes i skålen før og efter, at den er brændt.
 </figure>
 </div>
 <ol type="1">
-<li>Vej den tomme porcelænsskål, og skriv massen ned.</li>
-<li>Træk en tot ståluld på 1 til 2 g lidt fra hinanden, så den bliver luftig, og læg den i skålen.</li>
-<li>Vej skålen med ståluld, og skriv massen ned.</li>
-<li>Stil skålen på trefoden med trådnet.</li>
-<li>Tænd bunsenbrænderen, og hold flammen skråt ned på stålulden, til den gløder. Vend stålulden med digeltangen, så flammen når ind alle steder. Bliv ved i et par minutter.</li>
-<li>Sluk bunsenbrænderen, og lad skålen køle af i mindst 5 minutter.</li>
-<li>Vej skålen med indhold på den samme vægt som før, og skriv massen ned.</li>
-<li>Se på stålulden. Skriv ned, om den har ændret udseende.</li>
+<li>Skriv først dit gæt i skemaet: Bliver massen større, mindre eller uændret, når stålulden brænder?</li>
+<li>Vej den tomme porcelænsskål. Træk en tot ståluld på 1 til 2 g lidt fra hinanden, læg den i skålen, og vej igen.</li>
+<li>Stil skålen på trefoden, og hold flammen skråt ned på stålulden, til den gløder (figur 1). Vend stålulden med digeltangen, så flammen når ind alle steder, og bliv ved i et par minutter.</li>
+<li>Lad skålen køle af i mindst 5 minutter, og vej den igen på den samme vægt.</li>
+<li>Skriv ned, hvordan stålulden så ud før og efter.</li>
+<li>Smid den brændte ståluld i den beholder, din lærer viser dig, når skålen er helt kold.</li>
 </ol>
 </section>
 <section id="resultater" class="level2">
@@ -1076,19 +1068,27 @@ Figur&nbsp;1: Stålulden vejes i skålen før og efter, at den er brændt.
 </div>
 <div class="udfyld">
 <table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 49%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>
-<th style="text-align: left;">Sådan ser stålulden ud</th>
+<th style="text-align: left;">Det skrev jeg ned</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Før forsøget</td>
+<td style="text-align: left;">Mit gæt: større, mindre eller uændret masse?</td>
 <td style="text-align: left;"></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Efter forsøget</td>
+<td style="text-align: left;">Stålulden før forsøget</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stålulden efter forsøget</td>
 <td style="text-align: left;"></td>
 </tr>
 </tbody>
@@ -1097,99 +1097,83 @@ Figur&nbsp;1: Stålulden vejes i skålen før og efter, at den er brændt.
 </section>
 <section id="efterbehandling" class="level2">
 <h2 class="anchored" data-anchor-id="efterbehandling">Efterbehandling</h2>
+<div class="udgave lukket">
 <ol type="1">
-<li><p>Beregn massen af stålulden før forsøget og massen af det stof, der ligger i skålen efter forsøget.</p></li>
-<li><p>Blev massen større eller mindre? Passede dit gæt?</p></li>
-<li><p>Forklar med reaktionsskemaet, hvorfor massen ændrede sig, som den gjorde.</p></li>
-<li><p>Beregn, hvor mange gram jern(II)oxid der kan dannes af din ståluld, hvis alt jernet reagerer. Brug mængdeberegningsskemaet fra afsnit 4.5.</p>
+<li><p>Beregn massen af stålulden før forsøget. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+m(\text{ståluld}) = m(\text{skål med ståluld}) - m(\text{skål}) = \boxed{\phantom{00{,}00}}\ \mathrm{g} - \boxed{\phantom{00{,}00}}\ \mathrm{g} = \boxed{\phantom{00{,}00}}\ \mathrm{g}
+\]</span></p></li>
+<li><p>Beregn massen af det stof, der ligger i skålen efter forsøget. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+m(\text{efter}) = m(\text{skål med indhold}) - m(\text{skål}) = \boxed{\phantom{00{,}00}}\ \mathrm{g} - \boxed{\phantom{00{,}00}}\ \mathrm{g} = \boxed{\phantom{00{,}00}}\ \mathrm{g}
+\]</span></p></li>
+<li><p>Blev massen større eller mindre? Passede dit gæt? <span class="svar" data-linjer="1"></span></p></li>
+<li><p>Reaktionsskemaet viser, at jernet har reageret med et stof fra luften. Hvilket stof er det? <span class="svar" data-linjer="1"></span></p></li>
+<li><p>Beregn, hvor mange gram jern(II)oxid der kan dannes af din ståluld, hvis alt jernet reagerer. Skriv først massen af din ståluld i skemaet. Regn så ned, på tværs og op med de fire beregninger under skemaet, og skriv tallene i skemaet undervejs.</p></li>
+</ol>
 <div class="udfyld">
 <table class="caption-top table">
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>
 <th style="text-align: center;">2 Fe(s)</th>
-<th style="text-align: center;">+</th>
-<th style="text-align: center;">O<sub>2</sub>(g)</th>
-<th style="text-align: center;">→</th>
-<th style="text-align: center;">2 FeO(s)</th>
+<th style="text-align: center;">+ O<sub>2</sub>(g)</th>
+<th style="text-align: center;">→ 2 FeO(s)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;"><em>m</em></td>
+<td style="text-align: left;"><em>m</em> i g</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
+<td style="text-align: center;">–</td>
 <td style="text-align: center;"></td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><em>M</em></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
+<td style="text-align: left;"><em>M</em> i g/mol</td>
+<td style="text-align: center;">55,85</td>
+<td style="text-align: center;">–</td>
 <td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;"><em>n</em></td>
+<td style="text-align: left;"><em>n</em> i mol</td>
 <td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
+<td style="text-align: center;">–</td>
 <td style="text-align: center;"></td>
 </tr>
 </tbody>
 </table>
-</div></li>
-<li><p>Sammenlign den beregnede masse med den masse, du målte efter forsøget. Beregn afvigelsen i procent. Den beregnede masse er den forventede værdi.</p>
+</div>
+<p><span class="math display">\[
+n(\mathrm{Fe}) = \frac{m(\mathrm{Fe})}{M(\mathrm{Fe})} = \frac{\boxed{\phantom{00{,}00}}\ \mathrm{g}}{55{,}85\ \mathrm{g/mol}} = \boxed{\phantom{0{,}0000}}\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+n(\mathrm{FeO}) = n(\mathrm{Fe}) = \boxed{\phantom{0{,}0000}}\ \mathrm{mol}
+\]</span></p>
+<p><span class="math display">\[
+M(\mathrm{FeO}) = 55{,}85\ \mathrm{g/mol} + 16{,}00\ \mathrm{g/mol} = \boxed{\phantom{00{,}00}}\ \mathrm{g/mol}
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{FeO}) = n(\mathrm{FeO}) \cdot M(\mathrm{FeO}) = \boxed{\phantom{0{,}0000}}\ \mathrm{mol} \cdot \boxed{\phantom{00{,}00}}\ \mathrm{g/mol} = \boxed{\phantom{00{,}00}}\ \mathrm{g}
+\]</span></p>
+<ol start="6" type="1">
+<li><p>Beregn afvigelsen mellem den masse, du målte efter forsøget, og den beregnede masse af jern(II)oxid. Den beregnede masse er den forventede værdi. <span class="svar" data-linjer="0"></span></p>
 <p><span class="math display">\[
 \text{afvigelse} = \frac{\text{målt værdi} - \text{forventet værdi}}{\text{forventet værdi}} \cdot 100\ \%
+\]</span></p>
+<p><span class="math display">\[
+\text{afvigelse} = \frac{\boxed{\phantom{00{,}00}}\ \mathrm{g} - \boxed{\phantom{00{,}00}}\ \mathrm{g}}{\boxed{\phantom{00{,}00}}\ \mathrm{g}} \cdot 100\ \% = \boxed{\phantom{00{,}0}}\ \%
 \]</span></p></li>
-<li><p>Er den målte masse større eller mindre end den beregnede? Giv to mulige forklaringer.</p></li>
-<li><p>Ekstra: Jern kan også danne jern(III)oxid, Fe<sub>2</sub>O<sub>3</sub>. Afstem reaktionsskemaet herunder, og beregn, hvor mange gram jern(III)oxid din ståluld kan blive til. Bliver massen større eller mindre, end hvis der dannes jern(II)oxid?</p>
-<div class="reaktion">
-<p>Fe(s) + O<sub>2</sub>(g) → Fe<sub>2</sub>O<sub>3</sub>(s)</p>
-</div></li>
 </ol>
-<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp til efterbehandlingen">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Hjælp til efterbehandlingen
+<div class="udgave aaben">
+<ol type="1">
+<li>Beregn massen af stålulden før forsøget og massen af det stof, der ligger i skålen efter forsøget. Passede dit gæt?</li>
+<li>Forklar med reaktionsskemaet, hvorfor massen ændrede sig.</li>
+<li>Beregn, hvor mange gram jern(II)oxid der kan dannes af din ståluld, hvis alt jernet reagerer. Stil beregningen op i et mængdeberegningsskema.</li>
+<li>Beregn afvigelsen mellem den masse, du målte, og den beregnede masse, og giv to mulige forklaringer på afvigelsen.</li>
+<li>Jern kan også danne jern(III)oxid, Fe<sub>2</sub>O<sub>3</sub>. Afstem reaktionsskemaet for den reaktion, og undersøg med en beregning, om din måling passer bedre med Fe<sub>2</sub>O<sub>3</sub> end med FeO.</li>
+</ol>
 </div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><span id="ord-spoergsmaal-1" class="fagord-anker"><strong>Spørgsmål 1:</strong></span> Massen af stålulden er massen af skålen med ståluld minus massen af den tomme skål. Regn på samme måde med den sidste vejning.</p>
-<p><span id="ord-spoergsmaal-4" class="fagord-anker"><strong>Spørgsmål 4:</strong></span> Følg de tre trin fra afsnit 4.5. Trin 1 er ned: beregn stofmængden af jern ud fra massen og molarmassen. Trin 2 er på tværs: brug koefficienterne foran Fe og FeO. Trin 3 er op: beregn massen af jern(II)oxid ud fra stofmængden og molarmassen. Atommasserne står i det periodiske system bagest i bogen.</p>
-<p><span id="ord-spoergsmaal-6" class="fagord-anker"><strong>Spørgsmål 6:</strong></span> Tænk over, om alt jernet har reageret, om stålulden kun indeholder jern, og om der kan være dannet et andet jernoxid end FeO.</p>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Prøv selv
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Når du har lavet øvelsen, kan du gentage forsøget og beregningen i animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc4.8_staaluld/index.html">Afbrænding af ståluld</a>.</p>
-</div>
-</div>
-</section>
-<section id="oprydning" class="level2">
-<h2 class="anchored" data-anchor-id="oprydning">Oprydning</h2>
-<ul>
-<li>Vent, til skålen er helt kold.</li>
-<li>Smid den brændte ståluld i den affaldsbeholder, din lærer viser dig, og gør skålen ren.</li>
-</ul>
 
 
 </section>
@@ -2433,6 +2417,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

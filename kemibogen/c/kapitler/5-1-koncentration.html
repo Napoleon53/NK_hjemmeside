@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -795,14 +795,38 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1164,18 +1188,8 @@ c_{\text{efter}} = \frac{0{,}30\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}100\
 <p>Efter fortyndingen er koncentrationen 0,10 M. <span class="fagord-peg" data-fagord="volumen">Volumenet</span> er blevet tre gange så stort, og koncentrationen er blevet tre gange så lille.</p>
 </div>
 </div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Prøv selv
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc5.1_koncentration/index.html">Koncentration</a> kan du hælde stof og vand i et kar og se, hvad der sker med koncentrationen.</p>
-</div>
+<div class="proev-selv">
+<p><span id="ord-proev-selv" class="fagord-anker"><strong>Prøv selv:</strong></span> I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc5.1_koncentration/index.html">Koncentration</a> kan du hælde stof og vand i et kar og se, hvad der sker med koncentrationen.</p>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
 <div class="callout-header d-flex align-content-center">
@@ -1196,7 +1210,7 @@ c_{\text{efter}} = \frac{0{,}30\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}100\
 </div>
 </div>
 <div class="til-opgaver">
-<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/5-1-opgaver.html">Opgaver til 5.1</a> har almindelige opgaver og opgaver med fødevaretema og sundhedstema.</p>
+<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/5-1-opgaver.html">Opgaver til 5.1</a></p>
 </div>
 
 
@@ -2442,6 +2456,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -80,6 +80,35 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -766,14 +795,38 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -976,7 +1029,7 @@ Figur&nbsp;1: Oxidationstallene i et molekyle giver tilsammen 0. I en ion giver 
 </section>
 <section id="reglerne" class="level2">
 <h2 class="anchored" data-anchor-id="reglerne">Reglerne</h2>
-<p>Man behøver ikke tegne elektronpar hver gang, for fem regler er nok til næsten alle stoffer.</p>
+<p>Man behøver ikke tegne elektronpar hver gang, for tre regler er nok til de fleste stoffer.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 59%">
@@ -990,28 +1043,24 @@ Figur&nbsp;1: Oxidationstallene i et molekyle giver tilsammen 0. I en ion giver 
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">1. Et <span class="fagord-peg" data-fagord="grundstof">grundstof</span>, der ikke er bundet til andre <span class="fagord-peg" data-fagord="grundstof">grundstoffer</span>, har 0.</td>
-<td style="text-align: left;">Fe, O<sub>2</sub>, H<sub>2</sub> og Cl<sub>2</sub> har alle 0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2. En <span class="fagord-peg" data-fagord="ion">ion</span> med ét atom har samme <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span> som <span class="fagord-peg" data-fagord="ladning">ladningen</span>.</td>
-<td style="text-align: left;">Na<sup>+</sup> har +I, og Cl<sup>−</sup> har −I</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">3. Hydrogen har +I i forbindelser.</td>
+<td style="text-align: left;">1. Hydrogen har +I i forbindelser.</td>
 <td style="text-align: left;">H i H<sub>2</sub>O og i HCl</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">4. Oxygen har −II i forbindelser.</td>
+<td style="text-align: left;">2. Oxygen har −II i forbindelser.</td>
 <td style="text-align: left;">O i H<sub>2</sub>O og i CO<sub>2</sub></td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">5. Summen af alle <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span> er lig med <span class="fagord-peg" data-fagord="ladning">ladningen</span>.</td>
+<td style="text-align: left;">3. Summen af alle <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span> er lig med <span class="fagord-peg" data-fagord="ladning">ladningen</span>.</td>
 <td style="text-align: left;">0 for et <span class="fagord-peg" data-fagord="molekyle">molekyle</span>, 2− for SO<sub>4</sub><sup>2−</sup></td>
 </tr>
 </tbody>
 </table>
-<p>Regel 5 bruges til at finde det <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span>, de andre regler ikke giver.</p>
+<p>Regel 3 bruges til at finde det <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span>, de to første regler ikke giver. Den giver også <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> for <span class="fagord-peg" data-fagord="grundstof">grundstoffer</span> og for <span class="fagord-peg" data-fagord="ion">ioner</span> med ét atom:</p>
+<ul>
+<li>I et <span class="fagord-peg" data-fagord="grundstof">grundstof</span> som Fe, H<sub>2</sub> eller O<sub>2</sub> er alle atomerne ens, og stoffet har ingen <span class="fagord-peg" data-fagord="ladning">ladning</span>, så hvert atom har 0. Regel 1 og 2 gælder kun i forbindelser.</li>
+<li>En <span class="fagord-peg" data-fagord="ion">ion</span> med ét atom har samme <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span> som sin <span class="fagord-peg" data-fagord="ladning">ladning</span>, så Na<sup>+</sup> har +I, og Cl<sup>−</sup> har −I.</li>
+</ul>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: svovl i sulfationen">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1023,29 +1072,29 @@ Figur&nbsp;1: Oxidationstallene i et molekyle giver tilsammen 0. I en ion giver 
 </div>
 <div class="callout-body-container callout-body">
 <p>Hvad er <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> for svovl i SO<sub>4</sub><sup>2−</sup>?</p>
-<p><span id="ord-trin-1-de-atomer-reglerne-giver" class="fagord-anker"><strong>Trin 1: de atomer, reglerne giver</strong></span></p>
-<p>Oxygen har −II. Der er 4 oxygenatomer, som tilsammen giver 4 · (−2) = −8.</p>
-<p><span id="ord-trin-2-summen-skal-vaere-ionens-ladning" class="fagord-anker"><strong>Trin 2: summen skal være ionens ladning</strong></span></p>
-<p><span class="fagord-peg" data-fagord="ion">Ionens</span> <span class="fagord-peg" data-fagord="ladning">ladning</span> er 2−. Svovl skal derfor have det tal, der sammen med −8 giver −2.</p>
-<p>Svovl + (−8) = −2</p>
-<p><span id="ord-trin-3-loes-regnestykket" class="fagord-anker"><strong>Trin 3: løs regnestykket</strong></span></p>
-<p>Svovl = −2 + 8 = +6</p>
+<p>Efter regel 3 er summen af <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallene</span> lig med <span class="fagord-peg" data-fagord="ion">ionens</span> <span class="fagord-peg" data-fagord="ladning">ladning</span>, som er 2−. I beregningen står S for <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> for svovl, og O står for <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> for oxygen, som er −II efter regel 2.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{S} + 4 \cdot \mathrm{O} &amp;= \text{ladning} \\
+\mathrm{S} + 4 \cdot (-2) &amp;= -2 \\
+\mathrm{S} &amp;= 6
+\end{aligned}
+\]</span></p>
 <p><span id="ord-konklusion" class="fagord-anker"><strong>Konklusion</strong></span></p>
 <p>Svovl har <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> +VI i sulfationen.</p>
 </div>
 </div>
 <p>Husk, at <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> gælder for ét atom. I H<sub>2</sub>O har hvert hydrogenatom +I, og de to tilsammen giver +2.</p>
-<div class="callout callout-style-default callout-important callout-titled" title="Tre stoffer, hvor reglerne ser anderledes ud">
+<div class="callout callout-style-default callout-important callout-titled" title="Hydrogenperoxid er en undtagelse">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Vigtigt</span>Tre stoffer, hvor reglerne ser anderledes ud
+<span class="screen-reader-only">Vigtigt</span>Hydrogenperoxid er en undtagelse
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>I H<sub>2</sub> og O<sub>2</sub> er atomerne bundet til et atom af samme slags. Ingen af dem trækker mest, så begge har 0. Det er regel 1.</p>
 <p>I hydrogenperoxid, H<sub>2</sub>O<sub>2</sub>, er de to oxygenatomer bundet til hinanden. Her har hydrogen +I som normalt, og oxygen har derfor kun −I.</p>
 </div>
 </div>
@@ -1107,18 +1156,8 @@ Figur&nbsp;2: Jern kan have oxidationstallene 0, +II og +III.
 <section id="oxidationstal-i-navne" class="level2">
 <h2 class="anchored" data-anchor-id="oxidationstal-i-navne">Oxidationstal i navne</h2>
 <p><span class="fagord-peg" data-fagord="romertal">Romertallet</span> i navne som <span class="fagord-peg" data-fagord="jern(ii)ion">jern(II)ion</span> og jern(III)oxid, som du har brugt siden <a href="../kapitler/2-2-ioners-navne.html">afsnit 2.2</a>, er <span class="fagord-peg" data-fagord="metal">metallets</span> <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span>. Mangan(IV)oxid, MnO<sub>2</sub>, hedder sådan, fordi mangan har <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> +IV.</p>
-<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Prøv selv
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc8.2_oxidationstal/index.html">Oxidationstal</a> kan du øve reglerne på en tavle. Under fanen <span class="fagord-peg" data-fagord="elektron">Elektronerne</span> kan du selv trække elektronparrene hen til det atom, der trækker mest, og se, hvor <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> kommer fra.</p>
-</div>
+<div class="proev-selv">
+<p><span id="ord-proev-selv" class="fagord-anker"><strong>Prøv selv:</strong></span> I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc8.2_oxidationstal/index.html">Oxidationstal</a> kan du øve reglerne på en tavle. Under fanen <span class="fagord-peg" data-fagord="elektron">Elektronerne</span> kan du selv trække elektronparrene hen til det atom, der trækker mest, og se, hvor <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallet</span> kommer fra.</p>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
 <div class="callout-header d-flex align-content-center">
@@ -1140,7 +1179,7 @@ Figur&nbsp;2: Jern kan have oxidationstallene 0, +II og +III.
 </div>
 </div>
 <div class="til-opgaver">
-<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/8-3-opgaver.html">Opgaver til 8.3</a> har almindelige opgaver og opgaver med fødevaretema og klimatema.</p>
+<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/8-3-opgaver.html">Opgaver til 8.3</a></p>
 </div>
 
 
@@ -2386,6 +2425,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

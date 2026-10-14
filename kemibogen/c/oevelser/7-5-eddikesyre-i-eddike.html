@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -795,14 +795,38 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -936,14 +960,9 @@ window.Quarto = {
     <h2 id="toc-title">På denne side</h2>
    
   <ul class="collapse">
-  <li><a href="#teori" id="toc-teori" class="nav-link active" data-scroll-target="#teori">Teori</a></li>
-  <li><a href="#apparatur-og-kemikalier" id="toc-apparatur-og-kemikalier" class="nav-link" data-scroll-target="#apparatur-og-kemikalier">Apparatur og kemikalier</a></li>
-  <li><a href="#sikkerhed" id="toc-sikkerhed" class="nav-link" data-scroll-target="#sikkerhed">Sikkerhed</a></li>
-  <li><a href="#før-forsøget" id="toc-før-forsøget" class="nav-link" data-scroll-target="#før-forsøget">Før forsøget</a></li>
-  <li><a href="#fremgangsmåde" id="toc-fremgangsmåde" class="nav-link" data-scroll-target="#fremgangsmåde">Fremgangsmåde</a></li>
+  <li><a href="#fremgangsmåde" id="toc-fremgangsmåde" class="nav-link active" data-scroll-target="#fremgangsmåde">Fremgangsmåde</a></li>
   <li><a href="#resultater" id="toc-resultater" class="nav-link" data-scroll-target="#resultater">Resultater</a></li>
   <li><a href="#efterbehandling" id="toc-efterbehandling" class="nav-link" data-scroll-target="#efterbehandling">Efterbehandling</a></li>
-  <li><a href="#oprydning" id="toc-oprydning" class="nav-link" data-scroll-target="#oprydning">Oprydning</a></li>
   </ul>
 </nav>
     </div>
@@ -969,7 +988,6 @@ window.Quarto = {
 </header>
 
 
-<p>Øvelsen hører til afsnit <a href="../kapitler/7-5-syre-base-titrering.html">7.5 Syre/base-titrering</a>. Læs afsnittet, før du går i laboratoriet.</p>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Formål">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -983,31 +1001,11 @@ window.Quarto = {
 <p>Du skal bestemme, hvor mange procent eddikesyre der er i husholdningseddike, ved at titrere eddiken med natriumhydroxid. Bagefter skal du sammenligne dit resultat med det tal, der står på flasken.</p>
 </div>
 </div>
-<section id="teori" class="level2">
-<h2 class="anchored" data-anchor-id="teori">Teori</h2>
-<p>Eddikesyren i eddiken reagerer med hydroxidionerne fra buretten i forholdet 1 : 1.</p>
+<p>Eddikesyren i eddiken reagerer med hydroxidionerne fra buretten i forholdet 1 : 1. Indikatoren phenolphthalein er farveløs, så længe der er eddikesyre tilbage, og den bliver lyserød, når al eddikesyren er brugt.</p>
 <div class="reaktion">
 <p>CH<sub>3</sub>COOH(aq) + OH<sup>−</sup>(aq) → CH<sub>3</sub>COO<sup>−</sup>(aq) + H<sub>2</sub>O(l)</p>
 </div>
-<p>Indikatoren phenolphthalein er farveløs i en sur opløsning og lyserød i en basisk opløsning. Når al eddikesyren er brugt, gør den næste dråbe natriumhydroxid opløsningen svagt lyserød.</p>
-<p>I øvelsen måler du eddiken af med en pipette. Husholdningseddike har næsten samme densitet som vand, så du kan regne med, at 2,00 mL eddike vejer 2,00 g.</p>
-</section>
-<section id="apparatur-og-kemikalier" class="level2">
-<h2 class="anchored" data-anchor-id="apparatur-og-kemikalier">Apparatur og kemikalier</h2>
-<ul>
-<li>en burette i et stativ og en lille tragt</li>
-<li>en pipette på 2,00 mL og en pipettesuger</li>
-<li>en konisk kolbe på 100 mL</li>
-<li>en magnetomrører og en magnet</li>
-<li>to små bægerglas</li>
-<li>husholdningseddike</li>
-<li>natriumhydroxid, 0,100 M</li>
-<li>phenolphthalein</li>
-<li>demineraliseret vand</li>
-</ul>
-</section>
-<section id="sikkerhed" class="level2">
-<h2 class="anchored" data-anchor-id="sikkerhed">Sikkerhed</h2>
+<p><span id="ord-apparatur-og-kemikalier" class="fagord-anker"><strong>Apparatur og kemikalier:</strong></span> burette i et stativ, lille tragt, pipette på 2,00&nbsp;mL med pipettesuger, konisk kolbe på 100&nbsp;mL, magnetomrører med magnet, to små bægerglas, husholdningseddike, 0,100&nbsp;M natriumhydroxid, phenolphthalein og demineraliseret vand.</p>
 <div class="callout callout-style-default callout-important callout-titled" title="Sikkerhed">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1018,21 +1016,9 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<ul>
-<li>Brug sikkerhedsbriller under hele øvelsen. Natriumhydroxid skader øjnene, også når opløsningen er fortyndet.</li>
-<li>Fyld buretten over vasken, og hold toppen af buretten under øjenhøjde, mens du hælder.</li>
-<li>Får du natriumhydroxid på huden, skal du skylle med vand.</li>
-</ul>
+<p>Brug sikkerhedsbriller under hele øvelsen, for natriumhydroxid skader øjnene, også når opløsningen er fortyndet. Fyld buretten over vasken, og hold toppen af buretten under øjenhøjde, mens du hælder.</p>
 </div>
 </div>
-</section>
-<section id="før-forsøget" class="level2">
-<h2 class="anchored" data-anchor-id="før-forsøget">Før forsøget</h2>
-<ol type="a">
-<li>Læs på eddikeflasken, hvor mange procent eddikesyre eddiken indeholder. Skriv tallet i resultatskemaet.</li>
-<li>Omslaget er nået, når opløsningen i kolben er svagt lyserød. Hvad sker der med dit resultat, hvis du drypper videre, til opløsningen er kraftigt lyserød?</li>
-</ol>
-</section>
 <section id="fremgangsmåde" class="level2">
 <h2 class="anchored" data-anchor-id="fremgangsmåde">Fremgangsmåde</h2>
 <div id="fig-oevelse-eddike-opstilling" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1046,16 +1032,13 @@ Figur&nbsp;1: Opstillingen til titrering af eddike.
 </figure>
 </div>
 <ol type="1">
-<li>Mål 2,00 mL husholdningseddike af med pipetten, og tøm pipetten i den koniske kolbe.</li>
-<li>Tilsæt omkring 25 mL demineraliseret vand og 4 dråber phenolphthalein.</li>
-<li>Lad magneten glide forsigtigt ned i kolben, og stil kolben på magnetomrøreren. Start omrøringen.</li>
-<li>Fyld buretten med 0,100 M natriumhydroxid gennem tragten. Gør det over vasken, og tag tragten af igen. Lad lidt opløsning løbe ud i et bægerglas, så spidsen under hanen er fyldt og uden luftbobler.</li>
-<li>Aflæs buretten, og skriv startværdien ned.</li>
-<li>Åbn hanen, så natriumhydroxid drypper ned i kolben. I begyndelsen forsvinder den lyserøde farve med det samme.</li>
-<li>Dryp én dråbe ad gangen, når farven er længere om at forsvinde.</li>
-<li>Luk hanen, når én dråbe gør hele opløsningen svagt lyserød, og farven bliver der i 30 sekunder.</li>
-<li>Aflæs buretten, og skriv slutværdien ned.</li>
-<li>Gentag titreringen med en ny portion eddike i en ren kolbe. Er forskellen på de to forbrug større end 0,5 mL, skal du lave en tredje titrering.</li>
+<li>Læs på eddikeflasken, hvor mange procent eddikesyre eddiken indeholder, og skriv tallet i skemaet.</li>
+<li>Mål 2,00&nbsp;mL eddike af med pipetten, og tøm den i den koniske kolbe. Tilsæt omkring 25&nbsp;mL demineraliseret vand, 4 dråber phenolphthalein og magneten.</li>
+<li>Fyld buretten med natriumhydroxid gennem tragten, og tag tragten af. Lad lidt opløsning løbe ud i et bægerglas, så spidsen under hanen er fyldt. Aflæs buretten.</li>
+<li>Stil kolben på magnetomrøreren (figur 1), og lad natriumhydroxid dryppe ned i kolben. Dryp én dråbe ad gangen, når den lyserøde farve er længere om at forsvinde.</li>
+<li>Luk hanen, når én dråbe gør hele opløsningen svagt lyserød, og farven bliver der i 30 sekunder (figur 2). Aflæs buretten.</li>
+<li>Gentag titreringen med en ny portion eddike i en ren kolbe. Er forskellen på de to forbrug større end 0,5&nbsp;mL, laver du en tredje titrering.</li>
+<li>Tag magneten op, og hæld indholdet af kolben i vasken. Tøm buretten, som din lærer viser dig.</li>
 </ol>
 <div id="fig-oevelse-omslag" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1110,13 +1093,15 @@ Figur&nbsp;2: Sådan ser du, hvornår du skal stoppe.
 </div>
 <div class="udfyld">
 <table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Aflæst på eddikeflasken</th>
+<th style="text-align: left;">Resultat</th>
+</tr>
+</thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Gennemsnit af forbruget</td>
-<td style="text-align: left;">mL</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Indhold af eddikesyre ifølge flasken</td>
+<td style="text-align: left;">Indhold af eddikesyre</td>
 <td style="text-align: left;">%</td>
 </tr>
 </tbody>
@@ -1125,59 +1110,50 @@ Figur&nbsp;2: Sådan ser du, hvornår du skal stoppe.
 </section>
 <section id="efterbehandling" class="level2">
 <h2 class="anchored" data-anchor-id="efterbehandling">Efterbehandling</h2>
+<div class="udgave lukket">
 <ol type="1">
-<li><p>Beregn forbruget af natriumhydroxid i hver titrering og gennemsnittet af forbruget. Regn gennemsnittet om til liter.</p></li>
-<li><p>Beregn, hvor mange procent eddikesyre eddiken indeholder. Følg de fire trin i eksemplet i afsnit 7.5, og skriv det som en pæn beregning.</p></li>
-<li><p>Sammenlign dit resultat med tallet på flasken, og beregn afvigelsen i procent. Tallet på flasken er den forventede værdi.</p>
+<li><p>Beregn forbruget i hver titrering, og skriv det i resultatskemaet. Forbruget er buretten ved omslaget minus buretten ved start. Beregn derefter gennemsnittet af de to forbrug, og regn det om til liter. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+V(\mathrm{NaOH}) = \frac{\boxed{\phantom{00{,}00}}\ \mathrm{mL} + \boxed{\phantom{00{,}00}}\ \mathrm{mL}}{2} = \boxed{\phantom{00{,}00}}\ \mathrm{mL} = \boxed{\phantom{0{,}0000}}\ \mathrm{L}
+\]</span></p></li>
+<li><p>Trin 1: Beregn stofmængden af natriumhydroxid. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+n(\mathrm{NaOH}) = c(\mathrm{NaOH}) \cdot V(\mathrm{NaOH}) = 0{,}100\ \mathrm{mol/L} \cdot \boxed{\phantom{0{,}0000}}\ \mathrm{L} = \boxed{\phantom{0{,}00000}}\ \mathrm{mol}
+\]</span></p></li>
+<li><p>Trin 2: Eddikesyre og hydroxid reagerer i forholdet 1 : 1. Skriv stofmængden af eddikesyre. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+n(\mathrm{CH_3COOH}) = n(\mathrm{NaOH}) = \boxed{\phantom{0{,}00000}}\ \mathrm{mol}
+\]</span></p></li>
+<li><p>Trin 3: Beregn massen af eddikesyre. Molarmassen for eddikesyre er 60,05 g/mol. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+m(\mathrm{CH_3COOH}) = n(\mathrm{CH_3COOH}) \cdot M(\mathrm{CH_3COOH})
+\]</span></p>
+<p><span class="math display">\[
+m(\mathrm{CH_3COOH}) = \boxed{\phantom{0{,}00000}}\ \mathrm{mol} \cdot 60{,}05\ \mathrm{g/mol} = \boxed{\phantom{0{,}000}}\ \mathrm{g}
+\]</span></p></li>
+<li><p>Trin 4: Beregn masseprocenten. Eddike har næsten samme densitet som vand, så 2,00 mL eddike vejer 2,00 g. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+\text{masseprocent} = \frac{m(\mathrm{CH_3COOH})}{m(\text{eddike})} \cdot 100\ \% = \frac{\boxed{\phantom{0{,}000}}\ \mathrm{g}}{2{,}00\ \mathrm{g}} \cdot 100\ \% = \boxed{\phantom{0{,}00}}\ \%
+\]</span></p></li>
+<li><p>Beregn afvigelsen fra tallet på flasken. Tallet på flasken er den forventede værdi. <span class="svar" data-linjer="0"></span></p>
 <p><span class="math display">\[
 \text{afvigelse} = \frac{\text{målt værdi} - \text{forventet værdi}}{\text{forventet værdi}} \cdot 100\ \%
+\]</span></p>
+<p><span class="math display">\[
+\text{afvigelse} = \frac{\boxed{\phantom{0{,}00}}\ \% - \boxed{\phantom{0{,}00}}\ \%}{\boxed{\phantom{0{,}00}}\ \%} \cdot 100\ \% = \boxed{\phantom{00{,}0}}\ \%
 \]</span></p></li>
-<li><p>Hvorfor tilsætter man en indikator, og hvad viser farveskiftet?</p></li>
-<li><p>Du hældte omkring 25 mL vand i kolben uden at måle det præcist. Forklar, hvorfor det ikke gør noget for resultatet.</p></li>
-<li><p>Vandet skulle være demineraliseret. Giv et bud på, hvorfor postevand kan give en fejl.</p></li>
-<li><p>Hvorfor titrerer man eddiken med natriumhydroxid og ikke med saltsyre?</p></li>
-<li><p>Nævn to fejlkilder i din titrering. Fortæl for hver af dem, om den gør resultatet for højt eller for lavt.</p></li>
+<li><p>Hvad sker der med dit resultat, hvis du drypper videre, til opløsningen er kraftigt lyserød? <span class="svar" data-linjer="1"></span></p></li>
 </ol>
-<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp til efterbehandlingen">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
 </div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Hjælp til efterbehandlingen
+<div class="udgave aaben">
+<ol type="1">
+<li>Beregn forbruget i hver titrering og gennemsnittet af forbruget.</li>
+<li>Beregn, hvor mange procent eddikesyre eddiken indeholder. Skriv beregningen med formler, tal og enheder. Du kan regne med, at 2,00 mL eddike vejer 2,00 g.</li>
+<li>Sammenlign dit resultat med tallet på flasken, og beregn afvigelsen i procent.</li>
+<li>Du hældte omkring 25 mL vand i kolben uden at måle det præcist. Forklar, hvorfor det ikke ændrer resultatet.</li>
+<li>Nævn to fejlkilder, og forklar for hver af dem, om den gør resultatet for højt eller for lavt.</li>
+</ol>
 </div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><span id="ord-spoergsmaal-1" class="fagord-anker"><strong>Spørgsmål 1:</strong></span> Forbruget er buretten ved omslaget minus buretten ved start. Der går 1000 mL på 1 L.</p>
-<p><span id="ord-spoergsmaal-2" class="fagord-anker"><strong>Spørgsmål 2:</strong></span> De fire trin er stofmængden af natriumhydroxid, stofmængden af eddikesyre, massen af eddikesyre og masseprocenten. Massen af eddiken er 2,00 g.</p>
-<p><span id="ord-spoergsmaal-5-og-8" class="fagord-anker"><strong>Spørgsmål 5 og 8:</strong></span> Se tabellen under overskriften “Hvad betyder noget for resultatet?” i afsnit 7.5.</p>
-<p><span id="ord-spoergsmaal-6" class="fagord-anker"><strong>Spørgsmål 6:</strong></span> Postevand er ikke rent vand. Tænk over, hvad der sker, hvis vandet selv indeholder en smule syre eller base.</p>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Prøv selv
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc7.4_titrering_eddike/index.html">Titrering af eddike</a> kan du øve dig i at ramme omslaget og aflæse buretten, før du går i laboratoriet.</p>
-</div>
-</div>
-</section>
-<section id="oprydning" class="level2">
-<h2 class="anchored" data-anchor-id="oprydning">Oprydning</h2>
-<ul>
-<li>Tag magneten op af kolben, før du tømmer den.</li>
-<li>Indholdet af kolben må hældes i vasken.</li>
-<li>Tøm buretten, som din lærer viser dig, og skyl den med demineraliseret vand.</li>
-</ul>
 
 
 </section>
@@ -2421,6 +2397,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

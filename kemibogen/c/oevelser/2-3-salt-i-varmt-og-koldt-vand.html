@@ -36,8 +36,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../oevelser/2-4-find-det-ukendte-salt.html" rel="next">
-<link href="../oevelser/oversigt.html" rel="prev">
+<link href="../oevelser/2-4a-find-det-ukendte-salt.html" rel="next">
+<link href="../oevelser/2-1-leder-det-stroem.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -80,6 +80,35 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -766,14 +795,38 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -907,14 +960,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">På denne side</h2>
    
   <ul class="collapse">
-  <li><a href="#teori" id="toc-teori" class="nav-link active" data-scroll-target="#teori">Teori</a></li>
-  <li><a href="#apparatur-og-kemikalier" id="toc-apparatur-og-kemikalier" class="nav-link" data-scroll-target="#apparatur-og-kemikalier">Apparatur og kemikalier</a></li>
-  <li><a href="#sikkerhed" id="toc-sikkerhed" class="nav-link" data-scroll-target="#sikkerhed">Sikkerhed</a></li>
-  <li><a href="#før-forsøget" id="toc-før-forsøget" class="nav-link" data-scroll-target="#før-forsøget">Før forsøget</a></li>
-  <li><a href="#fremgangsmåde" id="toc-fremgangsmåde" class="nav-link" data-scroll-target="#fremgangsmåde">Fremgangsmåde</a></li>
+  <li><a href="#fremgangsmåde" id="toc-fremgangsmåde" class="nav-link active" data-scroll-target="#fremgangsmåde">Fremgangsmåde</a></li>
   <li><a href="#resultater" id="toc-resultater" class="nav-link" data-scroll-target="#resultater">Resultater</a></li>
   <li><a href="#efterbehandling" id="toc-efterbehandling" class="nav-link" data-scroll-target="#efterbehandling">Efterbehandling</a></li>
-  <li><a href="#oprydning" id="toc-oprydning" class="nav-link" data-scroll-target="#oprydning">Oprydning</a></li>
   </ul>
 </nav>
     </div>
@@ -940,7 +988,6 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Øvelsen hører til afsnit <a href="../kapitler/2-3-ionforbindelser.html">2.3 Ionforbindelser</a>. Læs afsnittet, før du går i laboratoriet. Der regnes kun med gram, så øvelsen kan laves, før du har lært om mol.</p>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Formål">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -951,35 +998,11 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Du skal undersøge, hvor meget kaliumnitrat iskoldt vand kan holde opløst. Det gør du ved at opløse saltet i varmt vand, køle opløsningen ned og veje de krystaller, der kommer frem.</p>
+<p>Du skal bestemme opløseligheden af kaliumnitrat i vand ved to temperaturer. Saltet opløses i varmt vand, opløsningen køles ned, og de krystaller, der dannes, bliver vejet.</p>
 </div>
 </div>
-<section id="teori" class="level2">
-<h2 class="anchored" data-anchor-id="teori">Teori</h2>
-<p>Kaliumnitrat, KNO<sub>3</sub>, er et salt af kaliumioner, K<sup>+</sup>, og nitrationer, NO<sub>3</sub><sup>−</sup>. Når saltet opløses i vand, slipper ionerne iongitteret og bevæger sig frit rundt mellem vandmolekylerne.</p>
-<p>Vand kan ikke opløse lige så meget salt, det skal være. Når vandet ikke kan opløse mere, er opløsningen mættet. Opløseligheden er den masse salt, der højst kan være opløst i 100 g vand. Den afhænger af, hvilket salt det er, og af vandets temperatur.</p>
-<p>I øvelsen opløser du en kendt masse kaliumnitrat i varmt vand og køler opløsningen ned i isvand. Et øjeblik indeholder opløsningen mere salt, end det kolde vand kan holde opløst. Så er den overmættet, og det salt, der er for meget, sætter sig sammen til krystaller. Krystallerne filtreres fra, tørres og vejes. Resten af saltet er stadig opløst i det kolde vand.</p>
-<p>Når man finder ud af, hvor meget der er af et stof, ved at skille det fra, tørre det og veje det, kaldes det en vejeanalyse. Du møder metoden igen i <a href="../kapitler/4-5-maengdeberegning.html#vejeanalyse">afsnit 4.5</a>, hvor et bundfald bliver vejet.</p>
-</section>
-<section id="apparatur-og-kemikalier" class="level2">
-<h2 class="anchored" data-anchor-id="apparatur-og-kemikalier">Apparatur og kemikalier</h2>
-<ul>
-<li>et bægerglas på 50 mL</li>
-<li>to bægerglas på 250 mL</li>
-<li>en vægt, der viser to decimaler</li>
-<li>en glaspind</li>
-<li>et termometer</li>
-<li>en tragt og et stykke filtrerpapir</li>
-<li>en konisk kolbe på 100 mL</li>
-<li>et urglas</li>
-<li>varmt vand fra en elkedel</li>
-<li>is</li>
-<li>kaliumnitrat</li>
-<li>demineraliseret vand</li>
-</ul>
-</section>
-<section id="sikkerhed" class="level2">
-<h2 class="anchored" data-anchor-id="sikkerhed">Sikkerhed</h2>
+<p>Opløseligheden er den største masse af et salt, der kan opløses i 100 g vand ved en bestemt temperatur. Når en varm opløsning køles ned, kan vandet ikke længere holde alt saltet opløst, og det overskydende salt danner krystaller.</p>
+<p><span id="ord-apparatur-og-kemikalier" class="fagord-anker"><strong>Apparatur og kemikalier:</strong></span> bægerglas på 50&nbsp;mL, varmebad (stort bægerglas med varmt vand fra en elkedel), isbad (stort bægerglas med is og vand), vægt, glaspind, termometer, tragt, filtrerpapir, konisk kolbe på 100&nbsp;mL, urglas, kaliumnitrat og demineraliseret vand.</p>
 <div class="callout callout-style-default callout-important callout-titled" title="Sikkerhed">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -990,46 +1013,29 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<ul>
-<li>Brug sikkerhedsbriller under hele øvelsen.</li>
-<li>Vandet fra elkedlen er meget varmt. Hæld det forsigtigt, og stil bægerglasset med det varme vand, hvor det ikke kan vælte.</li>
-<li>Kaliumnitrat er brandnærende. Det får andre ting til at brænde kraftigere. Hold saltet og det brugte filtrerpapir væk fra åben ild.</li>
-</ul>
+<p>Brug sikkerhedsbriller. Vandet i varmebadet er meget varmt. Kaliumnitrat får andre stoffer til at brænde kraftigere, så hold saltet og det brugte filtrerpapir væk fra åben ild.</p>
 </div>
 </div>
-</section>
-<section id="før-forsøget" class="level2">
-<h2 class="anchored" data-anchor-id="før-forsøget">Før forsøget</h2>
-<ol type="a">
-<li>Hvorfor skal filtrerpapiret vejes, før det bruges?</li>
-<li>Du vejer 10,0 g kaliumnitrat af. Efter forsøget ligger noget af saltet som krystaller i filteret. Hvor er resten af saltet?</li>
-</ol>
-</section>
 <section id="fremgangsmåde" class="level2">
 <h2 class="anchored" data-anchor-id="fremgangsmåde">Fremgangsmåde</h2>
 <div id="fig-oevelse-salt-trin" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-oevelse-salt-trin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="../figurer/oevelse-salt-trin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: De fire trin i øvelsen."><img src="../figurer/oevelse-salt-trin.svg" class="img-fluid figure-img"></a>
+<a href="../figurer/oevelse-salt-trin.svg" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figur&nbsp;1: Forsøgets fire dele: varmebad, isbad, filtrering og vejning."><img src="../figurer/oevelse-salt-trin.svg" class="img-fluid figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-oevelse-salt-trin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figur&nbsp;1: De fire trin i øvelsen.
+Figur&nbsp;1: Forsøgets fire dele: varmebad, isbad, filtrering og vejning.
 </figcaption>
 </figure>
 </div>
 <ol type="1">
-<li>Stil det lille bægerglas på vægten, og nulstil vægten. Hæld 20,0 g demineraliseret vand i glasset, og skriv massen ned.</li>
-<li>Vej 10,0 g kaliumnitrat af, og hæld det i vandet. Skriv massen ned.</li>
-<li>Rør rundt med glaspinden i et minut. Mærk på glasset, og se på saltet. Skriv ned, hvad du lægger mærke til.</li>
-<li>Fyld et stort bægerglas halvt med varmt vand fra elkedlen. Stil det lille bægerglas ned i det varme vand, og rør rundt, til alt saltet er opløst.</li>
-<li>Fyld det andet store bægerglas halvt med is og lidt koldt vand. Flyt det lille bægerglas over i isvandet, og sæt termometeret ned i opløsningen.</li>
-<li>Rør forsigtigt rundt med glaspinden, og hold øje med opløsningen. Skriv temperaturen ned, i samme øjeblik du ser de første krystaller.</li>
-<li>Lad glasset stå i isvandet, og rør rundt en gang imellem, til temperaturen er under 5 °C og ikke falder mere. Skriv temperaturen ned.</li>
-<li>Skriv dit navn med blyant på filtrerpapiret. Vej papiret, og skriv massen ned. Fold det, og sæt det i tragten over den koniske kolbe.</li>
-<li>Hæld det kolde indhold af bægerglasset op i filteret. Skub krystallerne med over med glaspinden.</li>
-<li>Sidder der krystaller tilbage i bægerglasset? Så hæld lidt af væsken fra den koniske kolbe tilbage i bægerglasset, sving glasset rundt, og hæld det hele i filteret igen. Skyl ikke med rent vand.</li>
-<li>Vent, til det ikke drypper mere. Løft filteret op, fold det ud på urglasset, og stil det til tørre til næste time.</li>
-<li>Næste time: Se på krystallerne, og skriv ned, hvordan de ser ud. Vej det tørre filtrerpapir med krystallerne, og skriv massen ned.</li>
+<li>Afvej 20,0 g demineraliseret vand og 10,0 g kaliumnitrat i det lille bægerglas. Skriv de to masser i skemaet.</li>
+<li>Stil bægerglasset i varmebadet (figur 1), og rør rundt, til alt saltet er opløst.</li>
+<li>Flyt bægerglasset til isbadet, og sæt termometeret i opløsningen. Aflæs temperaturen, i det øjeblik de første krystaller dannes.</li>
+<li>Rør rundt med jævne mellemrum, til temperaturen er under 5 °C og ikke falder mere. Aflæs temperaturen.</li>
+<li>Skriv dit navn med blyant på filtrerpapiret, og vej det. Filtrér den kolde opløsning ned i den koniske kolbe. Skyl de sidste krystaller over i filteret med væsken fra kolben og ikke med rent vand.</li>
+<li>Læg filtrerpapiret med krystallerne til tørre på urglasset. Hæld væsken fra kolben i den beholder, din lærer viser dig.</li>
+<li>Næste modul: Vej det tørre filtrerpapir med krystallerne.</li>
 </ol>
 </section>
 <section id="resultater" class="level2">
@@ -1052,7 +1058,7 @@ Figur&nbsp;1: De fire trin i øvelsen.
 <td style="text-align: left;">g</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Temperatur, da de første krystaller kom</td>
+<td style="text-align: left;">Temperatur, da de første krystaller blev dannet</td>
 <td style="text-align: left;">°C</td>
 </tr>
 <tr class="even">
@@ -1070,48 +1076,10 @@ Figur&nbsp;1: De fire trin i øvelsen.
 </tbody>
 </table>
 </div>
-<div class="udfyld">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 41%">
-<col style="width: 58%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: left;">Det lagde jeg mærke til</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Saltet røres ud i vandet</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Glasset står i varmt vand</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Glasset står i isvand</td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">De tørre krystaller</td>
-<td style="text-align: left;"></td>
-</tr>
-</tbody>
-</table>
-</div>
 </section>
 <section id="efterbehandling" class="level2">
 <h2 class="anchored" data-anchor-id="efterbehandling">Efterbehandling</h2>
-<ol type="1">
-<li><p>Beregn massen af de tørre krystaller.</p></li>
-<li><p>Beregn, hvor mange gram kaliumnitrat der stadig var opløst i det kolde vand.</p></li>
-<li><p>Beregn opløseligheden af kaliumnitrat ved den temperatur, du målte i den kolde opløsning. Opløseligheden er den masse salt, der kan være opløst i 100 g vand.</p></li>
-<li><p>I det øjeblik de første krystaller kom, var opløsningen netop mættet, og alt saltet var stadig opløst. Beregn opløseligheden ved den temperatur.</p></li>
-<li><p>Sammenlign de to tal. Hvad sker der med opløseligheden af kaliumnitrat, når vandet bliver koldere?</p></li>
-<li><p>Tabellen viser opløseligheden af kaliumnitrat ved fem temperaturer. Passer dine to resultater med tabellen?</p>
+<p>Tabellen viser opløseligheden af kaliumnitrat ved fem temperaturer.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 37%">
@@ -1141,41 +1109,72 @@ Figur&nbsp;1: De fire trin i øvelsen.
 <td style="text-align: center;">64</td>
 </tr>
 </tbody>
-</table></li>
-<li><p>Da filteret blev lagt til tørre, var krystallerne våde af opløsning, og den opløsning indeholder også kaliumnitrat. Bliver massen af de tørre krystaller for stor eller for lille af det? Hvad betyder det for den opløselighed, du beregnede i spørgsmål 3?</p></li>
-<li><p>Hvorfor måtte du ikke skylle krystallerne med rent vand?</p></li>
-<li><p>Forklar med ordene ioner og iongitter, hvad der sker med kaliumnitrat, når det opløses i det varme vand, og når krystallerne kommer frem i det kolde vand.</p></li>
+</table>
+<div class="udgave lukket">
+<ol type="1">
+<li><p>Beregn massen af de tørre krystaller. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+m(\text{krystaller}) = m(\text{filtrerpapir med krystaller}) - m(\text{filtrerpapir})
+\]</span></p>
+<p><span class="math display">\[
+m(\text{krystaller}) = \boxed{\phantom{00{,}00}}\ \mathrm{g} - \boxed{\phantom{00{,}00}}\ \mathrm{g} = \boxed{\phantom{00{,}00}}\ \mathrm{g}
+\]</span></p></li>
+<li><p>Resten af saltet var stadig opløst i den kolde opløsning. Beregn massen af det opløste salt. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+m(\text{opløst}) = m(\text{kaliumnitrat}) - m(\text{krystaller})
+\]</span></p>
+<p><span class="math display">\[
+m(\text{opløst}) = \boxed{\phantom{00{,}00}}\ \mathrm{g} - \boxed{\phantom{00{,}00}}\ \mathrm{g} = \boxed{\phantom{00{,}00}}\ \mathrm{g}
+\]</span></p></li>
+<li><p>Beregn opløseligheden i den kolde opløsning. Du brugte 20 g vand, og 100 g vand er 5 gange så meget. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+\text{opløselighed} = 5 \cdot m(\text{opløst}) = 5 \cdot \boxed{\phantom{00{,}00}}\ \mathrm{g} = \boxed{\phantom{00{,}00}}\ \mathrm{g}\ \text{pr. 100 g vand}
+\]</span></p></li>
+<li><p>Da de første krystaller blev dannet, var alle 10,0 g salt stadig opløst. Beregn opløseligheden ved den temperatur. <span class="svar" data-linjer="0"></span></p>
+<p><span class="math display">\[
+\text{opløselighed} = 5 \cdot 10{,}0\ \mathrm{g} = \boxed{\phantom{00{,}00}}\ \mathrm{g}\ \text{pr. 100 g vand}
+\]</span></p></li>
+<li><p>Skriv dine to resultater i skemaet. Find i tabellen den temperatur, der ligger tættest på din egen, og skriv tabellens opløselighed i den sidste kolonne.</p></li>
 </ol>
-<div class="hjaelp callout callout-style-default callout-tip callout-titled" title="Hjælp til efterbehandlingen">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<div class="udfyld">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Min temperatur</th>
+<th style="text-align: left;">Min opløselighed</th>
+<th style="text-align: left;">Tabellens opløselighed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Da de første krystaller blev dannet</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Den kolde opløsning</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Hjælp til efterbehandlingen
+<ol start="6" type="1">
+<li>Sæt ring om det rigtige ord: Når temperaturen falder, bliver opløseligheden af kaliumnitrat <span id="ord-stoerre" class="fagord-anker"><strong>større</strong></span> / <span id="ord-mindre" class="fagord-anker"><strong>mindre</strong></span>. <span class="svar" data-linjer="0"></span></li>
+</ol>
 </div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+<div class="udgave aaben">
+<ol type="1">
+<li>Beregn massen af de tørre krystaller og massen af det kaliumnitrat, der stadig var opløst i den kolde opløsning.</li>
+<li>Beregn opløseligheden af kaliumnitrat ved de to temperaturer, du målte. Opløseligheden angives i gram pr. 100 g vand.</li>
+<li>Sammenlign dine to resultater med tabellen, og beskriv, hvordan opløseligheden afhænger af temperaturen.</li>
+<li>Krystallerne var våde af opløsning, da de blev lagt til tørre, og opløsningen indeholder også kaliumnitrat. Vurdér, om det gør den beregnede opløselighed for stor eller for lille.</li>
+<li>Forklar med ordene ioner og iongitter, hvad der sker, når saltet opløses i varmebadet, og når krystallerne dannes i isbadet.</li>
+</ol>
 </div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p><span id="ord-spoergsmaal-1" class="fagord-anker"><strong>Spørgsmål 1:</strong></span> Massen af krystallerne er massen af filtrerpapir med krystaller minus massen af filtrerpapiret alene.</p>
-<p><span id="ord-spoergsmaal-2" class="fagord-anker"><strong>Spørgsmål 2:</strong></span> Alt det kaliumnitrat, du vejede af, er enten i krystallerne eller stadig opløst i vandet.</p>
-<p><span id="ord-spoergsmaal-3" class="fagord-anker"><strong>Spørgsmål 3:</strong></span> 100 g vand er 5 gange så meget som 20 g vand. Så kan 100 g vand også holde 5 gange så meget salt opløst.</p>
-<p><span id="ord-spoergsmaal-4" class="fagord-anker"><strong>Spørgsmål 4:</strong></span> Her var alle 10,0 g salt opløst i 20,0 g vand. Regn om til 100 g vand på samme måde som i spørgsmål 3.</p>
-<p><span id="ord-spoergsmaal-7" class="fagord-anker"><strong>Spørgsmål 7:</strong></span> Du kan begynde sådan: “Når vandet fordamper fra de våde krystaller, bliver saltet fra opløsningen …”.</p>
-<p><span id="ord-spoergsmaal-9" class="fagord-anker"><strong>Spørgsmål 9:</strong></span> Se under overskriften “Saltes egenskaber” i afsnit 2.3. Du kan begynde sådan: “I det varme vand slipper ionerne …” og “I det kolde vand sætter ionerne sig …”.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="oprydning" class="level2">
-<h2 class="anchored" data-anchor-id="oprydning">Oprydning</h2>
-<ul>
-<li>Hæld væsken fra den koniske kolbe i den beholder, din lærer viser dig.</li>
-<li>De tørre krystaller kan bruges igen. Hæld dem i det glas, din lærer har sat frem.</li>
-<li>Læg det brugte filtrerpapir i den beholder, din lærer viser dig.</li>
-<li>Isvandet og vandet fra det varme bad må hældes i vasken.</li>
-</ul>
 
 
 </section>
@@ -2421,6 +2420,57 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", skjul);
 });
 </script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -2828,13 +2878,13 @@ document.addEventListener("DOMContentLoaded", function () {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../oevelser/oversigt.html" class="pagination-link" aria-label="Laboratorieøvelser">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Laboratorieøvelser</span>
+      <a href="../oevelser/2-1-leder-det-stroem.html" class="pagination-link" aria-label="Øvelse 2.1: Leder det strøm?">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Øvelse 2.1: Leder det strøm?</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="pagination-link" aria-label="Øvelse 2.4: Find det ukendte salt">
-        <span class="nav-page-text">Øvelse 2.4: Find det ukendte salt</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="pagination-link" aria-label="Øvelse 2.4a: Find det ukendte salt">
+        <span class="nav-page-text">Øvelse 2.4a: Find det ukendte salt</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

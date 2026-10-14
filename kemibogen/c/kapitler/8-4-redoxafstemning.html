@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -80,35 +80,6 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -795,14 +766,38 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -940,7 +935,6 @@ window.Quarto = {
   <li><a href="#et-eksempel-i-sur-opløsning" id="toc-et-eksempel-i-sur-opløsning" class="nav-link" data-scroll-target="#et-eksempel-i-sur-opløsning">Et eksempel i sur opløsning</a></li>
   <li><a href="#basisk-opløsning" id="toc-basisk-opløsning" class="nav-link" data-scroll-target="#basisk-opløsning">Basisk opløsning</a></li>
   <li><a href="#mangans-farver" id="toc-mangans-farver" class="nav-link" data-scroll-target="#mangans-farver">Mangans farver</a></li>
-  <li><a href="#titrering-med-permanganat" id="toc-titrering-med-permanganat" class="nav-link" data-scroll-target="#titrering-med-permanganat">Titrering med permanganat</a></li>
   </ul>
 </nav>
     </div>
@@ -983,11 +977,10 @@ window.Quarto = {
 <li><span class="fagord-peg" data-fagord="afstemt">afstemme</span> en <span class="fagord-peg" data-fagord="redoxreaktion">redoxreaktion</span> ved hjælp af <span class="fagord-peg" data-fagord="oxidationstal">oxidationstal</span></li>
 <li><span class="fagord-peg" data-fagord="afstemt">afstemme</span> <span class="fagord-peg" data-fagord="ladning">ladningen</span> med H<sup>+</sup> i <span class="fagord-peg" data-fagord="sur">sur</span> <span class="fagord-peg" data-fagord="opløsning">opløsning</span> og med OH<sup>−</sup> i <span class="fagord-peg" data-fagord="basisk">basisk</span> <span class="fagord-peg" data-fagord="opløsning">opløsning</span></li>
 <li>forklare farveskiftene, når <span class="fagord-peg" data-fagord="permanganat">permanganat</span> reagerer</li>
-<li>regne på en <span class="fagord-peg" data-fagord="titrering">titrering</span> med <span class="fagord-peg" data-fagord="permanganat">permanganat</span></li>
 </ul>
 </div>
 </div>
-<p>Reaktionen mellem zink og kobber(II)ioner kan <span class="fagord-peg" data-fagord="afstemt">afstemmes</span> i hovedet. Men mange <span class="fagord-peg" data-fagord="redoxreaktion">redoxreaktioner</span> foregår i vand med <span class="fagord-peg" data-fagord="ion">ioner</span> som <span class="fagord-peg" data-fagord="permanganat">permanganat</span> og sulfit, og her er vand og H<sup>+</sup> også med i reaktionen. Derfor har man brug for en fast fremgangsmåde.</p>
+<p>Reaktionen mellem zink og kobber(II)ioner er let at <span class="fagord-peg" data-fagord="afstemt">afstemme</span> med <span class="fagord-peg" data-fagord="delreaktion">delreaktionerne</span> fra <a href="../kapitler/8-1-redoxreaktioner.html">afsnit 8.1</a>. Mange <span class="fagord-peg" data-fagord="redoxreaktion">redoxreaktioner</span> foregår dog i vand med <span class="fagord-peg" data-fagord="ion">ioner</span> som <span class="fagord-peg" data-fagord="permanganat">permanganat</span> og sulfit, og her er vand og H<sup>+</sup> også med i reaktionen. Derfor har man brug for en fast fremgangsmåde.</p>
 <section id="fremgangsmåden" class="level2">
 <h2 class="anchored" data-anchor-id="fremgangsmåden">Fremgangsmåden</h2>
 <p>Idéen er den samme som i <a href="../kapitler/8-1-redoxreaktioner.html">afsnit 8.1</a>: Der skal afgives lige så mange <span class="fagord-peg" data-fagord="elektron">elektroner</span>, som der optages. Med <span class="fagord-peg" data-fagord="oxidationstal">oxidationstallene</span> fra <a href="../kapitler/8-3-oxidationstal.html">afsnit 8.3</a> betyder det, at den samlede stigning skal være lige så stor som det samlede fald.</p>
@@ -1184,58 +1177,8 @@ Figur&nbsp;1: Mangan i fire oxidationstal. Jo længere mod højre, jo mere er ma
 </tr>
 </tbody>
 </table>
-</section>
-<section id="titrering-med-permanganat" class="level2">
-<h2 class="anchored" data-anchor-id="titrering-med-permanganat">Titrering med permanganat</h2>
-<p>Farveskiftet kan bruges i en <span class="fagord-peg" data-fagord="titrering">titrering</span>, som du kender fra <a href="../kapitler/5-3-titrering.html">afsnit 5.3</a> og <a href="../kapitler/7-5-syre-base-titrering.html">afsnit 7.5</a>. <span class="fagord-peg" data-fagord="burette">Buretten</span> fyldes med en <span class="fagord-peg" data-fagord="opløsning">opløsning</span> af kaliumpermanganat, KMnO<sub>4</sub>, og kolben indeholder en <span class="fagord-peg" data-fagord="sur">sur</span> <span class="fagord-peg" data-fagord="opløsning">opløsning</span> med <span class="fagord-peg" data-fagord="jern(ii)ion">jern(II)ioner</span>.</p>
-<p>Så længe der er <span class="fagord-peg" data-fagord="jern(ii)ion">jern(II)ioner</span> i kolben, bliver hver dråbe <span class="fagord-peg" data-fagord="permanganat">permanganat</span> straks reduceret til farveløst Mn<sup>2+</sup>. Når alle <span class="fagord-peg" data-fagord="jern(ii)ion">jern(II)ioner</span> er brugt, bliver den næste dråbe ikke affarvet, og <span class="fagord-peg" data-fagord="opløsning">opløsningen</span> får et blivende violet skær. <span class="fagord-peg" data-fagord="permanganat">Permanganat</span> er altså sin egen <span class="fagord-peg" data-fagord="indikator">indikator</span>.</p>
-<p>Det <span class="fagord-peg" data-fagord="afstemt">afstemte</span> <span class="fagord-peg" data-fagord="reaktionsskema">reaktionsskema</span> viser, at 1 <span class="fagord-peg" data-fagord="mol">mol</span> <span class="fagord-peg" data-fagord="permanganat">permanganat</span> reagerer med 5 <span class="fagord-peg" data-fagord="mol">mol</span> <span class="fagord-peg" data-fagord="jern(ii)ion">jern(II)ioner</span>, så forholdet er 1 : 5.</p>
-<div class="callout callout-style-default callout-note no-icon callout-titled" title="Eksempel: jern i ståluld">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Eksempel: jern i ståluld
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>0,100 g ståluld opløses i svovlsyre, så alt jernet bliver til <span class="fagord-peg" data-fagord="jern(ii)ion">jern(II)ioner</span>. <span class="fagord-peg" data-fagord="opløsning">Opløsningen</span> titreres med 0,0200 M kaliumpermanganat. Det violette skær bliver stående, når der er brugt 17,5 mL. Hvor mange procent jern indeholder stålulden?</p>
-<p><span id="ord-kendte-stoerrelser" class="fagord-anker"><strong>Kendte størrelser</strong></span></p>
-<p><em>m</em>(ståluld) = 0,100 g, <em>c</em>(KMnO<sub>4</sub>) = 0,0200 M og <em>V</em>(KMnO<sub>4</sub>) = 17,5 mL = 0,0175 L</p>
-<p><span id="ord-trin-1-stofmaengden-af-permanganat" class="fagord-anker"><strong>Trin 1: stofmængden af permanganat</strong></span></p>
-<p><span class="math display">\[
-n(\mathrm{MnO_4^-}) = c \cdot V = 0{,}0200\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0175\ \mathrm{L} = 0{,}000350\ \mathrm{mol}
-\]</span></p>
-<p><span id="ord-trin-2-stofmaengden-af-jern" class="fagord-anker"><strong>Trin 2: stofmængden af jern</strong></span></p>
-<p>Forholdet er 1 : 5, så der er 5 gange så mange <span class="fagord-peg" data-fagord="mol">mol</span> jern.</p>
-<p><span class="math display">\[
-n(\mathrm{Fe}) = \frac{5}{1} \cdot 0{,}000350\ \mathrm{mol} = 0{,}00175\ \mathrm{mol}
-\]</span></p>
-<p><span id="ord-trin-3-massen-af-jern" class="fagord-anker"><strong>Trin 3: massen af jern</strong></span></p>
-<p><span class="math display">\[
-m(\mathrm{Fe}) = n \cdot M = 0{,}00175\ \mathrm{mol} \cdot 55{,}85\ \dfrac{\mathrm{g}}{\mathrm{mol}} = 0{,}0977\ \mathrm{g}
-\]</span></p>
-<p><span id="ord-trin-4-masseprocenten" class="fagord-anker"><strong>Trin 4: masseprocenten</strong></span></p>
-<p><span class="math display">\[
-\text{masseprocent} = \frac{m(\mathrm{Fe})}{m(\text{ståluld})} \cdot 100\ \% = \frac{0{,}0977\ \mathrm{g}}{0{,}100\ \mathrm{g}} \cdot 100\ \% = 97{,}7\ \%
-\]</span></p>
-<p><span id="ord-konklusion" class="fagord-anker"><strong>Konklusion</strong></span></p>
-<p>Stålulden indeholder 97,7 % jern. Resten er blandt andet carbon, som gør jern til stål.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Prøv selv">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Prøv selv
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc8.4_redoxafstemning/index.html">Afstem redoxreaktioner</a> kan du <span class="fagord-peg" data-fagord="afstemt">afstemme</span> reaktioner trin for trin med hjælp undervejs. I <a href="https://kemiformler.dk/animationer/superanimationer/sc8.5_kaliumpermanganat/index.html">Kaliumpermanganat</a> kan du se farverne skifte og <span class="fagord-peg" data-fagord="afstemt">afstemme</span> reaktionerne bag dem.</p>
-</div>
+<div class="proev-selv">
+<p><span id="ord-proev-selv" class="fagord-anker"><strong>Prøv selv:</strong></span> I animationen <a href="https://kemiformler.dk/animationer/superanimationer/sc8.4_redoxafstemning/index.html">Afstem redoxreaktioner</a> kan du <span class="fagord-peg" data-fagord="afstemt">afstemme</span> reaktioner trin for trin med hjælp undervejs. I <a href="https://kemiformler.dk/animationer/superanimationer/sc8.5_kaliumpermanganat/index.html">Kaliumpermanganat</a> kan du se farverne skifte og <span class="fagord-peg" data-fagord="afstemt">afstemme</span> reaktionerne bag dem.</p>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled" title="Kort sagt">
 <div class="callout-header d-flex align-content-center">
@@ -1252,16 +1195,15 @@ m(\mathrm{Fe}) = n \cdot M = 0{,}00175\ \mathrm{mol} \cdot 55{,}85\ \dfrac{\math
 <li>Derefter <span class="fagord-peg" data-fagord="afstemt">afstemmes</span> <span class="fagord-peg" data-fagord="ladning">ladningen</span> med H<sup>+</sup> i <span class="fagord-peg" data-fagord="sur">sur</span> <span class="fagord-peg" data-fagord="opløsning">opløsning</span> og med OH<sup>−</sup> i <span class="fagord-peg" data-fagord="basisk">basisk</span> <span class="fagord-peg" data-fagord="opløsning">opløsning</span>.</li>
 <li>Til sidst <span class="fagord-peg" data-fagord="afstemt">afstemmes</span> hydrogen med H<sub>2</sub>O, og oxygen bruges som tjek.</li>
 <li><span class="fagord-peg" data-fagord="permanganat">Permanganat</span> er violet og bliver til farveløst Mn<sup>2+</sup> i <span class="fagord-peg" data-fagord="sur">sur</span> <span class="fagord-peg" data-fagord="opløsning">opløsning</span>.</li>
-<li>I en <span class="fagord-peg" data-fagord="titrering">titrering</span> reagerer 1 <span class="fagord-peg" data-fagord="mol">mol</span> <span class="fagord-peg" data-fagord="permanganat">permanganat</span> med 5 <span class="fagord-peg" data-fagord="mol">mol</span> <span class="fagord-peg" data-fagord="jern(ii)ion">jern(II)ioner</span>.</li>
 </ul>
 </div>
 </div>
 <div class="til-opgaver">
-<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/8-4-opgaver.html">Opgaver til 8.4</a> har almindelige opgaver og opgaver med fødevaretema og klimatema.</p>
+<p><span id="ord-opgaver" class="fagord-anker"><strong>Opgaver:</strong></span> <a href="../opgaver/8-4-opgaver.html">Opgaver til 8.4</a></p>
 </div>
 
 
-<script type="application/json" id="fagord-peg-data">{"afstemt":{"afsnit":"6.3","forklaring":"Siges om et reaktionsskema med lige mange atomer af hver slags på begge\nsider af pilen. Det klares med koefficienter foran formlerne.","maal":"../kapitler/6-3-alkaners-reaktioner.html#ord-afstemt","ord":"afstemt"},"basisk":{"afsnit":"7.3","forklaring":"Siges om en opløsning, der har flere hydroxidioner end oxoniumioner. Den\nhar pH over 7.","maal":"../kapitler/7-3-ph-skalaen.html#ord-basisk","ord":"basisk"},"bundfald":{"afsnit":"2.4","forklaring":"Fast stof, der dannes, når to saltopløsninger hældes sammen. To af\nionerne danner et tungtopløseligt salt.","maal":"../kapitler/2-4-faeldningsreaktioner.html#ord-bundfald","ord":"bundfald"},"burette":{"afsnit":"5.3","forklaring":"Langt glasrør med inddeling i milliliter og en hane forneden. Herfra\ndryppes opløsningen ned i kolben.","maal":"../kapitler/5-3-titrering.html#ord-burette","ord":"burette"},"elektron":{"afsnit":"1.2","forklaring":"Partikel uden om atomets kerne. Den har ladningen −1 og vejer næsten\ningenting.","maal":"../kapitler/1-2-atomet.html#ord-elektroner","ord":"elektron"},"hydroxidion":{"afsnit":"7.1","forklaring":"Partiklen OH<sup>−<\/sup>. Den er tilbage, når et vandmolekyle har\nafgivet H<sup>+<\/sup> til en base.","maal":"../kapitler/7-1-syrer-og-baser.html#ord-hydroxidion","ord":"hydroxidion"},"indikator":{"afsnit":"5.3","forklaring":"Stof, der skifter farve, når alt stoffet i prøven har reageret. I en\nMohrtitrering bruges kaliumchromat.","maal":"../kapitler/5-3-titrering.html#ord-indikator","ord":"indikator"},"ion":{"afsnit":"2.1","forklaring":"Atom, der har afgivet eller optaget elektroner og derfor har en ladning.","maal":"../kapitler/2-1-ioner.html#ord-ion","ord":"ion"},"jern(ii)ion":{"afsnit":"2.2","forklaring":"Partiklen Fe<sup>2+<\/sup>, som findes i blodet. Tallet i parentesen\nviser, at ladningen er +2.","maal":"../kapitler/2-2-ioners-navne.html#positive-ioner","ord":"jern(II)ion"},"jern(iii)ion":{"afsnit":"2.2","forklaring":"Partiklen Fe<sup>3+<\/sup>. Tallet i parentesen viser, at ladningen er\n+3.","maal":"../kapitler/2-2-ioners-navne.html#positive-ioner","ord":"jern(III)ion"},"koefficient":{"afsnit":"1.4","forklaring":"Det store tal foran en formel. Det viser, hvor mange molekyler der er.","maal":"../kapitler/1-4-reaktionsskemaer.html#ord-koefficient","ord":"koefficient"},"ladning":{"afsnit":"2.1","forklaring":"Viser, hvor mange elektroner en ion har afgivet eller optaget. Skrives\nhævet efter atomsymbolet, for eksempel 2+ i Mg<sup>2+<\/sup>.","maal":"../kapitler/2-1-ioner.html#sådan-skrives-en-ion","ord":"ladning"},"mol":{"afsnit":"4.3","forklaring":"Enhed for et bestemt antal, ligesom et par og et dusin. Her er antallet\n6,02 · 10<sup>23<\/sup> stykker.","maal":"../kapitler/4-3-stofmaengde.html#ord-mol","ord":"mol"},"opløsning":{"afsnit":"5.1","forklaring":"Blanding, hvor et stof har fordelt sig jævnt i en væske. Salt, der er\nrørt ud i vand, er et eksempel.","maal":"../kapitler/5-1-koncentration.html#ord-oploesning","ord":"opløsning"},"oxidationsmiddel":{"afsnit":"8.1","forklaring":"Stof, der optager elektroner fra et andet stof. Oxygen, chlor og brom er\nkraftige eksempler.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-oxidationsmiddel","ord":"oxidationsmiddel"},"oxidationstal":{"afsnit":"8.3","forklaring":"Ladning, et atom ville få, hvis de fælles elektronpar gik til det atom,\nder trækker mest. Det skrives med romertal, for eksempel −II.","maal":"../kapitler/8-3-oxidationstal.html#ord-oxidationstal","ord":"oxidationstal"},"oxoniumion":{"afsnit":"7.1","forklaring":"Partiklen H<sub>3<\/sub>O<sup>+<\/sup>. Den dannes, når et vandmolekyle\noptager en hydron.","maal":"../kapitler/7-1-syrer-og-baser.html#ord-oxoniumion","ord":"oxoniumion"},"permanganat":{"afsnit":"8.4","forklaring":"Violet ion med formlen MnO<sub>4<\/sub><sup>−<\/sup>. Den er et meget\nbrugt oxidationsmiddel og bliver farveløs, når den reduceres i sur\nopløsning.","maal":"../kapitler/8-4-redoxafstemning.html#mangans-farver","ord":"permanganat"},"reaktionspil":{"afsnit":"1.4","forklaring":"Tegnet mellem de stoffer, der reagerer, og de stoffer, der bliver\ndannet. Det læses <em>bliver til<\/em>.","maal":"../kapitler/1-4-reaktionsskemaer.html#ord-reaktionspilen","ord":"reaktionspil"},"reaktionsskema":{"afsnit":"1.4","forklaring":"Kemikerens opskrift: formler og en pil viser, hvad der reagerer, og hvad\nder dannes.","maal":"../kapitler/1-4-reaktionsskemaer.html#ord-reaktionsskema","ord":"reaktionsskema"},"redoxreaktion":{"afsnit":"8.1","forklaring":"Elektroner flytter fra ét stof til et andet. Det ene stof afgiver dem,\nog det andet optager dem samtidig.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-redoxreaktion","ord":"redoxreaktion"},"sulfat":{"afsnit":"2.3","forklaring":"Den sammensatte ion SO<sub>4<\/sub><sup>2−<\/sup> med ladningen −2.","maal":"../kapitler/2-3-ionforbindelser.html#sammensatte-ioner","ord":"sulfat"},"sur":{"afsnit":"7.3","forklaring":"Siges om en opløsning, der har flere oxoniumioner end hydroxidioner. Den\nhar pH under 7.","maal":"../kapitler/7-3-ph-skalaen.html#ord-sur","ord":"sur"},"titrering":{"afsnit":"5.3","forklaring":"Metode til at måle, hvor meget stof en prøve indeholder. En opløsning\nmed kendt koncentration dryppes i, til alt stoffet har reageret.","maal":"../kapitler/5-3-titrering.html#ord-titrering","ord":"titrering"}}</script>
+<script type="application/json" id="fagord-peg-data">{"afstemt":{"afsnit":"6.3","forklaring":"Siges om et reaktionsskema med lige mange atomer af hver slags på begge\nsider af pilen. Det klares med koefficienter foran formlerne.","maal":"../kapitler/6-3-alkaners-reaktioner.html#ord-afstemt","ord":"afstemt"},"basisk":{"afsnit":"7.3","forklaring":"Siges om en opløsning, der har flere hydroxidioner end oxoniumioner. Den\nhar pH over 7.","maal":"../kapitler/7-3-ph-skalaen.html#ord-basisk","ord":"basisk"},"bundfald":{"afsnit":"2.4","forklaring":"Fast stof, der dannes, når to saltopløsninger hældes sammen. To af\nionerne danner et tungtopløseligt salt.","maal":"../kapitler/2-4-faeldningsreaktioner.html#ord-bundfald","ord":"bundfald"},"delreaktion":{"afsnit":"8.1","forklaring":"Skema, der kun viser det ene stof, som enten afgiver eller optager\nelektroner. Elektronerne skrives med som e<sup>−<\/sup>.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-delreaktioner","ord":"delreaktion"},"elektron":{"afsnit":"1.2","forklaring":"Partikel uden om atomets kerne. Den har ladningen −1 og vejer næsten\ningenting.","maal":"../kapitler/1-2-atomet.html#ord-elektroner","ord":"elektron"},"hydroxidion":{"afsnit":"7.1","forklaring":"Partiklen OH<sup>−<\/sup>. Den er tilbage, når et vandmolekyle har\nafgivet H<sup>+<\/sup> til en base.","maal":"../kapitler/7-1-syrer-og-baser.html#ord-hydroxidion","ord":"hydroxidion"},"ion":{"afsnit":"2.1","forklaring":"Atom, der har afgivet eller optaget elektroner og derfor har en ladning.","maal":"../kapitler/2-1-ioner.html#ord-ion","ord":"ion"},"jern(ii)ion":{"afsnit":"2.2","forklaring":"Partiklen Fe<sup>2+<\/sup>, som findes i blodet. Tallet i parentesen\nviser, at ladningen er +2.","maal":"../kapitler/2-2-ioners-navne.html#positive-ioner","ord":"jern(II)ion"},"jern(iii)ion":{"afsnit":"2.2","forklaring":"Partiklen Fe<sup>3+<\/sup>. Tallet i parentesen viser, at ladningen er\n+3.","maal":"../kapitler/2-2-ioners-navne.html#positive-ioner","ord":"jern(III)ion"},"koefficient":{"afsnit":"1.4","forklaring":"Det store tal foran en formel. Det viser, hvor mange molekyler der er.","maal":"../kapitler/1-4-reaktionsskemaer.html#ord-koefficient","ord":"koefficient"},"ladning":{"afsnit":"2.1","forklaring":"Viser, hvor mange elektroner en ion har afgivet eller optaget. Skrives\nhævet efter atomsymbolet, for eksempel 2+ i Mg<sup>2+<\/sup>.","maal":"../kapitler/2-1-ioner.html#sådan-skrives-en-ion","ord":"ladning"},"opløsning":{"afsnit":"5.1","forklaring":"Blanding, hvor et stof har fordelt sig jævnt i en væske. Salt, der er\nrørt ud i vand, er et eksempel.","maal":"../kapitler/5-1-koncentration.html#ord-oploesning","ord":"opløsning"},"oxidationsmiddel":{"afsnit":"8.1","forklaring":"Stof, der optager elektroner fra et andet stof. Oxygen, chlor og brom er\nkraftige eksempler.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-oxidationsmiddel","ord":"oxidationsmiddel"},"oxidationstal":{"afsnit":"8.3","forklaring":"Ladning, et atom ville få, hvis de fælles elektronpar gik til det atom,\nder trækker mest. Det skrives med romertal, for eksempel −II.","maal":"../kapitler/8-3-oxidationstal.html#ord-oxidationstal","ord":"oxidationstal"},"oxoniumion":{"afsnit":"7.1","forklaring":"Partiklen H<sub>3<\/sub>O<sup>+<\/sup>. Den dannes, når et vandmolekyle\noptager en hydron.","maal":"../kapitler/7-1-syrer-og-baser.html#ord-oxoniumion","ord":"oxoniumion"},"permanganat":{"afsnit":"8.4","forklaring":"Violet ion med formlen MnO<sub>4<\/sub><sup>−<\/sup>. Den er et meget\nbrugt oxidationsmiddel og bliver farveløs, når den reduceres i sur\nopløsning.","maal":"../kapitler/8-4-redoxafstemning.html#mangans-farver","ord":"permanganat"},"reaktionspil":{"afsnit":"1.4","forklaring":"Tegnet mellem de stoffer, der reagerer, og de stoffer, der bliver\ndannet. Det læses <em>bliver til<\/em>.","maal":"../kapitler/1-4-reaktionsskemaer.html#ord-reaktionspilen","ord":"reaktionspil"},"reaktionsskema":{"afsnit":"1.4","forklaring":"Kemikerens opskrift: formler og en pil viser, hvad der reagerer, og hvad\nder dannes.","maal":"../kapitler/1-4-reaktionsskemaer.html#ord-reaktionsskema","ord":"reaktionsskema"},"redoxreaktion":{"afsnit":"8.1","forklaring":"Elektroner flytter fra ét stof til et andet. Det ene stof afgiver dem,\nog det andet optager dem samtidig.","maal":"../kapitler/8-1-redoxreaktioner.html#ord-redoxreaktion","ord":"redoxreaktion"},"sulfat":{"afsnit":"2.3","forklaring":"Den sammensatte ion SO<sub>4<\/sub><sup>2−<\/sup> med ladningen −2.","maal":"../kapitler/2-3-ionforbindelser.html#sammensatte-ioner","ord":"sulfat"},"sur":{"afsnit":"7.3","forklaring":"Siges om en opløsning, der har flere oxoniumioner end hydroxidioner. Den\nhar pH under 7.","maal":"../kapitler/7-3-ph-skalaen.html#ord-sur","ord":"sur"}}</script>
 </section>
 
 </main> <!-- /main -->
@@ -2503,6 +2445,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">

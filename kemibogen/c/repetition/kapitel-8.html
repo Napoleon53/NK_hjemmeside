@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9bb12f4aee668ca17c52c87f090ebd91.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b8f8d3ace0de2047d11de8857bbd15f3.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -792,14 +792,38 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-3-flammefarver.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.3: Flammefarver</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/1-4-sker-der-en-kemisk-reaktion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 1.4: Sker der en kemisk reaktion?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-1-leder-det-stroem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.1: Leder det strøm?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../oevelser/2-3-salt-i-varmt-og-koldt-vand.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Øvelse 2.3: Salt i varmt og koldt vand</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../oevelser/2-4-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Øvelse 2.4: Find det ukendte salt</span></a>
+  <a href="../oevelser/2-4a-find-det-ukendte-salt.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4a: Find det ukendte salt</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../oevelser/2-4b-bundfald-i-draaber.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Øvelse 2.4b: Bundfald i dråber</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -1083,7 +1107,6 @@ window.Quarto = {
 <li>afstemme en redoxreaktion ved hjælp af oxidationstal</li>
 <li>afstemme ladningen med H<sup>+</sup> i sur opløsning og med OH<sup>−</sup> i basisk opløsning</li>
 <li>forklare farveskiftene, når permanganat reagerer</li>
-<li>regne på en titrering med permanganat</li>
 </ul>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
@@ -1103,7 +1126,6 @@ window.Quarto = {
 <li>Derefter afstemmes ladningen med H<sup>+</sup> i sur opløsning og med OH<sup>−</sup> i basisk opløsning.</li>
 <li>Til sidst afstemmes hydrogen med H<sub>2</sub>O, og oxygen bruges som tjek.</li>
 <li>Permanganat er violet og bliver til farveløst Mn<sup>2+</sup> i sur opløsning.</li>
-<li>I en titrering reagerer 1 mol permanganat med 5 mol jern(II)ioner.</li>
 </ul>
 </div>
 </div>
@@ -1181,8 +1203,8 @@ window.Quarto = {
 <ol type="a">
 <li>Afstem reaktionsskemaet i sur opløsning: Fe<sup>2+</sup> + NO<sub>3</sub><sup>−</sup> → Fe<sup>3+</sup> + NO</li>
 <li>Hvad ser man, når violet permanganat bliver reduceret i en sur opløsning?</li>
-<li>En sur opløsning med jern(II)ioner titreres med 0,0200 M kaliumpermanganat. Der bruges 10,0 mL. Beregn stofmængden af permanganat.</li>
-<li>1 mol permanganat reagerer med 5 mol jern(II)ioner. Hvor stor en stofmængde jern(II)ioner var der i opløsningen?</li>
+<li>Find oxidationstallet for mangan i MnO<sub>4</sub><sup>−</sup> og i Mn<sup>2+</sup>. Bliver mangan oxideret eller reduceret, når permanganat bliver til Mn<sup>2+</sup>?</li>
+<li>Hvorfor må tallene fra trin 2 ikke ændres, når ladningen og hydrogen bliver afstemt i trin 3 og 4?</li>
 </ol></li>
 <li><p><span id="ord-korrosion" class="fagord-anker"><strong>Korrosion</strong></span> <a href="../kapitler/8-5-korrosion.html" class="rep-afsnit">afsnit 8.5</a></p>
 <ol type="a">
@@ -1222,10 +1244,39 @@ window.Quarto = {
 </ol></li>
 <li><p><strong>Oxidationstal</strong></p>
 <ol type="a">
-<li>Et grundstof, der ikke er bundet til andre grundstoffer, har 0. Hydrogen har +I i forbindelser, og oxygen har −II.</li>
-<li>Svovl har −II i H<sub>2</sub>S, fordi de to hydrogenatomer giver +2. Carbon har +II i CO, fordi oxygen giver −2. Nitrogen har +V i NO<sub>3</sub><sup>−</sup>, fordi de tre oxygenatomer giver −6, og summen skal være −1. Nitrogen har −III i NH<sub>4</sub><sup>+</sup>, fordi de fire hydrogenatomer giver +4, og summen skal være +1.</li>
-<li>Hydrogen stiger fra 0 i H<sub>2</sub> til +I i H<sub>2</sub>O og bliver oxideret. Oxygen falder fra 0 i O<sub>2</sub> til −II i H<sub>2</sub>O og bliver reduceret.</li>
-<li>Nej. Hydrogen har +I, og oxygen har −II både før og efter reaktionen. Ingen oxidationstal ændrer sig. Det er en syre/base-reaktion.</li>
+<li><p>Et grundstof, der ikke er bundet til andre grundstoffer, har 0. Hydrogen har +I i forbindelser, og oxygen har −II.</p></li>
+<li><p>I beregningerne står hvert grundstofs symbol for dets oxidationstal. Summen er lig med ladningen.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{S} + 2 \cdot \mathrm{H} &amp;= \text{ladning} \\
+\mathrm{S} + 2 \cdot 1 &amp;= 0 \\
+\mathrm{S} &amp;= -2
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{C} + \mathrm{O} &amp;= \text{ladning} \\
+\mathrm{C} + (-2) &amp;= 0 \\
+\mathrm{C} &amp;= 2
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{N} + 3 \cdot \mathrm{O} &amp;= \text{ladning} \\
+\mathrm{N} + 3 \cdot (-2) &amp;= -1 \\
+\mathrm{N} &amp;= 5
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathrm{N} + 4 \cdot \mathrm{H} &amp;= \text{ladning} \\
+\mathrm{N} + 4 \cdot 1 &amp;= 1 \\
+\mathrm{N} &amp;= -3
+\end{aligned}
+\]</span></p>
+<p>Svovl har −II i H<sub>2</sub>S, carbon har +II i CO, nitrogen har +V i NO<sub>3</sub><sup>−</sup>, og nitrogen har −III i NH<sub>4</sub><sup>+</sup>.</p></li>
+<li><p>Hydrogen stiger fra 0 i H<sub>2</sub> til +I i H<sub>2</sub>O og bliver oxideret. Oxygen falder fra 0 i O<sub>2</sub> til −II i H<sub>2</sub>O og bliver reduceret.</p></li>
+<li><p>Nej. Hydrogen har +I, og oxygen har −II både før og efter reaktionen. Ingen oxidationstal ændrer sig. Det er en syre/base-reaktion.</p></li>
 </ol></li>
 <li><p><strong>Afstemning og permanganat</strong></p>
 <ol type="a">
@@ -1262,14 +1313,16 @@ window.Quarto = {
 </table>
 <p>I trin 3 er ladningen +5 til venstre og +9 til højre, så der skal 4 H<sup>+</sup> til venstre.</p></li>
 <li><p>Den violette farve forsvinder, fordi permanganat bliver til Mn<sup>2+</sup>, som er farveløs.</p></li>
-<li><p>10,0 mL er 0,0100 L.</p>
+<li><p>Mn står for oxidationstallet for mangan, og O står for oxidationstallet for oxygen. I MnO<sub>4</sub><sup>−</sup> er</p>
 <p><span class="math display">\[
-n(\mathrm{MnO_4^-}) = c \cdot V = 0{,}0200\ \dfrac{\mathrm{mol}}{\mathrm{L}} \cdot 0{,}0100\ \mathrm{L} = 0{,}000200\ \mathrm{mol}
-\]</span></p></li>
-<li><p>Forholdet er 1 : 5, så der er 5 gange så mange mol jern(II)ioner.</p>
-<p><span class="math display">\[
-n(\mathrm{Fe^{2+}}) = 5 \cdot 0{,}000200\ \mathrm{mol} = 0{,}00100\ \mathrm{mol}
-\]</span></p></li>
+\begin{aligned}
+\mathrm{Mn} + 4 \cdot \mathrm{O} &amp;= \text{ladning} \\
+\mathrm{Mn} + 4 \cdot (-2) &amp;= -1 \\
+\mathrm{Mn} &amp;= 7
+\end{aligned}
+\]</span></p>
+<p>Mangan har +VII i MnO<sub>4</sub><sup>−</sup> og +II i Mn<sup>2+</sup>. Oxidationstallet falder, så mangan bliver reduceret.</p></li>
+<li><p>Tallene fra trin 2 sørger for, at der afgives lige så mange elektroner, som der optages. Ændres de, passer elektronregnskabet ikke længere.</p></li>
 </ol></li>
 <li><p><strong>Korrosion</strong></p>
 <ol type="a">
@@ -2525,6 +2578,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }, { passive: true });
   window.addEventListener("resize", skjul);
+});
+</script>
+<script>
+// Øvelser med to udgaver.
+//
+// I en øvelse kan en del af teksten stå i to udgaver, hver i sin boks: "::: {.udgave .lukket}" og
+// "::: {.udgave .aaben}". Dette script sætter to knapper under øvelsens overskrift og viser kun den valgte
+// udgave. Knappernes navne kommer fra boksenes navn="..." (ellers Trin for trin og Åben), og den lukkede
+// udgave vises fra start. Sættes "#aaben" efter sidens adresse, vises den åbne udgave.
+// Uden JavaScript står begge udgaver under hinanden med deres navn over (se stil/kemibogen.scss).
+// Kompendierne vælger udgaven for sig, se noter/kompendier.md.
+document.addEventListener("DOMContentLoaded", function () {
+  if (!document.querySelector("main .udgave")) return;
+
+  function navn(slags, standard) {
+    var boks = document.querySelector("main .udgave." + slags + "[data-navn]");
+    return boks ? boks.getAttribute("data-navn") : standard;
+  }
+  var navne = { lukket: navn("lukket", "Trin for trin"), aaben: navn("aaben", "Åben") };
+
+  var valg = document.createElement("div");
+  valg.className = "udgavevalg";
+  valg.setAttribute("role", "group");
+  valg.setAttribute("aria-label", "Udgave af øvelsen");
+  var tekst = document.createElement("span");
+  tekst.textContent = "Udgave:";
+  valg.appendChild(tekst);
+
+  var knapper = {};
+  function vis(slags, ret_adresse) {
+    document.body.classList.toggle("udgave-aaben", slags === "aaben");
+    Object.keys(knapper).forEach(function (s) {
+      knapper[s].setAttribute("aria-pressed", s === slags ? "true" : "false");
+    });
+    if (ret_adresse && history.replaceState) {
+      history.replaceState(null, "", location.pathname + location.search + (slags === "aaben" ? "#aaben" : ""));
+    }
+  }
+  ["lukket", "aaben"].forEach(function (slags) {
+    var knap = document.createElement("button");
+    knap.type = "button";
+    knap.textContent = navne[slags];
+    knap.addEventListener("click", function () { vis(slags, true); });
+    valg.appendChild(knap);
+    knapper[slags] = knap;
+  });
+
+  var hoved = document.querySelector("main #title-block-header") || document.querySelector("main h1");
+  hoved.parentNode.insertBefore(valg, hoved.nextSibling);
+  document.body.classList.add("har-udgavevalg");
+  vis(location.hash === "#aaben" ? "aaben" : "lukket", false);
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
