@@ -37,6 +37,12 @@
   .gruppe > p.hjaelp { margin: 2px 16px 0; color: var(--daempet); font-size: 14px; }
   .raekker { margin-top: 8px; }
   .raekke { border-top: 1px solid var(--lys); padding: 11px 16px 12px; }
+  .raekke.tom { color: var(--daempet); font-size: 14px; }
+  .underhoved { border-top: 1px solid var(--lys); padding: 9px 16px 0; font-size: 13px; font-weight: 700; color: var(--daempet); }
+  .underhoved + .raekke { border-top: 0; padding-top: 6px; }
+  .raekke .note { margin: 3px 0 0 27px; color: var(--daempet); font-size: 13.5px; }
+  .raekke.laast label.kryds { cursor: default; }
+  .raekke.laast label.kryds .let, .raekke.laast .omfang { opacity: 0.5; }
 
   label.kryds { display: flex; align-items: baseline; gap: 10px; cursor: pointer; }
   label.kryds input { width: 17px; height: 17px; margin: 0; accent-color: var(--groen); flex: none; position: relative; top: 2px; }
@@ -44,41 +50,56 @@
   label.kryds .let { font-weight: 400; font-size: 15px; }
   .omfang { margin-left: auto; padding-left: 12px; color: var(--daempet); font-size: 14px; white-space: nowrap; }
 
+  /* Et kapitel: en linje med kryds, og under den kapitlets afsnit, når kapitlet er valgt. */
+  .kapitel { border-top: 1px solid var(--kant); }
+  .kapitelhoved { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .kapitelhoved label.kryds { flex: 1; }
+  .kapitelhoved label.kryds .navn { font-size: 17px; }
+  .kapitel.valgt .kapitelhoved { background: var(--lys); }
+  .kapitel:not(.valgt) .afsnitliste, .kapitel:not(.valgt) .kapitelhoved .knap-lille { display: none; }
+  .afsnitliste .raekke { padding-left: 43px; }
+
   .indryk { margin-left: 27px; }
   .overskrifter { margin: 3px 0 0; color: var(--daempet); font-size: 13.5px; }
-  .opgaver { display: flex; align-items: center; gap: 10px; margin-top: 9px; flex-wrap: wrap; }
-  .opgaver > span { font-size: 14px; font-weight: 600; }
-  .trin { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; flex: 1 1 380px; }
-  .trin label { position: relative; cursor: pointer; }
-  .trin input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
-  .trin span { display: block; border: 1px solid var(--kant); border-radius: 6px; padding: 5px 6px 6px; text-align: center; background: #fff; line-height: 1.25; }
-  .trin b { display: block; font-size: 14.5px; }
-  .trin small { display: block; font-size: 13px; color: var(--daempet); }
-  .trin input:checked + span { background: var(--groen); border-color: var(--groen); color: #fff; }
-  .trin input:checked + span small { color: #d9efec; }
-  .trin input:focus-visible + span { outline: 2px solid var(--blaek); outline-offset: 2px; }
-  .trin label:hover span { border-color: var(--groen); }
+  .opgaver { display: flex; align-items: stretch; gap: 10px; margin-top: 9px; flex-wrap: wrap; }
+  .opgaver > span { font-size: 14px; font-weight: 600; margin-left: 6px; align-self: center; }
+  .trin { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; flex: 1 1 340px; }
+  .trin label, .valgknap { position: relative; cursor: pointer; display: flex; }
+  .valgknap { flex: 0 0 92px; }
+  .trin input, .valgknap input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .trin span, .valgknap span { display: flex; flex-direction: column; justify-content: center; flex: 1; border: 1px solid var(--kant); border-radius: 6px; padding: 5px 6px 6px; text-align: center; background: #fff; line-height: 1.25; }
+  .trin b, .valgknap b { display: block; font-size: 14.5px; }
+  .trin small, .valgknap small { display: block; font-size: 13px; color: var(--daempet); }
+  .trin input:checked + span, .valgknap input:checked + span { background: var(--groen); border-color: var(--groen); color: #fff; }
+  .trin input:checked + span small, .valgknap input:checked + span small { color: #d9efec; }
+  .trin input:focus-visible + span, .valgknap input:focus-visible + span { outline: 2px solid var(--blaek); outline-offset: 2px; }
+  .trin label:hover span, .valgknap:hover span { border-color: var(--groen); }
   .slukket .indryk { opacity: 0.45; }
+  .udgaver { display: flex; align-items: center; gap: 10px; margin: 7px 0 0 27px; }
+  .udgaver > span { font-size: 14px; font-weight: 600; }
+  .udgaver .trin { grid-template-columns: repeat(2, minmax(0, 150px)); flex: 0 1 auto; }
 
-  .egne { padding: 0 16px 12px; }
+  .egne { padding: 0 16px 12px; border-top: 1px solid var(--lys); padding-top: 10px; }
   .egne ul { list-style: none; margin: 0 0 8px; padding: 0; }
-  .egne li { display: flex; align-items: baseline; gap: 10px; padding: 5px 0; border-top: 1px solid var(--lys); }
+  .egne li { display: flex; align-items: baseline; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--lys); }
   .egne li .fil { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .egne li.fejl .fil { color: var(--roed); }
-  .knap-lille { font: inherit; font-size: 14px; border: 1px solid var(--kant); background: #fff; color: var(--blaek); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  .knap-lille { font: inherit; font-size: 14px; border: 1px solid var(--kant); background: #fff; color: var(--blaek); border-radius: 6px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
   .knap-lille:hover { border-color: var(--groen); color: var(--groen-moerk); }
+  .knap-lille:focus-visible { outline: 2px solid var(--blaek); outline-offset: 2px; }
   .egne input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
   .egne input[type=file]:focus-visible + .knap-lille { outline: 2px solid var(--blaek); outline-offset: 2px; }
   .egne p { margin: 6px 0 0; color: var(--daempet); font-size: 13.5px; }
 
-  .kurv { position: sticky; top: 14px; background: #fff; border: 1px solid var(--kant); border-radius: 8px; padding: 12px 16px 16px; }
+  .kurv { position: sticky; top: 14px; background: #fff; border: 1px solid var(--kant); border-radius: 8px; padding: 12px 16px 16px; max-height: calc(100vh - 28px); overflow-y: auto; }
   .kurv h2 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--groen); }
   .tal { margin: 2px 0 0; font-size: 34px; font-weight: 700; line-height: 1.15; }
   .tal small { font-size: 17px; font-weight: 600; }
   .ark { margin: 0 0 10px; color: var(--daempet); font-size: 14px; }
   .oversigt { list-style: none; margin: 0 0 14px; padding: 8px 0 0; border-top: 1px solid var(--lys); font-size: 14px; }
   .oversigt li { display: flex; gap: 10px; padding: 2px 0; }
-  .oversigt li span:last-child { margin-left: auto; color: var(--daempet); white-space: nowrap; }
+  .oversigt li.forside { font-weight: 600; margin-top: 4px; }
+  .oversigt li span:last-child { margin-left: auto; color: var(--daempet); white-space: nowrap; font-weight: 400; }
   .knap { display: block; width: 100%; font: inherit; font-size: 17px; font-weight: 600; color: #fff; background: var(--groen); border: 0; border-radius: 7px; padding: 11px 14px; cursor: pointer; }
   .knap:hover { background: var(--groen-moerk); }
   .knap:disabled { background: #9fb5b3; cursor: default; }
@@ -93,11 +114,14 @@
 
   @media (max-width: 860px) {
     .side { grid-template-columns: minmax(0, 1fr); }
-    .kurv { position: sticky; bottom: 0; top: auto; border-radius: 8px 8px 0 0; box-shadow: 0 -4px 14px rgba(20, 32, 31, 0.12); }
+    .kurv { position: sticky; bottom: 0; top: auto; border-radius: 8px 8px 0 0; box-shadow: 0 -4px 14px rgba(20, 32, 31, 0.12); max-height: none; overflow: visible; }
     .kurv .oversigt { display: none; }
     .tal { font-size: 26px; display: inline-block; margin-right: 10px; }
     .ark { display: inline-block; }
     .trin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .afsnitliste .raekke { padding-left: 16px; }
+    .valgknap { flex-basis: 100%; }
+    .opgaver > span { margin-left: 0; }
   }
 </style>
 </head>
@@ -107,7 +131,7 @@
   <div>
     <p class="maerke">Kemibogen · Kemi C</p>
     <h1>Byg dit kompendium</h1>
-    <p class="under" id="kapitel"></p>
+    <p class="under">Sæt kryds ved det, kompendiet skal indeholde, og lav en PDF til print.</p>
   </div>
 </header>
 
@@ -115,8 +139,8 @@
   <div>
     <section class="gruppe">
       <h2>Fagligt fokus</h2>
-      <p class="hjaelp">Hvert afsnit, du vælger, får sider til noter med bogens overskrifter. Vælg selv, hvor mange opgaver der skal med.</p>
-      <div class="raekker" id="afsnit"></div>
+      <p class="hjaelp">Vælg et eller flere kapitler. Til hvert afsnit kan du vælge sider til noter med bogens overskrifter og en mængde opgaver.</p>
+      <div class="raekker" id="kapitler"></div>
     </section>
 
     <section class="gruppe">
@@ -156,91 +180,139 @@
 <noscript><p style="max-width:1100px;margin:20px auto;padding:0 20px">Siden skal bruge JavaScript for at sætte kompendiet sammen.</p></noscript>
 
 <script src="pdf-lib.min.js"></script>
-<script src="data/kapitel-2.js"></script>
+<script src="data/kapitler.js"></script>
 <script src="saml.js"></script>
 <script>
 (function () {
   'use strict';
 
-  var KAPITEL = '2';
+  var GEMT = 'kemibogen-kompendier';
   var NIVEAUNAVNE = { ingen: 'Ingen', lav: 'Få', mellem: 'Mellem', mange: 'Mange' };
-  var data = window.KOMPENDIER && window.KOMPENDIER[KAPITEL];
+  var kapitler = window.KOMPENDIER;
   var $ = function (id) { return document.getElementById(id); };
 
-  if (!data || !window.Kompendium || !window.PDFLib) {
+  if (!kapitler || !window.Kompendium || !window.PDFLib) {
     $('side').innerHTML = '<p>Siden mangler sine filer. Delene laves med kompendier/lav_kompendium.py.</p>';
     return;
   }
 
+  var numre = Kompendium.numre(kapitler);
   var valg = hentValg();
   var egne = [];       // lærerens egne vejledninger: { navn, sider, bytes } eller { navn, fejl }
   var adresse = null;  // den færdige PDF
 
-  function del(id) {
-    return data.dele.filter(function (d) { return d.id === id; })[0];
+  function del(nr, id) {
+    return kapitler[nr].dele.filter(function (d) { return d.id === id; })[0];
   }
   function sider(n) { return n + (n === 1 ? ' side' : ' sider'); }
   function tekst(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  function valgte() {
+    return numre.filter(function (nr) { return valg.kapitler[nr].med; });
+  }
+  // Det kapitel, et afsnit eller en øvelse hører til: "2.1" og "oevelse-2.4b" hører til kapitel 2.
+  function kapitelAf(navn) {
+    return numre.filter(function (nr) {
+      return kapitler[nr].afsnit.some(function (a) { return a.nr === navn; }) || kapitler[nr].oevelser.indexOf(navn) >= 0;
+    })[0];
+  }
 
   // ---- Valgene gemmes i browseren, så de er der næste gang ----
   function hentValg() {
-    var v = Kompendium.standardvalg(data);
+    var v = Kompendium.standardvalg(kapitler);
     try {
-      var gemt = JSON.parse(localStorage.getItem('kemibogen-kompendium-' + KAPITEL) || 'null');
+      var gemt = JSON.parse(localStorage.getItem(GEMT) || 'null');
       if (gemt) {
         v.forside = gemt.forside !== false;
         v.indhold = gemt.indhold !== false;
-        data.afsnit.forEach(function (a) {
-          var g = gemt.afsnit && gemt.afsnit[a.nr];
+        v.separat = gemt.separat === true;
+        Object.keys(gemt.bilag || {}).forEach(function (id) { v.bilag[id] = gemt.bilag[id] !== false; });
+        numre.forEach(function (nr) {
+          var g = gemt.kapitler && gemt.kapitler[nr];
           if (!g) return;
-          v.afsnit[a.nr].med = g.med !== false;
-          if (g.opgaver === 'ingen' || a.opgaver[g.opgaver]) v.afsnit[a.nr].opgaver = g.opgaver;
+          v.kapitler[nr].med = !!g.med;
+          kapitler[nr].afsnit.forEach(function (a) {
+            var ga = g.afsnit && g.afsnit[a.nr];
+            if (!ga) return;
+            var va = v.kapitler[nr].afsnit[a.nr];
+            va.med = ga.med !== false;
+            va.noter = ga.noter !== false;
+            if (ga.opgaver === 'ingen' || a.opgaver[ga.opgaver]) va.opgaver = ga.opgaver;
+          });
+          kapitler[nr].oevelser.forEach(function (id) { if (g.oevelser && id in g.oevelser) v.kapitler[nr].oevelser[id] = !!g.oevelser[id]; });
+          Object.keys(kapitler[nr].udgaver || {}).forEach(function (id) { if (g.udgaver && g.udgaver[id] === 'aaben') v.kapitler[nr].udgaver[id] = 'aaben'; });
         });
-        data.oevelser.forEach(function (id) { if (gemt.oevelser && id in gemt.oevelser) v.oevelser[id] = !!gemt.oevelser[id]; });
-        data.bilag.forEach(function (id) { if (gemt.bilag && id in gemt.bilag) v.bilag[id] = !!gemt.bilag[id]; });
       }
     } catch (e) { /* uden gemte valg bruges standardvalgene */ }
     return v;
   }
   function gemValg() {
-    try { localStorage.setItem('kemibogen-kompendium-' + KAPITEL, JSON.stringify(valg)); } catch (e) { /* ikke vigtigt */ }
+    try { localStorage.setItem(GEMT, JSON.stringify(valg)); } catch (e) { /* ikke vigtigt */ }
   }
 
   // ---- Siden bygges ud fra delene ----
   function kryds(id, navn, omfang, sat, let_) {
     return '<label class="kryds"><input type="checkbox" id="' + id + '"' + (sat ? ' checked' : '') + '>' +
-      '<span class="' + (let_ ? 'let' : 'navn') + '">' + tekst(navn) + '</span><span class="omfang">' + tekst(omfang) + '</span></label>';
+      '<span class="' + (let_ ? 'let' : 'navn') + '">' + tekst(navn) + '</span>' +
+      (omfang ? '<span class="omfang">' + tekst(omfang) + '</span>' : '') + '</label>';
   }
 
-  function byg() {
-    $('kapitel').textContent = 'Kapitel ' + data.kapitel + ': ' + data.titel;
-    document.title = 'Byg dit kompendium til kapitel ' + data.kapitel + ' · Kemibogen';
-
-    $('afsnit').innerHTML = data.afsnit.map(function (a) {
-      var trin = ['ingen'].concat(Kompendium.NIVEAUER.filter(function (n) { return a.opgaver[n]; })).map(function (n) {
-        var d = n === 'ingen' ? null : del(a.opgaver[n]);
-        return '<label><input type="radio" name="opgaver-' + a.nr + '" value="' + n + '"' + (valg.afsnit[a.nr].opgaver === n ? ' checked' : '') + '>' +
-          '<span><b>' + NIVEAUNAVNE[n] + '</b><small>' + (d ? d.opgaver + ' opgaver · ' + sider(d.sider) : 'kun noter') + '</small></span></label>';
+  function bygKapitler() {
+    $('kapitler').innerHTML = numre.map(function (nr) {
+      var data = kapitler[nr], v = valg.kapitler[nr];
+      var afsnit = data.afsnit.map(function (a) {
+        var va = v.afsnit[a.nr];
+        var trin = ['ingen'].concat(Kompendium.NIVEAUER.filter(function (n) { return a.opgaver[n]; })).map(function (n) {
+          var d = n === 'ingen' ? null : del(nr, a.opgaver[n]);
+          return '<label><input type="radio" name="opgaver-' + a.nr + '" value="' + n + '"' + (va.opgaver === n ? ' checked' : '') + '>' +
+            '<span><b>' + NIVEAUNAVNE[n] + '</b>' + (d ? '<small>' + d.opgaver + ' opgaver</small><small>' + sider(d.sider) + '</small>' : '<small>0 sider</small>') + '</span></label>';
+        }).join('');
+        return '<div class="raekke" data-afsnit="' + a.nr + '">' +
+          kryds('afsnit-' + a.nr, a.titel, '', va.med) +
+          '<div class="indryk"><p class="overskrifter">' + a.overskrifter.map(tekst).join(' · ') + '</p>' +
+          '<div class="opgaver">' +
+          '<label class="valgknap"><input type="checkbox" id="noter-' + a.nr + '"' + (va.noter ? ' checked' : '') + '>' +
+          '<span><b>Noter</b><small>' + sider(del(nr, a.noter).sider) + '</small></span></label>' +
+          '<span id="opgavenavn-' + a.nr + '">Opgaver</span>' +
+          '<div class="trin" role="radiogroup" aria-labelledby="opgavenavn-' + a.nr + '">' + trin + '</div></div></div></div>';
       }).join('');
-      return '<div class="raekke" data-afsnit="' + a.nr + '">' +
-        kryds('afsnit-' + a.nr, a.titel, 'Noter · ' + sider(del(a.noter).sider), valg.afsnit[a.nr].med) +
-        '<div class="indryk"><p class="overskrifter">' + a.overskrifter.map(tekst).join(' · ') + '</p>' +
-        '<div class="opgaver" role="radiogroup" aria-label="Opgaver til ' + tekst(a.titel) + '"><span>Opgaver</span><div class="trin">' + trin + '</div></div></div></div>';
+      return '<div class="kapitel" data-kapitel="' + nr + '"><div class="kapitelhoved">' +
+        kryds('kapitel-' + nr, 'Kapitel ' + data.kapitel + ': ' + data.titel, '', v.med) +
+        '<button type="button" class="knap-lille" data-noter="' + nr + '"></button></div>' +
+        '<div class="afsnitliste">' + afsnit + '</div></div>';
     }).join('');
+  }
 
-    $('oevelser').innerHTML = data.oevelser.map(function (id) {
-      return '<div class="raekke">' + kryds('del-' + id, del(id).titel, sider(del(id).sider), valg.oevelser[id], true) + '</div>';
+  // Øvelserne og bilagene afhænger af, hvilke kapitler der er valgt.
+  function bygResten() {
+    var med = valgte();
+    var oevelser = med.filter(function (nr) { return kapitler[nr].oevelser.length; }).map(function (nr) {
+      return (med.length > 1 ? '<div class="underhoved">Kapitel ' + nr + '</div>' : '') +
+        kapitler[nr].oevelser.map(function (id) {
+          // Har øvelsen to udgaver, vælges udgaven på to knapper under navnet, og sidetallet følger valget.
+          var u = (kapitler[nr].udgaver || {})[id], valgt = del(nr, Kompendium.oevelsesdel(kapitler[nr], valg.kapitler[nr], id));
+          var knapper = !u ? '' : '<div class="udgaver"><span id="udgavenavn-' + id + '">Udgave</span>' +
+            '<div class="trin" role="radiogroup" aria-labelledby="udgavenavn-' + id + '">' +
+            [['lukket', id], ['aaben', u.aaben]].map(function (par, i) {
+              return '<label><input type="radio" name="udgave-' + id + '" value="' + par[0] + '"' + (valgt.id === par[1] ? ' checked' : '') + '>' +
+                '<span><b>' + tekst(u.navne[i]) + '</b><small>' + sider(del(nr, par[1]).sider) + '</small></span></label>';
+            }).join('') + '</div></div>';
+          return '<div class="raekke">' + kryds('del-' + id, valgt.titel, sider(valgt.sider), valg.kapitler[nr].oevelser[id], true) + knapper + '</div>';
+        }).join('');
     }).join('');
+    $('oevelser').innerHTML = oevelser || '<div class="raekke tom">' +
+      (med.length ? 'Bogen har ingen øvelser til ' + (med.length > 1 ? 'de valgte kapitler' : 'kapitlet') + '.' : 'Vælg et kapitel for at se bogens øvelser.') + '</div>';
 
-    var sidst = data.bilag[data.bilag.length - 1];
+    var bilag = Kompendium.bilagene(kapitler, valg);
     $('andet').innerHTML =
-      '<div class="raekke">' + kryds('forside', 'Forside med plads til navn og klasse', sider(1), valg.forside, true) + '</div>' +
-      '<div class="raekke">' + kryds('indhold', 'Indholdsfortegnelse', sider(1), valg.indhold, true) + '</div>' +
-      data.bilag.map(function (id) {
-        var navn = del(id).titel.replace(/^Bilag: /, '') + (id === sidst && /periodesystem/.test(id) ? ' som sidste side' : '');
-        return '<div class="raekke">' + kryds('del-' + id, navn, sider(del(id).sider), valg.bilag[id], true) + '</div>';
+      '<div class="raekke">' + kryds('forside', 'Forside med plads til navn og klasse' + (med.length > 1 ? ', én til hvert kapitel' : ''), sider(Math.max(1, med.length)), valg.forside, true) + '</div>' +
+      '<div class="raekke" id="raekke-indhold">' + kryds('indhold', 'Indholdsfortegnelse', ' ', valg.indhold, true) +
+      '<p class="note" id="forlangt" hidden>Der er for mange linjer til forsiden, så indholdsfortegnelsen står for sig selv.</p></div>' +
+      '<div class="raekke" id="raekke-separat">' + kryds('separat', 'Separat forside: indholdsfortegnelsen får sin egen side', '+ ' + sider(1), valg.separat, true) + '</div>' +
+      bilag.map(function (b, i) {
+        var navn = b.del.titel.replace(/^Bilag: /, '') + (i === bilag.length - 1 && /periodesystem/.test(b.id) ? ' som sidste side' : '');
+        return '<div class="raekke">' + kryds('bilag-' + b.id, navn, sider(b.del.sider), valg.bilag[b.id] !== false, true) + '</div>';
       }).join('');
   }
 
@@ -250,17 +322,37 @@
   }
 
   function opdater() {
-    var plan = Kompendium.plan(data, valg, gode());
+    var plan = Kompendium.plan(kapitler, valg, gode());
     $('sider').textContent = plan.sider;
     $('sideord').textContent = plan.sider === 1 ? 'side' : 'sider';
     $('ark').textContent = plan.sider ? Math.ceil(plan.sider / 2) + ' ark, når der printes på begge sider' : 'Vælg, hvad kompendiet skal indeholde';
     $('oversigt').innerHTML = plan.poster.map(function (p) {
       var sidste = p.side + p.sider - 1;
-      return '<li><span>' + tekst(p.slags === 'egen' ? p.navn : p.titel) + '</span><span>s. ' + p.side + (sidste > p.side ? '–' + sidste : '') + '</span></li>';
+      return '<li' + (p.slags === 'forside' && plan.kapitler.length > 1 ? ' class="forside"' : '') + '><span>' +
+        tekst(p.slags === 'egen' ? p.navn : (p.slags === 'forside' && plan.kapitler.length === 1 ? 'Forside' : p.titel) + (p.indhold ? ' med indhold' : '')) +
+        '</span><span>s. ' + p.side + (sidste > p.side ? '–' + sidste : '') + '</span></li>';
     }).join('');
     $('lav').disabled = plan.sider === 0;
-    data.afsnit.forEach(function (a) {
-      document.querySelector('[data-afsnit="' + a.nr + '"]').classList.toggle('slukket', !valg.afsnit[a.nr].med);
+    // Indholdet står på forsiden, medmindre der er valgt separat forside, eller der er for mange linjer.
+    var paaForside = valg.forside && !valg.separat && !plan.forlangt;
+    var indholdspost = plan.poster.filter(function (p) { return p.slags === 'indhold'; })[0];
+    document.querySelector('#raekke-indhold .omfang').textContent = paaForside ? 'på forsiden' : sider(indholdspost ? indholdspost.sider : 1);
+    $('forlangt').hidden = !plan.forlangt;
+    // Separat forside giver kun mening, når kompendiet har både forside og indholdsfortegnelse.
+    var kanSeparat = valg.forside && valg.indhold;
+    $('separat').disabled = !kanSeparat;
+    $('raekke-separat').classList.toggle('laast', !kanSeparat);
+    document.querySelector('#raekke-separat .omfang').textContent = plan.forlangt ? '' : '+ ' + sider(1);
+    numre.forEach(function (nr) {
+      var v = valg.kapitler[nr];
+      var boks = document.querySelector('[data-kapitel="' + nr + '"]');
+      boks.classList.toggle('valgt', v.med);
+      // Knappen slår noterne fra eller til i hele kapitlet.
+      var harNoter = kapitler[nr].afsnit.some(function (a) { return v.afsnit[a.nr].noter; });
+      boks.querySelector('[data-noter]').textContent = harNoter ? 'Slå alle noter fra' : 'Slå alle noter til';
+      kapitler[nr].afsnit.forEach(function (a) {
+        document.querySelector('[data-afsnit="' + a.nr + '"]').classList.toggle('slukket', !v.afsnit[a.nr].med);
+      });
     });
     // Et nyt valg gør den PDF, der lige er lavet, forældet.
     $('klar').hidden = true;
@@ -279,20 +371,42 @@
 
   // ---- Hændelser ----
   document.addEventListener('change', function (h) {
-    var el = h.target;
+    var el = h.target, nr, navn;
     if (el.type === 'radio' && el.name.indexOf('opgaver-') === 0) {
       // Vælger man opgaver i et afsnit, der er slået fra, kommer afsnittet med.
-      var nr = el.name.slice(8);
-      valg.afsnit[nr].opgaver = el.value;
-      valg.afsnit[nr].med = true;
-      $('afsnit-' + nr).checked = true;
-    } else if (el.type === 'checkbox') {
-      if (el.id.indexOf('afsnit-') === 0) valg.afsnit[el.id.slice(7)].med = el.checked;
-      else if (el.id === 'forside' || el.id === 'indhold') valg[el.id] = el.checked;
-      else if (el.id.indexOf('del-') === 0) {
-        var id = el.id.slice(4);
-        (id in valg.oevelser ? valg.oevelser : valg.bilag)[id] = el.checked;
+      navn = el.name.slice(8);
+      nr = kapitelAf(navn);
+      valg.kapitler[nr].afsnit[navn].opgaver = el.value;
+      valg.kapitler[nr].afsnit[navn].med = true;
+      $('afsnit-' + navn).checked = true;
+    } else if (el.type === 'radio' && el.name.indexOf('udgave-') === 0) {
+      // Vælger man en udgave af en øvelse, kommer øvelsen med.
+      navn = el.name.slice(7);
+      nr = kapitelAf(navn);
+      valg.kapitler[nr].udgaver[navn] = el.value;
+      valg.kapitler[nr].oevelser[navn] = true;
+      bygResten();
+    } else if (el.type === 'checkbox' && el.id.indexOf('kapitel-') === 0) {
+      valg.kapitler[el.id.slice(8)].med = el.checked;
+      bygResten();
+    } else if (el.type === 'checkbox' && el.id.indexOf('afsnit-') === 0) {
+      navn = el.id.slice(7);
+      valg.kapitler[kapitelAf(navn)].afsnit[navn].med = el.checked;
+    } else if (el.type === 'checkbox' && el.id.indexOf('noter-') === 0) {
+      navn = el.id.slice(6);
+      nr = kapitelAf(navn);
+      valg.kapitler[nr].afsnit[navn].noter = el.checked;
+      if (el.checked) {
+        valg.kapitler[nr].afsnit[navn].med = true;
+        $('afsnit-' + navn).checked = true;
       }
+    } else if (el.type === 'checkbox' && (el.id === 'forside' || el.id === 'indhold' || el.id === 'separat')) {
+      valg[el.id] = el.checked;
+    } else if (el.type === 'checkbox' && el.id.indexOf('del-') === 0) {
+      navn = el.id.slice(4);
+      valg.kapitler[kapitelAf(navn)].oevelser[navn] = el.checked;
+    } else if (el.type === 'checkbox' && el.id.indexOf('bilag-') === 0) {
+      valg.bilag[el.id.slice(6)] = el.checked;
     } else if (el.id === 'fil') {
       laesFiler(el.files);
       el.value = '';
@@ -304,10 +418,21 @@
   });
 
   document.addEventListener('click', function (h) {
-    var fjern = h.target.getAttribute && h.target.getAttribute('data-fjern');
-    if (fjern !== null && fjern !== undefined) {
+    if (!h.target.getAttribute) return;
+    var fjern = h.target.getAttribute('data-fjern');
+    var noter = h.target.getAttribute('data-noter');
+    if (fjern !== null) {
       egne.splice(Number(fjern), 1);
       tegnEgne();
+      opdater();
+    } else if (noter !== null) {
+      // Slår noterne fra i alle kapitlets afsnit, eller til igen, hvis de alle er slået fra.
+      var v = valg.kapitler[noter];
+      var til = !kapitler[noter].afsnit.some(function (a) { return v.afsnit[a.nr].noter; });
+      kapitler[noter].afsnit.forEach(function (a) {
+        v.afsnit[a.nr].noter = til;
+        $('noter-' + a.nr).checked = til;
+      });
       opdater();
     }
   });
@@ -332,18 +457,34 @@
     tegnEgne();
   }
 
+  // Et kapitels PDF hentes først, når den skal bruges.
+  function hentPdf(nr) {
+    window.KOMPENDIEPDF = window.KOMPENDIEPDF || {};
+    if (window.KOMPENDIEPDF[nr]) return Promise.resolve(window.KOMPENDIEPDF[nr]);
+    return new Promise(function (klar, fejl) {
+      var script = document.createElement('script');
+      script.src = 'data/' + kapitler[nr].pdffil;
+      script.onload = function () {
+        if (window.KOMPENDIEPDF[nr]) klar(window.KOMPENDIEPDF[nr]);
+        else fejl(new Error('Delene til kapitel ' + nr + ' mangler.'));
+      };
+      script.onerror = function () { fejl(new Error('Delene til kapitel ' + nr + ' kunne ikke hentes.')); };
+      document.head.appendChild(script);
+    });
+  }
+
   $('lav').addEventListener('click', function () {
     var knap = $('lav');
-    var plan = Kompendium.plan(data, valg, gode());
+    var plan = Kompendium.plan(kapitler, valg, gode());
     knap.disabled = true;
     knap.textContent = 'Laver PDF …';
     $('besked').hidden = true;
-    Kompendium.saml(PDFLib, data, valg, gode()).then(function (bytes) {
+    Kompendium.saml(PDFLib, kapitler, hentPdf, valg, gode()).then(function (bytes) {
       if (adresse) URL.revokeObjectURL(adresse);
       adresse = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
       $('aabn').href = adresse;
       $('gem').href = adresse;
-      $('gem').download = 'Kompendium til kapitel ' + data.kapitel + '.pdf';
+      $('gem').download = Kompendium.navn(kapitler, valg) + '.pdf';
       $('klartekst').textContent = 'Kompendiet er klar: ' + sider(plan.sider) + '.';
       $('klar').hidden = false;
     }).catch(function (fejl) {
@@ -355,7 +496,8 @@
     });
   });
 
-  byg();
+  bygKapitler();
+  bygResten();
   opdater();
 })();
 </script>
