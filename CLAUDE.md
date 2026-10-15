@@ -172,9 +172,10 @@ sync; denne er færdig.
   offentligt download lægges direkte her.
 - `files/Kildefiler/` er upubliceret materiale (kildefiler, .bak-filer) — ikke
   til offentliggørelse.
-- `kemibogen/` er en færdigbygget kopi af Kemibogen (kemiformler.dk/kemibogen,
-  `c/` er kemi C og `b/` er kemi B). Ret ikke i mappen: den skrives over fra
-  `~/NK_Undervisning/Kemibogen` med `bash vaerktoej/laeg_paa_hjemmesiden.sh`.
+- Kemibogen ligger fra 15. okt. 2026 på kemibogen.dk i sit eget repo (`~/NK_Kemibogen`,
+  Napoleon53/NK_Kemibogen) og ikke her. `kemibogen/index.html` og et lille script
+  øverst i `404.html` sender gamle links til kemiformler.dk/kemibogen/... videre til
+  samme side på kemibogen.dk. Læg ikke bogen her igen.
   Brugeren 9. okt. 2026: "Uden links dertil indtil videre", så lav ingen links
   til bogen fra resten af sitet, før brugeren beder om det.
 - `kompendier/` er en kopi af siden, hvor en lærer sætter sit eget kompendium
