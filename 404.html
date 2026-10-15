@@ -2,6 +2,15 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
+<script>
+// Kemibogen flyttede 15. okt. 2026 fra kemiformler.dk/kemibogen til kemibogen.dk: gamle links fører til samme side dér
+(function () {
+  var p = location.pathname;
+  if (/^\/kemibogen(\/|$)/i.test(p)) {
+    location.replace("https://kemibogen.dk" + (p.replace(/^\/kemibogen/i, "") || "/") + location.search + location.hash);
+  }
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Siden blev ikke fundet &ndash; Kemiformler</title>
 <meta name="description" content="Siden findes ikke. Find i stedet vej til animationer og downloads.">
