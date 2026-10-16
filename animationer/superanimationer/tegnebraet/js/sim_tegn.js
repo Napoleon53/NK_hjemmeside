@@ -2,7 +2,7 @@
    sim_tegn.js - tegnebraettet
 
    Frit tegnebraet til rapporter. Samme tavle og samme regler for at
-   tegne som paa quizfanerne i sc6.2, men med C, H, O, N, Cl, Br og I
+   tegne som paa quizfanerne i sc4.2, men med C, H, O, N, Cl, Br og I
    (S og F er taget af paletten: de bruges naesten ikke i gymnasiet),
    ringe, dobbelt- og tripelbindinger og flere molekyler paa én gang. Et
    molekyle kan flyttes med Shift eller Flyt.
@@ -27,11 +27,11 @@
    tavlen, giver den tilbage.
 
    Kemichaels skuffe: de klistermaerker, eleven har laast op i quizzerne
-   i sc6.2 (klistermaerker.js), saettes paa med et klik, flyttes ved at
+   i sc4.2 (klistermaerker.js), saettes paa med et klik, flyttes ved at
    traekke og goeres stoerre eller mindre i panelet.
 
    Tegningen huskes i browseren (localStorage), saa den er der igen,
-   naar siden aabnes. Indtil 25. sept. 2026 laa tegnebraettet i sc6.2 og
+   naar siden aabnes. Indtil 25. sept. 2026 laa tegnebraettet i sc4.2 og
    gemte under nk-sc6.2-tegnebraet; den gamle tegning hentes, hvis der
    ikke er en ny.
    ===================================================================== */
@@ -43,7 +43,7 @@
     var NOEGLE = "nk-tegnebraet";
     var GAMMEL = "nk-sc6.2-tegnebraet";
     var FOLD = "nk-tegnebraet-foldet";
-    var TOM_SKUFFE = 'Tom. Klar en quiz i <a href="../sc6.2_zigzagformler/index.html" target="_blank" rel="noopener">Zigzagformler</a>.';
+    var TOM_SKUFFE = 'Tom. Klar en quiz i <a href="../sc4.2_zigzagformler/index.html" target="_blank" rel="noopener">Zigzagformler</a>.';
 
     /* Hvorfor et molekyle ikke faar et navn (res.grund fra navngivning.js) */
     var GRUND = {

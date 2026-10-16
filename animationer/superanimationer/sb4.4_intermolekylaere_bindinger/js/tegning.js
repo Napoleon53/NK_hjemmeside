@@ -2,7 +2,7 @@
    tegning.js - det, fanerne tegner paa laerredet
 
    Rummet og bordet, temperaturkammeret med reagensglasset og ballonen,
-   termometeret (alt det fra sc6.1), luppen med molekylerne og
+   termometeret (alt det fra sc4.1), luppen med molekylerne og
    bindingerne mellem dem, og molekylerne som kuglemodeller paa
    kortene. Funktionerne tegner én ting et bestemt sted og husker intet
    selv; fanerne bestemmer, hvor tingene staar.
@@ -42,7 +42,7 @@
     T.HB_FARVE = "#d42a2a";
     T.LON_FARVE = "#5b6573";
 
-    /* ----- Rummet og bordet (som sc6.1) --------------------------------------- */
+    /* ----- Rummet og bordet (som sc4.1) --------------------------------------- */
     T.rum = function (ctx, W, H, gulvY) {
         var g = ctx.createLinearGradient(0, 0, 0, gulvY);
         g.addColorStop(0, "#262833");
@@ -69,7 +69,7 @@
         ctx.fillRect(x0, y + plade, x1 - x0, 4);
     };
 
-    /* ----- Reagensglasset (som sc6.1) ------------------------------------------
+    /* ----- Reagensglasset (som sc4.1) ------------------------------------------
        (x, y): midten af glassets bund. h: glassets hoejde i px. */
     T.glasMaal = function (x, y, h) {
         var M = MAAL.reagensglas, s = h / M.h;
@@ -151,7 +151,7 @@
         T.ballon(ctx, G.mund.x, G.mund.y, G.s, mk.ballon, tid, v.ballonFarve);
     };
 
-    /* ----- Ballonen (som sc6.1) --------------------------------------------------
+    /* ----- Ballonen (som sc4.1) --------------------------------------------------
        fyld: 0 er tom, 1 er fuld ved 20 °C (varmere damp fylder mere). */
     T.ballonMaal = function (mx, my, s, fyld) {
         var r = 28 * s * Math.cbrt(NK.klamp(fyld, 0, 1.6));
@@ -218,7 +218,7 @@
         ctx.restore();
     };
 
-    /* ----- Temperaturkammeret (som sc6.1) -----------------------------------------
+    /* ----- Temperaturkammeret (som sc4.1) -----------------------------------------
        xMidte, bundY: midten af kammerets bund. hoejde: kammerets hoejde i px. */
     T.kammerMaal = function (xMidte, bundY, hoejde) {
         var M = MAAL.kammer, s = hoejde / M.h;
@@ -316,7 +316,7 @@
         T.kammerFront(ctx, K, temp, v);
     };
 
-    /* ----- Termometeret (som sc6.1) ---------------------------------------------------
+    /* ----- Termometeret (som sc4.1) ---------------------------------------------------
        (x, bundY): midten af kuglens bund og hoejden h i px. omr: { min, max }. */
     T.termoMaal = function (x, bundY, h, omr) {
         var M = MAAL.termometer, s = h / M.h;

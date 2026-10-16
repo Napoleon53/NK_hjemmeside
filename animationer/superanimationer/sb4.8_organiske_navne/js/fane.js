@@ -1,7 +1,7 @@
 /* =====================================================================
    fane.js - det, de tre faner har til faelles
 
-   Moensteret er scenekortet fra sc7.5 og sc6.4: der er ingen laerer, og
+   Moensteret er scenekortet fra sc7.5 og sc4.4: der er ingen laerer, og
    der staar ingen tekst nederst i scenen. AL tekst staar paa ét kort
    oeverst midt i scenen (brugerens oensker 9. okt. 2026), og den gule
    hjaelpeknap sidder paa kortet. Whiteboardet begynder under kortet.

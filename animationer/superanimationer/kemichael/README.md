@@ -100,5 +100,5 @@ får stadig ingen præsentation (se `../README.md` under "Kemichael").
 | `tager` | tager koppen og går uden et ord |
 
 `sc7.1` (hydronen i kaffen) har sine egne kaffe-replikker i `js/data.js`.
-Den rolige Kemichael ved katederet (`sc4.5` og ni andre) er taget ud 9. okt.
+Den rolige Kemichael ved katederet (`sc5.5` og ni andre) er taget ud 9. okt.
 2026; se "Kemichael" i `../README.md`.

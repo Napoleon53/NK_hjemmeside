@@ -29,6 +29,11 @@
   .maerke { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--groen); }
   h1 { margin: 2px 0 2px; font-size: 26px; line-height: 1.2; }
   .top p.under { margin: 0; color: var(--daempet); }
+  /* Kort om, hvorfor kompendier på papir er en god idé (Niels 15. okt. 2026). */
+  .top p.hvorfor { margin: 12px 0 0; }
+  .grunde { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 18px; font-size: 14px; color: var(--daempet); }
+  .grunde li { border-left: 3px solid var(--kant); padding-left: 10px; }
+  .grunde b { color: var(--blaek); }
 
   .side { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; align-items: start; padding-top: 20px; padding-bottom: 40px; }
 
@@ -58,6 +63,7 @@
   .kapitel.valgt .kapitelhoved { background: var(--lys); }
   .kapitel:not(.valgt) .afsnitliste, .kapitel:not(.valgt) .kapitelhoved .knap-lille { display: none; }
   .afsnitliste .raekke { padding-left: 43px; }
+  .bogoverskrift { border-top: 1px solid var(--kant); padding: 9px 16px 8px; background: var(--bund); font-size: 13px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--daempet); }
 
   .indryk { margin-left: 27px; }
   .overskrifter { margin: 3px 0 0; color: var(--daempet); font-size: 13.5px; }
@@ -121,6 +127,7 @@
     .trin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .afsnitliste .raekke { padding-left: 16px; }
     .valgknap { flex-basis: 100%; }
+    .grunde { grid-template-columns: minmax(0, 1fr); }
     .opgaver > span { margin-left: 0; }
   }
 </style>
@@ -129,9 +136,15 @@
 
 <header class="top">
   <div>
-    <p class="maerke">Kemibogen · Kemi C</p>
+    <p class="maerke">Kemibogen · Kemi C og B</p>
     <h1>Byg dit kompendium</h1>
     <p class="under">Sæt kryds ved det, kompendiet skal indeholde, og lav en PDF til print.</p>
+    <p class="hvorfor">Med et kompendium på papir kan computerne blive i tasken, fordi noter, opgaver og øvelser står samlet med plads til at skrive.</p>
+    <ul class="grunde">
+      <li><b>Klar fra start.</b> Print kompendierne, før forløbet begynder, så alle elever har dem fra første modul.</li>
+      <li><b>Med i hver time.</b> Eleverne lærer at have kompendiet med, eller det ligger klar i kemilokalets skab.</li>
+      <li><b>Afleveres ved evalueringen.</b> Du kan bede eleverne aflevere det udfyldte kompendium, når forløbet evalueres.</li>
+    </ul>
   </div>
 </header>
 
@@ -259,8 +272,13 @@
   }
 
   function bygKapitler() {
-    $('kapitler').innerHTML = numre.map(function (nr) {
+    // Er der kapitler fra flere bøger, står hver bogs kapitler under en overskrift (Kemi C, Kemi B).
+    var boeger = numre.map(Kompendium.niveau).filter(function (b, i, alle) { return alle.indexOf(b) === i; });
+    $('kapitler').innerHTML = numre.map(function (nr, i) {
       var data = kapitler[nr], v = valg.kapitler[nr];
+      var bog = Kompendium.niveau(nr);
+      var bogoverskrift = boeger.length > 1 && (i === 0 || Kompendium.niveau(numre[i - 1]) !== bog) ?
+        '<div class="bogoverskrift">Kemi ' + bog + '</div>' : '';
       var afsnit = data.afsnit.map(function (a) {
         var va = v.afsnit[a.nr];
         var trin = ['ingen'].concat(Kompendium.NIVEAUER.filter(function (n) { return a.opgaver[n]; })).map(function (n) {
@@ -277,7 +295,7 @@
           '<span id="opgavenavn-' + a.nr + '">Opgaver</span>' +
           '<div class="trin" role="radiogroup" aria-labelledby="opgavenavn-' + a.nr + '">' + trin + '</div></div></div></div>';
       }).join('');
-      return '<div class="kapitel" data-kapitel="' + nr + '"><div class="kapitelhoved">' +
+      return bogoverskrift + '<div class="kapitel" data-kapitel="' + nr + '"><div class="kapitelhoved">' +
         kryds('kapitel-' + nr, 'Kapitel ' + data.kapitel + ': ' + data.titel, '', v.med) +
         '<button type="button" class="knap-lille" data-noter="' + nr + '"></button></div>' +
         '<div class="afsnitliste">' + afsnit + '</div></div>';

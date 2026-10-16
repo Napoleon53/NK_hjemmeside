@@ -14,7 +14,7 @@
    Basiskemi C (fagord, ionnavne, formler) og kompendierne i
    C:\NK_Undervisning\Kompendier. Molart rumfang, gaskonstanten og
    Avogadros tal foelger de tal, superanimationerne regner med
-   (sc4.6: R = 0,0831 L·bar/(mol·K), Vm = ca. 24 L/mol ved stuetemperatur
+   (sc5.6: R = 0,0831 L·bar/(mol·K), Vm = ca. 24 L/mol ved stuetemperatur
    og 1 bar).
 
    Bagsiderne er skrevet til vendespillet: hver forklaring begynder med,
@@ -152,44 +152,10 @@
             ].join("\n")
         },
         {
-            noegle: "beregninger",
-            emne: "C4-C5",
-            tekst: [
-                "Sæt: C4 og C5 Formler, størrelser og enheder",
-                "Sider: Størrelse eller formel | Betydning",
-                "",
-                "n | stofmængde, måles i mol",
-                "m | masse, måles i g",
-                "M | molarmasse, måles i g/mol",
-                "V | rumfang, måles i L",
-                "c | koncentration, måles i mol/L",
-                "T | temperatur, måles i K",
-                "p | tryk, måles i bar",
-                "n = m / M | stofmængden ud fra masse og molarmasse",
-                "m = n · M | massen ud fra stofmængde og molarmasse",
-                "M = m / n | molarmassen ud fra masse og stofmængde",
-                "c = n / V | koncentrationen ud fra stofmængde og rumfang",
-                "n = c · V | stofmængden ud fra koncentration og rumfang",
-                "V = n / c | rumfanget ud fra stofmængde og koncentration",
-                "n = V / Vₘ | stofmængden af en gas ud fra gassens rumfang",
-                "Vₘ | molart rumfang, ca. 24 L/mol ved stuetemperatur og 1 bar",
-                "p · V = n · R · T | idealgasligningen",
-                "R | gaskonstanten, 0,0831 L·bar/(mol·K)",
-                "0 °C i kelvin | 273,15 K",
-                "Avogadros konstant | 6,022 · 10²³ partikler pr. mol",
-                "molarmassen af H₂O | 18,02 g/mol",
-                "c(før) · V(før) = c(efter) · V(efter) | fortyndingsformlen",
-                "masseprocent | stoffets masse i procent af hele blandingens masse",
-                "formel koncentration | c(NaCl): stofmængden af det opløste salt pr. liter",
-                "aktuel koncentration | [Na⁺]: den koncentration, ionen har i opløsningen",
-                "betydende cifre | alle cifre fra det første, der ikke er 0: tre i 0,0250"
-            ].join("\n")
-        },
-        {
             noegle: "organisk",
-            emne: "C6",
+            emne: "C4",
             tekst: [
-                "Sæt: C6 Organisk kemi: navne og grupper",
+                "Sæt: C4 Organisk kemi: navne og grupper",
                 "Sider: Navnedel eller gruppe | Betydning",
                 "",
                 "meth- | 1 carbonatom",
@@ -223,6 +189,40 @@
                 "umættet | om en carbonkæde med mindst én dobbelt- eller tripelbinding",
                 "isomerer | stoffer med samme molekylformel, men forskellig opbygning",
                 "zigzagformel | formel, hvor hvert knæk og hver ende er et carbonatom"
+            ].join("\n")
+        },
+        {
+            noegle: "beregninger",
+            emne: "C5-C6",
+            tekst: [
+                "Sæt: C5 og C6 Formler, størrelser og enheder",
+                "Sider: Størrelse eller formel | Betydning",
+                "",
+                "n | stofmængde, måles i mol",
+                "m | masse, måles i g",
+                "M | molarmasse, måles i g/mol",
+                "V | rumfang, måles i L",
+                "c | koncentration, måles i mol/L",
+                "T | temperatur, måles i K",
+                "p | tryk, måles i bar",
+                "n = m / M | stofmængden ud fra masse og molarmasse",
+                "m = n · M | massen ud fra stofmængde og molarmasse",
+                "M = m / n | molarmassen ud fra masse og stofmængde",
+                "c = n / V | koncentrationen ud fra stofmængde og rumfang",
+                "n = c · V | stofmængden ud fra koncentration og rumfang",
+                "V = n / c | rumfanget ud fra stofmængde og koncentration",
+                "n = V / Vₘ | stofmængden af en gas ud fra gassens rumfang",
+                "Vₘ | molart rumfang, ca. 24 L/mol ved stuetemperatur og 1 bar",
+                "p · V = n · R · T | idealgasligningen",
+                "R | gaskonstanten, 0,0831 L·bar/(mol·K)",
+                "0 °C i kelvin | 273,15 K",
+                "Avogadros konstant | 6,022 · 10²³ partikler pr. mol",
+                "molarmassen af H₂O | 18,02 g/mol",
+                "c(før) · V(før) = c(efter) · V(efter) | fortyndingsformlen",
+                "masseprocent | stoffets masse i procent af hele blandingens masse",
+                "formel koncentration | c(NaCl): stofmængden af det opløste salt pr. liter",
+                "aktuel koncentration | [Na⁺]: den koncentration, ionen har i opløsningen",
+                "betydende cifre | alle cifre fra det første, der ikke er 0: tre i 0,0250"
             ].join("\n")
         },
         {

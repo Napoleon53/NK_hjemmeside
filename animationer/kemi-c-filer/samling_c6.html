@@ -291,7 +291,7 @@
     <div class="main-layout">
         <div class="sidebar" id="sidebarMenu">
             <div class="sidebar-header">
-                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Organisk C</span>
+                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Koncentration</span>
                 <div class="header-actions">
                     <button class="toggle-btn link-btn" onclick="kopierLink(this)" title="Kopiér link til denne animation">🔗</button>
                     <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
@@ -299,14 +299,9 @@
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="c6.1" data-beskrivelse="Varm alkaner op, og se hvorfor kogepunktet stiger med kædens længde og falder, når molekylet er forgrenet." onclick="visAnimation(this, '../superanimationer/sc6.1_kogepunkt/index.html')" title="Alkaners kogepunkt"><span class="btn-num">1</span><span class="btn-text">Alkaners kogepunkt</span></button>
-            <button class="tab-btn" data-emne="c6.2" data-beskrivelse="Øv zigzagformler, navne og isomerer, og afgør om et molekyle opløses bedst i vand eller heptan." onclick="visAnimation(this, '../superanimationer/sc6.2_zigzagformler/index.html')" title="Zigzagformler, navne, isomerer og opløselighed"><span class="btn-num">2</span><span class="btn-text">Zigzagformler</span></button>
-            <button class="tab-btn" data-emne="c6.3" data-beskrivelse="Tegn molekyler til rapporten og få navnet, også på alkoholer, syrer, estre, aminer og andre stofklasser." onclick="visAnimation(this, '../superanimationer/tegnebraet/index.html')" title="Tegnebræt til rapporter"><span class="btn-num">3</span><span class="btn-text">Tegnebræt</span></button>
-            <button class="tab-btn" data-emne="c6.addition" data-beskrivelse="Træk brom, hydrogen og vand hen til dobbeltbindingen i ethen, test fem væsker med bromvand, og sæt ethen sammen til plastik." onclick="visAnimation(this, '../superanimationer/sc6.4_addition_og_plastik/index.html')" title="Addition og plastik"><span class="btn-num">4</span><span class="btn-text">Addition og plastik</span></button>
-            <button class="tab-btn" data-emne="c6.4" data-beskrivelse="Byg fedtstoffer af glycerol og fedtsyrer til fem kunder, og se i køkkenet, hvorfor knæk i kæderne gør fedt flydende." onclick="visAnimation(this, '../superanimationer/sc6.6_fedtstoffer/index.html')" title="Byg et fedtstof"><span class="btn-num">5</span><span class="btn-text">Byg et fedtstof</span></button>
-            <button class="tab-btn" data-emne="c6.5" data-beskrivelse="Animation hvor du tester 4 forskellige fedtstoffer med bromvand for at finde det mindst umættede." onclick="visAnimation(this, 'c6.7_fedtstoffer_additionsreaktioner.html')" title="Forsøg: Umættet fedt?"><span class="btn-num">6</span><span class="btn-text">Umættet fedt?</span></button>
-            <button class="tab-btn" data-emne="c6.6" data-beskrivelse="Ryst bromvand med hexan, stil det ene glas i lys og det andet i mørke, og påvis HBr i vandfasen med pH-papir og AgNO₃." onclick="visAnimation(this, '../v2/superlab/sc6.8_substitution/index.html')" title="Forsøg: Substitution i benzin"><span class="btn-num">7</span><span class="btn-text">Substitution i benzin</span></button>
-            <button class="tab-btn" data-emne="c6.7" data-beskrivelse="Afvej og knus chips, træk fedtet ud med et opløsningsmiddel, filtrer, inddamp og beregn fedtindholdet." onclick="visAnimation(this, '../v2/superlab/sc6.9_fedt_i_chips/index.html')" title="Forsøg: Fedt i chips"><span class="btn-num">8</span><span class="btn-text">Fedt i chips</span></button>
+            <button class="tab-btn" data-emne="c6.1" data-beskrivelse="Se hvad stofmængdekoncentration er, skeln mellem c og n, lav opløsninger i en målekolbe, og fortynd dem." onclick="visAnimation(this, '../superanimationer/sc6.1_koncentration/index.html')" title="Koncentration"><span class="btn-num">1</span><span class="btn-text">Koncentration</span></button>
+            <button class="tab-btn" data-emne="c6.2" data-beskrivelse="Se forskellen på formel og aktuel koncentration, når et salt går i opløsning, og regn på ionerne og på blandinger." onclick="visAnimation(this, '../superanimationer/sc6.2_formel_og_aktuel/index.html')" title="Formel og aktuel koncentration"><span class="btn-num">2</span><span class="btn-text">Formel og aktuel</span></button>
+            <button class="tab-btn" data-emne="c6.3" data-beskrivelse="Titrér havvand med sølvnitrat, aflæs buretten, og beregn masseprocenten af NaCl. Se også, hvilke fejlkilder der ændrer resultatet." onclick="visAnimation(this, '../superanimationer/sc6.3_mohrtitrering/index.html')" title="Forsøg: Mohrtitrering"><span class="btn-num">3</span><span class="btn-text">Forsøg: Mohrtitrering</span></button>
 
         </div>
 
@@ -320,6 +315,12 @@
     </div>
 
     <script>
+        // Nogle animationer sætter selv fokus (autofocus) i et inputfelt, i samme øjeblik
+        // de loader. Det skal ikke tælle som en bevidst interaktion og kollapse menuen med
+        // det samme — kun et rigtigt klik/tastetryk inde i animationen skal gøre det. Derfor
+        // ignoreres blur kortvarigt lige efter et menuskift.
+        let ignorerBlurIndtil = Date.now() + 1200;
+
         function visAnimation(knap, filsti) {
             var iframe = document.getElementById('visningsVindue');
             document.getElementById('startside').style.display = 'none';
@@ -327,6 +328,7 @@
             iframe.src = filsti;
             // Ingen automatisk fuld skaerm: menuen bliver staaende, indtil man selv
             // trykker paa knappen i panelets hoved.
+            ignorerBlurIndtil = Date.now() + 1200;
 
             var alleKnapper = document.querySelectorAll('.tab-btn');
             alleKnapper.forEach(btn => btn.classList.remove('active'));
@@ -413,15 +415,13 @@
 
             if (emneFil) {
                 const knapper = document.querySelectorAll('.tab-btn');
-                const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === emneFil);
+                // Gamle numre efter omnummereringen 26. sept. 2026: Mohrtitreringen hed c6.5.
+                const gamleNumre = { 'c6.5': 'c6.3' };
+                const kode = gamleNumre[emneFil] || emneFil;
+                const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === kode);
                 if (aliasKnap) {
                     aliasKnap.click();
                 } else {
-                    // Gamle numre efter omnummereringen 26. sept. 2026: c6.8 og c6.9
-                    // findes via mappenavnet, som stadig har det gamle nummer.
-                    // 9. okt. 2026: Addition og plastik kom ind som nr. 4 med sin egen
-                    // kode (c6.addition). De fire knapper efter den rykkede et nummer,
-                    // men beholdt deres data-emne, saa delte links stadig aabner det samme.
                     knapper.forEach(knap => {
                         if (knap.getAttribute('onclick').includes(emneFil) && !document.querySelector('.tab-btn.active')) {
                             knap.click();
@@ -440,6 +440,14 @@
 
         window.addEventListener('blur', function() {
             if (document.activeElement === document.getElementById('visningsVindue')) {
+                if (Date.now() < ignorerBlurIndtil) {
+                    // Fokus blev stjålet af animationens egen autofocus, ikke et rigtigt
+                    // klik. Tag fokus tilbage med det samme, ellers fyrer 'blur' aldrig
+                    // igen resten af sessionen (den fyrer kun ved en fokus-overgang), og
+                    // et senere rigtigt klik ville aldrig kunne kollapse sidepanelet.
+                    window.focus();
+                    return;
+                }
                 document.getElementById('sidebarMenu').classList.add('collapsed');
                 if (window.parent !== window) {
                     window.parent.postMessage('animationFocus', '*');

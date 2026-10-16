@@ -116,7 +116,7 @@ gamle måling står som et blegt kryds.
 
 ## Fane 3: Beregningen
 
-Hvert trin regnes i tre skridt på tavlen (mønstret fra sc5.1 og sc4.3):
+Hvert trin regnes i tre skridt på tavlen (mønstret fra sc6.1 og sc5.3):
 formlen (vælg formens form, □ · □, □ · □ · □, □ / □ eller □ / (□ · □), og skriv
 eller klik et bogstav i hvert felt), tallene ind (klik på tallene under
 tavlen eller skriv dem) og resultatet med enhed. ε kan skrives som e, eps

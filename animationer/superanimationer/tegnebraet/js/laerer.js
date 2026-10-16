@@ -1,11 +1,11 @@
 /* =====================================================================
-   laerer.js - Kemichael ved tegnebraettet (samme kode som i sc6.2)
+   laerer.js - Kemichael ved tegnebraettet (samme kode som i sc4.2)
 
    Selve figuren (gang, arm, ansigt, tale, kaffen og klik paa ham) staar
    i ../../v2/kemichael/kemichael.js, som er faelles og ikke rettes her.
    Den er bygget til et fast tegnebord paa 1000 x 600 enheder. Denne
    side har intet fast tegnebord, saa laereren tegnes skaleret efter
-   laerredets hoejde, som i sc4.1 og sc4.2: skala 0,92 og gulvet ved
+   laerredets hoejde, som i sc5.1 og sc5.2: skala 0,92 og gulvet ved
    laerredets bund (NK.Scene.GULV), saa benene ikke bliver lange.
 
    Fanen (NK.Fane i fane.js) har this.tid, this.L og this.lay.

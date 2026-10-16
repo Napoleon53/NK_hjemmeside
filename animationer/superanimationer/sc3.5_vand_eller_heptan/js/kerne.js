@@ -1,5 +1,5 @@
 /* =====================================================================
-   kerne.js - faelles hjaelpefunktioner for sc3.5 (samme som sc4.2)
+   kerne.js - faelles hjaelpefunktioner for sc3.5 (samme som sc5.2)
 
    Alt bor i det globale objekt NK. Ingen moduler og ingen fetch:
    mappen skal ogsaa virke, naar index.html aabnes direkte fra

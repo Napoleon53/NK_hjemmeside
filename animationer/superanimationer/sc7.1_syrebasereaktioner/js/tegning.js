@@ -42,7 +42,7 @@
     };
     T.grundstofFarve = function (s) { return GRUNDSTOF[s] || "#c9d1d9"; };
 
-    /* ----- Rummet og bordet (som sc6.6) --------------------------------------- */
+    /* ----- Rummet og bordet (som sc4.6) --------------------------------------- */
     T.rum = function (ctx, W, H, gulvY) {
         var g = ctx.createLinearGradient(0, 0, 0, gulvY);
         g.addColorStop(0, "#262833");
@@ -470,7 +470,7 @@
         ctx.restore();
     };
 
-    /* ----- Smaating (som sc6.6) ----------------------------------------------------------- */
+    /* ----- Smaating (som sc4.6) ----------------------------------------------------------- */
     T.buePil = function (ctx, x0, y0, x1, y1, tid, kx, ky) {
         var mx = kx !== undefined ? kx : (x0 + x1) / 2;
         var my = ky !== undefined ? ky : Math.min(y0, y1) - Math.abs(x1 - x0) * 0.25 - 20;

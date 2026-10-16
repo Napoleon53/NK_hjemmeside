@@ -19,7 +19,7 @@
     function font(vaegt, px) { return vaegt + " " + px + "px " + SKRIFT; }
     T.font = font;
 
-    /* ----- Rummet og bordet (som sc4.2 og sc4.4) ------------------------------- */
+    /* ----- Rummet og bordet (som sc5.2 og sc5.4) ------------------------------- */
     T.rum = function (ctx, W, H, gulvY) {
         var g = ctx.createLinearGradient(0, 0, 0, gulvY);
         g.addColorStop(0, "#262833");
@@ -550,7 +550,7 @@
         ctx.restore();
     };
 
-    /* Et lyst skilt med to tegnestifter (som sc4.4) */
+    /* Et lyst skilt med to tegnestifter (som sc5.4) */
     T.skilt = function (ctx, x, y, b, h, v) {
         v = v || {};
         ctx.save();
@@ -575,7 +575,7 @@
         ctx.restore();
     };
 
-    /* Buet, stiplet pil, der viser vejen (som sc4.4) */
+    /* Buet, stiplet pil, der viser vejen (som sc5.4) */
     T.buePil = function (ctx, x0, y0, x1, y1, tid, kx, ky) {
         var mx = kx !== undefined ? kx : (x0 + x1) / 2;
         var my = ky !== undefined ? ky : Math.min(y0, y1) - Math.abs(x1 - x0) * 0.25 - 20;
@@ -601,7 +601,7 @@
         ctx.restore();
     };
 
-    /* En lille maerkat med tekst (som sc4.4) */
+    /* En lille maerkat med tekst (som sc5.4) */
     T.maerkat = function (ctx, x, y, tekst, v) {
         v = v || {};
         ctx.save();

@@ -6,7 +6,7 @@
    skruer paa, og kontakten, der slaar hydrogenbindingerne fra.
 
    Til venstre staar temperaturkammeret med et reagensglas med ethanol
-   og en ballon paa (som sc6.1). Termometeret til hoejre er knappen.
+   og en ballon paa (som sc4.1). Termometeret til hoejre er knappen.
    Fire maal: kog ethanol, hvad brydes, find det H, der kan danne
    hydrogenbindinger, og et tankeeksperiment uden hydrogenbindinger,
    hvor eleven gaetter foerst. Proeven fortsaetter fra maal til maal.

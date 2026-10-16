@@ -25,12 +25,12 @@
     D.SIKRE = [4, 9];
 
     /* Svaerhedsgraden foelger kapitlerne: de foerste fem spoergsmaal kommer
-       fra kapitel 1 til 3, de naeste fem fra 4, 5 og 7 og de sidste fem fra
-       5, 7 og 8. */
+       fra kapitel 1 til 3, de naeste fem fra 5, 6 og 7 og de sidste fem fra
+       6, 7 og 8. */
     D.TRIN = [
         { til: 4, kap: [1, 2, 3] },
-        { til: 9, kap: [4, 5, 7] },
-        { til: 14, kap: [5, 7, 8] }
+        { til: 9, kap: [5, 6, 7] },
+        { til: 14, kap: [6, 7, 8] }
     ];
 
     /* Titlen paa sejrsskaermen. Escaperoommets segl 1 spoerger efter den
@@ -81,8 +81,8 @@
             1: "Atomer og grundstoffer",
             2: "Ioner og ionforbindelser",
             3: "Molekyler og bindinger",
-            4: "Mængdeberegning",
-            5: "Koncentration og titrering",
+            5: "Mængdeberegning",
+            6: "Koncentration og titrering",
             7: "Syrer og baser",
             8: "Redox"
         },
@@ -90,8 +90,8 @@
             1: "Atoms and elements",
             2: "Ions and ionic compounds",
             3: "Molecules and bonds",
-            4: "Mole calculations",
-            5: "Concentration and titration",
+            5: "Mole calculations",
+            6: "Concentration and titration",
             7: "Acids and bases",
             8: "Redox"
         }
@@ -169,48 +169,48 @@
         sp("c3_10", 3, "En skæv fordeling af elektroner i en binding, som skyldes forskel i elektronegativitet", "An uneven distribution of electrons in a bond, caused by a difference in electronegativity",
             ["Polær", "Upolær", "Hydrofob", "Neutral"], ["Polar", "Non-polar", "Hydrophobic", "Neutral"]),
 
-        /* --- Kapitel 4: Mængdeberegning --- */
-        sp("c4_1", 4, "Størrelsen, der angiver, hvor meget noget fylder, i kemi typisk angivet i liter", "The quantity indicating how much space something takes up, in chemistry typically given in liters",
+        /* --- Kapitel 5: Mængdeberegning --- */
+        sp("c5_1", 5, "Størrelsen, der angiver, hvor meget noget fylder, i kemi typisk angivet i liter", "The quantity indicating how much space something takes up, in chemistry typically given in liters",
             ["Volumen", "Densitet", "Stofmængde", "Molarmasse"], ["Volume", "Density", "Amount of substance", "Molar mass"]),
-        sp("c4_2", 4, "Størrelsen, der angiver forholdet mellem masse og volumen, angivet i g/mL", "The quantity indicating the ratio between mass and volume, given in g/mL",
+        sp("c5_2", 5, "Størrelsen, der angiver forholdet mellem masse og volumen, angivet i g/mL", "The quantity indicating the ratio between mass and volume, given in g/mL",
             ["Densitet", "Volumen", "Molarmasse", "Stofmængde"], ["Density", "Volume", "Molar mass", "Amount of substance"]),
-        sp("c4_3", 4, "Metaller med en densitet på over 7 g/mL", "Metals with a density over 7 g/mL",
+        sp("c5_3", 5, "Metaller med en densitet på over 7 g/mL", "Metals with a density over 7 g/mL",
             ["Tungmetal", "Ædelmetal", "Overgangsmetal", "Alkalimetal"], ["Heavy metal", "Noble metal", "Transition metal", "Alkali metal"]),
-        sp("c4_4", 4, "Forholdet mellem to koefficienter i et reaktionsskema", "The ratio between two coefficients in a reaction scheme",
+        sp("c5_4", 5, "Forholdet mellem to koefficienter i et reaktionsskema", "The ratio between two coefficients in a reaction scheme",
             ["Antalsforhold", "Stofmængde", "Molarmasse", "Ækvivalent"], ["Ratio of amounts", "Amount of substance", "Molar mass", "Equivalent"]),
-        sp("c4_5", 4, "Størrelsen, der angiver antallet af stofenheder, angivet i enheden mol", "The quantity indicating the number of substance units, given in the unit mol",
+        sp("c5_5", 5, "Størrelsen, der angiver antallet af stofenheder, angivet i enheden mol", "The quantity indicating the number of substance units, given in the unit mol",
             ["Stofmængde", "Molarmasse", "Volumen", "Densitet"], ["Amount of substance", "Molar mass", "Volume", "Density"]),
-        sp("c4_6", 4, "Når forholdet mellem stofmængderne svarer til forholdet mellem koefficienterne i reaktionsskemaet", "When the ratio between the amounts of substance matches the ratio between the coefficients in the reaction scheme",
+        sp("c5_6", 5, "Når forholdet mellem stofmængderne svarer til forholdet mellem koefficienterne i reaktionsskemaet", "When the ratio between the amounts of substance matches the ratio between the coefficients in the reaction scheme",
             ["Ækvivalent", "Antalsforhold", "Stofmængde", "Molarmasse"], ["Equivalent", "Ratio of amounts", "Amount of substance", "Molar mass"]),
-        sp("c4_7", 4, "Størrelsen, der angiver massen af 1 mol af et stof, med enheden g/mol", "The quantity indicating the mass of 1 mol of a substance, with the unit g/mol",
+        sp("c5_7", 5, "Størrelsen, der angiver massen af 1 mol af et stof, med enheden g/mol", "The quantity indicating the mass of 1 mol of a substance, with the unit g/mol",
             ["Molarmasse", "Densitet", "Stofmængde", "Antalsforhold"], ["Molar mass", "Density", "Amount of substance", "Ratio of amounts"]),
-        sp("c4_8", 4, "Sammenhængen mellem tryk, volumen, stofmængde og temperatur", "The relationship between pressure, volume, amount of substance and temperature",
+        sp("c5_8", 5, "Sammenhængen mellem tryk, volumen, stofmængde og temperatur", "The relationship between pressure, volume, amount of substance and temperature",
             ["Idealgasligningen", "Gaskonstanten", "Boyles lov", "Avogadros lov"], ["Ideal gas law", "Gas constant", "Boyle's law", "Avogadro's law"]),
-        sp("c4_9", 4, "Temperaturen 0 K (−273,15 °C), den laveste temperatur, der findes", "The temperature 0 K (−273.15 °C), the lowest temperature that exists",
+        sp("c5_9", 5, "Temperaturen 0 K (−273,15 °C), den laveste temperatur, der findes", "The temperature 0 K (−273.15 °C), the lowest temperature that exists",
             ["Det absolutte nulpunkt", "Frysepunktet", "Kogepunktet", "Stuetemperatur"], ["Absolute zero", "Freezing point", "Boiling point", "Room temperature"]),
-        sp("c4_10", 4, "Symbolet R, som indgår i idealgasligningen", "The symbol R, which appears in the ideal gas law",
+        sp("c5_10", 5, "Symbolet R, som indgår i idealgasligningen", "The symbol R, which appears in the ideal gas law",
             ["Gaskonstanten", "Avogadros konstant", "Molarmassen", "Antalsforholdet"], ["Gas constant", "Avogadro's constant", "Molar mass", "Ratio of amounts"]),
 
-        /* --- Kapitel 5: Koncentration og titrering --- */
-        sp("c5_1", 5, "Størrelsen, der angiver stofmængde pr. volumenenhed af en opløsning", "The quantity indicating amount of substance per unit volume of a solution",
+        /* --- Kapitel 6: Koncentration og titrering --- */
+        sp("c6_1", 6, "Størrelsen, der angiver stofmængde pr. volumenenhed af en opløsning", "The quantity indicating amount of substance per unit volume of a solution",
             ["Stofmængdekoncentration", "Densitet", "Molarmasse", "Opløselighed"], ["Molar concentration", "Density", "Molar mass", "Solubility"]),
-        sp("c5_2", 5, "Glasudstyret, man bruger til at fremstille og fortynde opløsninger med stor nøjagtighed", "The glassware used to prepare and dilute solutions with high accuracy",
+        sp("c6_2", 6, "Glasudstyret, man bruger til at fremstille og fortynde opløsninger med stor nøjagtighed", "The glassware used to prepare and dilute solutions with high accuracy",
             ["Målekolbe", "Pipette", "Burette", "Bægerglas"], ["Volumetric flask", "Pipette", "Burette", "Beaker"]),
-        sp("c5_3", 5, "Glasudstyret, man bruger til at afmåle og overføre en bestemt mængde opløsning", "The glassware used to measure and transfer a specific amount of solution",
+        sp("c6_3", 6, "Glasudstyret, man bruger til at afmåle og overføre en bestemt mængde opløsning", "The glassware used to measure and transfer a specific amount of solution",
             ["Pipette", "Målekolbe", "Burette", "Bægerglas"], ["Pipette", "Volumetric flask", "Burette", "Beaker"]),
-        sp("c5_4", 5, "Når man tilsætter vand til en opløsning, så koncentrationen bliver lavere", "When water is added to a solution so the concentration becomes lower",
+        sp("c6_4", 6, "Når man tilsætter vand til en opløsning, så koncentrationen bliver lavere", "When water is added to a solution so the concentration becomes lower",
             ["Fortynding", "Titrering", "Mætning", "Koncentrering"], ["Dilution", "Titration", "Saturation", "Concentrating"]),
-        sp("c5_5", 5, "Når der ikke kan opløses mere stof i en opløsning, selvom man tilsætter mere af stoffet", "When no more substance can dissolve in a solution, even if more of the substance is added",
+        sp("c6_5", 6, "Når der ikke kan opløses mere stof i en opløsning, selvom man tilsætter mere af stoffet", "When no more substance can dissolve in a solution, even if more of the substance is added",
             ["Mættet", "Umættet", "Fortyndet", "Koncentreret"], ["Saturated", "Unsaturated", "Diluted", "Concentrated"]),
-        sp("c5_6", 5, "Den type koncentration, der tager højde for kemiske reaktioner og fortæller, hvad opløsningen faktisk indeholder", "The type of concentration that accounts for chemical reactions and tells what the solution actually contains",
+        sp("c6_6", 6, "Den type koncentration, der tager højde for kemiske reaktioner og fortæller, hvad opløsningen faktisk indeholder", "The type of concentration that accounts for chemical reactions and tells what the solution actually contains",
             ["Aktuel koncentration", "Formel koncentration", "Densitet", "Ækvivalenspunkt"], ["Actual concentration", "Formal concentration", "Density", "Equivalence point"]),
-        sp("c5_7", 5, "Analysemetoden, hvor man bestemmer en ukendt koncentration ved at tildryppe en opløsning med kendt koncentration", "The analysis method where an unknown concentration is determined by adding drops of a solution with known concentration",
+        sp("c6_7", 6, "Analysemetoden, hvor man bestemmer en ukendt koncentration ved at tildryppe en opløsning med kendt koncentration", "The analysis method where an unknown concentration is determined by adding drops of a solution with known concentration",
             ["Titrering", "Fortynding", "Filtrering", "Destillation"], ["Titration", "Dilution", "Filtration", "Distillation"]),
-        sp("c5_8", 5, "Glasudstyret, man typisk bruger til selve tildrypningen under en titrering", "The glassware typically used for the dropwise addition during a titration",
+        sp("c6_8", 6, "Glasudstyret, man typisk bruger til selve tildrypningen under en titrering", "The glassware typically used for the dropwise addition during a titration",
             ["Burette", "Pipette", "Målekolbe", "Bægerglas"], ["Burette", "Pipette", "Volumetric flask", "Beaker"]),
-        sp("c5_9", 5, "Et kemisk stof, der fx skifter farve for at vise, hvornår der er tilsat ækvivalente mængder", "A chemical substance that e.g. changes color to show when equivalent amounts have been added",
+        sp("c6_9", 6, "Et kemisk stof, der fx skifter farve for at vise, hvornår der er tilsat ækvivalente mængder", "A chemical substance that e.g. changes color to show when equivalent amounts have been added",
             ["Indikator", "Titrant", "Katalysator", "Reagens"], ["Indicator", "Titrant", "Catalyst", "Reagent"]),
-        sp("c5_10", 5, "Det punkt i en titrering, hvor man netop har tilsat ækvivalente mængder", "The point in a titration where exactly equivalent amounts have just been added",
+        sp("c6_10", 6, "Det punkt i en titrering, hvor man netop har tilsat ækvivalente mængder", "The point in a titration where exactly equivalent amounts have just been added",
             ["Ækvivalenspunkt", "Omslagspunkt", "Startpunkt", "Slutpunkt"], ["Equivalence point", "Endpoint", "Starting point", "Final point"]),
 
         /* --- Kapitel 7: Syrer og baser --- */

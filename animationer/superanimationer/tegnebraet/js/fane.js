@@ -2,7 +2,7 @@
    fane.js - rammen om tegnebraettet: laerredet med tavlen, musen, en
    besked oeverst paa scenen (toast), linjen under scenen og Kemichael
 
-   Det samme som NK.Fane i sc6.2 (js/opgavefane.js), bare uden quizzens
+   Det samme som NK.Fane i sc4.2 (js/opgavefane.js), bare uden quizzens
    konfetti, prikker og klistermaerke-vindue. NK.Fane.bland(P, "tb")
    laegger metoderne paa fanens prototype; "tb" er forstavelsen paa
    elementerne i index.html (tb-laerred, tb-toast, tb-status ...).

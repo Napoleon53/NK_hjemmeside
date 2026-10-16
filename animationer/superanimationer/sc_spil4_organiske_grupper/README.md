@@ -31,10 +31,10 @@ skifte på siden, så C-menuen åbner C og B-menuen B.
    stofklasse kommer med et eksempel. Panelet viser det sidste molekyle med navn
    og stofklasserne, man har mødt. Kemichael, reglerne og stofklasserne bag knapper,
    rundvisningen og lyd.
-3. **Naboerne:** `sc6.2_zigzagformler` ejer at læse og navngive zigzagformler og
+3. **Naboerne:** `sc4.2_zigzagformler` ejer at læse og navngive zigzagformler og
    `tegnebraet` at tegne dem. Her er der kun genkendelse af stofklassen; navnet
    vises først, når molekylet er sorteret, fordi endelsen (-ol, -al, -on) ellers
-   afslører svaret. Opløselighed hører til sc6.2 fane 4 og sc3.5.
+   afslører svaret. Opløselighed hører til sc4.2 fane 4 og sc3.5.
 4. **Loftet:** én side, ingen faner. Fem molekyler pr. stofklasse (C 35, B 40),
    højst fem spande ad gangen, ti niveauer som i de gamle.
 5. **Layoutet:** scene plus panel. Scenen er de faldende molekyler og spandene,

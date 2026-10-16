@@ -73,15 +73,15 @@ Id, kapitel, beskrivelsen på dansk og engelsk og de fire svar på hvert sprog.
 Skærmen viser selv "Hvilket fagord passer?" over beskrivelsen.
 
 Sværhedsgraden følger kapitlerne (`D.TRIN`): spørgsmål 1 til 5 kommer fra
-kapitel 1 til 3, spørgsmål 6 til 10 fra kapitel 4, 5 og 7 og spørgsmål 11 til 15
-fra kapitel 5, 7 og 8. Der er ingen spørgsmål fra kapitel 6; fagordsquizzen
+kapitel 1 til 3, spørgsmål 6 til 10 fra kapitel 5, 6 og 7 og spørgsmål 11 til 15
+fra kapitel 6, 7 og 8. Der er ingen spørgsmål fra kapitel 4 (organisk kemi); fagordsquizzen
 havde ingen.
 
 Rettet i forhold til den gamle:
 
 * Tungtopløselig er under 1 g i 100 mL vand, som i `sc2.1` og `sc2.4`. Den gamle
   sagde 2 g.
-* "Idealgasloven" hedder Idealgasligningen som i `sc4.6`, "Prikformel" hedder
+* "Idealgasloven" hedder Idealgasligningen som i `sc5.6`, "Prikformel" hedder
   Elektronprikformel som i `sc3.1`, og H₂ hedder hydrogen (før brint).
 * Forkerte svar: Formel koncentration i stedet for Stofmængdekoncentration ved
   Aktuel koncentration (den fejl, elever laver), Svovl, Kobber(II)sulfat,

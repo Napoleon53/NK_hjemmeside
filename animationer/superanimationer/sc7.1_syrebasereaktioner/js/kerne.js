@@ -1,6 +1,6 @@
 /* =====================================================================
    kerne.js - faelles hjaelpefunktioner for sc7.1 (samme fil som i
-   sc6.6, sc6.1 og sc4.2; potensform og betydende cifre bruges ikke her)
+   sc4.6, sc4.1 og sc5.2; potensform og betydende cifre bruges ikke her)
 
    Alt bor i det globale objekt NK. Ingen moduler og ingen fetch:
    mappen skal ogsaa virke, naar index.html aabnes direkte fra

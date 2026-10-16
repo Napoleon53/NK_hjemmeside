@@ -125,7 +125,7 @@ function koerTest(W) {
     var cooh = M.grupper(M.laes(D.stof("citronsyre"))).filter(function (x) { return x.slags === "COOH"; });
     paastand("citronsyre: tre COOH-grupper med C'et i gruppen", cooh.length === 3 && cooh.every(function (x) { return x.atomer.length === 4; }));
 
-    /* Reglen fra 6.5 (sc6.2): C-atomer pr. polær gruppe under 4 giver vand, over 4 heptan */
+    /* Reglen fra 6.5 (sc4.2): C-atomer pr. polær gruppe under 4 giver vand, over 4 heptan */
     var regel = ider.filter(function (id) {
         var c = TAL[id][0], n = TAL[id][1];
         var efterRegel = n === 0 ? "heptan" : (c < 4 * n ? "vand" : (c > 4 * n ? "heptan" : "graense"));

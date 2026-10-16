@@ -27,7 +27,7 @@
      tegnes med luft mellem atomerne; tusind tilfældige molekyler med
      funktionelle grupper, hvis navn skal give det samme molekyle tilbage;
      panelet, billedet til rapporten og Kemichaels skuffe; at linket
-     #klister=kaffekop og en gammel tegning fra sc6.2 virker; carboxylat-
+     #klister=kaffekop og en gammel tegning fra sc4.2 virker; carboxylat-
      ionerne og de små ioner; grupperne med ét klik, ladningen, Pæn
      tegning, Spejlvend, Kopiér og Indsæt, og at en gemt SVG kan åbnes
      igen; sproget og layoutet fra 520 × 380 til 1500 × 900.
@@ -58,7 +58,7 @@ function koer() {
     try { NOEGLER.forEach(function (n) { gemt[n] = localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
     try { koerTest(W); }
     catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
-    /* Til sidst: en ny side med #klister=kaffekop og en gammel tegning fra sc6.2 */
+    /* Til sidst: en ny side med #klister=kaffekop og en gammel tegning fra sc4.2 */
     try { anden(); }
     catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); slut(); }
 }
@@ -237,7 +237,7 @@ function koerTest(W) {
     })());
     paastand("grupper uden for gymnasiet får intet navn: syrechlorid, anhydrid, kulsyre", ["CC(=O)Cl", "CC(=O)OC(C)=O", "OC(=O)O"].every(function (s) { return NK.Navn.analyser(smiles(NK, s)).grund === "gruppe"; }));
 
-    overskrift("4. Molekylformel og molarmasse (H 1,01 som i sc4.1)");
+    overskrift("4. Molekylformel og molarmasse (H 1,01 som i sc5.1)");
     var fm = [["CCO", "C₂H₆O", "46,08"], ["CC(=O)O", "C₂H₄O₂", "60,06"], ["CCCCCC", "C₆H₁₄", "86,20"], ["CBr", "CH₃Br", "94,94"],
         ["CN", "CH₅N", "31,07"], ["C1=CC=CC=C1", "C₆H₆", "78,12"], ["ClC(Cl)Cl", "CHCl₃", "119,37"], ["CC(=O)Oc1ccccc1C(=O)O", "C₉H₈O₄", "180,17"]];
     var fmFejl = fm.filter(function (x) { var m = smiles(NK, x[0]); return m.formel() !== x[1] || NK.komma(m.molarmasse()) !== x[2]; });
@@ -817,7 +817,7 @@ function koerTest(W) {
     ramme.style.height = "820px";
 }
 
-/* ----- En ny side: #klister=kaffekop og en gammel tegning fra sc6.2 -------------- */
+/* ----- En ny side: #klister=kaffekop og en gammel tegning fra sc4.2 -------------- */
 function anden() {
     localStorage.removeItem("nk-tegnebraet");
     localStorage.removeItem("nk-skuffe");
@@ -829,11 +829,11 @@ function anden() {
     f2.addEventListener("load", function () {
         setTimeout(function () {
             try {
-                overskrift("16. Linket fra sc6.2 og en gammel tegning");
+                overskrift("16. Linket fra sc4.2 og en gammel tegning");
                 var W2 = f2.contentWindow, NK2 = W2.NK, T2 = NK2.sims["fane-tegn"];
                 paastand("#klister=kaffekop: kaffekoppen er klar til at blive sat på tavlen", T2.braet.vaerktoej === "klister:kaffekop", T2.braet.vaerktoej);
-                paastand("klistermærker fra den gamle nøgle i sc6.2 er med", NK2.Skuffe.aaben("kaffekop"));
-                paastand("en tegning fra tegnebrættet i sc6.2 er der stadig", T2.molekyler().length === 1 && T2.molekyler()[0].res.navn === "ethanol");
+                paastand("klistermærker fra den gamle nøgle i sc4.2 er med", NK2.Skuffe.aaben("kaffekop"));
+                paastand("en tegning fra tegnebrættet i sc4.2 er der stadig", T2.molekyler().length === 1 && T2.molekyler()[0].res.navn === "ethanol");
             } catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
             slut();
         }, 1500);

@@ -28,7 +28,7 @@ rigtige virtuelle laboratorium bygges for sig.
 3. **Naboerne:** `c7.1` ejer syre-base-reaktionerne, `c7.2` pH-skalaen, `c7.3`
    pH-beregningerne med log, og `sb3.2_titreringssimulator` (B-niveau) ejer
    titrerkurverne i dybden (halvtitrerpunkt, pKs, indikatorvalg). Her er kurven
-   et billede af springet ved omslaget og analyseres ikke. `c4.x` ejer
+   et billede af springet ved omslaget og analyseres ikke. `c5.x` ejer
    stofmængde og molarmasse; de bruges her uden at blive forklaret igen.
 4. **Loftet:** 3 faner. Fane 1: 1 burette, 1 kolbe, 1 lup med 8 figurer
    (1 figur = 1/8 af syren), 1 kurve. Fane 2: 4 regnetrin og 1 tavle. Fane 3:

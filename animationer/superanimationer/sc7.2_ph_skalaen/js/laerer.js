@@ -5,7 +5,7 @@
    i ../../v2/kemichael/kemichael.js, som er faelles og ikke rettes her.
    Den er bygget til et fast tegnebord paa 1000 x 600 enheder. Denne
    animation har intet fast tegnebord, saa laereren tegnes skaleret efter
-   laerredets hoejde (laererLaerredSkala), som i sc4.1, sc4.2 og sc4.4.
+   laerredets hoejde (laererLaerredSkala), som i sc5.1, sc5.2 og sc5.4.
 
    Benene: kitlen fortsaetter ned til scenens gulv (NK.Scene.GULV). Her
    saettes gulvet til laerredets bund, hver gang han tegnes, og skalaen
@@ -86,7 +86,7 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
-    /* ----- Praesentationen (som sc4.4) ----------------------------------------- */
+    /* ----- Praesentationen (som sc5.4) ----------------------------------------- */
     function introTrin(sim, linjer, standX, peg) {
         var trin = [
             { kald: function () { sim.introKlikTal = 0; } },

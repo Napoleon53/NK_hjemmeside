@@ -98,9 +98,9 @@ Sværhedsgraden er fælles for fane 2 og 3:
 
 ```
 index.html            tre faner, panelerne, teorien og rundvisningen
-css/stil.css          alt udseende (som sc6.6 plus tal-knapper, parlisten og
+css/stil.css          alt udseende (som sc4.6 plus tal-knapper, parlisten og
                       sværhedsgraden). NB: decimaltal med PUNKTUM i CSS
-js/kerne.js           NK-navnerum, formler, lærred, localStorage (som sc6.6)
+js/kerne.js           NK-navnerum, formler, lærred, localStorage (som sc4.6)
 js/data.js            familierne, pKs, sværhedsgraderne, strukturerne, de ti
                       reaktioner og Kemichaels replikker
 js/model.js           NK.Syrebase (roller, træning, forkerte svar, mærkater)

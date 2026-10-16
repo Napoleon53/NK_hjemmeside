@@ -3,7 +3,7 @@
 
    Viser rundt paa den fane, man staar paa: ét element ad gangen med en
    kort tekst. Fane 1 slutter med at pege paa de andre faner. Samme kode
-   som i sc1.1, sc1.2, sc4.1, sc4.2, sc4.4 og sc7.2; kun TURE er ny.
+   som i sc1.1, sc1.2, sc5.1, sc5.2, sc5.4 og sc7.2; kun TURE er ny.
 
    Hvert trin er en CSS-selector plus en titel og en kort tekst. Dele af
    laerredet har et usynligt felt oven paa sig, som fanen selv flytter paa

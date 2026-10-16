@@ -16,9 +16,16 @@
   var EGEN = 'Egen øvelsesvejledning';
   var SIDSTE_BILAG = 'bilag-periodesystem';
 
-  // Kapitlernes numre i rækkefølge.
+  // Bogen, et kapitel hører til: kapitel 2 hører til C-bogen og kapitel B1 til B-bogen.
+  function niveau(nr) {
+    var m = /^([AB]?)\d/.exec(nr);
+    return (m && m[1]) || 'C';
+  }
+
+  // Kapitlernes numre i rækkefølge: først C-bogens (1, 2 ...), så B-bogens (B1, B2 ...) og A-bogens.
   function numre(kapitler) {
-    return Object.keys(kapitler).sort(function (a, b) { return parseFloat(a) - parseFloat(b) || (a < b ? -1 : 1); });
+    function noegle(nr) { return ['C', 'B', 'A'].indexOf(niveau(nr)) * 1000 + (parseInt(nr.replace(/^[AB]/, ''), 10) || 0); }
+    return Object.keys(kapitler).sort(function (a, b) { return noegle(a) - noegle(b) || (a < b ? -1 : 1); });
   }
 
   function del(data, id) {
@@ -356,7 +363,7 @@
     });
   }
 
-  var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
+  var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, niveau: niveau, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
     oevelsesdel: oevelsesdel,
     bilagene: bilagene, plan: plan, navn: navn, saml: saml };
   if (typeof module !== 'undefined' && module.exports) module.exports = Kompendium;

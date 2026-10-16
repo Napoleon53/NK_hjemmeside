@@ -30,10 +30,10 @@ Kemichael.
    glasset med ballon, fire mål, fane 2 med brugerens opgave om
    intermolekylære bindinger (kogepunkterne for alkaner og alkoholer) og
    fane 3.
-3. **Naboerne:** `sc6.1_kogepunkt` ejer alkanernes kædelængde og form, når der
+3. **Naboerne:** `sc4.1_kogepunkt` ejer alkanernes kædelængde og form, når der
    kun er London-kræfter; her er alkanerne kun med som modstykke til
    alkoholerne. `sc3.3` ejer elektronegativitet og polaritet (δ+ og δ− bruges
-   kun som mærker). `sc3.4`, `sc3.5` og `sc6.2` fane 4 ejer opløselighed og
+   kun som mærker). `sc3.4`, `sc3.5` og `sc4.2` fane 4 ejer opløselighed og
    blandbarhed, som ikke er med. Dipol-dipol-bindinger (aldehyder, ketoner)
    er ikke med.
 4. **Loftet:** tre faner og 16 stoffer (methan til hexan, 2-methylpropan,
@@ -46,7 +46,7 @@ Kemichael.
 ## Fane 1: Ethanol
 
 Til venstre et temperaturkammer med et reagensglas med ethanol og en ballon
-(sprites fra sc6.1), i midten luppen, til højre termometeret, som eleven
+(sprites fra sc4.1), i midten luppen, til højre termometeret, som eleven
 trækker i (−100 til 120 °C). Øverst til venstre står, hvad der er i glasset,
 og hvor mange hydrogenbindinger og London-kræfter der er i luppen lige nu.
 Et klik på et molekyle viser δ+ og δ− og siger, hvor mange bindinger det har.
@@ -110,7 +110,7 @@ Påskeægget: et klik på termometerets kugle. Det er et sprittermometer, og ove
 
 ## Forenklinger
 
-* **Tilstanden kommer fra tabellen, ikke fra bevægelsen** (som sc6.1). Over
+* **Tilstanden kommer fra tabellen, ikke fra bevægelsen** (som sc4.1). Over
   kogepunktet går molekylerne til dampen ét ad gangen, hurtigere jo varmere
   det er. Under kogepunktet er en lille del damp efter damptrykket (Troutons
   regel, 110 J/(mol·K) for stoffer med hydrogenbindinger), højst 12 %.
@@ -136,7 +136,7 @@ Påskeægget: et klik på termometerets kugle. Det er et sprittermometer, og ove
 index.html          toplinje, de tre faner, teori og rundvisning
 css/stil.css        grundlaget fra sc1.4 og nederst signaturen, kontakten,
                     grafen og kortene. NB: decimaltal med PUNKTUM i CSS
-sprites/            reagensglasset, temperaturkammeret og termometeret (fra sc6.1)
+sprites/            reagensglasset, temperaturkammeret og termometeret (fra sc4.1)
 js/kerne.js         NK-navnerum, tekst og lærred (som sc1.4)
 js/data.js          stofferne, målene, parrene, rangeringerne, D.forklar og teksterne
 js/molekyler.js     molekylernes flade kuglemodeller ud fra skelettet ("CCO")
@@ -144,7 +144,7 @@ js/model.js         prøven i luppen: tilstanden, kræfterne og bindingerne
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, kammeret, glasset med ballon, termometeret,
                     luppen, molekylerne og kortene
-js/termostat.js     temperaturen, som eleven trækker i (fra sc6.1)
+js/termostat.js     temperaturen, som eleven trækker i (fra sc4.1)
 js/fane.js          det fælles: listen, statuslinjen, knappen, musen
 js/sim_ethanol.js   fane 1
 js/sim_sammenlign.js fane 2

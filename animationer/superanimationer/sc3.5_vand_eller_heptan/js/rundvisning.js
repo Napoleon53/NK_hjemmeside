@@ -2,7 +2,7 @@
    rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
 
    Viser rundt paa den fane, man staar paa: ét element ad gangen med en
-   kort tekst. Samme kode som i sc4.2; kun TURE er ny. Dele af laerredet
+   kort tekst. Samme kode som i sc5.2; kun TURE er ny. Dele af laerredet
    (glassene, proeven og kortet) har et usynligt felt oven paa sig, som
    bordet selv flytter paa plads (saetAnker i js/bord.js).
    ===================================================================== */

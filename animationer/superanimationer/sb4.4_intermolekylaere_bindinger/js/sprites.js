@@ -6,7 +6,7 @@
    endnu, springes den bare over i det billede.
 
    Reagensglasset, temperaturkammeret og termometeret er tegnet til
-   sc6.1 (Alkaners kogepunkt) og kopieret hertil, saa eleverne kender
+   sc4.1 (Alkaners kogepunkt) og kopieret hertil, saa eleverne kender
    dem fra C-niveau. MAAL er de koordinater, der staar i kommentaren
    oeverst i hver SVG-fil. Aendres en fil, skal tallene her foelge med.
    ===================================================================== */

@@ -5,7 +5,7 @@
    i ../../v2/kemichael/kemichael.js, som er faelles og ikke rettes her.
    Denne animation har intet fast tegnebord, saa laereren tegnes
    skaleret efter laerredets hoejde (0,92 × hoejde/600) med gulvet ved
-   laerredets bund, som i sc6.6.
+   laerredets bund, som i sc4.6.
 
    Scener:
      intro      alle faner: praesentationen (D.INTRO_*), naar eleven vil
@@ -91,7 +91,7 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
-    /* ----- Praesentationen (som sc6.6) -------------------------------------------
+    /* ----- Praesentationen (som sc4.6) -------------------------------------------
        Han gaar ind, siger sine linjer og gaar igen. Scenen laaser ikke. Han
        gaar kun, naar eleven vil det: knappen Spring praesentationen over, to
        klik direkte paa ham eller Esc. */

@@ -28,7 +28,7 @@ saltsyren fortyndes 100 gange (stærk er ikke det samme som koncentreret).
 3. **Naboerne:** `sc7.1` ejer hydronens vej fra syre til base og de
    korresponderende par. `sc7.2` ejer pH-skalaen, faktor ti og fortyndingen
    som emne; her er fortyndingen kun et middel, og der regnes ikke på pH.
-   `sc7.3` ejer beregningerne med log, `sc7.4` titreringen. `sc5.2` ejer
+   `sc7.3` ejer beregningerne med log, `sc7.4` titreringen. `sc6.2` ejer
    formel og aktuel koncentration for salte. `sc8.1` ejer metaller i syre;
    derfor er det kalk, der bruser her, ikke magnesium.
 4. **Loftet:** tre faner, fem syrer (saltsyre, salpetersyre, eddikesyre,
@@ -268,7 +268,7 @@ uden syrens navn (`D.GLAS`). Et klik på et glas viser det i den ene lup.
   ikke er lige svage: myresyre bruser mere end eddikesyre.
 
 Efter et rigtigt svar på det første spørgsmål står forklaringen alene, og
-eleven går selv videre med knappen Næste spørgsmål (reglen fra `sc5.1`).
+eleven går selv videre med knappen Næste spørgsmål (reglen fra `sc6.1`).
 
 ## Fane 3: Fortyndet? (`#fortynd`)
 

@@ -13,7 +13,7 @@
    blandes: det oploesningsmiddel, stoffet blandes med ved stuetemperatur
    i et reagensglas (1 mL eller en spatelspids i 5 mL). Kilderne staar i
    README.md. Stofferne er valgt, saa svaret er entydigt: ingen stoffer
-   paa graensen (ethanol, propanol, butanol), dem har sc6.2 (den gamle 6.5).
+   paa graensen (ethanol, propanol, butanol), dem har sc4.2 (den gamle 6.5).
 
    rho: massefylde i g/mL (Databogen). Den afgoer, hvilket lag der
    ligger oeverst. tint: farven i glasset [r, g, b, alfa] mod de hvide

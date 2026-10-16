@@ -5,7 +5,7 @@
    tastaturgenveje og tegneloekken.
 
    Linket index.html#klister=kaffekop (fra vinduet med et nyt
-   klistermaerke i sc6.2) aabner siden med klistermaerket klar.
+   klistermaerke i sc4.2) aabner siden med klistermaerket klar.
 
    Tastatur: C, H, O, N, I, L (Cl) og B (Br) vaelger grundstoffet (Shift+C
    er ogsaa Cl), M Markér, ? rundvisningen (ikke H: det er hydrogen her),

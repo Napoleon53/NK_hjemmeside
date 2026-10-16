@@ -2,7 +2,7 @@
    klistermaerker.js - Kemichaels skuffe
 
    Ti klistermaerker, som eleven laaser op ved at klare quizzerne i
-   sc6.2 Zigzagformler (fanerne Zigzag, Navne og Isomerer), og som kan
+   sc4.2 Zigzagformler (fanerne Zigzag, Navne og Isomerer), og som kan
    saettes paa tegnebraettet (og kommer med i billedet til rapporten).
    Hver quiz giver ét klistermaerke; de svaereste giver de bedste, og det
    sidste er Kemichael selv.
@@ -13,7 +13,7 @@
    "forurene" laerredet, saa det ikke kan gemmes).
 
    Det, der er laast op, huskes i browseren under NOEGLE. Begge sider
-   (sc6.2 og tegnebraettet) laeser den samme noegle. Indtil 25. sept. 2026
+   (sc4.2 og tegnebraettet) laeser den samme noegle. Indtil 25. sept. 2026
    hed den nk-sc6.2-skuffe; den gamle laeses én gang og flyttes over.
 
      NK.Skuffe.ALLE             listen i raekkefoelge

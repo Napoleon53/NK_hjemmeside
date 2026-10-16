@@ -2,7 +2,7 @@
    rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
 
    Viser rundt paa den fane, man staar paa: ét element ad gangen med en
-   kort tekst. Samme kode som i sc1.4, sc8.6, sc7.5 og sc6.4; kun TURE er ny.
+   kort tekst. Samme kode som i sc1.4, sc8.6, sc7.5 og sc4.4; kun TURE er ny.
 
    Hvert trin er en CSS-selector plus en titel og en kort tekst. Dele af
    laerredet har et usynligt felt oven paa sig, som fanen selv flytter paa

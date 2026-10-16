@@ -291,7 +291,7 @@
     <div class="main-layout">
         <div class="sidebar" id="sidebarMenu">
             <div class="sidebar-header">
-                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Koncentration</span>
+                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Beregninger</span>
                 <div class="header-actions">
                     <button class="toggle-btn link-btn" onclick="kopierLink(this)" title="Kopiér link til denne animation">🔗</button>
                     <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
@@ -299,9 +299,17 @@
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="c5.1" data-beskrivelse="Se hvad stofmængdekoncentration er, skeln mellem c og n, lav opløsninger i en målekolbe, og fortynd dem." onclick="visAnimation(this, '../superanimationer/sc5.1_koncentration/index.html')" title="Koncentration"><span class="btn-num">1</span><span class="btn-text">Koncentration</span></button>
-            <button class="tab-btn" data-emne="c5.2" data-beskrivelse="Se forskellen på formel og aktuel koncentration, når et salt går i opløsning, og regn på ionerne og på blandinger." onclick="visAnimation(this, '../superanimationer/sc5.2_formel_og_aktuel/index.html')" title="Formel og aktuel koncentration"><span class="btn-num">2</span><span class="btn-text">Formel og aktuel</span></button>
-            <button class="tab-btn" data-emne="c5.3" data-beskrivelse="Titrér havvand med sølvnitrat, aflæs buretten, og beregn masseprocenten af NaCl. Se også, hvilke fejlkilder der ændrer resultatet." onclick="visAnimation(this, '../superanimationer/sc5.3_mohrtitrering/index.html')" title="Forsøg: Mohrtitrering"><span class="btn-num">3</span><span class="btn-text">Forsøg: Mohrtitrering</span></button>
+            <button class="tab-btn" data-emne="c5.1" data-beskrivelse="Beregn molarmassen ud fra atommasserne, og brug vægten til at finde et ukendt stof." onclick="visAnimation(this, '../superanimationer/sc5.1_molarmasse/index.html')" title="Molarmasse"><span class="btn-num">1</span><span class="btn-text">Molarmasse</span></button>
+            <button class="tab-btn" data-emne="c5.2" data-beskrivelse="Se sammenhængen mellem masse, molarmasse og stofmængde med klumper på 1 mol, og find ud af, hvor der er flest atomer." onclick="visAnimation(this, '../superanimationer/sc5.2_stofmaengde/index.html')" title="Stofmængde"><span class="btn-num">2</span><span class="btn-text">Stofmængde</span></button>
+            <button class="tab-btn" data-emne="c5.3" data-beskrivelse="Byg formlen n = m / M, regn opgaver på vægten, og prøv hurtigrunden." onclick="visAnimation(this, '../superanimationer/sc5.3_stofmaengdeberegning/index.html')" title="Stofmængdeberegning"><span class="btn-num">3</span><span class="btn-text">Stofmængdeberegning</span></button>
+            <button class="tab-btn" data-emne="c5.4" data-beskrivelse="Find den begrænsende ingrediens og overskuddet i pølsevognen, og overfør det til molekyler og mol." onclick="visAnimation(this, '../superanimationer/sc5.4_aekvivalente_maengder/index.html')" title="Ækvivalente mængder"><span class="btn-num">4</span><span class="btn-text">Ækvivalente mængder</span></button>
+            <button class="tab-btn" data-emne="c5.5" data-beskrivelse="Følg stofmængden gennem reaktionspilen, løs opgaver i mængdeberegningsskemaet, og find den begrænsende mængde." onclick="visAnimation(this, '../superanimationer/sc5.5_maengdeberegning/index.html')" title="Mængdeberegning"><span class="btn-num">5</span><span class="btn-text">Mængdeberegning</span></button>
+<!--            <button class="tab-btn" onclick="visAnimation(this, 'c4_spil_hotdogs_korrekt_forhold.html')" title="Spil: Indkøb af hotdogs"><span class="btn-num">6</span><span class="btn-text">Ækvivalent opskrift</span></button>-->
+            <button class="tab-btn" data-emne="c5.6" data-beskrivelse="Forudsig, hvad der sker med gassen i cylinderen, når tryk, volumen eller temperatur ændres, og regn opgaver med idealgasligningen." onclick="visAnimation(this, '../superanimationer/sc5.6_idealgasligningen/index.html')" title="Idealgasligningen"><span class="btn-num">6</span><span class="btn-text">Idealgasligningen</span></button>
+            <button class="tab-btn" data-emne="c5.7" data-beskrivelse="Varm natron til konstant masse, regn ud, hvad diglen skal veje i tre hypoteser, og se, hvilken vægten rammer." onclick="visAnimation(this, '../superanimationer/sc5.7_natron/index.html')" title="Forsøg: Natron"><span class="btn-num">7</span><span class="btn-text">Forsøg: Natron</span></button>
+            <button class="tab-btn" data-emne="c5.8" data-beskrivelse="Gæt, om ståluld bliver lettere eller tungere af at brænde, brænd den på vægten, og regn ud, hvad den højst kan veje." onclick="visAnimation(this, '../superanimationer/sc5.8_staaluld/index.html')" title="Forsøg: Afbrænding ståluld"><span class="btn-num">8</span><span class="btn-text">Afbrænding ståluld</span></button>
+            <button class="tab-btn" data-emne="c5.9" data-beskrivelse="Animation hvor du vejer og måler lightergas for at bestemme, hvilken alkan den består af." onclick="visAnimation(this, '../superanimationer/sc5.9_lightergas/index.html')" title="Forsøg: Lightergas"><span class="btn-num">9</span><span class="btn-text">Forsøg: Lightergas</span></button>
+            <button class="tab-btn" data-emne="c5.10" data-beskrivelse="Tæl betydende cifre, flyt kommaet i videnskabelig notation og mellem enheder, og afrund resultater." onclick="visAnimation(this, '../superanimationer/sc5.10_betydende_cifre/index.html')" title="Afrunding/opskrivning"><span class="btn-num">10</span><span class="btn-text">Afrunding/opskrivning</span></button>
 
         </div>
 
@@ -415,16 +423,13 @@
 
             if (emneFil) {
                 const knapper = document.querySelectorAll('.tab-btn');
-                // Gamle numre efter omnummereringen 26. sept. 2026: Mohrtitreringen hed c5.5.
-                const gamleNumre = { 'c5.5': 'c5.3' };
-                const kode = gamleNumre[emneFil] || emneFil;
-                const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === kode);
+                const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === emneFil);
                 if (aliasKnap) {
                     aliasKnap.click();
                 } else {
                     knapper.forEach(knap => {
-                        if (knap.getAttribute('onclick').includes(emneFil) && !document.querySelector('.tab-btn.active')) {
-                            knap.click();
+                        if (knap.getAttribute('onclick').includes(emneFil)) {
+                            visAnimation(knap, emneFil);
                         }
                     });
                 }

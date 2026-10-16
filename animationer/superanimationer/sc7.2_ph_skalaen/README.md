@@ -25,7 +25,7 @@ virker fra harddisken.
    lup, der selv zoomer i 7 trin (højst ca. 100 prikker af den ion, der er
    flest af), 5 mål. Fane 3: 2 flasker, højst 9 fortyndinger af hver, 1 lup,
    5 mål.
-5. **Layoutet:** scene plus panel, som `sc4.1`, `sc4.2` og `sc4.4`. Skalaen
+5. **Layoutet:** scene plus panel, som `sc5.1`, `sc5.2` og `sc5.4`. Skalaen
    står øverst i alle tre faner.
 
 ## Hvad den viser
@@ -124,10 +124,10 @@ Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 
 ```
 index.html          markup for de tre faner, teorien og rundvisningen
-css/stil.css        alt udseende (grundlaget er sc4.4's). NB: decimaltal med PUNKTUM i CSS
+css/stil.css        alt udseende (grundlaget er sc5.4's). NB: decimaltal med PUNKTUM i CSS
 sprites/            de tolv hverdagsstoffer, pH-metret, reagensflasken, pipetten og
                     sprøjteflasken (egne tegninger) og bægerglasset (fra sc2.1)
-js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc4.4)
+js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc5.4)
 js/kemi.js          modellen: pH, koncentrationer, luppens rum, fortyndet syre og base,
                     universalindikatorens farver og tallene i ord
 js/data.js          stofferne og deres pH, hylderne, målene i fane 2 og 3 og replikkerne

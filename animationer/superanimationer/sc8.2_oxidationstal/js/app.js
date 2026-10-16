@@ -1,5 +1,5 @@
 /* =====================================================================
-   app.js - binder de to faner sammen (som sc5.1)
+   app.js - binder de to faner sammen (som sc6.1)
 
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
    fane opdateres og tegnes. Ingen praesentation: arbejdsfeltet i scenen

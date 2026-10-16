@@ -5,7 +5,7 @@
    og det, navnet bygger paa: hovedkaeden (eller ringen) i nummereringens
    raekkefoelge, sidegrupperne med lokanter, dobbelt- og tripelbindingerne,
    cis/trans og stofklassen. Det er den eneste autoritet for, hvad et
-   molekyle hedder. Tegnebraettet, navnelaeseren og quizzerne i sc6.2
+   molekyle hedder. Tegnebraettet, navnelaeseren og quizzerne i sc4.2
    bruger alle den samme funktion, saa det, der tegnes, og det, eleven
    skal ramme, aldrig kan komme i modstrid.
 

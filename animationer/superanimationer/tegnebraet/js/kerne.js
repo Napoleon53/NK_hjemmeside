@@ -1,5 +1,5 @@
 /* =====================================================================
-   kerne.js - faelles hjaelpefunktioner for tegnebraettet (samme som sc6.2 og sc4.2)
+   kerne.js - faelles hjaelpefunktioner for tegnebraettet (samme som sc4.2 og sc5.2)
 
    Alt bor i det globale objekt NK. Ingen moduler og ingen fetch:
    mappen skal ogsaa virke, naar index.html aabnes direkte fra

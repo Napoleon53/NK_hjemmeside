@@ -158,7 +158,7 @@ async function tests() {
     function beskrivelse(idet) { return D.SPOERGSMAAL.filter(function (s) { return s.id === idet; })[0].b.da; }
     paastand("kernepartiklen med positiv ladning er en proton", rigtigt("c1_1") === "Proton");
     paastand("tungtopløselig er under 1 g i 100 mL, som i sc2.1 og sc2.4", /under 1 g/.test(beskrivelse("c2_2")) && /over 1 g/.test(beskrivelse("c2_1")));
-    paastand("sammenhængen mellem p, V, n og T hedder idealgasligningen, som i sc4.6", rigtigt("c4_8") === "Idealgasligningen");
+    paastand("sammenhængen mellem p, V, n og T hedder idealgasligningen, som i sc5.6", rigtigt("c5_8") === "Idealgasligningen");
     paastand("H₃O⁺ er oxonium", rigtigt("c7_2") === "Oxonium");
     paastand("afgivelse af elektroner er oxidation, optagelse er reduktion", rigtigt("c8_1") === "Oxidation" && rigtigt("c8_2") === "Reduktion");
     paastand("H₂ hedder hydrogen", rigtigt("c8_10") === "Hydrogen");
@@ -169,7 +169,7 @@ async function tests() {
     var S = Spil.nyt();
     paastand("et spil har 15 forskellige spørgsmål", S.spoergsmaal.length === 15 &&
         Object.keys(S.spoergsmaal.reduce(function (o, q) { o[q.id] = 1; return o; }, {})).length === 15);
-    paastand("sværhedsgraden følger kapitlerne (1-3, så 4, 5 og 7, så 5, 7 og 8)", S.spoergsmaal.every(function (q, i) {
+    paastand("sværhedsgraden følger kapitlerne (1-3, så 5, 6 og 7, så 6, 7 og 8)", S.spoergsmaal.every(function (q, i) {
         return D.TRIN[Spil.trin(i)].kap.indexOf(q.kap) >= 0;
     }));
     paastand("trinene er 5, 5 og 5 spørgsmål", Spil.trin(0) === 0 && Spil.trin(4) === 0 && Spil.trin(5) === 1 && Spil.trin(9) === 1 && Spil.trin(10) === 2 && Spil.trin(14) === 2);

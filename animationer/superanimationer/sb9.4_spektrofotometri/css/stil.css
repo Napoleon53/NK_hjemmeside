@@ -589,7 +589,7 @@ kbd {
 .forfraknap:hover { color: var(--tekst); border-color: #6e6e80; background-color: var(--panel-3); }
 
 /* ---------------------------------------------------------------------
-   OPGAVELINJEN over scenen (som sc4.3)
+   OPGAVELINJEN over scenen (som sc5.3)
    --------------------------------------------------------------------- */
 .opgavelinje {
     width: min(100%, 1000px);

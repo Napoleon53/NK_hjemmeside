@@ -18,7 +18,7 @@ holdes urørte.
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
 (bl.a. `sc2.1_salt_i_vand`, `sc2.2_saltbygger`, `sc2.3`, `sc2.4`, `sc3.1`, `sc3.4_blandbarhed`,
-`sc3.4_blandbarhed_inaktiv`, `sc4.1_molarmasse`, `sc4.2_stofmaengde`, `sc4.4_aekvivalente_maengder`, `sc4.9_lightergas`, `sc5.3_mohrtitrering`, `sc6.1_kogepunkt`, `sc6.6_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike` og `sc8.1_spaendingsraekken`),
+`sc3.4_blandbarhed_inaktiv`, `sc5.1_molarmasse`, `sc5.2_stofmaengde`, `sc5.4_aekvivalente_maengder`, `sc5.9_lightergas`, `sc6.3_mohrtitrering`, `sc4.1_kogepunkt`, `sc4.6_fedtstoffer`, `sc7.1_syrebasereaktioner`, `sc7.2_ph_skalaen`, `sc7.3_ph_beregninger`, `sc7.4_titrering_eddike` og `sc8.1_spaendingsraekken`),
 indlæser filer fra `laboratoriet/` og `kemichael/`. Fjernes de, går
 animationerne i sort på kemiformler.dk.
 

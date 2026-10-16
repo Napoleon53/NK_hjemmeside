@@ -32,15 +32,15 @@ Ingen Kemichael. Al hjælp står i statuslinjen under scenen, som i
 | `grundstoffer` | C1 Grundstoffer: symbol og navn | 33 |
 | `ioner` | C2 Ioner: formel og navn | 31 |
 | `molekyler` | C3 Molekyler og bindinger: fagord | 27 |
-| `beregninger` | C4 og C5 Formler, størrelser og enheder | 25 |
-| `organisk` | C6 Organisk kemi: navne og grupper | 31 |
+| `organisk` | C4 Organisk kemi: navne og grupper | 31 |
+| `beregninger` | C5 og C6 Formler, størrelser og enheder | 25 |
 | `syrebase-redox` | C7 og C8 Syre/base og redox: fagord | 27 |
 
 174 kort i alt. Et sæt vælges også direkte i linket: `index.html#ioner`, og
 fanen kan komme med: `index.html#ioner&parring`.
 
 Tallene følger superanimationerne: R = 0,0831 L·bar/(mol·K) og Vₘ = ca. 24 L/mol
-ved stuetemperatur som i `sc4.6_idealgasligningen`, og oxidationstal skrives med romertal som i
+ved stuetemperatur som i `sc5.6_idealgasligningen`, og oxidationstal skrives med romertal som i
 `sc8.2_oxidationstal`.
 
 ## Skarpe bagsider

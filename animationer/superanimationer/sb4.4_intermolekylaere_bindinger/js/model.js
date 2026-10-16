@@ -5,7 +5,7 @@
    af stoffet, set gennem en rund lup med radius Rm (modellens enheder).
    Ballonen paa glasset holder trykket paa 1 atm.
 
-   Tilstanden kommer fra tabellen, ikke fra bevaegelsen (som sc6.1):
+   Tilstanden kommer fra tabellen, ikke fra bevaegelsen (som sc4.1):
      * Over kogepunktet river molekylerne sig loes fra vaesken ét ad
        gangen, hurtigere jo varmere det er, til alt er damp.
      * Under kogepunktet er en lille del damp efter damptrykket, og

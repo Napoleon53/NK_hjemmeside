@@ -8,7 +8,7 @@
    sc7.1 har ingen egne sprites: molekylerne, tavlen og brikkerne
    tegnes i js/tegning.js. ../../v2/kemichael/kemichael.js tilfoejer
    laererens sprites (og kaffekoppen) med deres egen mappe, derfor
-   startes indlaesningen foerst fra app.js. (Samme fil som i sc6.6;
+   startes indlaesningen foerst fra app.js. (Samme fil som i sc4.6;
    MAAL er tom.)
    ===================================================================== */
 (function () {

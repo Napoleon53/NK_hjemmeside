@@ -2,7 +2,7 @@
    regning.js - regnestykkerne i panelet
 
    NK.Regn: ét regnestykke i tre bidder, saadan som eleverne skal
-   skrive det (som sc5.1 og sc4.3):
+   skrive det (som sc6.1 og sc5.3):
 
        a = A / c                  1. formlen: eleven vaelger formens
                                      skabelon (□/□, □ · □, □ · □ over □

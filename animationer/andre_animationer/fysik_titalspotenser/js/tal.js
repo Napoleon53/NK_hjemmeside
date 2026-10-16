@@ -3,7 +3,7 @@
 
    Alt regnes paa cifferstrenge, ikke med kommatal i maskinen. Saa bliver
    0,1 + 0,2 aldrig 0,30000000000000004, og 2,5 km bliver praecis 2500 m.
-   Samme tanke som i kemiens sc4.10, men her er det fysikkens stige fra
+   Samme tanke som i kemiens sc5.10, men her er det fysikkens stige fra
    10⁻⁹ til 10⁹ og omregning mellem enheder, ogsaa m², m³ og liter.
 
    Et tal er { s, p, neg }:

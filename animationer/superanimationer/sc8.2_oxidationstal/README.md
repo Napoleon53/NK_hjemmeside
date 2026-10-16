@@ -205,10 +205,10 @@ stribe til knappen Start forfra.
 ```
 index.html          toplinje, de to faner med arbejdsfeltet i scenen, teori
                     og rundvisning
-css/stil.css        alt udseende (grundlaget er sc5.1; nederst tavlen,
+css/stil.css        alt udseende (grundlaget er sc6.1; nederst tavlen,
                     brikkerne, arbejdsfeltet, listen, gættet og regnskabet).
                     NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, hævet og sænket skrift, lærred (som sc5.1)
+js/kerne.js         NK-navnerum, hævet og sænket skrift, lærred (som sc6.1)
 js/data.js          grundstofferne, de 31 stoffer, de 12 molekyler med
                     tegning, forklaring i ord og note, og linjerne i arbejdsfeltet
 js/ox.js            modellen: oxidationstal efter reglerne, læsning af

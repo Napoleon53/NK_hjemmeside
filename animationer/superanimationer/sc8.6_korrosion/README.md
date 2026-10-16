@@ -29,7 +29,7 @@ samlingsfilerne som en sc8.6 fil."
    `sc8.2` ejer oxidationstal, som ikke bruges her (oxidation er at afgive
    elektroner). `sc8.4` og `sc8.5` ejer afstemning af redoxreaktioner med
    oxidationstal; her afstemmes fire korte skemaer ved at tælle atomer og
-   ladning. `sc4.8` ejer jern, der brænder i ilt. Forsøget med jern i ståluld
+   ladning. `sc5.8` ejer jern, der brænder i ilt. Forsøget med jern i ståluld
    er en titrering.
 4. **Loftet:** tre faner, fire metaller (magnesium, zink, jern, kobber), 17
    mål (6 + 5 + 6) og fire reaktionsskemaer.
@@ -192,7 +192,7 @@ under skibet.
 * **Salt:** tre gange så hurtigt er valgt, så forskellen kan ses. At chlorid
   også nedbryder beskyttende lag, er ikke med.
 * **Uden ilt** er luften ren nitrogen. **Uden vand** sker der intet: at jern
-  reagerer med ilt ved høj temperatur, ejer `sc4.8`.
+  reagerer med ilt ved høj temperatur, ejer `sc5.8`.
 
 ## Filer
 

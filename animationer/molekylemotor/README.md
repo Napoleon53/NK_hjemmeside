@@ -3,7 +3,7 @@
 Fælles kode til at tegne og navngive molekyler. Den bruges af seks sider:
 
 * `../superanimationer/tegnebraet/`: tegnebrættet til rapporter
-* `../superanimationer/sc6.2_zigzagformler/`: quizzerne om zigzagformler, navne
+* `../superanimationer/sc4.2_zigzagformler/`: quizzerne om zigzagformler, navne
   og isomerer og opløselighedsspillet
 * `../superanimationer/sc_spil4_organiske_grupper/`: spillet, hvor molekylerne
   sorteres efter stofklasse (tegningen, navnet og stofklassen; ikke tavlen)
@@ -20,7 +20,7 @@ Fælles kode til at tegne og navngive molekyler. Den bruges af seks sider:
   tavle (et klik på O eller N med Kæde sætter et carbonatom på); motoren er ikke
   ændret
 
-Koden lå i sc6.2 indtil 25. september 2026. Da fik tegnebrættet sin egen side, og
+Koden lå i sc4.2 indtil 25. september 2026. Da fik tegnebrættet sin egen side, og
 motoren blev flyttet hertil, så den ikke skal kopieres fra mappe til mappe. Den
 ligger ved siden af `v2/` og ikke i den, fordi `v2/` er frosset.
 
@@ -72,7 +72,7 @@ js/tegnebraet.js     tavlen: træk bygger kæden (120° i hvert knæk), klik, h�
 js/tavle.js          scenen: væggen, whiteboardet, bakken, papiret (prikkerne kan
                      følge tegnebrættets udsnit)
 js/klistermaerker.js Kemichaels skuffe: de ti klistermærker, hvad der låser dem op
-                     (quizzerne i sc6.2), og hvad der er låst op (nk-skuffe)
+                     (quizzerne i sc4.2), og hvad der er låst op (nk-skuffe)
 ```
 
 ## Navngivningens regler
@@ -208,7 +208,7 @@ tegning i filen (`ekstra.metadata`).
 
 Motoren testes i `../superanimationer/tegnebraet/_selvtest.html` (navngivning,
 funktionelle grupper, trivialnavne, navn til tegning, tusind tilfældige molekyler,
-tavlen og billedet) og i `../superanimationer/sc6.2_zigzagformler/_selvtest.html`
+tavlen og billedet) og i `../superanimationer/sc4.2_zigzagformler/_selvtest.html`
 (carbonhydriderne i quizzerne), og navnene og stofklasserne på spillets 75
 molekyler i `../superanimationer/sc_spil4_organiske_grupper/_selvtest.html`, og
 esterne og oxidationsprodukterne i `../superanimationer/sb4.5_organisk_syntese/_selvtest.html`.
@@ -224,4 +224,4 @@ Kør alle fire efter en ændring her.
   paletten, så et salt som natriumethanoat tegnes som ionen, ethanoat. Aminosyrer
   som zwitterion (NH₃⁺ og COO⁻) får intet navn.
 * To N med hver sin gruppe (N,N'-dimethylethan-1,2-diamin) får intet navn.
-* Atommasserne er IUPAC 2021 med to decimaler, H 1,01, som i sc4.1.
+* Atommasserne er IUPAC 2021 med to decimaler, H 1,01, som i sc5.1.

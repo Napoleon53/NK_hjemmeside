@@ -26,7 +26,7 @@ Fanernes indhold og rækkefølge valgte Claude.
    forled, stamme og endelse og de fire trin (find kæden, nummerér, sæt
    endelsen på, skriv sidegrupperne foran) er bogens, afsnit B3.1. Navnene på
    estere og aminer følger afsnit B4.5 og B4.6.
-3. **Naboerne:** `sc6.2_zigzagformler` ejer zigzagformlen og navnene på
+3. **Naboerne:** `sc4.2_zigzagformler` ejer zigzagformlen og navnene på
    alkaner og alkener; her er der ingen carbonhydrider. `sc_spil4_organiske_grupper`
    ejer genkendelsen af stofklassen for ét molekyle ad gangen på tid; fane 3
    her handler om flere grupper i samme molekyle. `tegnebraet` er værktøjet
@@ -103,7 +103,7 @@ fejl har sin egen forklaring. Halvdelen af formlerne er spejlvendt (`vend` i
 ## Fane 2: Tegn molekylet (`#tegn`)
 
 Navnet står på kortet, delt i sine dele. Eleven tegner molekylet på
-whiteboardet med molekylemotorens tavle, den samme som i `sc6.2` og på
+whiteboardet med molekylemotorens tavle, den samme som i `sc4.2` og på
 tegnebrættet: træk eller klik bygger kæden, et klik på en binding gør den
 dobbelt, højreklik sletter fra enden. Værktøjerne ligger øverst på tavlen:
 Kæde, −OH, =O og −NH₂ (kun dem, de valgte stofklasser har brug for), Fortryd
@@ -143,7 +143,7 @@ med dem, der har mindst én af dem.
 
 ## Hjælpen
 
-Som `sc7.5` og `sc6.4`: al tekst står på kortet øverst i scenen, og der er
+Som `sc7.5` og `sc4.4`: al tekst står på kortet øverst i scenen, og der er
 ingen tekstlinje nederst. Den gule knap giver ét hint ad gangen (to eller tre)
 og til sidst svaret. Et forkert svar giver en forklaring, der passer til
 fejlen, og knappen lyser stille. Et hint kan også vise noget i formlen (den
@@ -181,15 +181,15 @@ en tekst bliver for lang. Trinene, fejlforklaringerne og hintene laves i
 
 ```
 index.html           siden: tre faner, teorien og rundvisningen
-css/stil.css         stilarket (grundlaget er sc6.4; det nye står nederst under SB4.8)
-js/kerne.js          fælles hjælpefunktioner (som sc6.4)
+css/stil.css         stilarket (grundlaget er sc4.4; det nye står nederst under SB4.8)
+js/kerne.js          fælles hjælpefunktioner (som sc4.4)
 js/data.js           stofklasserne, stofferne og de faste tekster
 js/kemi.js           de funktionelle grupper, navnets dele, trinene, hint og forklaringer
 js/fane.js           det fælles: scenekortet, listen, hjælpeknappen, musen, tegnehjælpere
 js/sim_navn.js       fane 1
 js/sim_tegn.js       fane 2
 js/sim_grupper.js    fane 3
-js/rundvisning.js    rundvisningen (som sc6.4, kun teksterne er nye)
+js/rundvisning.js    rundvisningen (som sc4.4, kun teksterne er nye)
 js/app.js            faner, kontakterne til stofklasserne, tastatur og tegneløkken
 _selvtest.html       udviklerværktøj
 ```

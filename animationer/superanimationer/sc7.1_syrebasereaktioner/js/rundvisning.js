@@ -3,7 +3,7 @@
 
    Viser rundt paa den fane, man staar paa: ét element ad gangen med en
    kort tekst. Fane 1 slutter med at pege paa traeningen. Samme kode som
-   i sc6.6; kun TURE er ny.
+   i sc4.6; kun TURE er ny.
 
    Hvert trin er en CSS-selector plus en titel og en kort tekst. Dele af
    laerredet (partiklerne, skemaet, ligningen og brikkerne) har et

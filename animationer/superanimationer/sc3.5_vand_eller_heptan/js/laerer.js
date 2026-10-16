@@ -4,7 +4,7 @@
    Selve figuren staar i ../../v2/kemichael/kemichael.js, som er faelles
    og ikke rettes her. Den er bygget til et fast tegnebord paa 1000 x 600
    enheder; her tegnes han skaleret efter laerredets hoejde, og gulvet
-   saettes til laerredets bund, hver gang han tegnes (som i sc4.2), saa
+   saettes til laerredets bund, hver gang han tegnes (som i sc5.2), saa
    benene ikke bliver lange.
 
    Scener (han er sparsom, brugerens oenske):

@@ -4,10 +4,10 @@ Et værktøj til rapporter, ikke en superanimation om ét begreb. Åbn
 **`index.html`**. Siden henter sine egne filer, motoren fra `../../molekylemotor/`
 og Kemichael fra `../../v2/kemichael/`.
 
-Tegnebrættet var fane 1 i `sc6.2_zigzagformler` (24.-25. sept. 2026). Den 25.
+Tegnebrættet var fane 1 i `sc4.2_zigzagformler` (24.-25. sept. 2026). Den 25.
 september fik det sin egen side efter brugerens ønske: det bruges i rapporter på
 både C og B, og med de funktionelle grupper passer det ikke længere ind under
-zigzagformler for alkaner. Quizzerne blev i sc6.2, og motoren blev fælles.
+zigzagformler for alkaner. Quizzerne blev i sc4.2, og motoren blev fælles.
 
 **Pointen:** tegn molekylet, som bogen tegner det, og få navn, stofklasse,
 molekylformel og molarmasse med, klar til at kopiere ind i rapporten.
@@ -71,13 +71,13 @@ molekylformel og molarmasse med, klar til at kopiere ind i rapporten.
   tavlen) giver den tilbage til videre redigering; Fortryd henter den gamle.
 * **Navne** (knappen i toppen, T): endelserne for de otte stofklasser og
   reglerne for navngivning på én side.
-* **Kemichaels skuffe:** klistermærkerne fra quizzerne i sc6.2 (nk-skuffe).
+* **Kemichaels skuffe:** klistermærkerne fra quizzerne i sc4.2 (nk-skuffe).
   Kortet er usynligt, til eleven har låst mindst ét op. Et klik på et
   klistermærke og så på tavlen sætter det på; det kommer med i billedet.
   `index.html#klister=kaffekop` åbner siden med klistermærket klar (knappen i
-  vinduet med et nyt klistermærke i sc6.2 bruger det).
+  vinduet med et nyt klistermærke i sc4.2 bruger det).
 
-Tegningen huskes i browseren (`nk-tegnebraet`; en tegning fra sc6.2 under
+Tegningen huskes i browseren (`nk-tegnebraet`; en tegning fra sc4.2 under
 `nk-sc6.2-tegnebraet` hentes, hvis der ikke er en ny). Kemichael tilbyder at
 præsentere (`nk-tegnebraet-intro`), og kaffekoppen i hjørnet er påskeægget.
 
@@ -85,12 +85,12 @@ præsentere (`nk-tegnebraet-intro`), og kaffekoppen i hjørnet er påskeægget.
 
 ```
 index.html          markup: scenen, panelet, navnene på stofklasserne, rundvisningen
-css/stil.css        udseendet (samme som sc6.2, plus nederst det, der er særligt her)
-js/kerne.js         NK-navnerum, tekst, tal, laerred (samme som sc6.2)
+css/stil.css        udseendet (samme som sc4.2, plus nederst det, der er særligt her)
+js/kerne.js         NK-navnerum, tekst, tal, laerred (samme som sc4.2)
 js/data.js          Kemichaels præsentation og linjen under scenen
 js/fane.js          rammen: lærredet, tavlen, musen, beskeder, kaffekoppen
 js/sim_tegn.js      tegnebrættet: panelet, navn til tegning, billedet, skuffen
-js/laerer.js        Kemichael (samme som i sc6.2)
+js/laerer.js        Kemichael (samme som i sc4.2)
 js/praesentation.js tilbuddet om præsentationen (ens i alle mapper)
 js/rundvisning.js   rundvisningen bag ?
 js/sprites.js       lageret til Kemichaels sprites
@@ -123,16 +123,16 @@ molarmasse, tavlens regler, navn til tegning (gamle og engelske skrivemåder,
 trivialnavne, beskederne ved navne, der ikke kan tegnes), at alle trivialnavne
 tegnes med luft mellem atomerne, tusind tilfældige molekyler med funktionelle
 grupper (hvert navn skal give det samme molekyle tilbage), panelet og billedet,
-skuffen, linket `#klister=`, en gammel tegning fra sc6.2, carboxylat-ionerne og de
+skuffen, linket `#klister=`, en gammel tegning fra sc4.2, carboxylat-ionerne og de
 små ioner, grupperne med ét klik og ladningen, Pæn tegning, Spejlvend, Kopiér og
 Indsæt, at en gemt SVG kan åbnes igen, sproget og layoutet fra 520 × 380 til
 1500 × 900. Slutlinjen skal være ALT OK (25. september 2026: 133 påstande).
 
 ## I menuen
 
-Ja, fra 25. september 2026: knappen `data-emne="c6.3"` (nr. 3, Tegnebræt) i
-`animationer/kemi-c-filer/samling_c6.html` og nr. 3 i `FEEDBACK_EMNER` i
-`animationer/samling_alt.html`. Pladsen var ledig, efter at c6.3 og c6.4 blev
-til sc6.2. Og i B-menuen (brugerens ønske samme dag): knap 8 (`data-emne="tegnebraet"`)
+Ja, fra 25. september 2026: knappen `data-emne="c4.3"` (nr. 3, Tegnebræt) i
+`animationer/kemi-c-filer/samling_c4.html` og nr. 3 i `FEEDBACK_EMNER` i
+`animationer/samling_alt.html`. Pladsen var ledig, efter at c4.3 og c4.4 blev
+til sc4.2. Og i B-menuen (brugerens ønske samme dag): knap 8 (`data-emne="tegnebraet"`)
 i `animationer/kemi-b-filer/samling_b4,5,6.html` og nr. 8 i `FEEDBACK_EMNER` i
 `animationer/samling_alt_b.html`.

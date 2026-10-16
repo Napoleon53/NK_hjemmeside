@@ -1,5 +1,5 @@
 /* =====================================================================
-   fane.js - det, de to faner har til faelles (som sc8.2, sc4.5 og sc5.1)
+   fane.js - det, de to faner har til faelles (som sc8.2, sc5.5 og sc6.1)
 
    NK.Fane.paa(P, valg) laegger de faelles metoder paa fanens prototype:
 

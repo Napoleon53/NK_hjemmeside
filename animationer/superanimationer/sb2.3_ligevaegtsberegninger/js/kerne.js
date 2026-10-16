@@ -331,7 +331,7 @@ window.NK = NK;
     };
 
     /* Et tal med tre betydende cifre og dansk minus: −0,128, 64,0,
-       4,00 · 10⁻³ (potensform under 0,01, som i sc4.10) */
+       4,00 · 10⁻³ (potensform under 0,01, som i sc5.10) */
     NK.tal = function (v, cifre) {
         cifre = cifre || 3;
         if (!v) return "0";

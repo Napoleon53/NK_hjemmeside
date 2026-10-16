@@ -1,7 +1,7 @@
 /* =====================================================================
    tegnebraet.js - tavlen, man tegner molekyler paa
 
-   Den samme tavle bruges paa tegnebraettet og paa quizfanerne i sc6.2. Reglerne afgoer, hvad man
+   Den samme tavle bruges paa tegnebraettet og paa quizfanerne i sc4.2. Reglerne afgoer, hvad man
    maa: paa opgavefanerne kun C og et bestemt antal atomer, paa
    tegnebraettet alle grundstoffer, ringe og tripelbindinger.
 
@@ -46,7 +46,7 @@
 
    Molekylets koordinater er i bindingslaengder. Med zoom 1 og centrum
    (0, 0) staar (0, 0) midt i feltet, saa tegningen foelger med, naar
-   vinduet aendrer stoerrelse. Quizfanerne i sc6.2 roerer aldrig udsnittet.
+   vinduet aendrer stoerrelse. Quizfanerne i sc4.2 roerer aldrig udsnittet.
 
    valg:
      felt()        { x, y, b, h } i pixels: hvor man maa tegne

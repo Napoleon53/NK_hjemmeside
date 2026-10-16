@@ -53,7 +53,7 @@ Brugeren: "Lav sb4.6 om til en superanimation". sb4.6 er knap 6 i B4.
    opfundne regel, hvor ethyl havde atomnummer 7. Nyt: fane 1 (hvorfor der
    er to former) og den rigtige regel for næste atom, så CH₂CH₃ slår CH₃
    fordi C slår H.
-3. **Naboerne:** `sc6.2_zigzagformler` ejer den klassiske cis/trans i navne
+3. **Naboerne:** `sc4.2_zigzagformler` ejer den klassiske cis/trans i navne
    på C-niveau, og molekylemotoren tegner kun den. `sb4.7` ejer
    spejlbilledisomeri og R/S. Her er der ingen navngivning af molekylerne.
 4. **Loftet:** tre faner, ti grupper (H, CH₃, CH₂CH₃, CH₂OH, COOH, OCH₃, F,

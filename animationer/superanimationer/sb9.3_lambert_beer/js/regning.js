@@ -2,7 +2,7 @@
    regning.js - regnestykkerne paa fane 3: facit, tjek og hint
 
    Hvert trin regnes i tre skridt, som eleverne skal skrive det
-   (moenstret fra sc5.1 og sc4.3):
+   (moenstret fra sc6.1 og sc5.3):
 
        c = A / (ε · l)                     1. formlen: formens skabelon og
                                               et bogstav i hvert felt

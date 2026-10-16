@@ -25,7 +25,7 @@ tydeligt, at det er et forsøg.
    opløses kun lidt i begge, så forsøget kan ikke vise pointen).
 3. **Naboerne, der ejer resten:** `sc3.3` ejer elektronegativitet og polære
    bindinger. `sc3.4` ejer bassinet med molekylerne som kugler (partikelniveauet,
-   tætheden og rækkefølgen af lagene med vand, ethanol og olie). `sc6.2` fane 5
+   tætheden og rækkefølgen af lagene med vand, ethanol og olie). `sc4.2` fane 5
    (den gamle 6.5) ejer reglen "C-atomer pr. polær gruppe mod 4", de store
    molekyler og svaret "begge". Her er derfor kun små stoffer med et entydigt
    svar; ethanol, propanol og butanol er med vilje ikke med.
@@ -122,7 +122,7 @@ heptan ved stuetemperatur (methanol og heptan har to lag op til ca. 50 °C).
 Hexan-1-ol, pentan-1-ol, octan-1-ol og hexansyre blandes med heptan. Iod
 opløses i heptan med violet farve. Glucose, urinstof og citronsyre opløses ikke.
 
-Svarene passer med reglen i `sc6.2` fane 5 (C-atomer pr. polær gruppe under 4
+Svarene passer med reglen i `sc4.2` fane 5 (C-atomer pr. polær gruppe under 4
 giver vand, over 4 heptan), og intet stof ligger på grænsen. Selvtesten
 kontrollerer det.
 
@@ -140,14 +140,14 @@ kontrollerer det.
 
 ```
 index.html             toplinje, to faner, teori og rundvisning
-css/stil.css           alt udseende (fælles del som sc4.2). NB: decimaltal med PUNKTUM i CSS
+css/stil.css           alt udseende (fælles del som sc5.2). NB: decimaltal med PUNKTUM i CSS
 sprites/reagensglas.svg    glasset; indholdet tegnes bag det
 sprites/stativ.svg         stativet bag glassene
 sprites/stativ_forkant.svg pladens forkant, tegnes oven på glassene
 sprites/pipette.svg        pasteurpipette med gummisut
 sprites/spatel.svg         spatel til de faste stoffer
 sprites/proeveglas.svg     glasset med stoffet og etiketten
-js/kerne.js            NK-navnerum, lærred, tekst (samme som sc4.2)
+js/kerne.js            NK-navnerum, lærred, tekst (samme som sc5.2)
 js/data.js             stofferne, deres formler som tekst, replikkerne
 js/sprites.js          indlæser sprites; målene står i MAAL
 js/molekyle.js         læser og tegner strukturformlerne, finder de polære grupper

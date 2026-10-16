@@ -4,7 +4,7 @@
    Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
    fane opdateres og tegnes. Tilbuddet om Kemichaels praesentation
    kobles i hver fane (NK.Praesentation.kobl i sim_*.js). Samme opbygning
-   som sc6.6.
+   som sc4.6.
    ===================================================================== */
 (function () {
     "use strict";

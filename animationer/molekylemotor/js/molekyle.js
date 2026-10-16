@@ -2,7 +2,7 @@
    molekyle.js - molekylet som graf: atomer, bindinger og det, der kan
    regnes ud af dem (hydrogen, molekylformel, molarmasse, ringe)
 
-   Det er den samme model paa tegnebraettet og i sc6.2. Tegnebraettet (tegnebraet.js)
+   Det er den samme model paa tegnebraettet og i sc4.2. Tegnebraettet (tegnebraet.js)
    aendrer den, navngivningen (navngivning.js) laeser den, og tegningen
    (struktur.js) viser den.
 
@@ -16,7 +16,7 @@
    en binding.
 
    Atommasserne er IUPAC's standardatommasser (2021) rundet til to
-   decimaler, som i sc4.1 (H 1,01). De regnes i hundrededele, saa
+   decimaler, som i sc5.1 (H 1,01). De regnes i hundrededele, saa
    summen bliver praecis.
    ===================================================================== */
 (function () {

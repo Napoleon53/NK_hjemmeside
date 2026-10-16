@@ -1,5 +1,5 @@
 /* =====================================================================
-   kerne.js - faelles hjaelpefunktioner for sc7.4 (som sc7.2, sc4.2 og sc4.4:
+   kerne.js - faelles hjaelpefunktioner for sc7.4 (som sc7.2, sc5.2 og sc5.4:
    laerred, tekst, hukommelse og tal med dansk komma)
 
    Alt bor i det globale objekt NK. Ingen moduler og ingen fetch:

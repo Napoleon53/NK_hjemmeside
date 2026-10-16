@@ -22,7 +22,7 @@ Brugeren: "lav sb.4.7 om til en superanimation". sb4.7 er knap 7 i B4.
    spejlet (fane 1), at finde det asymmetriske C-atom i rigtige molekyler
    (fane 2), og at eleven selv nummererer, drejer og svarer.
 3. **Naboerne:** `sb4.6` ejer E og Z og prioriteten ved en dobbeltbinding.
-   `sc6.2` og molekylemotoren ejer navngivningen. Her bruges motoren kun til
+   `sc4.2` og molekylemotoren ejer navngivningen. Her bruges motoren kun til
    at tegne molekylerne på fane 2. Optisk aktivitet og polarimetri er ikke med.
 4. **Loftet:** tre faner. Fane 1 har seks molekyler, fane 2 tretten, fane 3
    syv (hvert som R eller S). Tolv grupper: H, F, Cl, Br, I, OH, NH₂, CH₃,

@@ -2,7 +2,7 @@
    sim_tegn.js - fane 2: Tegn molekylet
 
    Navnet staar paa kortet, delt i sine dele. Eleven tegner molekylet paa
-   whiteboardet med molekylemotorens tavle (den samme som i sc6.2 og paa
+   whiteboardet med molekylemotorens tavle (den samme som i sc4.2 og paa
    tegnebraettet): traek eller klik bygger kaeden, og en gruppe saettes
    paa med ét klik (−OH, =O, −NH₂).
 

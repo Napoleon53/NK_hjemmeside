@@ -277,7 +277,7 @@
     };
 
     /* Rammen og et kort skaft ned mod hoejre (samme farver som lup.svg fra
-       sc4.11, men skaftet er kortere, saa luppen kan staa i hjoernet) */
+       sc5.11, men skaftet er kortere, saa luppen kan staa i hjoernet) */
     T.lupRamme = function (ctx, cx, cy, r) {
         var v = Math.PI / 4, a = r + 4, l = r * 0.6;
         var c = Math.cos(v), s = Math.sin(v);

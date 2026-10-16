@@ -36,7 +36,7 @@ Hjælpen nedenfor.
    Opgave-introduktion (afløst af `?`). Nyt: reaktionen, hvor atomerne
    flyver hen på deres pladser, det lille tal, der kan ændres (fejlen, elever
    laver), tre nye reaktioner (køkkensalt, kulilte, aluminium) og fane 2.
-3. **Naboerne:** sc1.3 ejer knaldgasforsøget, sc4.4 og sc4.5 ejer mol og
+3. **Naboerne:** sc1.3 ejer knaldgasforsøget, sc5.4 og sc5.5 ejer mol og
    masse (også deres afstemning), sc8.4 og sc8.5 ejer redoxafstemningen med
    elektroner og ladning. Her er der ingen mol, ingen masse og ingen ioner.
 4. **Loftet:** to faner. Fane 1 har 10 reaktioner med højst to stoffer på

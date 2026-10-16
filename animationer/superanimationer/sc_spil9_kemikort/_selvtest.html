@@ -153,7 +153,7 @@ function tests() {
     paastand("K er kalium (ikke potassium)", bagside("i:grundstoffer", "K") === "kalium");
     paastand("S er svovl", bagside("i:grundstoffer", "S") === "svovl");
     paastand("n = m / M står i formelsættet", !!bagside("i:beregninger", "n = m / M"));
-    paastand("gaskonstanten er 0,0831 L·bar/(mol·K) som i sc4.6", /0,0831/.test(bagside("i:beregninger", "R")));
+    paastand("gaskonstanten er 0,0831 L·bar/(mol·K) som i sc5.6", /0,0831/.test(bagside("i:beregninger", "R")));
     paastand("molart rumfang er 24 L/mol", /24 L\/mol/.test(bagside("i:beregninger", "Vₘ")));
     paastand("oxidationstal skrives med romertal", bagside("i:syrebase-redox", "oxidationstal for O i forbindelser") === "−II");
 

@@ -1,5 +1,5 @@
 /* =====================================================================
-   kerne.js - faelles hjaelpefunktioner for sc4.2 (som sc4.1, plus tal
+   kerne.js - faelles hjaelpefunktioner for sc5.2 (som sc5.1, plus tal
    i potensform og med betydende cifre nederst)
 
    Alt bor i det globale objekt NK. Ingen moduler og ingen fetch:
