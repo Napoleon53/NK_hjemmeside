@@ -102,7 +102,7 @@ står niveauerne Let, Middel, Svær og Meget svær med en linje om, hvad
 niveauet har. Et niveau får et flueben, når en runde er klaret med mindst 7
 rigtige i første forsøg (`D.OPLAAS`). Meget svær har en lås, til Let, Middel
 og Svær har flueben; et klik på låsen siger hvorfor. Fluebenene huskes i
-browseren (`nk-sc4.10-enheder`), og slutteksten siger, når Meget svær er
+browseren (`nk-sc5.10-enheder`), og slutteksten siger, når Meget svær er
 låst op.
 
 ## Reglen og tallene

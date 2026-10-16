@@ -1,4 +1,4 @@
-# sc6.8 Substitution i benzin
+# sc4.8 Substitution i benzin
 
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.

@@ -22,7 +22,7 @@
     var O = NK.Opgaver;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc4.2-vaegt";
+    var NOEGLE = "nk-sc5.2-vaegt";
     var FLYV_TID = 0.42;
     var RAEKKER = [5, 4, 1];     /* klumper i hver raekke paa skaalen */
 
@@ -646,7 +646,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-vaegt", tilbud: "vaegt-tilbud", spring: "vaegt-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-vaegt", tilbud: "vaegt-tilbud", spring: "vaegt-spring" });
 
     /* Mens han siger, at man skifter stof paa hylden, lyser krukkerne */
     P.pegPaaFelt = function (til) { this.pegHylde = til; };

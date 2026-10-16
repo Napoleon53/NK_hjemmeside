@@ -47,7 +47,7 @@
     var SKAAL_Y = BORD - (M.bund - M.skaalY) * POS.vaegt.b / M.b;
 
     /* ----- Maalingerne deles med fane 2 og huskes i browseren --------------------- */
-    var NOEGLE_MAAL = "nk-sc4.9-maalinger";
+    var NOEGLE_MAAL = "nk-sc5.9-maalinger";
     NK.maalinger = (function () {
         var g = NK.hent(NOEGLE_MAAL, null);
         if (g && g.length === 2) {

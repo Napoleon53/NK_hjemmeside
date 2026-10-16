@@ -13,7 +13,9 @@ udvikles i `C:\NK_Undervisning\virtuelt_laboratorium\`, som har sin egen
 kopi af de fire mapper. Siden 21. september er den automatiske commit
 (`autocommit.ps1`) slået fra, og dermed også spærren, der tog rettede filer
 i dem ud af commit'en igen. Synkroniser committer alt, så mapperne skal
-holdes urørte.
+holdes urørte. Eneste undtagelse indtil nu: ved kapitelbyttet 16. okt. 2026
+gav brugeren lov til at omdøbe `superlab/sc6.8_substitution` og
+`sc6.9_fedt_i_chips` til `sc4.8_substitution` og `sc4.9_fedt_i_chips`.
 
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og de superanimationer, der henter `../../v2/kemichael/kemichael.js`
@@ -100,7 +102,7 @@ sync; denne er færdig.
   `arkiv/`. Ret samtidig kolonnen "I menuen" i superanimationernes README.
 - Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
   som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
-  er slut (mønster: `superlab/sc6.8_substitution/js/tegneserie.js`).
+  er slut (mønster: `superlab/sc4.8_substitution/js/tegneserie.js`).
 - Resultatskemaet for forsøget står i tegneseriens sidste rude, ikke som et
   kort i panelet.
 - Zoomboblen med mikroniveauet må gerne være lidt større end i de første
@@ -138,7 +140,7 @@ sync; denne er færdig.
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i
-  `superlab/sc6.8_substitution/index.html`, `aabnIntro` i `js/app.js`).
+  `superlab/sc4.8_substitution/index.html`, `aabnIntro` i `js/app.js`).
 - Forkerte handlinger i et forsøg afvises ikke med en besked, når det kan
   undgås. De udføres og giver et uheld, og Kemichael kommer og rydder op
   (`kemichael/`). Kun det, der fysisk ikke kan lade sig gøre, afvises.

@@ -245,7 +245,7 @@
     P.enter = function () { if (this.faerdig()) this.knap(); };
     P.fokus = function () {};
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.2-intro-isomerer", tilbud: "is-tilbud", spring: "is-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-isomerer", tilbud: "is-tilbud", spring: "is-spring" });
     P.pegPaaFelt = function (til) { NK.el("is-liste-kort").classList.toggle("peg", !!til); };
 
     NK.SimIsomerer = SimIsomerer;

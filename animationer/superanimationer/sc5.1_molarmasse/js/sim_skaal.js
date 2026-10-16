@@ -18,7 +18,7 @@
     var D = NK.Data;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc4.1-skaal";
+    var NOEGLE = "nk-sc5.1-skaal";
     var STIVHED = 26, DAEMPNING = 3.2;
 
     function SimSkaal() {
@@ -452,8 +452,8 @@
     /* ----- Kemichaels praesentation ---------------------------------------- */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
-        if (!tving && NK.hent("nk-sc4.1-intro-skaal", false)) return;
-        NK.gem("nk-sc4.1-intro-skaal", true);
+        if (!tving && NK.hent("nk-sc5.1-intro-skaal", false)) return;
+        NK.gem("nk-sc5.1-intro-skaal", true);
         this.introVent = tving ? 0.1 : 0.9;
     };
 

@@ -18,7 +18,7 @@
     var D = NK.Data;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc4.1-ukendt";
+    var NOEGLE = "nk-sc5.1-ukendt";
     var FLYV_TID = 0.5;
 
     function SimUkendt() {
@@ -366,8 +366,8 @@
     /* ----- Kemichaels praesentation ---------------------------------------- */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
-        if (!tving && NK.hent("nk-sc4.1-intro-ukendt", false)) return;
-        NK.gem("nk-sc4.1-intro-ukendt", true);
+        if (!tving && NK.hent("nk-sc5.1-intro-ukendt", false)) return;
+        NK.gem("nk-sc5.1-intro-ukendt", true);
         this.introVent = tving ? 0.1 : 0.9;
     };
 

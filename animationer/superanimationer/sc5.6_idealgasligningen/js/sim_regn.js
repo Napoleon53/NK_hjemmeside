@@ -23,8 +23,8 @@
     var Tj = NK.Tjek;
     var MAAL = NK.Sprites.MAAL;
 
-    var NOEGLE = "nk-sc4.6-regn";
-    var NOEGLE_NIV = "nk-sc4.6-regn-niveau";
+    var NOEGLE = "nk-sc5.6-regn";
+    var NOEGLE_NIV = "nk-sc5.6-regn-niveau";
 
     function SimRegn() {
         this.navn = "regn";

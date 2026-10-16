@@ -18,8 +18,8 @@
     var T = NK.Tjek;
     var Tg = NK.Tegn;
 
-    var NOEGLE_DOM = "nk-sc4.7-dommen";
-    var NOEGLE_JOURNAL = "nk-sc4.7-journal";
+    var NOEGLE_DOM = "nk-sc5.7-dommen";
+    var NOEGLE_JOURNAL = "nk-sc5.7-journal";
     NK.dommen = !!NK.hent(NOEGLE_DOM, false);
     NK.journal = NK.hent(NOEGLE_JOURNAL, null) || { fejl: 0, svar: 0, snyd: false, valgt: null };
 

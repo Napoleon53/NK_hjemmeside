@@ -18,7 +18,7 @@
     var D = NK.Data;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc4.2-atomer";
+    var NOEGLE = "nk-sc5.2-atomer";
     var TAEL_TID = 0.9;
 
     function SimAtomer() {
@@ -435,7 +435,7 @@
     };
 
     /* ----- Kemichaels praesentation ---------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-atomer", tilbud: "atomer-tilbud", spring: "atomer-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-atomer", tilbud: "atomer-tilbud", spring: "atomer-spring" });
 
     P.pegPaaFelt = function (til) { NK.el("atomer-valg").classList.toggle("peg", til); };
 

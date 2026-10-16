@@ -20,7 +20,7 @@
     var Tg = NK.Tegn;
     var Tj = NK.Tjek;
 
-    var NOEGLE = "nk-sc4.1-vaegt";
+    var NOEGLE = "nk-sc5.1-vaegt";
     var FLYV_TID = 0.45;
     var MAKS_ATOMER = 30;
     var TAEL_TID = 1.3;
@@ -658,8 +658,8 @@
     /* ----- Kemichaels praesentation ---------------------------------------- */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
-        if (!tving && NK.hent("nk-sc4.1-intro-vaegt", false)) return;
-        NK.gem("nk-sc4.1-intro-vaegt", true);
+        if (!tving && NK.hent("nk-sc5.1-intro-vaegt", false)) return;
+        NK.gem("nk-sc5.1-intro-vaegt", true);
         this.introVent = tving ? 0.1 : 0.9;
     };
 

@@ -1,7 +1,7 @@
 /* =====================================================================
    rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
 
-   Samme rundvisning som i sc6.8: ét element ad gangen med en kort
+   Samme rundvisning som i sc4.8: ét element ad gangen med en kort
    tekst. Kun de trin, der hoerer til den aktive fane, kommer med.
    ===================================================================== */
 (function () {

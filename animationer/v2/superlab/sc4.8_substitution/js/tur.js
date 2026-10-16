@@ -1,5 +1,5 @@
 /* =====================================================================
-   tur.js - rundvisningens stop i sc6.8
+   tur.js - rundvisningens stop i sc4.8
 
    Selve rundvisningen ligger i ../../laboratoriet/js/rundvisning.js.
    Hvert stop er en CSS-selector plus titel og tekst; findes elementet

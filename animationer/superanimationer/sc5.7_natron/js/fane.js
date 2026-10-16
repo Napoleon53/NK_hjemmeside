@@ -22,7 +22,7 @@
 
     function paa(P, valg) {
         var navn = valg.navn;
-        var NOEGLE = "nk-sc4.7-" + navn;
+        var NOEGLE = "nk-sc5.7-" + navn;
 
         function el(id) { return NK.el(navn + "-" + id); }
 

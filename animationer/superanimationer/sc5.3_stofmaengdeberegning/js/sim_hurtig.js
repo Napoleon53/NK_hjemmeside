@@ -16,7 +16,7 @@
     var D = NK.Data;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc4.3-hurtig";
+    var NOEGLE = "nk-sc5.3-hurtig";
 
     var HINT = {
         formel: "Tænk på enhederne: g, mol og g/mol. Hvilken regning giver den rigtige enhed?",

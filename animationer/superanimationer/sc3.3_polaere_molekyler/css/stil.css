@@ -1,6 +1,6 @@
 /* =====================================================================
    sc3.3 - Polære molekyler
-   Stilark. Samme udtryk som de andre superanimationer (sc2.1, sc6.8).
+   Stilark. Samme udtryk som de andre superanimationer (sc2.1, sc4.8).
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem), aldrig med
    dansk komma.
    ===================================================================== */
@@ -461,7 +461,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .teorikort b { color: var(--gul); font-weight: 600; }
 
 /* ---------------------------------------------------------------------
-   RUNDVISNINGEN (samme som sc6.8)
+   RUNDVISNINGEN (samme som sc4.8)
    --------------------------------------------------------------------- */
 .rundvisning { position: fixed; inset: 0; z-index: 200; }
 .rundvisning-baggrund { position: fixed; inset: 0; background: transparent; cursor: pointer; }

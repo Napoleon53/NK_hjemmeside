@@ -90,7 +90,7 @@ med antallet af polære grupper; under 4 opløses stoffet i vand, over 4 i hepta
   heptan i hver femmer og højst ét grænsetilfælde. Et nyt spil tager dem, man ikke
   har set, først. Prikkerne er grønne (rigtigt), gule (vist) og røde (forkert); et
   klik viser molekylet, regnestykket og det lag, eleven valgte. Point: 100, 70 med
-  hint, 0 for et vist svar. Rekorden huskes (`nk-sc6.2-oploeselighed-rekord`).
+  hint, 0 for et vist svar. Rekorden huskes (`nk-sc4.2-oploeselighed-rekord`).
   Hele bunken med højst tre viste svar giver stor konfetti og ros fra Kemichael.
   Fanen giver ikke et klistermærke.
 
@@ -119,7 +119,7 @@ tavlen, Kemichael med en replik om klistermærket og et vindue med det og knappe
 **Prøv den på tegnebrættet ↗**, der åbner tegnebrættet i en ny fane med
 klistermærket klar (`../tegnebraet/index.html#klister=kaffekop`). Quizzen bliver
 stående. Det, der er låst op, huskes i browseren under `nk-skuffe`, som begge
-sider læser (indtil 25. sept. 2026 `nk-sc6.2-skuffe`; den gamle flyttes over).
+sider læser (indtil 25. sept. 2026 `nk-sc4.2-skuffe`; den gamle flyttes over).
 
 Kaffekoppen står næsten gemt i scenens nederste højre hjørne og er den samme på
 alle fire faner: har Kemichael hentet den, er den væk på dem alle, til siden
@@ -216,5 +216,5 @@ Ja, fra 25. september 2026 som c4.2 i `animationer/kemi-c-filer/samling_c4.html`
 
 26. sept. 2026 blev C4 (dengang C6) omnummereret uden huller: 1 Alkaners kogepunkt, 2
 Zigzagformler, 3 Tegnebræt, 4 Byg et fedtstof (`sc4.6_fedtstoffer`), 5
-Umættet fedt?, 6 Substitution i benzin (`sc6.8`), 7 Fedt i chips (`sc6.9`).
+Umættet fedt?, 6 Substitution i benzin (`sc4.8`), 7 Fedt i chips (`sc4.9`).
 Mappenavnene har beholdt de gamle numre.

@@ -31,7 +31,7 @@
     var K = NK.Kemi;
     var Tg = NK.Tegn;
 
-    var NOEGLE_SKEMA = "nk-sc4.8-skema";
+    var NOEGLE_SKEMA = "nk-sc5.8-skema";
 
     function SimBeregning() {
         var mig = this;

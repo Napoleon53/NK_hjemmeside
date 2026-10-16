@@ -302,7 +302,7 @@
     P.enter = function () { if (this.loest) this.knap(); else this.tjekNavn(); };
     P.fokus = function () { if (this.retning === "navn" && !this.loest) NK.el("nv-input").focus(); };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.2-intro-navne", tilbud: "nv-tilbud", spring: "nv-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-navne", tilbud: "nv-tilbud", spring: "nv-spring" });
     P.pegPaaFelt = function (til) { NK.el("nv-felt").classList.toggle("peg", til && this.retning === "navn"); };
 
     NK.SimNavne = SimNavne;

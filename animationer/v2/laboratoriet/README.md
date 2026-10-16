@@ -6,7 +6,7 @@ stadig sin egen mappe med forløb, model, quizspørgsmål, Kemichael-scener og
 det, der er særligt for netop det forsøg.
 
 Bruges af sc1.3 Knaldgas, sc2.5 Fældning, sc2.6 Kobber og dibrom, sc2.7
-Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld og
+Blyiodid, sc4.8 Substitution, sc4.9 Fedt i chips, sc8.6 Jern i ståluld og
 sb2.4 Jernthiocyanat (kerne, rundvisning og grundstilark). Forsøgene ligger i
 `../superlab/` og henter filer herfra med `../../laboratoriet/`, ligesom med
 `kemichael/`. Forsøgene, der står helt på motoren, ligger for sig i
@@ -69,7 +69,7 @@ js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på. Boblen 
                      ned i samme forhold, og ingen slags forsvinder. Kuglernes og
                      skriftens størrelse er bobleIndhold i NK.BORD_VALG.
                      Formlen står uden kant i kuglen, mørk på lyse kugler og
-                     hvid på mørke (som i sc6.8); en lang formel gør kuglen
+                     hvid på mørke (som i sc4.8); en lang formel gør kuglen
                      større i stedet for skriften mindre. Når et tal ændrer
                      sig, fordi der sker en reaktion, SKER reaktionen også i
                      boblen — se »Reaktionerne i boblen« nedenfor
@@ -390,7 +390,7 @@ sb2.4's selvtest afsnit 19 prøver både rammen og forsøgets egne spørgsmål.
 ## Tegneserien
 
 `js/tegneserie.js` (`NK.Tegneserie`). Alle tre gamle tegneserier (sc2.7,
-sc6.8, sc8.6) var det samme mønster skrevet tre gange: **hver rude er et
+sc4.8, sc8.6) var det samme mønster skrevet tre gange: **hver rude er et
 udsnit af tegnebordet, tegnet med scenens egne tegnefunktioner ud fra en gemt
 tilstand** — ikke en ny tegning — plus et lag ovenpå med pil, lup og
 etiketter, og en sidste rude med resultatskemaet.
@@ -538,15 +538,15 @@ animationen som ovenfor.
 
 | Gammelt forsøg | Udstyr, der skal stå fremme | Skønnet bord | Mulig zoom |
 |---|---|---|---|
-| **sc6.8** substitution | to reagensglas i stativ, lampe, alufolie, prop, bromvand, hexan, pH-papir, AgNO₃ | ca. 800 × 620 | **1,17** |
+| **sc4.8** substitution | to reagensglas i stativ, lampe, alufolie, prop, bromvand, hexan, pH-papir, AgNO₃ | ca. 800 × 620 | **1,17** |
 | **sc2.5** fældning | 3×4-skema set ovenfra, syv dråbeflasker, lup | ca. 820 × 640 | **1,14** |
 | **sc2.6** kobber og dibrom | konisk kolbe med prop, to glas, tre dråbeflasker, kobberspåner, udsugning | ca. 950 × 650 | 0,99 |
 | **sc8.6** jern i ståluld | buret i stativ (høj), kolbe, varmeplade, vægt, to syreflasker, KMnO₄ | ca. 1000 × 780 | 0,92 (højden binder) |
 | **sc1.3** knaldgas | pneumatisk kar, måleglas, to trykflasker med slange, plads til molekyler, der flyver ud | ca. 1100 × 700 | 0,85 |
-| **sc6.9** fedt i chips | morter, tragt med filter, petriskål, vægt, varmeplade, brænder, heptan, chips | ca. 1200 × 680 | 0,78 |
+| **sc4.9** fedt i chips | morter, tragt med filter, petriskål, vægt, varmeplade, brænder, heptan, chips | ca. 1200 × 680 | 0,78 |
 
 sc8.6 er den eneste, hvor **højden** sætter grænsen: en buret i et stativ er
-høj, og lærredet er 715 px højt ved 1366 × 768. De to mindste (sc6.8 og
+høj, og lærredet er 715 px højt ved 1366 × 768. De to mindste (sc4.8 og
 sc2.5) kan komme højere op end noget, der kører i dag.
 
 Tre ting, der sætter grænsen i praksis:
@@ -814,7 +814,7 @@ på typen styrer, om beskeden siger »den« eller »det«. Zoomboblen
 tegnes i panelet (`NK.Bord.prototype.tegnBoble`), eller på scenen i
 laboratoriets hjørne, når bordet er sat op med `boble: { x, y }` (sb2.4).
 Boblen på scenen har en lup på kanten: et klik på den viser den stor midt
-på scenen over en mørk flade, som luppen i sc6.8 (`aabnStorBoble`), og et
+på scenen over en mørk flade, som luppen i sc4.8 (`aabnStorBoble`), og et
 klik hvor som helst eller Esc lukker den (`lukStorBoble`). Indholdet
 skaleres, så kugler og skrift er lige så skarpe, bare større.
 
@@ -1266,7 +1266,7 @@ selvtest med afsnittet ovenfor.
 * sc2.7 er lagt over i `../superlab_ny/sc2.7_blyiodid_ny/` (K3): kernen med
   afvejningen, varmepladen, de tre målinger, grafen (M9), quizzen og
   tegneserien kører. Tilbage er PbI₂ som krystal i zoomboblen, Kemichaels
-  egne scener og paritetslisten. Derefter sc6.8 og sc8.6.
+  egne scener og paritetslisten. Derefter sc4.8 og sc8.6.
 * **Grafen** (`js/graf.js`) er prøvet af sc2.7's kurve med punkter. Søjlerne
   venter på sc1.3, og en titreringskurve, der tegnes, mens der titreres, på
   den første titrering.
@@ -1277,7 +1277,7 @@ selvtest med afsnittet ovenfor.
 * **Mikroniveauet** kan vise bind, split, fæld, opløs og omdan. Fire former
   mere venter på deres første kunde: ligander, der sætter sig én ad gangen
   (sc2.6), bundfald pakket i hele formelenheder i et gitter med faste
-  pladser (sc2.5, sc2.7), et faseskift ned gennem en grænseflade (sc6.8) og
+  pladser (sc2.5, sc2.7), et faseskift ned gennem en grænseflade (sc4.8) og
   molekyler tegnet af atomer i stedet for kugler med formlen på (M10).
 * **Til spillet:** låste passager i `rum.js`, som spørger forløbets flag,
   om man må gå videre. Vilkårs- og forløbslaget er der allerede.

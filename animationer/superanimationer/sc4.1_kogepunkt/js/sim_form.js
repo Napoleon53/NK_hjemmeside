@@ -25,7 +25,7 @@
     var D = NK.Data;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc6.1-form";
+    var NOEGLE = "nk-sc4.1-form";
     var KASSE = { W: 20, H: 22 };
     var ANTAL = 14;
     var FARVER = ["#e35d4f", "#e8c547", "#4fc3b0"];
@@ -480,7 +480,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.1-intro-form", tilbud: "form-tilbud", spring: "form-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-form", tilbud: "form-tilbud", spring: "form-spring" });
 
     /* Mens han taler om glassene og termometeret, lyser de */
     P.pegPaaFelt = function () {

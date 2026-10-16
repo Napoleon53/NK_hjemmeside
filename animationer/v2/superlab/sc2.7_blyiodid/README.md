@@ -170,7 +170,7 @@ kaffekoppen ligger i `../../kemichael/sprites/`.
 | `varmeplade.svg` | varmeplade med magnetomrører | knapperne (52, 46) og (128, 46), lamperne (82, 38) og (158, 38) |
 | `termometer.svg` | digitalt termometer | display x 8-56, y 17-41 |
 | `affaldsdunk.svg` | tungmetalaffald, som i sc2.6 | åbning (45, 12) |
-| `koekkenrulle.svg` | køkkenrulle til spildet, som i sc6.8 | midte (36, 22) |
+| `koekkenrulle.svg` | køkkenrulle til spildet, som i sc4.8 | midte (36, 22) |
 | `lup.svg` | lup ved zoomboblens glas | linsens midte (15, 15) |
 
 Væskerne, bundfaldet, krystallerne, kogeboblerne, dampen, pulveret, stativet med

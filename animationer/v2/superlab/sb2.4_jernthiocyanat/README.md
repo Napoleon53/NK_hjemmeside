@@ -133,13 +133,13 @@ Alle ligger i `sprites/` som SVG og tegnes med `drawImage`. Ankrene står i
 | `spatel.svg` | skespatel, som i sc2.7 | skeens midte (12, 6) |
 | `flaske_kscn.svg`, `flaske_farve.svg` | glasflasker med KSCN 0,1 M og frugtfarve | åbningen (21, 3) |
 | `draabeflaske_agno3.svg` | dråbeflaske med AgNO₃ 0,1 M | spidsen (23, 0) |
-| `sproejteflaske.svg` | sprøjteflaske med vand, som i sc6.9 | tudens spids (44, 9) |
-| `reagensglas.svg` | reagensglas, som i sc6.8 | åbningen (15, 2); inderside i `S.GLAS_INDRE` |
+| `sproejteflaske.svg` | sprøjteflaske med vand, som i sc4.9 | tudens spids (44, 9) |
+| `reagensglas.svg` | reagensglas, som i sc4.8 | åbningen (15, 2); inderside i `S.GLAS_INDRE` |
 | `stativ8.svg` | træstativ til otte glas | huller ved x 34, 76, 118, 160, 202, 244, 286 og 328 |
 | `baegerglas.svg` | 250 mL, bruges til vandbad og isbad i skala 0,8 | inderside i `S.BAD_INDRE` |
 | `varmeplade.svg` | varmeplade, som i sc2.7, i skala 0,6 | knap (52, 46), lampe (82, 38) |
 | `affaldsdunk_surt.svg` | surt uorganisk affald | åbningen (45, 12) |
-| `koekkenrulle.svg`, `haand.svg`, `lup.svg` | som i sc6.8 | |
+| `koekkenrulle.svg`, `haand.svg`, `lup.svg` | som i sc4.8 | |
 
 Glasstaven, termometeret, det hvide kort og papiret, væsker, korn af fast
 stof, bundfald, vandet og isen i badene, damp, pytten, billedet, glassene set

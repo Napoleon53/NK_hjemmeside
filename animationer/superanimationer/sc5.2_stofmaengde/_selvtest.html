@@ -44,8 +44,8 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc4.2-vaegt", "nk-sc4.2-atomer", "nk-sc4.2-afvej",
-    "nk-sc4.2-intro-vaegt", "nk-sc4.2-intro-atomer", "nk-sc4.2-intro-afvej"];
+var NOEGLER = ["nk-sc5.2-vaegt", "nk-sc5.2-atomer", "nk-sc5.2-afvej",
+    "nk-sc5.2-intro-vaegt", "nk-sc5.2-intro-atomer", "nk-sc5.2-intro-afvej"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -376,7 +376,7 @@ function koerTest(W) {
     paastand("tre stoffer: Vis svaret løser den", V.naaet && V.landet() === 3 && V.komp().dele.length === 3);
     V.knap(); tik(V, 1);
     paastand("så forfra med to klumper og nye tal", V.maalNr === 7 && V.opg.navn === "To klumper");
-    paastand("hvor langt eleven er nået, huskes", (JSON.parse(W.localStorage.getItem("nk-sc4.2-vaegt")) || {}).maal === 7);
+    paastand("hvor langt eleven er nået, huskes", (JSON.parse(W.localStorage.getItem("nk-sc5.2-vaegt")) || {}).maal === 7);
     var S6 = [0, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 0];
     var lagtPaa = S6.map(function (x) { return V.laegPaa(x); });
     tik(V, 2);
@@ -421,7 +421,7 @@ function koerTest(W) {
     paastand("Vis svaret giver intet point", A.point === 1 && A.visteSvar);
     while (!A.slut) { if (!A.svar) A.vaelgSvar(A.facit()); A.knap(); }
     paastand("runden kan spilles til ende", A.slut && A.point === 7);
-    paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc4.2-atomer")) || {}).rekord >= 7);
+    paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc5.2-atomer")) || {}).rekord >= 7);
     var planFejl = [];
     D.PAR.forEach(function (p) {
         [{ v: p.a, h: p.b, niveau: p.niveau }, { v: p.b, h: p.a, niveau: p.niveau }].forEach(function (par) {

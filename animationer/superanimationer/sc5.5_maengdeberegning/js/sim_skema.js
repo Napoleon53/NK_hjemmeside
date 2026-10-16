@@ -20,7 +20,7 @@
     var Tg = NK.Tegn;
 
     var STIVHED = 26, DAEMPNING = 3.2;
-    var NOEGLE_FRIT = "nk-sc4.5-skema-frit";
+    var NOEGLE_FRIT = "nk-sc5.5-skema-frit";
 
     function SimSkema() {
         this.trinvis = !NK.hent(NOEGLE_FRIT, false);

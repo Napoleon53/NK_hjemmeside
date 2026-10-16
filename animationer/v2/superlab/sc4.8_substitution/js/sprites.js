@@ -41,7 +41,7 @@
         post.img.addEventListener("load", function () { post.klar = true; });
         post.img.addEventListener("error", function () {
             post.fejlet = true;
-            if (window.console) console.warn("sc6.8: kunne ikke indlaese " + sti);
+            if (window.console) console.warn("sc4.8: kunne ikke indlaese " + sti);
         });
         post.img.src = sti;
     }

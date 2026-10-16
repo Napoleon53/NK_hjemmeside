@@ -52,7 +52,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc4.3-formel", "nk-sc4.3-vaegt", "nk-sc4.3-hurtig"];
+var NOEGLER = ["nk-sc5.3-formel", "nk-sc5.3-vaegt", "nk-sc5.3-hurtig"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -528,7 +528,7 @@ function koerTest(W) {
     }
     paastand("runden er slut, og 11 af 12 var rigtige første gang", C.tilstand === "slut" && C.prikker.filter(function (p) { return p === 1; }).length === 11,
         C.prikker.join(","));
-    paastand("rekorden er gemt i browseren", C.rekord > 0 && W.localStorage.getItem("nk-sc4.3-hurtig") !== null);
+    paastand("rekorden er gemt i browseren", C.rekord > 0 && W.localStorage.getItem("nk-sc5.3-hurtig") !== null);
     C.knap();
     C.knap();
     paastand("Giv hint koster 5 s, og knappen hedder så Vis svaret", C.straf === 5 && C.el.knap.textContent === "Vis svaret");

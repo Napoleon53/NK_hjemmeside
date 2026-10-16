@@ -114,7 +114,7 @@
     }
 
     /* Formlen paa en kugle: fed skrift uden kant, inde i kuglen. Moerk
-       skrift paa lyse kugler og hvid paa moerke, som i sc6.8 - en sort kant
+       skrift paa lyse kugler og hvid paa moerke, som i sc4.8 - en sort kant
        om smaa bogstaver goer dem grynede. basis er skriftens stoerrelse;
        er formlen for bred, goeres skriften hoejst ned til mindst, og saa
        stoerre kuglen i stedet (rad i svaret), saa en lang formel som SO4 2-

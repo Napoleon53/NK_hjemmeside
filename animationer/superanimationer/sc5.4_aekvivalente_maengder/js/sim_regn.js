@@ -22,7 +22,7 @@
     var Tg = NK.Tegn;
     var Tj = NK.Tjek;
 
-    var NOEGLE = "nk-sc4.4-regn";
+    var NOEGLE = "nk-sc5.4-regn";
     var FARVE = { kendt: "#3fae72", ok: "#3d9ee0", svar: "#e0b43a", forkert: "#e05446" };
 
     function SimRegn() {
@@ -742,7 +742,7 @@
     };
 
     /* ----- Kemichaels praesentation ---------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.4-intro-regn", tilbud: "regn-tilbud", spring: "regn-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-regn", tilbud: "regn-tilbud", spring: "regn-spring" });
 
     /* Mens han siger, at man skriver under formlerne, blinker felterne */
     P.pegPaaFelt = function (til) {

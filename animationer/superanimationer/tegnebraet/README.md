@@ -78,7 +78,7 @@ molekylformel og molarmasse med, klar til at kopiere ind i rapporten.
   vinduet med et nyt klistermærke i sc4.2 bruger det).
 
 Tegningen huskes i browseren (`nk-tegnebraet`; en tegning fra sc4.2 under
-`nk-sc6.2-tegnebraet` hentes, hvis der ikke er en ny). Kemichael tilbyder at
+`nk-sc4.2-tegnebraet` hentes, hvis der ikke er en ny). Kemichael tilbyder at
 præsentere (`nk-tegnebraet-intro`), og kaffekoppen i hjørnet er påskeægget.
 
 ## Filer

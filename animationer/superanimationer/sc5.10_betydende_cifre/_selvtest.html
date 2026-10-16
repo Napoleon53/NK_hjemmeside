@@ -42,7 +42,7 @@ function vis() {
     document.getElementById("ud").innerHTML = linjer.join("\n");
 }
 
-var NOEGLER = ["nk-sc4.10-valg", "nk-sc4.10-rekord", "nk-sc4.10-enheder"];
+var NOEGLER = ["nk-sc5.10-valg", "nk-sc5.10-rekord", "nk-sc5.10-enheder"];
 var gemt = {};
 try { NOEGLER.forEach(function (k) { gemt[k] = localStorage.getItem(k); localStorage.removeItem(k); }); } catch (e) {}
 function laegTilbage() {
@@ -290,7 +290,7 @@ function koerAlt() {
         f.knap();
         paastand(id + ": Ny runde starter forfra", f.runde.nr === 0 && !f.runde.slut && f.runde.log.length === 0);
     });
-    paastand("Blandet: 10 af 10 bliver rekord", Number(w.localStorage.getItem("nk-sc4.10-rekord")) === 10);
+    paastand("Blandet: 10 af 10 bliver rekord", Number(w.localStorage.getItem("nk-sc5.10-rekord")) === 10);
     NK.visFane("komma");
     var fe = NK.aktivFane, okE = true;
     fe.skiftValg("enhed");
@@ -303,7 +303,7 @@ function koerAlt() {
 
     /* ----- 5b. Enhedernes niveauer og Meget svær ----------------------------------- */
     overskrift("5b. Enhedernes niveauer, og Meget svær låses op");
-    function klaretNu() { try { return JSON.parse(w.localStorage.getItem("nk-sc4.10-enheder")) || {}; } catch (e) { return {}; } }
+    function klaretNu() { try { return JSON.parse(w.localStorage.getItem("nk-sc5.10-enheder")) || {}; } catch (e) { return {}; } }
     function niveauKnap(n) { return d.querySelector('#niveauer [data-niveau="' + n + '"]'); }
     fe.knap();
     paastand("fire niveauknapper under Enheder, og Let har flueben efter runden med 10 rigtige",
@@ -314,7 +314,7 @@ function koerAlt() {
     paastand("et klik på Meget svær giver beskeden og skifter ikke niveau", fe.niveau === "let" && /låses op/.test(el("besked").textContent));
     niveauKnap("middel").click();
     paastand("Middel: ny runde med Middel-opgaver, og valget huskes", fe.niveau === "middel" && fe.runde.nr === 0 && fe.opg.niveau === "middel" &&
-        JSON.parse(w.localStorage.getItem("nk-sc4.10-valg"))["komma-niveau"] === "middel");
+        JSON.parse(w.localStorage.getItem("nk-sc5.10-valg"))["komma-niveau"] === "middel");
     helRunde(fe, 6);
     paastand("6 rigtige er ikke nok: Middel er ikke klaret", fe.runde.slut && !klaretNu().middel && !niveauKnap("middel").querySelector(".flueben"));
     fe.knap();
@@ -336,7 +336,7 @@ function koerAlt() {
     paastand("Meget svær: ti omregninger i træk giver 10 af 10, og kommaet hopper færdigt", okM && fe.rigtige() === 10, fe.runde.status.join(","));
     var genstart = new NK.Fane("komma", null);
     paastand("efter genindlæsning er Meget svær stadig valgt", genstart.niveau === "meget");
-    w.localStorage.removeItem("nk-sc4.10-enheder");
+    w.localStorage.removeItem("nk-sc5.10-enheder");
     genstart = new NK.Fane("komma", null);
     paastand("uden klarede niveauer falder et gemt Meget svær tilbage til Let", genstart.niveau === "let");
     fe.skiftNiveau("let");
@@ -396,7 +396,7 @@ function koerAlt() {
     f.tjek();
     paastand("tilbage på almindeligt tal tæller en skjult eksponent ikke med", f.loest && !f.fejl, el("besked").textContent);
     f.skiftValg("regn");
-    paastand("skift til regnestykker: ny runde, og valget huskes", f.runde.nr === 0 && f.opg.type === "regn" && JSON.parse(w.localStorage.getItem("nk-sc4.10-valg")).afrund === "regn");
+    paastand("skift til regnestykker: ny runde, og valget huskes", f.runde.nr === 0 && f.opg.type === "regn" && JSON.parse(w.localStorage.getItem("nk-sc5.10-valg")).afrund === "regn");
     f.skiftValg("maaletal");
 
     NK.visFane("tael");
@@ -456,7 +456,7 @@ function koerAlt() {
     var brede = [["1400px", "860px"], ["1100px", "640px"], ["900px", "700px"]], overl = [];
     /* Enhederne paa Svær og Meget svær har de laengste tal; de maales ogsaa
        loest, naar facit staar paa tavlen */
-    w.localStorage.setItem("nk-sc4.10-enheder", JSON.stringify({ let: true, middel: true, svaer: true }));
+    w.localStorage.setItem("nk-sc5.10-enheder", JSON.stringify({ let: true, middel: true, svaer: true }));
     var OPS = [["afrund"], ["komma", "notation"], ["komma", "enhed", "svaer"], ["komma", "enhed", "meget"], ["blandet"]];
     function tjekLinje(g, navn) {
         var rk = el("talrk"), bs = rk.querySelectorAll(".brik");

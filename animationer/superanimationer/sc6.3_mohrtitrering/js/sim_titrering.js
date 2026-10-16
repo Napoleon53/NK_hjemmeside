@@ -24,7 +24,7 @@
     var FART = 1.5;              /* mL/s med hanen helt aaben */
     var FALD = 0.3;              /* sekunder fra spidsen til overfladen */
     var TOM = 26.5;              /* mL: saa er buretten tom */
-    var NOEGLE_ROS = "nk-sc5.3-ros-titrering";
+    var NOEGLE_ROS = "nk-sc6.3-ros-titrering";
 
     function SimTitrering() {
         this.L = new NK.Laerred(NK.el("tit-laerred"));
@@ -646,7 +646,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.3-intro-titrering", tilbud: "tit-tilbud", spring: "tit-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc6.3-intro-titrering", tilbud: "tit-tilbud", spring: "tit-spring" });
 
     /* Mens han siger, hvad man goer, banker skyderen */
     P.pegPaaFelt = function (til) { this.pegHane = til; };

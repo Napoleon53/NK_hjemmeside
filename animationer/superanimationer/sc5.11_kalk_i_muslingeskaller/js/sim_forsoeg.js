@@ -30,7 +30,7 @@
     var Tg = NK.Tegn;
 
     /* ----- Maalingerne deles med fane 2 og huskes i browseren --------------------- */
-    var NOEGLE_MAAL = "nk-sc4.11-maalinger";
+    var NOEGLE_MAAL = "nk-sc5.11-maalinger";
     NK.maalinger = (function () {
         var g = NK.hent(NOEGLE_MAAL, null);
         if (g && g.length === 2) {

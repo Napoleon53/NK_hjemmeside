@@ -49,8 +49,8 @@ viser de gamle udgaver.
 | `superlab/sc2.5_faeldning` | ja | ældre sidelayout og ældre udgave af Kemichael |
 | `superlab/sc2.6_kobber_dibrom` | ja | |
 | `superlab/sc2.7_blyiodid` | ja | gammel kode; flyttet 11. okt. 2026 fra Kemi C til Kemi B, B2 Ligevægt knap 7 (`b2.7`), og lagt om til at bestemme Kₒ; mappenavnet er uændret |
-| `superlab/sc6.8_substitution` | ja | |
-| `superlab/sc6.9_fedt_i_chips` | ja | |
+| `superlab/sc4.8_substitution` | ja | |
+| `superlab/sc4.9_fedt_i_chips` | ja | |
 | `superlab/sc8.6_jern_i_staaluld` | ja | |
 | `superlab_ny/sb2.4_jernthiocyanat_ny` | ja | på den fælles motor; i »Det virtuelle laboratorium« |
 | `superlab_ny/sc2.7_blyiodid_ny` | ja | på den fælles motor (kernen, K3); i »Det virtuelle laboratorium« |
@@ -154,7 +154,7 @@ kan lave de fejl, man kan lave dér.
   `superlab_ny/` og hedder som den gamle udgave med `_ny` til sidst
   (`sc2.7_blyiodid` → `sc2.7_blyiodid_ny`). Mønster:
   `superlab_ny/sb2.4_jernthiocyanat_ny/` og `laboratoriet/README.md`. Quiz, tegneserie
-  og Kemichaels scener findes indtil videre i `superlab/sc6.8_substitution` og
+  og Kemichaels scener findes indtil videre i `superlab/sc4.8_substitution` og
   `superlab/sc8.6_jern_i_staaluld`.
 
 ## Det, der ikke er en animation

@@ -1,7 +1,7 @@
 /* =====================================================================
    tegneserie.js - forsoeget opsummeret i ruder
 
-   Alle tre gamle tegneserier (sc2.7, sc6.8, sc8.6) var det samme moenster
+   Alle tre gamle tegneserier (sc2.7, sc4.8, sc8.6) var det samme moenster
    skrevet tre gange: hver rude er ET UDSNIT AF TEGNEBORDET, tegnet med
    scenens egne tegnefunktioner ud fra en GEMT TILSTAND - ikke en ny
    tegning - plus et lag ovenpaa med pil, lup og etiketter, og en sidste

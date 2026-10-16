@@ -29,7 +29,7 @@
     var Tg = NK.Tegn;
     var Proeve = NK.Proeve;
 
-    var NOEGLE = "nk-sc6.6-koele";
+    var NOEGLE = "nk-sc4.6-koele";
     var SVAR = ["fast", "delvist", "flydende"];
 
     function SimKoele() {
@@ -670,7 +670,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.6-intro-koele", tilbud: "koele-tilbud", spring: "koele-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.6-intro-koele", tilbud: "koele-tilbud", spring: "koele-spring" });
 
     /* Mens han taler om zoomvinduet, lyser det */
     P.pegPaaFelt = function () {

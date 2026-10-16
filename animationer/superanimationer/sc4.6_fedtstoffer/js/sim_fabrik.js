@@ -26,7 +26,7 @@
     var F = NK.Fedt;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc6.6-fabrik";
+    var NOEGLE = "nk-sc4.6-fabrik";
     var PAA_TID = 0.9;           /* sekunder: fedtsyren bindes */
     var MAX_B = 28;              /* hoejst saa mange pixels pr. binding */
     var GLYCEROL_TEKST = ["CH₂", "CH", "CH₂"];
@@ -864,7 +864,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.6-intro-fabrik", tilbud: "fabrik-tilbud", spring: "fabrik-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.6-intro-fabrik", tilbud: "fabrik-tilbud", spring: "fabrik-spring" });
 
     P.pegPaaFelt = function () {};
 

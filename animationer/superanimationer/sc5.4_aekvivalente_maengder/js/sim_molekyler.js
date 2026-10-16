@@ -23,7 +23,7 @@
     var D = NK.Data;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc4.4-molekyler";
+    var NOEGLE = "nk-sc5.4-molekyler";
     var FLYV = 0.4;
     var SAML = 0.5;            /* molekylerne i et saet samles */
     var BYT = 0.85;            /* atomerne flytter til produkterne */
@@ -923,7 +923,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.4-intro-molekyler", tilbud: "molekyler-tilbud", spring: "molekyler-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-molekyler", tilbud: "molekyler-tilbud", spring: "molekyler-spring" });
 
     /* Mens han siger, at man traekker dem ind i kammeret, lyser kasserne */
     P.pegPaaFelt = function (til) { this.pegKasser = til; };

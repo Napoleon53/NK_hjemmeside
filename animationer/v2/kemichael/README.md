@@ -5,7 +5,7 @@ påskeæg og glimtene af hans baggrund ligger her, så han ser ens ud og opføre
 ens alle steder. Hver animation har sine egne scener i sin `js/laerer.js`.
 
 Bruges i sc1.3 Knaldgas, sc2.1 Salt i vand, sc2.6 Kobber og dibrom, sc2.7
-Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld, sb2.4
+Blyiodid, sc4.8 Substitution, sc4.9 Fedt i chips, sc8.6 Jern i ståluld, sb2.4
 Jernthiocyanat og prøvebordet i `laboratoriet/`.
 Animationerne ligger i `../superanimation/` og `../superlab/` og henter filer herfra
 med `../../kemichael/`.
@@ -81,18 +81,18 @@ Idéer til senere glimt i samme stil:
 | `fredag` | kaffen, posten `fredag` | Jeg går aldrig glip af et fredagsmøde. Der er kage. |
 | `gave` | kaffen, posten `gave` | Koppen var en gave fra en klasse, der ryddede op. Én gang. |
 | `kunst` | et knust glas fejes op (prøvebordet) | Skårene gemmer jeg. Det bliver en kunstinstallation. |
-| `phd` | morteren, knust helt vildt (sc6.9) | Sådan så min ph.d. også ud. Den blev aldrig færdig. |
-| `frokost` | han tager chipsposen (sc6.9) | Tak for frokosten. |
-| `oejenbryn` | branden (sc6.9) | Jeg prøvede det i 1994. Spørg mine øjenbryn. |
+| `phd` | morteren, knust helt vildt (sc4.9) | Sådan så min ph.d. også ud. Den blev aldrig færdig. |
+| `frokost` | han tager chipsposen (sc4.9) | Tak for frokosten. |
+| `oejenbryn` | branden (sc4.9) | Jeg prøvede det i 1994. Spørg mine øjenbryn. |
 | `vejleder` | spildt pulver (sc2.7) | Det sagde min vejleder også. Jeg lyttede heller ikke. |
 | `laege` | tre punkter på kurven (sc2.7) | Sådan en kurve lavede en elev i 2003. Hun er læge nu. |
-| `dab` | dab efter et særlig godt forsøg (sc6.8) | Det lærte jeg af en 1.g i 2016. |
-| `stroem` | lampen, han slukker (sc6.8) | Strømmen går fra kaffebudgettet. |
+| `dab` | dab efter et særlig godt forsøg (sc4.8) | Det lærte jeg af en 1.g i 2016. |
+| `stroem` | lampen, han slukker (sc4.8) | Strømmen går fra kaffebudgettet. |
 | `bartender` | kolben rystes første gang (sc8.6) | Jeg rystede cocktails under studiet. Det her er ikke det. |
 | `jura` | aubergine (sc8.6) | Aubergine så jeg sidst i 2011. Han læser jura nu. |
 | `titrering` | "Rustfrit." (sc8.6) | Min første titrering gav 140 %. Det var en lang nat. |
 | `afslag` | glas 7, referencen, får et indgreb (sb2.4) | Mit afslag fra et tidsskrift hænger indrammet. Samme grund. |
-| `regnskab3`, `6`, `10` | uheld: heptan, petriskål, varm skål og brand (sc6.9), spild og udsugning (sc6.8, sc2.6), vasken og kolben (sc2.6), spild og varmt glas (sc2.7), buretten og vægten (sc8.6), flammen (sc1.3), overkogningen (sc2.1) | Tredje uheld på den her computer. Det står i regnskabet. |
+| `regnskab3`, `6`, `10` | uheld: heptan, petriskål, varm skål og brand (sc4.9), spild og udsugning (sc4.8, sc2.6), vasken og kolben (sc2.6), spild og varmt glas (sc2.7), buretten og vægten (sc8.6), flammen (sc1.3), overkogningen (sc2.1) | Tredje uheld på den her computer. Det står i regnskabet. |
 
 ## Replikker
 
@@ -265,7 +265,7 @@ tæller oprydningerne i det forsøg, der kører nu, `K.oprydningsTekst()` giver
 teksten, og `K.tegneserieFigur(ctx, valg)` tegner ham i ruden. Valgene er `x`,
 `gulv`, `skala` (0,46 passer til en rude på 214 px), `arm`, `udtryk` og
 `haand(ctx, hd)`, som tegner det, han holder, fx køkkenrullen. Mønster:
-`../superlab/sc6.8_substitution/js/tegneserie.js`.
+`../superlab/sc4.8_substitution/js/tegneserie.js`.
 
 ## Filer
 

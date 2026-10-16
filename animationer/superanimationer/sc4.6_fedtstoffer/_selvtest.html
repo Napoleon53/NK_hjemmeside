@@ -43,7 +43,7 @@ function vis() {
     document.getElementById("ud").innerHTML = linjer.join("\n");
 }
 
-var NOEGLER = ["nk-sc6.6-fabrik", "nk-sc6.6-koele", "nk-sc6.6-intro-fabrik", "nk-sc6.6-intro-koele", "nk-kemichael"];
+var NOEGLER = ["nk-sc4.6-fabrik", "nk-sc4.6-koele", "nk-sc4.6-intro-fabrik", "nk-sc4.6-intro-koele", "nk-kemichael"];
 var gemt = {};
 try { NOEGLER.forEach(function (n) { gemt[n] = localStorage.getItem(n); localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
 

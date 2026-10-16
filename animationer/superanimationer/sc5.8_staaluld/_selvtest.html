@@ -48,7 +48,7 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc4.8-forsoeg", "nk-sc4.8-beregning", "nk-sc4.8-maalinger", "nk-sc4.8-skema"];
+var NOEGLER = ["nk-sc5.8-forsoeg", "nk-sc5.8-beregning", "nk-sc5.8-maalinger", "nk-sc5.8-skema"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -527,8 +527,8 @@ function koerTest(W) {
     var pctSvaer = B.opg.facit.pct;
     paastand("Svær, måling 1 kan løses: der regnes mere ud end i Let, så en mindre del af jernet har reageret",
         B.faerdig && B.status[0].stjerne && pctSvaer < pctLet && /Regnet ud: /.test(besked(B)), pctSvaer.toFixed(0) + " mod " + pctLet.toFixed(0) + ". " + besked(B));
-    var gemtB = NK.hent("nk-sc4.8-beregning", {});
-    paastand("de løste opgaver gemmes for hvert skema for sig, og valget af skema huskes", !!gemtB.m1 && !!gemtB.m2 && !!gemtB.m1_svaer && !gemtB.m2_svaer && NK.hent("nk-sc4.8-skema", "") === "svaer",
+    var gemtB = NK.hent("nk-sc5.8-beregning", {});
+    paastand("de løste opgaver gemmes for hvert skema for sig, og valget af skema huskes", !!gemtB.m1 && !!gemtB.m2 && !!gemtB.m1_svaer && !gemtB.m2_svaer && NK.hent("nk-sc5.8-skema", "") === "svaer",
         Object.keys(gemtB).join(","));
     loesB(1, true);
     paastand("Svær, måling 2 kan løses", B.faerdig && B.antalLoest() === 2, besked(B));

@@ -35,7 +35,7 @@ forslaget sat ind:
 3. **Naboerne:** `c4.7` "Umættet fedt?" (nr. 6 i menuen) ejer bromvand på
    fedtstoffer og at tælle dråber. `sc4.6_fedtstoffer` ejer fedtsyrer, knæk
    og hærdning; derfor er der ingen fedtstoffer her, og addition af
-   hydrogen vises kun på ethen og propen. `v2/superlab/sc6.8_substitution`
+   hydrogen vises kun på ethen og propen. `v2/superlab/sc4.8_substitution`
    ejer bromvand og hexan i lys og mørke, HBr og substitutionens gang;
    derfor er der hverken lampe, folie eller pH-papir her, og substitution
    nævnes kun med én sætning i teorien. `sc4.2` ejer navne og zigzagformler,
@@ -80,7 +80,7 @@ tilbagemeldinger på `sc7.5_staerke_og_svage_syrer`, og de gælder også her:
 
 `js/fane.js` og grundlaget i `css/stil.css` er taget fra sc7.5. Ændres
 mønsteret dér, hentes de to filer derfra igen. Det, der er rettet i
-`fane.js` her, er nøglen til browserens hukommelse (`nk-sc6.4-`) og
+`fane.js` her, er nøglen til browserens hukommelse (`nk-sc4.4-`) og
 tegningen på gætkortet (`figur`).
 
 ### Valg, brugeren ikke har taget stilling til
@@ -207,7 +207,7 @@ klik på et glas, opgaven ikke handler om.
   0,81 og benzen 0,88 g/mL) er skrevet efter hukommelsen. De bruges kun
   til at vise, at alle fem væsker ligger øverst.
 * **Lys er ikke med.** Et glas med en alkan blegner ikke, hvor længe det
-  end står. Substitutionen i lys er `sc6.8_substitution`.
+  end står. Substitutionen i lys er `sc4.8_substitution`.
 * **Benzen** bruges ikke i skolens laboratorium. Glasset er kun en model,
   og det siger et klik på det.
 * **Kæden** har en ledig plads i hver ende, mens den bygges, og der er

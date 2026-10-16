@@ -22,7 +22,7 @@
     var K = NK.Kemi;
     var Tg = NK.Tegn;
 
-    var NOEGLE_ROS = "nk-sc5.3-ros-beregning";
+    var NOEGLE_ROS = "nk-sc6.3-ros-beregning";
 
     function SimBeregning() {
         this.L = new NK.Laerred(NK.el("ber-laerred"));
@@ -512,7 +512,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.3-intro-beregning", tilbud: "ber-tilbud", spring: "ber-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc6.3-intro-beregning", tilbud: "ber-tilbud", spring: "ber-spring" });
 
     /* Mens han siger, hvor man skriver, lyser feltet */
     P.pegPaaFelt = function (til) {

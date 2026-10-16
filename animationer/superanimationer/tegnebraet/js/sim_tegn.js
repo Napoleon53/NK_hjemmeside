@@ -32,7 +32,7 @@
 
    Tegningen huskes i browseren (localStorage), saa den er der igen,
    naar siden aabnes. Indtil 25. sept. 2026 laa tegnebraettet i sc4.2 og
-   gemte under nk-sc6.2-tegnebraet; den gamle tegning hentes, hvis der
+   gemte under nk-sc4.2-tegnebraet; den gamle tegning hentes, hvis der
    ikke er en ny.
    ===================================================================== */
 (function () {
@@ -41,7 +41,7 @@
     var NK = window.NK;
     var D = NK.Data;
     var NOEGLE = "nk-tegnebraet";
-    var GAMMEL = "nk-sc6.2-tegnebraet";
+    var GAMMEL = "nk-sc4.2-tegnebraet";
     var FOLD = "nk-tegnebraet-foldet";
     var TOM_SKUFFE = 'Tom. Klar en quiz i <a href="../sc4.2_zigzagformler/index.html" target="_blank" rel="noopener">Zigzagformler</a>.';
 

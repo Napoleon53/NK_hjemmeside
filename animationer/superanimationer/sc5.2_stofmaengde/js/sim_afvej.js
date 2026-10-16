@@ -19,7 +19,7 @@
     var Tg = NK.Tegn;
     var Tj = NK.Tjek;
 
-    var NOEGLE = "nk-sc4.2-afvej";
+    var NOEGLE = "nk-sc5.2-afvej";
     /* Haeldningen: krukken loeftes hen over vejebaaden, haelder og saettes tilbage */
     var LOEFT = 0.45, HAELD = 1.0, TILBAGE = 0.5;
     var HAELD_TID = LOEFT + HAELD + TILBAGE;
@@ -581,7 +581,7 @@
     };
 
     /* ----- Kemichaels praesentation ---------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-afvej", tilbud: "afvej-tilbud", spring: "afvej-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.2-intro-afvej", tilbud: "afvej-tilbud", spring: "afvej-spring" });
 
     /* Mens han siger, at molarmassen staar paa krukken, lyser krukken */
     P.pegPaaFelt = function (til) { this.pegKrukke = til; };

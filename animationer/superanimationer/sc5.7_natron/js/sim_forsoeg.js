@@ -24,8 +24,8 @@
     var Tg = NK.Tegn;
 
     /* ----- Maalingen deles med fane 2 og huskes i browseren ----------------------- */
-    var NOEGLE_MAAL = "nk-sc4.7-maaling";
-    var NOEGLE_GAET = "nk-sc4.7-gaet";
+    var NOEGLE_MAAL = "nk-sc5.7-maaling";
+    var NOEGLE_GAET = "nk-sc5.7-gaet";
     NK.minMaaling = (function () {
         var g = NK.hent(NOEGLE_MAAL, null);
         if (g && g.mf > 0 && g.slut > 0 && g.vejninger && g.vejninger.length >= 2) return g;

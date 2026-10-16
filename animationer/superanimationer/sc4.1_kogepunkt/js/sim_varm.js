@@ -23,7 +23,7 @@
     var Tg = NK.Tegn;
     var S = NK.Sprites;
 
-    var NOEGLE = "nk-sc6.1-varm";
+    var NOEGLE = "nk-sc4.1-varm";
     var FLYV_TID = 0.5;
     var KASSE = { W: 32, H: 31 };
     var KP_FARVE = "#f0685a", SMP_FARVE = "#7fb8ec";
@@ -889,7 +889,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.1-intro-varm", tilbud: "varm-tilbud", spring: "varm-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-varm", tilbud: "varm-tilbud", spring: "varm-spring" });
 
     /* Mens han taler om hylden og termometeret, lyser de */
     P.pegPaaFelt = function () {

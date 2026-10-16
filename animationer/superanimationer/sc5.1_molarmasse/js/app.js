@@ -21,9 +21,9 @@
             esc: "springIntro"
         });
     }
-    tilbud(NK.SimVaegt && NK.SimVaegt.prototype, "nk-sc4.1-intro-vaegt", "vaegt-tilbud");
-    tilbud(NK.SimSkaal && NK.SimSkaal.prototype, "nk-sc4.1-intro-skaal", "skaal-tilbud");
-    tilbud(NK.SimUkendt && NK.SimUkendt.prototype, "nk-sc4.1-intro-ukendt", "ukendt-tilbud");
+    tilbud(NK.SimVaegt && NK.SimVaegt.prototype, "nk-sc5.1-intro-vaegt", "vaegt-tilbud");
+    tilbud(NK.SimSkaal && NK.SimSkaal.prototype, "nk-sc5.1-intro-skaal", "skaal-tilbud");
+    tilbud(NK.SimUkendt && NK.SimUkendt.prototype, "nk-sc5.1-intro-ukendt", "ukendt-tilbud");
 
     var sims = {};
     var faner = ["fane-vaegt", "fane-skaal", "fane-ukendt"];

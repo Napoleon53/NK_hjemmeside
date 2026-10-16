@@ -49,8 +49,8 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-skuffe", "nk-sc6.2-skuffe", "nk-sc6.2-intro-zigzag", "nk-sc6.2-intro-navne", "nk-sc6.2-intro-isomerer",
-    "nk-sc6.2-intro-oploeselighed", "nk-sc6.2-oploeselighed-rekord"];
+var NOEGLER = ["nk-skuffe", "nk-sc4.2-skuffe", "nk-sc4.2-intro-zigzag", "nk-sc4.2-intro-navne", "nk-sc4.2-intro-isomerer",
+    "nk-sc4.2-intro-oploeselighed", "nk-sc4.2-oploeselighed-rekord"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -421,7 +421,7 @@ function koerTest(W) {
     overskrift("8. Kemichaels skuffe og fejringen");
     var SK = NK.Skuffe;
     W.localStorage.removeItem(SK.NOEGLE);
-    W.localStorage.removeItem("nk-sc6.2-skuffe");
+    W.localStorage.removeItem("nk-sc4.2-skuffe");
     paastand("skuffen har ti klistermærker, ét for hver quiz", SK.ALLE.length === 10 && SK.antalAabne() === 0);
     var alleQuiz = SK.ALLE.map(function (k) { return k.quiz; }).sort().join();
     paastand("quizzerne er de ti på Zigzag, Navne og Isomerer", alleQuiz === ["is-4", "is-5", "is-6", "is-7", "nv-byg-alkaner", "nv-byg-alkener", "nv-navn-alkaner", "nv-navn-alkener", "zz-atomer", "zz-tegn"].join(), alleQuiz);
@@ -431,10 +431,10 @@ function koerTest(W) {
     paastand("en quiz låser sit klistermærke op én gang", k1 && k1.navn === "kaffekop" && k2 === null && SK.aaben("kaffekop") && SK.antalAabne() === 1);
     paastand("skuffen gemmes under den fælles nøgle, som tegnebrættet også læser", SK.NOEGLE === "nk-skuffe" && /kaffekop/.test(W.localStorage.getItem("nk-skuffe") || ""));
     W.localStorage.removeItem(SK.NOEGLE);
-    W.localStorage.setItem("nk-sc6.2-skuffe", JSON.stringify({ festhat: true }));
+    W.localStorage.setItem("nk-sc4.2-skuffe", JSON.stringify({ festhat: true }));
     paastand("det, der var låst op under den gamle nøgle, flyttes med over", SK.aaben("festhat") && SK.antalAabne() === 1);
     W.localStorage.removeItem(SK.NOEGLE);
-    W.localStorage.removeItem("nk-sc6.2-skuffe");
+    W.localStorage.removeItem("nk-sc4.2-skuffe");
     /* Isomerer, C4H10 klaret selv: kaffekoppen, konfetti og vinduet */
     NK.visFane("isomerer");
     d.querySelector('#is-niveau button[data-v="4"]').click();
@@ -587,7 +587,7 @@ function koerTest(W) {
     paastand("fane 4: Nyt spil giver en ny bunke med tre liv og 0 point", !OS.slut && OS.liv === 3 && OS.point === 0 && OS.nr === 0 && OS.res.every(function (x) { return x === 0; }));
     OS.bunke.forEach(function (m, k) { OS.vaelg(OS.m.svar === "begge" ? "vand" : OS.m.svar); if (k < OS.bunke.length - 1) OS.knap(); });
     paastand("fane 4: hele bunken rigtigt: 1500 point, rekorden huskes, og Kemichael roser", OS.slut === "vundet" && OS.point === 1500 &&
-        W.JSON.parse(W.localStorage.getItem("nk-sc6.2-oploeselighed-rekord")) === 1500 && OS.laerer && OS.laerer.scene && OS.laerer.scene.navn === "faerdig");
+        W.JSON.parse(W.localStorage.getItem("nk-sc4.2-oploeselighed-rekord")) === 1500 && OS.laerer && OS.laerer.scene && OS.laerer.scene.navn === "faerdig");
     OS.nytSpil();
     NK.visFane("zigzag");
 

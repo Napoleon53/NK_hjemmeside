@@ -20,7 +20,7 @@
     var faner = ["fane-forsoeg", "fane-beregning", "fane-fejl"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
-    var NOEGLE_NIVEAU = "nk-sc4.11-niveau";
+    var NOEGLE_NIVEAU = "nk-sc5.11-niveau";
 
     /* ----- Faner ------------------------------------------------------ */
     function visFane(id) {

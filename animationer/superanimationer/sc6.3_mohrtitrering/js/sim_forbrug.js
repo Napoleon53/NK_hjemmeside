@@ -22,7 +22,7 @@
     var Tg = NK.Tegn;
 
     var FART = 6;                /* mL/s, naar Kemichael titrerer */
-    var NOEGLE_ROS = "nk-sc5.3-ros-forbrug";
+    var NOEGLE_ROS = "nk-sc6.3-ros-forbrug";
 
     function SimForbrug() {
         this.L = new NK.Laerred(NK.el("for-laerred"));
@@ -414,7 +414,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc5.3-intro-forbrug", tilbud: "for-tilbud", spring: "for-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc6.3-intro-forbrug", tilbud: "for-tilbud", spring: "for-spring" });
 
     P.pegPaaFelt = function (til) { this.el.valg.classList.toggle("peg", !!til); };
 

@@ -23,7 +23,7 @@
     var S = D.STEMPEL;
     var MAAL = NK.Sprites.MAAL;
 
-    var NOEGLE = "nk-sc4.6-stempel";
+    var NOEGLE = "nk-sc5.6-stempel";
 
     /* Trykket paa fane 1 med tre decimaler, som luftens 1,013 bar */
     function pTekst(p) { return p.toFixed(3).replace(".", ",") + " bar"; }

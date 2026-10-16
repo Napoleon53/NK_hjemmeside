@@ -500,7 +500,7 @@
     };
 
     /* Kemichaels praesentation */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.2-intro-zigzag", tilbud: "zz-tilbud", spring: "zz-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-zigzag", tilbud: "zz-tilbud", spring: "zz-spring" });
     P.pegPaaFelt = function () {};
 
     NK.SimZigzag = SimZigzag;

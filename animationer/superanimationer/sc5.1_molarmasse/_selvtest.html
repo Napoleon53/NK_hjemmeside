@@ -45,8 +45,8 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc4.1-vaegt", "nk-sc4.1-skaal", "nk-sc4.1-ukendt",
-    "nk-sc4.1-intro-vaegt", "nk-sc4.1-intro-skaal", "nk-sc4.1-intro-ukendt"];
+var NOEGLER = ["nk-sc5.1-vaegt", "nk-sc5.1-skaal", "nk-sc5.1-ukendt",
+    "nk-sc5.1-intro-vaegt", "nk-sc5.1-intro-skaal", "nk-sc5.1-intro-ukendt"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -355,7 +355,7 @@ function koerTest(W) {
     paastand("Vis svaret giver intet point", S.point === 1 && S.visteSvar);
     while (!S.slut) { if (!S.svar) S.vaelgSvar(S.facit()); S.knap(); }
     paastand("runden kan spilles til ende", S.slut && S.point === 7);
-    paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc4.1-skaal")) || {}).rekord >= 7);
+    paastand("rekorden gemmes", (JSON.parse(W.localStorage.getItem("nk-sc5.1-skaal")) || {}).rekord >= 7);
     S.runde = [{ v: D.stof("CO"), h: D.stof("N2"), niveau: 2, hvorfor: "" }];
     S.nr = 0; S.slut = false; S.nytPar();
     S.vaelgSvar("l");

@@ -48,7 +48,7 @@ function vis() {
     document.getElementById("ud").innerHTML = linjer.join("\n");
 }
 
-var NOEGLER = ["nk-tegnebraet", "nk-sc6.2-tegnebraet", "nk-skuffe", "nk-sc6.2-skuffe", "nk-tegnebraet-intro", "nk-tegnebraet-foldet"];
+var NOEGLER = ["nk-tegnebraet", "nk-sc4.2-tegnebraet", "nk-skuffe", "nk-sc4.2-skuffe", "nk-tegnebraet-intro", "nk-tegnebraet-foldet"];
 var gemt = {};
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
@@ -486,7 +486,7 @@ function koerTest(W) {
     overskrift("10. Kemichaels skuffe");
     var SK = NK.Skuffe;
     localStorage.removeItem("nk-skuffe");
-    localStorage.removeItem("nk-sc6.2-skuffe");
+    localStorage.removeItem("nk-sc4.2-skuffe");
     T.visSkuffe();
     var skjulte = Array.prototype.filter.call(d.querySelectorAll("#tb-skuffe-felter button"), function (k) { return k.hidden; }).length;
     paastand("en tom skuffe er usynlig: kortet kommer først, når en quiz i Zigzagformler er klaret", skjulte === 10 && d.getElementById("tb-skuffe").hidden);
@@ -821,8 +821,8 @@ function koerTest(W) {
 function anden() {
     localStorage.removeItem("nk-tegnebraet");
     localStorage.removeItem("nk-skuffe");
-    localStorage.setItem("nk-sc6.2-skuffe", JSON.stringify({ kaffekop: true }));
-    localStorage.setItem("nk-sc6.2-tegnebraet", JSON.stringify({ m: { atomer: [[1, "C", 0, 0, 0], [2, "C", 0.866, -0.5, 0], [3, "O", 1.732, 0, 0]], bindinger: [[1, 2, 1], [2, 3, 1]], naeste: 4 }, o: [] }));
+    localStorage.setItem("nk-sc4.2-skuffe", JSON.stringify({ kaffekop: true }));
+    localStorage.setItem("nk-sc4.2-tegnebraet", JSON.stringify({ m: { atomer: [[1, "C", 0, 0, 0], [2, "C", 0.866, -0.5, 0], [3, "O", 1.732, 0, 0]], bindinger: [[1, 2, 1], [2, 3, 1]], naeste: 4 }, o: [] }));
     var f2 = document.createElement("iframe");
     f2.id = "ramme2";
     f2.src = "index.html#klister=kaffekop";

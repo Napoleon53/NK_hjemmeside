@@ -22,7 +22,7 @@
     var D = NK.Data;
     var Tg = NK.Tegn;
 
-    var NOEGLE = "nk-sc6.1-spil";
+    var NOEGLE = "nk-sc4.1-spil";
     var KASSE = { W: 32, H: 30 };
 
     function SimSpil() {
@@ -429,7 +429,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.1-intro-spil", tilbud: "spil-tilbud", spring: "spil-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.1-intro-spil", tilbud: "spil-tilbud", spring: "spil-spring" });
 
     /* Mens han siger, hvor man gaetter, lyser svarene */
     P.pegPaaFelt = function () {

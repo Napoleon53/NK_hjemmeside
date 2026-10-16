@@ -25,7 +25,7 @@
     var Tg = NK.Tegn;
     var Tj = NK.Tjek;
 
-    var NOEGLE = "nk-sc4.4-poelsevogn";
+    var NOEGLE = "nk-sc5.4-poelsevogn";
     var FLYV = 0.4;            /* en ting flyver fra beholderen til brættet */
     var SAML = 0.55;           /* tingene flyver hen paa bakken */
     var FORSKYD = 0.1;         /* retterne samles efter hinanden */
@@ -1287,7 +1287,7 @@
     };
 
     /* ----- Kemichaels praesentation ------------------------------------------- */
-    NK.Praesentation.kobl(P, { noegle: "nk-sc4.4-intro-hotdog", tilbud: "hotdog-tilbud", spring: "hotdog-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc5.4-intro-hotdog", tilbud: "hotdog-tilbud", spring: "hotdog-spring" });
 
     /* Mens han siger, at man traekker tingene hen paa brættet, lyser beholderne */
     P.pegPaaFelt = function (til) { this.pegBeholdere = til; };

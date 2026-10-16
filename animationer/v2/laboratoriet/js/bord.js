@@ -3454,7 +3454,7 @@
     }
 
     /* ----- Den store zoomboble ---------------------------------------------
-       Som luppen i den gamle sc6.8: et klik paa boblen i hjoernet viser den
+       Som luppen i den gamle sc4.8: et klik paa boblen i hjoernet viser den
        stor midt paa scenen, over alt andet, og imens kan intet andet
        roeres. Et klik hvor som helst lukker den, og siden lukker den med
        Esc. Den viser stadig det valgte glas og lever videre. */

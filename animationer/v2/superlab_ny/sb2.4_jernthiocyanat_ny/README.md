@@ -76,7 +76,7 @@ stativet, varmepladen med vandbadet og isbadet. Zoomboblen står i
 laboratoriets øverste venstre hjørne (`boble: { x, y }`, radius 135, og
 kuglerne og skriften i den er en tiendedel mindre end standard,
 `bobleIndhold: 0.9`) og skalerer med resten. Et klik på boblen viser den
-stor midt på scenen, som luppen i sc6.8; et klik eller Esc lukker den.
+stor midt på scenen, som luppen i sc4.8; et klik eller Esc lukker den.
 Boblen har en stiplet streg ned til det glas, den kigger ind i, og glassets
 navn under sig. Skalaen er fast (`partikelRef: 3`: 3 mM giver seks
 kugler), så FeSCN²⁺ bliver flere kugler, når der tilsættes Fe³⁺ eller SCN⁻,

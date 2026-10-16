@@ -1,4 +1,4 @@
-# sc6.9 Fedt i chips
+# sc4.9 Fedt i chips
 
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.

@@ -24,9 +24,9 @@
     var D = NK.Data;
     var C = NK.Cifre;
 
-    var NOEGLE_VALG = "nk-sc4.10-valg";
-    var NOEGLE_REKORD = "nk-sc4.10-rekord";
-    var NOEGLE_KLARET = "nk-sc4.10-enheder";   /* de enhedsniveauer, der er klaret */
+    var NOEGLE_VALG = "nk-sc5.10-valg";
+    var NOEGLE_REKORD = "nk-sc5.10-rekord";
+    var NOEGLE_KLARET = "nk-sc5.10-enheder";   /* de enhedsniveauer, der er klaret */
 
     function klaret() { return NK.hent(NOEGLE_KLARET, {}) || {}; }
     function oplaast(k) { k = k || klaret(); return !!(k.let && k.middel && k.svaer); }

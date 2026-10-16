@@ -30,7 +30,7 @@
     var BLAA = "#1f63c7", BRUN = "#a8620f", GROEN = "#2f8f5b", ROED = "#c8473a", GUL = "#d9a520";
     var LIV = 3;
     var POINT = { selv: 100, hint: 70 };
-    var NOEGLE_REKORD = "nk-sc6.2-oploeselighed-rekord";
+    var NOEGLE_REKORD = "nk-sc4.2-oploeselighed-rekord";
 
     var LAG = {
         heptan: { navn: "heptan", under: "upolær", fyld: "rgba(246, 205, 92, 0.30)", lys: "rgba(246, 205, 92, 0.58)",
@@ -834,7 +834,7 @@
         this.status(this.hjaelp && this.m.grupper.length ? S.oploesHint : S.oploesStart);
     };
 
-    NK.Praesentation.kobl(P, { noegle: "nk-sc6.2-intro-oploeselighed", tilbud: "op-tilbud", spring: "op-spring" });
+    NK.Praesentation.kobl(P, { noegle: "nk-sc4.2-intro-oploeselighed", tilbud: "op-tilbud", spring: "op-spring" });
 
     NK.SimOploes = SimOploes;
 }());

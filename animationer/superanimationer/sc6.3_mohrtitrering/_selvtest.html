@@ -46,8 +46,8 @@ function vis() {
 
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
-var NOEGLER = ["nk-sc5.3-intro-titrering", "nk-sc5.3-intro-beregning", "nk-sc5.3-intro-forbrug",
-    "nk-sc5.3-ros-titrering", "nk-sc5.3-ros-beregning", "nk-sc5.3-ros-forbrug"];
+var NOEGLER = ["nk-sc6.3-intro-titrering", "nk-sc6.3-intro-beregning", "nk-sc6.3-intro-forbrug",
+    "nk-sc6.3-ros-titrering", "nk-sc6.3-ros-beregning", "nk-sc6.3-ros-forbrug"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -379,7 +379,7 @@ function koerTest(W) {
         tik(sim, 4);
         paastand(id + ": præsentationen kan vises og sendes ud med Esc", inde && spring && !sim.laererIIntro() && d.getElementById(sim.springId).hidden);
     });
-    try { W.localStorage.removeItem("nk-sc5.3-intro-titrering"); } catch (e) { /* ingen hukommelse */ }
+    try { W.localStorage.removeItem("nk-sc6.3-intro-titrering"); } catch (e) { /* ingen hukommelse */ }
     S1.startIntro(false);
     var tilbud = d.getElementById("tit-tilbud");
     paastand("tilbuddet om præsentationen står der første gang", !tilbud.hidden && W.getComputedStyle(tilbud).display !== "none");
