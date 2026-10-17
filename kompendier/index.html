@@ -68,7 +68,10 @@
   .indryk { margin-left: 27px; }
   .overskrifter { margin: 3px 0 0; color: var(--daempet); font-size: 13.5px; }
   .opgaver { display: flex; align-items: stretch; gap: 10px; margin-top: 9px; flex-wrap: wrap; }
-  .opgaver > span { font-size: 14px; font-weight: 600; margin-left: 6px; align-self: center; }
+  .opgaver > span, .valggruppe > span { font-size: 14px; font-weight: 600; margin-left: 6px; align-self: center; }
+  /* Et navn og dets knapper (Noter eller Opgaver) står altid på samme linje. */
+  .valggruppe { display: flex; align-items: stretch; gap: 10px; flex: 1 1 420px; }
+  .valggruppe.noter + .valggruppe > span, .valggruppe.noter > span { min-width: 4.4em; }
   .trin { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; flex: 1 1 340px; }
   .trin label, .valgknap { position: relative; cursor: pointer; display: flex; }
   .valgknap { flex: 0 0 92px; }
@@ -81,6 +84,8 @@
   .trin input:focus-visible + span, .valgknap input:focus-visible + span { outline: 2px solid var(--blaek); outline-offset: 2px; }
   .trin label:hover span, .valgknap:hover span { border-color: var(--groen); }
   .slukket .indryk { opacity: 0.45; }
+  /* Noternes tre knapper har samme bredde som opgavernes fire, så de står under hinanden. */
+  .trin.tre { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .udgaver { display: flex; align-items: center; gap: 10px; margin: 7px 0 0 27px; }
   .udgaver > span { font-size: 14px; font-weight: 600; }
   .udgaver .trin { grid-template-columns: repeat(2, minmax(0, 150px)); flex: 0 1 auto; }
@@ -125,10 +130,15 @@
     .tal { font-size: 26px; display: inline-block; margin-right: 10px; }
     .ark { display: inline-block; }
     .trin { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .trin.tre { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .afsnitliste .raekke { padding-left: 16px; }
     .valgknap { flex-basis: 100%; }
     .grunde { grid-template-columns: minmax(0, 1fr); }
-    .opgaver > span { margin-left: 0; }
+    .opgaver > span, .valggruppe > span { margin-left: 0; }
+    .valggruppe { flex-wrap: wrap; }
+    /* Kapitlets knapper står under kapitlets navn, så de ikke løber ud over kanten. */
+    .kapitelhoved { flex-wrap: wrap; }
+    .kapitelhoved label.kryds { flex: 1 1 100%; }
   }
 </style>
 </head>
@@ -152,7 +162,7 @@
   <div>
     <section class="gruppe">
       <h2>Fagligt fokus</h2>
-      <p class="hjaelp">Vælg et eller flere kapitler. Til hvert afsnit kan du vælge sider til noter med bogens overskrifter og en mængde opgaver.</p>
+      <p class="hjaelp">Vælg et eller flere kapitler. Til hvert afsnit kan du vælge sider til noter med overskrifterne fra bogen og slides og en mængde opgaver. Har afsnittet ekstra noter, kan du vælge dem i stedet for de korte: de har mere plads og flere hjælpebokse, fx til elever, der har brug for mere støtte, eller til meget gruppearbejde.</p>
       <div class="raekker" id="kapitler"></div>
     </section>
 
@@ -231,6 +241,12 @@
     })[0];
   }
 
+  // Sand, når alle de afsnit i kapitlet, der har ekstra noter, har dem valgt.
+  function alleEkstra(nr) {
+    var v = valg.kapitler[nr];
+    return kapitler[nr].afsnit.every(function (a) { return !a.ekstra || (v.afsnit[a.nr].noter && v.afsnit[a.nr].ekstra); });
+  }
+
   // ---- Valgene gemmes i browseren, så de er der næste gang ----
   function hentValg() {
     var v = Kompendium.standardvalg(kapitler);
@@ -251,6 +267,7 @@
             var va = v.kapitler[nr].afsnit[a.nr];
             va.med = ga.med !== false;
             va.noter = ga.noter !== false;
+            va.ekstra = !!a.ekstra && ga.ekstra === true;
             if (ga.opgaver === 'ingen' || a.opgaver[ga.opgaver]) va.opgaver = ga.opgaver;
           });
           kapitler[nr].oevelser.forEach(function (id) { if (g.oevelser && id in g.oevelser) v.kapitler[nr].oevelser[id] = !!g.oevelser[id]; });
@@ -286,17 +303,27 @@
           return '<label><input type="radio" name="opgaver-' + a.nr + '" value="' + n + '"' + (va.opgaver === n ? ' checked' : '') + '>' +
             '<span><b>' + NIVEAUNAVNE[n] + '</b>' + (d ? '<small>' + d.opgaver + ' opgaver</small><small>' + sider(d.sider) + '</small>' : '<small>0 sider</small>') + '</span></label>';
         }).join('');
+        // Har afsnittet ekstra noter, vælges noterne på tre knapper: ingen, korte eller ekstra.
+        var noter = !a.ekstra ?
+          '<label class="valgknap"><input type="checkbox" id="noter-' + a.nr + '"' + (va.noter ? ' checked' : '') + '>' +
+          '<span><b>Noter</b><small>' + sider(del(nr, a.noter).sider) + '</small></span></label>' :
+          '<div class="valggruppe noter"><span id="notenavn-' + a.nr + '">Noter</span>' +
+          '<div class="trin tre" role="radiogroup" aria-labelledby="notenavn-' + a.nr + '">' +
+          [['ingen', 'Ingen', 0], ['korte', 'Korte', del(nr, a.noter).sider], ['ekstra', 'Ekstra', del(nr, a.ekstra).sider]].map(function (k) {
+            var valgt = k[0] === (!va.noter ? 'ingen' : va.ekstra ? 'ekstra' : 'korte');
+            return '<label><input type="radio" name="noter-' + a.nr + '" value="' + k[0] + '"' + (valgt ? ' checked' : '') + '>' +
+              '<span><b>' + k[1] + '</b><small>' + sider(k[2]) + '</small></span></label>';
+          }).join('') + '</div></div>';
         return '<div class="raekke" data-afsnit="' + a.nr + '">' +
           kryds('afsnit-' + a.nr, a.titel, '', va.med) +
-          '<div class="indryk"><p class="overskrifter">' + a.overskrifter.map(tekst).join(' · ') + '</p>' +
-          '<div class="opgaver">' +
-          '<label class="valgknap"><input type="checkbox" id="noter-' + a.nr + '"' + (va.noter ? ' checked' : '') + '>' +
-          '<span><b>Noter</b><small>' + sider(del(nr, a.noter).sider) + '</small></span></label>' +
-          '<span id="opgavenavn-' + a.nr + '">Opgaver</span>' +
-          '<div class="trin" role="radiogroup" aria-labelledby="opgavenavn-' + a.nr + '">' + trin + '</div></div></div></div>';
+          '<div class="indryk"><p class="overskrifter" id="overskrifter-' + a.nr + '"></p>' +
+          '<div class="opgaver">' + noter +
+          '<div class="valggruppe"><span id="opgavenavn-' + a.nr + '">Opgaver</span>' +
+          '<div class="trin" role="radiogroup" aria-labelledby="opgavenavn-' + a.nr + '">' + trin + '</div></div></div></div></div>';
       }).join('');
       return bogoverskrift + '<div class="kapitel" data-kapitel="' + nr + '"><div class="kapitelhoved">' +
         kryds('kapitel-' + nr, 'Kapitel ' + data.kapitel + ': ' + data.titel, '', v.med) +
+        (data.afsnit.some(function (a) { return a.ekstra; }) ? '<button type="button" class="knap-lille" data-ekstra="' + nr + '"></button>' : '') +
         '<button type="button" class="knap-lille" data-noter="' + nr + '"></button></div>' +
         '<div class="afsnitliste">' + afsnit + '</div></div>';
     }).join('');
@@ -368,8 +395,12 @@
       // Knappen slår noterne fra eller til i hele kapitlet.
       var harNoter = kapitler[nr].afsnit.some(function (a) { return v.afsnit[a.nr].noter; });
       boks.querySelector('[data-noter]').textContent = harNoter ? 'Slå alle noter fra' : 'Slå alle noter til';
+      var ekstraknap = boks.querySelector('[data-ekstra]');
+      if (ekstraknap) ekstraknap.textContent = alleEkstra(nr) ? 'Korte noter i hele kapitlet' : 'Ekstra noter i hele kapitlet';
       kapitler[nr].afsnit.forEach(function (a) {
         document.querySelector('[data-afsnit="' + a.nr + '"]').classList.toggle('slukket', !v.afsnit[a.nr].med);
+        // Overskrifterne under afsnittets navn er dem fra de noter, der er valgt.
+        $('overskrifter-' + a.nr).textContent = del(nr, Kompendium.noterdel(a, v.afsnit[a.nr])).overskrifter.join(' · ');
       });
     });
     // Et nyt valg gør den PDF, der lige er lavet, forældet.
@@ -397,6 +428,16 @@
       valg.kapitler[nr].afsnit[navn].opgaver = el.value;
       valg.kapitler[nr].afsnit[navn].med = true;
       $('afsnit-' + navn).checked = true;
+    } else if (el.type === 'radio' && el.name.indexOf('noter-') === 0) {
+      // Ingen, korte eller ekstra noter. Vælger man noter i et afsnit, der er slået fra, kommer afsnittet med.
+      navn = el.name.slice(6);
+      nr = kapitelAf(navn);
+      valg.kapitler[nr].afsnit[navn].noter = el.value !== 'ingen';
+      valg.kapitler[nr].afsnit[navn].ekstra = el.value === 'ekstra';
+      if (el.value !== 'ingen') {
+        valg.kapitler[nr].afsnit[navn].med = true;
+        $('afsnit-' + navn).checked = true;
+      }
     } else if (el.type === 'radio' && el.name.indexOf('udgave-') === 0) {
       // Vælger man en udgave af en øvelse, kommer øvelsen med.
       navn = el.name.slice(7);
@@ -439,6 +480,7 @@
     if (!h.target.getAttribute) return;
     var fjern = h.target.getAttribute('data-fjern');
     var noter = h.target.getAttribute('data-noter');
+    var ekstra = h.target.getAttribute('data-ekstra');
     if (fjern !== null) {
       egne.splice(Number(fjern), 1);
       tegnEgne();
@@ -447,10 +489,22 @@
       // Slår noterne fra i alle kapitlets afsnit, eller til igen, hvis de alle er slået fra.
       var v = valg.kapitler[noter];
       var til = !kapitler[noter].afsnit.some(function (a) { return v.afsnit[a.nr].noter; });
-      kapitler[noter].afsnit.forEach(function (a) {
-        v.afsnit[a.nr].noter = til;
-        $('noter-' + a.nr).checked = til;
+      kapitler[noter].afsnit.forEach(function (a) { v.afsnit[a.nr].noter = til; });
+      bygKapitler();
+      opdater();
+    } else if (ekstra !== null) {
+      // Vælger ekstra noter i alle kapitlets afsnit, der har dem, eller de korte igen.
+      var ve = valg.kapitler[ekstra];
+      var tilEkstra = !alleEkstra(ekstra);
+      kapitler[ekstra].afsnit.forEach(function (a) {
+        if (!a.ekstra) return;
+        ve.afsnit[a.nr].ekstra = tilEkstra;
+        if (tilEkstra) {
+          ve.afsnit[a.nr].noter = true;
+          ve.afsnit[a.nr].med = true;
+        }
       });
+      bygKapitler();
       opdater();
     }
   });

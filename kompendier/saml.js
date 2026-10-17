@@ -35,10 +35,10 @@
     return null;
   }
 
-  // Valgene for ét kapitel, første gang det vælges: alle afsnit med noter og en mellem mængde opgaver.
+  // Valgene for ét kapitel, første gang det vælges: alle afsnit med de korte noter og en mellem mængde opgaver.
   function kapitelvalg(data) {
     var v = { med: false, afsnit: {}, oevelser: {}, udgaver: {} };
-    data.afsnit.forEach(function (a) { v.afsnit[a.nr] = { med: true, noter: true, opgaver: 'mellem' }; });
+    data.afsnit.forEach(function (a) { v.afsnit[a.nr] = { med: true, noter: true, ekstra: false, opgaver: 'mellem' }; });
     data.oevelser.forEach(function (id) { v.oevelser[id] = false; });
     return v;
   }
@@ -47,6 +47,11 @@
   function oevelsesdel(data, v, id) {
     var u = data.udgaver && data.udgaver[id];
     return u && v.udgaver && v.udgaver[id] === 'aaben' ? u.aaben : id;
+  }
+
+  // Et afsnit kan have ekstra noter (mere plads og flere hjælpebokse). Læreren vælger dem i stedet for de korte.
+  function noterdel(a, av) {
+    return av && av.ekstra && a.ekstra ? a.ekstra : a.noter;
   }
 
   // Valgene, når siden åbnes første gang: intet kapitel er valgt.
@@ -182,7 +187,7 @@
       data.afsnit.forEach(function (a) {
         var av = v.afsnit[a.nr];
         if (!av || !av.med) return;
-        if (av.noter !== false) delpost(nr, a.noter);
+        if (av.noter !== false) delpost(nr, noterdel(a, av));
         if (a.opgaver[av.opgaver]) delpost(nr, a.opgaver[av.opgaver]);
       });
       data.oevelser.forEach(function (id) { if (v.oevelser[id]) delpost(nr, oevelsesdel(data, v, id)); });
@@ -364,7 +369,7 @@
   }
 
   var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, niveau: niveau, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
-    oevelsesdel: oevelsesdel,
+    oevelsesdel: oevelsesdel, noterdel: noterdel,
     bilagene: bilagene, plan: plan, navn: navn, saml: saml };
   if (typeof module !== 'undefined' && module.exports) module.exports = Kompendium;
   else rod.Kompendium = Kompendium;
