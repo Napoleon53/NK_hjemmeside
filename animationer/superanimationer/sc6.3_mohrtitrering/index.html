@@ -17,6 +17,13 @@
         <button class="faneknap" data-fane="fane-forbrug" role="tab" aria-selected="false"><span class="nr">3</span>Fejlkilder</button>
     </div>
 
+    <!-- Indikatoren i kolben (18. okt. 2026): dichlorfluorescein, som bruges i dag, eller kaliumchromat, som Mohr brugte -->
+    <div class="indikatorvalg" role="group" aria-label="Indikator i kolben">
+        <span class="indikator-etiket">Indikator</span>
+        <button class="indknap" type="button" data-ind="dcf" aria-pressed="true" title="Dichlorfluorescein: gulgrøn til lyserød. Bruges i dag (I)"><i class="prik dcf"></i><span class="navn">Dichlorfluorescein</span></button>
+        <button class="indknap" type="button" data-ind="chromat" aria-pressed="false" title="Kaliumchromat: gul til rødbrun. Mohrs egen indikator (I)"><i class="prik chromat"></i><span class="navn">Kaliumchromat</span></button>
+    </div>
+
     <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
     <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
 </header>
@@ -149,11 +156,19 @@
             Ag⁺ + Cl⁻ → AgCl
         </div>
         <p>Én Ag⁺ reagerer med én Cl⁻. Når alt chlorid er fældet, er der tilsat lige så mange mol Ag⁺, som der var Cl⁻. Det er ækvivalenspunktet.</p>
-        <div class="eksempel">
+        <!-- Indikatoren: app.js viser kun den del, der passer til den valgte (data-ind) -->
+        <div class="eksempel" data-ind="dcf">
+            <span class="eksempel-hoved">Indikatoren</span>
+            dichlorfluorescein: gulgrøn → lyserød
+        </div>
+        <p data-ind="dcf">Kolben indeholder lidt dichlorfluorescein, som farver væsken gulgrøn. Så længe der er Cl⁻ i kolben, er bundfaldet af AgCl hvidt. Når al chlorid er fældet, kommer der Ag⁺ i overskud, og først nu sætter indikatoren sig på bundfaldet, som bliver lyserødt. Den første lyserøde farve, der bliver, er omslaget.</p>
+        <p data-ind="dcf">Metoden er opkaldt efter Mohr, som brugte kaliumchromat som indikator. Chromat bruges ikke længere i skolen, fordi det er kræftfremkaldende.</p>
+        <div class="eksempel" data-ind="chromat" hidden>
             <span class="eksempel-hoved">Indikatoren</span>
             2 Ag⁺ + CrO₄²⁻ → Ag₂CrO₄
         </div>
-        <p>Kolben indeholder lidt kaliumchromat, som farver væsken gul. Chromat, CrO₄²⁻, fælder også Ag⁺ som rødbrunt sølvchromat, men først når der ikke er mere Cl⁻ at fælde. Den første rødbrune farve, der bliver, er omslaget. Metoden kaldes Mohrs titrering.</p>
+        <p data-ind="chromat" hidden>Kolben indeholder lidt kaliumchromat, som farver væsken gul. Chromat, CrO₄²⁻, fælder også Ag⁺ som rødbrunt sølvchromat, men først når der ikke er mere Cl⁻ at fælde. Den første rødbrune farve, der bliver, er omslaget. Metoden kaldes Mohrs titrering.</p>
+        <p data-ind="chromat" hidden>Chromat bruges ikke længere i skolen, fordi det er kræftfremkaldende. I dag bruges indikatoren dichlorfluorescein, som skifter fra gulgrøn til lyserød.</p>
         <div class="eksempel">
             <span class="eksempel-hoved">Beregningen</span>
             n(Ag⁺) = c · V<br>

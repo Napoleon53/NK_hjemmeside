@@ -18,8 +18,34 @@
     D.LIDT_FOR_LANGT = 0.50;
     D.AFLAES_TOL = 0.05;       /* mL, elevens aflaesning */
 
-    D.TITRER_HINT = "Træk skyderen ved hanen mod højre. Dryp til sidst, og luk hanen, så snart kolben bliver svagt rødbrun.";
     D.AFLAES_HINT = "Aflæs bunden af menisken i luppen. De lange streger er hele mL, de korte er 0,1 mL.";
+
+    /* ----- Indikatoren ------------------------------------------------------------
+       Ordene, der afhaenger af indikatoren. D.saetOrd(ind) laegger dem i
+       D.O og skriver de tekster om, der bruger dem (D.TITRER_HINT,
+       D.INTRO_TITRERING, D.ROS_TITRERING og D.BEM_MORK). navn: indikatoren,
+       start: farven foer omslaget, farve: omslagsfarven (svag, tydelig og
+       kraftig), skyer: skyerne, hvor draaben rammer, suppe: det, kolben
+       ligner langt forbi omslaget. */
+    D.ORD = {
+        dcf: { navn: "dichlorfluorescein", start: "gulgrøn", svag: "svagt lyserød", farve: "lyserød", Farve: "Lyserød",
+               tydelig: "tydeligt lyserød", kraftig: "kraftigt lyserød", skyer: "lyserøde skyer", suppe: "hindbærsmoothie" },
+        chromat: { navn: "kaliumchromat", start: "gul", svag: "svagt rødbrun", farve: "rødbrun", Farve: "Rødbrun",
+                   tydelig: "tydeligt rødbrun", kraftig: "mørk rødbrun", skyer: "rødbrune skyer", suppe: "tomatsuppe" }
+    };
+
+    D.saetOrd = function (ind) {
+        var o = D.ORD[ind] || D.ORD.dcf;
+        D.O = o;
+        D.TITRER_HINT = "Træk skyderen ved hanen mod højre. Dryp til sidst, og luk hanen, så snart kolben bliver " + o.svag + ".";
+        D.INTRO_TITRERING = [
+            "Titreringen. Havvand i kolben, sølvnitrat i buretten.",
+            "Åbn hanen, og luk den, når kolben bliver " + o.farve + ".",
+            "Sølvnitrat giver sorte fingre. Spørg mig ikke hvordan."
+        ];
+        D.ROS_TITRERING = o.Farve + " på én dråbe. Det tager nogle et helt år.";
+        D.BEM_MORK = "Stop nu, medmindre du vil lave " + o.suppe + ".";
+    };
 
     /* ----- Fane 2: beregningen ---------------------------------------------------
        De fire trin. Eleven skriver foerst formlen og saa tallet.
@@ -120,11 +146,7 @@
 
     /* ----- Kemichael --------------------------------------------------------------
        Hoejst ca. 60 tegn pr. replik og ingen teori. */
-    D.INTRO_TITRERING = [
-        "Titreringen. Havvand i kolben, sølvnitrat i buretten.",
-        "Åbn hanen, og luk den, når kolben bliver rødbrun.",
-        "Sølvnitrat giver sorte fingre. Spørg mig ikke hvordan."
-    ];
+    /* D.INTRO_TITRERING, D.ROS_TITRERING og D.BEM_MORK skrives af D.saetOrd */
     D.INTRO_BEREGNING = [
         "Beregningen. Fra forbruget til saltet i havvandet.",
         "Skriv først formlen og så tallet i feltet til højre.",
@@ -136,13 +158,12 @@
         "Sølvnitrat er dyrt. Jeg drypper, som var det mit eget."
     ];
 
-    D.ROS_TITRERING = "Rødbrun på én dråbe. Det tager nogle et helt år.";
     D.ROS_BEREGNING = "Saltet er talt. Med enheder.";
     D.ROS_FORBRUG = "Tolv kolber. Opvasken tager jeg ikke.";
 
-    D.BEM_MORK = "Stop nu, medmindre du vil lave tomatsuppe.";
     D.BEM_TOM = "Hele buretten. Sølv er ikke gratis.";
     D.AEG_PRAECIS = "På hundrededelen. Det har jeg aldrig ramt.";
 
+    D.saetOrd(NK.Kemi ? NK.Kemi.indikator : "dcf");
     NK.Data = D;
 }());

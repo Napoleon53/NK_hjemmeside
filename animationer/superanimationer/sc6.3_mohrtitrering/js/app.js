@@ -1,9 +1,10 @@
 /* =====================================================================
    app.js - binder de tre faner sammen (som sc7.4)
 
-   Faneskift, teorien, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes. Tilbuddet om Kemichaels praesentation
-   kobles i hver fane (NK.Praesentation.kobl i sim_*.js).
+   Faneskift, teorien, tastaturgenveje, valget af indikator og
+   tegneloekken. Kun den aktive fane opdateres og tegnes. Tilbuddet om
+   Kemichaels praesentation kobles i hver fane (NK.Praesentation.kobl i
+   sim_*.js).
    ===================================================================== */
 (function () {
     "use strict";
@@ -14,6 +15,31 @@
     var faner = ["fane-titrering", "fane-beregning", "fane-forbrug"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
+    var NOEGLE_IND = "nk-sc6.3-indikator";
+
+    /* ----- Indikatoren --------------------------------------------------
+       "dcf" (dichlorfluorescein, fra start) eller "chromat" (kaliumchromat).
+       Knapperne i toplinjen og tasten I skifter; valget huskes i browseren.
+       ?indikator=chromat i adressen vaelger uden at huske. Et skift starter
+       proeven paa fane 1 forfra med samme havvand og regner fane 3 om. */
+    function saetIndikator(ind, start) {
+        var K = NK.Kemi;
+        if (K.INDIKATORER.indexOf(ind) < 0) ind = "dcf";
+        var skift = ind !== K.indikator;
+        K.indikator = ind;
+        NK.Data.saetOrd(ind);
+        var knapper = document.querySelectorAll(".indknap");
+        for (var i = 0; i < knapper.length; i++) {
+            knapper[i].setAttribute("aria-pressed", knapper[i].getAttribute("data-ind") === ind ? "true" : "false");
+        }
+        var dele = document.querySelectorAll("#teori [data-ind]");
+        for (i = 0; i < dele.length; i++) dele[i].hidden = dele[i].getAttribute("data-ind") !== ind;
+        if (start || !skift) return;
+        NK.gem(NOEGLE_IND, ind);
+        if (sims["fane-titrering"]) sims["fane-titrering"].skiftIndikator();
+        if (sims["fane-forbrug"]) sims["fane-forbrug"].skiftIndikator();
+    }
+    NK.saetIndikator = saetIndikator;
 
     /* ----- Faner ------------------------------------------------------ */
     function visFane(id) {
@@ -87,6 +113,7 @@
         if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
+        if (e.key === "i" || e.key === "I") { saetIndikator(NK.Kemi.indikator === "dcf" ? "chromat" : "dcf"); return; }
         if (e.key === "r" || e.key === "R") { if (sim && sim.nulstil) sim.nulstil(); return; }
         if ((e.key === "Enter" || e.key === " ") && sim && sim.enter) {
             if (e.target && e.target.tagName === "BUTTON") return;
@@ -101,6 +128,10 @@
     /* ----- Opstart --------------------------------------------------------- */
     function start() {
         NK.Sprites.start();
+
+        /* Indikatoren vaelges, foer fanerne bygges */
+        var spoerg = /[?&]indikator=(dcf|chromat)\b/.exec(window.location.search || "");
+        saetIndikator(spoerg ? spoerg[1] : NK.hent(NOEGLE_IND, "dcf"), true);
 
         sims["fane-titrering"] = new NK.SimTitrering();
         sims["fane-beregning"] = new NK.SimBeregning();
@@ -123,6 +154,11 @@
 
         NK.el("hjaelpknap").addEventListener("click", function () { lukAlle(); NK.Rundvisning.start(aktivFane); });
         NK.el("teoriknap").addEventListener("click", aabnTeori);
+        var indKnapper = document.querySelectorAll(".indknap");
+        function bindInd(knap) {
+            knap.addEventListener("click", function () { saetIndikator(knap.getAttribute("data-ind")); });
+        }
+        for (i = 0; i < indKnapper.length; i++) bindInd(indKnapper[i]);
 
         document.addEventListener("keydown", tastatur);
 

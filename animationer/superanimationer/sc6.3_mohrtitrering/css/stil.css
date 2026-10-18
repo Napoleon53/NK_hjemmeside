@@ -138,6 +138,71 @@ body {
 
 .ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
 
+/* Valget af indikator i toplinjen (18. okt. 2026). Det valgte er blaat,
+   ikke gult: kortet er det eneste fyldte gule paa skaermen. Prikken viser
+   farven foer og efter omslaget. */
+.indikatorvalg {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.indikator-etiket {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tekst-mat);
+    margin-right: 2px;
+}
+
+.indknap {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 28px;
+    padding: 0 10px;
+    background: transparent;
+    border: 1px solid #4a4a58;
+    border-radius: 4px;
+    color: var(--tekst-svag);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.indknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.indknap[aria-pressed="true"] { background-color: rgba(61, 158, 224, 0.2); border-color: var(--blaa); color: #ffffff; }
+
+.indknap .prik {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.indknap .prik.dcf { background: linear-gradient(90deg, #cce256 50%, #e878aa 50%); }
+.indknap .prik.chromat { background: linear-gradient(90deg, #f2ce3a 50%, #ba5c34 50%); }
+
+/* Smallere skaerme: foerst uden ordet Indikator, saa kun prikken paa den
+   fravalgte (navnet staar i title), og til sidst faar fanerne egen linje */
+@media (max-width: 1250px) {
+    .indikator-etiket { display: none; }
+}
+
+@media (max-width: 1060px) {
+    .indknap[aria-pressed="false"] .navn { display: none; }
+}
+
+@media (max-width: 960px) {
+    .top { flex-wrap: wrap; }
+    .faneknapper { order: 3; width: 100%; flex: none; }
+}
+
 /* ---------------------------------------------------------------------
    HOVEDLAYOUT
    --------------------------------------------------------------------- */
@@ -659,6 +724,7 @@ select:focus-visible {
 
 @media (max-width: 1100px) {
     .top { gap: 10px; padding: 8px 12px; }
+    .indknap { padding: 0 8px; }
     .faneknap { padding: 7px 10px; font-size: 0.82rem; gap: 6px; }
     .faneknap .nr { width: 17px; height: 17px; font-size: 0.65rem; }
 }

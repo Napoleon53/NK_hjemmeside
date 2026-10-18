@@ -2,11 +2,12 @@
    sim_titrering.js - fane 1: titreringen
 
    Kolben staar klar med 1,00 g havvand, 20 mL demineraliseret vand og
-   lidt kaliumchromat paa magnetomroereren, og buretten er fyldt med
+   lidt indikator paa magnetomroereren, og buretten er fyldt med
    0,050 M soelvnitrat til 0,00. Eleven aabner hanen med skyderen (eller
-   et klik paa hanen), drypper til sidst og lukker, naar kolben bliver
-   svagt roedbrun. Saa aflaeses buretten i luppen i panelet, og tallet
-   foelger med til fane 2. Bygget som sc7.4's fane 1.
+   et klik paa hanen), drypper til sidst og lukker, naar kolben skifter
+   farve: gulgroen til lyserød med dichlorfluorescein, gul til roedbrun
+   med kaliumchromat (D.O har ordene). Saa aflaeses buretten i luppen i
+   panelet, og tallet foelger med til fane 2. Bygget som sc7.4's fane 1.
 
    Al soelvnitrat loeber i draaber paa 0,05 mL. Burettens niveau falder,
    naar en draabe slipper spidsen; kolbens rumfang, farven, kurven og
@@ -55,6 +56,7 @@
         this.nUd = 0;              /* draaber, der har sluppet spidsen */
         this.nInd = 0;             /* draaber, der har ramt kolben */
         this.t = K.tilstand(this.pr, 0);
+        this.lup.ind = this.pr.ind;
         this.acc = 0;
         this.a = 0;
         this.sidsteA = DRYP;
@@ -69,7 +71,7 @@
         this.bemMork = false;
         this.bemTom = false;
         this.lup.nulstil();
-        this.kurve.nulstil(this.vAek, K.nCl(this.pr));
+        this.kurve.nulstil(this.vAek, K.nCl(this.pr), this.pr.ind);
         this.kurve.tilfoej(0, this.t.nClFri, 0, 0);
         if (this.laererNyt) this.laererNyt();
         this.besked("", "");
@@ -82,17 +84,32 @@
     P.vInd = function () { return this.nInd * K.DRAABE; };
     P.styrke = function () { return K.styrke(this.t); };
     P.uklar = function () { return K.uklarhed(this.pr, this.t); };
+    /* Omslaget er naaet: kolben er synligt roedbrun (kaliumchromat) eller
+       lyserød (dichlorfluorescein). Navnet er fra foer, der var to. */
     P.rodbrun = function () { return this.styrke() >= 0.04; };
+
+    /* Indikatoren er skiftet: samme havvand forfra med den nye indikator
+       (samme proevenummer) */
+    P.skiftIndikator = function () {
+        this.nr--;
+        this.nyProeve(this.pr.p, this.pr.sted);
+    };
 
     /* Hvor langt forbi aekvivalenspunktet (mL); negativ foer */
     P.forbi = function () { return this.vUd() - this.vAek; };
 
     /* Hvor mange Ag⁺-figurer luppen skal have: 1/8 af aekvivalens-
        rumfanget pr. figur, to mere ved omslaget og to mere, naar kolben er
-       moerk roedbrun (chromatet, der ikke er i skala), og saa fri Ag⁺. */
+       moerk roedbrun (chromatet, der ikke er i skala), og saa fri Ag⁺.
+       Med dichlorfluorescein: én mere ved omslaget (Ag⁺ i overskud, saa
+       indikatoren saetter sig paa bundfaldet) og saa flere fri Ag⁺. */
     P.lupAg = function () {
         var v = this.vInd(), s = this.styrke();
         var k = Math.min(K.FIGURER, Math.floor(v / this.vAek * K.FIGURER + 1e-9));
+        if (this.pr.ind === "dcf") {
+            if (s >= 0.04) k += 1 + NK.klamp(Math.floor((v - this.vAek) / (this.vAek / K.FIGURER)), 0, NK.Lup.FRI_MAKS - 1);
+            return k;
+        }
         if (s >= 0.04) k += 2;
         if (s >= 0.9) {
             k += 2;
@@ -144,11 +161,12 @@
         this.nInd++;
         var v = this.vInd();
         this.t = K.tilstand(this.pr, v);
-        this.kurve.tilfoej(v, this.t.nClFri, this.t.nAgCl, this.t.nCro);
+        this.kurve.tilfoej(v, this.t.nClFri, this.t.nAgCl, this.pr.ind === "dcf" ? this.t.nAgFri : this.t.nCro);
         this.lup.saet(this.lupAg());
-        /* En roedbrun sky, hvor draaben rammer. Den forsvinder, fordi Ag₂CrO₄
-           bliver til AgCl, saa laenge der er Cl⁻. Taet paa omslaget bliver
-           den laenge. */
+        /* En sky, hvor draaben rammer: roedbrun med kaliumchromat, lyserød
+           med dichlorfluorescein. Den forsvinder, saa laenge der er Cl⁻
+           (Ag₂CrO₄ bliver til AgCl, og overskuddet af Ag⁺ bliver brugt).
+           Taet paa omslaget bliver den laenge. */
         var naer = NK.klamp((v / this.vAek - 0.85) / 0.15, 0, 1);
         if (v < this.vAek && this.skyer.length < 40) {
             this.skyer.push({ u: NK.r(-0.15, 0.15), w: 0, alder: 0, liv: 0.35 + 2.4 * naer * naer, retning: Math.random() < 0.5 ? -1 : 1 });
@@ -246,9 +264,10 @@
         this.fase = "faerdig";
         var over = this.forbi();
         var tekst;
-        if (over <= D.PRAECIS + 1e-9) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben blev rødbrun på den sidste dråbe.";
-        else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er tydeligt rødbrun, så der er tilsat lidt for meget sølvnitrat.";
-        else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er mørk rødbrun: omslaget kom tidligere, så forbruget er for stort.";
+        var o = D.O;
+        if (over <= D.PRAECIS + 1e-9) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben blev " + o.farve + " på den sidste dråbe.";
+        else if (over <= D.LIDT_FOR_LANGT) tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.tydelig + ", så der er tilsat lidt for meget sølvnitrat.";
+        else tekst = "Forbruget er " + K.mL(v) + " mL. Kolben er " + o.kraftig + ": omslaget kom tidligere, så forbruget er for stort.";
         this.besked((vist ? "<b>Svar:</b> " : "") + NK.html(tekst), vist ? "gul" : "god");
         NK.maaling = { V: v, m: this.pr.m, c: this.pr.c, p: this.pr.p, sted: this.pr.sted, egen: true, over: over, nr: this.nr, brugt: false };
         if (this.afvisTilbud) this.afvisTilbud();
@@ -279,7 +298,7 @@
             this.auto = { ur: 0 };
             this.a = 0.8;
             this.hjaelp = 0;
-            this.besked("Se buretten. Den drypper til sidst og stopper, når kolben bliver rødbrun.", "gul");
+            this.besked("Se buretten. Den drypper til sidst og stopper, når kolben bliver " + D.O.farve + ".", "gul");
             this.visKort();
             return;
         }
@@ -340,7 +359,7 @@
         NK.saetTekst("tit-sted", this.pr.sted + ", " + NK.tal2(this.pr.m) + " g");
         var prompt, tekst, klasse = "knap";
         if (this.fase === "titrer") {
-            prompt = "Titrér havvandet, til kolben bliver svagt rødbrun.";
+            prompt = "Titrér havvandet, til kolben bliver " + D.O.svag + ".";
             tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
         } else if (this.fase === "aflaes") {
             prompt = "Aflæs buretten. Hvor meget sølvnitrat er løbet ned?";
@@ -357,20 +376,20 @@
     };
 
     P.visStatus = function () {
-        var t;
+        var t, o = D.O;
         var v = this.vUd();
         if (this.info && this.info.tid > 0) t = this.info.tekst;
         else if (this.fase === "faerdig") t = "Forbruget er " + K.mL(this.aflaest) + " mL. Gå videre til beregningen, eller tag en <b>ny prøve</b>.";
         else if (this.fase === "aflaes") t = "Kolben er " + K.farveOrd(this.styrke(), this.uklar()) + ". Aflæs buretten i luppen til højre, og skriv forbruget.";
         else if (this.auto) t = "Buretten titrerer selv. Hurtigt først, så dråbe for dråbe.";
-        else if (this.rodbrun() && this.a > 0) t = "<b>Luk hanen!</b> Kolben er rødbrun.";
-        else if (this.rodbrun()) t = "Kolben er rødbrun.";
+        else if (this.rodbrun() && this.a > 0) t = "<b>Luk hanen!</b> Kolben er " + o.farve + ".";
+        else if (this.rodbrun()) t = "Kolben er " + o.farve + ".";
         else if (this.a > 0 && this.skyer.some(function (s) { return s.liv > 1.2; })) {
-            t = this.a > 0.45 ? "De rødbrune skyer bliver længere. Træk skyderen ned på <b>dryp</b>." :
-                "Du er tæt på. Luk hanen, så snart kolben bliver svagt rødbrun og bliver ved med at være det.";
+            t = this.a > 0.45 ? "De " + o.skyer + " bliver længere. Træk skyderen ned på <b>dryp</b>." :
+                "Du er tæt på. Luk hanen, så snart kolben bliver " + o.svag + " og bliver ved med at være det.";
         }
-        else if (this.a > 0) t = "Sølvnitrat løber ned. Hvidt sølvchlorid gør kolben uklar. Luk hanen, når den bliver rødbrun.";
-        else if (v > 0) t = "Kolben er gul og uklar. Der er stadig chlorid tilbage. Åbn hanen igen.";
+        else if (this.a > 0) t = "Sølvnitrat løber ned. Hvidt sølvchlorid gør kolben uklar. Luk hanen, når den bliver " + o.farve + ".";
+        else if (v > 0) t = "Kolben er " + o.start + " og uklar. Der er stadig chlorid tilbage. Åbn hanen igen.";
         else t = "Træk skyderen ved hanen mod højre for at åbne den.";
         NK.saetHTML("tit-status", t);
     };
@@ -492,8 +511,8 @@
                 a: fade
             };
         });
-        Tg.kolbe(ctx, g, mL, K.kolbeFarve(uklar, styrke), this.loppe, skyer,
-            { lys: this.over && this.over.slags === "kolbe" ? 0.6 : 0, fnug: uklar });
+        Tg.kolbe(ctx, g, mL, K.kolbeFarve(uklar, styrke, undefined, this.pr.ind), this.loppe, skyer,
+            { lys: this.over && this.over.slags === "kolbe" ? 0.6 : 0, fnug: uklar, sky: K.FARVER[this.pr.ind].sky });
 
         /* Straalen eller draaberne */
         var q = this.auto ? (this.a > 0.5 ? 1 : 0) : this.a * this.a;
@@ -526,20 +545,22 @@
             slukket: this.fase === "faerdig"
         });
 
-        this.lup.tegn(ctx, L.cx, L.cy, L.R, { farve: K.kolbeFarve(uklar, styrke, 0.1 + 0.3 * Math.max(uklar * 0.5, styrke)), lys: this.pegLup ? puls : 0 });
+        this.lup.tegn(ctx, L.cx, L.cy, L.R, { farve: K.kolbeFarve(uklar, styrke, 0.1 + 0.3 * Math.max(uklar * 0.5, styrke), this.pr.ind), lys: this.pegLup ? puls : 0 });
         var px = lay.px;
         NK.tekst(ctx, "1 figur = 1/8 af chloridet", L.cx, L.cy - L.R - 12, {
             font: Tg.font("700", px), justering: "center", farve: "#c8ced6", kant: true
         });
-        var tilbage = this.lup.clTilbage();
+        var tilbage = this.lup.clTilbage(), dcf = this.pr.ind === "dcf";
         var linje;
         if (tilbage > 0) linje = "Chlorid tilbage: " + tilbage + " af " + K.FIGURER;
+        else if (dcf && this.lup.indPaa() > 0) linje = "Alt chlorid er fældet. Indikatoren sætter sig på bundfaldet.";
+        else if (dcf) linje = "Alt chlorid er fældet.";
         else if (this.lup.friAg() > 0 && this.lup.ag2cro4() > 0) linje = "Alt chlorid er fældet. Ag⁺ er i overskud.";
         else if (this.lup.ag2cro4() > 0) linje = "Alt chlorid er fældet. Ag⁺ fælder nu chromat.";
         else linje = "Alt chlorid er fældet.";
         NK.tekst(ctx, linje, L.cx, L.cy + L.R + 12, {
             font: Tg.font("700", px), justering: "center", linje: "top",
-            farve: tilbage > 0 ? "#dde3ea" : "#f3b08c", kant: true
+            farve: tilbage > 0 ? "#dde3ea" : (dcf ? "#f4b6cf" : "#f3b08c"), kant: true
         });
 
         if (this.laererTegnOver) this.laererTegnOver(ctx);
@@ -622,7 +643,7 @@
         if (s === "draabe") { this.enDraabe(); return; }
         var tekst = {
             buret: "Sølvnitrat, AgNO₃, " + K.c(this.pr.c) + " M. Forbruget aflæses ved menisken i luppen til højre.",
-            kolbe: NK.tal2(this.pr.m) + " g havvand, 20 mL demineraliseret vand og lidt kaliumchromat, der farver kolben gul. Magnetloppen rører rundt.",
+            kolbe: NK.tal2(this.pr.m) + " g havvand, 20 mL demineraliseret vand og lidt " + D.O.navn + ", der farver kolben " + D.O.start + ". Magnetloppen rører rundt.",
             lup: "1 figur = 1/8 af chloridet i kolben. Hver Ag⁺ fælder én Cl⁻ som hvidt AgCl. Na⁺ og NO₃⁻ er ikke tegnet: de reagerer ikke.",
             flaske: "Havvand fra " + this.pr.sted + ". Saltindholdet er ukendt. Det skal du finde."
         }[s];

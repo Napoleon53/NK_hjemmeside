@@ -3,7 +3,9 @@
 
    NK.Kurve:  stofmaengderne i kolben mod tilsat soelvnitrat: Cl⁻ i
               opløsning, AgCl og Ag₂CrO₄ (som "ion-fordelingen" i den
-              gamle c6.5). Tegnes i takt med, at draaberne rammer kolben.
+              gamle c6.5). Med dichlorfluorescein er den tredje kurve
+              Ag⁺ i opløsning, som foerst stiger efter aekvivalens-
+              punktet. Tegnes i takt med, at draaberne rammer kolben.
    NK.Aflaes: luppen paa buretten ved menisken. Den viser inddelingen
               med 0,1 mL mellem stregerne, saa eleven selv kan aflaese
               (samme som sc7.4).
@@ -15,17 +17,27 @@
     var SKRIFT = "'Segoe UI', sans-serif";
     function font(v, px) { return v + " " + px + "px " + SKRIFT; }
 
-    var SERIER = [
-        { noegle: "cl", navn: "Cl⁻", farve: "#4cc47f" },
-        { noegle: "agcl", navn: "AgCl", farve: "#e9ecef" },
-        { noegle: "cro", navn: "Ag₂CrO₄", farve: "#d0643a" }
-    ];
+    /* Den tredje kurve afhaenger af indikatoren (noeglen er "x") */
+    var SERIER_IND = {
+        chromat: [
+            { noegle: "cl", navn: "Cl⁻", farve: "#4cc47f" },
+            { noegle: "agcl", navn: "AgCl", farve: "#e9ecef" },
+            { noegle: "x", navn: "Ag₂CrO₄", farve: "#d0643a" }
+        ],
+        dcf: [
+            { noegle: "cl", navn: "Cl⁻", farve: "#4cc47f" },
+            { noegle: "agcl", navn: "AgCl", farve: "#e9ecef" },
+            { noegle: "x", navn: "Ag⁺", farve: "#8fb8de" }
+        ]
+    };
 
     /* ----- Kurven ----------------------------------------------------------------------
-       Punkterne er { v, cl, agcl, cro } med v i mL og stofmaengderne i mmol. */
+       Punkterne er { v, cl, agcl, x } med v i mL og stofmaengderne i mmol.
+       x er Ag₂CrO₄ (kaliumchromat) eller fri Ag⁺ (dichlorfluorescein). */
     function Kurve(canvas) {
         this.L = new NK.Laerred(canvas);
         this.punkter = [];
+        this.serier = SERIER_IND[NK.Kemi.indikator] || SERIER_IND.chromat;
         this.X_MAKS = 15;
         this.Y_MAKS = 0.6;
         this.over = null;
@@ -33,7 +45,7 @@
         canvas.addEventListener("pointermove", function (e) {
             var p = mig.L.punkt(e), bedst = null, bd = 24 * 24;
             mig.punkter.forEach(function (q, i) {
-                SERIER.forEach(function (s) {
+                mig.serier.forEach(function (s) {
                     var dx = mig.x(q.v) - p.x, dy = mig.y(q[s.noegle]) - p.y, d = dx * dx + dy * dy;
                     if (d < bd) { bd = d; bedst = { i: i, s: s }; }
                 });
@@ -48,15 +60,16 @@
 
     /* Akserne passer til proeven: x til halvanden gang forbruget, y til
        stofmaengden af chlorid (mmol), rundet op */
-    PK.nulstil = function (vAek, nCl) {
+    PK.nulstil = function (vAek, nCl, ind) {
         this.punkter = [];
         this.over = null;
+        this.serier = SERIER_IND[ind || NK.Kemi.indikator] || SERIER_IND.chromat;
         if (vAek) this.X_MAKS = NK.klamp(Math.ceil(vAek * 1.5 / 5) * 5, 10, 25);
         if (nCl) this.Y_MAKS = Math.max(0.2, Math.ceil(nCl * 1000 * 1.25 * 10) / 10);
     };
 
-    PK.tilfoej = function (v, cl, agcl, cro) {
-        var p = { v: v, cl: cl * 1000, agcl: agcl * 1000, cro: cro * 1000 };
+    PK.tilfoej = function (v, cl, agcl, x) {
+        var p = { v: v, cl: cl * 1000, agcl: agcl * 1000, x: x * 1000 };
         var sidste = this.punkter[this.punkter.length - 1];
         if (sidste && Math.abs(sidste.v - v) < 1e-6) { this.punkter[this.punkter.length - 1] = p; return; }
         this.punkter.push(p);
@@ -112,6 +125,7 @@
         /* Forklaringen oeverst til hoejre */
         ctx.font = font("700", 12);
         var lx = r.r - 6, ly = r.t + 2;
+        var SERIER = this.serier;
         for (var i = SERIER.length - 1; i >= 0; i--) {
             var s = SERIER[i], b = ctx.measureText(s.navn).width;
             ctx.fillStyle = s.farve;

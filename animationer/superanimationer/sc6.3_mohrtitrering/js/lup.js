@@ -7,10 +7,17 @@
    hvidt AgCl, der synker til bunds. Na⁺ og NO₃⁻ er ikke tegnet, fordi de
    ikke reagerer (med dem blev luppen for fuld, 26. sept. 2026).
 
-   Naar alt chlorid er faeldet, finder de naeste Ag⁺ chromat. To Ag⁺ og
-   én CrO₄²⁻ bliver til roedbrunt Ag₂CrO₄. Chromatet er ikke tegnet i
-   samme skala som chloridet: det er kun lidt, men det er det, der farver
-   kolben. Sim'en sender to Ag⁺ ind ved omslaget (se sim_titrering.js).
+   Med kaliumchromat: naar alt chlorid er faeldet, finder de naeste Ag⁺
+   chromat. To Ag⁺ og én CrO₄²⁻ bliver til roedbrunt Ag₂CrO₄. Chromatet
+   er ikke tegnet i samme skala som chloridet: det er kun lidt, men det er
+   det, der farver kolben. Sim'en sender to Ag⁺ ind ved omslaget (se
+   sim_titrering.js).
+
+   Med dichlorfluorescein (18. okt. 2026): to gulgroenne piller med
+   ordet "indikator" svoemmer rundt (som i Kemibogens figur mohr-trin).
+   Naar alt chlorid er faeldet, og en Ag⁺ er i overskud, saetter de sig
+   paa bundfaldet (de naeste pladser i bunken) og bliver lyserøde. Sim'en sender én Ag⁺ ind ved
+   omslaget. Hvorfor indikatoren binder, er ikke vist.
 
    Sammensatte ioner tegnes som én kugle eller pille med formlen paa
    (reglen fra hjemmesidens CLAUDE.md). Positionerne er i luppens egne
@@ -24,6 +31,7 @@
 
     var N = K.FIGURER;
     var N_CR = 2;                /* chromat i luppen */
+    var N_IND = 2;               /* indikatorpiller (dichlorfluorescein) */
     var FRI_MAKS = 3;            /* hoejst saa mange fri Ag⁺ i luppen */
     var RAND = 0.8;              /* figurerne holder sig inden for denne radius */
 
@@ -32,7 +40,10 @@
         ag: { bund: "#d5dade", kant: "#7d8791", tekst: "#1c1f26" },
         agcl: { bund: "#f7f7f2", kant: "#9aa0a6", tekst: "#1c1f26" },
         cr: { bund: "#f2cf3a", kant: "#a8860e", tekst: "#2a2100" },
-        ag2cro4: { bund: "#b5522e", kant: "#7a3018", tekst: "#ffffff" }
+        ag2cro4: { bund: "#b5522e", kant: "#7a3018", tekst: "#ffffff" },
+        /* indikatoren fri (gulgroen) og paa bundfaldet (lyserød), Kemibogens farver */
+        ind: { bund: "#eaf2c0", kant: "#9aaa3c", tekst: "#4d5a12" },
+        indb: { bund: "#f4b6cf", kant: "#c2577f", tekst: "#6e1f3d" }
     };
 
     /* Pladserne i bunden af luppen, hvor bundfaldet lander: nederste
@@ -46,7 +57,10 @@
         return p;
     }());
 
-    function Lup() {
+    /* ind: indikatoren, "dcf" eller "chromat" (ellers den valgte). Den
+       kan skiftes ved at saette lup.ind og kalde nulstil. */
+    function Lup(ind) {
+        this.ind = ind || K.indikator;
         this.nulstil();
     }
 
@@ -61,6 +75,12 @@
             v = i / N * Math.PI * 2 + NK.r(-0.3, 0.3);
             r = i % 2 ? NK.r(0.2, 0.35) : NK.r(0.48, 0.6);
             this.figurer.push({ slags: "cl", x: Math.cos(v) * r, y: Math.sin(v) * r * 0.8 - 0.1, fase: "fri", ph: NK.r(0, 6), alfa: 1, reserveret: 0 });
+        }
+        if (this.ind === "dcf") {
+            for (i = 0; i < N_IND; i++) {
+                this.figurer.push({ slags: "ind", x: i ? 0.4 : -0.4, y: -0.42, fase: "fri", ph: NK.r(0, 6), alfa: 1, reserveret: 0 });
+            }
+            return;
         }
         for (i = 0; i < N_CR; i++) {
             this.figurer.push({ slags: "cr", x: i ? 0.42 : -0.42, y: -0.35, fase: "fri", ph: NK.r(0, 6), alfa: 1, reserveret: 0, ag: [] });
@@ -77,6 +97,7 @@
     P.agcl = function () { return this.tael("agcl"); };
     P.ag2cro4 = function () { return this.tael("ag2cro4"); };
     P.friAg = function () { return this.tael("ag", "fri"); };
+    P.indPaa = function () { return this.tael("indb"); };
 
     /* k: hvor mange Ag⁺-figurer der i alt er loebet ned. Er det faerre
        end foer (en ny proeve), begynder luppen forfra. */
@@ -118,6 +139,13 @@
         if (this.bunke <= 0) return { cy: 0, r: RAND };
         var bund = BUNKE[Math.min(this.bunke, BUNKE.length) - 1].y - 0.16;
         return { cy: (bund - RAND) / 2, r: (bund + RAND) / 2 };
+    };
+
+    /* Indikatoren saetter sig paa bundfaldet: den tager de naeste
+       pladser i bunken, saa den ligger oven paa AgCl, og bliver lyserød */
+    P.paaBunke = function (f) {
+        f.slags = "indb";
+        this.tilBunds(f);
     };
 
     P.tilBunds = function (f) {
@@ -211,6 +239,14 @@
             }
         }
 
+        /* Dichlorfluorescein: naar alt chlorid er faeldet, og en Ag⁺ er i
+           overskud, saetter indikatoren sig paa bundfaldet */
+        if (this.ind === "dcf" && this.clTilbage() === 0 && this.friAg() > 0) {
+            this.figurer.forEach(function (f) {
+                if (f.slags === "ind" && f.fase === "fri") mig.paaBunke(f);
+            });
+        }
+
         this.figurer = this.figurer.filter(function (f) {
             if (f.fase === "vaek") f.alfa -= dt * 4;
             return f.alfa > 0;
@@ -240,6 +276,7 @@
 
     /* Figurens halve bredde i luppens enheder (til skubbet) */
     function storrelse(f) {
+        if (f.slags === "ind" || f.slags === "indb") return 0.2;
         if (f.slags === "agcl" || f.slags === "cr") return 0.13;
         if (f.slags === "ag2cro4") return 0.16;
         if (f.slags === "cl") return 0.1;
@@ -313,7 +350,7 @@
         function pos(f) { return { x: cx + f.x * R, y: cy + f.y * R }; }
 
         /* Tegneordenen: bundfaldet bagerst, saa ionerne i opløsning */
-        var orden = { agcl: 1, ag2cro4: 1, cr: 2, cl: 2, ag: 3 };
+        var orden = { agcl: 1, ag2cro4: 1, indb: 1, cr: 2, ind: 2, cl: 2, ag: 3 };
         var liste = this.figurer.slice().sort(function (a, b) { return orden[a.slags] - orden[b.slags]; });
         liste.forEach(function (f) {
             var p = pos(f);
@@ -321,6 +358,8 @@
             else if (f.slags === "agcl") pille(ctx, p.x, p.y, "AgCl", px, FARVE.agcl, f.alfa);
             else if (f.slags === "cr") pille(ctx, p.x, p.y, "CrO₄²⁻", px, FARVE.cr, f.alfa);
             else if (f.slags === "ag2cro4") pille(ctx, p.x, p.y, "Ag₂CrO₄", px, FARVE.ag2cro4, f.alfa);
+            else if (f.slags === "ind") pille(ctx, p.x, p.y, "indikator", Math.max(12, px - 1), FARVE.ind, f.alfa);
+            else if (f.slags === "indb") pille(ctx, p.x, p.y, "indikator", Math.max(12, px - 1), FARVE.indb, f.alfa);
             else if (f.slags === "ag") kugle(ctx, p.x, p.y, px * 1.2, "Ag⁺", Math.max(12, px - 2), FARVE.ag, f.alfa);
         });
         ctx.restore();
@@ -343,5 +382,6 @@
     Lup.FARVE = FARVE;
     Lup.FRI_MAKS = FRI_MAKS;
     Lup.N_CR = N_CR;
+    Lup.N_IND = N_IND;
     NK.Lup = Lup;
 }());

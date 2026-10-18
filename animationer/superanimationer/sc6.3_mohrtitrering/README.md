@@ -1,7 +1,8 @@
 # sc6.3 Salt i havvand (Mohr-titrering)
 
 Superanimation om Mohrs titrering af havvand: buretten tæller chloridet. Åbn
-`index.html`. Mappen henter kun filer inde fra sig selv, bortset fra Kemichael
+`index.html`. Indikatoren vælges i toplinjen: dichlorfluorescein (fra start) eller
+kaliumchromat (se "Indikatoren" nedenfor). Mappen henter kun filer inde fra sig selv, bortset fra Kemichael
 (`../../v2/kemichael/kemichael.js` og `../kemichael/superanimation.js`). Ingen
 `fetch` og ingen moduler, så den virker fra harddisken.
 
@@ -14,8 +15,8 @@ er ingen flasker at hælde fra, ingen uheld og intet forløb trin for trin.
 ## Bestillingen
 
 1. **Pointen:** ved omslaget har buretten tilsat lige så mange mol Ag⁺, som der
-   var Cl⁻ i prøven, og den rødbrune farve kommer først, når der ikke er mere
-   Cl⁻ at fælde. Masseprocenten følger af n = c · V, 1 : 1, m = n · M og
+   var Cl⁻ i prøven, og omslagsfarven (lyserød eller rødbrun) kommer først, når
+   der ikke er mere Cl⁻ at fælde. Masseprocenten følger af n = c · V, 1 : 1, m = n · M og
    m% = m / m(prøve) · 100 %.
 2. **Afløser** `kemi-c-filer/c6.5_eksperiment_mohrtitrering.html` (menuens c6.3, nu
    i `arkiv/` som `c6.5_eksperiment_mohrtitrering_oldversion.html`).
@@ -45,7 +46,8 @@ er ingen flasker at hælde fra, ingen uheld og intet forløb trin for trin.
 | 3 | Fejlkilder | vælger, hvordan forbruget af sølvnitrat eller masseprocenten bliver, når én ting er ændret ved kolbe B | kun chloridet i kolben og koncentrationen af sølvnitrat ændrer forbruget; postevand og spild er fejlkilder, mere vand og en mindre prøve er ikke |
 
 **Titreringen.** Kolben står klar på magnetomrøreren med 1,00 g havvand, 20 mL
-demineraliseret vand og lidt kaliumchromat, der farver den gul, og buretten er
+demineraliseret vand og lidt indikator (her beskrevet med kaliumchromat, der
+farver den gul; den nye indikator står under Indikatoren nedenfor), og buretten er
 fyldt med 0,050 M sølvnitrat til 0,00 mL. Havvandet er hentet et af seks steder
 (Vesterhavet, Skagerrak, Kattegat, Lillebælt, Middelhavet og Det Røde Hav), og
 stedet står i opgavekortet. Eleven åbner hanen med skyderen (lukket, dryp, løb);
@@ -60,6 +62,29 @@ eleven aflæser buretten i luppen i panelet. Kurven i panelet viser stofmængden
 Cl⁻ i opløsning, AgCl og Ag₂CrO₄ undervejs. Går eleven for langt, bliver kolben
 mørk rødbrun, og beskeden siger, at forbruget er for stort; det er ikke en
 blokering, og resultatet på fane 2 viser følgen.
+
+**Indikatoren** (18. okt. 2026, brugerens ønske: "Kan du ikke lave animationen
+sc6.3, således, at den også kan vise forsøget med den nye indikator? Måske bare med
+en toggle"; chromat må ikke længere bruges i skolen, og Kemibogens afsnit 6.3 og
+øvelse 6.3a og 6.3b bruger dichlorfluorescein). To knapper i toplinjen, Dichlorfluorescein
+og Kaliumchromat, eller tasten <kbd>I</kbd>. Dichlorfluorescein er valgt fra start
+(Claudes valg, så animationen passer med bogen, der linker til den), og valget
+huskes i browseren. `?indikator=chromat` eller `?indikator=dcf` i adressen vælger
+uden at huske. Et skift starter prøven på fane 1 forfra med det samme havvand og
+samme prøvenummer og regner kolberne på fane 3 om; fane 2 er den samme.
+Med dichlorfluorescein er kolben gulgrøn, skyerne, hvor dråben rammer, og omslaget
+er lyserøde (farverne fra Kemibogens figurer), og luppen har to gulgrønne piller
+med ordet "indikator" i stedet for CrO₄²⁻. Ved omslaget kommer én Ag⁺ i overskud,
+og pillerne sætter sig på bundfaldet (de næste pladser i bunken) og bliver
+lyserøde, som i bogens figur `mohr-trin`. Hvorfor indikatoren binder, er ikke vist
+(bogen går heller ikke i dybden). Kurvens tredje linje er fri Ag⁺ i stedet for
+Ag₂CrO₄. Teorien viser kun delen om den valgte indikator; delen om
+dichlorfluorescein nævner, at metoden er opkaldt efter Mohr, som brugte
+kaliumchromat, og at chromat ikke bruges i skolen, fordi det er kræftfremkaldende.
+Kemichael siger "lyserød", og langt forbi omslaget laver man hindbærsmoothie i
+stedet for tomatsuppe. På smalle skærme forsvinder ordet Indikator (under 1250
+px), den fravalgte knap viser kun sin farveprik (under 1060 px), og fanerne får
+deres egen linje (under 960 px).
 
 **Beregningen.** Som i sc7.4: tavlen viser data, reaktionen Ag⁺ + Cl⁻ → AgCl og
 de fire linjer. Eleven skriver selv formlen i hvert trin og derefter tallet:
@@ -97,7 +122,7 @@ og `#forbrug`). Fanens id er stadig `fane-forbrug`.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> faner · <kbd>T</kbd> teori ·
 <kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichaels præsentation ·
-<kbd>R</kbd> ny prøve eller forfra · <kbd>Enter</kbd> videre ·
+<kbd>R</kbd> ny prøve eller forfra · <kbd>I</kbd> skift indikator · <kbd>Enter</kbd> videre ·
 <kbd>mellemrum</kbd> åbn og luk hanen · <kbd>D</kbd> én dråbe ·
 <kbd>←</kbd> <kbd>→</kbd> hanen mindre og mere åben · <kbd>Esc</kbd> luk eller
 send Kemichael ud.
@@ -124,8 +149,10 @@ index.html          markup for de tre faner, teorien og rundvisningen
 css/stil.css        alt udseende (kopieret fra sc7.4). NB: decimaltal med PUNKTUM i CSS
 sprites/            buretten, kolben og magnetomrøreren (fra sc7.4) og flasken med havvand
 js/kerne.js         NK-navnerum, hævet og sænket skrift, hukommelse, lærred, tal (som sc7.4)
-js/kemi.js          modellen: chlorid, AgCl og Ag₂CrO₄ af opløselighedsprodukterne, farven og stederne
-js/data.js          grænserne, hintene, de fire regnetrin, de seks situationer og replikkerne
+js/kemi.js          modellen: chlorid, AgCl og Ag₂CrO₄ af opløselighedsprodukterne, farven og stederne;
+                    K.indikator, K.FARVER og K.ORD for de to indikatorer
+js/data.js          grænserne, hintene, de fire regnetrin, de seks situationer og replikkerne;
+                    D.ORD og D.saetOrd skriver teksterne om til den valgte indikator
 js/tjek.js          tjekket af aflæsningen, formlerne og de fire regnetrin med beskeder til de typiske fejl
 js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, opstillingen, dråberne, skyderen, flasken, keglen og skiltene
@@ -138,7 +165,7 @@ js/sim_beregning.js fane 2
 js/sim_forbrug.js   fane 3
 js/laerer.js        Kemichael på alle tre faner og påskeæggene (som sc7.4)
 js/rundvisning.js   rundvisningen bag ? (koden er sc1.1's)
-js/app.js           faneskift, teorien, genveje, tegneløkke (som sc7.4)
+js/app.js           faneskift, teorien, genveje, valget af indikator (NK.saetIndikator), tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 _sprites.html       udviklerværktøj: viser tegningerne alene
 ```
@@ -163,10 +190,14 @@ typiske fejl, at sproget holder reglerne, at fane 1 kan gennemføres med musen,
 at luppen og kurven viser det samme som kolben, at Vis svaret rammer omslaget ved
 seks prøver, at overtitrering og en tom burette opfører sig rigtigt, at fane 2
 og 3 kan gennemføres, at alle kolber på fane 3 er rødbrune til sidst, at
-Kemichael kan vises og sendes ud på alle faner, og at layoutet holder fra
-520 × 380 til 1500 × 900. Den kræver en lokal server eller Chrome med
-`--allow-file-access-from-files`, og den lægger elevens valg tilbage bagefter.
-Sidst kørt 28. september 2026: ALT OK (100 påstande).
+Kemichael kan vises og sendes ud på alle faner, og at layoutet (også fanerne i
+toplinjen) holder fra 520 × 380 til 1500 × 900. Afsnit 1 til 10 kører med
+kaliumchromat. Afsnit 11 kører dichlorfluorescein: knapperne og teorien, modellen
+(samme ækvivalenspunkt, omslag inden for 0,01 mL, farveordene og sølvet regnet
+med), fane 1 med luppen og kurven, overtitrering, et skift midt i en titrering,
+tasten I, replikkerne, rundvisningen og fane 3. Den kræver en lokal server eller
+Chrome med `--allow-file-access-from-files`, og den lægger elevens valg tilbage
+bagefter. Sidst kørt 18. oktober 2026: ALT OK (130 påstande).
 
 ## Forenklinger
 
@@ -184,6 +215,12 @@ Sidst kørt 28. september 2026: ALT OK (100 påstande).
   rødbrune sky, hvor dråben rammer, er et billede af, at [Ag⁺] lokalt er høj,
   indtil omrøreren har blandet.
 * Postevand har 50 mg chlorid pr. liter.
+* Dichlorfluorescein: farven regnes af overskuddet af Ag⁺, [Ag⁺] − [Cl⁻], med
+  styrken 1 − exp(−√(x / 2,5 · 10⁻⁴ M)). Den første dråbe efter
+  ækvivalenspunktet giver svagt lyserød, og 1 mL for meget giver kraftigt
+  lyserød. I virkeligheden er farveskiftet skarpere og bliver ikke meget
+  kraftigere; den gradvise farve er valgt, så overtitrering kan ses som med
+  chromat. Indikatoren er ikke regnet med i stofmængderne.
 * Kolben er tegnet større i forhold til buretten end i virkeligheden, og
   væskehøjden i den stiger med 1,4 enheder pr. mL, så den kan ses.
 * Luppens figurer er hver 1/8 af chloridet i kolben, ikke enkelte ioner.

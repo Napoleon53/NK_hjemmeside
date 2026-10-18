@@ -48,7 +48,7 @@
 
     /* Proeven i en kolbe: det, der faktisk er der, og det, eleven tror.
        Kemichael titrerer til den foerste draabe efter aekvivalenspunktet,
-       hvor kolben er roedbrun. */
+       hvor kolben har skiftet farve (den valgte indikator). */
     P.kolbe = function (hvilken) {
         var sit = this.sit(), b = hvilken === "B" && sit ? sit.B : {};
         var m = b.m !== undefined ? b.m : K.PROEVE;
@@ -60,7 +60,7 @@
             spild: b.spild || 0,
             post: !!b.post
         };
-        ks.pr = { m: m * (1 - ks.spild), p: this.p, vand: ks.vand, c: ks.c, clVand: ks.post ? K.CL_POSTEVAND : 0, sted: this.sted };
+        ks.pr = { m: m * (1 - ks.spild), p: this.p, vand: ks.vand, c: ks.c, clVand: ks.post ? K.CL_POSTEVAND : 0, sted: this.sted, ind: K.indikator };
         var v = Math.ceil(K.vAek(ks.pr) / K.DRAABE - 1e-9) * K.DRAABE;
         for (var i = 0; i < 4 && K.farveStyrke(ks.pr, v) < 0.04; i++) v += K.DRAABE;
         ks.v = Math.round(v * 100) / 100;
@@ -161,6 +161,22 @@
         }
         if (this.forste < 0) this.forste = -2;   /* svaret er vist: taeller ikke som rigtigt */
         this.vaelg(sit.rigtig);
+    };
+
+    /* Indikatoren er skiftet: kolberne regnes om. Er de titreret, staar
+       de ved det nye omslag; ellers titrerer Kemichael videre. */
+    P.skiftIndikator = function () {
+        this.A = this.kolbe("A");
+        this.B = this.kolbe("B");
+        if (this.fase === "vist" || (this.sit() && this.sit().samme && this.koert && this.fase === "vaelg")) {
+            this.vA = this.A.v;
+            this.vB = this.B.v;
+        } else {
+            this.vA = Math.min(this.vA, this.A.v);
+            this.vB = Math.min(this.vB, this.B.v);
+        }
+        this.visTabel();
+        this.visStatus();
     };
 
     P.nulstil = function () {
@@ -323,7 +339,7 @@
         Tg.stativ(ctx, g);
         Tg.omroerer(ctx, g);
         var mL = ks.vand + ks.pr.m + K.V_IND + v;
-        var ov = Tg.kolbe(ctx, g, mL, K.kolbeFarve(uklar, styrke), this.tid * 9, [], { fnug: uklar });
+        var ov = Tg.kolbe(ctx, g, mL, K.kolbeFarve(uklar, styrke, undefined, ks.pr.ind), this.tid * 9, [], { fnug: uklar });
         if (koerer) Tg.straale(ctx, g, ov, 0.8);
         Tg.buret(ctx, g, v, koerer ? 0.85 : 0, {
             etiket: "AgNO₃ " + K.c(ks.c) + " M",

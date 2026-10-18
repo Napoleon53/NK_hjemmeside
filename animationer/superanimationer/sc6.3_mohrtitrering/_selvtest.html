@@ -25,6 +25,8 @@
    overholder reglerne, at alle tre faner kan gennemføres (fane 1 også
    med musen), at luppen viser det samme som kolben, at Kemichael kan
    vises og sendes ud, og at layoutet holder fra 520 × 380 til 1500 × 900.
+   Afsnit 1 til 10 koeres med kaliumchromat som indikator; afsnit 11
+   koerer den nye indikator, dichlorfluorescein (18. okt. 2026).
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens valg og lægger dem tilbage bagefter.
@@ -47,7 +49,7 @@ function vis() {
 window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
 var NOEGLER = ["nk-sc6.3-intro-titrering", "nk-sc6.3-intro-beregning", "nk-sc6.3-intro-forbrug",
-    "nk-sc6.3-ros-titrering", "nk-sc6.3-ros-beregning", "nk-sc6.3-ros-forbrug"];
+    "nk-sc6.3-ros-titrering", "nk-sc6.3-ros-beregning", "nk-sc6.3-ros-forbrug", "nk-sc6.3-indikator"];
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
@@ -82,6 +84,8 @@ function koerTest(W) {
     paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
     var S1 = NK.sims["fane-titrering"], S2 = NK.sims["fane-beregning"], S3 = NK.sims["fane-forbrug"];
     paastand("Kemichael er koblet på alle tre faner", !!(S1.laerer && S2.laerer && S3.laerer));
+    NK.saetIndikator("chromat");
+    paastand("afsnit 1 til 10 kører med kaliumchromat", K.indikator === "chromat" && S1.pr.ind === "chromat" && S1.lup.ind === "chromat");
 
     overskrift("2. Modellen");
     var pr = { m: 1.00, p: 3.10, vand: 20, c: 0.050, clVand: 0 };
@@ -251,8 +255,8 @@ function koerTest(W) {
     paastand("dråbe for dråbe bliver kolben rødbrun på den første dråbe efter omslagspunktet",
         S1.rodbrun() && S1.forbi() >= 0 && S1.vUd() - S1.vOmslag < 0.05 + 1e-9, S1.forbi().toFixed(3));
     paastand("luppen: alt chlorid er fældet, og der er dannet sølvchromat", S1.lup.clTilbage() === 0 && S1.lup.ag2cro4() === 1, S1.lup.ag2cro4());
-    paastand("kurven: sølvchromat først efter ækvivalenspunktet", S1.kurve.punkter.every(function (p) { return p.v > S1.vAek || p.cro === 0; }) &&
-        S1.kurve.punkter[S1.kurve.punkter.length - 1].cro > 0);
+    paastand("kurven: sølvchromat først efter ækvivalenspunktet", S1.kurve.punkter.every(function (p) { return p.v > S1.vAek || p.x === 0; }) &&
+        S1.kurve.punkter[S1.kurve.punkter.length - 1].x > 0);
     paastand("feltet til aflæsningen kommer frem", S1.fase === "aflaes" && !!d.querySelector("#tit-felt input"));
     var inp = d.querySelector("#tit-felt input");
     inp.value = "3"; S1.tjekAflaesning();
@@ -425,6 +429,8 @@ function koerTest(W) {
                 inde({ x: lay.tavle.x, y: lay.tavle.y, b: lay.tavle.b, h: lay.tavle.h }, "tavlen");
                 if (lay.tavle.h < 200) problemer.push(id + ": tavlen er for lav");
             }
+            var fk = d.querySelector(".faneknapper");
+            if (fk.scrollWidth > fk.clientWidth + 1) problemer.push("fanerne i toplinjen er skåret af");
             if (id === "fane-forbrug") {
                 opst(lay.gA, "A"); opst(lay.gB, "B");
                 if (lay.gB.stang.x - 44 * lay.gB.s < lay.gA.cx + 60 * lay.gA.s) problemer.push(id + ": A og B rører hinanden");
@@ -436,6 +442,102 @@ function koerTest(W) {
     });
     ramme.style.width = "";
     ramme.style.height = "";
+
+    overskrift("11. Dichlorfluorescein");
+    klik('.indknap[data-ind="dcf"]');
+    paastand("knappen vælger dichlorfluorescein og husker valget", K.indikator === "dcf" && W.localStorage.getItem("nk-sc6.3-indikator") === '"dcf"');
+    paastand("knapperne viser valget", d.querySelector('.indknap[data-ind="dcf"]').getAttribute("aria-pressed") === "true" &&
+        d.querySelector('.indknap[data-ind="chromat"]').getAttribute("aria-pressed") === "false");
+    var tDcf = [].slice.call(d.querySelectorAll('#teori [data-ind="dcf"]')), tCr = [].slice.call(d.querySelectorAll('#teori [data-ind="chromat"]'));
+    paastand("teorien viser kun delen om dichlorfluorescein", tDcf.length >= 2 && tCr.length >= 2 &&
+        tDcf.every(function (e) { return !e.hidden; }) && tCr.every(function (e) { return e.hidden; }));
+    var prD = { m: 1.00, p: 3.10, vand: 20, c: 0.050, clVand: 0, ind: "dcf" };
+    var prC = { m: 1.00, p: 3.10, vand: 20, c: 0.050, clVand: 0, ind: "chromat" };
+    var vAd = K.vAek(prD);
+    paastand("forbruget ved ækvivalenspunktet er det samme med begge indikatorer", naer(vAd, K.vAek(prC), 1e-12));
+    var tAd = K.tilstand(prD, vAd);
+    paastand("ved ækvivalenspunktet: intet chromat og ingen lyserød", tAd.nCro === 0 && K.styrke(tAd) < 0.04, K.styrke(tAd));
+    var vOd = K.vOmslag(prD);
+    paastand("omslaget kommer 0 til 0,01 mL efter ækvivalenspunktet og før chromatets", vOd > vAd && vOd - vAd < 0.01 && vOd <= K.vOmslag(prC), (vOd - vAd).toFixed(4));
+    paastand("én dråbe før: gulgrøn og uklar", K.farveOrd(K.farveStyrke(prD, vAd - 0.05), K.uklarhed(prD, K.tilstand(prD, vAd - 0.05)), "dcf") === "gulgrøn og uklar");
+    paastand("én dråbe efter omslaget: svagt lyserød", K.farveOrd(K.farveStyrke(prD, vOd + 0.05), 1, "dcf") === "svagt lyserød", K.farveStyrke(prD, vOd + 0.05).toFixed(2));
+    paastand("1 mL for meget: kraftigt lyserød", K.farveOrd(K.farveStyrke(prD, vAd + 1), 1, "dcf") === "kraftigt lyserød", K.farveStyrke(prD, vAd + 1).toFixed(2));
+    var tSd = K.tilstand(prD, 25);
+    paastand("sølvet er regnet med: i opløsning + AgCl = det tilsatte", tSd.nCro === 0 && naer(tSd.nAgFri + tSd.nAgCl, 0.05 * 0.025, 1.25e-9));
+    paastand("kolbens farve er gulgrøn ved start og lyserød til sidst", /rgba\(204, 226, 86/.test(K.kolbeFarve(0, 0, undefined, "dcf")) &&
+        /rgba\(232, 120, 170/.test(K.kolbeFarve(1, 1, undefined, "dcf")));
+
+    klik('[data-fane="fane-titrering"]');
+    S1.tilpas();
+    S1.nyProeve(3.10, "Vesterhavet");
+    paastand("fane 1: prøven, luppen og kurven har dichlorfluorescein", S1.pr.ind === "dcf" && S1.lup.ind === "dcf" &&
+        S1.lup.figurer.filter(function (f) { return f.slags === "ind"; }).length === 2 && S1.lup.figurer.every(function (f) { return f.slags !== "cr"; }) &&
+        S1.kurve.serier[2].navn === "Ag⁺");
+    paastand("opgaven og hintet siger lyserød", /svagt lyserød/.test(d.getElementById("tit-prompt").textContent) && /lyserød/.test(D.TITRER_HINT) && !/rødbrun/.test(D.TITRER_HINT));
+    S1.knap(); S1.knap();
+    for (i = 0; i < 8000 && S1.fase !== "aflaes"; i++) S1.opdater(1 / 60);
+    tik(S1, 4);
+    paastand("Vis svaret titrerer til den første lyserøde dråbe", S1.fase === "aflaes" && S1.rodbrun() && S1.forbi() >= 0 && S1.forbi() < 0.1, S1.forbi().toFixed(3));
+    paastand("luppen: alt chlorid er fældet, og indikatoren sidder lyserød på bundfaldet", S1.lup.clTilbage() === 0 && S1.lup.indPaa() === 2 &&
+        S1.lup.ag2cro4() === 0 && S1.lup.friAg() >= 1, "på bundfaldet " + S1.lup.indPaa() + ", fri Ag⁺ " + S1.lup.friAg());
+    var pk = S1.kurve.punkter;
+    paastand("kurven: Ag⁺ i opløsning først efter ækvivalenspunktet", pk.every(function (p) { return p.v > S1.vAek || p.x < 0.002; }) && pk[pk.length - 1].x > 0.001);
+    paastand("status siger lyserød, og intet om rødbrun eller chromat", /lyserød/.test(d.getElementById("tit-status").textContent) &&
+        !/rødbrun|chromat/i.test(d.getElementById("tit-status").textContent + d.getElementById("tit-kort").textContent));
+    inp = d.querySelector("#tit-felt input");
+    inp.value = String(S1.vUd()).replace(".", ","); S1.tjekAflaesning();
+    paastand("præcis titrering: lyserød på den sidste dråbe", /lyserød på den sidste dråbe/.test(d.getElementById("tit-besked").textContent));
+    S1.nyProeve(2.00, "Kattegat");
+    S1.saetHane(1);
+    for (i = 0; i < 6000 && S1.vUd() < S1.vAek + 2; i++) S1.opdater(1 / 60);
+    S1.saetHane(0); tik(S1, 4);
+    paastand("2 mL for langt: kraftigt lyserød, og luppen har fri Ag⁺", K.farveOrd(S1.styrke(), S1.uklar()) === "kraftigt lyserød" && S1.lup.friAg() >= 2 && S1.lup.indPaa() === 2);
+    S1.nyProeve(2.00, "Kattegat");
+    S1.saetHane(1);
+    tik(S1, 3);
+    var nrFoer = S1.nr;
+    NK.saetIndikator("chromat");
+    paastand("et skift midt i titreringen: samme havvand forfra med kaliumchromat", S1.vUd() === 0 && S1.nr === nrFoer && S1.pr.p === 2.00 &&
+        S1.pr.ind === "chromat" && S1.lup.figurer.filter(function (f) { return f.slags === "cr"; }).length === 2 && /rødbrun/.test(D.TITRER_HINT));
+    var tast = new W.KeyboardEvent("keydown", { key: "i", bubbles: true });
+    d.dispatchEvent(tast);
+    paastand("tasten I skifter tilbage til dichlorfluorescein", K.indikator === "dcf" && S1.pr.ind === "dcf");
+
+    var replikkerD = [].concat(D.INTRO_TITRERING, [D.ROS_TITRERING, D.BEM_MORK]);
+    paastand("Kemichaels replikker siger lyserød og hindbærsmoothie og er højst ca. 60 tegn", /lyserød/.test(D.INTRO_TITRERING.join(" ")) &&
+        /Lyserød/.test(D.ROS_TITRERING) && /hindbærsmoothie/.test(D.BEM_MORK) && replikkerD.every(function (x) { return x.length <= 62; }));
+    var synligTeori = tDcf.map(function (e) { return e.textContent; }).join(" ");
+    paastand("teorien om dichlorfluorescein siger gulgrøn og lyserød og ikke rødbrun", /gulgrøn/.test(synligTeori) && /lyserød/.test(synligTeori) && !/rødbrun/.test(synligTeori));
+    paastand("ingen tankestreger i de nye tekster", ![d.querySelector(".indikatorvalg").textContent, synligTeori, D.TITRER_HINT].concat(replikkerD).some(function (x) { return /[–—]/.test(x); }));
+    NK.Rundvisning.start("fane-titrering");
+    paastand("rundvisningen nævner dichlorfluorescein ved kolben", /dichlorfluorescein, der farver den gulgrøn/.test(d.getElementById("rv-tekst").textContent), d.getElementById("rv-tekst").textContent);
+    for (i = 0; i < 7; i++) d.getElementById("rv-naeste").click();
+    paastand("rundvisningen har et trin om indikatoren", d.getElementById("rv-titel").textContent === "Indikatoren" &&
+        /Dichlorfluorescein bruges i dag/.test(d.getElementById("rv-tekst").textContent), d.getElementById("rv-titel").textContent);
+    NK.Rundvisning.luk();
+
+    klik('[data-fane="fane-forbrug"]');
+    S3.tilpas();
+    S3.nulstil();
+    var Vd = {};
+    D.SITUATIONER.forEach(function (s, n) {
+        S3.vaelg(s.rigtig);
+        tik(S3, 5);
+        Vd[s.id] = { A: S3.A, B: S3.B };
+        if (n < D.SITUATIONER.length - 1) S3.knap();
+    });
+    paastand("fane 3: alle kolber er lyserøde, når Kemichael har titreret", D.SITUATIONER.every(function (s) {
+        return Vd[s.id].A.pr.ind === "dcf" && K.farveStyrke(Vd[s.id].A.pr, Vd[s.id].A.v) >= 0.04 && K.farveStyrke(Vd[s.id].B.pr, Vd[s.id].B.v) >= 0.04;
+    }));
+    paastand("fane 3: samme forbrug som med kaliumchromat (højst én dråbe fra)", D.SITUATIONER.every(function (s) {
+        return Math.abs(Vd[s.id].A.v - V[s.id].A.v) <= 0.051 && Math.abs(Vd[s.id].B.v - V[s.id].B.v) <= 0.051;
+    }));
+    S3.tegn();
+    NK.saetIndikator("chromat");
+    paastand("fane 3: et skift regner kolberne om, og de står ved det nye omslag", S3.A.pr.ind === "chromat" && S3.vA === S3.A.v && S3.fase === "vist");
+    NK.saetIndikator("dcf");
+    S3.nulstil();
+
     klik('[data-fane="fane-titrering"]');
     S1.nyProeve();
 }

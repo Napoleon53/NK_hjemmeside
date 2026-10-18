@@ -247,9 +247,10 @@
     }());
 
     /* Kolben med vaesken. mL: rumfang, farve: vaeskens farve (css),
-       loppe: magnetloppens vinkel, skyer: roedbrune skyer, hvor draaberne
-       rammer ([{ x, y, r, a }] i pixels), v.lys: glorie, v.fnug: hvor
-       meget hvidt AgCl der hvirvler rundt (0-1) */
+       loppe: magnetloppens vinkel, skyer: skyer, hvor draaberne rammer
+       ([{ x, y, r, a }] i pixels), v.lys: glorie, v.fnug: hvor meget hvidt
+       AgCl der hvirvler rundt (0-1), v.sky: skyernes farve [inderst, midt]
+       som rgb (ellers roedbrun som med kaliumchromat) */
     T.kolbe = function (ctx, g, mL, farve, loppe, skyer, opt) {
         opt = opt || {};
         var k = g.k, x = g.kolbe.x, y = g.kolbe.y;
@@ -274,10 +275,11 @@
                     ctx.fill();
                 }
             }
+            var sf = opt.sky || [[176, 72, 38], [214, 140, 90]];
             (skyer || []).forEach(function (sk) {
                 var rg = ctx.createRadialGradient(sk.x, sk.y, 0, sk.x, sk.y, sk.r);
-                rg.addColorStop(0, "rgba(176, 72, 38, " + (0.8 * sk.a) + ")");
-                rg.addColorStop(0.55, "rgba(214, 140, 90, " + (0.45 * sk.a) + ")");
+                rg.addColorStop(0, "rgba(" + sf[0].join(", ") + ", " + (0.8 * sk.a) + ")");
+                rg.addColorStop(0.55, "rgba(" + sf[1].join(", ") + ", " + (0.45 * sk.a) + ")");
                 rg.addColorStop(1, "rgba(245, 238, 220, 0)");
                 ctx.fillStyle = rg;
                 ctx.fillRect(sk.x - sk.r, Math.max(ov, sk.y - sk.r), sk.r * 2, sk.r * 2);

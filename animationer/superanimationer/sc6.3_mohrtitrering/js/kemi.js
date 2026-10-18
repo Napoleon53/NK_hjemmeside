@@ -1,20 +1,29 @@
 /* =====================================================================
    kemi.js - modellen: chlorid i havvand titreret med soelvnitrat (Mohr)
 
-   Ingen DOM og ingen tegning. En proeve er { m, p, vand, c, clVand, sted }:
+   Ingen DOM og ingen tegning. En proeve er { m, p, vand, c, clVand, sted, ind }:
      m       havvandets masse i gram (1,00 g)
      p       masseprocent NaCl i havvandet (alt chlorid regnet som NaCl)
      vand    vand i kolben, mL (20 mL demineraliseret vand)
      c       koncentrationen af AgNO₃, mol/L (0,050 M)
      clVand  chlorid i vandet, mol/L (0 for demineraliseret vand)
      sted    hvor havvandet er hentet (kun til teksten)
+     ind     indikatoren, "dcf" eller "chromat" (uden den: den valgte)
 
-   Kolben indeholder ogsaa lidt kaliumchromat (K.N_CR). Ag⁺ faelder
-   foerst AgCl og foerst derefter roedbrunt Ag₂CrO₄, fordi [Ag⁺] skal op
-   paa ca. 1,9 · 10⁻⁵ M, foer Ag₂CrO₄ kan dannes. Det sker lige efter
-   aekvivalenspunktet. [Ag⁺] findes af massebalancen for soelv med de
-   to opløselighedsprodukter; venstre minus hoejre vokser med [Ag⁺], saa
-   nulpunktet findes ved halvering paa log-skala (som pH i sc7.4).
+   To indikatorer (K.indikator, valgt oeverst i animationen, 18. okt.
+   2026): "dcf" er dichlorfluorescein, som bruges i skolen i dag og i
+   Kemibogen, og "chromat" er kaliumchromat, som Mohr brugte.
+
+   Med kaliumchromat (K.N_CR) faelder Ag⁺ foerst AgCl og foerst derefter
+   roedbrunt Ag₂CrO₄, fordi [Ag⁺] skal op paa ca. 1,9 · 10⁻⁵ M, foer
+   Ag₂CrO₄ kan dannes. Det sker lige efter aekvivalenspunktet. [Ag⁺]
+   findes af massebalancen for soelv med de to opløselighedsprodukter;
+   venstre minus hoejre vokser med [Ag⁺], saa nulpunktet findes ved
+   halvering paa log-skala (som pH i sc7.4).
+
+   Med dichlorfluorescein er der intet chromat. Indikatoren saetter sig
+   paa bundfaldet, naar Ag⁺ er i overskud ([Ag⁺] > [Cl⁻]), og saa bliver
+   bundfaldet lyserødt. Farven regnes af overskuddet [Ag⁺] - [Cl⁻].
 
    Tallene: M(NaCl) = 58,44 g/mol, Ks(AgCl) = 1,8 · 10⁻¹⁰ M²,
    Ks(Ag₂CrO₄) = 1,1 · 10⁻¹² M³ (Databogen, 25 °C).
@@ -42,6 +51,11 @@
     K.BURET = 25;              /* mL, burettens inddeling */
     K.FIGURER = 8;             /* figurer i luppen: 1 figur = 1/8 af chloridet */
 
+    /* Indikatoren: "dcf" (dichlorfluorescein) eller "chromat" (kaliumchromat).
+       Saettes af app.js (NK.saetIndikator) og husker brugerens valg. */
+    K.INDIKATORER = ["dcf", "chromat"];
+    K.indikator = "dcf";
+
     /* Havvand fra seks steder. p er masseprocent NaCl regnet af
        saliniteten (promille) med alt chlorid som NaCl: 0,0912 · S.
        Afrundede overfladevaerdier. */
@@ -62,7 +76,7 @@
             sted = s.sted;
             p = Math.round((s.p + NK.r(-0.08, 0.08)) * 100) / 100;
         }
-        return { m: K.PROEVE, p: p, vand: K.VAND, c: K.C_AG, clVand: 0, sted: sted || "Vesterhavet" };
+        return { m: K.PROEVE, p: p, vand: K.VAND, c: K.C_AG, clVand: 0, sted: sted || "Vesterhavet", ind: K.indikator };
     };
 
     /* Stofmaengden af chlorid i havvandet (= NaCl), mol */
@@ -93,13 +107,16 @@
     };
 
     /* Tilstanden i kolben, naar v mL soelvnitrat er tilsat:
-       { ag, cl, nAgCl, nCro, nClFri, vt } med [Ag⁺] og [Cl⁻] i mol/L og
-       stofmaengderne i mol. */
+       { ag, cl, nAgCl, nCro, nClFri, nAgFri, vt, ind } med [Ag⁺] og [Cl⁻]
+       i mol/L og stofmaengderne i mol. ind er indikatoren (proevens
+       pr.ind eller den valgte); med dichlorfluorescein er der intet
+       chromat, og nCro er 0. */
     K.tilstand = function (pr, v) {
-        var nCl = K.nCl(pr), nCr = K.N_CR;
+        var ind = pr.ind || K.indikator;
+        var nCl = K.nCl(pr), nCr = ind === "chromat" ? K.N_CR : 0;
         var nAg = pr.c * Math.max(0, v) / 1000;
         var vt = K.rumfang(pr, Math.max(0, v));
-        if (nAg <= 0) return { ag: 0, cl: nCl / vt, nAgCl: 0, nCro: 0, nClFri: nCl, vt: vt };
+        if (nAg <= 0) return { ag: 0, cl: nCl / vt, nAgCl: 0, nCro: 0, nClFri: nCl, nAgFri: 0, vt: vt, ind: ind };
         var ks1 = K.KS_AGCL, ks2 = K.KS_AG2CRO4;
         /* f(a) = alt soelv i opløsning og i bundfaldene minus det tilsatte */
         function f(a) {
@@ -117,18 +134,23 @@
         /* Rester paa 10⁻²⁰ mol fra kommatallene regnes som 0 */
         var nAgCl = nCl - clF * vt, nCro = nCr - crF * vt;
         if (nAgCl < nCl * 1e-9) nAgCl = 0;
-        if (nCro < nCr * 1e-9) nCro = 0;
-        return { ag: a, cl: clF, nAgCl: nAgCl, nCro: nCro, nClFri: clF * vt, vt: vt };
+        if (nCro <= nCr * 1e-9) nCro = 0;
+        return { ag: a, cl: clF, nAgCl: nAgCl, nCro: nCro, nClFri: clF * vt, nAgFri: a * vt, vt: vt, ind: ind };
     };
 
-    /* Hvor tydelig den roedbrune farve er for oejet: 0 ingen, 1 staerk.
-       Regnet af [Ag₂CrO₄] i kolben. Den foerste draabe efter omslaget
-       giver svagt roedbrun, en halv mL for meget giver moerk roedbrun. */
-    K.X0 = 6e-5;               /* mol/L */
+    /* Hvor tydelig omslagsfarven er for oejet: 0 ingen, 1 staerk.
+       Kaliumchromat: regnet af [Ag₂CrO₄] i kolben. Den foerste draabe
+       efter omslaget giver svagt roedbrun, en halv mL for meget giver
+       moerk roedbrun.
+       Dichlorfluorescein: regnet af overskuddet af Ag⁺, [Ag⁺] - [Cl⁻].
+       Foer aekvivalenspunktet er det 0. Den foerste draabe efter giver
+       svagt lyserød, og 1 mL for meget giver kraftigt lyserød. */
+    K.X0 = 6e-5;               /* mol/L Ag₂CrO₄ */
+    K.E0 = 2.5e-4;             /* mol/L Ag⁺ i overskud */
     K.styrke = function (t) {
-        var x = t.nCro / t.vt;
-        if (x <= 0) return 0;
-        return NK.klamp(1 - Math.exp(-Math.sqrt(x / K.X0)), 0, 1);
+        var x = t.ind === "dcf" ? (t.ag - t.cl) / K.E0 : t.nCro / t.vt / K.X0;
+        if (!(x > 0)) return 0;
+        return NK.klamp(1 - Math.exp(-Math.sqrt(x)), 0, 1);
     };
 
     K.farveStyrke = function (pr, v) {
@@ -151,24 +173,44 @@
         return hi;
     };
 
-    /* Vaeskens farve i kolben (css): gul af chromat, hvid af AgCl og
-       roedbrun af Ag₂CrO₄. uklar og styrke er 0-1. */
-    K.kolbeFarve = function (uklar, styrke, alfa) {
+    /* Farverne for hver indikator (rgb): start er opløsningen med
+       indikatoren, maelk er den med hvidt AgCl, slut er omslagsfarven, og
+       sky er den sky, der kommer, hvor draaben rammer (inderst og midt).
+       Kaliumchromat: gul, citrongul maelk og roedbrun. Dichlorfluorescein:
+       gulgroen, lys gulgroen maelk og lyserød (som i Kemibogens figurer). */
+    K.FARVER = {
+        chromat: { start: [242, 206, 58], maelk: [238, 228, 170], slut: [186, 92, 52],
+                   sky: [[176, 72, 38], [214, 140, 90]] },
+        dcf: { start: [204, 226, 86], maelk: [232, 240, 196], slut: [232, 120, 170],
+               sky: [[222, 88, 150], [240, 166, 200]] }
+    };
+
+    /* Vaeskens farve i kolben (css): opløsningen med indikatoren, hvid af
+       AgCl og omslagsfarven. uklar og styrke er 0-1, ind er indikatoren
+       (ellers den valgte). */
+    K.kolbeFarve = function (uklar, styrke, alfa, ind) {
+        var F = K.FARVER[ind || K.indikator] || K.FARVER.chromat;
         var u = NK.klamp(uklar, 0, 1), s = NK.klamp(styrke, 0, 1);
-        /* gul -> citrongul maelk */
-        var r = NK.lerp(242, 238, u), g = NK.lerp(206, 228, u), b = NK.lerp(58, 170, u);
-        /* -> roedbrun */
-        r = NK.lerp(r, 186, s); g = NK.lerp(g, 92, s); b = NK.lerp(b, 52, s);
+        var r = NK.lerp(F.start[0], F.maelk[0], u), g = NK.lerp(F.start[1], F.maelk[1], u), b = NK.lerp(F.start[2], F.maelk[2], u);
+        r = NK.lerp(r, F.slut[0], s); g = NK.lerp(g, F.slut[1], s); b = NK.lerp(b, F.slut[2], s);
         var a = alfa === undefined ? NK.lerp(0.42, 0.72, Math.max(u, s)) : alfa;
         return "rgba(" + Math.round(r) + ", " + Math.round(g) + ", " + Math.round(b) + ", " + a + ")";
     };
 
+    /* Ordene for farverne: start (opløsningen med indikatoren) og
+       omslagsfarven svagt, almindeligt og kraftigt */
+    K.ORD = {
+        chromat: { start: "gul", svag: "svagt rødbrun", farve: "rødbrun", kraftig: "mørk rødbrun" },
+        dcf: { start: "gulgrøn", svag: "svagt lyserød", farve: "lyserød", kraftig: "kraftigt lyserød" }
+    };
+
     /* Kolbens farve beskrevet i ord */
-    K.farveOrd = function (styrke, uklar) {
-        if (styrke < 0.04) return uklar > 0.02 ? "gul og uklar" : "gul";
-        if (styrke < 0.45) return "svagt rødbrun";
-        if (styrke < 0.9) return "rødbrun";
-        return "mørk rødbrun";
+    K.farveOrd = function (styrke, uklar, ind) {
+        var o = K.ORD[ind || K.indikator] || K.ORD.chromat;
+        if (styrke < 0.04) return uklar > 0.02 ? o.start + " og uklar" : o.start;
+        if (styrke < 0.45) return o.svag;
+        if (styrke < 0.9) return o.farve;
+        return o.kraftig;
     };
 
     /* ----- Tal i tekst ---------------------------------------------------------- */

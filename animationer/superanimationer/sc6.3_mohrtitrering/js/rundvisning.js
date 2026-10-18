@@ -5,7 +5,8 @@
    kort tekst. Fane 1 slutter med at pege paa de andre faner. Samme kode
    som i sc1.1, sc1.2, sc5.4, sc7.2 og sc7.4; kun TURE er ny.
 
-   Hvert trin er en CSS-selector plus en titel og en kort tekst. Dele af
+   Hvert trin er en CSS-selector plus en titel og en kort tekst (eller en
+   funktion, der giver teksten, naar den afhaenger af indikatoren). Dele af
    laerredet har et usynligt felt oven paa sig, som fanen selv flytter paa
    plads (saetAnker i sim_titrering.js, sim_beregning.js og sim_forbrug.js).
    ===================================================================== */
@@ -16,13 +17,14 @@
 
     var TURE = {
         "fane-titrering": [
-            { sel: "#tit-anker-kolbe", titel: "Kolben", tekst: "1,00 g havvand, 20 mL demineraliseret vand og lidt kaliumchromat, der farver den gul." },
+            { sel: "#tit-anker-kolbe", titel: "Kolben", tekst: function () { return "1,00 g havvand, 20 mL demineraliseret vand og lidt " + NK.Data.O.navn + ", der farver den " + NK.Data.O.start + "."; } },
             { sel: "#tit-anker-buret", titel: "Buretten", tekst: "Sølvnitrat, AgNO₃, 0,050 M. Den tæller oppefra: 0 står øverst." },
             { sel: "#tit-anker-hane", titel: "Hanen", tekst: "Træk skyderen for at åbne hanen. Dryp til sidst, eller brug knappen til én dråbe." },
             { sel: "#tit-anker-lup", titel: "Luppen", tekst: "Chloridet i kolben som 8 figurer. Hver Ag⁺, der kommer ned, fælder en Cl⁻ som hvidt AgCl." },
-            { sel: "#tit-kort", titel: "Prøven", tekst: "Luk hanen, når kolben bliver svagt rødbrun, og skriv så forbruget. Knappen giver et hint og derefter svaret." },
+            { sel: "#tit-kort", titel: "Prøven", tekst: function () { return "Luk hanen, når kolben bliver " + NK.Data.O.svag + ", og skriv så forbruget. Knappen giver et hint og derefter svaret."; } },
             { sel: "#tit-buretkort", titel: "Aflæsningen", tekst: "Buretten ved menisken. Aflæs bunden af menisken." },
-            { sel: "#tit-kurvekort", titel: "Kurverne", tekst: "Hvor meget Cl⁻, AgCl og Ag₂CrO₄ der er i kolben, mens der løber sølvnitrat ned." },
+            { sel: "#tit-kurvekort", titel: "Kurverne", tekst: function () { return "Hvor meget Cl⁻, AgCl og " + (NK.Kemi.indikator === "dcf" ? "fri Ag⁺" : "Ag₂CrO₄") + " der er i kolben, mens der løber sølvnitrat ned."; } },
+            { sel: ".indikatorvalg", titel: "Indikatoren", tekst: "Dichlorfluorescein bruges i dag og skifter fra gulgrøn til lyserød. Kaliumchromat brugte Mohr selv: gul til rødbrun." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionen, indikatoren og beregningen kort forklaret." },
             { sel: ".faneknapper", titel: "De andre faner", tekst: "Beregningen: fra forbruget til masseprocenten. Fejlkilder: hvad ændrer forbruget og masseprocenten?" }
         ],
@@ -118,7 +120,7 @@
         spot.style.height = (rect.height + pad * 2) + "px";
 
         NK.saetTekst("rv-titel", t.titel);
-        NK.saetTekst("rv-tekst", t.tekst);
+        NK.saetTekst("rv-tekst", typeof t.tekst === "function" ? t.tekst() : t.tekst);
         NK.saetTekst("rv-tal", (trinNr + 1) + "/" + trin.length);
         NK.el("rv-forrige").style.display = trinNr === 0 ? "none" : "";
         NK.saetTekst("rv-naeste", trinNr === trin.length - 1 ? "Afslut" : "Næste →");

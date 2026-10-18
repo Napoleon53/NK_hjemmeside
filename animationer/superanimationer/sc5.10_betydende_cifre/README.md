@@ -1,4 +1,7 @@
-# sc5.10 Afrunding og opskrivning
+# sc5.10 Betydende cifre
+
+Hed "Afrunding og opskrivning" til 18. okt. 2026, hvor brugeren bad om navnet Betydende cifre, så det passer med
+Kemibogens afsnit 5.1 og modulplanen (titlen, overskriften, teoriboksen og menuknapperne er rettet).
 
 Superanimation om betydende cifre: hvor præcist et tal er kendt, hvordan det
 afrundes, og hvordan kommaet flyttes med tierpotenser og enheder. Åbn
