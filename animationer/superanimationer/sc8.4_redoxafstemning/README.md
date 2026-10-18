@@ -116,8 +116,9 @@ spørger om, og Tjek (eller Enter) tjekker det.
 1. **Oxidationstal.** Felter over de atomer, der skifter. O og H står med
    gråt. Rigtige felter låses grønne med det samme.
 2. **Hvad oxideres?** En klamme pr. par med knapperne oxidation og reduktion.
-   Begge par skal vælges. Derefter er parrene blå (oxidation) og orange
-   (reduktion) på arket og vægten.
+   Begge par skal vælges. Derefter er parrene orange (oxidation) og blå
+   (reduktion) på arket og vægten (byttet 18. okt. 2026, så farverne følger
+   Kemibogen).
 3. **Elektroner pr. atom.** Stigning og fald pr. atom, i et felt på hver
    klamme.
 4. **Koefficienter.** Felter i pladserne foran formlerne; eleven skriver også

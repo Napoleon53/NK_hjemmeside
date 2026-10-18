@@ -126,7 +126,8 @@ og trinlisten over den viser de færdige med ✓):
    klamme en pil, der vendes med et klik, med ↑ og ↓ på tastaturet eller
    med + og − i feltet, og feltet til tallet. Tallet er det samlede for
    atomerne på klammen (H₂O₂ ⟶ O₂: 2 · 1 = ↑2). Når den er rigtig, bliver
-   klammen blå (oxidation) eller orange (reduktion), og ordet står under.
+   klammen orange (oxidation) eller blå (reduktion), og ordet står under. Farverne er byttet 18. okt. 2026, så
+   de følger Kemibogen (Niels: "animationen skal have samme tema som bogen").
 6. **Gangetal** foran pilene. "= 10" ved siden af følger med, mens der
    skrives, og bliver grønt, når de to er lige store. Er de rigtige, flyver
    tallene op foran formlerne (gange tallet fra bid 4), og luppen viser

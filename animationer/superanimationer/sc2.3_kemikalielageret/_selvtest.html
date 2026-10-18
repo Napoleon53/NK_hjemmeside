@@ -136,7 +136,7 @@ function koerTest(W) {
         var sammeAtomer = at && Object.keys(forventet).every(function (e) { return at[e] === forventet[e]; }) &&
             Object.keys(at).length === Object.keys(forventet).length;
         var parentes = /\(/.test(s.formel) === !!((k.sammensat && s.p > 1) || (a.sammensat && s.n > 1));
-        var navnOk = s.navn === k.stamme + (k.variabel ? "(" + D.ROM[k.q] + ")" : "") + a.navn;
+        var navnOk = s.navn === k.stamme + (k.variabel || k.enkelt ? "(" + D.ROM[k.q] + ")" : "") + a.navn;
         paastand(s.formel + " " + s.navn + ": neutral, mindste forhold, atomer, parentes, navn",
             sum === 0 && NK.gcd(s.p, s.n) === 1 && sammeAtomer && parentes && navnOk,
             "ladning " + sum + ", forhold " + s.p + ":" + s.n);
@@ -161,7 +161,9 @@ function koerTest(W) {
     paastand("romertal i navnet på jern, kobber, bly, tin og kviksølv",
         D.ion("Fe3").navn === "jern(III)ion" && D.ion("Cu1").navn === "kobber(I)ion" && D.ion("Pb4").navn === "bly(IV)ion" &&
         D.ion("Sn2").navn === "tin(II)ion" && D.ion("Hg2").navn === "kviksølv(II)ion");
-    paastand("sølv og zink uden romertal", D.ion("Ag").navn === "sølvion" && D.ion("Zn").navn === "zinkion");
+    paastand("sølv og zink med romertal som i Kemibogen", D.ion("Ag").navn === "sølv(I)ion" && D.ion("Zn").navn === "zink(II)ion");
+    paastand("sølvion og zinkion godkendes også, uden bemærkning", T.ionNavn("sølvion", D.ion("Ag")).ok && T.ionNavn("zinkion", D.ion("Zn")).ok &&
+        !T.ionNavn("sølvion", D.ion("Ag")).note && !T.ionNavn("zink(II)ion", D.ion("Zn")).note);
     paastand("Sn og Pb står i hovedgruppe 4, men er markeret med flere ladninger",
         D.hovedgruppe("Sn") === 4 && D.hovedgruppe("Pb") === 4 && D.FLERE_LADNINGER.indexOf("Sn") >= 0 && D.FLERE_LADNINGER.indexOf("Pb") >= 0);
     paastand("overgangsmetallerne har intet hovedgruppenummer", D.hovedgruppe("Fe") === null && D.hovedgruppe("Zn") === null);
@@ -193,8 +195,10 @@ function koerTest(W) {
     paastand("Na1+ godkendes med en bemærkning om skrivemåden", noteNa.ok && /bare som \+/.test(noteNa.note));
     var fos = T.navn("calciumfosfid", D.stof("Ca3P2"));
     paastand("fosfid godkendes, men staves phosphid", fos.ok && /phosphid/.test(fos.note));
-    var soelv = T.navn("sølv(I)bromid", D.stof("AgBr"));
-    paastand("sølv(I)bromid godkendes med en bemærkning", soelv.ok && /kun én ion/.test(soelv.note));
+    var soelv = T.navn("sølv(I)bromid", D.stof("AgBr")), soelv2 = T.navn("sølvbromid", D.stof("AgBr"));
+    paastand("sølv(I)bromid og sølvbromid godkendes begge uden bemærkning", soelv.ok && !soelv.note && soelv2.ok && !soelv2.note);
+    var zink = T.navn("zinkoxid", D.stof("ZnO")), zink2 = T.navn("zink(II)oxid", D.stof("ZnO")), zink3 = T.navn("zink(I)oxid", D.stof("ZnO"));
+    paastand("zinkoxid og zink(II)oxid godkendes, zink(I)oxid ikke", zink.ok && zink2.ok && !zink3.ok);
 
     overskrift("5. De typiske fejl giver den rigtige besked");
     var alleBeskeder = [];

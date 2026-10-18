@@ -23,9 +23,10 @@
 
     var NK = window.NK;
 
-    var FARVE = { v: "#6cb6ff", h: "#f0a35e" };
-    var BRIK = { v: "rgba(61, 158, 224, 0.28)", h: "rgba(230, 137, 42, 0.26)" };
-    var KANT = { v: "rgba(108, 182, 255, 0.85)", h: "rgba(240, 163, 94, 0.85)" };
+    /* Venstre skål (oxidation) er orange og højre skål (reduktion) blå, som i Kemibogen (Niels 18. okt. 2026) */
+    var FARVE = { v: "#f0a35e", h: "#6cb6ff" };
+    var BRIK = { v: "rgba(230, 137, 42, 0.26)", h: "rgba(61, 158, 224, 0.28)" };
+    var KANT = { v: "rgba(240, 163, 94, 0.85)", h: "rgba(108, 182, 255, 0.85)" };
     var GUL = "#f2c53d";
 
     function Vaegt() {

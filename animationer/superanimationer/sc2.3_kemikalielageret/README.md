@@ -217,6 +217,13 @@ bagefter.
   C-niveau.
 * Kalium, natrium og de andre metaller i hovedgrupperne har kun den ladning,
   hovedgruppen giver. Sn og Pb er markeret som metaller med flere ladninger.
+* Sølv og zink danner kun én ion, men får romertal i navnet som i Kemibogen:
+  sølv(I)ion, zink(II)oxid. Navnene uden romertal (sølvion, zinkoxid) og med
+  ladningen som tal (sølv(1+)ion) godkendes også uden bemærkning (brugeren 18.
+  okt. 2026: begge former skal godtages, når eleven skriver navnet). Animationen
+  nævner hverken, at sølv og zink kun danner én ion, eller at formen uden
+  romertal godkendes (brugeren samme dag: den alternative stavemåde er "dog ikke
+  omtalt"), så eleven aldrig hører om en undtagelse fra reglen.
 
 ## Tilbuddet om præsentationen
 

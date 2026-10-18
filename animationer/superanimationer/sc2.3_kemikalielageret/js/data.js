@@ -67,8 +67,9 @@
        navn        negative ioner: navnet
        variabel    metallet kan have flere ladninger: romertal i navnet
        enkelt      metallet staar ikke i en hovedgruppe, men har kun én
-                   ladning (Ag, Zn): ingen romertal, men ladningen kan
-                   ikke aflaeses
+                   ladning (Ag, Zn): romertal i navnet som i Kemibogen
+                   (soelv(I)ion), men navnet uden romertal godkendes ogsaa
+                   (Niels 18. okt. 2026)
        sammensat   en sammensat ion: den skal man kende */
     var ROM = { 1: "I", 2: "II", 3: "III", 4: "IV" };
     D.ROM = ROM;
@@ -131,10 +132,11 @@
             i.gruppe = D.hovedgruppe(i.formel);
         }
         if (i.q > 0) {
-            i.saltdel = i.stamme + (i.variabel ? "(" + ROM[i.q] + ")" : "");
+            i.saltdel = i.stamme + (i.variabel || i.enkelt ? "(" + ROM[i.q] + ")" : "");
             i.navn = i.saltdel + "ion";
             i.navne = [i.navn];
-            if (i.variabel) i.navne.push(i.stamme + "(" + i.q + "+)ion");
+            if (i.variabel || i.enkelt) i.navne.push(i.stamme + "(" + i.q + "+)ion");
+            if (i.enkelt) i.navne.push(i.stamme + "ion");
         } else {
             i.saltdel = i.navn;
             i.navne = [i.navn];
@@ -222,9 +224,9 @@
         ["Sn2", "F", "navn", 1, "#f5f5f2", "pulver", "Fluoren i nogle tandpastaer.", 8],
         ["Hg2", "O", "navn", 1, "#c23a20", "pulver", "Priestley fik ilt ud af det i 1774.", 9],
         ["K", "MnO4", "navn", 2, "#5a2168", "krystal", "Violette krystaller. Bruges i fodbad mod svamp.", 1],
-        ["Na", "S2O3", "formel", 2, "#f4f4f0", "krystal", "Fjerner sølvbromid fra fotopapir, så billedet tåler lys.", 2],
+        ["Na", "S2O3", "formel", 2, "#f4f4f0", "krystal", "Fjerner sølv(I)bromid fra fotopapir, så billedet tåler lys.", 2],
         ["Na", "HCO3", "navn", 2, "#f7f7f4", "pulver", "Natron: hævemiddel i bagepulver.", 3],
-        ["K", "CrO4", "formel", 2, "#efcd1c", "krystal", "Den gule indikator, når chlorid titreres med sølvnitrat.", 4],
+        ["K", "CrO4", "formel", 2, "#efcd1c", "krystal", "Den gule indikator, når chlorid titreres med sølv(I)nitrat.", 4],
         ["Pb2", "NO3", "navn", 2, "#f4f4f1", "krystal", "Giver gult bundfald med kaliumiodid.", 5],
         ["K", "Cr2O7", "formel", 2, "#e2621e", "krystal", "Orange. Blev grøn i gamle alkoholtestere.", 6]
     ];
@@ -281,7 +283,8 @@
         st.formelTekst = NK.formel(st.formel);
         st.navn = k.saltdel + a.navn;
         st.navne = [st.navn];
-        if (k.variabel) st.navne.push(k.stamme + "(" + k.q + "+)" + a.navn);
+        if (k.variabel || k.enkelt) st.navne.push(k.stamme + "(" + k.q + "+)" + a.navn);
+        if (k.enkelt) st.navne.push(k.stamme + a.navn);
         st.fare = FARE[st.id] || null;
         return st;
     }
@@ -380,8 +383,7 @@
                     svar: "<b>" + i.tekst + "</b>. " + antalTekst(antalAnden, anden) + " giver " +
                         NK.fortegn(antalAnden * anden.q) + ". Så skal " +
                         (antalDenne === 1 ? i.formel : antalDenne + " " + i.formel) + " give " +
-                        NK.fortegn(-antalAnden * anden.q) + (antalDenne > 1 ? ", altså " + NK.fortegn(i.q) + " hver" : "") + "." +
-                        (i.enkelt ? " " + stort(i.grundnavn) + " danner kun denne ion." : "")
+                        NK.fortegn(-antalAnden * anden.q) + (antalDenne > 1 ? ", altså " + NK.fortegn(i.q) + " hver" : "") + "."
                 };
             }
             if (i.beregnes) {
@@ -424,8 +426,8 @@
             }
             if (i.enkelt) {
                 return {
-                    hint: stort(i.grundnavn) + " danner kun én ion, så ladningen skal ikke stå i navnet.",
-                    svar: "<b>" + i.navn + "</b>."
+                    hint: stort(i.grundnavn) + " står i en undergruppe. Ladningen skal stå i navnet med romertal i parentes.",
+                    svar: "<b>" + i.navn + "</b>. " + ROM[i.q] + " er ladningen " + NK.ladningstekst(i.q) + "."
                 };
             }
             return {

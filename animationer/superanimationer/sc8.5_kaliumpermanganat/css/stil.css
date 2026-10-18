@@ -837,8 +837,9 @@ kbd {
     --margen: 96px;
     --blaek: #1c3f94;
     --blyant: #6c717a;
-    --ox-f: #1d7fcf;
-    --red-f: #d2620c;
+    /* Oxidation orange og reduktion blå, som i Kemibogen (Niels 18. okt. 2026) */
+    --ox-f: #d2620c;
+    --red-f: #1d7fcf;
     --vist: #9c6207;
     --haand: "Segoe Print", "Bradley Hand", "Noteworthy", "Comic Sans MS", cursive;
     position: absolute;
@@ -1324,8 +1325,8 @@ kbd {
 }
 
 .fx-kort.hel { grid-column: 1 / -1; }
-.fx-kort.ox { border-left-color: var(--blaa); }
-.fx-kort.red { border-left-color: var(--orange); }
+.fx-kort.ox { border-left-color: var(--orange); }
+.fx-kort.red { border-left-color: var(--blaa); }
 
 .fx-hoved { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; }
 .fx-regel { margin: 0 0 10px !important; font-size: 1rem !important; line-height: 1.5; color: #c8ced6 !important; }

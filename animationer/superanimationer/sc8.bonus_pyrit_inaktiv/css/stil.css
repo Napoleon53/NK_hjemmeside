@@ -1030,8 +1030,9 @@ kbd {
     --margen: 96px;
     --blaek: #1c3f94;
     --blyant: #6c717a;
-    --ox-f: #1d7fcf;
-    --red-f: #d2620c;
+    /* Oxidation orange og reduktion blå, som i Kemibogen (Niels 18. okt. 2026) */
+    --ox-f: #d2620c;
+    --red-f: #1d7fcf;
     --vist: #9c6207;
     --haand: "Segoe Print", "Bradley Hand", "Noteworthy", "Comic Sans MS", cursive;
     position: absolute;

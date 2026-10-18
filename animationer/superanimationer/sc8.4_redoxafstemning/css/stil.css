@@ -329,10 +329,11 @@ body.med-vaegt .ab-spm { font-size: 1.08rem; }
    ladning og O under det, og tasterne
    --------------------------------------------------------------------- */
 :root {
-    --ox:        #6cb6ff;
-    --ox-bund:   rgba(61, 158, 224, 0.16);
-    --red:       #f0a35e;
-    --red-bund:  rgba(230, 137, 42, 0.16);
+    /* Oxidation orange og reduktion blå, som i Kemibogen (Niels 18. okt. 2026) */
+    --ox:        #f0a35e;
+    --ox-bund:   rgba(230, 137, 42, 0.16);
+    --red:       #6cb6ff;
+    --red-bund:  rgba(61, 158, 224, 0.16);
     --felt-kant: #7d8cc4;
     --felt-bund: #1d2132;
 }
@@ -491,8 +492,8 @@ body.med-vaegt .skema { font-size: clamp(1.6rem, 2.9vw, 2.3rem); }
 .klamme:empty { display: none; }
 .klamme.oppe { border-bottom: none; border-radius: 9px 9px 0 0; }
 .klamme.nede { border-top: none; border-radius: 0 0 9px 9px; }
-.klamme.r-ox { border-color: rgba(108, 182, 255, 0.75); }
-.klamme.r-red { border-color: rgba(240, 163, 94, 0.75); }
+.klamme.r-ox { border-color: rgba(240, 163, 94, 0.75); }
+.klamme.r-red { border-color: rgba(108, 182, 255, 0.75); }
 
 .kl-tekst {
     position: absolute;

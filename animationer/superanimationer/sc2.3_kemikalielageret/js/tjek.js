@@ -247,7 +247,7 @@
         }
 
         var stamme = rensNavn(ion.stamme);
-        if (s === rensNavn(ion.saltdel) || (ion.variabel && s.indexOf(stamme + "(") === 0 && !/ion$/.test(s))) {
+        if (s === rensNavn(ion.saltdel) || ((ion.variabel || ion.enkelt) && s.indexOf(stamme + "(") === 0 && !/ion$/.test(s))) {
             return { besked: "En positiv ion får endelsen -ion, når den står alene." };
         }
         if (ion.variabel) {
@@ -259,8 +259,9 @@
                 return { besked: "Tjek tallet i parentesen. Det er ionens ladning, skrevet med romertal." };
             }
         } else if (s.indexOf(stamme + "(") === 0) {
-            if (ion.enkelt && (s === stamme + "(" + D.ROM[ion.q].toLowerCase() + ")ion" || s === stamme + "(" + ion.q + "+)ion")) {
-                return { ok: true, note: "Rigtigt. " + stort(ion.grundnavn) + " danner kun én ion, så tallet kan udelades: " + ion.navn + "." };
+            if (ion.enkelt) {
+                if (/\(\+\d\)/.test(s)) return { besked: "Skriv ladningen som romertal, fx " + ion.navn + ", eller som " + ion.q + "+." };
+                return { besked: "Tjek tallet i parentesen. Det er ionens ladning, skrevet med romertal." };
             }
             return { besked: stort(ion.grundnavn) + " danner kun én ion, så der skal ikke tal i navnet." };
         }
@@ -381,12 +382,6 @@
         var k = st.katIon, a = st.anIon;
         var stamme = rensNavn(k.stamme), katDel = rensNavn(k.saltdel), anDel = rensNavn(a.navn);
 
-        if (k.enkelt) {
-            var med = [stamme + "(" + D.ROM[k.q].toLowerCase() + ")" + anDel, stamme + "(" + k.q + "+)" + anDel];
-            if (med.indexOf(s) >= 0) {
-                return { ok: true, note: "Rigtigt. " + stort(k.grundnavn) + " danner kun én ion, så tallet kan udelades: " + st.navn + "." };
-            }
-        }
         var hverdag = HVERDAG[st.formel] && HVERDAG[st.formel][s];
         if (hverdag) return { besked: hverdag + " Glasset skal have det kemiske navn." };
 
@@ -398,8 +393,8 @@
             /(mono|di|tri|tetra|penta)(oxid|sulfid|fluorid|chlorid|bromid|iodid|nitrid|phosphid|hydroxid|nitrat|sulfat|carbonat|phosphat)/.test(s)) {
             return { besked: "Ionforbindelser får ikke talord som di- og tri- i navnet. Antallet følger af ladningerne." };
         }
-        if (k.variabel) {
-            if (s === stamme + anDel) {
+        if (k.variabel || k.enkelt) {
+            if (k.variabel && s === stamme + anDel) {
                 return { besked: stort(k.grundnavn) + " kan danne ioner med forskellig ladning. Ladningen skal stå i navnet: " + k.stamme + "(?)" + a.navn + "." };
             }
             if (s.indexOf(stamme + "(") === 0) {
@@ -412,6 +407,7 @@
         } else if (s.indexOf(stamme + "(") === 0) {
             return { besked: stort(k.grundnavn) + " danner kun én ion, så der skal ikke tal i navnet." };
         }
+        if (k.enkelt && s.indexOf(katDel) !== 0 && s.indexOf(stamme) === 0) katDel = stamme;
         if (s.indexOf(katDel) === 0) {
             var rest = s.slice(katDel.length);
             var f = forveksling(a, rest);
