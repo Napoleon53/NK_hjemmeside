@@ -9,8 +9,10 @@ Adresse: `kemiformler.dk/animationer/Historie/velfaerd_fire_faser/`.
 `index.html#1` til `#4` går lige til en fase. `index.html#facit` viser hele det
 udfyldte skema og er til tavlen; det rører ikke elevens eget skema.
 
-**I menuen:** nej. Lavet 6. okt. 2026. Den næste ledige plads i undersamlingen
-2.3b Velfærdsstaten er nr. 4 (`data-emne` 2.3b.4).
+**I menuen:** nr. 5 i undersamlingen 2.3b Velfærdsstaten (`data-emne` 2.3b.5,
+knappen hedder Fire faser), sat ind 19. okt. 2026 efter brugerens besked, først som
+nr. 4. Samme dag kom Keynes og velfærdsstaten ind foran den som nr. 4 (brugerens ønske:
+"før velfærdsoversigten"). Beskrivelsen af 2.3b i `samling_alt_historie.html` nævner den.
 
 ## Bestillingen
 

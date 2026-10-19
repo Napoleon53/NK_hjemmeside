@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keynes og velfærdsstaten</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body data-del="0">
+
+<header class="top">
+    <h1><span class="ikon">kr.</span> Keynes og velfærdsstaten</h1>
+
+    <!-- De tre dele. Man kan altid springe til en del. -->
+    <nav class="dele" id="dele" aria-label="Animationens tre dele">
+        <button class="del" type="button" data-del="0"><span class="del-nr">1</span><span class="del-navn">Kredsløbet</span></button>
+        <button class="del" type="button" data-del="1"><span class="del-nr">2</span><span class="del-navn">Gas og brems</span></button>
+        <button class="del" type="button" data-del="2"><span class="del-nr">3</span><span class="del-navn">Danmark<span class="del-aar"> 1953-1974</span></span></button>
+    </nav>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Keynes' teori (K)">Keynes' teori</button>
+    <button class="ikonknap tekstknap" id="fagordknap" type="button" title="Fagord (T)">Fagord</button>
+</header>
+
+<main>
+    <section class="scene" id="scene">
+
+        <!-- Tekstkortet: al tekst står her, over tegningen. Pladserne er
+             sat af fra start, så intet flytter sig fra trin til trin. -->
+        <div class="tekstkort" id="tk">
+            <p class="tk-tekst" id="tk-tekst"></p>
+            <div class="tk-svar" id="tk-svar" role="group" aria-label="Svar"></div>
+            <div class="tk-bund">
+                <p class="tk-besked" id="tk-besked" aria-live="polite"></p>
+                <button class="knap tk-mere" id="tk-mere" type="button" hidden>Læs mere</button>
+                <button class="knap stor" id="tk-knap" type="button">Videre →</button>
+            </div>
+        </div>
+
+        <!-- Tegningen: kredsløbet (del 1) eller kurven (del 2 og 3) -->
+        <div class="flade" id="flade">
+            <svg class="tegning" id="tegning" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+
+            <!-- Skemaet til sidst i del 3 -->
+            <div class="skema" id="skema" hidden>
+                <table>
+                    <thead><tr><th>År</th><th>Keynes' regel</th><th>Det gjorde Danmark</th><th>Hvorfor</th></tr></thead>
+                    <tbody id="skema-krop"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- ================================================================= -->
+<!-- KEYNES' TEORI (åbnes med knappen eller K)                          -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Keynes' teori</h2>
+        <p>John Maynard Keynes (1883-1946) var en britisk økonom. Hans hovedværk udkom i 1936 under krisen i 1930'erne.</p>
+
+        <h3>Efterspørgslen</h3>
+        <p>Hvor meget der bliver købt, bestemmer, hvor meget der bliver produceret, og hvor mange der er i arbejde. Markedet retter ikke altid sig selv. I en krise holder alle igen på samme tid, og arbejdsløsheden bliver hængende.</p>
+
+        <h3>Staten skal gå imod konjunkturen</h3>
+        <p><b class="gas">Gas</b> i dårlige tider: flere offentlige udgifter eller lavere skat, også selv om staten må låne. Det hedder ekspansiv finanspolitik.</p>
+        <p><b class="brems">Brems</b> i gode tider: højere skat eller færre offentlige udgifter, så økonomien ikke bliver overophedet. Det hedder kontraktiv finanspolitik.</p>
+
+        <h3>Multiplikatoreffekten</h3>
+        <p>En krone fra staten bliver til løn, som bliver brugt igen. Derfor vokser aktiviteten mere end det beløb, staten brugte.</p>
+
+        <h3>Modsætningen: liberalismen</h3>
+        <p>De liberale mente, at markedet selv finder balancen, når lønninger og priser tilpasser sig. Staten skal holde sig uden for økonomien og ikke bruge flere penge, end den har.</p>
+
+        <h3>Keynes i Danmark</h3>
+        <p>Den svenske økonom Gunnar Myrdal byggede på Keynes og inspirerede de danske socialdemokrater. Staten skulle udjævne både op- og nedture i økonomien og forskellen mellem rig og fattig. Krag og Kampmann ville styre økonomien med finanspolitik.</p>
+
+        <div class="knapper"><button class="knap blaa" type="button" data-luk>Luk</button></div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- FAGORDENE (åbnes med knappen eller T)                              -->
+<!-- ================================================================= -->
+<div class="overlay" id="fagord">
+    <div class="overlay-boks">
+        <h2>Fagord</h2>
+        <dl class="ordliste">
+            <dt>Konjunktur</dt>
+            <dd>Økonomiens op- og nedture. Højkonjunktur: gode tider. Lavkonjunktur: dårlige tider.</dd>
+            <dt>Efterspørgsel</dt>
+            <dd>Hvor meget familier, virksomheder og staten vil købe.</dd>
+            <dt>Finanspolitik</dt>
+            <dd>Statens styring af økonomien gennem skatter og offentlige udgifter.</dd>
+            <dt>Multiplikator&shy;effekt</dt>
+            <dd>Statens penge bliver brugt flere gange og giver derfor mere aktivitet end beløbet selv.</dd>
+            <dt>Valuta</dt>
+            <dd>Udenlandske penge, som landet skal bruge for at købe varer i udlandet.</dd>
+            <dt>Betalingsbalance</dt>
+            <dd>Landets indtægter fra og udgifter til udlandet. Underskud: flere udgifter end indtægter.</dd>
+            <dt>Inflation</dt>
+            <dd>Priserne stiger, så pengene bliver mindre værd.</dd>
+            <dt>Indirekte skat</dt>
+            <dd>Skat på varer, fx omsen og momsen.</dd>
+            <dt>Skattetryk</dt>
+            <dd>Hvor stor en del af indtægterne der går til skat.</dd>
+            <dt>Liberalisme</dt>
+            <dd>Den enkelte har ansvaret for sig selv, og staten blander sig mindst muligt.</dd>
+        </dl>
+
+        <h3>Om tegningerne</h3>
+        <p>Kredsløbet og kurverne er forenklinger. Kurven i del 3 er en tegning af de gode og dårlige tider, ikke tal.</p>
+
+        <h3>Kilde</h3>
+        <p>Kapitel 8-alternativ, del 1 og 2. Skrevet efter Peter Schroeder: Det 20. århundredes Danmarkshistorie (2007), s. 109-129. Detaljerne om omsen, momsen og kildeskatten er fra lex.dk.</p>
+
+        <h3>Genveje</h3>
+        <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> svar &nbsp;·&nbsp; <kbd>Enter</kbd> knappen &nbsp;·&nbsp; <kbd>K</kbd> Keynes' teori &nbsp;·&nbsp; <kbd>T</kbd> fagord &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+
+        <div class="knapper"><button class="knap blaa" type="button" data-luk>Luk</button></div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- LÆS MERE i del 3 (js/forloeb.js)                                   -->
+<!-- ================================================================= -->
+<div class="overlay" id="notat">
+    <div class="overlay-boks">
+        <h2 id="notat-titel"></h2>
+        <div id="notat-tekst"></div>
+        <div class="knapper"><button class="knap blaa" type="button" data-luk>Luk</button></div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kredsloeb.js"></script>
+<script src="js/kurve.js"></script>
+<script src="js/forloeb.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

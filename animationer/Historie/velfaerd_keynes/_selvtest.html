@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: Keynes og velfærdsstaten</title>
+<style>
+    body { font-family: Consolas, monospace; background: #111; color: #ddd; margin: 12px; }
+    #ud { white-space: pre-wrap; font-size: 13px; }
+    iframe { border: 1px solid #444; display: block; margin-top: 10px; }
+</style>
+</head>
+<body>
+<!-- Udviklervaerktoej. Kraever en lokal server (iframen skal vaere same-origin).
+     Koerer hele forloebet igennem i fire stoerrelser og tjekker modellen,
+     teksterne, det rolige kort (intet flytter sig), at intet loeber over,
+     og at ingen laesbar tekst er under 12,4 px. Slutlinjen er ALT OK eller N FEJL. -->
+<pre id="ud">Kører …</pre>
+<script>
+(function () {
+    "use strict";
+
+    var ud = document.getElementById("ud");
+    var linjer = [];
+    var fejl = 0, ok = 0;
+
+    function log(s) { linjer.push(s); ud.textContent = linjer.join("\n"); }
+    function paastand(b, tekst) {
+        if (b) ok++;
+        else { fejl++; log("FEJL: " + tekst); }
+    }
+    function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+    var STR = [[883, 620], [1069, 620], [1280, 620], [1366, 768], [1600, 900]];
+
+    function lav(w, h, hash) {
+        return new Promise(function (r) {
+            var f = document.createElement("iframe");
+            f.width = w; f.height = h;
+            f.src = "index.html?t=" + Date.now() + (hash || "");
+            f.onload = function () { r(f); };
+            document.body.appendChild(f);
+        });
+    }
+
+    /* ----- Teksterne og modellen (uden for siden) --------------------- */
+    function tjekData(W) {
+        var D = W.NK.Data, M = W.NK.Model;
+        var tekster = [];
+        function saml(x) {
+            if (typeof x === "string") tekster.push(x);
+            else if (Array.isArray(x)) x.forEach(saml);
+            else if (x && typeof x === "object") for (var k in x) if (k !== "slags" && k !== "rigtig" && k !== "maerke" && k !== "placering") saml(x[k]);
+        }
+        saml(D.DEL1); saml(D.DEL2); saml(D.SITUATIONER); saml(D.SLUT); saml(D.KEYNES_SVAR);
+        tekster.forEach(function (t) {
+            var ren = t.replace(/<[^>]+>/g, "");
+            paastand(!/[–—]/.test(ren), "tankestreg i: " + ren);
+            paastand(!/^(Også|Nu|Her)\b/.test(ren), "indforstået begyndelse: " + ren);
+        });
+        log("Tekster tjekket: " + tekster.length);
+
+        var uden = M.temperaturer(null);
+        paastand(M.iBalance(uden) === 4, "uden staten skal 4 af 8 år være i balance, er " + M.iBalance(uden));
+        /* Keynes' regel: vaelg det, der bringer temperaturen naermest 0 */
+        var t = 0, valg = [];
+        D.DEL2.aar.forEach(function (a) {
+            var bedst = 0, bedstAfst = 99;
+            [1, 0, -1].forEach(function (v) { var n = Math.abs(t + a.drift + v); if (n < bedstAfst) { bedstAfst = n; bedst = v; } });
+            valg.push(bedst); t = t + a.drift + bedst;
+        });
+        paastand(M.iBalance(M.temperaturer(valg)) === 8, "Keynes' regel skal give 8 af 8 år i balance");
+        paastand(M.iBalance(M.temperaturer([0, 0, 0, 0, 0, 0, 0, 0])) === 4, "ingenting hele vejen = uden staten");
+
+        D.SITUATIONER.forEach(function (s, i) {
+            var ja = s.hvorfor.svar.filter(function (x) { return x.ja; });
+            paastand(ja.length === 1, s.aar + ": præcis ét rigtigt hvorfor-svar");
+            s.hvorfor.svar.forEach(function (x) { paastand(!!(x.ja || x.nej), s.aar + ": hvert svar har en begrundelse"); });
+            var muligheder = s.keynes.rigtig === "begge" ? ["gas", "brems", "begge"] : ["gas", "brems"];
+            muligheder.forEach(function (m) { if (m !== s.keynes.rigtig) paastand(!!s.keynes.nej[m], s.aar + ": forklaring til forkert Keynes-svar " + m); });
+            paastand(s.mere && s.mere.tekst.length >= 2, s.aar + ": Læs mere har tekst");
+        });
+        /* Det rigtige svar staar ikke altid paa samme plads */
+        var pladser = {};
+        D.SITUATIONER.forEach(function (s) { s.hvorfor.svar.forEach(function (x, i) { if (x.ja) pladser[i] = true; }); });
+        paastand(Object.keys(pladser).length >= 2, "det rigtige hvorfor-svar skifter plads");
+    }
+
+    /* ----- Maalinger i siden ----------------------------------------- */
+    function maal(W, navn, faste) {
+        var d = W.document;
+        var tk = d.getElementById("tk"), fl = d.getElementById("flade");
+        var r1 = tk.getBoundingClientRect(), r2 = fl.getBoundingClientRect();
+        var aftryk = [Math.round(r1.top), Math.round(r1.height), Math.round(r2.top), Math.round(r2.height), Math.round(d.getElementById("tk-svar").getBoundingClientRect().top), Math.round(d.getElementById("tk-knap").getBoundingClientRect().top)].join(",");
+        if (faste.aftryk === undefined) faste.aftryk = aftryk;
+        paastand(aftryk === faste.aftryk, navn + ": kortet og tegningen står stille (" + aftryk + " mod " + faste.aftryk + ")");
+
+        var tt = d.getElementById("tk-tekst");
+        paastand(tt.scrollHeight <= tt.clientHeight + 1, navn + ": teksten løber over (" + tt.scrollHeight + " > " + tt.clientHeight + "): " + tt.textContent);
+        var b = d.getElementById("tk-besked");
+        paastand(b.scrollHeight <= b.clientHeight + 1, navn + ": beskeden løber over: " + b.textContent);
+        var sv = d.querySelectorAll(".tk-sv, .tk-chip");
+        for (var i = 0; i < sv.length; i++) {
+            paastand(sv[i].scrollHeight <= sv[i].clientHeight + 1 && sv[i].scrollWidth <= sv[i].clientWidth + 1, navn + ": svaret løber over: " + sv[i].textContent);
+        }
+        var svBoks = d.getElementById("tk-svar");
+        paastand(svBoks.scrollWidth <= svBoks.clientWidth + 1, navn + ": svarrækken er for bred");
+        var top = d.querySelector(".top");
+        paastand(top.scrollWidth <= top.clientWidth + 1, navn + ": toplinjen er for bred");
+        var knap = d.getElementById("tk-knap");
+        paastand(knap.scrollWidth <= knap.clientWidth + 1, navn + ": knapteksten løber over: " + knap.textContent);
+        paastand(d.documentElement.scrollHeight <= W.innerHeight + 1, navn + ": siden skal ikke rulles");
+
+        /* Skriftstoerrelser: HTML og SVG */
+        var mindst = 99, hvor = "";
+        var alle = d.querySelectorAll(".top *, #tk *");
+        for (var j = 0; j < alle.length; j++) {
+            var e = alle[j];
+            if (!e.childNodes.length || !Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); })) continue;
+            var r = e.getBoundingClientRect();
+            if (r.width === 0 || W.getComputedStyle(e).visibility === "hidden") continue;
+            var fs = parseFloat(W.getComputedStyle(e).fontSize);
+            if (fs < mindst) { mindst = fs; hvor = e.className + " " + e.textContent.slice(0, 30); }
+        }
+        var svg = d.getElementById("tegning");
+        if (svg.style.display !== "none") {
+            var sr = svg.getBoundingClientRect();
+            var skala = Math.min(sr.width / 1000, sr.height / 400);
+            var txt = svg.querySelectorAll("text");
+            for (var k = 0; k < txt.length; k++) {
+                if (!txt[k].textContent.trim()) continue;
+                var cs = W.getComputedStyle(txt[k]);
+                if (cs.visibility === "hidden" || cs.display === "none") continue;
+                var str = parseFloat(cs.fontSize) * skala;
+                if (str < mindst) { mindst = str; hvor = "svg " + txt[k].textContent; }
+            }
+        }
+        paastand(mindst >= 12.4, navn + ": mindste skrift er " + mindst.toFixed(1) + " px (" + hvor + ")");
+        if (faste.mindst === undefined || mindst < faste.mindst) { faste.mindst = mindst; faste.hvor = hvor; }
+        return mindst;
+    }
+
+    function trin(W) { return W.NK.Forloeb.tilstand().trin; }
+    function synlig(W, sel) {
+        var e = W.document.querySelector(sel);
+        if (!e) return false;
+        var cs = W.getComputedStyle(e);
+        return cs.display !== "none" && cs.visibility !== "hidden" && parseFloat(cs.opacity) > 0.05;
+    }
+    function besked(W) { return W.document.getElementById("tk-besked"); }
+
+    /* ----- Hele forloebet i en stoerrelse ------------------------------ */
+    async function gennem(w, h) {
+        var f = await lav(w, h);
+        var W = f.contentWindow, d = W.document;
+        var F = W.NK.Forloeb, K = W.NK.Kredsloeb;
+        var faste = {}, navn = w + "x" + h;
+        var mindst = 99;
+        function m(t) { mindst = Math.min(mindst, maal(W, navn + " " + t, faste)); }
+        await vent(300);
+
+        /* ===== Del 1 ===== */
+        paastand(trin(W) === "start", navn + ": starter i del 1");
+        paastand(!synlig(W, "[data-hvad=sparegris]") && !synlig(W, "[data-hvad=staten]"), navn + ": sparegris og stat er skjult fra start");
+        paastand(d.getElementById("tk-svar").children.length === 0, navn + ": ingen svar fra start");
+        m("start");
+        K.vedKlik && d.querySelector("[data-hvad=fabrik]").dispatchEvent(new W.MouseEvent("click", { bubbles: true }));
+        paastand(besked(W).textContent.indexOf("Virksomhederne laver") === 0, navn + ": klik på fabrikken forklarer");
+
+        F.trykKnap(); m("gaet");
+        paastand(trin(W) === "gaet" && K.pauset(), navn + ": gættet står stille");
+        paastand(d.getElementById("tk-knap").classList.contains("skjult"), navn + ": ingen knap, før der er gættet");
+        F.klikSvar(1); m("spar");
+        paastand(trin(W) === "spar" && !K.pauset(), navn + ": efter gættet skal familierne klikkes");
+        d.querySelector("[data-hvad=familier]").dispatchEvent(new W.MouseEvent("click", { bubbles: true }));
+        paastand(trin(W) === "krise1", navn + ": klik på familierne sparer op");
+        K.spring(); m("krise1");
+        paastand(K.tal().sparet === 2 && K.tal().kroner === 10, navn + ": 2 kroner i sparegrisen");
+        F.trykKnap(); F.trykKnap(); K.spring(); m("krise3");
+        paastand(K.tal().kroner === 9 && K.tal().job === 7, navn + ": efter krisen 9 kroner og 7 i arbejde");
+        F.trykKnap(); m("cirkel");
+        paastand(besked(W).textContent.indexOf("anderledes") >= 0, navn + ": gæt 2 holdt ikke");
+        F.trykKnap(); m("hvem");
+        F.klikSvar(0);
+        paastand(besked(W).classList.contains("roed"), navn + ": familierne er forkert"); m("hvem forkert");
+        F.klikSvar(2);
+        paastand(besked(W).classList.contains("groen"), navn + ": staten er rigtigt"); m("hvem rigtig");
+        F.trykKnap(); m("stat");
+        paastand(!d.querySelector("[data-hvad=staten]").classList.contains("k-skjult"), navn + ": staten vises");
+        F.trykKnap(); K.spring();
+        paastand(K.tal().vej === 2 && K.tal().job === 9 && K.tal().kroner === 11, navn + ": staten betaler 2 vejarbejdere");
+        F.trykKnap(); K.spring(); m("gas2");
+        paastand(K.tal().kroner === 12 && K.tal().job === 10 && K.tal().sparet === 1, navn + ": alle i arbejde igen");
+        F.trykKnap(); m("multi");
+        for (var i = 0; i < 600; i++) K.opdater(1 / 30);
+        paastand(K.tal().brugt >= 4, navn + ": statens krone er brugt flere gange (" + K.tal().brugt + ")");
+        paastand(d.querySelector(".del[data-del='0']").classList.contains("faerdig"), navn + ": del 1 er markeret færdig");
+
+        /* ===== Del 2 ===== */
+        F.trykKnap(); m("del2 intro");
+        paastand(trin(W) === "intro" && W.NK.Kurve.slags() === "spil", navn + ": del 2 begynder");
+        paastand(d.querySelector(".kv-kasse").getAttribute("visibility") === "hidden", navn + ": statskassen er skjult i introen");
+        F.trykKnap();
+        var D2 = W.NK.Data.DEL2, M = W.NK.Model, t = 0;
+        for (var a = 0; a < 8; a++) {
+            m("år " + (a + 1));
+            paastand(d.querySelector(".kv-kasse").getAttribute("visibility") === "visible", navn + ": statskassen vises år " + (a + 1));
+            var bedst = 0, afst = 99;
+            [1, 0, -1].forEach(function (v) { var n = Math.abs(t + D2.aar[a].drift + v); if (n < afst) { afst = n; bedst = v; } });
+            t += D2.aar[a].drift + bedst;
+            F.klikSvar(bedst === 1 ? 0 : (bedst === 0 ? 1 : 2));
+            m("år " + (a + 1) + " valgt");
+            paastand(besked(W).classList.contains("groen"), navn + ": Keynes' regel holder år " + (a + 1) + " i balance");
+            F.trykKnap();
+        }
+        m("resultat");
+        paastand(d.getElementById("tk-tekst").textContent.indexOf("8 af 8") >= 0, navn + ": resultatet siger 8 af 8");
+        paastand(besked(W).textContent.indexOf("overskud") >= 0, navn + ": statskassen ender i overskud");
+        F.trykKnap(); m("svaert");
+        F.klikSvar(1); m("svaert svar");
+        paastand(besked(W).textContent.indexOf("Dit gæt holdt") >= 0, navn + ": at bremse er svaret");
+
+        /* ===== Del 3 ===== */
+        F.trykKnap();
+        var S = W.NK.Data.SITUATIONER;
+        for (var n = 0; n < S.length; n++) {
+            m(S[n].aar + " læs");
+            paastand(trin(W) === "laes", navn + ": " + S[n].aar + " begynder med teksten alene");
+            paastand(d.getElementById("tk-svar").children.length === 0, navn + ": " + S[n].aar + " ingen svar, før teksten er læst");
+            paastand(d.querySelectorAll(".kv-stempel").length === n, navn + ": " + S[n].aar + " regeringens valg er ikke røbet");
+            F.trykKnap(); m(S[n].aar + " keynes");
+            var knapper = d.querySelectorAll(".tk-sv");
+            paastand(knapper.length === (S[n].keynes.rigtig === "begge" ? 3 : 2), navn + ": " + S[n].aar + " antal Keynes-svar");
+            for (var k = 0; k < knapper.length; k++) {
+                if (knapper[k].classList.contains("rigtig")) break;
+                F.klikSvar(k);
+                m(S[n].aar + " keynes svar " + k);
+            }
+            paastand(besked(W).classList.contains("groen"), navn + ": " + S[n].aar + " Keynes-svaret er fundet");
+            F.trykKnap(); m(S[n].aar + " hvorfor");
+            paastand(d.querySelectorAll(".kv-stempel").length === n + 1, navn + ": " + S[n].aar + " regeringens stempel");
+            paastand(!d.getElementById("tk-mere").hidden, navn + ": " + S[n].aar + " Læs mere kan åbnes");
+            F.mere();
+            var boks = d.querySelector("#notat .overlay-boks");
+            paastand(d.getElementById("notat").classList.contains("vis"), navn + ": Læs mere åbner");
+            if (h >= 620) paastand(boks.scrollHeight <= boks.clientHeight + 1, navn + ": " + S[n].aar + " Læs mere kan læses uden at rulle");
+            d.querySelector("#notat [data-luk]").click();
+            var hv = d.querySelectorAll(".tk-sv");
+            for (var q = 0; q < hv.length; q++) {
+                if (besked(W).classList.contains("groen")) break;
+                F.klikSvar(q);
+                m(S[n].aar + " hvorfor svar " + q);
+            }
+            paastand(besked(W).classList.contains("groen"), navn + ": " + S[n].aar + " hvorfor-svaret er fundet");
+            F.trykKnap();
+        }
+        m("slut");
+        paastand(trin(W) === "slut", navn + ": skemaet til sidst");
+        paastand(d.querySelectorAll("#skema-krop tr").length === 4, navn + ": skemaet har fire rækker");
+        paastand(d.getElementById("tegning").style.display === "none", navn + ": tegningen er væk bag skemaet");
+        var sk = d.getElementById("skema");
+        paastand(sk.scrollHeight <= sk.clientHeight + 1, navn + ": skemaet kan ses uden at rulle");
+        paastand(d.querySelectorAll(".del.faerdig").length === 3, navn + ": alle tre dele er færdige");
+
+        /* Start forfra */
+        F.trykKnap();
+        paastand(trin(W) === "start" && K.tal().kroner === 12 && K.tal().job === 10, navn + ": Start forfra nulstiller");
+        paastand(d.querySelectorAll(".del.faerdig").length === 0, navn + ": Start forfra fjerner fluebenene");
+
+        log(navn + ": mindste skrift " + mindst.toFixed(1) + " px (" + faste.hvor + ")");
+        f.parentNode.removeChild(f);
+    }
+
+    /* ----- Direkte link og taster -------------------------------------- */
+    async function genveje() {
+        var f = await lav(1280, 620, "#3");
+        var W = f.contentWindow, d = W.document;
+        await vent(200);
+        paastand(W.NK.Forloeb.tilstand().del === 2 && W.NK.Forloeb.tilstand().trin === "laes", "#3 åbner del 3");
+        d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+        paastand(W.NK.Forloeb.tilstand().trin === "keynes", "Enter er knappen");
+        d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "2", bubbles: true }));
+        paastand(d.querySelector(".tk-sv.forkert, .tk-sv.rigtig") !== null, "tasten 2 svarer");
+        d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "k", bubbles: true }));
+        paastand(d.getElementById("teori").classList.contains("vis"), "K åbner Keynes' teori");
+        d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        paastand(!d.getElementById("teori").classList.contains("vis"), "Esc lukker");
+        d.querySelector(".del[data-del='1']").click();
+        paastand(W.NK.Forloeb.tilstand().del === 1 && W.NK.Forloeb.tilstand().trin === "intro", "knappen 2 i toplinjen åbner del 2");
+        d.querySelector(".del[data-del='0']").click();
+        paastand(W.NK.Forloeb.tilstand().trin === "start" && W.NK.Kredsloeb.tal().kroner === 12, "knappen 1 åbner del 1 forfra");
+        f.parentNode.removeChild(f);
+    }
+
+    async function koer() {
+        try {
+            var f = await lav(1280, 620);
+            tjekData(f.contentWindow);
+            f.parentNode.removeChild(f);
+            for (var i = 0; i < STR.length; i++) await gennem(STR[i][0], STR[i][1]);
+            await genveje();
+        } catch (e) {
+            fejl++;
+            log("UNDTAGELSE: " + (e && e.stack || e));
+        }
+        log("");
+        log(ok + " påstande holdt.");
+        log(fejl ? fejl + " FEJL" : "ALT OK");
+    }
+
+    koer();
+}());
+</script>
+</body>
+</html>
