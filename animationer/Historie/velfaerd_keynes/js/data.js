@@ -28,14 +28,17 @@
 
     /* ------------------------------------------------------------------
        DEL 1: PENGENES KREDSLOEB
-       Kronerne paa kredsloebet er efterspoergslen: hvor meget der bliver
-       koebt. Arbejderne viser, hvor mange der har arbejde.
+       Kronerne paa sporet er efterspoergslen: hvor meget der bliver
+       koebt. De staar stille og flytter sig kun, naar der sker noget.
+       Arbejderne viser, hvor mange der har arbejde.
        ------------------------------------------------------------------ */
     var DEL1 = {
         kroner: 12,
         arbejdere: 10,
 
-        start: "<b>Pengene går rundt.</b> Familierne køber varer hos virksomhederne. Virksomhederne betaler løn til familierne, som så kan købe igen.",
+        /* Foerste kort: indledningen og gaettet paa en gang (faerre klik,
+           brugerens oenske 19. okt. 2026) */
+        start: "<b>Pengene går rundt.</b> Familierne køber varer hos virksomhederne, og virksomhederne betaler løn til familierne. <b>Gæt:</b> Hvad sker der, hvis familierne bliver bange for fremtiden og sparer op i stedet for at købe?",
         startHint: "Klik på familierne, virksomhederne, arbejderne eller en krone for at se, hvad de er.",
 
         klik: {
@@ -44,24 +47,18 @@
             arbejdere: "Arbejderne er dem, virksomhederne betaler løn til. De grå er arbejdsløse.",
             sparegris: "Sparegrisen er familiernes opsparing. Penge i sparegrisen bliver ikke brugt.",
             staten: "Staten kan låne penge og bruge dem, selv om familierne holder igen.",
-            krone: "En krone er penge, der bliver brugt. Jo flere kroner der går rundt, jo mere bliver der købt."
+            krone: "En krone er penge, der bliver brugt. Jo flere kroner der er på sporet, jo mere bliver der købt."
         },
 
         gaet: {
-            tekst: "<b>Gæt først.</b> Familierne bliver bange for fremtiden og sparer op i stedet for at købe. Hvad sker der med virksomhederne?",
-            svar: ["De sælger mindre og fyrer folk.", "Der sker ingenting.", "De sælger mere."],
-            holder: 0,
-            gjort: "Klik på familierne for at spare op."
+            svar: ["Virksomhederne sælger mindre og fyrer folk.", "Der sker ingenting.", "Virksomhederne sælger mere."],
+            holder: 0
         },
 
-        /* Den onde cirkel: tre runder. kroner og job er tallene efter runden */
-        krise: [
-            { tekst: "<b>Runde 1.</b> Familierne lægger 2 kroner i sparegrisen. Der går færre penge til virksomhederne.", kroner: 10, job: 10, spar: 2 },
-            { tekst: "<b>Runde 2.</b> Virksomhederne sælger mindre. De fyrer 2 arbejdere.", kroner: 10, job: 8 },
-            { tekst: "<b>Runde 3.</b> De arbejdsløse får ingen løn og må købe mindre. Virksomhederne sælger endnu mindre og fyrer 1 arbejder mere.", kroner: 9, job: 7 }
-        ],
-
-        cirkel: "<b>En ond cirkel.</b> Mindre køb giver færre job, og færre job giver endnu mindre køb. Sådan gik det i krisen i 1930'erne.",
+        /* Den onde cirkel koerer af sig selv efter gaettet: 2 kroner i
+           sparegrisen, 2 fyret, 1 krone vaek og 1 fyret mere. Til sidst
+           er der 9 kroner og 7 i arbejde. */
+        krise: "<b>En ond cirkel.</b> Familierne sparer 2 kroner op, så virksomhederne sælger mindre og fyrer 2 arbejdere. De arbejdsløse får ingen løn og køber mindre, så virksomhederne fyrer 1 mere. Sådan gik det i krisen i 1930'erne.",
         holdt: "Dit gæt holdt ✓",
         holdtIkke: "Det gik anderledes, end du gættede ✓",
 
@@ -74,31 +71,28 @@
             ]
         },
 
-        stat: {
-            tekst: "<b>Staten giver gas.</b> Staten låner penge og bygger en ny vej. Klik på staten.",
-            skilt: "Klik for at bygge en vej"
-        },
-
-        /* Staten saetter gang i det igen */
-        gas: [
-            { tekst: "<b>Runde 1.</b> Staten betaler løn til 2 vejarbejdere. De var arbejdsløse, men har nu penge at købe for.", kroner: 11, job: 9 },
-            { tekst: "<b>Runde 2.</b> Familierne tør købe igen og tager 1 krone op af sparegrisen. Virksomhederne sælger mere og ansætter 1 arbejder igen.", kroner: 12, job: 10 }
-        ],
-
-        multiplikator: "<b>Følg statens krone med den gule ring.</b> Den bliver brugt igen og igen, først som løn og så til varer. Det hedder multiplikatoreffekten.",
-        keynes: "<b>Keynes:</b> Når familierne og virksomhederne holder igen, skal staten bruge flere penge.",
-        faerdig: "Del 1 er færdig ✓"
+        /* Staten giver gas, og det koerer af sig selv: 2 arbejdsloese faar
+           loen (12 kroner igen sammen med 1 fra sparegrisen, 10 i arbejde),
+           og statens roede krone koerer tre ture (brugt 4 gange). */
+        gas: "<b>Staten giver gas.</b> Staten låner penge, bygger en vej og betaler løn til 2 arbejdsløse. De køber varer, og alle kommer i arbejde igen. Følg statens røde krone: Den bliver brugt igen og igen. Det hedder multiplikatoreffekten.",
+        faerdig: "<b>Del 1 er færdig ✓</b> Den samme krone er brugt 4 gange. Statens penge giver mere arbejde, end beløbet selv kan betale.",
+        keynes: "<b>Keynes:</b> Når familierne og virksomhederne holder igen, skal staten bruge flere penge."
     };
 
     /* ------------------------------------------------------------------
        DEL 2: GAS OG BREMS
-       Oekonomiens temperatur er et trin fra -3 (meget kold) til 3 (meget
-       varm). Balance er -1 til 1. Hvert aar flytter oekonomien sig af sig
-       selv (drift), og elevens valg laegger 1 til (gas) eller traekker 1
-       fra (brems). Uden staten er driften alene.
+       Under kurverne ligger et tal for, hvor hurtigt oekonomien koerer,
+       fra -3 til 3. Hvert aar flytter det sig af sig selv (drift), og
+       elevens valg laegger 1 til (gas) eller traekker 1 fra (brems).
+       Grafen viser to ting, der traekker hver sin vej:
+           arbejdsloesheden = 1,8 - tallet   prisstigningerne = 1,2 + tallet
+       paa en skala fra 0 (lav) til 5 (hoej). Over 3 er for hoejt.
+       Uden staten er driften alene.
        ------------------------------------------------------------------ */
+    var GRAENSE = 3;
+
     var DEL2 = {
-        intro: "<b>Gode og dårlige tider.</b> Økonomien går op og ned af sig selv. Keynes mente, at staten skal udjævne op- og nedture: gas, når det er for koldt, og brems, når det er for varmt.",
+        intro: "<b>Gode og dårlige tider.</b> I dårlige tider stiger arbejdsløsheden. I gode tider stiger priserne. Keynes mente, at staten kan holde begge under grænsen: gas mod arbejdsløshed og brems mod prisstigninger.",
         vaerktoej: [
             { slags: "gas", tekst: "Gas", under: "lavere skat eller flere offentlige udgifter" },
             { slags: "brems", tekst: "Brems", under: "højere skat eller færre offentlige udgifter" }
@@ -118,11 +112,17 @@
             { drift: 0, nyt: "Ordrerne holder sig på det høje niveau." },
             { drift: -1, nyt: "Ordrerne begynder at falde igen." }
         ],
-        zone: {
-            balance: "<b>I balance ✓</b> Der er arbejde nok, og priserne er rolige.",
-            kold: "<b>For koldt.</b> Mange er arbejdsløse. Keynes' regel: gas, når det er for koldt.",
-            varm: "<b>For varmt.</b> Priserne stiger hurtigt. Keynes' regel: brems, når det er for varmt."
+        /* Hvad der skete i aaret. Ingen ros og ingen skaeld ud. */
+        ledighed: { op: "Arbejdsløsheden stiger", ned: "Arbejdsløsheden falder", ens: "Arbejdsløsheden er som før" },
+        priser: { op: "priserne stiger hurtigere", ned: "priserne stiger langsommere", ens: "priserne stiger som før" },
+        /* Hoejst en venlig bemaerkning i hele spillet: foerste gang en
+           linje kommer over graensen */
+        hov: {
+            ledighed: "Hov, arbejdsløsheden er over grænsen. Keynes ville nok have givet lidt mere gas.",
+            priser: "Hov, priserne stiger over grænsen. Keynes ville nok have bremset lidt før."
         },
+        som: "Du styrede, som Keynes ville ✓",
+        opskrift: "Keynes' opskrift: gas, når arbejdsløsheden stiger, og brems, når priserne stiger.",
         svaert: {
             tekst: "<b>Gæt.</b> Gas og brems er begge Keynes' redskaber. Hvad tror du, var sværest for politikerne?",
             svar: ["At give gas", "At bremse"],
@@ -132,7 +132,7 @@
         faerdig: "Del 2 er færdig ✓"
     };
 
-    /* Oekonomiens temperatur aar for aar. valg er en liste med virkningerne
+    /* Tallet for oekonomien aar for aar. valg er en liste med virkningerne
        (1, 0 eller -1). Uden staten er listen tom. */
     function temperaturer(valg) {
         var t = 0, ud = [0];
@@ -143,36 +143,40 @@
         return ud;
     }
 
-    function zone(t) {
-        if (t > 1) return "varm";
-        if (t < -1) return "kold";
-        return "balance";
-    }
+    /* De to linjer starter et stykke fra hinanden, saa de aldrig ligger
+       oven i hinanden (det gjorde de foerst, og saa forsvandt den blaa).
+       Graensen rammes stadig ved samme tal: under -1 og over 1. */
+    function ledighed(t) { return 1.8 - t; }
+    function priser(t) { return 1.2 + t; }
 
-    /* Antal aar (1-8) i balance */
-    function iBalance(liste) {
-        var n = 0;
-        for (var i = 1; i < liste.length; i++) if (zone(liste[i]) === "balance") n++;
-        return n;
+    /* Antal aar (1-8), hvor arbejdsloesheden og prisstigningerne er over graensen */
+    function overGraensen(liste) {
+        var l = 0, p = 0;
+        for (var i = 1; i < liste.length; i++) {
+            if (ledighed(liste[i]) > GRAENSE) l++;
+            if (priser(liste[i]) > GRAENSE) p++;
+        }
+        return { ledighed: l, priser: p };
     }
 
     /* ------------------------------------------------------------------
        DEL 3: DANMARK 1953-1974
        Fire nedslag. I hvert: laes situationen, svar paa hvad Keynes' regel
        siger, se hvad regeringen gjorde, og svar paa hvorfor.
+       fokus: de linjer, teksten handler om (faar en gul ring).
+       raekke: stemplets raekke oeverst i grafen (0 eller 1).
        ------------------------------------------------------------------ */
     var SITUATIONER = [
         {
             aar: 1953,
-            temp: -2,
-            maerke: "valuta mangler",
-            placering: { maerke: "under", dx: 82, dy: -44 },
+            fokus: ["ledighed"],
+            raekke: 0,
             tekst: "<b>1953.</b> Socialdemokratiet kommer i regering. Mange er arbejdsløse, og væksten er lav. Danmark mangler valuta: udenlandske penge til at købe varer i udlandet.",
             keynes: {
                 rigtig: "gas",
-                ja: "Rigtigt. Økonomien er for kold, så Keynes' regel siger gas.",
+                ja: "Rigtigt. Arbejdsløsheden er over grænsen, så Keynes' regel siger gas.",
                 nej: {
-                    brems: "Nej. Økonomien er for kold, og mange er arbejdsløse. Keynes' regel siger gas, når det er for koldt."
+                    brems: "Nej. Arbejdsløsheden er over grænsen. Keynes' regel siger gas, når mange er arbejdsløse."
                 }
             },
             regeringen: "Vækst først",
@@ -195,21 +199,20 @@
             }
         },
         {
-            aar: 1958,
-            temp: 0.5,
-            maerke: "",
-            placering: { maerke: "under", dx: -100, dy: -6 },
-            tekst: "<b>1958.</b> Opsvinget kommer udefra. Industrien eksporterer mere, især til Vesttyskland. Arbejdsløsheden falder, og der kommer flere skattekroner i statskassen.",
+            aar: 1960,
+            fokus: ["ledighed", "priser"],
+            raekke: 1,
+            tekst: "<b>1960.</b> Opsvinget er i fuld gang. Industrien eksporterer mere end landbruget, arbejdsløsheden falder hurtigt, og der kommer flere skattekroner i statskassen.",
             keynes: {
                 rigtig: "brems",
-                ja: "Rigtigt. Det er gode tider, så Keynes' regel siger brems.",
+                ja: "Rigtigt. Det er gode tider, og priserne begynder at stige. Keynes' regel siger brems.",
                 nej: {
-                    gas: "Nej. Det er gode tider, og arbejdsløsheden falder. Keynes' regel siger brems i gode tider, så økonomien ikke bliver for varm."
+                    gas: "Nej. Arbejdsløsheden er under grænsen og falder. Keynes' regel siger brems i gode tider, så priserne ikke stiger for hurtigt."
                 }
             },
             regeringen: "Byg velfærd",
             hvorfor: {
-                tekst: "<b>Regeringen brugte skattekronerne på velfærd:</b> folkepension til alle over 67 år, skoler, sygehuse, institutioner og veje. Hvorfor?",
+                tekst: "<b>Regeringen brugte skattekronerne på velfærd:</b> skoler, sygehuse, plejehjem, børneinstitutioner og veje. Hvorfor?",
                 svar: [
                     { tekst: "Keynes sagde, at staten skal bruge flest penge i gode tider.", nej: "Nej. Keynes sagde brems i gode tider." },
                     { tekst: "Velfærdsstaten var planlagt siden 1945, og nu var der råd.", ja: "Rigtigt. Prisen var, at der kom mangel på arbejdskraft, og at lønnen begyndte at stige." },
@@ -218,25 +221,24 @@
             },
             kort: "Velfærden var planlagt siden 1945",
             mere: {
-                titel: "1958: Byg velfærd",
+                titel: "1960: Byg velfærd",
                 tekst: [
                     "Socialdemokratiet havde haft velfærdsstaten på tegnebrættet siden programmet Fremtidens Danmark i 1945. Folkepensionen trådte i kraft i 1957. Den var en universel ydelse: Grundbeløbet gik til alle over 67 år, uanset hvor mange penge de havde.",
                     "Det offentlige byggede skoler, sygehuse, plejehjem og børneinstitutioner, og antallet af offentligt ansatte steg markant. Institutionerne gjorde det muligt for kvinderne at tage arbejde, for industrien manglede arbejdskraft.",
-                    "Der var bred politisk enighed om, at de gode tider skulle give bedre levevilkår for alle."
+                    "I 1960 eksporterede Danmark for første gang flere industrivarer end landbrugsvarer. Der var bred politisk enighed om, at de gode tider skulle give bedre levevilkår for alle."
                 ]
             }
         },
         {
             aar: 1962,
-            temp: 2.6,
-            maerke: "underskud",
-            placering: { maerke: "venstre", dx: -100, dy: -30 },
+            fokus: ["priser"],
+            raekke: 0,
             tekst: "<b>1962.</b> Der er arbejde til næsten alle. Lønnen stiger så hurtigt, at priserne følger med. Danskerne køber flere udenlandske varer, og der er underskud på betalingsbalancen.",
             keynes: {
                 rigtig: "brems",
-                ja: "Rigtigt. Økonomien er for varm, så Keynes' regel siger brems.",
+                ja: "Rigtigt. Prisstigningerne er over grænsen, så Keynes' regel siger brems.",
                 nej: {
-                    gas: "Nej. Økonomien er for varm, og priserne stiger. Keynes' regel siger brems, når det er for varmt."
+                    gas: "Nej. Priserne stiger over grænsen. Keynes' regel siger brems, når priserne stiger for hurtigt."
                 }
             },
             regeringen: "Brems med skat",
@@ -260,14 +262,13 @@
         },
         {
             aar: 1974,
-            temp: null,
-            maerke: "",
-            placering: { maerke: "under", dx: -122, dy: 0 },
+            fokus: ["ledighed", "priser"],
+            raekke: 0,
             stempel: "Velfærden voksede",
             tekst: "<b>1974.</b> Krisen er kommet. Oliepriserne er steget voldsomt, og mange virksomheder fyrer folk. Samtidig stiger priserne hurtigt.",
             keynes: {
                 rigtig: "begge",
-                ja: "Rigtigt. Reglen peger begge veje, og så kan den ikke bruges.",
+                ja: "Rigtigt. Begge er over grænsen, så reglen peger begge veje. Så kan den ikke bruges.",
                 nej: {
                     gas: "Nej. Gas giver flere job, men så stiger priserne endnu hurtigere.",
                     brems: "Nej. Brems dæmper priserne, men så stiger arbejdsløsheden endnu mere."
@@ -300,15 +301,14 @@
         { slags: "begge", tekst: "Begge dele på én gang", under: "gas og brems" }
     ];
 
-    /* Kurven i del 3 er en tegning af konjunkturerne, ikke tal. Den vises
-       til og med den situation, eleven er naaet til. */
-    var HISTORIE = [
-        [1950, -1], [1953, -2], [1956, -2], [1958, 0.5], [1960, 1.5],
-        [1962, 2.6], [1964, 1.4], [1966, 2], [1968, 1.5], [1970, 2],
-        [1973, 2.2]
-    ];
-    /* Fra 1973 deler kurven sig: priserne bliver varme, arbejdsloesheden kold */
-    var SPLIT = { fra: [1973, 2.2], priser: [1974, 2.8], job: [1974, -2.6] };
+    /* Kurverne i del 3 er en tegning, ikke tal. Skalaen er den samme som
+       i del 2: 0 er lav, 5 er hoej, og over 3 er for hoejt. Formen foelger
+       de store linjer: hoej arbejdsloeshed i 1950'erne, fuld beskaeftigelse
+       og stigende priser i 1960'erne og begge dele paa en gang fra 1974. */
+    var HISTORIE = {
+        ledighed: [[1950, 3.3], [1953, 3.7], [1956, 4.2], [1958, 3.7], [1960, 2.3], [1962, 1.2], [1965, 0.8], [1968, 1.6], [1970, 1.1], [1973, 0.9], [1974, 3.3], [1975, 4.4]],
+        priser: [[1950, 2.6], [1953, 1.0], [1956, 1.7], [1958, 0.8], [1960, 1.2], [1962, 3.4], [1964, 2.3], [1966, 3.1], [1968, 3.3], [1970, 3.0], [1972, 3.1], [1973, 3.7], [1974, 4.5], [1975, 4.0]]
+    };
 
     var SLUT = {
         tekst: "<b>Socialdemokratiet og Keynes.</b> Krag og Kampmann byggede på Keynes: Staten skulle udjævne op- og nedture. I praksis bremsede valutaen gassen i 1950'erne, og de gode tider blev brugt på velfærd.",
@@ -316,9 +316,13 @@
     };
 
     var TEKST = {
-        kurveNote: "Kurven er en tegning, ikke tal.",
+        kurveNote: "Kurverne er en tegning, ikke tal.",
+        ledighed: "Arbejdsløshed",
+        priser: "Prisstigninger",
         uden: "uden staten",
-        med: "med dig"
+        forHoejt: "for højt",
+        graense: "grænse",
+        lav: "lav"
     };
 
     NK.Data = {
@@ -326,17 +330,18 @@
         DELE: DELE,
         DEL1: DEL1,
         DEL2: DEL2,
+        GRAENSE: GRAENSE,
         SITUATIONER: SITUATIONER,
         KEYNES_SVAR: KEYNES_SVAR,
         HISTORIE: HISTORIE,
-        SPLIT: SPLIT,
         SLUT: SLUT,
         TEKST: TEKST
     };
 
     NK.Model = {
         temperaturer: temperaturer,
-        zone: zone,
-        iBalance: iBalance
+        ledighed: ledighed,
+        priser: priser,
+        overGraensen: overGraensen
     };
 }());

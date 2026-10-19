@@ -444,17 +444,35 @@ main { flex: 1; position: relative; min-height: 0; }
 .k-skilt rect { fill: var(--gul); }
 .k-skilt text { font-size: 16px; font-weight: 800; fill: #1b1b21; text-anchor: middle; }
 
-/* ----- Del 2 og 3: kurven ------------------------------------------- */
-.kv-varm { fill: rgba(224, 84, 70, 0.11); }
-.kv-balance { fill: rgba(63, 174, 114, 0.13); }
-.kv-kold { fill: rgba(61, 158, 224, 0.11); }
-.kv-akse { stroke: #5a5b6c; stroke-width: 2; }
+/* ----- Del 2 og 3: grafen ------------------------------------------- */
+/* To linjer paa samme skala: arbejdsloesheden (blaa) og prisstigningerne
+   (roed). Over den stiplede graense er for hoejt (roedt omraade). */
+.kv-for-hoejt { fill: rgba(224, 84, 70, 0.13); }
+.kv-under { fill: rgba(255, 255, 255, 0.025); }
+.kv-graense { stroke: var(--roed-lys); stroke-width: 2; stroke-dasharray: 9 7; opacity: 0.85; }
+.kv-akse { stroke: #6a6b7c; stroke-width: 2; }
+.kv-akse-pil { fill: none; stroke: #6a6b7c; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-.kv-zone { font-size: 19px; font-weight: 800; }
-.kv-zone.varm { fill: var(--roed-lys); }
-.kv-zone.balance { fill: var(--groen-lys); }
-.kv-zone.kold { fill: #8fc8f0; }
-.kv-zone-lille { font-size: 16px; fill: var(--tekst-svag); }
+.kv-y { font-size: 17px; font-weight: 600; fill: var(--tekst-svag); text-anchor: end; }
+.kv-y.for-hoejt { font-size: 18px; font-weight: 800; fill: var(--roed-lys); }
+.kv-y.graense { fill: var(--roed-lys); }
+
+.kv-navn { font-size: 17px; font-weight: 700; }
+.kv-navn.ledighed { fill: #9fd3f7; }
+.kv-navn.priser { fill: var(--roed-lys); }
+
+.kv-linje { fill: none; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+.kv-linje.ledighed { stroke: #7cc4f4; }
+.kv-linje.priser { stroke: var(--roed-lys); }
+
+.kv-uden { fill: none; stroke: #8a919c; stroke-width: 2.5; stroke-dasharray: 7 7; }
+.kv-uden.ledighed { stroke: rgba(124, 196, 244, 0.6); }
+.kv-uden.priser { stroke: rgba(240, 145, 138, 0.6); }
+
+.kv-prik { stroke: #15151c; stroke-width: 3; }
+.kv-prik.ledighed { fill: #7cc4f4; }
+.kv-prik.priser { fill: var(--roed-lys); }
+.kv-prik.over { stroke: #ffffff; stroke-width: 2.5; }
 
 .kv-aartekst { font-size: 16px; fill: var(--tekst-svag); text-anchor: middle; }
 .kv-aartekst.valgt { fill: #15151c; font-weight: 700; }
@@ -465,14 +483,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .kv-aarplade.ingen { fill: #9aa3ad; }
 .kv-aarplade.nu { fill: transparent; stroke: var(--gul); stroke-width: 2; }
 
-.kv-med { fill: none; stroke: #ffffff; stroke-width: 3.5; stroke-linejoin: round; }
-.kv-uden { fill: none; stroke: #8a919c; stroke-width: 2.5; stroke-dasharray: 7 7; }
-.kv-prik { stroke: #15151c; stroke-width: 3; }
-.kv-prik.balance { fill: var(--groen-lys); }
-.kv-prik.varm { fill: var(--roed-lys); }
-.kv-prik.kold { fill: #8fc8f0; }
-.kv-uprik { fill: #8a919c; }
-
 .kv-lille { font-size: 16px; fill: var(--tekst-svag); }
 .kv-lille.midt { text-anchor: middle; }
 
@@ -482,15 +492,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .kv-kasse-fyld.over { fill: var(--groen); }
 .kv-kasse-fyld.under { fill: var(--roed); }
 
-.kv-historie { fill: none; stroke: #ffffff; stroke-width: 3.5; stroke-linecap: round; }
-.kv-historie.varm { stroke: var(--roed-lys); }
-.kv-historie.kold { stroke: #8fc8f0; }
-.kv-split { font-size: 16px; font-weight: 700; text-anchor: end; }
-.kv-split.varm { fill: var(--roed-lys); }
-.kv-split.kold { fill: #8fc8f0; }
-.kv-maerke { font-size: 16px; font-style: italic; fill: var(--tekst-svag); text-anchor: middle; }
-.kv-maerke.nu { fill: var(--gul-lys); }
-.kv-maerke.venstre { text-anchor: end; }
+.kv-hjaelpelinje { stroke: var(--gul); stroke-width: 1.5; stroke-dasharray: 4 6; opacity: 0.7; }
 
 .kv-stempel rect { fill: #191a22; stroke: var(--gul); stroke-width: 2.5; }
 .kv-stempel text { font-size: 16px; font-weight: 800; fill: var(--gul); text-anchor: middle; }

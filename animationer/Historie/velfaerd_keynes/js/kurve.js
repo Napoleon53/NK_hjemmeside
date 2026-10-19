@@ -1,17 +1,19 @@
 /* =====================================================================
-   kurve.js - kurven i del 2 og del 3
+   kurve.js - grafen i del 2 og del 3
 
-   Begge dele tegner oekonomiens "temperatur" som en kurve gennem tre
-   baand: for varm (priserne stiger), balance og for kold (arbejdsloeshed).
+   Grafen viser to ting, der traekker hver sin vej: arbejdsloesheden
+   (blaa linje) og prisstigningerne (roed linje). Begge paa samme skala
+   fra lav (nederst) til hoej (oeverst). Over den stiplede graense er for
+   hoejt, og det omraade er farvet roedt.
 
-   Del 2 (spil): aar 1-8. Den hvide kurve er elevens, den stiplede er
-   oekonomien uden staten. Statskassen staar til hoejre.
+   Del 2 (spil): aar 1-8. Til sidst kommer de stiplede linjer uden staten.
+   Statskassen staar til hoejre.
 
-       NK.Kurve.spil({ med, uden, valg, vist, kasse, venter })
+       NK.Kurve.spil({ temps, uden, valg, vist, visUden, kasse, visKasse, naeste })
 
-   Del 3 (historie): 1950-1975. Kurven er en tegning af de gode og
-   daarlige tider. Den vises til og med den situation, eleven er ved, og
-   regeringens valg staar som et stempel ved punktet.
+   Del 3 (historie): 1950-1975. Kurverne er en tegning. De vises til og
+   med den situation, eleven er ved, og regeringens valg staar som et
+   stempel oeverst i grafen.
 
        NK.Kurve.historie({ nr, afsloeret, slut })
    ===================================================================== */
@@ -21,25 +23,36 @@
     var NK = window.NK;
     var D = NK.Data;
 
-    var TRIN = 52;
-    function y(t) { return 200 - t * TRIN; }
+    var BUND = 344, TRIN = 54, TOP = 40, AKSE = 354;
+    function y(niveau) { return BUND - NK.klamp(niveau, 0.15, 5.5) * TRIN; }
 
     var svg, lag = {};
     var slags = "";
 
-    /* ----- Faelles: baandene og ordene til venstre --------------------- */
-    function baand(x1) {
-        var g = NK.svg("g", { "class": "kv-baand" }, svg);
-        NK.svg("rect", { x: 170, y: 18, width: x1 - 170, height: y(1.5) - 18, "class": "kv-varm" }, g);
-        NK.svg("rect", { x: 170, y: y(1.5), width: x1 - 170, height: y(-1.5) - y(1.5), "class": "kv-balance" }, g);
-        NK.svg("rect", { x: 170, y: y(-1.5), width: x1 - 170, height: 378 - y(-1.5), "class": "kv-kold" }, g);
-        NK.svg("line", { x1: 170, y1: 378, x2: x1, y2: 378, "class": "kv-akse" }, g);
+    /* ----- Faelles: aksen, graensen og forklaringen ------------------- */
+    function akse(x1) {
+        var g = NK.svg("g", { "class": "kv-akser" }, svg);
+        NK.svg("rect", { x: 170, y: TOP, width: x1 - 170, height: y(D.GRAENSE) - TOP, "class": "kv-for-hoejt" }, g);
+        NK.svg("rect", { x: 170, y: y(D.GRAENSE), width: x1 - 170, height: AKSE - y(D.GRAENSE), "class": "kv-under" }, g);
+        NK.svg("line", { x1: 170, y1: y(D.GRAENSE), x2: x1, y2: y(D.GRAENSE), "class": "kv-graense" }, g);
+        NK.svg("line", { x1: 170, y1: AKSE, x2: x1, y2: AKSE, "class": "kv-akse" }, g);
+        NK.svg("line", { x1: 170, y1: AKSE, x2: 170, y2: TOP - 4, "class": "kv-akse" }, g);
+        NK.svg("path", { d: "M163," + (TOP + 4) + " L170," + (TOP - 8) + " L177," + (TOP + 4), "class": "kv-akse-pil" }, g);
 
-        NK.svg("text", { x: 16, y: 62, "class": "kv-zone varm" }, g, "For varm");
-        NK.svg("text", { x: 16, y: 86, "class": "kv-zone-lille" }, g, "priserne stiger");
-        NK.svg("text", { x: 16, y: 206, "class": "kv-zone balance" }, g, "Balance");
-        NK.svg("text", { x: 16, y: 322, "class": "kv-zone kold" }, g, "For kold");
-        NK.svg("text", { x: 16, y: 346, "class": "kv-zone-lille" }, g, "arbejdsløshed");
+        /* Ordene paa den lodrette akse */
+        NK.svg("text", { x: 158, y: y(4.4) + 6, "class": "kv-y for-hoejt" }, g, D.TEKST.forHoejt);
+        NK.svg("text", { x: 158, y: y(D.GRAENSE) + 6, "class": "kv-y graense" }, g, D.TEKST.graense);
+        NK.svg("text", { x: 158, y: y(0.4) + 6, "class": "kv-y" }, g, D.TEKST.lav);
+
+        /* Forklaringen paa linjerne, oeverst */
+        var lg = NK.svg("g", { "class": "kv-forklaring" }, svg);
+        NK.svg("line", { x1: 180, y1: 18, x2: 208, y2: 18, "class": "kv-linje ledighed" }, lg);
+        NK.svg("text", { x: 216, y: 24, "class": "kv-navn ledighed" }, lg, D.TEKST.ledighed);
+        NK.svg("line", { x1: 360, y1: 18, x2: 388, y2: 18, "class": "kv-linje priser" }, lg);
+        NK.svg("text", { x: 396, y: 24, "class": "kv-navn priser" }, lg, D.TEKST.priser);
+        lag.udenForklaring = NK.svg("g", { visibility: "hidden" }, lg);
+        NK.svg("line", { x1: 552, y1: 18, x2: 580, y2: 18, "class": "kv-uden" }, lag.udenForklaring);
+        NK.svg("text", { x: 588, y: 24, "class": "kv-lille" }, lag.udenForklaring, D.TEKST.uden);
     }
 
     function byg(beholder, s) {
@@ -50,6 +63,10 @@
         if (s === "spil") bygSpil(); else bygHistorie();
     }
 
+    function punkter(liste) {
+        return liste.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ");
+    }
+
     /* ================================================================
        DEL 2: SPILLET
        ================================================================ */
@@ -57,76 +74,71 @@
     function xAar(i) { return X0 + i * (X1 - X0) / 8; }
 
     function bygSpil() {
-        baand(885);
+        akse(885);
 
         /* Aarene paa aksen. Bag hvert aar en lille plade, der faar valgets farve */
         lag.aar = [];
         for (var i = 0; i <= 8; i++) {
             var g = NK.svg("g", { "class": "kv-aar" }, svg);
-            var plade = NK.svg("rect", { x: xAar(i) - 25, y: 380, width: 50, height: 20, rx: 5, "class": "kv-aarplade" }, g);
-            var t = NK.svg("text", { x: xAar(i), y: 396, "class": "kv-aartekst" }, g, i === 0 ? "Start" : "År " + i);
+            var plade = NK.svg("rect", { x: xAar(i) - 25, y: 360, width: 50, height: 21, rx: 5, "class": "kv-aarplade" }, g);
+            var t = NK.svg("text", { x: xAar(i), y: 376, "class": "kv-aartekst" }, g, i === 0 ? "Start" : "År " + i);
             lag.aar.push({ plade: plade, tekst: t });
         }
 
-        /* Forklaringen paa de to kurver, oeverst til hoejre */
-        var lg = NK.svg("g", { "class": "kv-forklaring" }, svg);
-        NK.svg("line", { x1: 560, y1: 30, x2: 590, y2: 30, "class": "kv-med" }, lg);
-        NK.svg("text", { x: 598, y: 36, "class": "kv-lille" }, lg, D.TEKST.med);
-        NK.svg("line", { x1: 690, y1: 30, x2: 720, y2: 30, "class": "kv-uden" }, lg);
-        NK.svg("text", { x: 728, y: 36, "class": "kv-lille" }, lg, D.TEKST.uden);
-        lag.forklaring = lg;
-
-        lag.uden = NK.svg("polyline", { "class": "kv-uden", points: "" }, svg);
-        lag.udenPrikker = NK.svg("g", null, svg);
-        lag.med = NK.svg("polyline", { "class": "kv-med", points: "" }, svg);
+        lag.udenL = NK.svg("polyline", { "class": "kv-uden ledighed", points: "" }, svg);
+        lag.udenP = NK.svg("polyline", { "class": "kv-uden priser", points: "" }, svg);
+        lag.medL = NK.svg("polyline", { "class": "kv-linje ledighed", points: "" }, svg);
+        lag.medP = NK.svg("polyline", { "class": "kv-linje priser", points: "" }, svg);
         lag.prikker = NK.svg("g", null, svg);
-        lag.ring = NK.svg("circle", { r: 17, "class": "kv-ring", visibility: "hidden" }, svg);
 
         /* Statskassen: en lodret soejle. Overskud op, underskud ned. */
         var k = NK.svg("g", { "class": "kv-kasse" }, svg);
-        NK.svg("text", { x: 942, y: 30, "class": "kv-kasse-navn" }, k, "Statskassen");
-        NK.svg("text", { x: 942, y: 56, "class": "kv-lille midt" }, k, "overskud");
-        NK.svg("rect", { x: 928, y: 64, width: 28, height: 272, rx: 6, "class": "kv-kasse-spor" }, k);
-        NK.svg("line", { x1: 922, y1: 200, x2: 962, y2: 200, "class": "kv-kasse-nul" }, k);
-        lag.kasseFyld = NK.svg("rect", { x: 931, y: 200, width: 22, height: 0, rx: 3 }, k);
-        NK.svg("text", { x: 942, y: 360, "class": "kv-lille midt" }, k, "underskud");
+        NK.svg("text", { x: 945, y: 34, "class": "kv-kasse-navn" }, k, "Statskassen");
+        NK.svg("text", { x: 945, y: 62, "class": "kv-lille midt" }, k, "overskud");
+        NK.svg("rect", { x: 931, y: 70, width: 28, height: 262, rx: 6, "class": "kv-kasse-spor" }, k);
+        NK.svg("line", { x1: 925, y1: 201, x2: 965, y2: 201, "class": "kv-kasse-nul" }, k);
+        lag.kasseFyld = NK.svg("rect", { x: 934, y: 201, width: 22, height: 0, rx: 3 }, k);
+        NK.svg("text", { x: 945, y: 354, "class": "kv-lille midt" }, k, "underskud");
         lag.kasse = k;
     }
 
-    /* med og uden er lister med temperaturer fra start (indeks 0) og
-       frem. vist er det sidste aar, der er tegnet. valg[i] er valget i
-       aar i+1 ("gas", "ingen" eller "brems"). kasse er statskassen (gas
-       -1, brems +1). venter: punktet for vist har en gul ring. */
     function spil(o) {
-        var med = o.med, uden = o.uden, vist = o.vist;
-        var pm = [], pu = [];
-        lag.prikker.innerHTML = "";
-        lag.udenPrikker.innerHTML = "";
+        var M = NK.Model;
+        var vist = o.vist;
+        var pl = [], pp = [], ul = [], up = [];
         for (var i = 0; i <= vist; i++) {
-            pm.push(xAar(i) + "," + y(med[i]));
-            if (i > 0 && o.udenVist >= i) pu.push(xAar(i) + "," + y(uden[i]));
+            pl.push([xAar(i), y(M.ledighed(o.temps[i]))]);
+            pp.push([xAar(i), y(M.priser(o.temps[i]))]);
         }
-        if (pu.length) pu.unshift(xAar(0) + "," + y(uden[0]));
-        lag.med.setAttribute("points", pm.join(" "));
-        lag.uden.setAttribute("points", pu.join(" "));
-        for (var j = 0; j <= vist; j++) {
-            NK.svg("circle", { cx: xAar(j), cy: y(med[j]), r: j === vist ? 10 : 7, "class": "kv-prik " + NK.Model.zone(med[j]) + (j === vist ? " nu" : "") }, lag.prikker);
-            if (j > 0 && o.udenVist >= j) NK.svg("circle", { cx: xAar(j), cy: y(uden[j]), r: 4.5, "class": "kv-uprik" }, lag.udenPrikker);
+        if (o.visUden) {
+            for (var j = 0; j <= 8; j++) {
+                ul.push([xAar(j), y(M.ledighed(o.uden[j]))]);
+                up.push([xAar(j), y(M.priser(o.uden[j]))]);
+            }
         }
-        lag.ring.setAttribute("cx", xAar(vist));
-        lag.ring.setAttribute("cy", y(med[vist]));
-        lag.ring.setAttribute("visibility", o.venter ? "visible" : "hidden");
+        lag.medL.setAttribute("points", punkter(pl));
+        lag.medP.setAttribute("points", punkter(pp));
+        lag.udenL.setAttribute("points", punkter(ul));
+        lag.udenP.setAttribute("points", punkter(up));
+        lag.udenForklaring.setAttribute("visibility", o.visUden ? "visible" : "hidden");
 
-        lag.aar.forEach(function (a, n) {
-            var v = n > 0 ? o.valg[n - 1] : null;
-            a.plade.setAttribute("class", "kv-aarplade" + (v ? " " + v : "") + (n === vist && o.venter ? " nu" : ""));
-            a.tekst.setAttribute("class", "kv-aartekst" + (v ? " valgt" : "") + (n === vist && o.venter ? " nu" : ""));
+        lag.prikker.innerHTML = "";
+        for (var n = 0; n <= vist; n++) {
+            var l = M.ledighed(o.temps[n]), p = M.priser(o.temps[n]);
+            NK.svg("circle", { cx: xAar(n), cy: y(l), r: n === vist ? 8 : 6, "class": "kv-prik ledighed" + (l > D.GRAENSE ? " over" : "") }, lag.prikker);
+            NK.svg("circle", { cx: xAar(n), cy: y(p), r: n === vist ? 8 : 6, "class": "kv-prik priser" + (p > D.GRAENSE ? " over" : "") }, lag.prikker);
+        }
+
+        lag.aar.forEach(function (a, k) {
+            var v = k > 0 ? o.valg[k - 1] : null;
+            var naeste = o.naeste === k;
+            a.plade.setAttribute("class", "kv-aarplade" + (v ? " " + v : "") + (naeste ? " nu" : ""));
+            a.tekst.setAttribute("class", "kv-aartekst" + (v ? " valgt" : "") + (naeste ? " nu" : ""));
         });
 
-        lag.forklaring.setAttribute("visibility", o.udenVist > 0 ? "visible" : "hidden");
         lag.kasse.setAttribute("visibility", o.visKasse ? "visible" : "hidden");
-        var v2 = NK.klamp(o.kasse, -4, 4) * 33;
-        lag.kasseFyld.setAttribute("y", v2 >= 0 ? 200 - v2 : 200);
+        var v2 = NK.klamp(o.kasse, -4, 4) * 32;
+        lag.kasseFyld.setAttribute("y", v2 >= 0 ? 201 - v2 : 201);
         lag.kasseFyld.setAttribute("height", Math.abs(v2));
         lag.kasseFyld.setAttribute("class", "kv-kasse-fyld " + (o.kasse >= 0 ? "over" : "under"));
     }
@@ -138,25 +150,22 @@
     function xHist(aar) { return H0 + (aar - 1950) * (H1 - H0) / 25; }
 
     function bygHistorie() {
-        baand(905);
+        akse(905);
         for (var a = 1950; a <= 1975; a += 5) {
-            NK.svg("line", { x1: xHist(a), y1: 374, x2: xHist(a), y2: 382, "class": "kv-akse" }, svg);
-            NK.svg("text", { x: xHist(a), y: 397, "class": "kv-aartekst" }, svg, String(a));
+            NK.svg("line", { x1: xHist(a), y1: AKSE, x2: xHist(a), y2: AKSE + 7, "class": "kv-akse" }, svg);
+            NK.svg("text", { x: xHist(a), y: 377, "class": "kv-aartekst" }, svg, String(a));
         }
-        NK.svg("text", { x: H0 + 6, y: 370, "class": "kv-lille" }, svg, D.TEKST.kurveNote);
+        NK.svg("text", { x: H0 + 6, y: AKSE - 10, "class": "kv-lille" }, svg, D.TEKST.kurveNote);
 
-        lag.sti = NK.svg("path", { "class": "kv-historie", d: "" }, svg);
-        lag.priser = NK.svg("path", { "class": "kv-historie varm", d: "" }, svg);
-        lag.job = NK.svg("path", { "class": "kv-historie kold", d: "" }, svg);
-        lag.splitTekst = NK.svg("g", { visibility: "hidden" }, svg);
-        NK.svg("text", { x: H1 - 52, y: y(D.SPLIT.priser[1]) - 2, "class": "kv-split varm" }, lag.splitTekst, "priserne stiger");
-        NK.svg("text", { x: H1 - 52, y: y(D.SPLIT.job[1]) + 6, "class": "kv-split kold" }, lag.splitTekst, "arbejdsløsheden stiger");
+        lag.hjaelpelinje = NK.svg("line", { "class": "kv-hjaelpelinje", visibility: "hidden" }, svg);
+        lag.ledighed = NK.svg("path", { "class": "kv-linje ledighed", d: "" }, svg);
+        lag.priser = NK.svg("path", { "class": "kv-linje priser", d: "" }, svg);
         lag.punkter = NK.svg("g", null, svg);
         lag.stempler = NK.svg("g", null, svg);
     }
 
-    /* En blød kurve gennem punkterne (Catmull-Rom som Bezier) */
-    function blød(p) {
+    /* En bloed kurve gennem punkterne (Catmull-Rom som Bezier) */
+    function bloed(p) {
         if (p.length < 2) return "";
         var d = "M" + p[0][0].toFixed(1) + "," + p[0][1].toFixed(1);
         for (var i = 0; i < p.length - 1; i++) {
@@ -168,63 +177,69 @@
         return d;
     }
 
-    /* Kurven til og med et aar. Mellem to punkter regnes der lige ud. */
-    function stiTil(aar) {
+    /* Vaerdien i et aar (lige linje mellem to punkter) */
+    function vaerdi(serie, aar) {
+        for (var i = 0; i < serie.length - 1; i++) {
+            var a = serie[i], b = serie[i + 1];
+            if (aar >= a[0] && aar <= b[0]) return a[1] + (b[1] - a[1]) * (aar - a[0]) / (b[0] - a[0]);
+        }
+        return serie[serie.length - 1][1];
+    }
+
+    function stiTil(serie, aar) {
         var p = [];
-        var H = D.HISTORIE;
-        for (var i = 0; i < H.length; i++) {
-            if (H[i][0] <= aar) p.push([xHist(H[i][0]), y(H[i][1])]);
+        for (var i = 0; i < serie.length; i++) {
+            if (serie[i][0] <= aar) p.push([xHist(serie[i][0]), y(serie[i][1])]);
             else {
-                var a = H[i - 1], b = H[i], f = (aar - a[0]) / (b[0] - a[0]);
-                if (f > 0) p.push([xHist(aar), y(a[1] + (b[1] - a[1]) * f)]);
+                if (aar > serie[i - 1][0]) p.push([xHist(aar), y(vaerdi(serie, aar))]);
                 break;
             }
         }
         return p;
     }
 
-    function stempel(x, yy, tekst, aktiv) {
-        var g = NK.svg("g", { "class": "kv-stempel" + (aktiv ? " ny" : "") }, lag.stempler);
+    var RAEKKE_Y = [58, 94];
+
+    function stempel(x, yy, tekst, ny) {
+        var g = NK.svg("g", { "class": "kv-stempel" + (ny ? " ny" : "") }, lag.stempler);
         var b = tekst.length * 9.6 + 22;
-        var cx = NK.klamp(x, 170 + b / 2, 905 - b / 2);
-        NK.svg("rect", { x: cx - b / 2, y: yy - 15, width: b, height: 28, rx: 4 }, g);
-        NK.svg("text", { x: cx, y: yy + 5 }, g, tekst);
-        g.setAttribute("transform", "rotate(-2 " + cx + " " + yy + ")");
+        var cx = NK.klamp(x, 172 + b / 2, 903 - b / 2);
+        NK.svg("rect", { x: cx - b / 2, y: yy - 14, width: b, height: 28, rx: 4 }, g);
+        NK.svg("text", { x: cx, y: yy + 6 }, g, tekst);
+        g.setAttribute("transform", "rotate(-1.5 " + cx + " " + yy + ")");
     }
 
     /* nr: den situation, eleven er ved (0-3). afsloeret: hvor mange
        situationer der har faaet regeringens stempel. slut: hele kurven. */
     function historie(o) {
-        var S = D.SITUATIONER;
+        var S = D.SITUATIONER, H = D.HISTORIE;
         var nr = o.slut ? S.length - 1 : o.nr;
-        var aar = S[nr].aar;
-        var split = aar >= 1974;
-        lag.sti.setAttribute("d", blød(stiTil(split ? D.SPLIT.fra[0] : aar)));
+        var til = o.slut ? 1975 : S[nr].aar;
+        lag.ledighed.setAttribute("d", bloed(stiTil(H.ledighed, til)));
+        lag.priser.setAttribute("d", bloed(stiTil(H.priser, til)));
 
-        var f = D.SPLIT.fra, pr = D.SPLIT.priser, jb = D.SPLIT.job;
-        lag.priser.setAttribute("d", split ? "M" + xHist(f[0]) + "," + y(f[1]) + " L" + xHist(pr[0]) + "," + y(pr[1]) + " L" + xHist(1975) + "," + y(pr[1] + 0.1) : "");
-        lag.job.setAttribute("d", split ? "M" + xHist(f[0]) + "," + y(f[1]) + " L" + xHist(jb[0]) + "," + y(jb[1]) + " L" + xHist(1975) + "," + y(jb[1] - 0.15) : "");
-        lag.splitTekst.setAttribute("visibility", split ? "visible" : "hidden");
+        /* En stiplet lodret linje fra aaret op til regeringens stempel */
+        var hj = lag.hjaelpelinje;
+        if (o.slut) hj.setAttribute("visibility", "hidden");
+        else {
+            var xx = xHist(S[nr].aar);
+            hj.setAttribute("x1", xx); hj.setAttribute("x2", xx);
+            hj.setAttribute("y1", AKSE); hj.setAttribute("y2", RAEKKE_Y[S[nr].raekke] + 16);
+            hj.setAttribute("visibility", nr < o.afsloeret ? "visible" : "hidden");
+        }
 
         lag.punkter.innerHTML = "";
         lag.stempler.innerHTML = "";
         for (var i = 0; i <= nr; i++) {
             var s = S[i];
             var nu = !o.slut && i === nr;
-            var punkter = s.temp === null ? [pr[1], jb[1]] : [s.temp];
-            punkter.forEach(function (t) {
-                NK.svg("circle", { cx: xHist(s.aar), cy: y(t), r: nu ? 10 : 8, "class": "kv-prik " + NK.Model.zone(t) + (nu ? " nu" : "") }, lag.punkter);
-                if (nu) NK.svg("circle", { cx: xHist(s.aar), cy: y(t), r: 17, "class": "kv-ring" }, lag.punkter);
+            ["ledighed", "priser"].forEach(function (navn) {
+                var v = vaerdi(H[navn], s.aar);
+                var fokus = nu && s.fokus.indexOf(navn) >= 0;
+                NK.svg("circle", { cx: xHist(s.aar), cy: y(v), r: nu ? 8 : 6, "class": "kv-prik " + navn + (v > D.GRAENSE ? " over" : "") }, lag.punkter);
+                if (fokus) NK.svg("circle", { cx: xHist(s.aar), cy: y(v), r: 16, "class": "kv-ring" }, lag.punkter);
             });
-            /* Maerket staar under eller til venstre for punktet, saa kurven ikke krydser det */
-            if (s.maerke) {
-                var venstre = s.placering.maerke === "venstre";
-                NK.svg("text", { x: xHist(s.aar) + (venstre ? -18 : 0), y: y(s.temp) + (venstre ? 6 : 32), "class": "kv-maerke" + (venstre ? " venstre" : "") + (nu ? " nu" : "") }, lag.punkter, s.maerke);
-            }
-            if (i < o.afsloeret) {
-                var yy = (s.temp === null ? 0 : y(s.temp)) + s.placering.dy;
-                stempel(xHist(s.aar) + s.placering.dx, s.temp === null ? y(0) : yy, s.stempel || s.regeringen, i === o.afsloeret - 1 && !o.slut);
-            }
+            if (i < o.afsloeret) stempel(xHist(s.aar), RAEKKE_Y[s.raekke], s.stempel || s.regeringen, i === o.afsloeret - 1 && !o.slut);
         }
     }
 
@@ -235,6 +250,7 @@
         slags: function () { return slags; },
         y: y,
         xAar: xAar,
-        xHist: xHist
+        xHist: xHist,
+        vaerdi: vaerdi
     };
 }());

@@ -2,19 +2,24 @@
    kredsloeb.js - del 1: pengenes kredsloeb
 
    Tegningen er et spor (en ellipse) mellem familierne til venstre og
-   virksomhederne til hoejre. Kronerne koerer med uret: over toppen er
-   de koeb af varer, under bunden er de loen. Antallet af kroner paa
-   sporet er efterspoergslen. Inde i sporet staar de ti arbejdere, og
-   over dem staten, som foerst vises, naar eleven kommer til den.
+   virksomhederne til hoejre. Over toppen er kronerne koeb af varer,
+   under bunden er de loen. Antallet af kroner paa sporet er
+   efterspoergslen. Inde i sporet staar de ti arbejdere, og over dem
+   staten, som foerst vises, naar eleven kommer til den.
 
-   NK.Kredsloeb.byg(svg)       tegner det hele og starter bevaegelsen
+   Kronerne STAAR STILLE paa hver sin plads. De flytter sig kun, naar der
+   sker noget: en krone ryger i sparegrisen, staten betaler loen, eller
+   eleven klikker statens krone videre (brugerens oenske 19. okt. 2026:
+   de roterende penge gjorde det svaert at koncentrere sig).
+
+   NK.Kredsloeb.byg(svg)       tegner det hele
    NK.Kredsloeb.nulstil()      12 kroner, 10 i arbejde, intet skjult vist
    NK.Kredsloeb.pause(b)       intet bevaeger sig, mens eleven svarer
    NK.Kredsloeb.opdater(dt)    et skridt frem (kaldes af requestAnimationFrame
                                og af selvtesten)
    NK.Kredsloeb.spring()       alle kroner paa vej et sted hen er fremme
    sparOp(n), fjern(n), fyr(n), statGas(n), fraSparegris(n), ansaet(n)
-   vis(hvad, b), skilt(hvor), ring(hvor), foelg(b), tal()
+   vis(hvad, b), skilt(hvor), ring(hvor), foelg(b), foelgSkridt(fn), tal()
    ===================================================================== */
 (function () {
     "use strict";
@@ -27,13 +32,13 @@
     var GRIS = { x: 125, y: 345 };      /* sparegrisen */
     var STAT = { x: 500, y: 150 };      /* staten */
     var ARB_Y = 258;
-    var FART = 1 / 9;                   /* et omloeb paa 9 sekunder */
+    var FASE = 1 / 24;                  /* pladserne ligger mellem familierne og virksomhederne */
 
     var svg, spor, lagKroner, lagSkilt;
     var dele = {};
     var kroner = [];
     var arbejdere = [];                 /* status pr. arbejder: arbejde, ledig, vej */
-    var fase = 0;                       /* hvor "toget" af kroner er paa sporet */
+    var fase = FASE;                    /* hvor raekken af pladser begynder paa sporet */
     var pauset = false;
     var sparet = 0;
     var brugt = 0;
@@ -175,10 +180,10 @@
     function nulstil() {
         kroner.forEach(function (k) { if (k.el.parentNode) k.el.parentNode.removeChild(k.el); });
         kroner = [];
-        fase = 0;
+        fase = FASE;
         for (var i = 0; i < 12; i++) {
             var k = nyKrone("alm");
-            k.t = i / 12;
+            k.t = FASE + i / 12;
         }
         arbejdere = [];
         for (var j = 0; j < 10; j++) arbejdere.push("arbejde");
@@ -220,37 +225,28 @@
         return kroner.filter(function (k) { return k.fase === "loop"; });
     }
 
-    function opdater(dt) {
-        if (!svg || pauset) return;
-        fase += FART * dt;
+    /* Hver krone paa sporet har en plads. Pladserne ligger med lige stor
+       afstand, saa naar en krone kommer til eller forsvinder, glider de
+       andre stille hen paa deres nye plads og bliver der. */
+    function pladser() {
         var paa = iSporet();
         var n = paa.length;
-        if (n > 0) {
-            /* Kronerne holder lige stor afstand: hver har sin plads i "toget" */
-            paa.sort(function (a, b) { return ((a.t - fase) % 1 + 1) % 1 - ((b.t - fase) % 1 + 1) % 1; });
-            paa.forEach(function (k, i) {
-                var maal = fase + i / n;
-                var d = ((maal - k.t) % 1 + 1.5) % 1 - 0.5;
-                k.t += FART * dt + d * Math.min(1, 1.4 * dt);
-                taelBrug(k);
-            });
-        }
-        kroner.slice().forEach(function (k) {
-            if (k.fase === "ud" || k.fase === "vaek" || k.fase === "ind") flyt(k, dt);
-        });
-        placer();
+        paa.sort(function (a, b) { return ((a.t - fase) % 1 + 1) % 1 - ((b.t - fase) % 1 + 1) % 1; });
+        return paa.map(function (k, i) { return { k: k, maal: fase + i / n }; });
     }
 
-    /* Statens krone taeller en brug, hver gang den passerer familierne
-       (loen) eller virksomhederne (koeb af varer) */
-    function taelBrug(k) {
-        if (!k.foelg) return;
-        var halv = Math.floor(k.t * 2);
-        if (halv > k.sidsteHalv) {
-            brugt += halv - k.sidsteHalv;
-            k.sidsteHalv = halv;
-            visTaeller();
-        }
+    function paaVej(k) {
+        return k.fase === "ud" || k.fase === "vaek" || k.fase === "ind" || (k.fase === "tur" && k.til !== null);
+    }
+
+    function opdater(dt) {
+        if (!svg || pauset) return;
+        pladser().forEach(function (p) {
+            var d = ((p.maal - p.k.t) % 1 + 1.5) % 1 - 0.5;
+            p.k.t += d * Math.min(1, 3 * dt);
+        });
+        kroner.slice().forEach(function (k) { if (paaVej(k)) flyt(k, dt); });
+        placer();
     }
 
     function visTaeller() {
@@ -259,26 +255,39 @@
     }
 
     function flyt(k, dt) {
+        if (k.fase === "tur") {
+            /* Statens krone paa vej til naeste station langs sporet */
+            k.u += dt / (k.varighed || 0.9);
+            if (k.u >= 1) {
+                k.t = k.til;
+                k.til = null;
+                brugt++;
+                visTaeller();
+                if (k.vedAnkomst) { var fn = k.vedAnkomst; k.vedAnkomst = null; fn(); }
+            } else {
+                var e = k.u < 0.5 ? 2 * k.u * k.u : 1 - Math.pow(-2 * k.u + 2, 2) / 2;
+                k.t = k.fra + (k.til - k.fra) * e;
+            }
+            return;
+        }
         if (k.fase === "vaek") {
             k.u += dt / 0.7;
             if (k.u >= 1) fjernKrone(k);
             return;
         }
         if (k.fase === "ud") {
-            k.u += dt / 0.9;
+            k.u += dt / 0.7;
             if (k.u >= 1) { fjernKrone(k); sparet++; tegnGris(); }
             return;
         }
         /* ind: gennem en raekke punkter og saa ind i sporet ved familierne */
-        k.u += dt / 0.8;
+        k.u += dt / 0.55;
         while (k.u >= 1 && k.fase === "ind") {
             k.u -= 1;
             k.vej.shift();
             if (k.vej.length < 2) {
                 k.fase = "loop";
-                k.t = Math.round(fase) + 0.0001;
-                while (k.t < fase - 0.5) k.t += 1;
-                k.sidsteHalv = Math.floor(k.t * 2);
+                k.t = 0;
                 if (k.vedAnkomst) k.vedAnkomst();
             }
         }
@@ -292,7 +301,7 @@
     function placer() {
         kroner.forEach(function (k) {
             var p, op = 1, sk = 1;
-            if (k.fase === "loop") {
+            if (k.fase === "loop" || k.fase === "tur") {
                 p = punkt(k.t);
             } else if (k.fase === "ud") {
                 var u = Math.min(1, k.u);
@@ -320,10 +329,11 @@
        og naar eleven springer til en anden del) */
     function spring() {
         var gange = 0;
-        while (kroner.some(function (k) { return k.fase !== "loop"; }) && gange < 200) {
-            kroner.slice().forEach(function (k) { if (k.fase !== "loop") { k.u = 1; flyt(k, 0); } });
+        while (kroner.some(paaVej) && gange < 200) {
+            kroner.slice().forEach(function (k) { if (paaVej(k)) { k.u = 1; flyt(k, 0); } });
             gange++;
         }
+        pladser().forEach(function (p) { p.k.t = p.maal; });
         placer();
     }
 
@@ -388,15 +398,18 @@
         placer();
     }
 
-    /* Ringen og taelleren paa statens krone */
+    /* Ringen og taelleren paa statens krone. Kronen tages ud af raekken
+       af pladser og flyttes kun, naar eleven klikker (foelgSkridt). */
     function foelg(b) {
         foelges = b;
         var k = null;
-        kroner.forEach(function (x) { if (!k && x.slags === "stat") k = x; });
+        kroner.forEach(function (x) { if (!k && x.slags === "stat" && x.fase === "loop") k = x; });
         kroner.forEach(function (x) { x.foelg = false; });
         if (b && k) {
             k.foelg = true;
-            k.sidsteHalv = Math.floor(k.t * 2);
+            k.fase = "tur";
+            k.til = null;
+            k.foersteTur = true;
             brugt = 1;              /* foerste gang: som loen til vejarbejderen */
             dele.ringKrone = k;
             ring("krone");
@@ -404,6 +417,27 @@
             dele.ringKrone = null;
         }
         visTaeller();
+    }
+
+    /* Statens krone koerer til naeste station: virksomhederne (koeb af
+       varer) eller familierne (loen). Kronen er betalt som loen, saa
+       foerste tur gaar altid til virksomhederne. fn kaldes, naar den er
+       fremme. */
+    function foelgSkridt(fn) {
+        var k = dele.ringKrone;
+        if (!k) return false;
+        if (k.til !== null) { k.u = 1; flyt(k, 0); }
+        k.fra = k.t;
+        if (k.foersteTur) {
+            k.til = Math.floor(k.t - 0.5 + 0.000001) + 1.5;
+            k.foersteTur = false;
+        } else {
+            k.til = (Math.floor(k.t * 2 + 0.000001) + 1) / 2;
+        }
+        k.varighed = 0.9 * Math.max(1, (k.til - k.fra) / 0.5);
+        k.u = 0;
+        k.vedAnkomst = fn || null;
+        return true;
     }
 
     function ring(hvor) {
@@ -437,8 +471,8 @@
         var job = 0;
         arbejdere.forEach(function (s) { if (s !== "ledig") job++; });
         return {
-            kroner: iSporet().length,
-            paaVej: kroner.length - iSporet().length,
+            kroner: kroner.filter(function (k) { return k.fase === "loop" || k.fase === "tur"; }).length,
+            paaVej: kroner.filter(function (k) { return k.fase !== "loop" && k.fase !== "tur"; }).length,
             job: job,
             vej: arbejdere.filter(function (s) { return s === "vej"; }).length,
             sparet: sparet,
@@ -462,6 +496,7 @@
         statGas: statGas,
         fraSparegris: fraSparegris,
         foelg: foelg,
+        foelgSkridt: foelgSkridt,
         vis: vis,
         ring: ring,
         skilt: skilt,

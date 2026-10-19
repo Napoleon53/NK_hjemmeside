@@ -127,6 +127,7 @@
        DELENE
        ================================================================ */
     function startDel(nr) {
+        stopTidslinje();
         lukNotat();
         S.del = nr;
         document.body.setAttribute("data-del", String(nr));
@@ -154,8 +155,42 @@
 
     /* ================================================================
        DEL 1: PENGENES KREDSLOEB
+       Fem klik i alt (brugerens oenske: faerre klik og mere tekst pr.
+       klik). Gaettet staar paa foerste kort. Den onde cirkel og statens
+       gas koerer hver som en kort animation, der stopper af sig selv.
+       Knappen springer resten af animationen over.
        ================================================================ */
     var D1 = D.DEL1;
+
+    /* Det, der skal ske om lidt i en animation. spolFrem() lader det hele
+       ske med det samme, stopTidslinje() dropper det (ved spring til en
+       anden del). */
+    var tidslinje = [];
+
+    function senere(sek, fn) {
+        var post = { fn: fn };
+        post.id = setTimeout(function () {
+            var i = tidslinje.indexOf(post);
+            if (i >= 0) tidslinje.splice(i, 1);
+            fn();
+        }, sek * 1000);
+        tidslinje.push(post);
+    }
+
+    function spolFrem() {
+        while (tidslinje.length) {
+            var post = tidslinje.shift();
+            clearTimeout(post.id);
+            post.fn();
+            K.spring();
+        }
+        K.spring();
+    }
+
+    function stopTidslinje() {
+        tidslinje.forEach(function (post) { clearTimeout(post.id); });
+        tidslinje = [];
+    }
 
     function del1Start() {
         K.byg(el("tegning"));
@@ -164,15 +199,16 @@
         nytTrin("start", D1.start);
         besked(D1.startHint, "info");
         beskedKilde = "klik";
-        knap("Videre →", "videre", del1Gaet);
+        knap(null);
+        svar(D1.gaet.svar, function (i) {
+            S.gaet = i;
+            del1Krise();
+        });
     }
 
     function klikKredsloeb(hvad) {
-        if (S.del !== 0) return;
-        if (S.trin === "spar" && hvad === "familier") { del1Krise(0); return; }
-        if (S.trin === "stat" && hvad === "staten") { del1Gas(0); return; }
-        if (S.trin === "gaet" || S.trin === "hvem") return;
-        /* Ellers: fortael, hvad tingen er, hvis kortet ikke har en vigtigere besked */
+        if (S.del !== 0 || S.trin === "hvem") return;
+        /* Fortael, hvad tingen er, hvis kortet ikke har en vigtigere besked */
         var b = el("tk-besked");
         if (b.textContent === "" || beskedKilde === "klik") {
             besked(D1.klik[hvad] || "", "info");
@@ -180,48 +216,25 @@
         }
     }
 
-    function del1Gaet() {
-        nytTrin("gaet", D1.gaet.tekst);
-        K.pause(true);
-        svar(D1.gaet.svar, function (i) {
-            S.gaet = i;
-            marker(i, "valgt");
-            laasSvar(i);
-            trin("spar");
-            K.pause(false);
-            K.ring("familier");
-            K.skilt("familier", "Klik for at spare op");
-            besked(D1.gaet.gjort, "gul");
-            knap("Spar op", "handling", function () { del1Krise(0); });
-        });
-        knap(null);
-    }
-
     function dinGaet() {
         return [{ tekst: "Dit gæt: " + NK.html(D1.gaet.svar[S.gaet]) }];
     }
 
-    function del1Krise(r) {
-        var runde = D1.krise[r];
-        if (r === 0) { K.ring(null); K.skilt(null); K.sparOp(runde.spar); }
-        if (r === 1) K.fyr(2);
-        if (r === 2) { K.fjern(1); K.fyr(1); }
-        nytTrin("krise" + (r + 1), runde.tekst);
+    /* Den onde cirkel: 2 kroner i sparegrisen, 2 fyret, 1 krone vaek og
+       1 fyret mere. Beskeden om gaettet kommer, naar det er sket. */
+    function del1Krise() {
+        nytTrin("krise", D1.krise);
         svar(dinGaet(), null, true);
-        if (r < D1.krise.length - 1) knap("Næste runde →", "videre", function () { del1Krise(r + 1); });
-        else knap("Videre →", "videre", del1Cirkel);
-    }
-
-    function del1Cirkel() {
-        nytTrin("cirkel", D1.cirkel);
-        svar(dinGaet(), null, true);
-        besked(S.gaet === D1.gaet.holder ? D1.holdt : D1.holdtIkke, "groen");
-        knap("Næste spørgsmål →", "videre", del1Hvem);
+        K.sparOp(2);
+        senere(1.0, function () { K.fyr(2); });
+        senere(1.8, function () { K.fjern(1); });
+        senere(2.3, function () { K.fyr(1); });
+        senere(2.6, function () { besked(S.gaet === D1.gaet.holder ? D1.holdt : D1.holdtIkke, "groen"); });
+        knap("Næste spørgsmål →", "videre", function () { spolFrem(); del1Hvem(); });
     }
 
     function del1Hvem() {
         nytTrin("hvem", D1.hvem.tekst);
-        K.pause(true);
         knap(null);
         svar(D1.hvem.svar, function (i) {
             var s = D1.hvem.svar[i];
@@ -229,7 +242,7 @@
                 marker(i, "rigtig");
                 laasSvar(i);
                 besked(s.ja, "groen");
-                knap("Videre →", "videre", del1Stat);
+                knap("Se staten give gas →", "videre", del1Gas);
             } else {
                 marker(i, "forkert");
                 svarKnapper()[i].disabled = true;
@@ -238,45 +251,49 @@
         });
     }
 
-    function del1Stat() {
-        nytTrin("stat", D1.stat.tekst);
-        K.pause(false);
-        K.vis("staten", true);
-        K.ring("staten");
-        K.skilt("staten", D1.stat.skilt);
-        knap("Byg vejen", "handling", function () { del1Gas(0); });
-    }
-
-    function del1Gas(r) {
-        if (r === 0) { K.ring(null); K.skilt(null); K.statGas(2); }
-        if (r === 1) { K.fraSparegris(1); K.ansaet(1); }
-        nytTrin("gas" + (r + 1), D1.gas[r].tekst);
-        if (r < D1.gas.length - 1) knap("Næste runde →", "videre", function () { del1Gas(r + 1); });
-        else knap("Videre →", "videre", del1Multi);
-    }
-
-    function del1Multi() {
-        nytTrin("multi", D1.multiplikator);
-        K.foelg(true);
+    /* Staten giver gas: vejarbejderne faar loen, en krone kommer op af
+       sparegrisen, og statens roede krone koerer tre ture langs sporet. */
+    function del1Gas() {
+        nytTrin("gas", D1.gas);
         svar([{ tekst: D1.keynes }], null, true);
-        besked(D1.faerdig, "groen");
-        delFaerdig(0);
-        knap("Videre til del 2 →", "videre", function () { startDel(1); });
+        K.vis("staten", true);
+        senere(0.5, function () { K.statGas(2); });
+        senere(2.4, function () { K.fraSparegris(1); K.ansaet(1); });
+        senere(3.1, function () { K.foelg(true); });
+        senere(3.5, function () { tur(3); });
+        knap("Videre til del 2 →", "videre", function () { spolFrem(); startDel(1); });
+    }
+
+    function tur(n) {
+        if (n === 0) {
+            if (S.del === 0 && S.trin === "gas") {
+                besked(D1.faerdig, "groen");
+                delFaerdig(0);
+            }
+            return;
+        }
+        /* Et lille ophold ved hver station, saa taelleren kan ses */
+        K.foelgSkridt(function () { senere(0.35, function () { tur(n - 1); }); });
     }
 
     /* ================================================================
        DEL 2: GAS OG BREMS
+       Ingen ros og ingen skaeld ud aar for aar: beskeden siger kun, hvad
+       der skete. Hoejst en venlig bemaerkning i hele spillet (foerste
+       gang en linje kommer over graensen). Konsekvensen samles til sidst.
        ================================================================ */
     var D2 = D.DEL2;
+    var M = NK.Model;
 
-    function tegnSpil(venter) {
+    function tegnSpil(naeste) {
+        var slut = S.trin === "resultat" || S.trin === "svaert";
         KV.spil({
-            med: NK.Model.temperaturer(S.valg),
-            uden: NK.Model.temperaturer(null),
+            temps: M.temperaturer(S.valg),
+            uden: M.temperaturer(null),
             valg: S.valgSlags,
             vist: S.valg.length,
-            udenVist: S.valg.length,
-            venter: venter,
+            visUden: slut,
+            naeste: naeste ? S.valg.length + 1 : -1,
             kasse: S.kasse,
             visKasse: S.trin !== "intro"
         });
@@ -288,10 +305,19 @@
         S.valg = [];
         S.valgSlags = [];
         S.kasse = 0;
+        S.hov = false;
         nytTrin("intro", D2.intro);
         svar(D2.vaerktoej, null, true);
         tegnSpil(false);
         knap("Start år 1 →", "videre", function () { del2Aar(0); });
+    }
+
+    /* Hvad der skete i aaret, uden at sige, om det var godt eller skidt */
+    function skete(foer, efter) {
+        var dl = M.ledighed(efter) - M.ledighed(foer), dp = M.priser(efter) - M.priser(foer);
+        var l = dl > 0 ? D2.ledighed.op : (dl < 0 ? D2.ledighed.ned : D2.ledighed.ens);
+        var p = dp > 0 ? D2.priser.op : (dp < 0 ? D2.priser.ned : D2.priser.ens);
+        return l + ", og " + p + ".";
     }
 
     function del2Aar(i) {
@@ -308,22 +334,30 @@
             laasSvar(j);
             trin("aar" + (i + 1) + "set");
             tegnSpil(false);
-            var z = NK.Model.zone(NK.Model.temperaturer(S.valg)[i + 1]);
-            besked(D2.zone[z], z === "balance" ? "groen" : (z === "kold" ? "blaa" : "roed"));
+            var t = M.temperaturer(S.valg);
+            var tekst = skete(t[i], t[i + 1]);
+            if (!S.hov) {
+                if (M.ledighed(t[i + 1]) > D.GRAENSE) { tekst += " " + D2.hov.ledighed; S.hov = true; }
+                else if (M.priser(t[i + 1]) > D.GRAENSE) { tekst += " " + D2.hov.priser; S.hov = true; }
+            }
+            besked(tekst, "info");
             if (i < D2.aar.length - 1) knap("År " + (i + 2) + " →", "videre", function () { del2Aar(i + 1); });
             else knap("Se resultatet →", "videre", del2Resultat);
         });
     }
 
+    function gange(n) { return n + (n === 1 ? " gang" : " gange"); }
+
     function del2Resultat() {
-        var med = NK.Model.iBalance(NK.Model.temperaturer(S.valg));
-        var uden = NK.Model.iBalance(NK.Model.temperaturer(null));
+        var med = M.overGraensen(M.temperaturer(S.valg));
+        var uden = M.overGraensen(M.temperaturer(null));
         var gas = S.valg.filter(function (v) { return v > 0; }).length;
         var brems = S.valg.filter(function (v) { return v < 0; }).length;
-        nytTrin("resultat", "<b>Otte år er gået.</b> Med dig var økonomien i balance i " + med + " af 8 år. Uden staten (den stiplede linje) var den i balance i " + uden + " af 8 år.");
+        nytTrin("resultat", "<b>Otte år er gået.</b> Arbejdsløsheden var over grænsen i " + med.ledighed + " år, og priserne i " + med.priser + " år. Uden staten (de stiplede linjer) var det " + uden.ledighed + " og " + uden.priser + " år.");
         tegnSpil(false);
-        var kasse = S.kasse > 0 ? "overskud" : (S.kasse < 0 ? "underskud" : "balance");
-        besked("Du gav gas " + gas + (gas === 1 ? " gang" : " gange") + " og bremsede " + brems + (brems === 1 ? " gang" : " gange") + ". Statskassen har " + kasse + ".", "blaa");
+        var kasse = S.kasse > 0 ? "har overskud" : (S.kasse < 0 ? "har underskud" : "er i balance");
+        svar([{ tekst: med.ledighed + med.priser === 0 ? D2.som : D2.opskrift }], null, true);
+        besked("Du gav gas " + gange(gas) + " og bremsede " + gange(brems) + ". Statskassen " + kasse + ".", "blaa");
         knap("Næste spørgsmål →", "videre", del2Svaert);
     }
 
@@ -472,6 +506,7 @@
         klikSvar: klikSvar,
         trykKnap: trykKnap,
         mere: function () { if (vedMere) vedMere(); },
+        spolFrem: spolFrem,
         tilstand: function () { return S; }
     };
 }());

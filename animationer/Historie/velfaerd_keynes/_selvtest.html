@@ -59,17 +59,26 @@
         });
         log("Tekster tjekket: " + tekster.length);
 
-        var uden = M.temperaturer(null);
-        paastand(M.iBalance(uden) === 4, "uden staten skal 4 af 8 år være i balance, er " + M.iBalance(uden));
-        /* Keynes' regel: vaelg det, der bringer temperaturen naermest 0 */
+        var uden = M.overGraensen(M.temperaturer(null));
+        paastand(uden.ledighed === 2 && uden.priser === 2, "uden staten: 2 år med for høj arbejdsløshed og 2 med for høje prisstigninger");
+        /* Keynes' regel: vaelg det, der bringer oekonomien naermest midten */
         var t = 0, valg = [];
         D.DEL2.aar.forEach(function (a) {
             var bedst = 0, bedstAfst = 99;
             [1, 0, -1].forEach(function (v) { var n = Math.abs(t + a.drift + v); if (n < bedstAfst) { bedstAfst = n; bedst = v; } });
             valg.push(bedst); t = t + a.drift + bedst;
         });
-        paastand(M.iBalance(M.temperaturer(valg)) === 8, "Keynes' regel skal give 8 af 8 år i balance");
-        paastand(M.iBalance(M.temperaturer([0, 0, 0, 0, 0, 0, 0, 0])) === 4, "ingenting hele vejen = uden staten");
+        var med = M.overGraensen(M.temperaturer(valg));
+        paastand(med.ledighed === 0 && med.priser === 0, "Keynes' regel holder begge under grænsen alle 8 år");
+        for (var tt = -3; tt <= 3; tt++) paastand(Math.abs(M.ledighed(tt) - M.priser(tt)) >= 0.4, "de to linjer ligger ikke oven i hinanden ved " + tt);
+        var ens = M.overGraensen(M.temperaturer([0, 0, 0, 0, 0, 0, 0, 0]));
+        paastand(ens.ledighed === 2 && ens.priser === 2, "ingenting hele vejen = uden staten");
+        /* Del 3: linjerne staar, som teksterne siger */
+        var V = W.NK.Kurve.vaerdi, H = D.HISTORIE, G = D.GRAENSE;
+        paastand(V(H.ledighed, 1953) > G && V(H.priser, 1953) < G, "1953: arbejdsløsheden over grænsen, priserne under");
+        paastand(V(H.ledighed, 1960) < G && V(H.priser, 1960) < G, "1960: begge under grænsen");
+        paastand(V(H.ledighed, 1962) < G && V(H.priser, 1962) > G, "1962: priserne over grænsen");
+        paastand(V(H.ledighed, 1974) > G && V(H.priser, 1974) > G, "1974: begge over grænsen");
 
         D.SITUATIONER.forEach(function (s, i) {
             var ja = s.hvorfor.svar.filter(function (x) { return x.ja; });
@@ -161,39 +170,46 @@
         /* ===== Del 1 ===== */
         paastand(trin(W) === "start", navn + ": starter i del 1");
         paastand(!synlig(W, "[data-hvad=sparegris]") && !synlig(W, "[data-hvad=staten]"), navn + ": sparegris og stat er skjult fra start");
-        paastand(d.getElementById("tk-svar").children.length === 0, navn + ": ingen svar fra start");
-        m("start");
-        K.vedKlik && d.querySelector("[data-hvad=fabrik]").dispatchEvent(new W.MouseEvent("click", { bubbles: true }));
-        paastand(besked(W).textContent.indexOf("Virksomhederne laver") === 0, navn + ": klik på fabrikken forklarer");
-
-        F.trykKnap(); m("gaet");
-        paastand(trin(W) === "gaet" && K.pauset(), navn + ": gættet står stille");
+        paastand(d.querySelectorAll(".tk-sv").length === 3, navn + ": gættet står på første kort");
         paastand(d.getElementById("tk-knap").classList.contains("skjult"), navn + ": ingen knap, før der er gættet");
-        F.klikSvar(1); m("spar");
-        paastand(trin(W) === "spar" && !K.pauset(), navn + ": efter gættet skal familierne klikkes");
-        d.querySelector("[data-hvad=familier]").dispatchEvent(new W.MouseEvent("click", { bubbles: true }));
-        paastand(trin(W) === "krise1", navn + ": klik på familierne sparer op");
-        K.spring(); m("krise1");
-        paastand(K.tal().sparet === 2 && K.tal().kroner === 10, navn + ": 2 kroner i sparegrisen");
-        F.trykKnap(); F.trykKnap(); K.spring(); m("krise3");
-        paastand(K.tal().kroner === 9 && K.tal().job === 7, navn + ": efter krisen 9 kroner og 7 i arbejde");
-        F.trykKnap(); m("cirkel");
+        m("start");
+        d.querySelector("[data-hvad=fabrik]").dispatchEvent(new W.MouseEvent("click", { bubbles: true }));
+        paastand(besked(W).textContent.indexOf("Virksomhederne laver") === 0, navn + ": klik på fabrikken forklarer");
+        /* Kronerne staar stille, naar der ikke sker noget */
+        function kronePos() { return Array.prototype.map.call(d.querySelectorAll(".k-krone"), function (e) { return e.getAttribute("transform"); }).join("|"); }
+        var foer = kronePos();
+        for (var st = 0; st < 90; st++) K.opdater(1 / 30);
+        paastand(kronePos() === foer, navn + ": kronerne står stille i tre sekunder");
+
+        /* Gaettet: den onde cirkel koerer af sig selv og stopper */
+        var klik = 0;
+        F.klikSvar(1); klik++; m("krise");
+        paastand(trin(W) === "krise", navn + ": gættet sætter den onde cirkel i gang");
+        paastand(besked(W).textContent.indexOf("anderledes") < 0, navn + ": gættets svar kommer først, når det er sket");
+        F.spolFrem(); m("krise slut");
+        paastand(K.tal().sparet === 2 && K.tal().kroner === 9 && K.tal().job === 7, navn + ": efter krisen 2 sparet, 9 kroner og 7 i arbejde");
         paastand(besked(W).textContent.indexOf("anderledes") >= 0, navn + ": gæt 2 holdt ikke");
-        F.trykKnap(); m("hvem");
-        F.klikSvar(0);
+        foer = kronePos();
+        for (var st1 = 0; st1 < 90; st1++) K.opdater(1 / 30);
+        paastand(kronePos() === foer, navn + ": kronerne står stille efter krisen");
+        F.trykKnap(); klik++; m("hvem");
+        F.klikSvar(0); klik++;
         paastand(besked(W).classList.contains("roed"), navn + ": familierne er forkert"); m("hvem forkert");
-        F.klikSvar(2);
+        F.klikSvar(2); klik++;
         paastand(besked(W).classList.contains("groen"), navn + ": staten er rigtigt"); m("hvem rigtig");
-        F.trykKnap(); m("stat");
+        F.trykKnap(); klik++; m("gas");
         paastand(!d.querySelector("[data-hvad=staten]").classList.contains("k-skjult"), navn + ": staten vises");
-        F.trykKnap(); K.spring();
-        paastand(K.tal().vej === 2 && K.tal().job === 9 && K.tal().kroner === 11, navn + ": staten betaler 2 vejarbejdere");
-        F.trykKnap(); K.spring(); m("gas2");
-        paastand(K.tal().kroner === 12 && K.tal().job === 10 && K.tal().sparet === 1, navn + ": alle i arbejde igen");
-        F.trykKnap(); m("multi");
-        for (var i = 0; i < 600; i++) K.opdater(1 / 30);
-        paastand(K.tal().brugt >= 4, navn + ": statens krone er brugt flere gange (" + K.tal().brugt + ")");
+        paastand(!d.querySelector(".del[data-del='0']").classList.contains("faerdig"), navn + ": del 1 er ikke færdig, før kronen har kørt");
+        F.spolFrem(); m("gas slut");
+        paastand(K.tal().kroner === 12 && K.tal().job === 10 && K.tal().vej === 2 && K.tal().sparet === 1, navn + ": alle i arbejde igen");
+        paastand(K.tal().brugt === 4, navn + ": statens krone er brugt 4 gange (" + K.tal().brugt + ")");
+        paastand(parseFloat(d.querySelector(".k-ring").getAttribute("cx")) > 780, navn + ": statens krone ender hos virksomhederne (køb, løn, køb)");
+        paastand(besked(W).classList.contains("groen") && besked(W).textContent.indexOf("4 gange") >= 0, navn + ": slutbeskeden om de 4 gange");
         paastand(d.querySelector(".del[data-del='0']").classList.contains("faerdig"), navn + ": del 1 er markeret færdig");
+        foer = kronePos();
+        for (var st2 = 0; st2 < 90; st2++) K.opdater(1 / 30);
+        paastand(kronePos() === foer, navn + ": kronerne står stille, når statens krone er færdig");
+        paastand(klik + 1 <= 6, navn + ": del 1 klares med højst 6 klik (" + (klik + 1) + ")");
 
         /* ===== Del 2 ===== */
         F.trykKnap(); m("del2 intro");
@@ -209,11 +225,15 @@
             t += D2.aar[a].drift + bedst;
             F.klikSvar(bedst === 1 ? 0 : (bedst === 0 ? 1 : 2));
             m("år " + (a + 1) + " valgt");
-            paastand(besked(W).classList.contains("groen"), navn + ": Keynes' regel holder år " + (a + 1) + " i balance");
+            paastand(besked(W).classList.contains("info"), navn + ": år " + (a + 1) + " beskeden er neutral");
+            paastand(besked(W).textContent.indexOf("Hov") < 0, navn + ": år " + (a + 1) + " ingen bemærkning, når Keynes følges");
+            paastand(d.querySelectorAll(".kv-uden")[2].getAttribute("points") === "", navn + ": år " + (a + 1) + " linjerne uden staten er skjult");
             F.trykKnap();
         }
         m("resultat");
-        paastand(d.getElementById("tk-tekst").textContent.indexOf("8 af 8") >= 0, navn + ": resultatet siger 8 af 8");
+        paastand(d.getElementById("tk-tekst").textContent.indexOf("over grænsen i 0 år, og priserne i 0 år") >= 0, navn + ": resultatet siger 0 og 0 år");
+        paastand(d.getElementById("tk-svar").textContent.indexOf("som Keynes ville") >= 0, navn + ": du styrede, som Keynes ville");
+        paastand(d.querySelectorAll(".kv-uden")[2].getAttribute("points") !== "", navn + ": linjerne uden staten vises til sidst");
         paastand(besked(W).textContent.indexOf("overskud") >= 0, navn + ": statskassen ender i overskud");
         F.trykKnap(); m("svaert");
         F.klikSvar(1); m("svaert svar");
@@ -286,6 +306,17 @@
         paastand(!d.getElementById("teori").classList.contains("vis"), "Esc lukker");
         d.querySelector(".del[data-del='1']").click();
         paastand(W.NK.Forloeb.tilstand().del === 1 && W.NK.Forloeb.tilstand().trin === "intro", "knappen 2 i toplinjen åbner del 2");
+        /* Staten goer ingenting i otte aar: hoejst en venlig bemaerkning */
+        var F = W.NK.Forloeb, hov = 0;
+        F.trykKnap();
+        for (var a = 0; a < 8; a++) {
+            F.klikSvar(1);
+            if (d.getElementById("tk-besked").textContent.indexOf("Hov") >= 0) hov++;
+            F.trykKnap();
+        }
+        paastand(hov === 1, "ingenting i otte år giver præcis én bemærkning (" + hov + ")");
+        paastand(d.getElementById("tk-tekst").textContent.indexOf("i 2 år, og priserne i 2 år") >= 0, "ingenting i otte år: 2 og 2 år over grænsen");
+        paastand(d.getElementById("tk-svar").textContent.indexOf("opskrift") >= 0, "Keynes' opskrift står til sidst, når den ikke blev fulgt");
         d.querySelector(".del[data-del='0']").click();
         paastand(W.NK.Forloeb.tilstand().trin === "start" && W.NK.Kredsloeb.tal().kroner === 12, "knappen 1 åbner del 1 forfra");
         f.parentNode.removeChild(f);
