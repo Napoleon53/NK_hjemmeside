@@ -65,14 +65,12 @@ Bagsiderne er skrevet om 3. oktober 2026, så hvert par er entydigt i vendespill
   tetraeder (`sc3.2`), London-kræfter (`sb4.4`), carboxylgruppe (`sc_spil4`),
   isomerer, Avogadros konstant.
 
-## Ventetiden i vendespillet
+## Brikker, der ikke passer
 
-To brikker, der ikke passer, lå før åbne i 0,9 s. Det var for kort til at læse
-den anden brik (brugerens ønske 3. oktober 2026). Nu er tiden 1,5 s plus 35 ms
-pr. tegn på de to brikker, højst 5,5 s (`V.laesetid` i `js/vendespil.js`): et
-symbol og et navn knap 2 s, et fagord og en forklaring ca. 4 s. En rød streg i
-bunden af de to brikker løber ud i samme tid. Et klik på en ny brik vender dem
-med det samme, så den, der har læst, ikke skal vente.
+To brikker, der ikke passer, bliver liggende åbne, til eleven klikker på en ny
+brik. Der er ingen nedtælling (brugerens ønske 20. oktober 2026: "helt undlade
+den stressende følelse"). Før lå de 0,9 s og fra 3. oktober en læsetid efter
+antallet af tegn med en rød streg, der løb ud.
 
 ## Egne sæt
 
@@ -112,12 +110,13 @@ SO₄²⁻<TAB>sulfation
   **Kopiér til Quizlet**, **Gem som fil**, **Kopiér link** (linket har hele sættet i sig, `#kort=...`;
   fra harddisken peger det på kemiformler.dk), **Kopiér vejledning til AI** og
   **Nyt sæt**.
-* Et link med sættet i kan også vælge fanen: `index.html#kort=...&vendespil`
-  (brugerens valg 12. okt. 2026: "Det vil være fint at åbne direkte i
-  vendespil"). Fanen står efter sættet, delt af `&`, som i `#ioner&parring`.
+* Et link med sættet i kan også vælge fanen: `index.html#kort=...&parring`.
+  Fanen står efter sættet, delt af `&`, som i `#ioner&parring`.
 * **Kemibogen åbner spillet sådan.** Knappen "Kort og godt" på bogens
-  fagordlister (`kemibogen/`, kilden er `NK_Undervisning/Kemibogen/stil/fagord.html`)
-  laver et sæt af kapitlets fagord og åbner `#kort=...&vendespil`. Bogen regner
+  fagordlister (kilden er `NK_Undervisning/Kemibogen/stil/fagord.html`)
+  laver et sæt af kapitlets fagord og åbner `#kort=...&parring` (brugerens
+  valg 20. okt. 2026: parring er "den pædagogisk stærkeste"; fra 12. okt.
+  åbnede den i vendespil). Bogen regner
   med 90 tegn pr. side, mindst 4 kort og linkets form. Ændres `MAKS_TEGN`,
   `MINDST`, `tilLink` eller `fraLink` i `js/tekstformat.js`, eller flyttes
   mappen, skal bogens `stil/fagord.html` og `vaerktoej/tjek_fagord.py` rettes

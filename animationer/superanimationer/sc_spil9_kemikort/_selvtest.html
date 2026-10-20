@@ -296,14 +296,14 @@ function tests() {
     var galeTo = [brikker[par[0][0]], brikker[par[1][0]]];
     paastand("de bliver liggende åbne, så begge kan læses",
         galeTo.every(function (b) { return b.classList.contains("aaben") && b.classList.contains("gal"); }));
-    var ventMs = parseFloat(galeTo[1].style.getPropertyValue("--vent"));
-    paastand("de ligger mindst 1,5 s (" + ventMs + " ms)", ventMs >= 1500 && ventMs <= 5500);
-    paastand("statuslinjen beder eleven læse dem begge", /Læs dem begge/.test(el("ve-status").textContent), el("ve-status").textContent);
-    var kortTid = NK.Vendespil.laesetid("Na", "natrium");
-    var langTid = NK.Vendespil.laesetid("elektronegativitet", "tal for, hvor kraftigt et atom trækker i bindingens elektroner");
-    paastand("et symbol og et navn ligger knap 2 s (" + kortTid + " ms)", kortTid >= 1500 && kortTid <= 2200);
-    paastand("et fagord og en forklaring ligger 3,5 til 5 s (" + langTid + " ms)", langTid >= 3500 && langTid <= 5000);
-    paastand("ventetiden har et loft", NK.Vendespil.laesetid(new Array(200).join("x"), "y") === 5500);
+    paastand("der er ingen nedtælling", NK.Vendespil.laesetid === undefined);
+    paastand("statuslinjen siger, at de vender ved næste klik", /klikker på en ny brik/.test(el("ve-status").textContent), el("ve-status").textContent);
+    NK.Vendespil.klik(par[2][0]);
+    paastand("et klik på en ny brik vender de to",
+        galeTo.every(function (b) { return !b.classList.contains("aaben") && !b.classList.contains("gal"); }));
+    paastand("og åbner den nye", brikker[par[2][0]].classList.contains("aaben"));
+    NK.Vendespil.klik(par[2][1]);
+    paastand("den nye kan stadig finde sin makker", brikker[par[2][1]].classList.contains("fundet"));
     par.forEach(function (p) { NK.Vendespil.klik(p[0]); NK.Vendespil.klik(p[1]); });
     paastand("alle par kan findes", el("ve-fundet").textContent === "6 af 6", el("ve-fundet").textContent);
     paastand("spillet melder, at det er slut", el("ve-slut").hidden === false);

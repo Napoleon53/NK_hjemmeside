@@ -588,27 +588,6 @@ kbd {
 .brik.fundet { background: linear-gradient(160deg, #24432f, #1d3527); border-color: var(--groen); opacity: 0.92; cursor: default; }
 .brik.gal { background: linear-gradient(160deg, #4a2622, #351d1b); border-color: var(--roed); }
 
-/* Stregen i bunden af to brikker, der ikke passede: den loeber ud, mens
-   brikkerne ligger aabne, saa man kan se, hvor laenge man har til at laese.
-   Tiden kommer fra vendespil.js (--vent). */
-.brik { position: relative; }
-.brik.gal::after {
-    content: "";
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 6px;
-    height: 3px;
-    border-radius: 2px;
-    background: var(--roed);
-    transform-origin: left center;
-    animation: brik-vent var(--vent, 3s) linear forwards;
-}
-@keyframes brik-vent {
-    from { transform: scaleX(1); }
-    to { transform: scaleX(0); }
-}
-
 .brik-for.t1 { font-size: clamp(20px, 2.8vw, 34px); font-weight: 700; }
 .brik-for.t2 { font-size: clamp(17px, 2.1vw, 26px); font-weight: 700; }
 .brik-for.t3 { font-size: clamp(14px, 1.6vw, 21px); }

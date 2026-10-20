@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb3.1 Navngivning</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:760px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at molekylemotoren giver hvert stof det navn,
+   der står i js/data.js, at navnet kan læses i forled, stamme og
+   endelse, og at delene giver navnet, at stoffet har de grupper,
+   stofklassen siger, at alle opgaver på begge faner kan løses (tegnet
+   på tavlen og skrevet i feltet), at forkerte tegninger og navne får en
+   forklaring, der passer til fejlen, at man kan tegne med musen og
+   værktøjerne, at kontakterne til stofklasserne vælger opgaverne og
+   værktøjerne, at scenen er låst, når kortet er grønt, at hintene gør
+   det gult i formlen, de handler om, at teksterne er korte og uden
+   tankestreger, og at kortet aldrig dækker whiteboardet fra 1100 × 620
+   til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server med mappen animationer/ som
+   rod (motoren hentes fra ../../molekylemotor/). Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+/* Mange ens tjek samles i én påstand: fejlene listes */
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb3.1-t", "nk-sb3.1-s", "nk-sb3.1-klasser"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|maal|spoerg\w*|faa|saa|naar|kaede\w*|traek\w*|vaelg\w*|laengste|taelle?r?)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+/* Første indlæsning: gem elevens fremskridt, ryd det, og indlæs siden igen,
+   så fanerne begynder ved første opgave. Anden indlæsning: kør testen. */
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 1200); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kemi;
+    var T = NK.sims["fane-t"], S = NK.sims["fane-s"];
+    var ALLE = D.KLASSER.map(function (k) { return k.id; });
+
+    function el(id) { return d.getElementById(id); }
+    function kortTekst(f) { return el(f + "-ind").textContent; }
+    function videre(f) { return el(f + "-ind").querySelector("[data-videre]"); }
+    function kortH(f) { return el(f + "-skort").offsetHeight; }
+    function klikPunkt(sim, p) {
+        var r = sim.L.canvas.getBoundingClientRect();
+        sim.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + p.x, clientY: r.top + p.y, bubbles: true }));
+    }
+    function peger(sim, type, p, knap) {
+        var r = sim.L.canvas.getBoundingClientRect();
+        sim.L.canvas.dispatchEvent(new W.PointerEvent(type, { clientX: r.left + p.x, clientY: r.top + p.y, button: knap || 0, pointerId: 1, bubbles: true }));
+    }
+    /* Et klik med musen paa tavlen: ned og op samme sted (tavlen klikker selv i op) */
+    function klikTavle(p) { peger(T, "pointerdown", p); peger(T, "pointerup", p); }
+    function storrelse(b, h) {
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        [T, S].forEach(function (s) { s.lay = null; });
+    }
+    function visFane(id) { NK.visFane(id); NK.sims[id].tilpas(); NK.sims[id].layout(); }
+    function stof(navn) { return K.stof(D.STOFFER.filter(function (o) { return o.navn === navn; })[0]); }
+    function skrivNavn(t) { S.input.value = t; el("s-tjek").click(); }
+
+    /* ================================================================= */
+    overskrift("1. Kemien: navnene, delene og grupperne");
+    var f1 = [], f2 = [], f3 = [], f4 = [], f5 = [], lange = [], dubletter = [];
+    function laengde(hvad, tekst, maks) { if (tekst.length > maks) lange.push(hvad + " " + tekst.length + ": " + tekst); }
+    var set = {};
+    D.STOFFER.forEach(function (o) {
+        var s = K.stof(o), sg = s.sig;
+        if (s.motorNavn !== o.navn) f1.push(o.navn + " → " + s.motorNavn);
+        if (!s.p.ok || s.dele.map(function (x) { return x.tekst; }).join("") !== o.navn) f2.push(o.navn);
+        var passer = {
+            alkan: !sg.OH && !sg.COOH && !sg.dbl && !sg.tri && !sg.Cl && !sg.Br,
+            alken: sg.dbl > 0 && !sg.tri && !sg.OH && !sg.COOH && !sg.Cl && !sg.Br,
+            alkyn: sg.tri > 0 && !sg.OH && !sg.COOH && !sg.Cl && !sg.Br,
+            halogen: (sg.Cl + sg.Br) > 0 && !sg.OH && !sg.COOH && !sg.dbl && !sg.tri,
+            alkohol: sg.OH > 0 && !sg.COOH && !sg.dbl && !sg.tri,
+            carboxylsyre: sg.COOH > 0 && !sg.dbl && !sg.tri
+        }[o.k];
+        if (!passer || sg.CO || sg.andet) f3.push(o.navn + " (" + o.k + ")");
+        if (ALLE.indexOf(o.k) < 0 || [1, 2, 3].indexOf(o.niv) < 0 || ["t", "s"].indexOf(o.fane) < 0) f4.push(o.navn);
+        if (set[o.fane + o.navn]) dubletter.push(o.fane + ": " + o.navn);
+        set[o.fane + o.navn] = true;
+        if (o.fane === "t") K.tegneHints(s).forEach(function (h) { laengde("tegnehint", h, 150); });
+        else K.skriveHints(s).forEach(function (h) { laengde("skrivehint", h.tekst, 120); });
+        laengde("forklaring", K.forklaring(s), 160);
+        if (!K.tjekNavn(s, o.navn).ok) f5.push(o.navn);
+    });
+    samlet("motoren giver alle " + D.STOFFER.length + " stoffer det navn, der står i data", f1);
+    samlet("navnet kan læses i forled, stamme og endelse, og delene giver navnet", f2);
+    samlet("hvert stof har de grupper, stofklassen siger, og ingen andre", f3);
+    samlet("stofklasse, niveau og fane er gyldige", f4);
+    samlet("intet stof står to gange på samme fane", dubletter);
+    samlet("stoffets eget navn er rigtigt på fane 2", f5);
+    ALLE.forEach(function (k) {
+        var t = D.STOFFER.filter(function (o) { return o.k === k && o.fane === "t"; }), s = D.STOFFER.filter(function (o) { return o.k === k && o.fane === "s"; });
+        var niv = function (l) { return [1, 2, 3].every(function (n) { return l.some(function (o) { return o.niv === n; }); }); };
+        paastand(k + ": mindst fire stoffer på hver fane, og alle tre niveauer på hver fane", t.length >= 4 && s.length >= 4 && niv(t) && niv(s), t.length + " og " + s.length);
+    });
+    paastand("B3.1: 4-methylpentan-2-ol læses som 4-methyl, pentan og -2-ol", K.dele("4-methylpentan-2-ol").map(function (x) { return x.type + ":" + x.tekst; }).join(" ") === "forled:4-methyl stamme:pentan endelse:-2-ol");
+    paastand("bromethan læses som brom + ethan (ikke bro + methan)", K.laesNavn("bromethan").forledTekst === "brom" && K.laesNavn("bromethan").n === 2);
+    paastand("but-2-en læses som stammen but og endelsen -2-en", K.dele("but-2-en").map(function (x) { return x.tekst; }).join("|") === "but|-2-en");
+    paastand("2-hydroxypropansyre (mælkesyre fra B3.1) har forleddet 2-hydroxy", K.laesNavn("2-hydroxypropansyre").forled[0].navn === "hydroxy");
+
+    /* Elevens navn paa fane 2 */
+    var s1 = stof("pentan-2-ol"), s2 = stof("2-methylpentan"), s3 = stof("3-ethyl-2-methylpentan"), s4 = stof("2,3-dimethylbutan"), s5 = stof("pentansyre"), s6 = stof("but-2-en");
+    function svar(s, t) { return K.tjekNavn(s, t); }
+    paastand("tomt felt er intet svar", svar(s1, "  ").tom === true);
+    paastand("pentan-4-ol: nummerér fra den anden ende", !svar(s1, "pentan-4-ol").ok && /anden ende/.test(svar(s1, "pentan-4-ol").tekst));
+    paastand("2-pentanol godkendes med den nyere skrivemåde", svar(s1, "2-pentanol").ok && /nyere skrivemåde er pentan-2-ol/.test(svar(s1, "2-pentanol").note));
+    paastand("pentanol: tavlen beder om tallet", !svar(s1, "pentanol").ok && /hvor OH-gruppen sidder/.test(svar(s1, "pentanol").tekst));
+    paastand("pentan-3-ol er et andet stof, og det tegnes", !svar(s1, "pentan-3-ol").ok && !!svar(s1, "pentan-3-ol").mol && /Tæl igen, hvor OH-gruppen sidder/.test(svar(s1, "pentan-3-ol").tekst));
+    paastand("pent-2-en: molekylet har en OH-gruppe", /OH-gruppe/.test(svar(s1, "pent-2-en").tekst));
+    paastand("4-methylpentan: den anden ende", /anden ende/.test(svar(s2, "4-methylpentan").tekst));
+    paastand("2-ethylbutan: ikke den længste kæde", /ikke den længste kæde/.test(svar(s2, "2-ethylbutan").tekst), svar(s2, "2-ethylbutan").tekst);
+    paastand("2-methyl-3-ethylpentan: alfabetisk rækkefølge", /alfabetisk/.test(svar(s3, "2-methyl-3-ethylpentan").tekst));
+    paastand("2-methyl-3-methylbutan: ens sidegrupper skrives samlet", /samlet/.test(svar(s4, "2-methyl-3-methylbutan").tekst));
+    paastand("2,3dimethylbutan og 2 methylbutan: bindestreg mellem tal og bogstaver", /bindestreg/.test(svar(s4, "2,3dimethylbutan").tekst) && /bindestreg/.test(svar(s2, "2 methylpentan").tekst));
+    paastand("2-methyl-pentan: næsten, tjek bindestregerne", /bindestreg/.test(svar(s2, "2-methyl-pentan").tekst));
+    paastand("butansyre for pentansyre: husk carbonatomet i COOH", /COOH/.test(svar(s5, "butansyre").tekst));
+    paastand("pentan-1-syre: intet tal foran -syre", /intet tal/.test(svar(s5, "pentan-1-syre").tekst));
+    paastand("eddikesyre: trivialnavnet godkendes ikke", !svar(stof("ethansyre"), "eddikesyre").ok && /trivialnavn/.test(svar(stof("ethansyre"), "eddikesyre").tekst));
+    paastand("2-methylpentane: det engelske navn godkendes ikke", !svar(s2, "2-methylpentane").ok && /engelske/.test(svar(s2, "2-methylpentane").tekst));
+    paastand("but-2-en og trans-but-2-en er rigtige, cis-but-2-en ikke", svar(s6, "but-2-en").ok && svar(s6, "trans-but-2-en").ok && !svar(s6, "cis-but-2-en").ok);
+    paastand("prop-1-en godkendes med en note om det kortere navn", svar(stof("propen"), "prop-1-en").ok && /propen/.test(svar(stof("propen"), "prop-1-en").note));
+    paastand("propyn for propen: en dobbeltbinding, ikke en tripelbinding", /dobbeltbinding, ikke en tripelbinding/.test(svar(stof("propen"), "propyn").tekst));
+
+    /* Alle stoffer med tal: talt fra den forkerte ende giver en forklaring */
+    var spejlFejl = [];
+    D.STOFFER.forEach(function (o) {
+        if (o.fane !== "s" || !/\d/.test(o.navn)) return;
+        var s = K.stof(o), p = s.p, n = p.n;
+        if (p.cyclo) return;
+        var spejl = function (loks, u) { return loks.map(function (q) { return u ? n - q : n + 1 - q; }); };
+        var forled = p.forled.map(function (g) { return (g.loks ? spejl(g.loks).sort().join(",") + "-" : "") + g.mult + g.navn; }).join("-");
+        var e = p.endelse || p.umaettet, endelse = e ? (e.loks ? "-" + spejl(e.loks, !p.endelse).sort().join(",") + "-" : "") + e.mult + e.type : "";
+        var t = forled + p.stammeTekst + endelse;
+        if (t === o.navn) return;
+        var r = K.tjekNavn(s, t);
+        if (r.ok || !r.tekst || r.tekst.length > 110) spejlFejl.push(o.navn + " / " + t + ": " + (r.ok ? "godkendt" : r.tekst));
+        laengde("svar", r.tekst || "", 110);
+    });
+    samlet("fane 2: alle navne talt fra den forkerte ende afvises med en kort forklaring", spejlFejl);
+
+    /* Tegninger paa fane 1 */
+    function tegnet(s, navn) { return K.tegneFejl(s, NK.NavnLaeser.laes(navn).mol); }
+    paastand("butansyre for propansyre: carbonatomet i COOH tæller med", /tæller med i stammen/.test(tegnet(stof("propansyre"), "butansyre")));
+    paastand("pentan for 2-methylbutan: stammen er fire carbonatomer", /Stammen butan er fire carbonatomer/.test(tegnet(stof("2-methylbutan"), "pentan")));
+    paastand("pentan for pent-2-en: endelsen -2-en er en dobbeltbinding", /-2-en er en dobbeltbinding/.test(tegnet(stof("pent-2-en"), "pentan")));
+    paastand("but-2-en for but-2-yn: klik på dobbeltbindingen igen", /igen/.test(tegnet(stof("but-2-yn"), "but-2-en")));
+    paastand("1-brompropan for 2-brompropan: 2-brom betyder nummer 2", /2-brom betyder et bromatom på carbonatom nummer 2/.test(tegnet(stof("2-brompropan"), "1-brompropan")));
+    paastand("hexan for cyclohexan: cyclo betyder en ring", /ring/.test(tegnet(stof("cyclohexan"), "hexan")));
+    paastand("2,4-dimethylpentan for 2,2,4-trimethylpentan: to på nummer 2 og én på nummer 4", /to på carbonatom nummer 2 og én på nummer 4/.test(tegnet(stof("2,2,4-trimethylpentan"), "2,4-dimethylpentan")));
+    samlet("teksterne er korte (tegnehint 150, skrivehint 120, forklaring 160, svar 110)", lange);
+
+    /* ================================================================= */
+    overskrift("2. Stofklasserne: kontakterne i panelet");
+    var nT = D.STOFFER.filter(function (o) { return o.fane === "t"; }).length, nS = D.STOFFER.filter(function (o) { return o.fane === "s"; }).length;
+    paastand("fra start er alle seks stofklasser fra kemi C slået til", NK.klasser().join(",") === ALLE.join(","));
+    paastand("fane 1 har " + nT + " opgaver og fane 2 " + nS, T.opgaver.length === nT && S.opgaver.length === nS, T.opgaver.length + " og " + S.opgaver.length);
+    paastand("opgaverne står efter niveau: Let, Middel, Svær", [T, S].every(function (s) {
+        return s.opgaver.every(function (o, i) { return i === 0 || s.opgaver[i - 1].niv <= o.niv; });
+    }));
+    paastand("fane 1 begynder med en kæde, man trækker (propan)", T.opgaver[0].id === "propan", T.opgaver[0].id);
+    paastand("de første seks opgaver har hver sin stofklasse", T.opgaver.slice(0, 6).map(function (o) { return o.o.k; }).join(",") === ALLE.join(","));
+    function kontakt(id) { return d.querySelector('#fane-t .klasseknap[data-klasse="' + id + '"]'); }
+    paastand("der er seks kontakter i panelet på hver fane", d.querySelectorAll("#fane-t .klasseknap").length === 6 && d.querySelectorAll(".klasseknap").length === 12);
+    ["alkan", "alken", "alkyn", "halogen"].forEach(function (k) { kontakt(k).click(); });
+    paastand("kun alkohol og carboxylsyre (som i afsnit B3.1): opgaverne er kun dem", T.opgaver.every(function (o) { return o.o.k === "alkohol" || o.o.k === "carboxylsyre"; }) &&
+        S.opgaver.every(function (o) { return o.o.k === "alkohol" || o.o.k === "carboxylsyre"; }) && T.opgaver.length > 8);
+    paastand("valget huskes i browseren", (JSON.parse(W.localStorage.getItem("nk-sb3.1-klasser")) || []).join(",") === "alkohol,carboxylsyre");
+    T.vaelg(T.idx("propansyre"));
+    paastand("med alkohol og carboxylsyre: Kæde, −OH, =O, −COOH og Ring", T.vaerktoejer.map(function (v) { return v.tekst; }).join(" ") === "Kæde −OH =O −COOH ⬡ Ring", T.vaerktoejer.map(function (v) { return v.tekst; }).join(" "));
+    T.vaelg(T.idx("chlorethansyre"));
+    paastand("chlorethansyre får −Cl, også når halogenalkanerne er slået fra", T.vaerktoejer.some(function (v) { return v.id === "halogen:Cl"; }));
+    kontakt("carboxylsyre").click();
+    kontakt("alkohol").click();
+    paastand("den sidste stofklasse kan ikke slås fra, og panelet siger hvorfor", NK.klasser().join(",") === "alkohol" &&
+        /Mindst én stofklasse/.test(d.querySelector("#fane-t .klasse-note").textContent));
+    kontakt("alkyn").click();
+    paastand("med alkyner kommer = Binding, og tavlen må lave tripelbindinger", T.vaerktoejer.some(function (v) { return v.id === "binding"; }) && T.braet.r.tripel === true);
+    NK.saetKlasser(["alken"]);
+    paastand("kun alkener: tavlen må ikke lave tripelbindinger", T.braet.r.tripel === false);
+    NK.saetKlasser(ALLE);
+    paastand("alle seks slået til igen: alle opgaver er med", T.opgaver.length === nT && S.opgaver.length === nS);
+
+    /* ================================================================= */
+    overskrift("3. Fane 1: Tegn molekylet");
+    visFane("fane-t");
+    var b = T.braet;
+    var uloest = [], udenStjerne = [], startFejl = [], hoej = [];
+    T.opgaver.forEach(function (o, i) {
+        T.vaelg(i);
+        if (b.antal() !== 1 || T.faerdig || T.liveNavn) startFejl.push(o.id);
+        if (kortH("t") > T.kortZone()) hoej.push(o.id + ": " + kortH("t"));
+        b.saet(T.stof.mol.kopi());
+        if (!T.faerdig) { uloest.push(o.id); return; }
+        if (!T.status[i].stjerne) udenStjerne.push(o.id);
+        if (kortH("t") > T.kortZone()) hoej.push(o.id + " løst: " + kortH("t"));
+    });
+    samlet("alle opgaver begynder med kun startatomet og uden navn under", startFejl);
+    samlet("alle " + nT + " opgaver er løst, når tegningen er stoffet", uloest);
+    samlet("en opgave løst uden Vis svaret får en stjerne", udenStjerne);
+    samlet("kortet holder sig inden for sin plads", hoej);
+    paastand("listen viser alle løste", el("t-loest").textContent === String(nT));
+    paastand("når alt er løst, fører kortets knap videre til fane 2", /Skriv navnet/.test(videre("t").textContent), videre("t").textContent);
+
+    W.localStorage.removeItem("nk-sb3.1-t");
+    T.saetAktive(ALLE);
+
+    /* Med musen: traek fra startatomet bygger kaeden, og navnet staar under den */
+    T.vaelg(T.idx("hexan"));
+    var p0 = b.px(b.mol.atomer[0]), sk = b.s();
+    peger(T, "pointerdown", p0);
+    for (var u = 1; u <= 12; u++) peger(T, "pointermove", { x: p0.x + u * sk * 0.3, y: p0.y });
+    peger(T, "pointerup", { x: p0.x + 3.6 * sk, y: p0.y });
+    paastand("et træk med musen fra startatomet bygger en kæde, og dens navn står under den", b.antal() >= 3 && b.mol.fragmenter().length === 1 &&
+        /an$/.test(T.liveNavn || ""), b.antal() + " " + T.liveNavn);
+
+    /* Et klik paa enden af kaeden goer den ét carbonatom laengere */
+    function klikEnde() {
+        var e = null;
+        b.mol.atomer.forEach(function (a) { if (b.mol.grad(a.id) <= 1 && (!e || b.px(a).x > b.px(e).x)) e = a; });
+        klikTavle(b.px(e));
+    }
+    T.vaelg(T.idx("propan"));
+    klikEnde();
+    paastand("et klik på startatomet: ethan står under tegningen", T.liveNavn === "ethan" && !T.faerdig, T.liveNavn);
+    klikEnde();
+    paastand("et klik mere: propan er løst", T.faerdig && T.liveNavn === "propan", T.liveNavn);
+
+    T.vaelg(T.idx("2-methylbutan"));
+    klikEnde(); klikEnde(); klikEnde();
+    paastand("en kæde med fire carbonatomer hedder butan under tegningen, og der er ingen fejl endnu", T.liveNavn === "butan" && !T.faerdig && T.fast.klasse !== "skidt", T.liveNavn);
+    var foerKlik = b.antal();
+    klikTavle({ x: T.lay.tavle.x + 40, y: T.lay.tavle.y + T.lay.tavle.h - 50 });
+    paastand("et klik i den tomme tavle sætter ikke et nyt atom", b.antal() === foerKlik);
+    klikEnde();
+    paastand("et klik på kædens ende gør den længere: pentan, og kortet siger, hvad stammen butan betyder", b.antal() === 5 && /Du har tegnet pentan\. Stammen butan/.test(T.beskedTekst()), T.beskedTekst());
+    paastand("kortet med fejlen holder sig inden for sin plads", kortH("t") <= T.kortZone(), kortH("t"));
+    var nyEnde = b.mol.atomer[b.mol.atomer.length - 1];
+    peger(T, "pointerdown", b.px(nyEnde), 2);
+    paastand("et højreklik på enden sletter atomet, og fejlen forsvinder", b.antal() === 4 && T.fast.klasse !== "skidt");
+    /* Sidegruppen: klik paa carbonatom nummer 2 med Kaede */
+    var res = NK.Navn.analyser(b.mol), c2 = res.kaede[1];
+    klikTavle(b.px(c2));
+    paastand("et klik på carbonatom nummer 2 sætter methylgruppen på: 2-methylbutan er løst", T.faerdig, T.liveNavn);
+    paastand("den færdige tegning har navnedelenes farver", !!b.atomFarve && !!b.bindingFarve && b.mol.bindinger.some(function (bd) { return b.bindingFarve(bd); }));
+    var foerLaas = b.antal();
+    klikTavle(b.px(b.mol.atomer[0]));
+    klikPunkt(T, b.px(b.mol.atomer[0]));
+    paastand("låsen: der kan ikke tegnes videre, når opgaven er løst, og kortet blinker", b.antal() === foerLaas && el("t-skort").classList.contains("blink"));
+
+    /* Vaerktoejerne */
+    function vt(id) { return el("t-vaerktoej").querySelector('[data-vt="' + id + '"]'); }
+    T.vaelg(T.idx("2-brompropan"));
+    b.saet(NK.NavnLaeser.laes("propan").mol);
+    vt("halogen:Br").click();
+    paastand("−Br er valgt", b.vaerktoej === "halogen:Br" && vt("halogen:Br").classList.contains("aktiv"));
+    var kp = NK.Navn.analyser(b.mol).kaede;
+    klikTavle(b.px(kp[0]));
+    paastand("−Br på carbonatom nummer 1: 1-brompropan, og kortet siger, hvad 2-brom betyder", T.liveNavn === "1-brompropan" && /2-brom betyder et bromatom på carbonatom nummer 2/.test(T.beskedTekst()), T.beskedTekst());
+    paastand("efter −Br er værktøjet Kæde igen", b.vaerktoej === "tegn");
+    T.fortryd();
+    vt("halogen:Br").click();
+    klikTavle(b.px(kp[1]));
+    paastand("Fortryd, og −Br på nummer 2: 2-brompropan er løst", T.faerdig, T.liveNavn);
+
+    T.vaelg(T.idx("but-2-yn"));
+    b.saet(NK.NavnLaeser.laes("butan").mol);
+    vt("binding").click();
+    var kb = NK.Navn.analyser(b.mol).kaede, midt = function () { var A = b.px(kb[1]), B = b.px(kb[2]); return { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 }; };
+    klikTavle(b.px(kb[0]));
+    paastand("= Binding: et klik på et atom gør intet, men siger, hvor der skal klikkes", b.antal() === 4 && /stregen mellem to carbonatomer/.test(T.beskedTekst()), T.beskedTekst());
+    klikTavle(midt());
+    paastand("første klik på bindingen: but-2-en, og kortet siger: klik igen", T.liveNavn === "but-2-en" && /igen/.test(T.beskedTekst()), T.liveNavn + " / " + T.beskedTekst());
+    klikTavle(midt());
+    paastand("andet klik: but-2-yn er løst", T.faerdig, T.liveNavn);
+
+    T.vaelg(T.idx("propansyre"));
+    b.saet(NK.NavnLaeser.laes("propan").mol);
+    vt("gruppe:COOH").click();
+    var kq = NK.Navn.analyser(b.mol).kaede;
+    klikTavle(b.px(kq[0]));
+    paastand("−COOH på enden af propan: butansyre, og kortet siger, at carbonatomet i COOH tæller med", T.liveNavn === "butansyre" && /tæller med i stammen/.test(T.beskedTekst()), T.beskedTekst());
+    T.fortryd();
+    T.fortryd();
+    paastand("Fortryd to gange: kun startatomet", b.antal() <= 2);
+
+    T.vaelg(T.idx("cyclohexan"));
+    vt("ring6").click();
+    klikTavle({ x: T.lay.tavle.x + T.lay.tavle.b / 2, y: T.lay.tavle.y + T.lay.tavle.h / 2 });
+    paastand("Ring på en tom tavle: ringen kommer i stedet for startatomet, og cyclohexan er løst", T.faerdig && b.antal() === 6, b.antal() + " " + T.liveNavn);
+
+    T.vaelg(T.idx("ethanol"));
+    b.saet(NK.NavnLaeser.laes("ethanol").mol);
+    paastand("ethanol tegnet med −OH er løst", T.faerdig);
+    T.vaelg(T.idx("propan-1-ol"));
+    b.saet(NK.NavnLaeser.laes("ethanol").mol);
+    var oAtom = b.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+    klikTavle(b.px(oAtom));
+    paastand("Kæde på et oxygenatom bygger ikke videre, og kortet siger hvorfor", b.antal() === 3 && /carbonatom/.test(T.beskedTekst()), T.beskedTekst());
+
+    /* Hint og Vis svaret */
+    T.vaelg(T.idx("4-methylpentan-2-ol"));
+    el("t-knap").click();
+    paastand("første hint: tegn kæden først", /Stammen pentan er fem carbonatomer i træk/.test(T.beskedTekst()), T.beskedTekst());
+    el("t-knap").click(); el("t-knap").click();
+    paastand("tredje hint handler om forleddet, og så kommer Vis svaret", /Forleddet 4-methyl/.test(T.beskedTekst()) && el("t-knap").textContent === "Vis svaret");
+    paastand("kortet med et hint holder sig inden for sin plads", kortH("t") <= T.kortZone(), kortH("t"));
+    el("t-knap").click();
+    paastand("Vis svaret tegner molekylet: løst uden stjerne", T.faerdig && !T.status[T.nr].stjerne && NK.Navn.analyser(b.mol).navn === "4-methylpentan-2-ol");
+    videre("t").click();
+    paastand("knappen på kortet går til en opgave, der ikke er løst", !T.faerdig && !T.status[T.nr].loest);
+
+    /* ================================================================= */
+    overskrift("4. Fane 2: Skriv navnet");
+    visFane("fane-s");
+    var sUloest = [], sStjerne = [], sHoej = [], sStart = [], sKasse = [];
+    S.opgaver.forEach(function (o, i) {
+        S.vaelg(i);
+        if (S.input.value || S.dit || S.faerdig || el("s-feltrad").hidden) sStart.push(o.id);
+        if (kortH("s") > S.kortZone()) sHoej.push(o.id + ": " + kortH("s"));
+        skrivNavn(o.id);
+        if (!S.faerdig) { sUloest.push(o.id); return; }
+        if (!S.status[i].stjerne) sStjerne.push(o.id);
+        if (!S.ditGeo || !el("s-feltrad").hidden) sKasse.push(o.id);
+        if (kortH("s") > S.kortZone()) sHoej.push(o.id + " løst: " + kortH("s"));
+    });
+    samlet("alle opgaver begynder med et tomt felt og en tom kasse", sStart);
+    samlet("alle " + nS + " opgaver er løst, når navnet skrives", sUloest);
+    samlet("en opgave løst uden Vis svaret får en stjerne", sStjerne);
+    samlet("når navnet er rigtigt, er det tegnet i kassen, og feltet er væk", sKasse);
+    samlet("kortet holder sig inden for sin plads", sHoej);
+    paastand("når alt er løst, fører kortets knap videre til fane 1", /Tegn molekylet/.test(videre("s").textContent), videre("s").textContent);
+
+    W.localStorage.removeItem("nk-sb3.1-s");
+    S.saetAktive(ALLE);
+    S.vaelg(S.idx("3-methylbutan-2-ol"));
+    el("s-tjek").click();
+    paastand("Tjek med et tomt felt: kortet beder om et navn, og intet er forkert", /Skriv navnet i feltet/.test(S.beskedTekst()) && !S.dit && S.fast.klasse !== "skidt", S.beskedTekst());
+    skrivNavn("3-methylbutan-1-ol");
+    paastand("et andet stof: kassen tegner det, og kortet siger, hvor OH-gruppen sidder", !S.faerdig && !!S.ditGeo && /OH-gruppen sidder/.test(S.beskedTekst()) && S.input.classList.contains("forkert"), S.beskedTekst());
+    paastand("kortet med fejlen holder sig inden for sin plads", kortH("s") <= S.kortZone(), kortH("s"));
+    skrivNavn("2-methylbutan-3-ol");
+    paastand("det rigtige stof, talt fra den forkerte ende: kassen tegner det samme molekyle", S.dit.same && /anden ende/.test(S.beskedTekst()), S.beskedTekst());
+    paastand("efter et forkert svar lyser hjælpeknappen", el("s-knap").classList.contains("peg"));
+    el("s-knap").click();
+    var fk1 = S.fokusNu();
+    paastand("hint 1 af 4: den længste kæde er gul (fire carbonatomer)", /Hint 1 af 4/.test(S.beskedTekst()) && !!fk1 && Object.keys(fk1).length === 4 &&
+        S.stof.res.kaede.every(function (id) { return fk1[id]; }), S.beskedTekst());
+    el("s-knap").click();
+    paastand("hint 2: numrene står på kæden, og intet er gult", /Numrene står på kæden/.test(S.beskedTekst()) && S.visNumre && S.fokusNu() === null);
+    el("s-knap").click();
+    var fk3 = S.fokusNu(), ohO = S.stof.sig.ohAtomer[0];
+    paastand("hint 3: OH-gruppen og dens carbonatom er gule", /Endelsen er -2-ol/.test(S.beskedTekst()) && !!fk3 && fk3[ohO] === true && Object.keys(fk3).length === 2);
+    el("s-knap").click();
+    var fk4 = S.fokusNu();
+    paastand("hint 4: sidegruppen og dens carbonatom er gule", /3-methyl/.test(S.beskedTekst()) && !!fk4 && Object.keys(fk4).length === 2 && !fk4[ohO] && el("s-knap").textContent === "Vis svaret");
+    paastand("kortet med et hint holder sig inden for sin plads", kortH("s") <= S.kortZone(), kortH("s"));
+    paastand("mens der gives hint, har formlen ingen farvede svar", S.farve.gl.length === 0 && !Object.keys(S.farve.b).length);
+    el("s-knap").click();
+    paastand("Vis svaret skriver navnet i feltet og tegner det: løst uden stjerne", S.faerdig && !S.status[S.nr].stjerne && S.input.value === "3-methylbutan-2-ol" && el("s-skort").classList.contains("svar"));
+    paastand("når navnet er løst, har formlen alle tre farver og intet gult", S.farve.gl.length === 3 && S.fokusNu() === null);
+    S.input.value = "noget andet";
+    el("s-tjek").click();
+    paastand("låsen: Tjek gør intet, når opgaven er løst, og kortet blinker", S.faerdig && el("s-skort").classList.contains("blink"));
+    videre("s").click();
+    paastand("knappen på kortet går til en opgave, der ikke er løst, og feltet er tomt", !S.faerdig && !S.status[S.nr].loest && S.input.value === "" && !el("s-feltrad").hidden);
+    S.vaelg(S.idx("propan-1,2,3-triol"));
+    skrivNavn("glycerol");
+    paastand("glycerol: trivialnavnet godkendes ikke, men tegnes", !S.faerdig && /trivialnavn/.test(S.beskedTekst()) && !!S.ditGeo);
+    skrivNavn("1,2,3-propantriol");
+    paastand("1,2,3-propantriol: godkendt med den nyere skrivemåde på det grønne kort", S.faerdig && /nyere skrivemåde er propan-1,2,3-triol/.test(kortTekst("s")), kortTekst("s"));
+    S.vaelg(S.idx("ethan"));
+    skrivNavn("ethanxyz");
+    paastand("et navn, tavlen ikke kan læse: et ? i kassen og en forklaring", !S.faerdig && !!S.dit && !S.dit.mol && S.beskedTekst().length > 10, S.beskedTekst());
+
+    /* ================================================================= */
+    overskrift("5. Størrelser: kortet dækker aldrig whiteboardet");
+    [[1100, 620], [1300, 760], [1600, 950]].forEach(function (st) {
+        storrelse(st[0], st[1]);
+        var navn = st[0] + " × " + st[1];
+        visFane("fane-t");
+        T.vaelg(T.idx("2,2,4-trimethylpentan"));
+        var th = kortH("t");
+        el("t-knap").click(); th = Math.max(th, kortH("t"));
+        el("t-knap").click(); th = Math.max(th, kortH("t"));
+        T.besked("", "");
+        b.saet(NK.NavnLaeser.laes("2,4-dimethylpentan").mol);
+        b.saet(NK.NavnLaeser.laes("2,3,4-trimethylpentan").mol);
+        th = Math.max(th, kortH("t"));
+        paastand(navn + ": fane 1, kortet er højst " + T.kortZone() + " px med det længste hint og den længste fejl", th <= T.kortZone(), th);
+        var kort = el("t-skort").getBoundingClientRect(), tl = T.L.canvas.getBoundingClientRect(), vt0 = el("t-vaerktoej").getBoundingClientRect();
+        paastand(navn + ": fane 1, whiteboardet begynder under kortet", kort.bottom <= tl.top + T.lay.tavle.y && T.lay.tavle.h >= 250, Math.round(T.lay.tavle.h));
+        var knapperVt = Array.prototype.slice.call(el("t-vaerktoej").querySelectorAll(".vtknap"));
+        var top0 = knapperVt[0].getBoundingClientRect().top;
+        paastand(navn + ": fane 1, alle værktøjer står på én linje på whiteboardet", knapperVt.every(function (k) { return Math.abs(k.getBoundingClientRect().top - top0) < 2; }) &&
+            vt0.right <= tl.left + T.lay.tavle.x + T.lay.tavle.b && vt0.left >= tl.left + T.lay.tavle.x);
+        var felt = T.felt(), sk2 = T.skala();
+        paastand(navn + ": fane 1, otte carbonatomer i træk kan tegnes på tavlen", felt.b >= 7 * 0.866 * sk2 + 40 && felt.h >= 3 * sk2, Math.round(felt.b) + " × " + Math.round(felt.h) + ", skala " + sk2);
+
+        visFane("fane-s");
+        S.vaelg(S.idx("3-ethyl-2-methylpentan"));
+        var sh = kortH("s");
+        skrivNavn("2-methyl-3-ethylpentan"); sh = Math.max(sh, kortH("s"));
+        skrivNavn("3-ethyl-2-methylhexan"); sh = Math.max(sh, kortH("s"));
+        skrivNavn("2,3dimethylbutan"); sh = Math.max(sh, kortH("s"));
+        for (var h = 0; h < 4; h++) { el("s-knap").click(); sh = Math.max(sh, kortH("s")); }
+        paastand(navn + ": fane 2, kortet er højst " + S.kortZone() + " px med fejl og hint", sh <= S.kortZone(), sh);
+        var ks = el("s-skort").getBoundingClientRect(), sl = S.L.canvas.getBoundingClientRect();
+        paastand(navn + ": fane 2, whiteboardet begynder under kortet", ks.bottom <= sl.top + S.lay.tavle.y && S.lay.tavle.h >= 250, Math.round(S.lay.tavle.h));
+        var ude = [];
+        S.opgaver.forEach(function (o, i) {
+            S.vaelg(i);
+            var g = S.geo, v = S.venstre;
+            if (g.x0 < v.x || g.x1 > v.x + v.b || g.y0 < v.y || g.y1 > v.y + v.h) ude.push(o.id);
+        });
+        samlet(navn + ": fane 2, alle formler ligger til venstre for kassen", ude);
+        S.vaelg(S.idx("2,4-dimethylhexan"));
+        skrivNavn("2,4-dimethyloctan");
+        var dg = S.ditGeo, k = S.kasse;
+        paastand(navn + ": fane 2, et langt navn tegnes inde i kassen", !!dg && dg.x0 >= k.x && dg.x1 <= k.x + k.b && dg.y0 >= k.y + 30 && dg.y1 <= k.y + k.h - 36,
+            dg ? [Math.round(dg.x0), Math.round(dg.x1), Math.round(dg.y0), Math.round(dg.y1)].join(",") + " i " + [k.x, k.x + k.b, k.y, k.y + k.h].join(",") : "");
+        var kk = d.querySelector("#fane-s .klassekort").getBoundingClientRect(), pl = d.querySelector("#fane-s .panel").getBoundingClientRect();
+        paastand(navn + ": de seks kontakter kan ses i panelet uden at rulle", kk.top >= pl.top && kk.bottom <= pl.bottom, Math.round(kk.bottom) + " mod " + Math.round(pl.bottom));
+    });
+    storrelse(1300, 760);
+
+    /* ================================================================= */
+    overskrift("6. Sproget og rammen");
+    var tekster = [d.body.textContent];
+    D.STOFFER.forEach(function (o) {
+        var s = K.stof(o);
+        tekster.push(K.forklaring(s));
+        K.tegneHints(s).forEach(function (h) { tekster.push(h); });
+        K.skriveHints(s).forEach(function (h) { tekster.push(h.tekst); });
+    });
+    D.VAERKTOEJ.forEach(function (v) { tekster.push(v.titel); });
+    var alt = tekster.join(" \n ");
+    paastand("ingen tankestreger i teksterne", !/[–—]/.test(alt), (/.{20}[–—].{20}/.exec(alt) || [""])[0]);
+    paastand("ingen omskrevne æ, ø og å i det, eleven læser", !ASCII_ORD.test(alt), (ASCII_ORD.exec(alt) || [""])[0]);
+    paastand("ingen Kemichael i animationen", !/kemichael/i.test(d.documentElement.innerHTML));
+    paastand("to faner, Teori, rundvisning og et link til tegnebrættet", d.querySelectorAll(".faneknap").length === 2 && !!el("teoriknap") && !!el("hjaelpknap") &&
+        /tegnebraet\/index\.html$/.test(d.querySelector("a.linkknap").getAttribute("href")));
+    paastand("der er ingen tekstlinje nederst i scenen: al tekst står på kortet", d.querySelectorAll(".statuslinje").length === 0 &&
+        [el("t-besked"), el("s-besked")].every(function (e) { return !!e.closest(".scenekort"); }));
+    paastand("hjælpeknappen er gul og står på kortet på begge faner", ["t", "s"].every(function (f) {
+        return el(f + "-knap").classList.contains("hjaelp") && !!el(f + "-knap").closest(".scenekort");
+    }));
+    paastand("feltet til navnet står på kortet", !!el("s-input").closest(".scenekort"));
+    el("teoriknap").click();
+    paastand("Teori åbner kun, når eleven trykker, og har navnets tre dele som i B3.1", el("teori").classList.contains("vis") && /forled/.test(el("teori").textContent) && /4-methyl/.test(el("teori").textContent));
+    d.querySelector("#teori [data-luk]").click();
+    paastand("Teori kan lukkes igen", !el("teori").classList.contains("vis"));
+    ["fane-t", "fane-s"].forEach(function (f) {
+        visFane(f);
+        NK.Rundvisning.start(f);
+        var rv = 0, n = 0;
+        while (NK.Rundvisning.aktiv() && rv++ < 12) el("rv-naeste").click();
+        paastand("rundvisningen på " + f + " kan gennemføres", rv >= 4 && rv <= 7, rv);
+    });
+
+    NK.saetKlasser(D.STANDARD);
+}
+</script>
+</body>
+</html>

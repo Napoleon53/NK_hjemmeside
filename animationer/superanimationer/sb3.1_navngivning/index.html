@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navngivning</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⌬</span> Navngivning</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-t" role="tab" aria-selected="true"><span class="nr">1</span>Tegn molekylet</button>
+        <button class="faneknap" data-fane="fane-s" role="tab" aria-selected="false"><span class="nr">2</span>Skriv navnet</button>
+    </div>
+
+    <a class="ikonknap tekstknap linkknap" href="../tegnebraet/index.html" target="_blank" rel="noopener" title="Åbn tegnebrættet i en ny fane: tegn frit, og se navnene">Tegnebræt ↗</a>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: TEGN MOLEKYLET                                             -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-t" role="tabpanel" aria-label="Tegn molekylet">
+    <div class="scene">
+        <canvas id="t-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="t-skort">
+            <div class="sk-ind" id="t-ind"></div>
+            <div class="sk-bund" id="t-status">
+                <p class="st-tekst" id="t-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="t-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <!-- Vaerktoejerne ligger oeverst paa whiteboardet (js/sim_tegn.js) -->
+        <div class="tegnevaerktoej" id="t-vaerktoej">
+            <span class="vt-gruppe" id="t-vt"></span>
+            <span class="vt-gruppe vt-hoejre">
+                <button type="button" class="vtknap let" id="t-fortryd" title="Fortryd det sidste (Ctrl+Z)">↶ Fortryd</button>
+                <button type="button" class="vtknap let" id="t-ryd" title="Ryd tavlen og begynd forfra (R)">Ryd</button>
+            </span>
+        </div>
+        <div class="anker" id="t-anker-tavle"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort klassekort">
+            <h2>Stofklasser <span class="taeller">vælg, hvad der er med</span></h2>
+            <div class="klasser"></div>
+            <p class="klasse-note" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="t-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="t-loest">0</b>/<span id="t-ialt">0</span></span></h2>
+            <div class="opg-liste" id="t-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SKRIV NAVNET                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-s" role="tabpanel" aria-label="Skriv navnet">
+    <div class="scene">
+        <canvas id="s-laerred"></canvas>
+        <div class="scenekort" id="s-skort">
+            <div class="sk-ind" id="s-ind"></div>
+            <!-- Feltet staar fast her, saa det, eleven skriver, bliver staaende,
+                 naar kortet tegnes igen (js/sim_skriv.js) -->
+            <div class="sk-felt" id="s-feltrad">
+                <input type="text" id="s-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="fx 2-methylbutan" aria-label="Molekylets navn">
+                <button type="button" class="tjekknap" id="s-tjek">Tjek</button>
+            </div>
+            <div class="sk-bund" id="s-status">
+                <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="s-anker-tavle"></div>
+        <div class="anker" id="s-anker-kasse"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort klassekort">
+            <h2>Stofklasser <span class="taeller">vælg, hvad der er med</span></h2>
+            <div class="klasser"></div>
+            <p class="klasse-note" aria-live="polite"></p>
+        </div>
+
+        <div class="kort" id="s-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="s-loest">0</b>/<span id="s-ialt">0</span></span></h2>
+            <div class="opg-liste" id="s-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Navngivning</h2>
+        <p>Et systematisk navn er en opskrift på molekylet. Det har tre dele: forled, stamme og endelse.</p>
+        <div class="eksempel navneeksempel">
+            <span class="ne-del" style="--delfarve:#f0a35a">4-methyl<small>forled</small></span><span class="ne-del" style="--delfarve:#8ab8ff">pentan<small>stamme</small></span><span class="ne-del" style="--delfarve:#4fd6b8">-2-ol<small>endelse</small></span>
+        </div>
+        <h3 class="teori-hoved">Sådan finder du navnet</h3>
+        <p>1. Find den længste carbonkæde, som den funktionelle gruppe sidder på. Antallet af carbonatomer giver stammen: meth, eth, prop, but, pent, hex, hept, oct.<br>
+           2. Nummerér kæden fra den ende, der giver gruppen det laveste tal.<br>
+           3. Sæt endelsen på. Tallet foran endelsen viser, hvor gruppen sidder.<br>
+           4. Skriv sidegrupperne foran med deres tal: 2-methyl, 3-ethyl, 2-brom.</p>
+        <h3 class="teori-hoved">Stofklasserne fra kemi C</h3>
+        <table class="teoritabel">
+            <tr><th>Stofklasse</th><th>Gruppe</th><th>I navnet</th><th>Eksempel</th></tr>
+            <tr><td>Alkan</td><td>kun enkeltbindinger</td><td>-an</td><td>2-methylbutan</td></tr>
+            <tr><td>Alken</td><td>C=C</td><td>-en</td><td>but-2-en</td></tr>
+            <tr><td>Alkyn</td><td>C≡C</td><td>-yn</td><td>but-1-yn</td></tr>
+            <tr><td>Halogenalkan</td><td>−Cl, −Br</td><td>chlor, brom foran</td><td>2-brompropan</td></tr>
+            <tr><td>Alkohol</td><td>−OH</td><td>-ol</td><td>propan-2-ol</td></tr>
+            <tr><td>Carboxylsyre</td><td>−COOH</td><td>-syre</td><td>propansyre</td></tr>
+        </table>
+        <h3 class="teori-hoved">Flere regler</h3>
+        <p>En sidegruppe hedder som alkanen, men ender på -yl: methyl har ét carbonatom, ethyl to. To ens sidegrupper får di foran, tre får tri: 2,3-dimethylbutan. Forskellige sidegrupper står i alfabetisk rækkefølge: 3-ethyl-2-methylpentan.</p>
+        <p>Der står intet tal, når gruppen kun kan sidde ét sted: ethanol, propen, propansyre. I en carboxylsyre er carbonatomet i COOH altid nummer 1, og det tæller med i stammen. Cyclo betyder, at carbonatomerne sidder i en ring: cyclohexan.</p>
+        <p>Er OH ikke den vigtigste gruppe, hedder den hydroxy og står foran: 2-hydroxypropansyre (mælkesyre).</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> ryd tavlen &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/trivialnavne.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="../../molekylemotor/js/navnlaeser.js"></script>
+<script src="../../molekylemotor/js/tavle.js"></script>
+<script src="../../molekylemotor/js/tegnebraet.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_tegn.js"></script>
+<script src="js/sim_skriv.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

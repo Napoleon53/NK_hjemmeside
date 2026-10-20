@@ -5,7 +5,7 @@
    blandes og ligger med bagsiden op. To brikker, der kommer fra det
    samme kort, er et par. Tiden loeber, til alle par er fundet, og de
    gange, to brikker ikke passede sammen, taelles som fejl. To brikker,
-   der ikke passer, bliver liggende, til de kan vaere laest (V.laesetid).
+   der ikke passer, bliver liggende, til eleven klikker paa en ny brik.
 
    Brikkerne er knapper, saa spillet ogsaa kan spilles med tastaturet.
    ===================================================================== */
@@ -22,26 +22,12 @@
     var parAntal = 8;
     var brikker = [];
     var aabne = [];
-    var venter = 0;
     var fejl = 0;
     var fundet = 0;
     var start = 0;
     var ur = 0;
     var koerer = false;
     var slut = false;
-
-    /* To brikker, der ikke passer, bliver liggende, til eleven har naaet at
-       laese dem begge: en fast tid plus lidt pr. tegn paa de to brikker.
-       Et symbol og et navn giver knap 2 s, et fagord og en forklaring ca.
-       4 s. Et klik paa en ny brik vender dem med det samme. */
-    var VENT_MINDST = 1500;
-    var VENT_PR_TEGN = 35;
-    var VENT_HOEJST = 5500;
-
-    V.laesetid = function (a, b) {
-        var tegn = String(a || "").length + String(b || "").length;
-        return Math.min(VENT_HOEJST, VENT_MINDST + VENT_PR_TEGN * tegn);
-    };
 
     V.saetSaet = function (nyt, nyNoegle) {
         saet = nyt;
@@ -61,8 +47,6 @@
         stopUr();
         brikker = [];
         aabne = [];
-        clearTimeout(venter);
-        venter = 0;
         fejl = 0;
         fundet = 0;
         koerer = false;
@@ -142,7 +126,9 @@
 
     V.klik = function (nr) {
         if (slut || !brikker[nr]) return;
-        if (venter) { clearTimeout(venter); venter = 0; luk(); }
+        /* To brikker, der ikke passede, ligger aabne uden nedtaelling,
+           til eleven klikker paa en ny brik (Niels 20. okt. 2026). */
+        if (aabne.length === 2) luk();
         var e = brikEl(nr);
         if (!e || e.classList.contains("fundet") || aabne.indexOf(nr) >= 0) return;
         startUr();
@@ -169,16 +155,9 @@
             tegn();
         } else {
             fejl++;
-            var ms = V.laesetid(a.tekst, b.tekst);
-            aabne.forEach(function (i) {
-                var t = brikEl(i);
-                /* Stregen i bunden af brikken loeber ud paa samme tid */
-                t.style.setProperty("--vent", ms + "ms");
-                t.classList.add("gal");
-            });
-            status("De to hører ikke sammen. Læs dem begge, inden de vender sig igen.");
+            aabne.forEach(function (i) { brikEl(i).classList.add("gal"); });
+            status("De to hører ikke sammen. De vender sig, når du klikker på en ny brik.");
             tegn();
-            venter = setTimeout(function () { venter = 0; luk(); }, ms);
         }
     };
 
