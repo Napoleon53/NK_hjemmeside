@@ -239,18 +239,24 @@ function koerTest(W) {
     overskrift("3. Fane 1: Tegn molekylet");
     visFane("fane-t");
     var b = T.braet;
-    var uloest = [], udenStjerne = [], startFejl = [], hoej = [];
+    /* Tegningen tjekkes kun, naar eleven trykker Test */
+    function test() { el("t-test").click(); }
+    function navnTekst() { return el("t-navn").textContent; }
+    var uloest = [], udenStjerne = [], startFejl = [], hoej = [], udenTest = [];
     T.opgaver.forEach(function (o, i) {
         T.vaelg(i);
-        if (b.antal() !== 1 || T.faerdig || T.liveNavn) startFejl.push(o.id);
+        if (b.antal() !== 1 || T.faerdig || T.liveNavn || navnTekst()) startFejl.push(o.id);
         if (kortH("t") > T.kortZone()) hoej.push(o.id + ": " + kortH("t"));
         b.saet(T.stof.mol.kopi());
+        if (T.faerdig || navnTekst()) udenTest.push(o.id);
+        test();
         if (!T.faerdig) { uloest.push(o.id); return; }
         if (!T.status[i].stjerne) udenStjerne.push(o.id);
         if (kortH("t") > T.kortZone()) hoej.push(o.id + " løst: " + kortH("t"));
     });
-    samlet("alle opgaver begynder med kun startatomet og uden navn under", startFejl);
-    samlet("alle " + nT + " opgaver er løst, når tegningen er stoffet", uloest);
+    samlet("alle opgaver begynder med kun startatomet og uden navn", startFejl);
+    samlet("en rigtig tegning er ikke løst og har intet navn, før der trykkes Test", udenTest);
+    samlet("alle " + nT + " opgaver er løst, når tegningen er stoffet, og der trykkes Test", uloest);
     samlet("en opgave løst uden Vis svaret får en stjerne", udenStjerne);
     samlet("kortet holder sig inden for sin plads", hoej);
     paastand("listen viser alle løste", el("t-loest").textContent === String(nT));
@@ -265,8 +271,10 @@ function koerTest(W) {
     peger(T, "pointerdown", p0);
     for (var u = 1; u <= 12; u++) peger(T, "pointermove", { x: p0.x + u * sk * 0.3, y: p0.y });
     peger(T, "pointerup", { x: p0.x + 3.6 * sk, y: p0.y });
-    paastand("et træk med musen fra startatomet bygger en kæde, og dens navn står under den", b.antal() >= 3 && b.mol.fragmenter().length === 1 &&
-        /an$/.test(T.liveNavn || ""), b.antal() + " " + T.liveNavn);
+    paastand("et træk med musen fra startatomet bygger en kæde, og navnet står der ikke, før der trykkes Test", b.antal() >= 3 && b.mol.fragmenter().length === 1 &&
+        /an$/.test(T.liveNavn || "") && navnTekst() === "", b.antal() + " " + T.liveNavn + " / " + navnTekst());
+    test();
+    paastand("Test: navnet på kæden står ved knappen", new RegExp("hedder: " + T.liveNavn).test(navnTekst()), navnTekst());
 
     /* Et klik paa enden af kaeden goer den ét carbonatom laengere */
     function klikEnde() {
@@ -275,27 +283,39 @@ function koerTest(W) {
         klikTavle(b.px(e));
     }
     T.vaelg(T.idx("propan"));
+    test();
+    paastand("Test med kun startatomet: kortet beder om en tegning, og intet er forkert", /Tegn molekylet først/.test(T.beskedTekst()) && T.fast.klasse !== "skidt" && navnTekst() === "", T.beskedTekst());
     klikEnde();
-    paastand("et klik på startatomet: ethan står under tegningen", T.liveNavn === "ethan" && !T.faerdig, T.liveNavn);
+    paastand("et klik på startatomet: ethan, men intet navn og ingen fejl før Test", T.liveNavn === "ethan" && !T.faerdig && navnTekst() === "" && T.fast.klasse !== "skidt", T.liveNavn);
     klikEnde();
-    paastand("et klik mere: propan er løst", T.faerdig && T.liveNavn === "propan", T.liveNavn);
+    paastand("et klik mere: propan, men ikke løst før Test", T.liveNavn === "propan" && !T.faerdig);
+    test();
+    paastand("Test: propan er løst, og navnet står grønt ved knappen", T.faerdig && el("t-navn").classList.contains("rigtig") && /propan/.test(navnTekst()) && el("t-test").hidden, navnTekst());
 
     T.vaelg(T.idx("2-methylbutan"));
     klikEnde(); klikEnde(); klikEnde();
-    paastand("en kæde med fire carbonatomer hedder butan under tegningen, og der er ingen fejl endnu", T.liveNavn === "butan" && !T.faerdig && T.fast.klasse !== "skidt", T.liveNavn);
+    paastand("en kæde med fire carbonatomer hedder butan, og der er ingen fejl", T.liveNavn === "butan" && !T.faerdig && T.fast.klasse !== "skidt", T.liveNavn);
     var foerKlik = b.antal();
-    klikTavle({ x: T.lay.tavle.x + 40, y: T.lay.tavle.y + T.lay.tavle.h - 50 });
+    klikTavle({ x: T.lay.tavle.x + 40, y: T.lay.tavle.y + T.lay.tavle.h / 2 });
     paastand("et klik i den tomme tavle sætter ikke et nyt atom", b.antal() === foerKlik);
     klikEnde();
-    paastand("et klik på kædens ende gør den længere: pentan, og kortet siger, hvad stammen butan betyder", b.antal() === 5 && /Du har tegnet pentan\. Stammen butan/.test(T.beskedTekst()), T.beskedTekst());
+    paastand("ingen skæld ud: pentan har lige så mange atomer som stoffet, men der er ingen fejl og intet ryst før Test", b.antal() === 5 && T.liveNavn === "pentan" &&
+        T.fast.klasse !== "skidt" && !el("t-status").classList.contains("ryster") && navnTekst() === "", T.beskedTekst());
+    el("t-status").classList.remove("ryster");
+    test();
+    paastand("Test: pentan står rødt ved knappen og ryster, og kortet siger, hvad stammen butan betyder", el("t-navn").classList.contains("forkert") && el("t-navn").classList.contains("ryster") &&
+        /hedder: pentan$/.test(navnTekst()) && /Du har tegnet pentan\. Stammen butan/.test(T.beskedTekst()), navnTekst() + " / " + T.beskedTekst());
+    paastand("efter Test med en fejl lyser hjælpeknappen", el("t-knap").classList.contains("peg"));
     paastand("kortet med fejlen holder sig inden for sin plads", kortH("t") <= T.kortZone(), kortH("t"));
     var nyEnde = b.mol.atomer[b.mol.atomer.length - 1];
     peger(T, "pointerdown", b.px(nyEnde), 2);
-    paastand("et højreklik på enden sletter atomet, og fejlen forsvinder", b.antal() === 4 && T.fast.klasse !== "skidt");
+    paastand("et højreklik på enden sletter atomet: det røde navn forsvinder, og forklaringen bliver", b.antal() === 4 && navnTekst() === "" && T.fast.klasse === "skidt", navnTekst());
     /* Sidegruppen: klik paa carbonatom nummer 2 med Kaede */
     var res = NK.Navn.analyser(b.mol), c2 = res.kaede[1];
     klikTavle(b.px(c2));
-    paastand("et klik på carbonatom nummer 2 sætter methylgruppen på: 2-methylbutan er løst", T.faerdig, T.liveNavn);
+    paastand("et klik på carbonatom nummer 2 sætter methylgruppen på, men den er ikke løst før Test", T.liveNavn === "2-methylbutan" && !T.faerdig, T.liveNavn);
+    W.document.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    paastand("Enter er det samme som Test: 2-methylbutan er løst", T.faerdig, T.liveNavn);
     paastand("den færdige tegning har navnedelenes farver", !!b.atomFarve && !!b.bindingFarve && b.mol.bindinger.some(function (bd) { return b.bindingFarve(bd); }));
     var foerLaas = b.antal();
     klikTavle(b.px(b.mol.atomer[0]));
@@ -310,12 +330,14 @@ function koerTest(W) {
     paastand("−Br er valgt", b.vaerktoej === "halogen:Br" && vt("halogen:Br").classList.contains("aktiv"));
     var kp = NK.Navn.analyser(b.mol).kaede;
     klikTavle(b.px(kp[0]));
-    paastand("−Br på carbonatom nummer 1: 1-brompropan, og kortet siger, hvad 2-brom betyder", T.liveNavn === "1-brompropan" && /2-brom betyder et bromatom på carbonatom nummer 2/.test(T.beskedTekst()), T.beskedTekst());
     paastand("efter −Br er værktøjet Kæde igen", b.vaerktoej === "tegn");
+    test();
+    paastand("−Br på carbonatom nummer 1 og Test: 1-brompropan, og kortet siger, hvad 2-brom betyder", T.liveNavn === "1-brompropan" && /2-brom betyder et bromatom på carbonatom nummer 2/.test(T.beskedTekst()), T.beskedTekst());
     T.fortryd();
     vt("halogen:Br").click();
     klikTavle(b.px(kp[1]));
-    paastand("Fortryd, og −Br på nummer 2: 2-brompropan er løst", T.faerdig, T.liveNavn);
+    test();
+    paastand("Fortryd, −Br på nummer 2 og Test: 2-brompropan er løst", T.faerdig, T.liveNavn);
 
     T.vaelg(T.idx("but-2-yn"));
     b.saet(NK.NavnLaeser.laes("butan").mol);
@@ -324,16 +346,19 @@ function koerTest(W) {
     klikTavle(b.px(kb[0]));
     paastand("= Binding: et klik på et atom gør intet, men siger, hvor der skal klikkes", b.antal() === 4 && /stregen mellem to carbonatomer/.test(T.beskedTekst()), T.beskedTekst());
     klikTavle(midt());
-    paastand("første klik på bindingen: but-2-en, og kortet siger: klik igen", T.liveNavn === "but-2-en" && /igen/.test(T.beskedTekst()), T.liveNavn + " / " + T.beskedTekst());
+    test();
+    paastand("første klik på bindingen og Test: but-2-en, og kortet siger: klik igen", T.liveNavn === "but-2-en" && /igen/.test(T.beskedTekst()), T.liveNavn + " / " + T.beskedTekst());
     klikTavle(midt());
-    paastand("andet klik: but-2-yn er løst", T.faerdig, T.liveNavn);
+    test();
+    paastand("andet klik og Test: but-2-yn er løst", T.faerdig, T.liveNavn);
 
     T.vaelg(T.idx("propansyre"));
     b.saet(NK.NavnLaeser.laes("propan").mol);
     vt("gruppe:COOH").click();
     var kq = NK.Navn.analyser(b.mol).kaede;
     klikTavle(b.px(kq[0]));
-    paastand("−COOH på enden af propan: butansyre, og kortet siger, at carbonatomet i COOH tæller med", T.liveNavn === "butansyre" && /tæller med i stammen/.test(T.beskedTekst()), T.beskedTekst());
+    test();
+    paastand("−COOH på enden af propan og Test: butansyre, og kortet siger, at carbonatomet i COOH tæller med", T.liveNavn === "butansyre" && /tæller med i stammen/.test(T.beskedTekst()), T.beskedTekst());
     T.fortryd();
     T.fortryd();
     paastand("Fortryd to gange: kun startatomet", b.antal() <= 2);
@@ -341,11 +366,33 @@ function koerTest(W) {
     T.vaelg(T.idx("cyclohexan"));
     vt("ring6").click();
     klikTavle({ x: T.lay.tavle.x + T.lay.tavle.b / 2, y: T.lay.tavle.y + T.lay.tavle.h / 2 });
+    test();
     paastand("Ring på en tom tavle: ringen kommer i stedet for startatomet, og cyclohexan er løst", T.faerdig && b.antal() === 6, b.antal() + " " + T.liveNavn);
 
     T.vaelg(T.idx("ethanol"));
     b.saet(NK.NavnLaeser.laes("ethanol").mol);
+    test();
     paastand("ethanol tegnet med −OH er løst", T.faerdig);
+
+    /* Kontakten: navnet hele tiden */
+    var kon = el("t-visnavn");
+    paastand("kontakten Vis navnet hele tiden er slået fra fra start", !T.visAltid && kon.getAttribute("aria-checked") === "false" && !kon.classList.contains("til"));
+    T.vaelg(T.idx("propan"));
+    kon.click();
+    paastand("kontakten slået til: den står som til", T.visAltid && kon.getAttribute("aria-checked") === "true" && kon.classList.contains("til"));
+    paastand("med kun startatomet står der intet navn", navnTekst() === "", navnTekst());
+    klikEnde();
+    paastand("med kontakten: ethan står ved knappen, mens der tegnes, uden rødt", /hedder: ethan$/.test(navnTekst()) && !el("t-navn").classList.contains("forkert") && !T.faerdig, navnTekst());
+    test();
+    paastand("Test: ethan bliver rødt", el("t-navn").classList.contains("forkert") && T.fast.klasse === "skidt");
+    klikEnde();
+    paastand("et klik mere: propan står ved knappen, ikke rødt, og den er ikke løst før Test", /hedder: propan$/.test(navnTekst()) && !el("t-navn").classList.contains("forkert") && !T.faerdig, navnTekst());
+    test();
+    paastand("Test: propan er løst", T.faerdig);
+    kon.click();
+    T.vaelg(T.idx("hexan"));
+    klikEnde();
+    paastand("kontakten slået fra igen: intet navn, mens der tegnes", !T.visAltid && navnTekst() === "", navnTekst());
     T.vaelg(T.idx("propan-1-ol"));
     b.saet(NK.NavnLaeser.laes("ethanol").mol);
     var oAtom = b.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
@@ -439,8 +486,14 @@ function koerTest(W) {
         el("t-knap").click(); th = Math.max(th, kortH("t"));
         T.besked("", "");
         b.saet(NK.NavnLaeser.laes("2,4-dimethylpentan").mol);
+        test(); th = Math.max(th, kortH("t"));
         b.saet(NK.NavnLaeser.laes("2,3,4-trimethylpentan").mol);
-        th = Math.max(th, kortH("t"));
+        test(); th = Math.max(th, kortH("t"));
+        var lr = T.L.canvas.getBoundingClientRect(), tk = el("t-test").getBoundingClientRect(), kn = el("t-visnavn").getBoundingClientRect(), nv = el("t-navn").getBoundingClientRect();
+        var tavleBund = lr.top + T.lay.tavle.y + T.lay.tavle.h, feltBund = lr.top + T.felt().y + T.felt().h;
+        paastand(navn + ": fane 1, Test og kontakten står nederst på whiteboardet under tegnefeltet, og navnet står mellem dem", tk.bottom <= tavleBund && tk.top >= feltBund &&
+            tk.right <= lr.left + T.lay.tavle.x + T.lay.tavle.b && kn.left >= lr.left + T.lay.tavle.x && kn.right < nv.left && nv.right <= tk.left && /trimethylpentan/.test(navnTekst()),
+            [Math.round(feltBund), Math.round(tk.top), Math.round(tk.bottom), Math.round(tavleBund), Math.round(kn.right), Math.round(nv.left), Math.round(nv.right), Math.round(tk.left)].join(","));
         paastand(navn + ": fane 1, kortet er højst " + T.kortZone() + " px med det længste hint og den længste fejl", th <= T.kortZone(), th);
         var kort = el("t-skort").getBoundingClientRect(), tl = T.L.canvas.getBoundingClientRect(), vt0 = el("t-vaerktoej").getBoundingClientRect();
         paastand(navn + ": fane 1, whiteboardet begynder under kortet", kort.bottom <= tl.top + T.lay.tavle.y && T.lay.tavle.h >= 250, Math.round(T.lay.tavle.h));

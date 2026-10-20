@@ -64,15 +64,22 @@ igen), −OH, =O, −COOH, −Cl, −Br og Ring, og til højre Fortryd og Ryd. K
 værktøjer, de valgte stofklasser bruger, er med, og altid dem, opgavens eget stof
 har brug for (chlorethansyre får −Cl).
 
-* **Navnet under tegningen:** som på tegnebrættet står det, tegningen hedder,
-  under den, mens eleven tegner ("Tegningen hedder: butan").
+* **Test:** tegningen tjekkes kun, når eleven trykker Test (eller Enter) nederst
+  til højre på tavlen. Brugeren 20. okt. 2026: "svær at tegne uden at man
+  konstant får skæld ud". Mens eleven tegner, er der ingen fejl og intet ryst.
+* **Vis navnet hele tiden:** kontakten nederst til venstre på tavlen. Slået til
+  står det, tegningen hedder, ved Test-knappen, mens eleven tegner, som på
+  tegnebrættet ("Tegningen hedder: butan"). Den er slået fra, hver gang siden
+  åbnes. Eleven skal stadig trykke Test.
 * **Facit:** hedder tegningen det samme som opgaven (cis og trans tæller ikke),
-  er opgaven løst, og tegningen får navnedelenes farver.
-* **Fejl:** når tegningen har mindst lige så mange atomer som stoffet, men et
-  andet navn, siger kortet, hvad tegningen hedder, og hvilken del af navnet der
-  ikke passer, i navnets rækkefølge: grupperne (endelsen), kæden (stammen),
-  numrene og sidegrupperne (forleddet). Fx "Du har tegnet butansyre. Carbonatomet
-  i COOH tæller med i stammen. Propan er tre carbonatomer i alt."
+  er opgaven løst ved Test, navnet står grønt ved knappen, og tegningen får
+  navnedelenes farver.
+* **Fejl:** efter Test med et andet navn står navnet rødt ved knappen og
+  ryster, og kortet siger, hvilken del af navnet der ikke passer, i navnets
+  rækkefølge: grupperne (endelsen), kæden (stammen), numrene og sidegrupperne
+  (forleddet). Fx "Du har tegnet butansyre. Carbonatomet i COOH tæller med i
+  stammen. Propan er tre carbonatomer i alt." Det røde navn forsvinder, når
+  tegningen ændres; forklaringen på kortet bliver til næste Test.
 * Anderledes end på tegnebrættet (toppen af `js/sim_tegn.js`): −Cl og −Br
   sætter atomet på et carbonatom; grupperne kan kun sættes på carbonatomer;
   Kæde på O, Cl eller Br bygger ikke videre; et klik i den tomme tavle sætter
@@ -157,18 +164,21 @@ ikke ændret.
 ## Genveje
 
 `1` `2` fane, `R` ryd tavlen (fane 1), `Ctrl+Z` og `Ctrl+Y` fortryd og gentag
-(fane 1), `Enter` tjek (fane 2), `H` eller `?` rundvisning, `T` teori, `Esc` luk.
+(fane 1), `Enter` test (fane 1) og tjek (fane 2), `H` eller `?` rundvisning,
+`T` teori, `Esc` luk.
 
 ## Selvtest
 
-`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 154
+`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 172
 påstande: motoren giver hvert stof navnet fra data, navnet kan deles, og stoffet
 passer til stofklassen; typiske forkerte navne og tegninger får den rigtige
 forklaring (også alle navne talt fra den forkerte ende); kontakterne vælger
 opgaverne og værktøjerne; alle opgaver løses på begge faner; der tegnes med musen
-(træk, klik på enden, højreklik, −Br, = Binding, −COOH, Ring); hint gør det
-rigtige gult; låsen virker; kortet dækker aldrig whiteboardet fra 1100 × 620 til
-1600 × 950; teksterne er korte og uden tankestreger.
+(træk, klik på enden, højreklik, −Br, = Binding, −COOH, Ring); intet tjekkes,
+før der trykkes Test eller Enter, og kontakten Vis navnet hele tiden virker; hint
+gør det rigtige gult; låsen virker; kortet dækker aldrig whiteboardet, og Test
+står under tegnefeltet fra 1100 × 620 til 1600 × 950; teksterne er korte og uden
+tankestreger.
 
 ## I menuen
 

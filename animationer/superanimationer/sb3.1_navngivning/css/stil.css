@@ -2001,6 +2001,82 @@ kbd {
     .tegnevaerktoej .vtknap.let { padding: 5px 8px; font-size: 0.84rem; }
 }
 
+/* ----- Nederst paa tavlen (fane 1): kontakten, navnet og Test ----------------
+   Hoejden (40 px) staar ogsaa som BUND i js/sim_tegn.js. */
+.tegnebund {
+    position: absolute;
+    z-index: 2;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.tegnebund > * { pointer-events: auto; }
+
+.navnekontakt {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px 5px 6px;
+    border: 0;
+    border-radius: 9px;
+    background: none;
+    color: #4a5363;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.navnekontakt:hover { background-color: rgba(42, 118, 172, 0.08); }
+.navnekontakt .kk-kontakt { background-color: #c3c9d2; }
+.navnekontakt .kk-kontakt i { background-color: #ffffff; }
+.navnekontakt.til { color: #1d2433; }
+.navnekontakt.til .kk-kontakt { background-color: #2a76ac; }
+.navnekontakt.til .kk-kontakt i { left: 20px; }
+
+.tb-hoejre { display: inline-flex; align-items: center; gap: 14px; min-width: 0; }
+
+.tb-navn {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #6b7280;
+    font-size: 1.08rem;
+    font-weight: 600;
+}
+
+.tb-navn b { color: #334155; font-weight: 800; }
+.tb-navn.forkert, .tb-navn.forkert b { color: #c8382b; }
+.tb-navn.rigtig, .tb-navn.rigtig b { color: #1c8a4e; }
+.tb-navn.ryster { animation: st-ryst 0.4s ease-in-out 1; }
+
+.testknap {
+    flex: 0 0 auto;
+    min-width: 96px;
+    height: 40px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 9px;
+    background-color: var(--groen-mork);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+.testknap:hover { background-color: var(--groen); }
+.testknap:active { transform: scale(0.97); }
+.testknap[hidden] { display: none; }
+
 @media (max-height: 720px) {
     .sk-felt { margin-top: 6px; }
     .sk-felt input { padding: 5px 12px; font-size: 1.2rem; }

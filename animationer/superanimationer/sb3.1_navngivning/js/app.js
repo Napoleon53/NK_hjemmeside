@@ -183,6 +183,14 @@
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
         if (e.key === "r" || e.key === "R") { if (sim) sim.nulstil(); return; }
+        /* Enter: Test paa tegnefanen (ogsaa lige efter et klik paa et vaerktoej),
+           men ikke paa de andre knapper og links */
+        if (e.key === "Enter" && aktivFane === "fane-t" && sim) {
+            var paaKnap = e.target && e.target.closest && e.target.closest("button, a");
+            if (paaKnap && !paaKnap.closest("#t-vaerktoej, #t-bund")) return;
+            e.preventDefault();
+            sim.test();
+        }
     }
 
     /* ----- Opstart --------------------------------------------------------- */

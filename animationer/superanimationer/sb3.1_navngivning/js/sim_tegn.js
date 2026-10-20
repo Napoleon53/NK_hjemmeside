@@ -6,11 +6,14 @@
    samme som paa tegnebraettet: traek eller klik bygger kaeden, og en
    gruppe saettes paa med ét klik.
 
-   Som paa tegnebraettet staar navnet paa det tegnede under tegningen
-   ("Tegningen hedder: butan"), mens eleven tegner. Naar tegningen hedder
-   det samme som opgaven, er den loest. Naar den har mindst lige saa
-   mange atomer som stoffet, men et andet navn, siger kortet, hvad
-   tegningen hedder, og hvilken del af navnet der ikke passer.
+   Tegningen tjekkes kun, naar eleven trykker Test (eller Enter) nederst
+   paa whiteboardet (brugerens oenske 20. okt. 2026: "svaer at tegne uden
+   at man konstant faar skaeld ud"). Hedder tegningen det samme som
+   opgaven, er den loest. Ellers staar navnet paa tegningen roedt ved
+   Test-knappen og ryster, og kortet siger, hvilken del af navnet der
+   ikke passer. Kontakten "Vis navnet hele tiden" (slaaet fra, hver gang
+   siden aabnes) viser navnet paa det tegnede samme sted, mens eleven
+   tegner, som paa tegnebraettet.
 
    Det, der er anderledes end paa tegnebraettet (se klik nedenfor):
      * = Binding: et klik paa en binding goer den dobbelt, tripel og
@@ -82,6 +85,13 @@
         };
         NK.el("t-fortryd").addEventListener("click", function () { mig.fortryd(); });
         NK.el("t-ryd").addEventListener("click", function () { mig.nulstil(); });
+        this.bundEl = NK.el("t-bund");
+        this.navnEl = NK.el("t-navn");
+        this.testEl = NK.el("t-test");
+        this.kontaktEl = NK.el("t-visnavn");
+        this.visAltid = false;
+        this.testEl.addEventListener("click", function () { mig.test(); });
+        this.kontaktEl.addEventListener("click", function () { mig.visAltid = !mig.visAltid; mig.visNavn(); });
         this.vaerktoejEl.addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-vt]") : null;
             if (k) mig.vaelgVaerktoej(k.getAttribute("data-vt"));
@@ -114,8 +124,10 @@
         b.nulstil(true, true);
         this.saetter = false;
         this.liveNavn = null;
+        this.testet = null;
         this.bygVaerktoej();
         this.vaelgVaerktoej("tegn");
+        this.visNavn();
     };
 
     P.aktiveSkiftet = function () { this.bygVaerktoej(); };
@@ -196,7 +208,7 @@
 
     P.hintNu = function () { return this.faerdig || !this.stof ? [] : K.tegneHints(this.stof); };
 
-    /* ----- Tegningen tjekkes efter hver aendring ------------------------------------- */
+    /* ----- Efter hver aendring: kun navnet holdes ved lige, der tjekkes ikke ------------ */
     P.aendret = function (hvad) {
         if (this.saetter || this.faerdig || !this.stof) return;
         var b = this.braet;
@@ -205,12 +217,45 @@
         if (hvad === "vaerktoej") { this.visVaerktoej(); return; }
         var res = this.navnNu();
         this.liveNavn = res && res.navn ? res.navnUdenStereo : null;
-        if (res && res.navnUdenStereo === this.stof.res.navnUdenStereo) { this.klaret(); return; }
-        if (b.antal() < this.stof.antal) {
-            if (this.fast.klasse === "skidt") this.besked("", "");
+        /* Det roede navn fra sidste Test passer ikke laengere til tegningen */
+        if (this.testet && this.testet.navn !== this.liveNavn) this.testet = null;
+        this.visNavn();
+    };
+
+    /* ----- Test: foerst nu faar tegningen et navn og en dom ---------------------------
+       Forklaringen paa kortet bliver staaende, til eleven trykker Test igen. */
+    P.test = function () {
+        if (this.faerdig) { this.kortBlink(); return; }
+        if (!this.stof) return;
+        var b = this.braet, mol = b.mol;
+        if (mol.atomer.length <= 1 && !mol.bindinger.length) {
+            this.kortBesked("Tegn molekylet først. Træk fra carbonatomet, så vokser kæden.", 3.5);
             return;
         }
-        this.fejlLinje(K.tegneFejl(this.stof, b.mol));
+        var res = this.navnNu();
+        if (res && res.navnUdenStereo === this.stof.res.navnUdenStereo) { this.klaret(); return; }
+        this.testet = { navn: res && res.navn ? res.navnUdenStereo : null };
+        this.besked('<span class="b-maerke">Ikke endnu</span> ' + NK.html(K.tegneFejl(this.stof, mol)), "skidt");
+        this.pegKnap = true;
+        this.visKnap();
+        this.visNavn(true);
+    };
+
+    /* Nederst paa whiteboardet: navnet ved Test-knappen. Det staar der efter
+       Test (roedt, og det ryster), naar opgaven er loest (groent), og hele
+       tiden, naar kontakten er slaaet til. */
+    P.visNavn = function (ryst) {
+        var t = this.testet, html = "", kl = "tb-navn";
+        if (this.faerdig) { html = "Tegningen hedder: <b>" + NK.html(this.stof.navn) + "</b> ✓"; kl += " rigtig"; }
+        else if (t) { html = t.navn ? "Tegningen hedder: <b>" + NK.html(t.navn) + "</b>" : "Tegningen har intet navn"; kl += " forkert"; }
+        else if (this.visAltid && this.liveNavn) html = "Tegningen hedder: <b>" + NK.html(this.liveNavn) + "</b>";
+        var e = this.navnEl;
+        e.innerHTML = html;
+        e.className = kl;
+        if (ryst) { void e.offsetWidth; e.classList.add("ryster"); }
+        this.testEl.hidden = !!this.faerdig;
+        this.kontaktEl.classList.toggle("til", this.visAltid);
+        this.kontaktEl.setAttribute("aria-checked", this.visAltid ? "true" : "false");
     };
 
     /* Navnet paa tegningen, som det staar under den. Startatomet alene har intet navn. */
@@ -227,9 +272,11 @@
         b.traek = null;
         b.spoegelse = null;
         this.liveNavn = this.stof.navn;
+        this.testet = null;
         this.farvTegning();
         this.loest("selv", K.forklaring(this.stof), this.stof.navn + ".");
         this.visVaerktoej();
+        this.visNavn();
     };
 
     /* Den faerdige tegning faar navnedelenes farver: kaeden blaa (stamme),
@@ -283,13 +330,19 @@
         this.vaerktoejEl.style.left = (t.x + 10) + "px";
         this.vaerktoejEl.style.top = (t.y + 8) + "px";
         this.vaerktoejEl.style.width = (t.b - 20) + "px";
-        this.saetAnker("tavle", t.x, t.y + 54, t.b, t.h - 54);
+        this.bundEl.style.left = (t.x + 10) + "px";
+        this.bundEl.style.top = (t.y + t.h - BUND - 8) + "px";
+        this.bundEl.style.width = (t.b - 20) + "px";
+        this.saetAnker("tavle", t.x, t.y + 54, t.b, t.h - 54 - BUND - 12);
     };
 
-    /* Der tegnes under vaerktoejslinjen. Nederst er der plads til navnet. */
+    /* Hoejden paa raekken nederst (kontakten, navnet og Test), som i stil.css */
+    var BUND = 40;
+
+    /* Der tegnes mellem vaerktoejslinjen og raekken nederst */
     P.felt = function () {
         var t = this.lay ? this.lay.tavle : { x: 0, y: 0, b: 700, h: 450 };
-        return { x: t.x, y: t.y + 50, b: t.b, h: t.h - 50 - 30 };
+        return { x: t.x, y: t.y + 50, b: t.b, h: t.h - 50 - BUND - 14 };
     };
 
     P.skala = function () {
@@ -319,44 +372,10 @@
     P.opScene = function (pt) { this.braet.op(pt); };
     P.klikScene = function () { this.spaer(); };
 
-    /* Navnet under tegningen, som paa tegnebraettet */
-    P.tegnNavn = function (ctx) {
-        var b = this.braet, mol = b.mol, t = this.lay.tavle;
-        if (!this.liveNavn || !mol.atomer.length) return;
-        var x0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-        mol.atomer.forEach(function (a) {
-            var p = b.px(a);
-            x0 = Math.min(x0, p.x);
-            x1 = Math.max(x1, p.x);
-            y1 = Math.max(y1, p.y);
-        });
-        var s = b.s(), fs = Math.round(NK.klamp(s * 0.3, 15, 21));
-        var y = Math.min(y1 + s * 0.55 + fs, t.y + t.h - 10);
-        var x = NK.klamp((x0 + x1) / 2, t.x + 160, t.x + t.b - 160);
-        ctx.save();
-        ctx.textAlign = "center";
-        ctx.textBaseline = "alphabetic";
-        var forTekst = this.faerdig ? "" : "Tegningen hedder: ";
-        ctx.font = "600 " + fs + "px 'Segoe UI', Arial, sans-serif";
-        var w1 = ctx.measureText(forTekst).width;
-        ctx.font = "700 " + fs + "px 'Segoe UI', Arial, sans-serif";
-        var w2 = ctx.measureText(this.liveNavn).width;
-        var start = x - (w1 + w2) / 2;
-        ctx.textAlign = "left";
-        ctx.font = "600 " + fs + "px 'Segoe UI', Arial, sans-serif";
-        ctx.fillStyle = "#6b7280";
-        ctx.fillText(forTekst, start, y);
-        ctx.font = "700 " + fs + "px 'Segoe UI', Arial, sans-serif";
-        ctx.fillStyle = this.faerdig ? "#1c8a4e" : "#334155";
-        ctx.fillText(this.liveNavn, start + w1, y);
-        ctx.restore();
-    };
-
     P.tegn = function () {
         var ctx = this.L.ctx, lay = this.lay;
         NK.Tavle.tegn(ctx, lay);
         this.braet.tegn(ctx, this.faerdig ? { udenHaandtag: true, linje: Math.max(2.6, this.skala() * 0.055) } : null);
-        this.tegnNavn(ctx);
         this.tegnSejr(ctx, lay.tavle);
     };
 

@@ -17,7 +17,8 @@
         "fane-t": [
             { sel: "#t-skort", titel: "Kortet øverst", tekst: "Navnet står delt i forled, stamme og endelse. Tegn molekylet på tavlen. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#t-vt", titel: "Værktøjerne", tekst: "Kæde: træk fra et carbonatom, eller klik på et, så vokser kæden. = Binding gør en binding dobbelt og tripel. De andre knapper sætter en gruppe eller et atom på det carbonatom, du klikker på." },
-            { sel: "#t-anker-tavle", titel: "Tavlen", tekst: "Under tegningen står det, tegningen hedder, mens du tegner. Højreklik på et atom for enden af kæden for at slette det." },
+            { sel: "#t-anker-tavle", titel: "Tavlen", tekst: "Tegn molekylet her. Højreklik på et atom for enden af kæden for at slette det." },
+            { sel: "#t-bund", titel: "Test", tekst: "Tryk Test, når du er færdig. Så står det, tegningen hedder, ved knappen, og kortet siger, hvad der ikke passer. Vis navnet hele tiden viser navnet, mens du tegner." },
             { sel: "#t-fortryd, #t-ryd", titel: "Fortryd og Ryd", tekst: "Fortryd tager det sidste skridt tilbage. Ryd fjerner hele tegningen." },
             { sel: "#fane-t .klassekort", titel: "Stofklasser", tekst: "Slå en stofklasse til eller fra. Kun de stofklasser, der er slået til, kommer med i opgaverne på begge faner." },
             { sel: "#t-opgaver", titel: "Opgaverne", tekst: "Klik på et nummer for at vælge en opgave. En løst opgave får et flueben og en stjerne, hvis du ikke fik vist svaret." }

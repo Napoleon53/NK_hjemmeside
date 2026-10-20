@@ -45,6 +45,14 @@
                 <button type="button" class="vtknap let" id="t-ryd" title="Ryd tavlen og begynd forfra (R)">Ryd</button>
             </span>
         </div>
+        <!-- Nederst paa whiteboardet: kontakten, navnet og Test (js/sim_tegn.js) -->
+        <div class="tegnebund" id="t-bund">
+            <button type="button" class="navnekontakt" id="t-visnavn" role="switch" aria-checked="false" title="Vis navnet på tegningen, mens du tegner"><span class="kk-kontakt"><i></i></span>Vis navnet hele tiden</button>
+            <span class="tb-hoejre">
+                <span class="tb-navn" id="t-navn" aria-live="polite"></span>
+                <button type="button" class="testknap" id="t-test" title="Test tegningen (Enter)">Test</button>
+            </span>
+        </div>
         <div class="anker" id="t-anker-tavle"></div>
     </div>
 
@@ -130,7 +138,7 @@
         <p>En sidegruppe hedder som alkanen, men ender på -yl: methyl har ét carbonatom, ethyl to. To ens sidegrupper får di foran, tre får tri: 2,3-dimethylbutan. Forskellige sidegrupper står i alfabetisk rækkefølge: 3-ethyl-2-methylpentan.</p>
         <p>Der står intet tal, når gruppen kun kan sidde ét sted: ethanol, propen, propansyre. I en carboxylsyre er carbonatomet i COOH altid nummer 1, og det tæller med i stammen. Cyclo betyder, at carbonatomerne sidder i en ring: cyclohexan.</p>
         <p>Er OH ikke den vigtigste gruppe, hedder den hydroxy og står foran: 2-hydroxypropansyre (mælkesyre).</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> ryd tavlen &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> test og tjek &nbsp;·&nbsp; <kbd>R</kbd> ryd tavlen &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
