@@ -71,7 +71,9 @@
     function opg() { return F.FLAD[S().f][S().nr]; }
     function skriv(tekst) { el("ord").value = tekst; el("skriv").dispatchEvent(new w.Event("submit", { bubbles: true, cancelable: true })); }
     function svarknap(i) { return d.querySelector('#valg [data-svar="' + i + '"]'); }
-    function kort(f) { return d.querySelector('#faser [data-fase="' + f + '"]'); }
+    function kort(f) { return d.querySelector('#faser .fasekort[data-om="' + f + '"]'); }
+    function begynd(f) { return d.querySelector('#faser .fk-gaa[data-fase="' + f + '"]'); }
+    function omAaben() { return el("om").classList.contains("vis"); }
     function besked() { return el("besked").textContent; }
     function farve(navn) { return el("statuslinje").classList.contains(navn); }
     function gemt() { return JSON.parse(window.localStorage.getItem(NOEGLE)); }
@@ -216,6 +218,23 @@
             });
         });
         ens(skrevne, 23, "A: 23 ord skal skrives");
+        ok(JSON.stringify(D).toLowerCase().indexOf("udlicit") === -1, "A: udlicitering er ikke med (står ikke i det nye kapitel 11)");
+
+        D.FASER.forEach(function (fasen, f) {
+            var tid = fasen.tid || {}, navn = "A: om tiden i " + (f + 1) + ". fase";
+            ok(!!tid.billede && !!tid.person && !!tid.hvem && !!tid.kredit && !!tid.tekst, navn + " har billede, person, billedtekst, kredit og tekst");
+            ok((tid.tekst || "").length <= 330 && (tid.hvem || "").length <= 130, navn + ": teksterne er korte");
+            alle.push(tid.person || "", tid.hvem || "", tid.kredit || "", tid.tekst || "");
+            var omtekst = N((tid.tekst || "") + " " + (tid.hvem || "") + " " + (tid.person || ""));
+            fasen.felter.forEach(function (felt) {
+                felt.forEach(function (o) {
+                    if (o.type !== "skriv") return;
+                    [o.svar].concat(o.godtag || []).forEach(function (g) {
+                        if (N(g).length >= 5) ok(omtekst.indexOf(N(g)) === -1, navn + " røber ikke ordet " + g);
+                    });
+                });
+            });
+        });
 
         alle.forEach(function (t) {
             ok(!/[–—]/.test(t), "A: ingen tankestreg i: " + t);
@@ -258,9 +277,33 @@
         ens(el("intro1").textContent, T.intro1, "C: indledningen står på startbilledet");
         smaaSkrift("C start: ");
 
+        /* ----- Om tiden: et klik på kortet viser tiden, kun Begynd går ind i fasen ----- */
+        ens(liste("#faser .fk-laes").map(function (e) { return e.textContent; }), [T.omTiden, T.omTiden, T.omTiden, T.omTiden], "C: alle kort tilbyder at læse om tiden");
+        ok(liste("#faser .fk-foto").every(function (i) { return i.complete && i.naturalWidth === 400; }), "C: portrætterne på kortene er hentet");
+        kort(1).querySelector(".fk-aar").click();
+        ok(omAaben() && fase() === "start", "C: et klik på kortet åbner Om tiden og ikke fasen");
+        ens([el("om-nr").textContent, el("om-aar").textContent, el("om-fasenavn").textContent], ["2. fase", D.FASER[1].aar, D.FASER[1].navn], "C: Om tiden har fasens navn");
+        ens([el("om-person").textContent, el("om-hvem").textContent, el("om-tekst").textContent, el("om-kredit").textContent], [D.FASER[1].tid.person, D.FASER[1].tid.hvem, D.FASER[1].tid.tekst, D.FASER[1].tid.kredit], "C: Om tiden har billedtekst, kredit og tekst");
+        ok(el("om-billede").getAttribute("src") === D.FASER[1].tid.billede, "C: Om tiden viser fasens politiker");
+        ens(el("om-gaa").textContent, T.begynd, "C: knappen i Om tiden hedder Begynd");
+        smaaSkrift("C om tiden: ");
+        tast("1");
+        ok(fase() === "start" && omAaben(), "C: taster gør ingenting, mens Om tiden er åben");
+        tast("Escape");
+        ok(!omAaben(), "C: Esc lukker Om tiden");
+        kort(2).querySelector(".fk-status").click();
+        ok(omAaben() && el("om-aar").textContent === D.FASER[2].aar, "C: også et klik nederst på kortet åbner Om tiden");
+        el("om").click();
+        ok(!omAaben(), "C: et klik uden for vinduet lukker det");
+        kort(3).querySelector(".fk-om").click();
+        el("om-luk").click();
+        ok(!omAaben() && fase() === "start", "C: Luk lukker Om tiden");
+        kort(0).querySelector(".fk-navn").click();
+        el("om-gaa").click();
+        ok(!omAaben(), "C: Begynd i Om tiden lukker vinduet");
+
         /* ----- første opgave: et ord skal skrives ----- */
-        kort(0).click();
-        ens(fase(), "felt", "C: et klik på fasen åbner første opgave");
+        ens(fase(), "felt", "C: Begynd i Om tiden åbner første opgave");
         ok(synlig(el("felt")) && !synlig(el("start")) && !synlig(el("skema")), "C: kun opgaven og feltet er fremme");
         ok(!el("faserknap").hidden, "C: knappen Faserne er fremme");
         ens([el("sted-fase").textContent, el("sted-navn").textContent], [D.FASER[0].kort, D.FASER[0].navn], "C: fasen står over opgaven");
@@ -412,8 +455,8 @@
         ens(fase(), "skema", "C: fasen vises samlet");
         ok(synlig(el("skema")) && !synlig(el("felt")) && !synlig(el("start")), "C: kun skemaet er fremme");
         ens(S().viser, [0], "C: skemaet viser kun den fase, der er udfyldt");
-        ens([liste("#skema-tabel thead th").length, liste("#skema-tabel tbody tr").length, liste("#skema-tabel td li").length], [2, 4, 15], "C: én kolonne, fire rækker og 15 linjer");
-        ens(liste("#skema-tabel tbody th").map(function (e) { return e.textContent; }), D.RAEKKER.map(function (r) { return r.navn; }), "C: rækkerne har skemaets navne");
+        ens([liste("#skema-tabeller table").length, liste("#skema-tabeller thead th").length, liste("#skema-tabeller tbody tr").length, liste("#skema-tabeller td li").length], [1, 2, 4, 15], "C: én kolonne, fire rækker og 15 linjer");
+        ens(liste("#skema-tabeller tbody th").map(function (e) { return e.textContent; }), D.RAEKKER.map(function (r) { return r.navn; }), "C: rækkerne har skemaets navne");
         ens(el("skema-besked").textContent, "1. fase er udfyldt. 11 af 15 rigtige i første forsøg.", "C: resultatet for fasen");
         ok(!el("skema-videre").hidden && el("skema-videre").textContent === T.naesteFase, "C: knappen Næste fase er fremme");
         ok(!el("skema-kopier").hidden && el("skema-igen").hidden && el("skema-forfra").hidden, "C: kun Kopiér og Næste fase er fremme");
@@ -440,7 +483,7 @@
         ens(S().frem, [15, 0, 0, 0], "C: skemaet er husket efter en genindlæsning");
         ens(S().plet[1], 0, "C: det forkerte forsøg er husket");
         ok(kort(0).classList.contains("faerdig"), "C: første fase er stadig færdig");
-        kort(1).click();
+        begynd(1).click();
         loes();
         ens(S().foerste[1][0], false, "C: opgaven tæller ikke som første forsøg efter ud og ind");
         el("faserknap").click();
@@ -453,8 +496,11 @@
         ens(el("skema-besked").textContent, "1. fase: 11 af 15 rigtige i første forsøg.", "C: resultatet står ved skemaet");
         ok(el("skema-videre").hidden && !el("skema-igen").hidden, "C: Lav fasen igen er fremme, Næste fase er ikke");
         el("faserknap").click();
-        kort(0).click();
-        ens([fase(), S().viser], ["skema", [0]], "C: et klik på en færdig fase viser den");
+        kort(0).querySelector(".fk-om").click();
+        ens(el("om-gaa").textContent, T.seFasen, "C: Om tiden for en færdig fase tilbyder at se den");
+        tast("Escape");
+        begynd(0).click();
+        ens([fase(), S().viser], ["skema", [0]], "C: knappen Færdig viser den færdige fase");
         el("skema-igen").click();
         ens(el("skema-igen").textContent, T.sikker, "C: første tryk på Lav fasen igen spørger");
         ens(S().frem[0], 15, "C: første tryk sletter ikke noget");
@@ -475,8 +521,8 @@
         ens(el("skema-videre").textContent, T.seHele, "C: knappen hedder nu Se hele skemaet");
         el("skema-videre").click();
         ens(S().viser, [0, 1, 2, 3], "C: hele skemaet vises");
-        ens([liste("#skema-tabel thead th").length, liste("#skema-tabel td").length, liste("#skema-tabel td li").length], [5, 16, 55], "C: fire kolonner, 16 felter og 55 linjer");
-        ens(liste("#skema-tabel .s-aar").map(function (e) { return e.textContent; }), D.FASER.map(function (f) { return f.aar; }), "C: kolonnerne har fasernes årstal");
+        ens([S().stablet, liste("#skema-tabeller table").length, liste("#skema-tabeller td").length, liste("#skema-tabeller td li").length], [true, 4, 16, 55], "C: ved 883 px står faserne under hinanden: 4 tabeller, 16 felter og 55 linjer");
+        ens(liste("#skema-tabeller .s-aar").map(function (e) { return e.textContent; }), D.FASER.map(function (f) { return f.aar; }), "C: kolonnerne har fasernes årstal");
         ens(el("skema-besked").textContent, "Hele skemaet er udfyldt. 54 af 55 rigtige i første forsøg.", "C: det samlede resultat");
         ok(!el("skema-forfra").hidden && el("skema-igen").hidden && el("skema-videre").hidden, "C: Forfra er fremme til slut");
         ens(F.skemaTekst().split("\n").filter(function (l) { return l.indexOf("- ") === 0; }).length, 55, "C: alle 55 linjer er med i teksten, der kopieres");
@@ -522,6 +568,13 @@
             ok(kasser[3].r <= scene.r && kasse(d.querySelector(".intro")).t >= scene.t && kasse(d.querySelector(".start-linje")).b <= scene.b, sted + "startbilledet holder sig i scenen");
             ok(liste("#faser .fasekort").every(function (k) { return k.scrollHeight <= k.clientHeight + 1 && k.scrollWidth <= k.clientWidth + 1; }), sted + "teksten kan være på kortene");
             smaaSkrift(sted + "start: ");
+            for (var fo = 0; fo < 4; fo++) {
+                kort(fo).querySelector(".fk-om").click();
+                var omBoks = d.querySelector("#om .overlay-boks");
+                ok(omAaben() && omBoks.scrollHeight <= omBoks.clientHeight + 1, sted + "Om tiden i " + (fo + 1) + ". fase kan ses uden at rulle");
+                ok(kasse(el("om-gaa")).b <= hoejde && el("om-billede").getBoundingClientRect().height >= 150, sted + "Om tiden i " + (fo + 1) + ". fase: billede og knap kan ses");
+                tast("Escape");
+            }
 
             for (var f = 0; f < 4; f++) {
                 F.gaaTil(f);
@@ -565,7 +618,7 @@
                 var rul = el("skema-rul");
                 ok(rul.scrollHeight <= rul.clientHeight + 1, sted + (f + 1) + ". fase kan ses samlet uden at rulle (" + rul.scrollHeight + " mod " + rul.clientHeight + ")");
                 ok(rul.scrollWidth <= rul.clientWidth + 1, sted + (f + 1) + ". fase er ikke bredere end papiret");
-                ok(liste("#skema-tabel td, #skema-tabel th").every(function (c) { return c.scrollWidth <= c.clientWidth + 1; }), sted + (f + 1) + ". fase: ingen ord stikker ud af felterne");
+                ok(liste("#skema-tabeller td, #skema-tabeller th").every(function (c) { return c.scrollWidth <= c.clientWidth + 1; }), sted + (f + 1) + ". fase: ingen ord stikker ud af felterne");
                 ok(kasse(d.querySelector(".skema-linje")).b <= scene.b && !ruller(), sted + (f + 1) + ". fase: knapperne kan ses, og siden ruller ikke");
                 ok(d.querySelector(".skema-linje").getBoundingClientRect().height < 80, sted + (f + 1) + ". fase: resultat og knapper står på én linje");
                 smaaSkrift(sted + "fasen samlet: ");
@@ -574,8 +627,10 @@
             /* hele skemaet */
             el("skema-videre").click();
             ens(S().viser.length, 4, sted + "hele skemaet vises");
+            ens(S().stablet, bredde < 1000, sted + (bredde < 1000 ? "faserne står under hinanden" : "faserne står side om side"));
+            ok(liste("#skema-tabeller td").every(function (c) { return c.getBoundingClientRect().width >= 200; }), sted + "hvert felt i skemaet er mindst 200 px bredt");
             ok(el("skema-rul").scrollWidth <= el("skema-rul").clientWidth + 1, sted + "hele skemaet er ikke bredere end papiret");
-            ok(liste("#skema-tabel td, #skema-tabel th").every(function (c) { return c.scrollWidth <= c.clientWidth + 1; }), sted + "hele skemaet: ingen ord stikker ud af felterne");
+            ok(liste("#skema-tabeller td, #skema-tabeller th").every(function (c) { return c.scrollWidth <= c.clientWidth + 1; }), sted + "hele skemaet: ingen ord stikker ud af felterne");
             ok(kasse(d.querySelector(".skema-linje")).b <= scene.b && !ruller(), sted + "hele skemaet: knapperne kan ses, og siden ruller ikke");
             ok(d.querySelector(".skema-linje").getBoundingClientRect().height < 80, sted + "hele skemaet: resultat og knapper står på én linje");
             smaaSkrift(sted + "hele skemaet: ");

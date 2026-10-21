@@ -57,7 +57,9 @@
         orden: [],
         viser: [],
         efter: -1,
-        facit: false
+        facit: false,
+        stablet: false,
+        om: 0
     };
 
     function antal(f) { return FLAD[f].length; }
@@ -170,13 +172,17 @@
             if (S.frem[f] > 0) begyndt = true;
             if (f === anbefalet) klasse += " anbefalet";
             for (var r = 0; r < D.RAEKKER.length; r++) prikker += "<i" + (r < loeste ? ' class="on"' : "") + "></i>";
-            html += '<li><button class="' + klasse + '" type="button" data-fase="' + f + '">' +
-                '<span class="fk-nr">' + NK.html(udfyld(T.faseNr, { n: f + 1 })) + "</span>" +
+            /* Kortet viser tiden (Om tiden). Kun knappen nederst går ind i fasen. */
+            html += '<li><div class="' + klasse + '" data-om="' + f + '">' +
+                '<button class="fk-om" type="button" data-om="' + f + '">' +
+                '<span class="fk-top"><img class="fk-foto" src="' + fase.tid.billede + '" alt="">' +
+                '<span class="fk-nr">' + NK.html(udfyld(T.faseNr, { n: f + 1 })) + "</span></span>" +
                 '<span class="fk-aar">' + NK.html(fase.aar) + "</span>" +
                 '<span class="fk-navn">' + NK.html(fase.navn) + "</span>" +
+                '<span class="fk-laes">' + NK.html(T.omTiden) + "</span></button>" +
                 '<span class="fk-bund"><span class="fk-felter" aria-hidden="true">' + prikker + "</span>" +
                 '<span class="fk-status">' + NK.html(udfyld(T.felter, { k: loeste })) + "</span></span>" +
-                '<span class="fk-gaa">' + NK.html(gaa) + "</span></button></li>";
+                '<button class="fk-gaa" type="button" data-fase="' + f + '">' + NK.html(gaa) + "</button></div></li>";
         });
         el("faser").innerHTML = html;
 
@@ -196,6 +202,25 @@
         S.nr = S.frem[f];
         nyOpgave();
         visFelt();
+    }
+
+    /* Om tiden: tekst og en af tidens politikere. Knappen går ind i fasen. */
+    function visOm(f) {
+        var fase = D.FASER[f], tid = fase.tid;
+        S.om = f;
+        NK.saetTekst("om-nr", udfyld(T.faseNr, { n: f + 1 }));
+        NK.saetTekst("om-aar", fase.aar);
+        NK.saetTekst("om-fasenavn", fase.navn);
+        el("om-billede").src = tid.billede;
+        el("om-billede").alt = tid.person;
+        NK.saetTekst("om-person", tid.person);
+        NK.saetTekst("om-hvem", tid.hvem);
+        NK.saetTekst("om-kredit", tid.kredit);
+        NK.saetTekst("om-tekst", tid.tekst);
+        NK.saetTekst("om-luk", T.luk);
+        NK.saetTekst("om-gaa", faerdig(f) ? T.seFasen : (S.frem[f] > 0 ? T.fortsaet : T.begynd));
+        aabn("om");
+        el("om-gaa").focus();
     }
 
     function faerdigeFaser() {
@@ -414,9 +439,10 @@
 
     function bloed(html) { return html.replace(LED, "$1­"); }
 
-    function tegnSkema() {
-        var html = '<thead><tr><th class="hjoerne"></th>';
-        S.viser.forEach(function (f) {
+    /* Én tabel med en kolonne pr. fase. faser er de faser, tabellen viser. */
+    function tabelHTML(faser) {
+        var html = '<table class="skema-tabel kol-' + faser.length + '"><thead><tr><th class="hjoerne"></th>';
+        faser.forEach(function (f) {
             var fase = D.FASER[f];
             html += '<th scope="col"><span class="s-nr">' + NK.html(udfyld(T.faseNr, { n: f + 1 })) + "</span>" +
                 '<span class="s-aar">' + NK.html(fase.aar) + '</span><span class="s-navn">' + bloed(NK.html(fase.navn)) + "</span></th>";
@@ -424,18 +450,32 @@
         html += "</tr></thead><tbody>";
         D.RAEKKER.forEach(function (rk, r) {
             html += '<tr><th scope="row">' + NK.html(rk.navn) + "</th>";
-            S.viser.forEach(function (f) {
+            faser.forEach(function (f) {
                 html += "<td><ul>";
                 D.FASER[f].felter[r].forEach(function (o) { html += "<li>" + bloed(linjeHTML(o)) + "</li>"; });
                 html += "</ul></td>";
             });
             html += "</tr>";
         });
-        var tabel = el("skema-tabel");
-        tabel.className = "skema-tabel kol-" + S.viser.length;
-        tabel.innerHTML = html + "</tbody>";
+        return html + "</tbody></table>";
+    }
+
+    /* Er der ikke plads til ca. 15 rem pr. fase side om side, står faserne
+       under hinanden, hver med sin egen tabel, så felterne får hele bredden. */
+    function skemaStables() {
+        var plads = el("skema-rul").clientWidth, rem = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+        return S.viser.length > 1 && plads < (9 + 15 * S.viser.length) * rem;
+    }
+
+    function tegnSkema() {
+        var html = "";
+        el("skema-rul").className = "skema-rul";
+        S.stablet = skemaStables();
+        if (S.stablet) S.viser.forEach(function (f) { html += tabelHTML([f]); });
+        else html = tabelHTML(S.viser);
+        el("skema-tabeller").innerHTML = html;
         NK.saetTekst("skema-titel", D.TITEL);
-        el("skema-rul").className = "skema-rul kol-" + S.viser.length;
+        el("skema-rul").className = "skema-rul " + (S.stablet ? "stablet kol-1" : "kol-" + S.viser.length);
         el("skema-rul").scrollTop = 0;
     }
 
@@ -550,7 +590,7 @@
         }
         function gammelVej() {
             var omraade = document.createRange(), valg = window.getSelection();
-            omraade.selectNode(el("skema-tabel"));
+            omraade.selectNodeContents(el("skema-tabeller"));
             valg.removeAllRanges();
             valg.addRange(omraade);
             try { if (document.execCommand("copy")) { kvitter(); valg.removeAllRanges(); } } catch (e) { /* tabellen staar markeret */ }
@@ -629,8 +669,15 @@
         hent();
 
         el("faser").addEventListener("click", function (ev) {
-            var b = ev.target.closest("[data-fase]");
+            /* body har ogsaa data-fase, saa der spoerges efter knappen selv */
+            var b = ev.target.closest(".fk-gaa"), kort = ev.target.closest(".fasekort");
             if (b) gaaTil(parseInt(b.getAttribute("data-fase"), 10));
+            else if (kort) visOm(parseInt(kort.getAttribute("data-om"), 10));
+        });
+        el("om-gaa").addEventListener("click", function () { lukAlle(); gaaTil(S.om); });
+        el("om").addEventListener("click", function (e) { if (e.target === el("om")) lukAlle(); });
+        window.addEventListener("resize", function () {
+            if (S.fase === "skema" && S.stablet !== skemaStables()) tegnSkema();
         });
         el("skemaknap").addEventListener("click", function () { visSkema(faerdigeFaser(), -1, false); });
         el("faserknap").addEventListener("click", visStart);
@@ -653,7 +700,7 @@
         el("fagord").addEventListener("click", function (e) { if (e.target === el("fagord")) lukAlle(); });
         el("fagordknap").addEventListener("click", function () { aabn("fagord"); });
         document.addEventListener("keydown", tastatur);
-        window.addEventListener("hashchange", function () { if (!fraAnker()) visStart(); });
+        window.addEventListener("hashchange", function () { lukAlle(); if (!fraAnker()) visStart(); });
 
         if (!fraAnker()) visStart();
     }

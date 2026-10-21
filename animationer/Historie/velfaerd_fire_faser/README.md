@@ -35,7 +35,11 @@ nr. 4. Samme dag kom Keynes og velfærdsstaten ind foran den som nr. 4 (brugeren
 
 0. **Start.** De fire faser på en tidslinje. Den første fase, der ikke er
    udfyldt, er markeret, men eleven kan vælge frit. Så kan læreren tage én fase
-   pr. modul.
+   pr. modul. Kun knappen Begynd (Fortsæt, Færdig) går ind i fasen. Et klik på
+   resten af kortet åbner **Om tiden**: tre sætninger om tiden og et portræt af
+   en af tidens politikere (Estrup, Stauning, Kampmann, Schlüter) med
+   billedtekst og kreditering. Vinduet har selv en Begynd-knap. (Brugerens
+   ønske 21. okt. 2026.)
 1. **Feltet.** Fasens fire felter kommer i skemaets rækkefølge: Velfærdstiltag,
    Samfundet, Den politiske situation, Kobling til grundforklaringer. Hvert felt
    har tre eller fire opgaver, og hver løst opgave lægger en linje i feltet.
@@ -43,7 +47,11 @@ nr. 4. Samme dag kom Keynes og velfærdsstaten ind foran den som nr. 4 (brugeren
 2. **Fasen samlet.** Når de fire felter er udfyldt, ses fasens kolonne samlet.
 3. **Hele skemaet.** Når alle fire faser er udfyldt, ses hele skemaet. Det kan
    kopieres som tabel til Word og OneNote. Knappen Se dit skema på startbilledet
-   viser de faser, der er færdige.
+   viser de faser, der er færdige. Skemaet bruger hele vinduets bredde. Er der
+   ikke plads til ca. 15 rem pr. fase side om side (fx i samlingens vindue på
+   en bærbar), står faserne under hinanden, hver med sin egen tabel, så felterne
+   ikke bliver smalle. (Brugerens ønske 21. okt. 2026: arket måtte gerne
+   udvides, det blev for kompakt.) Det, der kopieres, er altid én tabel.
 
 De tre slags opgaver:
 
@@ -65,7 +73,8 @@ De tre slags opgaver:
 |-----|---------|
 | `index.html` | Siden og fagordene |
 | `css/stil.css` | Udseendet. Samme farver, knapper og statuslinje som de andre i 2.3b |
-| `js/data.js` | Faserne, felterne, opgaverne og alle tekster |
+| `js/data.js` | Faserne, felterne, opgaverne, Om tiden og alle tekster |
+| `billeder/` | De fire portrætter, 400 x 500 (se Kilder) |
 | `js/svar.js` | Bedømmer det ord, eleven skriver (stavefejl, varianter) |
 | `js/forloeb.js` | Forløbet, skemaet, det gemte skema, tastaturet og opstarten |
 | `js/kerne.js` | Små hjælpefunktioner |
@@ -104,7 +113,7 @@ grundforklaringer og de tre slags erhverv), ikke de ord, eleven skal skrive.
   moduler på samme computer. Lav fasen igen og Forfra skal trykkes to gange.
 - **Tolerancen.** Ingen stavefejl i ord på op til 4 bogstaver, én i ord på 5-7
   og to i længere ord. Jordskælvsvalget godtages for jordskredsvalget og
-  servicesamfund for informationssamfund (lærebogen bruger det ene, skemaet det
+  informationssamfund for servicesamfund (kapitlet bruger det ene, guldarket det
   andet).
 
 ## Forholdet til guldarket
@@ -124,6 +133,20 @@ Udeladt for at holde linjerne korte: underpunkterne under offentlig forsorg
 retsprincippet og „offentlige og private“ ved de tertiære erhverv i tredje fase.
 Kanslergadeforliget står kun i feltet Den politiske situation, fordi eleven
 skal skrive ordet dér.
+
+## Forholdet til det nye kapitel 11
+
+Brugeren skrev 21. okt. 2026, at udlicitering ikke er med i det opdaterede
+kapitel 11 (`tekster/kapitel-11-alternativ.qmd`). Derfor:
+
+- Udlicitering er væk. I stedet skal eleven skrive **nyliberalisme** (kapitlets
+  ord for idéen bag besparelserne og privatiseringen).
+- **Servicesamfund** er nu ordet i hullet; informationssamfund (guldarket)
+  godtages og står i parentes.
+- Spørgsmålet om 1982 nævner **firkløverregeringen**.
+
+Stauning er nu på billedet i Om tiden. Derfor er opgaven, hvor hans navn skulle
+skrives, blevet til en opgave om Det Radikale Venstre, der regerede med ham.
 
 ## Kilder
 
@@ -149,14 +172,26 @@ Det, der går ud over de læste tekster, er slået op 6. okt. 2026 i Lex
   efterlønnen.
 - Det Konservative Folkeparti står som stiftet i 1916 i Lex og i 1915 andre
   steder. Derfor siger animationen kun „under Første Verdenskrig“.
+- Kampmann som finansminister 1953-1960 og statsminister 1960-1962 (Lex, 21. okt.).
+
+Portrætterne er hentet fra Wikimedia Commons og beskåret til 400 x 500:
+
+- Estrup: „J. B. S. Estrup by Elfelt.jpg“, Peter Elfelt, Det Kgl. Bibliotek, fri af ophavsret.
+- Stauning: „Thorvald Stauning - Elfelt.jpg“, Peter Elfelt, Det Kgl. Bibliotek, fri af ophavsret.
+- Kampmann: „Viggo Kampmann by Elfelt & Co.jpg“, Elfelt & Co., Det Kgl. Bibliotek, CC BY 4.0.
+- Schlüter: „Poul Schluter.jpg“, World Economic Forum 1983, CC BY-SA 2.0.
+
+Der fandtes intet frit portræt af Glistrup, så fjerde fase har Schlüter.
 
 ## Test
 
-Selvtesten: ALT OK, 6964 påstande (6. okt. 2026). Den tjekker teksterne,
+Selvtesten: ALT OK, 7303 påstande (21. okt. 2026). Den tjekker teksterne,
 ordbedømmelsen, hele forløbet med klik og tastatur, det gemte skema og ankrene,
 og at intet flytter sig eller skal rulles ved 883 x 620 (samlingens vindue på
 en bærbar), 1280 x 620, 1366 x 768 og 1600 x 900. Én fase kan ses samlet uden
-at rulle i alle fire størrelser; hele skemaet ruller i papiret. Ingen læsbar
+at rulle i alle fire størrelser; hele skemaet ruller i papiret, og hvert felt
+er mindst 200 px bredt. Om tiden kan ses uden at rulle, og teksten dér røber
+ikke de ord, eleven skal skrive i fasen. Ingen læsbar
 tekst er under 12,4 px.
 
 Desuden prøvet med rigtig mus og rigtigt tastatur (Enter tjekker ordet og går ét

@@ -90,7 +90,7 @@
     <section class="skema" id="skema">
         <div class="skema-rul" id="skema-rul">
             <span class="etiket" id="skema-titel"></span>
-            <table class="skema-tabel" id="skema-tabel"></table>
+            <div class="skema-tabeller" id="skema-tabeller"></div>
         </div>
 
         <div class="statuslinje groen skema-linje">
@@ -141,6 +141,35 @@
 
         <div class="knapper" style="margin-top:16px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- OM TIDEN: et klik på en fase (ikke på Begynd) viser tiden og en     -->
+<!-- af tidens politikere. Begynd-knappen her går ind i fasen.           -->
+<!-- ================================================================= -->
+<div class="overlay" id="om">
+    <div class="overlay-boks om-boks" role="dialog" aria-labelledby="om-aar">
+        <div class="om-hoved">
+            <span class="opg-maerke" id="om-nr"></span>
+            <h2 id="om-aar"></h2>
+        </div>
+        <p class="om-fasenavn" id="om-fasenavn"></p>
+        <div class="om-krop">
+            <figure class="om-figur">
+                <img id="om-billede" alt="">
+                <figcaption>
+                    <b id="om-person"></b>
+                    <span id="om-hvem"></span>
+                    <small id="om-kredit"></small>
+                </figcaption>
+            </figure>
+            <p class="om-tekst" id="om-tekst"></p>
+        </div>
+        <div class="om-knapper">
+            <button class="knap" type="button" id="om-luk" data-luk></button>
+            <button class="knap hjaelp videre" type="button" id="om-gaa"></button>
         </div>
     </div>
 </div>

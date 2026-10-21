@@ -26,6 +26,10 @@
               grundforklaringer: rigtig er "f", "k" eller "i", og fejl
               har en tekst til hver af de to andre.
 
+   Hver fase har ogsaa tid: teksten og billedet i vinduet Om tiden, som
+   aabner, naar eleven klikker paa fasens kort (ikke paa Begynd). Den maa
+   ikke roebe de ord, eleven skal skrive i fasen.
+
    En linje i feltet maa ikke roebe svaret paa en senere opgave i samme
    felt. Selvtesten tjekker det for de ord, eleven skal skrive.
    ===================================================================== */
@@ -52,9 +56,12 @@ NK.Data = {
     TEKST: {
         intro1: "Velfærdsstaten blev bygget i fire faser.",
         intro2: "Du udfylder skemaet over faserne, ét felt ad gangen.",
-        startNy: "Tryk på en fase for at begynde.",
-        startGemt: "Dit skema er gemt på denne computer. Tryk på en fase for at fortsætte.",
-        startAlle: "Hele skemaet er udfyldt.",
+        startNy: "Tryk på Begynd for at gå i gang. Tryk på en fase for at læse om tiden.",
+        startGemt: "Dit skema er gemt på denne computer. Tryk på en fase for at læse om tiden.",
+        startAlle: "Hele skemaet er udfyldt. Tryk på en fase for at læse om tiden.",
+        omTiden: "Læs om tiden ›",
+        seFasen: "Se fasen →",
+        luk: "Luk",
         faseNr: "{n}. fase",
         felter: "{k} af 4 felter",
         begynd: "Begynd →",
@@ -102,6 +109,13 @@ NK.Data = {
             aar: "Slutningen af 1800-tallet",
             kort: "1800-tallet",
             navn: "Første begrænsede velfærdsordninger",
+            tid: {
+                billede: "billeder/estrup.jpg",
+                person: "J.B.S. Estrup",
+                hvem: "Godsejer. Han ledede regeringen fra 1875 til 1894, selv om flertallet i Folketinget var imod ham.",
+                kredit: "Foto: Peter Elfelt, Det Kgl. Bibliotek. Fri af ophavsret.",
+                tekst: "Landbruget var stadig Danmarks vigtigste erhverv, men fabrikker og jernbaner skød op, og byerne voksede hurtigt. Mange arbejdere boede trangt og stod uden hjælp, når de blev syge, gamle eller uden arbejde. Samtidig kæmpede bønderne og overklassen om, hvem der skulle styre landet."
+            },
             felter: [
                 /* Velfaerdstiltag */
                 [
@@ -317,6 +331,13 @@ NK.Data = {
             aar: "1930'erne",
             kort: "1930'erne",
             navn: "Socialreformens epoke",
+            tid: {
+                billede: "billeder/stauning.jpg",
+                person: "Thorvald Stauning",
+                hvem: "Socialdemokrat. Han var statsminister fra 1924 til 1926 og igen fra 1929 til 1942.",
+                kredit: "Foto: Peter Elfelt, Det Kgl. Bibliotek. Fri af ophavsret.",
+                tekst: "I 1930 nåede en verdensomspændende krise til Danmark. Priserne på smør og flæsk faldt, fabrikker lukkede, og lange køer af ledige stod foran kontorerne. I flere lande i Europa tog diktatorer magten, og mange frygtede, at det samme kunne ske i Danmark."
+            },
             felter: [
                 /* Velfaerdstiltag */
                 [
@@ -388,20 +409,35 @@ NK.Data = {
                     },
                     {
                         type: "skriv",
-                        spm: "I januar 1933 var 43,5 % af de forsikrede arbejdere uden arbejde. Krisens største problem var {hul}.",
+                        spm: "I januar 1933 var 43,5 % af de forsikrede arbejdere uden arbejde. Krisens største problem var {hul}.",
                         svar: "arbejdsløshed",
                         godtag: ["arbejdsløshed", "arbejdsløsheden", "arbejdsløse", "arbejdsløs", "ledighed", "ledigheden", "massearbejdsløshed", "massearbejdsløsheden"],
                         naesten: [
                             { ord: ["fattigdom", "fattigdommen"], t: "Fattigdommen fulgte med. Hvad kalder man det, når folk ikke kan få arbejde?" }
                         ],
                         hint: "Hvad kalder man det, når folk ikke kan få arbejde?",
-                        fordi: "I gennemsnit var 32 % af de forsikrede ledige i 1932.",
+                        fordi: "I gennemsnit var 32 % af de forsikrede ledige i 1932.",
                         fed: "Tårnhøj arbejdsløshed:",
-                        linje: "43,5 % af de forsikrede arbejdere i januar 1933."
+                        linje: "43,5 % af de forsikrede arbejdere i januar 1933."
                     }
                 ],
                 /* Den politiske situation */
                 [
+                    {
+                        type: "skriv",
+                        spm: "Fra 1929 regerede Stauning og Socialdemokratiet sammen med partiet Det {hul} Venstre.",
+                        svar: "Radikale",
+                        godtag: ["radikale", "radikal", "det radikale", "radikale venstre", "det radikale venstre", "r"],
+                        naesten: [
+                            { ord: ["konservative", "de konservative", "konservativ"], t: "De Konservative var i opposition. Partiet, der regerede med Stauning, forkortes R." },
+                            { ord: ["venstre"], t: "Ordet Venstre står der allerede. Hvilket ord står foran? Partiet forkortes R." },
+                            { ord: ["socialistisk", "socialistiske"], t: "Socialistisk Folkeparti kom først i 1960. Partiet, der regerede med Stauning, forkortes R." }
+                        ],
+                        hint: "Partiet forkortes R og var husmændenes parti.",
+                        fordi: "Regeringen af Socialdemokratiet og Det Radikale Venstre holdt fra 1929 til 1940.",
+                        fed: "Stauning",
+                        linje: "leder en regering af Socialdemokratiet og Det Radikale Venstre 1929-1940."
+                    },
                     {
                         type: "vaelg",
                         spm: "Hvilke fire partier dominerede dansk politik?",
@@ -423,20 +459,6 @@ NK.Data = {
                         ],
                         fed: "Klassepartier:",
                         linje: "Hvert parti har sin samfundsklasse som vælgere."
-                    },
-                    {
-                        type: "skriv",
-                        spm: "Fra 1929 regerede Socialdemokratiet sammen med Det Radikale Venstre. Statsministeren hed Thorvald {hul}.",
-                        svar: "Stauning",
-                        godtag: ["stauning", "thorvald stauning", "staunings"],
-                        naesten: [
-                            { ord: ["steincke", "kk steincke"], t: "K.K. Steincke var socialminister. Statsministeren talte om verdenskrisen i kilden fra 1931." },
-                            { ord: ["hitler"], t: "Hitler fik magten i Tyskland i 1933. Den danske statsminister talte om verdenskrisen i kilden fra 1931." }
-                        ],
-                        hint: "Du har læst en kilde fra 1931, hvor han taler om verdenskrisen.",
-                        fordi: "Stauning var statsminister fra 1929 til 1942.",
-                        fed: "Stauning",
-                        linje: "leder en regering af Socialdemokratiet og Det Radikale Venstre 1929-1940."
                     },
                     {
                         type: "skriv",
@@ -502,6 +524,13 @@ NK.Data = {
             aar: "Slutningen af 1950'erne til begyndelsen af 1970'erne",
             kort: "1960'erne",
             navn: "Den gyldne velfærdsperiode",
+            tid: {
+                billede: "billeder/kampmann.jpg",
+                person: "Viggo Kampmann",
+                hvem: "Socialdemokrat. Som finansminister fra 1953 til 1960 hjalp han væksten i gang, og han var statsminister fra 1960 til 1962.",
+                kredit: "Foto: Elfelt & Co., Det Kgl. Bibliotek. CC BY 4.0.",
+                tekst: "Fra slutningen af 1950'erne gik det stærkt fremad. Næsten alle havde arbejde, lønningerne steg, og mange fik bil, fjernsyn og parcelhus. Staten og kommunerne byggede skoler, sygehuse og plejehjem over hele landet."
+            },
             felter: [
                 /* Velfaerdstiltag */
                 [
@@ -541,7 +570,7 @@ NK.Data = {
                         svar: [
                             { t: "Uddannelse, sundhed, børnepasning og veje", rigtig: true, fordi: "Kommunerne byggede skoler, børnehaver og plejehjem." },
                             { t: "Fattiggårde, sygekasser og alderdomsunderstøttelse", fejl: "Det er ordningerne fra slutningen af 1800-tallet. Hvad byggede kommunerne i 1960'erne?" },
-                            { t: "Privatisering og udlicitering af offentlige opgaver", fejl: "Det hører til 1980'erne, hvor der skulle spares. I 1960'erne byggede det offentlige ud." }
+                            { t: "Privatisering og besparelser i den offentlige sektor", fejl: "Det hører til 1980'erne, hvor der skulle spares. I 1960'erne byggede det offentlige ud." }
                         ],
                         fed: "Mere offentlig service:",
                         linje: "uddannelse, sundhed, børnepasning og infrastruktur."
@@ -595,7 +624,7 @@ NK.Data = {
                             { ord: ["indvandrere", "gæstearbejdere", "fremmedarbejdere"], t: "Gæstearbejderne kom også, sidst i 1960'erne. Men her står: de gifte ..." }
                         ],
                         hint: "Før gik de hjemme som husmødre.",
-                        fordi: "I 1960'erne havde 30 % af de gifte kvinder arbejde uden for hjemmet, og tallet steg.",
+                        fordi: "I 1960'erne havde 30 % af de gifte kvinder arbejde uden for hjemmet, og tallet steg.",
                         linje: "De gifte kvinder kommer ud på arbejdsmarkedet."
                     }
                 ],
@@ -690,6 +719,13 @@ NK.Data = {
             aar: "Ca. 1973-1993",
             kort: "1973-1993",
             navn: "Velfærdsstaten under pres",
+            tid: {
+                billede: "billeder/schlueter.jpg",
+                person: "Poul Schlüter",
+                hvem: "Konservativ. Han var statsminister fra 1982 til 1993.",
+                kredit: "Foto: World Economic Forum, 1983. CC BY-SA 2.0.",
+                tekst: "I 1973 sluttede de gode tider brat. Fabrikker og værfter lukkede, og priserne steg. Mange vælgere var trætte af høje skatter og et stort offentligt bureaukrati, og i 1980'erne rykkede politikken mod højre."
+            },
             felter: [
                 /* Velfaerdstiltag */
                 [
@@ -710,25 +746,28 @@ NK.Data = {
                         svar: "privatisering",
                         godtag: ["privatisering", "privatiseringen", "privatiseringer", "privatisere", "at privatisere"],
                         naesten: [
-                            { ord: ["udlicitering", "udliciteringen"], t: "Ved udlicitering har det offentlige stadig opgaven. Her bliver virksomheden solgt og bliver privat." }
+                            { ord: ["nyliberalisme", "nyliberalismen"], t: "Nyliberalismen er idéen bag. Det at sælge til private hedder noget andet." }
                         ],
                         hint: "Virksomheden bliver privat. Ordet er lavet af det og ender på -isering.",
-                        fordi: "Idéen kom fra Thatchers England og Reagans USA.",
+                        fordi: "Tanken var, at private ejere driver virksomheder bedre og billigere.",
                         fed: "Privatisering:",
                         linje: "Offentlige virksomheder sælges til private."
                     },
                     {
                         type: "skriv",
-                        spm: "En kommune betaler et privat firma for at løse en offentlig opgave, fx rengøring. Det kaldes {hul}.",
-                        svar: "udlicitering",
-                        godtag: ["udlicitering", "udliciteringen", "udliciteringer", "udlicitere", "at udlicitere", "outsourcing"],
+                        spm: "Bag besparelserne stod en ny idé: Markedet skal styre mest muligt og staten mindst muligt. Den hedder {hul}.",
+                        svar: "nyliberalisme",
+                        godtag: ["nyliberalisme", "nyliberalismen", "neoliberalisme", "neoliberalismen", "nyliberalistisk", "nyliberal"],
                         naesten: [
-                            { ord: ["privatisering", "privatiseringen"], t: "Ved privatisering sælges virksomheden. Her betaler kommunen stadig, men en anden gør arbejdet." }
+                            { ord: ["liberalisme", "liberalismen", "liberal", "liberalistisk"], t: "Næsten. Det var en ny udgave af liberalismen fra 1800-tallet. Hvad kalder man den?" },
+                            { ord: ["kapitalisme", "kapitalismen", "markedsøkonomi", "markedsøkonomien", "fri konkurrence"], t: "Rigtig tanke. Idéen er en ny form for liberalisme. Hvad hedder den?" },
+                            { ord: ["thatcherisme", "thatcherismen"], t: "Thatcher førte politikken, men idéen hedder noget andet. Det er en ny form for liberalisme." },
+                            { ord: ["keynes", "keynesianisme", "keynesianismen"], t: "Keynes ville have staten til at styre mere. Her er det omvendt: en ny form for liberalisme." }
                         ],
-                        hint: "Opgaven sendes i udbud, også kaldet licitation. Ordet begynder med ud.",
-                        fordi: "Det offentlige betaler stadig, men private gør arbejdet.",
-                        fed: "Udlicitering:",
-                        linje: "Private firmaer løser offentlige opgaver mod betaling."
+                        hint: "Det er en ny udgave af liberalismen fra 1800-tallet.",
+                        fordi: "Thatcher i Storbritannien og Reagan i USA førte den politik.",
+                        fed: "Nyliberalisme:",
+                        linje: "Markedet skal styre mest muligt og staten mindst muligt."
                     }
                 ],
                 /* Samfundet */
@@ -751,12 +790,12 @@ NK.Data = {
                         type: "vaelg",
                         spm: "Hvad førte oliekrisen til i Danmark?",
                         svar: [
-                            { t: "Lavkonjunktur og en arbejdsløshed på over 10 %", rigtig: true, fordi: "Dyr energi gav dyrere varer, mindre salg og færre job." },
+                            { t: "Lavkonjunktur og en arbejdsløshed på over 10 %", rigtig: true, fordi: "Dyr energi gav dyrere varer, mindre salg og færre job." },
                             { t: "Højkonjunktur og mangel på arbejdskraft", fejl: "Sådan var 1960'erne. Dyr olie gør det dyrere at producere. Hvad sker der så med jobbene?" },
                             { t: "Lavere priser og højere løn", fejl: "Priserne steg kraftigt. Dyr olie gør det dyrere at producere. Hvad sker der så med jobbene?" }
                         ],
                         fed: "Lavkonjunktur",
-                        linje: "og en arbejdsløshed på over 10 %."
+                        linje: "og en arbejdsløshed på over 10 %."
                     },
                     {
                         type: "vaelg",
@@ -771,23 +810,23 @@ NK.Data = {
                     },
                     {
                         type: "skriv",
-                        spm: "Færre arbejder i industrien, og flere arbejder med service og viden. Industrisamfundet bliver til et {hul}.",
-                        svar: "informationssamfund",
-                        godtag: ["informationssamfund", "informationssamfundet", "servicesamfund", "servicesamfundet", "videnssamfund", "videnssamfundet", "vidensamfund", "information", "service"],
+                        spm: "Færre arbejder med at lave varer, og flere arbejder i handel og administration. Industrisamfundet bliver til et {hul}.",
+                        svar: "servicesamfund",
+                        godtag: ["servicesamfund", "servicesamfundet", "informationssamfund", "informationssamfundet", "videnssamfund", "videnssamfundet", "vidensamfund", "service", "information"],
                         naesten: [
-                            { ord: ["samfund", "samfundet"], t: "Ja, et samfund. Hvilken slags? Sæt service, viden eller information foran." },
+                            { ord: ["samfund", "samfundet"], t: "Ja, et samfund. Hvilken slags? Sæt et ord for de tertiære erhverv foran." },
                             { ord: ["industrisamfund", "industrisamfundet"], t: "Industrisamfundet er det, der forsvinder. Hvad arbejder flere med nu?" }
                         ],
-                        hint: "Sæt service, viden eller information foran ordet samfund.",
-                        fordi: "Lærebogen kalder det også et servicesamfund.",
-                        linje: "Industrisamfundet bliver til et informationssamfund (servicesamfund)."
+                        hint: "Hvad kalder man handel, transport og omsorg med ét ord? Sæt det foran samfund.",
+                        fordi: "Skemaet kalder det også et informationssamfund.",
+                        linje: "Industrisamfundet bliver til et servicesamfund (informationssamfund)."
                     }
                 ],
                 /* Den politiske situation */
                 [
                     {
                         type: "skriv",
-                        spm: "Ved valget i december 1973 faldt de gamle partier fra over 90 % til 57 % af stemmerne. Valget kaldes {hul}.",
+                        spm: "Ved valget i december 1973 faldt de gamle partier fra over 90 % til 57 % af stemmerne. Valget kaldes {hul}.",
                         svar: "jordskredsvalget",
                         godtag: ["jordskredsvalget", "jordskredsvalg", "jordskred", "jordskredet", "jordskælvsvalget", "jordskælvsvalg", "jordskælvet", "jordskælv", "jordskredsvalget 1973", "jordskredsvalget i 1973"],
                         naesten: [
@@ -826,14 +865,14 @@ NK.Data = {
                     },
                     {
                         type: "vaelg",
-                        spm: "Hvem regerede fra 1982 til 1993, og hvad ville de?",
+                        spm: "Hvem overtog regeringsmagten i 1982, og hvad ville de?",
                         svar: [
-                            { t: "Borgerlige regeringer under Poul Schlüter: offentlige besparelser og lavere skat", rigtig: true, fordi: "Schlüter var konservativ. Den offentlige sektor skulle slankes." },
-                            { t: "Socialdemokratiske regeringer under Anker Jørgensen: mere velfærd", fejl: "Anker Jørgensen gav op i 1982. Hvem tog over, og fra hvilken fløj?" },
+                            { t: "Den borgerlige firkløverregering under Poul Schlüter: besparelser og lavere skat", rigtig: true, fordi: "Schlüter var konservativ og statsminister til 1993. Den offentlige sektor skulle slankes." },
+                            { t: "Socialdemokratiet under Anker Jørgensen: mere velfærd", fejl: "Anker Jørgensen gav op i 1982. Hvem tog over, og fra hvilken fløj?" },
                             { t: "Fremskridtspartiet alene: ingen indkomstskat", fejl: "Fremskridtspartiet kom aldrig i regering. En konservativ statsminister tog over i 1982." }
                         ],
                         fed: "Borgerlige regeringer 1982-1993",
-                        linje: "(Schlüter): offentlige nedskæringer og ønske om skattelettelser."
+                        linje: "(Schlüter, fra 1982 firkløverregeringen): offentlige nedskæringer og ønske om skattelettelser."
                     }
                 ],
                 /* Kobling til grundforklaringer */
