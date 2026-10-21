@@ -320,9 +320,9 @@
             h.push("Endelsen " + K.medStreg(e.tekst) + " er " + (flere ? D.TAL[MULT[e.mult]] + " OH-grupper" : "en OH-gruppe") + paa +
                 ". Vælg −OH, og klik på carbonatomet.");
         } else if (e && e.type === "syre") {
-            if (e.mult === "di") h.push("Endelsen -disyre er en COOH-gruppe i hver ende af kæden. Sæt =O og −OH på begge ender.");
-            else if (n === 1) h.push("Methansyre er kun COOH-gruppen. Sæt =O og −OH på carbonatomet, der står på tavlen.");
-            else h.push("Endelsen -syre er =O og −OH på det sidste carbonatom. Eller sæt −COOH på en kæde, der er ét kortere.");
+            if (e.mult === "di") h.push("Endelsen -disyre er en COOH-gruppe i hver ende af kæden. Vælg −COOH, og klik på begge ender.");
+            else if (n === 1) h.push("Methansyre er kun COOH-gruppen. Vælg −COOH, og klik på carbonatomet, der står på tavlen.");
+            else h.push("Endelsen -syre er en COOH-gruppe for enden af kæden. Vælg −COOH, og klik på carbonatomet for enden.");
         } else if (u) {
             var tri = u.type === "yn";
             h.push("Endelsen " + K.medStreg(u.tekst) + " er en " + (tri ? "tripelbinding" : "dobbeltbinding") +

@@ -1995,6 +1995,7 @@ kbd {
 /* ----- Vaerktoejerne paa tavlen (fane 1): flere end i sb4.8, saa lidt mindre */
 .tegnevaerktoej .vtknap { padding: 6px 11px; font-size: 0.97rem; }
 .tegnevaerktoej .vtknap.let { padding: 6px 10px; font-size: 0.9rem; }
+.tegnevaerktoej .vtknap.let.aktiv { color: #ffffff; }   /* Slet, naar den er valgt */
 
 @media (max-width: 1250px) {
     .tegnevaerktoej .vtknap { padding: 5px 8px; font-size: 0.9rem; }

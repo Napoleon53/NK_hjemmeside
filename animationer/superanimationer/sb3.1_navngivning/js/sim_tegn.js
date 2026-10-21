@@ -20,6 +20,10 @@
        enkelt igen (Kaede goer det samme)
      * −Cl og −Br saetter et halogenatom paa carbonatomet; de andre
        grupper kan kun saettes paa carbonatomer
+     * −COOH goer carbonatomet for enden af kaeden til carbonatomet i
+       COOH (=O og −OH paa det), saa startatomet alene bliver methansyre
+     * Slet: et venstreklik paa et atom for enden af kaeden sletter det,
+       som et hoejreklik (vaerktoejet bliver valgt, til et andet vaelges)
      * Kaede paa et O, Cl eller Br bygger ikke videre, og et klik i den
        tomme tavle saetter ikke et nyt atom
      * Ring paa en tom tavle (kun startatomet) laegger ringen i stedet for
@@ -79,6 +83,11 @@
             if (v.indexOf("halogen:") === 0) {
                 if (u.slags === "atom") this.nytFra(u.atom.id, v.slice(8));
                 else this.toast("Klik på et carbonatom.");
+                return;
+            }
+            if (v === "gruppe:COOH") {
+                if (u.slags === "atom") mig.saetCOOH(u.atom.id);
+                else this.toast("Klik på carbonatomet for enden af kæden.");
                 return;
             }
             gammelKlik.call(this, u, pt);
@@ -163,7 +172,8 @@
 
     P.vaelgVaerktoej = function (id) {
         if (this.faerdig) return;
-        if (!this.vaerktoejer.some(function (v) { return v.id === id; })) id = "tegn";
+        /* Slet staar ved Fortryd og Ryd i index.html, ikke i data.js */
+        if (id !== "slet" && !this.vaerktoejer.some(function (v) { return v.id === id; })) id = "tegn";
         this.braet.vaerktoej = id;
         this.braet.grundstof = "C";
         this.visVaerktoej();
@@ -175,6 +185,41 @@
             k.classList.toggle("aktiv", k.getAttribute("data-vt") === nu);
         });
         this.vaerktoejEl.classList.toggle("laast", !!this.faerdig);
+    };
+
+    /* −COOH: carbonatomet, der klikkes paa, bliver til carbonatomet i COOH
+       (=O og −OH saettes paa det), saa det taeller med i kaeden som i navnet.
+       Brugeren 21. okt. 2026: "undgaa at COOH automatisk bliver til ethansyre"
+       (startatomet blev til CH3COOH, naar man ville tegne methansyre).
+       Ét Fortryd tager hele gruppen tilbage. */
+    P.saetCOOH = function (id) {
+        var b = this.braet, mol = b.mol, nb = mol.naboer(id);
+        var cNb = nb.filter(function (x) { return mol.atom(x).el === "C"; });
+        if (cNb.length > 1) { b.toast("COOH sidder for enden af kæden. Klik på et carbonatom for enden."); return false; }
+        if (nb.length > cNb.length || !mol.ledig(id, 3)) {
+            b.toast("Der er ikke plads til COOH på det carbonatom.");
+            return false;
+        }
+        var foer = b.billede(), hist = b.hist.slice();
+        this.saetter = true;
+        var ok = b.saetGruppe(id, "O") && b.saetGruppe(id, "OH");
+        this.saetter = false;
+        b.hist = hist;
+        if (!ok) { b.gendan(foer); return false; }
+        b.hist.push(foer);
+        if (b.hist.length > 80) b.hist.shift();
+        b.frem = [];
+        this.aendret("atom");
+        return true;
+    };
+
+    /* Slet: et venstreklik paa et atom for enden af kaeden sletter det, som
+       et hoejreklik. Er kun startatomet tilbage, gaar vaerktoejet til Kaede. */
+    P.slet = function (u) {
+        var b = this.braet;
+        if (!u || u.slags !== "atom") { b.toast("Klik på et atom for enden af kæden."); return; }
+        if (b.antal() <= 1) { b.toast("Startatomet bliver stående. Vælg Kæde for at tegne."); return; }
+        if (b.sletAtom(u.atom) && b.antal() <= 1) this.vaelgVaerktoej("tegn");
     };
 
     P.fortryd = function () {
@@ -351,16 +396,40 @@
     };
 
     /* ----- Musen: tavlen faar det hele -------------------------------------------------- */
+
+    /* Markoeren paa tavlen. Systemets tynde krydsmarkoer har naesten samme farve
+       som det lyse whiteboard (brugeren 21. okt. 2026: "samme farve som
+       baggrunden"), saa krydset er vores eget: moerkt med hvid kant og en blaa
+       prik, hvor der klikkes. Med Slet er det et roedt kryds. */
+    /* 32 px: stoerre billeder viser Windows ikke altid */
+    function svgMarkoer(svg, reserve) {
+        return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '") 16 16, ' + reserve;
+    }
+    var KRYDS_STREGER = "M16 3v9M16 20v9M3 16h9M20 16h9";
+    var MARKOER_KRYDS = svgMarkoer("<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>" +
+        "<path d='" + KRYDS_STREGER + "' stroke='#ffffff' stroke-width='7' stroke-linecap='round'/>" +
+        "<path d='" + KRYDS_STREGER + "' stroke='#1d2433' stroke-width='3.4' stroke-linecap='round'/>" +
+        "<circle cx='16' cy='16' r='3.8' fill='#2a76ac' stroke='#ffffff' stroke-width='1.8'/></svg>", "crosshair");
+    var MARKOER_SLET = svgMarkoer("<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>" +
+        "<path d='M7 7l18 18M25 7L7 25' stroke='#ffffff' stroke-width='8.5' stroke-linecap='round'/>" +
+        "<path d='M7 7l18 18M25 7L7 25' stroke='#c8382b' stroke-width='4.4' stroke-linecap='round'/></svg>", "pointer");
+    NK.Markoer = { kryds: MARKOER_KRYDS, slet: MARKOER_SLET };
+
     P.overScene = function (pt) {
         var b = this.braet;
         if (!pt) { b.ud(); return null; }
         b.flyt(pt);
-        return b.markoer(pt);
+        if (b.vaerktoej === "slet" && !this.faerdig) return MARKOER_SLET;
+        var m = b.markoer(pt);
+        return m === "crosshair" ? MARKOER_KRYDS : m;
     };
 
     P.nedScene = function (pt, e) {
         if (this.faerdig) return false;
-        return this.braet.ned(pt, e);
+        var b = this.braet;
+        /* Med Slet tegner et traek ikke: klikket sletter med det samme */
+        if (b.vaerktoej === "slet" && !(e && e.button === 2)) { this.slet(b.under(pt)); return false; }
+        return b.ned(pt, e);
     };
 
     P.hoejreScene = function (pt, e) {

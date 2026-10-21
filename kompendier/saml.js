@@ -256,6 +256,10 @@
           else if (post.slags === 'indhold') sidenumre.push(data.hjaelpesider.indhold);
           else for (var i = 0; i < post.del.sider; i++) sidenumre.push(post.del.start + i);
         });
+        // Er kapitlet lavet om, mens siden var åben, passer den gamle sideplan ikke til den nye PDF.
+        var antal = kilder[nr].getPageCount();
+        if (sidenumre.some(function (s) { return s >= antal; }))
+          throw new Error('Kompendiet er blevet opdateret, mens siden var åben. Tryk F5, og prøv igen.');
         return ud.copyPages(kilder[nr], sidenumre).then(function (sider) { koe[nr] = sider; });
       }));
     }).then(function () {

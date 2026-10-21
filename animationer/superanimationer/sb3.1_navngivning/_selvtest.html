@@ -356,12 +356,60 @@ function koerTest(W) {
     b.saet(NK.NavnLaeser.laes("propan").mol);
     vt("gruppe:COOH").click();
     var kq = NK.Navn.analyser(b.mol).kaede;
+    klikTavle(b.px(kq[1]));
+    paastand("−COOH midt i kæden: intet sker, og kortet siger, at COOH sidder for enden", b.antal() === 3 && /for enden af kæden/.test(T.beskedTekst()), T.beskedTekst());
     klikTavle(b.px(kq[0]));
+    paastand("−COOH på enden af propan: carbonatomet bliver til COOH, så det er propansyre uden et nyt carbonatom", T.liveNavn === "propansyre" && b.antal() === 5 && b.vaerktoej === "tegn" && !T.faerdig,
+        T.liveNavn + " " + b.antal());
+    T.fortryd();
+    paastand("ét Fortryd tager hele COOH-gruppen tilbage: propan", T.liveNavn === "propan" && b.antal() === 3, T.liveNavn + " " + b.antal());
+    T.braet.gentag();
     test();
-    paastand("−COOH på enden af propan og Test: butansyre, og kortet siger, at carbonatomet i COOH tæller med", T.liveNavn === "butansyre" && /tæller med i stammen/.test(T.beskedTekst()), T.beskedTekst());
+    paastand("Gentag og Test: propansyre er løst", T.faerdig, T.liveNavn);
+    T.vaelg(T.idx("methansyre"));
+    vt("gruppe:COOH").click();
+    klikTavle(b.px(b.mol.atomer[0]));
+    paastand("−COOH på startatomet giver methansyre, ikke ethansyre", T.liveNavn === "methansyre" && b.antal() === 3, T.liveNavn);
+    test();
+    paastand("Test: methansyre er løst", T.faerdig);
+    T.vaelg(T.idx("butansyre"));
+    b.saet(NK.NavnLaeser.laes("butan").mol);
+    b.vaerktoej = "gruppe:O";
+    klikTavle(b.px(NK.Navn.analyser(b.mol).kaede[0]));
+    vt("gruppe:COOH").click();
+    klikTavle(b.px(NK.Navn.analyser(b.mol).kaede[0]));
+    paastand("−COOH på et carbonatom, der allerede har =O: intet sker, og kortet siger hvorfor", b.antal() === 5 && /ikke plads til COOH/.test(T.beskedTekst()), T.beskedTekst());
+
+    /* Slet: venstreklik sletter */
+    function endeAtom() {
+        var e = null;
+        b.mol.atomer.forEach(function (a) { if (b.mol.grad(a.id) <= 1 && (!e || b.px(a).x > b.px(e).x)) e = a; });
+        return e;
+    }
+    T.vaelg(T.idx("butan"));
+    klikEnde(); klikEnde(); klikEnde();
+    /* Markoeren: et tydeligt kryds paa den lyse tavle, roedt kryds med Slet */
+    function markoerVed(p) { peger(T, "pointermove", p); return T.L.canvas.style.cursor; }
+    var tomPkt = { x: T.lay.tavle.x + 60, y: T.lay.tavle.y + T.lay.tavle.h / 2 };
+    var mk = markoerVed(tomPkt);
+    paastand("på den tomme tavle er markøren vores tydelige kryds, ikke systemets tynde", /data:image\/svg\+xml/.test(mk) && /crosshair$/.test(mk), mk.slice(-30));
+    el("t-slet").click();
+    mk = markoerVed(tomPkt);
+    paastand("med Slet er markøren et rødt kryds", /data:image\/svg\+xml/.test(mk) && /c8382b/i.test(decodeURIComponent(mk)) && /pointer$/.test(mk), mk.slice(-30));
+    paastand("Slet er valgt og står som valgt", b.vaerktoej === "slet" && el("t-slet").classList.contains("aktiv"));
+    klikTavle(b.px(NK.Navn.analyser(b.mol).kaede[1]));
+    paastand("Slet midt i kæden: intet sker, og kortet siger: slet fra enden", b.antal() === 4 && /enden af kæden/.test(T.beskedTekst()), T.beskedTekst());
+    klikTavle(b.px(endeAtom()));
+    paastand("et venstreklik med Slet på enden sletter atomet, og Slet er stadig valgt", b.antal() === 3 && b.vaerktoej === "slet", b.antal());
+    var ps = b.px(endeAtom());
+    peger(T, "pointerdown", ps);
+    for (var w = 1; w <= 8; w++) peger(T, "pointermove", { x: ps.x + w * sk * 0.4, y: ps.y });
+    peger(T, "pointerup", { x: ps.x + 3.2 * sk, y: ps.y });
+    paastand("et træk med Slet tegner ikke: atomet under musen er slettet, og der er ikke kommet nye", b.antal() === 2, b.antal());
+    klikTavle(b.px(endeAtom()));
+    paastand("når kun startatomet er tilbage, er værktøjet Kæde igen", b.antal() === 1 && b.vaerktoej === "tegn" && !el("t-slet").classList.contains("aktiv"));
     T.fortryd();
-    T.fortryd();
-    paastand("Fortryd to gange: kun startatomet", b.antal() <= 2);
+    paastand("Fortryd giver det slettede atom tilbage", b.antal() === 2);
 
     T.vaelg(T.idx("cyclohexan"));
     vt("ring6").click();

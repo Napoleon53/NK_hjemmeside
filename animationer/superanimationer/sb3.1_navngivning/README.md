@@ -60,7 +60,7 @@ dem: `index.html?med=alkohol,syre` (ordene `alkan`, `alken`, `alkyn`, `halogen`,
 Navnet står på kortet, delt i forled, stamme og endelse med bogens farver.
 Eleven tegner på molekylemotorens tavle, den samme som på tegnebrættet. Øverst på
 tavlen: Kæde, = Binding (et klik på en binding gør den dobbelt, tripel og enkelt
-igen), −OH, =O, −COOH, −Cl, −Br og Ring, og til højre Fortryd og Ryd. Kun de
+igen), −OH, =O, −COOH, −Cl, −Br og Ring, og til højre Slet, Fortryd og Ryd. Kun de
 værktøjer, de valgte stofklasser bruger, er med, og altid dem, opgavens eget stof
 har brug for (chlorethansyre får −Cl).
 
@@ -85,6 +85,19 @@ har brug for (chlorethansyre får −Cl).
   Kæde på O, Cl eller Br bygger ikke videre; et klik i den tomme tavle sætter
   ikke et nyt atom; Ring på en tom tavle lægger ringen i stedet for startatomet.
   Efter en gruppe, et halogenatom og en ring går værktøjet tilbage til Kæde.
+* **−COOH** gør carbonatomet for enden af kæden til carbonatomet i COOH (=O og
+  −OH sættes på det), så det tæller med i kæden som i navnet: propan + −COOH på
+  enden er propansyre, og startatomet alene bliver methansyre. Brugeren 21. okt.
+  2026: "undgå at COOH automatisk bliver til ethansyre" (før satte −COOH et nyt
+  carbonatom på). Midt i kæden siger kortet, at COOH sidder for enden. Ét Fortryd
+  tager hele gruppen.
+* **Slet** (brugerens ønske 21. okt. 2026): et venstreklik på et atom for enden
+  af kæden sletter det, som et højreklik. Slet bliver valgt, til et andet værktøj
+  vælges; et træk tegner ikke. Er kun startatomet tilbage, går værktøjet til Kæde.
+* **Markøren** på tavlen er vores eget kryds (mørkt med hvid kant og en blå prik,
+  32 px), fordi systemets tynde krydsmarkør havde samme farve som whiteboardet
+  (brugeren 21. okt. 2026). Med Slet er den et rødt kryds. Over et atom er den
+  den almindelige hånd.
 
 ## Fane 2: Skriv navnet (`#skriv`)
 
@@ -169,12 +182,13 @@ ikke ændret.
 
 ## Selvtest
 
-`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 172
+`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 185
 påstande: motoren giver hvert stof navnet fra data, navnet kan deles, og stoffet
 passer til stofklassen; typiske forkerte navne og tegninger får den rigtige
 forklaring (også alle navne talt fra den forkerte ende); kontakterne vælger
 opgaverne og værktøjerne; alle opgaver løses på begge faner; der tegnes med musen
-(træk, klik på enden, højreklik, −Br, = Binding, −COOH, Ring); intet tjekkes,
+(træk, klik på enden, højreklik, Slet, −Br, = Binding, −COOH på enden og på
+startatomet, Ring); intet tjekkes,
 før der trykkes Test eller Enter, og kontakten Vis navnet hele tiden virker; hint
 gør det rigtige gult; låsen virker; kortet dækker aldrig whiteboardet, og Test
 står under tegnefeltet fra 1100 × 620 til 1600 × 950; teksterne er korte og uden
