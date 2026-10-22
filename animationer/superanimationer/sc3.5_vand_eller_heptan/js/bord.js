@@ -17,9 +17,19 @@
      klikProeve()        klik paa pipetten eller proeveglasset
      klikKort(pt)        klik paa kortet
      tegnKortet(ctx)     kortet (ellers kun formlen)
+     tegnKortBund(ctx,r) feltet forneden paa kortet (med valg.bundFelt)
      visTraekPil()       den gule pil ved pipetten
+     skjulProeve()       proeveglasset og pipetten er ikke fremme endnu
+     skjulKort()         kortet med formlen er ikke fremme endnu
+     efterLayout()       layoutet er lige regnet om
    valg.soejle: plads forneden paa kortet til soejlen (fane 2)
+   valg.bundFelt: samme plads forneden til fanens eget felt (fane 1)
    valg.prefix: begyndelsen paa id'erne for ankerne (rundvisningen)
+
+   Over hvert glas staar navnet og under det, om vaesken er polaer
+   eller upolaer (brugerens oenske 22. okt. 2026: "Disse praedikater maa
+   gerne komme ind paa tegningen"). lay.teori er pladsen ved siden af
+   glassene, hvor teorikortet paa fane 1 staar.
    ===================================================================== */
 (function () {
     "use strict";
@@ -32,6 +42,7 @@
 
     var FLYV = 0.3, HJEM = 0.35;
     var VENSTRE_PLADS = 165;      /* til maerkaterne til venstre for vandglasset */
+    var MAERKE_PLADS = 46;        /* over glassene: navnet og polaert/upolaert */
 
     function kobl(P, valg) {
         valg = valg || {};
@@ -65,7 +76,7 @@
             var m = NK.klamp(W * 0.02, 8, 18);
             lay.m = m;
             lay.bordY = Math.round(H - NK.klamp(H * 0.12, 40, 92));
-            var bund = valg.soejle ? 44 : 0;
+            var bund = (valg.soejle || valg.bundFelt) ? 44 : 0;
 
             var tH = NK.klamp(Math.min(H * 0.52, lay.bordY * 0.66), 110, 390);
             var k = tH / 360;
@@ -76,8 +87,10 @@
             if (!lay.bred) {
                 /* Smal scene: kortet foroven i hele bredden, glassene under det */
                 var ch = NK.klamp(H * 0.36, 140, 260) + bund;
+                /* Kortet maa ikke tage pladsen fra glassene i mindste skala */
+                ch = Math.min(ch, Math.max(120, lay.bordY - m - MAERKE_PLADS - 6 - 0.3 * 375));
                 lay.kort = { x: m, y: m, b: W - 2 * m, h: ch };
-                var kMaks = (lay.bordY - (lay.kort.y + ch) - 30) / 375;
+                var kMaks = (lay.bordY - (lay.kort.y + ch) - MAERKE_PLADS - 6) / 375;
                 k = Math.max(0.3, Math.min(k, kMaks));
                 rackX = Math.max(m + VENSTRE_PLADS * 0.85 + 120 * k, W * 0.3);
             }
@@ -105,6 +118,19 @@
             }
             lay.fliseTop = Math.round(Math.max(lay.kort.y + 30, glasY + 150 * k));
             if (!lay.bred) lay.fliseTop = Math.round(glasY + 150 * k);
+
+            /* Teorikortet (fane 1): ved siden af stativet ned til bordet, mens
+               proeveglasset ikke er fremme; paa en smal scene over glassene */
+            if (lay.bred) {
+                var tx = Math.max(kortX, lay.rack.x + lay.rack.b + 24);
+                var tb = Math.min(W - m - tx, 620);
+                lay.teori = { x: tx + (W - m - tx - tb) / 2, y: m, b: tb, maksH: lay.bordY - 14 - m };
+            } else {
+                lay.teori = { x: m, y: m, b: W - 2 * m, maksH: Math.max(120, glasY - MAERKE_PLADS - 4 - m) };
+            }
+            /* Er der ikke plads nok, maa kortet gaa ned over bordkanten
+               (og paa en smal scene ned over glassene) */
+            lay.teori.maksHFuld = Math.max(lay.teori.maksH, H - 10 - m);
             this.lay = lay;
 
             var p = valg.prefix;
@@ -113,6 +139,7 @@
                 this.saetAnker(p + "-anker-proeve", lay.vial.x - 8, lay.pipTop - 8, lay.vial.b + 16, lay.bordY - lay.pipTop + 12);
                 this.saetAnker(p + "-anker-kort", lay.kort.x, lay.kort.y, lay.kort.b, lay.kort.h);
             }
+            if (this.efterLayout) this.efterLayout();
         };
 
         P.saetAnker = function (id, x, y, b, h) {
@@ -221,7 +248,7 @@
 
         P.overProeve = function (pt) {
             var lay = this.lay;
-            if (!lay) return false;
+            if (!lay || (this.skjulProeve && this.skjulProeve())) return false;
             var v = lay.vial;
             if (pt.x >= v.x - 4 && pt.x <= v.x + v.b + 4 && pt.y >= v.y - 4 && pt.y <= lay.bordY) return true;
             var p = this.pipPos(), k = lay.k;
@@ -235,6 +262,7 @@
         };
 
         P.overKort = function (pt) {
+            if (this.skjulKort && this.skjulKort()) return false;
             var r = this.lay && this.lay.kort;
             return !!r && pt.x >= r.x && pt.x <= r.x + r.b && pt.y >= r.y && pt.y <= r.y + r.h;
         };
@@ -345,11 +373,16 @@
             var s = D.stof(this.stof);
             T.rum(ctx, lay.W, lay.H, lay.fliseTop, lay.bordY + 6);
 
-            if (this.tegnKortet) this.tegnKortet(ctx);
+            if (this.skjulKort && this.skjulKort()) { /* kortet er ikke fremme endnu */ }
+            else if (this.tegnKortet) this.tegnKortet(ctx);
             else if (s) {
-                var felt = T.kort(ctx, lay.kort, s, {});
+                var bundFelt = valg.bundFelt ? 44 : 0;
+                var felt = T.kort(ctx, lay.kort, s, { bund: bundFelt });
                 var mol = M.laes(s);
                 M.tegn(ctx, mol, M.plan(mol, felt, 46), {});
+                if (bundFelt && this.tegnKortBund) {
+                    this.tegnKortBund(ctx, { x: lay.kort.x + 16, y: lay.kort.y + lay.kort.h - 44, b: lay.kort.b - 32, h: 34 });
+                }
             }
 
             T.bord(ctx, 0, lay.W, lay.bordY, lay.H + 10);
@@ -377,18 +410,12 @@
             });
             S.tegn(ctx, "stativ_forkant", lay.rack.x, lay.rack.y + 22 * k, lay.rack.b, 14 * k);
 
-            /* Navnene over glassene */
-            this.glas.forEach(function (g, i) {
-                var gl = lay.glas[i];
-                NK.tekst(ctx, D.stof(g.opl).navn, gl.cx, gl.y - 9, {
-                    justering: "center", font: T.font("700", NK.klamp(14 * k + 2, 13, 16)),
-                    farve: "#eef2f6", kant: true
-                });
-            });
+            this.tegnMaerker(ctx);
 
             this.glas.forEach(function (g, i) { mig.tegnIagttagelse(ctx, g, i); });
 
             /* Proeveglasset; pipetten staar i det, naar den er hjemme */
+            if (this.skjulProeve && this.skjulProeve()) return;
             var hjemme = this.pipHjemme();
             T.proeveglas(ctx, lay.vial.x, lay.vial.y, lay.vial.k, s, hjemme ? function () { mig.tegnPip(ctx); } : null);
             if (!hjemme) this.tegnPip(ctx);
@@ -396,6 +423,38 @@
             if (this.visTraekPil && this.visTraekPil() && hjemme) {
                 T.traekPil(ctx, lay.vial.x - 20, lay.vial.y - 14 * k, this.tid, -1);
             }
+        };
+
+        /* Over hvert glas: navnet og under det polaert eller upolaert.
+           Staar glassene taet (lille skala), rykkes maerkerne ud til siderne. */
+        P.maerker = function (ctx) {
+            var lay = this.lay, k = lay.k;
+            var px = NK.klamp(14 * k + 2, 13, 16), ppx = 13;
+            var ud = D.OPL.map(function (opl, i) {
+                var navn = D.stof(opl).navn, pol = D.polaritet(opl);
+                ctx.save();
+                ctx.font = T.font("700", px);
+                var bn = ctx.measureText(navn).width;
+                ctx.restore();
+                var bp = T.praedikatBredde(ctx, pol, ppx);
+                return { navn: navn, pol: pol, polaer: D.polaer(opl), b: Math.max(bn, bp), bp: bp, cx: lay.glas[i].cx, y: lay.glas[i].y, px: px, ppx: ppx };
+            });
+            var mangler = (ud[0].b + ud[1].b) / 2 + 10 - (ud[1].cx - ud[0].cx);
+            if (mangler > 0) { ud[0].cx -= mangler / 2; ud[1].cx += mangler / 2; }
+            ud.forEach(function (mk) {
+                mk.navnY = mk.y - 31;
+                mk.polY = mk.y - 14;
+            });
+            return ud;
+        };
+
+        P.tegnMaerker = function (ctx) {
+            this.maerker(ctx).forEach(function (mk) {
+                NK.tekst(ctx, mk.navn, mk.cx, mk.navnY, {
+                    justering: "center", font: T.font("700", mk.px), farve: "#eef2f6", kant: true
+                });
+                T.praedikat(ctx, mk.cx, mk.polY, mk.pol, mk.polaer, mk.ppx);
+            });
         };
 
         P.tegnPip = function (ctx) {

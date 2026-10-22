@@ -13,7 +13,8 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-anker-glas", titel: "Glassene", tekst: "Vand til venstre, heptan til højre. Klik på et glas for at ryste det." },
+            { sel: "#forsoeg-teori", titel: "Vand og heptan", tekst: "Vand er polært, og heptan er upolært. Tryk på Test stofferne for at begynde." },
+            { sel: "#forsoeg-anker-glas", titel: "Glassene", tekst: "Vand til venstre, heptan til højre. Mærket over glasset siger, om væsken er polær eller upolær. Klik på et glas for at ryste det." },
             { sel: "#forsoeg-anker-proeve", titel: "Prøven", tekst: "Træk pipetten (eller spatlen) ned i et af glassene." },
             { sel: "#forsoeg-anker-kort", titel: "Formlen", tekst: "Strukturformlen for stoffet, du tester." },
             { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Det, du ser i glassene, skrives her. Klik på et stof for at teste det." },

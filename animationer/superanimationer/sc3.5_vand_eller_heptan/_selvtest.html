@@ -23,8 +23,9 @@
    med reglen fra nabo-animationen (C-atomer pr. polær gruppe mod 4), at
    hvert stof opfører sig rigtigt i hvert glas (lag, rækkefølge,
    opløsning), at begge faner kan gennemføres (også med musen), at
-   sproget overholder reglerne, og at layoutet holder fra 520 × 380 til
-   1500 × 900.
+   sproget overholder reglerne, og at layoutet holder fra 390 × 844 til
+   1500 × 900. Fane 1 begynder med teorikortet (vand polært, heptan
+   upolært); testen gaar igennem det, foer forsoeget testes.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens rekord og valg og lægger dem tilbage bagefter.
@@ -92,8 +93,17 @@ function koerTest(W) {
 
     overskrift("2. Stofferne og formlerne");
     var ider = Object.keys(D.STOFFER);
-    paastand("14 stoffer: 8 i forsøget og 6 nye i gættelegen", ider.length === 14 && D.FORSOEG.length === 8 && D.GAET_NYE.length === 6 &&
+    paastand("14 stoffer: 2 opløsningsmidler, 6 i forsøget og 6 nye i gættelegen", ider.length === 14 && D.FORSOEG.length === 6 && D.GAET_NYE.length === 6 &&
         D.GAET_NYE.every(function (id) { return D.FORSOEG.indexOf(id) < 0; }));
+    paastand("vand og heptan tilsættes ikke (de er opløsningsmidlerne)", D.OPL.every(function (o) {
+        return D.FORSOEG.indexOf(o) < 0 && D.GAET_NYE.indexOf(o) < 0;
+    }));
+    paastand("vand er polært, heptan er upolært", D.polaritet("vand") === "polært" && D.polaritet("heptan") === "upolært");
+    paastand("konklusionerne: glycerol polært, hexan-1-ol og iod upolære",
+        D.konklusion("glycerol") === "Glycerol blandes med vand, så det er polært." &&
+        D.konklusion("hexanol") === "Hexan-1-ol blandes med heptan, så det er upolært." &&
+        D.konklusion("iod") === "Iod opløses i heptan, så det er upolært." &&
+        D.konklusion("glucose") === "Glucose opløses i vand, så det er polært.", D.konklusion("glycerol"));
     var sumFejl = [], valFejl = [], afstand = [], talFejl = [], rhoFejl = [];
     ider.forEach(function (id) {
         var s = D.stof(id), mol = M.laes(s);
@@ -197,12 +207,46 @@ function koerTest(W) {
     for (var p = 0; p < 4; p++) { fuld.tilsaet("methanol"); for (ii = 0; ii < 90 && fuld.tilsaetT >= 0; ii++) fuld.opdater(1 / 60); }
     paastand("højst tre portioner i et glas", fuld.portioner === 3 && fuld.fuld());
 
-    overskrift("4. Fane 1: forsøget");
+    overskrift("4. Fane 1: teorikortet");
+    try { W.localStorage.removeItem("nk-sc3.5-intro-forsoeg"); } catch (e) { /* ingen hukommelse */ }
     klik('[data-fane="fane-forsoeg"]');
     F.startForfra();
     F.tilpas();
-    paastand("forsøget starter med heptan og to tomme glas", F.stof === "heptan" && F.glas[0].tom() && F.glas[1].tom());
+    steg(F, 0.1);
+    var tk = d.getElementById("forsoeg-teori");
+    paastand("fanen starter med teorikortet", F.teori && W.getComputedStyle(tk).display !== "none" && tk.offsetHeight > 100);
+    paastand("kortet siger vand polært og heptan upolært", /Vand\s*polært/.test(tk.innerText) && /Heptan\s*upolært/.test(tk.innerText));
+    paastand("kortet har reglen og knappen Test stofferne", /ligner hinanden, blandes med hinanden/.test(tk.innerText) &&
+        /Test stofferne/.test(d.getElementById("forsoeg-teori-videre").textContent));
+    paastand("formlerne på kortet er tegnet (bindingslængde mindst 16 px)", F.teoriU >= 16 &&
+        F.teoriMol.every(function (m) { return m.L.b > 50 && m.L.h > 40 && m.plan; }), F.teoriU);
+    paastand("prøveglasset, pipetten og formelkortet er ikke fremme endnu", F.skjulProeve() && F.skjulKort() &&
+        !F.overProeve({ x: F.lay.vial.cx, y: F.lay.vial.y + 40 }) &&
+        d.getElementById("forsoeg-anker-proeve").offsetWidth === 0);
+    paastand("skemaet er dæmpet", d.getElementById("forsoeg-skema").classList.contains("daempet"));
+    paastand("tilbuddet om præsentationen venter, til kortet er læst", W.getComputedStyle(d.getElementById("forsoeg-tilbud")).display === "none");
+    paastand("linjen under scenen peger på Test stofferne", /Test stofferne/.test(F.statusTekst()));
+    var mk = F.maerker(F.L.ctx);
+    paastand("over glassene står vand polært og heptan upolært", mk[0].navn === "vand" && mk[0].pol === "polært" &&
+        mk[1].navn === "heptan" && mk[1].pol === "upolært");
+    F.klikGlas(0);
+    steg(F, 0.5);
+    paastand("et klik på vandglasset forklarer og tilsætter intet", /vand er polært/.test(F.statusTekst()) && F.glas[0].tom());
+    F.tast("ArrowDown");
+    paastand("piletasten går videre fra kortet", !F.teori);
+    F.startForfra();
+    paastand("Start forfra viser kortet igen", F.teori && !tk.hidden);
+    klik("#forsoeg-teori-videre");
+    steg(F, 0.1);
+    paastand("knappen Test stofferne lukker kortet og viser prøven", !F.teori && W.getComputedStyle(tk).display === "none" &&
+        !F.skjulProeve() && !d.getElementById("forsoeg-skema").classList.contains("daempet"));
+    paastand("bagefter tilbydes præsentationen", W.getComputedStyle(d.getElementById("forsoeg-tilbud")).display !== "none");
+    F.afvisTilbud();
+
+    overskrift("5. Fane 1: forsøget");
+    paastand("forsøget starter med glycerol og to tomme glas", F.stof === "glycerol" && F.glas[0].tom() && F.glas[1].tom());
     paastand("linjen under scenen siger, hvad man skal", /Træk pipetten/.test(F.statusTekst()));
+    paastand("kortet spørger: polært eller upolært?", !F.testet("glycerol") && /Polært eller upolært/.test(D.SPOERG_POLARITET));
     /* Med musen: grib pipetten, træk den over vandglasset og slip */
     var c = F.L.canvas, r = c.getBoundingClientRect();
     function mus(type, x, y) {
@@ -215,18 +259,35 @@ function koerTest(W) {
     paastand("pipetten følger musen og finder vandglasset", F.pip.tilstand === "traek" && F.over === 0, F.pip.tilstand + " " + F.over);
     mus("pointerup", gl.cx, gl.y + 20 * F.lay.k);
     steg(F, 1.6);
-    paastand("sluppet over glasset drypper den heptan i vandet", F.glas[0].portioner === 1 && F.glas[0].stof === "heptan");
+    paastand("sluppet over glasset drypper den glycerol i vandet", F.glas[0].portioner === 1 && F.glas[0].stof === "glycerol");
     paastand("linjen beder om en rystning", /ryste/.test(F.statusTekst()));
     mus("pointerdown", gl.cx, F.lay.bordY - 40);
     mus("pointerup", gl.cx, F.lay.bordY - 40);
     paastand("et klik på glasset ryster det", F.glas[0].rystT >= 0);
     steg(F, 4);
-    paastand("skemaet får 'to lag' for heptan i vand", F.skema.heptan && F.skema.heptan.vand && F.skema.heptan.vand.obs === "to lag");
-    paastand("skemaets celle viser det", /to lag/.test(d.querySelector('tr[data-stof="heptan"] td').textContent));
+    paastand("skemaet får 'ét lag' for glycerol i vand", F.skema.glycerol && F.skema.glycerol.vand && F.skema.glycerol.vand.obs === "ét lag");
+    paastand("skemaets celle viser det", /ét lag/.test(d.querySelector('tr[data-stof="glycerol"] td').textContent));
+    paastand("efter ét glas er konklusionen ikke givet endnu", !F.testet("glycerol") &&
+        !/polært/.test(d.querySelector('tr[data-stof="glycerol"] th').textContent));
     /* Et klik på det tomme heptanglas er det samme som at trække pipetten derhen */
     F.klikGlas(1);
     steg(F, 1.6);
     paastand("et klik på et tomt glas drypper stoffet i", F.glas[1].portioner === 1);
+    F.klikGlas(1);
+    steg(F, 4);
+    paastand("glycerol i heptan giver to lag", F.skema.glycerol.heptan && F.skema.glycerol.heptan.obs === "to lag");
+    paastand("testet i begge glas: skemaet skriver polært ved glycerol", F.testet("glycerol") &&
+        /polært/.test(d.querySelector('tr[data-stof="glycerol"] .skema-pol').textContent) &&
+        d.querySelector('tr[data-stof="glycerol"] .skema-pol').classList.contains("polaer"));
+    /* Konklusionen paa kortet: fanget, mens kortet tegnes */
+    var tegnet = [], konkl = NK.Tegn.konklusion;
+    NK.Tegn.konklusion = function (ctx, r, tekst, polaer) { tegnet.push({ tekst: tekst, polaer: polaer, r: r }); return konkl.apply(this, arguments); };
+    F.tegn();
+    NK.Tegn.konklusion = konkl;
+    paastand("kortet viser konklusionen i blåt", tegnet.length === 1 && tegnet[0].tekst === D.konklusion("glycerol") && tegnet[0].polaer === true,
+        JSON.stringify(tegnet.map(function (x) { return x.tekst; })));
+    paastand("konklusionen står inden for kortet", tegnet.length === 1 && tegnet[0].r.y + tegnet[0].r.h <= F.lay.kort.y + F.lay.kort.h &&
+        tegnet[0].r.x >= F.lay.kort.x && tegnet[0].r.x + tegnet[0].r.b <= F.lay.kort.x + F.lay.kort.b);
     F.vaelg("glucose");
     paastand("et nyt stof giver nye glas og spatlen", F.glas[0].tom() && F.glas[1].tom() && F.redskab() === "spatel");
     /* Resten af skemaet */
@@ -240,7 +301,12 @@ function koerTest(W) {
             for (var n = 0; n < 4 && !F.glas[i].resultat; n++) { F.klikGlas(i); steg(F, 3.6); }
         });
     });
-    paastand("alle 16 felter i skemaet kan udfyldes", F.skemaFuldt(), F.antalUdfyldt());
+    paastand("alle 12 felter i skemaet kan udfyldes", F.skemaFuldt() && F.antalUdfyldt() === 12 &&
+        d.getElementById("forsoeg-felter").textContent === "12", F.antalUdfyldt());
+    var polFejl = D.FORSOEG.filter(function (id) {
+        return d.querySelector('tr[data-stof="' + id + '"] .skema-pol').textContent !== D.polaritet(id);
+    });
+    paastand("skemaet skriver polært eller upolært ved alle seks stoffer", polFejl.length === 0, polFejl.join(", "));
     var skemaFejl = D.FORSOEG.filter(function (id) {
         return D.OPL.some(function (o) { return !F.skema[id][o] || F.skema[id][o].blandes !== D.blandbar(id, o); });
     });
@@ -256,7 +322,7 @@ function koerTest(W) {
     paastand("et færdigt glas rystet seks gange giver Kemichaels bemærkning", F.paaskeVist && F.laerer.scene && F.laerer.scene.navn === "ryst");
     F.laererNyt();
 
-    overskrift("5. Fane 2: gæt polaritet");
+    overskrift("6. Fane 2: gæt polaritet");
     klik('[data-fane="fane-gaet"]');
     G.tilpas();
     G.nyRunde();
@@ -327,7 +393,7 @@ function koerTest(W) {
     G.knap();
     paastand("Ny runde starter forfra", !G.slut && G.nr === 0 && G.point === 0);
 
-    overskrift("6. Kemichael og tilbuddet");
+    overskrift("7. Kemichael og tilbuddet");
     var tb = d.getElementById("gaet-tilbud");
     G.visTilbud(false);
     paastand("tilbuddet forsvinder helt efter Nej tak", W.getComputedStyle(tb).display === "none");
@@ -335,10 +401,15 @@ function koerTest(W) {
         D.RUNDE_REPLIK.map(function (x) { return x[1]; })).every(function (l) { return l.length <= 60; }));
     paastand("to eller tre linjer i hver præsentation", D.INTRO_FORSOEG.length === 3 && D.INTRO_GAET.length === 3);
 
-    overskrift("7. Sproget");
+    overskrift("8. Sproget");
     var tekster = [d.body.innerText];
     ider.forEach(function (id) { tekster.push(D.stof(id).hvorfor); });
     tekster = tekster.concat(D.INTRO_FORSOEG, D.INTRO_GAET, D.RUNDE_REPLIK.map(function (x) { return x[1]; }));
+    tekster = tekster.concat(Object.keys(D.TEORI).map(function (n) { return D.TEORI[n]; }), [D.SPOERG_POLARITET],
+        D.FORSOEG.map(function (id) { return D.konklusion(id); }));
+    paastand("teorikortets ord er Kemibogens: polært, upolært, ladede ender, ligner hinanden",
+        /negativ og en positiv ende/.test(D.TEORI.vand) && /ingen ladede ender/.test(D.TEORI.heptan) &&
+        D.TEORI.regel === "Stoffer, der ligner hinanden, blandes med hinanden.");
     ider.forEach(function (id) {
         G.stof = id; G.mol = M.laes(D.stof(id)); G.grupper = M.grupper(G.mol);
         tekster.push(G.hint());
@@ -349,12 +420,33 @@ function koerTest(W) {
     paastand("ingen ladning skrevet som 1+ eller 1−", !/1[+−]/.test(alt));
     paastand("ingen 'du skal lige'-talesprog", !/\b(lige|bare|faktisk)\b/i.test(D.INTRO_FORSOEG.concat(D.INTRO_GAET).join(" ")));
 
-    overskrift("8. Layout");
+    overskrift("9. Layout");
     var ramme = document.getElementById("ramme");
-    [[520, 380], [700, 560], [860, 640], [1100, 700], [1300, 820], [1500, 900]].forEach(function (st) {
+    klik('[data-fane="fane-forsoeg"]');
+    F.startForfra();
+    [[390, 844], [520, 380], [700, 560], [860, 640], [1100, 700], [1280, 720], [1300, 820], [1366, 650], [1500, 900]].forEach(function (st) {
         ramme.style.width = st[0] + "px";
         ramme.style.height = st[1] + "px";
         var problemer = [];
+        /* Teorikortet: inde i scenen, ruller ikke, formler til at læse, og
+           på en bred scene uden for glassene og mærkerne over dem */
+        klik('[data-fane="fane-forsoeg"]');
+        F.tilpas();
+        (function () {
+            var lay = F.lay, Wc = lay.W, Hc = lay.H;
+            var q = { x: tk.offsetLeft, y: tk.offsetTop, b: tk.offsetWidth, h: tk.offsetHeight };
+            if (q.x < -1 || q.y < -1 || q.x + q.b > Wc + 1 || q.y + q.h > Hc + 1) problemer.push("teorikortet uden for scenen");
+            if (tk.scrollHeight > tk.clientHeight) problemer.push("teorikortet ruller (" + tk.scrollHeight + " > " + tk.clientHeight + ")");
+            if (F.teoriU < 16) problemer.push("formlerne på teorikortet er små (" + F.teoriU + ")");
+            if (F.teoriValg.kompakt && Wc >= 700) problemer.push("teorikortet mangler forklaringerne");
+            var mk = F.maerker(F.L.ctx);
+            mk.forEach(function (m) {
+                var r = { x: m.cx - m.b / 2, y: m.navnY - 14, b: m.b, h: m.polY + 11 - (m.navnY - 14) };
+                if (r.x < -1 || r.x + r.b > Wc + 1 || r.y < -1) problemer.push("mærket over " + m.navn + " uden for");
+                if (lay.bred && r.x < q.x + q.b && r.x + r.b > q.x && r.y < q.y + q.h && r.y + r.h > q.y) problemer.push("teorikortet over mærket ved " + m.navn);
+            });
+            if (mk[0].cx + mk[0].b / 2 + 4 > mk[1].cx - mk[1].b / 2) problemer.push("mærkerne over glassene rører hinanden");
+        }());
         ["fane-forsoeg", "fane-gaet"].forEach(function (id) {
             klik('[data-fane="' + id + '"]');
             var sim = NK.sims[id];
@@ -366,7 +458,8 @@ function koerTest(W) {
             function over(a, b, navn) {
                 if (a.x < b.x + b.b - 1 && a.x + a.b > b.x + 1 && a.y < b.y + b.h - 1 && a.y + a.h > b.y + 1) problemer.push(id + ": " + navn);
             }
-            var glas = { x: lay.glas[0].x, y: lay.glas[0].y - 24, b: lay.glas[1].x + 60 * k - lay.glas[0].x, h: lay.bordY - lay.glas[0].y + 24 };
+            /* Glassene med navnet og polaert/upolaert over sig */
+            var glas = { x: lay.glas[0].x, y: lay.glas[0].y - 44, b: lay.glas[1].x + 60 * k - lay.glas[0].x, h: lay.bordY - lay.glas[0].y + 44 };
             var vial = { x: lay.vial.x, y: lay.pipTop, b: lay.vial.b, h: lay.bordY - lay.pipTop };
             inde(lay.kort, "kortet"); inde(lay.rack, "stativet"); inde(vial, "prøven"); inde(glas, "glassene");
             over(lay.kort, glas, "kortet over glassene");
@@ -384,7 +477,7 @@ function koerTest(W) {
             /* Den bredeste formel skal kunne læses */
             var bredest = ["octanol", "citronsyre", "glucose"].map(function (sid) {
                 var mol = M.laes(D.stof(sid));
-                var felt = { x: lay.kort.x + 16, y: lay.kort.y + 40, b: lay.kort.b - 32, h: lay.kort.h - 50 - (id === "fane-gaet" ? 44 : 0) };
+                var felt = { x: lay.kort.x + 16, y: lay.kort.y + 40, b: lay.kort.b - 32, h: lay.kort.h - 50 - 44 };
                 return M.plan(mol, felt, 46).u;
             });
             var mindst = Math.min.apply(null, bredest);

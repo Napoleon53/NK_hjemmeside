@@ -208,8 +208,10 @@
 
     D.stof = function (id) { return D.STOFFER[id] || null; };
 
-    /* Fane 1: stofferne fra den gamle c3.5 (uden sorbinsyre) plus iod */
-    D.FORSOEG = ["vand", "heptan", "glycerol", "hexanol", "glucose", "urinstof", "citronsyre", "iod"];
+    /* Fane 1: stofferne fra den gamle c3.5 (uden sorbinsyre) plus iod.
+       Vand og heptan er oploesningsmidlerne i glassene og tilsaettes ikke
+       (brugerens oenske 22. okt. 2026). */
+    D.FORSOEG = ["glycerol", "hexanol", "glucose", "urinstof", "citronsyre", "iod"];
 
     /* Fane 2: en runde er ti stoffer, fem af hver slags. De nye kommer
        alle med; resten trækkes blandt stofferne fra fane 1. */
@@ -225,6 +227,30 @@
     D.blandbar = function (stofId, oplId) {
         var s = D.stof(stofId);
         return !!s && s.blandes === oplId;
+    };
+
+    /* Polaert eller upolaert, som bogen siger det (Kemibogen 3.4): stoffer,
+       der ligner hinanden, blandes. Det, der blandes med vand, er polaert. */
+    D.polaer = function (stofId) { return D.blandbar(stofId, "vand"); };
+    D.polaritet = function (stofId) { return D.polaer(stofId) ? "polært" : "upolært"; };
+
+    /* Konklusionen paa kortet, naar stoffet er testet i begge glas */
+    D.konklusion = function (stofId) {
+        var s = D.stof(stofId);
+        var navn = s.navn.charAt(0).toUpperCase() + s.navn.slice(1);
+        var verbum = s.tilstand === "fast" ? "opløses i " : "blandes med ";
+        return navn + " " + verbum + D.stof(s.blandes).navn + ", så det er " + D.polaritet(stofId) + ".";
+    };
+    D.SPOERG_POLARITET = "Polært eller upolært? Test stoffet i begge glas.";
+
+    /* Teorikortet, der aabner fane 1: de to oploesningsmidler. Ordene er
+       Kemibogens (afsnit 3.4). */
+    D.TEORI = {
+        vand: "Oxygen trækker elektronerne til sig. Molekylet får en negativ og en positiv ende.",
+        heptan: "Kun carbon og hydrogen. Molekylet har ingen ladede ender.",
+        regel: "Stoffer, der ligner hinanden, blandes med hinanden.",
+        regel2: "Et polært stof blandes med vand, et upolært med heptan.",
+        knap: "Test stofferne"
     };
 
     /* Det, man ser i glasset, naar det har staaet efter rystningen */
@@ -247,7 +273,7 @@
         "Klik på de polære grupper, og træk pipetten.",
         "Gæt gerne forkert. Glassene bliver ikke sure."
     ];
-    D.SKEMA_FULDT = "Seksten forsøg og ingen knuste glas. Det noterer jeg.";
+    D.SKEMA_FULDT = "Tolv forsøg og ingen knuste glas. Det noterer jeg.";
     D.RYST_FOR_MEGET = {
         blandes: "Det er blandet. Det bliver ikke mere blandet.",
         ikke: "Det bliver ved med at være to lag. Jeg har prøvet."
