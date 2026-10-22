@@ -4,15 +4,19 @@
    Verden er 1000 x 470 enheder med bordets overflade ved y 430. Alt
    tegnes i verdens koordinater; layout() finder skala og forskydning.
 
-   Udstyret har en ankerpost (et punkt og en drejning). Mens eleven
-   holder noget, foelger ankeret musen; holdes en flaske, et maaleglas,
-   en kolbe eller en sproejteflaske over det, den skal haeldes i, saetter
-   den sig i haeldestilling og haelder, saa laenge den holdes der.
-   Klik viser ikke noget her: knapperne paa omroereren, hanen og
-   smeltepunktsapparatet klikkes, alt andet traekkes.
+   Tiden staar stille (brugerens oenske 22. okt. 2026: uret, der tikkede,
+   var stressende, og opløsningen kogte, mens man svarede paa et
+   spoergsmaal). Laboratoriets tid gaar kun i korte animationer:
+   opvarmningen, dryppene, ventetiden mellem to TLC-plader, koelingen i
+   isbadet og toerringen under lampen. Magnetomroereren holder
+   opløsningen paa 75-76 °C, saa den aldrig koger.
 
-   Trinnenes logik (hvilken del eleven er ved) staar nederst: delNu,
-   linje, skiltNu og goer. Kortet oeverst er js/trin.js.
+   Hver del har en groen knap ved tingen (js/trin.js), og et klik paa
+   tingen goer det samme. Knappen afmaaler den rigtige maengde, saa intet
+   kan maales forkert (brugerens oenske samme dag: "Lav gerne direkte
+   knapper"). Tingene kan stadig traekkes, og ogsaa saa bliver
+   maengderne rigtige. udfoer() bygger animationen for en del; goer()
+   goer delen paa én gang (spring til et trin og selvtesten).
    ===================================================================== */
 (function () {
     "use strict";
@@ -23,8 +27,6 @@
     var D = NK.Data;
 
     var VB = 1000, VH = 470, BORD = 430, FORAN = 452;
-    var F_TID = 0.5;        /* laboratoriets minutter pr. sekund */
-    var SPOL_FART = 9;      /* minutter pr. sekund, naar der spoles */
 
     /* ----- Glassenes inderside (spritets koordinater) ---------------------- */
     var KOLBE_INDRE = [[60, 6], [60, 62], [15, 180], [16, 186], [19, 190], [24, 192], [126, 192], [131, 190],
@@ -155,7 +157,9 @@
         this.tid = 0;
         this.S = nyTilstand();
         this.greb = null;
-        this.hold = null;           /* en knap, der holdes nede: {id: "pip2", h: "sug"} */
+        this.hold = null;           /* pipetten drypper: {id: "pip1", h: "toem"} */
+        this.anim = null;           /* den animation, der koerer (opdaterAnim) */
+        this.ap = {};               /* poser, som animationen styrer */
         this.draaber = [];
         this.skyer = [];
         this.bobler = [];
@@ -168,10 +172,10 @@
         this.startTrin();
         this.koblMus();
         var mig = this;
-        NK.el("spolknap").addEventListener("click", function () {
-            /* Tiden maa ogsaa gaa, mens kortet beder om at vente paa en ny TLC-plade */
-            if (mig.fase !== "mellem" && mig.spaer()) return;
-            mig.S.spol += 2;
+        NK.el("handling").addEventListener("click", function () {
+            if (mig.anim || mig.fase !== "forsoeg") return;
+            var del = mig.delNu();
+            if (del) mig.udfoer(del);
         });
     };
 
@@ -188,9 +192,6 @@
         var s = Math.min(W / VB, (H - top) / VH);
         s = Math.max(0.3, s);
         this.lay = { s: s, ox: (W - VB * s) / 2, oy: H - VH * s, top: top, W: W, H: H };
-        /* Uret staar oeverst til hoejre under kortet */
-        var ur = NK.el("ur");
-        if (ur) { ur.style.top = Math.round(top) + "px"; }
         this.ankre();
     };
 
@@ -229,15 +230,21 @@
        Poser: hvor tingene er lige nu
        ====================================================================== */
 
+    /* Det, eleven holder, eller det, en animation flytter, har sin egen pose */
+    P.ov = function (id) {
+        if (this.greb && this.greb.id === id) return this.grebPose(id);
+        return this.ap[id] || null;
+    };
+
     /* Kolbens aabning og drejning */
     P.kolbePose = function () {
-        if (this.greb && this.greb.id === "kolbe") return this.grebPose("kolbe");
-        var S = this.S;
-        if (S.kolbeSted === "isbad") return { x: G.kolbeIsbad.x, y: G.kolbeIsbad.y, v: 0 };
+        var o = this.ov("kolbe");
+        if (o) return o;
+        if (this.S.kolbeSted === "isbad") return { x: G.kolbeIsbad.x, y: G.kolbeIsbad.y, v: 0 };
         return { x: G.kolbePlade.x, y: G.kolbePlade.y, v: 0 };
     };
 
-    P.grebPose = function (id) {
+    P.grebPose = function () {
         var g = this.greb;
         if (g.pose) return g.pose;
         return { x: g.x, y: g.y, v: 0 };
@@ -256,26 +263,19 @@
 
     /* Pipetten: spidsens plads */
     P.pipPose = function (id) {
-        if (this.greb && this.greb.id === id) return this.grebPose(id);
+        var o = this.ov(id);
+        if (o) return o;
         var p = this.S.pip[id];
-        if (p.sted === "flaske") return { x: G.flaske.x, y: BORD - 16 };
-        if (p.sted === "kolbe") { var k = this.kolbePose(); return { x: k.x, y: k.y + 8 }; }
-        return { x: G.holder.x, y: BORD - 4 };
+        if (p.sted === "flaske") return { x: G.flaske.x, y: BORD - 16, v: 0 };
+        if (p.sted === "kolbe") { var k = this.kolbePose(); return { x: k.x, y: k.y + 8, v: 0 }; }
+        return { x: G.holder.x, y: BORD - 4, v: 0 };
     };
 
     var PIP_L = 150;
 
-    /* Knapperne ved pipettebolden */
-    P.pipKnapper = function (id) {
-        var p = this.pipPose(id), top = p.y - PIP_L;
-        return {
-            sug: { x: p.x + 24, y: top - 40, b: 82, h: 24 },
-            toem: { x: p.x + 24, y: top - 12, b: 82, h: 24 }
-        };
-    };
-
     P.termoPose = function () {
-        if (this.greb && this.greb.id === "termo") return this.grebPose("termo");
+        var o = this.ov("termo");
+        if (o) return o;
         if (this.S.termo.sted === "kolbe") {
             var k = this.kolbePose();
             return { x: k.x + 12, y: k.y + 150, v: 0.07 };
@@ -284,26 +284,29 @@
     };
 
     P.magnetPos = function () {
-        if (this.greb && this.greb.id === "magnet") return { x: this.greb.x, y: this.greb.y };
-        return { x: G.magnet.x, y: G.magnet.y };
+        return this.ov("magnet") || { x: G.magnet.x, y: G.magnet.y, v: 0 };
+    };
+
+    P.spidsHjem = function (id) {
+        return { x: G.spidsHolder.x + (id === "p" ? -10 : 10), y: BORD - 6, v: 0 };
     };
 
     P.spidsPose = function (id) {
-        if (this.greb && this.greb.id === "spids-" + id) return this.grebPose("spids-" + id);
-        return { x: G.spidsHolder.x + (id === "p" ? -10 : 10), y: BORD - 6 };
+        return this.ov("spids-" + id) || this.spidsHjem(id);
     };
 
     P.pladePose = function () {
-        if (this.greb && this.greb.id === "plade") return this.grebPose("plade");
+        var o = this.ov("plade");
+        if (o) return o;
         var st = this.S.tlc.sted;
-        if (st === "kammer") return { x: 710, y: 423 };
-        if (st === "uv") return { x: 880, y: BORD };
-        return { x: G.plade_tlc.x, y: BORD };
+        if (st === "kammer") return { x: 710, y: 423, v: 0 };
+        if (st === "uv") return { x: 880, y: BORD, v: 0 };
+        return { x: G.plade_tlc.x, y: BORD, v: 0 };
     };
 
     P.urglasPose = function (i) {
-        var id = i ? "urglas2" : "urglas";
-        if (this.greb && this.greb.id === id) return this.grebPose(id);
+        var o = this.ov(i ? "urglas2" : "urglas");
+        if (o) return o;
         var st = this.S.urglasSted[i];
         if (st === "vaegt") return { x: G.paaVaegt.x, y: G.paaVaegt.y, v: 0 };
         if (st === "lampe") return { x: G.underLampe.x, y: G.underLampe.y, v: 0 };
@@ -312,29 +315,47 @@
     };
 
     P.spatelPose = function () {
-        if (this.greb && this.greb.id === "spatel") return this.grebPose("spatel");
-        return { x: G.spatel.x, y: G.spatel.y, v: 0 };
+        return this.ov("spatel") || { x: G.spatel.x, y: G.spatel.y, v: 0 };
     };
 
     P.roerPose = function () {
-        if (this.greb && this.greb.id === "roer") return this.grebPose("roer");
-        if (this.S.roer.sted === "apparat") return { x: G.slot.x, y: G.slot.y + 34 };
-        return { x: G.roerHolder.x, y: BORD - 6 };
+        var o = this.ov("roer");
+        if (o) return o;
+        if (this.S.roer.sted === "apparat") return { x: G.slot.x, y: G.slot.y + 34, v: 0 };
+        return { x: G.roerHolder.x, y: BORD - 6, v: 0 };
     };
 
     P.maaleglasPose = function () {
-        if (this.greb && this.greb.id === "maaleglas") return this.grebPose("maaleglas");
-        return { x: G.maaleglas.x, y: G.maaleglas.y, v: 0 };
+        return this.ov("maaleglas") || { x: G.maaleglas.x, y: G.maaleglas.y, v: 0 };
     };
 
     P.flEthPose = function () {
-        if (this.greb && this.greb.id === "fl-eth") return this.grebPose("fl-eth");
-        return { x: G.flEth.x, y: G.flEth.y, v: 0 };
+        return this.ov("fl-eth") || { x: G.flEth.x, y: G.flEth.y, v: 0 };
     };
 
     P.sproejtePose = function () {
-        if (this.greb && this.greb.id === "sproejte") return this.grebPose("sproejte");
-        return { x: G.sproejte.x, y: G.sproejte.y, v: 0 };
+        return this.ov("sproejte") || { x: G.sproejte.x, y: G.sproejte.y, v: 0 };
+    };
+
+    /* Posen for et udstyr ud fra dets navn */
+    P.pose = function (id) {
+        switch (id) {
+            case "kolbe": return this.kolbePose();
+            case "maaleglas": return this.maaleglasPose();
+            case "fl-eth": return this.flEthPose();
+            case "sproejte": return this.sproejtePose();
+            case "termo": return this.termoPose();
+            case "pip2": case "pip1": return this.pipPose(id);
+            case "magnet": return this.magnetPos();
+            case "spids-p": return this.spidsPose("p");
+            case "spids-r": return this.spidsPose("r");
+            case "plade": return this.pladePose();
+            case "urglas": return this.urglasPose(0);
+            case "urglas2": return this.urglasPose(1);
+            case "spatel": return this.spatelPose();
+            case "roer": return this.roerPose();
+        }
+        return null;
     };
 
     /* Kasser til ringe, hit-test og skilte (verden) */
@@ -344,8 +365,6 @@
             case "magnet": p = this.magnetPos(); return { x: p.x - 16, y: p.y - 6, b: 32, h: 12 };
             case "pip2": case "pip1":
                 p = this.pipPose(id); return { x: p.x - 18, y: p.y - PIP_L - 44, b: 36, h: PIP_L + 46 };
-            case "pip2-sug": case "pip1-sug": return this.pipKnapper(id.slice(0, 4)).sug;
-            case "pip2-toem": case "pip1-toem": return this.pipKnapper(id.slice(0, 4)).toem;
             case "fl-sal": case "fl-en": return { x: G.flaske.x - 40, y: BORD - 150, b: 80, h: 150 };
             case "fl-eth": p = this.flEthPose(); if (p.v) return { x: p.x - 50, y: p.y - 50, b: 100, h: 100 };
                 t = tl("fl-eth", p); return { x: t.x, y: t.y, b: 90, h: 189 };
@@ -388,26 +407,14 @@
        ====================================================================== */
     P.opdater = function (dt) {
         this.tid += dt;
-        var S = this.S;
-        var dl = this.koerer() ? dt * F_TID : 0;
-        if (S.spol > 0) {
-            var e = Math.min(S.spol, dt * SPOL_FART);
-            dl += e;
-            S.spol -= e;
-        }
+        if (this.anim) this.opdaterAnim(dt);
         this.handlinger(dt);
-        var n = Math.max(1, Math.ceil(dl / 0.04));
-        for (var i = 0; i < n; i++) this.model(dl / n);
         this.animer(dt);
         this.kortOpdater(dt);
     };
 
-    /* Uret staar stille under et gaet og et spoergsmaal i de foerste trin */
-    P.koerer = function () {
-        return this.trinNr >= 3 || this.S.plade.varme;
-    };
-
-    /* Laboratoriets tid gaar: modellen */
+    /* Laboratoriets tid gaar: modellen. Kaldes kun af animationerne og
+       dryppene, saa intet aendrer sig, mens eleven laeser. */
     P.model = function (dm) {
         if (dm <= 0) return;
         var S = this.S;
@@ -416,45 +423,26 @@
         var maal = S.plade.varme ? Km.PLADE_SAT : Km.STUE;
         S.plade.T += (maal - S.plade.T) * (1 - Math.exp(-0.5 * dm));
         /* Kolben */
-        var holdt = this.greb && this.greb.id === "kolbe";
-        var sted = holdt ? "bord" : S.kolbeSted;
-        var omroer = S.plade.omroer && sted === "plade";
-        Km.opdaterKolbe(S.K, dm, sted, S.plade, omroer);
-        /* TLC-pladen i glasset */
-        var pl = S.tlc;
-        if (pl.sted === "kammer" && !(this.greb && this.greb.id === "plade")) {
-            pl.front = Math.min(0.92, pl.front + dm / 2.2);
-            if (pl.front >= 0.6) pl.udviklet = true;
-        }
-        /* Tragten */
-        Km.opdaterTragt(S.tragt, dm, S.sug);
+        var sted = this.ov("kolbe") ? "bord" : S.kolbeSted;
+        S.K.magnet = S.magnet.sted === "kolbe";
+        Km.opdaterKolbe(S.K, dm, sted, S.plade, S.plade.omroer && sted === "plade");
         /* Urglassene */
         for (var i = 0; i < 2; i++) {
-            var lampe = S.urglasSted[i] === "lampe" && this.trinNr === 8 && !(this.greb && this.greb.id === (i ? "urglas2" : "urglas"));
+            var lampe = S.urglasSted[i] === "lampe" && this.trinNr === 8 && !this.ov(i ? "urglas2" : "urglas");
             Km.opdaterUrglas(S.urglas[i], dm, lampe);
             if (lampe && S.urglas[i].mKryst > 0) S.lampeTid[i] += dm;
         }
     };
 
-    /* Handlinger i rigtig tid: knapper, der holdes nede, og haeldning */
+    /* Handlinger i rigtig tid: pipetten drypper, og det holdte glas haelder */
     P.handlinger = function (dt) {
-        var S = this.S, mig = this;
-        /* Pipettens knapper */
-        if (this.hold && this.trinNr !== null) {
+        var S = this.S;
+        if (this.hold) {
             var h = this.hold, pp = S.pip[h.id];
             h.t = (h.t || 0) + dt;
-            if (h.h === "sug" && pp.sted === "flaske") {
-                var trinTid = 0.24;
-                while (h.t >= trinTid) {
-                    h.t -= trinTid;
-                    if (pp.V < pp.cap - 1e-6) { pp.V = rund1(pp.V + 0.1); pp.stof = h.id === "pip2" ? "sal" : "en"; }
-                    else this.kortBesked(D.BESKED.pipFuld, 2);
-                }
-            } else if (h.h === "toem" && pp.sted === "flaske") {
-                while (h.t >= 0.2) { h.t -= 0.2; pp.V = Math.max(0, rund1(pp.V - 0.1)); }
-            } else if (h.h === "toem" && pp.sted === "kolbe" && pp.V > 0) {
+            if (pp.sted === "kolbe" && pp.V > 0) {
                 var draabe = pp.stof === "en" ? 0.05 : 0.1;
-                var takt = pp.stof === "en" ? 0.34 : 0.15;
+                var takt = pp.stof === "en" ? 0.3 : 0.14;
                 while (h.t >= takt && pp.V > 1e-6) {
                     h.t -= takt;
                     var d = Math.min(draabe, pp.V);
@@ -463,39 +451,54 @@
                 }
             }
         }
-        /* Haeldning: det holdte glas staar i haeldestilling over noget */
         var g = this.greb;
-        if (g && g.over) {
-            if (g.id === "fl-eth" && g.over === "maaleglas") {
-                var mg = S.maaleglas;
-                mg.V += 22 * dt;
-                if (mg.V > 116) { mg.V = 116; if (!mg.overloeb) { mg.overloeb = true; this.kortBesked(D.BESKED.overloeb, 4); } }
+        if (g && g.over) this.haeld(g.id, g.over, dt);
+        this.stroemme = this.stroemme.filter(function (s) { s.t -= dt; return s.t > 0; });
+    };
+
+    /* Haeld fra et glas i et andet, mens eleven holder det, eller mens en
+       animation goer det. Giver true, naar der ikke skal haeldes mere.
+       Maaleglasset fyldes aldrig over opskriftens 100 mL. */
+    P.haeld = function (id, over, dt) {
+        var S = this.S;
+        if (id === "fl-eth" && over === "maaleglas") {
+            var mg = S.maaleglas, loft = Math.max(0, Km.OPSKRIFT.ethanol - S.K.tilsat.ethanol);
+            if (mg.V < loft - 1e-6) {
+                mg.V = Math.min(loft, mg.V + 34 * dt);
                 this.stroem("fl-eth", "maaleglas");
-            } else if (g.id === "maaleglas" && g.over === "kolbe" && S.maaleglas.V > 0) {
-                var dv = Math.min(S.maaleglas.V, 45 * dt);
-                S.maaleglas.V -= dv;
-                Km.tilsaet(S.K, "ethanol", dv, S.ur);
-                if (S.maaleglas.V < 0.3) S.maaleglas.V = 0;
-                this.stroem("maaleglas", "kolbe");
-            } else if (g.id === "kolbe" && g.over === "tragt") {
-                this.haeldITragt(dt);
-            } else if (g.id === "sproejte") {
-                var ml = 7 * dt;
-                if (g.over === "tragt") {
-                    S.tragt.mL += ml * 0.4;
-                    S.tragt.vaadT = (S.tragt.vaadT || 0) + dt;
-                    if (S.tragt.vaadT > 0.5) S.tragt.vaad = true;
-                    this.stroem("sproejte", "tragt");
-                } else if (g.over === "kolbe") {
-                    Km.tilsaet(S.K, "ethanol", ml, S.ur);
-                    if (S.haeldt) S.skylMl += ml;
-                    this.stroem("sproejte", "kolbe");
-                }
+            }
+            return mg.V >= loft - 1e-6;
+        }
+        if (id === "maaleglas" && over === "kolbe") {
+            if (S.maaleglas.V <= 0) return true;
+            var dv = Math.min(S.maaleglas.V, 55 * dt);
+            if (S.maaleglas.V - dv < 0.3) dv = S.maaleglas.V;
+            S.maaleglas.V -= dv;
+            Km.tilsaet(S.K, "ethanol", dv, S.ur);
+            this.stroem("maaleglas", "kolbe");
+            return S.maaleglas.V <= 0;
+        }
+        if (id === "kolbe" && over === "tragt") {
+            this.haeldITragt(dt);
+            return Km.rumfang(S.K) < 0.05;
+        }
+        if (id === "sproejte") {
+            var ml = 7 * dt;
+            if (over === "tragt") {
+                S.tragt.mL += ml * 0.4;
+                S.tragt.vaadT = (S.tragt.vaadT || 0) + dt;
+                if (S.tragt.vaadT > 0.5) S.tragt.vaad = true;
+                this.stroem("sproejte", "tragt");
+                return S.tragt.vaad;
+            }
+            if (over === "kolbe") {
+                Km.tilsaet(S.K, "ethanol", ml, S.ur);
+                if (S.haeldt) S.skylMl += ml;
+                this.stroem("sproejte", "kolbe");
+                return S.skylMl >= 6;
             }
         }
-        /* Strømmene lever kort */
-        this.stroemme = this.stroemme.filter(function (s) { s.t -= dt; return s.t > 0; });
-        void mig;
+        return true;
     };
 
     function rund1(v) { return Math.round(v * 10) / 10; }
@@ -541,10 +544,8 @@
         var ov = this.kolbeOverflade || (p.y + 100);
         this.draaber.push({ x: p.x, y: p.y + 2, vy: 40, maal: ov, stof: stof });
         Km.tilsaet(S.K, stof, mL, S.ur);
-        if (stof === "en") {
-            var T = S.K.T;
-            if (T < 60 && !S.enKoldBesked) { S.enKoldBesked = true; }
-        }
+        /* Hver draabe tager lidt tid, saa reaktionen naar at begynde */
+        this.model(stof === "en" ? 0.1 : 0.02);
     };
 
     P.animer = function (dt) {
@@ -565,7 +566,7 @@
             return s.a > 0;
         });
         /* Magneten drejer */
-        var rundt = S.plade.omroer && S.magnet.sted === "kolbe" && S.kolbeSted === "plade" && !(this.greb && this.greb.id === "kolbe");
+        var rundt = S.plade.omroer && S.magnet.sted === "kolbe" && S.kolbeSted === "plade" && !this.ov("kolbe");
         if (rundt) this.magnetVinkel += dt * (this.hoppe > 0 ? 40 : 14);
         if (this.hoppe > 0) this.hoppe = Math.max(0, this.hoppe - dt);
         /* Bobler, naar det koger */
@@ -576,15 +577,22 @@
         /* Smeltepunktsapparatet varmer */
         var A = S.app;
         if (A.taendt && this.trinNr === 9) {
-            var fart = A.T < 112 ? 9 : 0.85;
-            if (S.spol > 0) fart *= 3;
+            var fart = A.T < 120 ? 14 : 1.1;
             A.T = Math.min(140, A.T + fart * dt);
         }
+        /* TLC-pladen i glasset: loebevaesken stiger, mens man ser paa */
+        var plk = S.tlc;
+        if (plk.sted === "kammer" && !this.ov("plade")) {
+            plk.front = Math.min(0.88, plk.front + dt * 0.36);
+            if (plk.front >= 0.8) plk.udviklet = true;
+        }
+        /* Tragten: ethanolen loeber igennem, mens man ser paa */
+        Km.opdaterTragt(S.tragt, dt * 0.8, S.sug);
         /* Vaegten: displayet falder til ro, og vejningen skrives i skemaet */
         this.opdaterVaegt(dt);
         /* TLC-pladen under UV-lampen */
         var pl = S.tlc;
-        if (pl.sted === "uv" && !(this.greb && this.greb.id === "plade")) {
+        if (pl.sted === "uv" && !this.ov("plade")) {
             pl.uvT += dt;
             if (pl.uvT > 0.9 && pl.udviklet && !pl.set) {
                 pl.set = true;
@@ -676,12 +684,13 @@
             var pt = mig.tilVerden(mig.L.punkt(e));
             mig.mus = pt;
             if (mig.greb) { mig.flyt(pt); return; }
-            var u = mig.hvad(pt);
+            var u = mig.anim ? null : mig.hvad(pt);
             c.style.cursor = u ? (u.klik ? "pointer" : "grab") : "default";
         });
         c.addEventListener("pointerleave", function () { mig.mus = null; });
         c.addEventListener("pointerdown", function (e) {
             if (e.button !== undefined && e.button !== 0) return;
+            if (mig.anim) return;
             var pt = mig.tilVerden(mig.L.punkt(e));
             mig.mus = pt;
             var u = mig.hvad(pt);
@@ -692,12 +701,10 @@
             e.preventDefault();
             try { c.setPointerCapture(e.pointerId); } catch (x) { /* ingen capture */ }
             if (u.klik) { mig.klik(u.id); return; }
-            if (u.hold) { mig.hold = { id: u.id, h: u.hold, t: u.hold === "sug" ? 0.2 : 0.3 }; return; }
             mig.grib(u.id, pt);
             c.style.cursor = "grabbing";
         });
         function slip(e) {
-            if (mig.hold) { mig.hold = null; }
             if (!mig.greb) return;
             var pt = mig.tilVerden(mig.L.punkt(e));
             mig.slip(pt);
@@ -712,26 +719,15 @@
         var S = this.S, t = this.trinNr, mig = this;
         function k(id) { return inde(mig.kasse(id), pt.x, pt.y, 3); }
         /* Knapper */
-        if (synlig("plade", t, S) && t >= 3 && (k("knap-varme"))) return { id: "knap-varme", klik: true };
-        if (synlig("plade", t, S) && t >= 3 && (k("knap-omroer"))) return { id: "knap-omroer", klik: true };
+        if (synlig("plade", t, S) && t >= 3 && k("knap-varme")) return { id: "knap-varme", klik: true };
+        if (synlig("plade", t, S) && t >= 3 && k("knap-omroer")) return { id: "knap-omroer", klik: true };
         if (synlig("hane", t, S) && k("hane")) return { id: "hane", klik: true };
         if (synlig("app", t, S) && k("smp-knap")) return { id: "smp-knap", klik: true };
         if (synlig("app", t, S) && Math.hypot(pt.x - G.linse.x, pt.y - G.linse.y) < G.linse.r + 3) return { id: "linse", klik: true };
-        var pips = ["pip2", "pip1"];
-        for (var i = 0; i < pips.length; i++) {
-            var id = pips[i], pp = S.pip[id];
-            if (!synlig(id, t, S)) continue;
-            if (pp.sted === "flaske" || pp.sted === "kolbe") {
-                var kn = this.pipKnapper(id);
-                if (pp.sted === "flaske" && inde(kn.sug, pt.x, pt.y, 2)) return { id: id, hold: "sug" };
-                if (inde(kn.toem, pt.x, pt.y, 2)) return { id: id, hold: "toem" };
-            }
-            if (k(id)) return { id: id };
-        }
-        /* Ting, der kan traekkes, i omvendt tegneorden */
-        var liste = ["roer", "spatel", "urglas2", "urglas", "sproejte", "spids-p", "spids-r", "plade",
+        /* Ting, der kan traekkes eller klikkes, i omvendt tegneorden */
+        var liste = ["pip2", "pip1", "roer", "spatel", "urglas2", "urglas", "sproejte", "spids-p", "spids-r", "plade",
                      "termo", "maaleglas", "fl-eth", "magnet", "kolbe"];
-        for (i = 0; i < liste.length; i++) {
+        for (var i = 0; i < liste.length; i++) {
             var n = liste[i];
             var syn = n === "spids-p" || n === "spids-r" || n === "plade" ? synlig("tlc", t, S) : synlig(n, t, S);
             if (n === "termo" && S.termo.sted === "kolbe" && t >= 7) syn = false;
@@ -744,38 +740,21 @@
     };
 
     P.grib = function (id, pt) {
-        var p;
-        switch (id) {
-            case "kolbe": p = this.kolbePose(); break;
-            case "maaleglas": p = this.maaleglasPose(); break;
-            case "fl-eth": p = this.flEthPose(); break;
-            case "sproejte": p = this.sproejtePose(); break;
-            case "termo": p = this.termoPose(); break;
-            case "pip2": case "pip1": p = this.pipPose(id); break;
-            case "magnet": p = this.magnetPos(); break;
-            case "spids-p": p = this.spidsPose("p"); break;
-            case "spids-r": p = this.spidsPose("r"); break;
-            case "plade": p = this.pladePose(); break;
-            case "urglas": p = this.urglasPose(0); break;
-            case "urglas2": p = this.urglasPose(1); break;
-            case "spatel": p = this.spatelPose(); break;
-            case "roer": p = this.roerPose(); break;
-        }
+        var p = this.pose(id);
         if (id === "termo" && Math.abs(p.v || 0) > 1) {
             /* Termometret ligger ned: det rejser sig, saa spidsen er under musen */
             p = { x: pt.x, y: pt.y + 150, v: 0 };
         }
-        this.greb = { id: id, x: p.x, y: p.y, dx: p.x - pt.x, dy: p.y - pt.y, pose: null, over: null };
-        if (id === "kolbe" && this.S.termo.sted === "kolbe" && this.trinNr >= 7) this.S.termo.sted = "bord";
+        this.greb = { id: id, x: p.x, y: p.y, dx: p.x - pt.x, dy: p.y - pt.y, pose: null, over: null, start: pt, langt: 0 };
         this.tragtFuldVist = false;
         this.nulstilHjaelp();
-        this.flyt(pt);
     };
 
-    /* Musen flytter det, eleven holder. Holdes et glas over det, det skal
-       haeldes i, saetter det sig i haeldestilling. */
     P.flyt = function (pt) {
         var g = this.greb, S = this.S, t = this.trinNr;
+        g.langt = Math.max(g.langt, Math.hypot(pt.x - g.start.x, pt.y - g.start.y));
+        if (g.langt < 6) return;
+        if (g.id === "kolbe" && S.termo.sted === "kolbe" && t >= 7) S.termo.sted = "bord";
         g.x = pt.x + g.dx;
         g.y = pt.y + g.dy;
         g.pose = null;
@@ -849,18 +828,26 @@
     };
 
     P.slip = function (pt) {
-        var g = this.greb, S = this.S, t = this.trinNr;
+        var g = this.greb, S = this.S, t = this.trinNr, mig = this;
         this.greb = null;
         var id = g.id, k;
+        /* Et klik uden at flytte: tingen goer det, kortet beder om */
+        if (g.langt < 6) { this.klikTing(id); return; }
         if (id === "magnet") {
             k = this.kolbePose();
             if (Math.abs(g.x - k.x) < 75 && g.y > k.y - 100 && g.y < k.y + 180) S.magnet.sted = "kolbe";
         } else if (id === "pip2" || id === "pip1") {
             var pp = S.pip[id];
             k = this.kolbePose();
-            if (Math.abs(g.x - G.flaske.x) < 50 && g.y > BORD - 200 && g.y < BORD + 10) pp.sted = "flaske";
-            else if (Math.abs(g.x - k.x) < 60 && g.y > k.y - 90 && g.y < k.y + 120) pp.sted = "kolbe";
-            else pp.sted = "holder";
+            if (Math.abs(g.x - G.flaske.x) < 50 && g.y > BORD - 200 && g.y < BORD + 10) {
+                pp.sted = "flaske";
+                /* Pipetten suger selv den rigtige maengde op */
+                var maal = this.pipMaal(id);
+                if (maal > pp.V + 1e-6) this.koerAnim([{ vent: 4, hver: function (dt) { return mig.fyldPipette(id, maal, dt); } }]);
+            } else if (Math.abs(g.x - k.x) < 60 && g.y > k.y - 90 && g.y < k.y + 120 && pp.V > 0) {
+                pp.sted = "kolbe";
+                this.koerAnim(this.toemTrin(id));
+            } else pp.sted = "holder";
         } else if (id === "termo") {
             k = this.kolbePose();
             if (t <= 7 && Math.abs(g.x - k.x) < 70 && g.y - 150 > k.y - 160 && g.y - 150 < k.y + 120) S.termo.sted = "kolbe";
@@ -876,12 +863,18 @@
                 pl.sted = "uv"; pl.uvT = 0;
             } else pl.sted = "bord";
         } else if (id === "kolbe") {
-            if (inde({ x: G.isbad.x - 10, y: G.isbad.y - 90, b: 230, h: 200 }, pt.x, pt.y)) S.kolbeSted = "isbad";
+            if (inde({ x: G.isbad.x - 10, y: G.isbad.y - 90, b: 230, h: 200 }, pt.x, pt.y)) {
+                S.kolbeSted = "isbad";
+                if (S.K.T > 25) this.koerAnim(this.koelTrin());
+            }
             else if (inde({ x: 90, y: 280, b: 260, h: 160 }, pt.x, pt.y) && t <= 6) S.kolbeSted = "plade";
         } else if (id === "urglas" || id === "urglas2") {
             var i = id === "urglas2" ? 1 : 0;
             if (inde({ x: 720, y: 290, b: 200, h: 160 }, pt.x, pt.y) && t === 8) S.urglasSted[i] = "vaegt";
-            else if (inde({ x: 200, y: 330, b: 160, h: 130 }, pt.x, pt.y) && t === 8) S.urglasSted[i] = "lampe";
+            else if (inde({ x: 200, y: 330, b: 160, h: 130 }, pt.x, pt.y) && t === 8) {
+                S.urglasSted[i] = "lampe";
+                if (S.urglas[i].mKryst > 0 && S.urglas[i].w > 0.0015) this.koerAnim(this.toerTrin(i));
+            }
             else S.urglasSted[i] = "bord";
         } else if (id === "spatel") {
             this.spatelSlip(g);
@@ -937,6 +930,14 @@
         }
     };
 
+    /* Klik paa en ting uden at flytte den: er det den, kortet beder om, goer
+       den det */
+    P.klikTing = function (id) {
+        var del = this.delNu(), s = this.skiltNu();
+        if (del && s && s.paa === id) this.udfoer(del);
+        this.tjekTrin();
+    };
+
     /* Klik paa knapper i scenen */
     P.klik = function (id) {
         var S = this.S;
@@ -971,10 +972,10 @@
         if (!A.taendt || S.roer.sted !== "apparat") { this.kortBesked("Tænd først for smeltepunktsapparatet.", 3); return; }
         var s = this.proevenSmp();
         if (A.start === null) {
-            if (A.T < s.start - 1.2) { this.kortBesked("Krystallerne er ikke begyndt at smelte endnu. Se godt efter i linsen.", 3); return; }
+            if (A.T < s.start - 0.3) { this.kortBesked("Krystallerne er ikke begyndt at smelte endnu. Se godt efter i linsen.", 3); return; }
             A.start = Math.round(A.T * 10) / 10;
         } else if (A.slut === null) {
-            if (A.T < s.slut - 0.6) { this.kortBesked("Der er stadig faste krystaller i linsen. Vent, til alt er klar væske.", 3); return; }
+            if (A.T < s.slut - 0.3) { this.kortBesked("Der er stadig faste krystaller i linsen. Vent, til alt er klar væske.", 3); return; }
             A.slut = Math.round(A.T * 10) / 10;
             A.taendt = false;
         }
@@ -1026,8 +1027,8 @@
     };
 
     P.tegnUdstyr = function (ctx) {
-        var S = this.S, t = this.trinNr, g = this.greb;
-        var holdt = function (id) { return g && g.id === id; };
+        var S = this.S, t = this.trinNr, g = this.greb, mig = this;
+        var holdt = function (id) { return (g && g.id === id) || !!mig.ap[id]; };
 
         /* Vaeggen: roeret med vakuum og hanen */
         if (synlig("hane", t, S)) this.tegnHane(ctx);
@@ -1078,7 +1079,8 @@
         this.tegnStroemme(ctx);
         this.tegnDraaber(ctx);
 
-        /* Det, eleven holder, oeverst */
+        /* Det, eleven holder, og det, en animation flytter, oeverst */
+        Object.keys(this.ap).forEach(function (id) { if (!(g && g.id === id)) mig.tegnHoldt(ctx, id); });
         if (g) this.tegnHoldt(ctx, g.id);
 
         /* Aflaesninger, knapper, ringe og skilte */
@@ -1786,7 +1788,7 @@
         ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.arc(L.x, L.y, L.r, 0, Math.PI * 2); ctx.stroke();
         /* Roeret ses ogsaa over hullet */
-        if (S.roer.sted === "apparat" && !(this.greb && this.greb.id === "roer")) {
+        if (S.roer.sted === "apparat" && !this.ov("roer")) {
             ctx.strokeStyle = "rgba(225, 238, 248, 0.95)";
             ctx.lineWidth = 2.6;
             ctx.beginPath(); ctx.moveTo(G.slot.x, G.slot.y); ctx.lineTo(G.slot.x, G.slot.y - 30); ctx.stroke();
@@ -1806,10 +1808,10 @@
 
     /* Hvor vaesken kommer ud af det holdte glas */
     P.mundPunkt = function (id) {
-        var g = this.greb;
-        if (!g || g.id !== id || !g.pose) return null;
-        if (id === "sproejte") return { x: g.pose.x, y: g.pose.y };
-        return { x: g.pose.x, y: g.pose.y + 2 };
+        var p = this.ov(id);
+        if (!p || !p.v) return null;
+        if (id === "sproejte") return { x: p.x, y: p.y };
+        return { x: p.x, y: p.y + 2 };
     };
 
     P.maalPunkt = function (id) {
@@ -1837,15 +1839,9 @@
         ["pip2", "pip1"].forEach(function (id) {
             if (!synlig(id, t, S)) return;
             var pp = S.pip[id], p = mig.pipPose(id), top = p.y - PIP_L;
-            var grebet = mig.greb && mig.greb.id === id;
-            if (pp.V > 0 || pp.sted !== "holder" || grebet) {
+            var flyttet = !!mig.ov(id);
+            if (pp.V > 0 || pp.sted !== "holder" || flyttet) {
                 Tg.boble(ctx, p.x - 24, top - 26, D.komma(pp.V, 1) + " mL", { hoejre: true, str: 15 });
-            }
-            if ((pp.sted === "flaske" || pp.sted === "kolbe") && !grebet) {
-                var kn = mig.pipKnapper(id);
-                var nede = mig.hold && mig.hold.id === id ? mig.hold.h : null;
-                if (pp.sted === "flaske") Tg.pille(ctx, kn.sug, "▲ Sug op", true, nede === "sug");
-                Tg.pille(ctx, kn.toem, "▼ Tøm", pp.V > 0, nede === "toem");
             }
         });
         if (synlig("maaleglas", t, S)) {
@@ -1861,17 +1857,21 @@
        Skilte og ringe: det, kortet beder om lige nu
        ====================================================================== */
     P.tegnHjaelp = function (ctx) {
-        if (this.fase !== "forsoeg" || this.greb) return;
+        if (this.fase !== "forsoeg" || this.greb || this.anim) return;
         var s = this.skiltNu();
         if (!s) return;
+        Tg.ring(ctx, this.kasse(s.paa), this.tid);
+    };
+
+    /* Hvor den groenne knap skal staa: over (eller under) det, kortet beder om,
+       i skaermens koordinater */
+    P.knapPlads = function () {
+        var s = this.skiltNu();
+        if (!s || !this.lay) return null;
         var k = this.kasse(s.paa);
-        if (!k) return;
-        Tg.ring(ctx, k, this.tid);
-        var x = k.x + k.b / 2, y = k.y - 8;
-        var opad = /-toem$/.test(s.paa);
-        if (opad) y = k.y + k.h + 8;
-        if (y - 44 < -this.lay.oy / this.lay.s + this.lay.top / this.lay.s) { y = k.y + k.h + 8; opad = true; }
-        Tg.skilt(ctx, x, y, s.tekst, this.tid, opad);
+        if (!k) return null;
+        var a = this.tilSkaerm(k.x + k.b / 2, k.y), b = this.tilSkaerm(k.x + k.b / 2, k.y + k.h);
+        return { x: a.x, top: a.y, bund: b.y, tekst: s.tekst };
     };
 
     P.tegnSejr = function (ctx, W, H) {
@@ -1892,29 +1892,22 @@
     /* Den del af trinnet, eleven er ved, eller null, naar trinnets forsoeg
        er gjort */
     P.delNu = function () {
-        var S = this.S, K = S.K, t = this.trinNr, pp, mangler;
+        var S = this.S, K = S.K, t = this.trinNr, pp;
         switch (t) {
             case 0: return S.magnet.sted === "kolbe" ? null : "magnet";
             case 1: case 4:
                 var id = t === 1 ? "pip2" : "pip1", pre = t === 1 ? "sal" : "en";
-                var maal = t === 1 ? OPSKRIFT.sal : OPSKRIFT.en;
-                var iKolbe = t === 1 ? K.vSal : K.vEn;
                 pp = S.pip[id];
-                mangler = Math.round((maal - iKolbe) * 100) / 100;
-                if (t === 4 && iKolbe < 0.01 && pp.V < 0.01 && pp.sted === "holder" && K.T < 70 && !S.ventet) return "en-vent";
-                if (mangler <= 0.05 && pp.V < 0.03) return null;
-                if (pp.V < 0.03) return pp.sted === "flaske" ? pre + "-sug" : pre + "-ned";
-                if (pp.sted === "kolbe") return t === 1 ? "sal-toem" : "en-toem";
-                if (Math.abs(pp.V - mangler) <= 0.05) return t === 1 ? "sal-over" : "en-toem";
-                return pp.sted === "flaske" ? pre + "-sug" : pre + "-ned";
+                if (this.pipMaal(id) <= 0.05 && pp.V < 0.03) return null;
+                return pp.V < 0.03 ? pre + "-sug" : pre + "-toem";
             case 2:
-                if (K.vEth >= 90) return null;
-                if (S.maaleglas.V + K.vEth < 95 && !(this.greb && this.greb.id === "maaleglas")) return "eth-maal";
-                return "eth-haeld";
+                if (K.tilsat.ethanol >= 95) return null;
+                return S.maaleglas.V + K.tilsat.ethanol < 99 ? "eth-maal" : "eth-haeld";
             case 3:
                 if (!S.plade.omroer) return "omroer";
                 if (!S.plade.varme) return "varme";
                 if (S.termo.sted !== "kolbe") return "termo";
+                if (K.T < 74.5) return "varm";
                 return null;
             case 5:
                 var pl = S.tlc;
@@ -1925,25 +1918,21 @@
                 return null;
             case 6:
                 if (S.plade.varme) return "sluk";
-                if (S.kolbeSted !== "isbad") return "isbad";
+                if (S.kolbeSted !== "isbad" || K.T > 25) return "isbad";
                 return null;
             case 7:
                 var Tr = S.tragt;
                 if (!Tr.vaad && !S.haeldt) return "filtr-fugt";
                 if (!S.sug && !S.haeldt) return "filtr-sug";
-                if (K.T >= 25 && !S.haeldt) return "filtr-kold";
-                if (!S.skyllet && (Km.rumfang(K) > 0.5 && S.skylMl < 2)) return "filtr-haeld";
+                if (!S.haeldt || (Km.rumfang(K) > 0.5 && S.skylMl < 2)) return "filtr-haeld";
                 if (!S.skyllet) return "filtr-skyl";
                 return null;
             case 8:
                 var U = S.urglas[S.aktivU];
-                var fulde = this.fuldeVejninger();
                 if (!U.vejetTom && U.mKryst <= 0) return "vej-tom";
                 if (U.mKryst <= 0) return "vej-skrab";
-                if (S.lampeTid[S.aktivU] < 0.5 && !fulde.length) return "vej-toer";
-                if (!fulde.length) return "vej-fuld";
-                /* Konstant masse: to vejninger i traek, der giver det samme */
-                if (fulde.length < 2 || Math.abs(fulde[fulde.length - 1].m - fulde[fulde.length - 2].m) > 0.0101) return "vej-igen";
+                if (U.w > 0.003) return "vej-toer";
+                if (!this.fuldeVejninger().some(function (v) { return v.w <= 0.003; })) return "vej-fuld";
                 return null;
             case 9:
                 if (!S.roer.fyldt) return "smp-fyld";
@@ -1964,93 +1953,25 @@
 
     /* En ekstra linje til kortet: det, eleven skal vide ud over kortets tekst */
     P.linje = function (del) {
-        var S = this.S, K = S.K;
-        switch (del) {
-            case "sal-sug": case "sal-ned": case "sal-over": case "sal-toem":
-                if (K.vSal > 0 && K.vSal < 1.35) return "Kolben har fået " + D.komma(K.vSal, 1) + " mL salicylaldehyd. Der mangler " + D.komma(1.4 - K.vSal, 1) + " mL.";
-                if (del === "sal-sug" && S.pip.pip2.V > 1.45) return "Pipetten viser " + D.komma(S.pip.pip2.V, 1) + " mL. Hold på ▼ Tøm for at lade lidt løbe tilbage.";
-                return "";
-            case "en-ned": case "en-sug": case "en-toem":
-                if (K.vEn > 0 && K.vEn < 0.45) return "Kolben har fået " + D.komma(K.vEn, 2) + " mL ethylendiamin. Der mangler lidt.";
-                if (del === "en-sug" && S.pip.pip1.V > 0.55) return "Pipetten viser " + D.komma(S.pip.pip1.V, 1) + " mL. Hold på ▼ Tøm for at lade lidt løbe tilbage.";
-                if (K.T < 60 && K.vEn === 0) return "Termometret viser " + Math.round(K.T) + " °C. Opskriften siger omkring 75 °C.";
-                return "";
-            case "eth-maal": case "eth-haeld":
-                if (S.maaleglas.V > 105) return "Måleglasset viser " + Math.round(S.maaleglas.V) + " mL. Det er mere end 100 mL.";
-                return "";
-            case "tlc-koer":
-                if (S.tlc.iKammer && S.tlc.sted !== "kammer" && !S.tlc.udviklet) return "Løbevæsken nåede kun lidt op. Stil pladen tilbage i glasset.";
-                return "";
-            case "tlc-uv":
-                return "";
-            case "filtr-kold":
-                return "Termometret viser " + D.komma(K.T, 1) + " °C.";
-            case "vej-fuld":
-                return "";
-            case "vej-igen":
-                var f = this.fuldeVejninger();
-                if (f.length === 1) return "Urglasset med krystaller vejede " + D.komma(f[0].m, 2) + " g.";
-                if (f.length >= 2) return "Urglasset med krystaller vejede " + D.komma(f[f.length - 2].m, 2) + " g og så " + D.komma(f[f.length - 1].m, 2) + " g.";
-                return "";
+        var S = this.S;
+        if (del === "tlc-koer" && S.tlc.iKammer && S.tlc.sted !== "kammer" && !S.tlc.udviklet) {
+            return "Løbevæsken nåede kun lidt op. Stil pladen tilbage i glasset.";
+        }
+        if (del === "vej-fuld" && this.fuldeVejninger().some(function (v) { return v.w > 0.003; })) {
+            return "Den første vejning var af våde krystaller. Vej igen, nu hvor de er tørre.";
         }
         return "";
     };
 
-    /* Skiltet og ringen: hvilken ting, og hvad der staar paa skiltet */
+    /* Den ting, kortet beder om, og teksten paa den gule knap ved den */
     P.skiltNu = function () {
         var del = this.delNu(), S = this.S;
         if (!del) return null;
         var d = this.delData(del);
-        var s = { paa: d.paa, tekst: d.skilt };
-        var pp;
-        switch (del) {
-            case "sal-sug": case "en-sug":
-                pp = S.pip[del === "sal-sug" ? "pip2" : "pip1"];
-                if (pp.sted !== "flaske") return { paa: del === "sal-sug" ? "pip2" : "pip1", tekst: "Træk mig ned i flasken" };
-                if (pp.V > (del === "sal-sug" ? 1.45 : 0.55)) return { paa: (del === "sal-sug" ? "pip2" : "pip1") + "-toem", tekst: "Hold: tøm lidt" };
-                return s;
-            case "sal-toem":
-                if (S.pip.pip2.sted !== "kolbe") return { paa: "pip2", tekst: "Træk mig hen over kolben" };
-                return s;
-            case "en-toem":
-                pp = S.pip.pip1;
-                if (pp.sted === "kolbe") return { paa: "pip1-toem", tekst: "Hold: dryp" };
-                return s;
-            case "eth-haeld":
-                if (S.maaleglas.V + S.K.vEth < 95) return { paa: "fl-eth", tekst: "Hold mig over måleglasset" };
-                return s;
-            case "tlc-p":
-                if (S.spids.p.indhold === "kolbe") return { paa: "plade", tekst: "Sæt pletten ved P" };
-                return s;
-            case "tlc-r":
-                if (S.spids.r.indhold === "ref") return { paa: "plade", tekst: "Sæt pletten ved R" };
-                return s;
-            case "tlc-uv":
-                if (S.tlc.sted === "uv") return null;
-                return s;
-            case "tlc-koer":
-                if (S.tlc.sted === "kammer") return null;
-                return s;
-            case "filtr-skyl":
-                if (S.skylMl >= 2) return { paa: "kolbe", tekst: "Hold mig over tragten" };
-                return s;
-            case "vej-skrab":
-                if (S.spatel.m > 0) return { paa: S.aktivU ? "urglas2" : "urglas", tekst: "Træk spatlen herhen" };
-                if (S.urglas2 && S.aktivU === 1 && S.urglas[0].mKryst > 0) return { paa: "spatel", tekst: "Træk mig hen til urglas 1" };
-                return s;
-            case "vej-tom": case "vej-toer": case "vej-fuld":
-                return { paa: S.aktivU ? "urglas2" : "urglas", tekst: d.skilt };
-            case "vej-igen":
-                var uid = S.aktivU ? "urglas2" : "urglas", st = S.urglasSted[S.aktivU];
-                if (st === "vaegt" || st === "bord") return { paa: uid, tekst: "Træk mig under lampen" };
-                if (S.lampeTid[S.aktivU] - (this.fuldeVejninger().slice(-1)[0] || { lampe: 0 }).lampe >= 1.5) return { paa: uid, tekst: "Træk mig op på vægten" };
-                return null;
-            case "en-vent": case "filtr-kold":
-                return null;
-            case "smp-start": case "smp-slut":
-                return s;
-        }
-        return s;
+        if (!d || d.auto) return null;
+        var paa = d.paa;
+        if (paa === "urglas" && S.aktivU === 1) paa = "urglas2";
+        return { paa: paa, tekst: d.knap };
     };
 
     P.delData = function (id) {
@@ -2061,89 +1982,400 @@
         return null;
     };
 
-    /* Spol modellen frem, indtil betingelsen er opfyldt (hoejst max minutter) */
+    /* Lad laboratoriets tid gaa, indtil betingelsen er opfyldt (hoejst max
+       minutter), uden at vise det (spring til et trin, Vis svaret i selvtesten) */
     P.spolTil = function (betingelse, max) {
         var n = 0;
         while (!betingelse() && n < max / 0.05) { this.model(0.05); n++; }
     };
 
-    /* Vis svaret: animationen goer delen for eleven */
+    /* ======================================================================
+       Animationerne: knapperne, et klik paa tingen og Vis svaret goer delen,
+       mens eleven ser paa. En animation er en liste af skridt:
+         { flyt: id, til: {x, y, v} eller en funktion, sek }  flyt tingen
+         { slip: id }                tingen er tilbage paa sin plads
+         { goer: funktion }          aendr tilstanden
+         { vent: sek, hver: f(dt) }  vent (f giver true, naar det er nok)
+         { lab: min, sek, stop: f }  lad laboratoriets tid gaa min minutter
+                                     paa sek sekunder (stop giver true: faerdig)
+       Mens en animation koerer, goer musen og knapperne intet.
+       ====================================================================== */
+    P.koerAnim = function (trin) {
+        this.anim = { trin: trin, i: 0, t: 0, fra: null, til: null };
+        this.greb = null;
+    };
+
+    P.opdaterAnim = function (dt) {
+        var A = this.anim;
+        while (A.i < A.trin.length) {
+            var s = A.trin[A.i];
+            if (s.goer) { s.goer.call(this); A.i++; A.t = 0; continue; }
+            if (s.slip) { delete this.ap[s.slip]; A.i++; A.t = 0; continue; }
+            if (s.flyt) {
+                if (!A.fra) {
+                    A.fra = this.ap[s.flyt] || this.pose(s.flyt);
+                    A.til = typeof s.til === "function" ? s.til.call(this) : s.til;
+                }
+                A.t += dt;
+                var f = NK.blod(Math.min(1, A.t / s.sek)), fra = A.fra, til = A.til;
+                this.ap[s.flyt] = { x: fra.x + (til.x - fra.x) * f, y: fra.y + (til.y - fra.y) * f,
+                                    v: (fra.v || 0) + ((til.v || 0) - (fra.v || 0)) * f };
+                if (A.t < s.sek) return;
+                A.i++; A.t = 0; A.fra = null; dt = 0;
+                continue;
+            }
+            if (s.vent !== undefined) {
+                A.t += dt;
+                var nok = s.hver ? s.hver.call(this, dt) : false;
+                dt = 0;
+                if (!nok && A.t < s.vent) return;
+                A.i++; A.t = 0;
+                continue;
+            }
+            if (s.lab) {
+                A.t += dt;
+                var dm = s.lab / s.sek * dt, n = Math.max(1, Math.ceil(dm / 0.04)), stop = false;
+                for (var k = 0; k < n && !stop; k++) {
+                    this.model(dm / n);
+                    stop = !!(s.stop && s.stop.call(this));
+                }
+                dt = 0;
+                if (!stop && A.t < s.sek) return;
+                A.i++; A.t = 0;
+                continue;
+            }
+            A.i++;
+        }
+        this.anim = null;
+        this.ap = {};
+        this.hold = null;
+        this.tjekTrin();
+    };
+
+    /* Den maengde, opskriften mangler i kolben (mL), afrundet til 0,1 mL */
+    P.pipMaal = function (id) {
+        var K = this.S.K;
+        var m = id === "pip2" ? Km.OPSKRIFT.sal - K.tilsat.sal : Km.OPSKRIFT.en - K.tilsat.en;
+        return Math.max(0, Math.round(m * 10) / 10);
+    };
+
+    /* Pipetten suger op, 0,1 mL ad gangen, til den har maal mL */
+    P.fyldPipette = function (id, maal, dt) {
+        var pp = this.S.pip[id];
+        pp.stof = id === "pip2" ? "sal" : "en";
+        pp.ft = (pp.ft || 0) + dt;
+        while (pp.ft >= 0.13 && pp.V < maal - 1e-6) { pp.ft -= 0.13; pp.V = rund1(pp.V + 0.1); }
+        if (pp.V > maal) pp.V = maal;
+        return pp.V >= maal - 1e-6;
+    };
+
+    /* Pipetten over kolben drypper, til den er tom, og saettes tilbage */
+    P.toemTrin = function (id) {
+        var mig = this, pp = this.S.pip[id];
+        return [
+            { vent: 8, hver: function () { if (!mig.hold) mig.hold = { id: id, h: "toem", t: 0 }; return pp.V <= 0; } },
+            { goer: function () { mig.hold = null; } },
+            { vent: 0.35 },
+            { flyt: id, til: function () { var k = mig.kolbePose(); return { x: k.x, y: k.y - 70, v: 0 }; }, sek: 0.35 },
+            { flyt: id, til: { x: G.holder.x, y: BORD - 110, v: 0 }, sek: 0.6 },
+            { flyt: id, til: { x: G.holder.x, y: BORD - 4, v: 0 }, sek: 0.3 },
+            { goer: function () { pp.sted = "holder"; } },
+            { slip: id }
+        ];
+    };
+
+    /* Kolben i isbadet bliver kold, og krystallerne kommer */
+    P.koelTrin = function () {
+        var K = this.S.K;
+        return [{ lab: 20, sek: 2.6, stop: function () { return K.T < 5; } }];
+    };
+
+    /* Krystallerne paa urglasset under lampen toerrer */
+    P.toerTrin = function (i) {
+        var U = this.S.urglas[i];
+        return [{ lab: 20, sek: 2.4, stop: function () { return U.w < 0.0015; } }];
+    };
+
+    /* Sproejteflasken over tragten eller kolben og tilbage */
+    P.sproejteTrin = function (maal) {
+        var mig = this;
+        function over() {
+            if (maal === "tragt") return { x: G.tragtRand.x + 10, y: G.tragtRand.y - 30, v: 0.25 };
+            var k = mig.kolbePose();
+            return { x: k.x + 8, y: k.y - 26, v: 0.25 };
+        }
+        return [
+            { flyt: "sproejte", til: { x: G.sproejte.x, y: G.sproejte.y - 90, v: 0 }, sek: 0.4 },
+            { flyt: "sproejte", til: over, sek: 0.6 },
+            { vent: 3, hver: function (dt) { return mig.haeld("sproejte", maal, dt); } },
+            { flyt: "sproejte", til: { x: G.sproejte.x, y: G.sproejte.y - 90, v: 0 }, sek: 0.5 },
+            { flyt: "sproejte", til: { x: G.sproejte.x, y: G.sproejte.y, v: 0 }, sek: 0.35 },
+            { slip: "sproejte" }
+        ];
+    };
+
+    /* Kolben fra isbadet over tragten, til den er tom, og tilbage */
+    P.kolbeTilTragt = function () {
+        var mig = this, S = this.S;
+        var hjem = { x: G.kolbeIsbad.x, y: G.kolbeIsbad.y, v: 0 };
+        return [
+            { goer: function () { S.termo.sted = "bord"; } },
+            { flyt: "kolbe", til: { x: hjem.x, y: hjem.y - 90, v: 0 }, sek: 0.5 },
+            { flyt: "kolbe", til: { x: G.tragtRand.x - 34, y: G.tragtRand.y - 24, v: 1.95 }, sek: 0.75 },
+            { vent: 8, hver: function (dt) { return mig.haeld("kolbe", "tragt", dt); } },
+            { vent: 0.3 },
+            { flyt: "kolbe", til: { x: hjem.x, y: hjem.y - 90, v: 0 }, sek: 0.7 },
+            { flyt: "kolbe", til: hjem, sek: 0.35 },
+            { slip: "kolbe" }
+        ];
+    };
+
+    /* Den groenne knap, et klik paa tingen og Vis svaret: delen goeres, mens
+       eleven ser paa. Maengderne er altid opskriftens. */
+    P.udfoer = function (del) {
+        if (this.anim) return;
+        var S = this.S, K = S.K, mig = this, k = this.kolbePose(), T = null, id, pp;
+        function op(id, h) { var p = mig.pose(id); return { x: p.x, y: p.y - (h || 70), v: 0 }; }
+        switch (del) {
+            case "magnet":
+                T = [{ flyt: "magnet", til: { x: k.x, y: k.y - 40, v: 0 }, sek: 0.6 },
+                     { flyt: "magnet", til: { x: k.x, y: k.y + 150, v: 0 }, sek: 0.35 },
+                     { goer: function () { S.magnet.sted = "kolbe"; } }, { slip: "magnet" }];
+                break;
+            case "sal-sug": case "en-sug":
+                id = del === "sal-sug" ? "pip2" : "pip1";
+                pp = S.pip[id];
+                var maal = this.pipMaal(id);
+                T = [];
+                if (pp.sted !== "flaske") {
+                    T.push({ flyt: id, til: op(id, 120), sek: 0.35 },
+                           { flyt: id, til: { x: G.flaske.x, y: BORD - 190, v: 0 }, sek: 0.6 },
+                           { flyt: id, til: { x: G.flaske.x, y: BORD - 16, v: 0 }, sek: 0.35 },
+                           { goer: function () { pp.sted = "flaske"; } }, { slip: id });
+                }
+                T.push({ vent: 4, hver: function (dt) { return mig.fyldPipette(id, maal, dt); } }, { vent: 0.25 });
+                break;
+            case "sal-toem": case "en-toem":
+                id = del === "sal-toem" ? "pip2" : "pip1";
+                pp = S.pip[id];
+                T = [];
+                if (pp.sted !== "kolbe") {
+                    T.push({ flyt: id, til: op(id, 170), sek: 0.4 },
+                           { flyt: id, til: { x: k.x, y: k.y - 60, v: 0 }, sek: 0.7 },
+                           { flyt: id, til: { x: k.x, y: k.y + 8, v: 0 }, sek: 0.3 },
+                           { goer: function () { pp.sted = "kolbe"; } }, { slip: id });
+                }
+                T = T.concat(this.toemTrin(id));
+                break;
+            case "eth-maal":
+                var bag = { x: G.flEth.x + 40, y: G.flEth.y - 80, v: 0.5 };
+                T = [{ flyt: "fl-eth", til: bag, sek: 0.5 },
+                     { flyt: "fl-eth", til: { x: G.maaleglas.x - 6, y: G.maaleglas.y - 12, v: 1.95 }, sek: 0.45 },
+                     { vent: 6, hver: function (dt) { return mig.haeld("fl-eth", "maaleglas", dt); } },
+                     { vent: 0.3 },
+                     { flyt: "fl-eth", til: bag, sek: 0.45 },
+                     { flyt: "fl-eth", til: { x: G.flEth.x, y: G.flEth.y, v: 0 }, sek: 0.45 },
+                     { slip: "fl-eth" }];
+                break;
+            case "eth-haeld":
+                var ved = { x: G.maaleglas.x - 80, y: G.maaleglas.y - 60, v: -0.6 };
+                T = [{ flyt: "maaleglas", til: ved, sek: 0.5 },
+                     { flyt: "maaleglas", til: { x: k.x + 8, y: k.y - 14, v: -1.95 }, sek: 0.6 },
+                     { vent: 6, hver: function (dt) { return mig.haeld("maaleglas", "kolbe", dt); } },
+                     { vent: 0.3 },
+                     { flyt: "maaleglas", til: ved, sek: 0.6 },
+                     { flyt: "maaleglas", til: { x: G.maaleglas.x, y: G.maaleglas.y, v: 0 }, sek: 0.45 },
+                     { slip: "maaleglas" }];
+                break;
+            case "omroer": T = [{ goer: function () { S.plade.omroer = true; } }, { vent: 0.3 }]; break;
+            case "varme": T = [{ goer: function () { S.plade.varme = true; } }, { vent: 0.3 }]; break;
+            case "sluk": T = [{ goer: function () { S.plade.varme = false; S.plade.omroer = false; } }, { vent: 0.3 }]; break;
+            case "termo":
+                T = [{ flyt: "termo", til: { x: G.termoBord.x - 60, y: G.termoBord.y - 70, v: -0.9 }, sek: 0.45 },
+                     { flyt: "termo", til: { x: k.x + 12, y: k.y + 40, v: 0.07 }, sek: 0.6 },
+                     { flyt: "termo", til: { x: k.x + 12, y: k.y + 150, v: 0.07 }, sek: 0.4 },
+                     { goer: function () { S.termo.sted = "kolbe"; } }, { slip: "termo" }];
+                break;
+            case "varm":
+                T = [{ vent: 0.4 }, { lab: 90, sek: 3, stop: function () { return K.T >= 75; } }];
+                break;
+            case "tlc-p": case "tlc-r":
+                var hv = del === "tlc-p" ? "p" : "r", sid = "spids-" + hv;
+                var dyp = hv === "p" ? { x: k.x, y: k.y + 40 } : { x: G.vial.x, y: 402 };
+                var mark = hv === "p" ? G.markP : G.markR;
+                T = [{ flyt: sid, til: op(sid, 90), sek: 0.35 },
+                     { flyt: sid, til: { x: dyp.x, y: dyp.y - 90, v: 0 }, sek: 0.6 },
+                     { flyt: sid, til: { x: dyp.x, y: dyp.y, v: 0 }, sek: 0.3 },
+                     { goer: function () { S.spids[hv].indhold = hv === "p" ? "kolbe" : "ref"; } },
+                     { flyt: sid, til: { x: dyp.x, y: dyp.y - 90, v: 0 }, sek: 0.3 },
+                     { flyt: sid, til: { x: mark.x, y: mark.y - 50, v: 0 }, sek: 0.6 },
+                     { flyt: sid, til: { x: mark.x, y: mark.y, v: 0 }, sek: 0.25 },
+                     { goer: function () { mig.saetPlet(hv, { x: mark.x, y: mark.y }); } },
+                     { flyt: sid, til: { x: mark.x, y: mark.y - 60, v: 0 }, sek: 0.25 },
+                     { flyt: sid, til: function () { var h = mig.spidsHjem(hv); return { x: h.x, y: h.y - 80, v: 0 }; }, sek: 0.5 },
+                     { flyt: sid, til: function () { return mig.spidsHjem(hv); }, sek: 0.3 },
+                     { slip: sid }];
+                break;
+            case "tlc-koer":
+                T = [{ flyt: "plade", til: op("plade", 110), sek: 0.4 },
+                     { flyt: "plade", til: { x: 710, y: 320, v: 0 }, sek: 0.6 },
+                     { flyt: "plade", til: { x: 710, y: 423, v: 0 }, sek: 0.35 },
+                     { goer: function () { var pl = S.tlc; pl.sted = "kammer"; pl.iKammer = true; if (pl.tProeve === undefined) pl.tProeve = S.ur; } },
+                     { slip: "plade" },
+                     { vent: 5, hver: function () { return S.tlc.udviklet; } }];
+                break;
+            case "tlc-uv":
+                T = [{ flyt: "plade", til: op("plade", 120), sek: 0.4 },
+                     { flyt: "plade", til: { x: 880, y: 320, v: 0 }, sek: 0.6 },
+                     { flyt: "plade", til: { x: 880, y: BORD, v: 0 }, sek: 0.35 },
+                     { goer: function () { S.tlc.sted = "uv"; S.tlc.uvT = 0; } },
+                     { slip: "plade" },
+                     { vent: 1.3, hver: function () { return S.tlc.set; } }];
+                break;
+            case "isbad":
+                T = [];
+                if (S.kolbeSted !== "isbad") {
+                    T.push({ flyt: "kolbe", til: { x: k.x, y: k.y - 50, v: 0 }, sek: 0.5 },
+                           { flyt: "kolbe", til: { x: G.kolbeIsbad.x, y: G.kolbeIsbad.y - 60, v: 0 }, sek: 0.7 },
+                           { flyt: "kolbe", til: { x: G.kolbeIsbad.x, y: G.kolbeIsbad.y, v: 0 }, sek: 0.35 },
+                           { goer: function () { S.kolbeSted = "isbad"; } }, { slip: "kolbe" });
+                }
+                T = T.concat(this.koelTrin());
+                break;
+            case "filtr-fugt": T = this.sproejteTrin("tragt"); break;
+            case "filtr-sug": T = [{ goer: function () { S.sug = true; } }, { vent: 0.4 }]; break;
+            case "filtr-haeld": T = this.kolbeTilTragt(); break;
+            case "filtr-skyl":
+                T = [];
+                if (Km.rumfang(K) > 0.5 && S.skylMl < 2) T = T.concat(this.kolbeTilTragt());
+                if (S.skylMl < 2) T = T.concat(this.sproejteTrin("kolbe"));
+                T = T.concat(this.kolbeTilTragt(), [{ vent: 0.5 }]);
+                break;
+            case "vej-tom": case "vej-fuld":
+                var ui = S.aktivU, uid = ui ? "urglas2" : "urglas", antal = S.vejninger.length;
+                T = [{ flyt: uid, til: op(uid, 70), sek: 0.4 },
+                     { flyt: uid, til: { x: G.paaVaegt.x, y: G.paaVaegt.y - 70, v: 0 }, sek: 0.7 },
+                     { flyt: uid, til: { x: G.paaVaegt.x, y: G.paaVaegt.y, v: 0 }, sek: 0.3 },
+                     { goer: function () { S.urglasSted[ui] = "vaegt"; S.vejetNu = false; } },
+                     { slip: uid },
+                     { vent: 2.5, hver: function () { return S.vejninger.length > antal; } }];
+                break;
+            case "vej-skrab":
+                var fraU = S.urglas2 && S.aktivU === 1 && S.urglas[0].mKryst > 0;
+                var hent = fraU ? function () { var p = mig.urglasPose(0); return { x: p.x + 40, y: p.y - 24, v: 0 }; }
+                                : function () { return { x: G.tragtMidt.x + 20, y: G.tragtMidt.y - 2, v: 0 }; };
+                var paaU = function (dy) { return function () { var p = mig.urglasPose(S.aktivU); return { x: p.x + 20, y: p.y - dy, v: 0 }; }; };
+                T = [{ flyt: "spatel", til: op("spatel", 80), sek: 0.4 },
+                     { flyt: "spatel", til: function () { var h = hent(); return { x: h.x, y: h.y - 50, v: 0 }; }, sek: 0.6 },
+                     { flyt: "spatel", til: hent, sek: 0.3 },
+                     { goer: function () { mig.spatelOver(mig.spatelPose()); } },
+                     { flyt: "spatel", til: paaU(70), sek: 0.7 },
+                     { flyt: "spatel", til: paaU(24), sek: 0.3 },
+                     { goer: function () { mig.spatelSlip(mig.spatelPose()); } },
+                     { flyt: "spatel", til: { x: G.spatel.x, y: G.spatel.y - 60, v: 0 }, sek: 0.5 },
+                     { flyt: "spatel", til: { x: G.spatel.x, y: G.spatel.y, v: 0 }, sek: 0.3 },
+                     { slip: "spatel" }];
+                break;
+            case "vej-toer":
+                var ut = S.aktivU, utid = ut ? "urglas2" : "urglas";
+                T = [{ flyt: utid, til: op(utid, 70), sek: 0.4 },
+                     { flyt: utid, til: { x: G.underLampe.x, y: G.underLampe.y - 70, v: 0 }, sek: 0.8 },
+                     { flyt: utid, til: { x: G.underLampe.x, y: G.underLampe.y, v: 0 }, sek: 0.3 },
+                     { goer: function () { S.urglasSted[ut] = "lampe"; } },
+                     { slip: utid }].concat(this.toerTrin(ut));
+                break;
+            case "smp-fyld":
+                var overU = function (dy) { return function () { var p = mig.urglasPose(S.aktivU); return { x: p.x, y: p.y - dy, v: 0 }; }; };
+                T = [{ flyt: "roer", til: op("roer", 90), sek: 0.4 },
+                     { flyt: "roer", til: overU(80), sek: 0.6 },
+                     { flyt: "roer", til: overU(14), sek: 0.3 },
+                     { goer: function () { S.roer.fyldt = true; } },
+                     { flyt: "roer", til: overU(80), sek: 0.3 },
+                     { flyt: "roer", til: { x: G.roerHolder.x, y: BORD - 90, v: 0 }, sek: 0.6 },
+                     { flyt: "roer", til: { x: G.roerHolder.x, y: BORD - 6, v: 0 }, sek: 0.3 },
+                     { slip: "roer" }];
+                break;
+            case "smp-ind":
+                T = [{ flyt: "roer", til: op("roer", 90), sek: 0.4 },
+                     { flyt: "roer", til: { x: G.slot.x, y: G.slot.y - 50, v: 0 }, sek: 0.7 },
+                     { flyt: "roer", til: { x: G.slot.x, y: G.slot.y + 34, v: 0 }, sek: 0.4 },
+                     { goer: function () { S.roer.sted = "apparat"; } },
+                     { slip: "roer" }];
+                break;
+            case "smp-taend": T = [{ goer: function () { S.app.taendt = true; } }, { vent: 0.2 }]; break;
+            case "smp-start": case "smp-slut":
+                this.klikLinse();
+                this.tjekTrin();
+                return;
+        }
+        if (T) this.koerAnim(T);
+    };
+
+    /* Vis svaret i selvtesten og spring til et trin: delen goeres paa én gang */
     P.goer = function (del) {
-        var S = this.S, K = S.K, mig = this;
-        var pp;
+        var S = this.S, K = S.K, pp, id, n;
         switch (del) {
             case "magnet": S.magnet.sted = "kolbe"; break;
-            case "sal-ned": case "en-ned": S.pip[del === "sal-ned" ? "pip2" : "pip1"].sted = "flaske"; break;
             case "sal-sug": case "en-sug":
-                pp = S.pip[del === "sal-sug" ? "pip2" : "pip1"];
+                id = del === "sal-sug" ? "pip2" : "pip1";
+                pp = S.pip[id];
                 pp.sted = "flaske";
                 pp.stof = del === "sal-sug" ? "sal" : "en";
-                pp.V = Math.round(((del === "sal-sug" ? OPSKRIFT.sal - K.vSal : OPSKRIFT.en - K.vEn)) * 10) / 10;
+                pp.V = this.pipMaal(id);
                 break;
-            case "sal-over": S.pip.pip2.sted = "kolbe"; break;
             case "sal-toem": case "en-toem":
-                pp = S.pip[del === "sal-toem" ? "pip2" : "pip1"];
+                id = del === "sal-toem" ? "pip2" : "pip1";
+                pp = S.pip[id];
                 if (pp.V < 0.03) this.goer(del === "sal-toem" ? "sal-sug" : "en-sug");
-                pp.sted = "kolbe";
-                Km.tilsaet(K, pp.stof || (del === "sal-toem" ? "sal" : "en"), pp.V, S.ur);
+                Km.tilsaet(K, pp.stof, pp.V, S.ur);
+                if (pp.stof === "en") this.model(1);
                 pp.V = 0;
                 pp.sted = "holder";
                 break;
-            case "eth-maal": S.maaleglas.V = Math.max(S.maaleglas.V, OPSKRIFT.ethanol - K.vEth); break;
+            case "eth-maal": S.maaleglas.V = Math.max(0, Km.OPSKRIFT.ethanol - K.tilsat.ethanol); break;
             case "eth-haeld":
-                if (S.maaleglas.V < 1) S.maaleglas.V = OPSKRIFT.ethanol - K.vEth;
+                if (S.maaleglas.V < 1) this.goer("eth-maal");
                 Km.tilsaet(K, "ethanol", S.maaleglas.V, S.ur);
                 S.maaleglas.V = 0;
                 break;
             case "omroer": S.plade.omroer = true; break;
             case "varme": S.plade.varme = true; break;
             case "termo": S.termo.sted = "kolbe"; break;
-            case "en-vent":
-                S.ventet = true;
-                this.spolTil(function () { return K.T >= 74; }, 40);
-                break;
+            case "varm": this.spolTil(function () { return K.T >= 75; }, 90); break;
             case "tlc-p":
+                S.tlc.sted = "bord";
                 S.tlc.P = Km.tlcProeve(K); S.tlc.faerdig = Km.faerdig(K); S.tlc.tProeve = S.ur; S.spids.p.indhold = null;
-                if (S.tlc.sted !== "bord") S.tlc.sted = "bord";
                 break;
             case "tlc-r": S.tlc.R = Km.tlcReference(); S.spids.r.indhold = null; break;
             case "tlc-koer":
-                S.tlc.sted = "kammer"; S.tlc.iKammer = true;
-                this.spolTil(function () { return S.tlc.front >= 0.85; }, 5);
+                S.tlc.sted = "kammer"; S.tlc.iKammer = true; S.tlc.front = 0.88; S.tlc.udviklet = true;
+                if (S.tlc.tProeve === undefined) S.tlc.tProeve = S.ur;
                 break;
             case "tlc-uv":
                 S.tlc.sted = "uv"; S.tlc.uvT = 1; S.tlc.set = true; S.tlc.cirkler = true;
                 this.logPlade();
                 break;
             case "sluk": S.plade.varme = false; S.plade.omroer = false; break;
-            case "isbad": S.kolbeSted = "isbad"; break;
+            case "isbad": S.kolbeSted = "isbad"; this.spolTil(function () { return K.T < 5; }, 40); break;
             case "filtr-fugt": S.tragt.vaad = true; S.tragt.mL += 2; break;
             case "filtr-sug": S.sug = true; break;
-            case "filtr-kold":
-                this.spolTil(function () { return K.T < 24; }, 40);
-                break;
-            case "filtr-haeld":
+            case "filtr-haeld": case "filtr-skyl":
                 S.termo.sted = "bord";
-                var n = 0;
+                if (del === "filtr-skyl") {
+                    if (Km.rumfang(K) > 0.5 && S.skylMl < 2) this.goer("filtr-haeld");
+                    Km.tilsaet(K, "ethanol", 6, S.ur);
+                    S.skylMl += 6;
+                }
+                n = 0;
                 while (Km.rumfang(K) > 0.05 && n < 400) {
                     if (S.tragt.mL >= Km.TRAGT_MAX - 1) Km.opdaterTragt(S.tragt, 1, S.sug);
                     this.haeldITragt(0.1);
                     n++;
                 }
-                break;
-            case "filtr-skyl":
-                if (Km.rumfang(K) > 0.5 && S.skylMl < 2) this.goer("filtr-haeld");
-                Km.tilsaet(K, "ethanol", 6, S.ur);
-                S.skylMl += 6;
-                var m2 = 0;
-                while (Km.rumfang(K) > 0.05 && m2 < 200) {
-                    if (S.tragt.mL >= Km.TRAGT_MAX - 1) Km.opdaterTragt(S.tragt, 1, S.sug);
-                    this.haeldITragt(0.1);
-                    m2++;
-                }
-                S.skyllet = true;
-                this.spolTil(function () { return S.tragt.mL < 0.05; }, 30);
-                this.spolTil(function () { return false; }, 1);
+                n = 0;
+                while (S.tragt.mL > 0.05 && n < 300) { Km.opdaterTragt(S.tragt, 0.2, S.sug); n++; }
+                Km.opdaterTragt(S.tragt, 1, S.sug);
+                if (del === "filtr-skyl") S.skyllet = true;
                 break;
             case "vej-tom":
                 S.urglasSted[S.aktivU] = "vaegt";
@@ -2165,7 +2397,7 @@
                 break;
             case "vej-toer":
                 S.urglasSted[S.aktivU] = "lampe";
-                this.spolTil(function () { return S.urglas[S.aktivU].w < 0.0015; }, 30);
+                this.spolTil(function () { return S.urglas[S.aktivU].w < 0.0015; }, 40);
                 break;
             case "vej-fuld":
                 var Ua = S.urglas[S.aktivU];
@@ -2173,19 +2405,6 @@
                 S.vejninger.push({ m: rund2(Km.urglasMasse(Ua)), tom: false, u: S.aktivU, lampe: S.lampeTid[S.aktivU], w: Ua.w });
                 S.vejetNu = true;
                 S.vaegtVis = Km.urglasMasse(Ua);
-                break;
-            case "vej-igen":
-                var Ui = S.urglas[S.aktivU];
-                S.urglasSted[S.aktivU] = "lampe";
-                this.spolTil(function () { return Ui.w < 0.0008; }, 40);
-                S.urglasSted[S.aktivU] = "vaegt";
-                var mi = rund2(Km.urglasMasse(Ui));
-                S.vejninger.push({ m: mi, tom: false, u: S.aktivU, lampe: S.lampeTid[S.aktivU], w: Ui.w });
-                if (this.fuldeVejninger().length < 2 || Math.abs(this.fuldeVejninger().slice(-2)[0].m - mi) > 0.0101) {
-                    S.vejninger.push({ m: mi, tom: false, u: S.aktivU, lampe: S.lampeTid[S.aktivU], w: Ui.w });
-                }
-                S.vejetNu = true;
-                S.vaegtVis = Km.urglasMasse(Ui);
                 break;
             case "smp-fyld": S.roer.fyldt = true; break;
             case "smp-ind": S.roer.fyldt = true; S.roer.sted = "apparat"; break;
@@ -2202,7 +2421,6 @@
                 S.app.taendt = false;
                 break;
         }
-        void mig;
     };
 
     /* De tal, kortets tekster bruger */
@@ -2226,21 +2444,20 @@
     /* Forbered trin i ved at goere alle de foregaaende trin efter opskriften */
     P.forbered = function (i) {
         this.S = nyTilstand();
-        var S = this.S, K = S.K, mig = this;
+        this.anim = null;
+        this.ap = {};
+        this.hold = null;
+        var S = this.S, K = S.K;
         for (var t = 0; t < i; t++) {
             this.trinNr = t;
-            if (t === 5) this.spolTil(function () { return Km.faerdig(K) && K.T > 70; }, 40);
-            if (t === 7) this.spolTil(function () { return K.T < 6; }, 30);
+            if (t === 5) this.spolTil(function () { return Km.faerdig(K); }, 40);
             var n = 0, del;
             while ((del = this.delNu()) !== null && n < 40) { this.goer(del); n++; }
             if (t === 8) S.feltSvar = this.tal().svar;
-            if (t === 3) this.spolTil(function () { return K.T >= 74; }, 40);
-            if (t === 4) this.spolTil(function () { return true; }, 0);
         }
         /* Det, der bliver staaende fra de foregaaende trin */
-        if (i >= 8) { S.urglasSted[S.aktivU] = "bord"; }
+        if (i >= 8) S.urglasSted[S.aktivU] = "bord";
         if (i === 9) S.urglasSted = ["bord", "bord"];
-        void mig;
     };
 
     /* ======================================================================

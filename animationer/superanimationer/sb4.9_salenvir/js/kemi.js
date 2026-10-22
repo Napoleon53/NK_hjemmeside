@@ -34,7 +34,9 @@
     };
 
     var STUE = 21;           /* stuetemperatur */
-    var PLADE_SAT = 100;     /* magnetomroererens varme, naar den er taendt */
+    /* Magnetomroereren holder opløsningen paa 75-76 °C, naar varmen er
+       taendt (som en regulering), saa ethanolen aldrig koger */
+    var PLADE_SAT = 76;
 
     /* Opskriften */
     var OPSKRIFT = { sal: 1.4, ethanol: 100, en: 0.5 };

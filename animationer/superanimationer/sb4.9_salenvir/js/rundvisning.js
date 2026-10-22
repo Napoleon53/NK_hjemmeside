@@ -15,11 +15,11 @@
 
     var TURE = {
         "fane-syntese": [
-            { sel: "#skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal gøre nu, ét skridt ad gangen. Et gult skilt i scenen viser, hvilken ting du skal bruge. Blinker kortet, skal du først gøre det, kortet siger." },
+            { sel: "#skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal gøre nu, ét skridt ad gangen. Blinker kortet, skal du først gøre det, kortet siger." },
+            { sel: "#handling", titel: "Den grønne knap", tekst: "Den grønne knap står ved den ting, du skal bruge nu, og gør skridtet med den rigtige mængde. Du kan også klikke på tingen eller trække den." },
             { sel: "#anker-opstilling", titel: "Opstillingen", tekst: "Den koniske kolbe sidder fast i stativet på magnetomrøreren. Knappen med bølgerne er varmen, knappen med den runde pil er omrøringen." },
-            { sel: "#anker-bord", titel: "Bordet", tekst: "Her står det udstyr, trinnet skal bruge. Træk tingene med musen: en pipette ned i en flaske, en flaske hen over et glas. Hold et glas over et andet for at hælde." },
-            { sel: "#status", titel: "Hjælpen", tekst: "Den gule knap giver et hint. Trykker du igen, viser den svaret: så gør animationen skridtet for dig." },
-            { sel: "#ur", titel: "Uret", tekst: "Laboratoriets ur. Knappen ⏩ 2 min lader tiden gå hurtigere, når du venter på varme, kulde eller tørring." },
+            { sel: "#anker-bord", titel: "Bordet", tekst: "Her står det udstyr, trinnet skal bruge. Den ting, der skal bruges nu, har en gul ring." },
+            { sel: "#status", titel: "Hjælpen", tekst: "Knappen på kortet fortæller, hvorfor skridtet gøres. Trykker du igen, gør animationen skridtet for dig." },
             { sel: "#trinkort", titel: "Trinnene", tekst: "Syntesen har ti trin. Klik på et trin for at begynde dér; trinnene før bliver så gjort efter opskriften." },
             { sel: "#maalkort", titel: "Dit forsøg", tekst: "Her kommer dine tal: mængderne, temperaturen, TLC-pladerne, vejningerne og smeltepunktet." }
         ]

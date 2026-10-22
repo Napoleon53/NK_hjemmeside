@@ -8,10 +8,12 @@
 
    Del:  id       navnet, som js/sim.js kender delen paa
          tekst    det, eleven skal goere, som en hel saetning (hoejst 95 tegn)
-         hint     hinttrappen (hver hoejst 100 tegn). Sidste trin paa
-                  hjaelpeknappen er Vis svaret: animationen goer delen.
-         skilt    det gule skilt ved tingen, der skal bruges (kort)
-         paa      den ting i scenen, skiltet og den gule ring sidder paa
+         knap     teksten paa den groenne knap ved tingen (kort). Knappen goer
+                  delen med den rigtige maengde, saa intet maales forkert
+         paa      den ting i scenen, knappen og den gule ring sidder ved
+         auto     delen sker af sig selv (opvarmningen), ingen knap
+         hint     hinttrappen (hver hoejst 100 tegn): hvorfor delen goeres.
+                  Sidste trin paa hjaelpeknappen er Vis svaret.
 
    Tal, der afhaenger af elevens eget forsoeg, saettes ind af js/sim.js
    (funktioner, der faar tallene som argument).
@@ -28,9 +30,9 @@
         {
             id: "magnet", navn: "Magneten",
             dele: [
-                { id: "magnet", tekst: "Træk magneten ned i den koniske kolbe.",
-                  skilt: "Træk mig ned i kolben", paa: "magnet",
-                  hint: ["Magneten er den lille hvide stav på bordet. Træk den hen over kolben, og slip."] }
+                { id: "magnet", tekst: "Læg magneten ned i den koniske kolbe.",
+                  knap: "Læg magneten i kolben", paa: "magnet",
+                  hint: ["Magneten er den lille hvide stav på bordet. Den skal røre i væsken, når omrøreren tændes."] }
             ],
             slut: "Magneten ligger i bunden af kolben. Når omrøreren tændes, drejer den rundt og rører i væsken."
         },
@@ -38,36 +40,25 @@
         {
             id: "sal", navn: "1,4 mL salicylaldehyd",
             dele: [
-                { id: "sal-ned", tekst: "Træk pipetten ned i flasken med salicylaldehyd.",
-                  skilt: "Træk mig ned i flasken", paa: "pip2",
-                  hint: ["Pipetten står i holderen. Træk den hen over den brune flaske, og slip."] },
-                { id: "sal-sug", tekst: "Hold på knappen Sug op, til pipetten viser 1,4 mL.",
-                  skilt: "Hold: sug op", paa: "pip2-sug",
-                  hint: ["Hold musen nede på knappen ▲ Sug op ved pipettebolden. Slip ved 1,4 mL.",
-                         "Fik du for meget? Hold på ▼ Tøm, mens pipetten står i flasken."] },
-                { id: "sal-over", tekst: "Træk pipetten med 1,4 mL salicylaldehyd hen over den koniske kolbe.",
-                  skilt: "Træk mig hen over kolben", paa: "pip2",
-                  hint: ["Træk pipetten, så spidsen er lige over kolbens åbning, og slip."] },
-                { id: "sal-toem", tekst: "Hold på knappen Tøm, til pipetten er tom.",
-                  skilt: "Hold: tøm", paa: "pip2-toem",
-                  hint: ["Hold musen nede på knappen ▼ Tøm ved pipettebolden, til der ikke er mere i pipetten."] }
+                { id: "sal-sug", tekst: "Afmål 1,4 mL salicylaldehyd med pipetten.",
+                  knap: "Sug 1,4 mL op", paa: "pip2",
+                  hint: ["Pipettebolden suger væsken op i pipetten. Tallet ved pipetten viser, hvor meget der er i."] },
+                { id: "sal-toem", tekst: "Kom de 1,4 mL salicylaldehyd i den koniske kolbe.",
+                  knap: "Tøm pipetten i kolben", paa: "pip2",
+                  hint: ["Pipetten føres hen over kolben, og bolden presser væsken ud."] }
             ],
-            slut: function (t) {
-                if (t.vSal > 1.55) return "Kolben fik " + k(t.vSal, 1) + " mL salicylaldehyd. Opskriften siger 1,4 mL, så noget af det bliver til overs.";
-                return "Kolben har fået " + k(t.vSal, 1) + " mL salicylaldehyd. Det er en næsten farveløs væske.";
-            }
+            slut: "Kolben har fået 1,4 mL salicylaldehyd. Det er en næsten farveløs væske."
         },
         /* ----- 3 ---------------------------------------------------------- */
         {
             id: "ethanol", navn: "100 mL ethanol",
             dele: [
-                { id: "eth-maal", tekst: "Hæld ethanol i måleglasset, til det viser 100 mL.",
-                  skilt: "Hold mig over måleglasset", paa: "fl-eth",
-                  hint: ["Træk flasken med ethanol hen over måleglasset, og hold den der. Slip ved 100 mL.",
-                         "Stregen øverst på måleglasset er 100 mL. Et tal over flasken viser, hvor meget der er i."] },
+                { id: "eth-maal", tekst: "Afmål 100 mL ethanol i måleglasset.",
+                  knap: "Hæld 100 mL i måleglasset", paa: "fl-eth",
+                  hint: ["Et måleglas måler rumfang mere præcist end stregerne på kolben."] },
                 { id: "eth-haeld", tekst: "Hæld de 100 mL ethanol fra måleglasset over i den koniske kolbe.",
-                  skilt: "Hold mig over kolben", paa: "maaleglas",
-                  hint: ["Træk måleglasset hen over kolbens åbning, og hold det der, til det er tomt."] }
+                  knap: "Hæld i kolben", paa: "maaleglas",
+                  hint: ["Måleglasset tømmes helt ned i kolben."] }
             ],
             slut: "Ethanolen er opløsningsmidlet. Både salicylaldehyd og ethylendiamin kan opløses i den."
         },
@@ -75,17 +66,19 @@
         {
             id: "varme", navn: "Omrøring og varme",
             dele: [
-                { id: "omroer", tekst: "Tænd for omrøringen: klik på den højre knap på magnetomrøreren.",
-                  skilt: "Klik: omrøring", paa: "knap-omroer",
-                  hint: ["Knappen med den runde pil er omrøringen. Klik på den."] },
-                { id: "varme", tekst: "Tænd for varmen: klik på den venstre knap på magnetomrøreren.",
-                  skilt: "Klik: varme", paa: "knap-varme",
-                  hint: ["Knappen med de tre bølger er varmen. Den sætter pladen til 100 °C."] },
+                { id: "omroer", tekst: "Tænd for omrøringen på magnetomrøreren.",
+                  knap: "Tænd omrøringen", paa: "knap-omroer",
+                  hint: ["Knappen med den runde pil er omrøringen. Magneten drejer rundt i kolben."] },
+                { id: "varme", tekst: "Tænd for varmen på magnetomrøreren.",
+                  knap: "Tænd varmen", paa: "knap-varme",
+                  hint: ["Knappen med de tre bølger er varmen."] },
                 { id: "termo", tekst: "Sæt termometret ned i kolben, så du kan følge temperaturen.",
-                  skilt: "Træk mig ned i kolben", paa: "termo",
-                  hint: ["Termometret ligger på bordet. Træk det hen over kolben, og slip."] }
+                  knap: "Sæt termometret i", paa: "termo",
+                  hint: ["Termometret ligger på bordet foran kolben."] },
+                { id: "varm", tekst: "Opløsningen bliver varmet op til omkring 75 °C.", auto: true,
+                  hint: ["Se på termometret, mens opløsningen bliver varm."] }
             ],
-            slut: "Pladen er sat til 100 °C, men ethanol koger ved 78 °C. Hold øje med termometret, mens opløsningen bliver varm."
+            slut: "Opløsningen er 75 °C. Det er varmt nok til, at reaktionen går hurtigt, og under ethanols kogepunkt på 78 °C."
         },
         /* ----- 5 ---------------------------------------------------------- */
         {
@@ -100,55 +93,45 @@
                 ]
             },
             dele: [
-                { id: "en-vent", tekst: "Vent, til termometret viser omkring 75 °C. Spol frem med knappen ⏩.",
-                  skilt: "Spol frem", paa: "ur",
-                  hint: ["Varmen er tændt. Knappen ⏩ 2 min får tiden til at gå hurtigere."] },
-                { id: "en-ned", tekst: "Træk den lille pipette ned i flasken med ethylendiamin.",
-                  skilt: "Træk mig ned i flasken", paa: "pip1",
-                  hint: ["Det er en pipette på 1 mL. Træk den hen over den brune flaske med ethylendiamin."] },
-                { id: "en-sug", tekst: "Hold på knappen Sug op, til pipetten viser 0,5 mL.",
-                  skilt: "Hold: sug op", paa: "pip1-sug",
-                  hint: ["Hold musen nede på knappen ▲ Sug op. Slip ved 0,5 mL."] },
-                { id: "en-toem", tekst: "Træk pipetten hen over kolben, og tøm den dråbe for dråbe.",
-                  skilt: "Træk mig hen over kolben", paa: "pip1",
-                  hint: ["Træk pipetten hen over kolben. Hold så på ▼ Tøm: den drypper én dråbe ad gangen."] }
+                { id: "en-sug", tekst: "Afmål 0,5 mL ethylendiamin med den lille pipette.",
+                  knap: "Sug 0,5 mL op", paa: "pip1",
+                  hint: ["Det er en pipette på 1 mL. Ethylendiamin er ætsende, så det afmåles med pipettebold."] },
+                { id: "en-toem", tekst: "Dryp de 0,5 mL ethylendiamin ned i kolben, én dråbe ad gangen.",
+                  knap: "Dryp i kolben", paa: "pip1",
+                  hint: ["Dråbe for dråbe giver en rolig reaktion. Se, hvad der sker, hvor dråberne rammer."] }
             ],
-            slut: function (t) {
-                var s = "Opløsningen blev gul. Det gule er Salenvir, der dannes, hvor dråberne rammer.";
-                if (t.enVedT !== null && t.enVedT < 60) s += " Opløsningen var kun " + Math.round(t.enVedT) + " °C, så reaktionen går langsomt.";
-                return s;
-            }
+            slut: "Opløsningen blev gul. Det gule er Salenvir, der dannes, hvor dråberne rammer."
         },
         /* ----- 6 ---------------------------------------------------------- */
         {
             id: "tlc", navn: "TLC",
             dele: [
-                { id: "tlc-p", tekst: "Dyp en pipettespids i kolben, og sæt en plet på TLC-pladen ved P.",
-                  skilt: "Træk mig ned i kolben", paa: "spids-p",
-                  hint: ["Træk den venstre pipettespids ned i kolben. Træk den så hen til stregen ved P på pladen, og slip."] },
-                { id: "tlc-r", tekst: "Dyp den anden spids i referenceglasset, og sæt en plet ved R.",
-                  skilt: "Træk mig ned i referencen", paa: "spids-r",
-                  hint: ["Referenceglasset har fortyndet salicylaldehyd. Træk spidsen derned og så hen til R på pladen."] },
-                { id: "tlc-koer", tekst: "Stil TLC-pladen i bægerglasset med løbevæske, og vent, til væsken næsten er oppe.",
-                  skilt: "Træk mig ned i glasset", paa: "plade",
-                  hint: ["Træk pladen ned i bægerglasset. Løbevæsken suges op og tager stofferne med sig."] },
-                { id: "tlc-uv", tekst: "Stil TLC-pladen under UV-lampen, så du kan se pletterne.",
-                  skilt: "Træk mig under lampen", paa: "plade",
-                  hint: ["Stofferne er farveløse, men de ses som mørke pletter i UV-lys. Træk pladen hen under lampen."] }
+                { id: "tlc-p", tekst: "Sæt en plet af prøven fra kolben ved P på TLC-pladen.",
+                  knap: "Sæt en prøve ved P", paa: "spids-p",
+                  hint: ["P er prøven fra kolben. Pletten sættes på blyantsstregen nederst på pladen."] },
+                { id: "tlc-r", tekst: "Sæt en plet af referencen ved R med den anden pipettespids.",
+                  knap: "Sæt referencen ved R", paa: "spids-r",
+                  hint: ["Referenceglasset har fortyndet salicylaldehyd. Så kan du se, hvor højt salicylaldehyd løber."] },
+                { id: "tlc-koer", tekst: "Stil TLC-pladen i bægerglasset med løbevæske.",
+                  knap: "Stil pladen i glasset", paa: "plade",
+                  hint: ["Løbevæsken suges op ad pladen og tager stofferne med sig, hvert stof sit eget stykke."] },
+                { id: "tlc-uv", tekst: "Se på TLC-pladen under UV-lampen.",
+                  knap: "Stil pladen under lampen", paa: "plade",
+                  hint: ["Stofferne er farveløse, men de ses som mørke pletter i UV-lys."] }
             ],
-            /* Spoergsmaalet bygges af js/sim.js ud fra pladen, se tlcSpm */
+            /* Spoergsmaalet bygges af js/sim.js ud fra pladen, se tlcVurdering */
             slut: "Salicylaldehyden er brugt op, og reaktionen er færdig."
         },
         /* ----- 7 ---------------------------------------------------------- */
         {
             id: "koel", navn: "Afkøling",
             dele: [
-                { id: "sluk", tekst: "Sluk for varmen på magnetomrøreren: klik på den venstre knap.",
-                  skilt: "Klik: sluk varmen", paa: "knap-varme",
-                  hint: ["Knappen med de tre bølger er varmen. Lampen ved knappen slukker, når varmen er slukket."] },
+                { id: "sluk", tekst: "Sluk for varmen og omrøringen på magnetomrøreren.",
+                  knap: "Sluk varmen", paa: "knap-varme",
+                  hint: ["Reaktionen er færdig, så der skal ikke varmes mere."] },
                 { id: "isbad", tekst: "Sæt kolben i isbadet, så opløsningen bliver kold.",
-                  skilt: "Træk kolben herned", paa: "isbad",
-                  hint: ["Tag fat i kolben, og træk den ned i skålen med is og vand. Termometret følger med."] }
+                  knap: "Sæt kolben i isbadet", paa: "kolbe",
+                  hint: ["Se i kolben, mens den bliver kold."] }
             ],
             spm: {
                 tekst: "Hvorfor skal opløsningen køles, før krystallerne filtreres fra?",
@@ -157,9 +140,9 @@
                     { t: "Reaktionen bliver først færdig i kulden.", ok: false,
                       f: "TLC-pladen viste, at reaktionen allerede er færdig. Kulden ændrer, hvor meget der kan være opløst." },
                     { t: "Filtrerpapiret tåler ikke varm ethanol.", ok: false,
-                      f: "Papiret tåler godt varm ethanol. Se, hvad der sker i kolben, mens den bliver kold." }
+                      f: "Papiret tåler godt varm ethanol. Se på kolben: der kom krystaller, da den blev kold." }
                 ],
-                hint: ["Se i kolben, mens den bliver kold. Hvad kommer der til syne?"],
+                hint: ["Se i kolben. Hvad kom der til syne, da den blev kold?"],
                 godt: "Rigtigt. Jo koldere ethanolen er, jo mindre Salenvir kan den opløse. Resten fælder ud som gule krystaller."
             },
             slut: "Jo koldere ethanolen er, jo mindre Salenvir kan den opløse. Resten fælder ud som gule krystaller."
@@ -168,48 +151,37 @@
         {
             id: "filtr", navn: "Sugefiltrering",
             dele: [
-                { id: "filtr-kold", tekst: "Vent, til termometret i kolben viser under 25 °C. Spol frem med ⏩.",
-                  skilt: "Spol frem", paa: "ur",
-                  hint: ["Isbadet køler kolben. Knappen ⏩ 2 min får tiden til at gå hurtigere."] },
                 { id: "filtr-fugt", tekst: "Fugt filtrerpapiret i Büchnertragten med ethanol fra sprøjteflasken.",
-                  skilt: "Hold mig over tragten", paa: "sproejte",
-                  hint: ["Træk sprøjteflasken hen over tragten, og hold den der et øjeblik."] },
-                { id: "filtr-sug", tekst: "Åbn for suget: klik på hanen på væggen.",
-                  skilt: "Klik: åbn hanen", paa: "hane",
-                  hint: ["Hanen sidder på røret til højre. Slangen går fra hanen til sugekolben."] },
+                  knap: "Fugt filtrerpapiret", paa: "sproejte",
+                  hint: ["Et vådt papir ligger tæt i tragten, så krystallerne ikke løber ind under det."] },
+                { id: "filtr-sug", tekst: "Åbn for suget på hanen ved væggen.",
+                  knap: "Åbn for suget", paa: "hane",
+                  hint: ["Slangen går fra hanen til sugekolben. Suget trækker ethanolen gennem papiret."] },
                 { id: "filtr-haeld", tekst: "Hæld kolbens indhold ned i Büchnertragten.",
-                  skilt: "Hold mig over tragten", paa: "kolbe",
-                  hint: ["Tag fat i kolben i isbadet, og hold den over tragten, til den er tom."] },
-                { id: "filtr-skyl", tekst: "Skyl kolben med lidt ethanol fra sprøjteflasken, og hæld det i tragten.",
-                  skilt: "Hold mig over kolben", paa: "sproejte",
-                  hint: ["Der sidder krystaller tilbage i kolben. Sprøjt lidt ethanol i kolben, og hæld den i tragten igen."] }
+                  knap: "Hæld kolben i tragten", paa: "kolbe",
+                  hint: ["Krystallerne bliver på papiret, og ethanolen løber ned i sugekolben."] },
+                { id: "filtr-skyl", tekst: "Skyl kolben med lidt ethanol, og hæld det i tragten.",
+                  knap: "Skyl kolben", paa: "sproejte",
+                  hint: ["Der sidder stadig krystaller i kolben. Skylningen får dem med."] }
             ],
-            slut: function (t) {
-                var s = "Krystallerne ligger på filtrerpapiret, og ethanolen er løbet ned i sugekolben.";
-                if (t.filtrT !== null && t.filtrT > 30) s += " Kolben var " + Math.round(t.filtrT) + " °C, så en del Salenvir var stadig opløst.";
-                else if (!t.vaad) s += " Papiret var ikke fugtet, så nogle krystaller løb under det.";
-                return s;
-            }
+            slut: "Krystallerne ligger på filtrerpapiret, og ethanolen er løbet ned i sugekolben."
         },
         /* ----- 9 ---------------------------------------------------------- */
         {
             id: "vej", navn: "Tørring og vejning",
             dele: [
-                { id: "vej-tom", tekst: "Vej det tomme urglas: stil det på vægten.",
-                  skilt: "Træk mig op på vægten", paa: "urglas",
-                  hint: ["Træk urglasset op på vægten. Massen kommer i skemaet til højre."] },
+                { id: "vej-tom", tekst: "Vej det tomme urglas.",
+                  knap: "Stil urglasset på vægten", paa: "urglas",
+                  hint: ["Urglassets egen masse skal trækkes fra bagefter. Massen kommer i skemaet til højre."] },
                 { id: "vej-skrab", tekst: "Skrab krystallerne fra tragten over på urglasset med spatlen.",
-                  skilt: "Træk mig hen til tragten", paa: "spatel",
-                  hint: ["Træk spatlen hen til krystallerne i tragten. Træk den så hen over urglasset, og slip."] },
-                { id: "vej-toer", tekst: "Stil urglasset under varmelampen, og lad krystallerne tørre.",
-                  skilt: "Træk mig under lampen", paa: "urglas",
-                  hint: ["Træk urglasset hen under lampen, og spol frem med ⏩. Våde krystaller er mørke og klumper."] },
-                { id: "vej-fuld", tekst: "Vej urglasset med krystallerne.",
-                  skilt: "Træk mig op på vægten", paa: "urglas",
-                  hint: ["Træk urglasset fra lampen op på vægten. Massen kommer i skemaet til højre."] },
-                { id: "vej-igen", tekst: "Tør krystallerne lidt mere under lampen, og vej igen, til massen er den samme to gange.",
-                  skilt: "Træk mig under lampen", paa: "urglas",
-                  hint: ["Massen falder, så længe der fordamper ethanol. Giver to vejninger det samme, er krystallerne tørre."] }
+                  knap: "Skrab krystallerne over", paa: "spatel",
+                  hint: ["Spatlen tager krystallerne fra filtrerpapiret i tragten."] },
+                { id: "vej-toer", tekst: "Lad krystallerne tørre under varmelampen.",
+                  knap: "Stil urglasset under lampen", paa: "urglas",
+                  hint: ["Krystallerne er våde af ethanol. Våde krystaller er mørke og klumper; tørre er lyse."] },
+                { id: "vej-fuld", tekst: "Vej urglasset med de tørre krystaller.",
+                  knap: "Stil urglasset på vægten", paa: "urglas",
+                  hint: ["Massen kommer i skemaet til højre."] }
             ],
             felt: {
                 tekst: "Hvad er dit praktiske udbytte, altså massen af Salenvir?",
@@ -234,23 +206,23 @@
         {
             id: "smp", navn: "Smeltepunkt",
             dele: [
-                { id: "smp-fyld", tekst: "Fyld lidt krystaller i smeltepunktsrøret: træk røret ned i krystallerne.",
-                  skilt: "Træk mig ned i krystallerne", paa: "roer",
-                  hint: ["Smeltepunktsrøret er det tynde glasrør. Træk det hen over krystallerne på urglasset."] },
-                { id: "smp-ind", tekst: "Sæt smeltepunktsrøret i hullet øverst på smeltepunktsapparatet.",
-                  skilt: "Træk mig hen i hullet", paa: "roer",
-                  hint: ["Hullet sidder på oversiden af apparatet, til venstre."] },
-                { id: "smp-taend", tekst: "Tænd for smeltepunktsapparatet: klik på knappen I/O.",
-                  skilt: "Klik: tænd", paa: "smp-knap",
-                  hint: ["Knappen sidder nederst til venstre på apparatet."] },
-                { id: "smp-start", tekst: "Klik på linsen, når krystallerne begynder at smelte.",
-                  skilt: "Klik, når det smelter", paa: "linse",
-                  hint: ["Se i linsen. Når de første krystaller bliver til klar væske, klikker du."] },
-                { id: "smp-slut", tekst: "Klik på linsen igen, når alle krystallerne er smeltet.",
-                  skilt: "Klik, når alt er smeltet", paa: "linse",
+                { id: "smp-fyld", tekst: "Fyld lidt krystaller i smeltepunktsrøret.",
+                  knap: "Fyld røret", paa: "roer",
+                  hint: ["Smeltepunktsrøret er det tynde glasrør. Det skal kun have lidt krystaller i bunden."] },
+                { id: "smp-ind", tekst: "Sæt smeltepunktsrøret i smeltepunktsapparatet.",
+                  knap: "Sæt røret i apparatet", paa: "roer",
+                  hint: ["Hullet sidder på oversiden af apparatet."] },
+                { id: "smp-taend", tekst: "Tænd for smeltepunktsapparatet.",
+                  knap: "Tænd apparatet", paa: "smp-knap",
+                  hint: ["Apparatet varmer prøven langsomt op, og linsen viser den forstørret."] },
+                { id: "smp-start", tekst: "Se i linsen, og klik, når krystallerne begynder at smelte.",
+                  knap: "Det smelter nu", paa: "linse",
+                  hint: ["Når de første krystaller bliver til klar væske, klikker du."] },
+                { id: "smp-slut", tekst: "Klik igen, når alle krystallerne er smeltet.",
+                  knap: "Alt er smeltet", paa: "linse",
                   hint: ["Når hele prøven er klar, gul væske, klikker du igen."] }
             ],
-            /* Spoergsmaalet bygges af js/sim.js ud fra elevens aflaesning, se smpSpm */
+            /* Spoergsmaalet bygges af js/sim.js ud fra elevens aflaesning, se smpVurdering */
             slut: function (t) {
                 return "Syntesen er færdig. Du fik " + k(t.m, 2) + " g Salenvir, og det smeltede ved " + k(t.a, 1) + " til " + k(t.b, 1) + " °C.";
             }
@@ -273,7 +245,7 @@
             faerdigMenNej: "Se en gang til: prøven P har ingen plet i højde med R. Salicylaldehyden er brugt op."
         },
         hint: ["Referencen R er salicylaldehyd. Har prøven P en plet i samme højde som R?"],
-        ikkeFaerdig: "Rigtigt. Der er stadig salicylaldehyd, så reaktionen er ikke færdig. Spol et par minutter frem, og kør en ny plade.",
+        ikkeFaerdig: "Rigtigt. Der er stadig salicylaldehyd, så reaktionen er ikke færdig. Vent 10 minutter, og kør en ny plade.",
         faerdig: "Rigtigt. Salicylaldehyden er brugt op, og reaktionen er færdig.",
         overskud: "Rigtigt, der er stadig salicylaldehyd. Kolben fik mere, end ethylendiaminen kan omsætte, så pletten bliver. Reaktionen er færdig."
     };
@@ -300,10 +272,7 @@
     /* Beskeder, der kommer, naar eleven goer noget andet end kortet siger */
     var BESKED = {
         ikkeVejet: "Urglasset blev ikke vejet tomt, så krystallernes masse kan ikke findes. Vej et nyt urglas, og flyt krystallerne over.",
-        overloeb: "Måleglasset løb over. Hæld det, der er i, over i kolben, og fyld op til 100 mL.",
-        pipFuld: "Pipetten er fuld.",
         tragtFuld: "Tragten er fuld. Uden sug løber ethanolen kun langsomt igennem.",
-        hurtigEn: "Ethylendiamin skal dryppes i. Tøm pipetten langsomt, dråbe for dråbe.",
         varmFiltr: function (T) { return "Kolben er " + Math.round(T) + " °C. Noget Salenvir er stadig opløst og løber ned i sugekolben."; },
         ikkeFugtet: "Filtrerpapiret er ikke fugtet. Nogle krystaller løber under papiret.",
         intetSug: "Der er ikke åbnet for suget, så ethanolen løber kun langsomt igennem."

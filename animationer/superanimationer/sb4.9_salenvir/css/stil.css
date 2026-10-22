@@ -649,42 +649,55 @@ kbd {
 .scenekort.loest.blink .sk-videre { animation: sk-blink-knap 1s ease-in-out 1, bank-groen 1.7s ease-out 1s infinite; }
 
 /* ---------------------------------------------------------------------
-   URET: laboratoriets tid og knappen, der spoler frem. Staar oeverst til
-   venstre i scenen lige under kortet (top saettes af js/sim.js).
+   DEN GROENNE KNAP ved den ting, kortet beder om (brugerens oenske 22. okt.
+   2026: "Lav gerne direkte knapper"). js/trin.js saetter pladsen og
+   --pil, der hvor spidsen peger ned paa tingen (eller op, .under).
    --------------------------------------------------------------------- */
-.ur {
+.handling {
     position: absolute;
     z-index: 2;
-    left: 12px;
-    top: 190px;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 6px 8px 6px 12px;
-    border: 1px solid #3a3a47;
+    padding: 9px 16px;
+    border: 2px solid #5fcf92;
     border-radius: 10px;
-    background-color: rgba(29, 30, 38, 0.92);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
-
-.ur-navn { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tekst-mat); }
-.ur-tid { min-width: 3.2em; font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #9ff0c0; }
-
-.spolknap {
-    padding: 6px 12px;
-    border: 1px solid var(--blaa);
-    border-radius: 8px;
-    background-color: var(--blaa-mork);
+    background-color: var(--groen-mork);
     color: #ffffff;
     font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 800;
+    white-space: nowrap;
     cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    animation: bank-groen 1.6s ease-out infinite;
 }
 
-.spolknap:hover { background-color: var(--blaa); }
-.spolknap:active { transform: scale(0.97); }
-.spolknap.banker { border-color: #ffdf6b; animation: bank-gul 1.5s ease-out infinite; }
+.handling::before {
+    content: "▶";
+    margin-right: 8px;
+    font-size: 0.8em;
+}
+
+.handling::after {
+    content: "";
+    position: absolute;
+    left: var(--pil, 50%);
+    bottom: -9px;
+    margin-left: -9px;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 9px solid #5fcf92;
+}
+
+.handling.under::after {
+    bottom: auto;
+    top: -9px;
+    border-top: 0;
+    border-bottom: 9px solid #5fcf92;
+}
+
+.handling:hover { background-color: var(--groen); }
+.handling:active { transform: scale(0.97); }
+
+.sk-videre:disabled { opacity: 0.75; cursor: default; animation: none; }
 
 /* ---------------------------------------------------------------------
    PANELET: maalingerne
@@ -738,7 +751,7 @@ button:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
     .gk-intro { margin-top: 7px; font-size: 0.93rem; line-height: 1.32; }
     .gk-tekst { margin: 4px 0 9px; font-size: 1.2rem; }
     .gk-knap { padding: 8px 8px 9px; gap: 5px; font-size: 0.93rem; line-height: 1.25; }
-    .ur { padding: 4px 6px 4px 10px; }
+    .handling { padding: 7px 13px; font-size: 0.93rem; }
     .opg-chip { padding: 4px 9px; font-size: 0.86rem; }
 }
 

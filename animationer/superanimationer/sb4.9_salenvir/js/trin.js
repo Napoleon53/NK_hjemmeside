@@ -112,7 +112,7 @@
         }
         if (this.fase === "loest" || this.fase === "mellem") {
             var chip = this.fase === "mellem" ? "Rigtigt ✓" : (this.brugtSvar ? "Trin " + nr + " · Svaret" : "Trin " + nr + " ✓");
-            var knapTekst = this.fase === "mellem" ? "Ny TLC-plade →" : (this.trinNr === D.TRIN.length - 1 ? "Start forfra ↺" : "Næste trin →");
+            var knapTekst = this.fase === "mellem" ? "Vent 10 minutter →" : (this.trinNr === D.TRIN.length - 1 ? "Start forfra ↺" : "Næste trin →");
             return '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">' + chip + "</span>" + NK.html(this.slutTekst) + "</p>" +
                 '<button type="button" class="sk-videre" data-videre="1">' + knapTekst + "</button></div>";
         }
@@ -179,8 +179,15 @@
 
     /* ----- Hver frame: hvilken del er eleven ved? ---------------------------------- */
     P.tjekTrin = function () {
-        if (this.fase !== "forsoeg") return;
+        if (this.fase !== "forsoeg" || this.anim) return;
         var del = this.delNu();
+        /* En del, der sker af sig selv (opvarmningen), gaar i gang med det samme */
+        var dd = del ? this.delData(del) : null;
+        if (dd && dd.auto) {
+            if (del !== this.delSidst) { this.delSidst = del; this.hjaelp = 0; this.visKort(); }
+            this.udfoer(del);
+            return;
+        }
         if (del !== this.delSidst) {
             this.delSidst = del;
             this.hjaelp = 0;
@@ -202,20 +209,25 @@
             if (html !== this.besk.html) { this.besk = { html: html, klasse: html ? "info" : "" }; this.visBund(); }
         }
         NK.saetHTML("maal", this.panelHTML());
-        /* Uret */
-        var ur = el("ur");
-        var vis = this.trinNr >= 3 && this.fase !== "gaet";
-        if (ur.hidden === vis) ur.hidden = !vis;
-        if (vis) {
-            var m = Math.floor(this.S.ur), s = Math.floor((this.S.ur - m) * 60);
-            NK.saetTekst("urtid", m + ":" + (s < 10 ? "0" : "") + s);
-            var vent = this.fase === "forsoeg" && ["en-vent", "filtr-kold", "vej-toer", "tlc-koer"].indexOf(this.delSidst) >= 0;
-            if (this.delSidst === "vej-igen" && this.S.urglasSted[this.S.aktivU] === "lampe") vent = true;
-            if (this.fase === "mellem") vent = true;
-            if (this.trinNr === 5 && this.fase === "forsoeg" && this.S.tlc.sted === "kammer") vent = true;
-            var k = el("spolknap");
-            if (k.classList.contains("banker") !== vent) k.classList.toggle("banker", vent);
-        }
+        this.visHandling();
+    };
+
+    /* Den groenne knap ved den ting, kortet beder om. Den staar over tingen
+       (eller under, hvis der ikke er plads), og en lille spids peger paa den. */
+    P.visHandling = function () {
+        var hk = el("handling"), pl = null;
+        if (this.fase === "forsoeg" && !this.anim && !this.greb && this.lay) pl = this.knapPlads();
+        if (!pl) { if (!hk.hidden) hk.hidden = true; return; }
+        if (hk.hidden) hk.hidden = false;
+        if (hk.textContent !== pl.tekst) hk.textContent = pl.tekst;
+        var bw = hk.offsetWidth, bh = hk.offsetHeight, W = this.lay.W;
+        var over = pl.top - bh - 14 >= this.lay.top;
+        var y = over ? pl.top - bh - 14 : pl.bund + 14;
+        var x = NK.klamp(pl.x - bw / 2, 8, W - bw - 8);
+        hk.style.left = Math.round(x) + "px";
+        hk.style.top = Math.round(y) + "px";
+        if (hk.classList.contains("under") === over) hk.classList.toggle("under", !over);
+        hk.style.setProperty("--pil", Math.round(NK.klamp(pl.x - x, 16, bw - 16)) + "px");
     };
 
     /* Trinnets forsoeg er gjort: spoergsmaal, felt eller det groenne kort */
@@ -336,17 +348,21 @@
 
     /* ----- Videre ------------------------------------------------------------------------ */
     P.videre = function () {
+        if (this.anim) return;
         if (this.fase === "mellem") {
-            /* En ny TLC-plade */
-            var S = this.S;
-            S.tlc = { sted: "bord", P: null, R: null, front: 0, iKammer: false, udviklet: false, uvT: 0, set: false, cirkler: false };
-            S.spids.p.indhold = null; S.spids.r.indhold = null;
-            this.fase = "forsoeg";
-            this.delSidst = undefined;
-            this.hjaelp = 0;
-            this.besk = { html: "", klasse: "" };
-            this.visKort();
-            this.tjekTrin();
+            /* Ti minutter gaar, og en ny TLC-plade ligger klar */
+            var mig = this, S = this.S;
+            this.koerAnim([{ lab: 10, sek: 2 }, { goer: function () {
+                S.tlc = { sted: "bord", P: null, R: null, front: 0, iKammer: false, udviklet: false, uvT: 0, set: false, cirkler: false };
+                S.spids.p.indhold = null; S.spids.r.indhold = null;
+                mig.fase = "forsoeg";
+                mig.delSidst = undefined;
+                mig.hjaelp = 0;
+                mig.besk = { html: "", klasse: "" };
+                mig.visKort();
+            } }]);
+            var b = document.querySelector("#ind [data-videre]");
+            if (b) { b.disabled = true; b.textContent = "Der går 10 minutter …"; }
             return;
         }
         if (this.fase !== "loest") return;
@@ -368,6 +384,7 @@
     };
 
     P.knap = function () {
+        if (this.anim) return;
         if (this.fase === "loest" || this.fase === "mellem") { this.videre(); return; }
         if (this.fase === "gaet") return;
         var h = this.hintListe();
@@ -394,9 +411,8 @@
             return;
         }
         var del = this.delSidst;
-        if (del) this.goer(del);
+        if (del && !this.anim) this.udfoer(del);
         this.hjaelp = 0;
-        this.tjekTrin();
         this.visKnap();
     };
 
