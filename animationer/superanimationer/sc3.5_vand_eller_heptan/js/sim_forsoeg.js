@@ -1,10 +1,19 @@
 /* =====================================================================
    sim_forsoeg.js - fane 1: forsoeget
 
-   Otte stoffer testes i et glas vand og et glas heptan. Eleven vaelger
-   stoffet i skemaet, traekker pipetten (eller spatlen) ned i et glas og
-   klikker paa glasset for at ryste det. Naar det har lagt sig, skrives
+   Foerste trin er teorikortet (brugerens oenske 22. okt. 2026): vand er
+   polaert, heptan er upolaert, og stoffer, der ligner hinanden, blandes.
+   Over glassene staar det samme som maerker. Proeveglasset og kortet med
+   formlen kommer foerst frem, naar eleven trykker Test stofferne (eller
+   vaelger et stof i skemaet).
+
+   Seks stoffer testes i et glas vand og et glas heptan. Vand og heptan
+   selv tilsaettes ikke; de er oploesningsmidlerne. Eleven vaelger stoffet
+   i skemaet, traekker pipetten (eller spatlen) ned i et glas og klikker
+   paa glasset for at ryste det. Naar det har lagt sig, skrives
    iagttagelsen i skemaet: ét lag, to lag, oploest eller oploeses ikke.
+   Er stoffet testet i begge glas, staar konklusionen forneden paa kortet
+   ("Glycerol blandes med vand, saa det er polaert.") og i skemaet.
 
    Et nyt stof faar nye glas. Et klik paa et tomt glas er det samme som
    at traekke pipetten derhen (foerste opgave uden forklaring).
@@ -15,6 +24,7 @@
     var NK = window.NK;
     var D = NK.Data;
     var M = NK.Molekyle;
+    var T = NK.Tegn;
 
     var ROS_NOEGLE = "nk-sc3.5-skema-ros";
 
@@ -27,16 +37,144 @@
         this.besked = null;
         this.stof = null;
         this.proevetAt = false;
+        this.teori = true;
 
         this.bordStart();
         this.bygPanel();
+        this.bygTeori();
         this.bygTilbud();
         if (this.laererStart) this.laererStart();
-        this.vaelg("heptan");
+        this.vaelg(D.FORSOEG[0]);
+        this.visTeori();
     }
 
     var P = SimForsoeg.prototype;
-    NK.Bord.kobl(P, { prefix: "forsoeg" });
+    NK.Bord.kobl(P, { prefix: "forsoeg", bundFelt: true });
+
+    /* ----- Teorikortet: foerste trin ------------------------------------------- */
+    P.bygTeori = function () {
+        var mig = this, boks = NK.el("forsoeg-teori");
+        Array.prototype.forEach.call(boks.querySelectorAll("[data-tekst]"), function (e) {
+            e.textContent = D.TEORI[e.getAttribute("data-tekst")];
+        });
+        NK.el("forsoeg-teori-videre").addEventListener("click", function () { mig.afslutTeori(); });
+        this.teoriMol = Array.prototype.map.call(boks.querySelectorAll(".tk-mol"), function (c) {
+            return { L: new NK.Laerred(c), stof: c.getAttribute("data-stof") };
+        });
+    };
+
+    P.visTeori = function () {
+        var t = this.teori;
+        NK.el("forsoeg-teori").hidden = !t;
+        NK.el("forsoeg-skema").classList.toggle("daempet", t);
+        /* Rundvisningen springer over det, der ikke er fremme */
+        NK.el("forsoeg-anker-proeve").hidden = t;
+        NK.el("forsoeg-anker-kort").hidden = t;
+        if (t) {
+            if (this.visTilbud && this.tilbudVises) this.visTilbud(false);
+            this.placerTeori();
+        }
+    };
+
+    P.afslutTeori = function () {
+        if (!this.teori) return false;
+        this.teori = false;
+        this.besked = null;
+        this.visTeori();
+        /* Tilbuddet om praesentationen kommer, naar der er noget at vise */
+        this.startIntro(false);
+        return true;
+    };
+
+    P.skjulProeve = function () { return this.teori; };
+    P.skjulKort = function () { return this.teori; };
+    P.maaTraekke = function () { return !this.teori; };
+    P.efterLayout = function () { if (this.teori) this.placerTeori(); };
+
+    /* Kortet staar paa lay.teori. Formlerne faar samme bindingslaengde u, saa
+       de to molekyler kan sammenlignes. Kortet proever vand og heptan under
+       hinanden og side om side (klassen "to") og tager den opstilling, der
+       giver de stoerste formler og stadig kan vaere i hoejden. Kan ingen
+       vaere der, proeves en lidt mindre skrift (klassen "lille"), saa mere
+       hoejde (lay.teori.maksHFuld: ned over bordkanten, paa en smal scene
+       ned over glassene) og til sidst uden de to smaa forklaringer
+       (klassen "kompakt"; tegningen og maerkerne staar der stadig).
+       Ellers ruller kortet, og knappen bliver staaende forneden. */
+    var TEORI_HOEJ = 3;                    /* lærrederne er 3 bindingslaengder hoeje */
+    var TEORI_U = { maks: 34, min: 18, minLille: 16 };
+
+    P.placerTeori = function () {
+        var lay = this.lay, boks = NK.el("forsoeg-teori");
+        if (!lay || !lay.teori || boks.hidden) return;
+        var r = lay.teori, ml = this.teoriMol;
+        boks.style.left = Math.round(r.x) + "px";
+        boks.style.top = Math.round(r.y) + "px";
+        boks.style.width = Math.round(r.b) + "px";
+        var gH = M.graense(M.laes(D.stof("heptan"))), gV = M.graense(M.laes(D.stof("vand")));
+
+        function saet(v, u) {
+            boks.classList.toggle("to", v.to);
+            boks.classList.toggle("lille", v.lille);
+            boks.classList.toggle("kompakt", v.kompakt);
+            if (u) ml.forEach(function (m) { m.L.canvas.style.height = Math.round(u * TEORI_HOEJ) + "px"; });
+        }
+        /* Den stoerste u, der kan vaere i hoejden, eller -1 */
+        function proev(v) {
+            saet(v, 0);
+            var bH = ml[1].L.canvas.clientWidth, bV = ml[0].L.canvas.clientWidth;
+            var u = Math.floor(Math.min(TEORI_U.maks, bH / (gH.x1 - gH.x0 + 1.3), bV / (gV.x1 - gV.x0 + 2.4)));
+            var mindst = v.lille ? TEORI_U.minLille : TEORI_U.min;
+            for (; u >= mindst; u--) {
+                saet(v, u);
+                if (boks.scrollHeight <= boks.clientHeight) return u;
+            }
+            return -1;
+        }
+        /* Den mindre skrift skal give formler, der er mindst 4 px stoerre */
+        function find(maksH, kompakt) {
+            boks.style.maxHeight = Math.round(maksH) + "px";
+            var bedst = null;
+            [false, true].forEach(function (lille) {
+                if (kompakt && !lille) return;
+                [false, true].forEach(function (to) {
+                    if (to && r.b < 440) return;
+                    var v = { to: to, lille: lille, kompakt: kompakt, maksH: maksH };
+                    v.u = proev(v);
+                    v.point = v.u - (lille ? 4 : 0);
+                    if (v.u > 0 && (!bedst || v.point > bedst.point)) bedst = v;
+                });
+            });
+            return bedst;
+        }
+
+        /* Ned over bordkanten kun, naar det giver tydeligt stoerre formler */
+        var bedst = find(r.maksH, false);
+        if ((!bedst || bedst.u < 26) && r.maksHFuld > r.maksH + 20) {
+            var dyb = find(r.maksHFuld, false);
+            if (dyb && (!bedst || dyb.point >= bedst.point + 4)) bedst = dyb;
+        }
+        bedst = bedst || find(r.maksHFuld, true) ||
+            { to: r.b >= 440, lille: true, kompakt: true, maksH: r.maksHFuld, u: TEORI_U.minLille };
+        boks.style.maxHeight = Math.round(bedst.maksH) + "px";
+        saet(bedst, bedst.u);
+        this.teoriU = bedst.u;
+        this.teoriValg = bedst;
+        this.tegnTeoriMol();
+    };
+
+    P.tegnTeoriMol = function () {
+        var u = this.teoriU;
+        this.teoriMol.forEach(function (m) {
+            m.L.tilpas();
+            var ctx = m.L.ctx;
+            ctx.clearRect(0, 0, m.L.b, m.L.h);
+            var mol = M.laes(D.stof(m.stof));
+            var plan = M.plan(mol, { x: 0, y: 0, b: m.L.b, h: m.L.h }, u);
+            M.tegn(ctx, mol, plan, {});
+            if (m.stof === "vand") T.delta(ctx, mol, plan);
+            m.plan = plan;
+        });
+    };
 
     /* ----- Stoffet og skemaet ------------------------------------------------ */
     P.vaelg = function (id) {
@@ -45,6 +183,12 @@
         this.nyeGlas();
         this.besked = null;
         this.visPanel();
+    };
+
+    /* Et klik paa et stof i skemaet: under teorikortet betyder det ogsaa "videre" */
+    P.vaelgFraSkema = function (id) {
+        this.afslutTeori();
+        this.vaelg(id);
     };
 
     P.naeste = function (retning) {
@@ -67,20 +211,36 @@
         this.besked = null;
     };
 
+    /* Forfra: tomt skema og teorikortet igen */
     P.startForfra = function () {
         this.skema = {};
         this.stof = null;
-        this.vaelg(D.FORSOEG[1]);
+        this.proevetAt = false;
+        this.vaelg(D.FORSOEG[0]);
+        this.teori = true;
+        this.visTeori();
+    };
+
+    /* Stoffet er testet i begge glas */
+    P.testet = function (id) {
+        var s = this.skema[id];
+        return !!s && D.OPL.every(function (o) { return !!s[o]; });
     };
 
     /* ----- Krogene fra bordet -------------------------------------------------- */
     P.maaTilsaette = function (i) {
         var g = this.glas[i];
-        return !g.fuld() && !g.optaget();
+        return !this.teori && !g.fuld() && !g.optaget();
     };
 
     P.klikGlas = function (i) {
         var g = this.glas[i];
+        if (this.teori) {
+            var opl = D.stof(D.OPL[i]);
+            this.visBesked("Glasset med " + opl.navn + ": " + opl.navn + " er " + D.polaritet(opl.id) +
+                ". <b>Tryk på " + D.TEORI.knap + "</b> for at tilsætte et stof.");
+            return;
+        }
         if (g.optaget()) return;
         if (g.portioner === 0) {
             if (this.pipHjemme() && this.maaTilsaette(i)) this.sendTil(i);
@@ -108,7 +268,14 @@
     };
 
     P.visTraekPil = function () {
-        return !this.proevetAt && this.glas[0].tom() && this.glas[1].tom();
+        return !this.teori && !this.proevetAt && this.glas[0].tom() && this.glas[1].tom();
+    };
+
+    /* Forneden paa kortet: spoergsmaalet, til begge glas er testet, saa svaret */
+    P.tegnKortBund = function (ctx, r) {
+        var s = this.stof;
+        if (this.testet(s)) T.konklusion(ctx, r, D.konklusion(s), D.polaer(s));
+        else T.konklusion(ctx, r, D.SPOERG_POLARITET, null);
     };
 
     P.redskabNavn = function () { return this.redskab() === "spatel" ? "spatlen" : "pipetten"; };
@@ -166,6 +333,7 @@
 
     P.statusTekst = function () {
         if (this.besked) return this.besked.html;
+        if (this.teori) return "Læs kortet om vand og heptan. <b>Tryk så på " + D.TEORI.knap + ".</b>";
         var s = D.stof(this.stof), g = this.glas;
         var redskab = this.redskabNavn();
         if (this.pip.tilstand === "traek") {
@@ -210,21 +378,22 @@
             var knap = document.createElement("button");
             knap.type = "button";
             knap.className = "skema-stof";
-            knap.innerHTML = NK.html(s.navn) + "<em>" + NK.formel(s.formel) + "</em>";
-            knap.addEventListener("click", function () { knap.blur(); mig.vaelg(id); });
+            knap.innerHTML = NK.html(s.navn) + "<em>" + NK.formel(s.formel) + "<span class=\"skema-pol\"></span></em>";
+            knap.addEventListener("click", function () { knap.blur(); mig.vaelgFraSkema(id); });
             navn.appendChild(knap);
             tr.appendChild(navn);
             var celler = {};
             D.OPL.forEach(function (o) {
                 var td = document.createElement("td");
                 td.className = "skema-celle";
-                td.addEventListener("click", function () { mig.vaelg(id); });
+                td.addEventListener("click", function () { mig.vaelgFraSkema(id); });
                 tr.appendChild(td);
                 celler[o] = td;
             });
             tb.appendChild(tr);
-            mig.raekker[id] = { tr: tr, celler: celler };
+            mig.raekker[id] = { tr: tr, celler: celler, pol: knap.querySelector(".skema-pol") };
         });
+        NK.saetTekst("forsoeg-felter", String(D.FORSOEG.length * D.OPL.length));
         NK.el("forsoeg-nulstil").addEventListener("click", function () { mig.startForfra(); });
         NK.el("forsoeg-spring").addEventListener("click", function () { mig.springIntro(); });
     };
@@ -240,6 +409,10 @@
                 td.className = "skema-celle" + (res ? (res.blandes ? " ja" : " nej") : "");
                 td.textContent = res ? (res.blandes ? "✓ " : "✗ ") + res.obs : "";
             });
+            /* Konklusionen under navnet, naar begge glas er testet */
+            var t = mig.testet(id);
+            r.pol.textContent = t ? D.polaritet(id) : "";
+            r.pol.className = "skema-pol" + (t ? (D.polaer(id) ? " polaer" : " upolaer") : "");
         });
         NK.saetTekst("forsoeg-udfyldt", String(this.antalUdfyldt()));
         NK.el("forsoeg-skema").classList.toggle("sejr", this.skemaFuldt());
@@ -247,6 +420,10 @@
 
     /* ----- Tastatur ----------------------------------------------------------------- */
     P.tast = function (key) {
+        if (this.teori) {
+            if (key === "ArrowDown" || key === "ArrowUp") { this.afslutTeori(); return true; }
+            return key === " ";
+        }
         if (key === "ArrowDown") { this.naeste(1); return true; }
         if (key === "ArrowUp") { this.naeste(-1); return true; }
         if (key === " ") {
@@ -256,10 +433,24 @@
         return false;
     };
 
+    /* Enter: videre fra teorikortet */
+    P.enter = function () { this.afslutTeori(); };
+
     P.fokus = function () {};
 
     /* ----- Kemichaels praesentation --------------------------------------------------- */
     NK.Praesentation.kobl(P, { noegle: "nk-sc3.5-intro-forsoeg", tilbud: "forsoeg-tilbud", spring: "forsoeg-spring" });
+
+    /* Mens teorikortet staar, tilbydes praesentationen ikke (den handler om
+       pipetten, der ikke er fremme endnu). K springer teorikortet over. */
+    var startIntro = P.startIntro;
+    P.startIntro = function (tving) {
+        if (this.teori) {
+            if (!tving) return;
+            this.afslutTeori();
+        }
+        return startIntro.call(this, tving);
+    };
 
     NK.SimForsoeg = SimForsoeg;
 

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="80" viewBox="0 0 40 80">
+  <!-- Lille glas med skruegevind uden laag (referenceglasset til TLC).
+       Vaesken tegnes BAG filen i x 8-32 med bunden y 75. Aabningen er
+       (20, 3). Etiketten tegnes OVENPAA i x 7-33, y 38-62. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.34"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.07"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="20" cy="79" rx="18" ry="1.8" fill="#000000" fill-opacity="0.35"/>
+  <path d="M12 4 L12 16 Q6 18 6 24 L6 74 Q6 78 10 78 L30 78 Q34 78 34 74 L34 24 Q34 18 28 16 L28 4 Z" fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M12 7 L28 7 M12 10 L28 10 M12 13 L28 13" stroke="#dcecf8" stroke-opacity="0.45" stroke-width="1"/>
+  <rect x="9" y="22" width="3" height="48" rx="1.5" fill="#ffffff" fill-opacity="0.2"/>
+</svg>

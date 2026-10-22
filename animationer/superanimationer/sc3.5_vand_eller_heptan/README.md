@@ -38,18 +38,43 @@ tydeligt, at det er et forsøg.
    glassene (så lagene kan ses) og kortet med formlen på væggen. Panelet har
    skemaet (fane 1) eller svaret, runden og de sorterede stoffer (fane 2).
 
+**Rettelse 22. okt. 2026.** Brugerens ønske: "inddrage lidt mere teori ... starte
+med at forklare at vand er polært og heptan er upolært. Disse prædikater må gerne
+komme ind på tegningen. Herfra skal man tilsætte stofferne. Lad være med at tilsætte
+heptan. Det giver ikke mening, når det er opløsningsmidlet." Sådan blev det:
+
+* Fane 1 begynder med et teorikort på væggen: vandmolekylet med δ− ved O og δ+
+  ved H og mærket *polært*, heptan med mærket *upolært*, én linje til hver og
+  reglen "Stoffer, der ligner hinanden, blandes med hinanden" (Kemibogens ord,
+  afsnit 3.4). Knappen Test stofferne (eller et stof i skemaet) fører videre;
+  prøveglasset og formelkortet kommer først frem da, og skemaet er dæmpet imens.
+* Over hvert glas står navnet og mærket *polært* eller *upolært*, på begge faner.
+* Vand og heptan er taget ud af stofferne på fane 1 (de er opløsningsmidlerne)
+  og dermed også ud af runden på fane 2. Seks stoffer, 12 felter.
+* Når et stof er testet i begge glas, står konklusionen forneden på formelkortet
+  ("Glycerol blandes med vand, så det er polært.") og som *polært* eller
+  *upolært* under navnet i skemaet. Før da spørger feltet "Polært eller upolært?".
+* Tilbuddet om Kemichaels præsentation kommer først, når teorikortet er lukket.
+
 ## Hvad viser den
 
 Åbn **`index.html`**. Mappen er selvstændig bortset fra `../../v2/kemichael/`, som
 Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
-**Fane 1, Forsøget** (`#forsoeg`). Et glas vand og et glas heptan i et stativ.
-Eleven vælger et stof i skemaet, trækker pipetten (væsker) eller spatlen (faste
-stoffer) ned i et glas og klikker på glasset for at ryste det. Et klik på et tomt
-glas er det samme som at trække pipetten derhen. Når glasset har lagt sig, står
-iagttagelsen ved glasset og i skemaet: ét lag, to lag (med navnene på lagene),
-opløst eller opløses ikke. Otte stoffer, 16 felter. Et nyt stof får nye glas.
-Kortet på væggen viser strukturformlen.
+**Fane 1, Forsøget** (`#forsoeg`). Et glas vand og et glas heptan i et stativ,
+med *polært* og *upolært* over glassene. Først teorikortet (se rettelsen
+ovenfor), så forsøget: eleven vælger et stof i skemaet, trækker pipetten (væsker)
+eller spatlen (faste stoffer) ned i et glas og klikker på glasset for at ryste
+det. Et klik på et tomt glas er det samme som at trække pipetten derhen. Når
+glasset har lagt sig, står iagttagelsen ved glasset og i skemaet: ét lag, to lag
+(med navnene på lagene), opløst eller opløses ikke. Seks stoffer, 12 felter. Et
+nyt stof får nye glas. Kortet på væggen viser strukturformlen og, når begge glas
+er testet, konklusionen: polært eller upolært. Start forfra viser teorikortet igen.
+
+Teorikortet er HTML oven på scenen (`#forsoeg-teori`); formlerne tegnes i to små
+lærreder. Det vælger selv mellem vand og heptan under hinanden og side om side,
+alt efter hvad der giver de største formler; på små skærme med lidt mindre skrift
+og til sidst uden de to små forklaringer (`placerTeori` i `js/sim_forsoeg.js`).
 
 **Fane 2, Gæt polaritet** (`#gaet`). Den gamle c3.5 med forsøget som facit. Et
 stof ad gangen: eleven klikker på de polære grupper (blå boble; et klik på C
@@ -169,7 +194,8 @@ _selvtest.html         udviklerværktøj, indgår ikke i animationen
   sumformel, tilstand, massefylde, `blandes` og strukturformlen som tekst. Læg
   id'et i `D.FORSOEG` (fane 1) eller `D.GAET_NYE` (fane 2), og ret tallene i
   selvtesten. Vælg kun stoffer med et entydigt svar.
-* **Replikkerne** står nederst i `js/data.js`.
+* **Replikkerne** står nederst i `js/data.js`, teorikortets tekster i `D.TEORI`
+  og konklusionen i `D.konklusion` samme sted.
 * **Tempoet** i glassene (rystning, emulsion, opløsning) står i `js/glas.js`.
 
 ## Selvtesten
@@ -177,8 +203,10 @@ _selvtest.html         udviklerværktøj, indgår ikke i animationen
 `_selvtest.html` åbner `index.html` i en iframe og kontrollerer strukturformlerne
 (sumformel, valens, afstand), de polære grupper og C-atomerne, reglen fra
 nabo-animationen, alle 28 forsøg (rigtigt glas, lagenes rækkefølge, tempo),
-fane 1 med musen og skemaet fuldt, fane 2 med musen, knapperne, hintet og en hel
-runde, Kemichael, sproget og layoutet fra 520 × 380 til 1500 × 900. Chrome kræver
+teorikortet (det, der er fremme, knappen, mærkerne over glassene), fane 1 med
+musen, konklusionerne og skemaet fuldt, fane 2 med musen, knapperne, hintet og en
+hel runde, Kemichael, sproget og layoutet fra 390 × 844 til 1500 × 900 (også at
+teorikortet ikke ruller). 100 kontroller, ALT OK 22. okt. 2026. Chrome kræver
 `--allow-file-access-from-files` eller en lokal server.
 
 ## I menuen

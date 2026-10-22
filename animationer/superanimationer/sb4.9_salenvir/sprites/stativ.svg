@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="420" viewBox="0 0 220 420">
+  <!-- Stativ med muffe, arm og klemme om halsen paa den koniske kolbe.
+       Stangen staar til venstre (midte x 18), foden staar paa bordet ved
+       y 420 og er x 0-44 bred, saa den gaar fri af omroereren.
+       Klemmen griber om kolbens hals med midten i (178, 203); kaeberne
+       passer til en hals, der er 36 bred (x 160-196). Set forfra ligger
+       den forreste kaebe som et baand hen over halsen, derfor tegnes
+       stativet EFTER kolben. -->
+  <defs>
+    <linearGradient id="stang" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7b8591"/>
+      <stop offset="0.4" stop-color="#e6ebf0"/>
+      <stop offset="1" stop-color="#6a7480"/>
+    </linearGradient>
+    <linearGradient id="arm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e6ebf0"/>
+      <stop offset="1" stop-color="#7b8591"/>
+    </linearGradient>
+    <linearGradient id="kaebe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7dde3"/>
+      <stop offset="0.5" stop-color="#a6b0ba"/>
+      <stop offset="1" stop-color="#6f7984"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a505b"/>
+      <stop offset="1" stop-color="#2a2e35"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Foden -->
+  <ellipse cx="22" cy="419" rx="26" ry="2.5" fill="#000000" fill-opacity="0.35"/>
+  <path d="M0 420 L3 405 Q4 401 9 401 L35 401 Q40 401 41 405 L44 420 Z" fill="url(#fod)" stroke="#1c1f24" stroke-width="1"/>
+
+  <!-- Stangen -->
+  <rect x="14" y="4" width="8" height="400" rx="3" fill="url(#stang)" stroke="#565f69" stroke-width="0.8"/>
+
+  <!-- Armen fra muffen til klemmen -->
+  <rect x="28" y="199" width="134" height="8" rx="3" fill="url(#arm)" stroke="#565f69" stroke-width="0.8"/>
+
+  <!-- Muffen paa stangen med skruen -->
+  <rect x="7" y="191" width="24" height="24" rx="3" fill="#8a949f" stroke="#4d5660" stroke-width="1"/>
+  <rect x="9" y="193" width="20" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.35"/>
+  <rect x="0" y="199" width="8" height="8" rx="2" fill="#d4a33a" stroke="#8a6a1f" stroke-width="0.8"/>
+
+  <!-- Klemmen: kork paa siderne og den forreste kaebe som et baand -->
+  <rect x="155" y="195" width="6" height="16" rx="2" fill="#b98a55" stroke="#7d5a31" stroke-width="0.7"/>
+  <rect x="195" y="195" width="6" height="16" rx="2" fill="#b98a55" stroke="#7d5a31" stroke-width="0.7"/>
+  <path d="M154 197 Q154 193 158 193 L198 193 Q204 193 204 199 L204 207 Q204 213 198 213 L158 213 Q154 213 154 209 Z" fill="url(#kaebe)" fill-opacity="0.92" stroke="#4d5660" stroke-width="1"/>
+  <rect x="157" y="195" width="44" height="2.4" rx="1.2" fill="#ffffff" fill-opacity="0.4"/>
+  <rect x="204" y="197" width="9" height="12" rx="2" fill="#d4a33a" stroke="#8a6a1f" stroke-width="0.8"/>
+</svg>

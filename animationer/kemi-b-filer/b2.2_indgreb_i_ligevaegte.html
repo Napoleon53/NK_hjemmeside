@@ -123,7 +123,41 @@
         white-space: nowrap;
     }
 
-    #ligning .lille-ligning { font-size: 0.92rem; font-weight: normal; color: #55606d; }
+    /* To ligevægte, der deler et stof: hver på sin linje, og det fælles stof
+       står lige under sig selv, så man kan se, hvordan de hænger sammen. */
+    #ligning .lign-trappe {
+        display: inline-grid;
+        grid-template-columns: auto auto auto auto;
+        align-items: center;
+        row-gap: 4px;
+        line-height: 1.4;
+        text-align: left;
+    }
+    #ligning .lign-nr {
+        font-size: max(0.6em, 12px);
+        font-weight: normal;
+        color: #55606d;
+        background: #dbe1e8;
+        border-radius: 5px;
+        padding: 2px 7px;
+        margin-right: 10px;
+        justify-self: end;
+        transition: background 0.25s;
+    }
+    #ligning .lc { padding: 1px 5px; transition: background 0.25s; justify-self: start; }
+    #ligning .lc.forst { border-radius: 6px 0 0 6px; }
+    #ligning .lc.l1.forst { justify-self: end; }
+    #ligning .lc.sidst { border-radius: 0 6px 6px 0; }
+    /* Den ligevægt eller det stof, spørgsmålet handler om, er gult */
+    #ligning.fokus-1 .l1, #ligning.fokus-2 .l2 { background: #fde98a; }
+    #ligning.fokus-led .led { background: #fde98a; border-radius: 6px; }
+    #ligning.fokus-1 .lign-nr[data-l="1"], #ligning.fokus-2 .lign-nr[data-l="2"] { background: #f2c94c; color: #23272f; }
+    /* Smal scene: linje 2 rykkes ikke ind, så skriften kan blive større */
+    #ligning.kompakt .lign-trappe { grid-template-columns: auto auto auto; }
+    #ligning.kompakt .lign-trappe > .tom { display: none; }
+    #ligning.kompakt .lc.l1.forst { justify-self: start; }
+    #ligning.kompakt .lc.l2.forst { grid-column: 2; }
+    #ligning.kompakt .lc.l2.sidst { grid-column: 3; }
 
     #entalpi {
         font-size: 0.85rem;
@@ -311,6 +345,33 @@
     .hint-knap:hover, .mere-knap:hover { border-color: var(--accent); color: #fff; }
     .hint-knap.skjult, .mere-knap.skjult { display: none; }
 
+    .teori-knap {
+        background: #33405a;
+        border: 1px solid #5a7bb0;
+        color: #e4ecfa;
+        padding: 8px 11px;
+        border-radius: 6px;
+        font-size: 0.84rem;
+        cursor: pointer;
+        margin: 0 0 12px 0;
+    }
+    .teori-knap:hover { border-color: var(--accent); color: #fff; }
+    .teori-boks {
+        background: rgba(0,0,0,0.22);
+        border-left: 3px solid #5a7bb0;
+        border-radius: 5px;
+        padding: 4px 12px;
+        font-size: 0.86rem;
+        line-height: 1.55;
+        color: #d6d6e2;
+        margin-bottom: 14px;
+    }
+    .teori-boks.skjult { display: none; }
+    .teori-boks p { margin: 8px 0; }
+    .teori-boks ol { margin: 6px 0 8px 0; padding-left: 20px; }
+    .teori-boks strong { color: #fff; }
+    .spm-blok .hint-knap { margin-top: 2px; }
+
     .hint-boks, .forklar-boks {
         background: rgba(0,0,0,0.22);
         border-left: 3px solid #6f7f9c;
@@ -398,6 +459,7 @@
         <h2>Indgreb i ligevægte</h2>
         <p><strong>Idéen:</strong> Du får et rigtigt forsøg at se på — en farve, et bundfald, nogle bobler. For hvert indgreb skal du <em>først</em> gætte, hvad der sker, og <em>derefter</em> udføre indgrebet og se, om du fik ret.</p>
         <p><strong>Tænk i to (eller tre) skridt:</strong> Først spørges der om, <em>hvad indgrebet gør ved stofferne</em> — hvilken koncentration stiger eller falder, eller tilføres der varme? Først bagefter spørges der om, <em>hvilken vej ligevægten forskydes</em> som svar på det. Nogle indgreb har et tredje spørgsmål om, hvad du så rent faktisk ser i glasset — og der er det ikke altid det samme som forskydningens retning.</p>
+        <p><strong>To ligevægte i ét glas:</strong> I forsøget med kulsyre hænger to ligevægte sammen, fordi CO₂(aq) er med i dem begge. Spørgsmålene tager én ligevægt ad gangen, og den ligevægt, der spørges om, er markeret med gult i reaktionsskemaerne.</p>
         <p><strong>Le Châteliers princip:</strong> Påvirker man et system i ligevægt, forskyder ligevægten sig den vej, der modvirker påvirkningen. Tilsætter du et stof, forbruges noget af det igen. Fjerner du et stof, dannes noget af det igen.</p>
         <p><strong>De fire slags indgreb:</strong> ændring af en <em>koncentration</em> (tilsætte, fjerne, fælde ud, fortynde), ændring af <em>temperaturen</em> (varme tæller som reaktant eller produkt), ændring af <em>tryk/rumfang</em> ved gasser, og <em>katalysator</em> (som aldrig flytter ligevægten — kun farten).</p>
         <p><strong>Referenceglasset:</strong> Mens du svarer på spørgsmålene, står der kun ét glas. Når du udfører indgrebet, dukker et urørt referenceglas op til venstre, så du kan se, hvordan glasset så ud lige inden. Det er forskellen mellem de to, du skal kigge efter. Hvert indgreb starter forfra fra den samme udgangsblanding.</p>
@@ -630,14 +692,36 @@ var SYSTEMER = [
     id: "kulsyre",
     navn: "Kulsyre og bromthymolblåt",
     kort: "blå ⇌ gul",
-    tags: "temperatur · gasafgang · fælles ion",
+    tags: "to ligevægte · temperatur · gasafgang · fælles ion",
     beholder: "baegerglas",
     pletter: ["#206ec6", "#e4cd2d"],
-    ligning: '<span class="lille-ligning">CO₂(g) ⇌ CO₂(aq);</span> <span style="color:#4a6070">CO₂</span>(aq) + 2 H₂O(l) <span class="rx-pil">⇌</span> <span style="color:#c05028">H₃O⁺</span>(aq) + HCO₃⁻(aq)',
-    entalpi: "Bromthymolblåt er tilsat: gul i sur opløsning, grøn omkring pH 7, blå i basisk.",
-    beskrivelse: "Vand med bromthymolblåt, som der er pustet CO₂ ned i. To ligevægte hænger sammen: opløsningen af CO₂ og dannelsen af kulsyre.",
-    barVenstre: "blå = lidt CO₂",
-    barHoejre: "gul = meget CO₂",
+    /* Trappen: CO₂(aq) i ligevægt 1 står lige over CO₂(aq) i ligevægt 2.
+       Klasserne l1/l2 og led bruges til den gule markering (fokus). */
+    ligning:
+        '<div class="lign-trappe">' +
+        '<span class="lign-nr" data-l="1">Ligevægt 1</span>' +
+        '<span class="lc l1 forst">CO₂(g) <span class="rx-pil">⇌</span></span>' +
+        '<span class="lc l1 led sidst"><span style="color:#4a6070">CO₂</span>(aq)</span>' +
+        '<span class="tom"></span>' +
+        '<span class="lign-nr" data-l="2">Ligevægt 2</span>' +
+        '<span class="tom"></span>' +
+        '<span class="lc l2 led forst"><span style="color:#4a6070">CO₂</span>(aq)</span>' +
+        '<span class="lc l2 sidst">+ 2 H₂O(l) <span class="rx-pil">⇌</span> <span style="color:#c05028">H₃O⁺</span>(aq) + HCO₃⁻(aq)</span>' +
+        '</div>',
+    entalpi: "Bromthymolblåt er tilsat: gul i sur opløsning (meget H₃O⁺), grøn omkring pH 7, blå i basisk opløsning (lidt H₃O⁺).",
+    beskrivelse: "Vand med bromthymolblåt, som der er pustet CO₂ ned i. To ligevægte hænger sammen, fordi CO₂(aq) er med i dem begge.",
+    teoriTitel: "📘 Teori: to ligevægte i ét glas",
+    teori:
+        "<p><strong>Ligevægt 1</strong> er CO₂, der opløses i vandet: CO₂(g) ⇌ CO₂(aq). Gasser opløses dårligere i varmt vand end i koldt vand.</p>" +
+        "<p><strong>Ligevægt 2</strong> er det opløste CO₂, der reagerer med vand. Der dannes H₃O⁺ og HCO₃⁻, og derfor gør CO₂ vandet surt.</p>" +
+        "<p><strong>CO₂(aq) er med i begge ligevægte.</strong> CO₂(aq) er produkt i ligevægt 1 og reaktant i ligevægt 2. Når den ene ligevægt forskydes, ændres koncentrationen af CO₂(aq), og så forskydes den anden ligevægt også.</p>" +
+        "<p><strong>Sådan gør du:</strong></p>" +
+        "<ol><li>Find den ligevægt, indgrebet rammer.</li>" +
+        "<li>Brug Le Châteliers princip på den ligevægt.</li>" +
+        "<li>Se, hvad der sker med CO₂(aq), og brug Le Châteliers princip på den anden ligevægt.</li></ol>" +
+        "<p><strong>Farven</strong> viser koncentrationen af H₃O⁺: gul ved meget H₃O⁺, blå ved lidt H₃O⁺.</p>",
+    barVenstre: "blå = lidt H₃O⁺",
+    barHoejre: "gul = meget H₃O⁺",
     arter: [
         { id: "co2", navn: "CO₂(aq)", enhed: "mM", farve: "#4a6070", ref: 20 },
         { id: "oxonium", navn: "H₃O⁺", enhed: "µM", farve: "#c05028", ref: 10 },
@@ -645,7 +729,7 @@ var SYSTEMER = [
     ],
     start: { konc: { co2: 8.0, oxonium: 0.9, hydrogencarbonat: 0.9 }, temp: 20, volumen: 1, bundfald: 0, bobler: 0.05 },
     bundfaldFarve: "#ffffff",
-    intro: "I bægerglasset er der pustet CO₂ ned i vandet gennem et sugerør. Indikatoren er slået om mod gulgrøn, fordi opløsningen er blevet sur.",
+    intro: "I bægerglasset er der pustet CO₂ ned i vandet gennem et sugerør. Bromthymolblåt er gulgrønt, fordi CO₂ har gjort vandet lidt surt.",
     farve: function (t) {
         var ox = Math.max(t.konc.oxonium, 0.01);
         var f = beg((Math.log(ox) - Math.log(0.08)) / (Math.log(2.5) - Math.log(0.08)), 0, 1);
@@ -655,75 +739,107 @@ var SYSTEMER = [
     indgreb: [
         {
             navn: "Varm vandet op til kogepunktet",
-            tekst: "Du sætter bægerglasset på en varmeplade og varmer det op. Gasser er mindre opløselige i varmt vand.",
-            spm0: "Hvad gør opvarmningen ved stofferne i den nederste ligevægt?",
-            svar0: ["Koncentrationen af CO₂ falder", "Koncentrationen af CO₂ stiger", "Koncentrationen af H₃O⁺ stiger"],
+            tekst: "Du sætter bægerglasset på en varmeplade og varmer vandet op. Gasser opløses dårligere i varmt vand end i koldt vand.",
+            /* Stilladset: ligevægt 1 -> CO₂(aq) -> ligevægt 2 -> farven.
+               fokus siger, hvad der er gult i reaktionsskemaerne under spørgsmålet. */
+            spmKinds: ["ligevægt 1", "CO₂(aq)", "ligevægt 2", "observationen"],
+            fokus: [1, "led", 2, 0],
+            spm0: "Hvilken vej forskydes ligevægt 1, CO₂(g) ⇌ CO₂(aq), når vandet bliver varmt?",
+            svar0: ["Mod venstre: CO₂ forlader vandet som gas", "Mod højre: mere CO₂ opløses i vandet", "Ingen forskydning — intet sker"],
             rigtig0: 0,
-            spm1: "Hvilken vej forskydes den nederste ligevægt?",
-            svar1: RET_V,
+            hint0: "Varmt vand kan holde på mindre opløst CO₂ end koldt vand. Hvor bliver den CO₂ af, som vandet ikke kan holde på?",
+            spm1: "Hvad sker der med koncentrationen af CO₂(aq), når ligevægt 1 forskydes mod venstre?",
+            svar1: ["Den falder", "Den stiger", "Den er uændret"],
             rigtig1: 0,
-            hint: "Se på den øverste ligevægt først: hvor bliver CO₂ af, når vandet bliver varmt? Og hvad betyder det for reaktanten i den nederste ligevægt?",
-            spm2: "Hvad ser du i glasset?",
-            svar2: ["Bobler, og farven går mod blå", "Bobler, og farven går mod gul", "Farven bliver blot lidt mørkere"],
+            hint1: "CO₂(aq) står til højre i ligevægt 1. Bliver der dannet eller brugt CO₂(aq), når ligevægt 1 forskydes mod venstre?",
+            spm2: "CO₂(aq) er reaktant i ligevægt 2. Hvilken vej forskydes ligevægt 2, når der bliver mindre CO₂(aq)?",
+            svar2: RET_V,
             rigtig2: 0,
+            hint2: "Når en reaktant forsvinder, modvirker systemet det ved at danne noget af reaktanten igen. Hvilken vej skal ligevægt 2 gå for at danne CO₂(aq)?",
+            spm3: "Hvad ser du i bægerglasset?",
+            svar3: ["Bobler, og farven går mod blå", "Bobler, og farven går mod gul", "Farven bliver blot lidt mørkere"],
+            rigtig3: 0,
+            hint3: "Farven viser koncentrationen af H₃O⁺: gul ved meget H₃O⁺, blå ved lidt H₃O⁺. Bliver der dannet eller brugt H₃O⁺, når ligevægt 2 forskydes mod venstre?",
+            pile: [[1, "venstre"], [2, "venstre"]],
             observation: "Der stiger <strong>bobler af CO₂</strong> op, og farven skifter fra gulgrøn mod <strong>blå</strong>.",
-            forklaring: "Varmen driver CO₂ ud af opløsningen — den øverste ligevægt forskydes mod gasfasen. Dermed falder [CO₂(aq)], som er reaktant i den nederste ligevægt, og den forskydes mod venstre. Der dannes mindre H₃O⁺, pH stiger, og bromthymolblåt slår om mod blåt. Det er samme grund til, at en varm sodavand er fladere end en kold.",
+            forklaring: "Varmen gør CO₂ dårligere opløseligt i vandet, så ligevægt 1 forskydes mod venstre, og CO₂ bobler ud af vandet. Dermed falder koncentrationen af CO₂(aq). CO₂(aq) er reaktant i ligevægt 2, så ligevægt 2 forskydes mod venstre. Der bliver mindre H₃O⁺, og bromthymolblåt slår om mod blå. Det er samme grund til, at en varm sodavand er fladere end en kold.",
             temp: 95,
             bobler: 1,
             slut: { co2: 1.5, oxonium: 0.12, hydrogencarbonat: 0.3 }
         },
         {
             navn: "Pust mere CO₂ ned i vandet",
-            tekst: "Du puster CO₂ ned i bægerglasset gennem et sugerør.",
-            spm0: "Hvad gør den tilførte CO₂ ved stofferne i ligevægten?",
-            svar0: ["Koncentrationen af CO₂ stiger", "Koncentrationen af CO₂ falder", "Koncentrationen af HCO₃⁻ falder"],
+            tekst: "Du puster CO₂ ned i bægerglasset gennem et sugerør. Der kommer mere CO₂(g) i kontakt med vandet.",
+            spmKinds: ["ligevægt 1", "ligevægt 2", "observationen"],
+            fokus: [1, 2, 0],
+            spm0: "Hvilken vej forskydes ligevægt 1, CO₂(g) ⇌ CO₂(aq), når du puster mere CO₂(g) ned i vandet?",
+            svar0: ["Mod højre: mere CO₂ opløses i vandet", "Mod venstre: CO₂ forlader vandet som gas", "Ingen forskydning — intet sker"],
             rigtig0: 0,
-            spm1: "Hvilken vej forskydes ligevægten?",
+            hint0: "CO₂(g) er reaktant i ligevægt 1. Hvad gør systemet, når der kommer mere af en reaktant?",
+            spm1: "Ligevægt 1 danner mere CO₂(aq), og CO₂(aq) er reaktant i ligevægt 2. Hvilken vej forskydes ligevægt 2?",
             svar1: RET_H,
             rigtig1: 0,
-            hint: "Du tilsætter en reaktant til den nederste ligevægt.",
-            spm2: "Hvad ser du i glasset?",
-            svar2: ["Farven går fra grøn mod gul", "Farven går fra grøn mod blå", "Farven ændrer sig slet ikke"],
+            hint1: "Systemet modvirker, at der kommer mere CO₂(aq), ved at bruge noget af den. Hvilken vej skal ligevægt 2 gå for at bruge CO₂(aq)?",
+            spm2: "Hvad ser du i bægerglasset?",
+            svar2: ["Farven går fra gulgrøn mod gul", "Farven går fra gulgrøn mod blå", "Farven ændrer sig slet ikke"],
             rigtig2: 0,
-            observation: "Farven skifter mod <strong>klar gul</strong>. Opløsningen er blevet mere sur end referencen.",
-            forklaring: "Mere CO₂(aq) er mere reaktant, og systemet modvirker det ved at løbe mod højre og danne H₃O⁺ og HCO₃⁻. Ligesom i kobolt-forsøget kan man skifte frem og tilbage — ligevægten er reversibel og indstiller sig hver gang på ny.",
+            hint2: "Farven viser koncentrationen af H₃O⁺: gul ved meget H₃O⁺, blå ved lidt H₃O⁺. Bliver der dannet eller brugt H₃O⁺, når ligevægt 2 forskydes mod højre?",
+            pile: [[1, "hoejre"], [2, "hoejre"]],
+            observation: "Farven skifter mod <strong>klar gul</strong>. Opløsningen er blevet mere sur end i referenceglasset.",
+            forklaring: "Mere CO₂(g) over vandet forskyder ligevægt 1 mod højre, så der opløses mere CO₂. Den ekstra CO₂(aq) er reaktant i ligevægt 2, og systemet modvirker det ved at forskyde ligevægt 2 mod højre. Der dannes H₃O⁺ og HCO₃⁻, og vandet bliver mere surt. Sammenlign med opvarmningen: de samme to ligevægte forskydes den modsatte vej.",
             bobler: 0.2,
             spring: { co2: 16.0 },
             slut: { co2: 14.5, oxonium: 1.8, hydrogencarbonat: 1.8 }
         },
         {
             navn: "Tilsæt natron, NaHCO₃",
-            tekst: "Du rører en teskefuld natron ud i vandet. Natron leverer HCO₃⁻ direkte til opløsningen.",
-            spm0: "Hvad gør natronen ved stofferne i ligevægten?",
-            svar0: ["Koncentrationen af HCO₃⁻ stiger", "Koncentrationen af HCO₃⁻ falder", "Koncentrationen af H₃O⁺ stiger"],
+            tekst: "Du rører en teskefuld natron, NaHCO₃, ud i vandet. Natron opløses som Na⁺ og HCO₃⁻.",
+            spmKinds: ["indgrebet", "ligevægt 2", "observationen"],
+            fokus: [0, 2, 0],
+            spm0: "Hvilken af de to ligevægte bliver forstyrret, når der kommer mere HCO₃⁻ i vandet?",
+            svar0: ["Ligevægt 2, fordi HCO₃⁻ er med i den", "Ligevægt 1, fordi CO₂ er med i den", "Ingen af dem, fordi Na⁺ ikke er med"],
             rigtig0: 0,
-            spm1: "Hvilken vej forskydes ligevægten?",
+            hint0: "Se efter HCO₃⁻ i de to reaktionsskemaer øverst.",
+            spm1: "HCO₃⁻ er produkt i ligevægt 2. Hvilken vej forskydes ligevægt 2, når der kommer mere HCO₃⁻?",
             svar1: RET_V,
             rigtig1: 0,
-            hint: "HCO₃⁻ står allerede på højre side af pilen. Hvad hedder den effekt?",
-            spm2: "Hvad ser du i glasset?",
-            svar2: ["Farven går fra gul mod grøn", "Farven går fra grøn mod gul", "Farven ændrer sig slet ikke"],
+            hint1: "Når der kommer mere af et produkt, modvirker systemet det ved at bruge noget af produktet. Hvilken vej skal ligevægt 2 gå for at bruge HCO₃⁻?",
+            spm2: "Hvad ser du i bægerglasset?",
+            svar2: ["Farven går fra gulgrøn mod blå", "Farven går fra gulgrøn mod gul", "Farven ændrer sig slet ikke"],
             rigtig2: 0,
-            observation: "Farven skifter fra gulgrøn mod <strong>blågrøn</strong> — opløsningen er blevet mindre sur.",
-            forklaring: "Fælles ion-effekten igen, denne gang med HCO₃⁻. Systemet modvirker den øgede produktkoncentration ved at løbe mod venstre, og dermed falder [H₃O⁺]. Sammen udgør CO₂/HCO₃⁻ blodets vigtigste puffersystem — det er præcis den samme ligevægt, der holder pH i blodet omkring 7,4.",
+            hint2: "Farven viser koncentrationen af H₃O⁺: gul ved meget H₃O⁺, blå ved lidt H₃O⁺. Bliver der dannet eller brugt H₃O⁺, når ligevægt 2 forskydes mod venstre?",
+            pile: [[2, "venstre"]],
+            observation: "Farven skifter fra gulgrøn mod <strong>blågrøn</strong>. Opløsningen er blevet mindre sur.",
+            forklaring: "Natron giver ekstra HCO₃⁻, som er produkt i ligevægt 2. Systemet modvirker det ved at forskyde ligevægt 2 mod venstre, og så bruges der også H₃O⁺. Koncentrationen af H₃O⁺ falder, og farven går mod blå. Et stof, der allerede er med i ligevægten, kaldes en fælles ion. Det er den samme ligevægt, der holder pH i blodet omkring 7,4.",
             spring: { hydrogencarbonat: 6.0 },
             slut: { co2: 8.8, oxonium: 0.25, hydrogencarbonat: 5.6 }
         },
         {
-            navn: "Hæld saltsyre, HCl(aq), i",
-            tekst: "Du hælder saltsyre ned i glasset — som når man kommer eddike på natron.",
-            spm0: "Hvad gør saltsyren ved stofferne i ligevægten?",
-            svar0: ["Koncentrationen af H₃O⁺ stiger", "Koncentrationen af H₃O⁺ falder", "Koncentrationen af HCO₃⁻ stiger"],
+            navn: "Hæld saltsyre, HCl(aq), i vand med natron",
+            tekst: "Dette bægerglas har fået en teskefuld natron, så der er mange HCO₃⁻-ioner i vandet. Du hælder saltsyre, HCl(aq), i. Saltsyre giver mange H₃O⁺-ioner.",
+            /* Glasset fra natron-indgrebet: uden HCO₃⁻ ville der næsten intet bruse */
+            fra: { konc: { co2: 8.8, oxonium: 0.25, hydrogencarbonat: 5.6 } },
+            spmKinds: ["ligevægt 2", "CO₂(aq)", "ligevægt 1", "observationen"],
+            fokus: [2, "led", 1, 0],
+            spm0: "H₃O⁺ er produkt i ligevægt 2. Hvilken vej forskydes ligevægt 2, når der kommer mange H₃O⁺-ioner?",
+            svar0: RET_V,
             rigtig0: 0,
-            spm1: "Hvilken vej forskydes ligevægten, når [H₃O⁺] sættes kraftigt op?",
-            svar1: RET_V,
+            hint0: "Når der kommer mere af et produkt, modvirker systemet det ved at bruge noget af produktet. Hvilken vej skal ligevægt 2 gå for at bruge H₃O⁺?",
+            spm1: "Hvad sker der med koncentrationen af CO₂(aq), når ligevægt 2 forskydes mod venstre?",
+            svar1: ["Den stiger", "Den falder", "Den er uændret"],
             rigtig1: 0,
-            hint: "H₃O⁺ er et produkt. Og hvad sker der med den CO₂, der dannes, når opløsningen bliver overmættet?",
-            spm2: "Hvad ser du i glasset?",
-            svar2: ["Det bruser, og farven bliver gul", "Det bruser, og farven bliver blå", "Der dannes et hvidt bundfald her"],
+            hint1: "CO₂(aq) står til venstre i ligevægt 2. Bliver der dannet eller brugt CO₂(aq), når ligevægt 2 forskydes mod venstre?",
+            spm2: "Vandet kan ikke holde på al den nye CO₂(aq). Hvilken vej forskydes ligevægt 1, CO₂(g) ⇌ CO₂(aq)?",
+            svar2: ["Mod venstre: CO₂ forlader vandet som gas", "Mod højre: mere CO₂ opløses i vandet", "Ingen forskydning — intet sker"],
             rigtig2: 0,
-            observation: "Det <strong>bruser kraftigt</strong>, mens CO₂ undslipper, og farven bliver <strong>gul</strong>.",
-            forklaring: "Syren presser den nederste ligevægt mod venstre, så HCO₃⁻ omdannes til CO₂(aq). Opløsningen bliver overmættet med CO₂, og den øverste ligevægt forskydes mod gasfasen — derfor bruser det. Gassen forlader systemet, så reaktionen kan køre helt til bunds. Det er den samme kobling af to ligevægte som i chromat-forsøget, bare med en gas i stedet for et bundfald.",
+            hint2: "CO₂(aq) er produkt i ligevægt 1. Hvad gør systemet, når der kommer mere af et produkt?",
+            spm3: "Hvad ser du i bægerglasset?",
+            svar3: ["Det bruser, og farven bliver gul", "Det bruser, og farven bliver blå", "Der dannes et hvidt bundfald"],
+            rigtig3: 0,
+            hint3: "Tænk på gassen fra ligevægt 1. Farven viser koncentrationen af H₃O⁺, og ligevægt 2 bruger kun en del af de H₃O⁺-ioner, du har hældt i.",
+            pile: [[2, "venstre"], [1, "venstre"]],
+            observation: "Det <strong>bruser kraftigt</strong>, mens CO₂ forlader vandet, og farven bliver <strong>gul</strong>.",
+            forklaring: "Saltsyren giver mange H₃O⁺-ioner, og ligevægt 2 forskydes mod venstre: H₃O⁺ og HCO₃⁻ bliver til CO₂(aq) og vand. Så meget CO₂(aq) kan vandet ikke holde på, og ligevægt 1 forskydes mod venstre. CO₂ forlader vandet som gas, og derfor bruser det. Ligevægt 2 bruger kun en del af de H₃O⁺-ioner, du har hældt i, så opløsningen er stadig meget sur, og farven bliver gul. Det er den samme reaktion, der bruser, når man hælder eddike på natron.",
             spring: { oxonium: 9.0 },
             bobler: 0.85,
             slut: { co2: 14.0, oxonium: 6.0, hydrogencarbonat: 0.3 }
@@ -1227,14 +1343,26 @@ var grafCanvas = document.getElementById("graf");
 var grafCtx = grafCanvas.getContext("2d");
 
 /* Reaktionsskemaet skal altid stå på én linje - skaler skriften ned, hvis den er for bred til pladsen. */
-function tilpasLigningStoerrelse() {
-    var stoerrelse = 1.3;
+function krympLigning(fra, til) {
+    var stoerrelse = fra;
     elLigning.style.fontSize = stoerrelse + "rem";
     var maxBredde = elLigning.clientWidth;
-    while (elLigning.scrollWidth > maxBredde && stoerrelse > 0.7) {
-        stoerrelse -= 0.05;
+    while (elLigning.scrollWidth > maxBredde && stoerrelse > til) {
+        stoerrelse = Math.round((stoerrelse - 0.05) * 100) / 100;
         elLigning.style.fontSize = stoerrelse + "rem";
     }
+    return elLigning.scrollWidth <= maxBredde;
+}
+
+/* To ligevægte står som en trappe. Bliver skriften for lille til trappen,
+   skiftes til den kompakte opstilling, hvor linje 2 ikke er rykket ind. */
+function tilpasLigningStoerrelse() {
+    elLigning.classList.remove("kompakt");
+    if (elLigning.querySelector(".lign-trappe")) {
+        if (krympLigning(1.3, 1.1)) { return; }
+        elLigning.classList.add("kompakt");
+    }
+    krympLigning(1.3, 0.7);
 }
 
 function kopiTilstand(t) {
@@ -1306,7 +1434,18 @@ function visObservation(html, erSvar) {
 }
 
 /* ---------- Quizpanelet ---------- */
-function antalSpm(ind) { return ind.spm2 ? 3 : 2; }
+function antalSpm(ind) {
+    var n = 0;
+    while (ind["spm" + n]) { n += 1; }
+    return n;
+}
+
+/* Gul markering i reaktionsskemaerne af det, spørgsmålet handler om:
+   1 eller 2 = den ligevægt, "led" = CO₂(aq), der er med i begge, 0 = intet. */
+function saetFokus(hvad) {
+    elLigning.classList.remove("fokus-1", "fokus-2", "fokus-led");
+    if (hvad) { elLigning.classList.add("fokus-" + hvad); }
+}
 
 /* Lille overskrift over hvert spørgsmål, så trinnene i tankegangen står klart */
 var SPM_MAERKE = ["indgrebet", "ligevægten", "observationen"];
@@ -1314,10 +1453,11 @@ var SPM_MAERKE = ["indgrebet", "ligevægten", "observationen"];
 /* De fleste indgreb stiller spørgsmålene i rækkefølgen indgrebet -> ligevægten
    -> observationen. Nogle indgreb (fx rene temperaturskift) springer det første
    spørgsmål over, fordi det ville være for trivielt ("varmt bad tilfører varme") -
-   de sætter spmKinds, så mærket alligevel passer til spørgsmålets indhold. */
+   de sætter spmKinds, så mærket alligevel passer til spørgsmålets indhold.
+   I forsøget med to ligevægte står mærket som tekst ("ligevægt 1"). */
 function spmMaerke(ind, nr) {
     var kind = ind.spmKinds ? ind.spmKinds[nr] : nr;
-    return SPM_MAERKE[kind];
+    return typeof kind === "string" ? kind : SPM_MAERKE[kind];
 }
 
 function samletAntalSpm() {
@@ -1430,6 +1570,22 @@ function visTrin(nr) {
     document.getElementById("indgreb-tekst").innerHTML = ind.tekst;
 
     var krop = document.getElementById("quiz-krop");
+    saetFokus(0);
+    slukPile();
+
+    if (sys.teori) {
+        var teoriKnap = document.createElement("button");
+        teoriKnap.className = "teori-knap";
+        teoriKnap.textContent = sys.teoriTitel || "📘 Teori";
+        var teoriBoks = document.createElement("div");
+        teoriBoks.className = "teori-boks skjult";
+        teoriBoks.innerHTML = sys.teori;
+        teoriKnap.addEventListener("click", function () {
+            teoriBoks.classList.toggle("skjult");
+        });
+        krop.appendChild(teoriKnap);
+        krop.appendChild(teoriBoks);
+    }
 
     if (ind.hint) {
         var hintKnap = document.createElement("button");
@@ -1512,11 +1668,29 @@ function byggSpm(holder, nr) {
             knapper.push(k);
         })(i);
     }
+
+    /* Hint til netop dette spørgsmål (bruges, når et indgreb har flere trin) */
+    if (!besvaret && ind["hint" + nr]) {
+        var hintKnap = document.createElement("button");
+        hintKnap.className = "hint-knap";
+        hintKnap.textContent = "💡 Vis hint";
+        var hintBoks = document.createElement("div");
+        hintBoks.className = "hint-boks skjult";
+        hintBoks.innerHTML = "<strong>Hint:</strong> " + ind["hint" + nr];
+        hintKnap.addEventListener("click", function () {
+            hintBoks.classList.toggle("skjult");
+            hintKnap.textContent = hintBoks.classList.contains("skjult") ? "💡 Vis hint" : "💡 Skjul hint";
+            rulNed();
+        });
+        blok.appendChild(hintKnap);
+        blok.appendChild(hintBoks);
+    }
     holder.appendChild(blok);
 
     if (besvaret) {
         markerSvar(holder, knapper, nr);
     } else {
+        saetFokus(ind.fokus ? ind.fokus[nr] : 0);
         aktiveSvarKnapper = knapper;
         rulNed();
     }
@@ -1535,6 +1709,8 @@ function markerSvar(holder, knapper, nr) {
     }
     var korrekt = valgt === rigtig;
     var flereSpm = nr < antalSpm(ind) - 1;
+    var hintKnap = knapper.length ? knapper[0].parentNode.querySelector(".hint-knap") : null;
+    if (hintKnap) { hintKnap.classList.add("skjult"); }
 
     var fb = document.createElement("div");
     fb.className = "feedback " + (korrekt ? "rigtig" : "forkert");
@@ -1572,6 +1748,7 @@ function vaelgSvar(nr, plads) {
 }
 
 function visUdfoerKnap(krop) {
+    saetFokus(0);
     var k = document.createElement("button");
     k.className = "stor-knap";
     k.id = "btn-udfoer";
@@ -1649,8 +1826,34 @@ function udfoerIndgreb() {
     opdaterHoved();
 }
 
+/* Ved to ligevægte siger "pile" hvilke pile der blinker, og i hvilken
+   rækkefølge: [[linje, retning], ...]. Ellers læses retningen af svaret. */
+var pilGen = 0;
+
+/* Går man videre, før en pil er færdig med at blinke, slukkes den */
+function slukPile() {
+    pilGen += 1;
+    var alle = elLigning.querySelectorAll(".rx-pil");
+    var i;
+    for (i = 0; i < alle.length; i++) { alle[i].className = "rx-pil"; }
+}
+
 function pilBlink(ind) {
-    var pil = elLigning.querySelector(".rx-pil");
+    var alle = elLigning.querySelectorAll(".rx-pil");
+    var gen = pilGen;
+    if (ind.pile) {
+        ind.pile.forEach(function (p, i) {
+            var el = alle[p[0] - 1];
+            if (!el) { return; }
+            setTimeout(function () {
+                if (gen !== pilGen) { return; }
+                el.className = "rx-pil " + p[1];
+                setTimeout(function () { if (gen === pilGen) { el.className = "rx-pil"; } }, 2800);
+            }, i * 1100);
+        });
+        return;
+    }
+    var pil = alle[0];
     if (!pil) { return; }
     var retning = "hoejre";
     if (ind.rigtig1 !== undefined && ind.svar1) {
@@ -1706,6 +1909,7 @@ function naesteTrin() {
 
 function visResultat() {
     fase = "faerdig";
+    saetFokus(0);
     var i, rigtige = 0, mulige = 0;
     for (i = 0; i < sys.indgreb.length; i++) {
         rigtige += rigtigeI(i);
@@ -2595,7 +2799,7 @@ document.addEventListener("keydown", function (e) {
         if (fase === "klar") { udfoerIndgreb(); e.preventDefault(); }
         else if (fase === "udfoert") { naesteTrin(); e.preventDefault(); }
     } else if (e.key >= "1" && e.key <= "4") {
-        if ((fase === "spm0" || fase === "spm1" || fase === "spm2") && aktiveSvarKnapper.length) {
+        if (fase.indexOf("spm") === 0 && aktiveSvarKnapper.length) {
             var i = parseInt(e.key, 10) - 1;
             if (i < aktiveSvarKnapper.length && !aktiveSvarKnapper[i].disabled) {
                 aktiveSvarKnapper[i].click();

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="180" viewBox="0 0 240 180">
+  <!-- Smeltepunktsapparat. Bunden staar paa bordet ved y 178.
+       Hullet til smeltepunktsroeret er (62, 30) paa oversiden.
+       Animationen tegner OVENPAA: temperaturen i displayet x 22-106,
+       y 60-92, proeven forstoerret i linsen (166, 92) r 36, og lampen i
+       taendknappen (42, 146). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9dee4"/>
+      <stop offset="1" stop-color="#a9b1ba"/>
+    </linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f4"/>
+      <stop offset="1" stop-color="#c7cdd4"/>
+    </linearGradient>
+    <radialGradient id="linse" cx="0.4" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#3a4a5a"/>
+      <stop offset="1" stop-color="#11181f"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="120" cy="178" rx="116" ry="3" fill="#000000" fill-opacity="0.35"/>
+  <path d="M14 24 L226 24 L236 38 L4 38 Z" fill="url(#top)" stroke="#7f878f" stroke-width="1" stroke-linejoin="round"/>
+  <rect x="4" y="36" width="232" height="140" rx="8" fill="url(#krop)" stroke="#7f878f" stroke-width="1.2"/>
+  <ellipse cx="62" cy="30" rx="7" ry="2.6" fill="#1a1d22" stroke="#555d66" stroke-width="0.8"/>
+  <!-- Display -->
+  <rect x="18" y="56" width="92" height="40" rx="5" fill="#2a2e35" stroke="#1d2026" stroke-width="1"/>
+  <rect x="22" y="60" width="84" height="32" rx="3" fill="#10161a" stroke="#050708" stroke-width="1"/>
+  <!-- Linsen -->
+  <circle cx="166" cy="92" r="44" fill="#5a636f" stroke="#2c323b" stroke-width="1.4"/>
+  <circle cx="166" cy="92" r="38" fill="url(#linse)" stroke="#1d2026" stroke-width="1.2"/>
+  <!-- Taendknappen -->
+  <circle cx="42" cy="146" r="12" fill="#4b525c" stroke="#1d2026" stroke-width="1"/>
+  <text x="42" y="167" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8" font-weight="700" fill="#3d444d">I/O</text>
+  <text x="166" y="160" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#3d444d">SMELTEPUNKT</text>
+  <rect x="8" y="40" width="224" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.45"/>
+</svg>

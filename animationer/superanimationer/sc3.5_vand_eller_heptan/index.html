@@ -32,6 +32,24 @@
         <div class="anker" id="forsoeg-anker-glas"></div>
         <div class="anker" id="forsoeg-anker-proeve"></div>
         <div class="anker" id="forsoeg-anker-kort"></div>
+        <!-- Teorikortet: foerste trin paa fane 1. Teksterne staar i D.TEORI
+             (js/data.js), formlerne tegnes i laerrederne (js/sim_forsoeg.js) -->
+        <div class="teorikort" id="forsoeg-teori" hidden>
+            <div class="tk-stoffer">
+                <div class="tk-stof">
+                    <h3>Vand <span class="praedikat polaer">polært</span></h3>
+                    <canvas class="tk-mol" data-stof="vand" aria-label="Strukturformel for vand med δ− ved O og δ+ ved hvert H"></canvas>
+                    <p data-tekst="vand"></p>
+                </div>
+                <div class="tk-stof">
+                    <h3>Heptan <span class="praedikat upolaer">upolært</span></h3>
+                    <canvas class="tk-mol" data-stof="heptan" aria-label="Strukturformel for heptan"></canvas>
+                    <p data-tekst="heptan"></p>
+                </div>
+            </div>
+            <p class="tk-regel"><b data-tekst="regel"></b> <span data-tekst="regel2"></span></p>
+            <button class="knap blaa banker tk-videre" id="forsoeg-teori-videre" type="button"><span data-tekst="knap"></span><span class="tegn">→</span></button>
+        </div>
         <div class="tilbud" id="forsoeg-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
@@ -42,7 +60,7 @@
 
     <aside class="panel">
         <div class="kort maaling" id="forsoeg-skema">
-            <h2>Skemaet <span class="taeller">udfyldt <b id="forsoeg-udfyldt">0</b>/16</span></h2>
+            <h2>Skemaet <span class="taeller">udfyldt <b id="forsoeg-udfyldt">0</b>/<span id="forsoeg-felter">12</span></span></h2>
             <table class="skema">
                 <thead><tr><th scope="col">Stof</th><th scope="col">Vand</th><th scope="col">Heptan</th></tr></thead>
                 <tbody id="forsoeg-raekker"></tbody>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="260" viewBox="0 0 60 260">
+  <!-- Maaleglas, 100 mL (samme glas som i sb1.4, ny inddeling).
+       Indholdet tegnes af animationen BAG denne fil.
+       Inderside: x 19-41, bund y 222. Rumfang: y = 222 - 1,8 * mL,
+       saa 50 mL staar ved y 132 og 100 mL ved y 42.
+       Tuden sidder oeverst til hoejre ved (44, 8). Foden er y 226-249. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe6f7" stop-opacity="0.2"/>
+      <stop offset="0.25" stop-color="#cfe6f7" stop-opacity="0.04"/>
+      <stop offset="0.75" stop-color="#cfe6f7" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#cfe6f7" stop-opacity="0.18"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9fb3c3"/>
+      <stop offset="1" stop-color="#5d6e7c"/>
+    </linearGradient>
+  </defs>
+  <path d="M18 12 L18 222 L42 222 L42 12 Z" fill="url(#glas)"/>
+  <path d="M15 10 Q18 11 18 15 L18 222 L42 222 L42 15 Q42 10 46 7"
+        fill="none" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="36" y="24" width="3" height="190" rx="1.5" fill="#ffffff" fill-opacity="0.16"/>
+  <!-- Inddeling: hver 10 mL, lang ved 50 og 100 mL -->
+  <g stroke="#eef6fc" stroke-opacity="0.7" stroke-width="1.2" stroke-linecap="round">
+    <path d="M19 42 h14 M19 132 h14"/>
+  </g>
+  <g stroke="#eef6fc" stroke-opacity="0.42" stroke-width="0.9" stroke-linecap="round">
+    <path d="M19 60 h7 M19 78 h7 M19 96 h7 M19 114 h7 M19 150 h7 M19 168 h7 M19 186 h7 M19 204 h7"/>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="7.5" font-weight="700" fill="#eef6fc" fill-opacity="0.8" text-anchor="end">
+    <text x="16" y="45">100</text>
+    <text x="16" y="135">50</text>
+  </g>
+  <path d="M14 224 L46 224 L56 246 Q56 249 53 249 L7 249 Q4 249 4 246 Z" fill="url(#fod)" stroke="#2f3a44" stroke-width="1"/>
+</svg>

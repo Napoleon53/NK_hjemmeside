@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb4.9 Syntese af Salenvir</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:820px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen rammer opskriftens tal, at hele
+   syntesen kan gennemføres med den grønne knap alene, at tiden står
+   stille, når der ikke sker noget (intet ur, ingen kogning, mens eleven
+   svarer), at knapperne og trækkene altid giver opskriftens mængder, at
+   et klik på tingen gør det samme som knappen, at fejl stadig giver en
+   konsekvens (urglas, der ikke er vejet, våde krystaller, et klik før
+   noget smelter), at scenen er låst under spørgsmål og animationer, at
+   Vis svaret kan klare hvert skridt, at kortet og den grønne knap holder
+   sig på plads på fire skærmstørrelser, og at teksterne er korte.
+
+   Iframen skal åbnes gennem en lokal server.
+   ===================================================================== */
+var linjer = [], fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); if (window.console) console.log(t); }
+function vis(slut) {
+    var t = linjer.join("\n");
+    if (slut) t += "\n\n" + antal + " påstande\n" + (fejl ? '<span class="fejl">' + fejl + " FEJL</span>" : '<span class="ok">ALT OK</span>');
+    document.getElementById("ud").innerHTML = t;
+}
+function vent(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+var ramme = document.getElementById("ramme");
+var W, NK, sim, D, Km, G;
+
+ramme.addEventListener("load", function () { setTimeout(start, 900); });
+
+async function start() {
+    W = ramme.contentWindow; NK = W.NK; sim = NK.sim; D = NK.Data; Km = NK.Kemi; G = NK.Sim.G;
+    try { await koer(); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    vis(true);
+}
+
+/* ----- Musen: rigtige hændelser på lærredet, i verdens koordinater ------------- */
+function skaerm(p) {
+    var r = sim.L.canvas.getBoundingClientRect(), s = sim.tilSkaerm(p.x, p.y);
+    return { x: r.left + s.x, y: r.top + s.y };
+}
+function haendelse(type, p) {
+    var s = skaerm(p);
+    sim.L.canvas.dispatchEvent(new W.PointerEvent(type, { clientX: s.x, clientY: s.y, button: 0, buttons: type === "pointerup" ? 0 : 1, pointerId: 1, bubbles: true, isPrimary: true }));
+}
+function midt(id) { var k = sim.kasse(id); return { x: k.x + k.b / 2, y: k.y + k.h / 2 }; }
+function tik(sek) { var n = Math.round(sek * 60); for (var i = 0; i < n; i++) sim.opdater(1 / 60); sim.tegn(); }
+function tikTil(bet, max) { var n = 0; while (!bet() && n < (max || 30) * 60) { sim.opdater(1 / 60); n++; } sim.tegn(); return bet(); }
+function faerdig() { return tikTil(function () { return !sim.anim; }, 30); }
+
+/* Træk id, så ankeret ender i maal (eller musen, hvis medMus), hold evt., og slip */
+function traek(id, maal, opt) {
+    opt = opt || {};
+    var fra = opt.fra || midt(id);
+    haendelse("pointerdown", fra);
+    var g = sim.greb;
+    if (!g) return false;
+    var mus = opt.medMus ? maal : { x: maal.x - g.dx, y: maal.y - g.dy };
+    for (var i = 1; i <= 8; i++) {
+        haendelse("pointermove", { x: fra.x + (mus.x - fra.x) * i / 8, y: fra.y + (mus.y - fra.y) * i / 8 });
+        sim.opdater(1 / 60);
+    }
+    if (opt.hold) tik(opt.hold);
+    haendelse("pointerup", mus);
+    sim.opdater(1 / 60);
+    return true;
+}
+/* Et klik på tingen uden at flytte den */
+function klikTing(id) { var p = midt(id); haendelse("pointerdown", p); haendelse("pointerup", p); sim.opdater(1 / 60); }
+/* Den grønne knap ved tingen */
+function knap() {
+    sim.opdater(1 / 60);
+    var b = W.document.getElementById("handling");
+    if (b.hidden) return false;
+    b.click();
+    faerdig();
+    tik(0.05);
+    return true;
+}
+function knapTekst() { sim.opdater(1 / 60); var b = W.document.getElementById("handling"); return b.hidden ? "" : b.textContent; }
+function kortTekst() { return W.document.getElementById("ind").textContent; }
+function besked() { return W.document.getElementById("besked").textContent; }
+function videre() { var b = W.document.querySelector("[data-videre]"); if (b) b.click(); faerdig(); tik(0.05); }
+function svar(j) { var b = W.document.querySelectorAll("#ind [data-valg]")[j]; if (b) b.click(); sim.opdater(1 / 60); }
+
+async function koer() {
+    var S, K;
+
+    /* ===================================================================
+       1. Modellen
+       =================================================================== */
+    overskrift("1. Modellen");
+    var nSal = Km.mmol("sal", 1.4), nEn = Km.mmol("en", 0.5);
+    paastand("1,4 mL salicylaldehyd er 13,4 mmol", Math.abs(nSal - 13.38) < 0.05, nSal.toFixed(2));
+    paastand("0,5 mL ethylendiamin er 7,48 mmol", Math.abs(nEn - 7.48) < 0.03, nEn.toFixed(2));
+    paastand("salicylaldehyd er den begrænsende reaktant (2 : 1)", nSal / 2 < nEn);
+    var K0 = Km.nyKolbe();
+    Km.tilsaet(K0, "sal", 1.4, 0); Km.tilsaet(K0, "en", 0.5, 0); Km.tilsaet(K0, "ethanol", 100, 0);
+    var teo = Km.teoretisk(K0);
+    paastand("teoretisk udbytte 1,80 g Salenvir", Math.abs(teo - 1.795) < 0.01, teo.toFixed(3));
+    paastand("alt Salenvir kan være opløst i 100 mL ethanol ved 75 °C", Km.oploeselighed(75) > teo);
+    paastand("ved 5 °C kan under 0,15 g være opløst", Km.oploeselighed(5) < 0.15);
+    paastand("magnetomrøreren holder opløsningen under ethanols kogepunkt", Km.PLADE_SAT < Km.STOF.ethanol.kp, Km.PLADE_SAT);
+    var smp = Km.smeltepunkt(0, 0, 0);
+    paastand("rent og tørt Salenvir smelter ved 127-128 °C", smp.start === 127 && smp.slut === 128);
+    var vaad = Km.smeltepunkt(0.03, 0, 0);
+    paastand("våde krystaller smelter lavere og bredere", vaad.start < 125 && vaad.slut - vaad.start > 2);
+
+    /* ===================================================================
+       2. Hele syntesen med den grønne knap
+       =================================================================== */
+    overskrift("2. Hele syntesen med den grønne knap");
+    paastand("der er intet ur i scenen", !W.document.getElementById("ur") && !W.document.getElementById("spolknap"));
+    sim.springTil(0);
+    S = sim.S; K = S.K;
+    paastand("trin 1: den grønne knap står ved magneten", knapTekst() === "Læg magneten i kolben");
+    knap();
+    paastand("magneten ligger i kolben", S.magnet.sted === "kolbe" && sim.fase === "loest");
+    haendelse("pointerdown", midt("kolbe"));
+    paastand("låst, mens kortet er grønt: kortet blinker", !sim.greb && W.document.getElementById("skort").classList.contains("blink"));
+    haendelse("pointerup", midt("kolbe"));
+    paastand("den grønne knap er væk, mens kortet er grønt", knapTekst() === "");
+    videre();
+
+    paastand("trin 2: Sug 1,4 mL op", sim.trinNr === 1 && knapTekst() === "Sug 1,4 mL op");
+    W.document.getElementById("handling").click();
+    tik(0.3);
+    haendelse("pointerdown", midt("pip1") );
+    paastand("under en animation sker der intet ved et klik", !sim.greb);
+    haendelse("pointerup", midt("pip1"));
+    faerdig(); tik(0.05);
+    paastand("pipetten har præcis 1,4 mL", Math.abs(S.pip.pip2.V - 1.4) < 1e-6 && S.pip.pip2.sted === "flaske", S.pip.pip2.V);
+    paastand("knappen hedder nu Tøm pipetten i kolben", knapTekst() === "Tøm pipetten i kolben");
+    knap();
+    paastand("kolben fik præcis 1,4 mL, og pipetten er tilbage", Math.abs(K.tilsat.sal - 1.4) < 1e-6 && S.pip.pip2.sted === "holder" && sim.fase === "loest");
+    videre();
+
+    paastand("trin 3: Hæld 100 mL i måleglasset", sim.trinNr === 2 && /100 mL/.test(knapTekst()));
+    knap();
+    paastand("måleglasset viser præcis 100 mL", Math.abs(S.maaleglas.V - 100) < 1e-6, S.maaleglas.V);
+    knap();
+    paastand("kolben fik 100 mL ethanol", Math.abs(K.tilsat.ethanol - 100) < 1e-6 && sim.fase === "loest", K.tilsat.ethanol);
+    videre();
+
+    paastand("trin 4: tænd omrøringen", sim.trinNr === 3 && knapTekst() === "Tænd omrøringen");
+    knap(); knap(); knap();
+    paastand("omrøring, varme og termometer", S.plade.omroer && S.plade.varme && S.termo.sted === "kolbe");
+    faerdig(); tik(0.1);
+    paastand("opløsningen varmes af sig selv op til 75 °C", K.T >= 74.9 && K.T < 76.5 && sim.fase === "loest", K.T.toFixed(2));
+    var ur0 = S.ur, T0 = K.T;
+    tik(4);
+    paastand("tiden står stille, mens kortet venter (ingen tikkende ur)", S.ur === ur0 && K.T === T0);
+    videre();
+
+    paastand("trin 5 begynder med et gæt", sim.trinNr === 4 && sim.fase === "gaet" && knapTekst() === "");
+    svar(0);
+    paastand("efter gættet: Sug 0,5 mL op", knapTekst() === "Sug 0,5 mL op");
+    knap();
+    paastand("pipetten har præcis 0,5 mL", Math.abs(S.pip.pip1.V - 0.5) < 1e-6);
+    var draaber = 0, foer = K.tilsat.en;
+    W.document.getElementById("handling").click();
+    tikTil(function () { if (K.tilsat.en > foer + 1e-6) { draaber++; foer = K.tilsat.en; } return !sim.anim; }, 20);
+    tik(0.05);
+    paastand("ethylendiamin drypper i, dråbe for dråbe (10 dråber)", draaber === 10, draaber);
+    paastand("opløsningen er gul af Salenvir, og den koger ikke", Km.mOploest(K) > 0.2 && K.kog === 0 && K.T < 76.5, Km.mOploest(K).toFixed(2));
+    paastand("trin 5 er løst, gættet holdt ikke", sim.fase === "loest" && /holdt ikke/.test(kortTekst()));
+    videre();
+
+    /* Trin 6: TLC */
+    paastand("trin 6: Sæt en prøve ved P", sim.trinNr === 5 && knapTekst() === "Sæt en prøve ved P");
+    knap();
+    paastand("pletten er sat ved P", !!S.tlc.P);
+    knap();
+    paastand("referencen er sat ved R", !!S.tlc.R);
+    knap();
+    paastand("pladen står i løbevæsken, og løbevæsken er steget", S.tlc.sted === "kammer" && S.tlc.udviklet);
+    knap();
+    paastand("pladen er set under UV-lampen og står i panelet", S.tlc.set && S.plader.length === 1);
+    var v1 = sim.tlcVurdering();
+    paastand("første plade: reaktionen er ikke færdig", sim.fase === "spm" && !v1.faerdig && v1.rigtig === 1, JSON.stringify(v1));
+    ur0 = S.ur; T0 = K.T;
+    tik(4);
+    paastand("tiden står stille, mens spørgsmålet står der", S.ur === ur0 && K.T === T0 && K.kog === 0);
+    svar(0);
+    paastand("forkert svar: forklaringen står på kortet", /samme højde/.test(besked()));
+    svar(1);
+    paastand("rigtigt svar: Vent 10 minutter", sim.fase === "mellem" && /Vent 10 minutter/.test(kortTekst()));
+    videre();
+    paastand("ti minutter er gået, og der er en ny plade", sim.fase === "forsoeg" && Math.abs(S.ur - ur0 - 10) < 0.2 && !S.tlc.P, (S.ur - ur0).toFixed(2));
+    knap(); knap(); knap(); knap();
+    var v2 = sim.tlcVurdering();
+    paastand("anden plade: reaktionen er færdig", v2.faerdig && v2.rigtig === 0, JSON.stringify(v2));
+    svar(0);
+    paastand("trin 6 er løst med to plader", sim.fase === "loest" && S.plader.length === 2);
+    paastand("opløsningen kogte aldrig", K.kog === 0 && Math.abs(K.tilsat.ethanol - K.vEth) < 0.5);
+    videre();
+
+    /* Trin 7 */
+    paastand("trin 7: Sluk varmen", sim.trinNr === 6 && knapTekst() === "Sluk varmen");
+    knap();
+    paastand("varmen er slukket", !S.plade.varme);
+    knap();
+    paastand("kolben står i isbadet og er kold", S.kolbeSted === "isbad" && K.T < 6, K.T.toFixed(1));
+    paastand("der er gule krystaller i kolben", K.mKryst > 1.3, K.mKryst.toFixed(2));
+    paastand("spørgsmålet om hvorfor der køles", sim.fase === "spm");
+    svar(1); svar(0);
+    paastand("trin 7 er løst", sim.fase === "loest");
+    videre();
+
+    /* Trin 8 */
+    paastand("trin 8: Fugt filtrerpapiret", sim.trinNr === 7 && knapTekst() === "Fugt filtrerpapiret");
+    knap();
+    paastand("filtrerpapiret er fugtet", S.tragt.vaad);
+    paastand("Åbn for suget", knapTekst() === "Åbn for suget");
+    klikTing("hane");
+    paastand("et klik på hanen åbner for suget", S.sug);
+    knap();
+    tikTil(function () { return S.tragt.mL < 0.05; }, 10);
+    paastand("kolben er hældt i tragten", Km.rumfang(K) < 0.05 && S.tragt.mKryst > 1.3, S.tragt.mKryst.toFixed(2));
+    paastand("Skyl kolben", knapTekst() === "Skyl kolben");
+    knap();
+    tik(1);
+    paastand("kolben er skyllet, og trin 8 er løst", S.skyllet && sim.fase === "loest");
+    var mTragt = S.tragt.mKryst;
+    paastand("krystallerne på filtret: 1,5-1,8 g", mTragt > 1.5 && mTragt < 1.8, mTragt.toFixed(3));
+    videre();
+
+    /* Trin 9 */
+    paastand("trin 9: Stil urglasset på vægten", sim.trinNr === 8 && knapTekst() === "Stil urglasset på vægten");
+    knap();
+    paastand("det tomme urglas er vejet", S.urglas[0].vejetTom && S.vejninger.length === 1);
+    knap();
+    paastand("krystallerne er skrabet over på urglasset", S.urglas[0].mKryst > 1.4 && !S.urglas2);
+    paastand("våde krystaller: Stil urglasset under lampen", S.urglas[0].w > 0.1 && knapTekst() === "Stil urglasset under lampen");
+    knap();
+    paastand("krystallerne er tørret under lampen", S.urglas[0].w < 0.003 && S.urglasSted[0] === "lampe", S.urglas[0].w.toFixed(4));
+    knap();
+    paastand("feltet til udbyttet", sim.fase === "felt");
+    var t = sim.tal();
+    var f = W.document.getElementById("felt");
+    f.value = NK.Data.komma(t.mFuld, 2); W.document.querySelector("[data-tjek]").click();
+    paastand("massen med urglasset er forkert, og forklaringen siger det", sim.fase === "felt" && /urglassets egen masse/.test(besked()));
+    f.value = NK.Data.komma(t.svar, 2); W.document.querySelector("[data-tjek]").click();
+    paastand("det praktiske udbytte er rigtigt", sim.fase === "loest" && S.feltSvar === t.svar, t.svar);
+    paastand("udbyttet er 80-95 % af det teoretiske", t.svar / teo > 0.8 && t.svar / teo < 0.95, (100 * t.svar / teo).toFixed(1) + " %");
+    videre();
+
+    /* Trin 10 */
+    paastand("trin 10: Fyld røret", sim.trinNr === 9 && knapTekst() === "Fyld røret");
+    knap(); knap(); knap();
+    paastand("røret er fyldt og sat i, og apparatet er tændt", S.roer.fyldt && S.roer.sted === "apparat" && S.app.taendt);
+    paastand("knappen Det smelter nu", knapTekst() === "Det smelter nu");
+    knap();
+    paastand("et klik, før noget smelter, tæller ikke", S.app.start === null && /ikke begyndt/.test(besked()));
+    tikTil(function () { return sim.smeltet() > 0.02; }, 60);
+    knap();
+    paastand("starten er aflæst", S.app.start !== null && knapTekst() === "Alt er smeltet");
+    tikTil(function () { return sim.smeltet() >= 1; }, 60);
+    tik(0.2);
+    knap();
+    paastand("smeltepunktet er aflæst: 126-129 °C", S.app.start > 125.8 && S.app.slut < 129, S.app.start + "-" + S.app.slut);
+    paastand("spørgsmålet om renhed: stoffet er rent", sim.fase === "spm" && sim.spm.rigtig === 0);
+    svar(0);
+    paastand("syntesen er færdig", sim.fase === "loest" && /færdig/.test(kortTekst()));
+
+    /* ===================================================================
+       3. Klik og træk på tingene
+       =================================================================== */
+    overskrift("3. Klik og træk på tingene");
+    sim.springTil(0); S = sim.S;
+    klikTing("magnet"); faerdig();
+    paastand("et klik på magneten lægger den i kolben", S.magnet.sted === "kolbe");
+    sim.springTil(1); S = sim.S; K = S.K;
+    traek("pip2", { x: G.flaske.x, y: 414 });
+    faerdig();
+    paastand("pipetten trukket ned i flasken suger selv præcis 1,4 mL op", Math.abs(S.pip.pip2.V - 1.4) < 1e-6, S.pip.pip2.V);
+    traek("pip2", { x: sim.kolbePose().x, y: sim.kolbePose().y + 10 });
+    faerdig();
+    paastand("pipetten trukket over kolben drypper alt i", Math.abs(K.tilsat.sal - 1.4) < 1e-6 && S.pip.pip2.sted === "holder");
+    sim.springTil(2); S = sim.S; K = S.K;
+    traek("fl-eth", { x: G.maaleglas.x, y: G.maaleglas.y - 30 }, { hold: 8 });
+    paastand("flasken holdt over måleglasset stopper ved 100 mL", Math.abs(S.maaleglas.V - 100) < 1e-6, S.maaleglas.V);
+    traek("maaleglas", { x: sim.kolbePose().x + 20, y: sim.kolbePose().y - 40 }, { hold: 4 });
+    paastand("måleglasset holdt over kolben hælder alt i", Math.abs(K.tilsat.ethanol - 100) < 1e-6);
+    sim.springTil(3); S = sim.S;
+    klikTing("knap-omroer"); klikTing("knap-varme");
+    klikTing("termo"); faerdig(); faerdig(); tik(0.1);
+    paastand("klik på knapperne og termometret: opvarmet til 75 °C", S.termo.sted === "kolbe" && S.K.T >= 74.9 && sim.fase === "loest");
+    sim.springTil(6); S = sim.S; K = S.K;
+    klikTing("knap-varme");
+    traek("kolbe", { x: 440, y: 360 }, { medMus: true });
+    faerdig();
+    paastand("kolben trukket ned i isbadet bliver kold af sig selv", S.kolbeSted === "isbad" && K.T < 6, K.T.toFixed(1));
+    /* Urglas, der ikke er vejet */
+    sim.springTil(8); S = sim.S;
+    traek("spatel", G.tragtMidt);
+    traek("spatel", sim.urglasPose(0));
+    paastand("krystaller på et urglas, der ikke er vejet: et nyt urglas kommer frem", S.urglas2 && S.aktivU === 1 && /ikke vejet/.test(besked()));
+    paastand("og knappen beder om at veje det nye urglas", sim.delNu() === "vej-tom" && knapTekst() === "Stil urglasset på vægten");
+    /* Våde krystaller */
+    sim.springTil(8); S = sim.S;
+    knap(); knap();
+    traek("urglas", G.urglasHjem[0]); tik(0.5);
+    traek("urglas", G.paaVaegt); tik(2);
+    var vej = S.vejninger[S.vejninger.length - 1];
+    paastand("vejet før tørring: krystallerne er våde og vejer for meget", !vej.tom && vej.w > 0.1, vej.w.toFixed(3));
+    paastand("kortet siger, at de skal tørre, og det rigtige tal kommer først bagefter", sim.delNu() === "vej-toer");
+    knap(); knap();
+    paastand("efter tørring og ny vejning: feltet", sim.fase === "felt" && sim.tal().mFuld < vej.m, sim.fase + " " + sim.delNu() + " " + sim.tal().mFuld + " " + vej.m + " " + JSON.stringify(S.vejninger));
+
+    /* ===================================================================
+       4. Vis svaret klarer hvert trin
+       =================================================================== */
+    overskrift("4. Vis svaret");
+    sim.springTil(0);
+    var hk = W.document.getElementById("knap"), tryk = 0;
+    while (!(sim.trinNr === 9 && sim.fase === "loest") && tryk < 500) {
+        if (sim.anim) faerdig();
+        else if (sim.fase === "gaet") svar(1);
+        else if (sim.fase === "loest" || sim.fase === "mellem") videre();
+        else if (sim.delNu() === "smp-start" || sim.delNu() === "smp-slut") { tikTil(function () { return sim.smeltet() >= (sim.delNu() === "smp-start" ? 0.05 : 1); }, 60); hk.click(); hk.click(); sim.opdater(1 / 60); }
+        else { hk.click(); sim.opdater(1 / 60); }
+        tryk++;
+    }
+    paastand("hjælpeknappen fører hele syntesen igennem", sim.trinNr === 9 && sim.fase === "loest", "tryk " + tryk);
+
+    /* ===================================================================
+       5. Teksterne
+       =================================================================== */
+    overskrift("5. Teksterne");
+    var alle = [], lang = [];
+    D.TRIN.forEach(function (tr) {
+        tr.dele.forEach(function (d) {
+            alle.push(d.tekst); if (d.tekst.length > 95) lang.push(d.tekst);
+            d.hint.forEach(function (h) { alle.push(h); if (h.length > 100) lang.push(h); });
+            if (d.knap) { alle.push(d.knap); if (d.knap.length > 28) lang.push(d.knap); }
+            else if (!d.auto) lang.push("ingen knap: " + d.id);
+        });
+        if (typeof tr.slut === "string") { alle.push(tr.slut); if (tr.slut.length > 160) lang.push(tr.slut); }
+        if (tr.spm) {
+            alle.push(tr.spm.tekst); if (tr.spm.tekst.length > 105) lang.push(tr.spm.tekst);
+            tr.spm.svar.forEach(function (s) { alle.push(s.t); if (s.t.length > 44) lang.push(s.t); if (s.f) { alle.push(s.f); if (s.f.length > 110) lang.push(s.f); } });
+            alle.push(tr.spm.godt);
+        }
+        if (tr.gaet) { alle.push(tr.gaet.intro, tr.gaet.tekst); tr.gaet.svar.forEach(function (s) { alle.push(s.t); }); }
+    });
+    [D.TLC_SPM.tekst, D.TLC_SPM.ikkeFaerdig, D.TLC_SPM.faerdig, D.TLC_SPM.overskud, D.TLC_SPM.fejl.ikkeFaerdigMenJa, D.TLC_SPM.fejl.nyPlet, D.TLC_SPM.fejl.faerdigMenNej,
+     D.SMP_SPM.fejlRent, D.SMP_SPM.fejlUrent, D.SMP_SPM.godtRent, D.BESKED.ikkeVejet, D.BESKED.tragtFuld].forEach(function (x) {
+        alle.push(x); if (x.length > 170) lang.push(x);
+    });
+    paastand("teksterne er korte, og hver del har en knap", lang.length === 0, lang.join(" | "));
+    var streg = alle.filter(function (x) { return /[–—]/.test(x); });
+    paastand("ingen tankestreger", streg.length === 0, streg.join(" | "));
+    var ascii = alle.filter(function (x) { return /\b(foer|naeste|paa|saa|haeld\w*|maal|proev\w*|vaeske\w*|toer\w*|koel\w*)\b/i.test(x); });
+    paastand("dansk med æ, ø og å i teksterne", ascii.length === 0, ascii.join(" | "));
+    var indf = alle.filter(function (x) { return /^(Også|Her |Nu |Den |Det samme)/.test(x); });
+    paastand("ingen tekst begynder indforstået", indf.length === 0, indf.join(" | "));
+
+    /* ===================================================================
+       6. Kortet og den grønne knap på fire skærmstørrelser
+       =================================================================== */
+    overskrift("6. Kortet og den grønne knap på fire skærmstørrelser");
+    var STR = [[1400, 820], [1100, 700], [1280, 720], [1600, 950]];
+    for (var si = 0; si < STR.length; si++) {
+        ramme.style.width = STR[si][0] + "px"; ramme.style.height = STR[si][1] + "px";
+        await vent(250);
+        sim.tilpas(); sim.layout();
+        var hoejst = 0, hvor = "", knapFejl = [];
+        for (var ti = 0; ti < 10; ti++) {
+            sim.springTil(ti);
+            if (sim.fase === "gaet") svar(1);
+            faerdig();
+            /* Den grønne knap ved hver del: inde i scenen og under kortet */
+            var n = 0;
+            while (sim.fase === "forsoeg" && n < 8) {
+                sim.opdater(1 / 60);
+                var b = W.document.getElementById("handling");
+                if (!b.hidden) {
+                    var rb = b.getBoundingClientRect(), rk = W.document.getElementById("skort").getBoundingClientRect(), rs = sim.L.canvas.getBoundingClientRect();
+                    if (rb.top < rk.bottom - 1 || rb.left < rs.left || rb.right > rs.right + 1 || rb.bottom > rs.bottom + 1) knapFejl.push("trin " + (ti + 1) + " " + b.textContent);
+                }
+                W.document.getElementById("knap").click();
+                sim.kortBesked(D.BESKED.ikkeVejet, 3);
+                sim.opdater(1 / 60);
+                var h = W.document.getElementById("skort").getBoundingClientRect().height;
+                if (h > hoejst) { hoejst = h; hvor = "trin " + (ti + 1); }
+                var d = sim.delNu();
+                if (d === "smp-start" || d === "smp-slut") break;
+                if (d) { sim.goer(d); sim.tjekTrin(); }
+                n++;
+            }
+            if (sim.fase === "spm") {
+                svar(sim.spm.rigtig === 0 ? 1 : 0);
+                var h2 = W.document.getElementById("skort").getBoundingClientRect().height;
+                if (h2 > hoejst) { hoejst = h2; hvor = "trin " + (ti + 1) + " spørgsmål"; }
+            }
+        }
+        paastand(STR[si][0] + " × " + STR[si][1] + ": kortet holder sig inden for " + sim.kortZone() + " px", hoejst <= sim.kortZone() + 1, Math.round(hoejst) + " px ved " + hvor);
+        paastand(STR[si][0] + " × " + STR[si][1] + ": den grønne knap er i scenen og under kortet", knapFejl.length === 0, knapFejl.join(", "));
+    }
+    ramme.style.width = "1400px"; ramme.style.height = "820px";
+
+    /* ===================================================================
+       7. Sprites
+       =================================================================== */
+    overskrift("7. Sprites");
+    paastand("alle sprites er indlæst", NK.Sprites.alleKlar());
+}
+</script>
+</body>
+</html>

@@ -890,3 +890,119 @@ select:focus-visible {
 .spalte li.tom { color: var(--tekst-mat); font-weight: 400; background: transparent; padding-left: 0; }
 
 .knap:disabled.banker { animation: none; }
+
+/* ---------------------------------------------------------------------
+   TEORIKORTET: foerste trin paa fane 1 (js/sim_forsoeg.js). Et hvidt
+   ark paa vaeggen som kortet med formlen; js saetter plads og bredde.
+   Klassen "to" stiller vand og heptan side om side.
+   --------------------------------------------------------------------- */
+.teorikort {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px 20px 18px;
+    background-color: #fbfbf7;
+    color: #1d2129;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.35);
+    overflow-y: auto;
+}
+
+/* De to naale foroven, som paa kortet med formlen */
+.teorikort::before,
+.teorikort::after {
+    content: "";
+    position: absolute;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #c0392b;
+}
+
+.teorikort::before { left: 7px; }
+.teorikort::after { right: 7px; }
+
+.tk-stoffer { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.teorikort.to .tk-stoffer { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 18px; }
+
+.tk-stof h3 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 4px;
+    font-size: 1.12rem;
+    font-weight: 700;
+}
+
+.tk-mol { display: block; width: 100%; height: 100px; }
+
+.tk-stof p {
+    margin: 4px 0 0;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: #39404a;
+}
+
+.praedikat {
+    display: inline-block;
+    padding: 1px 9px 2px;
+    border-radius: 999px;
+    border: 1.5px solid;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.praedikat.polaer { background-color: #cfe6f8; border-color: #3d9ee0; color: #154f78; }
+.praedikat.upolaer { background-color: #f6e7b8; border-color: #d6a332; color: #6b4f10; }
+
+.tk-regel {
+    margin: 0;
+    padding: 9px 12px;
+    border-left: 4px solid var(--gul);
+    background-color: #f1f2ec;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.94rem;
+    line-height: 1.4;
+    color: #2b3038;
+}
+
+.tk-regel b { color: #1d2129; }
+
+/* Knappen bliver forneden, ogsaa hvis kortet paa en lille skaerm ruller */
+.tk-videre {
+    position: sticky;
+    bottom: 0;
+    align-self: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+/* Lidt mindre skrift, naar kortet ellers ikke kan vaere der */
+.teorikort.lille { padding: 18px 14px 12px; gap: 9px; }
+.teorikort.lille .tk-stoffer { gap: 10px; }
+.teorikort.lille .tk-stof h3 { font-size: 1rem; }
+.teorikort.lille .tk-stof p { font-size: 0.84rem; line-height: 1.35; }
+.teorikort.lille .tk-regel { font-size: 0.86rem; padding: 7px 10px; }
+.teorikort.lille .tk-videre { padding: 8px 18px; font-size: 0.92rem; }
+
+/* Sidste udvej paa en meget lille scene: uden de to smaa forklaringer */
+.teorikort.kompakt .tk-stof p { display: none; }
+
+/* Skemaet er daempet, mens teorikortet staar. Et klik paa et stof virker
+   stadig (det er ogsaa "videre"). */
+.kort.maaling.daempet .skema { opacity: 0.45; transition: opacity 0.3s ease; }
+.kort.maaling .skema { transition: opacity 0.3s ease; }
+
+/* Polaert eller upolaert under navnet, naar stoffet er testet i begge glas */
+.skema-pol { font-weight: 700; }
+.skema-pol:not(:empty)::before { content: " · "; color: var(--tekst-mat); font-weight: 400; }
+.skema-pol.polaer { color: #6cb8ea; }
+.skema-pol.upolaer { color: #e3b754; }

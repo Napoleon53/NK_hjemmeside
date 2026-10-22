@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170">
+  <!-- UV-lampe paa to ben. Benene staar paa bordet ved y 170. Lysstriben
+       paa undersiden er x 18-162, y 36-42; animationen tegner det lilla
+       lys under lampen. En TLC-plade under lampen staar med bunden paa
+       bordet ved x 90. -->
+  <defs>
+    <linearGradient id="hus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b525c"/>
+      <stop offset="1" stop-color="#262b33"/>
+    </linearGradient>
+    <linearGradient id="ben" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6a7480"/>
+      <stop offset="0.45" stop-color="#cfd6de"/>
+      <stop offset="1" stop-color="#5d6672"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="90" cy="169" rx="88" ry="2.5" fill="#000000" fill-opacity="0.35"/>
+  <rect x="8" y="34" width="8" height="134" rx="2" fill="url(#ben)" stroke="#3a414c" stroke-width="0.8"/>
+  <rect x="164" y="34" width="8" height="134" rx="2" fill="url(#ben)" stroke="#3a414c" stroke-width="0.8"/>
+  <rect x="2" y="164" width="20" height="6" rx="2" fill="#2a2e35"/>
+  <rect x="158" y="164" width="20" height="6" rx="2" fill="#2a2e35"/>
+  <rect x="0" y="0" width="180" height="40" rx="8" fill="url(#hus)" stroke="#1a1d22" stroke-width="1.2"/>
+  <rect x="18" y="36" width="144" height="6" rx="2" fill="#3a2f5a" stroke="#1a1d22" stroke-width="0.8"/>
+  <rect x="4" y="3" width="172" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.2"/>
+  <text x="90" y="25" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" fill="#c9b8ff">UV-lampe · 254 nm</text>
+</svg>

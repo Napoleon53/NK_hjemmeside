@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sb4.9 Syntese af Salenvir</title>
+<style>
+    body { background: #1b1d24; color: #dde3ea; font-family: "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    h1 { font-size: 1rem; margin: 0 0 14px; color: #f2c53d; }
+    h2 { font-size: 0.85rem; margin: 22px 0 10px; color: #a9b0ba; text-transform: uppercase; letter-spacing: 0.08em; }
+    .ark { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+    figure { margin: 0; padding: 12px; background: #262833; border: 1px solid #3a3a47; border-radius: 8px; text-align: center; }
+    figure img { display: block; margin: 0 auto 8px; }
+    figcaption { font-size: 0.8rem; color: #a9b0ba; }
+    .samlet { position: relative; background: #14141a; border: 1px solid #3a3a47; border-radius: 8px; }
+    .samlet img { position: absolute; }
+</style>
+</head>
+<body>
+<!-- Udviklerværktøj: viser sprites alene, før de sættes i bevægelse. Indgår ikke i animationen. -->
+<h1>sb4.9: sprites i forstørret udgave</h1>
+<div class="ark">
+    <figure><img src="sprites/stativ.svg" width="220"><figcaption>stativ.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/kolbe.svg" width="150"><figcaption>kolbe.svg (som sc6.3)</figcaption></figure>
+    <figure><img src="sprites/varmeplade.svg" width="240"><figcaption>varmeplade.svg (som sc2.1)</figcaption></figure>
+    <figure><img src="sprites/termometer.svg" width="60"><figcaption>termometer.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/bold.svg" width="88"><figcaption>bold.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/flaske_brun.svg" width="80"><figcaption>flaske_brun.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/flaske_klar.svg" width="100"><figcaption>flaske_klar.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/maaleglas100.svg" width="60"><figcaption>maaleglas100.svg (som sb1.4)</figcaption></figure>
+    <figure><img src="sprites/vial.svg" width="40"><figcaption>vial.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/baegerglas.svg" width="100"><figcaption>baegerglas.svg (som sc7.5)</figcaption></figure>
+    <figure><img src="sprites/uvlampe.svg" width="180"><figcaption>uvlampe.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/isbad_bag.svg" width="210"><img src="sprites/isbad_for.svg" width="210"><figcaption>isbad_bag.svg og isbad_for.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/sugekolbe.svg" width="150"><figcaption>sugekolbe.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/buechner.svg" width="130"><figcaption>buechner.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/vakuumhane.svg" width="100"><figcaption>vakuumhane.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/sproejteflaske.svg" width="110"><figcaption>sproejteflaske.svg (som sc6.1)</figcaption></figure>
+    <figure><img src="sprites/urglas.svg" width="220"><figcaption>urglas.svg (som sc8.5)</figcaption></figure>
+    <figure><img src="sprites/spatel.svg" width="160"><figcaption>spatel.svg (som sc6.1)</figcaption></figure>
+    <figure><img src="sprites/vaegt.svg" width="240"><figcaption>vaegt.svg (som sc5.8)</figcaption></figure>
+    <figure><img src="sprites/varmelampe.svg" width="190"><figcaption>varmelampe.svg (ny)</figcaption></figure>
+    <figure><img src="sprites/smeltepunkt.svg" width="240"><figcaption>smeltepunkt.svg (ny)</figcaption></figure>
+</div>
+<h2>Sat sammen</h2>
+<div class="ark">
+    <!-- Opstillingen: kolben (0,9) paa omroereren, stativet bagefter -->
+    <div class="samlet" style="width:360px;height:440px">
+        <img src="sprites/varmeplade.svg" style="left:100px;top:366px;width:240px">
+        <img src="sprites/kolbe.svg" style="left:152.5px;top:186px;width:135px">
+        <img src="sprites/stativ.svg" style="left:42px;top:10px;width:220px">
+    </div>
+    <!-- Kolben i isbadet -->
+    <div class="samlet" style="width:240px;height:260px">
+        <img src="sprites/isbad_bag.svg" style="left:15px;top:160px;width:210px">
+        <img src="sprites/kolbe.svg" style="left:52.5px;top:66px;width:135px">
+        <img src="sprites/isbad_for.svg" style="left:15px;top:160px;width:210px">
+    </div>
+    <!-- Sugefiltreringen -->
+    <div class="samlet" style="width:300px;height:330px">
+        <img src="sprites/buechner.svg" style="left:62px;top:41px;width:130px">
+        <img src="sprites/sugekolbe.svg" style="left:59.5px;top:140px;width:135px">
+    </div>
+</div>
+</body>
+</html>
