@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="250" viewBox="0 0 60 250">
+  <!-- Digitalt stiktermometer. Hovedet med displayet er x 4-56, y 0-62;
+       animationen skriver temperaturen OVENPAA i displayet x 9-51, y 9-33.
+       Foeleren er en staalstang x 27-33, og spidsen er (30, 249). -->
+  <defs>
+    <linearGradient id="hoved" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2d6f9e"/>
+      <stop offset="0.5" stop-color="#3d8fc8"/>
+      <stop offset="1" stop-color="#245a80"/>
+    </linearGradient>
+    <linearGradient id="staal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7b8591"/>
+      <stop offset="0.45" stop-color="#eef2f6"/>
+      <stop offset="1" stop-color="#6a7480"/>
+    </linearGradient>
+  </defs>
+  <path d="M27 62 L27 240 L30 249 L33 240 L33 62 Z" fill="url(#staal)" stroke="#4d5660" stroke-width="0.7"/>
+  <rect x="22" y="58" width="16" height="10" rx="3" fill="#1f4a6b" stroke="#163650" stroke-width="0.8"/>
+  <rect x="4" y="0" width="52" height="62" rx="9" fill="url(#hoved)" stroke="#173d5a" stroke-width="1.2"/>
+  <rect x="9" y="9" width="42" height="24" rx="3" fill="#10161a" stroke="#050708" stroke-width="1"/>
+  <circle cx="30" cy="47" r="7" fill="#e6edf3" stroke="#173d5a" stroke-width="1"/>
+  <rect x="7" y="3" width="46" height="2.5" rx="1.2" fill="#ffffff" fill-opacity="0.3"/>
+</svg>

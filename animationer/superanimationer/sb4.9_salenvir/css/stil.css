@@ -1,0 +1,755 @@
+/* =====================================================================
+   sb4.9 - Syntese af Salenvir
+   Stilark. Grundlaget er sc7.5 (toplinjen, panelet, scenekortet, den
+   gule hjaelpeknap, rundvisningen). Nyt nederst: uret med knappen, der
+   spoler frem, prikkerne for trinnets dele, feltet til udbyttet og
+   maalingerne i panelet.
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
+   dansk komma. Dansk komma bruges kun i tekst, som brugeren laeser.
+   ===================================================================== */
+:root {
+    --bund:        #1b1b21;
+    --scene-bund:  #14141a;
+    --panel:       #2b2b36;
+    --panel-2:     #333340;
+    --panel-3:     #3d3d4b;
+    --linje:       #464655;
+    --tekst:       #f2f3f5;
+    --tekst-svag:  #a9b0ba;
+    --tekst-mat:   #7e8590;
+
+    --blaa:        #3d9ee0;
+    --blaa-mork:   #2a76ac;
+    --orange:      #e6892a;
+    --groen:       #3fae72;
+    --groen-mork:  #2b7d51;
+    --roed:        #e05446;
+    --gul:         #f2c53d;
+    --lilla:       #9b6bd6;
+
+    --radius:      10px;
+    --radius-lil:  6px;
+    --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
+    --panel-bredde: 300px;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bund);
+    color: var(--tekst);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+   TOPLINJE
+   --------------------------------------------------------------------- */
+.top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    background-color: #15151b;
+    border-bottom: 1px solid #33333f;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    flex-shrink: 0;
+}
+
+.samling-fuld .top { padding-left: 56px; }
+
+.top h1 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.top h1 .ikon { font-size: 1.1rem; margin-right: 3px; color: var(--gul); }
+
+.topfyld { flex: 1; }
+
+.ikonknap {
+    background: transparent;
+    border: 1px solid #4a4a58;
+    color: var(--tekst-svag);
+    border-radius: 4px;
+    width: 30px;
+    height: 28px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.ikonknap.tekstknap { width: auto; padding: 0 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; }
+
+/* ---------------------------------------------------------------------
+   HOVEDLAYOUT
+   --------------------------------------------------------------------- */
+main { flex: 1; position: relative; min-height: 0; }
+
+.fane {
+    position: absolute;
+    inset: 0;
+    display: none;
+    grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
+}
+
+.fane.aktiv { display: grid; }
+
+.scene {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    background-color: var(--scene-bund);
+    overflow: hidden;
+}
+
+.scene > canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+.anker { position: absolute; pointer-events: none; }
+
+/* ---------------------------------------------------------------------
+   HOEJRE SPALTE
+   --------------------------------------------------------------------- */
+.panel {
+    background-color: var(--panel);
+    border-left: 1px solid #1f1f27;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d5c var(--panel);
+}
+
+.panel::-webkit-scrollbar { width: 9px; }
+.panel::-webkit-scrollbar-track { background: var(--panel); }
+.panel::-webkit-scrollbar-thumb { background: #4d4d5c; border-radius: 5px; }
+
+.kort {
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 11px;
+}
+
+.kort > h2 {
+    margin: 0 0 8px 0;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+}
+
+.kort.maaling { border-left: 3px solid var(--groen); }
+
+/* Listen over trinnene */
+.opg-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.opg-chips.lodret { flex-direction: column; }
+
+.opg-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.opg-chip:hover { background-color: var(--panel-3); border-color: #5e5e70; }
+.opg-chip.loest { background-color: rgba(63, 174, 114, 0.18); border-color: rgba(63, 174, 114, 0.7); }
+.opg-chip.valgt { border-color: var(--blaa); background-color: rgba(61, 158, 224, 0.2); }
+.oc-f { display: inline-flex; align-items: center; gap: 8px; }
+.oc-m { font-style: normal; font-size: 0.78rem; color: #7ee0a8; margin-left: auto; }
+.oc-m:empty { display: none; }
+
+.oc-nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    color: var(--tekst-svag);
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.opg-chip.valgt .oc-nr { background-color: var(--blaa); color: #ffffff; }
+
+/* ---------------------------------------------------------------------
+   KNAPPER
+   --------------------------------------------------------------------- */
+.knapper { display: flex; flex-direction: column; gap: 7px; }
+
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.knap:active:not(:disabled) { transform: scale(0.985); }
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+
+.knap.nulstil {
+    background-color: transparent;
+    border-color: #5b3b39;
+    color: #e08b81;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+.knap.nulstil:hover:not(:disabled) { background-color: rgba(224, 84, 70, 0.16); border-color: var(--roed); }
+
+/* Gul, saa den ses, uden at man leder: Giv et hint er fyldt, Vis svaret kun et omrids */
+.knap.hjaelp { border: 2px solid #c79a12; background-color: #ffdf6b; color: #33290a; }
+.knap.hjaelp:hover:not(:disabled) { background-color: #ffd23e; border-color: #a67f08; }
+.knap.hjaelp.svar { border-color: rgba(242, 197, 61, 0.7); background-color: rgba(242, 197, 61, 0.12); color: #f7e4ab; }
+.knap.hjaelp.svar:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); color: #fff6d8; }
+
+@keyframes knap-peg {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+    50% { box-shadow: 0 0 0 6px rgba(242, 197, 61, 0.32); }
+}
+
+.knap.hjaelp.peg { animation: knap-peg 1.9s ease-in-out infinite; }
+
+@keyframes bank-groen {
+    0%   { box-shadow: 0 0 0 0 rgba(95, 207, 146, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(95, 207, 146, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(95, 207, 146, 0); }
+}
+
+@keyframes bank-gul {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
+    70%  { box-shadow: 0 0 0 11px rgba(242, 197, 61, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
+
+/* Maerket forrest i linjen: Hint, Ikke endnu */
+.b-maerke {
+    display: inline-block;
+    margin-right: 7px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #dfe4ea;
+    vertical-align: 1px;
+}
+
+@keyframes st-ryst {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(2px); }
+}
+
+@keyframes ryst {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+}
+
+/* ---------------------------------------------------------------------
+   OVERLAYS: teorien
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 8, 12, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 640px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 22px 24px;
+}
+
+.overlay-boks h2 { margin: 0 0 12px 0; font-size: 1.15rem; color: var(--blaa); }
+.overlay-boks p { margin: 0 0 10px; font-size: 0.95rem; line-height: 1.55; color: #dde3ea; }
+
+.overlay-boks h3.teori-hoved {
+    margin: 16px 0 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gul);
+}
+
+kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px solid #5e5e70;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background-color: var(--panel-2);
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--tekst);
+}
+
+.overlay-boks p.genveje { font-size: 0.85rem; color: var(--tekst-svag); margin-top: 12px; }
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som i sc7.5)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning-baggrund { position: fixed; inset: 0; background: transparent; cursor: pointer; }
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.rundvisning-tal { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; color: var(--tekst-mat); }
+.rundvisning-luk { background: transparent; border: none; color: var(--tekst-svag); font-size: 0.9rem; line-height: 1; cursor: pointer; padding: 2px 4px; }
+.rundvisning-luk:hover { color: var(--tekst); }
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.87rem; line-height: 1.5; color: #c8ced6; }
+.rundvisning-knapper { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
+
+/* ---------------------------------------------------------------------
+   SCENEKORTET (som sc7.5). Hoejden uden for gaettet maa ikke overstige
+   kortZone() i js/sim.js (184 px, 156 px paa lave skaerme); selvtesten
+   maaler det.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 3;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(860px, calc(100% - 24px));
+    padding: 9px 14px 10px;
+    border: 2px solid #4a4f5e;
+    border-radius: 12px;
+    background-color: #1d1e26;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.scenekort.spm { border: 3px solid var(--gul); background-color: #25211a; padding: 8px 13px 9px; }
+.scenekort.loest { border-color: var(--groen); background-color: #17241e; }
+
+.sk-tekst { margin: 0; font-size: 1.1rem; line-height: 1.34; font-weight: 700; color: #ffffff; }
+.scenekort.loest .sk-tekst { font-weight: 600; }
+
+.sk-chip {
+    display: inline-block;
+    margin-right: 9px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background-color: #3d4150;
+    color: #dfe4ea;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    vertical-align: 2px;
+    white-space: nowrap;
+}
+
+.scenekort.spm .sk-chip { background-color: var(--gul); color: #33290a; }
+.scenekort.loest .sk-chip { background-color: var(--groen); color: #ffffff; }
+
+/* Prikkerne for trinnets dele */
+.sk-prikker { display: inline-flex; gap: 4px; margin-left: 9px; vertical-align: 1px; }
+.sk-prikker i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.22); }
+.sk-prikker i.gjort { background-color: #7ee0a8; }
+.sk-prikker i.nu { background-color: var(--gul); box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.35); }
+
+.sk-slut { display: flex; align-items: center; gap: 14px; }
+.sk-slut .sk-tekst { flex: 1; font-size: 1.02rem; line-height: 1.33; font-weight: 600; color: #e9f7ef; }
+
+.sk-videre {
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    border: 1px solid #5fcf92;
+    border-radius: 10px;
+    background-color: var(--groen-mork);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    animation: bank-groen 1.7s ease-out infinite;
+}
+
+.sk-videre:hover { background-color: var(--groen); }
+.sk-videre:active { transform: scale(0.97); }
+
+.scenekort.loest.svar { border-color: var(--gul); background-color: #23201a; }
+.scenekort.loest.svar .sk-chip { background-color: var(--gul); color: #33290a; }
+.scenekort.loest.svar .sk-tekst { color: #f7ecd0; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 620px; margin-left: auto; margin-right: auto; }
+
+.v-bogstav {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: var(--tekst-svag);
+}
+
+.sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border: 2px solid rgba(242, 197, 61, 0.75);
+    border-radius: 9px;
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.sk-knap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.3); border-color: #ffdf6b; }
+.sk-knap .v-bogstav { background-color: var(--gul); color: #33290a; }
+.sk-knap:disabled { cursor: default; }
+.sk-knap.forkert { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.16); opacity: 0.6; }
+.sk-knap.forkert .v-bogstav { background-color: var(--roed); color: #ffffff; }
+
+/* Feltet til udbyttet (trin 9) */
+.sk-felt { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 9px; font-size: 1.15rem; font-weight: 700; }
+.sk-felt input {
+    width: 110px;
+    padding: 6px 10px;
+    border: 2px solid var(--gul);
+    border-radius: 8px;
+    background-color: #14141a;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: right;
+}
+.sk-felt input:focus { outline: none; box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.35); }
+.sk-felt input.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
+.sk-felt .enhed { color: #dfe4ea; }
+
+.sk-tjek {
+    padding: 8px 18px;
+    border: 1px solid var(--blaa);
+    border-radius: 8px;
+    background-color: var(--blaa-mork);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.98rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.sk-tjek:hover { background-color: var(--blaa); }
+
+/* Kortets nederste raekke: hint, fejl, beskeder og hjaelpeknappen */
+.sk-bund {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.sk-bund.tom { margin-top: 6px; padding-top: 0; border-top: 0; }
+.sk-bund .st-tekst { flex: 1; margin: 0; font-size: 0.98rem; line-height: 1.38; color: #cfd6de; }
+.st-tekst:empty::before { content: "\00a0"; }
+
+.sk-bund .knap {
+    flex: 0 0 auto;
+    margin-left: auto;
+    justify-content: center;
+    min-width: 150px;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.sk-bund.skidt { border-top-color: var(--roed); }
+.sk-bund.skidt .st-tekst { color: #ffb3aa; }
+.sk-bund.skidt .b-maerke { background-color: rgba(224, 84, 70, 0.3); color: #ffd7d2; }
+.sk-bund.hint,
+.sk-bund.gul { border-top-color: rgba(242, 197, 61, 0.7); }
+.sk-bund.hint .st-tekst,
+.sk-bund.gul .st-tekst { color: #f7e4ab; }
+.sk-bund.hint .b-maerke { background-color: rgba(242, 197, 61, 0.3); color: #fff2cc; }
+.sk-bund.info .st-tekst { color: #cfe6fa; }
+.sk-bund.ryster { animation: st-ryst 0.4s ease-in-out 1; }
+
+/* Gaettet: stoerre, og det eneste fyldte gule paa skaermen */
+.scenekort.gaet {
+    top: 16px;
+    width: min(680px, calc(100% - 36px));
+    padding: 14px 18px 16px;
+    border: 3px solid var(--gul);
+    border-radius: 14px;
+    background-color: #25211a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+    animation: gk-puls 2.2s ease-in-out infinite;
+}
+
+.scenekort.gaet .sk-bund { margin-top: 10px; padding-top: 0; border-top: 0; }
+
+.gk-maerke {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background-color: var(--gul);
+    color: #33290a;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.gk-intro { margin: 10px 0 0; font-size: 1rem; line-height: 1.4; color: #d9d2bf; }
+.gk-tekst { margin: 6px 0 12px; font-size: 1.4rem; line-height: 1.25; font-weight: 700; color: #ffffff; }
+.gk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+
+.gk-knap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 10px 12px;
+    border: 2px solid rgba(242, 197, 61, 0.75);
+    border-radius: 10px;
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.gk-knap:hover { background-color: rgba(242, 197, 61, 0.3); border-color: #ffdf6b; }
+.gk-knap .v-bogstav { background-color: var(--gul); color: #33290a; }
+
+@keyframes gk-puls {
+    0%, 100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 0 rgba(242, 197, 61, 0); }
+    50%      { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 9px rgba(242, 197, 61, 0.24); }
+}
+
+@keyframes gk-blink {
+    0%, 33%, 66%  { background-color: #6b5510; box-shadow: 0 0 0 16px rgba(242, 197, 61, 0.5); }
+    16%, 50%, 100% { background-color: #25211a; box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
+
+.scenekort.gaet.blink { animation: gk-blink 1s ease-in-out 1, gk-puls 2.2s ease-in-out 1s infinite; }
+
+@keyframes sk-blink {
+    0%, 33%, 66%  { box-shadow: 0 0 0 12px rgba(242, 197, 61, 0.5); }
+    16%, 50%, 100% { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); }
+}
+
+@keyframes sk-blink-knap {
+    0%, 33%, 66%  { box-shadow: 0 0 0 10px rgba(126, 224, 168, 0.75); background-color: var(--groen); }
+    16%, 50%, 100% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); background-color: var(--groen-mork); }
+}
+
+.scenekort.opgave.blink,
+.scenekort.spm.blink { animation: sk-blink 1s ease-in-out 1; }
+.scenekort.loest.blink .sk-videre { animation: sk-blink-knap 1s ease-in-out 1, bank-groen 1.7s ease-out 1s infinite; }
+
+/* ---------------------------------------------------------------------
+   URET: laboratoriets tid og knappen, der spoler frem. Staar oeverst til
+   venstre i scenen lige under kortet (top saettes af js/sim.js).
+   --------------------------------------------------------------------- */
+.ur {
+    position: absolute;
+    z-index: 2;
+    left: 12px;
+    top: 190px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 8px 6px 12px;
+    border: 1px solid #3a3a47;
+    border-radius: 10px;
+    background-color: rgba(29, 30, 38, 0.92);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.ur-navn { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tekst-mat); }
+.ur-tid { min-width: 3.2em; font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #9ff0c0; }
+
+.spolknap {
+    padding: 6px 12px;
+    border: 1px solid var(--blaa);
+    border-radius: 8px;
+    background-color: var(--blaa-mork);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.spolknap:hover { background-color: var(--blaa); }
+.spolknap:active { transform: scale(0.97); }
+.spolknap.banker { border-color: #ffdf6b; animation: bank-gul 1.5s ease-out infinite; }
+
+/* ---------------------------------------------------------------------
+   PANELET: maalingerne
+   --------------------------------------------------------------------- */
+.m-raekke {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 0.9rem;
+}
+
+.m-raekke:last-child { border-bottom: 0; }
+.m-navn { color: var(--tekst-svag); }
+.m-tal { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.m-tal em { display: block; font-style: normal; font-weight: 400; font-size: 0.76rem; color: var(--tekst-mat); }
+.m-tom { margin: 0; font-size: 0.86rem; color: var(--tekst-mat); }
+
+.m-plader { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.m-plade { margin: 0; text-align: center; }
+.m-plade svg { display: block; border-radius: 2px; }
+.m-plade figcaption { font-size: 0.74rem; color: var(--tekst-svag); margin-top: 2px; }
+
+/* ---------------------------------------------------------------------
+   TILGAENGELIGHED OG SMALLE OG LAVE SKAERME
+   --------------------------------------------------------------------- */
+button:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
+
+@media (max-width: 1320px) {
+    :root { --panel-bredde: 270px; }
+}
+
+@media (max-height: 720px) {
+    .scenekort { top: 8px; padding: 7px 12px 8px; }
+    .scenekort.spm { padding: 6px 11px 7px; }
+    .sk-tekst { font-size: 1rem; line-height: 1.3; }
+    .sk-chip { font-size: 0.72rem; padding: 2px 9px; }
+    .sk-slut { gap: 10px; }
+    .sk-slut .sk-tekst { font-size: 0.95rem; line-height: 1.3; }
+    .sk-videre { padding: 9px 14px; font-size: 0.95rem; }
+    .sk-svar { gap: 6px; margin-top: 6px; }
+    .sk-knap { padding: 5px 9px; font-size: 0.9rem; line-height: 1.2; }
+    .sk-bund { margin-top: 6px; padding-top: 5px; gap: 10px; }
+    .sk-bund .st-tekst { font-size: 0.9rem; line-height: 1.3; }
+    .sk-bund .knap { min-width: 130px; padding: 6px 13px; font-size: 0.9rem; }
+    .sk-felt { margin-top: 6px; }
+    .scenekort.gaet { top: 10px; padding: 10px 14px 12px; }
+    .gk-maerke { font-size: 0.82rem; padding: 3px 12px; }
+    .gk-intro { margin-top: 7px; font-size: 0.93rem; line-height: 1.32; }
+    .gk-tekst { margin: 4px 0 9px; font-size: 1.2rem; }
+    .gk-knap { padding: 8px 8px 9px; gap: 5px; font-size: 0.93rem; line-height: 1.25; }
+    .ur { padding: 4px 6px 4px 10px; }
+    .opg-chip { padding: 4px 9px; font-size: 0.86rem; }
+}
+
+@media (max-width: 860px) {
+    body { overflow: auto; }
+    main { overflow: visible; }
+    .fane { position: static; grid-template-columns: minmax(0, 1fr); }
+    .scene { height: 70vh; min-height: 480px; }
+    .panel { border-left: none; border-top: 1px solid #1f1f27; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

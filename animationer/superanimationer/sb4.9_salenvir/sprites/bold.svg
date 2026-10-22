@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="62" viewBox="0 0 44 62">
+  <!-- Pipettebold (peleusbold) i roedt gummi. Pipetten sidder i studsen
+       forneden, og pipettens top er (22, 62). Ventilerne A, S og E. -->
+  <defs>
+    <radialGradient id="gummi" cx="0.38" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#f06b5c"/>
+      <stop offset="0.6" stop-color="#c8392b"/>
+      <stop offset="1" stop-color="#8e2219"/>
+    </radialGradient>
+  </defs>
+  <rect x="17" y="40" width="10" height="22" rx="2.5" fill="#b8352a" stroke="#6f1a12" stroke-width="0.9"/>
+  <path d="M27 48 L38 50 Q41 51 41 54 L41 56 Q41 59 38 59 L27 57 Z" fill="#b8352a" stroke="#6f1a12" stroke-width="0.9"/>
+  <circle cx="22" cy="24" r="19" fill="url(#gummi)" stroke="#6f1a12" stroke-width="1.1"/>
+  <rect x="18.5" y="0.5" width="7" height="7" rx="2" fill="#b8352a" stroke="#6f1a12" stroke-width="0.9"/>
+  <ellipse cx="15" cy="16" rx="5" ry="3.5" fill="#ffffff" fill-opacity="0.35"/>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="6.5" font-weight="800" fill="#ffe2dc" text-anchor="middle">
+    <text x="22" y="14">A</text>
+    <text x="22" y="54">S</text>
+    <text x="35" y="56">E</text>
+  </g>
+</svg>

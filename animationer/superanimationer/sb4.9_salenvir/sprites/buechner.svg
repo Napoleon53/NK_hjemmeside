@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="132" viewBox="0 0 130 132">
+  <!-- Buechnertragt af porcelaen med gummimanchet. Indholdet (filtrerpapir,
+       vaeske og krystaller) tegnes af animationen OVENPAA i ellipsen
+       (65, 12) rx 53 ry 6,5. Manchetten sidder i sugekolbens aabning ved
+       y 104 (midte x 65); stilkens spids er (65, 131). -->
+  <defs>
+    <linearGradient id="porc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9c0c8"/>
+      <stop offset="0.35" stop-color="#ffffff"/>
+      <stop offset="0.7" stop-color="#e3e7ec"/>
+      <stop offset="1" stop-color="#a7afb8"/>
+    </linearGradient>
+    <linearGradient id="gummi" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2a2d33"/>
+      <stop offset="0.4" stop-color="#555b65"/>
+      <stop offset="1" stop-color="#23262b"/>
+    </linearGradient>
+  </defs>
+  <!-- Stilken -->
+  <path d="M59 82 L59 124 L71 131 L71 82 Z" fill="url(#porc)" stroke="#8d96a0" stroke-width="1"/>
+  <!-- Keglen under skaalen -->
+  <path d="M11 54 L59 86 L71 86 L119 54 Z" fill="url(#porc)" stroke="#8d96a0" stroke-width="1" stroke-linejoin="round"/>
+  <!-- Skaalen -->
+  <path d="M5 11 L11 54 Q65 64 119 54 L125 11 Z" fill="url(#porc)" stroke="#8d96a0" stroke-width="1.1" stroke-linejoin="round"/>
+  <!-- Aabningen set lidt oppefra -->
+  <ellipse cx="65" cy="11" rx="60" ry="9" fill="#cfd5dc" stroke="#8d96a0" stroke-width="1.1"/>
+  <ellipse cx="65" cy="12" rx="54" ry="7" fill="#b6bec7"/>
+  <!-- Gummimanchetten -->
+  <path d="M46 96 L84 96 L79 116 L51 116 Z" fill="url(#gummi)" stroke="#16181c" stroke-width="1"/>
+  <rect x="48" y="97" width="34" height="2" rx="1" fill="#ffffff" fill-opacity="0.18"/>
+  <rect x="15" y="20" width="5" height="30" rx="2.5" fill="#ffffff" fill-opacity="0.55"/>
+</svg>

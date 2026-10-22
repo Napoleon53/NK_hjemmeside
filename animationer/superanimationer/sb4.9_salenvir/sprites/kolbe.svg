@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="200" viewBox="0 0 150 200">
+  <!-- Konisk kolbe (Erlenmeyer). Vaesken og magnetloppen tegnes af
+       animationen BAG filen, klippet til indersiden: halsen x 60-90 fra
+       y 6 til y 62, bunden y 192 med indersiden x 15-135. Aabningen er
+       (75, 4). -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.36"/>
+      <stop offset="0.14" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="0.78" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Krop og hals -->
+  <path d="M56 6 L56 60 L10 180 Q6 197 24 197 L126 197 Q144 197 140 180 L94 60 L94 6 Z" fill="url(#glas)"/>
+  <path d="M56 6 L56 60 L10 180 Q6 197 24 197 L126 197 Q144 197 140 180 L94 60 L94 6"
+        fill="none" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M60 6 L60 62 L15 180 Q13 192 24 192 L126 192 Q137 192 135 180 L90 62 L90 6"
+        fill="none" stroke="#dcecf8" stroke-opacity="0.2" stroke-width="1"/>
+
+  <!-- Kant ved aabningen -->
+  <rect x="52" y="0" width="46" height="7" rx="2.5" fill="#dcecf8" fill-opacity="0.28" stroke="#e6f2fb" stroke-opacity="0.9" stroke-width="1.4"/>
+
+  <!-- Inddeling paa siden -->
+  <g stroke="#eef6fc" stroke-opacity="0.5" stroke-width="1.1" stroke-linecap="round">
+    <path d="M104 140 h10 M97 110 h8 M90 80 h7"/>
+  </g>
+
+  <!-- Genskin -->
+  <rect x="63" y="10" width="4" height="48" rx="2" fill="#ffffff" fill-opacity="0.22"/>
+  <path d="M53 86 L25 156" stroke="#ffffff" stroke-opacity="0.22" stroke-width="4" stroke-linecap="round"/>
+</svg>

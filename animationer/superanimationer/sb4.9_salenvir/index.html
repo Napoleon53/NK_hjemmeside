@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syntese af Salenvir</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Syntese af Salenvir</h1>
+    <div class="topfyld"></div>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+<section class="fane aktiv" id="fane-syntese" aria-label="Syntesen">
+    <div class="scene">
+        <canvas id="laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/trin.js) -->
+        <div class="scenekort" id="skort">
+            <div class="sk-ind" id="ind"></div>
+            <div class="sk-bund" id="status">
+                <p class="st-tekst" id="besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <!-- Laboratoriets ur og knappen, der spoler frem -->
+        <div class="ur" id="ur" hidden>
+            <span class="ur-navn">Tid</span>
+            <span class="ur-tid" id="urtid">0:00</span>
+            <button class="spolknap" id="spolknap" type="button" title="Lad tiden gå 2 minutter frem">⏩ 2 min</button>
+        </div>
+        <div class="anker" id="anker-opstilling"></div>
+        <div class="anker" id="anker-bord"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="trinkort">
+            <h2>Trinnene</h2>
+            <div class="opg-chips lodret" id="liste"></div>
+            <button class="knap nulstil" id="forfra" type="button">Start forfra</button>
+        </div>
+        <div class="kort maaling" id="maalkort">
+            <h2>Dit forsøg</h2>
+            <div id="maal"></div>
+        </div>
+    </aside>
+</section>
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Syntese af Salenvir</h2>
+        <p>Salenvir laves af salicylaldehyd og ethylendiamin, som reagerer i varm ethanol. Salenvir er et gult, fast stof.</p>
+        <h3 class="teori-hoved">Tyndtlagskromatografi (TLC)</h3>
+        <p>En TLC-plade er belagt med kiselgel. Løbevæsken suges op ad pladen og tager stofferne med sig. Hvert stof flytter sig sit eget stykke, afhængigt af hvor polært det er.</p>
+        <p>Ved P sættes en prøve fra kolben, ved R en reference af salicylaldehyd. Stofferne er farveløse, men ses som mørke pletter i UV-lys. Har prøven ingen plet i højde med referencen, er salicylaldehyden brugt op, og reaktionen er færdig.</p>
+        <h3 class="teori-hoved">Køling og sugefiltrering</h3>
+        <p>Jo koldere ethanolen er, jo mindre Salenvir kan den opløse. Når kolben køles, fælder Salenvir ud som krystaller. Ved sugefiltrering trækker et vakuum ethanolen gennem filtrerpapiret i Büchnertragten, så krystallerne bliver liggende.</p>
+        <h3 class="teori-hoved">Tørring og udbytte</h3>
+        <p>Krystallerne er våde af ethanol, til de har tørret under varmelampen. Det praktiske udbytte er massen af de tørre krystaller: massen af urglasset med krystaller minus massen af det tomme urglas. Ændrer massen sig ikke mellem to vejninger, er krystallerne tørre.</p>
+        <h3 class="teori-hoved">Smeltepunkt og renhed</h3>
+        <p>Et rent stof smelter ved et bestemt smeltepunkt og over højst et par grader. Salenvir smelter ved 127-128 °C. Urenheder og ethanol, der ikke er tørret væk, sænker smeltepunktet og gør intervallet bredere.</p>
+        <p class="genveje"><kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen                                -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/trin.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
