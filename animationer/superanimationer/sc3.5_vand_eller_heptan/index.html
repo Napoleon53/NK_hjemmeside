@@ -27,35 +27,25 @@
 <!-- Raekkerne i skemaet bygges af sim_forsoeg.js                       -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-forsoeg" role="tabpanel" aria-label="Forsøget">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="forsoeg-laerred"></canvas>
         <div class="anker" id="forsoeg-anker-glas"></div>
         <div class="anker" id="forsoeg-anker-proeve"></div>
         <div class="anker" id="forsoeg-anker-kort"></div>
-        <!-- Teorikortet: foerste trin paa fane 1. Teksterne staar i D.TEORI
-             (js/data.js), formlerne tegnes i laerrederne (js/sim_forsoeg.js) -->
-        <div class="teorikort" id="forsoeg-teori" hidden>
-            <div class="tk-stoffer">
-                <div class="tk-stof">
-                    <h3>Vand <span class="praedikat polaer">polært</span></h3>
-                    <canvas class="tk-mol" data-stof="vand" aria-label="Strukturformel for vand med δ− ved O og δ+ ved hvert H"></canvas>
-                    <p data-tekst="vand"></p>
-                </div>
-                <div class="tk-stof">
-                    <h3>Heptan <span class="praedikat upolaer">upolært</span></h3>
-                    <canvas class="tk-mol" data-stof="heptan" aria-label="Strukturformel for heptan"></canvas>
-                    <p data-tekst="heptan"></p>
-                </div>
+        <!-- Spoergsmaalet og svarene: paa kortet med formlen (js/tekstboks.js) -->
+        <div class="tekstboks" id="forsoeg-tb">
+            <p class="tb-tekst" id="forsoeg-tb-tekst"></p>
+            <div class="tb-rad">
+                <div class="tb-svar" id="forsoeg-tb-svar"></div>
+                <button class="tb-knap skjult" id="forsoeg-tb-knap" type="button"></button>
             </div>
-            <p class="tk-regel"><b data-tekst="regel"></b> <span data-tekst="regel2"></span></p>
-            <button class="knap blaa banker tk-videre" id="forsoeg-teori-videre" type="button"><span data-tekst="knap"></span><span class="tegn">→</span></button>
+            <p class="tb-linje" id="forsoeg-tb-linje" aria-live="polite"></p>
         </div>
         <div class="tilbud" id="forsoeg-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
         <button class="spring-over" id="forsoeg-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="forsoeg-status"></div>
     </div>
 
     <aside class="panel">
@@ -74,43 +64,40 @@
 <!-- FANE 2: GAET POLARITET                                             -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-gaet" role="tabpanel" aria-label="Gæt polaritet">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="gaet-laerred"></canvas>
         <div class="anker" id="gaet-anker-glas"></div>
         <div class="anker" id="gaet-anker-proeve"></div>
         <div class="anker" id="gaet-anker-kort"></div>
+        <!-- Spoergsmaalet og svarene: paa kortet med formlen (js/tekstboks.js) -->
+        <div class="tekstboks" id="gaet-tb">
+            <p class="tb-tekst" id="gaet-tb-tekst"></p>
+            <div class="tb-rad">
+                <div class="tb-svar" id="gaet-tb-svar"></div>
+                <button class="tb-knap skjult" id="gaet-tb-knap" type="button"></button>
+            </div>
+            <p class="tb-linje" id="gaet-tb-linje" aria-live="polite"></p>
+        </div>
         <div class="tilbud" id="gaet-tilbud" hidden>
             <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
             <button class="tilbud-nej" type="button">Nej tak</button>
         </div>
         <button class="spring-over" id="gaet-spring" type="button" hidden>Spring præsentationen over <span>✕</span></button>
-        <div class="scene-mrk" id="gaet-status"></div>
     </div>
 
     <aside class="panel">
-        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste stof -->
-        <div class="kort opgavekort" id="gaet-kort">
-            <h2><span>Gæt polaritet</span><span class="taeller">stof <b id="gaet-nr">1</b>/<span id="gaet-antal">10</span></span></h2>
-            <p class="opgave-spm">Blandes stoffet med vand eller heptan?</p>
-            <div class="valgrad to" id="gaet-valg">
-                <button class="valgknap vand" type="button" data-svar="vand"><span class="pil">←</span>Vand</button>
-                <button class="valgknap heptan" type="button" data-svar="heptan"><span class="pil">→</span>Heptan</button>
-            </div>
-            <p class="besked" id="gaet-besked" aria-live="polite"></p>
-            <div class="knaprad"><button class="knap" id="gaet-knap" type="button">Giv hint</button></div>
-        </div>
-
         <div class="kort maaling" id="gaet-runde">
-            <h2>Runden <span class="taeller">rekord <b id="gaet-rekord">0</b></span></h2>
+            <h2>Runden <span class="taeller">stof <b id="gaet-nr">1</b>/<span id="gaet-antal">10</span></span></h2>
             <div class="talraekke"><span>Rigtige</span><span class="tal gul" id="gaet-point">0</span></div>
             <div class="talraekke"><span>I træk</span><span class="tal" id="gaet-stime">0</span></div>
+            <div class="talraekke"><span>Rekord</span><span class="tal" id="gaet-rekord">0</span></div>
         </div>
 
         <div class="kort" id="gaet-sorteret">
             <h2>Sorteret</h2>
             <div class="sorteret">
-                <div class="spalte vand"><h3>Blandes med vand</h3><ul id="gaet-liste-vand"></ul></div>
-                <div class="spalte heptan"><h3>Blandes med heptan</h3><ul id="gaet-liste-heptan"></ul></div>
+                <div class="spalte vand"><h3>Polære</h3><ul id="gaet-liste-vand"></ul></div>
+                <div class="spalte heptan"><h3>Upolære</h3><ul id="gaet-liste-heptan"></ul></div>
             </div>
         </div>
     </aside>
@@ -168,6 +155,7 @@
 <script src="js/glas.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/praesentation.js"></script>
+<script src="js/tekstboks.js"></script>
 <script src="js/bord.js"></script>
 <script src="js/sim_forsoeg.js"></script>
 <script src="js/sim_gaet.js"></script>

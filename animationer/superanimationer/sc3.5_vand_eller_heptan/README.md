@@ -41,51 +41,63 @@ tydeligt, at det er et forsøg.
 **Rettelse 22. okt. 2026.** Brugerens ønske: "inddrage lidt mere teori ... starte
 med at forklare at vand er polært og heptan er upolært. Disse prædikater må gerne
 komme ind på tegningen. Herfra skal man tilsætte stofferne. Lad være med at tilsætte
-heptan. Det giver ikke mening, når det er opløsningsmidlet." Sådan blev det:
+heptan. Det giver ikke mening, når det er opløsningsmidlet." Vand og heptan er taget
+ud af stofferne (de er opløsningsmidlerne), og over hvert glas står navnet og
+mærket *polært* eller *upolært*. Det første teorikort (HTML) er afløst 23. okt.
 
-* Fane 1 begynder med et teorikort på væggen: vandmolekylet med δ− ved O og δ+
-  ved H og mærket *polært*, heptan med mærket *upolært*, én linje til hver og
-  reglen "Stoffer, der ligner hinanden, blandes med hinanden" (Kemibogens ord,
-  afsnit 3.4). Knappen Test stofferne (eller et stof i skemaet) fører videre;
-  prøveglasset og formelkortet kommer først frem da, og skemaet er dæmpet imens.
-* Over hvert glas står navnet og mærket *polært* eller *upolært*, på begge faner.
-* Vand og heptan er taget ud af stofferne på fane 1 (de er opløsningsmidlerne)
-  og dermed også ud af runden på fane 2. Seks stoffer, 12 felter.
-* Når et stof er testet i begge glas, står konklusionen forneden på formelkortet
-  ("Glycerol blandes med vand, så det er polært.") og som *polært* eller
-  *upolært* under navnet i skemaet. Før da spørger feltet "Polært eller upolært?".
-* Tilbuddet om Kemichaels præsentation kommer først, når teorikortet er lukket.
+**Rettelse 23. okt. 2026.** Brugerens ønske: "Det er bare måden man bliver quizzet
+på. Undgå at teksten står helt oppe i højre hjørne, men flyt teksten ind, så det får
+bedre blikfang ... rart, hvis man selv skulle svare på flere ting eller markere
+polære grupper. Helt fra start må man gerne starte med, at man selv skal angive at
+vand er polært." Sådan blev det:
+
+* Alt, eleven læser og svarer, står i en tekstboks på kortet med formlen midt i
+  scenen (`js/tekstboks.js`): spørgsmålet, svarknapperne, én knap (Giv hint →
+  Vis svaret → Næste) og en linje med forsøget, hint, fejl og ros. Spørgekortet i
+  panelet og linjen nederst i scenen er væk.
+* Fane 1 begynder med tre spørgsmål: er vand polært (vandmolekylet med δ− og δ+),
+  er heptan polært, og hvad blandes et polært stof med. Et rigtigt svar sætter
+  mærket på glasset. For hvert stof: test i begge glas → polært eller upolært? →
+  klik på de polære grupper (iod: knappen Ingen polære grupper).
+* Fane 2: find de polære grupper → polært eller upolært? → test svaret ved at
+  trække pipetten ned i det glas, svaret passer til. Forsøget afgør, om svaret var
+  rigtigt. Sorteret hedder nu Polære og Upolære.
 
 ## Hvad viser den
 
 Åbn **`index.html`**. Mappen er selvstændig bortset fra `../../v2/kemichael/`, som
 Kemichael hentes fra. Ingen `fetch` og ingen moduler, så den virker fra harddisken.
 
-**Fane 1, Forsøget** (`#forsoeg`). Et glas vand og et glas heptan i et stativ,
-med *polært* og *upolært* over glassene. Først teorikortet (se rettelsen
-ovenfor), så forsøget: eleven vælger et stof i skemaet, trækker pipetten (væsker)
-eller spatlen (faste stoffer) ned i et glas og klikker på glasset for at ryste
-det. Et klik på et tomt glas er det samme som at trække pipetten derhen. Når
-glasset har lagt sig, står iagttagelsen ved glasset og i skemaet: ét lag, to lag
-(med navnene på lagene), opløst eller opløses ikke. Seks stoffer, 12 felter. Et
-nyt stof får nye glas. Kortet på væggen viser strukturformlen og, når begge glas
-er testet, konklusionen: polært eller upolært. Start forfra viser teorikortet igen.
-
-Teorikortet er HTML oven på scenen (`#forsoeg-teori`); formlerne tegnes i to små
-lærreder. Det vælger selv mellem vand og heptan under hinanden og side om side,
-alt efter hvad der giver de største formler; på små skærme med lidt mindre skrift
-og til sidst uden de to små forklaringer (`placerTeori` i `js/sim_forsoeg.js`).
+**Fane 1, Forsøget** (`#forsoeg`). Et glas vand og et glas heptan i et stativ.
+Først tre spørgsmål på kortet (D.START i `js/data.js`); prøveglasset er ikke
+fremme, og skemaet er dæmpet. Et rigtigt svar sætter *polært* eller *upolært* over
+glasset. Så stofferne, ét ad gangen: eleven trækker pipetten (væsker) eller
+spatlen (faste stoffer) ned i et glas og klikker på glasset for at ryste det (et
+klik på et tomt glas er det samme som at trække pipetten derhen). Når glasset har
+lagt sig, står iagttagelsen ved glasset og i skemaet: ét lag, to lag (med navnene
+på lagene), opløst eller opløses ikke. Når begge glas er testet, spørger kortet:
+er stoffet polært eller upolært? Et rigtigt svar skrives i skemaet. Til sidst
+klikker eleven på de polære grupper; når alle er fundet, viser formlen polære
+grupper blå og carbonkæden gul. Næste går til næste stof, der ikke er færdigt.
+Seks stoffer, 12 felter. Skemaet er også valget af stof. Start forfra begynder
+med vand igen.
 
 **Fane 2, Gæt polaritet** (`#gaet`). Den gamle c3.5 med forsøget som facit. Et
-stof ad gangen: eleven klikker på de polære grupper (blå boble; et klik på C
-eller H blinker gråt), og søjlen stiller C-atomerne op mod de fundne grupper.
-Så gætter eleven ved at trække pipetten ned i det glas, stoffet blandes med
-(eller med knapperne Vand og Heptan). Stoffet kommer i glasset, glasset rystes
-af sig selv, og når det har lagt sig, er svaret klart. Derefter testes det andet
-glas også, og formlen viser facit: polære grupper blå, carbonkæden gul. Et
-forkert svar får en forklaring, der passer til fejlen. En runde er ti stoffer,
-fem af hver slags; de seks nye er altid med. Knappen i opgavekortet: Giv hint
-(markerer alle polære grupper), Vis svaret, Næste stof. Rekorden huskes.
+stof ad gangen: eleven klikker på de polære grupper (blå boble; et klik på C eller
+H blinker gråt), og søjlen stiller C-atomerne op mod de fundne grupper. Når alle
+er fundet, spørger kortet: polært eller upolært? Svaret testes ved at trække
+pipetten ned i det glas, et stof med den polaritet blandes med; et glas, der ikke
+passer til svaret, giver en forklaring. Glasset rystes af sig selv, og når det har
+lagt sig, er svaret afgjort. Derefter testes det andet glas også, og formlen viser
+facit. En runde er ti stoffer, fem af hver slags; de seks nye er altid med. Knappen:
+Giv hint (markerer alle polære grupper og siger tommelfingerreglen), Vis svaret,
+Næste stof. Rekorden huskes.
+
+**Kortet og tekstboksen.** Kortet har navnet foroven, formlen og tekstboksen.
+Tekstboksen står under formlen, eller til højre for den, når kortet er bredt og
+lavt; søjlen på fane 2 viger, når der ikke er plads (tallene står også i
+tekstboksen). Bliver formlen for lille på et bredt layout, bruges det smalle med
+kortet foroven (`beregnLayout` og `kortDele` i `js/bord.js`).
 
 **Kemichael** tilbyder at præsentere hver fane (Start præsentation / Nej tak).
 Ellers kommer han kun, når skemaet er fuldt (én gang pr. browser), når en runde
@@ -94,8 +106,8 @@ er slut, og ved påskeægget: ryst et færdigt glas seks gange mere.
 **Teori** og **?** (rundvisningen) ligger i toplinjen.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>↑</kbd> <kbd>↓</kbd> stof og
-<kbd>mellemrum</kbd> ryst (fane 1) · <kbd>←</kbd> vand, <kbd>→</kbd> heptan og
-<kbd>Enter</kbd> næste (fane 2) · <kbd>R</kbd> nye glas eller ny runde ·
+<kbd>mellemrum</kbd> ryst (fane 1) · <kbd>←</kbd> polært eller vandglasset,
+<kbd>→</kbd> upolært eller heptanglasset (fane 2) · <kbd>Enter</kbd> Næste · <kbd>R</kbd> nye glas eller ny runde ·
 <kbd>T</kbd> teori · <kbd>H</kbd> rundvisning · <kbd>K</kbd> præsentation ·
 <kbd>Esc</kbd> luk.
 
@@ -179,9 +191,10 @@ js/molekyle.js         læser og tegner strukturformlerne, finder de polære gru
 js/glas.js             reagensglasset: modellen og tegningen af indholdet
 js/tegning.js          rummet, bordet, kortet, søjlen, prøveglasset, mærkaterne
 js/praesentation.js    tilbuddet om præsentationen (samme fil som i sc1.2)
+js/tekstboks.js        spørgsmålet, svarene og knappen på kortet i scenen
 js/bord.js             scenen, begge faner deler: layout, pipetten, musen
 js/sim_forsoeg.js      fane 1: skemaet og linjen under scenen
-js/sim_gaet.js         fane 2: runden, svaret og forsøget som facit
+js/sim_gaet.js         fane 2: grupperne, polært/upolært og forsøget som facit
 js/laerer.js           Kemichael
 js/rundvisning.js      rundvisningen bag ?
 js/app.js              faneskift, genveje og tegneløkken
@@ -203,10 +216,11 @@ _selvtest.html         udviklerværktøj, indgår ikke i animationen
 `_selvtest.html` åbner `index.html` i en iframe og kontrollerer strukturformlerne
 (sumformel, valens, afstand), de polære grupper og C-atomerne, reglen fra
 nabo-animationen, alle 28 forsøg (rigtigt glas, lagenes rækkefølge, tempo),
-teorikortet (det, der er fremme, knappen, mærkerne over glassene), fane 1 med
-musen, konklusionerne og skemaet fuldt, fane 2 med musen, knapperne, hintet og en
-hel runde, Kemichael, sproget og layoutet fra 390 × 844 til 1500 × 900 (også at
-teorikortet ikke ruller). 100 kontroller, ALT OK 22. okt. 2026. Chrome kræver
+spørgsmålene om vand og heptan (svar, hint, Vis svaret, mærkerne på glassene), fane 1
+med musen, polært/upolært, de polære grupper og alle seks stoffer, fane 2 med musen,
+gruppen, svaret, glasset, der ikke passer, hintet og en hel runde, Kemichael,
+sproget (hver tekst nævner selv stoffet) og layoutet fra 390 × 844 til 1500 × 900,
+også at hver tekst kan være i tekstboksen. 122 kontroller, ALT OK 23. okt. 2026. Chrome kræver
 `--allow-file-access-from-files` eller en lokal server.
 
 ## I menuen

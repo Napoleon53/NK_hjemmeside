@@ -161,26 +161,7 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .scene > canvas { display: block; width: 100%; height: 100%; }
-.scene.medtekst { padding-bottom: 50px; }
 
-.scene-mrk {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    min-height: 50px;
-    display: block;
-    padding: 15px 20px 10px;
-    background: linear-gradient(to top, rgba(8, 8, 13, 0.97) 60%, rgba(8, 8, 13, 0.6));
-    font-size: 0.9rem;
-    line-height: 1.45;
-    color: #dde3ea;
-    text-align: center;
-    pointer-events: none;
-    z-index: 4;
-}
-
-.scene-mrk b { color: #ffffff; }
 
 /* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
 .anker { position: absolute; pointer-events: none; }
@@ -670,7 +651,7 @@ select:focus-visible {
     main { overflow: visible; }
     .fane { position: static; grid-template-columns: minmax(0, 1fr); }
     .fane.aktiv { display: grid; }
-    .scene { height: 66vh; min-height: 440px; }
+    .scene { height: 66vh; min-height: 560px; }   /* plads til kortet med spoergsmaalet */
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
 }
 
@@ -892,116 +873,114 @@ select:focus-visible {
 .knap:disabled.banker { animation: none; }
 
 /* ---------------------------------------------------------------------
-   TEORIKORTET: foerste trin paa fane 1 (js/sim_forsoeg.js). Et hvidt
-   ark paa vaeggen som kortet med formlen; js saetter plads og bredde.
-   Klassen "to" stiller vand og heptan side om side.
+   TEKSTBOKSEN: spoergsmaalet paa kortet med formlen (js/tekstboks.js).
+   Brugerens oenske 23. okt. 2026: teksten inde i scenen, ikke oppe i
+   hoejre hjoerne. js saetter plads og hoejde (lay.tb i js/bord.js);
+   pladserne staar stille: tekst, svar + knap, linje.
    --------------------------------------------------------------------- */
-.teorikort {
+.tekstboks {
     position: absolute;
     z-index: 3;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 22px 20px 18px;
-    background-color: #fbfbf7;
-    color: #1d2129;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 5px;
-    box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.35);
-    overflow-y: auto;
-}
-
-/* De to naale foroven, som paa kortet med formlen */
-.teorikort::before,
-.teorikort::after {
-    content: "";
-    position: absolute;
-    top: 7px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background-color: #c0392b;
-}
-
-.teorikort::before { left: 7px; }
-.teorikort::after { right: 7px; }
-
-.tk-stoffer { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
-.teorikort.to .tk-stoffer { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 18px; }
-
-.tk-stof h3 {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin: 0 0 4px;
-    font-size: 1.12rem;
-    font-weight: 700;
-}
-
-.tk-mol { display: block; width: 100%; height: 100px; }
-
-.tk-stof p {
-    margin: 4px 0 0;
-    font-size: 0.92rem;
-    line-height: 1.4;
-    color: #39404a;
-}
-
-.praedikat {
-    display: inline-block;
-    padding: 1px 9px 2px;
-    border-radius: 999px;
-    border: 1.5px solid;
-    font-size: 0.8rem;
-    font-weight: 700;
-    line-height: 1.35;
-}
-
-.praedikat.polaer { background-color: #cfe6f8; border-color: #3d9ee0; color: #154f78; }
-.praedikat.upolaer { background-color: #f6e7b8; border-color: #d6a332; color: #6b4f10; }
-
-.tk-regel {
-    margin: 0;
-    padding: 9px 12px;
-    border-left: 4px solid var(--gul);
+    gap: 7px;
+    padding: 9px 12px 8px 13px;
     background-color: #f1f2ec;
-    border-radius: 0 6px 6px 0;
-    font-size: 0.94rem;
-    line-height: 1.4;
-    color: #2b3038;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 5px solid var(--gul);
+    border-radius: 6px;
+    color: #1d2129;
+    overflow: hidden;
 }
 
-.tk-regel b { color: #1d2129; }
-
-/* Knappen bliver forneden, ogsaa hvis kortet paa en lille skaerm ruller */
-.tk-videre {
-    position: sticky;
-    bottom: 0;
-    align-self: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 22px;
-    font-size: 1rem;
-    color: #ffffff;
+.tb-tekst {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.3;
 }
 
-/* Lidt mindre skrift, naar kortet ellers ikke kan vaere der */
-.teorikort.lille { padding: 18px 14px 12px; gap: 9px; }
-.teorikort.lille .tk-stoffer { gap: 10px; }
-.teorikort.lille .tk-stof h3 { font-size: 1rem; }
-.teorikort.lille .tk-stof p { font-size: 0.84rem; line-height: 1.35; }
-.teorikort.lille .tk-regel { font-size: 0.86rem; padding: 7px 10px; }
-.teorikort.lille .tk-videre { padding: 8px 18px; font-size: 0.92rem; }
+.tb-rad {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+}
 
-/* Sidste udvej paa en meget lille scene: uden de to smaa forklaringer */
-.teorikort.kompakt .tk-stof p { display: none; }
+.tb-svar { display: flex; flex-wrap: wrap; gap: 8px; }
 
-/* Skemaet er daempet, mens teorikortet staar. Et klik paa et stof virker
-   stadig (det er ogsaa "videre"). */
-.kort.maaling.daempet .skema { opacity: 0.45; transition: opacity 0.3s ease; }
-.kort.maaling .skema { transition: opacity 0.3s ease; }
+.tb-svarknap {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 6px 15px;
+    border-radius: 999px;
+    border: 2px solid #8f99a4;
+    background-color: #ffffff;
+    color: #1d2129;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
 
-/* Polaert eller upolaert under navnet, naar stoffet er testet i begge glas */
+.tb-svarknap:hover:not(:disabled) { border-color: var(--blaa); background-color: #e8f3fc; }
+.tb-svarknap:disabled { cursor: default; }
+.tb-svarknap.valgt { border-color: #d6a332; background-color: #fbefc6; }
+.tb-svarknap.rigtig { border-color: #2e9e62; background-color: #2e9e62; color: #ffffff; }
+.tb-svarknap.forkert { border-color: #c9503d; color: #b03a2a; background-color: #fbe9e5; }
+
+/* Den ene knap: Giv hint (gul) -> Vis svaret (gult omrids) -> Naeste (blaa) */
+.tb-knap {
+    margin-left: auto;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tb-knap.skjult { visibility: hidden; }
+.tb-knap.hjaelp { background-color: var(--gul); color: #2b2100; }
+.tb-knap.hjaelp:hover { background-color: #f6d468; }
+.tb-knap.svar { background-color: transparent; border-color: #d6a332; color: #7a5a00; }
+.tb-knap.svar:hover { background-color: #fbefc6; }
+.tb-knap.naeste { background-color: var(--blaa-mork); color: #ffffff; animation: bank 1.7s ease-out infinite; }
+.tb-knap.naeste:hover { background-color: var(--blaa); }
+.tb-knap.peg:not(.naeste) { box-shadow: 0 0 0 4px rgba(242, 197, 61, 0.55); }
+
+.tb-linje {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    color: #46505b;
+}
+
+.tb-linje b { color: inherit; }
+.tb-linje.god { color: #1f7a49; font-weight: 600; }
+.tb-linje.skidt { color: #b03a2a; }
+.tb-linje.hint { color: #7a5a00; }
+
+@keyframes tb-ryst {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.tb-linje.ryst { animation: tb-ryst 0.3s ease-in-out 1; }
+
+/* Paa et smalt kort lidt mindre skrift, saa svar og knap kan staa paa én raekke */
+.tekstboks.smal .tb-tekst { font-size: 1rem; }
+.tekstboks.smal .tb-svarknap { font-size: 0.88rem; padding: 5px 12px; }
+.tekstboks.smal .tb-knap { font-size: 0.86rem; padding: 6px 11px; }
+.tekstboks.smal .tb-linje { font-size: 0.86rem; }
+
+/* Skemaet er daempet, mens spoergsmaalene om vand og heptan staar */
+.kort.maaling.daempet .skema { opacity: 0.45; }
+
+/* Polaert eller upolaert under navnet, naar eleven har svaret */
 .skema-pol { font-weight: 700; }
 .skema-pol:not(:empty)::before { content: " · "; color: var(--tekst-mat); font-weight: 400; }
 .skema-pol.polaer { color: #6cb8ea; }

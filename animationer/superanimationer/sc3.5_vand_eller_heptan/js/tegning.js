@@ -276,7 +276,7 @@
 
     /* ----- Polaert eller upolaert ---------------------------------------------
        Et lille skilt: blaat for polaert (som vandet), gult for upolaert (som
-       heptanen). Samme farver som soejlen paa fane 2 og teorikortet. */
+       heptanen). Samme farver som soejlen paa fane 2. */
     T.PRAEDIKAT = {
         true: { fyld: "#cfe6f8", kant: "#3d9ee0", tekst: "#154f78" },
         false: { fyld: "#f6e7b8", kant: "#d6a332", tekst: "#6b4f10" }
@@ -307,60 +307,6 @@
         ctx.fillText(tekst, cx, cy + 0.5);
         ctx.restore();
         return b;
-    };
-
-    /* Feltet forneden paa kortet (fane 1): spoergsmaalet, til stoffet er
-       testet i begge glas, og saa konklusionen. polaer: null (ikke testet
-       endnu), true eller false. Er der ikke plads paa én linje, deles
-       teksten efter det foerste komma, punktum eller spoergsmaalstegn. */
-    T.konklusion = function (ctx, r, tekst, polaer) {
-        ctx.save();
-        var vaegt = polaer === null ? "600" : "700";
-        var bred = r.b - 24, px = 15, linjer = [tekst];
-        while (px > 13) {
-            ctx.font = T.font(vaegt, px);
-            if (ctx.measureText(tekst).width <= bred) break;
-            px -= 0.5;
-        }
-        ctx.font = T.font(vaegt, px);
-        if (ctx.measureText(tekst).width > bred) {
-            var i = tekst.search(/[,.?] /);
-            if (i > 0) linjer = [tekst.slice(0, i + 1), tekst.slice(i + 2)];
-            px = 14;
-            while (px > 12) {
-                ctx.font = T.font(vaegt, px);
-                if (Math.max(ctx.measureText(linjer[0]).width, ctx.measureText(linjer[linjer.length - 1]).width) <= bred) break;
-                px -= 0.5;
-            }
-        }
-        var h = linjer.length > 1 ? r.h + 2 : Math.min(30, r.h);
-        var y = r.y + (r.h - h) / 2;
-        NK.rundtRekt(ctx, r.x, y, r.b, h, Math.min(15, h / 2));
-        if (polaer === null) {
-            ctx.setLineDash([5, 4]);
-            ctx.strokeStyle = "rgba(93, 101, 112, 0.65)";
-            ctx.lineWidth = 1.3;
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillStyle = T.FARVE.graa;
-        } else {
-            var f = T.PRAEDIKAT[!!polaer];
-            ctx.fillStyle = f.fyld;
-            ctx.fill();
-            ctx.strokeStyle = f.kant;
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-            ctx.fillStyle = f.tekst;
-        }
-        ctx.font = T.font(vaegt, px);
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        var lh = px + 2;
-        linjer.forEach(function (l, n) {
-            ctx.fillText(l, r.x + r.b / 2, y + h / 2 + 0.5 + (n - (linjer.length - 1) / 2) * lh);
-        });
-        ctx.restore();
-        return { linjer: linjer.length, px: px };
     };
 
     /* δ− ved O og δ+ ved hvert H i vandmolekylet, som i bogen (Kemibogen

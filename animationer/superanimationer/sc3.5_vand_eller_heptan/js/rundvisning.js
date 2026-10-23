@@ -13,20 +13,20 @@
 
     var TURE = {
         "fane-forsoeg": [
-            { sel: "#forsoeg-teori", titel: "Vand og heptan", tekst: "Vand er polært, og heptan er upolært. Tryk på Test stofferne for at begynde." },
+            { sel: "#forsoeg-tb", titel: "Spørgsmålet", tekst: "Her står det, du skal gøre eller svare på. Den gule knap giver et hint." },
             { sel: "#forsoeg-anker-glas", titel: "Glassene", tekst: "Vand til venstre, heptan til højre. Mærket over glasset siger, om væsken er polær eller upolær. Klik på et glas for at ryste det." },
             { sel: "#forsoeg-anker-proeve", titel: "Prøven", tekst: "Træk pipetten (eller spatlen) ned i et af glassene." },
-            { sel: "#forsoeg-anker-kort", titel: "Formlen", tekst: "Strukturformlen for stoffet, du tester." },
-            { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Det, du ser i glassene, skrives her. Klik på et stof for at teste det." },
+            { sel: "#forsoeg-anker-kort", titel: "Formlen", tekst: "Strukturformlen for stoffet. Her klikker du på de polære grupper." },
+            { sel: "#forsoeg-skema", titel: "Skemaet", tekst: "Det, du ser i glassene, og dit svar skrives her. Klik på et stof for at teste det." },
             { sel: "#teoriknap", titel: "Teori", tekst: "Polære grupper og carbonkæder kort forklaret." },
             { sel: ".faneknapper", titel: "Fane 2", tekst: "Gæt polaritet: gæt først, så viser forsøget svaret." }
         ],
         "fane-gaet": [
             { sel: "#gaet-anker-kort", titel: "Formlen", tekst: "Klik på de polære grupper. Søjlen tæller dem og C-atomerne." },
-            { sel: "#gaet-anker-glas", titel: "Glassene", tekst: "Træk pipetten ned i det glas, du tror, stoffet blandes med. Forsøget viser svaret." },
-            { sel: "#gaet-kort", titel: "Dit svar", tekst: "Du kan også svare her eller med piletasterne. Knappen giver et hint og derefter svaret." },
+            { sel: "#gaet-tb", titel: "Dit svar", tekst: "Svar polært eller upolært her. Den gule knap giver et hint og derefter svaret." },
+            { sel: "#gaet-anker-glas", titel: "Glassene", tekst: "Test dit svar: træk pipetten ned i det glas, svaret passer til. Forsøget viser, om du har ret." },
             { sel: "#gaet-runde", titel: "Runden", tekst: "Ti stoffer, fem af hver slags. Rekorden huskes." },
-            { sel: "#gaet-sorteret", titel: "Sorteret", tekst: "Stofferne, du har testet, efter hvad de blandes med." }
+            { sel: "#gaet-sorteret", titel: "Sorteret", tekst: "Stofferne, du har testet: polære og upolære." }
         ]
     };
 

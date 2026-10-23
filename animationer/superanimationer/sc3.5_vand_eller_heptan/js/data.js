@@ -234,23 +234,76 @@
     D.polaer = function (stofId) { return D.blandbar(stofId, "vand"); };
     D.polaritet = function (stofId) { return D.polaer(stofId) ? "polært" : "upolært"; };
 
-    /* Konklusionen paa kortet, naar stoffet er testet i begge glas */
-    D.konklusion = function (stofId) {
-        var s = D.stof(stofId);
-        var navn = s.navn.charAt(0).toUpperCase() + s.navn.slice(1);
-        var verbum = s.tilstand === "fast" ? "opløses i " : "blandes med ";
-        return navn + " " + verbum + D.stof(s.blandes).navn + ", så det er " + D.polaritet(stofId) + ".";
-    };
-    D.SPOERG_POLARITET = "Polært eller upolært? Test stoffet i begge glas.";
+    D.stort = function (t) { return t.charAt(0).toUpperCase() + t.slice(1); };
+    D.navn = function (stofId) { return D.stof(stofId).navn; };
+    D.Navn = function (stofId) { return D.stort(D.stof(stofId).navn); };
 
-    /* Teorikortet, der aabner fane 1: de to oploesningsmidler. Ordene er
-       Kemibogens (afsnit 3.4). */
-    D.TEORI = {
-        vand: "Oxygen trækker elektronerne til sig. Molekylet får en negativ og en positiv ende.",
-        heptan: "Kun carbon og hydrogen. Molekylet har ingen ladede ender.",
-        regel: "Stoffer, der ligner hinanden, blandes med hinanden.",
-        regel2: "Et polært stof blandes med vand, et upolært med heptan.",
-        knap: "Test stofferne"
+    /* Det, forsoeget viste, som én saetning: "Glycerol blandes med vand,
+       men ikke med heptan." Faste stoffer opløses; iod naesten ikke i vand. */
+    D.obsSaetning = function (stofId) {
+        var s = D.stof(stofId), x = s.blandes, y = x === "vand" ? "heptan" : "vand";
+        var ikke = s.obs && s.obs[y] && /næsten/.test(s.obs[y]) ? "næsten ikke" : "ikke";
+        if (s.tilstand === "fast") return D.Navn(stofId) + " opløses i " + x + ", men " + ikke + " i " + y + ".";
+        return D.Navn(stofId) + " blandes med " + x + ", men " + ikke + " med " + y + ".";
+    };
+
+    /* ----- Spoergsmaalene paa kortet i scenen ------------------------------
+       Brugerens oenske 23. okt. 2026: spoergsmaalene skal staa inde i scenen
+       (ikke oppe i hoejre hjoerne), eleven skal selv svare paa flere ting og
+       markere polaere grupper, og fane 1 begynder med, at eleven selv siger,
+       at vand er polaert. Ordene er Kemibogens (afsnit 3.4).
+
+       D.START: de tre spoergsmaal, der aabner fane 1. kontekst staar i linjen
+       under svarknapperne, til der er svaret. */
+    D.POL_SVAR = [{ id: "polaert", tekst: "Polært" }, { id: "upolaert", tekst: "Upolært" }];
+    D.polId = function (stofId) { return D.polaer(stofId) ? "polaert" : "upolaert"; };
+
+    D.START = [
+        {
+            id: "vand", kort: "vand", spm: "Er vand polært eller upolært?",
+            kontekst: "Oxygen trækker elektronerne til sig. Vandmolekylet får en negativ ende (δ−) og en positiv ende (δ+).",
+            svar: D.POL_SVAR, rigtig: "polaert",
+            hint: "Et molekyle med en negativ og en positiv ende kaldes polært.",
+            ros: "Rigtigt. Vand er polært.",
+            fejl: "Nej. Vandmolekylet har en negativ og en positiv ende. Så er det polært."
+        },
+        {
+            id: "heptan", kort: "heptan", spm: "Er heptan polært eller upolært?",
+            kontekst: "Heptan består kun af carbon og hydrogen. Molekylet har ingen ladede ender.",
+            svar: D.POL_SVAR, rigtig: "upolaert",
+            hint: "Et molekyle uden en negativ og en positiv ende kaldes upolært.",
+            ros: "Rigtigt. Heptan er upolært.",
+            fejl: "Nej. Heptan har ingen ladede ender. Så er det upolært."
+        },
+        {
+            id: "regel", kort: "begge", spm: "Hvad blandes et polært stof med?",
+            kontekst: "Stoffer, der ligner hinanden, blandes med hinanden.",
+            svar: [{ id: "vand", tekst: "Vand" }, { id: "heptan", tekst: "Heptan" }], rigtig: "vand",
+            hint: "Vand er polært, og heptan er upolært. Hvilken af dem ligner et polært stof?",
+            ros: "Rigtigt. Et polært stof blandes med vand, og et upolært stof blandes med heptan.",
+            fejl: "Nej. Et polært stof ligner det polære vand. Derfor blandes det med vand."
+        }
+    ];
+
+    /* Fane 1, for hvert stof: test, polaert eller upolaert, polaere grupper */
+    D.F1 = {
+        test: function (id) { return "Test " + D.navn(id) + " i begge glas."; },
+        pol: function (id) { return "Er " + D.navn(id) + " polært eller upolært?"; },
+        polHint: "Vand er polært, og heptan er upolært. Stoffer, der ligner hinanden, blandes med hinanden.",
+        polFejl: function (id) {
+            var s = D.stof(id), verbum = s.tilstand === "fast" ? "opløses i" : "blandes med";
+            return D.polaer(id) ? "Nej. " + D.Navn(id) + " " + verbum + " vand og ligner derfor det polære vand."
+                                : "Nej. " + D.Navn(id) + " " + verbum + " heptan og ligner derfor den upolære heptan.";
+        },
+        polRos: function (id) { return "Rigtigt. " + D.Navn(id) + " er " + D.polaritet(id) + "."; },
+        grp: function (id) { return "Klik på de polære grupper i " + D.navn(id) + "."; },
+        grpHint: "Polære grupper har O eller N: OH, COOH, C=O og NH₂. C og H hører til den upolære carbonkæde.",
+        grpRos: function (id) { return "Rigtigt. " + D.stof(id).hvorfor; },
+        ingen: "Ingen polære grupper",
+        ingenFejl: function (id) { return "Nej. Der er polære grupper i " + D.navn(id) + ". Kig efter O og N."; },
+        fundet: function (n) { return n === 0 ? "Klik på en polær gruppe i formlen." : (n === 1 ? "Fundet: 1 polær gruppe." : "Fundet: " + n + " polære grupper."); },
+        fuldt: "Skemaet er fuldt.",
+        fuldtLinje: "Alle seks stoffer er testet. På fane 2 gætter du, før du tester."
     };
 
     /* Det, man ser i glasset, naar det har staaet efter rystningen */
@@ -270,7 +323,7 @@
     ];
     D.INTRO_GAET = [
         "Her gætter du, før forsøget viser svaret.",
-        "Klik på de polære grupper, og træk pipetten.",
+        "Find de polære grupper, og svar polært eller upolært.",
         "Gæt gerne forkert. Glassene bliver ikke sure."
     ];
     D.SKEMA_FULDT = "Tolv forsøg og ingen knuste glas. Det noterer jeg.";

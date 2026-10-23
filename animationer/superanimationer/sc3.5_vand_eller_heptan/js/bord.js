@@ -16,20 +16,22 @@
      klikGlas(i)         klik paa glas i
      klikProeve()        klik paa pipetten eller proeveglasset
      klikKort(pt)        klik paa kortet
-     tegnKortet(ctx)     kortet (ellers kun formlen)
-     tegnKortBund(ctx,r) feltet forneden paa kortet (med valg.bundFelt)
+     tegnKortet(ctx)     kortet med formlen (lay.formel) og evt. soejlen
      visTraekPil()       den gule pil ved pipetten
      skjulProeve()       proeveglasset og pipetten er ikke fremme endnu
-     skjulKort()         kortet med formlen er ikke fremme endnu
-     efterLayout()       layoutet er lige regnet om
-   valg.soejle: plads forneden paa kortet til soejlen (fane 2)
-   valg.bundFelt: samme plads forneden til fanens eget felt (fane 1)
-   valg.prefix: begyndelsen paa id'erne for ankerne (rundvisningen)
+     visPraedikat(opl)   0-1: maerket polaert/upolaert over glasset (1 = helt fremme)
+   valg.soejle: plads under formlen til soejlen (fane 2)
+   valg.prefix: begyndelsen paa id'erne for ankerne og tekstboksen
+
+   Kortet paa vaeggen har tre dele: navnet foroven, formlen (lay.formel)
+   og tekstboksen (lay.tb, js/tekstboks.js) med spoergsmaalet. Tekstboksen
+   staar under formlen, eller til hoejre for den (lay.tbSide), naar kortet
+   er bredt og lavt. Spoergsmaalene staar altsaa inde i scenen, ikke i
+   panelet (brugerens oenske 23. okt. 2026), og der er ingen linje nederst.
 
    Over hvert glas staar navnet og under det, om vaesken er polaer
    eller upolaer (brugerens oenske 22. okt. 2026: "Disse praedikater maa
-   gerne komme ind paa tegningen"). lay.teori er pladsen ved siden af
-   glassene, hvor teorikortet paa fane 1 staar.
+   gerne komme ind paa tegningen").
    ===================================================================== */
 (function () {
     "use strict";
@@ -43,6 +45,15 @@
     var FLYV = 0.3, HJEM = 0.35;
     var VENSTRE_PLADS = 165;      /* til maerkaterne til venstre for vandglasset */
     var MAERKE_PLADS = 46;        /* over glassene: navnet og polaert/upolaert */
+    var SOEJLE_H = 40;            /* soejlen under formlen (fane 2) */
+    var TB_UNDER = { smal: 170, bred: 154 };   /* tekstboksens hoejde under formlen */
+    var TB_SIDE = { min: 200, maks: 330 };     /* tekstboksens bredde til hoejre for formlen */
+    var SIDE_MIN = 440;           /* kortets mindste bredde med tekstboksen ved siden af formlen */
+    var FORMEL_MIN = 118;         /* under det bliver tekstboksen sat ved siden af formlen */
+    var FORMEL_NOK = 90;          /* under det bruges det smalle layout */
+
+    /* Kortets hoved (navn og formel): samme maal som T.kort i js/tegning.js */
+    function hovedHoejde(b) { return 26 + 0.8 * NK.klamp(b * 0.045, 15, 20); }
 
     function kobl(P, valg) {
         valg = valg || {};
@@ -69,27 +80,51 @@
             return s && s.tilstand === "fast" ? "spatel" : "pipette";
         };
 
-        /* ----- Layout --------------------------------------------------------- */
+        /* ----- Layout ---------------------------------------------------------
+           Bred scene: glassene til venstre, kortet til hoejre for dem.
+           Smal scene: kortet foroven i hele bredden, glassene under det.
+           Bliver formlen paa et bredt layout for lille, bruges det smalle. */
         P.bordLayout = function () {
+            var lay = this.beregnLayout(true);
+            if (lay.bred && lay.formel.h < FORMEL_NOK) {
+                var smal = this.beregnLayout(false);
+                if (smal.formel.h > lay.formel.h) lay = smal;
+            }
+            this.lay = lay;
+            if (this.tb) this.tb.placer(lay.tb, lay.tbSide);
+
+            var p = valg.prefix, glasY = lay.glas[0].y;
+            if (p) {
+                this.saetAnker(p + "-anker-glas", lay.rack.x - 8, glasY - MAERKE_PLADS, lay.rack.b + 16, lay.bordY - glasY + MAERKE_PLADS + 4);
+                this.saetAnker(p + "-anker-proeve", lay.vial.x - 8, lay.pipTop - 8, lay.vial.b + 16, lay.bordY - lay.pipTop + 12);
+                this.saetAnker(p + "-anker-kort", lay.kort.x, lay.kort.y, lay.kort.b, lay.kort.h);
+            }
+            if (this.efterLayout) this.efterLayout();
+        };
+
+        P.beregnLayout = function (vilBred) {
             var W = this.L.b, H = this.L.h;
             var lay = { W: W, H: H };
             var m = NK.klamp(W * 0.02, 8, 18);
             lay.m = m;
             lay.bordY = Math.round(H - NK.klamp(H * 0.12, 40, 92));
-            var bund = (valg.soejle || valg.bundFelt) ? 44 : 0;
+            var soejle = valg.soejle ? SOEJLE_H : 0;
 
             var tH = NK.klamp(Math.min(H * 0.52, lay.bordY * 0.66), 110, 390);
             var k = tH / 360;
             var rackX = Math.max(m + VENSTRE_PLADS + 120 * k, W * 0.27);
             var kortX = rackX + 80 * k + 30;
-            lay.bred = W - m - kortX >= 300;
+            lay.bred = vilBred && W - m - kortX >= 300;
 
             if (!lay.bred) {
-                /* Smal scene: kortet foroven i hele bredden, glassene under det */
-                var ch = NK.klamp(H * 0.36, 140, 260) + bund;
+                /* Kortet foroven i hele bredden; tekstboksen ved siden af
+                   formlen, naar der er bredde til det */
+                var smalB = W - 2 * m;
+                var ch = smalB >= SIDE_MIN ? Math.max(NK.klamp(H * 0.36, 140, 260) + soejle, hovedHoejde(smalB) + 250)
+                                           : NK.klamp(H * 0.3, 110, 220) + soejle + TB_UNDER.smal + 20;
                 /* Kortet maa ikke tage pladsen fra glassene i mindste skala */
                 ch = Math.min(ch, Math.max(120, lay.bordY - m - MAERKE_PLADS - 6 - 0.3 * 375));
-                lay.kort = { x: m, y: m, b: W - 2 * m, h: ch };
+                lay.kort = { x: m, y: m, b: smalB, h: ch };
                 var kMaks = (lay.bordY - (lay.kort.y + ch) - MAERKE_PLADS - 6) / 375;
                 k = Math.max(0.3, Math.min(k, kMaks));
                 rackX = Math.max(m + VENSTRE_PLADS * 0.85 + 120 * k, W * 0.3);
@@ -113,34 +148,41 @@
             if (lay.bred) {
                 var kb = Math.min(W - m - kortX, 640);
                 var kx = kortX + (W - m - kortX - kb) / 2;
-                var kBund = Math.min(glasY + 150 * k, lay.pipTop - 14);
-                lay.kort = { x: kx, y: m, b: kb, h: Math.max(120, Math.min(kBund - m, 300 + bund)) };
+                /* Kortet gaar ned over fliserne, men holder sig over pipetten og
+                   over skiltene ved heptanglasset (hoejst tre portioner i glasset) */
+                var kBund = Math.min(lay.pipTop - 14, glasY + (NK.Glas.BUND - 160) * k - 40);
+                lay.kort = { x: kx, y: m, b: kb, h: Math.max(160, Math.min(kBund - m, 560)) };
             }
             lay.fliseTop = Math.round(Math.max(lay.kort.y + 30, glasY + 150 * k));
             if (!lay.bred) lay.fliseTop = Math.round(glasY + 150 * k);
 
-            /* Teorikortet (fane 1): ved siden af stativet ned til bordet, mens
-               proeveglasset ikke er fremme; paa en smal scene over glassene */
-            if (lay.bred) {
-                var tx = Math.max(kortX, lay.rack.x + lay.rack.b + 24);
-                var tb = Math.min(W - m - tx, 620);
-                lay.teori = { x: tx + (W - m - tx - tb) / 2, y: m, b: tb, maksH: lay.bordY - 14 - m };
-            } else {
-                lay.teori = { x: m, y: m, b: W - 2 * m, maksH: Math.max(120, glasY - MAERKE_PLADS - 4 - m) };
-            }
-            /* Er der ikke plads nok, maa kortet gaa ned over bordkanten
-               (og paa en smal scene ned over glassene) */
-            lay.teori.maksHFuld = Math.max(lay.teori.maksH, H - 10 - m);
-            this.lay = lay;
-
-            var p = valg.prefix;
-            if (p) {
-                this.saetAnker(p + "-anker-glas", lay.rack.x - 8, glasY - 24, lay.rack.b + 16, lay.bordY - glasY + 28);
-                this.saetAnker(p + "-anker-proeve", lay.vial.x - 8, lay.pipTop - 8, lay.vial.b + 16, lay.bordY - lay.pipTop + 12);
-                this.saetAnker(p + "-anker-kort", lay.kort.x, lay.kort.y, lay.kort.b, lay.kort.h);
-            }
-            if (this.efterLayout) this.efterLayout();
+            kortDele(lay, soejle);
+            return lay;
         };
+
+        /* Kortets dele: hovedet, formlen, soejlen og tekstboksen. Tekstboksen
+           staar under formlen, eller til hoejre for den, naar kortet er bredt
+           nok og formlen ellers bliver for lav. Soejlen (fane 2) viger, naar
+           der ikke er plads; tallene staar ogsaa i tekstboksen. */
+        function kortDele(lay, soejle) {
+            var r = lay.kort, hoved = hovedHoejde(r.b);
+            var tbH = r.b < 420 ? TB_UNDER.smal : TB_UNDER.bred;
+            var under = r.h - hoved - tbH - 20;
+            var side = r.b >= SIDE_MIN && (under - soejle < FORMEL_MIN || r.b > 2.2 * r.h);
+            if (side) {
+                var tbB = NK.klamp(r.b * 0.42, TB_SIDE.min, TB_SIDE.maks);
+                lay.tb = { x: r.x + r.b - tbB - 12, y: r.y + hoved - 6, b: tbB, h: r.h - hoved - 6 };
+                var fh = r.h - hoved - 12;
+                if (fh - soejle < 110) soejle = 0;
+                lay.formel = { x: r.x + 16, y: r.y + hoved, b: lay.tb.x - 14 - (r.x + 16), h: fh - soejle };
+            } else {
+                if (under - soejle < FORMEL_MIN) soejle = 0;
+                lay.tb = { x: r.x + 12, y: r.y + r.h - tbH - 12, b: r.b - 24, h: tbH };
+                lay.formel = { x: r.x + 16, y: r.y + hoved, b: r.b - 32, h: lay.tb.y - 8 - soejle - (r.y + hoved) };
+            }
+            lay.tbSide = side;
+            lay.soejle = soejle ? { x: lay.formel.x, y: lay.formel.y + lay.formel.h + 2, b: lay.formel.b, h: soejle - 6 } : null;
+        }
 
         P.saetAnker = function (id, x, y, b, h) {
             var e = NK.el(id);
@@ -262,7 +304,6 @@
         };
 
         P.overKort = function (pt) {
-            if (this.skjulKort && this.skjulKort()) return false;
             var r = this.lay && this.lay.kort;
             return !!r && pt.x >= r.x && pt.x <= r.x + r.b && pt.y >= r.y && pt.y <= r.y + r.h;
         };
@@ -373,16 +414,11 @@
             var s = D.stof(this.stof);
             T.rum(ctx, lay.W, lay.H, lay.fliseTop, lay.bordY + 6);
 
-            if (this.skjulKort && this.skjulKort()) { /* kortet er ikke fremme endnu */ }
-            else if (this.tegnKortet) this.tegnKortet(ctx);
+            if (this.tegnKortet) this.tegnKortet(ctx);
             else if (s) {
-                var bundFelt = valg.bundFelt ? 44 : 0;
-                var felt = T.kort(ctx, lay.kort, s, { bund: bundFelt });
+                T.kort(ctx, lay.kort, s, {});
                 var mol = M.laes(s);
-                M.tegn(ctx, mol, M.plan(mol, felt, 46), {});
-                if (bundFelt && this.tegnKortBund) {
-                    this.tegnKortBund(ctx, { x: lay.kort.x + 16, y: lay.kort.y + lay.kort.h - 44, b: lay.kort.b - 32, h: 34 });
-                }
+                M.tegn(ctx, mol, M.plan(mol, lay.formel, 46), {});
             }
 
             T.bord(ctx, 0, lay.W, lay.bordY, lay.H + 10);
@@ -448,12 +484,22 @@
             return ud;
         };
 
+        /* Maerket kommer frem, naar fanen siger det (visPraedikat: 0 til 1);
+           det vokser frem fra midten, saa man ser, at det er nyt */
         P.tegnMaerker = function (ctx) {
-            this.maerker(ctx).forEach(function (mk) {
+            var mig = this;
+            this.maerker(ctx).forEach(function (mk, i) {
                 NK.tekst(ctx, mk.navn, mk.cx, mk.navnY, {
                     justering: "center", font: T.font("700", mk.px), farve: "#eef2f6", kant: true
                 });
-                T.praedikat(ctx, mk.cx, mk.polY, mk.pol, mk.polaer, mk.ppx);
+                var vis = mig.visPraedikat ? mig.visPraedikat(D.OPL[i]) : 1;
+                if (vis <= 0) return;
+                ctx.save();
+                ctx.translate(mk.cx, mk.polY);
+                var sk = vis >= 1 ? 1 : NK.pop(vis);
+                ctx.scale(sk, sk);
+                T.praedikat(ctx, 0, 0, mk.pol, mk.polaer, mk.ppx);
+                ctx.restore();
             });
         };
 

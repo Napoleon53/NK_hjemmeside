@@ -172,6 +172,7 @@
         var g = M.graense(mol);
         var b = g.x1 - g.x0, h = g.y1 - g.y0;
         var u = Math.min(uMaks || 48, rekt.b / (b + 1.3), rekt.h / (h + 1.3));
+        u = Math.max(6, u);   /* aldrig negativ, heller ikke paa et meget lille kort */
         return {
             u: u,
             ox: rekt.x + rekt.b / 2 - (g.x0 + g.x1) / 2 * u,
