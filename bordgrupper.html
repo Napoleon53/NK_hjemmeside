@@ -263,7 +263,7 @@
   table.gcard .role-tag + br{display:none;}
 
   /* Lokaleplanen: tegningen af lokalet med navnene på pladserne */
-  #planView svg.plan{display:block; max-width:100%; height:auto; margin:0 auto; user-select:none; -webkit-user-select:none;}
+  .plan-view svg.plan{display:block; max-width:100%; height:auto; margin:0 auto; user-select:none; -webkit-user-select:none;}
   svg.plan .pseat{cursor:grab; touch-action:none;}
   svg.plan .pseat.swap-selected .seat-bg{fill:#fde68a;}
   svg.plan .pseat.swap-over .seat-bg{fill:#bfdbfe;}
@@ -486,17 +486,7 @@ Elev 28</textarea>
 </div>
 
 <section class="step" id="stepWeeks">
-  <div class="step-head"><span class="step-num">3</span><h2>Uger og lokale</h2></div>
-  <div class="row">
-    <label class="inline">
-      Lokale
-      <select id="roomSelect">
-        <option value="fire">Firemandsborde (7 borde)</option>
-        <option value="hex">Sekskantede borde (5 borde)</option>
-        <option value="rows">Rækker (3 rækker)</option>
-      </select>
-    </label>
-  </div>
+  <div class="step-head"><span class="step-num">3</span><h2>Uger</h2></div>
   <div class="row">
     <label class="inline">
       Første uge
@@ -540,14 +530,24 @@ Elev 28</textarea>
   <p class="muted swap-hint">Byt to elever ved at trække det ene navn hen på det andet eller ved at klikke på dem efter hinanden.</p>
 
   <div class="tabbar">
-    <button class="tabbtn active" data-tab="plan" type="button">Pladser</button>
+    <button class="tabbtn active" data-tab="fire" type="button">Firemandsborde</button>
+    <button class="tabbtn" data-tab="hex" type="button">Sekskantede borde</button>
+    <button class="tabbtn" data-tab="rows" type="button">Rækker</button>
     <button class="tabbtn" data-tab="groups" type="button">Grupper</button>
   </div>
 
   <div class="tab-stack">
-    <div class="tabpanel active" id="tab-plan">
-      <p class="tabsub"><span id="planSub"></span> <span class="over-note" id="planNote"></span></p>
-      <div id="planView"></div>
+    <div class="tabpanel active" id="tab-fire">
+      <p class="tabsub">Gruppe 1 sidder ved bord 1 og så videre, og makkere sidder ved siden af hinanden. <span class="over-note" id="note-fire"></span></p>
+      <div class="plan-view" id="view-fire"></div>
+    </div>
+    <div class="tabpanel" id="tab-hex">
+      <p class="tabsub">Makkerpar og trioer sidder samlet, og under navnet står elevens gruppe. <span class="over-note" id="note-hex"></span></p>
+      <div class="plan-view" id="view-hex"></div>
+    </div>
+    <div class="tabpanel" id="tab-rows">
+      <p class="tabsub">Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret. <span class="over-note" id="note-rows"></span></p>
+      <div class="plan-view" id="view-rows"></div>
     </div>
     <div class="tabpanel" id="tab-groups">
       <p class="tabsub">Hver kolonne er et makkerpar eller en trio.</p>
@@ -1493,37 +1493,31 @@ Elev 28</textarea>
     });
   }
 
-  // ---------- Lokalet: hvor hver elev sidder ----------
-  var PLAN_SUB = {
-    fire: 'Gruppe 1 sidder ved bord 1 og så videre, og makkere sidder ved siden af hinanden.',
-    hex: 'Makkerpar og trioer sidder samlet, og under navnet står elevens gruppe.',
-    rows: 'Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret.'
+  // ---------- Lokalerne: hvor hver elev sidder ----------
+  // Alle tre lokaler tegnes, hver i sin fane, og filen har dem alle på samme side.
+  var PLAN_SIZE = {
+    fire: { swappable:true, maxW:880, maxH:800 },
+    hex: { swappable:true, maxW:1100, maxH:660 }
   };
 
-  function getRoom(){
-    var v = byId('roomSelect').value;
-    return BG.ROOMS[v] ? v : BG.DEFAULT_ROOM;
-  }
-
   function renderPlanView(g, l){
-    var room = getRoom();
-    var view = byId('planView');
+    var roleNames = getActiveRoleNames();
+    ['fire', 'hex'].forEach(function(room){
+      byId('view-' + room).innerHTML = BG.planSvg(room, BG.roomSeating(room, g, l, roleNames), PLAN_SIZE[room]);
+    });
+    var view = byId('view-rows');
     view.innerHTML = '';
-    if(room === 'rows'){
-      var rows = document.createElement('div');
-      rows.className = 'tables';
-      renderRowGrid(rows, l.row);
-      view.appendChild(rows);
-      var board = document.createElement('div');
-      board.className = 'board';
-      board.textContent = 'lærer / tavle / projektor';
-      view.appendChild(board);
-    } else {
-      var seating = BG.roomSeating(room, g, l, getActiveRoleNames());
-      view.innerHTML = BG.planSvg(room, seating, room === 'fire' ? { swappable:true, maxW:880, maxH:800 } : { swappable:true, maxW:1100, maxH:660 });
-    }
-    byId('planSub').textContent = PLAN_SUB[room];
-    byId('planNote').textContent = BG.seatingNote(room, g, l);
+    var rows = document.createElement('div');
+    rows.className = 'tables';
+    renderRowGrid(rows, l.row);
+    view.appendChild(rows);
+    var board = document.createElement('div');
+    board.className = 'board';
+    board.textContent = 'lærer / tavle / projektor';
+    view.appendChild(board);
+    BG.ROOM_KEYS.forEach(function(room){
+      byId('note-' + room).textContent = BG.seatingNote(room, g, l);
+    });
   }
 
   // Gruppekortene på skærmen er de samme tabeller som i filen.
@@ -1662,8 +1656,8 @@ Elev 28</textarea>
     renderPlanView(g, l);
     if(!exportBusy){
       byId('exportHint').textContent = rounds.length === 1
-        ? 'Filen indeholder perioden, som den vises her.'
-        : 'Filen indeholder alle ' + rounds.length + ' perioder, som de vises her.';
+        ? 'Filen er én side med alle tre lokaler og grupperne.'
+        : 'Filen har én side pr. periode, ' + rounds.length + ' i alt, med alle tre lokaler og grupperne.';
     }
 
     var broken = brokenConditions(g);
@@ -1681,12 +1675,24 @@ Elev 28</textarea>
   }
 
   // ---------- Faner ----------
+  // Den valgte fane gemmes med klassen, så klassens sædvanlige lokale står først næste gang.
+  var TAB_KEYS = ['fire', 'hex', 'rows', 'groups'];
+
+  function activeTab(){
+    var btn = document.querySelector('.tabbtn.active');
+    return btn ? btn.dataset.tab : TAB_KEYS[0];
+  }
+
+  function showTab(key){
+    if(TAB_KEYS.indexOf(key) === -1) key = TAB_KEYS[0];
+    document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.toggle('active', b.dataset.tab === key); });
+    document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.toggle('active', p.id === 'tab-' + key); });
+  }
+
   document.querySelectorAll('.tabbtn').forEach(function(btn){
     btn.addEventListener('click', function(){
-      document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.remove('active'); });
-      document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.remove('active'); });
-      btn.classList.add('active');
-      byId('tab-' + btn.dataset.tab).classList.add('active');
+      showTab(btn.dataset.tab);
+      scheduleSave();
     });
   });
 
@@ -1808,7 +1814,7 @@ Elev 28</textarea>
     var roleNames = getActiveRoleNames();
     return rounds.map(function(round){
       var title = (className ? ('Bordgrupper til ' + className + ' i ') : 'Bordgrupper i ') + formatWeekList(round.weeks) + '.';
-      return BG.roundBodyHtml(round.groups, round.layouts, { title:title, roleNames:roleNames, room:getRoom() });
+      return BG.roundBodyHtml(round.groups, round.layouts, { title:title, roleNames:roleNames });
     });
   }
 
@@ -1842,10 +1848,10 @@ Elev 28</textarea>
     { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er udfyldt med en eksempelklasse, så du kan prøve programmet med det samme.' },
     { sel:'#shortenNamesBtn', text:'Renser en elevliste kopieret fra Lectio for id-numre og holdoplysninger og forkorter lange navne til fornavn og forbogstav i efternavnet. Korte navne bliver stående.' },
     { sel:'#stepGroups', text:'Her kan du vælge gruppestørrelse, sætte betingelser for bestemte elever, tage hensyn til køn og kategori og give eleverne roller. Det bliver stående, selvom du retter i navnelisten.' },
-    { sel:'#stepWeeks', text:'Vælg lokalet, første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
+    { sel:'#stepWeeks', text:'Vælg første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
     { sel:'#generateBtn', text:'Laver grupper til alle perioder. Makkere og gruppekammerater gentages så lidt som muligt.' },
-    { sel:'#periodBar', text:'Vælg en periode for at se, hvor eleverne sidder i lokalet, og hvem de er i gruppe med. Træk et navn hen på et andet for at bytte to elever.' },
-    { sel:'#exportBtn', text:'Filen har én side pr. periode med pladserne i lokalet og grupperne, præcis som de vises her.' }
+    { sel:'#periodBar', text:'Vælg en periode og et lokale for at se, hvor eleverne sidder, og hvem de er i gruppe med. Træk et navn hen på et andet for at bytte to elever.' },
+    { sel:'#exportBtn', text:'Filen har én A4-side pr. periode med pladserne ved firemandsborde, sekskantede borde og rækker og gruppekortene, så den passer, uanset hvor klassen har time.' }
   ];
 
   function clearTourHighlight(){
@@ -2078,7 +2084,7 @@ Elev 28</textarea>
       roleNames:new Array(ROLE_COUNT_MAX).fill(''),
       avoidTrios:false, traitsEnabled:false, genderPreference:'none', categoryPreference:'none',
       rolesEnabled:false, roleCount:1,
-      room:BG.DEFAULT_ROOM, startWeek:defaultStartWeek(), rotationWeeks:2, planWeeks:10,
+      view:TAB_KEYS[0], startWeek:defaultStartWeek(), rotationWeeks:2, planWeeks:10,
       plan:null, earlierPlans:[]
     };
   }
@@ -2092,7 +2098,7 @@ Elev 28</textarea>
       avoidTrios: getAvoidTrios(), traitsEnabled: traitsEnabled(),
       genderPreference: byId('genderPreference').value, categoryPreference: byId('categoryPreference').value,
       rolesEnabled: getRolesEnabled(), roleCount: getRoleCount(),
-      room: getRoom(), startWeek: getStartWeek(), rotationWeeks: getRotationWeeks(), planWeeks: getPlanWeeks(),
+      view: activeTab(), startWeek: getStartWeek(), rotationWeeks: getRotationWeeks(), planWeeks: getPlanWeeks(),
       plan: state.plan ? serializePlan(state.plan) : null,
       earlierPlans: state.earlierPlans
     };
@@ -2181,7 +2187,8 @@ Elev 28</textarea>
     byId('startWeek').value = c.startWeek;
     byId('rotationWeeks').value = c.rotationWeeks;
     byId('planWeeks').value = c.planWeeks;
-    byId('roomSelect').value = BG.ROOMS[c.room] ? c.room : BG.DEFAULT_ROOM;
+    // Klasser gemt før 23. okt. 2026 har det valgte lokale under "room".
+    showTab(saved && !saved.view && saved.room ? saved.room : c.view);
     ['condError', 'errorLabel', 'exportError'].forEach(function(id){ showMessage(id, null); });
 
     state.earlierPlans = c.earlierPlans;
@@ -2259,7 +2266,6 @@ Elev 28</textarea>
   });
   byId('roleCount').addEventListener('change', function(){ renderRoleNamesPanel(); renderPlan(); });
 
-  byId('roomSelect').addEventListener('change', renderPlan);
   ['startWeek', 'rotationWeeks', 'planWeeks'].forEach(function(id){
     byId(id).addEventListener('input', function(){ updatePeriodHint(); renderPlan(); });
   });

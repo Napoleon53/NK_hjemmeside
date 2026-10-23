@@ -1,6 +1,7 @@
 // Fælles visning og eksport for bordgrupper.html (lodtrækning) og bordgrupper-faerdige.html
 // (grupper, læreren selv har lavet). Filen kender ikke lodtrækningen: den får par, trioer og
-// grupper ind og giver lokaleplaner, rækkeopstilling og Word-/PDF-sider ud.
+// grupper ind og giver lokaleplaner, rækkeopstilling og Word-/PDF-sider ud. Hver side i filen
+// har alle tre lokaler, så den passer, uanset hvor klassen har time.
 (function(global){
   'use strict';
 
@@ -247,9 +248,12 @@
     return measureCtx.measureText(text).width;
   }
 
-  // Navnet på én linje, ellers på to linjer (fornavn og resten), ellers med mindre skrift.
+  // Navnet på én linje, eventuelt lidt mindre, ellers på to linjer (fornavn og resten), ellers
+  // med mindre skrift. "Muhammad A." skal hellere være lidt mindre end deles i to.
   function fitName(name, maxW, fs){
-    if(textWidth(name, fs, 600) <= maxW) return { lines:[name], fs:fs };
+    var whole = textWidth(name, fs, 600);
+    if(whole <= maxW) return { lines:[name], fs:fs };
+    if(whole * 0.8 <= maxW) return { lines:[name], fs:r1(fs * maxW / whole) };
     var words = name.split(/\s+/);
     if(words.length > 1){
       var fs2 = r1(fs * 0.92), best = null;
@@ -265,17 +269,20 @@
   }
 
   // Navn, eventuel rolle over navnet og eventuel gruppe under navnet, samlet om (cx, cy).
-  function seatLabelSvg(seat, cx, cy, maxW, fs, showGroup){
+  // "k" gør rolle og gruppe større på de små tegninger i filen, ligesom navnet.
+  function seatLabelSvg(seat, cx, cy, maxW, fs, showGroup, k){
+    k = k || 1;
     var fit = fitName(seat.name, maxW, fs);
     var lh = fit.fs * 1.12;
-    var roleH = seat.role ? 17 : 0;
-    var groupH = (showGroup && seat.group) ? 14 : 0;
+    var roleFs = r1(10.5 * k), groupFs = r1(11.5 * k);
+    var roleH = seat.role ? r1(17 * k) : 0;
+    var groupH = (showGroup && seat.group) ? r1(14 * k) : 0;
     var y = cy - (roleH + fit.lines.length * lh + groupH) / 2;
     var out = '';
     if(seat.role){
-      var rw = Math.min(maxW, textWidth(seat.role, 10.5, 700) + 10);
-      out += '<rect x="' + r1(cx - rw/2) + '" y="' + r1(y) + '" width="' + r1(rw) + '" height="14" rx="3" fill="' + ROLE_FILL + '"/>' +
-        '<text x="' + cx + '" y="' + r1(y + 10.6) + '" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">' + escapeHtml(seat.role) + '</text>';
+      var rw = Math.min(maxW, textWidth(seat.role, roleFs, 700) + 10 * k);
+      out += '<rect x="' + r1(cx - rw/2) + '" y="' + r1(y) + '" width="' + r1(rw) + '" height="' + r1(14 * k) + '" rx="3" fill="' + ROLE_FILL + '"/>' +
+        '<text x="' + cx + '" y="' + r1(y + 10.6 * k) + '" font-size="' + roleFs + '" font-weight="700" fill="#fff" text-anchor="middle">' + escapeHtml(seat.role) + '</text>';
       y += roleH;
     }
     fit.lines.forEach(function(line){
@@ -284,19 +291,20 @@
       y += lh;
     });
     if(groupH){
-      out += '<text x="' + cx + '" y="' + r1(y + 11) + '" font-size="11.5" fill="' + MUTED + '" text-anchor="middle">' + escapeHtml(seat.group) + '</text>';
+      out += '<text x="' + cx + '" y="' + r1(y + 11 * k) + '" font-size="' + groupFs + '" fill="' + MUTED + '" text-anchor="middle">' + escapeHtml(seat.group) + '</text>';
     }
     return out;
   }
 
   // En plads på tegningen: feltet og navnet hver for sig, så alle navne kan tegnes oven på alle
   // felter (et langt navn må gerne gå lidt ind over nabopladsen). På skærmen får begge en
-  // henvisning til navnet, så det kan byttes.
-  function seatSvg(shape, seat, cx, cy, maxW, fs, showGroup, swappable){
-    var attrs = (seat && swappable) ? ' class="pseat" data-u="' + seat.ref + '" data-i="' + seat.i + '"' : '';
+  // henvisning til navnet, så det kan byttes. opts.k er tekstens forstørrelse.
+  function seatSvg(shape, seat, cx, cy, maxW, fs, showGroup, opts){
+    var k = opts.k || 1;
+    var attrs = (seat && opts.swappable) ? ' class="pseat" data-u="' + seat.ref + '" data-i="' + seat.i + '"' : '';
     return {
       bg: '<g' + attrs + '>' + shape + '</g>',
-      label: seat ? '<g' + attrs + '>' + seatLabelSvg(seat, cx, cy, maxW, fs, showGroup) + '</g>' : ''
+      label: seat ? '<g' + attrs + '>' + seatLabelSvg(seat, cx, cy, maxW, r1(fs * k), showGroup, k) + '</g>' : ''
     };
   }
 
@@ -336,7 +344,7 @@
     ['a', 'b', 'c', 'd'].forEach(function(L){
       var r = FIRE_SEATS[L], s = bySeat[L];
       var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" fill="' + (s ? SEAT_FILL : EMPTY_FILL) + '"/>';
-      var part = seatSvg(shape, s, r.x + r.w/2, r.y + r.h/2, r.w - 12, 17, false, opts.swappable);
+      var part = seatSvg(shape, s, r.x + r.w/2, r.y + r.h/2, r.w - 12, 17, false, opts);
       out += part.bg;
       labels += part.label;
     });
@@ -351,7 +359,7 @@
       var r = FIRE_SEATS[L], s = bySeat[L];
       if(!s) return;
       var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" rx="3" fill="' + SEAT_FILL + '" stroke="' + LINE + '" stroke-width="2"/>';
-      var part = seatSvg(shape, s, r.x + r.w/2, r.y + r.h/2, r.w - 12, 16, false, opts.swappable);
+      var part = seatSvg(shape, s, r.x + r.w/2, r.y + r.h/2, r.w - 12, 16, false, opts);
       out += part.bg;
       labels += part.label;
       markRect(r);
@@ -383,7 +391,7 @@
     ['a', 'b', 'c', 'd', 'e', 'f'].forEach(function(L){
       var p = HEX_SEATS[L], s = bySeat[L];
       var shape = '<polygon class="seat-bg" points="0,0 ' + p.sector[0].join(',') + ' ' + p.sector[1].join(',') + '" fill="' + (s ? SEAT_FILL : EMPTY_FILL) + '"/>';
-      var part = seatSvg(shape, s, p.text[0], p.text[1], p.maxW, 16, true, opts.swappable);
+      var part = seatSvg(shape, s, p.text[0], p.text[1], p.maxW, 16, true, opts);
       out += part.bg;
       labels += part.label;
     });
@@ -398,7 +406,7 @@
       var cx = k === 0 ? -60 : 60, cy = d.extra * 200;
       var r = { x:cx - 56, y:cy - 20, w:112, h:40 };
       var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" rx="3" fill="' + SEAT_FILL + '" stroke="' + LINE + '" stroke-width="2"/>';
-      var part = seatSvg(shape, s, cx, cy, r.w - 10, 15, false, opts.swappable);
+      var part = seatSvg(shape, s, cx, cy, r.w - 10, 15, false, opts);
       out += part.bg;
       labels += part.label;
       mark(r.x, r.y); mark(r.x + r.w, r.y + r.h);
@@ -597,30 +605,31 @@
   // Siden er A4 på langs med 0,8 cm margen: 1062 x 733 px. Overskriften tager ca. 40 px.
   var PAGE_W = 1062;
 
+  // Alle tre lokaler står på samme side, så papiret passer, hvor klassen end har time.
+  // Tegningerne er ca. 1040 og 1140 enheder brede og står side om side i næsten samme
+  // målestok (knap halv størrelse). Teksten på dem er derfor 1,25 gange større end på skærmen.
+  // 494 px + 10 pt mellemrum + 550 px skal holde sig under sidens 1062 px, også i Word.
+  var MINI_FIRE = { maxW:494, maxH:470, k:1.25 };
+  var MINI_HEX = { maxW:550, maxH:360, k:1.25 };
+
   // Fælles indhold for én side - genbruges af både Word- og PDF-eksport og af visningen
-  // på siden med færdige grupper. "opts": overskrift, lokale og eventuelle rollenavne.
-  // Pladserne står forrest. Firemandsborde har gruppekortene ved siden af tegningen, de
-  // andre lokaler har dem nedenunder.
+  // på siden med færdige grupper. "opts": overskrift og eventuelle rollenavne.
+  // Firemandsbordene står til venstre, de sekskantede borde og rækkerne til højre og
+  // gruppekortene nederst i én række.
   function roundBodyHtml(g, l, opts){
     opts = opts || {};
-    var room = roomKey(opts.room);
     var roleNames = opts.roleNames || [];
     var html = '<h1>' + escapeHtml(opts.title || 'Bordgrupper') + '</h1>';
-    html += '<p class="dato">' + g.n + ' elever, ' + describeSizes(bundleSizes(g)) + '. ' + ROOMS[room].navn + '.</p>';
+    html += '<p class="dato">' + g.n + ' elever, ' + describeSizes(bundleSizes(g)) + '.</p>';
     var cards = g.bundles.map(function(b){ return groupCardTable(b.label, bundleColumns(b, g), bundleRoleMap(b, roleNames)); });
+    var fire = planSvg('fire', roomSeating('fire', g, l, roleNames), MINI_FIRE);
+    var hex = planSvg('hex', roomSeating('hex', g, l, roleNames), MINI_HEX);
 
-    if(room === 'rows'){
-      html += '<div class="section"><div class="sectitle">Pladser</div>' + rowGridWordTable(l.row) + boardTableHtml() + '</div>';
-      html += '<div class="section"><div class="sectitle">Grupper</div>' + cardsGridHtml(cards, 4) + '</div>';
-      return html;
-    }
-    var seating = roomSeating(room, g, l, roleNames);
-    if(room === 'fire'){
-      html += '<table class="pagegrid"><tr><td class="plancell">' + planSvg('fire', seating, { maxW:680, maxH:640 }) + '</td>' +
-        '<td class="sidecell"><div class="sectitle">Grupper</div>' + cardsGridHtml(cards, 2) + '</td></tr></table>';
-      return html;
-    }
-    html += '<div class="plancenter">' + planSvg('hex', seating, { maxW:980, maxH:470 }) + '</div>';
+    html += '<table class="pagegrid"><tr>' +
+      '<td class="plancell" style="width:48%;"><div class="sectitle">' + ROOMS.fire.navn + '</div><div class="plancenter">' + fire + '</div></td>' +
+      '<td style="width:52%;"><div class="sectitle">' + ROOMS.hex.navn + '</div><div class="plancenter">' + hex + '</div>' +
+      '<div class="sectitle">' + ROOMS.rows.navn + '</div>' + rowGridWordTable(l.row) + boardTableHtml() + '</td>' +
+      '</tr></table>';
     html += '<div class="section"><div class="sectitle">Grupper</div>' + cardsGridHtml(cards, 7) + '</div>';
     return html;
   }
@@ -637,25 +646,25 @@
       '.sectitle{font-size:9pt; font-weight:bold; background:#dfe7f0; padding:2pt 5pt; margin-bottom:3pt;}' +
       'table.layout{width:100%; border-collapse:collapse; margin-bottom:2pt;}' +
       'table.layout td{vertical-align:top; padding:2pt 4pt; border:1px solid #ccc;}' +
-      'table.pagegrid{width:100%; border-collapse:collapse;}' +
+      'table.pagegrid{width:100%; border-collapse:collapse; margin-bottom:5pt;}' +
       'table.pagegrid td{vertical-align:top; padding:0; border:none;}' +
       'td.plancell{padding-right:10pt;}' +
       '.plancenter{text-align:center; margin-bottom:4pt;}' +
       'svg.plan{display:inline-block;}' +
       'table.gcard{border-collapse:collapse; width:100%;}' +
-      'table.gcard th{font-size:6.8pt; background:#dfe7f0; padding:1.5pt 3pt; border:1px solid #aaa;}' +
-      'table.gcard td{font-size:6.8pt; padding:1.5pt 4pt; border:1px solid #ccc; text-align:center;}' +
+      'table.gcard th{font-size:7.5pt; background:#dfe7f0; padding:1.5pt 3pt; border:1px solid #aaa;}' +
+      'table.gcard td{font-size:7.5pt; padding:1.5pt 3pt; border:1px solid #ccc; text-align:center;}' +
       'table.gcard td.pa{color:#1d63c9; font-weight:bold; background:#eaf3fd;}' +
       'table.gcard td.pb{color:#c9720f; font-weight:bold; background:#fdf1e3;}' +
       'table.gcard td.pc{color:#7c3aed; font-weight:bold; background:#f1eafe;}' +
       'table.gcard td.pt{color:#159957; font-weight:bold; background:#e8f9ef;}' +
       '.role-tag{display:block; font-size:5.5pt; font-weight:bold; color:#fff; background:#b45309; border-radius:3px; padding:0.5pt 3pt; margin-bottom:1pt; line-height:1.3;}' +
       'table.rowgrid{width:100%; border-collapse:collapse;}' +
-      'table.rowgrid th{width:8%; font-size:6.8pt; background:#dfe7f0; padding:2pt 3pt; border:1px solid #aaa; text-align:left;}' +
-      'table.rowgrid td{font-size:6.5pt; padding:2pt 3pt; border:1px solid #ccc; text-align:center;}' +
+      'table.rowgrid th{width:8%; font-size:6.5pt; background:#dfe7f0; padding:2pt 3pt; border:1px solid #aaa; text-align:left;}' +
+      'table.rowgrid td{font-size:6.5pt; font-weight:bold; padding:2pt 1.5pt; border:1px solid #ccc; text-align:center;}' +
       'table.rowgrid td.st{border-top:3px solid #22c55e; background:#eafaf0;}' +
-      'table.boardbar{width:70%; margin:6pt auto 0; border-collapse:collapse;}' +
-      'table.boardbar td{border:1.5px solid #334155; background:#f1f5f9; text-align:center; font-weight:bold; font-size:8pt; color:#334155; padding:3pt;}' +
+      'table.boardbar{width:80%; margin:5pt auto 0; border-collapse:collapse;}' +
+      'table.boardbar td{border:1.5px solid #334155; background:#f1f5f9; text-align:center; font-weight:bold; font-size:7.5pt; color:#334155; padding:2.5pt;}' +
       '.pagebreak{page-break-before:always;}';
   }
 
@@ -683,7 +692,7 @@
     return html + '</body></html>';
   }
 
-  // Tegner en lokaleplan som PNG (base64) i dobbelt opløsning, så den står skarpt på papir.
+  // Tegner en lokaleplan som PNG (base64) i flere gange opløsningen, så den står skarpt på papir.
   function svgToPngBase64(svg, w, h, scale){
     var W = Math.round(w * scale), H = Math.round(h * scale);
     var big = svg.replace(/width="[\d.]+" height="[\d.]+"/, 'width="' + W + '" height="' + H + '"');
@@ -732,7 +741,8 @@
     });
     var html = documentHtml(bodies, title, true);
     if(!images.length) return Promise.resolve('\ufeff' + html);
-    return Promise.all(images.map(function(im){ return svgToPngBase64(im.svg, im.w, im.h, 2); })).then(function(pngs){
+    // Tegningerne er små på siden, så de laves i tredobbelt opløsning, ellers bliver navnene uskarpe.
+    return Promise.all(images.map(function(im){ return svgToPngBase64(im.svg, im.w, im.h, 3); })).then(function(pngs){
       var boundary = '----=_NextPart_Bordgrupper_' + Date.now().toString(36);
       var out = 'MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary="' + boundary + '"; type="text/html"\r\n\r\n' +
         '--' + boundary + '\r\nContent-Type: text/html; charset="utf-8"\r\nContent-Transfer-Encoding: base64\r\n' +
