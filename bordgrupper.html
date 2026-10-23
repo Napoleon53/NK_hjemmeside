@@ -558,7 +558,7 @@ Elev 28</textarea>
 
 <p class="sidefod"><a href="bordgrupper-faerdige.html">Har du allerede grupperne? Hent dem i samme format</a></p>
 
-<script src="assets/bordgrupper-visning.js"></script>
+<script src="assets/bordgrupper-visning.js?v=2026-10-23b"></script>
 <script>
 (function(){
   var CATEGORY_MAX = 9;
@@ -1656,8 +1656,8 @@ Elev 28</textarea>
     renderPlanView(g, l);
     if(!exportBusy){
       byId('exportHint').textContent = rounds.length === 1
-        ? 'Filen er én side med alle tre lokaler og grupperne.'
-        : 'Filen har én side pr. periode, ' + rounds.length + ' i alt, med alle tre lokaler og grupperne.';
+        ? 'Filen er én stående A4-side med alle tre lokaler.'
+        : 'Filen har én stående A4-side pr. periode, ' + rounds.length + ' i alt, med alle tre lokaler.';
     }
 
     var broken = brokenConditions(g);
@@ -1851,7 +1851,7 @@ Elev 28</textarea>
     { sel:'#stepWeeks', text:'Vælg første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
     { sel:'#generateBtn', text:'Laver grupper til alle perioder. Makkere og gruppekammerater gentages så lidt som muligt.' },
     { sel:'#periodBar', text:'Vælg en periode og et lokale for at se, hvor eleverne sidder, og hvem de er i gruppe med. Træk et navn hen på et andet for at bytte to elever.' },
-    { sel:'#exportBtn', text:'Filen har én A4-side pr. periode med pladserne ved firemandsborde, sekskantede borde og rækker og gruppekortene, så den passer, uanset hvor klassen har time.' }
+    { sel:'#exportBtn', text:'Filen har én stående A4-side pr. periode med pladserne ved firemandsborde, sekskantede borde og rækker, så den passer, uanset hvor klassen har time.' }
   ];
 
   function clearTourHighlight(){

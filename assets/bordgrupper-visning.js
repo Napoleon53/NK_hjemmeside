@@ -1,7 +1,9 @@
 // Fælles visning og eksport for bordgrupper.html (lodtrækning) og bordgrupper-faerdige.html
 // (grupper, læreren selv har lavet). Filen kender ikke lodtrækningen: den får par, trioer og
 // grupper ind og giver lokaleplaner, rækkeopstilling og Word-/PDF-sider ud. Hver side i filen
-// har alle tre lokaler, så den passer, uanset hvor klassen har time.
+// er en stående A4 med alle tre lokaler, så den passer, uanset hvor klassen har time.
+// Siderne henter filen med ?v=dato, så browseren ikke bruger en gammel, gemt udgave: ret
+// datoen i begge sider, når filen ændres.
 (function(global){
   'use strict';
 
@@ -476,7 +478,10 @@
       return room === 'hex' ? hexTableSvg(t, opts, box) : fireTableSvg(t, opts, box);
     }).join('');
     var bar = BOARD[room];
-    var barY = Math.max(bar.y, Math.round(box.y1 + 36));
+    // På skærmen står tavlen samme sted, uanset ekstra stole. I filen (opts.tight) rykker den
+    // op under de forreste borde, så der ikke er tom plads på siden.
+    var barY = Math.round(box.y1 + 36);
+    if(!opts.tight) barY = Math.max(bar.y, barY);
     addPt(box, bar.x0, barY);
     addPt(box, bar.x1, barY + 42);
     body += '<rect x="' + bar.x0 + '" y="' + barY + '" width="' + (bar.x1 - bar.x0) + '" height="42" rx="4" fill="#f1f5f9" stroke="' + LINE + '" stroke-width="2"/>' +
@@ -602,53 +607,53 @@
     return html;
   }
 
-  // Siden er A4 på langs med 0,8 cm margen: 1062 x 733 px. Overskriften tager ca. 40 px.
-  var PAGE_W = 1062;
+  // Siden er A4 på højkant med 0,8 cm margen: 733 x 1062 px. Overskriften tager ca. 40 px.
+  var PAGE_W = 733;
 
-  // Alle tre lokaler står på samme side, så papiret passer, hvor klassen end har time.
-  // Tegningerne er ca. 1040 og 1140 enheder brede og står side om side i næsten samme
-  // målestok (knap halv størrelse). Teksten på dem er derfor 1,25 gange større end på skærmen.
-  // 494 px + 10 pt mellemrum + 550 px skal holde sig under sidens 1062 px, også i Word.
-  var MINI_FIRE = { maxW:494, maxH:470, k:1.25 };
-  var MINI_HEX = { maxW:550, maxH:360, k:1.25 };
+  // Alle tre lokaler står under hinanden på samme side, så papiret passer, hvor klassen end
+  // har time. Tegningerne er så høje, de kan blive, og lige brede (ca. 540 px), og teksten på
+  // dem er 1,25 gange større end på skærmen, så navnene kan læses i den lille størrelse.
+  // Højderne er faste, så siden fylder næsten det samme, uanset klassen: højst ca. 970 af
+  // 1062 px (33 elever med ekstra stole). Resten er luft til Word, der sætter lidt større op.
+  var MINI_FIRE = { maxW:PAGE_W, maxH:460, k:1.25, tight:true };
+  var MINI_HEX = { maxW:PAGE_W, maxH:330, k:1.25, tight:true };
 
   // Fælles indhold for én side - genbruges af både Word- og PDF-eksport og af visningen
   // på siden med færdige grupper. "opts": overskrift og eventuelle rollenavne.
-  // Firemandsbordene står til venstre, de sekskantede borde og rækkerne til højre og
-  // gruppekortene nederst i én række.
+  // Firemandsbordene viser grupperne (gruppe 1 ved bord 1 osv.), så gruppekort står der kun
+  // for grupper, der ikke har plads ved et firemandsbord (flere end 7 grupper eller 9+ elever).
   function roundBodyHtml(g, l, opts){
     opts = opts || {};
     var roleNames = opts.roleNames || [];
     var html = '<h1>' + escapeHtml(opts.title || 'Bordgrupper') + '</h1>';
     html += '<p class="dato">' + g.n + ' elever, ' + describeSizes(bundleSizes(g)) + '.</p>';
-    var cards = g.bundles.map(function(b){ return groupCardTable(b.label, bundleColumns(b, g), bundleRoleMap(b, roleNames)); });
     var fire = planSvg('fire', roomSeating('fire', g, l, roleNames), MINI_FIRE);
     var hex = planSvg('hex', roomSeating('hex', g, l, roleNames), MINI_HEX);
 
-    html += '<table class="pagegrid"><tr>' +
-      '<td class="plancell" style="width:48%;"><div class="sectitle">' + ROOMS.fire.navn + '</div><div class="plancenter">' + fire + '</div></td>' +
-      '<td style="width:52%;"><div class="sectitle">' + ROOMS.hex.navn + '</div><div class="plancenter">' + hex + '</div>' +
-      '<div class="sectitle">' + ROOMS.rows.navn + '</div>' + rowGridWordTable(l.row) + boardTableHtml() + '</td>' +
-      '</tr></table>';
-    html += '<div class="section"><div class="sectitle">Grupper</div>' + cardsGridHtml(cards, 7) + '</div>';
+    html += '<div class="sectitle">' + ROOMS.fire.navn + '</div><div class="plancenter">' + fire + '</div>';
+    html += '<div class="sectitle">' + ROOMS.hex.navn + '</div><div class="plancenter">' + hex + '</div>';
+    html += '<div class="sectitle">' + ROOMS.rows.navn + '</div>' + rowGridWordTable(l.row) + boardTableHtml();
+
+    var outside = g.bundles.filter(function(b, k){ return k >= FIRE_TABLES.length || b.members.length > SEAT_LETTERS.length; });
+    if(outside.length){
+      var cards = outside.map(function(b){ return groupCardTable(b.label, bundleColumns(b, g), bundleRoleMap(b, roleNames)); });
+      html += '<div class="section"><div class="sectitle">Grupper uden plads ved et firemandsbord</div>' + cardsGridHtml(cards, 5) + '</div>';
+    }
     return html;
   }
 
   function sharedExportStyles(word){
     var page = word
-      ? '@page WordSection1{size:841.9pt 595.3pt; margin:0.8cm; mso-page-orientation:landscape;} div.WordSection1{page:WordSection1;}'
-      : '@page{size:A4 landscape; margin:0.8cm;} @media screen{body{max-width:' + PAGE_W + 'px; margin:16px auto; padding:0 12px;}}';
+      ? '@page WordSection1{size:595.3pt 841.9pt; margin:0.8cm;} div.WordSection1{page:WordSection1;}'
+      : '@page{size:A4 portrait; margin:0.8cm;} @media screen{body{max-width:' + PAGE_W + 'px; margin:16px auto; padding:0 12px;}}';
     return page +
       'body{font-family:Calibri, Arial, sans-serif; font-size:8pt; line-height:1.15;}' +
       'h1{font-size:12pt; margin:0 0 2pt;}' +
       '.dato{color:#555; margin:0 0 6pt; font-size:7.5pt;}' +
-      '.section{margin-bottom:5pt;}' +
-      '.sectitle{font-size:9pt; font-weight:bold; background:#dfe7f0; padding:2pt 5pt; margin-bottom:3pt;}' +
+      '.section{margin:6pt 0 0;}' +
+      '.sectitle{font-size:8.5pt; font-weight:bold; background:#dfe7f0; padding:1.5pt 5pt; margin-bottom:2pt;}' +
       'table.layout{width:100%; border-collapse:collapse; margin-bottom:2pt;}' +
       'table.layout td{vertical-align:top; padding:2pt 4pt; border:1px solid #ccc;}' +
-      'table.pagegrid{width:100%; border-collapse:collapse; margin-bottom:5pt;}' +
-      'table.pagegrid td{vertical-align:top; padding:0; border:none;}' +
-      'td.plancell{padding-right:10pt;}' +
       '.plancenter{text-align:center; margin-bottom:4pt;}' +
       'svg.plan{display:inline-block;}' +
       'table.gcard{border-collapse:collapse; width:100%;}' +
@@ -660,10 +665,10 @@
       'table.gcard td.pt{color:#159957; font-weight:bold; background:#e8f9ef;}' +
       '.role-tag{display:block; font-size:5.5pt; font-weight:bold; color:#fff; background:#b45309; border-radius:3px; padding:0.5pt 3pt; margin-bottom:1pt; line-height:1.3;}' +
       'table.rowgrid{width:100%; border-collapse:collapse;}' +
-      'table.rowgrid th{width:8%; font-size:6.5pt; background:#dfe7f0; padding:2pt 3pt; border:1px solid #aaa; text-align:left;}' +
-      'table.rowgrid td{font-size:6.5pt; font-weight:bold; padding:2pt 1.5pt; border:1px solid #ccc; text-align:center;}' +
+      'table.rowgrid th{width:8%; font-size:7pt; background:#dfe7f0; padding:2pt 3pt; border:1px solid #aaa; text-align:left;}' +
+      'table.rowgrid td{font-size:7pt; font-weight:bold; padding:2.5pt 1.5pt; border:1px solid #ccc; text-align:center;}' +
       'table.rowgrid td.st{border-top:3px solid #22c55e; background:#eafaf0;}' +
-      'table.boardbar{width:80%; margin:5pt auto 0; border-collapse:collapse;}' +
+      'table.boardbar{width:74%; margin:5pt auto 0; border-collapse:collapse;}' +
       'table.boardbar td{border:1.5px solid #334155; background:#f1f5f9; text-align:center; font-weight:bold; font-size:7.5pt; color:#334155; padding:2.5pt;}' +
       '.pagebreak{page-break-before:always;}';
   }
