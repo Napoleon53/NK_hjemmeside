@@ -13,10 +13,6 @@
     --muted:#5c6a76;
     --accent:#2563eb;
     --accent-dark:#1d4ed8;
-    --pair-a:#e0f2fe;
-    --pair-a-border:#38bdf8;
-    --trio-bg:#dcfce7;
-    --trio-border:#22c55e;
     --four-border:#7c3aed;
     --warn:#b45309;
   }
@@ -285,8 +281,6 @@
   }
   .row-grid{display:grid; gap:6px;}
   .row-grid .seat{min-width:0; width:100%;}
-  .row-grid .seat.seat-pair{border-top:4px solid var(--pair-a-border);}
-  .row-grid .seat.seat-three{border-top:4px solid var(--trio-border); background:var(--trio-bg);}
 
   @keyframes tourPulse{
     0%{ box-shadow:0 0 0 4px rgba(251,191,36,.95), 0 0 0 4px rgba(251,191,36,.5), 0 0 0 9999px rgba(15,23,42,.55); }
@@ -538,15 +532,15 @@ Elev 28</textarea>
 
   <div class="tab-stack">
     <div class="tabpanel active" id="tab-fire">
-      <p class="tabsub">Gruppe 1 sidder ved bord 1 og så videre, og makkere sidder ved siden af hinanden. <span class="over-note" id="note-fire"></span></p>
+      <p class="tabsub">Gruppe 1 sidder ved bord 1 og så videre. Makkere sidder ved siden af hinanden og har samme farve. <span class="over-note" id="note-fire"></span></p>
       <div class="plan-view" id="view-fire"></div>
     </div>
     <div class="tabpanel" id="tab-hex">
-      <p class="tabsub">Makkerpar og trioer sidder samlet, og under navnet står elevens gruppe. <span class="over-note" id="note-hex"></span></p>
+      <p class="tabsub">Makkerpar og trioer sidder samlet og har samme farve, og under navnet står elevens gruppe. <span class="over-note" id="note-hex"></span></p>
       <div class="plan-view" id="view-hex"></div>
     </div>
     <div class="tabpanel" id="tab-rows">
-      <p class="tabsub">Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret. <span class="over-note" id="note-rows"></span></p>
+      <p class="tabsub">Samme plads står lige bag hinanden i alle rækker, og makkere har samme farve. <span class="over-note" id="note-rows"></span></p>
       <div class="plan-view" id="view-rows"></div>
     </div>
     <div class="tabpanel" id="tab-groups">
@@ -558,7 +552,7 @@ Elev 28</textarea>
 
 <p class="sidefod"><a href="bordgrupper-faerdige.html">Har du allerede grupperne? Hent dem i samme format</a></p>
 
-<script src="assets/bordgrupper-visning.js?v=2026-10-23b"></script>
+<script src="assets/bordgrupper-visning.js?v=2026-10-23c"></script>
 <script>
 (function(){
   var CATEGORY_MAX = 9;
@@ -1480,12 +1474,7 @@ Elev 28</textarea>
       grid.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0,1fr))';
       rowSeats(table).forEach(function(s){
         var seat = renderSeat(s.name, s.ref, s.i);
-        if(s.color){
-          seat.classList.add('seat-pair');
-          seat.style.borderTopColor = s.color;
-        } else {
-          seat.classList.add('seat-three');
-        }
+        seat.style.background = s.tint;
         grid.appendChild(seat);
       });
       block.appendChild(grid);

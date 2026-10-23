@@ -32,8 +32,22 @@
     return sizes.length + groupWord + ': ' + joinDa(keys.map(function(k){ return counts[k] + ' på ' + k; }));
   }
 
-  // Skiftende farver pr. makkerpar i rækkeopstillingen, så man nemt kan se hvem der er makker med hvem.
-  var PAIR_PALETTE = ['#38bdf8', '#f59e0b', '#7c3aed', '#ec4899', '#14b8a6', '#ef4444'];
+  // Makkerpar får en lys farve i alle tre lokaler, så man kan se, hvem der sidder sammen:
+  // 1., 2. og 3. makkerpar ved et bord eller i en række er blå, orange og lilla, og en trio er
+  // grøn. Ved firemandsbordene er det samme farver som kolonnerne i gruppekortene. Ved et
+  // sekskantet bord eller i en række kan to trioer sidde side om side; den anden er lyserød.
+  var PAIR_TINTS = ['#dbeafe', '#ffedd5', '#ede9fe'];
+  var TRIO_TINTS = ['#dcfce7', '#fce7f3'];
+
+  // Farven til hver enhed (par eller trio) i rækkefølge, ud fra henvisningen ("p3" eller "t1").
+  function unitTints(units){
+    var pairNo = 0, trioNo = 0;
+    return units.map(function(u){
+      return u.ref.charAt(0) === 't'
+        ? TRIO_TINTS[trioNo++ % TRIO_TINTS.length]
+        : PAIR_TINTS[pairNo++ % PAIR_TINTS.length];
+    });
+  }
 
   // Sikkerhedsloft: meget lange (fx fulde) navne kan ødelægge de faste bordopstillinger,
   // så de afkortes automatisk her - uanset om "Forkort navne"-knappen er brugt.
@@ -150,12 +164,11 @@
     return names[ti] || ('Ekstra række ' + (ti-2));
   }
 
-  // Sæderne i en række i rækkefølge. Hvert makkerpar får sin egen farve; trioer har ingen.
+  // Sæderne i en række i rækkefølge, hver med sit makkerpars eller sin trios farve.
   function rowSeats(table){
-    var seats = [], pairColorIdx = 0;
-    table.units.forEach(function(unit){
-      var color = unit.type === 'three' ? null : PAIR_PALETTE[pairColorIdx++ % PAIR_PALETTE.length];
-      unit.data.forEach(function(nm, i){ seats.push({ name:nm, color:color, ref:unit.ref, i:i }); });
+    var seats = [], tints = unitTints(table.units);
+    table.units.forEach(function(unit, k){
+      unit.data.forEach(function(nm, i){ seats.push({ name:nm, tint:tints[k], ref:unit.ref, i:i }); });
     });
     return seats;
   }
@@ -235,7 +248,7 @@
 
   var FONT = "'Segoe UI', Calibri, Arial, sans-serif";
   var INK = '#1f2933', LINE = '#334155', MUTED = '#64748b', BADGE = '#1d4ed8';
-  var SEAT_FILL = '#ffffff', EMPTY_FILL = '#eef1f5', ROLE_FILL = '#b45309';
+  var EMPTY_FILL = '#eef1f5', ROLE_FILL = '#b45309';
 
   function r1(v){ return Math.round(v*10)/10; }
 
@@ -345,7 +358,7 @@
 
     ['a', 'b', 'c', 'd'].forEach(function(L){
       var r = FIRE_SEATS[L], s = bySeat[L];
-      var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" fill="' + (s ? SEAT_FILL : EMPTY_FILL) + '"/>';
+      var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" fill="' + (s ? s.tint : EMPTY_FILL) + '"/>';
       var part = seatSvg(shape, s, r.x + r.w/2, r.y + r.h/2, r.w - 12, 17, false, opts);
       out += part.bg;
       labels += part.label;
@@ -360,7 +373,7 @@
     ['e', 'f', 'g', 'h'].forEach(function(L){
       var r = FIRE_SEATS[L], s = bySeat[L];
       if(!s) return;
-      var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" rx="3" fill="' + SEAT_FILL + '" stroke="' + LINE + '" stroke-width="2"/>';
+      var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" rx="3" fill="' + s.tint + '" stroke="' + LINE + '" stroke-width="2"/>';
       var part = seatSvg(shape, s, r.x + r.w/2, r.y + r.h/2, r.w - 12, 16, false, opts);
       out += part.bg;
       labels += part.label;
@@ -392,7 +405,7 @@
     var labels = '';
     ['a', 'b', 'c', 'd', 'e', 'f'].forEach(function(L){
       var p = HEX_SEATS[L], s = bySeat[L];
-      var shape = '<polygon class="seat-bg" points="0,0 ' + p.sector[0].join(',') + ' ' + p.sector[1].join(',') + '" fill="' + (s ? SEAT_FILL : EMPTY_FILL) + '"/>';
+      var shape = '<polygon class="seat-bg" points="0,0 ' + p.sector[0].join(',') + ' ' + p.sector[1].join(',') + '" fill="' + (s ? s.tint : EMPTY_FILL) + '"/>';
       var part = seatSvg(shape, s, p.text[0], p.text[1], p.maxW, 16, true, opts);
       out += part.bg;
       labels += part.label;
@@ -407,7 +420,7 @@
       if(!s) return;
       var cx = k === 0 ? -60 : 60, cy = d.extra * 200;
       var r = { x:cx - 56, y:cy - 20, w:112, h:40 };
-      var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" rx="3" fill="' + SEAT_FILL + '" stroke="' + LINE + '" stroke-width="2"/>';
+      var shape = '<rect class="seat-bg" x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" rx="3" fill="' + s.tint + '" stroke="' + LINE + '" stroke-width="2"/>';
       var part = seatSvg(shape, s, cx, cy, r.w - 10, 15, false, opts);
       out += part.bg;
       labels += part.label;
@@ -438,11 +451,11 @@
     }
     var unseated = [];
     function fill(units){
-      var seats = [];
-      units.forEach(function(u){
+      var seats = [], tints = unitTints(units);
+      units.forEach(function(u, k){
         u.data.forEach(function(nm, i){
           if(seats.length >= SEAT_LETTERS.length){ unseated.push(nm); return; }
-          seats.push({ letter:SEAT_LETTERS[seats.length], name:nm, ref:u.ref, i:i, role:roles[nm] || null, group:u.groupLabel || null });
+          seats.push({ letter:SEAT_LETTERS[seats.length], name:nm, ref:u.ref, i:i, tint:tints[k], role:roles[nm] || null, group:u.groupLabel || null });
         });
       });
       return seats;
@@ -580,9 +593,7 @@
       for(var c=0; c<cols; c++){
         var s = seats[c];
         if(!s){ html += '<td style="width:' + width + '%;"></td>'; continue; }
-        html += s.color
-          ? '<td style="width:' + width + '%; border-top:3px solid ' + s.color + ';">' + escapeHtml(s.name) + '</td>'
-          : '<td class="st" style="width:' + width + '%;">' + escapeHtml(s.name) + '</td>';
+        html += '<td style="width:' + width + '%; background:' + s.tint + ';">' + escapeHtml(s.name) + '</td>';
       }
       html += '</tr>';
     });
@@ -647,7 +658,7 @@
       ? '@page WordSection1{size:595.3pt 841.9pt; margin:0.8cm;} div.WordSection1{page:WordSection1;}'
       : '@page{size:A4 portrait; margin:0.8cm;} @media screen{body{max-width:' + PAGE_W + 'px; margin:16px auto; padding:0 12px;}}';
     return page +
-      'body{font-family:Calibri, Arial, sans-serif; font-size:8pt; line-height:1.15;}' +
+      'body{font-family:Calibri, Arial, sans-serif; font-size:8pt; line-height:1.15; -webkit-print-color-adjust:exact; print-color-adjust:exact;}' +
       'h1{font-size:12pt; margin:0 0 2pt;}' +
       '.dato{color:#555; margin:0 0 6pt; font-size:7.5pt;}' +
       '.section{margin:6pt 0 0;}' +
@@ -667,7 +678,6 @@
       'table.rowgrid{width:100%; border-collapse:collapse;}' +
       'table.rowgrid th{width:8%; font-size:7pt; background:#dfe7f0; padding:2pt 3pt; border:1px solid #aaa; text-align:left;}' +
       'table.rowgrid td{font-size:7pt; font-weight:bold; padding:2.5pt 1.5pt; border:1px solid #ccc; text-align:center;}' +
-      'table.rowgrid td.st{border-top:3px solid #22c55e; background:#eafaf0;}' +
       'table.boardbar{width:74%; margin:5pt auto 0; border-collapse:collapse;}' +
       'table.boardbar td{border:1.5px solid #334155; background:#f1f5f9; text-align:center; font-weight:bold; font-size:7.5pt; color:#334155; padding:2.5pt;}' +
       '.pagebreak{page-break-before:always;}';
@@ -791,7 +801,7 @@
   global.Bordgrupper = {
     MAX_HEX_TABLES: MAX_HEX_TABLES, HEX_CAPACITY: HEX_CAPACITY,
     MAX_ROWS: MAX_ROWS, ROW_CAPACITY: ROW_CAPACITY,
-    PAIR_PALETTE: PAIR_PALETTE, MAX_NAME_LENGTH: MAX_NAME_LENGTH,
+    PAIR_TINTS: PAIR_TINTS, TRIO_TINTS: TRIO_TINTS, MAX_NAME_LENGTH: MAX_NAME_LENGTH,
     ROOMS: ROOMS, ROOM_KEYS: ROOM_KEYS, DEFAULT_ROOM: DEFAULT_ROOM, FIRE_TABLE_COUNT: FIRE_TABLES.length,
     escapeHtml: escapeHtml, joinDa: joinDa, describeSizes: describeSizes,
     capName: capName, shuffle: shuffle,
