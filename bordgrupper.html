@@ -262,16 +262,18 @@
   table.gcard .role-tag{display:block; width:fit-content; margin:0 auto 2px; font-size:.68rem; font-weight:700; color:#fff; background:#b45309; border-radius:3px; padding:1px 5px;}
   table.gcard .role-tag + br{display:none;}
 
-  .tables{display:flex; flex-direction:column; gap:22px;}
-  .tables.grid-mode{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px;}
-  .table-block h2{font-size:1.05rem; margin:0 0 10px;}
-  .row-seats{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start;}
+  /* Lokaleplanen: tegningen af lokalet med navnene på pladserne */
+  #planView svg.plan{display:block; max-width:100%; height:auto; margin:0 auto; user-select:none; -webkit-user-select:none;}
+  svg.plan .pseat{cursor:grab; touch-action:none;}
+  svg.plan .pseat.swap-selected .seat-bg{fill:#fde68a;}
+  svg.plan .pseat.swap-over .seat-bg{fill:#bfdbfe;}
+  svg.plan .pseat.swap-done .seat-bg{animation:seatFlash 1.4s ease-out;}
+  svg.plan [data-u]{outline:none !important;}
+  @keyframes seatFlash{ from{ fill:#facc15; } }
+  .board{max-width:640px; margin:18px auto 0; padding:8px; text-align:center; font-weight:600; color:#334155; border:2px solid #334155; border-radius:4px; background:#f1f5f9; letter-spacing:.04em;}
 
-  .unit{display:flex; flex-direction:column; padding:6px; border-radius:8px;}
-  .unit.pair{border:2px solid var(--pair-a-border); background:var(--pair-a);}
-  .unit.three{background:var(--trio-bg); border:2px solid var(--trio-border);}
-  .unit-tag{font-size:.75rem; color:var(--four-border); font-weight:700; margin-bottom:2px;}
-  .unit-seats{display:flex; flex-wrap:wrap; gap:4px;}
+  .tables{display:flex; flex-direction:column; gap:22px;}
+  .table-block h2{font-size:1.05rem; margin:0 0 10px;}
   .seat{
     background:#fff;
     border:1px solid rgba(0,0,0,.12);
@@ -285,13 +287,6 @@
   .row-grid .seat{min-width:0; width:100%;}
   .row-grid .seat.seat-pair{border-top:4px solid var(--pair-a-border);}
   .row-grid .seat.seat-three{border-top:4px solid var(--trio-border); background:var(--trio-bg);}
-  .hexblock{
-    border-radius:16px;
-    border:2px solid var(--border);
-    padding:14px;
-    background:#fbfdff;
-  }
-  .hexblock h2{margin-top:0;}
 
   @keyframes tourPulse{
     0%{ box-shadow:0 0 0 4px rgba(251,191,36,.95), 0 0 0 4px rgba(251,191,36,.5), 0 0 0 9999px rgba(15,23,42,.55); }
@@ -491,7 +486,17 @@ Elev 28</textarea>
 </div>
 
 <section class="step" id="stepWeeks">
-  <div class="step-head"><span class="step-num">3</span><h2>Uger</h2></div>
+  <div class="step-head"><span class="step-num">3</span><h2>Uger og lokale</h2></div>
+  <div class="row">
+    <label class="inline">
+      Lokale
+      <select id="roomSelect">
+        <option value="fire">Firemandsborde (7 borde)</option>
+        <option value="hex">Sekskantede borde (5 borde)</option>
+        <option value="rows">Rækker (3 rækker)</option>
+      </select>
+    </label>
+  </div>
   <div class="row">
     <label class="inline">
       Første uge
@@ -535,23 +540,18 @@ Elev 28</textarea>
   <p class="muted swap-hint">Byt to elever ved at trække det ene navn hen på det andet eller ved at klikke på dem efter hinanden.</p>
 
   <div class="tabbar">
-    <button class="tabbtn active" data-tab="groups" type="button">Grupper</button>
-    <button class="tabbtn" data-tab="hex" type="button">Sekskantede borde</button>
-    <button class="tabbtn" data-tab="row" type="button">Rækkeopstilling</button>
+    <button class="tabbtn active" data-tab="plan" type="button">Pladser</button>
+    <button class="tabbtn" data-tab="groups" type="button">Grupper</button>
   </div>
 
   <div class="tab-stack">
-    <div class="tabpanel active" id="tab-groups">
-      <p class="tabsub">Hver kolonne er et makkerpar eller en trio. Ved firemandsborde er hver gruppe ét bord.</p>
+    <div class="tabpanel active" id="tab-plan">
+      <p class="tabsub"><span id="planSub"></span> <span class="over-note" id="planNote"></span></p>
+      <div id="planView"></div>
+    </div>
+    <div class="tabpanel" id="tab-groups">
+      <p class="tabsub">Hver kolonne er et makkerpar eller en trio.</p>
       <div class="card-grid" id="tables-groups"></div>
-    </div>
-    <div class="tabpanel" id="tab-hex">
-      <p class="tabsub">5 borde med 6 pladser. Makkerpar og trioer sidder samlet, og mærket viser elevernes gruppe. <span class="over-note" id="hexNote"></span></p>
-      <div class="tables grid-mode" id="tables-hex"></div>
-    </div>
-    <div class="tabpanel" id="tab-row">
-      <p class="tabsub">3 rækker med 10 pladser. Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret. <span class="over-note" id="rowNote"></span></p>
-      <div class="tables" id="tables-row"></div>
     </div>
   </div>
 </section>
@@ -1283,7 +1283,12 @@ Elev 28</textarea>
       return b;
     });
 
-    return shuffle(bundles).map(function(b, i){
+    // Grupper på 5 eller flere kommer sidst. Ved firemandsborde sidder gruppe nr. k ved bord k,
+    // og bord 7 har en ekstra plads.
+    var mixed = shuffle(bundles);
+    var big = function(b){ return bundleMembers(b).length >= 5; };
+    var ordered = mixed.filter(function(b){ return !big(b); }).concat(mixed.filter(big));
+    return ordered.map(function(b, i){
       b.label = 'Gruppe ' + (i+1);
       b.members = bundleMembers(b);
       return b;
@@ -1462,42 +1467,7 @@ Elev 28</textarea>
     return d;
   }
 
-  function renderUnit(unit){
-    var wrap = document.createElement('div');
-    wrap.className = 'unit ' + (unit.type === 'three' ? 'three' : 'pair');
-    if(unit.groupLabel){
-      var tag = document.createElement('div');
-      tag.className = 'unit-tag';
-      tag.textContent = unit.groupLabel;
-      wrap.appendChild(tag);
-    }
-    var seatsRow = document.createElement('div');
-    seatsRow.className = 'unit-seats';
-    unit.data.forEach(function(nm, i){ seatsRow.appendChild(renderSeat(nm, unit.ref, i)); });
-    wrap.appendChild(seatsRow);
-    return wrap;
-  }
-
-  function renderTablesInto(containerId, tables, labelFn, hexStyle, showCount){
-    var container = byId(containerId);
-    container.innerHTML = '';
-    tables.forEach(function(table, ti){
-      var block = document.createElement('div');
-      block.className = hexStyle ? 'table-block hexblock' : 'table-block';
-      var h = document.createElement('h2');
-      h.textContent = labelFn(ti) + (showCount ? ' (' + table.size + ' elever)' : '');
-      block.appendChild(h);
-      var rowSeats = document.createElement('div');
-      rowSeats.className = 'row-seats';
-      table.units.forEach(function(unit){ rowSeats.appendChild(renderUnit(unit)); });
-      block.appendChild(rowSeats);
-      container.appendChild(block);
-    });
-  }
-
-  function renderRowGrid(containerId, tables){
-    var container = byId(containerId);
-    container.innerHTML = '';
+  function renderRowGrid(container, tables){
     var cols = rowColumns(tables);
     tables.forEach(function(table, ti){
       var block = document.createElement('div');
@@ -1521,6 +1491,39 @@ Elev 28</textarea>
       block.appendChild(grid);
       container.appendChild(block);
     });
+  }
+
+  // ---------- Lokalet: hvor hver elev sidder ----------
+  var PLAN_SUB = {
+    fire: 'Gruppe 1 sidder ved bord 1 og så videre, og makkere sidder ved siden af hinanden.',
+    hex: 'Makkerpar og trioer sidder samlet, og under navnet står elevens gruppe.',
+    rows: 'Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret.'
+  };
+
+  function getRoom(){
+    var v = byId('roomSelect').value;
+    return BG.ROOMS[v] ? v : BG.DEFAULT_ROOM;
+  }
+
+  function renderPlanView(g, l){
+    var room = getRoom();
+    var view = byId('planView');
+    view.innerHTML = '';
+    if(room === 'rows'){
+      var rows = document.createElement('div');
+      rows.className = 'tables';
+      renderRowGrid(rows, l.row);
+      view.appendChild(rows);
+      var board = document.createElement('div');
+      board.className = 'board';
+      board.textContent = 'lærer / tavle / projektor';
+      view.appendChild(board);
+    } else {
+      var seating = BG.roomSeating(room, g, l, getActiveRoleNames());
+      view.innerHTML = BG.planSvg(room, seating, room === 'fire' ? { swappable:true, maxW:880, maxH:800 } : { swappable:true, maxW:1100, maxH:660 });
+    }
+    byId('planSub').textContent = PLAN_SUB[room];
+    byId('planNote').textContent = BG.seatingNote(room, g, l);
   }
 
   // Gruppekortene på skærmen er de samme tabeller som i filen.
@@ -1656,13 +1659,12 @@ Elev 28</textarea>
     });
 
     renderGroupCards(g);
-    renderTablesInto('tables-hex', l.hex, function(ti){ return 'Bord ' + (ti+1); }, true, true);
-    renderRowGrid('tables-row', l.row);
-    byId('hexNote').textContent = capacityNote(g.n, l.hex, HEX_CAPACITY, 'bord', 'borde');
-    byId('rowNote').textContent = capacityNote(g.n, l.row, ROW_CAPACITY, 'række', 'rækker');
-    byId('exportHint').textContent = rounds.length === 1
-      ? 'Filen indeholder perioden, som den vises her.'
-      : 'Filen indeholder alle ' + rounds.length + ' perioder, som de vises her.';
+    renderPlanView(g, l);
+    if(!exportBusy){
+      byId('exportHint').textContent = rounds.length === 1
+        ? 'Filen indeholder perioden, som den vises her.'
+        : 'Filen indeholder alle ' + rounds.length + ' perioder, som de vises her.';
+    }
 
     var broken = brokenConditions(g);
     showMessage('conditionWarning', broken.length
@@ -1806,14 +1808,25 @@ Elev 28</textarea>
     var roleNames = getActiveRoleNames();
     return rounds.map(function(round){
       var title = (className ? ('Bordgrupper til ' + className + ' i ') : 'Bordgrupper i ') + formatWeekList(round.weeks) + '.';
-      return BG.roundBodyHtml(round.groups, round.layouts, { title:title, roleNames:roleNames });
+      return BG.roundBodyHtml(round.groups, round.layouts, { title:title, roleNames:roleNames, room:getRoom() });
     });
   }
 
+  // Tegningerne skal laves om til billeder til Word, så filen er et øjeblik om at blive klar.
+  var exportBusy = false;
   function exportWord(){
     var rounds = planRounds();
-    if(!rounds) return;
-    BG.downloadWord(planPages(rounds), buildFilenameBase());
+    if(!rounds || exportBusy) return;
+    exportBusy = true;
+    var btn = byId('exportBtn');
+    btn.disabled = true;
+    showMessage('exportError', null);
+    BG.downloadWord(planPages(rounds), buildFilenameBase()).catch(function(err){
+      showMessage('exportError', 'Word-filen kunne ikke laves: ' + (err && err.message ? err.message : err));
+    }).then(function(){
+      exportBusy = false;
+      btn.disabled = false;
+    });
   }
 
   function exportPDF(){
@@ -1829,10 +1842,10 @@ Elev 28</textarea>
     { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er udfyldt med en eksempelklasse, så du kan prøve programmet med det samme.' },
     { sel:'#shortenNamesBtn', text:'Renser en elevliste kopieret fra Lectio for id-numre og holdoplysninger og forkorter lange navne til fornavn og forbogstav i efternavnet. Korte navne bliver stående.' },
     { sel:'#stepGroups', text:'Her kan du vælge gruppestørrelse, sætte betingelser for bestemte elever, tage hensyn til køn og kategori og give eleverne roller. Det bliver stående, selvom du retter i navnelisten.' },
-    { sel:'#stepWeeks', text:'Vælg første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
+    { sel:'#stepWeeks', text:'Vælg lokalet, første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
     { sel:'#generateBtn', text:'Laver grupper til alle perioder. Makkere og gruppekammerater gentages så lidt som muligt.' },
-    { sel:'#periodBar', text:'Vælg en periode for at se dens grupper, sekskantede borde og rækkeopstilling. Træk et navn hen på et andet for at bytte to elever.' },
-    { sel:'#exportBtn', text:'Filen indeholder alle perioder, præcis som de vises her.' }
+    { sel:'#periodBar', text:'Vælg en periode for at se, hvor eleverne sidder i lokalet, og hvem de er i gruppe med. Træk et navn hen på et andet for at bytte to elever.' },
+    { sel:'#exportBtn', text:'Filen har én side pr. periode med pladserne i lokalet og grupperne, præcis som de vises her.' }
   ];
 
   function clearTourHighlight(){
@@ -1952,7 +1965,51 @@ Elev 28</textarea>
     clearSwapMarks('swap-over');
     clearSwapMarks('swap-dragging');
   });
+  // Navnene på tegningen af lokalet kan ikke trækkes med browserens egen træk-og-slip, så her
+  // følges musen (eller fingeren) selv. Et kort klik uden bevægelse vælger navnet som før.
+  var planDrag = null, skipClick = false;
+  function svgSeat(el){
+    var ref = swapRef(el);
+    return ref && ref.el instanceof SVGElement ? ref : null;
+  }
+  resultSection.addEventListener('pointerdown', function(e){
+    if(e.button !== 0) return;
+    var source = svgSeat(e.target);
+    if(!source) return;
+    e.preventDefault();
+    planDrag = { source:source, x:e.clientX, y:e.clientY, moved:false };
+  });
+  document.addEventListener('pointermove', function(e){
+    if(!planDrag) return;
+    if(!planDrag.moved){
+      if(Math.abs(e.clientX - planDrag.x) + Math.abs(e.clientY - planDrag.y) < 6) return;
+      planDrag.moved = true;
+      clearSelection();
+      swapElements(planDrag.source).forEach(function(el){ el.classList.add('swap-dragging'); });
+    }
+    var target = svgSeat(document.elementFromPoint(e.clientX, e.clientY));
+    clearSwapMarks('swap-over');
+    if(target && !(target.u === planDrag.source.u && target.i === planDrag.source.i)){
+      swapElements(target).forEach(function(el){ el.classList.add('swap-over'); });
+    }
+  });
+  function endPlanDrag(e){
+    if(!planDrag) return;
+    var drag = planDrag;
+    planDrag = null;
+    clearSwapMarks('swap-over');
+    clearSwapMarks('swap-dragging');
+    if(!drag.moved || !e) return;
+    skipClick = true;
+    setTimeout(function(){ skipClick = false; }, 0);
+    var target = swapRef(document.elementFromPoint(e.clientX, e.clientY));
+    if(target) swapStudents(drag.source, target);
+  }
+  document.addEventListener('pointerup', endPlanDrag);
+  document.addEventListener('pointercancel', function(){ endPlanDrag(null); });
+
   resultSection.addEventListener('click', function(e){
+    if(skipClick){ skipClick = false; return; }
     var target = swapRef(e.target);
     if(!target){
       if(swapSelection) clearSelection();
@@ -2021,7 +2078,7 @@ Elev 28</textarea>
       roleNames:new Array(ROLE_COUNT_MAX).fill(''),
       avoidTrios:false, traitsEnabled:false, genderPreference:'none', categoryPreference:'none',
       rolesEnabled:false, roleCount:1,
-      startWeek:defaultStartWeek(), rotationWeeks:2, planWeeks:10,
+      room:BG.DEFAULT_ROOM, startWeek:defaultStartWeek(), rotationWeeks:2, planWeeks:10,
       plan:null, earlierPlans:[]
     };
   }
@@ -2035,7 +2092,7 @@ Elev 28</textarea>
       avoidTrios: getAvoidTrios(), traitsEnabled: traitsEnabled(),
       genderPreference: byId('genderPreference').value, categoryPreference: byId('categoryPreference').value,
       rolesEnabled: getRolesEnabled(), roleCount: getRoleCount(),
-      startWeek: getStartWeek(), rotationWeeks: getRotationWeeks(), planWeeks: getPlanWeeks(),
+      room: getRoom(), startWeek: getStartWeek(), rotationWeeks: getRotationWeeks(), planWeeks: getPlanWeeks(),
       plan: state.plan ? serializePlan(state.plan) : null,
       earlierPlans: state.earlierPlans
     };
@@ -2124,6 +2181,7 @@ Elev 28</textarea>
     byId('startWeek').value = c.startWeek;
     byId('rotationWeeks').value = c.rotationWeeks;
     byId('planWeeks').value = c.planWeeks;
+    byId('roomSelect').value = BG.ROOMS[c.room] ? c.room : BG.DEFAULT_ROOM;
     ['condError', 'errorLabel', 'exportError'].forEach(function(id){ showMessage(id, null); });
 
     state.earlierPlans = c.earlierPlans;
@@ -2201,6 +2259,7 @@ Elev 28</textarea>
   });
   byId('roleCount').addEventListener('change', function(){ renderRoleNamesPanel(); renderPlan(); });
 
+  byId('roomSelect').addEventListener('change', renderPlan);
   ['startWeek', 'rotationWeeks', 'planWeeks'].forEach(function(id){
     byId(id).addEventListener('input', function(){ updatePeriodHint(); renderPlan(); });
   });

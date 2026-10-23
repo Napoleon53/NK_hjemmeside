@@ -7,7 +7,8 @@ trin. Kun syntesevejledningen er med; introduktionen (HAB-virus, DBE-1,2-DA,
 svampen og afstemningen af reaktionen med biproduktet) er bevidst udeladt, som
 brugeren bad om. Teksterne er skrevet om, ikke kopieret fra vejledningen.
 
-Ikke i menuen. Kan åbnes direkte og ved et bestemt trin med `index.html#trin6`.
+Ikke i menuen. Kan åbnes direkte og ved et bestemt trin med `index.html#trin6`. Kemibogen B
+linker til den fra afsnit B8.6 TLC med `#trin6` (23. okt. 2026, Prøv selv).
 
 **Gjort mere brugervenlig 22. okt. 2026** (brugerens ønske efter første kig: "Uret der
 tikker er stressende. Det er også lidt træls at opløsningen koger mens man er i gang med
