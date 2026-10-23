@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Skærmbillede: sc5.12</title>
+<style>
+    html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+    iframe { border: 0; display: block; }
+</style>
+</head>
+<body>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen.
+
+   ?b=1300&h=800&fane=g&s=start,vaelg:0,gaet:1,koer:7
+   åbner index.html i en iframe på b × h og kører kommandoerne:
+     klar       ryd elevens fremskridt (sker altid først)
+     start      tryk Start på introkortet (fane 1)
+     vaelg:n    vælg gæt eller opgave n (fra 0)
+     gaet:j     svar j (fane 1 og 2)
+     hint       tryk på den gule knap
+     videre     tryk på kortets grønne knap
+     koer:sek   kør scenen sek sekunder
+     klik:y     klik på stigen i højden y (fane 1)
+     alle       besvar alle gæt med svar 0 (fane 1) og gå til resultatet
+     rv:n       start rundvisningen og gå til trin n (fra 0)
+   Når kommandoerne er kørt, sættes window.klar = true.
+   ===================================================================== */
+var q = {};
+location.search.replace(/^\?/, "").split("&").forEach(function (p) { var a = p.split("="); q[a[0]] = decodeURIComponent(a.slice(1).join("=") || ""); });
+var ramme = document.getElementById("ramme");
+ramme.style.width = (q.b || 1300) + "px";
+ramme.style.height = (q.h || 800) + "px";
+var trin = 0;
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { ["nk-sc5.12-gaet", "nk-sc5.12-tael"].forEach(function (n) { W.localStorage.removeItem(n); }); } catch (e) {}
+        W.location.reload();
+        return;
+    }
+    setTimeout(koer, 400);
+});
+function koer() {
+    var W = ramme.contentWindow, NK = W.NK;
+    var fane = { g: "fane-g", t: "fane-t" }[q.fane || "g"];
+    NK.visFane(fane);
+    var F = NK.sims[fane];
+    function k(sek) { for (var t = 0; t < sek; t += 1 / 60) F.opdater(1 / 60); }
+    (q.s || "").split(",").filter(Boolean).forEach(function (c) {
+        var a = c.split(":"), n = a[0], v = a[1];
+        if (n === "start" || n === "videre") F.videre();
+        else if (n === "vaelg") F.vaelg(parseInt(v, 10));
+        else if (n === "gaet") F.svarValg(parseInt(v, 10));
+        else if (n === "hint") F.knap();
+        else if (n === "koer") k(parseFloat(v));
+        else if (n === "klik") F.klik(100, parseFloat(v));
+        else if (n === "rv") {
+            F.tilpas();
+            NK.Rundvisning.start(fane);
+            for (var r = 0; r < parseInt(v, 10); r++) W.document.getElementById("rv-naeste").click();
+        }
+        else if (n === "alle") {
+            NK.Data.GAET.forEach(function (g, i) { F.vaelg(i); F.svarValg(0); k(8); });
+            F.videre();
+        }
+    });
+    F.tilpas();
+    F.tegn();
+    window.klar = true;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hvor meget er et mol?</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⬆</span> Hvor meget er et mol?</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-g" role="tab" aria-selected="true"><span class="nr">1</span>Gæt et mol</button>
+        <button class="faneknap" data-fane="fane-t" role="tab" aria-selected="false"><span class="nr">2</span>Tæl i mol</button>
+    </div>
+
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: GÆT ET MOL                                                 -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-g" role="tabpanel" aria-label="Gæt et mol">
+    <div class="scene">
+        <canvas id="g-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/kort.js) -->
+        <div class="scenekort" id="g-skort">
+            <div class="sk-ind" id="g-ind"></div>
+            <div class="sk-bund" id="g-status">
+                <p class="st-tekst" id="g-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="g-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="g-anker-stige"></div>
+        <div class="anker" id="g-anker-ting"></div>
+        <div class="anker" id="g-anker-flag"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling molkort" id="g-molkort">
+            <h2>Et antal</h2>
+            <table class="antal-tabel">
+                <tr><td>1 par</td><td>2 stk.</td></tr>
+                <tr><td>1 dusin</td><td>12 stk.</td></tr>
+                <tr class="mol"><td>1 mol</td><td>6,02 · 10<sup>23</sup> stk.</td></tr>
+            </table>
+            <p class="mol-lang" id="g-mollang">602 000 000 000 000 000 000 000</p>
+            <p class="moldag" id="g-moldag" hidden></p>
+        </div>
+
+        <div class="kort" id="g-opgaver">
+            <h2>Gættene <span class="taeller">rigtige <b id="g-rigtige">0</b> af <b id="g-gaettet">0</b></span></h2>
+            <div class="opg-liste" id="g-liste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: TÆL I MOL                                                  -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-t" role="tabpanel" aria-label="Tæl i mol">
+    <div class="scene">
+        <canvas id="t-laerred"></canvas>
+        <div class="scenekort" id="t-skort">
+            <div class="sk-ind" id="t-ind"></div>
+            <div class="sk-bund" id="t-status">
+                <p class="st-tekst" id="t-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="t-knap" type="button">Giv et hint</button>
+            </div>
+        </div>
+        <div class="anker" id="t-anker-scene"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling molkort" id="t-molkort">
+            <h2>Et antal</h2>
+            <table class="antal-tabel">
+                <tr><td>1 par</td><td>2 stk.</td></tr>
+                <tr><td>1 dusin</td><td>12 stk.</td></tr>
+                <tr class="mol"><td>1 mol</td><td>6,02 · 10<sup>23</sup> stk.</td></tr>
+            </table>
+        </div>
+
+        <div class="kort" id="t-formelkort">
+            <h2>Fra mol til antal</h2>
+            <p class="formel">antal = <i>n</i> · 6,02 · 10<sup>23</sup></p>
+            <p class="formel"><i>n</i> = <span class="brok"><span class="bt">antal</span><span class="bn">6,02 · 10<sup>23</sup></span></span></p>
+            <p class="note"><i>n</i> er stofmængden i mol.</p>
+        </div>
+
+        <div class="kort" id="t-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="t-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="t-liste"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Hvor meget er et mol?</h2>
+        <h3 class="teori-hoved">Et mol er et antal</h3>
+        <p>Et par er 2 stk., og et dusin er 12 stk. Et mol er også et antal, bare meget større: 1 mol er 6,02 · 10<sup>23</sup> stk. Tallet kaldes Avogadros tal. Antallet af mol kaldes stofmængden, <i>n</i>, og enheden er mol.</p>
+        <h3 class="teori-hoved">Fra mol til antal og tilbage</h3>
+        <p>Antallet findes ved at gange stofmængden med 6,02 · 10<sup>23</sup>. Stofmængden findes ved at dividere antallet med 6,02 · 10<sup>23</sup>.</p>
+        <div class="eksempel">
+            <span class="eksempel-hoved">Eksempel</span>
+            2,00 mol vand er 2,00 · 6,02 · 10<sup>23</sup> = 1,20 · 10<sup>24</sup> vandmolekyler.
+        </div>
+        <h3 class="teori-hoved">Hvorfor så stort et tal?</h3>
+        <p>Atomer og molekyler er så små, at selv en lille portion stof indeholder et enormt antal af dem. 1 mol vandmolekyler fylder kun 18 mL. 1 mol af ting fra hverdagen er derimod ufatteligt meget: en stak af 1 mol papirark når 6400 lysår ud i rummet.</p>
+        <h3 class="teori-hoved">Stigen på fane 1</h3>
+        <p>Stigen er en tallinje i tierpotenser. Hvert trin er 10 gange større end trinet under. Søjlen begynder ved ét stk. og vokser til 1 mol, og turen er altid 23,8 trin lang, fordi 1 mol er 6,02 · 10<sup>23</sup> stk., og det tal ligger mellem 10<sup>23</sup> og 10<sup>24</sup>.</p>
+        <h3 class="teori-hoved">Tallene</h3>
+        <p>Tallene er afrundede overslag: et ark papir er 0,1 mm, en dråbe 0,05 mL, en fodbold 5,6 L, et carbonatom 0,15 nm bredt, en muldvarp 0,1 L, og 1 mol luft fylder 24 L ved 20 °C. Afstande er målt fra Jorden.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ikoner.js"></script>
+<script src="js/stige.js"></script>
+<script src="js/kort.js"></script>
+<script src="js/sim_gaet.js"></script>
+<script src="js/sim_tael.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

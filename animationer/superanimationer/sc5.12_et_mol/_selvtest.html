@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc5.12 Hvor meget er et mol?</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at 1 mol af hver ting er regnet rigtigt, at det
+   rigtige svar er det, der ligger nærmest 1 mol på stigen, og at de
+   forkerte svar ligger mindst en tierpotens væk; at det rigtige svar
+   ikke altid er det største; at de tal, forklaringerne nævner, passer;
+   at alle ni gæt og seks opgaver kan gennemføres (også med forkerte
+   svar, hint og Vis svaret); at scenen er låst, mens kortet stiller et
+   spørgsmål; at teksterne er korte og holder sproget; og at kortet ikke
+   dækker stigen fra 1100 × 620 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sc5.12-gaet", "nk-sc5.12-tael"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|maal|gaet\w*|spoerg\w*|faa|saa|naar|laengde|saek\w*|aeg|tael\w*|stoerre|stoerst)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function log10(v) { return Math.log(v) / Math.LN10; }
+function koerF(F, sek) { for (var t = 0; t < sek; t += 1 / 60) F.opdater(1 / 60); }
+function taet(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+function koerTest(W) {
+    var d = W.document, NK = W.NK, D = NK.Data;
+    var G = NK.sims["fane-g"], T = NK.sims["fane-t"];
+
+    /* ----------------------------------------------------------------- */
+    overskrift("1. Gættene: 1 mol af hver ting og det rigtige svar");
+    paastand("1 mol er 6,02 · 10²³", D.NA === 6.02e23);
+    paastand("tallet i panelet har 24 cifre og begynder med 602", D.MOL_LANG.replace(/ /g, "").length === 24 && D.MOL_LANG.indexOf("602 ") === 0);
+    paastand("der er otte gæt", D.GAET.length === 8);
+    function q(id) { return D.GAET.filter(function (g) { return g.id === id; })[0]; }
+    var stoerst = 0, mindst = 0, plads = [0, 0, 0, 0];
+    D.GAET.forEach(function (q) {
+        var L = log10(q.en * D.NA);
+        var afst = q.svar.map(function (s) { return Math.abs(log10(s.v) - L); });
+        var naermest = afst.indexOf(Math.min.apply(null, afst));
+        paastand(q.id + ": svarene står fra mindst til størst", q.svar.every(function (s, i) { return i === 0 || s.v > q.svar[i - 1].v; }));
+        paastand(q.id + ": det rigtige svar (" + q.svar[q.ret].t + ") ligger nærmest 1 mol", naermest === q.ret);
+        paastand(q.id + ": det rigtige svar er højst en faktor 2 fra 1 mol", afst[q.ret] < 0.31, afst[q.ret].toFixed(2));
+        paastand(q.id + ": de forkerte svar er mindst 10 gange væk", afst.every(function (a, i) { return i === q.ret || a >= 1; }), afst.map(function (a) { return a.toFixed(1); }).join(" "));
+        paastand(q.id + ": stigen findes, og tingen er under 1 mol på stigen", !!D.STIGER[q.stige] && q.en > 0);
+        paastand(q.id + ": tingen øverst på søjlen har et ikon", NK.Ikon.findes(q.top));
+        if (q.ret === 3) stoerst++;
+        if (q.ret === 0) mindst++;
+        plads[q.ret]++;
+    });
+    paastand("det rigtige svar er ikke altid det største (brugerens krav)", stoerst > 0 && stoerst <= 3, stoerst + " af " + D.GAET.length + " er det største");
+    paastand("det rigtige svar står på mindst tre af pladserne A til D", plads.filter(function (n) { return n > 0; }).length >= 3, plads.join(" "));
+    paastand("diamanten, vandmolekylerne og luften er taget ud (brugeren: kedelige)", !q("diamant") && !q("molekyler") && !q("luft"));
+
+    overskrift("2. Tallene i forklaringerne");
+    var lysaar = 9.461e15;
+    paastand("papir: 1 mol ark er 6 · 10¹⁹ m og 6400 lysår", taet(q("papir").en * D.NA, 6.02e19, 1e17) && taet(6.02e19 / lysaar, 6400, 100));
+    paastand("vingummibamser: 1 mol à 2 cm³ er 1,2 · 10¹⁸ m³, 90 % af verdenshavene", taet(q("bamser").en * D.NA, 1.2e18, 0.01e18) && taet(1.204e18 / 1.335e18, 0.9, 0.01));
+    paastand("vingummibamser: 1 mol à 2,3 g er ca. 170 mio. tons pr. menneske", taet(D.NA * 2.3e-3 / 8.0e9 / 1000 / 1e6, 173, 3));
+    paastand("sand: 1 mol à 0,1 mm³ er 6 · 10¹³ m³, 1,4 km over Danmark og 8 gange Møllehøj", taet(q("sand").en * D.NA, 6.02e13, 1e11) && taet(6.02e13 / 4.3e10, 1400, 1) && Math.round(1400 / 171) === 8);
+    paastand("sand: et sandkorn på 0,6 mm fylder ca. 0,1 mm³", taet(Math.PI / 6 * Math.pow(0.6, 3), 0.11, 0.01));
+    paastand("tælle: 6,02 · 10²³ s er 1,9 · 10¹⁶ år og 1,4 mio. gange universets alder", taet(6.02e23 / 3.156e7, 1.9e16, 0.05e16) && taet(6.02e23 / 3.156e7 / 1.38e10, 1.38e6, 0.03e6));
+    paastand("dråber: 1 mol à 0,05 mL er 3 · 10¹⁶ m³, 8 Middelhave og 2 % af havene", taet(q("draaber").en * D.NA, 3.01e16, 1e14) && Math.round(3.01e16 / 3.75e15) === 8 && Math.round(3.01e16 / 1.335e18 * 100) === 2);
+    paastand("dråber: 1 m³ er 20 millioner dråber", taet(1 / 5e-8, 2e7, 1));
+    paastand("række: 1 mol à 0,154 nm er 9 · 10¹³ m og 15 gange afstanden til Pluto", taet(q("raekke").en * D.NA, 9.27e13, 0.01e13) && Math.floor(9.27e13 / 5.9e12) === 15);
+    var vb = 4 / 3 * Math.PI * Math.pow(0.11, 3);
+    paastand("fodbolde: en bold med radius 11 cm fylder 5,6 L", taet(vb * 1000, 5.6, 0.05));
+    paastand("fodbolde: 1 mol fylder 3,4 · 10²¹ m³, tre jordkloder", taet(5.6e-3 * D.NA, 3.37e21, 0.02e21) && Math.round(3.37e21 / 1.08e21) === 3);
+    paastand("muldvarpe: 1 mol à 0,1 L er 6 · 10¹⁹ m³, næsten tre gange Månen", taet(q("muldvarpe").en * D.NA, 6.02e19, 1e17) && taet(6.02e19 / 2.19e19, 2.75, 0.05));
+
+    overskrift("3. Stigerne");
+    Object.keys(D.STIGER).forEach(function (k) {
+        var m = D.STIGER[k].maerker;
+        paastand(k + ": de kendte ting står fra mindst til størst", m.every(function (e, i) { return i === 0 || e.v > m[i - 1].v; }));
+        paastand(k + ": alle kendte ting har et ikon", m.every(function (e) { return NK.Ikon.findes(e.i); }), m.filter(function (e) { return !NK.Ikon.findes(e.i); }).map(function (e) { return e.i; }).join(" "));
+    });
+    D.GAET.forEach(function (g) {
+        var m = D.STIGER[g.stige].maerker, L0 = log10(g.en), L1 = log10(g.en * D.NA);
+        var paaVejen = m.filter(function (e) { var L = log10(e.v); return L > L0 + 0.3 && L < L1; }).length;
+        paastand(g.id + ": søjlen kommer forbi mindst fire kendte ting på vejen", paaVejen >= 4, paaVejen);
+    });
+
+    overskrift("4. Fane 2: opgaverne");
+    paastand("der er seks opgaver", D.OPGAVER.length === 6);
+    var tPlads = [0, 0, 0, 0];
+    D.OPGAVER.forEach(function (o) {
+        var ok = o.svar.filter(function (s) { return s.ok; });
+        paastand(o.id + ": netop ét rigtigt svar", ok.length === 1);
+        paastand(o.id + ": hvert forkert svar har en forklaring", o.svar.every(function (s) { return s.ok || (s.f && s.f.length > 20); }));
+        paastand(o.id + ": mindst ét hint", o.hint && o.hint.length >= 1);
+        o.svar.forEach(function (s, i) { if (s.ok) tPlads[i]++; });
+    });
+    paastand("det rigtige svar står ikke samme sted hver gang", tPlads.filter(function (n) { return n > 0; }).length >= 3, tPlads.join(" "));
+    function tal(t) { var m = t.replace(/[^\d,·⁰¹²³⁴⁵⁶⁷⁸⁹⁻ ]/g, "").trim(); return m; }
+    function vaerdi(t) {
+        var H = { "⁰": "0", "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5", "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁻": "-" };
+        var a = t.replace(/ (æg|mol)$/, "").replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]/g, function (c) { return H[c]; });
+        var m = a.match(/^([\d,]+)(?: · 10(-?\d+))?$/);
+        if (!m) return NaN;
+        return parseFloat(m[1].replace(",", ".")) * (m[2] ? Math.pow(10, parseInt(m[2], 10)) : 1);
+    }
+    function ret(o) { return o.svar.filter(function (s) { return s.ok; })[0].t; }
+    paastand("3 dusin æg er 36", vaerdi(ret(D.OPGAVER[0])) === 36);
+    paastand("3 mol æg er 1,8 · 10²⁴", taet(vaerdi(ret(D.OPGAVER[1])), 3 * D.NA, 0.01e24));
+    paastand("1,2 · 10²⁴ molekyler er 2 mol", taet(vaerdi(ret(D.OPGAVER[2])), 1.2e24 / D.NA, 0.01));
+    paastand("3 · 10²³ atomer er 0,5 mol", taet(vaerdi(ret(D.OPGAVER[3])), 3e23 / D.NA, 0.01));
+    paastand("8 · 10⁹ mennesker er 1 · 10⁻¹⁴ mol (med ét ciffer)", taet(vaerdi(ret(D.OPGAVER[5])), 8e9 / D.NA, 0.4e-14));
+    paastand("fejlsvar: 2,0 · 10²³ og 7,2 · 10⁴⁷ og 1,8 · 10⁴⁷ og 5 · 10³³ er regnet ud", taet(vaerdi("2,0 · 10²³") / 1e23, D.NA / 3 / 1e23, 0.01) &&
+        taet(vaerdi("7,2 · 10⁴⁷") / 1e47, 1.2e24 * D.NA / 1e47, 0.03) && taet(vaerdi("1,8 · 10⁴⁷") / 1e47, 3e23 * D.NA / 1e47, 0.01) && taet(vaerdi("5 · 10³³") / 1e33, 8e9 * D.NA / 1e33, 0.2));
+    /* Brugeren 23. okt. 2026: eleverne er daarlige til at regne, saa ingen flere cifre end noedvendigt */
+    var mangeCifre = [];
+    D.OPGAVER.forEach(function (o) {
+        o.svar.forEach(function (sv) {
+            var m = sv.t.match(/^([\d,]+)/);
+            /* Kun kommatal og potenser; hele antal som 312 æg taeller ikke */
+            if (m && /[,·]/.test(sv.t) && m[1].replace(",", "").replace(/^0+/, "").length > 2) mangeCifre.push(sv.t);
+        });
+    });
+    paastand("fane 2: højst to betydende cifre i svarene", mangeCifre.length === 0, mangeCifre.join("; "));
+
+    overskrift("5. Sproget og længden");
+    var tekster = [];
+    D.GAET.forEach(function (g) {
+        tekster.push(["intro " + g.id, g.intro, 80], ["spm " + g.id, g.spm, 105], ["hint " + g.id, g.hint, 100], ["forkl " + g.id, g.forkl, 160]);
+        g.svar.forEach(function (s) { tekster.push(["svar " + g.id, s.t, 34]); });
+    });
+    D.OPGAVER.forEach(function (o) {
+        tekster.push(["spm " + o.id, o.spm, 105], ["forkl " + o.id, o.forkl, 160]);
+        o.hint.forEach(function (h) { tekster.push(["hint " + o.id, h, 100]); });
+        o.svar.forEach(function (s) { tekster.push(["svar " + o.id, s.t, 34]); if (s.f) tekster.push(["fejl " + o.id, s.f, 110]); });
+    });
+    Object.keys(D.STIGER).forEach(function (k) { D.STIGER[k].maerker.forEach(function (m) { tekster.push(["ting " + m.n, m.n + " " + m.vis, 60]); }); });
+    tekster.push(["slut g", D.FAERDIG.g, 160], ["slut t", D.FAERDIG.t, 160]);
+    var forLange = tekster.filter(function (t) { return t[1].length > t[2]; });
+    paastand("alle tekster holder længden", forLange.length === 0, forLange.map(function (t) { return t[0] + " " + t[1].length + "/" + t[2]; }).join("; "));
+    var alt = tekster.map(function (t) { return t[1]; }).join(" ") + " " + d.body.textContent;
+    paastand("ingen tankestreger", !/[–—]/.test(alt));
+    paastand("ingen 1+ eller 1−", !/1[+−]/.test(alt));
+    paastand("ingen ord skrevet uden æ, ø og å", !ASCII_ORD.test(alt), (alt.match(ASCII_ORD) || [""])[0]);
+    paastand("intet indforstået 'også her' eller 'nu'", !/\b(også her|Nu er|nu er)\b/.test(alt));
+    paastand("decimaltal med komma, ikke punktum", !/\d\.\d/.test(tekster.map(function (t) { return t[1]; }).join(" ")));
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6. Fane 1 hele vejen igennem");
+    NK.visFane("fane-g");
+    G.nulstil();
+    paastand("første gang: introduktionen med knappen Start", G.fase === "intro" && /Start/.test(d.getElementById("g-skort").textContent));
+    G.klik(400, 600);
+    paastand("et klik i scenen under introduktionen får kortet til at blinke", d.getElementById("g-skort").classList.contains("blink"));
+    G.videre();
+    paastand("Start: gæt 1 med fire svar", G.fase === "spm" && G.nr === 0 && d.querySelectorAll("#g-skort .sk-knap").length === 4);
+    var c0 = G.stige.c;
+    G.klik(400, 600);
+    paastand("låst under gættet: kortet blinker, og stigen flytter sig ikke", d.getElementById("g-skort").classList.contains("blink") && G.stige.c === c0 && G.fase === "spm");
+    G.knap();
+    paastand("hintet står på kortet, og knappen er væk", /Hint:/.test(d.getElementById("g-besked").textContent) && d.getElementById("g-knap").hidden);
+    G.svarValg(1);
+    paastand("svaret sætter søjlen i gang, og svarene er låst", G.fase === "koer" && Array.prototype.every.call(d.querySelectorAll("#g-skort .sk-knap"), function (k) { return k.disabled; }));
+    G.svarValg(2);
+    paastand("et nyt klik på et svar ændrer ikke gættet", G.svar.papir === 1);
+    koerF(G, 2.6);
+    paastand("søjlen vokser, og tælleren står på kortet", G.Ltop > G.fra + 5 && /Antal ark: [\d,]+ · 10/.test(d.getElementById("g-besked").textContent));
+    koerF(G, 1.2);
+    paastand("Månen har lyst op, da søjlen kom forbi", G.stige.blink["Månen"] !== undefined);
+    koerF(G, 4.3);
+    paastand("efter turen: kortet viser svaret og knappen Næste gæt", G.fase === "facit" && /Næste gæt/.test(d.getElementById("g-skort").textContent));
+    paastand("forkert gæt: kortet er blåt og siger, hvor langt gættet var fra", d.getElementById("g-skort").classList.contains("facit") && d.getElementById("g-skort").innerHTML.indexOf("10<sup>11</sup> gange for lille") >= 0);
+    koerF(G, 2);
+    var v = G.stige.view;
+    var yS = D.GAET[0].svar.map(function (s) { return G.stige.yAf(log10(s.v)); });
+    paastand("overblikket viser alle fire svar og 1 mol under kortet", yS.concat([G.stige.yAf(G.til)]).every(function (y) { return y >= G.stige.fri && y <= v.y + v.h; }), yS.map(Math.round).join(" "));
+    var cF = G.stige.c;
+    G.klik(400, G.stige.yAf(15));
+    koerF(G, 1);
+    paastand("et klik på stigen zoomer ind", G.zoomet && G.stige.p > 70);
+    G.klik(400, 600);
+    koerF(G, 1);
+    paastand("et klik mere viser alle svar igen", !G.zoomet && taet(G.stige.c, cF, 0.01));
+    paastand("panelet: 0 rigtige af 1", d.getElementById("g-rigtige").textContent === "0" && d.getElementById("g-gaettet").textContent === "1");
+    G.videre();
+    paastand("Næste gæt: gæt 2", G.nr === 1 && G.fase === "spm");
+    G.svarValg(D.GAET[1].ret); koerF(G, 8);
+    paastand("rigtigt gæt: kortet er grønt med Rigtigt", d.getElementById("g-skort").classList.contains("loest") && !d.getElementById("g-skort").classList.contains("facit") && /Rigtigt/.test(d.getElementById("g-skort").textContent));
+    paastand("listen: gæt 1 har ✗ og gæt 2 har ✓", G.chips[0].querySelector(".oc-m").textContent === "✗" && G.chips[1].querySelector(".oc-m").textContent === "✓");
+    for (var i = 2; i < D.GAET.length; i++) { G.videre(); G.svarValg(D.GAET[G.nr].ret); koerF(G, 8); }
+    paastand("efter alle gæt: knappen hedder Se resultatet", /Se resultatet/.test(d.getElementById("g-skort").textContent));
+    G.videre();
+    paastand("resultatet: 7 af 8 rigtige og titlen Molmester", G.fase === "slut" && G.antalRigtige() === 7 && /7 af 8/.test(d.getElementById("g-skort").textContent) && /Molmester/.test(d.getElementById("g-skort").textContent));
+    G.vaelg(0);
+    paastand("et gæt fra listen viser svaret igen uden nyt gæt", G.fase === "facit" && G.svar.papir === 1);
+    G.vaelg(D.GAET.length - 1); G.videre();
+    paastand("Videre efter alle gæt går til resultatet", G.fase === "slut");
+    G.videre();
+    paastand("Videre til fane 2 skifter fane", d.getElementById("fane-t").classList.contains("aktiv"));
+    NK.visFane("fane-g");
+    G.knap();
+    paastand("Gæt forfra rydder gættene", G.fase === "intro" && G.antalSvar() === 0);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("6b. Potenserne er rigtig hævet skrift");
+    var SUPTEGN = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]/;
+    G.nulstil(); G.videre(); G.knap();
+    paastand("introduktion, gæt og hint: ingen ²³-tegn på skærmen, kun sup-elementer", !SUPTEGN.test(d.body.textContent) && d.querySelectorAll("#g-skort sup").length >= 1, (d.body.textContent.match(SUPTEGN) || [""])[0]);
+    G.svarValg(1); koerF(G, 9);
+    paastand("svaret: potenserne står som sup-elementer", !SUPTEGN.test(d.getElementById("g-skort").textContent) && d.querySelectorAll("#g-skort sup").length >= 2);
+    paastand("panelet og teorien bruger sup-elementer", d.querySelectorAll("#g-molkort sup, #t-formelkort sup, #teori sup").length >= 4);
+    NK.Rundvisning.start("fane-g");
+    for (i = 0; i < 8 && d.getElementById("rv-titel").textContent !== "Et antal"; i++) d.getElementById("rv-naeste").click();
+    paastand("rundvisningen bruger sup-elementer", d.querySelectorAll("#rv-tekst sup").length >= 1 && !SUPTEGN.test(d.getElementById("rv-tekst").textContent));
+    NK.Rundvisning.luk();
+    var cx = G.L.ctx;
+    cx.font = "600 13px 'Segoe UI', sans-serif";
+    paastand("lærredet: 10²³ er smallere end 1023 og bredere end 10", NK.tekstBredde(cx, "10²³") < cx.measureText("1023").width + 2 && NK.tekstBredde(cx, "10²³") > cx.measureText("10").width + 4);
+    G.nulstil();
+
+    overskrift("7. Fane 2 hele vejen igennem");
+    NK.visFane("fane-t");
+    T.nulstil();
+    paastand("opgave 1 med fire svar og den gule knap", T.fase === "spm" && d.querySelectorAll("#t-skort .sk-knap").length === 4 && !d.getElementById("t-knap").hidden);
+    T.L.canvas.dispatchEvent(new W.PointerEvent("pointerdown", { bubbles: true }));
+    paastand("et klik i scenen får kortet til at blinke", d.getElementById("t-skort").classList.contains("blink"));
+    T.svarValg(0);
+    paastand("forkert svar: rødt, forklaringen på kortet, knappen lyser", d.querySelector('#t-skort [data-valg="0"]').classList.contains("forkert") && d.getElementById("t-status").classList.contains("skidt") && /divideret/.test(d.getElementById("t-besked").textContent) && d.getElementById("t-knap").classList.contains("peg"));
+    T.svarValg(1);
+    paastand("rigtigt svar: grønt kort med Næste opgave, men ingen stjerne", T.fase === "loest" && /Næste opgave/.test(d.getElementById("t-skort").textContent) && T.status[0].loest && !T.status[0].stjerne);
+    T.videre();
+    T.svarValg(3);
+    paastand("rigtigt i første forsøg giver en stjerne", T.status[1].stjerne && T.chips[1].querySelector(".oc-m").textContent === "★");
+    T.videre();
+    paastand("opgave 3: knappen hedder Giv et hint", d.getElementById("t-knap").textContent === "Giv et hint");
+    T.knap();
+    paastand("første hint, så Næste hint", /Hint:/.test(d.getElementById("t-besked").textContent) && d.getElementById("t-knap").textContent === "Næste hint");
+    T.knap();
+    paastand("andet hint, så Vis svaret (kun et omrids)", /n = antal/.test(d.getElementById("t-besked").textContent) && d.getElementById("t-knap").textContent === "Vis svaret" && d.getElementById("t-knap").classList.contains("svar"));
+    T.knap();
+    paastand("Vis svaret: gult kort med Svaret", T.fase === "loest" && d.getElementById("t-skort").classList.contains("svar"));
+    koerF(T, 3);
+    for (i = 3; i < 6; i++) {
+        T.videre();
+        D.OPGAVER[T.nr].svar.forEach(function (s, j) { if (s.ok) T.svarValg(j); });
+        koerF(T, 3);
+    }
+    paastand("alle seks løst, og den sidste knap hedder Færdig", T.antalLoest() === 6 && /Færdig/.test(d.getElementById("t-skort").textContent));
+    T.videre();
+    paastand("Færdig: kortet siger, at alle er løst, og Start forfra står klar", T.fase === "slut" && !d.getElementById("t-knap").hidden && /Start forfra/.test(d.getElementById("t-knap").textContent));
+    T.knap();
+    paastand("Start forfra rydder opgaverne", T.antalLoest() === 0 && T.nr === 0);
+
+    /* ----------------------------------------------------------------- */
+    overskrift("8. Kortet dækker ikke stigen eller sækkene");
+    var maal = [[1100, 620], [1300, 760], [1400, 860], [1600, 950]];
+    maal.forEach(function (m) {
+        ramme.style.width = m[0] + "px";
+        ramme.style.height = m[1] + "px";
+        var vaerst = 0, hvor = "";
+        function maal1(F, navn) {
+            F.tilpas();
+            var k = d.getElementById(F === G ? "g-skort" : "t-skort");
+            var bund = k.offsetTop + k.offsetHeight;
+            var graense = 10 + F.kortZone() + 6;
+            if (bund - graense > vaerst) { vaerst = bund - graense; hvor = navn + " " + bund + " > " + graense; }
+        }
+        NK.visFane("fane-g");
+        var tegnFejl = "";
+        function tegn(F, navn) { try { F.tegn(); } catch (e) { tegnFejl = tegnFejl || navn + ": " + e.message; } }
+        G.nulstil(); maal1(G, "intro"); tegn(G, "intro");
+        D.GAET.forEach(function (g, i) {
+            G.vaelg(i); maal1(G, g.id + " spm"); tegn(G, g.id + " spm");
+            G.knap(); maal1(G, g.id + " hint");
+            G.svarValg(i === 4 ? 3 : 0); maal1(G, g.id + " kører");
+            koerF(G, 2.5); tegn(G, g.id + " kører");
+            koerF(G, 4.5); maal1(G, g.id + " svar"); tegn(G, g.id + " svar");
+            koerF(G, 2); tegn(G, g.id + " overblik");
+        });
+        G.videre(); maal1(G, "slut");
+        NK.visFane("fane-t");
+        T.nulstil();
+        D.OPGAVER.forEach(function (o, i) {
+            T.vaelg(i); maal1(T, o.id + " spm");
+            o.svar.forEach(function (s, j) { if (!s.ok) { T.svarValg(j); maal1(T, o.id + " fejl " + j); } });
+            T.knap(); maal1(T, o.id + " hint");
+            tegn(T, o.id + " spm");
+            T.knap(); T.knap(); maal1(T, o.id + " svar");
+            koerF(T, 1.2); tegn(T, o.id + " fyldes");
+            koerF(T, 2); tegn(T, o.id + " svar");
+        });
+        T.videre(); maal1(T, "slut"); tegn(T, "slut");
+        paastand(m[0] + " × " + m[1] + ": kortet holder sig inden for sin plads", vaerst <= 0, hvor);
+        paastand(m[0] + " × " + m[1] + ": alle gæt og opgaver kan tegnes uden fejl", tegnFejl === "", tegnFejl);
+    });
+    ramme.style.width = "1400px";
+    ramme.style.height = "860px";
+    G.nulstil();
+    T.nulstil();
+}
+</script>
+</body>
+</html>
