@@ -15,26 +15,24 @@
 
     var TURE = {
         "fane-e": [
-            { sel: "#e-anker-lup", titel: "Luppen", tekst: "Molekylerne i glasset. De røde stiplede streger er hydrogenbindinger, de grå prikker er London-kræfter. Klik på et molekyle." },
-            { sel: "#e-signatur", titel: "Bindingerne", tekst: "Hvor mange bindinger der er mellem molekylerne i luppen lige nu." },
+            { sel: "#e-skort", titel: "Opgaven", tekst: "Her står opgaven. Hint og svar står også her. Dit svar tæller først, når du trykker Indsend svar." },
+            { sel: "#e-anker-lup", titel: "Luppen", tekst: "Ethanolmolekylerne i glasset. Klik på et molekyle for at se dets bindinger til naboerne." },
+            { sel: "#e-signatur", titel: "Stregerne", tekst: "Rød stiplet streg: en hydrogenbinding. Grå prikker: en London-kraft." },
             { sel: "#e-anker-termometer", titel: "Termometeret", tekst: "Træk i det runde håndtag for at varme op eller køle ned. Pil op og ned virker også." },
-            { sel: "#e-anker-kammer", titel: "Glasset", tekst: "Ethanol i et reagensglas i et temperaturkammer. Ballonen fanger dampen, når ethanol koger." },
-            { sel: "#e-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu, og hvad der gik galt. Knappen til højre giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#e-kort", titel: "Opgaven", tekst: "Fire mål, ét ad gangen." },
-            { sel: ".faneknapper", titel: "De andre faner", tekst: "Sammenlign stiller to stoffer op mod hinanden. Rangér sætter tre eller fire i rækkefølge." }
+            { sel: "#e-anker-kammer", titel: "Glasset", tekst: "Ethanol i et reagensglas. Når ethanol koger, kommer der bobler, og ballonen fanger dampen." },
+            { sel: "#e-opgaver", titel: "Opgaverne", tekst: "Fire opgaver. En opgave, du løser i første forsøg uden at se svaret, får en stjerne." }
         ],
         "fane-s": [
-            { sel: "#s-anker-lupper", titel: "To stoffer", tekst: "Hvert stof har sin egen lup. Gæt først ved at klikke på det stof, du tror koger ved den højeste temperatur." },
-            { sel: "#s-anker-termometer", titel: "Termometeret", tekst: "Varmer begge glas på én gang. Kogepunkterne kommer på termometeret, når stofferne koger." },
+            { sel: "#s-skort", titel: "Opgaven", tekst: "Gæt først. Find så kogepunkterne, og send dem ind med Indsend svar." },
+            { sel: "#s-anker-lupper", titel: "To stoffer", tekst: "Hvert stof har sin egen lup. Klik på et molekyle for at se dets bindinger." },
+            { sel: "#s-anker-termometer", titel: "Termometeret", tekst: "Varmer begge glas på én gang. Et stof koger, når der kommer bobler i dets glas." },
             { sel: "#s-grafkort", titel: "Grafen", tekst: "Kogepunkterne mod molarmassen. Alkaner er grå, alkoholer er røde." },
-            { sel: "#s-status", titel: "Linjen forneden", tekst: "Her står, hvad du skal nu. Knappen giver ét hint ad gangen og til sidst svaret." },
             { sel: "#s-opgaver", titel: "Parrene", tekst: "Fem par, der hver viser én ting: OH-gruppen, kæden, formen, to OH-grupper og et stort molekyle." }
         ],
         "fane-r": [
-            { sel: "#r-tavle", titel: "Tavlen", tekst: "Træk kortene i rækkefølge efter kogepunkt, det laveste til venstre. Du kan også klikke på to kort for at bytte dem." },
-            { sel: "#r-tjek", titel: "Tjek", tekst: "Tjekker rækkefølgen. Enter gør det samme." },
-            { sel: "#r-status", titel: "Linjen forneden", tekst: "Står et par forkert, forklares det her. Knappen giver ét hint ad gangen." },
-            { sel: "#r-opgaver", titel: "Opgaverne", tekst: "Tolv opgaver i tre grupper. En opgave, du løser uden at se svaret, får en stjerne." }
+            { sel: "#r-skort", titel: "Opgaven", tekst: "Sæt stofferne i rækkefølge, og tryk Indsend svar. Står et par forkert, forklares det her." },
+            { sel: "#r-tavle", titel: "Tavlen", tekst: "Træk et kort hen på et andet, så bytter de plads. Du kan også klikke på to kort." },
+            { sel: "#r-opgaver", titel: "Opgaverne", tekst: "Tolv opgaver i tre grupper. En opgave, du løser i første forsøg uden at se svaret, får en stjerne." }
         ]
     };
     var trin = [];

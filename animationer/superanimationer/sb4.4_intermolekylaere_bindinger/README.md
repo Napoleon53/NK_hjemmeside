@@ -2,8 +2,43 @@
 
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv og virker også, når den åbnes direkte fra harddisken.
-Der er ingen Kemichael: hjælpen står i statuslinjen nederst i scenen, som i
-`sc1.4_afstemning`.
+Der er ingen Kemichael. Al tekst står på ét kort øverst midt i scenen, som i
+`sc7.5_staerke_og_svage_syrer`, og intet svar tæller, før eleven trykker
+Indsend svar (ombygget 24. oktober 2026, se nedenfor).
+
+## Ombygningen 24. oktober 2026
+
+Brugeren: "teksten står i højre hjørne, hvor læserens øjne ikke naturligt
+falder. Teksten skal i stedet stå meget tydeligt øverst i midten, og man skal
+sjældent kunne løse opgaver ved tilfældigt at klikke på slidere og knapper.
+Der skal som minimum være et indsend svar." Om denne animation: "90 % af
+eleverne løser opgaven ved bare uhæmmet at trække i slideren", og tælleren af
+hydrogenbindinger oppe i hjørnet var "lidt underlig og indforstået".
+
+* **Kortet øverst midt i scenen** (fra sc7.5): opgaven, spørgsmålet, svarene,
+  hint, forklaringen til et forkert svar og knapperne. Statuslinjen nederst
+  og opgavekortet i panelet er væk; panelet har kun listen (og grafen på
+  fane 2). Kortets plads er sat af (`kortZone` i `js/fane.js`), så intet
+  under det flytter sig.
+* **Indsend svar.** Termometeret løser ingen opgave af sig selv. Et
+  kogepunkt findes ved at stille termometeret på den temperatur, hvor
+  stoffet begynder at koge (der kommer bobler), og trykke Indsend svar
+  (±4 °C, `D.TOL`). Knappen viser temperaturen, der sendes ind, er grå,
+  til termometeret er rørt, og banker, når der er noget at sende. Et svar
+  på et spørgsmål vælges først og sendes så ind. Et forkert svar giver en
+  rød forklaring på kortet (`D.tempFejl` siger, hvad eleven ser: ingen
+  bobler, bobler eller kun damp).
+* **Stjernen** kræver løst i første forsøg uden Vis svaret, så det ikke kan
+  betale sig at gætte løs.
+* **Låsen:** under et gæt og på det grønne kort kan termometeret og
+  kontakten ikke bruges; kortet blinker i stedet.
+* **Tælleren er væk.** I stedet forklarer en lille kasse ved luppen med en
+  tegning, hvad en rød stiplet streg (hydrogenbinding fra H på O til O i et
+  andet molekyle) og grå prikker (London-kraft mellem C-atomer) er. Et klik
+  på et molekyle siger stadig, hvor mange bindinger netop det har.
+* **Intet indforstået:** hver tekst nævner selv stofferne ("Ethanol og
+  butan-1-ol har begge …", ikke "Begge har …"), og på fane 2 har det stof,
+  kortet spørger om, en gul ring om luppen og glasset.
 
 Den afløser `animationer/kemi-b-filer/b4.1_intermolekylaert_ethanol.html`
 ("Intermolekylært", knap 4 i `kemi-b-filer/samling_b4,5,6.html`). Brugeren
@@ -45,33 +80,39 @@ Kemichael.
 
 ## Fane 1: Ethanol
 
-Til venstre et temperaturkammer med et reagensglas med ethanol og en ballon
-(sprites fra sc4.1), i midten luppen, til højre termometeret, som eleven
-trækker i (−100 til 120 °C). Øverst til venstre står, hvad der er i glasset,
-og hvor mange hydrogenbindinger og London-kræfter der er i luppen lige nu.
-Et klik på et molekyle viser δ+ og δ− og siger, hvor mange bindinger det har.
+Til venstre forklaringen af stregerne i luppen og under den et
+temperaturkammer med et reagensglas med ethanol og en ballon (sprites fra
+sc4.1), i midten luppen, til højre termometeret, som eleven trækker i (−100
+til 120 °C). Et klik på et molekyle viser δ+ og δ− og siger, hvor mange
+bindinger det har.
 
-Fire mål i fast rækkefølge:
+Fire opgaver i fast rækkefølge. Hver begynder med en frisk prøve:
 
-1. **Kog ethanol.** Over 78 °C river molekylerne sig løs ét ad gangen,
-   bindingerne til dem springer synligt, og ballonen fyldes.
-2. **Hvad brydes?** Bindingen mellem O og H, bindingerne mellem molekylerne
-   eller bindingen mellem C og C. De forkerte er de fejl, elever laver, og
-   dampen i luppen viser, at molekylerne er hele.
-3. **Find H'et.** Eleven klikker på det H, der kan danne hydrogenbindinger.
-   Et H på C giver forklaringen. Bagefter har H på O en rød kant (δ+) på
-   alle tre faner.
-4. **Uden hydrogenbindinger.** Gæt først (højere, lidt lavere, meget lavere),
-   så kommer kontakten frem. Uden hydrogenbindinger koger ethanol ved
-   stuetemperatur, og eleven finder det nye kogepunkt, −42 °C, ved at køle
-   ned (eller varme op). Kontakten bliver, når målet er løst.
+1. **Ethanols kogepunkt.** Find den temperatur, hvor ethanol begynder at
+   koge, og send den ind. Over 78 °C river molekylerne sig løs ét ad gangen,
+   bindingerne til dem springer synligt, der kommer bobler, og ballonen
+   fyldes.
+2. **Hvad brydes?** Ethanol varmes op af sig selv (70 til 84 °C), og eleven
+   vælger alle de bindinger, der brydes: hydrogenbindingerne og
+   London-kræfterne, ikke bindingen mellem O og H eller mellem C og C. 15
+   kombinationer, så tilfældige klik sjældent rammer.
+3. **Find H'et.** Eleven klikker på et atom (gul ring, ingen δ, så svaret
+   ikke afsløres) og sender det ind. Et H på C giver forklaringen. Bagefter
+   har H på O en rød kant (δ+) på alle tre faner.
+4. **Uden hydrogenbindinger.** Gæt først (højere, lidt lavere, meget
+   lavere), så kommer kontakten frem og pulserer. Uden hydrogenbindinger er
+   ethanol damp ved stuetemperatur, og eleven finder det nye kogepunkt,
+   −42 °C, ved at køle ned og sende det ind. Kontakten er der kun i denne
+   opgave; i de andre er hydrogenbindingerne altid slået til.
 
 ## Fane 2: Sammenlign
 
 Brugerens opgave med tabellerne som forsøg: to stoffer i hver sit glas og hver
-sin lup, ét termometer (−100 til 220 °C). Eleven gætter, hvilket stof der koger
-ved den højeste temperatur (klik på luppen), varmer op, til begge har kogt, og
-svarer på hvorfor. Fem par:
+sin lup, ét termometer (−100 til 220 °C). Eleven gætter på kortet, hvilket stof
+der koger ved den højeste temperatur, finder så kogepunktet for hvert stof og
+sender det ind (et kogepunkt, der er fundet i et andet par, skal ikke findes
+igen), ser dem side om side på et grønt kort med dommen over gættet og svarer
+til sidst på hvorfor. Fem par:
 
 | Par | Pointe |
 |-----|--------|
@@ -90,20 +131,23 @@ brugerens opgave vises.
 
 Tre eller fire stoffer som kort på en tavle i tilfældig rækkefølge, alle tegnet
 i samme målestok. Eleven trækker dem fra det laveste kogepunkt til venstre til
-det højeste til højre (eller klikker på to kort) og trykker Tjek. Er det
-forkert, bliver de to første kort, der står forkert, røde, og linjen forklarer
-dem ud fra OH-grupperne, kæden eller formen (`D.forklar`). Kogepunkterne vises
-først, når rækkefølgen er rigtig, og kommer så på en akse under tavlen. 12
-opgaver i Let (OH eller ej), Middel (kæden og OH) og Svær (formen og flere OH).
-En opgave, der er løst uden Vis svaret, får en stjerne, og stjernerne huskes i
-browseren.
+det højeste til højre (eller klikker på to kort) og trykker Indsend svar på
+kortet øverst. Er det forkert, bliver de to første kort, der står forkert,
+røde, og kortet forklarer dem ud fra OH-grupperne, kæden eller formen
+(`D.forklar`, der selv nævner begge stoffer). Kogepunkterne vises først, når
+rækkefølgen er rigtig, og kommer så på en akse under tavlen. 12 opgaver i Let
+(OH eller ej), Middel (kæden og OH) og Svær (formen og flere OH). En opgave,
+der er løst i første forsøg uden Vis svaret, får en stjerne, og stjernerne
+huskes i browseren.
 
 ## Hjælpen
 
-Som sc1.4: statuslinjen nederst i scenen siger næste skridt, bliver rød og
-ryster ved et forkert svar og grøn ved et rigtigt. Knappen i samme linje giver
-ét hint ad gangen (tre trin) og til sidst svaret. Teorien ligger bag knappen
-Teori, rundvisningen bag `?`.
+Som sc7.5: kortets nederste række har hint, den røde forklaring til et
+forkert svar (rækken ryster) og svaret på et klik i scenen. Den gule knap
+giver ét hint ad gangen (tre trin) og til sidst svaret; Indsend svar står
+ved siden af. Et løst svar står på det grønne kort med forklaringen og
+knappen Næste opgave. Teorien ligger bag knappen Teori, rundvisningen bag
+`?`.
 
 Påskeægget: et klik på termometerets kugle. Det er et sprittermometer, og over
 78 °C ville spritten i et rigtigt sprittermometer koge.
@@ -145,7 +189,8 @@ js/sprites.js       indlæser SVG-filerne; MAAL har koordinaterne i dem
 js/tegning.js       rummet, kammeret, glasset med ballon, termometeret,
                     luppen, molekylerne og kortene
 js/termostat.js     temperaturen, som eleven trækker i (fra sc4.1)
-js/fane.js          det fælles: listen, statuslinjen, knappen, musen
+js/fane.js          det fælles: listen, kortet øverst, Indsend svar, hint,
+                    låsen, musen og termometeret
 js/sim_ethanol.js   fane 1
 js/sim_sammenlign.js fane 2
 js/sim_ranger.js    fane 3
@@ -163,7 +208,7 @@ Fysikkens konstanter står øverst i `js/model.js`.
 
 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane · <kbd>↑</kbd> <kbd>↓</kbd>
 temperaturen (med Skift ti grader) · <kbd>R</kbd> forfra · <kbd>H</kbd>
-rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd> tjek eller næste ·
+rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd> indsend eller næste ·
 <kbd>Esc</kbd> luk. Direkte links: `#ethanol`, `#sammenlign` og `#ranger`.
 
 ## Selvtest
@@ -172,10 +217,14 @@ rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd> tjek eller næste ·
 Den tjekker molekylernes atomer og molarmasser, kogepunkterne og
 tommelfingerreglerne, at hvert brugt stof koger ved kogepunktet og fortætter
 under det, at alkoholerne danner hydrogenbindinger og alkanerne ingen, at
-ethanol uden hydrogenbindinger koger ved −42 °C, alle fire mål, alle fem par og
-alle 12 rangeringer (selv, med forkerte svar og med Vis svaret), at hvert par i
-en rangering har en forklaring, sproget og layoutet fra 1100 × 700 til
-1600 × 950. Sidst kørt 2. oktober 2026: ALT OK (54 påstande).
+ethanol uden hydrogenbindinger koger ved −42 °C, alle fire opgaver, alle fem
+par og alle 12 rangeringer (selv, med forkerte svar og med Vis svaret), at
+termometeret alene aldrig løser en opgave, at intet bedømmes før Indsend svar,
+at termometeret er låst under et gæt, at stjernen kræver første forsøg, at
+hvert par i en rangering har en forklaring, sproget (også intet indforstået og
+korte tekster) og layoutet fra 1100 × 700 til 1600 × 950, herunder at kortet
+med det længste hint og den længste forklaring kan være på sin plads. Sidst
+kørt 24. oktober 2026: ALT OK (74 påstande).
 
 ## Til menuen (først når brugeren siger til)
 

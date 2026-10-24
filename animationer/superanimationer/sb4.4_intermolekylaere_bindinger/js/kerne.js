@@ -185,7 +185,9 @@ window.NK = NK;
 
     /* Tekst, der skal ind i innerHTML, uden at < og & driller. */
     NK.html = function (s) {
-        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        /* Et tal og dets enhed holdes sammen paa samme linje (78 °C, 46 g/mol) */
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/ (°C|g\/mol)/g, "\u00a0$1");
     };
 
     /* ----- Laerred: canvas med korrekt skarphed paa alle skaerme ------ */

@@ -4,13 +4,13 @@
    Tre eller fire stoffer staar som kort paa en tavle i en tilfaeldig
    raekkefoelge. Eleven traekker dem paa plads fra det laveste kogepunkt
    til venstre til det hoejeste til hoejre (eller klikker paa to kort for
-   at bytte dem) og trykker Tjek. Er det forkert, forklares det foerste
+   at bytte dem) og trykker Indsend svar paa kortet oeverst. Er det forkert, forklares det foerste
    par, der staar forkert, ud fra OH-grupperne, kaeden eller formen
    (D.forklar). Kogepunkterne vises foerst, naar raekkefoelgen er rigtig,
    og saa kommer de paa en akse under tavlen.
 
-   12 opgaver i Let, Middel og Svaer. En opgave, der er loest uden Vis
-   svaret, faar en stjerne, og stjernerne huskes.
+   12 opgaver i Let, Middel og Svaer. En opgave, der er loest i foerste
+   forsoeg uden Vis svaret, faar en stjerne, og stjernerne huskes.
    ===================================================================== */
 (function () {
     "use strict";
@@ -23,8 +23,6 @@
         var mig = this;
         this.tavle = NK.el("r-tavle");
         this.pladser = NK.el("r-pladser");
-        this.tjekKnap = NK.el("r-tjek");
-        this.tjekKnap.addEventListener("click", function () { mig.tjek(); });
         var opg = D.RANGER.map(function (o) {
             var n = o.gruppe === "let" ? "Let" : (o.gruppe === "middel" ? "Middel" : "Svær");
             var nr = D.RANGER.filter(function (x) { return x.gruppe === o.gruppe; }).indexOf(o) + 1;
@@ -55,15 +53,13 @@
         this.bygKort();
     };
 
-    P.promptHTML = function () {
-        return '<p class="maal-tekst">Sæt stofferne i rækkefølge efter kogepunkt: det laveste til venstre og det højeste til højre.</p>' +
-            '<p class="note-tekst">Træk et kort hen på et andet, så bytter de plads. Du kan også klikke på to kort. Tryk Tjek rækkefølgen, når du er klar.</p>';
+    P.delNu = function () {
+        return { slags: "opgave", chip: this.opg.o.navn,
+            tekst: "Sæt stofferne i rækkefølge efter kogepunkt, det laveste til venstre. Træk et kort hen på et andet, så bytter de plads." };
     };
 
-    P.trinLinje = function () {
-        if (this.opg.fejlPar) return "Flyt kortene, og tjek igen.";
-        return "Træk kortene i rækkefølge, og tryk Tjek rækkefølgen.";
-    };
+    P.kanIndsende = function () { return !this.opg.loest; };
+    P.indsend = function () { this.tjek(); };
 
     /* Det foerste par fra venstre, der staar forkert: [venstre, hoejre] */
     P.foersteFejl = function (orden) {
@@ -76,7 +72,7 @@
 
     P.hintTrin = function () {
         var o = this.opg.o, f = this.foersteFejl();
-        if (!f) return ["Rækkefølgen er rigtig. Tryk Tjek rækkefølgen."];
+        if (!f) return ["Rækkefølgen er rigtig. Tryk Indsend svar."];
         var oh = {}, c = {};
         o.stoffer.forEach(function (id) { oh[D.STOF[id].OH] = 1; c[D.STOF[id].C] = 1; });
         var t1;
@@ -89,7 +85,7 @@
         }
         var a = D.STOF[f[0]], b = D.STOF[f[1]];
         return [t1,
-            "Se på " + a.navn + " og " + b.navn + ". " + D.forklar(f[1], f[0]),
+            D.forklar(f[1], f[0]),
             "Flyt " + b.navn + " til venstre for " + a.navn + "."];
     };
 
@@ -110,7 +106,7 @@
         if (!f) { this.erLoest("selv"); return; }
         g.fejlPar = f;
         this.visFejl();
-        this.fejlLinje("Se på " + D.STOF[f[0]].navn + " og " + D.STOF[f[1]].navn + ". " + D.forklar(f[1], f[0]));
+        this.fejlLinje(D.forklar(f[1], f[0]));
         this.tavle.classList.remove("ryst");
         void this.tavle.offsetWidth;
         this.tavle.classList.add("ryst");
@@ -122,19 +118,14 @@
         g.fejlPar = null;
         this.tavle.classList.add("faerdig");
         this.bygKort();
-        var linje = g.rigtig.map(function (id) { return D.STOF[id].navn + " " + D.kpTekst(D.STOF[id]); }).join(", ") + ".";
-        this.loest(maade, maade === "svar" ? linje : linje + " " + NK.tilfaeldig(D.ROS));
-        this.tjekKnap.disabled = true;
+        var linje = g.rigtig.map(function (id) { return D.STOF[id].navn + " " + D.kpTekst(D.STOF[id]); }).join(" < ") + ".";
+        this.loest(maade, maade === "svar" ? "" : "Rigtig rækkefølge.", D.Stort(linje));
     };
-
-    P.enter = function () { this.tjek(); };
 
     /* ----- Kortene --------------------------------------------------------------------- */
     P.bygKort = function () {
         var g = this.opg, mig = this;
         this.tavle.classList.toggle("faerdig", g.loest);
-        this.tjekKnap.disabled = g.loest;
-        this.tjekKnap.style.visibility = g.loest ? "hidden" : "";
         this.pladser.innerHTML = "";
         this.pladser.style.setProperty("--n", g.orden.length);
         this.kortEl = [];
@@ -257,23 +248,18 @@
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var baand = this.baand();
-        var lay = { W: W, H: H, baand: baand };
+        var lay = { W: W, H: H, baand: baand, top: this.top() };
         var kant = NK.klamp(W * 0.025, 12, 28);
         var b = Math.min(W - 2 * kant, 1000);
         var t = this.tavle;
         t.style.left = Math.round((W - b) / 2) + "px";
-        t.style.top = NK.klamp(H * 0.04, 12, 30) + "px";
+        t.style.top = lay.top + "px";
         t.style.width = Math.round(b) + "px";
-        var kortH = NK.klamp((baand.y - 200) * 0.52, 180, 290);
+        var kortH = NK.klamp((baand.y - lay.top - 150) * 0.85, 170, 300);
         t.style.setProperty("--korth", Math.round(kortH) + "px");
         var th = t.offsetHeight || kortH + 80;
-        var k = this.tjekKnap;
-        var ky = parseFloat(t.style.top) + th + NK.klamp(H * 0.03, 12, 24);
-        k.style.top = Math.round(ky) + "px";
-        k.style.left = Math.round(W / 2 - (k.offsetWidth || 220) / 2) + "px";
-        lay.tavle = { x: (W - b) / 2, y: parseFloat(t.style.top), b: b, h: th };
-        lay.tjekY = ky + (k.offsetHeight || 50) / 2;
-        lay.akseY = ky + (k.offsetHeight || 50) + NK.klamp((baand.y - ky - 50) * 0.45, 40, 90);
+        lay.tavle = { x: (W - b) / 2, y: lay.top, b: b, h: th };
+        lay.akseY = lay.top + th + NK.klamp((baand.y - lay.top - th) * 0.5, 50, 110);
         this.lay = lay;
         this.saetAnker("akse", lay.tavle.x, lay.akseY - 30, b, 60);
         this.tegnKort();
@@ -286,15 +272,7 @@
         if (!lay) return;
         Tg.rum(ctx, lay.W, lay.baand.y, lay.baand.y);
         if (g.loest) this.tegnAkse(ctx);
-        if (g.loest && this.sejrT < 0.9) {
-            ctx.save();
-            ctx.globalAlpha = 0.14 * (1 - this.sejrT / 0.9);
-            ctx.fillStyle = "#3fae72";
-            ctx.fillRect(0, 0, lay.W, lay.baand.y);
-            ctx.restore();
-        }
-        /* Stemplet staar, hvor Tjek stod */
-        if (g.loest) Tg.stempel(ctx, lay.W / 2, lay.tjekY, "RIGTIG RÆKKEFØLGE ✓", NK.pop((this.sejrT || 0) / 0.45));
+        this.tegnSejr(ctx, lay.W, lay.baand.y);
     };
 
     /* Kogepunkterne paa en akse under tavlen, naar raekkefoelgen er rigtig */

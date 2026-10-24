@@ -2,10 +2,12 @@
    sim_sammenlign.js - fane 2: sammenlign to stoffer
 
    Brugerens opgave med tabellerne som forsoeg: to stoffer i hver sit
-   reagensglas i hver sit kammer, med hver sin lup over. Eleven gaetter,
-   hvilket der koger ved den hoejeste temperatur (klik paa luppen), varmer
-   begge op med termometeret og svarer saa paa hvorfor. De forkerte svar
-   er de fejl, elever laver, og hver har sin forklaring.
+   reagensglas i hver sit kammer, med hver sin lup over. Eleven gaetter
+   paa kortet, hvilket der koger ved den hoejeste temperatur, finder
+   saa kogepunktet for hvert stof med termometeret og sender det ind
+   (Indsend svar: termometeret loeser intet af sig selv), og svarer til
+   sidst paa hvorfor. De forkerte svar er de fejl, elever laver, og hver
+   har sin forklaring.
 
    Fem par: OH-gruppen (propan og ethanol), kaeden, formen, to
    OH-grupper og et langt molekyle. Kogepunkterne kommer paa grafen i
@@ -52,11 +54,15 @@
         return '<span class="oc-nr">' + (i + 1) + "</span>" + NK.html(o.navn);
     };
 
-    /* ----- Opgaven ---------------------------------------------------------------- */
+    /* ----- Opgaven ----------------------------------------------------------------
+       Et par har fire dele: gaettet, kogepunktet for a, kogepunktet for b og
+       spoergsmaalet om hvorfor. Et kogepunkt, eleven har fundet i et andet
+       par, skal ikke findes igen. Naar begge kogepunkter er kendt, staar de
+       paa et groent kort med dommen over gaettet, foer spoergsmaalet kommer. */
     P.lavOpgave = function (i) {
         var o = this.opgaver[i];
         var sa = D.STOF[o.a], sb = D.STOF[o.b];
-        this.opg = { o: o, fase: "gaet", gaet: null, kogt: { a: false, b: false }, forkert: {}, rigtig: undefined };
+        this.opg = { o: o, fase: "gaet", gaet: null, maaler: null, forkert: {} };
         this.st = { a: sa, b: sb };
         this.Pr = {
             a: new NK.Proeve(sa, D.antalILup(sa), D.SAMMEN.Rm, 11 + i),
@@ -65,6 +71,7 @@
         this.Pr.a.nulstil(o.start);
         this.Pr.b.nulstil(o.start);
         this.termo.saet(o.start);
+        this.roertTermo = false;
         this.valgt = null;
         this.valgtT = 0;
         this.grafNoegle = "";
@@ -72,126 +79,131 @@
 
     P.hoejest = function () { return this.st.a.kp > this.st.b.kp ? "a" : "b"; };
 
-    P.promptHTML = function () {
+    P.kendt = function (k) { return !!this.maalt[this.st[k].id]; };
+
+    P.delNu = function () {
         var g = this.opg, o = g.o, sa = this.st.a, sb = this.st.b;
-        var html = '<p class="note-tekst">' + NK.html(o.intro) + "</p>";
         if (g.fase === "gaet") {
-            html += '<p class="maal-tekst">Hvilket stof koger ved den højeste temperatur? Gæt, og klik på dets lup.</p>';
-            html += '<div class="knapper valgrad">' +
-                '<button type="button" class="knap" data-valg="0"><span class="v-prik" style="background:' + FARVE.a + '"></span>' + NK.html(D.Stort(sa.navn)) + "</button>" +
-                '<button type="button" class="knap" data-valg="1"><span class="v-prik" style="background:' + FARVE.b + '"></span>' + NK.html(D.Stort(sb.navn)) + "</button></div>";
-        } else if (g.fase === "varm") {
-            html += '<p class="maal-tekst">Varm op med termometeret, og se, hvilket stof der koger først.</p>';
-            html += '<p class="note-tekst">Dit gæt: ' + NK.html(this.st[g.gaet].navn) + ".</p>";
-        } else {
-            html += '<p class="maal-tekst">' + NK.html(o.spm) + "</p>";
-            html += '<div class="knapper valgrad">';
-            o.svar.forEach(function (sv, j) {
-                var kl = "knap", laast = g.rigtig !== undefined;
-                if (g.forkert[j]) { kl += " forkert"; laast = true; }
-                if (g.rigtig === j) kl += " rigtig";
-                html += '<button type="button" class="' + kl + '" data-valg="' + j + '"' + (laast ? " disabled" : "") + ">" +
-                    '<span class="v-bogstav">' + "ABC".charAt(j) + "</span>" + NK.html(sv.t) + "</button>";
-            });
-            html += "</div>";
+            return { slags: "gaet", intro: o.intro, tekst: "Hvilket stof koger ved den højeste temperatur?",
+                svar: [{ t: D.Stort(sa.navn), prik: FARVE.a }, { t: D.Stort(sb.navn), prik: FARVE.b }] };
         }
-        return html;
+        if (g.fase === "maal") {
+            var n = this.st[g.maaler].navn;
+            return { slags: "opgave", chip: "Mål", tekst: "Find kogepunktet for " + n + ": stil termometeret på den temperatur, hvor " + n + " begynder at koge.",
+                ekstra: '<p class="sk-gaet">Dit gæt: <b>' + NK.html(D.Stort(this.st[g.gaet].navn)) + " koger ved den højeste temperatur.</b></p>" };
+        }
+        return { slags: "spm", tekst: o.spm, svar: o.svar, forkert: g.forkert };
     };
 
-    P.trinLinje = function () {
+    P.sceneLinje = function () {
         var g = this.opg;
-        if (g.fase === "gaet") return "Gæt først: klik på luppen med det stof, du tror koger ved den højeste temperatur.";
-        if (g.fase === "varm") {
-            var k = g.kogt;
-            if (!k.a && !k.b) return this.roertTermo ? "Varm videre. Begge stoffer er stadig væsker." : "Træk i det runde håndtag på termometeret, og varm op.";
-            var x = k.a ? "a" : "b", y = k.a ? "b" : "a";
-            return D.Stort(this.st[x].navn) + " koger ved " + D.kpTekst(this.st[x]) + ". Varm videre, til " + this.st[y].navn + " også koger.";
-        }
-        return "Vælg et svar i opgavekortet.";
+        if (g.fase === "maal" && this.roertTermo) return "Stil termometeret på kogepunktet for " + this.st[g.maaler].navn + ", og tryk Indsend svar.";
+        return "";
     };
 
     P.hintTrin = function () {
         var g = this.opg;
-        if (g.fase === "gaet") return ["Det er et gæt. Bagefter måler du det."];
-        if (g.fase === "varm") {
-            var maks = Math.max(this.st.a.kp, this.st.b.kp);
-            return ["Træk i det runde håndtag på termometeret til højre.",
-                    "Varm op, til begge stoffer koger. Ballonen fyldes, når et stof koger.",
-                    "Træk termometeret op over " + D.grader(Math.ceil((maks + 8) / 10) * 10) + " °C."];
-        }
+        if (g.fase === "maal") return D.maalHint(this.st[g.maaler]);
         return g.o.hint;
+    };
+
+    /* Gaettet: videre til det foerste kogepunkt, eleven ikke kender */
+    P.gaetValg = function (j) {
+        var g = this.opg;
+        g.gaet = j === 0 ? "a" : "b";
+        this.naesteMaal();
+    };
+
+    P.naesteMaal = function () {
+        var g = this.opg;
+        this.roertTermo = false;
+        var k = !this.kendt("a") ? "a" : (!this.kendt("b") ? "b" : null);
+        if (k) {
+            g.fase = "maal";
+            g.maaler = k;
+            this.nyDel();
+            this.layout();
+            return;
+        }
+        /* Begge kendt: dommen over gaettet og kogepunkterne */
+        g.fase = "kendt";
+        g.maaler = null;
+        var h = this.hoejest(), l = h === "a" ? "b" : "a";
+        var t = D.Stort(this.st[l].navn) + " koger ved " + D.kpTekst(this.st[l]) + ", og " + this.st[h].navn + " koger ved " + D.kpTekst(this.st[h]) + ".";
+        var holdt = g.gaet === h;
+        this.mellemsvar("selv", (holdt ? "Dit gæt holdt. " : "Dit gæt holdt ikke. ") + t, holdt ? "Godt gættet ✓" : "Målt ✓", "Næste spørgsmål →");
+        this.layout();
+    };
+
+    /* Naeste paa det groenne kort: spoergsmaalet om hvorfor */
+    P.videre = function () {
+        this.opg.fase = "spm";
+        this.nyDel();
+        this.layout();
+    };
+
+    P.kanIndsende = function () { return this.opg.fase === "maal" && !!this.roertTermo; };
+
+    P.indsendTekst = function () { return this.opg.fase === "maal" ? this.indsendTemp() : ""; };
+
+    P.indsend = function () {
+        var g = this.opg;
+        if (g.fase !== "maal") return;
+        var k = g.maaler, st = this.st[k], T = this.Tnu();
+        if (Math.abs(T - this.Pr[k].kp()) <= D.TOL) { this.fundetKp(k, false); return; }
+        this.fejlLinje(D.tempFejl(st.navn, T, this.Pr[k]));
+    };
+
+    /* Et kogepunkt er fundet (eller vist med Vis svaret) */
+    P.fundetKp = function (k, svar) {
+        var st = this.st[k];
+        this.maalt[st.id] = true;
+        this.grafNoegle = "";
+        var andet = k === "a" ? "b" : "a";
+        if (!this.kendt(andet)) {
+            this.naesteMaal();
+            this.besked('<span class="b-maerke">' + (svar ? "Svaret" : "Rigtigt") + "</span> " +
+                NK.html(D.Stort(st.navn) + " koger ved " + D.kpTekst(st) + "."), svar ? "gul" : "god");
+            return;
+        }
+        this.naesteMaal();
+    };
+
+    P.spmLoest = function (d) {
+        this.loest("selv", this.opg.o.loest, this.svarTekst(d));
     };
 
     P.visSvar = function () {
         var g = this.opg;
-        if (g.fase === "gaet") {
-            this.gaet(this.hoejest(), true);
-        } else if (g.fase === "varm") {
-            var maks = Math.max(this.st.a.kp, this.st.b.kp);
-            this.termo.animerTil(Math.min(D.SAMMEN.omr.max, maks + 12), 90);
-            this.roertTermo = true;
-        } else {
-            g.o.svar.forEach(function (sv, j) { if (sv.ok) g.rigtig = j; });
-            this.loest("svar", g.o.loest);
-        }
-    };
-
-    /* ----- Gaettet og svarene --------------------------------------------------------- */
-    P.gaet = function (hvem, fraSvar) {
-        var g = this.opg;
-        if (g.fase !== "gaet") return;
-        g.gaet = hvem;
-        g.fase = "varm";
-        this.hjaelp = 0;
-        this.visKort();
-        var t = "Dit gæt: " + this.st[hvem].navn + ". " + this.trinLinje();
-        this.besked('<span class="b-maerke">' + (fraSvar ? "Svaret" : "Gættet") + "</span> " + NK.html(t), "peger");
-        this.sidsteTrin = this.trinLinje();
-    };
-
-    P.svarValg = function (j) {
-        var g = this.opg, o = g.o;
-        if (this.faerdig) return;
-        if (g.fase === "gaet") { this.gaet(j === 0 ? "a" : "b"); return; }
-        if (g.fase !== "hvorfor") return;
-        if (o.svar[j].ok) {
-            g.rigtig = j;
-            this.loest("selv", o.loest + " " + NK.tilfaeldig(D.ROS));
+        if (g.fase === "maal") {
+            var k = g.maaler;
+            this.termo.animerTil(Math.round(this.Pr[k].kp()) + 2, 90);
+            this.fundetKp(k, true);
             return;
         }
-        g.forkert[j] = true;
-        this.visKort();
-        this.fejlLinje(o.svar[j].f);
-    };
-
-    /* Begge har kogt: dommen over gaettet og saa spoergsmaalet */
-    P.beggeKogt = function () {
-        var g = this.opg, h = this.hoejest(), l = h === "a" ? "b" : "a";
-        g.fase = "hvorfor";
-        this.hjaelp = 0;
-        this.visKort();
-        var t = D.Stort(this.st[l].navn) + " koger ved " + D.kpTekst(this.st[l]) + " og " + this.st[h].navn + " ved " +
-            D.kpTekst(this.st[h]) + ". ";
-        if (g.gaet === h) this.besked('<span class="b-maerke">Godt gættet</span> ' + NK.html(t + "Svar nu på, hvorfor."), "god");
-        else this.besked('<span class="b-maerke">Gættet holdt ikke</span> ' + NK.html(t + "Svar nu på, hvorfor."), "gul");
-        this.sidsteTrin = this.trinLinje();
+        if (g.fase === "spm") {
+            var d = this.delNu();
+            this.loest("svar", g.o.loest, this.svarTekst(d));
+        }
     };
 
     /* ----- Scenen ------------------------------------------------------------------------ */
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var baand = this.baand();
-        var lay = { W: W, H: H, baand: baand };
+        var lay = { W: W, H: H, baand: baand, top: this.top() };
         var kant = NK.klamp(W * 0.016, 10, 18);
         lay.bordY = baand.y - NK.klamp(H * 0.035, 14, 26);
-        lay.termo = Tg.termoMaal(W - kant - 50, lay.bordY - 4, lay.bordY - 4 - 16, D.SAMMEN.omr);
+        lay.termo = Tg.termoMaal(W - kant - 50, lay.bordY - 4, lay.bordY - 4 - lay.top - 4, D.SAMMEN.omr);
         var x0 = kant, x1 = lay.termo.x - 78;
         var colB = (x1 - x0) / 2;
-        var arbH = lay.bordY - 10;
-        var sk = NK.klamp(Math.min(arbH * 0.36 / 420, colB * 0.5 / 240), 0.2, 0.6);
-        var lupBund = lay.bordY - 418 * sk - 10;
-        var top = 52;
-        var r = Math.max(50, Math.min(colB / 2 - 16, (lupBund - top) / 2));
+        /* Navnet og formlen over hver lup, saa luppen, og kammeret nederst.
+           Kamrene er smaa, saa lupperne kan vaere store. */
+        var etiket = 50;
+        var top = lay.top + etiket;
+        var r = Math.max(50, Math.min(colB / 2 - 14, (lay.bordY - top - 140) / 2));
+        var kamH = lay.bordY - (top + 2 * r) - 12;
+        var sk = NK.klamp(Math.min(kamH / 418, colB * 0.5 / 240), 0.2, 0.6);
         lay.kol = {};
         ["a", "b"].forEach(function (k, n) {
             var cx = x0 + colB * (n + 0.5);
@@ -199,7 +211,7 @@
             var G = K.glas();
             lay.kol[k] = {
                 kammer: K, glas: G,
-                lup: { x: cx, y: top + r + Math.max(0, (lupBund - top - 2 * r) / 2), r: r },
+                lup: { x: cx, y: top + r, r: r },
                 zoomFra: { x: G.ind.x0 + 2, y: G.ind.bund - G.fuld * 0.55, b: G.ind.x1 - G.ind.x0 - 4, h: G.fuld * 0.4 }
             };
         });
@@ -211,34 +223,12 @@
     };
 
     P.opdaterScene = function (dt) {
-        var g = this.opg, mig = this;
+        var g = this.opg;
         if (!g) return;
         this.termo.opdater(dt);
         this.Pr.a.opdater(dt, this.termo.T);
         this.Pr.b.opdater(dt, this.termo.T);
         if (this.valgtT > 0) { this.valgtT -= dt; if (this.valgtT <= 0) this.valgt = null; }
-        ["a", "b"].forEach(function (k) {
-            var Pk = mig.Pr[k];
-            if (!g.kogt[k] && Pk.T >= Pk.kp() && Pk.antalGas() > Pk.N / 2) {
-                g.kogt[k] = true;
-                mig.maalt[mig.st[k].id] = true;
-                mig.grafNoegle = "";
-            }
-        });
-        if (g.fase === "varm" && g.kogt.a && g.kogt.b) this.beggeKogt();
-        if (!this.faerdig && !this.kortT && this.fast.klasse === "") {
-            var t = this.trinLinje();
-            if (t !== this.sidsteTrin) { this.sidsteTrin = t; this.naesteLinje("", ""); }
-        } else if (!this.faerdig && this.fast.klasse === "peger" && g.fase === "varm" && (g.kogt.a || g.kogt.b)) {
-            this.sidsteTrin = this.trinLinje();
-            this.naesteLinje("", "");
-        }
-    };
-
-    P.naesteLinjeGammel = P.naesteLinje;
-    P.naesteLinje = function (foer, slags) {
-        this.sidsteTrin = this.faerdig ? "" : this.trinLinje();
-        this.naesteLinjeGammel(foer, slags);
     };
 
     P.efterOpgave = function () {
@@ -246,27 +236,32 @@
         this.tabelKnap.hidden = this.antalLoest() < this.opgaver.length;
     };
 
+    /* Kogepunktet staar ved et stof, naar eleven har fundet det, men ikke under gaettet */
+    P.visKp = function (k) {
+        return this.opg.fase !== "gaet" && this.kendt(k);
+    };
+
     P.tegn = function () {
         var ctx = this.L.ctx, lay = this.lay, mig = this, g = this.opg;
         if (!lay || !g) return;
         Tg.rum(ctx, lay.W, lay.baand.y, lay.bordY + 10);
         Tg.bord(ctx, 0, lay.termo.x - 60, lay.bordY, lay.baand.y);
+        var maaler = !this.faerdig && !this.venter && g.fase === "maal" ? g.maaler : null;
         ["a", "b"].forEach(function (k) {
             var c = lay.kol[k], st = mig.st[k], Pk = mig.Pr[k];
-            Tg.kammerMedGlas(ctx, c.kammer, mig.termo.T, Pk.makro(), mig.tid, {
-                ballonFarve: BALLON[k], lys: g.fase === "gaet" && mig.over === k ? 1 : 0
-            });
+            /* Det stof, kortet spoerger om, har en gul ring om luppen og glasset */
+            var lys = maaler === k ? 0.6 + 0.4 * Math.sin(mig.tid * 4) : 0;
+            Tg.kammerMedGlas(ctx, c.kammer, mig.termo.T, Pk.makro(), mig.tid, { ballonFarve: BALLON[k], lys: lys });
             Tg.zoomTilLup(ctx, c.zoomFra, c.lup);
             Tg.lup(ctx, c.lup, Pk, {
-                valgt: mig.valgt && mig.valgt.k === k ? mig.valgt.m : null, donorKant: true, tid: mig.tid,
-                gaet: g.gaet === k, lys: g.fase === "gaet" && mig.over === k ? 1 : 0
+                valgt: mig.valgt && mig.valgt.k === k ? mig.valgt.m : null, donorKant: true, tid: mig.tid, lys: lys
             });
-            var under = NK.formel(st.formel) + "  ·  " + D.Mtekst(st) + (g.kogt[k] ? "  ·  koger ved " + D.kpTekst(st) : "");
-            Tg.etiket(ctx, c.lup.x, c.lup.y - c.lup.r - 30, D.Stort(st.navn) + (g.gaet === k ? "  (dit gæt)" : ""), under, { farve: FARVE[k], px: 16 });
+            var under = NK.formel(st.formel) + "  ·  " + D.Mtekst(st) + (mig.visKp(k) ? "  ·  koger ved " + D.kpTekst(st) : "");
+            Tg.etiket(ctx, c.lup.x, c.lup.y - c.lup.r - 30, D.Stort(st.navn), under, { farve: FARVE[k], px: 16 });
         });
         var maerker = [];
         ["a", "b"].forEach(function (k) {
-            if (g.kogt[k]) maerker.push({ t: mig.st[k].kp, tekst: D.kpTekst(mig.st[k]), farve: FARVE[k] });
+            if (mig.visKp(k)) maerker.push({ t: mig.st[k].kp, tekst: D.kpTekst(mig.st[k]), farve: FARVE[k] });
         });
         /* To maerker taet paa hinanden skubbes fra hinanden */
         if (maerker.length === 2) {
@@ -276,15 +271,9 @@
         Tg.termometer(ctx, lay.termo, this.termo.T, {
             trin: 20, store: 40, maerker: maerker, stue: true, tid: this.tid,
             haandtag: this.haandtagLys, traekker: this.termo.traekker,
-            puls: g.fase === "varm" && !this.roertTermo
+            puls: !!maaler && !this.roertTermo
         });
-        if (this.faerdig && this.sejrT < 0.9) {
-            ctx.save();
-            ctx.globalAlpha = 0.14 * (1 - this.sejrT / 0.9);
-            ctx.fillStyle = "#3fae72";
-            ctx.fillRect(0, 0, lay.W, lay.baand.y);
-            ctx.restore();
-        }
+        this.tegnSejr(ctx, lay.W, lay.baand.y);
         this.tegnGraf();
     };
 
@@ -419,11 +408,9 @@
 
     P.overScene = function (pt) {
         var t = this.termoOver(pt);
-        this.over = null;
         if (t) return t;
         if (!pt) return null;
         var k = this.hvemVed(pt);
-        if (k && this.opg.fase === "gaet") { this.over = k; return "pointer"; }
         return k && this.atomVed(pt, k) ? "pointer" : null;
     };
 
@@ -433,9 +420,11 @@
 
     P.klikScene = function (pt) {
         if (this.termoKugle(pt)) return;
+        if (this.paaTermo(pt)) return;
         var k = this.hvemVed(pt);
         if (!k) return;
-        if (this.opg.fase === "gaet") { this.gaet(k); return; }
+        /* Under gaettet: kortet blinker, for gaettet staar paa kortet */
+        if (this.gaetNu()) { this.kortBlink(); return; }
         var m = this.atomVed(pt, k);
         if (!m) return;
         var Pk = this.Pr[k], st = this.st[k];

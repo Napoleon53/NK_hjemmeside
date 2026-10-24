@@ -73,66 +73,100 @@
         stof: "ethanol", antal: 22, Rm: 11.6, start: 20, omr: { min: -100, max: 120 }
     };
 
+    /* Fire opgaver. Ingen af dem loeses af sig selv, naar eleven traekker i
+       termometeret (brugeren 24. okt. 2026: "90% af eleverne loeser opgaven
+       ved bare uhaemmet at traekke i slideren"): et kogepunkt skal findes og
+       sendes ind med Indsend svar, og spoergsmaalene sendes ogsaa ind. */
     D.E_MAAL = [
         {
-            id: "kog", navn: "Kog ethanol",
-            prompt: "Glasset i kammeret indeholder ethanol ved 20 °C. Luppen viser molekylerne i væsken. Træk termometeret op, og varm ethanol op, til den koger.",
+            id: "kog", navn: "Ethanols kogepunkt",
+            tekst: "Find ethanols kogepunkt: stil termometeret på den temperatur, hvor ethanol begynder at koge.",
             hint: [
-                "Termometeret til højre styrer temperaturen i kammeret. Træk i det runde håndtag.",
-                "Ethanol er en væske ved 20 °C. Den skal varmes op over sit kogepunkt.",
-                "Træk termometeret op over 80 °C, og vent, til ballonen er fuld."
+                "Når ethanol koger, kommer der bobler i glasset, og molekylerne i luppen river sig løs.",
+                "Træk termometeret op, til der kommer bobler i glasset. Køl så ned, til boblerne lige stopper.",
+                "Ethanols kogepunkt ligger mellem 70 °C og 90 °C."
             ],
-            loest: "Ethanol koger ved 78 °C. Molekylerne river sig løs fra hinanden, og dampen fylder ballonen."
+            loest: "Under 78 °C holder bindingerne mellem molekylerne ethanol sammen som en væske. Over 78 °C river molekylerne sig løs, og dampen fylder ballonen."
         },
         {
             id: "brydes", navn: "Hvad brydes?",
-            prompt: "Når ethanol koger, brydes nogle bindinger. Hvilke? Se i luppen, mens ethanol koger, og vælg et svar.",
+            tekst: "Hvilke bindinger brydes, når ethanol koger? Vælg alle, der passer.",
+            multi: true,
             svar: [
-                { t: "Bindingen mellem O og H. H-atomet flyver af.",
-                  f: "Se på et molekyle i dampen. Det har stadig sit H på O. Bindingerne inde i molekylet holder." },
-                { t: "Bindingerne mellem molekylerne. Molekylerne er hele.", ok: true },
-                { t: "Bindingen mellem de to C-atomer. Molekylet deles i to.",
-                  f: "Se på et molekyle i dampen. Det har stadig begge C-atomer. Molekylet er helt." }
+                { t: "Hydrogenbindinger mellem molekylerne", ok: true,
+                  mangler: "Molekylerne i dampen har ingen røde streger. Hydrogenbindingerne er også brudt." },
+                { t: "London-kræfter mellem molekylerne", ok: true,
+                  mangler: "Molekylerne i dampen har ingen grå prikker. London-kræfterne er også brudt." },
+                { t: "Bindingen mellem O og H i et molekyle",
+                  f: "Et ethanolmolekyle i dampen har stadig sit H på O. Bindingerne i molekylet holder." },
+                { t: "Bindingen mellem C og C i et molekyle",
+                  f: "Et ethanolmolekyle i dampen har stadig begge C-atomer. Bindingerne i molekylet holder." }
             ],
             hint: [
-                "Varm ethanol op over 78 °C, og se på et molekyle, der er fløjet op i dampen.",
-                "Klik på et molekyle i dampen. Har det stadig 2 C, 6 H og 1 O?",
-                "Molekylerne er hele. Det er de røde og grå streger mellem dem, der forsvinder."
+                "Klik på et ethanolmolekyle i dampen. Er det helt?",
+                "Hvilke streger er der mellem molekylerne i væsken? Og i dampen?",
+                "Molekylerne er hele. Kun de røde streger og de grå prikker mellem dem forsvinder."
             ],
-            loest: "Kun bindingerne mellem molekylerne brydes: hydrogenbindingerne og London-kræfterne. Molekylerne er hele, også i dampen."
+            loest: "Kun bindingerne mellem molekylerne brydes: hydrogenbindingerne og London-kræfterne. Ethanolmolekylerne er hele, også i dampen."
         },
         {
             id: "hvilket", navn: "Find H'et",
-            prompt: "Ethanol har seks H-atomer, men kun ét af dem kan danne hydrogenbindinger. Klik på sådan et H i luppen.",
+            tekst: "Ethanol har seks H-atomer, men kun ét af dem kan danne hydrogenbindinger. Klik på sådan et H i luppen.",
             hint: [
-                "Hydrogenbindingen er den røde stiplede streg. Se, hvor den begynder.",
-                "Det H, du skal finde, sidder på det røde O-atom.",
+                "En hydrogenbinding er en rød stiplet streg. Se, hvilket atom den begynder ved.",
+                "Det H, du skal finde, sidder på et rødt O-atom.",
                 "Klik på det lille hvide H, der sidder direkte på et rødt O."
             ],
+            valgt: { H: "Du har valgt et H-atom.", O: "Du har valgt et O-atom.", C: "Du har valgt et C-atom." },
             klik: {
-                HC: "Det H sidder på C. C og H trækker næsten lige meget i elektronerne, så H bliver ikke positivt nok til en hydrogenbinding.",
-                O: "Det er O. Det tager imod hydrogenbindingen med sine frie elektronpar. Find det H, der binder til det.",
-                C: "Det er C. Find et H-atom."
+                HC: "Det H sidder på C. C og H trækker næsten lige meget i elektronerne, så H bliver ikke δ+.",
+                O: "Det er et O-atom. O tager imod hydrogenbindingen. Find det H, der binder til O.",
+                C: "Det er et C-atom. Find et H-atom."
             },
-            loest: "H på O er δ+, fordi O trækker elektronerne til sig. Det tiltrækkes af et frit elektronpar på O i et nabomolekyle. Det er en hydrogenbinding."
+            loest: "H på O er δ+, fordi O trækker elektronerne til sig. Det tiltrækkes af O i et nabomolekyle, som er δ−. Det er en hydrogenbinding."
         },
         {
             id: "uden", navn: "Uden hydrogenbindinger",
-            prompt: "Tænk dig, at ethanol ikke kunne danne hydrogenbindinger. Hvor ville den så koge? Gæt først.",
-            prompt2: "Slå hydrogenbindingerne fra med kontakten over luppen. Find så kogepunktet: køl ned, til ethanol bliver en væske igen, eller varm op, til den koger.",
-            svar: [
-                { t: "Højere end 78 °C" },
-                { t: "Lidt lavere, omkring 60 °C" },
-                { t: "Meget lavere, under 0 °C", ok: true }
-            ],
+            gaet: {
+                intro: "Tænk dig, at ethanol ikke kunne danne hydrogenbindinger.",
+                tekst: "Hvor ville ethanol så koge?",
+                svar: [
+                    { t: "Højere end 78 °C" },
+                    { t: "Lidt lavere, omkring 60 °C" },
+                    { t: "Meget lavere, under 0 °C", ok: true }
+                ]
+            },
+            tekst: "Slå hydrogenbindingerne fra med kontakten til venstre. Find så kogepunktet for ethanol uden hydrogenbindinger.",
             hint: [
-                "Kontakten over luppen slår hydrogenbindingerne fra og til.",
-                "Uden hydrogenbindinger koger ethanol allerede ved stuetemperatur. Køl ned, til den bliver en væske igen.",
-                "Slå hydrogenbindingerne fra, og træk termometeret ned under −50 °C."
+                "Kontakten til venstre for luppen slår hydrogenbindingerne fra og til.",
+                "Uden hydrogenbindinger er ethanol damp ved 20 °C. Køl ned, til der kommer væske i glasset.",
+                "Kogepunktet for ethanol uden hydrogenbindinger ligger mellem −60 °C og −20 °C."
             ],
-            loest: "Uden hydrogenbindinger koger ethanol ved −42 °C, ligesom propan, der har samme størrelse og form. Hydrogenbindingerne løfter kogepunktet 120 °C."
+            loest: "Uden hydrogenbindinger koger ethanol ved −42 °C ligesom propan, der har samme størrelse og form. Hydrogenbindingerne løfter kogepunktet 120 °C."
         }
     ];
+
+    /* Saa taet paa kogepunktet skal den temperatur vaere, eleven sender ind */
+    D.TOL = 4;
+
+    /* Svaret paa en temperatur, der ikke er kogepunktet. P er proeven, saa
+       teksten kan sige, hvad eleven ser: vaeske, bobler eller kun damp. */
+    D.tempFejl = function (navn, T, P) {
+        var kp = P.kp(), t = D.grader(T) + " °C";
+        if (T < kp) return "Ved " + t + " koger " + navn + " ikke: der er ingen bobler i glasset. Kogepunktet er højere.";
+        if (P.antalGas() === P.N) return "Ved " + t + " er " + navn + " kun damp. Kogepunktet er lavere: køl ned, til der kommer væske.";
+        return "Ved " + t + " koger " + navn + ", men kogepunktet er lavere. Køl ned, til boblerne lige stopper.";
+    };
+
+    /* Hint til at finde et kogepunkt paa fane 2 */
+    D.maalHint = function (st) {
+        var lo = Math.floor((st.kp - 6) / 10) * 10, hi = lo + 20;
+        return [
+            "Et stof koger, når der kommer bobler i dets glas, og molekylerne i dets lup river sig løs.",
+            "Træk termometeret op, til der kommer bobler i glasset med " + st.navn + ". Køl så ned, til boblerne lige stopper.",
+            "Kogepunktet for " + st.navn + " ligger mellem " + D.grader(lo) + " °C og " + D.grader(hi) + " °C."
+        ];
+    };
 
     /* ----- Fane 2: Sammenlign ------------------------------------------------
        To stoffer i hver sin lup. Eleven gaetter, hvilket der koger ved den
@@ -153,55 +187,55 @@
             spm: "Ethanol koger 120 °C højere end propan. Hvorfor?",
             svar: [
                 { t: "Ethanol er lidt tungere.",
-                  f: "2 g/mol gør næsten ingen forskel. Propan og butan er 14 g/mol fra hinanden og koger kun 42 °C fra hinanden." },
-                { t: "Ethanol har en OH-gruppe. Molekylerne danner hydrogenbindinger til hinanden.", ok: true },
-                { t: "Bindingen mellem O og H er stærkere end bindingen mellem C og H.",
+                  f: "2 g/mol gør næsten ingen forskel. Butan er 14 g/mol tungere end propan og koger kun 42 °C højere." },
+                { t: "Ethanol har en OH-gruppe, der danner hydrogenbindinger.", ok: true },
+                { t: "O og H binder stærkere end C og H.",
                   f: "Bindingerne inde i molekylerne brydes ikke, når et stof koger. Det er bindingerne mellem molekylerne." }
             ],
             hint: ["Se i lupperne. Hvilke streger har ethanol, som propan ikke har?",
                    "De røde streger er hydrogenbindinger. De går fra H på O til O i et andet molekyle.",
-                   "Propan har ingen OH-gruppe og kun London-kræfter."],
+                   "Propan har ingen OH-gruppe. Mellem propanmolekylerne er der kun London-kræfter."],
             loest: "Hydrogenbindingerne mellem OH-grupperne holder ethanolmolekylerne sammen. Propan har kun London-kræfter."
         },
         {
             id: "kaede", navn: "Ethanol og butan-1-ol", a: "ethanol", b: "butan1ol", start: 20,
-            intro: "Begge har én OH-gruppe. Butan-1-ol har to C-atomer mere.",
+            intro: "Ethanol og butan-1-ol har begge én OH-gruppe. Butan-1-ol har to C-atomer mere.",
             spm: "Butan-1-ol koger 40 °C højere end ethanol. Hvorfor?",
             svar: [
-                { t: "Butan-1-ol har flere H-atomer, så den danner flere hydrogenbindinger.",
-                  f: "Kun H på O danner hydrogenbindinger. Begge har ét H på O." },
-                { t: "Butan-1-ol har flere OH-grupper.", f: "Tæl efter: begge har én OH-gruppe." },
-                { t: "Den lange kæde rører sine naboer mere, så London-kræfterne er større.", ok: true }
+                { t: "Flere H-atomer giver flere hydrogenbindinger.",
+                  f: "Kun H på O danner hydrogenbindinger. Ethanol og butan-1-ol har begge ét H på O." },
+                { t: "Butan-1-ol har flere OH-grupper.", f: "Tæl efter: ethanol og butan-1-ol har begge én OH-gruppe." },
+                { t: "Den lange kæde giver flere London-kræfter.", ok: true }
             ],
-            hint: ["Begge har én OH-gruppe. Hvad er så forskellen?",
-                   "Se på de grå streger i lupperne. Det er London-kræfterne.",
+            hint: ["Ethanol og butan-1-ol har begge én OH-gruppe. Hvad er så forskellen?",
+                   "Se på de grå prikker i lupperne. Det er London-kræfterne.",
                    "En lang kæde rører sine naboer flere steder."],
-            loest: "Hydrogenbindingerne er de samme, men den lange kæde giver flere London-kræfter."
+            loest: "Ethanol og butan-1-ol danner lige mange hydrogenbindinger, men den lange kæde i butan-1-ol giver flere London-kræfter."
         },
         {
             id: "form", navn: "Propan-1-ol og propan-2-ol", a: "propan2ol", b: "propan1ol", start: 20,
-            intro: "Samme atomer og samme molarmasse, 60 g/mol. OH-gruppen sidder for enden eller i midten.",
+            intro: "Propan-1-ol og propan-2-ol har samme atomer og samme molarmasse: 60 g/mol. OH-gruppen sidder for enden eller i midten.",
             spm: "Propan-1-ol koger 15 °C højere end propan-2-ol. Hvorfor?",
             svar: [
-                { t: "Propan-2-ol er lettere.", f: "De har de samme atomer, så de vejer det samme: 60 g/mol." },
-                { t: "Propan-2-ol er mere kugleformet. Molekylerne rører hinanden mindre.", ok: true },
+                { t: "Propan-2-ol er lettere.", f: "Propan-1-ol og propan-2-ol har de samme atomer, så de vejer det samme: 60 g/mol." },
+                { t: "Propan-2-ol er kugleformet og rører naboerne mindre.", ok: true },
                 { t: "Propan-2-ol kan ikke danne hydrogenbindinger.",
-                  f: "Propan-2-ol har også en OH-gruppe. Se i luppen: den har røde streger." }
+                  f: "Propan-2-ol har også en OH-gruppe. Se i luppen med propan-2-ol: der er røde streger." }
             ],
-            hint: ["Begge har én OH-gruppe, og de vejer det samme. Se på formen.",
+            hint: ["Propan-1-ol og propan-2-ol har begge én OH-gruppe og vejer det samme. Se på formen.",
                    "Propan-1-ol er en lige kæde. I propan-2-ol sidder OH-gruppen i midten.",
                    "Et kugleformet molekyle rører sine naboer færre steder end et langt."],
-            loest: "Begge danner hydrogenbindinger. Propan-1-ol er langt og lige og rører sine naboer mere, så London-kræfterne er større."
+            loest: "Propan-1-ol og propan-2-ol danner begge hydrogenbindinger. Propan-1-ol er langt og lige og rører sine naboer mere, så London-kræfterne er større."
         },
         {
             id: "diol", navn: "Ethanol og ethan-1,2-diol", a: "ethanol", b: "ethandiol", start: 20,
-            intro: "Ethan-1,2-diol har en OH-gruppe i hver ende.",
+            intro: "Ethanol har én OH-gruppe. Ethan-1,2-diol har en OH-gruppe i hver ende.",
             spm: "Ethan-1,2-diol koger ved 197 °C, ethanol ved 78 °C. Hvorfor?",
             svar: [
                 { t: "Ethan-1,2-diol er tungere.",
-                  f: "Propan-1-ol vejer næsten det samme, 60 g/mol, og koger ved 97 °C. Vægten forklarer ikke 197 °C." },
-                { t: "Kæden er længere.", f: "Begge har to C-atomer." },
-                { t: "To OH-grupper giver dobbelt så mange hydrogenbindinger.", ok: true }
+                  f: "Propan-1-ol vejer næsten det samme, 60 g/mol, men koger ved 97 °C. Vægten forklarer ikke 197 °C." },
+                { t: "Kæden i ethan-1,2-diol er længere.", f: "Ethanol og ethan-1,2-diol har begge to C-atomer." },
+                { t: "To OH-grupper giver flere hydrogenbindinger.", ok: true }
             ],
             hint: ["Tæl OH-grupperne i de to stoffer.",
                    "Tæl de røde streger i de to lupper.",
@@ -210,15 +244,15 @@
         },
         {
             id: "lang", navn: "Hexan og pentan-1-ol", a: "hexan", b: "pentan1ol", start: 20,
-            intro: "Næsten lige tunge, 86 og 88 g/mol, ligesom propan og ethanol. Men større.",
-            spm: "Her er forskellen 69 °C. Mellem propan og ethanol var den 120 °C. Hvorfor er den mindre?",
+            intro: "Hexan og pentan-1-ol er næsten lige tunge: 86 og 88 g/mol. De er større end propan og ethanol.",
+            spm: "Ethanol koger 120 °C over propan. Pentan-1-ol kun 69 °C over hexan. Hvorfor?",
             svar: [
                 { t: "Hexan har også hydrogenbindinger.",
-                  f: "Hexan har ingen OH-gruppe. Se i luppen: der er ingen røde streger." },
-                { t: "Pentan-1-ol har færre OH-grupper end ethanol.", f: "Begge har én OH-gruppe." },
-                { t: "Den lange kæde giver mange London-kræfter. Én OH-gruppe betyder mindre i et stort molekyle.", ok: true }
+                  f: "Hexan har ingen OH-gruppe. Se i luppen med hexan: der er ingen røde streger." },
+                { t: "Pentan-1-ol har færre OH-grupper end ethanol.", f: "Pentan-1-ol og ethanol har begge én OH-gruppe." },
+                { t: "OH-gruppen betyder mindre, når kæden er lang.", ok: true }
             ],
-            hint: ["Se på grafen i panelet. Hvad sker der med afstanden mellem alkanen og alkoholen?",
+            hint: ["Se på grafen til højre. Hvad sker der med afstanden mellem alkanen og alkoholen?",
                    "Hexan og pentan-1-ol har lange kæder med mange London-kræfter.",
                    "Der er stadig kun én OH-gruppe, men nu er der meget mere kæde."],
             loest: "I store molekyler holder London-kræfterne mest. Én OH-gruppe løfter stadig kogepunktet, men mindre."
@@ -273,12 +307,12 @@
                 ". Flere OH-grupper giver flere hydrogenbindinger.";
         }
         if (H.OH < L.OH) return null;
-        var oh = H.OH ? "Begge har " + D.ohTekst(H.OH) + ". " : "Ingen af dem har en OH-gruppe. ";
+        var oh = D.Stort(Ln) + " og " + Hn + (H.OH ? " har begge " + D.ohTekst(H.OH) + ". " : " har ingen OH-gruppe. ");
         if (H.C > L.C) {
-            return oh + D.Stort(Hn) + " har den længste kæde. Den rører sine naboer mere, så London-kræfterne er større.";
+            return oh + D.Stort(Hn) + " har den længste kæde, som rører naboerne mere, så London-kræfterne er større.";
         }
         if (H.C === L.C && D.FORM[L.id] && !D.FORM[H.id]) {
-            return "De har de samme atomer. " + D.Stort(Ln) + " " + D.FORM[L.id] + ", så molekylerne rører hinanden mindre.";
+            return D.Stort(Ln) + " og " + Hn + " har de samme atomer. " + D.Stort(Ln) + " " + D.FORM[L.id] + ", så molekylerne rører hinanden mindre.";
         }
         return null;
     };
@@ -290,7 +324,7 @@
         r: "Alle tolv. Nu kan du klare dig uden tabellen."
     };
 
-    D.ROS = ["Sådan.", "Det passer.", "Rigtig rækkefølge."];
+    D.ROS = ["Sådan.", "Det passer.", "Godt set."];
 
     /* Paaskeaegget: termometerets kugle */
     D.PAASKE = {

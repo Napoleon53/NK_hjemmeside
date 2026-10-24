@@ -428,6 +428,7 @@
          valgt: et molekyle, der er klikket paa (faar δ+ og δ−)
          donorKant: H paa O faar en roed kant (δ+), naar eleven har fundet det
          lysH: et H, der blinker (Vis svaret)
+         valgtAtom: { m, i } det atom, eleven har klikket paa (gul ring, intet δ)
          titel, lys, gaet: gul ring (elevens gaet), tid } */
     T.lup = function (ctx, L, P, v) {
         v = v || {};
@@ -487,7 +488,8 @@
         P.mol.forEach(function (m) {
             T.molekyle(ctx, P.F, m, s, ox, oy, {
                 valgt: v.valgt === m, donorKant: v.donorKant, ring: m.ring,
-                lysH: v.lysH && v.lysH.m === m ? v.lysH : null, tid: v.tid
+                lysH: v.lysH && v.lysH.m === m ? v.lysH : null, tid: v.tid,
+                valgtAtom: v.valgtAtom && v.valgtAtom.m === m ? v.valgtAtom.i : -1
             });
         });
 
@@ -579,6 +581,19 @@
             ctx.strokeStyle = roedKant ? "#e2483b" : f.kant;
             ctx.stroke();
         });
+        if (v.valgtAtom >= 0) {
+            var iv = v.valgtAtom;
+            ctx.strokeStyle = "#f2c53d";
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.arc(px[iv], py[iv], A[iv].r * s + 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.strokeStyle = "rgba(20, 20, 26, 0.7)";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.arc(px[iv], py[iv], A[iv].r * s + 7.5, 0, Math.PI * 2);
+            ctx.stroke();
+        }
         if (v.lysH) {
             var i0 = v.lysH.h, puls = 0.5 + 0.5 * Math.sin((v.tid || 0) * 6);
             ctx.strokeStyle = "rgba(242, 197, 61, 0.95)";

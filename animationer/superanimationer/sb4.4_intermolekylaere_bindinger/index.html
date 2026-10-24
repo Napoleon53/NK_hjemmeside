@@ -29,35 +29,44 @@
 <section class="fane aktiv" id="fane-e" role="tabpanel" aria-label="Ethanol">
     <div class="scene">
         <canvas id="e-laerred"></canvas>
-        <!-- Hvad der er i glasset, og bindingerne i luppen lige nu -->
+        <!-- Kortet oeverst midt i scenen: opgaven, spoergsmaalet, svarene, hint,
+             forklaringen og knapperne (brugerens oensker 9. og 24. okt. 2026) -->
+        <div class="scenekort" id="e-skort">
+            <div class="sk-ind" id="e-ind"></div>
+            <div class="sk-bund" id="e-status">
+                <p class="st-tekst" id="e-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="e-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="e-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <!-- Saadan laeses luppen: hvad stregerne og farverne betyder (ingen taeller) -->
         <div class="signatur" id="e-signatur">
-            <div class="sig-titel">Ethanol <span class="sig-formel">CH₃CH₂OH</span></div>
-            <div class="sig-raekke"><i class="sig-hb"></i><span class="sig-navn">Hydrogenbindinger</span><b id="e-ant-hb">0</b></div>
-            <div class="sig-raekke"><i class="sig-lon"></i><span class="sig-navn">London-kræfter</span><b id="e-ant-lon">0</b></div>
+            <div class="sig-titel">Sådan læses luppen</div>
+            <div class="sig-raekke">
+                <svg class="sig-tegn" viewBox="0 0 64 22" aria-hidden="true"><line x1="10" y1="11" x2="24" y2="11" stroke="#7b838f" stroke-width="3"/><circle cx="10" cy="11" r="8" fill="#e2483b" stroke="#9c2a20"/><circle cx="25" cy="11" r="5" fill="#f4f6f8" stroke="#e2483b" stroke-width="1.6"/><line x1="31" y1="11" x2="46" y2="11" stroke="#e05446" stroke-width="3" stroke-dasharray="4 3"/><circle cx="54" cy="11" r="8" fill="#e2483b" stroke="#9c2a20"/></svg>
+                <b>Hydrogenbinding</b>
+                <span class="sig-forkl">fra H på O til O i et andet molekyle</span>
+            </div>
+            <div class="sig-raekke">
+                <svg class="sig-tegn" viewBox="0 0 64 22" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="#454b55" stroke="#23262c"/><line x1="22" y1="11" x2="42" y2="11" stroke="#a3acb8" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.5 5"/><circle cx="52" cy="11" r="8" fill="#454b55" stroke="#23262c"/></svg>
+                <b>London-kraft</b>
+                <span class="sig-forkl">mellem C-atomer i to molekyler</span>
+            </div>
             <div class="sig-atomer"><span><i class="sig-c"></i>C</span><span><i class="sig-o"></i>O</span><span><i class="sig-h"></i>H</span></div>
         </div>
         <button class="kontakt til" id="e-kontakt" type="button" aria-pressed="true" hidden><span id="e-kontakt-tekst">Hydrogenbindinger: til</span></button>
         <div class="anker" id="e-anker-lup"></div>
         <div class="anker" id="e-anker-kammer"></div>
         <div class="anker" id="e-anker-termometer"></div>
-
-        <div class="statuslinje" id="e-status">
-            <p class="st-tekst" id="e-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="e-forfra" type="button" title="Ny prøve ved 20 °C (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="e-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="e-kort">
-            <h2><span id="e-titel">Opgave</span><span class="taeller">mål <b id="e-nr">1</b>/<span id="e-antal">4</span></span></h2>
-            <div id="e-prompt"></div>
-        </div>
-
         <div class="kort" id="e-opgaver">
-            <h2>Målene <span class="taeller">løst <b id="e-loest">0</b>/4</span></h2>
+            <h2>Opgaverne <span class="taeller">løst <b id="e-loest">0</b>/4</span></h2>
             <div class="opg-liste" id="e-liste"></div>
+            <p class="liste-note">★ = løst i første forsøg uden at se svaret</p>
         </div>
+        <button class="forfraknap" id="e-forfra" type="button" title="Ny prøve ved 20 °C (R)">Ny prøve ved 20 °C ↺</button>
     </aside>
 </section>
 
@@ -67,21 +76,34 @@
 <section class="fane" id="fane-s" role="tabpanel" aria-label="Sammenlign">
     <div class="scene">
         <canvas id="s-laerred"></canvas>
+        <!-- Kortet oeverst midt i scenen: opgaven, spoergsmaalet, svarene, hint,
+             forklaringen og knapperne (brugerens oensker 9. og 24. okt. 2026) -->
+        <div class="scenekort" id="s-skort">
+            <div class="sk-ind" id="s-ind"></div>
+            <div class="sk-bund" id="s-status">
+                <p class="st-tekst" id="s-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="s-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="anker" id="s-anker-lupper"></div>
         <div class="anker" id="s-anker-kamre"></div>
         <div class="anker" id="s-anker-termometer"></div>
-
-        <div class="statuslinje" id="s-status">
-            <p class="st-tekst" id="s-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="s-forfra" type="button" title="Samme par forfra (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="s-kort">
-            <h2><span id="s-titel">Opgave</span><span class="taeller">par <b id="s-nr">1</b>/<span id="s-antal">5</span></span></h2>
-            <div id="s-prompt"></div>
+        <div class="kort" id="s-noegle">
+            <h2>Sådan læses lupperne</h2>
+            <div class="sig-raekke">
+                <svg class="sig-tegn" viewBox="0 0 64 22" aria-hidden="true"><line x1="10" y1="11" x2="24" y2="11" stroke="#7b838f" stroke-width="3"/><circle cx="10" cy="11" r="8" fill="#e2483b" stroke="#9c2a20"/><circle cx="25" cy="11" r="5" fill="#f4f6f8" stroke="#e2483b" stroke-width="1.6"/><line x1="31" y1="11" x2="46" y2="11" stroke="#e05446" stroke-width="3" stroke-dasharray="4 3"/><circle cx="54" cy="11" r="8" fill="#e2483b" stroke="#9c2a20"/></svg>
+                <b>Hydrogenbinding</b>
+                <span class="sig-forkl">fra H på O til O i et andet molekyle</span>
+            </div>
+            <div class="sig-raekke">
+                <svg class="sig-tegn" viewBox="0 0 64 22" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="#454b55" stroke="#23262c"/><line x1="22" y1="11" x2="42" y2="11" stroke="#a3acb8" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.5 5"/><circle cx="52" cy="11" r="8" fill="#454b55" stroke="#23262c"/></svg>
+                <b>London-kraft</b>
+                <span class="sig-forkl">mellem C-atomer i to molekyler</span>
+            </div>
         </div>
 
         <div class="kort maaling" id="s-grafkort">
@@ -94,7 +116,9 @@
         <div class="kort" id="s-opgaver">
             <h2>Parrene <span class="taeller">løst <b id="s-loest">0</b>/5</span></h2>
             <div class="opg-liste" id="s-liste"></div>
+            <p class="liste-note">★ = løst i første forsøg uden at se svaret</p>
         </div>
+        <button class="forfraknap" id="s-forfra" type="button" title="Samme par forfra (R)">Samme par forfra ↺</button>
     </aside>
 </section>
 
@@ -104,30 +128,30 @@
 <section class="fane" id="fane-r" role="tabpanel" aria-label="Rangér">
     <div class="scene">
         <canvas id="r-laerred"></canvas>
+        <!-- Kortet oeverst midt i scenen: opgaven, spoergsmaalet, svarene, hint,
+             forklaringen og knapperne (brugerens oensker 9. og 24. okt. 2026) -->
+        <div class="scenekort" id="r-skort">
+            <div class="sk-ind" id="r-ind"></div>
+            <div class="sk-bund" id="r-status">
+                <p class="st-tekst" id="r-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="r-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
         <div class="tavle rangtavle" id="r-tavle">
             <div class="rt-akse"><span>Lavest kogepunkt</span><span class="rt-pil" aria-hidden="true"></span><span>Højest kogepunkt</span></div>
             <div class="rt-pladser" id="r-pladser"></div>
         </div>
-        <button class="tjekknap" id="r-tjek" type="button">Tjek rækkefølgen</button>
         <div class="anker" id="r-anker-akse"></div>
-
-        <div class="statuslinje" id="r-status">
-            <p class="st-tekst" id="r-besked" aria-live="polite"></p>
-            <button class="forfraknap" id="r-forfra" type="button" title="Samme stoffer i ny rækkefølge (R)">Forfra ↺</button>
-            <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
-        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort opgavekort" id="r-kort">
-            <h2><span id="r-titel">Opgave</span><span class="taeller">opgave <b id="r-nr">1</b>/<span id="r-antal">12</span></span></h2>
-            <div id="r-prompt"></div>
-        </div>
-
         <div class="kort" id="r-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="r-loest">0</b>/12 · ★ <b id="r-stjerner">0</b></span></h2>
             <div class="opg-liste" id="r-liste"></div>
+            <p class="liste-note">★ = løst i første forsøg uden at se svaret</p>
         </div>
+        <button class="forfraknap" id="r-forfra" type="button" title="Samme stoffer i ny rækkefølge (R)">Bland kortene igen ↺</button>
     </aside>
 </section>
 
@@ -156,7 +180,7 @@
             <li>Et forgrenet, mere kugleformet molekyle har et lavere kogepunkt.</li>
             <li>I små molekyler betyder OH-gruppen mest. I store molekyler betyder kæden mest.</li>
         </ol>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperaturen (med Skift ti grader) &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> tjek eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperaturen (med Skift ti grader) &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>

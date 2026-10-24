@@ -70,6 +70,13 @@ sync; denne er færdig.
   over animationen; der er ingen tekstlinje nederst i scenen.
   Mønster: scenekortet (`kortHTML` og `gaetBlink`) i
   `animationer/superanimationer/sc7.5_staerke_og_svage_syrer/js/fane.js`.
+- Teksten står meget tydeligt øverst i midten, aldrig i højre hjørne, og en
+  opgave må sjældent kunne løses ved tilfældigt at klikke på skydere og
+  knapper (brugeren 24. okt. 2026, "husk dette"). Som minimum er der en knap
+  **Indsend svar**: en skyder, et termometer eller en kontakt løser aldrig
+  en opgave af sig selv, og svarknapper vælger kun. Stjerne kun for første
+  forsøg; gerne "vælg alle, der passer". Et gæt er gratis. Mønster:
+  `animationer/superanimationer/sb4.4_intermolekylaere_bindinger/js/fane.js`.
 
 ## Superanimationer
 

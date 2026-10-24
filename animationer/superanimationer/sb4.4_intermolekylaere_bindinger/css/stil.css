@@ -33,7 +33,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 430px;
+    --panel-bredde: 340px;
 }
 
 * { box-sizing: border-box; }
@@ -469,7 +469,7 @@ select:focus-visible {
 }
 
 @media (max-width: 1320px) {
-    :root { --panel-bredde: 370px; }
+    :root { --panel-bredde: 310px; }
 }
 
 @media (max-width: 1100px) {
@@ -689,13 +689,22 @@ select:focus-visible {
     font-weight: 700;
 }
 
+/* Gul, saa den ses, uden at man leder: Giv et hint er fyldt, Vis svaret kun et omrids */
 .knap.hjaelp {
+    border: 2px solid #c79a12;
+    background-color: #ffdf6b;
+    color: #33290a;
+}
+
+.knap.hjaelp:hover:not(:disabled) { background-color: #ffd23e; border-color: #a67f08; }
+
+.knap.hjaelp.svar {
+    border-color: rgba(242, 197, 61, 0.7);
     background-color: rgba(242, 197, 61, 0.12);
-    border-color: rgba(242, 197, 61, 0.65);
     color: #f7e4ab;
 }
 
-.knap.hjaelp:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); color: #fff6d8; }
+.knap.hjaelp.svar:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); color: #fff6d8; }
 
 /* Efter et forkert svar peger knappen stille paa sig selv */
 @keyframes knap-peg {
@@ -1033,16 +1042,23 @@ kbd {
     color: #cfd6de;
 }
 
-.sig-titel { margin-bottom: 7px; font-size: 1rem; font-weight: 700; color: var(--tekst); }
+.sig-titel { margin-bottom: 2px; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--gul); }
 .sig-formel { margin-left: 4px; font-weight: 600; color: var(--tekst-svag); }
 
-.sig-raekke { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
-.sig-navn { flex: 1; }
-.sig-raekke b { min-width: 2ch; text-align: right; font-variant-numeric: tabular-nums; color: var(--tekst); }
+/* Hver raekke: en lille tegning, navnet og en kort linje om, hvad stregen er
+   (brugeren 24. okt. 2026: taelleren var "underlig og indforstaaet") */
+.sig-raekke {
+    display: grid;
+    grid-template-columns: 50px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 1px;
+    margin-top: 7px;
+}
 
-.sig-hb, .sig-lon { flex: 0 0 26px; height: 0; }
-.sig-hb  { border-top: 3px dashed #e05446; }
-.sig-lon { border-top: 3px dotted #a3acb8; }
+.sig-tegn { width: 50px; height: 18px; display: block; }
+.sig-raekke b { font-size: 0.9rem; font-weight: 700; color: var(--tekst); }
+.sig-forkl { grid-column: 1 / -1; font-size: 0.82rem; line-height: 1.35; color: var(--tekst-svag); }
 
 .sig-atomer { display: flex; gap: 12px; margin-top: 8px; padding-top: 7px; border-top: 1px solid #33343f; color: var(--tekst-svag); }
 .sig-atomer span { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; }
@@ -1087,6 +1103,14 @@ kbd {
 .kontakt:hover { background-color: var(--panel-3); border-color: #7a7a90; color: var(--tekst); }
 .kontakt.til { background-color: rgba(224, 84, 70, 0.16); border-color: var(--roed); color: #ffd7d2; }
 .kontakt.til::before { background-color: var(--roed); box-shadow: inset 16px 0 0 -14px #ffffff; }
+
+/* Kontakten er det, kortet beder om: den pulserer gult, til den er slaaet fra */
+@keyframes kontakt-peg {
+    0%, 100% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(242, 197, 61, 0); }
+    50% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), 0 0 0 6px rgba(242, 197, 61, 0.45); }
+}
+
+.kontakt.peg { border-color: var(--gul); animation: kontakt-peg 1.6s ease-in-out infinite; }
 
 /* ---------------------------------------------------------------------
    SB4.4: fane 2, grafen i panelet
@@ -1210,3 +1234,359 @@ kbd {
 .tjekknap:active { transform: scale(0.97); }
 .tjekknap:disabled { opacity: 0.35; cursor: default; }
 .tjekknap:disabled:hover { background-color: var(--groen-mork); }
+
+
+@keyframes bank-groen {
+    0%   { box-shadow: 0 0 0 0 rgba(95, 207, 146, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(95, 207, 146, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(95, 207, 146, 0); }
+}
+
+/* =====================================================================
+   SB4.4, 24. okt. 2026: kortet oeverst midt i scenen (fra sc7.5) med
+   Indsend svar. Brugeren: "teksten skal i stedet staa meget tydeligt
+   oeverst i midten, og man skal sjaeldent kunne loese opgaver ved
+   tilfaeldigt at klikke paa slidere og knapper. Der skal som minimum
+   vaere et indsend svar." Statuslinjen nederst er vaek.
+   ===================================================================== */
+/* ---------------------------------------------------------------------
+   SC7.5: scenekortet. Opgaven staar paa ét kort oeverst midt i scenen,
+   samme sted hele vejen, fordi eleverne klikker, foer de laeser
+   (brugerens valg 9. okt. 2026). Fire udgaver:
+     .gaet    et gaet foer forsoeget: stort og gult, pulserer stille og
+              blinker, naar eleven klikker paa forsoeget foerst
+     .opgave  det, eleven skal goere i scenen
+     .spm     et spoergsmaal med svarene som knapper side om side
+     .loest   maalet er loest
+   Kortet er centreret med margin, ikke med transform. Hoejden uden for
+   gaettet maa ikke overstige kortZone() i js/fane.js (198 px, 172 px paa
+   lave skaerme); selvtesten maaler det, ogsaa med et hint eller en
+   forklaring til et forkert svar i kortets nederste raekke.
+   --------------------------------------------------------------------- */
+.scenekort {
+    position: absolute;
+    z-index: 3;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: min(880px, calc(100% - 24px));
+    padding: 9px 14px 11px;
+    border: 2px solid #4a4f5e;
+    border-radius: 12px;
+    background-color: #1d1e26;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.scenekort.spm { border: 3px solid var(--gul); background-color: #25211a; padding: 8px 13px 10px; }
+.scenekort.loest { border-color: var(--groen); background-color: #17241e; }
+
+.sk-tekst { margin: 0; font-size: 1.1rem; line-height: 1.34; font-weight: 700; color: #ffffff; }
+.scenekort.opgave .sk-tekst,
+.scenekort.loest .sk-tekst { font-weight: 600; }
+
+.sk-chip {
+    display: inline-block;
+    margin-right: 9px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background-color: #3d4150;
+    color: #dfe4ea;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    vertical-align: 2px;
+    white-space: nowrap;
+}
+
+.scenekort.spm .sk-chip { background-color: var(--gul); color: #33290a; }
+.scenekort.loest .sk-chip { background-color: var(--groen); color: #ffffff; }
+
+/* Loest: forklaringen til venstre og knappen, der foerer videre, til hoejre.
+   Brugerens oenske 9. okt. 2026: forklaringen blev overset nede i
+   statuslinjen, saa den staar i det groenne kort, og her ledes der videre. */
+.sk-slut { display: flex; align-items: center; gap: 14px; }
+.sk-slut .sk-tekst { flex: 1; font-size: 1.02rem; line-height: 1.33; font-weight: 600; color: #e9f7ef; }
+.sk-svaret { color: #9af0c0; font-weight: 800; }
+
+.sk-videre {
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    border: 1px solid #5fcf92;
+    border-radius: 10px;
+    background-color: var(--groen-mork);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    animation: bank-groen 1.7s ease-out infinite;
+}
+
+.sk-videre:hover { background-color: var(--groen); }
+.sk-videre:active { transform: scale(0.97); }
+
+/* Svaret er vist med hjaelpeknappen: gult i stedet for groent */
+.scenekort.loest.svar { border-color: var(--gul); background-color: #23201a; }
+.scenekort.loest.svar .sk-chip { background-color: var(--gul); color: #33290a; }
+.scenekort.loest.svar .sk-tekst { color: #f7ecd0; }
+.scenekort.loest.svar .sk-svaret { color: #ffdf6b; }
+
+.sk-gaet { margin: 4px 0 0; font-size: 0.95rem; color: #c8ced6; }
+.sk-gaet b { color: #ffffff; }
+
+/* Reaktionsskemaet paa kortet (fane 2): pilen er et gult spoergsmaalstegn */
+.sk-skema { margin: 5px 0 0; font-size: 1.3rem; font-weight: 700; color: #ffffff; text-align: center; white-space: nowrap; }
+.sk-pil { display: inline-block; min-width: 2.2em; margin: 0 0.35em; padding: 0 0.3em; border: 2px solid var(--gul); border-radius: 6px; background-color: rgba(242, 197, 61, 0.16); color: var(--gul); text-align: center; }
+
+.sk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.sk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 520px; margin-left: auto; margin-right: auto; }
+
+.sk-knap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border: 2px solid rgba(242, 197, 61, 0.75);
+    border-radius: 9px;
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.22;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.sk-knap:hover:not(:disabled) { background-color: rgba(242, 197, 61, 0.3); border-color: #ffdf6b; }
+.sk-knap .v-bogstav { background-color: var(--gul); color: #33290a; }
+.sk-knap:disabled { cursor: default; }
+.sk-knap:disabled:not(.rigtig):not(.forkert) { opacity: 0.45; }
+.sk-knap.rigtig { border-color: var(--groen); background-color: rgba(63, 174, 114, 0.28); }
+.sk-knap.rigtig .v-bogstav { background-color: var(--groen); color: #ffffff; }
+.sk-knap.forkert { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.16); opacity: 0.6; }
+.sk-knap.forkert .v-bogstav { background-color: var(--roed); color: #ffffff; }
+
+/* Kortets nederste raekke: hint, forklaringen til et forkert svar, det naeste
+   skridt og hjaelpeknappen. Det var statuslinjen nederst i scenen, til
+   brugeren bad om at faa al tekst samlet over animationen (9. okt. 2026).
+   Raekken har stadig id x-status og klasserne skidt, hint, gul, god og peger. */
+.sk-bund {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.sk-bund.tom { margin-top: 6px; padding-top: 0; border-top: 0; }
+
+.sk-bund .st-tekst { flex: 1; margin: 0; font-size: 0.98rem; line-height: 1.38; color: #cfd6de; }
+
+.sk-bund .knap {
+    flex: 0 0 auto;
+    margin-left: auto;
+    justify-content: center;
+    min-width: 150px;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.sk-bund.skidt { border-top-color: var(--roed); }
+.sk-bund.skidt .st-tekst { color: #ffb3aa; }
+.sk-bund.skidt .b-maerke { background-color: rgba(224, 84, 70, 0.3); color: #ffd7d2; }
+.sk-bund.god .st-tekst { color: #b8f0cf; }
+.sk-bund.god .b-maerke { background-color: rgba(63, 174, 114, 0.35); color: #d6ffe8; }
+.sk-bund.hint,
+.sk-bund.gul { border-top-color: rgba(242, 197, 61, 0.7); }
+.sk-bund.hint .st-tekst,
+.sk-bund.gul .st-tekst { color: #f7e4ab; }
+.sk-bund.hint .b-maerke,
+.sk-bund.gul .b-maerke { background-color: rgba(242, 197, 61, 0.3); color: #fff2cc; }
+.sk-bund.peger .st-tekst { color: #cfe6fa; }
+.sk-bund.ryster { animation: st-ryst 0.4s ease-in-out 1; }
+
+/* Under et gaet er raekken vaek: gaettet er gratis, og der er ingen hjaelpeknap */
+.scenekort.gaet .sk-bund { margin-top: 10px; padding-top: 0; border-top: 0; }
+
+/* Gaettet: stoerre, og det eneste fyldte gule paa skaermen */
+.scenekort.gaet {
+    top: 16px;
+    width: min(660px, calc(100% - 36px));
+    padding: 14px 18px 16px;
+    border: 3px solid var(--gul);
+    border-radius: 14px;
+    background-color: #25211a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+    animation: gk-puls 2.2s ease-in-out infinite;
+}
+
+.gk-maerke {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background-color: var(--gul);
+    color: #33290a;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.gk-intro { margin: 10px 0 0; font-size: 1rem; line-height: 1.4; color: #d9d2bf; }
+.gk-tekst { margin: 6px 0 12px; font-size: 1.4rem; line-height: 1.25; font-weight: 700; color: #ffffff; }
+
+.gk-svar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+
+.gk-knap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    padding: 11px 10px 12px;
+    border: 2px solid rgba(242, 197, 61, 0.75);
+    border-radius: 10px;
+    background-color: rgba(242, 197, 61, 0.12);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.gk-knap:hover { background-color: rgba(242, 197, 61, 0.3); border-color: #ffdf6b; }
+.gk-knap:active { background-color: rgba(242, 197, 61, 0.42); }
+.gk-knap .v-bogstav { background-color: var(--gul); color: #33290a; }
+
+@keyframes gk-puls {
+    0%, 100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 0 rgba(242, 197, 61, 0); }
+    50%      { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 9px rgba(242, 197, 61, 0.24); }
+}
+
+@keyframes gk-blink {
+    0%, 33%, 66%  { background-color: #6b5510; box-shadow: 0 0 0 16px rgba(242, 197, 61, 0.5); }
+    16%, 50%, 100% { background-color: #25211a; box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
+
+.scenekort.gaet.blink { animation: gk-blink 1s ease-in-out 1, gk-puls 2.2s ease-in-out 1s infinite; }
+
+/* Laasen: eleven klikkede paa forsoeget, men skal foerst goere det, kortet siger.
+   Kortet blinker tre gange; er det groent, er det knappen Naeste, der blinker. */
+@keyframes sk-blink {
+    0%, 33%, 66%  { box-shadow: 0 0 0 12px rgba(242, 197, 61, 0.5); }
+    16%, 50%, 100% { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); }
+}
+
+@keyframes sk-blink-knap {
+    0%, 33%, 66%  { box-shadow: 0 0 0 10px rgba(126, 224, 168, 0.75); background-color: var(--groen); }
+    16%, 50%, 100% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); background-color: var(--groen-mork); }
+}
+
+.scenekort.opgave.blink,
+.scenekort.spm.blink { animation: sk-blink 1s ease-in-out 1; }
+.scenekort.loest.blink .sk-videre { animation: sk-blink-knap 1s ease-in-out 1, bank-groen 1.7s ease-out 1s infinite; }
+
+/* Lave skaerme (rammen i menuen paa en baerbar): kortet fylder mindre */
+@media (max-height: 720px) {
+    .scenekort { top: 8px; padding: 7px 12px 8px; }
+    .scenekort.spm { padding: 6px 11px 7px; }
+    .sk-tekst { font-size: 1rem; line-height: 1.3; }
+    .sk-chip { font-size: 0.72rem; padding: 2px 9px; }
+    .sk-skema { font-size: 1.15rem; margin-top: 3px; }
+    .sk-slut { gap: 10px; }
+    .sk-slut .sk-tekst { font-size: 0.95rem; line-height: 1.3; }
+    .sk-videre { padding: 9px 14px; font-size: 0.95rem; }
+    .sk-svar { gap: 6px; margin-top: 6px; }
+    .sk-knap { padding: 5px 9px; font-size: 0.9rem; line-height: 1.2; }
+    .sk-bund { margin-top: 6px; padding-top: 5px; gap: 10px; }
+    .sk-bund .st-tekst { font-size: 0.9rem; line-height: 1.3; }
+    .sk-bund .knap { min-width: 138px; padding: 6px 13px; font-size: 0.9rem; }
+    .scenekort.gaet { top: 10px; padding: 10px 14px 12px; }
+    .scenekort.gaet .sk-bund { margin-top: 7px; }
+    .gk-maerke { font-size: 0.82rem; padding: 3px 12px; }
+    .gk-intro { margin-top: 7px; font-size: 0.93rem; line-height: 1.32; }
+    .gk-tekst { margin: 4px 0 9px; font-size: 1.2rem; }
+    .gk-knap { padding: 8px 8px 9px; gap: 5px; font-size: 0.93rem; line-height: 1.25; }
+}
+
+/* Hoejden, kortet har sat af (kortZone i js/fane.js): 206 px, 196 px paa
+   lave skaerme. Kortet ligger over alt andet i scenen (ogsaa gaettet). Kortet er lidt smallere end i sc7.5, saa termometeret
+   til hoejre kan ses ved siden af. */
+.scenekort { width: min(960px, calc(100% - 24px)); z-index: 6; }
+.scenekort.gaet { width: min(680px, calc(100% - 36px)); }
+
+/* Svarene paa et spoergsmaal vaelges foerst og sendes saa ind */
+.sk-svar.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Smal scene: fire svar i to raekker, saa ordene kan vaere paa linjen, og
+   lidt mindre skrift paa kortet, saa det kan vaere paa sin plads */
+@media (max-width: 1320px) {
+    .sk-tekst { font-size: 1.02rem; }
+    .sk-knap { font-size: 0.88rem; }
+    .sk-bund .st-tekst { font-size: 0.92rem; }
+    .sk-svar.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sk-svar.n4 .sk-knap { padding-top: 5px; padding-bottom: 5px; }
+}
+.sk-knap.valgt { border-color: var(--blaa); background-color: rgba(61, 158, 224, 0.28); box-shadow: 0 0 0 2px rgba(61, 158, 224, 0.45); }
+.sk-knap.valgt .v-bogstav { background-color: var(--blaa); color: #ffffff; }
+
+/* Vaelg alle, der passer: en afkrydsningsboks i stedet for et bogstav */
+.v-boks {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--gul);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.sk-knap.valgt .v-boks { border-color: var(--blaa); background-color: var(--blaa); }
+
+/* Gaettet med to svar (fane 2): navnene med farveprikken */
+.gk-svar.n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 460px; margin: 0 auto; }
+.gk-knap { flex-direction: row; justify-content: center; align-items: center; }
+.gk-knap .v-prik { width: 16px; height: 16px; }
+
+/* Indsend svar: blaa, graa til der er noget at sende ind, banker naar der er */
+.knap.indsend {
+    border: 2px solid var(--blaa);
+    background-color: var(--blaa-mork);
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+.knap.indsend:hover { background-color: var(--blaa); }
+.knap.indsend.klar { animation: bank 1.7s ease-out infinite; }
+.knap.indsend.ikke-klar { border-color: #4a4a58; background-color: var(--panel-2); color: var(--tekst-mat); cursor: default; }
+.knap.indsend.ikke-klar:hover { background-color: var(--panel-2); }
+
+.sk-bund .knap.indsend { margin-left: 0; min-width: 170px; font-variant-numeric: tabular-nums; }
+
+/* Hint-knappen og Indsend staar sammen til hoejre i kortets nederste raekke */
+.sk-bund .knap.hjaelp { margin-left: auto; }
+.sk-bund .st-tekst[hidden] + .knap { margin-left: auto; }
+
+/* Panelet: noten under listen og Forfra under kortet */
+.liste-note { margin: 8px 0 0; font-size: 0.78rem; color: var(--tekst-mat); }
+.panel > .forfraknap { align-self: flex-start; }
+
+@media (max-height: 720px) {
+    .sk-bund .knap.indsend { min-width: 150px; }
+}

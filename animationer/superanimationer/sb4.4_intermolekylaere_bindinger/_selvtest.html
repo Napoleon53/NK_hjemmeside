@@ -23,10 +23,12 @@
    koger ved kogepunktet og fortætter under det, at alkoholerne danner
    hydrogenbindinger og alkanerne ikke gør, at ethanol uden
    hydrogenbindinger koger ved −42 °C, at alle opgaver på de tre faner
-   kan løses (selv og med Vis svaret), at de forkerte svar giver en rød
-   linje med forklaringen, at hvert par i Rangér har en forklaring, at
-   sproget holder reglerne, og at tingene kan være der fra 1100 × 700
-   til 1600 × 950.
+   kan løses (selv og med Vis svaret), at termometeret alene aldrig løser
+   en opgave, og at intet bedømmes, før eleven trykker Indsend svar, at
+   termometeret er låst under et gæt, at de forkerte svar giver en rød
+   linje med forklaringen på kortet, at hvert par i Rangér har en
+   forklaring, at sproget holder reglerne, og at kortet øverst og tingene
+   under det kan være der fra 1100 × 700 til 1600 × 950.
 
    Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
    fremskridt og lægger det tilbage bagefter.
@@ -166,63 +168,115 @@ function koerTest(W) {
     /* ------------------------------------------------------------------ */
     overskrift("4. Fane 1: Ethanol");
     NK.visFane("fane-e");
-    E.nr = 0;
-    E.P.hb = true;
-    E.termo.saet(20);
+    function skortKl(F) { return d.getElementById(F.navn + "-skort").className; }
+    function blinker(F) { return d.getElementById(F.navn + "-skort").classList.contains("blink"); }
+    function nulBlink(F) { d.getElementById(F.navn + "-skort").classList.remove("blink"); }
+    function indsendKlar(F) { var k = F.el.indsend; return !k.hidden && k.classList.contains("klar"); }
+    function termoPt(F, T) { var TM = F.lay.termo; return { x: TM.x, y: TM.yFor(T) }; }
     E.vaelg(0);
-    paastand("første mål er Kog ethanol, og linjen siger, hvad man gør", E.opg.o.id === "kog" && /termometeret/.test(E.beskedTekst()), E.beskedTekst());
+    paastand("første opgave er Ethanols kogepunkt, og opgaven står på kortet øverst i scenen",
+        E.opg.o.id === "kog" && /kogepunkt/.test(E.kortTekst()) && /opgave/.test(skortKl(E)));
+    paastand("der er ingen linje nederst i scenen og intet opgavekort i panelet",
+        !d.querySelector(".statuslinje") && !d.querySelector(".opgavekort") && !d.getElementById("r-tjek"));
+    paastand("tælleren af bindinger er væk; forklaringen af stregerne står ved luppen",
+        !d.getElementById("e-ant-hb") && /Hydrogenbinding/.test(E.signatur.textContent) && /London-kraft/.test(E.signatur.textContent));
+    paastand("Indsend svar er gråt, før termometeret er rørt", !indsendKlar(E) && /20 °C/.test(E.el.indsend.textContent.replace(/ /g, " ")));
+    E.indsendKlik();
+    paastand("Indsend svar før termometeret er rørt koster intet, men kortet blinker", !E.fejlet && !E.faerdig && blinker(E));
     E.knap();
-    paastand("Giv et hint giver hint 1 af 3 i gul linje", /Hint 1 af 3/.test(E.beskedTekst()) && E.el.status.classList.contains("hint"));
-    E.termo.saet(86);
+    paastand("Giv et hint giver hint 1 af 3 på kortet", /Hint 1 af 3/.test(E.beskedTekst()) && E.el.status.classList.contains("hint"));
+    /* Det, brugeren klagede over: eleven trækker termometeret helt op */
+    E.termo.saet(120); E.roertTermo = true;
+    koerF(E, 7);
+    paastand("termometeret helt op løser ikke opgaven af sig selv (ethanol koger, men intet er sendt ind)",
+        !E.faerdig && E.P.antalGas() === E.P.N, E.P.antalGas());
+    paastand("Indsend svar viser temperaturen og banker", indsendKlar(E) && /120 °C/.test(E.el.indsend.textContent.replace(/ /g, " ")));
+    E.indsendKlik();
+    paastand("120 °C sendt ind: rød linje om, at kogepunktet er lavere, og ingen løsning",
+        !E.faerdig && E.el.status.classList.contains("skidt") && /lavere/.test(E.beskedTekst()), E.beskedTekst());
+    E.termo.saet(60);
     koerF(E, 4);
-    paastand("ethanol koger ved 86 °C, og målet er løst", E.faerdig && E.fundet.kp && /78 °C/.test(E.beskedTekst()), E.beskedTekst());
-    paastand("statuslinjen er grøn med Rigtigt", E.el.status.classList.contains("god") && /Rigtigt/.test(E.beskedTekst()));
+    E.indsendKlik();
+    paastand("60 °C sendt ind: ethanol koger ikke, kogepunktet er højere", !E.faerdig && /højere/.test(E.beskedTekst()), E.beskedTekst());
+    E.termo.saet(79);
+    E.indsendKlik();
+    paastand("79 °C sendt ind løser opgaven; det grønne kort siger 78 °C og har Næste opgave",
+        E.faerdig && /loest/.test(skortKl(E)) && /78 °C/.test(E.kortTekst().replace(/ /g, " ")) && /Næste opgave/.test(E.kortTekst()));
+    paastand("to forkerte svar først: ingen stjerne", !E.status[0].stjerne && E.status[0].loest);
+    nulBlink(E);
+    E.termoNed(termoPt(E, 0));
+    paastand("på det grønne kort er termometeret låst, og kortet blinker", E.termo.T === 79 && blinker(E));
     E.knap();
-    paastand("knappen går videre til Hvad brydes?", E.opg.o.id === "brydes" && !E.faerdig);
-    E.svarValg(0);
-    paastand("et forkert svar giver en rød linje med forklaringen", E.el.status.classList.contains("skidt") && /H på O/.test(E.beskedTekst()), E.beskedTekst());
-    paastand("og hjælpeknappen lyser stille", E.el.knap.classList.contains("peg"));
-    E.svarValg(1);
-    paastand("det rigtige svar løser målet", E.faerdig && /mellem molekylerne/.test(E.beskedTekst()));
+    paastand("opgave 2, Hvad brydes?, er et spørgsmål med fire svar, hvor flere kan vælges, og ethanol varmes op",
+        E.opg.o.id === "brydes" && /spm/.test(skortKl(E)) && d.querySelectorAll("#e-ind .sk-knap").length === 4 && E.termo.maal === 84);
+    paastand("Indsend svar er gråt, før et svar er valgt", !indsendKlar(E));
+    E.valgKlik(0);
+    paastand("et klik på et svar vælger det uden at bedømme det", E.valgte[0] && !E.faerdig && !E.el.status.classList.contains("skidt") && indsendKlar(E));
+    E.indsendKlik();
+    paastand("kun hydrogenbindinger sendt ind: rød linje om London-kræfterne", !E.faerdig && /London/.test(E.beskedTekst()), E.beskedTekst());
+    E.valgKlik(1); E.valgKlik(2);
+    E.indsendKlik();
+    paastand("med bindingen mellem O og H: rød linje om, at molekylet er helt", !E.faerdig && /H på O/.test(E.beskedTekst()), E.beskedTekst());
+    E.valgKlik(2);
+    E.indsendKlik();
+    paastand("hydrogenbindinger og London-kræfter sendt ind løser opgaven", E.faerdig && /mellem molekylerne/.test(E.kortTekst()));
     E.knap();
-    paastand("Find H'et", E.opg.o.id === "hvilket");
-    E.termo.saet(20);
-    koerF(E, 6);
+    koerF(E, 4);
+    paastand("opgave 3, Find H'et, begynder med væske ved 20 °C", E.opg.o.id === "hvilket" && E.termo.T === 20 && E.P.antalGas() <= 3);
     var L = E.lay.lup, s1 = L.r / E.P.Rm, A = E.P.F.atomer;
-    var mL = null;
-    E.P.mol.forEach(function (m) { if (!m.gas && (!mL || Math.hypot(m.x, m.y) < Math.hypot(mL.x, mL.y))) mL = m; });
+    var mL = E.findMolekyle(false);
     E.P.verden(mL);
     var hC = A.map(function (a, i) { return a.e === "H" && !a.donor ? i : -1; }).filter(function (i) { return i >= 0; })[0];
     E.klikScene({ x: L.x + mL.wx[hC] * s1, y: L.y + mL.wy[hC] * s1 });
-    paastand("et klik på H på C giver en rød linje", E.el.status.classList.contains("skidt") && /sidder på C/.test(E.beskedTekst()), E.beskedTekst());
+    paastand("et klik på et H vælger det (gul ring) uden at bedømme det og uden δ+ og δ−",
+        E.opg.atom && E.opg.atom.e === "H" && !E.faerdig && !E.valgt && /valgt et H-atom/.test(E.beskedTekst()), E.beskedTekst());
+    E.indsendKlik();
+    paastand("H på C sendt ind: rød linje om, at det sidder på C", !E.faerdig && /sidder på C/.test(E.beskedTekst()) && !E.opg.atom, E.beskedTekst());
+    E.P.verden(mL);
     var hO = E.P.F.donorer[0];
     E.klikScene({ x: L.x + mL.wx[hO] * s1, y: L.y + mL.wy[hO] * s1 });
-    paastand("et klik på H på O løser målet, og H på O får δ+-kanten", E.faerdig && E.donorKant, E.beskedTekst());
+    E.indsendKlik();
+    paastand("H på O sendt ind løser opgaven, og H på O får δ+-kanten", E.faerdig && E.donorKant);
     E.knap();
-    paastand("Uden hydrogenbindinger starter med et gæt, og kontakten er skjult", E.opg.o.id === "uden" && E.opg.fase === "gaet" && E.kontakt.hidden);
-    E.svarValg(2);
-    paastand("efter gættet kommer kontakten frem", E.opg.fase === "find" && !E.kontakt.hidden);
+    paastand("opgave 4 begynder med et gæt; kontakten og Indsend svar er skjult",
+        E.opg.o.id === "uden" && /gaet/.test(skortKl(E)) && E.kontakt.hidden && E.el.indsend.hidden);
+    nulBlink(E);
+    var foer = E.termo.T;
+    E.termoNed(termoPt(E, -60));
+    E.tast({ key: "ArrowDown", shiftKey: true });
+    paastand("under gættet er termometeret låst (mus og piletaster), og kortet blinker", E.termo.T === foer && blinker(E));
+    E.valgKlik(2);
+    paastand("efter gættet: kontakten kommer frem og pulserer, og Indsend er gråt, så længe hydrogenbindingerne er til",
+        E.opg.fase === "opgave" && !E.kontakt.hidden && E.kontakt.classList.contains("peg") && !indsendKlar(E) && /Dit gæt/.test(E.kortTekst()));
     E.skiftHb();
-    paastand("kontakten slår hydrogenbindingerne fra", !E.P.hb && /fra/.test(E.kontakt.textContent));
-    E.termo.saet(20);
+    paastand("kontakten slår hydrogenbindingerne fra", !E.P.hb && /fra/.test(E.kontakt.textContent) && !E.kontakt.classList.contains("peg"));
+    E.tast({ key: "ArrowUp" }); E.termo.saet(20);
     koerF(E, 6);
-    paastand("uden hydrogenbindinger koger ethanol ved 20 °C", E.P.antalGas() === E.P.N && !E.faerdig);
-    E.termo.saet(-60);
+    paastand("uden hydrogenbindinger er ethanol damp ved 20 °C, og opgaven er ikke løst af sig selv", E.P.antalGas() === E.P.N && !E.faerdig);
+    E.termo.saet(-80);
     koerF(E, 8);
-    paastand("ved −60 °C fortætter den, og målet er løst med −42 °C", E.faerdig && E.fundet.uden && /−42 °C/.test(E.beskedTekst()), E.beskedTekst());
-    paastand("alle fire er løst, og knappen går videre til Sammenlign", E.antalLoest() === 4 && /Sammenlign/.test(E.el.knap.textContent));
-    E.skiftHb();
-    paastand("kontakten bliver, når målet er løst, og slår dem til igen", E.P.hb && !E.kontakt.hidden);
-    /* Vis svaret paa alle fire */
+    paastand("ved −80 °C er den væske igen, og opgaven er stadig ikke løst", E.P.antalGas() <= 3 && !E.faerdig);
+    E.indsendKlik();
+    paastand("−80 °C sendt ind: rød linje, kogepunktet er højere", !E.faerdig && /højere/.test(E.beskedTekst()));
+    E.termo.saet(-42);
+    E.indsendKlik();
+    paastand("−42 °C sendt ind løser opgaven med dommen over gættet", E.faerdig && /−42 °C/.test(E.kortTekst().replace(/ /g, " ")) && /Dit gæt holdt/.test(E.kortTekst()));
+    paastand("alle fire er løst, og kortets knap går videre til Sammenlign", E.antalLoest() === 4 && /Sammenlign/.test(E.kortTekst()));
+    E.vaelg(0);
+    paastand("de andre opgaver har altid hydrogenbindingerne slået til og ingen kontakt", E.P.hb && E.kontakt.hidden);
+    E.status[0].stjerne = false;
+    E.tast({ key: "ArrowUp" }); E.termo.saet(78);
+    E.indsendKlik();
+    paastand("løst i første forsøg: stjerne", E.faerdig && E.status[0].stjerne);
     var svarOK = true;
     [0, 1, 2, 3].forEach(function (i) {
         E.vaelg(i);
+        if (E.gaetNu()) E.valgKlik(0);
         for (var k = 0; k < 6 && !E.faerdig; k++) E.knap();
-        if (!E.faerdig || !E.el.status.classList.contains("gul")) svarOK = false;
+        if (!E.faerdig || !/svar/.test(skortKl(E)) || E.status[i].stjerne && i !== 0) svarOK = false;
     });
-    paastand("Vis svaret virker på alle fire mål (gul linje)", svarOK);
-    E.P.hb = true;
-    E.termo.saet(20);
+    paastand("Vis svaret virker på alle fire (gult kort)", svarOK);
+    E.vaelg(0);
     paastand("påskeægget: termometerets kugle", (function () {
         var TM = E.lay.termo;
         E.klikScene({ x: TM.kugle.x, y: TM.kugle.y });
@@ -232,41 +286,63 @@ function koerTest(W) {
     /* ------------------------------------------------------------------ */
     overskrift("5. Fane 2: Sammenlign");
     NK.visFane("fane-s");
+    S.maalt = {};
     var parFejl = [];
     D.PAR.forEach(function (p, i) {
         S.vaelg(i);
-        if (S.opg.fase !== "gaet") parFejl.push(p.id + " ikke gæt");
-        S.svarValg(0);
-        if (S.opg.fase !== "varm") parFejl.push(p.id + " ikke varm");
-        var a = S.Pr.a, b = S.Pr.b;
-        if (a.antalGas() > a.N / 2 || b.antalGas() > b.N / 2) parFejl.push(p.id + " er damp fra start");
-        var lav = Math.min(s[p.a].kp, s[p.b].kp), hoej = Math.max(s[p.a].kp, s[p.b].kp);
-        S.termo.saet(Math.round((lav + hoej) / 2));
-        koerF(S, 6);
-        var nGas = (s[p.a].kp < s[p.b].kp ? a : b).antalGas();
-        if (S.opg.kogt.a === S.opg.kogt.b) parFejl.push(p.id + " kun det ene skulle koge");
-        S.termo.saet(hoej + 12);
-        koerF(S, 7);
-        if (S.opg.fase !== "hvorfor") parFejl.push(p.id + " ikke hvorfor (" + a.antalGas() + "," + b.antalGas() + ")");
+        var kendtFoer = { a: S.kendt("a"), b: S.kendt("b") };
+        if (!/gaet/.test(skortKl(S)) || !S.el.indsend.hidden) parFejl.push(p.id + " gæt");
+        nulBlink(S);
+        var T0 = S.termo.T;
+        S.termoNed(termoPt(S, T0 + 60));
+        S.klikScene({ x: S.lay.kol.b.lup.x, y: S.lay.kol.b.lup.y });
+        if (S.termo.T !== T0 || !blinker(S) || S.opg.fase !== "gaet") parFejl.push(p.id + " ikke låst under gættet");
+        S.valgKlik(0);
+        ["a", "b"].forEach(function (k) {
+            if (kendtFoer[k]) { if (S.opg.maaler === k) parFejl.push(p.id + " " + k + " måles igen"); return; }
+            if (S.opg.fase !== "maal" || S.opg.maaler !== k) { parFejl.push(p.id + " måler ikke " + k); return; }
+            var kp = Math.round(S.st[k].kp);
+            S.tast({ key: "ArrowUp" });
+            S.termo.saet(kp + 30);
+            koerF(S, 6);
+            if (S.opg.maaler !== k || S.faerdig) parFejl.push(p.id + " " + k + " løst af termometeret");
+            S.indsendKlik();
+            if (!S.el.status.classList.contains("skidt") || !/lavere/.test(S.beskedTekst())) parFejl.push(p.id + " " + k + " for højt ikke rødt");
+            S.termo.saet(kp - 15);
+            S.indsendKlik();
+            if (!/højere/.test(S.beskedTekst())) parFejl.push(p.id + " " + k + " for lavt ikke rødt");
+            S.termo.saet(kp + 2);
+            S.indsendKlik();
+            if (S.opg.maaler === k && S.opg.fase === "maal") parFejl.push(p.id + " " + k + " ikke fundet");
+        });
+        if (!S.venter || !/koger ved/.test(S.kortTekst())) parFejl.push(p.id + " intet grønt kort med kogepunkterne");
+        S.knap();
+        if (S.opg.fase !== "spm" || !/spm/.test(skortKl(S))) parFejl.push(p.id + " ikke spørgsmål");
         var forkert = -1, rigtig = -1;
         p.svar.forEach(function (sv, j) { if (sv.ok) rigtig = j; else if (forkert < 0) forkert = j; });
-        S.svarValg(forkert);
-        if (!S.el.status.classList.contains("skidt")) parFejl.push(p.id + " forkert svar ikke rødt");
-        S.svarValg(rigtig);
+        S.valgKlik(forkert);
+        if (S.el.status.classList.contains("skidt")) parFejl.push(p.id + " bedømt før Indsend");
+        S.indsendKlik();
+        if (!S.el.status.classList.contains("skidt") || !d.querySelector("#s-ind .sk-knap.forkert")) parFejl.push(p.id + " forkert svar ikke rødt");
+        S.valgKlik(rigtig);
+        S.indsendKlik();
         if (!S.faerdig) parFejl.push(p.id + " ikke løst");
+        if (S.status[i].stjerne) parFejl.push(p.id + " stjerne trods fejl");
         if (p.svar.filter(function (sv) { return sv.ok; }).length !== 1) parFejl.push(p.id + " antal rigtige");
         if (s[p.b].kp <= s[p.a].kp) parFejl.push(p.id + " b skal koge højest");
-        void nGas;
     });
-    paastand("alle fem par: gæt, det laveste koger først, så det højeste, forkert er rødt, rigtigt løser", parFejl.length === 0, parFejl.slice(0, 4).join(", "));
+    paastand("alle fem par: låst under gættet, termometeret løser intet, for højt og for lavt er rødt, rigtigt sendt ind går videre, forkert svar er rødt", parFejl.length === 0, parFejl.slice(0, 4).join(", "));
+    paastand("et kogepunkt, der er fundet i et andet par, skal ikke findes igen (ethanol i par 2 og 4)", parFejl.join().indexOf("måles igen") < 0);
     var maalte = Object.keys(S.maalt).length;
     paastand("alle otte stoffer fra parrene er kommet på grafen", maalte === 8, maalte);
     paastand("knappen Vis hele tabellen kommer frem, når alle fem er løst", !S.tabelKnap.hidden);
     var rigtigePlads = D.PAR.map(function (p) { var r = -1; p.svar.forEach(function (sv, j) { if (sv.ok) r = j; }); return r; });
     paastand("det rigtige svar står ikke altid samme sted", rigtigePlads.some(function (x) { return x !== rigtigePlads[0]; }), rigtigePlads.join(""));
+    S.maalt = {};
     S.vaelg(0);
-    for (var k = 0; k < 12 && !S.faerdig; k++) { S.knap(); koerF(S, 7); }
-    paastand("Vis svaret fører et par helt igennem", S.faerdig, S.opg.fase);
+    S.valgKlik(1);
+    for (var k2 = 0; k2 < 16 && !S.faerdig; k2++) { S.knap(); koerF(S, 2); }
+    paastand("Vis svaret fører et par helt igennem uden stjerne", S.faerdig && !S.status[0].stjerne, S.opg.fase);
 
     /* ------------------------------------------------------------------ */
     overskrift("6. Fane 3: Rangér");
@@ -291,27 +367,33 @@ function koerTest(W) {
         R.vaelg(i);
         if (R.opg.orden.join() === R.opg.rigtig.join()) rFejl.push(o.id + " starter rigtigt");
         if (R.kortEl.length !== o.stoffer.length) rFejl.push(o.id + " kort");
+        if (!/Sæt stofferne/.test(R.kortTekst())) rFejl.push(o.id + " opgaven står ikke på kortet");
         var h = R.hintTrin();
         if (h.length !== 3) rFejl.push(o.id + " hint " + h.length);
-        R.tjek();
+        R.indsendKlik();
         if (!R.el.status.classList.contains("skidt") || !R.opg.fejlPar) rFejl.push(o.id + " forkert ikke rødt");
         if (d.querySelectorAll("#r-pladser .stofkort.fejl").length !== 2) rFejl.push(o.id + " to røde kort");
         if (d.querySelectorAll("#r-pladser .sk-kp").length) rFejl.push(o.id + " kogepunkt vist for tidligt");
-        /* Byt kortene paa plads, som en elev ville */
         var g = 0;
         while (R.foersteFejl() && g++ < 20) {
             var f = R.foersteFejl();
             R.byt(R.opg.orden.indexOf(f[0]), R.opg.orden.indexOf(f[1]));
         }
-        R.tjek();
+        if (R.faerdig) rFejl.push(o.id + " løst uden Indsend");
+        R.indsendKlik();
         if (!R.faerdig) rFejl.push(o.id + " ikke løst");
+        if (R.status[i].stjerne) rFejl.push(o.id + " stjerne trods fejl");
         if (d.querySelectorAll("#r-pladser .sk-kp").length !== o.stoffer.length) rFejl.push(o.id + " kogepunkter ikke vist");
     });
-    paastand("alle 12: et forkert tjek er rødt med to røde kort og uden kogepunkter; bytter man på plads, er den løst", rFejl.length === 0, rFejl.slice(0, 4).join(", "));
-    paastand("de løste har stjerner", R.antalStjerner() === 12, R.antalStjerner());
+    paastand("alle 12: et forkert svar er rødt med to røde kort og uden kogepunkter; først Indsend svar løser opgaven", rFejl.length === 0, rFejl.slice(0, 4).join(", "));
+    R.status[0].stjerne = false;
+    R.vaelg(0);
+    R.opg.orden = R.opg.rigtig.slice(); R.bygKort();
+    R.indsendKlik();
+    paastand("rigtig rækkefølge i første forsøg giver en stjerne", R.faerdig && R.status[0].stjerne);
     R.vaelg(5);
     R.knap(); R.knap(); R.knap(); R.knap();
-    paastand("Vis svaret efter tre hint sætter kortene rigtigt og giver ingen ny stjerne", R.faerdig && R.opg.orden.join() === R.opg.rigtig.join() && R.el.status.classList.contains("gul"));
+    paastand("Vis svaret efter tre hint sætter kortene rigtigt på et gult kort", R.faerdig && R.opg.orden.join() === R.opg.rigtig.join() && /svar/.test(skortKl(R)));
 
     /* ------------------------------------------------------------------ */
     overskrift("7. Sproget");
@@ -324,9 +406,15 @@ function koerTest(W) {
     D.RANGER.forEach(function (o) {
         o.stoffer.forEach(function (a) { o.stoffer.forEach(function (b) { if (s[a].kp < s[b].kp) tekster.push(D.forklar(a, b)); }); });
     });
-    R.opgaver.forEach(function (o, i) { R.vaelg(i); R.hintTrin().forEach(function (t) { tekster.push(t); }); tekster.push(R.trinLinje()); });
-    D.PAR.forEach(function (p, i) { S.vaelg(i); tekster.push(S.promptHTML(), S.trinLinje()); S.hintTrin().forEach(function (t) { tekster.push(t); }); });
-    E.opgaver.forEach(function (o, i) { E.vaelg(i); tekster.push(E.promptHTML(), E.trinLinje()); });
+    var falskP = function (kp, gas) { return { kp: function () { return kp; }, antalGas: function () { return gas; }, N: 10 }; };
+    var tempTekster = [];
+    ["ethanol", "ethanol uden hydrogenbindinger", "ethan-1,2-diol", "2-methylpropan"].forEach(function (n) {
+        tempTekster.push(D.tempFejl(n, -100, falskP(0, 0)), D.tempFejl(n, -100, falskP(-150, 10)), D.tempFejl(n, -100, falskP(-150, 4)));
+    });
+    tekster = tekster.concat(tempTekster);
+    alleId.forEach(function (id) { tekster = tekster.concat(D.maalHint(s[id])); });
+    R.opgaver.forEach(function (o, i) { R.vaelg(i); R.hintTrin().forEach(function (t) { tekster.push(t); }); tekster.push(R.kortTekst()); });
+    E.opgaver.forEach(function (o, i) { E.vaelg(i); tekster.push(E.kortTekst()); });
     tekster.push(d.getElementById("teori").textContent, d.body.textContent);
     var tanke = tekster.filter(function (t) { return /[–—]/.test(t); });
     paastand("ingen tankestreger", tanke.length === 0, tanke.slice(0, 2).join(" | "));
@@ -336,53 +424,107 @@ function koerTest(W) {
     paastand("ingen ord uden æ, ø og å", ascii.length === 0, ascii.slice(0, 2).join(" | "));
     var natron = tekster.filter(function (t) { return /natronlud/i.test(t); });
     paastand("intet natronlud", natron.length === 0);
+    var indforstaaet = tekster.filter(function (t) { return /(^|[.?!] )(Begge|Her|Også her|De har|Den har)\b/.test(t); });
+    paastand("intet indforstået: ingen tekst begynder en sætning med Begge, Her, Også her, De har eller Den har", indforstaaet.length === 0, indforstaaet.slice(0, 2).join(" | "));
+    var lange = [];
+    D.PAR.forEach(function (p) { p.svar.forEach(function (sv) { if (sv.t.length > 70) lange.push(sv.t); if (sv.f && sv.f.length > 110) lange.push(sv.f); }); });
+    D.E_MAAL.forEach(function (o) {
+        (o.svar || []).forEach(function (sv) { if (sv.t.length > 45) lange.push(sv.t); if ((sv.f || sv.mangler || "").length > 110) lange.push(sv.f || sv.mangler); });
+        o.hint.forEach(function (h) { if (h.length > 120) lange.push(h); });
+    });
+    tempTekster.forEach(function (t) { if (t.length > 130) lange.push(t); });
+    paastand("korte tekster: svar højst 70 tegn (fane 1: 45), forklaringer højst 110, hint højst 120", lange.length === 0, lange.slice(0, 2).join(" | "));
 
     /* ------------------------------------------------------------------ */
     overskrift("8. Layoutet");
     var ramme = document.getElementById("ramme");
     var maal = [[1100, 700], [1300, 820], [1500, 900], [1600, 950]];
-    var lFejl = [];
+    var lFejl = [], kFejl = [];
     function over(a, b) { return a.x < b.x + b.b && b.x < a.x + a.b && a.y < b.y + b.h && b.y < a.y + a.h; }
+    /* Kortets hoejde med hver af teksterne i den nederste raekke (det laengste
+       hint, den laengste forklaring) maa ikke vaere hoejere end pladsen, der
+       er sat af til det */
+    function kortOK(F, n, navn, tekster) {
+        var e = d.getElementById(F.navn + "-skort"), zone = F.kortZone();
+        var h = e.offsetHeight, hvor = "";
+        (tekster || []).forEach(function (t) {
+            F.besked('<span class="b-maerke">Ikke rigtigt</span> ' + NK.html(t), "skidt");
+            if (e.offsetHeight > h) { h = e.offsetHeight; hvor = t.slice(0, 30); }
+        });
+        F.naesteLinje("", "");
+        if (h > zone) kFejl.push(n + " " + navn + " " + h + ">" + zone + " " + hvor);
+    }
     maal.forEach(function (m) {
         var n = m.join("×");
         ramme.style.width = m[0] + "px";
         ramme.style.height = m[1] + "px";
         NK.visFane("fane-e");
-        E.vaelg(3); E.svarValg(2);
+        /* Kortet i alle dele af alle fire opgaver */
+        E.vaelg(0); E.tilpas(); E.layout();
+        kortOK(E, n, "kog", D.E_MAAL[0].hint.concat(tempTekster.slice(0, 6)));
+        E.loest("selv", D.E_MAAL[0].loest, "Ethanol koger ved 78 °C."); kortOK(E, n, "kog løst");
+        E.vaelg(1); kortOK(E, n, "brydes", D.E_MAAL[1].hint.concat(D.E_MAAL[1].svar.map(function (sv) { return sv.f || sv.mangler; })));
+        E.loest("selv", D.E_MAAL[1].loest); kortOK(E, n, "brydes løst");
+        E.vaelg(2); kortOK(E, n, "hvilket", D.E_MAAL[2].hint.concat([D.E_MAAL[2].klik.HC, D.E_MAAL[2].klik.O]));
+        E.loest("selv", D.E_MAAL[2].loest); kortOK(E, n, "hvilket løst");
+        E.vaelg(3); E.valgKlik(0); kortOK(E, n, "uden", D.E_MAAL[3].hint.concat(tempTekster.slice(3, 6)));
+        E.loest("selv", "Dit gæt holdt ikke. " + D.E_MAAL[3].loest); kortOK(E, n, "uden løst");
+        E.vaelg(3);
+        var l = E.lay, Lp = l.lup, top = E.top();
+        var gk = d.getElementById("e-skort").getBoundingClientRect(), scE = d.querySelector("#fane-e .scene").getBoundingClientRect();
+        if (gk.bottom - scE.top > l.baand.y - 40) lFejl.push(n + " gættet er for højt");
+        E.valgKlik(0);
         E.tilpas(); E.layout();
-        var l = E.lay, Lp = l.lup;
-        if (Lp.y + Lp.r > l.baand.y || Lp.y - Lp.r < 20) lFejl.push(n + " luppen");
+        l = E.lay; Lp = l.lup;
+        if (Lp.y + Lp.r > l.baand.y || Lp.y - Lp.r < top) lFejl.push(n + " luppen under kortet");
         if (Lp.r < 150) lFejl.push(n + " luppen er lille " + Math.round(Lp.r));
+        if (l.termo.top < top - 12) lFejl.push(n + " termometeret under kortet");
         var K = l.kammer, G = l.glas;
         var Bm = NK.Tegn.ballonMaal(G.mund.x, G.mund.y, G.s, 1.6), ballonTop = Bm.y - Bm.r * 1.1;
         var kasseKammer = { x: K.x, y: ballonTop, b: K.b, h: l.bordY - ballonTop };
         if (over(kasseKammer, { x: Lp.x - Lp.r, y: Lp.y - Lp.r, b: 2 * Lp.r, h: 2 * Lp.r })) lFejl.push(n + " kammeret rører luppen");
         var sig = E.signatur.getBoundingClientRect(), ko = E.kontakt.getBoundingClientRect(), sc = d.querySelector("#fane-e .scene").getBoundingClientRect();
         var sigK = { x: sig.left - sc.left, y: sig.top - sc.top, b: sig.width, h: ko.bottom - sig.top };
-        if (sigK.y + sigK.h > ballonTop - 4) lFejl.push(n + " signaturen rører ballonen");
-        if (sigK.x + sigK.b > Lp.x - Lp.r * 0.7) lFejl.push(n + " signaturen rører luppen");
+        if (sigK.y < top - 2) lFejl.push(n + " forklaringen under kortet");
+        if (sigK.y + sigK.h > ballonTop - 4) lFejl.push(n + " forklaringen eller kontakten rører ballonen");
+        if (sigK.x + sigK.b > Lp.x - Lp.r * 0.7) lFejl.push(n + " forklaringen rører luppen");
         if (l.termo.x - 60 < Lp.x + Lp.r) lFejl.push(n + " termometeret rører luppen");
+
         NK.visFane("fane-s");
+        S.maalt = {};
         S.vaelg(4);
         S.tilpas(); S.layout();
-        var a = S.lay.kol.a, b = S.lay.kol.b;
+        var a = S.lay.kol.a, b = S.lay.kol.b, topS = S.top();
         if (a.lup.x + a.lup.r > b.lup.x - b.lup.r) lFejl.push(n + " lupperne rører hinanden");
-        if (a.lup.y - a.lup.r - 46 < 0) lFejl.push(n + " navnet over luppen er ude af scenen");
+        if (a.lup.y - a.lup.r - 46 < topS - 4) lFejl.push(n + " navnet over luppen er under kortet");
         var Ba = NK.Tegn.ballonMaal(a.glas.mund.x, a.glas.mund.y, a.glas.s, 1.6);
         if (a.lup.y + a.lup.r > Ba.y - Ba.r * 1.1) lFejl.push(n + " luppen rører ballonen");
-        if (a.lup.r < 110) lFejl.push(n + " lupperne er små " + Math.round(a.lup.r));
+        if (a.lup.r < 105) lFejl.push(n + " lupperne er små " + Math.round(a.lup.r));
         if (b.lup.x + b.lup.r > S.lay.termo.x - 60) lFejl.push(n + " luppen rører termometeret");
+        S.valgKlik(1);
+        kortOK(S, n, "mål", D.maalHint(s.hexan).concat(tempTekster.slice(6, 9)));
+        S.visSvar(); S.visSvar();
+        kortOK(S, n, "begge målt");
+        D.PAR.forEach(function (p, i) {
+            S.maalt = {}; S.vaelg(i); S.valgKlik(0); S.visSvar(); S.visSvar(); S.knap();
+            kortOK(S, n, "spm " + p.id, p.hint.concat(p.svar.map(function (sv) { return sv.f || ""; })));
+            S.loest("selv", p.loest, S.svarTekst(S.delNu())); kortOK(S, n, "løst " + p.id);
+        });
+
         NK.visFane("fane-r");
         [0, 4, 11].forEach(function (i) {
             R.vaelg(i);
             R.tilpas(); R.layout();
-            var t = d.getElementById("r-tavle").getBoundingClientRect(), k = d.getElementById("r-tjek").getBoundingClientRect();
+            var t = d.getElementById("r-tavle").getBoundingClientRect();
             var scR = d.querySelector("#fane-r .scene").getBoundingClientRect();
-            if (k.bottom > scR.top + R.lay.baand.y) lFejl.push(n + " tjek bag statuslinjen");
-            if (t.bottom > k.top) lFejl.push(n + " tavlen over tjek");
+            if (t.top - scR.top < R.top() - 2) lFejl.push(n + " tavlen under kortet");
+            if (R.lay.akseY + 30 > R.lay.baand.y) lFejl.push(n + " aksen er ude af scenen");
             d.querySelectorAll("#r-pladser .stofkort").forEach(function (kort) {
                 if (kort.scrollHeight > kort.clientHeight + 2) lFejl.push(n + " kortet er for lavt " + R.opgaver[i].id);
             });
+            var fl = [];
+            R.opg.o.stoffer.forEach(function (x) { R.opg.o.stoffer.forEach(function (y) { if (s[x].kp < s[y].kp) fl.push(D.forklar(x, y)); }); });
+            kortOK(R, n, "rangér " + R.opgaver[i].id, R.hintTrin().concat(fl));
         });
         ["#fane-e .panel", "#fane-s .panel", "#fane-r .panel"].forEach(function (sel, i) {
             NK.visFane(["fane-e", "fane-s", "fane-r"][i]);
@@ -390,7 +532,8 @@ function koerTest(W) {
             if (p.scrollWidth > p.clientWidth + 1) lFejl.push(n + " panelet er for bredt");
         });
     });
-    paastand("luppen, kammeret, termometeret, tavlen og kortene kan være der fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 5).join(", "));
+    paastand("kortet er aldrig højere end pladsen over luppen, heller ikke med det længste hint eller den længste forklaring", kFejl.length === 0, kFejl.slice(0, 4).join(", "));
+    paastand("luppen, kammeret, termometeret, tavlen og kortene kan være der under kortet fra 1100 × 700 til 1600 × 950", lFejl.length === 0, lFejl.slice(0, 5).join(", "));
     ramme.style.width = "1300px";
     ramme.style.height = "820px";
     var smaa = [];

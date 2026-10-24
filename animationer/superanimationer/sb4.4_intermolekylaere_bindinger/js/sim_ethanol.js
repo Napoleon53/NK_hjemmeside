@@ -5,11 +5,19 @@
    roede hydrogenbindinger og de graa London-kraefter, temperaturen man
    skruer paa, og kontakten, der slaar hydrogenbindingerne fra.
 
-   Til venstre staar temperaturkammeret med et reagensglas med ethanol
-   og en ballon paa (som sc4.1). Termometeret til hoejre er knappen.
-   Fire maal: kog ethanol, hvad brydes, find det H, der kan danne
-   hydrogenbindinger, og et tankeeksperiment uden hydrogenbindinger,
-   hvor eleven gaetter foerst. Proeven fortsaetter fra maal til maal.
+   Til venstre staar forklaringen af stregerne i luppen (ingen taeller:
+   brugeren 24. okt. 2026 fandt taelleren "lidt underlig og
+   indforstaaet") og under den temperaturkammeret med et reagensglas med
+   ethanol og en ballon paa (som sc4.1). Termometeret til hoejre styrer
+   temperaturen. Fire opgaver, og ingen af dem loeses af sig selv, naar
+   eleven traekker i termometeret:
+
+     1. kog: find kogepunktet og send det ind (Indsend svar: 78 °C)
+     2. brydes: hvilke bindinger brydes, vaelg alle, der passer
+     3. hvilket: klik paa det H, der kan danne hydrogenbindinger, og send
+        det ind
+     4. uden: gaet foerst, slaa saa hydrogenbindingerne fra og find det
+        nye kogepunkt (−42 °C)
    ===================================================================== */
 (function () {
     "use strict";
@@ -25,12 +33,12 @@
         this.P = new NK.Proeve(this.st, this.cfg.antal, this.cfg.Rm, 5);
         this.P.nulstil(this.cfg.start);
         this.termo = new NK.Termostat(this.cfg.omr, this.cfg.start);
-        this.fundet = { kp: false, uden: false };
         this.valgt = null;
         this.valgtT = 0;
         this.kontakt = NK.el("e-kontakt");
         this.signatur = NK.el("e-signatur");
         this.startFane(D.E_MAAL, [{ id: "alle", titel: "", lodret: true }]);
+        this.fundet = { kp: this.status[this.idx("kog")].loest, uden: this.status[this.idx("uden")].loest };
         this.donorKant = this.status[this.idx("hvilket")].loest;
         this.kontakt.addEventListener("click", function () { mig.skiftHb(); });
         /* Den foerste opgave, eleven ikke har loest */
@@ -42,11 +50,6 @@
     var P = SimEthanol.prototype;
     NK.Fane.paa(P, { navn: "e", naesteFane: "fane-s", naesteNavn: "Sammenlign" });
 
-    P.idx = function (id) {
-        for (var i = 0; i < this.opgaver.length; i++) if (this.opgaver[i].id === id) return i;
-        return -1;
-    };
-
     P.chipTekst = function (o, i) {
         return '<span class="oc-nr">' + (i + 1) + "</span>" + NK.html(o.navn);
     };
@@ -54,86 +57,127 @@
     P.gasMest = function () { return this.P.antalGas() > this.P.N / 2; };
 
     /* ----- Opgaven -------------------------------------------------------------- */
+    /* Hver opgave begynder med en frisk proeve, der passer til den: en vaeske
+       ved 20 °C, og til Hvad brydes? en vaeske, der varmes op, til den koger */
     P.lavOpgave = function (i) {
         var o = this.opgaver[i];
-        this.opg = { o: o, fase: o.id === "uden" ? "gaet" : "", forkert: {}, gaet: -1, lysH: null };
-        this.udenSaa = { over: false, under: false };
+        this.opg = { o: o, fase: o.gaet ? "gaet" : (o.svar ? "spm" : "opgave"), gaet: -1, atom: null, lysH: null };
+        this.P.hb = true;
+        this.valgt = null;
+        this.roertTermo = false;
+        if (o.id === "brydes") {
+            this.P.nulstil(70);
+            this.termo.saet(70);
+            this.termo.animerTil(84, 5);
+        } else {
+            this.P.nulstil(this.cfg.start);
+            this.termo.saet(this.cfg.start);
+        }
         this.visKontakt();
     };
 
-    P.promptHTML = function () {
+    P.delNu = function () {
         var g = this.opg, o = g.o;
-        var html = '<p class="maal-tekst">' + NK.html(g.fase === "find" ? o.prompt2 : o.prompt) + "</p>";
-        if (o.svar && (o.id !== "uden" || g.fase === "gaet" || g.gaet >= 0)) {
-            html += '<div class="knapper valgrad">';
-            o.svar.forEach(function (sv, j) {
-                var kl = "knap";
-                var laast = false;
-                if (o.id === "uden") {
-                    if (g.gaet >= 0) { laast = true; if (j === g.gaet) kl += " valgt"; }
-                } else {
-                    if (g.forkert[j]) { kl += " forkert"; laast = true; }
-                    if (g.rigtig === j) kl += " rigtig";
-                    if (g.rigtig !== undefined) laast = true;
-                }
-                html += '<button type="button" class="' + kl + '" data-valg="' + j + '"' + (laast ? " disabled" : "") + ">" +
-                    '<span class="v-bogstav">' + "ABC".charAt(j) + "</span>" + NK.html(sv.t) + "</button>";
-            });
-            html += "</div>";
-
-        }
-        return html;
+        if (g.fase === "gaet") return { slags: "gaet", intro: o.gaet.intro, tekst: o.gaet.tekst, svar: o.gaet.svar };
+        if (g.fase === "spm") return { slags: "spm", tekst: o.tekst, svar: o.svar, multi: o.multi, chip: "Opgave " + (this.nr + 1) };
+        var d = { slags: "opgave", tekst: o.tekst, chip: "Opgave " + (this.nr + 1) };
+        if (o.id === "uden" && g.gaet >= 0) d.ekstra = '<p class="sk-gaet">Dit gæt: <b>' + NK.html(o.gaet.svar[g.gaet].t) + "</b></p>";
+        return d;
     };
 
-    P.trinLinje = function () {
-        var g = this.opg, id = g.o.id, T = Math.round(this.termo.T);
-        if (id === "kog") {
-            if (!this.roertTermo) return "Træk i det runde håndtag på termometeret til højre.";
-            if (!this.P.hb) return "Hydrogenbindingerne er slået fra. Slå dem til igen med kontakten over luppen.";
-            if (this.P.koger()) return "Ethanol koger. Se, hvad der sker i luppen.";
-            return "Varm videre. Ethanol er stadig en væske ved " + D.grader(T) + " °C.";
-        }
-        if (id === "brydes") {
-            if (this.gasMest()) return "Vælg et svar i opgavekortet.";
-            if (this.P.koger() && this.P.hb) return "Ethanol koger. Se i luppen, og vælg så et svar i opgavekortet.";
-            return "Varm op, til ethanol koger, og se i luppen. Vælg så et svar i opgavekortet.";
-        }
-        if (id === "hvilket") {
-            return this.gasMest() ? "Klik på et H-atom. Det er nemmest at se i væsken under 78 °C." : "Klik på et H-atom i luppen.";
-        }
-        if (g.fase === "gaet") return "Gæt først i opgavekortet.";
-        if (this.P.hb) return "Slå hydrogenbindingerne fra med kontakten over luppen.";
-        return this.gasMest() ? "Køl ned, til ethanol bliver en væske igen." : "Varm op, til ethanol koger.";
+    /* Det, kortet ikke selv siger, i kortets nederste raekke */
+    P.sceneLinje = function () {
+        var g = this.opg, id = g.o.id;
+        if (id === "hvilket") return g.atom ? g.o.valgt[g.atom.e] + " Tryk Indsend svar." : "";
+        if (id === "uden" && !this.P.hb && this.roertTermo) return "Stil termometeret på kogepunktet, og tryk Indsend svar.";
+        if (id === "kog" && this.roertTermo) return "Stil termometeret på kogepunktet, og tryk Indsend svar.";
+        return "";
     };
 
-    P.hintTrin = function () {
+    P.hintTrin = function () { return this.opg.o.hint; };
+
+    /* ----- Indsend svar ------------------------------------------------------------ */
+    P.kanIndsende = function () {
+        var g = this.opg, id = g.o.id;
+        if (id === "kog") return !!this.roertTermo;
+        if (id === "uden") return !this.P.hb && !!this.roertTermo;
+        if (id === "hvilket") return !!g.atom;
+        return false;
+    };
+
+    P.indsendTekst = function () {
+        var id = this.opg.o.id;
+        if (id === "kog" || id === "uden") return this.indsendTemp();
+        return "";
+    };
+
+    P.indsend = function () {
+        var g = this.opg, o = g.o, T = this.Tnu();
+        if (o.id === "kog" || o.id === "uden") {
+            if (Math.abs(T - this.P.kp()) <= D.TOL) {
+                if (o.id === "kog") this.fundet.kp = true; else this.fundet.uden = true;
+                this.loest("selv", this.gaetDom() + o.loest, o.id === "kog" ? "Ethanol koger ved 78 °C." : "");
+                return;
+            }
+            this.fejlLinje(D.tempFejl(o.id === "kog" ? "ethanol" : "ethanol uden hydrogenbindinger", T, this.P));
+            return;
+        }
+        if (o.id === "hvilket") {
+            var a = g.atom;
+            if (a.donor) {
+                g.lysH = { m: a.m, h: a.i };
+                this.donorKant = true;
+                this.loest("selv", o.loest);
+                return;
+            }
+            this.fejlLinje(a.e === "H" ? o.klik.HC : o.klik[a.e]);
+            g.atom = null;
+            this.visKort();
+        }
+    };
+
+    P.spmLoest = function () {
+        this.loest("selv", this.opg.o.loest);
+    };
+
+    P.gaetDom = function () {
         var g = this.opg;
-        if (g.o.id === "uden" && g.fase === "gaet") return ["Det er et gæt. Vælg det, du tror, og prøv det bagefter."];
-        return g.o.hint;
+        if (g.gaet < 0) return "";
+        return g.o.gaet.svar[g.gaet].ok ? "Dit gæt holdt. " : "Dit gæt holdt ikke. ";
+    };
+
+    P.gaetValg = function (j) {
+        var g = this.opg;
+        g.gaet = j;
+        g.fase = "opgave";
+        this.visKontakt();
+        this.nyDel();
+        this.layout();
     };
 
     P.visSvar = function () {
         var g = this.opg, o = g.o;
         if (o.id === "kog") {
-            this.P.hb = true;
-            this.visKontakt();
-            this.termo.animerTil(90, 50);
+            this.termo.animerTil(80, 50);
             this.fundet.kp = true;
-            this.loest("svar", o.loest);
+            this.loest("svar", o.loest, "Ethanol koger ved 78 °C.");
         } else if (o.id === "brydes") {
-            g.rigtig = 1;
-            this.loest("svar", o.loest);
+            var mig = this;
+            this.valgte = {};
+            o.svar.forEach(function (sv, j) { if (sv.ok) mig.valgte[j] = true; });
+            this.loest("svar", o.loest, "Hydrogenbindingerne og London-kræfterne.");
         } else if (o.id === "hvilket") {
             var m = this.findMolekyle(false) || this.P.mol[0];
             g.lysH = { m: m, h: this.P.F.donorer[0] };
+            g.atom = null;
             this.donorKant = true;
             this.loest("svar", o.loest);
         } else {
             if (g.gaet < 0) g.gaet = 2;
-            g.fase = "find";
+            g.fase = "opgave";
             this.P.hb = false;
             this.visKontakt();
-            this.termo.animerTil(-60, 60);
+            this.termo.animerTil(-42, 60);
             this.fundet.uden = true;
             this.loest("svar", o.loest);
         }
@@ -150,85 +194,67 @@
         return bedst;
     };
 
-    /* ----- Svarknapperne ----------------------------------------------------------- */
-    P.svarValg = function (j) {
-        var g = this.opg, o = g.o;
-        if (this.faerdig || !o.svar) return;
-        if (o.id === "uden") {
-            if (g.fase !== "gaet") return;
-            g.gaet = j;
-            g.fase = "find";
-            this.visKontakt();
-            this.visKort();
-            var godt = o.svar[j].ok;
-            if (godt) this.besked('<span class="b-maerke">Godt gættet</span> ' + NK.html("Slå nu hydrogenbindingerne fra med kontakten over luppen, og find det nye kogepunkt."), "god");
-            else this.besked('<span class="b-maerke">Dit gæt</span> ' + NK.html("Det finder du ud af nu. Slå hydrogenbindingerne fra med kontakten over luppen."), "peger");
-            return;
-        }
-        if (o.svar[j].ok) {
-            g.rigtig = j;
-            this.loest("selv", o.loest + " " + NK.tilfaeldig(D.ROS));
-            return;
-        }
-        g.forkert[j] = true;
-        this.visKort();
-        this.fejlLinje(o.svar[j].f);
-    };
-
-    /* ----- Kontakten: hydrogenbindingerne til og fra --------------------------------- */
+    /* ----- Kontakten: hydrogenbindingerne til og fra ---------------------------------
+       Den er der kun i opgave 4, efter gaettet. I de andre opgaver er
+       hydrogenbindingerne slaaet til, saa kogepunktet er ethanols. */
     P.visKontakt = function () {
         var g = this.opg;
-        var vis = this.status[this.idx("uden")].loest || (g && g.o.id === "uden" && g.fase === "find") || !this.P.hb;
+        var vis = !!g && g.o.id === "uden" && g.fase !== "gaet";
         this.kontakt.hidden = !vis;
         this.kontakt.classList.toggle("til", this.P.hb);
+        this.kontakt.classList.toggle("peg", vis && this.P.hb && !this.faerdig);
         this.kontakt.setAttribute("aria-pressed", this.P.hb ? "true" : "false");
         NK.saetTekst("e-kontakt-tekst", this.P.hb ? "Hydrogenbindinger: til" : "Hydrogenbindinger: fra");
+        if (this.lay) this.placerKontakt();
     };
 
     P.skiftHb = function () {
+        if (this.spaer()) return;
         this.P.hb = !this.P.hb;
+        this.roertTermo = false;
         this.nulstilHjaelp();
         this.visKontakt();
         if (!this.P.hb) {
-            this.udenSaa = { over: false, under: false };
             this.besked('<span class="b-maerke">Tankeeksperiment</span> ' +
-                NK.html("Hydrogenbindingerne er slået fra. I virkeligheden kan man ikke det, men modellen kan. ") +
-                NK.html(this.trinLinje()), "peger");
+                NK.html("I virkeligheden kan man ikke slå hydrogenbindingerne fra, men modellen kan. Find nu kogepunktet."), "peger");
         } else {
-            this.besked('<span class="b-maerke">Til igen</span> ' + NK.html("Hydrogenbindingerne er slået til igen. " +
-                (this.faerdig ? "" : this.trinLinje())), "peger");
+            this.besked('<span class="b-maerke">Til igen</span> ' + NK.html("Hydrogenbindingerne er slået til igen."), "peger");
         }
-        this.sidsteTrin = this.trinLinje();
+        this.visKnap();
     };
 
-    /* ----- Forfra: ny proeve ved 20 °C med hydrogenbindingerne slaaet til ----------- */
-    P.nulstil = function () {
-        this.P.hb = true;
-        this.P.nulstil(this.cfg.start);
-        this.termo.saet(this.cfg.start);
-        this.valgt = null;
-        this.vaelg(this.nr);
-    };
+    /* ----- Forfra: ny proeve ved 20 °C ----------------------------------------------- */
+    P.nulstil = function () { this.vaelg(this.nr); };
 
     /* ----- Scenen -------------------------------------------------------------------- */
+    P.placerKontakt = function () {
+        var sig = this.signatur, lay = this.lay;
+        this.kontakt.style.left = lay.kant + "px";
+        this.kontakt.style.top = Math.round(lay.top + (sig.offsetHeight || 150) + 10) + "px";
+        this.kontakt.style.width = Math.round(lay.vB) + "px";
+    };
+
     P.layout = function () {
         var W = this.L.b, H = this.L.h;
         var baand = this.baand();
-        var lay = { W: W, H: H, baand: baand };
+        var lay = { W: W, H: H, baand: baand, top: this.top() };
         var kant = NK.klamp(W * 0.016, 10, 18);
+        lay.kant = kant;
         lay.bordY = baand.y - NK.klamp(H * 0.035, 14, 26);
-        lay.termo = Tg.termoMaal(W - kant - 50, lay.bordY - 4, lay.bordY - 4 - 16, this.cfg.omr);
+        lay.termo = Tg.termoMaal(W - kant - 50, lay.bordY - 4, lay.bordY - 4 - lay.top - 4, this.cfg.omr);
 
-        /* Venstre kolonne: signaturen foroven, kammeret paa bordet */
-        var vB = NK.klamp(W * 0.24, 178, 250);
+        /* Venstre kolonne: forklaringen foroven, kontakten under den, kammeret paa bordet */
+        var vB = NK.klamp(W * 0.25, 196, 260);
+        lay.vB = vB;
         var sig = this.signatur;
         sig.style.left = kant + "px";
-        sig.style.top = "12px";
+        sig.style.top = lay.top + "px";
         sig.style.width = Math.round(vB) + "px";
-        var sigBund = 12 + (sig.offsetHeight || 120) + (this.kontakt.hidden ? 0 : (this.kontakt.offsetHeight || 44) + 8);
-        this.kontakt.style.left = kant + "px";
-        this.kontakt.style.top = Math.round(12 + (sig.offsetHeight || 120) + 8) + "px";
-        this.kontakt.style.width = Math.round(vB) + "px";
+        this.lay = lay;
+        this.placerKontakt();
+        /* Kammeret faar pladsen under kontakten, ogsaa naar kontakten er skjult,
+           saa intet flytter sig, naar den kommer frem */
+        var sigBund = lay.top + (sig.offsetHeight || 150) + 10 + (this.kontakt.offsetHeight || 46) + 8;
         var rum = lay.bordY - sigBund - 12;
         var sk = NK.klamp(Math.min(rum / 420, vB * 0.92 / 240), 0.22, 0.8);
         lay.kammer = Tg.kammerMaal(kant + vB / 2, lay.bordY, 300 * sk);
@@ -238,10 +264,9 @@
 
         /* Luppen i midten */
         var x0 = kant + vB + 26, x1 = lay.termo.x - 74;
-        var top = 36, bund = lay.bordY - 10;
+        var top = lay.top + 24, bund = lay.bordY - 10;
         var r = Math.max(60, Math.min((x1 - x0) / 2, (bund - top) / 2));
         lay.lup = { x: (x0 + x1) / 2, y: top + (bund - top) / 2, r: r };
-        this.lay = lay;
 
         this.saetAnker("lup", lay.lup.x - r, lay.lup.y - r, 2 * r, 2 * r);
         this.saetAnker("kammer", lay.kammer.x, G.top - 40 * sk, lay.kammer.b, lay.bordY - G.top + 40 * sk);
@@ -249,41 +274,13 @@
     };
 
     P.opdaterScene = function (dt) {
-        var P0 = this.P, g = this.opg;
+        var P0 = this.P;
         this.termo.opdater(dt);
         P0.opdater(dt, this.termo.T);
         if (this.valgtT > 0) { this.valgtT -= dt; if (this.valgtT <= 0) this.valgt = null; }
-
-        var gasMest = this.gasMest(), kp = P0.kp();
-        if (P0.hb && P0.T >= kp && gasMest) this.fundet.kp = true;
-        if (!P0.hb) {
-            if (P0.T >= kp && gasMest) this.udenSaa.over = true;
-            if (P0.T < kp && !gasMest) this.udenSaa.under = true;
-            if (this.udenSaa.over && this.udenSaa.under) this.fundet.uden = true;
-        }
-
-        if (g && !this.faerdig) {
-            if (g.o.id === "kog" && this.fundet.kp && P0.hb && gasMest) {
-                this.loest("selv", g.o.loest);
-            } else if (g.o.id === "uden" && g.fase === "find" && !P0.hb && this.udenSaa.over && this.udenSaa.under) {
-                this.loest("selv", g.o.loest);
-            }
-        }
-
-        /* Linjen foelger med, naar noget skifter (men et hint eller en fejl bliver staaende) */
-        if (!this.faerdig && !this.kortT && (this.fast.klasse === "" || this.fast.klasse === "peger")) {
-            var t = this.trinLinje();
-            if (t !== this.sidsteTrin) { this.sidsteTrin = t; if (this.fast.klasse === "") this.naesteLinje("", ""); }
-        }
-
-        NK.saetTekst("e-ant-hb", String(P0.hbListe.length));
-        NK.saetTekst("e-ant-lon", String(P0.lonListe.length));
-    };
-
-    P.naesteLinjeGammel = P.naesteLinje;
-    P.naesteLinje = function (foer, slags) {
-        this.sidsteTrin = this.faerdig ? "" : this.trinLinje();
-        this.naesteLinjeGammel(foer, slags);
+        /* Det valgte atom foelger sit molekyle; flyver det op i dampen, er valget vaek */
+        var g = this.opg;
+        if (g && g.atom && g.atom.m.gas) { g.atom = null; this.visKort(); }
     };
 
     P.efterOpgave = function () {
@@ -293,7 +290,7 @@
 
     /* ----- Tegning ------------------------------------------------------------------- */
     P.tegn = function () {
-        var ctx = this.L.ctx, lay = this.lay;
+        var ctx = this.L.ctx, lay = this.lay, g = this.opg;
         if (!lay) return;
         Tg.rum(ctx, lay.W, lay.baand.y, lay.bordY + 10);
         Tg.bord(ctx, 0, lay.kammer.x + lay.kammer.b + 16, lay.bordY, lay.baand.y);
@@ -302,27 +299,23 @@
         Tg.zoomTilLup(ctx, lay.zoomFra, lay.lup);
         Tg.lup(ctx, lay.lup, this.P, {
             valgt: this.valgt, donorKant: this.donorKant, tid: this.tid,
-            lysH: this.opg && this.opg.lysH && this.opg.o.id === "hvilket" ? this.opg.lysH : null
+            valgtAtom: g && g.atom ? g.atom : null,
+            lysH: g && g.lysH && g.o.id === "hvilket" ? g.lysH : null
         });
-        NK.tekst(ctx, "MOLEKYLERNE I GLASSET", lay.lup.x, lay.lup.y - lay.lup.r - 14, {
+        NK.tekst(ctx, "ETHANOLMOLEKYLERNE I GLASSET", lay.lup.x, lay.lup.y - lay.lup.r - 12, {
             font: Tg.font("700", 13), justering: "center", farve: "#9aa3ae"
         });
         var maerker = [];
         if (this.fundet.kp) maerker.push({ t: this.st.kp, tekst: "78 °C", farve: "#ffb74d" });
         if (this.fundet.uden) maerker.push({ t: D.STOF[this.st.uden].kp, tekst: "−42 °C", farve: "#b0bec5", stiplet: true });
-        var g = this.opg;
+        var brugTermo = g && !this.faerdig && !this.venter && g.fase === "opgave" &&
+            (g.o.id === "kog" || (g.o.id === "uden" && !this.P.hb));
         Tg.termometer(ctx, lay.termo, this.termo.T, {
             trin: 10, store: 20, maerker: maerker, stue: true, tid: this.tid,
             haandtag: this.haandtagLys, traekker: this.termo.traekker,
-            puls: !this.roertTermo && g && g.o.id === "kog"
+            puls: brugTermo && !this.roertTermo
         });
-        if (this.faerdig && this.sejrT < 0.9) {
-            ctx.save();
-            ctx.globalAlpha = 0.14 * (1 - this.sejrT / 0.9);
-            ctx.fillStyle = "#3fae72";
-            ctx.fillRect(0, 0, lay.W, lay.baand.y);
-            ctx.restore();
-        }
+        this.tegnSejr(ctx, lay.W, lay.baand.y);
     };
 
     /* ----- Musen ---------------------------------------------------------------------- */
@@ -357,20 +350,17 @@
 
     P.klikScene = function (pt) {
         if (this.termoKugle(pt)) return;
+        if (this.paaTermo(pt)) return;
         var hit = this.atomVed(pt);
         if (!hit) return;
         var a = this.P.F.atomer[hit.i], m = hit.m, g = this.opg;
         if (g.o.id === "hvilket" && !this.faerdig) {
-            this.valgt = m;
-            this.valgtT = 5;
-            if (a.donor) {
-                g.lysH = { m: m, h: hit.i };
-                this.loest("selv", g.o.loest + " " + NK.tilfaeldig(D.ROS));
-            } else if (a.e === "H") {
-                this.fejlLinje(g.o.klik.HC);
-            } else {
-                this.kortBesked(g.o.klik[a.e], 6);
-            }
+            /* Et klik vaelger atomet. Det bliver foerst bedoemt, naar eleven sender det ind. */
+            if (m.gas) { this.kortBesked("Det molekyle er i dampen. Klik på et H-atom i væsken.", 4); return; }
+            g.atom = { m: m, i: hit.i, e: a.e, donor: !!a.donor };
+            this.nulstilHjaelp();
+            this.naesteLinje("", "");
+            this.visKort();
             return;
         }
         this.valgt = m;
