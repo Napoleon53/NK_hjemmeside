@@ -27,6 +27,8 @@
             knapper[i].setAttribute("aria-selected", valgt ? "true" : "false");
         }
         aktivFane = id;
+        var kalder = document.querySelector('.faneknap[data-fane="' + id + '"]');
+        if (kalder) kalder.classList.remove("kald");
         if (NK.Rundvisning) NK.Rundvisning.luk();
         if (sims[id]) {
             sims[id].tilpas();
@@ -35,6 +37,14 @@
         }
     }
     NK.visFane = visFane;
+
+    /* Naeste fane pulserer i toplinjen, naar alle opgaver paa en fane er loest,
+       til eleven aabner den (brugeren 24. okt. 2026: eleverne skal ledes over
+       i fane 3 bagefter) */
+    NK.kaldFane = function (id) {
+        var k = document.querySelector('.faneknap[data-fane="' + id + '"]');
+        if (k && id !== aktivFane) k.classList.add("kald");
+    };
 
     /* ----- Overlays ---------------------------------------------------- */
     function lukAlle() {

@@ -1590,3 +1590,97 @@ kbd {
 @media (max-height: 720px) {
     .sk-bund .knap.indsend { min-width: 150px; }
 }
+
+
+/* =====================================================================
+   SB4.4, 24. okt. 2026: Rangér med seks niveauer, fem kort, konfetti og
+   sejrsskaermen (brugeren: "en vaerdig afslutning, naar man er faerdig")
+   ===================================================================== */
+
+/* Fem kort: lidt mindre skrift, saa navnene kan vaere der */
+.tavle.rangtavle.n5 .rt-pladser { gap: 10px; }
+.tavle.rangtavle.n5 .sk-navn { font-size: 0.9rem; }
+.tavle.rangtavle.n5 .sk-formel { font-size: 0.88rem; }
+.tavle.rangtavle.n5 .sk-m { font-size: 0.8rem; }
+.tavle.rangtavle.n5 .sk-kp { font-size: 0.92rem; padding: 2px 9px; }
+.sk-navn { hyphens: manual; overflow-wrap: break-word; }
+.tavle.rangtavle.n5 .stofkort { padding-left: 4px; padding-right: 4px; }
+
+/* Konfetti (fra sb1.4) */
+.konfetti { position: fixed; width: 0; height: 0; z-index: 60; pointer-events: none; }
+.konfetti.regn { width: 0; height: 0; }
+
+.konfetti i {
+    position: absolute;
+    left: -4px;
+    top: -6px;
+    width: 8px;
+    height: 12px;
+    border-radius: 2px;
+    opacity: 0;
+    animation: konfetti 2.1s linear forwards;
+}
+
+.konfetti.regn i { animation-duration: 2.8s; }
+
+@keyframes konfetti {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+    28%  { transform: translate(calc(var(--dx) * 0.75), var(--op)) rotate(calc(var(--rot) * 0.35)); opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6); }
+    80%  { opacity: 1; }
+    100% { transform: translate(var(--dx), var(--ned)) rotate(var(--rot)); opacity: 0; }
+}
+
+/* Sejrsskaermen over scenen */
+.sejr {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background-color: rgba(10, 11, 16, 0.72);
+    animation: sejr-ind 0.35s ease-out 1;
+}
+
+.sejr[hidden] { display: none; }
+
+.sejr-boks {
+    width: min(520px, 100%);
+    padding: 22px 26px 22px;
+    border: 3px solid var(--gul);
+    border-radius: 18px;
+    background: radial-gradient(circle at 50% 0%, #3a3220 0%, #23201a 55%, #1b1a17 100%);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), 0 0 0 8px rgba(242, 197, 61, 0.12);
+    text-align: center;
+    animation: sejr-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) 1;
+}
+
+.sejr.soelv .sejr-boks { border-color: #c9d1da; background: radial-gradient(circle at 50% 0%, #343a42 0%, #22252b 55%, #1b1c20 100%); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), 0 0 0 8px rgba(201, 209, 218, 0.12); }
+.sejr.bronze .sejr-boks { border-color: #cd7f32; background: radial-gradient(circle at 50% 0%, #3a2a1c 0%, #241d17 55%, #1b1815 100%); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), 0 0 0 8px rgba(205, 127, 50, 0.14); }
+
+.sejr-medalje { width: 112px; margin: 0 auto 4px; animation: medalje-sving 2.6s ease-in-out 0.6s infinite; transform-origin: 50% 0; }
+.sejr-medalje svg { display: block; width: 100%; height: auto; }
+
+.sejr-titel { margin: 4px 0 8px; font-size: 1.5rem; font-weight: 800; color: #ffffff; letter-spacing: 0.01em; }
+.sejr-tekst { margin: 0 0 10px; font-size: 1rem; line-height: 1.45; color: #e6ebf1; }
+.sejr-medaljetekst { margin: 0 0 4px; font-size: 1.05rem; color: #ffe9a6; }
+.sejr.soelv .sejr-medaljetekst { color: #e3e8ee; }
+.sejr.bronze .sejr-medaljetekst { color: #f3c79c; }
+.sejr-maal { margin: 0 0 14px; font-size: 0.92rem; color: var(--tekst-svag); }
+.sejr-knapper { display: flex; justify-content: center; gap: 10px; }
+.sejr-knapper .knap { justify-content: center; min-width: 120px; padding: 10px 18px; font-size: 0.98rem; font-weight: 700; }
+.sejr-knapper .knap.blaa { animation: bank 1.7s ease-out infinite; }
+
+@keyframes sejr-ind { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sejr-pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes medalje-sving { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+
+
+/* Naeste fane kalder, naar alle opgaver paa fanen er loest */
+@keyframes fane-kald {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+    50% { box-shadow: 0 0 0 5px rgba(242, 197, 61, 0.55); }
+}
+
+.faneknap.kald { border-color: var(--gul); color: #fff2cc; animation: fane-kald 1.4s ease-in-out infinite; }

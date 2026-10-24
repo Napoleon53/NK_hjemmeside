@@ -27,7 +27,7 @@
             { sel: "#s-anker-lupper", titel: "To stoffer", tekst: "Hvert stof har sin egen lup. Klik på et molekyle for at se dets bindinger." },
             { sel: "#s-anker-termometer", titel: "Termometeret", tekst: "Varmer begge glas på én gang. Et stof koger, når der kommer bobler i dets glas." },
             { sel: "#s-grafkort", titel: "Grafen", tekst: "Kogepunkterne mod molarmassen. Alkaner er grå, alkoholer er røde." },
-            { sel: "#s-opgaver", titel: "Parrene", tekst: "Fem par, der hver viser én ting: OH-gruppen, kæden, formen, to OH-grupper og et stort molekyle." }
+            { sel: "#s-opgaver", titel: "Parrene", tekst: "Tre par, der hver viser én ting: OH-gruppen, kæden og to OH-grupper. Bagefter venter Rangér." }
         ],
         "fane-r": [
             { sel: "#r-skort", titel: "Opgaven", tekst: "Sæt stofferne i rækkefølge, og tryk Indsend svar. Står et par forkert, forklares det her." },

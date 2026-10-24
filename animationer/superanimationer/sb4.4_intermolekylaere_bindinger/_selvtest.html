@@ -84,9 +84,9 @@ function koerTest(W) {
     alleId.forEach(function (id) {
         var st = D.STOF[id], F = NK.Mol.form(st.smiles), t = { C: 0, H: 0, O: 0 };
         F.atomer.forEach(function (a) { t[a.e]++; });
-        var nC = st.C, nO = st.OH;
+        var nC = st.C, nO = st.O;
         if (t.C !== nC || t.O !== nO || t.H !== 2 * nC + 2) molFejl.push(id + " " + JSON.stringify(t));
-        if (F.donorer.length !== st.OH || F.acceptorer.length !== st.OH) molFejl.push(id + " OH");
+        if (F.donorer.length !== st.OH || F.acceptorer.length !== st.O) molFejl.push(id + " OH");
         if (F.bindinger.length !== F.atomer.length - 1) molFejl.push(id + " bindinger");
         /* Ingen atomer oven i hinanden */
         for (var i = 0; i < F.atomer.length; i++) for (var j = i + 1; j < F.atomer.length; j++) {
@@ -96,8 +96,8 @@ function koerTest(W) {
         var M = 12.011 * t.C + 1.008 * t.H + 15.999 * t.O;
         if (Math.abs(M - st.M) > 0.05) molFejl.push(id + " M " + M.toFixed(2));
     });
-    paastand("alle 16 stoffer har de rigtige atomer, OH-grupper og molarmasse", molFejl.length === 0, molFejl.slice(0, 4).join(", "));
-    paastand("16 stoffer", alleId.length === 16);
+    paastand("alle stoffer har de rigtige atomer, OH-grupper og molarmasse (en ether har O uden H)", molFejl.length === 0, molFejl.slice(0, 4).join(", "));
+    paastand("33 stoffer", alleId.length === 33, alleId.length);
 
     /* ------------------------------------------------------------------ */
     overskrift("2. Kogepunkterne og tommelfingerreglerne");
@@ -117,6 +117,16 @@ function koerTest(W) {
     paastand("forskellen bliver mindre med kæden: ethanol/propan 120, pentan-1-ol/hexan 69",
         s.ethanol.kp - s.propan.kp === 120 && s.pentan1ol.kp - s.hexan.kp === 69);
     paastand("de forgrenede koger lavere end de lige", s.mpropan.kp < s.butan.kp && s.propan2ol.kp < s.propan1ol.kp && s.mpropan2ol.kp < s.butan1ol.kp);
+    var isoFejl = [];
+    alleId.forEach(function (a) {
+        alleId.forEach(function (b) {
+            var A = s[a], B = s[b];
+            if (A.C === B.C && A.OH === B.OH && A.O === B.O && !A.eter && !B.eter && A.gren > B.gren && A.kp >= B.kp) isoFejl.push(a + "/" + b);
+        });
+    });
+    paastand("isomerer: jo mere forgrenet, jo lavere kogepunkt (som gren siger)", isoFejl.length === 0, isoFejl.join(", "));
+    paastand("en ether koger langt lavere end alkoholen med de samme atomer", s.dimethylether.kp < s.ethanol.kp - 50 &&
+        s.diethylether.kp < s.butan1ol.kp - 50 && s.dipropylether.kp < s.hexan1ol.kp - 50);
     paastand("flere OH-grupper: ethanol < ethan-1,2-diol, propan-1-ol < propan-1,2,3-triol", s.ethanol.kp < s.ethandiol.kp && s.propan1ol.kp < s.glycerol.kp);
     paastand("butan står med én decimal: −0,5 °C", D.kpTekst(s.butan) === "−0,5 °C" && D.kpTekst(s.ethanol) === "78 °C");
 
@@ -331,11 +341,44 @@ function koerTest(W) {
         if (p.svar.filter(function (sv) { return sv.ok; }).length !== 1) parFejl.push(p.id + " antal rigtige");
         if (s[p.b].kp <= s[p.a].kp) parFejl.push(p.id + " b skal koge højest");
     });
-    paastand("alle fem par: låst under gættet, termometeret løser intet, for højt og for lavt er rødt, rigtigt sendt ind går videre, forkert svar er rødt", parFejl.length === 0, parFejl.slice(0, 4).join(", "));
-    paastand("et kogepunkt, der er fundet i et andet par, skal ikke findes igen (ethanol i par 2 og 4)", parFejl.join().indexOf("måles igen") < 0);
+    paastand("alle tre par: låst under gættet, termometeret løser intet, for højt og for lavt er rødt, rigtigt sendt ind går videre, forkert svar er rødt", parFejl.length === 0, parFejl.slice(0, 4).join(", "));
+    paastand("et kogepunkt, der er fundet i et andet par, skal ikke findes igen (ethanol i par 2 og 3)", parFejl.join().indexOf("måles igen") < 0);
+    var parStoffer = {};
+    D.PAR.forEach(function (p) { parStoffer[p.a] = 1; parStoffer[p.b] = 1; });
     var maalte = Object.keys(S.maalt).length;
-    paastand("alle otte stoffer fra parrene er kommet på grafen", maalte === 8, maalte);
-    paastand("knappen Vis hele tabellen kommer frem, når alle fem er løst", !S.tabelKnap.hidden);
+    paastand("tre par, og alle stofferne fra parrene er kommet på grafen", D.PAR.length === 3 && maalte === Object.keys(parStoffer).length, maalte);
+    paastand("knappen Vis hele tabellen kommer frem, når alle tre er løst", !S.tabelKnap.hidden);
+    var kald = d.querySelector('.faneknap[data-fane="fane-r"]');
+    paastand("når alle tre par er løst, siger kortet Rangér, knappen fører dertil, og fanen Rangér pulserer",
+        /Rangér/.test(S.kortTekst()) && kald.classList.contains("kald") && /Videre til Rangér/.test(d.querySelector("#s-ind .sk-videre").textContent));
+    S.knap();
+    paastand("knappen åbner Rangér, og fanen holder op med at pulsere", d.getElementById("fane-r").classList.contains("aktiv") && !kald.classList.contains("kald"));
+    NK.visFane("fane-s");
+    /* Grafen: navnene rammer aldrig hinanden eller et punkt, i alle dele af alle par */
+    var grafFejl = [];
+    function overlap(a, b) { return a.x < b.x + b.b && b.x < a.x + a.b && a.y < b.y + b.h && b.y < a.y + a.h; }
+    D.PAR.forEach(function (p, i) {
+        S.vaelg(i);
+        [0, 1, 2, 3].forEach(function (trin) {
+            if (trin === 1) S.valgKlik(0);
+            if (trin >= 2 && S.opg.fase === "maal") S.visSvar();
+            S.grafNoegle = ""; S.tegnGraf();
+            var et = S.grafEtiketter || [], bo = S.grafBokse || [];
+            et.forEach(function (e) {
+                bo.forEach(function (q) { if (q !== e.r && overlap(e.r, q)) grafFejl.push(p.id + " " + e.id + " rammer " + (q.punkt || "noget")); });
+            });
+            bo.forEach(function (q) {
+                if (q.punkt) return;
+                if (q.x < 0 || q.x + q.b > S.grafL.b + 0.5 || q.y < 0 || q.y + q.h > S.grafL.h + 0.5) grafFejl.push(p.id + " noget er uden for grafen");
+            });
+        });
+        S.visSvar(); S.knap();
+        S.grafNoegle = ""; S.tegnGraf();
+        (S.grafEtiketter || []).forEach(function (e) {
+            (S.grafBokse || []).forEach(function (q) { if (q !== e.r && overlap(e.r, q)) grafFejl.push(p.id + " spm " + e.id); });
+        });
+    });
+    paastand("grafen: navnene rammer aldrig hinanden, et punkt eller trappen", grafFejl.length === 0, grafFejl.slice(0, 3).join(", "));
     var rigtigePlads = D.PAR.map(function (p) { var r = -1; p.svar.forEach(function (sv, j) { if (sv.ok) r = j; }); return r; });
     paastand("det rigtige svar står ikke altid samme sted", rigtigePlads.some(function (x) { return x !== rigtigePlads[0]; }), rigtigePlads.join(""));
     S.maalt = {};
@@ -347,24 +390,34 @@ function koerTest(W) {
     /* ------------------------------------------------------------------ */
     overskrift("6. Fane 3: Rangér");
     NK.visFane("fane-r");
-    var fFejl = [], lige = [];
+    var fFejl = [], lige = [], brugtR = {};
     D.RANGER.forEach(function (o) {
         var st = o.stoffer;
+        st.forEach(function (x) { brugtR[x] = 1; });
         for (var i = 0; i < st.length; i++) for (var j = 0; j < st.length; j++) {
             if (i === j) continue;
             var a = s[st[i]], b = s[st[j]];
-            if (a.kp === b.kp) lige.push(o.id);
-            if (a.kp < b.kp && !D.forklar(a, b)) fFejl.push(o.id + ": " + a.navn + "/" + b.navn);
+            if (Math.abs(a.kp - b.kp) < 5) lige.push(o.id);
+            if (a.kp < b.kp && (!D.grund(a, b) || !D.HINT1[D.grund(a, b).slags])) fFejl.push(o.id + ": " + a.navn + "/" + b.navn);
         }
     });
-    paastand("ingen opgave har to stoffer med samme kogepunkt", lige.length === 0, lige.join(", "));
-    paastand("hvert par i hver opgave har en forklaring", fFejl.length === 0, fFejl.slice(0, 4).join(", "));
-    paastand("12 opgaver, 4 i hver gruppe", D.RANGER.length === 12 && ["let", "middel", "svaer"].every(function (g) {
-        return D.RANGER.filter(function (o) { return o.gruppe === g; }).length === 4;
-    }));
-    var rFejl = [];
+    paastand("to stoffer i samme opgave koger mindst 5 °C fra hinanden", lige.length === 0, lige.join(", "));
+    paastand("hvert par i hver opgave har en forklaring og et hint", fFejl.length === 0, fFejl.slice(0, 4).join(", "));
+    paastand("30 opgaver, 5 i hver af de seks niveauer, og alle 33 stoffer er med",
+        D.RANGER.length === 30 && D.RANGER_GRUPPER.length === 6 && D.RANGER_GRUPPER.every(function (g) {
+            return D.RANGER.filter(function (o) { return o.gruppe === g.id; }).length === 5;
+        }) && Object.keys(brugtR).length === 33);
+    paastand("en ether sammenlignes aldrig med en alkan (dér skulle dipol-dipol-bindinger med)",
+        D.grund("diethylether", "pentan") === null && D.grund("butan", "diethylether") === null);
+    paastand("Mester har opgaver, hvor en meget lang kæde slår én OH-gruppe",
+        D.RANGER.some(function (o) { return o.gruppe === "mester" && o.stoffer.some(function (a) { return o.stoffer.some(function (b) {
+            return s[a].kp < s[b].kp && D.grund(a, b).slags === "lang"; }); }); }));
+    var rFejl = [], nivFejl = [];
+    R.lukSejr();
     R.opgaver.forEach(function (o, i) {
         R.vaelg(i);
+        if (!R.sejr.hidden) rFejl.push(o.id + " sejren står fremme");
+        if (!/Sæt stofferne/.test(R.kortTekst()) || R.kortTekst().indexOf(R.gruppe[o.gruppe].fokus) < 0) rFejl.push(o.id + " kortet mangler opgaven eller niveauets linje");
         if (R.opg.orden.join() === R.opg.rigtig.join()) rFejl.push(o.id + " starter rigtigt");
         if (R.kortEl.length !== o.stoffer.length) rFejl.push(o.id + " kort");
         if (!/Sæt stofferne/.test(R.kortTekst())) rFejl.push(o.id + " opgaven står ikke på kortet");
@@ -384,8 +437,24 @@ function koerTest(W) {
         if (!R.faerdig) rFejl.push(o.id + " ikke løst");
         if (R.status[i].stjerne) rFejl.push(o.id + " stjerne trods fejl");
         if (d.querySelectorAll("#r-pladser .sk-kp").length !== o.stoffer.length) rFejl.push(o.id + " kogepunkter ikke vist");
+        /* Den sidste i et niveau: niveauet er klaret, og knappen går til næste niveau */
+        var sidst = i + 1 === R.opgaver.length || R.opgaver[i + 1].gruppe !== o.gruppe;
+        if (sidst && !/Niveauet .* er klaret/.test(R.kortTekst())) nivFejl.push(o.id + " ingen besked om niveauet");
+        if (!sidst && /Niveauet/.test(R.kortTekst())) nivFejl.push(o.id + " niveau klaret for tidligt");
+        if (sidst && i + 1 < R.opgaver.length && !/Næste niveau/.test(R.kortTekst())) nivFejl.push(o.id + " knappen går ikke til næste niveau");
+        if (i + 1 < R.opgaver.length && !R.sejr.hidden) nivFejl.push(o.id + " sejren kom for tidligt");
     });
-    paastand("alle 12: et forkert svar er rødt med to røde kort og uden kogepunkter; først Indsend svar løser opgaven", rFejl.length === 0, rFejl.slice(0, 4).join(", "));
+    paastand("alle 30: et forkert svar er rødt med to røde kort og uden kogepunkter; først Indsend svar løser opgaven", rFejl.length === 0, rFejl.slice(0, 4).join(", "));
+    paastand("når et niveau er klaret, står det på det grønne kort, og knappen går til næste niveau", nivFejl.length === 0, nivFejl.slice(0, 4).join(", "));
+    paastand("når alle 30 er klaret, kommer sejrsskærmen med en medalje (bronze uden stjerner) og knappen Gå efter guld",
+        !R.sejr.hidden && /bronze/.test(R.sejr.className) && /30/.test(R.sejr.textContent) && !NK.el("r-sejr-igen").hidden && /medalje/.test(R.kortTekst()));
+    NK.el("r-sejr-igen").click();
+    paastand("Gå efter guld lukker sejren og åbner den første opgave uden stjerne", R.sejr.hidden && R.nr === 0);
+    R.status.forEach(function (st) { st.stjerne = true; });
+    R.visSejr();
+    paastand("med alle 30 stjerner er medaljen guld, og Gå efter guld er væk", /guld/.test(R.sejr.className) && NK.el("r-sejr-igen").hidden);
+    R.lukSejr();
+    R.status.forEach(function (st) { st.stjerne = false; });
     R.status[0].stjerne = false;
     R.vaelg(0);
     R.opg.orden = R.opg.rigtig.slice(); R.bygKort();
@@ -402,7 +471,8 @@ function koerTest(W) {
         if (typeof x === "string") tekster.push(x);
         else if (Array.isArray(x)) x.forEach(saml);
         else if (x && typeof x === "object") Object.keys(x).forEach(function (k) { saml(x[k]); });
-    }({ E: D.E_MAAL, P: D.PAR, F: D.FAERDIG, R: D.ROS, PA: D.PAASKE, FO: D.FORM }));
+    }({ E: D.E_MAAL, P: D.PAR, F: D.FAERDIG, R: D.ROS, PA: D.PAASKE, FO: D.FORM, H1: D.HINT1, G: D.RANGER_GRUPPER,
+        M: [D.MEDALJE(30, 30), D.MEDALJE(22, 30), D.MEDALJE(3, 30)] }));
     D.RANGER.forEach(function (o) {
         o.stoffer.forEach(function (a) { o.stoffer.forEach(function (b) { if (s[a].kp < s[b].kp) tekster.push(D.forklar(a, b)); }); });
     });
@@ -492,7 +562,7 @@ function koerTest(W) {
 
         NK.visFane("fane-s");
         S.maalt = {};
-        S.vaelg(4);
+        S.vaelg(D.PAR.length - 1);
         S.tilpas(); S.layout();
         var a = S.lay.kol.a, b = S.lay.kol.b, topS = S.top();
         if (a.lup.x + a.lup.r > b.lup.x - b.lup.r) lFejl.push(n + " lupperne rører hinanden");
@@ -512,7 +582,7 @@ function koerTest(W) {
         });
 
         NK.visFane("fane-r");
-        [0, 4, 11].forEach(function (i) {
+        [0, 5, 9, 15, 23, 25, 26, 27, 28, 29].forEach(function (i) {
             R.vaelg(i);
             R.tilpas(); R.layout();
             var t = d.getElementById("r-tavle").getBoundingClientRect();
@@ -521,6 +591,9 @@ function koerTest(W) {
             if (R.lay.akseY + 30 > R.lay.baand.y) lFejl.push(n + " aksen er ude af scenen");
             d.querySelectorAll("#r-pladser .stofkort").forEach(function (kort) {
                 if (kort.scrollHeight > kort.clientHeight + 2) lFejl.push(n + " kortet er for lavt " + R.opgaver[i].id);
+                kort.querySelectorAll(".sk-navn, .sk-formel").forEach(function (e) {
+                    if (e.scrollWidth > e.clientWidth + 1) lFejl.push(n + " navnet er for bredt " + R.opgaver[i].id + " " + e.textContent);
+                });
             });
             var fl = [];
             R.opg.o.stoffer.forEach(function (x) { R.opg.o.stoffer.forEach(function (y) { if (s[x].kp < s[y].kp) fl.push(D.forklar(x, y)); }); });

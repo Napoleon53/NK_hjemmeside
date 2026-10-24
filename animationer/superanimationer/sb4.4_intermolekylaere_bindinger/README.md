@@ -74,7 +74,10 @@ Kemichael.
 4. **Loftet:** tre faner og 16 stoffer (methan til hexan, 2-methylpropan,
    methanol til pentan-1-ol, propan-2-ol, 2-methylpropan-2-ol,
    ethan-1,2-diol og propan-1,2,3-triol). 22 molekyler i luppen på fane 1, 6
-   til 12 i hver lup på fane 2.
+   til 12 i hver lup på fane 2. Hævet 24. oktober 2026 til 33 stoffer på
+   brugerens ønske (fane 3): også heptan, octan, decan, forgrenede alkaner og
+   alkoholer, hexan-1-ol, octan-1-ol, propan-1,2-diol, propan-1,3-diol og tre
+   ethere.
 5. **Layoutet:** scene plus panel. Luppen er stjernen på fane 1 og 2;
    kammeret med glasset er lille. Fane 3 er en tavle med kort.
 
@@ -112,33 +115,69 @@ sin lup, ét termometer (−100 til 220 °C). Eleven gætter på kortet, hvilket
 der koger ved den højeste temperatur, finder så kogepunktet for hvert stof og
 sender det ind (et kogepunkt, der er fundet i et andet par, skal ikke findes
 igen), ser dem side om side på et grønt kort med dommen over gættet og svarer
-til sidst på hvorfor. Fem par:
+til sidst på hvorfor. Tre par (brugeren 24. oktober 2026: "lav kun 3 opgaver
+i fane 2, og sørg for at eleverne ledes over i fane 3 bagefter"):
 
 | Par | Pointe |
 |-----|--------|
 | propan og ethanol | samme størrelse; OH-gruppen løfter kogepunktet 120 °C |
 | ethanol og butan-1-ol | samme OH; den lange kæde giver flere London-kræfter |
-| propan-2-ol og propan-1-ol | samme atomer; den kugleformede rører naboerne mindst |
-| ethanol og ethan-1,2-diol | to OH-grupper giver dobbelt så mange hydrogenbindinger |
-| hexan og pentan-1-ol | samme størrelse som par 1, men større; forskellen er kun 69 °C |
+| ethanol og ethan-1,2-diol | to OH-grupper giver flere hydrogenbindinger |
+
+Formen og de store molekyler (propan-1-ol/propan-2-ol og hexan/pentan-1-ol)
+er taget ud her; de øves i Rangér. Når alle tre par er løst, siger det
+grønne kort, at Rangér venter, knappen hedder Videre til Rangér, og fanen
+Rangér pulserer gult i toplinjen, til eleven åbner den (`NK.kaldFane` i
+`js/app.js`; det samme sker fra Ethanol til Sammenlign).
 
 Kogepunkterne kommer på grafen i panelet (kogepunkt mod molarmasse, alkaner
-grå, alkoholer røde), og forskellen mellem propan og ethanol og mellem hexan og
-pentan-1-ol står som en gul streg. Når alle fem er løst, kan hele tabellen fra
-brugerens opgave vises.
+grå, alkoholer røde). Brugeren samme dag: "Gør grafen lidt mindre
+forvirrende" (navnene lå oven i hinanden). Navnene placeres nu, så de aldrig
+rammer hinanden, et punkt eller trappen (`grafBokse`, som selvtesten tjekker);
+det aktuelle par har navnene i samme blå og orange som over lupperne, og
+forskellen vises kun for det aktuelle par, når begge kogepunkter er fundet:
+en stiplet trappe fra det laveste punkt op til det højeste med teksten
+"120 °C højere". Når alle tre er løst, kan hele tabellen vises.
 
 ## Fane 3: Rangér
 
-Tre eller fire stoffer som kort på en tavle i tilfældig rækkefølge, alle tegnet
-i samme målestok. Eleven trækker dem fra det laveste kogepunkt til venstre til
-det højeste til højre (eller klikker på to kort) og trykker Indsend svar på
-kortet øverst. Er det forkert, bliver de to første kort, der står forkert,
-røde, og kortet forklarer dem ud fra OH-grupperne, kæden eller formen
-(`D.forklar`, der selv nævner begge stoffer). Kogepunkterne vises først, når
-rækkefølgen er rigtig, og kommer så på en akse under tavlen. 12 opgaver i Let
-(OH eller ej), Middel (kæden og OH) og Svær (formen og flere OH). En opgave,
-der er løst i første forsøg uden Vis svaret, får en stjerne, og stjernerne
-huskes i browseren.
+Tre til fem stoffer som kort på en tavle i tilfældig rækkefølge, alle tegnet i
+samme målestok med molekylformlen (C₅H₁₂), så det ses, at isomerer har de samme
+atomer. Eleven trækker dem fra det laveste kogepunkt til venstre til det højeste
+til højre (eller klikker på to kort) og trykker Indsend svar på kortet øverst.
+Er det forkert, bliver de to første kort, der står forkert, røde, og kortet
+forklarer dem (`D.grund`, der selv nævner begge stoffer). Kogepunkterne vises
+først, når rækkefølgen er rigtig, og kommer så på en akse under tavlen.
+
+Udvidet 24. oktober 2026 (brugeren: "Opgaven med sæt i rækkefølge er vildt god!
+Kan du ikke inddrage langt flere forskellige molekyler og niveauer, og måske
+give en værdig afslutning, når man er færdig"): 30 opgaver i seks niveauer med
+fem i hver. Kortet viser niveauets navn og én linje om, hvad niveauet handler
+om (`D.RANGER_GRUPPER`).
+
+| Niveau | Kort | Pointe |
+|--------|------|--------|
+| 1. Let: OH eller ej | 3 | én alkohol mellem alkaner af samme størrelse |
+| 2. Kæden | 3 til 4 | samme slags, forskellig kæde, op til decan og octan-1-ol |
+| 3. Kæden og OH | 4 | begge dele |
+| 4. Formen | 3 til 4 | isomerer: jo mere forgrenet, jo lavere (`gren` 0, 1 eller 2) |
+| 5. Flere OH og ethere | 3 til 4 | dioler og glycerol; en ether har O uden H og samme atomer som en alkohol |
+| 6. Mester | 5 | det hele, og en meget lang alkan kan koge over en lille alkohol |
+
+Hint 1 følger det første forkerte par (`D.HINT1`: OH, ether, kæde, form eller
+lang kæde), hint 2 forklarer parret, og hint 3 siger, hvad der skal flyttes.
+En opgave, der er løst i første forsøg uden Vis svaret, får en stjerne, og
+stjernerne huskes i browseren. Når et niveau er klaret, siger det grønne kort
+det, der er konfetti, og knappen går til næste niveau. Når alle 30 er klaret,
+kommer sejrsskærmen "Mester i kogepunkter!" med regn af konfetti og en
+medalje efter stjernerne (`D.MEDALJE`): guld med alle 30, sølv med mindst 20,
+ellers bronze, og knappen Gå efter guld åbner den første opgave uden stjerne.
+Sejren kommer igen, når den sidste stjerne er hentet.
+
+Etherne sammenlignes kun med alkoholer, aldrig med alkaner: dér skulle
+dipol-dipol-bindinger med, og dem ejer `sc3.3`. Selvtesten tjekker, at hvert
+par i en opgave har en forklaring, og at to stoffer i samme opgave koger
+mindst 5 °C fra hinanden.
 
 ## Hjælpen
 
@@ -167,9 +206,11 @@ Påskeægget: et klik på termometerets kugle. Det er et sprittermometer, og ove
   overfladen, hvor de i virkeligheden er størst.
 * **Uden hydrogenbindinger koger en alkohol som alkanen med samme form**, hvor
   OH er byttet ud med CH₃ (ethanol som propan, −42 °C). Ethanols dipol er ikke
-  regnet med; dimethylether, der har den, koger ved −24 °C.
+  regnet med; dimethylether, der har den, koger ved −25 °C.
 * **Molekylerne er flade**, og H-atomerne på et CH₂ ligger ved siden af
-  hinanden i stedet for foran og bagved.
+  hinanden i stedet for foran og bagved. H-atomer, der på den flade tegning
+  ville ligge oven i hinanden (ved et forgrenet C), er skubbet lidt fra
+  hinanden.
 * **Kogepunkterne** er tabelværdier ved 1 atm, afrundet til hele grader, som i
   brugerens opgave (CRC og NIST). Butan er −0,5 °C. Ballonen holder trykket
   på 1 atm.
@@ -217,14 +258,15 @@ rundvisning · <kbd>T</kbd> teori · <kbd>Enter</kbd> indsend eller næste ·
 Den tjekker molekylernes atomer og molarmasser, kogepunkterne og
 tommelfingerreglerne, at hvert brugt stof koger ved kogepunktet og fortætter
 under det, at alkoholerne danner hydrogenbindinger og alkanerne ingen, at
-ethanol uden hydrogenbindinger koger ved −42 °C, alle fire opgaver, alle fem
-par og alle 12 rangeringer (selv, med forkerte svar og med Vis svaret), at
+ethanol uden hydrogenbindinger koger ved −42 °C, alle fire opgaver, alle tre
+par (og at grafens navne ikke rammer noget) og alle 30 rangeringer (selv, med forkerte svar og med Vis svaret, niveauerne
+og sejren med medaljen), at
 termometeret alene aldrig løser en opgave, at intet bedømmes før Indsend svar,
 at termometeret er låst under et gæt, at stjernen kræver første forsøg, at
 hvert par i en rangering har en forklaring, sproget (også intet indforstået og
 korte tekster) og layoutet fra 1100 × 700 til 1600 × 950, herunder at kortet
 med det længste hint og den længste forklaring kan være på sin plads. Sidst
-kørt 24. oktober 2026: ALT OK (74 påstande).
+kørt 24. oktober 2026: ALT OK (85 påstande).
 
 ## Til menuen (først når brugeren siger til)
 

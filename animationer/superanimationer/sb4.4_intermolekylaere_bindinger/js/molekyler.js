@@ -126,6 +126,35 @@
             });
         });
 
+        /* To H-atomer, der rammer hinanden (fx ved et C med fire C-naboer i
+           2,2-dimethylbutan), glider lidt fra hinanden rundt om deres eget
+           atom. Molekyler uden saadanne H-atomer aendres ikke. */
+        var GRAENSE = 0.68;
+        for (var runde = 0; runde < 60; runde++) {
+            var flyttet = false;
+            for (var p = 0; p < atomer.length; p++) {
+                var A = atomer[p];
+                if (A.e !== "H") continue;
+                for (var q = p + 1; q < atomer.length; q++) {
+                    var B = atomer[q];
+                    if (B.e !== "H") continue;
+                    var dx = B.x - A.x, dy = B.y - A.y, dd = Math.hypot(dx, dy);
+                    if (dd >= GRAENSE || dd < 1e-6) continue;
+                    var k = (GRAENSE - dd) * 0.3 / dd;
+                    A.x -= dx * k; A.y -= dy * k; B.x += dx * k; B.y += dy * k;
+                    flyttet = true;
+                }
+            }
+            if (!flyttet) break;
+            /* Tilbage paa bindingens laengde */
+            atomer.forEach(function (h) {
+                if (h.e !== "H") return;
+                var P0 = pos[h.paa], lh = BINDING[sk[h.paa].e + "H"];
+                var ux = h.x - P0.x, uy = h.y - P0.y, nn = Math.hypot(ux, uy) || 1;
+                h.x = P0.x + ux / nn * lh; h.y = P0.y + uy / nn * lh;
+            });
+        }
+
         /* Egenskaberne og tyngdepunktet */
         var mx = 0, my = 0, M = 0;
         atomer.forEach(function (a) {

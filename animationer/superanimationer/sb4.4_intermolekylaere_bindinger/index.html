@@ -114,7 +114,7 @@
         </div>
 
         <div class="kort" id="s-opgaver">
-            <h2>Parrene <span class="taeller">løst <b id="s-loest">0</b>/5</span></h2>
+            <h2>Parrene <span class="taeller">løst <b id="s-loest">0</b>/3</span></h2>
             <div class="opg-liste" id="s-liste"></div>
             <p class="liste-note">★ = løst i første forsøg uden at se svaret</p>
         </div>
@@ -143,11 +143,26 @@
             <div class="rt-pladser" id="r-pladser"></div>
         </div>
         <div class="anker" id="r-anker-akse"></div>
+
+        <!-- Sejren: alle 30 er sat i rigtig raekkefoelge. Medaljen efter stjernerne. -->
+        <div class="sejr" id="r-sejr" hidden>
+            <div class="sejr-boks" role="dialog" aria-labelledby="r-sejr-titel">
+                <div class="sejr-medalje" id="r-medalje"></div>
+                <h2 class="sejr-titel" id="r-sejr-titel">Mester i kogepunkter!</h2>
+                <p class="sejr-tekst" id="r-sejr-tekst"></p>
+                <p class="sejr-medaljetekst" id="r-sejr-medalje"></p>
+                <p class="sejr-maal" id="r-sejr-maal"></p>
+                <div class="sejr-knapper">
+                    <button class="knap blaa" id="r-sejr-igen" type="button">Gå efter guld →</button>
+                    <button class="knap" id="r-sejr-luk" type="button">Luk</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
         <div class="kort" id="r-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="r-loest">0</b>/12 · ★ <b id="r-stjerner">0</b></span></h2>
+            <h2>Opgaverne <span class="taeller">løst <b id="r-loest">0</b>/30 · ★ <b id="r-stjerner">0</b></span></h2>
             <div class="opg-liste" id="r-liste"></div>
             <p class="liste-note">★ = løst i første forsøg uden at se svaret</p>
         </div>
@@ -179,6 +194,7 @@
             <li>En længere kæde giver et højere kogepunkt.</li>
             <li>Et forgrenet, mere kugleformet molekyle har et lavere kogepunkt.</li>
             <li>I små molekyler betyder OH-gruppen mest. I store molekyler betyder kæden mest.</li>
+            <li>En ether har O mellem to C-atomer og intet H på O. Den danner ingen hydrogenbindinger til sine egne molekyler.</li>
         </ol>
         <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>↑</kbd> <kbd>↓</kbd> temperaturen (med Skift ti grader) &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">

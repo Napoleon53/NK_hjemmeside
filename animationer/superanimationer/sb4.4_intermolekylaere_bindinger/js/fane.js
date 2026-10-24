@@ -212,6 +212,8 @@
 
         P.videreTekst = function () {
             if (!this.faerdig) return (this.mellem && this.mellem.knap) || "Næste →";
+            var egen = this.videreFane && this.videreFane();
+            if (egen) return egen;
             if (this.naesteUloeste() >= 0) return "Næste opgave →";
             return valg.naesteFane ? "Videre til " + valg.naesteNavn + " →" : "Start forfra ↺";
         };
@@ -431,6 +433,7 @@
         /* ----- Hjaelpeknappen (og den groenne knap paa kortet) ---------------------------- */
         P.knap = function () {
             if (this.faerdig) {
+                if (this.videreKlik && this.videreKlik()) return;
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) this.vaelg(naeste);
                 else if (valg.naesteFane && NK.visFane) NK.visFane(valg.naesteFane);
@@ -481,10 +484,12 @@
             this.gem();
             this.sejrT = 0;
             var alle = this.antalLoest() === this.opgaver.length;
-            this.slut = { maade: maade, svaret: svaret || "", tekst: (tekst || "") + (alle && foerste ? " " + D.FAERDIG[navn] : "") };
+            this.slut = { maade: maade, svaret: svaret || "", tekst: (tekst || "") + (alle && foerste && D.FAERDIG[navn] ? " " + D.FAERDIG[navn] : "") };
             this.besked("", "");
             this.visKort();
             this.visListe();
+            /* Alle opgaver paa fanen er loest: naeste fane kalder i toplinjen */
+            if (alle && valg.naesteFane && NK.kaldFane) NK.kaldFane(valg.naesteFane);
             if (this.efterOpgave) this.efterOpgave();
         };
 
@@ -711,6 +716,56 @@
             return "Indsend svar: " + D.grader(this.Tnu()) + " °C";
         };
     }
+
+    /* ----- Konfetti (som sb1.4) -------------------------------------------------
+       NK.konfetti(el, antal): et pust ud fra elementets top, naar et niveau er
+       klaret. NK.konfettiRegn(el, antal): regn over hele elementet til sejren. */
+    var KONFETTI = ["#f2c53d", "#3d9ee0", "#e05446", "#3fae72", "#9b6bd6", "#ffffff"];
+
+    function konfettiBoks(x, y) {
+        var boks = document.createElement("div");
+        boks.className = "konfetti";
+        boks.setAttribute("aria-hidden", "true");
+        boks.style.left = x + "px";
+        boks.style.top = y + "px";
+        document.body.appendChild(boks);
+        window.setTimeout(function () { if (boks.parentNode) boks.parentNode.removeChild(boks); }, 4200);
+        return boks;
+    }
+
+    function stykke(boks, i, dx, op, ned, forsink) {
+        var b = document.createElement("i");
+        b.style.backgroundColor = KONFETTI[i % KONFETTI.length];
+        b.style.setProperty("--dx", dx.toFixed(0) + "px");
+        b.style.setProperty("--op", op.toFixed(0) + "px");
+        b.style.setProperty("--ned", ned.toFixed(0) + "px");
+        b.style.setProperty("--rot", NK.r(-720, 720).toFixed(0) + "deg");
+        b.style.animationDelay = forsink.toFixed(2) + "s";
+        if (i % 3 === 0) b.style.borderRadius = "50%";
+        boks.appendChild(b);
+    }
+
+    NK.konfetti = function (el, antal) {
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        var boks = konfettiBoks(r.left + r.width / 2, r.top + 18);
+        for (var i = 0; i < (antal || 46); i++) {
+            var v = NK.r(-Math.PI * 0.95, -Math.PI * 0.05), fart = NK.r(80, 240);
+            stykke(boks, i, Math.cos(v) * fart * 1.6, Math.sin(v) * fart, NK.r(180, 380), NK.r(0, 0.18));
+        }
+    };
+
+    NK.konfettiRegn = function (el, antal) {
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        var boks = konfettiBoks(r.left, r.top);
+        boks.classList.add("regn");
+        for (var i = 0; i < (antal || 120); i++) {
+            var x = NK.r(0, r.width);
+            stykke(boks, i, NK.r(-60, 60), NK.r(-40, 10), NK.r(r.height * 0.6, r.height + 40), NK.r(0, 1.2));
+            boks.lastChild.style.left = x + "px";
+        }
+    };
 
     NK.Fane = { paa: paa };
 }());

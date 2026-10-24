@@ -17,25 +17,64 @@
     var D = {};
 
     /* ----- Stofferne ------------------------------------------------------ */
+    /* gren: 0 er en lige kaede, 1 en forgrening (eller OH inde paa kaeden),
+       2 to forgreninger paa samme C. eter: O sidder mellem to C-atomer og
+       har intet H. Etherne sammenlignes kun med alkoholer, ikke med
+       alkaner (dér skulle dipol-dipol-bindinger med, og dem ejer sc3.3). */
     D.STOF = {
         methan:      { navn: "methan", formel: "CH4", smiles: "C", kp: -162, M: 16.04, OH: 0, C: 1 },
         ethan:       { navn: "ethan", formel: "CH3CH3", smiles: "CC", kp: -89, M: 30.07, OH: 0, C: 2 },
         propan:      { navn: "propan", formel: "CH3CH2CH3", smiles: "CCC", kp: -42, M: 44.10, OH: 0, C: 3 },
         butan:       { navn: "butan", formel: "CH3CH2CH2CH3", smiles: "CCCC", kp: -0.5, M: 58.12, OH: 0, C: 4 },
-        mpropan:     { navn: "2-methylpropan", formel: "CH3CH(CH3)CH3", smiles: "CC(C)C", kp: -12, M: 58.12, OH: 0, C: 4, gren: true },
+        mpropan:     { navn: "2-methylpropan", formel: "CH3CH(CH3)CH3", smiles: "CC(C)C", kp: -12, M: 58.12, OH: 0, C: 4, gren: 1 },
         pentan:      { navn: "pentan", formel: "CH3(CH2)3CH3", smiles: "CCCCC", kp: 36, M: 72.15, OH: 0, C: 5 },
+        mbutan:      { navn: "2-methylbutan", formel: "CH3CH(CH3)CH2CH3", smiles: "CC(C)CC", kp: 28, M: 72.15, OH: 0, C: 5, gren: 1 },
+        dmpropan:    { navn: "2,2-dimethylpropan", formel: "C(CH3)4", smiles: "CC(C)(C)C", kp: 10, M: 72.15, OH: 0, C: 5, gren: 2 },
         hexan:       { navn: "hexan", formel: "CH3(CH2)4CH3", smiles: "CCCCCC", kp: 69, M: 86.18, OH: 0, C: 6 },
+        mpentan:     { navn: "2-methylpentan", formel: "CH3CH(CH3)(CH2)2CH3", smiles: "CC(C)CCC", kp: 60, M: 86.18, OH: 0, C: 6, gren: 1 },
+        dmbutan:     { navn: "2,2-dimethylbutan", formel: "CH3C(CH3)2CH2CH3", smiles: "CC(C)(C)CC", kp: 50, M: 86.18, OH: 0, C: 6, gren: 2 },
+        heptan:      { navn: "heptan", formel: "CH3(CH2)5CH3", smiles: "CCCCCCC", kp: 98, M: 100.20, OH: 0, C: 7 },
+        octan:       { navn: "octan", formel: "CH3(CH2)6CH3", smiles: "CCCCCCCC", kp: 126, M: 114.23, OH: 0, C: 8 },
+        decan:       { navn: "decan", formel: "CH3(CH2)8CH3", smiles: "CCCCCCCCCC", kp: 174, M: 142.28, OH: 0, C: 10 },
         methanol:    { navn: "methanol", formel: "CH3OH", smiles: "CO", kp: 65, M: 32.04, OH: 1, C: 1, uden: "ethan" },
         ethanol:     { navn: "ethanol", formel: "CH3CH2OH", smiles: "CCO", kp: 78, M: 46.07, OH: 1, C: 2, uden: "propan" },
         propan1ol:   { navn: "propan-1-ol", formel: "CH3CH2CH2OH", smiles: "CCCO", kp: 97, M: 60.10, OH: 1, C: 3, uden: "butan" },
-        propan2ol:   { navn: "propan-2-ol", formel: "CH3CH(OH)CH3", smiles: "CC(O)C", kp: 82, M: 60.10, OH: 1, C: 3, gren: true, uden: "mpropan" },
+        propan2ol:   { navn: "propan-2-ol", formel: "CH3CH(OH)CH3", smiles: "CC(O)C", kp: 82, M: 60.10, OH: 1, C: 3, gren: 1, uden: "mpropan" },
         butan1ol:    { navn: "butan-1-ol", formel: "CH3(CH2)3OH", smiles: "CCCCO", kp: 118, M: 74.12, OH: 1, C: 4, uden: "pentan" },
-        mpropan2ol:  { navn: "2-methylpropan-2-ol", formel: "(CH3)3COH", smiles: "CC(C)(C)O", kp: 82, M: 74.12, OH: 1, C: 4, gren: true },
+        butan2ol:    { navn: "butan-2-ol", formel: "CH3CH(OH)CH2CH3", smiles: "CC(O)CC", kp: 100, M: 74.12, OH: 1, C: 4, gren: 1 },
+        mpropan2ol:  { navn: "2-methylpropan-2-ol", formel: "(CH3)3COH", smiles: "CC(C)(C)O", kp: 82, M: 74.12, OH: 1, C: 4, gren: 2 },
         pentan1ol:   { navn: "pentan-1-ol", formel: "CH3(CH2)4OH", smiles: "CCCCCO", kp: 138, M: 88.15, OH: 1, C: 5, uden: "hexan" },
+        pentan2ol:   { navn: "pentan-2-ol", formel: "CH3CH(OH)(CH2)2CH3", smiles: "CC(O)CCC", kp: 119, M: 88.15, OH: 1, C: 5, gren: 1 },
+        mbutan2ol:   { navn: "2-methylbutan-2-ol", formel: "CH3CH2C(CH3)2OH", smiles: "CCC(C)(C)O", kp: 102, M: 88.15, OH: 1, C: 5, gren: 2 },
+        hexan1ol:    { navn: "hexan-1-ol", formel: "CH3(CH2)5OH", smiles: "CCCCCCO", kp: 158, M: 102.17, OH: 1, C: 6 },
+        octan1ol:    { navn: "octan-1-ol", formel: "CH3(CH2)7OH", smiles: "CCCCCCCCO", kp: 195, M: 130.23, OH: 1, C: 8 },
         ethandiol:   { navn: "ethan-1,2-diol", ekstra: "glykol", formel: "HOCH2CH2OH", smiles: "OCCO", kp: 197, M: 62.07, OH: 2, C: 2, uden: "butan" },
-        glycerol:    { navn: "propan-1,2,3-triol", ekstra: "glycerol", formel: "HOCH2CH(OH)CH2OH", smiles: "OCC(O)CO", kp: 290, M: 92.09, OH: 3, C: 3 }
+        propan12diol: { navn: "propan-1,2-diol", formel: "CH3CH(OH)CH2OH", smiles: "CC(O)CO", kp: 188, M: 76.09, OH: 2, C: 3, gren: 1 },
+        propan13diol: { navn: "propan-1,3-diol", formel: "HO(CH2)3OH", smiles: "OCCCO", kp: 214, M: 76.09, OH: 2, C: 3 },
+        glycerol:    { navn: "propan-1,2,3-triol", ekstra: "glycerol", formel: "HOCH2CH(OH)CH2OH", smiles: "OCC(O)CO", kp: 290, M: 92.09, OH: 3, C: 3 },
+        dimethylether: { navn: "dimethylether", formel: "CH3OCH3", smiles: "COC", kp: -25, M: 46.07, OH: 0, C: 2, eter: true },
+        diethylether:  { navn: "diethylether", formel: "CH3CH2OCH2CH3", smiles: "CCOCC", kp: 35, M: 74.12, OH: 0, C: 4, eter: true },
+        dipropylether: { navn: "dipropylether", formel: "C3H7OC3H7", smiles: "CCCOCCC", kp: 90, M: 102.17, OH: 0, C: 6, eter: true }
     };
-    Object.keys(D.STOF).forEach(function (id) { D.STOF[id].id = id; });
+    Object.keys(D.STOF).forEach(function (id) {
+        var st = D.STOF[id];
+        st.id = id;
+        st.gren = st.gren || 0;
+        st.O = st.OH + (st.eter ? 1 : 0);
+    });
+
+    /* Navnet som HTML med bloede bindestreger, saa et langt navn paa et smalt
+       kort deles ved en stavelsesgraense (methyl-butan), aldrig midt i et ord */
+    D.navnHTML = function (st) {
+        return NK.html(st.navn).replace(/(methyl|ethyl|propyl)(?=[a-z])/g, "$1&shy;")
+            .replace(/(an|en)(-\d)/g, "$1$2").replace(/(?=ether$)/, "&shy;");
+    };
+
+    /* Molekylformlen paa kortene paa fane 3: C5H12. Saa ses det, at
+       isomerer har de samme atomer. */
+    D.sumformel = function (st) {
+        return NK.formel("C" + (st.C > 1 ? st.C : "") + "H" + (2 * st.C + 2) + (st.O ? "O" + (st.O > 1 ? st.O : "") : ""));
+    };
 
     /* ----- Tal og tekst ---------------------------------------------------- */
     /* En temperatur med dansk komma og rigtigt minus: -0.5 -> "−0,5" */
@@ -169,6 +208,9 @@
     };
 
     /* ----- Fane 2: Sammenlign ------------------------------------------------
+       Tre par (brugeren 24. okt. 2026: "lav kun 3 opgaver i fane 2, og soerg
+       for at eleverne ledes over i fane 3 bagefter"): OH-gruppen, kaeden og
+       to OH-grupper. Formen og de store molekyler oeves i Rangér.
        To stoffer i hver sin lup. Eleven gaetter, hvilket der koger ved den
        hoejeste temperatur, varmer op og svarer paa hvorfor. De forkerte
        svar er de fejl, elever laver. */
@@ -213,21 +255,6 @@
             loest: "Ethanol og butan-1-ol danner lige mange hydrogenbindinger, men den lange kæde i butan-1-ol giver flere London-kræfter."
         },
         {
-            id: "form", navn: "Propan-1-ol og propan-2-ol", a: "propan2ol", b: "propan1ol", start: 20,
-            intro: "Propan-1-ol og propan-2-ol har samme atomer og samme molarmasse: 60 g/mol. OH-gruppen sidder for enden eller i midten.",
-            spm: "Propan-1-ol koger 15 °C højere end propan-2-ol. Hvorfor?",
-            svar: [
-                { t: "Propan-2-ol er lettere.", f: "Propan-1-ol og propan-2-ol har de samme atomer, så de vejer det samme: 60 g/mol." },
-                { t: "Propan-2-ol er kugleformet og rører naboerne mindre.", ok: true },
-                { t: "Propan-2-ol kan ikke danne hydrogenbindinger.",
-                  f: "Propan-2-ol har også en OH-gruppe. Se i luppen med propan-2-ol: der er røde streger." }
-            ],
-            hint: ["Propan-1-ol og propan-2-ol har begge én OH-gruppe og vejer det samme. Se på formen.",
-                   "Propan-1-ol er en lige kæde. I propan-2-ol sidder OH-gruppen i midten.",
-                   "Et kugleformet molekyle rører sine naboer færre steder end et langt."],
-            loest: "Propan-1-ol og propan-2-ol danner begge hydrogenbindinger. Propan-1-ol er langt og lige og rører sine naboer mere, så London-kræfterne er større."
-        },
-        {
             id: "diol", navn: "Ethanol og ethan-1,2-diol", a: "ethanol", b: "ethandiol", start: 20,
             intro: "Ethanol har én OH-gruppe. Ethan-1,2-diol har en OH-gruppe i hver ende.",
             spm: "Ethan-1,2-diol koger ved 197 °C, ethanol ved 78 °C. Hvorfor?",
@@ -241,21 +268,6 @@
                    "Tæl de røde streger i de to lupper.",
                    "Hver OH-gruppe kan danne hydrogenbindinger."],
             loest: "Hver OH-gruppe danner hydrogenbindinger. Med to OH-grupper holder hvert molekyle fast i flere naboer."
-        },
-        {
-            id: "lang", navn: "Hexan og pentan-1-ol", a: "hexan", b: "pentan1ol", start: 20,
-            intro: "Hexan og pentan-1-ol er næsten lige tunge: 86 og 88 g/mol. De er større end propan og ethanol.",
-            spm: "Ethanol koger 120 °C over propan. Pentan-1-ol kun 69 °C over hexan. Hvorfor?",
-            svar: [
-                { t: "Hexan har også hydrogenbindinger.",
-                  f: "Hexan har ingen OH-gruppe. Se i luppen med hexan: der er ingen røde streger." },
-                { t: "Pentan-1-ol har færre OH-grupper end ethanol.", f: "Pentan-1-ol og ethanol har begge én OH-gruppe." },
-                { t: "OH-gruppen betyder mindre, når kæden er lang.", ok: true }
-            ],
-            hint: ["Se på grafen til højre. Hvad sker der med afstanden mellem alkanen og alkoholen?",
-                   "Hexan og pentan-1-ol har lange kæder med mange London-kræfter.",
-                   "Der er stadig kun én OH-gruppe, men nu er der meget mere kæde."],
-            loest: "I store molekyler holder London-kræfterne mest. Én OH-gruppe løfter stadig kogepunktet, men mindre."
         }
     ];
 
@@ -264,64 +276,142 @@
     D.ALKOHOLER = ["methanol", "ethanol", "propan1ol", "butan1ol", "pentan1ol"];
 
     /* ----- Fane 3: Rangér -------------------------------------------------------
-       Stofferne staar i en tilfaeldig raekkefoelge; eleven saetter dem efter
-       kogepunkt. Selvtesten tjekker, at hvert par har en forklaring. */
+       Seks niveauer med fem opgaver hver (brugeren 24. okt. 2026: "Kan du
+       ikke inddrage langt flere forskellige molekyler og niveauer"). Stofferne
+       staar i en tilfaeldig raekkefoelge; eleven saetter dem efter kogepunkt.
+       Selvtesten tjekker, at hvert par i en opgave har en forklaring
+       (D.grund), og at to stoffer i samme opgave koger mindst 5 °C fra
+       hinanden. */
+    D.RANGER_GRUPPER = [
+        { id: "let", titel: "1. Let: OH eller ej", kort: "Let", fokus: "Ét af stofferne har en OH-gruppe." },
+        { id: "kaede", titel: "2. Kæden", kort: "Kæden", fokus: "Stofferne er af samme slags. Se på kæderne." },
+        { id: "begge", titel: "3. Kæden og OH", kort: "Kæden og OH", fokus: "Både OH-grupper og kæder tæller." },
+        { id: "form", titel: "4. Formen", kort: "Formen", fokus: "Nogle af stofferne har de samme atomer. Se på formen." },
+        { id: "flere", titel: "5. Flere OH og ethere", kort: "Flere OH", fokus: "Nyt: flere OH-grupper, og ethere, hvor O sidder mellem to C-atomer." },
+        { id: "mester", titel: "6. Mester", kort: "Mester", fokus: "Fem stoffer og alt det, du har lært." }
+    ];
+
     D.RANGER = [
         { id: "l1", gruppe: "let", stoffer: ["propan", "ethanol", "butan"] },
         { id: "l2", gruppe: "let", stoffer: ["methanol", "methan", "ethan"] },
         { id: "l3", gruppe: "let", stoffer: ["propan1ol", "butan", "pentan"] },
         { id: "l4", gruppe: "let", stoffer: ["hexan", "pentan1ol", "pentan"] },
-        { id: "m1", gruppe: "middel", stoffer: ["butan1ol", "methanol", "propan1ol", "ethanol"] },
-        { id: "m2", gruppe: "middel", stoffer: ["ethanol", "propan", "butan1ol", "pentan"] },
-        { id: "m3", gruppe: "middel", stoffer: ["hexan", "propan1ol", "butan", "ethanol"] },
-        { id: "m4", gruppe: "middel", stoffer: ["methanol", "butan1ol", "pentan", "propan"] },
-        { id: "s1", gruppe: "svaer", stoffer: ["ethandiol", "propan1ol", "propan2ol"] },
-        { id: "s2", gruppe: "svaer", stoffer: ["propan2ol", "butan", "propan1ol", "mpropan"] },
-        { id: "s3", gruppe: "svaer", stoffer: ["glycerol", "ethanol", "butan1ol", "ethandiol"] },
-        { id: "s4", gruppe: "svaer", stoffer: ["pentan1ol", "mpropan2ol", "ethandiol", "hexan"] }
-    ];
-    D.RANGER_GRUPPER = [
-        { id: "let", titel: "Let: OH eller ej" },
-        { id: "middel", titel: "Middel: kæden og OH" },
-        { id: "svaer", titel: "Svær: formen og flere OH" }
+        { id: "l5", gruppe: "let", stoffer: ["butan", "ethanol", "pentan"] },
+        { id: "k1", gruppe: "kaede", stoffer: ["propan", "hexan", "ethan", "butan"] },
+        { id: "k2", gruppe: "kaede", stoffer: ["butan1ol", "methanol", "propan1ol", "ethanol"] },
+        { id: "k3", gruppe: "kaede", stoffer: ["octan", "pentan", "heptan"] },
+        { id: "k4", gruppe: "kaede", stoffer: ["hexan1ol", "propan1ol", "octan1ol", "pentan1ol"] },
+        { id: "k5", gruppe: "kaede", stoffer: ["decan", "methan", "hexan", "octan"] },
+        { id: "b1", gruppe: "begge", stoffer: ["ethanol", "propan", "butan1ol", "pentan"] },
+        { id: "b2", gruppe: "begge", stoffer: ["hexan", "propan1ol", "butan", "ethanol"] },
+        { id: "b3", gruppe: "begge", stoffer: ["methanol", "butan1ol", "pentan", "propan"] },
+        { id: "b4", gruppe: "begge", stoffer: ["methanol", "ethan", "propan1ol", "butan"] },
+        { id: "b5", gruppe: "begge", stoffer: ["propan1ol", "pentan", "ethan", "ethanol"] },
+        { id: "f1", gruppe: "form", stoffer: ["pentan", "dmpropan", "mbutan"] },
+        { id: "f2", gruppe: "form", stoffer: ["hexan", "dmbutan", "mpentan"] },
+        { id: "f3", gruppe: "form", stoffer: ["butan1ol", "mpropan2ol", "butan2ol"] },
+        { id: "f4", gruppe: "form", stoffer: ["propan2ol", "butan", "propan1ol", "mpropan"] },
+        { id: "f5", gruppe: "form", stoffer: ["pentan1ol", "mbutan2ol", "pentan2ol"] },
+        { id: "o1", gruppe: "flere", stoffer: ["ethandiol", "propan1ol", "propan2ol"] },
+        { id: "o2", gruppe: "flere", stoffer: ["dimethylether", "ethanol", "methanol"] },
+        { id: "o3", gruppe: "flere", stoffer: ["glycerol", "ethanol", "butan1ol", "ethandiol"] },
+        { id: "o4", gruppe: "flere", stoffer: ["diethylether", "ethandiol", "butan1ol"] },
+        { id: "o5", gruppe: "flere", stoffer: ["dipropylether", "hexan1ol", "propan13diol", "glycerol"] },
+        { id: "x1", gruppe: "mester", stoffer: ["ethanol", "heptan", "pentan", "pentan1ol", "methan"] },
+        { id: "x2", gruppe: "mester", stoffer: ["ethandiol", "octan", "butan1ol", "propan2ol", "ethan"] },
+        { id: "x3", gruppe: "mester", stoffer: ["glycerol", "decan", "hexan1ol", "methanol", "mbutan"] },
+        { id: "x4", gruppe: "mester", stoffer: ["dimethylether", "methanol", "ethanol", "pentan2ol", "propan12diol"] },
+        { id: "x5", gruppe: "mester", stoffer: ["dmbutan", "hexan", "octan", "butan2ol", "propan13diol"] }
     ];
 
     /* Formen som tekst for de forgrenede */
     D.FORM = {
         mpropan: "er forgrenet og mere kugleformet",
+        mbutan: "er forgrenet og mere kugleformet",
+        dmpropan: "er forgrenet og næsten en kugle",
+        mpentan: "er forgrenet og mere kugleformet",
+        dmbutan: "er dobbelt forgrenet og mere kugleformet",
         propan2ol: "har OH-gruppen i midten og er mere kugleformet",
-        mpropan2ol: "er forgrenet og mere kugleformet"
+        butan2ol: "har OH-gruppen inde på kæden og er mere kugleformet",
+        mpropan2ol: "er forgrenet og næsten en kugle",
+        pentan2ol: "har OH-gruppen inde på kæden og er mere kugleformet",
+        mbutan2ol: "er forgrenet og mere kugleformet",
+        propan12diol: "har den ene OH-gruppe inde på kæden"
     };
 
-    /* Hvorfor hoej koger hoejere end lav. null, hvis reglerne ikke kan
-       forklare det (det maa ikke ske i opgaverne; selvtesten tjekker). */
-    D.forklar = function (lav, hoej) {
+    /* Hvorfor hoej koger hoejere end lav: { slags, tekst }, eller null, hvis
+       reglerne ikke kan forklare det (det maa ikke ske i opgaverne;
+       selvtesten tjekker). slags siger, hvilket hint 1 der passer (D.HINT1). */
+    D.grund = function (lav, hoej) {
         var L = typeof lav === "string" ? D.STOF[lav] : lav, H = typeof hoej === "string" ? D.STOF[hoej] : hoej;
-        var Ln = L.navn, Hn = H.navn;
+        var Ln = L.navn, Hn = H.navn, St = D.Stort;
+        var tungere = L.M > H.M + 4 ? ", selv om " + Ln + " er tungere." : ".";
+        var sammeAtomer = L.C === H.C && L.O === H.O;
+        /* En ether mod en alkan: dér skulle dipol-dipol-bindinger med */
+        if ((L.eter && !H.OH && !H.eter) || (H.eter && !L.OH && !L.eter)) return null;
         if (H.OH > L.OH) {
-            if (L.OH === 0) {
-                return D.Stort(Hn) + " har " + D.ohTekst(H.OH) + ", og " + Ln + " har ingen. Hydrogenbindingerne holder molekylerne i " +
-                    Hn + " sammen" + (L.M > H.M + 4 ? ", selv om " + Ln + " er tungere." : ".");
+            if (L.eter) {
+                if (sammeAtomer) {
+                    return { slags: "eter", tekst: St(Ln) + " og " + Hn + " har de samme atomer, men kun " + Hn +
+                        " har H på O. " + St(Ln) + " danner ingen hydrogenbindinger." };
+                }
+                return { slags: "eter", tekst: St(Hn) + " har " + D.ohTekst(H.OH) + ". I " + Ln +
+                    " sidder O mellem to C-atomer uden H, så " + Ln + " danner ingen hydrogenbindinger." };
             }
-            return D.Stort(Hn) + " har " + D.ohTekst(H.OH) + ", og " + Ln + " har " + D.ohTekst(L.OH) +
-                ". Flere OH-grupper giver flere hydrogenbindinger.";
+            if (L.OH === 0) {
+                return { slags: "oh", tekst: St(Hn) + " har " + D.ohTekst(H.OH) + ", og " + Ln + " har ingen. Hydrogenbindingerne holder molekylerne sammen" + tungere };
+            }
+            return { slags: "oh", tekst: St(Hn) + " har " + D.ohTekst(H.OH) + ", og " + Ln + " har " + D.ohTekst(L.OH) +
+                ". Flere OH-grupper giver flere hydrogenbindinger." };
         }
-        if (H.OH < L.OH) return null;
-        var oh = D.Stort(Ln) + " og " + Hn + (H.OH ? " har begge " + D.ohTekst(H.OH) + ". " : " har ingen OH-gruppe. ");
+        if (H.OH < L.OH) {
+            /* En meget lang kaede kan slaa én OH-gruppe (Mester) */
+            if (H.OH === 0 && !H.eter && L.OH === 1 && H.C >= L.C + 4) {
+                return { slags: "lang", tekst: St(Hn) + " har ingen OH-gruppe, men en meget længere kæde: " + H.C + " C-atomer mod " + L.C +
+                    " i " + Ln + ". De mange London-kræfter holder mere end én OH-gruppe." };
+            }
+            return null;
+        }
+        if (L.eter !== H.eter) return null;
+        var oh = St(Ln) + " og " + Hn + (H.OH ? " har begge " + D.ohTekst(H.OH) + ". " : " har ingen OH-gruppe. ");
         if (H.C > L.C) {
-            return oh + D.Stort(Hn) + " har den længste kæde, som rører naboerne mere, så London-kræfterne er større.";
+            return { slags: "kaede", tekst: oh + St(Hn) + " har den længste kæde, som rører naboerne mere, så London-kræfterne er større." };
         }
-        if (H.C === L.C && D.FORM[L.id] && !D.FORM[H.id]) {
-            return D.Stort(Ln) + " og " + Hn + " har de samme atomer. " + D.Stort(Ln) + " " + D.FORM[L.id] + ", så molekylerne rører hinanden mindre.";
+        if (sammeAtomer && L.gren > H.gren) {
+            if (!H.gren) {
+                return { slags: "form", tekst: St(Ln) + " og " + Hn + " har de samme atomer. " + St(Ln) + " " + D.FORM[L.id] + ", så molekylerne rører hinanden mindre." };
+            }
+            return { slags: "form", tekst: St(Ln) + " og " + Hn + " har de samme atomer, men " + Ln + " er mere forgrenet og kugleformet, så molekylerne rører hinanden mindre." };
         }
         return null;
+    };
+
+    D.forklar = function (lav, hoej) {
+        var g = D.grund(lav, hoej);
+        return g ? g.tekst : null;
+    };
+
+    /* Hint 1 paa fane 3 efter, hvad det foerste forkerte par handler om */
+    D.HINT1 = {
+        oh: "Tæl OH-grupperne. Hydrogenbindinger løfter kogepunktet meget.",
+        eter: "Se efter H på O. Kun et H, der sidder på O, kan danne hydrogenbindinger.",
+        kaede: "Se på kæderne. Jo længere kæde, jo flere London-kræfter.",
+        form: "Se på formen. Et kugleformet molekyle rører sine naboer mindst.",
+        lang: "Se på kædernes længde. En meget lang kæde giver rigtig mange London-kræfter."
+    };
+
+    /* Medaljen, naar alle 30 er sat rigtigt: efter antal stjerner */
+    D.MEDALJE = function (stjerner, ialt) {
+        if (stjerner >= ialt) return { id: "guld", navn: "Guld", tekst: "Alle " + ialt + " i første forsøg." };
+        if (stjerner >= Math.ceil(ialt * 2 / 3)) return { id: "soelv", navn: "Sølv", tekst: stjerner + " af " + ialt + " i første forsøg." };
+        return { id: "bronze", navn: "Bronze", tekst: stjerner + " af " + ialt + " i første forsøg." };
     };
 
     /* ----- Faelles tekster ----------------------------------------------------- */
     D.FAERDIG = {
         e: "Alle fire. Ethanol koger højt, fordi OH-grupperne holder fast i hinanden.",
-        s: "Alle fem. OH-gruppen betyder mest, når molekylerne er små.",
-        r: "Alle tolv. Nu kan du klare dig uden tabellen."
+        s: "Alle tre par er klaret. Nu skal du selv sætte stoffer i rækkefølge efter kogepunkt i Rangér.",
+        r: ""
     };
 
     D.ROS = ["Sådan.", "Det passer.", "Godt set."];

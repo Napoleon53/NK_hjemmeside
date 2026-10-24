@@ -9,9 +9,10 @@
    sidst paa hvorfor. De forkerte svar er de fejl, elever laver, og hver
    har sin forklaring.
 
-   Fem par: OH-gruppen (propan og ethanol), kaeden, formen, to
-   OH-grupper og et langt molekyle. Kogepunkterne kommer paa grafen i
-   panelet, kogepunkt mod molarmasse, med alkanerne og alkoholerne.
+   Tre par: OH-gruppen (propan og ethanol), kaeden (ethanol og
+   butan-1-ol) og to OH-grupper (ethanol og ethan-1,2-diol). Bagefter
+   ledes eleven videre til Rangér. Kogepunkterne kommer paa grafen i
+   panelet, kogepunkt mod molarmasse.
    ===================================================================== */
 (function () {
     "use strict";
@@ -22,8 +23,6 @@
 
     var FARVE = { a: "#64b5f6", b: "#ffb74d" };
     var BALLON = { a: "#4f8fd6", b: "#e3893a" };
-    /* Navnene paa grafen skubbes lidt, hvor punkterne ligger taet */
-    var ETIKET_DY = { pentan1ol: -11, butan1ol: 9, propan2ol: -8, propan1ol: 8 };
 
     function SimSammenlign() {
         var mig = this;
@@ -277,11 +276,22 @@
         this.tegnGraf();
     };
 
-    /* ----- Grafen i panelet: kogepunkt mod molarmasse ----------------------------------- */
+    /* ----- Grafen i panelet: kogepunkt mod molarmasse -----------------------------------
+       Brugeren 24. okt. 2026: "Goer grafen lidt mindre forvirrende" (navnene
+       laa oven i hinanden, og "120 °C" svaevede for sig selv). Nu:
+         * navnene placeres, saa de aldrig rammer hinanden eller et punkt
+           (grafBokse husker pladserne, saa selvtesten kan tjekke det)
+         * det par, eleven arbejder med, har navnene i samme blaa og orange
+           som over lupperne og lidt stoerre punkter
+         * forskellen vises kun for det par, eleven arbejder med, naar begge
+           kogepunkter er fundet: en trappe fra det laveste punkt over til det
+           hoejeste med teksten "120 °C højere" */
     P.tegnGraf = function () {
-        var L = this.grafL;
+        var L = this.grafL, g = this.opg;
         var nyStr = L.tilpas();
-        var noegle = Object.keys(this.maalt).sort().join(",") + "|" + this.visTabel + "|" + L.b + "x" + L.h;
+        var parNu = g && g.fase !== "gaet" ? g.o : null;
+        var noegle = Object.keys(this.maalt).sort().join(",") + "|" + this.visTabel + "|" + L.b + "x" + L.h + "|" +
+            (parNu ? parNu.id + (this.visKp("a") ? "a" : "") + (this.visKp("b") ? "b" : "") : "");
         if (!nyStr && noegle === this.grafNoegle) return;
         this.grafNoegle = noegle;
         var ctx = L.ctx, W = L.b, H = L.h, mig = this;
@@ -319,7 +329,7 @@
 
         /* Hele tabellen som svage linjer */
         if (this.visTabel) {
-            [[D.ALKANER, "rgba(176, 190, 197, 0.55)"], [D.ALKOHOLER, "rgba(240, 104, 90, 0.55)"]].forEach(function (s) {
+            [[D.ALKANER, "rgba(176, 190, 197, 0.45)"], [D.ALKOHOLER, "rgba(240, 104, 90, 0.45)"]].forEach(function (s) {
                 ctx.strokeStyle = s[1];
                 ctx.fillStyle = s[1];
                 ctx.lineWidth = 1.5;
@@ -338,43 +348,132 @@
             });
         }
 
-        /* Forskellen mellem en alkan og en alkohol, der vejer det samme */
-        [["propan", "ethanol"], ["hexan", "pentan1ol"]].forEach(function (p) {
-            if (!mig.maalt[p[0]] || !mig.maalt[p[1]]) return;
-            var a = D.STOF[p[0]], b = D.STOF[p[1]], x = (X(a.M) + X(b.M)) / 2 + 9;
-            ctx.strokeStyle = "rgba(242, 197, 61, 0.85)";
-            ctx.setLineDash([3, 3]);
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(x, Y(a.kp));
-            ctx.lineTo(x, Y(b.kp));
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillStyle = "#f2c53d";
-            ctx.font = Tg.font("700", 12);
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillText(Math.round(b.kp - a.kp) + " °C", x + 4, (Y(a.kp) + Y(b.kp)) / 2);
+        /* Pladserne, der er optaget: punkterne, trappen og navnene */
+        var bokse = [];
+        var omraade = { x0: v + 2, y0: o - 6, x1: W - 2, y1: H - u - 2 };
+        function rammer(r) {
+            for (var i = 0; i < bokse.length; i++) {
+                var q = bokse[i];
+                if (r.x < q.x + q.b && q.x < r.x + r.b && r.y < q.y + q.h && q.y < r.y + r.h) return true;
+            }
+            return false;
+        }
+        function inde(r) { return r.x >= omraade.x0 && r.x + r.b <= omraade.x1 && r.y >= omraade.y0 && r.y + r.h <= omraade.y1; }
+
+        var ids = Object.keys(this.maalt);
+        var farveNu = {};
+        if (parNu) {
+            if (this.maalt[parNu.a]) farveNu[parNu.a] = FARVE.a;
+            if (this.maalt[parNu.b]) farveNu[parNu.b] = FARVE.b;
+        }
+        ids.forEach(function (id) {
+            var st = D.STOF[id], r = farveNu[id] ? 6 : 5;
+            bokse.push({ x: X(st.M) - r - 1, y: Y(st.kp) - r - 1, b: 2 * r + 2, h: 2 * r + 2, punkt: id });
         });
 
-        /* De maalte stoffer */
-        Object.keys(this.maalt).forEach(function (id) {
-            var st = D.STOF[id];
-            var x = X(st.M), y = Y(st.kp);
-            ctx.fillStyle = st.OH ? (st.OH > 1 ? "#c62828" : "#f0685a") : "#b0bec5";
-            ctx.strokeStyle = "#14141a";
+        /* Trappen for det aktuelle par: vandret fra det laveste punkt, lodret op
+           til det hoejeste, og forskellen ved siden af den lodrette streg */
+        if (parNu && this.visKp("a") && this.visKp("b")) {
+            var lo = D.STOF[parNu.a], hi = D.STOF[parNu.b];
+            if (lo.kp > hi.kp) { var tmp = lo; lo = hi; hi = tmp; }
+            var xs = X(hi.M), y0 = Y(lo.kp), y1 = Y(hi.kp);
+            ctx.strokeStyle = "rgba(242, 197, 61, 0.9)";
             ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 3]);
             ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.moveTo(X(lo.M), y0);
+            ctx.lineTo(xs, y0);
+            ctx.lineTo(xs, y1 + 7);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            /* Pilespids op mod det hoejeste punkt */
+            ctx.fillStyle = "#f2c53d";
+            ctx.beginPath();
+            ctx.moveTo(xs, y1 + 7);
+            ctx.lineTo(xs - 4, y1 + 13);
+            ctx.lineTo(xs + 4, y1 + 13);
+            ctx.closePath();
+            ctx.fill();
+            bokse.push({ x: Math.min(X(lo.M), xs) - 2, y: y0 - 2, b: Math.abs(xs - X(lo.M)) + 4, h: 4 });
+            bokse.push({ x: xs - 3, y: y1, b: 6, h: y0 - y1 });
+            ctx.font = Tg.font("700", 12);
+            var tekst = Math.round(hi.kp - lo.kp) + " °C højere", tb = ctx.measureText(tekst).width;
+            /* Ved siden af den lodrette streg, helst midt paa den; ellers laengere
+               op eller ned. Teksten er altid inde i grafen. */
+            var ym = (y0 + y1) / 2 - 7, kand = [];
+            [0, -12, 12, -24, 24, -36, 36].forEach(function (dy) {
+                kand.push({ x: xs + 6, y: ym + dy }, { x: xs - 6 - tb, y: ym + dy });
+            });
+            var pl = null;
+            kand.forEach(function (k) { var r = { x: k.x, y: k.y, b: tb, h: 14 }; if (!pl && inde(r) && !rammer(r)) pl = r; });
+            if (!pl) {
+                var x0 = Math.min(Math.max(xs - 6 - tb, omraade.x0), omraade.x1 - tb);
+                pl = { x: x0, y: Math.max(omraade.y0, Math.min(ym, omraade.y1 - 14)), b: tb, h: 14 };
+            }
+            ctx.fillStyle = "#f2c53d";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
+            ctx.fillText(tekst, pl.x, pl.y);
+            bokse.push(pl);
+        }
+
+        /* De maalte stoffer: punkterne */
+        ids.forEach(function (id) {
+            var st = D.STOF[id], nu = !!farveNu[id];
+            ctx.fillStyle = st.OH ? (st.OH > 1 ? "#c62828" : "#f0685a") : "#b0bec5";
+            ctx.strokeStyle = nu ? "#ffffff" : "#14141a";
+            ctx.lineWidth = nu ? 2 : 1.5;
+            ctx.beginPath();
+            ctx.arc(X(st.M), Y(st.kp), nu ? 6 : 5, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
-            ctx.font = Tg.font("600", 12);
-            ctx.fillStyle = "#cfd6de";
-            var hoejre = x < W * 0.62;
-            ctx.textAlign = hoejre ? "left" : "right";
-            ctx.textBaseline = "middle";
-            ctx.fillText(st.navn, x + (hoejre ? 9 : -9), y + (ETIKET_DY[st.id] || 0));
         });
+
+        /* Navnene: det aktuelle par foerst, og hvert navn paa den foerste plads,
+           der ikke rammer noget */
+        ids.sort(function (p, q) { return (farveNu[q] ? 1 : 0) - (farveNu[p] ? 1 : 0); });
+        var etiketter = [];
+        ids.forEach(function (id) {
+            var st = D.STOF[id], nu = !!farveNu[id];
+            ctx.font = Tg.font(nu ? "700" : "600", 12);
+            var b = ctx.measureText(st.navn).width, hh = 14, x = X(st.M), y = Y(st.kp);
+            var kand = [
+                { x: x + 10, y: y - 7 }, { x: x - 10 - b, y: y - 7 },
+                { x: x + 8, y: y - 21 }, { x: x - 8 - b, y: y - 21 },
+                { x: x + 8, y: y + 7 }, { x: x - 8 - b, y: y + 7 },
+                { x: x - b / 2, y: y - 24 }, { x: x - b / 2, y: y + 10 }
+            ];
+            var pl = null;
+            kand.forEach(function (k) { var r = { x: k.x, y: k.y, b: b, h: hh }; if (!pl && inde(r) && !rammer(r)) pl = r; });
+            if (!pl) {
+                /* Ingen ledig plads: laengere vaek, til hoejre eller venstre */
+                for (var dy = 14; dy <= 60 && !pl; dy += 14) {
+                    [{ x: x + 10, y: y - 7 - dy }, { x: x + 10, y: y - 7 + dy }, { x: x - 10 - b, y: y - 7 - dy }, { x: x - 10 - b, y: y - 7 + dy }].forEach(function (k) {
+                        var r = { x: k.x, y: k.y, b: b, h: hh };
+                        if (!pl && inde(r) && !rammer(r)) pl = r;
+                    });
+                }
+            }
+            if (!pl) pl = { x: x + 10, y: y - 7, b: b, h: hh };
+            bokse.push(pl);
+            etiketter.push({ id: id, r: pl, nu: nu });
+            /* Er navnet flyttet vaek fra punktet, viser en tynd streg, hvor det hoerer til */
+            var cx = Math.max(pl.x, Math.min(x, pl.x + b)), cy = Math.max(pl.y, Math.min(y, pl.y + hh));
+            if (Math.hypot(cx - x, cy - y) > 14) {
+                ctx.strokeStyle = "rgba(207, 214, 222, 0.45)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(cx, cy);
+                ctx.stroke();
+            }
+            ctx.fillStyle = nu ? farveNu[id] : "#aab3bd";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
+            ctx.fillText(st.navn, pl.x, pl.y + 1);
+        });
+        this.grafBokse = bokse;
+        this.grafEtiketter = etiketter;
         ctx.restore();
     };
 
