@@ -26,6 +26,7 @@ animationer og downloads.
 | `tastatur.html` | Udvid dit tastaturlayout | `/index.php/tastaturlayout/` |
 | `opgaver.html` | Selvrettende Excel-opgaver | `/index.php/selvrettendeopgaver/` |
 | `formelsamling.html` | Formelsamling til kemi | `/index.php/digital-formelsamling/` |
+| `licens.html` | Brug af materialet (licensen) | — |
 | `404.html` | Siden findes ikke | — |
 
 Menuen er samlet i tre indgange: **Forside · Animationer · Downloads**.
@@ -96,6 +97,15 @@ Redirect 301 /index.php/manuel-installation/  /manuel-installation.html
   med det samme og virker offline.
 - Fungerer uden JavaScript; kun hamburgermenuen bruger JS.
 - Responsiv ned til mobil (390 px) og op til store skærme (1440 px+).
+
+## Licens
+
+Indholdet © Niels Kræmmer må bruges gratis efter licensen Creative Commons
+Kreditering-IkkeKommerciel 4.0 International (CC BY-NC 4.0) fra 25. okt. 2026. Før da stod
+GNU AGPL 3.0 i `LICENSE`. Den fulde licenstekst står i `LICENSE`, og `licens.html` forklarer på
+dansk, hvad man må. Alle sider i roden har en linje om licensen nederst i sidefoden
+(`.footer-bund`); en ny side skal have den samme. Biblioteker, som andre har lavet, har deres
+egne licenser ved siden af filerne (fx `kompendier/pdf-lib-LICENSE.md`, MIT).
 
 ## Forskelle fra den gamle WordPress-side
 

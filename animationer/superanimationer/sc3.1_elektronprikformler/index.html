@@ -3,112 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elektron-prikformler</title>
+<title>Elektronprikformler</title>
 <link rel="stylesheet" href="css/stil.css">
 </head>
-<body data-fane="byg">
+<body>
 
 <header class="top">
-    <div class="titel">
-        <span class="opgave-taeller" id="taeller-tekst">Opgave 1/9</span>
-        <h1>Elektron-prikformler</h1>
-    </div>
+    <h1><span class="ikon">⁘</span> Elektronprikformler</h1>
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
-        <button class="faneknap aktiv" data-fane="byg" type="button" role="tab" aria-selected="true" title="Byg (1)"><span class="nr">1</span>Byg</button>
-        <button class="faneknap" data-fane="fejl" type="button" role="tab" aria-selected="false" title="Find fejlen (2)"><span class="nr">2</span>Find fejlen</button>
+        <button class="faneknap aktiv" data-fane="fane-b" role="tab" aria-selected="true"><span class="nr">1</span>Byg</button>
+        <button class="faneknap" data-fane="fane-f" role="tab" aria-selected="false"><span class="nr">2</span>Find fejlen</button>
     </div>
 
-    <div class="opgave-menu kun-byg" id="opgave-menu"></div>
-    <div class="opgave-menu kun-fejl" id="fejl-menu"></div>
-
-    <button class="ikonknap" id="rundvisning-knap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
 </header>
 
-<main id="scene">
-    <canvas id="laerred"></canvas>
+<main>
 
-    <div id="stregformel-panel" class="kun-byg">
-        <div id="stregformel-titel">Stregformel</div>
-        <canvas id="stregformel-laerred" width="224" height="180"></canvas>
-    </div>
-
-    <div id="hint-boks">
-        <div class="hint-hoved">
-            <span id="hint-boks-titel">Hint</span>
-            <button id="hint-luk" type="button" aria-label="Luk hintet">✕</button>
+<!-- ================================================================= -->
+<!-- FANE 1: BYG                                                        -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-b" role="tabpanel" aria-label="Byg">
+    <div class="scene">
+        <canvas id="b-laerred"></canvas>
+        <!-- Kortet oeverst midt i scenen: opgaven, hint, forklaringen og
+             knapperne (brugerens oensker 9. og 24. okt. 2026) -->
+        <div class="scenekort opgave" id="b-skort">
+            <div class="sk-ind" id="b-ind"></div>
+            <div class="sk-bund" id="b-status">
+                <p class="st-tekst" id="b-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="b-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="b-indsend" type="button">Indsend svar</button>
+            </div>
         </div>
-        <p id="hint-tekst"></p>
-        <img id="hint-sprite" alt="Den rigtige elektronprikformel" hidden>
+        <div class="anker" id="b-anker-flade"></div>
     </div>
 
-    <div id="opsaetning-overlay" class="overlay-boks kun-byg">
-        <div id="opsaetning-molekyle"></div>
-        <h2 id="opsaetning-overskrift"></h2>
-        <p class="opsaetning-sp">Hvor mange elektroner er der i yderste skal?</p>
-        <div class="pt-gruppe-rad">
-            <div class="pt-gruppe">I</div><div class="pt-gruppe">II</div><div class="pt-gruppe">III</div><div class="pt-gruppe">IV</div>
-            <div class="pt-gruppe">V</div><div class="pt-gruppe">VI</div><div class="pt-gruppe">VII</div><div class="pt-gruppe">VIII</div>
+    <aside class="panel">
+        <div class="kort" id="b-opgaver">
+            <h2>Molekylerne <span class="taeller">løst <b id="b-loest">0</b>/10 · ★ <b id="b-stjerner">0</b></span></h2>
+            <div class="opg-liste" id="b-liste"></div>
+            <p class="liste-note">★ = løst i første forsøg uden at se svaret</p>
         </div>
-        <div id="periodisk-system" class="pt-grid"></div>
-        <div id="valens-knapper"></div>
-        <p class="valens-besked" id="valens-besked" aria-live="polite"></p>
-    </div>
+        <button class="forfraknap" id="b-forfra" type="button" title="Samme molekyle forfra (R)">Byg forfra ↺</button>
+    </aside>
+</section>
 
-    <div id="sejr-overlay" class="sejr-kort skjult kun-byg">
-        <img id="sejr-sprite" alt="">
-        <div>
-            <h2>Korrekt elektronprikformel</h2>
-            <p>Alle atomer opfylder oktetreglen, og hydrogen har to elektroner.</p>
-            <button class="knap groen" id="naeste-knap" type="button">Næste opgave</button>
+<!-- ================================================================= -->
+<!-- FANE 2: FIND FEJLEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-f" role="tabpanel" aria-label="Find fejlen">
+    <div class="scene">
+        <canvas id="f-laerred"></canvas>
+        <div class="scenekort opgave" id="f-skort">
+            <div class="sk-ind" id="f-ind"></div>
+            <div class="sk-bund" id="f-status">
+                <p class="st-tekst" id="f-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="f-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="f-indsend" type="button">Indsend svar</button>
+            </div>
         </div>
+        <div class="anker" id="f-anker-flade"></div>
     </div>
 
-    <div id="toast"></div>
+    <aside class="panel">
+        <div class="kort" id="f-opgaver">
+            <h2>Tegningerne <span class="taeller">løst <b id="f-loest">0</b>/12 · ★ <b id="f-stjerner">0</b></span></h2>
+            <div class="opg-liste" id="f-liste"></div>
+            <p class="liste-note">★ = løst i første forsøg uden at se svaret</p>
+        </div>
+        <button class="forfraknap" id="f-forfra" type="button" title="Samme tegning forfra (R)">Samme tegning forfra ↺</button>
+    </aside>
+</section>
 
-    <!-- Kemichael tegnes paa sit eget lag oven over vinduerne - se js/laerer.js -->
-    <canvas id="laerer-lag" aria-hidden="true"></canvas>
-    <div class="tilbud" id="tilbud" hidden>
-        <button class="tilbud-start" type="button">Start præsentation <span>▶</span></button>
-        <button class="tilbud-nej" type="button">Nej tak</button>
-    </div>
-    <button class="spring-over" id="spring-over" type="button" hidden>Spring præsentationen over <span>✕</span></button>
 </main>
 
-<footer>
-    <div class="bund kun-byg" id="byg-bund">
-        <p class="vejledning">
-            <b>Vejledning:</b> Træk atomer sammen for at binde dem. Klik på de fælles elektroner for at skifte
-            enkelt → dobbelt → tripel → fjern. Tæl selv elektronerne om hvert atom, og tryk Tjek svar.
-        </p>
-        <div class="knaprad">
-            <button class="knap lilla skjult" id="byg-knap" type="button">Giv hint</button>
-            <button class="knap skjult" id="nulstil-knap" type="button">Nulstil</button>
-            <button class="knap blaa skjult" id="tjek-knap" type="button">Tjek svar</button>
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Elektronprikformler</h2>
+        <p>I en elektronprikformel skriver man atomets symbol og tegner elektronerne i den yderste skal som prikker omkring det. Antallet er hovedgruppens nummer.</p>
+        <h3 class="teori-hoved">Atomet</h3>
+        <ol class="teori-trin">
+            <li>Prikkerne sættes på symbolets fire sider.</li>
+            <li>De første fire elektroner får hver sin side. De næste danner par med dem, der allerede står der.</li>
+            <li>En elektron, der står alene, er uparret. Hver uparret elektron kan danne én binding.</li>
+        </ol>
+        <h3 class="teori-hoved">Molekylet</h3>
+        <p>To atomer lægger hver en uparret elektron i et <b>fælles elektronpar</b>, som hører til begge atomer. Det er en elektronparbinding. Elektronpar, der ikke er med i en binding, kaldes <b>frie elektronpar</b>. Deler to atomer to elektronpar, er det en dobbeltbinding, og deler de tre, er det en tripelbinding.</p>
+        <table class="teori-tabel">
+            <thead><tr><th>Grundstof</th><th>Elektroner i yderste skal</th><th>Uparrede</th><th>Bindinger</th></tr></thead>
+            <tbody>
+                <tr><td>Hydrogen, H</td><td>1</td><td>1</td><td>1</td></tr>
+                <tr><td>Chlor, Cl</td><td>7</td><td>1</td><td>1</td></tr>
+                <tr><td>Oxygen, O</td><td>6</td><td>2</td><td>2</td></tr>
+                <tr><td>Nitrogen, N</td><td>5</td><td>3</td><td>3</td></tr>
+                <tr><td>Carbon, C</td><td>4</td><td>4</td><td>4</td></tr>
+            </tbody>
+        </table>
+        <h3 class="teori-hoved">Tæl efter</h3>
+        <p>Hvert atom skal have 8 elektroner omkring sig, hydrogen kun 2. De fælles elektronpar tæller med hos begge atomer. I en stregformel er hvert fælles elektronpar en streg, og de frie elektronpar tegnes ikke med.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Enter</kbd> indsend eller næste &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
     </div>
+</div>
 
-    <div class="bund kun-fejl" id="fejl-bund">
-        <div class="fejl-tekst">
-            <p class="fejl-spm" id="fejl-spm"></p>
-            <p class="fejl-besked" id="fejl-besked" aria-live="polite"></p>
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/4</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
         </div>
-        <div class="fejl-svar" id="fejl-svar"></div>
-        <button class="knap lilla" id="fejl-knap" type="button">Giv hint</button>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
     </div>
-</footer>
+</div>
 
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
+<script src="js/prik.js"></script>
 <script src="js/tegning.js"></script>
-<script src="js/sprites.js"></script>
-<script src="../../v2/kemichael/kemichael.js"></script>
-<script src="../kemichael/superanimation.js"></script>
+<script src="js/fane.js"></script>
 <script src="js/sim_byg.js"></script>
 <script src="js/sim_fejl.js"></script>
-<script src="js/laerer.js"></script>
 <script src="js/rundvisning.js"></script>
-<script src="js/praesentation.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

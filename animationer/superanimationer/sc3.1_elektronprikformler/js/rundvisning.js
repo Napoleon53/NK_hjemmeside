@@ -1,107 +1,162 @@
 /* =====================================================================
-   rundvisning.js - spotlight-rundvisningen bag "?"-knappen
+   rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
 
-   Peger på ét element ad gangen og lukker sig selv, hvis eleven klikker
-   udenfor eller trykker Esc. Samme opskrift som sc1.1_atombygger.
+   Viser rundt paa den fane, man staar paa: ét element ad gangen med en
+   kort tekst. Samme kode som i sb4.4; kun TURE er ny.
+
+   Hvert trin er en CSS-selector plus en titel og en kort tekst. Dele af
+   laerredet har et usynligt felt oven paa sig, som fanen selv flytter paa
+   plads (saetAnker i fane.js og sim_*.js).
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
 
-    /* fane: trinnet vises kun paa den fane. Uden fane vises det paa
-       begge, hvis elementet kan ses. */
-    var TRIN_KANDIDATER = [
-        { sel: ".faneknapper", tekst: "På Byg bygger du selv prikformlerne. På Find fejlen retter du Kemichaels tegninger." },
-        { sel: "#opgave-menu", tekst: "Vælg molekylet her. Det blå felt er den opgave, du er i gang med, og grøn skrift betyder, at opgaven er løst." },
-        { sel: "#opsaetning-overlay", tekst: "Find atomet i det periodiske system, og klik på den firkant, der viser antallet af elektroner i dets yderste skal (valenselektroner)." },
-        { sel: "#byg-bund", tekst: "Træk atomerne sammen for at danne bindinger. Klik på de fælles elektroner mellem to atomer for at skifte mellem enkelt-, dobbelt- og tripelbinding. Tæl selv elektronerne om hvert atom, og tryk Tjek svar. Sidder du fast, giver den lilla knap hjælp ét trin ad gangen." },
-        { sel: "#fejl-menu", tekst: "Vælg en af Kemichaels tegninger. Grøn skrift betyder, at du har fundet fejlen selv." },
-        { sel: "#laerred", fane: "fejl", tekst: "Klik på det atom, der er tegnet forkert. Klikker du på et atom, der passer, tæller animationen elektronerne om det for dig." },
-        { sel: "#fejl-bund", tekst: "Her står spørgsmålet. Er tegningen rigtig, så tryk Ingen fejl. Sidder du fast, giver den lilla knap et hint og derefter svaret." }
-    ];
+    var TURE = {
+        "fane-b": [
+            { sel: "#b-skort", titel: "Opgaven", tekst: "Her står det, du skal gøre. Hint og svar står også her. Dit svar tæller først, når du trykker Indsend svar." },
+            { sel: "#b-anker-flade", titel: "Bordet", tekst: "Først bygger du atomerne: et klik på en plads sætter en elektron, og et klik på en elektron fjerner den. Så trækker du en uparret elektron hen på en uparret elektron på et andet atom. Et klik på et fælles elektronpar skiller det ad igen." },
+            { sel: "#b-opgaver", titel: "Molekylerne", tekst: "Ti molekyler fra let til svær. Et molekyle, du klarer i første forsøg uden at se svaret, får en stjerne." },
+            { sel: "#b-forfra", titel: "Forfra", tekst: "Begynder forfra på det molekyle, du er ved." }
+        ],
+        "fane-f": [
+            { sel: "#f-skort", titel: "Opgaven", tekst: "Klik på det atom, der er tegnet forkert, eller vælg Ingen fejl. Tryk så Indsend svar." },
+            { sel: "#f-anker-flade", titel: "Elevens tegning", tekst: "Tæl elektronerne omkring hvert atom. Begge elektroner i et fælles elektronpar tæller med hos begge atomer." },
+            { sel: "#f-opgaver", titel: "Tegningerne", tekst: "Tolv tegninger. Nogle er rigtige." }
+        ]
+    };
+    var trin = [];
+    var trinNr = 0;
+    var erAktiv = false;
 
-    var trin = [], trinIdx = 0, baggrund = null, boble = null;
-
-    function elementErSynligt(sel) {
-        var e = document.querySelector(sel);
-        if (!e) return false;
-        var r = e.getBoundingClientRect();
-        return r.width > 0 && r.height > 0;
+    function synligeElementer(sel) {
+        var liste = document.querySelectorAll(sel);
+        var ud = [];
+        for (var i = 0; i < liste.length; i++) {
+            if (liste[i].offsetWidth || liste[i].offsetHeight) ud.push(liste[i]);
+        }
+        return ud;
     }
 
-    NK.startRundvisning = function () {
-        var fane = document.body.getAttribute("data-fane");
-        afslutRundvisning();
-        trin = TRIN_KANDIDATER.filter(function (t) { return (!t.fane || t.fane === fane) && elementErSynligt(t.sel); });
-        if (!trin.length) return;
-        if (!baggrund) {
-            baggrund = document.createElement("div");
-            baggrund.id = "rundvisning-baggrund";
-            document.body.appendChild(baggrund);
-            boble = document.createElement("div");
-            boble.id = "rundvisning-boble";
-            document.body.appendChild(boble);
+    /* Den samlede begraensningskasse for alle elementer, en selector
+       matcher - saa ét trin kan fremhaeve flere ting paa én gang. */
+    function samletRect(sel) {
+        var liste = synligeElementer(sel);
+        if (!liste.length) return null;
+        var r = liste[0].getBoundingClientRect();
+        var top = r.top, left = r.left, right = r.right, bottom = r.bottom;
+        for (var i = 1; i < liste.length; i++) {
+            var r2 = liste[i].getBoundingClientRect();
+            top = Math.min(top, r2.top);
+            left = Math.min(left, r2.left);
+            right = Math.max(right, r2.right);
+            bottom = Math.max(bottom, r2.bottom);
         }
-        visTrin(0);
+        return { top: top, left: left, right: right, bottom: bottom, width: right - left, height: bottom - top };
+    }
+
+    /* Boksen laegges der, hvor der er plads: foerst under maalet, saa
+       over det, saa til hoejre, saa til venstre, og til sidst midt paa
+       skaermen, hvis intet af det passer. */
+    function plasserBoks(rect) {
+        var boks = NK.el("rv-boks");
+        var margin = 16;
+        var vb = window.innerWidth, vh = window.innerHeight;
+        var bB = boks.offsetWidth, bH = boks.offsetHeight;
+        var top, left;
+
+        if (rect.bottom + margin + bH <= vh) {
+            top = rect.bottom + margin;
+            left = rect.left + rect.width / 2 - bB / 2;
+        } else if (rect.top - margin - bH >= 0) {
+            top = rect.top - margin - bH;
+            left = rect.left + rect.width / 2 - bB / 2;
+        } else if (rect.right + margin + bB <= vb) {
+            top = rect.top + rect.height / 2 - bH / 2;
+            left = rect.right + margin;
+        } else if (rect.left - margin - bB >= 0) {
+            top = rect.top + rect.height / 2 - bH / 2;
+            left = rect.left - margin - bB;
+        } else {
+            top = (vh - bH) / 2;
+            left = (vb - bB) / 2;
+        }
+
+        boks.style.left = NK.klamp(left, 10, vb - bB - 10) + "px";
+        boks.style.top = NK.klamp(top, 10, vh - bH - 10) + "px";
+    }
+
+    function visTrin() {
+        var t = trin[trinNr];
+        if (!t) { luk(); return; }
+
+        var maal = synligeElementer(t.sel)[0];
+        if (maal) maal.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
+
+        var rect = samletRect(t.sel);
+        if (!rect) { naeste(); return; }
+
+        var pad = 6;
+        var spot = NK.el("rv-spot");
+        spot.style.top = (rect.top - pad) + "px";
+        spot.style.left = (rect.left - pad) + "px";
+        spot.style.width = (rect.width + pad * 2) + "px";
+        spot.style.height = (rect.height + pad * 2) + "px";
+
+        NK.saetTekst("rv-titel", t.titel);
+        NK.saetTekst("rv-tekst", t.tekst);
+        NK.saetTekst("rv-tal", (trinNr + 1) + "/" + trin.length);
+        NK.el("rv-forrige").style.display = trinNr === 0 ? "none" : "";
+        NK.saetTekst("rv-naeste", trinNr === trin.length - 1 ? "Afslut" : "Næste →");
+
+        plasserBoks(rect);
+    }
+
+    function start(faneId) {
+        var liste = TURE[faneId];
+        if (!liste || !liste.length) return;
+        trin = liste;
+        trinNr = 0;
+        erAktiv = true;
+        NK.el("rundvisning").hidden = false;
+        visTrin();
+    }
+
+    function luk() {
+        erAktiv = false;
+        NK.el("rundvisning").hidden = true;
+    }
+
+    function naeste() {
+        if (trinNr >= trin.length - 1) { luk(); return; }
+        trinNr++;
+        visTrin();
+    }
+
+    function forrige() {
+        if (trinNr <= 0) return;
+        trinNr--;
+        visTrin();
+    }
+
+    NK.Rundvisning = {
+        start: start,
+        luk: luk,
+        aktiv: function () { return erAktiv; }
     };
 
-    function visTrin(i) {
-        trinIdx = i;
-        var t = trin[i];
-        var maal = document.querySelector(t.sel);
-        if (!maal) { afslutRundvisning(); return; }
-
-        var r = maal.getBoundingClientRect();
-        var p = 6;
-        var x1 = Math.max(r.left - p, 0), y1 = Math.max(r.top - p, 0);
-        var x2 = Math.min(r.right + p, window.innerWidth), y2 = Math.min(r.bottom + p, window.innerHeight);
-        var poly = "polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, " +
-            x1 + "px " + y1 + "px, " + x2 + "px " + y1 + "px, " + x2 + "px " + y2 + "px, " + x1 + "px " + y2 + "px, " + x1 + "px " + y1 + "px, 0 0)";
-        baggrund.style.clipPath = poly;
-        baggrund.style.webkitClipPath = poly;
-
-        var sidste = i === trin.length - 1;
-        var forrigeHtml = i > 0 ? '<button class="rundvisning-knap svag" id="rundvisning-forrige">◀ Forrige</button>' : "";
-        boble.innerHTML =
-            '<div class="rundvisning-taeller">Trin ' + (i + 1) + " af " + trin.length + "</div>" +
-            '<div class="rundvisning-tekst">' + t.tekst + "</div>" +
-            '<div class="rundvisning-nav">' +
-            '<button class="rundvisning-knap svag" id="rundvisning-afslut">Afslut</button>' +
-            '<div style="display:flex; gap:8px;">' + forrigeHtml +
-            '<button class="rundvisning-knap" id="rundvisning-naeste">' + (sidste ? "Afslut ✔" : "Næste ▶") + "</button>" +
-            "</div></div>";
-
-        NK.el("rundvisning-afslut").addEventListener("click", afslutRundvisning);
-        if (i > 0) NK.el("rundvisning-forrige").addEventListener("click", function () { visTrin(i - 1); });
-        NK.el("rundvisning-naeste").addEventListener("click", function () { sidste ? afslutRundvisning() : visTrin(i + 1); });
-
-        var br = boble.getBoundingClientRect();
-        var top = y2 + 14;
-        if (top + br.height > window.innerHeight - 10) {
-            top = y1 - br.height - 14;
-            if (top < 10) top = 10;
-        }
-        var left = r.left + r.width / 2 - br.width / 2;
-        left = Math.max(10, Math.min(left, window.innerWidth - br.width - 10));
-        boble.style.top = top + "px";
-        boble.style.left = left + "px";
+    function init() {
+        NK.el("rv-naeste").addEventListener("click", naeste);
+        NK.el("rv-forrige").addEventListener("click", forrige);
+        NK.el("rv-luk").addEventListener("click", luk);
+        NK.el("rv-baggrund").addEventListener("click", luk);
+        window.addEventListener("resize", function () { if (erAktiv) visTrin(); });
     }
 
-    function afslutRundvisning() {
-        if (baggrund) { baggrund.remove(); baggrund = null; }
-        if (boble) { boble.remove(); boble = null; }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
     }
-
-    NK.lukRundvisning = afslutRundvisning;
-
-    document.addEventListener("keydown", function (e) {
-        if (!baggrund) return;
-        if (e.key === "Escape") { afslutRundvisning(); return; }
-        if (e.key === "ArrowRight" || e.key === "Enter") {
-            if (trinIdx < trin.length - 1) visTrin(trinIdx + 1); else afslutRundvisning();
-        } else if (e.key === "ArrowLeft") {
-            if (trinIdx > 0) visTrin(trinIdx - 1);
-        }
-    });
 }());

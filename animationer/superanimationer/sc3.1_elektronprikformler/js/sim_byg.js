@@ -1,471 +1,730 @@
 /* =====================================================================
-   sim_byg.js - fanen Byg: vaelg valenselektroner, traek atomer
-   sammen, byg bindinger, tjek mod oktetreglen.
+   sim_byg.js - fanen Byg
 
-   Eleven taeller selv. Der staar intet elektrontal ved atomerne, og
-   symbolerne skifter ikke farve undervejs. Foerst "Tjek svar" viser,
-   hvilke atomer der ikke passer (roed ring og "for faa"/"for mange").
-   Hjaelpen kommer i trin paa én knap: Giv hint, Tael for mig (nu staar
-   elektrontallet ved hvert atom) og Vis svaret (facit i hintboksen).
+   Hvert molekyle bygges i tre trin, som i bogen:
 
-   Objektet foelger samme moenster som resten af superanimationerne:
-   tilpas(), opdater(dt), tegn() og nulstil(). Kun den aktive fane
-   tegnes; musen virker kun, naar aktiv er sat - se js/app.js.
+     1 Byg atomet. Foerste gang et grundstof dukker op, saetter eleven
+       selv dets elektroner i yderste skal. Hver side har to stiplede
+       pladser: et klik paa en tom plads (eller ved siden) saetter en
+       elektron, et klik paa en elektron fjerner den, og et hoejreklik
+       ved en side fjerner én (brugerens oenske 25. okt. 2026: begge dele).
+       Det periodiske system med hovedgrupperne staar ved siden af.
+       Indsend svar holder tegningen op mod antallet (hovedgruppen) og
+       bogens regel: de foerste fire faar hver sin side.
+     2 Byg molekylet. Atomerne ligger paa bordet med elevens egne
+       elektroner. Eleven traekker en uparret elektron hen paa en uparret
+       elektron paa et andet atom (eller klikker paa dem efter hinanden),
+       og de bliver et faelles elektronpar. Et klik paa et faelles par
+       skiller det ad igen. Programmet laver aldrig en binding selv.
+       Indsend svar: er der uparrede elektroner tilbage, faar eleven at
+       vide hvor.
+     3 Tael efter. Eleven taeller elektronerne omkring ét atom og sender
+       tallet ind. Bagefter staar stregformlen ved siden af.
+
+   Intet bedoemmes, foer eleven trykker Indsend svar, og et forkert svar
+   koster stjernen (brugeren 24. okt. 2026). Hint og svar staar paa
+   kortet oeverst i scenen (js/fane.js).
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
+    var D = NK.Data;
+    var P = NK.Prik;
+    var T = NK.T;
 
-    var GEM_FREMSKRIDT = "sc3_1_fremskridt";
-    var GEM_LOEST = "sc3_1_loeste";
-    var SNAP_AFSTAND = 105;
-    var BRYD_AFSTAND = 200;
+    var FART = 9;          /* atomerne glider mod deres plads */
+    var TAEL_FART = 6;     /* prikker pr. sekund i optaellingen */
 
-    /* Knappens tekst foer hvert trin i hjaelpen */
-    var HJAELP_KNAP = ["Giv hint", "Tæl for mig", "Vis svaret"];
-
-    function loadFremskridt() {
-        var v = parseInt(NK.hent(GEM_FREMSKRIDT, 0), 10);
-        return (isNaN(v) || v < 0 || v >= NK.OPGAVER.length) ? 0 : v;
+    /* Grundstofferne i formlens raekkefoelge: "CH₂O" -> C, H, O */
+    function grundstoffer(mol) {
+        var ud = [];
+        (mol.f.match(/[A-Z][a-z]?/g) || []).forEach(function (s) {
+            Object.keys(D.EL).forEach(function (z) {
+                if (D.EL[z].s === s && ud.indexOf(+z) < 0) ud.push(+z);
+            });
+        });
+        return ud;
     }
 
-    function loadLoeste() {
-        var arr = NK.hent(GEM_LOEST, null);
-        if (Array.isArray(arr)) return NK.OPGAVER.map(function (_, i) { return !!arr[i]; });
-        return NK.OPGAVER.map(function () { return false; });
-    }
+    NK.SimByg = function () {
+        this.tegnede = {};
+        this.vis = {};
+        this.harBundet = false;
+        this.startFane(D.MOLEKYLER.map(function (m) { return { id: m.id, chip: m.f, titel: NK.stort(m.navn) }; }));
+        var mig = this;
+        /* Hoejreklik ved en side af atomet fjerner en elektron */
+        this.L.canvas.addEventListener("contextmenu", function (e) {
+            if (mig.trin !== "atom") return;
+            e.preventDefault();
+            mig.hoejreKlik(mig.L.punkt(e));
+        });
+        var foerste = 0;
+        for (var i = 0; i < this.status.length; i++) if (!this.status[i].loest) { foerste = i; break; }
+        this.vaelg(foerste);
+    };
 
-    NK.SimByg = function (laerred) {
-        this.laerred = laerred;
-        this.linjeLaerred = new NK.Laerred(NK.el("stregformel-laerred"));
-        this.loeste = loadLoeste();
-        this.aktiv = true;
+    var P_ = NK.SimByg.prototype;
+    NK.Fane.paa(P_, { navn: "b", naesteFane: "fane-f", naesteNavn: "Find fejlen", naesteTekst: "Næste molekyle →" });
 
-        this.state = {
-            niveau: 0,
-            fase: "opsaetning",
-            delfase: 0,
-            unikkeAtomer: [],
-            atomer: [],
-            bindinger: [],
-            partikler: [],
-            hjaelp: 0,          /* 0: ingen, 1: hint, 2: elektrontal, 3: svaret */
-            markering: {},      /* { atom-id: "faa" | "mange" } efter Tjek svar */
-            fejlTjek: 0
+    /* ----- Opgaven ------------------------------------------------------------ */
+    P_.lavOpgave = function (i) {
+        var mol = D.MOLEKYLER[i];
+        var mig = this;
+        this.mol = mol;
+        this.nye = grundstoffer(mol).filter(function (z) { return !mig.tegnede[z]; });
+        this.atomNr = 0;
+        this.trin = this.nye.length ? "atom" : "byg";
+        this.tegning = [0, 0, 0, 0];
+        this.pladser = [[0, 0], [0, 0], [0, 0], [0, 0]];
+        this.overPlads = null;
+        this.M = P.nytMolekyle(mol.atomer, this.tegnede);
+        this.talValg = null;
+        this.talForkert = {};
+        this.taelling = null;
+        this.haand = null;
+        this.valgtE = null;
+        this.over = null;
+        this.markering = {};
+        this.nytPar = null;
+        this.stregAlfa = 0;
+        this.vis = {};
+        this.pl = null;
+        this.G = null;
+        this.straks = true;
+    };
+
+    P_.atomZ = function () { return this.nye[this.atomNr]; };
+    P_.omAtom = function () { return this.M.atomer[this.mol.om]; };
+
+    P_.delNu = function () {
+        var mol = this.mol;
+        if (this.trin === "atom") {
+            var el = D.EL[this.atomZ()];
+            return {
+                chip: "Byg atomet" + (this.nye.length > 1 ? " " + (this.atomNr + 1) + " af " + this.nye.length : ""),
+                tekst: mol.f + ": Byg et " + el.atom + ". Klik på pladserne omkring " + el.s + " for at sætte elektronerne i yderste skal. Et klik på en elektron fjerner den."
+            };
+        }
+        if (this.trin === "byg") {
+            return {
+                chip: "Byg molekylet",
+                tekst: "Byg " + mol.f + ": Træk en uparret elektron hen på en uparret elektron på et andet atom. Så deler de to atomer et elektronpar."
+            };
+        }
+        return {
+            chip: "Tæl efter",
+            tekst: "Hvor mange elektroner har " + D.omNavn(mol) + " omkring sig i " + mol.f + "?",
+            ekstra: this.talHTML()
         };
-
-        this.traekAtom = null;
-        this.snapMaal = null;
-        this.hoverAtom = null;
-
-        this._byggOpgaveMenu();
-        this._bindInteraktion();
-        this.initNiveau(loadFremskridt());
     };
 
-    /* ----- Opgavemenuen: én knap pr. molekylformel --------------------- */
-    NK.SimByg.prototype._byggOpgaveMenu = function () {
-        var self = this;
-        var menu = NK.el("opgave-menu");
-        menu.innerHTML = "";
-        NK.OPGAVER.forEach(function (opg, i) {
-            var knap = document.createElement("button");
-            knap.className = "opgave-knap";
-            knap.type = "button";
-            knap.title = opg.navn;
-            knap.textContent = opg.f;
-            knap.addEventListener("click", function () { self.initNiveau(i); });
-            menu.appendChild(knap);
-        });
+    P_.kanIndsende = function () {
+        if (this.trin === "atom") return P.sum(this.tegning) > 0;
+        if (this.trin === "byg") return this.M.bindinger.length > 0;
+        return this.talValg !== null && this.talValg !== undefined;
     };
 
-    NK.SimByg.prototype._opdaterOpgaveMenu = function () {
-        var knapper = NK.el("opgave-menu").children;
-        for (var i = 0; i < knapper.length; i++) {
-            knapper[i].classList.toggle("loest", this.loeste[i]);
-            knapper[i].classList.toggle("aktiv", i === this.state.niveau);
+    P_.indsendTekst = function () {
+        if (this.trin === "atom") {
+            var n = P.sum(this.tegning);
+            return n ? "Indsend svar: " + n + (n === 1 ? " elektron" : " elektroner") : "Indsend svar";
         }
+        if (this.trin === "tael" && this.talValg) return "Indsend svar: " + this.talValg;
+        return "Indsend svar";
     };
 
-    NK.SimByg.prototype.opdaterTaeller = function () {
-        NK.el("taeller-tekst").textContent = "Opgave " + (this.state.niveau + 1) + "/" + NK.OPGAVER.length;
+    P_.kortKlik = function (e) {
+        if (this.trin === "tael") this.talKlik(e);
     };
 
-    /* ----- Niveaustyring ------------------------------------------------ */
-    NK.SimByg.prototype.initNiveau = function (idx) {
-        if (idx >= NK.OPGAVER.length) idx = 0;
-        var s = this.state;
-        s.niveau = idx;
-        s.fase = "opsaetning";
-        s.delfase = 0;
-        s.unikkeAtomer = Array.from(new Set(NK.OPGAVER[idx].atomer)).sort(function (a, b) { return a - b; });
-        s.atomer = [];
-        s.bindinger = [];
-        s.partikler = [];
-        s.hjaelp = 0;
-        s.markering = {};
-        s.fejlTjek = 0;
-        NK.gem(GEM_FREMSKRIDT, idx);
-
-        if (this.aktiv) this.opdaterTaeller();
-        NK.el("sejr-overlay").classList.add("skjult");
-        NK.el("tjek-knap").classList.add("skjult");
-        NK.el("nulstil-knap").classList.add("skjult");
-        NK.el("byg-knap").classList.add("skjult");
-        NK.el("opsaetning-overlay").classList.remove("skjult");
-        NK.el("stregformel-panel").classList.add("skjult");
-        NK.skjulHint("byg");
-
-        this._opdaterOpgaveMenu();
-        this._opsaetningsFase();
-    };
-
-    NK.SimByg.prototype._opsaetningsFase = function () {
-        var s = this.state;
-        var opg = NK.OPGAVER[s.niveau];
-
-        if (s.delfase >= s.unikkeAtomer.length) {
-            NK.el("opsaetning-overlay").classList.add("skjult");
-            NK.el("tjek-knap").classList.remove("skjult");
-            NK.el("nulstil-knap").classList.remove("skjult");
-            NK.el("stregformel-panel").classList.remove("skjult");
-            this._opdaterHjaelpKnap();
-            this._spawnAtomer();
+    P_.indsend = function () {
+        if (this.trin === "atom") {
+            var z = this.atomZ();
+            var f = P.tegningFejl(z, this.tegning);
+            if (f) { this.fejlLinje(f.slags === "antal" ? D.antalHint(z, f.tal) : D.FORDELING); return; }
+            this.tegnede[z] = this.tegning.slice();
+            this.mellemsvar("selv", D.atomRigtigt(z), this.atomNr + 1 < this.nye.length ? "Næste atom →" : "Byg molekylet →");
             return;
         }
-
-        var z = s.unikkeAtomer[s.delfase];
-        var el = NK.ELEMENTER[z];
-        var atomLabel = '<span class="fremhaev">' + el.n + " (" + el.s + ")</span>";
-        NK.el("opsaetning-molekyle").innerHTML =
-            opg.f + ' <span class="opsaetning-navn">(' + opg.navn + ")</span>";
-        NK.el("opsaetning-overskrift").innerHTML = s.delfase === 0
-            ? "Før vi kan lave elektronprikformlen for " + opg.f + " (" + opg.navn + "), skal vi først betragte " + atomLabel
-            : "Lad os nu se nærmere på " + atomLabel;
-        NK.el("valens-besked").textContent = "";
-
-        var pt = NK.el("periodisk-system");
-        pt.innerHTML = "";
-        NK.PT_KORT.forEach(function (pid) {
-            var felt = document.createElement("div");
-            felt.className = "pt-felt";
-            if (pid > 0 && NK.ELEMENTER[pid]) {
-                felt.innerHTML = '<span class="pt-nr">' + pid + '</span><span class="pt-symbol">' + NK.ELEMENTER[pid].s + "</span>";
-                felt.classList.add("aktiv");
-                if (pid === z) felt.classList.add("fremhaevet");
-            } else {
-                felt.style.visibility = "hidden";
+        if (this.trin === "byg") {
+            var r = P.faerdig(this.M);
+            if (r.ok) {
+                this.markering = {};
+                this.mellemsvar("selv", this.mol.bygt, "Tæl efter →");
+                return;
             }
-            pt.appendChild(felt);
-        });
-
-        var self = this;
-        var knapper = NK.el("valens-knapper");
-        knapper.innerHTML = "";
-        for (var i = 1; i <= 8; i++) {
-            (function (tal) {
-                var knap = document.createElement("button");
-                knap.className = "valens-knap";
-                knap.type = "button";
-                knap.textContent = tal;
-                knap.addEventListener("click", function () { self.svarValens(tal, knap); });
-                knapper.appendChild(knap);
-            }(i));
-        }
-    };
-
-    /* Et forkert tal blinker og giver et hint, der passer til fejlen. */
-    NK.SimByg.prototype.svarValens = function (tal, knap) {
-        var s = this.state;
-        if (s.fase !== "opsaetning") return;
-        var z = s.unikkeAtomer[s.delfase];
-        if (tal === NK.ELEMENTER[z].v) {
-            s.delfase++;
-            this._opsaetningsFase();
+            this.markering = {};
+            var mig = this;
+            r.enlige.forEach(function (a) { mig.markering[a.id] = true; });
+            this.fejlLinje(this.bygFejl(r));
             return;
         }
-        NK.el("valens-besked").textContent = NK.valensHint(z, tal);
-        if (knap) {
-            knap.classList.add("forkert");
-            setTimeout(function () { knap.classList.remove("forkert"); }, 400);
-        }
-    };
-
-    NK.SimByg.prototype.nulstilNiveau = function () {
-        if (this.state.fase !== "aktion") return;
-        this.state.atomer = [];
-        this.state.bindinger = [];
-        this.state.partikler = [];
-        this.state.markering = {};
-        this._spawnAtomer();
-    };
-
-    NK.SimByg.prototype._spawnAtomer = function () {
-        this.laerred.tilpas();
-        var s = this.state;
-        s.fase = "aktion";
-        var liste = NK.OPGAVER[s.niveau].atomer;
-        var cx = this.laerred.b / 2, cy = this.laerred.h / 2;
-        var r = Math.min(this.laerred.b, this.laerred.h) * 0.25;
-
-        liste.forEach(function (z, i) {
-            var vinkel = (i / liste.length) * Math.PI * 2 - 1.57;
-            s.atomer.push({
-                id: i, z: z,
-                x: cx + Math.cos(vinkel) * r,
-                y: cy + Math.sin(vinkel) * r,
-                r: 30
-            });
-        });
-    };
-
-    /* Haenger alle atomerne sammen gennem bindingerne? */
-    NK.SimByg.prototype._sammenhaengende = function () {
-        var s = this.state;
-        if (!s.atomer.length) return true;
-        var set = {}, koe = [s.atomer[0]];
-        set[s.atomer[0].id] = true;
-        while (koe.length) {
-            var a = koe.shift();
-            s.bindinger.forEach(function (b) {
-                var n = b.s === a ? b.t : b.t === a ? b.s : null;
-                if (n && !set[n.id]) { set[n.id] = true; koe.push(n); }
-            });
-        }
-        return s.atomer.every(function (a) { return set[a.id]; });
-    };
-
-    NK.SimByg.prototype.tjekSvar = function () {
-        var s = this.state;
-        if (s.fase !== "aktion") return;
-        s.markering = {};
-
-        if (!this._sammenhaengende()) {
-            this._fejlTjek("Atomerne hænger ikke sammen.");
+        var om = this.omAtom();
+        var st = P.status(this.M, om);
+        if (this.talValg === st.nu) {
+            this.taelling = { id: om.id, n: 0, faerdig: false };
+            this.loest("selv", D.taelForklaring(om.z, st) + " Til højre er hvert fælles elektronpar tegnet som en streg.");
             return;
         }
+        var galt = this.talValg;
+        this.talForkert[galt] = true;
+        this.talValg = null;
+        this.visKort();
+        this.fejlLinje(D.taelleHint(st, galt));
+    };
 
-        var forkerte = [];
-        s.atomer.forEach(function (a) {
-            var st = NK.atomStatus(s, a);
-            if (st.stabil) return;
-            forkerte.push({ a: a, st: st });
-            s.markering[a.id] = st.nu < st.maal ? "faa" : "mange";
-        });
-
-        if (!forkerte.length) {
-            s.fase = "sejr";
-            NK.el("sejr-sprite").src = "sprites/" + NK.OPGAVER[s.niveau].sprite;
-            NK.el("sejr-overlay").classList.remove("skjult");
-            NK.el("tjek-knap").classList.add("skjult");
-            NK.el("nulstil-knap").classList.add("skjult");
-            NK.el("byg-knap").classList.add("skjult");
-            NK.skjulHint("byg");
-            this.loeste[s.niveau] = true;
-            NK.gem(GEM_LOEST, this.loeste);
-            this._opdaterOpgaveMenu();
-            this._spawnKonfetti();
-            return;
-        }
-
-        if (forkerte.length === 1) {
-            var f = forkerte[0];
-            this._fejlTjek("Prøv igen: " + NK.ELEMENTER[f.a.z].n.toLowerCase() + " har for " +
-                (f.st.nu < f.st.maal ? "få" : "mange") + " elektroner.");
+    /* Hvad der mangler, naar prikformlen ikke er faerdig */
+    P_.bygFejl = function (r) {
+        var M = this.M;
+        var tekst;
+        if (r.enlige.length === 1) {
+            var a = r.enlige[0], n = P.enlige(M, a);
+            tekst = NK.stort(D.EL[a.z].navn) + " har stadig " + n + (n === 1 ? " uparret elektron." : " uparrede elektroner.") +
+                " Hver uparret elektron skal være med i et fælles elektronpar.";
         } else {
-            this._fejlTjek("Prøv igen: de røde atomer passer ikke med oktetreglen.");
+            tekst = "Atomerne med rød ring har stadig uparrede elektroner. Hver uparret elektron skal være med i et fælles elektronpar.";
+        }
+        if (!this.kanBindes()) tekst += " Klik på et fælles elektronpar for at skille det ad igen.";
+        return tekst;
+    };
+
+    /* Kan to atomer med uparrede elektroner stadig dele et par? */
+    P_.kanBindes = function () {
+        var M = this.M;
+        var dele = P.dele(M);
+        function del(id) { for (var i = 0; i < dele.length; i++) if (dele[i].indexOf(id) >= 0) return i; return -1; }
+        var enlige = M.atomer.filter(function (a) { return P.enlige(M, a) > 0; });
+        for (var i = 0; i < enlige.length; i++) {
+            for (var j = i + 1; j < enlige.length; j++) {
+                var a = enlige[i], b = enlige[j];
+                var x = P.find(M, a, b);
+                if (x ? x.n < 3 : del(a.id) !== del(b.id)) return true;
+            }
+        }
+        return false;
+    };
+
+    P_.visSvar = function () {
+        if (this.trin === "atom") {
+            var z = this.atomZ();
+            this.tegning = P.standard(z);
+            this.tegnede[z] = this.tegning.slice();
+            this.mellemsvar("svar", D.atomRigtigt(z), this.atomNr + 1 < this.nye.length ? "Næste atom →" : "Byg molekylet →");
+            return;
+        }
+        if (this.trin === "byg") {
+            this.M = P.facit(this.mol, this.tegnede);
+            this.pl = null;
+            this.markering = {};
+            this.haand = null;
+            this.valgtE = null;
+            this.mellemsvar("svar", this.mol.bygt, "Tæl efter →");
+            return;
+        }
+        var om = this.omAtom();
+        var st = P.status(this.M, om);
+        this.taelling = { id: om.id, n: 0, faerdig: false };
+        this.loest("svar", D.taelForklaring(om.z, st) + " Til højre er hvert fælles elektronpar tegnet som en streg.", st.nu + " elektroner.");
+    };
+
+    /* Eleven trykker videre paa et groent mellemsvar */
+    P_.videre = function () {
+        if (this.trin === "atom") {
+            this.atomNr++;
+            if (this.atomNr < this.nye.length) {
+                this.tegning = [0, 0, 0, 0];
+                this.pladser = [[0, 0], [0, 0], [0, 0], [0, 0]];
+                this.nyDel();
+                return;
+            }
+            this.trin = "byg";
+            this.M = P.nytMolekyle(this.mol.atomer, this.tegnede);
+            this.vis = {};
+            this.pl = null;
+            this.G = null;
+            this.straks = true;
+            this.nyDel();
+            this.layout();
+            return;
+        }
+        if (this.trin === "byg") {
+            this.trin = "tael";
+            this.talValg = null;
+            this.talForkert = {};
+            this.nyDel();
         }
     };
 
-    /* Efter tre forkerte tjek i træk minder hjaelpeknappen om sig selv. */
-    NK.SimByg.prototype._fejlTjek = function (tekst) {
-        var s = this.state;
-        NK.visToast(tekst);
-        s.fejlTjek++;
-        if (s.fejlTjek >= 3 && s.hjaelp < HJAELP_KNAP.length) {
-            var k = NK.el("byg-knap");
-            k.classList.remove("puf");
-            void k.offsetWidth;
-            k.classList.add("puf");
+    P_.hintTrin = function () {
+        if (this.trin === "atom") {
+            var z = this.atomZ(), el = D.EL[z];
+            return [
+                "Find " + el.s + " i det periodiske system til højre. Hovedgruppens nummer er antallet af elektroner i yderste skal.",
+                z === 1 ? "H står i hovedgruppe 1 og har 1 elektron. Den sættes ved én af siderne." :
+                    el.s + " står i hovedgruppe " + el.g + ". De første fire elektroner får hver sin side af symbolet. Først derefter danner de par."
+            ];
         }
+        if (this.trin === "byg") return this.mol.hint;
+        var om = this.omAtom();
+        var st = P.status(this.M, om);
+        return [
+            "Tæl alle prikker omkring " + D.EL[om.z].navn + ": de frie elektroner og begge elektroner i hvert fælles elektronpar.",
+            D.taelHint2(om.z, st)
+        ];
     };
 
-    NK.SimByg.prototype._spawnKonfetti = function () {
-        var cx = this.laerred.b / 2, cy = this.laerred.h / 2;
-        for (var i = 0; i < 80; i++) {
-            this.state.partikler.push({
-                x: cx, y: cy,
-                vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15,
-                liv: 1 + Math.random(),
-                farve: "hsl(" + Math.floor(Math.random() * 360) + ", 70%, 60%)",
-                stoerrelse: 3 + Math.random() * 3
+    /* ----- Plads paa scenen ------------------------------------------------------ */
+    P_.layout = function () {
+        var W = this.L.b, H = this.L.h;
+        var top = this.top();
+        var flade = { x: 16, y: top, b: Math.max(200, W - 32), h: Math.max(160, H - top - 14) };
+        var lay = { W: W, H: H, flade: flade };
+        /* Tegn atomet: atomet til venstre, det periodiske system til hoejre */
+        lay.stor = NK.klamp(Math.min(flade.h * 0.22, flade.b * 0.09), 46, 84);
+        lay.celle = Math.floor(NK.klamp(Math.min(flade.b * 0.46 / 8, flade.h * 0.78 / 5.2), 24, 50));
+        var tabB = lay.celle * 8;
+        var friB = flade.b - tabB;
+        lay.atom = { x: flade.x + Math.max(lay.stor * 2.4, friB * 0.48), y: flade.y + flade.h * 0.5 };
+        lay.tabel = { x: flade.x + flade.b - tabB - Math.max(10, friB * 0.06), y: flade.y + (flade.h - lay.celle * 4) / 2 + lay.celle * 0.45 };
+        /* Bordet: symbolernes stoerrelse efter scenen */
+        lay.F = NK.klamp(Math.min(flade.b / 14, flade.h / 6.4), 30, 62);
+        this.lay = lay;
+        this.saetAnker("flade", flade.x, flade.y, flade.b, flade.h);
+    };
+
+    /* Atomernes pladser paa bordet: delene (molekylerne og de loese atomer)
+       side om side. Naar opgaven er loest, staar prikformlen til venstre og
+       stregformlen til hoejre. */
+    P_.bordPladser = function () {
+        var lay = this.lay, M = this.M, fl = lay.flade;
+        var F = lay.F, L = T.maal(F).bind;
+        var dele = P.dele(M);
+        var bokse = dele.map(function (del) {
+            var xs = del.map(function (id) { return M.atomer[id].gx; }), ys = del.map(function (id) { return M.atomer[id].gy; });
+            return { del: del, x0: Math.min.apply(null, xs), x1: Math.max.apply(null, xs), y0: Math.min.apply(null, ys), y1: Math.max.apply(null, ys) };
+        });
+        var mellem = 1.45;
+        var bredde = 0, hoejde = 0;
+        bokse.forEach(function (b, i) { bredde += (b.x1 - b.x0) + (i ? mellem : 0); hoejde = Math.max(hoejde, b.y1 - b.y0); });
+        var to = this.faerdig && this.trin === "tael";
+        var plads = to ? fl.b * 0.42 : fl.b * 0.9;
+        var k = Math.min(1, plads / Math.max(1, (bredde + 0.9) * L), fl.h * 0.78 / Math.max(1, (hoejde + 0.9) * L));
+        F *= k; L *= k;
+        var cx = to ? fl.x + fl.b * 0.27 : fl.x + fl.b / 2;
+        var cy = fl.y + fl.h * 0.5;
+        var x = cx - bredde * L / 2;
+        var pos = {};
+        bokse.forEach(function (b) {
+            var my = (b.y0 + b.y1) / 2;
+            b.del.forEach(function (id) {
+                var a = M.atomer[id];
+                pos[id] = { x: x + (a.gx - b.x0) * L, y: cy + (a.gy - my) * L };
+            });
+            x += (b.x1 - b.x0 + mellem) * L;
+        });
+        var streg = null;
+        if (to) {
+            streg = {};
+            var sx = fl.x + fl.b * 0.76 - cx;
+            Object.keys(pos).forEach(function (id) { streg[id] = { x: pos[id].x + sx, y: pos[id].y }; });
+        }
+        return { pos: pos, F: F, streg: streg, pil: to ? { x1: fl.x + fl.b * 0.47, x2: fl.x + fl.b * 0.55, y: cy } : null };
+    };
+
+    /* ----- Tegneloekken ---------------------------------------------------------- */
+    P_.opdaterScene = function (dt) {
+        if (this.trin === "atom" || !this.lay) return;
+        var pl = this.bordPladser();
+        this.pl = pl;
+        var mig = this;
+        Object.keys(pl.pos).forEach(function (id) {
+            var m = pl.pos[id], v = mig.vis[id];
+            if (!v || mig.straks) { mig.vis[id] = { x: m.x, y: m.y }; return; }
+            v.x = NK.mod(v.x, m.x, FART, dt);
+            v.y = NK.mod(v.y, m.y, FART, dt);
+        });
+        this.straks = false;
+        var t = this.taelling;
+        if (t && !t.faerdig) {
+            var antal = this.G ? T.atometsPrikker(this.G, this.M, this.M.atomer[t.id], this.vis).length : P.status(this.M, this.M.atomer[t.id]).nu;
+            t.n += dt * TAEL_FART;
+            if (t.n >= antal) { t.n = antal; t.faerdig = true; }
+        }
+        if (this.faerdig && this.stregAlfa < 1) this.stregAlfa = Math.min(1, this.stregAlfa + dt * 1.4);
+        if (this.nytPar) { this.nytPar.t += dt; if (this.nytPar.t > 0.8) this.nytPar = null; }
+    };
+
+    P_.tegn = function () {
+        var ctx = this.L.ctx, lay = this.lay;
+        this.L.ryd("#14141a");
+        if (!lay) return;
+        if (this.trin === "atom") { this.tegnAtomTrin(ctx); this.tegnSejr(ctx, lay.W, lay.H); return; }
+        if (!this.pl) this.opdaterScene(0);
+        var pl = this.pl, M = this.M;
+        var aaben = !this.faerdig && !this.venter;
+        var ringe = {};
+        var mig = this;
+        Object.keys(this.markering).forEach(function (id) { ringe[id] = "roed"; });
+        if (this.trin === "tael") ringe[this.mol.om] = this.faerdig ? "groen" : "gul";
+        var vis = {
+            tid: this.tid,
+            gloed: this.trin === "byg" && aaben,
+            skjul: this.haand && this.haand.flyttet ? this.haand : null,
+            valgt: this.valgtE,
+            over: aaben && this.trin === "byg" ? this.over : null,
+            maal: !!(this.haand && this.haand.flyttet),
+            ringe: ringe,
+            taelling: this.taelling
+        };
+        this.G = T.molekyle(ctx, M, this.vis, pl.F, vis);
+
+        /* Et nyt faelles par lyser kort op */
+        if (this.nytPar) {
+            var np = this.nytPar;
+            this.G.par.forEach(function (q) {
+                if (q.binding !== np.binding) return;
+                T.ring(ctx, q.x, q.y, T.maal(pl.F).par * 2.4 + np.t * 18, "rgba(255, 255, 255, " + (0.7 * (1 - np.t / 0.8)).toFixed(3) + ")", { bredde: 2 });
             });
         }
-    };
 
-    NK.SimByg.prototype.naesteNiveau = function () {
-        this.initNiveau(this.state.niveau + 1);
-    };
+        /* Foerste gang: en stiplet pil viser, hvad der skal traekkes hvorhen */
+        if (this.trin === "byg" && aaben && !this.harBundet && !M.bindinger.length && !this.haand) this.tegnVejledning(ctx);
 
-    /* ----- Hjaelpen: én knap, ét trin ad gangen ------------------------- */
-    NK.SimByg.prototype.hjaelp = function () {
-        var s = this.state;
-        if (s.fase !== "aktion" || s.hjaelp >= HJAELP_KNAP.length) return;
-        s.hjaelp++;
-        var opg = NK.OPGAVER[s.niveau];
-        if (s.hjaelp === 1) NK.visHint("byg", "Hint", opg.hint);
-        else if (s.hjaelp === 2) NK.visHint("byg", "Hint", opg.hint + " Nu står elektrontallet ved hvert atom.");
-        else NK.visHint("byg", "Svaret", "Byg den, og tryk Tjek svar.", "sprites/" + opg.sprite);
-        this._opdaterHjaelpKnap();
-    };
-
-    NK.SimByg.prototype._opdaterHjaelpKnap = function () {
-        var k = NK.el("byg-knap");
-        var s = this.state;
-        k.classList.remove("puf");
-        k.classList.toggle("skjult", s.fase !== "aktion" || s.hjaelp >= HJAELP_KNAP.length);
-        if (s.hjaelp < HJAELP_KNAP.length) k.textContent = HJAELP_KNAP[s.hjaelp];
-    };
-
-    /* ----- Traek og slip ------------------------------------------------- */
-    NK.SimByg.prototype._musPunkt = function (e) {
-        var r = this.laerred.canvas.getBoundingClientRect();
-        return { x: e.clientX - r.left, y: e.clientY - r.top };
-    };
-
-    NK.SimByg.prototype._bindingVed = function (p) {
-        var b = this.state.bindinger;
-        for (var i = 0; i < b.length; i++) {
-            if (Math.hypot(p.x - (b[i].s.x + b[i].t.x) / 2, p.y - (b[i].s.y + b[i].t.y) / 2) < 16) return i;
+        /* Elektronen i haanden og en elastik hjem til atomet */
+        var h = this.haand;
+        if (h && h.flyttet) {
+            var hjem = this.G.frie.filter(function (d) { return d.id === h.id && d.side === h.side; })[0];
+            var m = T.maal(pl.F);
+            if (hjem) {
+                ctx.save();
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+                ctx.setLineDash([4, 5]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(hjem.x, hjem.y);
+                ctx.lineTo(h.x, h.y);
+                ctx.stroke();
+                ctx.restore();
+                T.ring(ctx, hjem.x, hjem.y, m.prikR + 1, "rgba(255, 255, 255, 0.35)", { bredde: 1.4, stiplet: [2, 3] });
+            }
+            ctx.save();
+            ctx.shadowColor = "#ffffff";
+            ctx.shadowBlur = 12;
+            T.prik(ctx, h.x, h.y, m.prikR * 1.35, D.EL[M.atomer[h.id].z].farve);
+            ctx.restore();
         }
-        return -1;
+
+        /* Loest: stregformlen ved siden af */
+        if (this.faerdig && pl.streg) {
+            var a = NK.blod(this.stregAlfa);
+            var fs = Math.round(NK.klamp(pl.F * 0.36, 13, 16));
+            var under = this.underkant(pl);
+            T.pil(ctx, pl.pil.x1, pl.pil.x2, pl.pil.y, "rgba(201, 208, 217, " + (0.8 * a).toFixed(3) + ")");
+            T.stregformel(ctx, M, pl.streg, pl.F, a);
+            NK.tekst(ctx, "Elektronprikformel", this.midtX(pl.pos), under, { font: "700 " + fs + "px 'Segoe UI', sans-serif", farve: "#a9b0ba", justering: "center", alfa: a });
+            NK.tekst(ctx, "Stregformel", this.midtX(pl.streg), under, { font: "700 " + fs + "px 'Segoe UI', sans-serif", farve: "#a9b0ba", justering: "center", alfa: a });
+        }
+        this.tegnSejr(ctx, lay.W, lay.H);
     };
 
-    NK.SimByg.prototype._atomVed = function (p) {
-        var a = this.state.atomer;
-        for (var i = 0; i < a.length; i++) {
-            if (Math.hypot(p.x - a[i].x, p.y - a[i].y) < a[i].r) return a[i];
+    P_.midtX = function (pos) {
+        var xs = Object.keys(pos).map(function (id) { return pos[id].x; });
+        return (Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2;
+    };
+
+    P_.underkant = function (pl) {
+        var ys = Object.keys(pl.pos).map(function (id) { return pl.pos[id].y; });
+        return Math.max.apply(null, ys) + pl.F * 2.1;
+    };
+
+    /* Den stiplede pil fra en uparret elektron paa det foerste atom til en
+       paa det naeste, og et skilt, der siger, hvad man goer */
+    P_.tegnVejledning = function (ctx) {
+        var G = this.G;
+        var a = this.M.atomer[0], b = null;
+        for (var i = 1; i < this.M.atomer.length; i++) if (this.M.atomer[i].z !== 1 || a.z === 1) { b = this.M.atomer[i]; break; }
+        if (!b) return;
+        var fra = null, til = null, bedst = Infinity;
+        G.frie.forEach(function (d) {
+            if (!d.enlig || d.id !== a.id) return;
+            G.frie.forEach(function (e) {
+                if (!e.enlig || e.id !== b.id) return;
+                var dd = Math.hypot(d.x - e.x, d.y - e.y);
+                if (dd < bedst) { bedst = dd; fra = d; til = e; }
+            });
+        });
+        if (!fra) return;
+        var t = (this.tid % 2.2) / 2.2;
+        ctx.save();
+        ctx.strokeStyle = "rgba(242, 197, 61, 0.85)";
+        ctx.fillStyle = "rgba(242, 197, 61, 0.85)";
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([7, 6]);
+        var mx = (fra.x + til.x) / 2, my = Math.min(fra.y, til.y) - 46;
+        ctx.beginPath();
+        ctx.moveTo(fra.x, fra.y - 10);
+        ctx.quadraticCurveTo(mx, my, til.x, til.y - 10);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        /* En lille elektron, der viser vejen */
+        var u = NK.blod(t), x = (1 - u) * (1 - u) * fra.x + 2 * (1 - u) * u * mx + u * u * til.x;
+        var y = (1 - u) * (1 - u) * (fra.y - 10) + 2 * (1 - u) * u * my + u * u * (til.y - 10);
+        ctx.globalAlpha = 0.9 * (1 - Math.max(0, t - 0.85) / 0.15);
+        T.prik(ctx, x, y, T.maal(this.pl.F).prikR, D.EL[a.z].farve);
+        ctx.restore();
+        T.skilt(ctx, "Træk den uparrede elektron", mx, my - 24, 0.95);
+    };
+
+    /* Pladserne foelger antallet paa hver side (tegning), ogsaa naar
+       tegningen er sat udefra (Vis svaret): én elektron sidder paa den
+       foerste plads, to paa begge. */
+    P_.synkPladser = function () {
+        for (var s = 0; s < 4; s++) {
+            var p = this.pladser[s], n = this.tegning[s];
+            if (p[0] + p[1] !== n) this.pladser[s] = n === 0 ? [0, 0] : (n === 1 ? [1, 0] : [1, 1]);
         }
+    };
+
+    P_.saetPlads = function (s, k, v) {
+        this.synkPladser();
+        this.pladser[s][k] = v;
+        this.tegning[s] = this.pladser[s][0] + this.pladser[s][1];
+        if (this.fast.klasse === "skidt") this.besked("", "");
+        this.nulstilHjaelp();
+        this.visIndsend();
+    };
+
+    /* Den plads, et klik ved siden (ikke lige paa en plads) skal bruge:
+       den naermeste tomme, eller den naermeste fyldte, naar der fjernes */
+    P_.naermestePlads = function (side, pt, fyldt) {
+        var lay = this.lay, mig = this, bedst = null;
+        T.pladsPunkter(lay.atom.x, lay.atom.y, lay.stor, this.atomZ()).forEach(function (q) {
+            if (q.side !== side || !!mig.pladser[side][q.plads] !== fyldt) return;
+            var d = Math.hypot(pt.x - q.x, pt.y - q.y);
+            if (!bedst || d < bedst.d) bedst = { side: side, plads: q.plads, d: d };
+        });
+        return bedst;
+    };
+
+    P_.hoejreKlik = function (pt) {
+        if (!this.lay || this.trin !== "atom") return;
+        var lay = this.lay, z = this.atomZ();
+        var q = T.pladsVed(lay.atom.x, lay.atom.y, lay.stor, z, pt);
+        var s = q ? q.side : T.sideVed(lay.atom.x, lay.atom.y, lay.stor, pt);
+        if (s < 0) return;
+        if (this.spaer()) return;
+        this.synkPladser();
+        var f = q && this.pladser[q.side][q.plads] ? q : this.naermestePlads(s, pt, true);
+        if (f) this.saetPlads(f.side, f.plads, 0);
+    };
+
+    /* Foerste trin: atomet og det periodiske system */
+    P_.tegnAtomTrin = function (ctx) {
+        var lay = this.lay, z = this.atomZ();
+        var aaben = !this.venter && !this.faerdig;
+        var tegnet = this.venter || this.faerdig;
+        this.synkPladser();
+        T.byggeAtom(ctx, lay.atom.x, lay.atom.y, lay.stor, z, this.pladser, aaben ? this.overPlads : null);
+        if (tegnet) T.ring(ctx, lay.atom.x, lay.atom.y, lay.stor * 1.55, this.mellem && this.mellem.maade === "svar" ? T.FARVE.gul : T.FARVE.groen, { bredde: 3, gloed: 12 });
+        else T.ring(ctx, lay.atom.x, lay.atom.y, lay.stor * 1.55, "rgba(242, 197, 61, 0.55)", { bredde: 2, stiplet: [6, 6] });
+        if (aaben && P.sum(this.tegning) === 0) T.skilt(ctx, "Klik på de stiplede pladser", lay.atom.x, lay.atom.y + lay.stor * 1.55 + 26);
+        this.felter = T.periodisk(ctx, lay.tabel.x, lay.tabel.y, lay.celle, z, aaben && this.hjaelp >= 2 ? D.EL[z].g : null);
+    };
+
+    /* ----- Musen ----------------------------------------------------------------- */
+    P_.radius = function () { return Math.max(15, T.maal(this.pl ? this.pl.F : 40).prikR * 3); };
+
+    /* Den uparrede elektron under punktet (ikke paa atomet uden) */
+    P_.enligVed = function (pt, uden) {
+        if (!this.G) return null;
+        var bedst = null, r = this.radius();
+        this.G.frie.forEach(function (d) {
+            if (!d.enlig || d.id === uden) return;
+            var dd = Math.hypot(pt.x - d.x, pt.y - d.y);
+            if (dd < r && (!bedst || dd < bedst.d)) bedst = { id: d.id, side: d.side, d: dd };
+        });
+        return bedst;
+    };
+
+    /* Et atom under punktet: dets naermeste uparrede elektron */
+    P_.atomVed = function (pt, uden) {
+        if (!this.G || !this.pl) return null;
+        var M = this.M, F = this.pl.F, mig = this;
+        var ramt = null;
+        M.atomer.forEach(function (a) {
+            if (a.id === uden) return;
+            var p = mig.vis[a.id];
+            if (p && Math.hypot(pt.x - p.x, pt.y - p.y) < T.ringR(D.EL[a.z].s, F)) ramt = a;
+        });
+        if (!ramt) return null;
+        var bedst = null;
+        this.G.frie.forEach(function (d) {
+            if (!d.enlig || d.id !== ramt.id) return;
+            var dd = Math.hypot(pt.x - d.x, pt.y - d.y);
+            if (!bedst || dd < bedst.d) bedst = { id: d.id, side: d.side, d: dd };
+        });
+        return bedst || { id: ramt.id, side: -1, ingen: true };
+    };
+
+    P_.parVed = function (pt) {
+        if (!this.G) return null;
+        var r = T.maal(this.pl.F).par * 2.4, bedst = null;
+        this.G.par.forEach(function (q) {
+            var d = Math.hypot(pt.x - q.x, pt.y - q.y);
+            if (d < Math.max(r, 13) && (!bedst || d < bedst.d)) bedst = { binding: q.binding, d: d };
+        });
+        return bedst;
+    };
+
+    P_.parretVed = function (pt) {
+        if (!this.G) return null;
+        var r = this.radius() * 0.8, fundet = null;
+        this.G.frie.forEach(function (d) {
+            if (!d.enlig && Math.hypot(pt.x - d.x, pt.y - d.y) < r) fundet = d;
+        });
+        return fundet;
+    };
+
+    P_.overScene = function (pt) {
+        this.over = null;
+        this.overPlads = null;
+        if (!pt || !this.lay) return null;
+        var aaben = !this.faerdig && !this.venter;
+        if (this.trin === "atom") {
+            if (!aaben) return null;
+            var lay = this.lay;
+            this.synkPladser();
+            var q = T.pladsVed(lay.atom.x, lay.atom.y, lay.stor, this.atomZ(), pt);
+            if (q) { this.overPlads = q; return "pointer"; }
+            var s = T.sideVed(lay.atom.x, lay.atom.y, lay.stor, pt);
+            if (s >= 0) { this.overPlads = this.naermestePlads(s, pt, false); return "pointer"; }
+            return this.aedelgasVed(pt) ? "pointer" : null;
+        }
+        if (this.trin !== "byg" || !aaben) return null;
+        var e = this.enligVed(pt);
+        if (e) { this.over = e; return "greb"; }
+        var q = this.parVed(pt);
+        if (q) { this.over = q; return "pointer"; }
         return null;
     };
 
-    /* Laeg atomet i bindingslaengde fra det andet, i den retning det har nu. */
-    NK.SimByg.prototype._placerVed = function (atom, andet) {
-        var dx = atom.x - andet.x, dy = atom.y - andet.y;
-        var len = Math.hypot(dx, dy);
-        if (len < 1) { dx = 1; dy = 0; len = 1; }
-        atom.x = NK.klamp(andet.x + (dx / len) * NK.BINDINGSLAENGDE, 40, this.laerred.b - 40);
-        atom.y = NK.klamp(andet.y + (dy / len) * NK.BINDINGSLAENGDE, 40, this.laerred.h - 40);
+    P_.aedelgasVed = function (pt) {
+        var f = (this.felter || []).filter(function (x) {
+            return pt.x >= x.x && pt.x <= x.x + x.b && pt.y >= x.y && pt.y <= x.y + x.h;
+        })[0];
+        return f && D.AEDELGAS[f.s] ? f.s : null;
     };
 
-    NK.SimByg.prototype._bindInteraktion = function () {
-        var self = this;
-        var cvs = this.laerred.canvas;
-
-        cvs.addEventListener("mousedown", function (e) {
-            var s = self.state;
-            if (!self.aktiv || s.fase !== "aktion") return;
-            var p = self._musPunkt(e);
-            var i = self._bindingVed(p);
-            if (i >= 0) {
-                if (s.bindinger[i].orden >= 3) s.bindinger.splice(i, 1);
-                else s.bindinger[i].orden++;
-                s.markering = {};
-                return;
-            }
-            self.traekAtom = self._atomVed(p);
-            if (self.traekAtom) cvs.style.cursor = "grabbing";
-        });
-
-        window.addEventListener("mousemove", function (e) {
-            if (!self.aktiv) return;
-            var p = self._musPunkt(e);
-            var t = self.traekAtom;
-            if (!t) {
-                var aktiv = self.state.fase === "aktion";
-                self.hoverAtom = aktiv ? self._atomVed(p) : null;
-                cvs.style.cursor = !aktiv ? "default" : self._bindingVed(p) >= 0 ? "pointer" : self.hoverAtom ? "grab" : "default";
-                return;
-            }
-            t.x = NK.klamp(p.x, 40, self.laerred.b - 40);
-            t.y = NK.klamp(p.y, 40, self.laerred.h - 40);
-
-            self.snapMaal = null;
-            var bedsteAfstand = SNAP_AFSTAND;
-            self.state.atomer.forEach(function (a) {
-                if (a === t) return;
-                var d = Math.hypot(t.x - a.x, t.y - a.y);
-                if (d < bedsteAfstand) { bedsteAfstand = d; self.snapMaal = a; }
-            });
-        });
-
-        window.addEventListener("mouseup", function () {
-            var t = self.traekAtom;
-            if (t) {
-                var s = self.state;
-                var foer = s.bindinger.length;
-                s.bindinger = s.bindinger.filter(function (b) {
-                    if (b.s !== t && b.t !== t) return true;
-                    var modpart = (b.s === t) ? b.t : b.s;
-                    return Math.hypot(t.x - modpart.x, t.y - modpart.y) <= BRYD_AFSTAND;
-                });
-
-                var andet = self.snapMaal;
-                var findes = andet && s.bindinger.some(function (b) {
-                    return (b.s === t && b.t === andet) || (b.s === andet && b.t === t);
-                });
-                if (andet && !findes) {
-                    s.bindinger.push({ s: t, t: andet, orden: 1 });
-                    self._placerVed(t, andet);
-                } else {
-                    /* Et endeatom falder tilbage i bindingslaengde, naar det slippes. */
-                    var mine = s.bindinger.filter(function (b) { return b.s === t || b.t === t; });
-                    if (mine.length === 1) self._placerVed(t, mine[0].s === t ? mine[0].t : mine[0].s);
-                }
-                if (s.bindinger.length !== foer) s.markering = {};
-                cvs.style.cursor = "grab";
-            }
-            self.traekAtom = null;
-            self.snapMaal = null;
-        });
+    P_.nedScene = function (pt) {
+        if (!this.lay) return false;
+        if (this.trin === "atom") {
+            var lay = this.lay;
+            var gas = this.aedelgasVed(pt);
+            if (gas) { this.kortBesked(D.AEDELGAS[gas], 8, "gul"); NK.paaskeaeg = (NK.paaskeaeg || 0) + 1; return false; }
+            var pl = T.pladsVed(lay.atom.x, lay.atom.y, lay.stor, this.atomZ(), pt);
+            var s = pl ? pl.side : T.sideVed(lay.atom.x, lay.atom.y, lay.stor, pt);
+            if (s < 0) return false;
+            if (this.spaer()) return false;
+            this.synkPladser();
+            /* Lige paa en plads: saet eller fjern. Ved siden: den naermeste tomme plads. */
+            if (pl) { this.saetPlads(pl.side, pl.plads, this.pladser[pl.side][pl.plads] ? 0 : 1); return false; }
+            var tom = this.naermestePlads(s, pt, false);
+            if (tom) this.saetPlads(tom.side, tom.plads, 1);
+            else this.kortBesked("Der kan højst sidde 2 elektroner på hver side af symbolet. Et klik på en elektron fjerner den.", 5);
+            return false;
+        }
+        var e = this.trin === "byg" ? this.enligVed(pt) : null;
+        var q = this.parVed(pt);
+        var parret = this.parretVed(pt);
+        if (this.faerdig || this.venter) {
+            if (e || q || parret) this.spaer();
+            return false;
+        }
+        if (this.trin === "tael") {
+            if (e || q || parret || this.atomVed(pt)) this.kortBesked("Prikformlen er færdig. Tæl elektronerne, og vælg tallet på kortet.", 4);
+            return false;
+        }
+        if (e) {
+            this.haand = { id: e.id, side: e.side, x: pt.x, y: pt.y, sx: pt.x, sy: pt.y, flyttet: false };
+            return true;
+        }
+        if (q) {
+            P.bryd(this.M, q.binding);
+            this.efterAendring();
+            this.valgtE = null;
+            return false;
+        }
+        if (parret) {
+            this.kortBesked("Den elektron er med i et frit elektronpar. Kun en uparret elektron kan danne en binding.", 5);
+            return false;
+        }
+        this.valgtE = null;
+        return false;
     };
 
-    /* ----- Faelles grænseflade: tilpas / opdater / tegn / nulstil ------- */
-    NK.SimByg.prototype.tilpas = function () {
-        this.linjeLaerred.tilpas();
+    P_.flytScene = function (pt) {
+        var h = this.haand;
+        if (!h) return;
+        h.x = pt.x;
+        h.y = pt.y;
+        if (Math.hypot(pt.x - h.sx, pt.y - h.sy) > 7) h.flyttet = true;
+        var parret = this.parretVed(pt);
+        this.over = h.flyttet ? (this.enligVed(pt, h.id) || (parret && parret.id !== h.id ? null : this.atomVed(pt, h.id))) : null;
+        if (this.over && this.over.ingen) this.over = null;
     };
 
-    NK.SimByg.prototype.opdater = function () {
-        /* Partiklerne opdateres i tegn() - se tegning.js. Metoden findes
-           kun for at foelge samme grænseflade som de andre superanimationer. */
+    P_.opScene = function (pt) {
+        var h = this.haand;
+        this.haand = null;
+        this.over = null;
+        if (!h) return;
+        if (!h.flyttet) {
+            /* Et klik: vaelg elektronen, eller bind den til den, der er valgt */
+            var v = this.valgtE;
+            if (v && v.id !== h.id) { this.valgtE = null; this.forsoegBind(v.id, v.side, h.id, h.side); return; }
+            this.valgtE = v && v.id === h.id && v.side === h.side ? null : { id: h.id, side: h.side };
+            return;
+        }
+        this.valgtE = null;
+        var enlig = this.enligVed(pt, h.id);
+        if (enlig) { this.forsoegBind(h.id, h.side, enlig.id, enlig.side); return; }
+        /* Lige paa et frit elektronpar: det kan ikke danne en binding */
+        var parret = this.parretVed(pt);
+        if (parret && parret.id !== h.id) {
+            this.kortBesked("Den elektron er med i et frit elektronpar. Kun en uparret elektron kan danne en binding.", 5);
+            return;
+        }
+        var maal = this.atomVed(pt, h.id);
+        if (maal && !maal.ingen) { this.forsoegBind(h.id, h.side, maal.id, maal.side); return; }
+        if (maal && maal.ingen) {
+            var a = this.M.atomer[maal.id];
+            this.kortBesked(NK.stort(D.EL[a.z].navn) + " har ingen uparrede elektroner tilbage og kan ikke danne flere bindinger.", 5);
+            return;
+        }
     };
 
-    NK.SimByg.prototype.nulstil = function () {
-        this.nulstilNiveau();
+    P_.forsoegBind = function (aId, sA, bId, sB) {
+        var M = this.M;
+        var r = P.binde(M, aId, sA, bId, sB, this.vis);
+        if (r.ok) {
+            this.harBundet = true;
+            this.nytPar = { binding: r.binding, t: 0 };
+            this.efterAendring();
+            return;
+        }
+        var ea = D.EL[M.atomer[aId].z], eb = D.EL[M.atomer[bId].z];
+        var to = ea === eb ? "De to " + ea.atom + "er" : NK.stort(ea.atom) + "et og " + eb.atom + "et";
+        if (r.grund === "ring") this.kortBesked(to + " sidder ikke ved siden af hinanden, så de kan ikke dele et elektronpar.", 6);
+        else if (r.grund === "maks") this.kortBesked("To atomer kan højst dele 3 elektronpar.", 5);
+        else if (r.grund === "plads") this.kortBesked("Der er ikke plads til atomet dér. Prøv med en anden uparret elektron.", 5);
     };
 
-    NK.SimByg.prototype.tegn = function () {
-        var ctx = this.laerred.ctx;
-        var s = this.state;
-        ctx.fillStyle = "#14141a";
-        ctx.fillRect(0, 0, this.laerred.b, this.laerred.h);
-
-        var opg = NK.OPGAVER[s.niveau];
-        var geo = NK.OPGAVE_GEOMETRI[s.niveau];
-        if (s.fase !== "aktion" && s.fase !== "sejr") return;
-
-        var vis = {
-            snap: this.snapMaal, hover: this.hoverAtom, traek: this.traekAtom,
-            taeller: s.hjaelp >= 2,
-            stabilGroen: s.fase === "sejr",
-            ringe: {}, etiketter: {}
-        };
-        Object.keys(s.markering).forEach(function (id) {
-            vis.ringe[id] = "roed";
-            if (!vis.taeller) vis.etiketter[id] = { tekst: s.markering[id] === "faa" ? "for få" : "for mange", farve: "roed" };
-        });
-        NK.tegnStregformel(this.linjeLaerred.ctx, this.linjeLaerred.b, this.linjeLaerred.h, opg, geo, s);
-        NK.tegnSpil(ctx, s, vis);
+    /* Molekylet er aendret: de roede ringe og hinttrappen begynder forfra */
+    P_.efterAendring = function () {
+        this.markering = {};
+        if (this.fast.klasse === "skidt") this.besked("", "");
+        this.nulstilHjaelp();
+        this.visIndsend();
     };
 }());

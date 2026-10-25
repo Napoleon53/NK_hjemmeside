@@ -1,398 +1,313 @@
 /* =====================================================================
    sim_fejl.js - fanen Find fejlen
 
-   Kemichael har tegnet en prikformel (NK.FEJL i js/data.js). Nogle har
-   én fejl, som elever faktisk laver; nogle er rigtige. Eleven
+   En elev har tegnet tolv prikformler (D.FEJL). Ni har én fejl, som
+   elever faktisk laver; tre er rigtige. For hver tegning:
 
-     1. klikker paa det atom, der er tegnet forkert, eller paa Ingen fejl
-     2. taeller, hvor mange elektroner det atom har omkring sig
-     3. ser tegningen rettet ved siden af
+     1 Eleven klikker paa det atom, der er tegnet forkert, eller vaelger
+       Ingen fejl paa kortet, og trykker Indsend svar. Et klik vaelger
+       kun. Er det valgte atom tegnet rigtigt, taeller animationen hoejt
+       omkring det (saa eleven ser, hvordan der skal taelles), og svaret
+       koster stjernen.
+     2 Eleven taeller elektronerne omkring det forkerte atom og sender
+       tallet ind.
+     3 Den rettede tegning kommer frem ved siden af.
 
-   Klikker eleven paa et atom, der passer, taeller animationen hoejt:
-   prikkerne om atomet lyser op én ad gangen, og tallet staar ved siden
-   af. Saa ser eleven, hvordan der skal taelles, uden at faa svaret paa
-   det forkerte atom. Et forkert elektrontal giver et hint, der passer
-   til maaden, der er talt forkert paa (NK.taelleHint).
-
-   Hjaelpen kommer i trin paa én knap: Giv hint, Vis svaret, Naeste
-   tegning. En tegning taeller som loest, naar eleven kom igennem uden
-   Vis svaret.
-
-   Tegningen bruger de samme regler som byggefanen (NK.tegnSpil), saa
-   de rettede tegninger ser ud som facit i sejrsboksen.
+   Hvilket atom der er forkert, regnes ud af tegningen (NK.Prik.fejlAtomer).
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
+    var D = NK.Data;
+    var P = NK.Prik;
+    var T = NK.T;
 
-    var GEM_NR = "sc3_1_fejl_nr";
-    var GEM_LOEST = "sc3_1_fejl_loeste";
-    var TAEL_FART = 6;          /* prikker pr. sekund, naar der taelles hoejt */
-    var SVAR_MAKS = 12;
+    var TAEL_FART = 6;
 
-    function lavTegning(zListe, geo, bindinger, frie) {
-        var L = NK.BINDINGSLAENGDE;
-        var n = zListe.length;
-        var pos = [];
-        if (geo.type === "kaede") {
-            for (var i = 0; i < n; i++) pos[i] = { x: (i - (n - 1) / 2) * L, y: 0 };
-        } else {
-            pos[geo.hub] = { x: 0, y: 0 };
-            Object.keys(geo.vinkler).forEach(function (k) {
-                var rad = geo.vinkler[k] * Math.PI / 180;
-                pos[+k] = { x: Math.cos(rad) * L, y: Math.sin(rad) * L };
-            });
+    NK.SimFejl = function () {
+        this.startFane(D.FEJL.map(function (o, i) { return { id: "t" + (i + 1), chip: String(i + 1), titel: "Tegning " + (i + 1) + ": " + o.f }; }));
+        var foerste = 0;
+        for (var i = 0; i < this.status.length; i++) if (!this.status[i].loest) { foerste = i; break; }
+        this.vaelg(foerste);
+    };
+
+    var P_ = NK.SimFejl.prototype;
+    NK.Fane.paa(P_, { navn: "f", naesteTekst: "Næste tegning →" });
+
+    P_.lavOpgave = function (i) {
+        var o = D.FEJL[i];
+        this.o = o;
+        this.M = P.elevTegning(o);
+        this.R = P.rettet(o);
+        var fejl = P.fejlAtomer(this.M);
+        this.forkert = fejl.length ? fejl[0] : null;
+        this.del = "find";
+        this.valgt = null;
+        this.forkerteValg = {};
+        this.talValg = null;
+        this.talForkert = {};
+        this.taelling = null;
+        this.talte = {};
+        this.retAlfa = 0;
+        this.overAtom = null;
+        this.pos = null;
+        this.G = null;
+    };
+
+    /* "oxygenatomet", eller "bromatomet med den gule ring", naar der er to ens */
+    P_.atomNavn = function (a) {
+        var ens = this.M.atomer.filter(function (x) { return x.z === a.z; }).length;
+        return D.EL[a.z].atom + "et" + (ens > 1 ? " med den gule ring" : "");
+    };
+
+    P_.delNu = function () {
+        if (this.del === "find") {
+            var kl = "sk-knap ingen" + (this.valgt === "ingen" ? " valgt" : "") + (this.forkerteValg.ingen ? " forkert" : "");
+            return {
+                chip: "Find fejlen",
+                tekst: "En elev har tegnet prikformlen for " + this.o.f + ". Klik på det atom, der er tegnet forkert. Er tegningen rigtig, så vælg Ingen fejl.",
+                ekstra: '<div class="sk-ingen"><button type="button" class="' + kl + '" data-ingen="1"' + (this.forkerteValg.ingen ? " disabled" : "") +
+                    '><span class="v-boks" aria-hidden="true">' + (this.valgt === "ingen" ? "✓" : "") + "</span><span>Ingen fejl</span></button></div>"
+            };
         }
-        /* Midt i tegningen i (0, 0) */
-        var xs = pos.map(function (p) { return p.x; }), ys = pos.map(function (p) { return p.y; });
+        return {
+            chip: "Tæl efter",
+            tekst: "Hvor mange elektroner har " + this.atomNavn(this.forkert) + " omkring sig på elevens tegning?",
+            ekstra: this.talHTML()
+        };
+    };
+
+    P_.kanIndsende = function () {
+        if (this.del === "find") return this.valgt !== null;
+        return this.talValg !== null && this.talValg !== undefined;
+    };
+
+    P_.indsendTekst = function () {
+        if (this.del === "find") {
+            if (this.valgt === "ingen") return "Indsend svar: ingen fejl";
+            if (this.valgt !== null) return "Indsend svar: " + D.EL[this.M.atomer[this.valgt].z].navn;
+            return "Indsend svar";
+        }
+        return this.talValg ? "Indsend svar: " + this.talValg : "Indsend svar";
+    };
+
+    P_.kortKlik = function (e) {
+        if (this.faerdig || this.venter) return;
+        if (this.del === "tael") { this.talKlik(e); return; }
+        var k = e.target.closest ? e.target.closest("[data-ingen]") : null;
+        if (!k || k.disabled) return;
+        this.valgt = this.valgt === "ingen" ? null : "ingen";
+        if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+        this.nulstilHjaelp();
+        this.visKort();
+    };
+
+    P_.indsend = function () {
+        var o = this.o;
+        if (this.del === "find") {
+            if (this.valgt === "ingen") {
+                if (!this.forkert) { this.loest("selv", o.forklaring); return; }
+                this.forkerteValg.ingen = true;
+                this.valgt = null;
+                this.visKort();
+                this.fejlLinje("Der er et atom, der er tegnet forkert. Tæl elektronerne omkring hvert atom.");
+                return;
+            }
+            var a = this.M.atomer[this.valgt];
+            if (a === this.forkert) {
+                this.mellemsvar("selv", "Det er " + this.atomNavnUden(a) + ", der er tegnet forkert.", "Tæl efter →");
+                return;
+            }
+            var st = P.status(this.M, a);
+            this.forkerteValg[a.id] = true;
+            this.talte[a.id] = true;
+            this.taelling = { id: a.id, n: 0, faerdig: false };
+            this.valgt = null;
+            this.visKort();
+            this.fejlLinje(NK.stort(D.EL[a.z].navn) + " har " + st.nu + " elektroner omkring sig, og det passer." +
+                (this.forkert ? " Tæl omkring de andre atomer." : " Er de andre atomer også rigtige?"));
+            return;
+        }
+        var stF = P.status(this.M, this.forkert);
+        if (this.talValg === stF.nu) {
+            this.taelling = { id: this.forkert.id, n: 0, faerdig: false };
+            this.loest("selv", o.forklaring);
+            return;
+        }
+        var galt = this.talValg;
+        this.talForkert[galt] = true;
+        this.talValg = null;
+        this.visKort();
+        this.fejlLinje(D.taelleHint(stF, galt));
+    };
+
+    /* "oxygenatomet" uden henvisningen til ringen (til det groenne kort) */
+    P_.atomNavnUden = function (a) {
+        var ens = this.M.atomer.filter(function (x) { return x.z === a.z; }).length;
+        if (ens > 1 && this.o.ret && this.o.ret.atomer) return "hydrogenatomet i midten";
+        return (ens > 1 ? "det ene " : "") + D.EL[a.z].atom + (ens > 1 ? "" : "et");
+    };
+
+    P_.visSvar = function () {
+        var o = this.o;
+        var svaret = this.forkert ? NK.stort(this.atomNavnUden(this.forkert)) + " er tegnet forkert." : "Tegningen er rigtig.";
+        if (this.forkert) this.taelling = { id: this.forkert.id, n: 0, faerdig: false };
+        this.valgt = null;
+        this.loest("svar", o.forklaring, svaret);
+    };
+
+    P_.videre = function () {
+        this.del = "tael";
+        this.talValg = null;
+        this.talForkert = {};
+        this.taelling = null;
+        this.nyDel();
+    };
+
+    P_.hintTrin = function () {
+        if (this.del === "find") {
+            return ["Tæl elektronerne omkring hvert atom. Begge elektroner i et fælles elektronpar tæller med hos begge atomer. Hydrogen skal have 2, de andre 8.",
+                this.o.hint];
+        }
+        var st = P.status(this.M, this.forkert);
+        return ["Tæl alle prikker omkring " + D.EL[this.forkert.z].navn + ": de frie elektroner og begge elektroner i hvert fælles elektronpar.",
+            D.taelHint2(this.forkert.z, st)];
+    };
+
+    /* ----- Plads paa scenen ------------------------------------------------------ */
+    P_.layout = function () {
+        var W = this.L.b, H = this.L.h;
+        var top = this.top();
+        var flade = { x: 16, y: top, b: Math.max(200, W - 32), h: Math.max(160, H - top - 14) };
+        this.lay = { W: W, H: H, flade: flade };
+        this.saetAnker("flade", flade.x, flade.y, flade.b, flade.h);
+    };
+
+    /* Arkets plads: midt paa, saa til venstre, naar den rettede kommer frem */
+    P_.arkPladser = function () {
+        var fl = this.lay.flade;
+        var skub = NK.blod(this.retAlfa);
+        var b = Math.min(fl.b * (0.62 - 0.16 * skub), 560), h = Math.min(fl.h * 0.9, 380);
+        var cy = fl.y + fl.h * 0.5;
+        var cxV = fl.x + fl.b * (0.5 - 0.235 * skub), cxH = fl.x + fl.b * 0.735;
+        return {
+            venstre: { x: cxV - b / 2, y: cy - h / 2, b: b, h: h, cx: cxV, cy: cy + 10 },
+            hoejre: { x: cxH - b / 2, y: cy - h / 2, b: b, h: h, cx: cxH, cy: cy + 10 }
+        };
+    };
+
+    function pladser(M, ark, F) {
+        var L = T.maal(F).bind;
+        var xs = M.atomer.map(function (a) { return a.gx; }), ys = M.atomer.map(function (a) { return a.gy; });
         var mx = (Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2;
         var my = (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2;
-
-        var atomer = zListe.map(function (z, i) {
-            var a = { id: i, z: z, x: pos[i].x - mx, y: pos[i].y - my, r: NK.ELEMENTER[z].s.length > 1 ? 28 : 22 };
-            if (frie && frie[i] !== undefined) a.frie = frie[i];
-            return a;
-        });
-        return {
-            atomer: atomer,
-            bindinger: bindinger.map(function (b) { return { s: atomer[b[0]], t: atomer[b[1]], orden: b[2] }; }),
-            bredde: Math.max.apply(null, xs) - Math.min.apply(null, xs),
-            hoejde: Math.max.apply(null, ys) - Math.min.apply(null, ys)
-        };
+        var pos = {};
+        M.atomer.forEach(function (a) { pos[a.id] = { x: ark.cx + (a.gx - mx) * L, y: ark.cy + (a.gy - my) * L }; });
+        return pos;
     }
 
-    /* Tegningen og den rettede udgave af opgave nr. */
-    NK.fejlTegning = function (nr) {
-        var o = NK.FEJL[nr];
-        var ret = o.ret || {};
-        return {
-            tegning: lavTegning(o.atomer, o.geo, o.bindinger, o.frie),
-            rettet: lavTegning(ret.atomer || o.atomer, ret.geo || o.geo, ret.bindinger || o.bindinger, null),
-            sammeAtomer: !ret.atomer
-        };
+    P_.stoerrelse = function (ark) {
+        var M = this.M;
+        var xs = M.atomer.map(function (a) { return a.gx; }), ys = M.atomer.map(function (a) { return a.gy; });
+        var w = Math.max.apply(null, xs) - Math.min.apply(null, xs), h = Math.max.apply(null, ys) - Math.min.apply(null, ys);
+        return NK.klamp(Math.min(ark.b / ((w + 1.6) * 2.45), (ark.h - 40) / ((h + 1.7) * 2.45)), 28, 58);
     };
 
-    /* Det atom, der er tegnet forkert (eller null), regnet af tegningen. */
-    NK.fejlAtomer = function (tegning) {
-        return tegning.atomer.filter(function (a) { return !NK.atomStatus(tegning, a).stabil; });
-    };
-
-    NK.SimFejl = function (laerred) {
-        this.laerred = laerred;
-        this.aktiv = false;
-        this.hover = null;
-        var gemt = NK.hent(GEM_LOEST, null);
-        this.loeste = NK.FEJL.map(function (_, i) { return !!(Array.isArray(gemt) && gemt[i]); });
-        var nr = parseInt(NK.hent(GEM_NR, 0), 10);
-        this._byggMenu();
-        this._bindInteraktion();
-        this.nyTegning(isNaN(nr) || nr < 0 || nr >= NK.FEJL.length ? 0 : nr);
-    };
-
-    var P = NK.SimFejl.prototype;
-
-    /* ----- Menuen: én knap pr. tegning ---------------------------------- */
-    P._byggMenu = function () {
-        var self = this;
-        var menu = NK.el("fejl-menu");
-        menu.innerHTML = "";
-        NK.FEJL.forEach(function (o, i) {
-            var knap = document.createElement("button");
-            knap.className = "opgave-knap";
-            knap.type = "button";
-            knap.title = "Tegning " + (i + 1);
-            knap.textContent = i + 1;
-            knap.addEventListener("click", function () { self.nyTegning(i); });
-            menu.appendChild(knap);
-        });
-    };
-
-    P._opdaterMenu = function () {
-        var knapper = NK.el("fejl-menu").children;
-        for (var i = 0; i < knapper.length; i++) {
-            knapper[i].classList.toggle("loest", this.loeste[i]);
-            knapper[i].classList.toggle("aktiv", i === this.nr);
-        }
-    };
-
-    P.opdaterTaeller = function () {
-        NK.el("taeller-tekst").textContent = "Tegning " + (this.nr + 1) + "/" + NK.FEJL.length;
-    };
-
-    /* ----- En ny tegning --------------------------------------------------- */
-    P.nyTegning = function (nr) {
-        if (nr >= NK.FEJL.length) nr = 0;
-        this.nr = nr;
-        NK.gem(GEM_NR, nr);
-        var t = NK.fejlTegning(nr);
-        this.tegning = t.tegning;
-        this.rettet = t.rettet;
-        this.sammeAtomer = t.sammeAtomer;
-        var forkerte = NK.fejlAtomer(this.tegning);
-        this.forkert = forkerte.length ? forkerte[0] : null;
-
-        this.trin = "find";
-        this.hjaelp = 0;            /* 0: intet, 1: hint vist, 2: svaret vist */
-        this.valgt = null;
-        this.talte = {};            /* atomer, der er talt hoejt: { id: true } */
-        this.taelling = null;
-        this.retAlfa = 0;
-        this.visRettet = false;
-        this.hover = null;
-
-        NK.skjulHint("fejl");
-        this._saetSpm("Klik på det atom, Kemichael har tegnet forkert.");
-        this._saetBesked("", "");
-        this._visSvarknapper("find");
-        this._opdaterKnap();
-        this._opdaterMenu();
-        if (this.aktiv) this.opdaterTaeller();
-    };
-
-    P.nulstil = function () { this.nyTegning(this.nr); };
-
-    /* ----- Tekst og knapper under scenen ---------------------------------- */
-    P._saetSpm = function (tekst) { NK.el("fejl-spm").textContent = tekst; };
-
-    P._saetBesked = function (tekst, klasse) {
-        var b = NK.el("fejl-besked");
-        b.textContent = tekst;
-        b.className = "fejl-besked" + (klasse ? " " + klasse : "");
-    };
-
-    P._visSvarknapper = function (hvad) {
-        var self = this;
-        var boks = NK.el("fejl-svar");
-        boks.innerHTML = "";
-        if (hvad === "find") {
-            var ingen = document.createElement("button");
-            ingen.className = "knap";
-            ingen.type = "button";
-            ingen.id = "ingen-fejl-knap";
-            ingen.textContent = "Ingen fejl";
-            ingen.addEventListener("click", function () { self.ingenFejl(); });
-            boks.appendChild(ingen);
-        } else if (hvad === "taal") {
-            for (var i = 1; i <= SVAR_MAKS; i++) {
-                (function (tal) {
-                    var k = document.createElement("button");
-                    k.className = "tal-knap";
-                    k.type = "button";
-                    k.textContent = tal;
-                    k.addEventListener("click", function () { self.svarTal(tal, k); });
-                    boks.appendChild(k);
-                }(i));
-            }
-        }
-    };
-
-    P._opdaterKnap = function () {
-        var k = NK.el("fejl-knap");
-        k.classList.toggle("groen", this.trin === "faerdig");
-        k.classList.toggle("lilla", this.trin !== "faerdig");
-        k.textContent = this.trin === "faerdig" ? "Næste tegning" : this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
-    };
-
-    /* ----- Elevens valg ---------------------------------------------------- */
-    P.klikAtom = function (a) {
-        if (this.trin !== "find" || !a) return;
-        if (a === this.forkert) {
-            this.valgt = a;
-            this.trin = "taal";
-            this.taelling = null;
-            this._saetSpm("Hvor mange elektroner har " + NK.ELEMENTER[a.z].n.toLowerCase() + " omkring sig?");
-            this._saetBesked("Det er det atom. Tæl nu elektronerne omkring det.", "ok");
-            this._visSvarknapper("taal");
-            return;
-        }
-        /* Et atom, der passer: animationen taeller hoejt. */
-        var st = NK.atomStatus(this.tegning, a);
-        this.talte[a.id] = true;
-        this.taelling = { id: a.id, n: 0, faerdig: false };
-        this._saetBesked(NK.ELEMENTER[a.z].n + " har " + st.nu + " elektroner omkring sig. Det passer.", "");
-    };
-
-    P.ingenFejl = function () {
-        if (this.trin !== "find") return;
-        if (this.forkert) {
-            this._saetBesked("Der er en fejl. Tæl elektronerne om hvert atom.", "fejl");
-            return;
-        }
-        this._afslut(this.hjaelp < 2, "Rigtigt. " + NK.FEJL[this.nr].forklaring);
-    };
-
-    P.svarTal = function (tal, knap) {
-        if (this.trin !== "taal") return;
-        var st = NK.atomStatus(this.tegning, this.valgt);
-        if (tal === st.nu) {
-            this._afslut(this.hjaelp < 2, "Rigtigt. " + NK.FEJL[this.nr].forklaring);
-            return;
-        }
-        this._saetBesked(NK.taelleHint(st, tal), "fejl");
-        if (knap) {
-            knap.classList.add("forkert");
-            setTimeout(function () { knap.classList.remove("forkert"); }, 400);
-        }
-    };
-
-    /* Tegningen er klaret: det forkerte atom taelles hoejt, og den rettede
-       tegning kommer frem ved siden af. */
-    P._afslut = function (selv, tekst) {
-        this.trin = "faerdig";
-        NK.skjulHint("fejl");
-        this._saetSpm(this.forkert ? "Sådan ser den rettede tegning ud." : "Tegningen er rigtig.");
-        this._saetBesked(tekst, "ok");
-        this._visSvarknapper("ingen");
-        if (this.forkert) {
-            this.valgt = this.forkert;
-            this.taelling = { id: this.forkert.id, n: 0, faerdig: false, derefter: "ret" };
-        } else {
-            this.taelling = null;
-        }
-        if (selv && !this.loeste[this.nr]) {
-            this.loeste[this.nr] = true;
-            NK.gem(GEM_LOEST, this.loeste);
-        }
-        this._opdaterMenu();
-        this._opdaterKnap();
-    };
-
-    /* Én knap: Giv hint, Vis svaret, Naeste tegning */
-    P.knap = function () {
-        if (this.trin === "faerdig") { this.nyTegning(this.nr + 1); return; }
-        if (this.hjaelp === 0) {
-            this.hjaelp = 1;
-            NK.visHint("fejl", "Hint", NK.FEJL[this.nr].hint);
-            this._opdaterKnap();
-            return;
-        }
-        this.hjaelp = 2;
-        NK.skjulHint("fejl");
-        this._afslut(false, NK.FEJL[this.nr].forklaring);
-    };
-
-    /* ----- Musen ---------------------------------------------------------- */
-    P._layout = function () {
-        var b = this.laerred.b, h = this.laerred.h;
-        var k = NK.klamp(Math.min(b / 900, (h - 40) / 420), 0.8, 1.6);
-        var skub = NK.blod(this.retAlfa);
-        return {
-            k: k,
-            venstre: { x: b * (0.5 - 0.22 * skub), y: h * 0.5 },
-            hoejre: { x: b * 0.72, y: h * 0.5 }
-        };
-    };
-
-    P._atomVed = function (e) {
-        var r = this.laerred.canvas.getBoundingClientRect();
-        var lay = this._layout();
-        var x = (e.clientX - r.left - lay.venstre.x) / lay.k;
-        var y = (e.clientY - r.top - lay.venstre.y) / lay.k;
-        var a = this.tegning.atomer;
-        for (var i = 0; i < a.length; i++) {
-            if (Math.hypot(x - a[i].x, y - a[i].y) < a[i].r + 6) return a[i];
-        }
-        return null;
-    };
-
-    P._bindInteraktion = function () {
-        var self = this;
-        var cvs = this.laerred.canvas;
-        cvs.addEventListener("mousedown", function (e) {
-            if (!self.aktiv) return;
-            self.klikAtom(self._atomVed(e));
-        });
-        window.addEventListener("mousemove", function (e) {
-            if (!self.aktiv) return;
-            self.hover = self.trin === "find" ? self._atomVed(e) : null;
-            cvs.style.cursor = self.hover ? "pointer" : "default";
-        });
-    };
-
-    /* ----- Faelles grænseflade --------------------------------------------- */
-    P.tilpas = function () {};
-
-    P.opdater = function (dt) {
+    P_.opdaterScene = function (dt) {
         var t = this.taelling;
         if (t && !t.faerdig) {
-            var tegning = this.tegning;
-            var a = tegning.atomer[t.id];
-            var antal = NK.atometsPrikker(tegning, a).length;
+            var antal = this.G && this.pos ? T.atometsPrikker(this.G, this.M, this.M.atomer[t.id], this.pos).length : P.status(this.M, this.M.atomer[t.id]).nu;
             t.n += dt * TAEL_FART;
-            if (t.n >= antal) {
-                t.n = antal;
-                t.faerdig = true;
-                if (t.derefter === "ret") this.visRettet = true;
-            }
+            if (t.n >= antal) { t.n = antal; t.faerdig = true; }
         }
-        if (this.visRettet && this.retAlfa < 1) this.retAlfa = Math.min(1, this.retAlfa + dt * 1.6);
+        if (this.faerdig && this.forkert && this.retAlfa < 1 && (!t || t.faerdig)) this.retAlfa = Math.min(1, this.retAlfa + dt * 1.5);
     };
 
-    function ark(ctx, lay, tegning, midt, titel, farve, alfa) {
-        var k = lay.k;
-        var b = (tegning.bredde + 150) * k, h = (tegning.hoejde + 150) * k;
-        b = Math.max(b, 260); h = Math.max(h, 200);
-        ctx.save();
-        ctx.globalAlpha *= alfa;
-        NK.rundtRekt(ctx, midt.x - b / 2, midt.y - h / 2, b, h, 14);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        NK.tekst(ctx, titel, midt.x - b / 2 + 14, midt.y - h / 2 + 22, {
-            font: "700 13px 'Segoe UI', sans-serif", farve: farve
-        });
-        ctx.restore();
-    }
+    P_.tegn = function () {
+        var ctx = this.L.ctx;
+        this.L.ryd("#14141a");
+        if (!this.lay) return;
+        var ark = this.arkPladser();
+        var F = this.stoerrelse(ark.venstre);
+        this.F = F;
+        this.pos = pladser(this.M, ark.venstre, F);
+        T.ark(ctx, ark.venstre, "ELEVENS TEGNING AF " + this.o.f, "#a9b0ba");
 
-    P.tegn = function () {
-        var ctx = this.laerred.ctx;
-        ctx.fillStyle = "#14141a";
-        ctx.fillRect(0, 0, this.laerred.b, this.laerred.h);
-
-        var lay = this._layout();
-        var o = NK.FEJL[this.nr];
-        var self = this;
-
-        /* Kemichaels tegning */
-        var vis = { hover: this.hover, ringe: {}, etiketter: {}, taelling: this.taelling };
-        Object.keys(this.talte).forEach(function (id) {
-            if (!self.taelling || +id !== self.taelling.id) {
-                var st = NK.atomStatus(self.tegning, self.tegning.atomer[id]);
-                vis.etiketter[id] = { tekst: st.nu + " e" + NK.haevet("-"), farve: "groen" };
-            }
-        });
-        if (this.trin === "taal" && this.valgt) vis.ringe[this.valgt.id] = "gul";
-        if (this.trin === "faerdig") {
-            if (this.forkert) vis.ringe[this.forkert.id] = "roed";
-            else vis.stabilGroen = true;
+        var ringe = {}, etiketter = {};
+        var mig = this;
+        if (this.del === "find" && !this.faerdig && !this.venter && this.valgt !== null && this.valgt !== "ingen") ringe[this.valgt] = "blaa";
+        if (this.venter || (this.del === "tael" && !this.faerdig)) ringe[this.forkert.id] = "gul";
+        if (this.faerdig) {
+            if (this.forkert) ringe[this.forkert.id] = "roed";
+            else this.M.atomer.forEach(function (a) {
+                /* En rigtig tegning: hvert atom viser sit antal i groent */
+                if (mig.taelling && a.id === mig.taelling.id) return;
+                etiketter[a.id] = { tekst: P.status(mig.M, a).nu + " e" + NK.haevet("-"), farve: "groen" };
+            });
         }
-
-        ark(ctx, lay, this.tegning, lay.venstre, "KEMICHAELS TEGNING AF " + o.f, "#a9b0ba", 1);
-        ctx.save();
-        ctx.translate(lay.venstre.x, lay.venstre.y);
-        ctx.scale(lay.k, lay.k);
-        NK.tegnSpil(ctx, this.tegning, vis);
-        ctx.restore();
+        if (this.overAtom !== null && this.overAtom !== undefined && !ringe[this.overAtom]) ringe[this.overAtom] = { farve: "rgba(255, 255, 255, 0.35)", stiplet: [4, 4], gloed: false };
+        Object.keys(this.talte).forEach(function (id) {
+            if (mig.taelling && +id === mig.taelling.id) return;
+            var st = P.status(mig.M, mig.M.atomer[id]);
+            etiketter[id] = { tekst: st.nu + " e" + NK.haevet("-"), farve: "groen" };
+        });
+        this.G = T.molekyle(ctx, this.M, this.pos, F, { ringe: ringe, etiketter: etiketter, taelling: this.taelling });
 
         /* Den rettede tegning ved siden af */
         if (this.retAlfa > 0) {
             var a = NK.blod(this.retAlfa);
-            ark(ctx, lay, this.rettet, lay.hoejre, "RETTET", "#7ee0a8", a);
-            var visRet = { stabilGroen: true, ringe: {}, etiketter: {} };
-            if (this.sammeAtomer && this.forkert) {
-                var st = NK.atomStatus(this.rettet, this.rettet.atomer[this.forkert.id]);
-                visRet.ringe[this.forkert.id] = "groen";
-                visRet.etiketter[this.forkert.id] = { tekst: st.nu + " e" + NK.haevet("-"), farve: "groen" };
+            T.ark(ctx, ark.hoejre, "RETTET", "#7ee0a8", a);
+            var R = this.R;
+            var posR = pladser(R, ark.hoejre, F);
+            var visR = { alfa: a, ringe: {}, etiketter: {} };
+            var samme = !this.o.ret || !this.o.ret.atomer;
+            if (samme && this.forkert) {
+                var st = P.status(R, R.atomer[this.forkert.id]);
+                visR.ringe[this.forkert.id] = "groen";
+                visR.etiketter[this.forkert.id] = { tekst: st.nu + " e" + NK.haevet("-"), farve: "groen" };
             }
-            ctx.save();
-            ctx.globalAlpha = a;
-            ctx.translate(lay.hoejre.x, lay.hoejre.y);
-            ctx.scale(lay.k, lay.k);
-            NK.tegnSpil(ctx, this.rettet, visRet);
-            ctx.restore();
+            T.molekyle(ctx, R, posR, F, visR);
         }
+        this.tegnSejr(ctx, this.lay.W, this.lay.H);
+    };
+
+    /* ----- Musen ----------------------------------------------------------------- */
+    P_.atomVed = function (pt) {
+        if (!this.pos || !pt) return null;
+        var F = this.F, mig = this, ramt = null;
+        this.M.atomer.forEach(function (a) {
+            var p = mig.pos[a.id];
+            if (Math.hypot(pt.x - p.x, pt.y - p.y) < T.ringR(D.EL[a.z].s, F)) ramt = a;
+        });
+        return ramt;
+    };
+
+    P_.overScene = function (pt) {
+        this.overAtom = null;
+        var a = this.atomVed(pt);
+        if (!a) return null;
+        if (this.del === "find" && !this.faerdig && !this.venter) { this.overAtom = a.id; return "pointer"; }
+        return null;
+    };
+
+    P_.nedScene = function (pt) {
+        var a = this.atomVed(pt);
+        if (!a) return false;
+        if (this.spaer()) return false;
+        if (this.del === "tael") {
+            this.kortBesked("Tæl elektronerne omkring " + this.atomNavn(this.forkert) + ", og vælg tallet på kortet.", 4);
+            return false;
+        }
+        if (this.forkerteValg[a.id]) {
+            var st = P.status(this.M, a);
+            this.kortBesked(NK.stort(D.EL[a.z].navn) + " har " + st.nu + " elektroner omkring sig, og det passer.", 4);
+            return false;
+        }
+        this.valgt = this.valgt === a.id ? null : a.id;
+        if (this.fast.klasse === "skidt" || this.fast.klasse === "hint") this.besked("", "");
+        this.nulstilHjaelp();
+        this.visKort();
+        return false;
     };
 }());
