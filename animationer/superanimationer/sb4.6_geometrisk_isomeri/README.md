@@ -3,9 +3,9 @@
 En superanimation i sin egen mappe. Åbn **`index.html`**. Mappen henter kun
 filer inde fra sig selv og virker også, når den åbnes direkte fra harddisken.
 
-Den afløser `animationer/kemi-b-filer/b6.1_geometrisk_isomeri.html`, som står
-i menuen B3 som knap 2 "Geometrisk isomeri". Den er **ikke i menuen endnu**;
-den gamle ligger urørt, til brugeren siger til.
+Den afløser `animationer/kemi-b-filer/b6.1_geometrisk_isomeri.html` og står
+fra 26. okt. 2026 i menuen B3 som knap 2 "Geometrisk isomeri". Den gamle ligger
+i `kemi-c-filer/arkiv/b6.1_geometrisk_isomeri_oldversion.html`.
 
 ## Ombygningen 10. oktober 2026
 
@@ -181,8 +181,7 @@ Sidst kørt: ALT OK (154 påstande), 10. oktober 2026.
 
 ## I menuen
 
-Ikke endnu. Når brugeren siger til: `kemi-b-filer/samling_b_bindinger_isomeri.html`, knap
-2 (`data-emne="b6geo"`), skal pege på
-`../superanimationer/sb4.6_geometrisk_isomeri/index.html`, den gamle flyttes
-med `git mv` til `kemi-c-filer/arkiv/b6.1_geometrisk_isomeri_oldversion.html`,
-og kolonnen "I menuen" i superanimationernes README rettes.
+I menuen fra 26. okt. 2026 (brugerens ønske): `kemi-b-filer/samling_b_bindinger_isomeri.html`,
+knap 2 i B3 (`data-emne="b6geo"`). Den gamle ligger i
+`kemi-c-filer/arkiv/b6.1_geometrisk_isomeri_oldversion.html`.
+

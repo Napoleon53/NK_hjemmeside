@@ -1,7 +1,8 @@
 /* =====================================================================
    tabel.js - faeldningstabellen i panelet
 
-   Raekkerne er de positive ioner, soejlerne de negative. Et felt er
+   Soejlerne er de positive ioner, raekkerne de negative (vendt 26. okt.
+   2026, saa tabellen er som i Kemibogen). Et felt er
    L, T eller ÷. Tabellen er baade et opslagsvaerk og, i de trin, hvor
    det giver mening, selve maaden at svare paa: eleven klikker paa det
    par, der falder ud.
@@ -31,13 +32,13 @@
     NK.Tabel.prototype.byg = function () {
         var self = this;
         var h = '<table class="ftabel"><thead><tr><th class="hjoerne"></th>';
-        D.AN_ORDEN.forEach(function (a) {
-            h += '<th class="an" data-an="' + a + '">' + D.ionTekst(D.ion(a)) + "</th>";
+        D.KAT_ORDEN.forEach(function (k) {
+            h += '<th class="kat" data-kat="' + k + '">' + D.ionTekst(D.ion(k)) + "</th>";
         });
         h += "</tr></thead><tbody>";
-        D.KAT_ORDEN.forEach(function (k) {
-            h += '<tr><th class="kat" data-kat="' + k + '">' + D.ionTekst(D.ion(k)) + "</th>";
-            D.AN_ORDEN.forEach(function (a) {
+        D.AN_ORDEN.forEach(function (a) {
+            h += '<tr><th class="an" data-an="' + a + '">' + D.ionTekst(D.ion(a)) + "</th>";
+            D.KAT_ORDEN.forEach(function (k) {
                 var kode = D.opl(k, a);
                 h += '<td class="k' + kode + '" data-kat="' + k + '" data-an="' + a + '">' + TEGN[kode] + "</td>";
             });

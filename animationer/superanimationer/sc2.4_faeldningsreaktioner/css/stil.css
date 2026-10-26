@@ -36,7 +36,8 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 430px;
+    /* 460 og ikke 430 px, fordi fældningstabellen har 12 kolonner med positive ioner (26. okt. 2026) */
+    --panel-bredde: 460px;
 }
 
 * { box-sizing: border-box; }
@@ -689,10 +690,11 @@ main { flex: 1; position: relative; min-height: 0; }
 .ftabel {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 2px;
+    border-spacing: 1px 2px;
     table-layout: fixed;
     font-size: 0.8rem;
 }
+.kort.tabelkort { padding-left: 6px; padding-right: 6px; }
 
 .ftabel th {
     font-weight: 700;
@@ -702,9 +704,10 @@ main { flex: 1; position: relative; min-height: 0; }
     border-radius: 3px;
 }
 
-.ftabel th.hjoerne { width: 48px; }
-.ftabel th.kat { color: var(--kat); text-align: right; padding-right: 5px; }
-.ftabel th.an { color: var(--an); font-size: 0.74rem; }
+.ftabel th.hjoerne { width: 40px; }
+/* De positive ioner står øverst og de negative i venstre side (26. okt. 2026, som i Kemibogen) */
+.ftabel th.kat { color: var(--kat); font-size: 0.74rem; }
+.ftabel th.an { color: var(--an); text-align: right; padding-right: 4px; }
 .ftabel th.over { background-color: rgba(255, 255, 255, 0.1); }
 .ftabel th.hint { background-color: rgba(242, 197, 61, 0.28); color: #ffffff; }
 
@@ -950,8 +953,9 @@ select:focus-visible {
 }
 
 @media (max-width: 1320px) {
-    :root { --panel-bredde: 380px; }
+    :root { --panel-bredde: 430px; }
     .skema { font-size: 1.3rem; }
+    .ftabel th.kat { font-size: 0.7rem; }
 }
 
 @media (max-width: 1040px) {

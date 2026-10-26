@@ -43,7 +43,8 @@ hydrogenbindinger oppe i hjørnet var "lidt underlig og indforstået".
 Den afløser `animationer/kemi-b-filer/b4.1_intermolekylaert_ethanol.html`
 ("Intermolekylært", knap 4 i `kemi-b-filer/samling_b4,5,6.html`). Brugeren
 kaldte den sb4.1 efter filnavnet; mappen hedder sb4.4, fordi den er knap 4 i
-B4-menuen, ligesom sb4.5 til sb4.7.
+B4-menuen, ligesom sb4.5 til sb4.7. Fra 26. okt. 2026 står den i menuen B3 som
+knap 1 (se nederst).
 
 ## Bestillingen (2. oktober 2026)
 
@@ -268,14 +269,10 @@ korte tekster) og layoutet fra 1100 × 700 til 1600 × 950, herunder at kortet
 med det længste hint og den længste forklaring kan være på sin plads. Sidst
 kørt 24. oktober 2026: ALT OK (85 påstande).
 
-## Til menuen (først når brugeren siger til)
+## I menuen
 
-* `kemi-b-filer/samling_b4,5,6.html`, knap 4 (`data-emne="b4"`): onclick til
-  `'../superanimationer/sb4.4_intermolekylaere_bindinger/index.html'`, titel og
-  tekst "Intermolekylære bindinger", beskrivelse fx "Varm ethanol op, slå
-  hydrogenbindingerne fra, og sammenlign alkoholer og alkaner."
-* Den gamle flyttes med `git mv` til
-  `kemi-c-filer/arkiv/b4.1_intermolekylaert_ethanol_oldversion.html`.
-* `FEEDBACK_EMNER` i `samling_alt_b.html`: `{ nr: 4, navn: 'Intermolekylært' }`
-  bliver `'Intermolekylære bindinger'`.
-* Kolonnen "I menuen" i `../README.md` rettes.
+I menuen fra 26. okt. 2026 (brugerens ønske): `kemi-b-filer/samling_b_bindinger_isomeri.html`,
+knap 1 i B3 (`data-emne="b4"`, teksten stadig "Intermolekylært", da det lange navn ikke
+kan stå i panelet). Den gamle ligger i
+`kemi-c-filer/arkiv/b4.1_intermolekylaert_ethanol_oldversion.html`.
+

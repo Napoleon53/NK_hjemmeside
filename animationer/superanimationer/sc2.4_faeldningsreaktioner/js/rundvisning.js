@@ -12,7 +12,7 @@
 
     var NK = window.NK;
 
-    var TABEL = { sel: "#tabelkort", titel: "Fældningstabellen", tekst: "Find rækken med den positive ion og søjlen med den negative. L er letopløseligt, T er tungtopløseligt." };
+    var TABEL = { sel: "#tabelkort", titel: "Fældningstabellen", tekst: "Find søjlen med den positive ion og rækken med den negative. L er letopløseligt, T er tungtopløseligt." };
     var OPGAVE = { sel: "#opgavekort", titel: "Opgaven", tekst: "Opgaven og de fire trin er de samme på alle sværhedsgrader. Knappen giver først et hint, så svaret og til sidst en ny opgave." };
 
     var TURE = {

@@ -4,9 +4,9 @@ En superanimation i sin egen mappe. Åbn **`index.html`**. Den henter
 molekylemotoren fra `../../molekylemotor/` (fane 2) og virker også, når den
 åbnes direkte fra harddisken.
 
-Den afløser `animationer/kemi-b-filer/b6.2_spejlbilledeisomeri.html`, som står
-i menuen B4 (Organisk B) som knap 7 "Spejlbilledeisomeri". Den er **ikke i
-menuen endnu**; den gamle ligger urørt, til brugeren siger til.
+Den afløser `animationer/kemi-b-filer/b6.2_spejlbilledeisomeri.html` og står
+fra 26. okt. 2026 i menuen B3 som knap 3 "Spejlbilledeisomeri". Den gamle ligger
+i `kemi-c-filer/arkiv/b6.2_spejlbilledeisomeri_oldversion.html`.
 
 ## Bestillingen (2. oktober 2026)
 
@@ -131,8 +131,7 @@ Sidst kørt: ALT OK (89 påstande), 2. oktober 2026.
 
 ## I menuen
 
-Ikke endnu. Når brugeren siger til: `kemi-b-filer/samling_b4,5,6.html`, knap
-7 (`data-emne="b6spejl"`), skal pege på
-`../superanimationer/sb4.7_spejlbilledeisomeri/index.html`, den gamle flyttes
-med `git mv` til `kemi-c-filer/arkiv/b6.2_spejlbilledeisomeri_oldversion.html`,
-og kolonnen "I menuen" i superanimationernes README rettes.
+I menuen fra 26. okt. 2026 (brugerens ønske): `kemi-b-filer/samling_b_bindinger_isomeri.html`,
+knap 3 i B3 (`data-emne="b6spejl"`). Den gamle ligger i
+`kemi-c-filer/arkiv/b6.2_spejlbilledeisomeri_oldversion.html`.
+

@@ -258,8 +258,8 @@
                     }
                     var ny = o.nye.filter(function (n) { return niv.s.fundne.indexOf(n) < 0; })[0];
                     niv.hint = [{ kat: ny.salt.kat.id, an: ny.salt.an.id }];
-                    return "Byt partner: " + ionT(ny.salt.kat) + " skal have " + ionT(ny.salt.an) + " som ny partner. Find rækken med "
-                        + ionT(ny.salt.kat) + " og søjlen med " + ionT(ny.salt.an) + ".";
+                    return "Byt partner: " + ionT(ny.salt.kat) + " skal have " + ionT(ny.salt.an) + " som ny partner. Find søjlen med "
+                        + ionT(ny.salt.kat) + " og rækken med " + ionT(ny.salt.an) + ".";
                 },
                 vis: function (niv) {
                     if (niv.s.fase === "b") { niv.loes(true, resultat(niv.o, true)); return; }
