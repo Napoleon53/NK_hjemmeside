@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isomerjagten</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⌬</span> Isomerjagten</h1>
+    <span class="top-fyld"></span>
+    <a class="ikonknap tekstknap linkknap" href="../tegnebraet/index.html" target="_blank" rel="noopener" title="Åbn tegnebrættet i en ny fane: tegn frit, og se navnene">Tegnebræt ↗</a>
+    <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<section class="fane aktiv" id="fane-j" aria-label="Isomerjagten">
+    <div class="scene">
+        <canvas id="j-laerred"></canvas>
+        <!-- Scenekortet: al tekst staar oeverst midt i scenen (js/fane.js) -->
+        <div class="scenekort" id="j-skort">
+            <div class="sk-ind" id="j-ind"></div>
+            <div class="sk-bund" id="j-status">
+                <p class="st-tekst" id="j-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="j-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="j-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <!-- Vaerktoejerne ligger oeverst paa whiteboardet (js/sim_jagt.js) -->
+        <div class="tegnevaerktoej" id="j-vaerktoej">
+            <span class="vt-gruppe" id="j-vt"></span>
+            <span class="vt-gruppe vt-hoejre">
+                <button type="button" class="vtknap let" id="j-slet" data-vt="slet" title="Klik på et atom for enden af kæden for at slette det (højreklik gør det samme)">✕ Slet</button>
+                <button type="button" class="vtknap let" id="j-fortryd" title="Fortryd det sidste (Ctrl+Z)">↶ Fortryd</button>
+                <button type="button" class="vtknap let" id="j-ryd" title="Ryd tavlen og begynd forfra (R)">Ryd</button>
+            </span>
+        </div>
+        <div class="anker" id="j-anker-tavle"></div>
+
+        <!-- Sejren: alle fem jagter er klaret -->
+        <div class="sejr" id="j-sejr" hidden>
+            <div class="sejr-boks" role="dialog" aria-labelledby="j-sejr-titel">
+                <div class="sejr-medalje" id="j-medalje"></div>
+                <h2 class="sejr-titel" id="j-sejr-titel">Mester i isomerer!</h2>
+                <p class="sejr-tekst" id="j-sejr-tekst"></p>
+                <p class="sejr-medaljetekst" id="j-sejr-medalje"></p>
+                <p class="sejr-maal" id="j-sejr-maal"></p>
+                <div class="sejr-knapper">
+                    <button class="knap blaa" id="j-sejr-igen" type="button">Gå efter guld →</button>
+                    <button class="knap" id="j-sejr-luk" type="button">Luk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="j-jagter">
+            <h2>Jagterne <span class="taeller">klaret <b id="j-klaret">0</b>/<span id="j-ialt">8</span></span></h2>
+            <div class="jagtliste" id="j-jagtliste"></div>
+        </div>
+
+        <div class="kort" id="j-hylde">
+            <h2>Hylden <span class="taeller" id="j-hyldetal"></span></h2>
+            <div id="j-hylder"></div>
+            <button class="knap igenknap" id="j-igen" type="button" hidden>↺ Begynd jagten forfra</button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIEN (aabnes kun med knappen eller T)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks bred">
+        <h2>Isomerer</h2>
+        <p><b>Isomerer</b> er forskellige stoffer med samme molekylformel. Atomerne er de samme, men de er sat forskelligt sammen. I <b>strukturisomerer</b> er atomerne bundet sammen i forskellig rækkefølge.</p>
+        <h3 class="teori-hoved">Tre slags strukturisomeri</h3>
+        <table class="teoritabel">
+            <tr><th>Slags</th><th>Det, der er forskelligt</th><th>Eksempel</th></tr>
+            <tr><td>Kædeisomeri</td><td>carbonkæden er bygget forskelligt</td><td>butan og 2-methylpropan</td></tr>
+            <tr><td>Stillingsisomeri</td><td>samme kæde, men gruppen sidder på et andet carbonatom</td><td>propan-1-ol og propan-2-ol</td></tr>
+            <tr><td>Funktionsisomeri</td><td>forskellige funktionelle grupper</td><td>ethanol og dimethylether</td></tr>
+        </table>
+        <p>En <b>ether</b> har et oxygenatom midt i carbonkæden, R−O−R′. Den er funktionsisomer til alkoholerne.</p>
+        <h3 class="teori-hoved">Sådan afgør du, hvilken slags isomerer to stoffer er</h3>
+        <p>1. Er de funktionelle grupper forskellige? Så er stofferne funktionsisomerer.<br>
+           2. Er gruppen den samme, men carbonkæden forskellig? Så er de kædeisomerer.<br>
+           3. Er både gruppen og kæden den samme? Så sidder gruppen forskellige steder, og de er stillingsisomerer.</p>
+        <h3 class="teori-hoved">Det samme stof tegnet to gange</h3>
+        <p>Et molekyle må gerne vendes og drejes. Butan-1-ol er det samme stof, uanset om OH-gruppen tegnes i højre eller venstre ende. Er du i tvivl, så giv begge tegninger et systematisk navn.</p>
+        <h3 class="teori-hoved">Sådan finder du dem alle</h3>
+        <p>Begynd med den lige kæde, og flyt gruppen fra carbonatom til carbonatom. Gør derefter kæden ét carbonatom kortere, og sæt det sidste carbonatom på som en methylgruppe. Til sidst etherne: oxygenatomet midt i kæden.</p>
+        <h3 class="teori-hoved">Kogepunktet</h3>
+        <p>Spørg i denne rækkefølge: Kan det ene stof danne hydrogenbindinger og det andet ikke? Er det ene stof polært og det andet upolært? Har de samme slags bindinger, koger det største og mindst forgrenede molekyle højest.</p>
+        <p class="genveje"><kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> ryd tavlen &nbsp;·&nbsp; <kbd>Ctrl</kbd>+<kbd>Z</kbd> fortryd &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen                                -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="../../molekylemotor/js/molekyle.js"></script>
+<script src="../../molekylemotor/js/navngivning.js"></script>
+<script src="../../molekylemotor/js/smiles.js"></script>
+<script src="../../molekylemotor/js/trivialnavne.js"></script>
+<script src="../../molekylemotor/js/layout.js"></script>
+<script src="../../molekylemotor/js/struktur.js"></script>
+<script src="../../molekylemotor/js/navnlaeser.js"></script>
+<script src="../../molekylemotor/js/tavle.js"></script>
+<script src="../../molekylemotor/js/tegnebraet.js"></script>
+<script src="js/data.js"></script>
+<script src="js/kemi.js"></script>
+<script src="js/fane.js"></script>
+<script src="js/sim_jagt.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

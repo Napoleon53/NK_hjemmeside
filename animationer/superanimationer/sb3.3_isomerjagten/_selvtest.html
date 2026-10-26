@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb3.3 Isomerjagten</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at hver jagt har præcis de isomerer, der findes
+   (alle træer med jagtens atomer bygges og navngives af motoren), at
+   motoren giver hver isomer navnet fra js/data.js, at slags isomeri
+   passer med bogens facit til opgave B3.3.3, at kortet kun spørger om
+   par, der er forskellige på én måde, at alle jagter kan løses med
+   tegninger, der er vendt og drejet, at det samme stof tegnet igen
+   bliver genkendt, at forkerte tegninger og svar får den rigtige
+   forklaring og koster stjernen, at Vis svaret virker, at scenen er
+   låst, når kortet spørger eller er grønt, at teksterne er korte og
+   uden tankestreger, og at kortet aldrig dækker whiteboardet fra
+   1100 × 620 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server med mappen animationer/ som
+   rod (motoren hentes fra ../../molekylemotor/). Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function note(t) { skriv("        " + t, "note"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb3.3-jagter"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|maal|spoerg\w*|faa|saa|naar|kaede\w*|traek\w*|vaelg\w*|laengste|taelle?r?|hoejest\w*|raekke\w*)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 1200); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kemi;
+    var s = NK.sims["fane-j"];
+
+    function el(id) { return d.getElementById(id); }
+    function kortTekst() { return el("j-ind").textContent; }
+    function besked() { return el("j-besked").hidden ? "" : el("j-besked").textContent; }
+    function videreKnap() { return el("j-ind").querySelector("[data-videre]"); }
+    function storrelse(b, h) {
+        ramme.style.width = b + "px";
+        ramme.style.height = h + "px";
+        s.lay = null;
+        s.tilpas();
+        s.layout();
+    }
+    /* Et molekyle bygget af navnet, vendt og drejet, så det ikke ligner bogens tegning */
+    function tegnet(navn, vend) {
+        var m = NK.NavnLaeser.laes(navn).mol.kopi();
+        var v = vend ? 2.3 : 0;
+        m.atomer.forEach(function (a) {
+            var x = a.x, y = a.y;
+            a.x = (vend ? -1 : 1) * (x * Math.cos(v) - y * Math.sin(v));
+            a.y = x * Math.sin(v) + y * Math.cos(v);
+        });
+        return m;
+    }
+    function indsendTegning(navn, vend) {
+        s.braet.saet(tegnet(navn, vend));
+        s.indsendKlik();
+    }
+    function svarRigtigt() {
+        var j = 0;
+        D.SLAGS.forEach(function (x, i) { if (x.id === s.spm.rel) j = i; });
+        s.svarValg(j);
+        s.indsendKlik();
+    }
+    function kogRigtigt() {
+        var k = s.kog, f = K.kogFacit(s.jagt, k.navne);
+        if (s.jagt.kog === "raekke") f.forEach(function (n) { s.kogKlik(k.navne.indexOf(n)); });
+        else s.kogKlik(k.navne.indexOf(f[0]));
+        s.indsendKlik();
+    }
+    /* En hel jagt løses: alle isomerer tegnes vendt, spørgsmålene og kogepunkterne besvares rigtigt */
+    function loesJagt(i) {
+        s.jagIgen(i);
+        var j = D.JAGTER[i], vaern = 0;
+        j.isomerer.slice().reverse().forEach(function (x, n) {
+            indsendTegning(x.navn, n % 2 === 0);
+            if (s.fase === "spm") svarRigtigt();
+            if (s.groen && s.groen.til === "naeste") s.videreKlik();
+        });
+        while (s.groen && (s.groen.til === "kog" || s.groen.til === "klaret") && vaern++ < 3) s.videreKlik();
+        if (s.fase === "kog" && !s.groen) kogRigtigt();
+    }
+
+    /* ================================================================= */
+    overskrift("1. Kemien: hver jagt har præcis de isomerer, der findes");
+    var f1 = [], f2 = [], f3 = [], f4 = [], navneSet = {};
+    D.JAGTER.forEach(function (j) {
+        var n = D.antal(j);
+        j.isomerer.forEach(function (x) {
+            var l = NK.NavnLaeser.laes(x.navn), r = NK.Navn.analyser(l.mol);
+            if (r.navnUdenStereo !== x.navn) f1.push(x.navn + " -> " + r.navnUdenStereo);
+            var t = K.optael(l.mol);
+            if (t.C !== n.C || t.O !== n.O || t.H !== n.H) f2.push(x.navn + " " + l.mol.formel() + " i " + j.formel);
+            if ((j.kog && typeof x.kp !== "number") || !x.mangler) f3.push(x.navn);
+            if (j.kun && K.isomer(x.navn).klasse !== j.kun) f4.push(x.navn);
+            if (navneSet[j.id + x.navn]) f4.push("to gange: " + x.navn);
+            navneSet[j.id + x.navn] = true;
+        });
+    });
+    samlet("motoren giver hver isomer navnet fra data.js", f1);
+    samlet("hver isomer har jagtens molekylformel", f2);
+    samlet("hver isomer har kogepunkt og hint", f3);
+    samlet("ingen isomer to gange, og 'kun alkohol' holder", f4);
+
+    /* Alle træer med n atomer (Prüfer-følger), hvert atom C eller ét O:
+       navnene på dem, der overholder valensen, er jagtens isomerer */
+    function alleTraeer(n) {
+        var ud = [];
+        if (n === 1) return [[]];
+        if (n === 2) return [[[0, 1]]];
+        var seq = [];
+        (function rek(k) {
+            if (k === n - 2) {
+                var grad = [], i, kanter = [];
+                for (i = 0; i < n; i++) grad[i] = 1;
+                seq.forEach(function (v) { grad[v]++; });
+                var g = grad.slice();
+                seq.forEach(function (v) {
+                    for (var u = 0; u < n; u++) if (g[u] === 1) { kanter.push([u, v]); g[u]--; g[v]--; break; }
+                });
+                var rest = [];
+                for (i = 0; i < n; i++) if (g[i] === 1) rest.push(i);
+                kanter.push(rest);
+                ud.push(kanter);
+                return;
+            }
+            for (var v = 0; v < n; v++) { seq[k] = v; rek(k + 1); }
+        }(0));
+        return ud;
+    }
+    D.JAGTER.forEach(function (j) {
+        var a = D.antal(j), n = a.C + a.O, fundet = {};
+        alleTraeer(n).forEach(function (kanter) {
+            var grad = [];
+            for (var i = 0; i < n; i++) grad[i] = 0;
+            kanter.forEach(function (k) { grad[k[0]]++; grad[k[1]]++; });
+            var Opladser = a.O ? [] : [-1];
+            for (i = 0; a.O && i < n; i++) Opladser.push(i);
+            Opladser.forEach(function (o) {
+                for (var i = 0; i < n; i++) if (grad[i] > (i === o ? 2 : 4)) return;
+                /* Jagten med en dobbeltbinding: hver binding kan være den dobbelte */
+                (j.dobbelt ? kanter.map(function (k, nr) { return nr; }) : [-1]).forEach(function (dbl) {
+                    if (dbl >= 0 && (grad[kanter[dbl][0]] > 3 || grad[kanter[dbl][1]] > 3)) return;
+                    var m = new NK.Molekyle(), ids = [];
+                    for (var i = 0; i < n; i++) ids.push(m.tilfoej(i === o ? "O" : "C", i, (i % 2) * 0.5).id);
+                    kanter.forEach(function (k, nr) { m.bind(ids[k[0]], ids[k[1]], nr === dbl ? 2 : 1); });
+                    var x = K.tegning(m);
+                    if (j.kun && x.klasse !== j.kun) return;
+                    fundet[x.navn] = true;
+                });
+            });
+        });
+        var data = j.isomerer.map(function (x) { return x.navn; }).sort(), alle = Object.keys(fundet).sort();
+        paastand(j.formel + ": " + alle.length + " isomerer, og det er dem i data.js", data.join() === alle.join(), "fundet: " + alle.join(", "));
+    });
+
+    var tal = D.JAGTER.map(function (j) { return j.isomerer.length; }).join(",");
+    paastand("antal isomerer pr. jagt er 3, 2, 3, 7, 8, 5, 5 og 14", tal === "3,2,3,7,8,5,5,14", tal);
+    paastand("hver jagt har en sværhedsgrad: Let, Middel, Svær eller Mester", D.JAGTER.every(function (j) { return /^(Let|Middel|Svær|Mester)$/.test(j.niv); }));
+    var fk = [];
+    D.JAGTER.forEach(function (j) {
+        var kp = j.isomerer.map(function (x) { return x.kp; }).sort(function (x, y) { return y - x; });
+        if (j.kog === "raekke") { for (var i = 1; i < kp.length; i++) if (kp[i] === kp[i - 1]) fk.push(j.formel + " to ens kogepunkter"); }
+        else if (j.kog && kp[0] === kp[1]) fk.push(j.formel + " to har det højeste");
+    });
+    samlet("kogepunkterne giver ét facit (ingen ens tal i en rækkefølge)", fk);
+    paastand("kogepunkter som sb4.4: butan-1-ol 118, diethylether 35, dimethylether −25",
+        D.isomer(D.jagt("c4h10o"), "butan-1-ol").kp === 118 && D.isomer(D.jagt("c4h10o"), "diethylether").kp === 35 && D.isomer(D.jagt("c2h6o"), "dimethylether").kp === -25);
+
+    /* ================================================================= */
+    overskrift("2. Slags isomeri (bogens facit til opgave B3.3.3) og de par, kortet spørger om");
+    [["pentan", "2-methylbutan", "kaede"], ["pentan-2-ol", "pentan-3-ol", "stilling"], ["butan-2-ol", "diethylether", "funktion"],
+     ["butan-1-ol", "2-methylpropan-1-ol", "kaede"], ["propan-1-ol", "ethylmethylether", "funktion"], ["propan-1-ol", "propan-2-ol", "stilling"],
+     ["2-methylbutan-1-ol", "3-methylbutan-1-ol", "stilling"], ["ethanol", "dimethylether", "funktion"]].forEach(function (p) {
+        var r = K.relation(K.isomer(p[0]), K.isomer(p[1]));
+        paastand(p[0] + " og " + p[1] + ": " + p[2], r === p[2], r);
+    });
+    paastand("2-methylbutan-1-ol og 3-methylbutan-1-ol spørges der ikke om (svære at se)", !K.ren(K.isomer("2-methylbutan-1-ol"), K.isomer("3-methylbutan-1-ol")));
+    paastand("butan-2-ol og 2-methylpropan-1-ol spørges der ikke om (både kæde og plads er forskellige)", !K.ren(K.isomer("butan-2-ol"), K.isomer("2-methylpropan-1-ol")));
+    paastand("to ethere spørges der ikke om", !K.ren(K.isomer("diethylether"), K.isomer("methylpropylether")));
+    var ren = [];
+    D.JAGTER.forEach(function (j) {
+        j.isomerer.forEach(function (a) {
+            j.isomerer.forEach(function (b) {
+                if (a === b) return;
+                var A = K.isomer(a.navn), B = K.isomer(b.navn);
+                if (!K.ren(A, B)) return;
+                var r = K.relation(A, B);
+                if (r === "kaede" && A.klasse !== "alkan" && A.lok !== B.lok) ren.push(a.navn + "/" + b.navn);
+                if (r === "stilling" && A.uden !== B.uden) ren.push(a.navn + "/" + b.navn);
+                if (r === "funktion" && A.klasse === B.klasse) ren.push(a.navn + "/" + b.navn);
+            });
+        });
+    });
+    samlet("hvert par, kortet spørger om, er forskelligt på én måde", ren);
+
+    /* ================================================================= */
+    overskrift("3. Teksterne: korte, uden tankestreger og uden ASCII-dansk");
+    var tekster = [];
+    function t(hvad, tekst, maks) { tekster.push({ hvad: hvad, t: tekst, maks: maks }); }
+    D.JAGTER.forEach(function (j) {
+        t(j.formel + " opgave", j.tekst, 110);
+        t(j.formel + " strategi", j.strategi, 105);
+        (j.kogHint || []).forEach(function (h) { t(j.formel + " kogehint", h, 100); });
+        t(j.formel + " kogetekst", D.kogTekst(j), 160);
+        j.isomerer.forEach(function (x) {
+            t(x.navn + " mangler", x.mangler, 100);
+            t(x.navn + " samme", K.sammeTekst(x.navn), 130);
+            if (j.dobbelt) t(x.navn + " cis og trans", K.sammeStereo(x.navn, "cis-" + x.navn), 125);
+            if (j.kun === "alkohol") return;
+        });
+        j.isomerer.forEach(function (a) {
+            j.isomerer.forEach(function (b) {
+                if (a === b) return;
+                var A = K.isomer(a.navn), B = K.isomer(b.navn);
+                if (K.ren(A, B)) {
+                    t(a.navn + "/" + b.navn + " spørgsmål", D.stor(a.navn) + " er ny. Hvilken slags isomerer er " + a.navn + " og " + b.navn + "?", 112);
+                    t(a.navn + "/" + b.navn + " rigtigt", K.relForklaring(a.navn, b.navn), 160);
+                    t(a.navn + "/" + b.navn + " hint", K.relHint(a.navn, b.navn), 100);
+                    D.SLAGS.forEach(function (x) {
+                        if (x.id !== K.relation(A, B)) t(a.navn + "/" + b.navn + " " + x.id, K.relFejl(a.navn, b.navn, x.id), 125);
+                    });
+                }
+                if (j.kog === "raekke" && a.kp > b.kp) t(a.navn + " over " + b.navn, K.kogFejl(j, a.navn, b.navn), 120);
+            });
+            if (j.kog === "hoejest" && a !== j.isomerer.slice().sort(function (x, y) { return y.kp - x.kp; })[0]) t(a.navn + " højest", K.hoejestFejl(j, a.navn), 120);
+        });
+    });
+    t("kun alkohol", K.kunAlkohol("2-methoxy-2-methylpropan"), 110);
+    t("spm-hint", K.SPM_HINT, 100);
+    var lange = [], streger = [], ascii = [];
+    tekster.forEach(function (x) {
+        if (x.t.length > x.maks) lange.push(x.hvad + " " + x.t.length + ">" + x.maks + ": " + x.t);
+        if (/[–—]/.test(x.t)) streger.push(x.hvad);
+        if (ASCII_ORD.test(x.t)) ascii.push(x.hvad + ": " + x.t.match(ASCII_ORD)[0]);
+    });
+    note(tekster.length + " tekster tjekket");
+    samlet("ingen tekst er for lang", lange);
+    samlet("ingen tankestreger", streger);
+    samlet("intet ASCII-dansk (paa, naar ...)", ascii);
+    var htmlTekst = d.body.innerText;
+    paastand("siden har ingen tankestreger", !/[–—]/.test(htmlTekst));
+
+    /* ================================================================= */
+    overskrift("4. Alle otte jagter kan løses med vendte og drejede tegninger");
+    var pladser = [];
+    D.JAGTER.forEach(function (j, i) {
+        s.jagIgen(i);
+        var n = d.querySelectorAll("#j-hylder .hk").length;
+        if (n !== j.isomerer.length) pladser.push(j.formel + " " + n + " pladser");
+    });
+    samlet("hylden har en plads til hver isomer i alle jagter", pladser);
+    storrelse(1300, 800);
+    D.JAGTER.forEach(function (j, i) {
+        loesJagt(i);
+        var st = s.status[i];
+        paastand(j.formel + ": alle fundet, kogepunkterne klaret og en stjerne", st.fundet.length === j.isomerer.length && st.kog && st.loest && st.stjerne,
+            st.fundet.length + " " + st.kog + " " + st.stjerne + " | " + kortTekst());
+    });
+    paastand("listen viser otte stjerner", d.querySelectorAll(".jagtlinje .jl-maerke").length === 8 &&
+        Array.prototype.every.call(d.querySelectorAll(".jagtlinje .jl-maerke"), function (e) { return e.textContent === "★"; }));
+    paastand("den sidste jagt fører til medaljen", s.groen && s.groen.til === "medalje" && /medalje/.test(videreKnap().textContent));
+    s.videreKlik();
+    paastand("medaljen er guld med 8/8", !el("j-sejr").hidden && el("j-sejr").classList.contains("guld") && /8\/8/.test(el("j-medalje").textContent));
+    paastand("sejren tæller alle 47 isomerer", /alle 47 isomerer i de otte jagter/.test(el("j-sejr-tekst").textContent), el("j-sejr-tekst").textContent);
+    paastand("guld: knappen Gå efter guld er væk", el("j-sejr-igen").hidden);
+    s.lukSejr();
+    var gemtNu = NK.hent("nk-sb3.3-jagter", {});
+    paastand("det fundne huskes i browseren", gemtNu.c4h10o && gemtNu.c4h10o.f.length === 7 && gemtNu.c4h10o.s === 1);
+
+    /* ================================================================= */
+    overskrift("5. Tegningen bedømmes først ved Indsend svar");
+    s.jagIgen(3);
+    paastand("Indsend svar er grå med kun startatomet", el("j-indsend").classList.contains("ikke-klar") && el("j-indsend").textContent === "Indsend svar");
+    s.indsendKlik();
+    paastand("Indsend uden tegning: kortet siger, hvad der skal gøres", /Tegn et molekyle først/.test(besked()) && s.st.fundet.length === 0, besked());
+    s.braet.saet(tegnet("butan-1-ol", false));
+    paastand("knappen viser tegningens molekylformel", el("j-indsend").innerHTML === "<span>Indsend svar: C<sub>4</sub>H<sub>10</sub>O</span>" && el("j-indsend").classList.contains("klar"), el("j-indsend").innerHTML);
+    paastand("intet er bedømt, før der trykkes", s.st.fundet.length === 0 && !/Ny isomer|Forkert|Samme|Ikke endnu/.test(besked()), besked());
+    s.indsendKlik();
+    paastand("butan-1-ol kommer på hylden", s.st.fundet.join() === "butan-1-ol" && /Butan-1-ol står nu på hylden/.test(besked()) && d.querySelectorAll("#j-hylder .hk:not(.tom)").length === 1, besked());
+    paastand("tegningen bliver stående på tavlen", s.braet.mol.atomer.length === 5 && s.fase === "tegn");
+    indsendTegning("butan-1-ol", true);
+    paastand("det samme stof vendt: Samme stof, og intet nyt på hylden", /Samme stof/.test(besked()) && s.st.fundet.length === 1 && !!d.querySelector("#j-hylder .hk.igen"), besked());
+    paastand("det samme stof koster ikke stjernen", !s.st.fe);
+    indsendTegning("pentan-1-ol", false);
+    paastand("fem carbonatomer: Forkert formel med tallene", /Forkert formel/.test(besked()) && /fem carbonatomer/.test(besked()) && /fire/.test(besked()), besked());
+    indsendTegning("butan", false);
+    paastand("intet oxygen: kortet siger, hvordan det kommer på", /intet oxygenatom/.test(besked()) && /OH-gruppe/.test(besked()), besked());
+    indsendTegning("butan-1,2-diol", false);
+    paastand("to oxygenatomer: kortet siger det", /to oxygenatomer/.test(besked()), besked());
+    paastand("forkerte tegninger koster ikke stjernen", !s.st.fe && s.st.fundet.length === 1);
+    s.jagIgen(4);
+    indsendTegning("ethylpropylether", false);
+    paastand("C₅H₁₂O: en ether afvises, fordi kun alkoholerne tæller", /ether/.test(besked()) && /kun finde alkoholerne/.test(besked()) && s.st.fundet.length === 0, besked());
+
+    /* ================================================================= */
+    overskrift("6. Spørgsmålet: hvilken slags isomerer?");
+    s.jagIgen(3);
+    indsendTegning("butan-1-ol", false);
+    indsendTegning("butan-2-ol", false);
+    paastand("ny isomer med en partner på hylden: kortet spørger", s.fase === "spm" && s.spm.partner === "butan-1-ol" && s.spm.rel === "stilling" &&
+        /Hvilken slags isomerer er butan-2-ol og butan-1-ol/.test(kortTekst()), kortTekst());
+    paastand("de to står på whiteboardet, og værktøjerne er væk", s.celler.length === 2 && el("j-vaerktoej").hidden);
+    paastand("de to er fremhævet på hylden", d.querySelectorAll("#j-hylder .hk.sammen").length === 2);
+    paastand("Indsend svar er grå, til et svar er valgt", el("j-indsend").classList.contains("ikke-klar"));
+    s.svarValg(0);
+    paastand("et svar vælger kun: intet er bedømt", s.fase === "spm" && !s.groen && besked() === "" && el("j-indsend").classList.contains("klar"));
+    s.indsendKlik();
+    paastand("forkert svar (kæde): forklaringen siger, at kæden er den samme", /Carbonkæden er den samme/.test(besked()) && /Ikke endnu/.test(besked()), besked());
+    paastand("det forkerte svar kan ikke vælges igen", el("j-ind").querySelectorAll(".sk-knap")[0].disabled);
+    paastand("et forkert svar koster stjernen", s.st.fe);
+    /* Låsen: et klik på tavlen gør intet, kortet blinker */
+    var n0 = s.braet.mol.atomer.length;
+    el("j-skort").classList.remove("blink");
+    s.klikScene({ x: s.lay.tavle.x + 40, y: s.lay.tavle.y + 60 });
+    paastand("under spørgsmålet: et klik på tavlen får kortet til at blinke", el("j-skort").classList.contains("blink") && s.braet.mol.atomer.length === n0);
+    s.svarValg(1);
+    s.indsendKlik();
+    paastand("rigtigt svar: grønt kort med Stillingsisomerer og forklaringen", s.groen && /Stillingsisomerer/.test(kortTekst()) && /nr\. 2 og nr\. 1/.test(kortTekst()), kortTekst());
+    el("j-skort").classList.remove("blink");
+    s.fortryd();
+    paastand("grønt kort: Fortryd blinker kortet i stedet", el("j-skort").classList.contains("blink"));
+    s.videreKlik();
+    paastand("Find den næste isomer: tilbage til tavlen med tegningen", s.fase === "tegn" && !s.groen && s.braet.mol.atomer.length === 5 && !el("j-vaerktoej").hidden);
+    indsendTegning("2-methylpropan-2-ol", false);
+    paastand("2-methylpropan-2-ol sammenlignes med butan-2-ol (kæde, OH på nr. 2 i begge)", s.fase === "spm" && s.spm.partner === "butan-2-ol" && s.spm.rel === "kaede", JSON.stringify(s.spm));
+    svarRigtigt();
+    s.videreKlik();
+    indsendTegning("diethylether", false);
+    paastand("den første ether sammenlignes med en alkohol (funktion)", s.fase === "spm" && s.spm.rel === "funktion", JSON.stringify(s.spm));
+    s.svarValg(0);
+    s.indsendKlik();
+    paastand("forkert svar ved funktion: forklaringen nævner OH-gruppen og etheren", /OH-gruppe/.test(besked()) && /diethylether/.test(besked()), besked());
+
+    /* ================================================================= */
+    overskrift("7. Hjælpen: hint og Vis svaret");
+    s.jagIgen(2);
+    paastand("hint 1 er strategien", (s.knap(), /Begynd med alkoholerne/.test(besked())), besked());
+    paastand("hint 2 beskriver den første isomer, der mangler", (s.knap(), /Der mangler en alkohol med OH-gruppen for enden/.test(besked())), besked());
+    paastand("efter to hint: Vis svaret (kun omrids)", el("j-knap").textContent === "Vis svaret" && el("j-knap").classList.contains("svar"));
+    s.knap();
+    paastand("Vis svaret tegner isomeren og lægger den på hylden", s.st.fundet.join() === "propan-1-ol" && s.st.sv && s.braet.mol.atomer.length === 4, s.st.fundet.join());
+    var vaern = 0;
+    while (!s.st.kog && vaern++ < 20) {
+        if (s.groen) s.videreKlik();
+        else { s.knap(); s.knap(); s.knap(); }
+    }
+    paastand("hele jagten kan klares med Vis svaret", s.st.kog);
+    paastand("Vis svaret giver ingen ny stjerne (men den gamle bliver)", s.status[2].stjerne && /Svaret/.test(kortTekst()), kortTekst());
+    s.status[2].stjerne = false;
+    s.jagIgen(2);
+    s.knap(); s.knap(); s.knap();
+    vaern = 0;
+    while (!s.st.kog && vaern++ < 20) { if (s.groen) s.videreKlik(); else { s.knap(); s.knap(); s.knap(); } }
+    paastand("uden gammel stjerne: ingen stjerne efter Vis svaret", s.st.kog && !s.st.stjerne);
+
+    /* ================================================================= */
+    overskrift("8. Kogepunkterne");
+    s.jagIgen(2);
+    D.jagt("c3h8o").isomerer.forEach(function (x) { indsendTegning(x.navn, true); if (s.fase === "spm") svarRigtigt(); if (s.groen && s.groen.til === "naeste") s.videreKlik(); });
+    s.videreKlik();
+    paastand("kogepunkterne: kortet spørger, og tavlen viser tre kort", s.fase === "kog" && s.celler.length === 3 && /fra højeste til laveste kogepunkt/.test(kortTekst()), kortTekst());
+    var facit = K.kogFacit(s.jagt, s.kog.navne);
+    paastand("kortene står ikke i facits rækkefølge", s.kog.navne.join() !== facit.join(), s.kog.navne.join());
+    paastand("intet tal på kortene før svaret", s.kog.orden.length === 0 && !s.kog.loest);
+    s.kogKlik(s.kog.navne.indexOf("propan-2-ol"));
+    s.kogKlik(s.kog.navne.indexOf("propan-1-ol"));
+    paastand("Indsend er grå, til alle tre har et nummer", el("j-indsend").classList.contains("ikke-klar"));
+    s.kogKlik(s.kog.navne.indexOf("propan-1-ol"));
+    paastand("et klik mere fjerner nummeret igen", s.kog.orden.length === 1);
+    s.kogKlik(s.kog.navne.indexOf("ethylmethylether"));
+    s.kogKlik(s.kog.navne.indexOf("propan-1-ol"));
+    s.indsendKlik();
+    paastand("forkert rækkefølge: propan-2-ol er mere kugleformet", /Propan-2-ol er mere kugleformet/.test(besked()) && /propan-1-ol/.test(besked()), besked());
+    paastand("efter et forkert svar er numrene væk", s.kog.orden.length === 0);
+    s.indsendKlik();
+    kogRigtigt();
+    paastand("rigtig rækkefølge: grønt kort med kogepunkterne", s.groen && /97 °C/.test(kortTekst()) && /82 °C/.test(kortTekst()) && /7 °C/.test(kortTekst()), kortTekst());
+    paastand("kortene står nu fra højeste til laveste kogepunkt", s.kog.navne.join() === facit.join());
+    paastand("kogepunkterne står på hylden", d.querySelectorAll("#j-hylder .hk-kp").length === 3);
+    s.jagIgen(3);
+    D.jagt("c4h10o").isomerer.forEach(function (x) { indsendTegning(x.navn, false); if (s.fase === "spm") svarRigtigt(); if (s.groen && s.groen.til === "naeste") s.videreKlik(); });
+    s.videreKlik();
+    paastand("C₄H₁₀O: kortet spørger om det højeste kogepunkt, og tavlen viser syv", s.fase === "kog" && s.celler.length === 7 && /højeste kogepunkt/.test(kortTekst()));
+    s.kogKlik(s.kog.navne.indexOf("diethylether"));
+    s.indsendKlik();
+    paastand("en ether: kan ikke danne hydrogenbindinger med sig selv", /ether og kan ikke danne hydrogenbindinger/.test(besked()), besked());
+    s.kogKlik(s.kog.navne.indexOf("diethylether"));
+    paastand("den prøvede kan ikke vælges igen", s.kog.valgt === null);
+    s.kogKlik(s.kog.navne.indexOf("2-methylpropan-1-ol"));
+    s.indsendKlik();
+    paastand("en forgrenet alkohol: kontaktfladen er mindre", /forgrenet kæde/.test(besked()), besked());
+    s.kogKlik(s.kog.navne.indexOf("butan-2-ol"));
+    s.indsendKlik();
+    paastand("butan-2-ol: OH-gruppen sidder inde på kæden", /inde på kæden/.test(besked()), besked());
+    s.kogKlik(s.kog.navne.indexOf("butan-1-ol"));
+    s.indsendKlik();
+    paastand("butan-1-ol: grønt kort med 118 °C", s.groen && /118 °C/.test(kortTekst()), kortTekst());
+
+    /* ================================================================= */
+    overskrift("9. Kortet dækker aldrig whiteboardet, og knapperne står på én række");
+    var lang = "", langFejl = "";
+    tekster.forEach(function (x) { if (/rigtigt$/.test(x.hvad) && x.t.length > lang.length) lang = x.t; if (/ (kaede|stilling|funktion)$/.test(x.hvad) && x.t.length > langFejl.length) langFejl = x.t; });
+    var daekker = [], raekke = [];
+    [[1100, 620], [1200, 700], [1300, 800], [1600, 950]].forEach(function (str) {
+        storrelse(str[0], str[1]);
+        function maal(hvad) {
+            var kort = el("j-skort"), sc = s.L.canvas.getBoundingClientRect(), r = kort.getBoundingClientRect();
+            if (r.bottom - sc.top > s.lay.tavle.y + 1) daekker.push(str.join("×") + " " + hvad + ": " + Math.round(r.bottom - sc.top) + " > " + s.lay.tavle.y);
+            var k = el("j-knap"), i = el("j-indsend");
+            if (!k.hidden && !i.hidden && Math.abs(k.getBoundingClientRect().top - i.getBoundingClientRect().top) > 4) raekke.push(str.join("×") + " " + hvad);
+        }
+        Array.prototype.forEach.call(d.querySelectorAll(".jl-navn, .jl-formel"), function (e) {
+            if (e.scrollWidth > e.clientWidth + 1) daekker.push(str.join("×") + " flisen skærer " + e.textContent + " af");
+        });
+        s.jagIgen(4);
+        maal("opgaven");
+        s.fejlLinje("Tegningen har " + "otte carbonatomer, men C₅H₁₂O har fem. Slet et carbonatom.", "Forkert formel");
+        maal("forkert formel");
+        s.besked('<span class="b-maerke">Samme stof</span> ' + K.sammeTekst("2,2-dimethylpropan-1-ol"), "gul");
+        maal("samme stof");
+        indsendTegning("2-methylbutan-1-ol", false);
+        indsendTegning("2,2-dimethylpropan-1-ol", false);
+        maal("spørgsmålet");
+        s.fejlLinje(langFejl);
+        maal("spørgsmålet med den længste fejl");
+        s.groen = { maade: "selv", fed: "Stillingsisomerer.", tekst: lang, knap: "Videre til kogepunkterne →", til: "naeste" };
+        s.visKort();
+        maal("den længste forklaring");
+        s.groen = { maade: "selv", chip: "Jagten er klaret ★", tekst: D.kogTekst(D.jagt("c5h12")), knap: "Næste jagt: C₂H₆O →", til: "naeste" };
+        s.visKort();
+        maal("jagten er klaret");
+        s.groen = null;
+        s.jagIgen(3);
+        D.jagt("c4h10o").isomerer.forEach(function (x) { indsendTegning(x.navn, false); if (s.fase === "spm") svarRigtigt(); if (s.groen && s.groen.til === "naeste") s.videreKlik(); });
+        s.videreKlik();
+        s.fejlLinje(K.hoejestFejl(D.jagt("c4h10o"), "2-methylpropan-2-ol"));
+        maal("kogepunkterne med fejl");
+        s.jagIgen(7);
+        D.JAGTER[7].isomerer.forEach(function (x) { indsendTegning(x.navn, false); if (s.fase === "spm") svarRigtigt(); if (s.groen && s.groen.til === "naeste") s.videreKlik(); });
+        s.videreKlik();
+        maal("mesterjagtens kogepunkter");
+        var c = s.celler, ud = c.filter(function (x) { return x.x < s.lay.tavle.x || x.y < s.lay.tavle.y || x.x + x.b > s.lay.tavle.x + s.lay.tavle.b + 1 || x.y + x.h > s.lay.tavle.y + s.lay.tavle.h + 1; });
+        if (ud.length) daekker.push(str.join("×") + " kort uden for tavlen");
+        if (c.some(function (x) { return x.h < 90 || x.b < 120; })) daekker.push(str.join("×") + " kogekortene er for små: " + Math.round(c[0].b) + "×" + Math.round(c[0].h));
+    });
+    samlet("kortet slutter over whiteboardet i alle størrelser og alle dele", daekker);
+    samlet("Giv et hint og Indsend svar står på samme række", raekke);
+    storrelse(1300, 800);
+
+    /* ================================================================= */
+    overskrift("10. Tavlen: værktøjerne");
+    s.jagIgen(3);
+    var b = s.braet;
+    paastand("C₄H₁₀O har Kæde, −OH og C → O", Array.prototype.map.call(d.querySelectorAll("#j-vt [data-vt]"), function (e) { return e.textContent; }).join(",") === "Kæde,−OH,C → O");
+    s.jagIgen(0);
+    paastand("C₅H₁₂ har kun Kæde", d.querySelectorAll("#j-vt [data-vt]").length === 1);
+    s.jagIgen(3);
+    b.saet(tegnet("butan", false));
+    var midt = b.mol.atomer.filter(function (a) { return b.mol.naboer(a.id).length === 2; })[0];
+    s.vaelgVaerktoej("skiftO");
+    b.klik({ slags: "atom", atom: midt });
+    paastand("C → O på et carbonatom midt i kæden giver en ether", b.mol.formel() === "C₃H₈O" && K.tegning(b.mol).klasse === "ether" && b.vaerktoej === "tegn", b.mol.formel());
+    s.vaelgVaerktoej("skiftO");
+    b.klik({ slags: "atom", atom: b.mol.atom(midt.id) });
+    paastand("C → O på et oxygenatom gør det til carbon igen", b.mol.formel() === "C₄H₁₀");
+    b.saet(tegnet("2-methylpropan", false));
+    var gren = b.mol.atomer.filter(function (a) { return b.mol.naboer(a.id).length === 3; })[0];
+    s.vaelgVaerktoej("skiftO");
+    b.klik({ slags: "atom", atom: gren });
+    paastand("C → O på et carbonatom med tre naboer afvises", b.mol.formel() === "C₄H₁₀" && /to bindinger/.test(besked()), besked());
+    b.saet(tegnet("butan", false));
+    var ende = b.mol.atomer.filter(function (a) { return b.mol.naboer(a.id).length === 1; })[0];
+    s.vaelgVaerktoej("gruppe:OH");
+    b.klik({ slags: "atom", atom: ende });
+    paastand("−OH på enden giver butan-1-ol, og værktøjet går tilbage til Kæde", K.tegning(b.mol).navn === "butan-1-ol" && b.vaerktoej === "tegn");
+    var O = b.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+    b.klik({ slags: "atom", atom: O });
+    paastand("Kæde på oxygenatomet sætter et carbonatom på (en ether kan bygges fra OH)", K.tegning(b.mol).navn === "butylmethylether", K.tegning(b.mol).navn);
+    s.vaelgVaerktoej("skiftO");
+    var O2 = b.mol.atomer.filter(function (a) { return a.el === "O"; })[0];
+    var naboC = b.mol.atom(b.mol.naboer(O2.id)[0]);
+    b.klik({ slags: "atom", atom: naboC });
+    paastand("to oxygenatomer må ikke sidde sammen", b.mol.optaelling().O === 1 && /To oxygenatomer/.test(besked()), besked());
+    var bd = b.mol.bindinger[0];
+    b.klik({ slags: "binding", binding: bd });
+    paastand("ingen dobbeltbindinger: et klik på en binding siger det", bd.orden === 1 && /enkeltbindinger/.test(besked()), besked());
+
+    /* ================================================================= */
+    overskrift("11. Den gule ramme: hvilken molekylformel jagter man?");
+    s.jagIgen(3);
+    var maalEl = el("j-ind").querySelector(".maal");
+    paastand("kortet har den gule ramme med formlen", !!maalEl && maalEl.querySelector(".maal-formel").innerHTML === "C<sub>4</sub>H<sub>10</sub>O");
+    paastand("antallet af atomer står med almindelige tal: 4 C, 10 H, 1 O",
+        Array.prototype.map.call(maalEl.querySelectorAll(".maal-atomer i"), function (e) { return e.textContent; }).join(",") === "4 C,10 H,1 O");
+    paastand("rammen står til venstre for teksten", maalEl.getBoundingClientRect().right <= el("j-ind").querySelector(".sk-tekst").getBoundingClientRect().left);
+    s.jagIgen(0);
+    paastand("C₅H₁₂: ingen O i rammen", el("j-ind").querySelectorAll(".maal-atomer i").length === 2);
+    s.jagIgen(3);
+    s.braet.saet(tegnet("pentan-1-ol", false));
+    s.indsendKlik();
+    var ingenUnicode = [];
+    ["j-ind", "j-besked", "j-indsend", "j-jagtliste", "j-hyldetal"].forEach(function (id) { if (/[₀-₉]/.test(el(id).innerHTML)) ingenUnicode.push(id); });
+    samlet("de sænkede tal er <sub> (store nok til at læse) på kortet, knappen og i panelet", ingenUnicode);
+    paastand("Indsend svar viser formlen med <sub> i ét stykke tekst", el("j-indsend").innerHTML === "<span>Indsend svar: C<sub>5</sub>H<sub>12</sub>O</span>", el("j-indsend").innerHTML);
+    var sp = el("j-indsend").querySelectorAll("sub");
+    paastand("de sænkede tal sidder lige efter bogstaverne (ikke skubbet fra hinanden)",
+        sp.length === 2 && sp[0].getBoundingClientRect().left - sp[0].previousSibling.parentNode.getBoundingClientRect().left > 0 &&
+        Math.abs(sp[0].getBoundingClientRect().top - sp[1].getBoundingClientRect().top) < 2 &&
+        sp[0].getBoundingClientRect().bottom > el("j-indsend").querySelector("span").getBoundingClientRect().top + 8);
+    s.indsendKlik();
+    s.svarValg && s.fase === "spm" && s.svarValg(0);
+    paastand("rammen er der kun, mens der tegnes", (s.jagIgen(3), indsendTegning("butan-1-ol", false), indsendTegning("butan-2-ol", false), s.fase === "spm" && !el("j-ind").querySelector(".maal")));
+
+    /* ================================================================= */
+    overskrift("12. Alkenerne: dobbeltbindingen, cis og trans");
+    s.jagIgen(6);
+    paastand("C₅H₁₀ har Kæde og = Binding", Array.prototype.map.call(d.querySelectorAll("#j-vt [data-vt]"), function (e) { return e.textContent; }).join(",") === "Kæde,= Binding");
+    b = s.braet;
+    b.saet(tegnet("pentan", false));
+    s.indsendKlik();
+    paastand("ingen dobbeltbinding: kortet siger, hvordan den kommer på", /ingen dobbeltbinding/.test(besked()) && /= Binding/.test(besked()), besked());
+    var endeB = b.mol.bindinger.filter(function (x) { return b.mol.naboer(x.a).length === 1 || b.mol.naboer(x.b).length === 1; })[0];
+    s.vaelgVaerktoej("binding");
+    b.klik({ slags: "binding", binding: endeB });
+    paastand("= Binding gør bindingen dobbelt", endeB.orden === 2 && b.mol.formel() === "C₅H₁₀");
+    s.indsendKlik();
+    paastand("pent-1-en kommer på hylden", s.st.fundet.join() === "pent-1-en" && d.querySelectorAll("#j-hylder .hk:not(.tom)").length === 1 &&
+        d.querySelectorAll("#j-hylder .hk.tom").length === 4 && /Alkener/.test(el("j-hylder").textContent), besked());
+    b.saet(tegnet("penta-1,3-dien", false));
+    s.indsendKlik();
+    paastand("to dobbeltbindinger: kortet siger det", /to dobbeltbindinger/.test(besked()), besked());
+    indsendTegning("trans-pent-2-en", false);
+    if (s.fase === "spm") { svarRigtigt(); s.videreKlik(); }
+    paastand("pent-2-en er fundet, og stillingsisomeri med dobbeltbindingen er forklaret", s.st.fundet.indexOf("pent-2-en") >= 0);
+    indsendTegning("cis-pent-2-en", false);
+    paastand("cis-formen bagefter: samme stof, og kortet siger, at cis og trans tæller som ét", /Samme stof/.test(besked()) && /cis-pent-2-en/.test(besked()) && /Cis og trans tæller som ét stof/.test(besked()), besked());
+    paastand("relationen pent-1-en og pent-2-en er stilling, og teksten nævner dobbeltbindingen",
+        K.relation(K.isomer("pent-1-en"), K.isomer("pent-2-en")) === "stilling" && /dobbeltbindingen går fra nr\. 1 og nr\. 2/.test(K.relForklaring("pent-1-en", "pent-2-en")), K.relForklaring("pent-1-en", "pent-2-en"));
+    loesJagt(6);
+    paastand("alkenjagten slutter uden kogepunkter med et grønt kort", s.st.kog && s.groen && /Alle fem alkener er fundet/.test(kortTekst()), kortTekst());
+    paastand("whiteboardet viser de fem alkener uden °C, og hylden har ingen kogepunkter",
+        s.celler.length === 5 && d.querySelectorAll("#j-hylder .hk-kp").length === 0);
+}
+</script>
+</body>
+</html>
