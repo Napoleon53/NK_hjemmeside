@@ -491,6 +491,7 @@
             <button class="tab-btn" data-beskrivelse="Absorptionsspektre og Lambert-Beers lov, inkl. et rigtigt forsøg med azofarvestof i en Breezer." onclick="visKategori(this, 'kemi-b-filer/samling_b9.html')" title="B5: Spektroskopi"><span class="btn-num">B5</span><span class="btn-text">Spektroskopi</span></button>
             <button class="tab-btn" data-beskrivelse="Regn med syrekonstanten Ks og pKs, og træn at omregne mellem dem." onclick="visKategori(this, 'kemi-b-filer/samling_b3.html')" title="B6: Syre/Base"><span class="btn-num">B6</span><span class="btn-text">Syre/Base</span></button>
             <button class="tab-btn" data-beskrivelse="Se hvordan glucose og fructose lukker ring og danner alfa- og beta-anomerer." onclick="visKategori(this, 'kemi-b-filer/samling_b7.html')" title="B7: Fødevarer"><span class="btn-num">B7</span><span class="btn-text">Fødevarer</span></button>
+            <button class="tab-btn" data-beskrivelse="Tyndtlagschromatografi (TLC): hvorfor stofferne løber forskelligt, Rf-værdien, og hvordan man læser en TLC-plade." onclick="visKategori(this, 'kemi-b-filer/samling_b8.html')" title="B8: Medicin"><span class="btn-num">B8</span><span class="btn-text">Medicin</span></button>
 
             <button class="skift-btn" id="skiftKnap" data-href="samling_alt.html"><span class="skift-tekst">Skift til kemi C</span><span class="skift-besked">Hold nede i 1 sekund</span><span class="skift-fyld"></span></button>
             <button class="tab-btn feedback-btn" data-beskrivelse="Alle animationerne bliver løbende forbedret, og al feedback du sender bliver læst og forsøgt implementeret." onclick="visFeedback()" title="Giv feedback (rettelser eller forslag)"><span class="btn-num">✎</span><span class="btn-text">Feedback</span></button>
@@ -599,6 +600,7 @@
             if (/^(b4|b6)/i.test(emne)) return 'kemi-b-filer/samling_b_bindinger_isomeri.html';
             if (/^(b5|eb\d*|b\.spil|tegnebraet)/i.test(emne)) return 'kemi-b-filer/samling_b4,5,6.html';
             if (/^b7/i.test(emne)) return 'kemi-b-filer/samling_b7.html';
+            if (/^b8/i.test(emne)) return 'kemi-b-filer/samling_b8.html';
             if (/^b9/i.test(emne)) return 'kemi-b-filer/samling_b9.html';
             return null;
         }
@@ -713,6 +715,9 @@
             ]},
             { navn: 'B7: Fødevarer', animationer: [
                 { nr: 1, navn: 'Ringslutning' }
+            ]},
+            { navn: 'B8: Medicin', animationer: [
+                { nr: 1, navn: 'TLC' }
             ]},
             { navn: 'Generelt (ikke et bestemt kapitel)', animationer: [] }
         ];

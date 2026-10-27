@@ -18,7 +18,7 @@
             { sel: "#p-skort", titel: "Opgaven", tekst: "Her står opgaven. Hint og svar står også her. Et svar tæller først, når du trykker Indsend svar." },
             { sel: "#p-anker-kar", titel: "Karret", tekst: "TLC-pladen står over karret. Klik på den, så sænkes den ned i løbevæsken, og væsken suges op." },
             { sel: "#p-anker-flasker", titel: "Løbevæskerne", tekst: "Fire flasker fra upolær til polær. Et klik på en flaske fylder karret med den løbevæske." },
-            { sel: "#p-anker-lup", titel: "Luppen", tekst: "Pladens overflade med OH-grupper. Se, hvilke molekyler der sidder fast, og hvilke der følger med væsken." },
+            { sel: "#p-anker-lup", titel: "Luppen", tekst: "Luppen viser pladens overflade med OH-grupper: hvilke molekyler der sidder fast, og hvilke der følger med væsken. Den kommer frem i de opgaver, der handler om den. Knappen Vis luppen viser den når som helst." },
             { sel: "#p-noegle", titel: "Sådan læses luppen", tekst: "Rød stiplet streg: en hydrogenbinding. Orange skær: caroten. Gult skær: lutein." },
             { sel: "#p-opgaver", titel: "Opgaverne", tekst: "Seks opgaver. En opgave, du løser uden fejl og uden at se svaret, får en stjerne." }
         ],
@@ -126,7 +126,9 @@
     function start(faneId) {
         var liste = TURE[faneId];
         if (!liste || !liste.length) return;
-        trin = liste;
+        /* Det, der er skjult lige nu (fx noeglen til luppen), springes over */
+        trin = liste.filter(function (s) { return synligeElementer(s.sel).length > 0; });
+        if (!trin.length) return;
         trinNr = 0;
         erAktiv = true;
         NK.el("rundvisning").hidden = false;

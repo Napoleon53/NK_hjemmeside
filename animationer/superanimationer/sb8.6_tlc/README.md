@@ -1,7 +1,7 @@
 # sb8.6 TLC
 
 Superanimation om tyndtlagschromatografi til afsnit B8.6 i Kemibogen B (kapitel B8
-Medicin). Bygget fra bunden 27. okt. 2026. Ikke i menuen.
+Medicin). Bygget fra bunden 27. okt. 2026. I menuen som B8 Medicin nr. 1.
 
 ## Bestillingen
 
@@ -39,7 +39,10 @@ er en knap, der fylder karret (som heptanhanen i `sc3.2`).
 
 * **Tovtrækningen** (`#tovtraekning`). Et kar med en plade med gulerod og spinat, fire
   flasker fra upolær til polær (heptan, 9 : 1, 7 : 3, propanon) og en lup over banen
-  med spinat. Opgaverne: gæt og kør spinat (den grønne plet deles i fire), find
+  med spinat. Luppen er skjult, til en del spørger til den (Hvem holder fast? og sidste
+  spørgsmål i Ren propanon), og bliver så opgaven ud; knappen Vis luppen (og krydset)
+  viser og skjuler den når som helst. Nøglen i panelet står under opgaverne og vises kun
+  sammen med luppen, så intet andet flytter sig. Opgaverne: gæt og kør spinat (den grønne plet deles i fire), find
   caroten ud fra gulerod, klik på den stationære og den mobile fase i karret, hvorfor
   lutein løber kortere end caroten (luppen), gæt og kør ren heptan og ren propanon,
   og find selv den løbevæske, der skiller bedst ad.
@@ -66,7 +69,8 @@ propanon 0,53; blandingerne regnet med Snyders formel for to væsker). A og s re
 hvert stof ud fra to Rf-værdier i `js/data.js`.
 
 Luppen (`js/lup.js`) bruger den samme model: hvert farvestofmolekyle hopper på og af
-pladens OH-grupper med rater, så andelen af tiden fast er 1 − Rf. Propanon sætter sig
+pladens OH-grupper med rater, så andelen af tiden fast er 1 − Rf. Raterne er ganget med
+`ROLIG` (0,4), så bindingerne ikke blinker; forholdet og andelen er de samme. Propanon sætter sig
 selv på OH-grupperne og skubbes kun væk af et farvestof. Selvtesten måler andelen i
 luppen og sammenligner med modellen.
 
@@ -123,17 +127,28 @@ bogens tal stadig rammes, og at 7 : 3 skiller spinat ad, mens de andre ikke gør
 
 ## Selvtest
 
-`_selvtest.html` gennem en lokal server med `animationer/` som rod: ALT OK (185
+`_selvtest.html` gennem en lokal server med `animationer/` som rod: ALT OK (196
 påstande) 27. okt. 2026. Den tjekker bogens Rf-værdier, løbevæskernes opførsel,
 luppen mod modellen, at alle 17 opgaver kan løses selv (med stjerne) og med Vis
 svaret, de typiske fejl i felterne (toppen eller bunden af pletten, målt fra kanten,
-brøken byttet om, afrundet for meget), låsen, sproget og kortets højde på 1100 × 700,
-1366 × 768 og 1600 × 950.
+brøken byttet om, afrundet for meget), låsen, sproget, kortets højde på 1100 × 700,
+1366 × 768 og 1600 × 950, og at det er roligt: luppen kun der, hvor den spørges om, og
+to billeder af hver opgave med 1,3 s imellem er ens, før eleven gør noget.
 
-## Til menuen
+## Roligt
 
-Der er endnu ingen samling for B8 Medicin. Siger brugeren til, oprettes
-`kemi-b-filer/samling_b8.html` (som de andre B-samlinger) med denne som nr. 6
-"TLC" og koden `b8.6`, og den kommer i `findSideFraEmne`, `FEEDBACK_EMNER` og listen på
-`animationer.html`. Kolonnen "I menuen" i superanimationernes README rettes.
-Kemibogen B8.6 kan linke til den i "Prøv selv" ved siden af Salenvir.
+Brugeren 27. okt. 2026: "Der sker for meget i animationen på en gang... meget flimmer,
+så det er lidt svært at se hvad det er man skal kunne, når der sker alt mulig i
+baggrunden." Derfor: luppen er skjult uden for de dele, der spørger til den; i luppen
+står de faste molekyler stille, væsken løber langsommere, og pilene står stille; de
+gule ringe pulserer ikke, og de gule skilte vipper ikke. Det eneste, der bevæger sig af
+sig selv, er luppen, når den vises, og pladen, mens den løber.
+
+## I menuen
+
+27. okt. 2026 (brugerens ønske: "lav en ny kategori til medicin som er nummer 8. Der
+kommer flere til medicin senere"): ny `kemi-b-filer/samling_b8.html` (kopi af
+`samling_b7.html`) med denne som nr. 1 "TLC" og koden `b8.6`; B8 Medicin står i
+`samling_alt_b.html` (knap, `findSideFraEmne` med `^b8`, `FEEDBACK_EMNER`) og i listen på
+`animationer.html`. Kemibogen B8.6 kan linke til
+`animationer/samling_alt_b.html?emne=b8.6` i "Prøv selv" ved siden af Salenvir.

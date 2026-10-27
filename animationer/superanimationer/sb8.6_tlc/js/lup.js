@@ -172,7 +172,7 @@
         var antalP = Math.round(12 * (loeb.propanon || 0));
         for (var j = 0; j < 12; j++) mig.mol.push(mig.nyt(j < antalP ? "propanon" : "heptan", n++));
         /* Kom hurtigt i ligevaegt, saa luppen ikke begynder tom */
-        for (var k = 0; k < 240; k++) this.opdater(1 / 30, true);
+        for (var k = 0; k < 360; k++) this.opdater(1 / 30, true);
     };
 
     Lup.prototype.nyt = function (slags, n) {
@@ -182,14 +182,17 @@
         return m;
     };
 
-    /* Hvor ofte et molekyle slipper og saetter sig (pr. sekund) */
+    /* Hvor ofte et molekyle slipper og saetter sig (pr. sekund). ROLIG gør
+       begge rater langsommere, saa bindingerne ikke blinker; forholdet og
+       dermed andelen af tiden fast er det samme. */
+    var ROLIG = 0.4;
     Lup.prototype.rater = function (m) {
         if (m.slags === "heptan") return { paa: 0, af: 0 };
-        if (m.slags === "propanon") return { paa: 4.0, af: 0.8 };
+        if (m.slags === "propanon") return { paa: 4.0 * ROLIG, af: 0.8 * ROLIG };
         var rf = NK.Model.rf(m.stof, this.loeb);
         var af = 0.55;
         var paa = NK.klamp(af * (1 - rf) / Math.max(rf, 0.004), 0, 40);
-        return { paa: paa, af: af };
+        return { paa: paa * ROLIG, af: af * ROLIG };
     };
 
     /* En ledig plads naer molekylet (lutein og caroten maa skubbe propanon vaek) */
@@ -221,13 +224,13 @@
 
     Lup.prototype.opdater = function (dt, stille) {
         this.t += dt;
-        var mig = this, u = 62 * this.fart;              /* væskens fart i px/s */
+        var mig = this, u = 34 * this.fart;              /* væskens fart i px/s */
         this.mol.forEach(function (m) {
             var r = mig.rater(m);
             if (m.tilst === "fri") {
                 m.y -= u * m.tempo * dt;
                 m.vx = (m.vx || 0) * Math.exp(-2.5 * dt);
-                m.x += (m.vx + Math.sin(mig.t * 0.9 + m.fase) * 9) * dt;
+                m.x += (m.vx + Math.sin(mig.t * 0.6 + m.fase) * 4) * dt;
                 m.x = NK.klamp(m.x, mig.fri0(m), mig.fri1(m));
                 m.v += (Math.sin(mig.t * 0.7 + m.fase) * 0.2 - m.v) * dt;
                 if (m.y < -26) { m.y = mig.H + 26; m.x = NK.r(mig.fri0(m), mig.fri1(m)); }
@@ -243,13 +246,13 @@
             } else if (m.tilst === "kommer") {
                 var maal = mig.fastPos(m, m.plads);
                 var dx = maal.x - m.x, dy = maal.y - m.y, d = Math.hypot(dx, dy);
-                var fart = stille ? 1e4 : 260;
+                var fart = stille ? 1e4 : 140;
                 if (d < fart * dt) { m.x = maal.x; m.y = maal.y; m.tilst = "fast"; }
                 else { m.x += dx / d * fart * dt; m.y += dy / d * fart * dt; }
                 m.v += (0 - m.v) * Math.min(1, 6 * dt);
             } else {
                 var fp = mig.fastPos(m, m.plads);
-                m.x = fp.x + Math.sin(mig.t * 5 + m.fase) * 0.6;
+                m.x = fp.x;                             /* fast: staar stille */
                 m.y = fp.y;
                 m.v = 0;
                 if (Math.random() < 1 - Math.exp(-r.af * dt)) mig.slip(m, false);
@@ -324,13 +327,12 @@
         ctx.fillStyle = g;
         ctx.fillRect(x, y, W, H);
         ctx.translate(x, y);
-        /* Stroemmen i væsken: svage pile opad */
+        /* Stroemmen i væsken: svage pile opad, der staar stille */
         ctx.strokeStyle = "rgba(61, 120, 170, 0.18)";
         ctx.lineWidth = 2;
         for (var k = 0; k < 3; k++) {
             var px = this.vaeg + (W - this.vaeg) * (0.3 + 0.3 * k);
-            var off = ((this.t * 62 * this.fart) % 70);
-            for (var yy = H + 70 - off; yy > -30; yy -= 70) {
+            for (var yy = H + 35; yy > -30; yy -= 70) {
                 ctx.beginPath();
                 ctx.moveTo(px, yy);
                 ctx.lineTo(px, yy - 26);

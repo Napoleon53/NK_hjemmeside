@@ -45,7 +45,15 @@
     </div>
 
     <aside class="panel">
-        <div class="kort" id="p-noegle">
+        <div class="kort" id="p-opgaver">
+            <h2>Opgaverne <span class="taeller">løst <b id="p-loest">0</b>/6</span></h2>
+            <div class="opg-liste" id="p-liste"></div>
+            <p class="liste-note">★ = løst uden fejl og uden at se svaret</p>
+        </div>
+        <button class="forfraknap" id="p-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
+
+        <!-- Noeglen vises kun, naar luppen vises (js/sim_pladen.js); den staar nederst, saa intet flytter sig -->
+        <div class="kort" id="p-noegle" style="display:none">
             <h2>Sådan læses luppen</h2>
             <div class="sig-raekke">
                 <svg class="sig-tegn" viewBox="0 0 64 22" aria-hidden="true"><rect x="0" y="2" width="12" height="18" fill="#e4d8bf"/><circle cx="13" cy="11" r="6.5" fill="#e2483b" stroke="#9c2a20"/><line x1="19" y1="11" x2="25" y2="11" stroke="#5d636c" stroke-width="2.4"/><circle cx="27" cy="11" r="4" fill="#f4f6f8" stroke="#9aa2ab"/><line x1="32" y1="11" x2="46" y2="11" stroke="#e05446" stroke-width="2.6" stroke-dasharray="4 3"/><circle cx="54" cy="11" r="7" fill="#e2483b" stroke="#9c2a20"/></svg>
@@ -73,13 +81,6 @@
                 <span class="sig-forkl">polær løbevæske, O-atomet sætter sig på pladen</span>
             </div>
         </div>
-
-        <div class="kort" id="p-opgaver">
-            <h2>Opgaverne <span class="taeller">løst <b id="p-loest">0</b>/6</span></h2>
-            <div class="opg-liste" id="p-liste"></div>
-            <p class="liste-note">★ = løst uden fejl og uden at se svaret</p>
-        </div>
-        <button class="forfraknap" id="p-forfra" type="button" title="Samme opgave forfra (R)">Samme opgave forfra ↺</button>
     </aside>
 </section>
 

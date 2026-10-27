@@ -135,7 +135,7 @@ function koerTest(W) {
         L.stoerrelse(330, 380);
         L.saet(D.LOEB[k[0]], { caroten: 3, lutein: 3 });
         var sum = 0, n = 0;
-        for (var t = 0; t < 120; t += 1 / 30) { L.opdater(1 / 30); sum += L.andelFast(k[1]); n++; }
+        for (var t = 0; t < 300; t += 1 / 30) { L.opdater(1 / 30); sum += L.andelFast(k[1]); n++; }
         var maalt = sum / n, model = M.fast(D.STOF[k[1]], D.LOEB[k[0]]);
         paastand("luppen, " + k[1] + " i " + k[0] + ": fast " + maalt.toFixed(2) + " mod modellens " + model.toFixed(2), naer(maalt, model, 0.15));
     });
@@ -479,6 +479,77 @@ function koerTest(W) {
     });
     ramme.style.width = "1366px";
     ramme.style.height = "768px";
+    void ramme.offsetWidth;
+
+    /* ================================================================ */
+    overskrift("12. Roligt: luppen kun der, hvor den spørges om, og intet bevæger sig af sig selv");
+    NK.visFane("fane-p");
+    Sp.tilpas(); Sp.layout();
+    var forventet = { spinat: [false, false, false, false], faser: [false, false], lup: [true],
+        heptan: [false, false, false], propanon: [false, false, true], vaelg: [false] };
+    var lupFejl = [];
+    D.PLADEN.forEach(function (o, i) {
+        Sp.vaelg(i);
+        o.dele.forEach(function (del, di) {
+            Sp.opg.di = di; Sp.nyDel();
+            if (Sp.lupVises() !== forventet[o.id][di]) lupFejl.push(o.id + " del " + di);
+        });
+    });
+    paastand("fane 1: luppen vises kun i Hvem holder fast? og i sidste spørgsmål i Ren propanon", !lupFejl.length, lupFejl.join(", "));
+
+    Sp.vaelg(0);
+    Sp.tegn();
+    paastand("fane 1: under et gæt er der ingen knap til luppen (det store kort ligger over)", !Sp.lupKnapR);
+    Sp.opg.di = 1; Sp.nyDel();
+    Sp.opdater(1 / 60); Sp.tegn();
+    var lk = Sp.lupKnapR, noegle = d.getElementById("p-noegle"), opgEl = d.getElementById("p-opgaver");
+    paastand("fane 1: knappen Vis luppen står på luppens plads under kortet", !!lk && lk.y >= Sp.top() - 4 && lk.x + lk.b <= Sp.lay.W,
+        lk && Math.round(lk.y) + " / " + Sp.top());
+    paastand("fane 1: nøglen til luppen er skjult, når luppen er skjult", noegle.style.display === "none");
+    var opgY0 = opgEl.getBoundingClientRect().top;
+    Sp.klikScene({ x: lk.x + lk.b / 2, y: lk.y + lk.h / 2 });
+    Sp.opdater(1 / 60); Sp.tegn();
+    paastand("fane 1: et klik på Vis luppen viser luppen og nøglen i panelet", Sp.lupVises() && noegle.style.display !== "none");
+    paastand("fane 1: opgavelisten flytter sig ikke, når nøglen kommer frem", naer(opgEl.getBoundingClientRect().top, opgY0, 0.5));
+    lk = Sp.lupKnapR;
+    Sp.klikScene({ x: lk.x + lk.b / 2, y: lk.y + lk.h / 2 });
+    Sp.opdater(1 / 60);
+    paastand("fane 1: et klik på krydset skjuler luppen og nøglen igen", !Sp.lupVises() && noegle.style.display === "none");
+    Sp.vaelg(2); Sp.lupValg = false; Sp.nyDel();
+    paastand("fane 1: en del, der spørger til luppen, viser den igen", Sp.lupVises());
+
+    /* Intet bevæger sig, når eleven ikke gør noget: to billeder med 1,3 s imellem er ens */
+    function billede(S) {
+        S.tegn();
+        var c = S.L.ctx.canvas;
+        return S.L.ctx.getImageData(0, 0, c.width, c.height).data;
+    }
+    function forskel(a, b) {
+        if (a.length !== b.length) return -1;
+        var n = 0;
+        for (var i = 0; i < a.length; i += 4) if (a[i] !== b[i] || a[i + 1] !== b[i + 1] || a[i + 2] !== b[i + 2]) n++;
+        return n;
+    }
+    [["fane-p", Sp], ["fane-r", Sr], ["fane-l", Sl]].forEach(function (k) {
+        NK.visFane(k[0]);
+        var S = k[1];
+        S.tilpas(); S.layout();
+        var urolig = [];
+        S.opgaver.forEach(function (o, i) {
+            if (S === Sp && o.id === "lup") return;          /* her er luppen selve opgaven */
+            S.vaelg(i);
+            S.tilpas(); S.layout();
+            koerF(S, 1.5);
+            var a = billede(S);
+            koerF(S, 1.3);
+            var n = forskel(a, billede(S));
+            if (n !== 0) urolig.push(o.navn + " (" + n + " px)");
+        });
+        paastand(k[0] + ": intet bevæger sig, før eleven gør noget", !urolig.length, urolig.join("; "));
+    });
+    Sp.vaelg(0);
+    Sr.vaelg(0);
+    Sl.vaelg(0);
     NK.visFane("fane-p");
 }
 </script>

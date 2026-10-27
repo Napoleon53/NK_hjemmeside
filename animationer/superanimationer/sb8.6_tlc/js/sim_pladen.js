@@ -36,7 +36,32 @@
         this.valgtDel = null;
         this.hover = null;
         this.fyldT = 0;
+        this.lupValg = null;
         this.nyPlade(id, !!(o.koert || o.fra));
+    };
+
+    /* En del, der spoerger til luppen, viser den igen, ogsaa hvis eleven har skjult den */
+    P.nyDelScene = function (del) {
+        if (del && del.om && del.om.indexOf("lup") >= 0) this.lupValg = null;
+    };
+
+    /* ----- Luppen ------------------------------------------------------------------
+       Luppen er skjult, til en del spoerger til den (opgaven Hvem holder fast? og
+       sidste spoergsmaal i Ren propanon). Saa bliver den, til opgaven er slut.
+       Knappen over luppens plads viser og skjuler den. Intet andet flytter sig. */
+    P.lupVises = function () {
+        if (this.lupValg === true || this.lupValg === false) return this.lupValg;
+        var g = this.opg;
+        if (!g) return false;
+        for (var i = 0; i <= g.di && i < g.o.dele.length; i++) {
+            if ((g.o.dele[i].om || []).indexOf("lup") >= 0) return true;
+        }
+        return false;
+    };
+
+    P.paaLupKnap = function (pt) {
+        var r = this.lupKnapR;
+        return !!r && pt.x >= r.x - 3 && pt.x <= r.x + r.b + 3 && pt.y >= r.y - 3 && pt.y <= r.y + r.h + 3;
     };
 
     /* En ny plade med løbevæsken id. koert: pladen er allerede loebet (fx 7 : 3,
@@ -184,7 +209,14 @@
             if (this.laag <= 0) { this.sted = "i"; p.koer(); }
         }
         p.opdater(dt);
-        this.lup.opdater(dt);
+        var lupVis = this.lupVises();
+        if (lupVis) this.lup.opdater(dt);
+        /* Noeglen til luppen staar i panelet under opgaverne, kun naar luppen vises */
+        if (lupVis !== this.noegleVist) {
+            this.noegleVist = lupVis;
+            var nk = document.getElementById("p-noegle");
+            if (nk) nk.style.display = lupVis ? "" : "none";
+        }
         /* Pladen er loebet: forsoeget er klaret */
         if (p.status === "faerdig" && !p.meldt) {
             p.meldt = true;
@@ -205,7 +237,8 @@
         Tg.baggrund(ctx, W, H, lay.bordY);
         this.tegnFlasker(ctx);
         this.tegnKar(ctx);
-        this.tegnLup(ctx);
+        if (this.lupVises()) this.tegnLup(ctx);
+        this.tegnLupKnap(ctx);
         this.tegnRinge(ctx, t);
         this.tegnSkilte(ctx, t);
         this.tegnSejr(ctx, W, H);
@@ -338,15 +371,61 @@
         ctx.strokeRect(bx - r, by - r, 2 * r, 2 * r);
         ctx.restore();
         this.lup.tegn(ctx, lay.lupX, lay.lupY);
-        Tg.etiket(ctx, "Luppen: spinat i " + this.loeb.navn, lay.lupX + lay.lupB / 2, lay.lupY - 18,
+        Tg.etiket(ctx, "Luppen: spinat i " + this.loeb.kort, lay.lupX + lay.lupB / 2, lay.lupY - 18,
             { font: "700 13px 'Segoe UI', sans-serif" });
+    };
+
+    /* Knappen, der viser og skjuler luppen: oeverst til hoejre paa luppens plads.
+       Under et gaet ligger det store kort over den, saa den tegnes ikke. */
+    P.tegnLupKnap = function (ctx) {
+        var lay = this.lay, vis = this.lupVises();
+        this.lupKnapR = null;
+        if (this.gaetNu()) return;
+        var x1 = lay.lupX + lay.lupB + 7, yc = lay.lupY - 18, h = 24;
+        ctx.save();
+        if (vis) {
+            /* Et rundt kryds i rammens hjoerne */
+            var r = h / 2, cx = x1 - r, hov = this.hover === "lupknap";
+            ctx.fillStyle = hov ? "#3a4252" : "rgba(20,22,28,0.9)";
+            ctx.strokeStyle = "rgba(255,255,255,0.35)";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.arc(cx, yc, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.strokeStyle = "#e9eef4";
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(cx - 4.5, yc - 4.5); ctx.lineTo(cx + 4.5, yc + 4.5);
+            ctx.moveTo(cx + 4.5, yc - 4.5); ctx.lineTo(cx - 4.5, yc + 4.5);
+            ctx.stroke();
+            this.lupKnapR = { x: cx - r, y: yc - r, b: h, h: h };
+        } else {
+            ctx.font = "700 13px 'Segoe UI', sans-serif";
+            var tekst = "Vis luppen", b = Math.round(ctx.measureText(tekst).width + 26);
+            var x = x1 - b, y = yc - h / 2, hov2 = this.hover === "lupknap";
+            ctx.fillStyle = hov2 ? "#3a4252" : "#262a33";
+            ctx.strokeStyle = "rgba(255,255,255,0.35)";
+            ctx.lineWidth = 1.2;
+            NK.rundtRekt(ctx, x, y, b, h, 12);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#e9eef4";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(tekst, x + b / 2, yc + 1);
+            this.lupKnapR = { x: x, y: y, b: b, h: h };
+        }
+        ctx.restore();
     };
 
     /* De gule ringe om det, kortet handler om */
     P.tegnRinge = function (ctx, t) {
         var lay = this.lay, mig = this, R = this.pladeR, p = this.plade, s = lay.s;
         this.omNu().forEach(function (om) {
-            if (om === "lup") Tg.ring(ctx, lay.lupX - 7, lay.lupY - 7, lay.lupB + 14, lay.lupH + 14, t, 20);
+            if (om === "lup" && mig.lupVises()) Tg.ring(ctx, lay.lupX - 7, lay.lupY - 7, lay.lupB + 14, lay.lupH + 14, t, 20);
+            else if (om === "lup" && mig.lupKnapR) { var k = mig.lupKnapR; Tg.ring(ctx, k.x, k.y, k.b, k.h, t, 14); }
             else if (om === "plade" && mig.sted === "over") Tg.ring(ctx, R.x, R.y, R.b, R.h, t, 6);
             else if (om === "flasker") Tg.ring(ctx, lay.flasker[0].x, lay.flasker[0].y, lay.flSlut - lay.flasker[0].x, lay.flasker[0].h, t);
             else if (om.indexOf("flaske:") === 0 && mig.loeb.id !== om.slice(7)) {
@@ -424,6 +503,7 @@
     P.overScene = function (pt) {
         this.hover = null;
         if (!pt || !this.lay) return null;
+        if (this.paaLupKnap(pt)) { this.hover = "lupknap"; return "pointer"; }
         var del = this.delData();
         if (del && del.maal && !this.faerdig && !this.venter) {
             this.hover = this.delVed(pt);
@@ -437,6 +517,8 @@
 
     P.klikScene = function (pt) {
         if (!this.lay) return;
+        /* Luppen vises og skjules (ogsaa under et spoergsmaal: det er kun et kig) */
+        if (this.paaLupKnap(pt)) { this.lupValg = !this.lupVises(); return; }
         /* Paaskeaegget: tre klik paa startlinjen */
         if (this.paaStart(pt)) {
             this.startKlik = (this.startKlik || 0) + 1;

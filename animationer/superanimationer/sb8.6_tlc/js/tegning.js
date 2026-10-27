@@ -403,10 +403,10 @@
     };
 
     /* ----- Gule ringe og skilte -------------------------------------------------- */
-    /* En rolig gul ring om det, kortet handler om */
+    /* En rolig gul ring om det, kortet handler om. Den staar stille (ingen puls). */
     Tg.ring = function (ctx, x, y, b, h, t, r) {
         ctx.save();
-        ctx.strokeStyle = "rgba(242, 197, 61, " + (0.65 + 0.3 * Math.sin(t * 3)).toFixed(3) + ")";
+        ctx.strokeStyle = "rgba(242, 197, 61, 0.9)";
         ctx.lineWidth = 3;
         ctx.setLineDash([]);
         NK.rundtRekt(ctx, x - 6, y - 6, b + 12, h + 12, r === undefined ? 10 : r);
@@ -415,15 +415,14 @@
     };
 
     /* Et gult skilt, der siger, hvad et klik goer. pil: "ned", "op", "venstre"
-       eller "hoejre" (skiltet peger den vej paa tingen). */
+       eller "hoejre" (skiltet peger den vej paa tingen). Skiltet staar stille. */
     Tg.skilt = function (ctx, tekst, x, y, t, pil) {
         ctx.save();
         ctx.font = "700 14px 'Segoe UI', sans-serif";
         var b = ctx.measureText(tekst).width + 22, h = 28;
-        var dy = Math.sin(t * 4) * 2.5;
-        var bx = x - b / 2, by = y - h / 2 + dy;
-        if (pil === "venstre") { bx = x + 10; by = y - h / 2; bx += Math.sin(t * 4) * 2.5; }
-        if (pil === "hoejre") { bx = x - b - 10; by = y - h / 2; bx -= Math.sin(t * 4) * 2.5; }
+        var bx = x - b / 2, by = y - h / 2;
+        if (pil === "venstre") { bx = x + 10; }
+        if (pil === "hoejre") { bx = x - b - 10; }
         ctx.shadowColor = "rgba(0,0,0,0.45)";
         ctx.shadowBlur = 8;
         ctx.shadowOffsetY = 2;
