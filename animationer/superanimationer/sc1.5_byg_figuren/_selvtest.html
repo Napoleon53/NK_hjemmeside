@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: Byg figuren</title>
+<link rel="stylesheet" href="css/stil.css">
+<style>
+    /* Animationen bygges uden for skaermen, saa tekst kan maales */
+    #proeve { position: absolute; left: -6000px; top: 0; width: 1400px; height: 860px; display: flex; flex-direction: column; }
+    #ud { position: fixed; inset: 0; margin: 0; padding: 16px; overflow: auto; background: #111; color: #ddd; font: 13px/1.45 monospace; white-space: pre-wrap; z-index: 999; }
+</style>
+</head>
+<body>
+<div id="proeve">
+    <div class="faneknapper" id="faneknapper"></div>
+    <main id="hoved" style="position:relative;flex:1"></main>
+</div>
+<template id="skabelon">
+    <section class="fane" role="tabpanel">
+        <div class="scene"><div class="scenekort"></div><div class="figur"></div></div>
+        <aside class="panel">
+            <div class="kort"><h2>Lagene <span class="taeller stjerne-taeller"></span></h2><div class="lagliste"></div></div>
+            <div class="kort"><h2>Fagord på plads <span class="taeller ord-taeller"></span></h2><div class="ordliste"></div></div>
+            <button class="forfraknap" type="button">Byg figuren forfra</button>
+        </aside>
+    </section>
+</template>
+<pre id="ud">Kører …</pre>
+
+<script src="js/svg.js"></script>
+<script src="js/data.js"></script>
+<script src="js/motor.js"></script>
+<script src="js/ps.js"></script>
+<script src="js/fig_hvad.js"></script>
+<script src="js/fig_atom.js"></script>
+<script src="js/fig_skal.js"></script>
+<script src="js/fig_skema.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function () {
+    "use strict";
+    var linjer = [], fejl = 0;
+    function ok(betingelse, tekst) {
+        if (!betingelse) fejl++;
+        linjer.push((betingelse ? "  ok    " : "  FEJL  ") + tekst);
+    }
+    function afsnit(t) { linjer.push("\n" + t); }
+
+    function koer() {
+        NK.SV.stille = true;
+        var B = NK.byggere;
+
+        /* 1. Fagordene: alle 41 fra bogens liste sidder paa en plads, og kun én gang */
+        afsnit("1. Fagordene");
+        var bog = Object.keys(NK.FORKLARING);
+        ok(bog.length === 41, "41 fagord i forklaringerne (" + bog.length + ")");
+        var set = {};
+        NK.FANER.forEach(function (f) {
+            B[f.id].alleOrd.forEach(function (o) { set[o] = (set[o] || 0) + 1; });
+        });
+        bog.forEach(function (o) { ok(set[o] === 1, "\"" + o + "\" står på netop én figur"); });
+        Object.keys(set).forEach(function (o) { ok(bog.indexOf(o) >= 0, "\"" + o + "\" har en forklaring fra bogen"); });
+        NK.FANER.forEach(function (f, i) {
+            var afsnitNr = "1." + (i + 1);
+            ok(B[f.id].def.nr === afsnitNr, f.id + " er afsnit " + afsnitNr);
+        });
+
+        /* 2. Figurerne: pladserne er inden for arket og overlapper ikke */
+        afsnit("2. Pladserne");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id], vb = b.def.vb, W = b.bredde, H = 34;
+            b.springLag(b.lag.length);
+            var ps = b.pladsListe;
+            ps.forEach(function (p) {
+                ok(p.x - W / 2 >= 6 && p.x + W / 2 <= vb[0] - 6 && p.y - H / 2 >= 6 && p.y + H / 2 <= vb[1] - 6,
+                    f.id + ": pladsen " + p.id + " er inden for arket");
+                ok(p.maal[0] >= 0 && p.maal[0] <= vb[0] && p.maal[1] >= 0 && p.maal[1] <= vb[1], f.id + ": stregen fra " + p.id + " ender på arket");
+                ok(p.lag !== undefined, f.id + ": " + p.id + " hører til et lag");
+                (p.dele || []).forEach(function (d) { ok(!!b.dele[d], f.id + ": " + p.id + " bygger delen " + d); });
+            });
+            for (var i = 0; i < ps.length; i++) for (var j = i + 1; j < ps.length; j++) {
+                var a = ps[i], c = ps[j];
+                var over = Math.abs(a.x - c.x) < W + 4 && Math.abs(a.y - c.y) < H + 4;
+                ok(!over, f.id + ": " + a.id + " og " + c.id + " overlapper ikke");
+            }
+            b.deleListe.forEach(function (d) {
+                var brugt = d.auto || ps.some(function (p) { return (p.dele || []).indexOf(d.id) >= 0; });
+                ok(brugt, f.id + ": delen " + d.id + " bliver bygget af en plads eller af sit lag");
+            });
+            b.lag.forEach(function (l, n) {
+                (l.ekstra || []).forEach(function (o) {
+                    var paaLaget = l.pladser.some(function (id) { return b.pladser[id].ord.indexOf(o) >= 0; });
+                    ok(!paaLaget, f.id + " lag " + (n + 1) + ": ordet i overskud \"" + o + "\" passer ikke på lagets pladser");
+                    ok(!!NK.FORKLARING[o], f.id + " lag " + (n + 1) + ": ordet i overskud \"" + o + "\" er et fagord fra kapitlet");
+                });
+            });
+        });
+
+        /* 3. Forloebet: et forkert svar, saa alle lag og Mesterproeven */
+        afsnit("3. Forløbet");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.nulstil();
+            var L = b.lag.length;
+            /* Indsend uden ord: ingen bedoemmelse */
+            b.indsend();
+            ok(b.forsoeg === 0 && b.tilstand === "opgave", f.id + ": Indsend uden ord tæller ikke som forsøg");
+            /* To ord byttet om */
+            var a = b.aktive();
+            if (a.length >= 2 && a[0].ord.indexOf(a[1].ord[0]) < 0) {
+                b.placer(a[1].ord[0], a[0]);
+                b.placer(a[0].ord[0], a[1]);
+                for (var k = 2; k < a.length; k++) b.placer(a[k].ord.filter(function (o) { return !b.hvorEr(o); })[0], a[k]);
+                b.indsend();
+                ok(b.tilstand === "opgave", f.id + ": byttede ord giver ikke et løst lag");
+                ok(b.bakke.indexOf(a[0].ord[0]) >= 0 && b.bakke.indexOf(a[1].ord[0]) >= 0, f.id + ": de forkerte ord er tilbage i bakken");
+                ok(!a[0].laast && !a[1].laast, f.id + ": de forkerte pladser er ikke låst");
+                ok(/<b>[^<]+<\/b>/.test(b.beskedTekst) && b.beskedTekst.length > 40, f.id + ": der kommer en forklaring på fejlen");
+            }
+            for (var n = 0; n <= L; n++) {
+                var brugt = [];
+                b.aktive().forEach(function (p) {
+                    var o = p.ord.filter(function (w) { return brugt.indexOf(w) < 0 && !b.pladsListe.some(function (q) { return q.laast && q.vist === w && !b.mester; }); })[0];
+                    brugt.push(o);
+                    b.placer(o, p);
+                });
+                b.indsend();
+                ok(b.tilstand === "loest", f.id + ": " + (n < L ? "lag " + (n + 1) : "Mesterprøven") + " kan løses");
+                if (n === 0) ok(!b.stjerner[0], f.id + ": ingen stjerne efter et forkert forsøg");
+                if (n > 0) ok(!!b.stjerner[n], f.id + ": stjerne for " + (n < L ? "lag " + (n + 1) : "Mesterprøven") + " uden fejl");
+                if (n < L) {
+                    var ikkeBygget = b.lag[n].pladser.filter(function (id) {
+                        return (b.pladser[id].dele || []).some(function (d) { return b.dele[d].tilstand !== "bygget"; });
+                    });
+                    ok(!ikkeBygget.length, f.id + ": alt i lag " + (n + 1) + " er bygget");
+                    b.naeste();
+                }
+            }
+            ok(b.faerdig, f.id + ": figuren er færdig efter Mesterprøven");
+            ok(b.pladsListe.every(function (p) { return p.laast; }), f.id + ": alle pladser er låst til sidst");
+        });
+
+        /* 4. Hjaelpen: et hint og saa svaret */
+        afsnit("4. Hjælpen");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.nulstil();
+            b.hjaelp();
+            var p = b.pladser[b.hintPlads];
+            ok(!!p && b.hintTrin === 1, f.id + ": Giv et hint peger på en plads");
+            ok(/Fagordet til den orange plads betyder/.test(b.beskedTekst), f.id + ": hintet er forklaringen fra bogen");
+            var knap = b.kort.querySelector(".knap.hjaelp");
+            ok(knap && knap.textContent === "Vis svaret", f.id + ": knappen hedder nu Vis svaret");
+            b.hjaelp();
+            ok(p && p.ord.indexOf(p.paa) >= 0, f.id + ": Vis svaret sætter det rigtige ord på pladsen");
+            var brugt = [];
+            b.aktive().forEach(function (q) { if (!q.paa) { var o = q.ord.filter(function (w) { return !b.hvorEr(w); })[0]; b.placer(o, q); } });
+            b.indsend();
+            ok(b.tilstand === "loest" && !b.stjerner[0], f.id + ": løst med hjælp giver ingen stjerne");
+        });
+
+        /* 5. Hoppe mellem lagene */
+        afsnit("5. Lagene i panelet");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.nulstil();
+            b.springLag(2);
+            ok(b.lagNr === 2 && b.tilstand === "opgave", f.id + ": et klik på lag 3 starter lag 3");
+            var foer = b.pladsListe.filter(function (p) { return p.lag < 2; });
+            ok(foer.every(function (p) { return p.laast && p.vist; }), f.id + ": lagene før står færdige");
+            b.springLag(0);
+            ok(b.pladsListe.filter(function (p) { return p.laast; }).length === 0, f.id + ": tilbage til lag 1 tømmer figuren");
+        });
+
+        /* 6. Sproget */
+        afsnit("6. Sproget");
+        var tekster = [];
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.lag.forEach(function (l) { tekster.push([f.id + " ros", l.ros, 130]); });
+            b.pladsListe.forEach(function (p) {
+                Object.keys(p.fejl || {}).forEach(function (w) {
+                    tekster.push([f.id + " fejl " + p.id + "/" + w, p.fejl[w].replace(/<[^>]+>/g, ""), 140]);
+                    ok(NK.FORKLARING[w] !== undefined, f.id + ": fejlteksten ved " + p.id + " gælder et fagord (" + w + ")");
+                });
+            });
+        });
+        tekster.forEach(function (t) {
+            ok(t[1].length <= t[2], t[0] + " er højst " + t[2] + " tegn (" + t[1].length + ")");
+            ok(!/\b1[+−-]/.test(t[1]), t[0] + " skriver ikke 1+ eller 1−");
+            ok(!/[–—]/.test(t[1]), t[0] + " har ingen tankestreg");
+        });
+
+        linjer.push("\n" + (fejl ? fejl + " FEJL" : "ALT OK (" + linjer.filter(function (l) { return /^ {2}ok/.test(l); }).length + ")"));
+        document.getElementById("ud").textContent = linjer.join("\n");
+    }
+
+    window.setTimeout(function () {
+        try { koer(); } catch (e) { document.getElementById("ud").textContent = linjer.join("\n") + "\n\nUNDTAGELSE: " + e.stack + "\n\n1 FEJL"; }
+    }, 300);
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Byg figuren: fagord til kapitel 1</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">◧</span> Byg figuren</h1>
+    <div class="faneknapper" role="tablist" aria-label="Vælg afsnit" id="faneknapper"></div>
+</header>
+
+<main id="hoved"></main>
+
+<!-- Skabelonen til en fane: scene med kortet og figuren, panel med lagene.
+     js/app.js laver én fane pr. afsnit ud fra den. -->
+<template id="skabelon">
+    <section class="fane" role="tabpanel">
+        <div class="scene">
+            <div class="scenekort"></div>
+            <div class="figur"></div>
+        </div>
+        <aside class="panel">
+            <div class="kort">
+                <h2>Lagene <span class="taeller stjerne-taeller"></span></h2>
+                <div class="lagliste"></div>
+                <p class="liste-note">★ = rigtigt i første forsøg uden hint</p>
+            </div>
+            <div class="kort">
+                <h2>Fagord på plads <span class="taeller ord-taeller"></span></h2>
+                <div class="ordliste"></div>
+                <p class="liste-note">Peg på et fagord for at se forklaringen fra bogen.</p>
+            </div>
+            <button class="forfraknap" type="button" title="Byg figuren forfra">Byg figuren forfra ↺</button>
+        </aside>
+    </section>
+</template>
+
+<script src="js/svg.js"></script>
+<script src="js/data.js"></script>
+<script src="js/motor.js"></script>
+<script src="js/ps.js"></script>
+<script src="js/fig_hvad.js"></script>
+<script src="js/fig_atom.js"></script>
+<script src="js/fig_skal.js"></script>
+<script src="js/fig_skema.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

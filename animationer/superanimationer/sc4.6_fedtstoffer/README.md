@@ -66,7 +66,7 @@ vippes, fast fedt følger glasset, og delvist fast fedt er uklart med
 krystaller i bunden. Zoomvinduet viser molekylerne i det valgte glas: hver
 kæde i fedtsyrens farve, de faste i rækker nedefra (glycerol udad, kæderne
 ind mod midten), de flydende i bevægelse over dem. Panelet har opgaven og
-varedeklarationen (mættede, enkelt- og flerumættede fedtsyrer i procent).
+varedeklarationen (mættede, mono- og polyumættede fedtsyrer i procent).
 Seks opgaver: gæt fast, delvist fast eller flydende, så flytter glasset
 derhen, og svaret forklares. Sætter eleven selv glasset det rigtige sted,
 tæller det også. Til sidst: hvorfor er smør fast i køleskabet, når
@@ -172,7 +172,7 @@ OK (99 påstande).
 
 * **Alle fedtsyrer har 18 C-atomer.** Stearinsyre står for alle de mættede
   (i smør og kakaosmør også palmitinsyre og kortere kæder), oliesyre for de
-  enkeltumættede. Kædelængden er holdt ude, så det kun er knækkene, der
+  monoumættede. Kædelængden er holdt ude, så det kun er knækkene, der
   varierer. Kokosfedt er udeladt af samme grund: det er mættet, men smelter
   ved ca. 24 °C, fordi kæderne er korte.
 * **Smeltepunkterne.** Fem er målte (den mest stabile krystalform):

@@ -32,7 +32,7 @@
             { sel: "#koele-anker-vindue", titel: "I solen", tekst: "I vindueskarmen er det 35 °C." },
             { sel: "#koele-anker-zoom", titel: "Molekylerne", tekst: "Det valgte glas set helt tæt på. Hver kæde er en fedtsyre i sin farve. Faste molekyler ligger i rækker." },
             { sel: "#koele-kort", titel: "Opgaven", tekst: "Gæt først: fast, delvist fast eller flydende. Så flytter glasset derhen." },
-            { sel: "#koele-dekl-kort", titel: "Varedeklarationen", tekst: "Fedtsyrerne i det valgte glas: mættede, enkeltumættede og flerumættede." }
+            { sel: "#koele-dekl-kort", titel: "Varedeklarationen", tekst: "Fedtsyrerne i det valgte glas: mættede, monoumættede og polyumættede." }
         ]
     };
 

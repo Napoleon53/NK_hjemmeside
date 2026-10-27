@@ -459,8 +459,8 @@
         var t = D.typer(f.andel);
         var rk = [
             { navn: "Mættede", v: t.maettede, farve: D.syre("S").farve },
-            { navn: "Enkeltumættede", v: t.enkelt, farve: D.syre("O").farve },
-            { navn: "Flerumættede", v: t.fler, farve: D.syre("L").farve }
+            { navn: "Monoumættede", v: t.enkelt, farve: D.syre("O").farve },
+            { navn: "Polyumættede", v: t.fler, farve: D.syre("L").farve }
         ];
         var bar = '<div class="deklbar">' + rk.map(function (r) {
             return r.v > 0 ? '<span style="width:' + r.v.toFixed(1) + "%;background:" + r.farve + '"></span>' : "";

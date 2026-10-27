@@ -34,11 +34,11 @@
     D.SYRER = [
         { id: "S",  navn: "stearinsyre",  Navn: "Stearinsyre",  db: 0, cis: [],         slags: "mættet",
           formel: "C17H35COOH", smpRen: 73,  farve: "#c4a3f2", omega3: false },
-        { id: "O",  navn: "oliesyre",     Navn: "Oliesyre",     db: 1, cis: [9],        slags: "enkeltumættet",
+        { id: "O",  navn: "oliesyre",     Navn: "Oliesyre",     db: 1, cis: [9],        slags: "monoumættet",
           formel: "C17H33COOH", smpRen: 5,   farve: "#6fd08c", omega3: false },
-        { id: "L",  navn: "linolsyre",    Navn: "Linolsyre",    db: 2, cis: [9, 12],    slags: "flerumættet",
+        { id: "L",  navn: "linolsyre",    Navn: "Linolsyre",    db: 2, cis: [9, 12],    slags: "polyumættet",
           formel: "C17H31COOH", smpRen: -13, farve: "#5fb3f0", omega3: false },
-        { id: "Ln", navn: "linolensyre",  Navn: "Linolensyre",  db: 3, cis: [9, 12, 15], slags: "flerumættet",
+        { id: "Ln", navn: "linolensyre",  Navn: "Linolensyre",  db: 3, cis: [9, 12, 15], slags: "polyumættet",
           formel: "C17H29COOH", smpRen: -24, farve: "#f0a04b", omega3: true }
     ];
     var syreEfterId = {};
