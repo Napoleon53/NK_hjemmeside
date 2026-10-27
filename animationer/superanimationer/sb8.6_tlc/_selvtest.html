@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb8.6 TLC</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1366px; height:768px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen rammer bogens Rf-værdier, at
+   løbevæskerne opfører sig som i bogen (for upolær, for polær, 7 : 3
+   skiller ad), at luppen viser den samme andel som modellen, at alle
+   opgaver kan løses selv og med Vis svaret, at et forkert svar giver en
+   rød linje og ingen fremgang, at de typiske fejl i felterne får deres
+   egen forklaring, at scenen er låst under gæt og spørgsmål, at
+   sproget holder reglerne, og at kortet og tingene under det kan være
+   der fra 1100 × 700 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+var NOEGLER = ["nk-sb8.6-p", "nk-sb8.6-r", "nk-sb8.6-l"];
+var ramme = document.getElementById("ramme");
+
+function koer() {
+    var W = ramme.contentWindow;
+    var gemt = {};
+    try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+/* Koer en fane sek sekunder */
+function koerF(F, sek) { for (var t = 0; t < sek; t += 1 / 60) F.opdater(1 / 60); }
+function naer(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, M = NK.Model;
+    var Sp = NK.sims["fane-p"], Sr = NK.sims["fane-r"], Sl = NK.sims["fane-l"];
+    var rf = function (stof, loeb) { return M.rf(D.STOF[stof], D.LOEB[loeb]); };
+
+    /* ================================================================ */
+    overskrift("1. Modellen rammer bogens Rf-værdier (B8.6)");
+    [["acetylsalicylsyre", "eta", 0.60], ["paracetamol", "eta", 0.38], ["koffein", "eta", 0.15], ["ibuprofen", "eta", 0.75],
+     ["caroten", "hp73", 0.92], ["klorofylA", "hp73", 0.55], ["klorofylB", "hp73", 0.45], ["lutein", "hp73", 0.25],
+     ["roedt", "farve", 0.30], ["gult", "farve", 0.55], ["blaat", "farve", 0.75], ["koffein", "ee91", 0.45]].forEach(function (k) {
+        paastand(k[0] + " i " + D.LOEB[k[1]].navn + " har Rf " + k[2], naer(rf(k[0], k[1]), k[2], 0.005), rf(k[0], k[1]).toFixed(3));
+    });
+    /* Bogens plade med tabletter: samme hoejder som figuren (startlinje 216, front 78 i SVG) */
+    paastand("bogens figur: acetylsalicylsyre over paracetamol over koffein", rf("acetylsalicylsyre", "eta") > rf("paracetamol", "eta") && rf("paracetamol", "eta") > rf("koffein", "eta"));
+
+    overskrift("2. Løbevæskerne: mere polær løbevæske giver højere Rf");
+    Object.keys(D.STOF).forEach(function (id) {
+        var st = D.STOF[id], ok = true, forrige = -1;
+        ["heptan", "hp91", "hp73", "propanon"].forEach(function (l) {
+            var v = M.rf(st, D.LOEB[l]);
+            if (v < forrige - 1e-9) ok = false;
+            forrige = v;
+        });
+        paastand(st.navn + " (" + id + "): Rf stiger fra heptan til propanon", ok);
+    });
+    paastand("ren heptan: caroten løber stadig langt (Rf > 0,6)", rf("caroten", "heptan") > 0.6, rf("caroten", "heptan").toFixed(2));
+    ["lutein", "klorofylA", "klorofylB"].forEach(function (id) {
+        paastand("ren heptan: " + id + " bliver ved startlinjen (Rf < 0,05)", rf(id, "heptan") < 0.05, rf(id, "heptan").toFixed(3));
+        paastand("ren propanon: " + id + " løber næsten op (Rf > 0,75)", rf(id, "propanon") > 0.75, rf(id, "propanon").toFixed(2));
+        paastand("9 : 1: " + id + " ligger lavt (Rf < 0,2)", rf(id, "hp91") < 0.2, rf(id, "hp91").toFixed(2));
+    });
+    function spinat(loeb) {
+        var p = new M.Plade({ baner: D.SPINAT_BANER, loeb: D.LOEB[loeb], bredde: 4.2 });
+        p.faerdiggoer();
+        return p;
+    }
+    paastand("7 : 3 skiller de fire farvestoffer i spinat ad", spinat("hp73").skiltAd(1));
+    paastand("ren heptan skiller dem ikke ad", !spinat("heptan").skiltAd(1));
+    paastand("ren propanon skiller dem ikke ad", !spinat("propanon").skiltAd(1));
+    paastand("9 : 1 skiller dem ikke ad", !spinat("hp91").skiltAd(1));
+    paastand("rækkefølgen i 7 : 3 er som bogens figur: caroten, klorofyl a, klorofyl b, lutein",
+        rf("caroten", "hp73") > rf("klorofylA", "hp73") && rf("klorofylA", "hp73") > rf("klorofylB", "hp73") && rf("klorofylB", "hp73") > rf("lutein", "hp73"));
+    /* Pillen: lige langt i ethylethanoat, skilt ad med 1 : 1 */
+    function to(a, b, loeb) {
+        var p = new M.Plade({ baner: [{ pletter: [{ stof: a }, { stof: b }] }], loeb: D.LOEB[loeb] });
+        p.faerdiggoer();
+        return p;
+    }
+    paastand("naproxen og ibuprofen løber lige langt i ethylethanoat", naer(rf("naproxen", "eta"), rf("ibuprofen", "eta"), 0.005));
+    paastand("naproxen og ibuprofen skilles ad i heptan og ethylethanoat (1 : 1)", to("naproxen", "ibuprofen", "he11").skiltAd(0));
+    paastand("salicylsyre og acetylsalicylsyre skilles ad i ethylethanoat", to("salicylsyre", "acetylsalicylsyre", "eta").skiltAd(0));
+    paastand("4-aminofenol og paracetamol skilles ad i ethylethanoat", to("aminofenol", "paracetamol", "eta").skiltAd(0));
+    paastand("koffein skilles fra de andre stoffer i kaffe og energidrik",
+        to("kaffeA", "koffein", "ee91").skiltAd(0) && to("kaffeB", "koffein", "ee91").skiltAd(0) && to("energi", "koffein", "ee91").skiltAd(0));
+    var pl = new M.Plade({ baner: [{ pletter: [{ stof: "paracetamol" }] }], loeb: D.LOEB.eta });
+    pl.faerdiggoer();
+    paastand("pladen: fronten når frontMax, og pletten står ved Rf · front", naer(pl.front, 5.0, 1e-9) && naer(pl.pletter()[0].z, 0.38 * 5.0, 1e-9));
+    paastand("pladen: blyantsstregen ved fronten er tegnet, når pladen er taget op", pl.markeret);
+
+    /* ================================================================ */
+    overskrift("3. Luppen viser den samme andel som modellen");
+    [["heptan", "lutein"], ["heptan", "caroten"], ["hp73", "lutein"], ["propanon", "lutein"], ["propanon", "caroten"]].forEach(function (k) {
+        var L = new NK.Lup();
+        L.stoerrelse(330, 380);
+        L.saet(D.LOEB[k[0]], { caroten: 3, lutein: 3 });
+        var sum = 0, n = 0;
+        for (var t = 0; t < 120; t += 1 / 30) { L.opdater(1 / 30); sum += L.andelFast(k[1]); n++; }
+        var maalt = sum / n, model = M.fast(D.STOF[k[1]], D.LOEB[k[0]]);
+        paastand("luppen, " + k[1] + " i " + k[0] + ": fast " + maalt.toFixed(2) + " mod modellens " + model.toFixed(2), naer(maalt, model, 0.15));
+    });
+    (function () {
+        var L = new NK.Lup();
+        L.stoerrelse(330, 380);
+        L.saet(D.LOEB.heptan, { caroten: 3, lutein: 3 });
+        var p0 = 0;
+        L.opdater(0.2);
+        L.mol.forEach(function (m) { if (m.slags === "propanon" && m.tilst === "fast") p0++; });
+        paastand("luppen: i ren heptan sidder der intet propanon på pladen", p0 === 0);
+        L.saet(D.LOEB.propanon, { caroten: 3, lutein: 3 });
+        var p1 = 0;
+        for (var t = 0; t < 10; t += 1 / 30) L.opdater(1 / 30);
+        L.mol.forEach(function (m) { if (m.slags === "propanon" && m.tilst === "fast") p1++; });
+        paastand("luppen: i propanon sidder propanon på de fleste OH-grupper", p1 >= L.pladser.length * 0.5, p1 + " af " + L.pladser.length);
+        var ok = true;
+        L.pladser.forEach(function (p) { if (p.mol && p.mol.plads !== p) ok = false; });
+        paastand("luppen: hver OH-gruppe har højst ét molekyle, og de passer sammen", ok);
+    }());
+
+    /* ================================================================ */
+    overskrift("4. Fane 1: alle opgaver kan løses selv");
+    function vaelgOk(S, del) {
+        S.valgte = {};
+        del.svar.forEach(function (sv, j) { if (sv.ok) S.valgte[j] = true; });
+        S.visKort();
+    }
+    function loesP(S, i) {
+        S.vaelg(i);
+        var o = S.opgaver[i];
+        for (var n = 0; n < 40 && !S.faerdig; n++) {
+            if (S.venter) { S.knap(); continue; }
+            var del = S.delData();
+            if (del.slags === "gaet") { S.valgKlik(del.svar.findIndex(function (sv) { return sv.ok; })); continue; }
+            if (del.slags === "spm") { vaelgOk(S, del); S.indsendKlik(); continue; }
+            if (del.slags === "forsoeg") {
+                var f = S.oenskeFlaske();
+                if (f && f !== S.loeb.id) { S.flaskeKlik(f); koerF(S, 1.2); }
+                S.pladeKlik();
+                koerF(S, 9);
+                continue;
+            }
+            if (del.maal) {
+                var r = S.delRekt(del.maal);
+                S.klikScene({ x: r.x + r.b / 2, y: r.y + r.h / 2 });
+                paastand(o.navn + ": et klik midt på " + D.DELE[del.maal].navn + " vælger " + D.DELE[del.maal].navn, S.valgtDel === del.maal, S.valgtDel);
+                S.indsendKlik();
+                continue;
+            }
+            if (o.vaelg) { S.flaskeKlik(o.rigtig); koerF(S, 1.2); S.pladeKlik(); koerF(S, 9); S.indsendKlik(); continue; }
+        }
+        return S.faerdig;
+    }
+    Sp.tilpas(); Sp.layout();
+    Sp.opgaver.forEach(function (o, i) {
+        var ok = loesP(Sp, i);
+        paastand(o.navn + " er løst med stjerne", ok && Sp.status[i].stjerne);
+    });
+
+    overskrift("5. Fane 1: forkerte svar, låsen og Vis svaret");
+    Sp.vaelg(0);
+    var blink = function (S) { return S.el.skort.classList.contains("blink"); };
+    Sp.el.skort.classList.remove("blink");
+    Sp.pladeKlik();
+    paastand("under gættet sætter et klik på pladen intet i gang", Sp.sted === "over");
+    paastand("under gættet blinker kortet ved et klik på pladen", blink(Sp));
+    Sp.el.skort.classList.remove("blink");
+    Sp.flaskeKlik("heptan");
+    paastand("under gættet kan karret ikke fyldes med en anden løbevæske", Sp.loeb.id === "hp73" && blink(Sp));
+    Sp.valgKlik(0);
+    Sp.pladeKlik();
+    koerF(Sp, 9);
+    paastand("et forkert gæt: forsøget kører alligevel, og kortet siger, at gættet ikke holdt", Sp.venter && /holdt ikke/.test(Sp.kortTekst()));
+    Sp.knap();
+    var foer = Sp.opg.di;
+    Sp.valgte = { 0: true };
+    Sp.indsendKlik();
+    paastand("et forkert svar giver en rød linje på kortet og ingen fremgang", Sp.fast.klasse === "skidt" && Sp.opg.di === foer && !Sp.venter);
+    paastand("et forkert enkeltsvar bliver rødt og kan ikke vælges igen", !!Sp.opg.forkert[0]);
+    Sp.el.skort.classList.remove("blink");
+    var l0 = Sp.loeb.id;
+    Sp.flaskeKlik("propanon");
+    paastand("under et spørgsmål kan karret ikke fyldes om", Sp.loeb.id === l0 && blink(Sp));
+    /* Vis svaret paa hver opgave */
+    Sp.opgaver.forEach(function (o, i) {
+        Sp.vaelg(i);
+        for (var n = 0; n < 60 && !Sp.faerdig; n++) { if (Sp.gaetNu()) Sp.valgKlik(0); else Sp.knap(); }
+        paastand(o.navn + " kan løses med Vis svaret", Sp.faerdig && Sp.slut.maade === "svar");
+    });
+    /* Den bedste loebevaeske: forkerte valg */
+    Sp.vaelg(Sp.idx("vaelg"));
+    ["heptan", "hp91", "propanon"].forEach(function (id) {
+        Sp.flaskeKlik(id); koerF(Sp, 1.2); Sp.pladeKlik(); koerF(Sp, 9);
+        Sp.indsendKlik();
+        paastand("Find den bedste løbevæske: " + id + " er forkert og får sin forklaring", !Sp.faerdig && Sp.beskedTekst().indexOf(D.PLADEN[5].fejl[id].slice(0, 20)) >= 0);
+    });
+    paastand("Find den bedste løbevæske: Indsend svar er gråt, før pladen er kørt", (function () {
+        Sp.flaskeKlik("hp73"); koerF(Sp, 0.2); return !Sp.kanSendes();
+    }()));
+    /* Paaskeaegget */
+    Sp.vaelg(0);
+    var ys = NK.Tegn.pladeY(Sp.plade, Sp.pladeR.y, Sp.lay.s, Sp.plade.start);
+    for (var k = 0; k < 3; k++) Sp.klikScene({ x: Sp.pladeR.x + Sp.pladeR.b / 2, y: ys });
+    paastand("påskeægget: tre klik på startlinjen giver en startlinje med kuglepen", Sp.plade.kuglepen && Sp.kuglepen);
+    Sp.kuglepen = false;
+
+    /* ================================================================ */
+    overskrift("6. Fane 2: alle opgaver kan løses selv");
+    function loesR(S, i) {
+        S.vaelg(i);
+        for (var n = 0; n < 40 && !S.faerdig; n++) {
+            if (S.venter) { S.knap(); continue; }
+            var del = S.delData();
+            if (del.slags === "spm") { vaelgOk(S, del); S.indsendKlik(); continue; }
+            if (del.slags === "felt") {
+                del.felter.forEach(function (f) { S.feltV[f.id] = D.dk(f.ret, f.rf ? 2 : 1); });
+                S.indsendKlik();
+                continue;
+            }
+            if (del.id === "placer") { S.traek.z = del.ret; S.traek.roert = true; S.indsendKlik(); continue; }
+        }
+        return S.faerdig;
+    }
+    Sr.tilpas(); Sr.layout();
+    Sr.opgaver.forEach(function (o, i) {
+        var ok = loesR(Sr, i);
+        paastand(o.navn + " er løst med stjerne", ok && Sr.status[i].stjerne);
+        paastand(o.navn + ": notesblokken har tallene", Sr.notes.textContent.indexOf("Her kommer") < 0 || o.id === "graense");
+    });
+
+    overskrift("7. Fane 2: de typiske fejl i felterne");
+    function proev(i, svar, del) {
+        Sr.vaelg(i);
+        while (Sr.delData().id !== del) {
+            var d0 = Sr.delData();
+            if (d0.slags === "felt") d0.felter.forEach(function (f) { Sr.feltV[f.id] = D.dk(f.ret, f.rf ? 2 : 1); });
+            if (d0.slags === "spm") vaelgOk(Sr, d0);
+            Sr.indsendKlik();
+            if (Sr.venter) Sr.knap();
+        }
+        Object.keys(svar).forEach(function (k) { Sr.feltV[k] = svar[k]; });
+        var di = Sr.opg.di;
+        Sr.indsendKlik();
+        return { tekst: Sr.beskedTekst(), videre: Sr.opg.di !== di || Sr.faerdig };
+    }
+    var r1 = proev(0, { a: "2,1" }, "plet");
+    paastand("målt til toppen af pletten: forklaringen siger midten", /toppen/.test(r1.tekst) && !r1.videre, r1.tekst);
+    var r2 = proev(0, { a: "1,7" }, "plet");
+    paastand("målt til bunden af pletten: forklaringen siger midten", /bunden/.test(r2.tekst) && !r2.videre, r2.tekst);
+    var r3 = proev(0, { a: "2,0" }, "plet");
+    paastand("1 mm ved siden af godtages", r3.videre);
+    var r4 = proev(2, { a: "6,3" }, "front");
+    paastand("Linealen ved kanten: målt fra kanten giver forklaringen om startlinjen", /kant/.test(r4.tekst) && !r4.videre, r4.tekst);
+    var r5 = proev(0, { t: "5,0", n: "1,9", r: "2,63" }, "regn");
+    paastand("tallene byttet om i brøken: forklaringen siger det", /byttet/.test(r5.tekst) && !r5.videre, r5.tekst);
+    var r6 = proev(0, { t: "1,9", n: "5,0", r: "0,4" }, "regn");
+    paastand("Rf afrundet til 0,4: ikke godtaget, to decimaler", /decimaler/.test(r6.tekst) && !r6.videre, r6.tekst);
+    var r7 = proev(0, { t: "1,9", n: "5,0", r: "0,38" }, "regn");
+    paastand("Rf = 1,9 cm / 5,0 cm = 0,38 godtages", r7.videre);
+    var r8 = proev(0, { a: "fem" }, "front");
+    paastand("bogstaver i feltet: forklaringen beder om et tal", /tal/.test(r8.tekst) && !r8.videre, r8.tekst);
+    var r9 = proev(1, { a: "4,3", r: "1,16" }, "rf3");
+    paastand("Rf over 1: forklaringen siger, at plettens afstand står øverst", /større end 1/.test(r9.tekst) && !r9.videre, r9.tekst);
+    /* Den lange plade */
+    Sr.vaelg(3);
+    Sr.traek.z = 2.0; Sr.traek.roert = true;
+    Sr.indsendKlik();
+    paastand("Den lange plade: 2,0 cm (0,40 · 5,0) er for langt nede", !Sr.venter && /nede/.test(Sr.beskedTekst()));
+    paastand("Den lange plade: Indsend svar viser højden", /2,0 cm/.test(Sr.el.indsend.textContent));
+    Sr.opgaver.forEach(function (o, i) {
+        Sr.vaelg(i);
+        for (var n = 0; n < 80 && !Sr.faerdig; n++) Sr.knap();
+        paastand(o.navn + " kan løses med Vis svaret", Sr.faerdig && Sr.slut.maade === "svar");
+    });
+
+    /* ================================================================ */
+    overskrift("8. Fane 3: alle sager kan løses selv");
+    function loesL(S, i) {
+        S.vaelg(i);
+        for (var n = 0; n < 40 && !S.faerdig; n++) {
+            if (S.venter) { S.knap(); continue; }
+            var del = S.delData();
+            if (del.slags === "spm") { vaelgOk(S, del); S.indsendKlik(); continue; }
+            if (del.slags === "forsoeg") {
+                var m = S.mangler();
+                if (m.indexOf("koer") >= 0) { koerF(S, 1.0); S.pladeKlik(); koerF(S, 11); continue; }
+                if (m.indexOf("uv") >= 0) { S.lampeKlik(); koerF(S, 1); continue; }
+            }
+        }
+        return S.faerdig;
+    }
+    Sl.tilpas(); Sl.layout();
+    Sl.opgaver.forEach(function (o, i) {
+        var ok = loesL(Sl, i);
+        paastand(o.navn + " er løst med stjerne", ok && Sl.status[i].stjerne);
+    });
+    /* Pladen viser det, svaret siger: hver rigtig bane har en plet i samme hoejde */
+    (function () {
+        var o = D.LAES[1];
+        var p = new M.Plade({ baner: o.baner, loeb: D.LOEB[o.loeb] });
+        p.faerdiggoer();
+        var ps = p.pletter();
+        var z = function (b, stof) { return ps.filter(function (q) { return q.bane === b && q.stof.id === stof; })[0]; };
+        paastand("Hovedpinetabletten: tablettens pletter står i samme højde som acetylsalicylsyre og koffein",
+            naer(z(3, "acetylsalicylsyre").z, z(0, "acetylsalicylsyre").z, 1e-9) && naer(z(3, "koffein").z, z(2, "koffein").z, 1e-9));
+        paastand("Hovedpinetabletten: tabletten har ingen plet i højde med paracetamol",
+            ps.filter(function (q) { return q.bane === 3 && Math.abs(q.z - z(1, "paracetamol").z) < q.ry; }).length === 0);
+    }());
+
+    overskrift("9. Fane 3: låsen, UV-lampen og Vis svaret");
+    Sl.vaelg(1);
+    koerF(Sl, 0.5);
+    Sl.lampeKlik();
+    paastand("UV-lampen kan ikke tændes, før pladen er kørt", !Sl.lampe && /først/.test(Sl.beskedTekst()));
+    Sl.pladeKlik(); koerF(Sl, 11);
+    paastand("Hovedpinetabletten: efter kørslen kommer spørgsmålet om de usynlige pletter", Sl.delData().slags === "spm" && Sl.uv === 0);
+    Sl.el.skort.classList.remove("blink");
+    Sl.lampeKlik();
+    paastand("under spørgsmålet kan UV-lampen ikke tændes, og kortet blinker", !Sl.lampe && blink(Sl));
+    Sl.valgte = { 1: true };
+    Sl.indsendKlik();
+    paastand("et forkert svar giver en rød linje på kortet", Sl.fast.klasse === "skidt" && !Sl.venter);
+    Sl.opgaver.forEach(function (o, i) {
+        Sl.vaelg(i);
+        for (var n = 0; n < 80 && !Sl.faerdig; n++) Sl.knap();
+        paastand(o.navn + " kan løses med Vis svaret", Sl.faerdig && Sl.slut.maade === "svar");
+    });
+    Sl.vaelg(4);
+    for (var n2 = 0; n2 < 80 && Sl.plader.length < 2; n2++) Sl.knap();
+    paastand("Pillen fra nettet: den anden plade har den anden løbevæske", Sl.plader.length === 2 && Sl.plader[1].loeb.id === "he11");
+
+    /* ================================================================ */
+    overskrift("10. Sproget");
+    var tekster = [];
+    function saml(o, sti) {
+        if (typeof o === "string") { tekster.push({ t: o, sti: sti }); return; }
+        if (!o || typeof o !== "object") return;
+        Object.keys(o).forEach(function (k) { if (k !== "id" && k !== "rf" && k !== "farve") saml(o[k], sti + "." + k); });
+    }
+    saml(D.PLADEN, "PLADEN"); saml(D.RF, "RF"); saml(D.LAES, "LAES"); saml(D.FELTFEJL, "FELTFEJL"); saml(D.DELE, "DELE"); saml(D.PAASKE, "PAASKE"); saml(D.FAERDIG, "FAERDIG");
+    var tankestreg = tekster.filter(function (x) { return /[–—]/.test(x.t); });
+    paastand("ingen tankestreger", !tankestreg.length, tankestreg.map(function (x) { return x.sti; }).join(", "));
+    var ladning = tekster.filter(function (x) { return /\b1[+−-]/.test(x.t); });
+    paastand("ingen ladning skrevet som 1+ eller 1−", !ladning.length);
+    var indfor = tekster.filter(function (x) { return /^(Også|Her |Nu |Det samme)/.test(x.t); });
+    paastand("ingen tekst begynder indforstået (Også, Her, Nu)", !indfor.length, indfor.map(function (x) { return x.t; }).join(" | "));
+    var natronlud = tekster.filter(function (x) { return /natronlud/i.test(x.t); });
+    paastand("ingen natronlud", !natronlud.length);
+    function laengder(liste) {
+        var ud = [];
+        liste.forEach(function (o) {
+            o.dele.forEach(function (del) {
+                if (del.slags === "gaet" && del.tekst.length > 60) ud.push("gæt " + del.tekst.length);
+                if (del.slags === "spm" && del.tekst.length > 105) ud.push("spm " + del.tekst.length);
+                (del.svar || []).forEach(function (sv) {
+                    if (!sv.broek && sv.t.length > 34 && !/afstand/.test(sv.t)) ud.push("svar '" + sv.t + "'");
+                    if (sv.f && sv.f.length > 125) ud.push("fejl " + sv.f.length);
+                });
+                (del.hint || []).forEach(function (h) { if (h.length > 110) ud.push("hint " + h.length + " '" + h.slice(0, 30) + "'"); });
+                if (del.godt && del.godt.length > 180) ud.push("godt " + del.godt.length);
+            });
+            if (o.loest.length > 200) ud.push("løst " + o.loest.length);
+        });
+        return ud;
+    }
+    [["Tovtrækningen", D.PLADEN], ["Rf-værdien", D.RF], ["Læs pladen", D.LAES]].forEach(function (k) {
+        var l = laengder(k[1]);
+        paastand(k[0] + ": teksterne holder sig under grænserne", !l.length, l.join("; "));
+    });
+
+    /* ================================================================ */
+    overskrift("11. Kortet og scenen fra 1100 × 700 til 1600 × 950");
+    var STR = [[1100, 700], [1366, 768], [1600, 950]];
+    function maalAlle(S, navn, sid) {
+        var ud = [], zone = S.kortZone();
+        S.opgaver.forEach(function (o, i) {
+            S.vaelg(i);
+            for (var n = 0; n < 60 && !S.faerdig; n++) {
+                if (S.gaetNu()) { S.valgKlik(0); continue; }
+                var del = S.delData();
+                if (del.slags !== "gaet" && !S.venter) {
+                    /* Det laengste hint og den laengste fejl paa kortet */
+                    var lang = (del.hint || []).concat((del.svar || []).map(function (sv) { return sv.f || ""; })).concat([del.mangler || ""])
+                        .concat(Object.keys(D.FELTFEJL).map(function (k) { return D.FELTFEJL[k]; }))
+                        .sort(function (a, b) { return b.length - a.length; })[0];
+                    S.fejlLinje(lang);
+                    var h = S.el.skort.getBoundingClientRect().height;
+                    if (h > zone + 0.5) ud.push(o.navn + " del " + S.opg.di + ": " + Math.round(h) + " > " + zone);
+                    S.besked("", "");
+                }
+                if (S.venter || S.faerdig) {
+                    var h2 = S.el.skort.getBoundingClientRect().height;
+                    if (h2 > zone + 0.5) ud.push(o.navn + " grønt kort: " + Math.round(h2));
+                }
+                S.knap();
+            }
+            var h3 = S.el.skort.getBoundingClientRect().height;
+            if (h3 > zone + 0.5) ud.push(o.navn + " løst: " + Math.round(h3));
+        });
+        return ud;
+    }
+    STR.forEach(function (st) {
+        ramme.style.width = st[0] + "px";
+        ramme.style.height = st[1] + "px";
+        void ramme.offsetWidth;
+        var tag = st[0] + " × " + st[1];
+        [["fane-p", Sp], ["fane-r", Sr], ["fane-l", Sl]].forEach(function (k) {
+            NK.visFane(k[0]);
+            var S = k[1];
+            S.tilpas(); S.layout();
+            var fejlK = maalAlle(S, k[0]);
+            paastand(tag + " " + k[0] + ": kortet kan være på sin plads i alle dele", !fejlK.length, fejlK.slice(0, 4).join("; "));
+            S.vaelg(0);
+            S.tilpas(); S.layout();
+            var top = S.top(), lay = S.lay;
+            if (S === Sp) {
+                var R = Sp.pladeRekt();
+                paastand(tag + " fane 1: pladen over karret og luppen begynder under kortet", R.y >= top - 1 && lay.lupY - 26 >= top - 1, Math.round(R.y) + " / " + Math.round(lay.lupY) + " / " + top);
+                paastand(tag + " fane 1: karret og luppen rører ikke hinanden", lay.K.x + lay.K.b + 10 <= lay.lupX);
+                paastand(tag + " fane 1: flaskerne rører ikke karret", lay.flSlut + 10 <= lay.K.x);
+                paastand(tag + " fane 1: luppen er inden for scenen", lay.lupX + lay.lupB <= lay.W && lay.lupY + lay.lupH <= lay.bordY + 4);
+            }
+            if (S === Sr) {
+                Sr.vaelg(3); Sr.tilpas(); Sr.layout(); lay = Sr.lay;
+                paastand(tag + " fane 2: den lange plade begynder under kortet og slutter over bordkanten", lay.py >= top - 1 && lay.py + lay.ph <= lay.bordY + 1, Math.round(lay.py) + " " + top);
+                paastand(tag + " fane 2: notesblokken dækker ikke navnene på stregerne", lay.nbX >= lay.px + lay.pb + 96);
+                paastand(tag + " fane 2: notesblokken er inden for scenen", lay.nbX + lay.nbB <= lay.W + 1, Math.round(lay.nbX + lay.nbB) + " > " + lay.W);
+                paastand(tag + " fane 2: pladen er stor nok til at aflæse millimeter (s ≥ 38 px pr. cm)", lay.s >= 38, lay.s.toFixed(1));
+            }
+            if (S === Sl) {
+                [0, 4].forEach(function (i) {
+                    Sl.vaelg(i); Sl.tilpas(); Sl.layout(); lay = Sl.lay;
+                    var Rp = Sl.pladeRekt(Sl.aktiv, 0);
+                    paastand(tag + " fane 3 (" + Sl.opgaver[i].navn + "): pladen over karret og UV-kassen begynder under kortet", Rp.y >= top - 1 && lay.vY >= top - 1, Math.round(Rp.y) + " " + Math.round(lay.vY) + " " + top);
+                    paastand(tag + " fane 3 (" + Sl.opgaver[i].navn + "): karret og UV-kassen rører ikke hinanden, og kassen er inden for scenen",
+                        lay.K.x + lay.K.b + 10 <= lay.vX && lay.vX + lay.vB <= lay.W);
+                });
+            }
+        });
+    });
+    ramme.style.width = "1366px";
+    ramme.style.height = "768px";
+    NK.visFane("fane-p");
+}
+</script>
+</body>
+</html>

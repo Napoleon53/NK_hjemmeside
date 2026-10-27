@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="252" height="34" viewBox="0 0 252 34">
+  <!-- Laaget paa TLC-karret: en glasplade med en lille knop. Glaspladens
+       underside ligger ved y 30 og skal staa paa karrets rand (y 24 i
+       kar_bag.svg). Pladen er x 4-248, altsaa 6 enheder bredere end
+       karret i hver side. -->
+  <defs>
+    <linearGradient id="plade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eaf5fc" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#b7cddd" stop-opacity="0.42"/>
+    </linearGradient>
+    <linearGradient id="knop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c3d6e4" stop-opacity="0.7"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#9fb8cc" stop-opacity="0.7"/>
+    </linearGradient>
+  </defs>
+  <rect x="104" y="2" width="44" height="14" rx="6" fill="url(#knop)" stroke="#dcecf8" stroke-opacity="0.9" stroke-width="1.2"/>
+  <path d="M4 18 Q4 14 10 14 L242 14 Q248 14 248 18 L248 26 Q248 30 242 30 L10 30 Q4 30 4 26 Z"
+        fill="url(#plade)" stroke="#e6f2fb" stroke-opacity="0.95" stroke-width="1.4"/>
+  <rect x="12" y="16.5" width="228" height="2.5" rx="1.25" fill="#ffffff" fill-opacity="0.5"/>
+</svg>

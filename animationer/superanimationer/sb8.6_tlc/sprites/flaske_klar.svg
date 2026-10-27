@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="210" viewBox="0 0 100 210">
+  <!-- Klar glasflaske, 1 L, uden laag. Vaesken tegnes af animationen BAG
+       filen i kroppen x 9-91 fra y 72 til bunden y 204. Aabningen er
+       (50, 5); bunden er y 208. Etiketten tegnes OVENPAA i x 14-86,
+       y 112-166. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.34"/>
+      <stop offset="0.15" stop-color="#d4ebfa" stop-opacity="0.07"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="208" rx="46" ry="2.5" fill="#000000" fill-opacity="0.35"/>
+  <path d="M38 6 L38 34 Q38 44 30 50 Q6 62 6 84 L6 198 Q6 207 15 207 L85 207 Q94 207 94 198 L94 84 Q94 62 70 50 Q62 44 62 34 L62 6 Z"
+        fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.8" stroke-linejoin="round"/>
+  <rect x="36" y="2" width="28" height="8" rx="2.5" fill="#dcecf8" fill-opacity="0.25" stroke="#e6f2fb" stroke-opacity="0.9" stroke-width="1.3"/>
+  <rect x="13" y="76" width="5" height="118" rx="2.5" fill="#ffffff" fill-opacity="0.2"/>
+  <rect x="42" y="12" width="3" height="28" rx="1.5" fill="#ffffff" fill-opacity="0.2"/>
+</svg>

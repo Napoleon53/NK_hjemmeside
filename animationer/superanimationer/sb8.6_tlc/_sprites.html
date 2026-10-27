@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Sprites: sb8.6 TLC</title>
+<style>
+    body { background: #1d1f27; color: #e9eef4; font-family: "Segoe UI", sans-serif; margin: 0; padding: 20px; }
+    h1 { font-size: 1.1rem; margin: 0 0 14px; }
+    .raekke { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-end; }
+    figure { margin: 0; text-align: center; }
+    figcaption { margin-top: 6px; font-size: 0.85rem; color: #a9b0ba; }
+    .lag { position: relative; width: 240px; height: 300px; }
+    .lag img { position: absolute; left: 0; top: 0; }
+</style>
+</head>
+<body>
+<!-- Udviklerværktøj: tegningerne alene, som README'en i superanimationer/ beder om -->
+<h1>sb8.6 TLC: sprites</h1>
+<div class="raekke">
+    <figure><img src="sprites/kar_bag.svg" alt=""><figcaption>kar_bag.svg</figcaption></figure>
+    <figure><img src="sprites/kar_for.svg" alt=""><figcaption>kar_for.svg</figcaption></figure>
+    <figure><div class="lag"><img src="sprites/kar_bag.svg" alt=""><img src="sprites/kar_for.svg" alt=""><img src="sprites/laag.svg" alt="" style="left:-6px;top:-6px"></div><figcaption>karret samlet med låget</figcaption></figure>
+    <figure><img src="sprites/laag.svg" alt=""><figcaption>laag.svg</figcaption></figure>
+    <figure><img src="sprites/flaske_klar.svg" alt=""><figcaption>flaske_klar.svg (fra sb4.9)</figcaption></figure>
+</div>
+</body>
+</html>
