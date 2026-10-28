@@ -9,6 +9,10 @@
   if (/^\/kemibogen(\/|$)/i.test(p)) {
     location.replace("https://kemibogen.dk" + (p.replace(/^\/kemibogen/i, "") || "/") + location.search + location.hash);
   }
+  // Portugals historie flyttede 28. okt. 2026 fra kemiformler.dk/portugal til historiebog.dk/portugal
+  if (/^\/portugal(\/|$)/i.test(p)) {
+    location.replace("https://historiebog.dk" + p + location.search + location.hash);
+  }
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
