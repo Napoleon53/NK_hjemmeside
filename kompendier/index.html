@@ -116,6 +116,7 @@
   .tal { margin: 2px 0 0; font-size: 34px; font-weight: 700; line-height: 1.15; }
   .tal small { font-size: 17px; font-weight: 600; }
   .ark { margin: 0 0 10px; color: var(--daempet); font-size: 14px; }
+  #fra-sidst { display: block; margin: 0 0 12px; white-space: normal; text-align: left; }
   .oversigt { list-style: none; margin: 0 0 14px; padding: 8px 0 0; border-top: 1px solid var(--lys); font-size: 14px; }
   .oversigt li { display: flex; gap: 10px; padding: 2px 0; }
   .oversigt li.forside { font-weight: 600; margin-top: 4px; }
@@ -196,6 +197,7 @@
     <h2>Dit kompendium</h2>
     <p class="tal" aria-live="polite"><span id="sider">0</span> <small id="sideord">sider</small></p>
     <p class="ark" id="ark"></p>
+    <button class="knap-lille" id="fra-sidst" type="button" hidden></button>
     <ol class="oversigt" id="oversigt"></ol>
     <button class="knap" id="lav" type="button">Lav PDF</button>
     <div class="klar" id="klar" hidden>
@@ -229,7 +231,8 @@
   }
 
   var numre = Kompendium.numre(kapitler);
-  var valg = hentValg();
+  var fraSidst = laesGemt();  // valgene fra den sidste PDF, som knappen kan hente frem
+  var valg = Kompendium.standardvalg(kapitler);  // siden begynder altid uden krydser
   var egne = [];       // lærerens egne vejledninger: { navn, sider, bytes } eller { navn, fejl }
   var adresse = null;  // den færdige PDF
 
@@ -256,11 +259,24 @@
     return kapitler[nr].afsnit.every(function (a) { return !a.ekstra || (v.afsnit[a.nr].noter && v.afsnit[a.nr].ekstra); });
   }
 
-  // ---- Valgene gemmes i browseren, så de er der næste gang ----
-  function hentValg() {
-    var v = Kompendium.standardvalg(kapitler);
+  // ---- Valgene gemmes i browseren, når der laves en PDF, men hentes kun frem, når læreren trykker på knappen ----
+  // De gemte valg, hvis de har mindst ét kapitel.
+  function laesGemt() {
     try {
       var gemt = JSON.parse(localStorage.getItem(GEMT) || 'null');
+      if (gemt && gemt.kapitler && numre.some(function (nr) { return gemt.kapitler[nr] && gemt.kapitler[nr].med; })) return gemt;
+    } catch (e) { /* uden gemte valg er der ingen knap */ }
+    return null;
+  }
+  // "kapitel 2" eller "kapitel 1, 2 og 3" ud fra de gemte valg.
+  function gemteKapitler(gemt) {
+    var liste = numre.filter(function (nr) { return gemt.kapitler[nr] && gemt.kapitler[nr].med; })
+      .map(function (nr) { return kapitler[nr].kapitel; });
+    return 'kapitel ' + (liste.length > 1 ? liste.slice(0, -1).join(', ') + ' og ' + liste[liste.length - 1] : liste[0]);
+  }
+  function hentValg(gemt) {
+    var v = Kompendium.standardvalg(kapitler);
+    try {
       if (gemt) {
         v.forside = gemt.forside !== false;
         v.indhold = gemt.indhold !== false;
@@ -287,6 +303,7 @@
     return v;
   }
   function gemValg() {
+    if (!valgte().length) return;
     try { localStorage.setItem(GEMT, JSON.stringify(valg)); } catch (e) { /* ikke vigtigt */ }
   }
 
@@ -387,6 +404,9 @@
         '</span><span>s. ' + p.side + (sidste > p.side ? '–' + sidste : '') + '</span></li>';
     }).join('');
     $('lav').disabled = plan.sider === 0;
+    // Knappen med valgene fra sidst står der kun, så længe intet kapitel er valgt.
+    $('fra-sidst').hidden = !fraSidst || valgte().length > 0;
+    if (fraSidst) $('fra-sidst').textContent = 'Hent valgene fra dit sidste kompendium (' + gemteKapitler(fraSidst) + ')';
     // Indholdet står på forsiden, medmindre der er valgt separat forside, eller der er for mange linjer.
     var paaForside = valg.forside && !valg.separat && !plan.forlangt;
     var indholdspost = plan.poster.filter(function (p) { return p.slags === 'indhold'; })[0];
@@ -416,7 +436,6 @@
     $('klar').hidden = true;
     $('besked').hidden = true;
     if (adresse) { URL.revokeObjectURL(adresse); adresse = null; }
-    gemValg();
   }
 
   function tegnEgne() {
@@ -490,7 +509,12 @@
     var fjern = h.target.getAttribute('data-fjern');
     var noter = h.target.getAttribute('data-noter');
     var ekstra = h.target.getAttribute('data-ekstra');
-    if (fjern !== null) {
+    if (h.target.id === 'fra-sidst') {
+      valg = hentValg(fraSidst);
+      bygKapitler();
+      bygResten();
+      opdater();
+    } else if (fjern !== null) {
       egne.splice(Number(fjern), 1);
       tegnEgne();
       opdater();
@@ -568,6 +592,7 @@
       $('gem').download = Kompendium.navn(kapitler, valg) + '.pdf';
       $('klartekst').textContent = 'Kompendiet er klar: ' + sider(plan.sider) + '.';
       $('klar').hidden = false;
+      gemValg();
     }).catch(function (fejl) {
       $('besked').textContent = 'PDF\'en kunne ikke laves. ' + (fejl && fejl.message ? fejl.message : '');
       $('besked').hidden = false;
