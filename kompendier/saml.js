@@ -83,6 +83,12 @@
     return ud.map(function (b) { b.del = del(kapitler[b.kap], b.id); return b; });
   }
 
+  // Er bilaget med? De andre bilag er med, til man fjerner krydset, men det periodiske system kommer kun med, når man
+  // selv sætter kryds (Niels 29. okt. 2026: ikke med, "medmindre man aktivt tilvælger det").
+  function bilagMed(valg, id) {
+    return id === SIDSTE_BILAG ? valg.bilag[id] === true : valg.bilag[id] !== false;
+  }
+
   function kapitelnavn(data) {
     return 'Kapitel ' + data.kapitel + ': ' + data.titel;
   }
@@ -204,7 +210,7 @@
       linjer.push({ kap: null, titel: EGEN, side: post.side });
     });
     bilagene(kapitler, valg).forEach(function (b) {
-      if (valg.bilag[b.id] === false) return;
+      if (!bilagMed(valg, b.id)) return;
       var post = tilfoej({ slags: 'del', kap: b.kap, del: b.del, titel: b.del.titel, sider: b.del.sider });
       linjer.push({ kap: b.kap, titel: b.del.titel, side: post.side });
     });
@@ -379,7 +385,7 @@
 
   var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, niveau: niveau, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
     oevelsesdel: oevelsesdel, noterdel: noterdel,
-    bilagene: bilagene, plan: plan, navn: navn, saml: saml };
+    bilagene: bilagene, bilagMed: bilagMed, plan: plan, navn: navn, saml: saml };
   if (typeof module !== 'undefined' && module.exports) module.exports = Kompendium;
   else rod.Kompendium = Kompendium;
 })(typeof window !== 'undefined' ? window : this);

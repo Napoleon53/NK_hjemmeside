@@ -281,7 +281,7 @@
         v.forside = gemt.forside !== false;
         v.indhold = gemt.indhold !== false;
         v.separat = gemt.separat === true;
-        Object.keys(gemt.bilag || {}).forEach(function (id) { v.bilag[id] = gemt.bilag[id] !== false; });
+        Object.keys(gemt.bilag || {}).forEach(function (id) { if (typeof gemt.bilag[id] === 'boolean') v.bilag[id] = gemt.bilag[id]; });
         numre.forEach(function (nr) {
           var g = gemt.kapitler && gemt.kapitler[nr];
           if (!g) return;
@@ -383,7 +383,7 @@
       '<div class="raekke" id="raekke-separat">' + kryds('separat', 'Separat forside: indholdsfortegnelsen får sin egen side', '+ ' + sider(1), valg.separat, true) + '</div>' +
       bilag.map(function (b, i) {
         var navn = b.del.titel.replace(/^Bilag: /, '') + (i === bilag.length - 1 && /periodesystem/.test(b.id) ? ' som sidste side' : '');
-        return '<div class="raekke">' + kryds('bilag-' + b.id, navn, sider(b.del.sider), valg.bilag[b.id] !== false, true) + '</div>';
+        return '<div class="raekke">' + kryds('bilag-' + b.id, navn, sider(b.del.sider), Kompendium.bilagMed(valg, b.id), true) + '</div>';
       }).join('');
   }
 
