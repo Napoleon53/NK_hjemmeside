@@ -36,9 +36,14 @@
   }
 
   // Valgene for ét kapitel, første gang det vælges: alle afsnit med de korte noter og en mellem mængde opgaver.
+  // Har afsnittet ingen Mellem (fx 1.1 fra 29. okt. 2026, hvor der kun er Få), bliver det den største mængde under.
+  function standardmaengde(a) {
+    var o = a.opgaver || {};
+    return o.mellem ? 'mellem' : o.lav ? 'lav' : 'ingen';
+  }
   function kapitelvalg(data) {
     var v = { med: false, afsnit: {}, oevelser: {}, udgaver: {} };
-    data.afsnit.forEach(function (a) { v.afsnit[a.nr] = { med: true, noter: true, ekstra: false, opgaver: 'mellem' }; });
+    data.afsnit.forEach(function (a) { v.afsnit[a.nr] = { med: true, noter: true, ekstra: false, opgaver: standardmaengde(a) }; });
     data.oevelser.forEach(function (id) { v.oevelser[id] = false; });
     return v;
   }
