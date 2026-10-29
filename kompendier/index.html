@@ -214,8 +214,8 @@
 <noscript><p style="max-width:1100px;margin:20px auto;padding:0 20px">Siden skal bruge JavaScript for at sætte kompendiet sammen.</p></noscript>
 
 <script src="pdf-lib.min.js"></script>
-<script src="data/kapitler.js"></script>
-<script src="saml.js"></script>
+<script src="data/kapitler.js?v=20261029"></script>
+<script src="saml.js?v=20261029"></script>
 <script>
 (function () {
   'use strict';
@@ -568,7 +568,7 @@
     if (window.KOMPENDIEPDF[nr]) return Promise.resolve(window.KOMPENDIEPDF[nr]);
     return new Promise(function (klar, fejl) {
       var script = document.createElement('script');
-      script.src = 'data/' + kapitler[nr].pdffil;
+      script.src = 'data/' + kapitler[nr].pdffil + (kapitler[nr].version ? '?v=' + kapitler[nr].version : '');
       script.onload = function () {
         if (window.KOMPENDIEPDF[nr]) klar(window.KOMPENDIEPDF[nr]);
         else fejl(new Error('Delene til kapitel ' + nr + ' mangler.'));

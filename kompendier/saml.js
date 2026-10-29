@@ -83,10 +83,13 @@
     return ud.map(function (b) { b.del = del(kapitler[b.kap], b.id); return b; });
   }
 
-  // Er bilaget med? De andre bilag er med, til man fjerner krydset, men det periodiske system kommer kun med, når man
-  // selv sætter kryds (Niels 29. okt. 2026: ikke med, "medmindre man aktivt tilvælger det").
+  // Er bilaget med? De andre bilag er med, til man fjerner krydset. Det periodiske system er kun med fra start, når
+  // kapitel 1 er valgt; ellers kommer det kun med, når man selv sætter kryds (Niels 29. okt. 2026). Et kryds, man selv
+  // har sat eller fjernet, gælder altid.
   function bilagMed(valg, id) {
-    return id === SIDSTE_BILAG ? valg.bilag[id] === true : valg.bilag[id] !== false;
+    if (id !== SIDSTE_BILAG) return valg.bilag[id] !== false;
+    if (typeof valg.bilag[id] === 'boolean') return valg.bilag[id];
+    return !!(valg.kapitler['1'] && valg.kapitler['1'].med);
   }
 
   function kapitelnavn(data) {
