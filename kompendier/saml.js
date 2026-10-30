@@ -254,15 +254,23 @@
           if (!valg.forside) kapitellinje.side = side;
         }
       }
+      // Den faglige læsning til et afsnit (fx oevelse-1.4-laesning) står først i afsnittet, når afsnittet er med
+      // (Niels 30. okt. 2026); ellers står den med de andre øvelser bagest i kapitlet.
+      var lagt = {};
       data.afsnit.forEach(function (a) {
         var av = v.afsnit[a.nr];
         if (!av || !av.med) return;
+        var laesning = 'oevelse-' + a.nr + '-laesning';
+        if (v.oevelser[laesning] && data.oevelser.indexOf(laesning) >= 0) {
+          delpost(nr, oevelsesdel(data, v, laesning));
+          lagt[laesning] = true;
+        }
         if (av.noter !== false) delpost(nr, noterdel(a, av));
         if (v.custom && data.opgavekort) {
           if ((v.custom[a.nr] || []).length) custompost(nr, a.nr, v.custom[a.nr]);
         } else if (a.opgaver[av.opgaver]) delpost(nr, a.opgaver[av.opgaver]);
       });
-      data.oevelser.forEach(function (id) { if (v.oevelser[id]) delpost(nr, oevelsesdel(data, v, id)); });
+      data.oevelser.forEach(function (id) { if (v.oevelser[id] && !lagt[id]) delpost(nr, oevelsesdel(data, v, id)); });
       // Med flere kapitler får hvert kapitel sin egen linje i indholdet.
       if (med.length > 1 && side > foerste && side > kapitellinje.side) linjer.splice(plads, 0, kapitellinje);
     });
