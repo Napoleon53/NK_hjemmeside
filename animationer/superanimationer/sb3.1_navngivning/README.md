@@ -196,9 +196,10 @@ tankestreger.
 
 ## I menuen
 
-Ikke endnu. Når brugeren siger til: en ny knap i
-`kemi-b-filer/samling_b_bindinger_isomeri.html` (B3 Bindinger og isomeri) med
-`../superanimationer/sb3.1_navngivning/index.html`, en ny `data-emne` (fx
-`b3.navngivning`), navnet i `FEEDBACK_EMNER` i `samling_alt_b.html` og kolonnen
-"I menuen" i `../README.md`. Kemibogen B kan linke til den fra boksen Prøv selv i
-afsnit B3.1 (med `?med=alkohol,syre`), og kemi C kapitel 4 kan linke uden `?med`.
+Ja, fra 30. oktober 2026 (brugerens ønske): nr. 1 i
+`kemi-b-filer/samling_b_bindinger_isomeri.html` (B3 Bindinger og isomeri), så
+menuen følger bogen; de tre andre rykkede ét nummer ned. Koden er `navngivning`
+(`samling_alt_b.html?emne=navngivning`); den sendes til B3 af `findSideFraEmne`,
+fordi koder, der begynder med `b3`, går til B6 Syre/Base. Navnet står også i
+`FEEDBACK_EMNER`. Kemibogen B linker til den fra boksen Prøv selv i afsnit B3.1,
+og Kemibogen C fra afsnit 4.5.

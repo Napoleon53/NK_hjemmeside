@@ -59,6 +59,55 @@
     return av && av.ekstra && a.ekstra ? a.ekstra : a.noter;
   }
 
+  // ---- Custom: læreren vælger selv opgaverne og deres rækkefølge (Niels 30. okt. 2026) ----
+  // Et kapitel kan have opgavekort (data/opgavekort.js, lavet af lav_opgavekort.py): hver af bogens opgaver som et
+  // kort, der er præcis så højt som opgaven. tilknyt lægger dem på kapitlet som kapitler[nr].opgavekort. Vælger
+  // læreren custom, står opgaverne i valg.kapitler[nr].custom: { '1.2': ['1.2.1', '1.2.3'], ... }, hvor nøglen er
+  // det afsnit, opgaverne står under i kompendiet (normalt deres eget, men læreren må flytte dem).
+  function tilknyt(kapitler, kort) {
+    Object.keys(kort || {}).forEach(function (nr) { if (kapitler[nr]) kapitler[nr].opgavekort = kort[nr]; });
+  }
+  function kortet(ok, nr) {
+    for (var i = 0; i < ok.opgaver.length; i++) if (ok.opgaver[i].nr === nr) return ok.opgaver[i];
+    return null;
+  }
+  function kortafsnit(ok, nr) {
+    for (var i = 0; i < ok.afsnit.length; i++) if (ok.afsnit[i].nr === nr) return ok.afsnit[i];
+    return null;
+  }
+  // Opgaverne i hvert afsnit, når custom begynder fra mængden m ('lav', 'mellem', 'mange' eller 'ingen'). m kan også
+  // være et objekt med en mængde pr. afsnit. Har afsnittet ikke mængden (1.1 har kun Få), bruges den største under.
+  function customStart(data, m) {
+    var ud = {};
+    data.opgavekort.afsnit.forEach(function (a) {
+      var maengde = typeof m === 'object' ? m[a.nr] : m;
+      var i = NIVEAUER.indexOf(maengde), liste = [];
+      for (; i >= 0 && !liste.length; i--) liste = a.maengder[NIVEAUER[i]] || [];
+      ud[a.nr] = liste.slice();
+    });
+    return ud;
+  }
+  // Opgaverne i et afsnits del lagt på sider. Hver side er en liste af stykker med y: afstanden fra tekstens top
+  // (2,3 cm under papirets kant). Første side begynder med afsnittets overskrift. En opgave deles ikke: er der ikke
+  // plads til den, kommer den øverst på næste side, som når Typst laver kompendiet. Opgaverne får numre forfra.
+  function pak(ok, afsnit, liste) {
+    var m = ok.maal, plads = m.hoejde - m.top - m.bund;
+    var a = kortafsnit(ok, afsnit);
+    var sider = [[{ slags: 'hoved', afsnit: a, y: 0, h: a.hh }]], y = a.hh, n = 0;
+    liste.forEach(function (nr) {
+      var k = kortet(ok, nr);
+      if (!k) return;
+      var top = y + m.luft;
+      if (top + k.h > plads + 0.5) {
+        sider.push([]);
+        top = 0;
+      }
+      sider[sider.length - 1].push({ slags: 'opgave', kort: k, n: ++n, y: top, h: k.h });
+      y = top + k.h;
+    });
+    return sider;
+  }
+
   // Valgene, når siden åbnes første gang: intet kapitel er valgt.
   function standardvalg(kapitler) {
     var valg = { forside: true, indhold: true, separat: false, kapitler: {}, bilag: {} };
@@ -181,6 +230,13 @@
       var post = tilfoej({ slags: 'del', kap: nr, del: d, titel: d.titel, sider: d.sider });
       linjer.push({ kap: nr, titel: d.titel, side: post.side });
     }
+    // Lærerens egne opgaver til et afsnit (custom), lagt på sider af pak.
+    function custompost(nr, afsnit, liste) {
+      var ok = kapitler[nr].opgavekort, sider = pak(ok, afsnit, liste);
+      var titel = kortafsnit(ok, afsnit).titel;
+      var post = tilfoej({ slags: 'custom', kap: nr, afsnit: afsnit, titel: titel, sider: sider.length, pakning: sider });
+      linjer.push({ kap: nr, titel: titel, side: post.side });
+    }
     med.forEach(function (nr, i) {
       var data = kapitler[nr], v = valg.kapitler[nr];
       var foerste = side;
@@ -202,7 +258,9 @@
         var av = v.afsnit[a.nr];
         if (!av || !av.med) return;
         if (av.noter !== false) delpost(nr, noterdel(a, av));
-        if (a.opgaver[av.opgaver]) delpost(nr, a.opgaver[av.opgaver]);
+        if (v.custom && data.opgavekort) {
+          if ((v.custom[a.nr] || []).length) custompost(nr, a.nr, v.custom[a.nr]);
+        } else if (a.opgaver[av.opgaver]) delpost(nr, a.opgaver[av.opgaver]);
       });
       data.oevelser.forEach(function (id) { if (v.oevelser[id]) delpost(nr, oevelsesdel(data, v, id)); });
       // Med flere kapitler får hvert kapitel sin egen linje i indholdet.
@@ -233,6 +291,61 @@
     return { left: x, bottom: h - y - g.h, right: x + g.b, top: h - y };
   }
 
+  // Tegner opgavekortene på custom-siderne: sidehovedet, afsnittets overskrift og opgaverne, og i hver opgaves
+  // bjælke "Opgave n:" og titlen, klippet ud af kortenes strimler. Alle mål er i punkt fra papirets øverste kant;
+  // PDF'en måler fra bunden. Hvert stykke indlejres kun én gang pr. kapitel, selv om det tegnes flere gange.
+  var LUFT_OVER = 7, LUFT_UNDER = 5;  // ekstra plads om en strimmel, så ascendere og descendere kommer med
+  function tegnKort(PDFLib, ud, kapitler, tegninger) {
+    var kaede = Promise.resolve();
+    var prKapitel = {};
+    tegninger.forEach(function (t) { (prKapitel[t.post.kap] = prKapitel[t.post.kap] || []).push(t); });
+    Object.keys(prKapitel).forEach(function (nr) {
+      kaede = kaede.then(function () {
+        var ok = kapitler[nr].opgavekort, kilde = ok._kilde, m = ok.maal, H = m.hoejde;
+        var noegler = [], sider = [], felter = [], opslag = {};
+        function brug(noegle, side, felt) {
+          if (!(noegle in opslag)) {
+            opslag[noegle] = noegler.length;
+            noegler.push(noegle);
+            sider.push(kilde.getPage(side));
+            felter.push(felt);
+          }
+          return noegle;
+        }
+        function strimmel(s) {
+          var h = kilde.getPage(s.side).getHeight();
+          return { left: s.x - 2, right: s.x + s.b + 3, bottom: h - (s.y + s.grund + LUFT_UNDER), top: h - (s.y - LUFT_OVER) };
+        }
+        // Først en liste over, hvad der skal tegnes hvor, så de samme stykker kan indlejres på én gang.
+        var plan = [];
+        prKapitel[nr].forEach(function (t) {
+          var a = kortafsnit(ok, t.post.afsnit);
+          var sh = t.nr === 0 ? ok.sidehoved : a.sidehoved;
+          plan.push({ side: t.side, noegle: brug('s' + sh, sh), x: 0, top: 0, hel: sh });
+          t.stykker.forEach(function (s) {
+            var nr0 = s.slags === 'hoved' ? s.afsnit.hoved : s.kort.side;
+            plan.push({ side: t.side, noegle: brug('s' + nr0, nr0), x: 0, top: m.top + s.y, hel: nr0 });
+            if (s.slags !== 'opgave') return;
+            var tal = ok.numre[Math.min(s.n, ok.numre.length) - 1], titel = ok.titler[s.kort.nr];
+            var grund = m.top + s.y + s.kort.grund;  // bjælkens grundlinje
+            var x = m.venstre + m.inset;
+            plan.push({ side: t.side, noegle: brug('n' + s.n, tal.side, strimmel(tal)), x: x - 2, bund: grund + LUFT_UNDER });
+            plan.push({ side: t.side, noegle: brug('t' + s.kort.nr, titel.side, strimmel(titel)), x: x + tal.efter - 2, bund: grund + LUFT_UNDER });
+          });
+        });
+        return ud.embedPages(sider, felter).then(function (stykker) {
+          plan.forEach(function (p) {
+            var stykke = stykker[opslag[p.noegle]];
+            // Et helt kort står med sin øverste kant i top; en strimmel med sin nederste kant i bund.
+            var y = p.hel !== undefined ? H - p.top - kilde.getPage(p.hel).getHeight() : H - p.bund;
+            p.side.drawPage(stykke, { x: p.x, y: y });
+          });
+        });
+      });
+    });
+    return kaede;
+  }
+
   // Sætter kompendiet sammen og giver PDF'en som bytes.
   // hentPdf(nr) giver et løfte om kapitlets PDF (base64). egne: [{ navn, sider, bytes }].
   function saml(PDFLib, kapitler, hentPdf, valg, egne) {
@@ -247,13 +360,25 @@
       if (post.kap && brugte.indexOf(post.kap) < 0) brugte.push(post.kap);
     });
 
+    // Kapitler med custom-opgaver skal også bruge PDF'en med opgavekortene: hentPdf(nr, 'opgavekort').
+    var medKort = [];
+    p.poster.forEach(function (post) {
+      if (post.slags === 'custom' && medKort.indexOf(post.kap) < 0) medKort.push(post.kap);
+    });
+    var tegninger = [];  // de custom-sider, der skal tegnes på, når alle sider er lagt ind
+
     // Hvert kapitels PDF læses kun første gang.
     var hent = Promise.all(brugte.map(function (nr) {
       var data = kapitler[nr];
       if (data._kilde) { kilder[nr] = data._kilde; return null; }
       return Promise.resolve(hentPdf(nr)).then(function (pdf) { return PDFLib.PDFDocument.load(pdf); })
         .then(function (dok) { data._kilde = kilder[nr] = dok; });
-    }));
+    }).concat(medKort.map(function (nr) {
+      var ok = kapitler[nr].opgavekort;
+      if (ok._kilde) return null;
+      return Promise.resolve(hentPdf(nr, 'opgavekort')).then(function (pdf) { return PDFLib.PDFDocument.load(pdf); })
+        .then(function (dok) { ok._kilde = dok; });
+    })));
 
     return hent.then(function () {
       return PDFLib.PDFDocument.create();
@@ -265,7 +390,7 @@
       return Promise.all(brugte.map(function (nr) {
         var data = kapitler[nr], sidenumre = [];
         p.poster.forEach(function (post) {
-          if (post.kap !== nr) return;
+          if (post.kap !== nr || post.slags === 'custom') return;
           if (post.slags === 'forside') sidenumre.push(data.forside);
           else if (post.slags === 'indhold') sidenumre.push(data.hjaelpesider.indhold);
           else for (var i = 0; i < post.del.sider; i++) sidenumre.push(post.del.start + i);
@@ -294,6 +419,14 @@
       var kaede = Promise.resolve();
       p.poster.forEach(function (post) {
         kaede = kaede.then(function () {
+          if (post.slags === 'custom') {
+            // Tomme A4-sider, som opgavekortene tegnes på bagefter.
+            var m = kapitler[post.kap].opgavekort.maal;
+            post.pakning.forEach(function (stykker, i) {
+              tegninger.push({ side: ud.addPage([m.bredde, m.hoejde]), post: post, nr: i, stykker: stykker });
+            });
+            return null;
+          }
           if (post.slags !== 'egen') {
             for (var i = 0; i < post.sider; i++) ud.addPage(post.slags === 'indhold' && i ? flere.shift() : koe[post.kap].shift());
             return null;
@@ -306,6 +439,8 @@
         });
       });
       return kaede;
+    }).then(function () {
+      return tegnKort(PDFLib, ud, kapitler, tegninger);
     }).then(function () {
       if (!brugte.length) return null;
       // Tallene og linjen til lærerens egne vejledninger klippes fra det første kapitel, og hver dels
@@ -388,6 +523,7 @@
 
   var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, niveau: niveau, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
     oevelsesdel: oevelsesdel, noterdel: noterdel,
+    tilknyt: tilknyt, kortet: kortet, kortafsnit: kortafsnit, customStart: customStart, pak: pak,
     bilagene: bilagene, bilagMed: bilagMed, plan: plan, navn: navn, saml: saml };
   if (typeof module !== 'undefined' && module.exports) module.exports = Kompendium;
   else rod.Kompendium = Kompendium;

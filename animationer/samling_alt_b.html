@@ -486,7 +486,7 @@
 
             <button class="tab-btn" data-beskrivelse="Udforsk hvad der påvirker, hvor hurtigt en kemisk reaktion forløber - koncentration, temperatur, katalysator og inhibitor." onclick="visKategori(this, 'kemi-b-filer/samling_b1.html')" title="B1: Kinetik"><span class="btn-num">B1</span><span class="btn-text">Kinetik</span></button>
             <button class="tab-btn" data-beskrivelse="Opskriv reaktionsbrøken, regn på ligevægtskonstanten K, forskyd en rigtig ligevægt, og bestem et opløselighedsprodukt i et virtuelt laboratorium." onclick="visKategori(this, 'kemi-b-filer/samling_b2.html')" title="B2: Ligevægt"><span class="btn-num">B2</span><span class="btn-text">Ligevægt</span></button>
-            <button class="tab-btn" data-beskrivelse="Se hydrogenbindingerne mellem ethanol-molekyler, og byg og genkend geometriske isomerer og spejlbilledeisomerer." onclick="visKategori(this, 'kemi-b-filer/samling_b_bindinger_isomeri.html')" title="B3: Intermolekylære bindinger og isomeri"><span class="btn-num">B3</span><span class="btn-text">Bindinger og isomeri</span></button>
+            <button class="tab-btn" data-beskrivelse="Navngiv og tegn stofferne fra kemi C, se hydrogenbindingerne mellem ethanol-molekyler, og genkend geometriske isomerer og spejlbilledeisomerer." onclick="visKategori(this, 'kemi-b-filer/samling_b_bindinger_isomeri.html')" title="B3: Intermolekylære bindinger og isomeri"><span class="btn-num">B3</span><span class="btn-text">Bindinger og isomeri</span></button>
             <button class="tab-btn" data-beskrivelse="Estersyntese, DNPH/Tollens, oxidation af alkoholer, organisk syntese, et tegnebræt og et spil om organiske stofklasser." onclick="visKategori(this, 'kemi-b-filer/samling_b4,5,6.html')" title="B4: Funktionelle grupper"><span class="btn-num">B4</span><span class="btn-text">Funktionelle grupper</span></button>
             <button class="tab-btn" data-beskrivelse="Absorptionsspektre og Lambert-Beers lov, inkl. et rigtigt forsøg med azofarvestof i en Breezer." onclick="visKategori(this, 'kemi-b-filer/samling_b9.html')" title="B5: Spektroskopi"><span class="btn-num">B5</span><span class="btn-text">Spektroskopi</span></button>
             <button class="tab-btn" data-beskrivelse="Regn med syrekonstanten Ks og pKs, og træn at omregne mellem dem." onclick="visKategori(this, 'kemi-b-filer/samling_b3.html')" title="B6: Syre/Base"><span class="btn-num">B6</span><span class="btn-text">Syre/Base</span></button>
@@ -597,7 +597,7 @@
             if (/^b3/i.test(emne)) return 'kemi-b-filer/samling_b3.html';
             // Link-koderne (data-emne) er fra før omnummereringen 9. okt. 2026 og er ikke ændret:
             // b4 og b6 ligger nu i B3 (bindinger og isomeri), b5 i B4, b9 i B5 og b3 i B6.
-            if (/^(b4|b6)/i.test(emne)) return 'kemi-b-filer/samling_b_bindinger_isomeri.html';
+            if (/^(b4|b6|navngivning)/i.test(emne)) return 'kemi-b-filer/samling_b_bindinger_isomeri.html';
             if (/^(b5|eb\d*|b\.spil|tegnebraet)/i.test(emne)) return 'kemi-b-filer/samling_b4,5,6.html';
             if (/^b7/i.test(emne)) return 'kemi-b-filer/samling_b7.html';
             if (/^b8/i.test(emne)) return 'kemi-b-filer/samling_b8.html';
@@ -700,7 +700,7 @@
                 { nr: 5, navn: 'Forsøg: Jernthiocyanat' }, { nr: 6, navn: 'Ligevægtssimulation' }, { nr: 7, navn: 'Volumenændring' }, { nr: 8, navn: 'Forsøg: Kₒ for PbI₂' }
             ]},
             { navn: 'B3: Bindinger og isomeri', animationer: [
-                { nr: 1, navn: 'Intermolekylært' }, { nr: 2, navn: 'Geometrisk isomeri' }, { nr: 3, navn: 'Spejlbilledeisomeri' }
+                { nr: 1, navn: 'Navngivning' }, { nr: 2, navn: 'Intermolekylært' }, { nr: 3, navn: 'Geometrisk isomeri' }, { nr: 4, navn: 'Spejlbilledeisomeri' }
             ]},
             { navn: 'B4: Funktionelle grupper', animationer: [
                 { nr: 1, navn: 'Estersyntese' }, { nr: 2, navn: 'DNPH/Tollens' }, { nr: 3, navn: 'Oxidation af alkohol' },
