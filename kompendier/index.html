@@ -151,6 +151,8 @@
   .custom-start { display: flex; align-items: center; gap: 6px; margin-left: auto; font-size: 14px; flex-wrap: wrap; }
   .custom-start > span { color: var(--daempet); margin-right: 2px; }
   .custom-top .knap { width: auto; padding: 9px 24px; }
+  .custom-top .knap-hvid { background: #fff; color: var(--groen-moerk); border: 1px solid var(--groen); }
+  .custom-top .knap-hvid:hover { background: var(--lys); }
   .custom-krop { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 410px; }
 
   .bank { overflow-y: auto; padding: 0 20px 40px; }
@@ -316,6 +318,7 @@
       <p class="hjaelp">Klik på et kort for at se hele opgaven. Træk det over i dit kompendium, eller tryk +. Træk i listen for at ændre rækkefølgen.</p>
     </div>
     <div class="custom-start" id="custom-start"></div>
+    <button class="knap knap-hvid" id="custom-ud" type="button" title="Luk menuen og brug kapitlets mængder (Få, Mellem, Mange) igen">Tilbage uden custom</button>
     <button class="knap" id="custom-faerdig" type="button">Færdig</button>
   </header>
   <div class="custom-krop">
@@ -351,7 +354,7 @@
 
 <script src="pdf-lib.min.js"></script>
 <script src="data/kapitler.js?v=20261029"></script>
-<script src="data/opgavekort.js?v=20261030"></script>
+<script src="data/opgavekort.js?v=20261031"></script>
 <script src="saml.js?v=20261030b"></script>
 <script>
 (function () {
@@ -1059,6 +1062,10 @@
       visning = el.id === 'vis-liste' ? 'liste' : 'sider';
       tegnUdkast();
     } else if (el.id === 'custom-faerdig') {
+      lukCustom();
+    } else if (el.id === 'custom-ud') {
+      // Ud af custom: kapitlet bruger mængderne igen, som før custom blev valgt.
+      cv().custom = null;
       lukCustom();
     } else if (el.hasAttribute('data-kort') || el.hasAttribute('data-flyt')) {
       visStor(el.getAttribute('data-kort') || el.getAttribute('data-flyt'));
