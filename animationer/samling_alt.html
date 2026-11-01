@@ -487,6 +487,7 @@
             <button class="tab-btn" data-beskrivelse="Se hvordan syrer og baser reagerer, forstå pH-skalaen, og prøv en syre-base-titrering." onclick="visKategori(this, 'kemi-c-filer/samling_c7.html')" title="C7: Syre/Base"><span class="btn-num">C7</span><span class="btn-text">Syre/Base</span></button>
             <button class="tab-btn" data-beskrivelse="Afstem redoxreaktioner, undersøg oxidationstal, og se elektrokemien bag spændingsrækken og korrosion." onclick="visKategori(this, 'kemi-c-filer/samling_c8.html')" title="C8: Redox"><span class="btn-num">C8</span><span class="btn-text">Redox</span></button>
             <button class="tab-btn" data-beskrivelse="Test din viden i quizzer og spil, der gør kemi-emnerne til en konkurrence." onclick="visKategori(this, 'kemi-c-filer/samling_c_spil.html')" title="Spil"><span class="btn-num">spil</span><span class="btn-text">Spil</span></button>
+            <button class="tab-btn" data-beskrivelse="Sæt fagordene fra kapitlerne på figurer som i bogen, lag for lag eller alle på én gang." onclick="visKategori(this, 'kemi-c-filer/samling_c_bygfiguren.html')" title="Byg figuren: fagord på figurer"><span class="btn-num">byg</span><span class="btn-text">Byg figuren</span></button>
             <!-- <button class="tab-btn" onclick="visKategori(this, 'samling_b4,5,6.html')" title="B4: Organisk B"><span class="btn-num">B4</span><span class="btn-text">Organisk B</span></button> -->
 
             <button class="skift-btn" id="skiftKnap" data-href="samling_alt_b.html"><span class="skift-tekst">Skift til kemi B</span><span class="skift-besked">Hold nede i 1 sekund</span><span class="skift-fyld"></span></button>
@@ -588,6 +589,8 @@
         window.onresize = checkScreenSize;
 
         function findSideFraEmne(emne) {
+            // Byg figuren har sit eget panel (2. nov. 2026); koderne er c1.byg, c2.byg ...
+            if (/\.byg$/i.test(emne)) return 'kemi-c-filer/samling_c_bygfiguren.html';
             const kapitel = emne.match(/^c(\d+)/i);
             if (kapitel) return 'kemi-c-filer/samling_c' + kapitel[1] + '.html';
             if (/^spil/i.test(emne)) return 'kemi-c-filer/samling_c_spil.html';
@@ -724,6 +727,10 @@
                 { nr: 1, navn: 'Pacman Quiz' }, { nr: 2, navn: 'Kemi-Millionær' }, { nr: 3, navn: 'Kemi-Jeopardy' }, { nr: 4, navn: 'Organiske grupper' },
                 { nr: 5, navn: 'Syregalgen' }, { nr: 6, navn: 'Ion-Tetris' }, { nr: 7, navn: 'Kemi-Lykkehjulet' }, { nr: 8, navn: 'EscapeRoom Kemi C' },
                 { nr: 9, navn: 'Kort og godt' }
+            ]},
+            { navn: 'Byg figuren', animationer: [
+                { nr: 1, navn: 'Atomer' }, { nr: 2, navn: 'Ionforbindelser' }, { nr: 3, navn: 'Molekyler' }, { nr: 4, navn: 'Organisk kemi' },
+                { nr: 5, navn: 'Beregninger' }, { nr: 6, navn: 'Koncentration' }
             ]},
             { navn: 'Generelt (ikke et bestemt kapitel)', animationer: [] }
         ];

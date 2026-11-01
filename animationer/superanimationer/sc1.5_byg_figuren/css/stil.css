@@ -34,7 +34,11 @@
 [hidden] { display: none !important; }
 html, body { margin: 0; padding: 0; height: 100%; }
 
+/* Tekst kan ikke markeres ved et uheld, mens man traekker ord rundt
+   (brugeren 1. nov. 2026: "jeg ender hele tiden at markere teksten") */
 body {
+    -webkit-user-select: none;
+    user-select: none;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bund);
     color: var(--tekst);
@@ -213,6 +217,26 @@ main { flex: 1; position: relative; min-height: 0; }
 .laglinje.mester .l-nr { background-color: #5a4a1a; color: var(--gul); }
 
 .liste-note { margin: 8px 0 0; font-size: 0.78rem; color: var(--tekst-mat); }
+
+/* Kontakten til den svaere udgave oeverst i panelet (brugeren 2. nov. 2026) */
+.kort.svaer { position: relative; display: flex; align-items: center; gap: 11px; padding: 10px 11px; cursor: pointer; }
+.kort.svaer input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.svaer-kontakt {
+    position: relative; flex-shrink: 0; width: 38px; height: 22px; border-radius: 999px;
+    background-color: var(--panel-3); border: 1px solid #5a5a6a; transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.svaer-kontakt::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+    background-color: var(--tekst-svag); transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.kort.svaer input:checked + .svaer-kontakt { background-color: #5a4a1a; border-color: var(--gul); }
+.kort.svaer input:checked + .svaer-kontakt::after { transform: translateX(16px); background-color: var(--gul); }
+.kort.svaer input:focus-visible + .svaer-kontakt { outline: 2px solid var(--blaa); outline-offset: 2px; }
+.svaer-tekst { display: flex; flex-direction: column; font-size: 0.88rem; line-height: 1.25; }
+.svaer-tekst b { font-weight: 700; color: var(--tekst); }
+.svaer-tekst em { font-style: normal; font-size: 0.78rem; color: var(--tekst-mat); }
+.kort.svaer:hover { border-color: #5e5e70; }
+.svaer-udgave .kort.svaer { border-color: #8a7330; background-color: rgba(242, 197, 61, 0.08); }
 
 /* Fagordene, der sidder paa plads */
 .ordliste { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -396,10 +420,41 @@ button:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
 }
 
 .ord:hover { transform: translateY(-1px); box-shadow: 0 4px 9px rgba(0, 0, 0, 0.4); border-color: #a88b3c; }
-.ord.valgt { border-color: var(--blaa); box-shadow: 0 0 0 3px rgba(61, 158, 224, 0.55); }
+/* Mange ord i bakken (den svaere udgave med 11 eller flere): lidt mindre brikker */
+.bakke.mange { gap: 6px; }
+.bakke.mange .ord { padding: 4px 9px; font-size: 0.9rem; }
+
+/* Det valgte ord: en kraftig gul ring, og det loefter sig, saa man kan se,
+   hvad man er ved at flytte (brugeren 1. nov. 2026) */
+.ord.valgt {
+    border-color: #c99a12;
+    background: linear-gradient(#fff8d6, #ffe68a);
+    transform: translateY(-4px) scale(1.07);
+    box-shadow: 0 0 0 4px var(--gul), 0 0 0 9px rgba(242, 197, 61, 0.3), 0 8px 16px rgba(0, 0, 0, 0.5);
+    animation: valgt-puls 1.5s ease-in-out infinite;
+}
+
+@keyframes valgt-puls {
+    0%, 100% { box-shadow: 0 0 0 4px var(--gul), 0 0 0 8px rgba(242, 197, 61, 0.32), 0 8px 16px rgba(0, 0, 0, 0.5); }
+    50%      { box-shadow: 0 0 0 4px var(--gul), 0 0 0 13px rgba(242, 197, 61, 0.14), 0 8px 16px rgba(0, 0, 0, 0.5); }
+}
+
+.har-valgt .ord:not(.valgt) { opacity: 0.55; }
+
+/* Mens et ord er valgt, lyser de gule pladser op, og pladsen, man peger
+   paa, viser ordet svagt */
+.har-valgt .plads.aktiv .p-boks { fill: #ffefa8; stroke-width: 3.2; }
+.har-valgt .plads.aktiv, .har-valgt .plads.fyldt { cursor: pointer; }
+.plads.forslag .p-boks { fill: #fff3c4; stroke: #e2b021; stroke-width: 3.5; stroke-dasharray: none; }
+.plads.forslag .p-tekst { fill: #9a7b1c; opacity: 0.8; }
+
+.sk-bund.valg .st-tekst { color: #ffe9a6; }
+.sk-bund.valg .b-maerke { background-color: var(--gul); color: #33290a; }
 .ord.i-luften { opacity: 0.25; }
 
 /* Det ord, der traekkes, foelger musen */
+body.traekker, body.traekker * { cursor: grabbing !important; }
+
 .traek {
     position: fixed;
     z-index: 100;
@@ -514,8 +569,21 @@ button:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
 .plads.laast .p-tekst { fill: #1f2a33; }
 .plads.laast.ny .p-boks { stroke: #3fae72; stroke-width: 3; }
 .plads.laast:hover .p-boks { stroke: #3fae72; }
-.plads .p-halo { display: none; }
+/* Det, en plads handler om: gult, mens der spoerges; kraftigere, naar
+   musen eller et ord er over pladsen, og ved hintet */
+.plads .p-halo { display: none; fill: rgba(242, 197, 61, 0.22); stroke: #e2b021; stroke-width: 2; pointer-events: none; }
+.plads .p-halo.ring { fill: none; stroke: rgba(226, 176, 33, 0.75); stroke-width: 3; }
+circle.p-halo.ring { stroke: rgba(242, 197, 61, 0.55); stroke-width: 10; }
 .plads.aktiv .p-halo, .plads.fyldt .p-halo { display: inline; }
+.plads.aktiv:hover .p-halo, .plads.fyldt:hover .p-halo, .plads.over .p-halo { fill: rgba(242, 197, 61, 0.45); stroke: #d9a514; stroke-width: 3.5; }
+.plads.aktiv:hover .p-halo.ring, .plads.fyldt:hover .p-halo.ring, .plads.over .p-halo.ring { fill: none; stroke: #e2b021; stroke-width: 4.5; }
+.plads.aktiv:hover circle.p-halo.ring, .plads.fyldt:hover circle.p-halo.ring, .plads.over circle.p-halo.ring { stroke: rgba(242, 197, 61, 0.85); stroke-width: 12; }
+.plads.hintet .p-halo { fill: rgba(230, 137, 42, 0.28); stroke: #e6892a; stroke-width: 3.5; }
+.plads.hintet .p-halo.ring { fill: none; }
+.plads.hintet circle.p-halo.ring { stroke: rgba(230, 137, 42, 0.6); stroke-width: 10; }
+
+/* Figuren uden farver, til delen er bygget */
+.del .spoeg { filter: grayscale(1) brightness(1.06); opacity: 0.6; }
 
 /* Ting, der popper frem, vokser fra deres egen midte */
 .anim { transform-box: fill-box; transform-origin: center; }

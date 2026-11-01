@@ -27,7 +27,16 @@
     }
     NK.visFane = visFane;
 
-    /* Naar Mesterproeven er klaret: et flueben paa fanen, og naeste fane kalder */
+    /* Svaer udgave: alle fagord paa én gang. Kontakten staar i panelet paa
+       hver fane, men gaelder dem alle, og alle figurer begynder forfra,
+       naar den slaas til eller fra (brugeren 2. nov. 2026). */
+    NK.svaer = false;
+    NK.saetSvaer = function (til) {
+        NK.svaer = !!til;
+        Object.keys(byggere).forEach(function (id) { byggere[id].saetAlt(NK.svaer); });
+    };
+
+    /* Naar figuren er faerdig: en stjerne paa fanen, og naeste fane kalder */
     NK.faneFaerdig = function (id, faerdig) {
         var f = faner.filter(function (x) { return x.id === id; })[0];
         if (!f) return;
@@ -61,7 +70,7 @@
             e.preventDefault();
             b.enter();
         }
-        if (e.key === "Escape" && b) b.skjulForkl();
+        if (e.key === "Escape" && b) { b.skjulForkl(); if (b.valgt) b.vaelg(null); }
     }
 
     function start() {

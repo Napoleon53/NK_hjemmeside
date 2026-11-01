@@ -22,10 +22,21 @@
     return (m && m[1]) || 'C';
   }
 
-  // Kapitlernes numre i rækkefølge: først C-bogens (1, 2 ...), så B-bogens (B1, B2 ...) og A-bogens.
+  // Kapitlernes numre i rækkefølge: først C-bogens (1, 2 ...), så B-bogens (B1, B2 ...) og A-bogens. Til sidst
+  // samlingerne, som ikke er kapitler (BL med de lange opgaver til kemi B, 1. nov. 2026).
   function numre(kapitler) {
-    function noegle(nr) { return ['C', 'B', 'A'].indexOf(niveau(nr)) * 1000 + (parseInt(nr.replace(/^[AB]/, ''), 10) || 0); }
+    function noegle(nr) {
+      return (kapitler[nr].samling ? 9000 : 0) + ['C', 'B', 'A'].indexOf(niveau(nr)) * 1000 + (parseInt(nr.replace(/^[AB]/, ''), 10) || 0);
+    }
     return Object.keys(kapitler).sort(function (a, b) { return noegle(a) - noegle(b) || (a < b ? -1 : 1); });
+  }
+  // Kun kapitlerne, og kun samlingerne. En samling (samling: lange i opskriften) har ingen afsnit, men en liste af
+  // lange opgaver (data.lange), som læreren sætter kryds ved hver for sig under "Lange opgaver til B-niveau".
+  function kapitelnumre(kapitler) {
+    return numre(kapitler).filter(function (nr) { return !kapitler[nr].samling; });
+  }
+  function samlinger(kapitler) {
+    return numre(kapitler).filter(function (nr) { return kapitler[nr].samling; });
   }
 
   function del(data, id) {
@@ -45,6 +56,11 @@
     var v = { med: false, afsnit: {}, oevelser: {}, udgaver: {} };
     data.afsnit.forEach(function (a) { v.afsnit[a.nr] = { med: true, noter: true, ekstra: false, laesning: false, opgaver: standardmaengde(a) }; });
     data.oevelser.forEach(function (id) { v.oevelser[id] = false; });
+    // En samlings lange opgaver er ikke valgt fra start.
+    if (data.lange) {
+      v.lange = {};
+      data.lange.forEach(function (id) { v.lange[id] = false; });
+    }
     return v;
   }
 
@@ -130,8 +146,13 @@
     return valg;
   }
 
+  // De valgte kapitler og samlinger. En samling er kun med, når mindst én af dens opgaver har et kryds.
   function valgte(kapitler, valg) {
-    return numre(kapitler).filter(function (nr) { return valg.kapitler[nr] && valg.kapitler[nr].med; });
+    return numre(kapitler).filter(function (nr) {
+      var v = valg.kapitler[nr];
+      if (!v || !v.med) return false;
+      return !kapitler[nr].samling || (kapitler[nr].lange || []).some(function (id) { return v.lange && v.lange[id]; });
+    });
   }
 
   // De bilag, de valgte kapitler har, hvert bilag én gang. Det periodiske system står altid sidst.
@@ -156,8 +177,9 @@
     return !!(valg.kapitler['1'] && valg.kapitler['1'].med);
   }
 
+  // Navnet i indholdet. Det skal være præcis den første strimmel i kapitlets PDF (kapitelnavn i opskriften).
   function kapitelnavn(data) {
-    return 'Kapitel ' + data.kapitel + ': ' + data.titel;
+    return data.kapitelnavn || 'Kapitel ' + data.kapitel + ': ' + data.titel;
   }
 
   // "kapitel 2" eller "kapitel 1, 2 og 3".
@@ -234,6 +256,8 @@
     var poster = [], linjer = [], indhold = null;
     var side = 1;
     var med = valgte(kapitler, valg);
+    // Er der kapitler med, kommer en samlings lange opgaver efter dem uden en ekstra forside.
+    var medKapitler = med.some(function (nr) { return !kapitler[nr].samling; });
     function tilfoej(post) {
       post.side = side;
       side += post.sider;
@@ -257,7 +281,8 @@
       var foerste = side;
       var kapitellinje = { kap: nr, titel: kapitelnavn(data), side: side, fed: true };
       var plads = linjer.length;
-      var forside = valg.forside ? tilfoej({ slags: 'forside', kap: nr, titel: 'Forside til kapitel ' + nr, sider: 1 }) : null;
+      var forside = valg.forside && !(data.samling && medKapitler) ?
+        tilfoej({ slags: 'forside', kap: nr, titel: data.samling ? 'Forside: ' + kapitelnavn(data) : 'Forside til kapitel ' + nr, sider: 1 }) : null;
       if (i === 0 && valg.indhold) {
         if (forside && !egnesider) {
           forside.indhold = true;
@@ -279,6 +304,7 @@
         } else if (a.opgaver[av.opgaver]) delpost(nr, a.opgaver[av.opgaver]);
       });
       oevelsesliste(data).forEach(function (id) { if (v.oevelser[id]) delpost(nr, oevelsesdel(data, v, id)); });
+      (data.lange || []).forEach(function (id) { if (v.lange && v.lange[id]) delpost(nr, id); });
       // Med flere kapitler får hvert kapitel sin egen linje i indholdet.
       if (med.length > 1 && side > foerste && side > kapitellinje.side) linjer.splice(plads, 0, kapitellinje);
     });
@@ -295,9 +321,13 @@
   }
 
   // Kompendiets navn: "Kompendium til kapitel 2 og 3".
+  // Med lange opgaver: "Kompendium til kapitel B2 med lange opgaver" eller "Kompendium med lange opgaver".
   function navn(kapitler, valg) {
     var med = valgte(kapitler, valg);
-    return 'Kompendium' + (med.length ? ' til ' + kapitelord(med) : '');
+    var kap = med.filter(function (nr) { return !kapitler[nr].samling; });
+    var saml = med.filter(function (nr) { return kapitler[nr].samling; });
+    return 'Kompendium' + (kap.length ? ' til ' + kapitelord(kap) : '') +
+      (saml.length ? ' med ' + saml.map(function (nr) { return kapitler[nr].titel.toLowerCase(); }).join(' og ') : '');
   }
 
   // Det felt på en hjælpeside, hvor tallet n står. g er målene fra skabelonen, og h er sidens højde.
@@ -537,7 +567,8 @@
     });
   }
 
-  var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, niveau: niveau, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
+  var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, kapitelnumre: kapitelnumre, samlinger: samlinger, valgte: valgte,
+    niveau: niveau, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
     oevelsesdel: oevelsesdel, noterdel: noterdel, laesning: laesning, oevelsesliste: oevelsesliste,
     tilknyt: tilknyt, kortet: kortet, kortafsnit: kortafsnit, customStart: customStart, pak: pak,
     bilagene: bilagene, bilagMed: bilagMed, plan: plan, navn: navn, saml: saml };

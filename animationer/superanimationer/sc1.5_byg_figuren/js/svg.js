@@ -75,24 +75,20 @@ window.NK = NK;
     /* Fylder et text-element med tspans, saa _2 bliver saenket og ^+ haevet */
     SV.formelInd = function (t, s) {
         while (t.firstChild) t.removeChild(t.firstChild);
-        var re = /([_^])(\{[^}]*\}|[0-9+−\-]+)/g;
-        var sidst = 0, m, skift = 0;
+        var re = /([_^])(\{[^}]*\}|[0-9+\u2212\-]+)/g;
+        var sidst = 0, m;
+        /* off er, hvor langt linjen staar under grundlinjen (i hele em).
+           Et saenket tal ligger 0,32 em af den lille skrift nede, et
+           haevet 0,55 em oppe, og NO₃⁻ gaar direkte fra det ene til det andet. */
+        var off = 0, LILLE = 0.68;
         function stykke(tekst, slags) {
             if (!tekst) return;
             var ts = SV.el("tspan", {}, t);
-            if (slags === "_") {
-                ts.setAttribute("font-size", "68%");
-                ts.setAttribute("dy", "0.32em");
-                skift = -0.32;
-            } else if (slags === "^") {
-                ts.setAttribute("font-size", "68%");
-                ts.setAttribute("dy", "-0.55em");
-                skift = 0.55;
-            } else if (skift) {
-                /* tilbage paa linjen; dy maales i den foregaaende tspans skrift */
-                ts.setAttribute("dy", (skift * 0.68) + "em");
-                skift = 0;
-            }
+            var skala = slags ? LILLE : 1;
+            var maal = slags === "_" ? 0.32 * LILLE : (slags === "^" ? -0.55 * LILLE : 0);
+            if (slags) ts.setAttribute("font-size", "68%");
+            if (Math.abs(maal - off) > 1e-6) ts.setAttribute("dy", ((maal - off) / skala).toFixed(4) + "em");
+            off = maal;
             ts.textContent = tekst;
         }
         while ((m = re.exec(s)) !== null) {
@@ -113,7 +109,17 @@ window.NK = NK;
         O:        ["#ff9585", "#e0443a", "#962a20"],
         C:        ["#8d939b", "#4b5159", "#25292e"],
         guld:     ["#fff1b8", "#f0c23e", "#a87b0c"],
-        Cl:       ["#d8f59a", "#8fcf3c", "#4f8a14"]
+        Cl:       ["#d8f59a", "#8fcf3c", "#4f8a14"],
+        /* Kapitel 2: atomerne i de sammensatte ioner og ionerne i fældningen,
+           i bogens farver */
+        N:        ["#b4ccff", "#4a78dc", "#20438f"],
+        S:        ["#fff4a3", "#f0c83a", "#a3800c"],
+        P:        ["#ffd3a6", "#f08c3c", "#a35512"],
+        kalium:   ["#ffe6b3", "#f2ac45", "#a86c10"],
+        iod:      ["#e6ccff", "#9a62d8", "#5a2c90"],
+        bly:      ["#ffc2ba", "#de6b5f", "#94362c"],
+        /* Kapitel 3: elektronerne fra hydrogen er groenne som i bogen */
+        gron:     ["#a9e6b6", "#2e9e48", "#17652a"]
     };
     SV.KUGLER = KUGLER;
 
@@ -169,7 +175,7 @@ window.NK = NK;
         if (tegn) SV.el("ellipse", { cx: cx - r * 0.38, cy: cy - r * 0.5, rx: r * 0.26, ry: r * 0.14, fill: "#ffffff", "fill-opacity": 0.45 }, g);
         else SV.el("ellipse", { cx: cx - r * 0.3, cy: cy - r * 0.36, rx: r * 0.32, ry: r * 0.2, fill: "#ffffff", "fill-opacity": 0.5 }, g);
         if (tegn) {
-            var lys = slags === "neutron" || slags === "H" || slags === "guld" || slags === "Cl";
+            var lys = slags === "neutron" || slags === "H" || slags === "guld" || slags === "Cl" || slags === "S" || slags === "kalium";
             SV.tekst(g, cx, cy + r * 0.36, tegn, {
                 "font-size": r * (tegn.length > 1 ? 0.85 : 1.15),
                 "font-weight": 700,

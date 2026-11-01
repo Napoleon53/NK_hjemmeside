@@ -4,13 +4,18 @@
    Forklaringerne er kopieret ordret fra Kemibogens fagordliste til
    kapitel 1 (NK_Undervisning/Kemibogen/fagord/kapitel-1.qmd) den
    27. okt. 2026. Rettes en forklaring i bogen, skal den rettes her med.
-   Selvtesten tjekker, at alle 41 fagord fra listen sidder paa en plads.
+   Selvtesten tjekker, at alle fagord fra listen sidder paa en plads,
+   undtagen dem i NK.UDELADT.
    ===================================================================== */
 var NK = window.NK || {};
 window.NK = NK;
 
 (function () {
     "use strict";
+
+    /* Kapitlet og antallet af fagord i bogens liste (selvtesten tjekker det) */
+    NK.KAPITEL = "1";
+    NK.ANTAL_FAGORD = 41;
 
     NK.FORKLARING = {
         /* 1.1 Hvad er kemi? */
@@ -59,6 +64,11 @@ window.NK = NK;
         "afstemt": "Siges om et reaktionsskema, når der er lige mange atomer af hver slags før og efter pilen.",
         "tilstandssymbol": "Bogstaver i en parentes efter en formel, for eksempel (s) eller (aq). De viser, om stoffet er fast, flydende, en gas eller opløst i vand."
     };
+
+    /* Fagord fra listen, der med vilje ikke er paa en figur.
+       model: brugeren 1. nov. 2026, "ordet model er saadan lidt skoert at
+       saette hen til et vandmolekyle. Saa den skal maaske bare fjernes". */
+    NK.UDELADT = ["model"];
 
     /* De fire faner i samme raekkefoelge som afsnittene. hash er de
        adresser, der aabner fanen direkte: index.html#atomet */

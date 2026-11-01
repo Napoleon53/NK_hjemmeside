@@ -274,6 +274,13 @@
       <div class="raekker" id="kapitler"></div>
     </section>
 
+    <!-- Lange opgaver til B-niveau (Niels 1. nov. 2026): læreren sætter kryds ved hver opgave. Fyldes af bygLange(). -->
+    <section class="gruppe" id="gruppe-lange" hidden>
+      <h2>Lange opgaver til B-niveau</h2>
+      <p class="hjaelp">Større opgaver, der blander stof fra flere kapitler i kemi B, fx til dygtige elever eller til repetition sidst på året. Sæt kryds ved de opgaver, du vil have med. De kommer efter kapitlernes dele, og vælger du ingen kapitler, får de deres egen forside.</p>
+      <div class="raekker" id="lange"></div>
+    </section>
+
     <section class="gruppe">
       <h2>Øvelsesvejledninger</h2>
       <div class="raekker" id="oevelser"></div>
@@ -353,9 +360,9 @@
 <noscript><p style="max-width:1100px;margin:20px auto;padding:0 20px">Siden skal bruge JavaScript for at sætte kompendiet sammen.</p></noscript>
 
 <script src="pdf-lib.min.js"></script>
-<script src="data/kapitler.js?v=20261029"></script>
+<script src="data/kapitler.js?v=20261101"></script>
 <script src="data/opgavekort.js?v=20261031"></script>
-<script src="saml.js?v=20261101a"></script>
+<script src="saml.js?v=20261101b"></script>
 <script>
 (function () {
   'use strict';
@@ -374,7 +381,8 @@
 
   // Opgavekortene til custom-menuen (data/opgavekort.js) hører til de kapitler, der har dem.
   Kompendium.tilknyt(kapitler, window.OPGAVEKORT);
-  var numre = Kompendium.numre(kapitler);
+  var numre = Kompendium.kapitelnumre(kapitler);    // kapitlerne
+  var samlinger = Kompendium.samlinger(kapitler);   // samlinger, der ikke er kapitler: de lange opgaver (BL)
   var fraSidst = laesGemt();  // valgene fra den sidste PDF, som knappen kan hente frem
   var valg = Kompendium.standardvalg(kapitler);  // siden begynder altid uden krydser
   var egne = [];       // lærerens egne vejledninger: { navn, sider, bytes } eller { navn, fejl }
@@ -408,7 +416,7 @@
   function laesGemt() {
     try {
       var gemt = JSON.parse(localStorage.getItem(GEMT) || 'null');
-      if (gemt && gemt.kapitler && numre.some(function (nr) { return gemt.kapitler[nr] && gemt.kapitler[nr].med; })) return gemt;
+      if (gemt && gemt.kapitler && numre.concat(samlinger).some(function (nr) { return gemt.kapitler[nr] && gemt.kapitler[nr].med; })) return gemt;
     } catch (e) { /* uden gemte valg er der ingen knap */ }
     return null;
   }
@@ -416,7 +424,10 @@
   function gemteKapitler(gemt) {
     var liste = numre.filter(function (nr) { return gemt.kapitler[nr] && gemt.kapitler[nr].med; })
       .map(function (nr) { return kapitler[nr].kapitel; });
-    return 'kapitel ' + (liste.length > 1 ? liste.slice(0, -1).join(', ') + ' og ' + liste[liste.length - 1] : liste[0]);
+    var lange = samlinger.some(function (nr) { return gemt.kapitler[nr] && gemt.kapitler[nr].med; }) ? 'lange opgaver' : '';
+    if (!liste.length) return lange;
+    return 'kapitel ' + (liste.length > 1 ? liste.slice(0, -1).join(', ') + ' og ' + liste[liste.length - 1] : liste[0]) +
+      (lange ? ' og ' + lange : '');
   }
   function hentValg(gemt) {
     var v = Kompendium.standardvalg(kapitler);
@@ -454,12 +465,19 @@
           Kompendium.oevelsesliste(kapitler[nr]).forEach(function (id) { if (g.oevelser && id in g.oevelser) v.kapitler[nr].oevelser[id] = !!g.oevelser[id]; });
           Object.keys(kapitler[nr].udgaver || {}).forEach(function (id) { if (g.udgaver && g.udgaver[id] === 'aaben') v.kapitler[nr].udgaver[id] = 'aaben'; });
         });
+        // De lange opgaver, der stadig findes i samlingen.
+        samlinger.forEach(function (nr) {
+          var g = gemt.kapitler && gemt.kapitler[nr];
+          if (!g || !g.lange) return;
+          kapitler[nr].lange.forEach(function (id) { v.kapitler[nr].lange[id] = !!g.lange[id]; });
+          v.kapitler[nr].med = kapitler[nr].lange.some(function (id) { return v.kapitler[nr].lange[id]; });
+        });
       }
     } catch (e) { /* uden gemte valg bruges standardvalgene */ }
     return v;
   }
   function gemValg() {
-    if (!valgte().length) return;
+    if (!valgte().length && !langeValgt()) return;
     try { localStorage.setItem(GEMT, JSON.stringify(valg)); } catch (e) { /* ikke vigtigt */ }
   }
 
@@ -560,6 +578,40 @@
       }).join('');
   }
 
+  // ---- Lange opgaver til B-niveau ----
+  // Sand, når mindst én lang opgave har et kryds.
+  function langeValgt() {
+    return samlinger.some(function (nr) {
+      var v = valg.kapitler[nr];
+      return kapitler[nr].lange.some(function (id) { return v.lange && v.lange[id]; });
+    });
+  }
+  // Samlingen, en lang opgave hører til: "lang-B2.6.12" hører til BL.
+  function samlingAf(id) {
+    return samlinger.filter(function (nr) { return kapitler[nr].lange.indexOf(id) >= 0; })[0];
+  }
+  // Afsnittets navn fra kapitlets data ("B2.6 Ligevægtsberegninger"), eller blot nummeret.
+  function afsnitsnavn(afsnit) {
+    var a = null;
+    numre.forEach(function (nr) { kapitler[nr].afsnit.forEach(function (x) { if (x.nr === afsnit) a = x; }); });
+    return a ? a.titel : afsnit;
+  }
+  // Én række pr. lang opgave med kryds og sidetal, under en linje med afsnittet, opgaven hører til.
+  function bygLange() {
+    $('gruppe-lange').hidden = !samlinger.length;
+    $('lange').innerHTML = samlinger.map(function (nr) {
+      var v = valg.kapitler[nr], forrige = null;
+      return kapitler[nr].lange.map(function (id) {
+        var d = del(nr, id);
+        var afsnit = id.replace(/^lang-/, '').replace(/\.\d+$/, '');
+        var hoved = afsnit !== forrige ? '<div class="underhoved">Til afsnit ' + tekst(afsnitsnavn(afsnit)) + '</div>' : '';
+        forrige = afsnit;
+        return hoved + '<div class="raekke">' + kryds('del-' + id, d.titel.replace(/^Lang opgave: /, ''), sider(d.sider),
+          !!(v.lange && v.lange[id]), true) + '</div>';
+      }).join('');
+    }).join('');
+  }
+
   // ---- Oversigten til højre følger valgene ----
   function gode() {
     return egne.filter(function (e) { return !e.fejl; });
@@ -578,7 +630,7 @@
     }).join('');
     $('lav').disabled = plan.sider === 0;
     // Knappen med valgene fra sidst står der kun, så længe intet kapitel er valgt.
-    $('fra-sidst').hidden = !fraSidst || valgte().length > 0;
+    $('fra-sidst').hidden = !fraSidst || valgte().length > 0 || langeValgt();
     if (fraSidst) $('fra-sidst').textContent = 'Hent valgene fra dit sidste kompendium (' + gemteKapitler(fraSidst) + ')';
     // Indholdet står på forsiden, medmindre der er valgt separat forside, eller der er for mange linjer.
     var paaForside = valg.forside && !valg.separat && !plan.forlangt;
@@ -670,6 +722,12 @@
       }
     } else if (el.type === 'checkbox' && (el.id === 'forside' || el.id === 'indhold' || el.id === 'separat')) {
       valg[el.id] = el.checked;
+    } else if (el.type === 'checkbox' && el.id.indexOf('del-lang-') === 0) {
+      // En lang opgave. Samlingen er med, så længe mindst én af dens opgaver har et kryds.
+      navn = el.id.slice(4);
+      nr = samlingAf(navn);
+      valg.kapitler[nr].lange[navn] = el.checked;
+      valg.kapitler[nr].med = kapitler[nr].lange.some(function (id) { return valg.kapitler[nr].lange[id]; });
     } else if (el.type === 'checkbox' && el.id.indexOf('del-') === 0) {
       navn = el.id.slice(4);
       valg.kapitler[kapitelAf(navn)].oevelser[navn] = el.checked;
@@ -702,6 +760,7 @@
     } else if (h.target.id === 'fra-sidst') {
       valg = hentValg(fraSidst);
       bygKapitler();
+      bygLange();
       bygResten();
       opdater();
     } else if (fjern !== null) {
@@ -1136,6 +1195,7 @@
   });
 
   bygKapitler();
+  bygLange();
   bygResten();
   opdater();
 })();

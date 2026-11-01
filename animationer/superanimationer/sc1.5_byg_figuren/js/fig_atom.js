@@ -111,20 +111,23 @@
               ros: "Carbonatomer findes med 6, 7 og 8 neutroner, og atommassen er gennemsnittet." }
         ],
         pladser: [
-            { id: "kerne", ord: ["kerne"], x: A.x, y: 38, maal: [A.x, A.y - 24], halo: 30, dele: ["kerne"],
+            { id: "kerne", ord: ["kerne"], x: A.x, y: 38, maal: [A.x, A.y - 27], dele: ["kerne"], omr: [{ c: [A.x, A.y, 27] }],
               fejl: { proton: "<b>proton</b> er én af kuglerne. Pladsen peger på hele klumpen af kugler i midten af atomet." } },
-            { id: "elektron", ord: ["elektron"], x: 110, y: 440, maal: [epos(ELEKTRONER[2]).x, epos(ELEKTRONER[2]).y], halo: 18, dele: ["elektron"] },
-            { id: "proton", ord: ["proton"], x: 420, y: 60, maal: [proton0.x, proton0.y], halo: 24, dele: ["proton"],
+            { id: "elektron", ord: ["elektron"], x: 110, y: 440, maal: [epos(ELEKTRONER[2]).x, epos(ELEKTRONER[2]).y + 11], dele: ["elektron"],
+              omr: [{ c: [epos(ELEKTRONER[2]).x, epos(ELEKTRONER[2]).y, 17] }] },
+            { id: "proton", ord: ["proton"], x: 420, y: 60, maal: [proton0.x - 16, proton0.y - 16], dele: ["proton"], omr: [{ c: [proton0.x, proton0.y, 23] }],
               fejl: { neutron: "<b>neutron</b> passer ikke på kuglen med +. En neutron har ingen ladning." } },
-            { id: "neutron", ord: ["neutron"], x: 560, y: 380, maal: [neutron0.x, neutron0.y], halo: 24, dele: ["neutron"],
+            { id: "neutron", ord: ["neutron"], x: 560, y: 380, maal: [neutron0.x, neutron0.y + 23], dele: ["neutron"], omr: [{ c: [neutron0.x, neutron0.y, 23] }],
               fejl: { proton: "<b>proton</b> passer ikke på kuglen uden tegn. En proton har ladningen +1." } },
-            { id: "atomnummer", ord: ["atomnummer"], x: 655, y: 74, maal: [KORT.x + 9, KORT.y + 24], halo: 15, dele: ["atomnummer"],
+            { id: "atomnummer", ord: ["atomnummer"], x: 655, y: 74, maal: [KORT.x + 12, KORT.y + 25], dele: ["atomnummer"], omr: [{ r: [KORT.x + 12, KORT.y + 8, 32, 34, 6] }],
               fejl: { nukleontal: "<b>nukleontal</b> tæller både protoner og neutroner. Tallet 6 i feltet tæller kun protonerne." } },
-            { id: "elektrisk neutral", ord: ["elektrisk neutral"], x: 585, y: 452, maal: [LAD.x + 14, LAD.y + LAD.h - 14], halo: 15, dele: ["neutral"] },
-            { id: "isotoper", ord: ["isotoper"], x: 180, y: 576, maal: [ISO.x, ISO.y + 86], halo: 15, dele: ["isotoper"] },
-            { id: "nukleontal", ord: ["nukleontal"], x: 880, y: 452, maal: [X14.x, X14.y - 14], halo: 10, dele: ["nukleontal"],
+            { id: "elektrisk neutral", ord: ["elektrisk neutral"], x: 585, y: 452, maal: [LAD.x - 6, LAD.y + LAD.h - 14], dele: ["neutral"],
+              omr: [{ r: [LAD.x - 6, LAD.y - 6, LAD.b + 12, LAD.h + 12, 14], tom: true }] },
+            { id: "isotoper", ord: ["isotoper"], x: 180, y: 576, maal: [ISO.x - 6, ISO.y + 86], dele: ["isotoper"],
+              omr: [{ r: [ISO.x - 6, ISO.y - 6, ISO.b + 12, ISO.h + 12, 16], tom: true }] },
+            { id: "nukleontal", ord: ["nukleontal"], x: 880, y: 452, maal: [X14.x, X14.y - 23], dele: ["nukleontal"], omr: [{ c: [X14.x, X14.y - 6, 17] }],
               fejl: { atommasse: "<b>atommasse</b> er gennemsnittet for alle carbonatomer. Tallet 14 i carbon-14 tæller partiklerne i én kerne." } },
-            { id: "atommasse", ord: ["atommasse"], x: KORT.x + KORT.b / 2, y: 268, maal: [KORT.x + KORT.b / 2, KORT.y + KORT.h], halo: 14, dele: ["atommasse"],
+            { id: "atommasse", ord: ["atommasse"], x: KORT.x + KORT.b / 2, y: 268, maal: [KORT.x + KORT.b / 2, KORT.y + 174], dele: ["atommasse"], omr: [{ r: [KORT.x + KORT.b / 2 - 34, KORT.y + 148, 68, 26, 6] }],
               fejl: { nukleontal: "<b>nukleontal</b> er et helt tal for én kerne. 12,01 er et gennemsnit og ikke et helt tal." } }
         ],
 
@@ -157,9 +160,6 @@
 
             api.del("kerne", {
                 lag: 0,
-                spoeg: function (g) {
-                    SV.el("circle", { cx: A.x, cy: A.y, r: 22, fill: F.spoegFyld, stroke: F.spoeg, "stroke-width": 1.6, "stroke-dasharray": "4 3" }, g);
-                },
                 fuld: function (g) { return { kugler: lilleKerne(g, A.x, A.y, 12, 5.1, 5.2, true) }; },
                 byg: function (g, r, an) {
                     r.kugler.forEach(function (k, i) { an.glid(k, (i % 3 - 1) * 40, -30 - i * 3, i * 45, 420); });
@@ -168,11 +168,6 @@
 
             api.del("elektron", {
                 lag: 0,
-                spoeg: function (g) {
-                    SV.el("circle", { cx: A.x, cy: A.y, r: R1, fill: "none", stroke: F.spoeg, "stroke-width": 1.3, "stroke-dasharray": "4 4" }, g);
-                    SV.el("circle", { cx: A.x, cy: A.y, r: R2, fill: "none", stroke: F.spoeg, "stroke-width": 1.3, "stroke-dasharray": "4 4" }, g);
-                    ELEKTRONER.forEach(function (e) { var p = epos(e); SV.spoegKugle(g, p.x, p.y, 10); });
-                },
                 fuld: function (g) {
                     var ringe = [
                         SV.el("circle", { cx: A.x, cy: A.y, r: R1, fill: "none", stroke: "#9db6e6", "stroke-width": 1.4, "stroke-dasharray": "5 4" }, g),
@@ -191,9 +186,6 @@
             ["proton", "neutron"].forEach(function (s) {
                 api.del(s, {
                     lag: 0,
-                    spoeg: function (g) {
-                        lupPos.forEach(function (p, i) { if (slags(i, 12) === s) SV.spoegKugle(g, L.x + p.x, L.y + p.y, LUP_R); });
-                    },
                     fuld: function (g) {
                         var k = [];
                         lupPos.forEach(function (p, i) {
@@ -219,7 +211,6 @@
 
             api.del("atomnummer", {
                 lag: 1,
-                spoeg: function (g) { SV.tekst(g, KORT.x + 28, KORT.y + 33, "6", { "font-size": 26, "font-weight": 700, fill: F.spoeg }); },
                 fuld: function (g) { return { t: SV.tekst(g, KORT.x + 28, KORT.y + 33, "6", { "font-size": 26, "font-weight": 700, fill: F.teal }) }; },
                 byg: function (g, r, an) {
                     an.pop(r.t, 0);
@@ -230,8 +221,7 @@
 
             api.del("neutral", {
                 lag: 1,
-                spoeg: function (g) { regnskab(g, true); },
-                fuld: function (g) { return regnskab(g, false); },
+                fuld: function (g) { return regnskab(g); },
                 byg: function (g, r, an) {
                     an.glid(r.r1, -20, 0, 0, 450);
                     an.glid(r.r2, -20, 0, 160, 450);
@@ -257,9 +247,6 @@
 
             api.del("isotoper", {
                 lag: 2,
-                spoeg: function (g) {
-                    ISOTOPER.forEach(function (n, i) { SV.el("circle", { cx: isoX(i), cy: ISO.y + 88, r: 36, fill: F.spoegFyld, stroke: F.spoeg, "stroke-width": 1.5, "stroke-dasharray": "4 3" }, g); });
-                },
                 fuld: function (g) {
                     var k = ISOTOPER.map(function (n, i) {
                         var gg = SV.g(g);
@@ -289,7 +276,6 @@
 
             api.del("atommasse", {
                 lag: 2,
-                spoeg: function (g) { SV.tekst(g, KORT.x + KORT.b / 2, KORT.y + 166, "12,01", { "font-size": 17, "font-weight": 700, fill: F.spoeg }); },
                 fuld: function (g) {
                     var t = SV.tekst(g, KORT.x + KORT.b / 2, KORT.y + 166, "12,01", { "font-size": 17, "font-weight": 700, fill: F.teal });
                     return { t: t };
@@ -298,22 +284,21 @@
             });
 
             /* Regnskabet over ladningerne: 6 protoner, 6 elektroner, i alt 0 */
-            function regnskab(g, spoeg) {
+            function regnskab(g) {
                 var x = LAD.x, y = LAD.y, b = LAD.b, h = LAD.h;
-                var mat = spoeg ? F.spoeg : null;
-                SV.el("rect", { x: x, y: y, width: b, height: h, rx: 12, fill: spoeg ? "#f6f8fa" : "#ffffff", stroke: spoeg ? F.spoeg : "#cdd5dd", "stroke-width": 1.5, "stroke-dasharray": spoeg ? "5 4" : null, filter: spoeg ? null : "url(#skygge)" }, g);
-                SV.tekst(g, x + 14, y + 20, "LADNINGEN I ATOMET", { "font-size": 11.5, "font-weight": 700, fill: mat || F.mat, "text-anchor": "start", "letter-spacing": 1 });
+                SV.el("rect", { x: x, y: y, width: b, height: h, rx: 12, fill: "#ffffff", stroke: "#cdd5dd", "stroke-width": 1.5, filter: "url(#skygge)" }, g);
+                SV.tekst(g, x + 14, y + 20, "LADNINGEN I ATOMET", { "font-size": 11.5, "font-weight": 700, fill: F.mat, "text-anchor": "start", "letter-spacing": 1 });
                 var r1 = SV.g(g), r2 = SV.g(g);
-                if (spoeg) SV.spoegKugle(r1, x + 22, y + 40, 7); else SV.kugle(r1, x + 22, y + 40, 7.5, "proton");
-                SV.tekst(r1, x + 38, y + 45, "6 protoner", { "font-size": 15, fill: mat || F.tekst, "text-anchor": "start" });
-                SV.tekst(r1, x + b - 16, y + 45, "+6", { "font-size": 16, "font-weight": 700, fill: mat || F.roed, "text-anchor": "end" });
-                if (spoeg) SV.spoegKugle(r2, x + 22, y + 64, 7); else SV.kugle(r2, x + 22, y + 64, 7.5, "elektron");
-                SV.tekst(r2, x + 38, y + 69, "6 elektroner", { "font-size": 15, fill: mat || F.tekst, "text-anchor": "start" });
-                SV.tekst(r2, x + b - 16, y + 69, "−6", { "font-size": 16, "font-weight": 700, fill: mat || F.blaa, "text-anchor": "end" });
-                var streg = SV.el("line", { x1: x + 14, y1: y + 78, x2: x + b - 14, y2: y + 78, stroke: mat || "#9aa4ae", "stroke-width": 1.4 }, g);
-                SV.tekst(g, x + 38, y + 98, "i alt", { "font-size": 15, "font-weight": 700, fill: mat || F.tekst, "text-anchor": "start" });
-                var nul = SV.tekst(g, x + b - 16, y + 98, "0", { "font-size": 18, "font-weight": 700, fill: mat || F.groen, "text-anchor": "end" });
-                var flueben = SV.el("path", { d: "M" + (x + b - 62) + "," + (y + 92) + " l6,6 l12,-13", fill: "none", stroke: spoeg ? "none" : F.groen, "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+                SV.kugle(r1, x + 22, y + 40, 7.5, "proton");
+                SV.tekst(r1, x + 38, y + 45, "6 protoner", { "font-size": 15, fill: F.tekst, "text-anchor": "start" });
+                SV.tekst(r1, x + b - 16, y + 45, "+6", { "font-size": 16, "font-weight": 700, fill: F.roed, "text-anchor": "end" });
+                SV.kugle(r2, x + 22, y + 64, 7.5, "elektron");
+                SV.tekst(r2, x + 38, y + 69, "6 elektroner", { "font-size": 15, fill: F.tekst, "text-anchor": "start" });
+                SV.tekst(r2, x + b - 16, y + 69, "−6", { "font-size": 16, "font-weight": 700, fill: F.blaa, "text-anchor": "end" });
+                var streg = SV.el("line", { x1: x + 14, y1: y + 78, x2: x + b - 14, y2: y + 78, stroke: "#9aa4ae", "stroke-width": 1.4 }, g);
+                SV.tekst(g, x + 38, y + 98, "i alt", { "font-size": 15, "font-weight": 700, fill: F.tekst, "text-anchor": "start" });
+                var nul = SV.tekst(g, x + b - 16, y + 98, "0", { "font-size": 18, "font-weight": 700, fill: F.groen, "text-anchor": "end" });
+                var flueben = SV.el("path", { d: "M" + (x + b - 62) + "," + (y + 92) + " l6,6 l12,-13", fill: "none", stroke: F.groen, "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
                 return { r1: r1, r2: r2, streg: streg, nul: nul, flueben: flueben };
             }
         }

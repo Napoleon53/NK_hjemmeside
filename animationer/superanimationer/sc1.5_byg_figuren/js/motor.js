@@ -6,12 +6,33 @@
    bakken paa kortet oeverst. Eleven traekker (eller klikker) ordene paa
    plads og trykker Indsend svar. Et ord, der sidder rigtigt, laases, og
    den del af figuren, det peger paa, bliver bygget. Et forkert ord
-   ryger tilbage i bakken med ordets forklaring fra bogen. Til sidst
-   kommer Mesterproeven: hele figuren med alle fagordene taget af.
+   ryger tilbage i bakken med ordets forklaring fra bogen. Figuren er
+   faerdig, naar det sidste lag er loest.
+
+   Svaer udgave (kontakten oeverst i panelet, brugeren 2. nov. 2026): alle
+   fagord paa én gang. Hele figuren staar graa fra start, og en del faar
+   farve, naar ordet til den sidder. Den afloeste Mesterproeven, som kom
+   efter lagene og "virkede lidt underlig at lave, naar man lige havde
+   taget dem alle".
 
    Figuren beskrives i js/fig_*.js som
      { id, vb, lag: [{ navn, pladser, ekstra, ros }], pladser: [...], tegn(api) }
-   En plads er { id, ord: [...], x, y, maal: [x, y], via, dele, halo, fejl }.
+   En plads er { id, ord: [...], x, y, maal: [x, y], via, dele, omr, fejl }.
+   omr er det, pladsen handler om, og bliver gult, mens der spoerges:
+   { c: [x, y, r] } en cirkel, { ring: [x, y, r] } en ring,
+   { r: [x, y, b, h], tom: true } et rektangel (tom: kun kanten).
+
+   titel: true er en plads, der sidder som titel paa et kort, uden streg.
+   par: "<id>" goer to pladser til et par for to navne paa det samme
+   (oktetreglen og aedelgasreglen): de staar side om side med "eller"
+   imellem og én faelles streg, saa man kan se, at begge raekkefoelger er
+   rigtige (brugeren 1. nov. 2026). x er parrets midte; motoren placerer boksene.
+
+   Figuren bliver afsloeret lag for lag. Det aktuelle lags dele staar
+   graa (brugerens oenske 1. nov. 2026: "man vil ikke sige at figuren er
+   der, men bare uden farver?"), og en del faar farve, naar ordet til den
+   sidder rigtigt. De senere lag er skjult (brugeren samme dag: "afsloere
+   figurene fortsat i takt med at delpunkterne klares (som foer)").
    ===================================================================== */
 var NK = window.NK || {};
 window.NK = NK;
@@ -113,10 +134,22 @@ window.NK = NK;
         this.bredde = Math.ceil(this.bredde);
         this.pladser = {};
         this.pladsListe = [];
+        /* Et par staar side om side om parrets midte, med plads til "eller" */
+        def.pladser.forEach(function (p) {
+            if (!p.par || p.parMidte !== undefined) return;
+            var q = def.pladser.filter(function (x) { return x.id === p.par; })[0];
+            p.parMidte = p.x;
+            p.x = p.parMidte - self.bredde / 2 - 22;
+            q.x = p.parMidte + self.bredde / 2 + 22;
+            q.y = p.y;
+            q.titel = true;
+            q.maal = p.maal;
+        });
         def.pladser.forEach(function (p) {
             p.lag = pladsLag[p.id];
             self.lavPlads(p);
         });
+        def.pladser.forEach(function (p) { if (p.par) self.lavPar(p, self.pladser[p.par]); });
 
         /* Alle fagord i figuren, i pladsernes raekkefoelge */
         this.alleOrd = [];
@@ -130,6 +163,23 @@ window.NK = NK;
 
         rod.querySelector(".forfraknap").addEventListener("click", function () { self.nulstil(); });
 
+        /* Kontakten til den svaere udgave staar oeverst i panelet */
+        var panel = rod.querySelector(".panel");
+        if (panel) {
+            var sv = document.createElement("label");
+            sv.className = "kort svaer";
+            sv.innerHTML = "<input type=\"checkbox\"><span class=\"svaer-kontakt\" aria-hidden=\"true\"></span>" +
+                "<span class=\"svaer-tekst\"><b>Svær udgave</b><em>Alle fagord på én gang</em></span>";
+            panel.insertBefore(sv, panel.firstChild);
+            this.svaerKontakt = sv.querySelector("input");
+            this.svaerKontakt.addEventListener("change", function () {
+                if (NK.saetSvaer) NK.saetSvaer(self.svaerKontakt.checked);
+                else self.saetAlt(self.svaerKontakt.checked);
+            });
+        }
+
+        this.alt = !!NK.svaer;
+        if (this.svaerKontakt) this.svaerKontakt.checked = this.alt;
         this.nulstil();
     }
 
@@ -146,7 +196,8 @@ window.NK = NK;
                 var g = SV.g(self.tegning, { "class": "del", "data-del": id });
                 var sp = SV.g(g, { "class": "spoeg" });
                 var fu = SV.g(g, { "class": "fuld" });
-                if (o.spoeg) o.spoeg(sp);
+                /* Spoegelset er den samme tegning uden farver (se stilarket) */
+                if (o.fuld) o.fuld(sp);
                 var refs = o.fuld ? o.fuld(fu) : null;
                 var d = { id: id, lag: o.lag || 0, auto: !!o.auto, g: g, sp: sp, fu: fu, byg: o.byg, refs: refs || {}, tilstand: "" };
                 self.dele[id] = d;
@@ -166,6 +217,15 @@ window.NK = NK;
             var A = animator(t0);
             if (d.byg) d.byg(d.fu, d.refs, A);
             else A.fade(d.fu, 0, 500);
+            /* Den graa udgave toner ud, mens farverne kommer */
+            if (d.sp.animate) {
+                d.sp.style.display = "";
+                var an = d.sp.animate([{ opacity: 0.6 }, { opacity: 0 }], { duration: 500, delay: t0 + 150, fill: "forwards" });
+                an.onfinish = function () {
+                    an.cancel();
+                    if (d.tilstand === "bygget") d.sp.style.display = "none";
+                };
+            }
         }
     };
 
@@ -176,7 +236,12 @@ window.NK = NK;
         var g = SV.g(this.pladsLag, { "class": "plads", "data-id": p.id });
         var mx = p.maal[0], my = p.maal[1];
         p.g = g;
-        p.halo = SV.el("circle", { "class": "p-halo", cx: mx, cy: my, r: p.halo || 15, fill: "rgba(242,197,61,0.28)", stroke: "#e2b021", "stroke-width": 2 }, g);
+        /* Det, pladsen handler om, bliver gult, mens der spoerges om det */
+        (p.omr || [{ c: [mx, my, 15] }]).forEach(function (o) {
+            if (o.c) SV.el("circle", { "class": "p-halo", cx: o.c[0], cy: o.c[1], r: o.c[2] }, g);
+            else if (o.ring) SV.el("circle", { "class": "p-halo ring", cx: o.ring[0], cy: o.ring[1], r: o.ring[2] }, g);
+            else if (o.r) SV.el("rect", { "class": "p-halo" + (o.tom ? " ring" : ""), x: o.r[0], y: o.r[1], width: o.r[2], height: o.r[3], rx: o.r[4] || 7 }, g);
+        });
 
         /* Stregen fra kassens kant til maalet, evt. med et knaek */
         var fra = p.via || p.maal;
@@ -185,18 +250,45 @@ window.NK = NK;
         if (!isFinite(t) || t > 1) t = 1;
         var kx = p.x + dx * t, ky = p.y + dy * t;
         var punkter = kx + "," + ky + " " + (p.via ? p.via[0] + "," + p.via[1] + " " : "") + mx + "," + my;
-        p.streg = SV.el("polyline", { "class": "p-streg", points: punkter, fill: "none", stroke: "#59636e", "stroke-width": 1.6 }, g);
-        p.prik = SV.el("circle", { "class": "p-prik", cx: mx, cy: my, r: 3.6, fill: "#3b4650" }, g);
+        if (!p.titel && !p.par) {
+            p.streg = SV.el("polyline", { "class": "p-streg", points: punkter, fill: "none", stroke: "#59636e", "stroke-width": 1.6 }, g);
+            p.prik = SV.el("circle", { "class": "p-prik", cx: mx, cy: my, r: 3.6, fill: "#3b4650" }, g);
+        }
 
         p.boks = SV.el("rect", { "class": "p-boks", x: p.x - B / 2, y: p.y - PH / 2, width: B, height: PH, rx: 8, fill: "#ffffff", stroke: "#b9c6cf" }, g);
         p.tekst = SV.tekst(g, p.x, p.y + 6.3, "", { "class": "p-tekst", "font-size": SKRIFT, "font-weight": 700 });
 
         g.addEventListener("pointerdown", function (e) { self.pladsNed(e, p); });
-        g.addEventListener("pointerenter", function (e) { if (p.laast && e.pointerType !== "touch") self.visForkl(p.boks, p.vist); });
-        g.addEventListener("pointerleave", function () { self.skjulForkl(); });
+        g.addEventListener("pointerenter", function (e) {
+            if (p.laast && e.pointerType !== "touch") self.visForkl(p.boks, p.vist);
+            /* Er et ord valgt, staar det svagt paa pladsen, man peger paa */
+            if (!p.laast && self.valgt && self.tilstand === "opgave") {
+                SV.formelInd(p.tekst, self.valgt);
+                p.g.classList.add("forslag");
+            }
+        });
+        g.addEventListener("pointerleave", function () {
+            self.skjulForkl();
+            if (p.g.classList.contains("forslag")) { p.g.classList.remove("forslag"); self.tegnPlads(p); }
+        });
 
         this.pladser[p.id] = p;
         this.pladsListe.push(p);
+    };
+
+    /* Parret: en klamme under (eller over) begge bokse, der samles i én
+       streg til maalet, og "eller" imellem boksene */
+    Bygger.prototype.lavPar = function (p, q) {
+        var B = this.bredde, mx = p.parMidte, y = p.y;
+        var op = p.maal[1] < y;
+        var kant = op ? y - PH / 2 - 3 : y + PH / 2 + 3;
+        var knaek = op ? kant - 9 : kant + 9;
+        var x1 = p.x - B / 2 + 16, x2 = q.x + B / 2 - 16;
+        p.klamme = SV.el("path", { "class": "p-streg", d: "M" + x1 + "," + kant + " L" + x1 + "," + knaek + " L" + x2 + "," + knaek + " L" + x2 + "," + kant,
+            fill: "none", stroke: "#59636e", "stroke-width": 1.6 }, p.g);
+        p.streg = SV.el("polyline", { "class": "p-streg", points: mx + "," + knaek + " " + p.maal[0] + "," + p.maal[1], fill: "none", stroke: "#59636e", "stroke-width": 1.6 }, p.g);
+        p.prik = SV.el("circle", { "class": "p-prik", cx: p.maal[0], cy: p.maal[1], r: 3.6, fill: "#3b4650" }, p.g);
+        p.eller = SV.tekst(p.g, mx, y + 5, "eller", { "class": "p-eller", "font-size": 14, "font-style": "italic", fill: "#7e8893" });
     };
 
     Bygger.prototype.tegnPlads = function (p) {
@@ -207,6 +299,7 @@ window.NK = NK;
         c.toggle("aktiv", synlig && !p.laast && !p.paa);
         c.toggle("fyldt", synlig && !p.laast && !!p.paa);
         c.toggle("hintet", this.hintPlads === p.id && !p.laast);
+        c.remove("forslag");
         SV.formelInd(p.tekst, p.laast ? p.vist : (p.paa || ""));
     };
 
@@ -218,7 +311,7 @@ window.NK = NK;
     Bygger.prototype.aktive = function () {
         var self = this;
         return this.pladsListe.filter(function (p) {
-            return p.synlig && !p.laast && (self.mester || p.lag === self.lagNr);
+            return p.synlig && !p.laast && (self.alt || p.lag === self.lagNr);
         });
     };
 
@@ -227,26 +320,36 @@ window.NK = NK;
        ================================================================= */
     Bygger.prototype.nulstil = function () {
         this.stjerner = [];
-        this.springLag(0, true);
         this.faerdig = false;
         if (NK.faneFaerdig) NK.faneFaerdig(this.id, false);
+        this.springLag(0, true);
     };
 
-    /* Gaa til et lag: lagene foer bygges straks, resten skjules */
+    /* Svaer udgave til og fra: figuren begynder forfra */
+    Bygger.prototype.saetAlt = function (alt) {
+        this.alt = !!alt;
+        if (this.svaerKontakt) this.svaerKontakt.checked = this.alt;
+        this.nulstil();
+    };
+
+    /* Gaa til et lag: lagene foer bygges straks, laget selv staar graa,
+       og resten er skjult. I den svaere udgave staar hele figuren graa. */
     Bygger.prototype.springLag = function (n, frisk) {
         var self = this, i;
+        n = this.alt ? 0 : Math.max(0, Math.min(n, this.lag.length - 1));
         this.skjulForkl();
         var gem = SV.stille;
         SV.stille = true;
         for (i = 0; i < this.deleListe.length; i++) {
             var d = this.deleListe[i];
-            this.saetDel(d, d.lag < n ? "bygget" : "skjult");
+            if (this.alt) this.saetDel(d, d.auto ? "bygget" : "spoeg");
+            else this.saetDel(d, d.lag < n ? "bygget" : (d.lag === n ? "spoeg" : "skjult"));
         }
         SV.stille = gem;
         this.pladsListe.forEach(function (p) {
             p.paa = null;
-            p.synlig = p.lag < n;
-            p.laast = p.lag < n;
+            p.synlig = !self.alt && p.lag < n;
+            p.laast = !self.alt && p.lag < n;
             if (p.laast && !p.vist) p.vist = p.ord[0];
             if (!p.laast) p.vist = null;
         });
@@ -265,17 +368,18 @@ window.NK = NK;
     Bygger.prototype.startLag = function (n) {
         var self = this;
         this.lagNr = n;
-        this.mester = n >= this.lag.length;
         this.forsoeg = 0;
         this.hjaelpBrugt = false;
         this.hintTrin = 0;
         this.hintPlads = null;
         this.valgt = null;
+        this.rod.classList.remove("har-valgt");
         this.tilstand = "opgave";
         this.besked("", "");
 
-        if (this.mester) {
-            /* Hele figuren staar der, og alle ord er taget af */
+        this.rod.classList.toggle("svaer-udgave", this.alt);
+        if (this.alt) {
+            /* Svaer udgave: alle pladser paa én gang og alle fagord i bakken */
             this.pladsListe.forEach(function (p) { p.synlig = true; p.laast = false; p.paa = null; p.vist = null; });
             this.bakke = bland(this.alleOrd);
         } else {
@@ -284,7 +388,11 @@ window.NK = NK;
             this.deleListe.forEach(function (d) {
                 if (d.lag !== n) return;
                 if (d.auto) { self.saetDel(d, "bygget", t); t += 150; }
-                else self.saetDel(d, d.sp.firstChild ? "spoeg" : "skjult");
+                else if (d.tilstand === "skjult") {
+                    /* Lagets dele kommer frem uden farver */
+                    self.saetDel(d, "spoeg");
+                    if (d.sp.animate && !SV.stille) d.sp.animate([{ opacity: 0 }, { opacity: 0.6 }], { duration: 450, delay: 100, fill: "backwards" });
+                }
             });
             var ord = [];
             lag.pladser.forEach(function (id) {
@@ -310,7 +418,10 @@ window.NK = NK;
     Bygger.prototype.placer = function (ord, p) {
         if (!p || p.laast || !p.synlig) return;
         var fra = this.hvorEr(ord);
-        if (fra === p) return;
+        /* Ordet blev sluppet paa sin egen plads. Under traekket var det skjult
+           paa pladsen, saa det tegnes igen (brugeren 2. nov. 2026: ordet
+           "forsvandt simpelthen bare" og kom foerst frem ved naeste ord) */
+        if (fra === p) { this.tegnPlads(p); return; }
         var gammel = p.paa;
         if (fra) fra.paa = null;
         var i = this.bakke.indexOf(ord);
@@ -321,18 +432,29 @@ window.NK = NK;
             if (fra) fra.paa = gammel;
             else this.bakke.push(gammel);
         }
-        this.valgt = null;
+        this.vaelg(null);
         if (this.beskedSlags === "skidt") this.besked("", "");
         this.tegnPladser();
         this.tegnBakke();
         this.tegnKnapper();
     };
 
+    /* Et klik paa et ord i bakken vaelger det (brugeren 1. nov. 2026: "en meget
+       tydelig ring om det man har klikket"): ordet faar en gul ring og loefter
+       sig, de gule pladser lyser op, og kortet siger, hvad der skal ske */
+    Bygger.prototype.vaelg = function (ord) {
+        this.valgt = ord || null;
+        this.rod.classList.toggle("har-valgt", !!this.valgt);
+        if (this.valgt) this.besked("<b>" + html(this.valgt) + "</b> er valgt. Klik på den gule plads, ordet hører til.", "valg", "Valgt");
+        else if (this.beskedSlags === "valg") this.besked("", "");
+        this.tegnBakke();
+    };
+
     Bygger.prototype.tilBakken = function (p) {
         if (!p.paa) return;
         this.bakke.push(p.paa);
         p.paa = null;
-        this.valgt = null;
+        this.vaelg(null);
         this.tegnPladser();
         this.tegnBakke();
         this.tegnKnapper();
@@ -380,11 +502,15 @@ window.NK = NK;
         function find(x, y) {
             over = null;
             overBakke = false;
-            var r, k = 10;
+            /* Pladsen tæller, til man er 30 px fra den; den naermeste vinder
+               (brugeren 1. nov. 2026: traekket var "minitræls") */
+            var r, bedst = 30;
             var aktive = self.aktive();
             for (var i = 0; i < aktive.length; i++) {
                 r = aktive[i].boks.getBoundingClientRect();
-                if (x >= r.left - k && x <= r.right + k && y >= r.top - k && y <= r.bottom + k) { over = aktive[i]; break; }
+                var ax = Math.max(r.left - x, 0, x - r.right), ay = Math.max(r.top - y, 0, y - r.bottom);
+                var afst = Math.sqrt(ax * ax + ay * ay);
+                if (afst <= bedst) { bedst = afst; over = aktive[i]; }
             }
             if (!over && bakkeEl) {
                 r = bakkeEl.getBoundingClientRect();
@@ -394,11 +520,16 @@ window.NK = NK;
             if (bakkeEl) bakkeEl.classList.toggle("over", overBakke && !!fraPlads);
         }
 
+        function ingenMarkering(ev) { ev.preventDefault(); }
+        if (window.getSelection) { try { window.getSelection().removeAllRanges(); } catch (x) { /* intet */ } }
+        document.addEventListener("selectstart", ingenMarkering);
+
         function flyt(ev) {
             if (!ord) return;
             var dx = ev.clientX - sx, dy = ev.clientY - sy;
             if (!i_luften && dx * dx + dy * dy > 36) {
                 i_luften = true;
+                document.body.classList.add("traekker");
                 spoegelse = document.createElement("div");
                 spoegelse.className = "ord traek";
                 spoegelse.textContent = ord;
@@ -415,6 +546,8 @@ window.NK = NK;
         }
 
         function op(ev) {
+            document.removeEventListener("selectstart", ingenMarkering);
+            document.body.classList.remove("traekker");
             window.removeEventListener("pointermove", flyt);
             window.removeEventListener("pointerup", op);
             window.removeEventListener("pointercancel", op);
@@ -437,8 +570,7 @@ window.NK = NK;
                 else if (fraPlads.paa) self.tilBakken(fraPlads);
                 else self.peg("Træk et fagord fra bakken hen på den gule plads, eller klik først på ordet og så på pladsen.");
             } else if (ord) {
-                self.valgt = self.valgt === ord ? null : ord;
-                self.tegnBakke();
+                self.vaelg(self.valgt === ord ? null : ord);
             }
         }
 
@@ -480,13 +612,11 @@ window.NK = NK;
             if (self.hintPlads === p.id) { self.hintPlads = null; self.hintTrin = 0; }
             p.g.classList.add("ny");
             (function (pp) { window.setTimeout(function () { pp.g.classList.remove("ny"); }, 1800); }(p));
-            if (!self.mester) {
-                (p.dele || []).forEach(function (id) {
-                    var d = self.dele[id];
-                    if (d && d.tilstand !== "bygget") { self.saetDel(d, "bygget", t0); t0 += 260; }
-                });
-                t0 += 200;
-            }
+            (p.dele || []).forEach(function (id) {
+                var d = self.dele[id];
+                if (d && d.tilstand !== "bygget") { self.saetDel(d, "bygget", t0); t0 += 260; }
+            });
+            t0 += 200;
         });
 
         /* De forkerte ryger tilbage i bakken */
@@ -532,7 +662,7 @@ window.NK = NK;
         this.hintPlads = null;
         this.tegnPladser();
         this.tegnPanel();
-        if (this.mester) {
+        if (this.sidste()) {
             this.faerdig = true;
             if (NK.faneFaerdig) NK.faneFaerdig(this.id, true);
             NK.konfetti(this.kort);
@@ -540,9 +670,15 @@ window.NK = NK;
         this.tegnKort(stjerne);
     };
 
+    /* Det sidste, der skal loeses paa fanen: det sidste lag eller hele
+       figuren i den svaere udgave */
+    Bygger.prototype.sidste = function () {
+        return this.alt || this.lagNr === this.lag.length - 1;
+    };
+
     Bygger.prototype.naeste = function () {
         if (this.tilstand !== "loest") return;
-        if (this.mester) {
+        if (this.sidste()) {
             if (NK.naesteFane) NK.naesteFane(this.id);
             return;
         }
@@ -604,30 +740,31 @@ window.NK = NK;
         var k = this.kort;
         var L = this.lag.length;
         k.classList.toggle("loest", this.tilstand === "loest");
-        k.classList.toggle("mester", this.mester && this.tilstand !== "loest");
+        k.classList.toggle("mester", this.alt && this.tilstand !== "loest");
 
         if (this.tilstand === "loest") {
             var h = "<div class=\"sk-slut\"><div class=\"sk-slut-tekst\">";
-            if (this.mester) {
-                var antal = this.stjerner.filter(Boolean).length;
-                h += "<p class=\"sk-tekst\"><span class=\"sk-chip\">Figuren er færdig</span>Alle " + talOrd(this.alleOrd.length) +
+            var antal = this.stjerner.filter(Boolean).length, mulige = this.alt ? 1 : L;
+            var stjerneLinje = "<li>Stjerner: <b>" + "★".repeat(antal) + "☆".repeat(Math.max(0, mulige - antal)) + "</b> (" + antal + " af " + mulige + ")</li>";
+            if (this.alt) {
+                h += "<p class=\"sk-tekst\"><span class=\"sk-chip\">Figuren er færdig" + (stjerne ? " ★" : "") + "</span>Alle " + talOrd(this.alleOrd.length) +
                     " fagord fra afsnit " + this.def.nr + " sidder på plads.</p>";
-                h += "<ul class=\"fl-liste\"><li>Stjerner: <b>" + "★".repeat(antal) + "☆".repeat(L + 1 - antal) + "</b> (" + antal + " af " + (L + 1) + ")</li>" +
-                    "<li>Peg på et fagord i figuren for at se forklaringen fra bogen.</li></ul>";
+                h += "<ul class=\"fl-liste\">" + stjerneLinje + "<li>Peg på et fagord i figuren for at se forklaringen fra bogen.</li></ul>";
             } else {
                 var lag = this.lag[this.lagNr];
-                h += "<p class=\"sk-tekst\"><span class=\"sk-chip\">Rigtigt" + (stjerne ? " ★" : "") + "</span>" + html(lag.ros || "Figuren har fået nye dele.") + "</p>";
+                h += "<p class=\"sk-tekst\"><span class=\"sk-chip\">" + (this.sidste() ? "Figuren er færdig" : "Rigtigt") + (stjerne ? " ★" : "") + "</span>" +
+                    html(lag.ros || "Figuren har fået nye dele.") + "</p>";
                 h += "<ul class=\"fl-liste\">";
                 lag.pladser.forEach(function (id) {
                     var p = self.pladser[id];
                     h += "<li><b>" + html(p.vist) + "</b>" + html(NK.foersteSaetning(NK.FORKLARING[p.vist] || "")) + "</li>";
                 });
+                if (this.sidste() && L > 1) h += stjerneLinje;
                 h += "</ul>";
             }
             var knapTekst;
-            if (this.mester) knapTekst = NK.naesteFaneNavn ? NK.naesteFaneNavn(this.id) : "Videre";
-            else if (this.lagNr + 1 < L) knapTekst = "Næste lag →";
-            else knapTekst = "Mesterprøven →";
+            if (this.sidste()) knapTekst = NK.naesteFaneNavn ? NK.naesteFaneNavn(this.id) : "Videre";
+            else knapTekst = "Næste lag →";
             h += "</div><button class=\"sk-videre\" type=\"button\">" + html(knapTekst) + "</button></div>";
             k.innerHTML = h;
             k.querySelector(".sk-videre").addEventListener("click", function () { self.naeste(); });
@@ -635,13 +772,13 @@ window.NK = NK;
         }
 
         var chip, tekst;
-        if (this.mester) {
-            chip = "Mesterprøven";
-            tekst = "Figuren er færdig, men fagordene er taget af. Sæt alle " + talOrd(this.alleOrd.length) + " på plads igen.";
+        if (this.alt) {
+            chip = "Svær udgave";
+            tekst = "Sæt alle " + talOrd(this.alleOrd.length) + " fagord på figuren på én gang.";
         } else {
             var l = this.lag[this.lagNr];
             chip = "Lag " + (this.lagNr + 1) + " af " + L;
-            if (this.lagNr === 0) tekst = "Træk hvert fagord hen på den gule plads, det hører til. Når ordet sidder rigtigt, bliver den del af figuren bygget.";
+            if (this.lagNr === 0) tekst = "Træk hvert fagord hen på den gule plads, det hører til, eller klik på ordet og så på pladsen. Når ordet sidder rigtigt, bliver den del af figuren bygget.";
             else tekst = "Træk fagordene hen på de gule pladser i figuren.";
             if (l.ekstra && l.ekstra.length) tekst += (l.ekstra.length === 1 ? " Ét fagord er i overskud." : " " + talOrd(l.ekstra.length, true) + " fagord er i overskud.");
         }
@@ -670,6 +807,7 @@ window.NK = NK;
             b.appendChild(tom);
             return;
         }
+        b.classList.toggle("mange", this.bakke.length > 10);
         this.bakke.forEach(function (o) {
             var k = document.createElement("button");
             k.type = "button";
@@ -749,15 +887,16 @@ window.NK = NK;
         var self = this;
         var L = this.lag.length;
         this.lagListe.innerHTML = "";
-        for (var i = 0; i <= L; i++) {
-            var mester = i === L;
+        /* I den svaere udgave er der kun én linje: hele figuren */
+        var linjer = this.alt ? 1 : L;
+        for (var i = 0; i < linjer; i++) {
             var b = document.createElement("button");
             b.type = "button";
-            var loest = mester ? this.faerdig || (this.mester && this.tilstand === "loest") : (i < this.lagNr || (i === this.lagNr && this.tilstand === "loest"));
-            b.className = "laglinje" + (i === this.lagNr ? " valgt" : "") + (loest ? " loest" : "") + (mester ? " mester" : "");
-            var navn = mester ? "Mesterprøven" : this.lag[i].navn;
-            var under = mester ? "alle " + this.alleOrd.length + " fagord" : this.lag[i].pladser.length + " fagord";
-            b.innerHTML = "<span class=\"l-nr\">" + (mester ? "★" : (loest ? "✓" : (i + 1))) + "</span>" +
+            var loest = this.alt ? this.tilstand === "loest" : (i < this.lagNr || (i === this.lagNr && this.tilstand === "loest"));
+            b.className = "laglinje" + (i === this.lagNr ? " valgt" : "") + (loest ? " loest" : "") + (this.alt ? " mester" : "");
+            var navn = this.alt ? "Alle fagord på én gang" : this.lag[i].navn;
+            var under = (this.alt ? this.alleOrd.length : this.lag[i].pladser.length) + " fagord";
+            b.innerHTML = "<span class=\"l-nr\">" + (loest ? "✓" : (this.alt ? "★" : (i + 1))) + "</span>" +
                 "<span class=\"l-navn\">" + html(navn) + "<em>" + html(under) + "</em></span>" +
                 "<span class=\"l-stjerne\">" + (this.stjerner[i] ? "★" : "") + "</span>";
             (function (n) { b.addEventListener("click", function () { self.springLag(n); }); }(i));
