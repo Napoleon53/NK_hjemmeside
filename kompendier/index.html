@@ -270,7 +270,7 @@
   <div>
     <section class="gruppe">
       <h2>Fagligt fokus</h2>
-      <p class="hjaelp">Vælg et eller flere kapitler. Til hvert afsnit kan du vælge sider til noter med overskrifterne fra bogen og slides og en mængde opgaver. Har afsnittet ekstra noter, kan du vælge dem i stedet for de korte: de har mere plads og flere hjælpebokse, fx til elever, der har brug for mere støtte, eller til meget gruppearbejde.</p>
+      <p class="hjaelp">Vælg et eller flere kapitler. Til hvert afsnit kan du vælge sider til noter med overskrifterne fra bogen og slides og en mængde opgaver. Har afsnittet ekstra noter, kan du vælge dem i stedet for de korte: de har mere plads og flere hjælpebokse, fx til elever, der har brug for mere støtte, eller til meget gruppearbejde. Afsnit 1.4 og 2.4 har en læseøvelse, som du kan vælge i stedet for noterne, når afsnittet bruges til faglig læsning.</p>
       <div class="raekker" id="kapitler"></div>
     </section>
 
@@ -355,13 +355,15 @@
 <script src="pdf-lib.min.js"></script>
 <script src="data/kapitler.js?v=20261029"></script>
 <script src="data/opgavekort.js?v=20261031"></script>
-<script src="saml.js?v=20261030b"></script>
+<script src="saml.js?v=20261101a"></script>
 <script>
 (function () {
   'use strict';
 
   var GEMT = 'kemibogen-kompendier';
   var NIVEAUNAVNE = { ingen: 'Ingen', lav: 'Få', mellem: 'Mellem', mange: 'Mange' };
+  // Står under afsnittets navn, når læseøvelsen er valgt i stedet for noterne.
+  var LAESEOEVELSE = 'Eleverne læser afsnittet i bogen med læsekortet, forklarer fagordene og svarer på afsnittets fokusspørgsmål.';
   var kapitler = window.KOMPENDIER;
   var $ = function (id) { return document.getElementById(id); };
 
@@ -435,6 +437,10 @@
             va.med = ga.med !== false;
             va.noter = ga.noter !== false;
             va.ekstra = !!a.ekstra && ga.ekstra === true;
+            // Læseøvelsen var en øvelse til 1. nov. 2026. Var den krydset af dengang, bliver den nu valgt i stedet
+            // for noterne.
+            var laes = Kompendium.laesning(kapitler[nr], a);
+            va.laesning = !!laes && ('laesning' in ga ? ga.laesning === true : !!(g.oevelser && g.oevelser[laes]));
             if (ga.opgaver === 'ingen' || a.opgaver[ga.opgaver]) va.opgaver = ga.opgaver;
           });
           // Custom-opgaverne kommer med, så længe kortene findes (opgaver, der er fjernet fra bogen, springes over).
@@ -445,7 +451,7 @@
               v.kapitler[nr].custom[a.nr] = (g.custom[a.nr] || []).filter(function (o) { return Kompendium.kortet(ok, o); });
             });
           }
-          kapitler[nr].oevelser.forEach(function (id) { if (g.oevelser && id in g.oevelser) v.kapitler[nr].oevelser[id] = !!g.oevelser[id]; });
+          Kompendium.oevelsesliste(kapitler[nr]).forEach(function (id) { if (g.oevelser && id in g.oevelser) v.kapitler[nr].oevelser[id] = !!g.oevelser[id]; });
           Object.keys(kapitler[nr].udgaver || {}).forEach(function (id) { if (g.udgaver && g.udgaver[id] === 'aaben') v.kapitler[nr].udgaver[id] = 'aaben'; });
         });
       }
@@ -479,15 +485,20 @@
           return '<label><input type="radio" name="opgaver-' + a.nr + '" value="' + n + '"' + (va.opgaver === n ? ' checked' : '') + '>' +
             '<span><b>' + NIVEAUNAVNE[n] + '</b>' + (d ? '<small>' + d.opgaver + ' opgaver</small><small>' + sider(d.sider) + '</small>' : '<small>0 sider</small>') + '</span></label>';
         }).join('');
-        // Har afsnittet ekstra noter, vælges noterne på tre knapper: ingen, korte eller ekstra.
-        var noter = !a.ekstra ?
+        // Har afsnittet ekstra noter, vælges noterne på tre knapper: ingen, korte eller ekstra. Har det en
+        // læseøvelse (1.4 og 2.4), er knapperne ingen, noter eller læseøvelse, og noterne er valgt fra start.
+        var laes = Kompendium.laesning(data, a);
+        var muligheder = [['ingen', 'Ingen', 0], ['korte', a.ekstra ? 'Korte' : 'Noter', del(nr, a.noter).sider]];
+        if (a.ekstra) muligheder.push(['ekstra', 'Ekstra', del(nr, a.ekstra).sider]);
+        if (laes) muligheder.push(['laesning', 'Læseøvelse', del(nr, laes).sider]);
+        var noteknap = !va.noter ? 'ingen' : laes && va.laesning ? 'laesning' : a.ekstra && va.ekstra ? 'ekstra' : 'korte';
+        var noter = muligheder.length < 3 ?
           '<label class="valgknap"><input type="checkbox" id="noter-' + a.nr + '"' + (va.noter ? ' checked' : '') + '>' +
           '<span><b>Noter</b><small>' + sider(del(nr, a.noter).sider) + '</small></span></label>' :
           '<div class="valggruppe noter"><span id="notenavn-' + a.nr + '">Noter</span>' +
-          '<div class="trin tre" role="radiogroup" aria-labelledby="notenavn-' + a.nr + '">' +
-          [['ingen', 'Ingen', 0], ['korte', 'Korte', del(nr, a.noter).sider], ['ekstra', 'Ekstra', del(nr, a.ekstra).sider]].map(function (k) {
-            var valgt = k[0] === (!va.noter ? 'ingen' : va.ekstra ? 'ekstra' : 'korte');
-            return '<label><input type="radio" name="noter-' + a.nr + '" value="' + k[0] + '"' + (valgt ? ' checked' : '') + '>' +
+          '<div class="trin' + (muligheder.length === 3 ? ' tre' : '') + '" role="radiogroup" aria-labelledby="notenavn-' + a.nr + '">' +
+          muligheder.map(function (k) {
+            return '<label><input type="radio" name="noter-' + a.nr + '" value="' + k[0] + '"' + (k[0] === noteknap ? ' checked' : '') + '>' +
               '<span><b>' + k[1] + '</b><small>' + sider(k[2]) + '</small></span></label>';
           }).join('') + '</div></div>';
         // I custom står lærerens egne opgaver i stedet for de fire mængder.
@@ -519,9 +530,10 @@
   // Øvelserne og bilagene afhænger af, hvilke kapitler der er valgt.
   function bygResten() {
     var med = valgte();
-    var oevelser = med.filter(function (nr) { return kapitler[nr].oevelser.length; }).map(function (nr) {
+    // Læseøvelserne står ved afsnittenes noter og ikke her.
+    var oevelser = med.filter(function (nr) { return Kompendium.oevelsesliste(kapitler[nr]).length; }).map(function (nr) {
       return (med.length > 1 ? '<div class="underhoved">Kapitel ' + nr + '</div>' : '') +
-        kapitler[nr].oevelser.map(function (id) {
+        Kompendium.oevelsesliste(kapitler[nr]).map(function (id) {
           // Har øvelsen to udgaver, vælges udgaven på to knapper under navnet, og sidetallet følger valget.
           var u = (kapitler[nr].udgaver || {})[id], valgt = del(nr, Kompendium.oevelsesdel(kapitler[nr], valg.kapitler[nr], id));
           var knapper = !u ? '' : '<div class="udgaver"><span id="udgavenavn-' + id + '">Udgave</span>' +
@@ -592,8 +604,11 @@
       if (sum && v.custom) sum.textContent = customIAlt(nr);
       kapitler[nr].afsnit.forEach(function (a) {
         document.querySelector('[data-afsnit="' + a.nr + '"]').classList.toggle('slukket', !v.afsnit[a.nr].med);
-        // Overskrifterne under afsnittets navn er dem fra de noter, der er valgt.
-        $('overskrifter-' + a.nr).textContent = del(nr, Kompendium.noterdel(a, v.afsnit[a.nr])).overskrifter.join(' · ');
+        // Overskrifterne under afsnittets navn er dem fra de noter, der er valgt. Er læseøvelsen valgt, står der,
+        // hvad eleverne gør.
+        var noteid = Kompendium.noterdel(a, v.afsnit[a.nr], kapitler[nr]);
+        $('overskrifter-' + a.nr).textContent = noteid === Kompendium.laesning(kapitler[nr], a) ? LAESEOEVELSE :
+          del(nr, noteid).overskrifter.join(' · ');
       });
     });
     // Et nyt valg gør den PDF, der lige er lavet, forældet.
@@ -621,11 +636,13 @@
       valg.kapitler[nr].afsnit[navn].med = true;
       $('afsnit-' + navn).checked = true;
     } else if (el.type === 'radio' && el.name.indexOf('noter-') === 0) {
-      // Ingen, korte eller ekstra noter. Vælger man noter i et afsnit, der er slået fra, kommer afsnittet med.
+      // Ingen, korte eller ekstra noter eller læseøvelsen. Vælger man noter i et afsnit, der er slået fra, kommer
+      // afsnittet med.
       navn = el.name.slice(6);
       nr = kapitelAf(navn);
       valg.kapitler[nr].afsnit[navn].noter = el.value !== 'ingen';
       valg.kapitler[nr].afsnit[navn].ekstra = el.value === 'ekstra';
+      valg.kapitler[nr].afsnit[navn].laesning = el.value === 'laesning';
       if (el.value !== 'ingen') {
         valg.kapitler[nr].afsnit[navn].med = true;
         $('afsnit-' + navn).checked = true;
@@ -706,6 +723,7 @@
         if (!a.ekstra) return;
         ve.afsnit[a.nr].ekstra = tilEkstra;
         if (tilEkstra) {
+          ve.afsnit[a.nr].laesning = false;
           ve.afsnit[a.nr].noter = true;
           ve.afsnit[a.nr].med = true;
         }

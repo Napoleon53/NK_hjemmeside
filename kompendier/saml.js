@@ -43,7 +43,7 @@
   }
   function kapitelvalg(data) {
     var v = { med: false, afsnit: {}, oevelser: {}, udgaver: {} };
-    data.afsnit.forEach(function (a) { v.afsnit[a.nr] = { med: true, noter: true, ekstra: false, opgaver: standardmaengde(a) }; });
+    data.afsnit.forEach(function (a) { v.afsnit[a.nr] = { med: true, noter: true, ekstra: false, laesning: false, opgaver: standardmaengde(a) }; });
     data.oevelser.forEach(function (id) { v.oevelser[id] = false; });
     return v;
   }
@@ -54,8 +54,23 @@
     return u && v.udgaver && v.udgaver[id] === 'aaben' ? u.aaben : id;
   }
 
+  // Et afsnit kan have en læseøvelse (oevelse-1.4-laesning og oevelse-2.4-laesning): eleverne læser afsnittet i
+  // bogen med læsekortet. Læreren kan vælge den i stedet for noterne (Niels 1. nov. 2026), så den står ved
+  // afsnittets noter på siden og ikke blandt øvelserne. Den er stadig en del, hvis navn begynder med oevelse-.
+  function laesning(data, a) {
+    var id = 'oevelse-' + a.nr + '-laesning';
+    return data.oevelser.indexOf(id) >= 0 ? id : null;
+  }
+  // Kapitlets øvelser uden læseøvelserne.
+  function oevelsesliste(data) {
+    var laes = data.afsnit.map(function (a) { return laesning(data, a); });
+    return data.oevelser.filter(function (id) { return laes.indexOf(id) < 0; });
+  }
+
   // Et afsnit kan have ekstra noter (mere plads og flere hjælpebokse). Læreren vælger dem i stedet for de korte.
-  function noterdel(a, av) {
+  // Har afsnittet en læseøvelse, og er den valgt, står den i stedet for noterne.
+  function noterdel(a, av, data) {
+    if (av && av.laesning && data && laesning(data, a)) return laesning(data, a);
     return av && av.ekstra && a.ekstra ? a.ekstra : a.noter;
   }
 
@@ -254,23 +269,16 @@
           if (!valg.forside) kapitellinje.side = side;
         }
       }
-      // Den faglige læsning til et afsnit (fx oevelse-1.4-laesning) står først i afsnittet, når afsnittet er med
-      // (Niels 30. okt. 2026); ellers står den med de andre øvelser bagest i kapitlet.
-      var lagt = {};
+      // En valgt læseøvelse står, hvor afsnittets noter ellers ville stå (noterdel).
       data.afsnit.forEach(function (a) {
         var av = v.afsnit[a.nr];
         if (!av || !av.med) return;
-        var laesning = 'oevelse-' + a.nr + '-laesning';
-        if (v.oevelser[laesning] && data.oevelser.indexOf(laesning) >= 0) {
-          delpost(nr, oevelsesdel(data, v, laesning));
-          lagt[laesning] = true;
-        }
-        if (av.noter !== false) delpost(nr, noterdel(a, av));
+        if (av.noter !== false) delpost(nr, noterdel(a, av, data));
         if (v.custom && data.opgavekort) {
           if ((v.custom[a.nr] || []).length) custompost(nr, a.nr, v.custom[a.nr]);
         } else if (a.opgaver[av.opgaver]) delpost(nr, a.opgaver[av.opgaver]);
       });
-      data.oevelser.forEach(function (id) { if (v.oevelser[id] && !lagt[id]) delpost(nr, oevelsesdel(data, v, id)); });
+      oevelsesliste(data).forEach(function (id) { if (v.oevelser[id]) delpost(nr, oevelsesdel(data, v, id)); });
       // Med flere kapitler får hvert kapitel sin egen linje i indholdet.
       if (med.length > 1 && side > foerste && side > kapitellinje.side) linjer.splice(plads, 0, kapitellinje);
     });
@@ -530,7 +538,7 @@
   }
 
   var Kompendium = { NIVEAUER: NIVEAUER, numre: numre, niveau: niveau, kapitelvalg: kapitelvalg, standardvalg: standardvalg,
-    oevelsesdel: oevelsesdel, noterdel: noterdel,
+    oevelsesdel: oevelsesdel, noterdel: noterdel, laesning: laesning, oevelsesliste: oevelsesliste,
     tilknyt: tilknyt, kortet: kortet, kortafsnit: kortafsnit, customStart: customStart, pak: pak,
     bilagene: bilagene, bilagMed: bilagMed, plan: plan, navn: navn, saml: saml };
   if (typeof module !== 'undefined' && module.exports) module.exports = Kompendium;
