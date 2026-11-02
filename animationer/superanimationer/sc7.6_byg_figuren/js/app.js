@@ -47,16 +47,24 @@
         }
     };
 
-    NK.naesteFaneNavn = function (id) {
+    /* Fanen efter den aktuelle. Efter den sidste fane: den foerste fane, der
+       ikke er bygget endnu, eller ingen. Knappen paa kortet maa aldrig bygge
+       forfra, for man trykker paa den i forventning om en ny opgave
+       (brugeren 2. nov. 2026); forfra-knappen staar i panelet. */
+    function naesteFaneEfter(id) {
         var i = faner.map(function (f) { return f.id; }).indexOf(id);
-        if (i + 1 < faner.length) return "Næste figur: " + faner[i + 1].nr + " →";
-        return "Byg figuren igen ↺";
+        if (i + 1 < faner.length) return faner[i + 1];
+        return faner.filter(function (f) { return f.id !== id && !byggere[f.id].faerdig; })[0] || null;
+    }
+
+    NK.naesteFaneNavn = function (id) {
+        var f = naesteFaneEfter(id);
+        return f ? "Næste figur: " + f.nr + " →" : null;
     };
 
     NK.naesteFane = function (id) {
-        var i = faner.map(function (f) { return f.id; }).indexOf(id);
-        if (i + 1 < faner.length) visFane(faner[i + 1].id);
-        else byggere[id].nulstil();
+        var f = naesteFaneEfter(id);
+        if (f) visFane(f.id);
     };
 
     function tastatur(e) {

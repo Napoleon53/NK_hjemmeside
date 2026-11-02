@@ -58,6 +58,12 @@ som en superanimation".
   hint.
 - Når det sidste lag er løst, er figuren færdig: konfetti, en stjerne på fanen, og
   næste fane kalder.
+- Knappen på det grønne kort fører altid til en ny opgave (Næste lag, Næste figur)
+  og bygger aldrig forfra (2. nov. 2026): "man kommer til at trykke der i
+  forventningen om en ny opgave". Efter den sidste fane peger den på den første
+  figur, der ikke er bygget; er alle bygget, er der ingen knap, kun linjen "Alle
+  figurerne til kapitel N er bygget" og et vink om Svær udgave. Byg forfra står
+  kun i panelet.
 - **Svær udgave** (kontakten øverst i panelet, 2. nov. 2026): alle fagord på én gang.
   Hele figuren står uden farver fra start, og en del får farve, når ordet sidder.
   Kontakten gælder alle faner, og figurerne begynder forfra, når den slås til eller
@@ -154,7 +160,7 @@ gennem to runder rettelser. Følg dem, også når et nyt kapitel frister til and
   er et par: `par: "<andet id>"` på den første plads, og `x` er parrets midte.
   Motoren sætter boksene side om side med "eller" imellem og én fælles klamme og
   streg til noget eget (mærket med 8, skålen med salt). Brugeren 1. nov. 2026: man
-  skal kunne fornemme, "at begge løsninger er accepteret".
+  skal kunne fornemme, "at begge løsninger er accepteret". Kun ægte synonymer er et par: ord, der kun betyder det samme i et særtilfælde (cis-form og Z på but-2-en), får hver sin figur (brugeren 2. nov. 2026: "cis og trans bliver lidt præsenteret som synonymer for Z og E.. men det er jo ikke tilfældet").
 - Mange ting af samme slags (ionerne i 2.2) får hvert sit kort med et navneskilt
   under (`titel: true` med skiltet på kortets underkant). Kortet skal være højt nok
   til, at skiltet ikke dækker formlen.
@@ -184,6 +190,11 @@ gennem to runder rettelser. Følg dem, også når et nyt kapitel frister til and
   bevæger sig, når laget er bygget.
 - Hold figuren enkel og som i bogen: ingen buede pile, ingen ting, der kun er der for
   at have noget at pege på.
+- Tegn kun det, en plads bruger (brugeren 2. nov. 2026 om B2.1: "For mange figurer som man
+  ikke bruger"). To pladser må ikke pege på ting, der ligner hinanden, eller ligge så tæt,
+  at det bliver et gæt. Et overbegreb er en ramme om sine dele (ligevægtsloven om
+  Y = brøk = K), og en regel med et navn er titel på en boks med reglen (Le Chateliers
+  princip).
 - Alle pladser er lige brede (bredden måles efter det længste ord), så der skal være
   plads til dem; skriften er bredere på Linux end på Windows.
 
@@ -198,7 +209,7 @@ gennem to runder rettelser. Følg dem, også når et nyt kapitel frister til and
 
 **Filerne til et nyt kapitel**
 
-Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13), 6 (sc6.4), 7 (sc7.6) og 8 (sc8.7), og i B-bogen B1 (sb1.5, eget panel `kemi-b-filer/samling_b_bygfiguren.html` i B-panelets fane "byg", grafer og energiprofiler i `js/kurver.js`). Et kapitel med
+Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13), 6 (sc6.4), 7 (sc7.6) og 8 (sc8.7), og i B-bogen B1 (sb1.5, eget panel `kemi-b-filer/samling_b_bygfiguren.html` i B-panelets fane "byg", grafer og energiprofiler i `js/kurver.js`), B2 (sb2.9, fanerne B2.1, B2.2, B2.4 og B2.7 med numrene i `NK.AFSNIT`, som selvtesten læser) B3 (sb3.5, strukturformler i `js/org.js`) og B4 (sb4.10, syv faner; sb4.4 til sb4.9 var optaget). Et kapitel med
 mange formler kan have sin egen tegnehjælp (`js/org.js` i sc4.9). En ny mappe `scN.x_byg_figuren`
 (eller `sbN.x_...`) som kopi af denne, nummeret efter kapitlets menu. `svg.js`,
 `motor.js`, `ps.js`, `app.js` og stilarket kan tages, som de er. Ret `js/data.js`
@@ -239,5 +250,5 @@ pladsen igen). Selvtesten tjekker det nu.
 ## Ikke lavet
 
 - Udskrift af figuren som noteark (tom og med facit).
-- B-bogens kapitel B2 til B8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
+- B-bogens kapitel B5 til B8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
 - Den svære udgave kan ikke vælges med et link.

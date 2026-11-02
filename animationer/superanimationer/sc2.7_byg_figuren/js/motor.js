@@ -762,12 +762,21 @@ window.NK = NK;
                 if (this.sidste() && L > 1) h += stjerneLinje;
                 h += "</ul>";
             }
-            var knapTekst;
-            if (this.sidste()) knapTekst = NK.naesteFaneNavn ? NK.naesteFaneNavn(this.id) : "Videre";
-            else knapTekst = "Næste lag →";
-            h += "</div><button class=\"sk-videre\" type=\"button\">" + html(knapTekst) + "</button></div>";
+            /* Efter den sidste figur er der ingen knap her: en knap, der
+               byggede forfra, blev trykket paa i forventning om en ny opgave */
+            var knapTekst = null;
+            if (!this.sidste()) knapTekst = "Næste lag →";
+            else if (NK.naesteFaneNavn) knapTekst = NK.naesteFaneNavn(this.id);
+            if (!knapTekst) {
+                h += "<p class=\"sk-alle\">Alle figurerne til kapitel " + html(NK.KAPITEL) + " er bygget." +
+                    (this.alt ? "" : " Slå <b>Svær udgave</b> til i panelet for at sætte alle fagord på én gang.") + "</p>";
+            }
+            h += "</div>";
+            if (knapTekst) h += "<button class=\"sk-videre\" type=\"button\">" + html(knapTekst) + "</button>";
+            h += "</div>";
             k.innerHTML = h;
-            k.querySelector(".sk-videre").addEventListener("click", function () { self.naeste(); });
+            var vk = k.querySelector(".sk-videre");
+            if (vk) vk.addEventListener("click", function () { self.naeste(); });
             return;
         }
 

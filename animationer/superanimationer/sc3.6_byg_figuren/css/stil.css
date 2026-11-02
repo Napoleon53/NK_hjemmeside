@@ -518,6 +518,9 @@ body.traekker, body.traekker * { cursor: grabbing !important; }
 .fl-liste { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
 .fl-liste li { font-size: 0.92rem; line-height: 1.32; color: #d9efe2; }
 .fl-liste li b { color: #9af0c0; margin-right: 6px; }
+/* Efter den sidste figur: ingen knap, kun denne linje */
+.sk-alle { margin: 8px 0 0; font-size: 0.92rem; line-height: 1.32; color: #ffffff; }
+.sk-alle b { color: #f2c53d; }
 
 .sk-videre {
     flex: 0 0 auto;
