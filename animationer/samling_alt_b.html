@@ -492,6 +492,7 @@
             <button class="tab-btn" data-beskrivelse="Regn med syrekonstanten Ks og pKs, og træn at omregne mellem dem." onclick="visKategori(this, 'kemi-b-filer/samling_b3.html')" title="B6: Syre/Base"><span class="btn-num">B6</span><span class="btn-text">Syre/Base</span></button>
             <button class="tab-btn" data-beskrivelse="Se hvordan glucose og fructose lukker ring og danner alfa- og beta-anomerer." onclick="visKategori(this, 'kemi-b-filer/samling_b7.html')" title="B7: Fødevarer"><span class="btn-num">B7</span><span class="btn-text">Fødevarer</span></button>
             <button class="tab-btn" data-beskrivelse="Tyndtlagschromatografi (TLC): hvorfor stofferne løber forskelligt, Rf-værdien, og hvordan man læser en TLC-plade." onclick="visKategori(this, 'kemi-b-filer/samling_b8.html')" title="B8: Medicin"><span class="btn-num">B8</span><span class="btn-text">Medicin</span></button>
+            <button class="tab-btn" data-beskrivelse="Sæt fagordene fra kapitlerne på figurer som i bogen, lag for lag eller alle på én gang." onclick="visKategori(this, 'kemi-b-filer/samling_b_bygfiguren.html')" title="Byg figuren: fagord på figurer"><span class="btn-num">byg</span><span class="btn-text">Byg figuren</span></button>
 
             <button class="skift-btn" id="skiftKnap" data-href="samling_alt.html"><span class="skift-tekst">Skift til kemi C</span><span class="skift-besked">Hold nede i 1 sekund</span><span class="skift-fyld"></span></button>
             <button class="tab-btn feedback-btn" data-beskrivelse="Alle animationerne bliver løbende forbedret, og al feedback du sender bliver læst og forsøgt implementeret." onclick="visFeedback()" title="Giv feedback (rettelser eller forslag)"><span class="btn-num">✎</span><span class="btn-text">Feedback</span></button>
@@ -592,6 +593,8 @@
         window.onresize = checkScreenSize;
 
         function findSideFraEmne(emne) {
+            // Byg figuren har sit eget panel som i kemi C (1. nov. 2026); koderne er b1.byg, b2.byg ...
+            if (/\.byg$/i.test(emne)) return 'kemi-b-filer/samling_b_bygfiguren.html';
             if (/^b1/i.test(emne)) return 'kemi-b-filer/samling_b1.html';
             if (/^b2/i.test(emne)) return 'kemi-b-filer/samling_b2.html';
             if (/^b3/i.test(emne)) return 'kemi-b-filer/samling_b3.html';
@@ -718,6 +721,9 @@
             ]},
             { navn: 'B8: Medicin', animationer: [
                 { nr: 1, navn: 'TLC' }
+            ]},
+            { navn: 'Byg figuren', animationer: [
+                { nr: 'B1', navn: 'Kinetik' }
             ]},
             { navn: 'Generelt (ikke et bestemt kapitel)', animationer: [] }
         ];

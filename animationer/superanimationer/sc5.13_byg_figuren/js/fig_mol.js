@@ -12,6 +12,11 @@
    der er den samme for alle fire.
    Tegnet om 1. nov. 2026 (brugeren: "i 5.3 synes jeg mol er skitseret
    på en uheldig måde.. Tegningerne i hele 5.3 er generelt lidt grimme").
+   Samme dag: ét mol vand står i et 25 mL måleglas med en lille mærkat
+   (brugeren: "Måske bør du også bruge 25 mL måleglas til at vise et mol
+   vand"), også på mol-kortet, og masse er en plads ved vægtenes display
+   ("Kan du ikke også tilføje masse til 5.3... så kan du bare pege på
+   vægten").
    ===================================================================== */
 (function () {
     "use strict";
@@ -25,8 +30,15 @@
     var KX = [40, 360, 680], KY = 46, KB = 280, KH = 180;  /* de tre kort med antal */
     var TY = KY + 166;                                    /* "… stykker" */
     var PX = [318, 512, 706, 895];                        /* de fire portioner */
-    var VTOP = 332, S = 1.2;                              /* vægtskålenes overkant og skala */
-    var RM = 462, RN = 516;                               /* rækkerne */
+    var VTOP = 344, S = 1.2;                              /* vægtskålenes overkant og skala */
+    var RM = 472, RN = 526;                               /* rækkerne */
+    var VB = [120, 120, 120, 140];                        /* vægtenes bredde i bogens mål */
+
+    /* Vægtens display som i LAB.vaegtBog, regnet om til figurens mål */
+    function display(i) {
+        var cx = PX[i], b = VB[i], db = b < 140 ? 70 : 78, dx = cx - db / 2 - (b >= 110 ? 8 : 0);
+        return { x: cx + (dx - cx) * S, y: VTOP + 14 * S, b: db * S, h: 20 * S, bx: dx, db: db };
+    }
     var RX = 210, RB = 760;                               /* rækkernes venstre kant og bredde */
 
     /* Et æg: smallest foroven. Tegnes om (0, 0) og drejes rot grader */
@@ -110,27 +122,35 @@
     }
 
     NK.FIGURER.mol = {
-        vb: [1000, 552],
+        vb: [1000, 562],
         lag: [
-            { navn: "Ét mol af fire stoffer", pladser: ["mol", "molarmasse", "stofmængde"],
-              ros: "Et mol er 6,02 · 10²³ stykker. Ét mol af hvert stof er lige mange formelenheder, men de vejer ikke det samme." }
+            { navn: "Ét mol af fire stoffer", pladser: ["mol", "masse", "molarmasse", "stofmængde"],
+              ros: "Et mol er 6,02 · 10²³ stykker. Ét mol af hvert stof er lige mange formelenheder, men massen er forskellig." }
         ],
         pladser: [
             { id: "mol", ord: ["mol"], x: KX[2] + KB / 2, y: KY, maal: [KX[2] + KB / 2, KY], titel: true, dele: ["molkort"],
               omr: [{ r: [KX[2] - 5, KY - 5, KB + 10, KH + 10, 16] }],
               fejl: { "stofmængde": "<b>stofmængde</b> er antallet af mol. Kortet spørger om ordet for 6,02 · 10²³ stykker, ligesom par og dusin.",
-                      molarmasse: "<b>molarmasse</b> er massen af ét mol i g/mol. Kortet spørger om ordet for et antal, ligesom par og dusin." } },
+                      molarmasse: "<b>molarmasse</b> er massen af ét mol i g/mol. Kortet spørger om ordet for et antal, ligesom par og dusin.",
+                      masse: "<b>masse</b> er, hvor meget noget vejer. Kortet spørger om ordet for et antal, ligesom par og dusin." } },
+            { id: "masse", ord: ["masse"], x: 112, y: VTOP + 24 * S, maal: [display(0).x - 7, VTOP + 24 * S], dele: ["visning"],
+              omr: [0, 1, 2, 3].map(function (i) { var d = display(i); return { r: [d.x - 3, d.y - 3, d.b + 6, d.h + 6, 5] }; }),
+              fejl: { mol: "<b>mol</b> er et antal. Pladsen peger på tallene i gram på vægtenes display.",
+                      molarmasse: "<b>molarmasse</b> måles i g/mol. Vægtenes display viser gram.",
+                      "stofmængde": "<b>stofmængde</b> måles i mol. Vægtenes display viser, hvor mange gram portionen vejer." } },
             { id: "molarmasse", ord: ["molarmasse"], x: 112, y: RM, maal: [RX - 2, RM], dele: ["mrk"], omr: [raekke("m", RM)],
               fejl: { "stofmængde": "<b>stofmængde</b> måles i mol. Rækken her har tal i g/mol, og de er forskellige for de fire stoffer.",
-                      mol: "<b>mol</b> er et antal. Rækken her viser, hvor mange gram ét mol af hvert stof vejer." } },
+                      mol: "<b>mol</b> er et antal. Rækken her viser, hvor mange gram ét mol af hvert stof vejer.",
+                      masse: "<b>masse</b> måles i gram og står på vægtene. Rækken her har tal i g/mol." } },
             { id: "stofmængde", ord: ["stofmængde"], x: 112, y: RN, maal: [RX - 2, RN], dele: ["nrk"], omr: [raekke("n", RN)],
               fejl: { molarmasse: "<b>molarmasse</b> måles i g/mol. Rækken her har tallet 1,00 mol under alle fire stoffer.",
-                      mol: "<b>mol</b> er enheden. Rækken spørger om størrelsen n, der måles i mol, ligesom masse måles i gram." } }
+                      mol: "<b>mol</b> er enheden. Rækken spørger om størrelsen n, der måles i mol, ligesom masse måles i gram.",
+                      masse: "<b>masse</b> måles i gram og står på vægtene. Rækken her har tal i mol." } }
         ],
 
         tegn: function (api) {
             LAB.gradienter();
-            var B = ORG.bredde(["mol", "molarmasse", "stofmængde"]);
+            var B = ORG.bredde(["mol", "masse", "molarmasse", "stofmængde"]);
 
             /* ----- Par og dusin står der fra start ------------------------------ */
             api.del("antal", {
@@ -159,10 +179,10 @@
                 fuld: function (g) {
                     var c2 = KX[2] + KB / 2;
                     ORG.kort(g, KX[2], KY, KB, KH);
-                    var bx = KX[2] + 58, bund = KY + 134;
-                    SV.el("ellipse", { cx: bx, cy: bund + 3, rx: 30, ry: 4, fill: "url(#lab-skygge)" }, g);
-                    var b = LAB.lilleBaeger(g, bx, bund, 40, 56, 0.68);
-                    var m = lup(g, KX[2] + 190, KY + 88, 52, [bx, (b.vy + bund) / 2 + 2]);
+                    var bx = KX[2] + 58, bund = KY + 140;
+                    SV.el("ellipse", { cx: bx, cy: bund + 2, rx: 34, ry: 4, fill: "url(#lab-skygge)" }, g);
+                    var b = LAB.maaleglasBog(g, bx, bund, { h: 80, ml: 18.02 });
+                    var m = lup(g, KX[2] + 190, KY + 88, 52, [bx - 3, (b.vy + b.rb) / 2 + 2]);
                     var t = SV.tekst(g, c2, TY, "6,02 · 10^23 stykker", { "font-size": 20, "font-weight": 700 });
                     return { m: m, t: t };
                 },
@@ -173,20 +193,32 @@
             api.del("portioner", {
                 lag: 0, auto: true,
                 fuld: function (g) {
-                    var data = [["carbon", "12,01 g", 120], ["vand", "18,02 g", 120], ["køkkensalt", "58,44 g", 120], ["sukker", "342,3 g", 140]];
-                    data.forEach(function (p, i) {
+                    ["carbon", "vand", "køkkensalt", "sukker"].forEach(function (navn, i) {
                         var cx = PX[i], gr = LAB.skaleret(g, cx, VTOP, S);
-                        LAB.vaegtBog(gr, cx, VTOP, p[1], p[2]);
+                        LAB.vaegtBog(gr, cx, VTOP, "", VB[i]);
                         if (i === 0) LAB.urglas(gr, cx, VTOP, 62, function (gg, yb) { LAB.bunkeBog(gg, cx, yb, 46, 19, "kul", 5); });
-                        if (i === 1) LAB.lilleBaeger(gr, cx, VTOP, 30, 40, 0.68);
+                        if (i === 1) LAB.maaleglasBog(gr, cx, VTOP, { h: 72, ml: 18.02 });
                         if (i === 2) LAB.skaal(gr, cx, VTOP, 88, 11, function (gg, yb) { LAB.bunkeBog(gg, cx, yb, 72, 30, "salt", 462); });
                         if (i === 3) LAB.skaal(gr, cx, VTOP, 148, 11, function (gg, yb) { LAB.bunkeBog(gg, cx, yb, 132, 58, "sukker", 644); });
-                        SV.tekst(g, cx, VTOP + 82, p[0], { "font-size": 17, "font-weight": 700, fill: "#2b3640" });
+                        SV.tekst(g, cx, VTOP + 82, navn, { "font-size": 17, "font-weight": 700, fill: "#2b3640" });
                     });
                     [RM, RN].forEach(function (y) {
                         SV.el("rect", { x: RX, y: y - 18, width: RB, height: 34, rx: 8, fill: "#f6f8fa", stroke: "#d4dbe2", "stroke-width": 1.2 }, g);
                     });
                 }
+            });
+
+            /* Tallene på vægtenes display: massen */
+            api.del("visning", {
+                lag: 0,
+                fuld: function (g) {
+                    var t = ["12,01 g", "18,02 g", "58,44 g", "342,3 g"].map(function (v, i) {
+                        var d = display(i), gr = LAB.skaleret(g, PX[i], VTOP, S);
+                        return SV.tekst(gr, d.bx + d.db / 2, VTOP + 29, v, { "font-size": 13.5, "font-weight": 700, fill: "#a8f5c8" });
+                    });
+                    return { t: t };
+                },
+                byg: function (g, r, an) { r.t.forEach(function (t, i) { an.pop(t, i * 120, 400); }); }
             });
 
             function raekkeDel(id, y, sym, tekster) {

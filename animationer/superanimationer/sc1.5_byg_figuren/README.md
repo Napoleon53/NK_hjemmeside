@@ -198,7 +198,7 @@ gennem to runder rettelser. Følg dem, også når et nyt kapitel frister til and
 
 **Filerne til et nyt kapitel**
 
-Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13) og 6 (sc6.4). Et kapitel med
+Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13), 6 (sc6.4), 7 (sc7.6) og 8 (sc8.7), og i B-bogen B1 (sb1.5, eget panel `kemi-b-filer/samling_b_bygfiguren.html` i B-panelets fane "byg", grafer og energiprofiler i `js/kurver.js`). Et kapitel med
 mange formler kan have sin egen tegnehjælp (`js/org.js` i sc4.9). En ny mappe `scN.x_byg_figuren`
 (eller `sbN.x_...`) som kopi af denne, nummeret efter kapitlets menu. `svg.js`,
 `motor.js`, `ps.js`, `app.js` og stilarket kan tages, som de er. Ret `js/data.js`
@@ -239,5 +239,5 @@ pladsen igen). Selvtesten tjekker det nu.
 ## Ikke lavet
 
 - Udskrift af figuren som noteark (tom og med facit).
-- Kapitel 7 og 8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
+- B-bogens kapitel B2 til B8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
 - Den svære udgave kan ikke vælges med et link.

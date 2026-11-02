@@ -113,7 +113,8 @@
         "lab-bunke-sukker": ["radial", { cx: 0.36, cy: 0.25, r: 0.85 }, [[0, "#ffffff"], [0.5, "#fcfaf4"], [1, "#e8e0cc"]]],
         "lab-bunke-kul": ["radial", { cx: 0.36, cy: 0.25, r: 0.85 }, [[0, "#7a8288"], [0.5, "#3a4044"], [1, "#121517"]]],
         "lab-aeg": ["radial", { cx: 0.36, cy: 0.28, r: 0.78 }, [[0, "#fffaf1"], [0.55, "#f1dcb6"], [1, "#d2ad74"]]],
-        "lab-pap": ["linear", { x1: 0, x2: 0, y1: 0, y2: 1 }, [[0, "#e6dfd2"], [1, "#cbc1af"]]]
+        "lab-pap": ["linear", { x1: 0, x2: 0, y1: 0, y2: 1 }, [[0, "#e6dfd2"], [1, "#cbc1af"]]],
+        "lab-maale-vand": ["linear", { x1: 0, x2: 1, y1: 0, y2: 0 }, [[0, "#9cc9ec"], [0.35, "#d4e9f8"], [1, "#8fbfe6"]]]
     };
     LAB.gradienter = function () {
         var defs = document.querySelector("#faelles-defs defs");
@@ -243,5 +244,34 @@
             SV.el("line", { x1: x1 - 9, y1: yk, x2: x1 - 3, y2: yk, stroke: "#8a9a9f", "stroke-width": 1 }, g);
         }
         return { vy: vy };
+    };
+
+    /* Måleglas som bogens k5_maaleglas: fod, glasrør med tud og glans, vand med
+       menisk og en streg pr. mL (lange ved hver 5. mL). bund er fodens underkant.
+       o.max er glassets største mål (25 mL), o.ml vandets volumen, og en lille
+       mærkat foroven viser glassets størrelse (brugeren 1. nov. 2026: "en lille
+       diskret 25 mL-mærkat på en pænt måleglas"). Giver væskens overflade (vy). */
+    LAB.maaleglasBog = function (g, cx, bund, o) {
+        o = o || {};
+        var h = o.h || 76, b = o.b || 30, max = o.max || 25, ml = o.ml || 18;
+        var fod = 7, rb = bund - fod, top = rb - h, x0 = cx - b / 2, x1 = cx + b / 2;
+        var nul = rb - 3, fuld = top + 17, d = (nul - fuld) / max, vy = nul - d * ml;
+        SV.el("path", { d: "M " + (x0 - 12) + "," + bund + " L " + (x0 - 8) + "," + (bund - fod) + " H " + (x1 + 8) + " L " + (x1 + 12) + "," + bund + " Z",
+            fill: "url(#lab-glas)", stroke: GLASKANT, "stroke-width": 1.5, "stroke-linejoin": "round" }, g);
+        SV.el("path", { d: "M " + (x0 + 1.5) + "," + vy + " Q " + cx + "," + (vy + 5) + " " + (x1 - 1.5) + "," + vy + " V " + (rb - 3) + " Q " + (x1 - 1.5) + "," + (rb - 1) + " " + (x1 - 4) + "," + (rb - 1) +
+            " H " + (x0 + 4) + " Q " + (x0 + 1.5) + "," + (rb - 1) + " " + (x0 + 1.5) + "," + (rb - 3) + " Z", fill: "url(#lab-maale-vand)" }, g);
+        SV.el("path", { d: "M " + (x0 + 1.5) + "," + vy + " Q " + cx + "," + (vy + 5) + " " + (x1 - 1.5) + "," + vy, fill: "none", stroke: "#e6f2fb", "stroke-width": 1.6 }, g);
+        SV.el("path", { d: "M " + (x0 - 4) + "," + (top - 2) + " Q " + x0 + "," + top + " " + x0 + "," + (top + 6) + " V " + (rb - 2) + " Q " + x0 + "," + rb + " " + (x0 + 3) + "," + rb +
+            " H " + (x1 - 3) + " Q " + x1 + "," + rb + " " + x1 + "," + (rb - 2) + " V " + (top + 2) + " Q " + x1 + "," + top + " " + (x1 + 1.5) + "," + top,
+            fill: "url(#lab-glas)", stroke: GLASKANT, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
+        for (var m = 1; m <= max; m++) {
+            var y = nul - d * m, lang = m % 5 === 0;
+            SV.el("line", { x1: x1 - (lang ? 10 : 5.5), y1: y, x2: x1 - 1.5, y2: y, stroke: "#56666c", "stroke-width": lang ? 0.9 : 0.6 }, g);
+        }
+        SV.el("path", { d: "M " + (x0 + 5) + "," + (top + 16) + " V " + (rb - 8), stroke: "#ffffff", "stroke-width": 3, "stroke-linecap": "round", opacity: 0.75 }, g);
+        /* Mærkaten med glassets størrelse */
+        SV.el("rect", { x: cx - 12.5, y: top + 3.5, width: 25, height: 9.5, rx: 2, fill: "#ffffff", stroke: "#a9b6bc", "stroke-width": 0.6, opacity: 0.95 }, g);
+        SV.tekst(g, cx, top + 10.8, (o.maerkat || max + " mL"), { "font-size": 6.8, "font-weight": 700, fill: "#56666c" });
+        return { vy: vy, top: top, rb: rb };
     };
 }());

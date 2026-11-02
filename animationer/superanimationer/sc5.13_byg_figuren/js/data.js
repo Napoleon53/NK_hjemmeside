@@ -58,7 +58,11 @@ window.NK = NK;
        er fra kapitel 1's fagordliste. */
     NK.TIDLIGERE = {
         "atommasse": "Gennemsnittet af, hvad et grundstofs isotoper vejer, målt i enheden u.",
-        "koefficient": "Det store tal foran en formel. Det viser, hvor mange molekyler der er."
+        "koefficient": "Det store tal foran en formel. Det viser, hvor mange molekyler der er.",
+        /* masse står ikke på nogen af bogens fagordlister. Brugeren bad om den i
+           5.3 ved vægtene 1. nov. 2026; forklaringen er skrevet som bogens
+           forklaring af volumen i 5.1 */
+        "masse": "Hvor meget noget vejer. Symbolet er m, og der måles i gram eller kilogram."
     };
     Object.keys(NK.TIDLIGERE).forEach(function (o) { NK.FORKLARING[o] = NK.TIDLIGERE[o]; });
 
