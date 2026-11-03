@@ -68,7 +68,9 @@ som en superanimation".
   Hele figuren står uden farver fra start, og en del får farve, når ordet sidder.
   Kontakten gælder alle faner, og figurerne begynder forfra, når den slås til eller
   fra. Den afløste Mesterprøven, som kom efter lagene, fordi brugeren og andre syntes,
-  at den "virkede lidt underlig at lave, når man lige havde taget dem alle".
+  at den "virkede lidt underlig at lave, når man lige havde taget dem alle". Bliver kortet med
+  alle ordene højere end pladsen over figuren, rykker figuren ned under det (`tilpasFigur`, 3. nov.
+  2026, fordi B5.2's ni fagord dækkede pladserne foroven).
 - Peger man på et ord, der sidder på plads (i figuren eller panelet), kommer hele
   forklaringen fra bogen frem.
 - Ét og samme ord kan passe på to pladser: ædelgasreglen og oktetreglen er to navne
@@ -209,7 +211,7 @@ gennem to runder rettelser. Følg dem, også når et nyt kapitel frister til and
 
 **Filerne til et nyt kapitel**
 
-Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13), 6 (sc6.4), 7 (sc7.6) og 8 (sc8.7), og i B-bogen B1 (sb1.5, eget panel `kemi-b-filer/samling_b_bygfiguren.html` i B-panelets fane "byg", grafer og energiprofiler i `js/kurver.js`), B2 (sb2.9, fanerne B2.1, B2.2, B2.4 og B2.7 med numrene i `NK.AFSNIT`, som selvtesten læser) B3 (sb3.5, strukturformler i `js/org.js`) og B4 (sb4.10, syv faner; sb4.4 til sb4.9 var optaget). Et kapitel med
+Kapitler, der er lavet: 1 (sc1.5), 2 (sc2.7), 3 (sc3.6), 4 (sc4.9), 5 (sc5.13), 6 (sc6.4), 7 (sc7.6) og 8 (sc8.7), og i B-bogen B1 (sb1.5, eget panel `kemi-b-filer/samling_b_bygfiguren.html` i B-panelets fane "byg", grafer og energiprofiler i `js/kurver.js`), B2 (sb2.9, fanerne B2.1, B2.2, B2.4 og B2.7 med numrene i `NK.AFSNIT`, som selvtesten læser) B3 (sb3.5, strukturformler i `js/org.js`) B4 (sb4.10, syv faner; sb4.4 til sb4.9 var optaget) og B5 (sb5.6, lys, spektre og kuvetter i `js/b5.js`). Et kapitel med
 mange formler kan have sin egen tegnehjælp (`js/org.js` i sc4.9). En ny mappe `scN.x_byg_figuren`
 (eller `sbN.x_...`) som kopi af denne, nummeret efter kapitlets menu. `svg.js`,
 `motor.js`, `ps.js`, `app.js` og stilarket kan tages, som de er. Ret `js/data.js`
@@ -250,5 +252,5 @@ pladsen igen). Selvtesten tjekker det nu.
 ## Ikke lavet
 
 - Udskrift af figuren som noteark (tom og med facit).
-- B-bogens kapitel B5 til B8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
+- B-bogens kapitel B6 til B8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
 - Den svære udgave kan ikke vælges med et link.

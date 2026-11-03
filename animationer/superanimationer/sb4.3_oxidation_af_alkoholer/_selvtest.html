@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sb4.3 Oxidation af alkoholer</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at modellen giver bogens oxidationstal og
+   produkter (afsnit B4.3), at motoren navngiver alle svarene, at begge
+   faner kan gennemføres, at forkerte svar får den rigtige forklaring og
+   koster stjernen, at Vis svaret virker, at intet løses uden Indsend
+   svar, at scenen er låst, når kortet er grønt, at teksterne er uden
+   tankestreger og ASCII-dansk, og at kortet aldrig dækker whiteboardet
+   fra 1100 × 620 til 1600 × 950.
+
+   Iframen skal åbnes gennem en lokal server med mappen animationer/ som
+   rod (motoren hentes fra ../../molekylemotor/). Testen gemmer elevens
+   fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + String(note).replace(/</g, "&lt;") + ")" : ""), "fejl"); }
+}
+function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + antal + " påstande");
+    skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+var NOEGLER = ["nk-sb4.3-serier", "nk-sb4.3-opgaver"];
+var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|kaede\w*|vaelg\w*|taelle?r?|traekker|primaer|sekundaer|tertiaer|groent)\b/i;
+var gemt = {};
+var ramme = document.getElementById("ramme");
+var trin = 0;
+
+ramme.addEventListener("load", function () {
+    var W = ramme.contentWindow;
+    if (trin === 0) {
+        trin = 1;
+        try { NOEGLER.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); W.localStorage.removeItem(n); }); } catch (e) { /* ingen hukommelse */ }
+        W.location.reload();
+        return;
+    }
+    if (trin === 1) { trin = 2; setTimeout(koer, 900); }
+});
+
+function koer() {
+    var W = ramme.contentWindow;
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        NOEGLER.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+    window.faerdig = true;
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK, D = NK.Data, K = NK.Kemi;
+    var o = NK.sims["fane-o"], p = NK.sims["fane-p"];
+    var tekster = [];
+
+    function el(id) { return d.getElementById(id); }
+    function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
+    function kort(sim) { return el(sim.navn + "-ind").textContent; }
+    function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: t }); }
+    function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
+    function hPaaC(sim) { return K.hPaa(sim.mol, sim.c); }
+
+    /* ================================================================= */
+    overskrift("1. Modellen: bogens oxidationstal og produkter");
+    var FORVENT = {
+        "ethanol": [["ethanol", -1, "alkohol"], ["ethanal", 1, "aldehyd"], ["ethansyre", 3, "carboxylsyre"]],
+        "propan-2-ol": [["propan-2-ol", 0, "alkohol"], ["propanon", 2, "keton"]],
+        "2-methylpropan-2-ol": [["2-methylpropan-2-ol", 1, "alkohol"]]
+    };
+    D.SERIER.forEach(function (s) {
+        var b = K.byg(s), mol = b.mol, fundet = [];
+        for (var i = 0; i < 5; i++) {
+            var n = K.navn(mol), t = K.optael(mol, b.c);
+            fundet.push([n.navn, K.oxtal(mol, b.c), n.klasse]);
+            paastand(n.navn + ": elektronegativiteten giver bogens regel (O − H)", K.oxtal(mol, b.c) === t.O - t.H);
+            paastand(n.navn + ": carbonatomet har fire bindinger", t.O + t.H + t.C === 4);
+            var h = K.hPaa(mol, b.c);
+            if (!h.length) break;
+            K.udfoer(mol, b.c, K.plan(mol, b.c, h[h.length - 1]));
+        }
+        paastand(s.navn + ": " + fundet.map(function (f) { return f[0] + " " + D.rom(f[1]); }).join(" → "),
+            JSON.stringify(fundet) === JSON.stringify(FORVENT[s.id]), JSON.stringify(fundet));
+        paastand(s.navn + " er " + D.TYPER[s.type].navn + " (motorens type)", K.type(K.tung(K.byg(s).mol), K.cMedOH(K.tung(K.byg(s).mol)).c) === s.type);
+    });
+    var ingenPlan = K.byg(D.SERIER[0]);
+    paastand("intet kan oxideres på et H på et andet carbonatom", K.plan(ingenPlan.mol, ingenPlan.c, ingenPlan.id.H1) === null);
+
+    var navnefejl = [], klassefejl = [], produktfejl = [], typefejl = [];
+    var TYPE = { "propan-1-ol": "primaer", "propan-2-ol": "sekundaer", "2-methylpropan-2-ol": "tertiaer", "butan-1-ol": "primaer",
+        "butan-2-ol": "sekundaer", "pentan-3-ol": "sekundaer", "2-methylbutan-2-ol": "tertiaer", "2-methylpropan-1-ol": "primaer",
+        "3-methylbutan-2-ol": "sekundaer", "3-methylbutan-1-ol": "primaer" };
+    D.OPGAVER.forEach(function (op) {
+        var a = K.alkohol(op.alkohol);
+        if (a.type !== TYPE[op.alkohol]) typefejl.push(op.alkohol + " " + a.type);
+        if (K.produkt(a, op.maade) !== op.svar) produktfejl.push(op.alkohol + " → " + K.produkt(a, op.maade));
+        if ((a.type === "primaer") !== !!op.maade) produktfejl.push(op.alkohol + ": mild/kraftig kun ved primære");
+        op.valg.forEach(function (v, j) {
+            if (!v) { if (D.VALG_KLASSE[j] !== null) klassefejl.push(op.alkohol + " null"); return; }
+            var res = NK.Navn.analyser(NK.NavnLaeser.laes(v).mol);
+            if (res.navn !== v) navnefejl.push(v + " → " + res.navn);
+            if (res.stofklasse !== D.VALG_KLASSE[j]) klassefejl.push(v + " er " + res.stofklasse);
+        });
+        if (op.valg.indexOf(op.svar) < 0) produktfejl.push(op.alkohol + ": svaret er ikke blandt valgene");
+    });
+    samlet("typen af de ti alkoholer er rigtig", typefejl);
+    samlet("modellens produkt er svaret i data.js", produktfejl);
+    samlet("motoren giver alle svarene det samme navn", navnefejl);
+    samlet("svarene står i rækkefølgen aldehyd, keton, carboxylsyre, ingen", klassefejl);
+    var slags = {};
+    D.OPGAVER.forEach(function (op) { slags[K.alkohol(op.alkohol).type + (op.maade || "")] = true; });
+    paastand("fane 2 har primær mild, primær kraftig, sekundær og tertiær",
+        slags.primaermild && slags.primaerkraftig && slags.sekundaer && slags.tertiaer, Object.keys(slags).join(","));
+
+    /* ================================================================= */
+    overskrift("2. Fane 1: Oxidationstallet");
+    NK.visFane("fane-o");
+    o.vaelg(0);
+    paastand("Indsend svar kan ikke trykkes uden et valg", !o.kanSendes() && el("o-indsend").classList.contains("ikke-klar"));
+    o.indsendKlik();
+    paastand("intet sker uden et valg", o.fase === "ox" && o.trin.length === 0);
+    o.svarValg(D.OXTAL.indexOf(1));
+    paastand("et svar på kortet vælger kun", o.fase === "ox" && o.valgt === D.OXTAL.indexOf(1));
+    paastand("knappen viser valget", /\+I/.test(el("o-indsend").textContent), el("o-indsend").textContent);
+    o.indsendKlik();
+    husk("fejl fortegn", besked(o));
+    paastand("byttet fortegn får forklaringen om fortegnet", /Fortegnet er byttet om/.test(besked(o)), besked(o));
+    paastand("det forkerte svar kan ikke vælges igen", el("o-ind").querySelectorAll(".brik.forkert").length === 1);
+    paastand("hjælpeknappen lyser efter et forkert svar", el("o-knap").classList.contains("peg"));
+    o.svarValg(D.OXTAL.indexOf(-1));
+    o.indsendKlik();
+    husk("rigtigt ox", besked(o));
+    paastand("rigtigt: −I, og regnestykket står i linjen", o.fase === "h" && /I alt −I/.test(besked(o)), besked(o));
+    paastand("ethanol står ud for −I på trappen", /−I\s*—?\s*ethanol/.test(el("o-trappe").textContent.replace(/\s+/g, " ")) || el("o-trappe").textContent.indexOf("ethanol") >= 0);
+    var oh = K.ohPaa(o.mol, o.c);
+    o.valgt = oh.h;
+    o.indsendKlik();
+    husk("fejl OH", besked(o));
+    paastand("OH-gruppens H giver forklaringen om oxygenatomet", /sidder på oxygenatomet/.test(besked(o)), besked(o));
+    o.valgt = o.b.id.H1;
+    o.indsendKlik();
+    husk("fejl andet C", besked(o));
+    paastand("et H på et andet carbonatom giver sin forklaring", /andet carbonatom/.test(besked(o)), besked(o));
+    o.svarValg(0);
+    o.indsendKlik();
+    husk("fejl intet", besked(o));
+    paastand("Intet hydrogenatom er forkert, når der er et", /Se igen/.test(besked(o)), besked(o));
+    o.valgt = hPaaC(o)[0];
+    o.indsendKlik();
+    paastand("et rigtigt H starter oxidationen", o.fase === "anim");
+    o.klikScene({ x: 10, y: 10 });
+    tid(o, 2);
+    paastand("efter oxidationen er stoffet ethanal", o.fase === "ox" && o.stof.navn === "ethanal", o.stof.navn);
+    husk("oxideret", besked(o));
+    o.svarValg(D.OXTAL.indexOf(1)); o.indsendKlik();
+    paastand("trappen viser, at tallet steg 2", /steg \+2/.test(el("o-trappe").textContent));
+    o.valgt = hPaaC(o)[0]; o.indsendKlik(); tid(o, 2);
+    paastand("efter endnu en oxidation er stoffet ethansyre", o.stof.navn === "ethansyre", o.stof.navn);
+    o.svarValg(D.OXTAL.indexOf(3)); o.indsendKlik();
+    o.svarValg(0); o.indsendKlik();
+    husk("slut ethanol", o.groen && o.groen.tekst);
+    paastand("serien slutter, når der ikke er flere H", !!o.groen && /−I til \+I til \+III/.test(o.groen.tekst), o.groen && o.groen.tekst);
+    paastand("ethanol er klaret, men uden stjerne (der var fejl)", o.status[0].loest && !o.status[0].stjerne);
+    var foer = o.stof.navn;
+    o.klikScene({ x: o.lay.tavle.x + o.lay.tavle.b / 2, y: o.lay.tavle.y + o.lay.tavle.h / 2 });
+    paastand("scenen er låst, når kortet er grønt", o.groen && o.stof.navn === foer);
+    o.videreKlik();
+    paastand("videre går til propan-2-ol", o.serie.id === "propan-2-ol");
+
+    /* propan-2-ol uden fejl: stjerne */
+    o.svarValg(D.OXTAL.indexOf(0)); o.indsendKlik();
+    o.valgt = hPaaC(o)[0]; o.indsendKlik(); tid(o, 2);
+    paastand("propan-2-ol bliver til propanon", o.stof.navn === "propanon", o.stof.navn);
+    o.svarValg(D.OXTAL.indexOf(2)); o.indsendKlik();
+    paastand("propanon har intet H på carbonatomet", hPaaC(o).length === 0);
+    o.valgt = o.b.id.H1; o.indsendKlik();
+    husk("fejl andet C uden H", besked(o));
+    paastand("forklaringen siger, at der skal ses på selve carbonatomet", /selve det markerede carbonatom/.test(besked(o)), besked(o));
+    o.vaelg(1);
+    o.svarValg(D.OXTAL.indexOf(0)); o.indsendKlik();
+    o.valgt = hPaaC(o)[0]; o.indsendKlik(); tid(o, 2);
+    o.svarValg(D.OXTAL.indexOf(2)); o.indsendKlik();
+    o.svarValg(0); o.indsendKlik();
+    husk("slut propan-2-ol", o.groen && o.groen.tekst);
+    paastand("propan-2-ol uden fejl giver stjerne", o.status[1].loest && o.status[1].stjerne);
+
+    /* 2-methylpropan-2-ol med hint og Vis svaret */
+    o.vaelg(2);
+    o.knap();
+    husk("hint 1 ox", besked(o));
+    paastand("første hint slår elektronparrene til", o.visPar && el("o-kontakter").querySelector('[data-vis="par"]').classList.contains("til"));
+    o.knap();
+    husk("hint 2 ox", besked(o));
+    paastand("andet hint tæller bindingerne", /1 binding til O og 3 bindinger til C/.test(besked(o)), besked(o));
+    o.knap();
+    paastand("Vis svaret giver +I", o.fase === "h" && /I alt \+I/.test(besked(o)), besked(o));
+    o.knap(); o.knap();
+    husk("hint 2 h", besked(o));
+    o.knap();
+    husk("slut tertiær", o.groen && o.groen.tekst);
+    paastand("Vis svaret afslutter med Intet hydrogenatom", !!o.groen && /kan ikke oxideres\./.test(o.groen.tekst), o.groen && o.groen.tekst);
+    paastand("Vis svaret koster stjernen", o.status[2].loest && !o.status[2].stjerne);
+    paastand("alle tre er klaret i panelet", el("o-klaret").textContent === "3");
+    o.videreKlik();
+    paastand("efter den sidste går knappen til fane 2", el("fane-p").classList.contains("aktiv"));
+
+    /* ================================================================= */
+    overskrift("3. Fane 2: Hvad dannes?");
+    NK.visFane("fane-p");
+    var forkerteTekster = {};
+    p.opgaver.forEach(function (op, i) {
+        p.vaelg(i);
+        var rigtigType = D.TYPE_ORDEN.indexOf(op.alk.type);
+        husk("kort type " + i, kort(p));
+        p.klikScene({ x: p.kasser.valg[0].x + 20, y: p.kasser.valg[0].y + 20 });
+        if (p.valgt !== null) paastand("svarene på tavlen er låst, før typen er fundet (" + op.o.alkohol + ")", false);
+        var forkertType = (rigtigType + 1) % 3;
+        p.svarValg(forkertType); p.indsendKlik();
+        husk("fejl type " + i, besked(p));
+        p.svarValg(rigtigType); p.indsendKlik();
+        husk("rigtig type " + i, besked(p));
+        if (p.fase !== "produkt") paastand("typen går videre (" + op.o.alkohol + ")", false);
+        husk("kort produkt " + i, kort(p));
+        var rigtig = op.o.valg.indexOf(op.produkt);
+        var forkert = (rigtig + 1) % 4;
+        p.klikScene({ x: p.kasser.valg[forkert].x + 20, y: p.kasser.valg[forkert].y + 20 });
+        if (p.valgt !== forkert) paastand("et klik på tavlen vælger et svar (" + op.o.alkohol + ")", false);
+        if (p.groen) paastand("et klik løser ikke opgaven (" + op.o.alkohol + ")", false);
+        p.indsendKlik();
+        forkerteTekster[op.o.alkohol] = besked(p);
+        husk("fejl produkt " + i, besked(p));
+        p.klikScene({ x: p.kasser.valg[rigtig].x + 20, y: p.kasser.valg[rigtig].y + 20 });
+        p.indsendKlik();
+        husk("slut " + i, p.groen && p.groen.tekst);
+        if (!p.groen) paastand("opgaven løses (" + op.o.alkohol + ")", false, besked(p));
+        tid(p, 2);
+    });
+    paastand("alle ti opgaver er løst", p.antalLoest() === 10 && el("p-loest").textContent === "10");
+    paastand("fejl koster stjernen", p.status.every(function (s) { return !s.stjerne; }));
+    paastand("tabellen er fyldt ud", el("p-fundet").querySelectorAll(".fund-raekke.kendt").length === 4);
+    paastand("tertiær: ingen reaktion forklares med det manglende H", /intet hydrogenatom/.test(forkerteTekster["2-methylpropan-2-ol"]), forkerteTekster["2-methylpropan-2-ol"]);
+    paastand("mild oxidation: syren forklares med destillationen", /destilleres/.test(forkerteTekster["propan-1-ol"]) || /keton/.test(forkerteTekster["propan-1-ol"]), forkerteTekster["propan-1-ol"]);
+    paastand("glasset er grønt efter en oxidation", p.glasT >= 1 || p.opg.produkt === null);
+
+    /* Vis svaret paa fane 2 */
+    p.vaelg(4);
+    p.knap(); p.knap(); p.knap();
+    paastand("Vis svaret finder typen", p.fase === "produkt");
+    p.knap(); p.knap(); p.knap();
+    var valgte = Array.prototype.map.call(el("p-liste").querySelectorAll(".opg-chip.valgt"), function (c) { return c.getAttribute("data-opg"); });
+    paastand("kun opgave 5 er markeret i listen", valgte.join(",") === "4", valgte.join(","));
+    paastand("Vis svaret finder produktet", !!p.groen && /butanon/.test(p.groen.tekst), p.groen && p.groen.tekst);
+
+    /* ================================================================= */
+    overskrift("4. Teksterne");
+    o.vaelg(0); o.knap(); o.knap();
+    husk("hint", besked(o));
+    var html = d.body.innerText;
+    var streger = [], ascii = [], ladning = [], lange = [];
+    tekster.forEach(function (x) {
+        if (/[–—]/.test(x.t)) streger.push(x.hvad);
+        if (ASCII_ORD.test(x.t)) ascii.push(x.hvad + ": " + x.t.match(ASCII_ORD)[0]);
+        if (/\b1[+−]/.test(x.t)) ladning.push(x.hvad);
+        if (x.t.length > 330) lange.push(x.hvad + " (" + x.t.length + ")");
+    });
+    samlet("ingen tankestreger (" + tekster.length + " tekster)", streger);
+    samlet("intet ASCII-dansk", ascii);
+    samlet("teksterne er korte", lange);
+    samlet("ingen ladning skrevet som 1+ eller 1−", ladning);
+    paastand("siden har ingen tankestreger", !/[–—]/.test(html));
+    paastand("ingen Kemichael", !d.querySelector('script[src*="kemichael"]'));
+
+    /* ================================================================= */
+    overskrift("5. Kortet dækker aldrig whiteboardet");
+    var daekker = [], raekke = [];
+    [[1100, 620], [1300, 800], [1600, 950]].forEach(function (str) {
+        ramme.style.width = str[0] + "px";
+        ramme.style.height = str[1] + "px";
+        [o, p].forEach(function (sim) {
+            NK.visFane(sim === o ? "fane-o" : "fane-p");
+            sim.vaelg(0);
+            sim.lay = null; sim.tilpas(); sim.layout();
+            sim.svarValg(1);
+            var kortR = el(sim.navn + "-skort").getBoundingClientRect(), c = sim.L.canvas.getBoundingClientRect();
+            var tavleTop = c.top + sim.lay.tavle.y;
+            if (kortR.bottom > tavleTop + 1) daekker.push(str.join("×") + " " + sim.navn + " (" + Math.round(kortR.bottom - tavleTop) + " px)");
+            var k = el(sim.navn + "-knap"), ind = el(sim.navn + "-indsend");
+            if (Math.abs(k.getBoundingClientRect().top - ind.getBoundingClientRect().top) > 4) raekke.push(str.join("×") + " " + sim.navn);
+        });
+    });
+    samlet("kortet slutter over whiteboardet", daekker);
+    samlet("hint og Indsend svar står på samme række", raekke);
+    ramme.style.width = ""; ramme.style.height = "";
+}
+</script>
+</body>
+</html>

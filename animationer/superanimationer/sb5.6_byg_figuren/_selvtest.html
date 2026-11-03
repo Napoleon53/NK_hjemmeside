@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: Byg figuren</title>
+<link rel="stylesheet" href="css/stil.css">
+<style>
+    /* Animationen bygges uden for skaermen, saa tekst kan maales */
+    #proeve { position: absolute; left: -6000px; top: 0; width: 1400px; height: 860px; display: flex; flex-direction: column; }
+    #ud { position: fixed; inset: 0; margin: 0; padding: 16px; overflow: auto; background: #111; color: #ddd; font: 13px/1.45 monospace; white-space: pre-wrap; z-index: 999; }
+</style>
+</head>
+<body>
+<div id="proeve">
+    <div class="faneknapper" id="faneknapper"></div>
+    <main id="hoved" style="position:relative;flex:1"></main>
+</div>
+<template id="skabelon">
+    <section class="fane" role="tabpanel">
+        <div class="scene"><div class="scenekort"></div><div class="figur"></div></div>
+        <aside class="panel">
+            <div class="kort"><h2>Lagene <span class="taeller stjerne-taeller"></span></h2><div class="lagliste"></div></div>
+            <div class="kort"><h2>Fagord på plads <span class="taeller ord-taeller"></span></h2><div class="ordliste"></div></div>
+            <button class="forfraknap" type="button">Byg figuren forfra</button>
+        </aside>
+    </section>
+</template>
+<pre id="ud">Kører …</pre>
+
+<script src="js/svg.js"></script>
+<script src="js/data.js"></script>
+<script src="js/motor.js"></script>
+<script src="js/kurver.js"></script>
+<script src="js/b5.js"></script>
+<script src="js/fig_farver.js"></script>
+<script src="js/fig_spektre.js"></script>
+<script src="js/fig_lambert.js"></script>
+<script src="js/fig_standard.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function () {
+    "use strict";
+    var linjer = [], fejl = 0;
+    function ok(betingelse, tekst) {
+        if (!betingelse) fejl++;
+        linjer.push((betingelse ? "  ok    " : "  FEJL  ") + tekst);
+    }
+    function afsnit(t) { linjer.push("\n" + t); }
+
+    function koer() {
+        NK.SV.stille = true;
+        var B = NK.byggere;
+
+        /* 1. Fagordene: alle fra bogens liste sidder paa en plads, og kun én gang
+           (undtagen dem, der med vilje er udeladt) */
+        afsnit("1. Fagordene");
+        /* Ord fra et tidligere kapitel (NK.TIDLIGERE i data.js) taeller ikke med
+           i kapitlets liste, og ordene i NK.GENTAGET maa staa paa mere end én
+           figur (brugeren 1. nov. 2026: "der maa gerne vaere lidt repeterende
+           oevelser") */
+        var tidligere = Object.keys(NK.TIDLIGERE || {});
+        var gentaget = NK.GENTAGET || [];
+        var bog = Object.keys(NK.FORKLARING).filter(function (o) { return tidligere.indexOf(o) < 0; });
+        ok(bog.length === NK.ANTAL_FAGORD, NK.ANTAL_FAGORD + " fagord i forklaringerne fra bogen (" + bog.length + ")");
+        NK.UDELADT.forEach(function (o) { ok(bog.indexOf(o) >= 0, "det udeladte \"" + o + "\" er et fagord fra bogen"); });
+        bog = bog.filter(function (o) { return NK.UDELADT.indexOf(o) < 0; });
+        var set = {};
+        NK.FANER.forEach(function (f) {
+            B[f.id].alleOrd.forEach(function (o) { set[o] = (set[o] || 0) + 1; });
+        });
+        bog.concat(tidligere).forEach(function (o) {
+            if (gentaget.indexOf(o) >= 0) ok(set[o] >= 1, "\"" + o + "\" står på mindst én figur (gentaget med vilje)");
+            else ok(set[o] === 1, "\"" + o + "\" står på netop én figur");
+        });
+        gentaget.forEach(function (o) { ok(bog.indexOf(o) >= 0 || tidligere.indexOf(o) >= 0, "det gentagne \"" + o + "\" er et fagord"); });
+        Object.keys(set).forEach(function (o) { ok(bog.indexOf(o) >= 0 || tidligere.indexOf(o) >= 0, "\"" + o + "\" har en forklaring fra bogen"); });
+        NK.FANER.forEach(function (f, i) {
+            /* Et kapitel, hvor ikke alle afsnit har fagord (B2), har numrene i NK.AFSNIT */
+            var afsnitNr = NK.AFSNIT ? NK.AFSNIT[i] : NK.KAPITEL + "." + (i + 1);
+            ok(B[f.id].def.nr === afsnitNr, f.id + " er afsnit " + afsnitNr);
+        });
+
+        /* 2. Figurerne: pladserne er inden for arket og overlapper ikke */
+        afsnit("2. Pladserne");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id], vb = b.def.vb, W = b.bredde, H = 34;
+            b.saetAlt(true);                       /* alle pladser paa én gang */
+            var ps = b.pladsListe;
+            ps.forEach(function (p) {
+                ok(p.x - W / 2 >= 6 && p.x + W / 2 <= vb[0] - 6 && p.y - H / 2 >= 6 && p.y + H / 2 <= vb[1] - 6,
+                    f.id + ": pladsen " + p.id + " er inden for arket");
+                ok(p.maal[0] >= 0 && p.maal[0] <= vb[0] && p.maal[1] >= 0 && p.maal[1] <= vb[1], f.id + ": stregen fra " + p.id + " ender på arket");
+                ok(p.lag !== undefined, f.id + ": " + p.id + " hører til et lag");
+                (p.dele || []).forEach(function (d) { ok(!!b.dele[d], f.id + ": " + p.id + " bygger delen " + d); });
+            });
+            /* Prikkerne: ingen to oven i hinanden, og hver ved sit eget gule felt
+               (brugeren 1. nov. 2026: "ikke tvetydige punkter, som ligner et af de andre") */
+            var medPrik = ps.filter(function (p) { return !p.titel; });
+            for (var u = 0; u < medPrik.length; u++) for (var v = u + 1; v < medPrik.length; v++) {
+                var dx = medPrik[u].maal[0] - medPrik[v].maal[0], dy = medPrik[u].maal[1] - medPrik[v].maal[1];
+                ok(Math.sqrt(dx * dx + dy * dy) >= 24, f.id + ": prikkerne fra " + medPrik[u].id + " og " + medPrik[v].id + " ligger ikke oven i hinanden");
+            }
+            ps.forEach(function (p) {
+                var x = p.maal[0], y = p.maal[1], ved = false;
+                (p.omr || []).forEach(function (o) {
+                    var bx = o.c ? [o.c[0] - o.c[2], o.c[1] - o.c[2], 2 * o.c[2], 2 * o.c[2]] :
+                             o.ring ? [o.ring[0] - o.ring[2], o.ring[1] - o.ring[2], 2 * o.ring[2], 2 * o.ring[2]] : o.r;
+                    if (x >= bx[0] - 8 && x <= bx[0] + bx[2] + 8 && y >= bx[1] - 8 && y <= bx[1] + bx[3] + 8) ved = true;
+                });
+                ok(!!p.omr && p.omr.length > 0, f.id + ": " + p.id + " har et gult felt");
+                ok(ved, f.id + ": prikken fra " + p.id + " ligger ved sit gule felt");
+            });
+            for (var i = 0; i < ps.length; i++) for (var j = i + 1; j < ps.length; j++) {
+                var a = ps[i], c = ps[j];
+                var over = Math.abs(a.x - c.x) < W + 4 && Math.abs(a.y - c.y) < H + 4;
+                ok(!over, f.id + ": " + a.id + " og " + c.id + " overlapper ikke");
+            }
+            b.deleListe.forEach(function (d) {
+                var brugt = d.auto || ps.some(function (p) { return (p.dele || []).indexOf(d.id) >= 0; });
+                ok(brugt, f.id + ": delen " + d.id + " bliver bygget af en plads eller af sit lag");
+            });
+            b.lag.forEach(function (l, n) {
+                (l.ekstra || []).forEach(function (o) {
+                    var paaLaget = l.pladser.some(function (id) { return b.pladser[id].ord.indexOf(o) >= 0; });
+                    ok(!paaLaget, f.id + " lag " + (n + 1) + ": ordet i overskud \"" + o + "\" passer ikke på lagets pladser");
+                    ok(!!NK.FORKLARING[o], f.id + " lag " + (n + 1) + ": ordet i overskud \"" + o + "\" er et fagord fra kapitlet");
+                });
+            });
+        });
+
+        NK.FANER.forEach(function (f) { B[f.id].saetAlt(false); });
+        /* 3. Forloebet: et forkert svar, saa alle lagene */
+        afsnit("3. Forløbet");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.nulstil();
+            var L = b.lag.length;
+            /* Figuren kommer frem lag for lag */
+            ok(b.deleListe.every(function (d) { return d.lag === 0 ? d.tilstand !== "skjult" : d.tilstand === "skjult"; }), f.id + ": kun lag 1 er fremme fra start");
+            ok(b.deleListe.every(function (d) { return d.lag !== 0 || d.auto || d.tilstand === "spoeg"; }), f.id + ": lag 1 står uden farver, til ordene sidder");
+            /* Indsend uden ord: ingen bedoemmelse */
+            b.indsend();
+            ok(b.forsoeg === 0 && b.tilstand === "opgave", f.id + ": Indsend uden ord tæller ikke som forsøg");
+            /* To ord byttet om: to pladser, hvor ingen af ordene passer paa den anden */
+            var a = b.aktive(), u = -1, v = -1;
+            for (var x1 = 0; x1 < a.length && u < 0; x1++) for (var x2 = x1 + 1; x2 < a.length; x2++) {
+                if (a[x1].ord.indexOf(a[x2].ord[0]) < 0 && a[x2].ord.indexOf(a[x1].ord[0]) < 0) { u = x1; v = x2; break; }
+            }
+            ok(u >= 0, f.id + ": lag 1 har to pladser, der kan byttes forkert");
+            if (u >= 0) {
+                var pu = a[u], pv = a[v];
+                b.placer(pv.ord[0], pu);
+                b.placer(pu.ord[0], pv);
+                a.forEach(function (p) { if (!p.paa) b.placer(p.ord.filter(function (o) { return !b.hvorEr(o); })[0], p); });
+                b.indsend();
+                ok(b.tilstand === "opgave", f.id + ": byttede ord giver ikke et løst lag");
+                ok(b.bakke.indexOf(pu.ord[0]) >= 0 && b.bakke.indexOf(pv.ord[0]) >= 0, f.id + ": de forkerte ord er tilbage i bakken");
+                ok(!pu.laast && !pv.laast, f.id + ": de forkerte pladser er ikke låst");
+                ok(/<b>[^<]+<\/b>/.test(b.beskedTekst) && b.beskedTekst.length > 40, f.id + ": der kommer en forklaring på fejlen");
+            }
+            for (var n = 0; n < L; n++) {
+                var brugt = [];
+                b.aktive().forEach(function (p) {
+                    var o = p.ord.filter(function (w) { return brugt.indexOf(w) < 0 && !b.pladsListe.some(function (q) { return q.laast && q.vist === w && !b.mester; }); })[0];
+                    brugt.push(o);
+                    b.placer(o, p);
+                });
+                b.indsend();
+                ok(b.tilstand === "loest", f.id + ": lag " + (n + 1) + " kan løses");
+                if (n === 0) ok(!b.stjerner[0], f.id + ": ingen stjerne efter et forkert forsøg");
+                if (n > 0) ok(!!b.stjerner[n], f.id + ": stjerne for lag " + (n + 1) + " uden fejl");
+                if (n < L - 1) {
+                    var ikkeBygget = b.lag[n].pladser.filter(function (id) {
+                        return (b.pladser[id].dele || []).some(function (d) { return b.dele[d].tilstand !== "bygget"; });
+                    });
+                    ok(!ikkeBygget.length, f.id + ": alt i lag " + (n + 1) + " er bygget");
+                    b.naeste();
+                }
+            }
+            ok(b.faerdig, f.id + ": figuren er færdig til sidst");
+            ok(b.pladsListe.every(function (p) { return p.laast; }), f.id + ": alle pladser er låst til sidst");
+        });
+
+        /* 3b. Den svaere udgave: alle fagord paa én gang (brugeren 2. nov. 2026) */
+        afsnit("3b. Svær udgave");
+        ok(typeof NK.saetSvaer === "function", "kontakten findes");
+        NK.saetSvaer(true);
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            ok(b.alt && b.svaerKontakt && b.svaerKontakt.checked, f.id + ": kontakten er slået til på fanen");
+            ok(b.aktive().length === b.pladsListe.length, f.id + ": alle pladser spørger på én gang");
+            ok(b.bakke.length === b.alleOrd.length, f.id + ": alle fagord ligger i bakken");
+            ok(b.deleListe.every(function (d) { return d.auto ? d.tilstand === "bygget" : d.tilstand === "spoeg"; }), f.id + ": hele figuren står uden farver fra start");
+            var brugt = [];
+            b.aktive().forEach(function (p) {
+                var o = p.ord.filter(function (w) { return brugt.indexOf(w) < 0; })[0];
+                brugt.push(o);
+                b.placer(o, p);
+            });
+            b.indsend();
+            ok(b.tilstand === "loest" && b.faerdig, f.id + ": alt på én gang kan løses, og figuren er færdig");
+            ok(b.deleListe.every(function (d) { return d.tilstand === "bygget"; }), f.id + ": hele figuren er bygget til sidst");
+            ok(!!b.stjerner[0], f.id + ": stjerne uden fejl");
+        });
+        NK.saetSvaer(false);
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            ok(!b.alt && b.lagNr === 0 && b.aktive().length === b.lag[0].pladser.length, f.id + ": slået fra igen begynder figuren ved lag 1");
+        });
+        /* Et ord, der slippes paa sin egen plads, staar der stadig (fejl 2. nov. 2026) */
+        afsnit("3c. Ord sluppet på sin egen plads");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.nulstil();
+            var p = b.aktive()[0], o = p.ord[0];
+            b.placer(o, p);
+            p.paa = null; b.tegnPlads(p); p.paa = o;   /* som under traekket */
+            b.placer(o, p);
+            ok(p.tekst.textContent === o, f.id + ": ordet står på pladsen igen");
+        });
+        /* 4. Hjaelpen: et hint og saa svaret */
+        afsnit("4. Hjælpen");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.nulstil();
+            b.hjaelp();
+            var p = b.pladser[b.hintPlads];
+            ok(!!p && b.hintTrin === 1, f.id + ": Giv et hint peger på en plads");
+            ok(/Fagordet til den orange plads betyder/.test(b.beskedTekst), f.id + ": hintet er forklaringen fra bogen");
+            var knap = b.kort.querySelector(".knap.hjaelp");
+            ok(knap && knap.textContent === "Vis svaret", f.id + ": knappen hedder nu Vis svaret");
+            b.hjaelp();
+            ok(p && p.ord.indexOf(p.paa) >= 0, f.id + ": Vis svaret sætter det rigtige ord på pladsen");
+            var brugt = [];
+            b.aktive().forEach(function (q) { if (!q.paa) { var o = q.ord.filter(function (w) { return !b.hvorEr(w); })[0]; b.placer(o, q); } });
+            b.indsend();
+            ok(b.tilstand === "loest" && !b.stjerner[0], f.id + ": løst med hjælp giver ingen stjerne");
+        });
+
+        /* 5. Hoppe mellem lagene */
+        afsnit("5. Lagene i panelet");
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.nulstil();
+            var sidste = b.lag.length - 1;
+            b.springLag(sidste);
+            ok(b.lagNr === sidste && b.tilstand === "opgave" && !b.mester, f.id + ": et klik på det sidste lag starter det");
+            var foer = b.pladsListe.filter(function (p) { return p.lag < sidste; });
+            ok(foer.every(function (p) { return p.laast && p.vist; }), f.id + ": lagene før står færdige");
+            b.springLag(0);
+            ok(b.pladsListe.filter(function (p) { return p.laast; }).length === 0, f.id + ": tilbage til lag 1 tømmer figuren");
+        });
+
+        /* 6. Sproget */
+        afsnit("6. Sproget");
+        var tekster = [];
+        NK.FANER.forEach(function (f) {
+            var b = B[f.id];
+            b.lag.forEach(function (l) { tekster.push([f.id + " ros", l.ros, 130]); });
+            b.pladsListe.forEach(function (p) {
+                Object.keys(p.fejl || {}).forEach(function (w) {
+                    tekster.push([f.id + " fejl " + p.id + "/" + w, p.fejl[w].replace(/<[^>]+>/g, ""), 140]);
+                    ok(NK.FORKLARING[w] !== undefined, f.id + ": fejlteksten ved " + p.id + " gælder et fagord (" + w + ")");
+                });
+            });
+        });
+        tekster.forEach(function (t) {
+            ok(t[1].length <= t[2], t[0] + " er højst " + t[2] + " tegn (" + t[1].length + ")");
+            ok(!/\b1[+−-]/.test(t[1]), t[0] + " skriver ikke 1+ eller 1−");
+            ok(!/[–—]/.test(t[1]), t[0] + " har ingen tankestreg");
+        });
+
+        linjer.push("\n" + (fejl ? fejl + " FEJL" : "ALT OK (" + linjer.filter(function (l) { return /^ {2}ok/.test(l); }).length + ")"));
+        document.getElementById("ud").textContent = linjer.join("\n");
+    }
+
+    window.setTimeout(function () {
+        try { koer(); } catch (e) { document.getElementById("ud").textContent = linjer.join("\n") + "\n\nUNDTAGELSE: " + e.stack + "\n\n1 FEJL"; }
+    }, 300);
+}());
+</script>
+</body>
+</html>

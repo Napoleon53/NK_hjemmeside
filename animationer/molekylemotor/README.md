@@ -1,6 +1,6 @@
 # Molekylemotoren
 
-Fælles kode til at tegne og navngive molekyler. Den bruges af otte sider:
+Fælles kode til at tegne og navngive molekyler. Den bruges af ni sider:
 
 * `../superanimationer/tegnebraet/`: tegnebrættet til rapporter
 * `../superanimationer/sc4.2_zigzagformler/`: quizzerne om zigzagformler, navne
@@ -23,6 +23,10 @@ Fælles kode til at tegne og navngive molekyler. Den bruges af otte sider:
   oxygen, og = Binding i jagten med alkener), og navngivningen (uden cis og trans) afgør, om tegningen er en ny isomer eller det samme stof igen.
   Hylden og whiteboardet tegnes af struktur ud fra navnelæserens molekyler. Animationen
   lægger sin egen `klik` på sin tavle; motoren er ikke ændret
+* `../superanimationer/sb4.3_oxidation_af_alkoholer/`: oxidation af alkoholer. Fane 1
+  tegner sine egne strukturformler med alle H (stilen "alle") og navngiver dem uden H;
+  fane 2 bygger alkoholerne og de fire svar af navnet og navngiver modellens produkt
+  (molekyle, navngivning, navnelæser, layout, struktur og tavle). Motoren er ikke ændret
 * `../superanimationer/sb4.8_organiske_navne/`: navne på alkoholer, aldehyder,
   ketoner, carboxylsyrer, estere og aminer. Molekylerne bygges af navnet
   (navnelæseren), tegnes af struktur, og på fanen Tegn molekylet tegner eleven på

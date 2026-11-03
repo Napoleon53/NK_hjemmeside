@@ -216,9 +216,9 @@ kortet dækker aldrig whiteboardet fra 1100 × 620 til 1600 × 950.
 
 ## I menuen
 
-Ikke endnu. Når brugeren siger til: en ny knap i
-`kemi-b-filer/samling_b4,5,6.html` (B4 Funktionelle grupper) med
-`../superanimationer/sb4.8_organiske_navne/index.html`, en ny `data-emne`
-(fx `b4.navne`), navnet i `FEEDBACK_EMNER` i `samling_alt_b.html` og kolonnen
-"I menuen" i `../README.md`. Kemibogen B kan linke til den fra boksen Prøv selv
+Fra 3. nov. 2026 som nr. 1 "Organiske navne" i
+`kemi-b-filer/samling_b4,5,6.html` (B4 Funktionelle grupper) med koden
+`b5navne` (`?emne=b5navne`). Koder til B4 begynder med `b5` (fra før
+omnummereringen 9. okt. 2026); en kode med `b4` sender til B3. Navnet står i
+`FEEDBACK_EMNER` i `samling_alt_b.html`. Kemibogen B kan linke til den fra boksen Prøv selv
 i afsnit B3.1 (med `?med=alkohol,aldehyd,keton,syre`) og fra B4.5 og B4.6.

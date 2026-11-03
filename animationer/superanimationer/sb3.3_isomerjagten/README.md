@@ -226,9 +226,9 @@ whiteboardet fra 1100 × 620 til 1600 × 950; værktøjerne gør det, de skal.
 
 ## I menuen
 
-Ikke endnu. Når brugeren siger til: en ny knap i
+Fra 3. nov. 2026 som nr. 3 "Isomerjagten" i
 `kemi-b-filer/samling_b_bindinger_isomeri.html` (B3 Bindinger og isomeri) med
-`../superanimationer/sb3.3_isomerjagten/index.html`, en ny `data-emne` (fx
-`b3.isomerjagt`), navnet i `FEEDBACK_EMNER` i `samling_alt_b.html` og kolonnen
-"I menuen" i `../README.md`. Kemibogen B kan linke til den fra boksen Prøv selv
+koden `isomerjagten` (`?emne=isomerjagten`). Koden begynder ikke med `b3`, for
+den sender til B6 Syre/Base; `findSideFraEmne` i `samling_alt_b.html` kender
+den. Navnet står i `FEEDBACK_EMNER`. Kemibogen B kan linke til den fra boksen Prøv selv
 i afsnit B3.3 (i stedet for eller ud over tegnebrættet).

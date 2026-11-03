@@ -178,6 +178,10 @@ window.NK = NK;
             });
         }
 
+        /* Kortet foelges, saa figuren kan rykke ned under det (se tilpasFigur) */
+        this.svaerTop = 0;
+        if (window.ResizeObserver) new window.ResizeObserver(function () { self.tilpasFigur(); }).observe(this.kort);
+
         this.alt = !!NK.svaer;
         if (this.svaerKontakt) this.svaerKontakt.checked = this.alt;
         this.nulstil();
@@ -329,7 +333,24 @@ window.NK = NK;
     Bygger.prototype.saetAlt = function (alt) {
         this.alt = !!alt;
         if (this.svaerKontakt) this.svaerKontakt.checked = this.alt;
+        this.svaerTop = 0;
+        this.figur.style.top = "";
         this.nulstil();
+        this.tilpasFigur();
+    };
+
+    /* I den svaere udgave kan bakken faa saa mange ord, at kortet bliver
+       hoejere end pladsen over figuren, og pladserne foroven kom ind under
+       kortet (B5.2 med ni fagord, 3. nov. 2026). Saa rykker figuren ned
+       under kortet. Den rykker ikke op igen, mens der arbejdes, saa
+       pladserne ikke flytter sig, naar bakken bliver mindre. */
+    Bygger.prototype.tilpasFigur = function () {
+        if (!this.alt || !this.kort.offsetHeight) return;
+        var zone = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue("--kortzone")) || 0;
+        var bund = this.kort.offsetTop + this.kort.offsetHeight + 10;
+        if (bund <= zone || bund <= this.svaerTop) return;
+        this.svaerTop = bund;
+        this.figur.style.top = bund + "px";
     };
 
     /* Gaa til et lag: lagene foer bygges straks, laget selv staar graa,

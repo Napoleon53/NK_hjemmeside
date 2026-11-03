@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 200" width="60" height="200">
+  <!-- Reagensglas med kaliumdichromat i sur opløsning (groen). Glasset er ens i begge filer; kun væsken skifter farve -->
+  <defs>
+    <linearGradient id="vaeske" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#2f7d5a"/>
+      <stop offset="0.45" stop-color="#5fae86"/>
+      <stop offset="1" stop-color="#2f7d5a"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.4" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <!-- Vaesken: de nederste 55 % -->
+  <path d="M13 92 L47 92 L47 172 A17 17 0 0 1 13 172 Z" fill="url(#vaeske)"/>
+  <ellipse cx="30" cy="92" rx="17" ry="3.2" fill="#5fae86" opacity="0.9"/>
+  <!-- Glasset -->
+  <path d="M13 12 L13 172 A17 17 0 0 0 47 172 L47 12" fill="url(#glas)" stroke="#6b7685" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M8 10 Q8 6 12 6 L48 6 Q52 6 52 10 L52 13 L8 13 Z" fill="#e9edf1" stroke="#6b7685" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M19 22 L19 165" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" opacity="0.75"/>
+</svg>
