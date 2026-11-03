@@ -13,6 +13,11 @@
      niv          svaerhedsgraden: Let, Middel, Svaer eller Mester (flisen og kortet)
      tekst        opgaven paa kortet ved siden af den gule ramme med formlen
      kun          "alkohol": kun alkoholerne taeller (etherne afvises)
+     quiz         sand: isomeri-quizzen ("Hvilken slags isomerer er X og Y?")
+                  er slaaet til fra start. Brugeren 3. nov. 2026: til i de
+                  tre foerste jagter, fra i resten, saa man kan "kvaerne
+                  isomere" uden at blive afbrudt. Eleven kan slaa den til
+                  og fra i panelet, og valget huskes pr. jagt
      dobbelt      sand: jagten har én dobbeltbinding (vaerktoejet = Binding);
                   cis og trans taeller som ét stof
      strategi     hint 1, saa laenge der mangler isomerer (bogens Hjaelp 1)
@@ -53,7 +58,7 @@
 
     D.JAGTER = [
         {
-            id: "c5h12", formel: "C5H12", titel: "Alkaner", niv: "Let",
+            id: "c5h12", formel: "C5H12", titel: "Alkaner", niv: "Let", quiz: true,
             tekst: "Molekylformlen passer til tre forskellige alkaner. Tegn dem én ad gangen, og tryk Indsend svar.",
             strategi: "Begynd med den lige kæde. Gør den ét carbonatom kortere, og sæt det sidste på som en sidegren.",
             kog: "raekke",
@@ -69,7 +74,7 @@
             ]
         },
         {
-            id: "c2h6o", formel: "C2H6O", titel: "Alkohol og ether", niv: "Let",
+            id: "c2h6o", formel: "C2H6O", titel: "Alkohol og ether", niv: "Let", quiz: true,
             tekst: "Molekylformlen passer til to stoffer: en alkohol og en ether. Tegn dem én ad gangen, og tryk Indsend svar.",
             strategi: "Oxygenatomet kan sidde for enden som en OH-gruppe eller midt i kæden mellem to carbonatomer.",
             kog: "raekke",
@@ -84,7 +89,7 @@
             ]
         },
         {
-            id: "c3h8o", formel: "C3H8O", titel: "Alkoholer og ether", niv: "Let",
+            id: "c3h8o", formel: "C3H8O", titel: "Alkoholer og ether", niv: "Let", quiz: true,
             tekst: "Molekylformlen passer til tre stoffer: to alkoholer og en ether. Tegn dem én ad gangen, og tryk Indsend svar.",
             strategi: "Begynd med alkoholerne, og flyt OH-gruppen. Sæt så oxygenatomet ind midt i kæden.",
             kog: "raekke",
@@ -214,10 +219,15 @@
     /* Vaerktoejerne oeverst paa tavlen. ilt: kun i jagter med oxygen.
        dobbelt: kun i jagter med en dobbeltbinding */
     D.VAERKTOEJ = [
-        { id: "tegn", tekst: "Kæde", titel: "Træk fra et atom, eller klik på et: kæden vokser med ét carbonatom" },
-        { id: "binding", tekst: "= Binding", titel: "Klik på en binding mellem to carbonatomer: enkelt eller dobbelt", dobbelt: true },
-        { id: "gruppe:OH", tekst: "−OH", titel: "Klik på et carbonatom for at sætte en OH-gruppe på", ilt: true },
-        { id: "skiftO", tekst: "C → O", titel: "Klik på et carbonatom for at gøre det til et oxygenatom. Klik på O igen for at gøre det til C", ilt: true }
+        { id: "C", el: "C", tekst: "C", titel: "Carbon (tast C): træk fra et atom for at tegne en kæde, eller klik på et atom for at gøre kæden ét C længere. Et klik på et O gør det til C" },
+        { id: "O", el: "O", tekst: "O", titel: "Oxygen (tast O): træk fra et carbonatom for at sætte et oxygenatom på, eller klik på et carbonatom for at gøre det til O", ilt: true },
+        { id: "binding", tekst: "= Binding", titel: "Klik på en binding mellem to carbonatomer: enkelt eller dobbelt", dobbelt: true }
+    ];
+
+    /* Visningen paa tavlen: zigzag (som i bogen) eller alle atomer med H */
+    D.STIL = [
+        { id: "zigzag", tekst: "Zigzag", titel: "Zigzagformel som i bogen" },
+        { id: "alle", tekst: "Alle atomer", titel: "Strukturformel med alle atomer, også H" }
     ];
 
     /* Medaljen til sidst: stjerner ud af de fem jagter */

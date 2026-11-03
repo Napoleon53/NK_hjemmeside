@@ -81,7 +81,20 @@ function koerTest(W) {
     var I = NK.sims["fane-i"], B = NK.sims["fane-b"], R = NK.sims["fane-r"];
     var FANER = [["i", I, "fane-i"], ["b", B, "fane-b"], ["r", R, "fane-r"]];
 
-    function kortT(X) { var e = X.el.skort.querySelector(".sk-tekst"); return e ? e.textContent : ""; }
+    function kortT(X) {
+        /* Papirkortet: efter et rigtigt svar bliver spoergsmaalet staaende, og
+           forklaringen staar i raekken under svarene (.sk-bund.bliv) */
+        var e = X.el.skort.querySelector(".sk-bund.bliv .st-tekst") || X.el.skort.querySelector(".sk-tekst");
+        return e ? e.textContent : "";
+    }
+    function erSpm(f) { return f === "brok" || f === "spm" || f === "spm2"; }
+    /* Et svar paa et spoergsmaal vaelger kun; Indsend svar bedoemmer det. Gaettet virker med det samme. */
+    function svar(X, j) {
+        var g = X.opg, spm = !!g && erSpm(g.fase) && !X.venter && !X.faerdig;
+        X.svarValg(j);
+        if (spm) X.indsendKlik();
+    }
+    function videre(X) { return X.el.skort.querySelector(".sk-videre"); }
     function besked(X) { return X.el.besked.hidden ? "" : X.beskedTekst(); }
     function roed(X) { return /skidt/.test(X.el.status.className); }
     function blinker(X) { return X.el.skort.classList.contains("blink"); }
@@ -136,8 +149,8 @@ function koerTest(W) {
                 }
                 udfyld(X); X.tjek(); log.push("felter"); continue;
             }
-            if (forkertFoerst) { X.svarValg(forkert(X)); log.push(roed(X) && X.pegKnap ? "fejl-rød" : "fejl-IKKE-rød"); }
-            X.svarValg(rigtigt(X)); log.push(f);
+            if (forkertFoerst) { svar(X, forkert(X)); log.push(roed(X) && X.pegKnap ? "fejl-rød" : "fejl-IKKE-rød"); }
+            svar(X, rigtigt(X)); log.push(f);
         }
         return log;
     }
@@ -269,6 +282,44 @@ function koerTest(W) {
     R.pump();
     paastand("fane r: efter indgrebet viser tavlen [N₂O₄] = 0,10 M med 0,050 M før", /0,10 M/.test(NK.el("r-oplyst").textContent) && /før: 0,050 M/.test(NK.el("r-oplyst").textContent) && R.opg.fase === "felter");
 
+    overskrift("5b. Papirkortet: Indsend svar, og kortet bliver på spørgsmålet");
+    paastand("papirkortet er slået til, og kortets tekst står med Lexend", d.body.classList.contains("papirkort") && /Lexend/.test(W.getComputedStyle(R.el.skort).fontFamily));
+    R.vaelg(0);
+    var skR = R.el.skort;
+    paastand("mål 1 begynder med spørgsmålet om reaktionsbrøken: Indsend svar er grå, og spørgsmålet er halvfedt",
+        R.opg.fase === "brok" && !R.el.indsend.hidden && R.el.indsend.classList.contains("ikke-klar") && !!skR.querySelector(".sk-spm"));
+    R.el.indsend.click();
+    paastand("Indsend svar uden et valgt svar: kortet blinker og siger, hvad der mangler", blinker(R) && /Vælg et af svarene/.test(besked(R)) && R.opg.rigtig === undefined, besked(R));
+    nulstilBlink(R);
+    skR.querySelector('.sk-knap[data-valg="' + forkert(R) + '"]').click();
+    paastand("et svar på kortet vælger kun: intet er bedømt, svaret er blåt, og Indsend svar er klar",
+        R.opg.valgt === forkert(R) && !roed(R) && R.el.indsend.classList.contains("klar") && skR.querySelectorAll(".sk-knap.valgt").length === 1 && skR.querySelectorAll(".sk-knap.forkert").length === 0);
+    R.el.indsend.click();
+    paastand("Indsend svar med et forkert svar: svaret bliver rødt og låst, og forklaringen står på kortet",
+        roed(R) && /^Ikke endnu/.test(besked(R)) && skR.querySelectorAll(".sk-knap.forkert:disabled").length === 1 && R.opg.valgt === null, besked(R));
+    skR.querySelector('.sk-knap[data-valg="' + rigtigt(R) + '"]').click();
+    R.el.indsend.click();
+    paastand("det rigtige svar: spørgsmålet bliver stående, brøken er grøn, de andre er låst, og knappen Videre står, hvor Indsend svar stod",
+        R.venter && R.opg.fase === "brok" && skR.classList.contains("loest") && /Hvilken reaktionsbrøk hører til reaktionen på tavlen\?/.test(skR.querySelector(".sk-tekst").textContent) &&
+        skR.querySelectorAll(".sk-knap.rigtig").length === 1 && skR.querySelectorAll(".sk-knap:not(:disabled)").length === 0 &&
+        /^Rigtigt /.test(kortT(R)) && !!skR.querySelector(".sk-bund.bliv .sk-videre") && R.el.indsend.hidden && R.el.status.hidden &&
+        skR.getBoundingClientRect().height <= R.kortZone(), kortT(R) + " " + Math.round(skR.getBoundingClientRect().height));
+    var spmFoer = skR.querySelector(".sk-tekst").textContent;
+    videre(R).click();
+    paastand("først når eleven trykker, kommer regnestykket, og der står ingen ros fra spørgsmålet under det",
+        R.opg.fase === "felter" && !R.venter && !/Rigtigt|Godt/.test(besked(R)) && skR.querySelector(".sk-tekst").textContent !== spmFoer, besked(R));
+    udfyld(R); R.tjek();
+    paastand("regnestykket rigtigt: opgaven bliver stående med Rigtigt og Y, og spørgsmålet om Y og K venter på Næste spørgsmål",
+        R.venter && R.opg.fase === "felter" && /^Rigtigt Y = 0,50/.test(kortT(R)) && videre(R).textContent === "Næste spørgsmål →" &&
+        skR.getBoundingClientRect().height <= R.kortZone(), kortT(R));
+    videre(R).click();
+    paastand("spørgsmålet om Y og K står alene: ingen ros fra regnestykket under det", R.opg.fase === "spm" && !R.venter && besked(R) === "" && !skR.querySelector(".sk-bund.bliv"), besked(R));
+    R.knap(); R.knap(); R.knap(); R.knap();
+    paastand("Vis svaret på et spørgsmål: svaret bliver gult på kortet, og spørgsmålet bliver stående",
+        R.faerdig && skR.classList.contains("svar") && skR.querySelectorAll(".sk-knap.svar-vist").length === 1 && /^Svaret /.test(kortT(R)) &&
+        /Næste opgave|Videre til/.test(videre(R).textContent), kortT(R));
+    paastand("Næste og hintknappen står aldrig samme sted som Start forfra", !/forfra/i.test(videre(R).textContent));
+
     overskrift("6. Regnestykket på fane 3 forstår eleverne");
     var T = R.tolk;
     function v(s) { return T.call(R, s).v; }
@@ -282,7 +333,7 @@ function koerTest(W) {
         for (var n = 0; n < 6 && R.opg.fase !== "felter"; n++) {
             if (R.venter) R.knap();
             else if (R.opg.fase === "forsoeg") R.pump();
-            else R.svarValg(rigtigt(R));
+            else svar(R, rigtigt(R));
         }
         var r = R.r;
         r.over.concat(r.under).forEach(function (dd) { R.felt(dd.s).value = felter[dd.s] !== undefined ? felter[dd.s] : R.tal(R.c[dd.s]); });
@@ -301,11 +352,13 @@ function koerTest(W) {
     var b5 = proev(1, {}, "0,80");
     paastand("NO₂: 0,80 uden enhed giver beskeden om M", /Husk enheden/.test(b5), b5);
     var b6 = proev(1, {}, "0,8 M");
-    paastand("NO₂: 0,8 M bliver godkendt", R.opg.fase === "spm" && /0,80 M/.test(R.felt("Y").value), R.opg.fase);
+    paastand("NO₂: 0,8 M bliver godkendt, og kortet bliver på regnestykket med Rigtigt, til eleven trykker Næste spørgsmål",
+        R.opg.fase === "felter" && R.venter && /0,80 M/.test(R.felt("Y").value) && /^Rigtigt /.test(kortT(R)) && /Y = 0,80 M/.test(kortT(R)) &&
+        videre(R).textContent === "Næste spørgsmål →", R.opg.fase + " " + kortT(R));
     var b7 = proev(4, {}, "3,0 · 10^-4");
     paastand("salmiak: uden M² giver beskeden om enheden", /M²/.test(b7) && R.opg.fase === "felter", b7);
     proev(4, {}, "0,0003 M2");
-    paastand("salmiak: 0,0003 M2 bliver godkendt og vist som 3,0 · 10⁻⁴ M²", R.opg.fase === "spm" && R.felt("Y").value === "3,0 · 10⁻⁴ M²", R.felt("Y").value);
+    paastand("salmiak: 0,0003 M2 bliver godkendt og vist som 3,0 · 10⁻⁴ M²", R.venter && R.opg.fase === "felter" && R.felt("Y").value === "3,0 · 10⁻⁴ M²", R.felt("Y").value);
     var b8 = proev(0, { CO2: "" }, "0,50");
     paastand("et tomt felt giver en besked om, hvad der skal i det", /Skriv \[CO₂\]/.test(b8), b8);
 
@@ -380,7 +433,7 @@ function koerTest(W) {
                     if (fa === "gaet") X.svarValg(rigtigt(X));
                     else if (fa === "forsoeg") goerForsoeg(X, navn);
                     else if (fa === "felter") { udfyld(X); X.tjek(); }
-                    else X.svarValg(rigtigt(X));
+                    else svar(X, rigtigt(X));
                 }
             });
             /* Scenens ting ligger inden for scenen */

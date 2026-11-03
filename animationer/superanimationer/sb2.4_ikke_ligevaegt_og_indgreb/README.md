@@ -177,3 +177,22 @@ I menuen fra 22. oktober 2026 (brugeren: "ja til det hele"):
   koder og filnavne er de samme, så gamle links virker.
 * `FEEDBACK_EMNER` i `samling_alt_b.html` under B2.
 * Kemibogen B: boksen Prøv selv i `b/kapitler/b2-4-ikke-ligevaegt-og-indgreb.qmd`.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`.
+
+* **Indsend svar:** et svar på et spørgsmål (også reaktionsbrøken på fane 3) vælger
+  kun. Det bedømmes med knappen Indsend svar i kortets nederste række
+  (`indsendKlik` og `visIndsend` i `js/fane.js`, knapperne `i-indsend`, `b-indsend`
+  og `r-indsend`). Gættet før forsøget er gratis og virker stadig med det samme.
+* **Kortet bliver på spørgsmålet:** et rigtigt svar lægger ikke kortet om.
+  Spørgsmålet bliver stående med svaret grønt (gult ved Vis svaret), forklaringen
+  står under svarene, og Næste står, hvor Indsend svar stod (`blivHTML`).
+* **Regnestykket på fane 3:** et rigtigt regnestykke giver ikke længere "Godt"
+  under spørgsmålet om *Y* og *K*. Opgaven bliver stående med "Rigtigt. Y = …",
+  og spørgsmålet kommer, når eleven trykker Næste spørgsmål (`regnetRigtigt` i
+  `js/sim_regn.js` kalder `mellemsvar`).
+* Selvtesten svarer med `svar(X, j)`, der vælger og trykker Indsend svar, og har
+  påstande om Indsend svar, og om at kortet bliver på spørgsmålet (121 påstande).

@@ -15,7 +15,7 @@
 
     var TURE = {
         "fane-i": [
-            { sel: "#i-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu. Et gæt og et spørgsmål har gule svarknapper på kortet. Når svaret er rigtigt, står forklaringen på kortet. Blinker kortet, skal du først gøre det, kortet siger." },
+            { sel: "#i-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu. Et gæt og et spørgsmål har svarknapper på kortet. Vælg et svar på et spørgsmål, og tryk Indsend svar. Når svaret er rigtigt, står forklaringen på kortet. Blinker kortet, skal du først gøre det, kortet siger." },
             { sel: "#i-anker-beholder", titel: "Beholderen", tekst: "En lukket beholder med CO, H₂O, CO₂ og H₂. Hvert molekyle står for 0,025 M. Når reaktionen forløber, bliver et par molekyler lavet om ad gangen. Klik på et molekyle for at se, hvad det er." },
             { sel: "#i-anker-knapper", titel: "Indgrebene", tekst: "Når opgaven beder om det, kan du pumpe et stof ind (+) eller fjerne det (−). Hver gang er det 0,10 M." },
             { sel: "#i-anker-tallinje", titel: "Tallinjen", tekst: "Reaktionsbrøken Y og ligevægtskonstanten K. Står Y til venstre for K, går reaktionen mod højre. Står Y til højre for K, går den mod venstre. Den tomme, stiplede ring viser Y før indgrebet." },
@@ -25,7 +25,7 @@
             { sel: ".faneknapper", titel: "De andre faner", tekst: "På fane 2 ser du den samme slags indgreb i blodet. På fane 3 regner du Y ud og sammenligner med K." }
         ],
         "fane-b": [
-            { sel: "#b-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu, og stiller spørgsmålene med gule svarknapper. Det, opgaven handler om, har en gul ring." },
+            { sel: "#b-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu, og stiller spørgsmålene med svarknapper. Vælg et svar, og tryk Indsend svar. Det, opgaven handler om, har en gul ring." },
             { sel: "#b-anker-lunge", titel: "Lungerne", tekst: "I lungerne kommer der oxygen ind i blodet fra luften. Når opgaven beder om det, sender et klik på lungerne blodet derhen." },
             { sel: "#b-anker-muskel", titel: "Musklen", tekst: "Musklen bruger oxygen. Når opgaven beder om det, sender et klik på musklen blodet derhen." },
             { sel: "#b-anker-lup", titel: "Luppen", tekst: "En lille portion af blodet: 12 Hb og de frie O₂. En Hb med O₂ på er lysere rød og hedder HbO₂. For at gøre det enkelt har hver Hb kun ét sted, hvor et O₂ kan sætte sig." },
@@ -35,7 +35,7 @@
             { sel: "#b-opgaver", titel: "Opgaverne", tekst: "Fem opgaver om lungerne, musklen og bjergene." }
         ],
         "fane-r": [
-            { sel: "#r-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu, og stiller spørgsmålene med gule svarknapper." },
+            { sel: "#r-skort", titel: "Opgaven", tekst: "Kortet øverst siger, hvad du skal nu, og stiller spørgsmålene med svarknapper. Vælg et svar, og tryk Indsend svar." },
             { sel: "#r-anker-tavle", titel: "Tavlen", tekst: "Reaktionsskemaet, K og koncentrationerne. Når du har valgt reaktionsbrøken, sætter du tallene ind i felterne og regner Y ud. Enheden M står allerede efter hvert felt. Tryk på Tjek eller Enter." },
             { sel: "#r-anker-tallinje", titel: "Tallinjen", tekst: "Når Y er regnet ud, står Y på tallinjen ved siden af K. Når opgaven er løst, ser du Y gå hen til K." },
             { sel: "#r-status", titel: "Hjælpen", tekst: "Den gule knap på kortet giver ét hint ad gangen og til sidst svaret. Svarer du forkert, står forklaringen her på kortet." },

@@ -154,3 +154,9 @@ ved 1500 × 950 og 1280 × 720 er set igennem; kortet med ordene dækker ingen p
   opløselighed = 0,0761 g/100 mL (en tiendedel). Pladsen står en linje over og peger ned til
   værdien, og venstresiden "opløselighed" er en streg i den grå udgave.
 - Selvtest ALT OK (645).
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

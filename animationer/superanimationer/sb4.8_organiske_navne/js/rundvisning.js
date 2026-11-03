@@ -15,7 +15,7 @@
 
     var TURE = {
         "fane-n": [
-            { sel: "#n-skort", titel: "Kortet øverst", tekst: "Al tekst står her: trinnet, navnet, du bygger, og brikkerne at vælge imellem. Den gule knap giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#n-skort", titel: "Kortet øverst", tekst: "Al tekst står her: trinnet, navnet, du bygger, og brikkerne at vælge imellem. Vælg en brik, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#n-anker-tavle", titel: "Formlen", tekst: "Molekylet er tegnet som zigzagformel. Hvert knæk og hver ende er et carbonatom. Det gule er det, kortet spørger om lige nu. Det, du har fundet, får delens farve fra navnet." },
             { sel: "#fane-n .klassekort", titel: "Stofklasser", tekst: "Slå en stofklasse til eller fra. Kun de stofklasser, der er slået til, kommer med i opgaverne på alle tre faner." },
             { sel: "#n-opgaver", titel: "Opgaverne", tekst: "Klik på et nummer for at vælge en opgave. En løst opgave får et flueben og en stjerne, hvis du ikke fik vist svaret." },
@@ -29,7 +29,7 @@
             { sel: "#fane-t .klassekort", titel: "Stofklasser", tekst: "Slå en stofklasse til eller fra. Kun de stofklasser, der er slået til, kommer med i opgaverne." }
         ],
         "fane-g": [
-            { sel: "#g-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålet og forklaringen. Den gule knap giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#g-skort", titel: "Kortet øverst", tekst: "Al tekst står her: opgaven, spørgsmålet og forklaringen. Vælg et svar, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#g-anker-tavle", titel: "Formlen", tekst: "Klik på et atom i en funktionel gruppe, og vælg stofklassen på kortet. Den gule ring er det, kortet spørger om. En gruppe, du har fundet, får stofklassens farve og navn." },
             { sel: "#fane-g .klassekort", titel: "Stofklasser", tekst: "Stofferne på fane 3 har kun grupper fra de stofklasser, der er slået til." },
             { sel: "#g-opgaver", titel: "Opgaverne", tekst: "Klik på et nummer for at vælge et andet stof." }

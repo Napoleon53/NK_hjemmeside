@@ -416,3 +416,15 @@ Ikke lagt i menuen. Når brugeren siger til:
 * `FEEDBACK_EMNER` i `samling_alt.html` under C7.
 * Rækken i `../README.md`.
 * Kemibogen: boksen Prøv selv i `kapitler/7-2-staerke-og-svage-syrer.qmd`.
+
+## Papirkortet og Indsend svar (3. nov. 2026)
+
+Prøve på det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`. Et svar på
+et spørgsmål vælger kun; det bedømmes med knappen Indsend svar (`indsendKlik` og
+`visIndsend` i `js/fane.js`, knappen `x-indsend` i hver fanes nederste række).
+Gættet er stadig gratis og virker med det samme. Et rigtigt svar lægger ikke
+kortet om: spørgsmålet bliver stående med svaret grønt, forklaringen står under
+svarene, og Næste står, hvor Indsend svar stod (`blivHTML`). Selvtesten svarer
+med `svar(X, j)`, der vælger og trykker Indsend svar, og den tillader filerne i
+`../faelles/`.

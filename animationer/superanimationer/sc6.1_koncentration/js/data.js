@@ -461,7 +461,7 @@
     /* Fane 1: de gule skilte ved det, der skal bruges, og linjen, naar eleven
        klikker paa forsoeget, foer der er gaettet */
     D.SKILT = { krukke: "Klik: en skefuld", vand: "Hold nede: vand", tap: "Hold nede: tap ud" };
-    D.GAET_LINJE = "Gæt først. Vælg et af de tre svar på det gule kort.";
+    D.GAET_LINJE = "Gæt først. Vælg et af de tre svar på kortet.";
 
     D.INTRO = {
         kar: "Koncentrationen er stofmængde pr. liter.",

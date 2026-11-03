@@ -18,8 +18,9 @@
    åbner index.html i en iframe på b × h og kører kommandoerne:
      vaelg:n    vælg mål n (fra 0)
      gaet:j     svar j på gættet
-     svar:j     svar j på spørgsmålet
-     rigtig     det rigtige svar på spørgsmålet
+     svar:j     svar j på spørgsmålet (vælger og trykker Indsend svar)
+     valgt:j    vælg svar j uden at trykke Indsend svar
+     rigtig     det rigtige svar på spørgsmålet (med Indsend svar)
      forsoeg    gør forsøget for eleven (som Vis svaret, men uden at gå videre)
      knap       tryk på hjælpeknappen
      videre     tryk på kortets grønne knap
@@ -53,8 +54,9 @@ function koer() {
     (q.s || "").split(",").filter(Boolean).forEach(function (c) {
         var a = c.split(":"), n = a[0], v = a[1];
         if (n === "vaelg") F.vaelg(parseInt(v, 10));
-        else if (n === "gaet" || n === "svar") F.svarValg(parseInt(v, 10));
-        else if (n === "rigtig") { var del = F.opg.o[F.opg.fase]; del.svar.forEach(function (s, j) { if (s.ok) F.svarValg(j); }); }
+        else if (n === "gaet" || n === "valgt") F.svarValg(parseInt(v, 10));
+        else if (n === "svar") { F.svarValg(parseInt(v, 10)); if (F.indsendKlik) F.indsendKlik(); }
+        else if (n === "rigtig") { var del = F.opg.o[F.opg.fase]; del.svar.forEach(function (s, j) { if (s.ok) F.svarValg(j); }); if (F.indsendKlik) F.indsendKlik(); }
         else if (n === "forsoeg") F.forsoegSvar(F.opg.o);
         else if (n === "knap") F.knap();
         else if (n === "videre") F.knap();

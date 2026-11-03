@@ -224,7 +224,11 @@ lighedstegnene under hinanden; at der ingen statuslinje er; og at fane 1 kan
 være i scenen med et hint og med forklaringen i tekstboksen.
 Sidst kørt: ALT OK (599 påstande), 9. oktober 2026 (Linux, headless Chrome).
 
-## Til menuen
+## I menuen
+
+I menuen fra 3. nov. 2026 som nr. 4 i `kemi-b-filer/samling_b2.html` (koden `b2.3`). Den gamle ligger i `kemi-c-filer/arkiv/b2.3_ligevaegtsberegninger_oldversion.html`.
+
+### Sådan kom den i menuen
 
 Når brugeren siger til:
 

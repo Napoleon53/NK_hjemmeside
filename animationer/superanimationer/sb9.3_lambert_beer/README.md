@@ -209,7 +209,11 @@ typiske fejl, hinttrappen, sproget og layoutet fra 1100 × 700 til
 1600 × 950.
 Sidst kørt: ALT OK, 2. oktober 2026.
 
-## Til menuen
+## I menuen
+
+I menuen fra 3. nov. 2026 som nr. 2 i `kemi-b-filer/samling_b9.html` (koden `b9.3`). Den gamle ligger i `kemi-c-filer/arkiv/b9.3_lambert_beer_simulation_oldversion.html`.
+
+### Sådan kom den i menuen
 
 Når brugeren siger til:
 

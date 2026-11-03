@@ -41,8 +41,9 @@ trækkes. Kortet bliver grønt ved et rigtigt gæt og blåt ved et forkert, og d
 forkerte gæt får at vide, hvor mange gange for stort eller lille det var (i
 tierpotenser). Til sidst antal rigtige og en fjollet titel (Mol-lærling til
 Avogadros arving). Svarene står fra mindst til størst; det rigtige svar står
-på plads B, C og D, og kun to af otte er det største. Gættet er gratis; den
-gule knap giver ét hint med tal, man kan lave et overslag med.
+på plads B, C og D, og kun to af otte er det største. Et klik vælger gættet,
+og først Indsend svar låser det (3. nov. 2026); den gule knap giver ét hint
+med tal, man kan lave et overslag med.
 
 **2 Tæl i mol.** Seks opgaver: 3 dusin æg, 3 mol æg, fra antal til mol (2,00 og
 0,500 mol), H-atomer i 1 mol H₂O og mol mennesker. Lærredet viser bakker og
@@ -106,3 +107,32 @@ Lagt ind 23. okt. 2026 (brugerens ja):
 * `FEEDBACK_EMNER` i `animationer/samling_alt.html`: nr. 3 "Hvor meget er et mol?", de andre et nummer op.
 * Kemibogen: `kapitler/5-3-stofmaengde.qmd` har en "Prøv selv"-linje (kommer på kemibogen.dk, når bogen
   bygges og lægges ind næste gang).
+
+## Papirkortet (3. nov. 2026)
+
+Scenekortet er det lyse papirkort (se Fælles krav i `../README.md`):
+`../faelles/papirkort.css` og `../faelles/papirkort.js` er indlæst, og
+`<body class="papirkort">`. Etiketten, indledningen og spørgsmålet står i én
+linje (`NK.Kort.tekst` i `js/kort.js`), og spørgsmålet står halvfedt.
+
+På begge faner vælger et klik på et svar kun (blåt, og valget kan flyttes), og
+knappen Indsend svar ved den gule knap bedømmer det (`svarValg` og
+`indsendKlik` i `js/sim_gaet.js` og `js/sim_tael.js`, `indsend` og `kortBesked`
+i `js/kort.js`). På fane 1 låser Indsend svar gættet og sætter søjlen i gang;
+brugeren valgte samme dag, at gættene skal have Indsend svar, for de tæller med
+i resultatet, og et fejlklik må ikke koste noget. Trykkes Indsend svar uden et
+valgt svar, blinker kortet, og en kort besked siger det; et hint eller
+forklaringen til et forkert svar kommer igen bagefter.
+
+Efter svaret bliver kortet på spørgsmålet på begge faner (`NK.Kort.bliv`):
+det rigtige svar er grønt, forklaringen står under svarene, og Næste opgave
+eller Næste gæt står, hvor Indsend svar stod. Ved et forkert gæt er det
+rigtige svar gult, gættet rødt, og sætningen om, hvor langt gættet var fra,
+står i forklaringen. Gæt forfra og Start forfra står nu til venstre i kortets
+nederste række, for Færdig og Se resultatet står lavere end før og ville ellers
+ligge samme sted. Det, der er særligt her, står sidst i `css/stil.css`; svarene
+er lidt tættere, når kortet bliver på spørgsmålet, så det kan være i
+`kortZone()`. Selvtesten (ALT OK, 180 påstande) svarer med Indsend svar på
+begge faner og tjekker, at et klik på et gæt kun vælger, at Indsend svar låser
+det, at kortet bliver på spørgsmålet, at det holder sig i `kortZone()` fra
+1100 × 620, og at forfra-knapperne ikke står, hvor knappen videre stod.

@@ -23,7 +23,7 @@
    det hele kommer i på én gang, at de seks fejlkilder går den rigtige
    vej, at formlerne og tallene genkendes med de typiske fejl, at facit
    i alle opgaver og begge veje er pænt og kan skrives som svar, at alle
-   tre faner kan gennemføres med musen (gættet på det gule kort i scenen,
+   tre faner kan gennemføres med musen (gættet på papirkortet i scenen,
    aflæsning med et klik på vægten, formlen valgt blandt tre), at et klik
    i den forkerte rækkefølge får en forklaring, at omskifteren skifter
    vej, at hint og svar står på kortet ved den gule knap, at sproget
@@ -99,6 +99,14 @@ function koerTest(W) {
         enter(e);
     }
     function besked(sim) { return sim.beskedTekst(); }
+    /* Det faerdige udseende: en overgang, der er i gang, springes over */
+    function stil(e, navn) {
+        var t = e.style.transition;
+        e.style.transition = "none";
+        var v = W.getComputedStyle(e)[navn];
+        e.style.transition = t;
+        return v;
+    }
     function komma(v) { return NK.tal2(v); }
 
     overskrift("1. Indlæsning");
@@ -117,6 +125,11 @@ function koerTest(W) {
     paastand("omskifteren står på Uden mol uden link og hukommelse (brugeren 9. okt. 2026: for svær til HF)", NK.niveau === "nf" &&
         d.querySelector('.niveauknap[data-niveau="nf"]').classList.contains("aktiv"));
     paastand("omskifteren vises ikke på fanen Forsøget", d.querySelector(".niveau").hidden);
+    var kortCs = W.getComputedStyle(d.getElementById("forsoeg-kort"));
+    paastand("papirkortet er slået til: lyst kort med skriften Lexend, og NK.Papir findes", d.body.classList.contains("papirkort") && !!NK.Papir &&
+        /Lexend/.test(kortCs.fontFamily) && /251, 250, 246/.test(kortCs.backgroundColor), kortCs.fontFamily + " " + kortCs.backgroundColor);
+    paastand("mappen henter kun sine egne filer og det fælles papirkort", Array.prototype.every.call(d.querySelectorAll("script[src], link[href], img[src]"), function (e) {
+        var u = e.getAttribute("src") || e.getAttribute("href"); return /^\.\.\/faelles\//.test(u) || !/^(\.\.|\/|https?:)/.test(u); }));
     paastand("opgavekortet på fane 1 og 3 står i scenen, ikke i panelet", !!d.querySelector("#fane-forsoeg .scene > #forsoeg-kort.scenekort") &&
         !!d.querySelector("#fane-fejl .scene > #fejl-kort.scenekort") && !d.querySelector("#fane-forsoeg .panel .opgavekort, #fane-fejl .panel .opgavekort"));
 
@@ -288,9 +301,11 @@ function koerTest(W) {
     function vaegt1() { klik(A, lay.v1.x, lay.bordY - 20); }
     function vaegt2() { klik(A, lay.v2.x, lay.bordY - 20); }
     function gaetKnap(navn, tekst) { return [].filter.call(d.querySelectorAll("#" + navn + "-valg .gk-knap"), function (k) { return k.textContent.indexOf(tekst) >= 0; })[0]; }
-    paastand("måling 1 starter med et gæt på det gule kort midt i scenen", A.fase() === "valg" && kortA.classList.contains("gaet") &&
+    paastand("måling 1 starter med et gæt på kortet midt i scenen", A.fase() === "valg" && kortA.classList.contains("gaet") &&
         d.querySelectorAll("#forsoeg-valg .gk-knap").length === 3 && /Gæt først/i.test(A.kortTekst()), A.kortTekst());
-    paastand("under gættet er kortet det eneste fyldte gule: hintknappen er kun et omrids", A.el.knap.classList.contains("svar"));
+    paastand("under gættet er hintknappen en stille knap med kant, og intet på kortet pulserer", A.el.knap.classList.contains("svar") &&
+        stil(A.el.knap, "backgroundColor") === "rgba(0, 0, 0, 0)" && stil(kortA, "animationName") === "none" &&
+        [].every.call(d.querySelectorAll("#forsoeg-valg .gk-knap"), function (k) { return stil(k, "backgroundColor") === "rgb(255, 255, 255)"; }));
     paastand("under gættet er luppen, de fire skridt og Start forfra ikke fremme", !A.lupFremme() && d.getElementById("forsoeg-skridt").hidden &&
         d.getElementById("forsoeg-forfra").hidden && d.getElementById("forsoeg-aflaes").hidden);
     pulver();
@@ -353,8 +368,13 @@ function koerTest(W) {
     vaegt2();
     tik(A, 0.1);
     paastand("et klik på vægten under kolben løser måling 1, og målingen er gemt", A.faerdig && NK.maalinger[0] && NK.maalinger[0].me === A.kolbe.visning());
-    paastand("kortet er grønt og har forklaringen og knappen Næste måling", kortA.classList.contains("sejr") && /Dit gæt holdt ikke/.test(besked(A)) &&
-        /CO₂/.test(besked(A)) && A.el.knap.textContent === "Næste måling →" && /Løst/i.test(A.kortTekst()), A.kortTekst());
+    paastand("målingen er løst: forklaringen står i den grønne boks på kortet, og knappen Næste måling står nederst, hvor hintknappen stod",
+        kortA.classList.contains("sejr") && /Dit gæt holdt ikke/.test(besked(A)) && /god/.test(A.el.besked.className) &&
+        /CO₂/.test(besked(A)) && A.el.knap.textContent === "Næste måling →" && /Løst/i.test(A.kortTekst()) && kortA.querySelector(".sk-bund").contains(A.el.knap), A.kortTekst());
+    paastand("knappen Næste måling er grøn og pulserer ikke, og Start forfra står et andet sted (i kortets øverste række)",
+        stil(A.el.knap, "animationName") === "none" && /43, 125, 81/.test(stil(A.el.knap, "backgroundColor")) &&
+        !d.getElementById("forsoeg-forfra").hidden && kortA.querySelector(".sk-hoved").contains(d.getElementById("forsoeg-forfra")) &&
+        !kortA.querySelector(".sk-bund").contains(d.getElementById("forsoeg-forfra")), stil(A.el.knap, "backgroundColor"));
     paastand("skemaet viser kolbens tab", /Kolben tabte/.test(d.getElementById("forsoeg-note").textContent), d.getElementById("forsoeg-note").textContent);
     paastand("fane 2 regner nu på den egen måling", B.opg.id !== "m1" || (B.opg.tal.egen && B.opg.tal.mf === NK.maalinger[0].mf));
 
@@ -493,7 +513,7 @@ function koerTest(W) {
     C.vaelg(0, false);
     paastand("fejlkilderne går fra den letteste til den sværeste", D.FEJL[0].id === "tidligt" && D.FEJL[1].id === "sproejt" && D.FEJL[5].id === "spild",
         D.FEJL.map(function (o) { return o.id; }).join(", "));
-    paastand("hver fejlkilde starter med et gæt på det gule kort midt i scenen", kortC.classList.contains("gaet") &&
+    paastand("hver fejlkilde starter med et gæt på kortet midt i scenen", kortC.classList.contains("gaet") &&
         d.querySelectorAll("#fejl-valg .gk-knap").length === 3 && C.kortTekst().indexOf(D.FEJL_SPM) >= 0 && C.kortTekst().indexOf(D.FEJL[0].tekst) >= 0, C.kortTekst());
     klik(C, C.lay.st[0].x, C.lay.bordY - 30);
     paastand("et klik på forsøget før gættet: forsøget starter ikke, og kortet blinker", !C.koerer && C.valgt === null && kortC.classList.contains("blink") &&
@@ -512,11 +532,22 @@ function koerTest(W) {
         if (vej !== o.rigtig) retning.push(o.id + ": B gav " + K.pct1(r.B.pct) + " %");
         if (!C.status[i].stjerne) retning.push(o.id + " fik ingen stjerne");
         if (!/Dit gæt holdt/.test(besked(C))) retning.push(o.id + ": " + besked(C));
-        if (!/Rigtigt gættet/i.test(C.kortTekst()) || !kortC.classList.contains("sejr") || kortC.classList.contains("svar")) retning.push(o.id + ": kortet er ikke grønt");
-        if (C.el.knap.hidden || C.el.knap.textContent !== (i < D.FEJL.length - 1 ? "Næste fejlkilde →" : "Forfra ↺")) retning.push(o.id + ": knappen hedder " + C.el.knap.textContent);
+        if (!/Rigtigt gættet/i.test(C.kortTekst()) || !kortC.classList.contains("sejr") || kortC.classList.contains("svar")) retning.push(o.id + ": kortet siger ikke Rigtigt gættet");
+        /* Efter den sidste fejlkilde er der intet at gaa videre til: ingen knap, saa
+           Start forfra aldrig staar, hvor Naeste stod (Kør igen staar i kortets oeverste raekke) */
+        if (i < D.FEJL.length - 1 ? (C.el.knap.hidden || C.el.knap.textContent !== "Næste fejlkilde →") : (!C.el.knap.hidden || /forfra/i.test(C.el.knap.textContent)))
+            retning.push(o.id + ": knappen hedder " + C.el.knap.textContent + (C.el.knap.hidden ? " (skjult)" : ""));
+        /* Rosen til gaettet staar aldrig under det naeste gaet */
+        if (i < D.FEJL.length - 1) {
+            C.el.knap.click();
+            if (C.nr !== i + 1 || !kortC.classList.contains("gaet") || besked(C) !== "" || /holdt/.test(C.kortTekst())) retning.push(o.id + ": efter Næste fejlkilde står der: " + C.kortTekst());
+        }
     });
     paastand("mens de to forsøg kører, siger kortet det, og hintknappen er væk", vaekC === true);
-    paastand("alle seks kan løses med det rigtige gæt: B går den rigtige vej, og kortet er grønt med forklaringen og knappen videre", retning.length === 0, retning.join("; "));
+    paastand("alle seks kan løses med det rigtige gæt: B går den rigtige vej, forklaringen og knappen videre står på kortet, og Næste fejlkilde giver et nyt gæt uden rosen til det forrige", retning.length === 0, retning.join("; "));
+    paastand("efter den sidste fejlkilde er der ingen knap, hvor Næste stod, og Kør igen står i kortets øverste række", C.faerdig && C.el.knap.hidden &&
+        !d.getElementById("fejl-forfra").hidden && kortC.querySelector(".sk-hoved").contains(d.getElementById("fejl-forfra")) &&
+        (function () { var nr = C.nr; C.knap(); C.enter(); return C.nr === nr && C.faerdig; }()));
     paastand("tabellen viser begge grupper", d.getElementById("fejl-t-pct-b").textContent !== "" && d.getElementById("fejl-t-pct-a").textContent === "95,3 %",
         d.getElementById("fejl-t-pct-a").textContent);
     paastand("kortet siger, hvad de to grupper fik", /Gruppe A får 95,3 % kalk/.test(C.kortTekst()), C.kortTekst());
@@ -524,7 +555,7 @@ function koerTest(W) {
     C.vaelg(iSpild, false);
     d.querySelectorAll("#fejl-valg .gk-knap")[1].click();
     for (i = 0; i < 100 && C.koerer; i++) tik(C, 1);
-    paastand("spildt pulver, gættet lavere: forklaringen tager fat i gættet, kortet er gult, og stjernen bliver", /Du gættede: lavere/.test(besked(C)) &&
+    paastand("spildt pulver, gættet lavere: forklaringen tager fat i gættet og står i en gul boks, og stjernen bliver", /Du gættede: lavere/.test(besked(C)) && /gul/.test(C.el.besked.className) &&
         C.status[iSpild].stjerne && kortC.classList.contains("svar") && /Forklaringen/i.test(C.kortTekst()), besked(C));
     paastand("Kør igen kører de samme to forsøg", (function () { d.getElementById("fejl-forfra").click(); var ok = C.koerer; for (var q = 0; q < 100 && C.koerer; q++) tik(C, 1); return ok && !C.koerer && C.res; }()));
 

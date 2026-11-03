@@ -20,6 +20,9 @@
        foer eleven trykker Indsend svar. Et rigtigt svar, der har en del
        mere, faar et groent kort med knappen videre (mellemsvar). Loest:
        kortet er groent med forklaringen og knappen Naeste.
+     * papirkortet (3. nov. 2026, ../faelles/papirkort.css): har delen
+       spm (Tael efter, Find fejlen), bliver spoergsmaalet staaende efter
+       et rigtigt svar (blivHTML), og ekstra tegnes laast.
      * kortets nederste raekke: hint, forklaringen til et forkert svar
        og svaret paa et klik i scenen, hjaelpeknappen (Giv et hint >
        Naeste hint > Vis svaret) og Indsend svar. Indsend er graa, til
@@ -31,7 +34,8 @@
      lavOpgave(i), delNu() -> { tekst, chip, ekstra }, layout(), tegn(),
      opdaterScene(dt), hintTrin(), visSvar(), indsend(), kanIndsende(),
      videre() (naar eleven trykker videre paa et mellemsvar)
-   Fanen KAN have: indsendTekst(), kortKlik(e), efterOpgave(), enter().
+   Fanen KAN have: indsendTekst(), kortKlik(e), efterOpgave(), enter(),
+     talFacit() (det rigtige tal, saa tallene kan tegnes laast).
    ===================================================================== */
 (function () {
     "use strict";
@@ -162,10 +166,13 @@
             return null;
         };
 
+        /* Kortets knap gaar altid fremad (brugeren 3. nov. 2026: Start forfra
+           staar aldrig samme sted som Naeste). Er alt loest paa den sidste
+           fane, gaar knappen til den naeste opgave i raekken (knap). */
         P.videreTekst = function () {
             if (!this.faerdig) return (this.mellem && this.mellem.knap) || "Næste →";
-            if (this.naesteUloeste() >= 0) return valg.naesteTekst || "Næste opgave →";
-            return valg.naesteFane ? "Videre til " + valg.naesteNavn + " →" : "Start forfra ↺";
+            if (this.naesteUloeste() >= 0 || !valg.naesteFane) return valg.naesteTekst || "Næste opgave →";
+            return "Videre til " + valg.naesteNavn + " →";
         };
 
         /* Den hoejde, kortet har faaet sat af oeverst i scenen. Det, eleven
@@ -182,9 +189,13 @@
         P.visKort = function () {
             var e = this.el.skort;
             var slut = this.slutNu(), d = slut ? null : this.delNu();
-            var kl = "scenekort " + (slut ? "loest" + (slut.maade === "svar" ? " svar" : "") : "opgave");
+            /* Papirkortet: var det et spoergsmaal med svaret paa kortet (delNu
+               har spm), bliver spoergsmaalet staaende efter et rigtigt svar */
+            var spmD = slut && NK.Papir ? this.delNu() : null;
+            var bliv = !!(spmD && spmD.spm);
+            var kl = "scenekort " + (slut ? "loest" + (slut.maade === "svar" ? " svar" : "") + (bliv ? " bliv" : "") : "opgave");
             if (e.className.replace(" blink", "") !== kl) e.className = kl;
-            NK.saetHTML(navn + "-ind", this.kortHTML(slut, d));
+            NK.saetHTML(navn + "-ind", bliv ? this.blivHTML(slut, spmD) : this.kortHTML(slut, d));
             this.visKnap();
         };
 
@@ -195,9 +206,25 @@
                 return '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">' + maerke + "</span>" + svaret + NK.html(slut.tekst || "") + "</p>" +
                     '<button type="button" class="sk-videre" data-videre="1">' + NK.html(this.videreTekst()) + "</button></div>";
             }
-            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(d.chip || "Opgave") + "</span>" + NK.html(d.tekst) + "</p>";
+            var tekst = NK.Papir ? NK.Papir.tekst(NK.html(d.tekst)) : NK.html(d.tekst);
+            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(d.chip || "Opgave") + "</span>" + tekst + "</p>";
             if (d.ekstra) html += d.ekstra;
             return html;
+        };
+
+        /* Papirkortet (brugerens valg 3. nov. 2026): et rigtigt svar paa et
+           spoergsmaal paa kortet laegger ikke kortet om. Spoergsmaalet og
+           svarene bliver staaende og er laast (fanen tegner ekstra laast, naar
+           faerdig eller venter er sat), det rigtige svar er groent, forklaringen
+           staar under svarene, og knappen, der foerer videre, staar dér, hvor
+           Indsend svar stod. Ved tallene staar svaret allerede paa knappen, saa
+           slut.svaret kommer kun med ved de andre spoergsmaal. */
+        P.blivHTML = function (slut, d) {
+            var vist = slut.maade === "svar";
+            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(d.chip || "Opgave") + "</span>" + NK.Papir.tekst(NK.html(d.tekst)) + "</p>";
+            if (d.ekstra) html += d.ekstra;
+            var svaret = slut.svaret && d.spm !== "tal" ? '<b class="sk-svaret">' + NK.html(slut.svaret) + "</b> " : "";
+            return html + NK.Papir.bliv(svaret + NK.html(slut.tekst || ""), vist ? "Svaret" : "Rigtigt", NK.html(this.videreTekst()), vist);
         };
 
         /* Kortet blinker: eleven greb ud efter scenen, men skal foerst goere
@@ -485,13 +512,20 @@
            En raekke knapper fra 1 til 12. En knap vaelger kun; Indsend svar
            sender tallet ind. Et forkert tal, der er sendt ind, bliver roedt. */
         P.talHTML = function () {
+            /* Laast, naar svaret er rigtigt (papirkortet): det rigtige tal er
+               groent (gult med Vis svaret), de andre er toned ned */
+            var slut = this.slutNu(), laast = !!slut;
+            var facit = laast && this.talFacit ? this.talFacit() : null, vist = laast && slut.maade === "svar";
             var html = '<div class="tal-raekke" role="group" aria-label="Vælg et tal">';
             for (var t = 1; t <= 12; t++) {
                 var kl = "tal-knap";
-                if (this.talValg === t) kl += " valgt";
                 var forkert = this.talForkert && this.talForkert[t];
-                if (forkert) kl += " forkert";
-                html += '<button type="button" class="' + kl + '" data-tal="' + t + '"' + (forkert ? " disabled" : "") + ">" + t + "</button>";
+                if (laast) kl += t === facit ? (vist ? " svar-vist" : " rigtig") : (forkert ? " forkert" : " dim");
+                else {
+                    if (this.talValg === t) kl += " valgt";
+                    if (forkert) kl += " forkert";
+                }
+                html += '<button type="button" class="' + kl + '" data-tal="' + t + '"' + (forkert || laast ? " disabled" : "") + ">" + t + "</button>";
             }
             return html + "</div>";
         };

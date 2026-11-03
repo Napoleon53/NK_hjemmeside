@@ -224,7 +224,11 @@ otte molekyler, quizzen, sproget (ingen tankestreger, ASCII-ord eller
 Lambert-Beer) og layoutet fra 1100 × 700 til 1600 × 950.
 Sidst kørt: ALT OK (74 påstande), 2. oktober 2026.
 
-## Til menuen
+## I menuen
+
+I menuen fra 3. nov. 2026 som nr. 1 i `kemi-b-filer/samling_b9.html` (koden `b9.1`). Den gamle ligger i `kemi-c-filer/arkiv/b9_1.Absorbtionsspektrum_oldversion.html`.
+
+### Sådan kom den i menuen
 
 Når brugeren siger til:
 

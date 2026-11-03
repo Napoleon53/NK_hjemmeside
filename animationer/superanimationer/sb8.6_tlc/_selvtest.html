@@ -23,9 +23,10 @@
    skiller ad), at luppen viser den samme andel som modellen, at alle
    opgaver kan løses selv og med Vis svaret, at et forkert svar giver en
    rød linje og ingen fremgang, at de typiske fejl i felterne får deres
-   egen forklaring, at scenen er låst under gæt og spørgsmål, at
-   sproget holder reglerne, og at kortet og tingene under det kan være
-   der fra 1100 × 700 til 1600 × 950.
+   egen forklaring, at scenen er låst under gæt og spørgsmål, at kortet
+   bliver på delen efter et rigtigt svar (papirkortet), at sproget holder
+   reglerne, og at kortet og tingene under det kan være der fra
+   1100 × 700 til 1600 × 950.
 
    Iframen skal åbnes gennem en lokal server. Testen gemmer elevens
    fremskridt og lægger det tilbage bagefter.
@@ -72,6 +73,11 @@ function koerTest(W) {
     var d = W.document;
     var NK = W.NK, D = NK.Data, M = NK.Model;
     var Sp = NK.sims["fane-p"], Sr = NK.sims["fane-r"], Sl = NK.sims["fane-l"];
+    /* Papirkortet: kortets hovedtekst og raekken under den med forklaringen og
+       knappen, der foerer videre (NK.html holder tal og enhed sammen med et
+       haardt mellemrum) */
+    function kortTxt(S) { var e = S.el.skort.querySelector(".sk-tekst"); return e ? e.textContent.replace(/\u00a0/g, " ") : ""; }
+    function blivT(S) { var b = S.el.skort.querySelector(".sk-bund.bliv"); return b ? b.textContent.replace(/\u00a0/g, " ") : ""; }
     var rf = function (stof, loeb) { return M.rf(D.STOF[stof], D.LOEB[loeb]); };
 
     /* ================================================================ */
@@ -209,7 +215,8 @@ function koerTest(W) {
     Sp.valgKlik(0);
     Sp.pladeKlik();
     koerF(Sp, 9);
-    paastand("et forkert gæt: forsøget kører alligevel, og kortet siger, at gættet ikke holdt", Sp.venter && /holdt ikke/.test(Sp.kortTekst()));
+    paastand("et forkert gæt: forsøget kører alligevel, og kortet bliver på forsøget og siger, at gættet ikke holdt",
+        Sp.venter && /holdt ikke/.test(blivT(Sp)) && kortTxt(Sp).indexOf(D.PLADEN[0].dele[1].tekst) >= 0);
     Sp.knap();
     var foer = Sp.opg.di;
     Sp.valgte = { 0: true };
@@ -280,7 +287,8 @@ function koerTest(W) {
         Object.keys(svar).forEach(function (k) { Sr.feltV[k] = svar[k]; });
         var di = Sr.opg.di;
         Sr.indsendKlik();
-        return { tekst: Sr.beskedTekst(), videre: Sr.opg.di !== di || Sr.faerdig };
+        /* Godtaget: kortet bliver paa delen med knappen videre (papirkortet) */
+        return { tekst: Sr.beskedTekst(), videre: Sr.opg.di !== di || Sr.faerdig || Sr.venter };
     }
     var r1 = proev(0, { a: "2,1" }, "plet");
     paastand("målt til toppen af pletten: forklaringen siger midten", /toppen/.test(r1.tekst) && !r1.videre, r1.tekst);
@@ -547,6 +555,69 @@ function koerTest(W) {
         });
         paastand(k[0] + ": intet bevæger sig, før eleven gør noget", !urolig.length, urolig.join("; "));
     });
+    /* ================================================================ */
+    overskrift("13. Papirkortet: kortet bliver på delen, til eleven selv går videre");
+    paastand("kortet er et lyst papirkort med skriften Lexend", d.body.classList.contains("papirkort") &&
+        /Lexend/.test(W.getComputedStyle(Sp.el.skort).fontFamily) && !!NK.Papir);
+    NK.visFane("fane-r");
+    Sr.tilpas(); Sr.layout();
+    Sr.vaelg(0);
+    var del0 = Sr.delData();
+    del0.felter.forEach(function (f) { Sr.feltV[f.id] = D.dk(f.ret, 1); });
+    Sr.indsendKlik();
+    paastand("Rf-værdien: et rigtigt tal i en stille del går direkte videre til næste del uden ros og med tom nederste række",
+        !!del0.stille && Sr.opg.di === 1 && !Sr.venter && !Sr.el.skort.querySelector(".sk-bund.bliv") &&
+        Sr.beskedTekst() === "" && Sr.fast.klasse === "" && Sr.el.skort.textContent.indexOf(del0.godt.slice(0, 15)) < 0);
+    var del1 = Sr.delData();
+    del1.felter.forEach(function (f) { Sr.feltV[f.id] = D.dk(f.ret, 1); });
+    Sr.indsendKlik();
+    var delF = Sr.delData();
+    vaelgOk(Sr, delF);
+    Sr.indsendKlik();
+    paastand("et spørgsmål med stille: true (formlen) bliver stående som de andre spørgsmål",
+        !!delF.stille && delF.slags === "spm" && Sr.venter && !!Sr.el.skort.querySelector(".sk-knap.rigtig") && /Rigtigt/.test(blivT(Sr)));
+    Sr.knap();
+    var delR = Sr.delData();
+    delR.felter.forEach(function (f) { Sr.feltV[f.id] = D.dk(f.ret, f.rf ? 2 : 1); });
+    Sr.indsendKlik();
+    var feltR = Sr.el.skort.querySelectorAll("input[data-felt]");
+    paastand("regnestykket: kortet bliver på det; felterne står låst og grønne med tallene, og forklaringen står under",
+        Sr.faerdig && !delR.stille && feltR.length === delR.felter.length && Array.prototype.every.call(feltR, function (e) {
+            return e.disabled && e.classList.contains("rigtig") && e.value !== ""; }) && blivT(Sr).indexOf(Sr.opg.o.loest.slice(0, 15)) >= 0);
+    paastand("knappen, der fører videre, står, hvor Indsend svar stod, og Indsend svar og hintknappen er væk",
+        !!Sr.el.skort.querySelector(".sk-bund.bliv .sk-videre") && Sr.el.indsend.hidden && Sr.el.status.hidden);
+    paastand("rosen er ét ord uden flueben: Rigtigt", Sr.el.skort.querySelector(".sk-bund.bliv .b-maerke").textContent === "Rigtigt");
+    NK.visFane("fane-p");
+    Sp.tilpas(); Sp.layout();
+    Sp.vaelg(0);
+    Sp.valgKlik(Sp.delData().svar.findIndex(function (sv) { return sv.ok; }));
+    Sp.pladeKlik(); koerF(Sp, 9);
+    paastand("Tovtrækningen: efter forsøget bliver forsøget stående med det, eleven så, og dommen over gættet",
+        Sp.venter && kortTxt(Sp).indexOf(D.PLADEN[0].dele[1].tekst) >= 0 && /Dit gæt holdt/.test(blivT(Sp)) && /Næste spørgsmål/.test(blivT(Sp)));
+    Sp.knap();
+    var dS = Sp.delData(), fS = dS.svar.findIndex(function (sv) { return !sv.ok; }), rS = dS.svar.findIndex(function (sv) { return sv.ok; });
+    Sp.valgKlik(fS); Sp.indsendKlik(); Sp.valgKlik(rS); Sp.indsendKlik();
+    var knS = Sp.el.skort.querySelectorAll(".sk-knap");
+    paastand("et rigtigt svar: spørgsmålet bliver stående, det rigtige svar er grønt, det forkerte rødt, de andre tonet ned, og alle er låst",
+        Sp.venter && knS.length === dS.svar.length && knS[rS].classList.contains("rigtig") && knS[fS].classList.contains("forkert") &&
+        Array.prototype.every.call(knS, function (k, j) { return k.disabled && (j === rS || j === fS || k.classList.contains("dim")); }) &&
+        kortTxt(Sp).indexOf(dS.tekst) >= 0 && blivT(Sp).indexOf(dS.godt.slice(0, 20)) >= 0);
+    NK.visFane("fane-l");
+    Sl.tilpas(); Sl.layout();
+    Sl.vaelg(0);
+    for (var n3 = 0; n3 < 30 && !(Sl.venter && Sl.mellem && Sl.mellem.del && Sl.mellem.del.slags === "spm"); n3++) Sl.knap();
+    var dL = Sl.mellem && Sl.mellem.del, okL = dL ? dL.svar.filter(function (sv) { return sv.ok; }).length : -1;
+    paastand("Vis svaret på et spørgsmål: kortet bliver på spørgsmålet, og de rigtige svar er gule",
+        !!dL && Sl.el.skort.querySelectorAll(".sk-knap.svar-vist").length === okL && !!Sl.el.skort.querySelector(".sk-bund.bliv.svar") &&
+        Sl.el.skort.querySelector(".sk-bund.bliv .b-maerke").textContent === "Svaret");
+    var loestFoer = Sl.status.map(function (st) { return st.loest; });
+    Sl.status.forEach(function (st) { st.loest = true; });
+    Sl.faerdig = true;
+    var vtL = Sl.videreTekst();
+    Sl.status.forEach(function (st, i) { st.loest = loestFoer[i]; });
+    Sl.faerdig = false;
+    paastand("kortets knap går altid fremad og siger aldrig Start forfra, heller ikke når alle sager er løst", !/forfra/i.test(vtL), vtL);
+
     Sp.vaelg(0);
     Sr.vaelg(0);
     Sl.vaelg(0);

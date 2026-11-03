@@ -88,3 +88,9 @@ kortet med ordene ingen plads ved 1920 × 1080, 1500 × 950, 1366 × 768 og 1280
 
 `index.html#gasser` (eller `#densitet`, `#molarmasse`, `#stofmaengde`,
 `#begraensende-faktor`, `#vejeanalyse`, `#5.4`) åbner en fane.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

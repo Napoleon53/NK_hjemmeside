@@ -299,11 +299,10 @@
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="b9.1" data-beskrivelse="Se hvorfor opløsninger har farve, og hvordan et absorptionsspektrum hænger sammen med den bølgelængde man måler ved." onclick="visAnimation(this, 'b9_1.Absorbtionsspektrum.html')" title="Absorptionsspektre"><span class="btn-num">1</span><span class="btn-text">Absorptionsspektre</span></button>
-            <button class="tab-btn" data-emne="b9.2" data-beskrivelse="Bestem koncentrationen af azofarvestof i en Breezer ved at måle en standardrække og bruge Lambert-Beers lov." onclick="visAnimation(this, 'b9.2_forsøg_breezer.html')" title="Lambert-Beers lov: Breezer-forsøg"><span class="btn-num">2</span><span class="btn-text">Breezer-forsøg</span></button>
-            <button class="tab-btn" data-emne="b9.3" data-beskrivelse="Simulér en spektrofotometrisk måling, byg en standardkurve, og udled Lambert-Beers lov." onclick="visAnimation(this, 'b9.3_lambert_beer_simulation.html')" title="Lambert-Beers Lov"><span class="btn-num">3</span><span class="btn-text">Lambert-Beers Lov</span></button>
-            <button class="tab-btn" data-emne="b9.4" data-beskrivelse="Bestem koncentrationen af nitrit i drikkevand og spildevand ved at lave en standardkurve og måle absorbans, med mikroplan-visning af Griess-reaktionen." onclick="visAnimation(this, 'b9.4_nitritforsøg.html')" title="Nitrit i vand"><span class="btn-num">4</span><span class="btn-text">Nitrit i vand</span></button>
-            <button class="tab-btn" data-emne="b9.5" data-beskrivelse="Løs 6 eksamensagtige spektroskopiopgaver: bestem forskriften (ε) ud fra en standardkurve, og brug den til at finde koncentrationen i en ukendt prøve." onclick="visAnimation(this, 'b9_5.spektroskopi_opgaver.html')" title="Spektroskopiopgaver"><span class="btn-num">5</span><span class="btn-text">Spektroskopiopgaver</span></button>
+            <button class="tab-btn" data-emne="b9.1" data-beskrivelse="Se hvorfor opløsninger har farve, hvad konjugerede dobbeltbindinger gør ved spektret, og find chromoforen i farvestoffer." onclick="visAnimation(this, '../superanimationer/sb9.1_absorptionsspektre/index.html')" title="Absorptionsspektre"><span class="btn-num">1</span><span class="btn-text">Absorptionsspektre</span></button>
+            <button class="tab-btn" data-emne="b9.3" data-beskrivelse="Se lyset blive absorberet i kuvetten, mål en standardkurve i spektrofotometret, og regn med Lambert-Beers lov." onclick="visAnimation(this, '../superanimationer/sb9.3_lambert_beer/index.html')" title="Lambert-Beers lov"><span class="btn-num">2</span><span class="btn-text">Lambert-Beers lov</span></button>
+            <button class="tab-btn" data-emne="b9.4" data-beskrivelse="Lav en standardkurve, og find farvestoffet i en rød sodavand, nitrit i vandprøver og to farvestoffer i en grøn sodavand." onclick="visAnimation(this, '../superanimationer/sb9.4_spektrofotometri/index.html')" title="Spektrofotometri"><span class="btn-num">3</span><span class="btn-text">Spektrofotometri</span></button>
+            <button class="tab-btn" data-emne="b9.5" data-beskrivelse="Løs 6 eksamensagtige spektroskopiopgaver: bestem forskriften (ε) ud fra en standardkurve, og brug den til at finde koncentrationen i en ukendt prøve." onclick="visAnimation(this, 'b9_5.spektroskopi_opgaver.html')" title="Spektroskopiopgaver"><span class="btn-num">4</span><span class="btn-text">Spektroskopiopgaver</span></button>
 
         </div>
 
@@ -406,7 +405,9 @@
 
         window.addEventListener('load', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const emneFil = urlParams.get('emne');
+            // b9.2 (Breezer-forsøget) er en del af Spektrofotometri (b9.4) fra 3. nov. 2026.
+            const gamleNumre = { 'b9.2': 'b9.4' };
+            const emneFil = gamleNumre[urlParams.get('emne')] || urlParams.get('emne');
 
             if (emneFil) {
                 const knapper = document.querySelectorAll('.tab-btn');

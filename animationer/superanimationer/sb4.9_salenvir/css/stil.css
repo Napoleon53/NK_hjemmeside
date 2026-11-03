@@ -522,18 +522,7 @@ kbd {
 .sk-felt input.ryst { animation: ryst 0.35s ease 1; border-color: var(--roed); }
 .sk-felt .enhed { color: #dfe4ea; }
 
-.sk-tjek {
-    padding: 8px 18px;
-    border: 1px solid var(--blaa);
-    border-radius: 8px;
-    background-color: var(--blaa-mork);
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 0.98rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-.sk-tjek:hover { background-color: var(--blaa); }
+/* Feltet sendes ind med Indsend svar i kortets nederste raekke (3. nov. 2026) */
 
 /* Kortets nederste raekke: hint, fejl, beskeder og hjaelpeknappen */
 .sk-bund {
@@ -765,4 +754,45 @@ button:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* =====================================================================
+   PAPIRKORTET (brugerens valg 3. nov. 2026). ../faelles/papirkort.css
+   goer kortet til et lyst ark med Lexend, naar <body class="papirkort">.
+   Her kun det, der er saerligt for sb4.9: prikkerne for trinnets dele,
+   feltet til udbyttet, linjen med det, eleven skal vide (info), og den
+   groenne knap ved tingen, der faar kortets skrift.
+   ===================================================================== */
+html body.papirkort.papirkort .scenekort .sk-prikker i { background-color: #ddd8ca; box-shadow: none; }
+html body.papirkort.papirkort .scenekort .sk-prikker i.gjort { background-color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .sk-prikker i.nu { background-color: var(--pk-gul); box-shadow: 0 0 0 2px rgba(224, 178, 46, 0.3); }
+
+html body.papirkort.papirkort .scenekort .sk-felt { font-size: 1.1rem; font-weight: 600; color: var(--pk-tekst); }
+html body.papirkort.papirkort .scenekort .sk-felt .enhed { color: var(--pk-tekst); }
+html body.papirkort.papirkort .scenekort .sk-felt input {
+    border: 1.5px solid var(--pk-knapkant);
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: none;
+}
+html body.papirkort.papirkort .scenekort .sk-felt input:focus { border-color: var(--pk-blaa); box-shadow: 0 0 0 3px var(--pk-blaa-lys); }
+html body.papirkort.papirkort .scenekort .sk-felt input.ryst { border-color: var(--pk-roed); }
+/* Efter et rigtigt svar staar tallet laast i feltet: groent (gult med Vis svaret) */
+html body.papirkort.papirkort .scenekort .sk-felt input:disabled { opacity: 1; -webkit-text-fill-color: currentColor; }
+html body.papirkort.papirkort .scenekort .sk-felt input.rigtig { border-color: var(--pk-groen); background-color: var(--pk-groen-lys); color: #1d5a3a; box-shadow: inset 0 0 0 1px var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .sk-felt input.svar-vist { border-color: #c9a640; background-color: var(--pk-gul-lys); color: var(--pk-gul-tekst); box-shadow: inset 0 0 0 1px #c9a640; }
+
+/* Linjen med det, eleven skal vide ud over kortets tekst (js/trin.js kortOpdater) */
+html body.papirkort.papirkort .scenekort .sk-bund.info .st-tekst { background-color: #f0eee8; border-left-color: #a8a293; color: var(--pk-tekst-svag); }
+
+/* Den groenne knap ved tingen staar i scenen, ikke paa kortet. Den beholder
+   farven og pulsen (brugerens valg 22. okt. 2026) og faar kortets skrift. */
+html body.papirkort.papirkort .handling { font-family: "Lexend", "Segoe UI", Tahoma, sans-serif; font-weight: 600; }
+
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort .sk-felt,
+    html body.papirkort.papirkort .scenekort .sk-felt input { font-size: 1rem; }
+    html body.papirkort.papirkort .scenekort .sk-felt input { padding: 4px 9px; }
 }

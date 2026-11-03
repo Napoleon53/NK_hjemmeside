@@ -1684,3 +1684,15 @@ kbd {
 }
 
 .faneknap.kald { border-color: var(--gul); color: #fff2cc; animation: fane-kald 1.4s ease-in-out infinite; }
+
+/* =====================================================================
+   Papirkortet (3. nov. 2026): kortet er et lyst ark (../faelles/papirkort.css).
+   Her kun det, der er saerligt for denne animation: afkrydsningsboksen i
+   Hvad brydes? (vaelg alle, der passer) var moerk og gul paa det moerke kort.
+   ===================================================================== */
+html body.papirkort.papirkort .scenekort .v-boks { border: 1.5px solid #a8a293; background-color: #ffffff; color: #ffffff; }
+html body.papirkort.papirkort .scenekort .sk-knap.valgt .v-boks { border-color: var(--pk-blaa); background-color: var(--pk-blaa); }
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig .v-boks { border-color: var(--pk-groen); background-color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .sk-knap.svar-vist .v-boks { border-color: #c9a640; background-color: #c9a640; }
+/* Boksen har selv fluebenet, saa knappen faar ikke et ekstra foran */
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig:has(.v-boks)::before { content: none; }

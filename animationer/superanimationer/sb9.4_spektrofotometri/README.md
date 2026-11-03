@@ -188,7 +188,11 @@ pointer-hændelser, quizzen, sproget og layoutet fra 1100 × 700 til
 1600 × 950.
 Sidst kørt: ALT OK (113 påstande), 2. oktober 2026.
 
-## Til menuen
+## I menuen
+
+I menuen fra 3. nov. 2026 som nr. 3 i `kemi-b-filer/samling_b9.html` (koden `b9.4`). Breezer-knappen er fjernet, og knapperne er omnummereret 1-4 uden hul; `?emne=b9.2` åbner denne animation (`gamleNumre` i samlingsfilen). De gamle ligger i `kemi-c-filer/arkiv/` som `b9.2_forsøg_breezer_oldversion.html` og `b9.4_nitritforsøg_oldversion.html`.
+
+### Sådan kom den i menuen
 
 Når brugeren siger til:
 

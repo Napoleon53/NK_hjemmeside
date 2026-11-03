@@ -135,7 +135,7 @@
         }
         if (t.O !== n.O) {
             if (!n.O) return "Tegningen har oxygen, men " + f + " har intet oxygenatom.";
-            if (!t.O) return "Tegningen har intet oxygenatom, men " + f + " har ét. Sæt en OH-gruppe på, eller gør et C til O.";
+            if (!t.O) return "Tegningen har intet oxygenatom, men " + f + " har ét. Vælg O, og sæt et oxygenatom på.";
             return "Tegningen har " + K.tal(t.O, true) + " oxygenatomer, men " + f + " har ét. Slet et oxygenatom.";
         }
         if (t.H !== n.H) {

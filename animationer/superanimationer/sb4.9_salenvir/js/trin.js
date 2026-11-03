@@ -11,7 +11,18 @@
      mellem   en groen besked, foer der koeres en ny TLC-plade
      loest    det groenne kort med forklaringen og knappen Naeste trin
    Kortets nederste raekke har beskeden (hint, fejl, et svar paa noget
-   i scenen) og den gule hjaelpeknap: Giv et hint > Vis svaret.
+   i scenen), den gule hjaelpeknap (Giv et hint > Vis svaret) og Indsend
+   svar under et spoergsmaal og ved feltet.
+
+   Papirkortet (brugerens valg 3. nov. 2026, ../faelles/papirkort.css):
+   et svar paa et spoergsmaal vaelger kun, og Indsend svar bedoemmer det
+   (brugeren 24. okt. 2026). Efter et rigtigt svar paa et spoergsmaal
+   eller i feltet bliver kortet paa spoergsmaalet (this.bliv, blivHTML):
+   svaret er groent, forklaringen staar under, og Naeste trin (eller Vent
+   10 minutter) staar, hvor Indsend svar stod. Et skridt i forsoeget er en
+   handling med den groenne knap ved tingen, ikke et spoergsmaal, og faar
+   ingen ekstra knap. Det sidste trin har ingen knap videre; Start forfra
+   staar i panelet (brugeren 3. nov. 2026: aldrig samme sted som Naeste).
 
    Laasen: scenen kan kun bruges, mens kortet viser et forsoeg. Ellers
    blinker kortet (spaer).
@@ -37,6 +48,7 @@
         this.brugtSvar = false;
         this.delSidst = undefined;      /* saa foerste tjek altid ser delen */
         this.spm = null;
+        this.bliv = null;               /* papirkortet: kortet bliver paa spoergsmaalet */
         this.slutTekst = "";
         this.kortT = 0;
         this.besk = { html: "", klasse: "" };
@@ -78,13 +90,16 @@
             if (v) { mig.videre(); return; }
             var k = e.target.closest ? e.target.closest("[data-valg]") : null;
             if (k && !k.disabled) { mig.svarValg(parseInt(k.getAttribute("data-valg"), 10)); return; }
-            var tj = e.target.closest ? e.target.closest("[data-tjek]") : null;
-            if (tj) mig.feltTjek();
         });
         el("skort").addEventListener("keydown", function (e) {
-            if (e.key === "Enter" && e.target && e.target.id === "felt") { e.preventDefault(); mig.feltTjek(); }
+            if (e.key === "Enter" && e.target && e.target.id === "felt") { e.preventDefault(); mig.indsendKlik(); }
+        });
+        /* Indsend svar bliver blaa, saa snart der staar noget i feltet */
+        el("skort").addEventListener("input", function (e) {
+            if (e.target && e.target.id === "felt") mig.visIndsend();
         });
         el("knap").addEventListener("click", function () { mig.knap(); });
+        el("indsend").addEventListener("click", function () { mig.indsendKlik(); });
     };
 
     P.visListe = function () {
@@ -110,28 +125,31 @@
             });
             return html + "</div>";
         }
+        if ((this.fase === "loest" || this.fase === "mellem") && this.bliv && NK.Papir) return this.blivHTML();
         if (this.fase === "loest" || this.fase === "mellem") {
             var chip = this.fase === "mellem" ? "Rigtigt ✓" : (this.brugtSvar ? "Trin " + nr + " · Svaret" : "Trin " + nr + " ✓");
-            var knapTekst = this.fase === "mellem" ? "Vent 10 minutter →" : (this.trinNr === D.TRIN.length - 1 ? "Start forfra ↺" : "Næste trin →");
+            /* Kortets knap gaar altid fremad; efter det sidste trin er der ingen */
+            var knapTekst = this.fase === "mellem" ? "Vent 10 minutter →" : (this.trinNr === D.TRIN.length - 1 ? "" : "Næste trin →");
             return '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">' + chip + "</span>" + NK.html(this.slutTekst) + "</p>" +
-                '<button type="button" class="sk-videre" data-videre="1">' + knapTekst + "</button></div>";
+                (knapTekst ? '<button type="button" class="sk-videre" data-videre="1">' + knapTekst + "</button>" : "") + "</div>";
         }
         if (this.fase === "spm") {
             var s = this.spm;
-            html = '<p class="sk-tekst"><span class="sk-chip">Spørgsmål</span>' + NK.html(s.tekst) + "</p>";
+            html = '<p class="sk-tekst"><span class="sk-chip">Spørgsmål</span>' + tekstHTML(s.tekst) + "</p>";
             html += '<div class="sk-svar n' + s.svar.length + '">';
             s.svar.forEach(function (sv, j) {
                 var kl = "sk-knap", laast = false;
                 if (s.forkert[j]) { kl += " forkert"; laast = true; }
+                if (s.valgt === j) kl += " valgt";
                 html += '<button type="button" class="' + kl + '" data-valg="' + j + '"' + (laast ? " disabled" : "") + '><span class="v-bogstav">' + "ABC".charAt(j) + "</span><span>" + NK.html(sv.t) + "</span></button>";
             });
             return html + "</div>";
         }
         if (this.fase === "felt") {
             var f = tr.felt;
-            html = '<p class="sk-tekst"><span class="sk-chip">Trin ' + nr + " af 10</span>" + NK.html(f.tekst) + "</p>";
+            html = '<p class="sk-tekst"><span class="sk-chip">Trin ' + nr + " af 10</span>" + tekstHTML(f.tekst) + "</p>";
             html += '<div class="sk-felt"><label for="felt">m(Salenvir) =</label><input id="felt" type="text" inputmode="decimal" autocomplete="off" spellcheck="false">' +
-                '<span class="enhed">' + f.enhed + '</span><button type="button" class="sk-tjek" data-tjek="1">Tjek</button></div>';
+                '<span class="enhed">' + f.enhed + "</span></div>";
             return html;
         }
         /* Forsoeget: den del, eleven er ved */
@@ -143,12 +161,49 @@
         });
         void mig;
         return '<p class="sk-tekst"><span class="sk-chip">Trin ' + nr + ' af 10<span class="sk-prikker">' + prikker + "</span></span>" +
-            NK.html(d ? d.tekst : "") + "</p>";
+            tekstHTML(d ? d.tekst : "") + "</p>";
+    };
+
+    /* Kortets tekst: paa papirkortet er spoergsmaalet halvfedt (NK.Papir.tekst) */
+    function tekstHTML(t) { return NK.Papir ? NK.Papir.tekst(NK.html(t)) : NK.html(t); }
+
+    /* Papirkortet: kortet bliver paa spoergsmaalet efter et rigtigt svar.
+       Svarene er laast, det rigtige er groent (gult med Vis svaret), et
+       forkert svar, der er sendt ind, er stadig roedt, og de andre er toned
+       ned. I feltet staar det rigtige tal. Forklaringen staar under, og
+       knappen, der foerer videre, staar dér, hvor Indsend svar stod. */
+    P.blivHTML = function () {
+        var tr = D.TRIN[this.trinNr], nr = this.trinNr + 1, vist = this.bliv.vist, html;
+        if (this.bliv.slags === "felt") {
+            var f = tr.felt;
+            html = '<p class="sk-tekst"><span class="sk-chip">Trin ' + nr + " af 10</span>" + NK.Papir.tekst(NK.html(f.tekst)) + "</p>";
+            html += '<div class="sk-felt"><label for="felt">m(Salenvir) =</label><input id="felt" class="' + (vist ? "svar-vist" : "rigtig") +
+                '" type="text" value="' + D.komma(this.S.feltSvar, 2) + '" disabled><span class="enhed">' + f.enhed + "</span></div>";
+        } else {
+            var s = this.spm;
+            html = '<p class="sk-tekst"><span class="sk-chip">Spørgsmål</span>' + NK.Papir.tekst(NK.html(s.tekst)) + "</p>";
+            html += '<div class="sk-svar n' + s.svar.length + '">';
+            s.svar.forEach(function (sv, j) {
+                var kl = "sk-knap " + (j === s.rigtig ? (vist ? "svar-vist" : "rigtig") : (s.forkert[j] ? "forkert" : "dim"));
+                html += '<button type="button" class="' + kl + '" data-valg="' + j + '" disabled><span class="v-bogstav">' + "ABC".charAt(j) + "</span><span>" + NK.html(sv.t) + "</span></button>";
+            });
+            html += "</div>";
+        }
+        /* Forklaringen begynder med "Rigtigt." eller "Rigtigt,": ordet bliver
+           maerket foran (og hedder Svaret, naar svaret blev vist) */
+        var t = String(this.slutTekst || "").replace(/^Rigtigt[.,]\s*/, "");
+        t = NK.html(t.charAt(0).toUpperCase() + t.slice(1));
+        var maerke = vist ? "Svaret" : "Rigtigt";
+        var knap = this.fase === "mellem" ? "Vent 10 minutter →" : (this.trinNr === D.TRIN.length - 1 ? "" : "Næste trin →");
+        if (knap) return html + NK.Papir.bliv(t, maerke, knap, vist);
+        return html + '<div class="sk-bund bliv ' + (vist ? "svar" : "god") + '"><p class="st-tekst"><span class="b-maerke">' + maerke + "</span> " + t + "</p></div>";
     };
 
     P.visKort = function () {
         var e = el("skort");
-        var kl = "scenekort " + (this.fase === "gaet" ? "gaet" : (this.fase === "loest" || this.fase === "mellem" ? "loest" + (this.brugtSvar && this.fase === "loest" ? " svar" : "") : (this.fase === "spm" || this.fase === "felt" ? "spm" : "opgave")));
+        var svarKl = this.bliv ? this.bliv.vist : this.brugtSvar && this.fase === "loest";
+        var kl = "scenekort " + (this.fase === "gaet" ? "gaet" : (this.fase === "loest" || this.fase === "mellem" ? "loest" + (svarKl ? " svar" : "") + (this.bliv && NK.Papir ? " bliv" : "") :
+            (this.fase === "spm" || this.fase === "felt" ? "spm" : "opgave")));
         if (e.className.replace(" blink", "") !== kl) e.className = kl;
         if (this.fase === "felt") {
             /* Feltet bygges kun én gang, saa det, eleven skriver, bliver staaende */
@@ -269,6 +324,7 @@
         this.fase = "loest";
         this.slutTekst = tekst;
         this.besk = { html: "", klasse: "" };
+        this.kortT = 0;
         this.sejrT = 0;
         this.visKort();
         this.visListe();
@@ -287,11 +343,46 @@
         }
         if (this.fase !== "spm") return;
         var s = this.spm;
-        if (j === s.rigtig) { this.spmRigtigt(); return; }
+        if (s.forkert[j]) return;
+        /* Et svar vaelger kun; det bedoemmes, naar eleven trykker Indsend svar
+           (brugeren 24. okt. 2026: "der skal som minimum vaere et indsend svar") */
+        s.valgt = j;
+        this.kortT = 0;             /* "Vaelg et af svarene" er ikke laengere sand */
+        this.visKort();
+        void tr;
+    };
+
+    /* Indsend svar: det valgte svar paa spoergsmaalet eller tallet i feltet bedoemmes */
+    P.indsendKlik = function () {
+        if (this.anim) return;
+        if (this.fase === "felt") { this.feltTjek(); return; }
+        if (this.fase !== "spm") { this.kortBlink(); return; }
+        var s = this.spm;
+        if (s.valgt === null || s.valgt === undefined) {
+            this.kortBlink();
+            this.kortBesked("Vælg et af svarene på kortet først.", 3.5);
+            return;
+        }
+        var j = s.valgt;
+        s.valgt = null;
+        if (j === s.rigtig) { this.spmRigtigt(false); return; }
         s.forkert[j] = true;
         this.visKort();
         this.fejlLinje(this.spmFejl(j));
-        void tr;
+    };
+
+    /* Indsend svar staar kun fremme under et spoergsmaal og ved feltet; graa,
+       til der er valgt et svar eller skrevet noget i feltet */
+    P.visIndsend = function () {
+        var e = el("indsend");
+        if (!e) return;
+        var vis = (this.fase === "spm" || this.fase === "felt") && !this.anim;
+        if (e.hidden === vis) e.hidden = !vis;
+        var f = el("felt");
+        var klar = vis && (this.fase === "spm" ? this.spm && this.spm.valgt !== null && this.spm.valgt !== undefined : !!(f && !f.disabled && f.value.trim()));
+        e.classList.toggle("klar", klar);
+        e.classList.toggle("ikke-klar", !klar);
+        e.setAttribute("aria-disabled", klar ? "false" : "true");
     };
 
     P.spmFejl = function (j) {
@@ -304,13 +395,17 @@
         return s.svar[j].f || "Prøv igen.";
     };
 
-    P.spmRigtigt = function () {
+    /* vist: svaret kom fra Vis svaret, ikke fra eleven */
+    P.spmRigtigt = function (vist) {
         var s = this.spm, tr = D.TRIN[this.trinNr];
+        s.valgt = null;
+        this.bliv = { slags: "spm", vist: !!vist };
         if (s.slags === "tlc") {
             if (!s.vurdering.faerdig) {
                 this.fase = "mellem";
                 this.slutTekst = s.vurdering.tekst;
                 this.besk = { html: "", klasse: "" };
+                this.kortT = 0;
                 this.visKort();
                 return;
             }
@@ -339,6 +434,7 @@
         if (isNaN(v)) { this.fejlLinje("Skriv massen som et tal, fx 1,52."); return; }
         if (Math.abs(v - t.svar) <= 0.011) {
             this.S.feltSvar = t.svar;
+            this.bliv = { slags: "felt", vist: false };
             this.loest(this.slutFor(D.TRIN[this.trinNr]));
             return;
         }
@@ -356,6 +452,7 @@
                 S.tlc = { sted: "bord", P: null, R: null, front: 0, iKammer: false, udviklet: false, uvT: 0, set: false, cirkler: false };
                 S.spids.p.indhold = null; S.spids.r.indhold = null;
                 mig.fase = "forsoeg";
+                mig.bliv = null;
                 mig.delSidst = undefined;
                 mig.hjaelp = 0;
                 mig.besk = { html: "", klasse: "" };
@@ -366,7 +463,8 @@
             return;
         }
         if (this.fase !== "loest") return;
-        if (this.trinNr >= D.TRIN.length - 1) { this.springTil(0); return; }
+        /* Efter det sidste trin gaar intet videre: Start forfra staar i panelet */
+        if (this.trinNr >= D.TRIN.length - 1) { this.kortBlink(); return; }
         /* Det, der skal flytte med til naeste trin */
         var naeste = this.trinNr + 1;
         if (naeste === 8) { this.S.termo.sted = "bord"; }
@@ -399,7 +497,7 @@
         this.brugtSvar = true;
         this.besk = { html: "", klasse: "" };
         if (this.fase === "spm") {
-            this.spmRigtigt();
+            this.spmRigtigt(true);
             return;
         }
         if (this.fase === "felt") {
@@ -407,6 +505,7 @@
             var f = el("felt");
             if (f) f.value = D.komma(t.svar, 2);
             this.S.feltSvar = t.svar;
+            this.bliv = { slags: "felt", vist: true };
             this.loest(this.slutFor(D.TRIN[this.trinNr]));
             return;
         }
@@ -431,6 +530,7 @@
         if (this.pegKnap) klasse += " peg";
         if (k.textContent !== tekst) k.textContent = tekst;
         if (k.className !== klasse) k.className = klasse;
+        this.visIndsend();
         this.visBund();
     };
 
@@ -447,6 +547,7 @@
 
     P.fejlLinje = function (tekst) {
         this.besk = { html: '<span class="b-maerke">Ikke endnu</span> ' + NK.html(tekst), klasse: "skidt" };
+        this.kortT = 0;             /* forklaringen til svaret skal ses med det samme */
         this.pegKnap = true;
         this.visKnap();
         var st = el("status");

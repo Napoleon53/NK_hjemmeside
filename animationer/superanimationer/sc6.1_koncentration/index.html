@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Koncentration</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Koncentration</h1>
@@ -39,8 +40,8 @@
              med hint og fejl, forklaringen og knappen Naeste opgave -->
         <div class="scenekort opgave" id="kar-skort">
             <div id="kar-ind" aria-live="polite"></div>
-            <div class="kt-bund tom" id="kar-status">
-                <p class="kt-besked" id="kar-besked" aria-live="polite"></p>
+            <div class="kt-bund sk-bund tom" id="kar-status">
+                <p class="kt-besked st-tekst" id="kar-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="kar-knap" type="button">Giv hint</button>
             </div>
         </div>
@@ -78,9 +79,10 @@
         <!-- Spoergsmaalet med svarene staar paa kortet oeverst i scenen, ikke i panelet -->
         <div class="scenekort spm" id="glas-skort">
             <div id="glas-ind" aria-live="polite"></div>
-            <div class="kt-bund tom" id="glas-status">
-                <p class="kt-besked" id="glas-besked" aria-live="polite"></p>
+            <div class="kt-bund sk-bund tom" id="glas-status">
+                <p class="kt-besked st-tekst" id="glas-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="glas-knap" type="button">Giv hint</button>
+                <button class="knap indsend ikke-klar" id="glas-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <button class="forfraknap" id="glas-forfra" type="button" title="Opgaven forfra (R)">Start forfra ↺</button>
@@ -220,6 +222,7 @@
 <script src="js/tjek.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/regning.js"></script>
 <script src="js/sim_kar.js"></script>

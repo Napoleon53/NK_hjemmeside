@@ -847,11 +847,13 @@ sub { font-size: 0.68em; line-height: 0; vertical-align: -0.3em; font-style: nor
 
 .formel-omr { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 
-/* Skabelonerne: formlens form, eleven vaelger foer bogstaverne */
+/* Skabelonerne: formlens form, eleven vaelger foer bogstaverne. Reglerne
+   gaelder kun i .skabeloner, for scenekortet paa fane 1 og 2 bruger ogsaa
+   klasserne sk-tekst og sk-knap (papirkortet, 3. nov. 2026). */
 .skabeloner { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.sk-tekst { flex-basis: 100%; font-size: 0.9rem; font-weight: 600; color: #f0d77a; }
+.skabeloner .sk-tekst { flex-basis: 100%; font-size: 0.9rem; font-weight: 600; color: #f0d77a; }
 .skabeloner.lille .sk-tekst { flex-basis: auto; font-size: 0.78rem; color: var(--tekst-mat); margin-right: 2px; }
-.sk-knap {
+.skabeloner .sk-knap {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -867,7 +869,7 @@ sub { font-size: 0.68em; line-height: 0; vertical-align: -0.3em; font-style: nor
     font-weight: 700;
     cursor: pointer;
 }
-.sk-knap:hover { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); }
+.skabeloner .sk-knap:hover { background-color: rgba(242, 197, 61, 0.24); border-color: var(--gul); }
 .skabeloner.lille .sk-knap { min-width: 40px; min-height: 30px; padding: 2px 7px; font-size: 0.8rem; background-color: transparent; border-color: #4a4a58; color: var(--tekst-svag); }
 .skabeloner.lille .sk-knap:hover { border-color: var(--gul); color: var(--tekst); }
 .sk-broek { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; }
@@ -1296,3 +1298,44 @@ sub { font-size: 0.68em; line-height: 0; vertical-align: -0.3em; font-style: nor
 
 /* Start forfra lyser op, naar hverken stof, vand eller hanen kan redde karret */
 .forfraknap.peg { color: #33290a; border-color: #c79a12; background-color: #ffdf6b; animation: knap-peg 1.9s ease-in-out infinite; }
+
+/* ---------------------------------------------------------------------
+   Papirkortet (brugerens valg 3. nov. 2026). Udseendet ligger i
+   ../faelles/papirkort.css; elementerne paa kortet har ogsaa de faelles
+   klasser (js/fane.js). Her er kun det, der er saerligt for kortet her:
+   gaettet under opgaven, regnestykket i opgaven Enhederne og den gule
+   forklaring, naar karret har vist svaret. Det, der var lyst paa det
+   moerke kort, bliver moerkt paa papiret.
+   --------------------------------------------------------------------- */
+html body.papirkort.papirkort .scenekort .kt-intro { margin: 0; font-size: inherit; line-height: inherit; color: inherit; }
+html body.papirkort.papirkort .scenekort .kt-gaet { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .kt-gaet b { color: var(--pk-tekst); }
+html body.papirkort.papirkort .scenekort .kt-gaet.rigtig,
+html body.papirkort.papirkort .scenekort .kt-gaet.rigtig b { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .kt-gaet.forkert,
+html body.papirkort.papirkort .scenekort .kt-gaet.forkert b { color: var(--pk-roed-tekst); }
+html body.papirkort.papirkort .scenekort .kt-slut-t .kt-gaet { margin: 0 0 5px; }
+html body.papirkort.papirkort .scenekort .kt-regn { line-height: 1.22; color: var(--pk-tekst); font-weight: 600; }
+html body.papirkort.papirkort .scenekort .kt-ukendt { border-color: var(--pk-gul); background-color: var(--pk-gul-lys); color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .kt-enhed { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort.svar .kt-enhed { color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .kt-enheder { margin-bottom: 2px; line-height: 1.3; color: var(--pk-tekst-svag); font-weight: 500; }
+html body.papirkort.papirkort .scenekort .kt-enheder b { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .kt-enheder .streg { color: var(--pk-tekst-svag); }
+/* Et forkert svar er roedt som paa de andre papirkort, ikke streget over */
+html body.papirkort.papirkort .scenekort .kt-knap.forkert { text-decoration: none; }
+/* Karret har vist svaret: forklaringen staar i en gul boks */
+html body.papirkort.papirkort .scenekort.loest.svar .sk-slut-tekst > .sk-tekst {
+    border-left-color: #d4a72c;
+    background-color: var(--pk-gul-lys);
+    color: var(--pk-gul-tekst);
+}
+
+/* Lave skaerme: forklaringen paa fane 1 skal kunne vaere i karrets plads
+   (ZONE i js/sim_kar.js). Reglerne har en klasse mere end de faelles, for
+   papirkort.css indlaeses efter denne fil. */
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort .kt-regn { font-size: 1.08rem; }
+    html body.papirkort.papirkort .scenekort.loest .sk-slut-tekst > .kt-tekst.sk-tekst { padding: 4px 9px; font-size: 0.88rem; line-height: 1.3; }
+    html body.papirkort.papirkort .scenekort.loest .kt-slut-t .kt-gaet { margin-bottom: 3px; font-size: 0.86rem; }
+}

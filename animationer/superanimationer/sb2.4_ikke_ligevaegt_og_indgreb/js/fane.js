@@ -21,9 +21,12 @@
        spoergsmaalene med deres svar staar samme sted hele vejen, fordi
        eleverne klikker, foer de laeser. Et gaet er stort og gult, pulserer
        stille og blinker, hvis eleven klikker paa forsoeget foerst
-       (gaetBlink). Naar svaret er rigtigt, bliver kortet groent med
-       svaret, forklaringen og knappen Naeste opgave eller Naeste
-       spoergsmaal (slutNu, videreTekst). Efter et forsoeg med et gaet
+       (gaetBlink). Et svar paa et spoergsmaal vaelger kun; det bedoemmes
+       med knappen Indsend svar (indsendKlik, visIndsend). Naar svaret er
+       rigtigt, bliver spoergsmaalet staaende med svaret groent,
+       forklaringen under svarene og knappen Naeste opgave eller Naeste
+       spoergsmaal dér, hvor Indsend svar stod (blivHTML, papirkortet fra
+       3. nov. 2026; slutNu, videreTekst). Efter et forsoeg med et gaet
        eller et set staar det, eleven saa, alene paa det groenne kort,
        foer spoergsmaalet kommer. Panelet har intet opgavekort.
      * kortets nederste raekke (x-status: besked, kortBesked, fejlLinje,
@@ -75,8 +78,8 @@
 
    I index.html har hver fane i scenen: canvas x-laerred og kortet
    <div class="scenekort" id="x-skort"> med <div id="x-ind"> (kortets
-   indhold) og raekken <div class="sk-bund" id="x-status"> med x-besked og
-   x-knap. I panelet: x-liste og x-loest. En knap x-forfra er valgfri og
+   indhold) og raekken <div class="sk-bund" id="x-status"> med x-besked,
+   x-knap og x-indsend. I panelet: x-liste og x-loest. En knap x-forfra er valgfri og
    staar ved det, den nulstiller.
 
    Teksterne i js/data.js skal vaere korte: gaettets tekst hoejst 60 tegn,
@@ -117,10 +120,11 @@
             this.hjaelp = 0;
             this.pegKnap = false;
             this.el = { knap: el("knap"), liste: el("liste"),
-                besked: el("besked"), status: el("status"), forfra: el("forfra"), skort: el("skort") };
+                besked: el("besked"), status: el("status"), forfra: el("forfra"), skort: el("skort"), indsend: el("indsend") };
             this.fast = { html: "", klasse: "" };
             this.kortT = 0;
             this.el.knap.addEventListener("click", function () { mig.knap(); });
+            if (this.el.indsend) this.el.indsend.addEventListener("click", function () { mig.indsendKlik(); mig.fokus(); });
             if (this.el.forfra) this.el.forfra.addEventListener("click", function () { mig.forfra(); mig.fokus(); });
             function valgKlik(e) {
                 if (e.target.closest && e.target.closest("[data-videre]")) { mig.knap(); return; }
@@ -213,7 +217,7 @@
         P.lavOpgave = function (i) {
             var o = this.opgaver[i], faser = [];
             FASER.forEach(function (f) { if (o[f]) faser.push(f); });
-            this.opg = { o: o, faser: faser, fi: 0, fase: faser[0], gaet: -1, forkert: {}, rigtig: undefined };
+            this.opg = { o: o, faser: faser, fi: 0, fase: faser[0], gaet: -1, forkert: {}, rigtig: undefined, valgt: null };
             if (this.nyOpgave) this.nyOpgave(o);
         };
 
@@ -286,6 +290,7 @@
                paa kortet, og knappen paa kortet foerer videre (brugerens oenske 9. okt.
                2026: forklaringen blev overset nede i statuslinjen) */
             var slut = this.slutNu();
+            if (slut && NK.Papir && ((spm && g.rigtig !== undefined) || (g.fase === "felter" && this.venter))) return this.blivHTML(slut);
             if (slut) {
                 var maerke = slut.maade === "svar" ? "Svaret" : (slut.maerke || (spm ? "Rigtigt ✓" : (this.faerdig ? "Løst ✓" : "Godt ✓")));
                 var svaret = "";
@@ -298,7 +303,7 @@
                     '<button type="button" class="sk-videre" data-videre="1">' + NK.html(this.videreTekst()) + "</button></div>";
             }
             var chip = spm ? "Spørgsmål" : "Opgave " + (this.nr + 1);
-            html = '<p class="sk-tekst"><span class="sk-chip">' + chip + "</span>" + NK.html(del.tekst) + "</p>";
+            html = '<p class="sk-tekst"><span class="sk-chip">' + chip + "</span>" + (NK.Papir ? NK.Papir.tekst(NK.html(del.tekst)) : NK.html(del.tekst)) + "</p>";
             if (g.gaet >= 0 && g.fase === "forsoeg") {
                 html += '<p class="sk-gaet">Dit gæt: <b>' + NK.html(o.gaet.svar[g.gaet].t) + "</b></p>";
             }
@@ -308,6 +313,7 @@
                 del.svar.forEach(function (sv, j) {
                     var kl = "sk-knap", laast = false;
                     if (g.forkert[j]) { kl += " forkert"; laast = true; }
+                    if (g.valgt === j) kl += " valgt";
                     if (g.rigtig === j) kl += " rigtig";
                     if (g.rigtig !== undefined) laast = true;
                     html += '<button type="button" class="' + kl + '" data-valg="' + j + '"' + (laast ? " disabled" : "") + ">" +
@@ -316,6 +322,29 @@
                 html += "</div>";
             }
             return html;
+        };
+
+        /* Papirkortet (brugerens valg 3. nov. 2026): et rigtigt svar laegger ikke
+           kortet om. Spoergsmaalet og svarene bliver staaende, det rigtige svar er
+           groent dér, hvor eleven klikkede, forklaringen staar under svarene, og
+           knappen, der foerer videre, staar dér, hvor Indsend svar stod. Det samme
+           gaelder regnestykket paa fane 3 (felter): opgaven bliver staaende, og
+           Naeste spoergsmaal kommer foerst, naar eleven trykker. */
+        P.blivHTML = function (slut) {
+            var g = this.opg, del = g.o[g.fase], vist = slut.maade === "svar", spm = erSpm(g.fase);
+            var html = '<p class="sk-tekst"><span class="sk-chip">' + (spm ? "Spørgsmål" : "Opgave " + (this.nr + 1)) + "</span>" +
+                NK.Papir.tekst(NK.html(del.tekst)) + "</p>";
+            if (spm && this.kortEkstra) html += this.kortEkstra();
+            if (spm && del.svar) {
+                html += '<div class="sk-svar n' + del.svar.length + '">';
+                del.svar.forEach(function (sv, j) {
+                    var kl = "sk-knap " + (g.rigtig === j ? (vist ? "svar-vist" : "rigtig") : (g.forkert[j] ? "forkert" : "dim"));
+                    html += '<button type="button" class="' + kl + '" data-valg="' + j + '" disabled>' +
+                        '<span class="v-bogstav">' + "ABC".charAt(j) + "</span><span>" + (sv.h || NK.html(sv.t)) + "</span></button>";
+                });
+                html += "</div>";
+            }
+            return html + NK.Papir.bliv(NK.html(slut.tekst || ""), vist ? "Svaret" : "Rigtigt", NK.html(this.videreTekst()), vist);
         };
 
         /* Kortet blinker: eleven klikkede paa forsoeget, men skal foerst goere det,
@@ -357,6 +386,7 @@
             g.fase = g.faser[g.fi];
             g.forkert = {};
             g.rigtig = undefined;
+            g.valgt = null;
             if (this.nyFase) this.nyFase(g.fase);
             this.visKort();
             this.layout();
@@ -382,8 +412,26 @@
                 return;
             }
             if (!erSpm(g.fase)) return;
-            if (this.venter || g.rigtig !== undefined) return;
-            var del = o[g.fase];
+            if (this.venter || g.rigtig !== undefined || g.forkert[j]) return;
+            /* Et svar vaelger kun; det bedoemmes, naar eleven trykker Indsend svar
+               (brugeren 24. okt. 2026: "der skal som minimum vaere et indsend svar").
+               Gaettet foer forsoeget er gratis og virker stadig med det samme. */
+            g.valgt = j;
+            this.visKort();
+        };
+
+        /* Indsend svar: det valgte svar paa spoergsmaalet bedoemmes */
+        P.indsendKlik = function () {
+            var g = this.opg;
+            if (this.faerdig || this.venter) { this.kortBlink(); return; }
+            if (!g || !erSpm(g.fase)) return;
+            if (g.valgt === null || g.valgt === undefined) {
+                this.kortBlink();
+                this.kortBesked("Vælg et af svarene på kortet først.", 3.5);
+                return;
+            }
+            var j = g.valgt, o = g.o, del = o[g.fase];
+            g.valgt = null;
             if (del.svar[j].ok) {
                 g.rigtig = j;
                 if (g.fi < g.faser.length - 1) { this.mellemsvar("selv", del.godt); return; }
@@ -393,6 +441,18 @@
             g.forkert[j] = true;
             this.visKort();
             this.fejlLinje(del.svar[j].f);
+        };
+
+        /* Indsend svar staar kun fremme under et spoergsmaal; graa, til et svar er valgt */
+        P.visIndsend = function () {
+            var e = this.el.indsend;
+            if (!e) return;
+            var g = this.opg, spm = !!g && erSpm(g.fase) && !this.venter && !this.faerdig;
+            e.hidden = !spm;
+            var klar = spm && g.valgt !== null && g.valgt !== undefined;
+            e.classList.toggle("klar", klar);
+            e.classList.toggle("ikke-klar", !klar);
+            e.setAttribute("aria-disabled", klar ? "false" : "true");
         };
 
         /* Et rigtigt svar, og der kommer et spoergsmaal til: forklaringen staar
@@ -442,6 +502,7 @@
                 return;
             }
             if (erSpm(g.fase)) {
+                g.valgt = null;
                 o[g.fase].svar.forEach(function (sv, j) { if (sv.ok) g.rigtig = j; });
                 if (g.fi < g.faser.length - 1) { this.mellemsvar("svar", o[g.fase].godt); return; }
                 this.loest("svar", o.loest);
@@ -472,6 +533,7 @@
             }
             this.el.knap.textContent = tekst;
             this.el.knap.className = klasse;
+            this.visIndsend();
             this.visBund();
         };
 

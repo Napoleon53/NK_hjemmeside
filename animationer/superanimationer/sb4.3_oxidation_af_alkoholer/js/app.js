@@ -7,6 +7,7 @@
    Man kan linke direkte til en fane:
      index.html#oxidationstal   fane 1
      index.html#dannes          fane 2
+     index.html#ukendte         fane 3
    ===================================================================== */
 (function () {
     "use strict";
@@ -14,7 +15,7 @@
     var NK = window.NK;
 
     var sims = {};
-    var faner = ["fane-o", "fane-p"];
+    var faner = ["fane-o", "fane-p", "fane-u"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
 
@@ -79,7 +80,7 @@
             if (e.key === "?" || e.key === "h" || e.key === "H") NK.Rundvisning.luk();
             return;
         }
-        if (e.key === "1" || e.key === "2") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
+        if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start(aktivFane); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
         if (e.key === "r" || e.key === "R") { if (sim) sim.nulstil(); return; }
@@ -96,6 +97,7 @@
     function start() {
         sims["fane-o"] = new NK.SimOxtal();
         sims["fane-p"] = new NK.SimProdukt();
+        sims["fane-u"] = new NK.SimForsoeg();
         NK.sims = sims;              /* saa fanerne kan pilles ved fra konsollen og selvtesten */
 
         var knapper = document.querySelectorAll(".faneknap");
@@ -130,7 +132,8 @@
         var oenske = "";
         try { oenske = decodeURIComponent((window.location.hash || "").replace(/^#/, "")).toLowerCase(); } catch (x) { oenske = ""; }
         var HASH = { oxidationstal: "fane-o", oxidationstallet: "fane-o", "1": "fane-o",
-                     dannes: "fane-p", produkt: "fane-p", produktet: "fane-p", "2": "fane-p" };
+                     dannes: "fane-p", produkt: "fane-p", produktet: "fane-p", "2": "fane-p",
+                     ukendte: "fane-u", forsoeg: "fane-u", "forsøg": "fane-u", permanganat: "fane-u", "3": "fane-u" };
         visFane(HASH[oenske] || faner[0]);
 
         window.requestAnimationFrame(function (ts) {

@@ -62,8 +62,8 @@ sync; denne er færdig.
   sidder fast, ikke som fast forklaringstekst før opgaven.
 - Eleverne klikker, før de læser (brugeren 9. okt. 2026). Skal eleven gætte
   eller stille en hypotese, før forsøget begynder, står gættet stort midt i
-  scenen over forsøget, ikke kun i panelet. Kortet er det eneste fyldte gule
-  på skærmen, og et klik på forsøget før gættet får kortet til at blinke.
+  scenen over forsøget, ikke kun i panelet, og et klik på forsøget før
+  gættet får kortet til at blinke.
   Spørgsmålene bagefter står samme sted, så eleven ikke skal lede i panelet,
   og forklaringen til det rigtige svar og knappen Næste opgave står i samme
   kort. Al tekst (også hint og forklaringen til et forkert svar) er samlet
@@ -77,6 +77,22 @@ sync; denne er færdig.
   en opgave af sig selv, og svarknapper vælger kun. Stjerne kun for første
   forsøg; gerne "vælg alle, der passer". Et gæt er gratis. Mønster:
   `animationer/superanimationer/sb4.4_intermolekylaere_bindinger/js/fane.js`.
+- "Start forfra" står aldrig samme sted som "Næste opgave" (brugeren 3. nov.
+  2026, "husk det"). Det grønne korts knap går altid fremad (næste opgave,
+  næste fane); at begynde forfra ligger på en knap et andet sted, fx i
+  panelet, så ingen nulstiller ved at trykke videre en gang for meget.
+- Scenekortet er et lyst papirkort med skriften Lexend (brugeren 3. nov. 2026:
+  det gamle kort var "aggressivt og svært at læse", og "det er faktisk lidt
+  stressende at opgaverne skifter så hurtigt"). Mørk tekst på lyst papir, kun
+  det valgte svar har farve, ingen versaler eller puls, Indsend svar er
+  hovedknappen og Giv et hint en stille knap med gul kant. Efter et rigtigt
+  svar bliver kortet på spørgsmålet: svaret bliver grønt, dér hvor eleven
+  klikkede, forklaringen står under svarene, og Næste står, hvor Indsend svar
+  stod. Rosen til et svar står aldrig under det næste spørgsmål. Udseendet og
+  skriften ligger ét sted, `animationer/superanimationer/faelles/papirkort.css`
+  og `papirkort.js`; mønstre: `sb3.3_isomerjagten`, `sc7.5_staerke_og_svage_syrer`
+  og `sc1.5_byg_figuren`. Alle 27 animationer med scenekortet har det; nye
+  animationer får det fra start.
 
 ## Superanimationer
 
@@ -90,9 +106,9 @@ sync; denne er færdig.
   sept. 2026: præsentationerne blev ofte indforståede), og han sidder ikke
   længere ved et kateder i bunden (brugerens valg 9. okt. 2026: Kemichael
   hører primært til i laboratoriet, måske med et lille cameo hist og pist).
-  Nye superanimationer får ham ikke. Hjælpen er en gul hintknap, der altid
-  kan ses: Giv hint fyldt gul, Vis svaret kun et omrids, og knappen lyser
-  stille op efter et forkert svar. Se superanimationernes README under
+  Nye superanimationer får ham ikke. Hjælpen er en hintknap på kortet, der
+  altid kan ses (Giv hint, Næste hint, Vis svaret), og den lyser stille op
+  efter et forkert svar. På papirkortet er den en stille knap med gul kant. Se superanimationernes README under
   "Kemichael".
 - Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
   gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).

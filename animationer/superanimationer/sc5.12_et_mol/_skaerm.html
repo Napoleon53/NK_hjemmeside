@@ -19,7 +19,8 @@
      klar       ryd elevens fremskridt (sker altid først)
      start      tryk Start på introkortet (fane 1)
      vaelg:n    vælg gæt eller opgave n (fra 0)
-     gaet:j     svar j (fane 1 og 2)
+     gaet:j     vælg svar j (fane 1 og 2; det bedømmes først med indsend)
+     indsend    tryk Indsend svar
      hint       tryk på den gule knap
      videre     tryk på kortets grønne knap
      koer:sek   kør scenen sek sekunder
@@ -55,6 +56,7 @@ function koer() {
         if (n === "start" || n === "videre") F.videre();
         else if (n === "vaelg") F.vaelg(parseInt(v, 10));
         else if (n === "gaet") F.svarValg(parseInt(v, 10));
+        else if (n === "indsend" && F.indsendKlik) F.indsendKlik();
         else if (n === "hint") F.knap();
         else if (n === "koer") k(parseFloat(v));
         else if (n === "klik") F.klik(100, parseFloat(v));
@@ -64,7 +66,7 @@ function koer() {
             for (var r = 0; r < parseInt(v, 10); r++) W.document.getElementById("rv-naeste").click();
         }
         else if (n === "alle") {
-            NK.Data.GAET.forEach(function (g, i) { F.vaelg(i); F.svarValg(0); k(8); });
+            NK.Data.GAET.forEach(function (g, i) { F.vaelg(i); F.svarValg(0); F.indsendKlik(); k(8); });
             F.videre();
         }
     });

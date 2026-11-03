@@ -20,6 +20,10 @@ molekylformel og molarmasse med, klar til at kopiere ind i rapporten.
   atom eller ved at klikke på enden: hvert klik gør kæden ét C længere og
   fortsætter zigzaggen. Et grundstof valgt og et klik på et atom gør det til det
   grundstof. Højreklik sletter, Shift og træk flytter ét atom.
+* **Trækket** (brugerens ønske 3. nov. 2026): mens man trækker, står kæden svagt
+  grå med antallet af C-atomer ved musen, og først ved slip kommer den på tavlen.
+  Den er altid en lige zigzag mod musen (ingen spiral) og har højst 20 C-atomer.
+  Reglerne står i molekylemotorens README under "Trækket".
 * **Grupper med ét klik** (brugerens ønske 25. sept. 2026): –OH, =O, –CHO, –COOH,
   –COO⁻ og –NH₂ under grundstofferne. Vælg gruppen, og klik på et atom: gruppen
   sættes i det største frie hul, og en syregruppe for enden af en kæde fortsætter

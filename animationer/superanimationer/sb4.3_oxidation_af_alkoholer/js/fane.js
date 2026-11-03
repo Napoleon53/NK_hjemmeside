@@ -21,7 +21,8 @@
      videre()       eleven trykkede paa det groenne korts knap
      layout(), tegn()
    Fanen KAN have: opdaterScene(dt), overScene, klikScene, efterHint(n),
-     ingentingTekst().
+     ingentingTekst(), skjulIndsend() (sand: knappen er vaek, fx mens
+     kortet har sin egen knap Udfoer forsoeget).
 
    Kortet er groent, naar this.groen er sat:
      { tekst, fed, maade: "selv" | "svar", knap: "Naeste ... →" }
@@ -66,7 +67,29 @@
 
         P.visKort = function () {
             var e = this.el.skort, html, kl;
-            if (this.groen) {
+            if (this.groen && this.groen.spm && NK.Papir) {
+                /* Papirkortet (brugerens valg 3. nov. 2026): kortet bliver paa
+                   spoergsmaalet. Svaret er groent dér, hvor eleven klikkede,
+                   forklaringen staar under svarene, og knappen, der foerer
+                   videre, staar dér, hvor Indsend svar stod. groen kan have
+                   svarNr (det rigtige svar), kortChip og kortTekst (kortet, som
+                   det stod), maerke og naeste (det, knappen goer). Saetningen
+                   om at trykke Indsend svar er vaek, naar svaret er givet. */
+                var gb = this.groen, kb = this.kortData(), vist = gb.maade === "svar";
+                var kt = (gb.kortTekst || kb.tekst).replace(/\s+[A-ZÆØÅ][^.?!]*Indsend svar\./g, "");
+                kl = "scenekort loest bliv" + (vist ? " svar" : "");
+                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(gb.kortChip || kb.chip) + "</span>" + NK.Papir.tekst(NK.html(kt)) + "</p>";
+                if (kb.svar && kb.svar.length) {
+                    html += '<div class="sk-svar brikker" style="grid-template-columns: repeat(' + kb.svar.length + ', minmax(0, 1fr));">';
+                    kb.svar.forEach(function (sv, j) {
+                        var r = gb.svarNr !== undefined ? j === gb.svarNr : sv.valgt;
+                        html += '<button type="button" class="sk-knap brik ' + (r ? (vist ? "svar-vist" : "rigtig") : "dim") + '" data-valg="' + j + '" disabled><span>' +
+                            NK.html(sv.t) + "</span></button>";
+                    });
+                    html += "</div>";
+                }
+                html += NK.Papir.bliv(NK.html(gb.tekst || ""), gb.maerke || (vist ? "Svaret" : "Rigtigt"), NK.html(gb.knap), vist);
+            } else if (this.groen) {
                 var g = this.groen;
                 kl = "scenekort loest" + (g.maade === "svar" ? " svar" : "");
                 html = '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">' + NK.html(g.chip || (g.maade === "svar" ? "Svaret" : "Rigtigt ✓")) + "</span>" +
@@ -75,7 +98,7 @@
             } else {
                 var k = this.kortData();
                 kl = "scenekort " + (k.slags === "spm" ? "spm" : "opgave") + (k.maal ? " medmaal" : "");
-                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(k.chip) + "</span>" + NK.html(k.tekst) + "</p>" + (k.ekstra || "");
+                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(k.chip) + "</span>" + (NK.Papir ? NK.Papir.tekst(NK.html(k.tekst)) : NK.html(k.tekst)) + "</p>" + (k.ekstra || "");
                 /* Den gule ramme med det, eleven jagter, staar til venstre for teksten */
                 if (k.maal) html = '<div class="sk-maalrad">' + k.maal + '<div class="sk-maaltekst">' + html + "</div></div>";
                 if (k.svar && k.svar.length) {
@@ -123,8 +146,8 @@
 
         P.visIndsend = function () {
             var e = this.el.indsend;
-            e.hidden = !!this.groen;
-            if (this.groen) return;
+            e.hidden = !!this.groen || !!(this.skjulIndsend && this.skjulIndsend());
+            if (e.hidden) return;
             var kan = this.kanSendes();
             /* Teksten i ét <span>: knappen er en flexboks, som ellers ville skille
                de saenkede tal fra bogstaverne */
@@ -182,6 +205,14 @@
 
         P.videreKlik = function () {
             if (!this.groen) return;
+            /* Et rigtigt svar midt i en opgave: knappen foerer til naeste trin */
+            if (this.groen.naeste) {
+                var f = this.groen.naeste;
+                this.groen = null;
+                this.besked("", "");
+                f.call(this);
+                return;
+            }
             this.videre();
         };
 
@@ -208,7 +239,7 @@
         P.beskedTekst = function () { return this.el.besked.hidden ? "" : this.el.besked.textContent; };
 
         P.godLinje = function (tekst, maerke) {
-            this.besked('<span class="b-maerke">' + NK.html(maerke || "Rigtigt ✓") + "</span> " + NK.html(tekst), "god");
+            this.besked('<span class="b-maerke">' + NK.html(maerke || "Rigtigt") + "</span> " + NK.html(tekst), "god");
         };
 
         P.ryst = function () {
@@ -381,6 +412,7 @@
 
     /* En ring om et punkt (det markerede atom, det valgte H) */
     function ring(ctx, p, r, farve, fyld, bredde) {
+        if (!p || !(r > 0)) return;
         ctx.save();
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);

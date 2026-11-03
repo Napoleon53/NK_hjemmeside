@@ -54,3 +54,9 @@ sænkede tal skrevet som tegn), `js/fig_ioner.js`, `fig_navne.js`, `fig_forb.js`
   og NaOH er ikke med.
 - Lagenes rækkefølge og ordene i overskud er Claudes valg; brugeren har ikke set
   figurerne endnu.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

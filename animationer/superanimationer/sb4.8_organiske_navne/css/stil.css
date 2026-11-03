@@ -1948,3 +1948,84 @@ kbd {
     .klasser { gap: 4px; }
     .vtknap { padding: 5px 12px; font-size: 0.95rem; }
 }
+
+/* =====================================================================
+   Papirkortet (3. nov. 2026, ../faelles/papirkort.css): navnets dele paa
+   det lyse kort. Delene har blaekfarven (--delblaek, den samme som i
+   formlen paa whiteboardet), fordi de lyse farver var lavet til det
+   moerke kort. Ingen versaler og intet puls: den tomme plads, eleven er
+   ved, er stille gul. Reglerne har samme prefiks som den faelles fil.
+   ===================================================================== */
+/* Samme afstand, mens trinnet staar paa kortet, og naar kortet bliver paa det
+   efter et rigtigt svar, saa navnet ikke hopper. Navnet er lidt mindre end paa
+   det moerke kort, saa forklaringen til hele navnet kan vaere under svarene. */
+html body.papirkort.papirkort .scenekort .navnelinje:not(.stor),
+html body.papirkort.papirkort .scenekort.loest .navnelinje:not(.stor) { margin: 2px 0 0; }
+html body.papirkort.papirkort .scenekort .navnelinje:not(.stor) .nl-tekst { font-size: 1.35rem; }
+
+html body.papirkort.papirkort .scenekort .nl-foran {
+    margin-top: 6px;
+    color: var(--pk-tekst-svag);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+html body.papirkort.papirkort .scenekort .nl-tekst {
+    border-bottom-color: var(--delblaek, var(--pk-tekst));
+    color: var(--delblaek, var(--pk-tekst));
+    font-weight: 600;
+}
+
+html body.papirkort.papirkort .scenekort .nl-etiket {
+    margin-top: 1px;
+    color: var(--delblaek, var(--pk-mat));
+    font-size: 0.74rem;
+    line-height: 1.1;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 1;
+}
+
+html body.papirkort.papirkort .scenekort .nl-del.tom .nl-tekst {
+    border: 1.5px dashed #c9c3b3;
+    background-color: transparent;
+    color: var(--pk-mat);
+    font-weight: 500;
+}
+
+html body.papirkort.papirkort .scenekort .nl-del.tom .nl-etiket { color: var(--pk-mat); }
+
+html body.papirkort.papirkort .scenekort .nl-del.tom.aktiv .nl-tekst {
+    border-color: #d4a72c;
+    background-color: var(--pk-gul-lys);
+    color: #8a6d12;
+    animation: none;
+}
+
+html body.papirkort.papirkort .scenekort .nl-del.tom.aktiv .nl-etiket { color: #8a6d12; font-weight: 600; }
+
+/* Hjaelpeknappen gav delen: gul i stedet for delens farve */
+html body.papirkort.papirkort .scenekort .nl-del.vist .nl-tekst { border-bottom-color: #c9a640; color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .nl-del.vist .nl-etiket { color: #8a6d12; }
+
+/* Brikkerne: Lexend er lidt bredere, saa de seks stofklasser paa fane 3 faar lidt mindre skrift */
+html body.papirkort.papirkort .scenekort .sk-knap.brik.medprik { font-size: 0.9rem; }
+
+@media (max-width: 1250px) {
+    html body.papirkort.papirkort .scenekort .sk-knap.brik.medprik { font-size: 0.8rem; }
+    /* Smalle vinduer: kortet er smallere, saa forklaringen under svarene faar flere
+       linjer, naar kortet bliver paa spoergsmaalet. Svarene og forklaringen staar
+       lidt taettere (som paa lave skaerme i den faelles fil), saa kortet kan vaere i
+       sin plads, ogsaa med forklaringen til hele navnet. */
+    html body.papirkort.papirkort .scenekort.loest .sk-svar.brikker .sk-knap.brik { padding-top: 4px; padding-bottom: 4px; }
+    /* .loest giver én klasse mere end den faelles regel, som indlaeses efter denne fil */
+    html body.papirkort.papirkort .scenekort.loest .sk-bund.bliv .st-tekst { padding: 3px 9px; font-size: 0.88rem; line-height: 1.26; }
+}
+
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort .navnelinje:not(.stor) .nl-tekst { font-size: 1.2rem; }
+    html body.papirkort.papirkort .scenekort .nl-etiket { font-size: 0.68rem; }
+}

@@ -160,9 +160,9 @@
         }
         if (f === "faerdig") {
             var n = this.noteret;
-            return '<p class="sk-tekst">' + NK.html(o.titel + " er færdig: m(før) = " + K.g2(n.mf) + " g og m(efter) = " + K.g2(n.me) + " g.") + "</p>";
+            return '<p class="sk-tekst">' + this.papirTekst(NK.html(o.titel + " er færdig: m(før) = " + K.g2(n.mf) + " g og m(efter) = " + K.g2(n.me) + " g.")) + "</p>";
         }
-        return '<p class="sk-tekst">' + NK.html(this.trinLinje()) + "</p>";
+        return '<p class="sk-tekst">' + this.papirTekst(NK.html(this.trinLinje())) + "</p>";
     };
 
     /* De fire skridt oeverst paa kortet: klaret, nu og senere */

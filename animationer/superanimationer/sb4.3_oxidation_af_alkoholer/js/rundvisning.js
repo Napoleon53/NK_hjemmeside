@@ -16,16 +16,22 @@
     var TURE = {
         "fane-o": [
             { sel: "#o-skort", titel: "Kortet øverst", tekst: "Al tekst står her: spørgsmålet, svarene og forklaringen. Vælg et svar, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#o-anker-tavle", titel: "Formlen", tekst: "Det markerede carbonatom er det, der bliver oxideret. Er det gult, spørger kortet om det. Når oxidationsmidlet skal tage et hydrogenatom, klikker du på det i formlen." },
+            { sel: "#o-anker-tavle", titel: "Formlen", tekst: "Det markerede carbonatom er det, der bliver oxideret. Er det gult, spørger kortet om det. Når du har fundet oxidationstallet, får alle atomer deres oxidationstal. Tryk så Oxidér på kortet, og se, hvilke hydrogenatomer der forsvinder." },
             { sel: "#o-serier", titel: "Alkoholerne", tekst: "En primær, en sekundær og en tertiær alkohol. Klik på en af dem for at begynde forfra med den." },
             { sel: "#o-trappekort", titel: "Oxidationstallet", tekst: "Hvert stof kommer op ud for sit oxidationstal, når du har fundet det. Så kan du se, hvor meget tallet stiger ved hver oxidation." },
-            { sel: "#o-visning", titel: "Elektronerne", tekst: "Elektronparrene viser, hvilket atom der trækker elektronerne i hver binding til sig. Elektronegativiteten står ved atomerne." }
+            { sel: "#o-visning", titel: "Elektronerne", tekst: "Elektronparrene viser, hvilket atom der trækker elektronerne i hver binding til sig. Mellem to carbonatomer bliver parret i midten. Elektronegativiteten står ved atomerne." }
         ],
         "fane-p": [
             { sel: "#p-skort", titel: "Kortet øverst", tekst: "Først typen af alkohol, så produktet. Vælg, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#p-anker-valg", titel: "Svarene", tekst: "Klik på det stof, alkoholen bliver til, eller på Ingen reaktion. Svarene kan vælges, når typen er fundet." },
             { sel: "#p-opgaver", titel: "Opgaverne", tekst: "Klik på et nummer for at vælge en opgave. En løst opgave får et flueben og en stjerne, hvis den blev løst i første forsøg." },
             { sel: "#p-fundkort", titel: "Det har du fundet", tekst: "Tabellen fyldes ud, når du har løst en opgave af hver slags." }
+        ],
+        "fane-u": [
+            { sel: "#u-skort", titel: "Kortet øverst", tekst: "Ét spørgsmål ad gangen. Vælg et svar, og tryk Indsend svar. Den gule knap giver ét hint ad gangen og til sidst svaret." },
+            { sel: "#u-anker-glas", titel: "Glassene", tekst: "Efter forsøget står farven, bundfaldet og pH ved hvert glas, og glassene bliver stående. Når kortet spørger om et glas, kan du også klikke på det." },
+            { sel: "#u-anker-skema", titel: "Én alkohol ad gangen", tekst: "Den alkohol, du arbejder med, står som overskrift; de andre venter til højre. Tre felter fra venstre mod højre: molekylet, reaktionen og det, du forventer at se. Til sidst finder du glasset, og kortet glider op i det." },
+            { sel: "#u-trin", titel: "Trinene", tekst: "Teorien skal kun laves første gang. Bagefter begynder en ny runde ved forsøget med glassene blandet om." }
         ]
     };
     var trin = [];

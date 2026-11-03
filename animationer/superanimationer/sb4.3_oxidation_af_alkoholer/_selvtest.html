@@ -40,13 +40,14 @@ function paastand(navn, sand, note) {
 }
 function samlet(navn, liste) { paastand(navn, liste.length === 0, liste.slice(0, 4).join(" | ")); }
 function overskrift(t) { skriv("\n" + t, "h"); }
+function note(t) { skriv("        " + t, "note"); }
 function vis() {
     skriv("\n" + antal + " påstande");
     skriv(fejl ? fejl + " FEJL" : "ALT OK", fejl ? "fejl" : "ok");
     document.getElementById("ud").innerHTML = linjer.join("\n");
 }
 
-var NOEGLER = ["nk-sb4.3-serier", "nk-sb4.3-opgaver"];
+var NOEGLER = ["nk-sb4.3-serier", "nk-sb4.3-opgaver", "nk-sb4.3-forsoeg"];
 var ASCII_ORD = /\b(foer|faerdig|naeste|gaa|staa|paa|foerst|hoejre|oeverst|loest|proev\w*|spoerg\w*|faa|saa|naar|kaede\w*|vaelg\w*|taelle?r?|traekker|primaer|sekundaer|tertiaer|groent)\b/i;
 var gemt = {};
 var ramme = document.getElementById("ramme");
@@ -79,12 +80,14 @@ function koer() {
 function koerTest(W) {
     var d = W.document;
     var NK = W.NK, D = NK.Data, K = NK.Kemi;
-    var o = NK.sims["fane-o"], p = NK.sims["fane-p"];
+    var o = NK.sims["fane-o"], p = NK.sims["fane-p"], u = NK.sims["fane-u"];
     var tekster = [];
 
     function el(id) { return d.getElementById(id); }
     function besked(sim) { var b = el(sim.navn + "-besked"); return b.hidden ? "" : b.textContent; }
     function kort(sim) { return el(sim.navn + "-ind").textContent; }
+    /* Papirkortet: forklaringen til et rigtigt svar staar under svarene (.sk-bund.bliv) */
+    function bliv(sim) { var b = el(sim.navn + "-ind").querySelector(".sk-bund.bliv .st-tekst"); return b ? b.textContent : ""; }
     function husk(hvad, t) { if (t) tekster.push({ hvad: hvad, t: t }); }
     function tid(sim, sek) { for (var t = 0; t < sek; t += 1 / 60) sim.opdater(1 / 60); }
     function hPaaC(sim) { return K.hPaa(sim.mol, sim.c); }
@@ -137,6 +140,14 @@ function koerTest(W) {
     samlet("svarene står i rækkefølgen aldehyd, keton, carboxylsyre, ingen", klassefejl);
     var slags = {};
     D.OPGAVER.forEach(function (op) { slags[K.alkohol(op.alkohol).type + (op.maade || "")] = true; });
+    var midler = [];
+    D.OPGAVER.forEach(function (op) {
+        if (!D.MIDLER[op.middel]) midler.push(op.alkohol + ": intet middel");
+        if (op.maade && D.MAADE[op.maade].middel !== op.middel) midler.push(op.alkohol + ": " + op.maade + " med " + op.middel);
+    });
+    samlet("mild er dichromat, kraftig er permanganat", midler);
+    paastand("begge oxidationsmidler bruges ved sekundære og tertiære",
+        D.OPGAVER.some(function (op) { return !op.maade && op.middel === "dichromat"; }) && D.OPGAVER.some(function (op) { return !op.maade && op.middel === "permanganat"; }));
     paastand("fane 2 har primær mild, primær kraftig, sekundær og tertiær",
         slags.primaermild && slags.primaerkraftig && slags.sekundaer && slags.tertiaer, Object.keys(slags).join(","));
 
@@ -156,64 +167,60 @@ function koerTest(W) {
     paastand("det forkerte svar kan ikke vælges igen", el("o-ind").querySelectorAll(".brik.forkert").length === 1);
     paastand("hjælpeknappen lyser efter et forkert svar", el("o-knap").classList.contains("peg"));
     o.svarValg(D.OXTAL.indexOf(-1));
+    paastand("elektronparrene er slået fra, før svaret er givet", !o.visPar && !o.oxVist);
     o.indsendKlik();
-    husk("rigtigt ox", besked(o));
-    paastand("rigtigt: −I, og regnestykket står i linjen", o.fase === "h" && /I alt −I/.test(besked(o)), besked(o));
-    paastand("ethanol står ud for −I på trappen", /−I\s*—?\s*ethanol/.test(el("o-trappe").textContent.replace(/\s+/g, " ")) || el("o-trappe").textContent.indexOf("ethanol") >= 0);
-    var oh = K.ohPaa(o.mol, o.c);
-    o.valgt = oh.h;
-    o.indsendKlik();
-    husk("fejl OH", besked(o));
-    paastand("OH-gruppens H giver forklaringen om oxygenatomet", /sidder på oxygenatomet/.test(besked(o)), besked(o));
-    o.valgt = o.b.id.H1;
-    o.indsendKlik();
-    husk("fejl andet C", besked(o));
-    paastand("et H på et andet carbonatom giver sin forklaring", /andet carbonatom/.test(besked(o)), besked(o));
-    o.svarValg(0);
-    o.indsendKlik();
-    husk("fejl intet", besked(o));
-    paastand("Intet hydrogenatom er forkert, når der er et", /Se igen/.test(besked(o)), besked(o));
-    o.valgt = hPaaC(o)[0];
-    o.indsendKlik();
-    paastand("et rigtigt H starter oxidationen", o.fase === "anim");
-    o.klikScene({ x: 10, y: 10 });
-    tid(o, 2);
-    paastand("efter oxidationen er stoffet ethanal", o.fase === "ox" && o.stof.navn === "ethanal", o.stof.navn);
-    husk("oxideret", besked(o));
+    husk("rigtigt ox", bliv(o));
+    paastand("rigtigt: oxidationstallene kommer frem på alle atomer, og elektronparrene slås til",
+        o.oxVist && o.visPar && el("o-kontakter").querySelector('[data-vis="par"]').classList.contains("til"));
+    paastand("rigtigt: kortet bliver på spørgsmålet, −I er grønt, og regnestykket står under svarene",
+        !!o.groen && o.fase === "ox" && /I alt −I/.test(bliv(o)) && /^Rigtigt/.test(bliv(o)) && besked(o) === "" &&
+        (el("o-ind").querySelector(".sk-knap.rigtig") || {}).textContent === "−I" && el("o-ind").querySelectorAll(".sk-knap:not(:disabled)").length === 0 &&
+        el("o-indsend").hidden && el("o-knap").hidden && /Næste trin/.test(el("o-ind").querySelector(".sk-videre").textContent), bliv(o));
+    paastand("kortet beder ikke om Indsend svar, når svaret er givet", !/Indsend svar/.test(el("o-ind").querySelector(".sk-tekst").textContent));
+    o.videreKlik();
+    paastand("Næste trin: så kommer oxidationen", o.fase === "h" && !o.groen && besked(o) === "");
+    paastand("ethanol står på trappen", el("o-trappe").textContent.indexOf("ethanol") >= 0);
+    husk("kort oxider", kort(o));
+    paastand("kortet siger før Oxidér, hvad der dannes", /Ethanol bliver oxideret til ethanal, et aldehyd\./.test(kort(o)), kort(o));
+    var knapO = el("o-ind").querySelector('[data-handling="oxider"]');
+    paastand("kortet har knappen Oxidér, og Indsend svar er væk", !!knapO && el("o-indsend").hidden);
+    o.tegn();
+    o.klikScene({ x: o.geo.P[o.c].x, y: o.geo.P[o.c].y });
+    paastand("et klik i formlen oxiderer ikke", o.fase === "h");
+    knapO.click();
+    paastand("Oxidér starter oxidationen", o.fase === "anim");
+    tid(o, 2.5);
+    paastand("efter oxidationen går kortet direkte til næste spørgsmål uden et klik",
+        !o.groen && o.fase === "ox" && /oxidationstallet for det markerede carbonatom i ethanal/.test(kort(o)) && !el("o-ind").querySelector('[data-handling="oxider"]'), kort(o));
+    paastand("efter oxidationen er det nye stofs oxidationstal skjult", !o.oxVist);
+    paastand("efter oxidationen er stoffet ethanal", o.fase === "ox" && o.stof.navn === "ethanal" && besked(o) === "", o.stof.navn);
     o.svarValg(D.OXTAL.indexOf(1)); o.indsendKlik();
     paastand("trappen viser, at tallet steg 2", /steg \+2/.test(el("o-trappe").textContent));
-    o.valgt = hPaaC(o)[0]; o.indsendKlik(); tid(o, 2);
+    o.videreKlik();
+    o.oxider(); tid(o, 2.5);
     paastand("efter endnu en oxidation er stoffet ethansyre", o.stof.navn === "ethansyre", o.stof.navn);
     o.svarValg(D.OXTAL.indexOf(3)); o.indsendKlik();
-    o.svarValg(0); o.indsendKlik();
     husk("slut ethanol", o.groen && o.groen.tekst);
-    paastand("serien slutter, når der ikke er flere H", !!o.groen && /−I til \+I til \+III/.test(o.groen.tekst), o.groen && o.groen.tekst);
+    paastand("serien slutter af sig selv, når der ikke er flere H", !!o.groen && /−I til \+I til \+III/.test(o.groen.tekst), o.groen && o.groen.tekst);
     paastand("ethanol er klaret, men uden stjerne (der var fejl)", o.status[0].loest && !o.status[0].stjerne);
     var foer = o.stof.navn;
     o.klikScene({ x: o.lay.tavle.x + o.lay.tavle.b / 2, y: o.lay.tavle.y + o.lay.tavle.h / 2 });
     paastand("scenen er låst, når kortet er grønt", o.groen && o.stof.navn === foer);
     o.videreKlik();
     paastand("videre går til propan-2-ol", o.serie.id === "propan-2-ol");
-
-    /* propan-2-ol uden fejl: stjerne */
     o.svarValg(D.OXTAL.indexOf(0)); o.indsendKlik();
-    o.valgt = hPaaC(o)[0]; o.indsendKlik(); tid(o, 2);
+    o.videreKlik();
+    o.knap();
+    paastand("hintet ved Oxidér peger på knappen", /Oxidér/.test(besked(o)), besked(o));
+    o.knap();
+    paastand("Vis svaret ved Oxidér oxiderer uden at koste noget", o.fase === "anim" && !o.sv);
+    tid(o, 2.5);
     paastand("propan-2-ol bliver til propanon", o.stof.navn === "propanon", o.stof.navn);
     o.svarValg(D.OXTAL.indexOf(2)); o.indsendKlik();
-    paastand("propanon har intet H på carbonatomet", hPaaC(o).length === 0);
-    o.valgt = o.b.id.H1; o.indsendKlik();
-    husk("fejl andet C uden H", besked(o));
-    paastand("forklaringen siger, at der skal ses på selve carbonatomet", /selve det markerede carbonatom/.test(besked(o)), besked(o));
-    o.vaelg(1);
-    o.svarValg(D.OXTAL.indexOf(0)); o.indsendKlik();
-    o.valgt = hPaaC(o)[0]; o.indsendKlik(); tid(o, 2);
-    o.svarValg(D.OXTAL.indexOf(2)); o.indsendKlik();
-    o.svarValg(0); o.indsendKlik();
     husk("slut propan-2-ol", o.groen && o.groen.tekst);
     paastand("propan-2-ol uden fejl giver stjerne", o.status[1].loest && o.status[1].stjerne);
-
-    /* 2-methylpropan-2-ol med hint og Vis svaret */
     o.vaelg(2);
+    o.saetPar(false);
     o.knap();
     husk("hint 1 ox", besked(o));
     paastand("første hint slår elektronparrene til", o.visPar && el("o-kontakter").querySelector('[data-vis="par"]').classList.contains("til"));
@@ -221,12 +228,8 @@ function koerTest(W) {
     husk("hint 2 ox", besked(o));
     paastand("andet hint tæller bindingerne", /1 binding til O og 3 bindinger til C/.test(besked(o)), besked(o));
     o.knap();
-    paastand("Vis svaret giver +I", o.fase === "h" && /I alt \+I/.test(besked(o)), besked(o));
-    o.knap(); o.knap();
-    husk("hint 2 h", besked(o));
-    o.knap();
     husk("slut tertiær", o.groen && o.groen.tekst);
-    paastand("Vis svaret afslutter med Intet hydrogenatom", !!o.groen && /kan ikke oxideres\./.test(o.groen.tekst), o.groen && o.groen.tekst);
+    paastand("Vis svaret giver +I, og den tertiære kan ikke oxideres", !!o.groen && /I alt \+I/.test(o.groen.tekst) && /kan ikke oxideres\./.test(o.groen.tekst), o.groen && o.groen.tekst);
     paastand("Vis svaret koster stjernen", o.status[2].loest && !o.status[2].stjerne);
     paastand("alle tre er klaret i panelet", el("o-klaret").textContent === "3");
     o.videreKlik();
@@ -241,12 +244,16 @@ function koerTest(W) {
         var rigtigType = D.TYPE_ORDEN.indexOf(op.alk.type);
         husk("kort type " + i, kort(p));
         p.klikScene({ x: p.kasser.valg[0].x + 20, y: p.kasser.valg[0].y + 20 });
-        if (p.valgt !== null) paastand("svarene på tavlen er låst, før typen er fundet (" + op.o.alkohol + ")", false);
+        if (p.valgt !== null) paastand("svarene på tavlen er skjult og låst, før typen er fundet (" + op.o.alkohol + ")", false);
         var forkertType = (rigtigType + 1) % 3;
         p.svarValg(forkertType); p.indsendKlik();
         husk("fejl type " + i, besked(p));
         p.svarValg(rigtigType); p.indsendKlik();
-        husk("rigtig type " + i, besked(p));
+        husk("rigtig type " + i, bliv(p));
+        if (!p.groen || p.fase !== "type" || !/^Rigtigt/.test(bliv(p)) || besked(p) !== "") paastand("rigtig type: kortet bliver på spørgsmålet (" + op.o.alkohol + ")", false, bliv(p));
+        p.klikScene({ x: p.kasser.valg[0].x + 20, y: p.kasser.valg[0].y + 20 });
+        if (p.valgt !== null) paastand("svarene om produktet er låst, til eleven trykker Næste spørgsmål (" + op.o.alkohol + ")", false);
+        p.videreKlik();
         if (p.fase !== "produkt") paastand("typen går videre (" + op.o.alkohol + ")", false);
         husk("kort produkt " + i, kort(p));
         var rigtig = op.o.valg.indexOf(op.produkt);
@@ -273,14 +280,156 @@ function koerTest(W) {
     /* Vis svaret paa fane 2 */
     p.vaelg(4);
     p.knap(); p.knap(); p.knap();
-    paastand("Vis svaret finder typen", p.fase === "produkt");
+    paastand("Vis svaret finder typen: kortet bliver på spørgsmålet med svaret i gult", !!p.groen && p.fase === "type" && /^Svaret/.test(bliv(p)) &&
+        !!el("p-ind").querySelector(".sk-knap.svar-vist"), bliv(p));
+    p.knap();
+    paastand("kortets knap går videre til produktet", p.fase === "produkt" && !p.groen);
     p.knap(); p.knap(); p.knap();
     var valgte = Array.prototype.map.call(el("p-liste").querySelectorAll(".opg-chip.valgt"), function (c) { return c.getAttribute("data-opg"); });
     paastand("kun opgave 5 er markeret i listen", valgte.join(",") === "4", valgte.join(","));
     paastand("Vis svaret finder produktet", !!p.groen && /butanon/.test(p.groen.tekst), p.groen && p.groen.tekst);
 
     /* ================================================================= */
-    overskrift("4. Teksterne");
+    overskrift("4. Fane 3: Ukendte alkoholer");
+    ["primaer", "sekundaer"].forEach(function (t) {
+        var a = K.afstemt(t);
+        paastand("skemaet for den " + D.TYPER[t].navn + " er afstemt (atomer og ladning " + a.ladning.join(" = ") + ")", a.ok, JSON.stringify(a));
+        var m = K.afstem(t), sk = D.FORSOEG.skemaer[t];
+        var tal = {};
+        sk.venstre.concat(sk.hoejre).forEach(function (x) { tal[x[1]] = x[0]; });
+        paastand("trinene for den " + D.TYPER[t].navn + " giver skemaet: " + m.kAlk + " og " + m.kMn + ", " + m.oh + " OH⁻, " + m.h2o + " H₂O",
+            tal[m.alkohol] === m.kAlk && tal["MnO₄⁻"] === m.kMn && tal["OH⁻"] === m.oh && tal["H₂O"] === m.h2o && m.oV === m.oH);
+    });
+    var A2 = K.afstem("sekundaer"), A1 = K.afstem("primaer");
+    paastand("oxidationstallene: propan-2-ol 0 → +II, propan-1-ol −I → +III, mangan +VII → +IV",
+        A2.cFra === 0 && A2.cTil === 2 && A1.cFra === -1 && A1.cTil === 3 && A2.mnFra === 7 && A2.mnTil === 4);
+    paastand("romertallene går til +VII", D.rom(7) === "+VII" && D.rom(-1) === "−I");
+    paastand("bundfaldet følger skemaet: den primære giver dobbelt så meget som den sekundære",
+        Math.abs(K.bundfald("primaer") / K.bundfald("sekundaer") - 2) < 1e-9 && K.bundfald("tertiaer") === 0);
+    ["tertiaer", "sekundaer", "primaer"].forEach(function (t) {
+        var f = K.fuldStruktur(D.FORSOEG.alkoholer.filter(function (a) { return a.type === t; })[0].navn);
+        paastand("den fulde strukturformel for den " + D.TYPER[t].navn + " har " + f.h.length + " H på carbonatomet med OH",
+            f.h.length === { tertiaer: 0, sekundaer: 1, primaer: 2 }[t]);
+    });
+    NK.visFane("fane-u");
+    u.forfra();
+    function pos(n) { tid(u, 1.5); return u.kortPos[n]; }
+    paastand("første gang begynder fanen med forsøget, og Indsend svar er væk", u.trin() === "forsoeg" && el("u-indsend").hidden);
+    paastand("glassene viser ingen resultater før forsøget", !u.udfoert);
+    paastand("de tre alkoholer står i en række under glassene, den tertiære først",
+        pos(2).y > u.baand.y + u.baand.h && pos(2).x < pos(1).x && pos(1).x < pos(0).x);
+    var knapF = el("u-ind").querySelector('[data-handling="forsoeg"]');
+    paastand("kortet har knappen Udfør forsøget", !!knapF);
+    knapF.click();
+    tid(u, 3.8);
+    var it0 = u.glasMed("tertiaer"), ip0 = u.glasMed("primaer"), is0 = u.glasMed("sekundaer");
+    paastand("midt i forsøget falder MnO₂ til bunds", u.glasTilstand(ip0).bundfald > 0 && u.glasTilstand(ip0).korn !== null && u.glasTilstand(it0).bundfald === 0);
+    tid(u, 4);
+    paastand("efter forsøget: mest bundfald hos den primære, intet hos den tertiære",
+        u.glasTilstand(ip0).bundfald > u.glasTilstand(is0).bundfald && u.glasTilstand(it0).bundfald === 0 && u.glasTilstand(ip0).papir === 1);
+    paastand("pH: tertiær 7, primær 8 og sekundær 10 (brugerens valg)", u.papir(it0) === 7 && u.papir(ip0) === 8 && u.papir(is0) === 10);
+    paastand("nu er den tertiære i fokus, og de to andre venter",
+        u.trin() === "t-H" && u.kortMaal(2).slags === "fokus" && u.kortMaal(1).slags === "venter" && u.kortMaal(0).slags === "venter");
+    husk("u t-H", kort(u));
+    u.indsendKlik();
+    paastand("intet sker uden et valg", u.trin() === "t-H");
+    var fejlTekster = {};
+    var bobler = [];
+    /* Papirkortet: efter et rigtigt svar bliver kortet paa spoergsmaalet med
+       forklaringen under svarene, og tavlen venter, til eleven trykker Naeste */
+    var blivFejl = [];
+    function blivTjek(id) {
+        husk("u bliv " + id, bliv(u));
+        if (!(u.groen && u.groen.naeste && u.trin() === id && besked(u) === "" && /^(Rigtigt|Svaret)/.test(bliv(u)) && bliv(u).length > 12 &&
+            /Næste spørgsmål/.test(el("u-ind").querySelector(".sk-videre").textContent))) blivFejl.push(id + ": " + bliv(u));
+    }
+    function trinMedFejl(id) {
+        if (u.trin() !== id) { paastand("trinet " + id + " kommer i rækkefølge", false, u.trin()); return false; }
+        var sp = u.spm();
+        husk("u kort " + id, kort(u));
+        if (sp.indtast) {
+            var af = K.afstem(id.charAt(0) === "s" ? "sekundaer" : "primaer");
+            u.tegn();
+            if (u.koefFelt[0].hidden) paastand("felterne til koefficienterne vises i skemaet (" + id + ")", false);
+            u.indsendKlik();
+            if (u.trin() !== id) paastand("intet sker med tomme felter (" + id + ")", false);
+            u.koefFelt[0].value = af.kMn; u.koefFelt[1].value = af.kAlk; u.indsendKlik();
+            fejlTekster[id] = besked(u);
+            husk("u fejl " + id, besked(u));
+            u.koefFelt[0].value = af.kAlk * 2; u.koefFelt[1].value = af.kMn * 2; u.indsendKlik();
+            husk("u fejl2 " + id, besked(u));
+            if (!/så små som muligt/.test(besked(u))) paastand("dobbelte koefficienter forklares (" + id + ")", false, besked(u));
+            u.knap(); husk("u hint1 " + id, besked(u)); u.knap(); husk("u hint2 " + id, besked(u));
+            u.koefFelt[0].value = af.kAlk; u.koefFelt[1].value = af.kMn; u.indsendKlik();
+            blivTjek(id);
+            if (!u.koefFelt[0].disabled) paastand("felterne er låst, mens kortet venter på Næste (" + id + ")", false);
+            u.videreKlik();
+            bobler.push(!!u.boble && u.boble.stille);
+            u.tegn();
+            if (!u.koefFelt[0].hidden) paastand("felterne forsvinder efter det rigtige svar (" + id + ")", false);
+            return true;
+        }
+        var forkert = (sp.rigtig + 1) % sp.svar.length;
+        if (sp.laast) while (sp.laast[forkert] || forkert === sp.rigtig) forkert = (forkert + 1) % sp.svar.length;
+        u.svarValg(forkert); u.indsendKlik();
+        fejlTekster[id] = besked(u);
+        husk("u fejl " + id, besked(u));
+        u.knap(); husk("u hint1 " + id, besked(u)); u.knap(); husk("u hint2 " + id, besked(u));
+        u.svarValg(sp.rigtig); u.indsendKlik();
+        blivTjek(id);
+        u.videreKlik();
+        bobler.push((!!u.boble && u.boble.stille) || u.trin() === "forsoeg");
+        if (besked(u)) paastand("kortets nederste linje er tom, når næste spørgsmål kommer (" + id + ")", false, besked(u));
+        u.tegn();
+        return true;
+    }
+    ["t-H", "t-reak", "t-forvent"].forEach(trinMedFejl);
+    paastand("den tertiære: forventet violet og pH 7 før glasset vælges", u.trin() === "t-glas" && /violet/.test(fejlTekster["t-forvent"] + kort(u)));
+    u.tegn();
+    u.klikScene({ x: u.kol[ip0].x + u.kol[ip0].b / 2, y: u.baand.y + u.baand.h / 2 });
+    paastand("et klik på et glas vælger det", u.valgt === ip0);
+    u.indsendKlik();
+    husk("u fejl t-glas", besked(u));
+    paastand("et brunsort glas forklares med oxidationen", /brunsort/.test(besked(u)), besked(u));
+    u.svarValg(it0); u.indsendKlik();
+    blivTjek("t-glas");
+    u.videreKlik();
+    paastand("den tertiære er fundet og glider op i sit glas", u.kendt[it0] === 2 && Math.abs(pos(2).y - u.plads(it0).y) < 1);
+    paastand("nu er den sekundære i fokus, og den primære venter", u.kortMaal(1).slags === "fokus" && u.kortMaal(0).slags === "venter");
+    ["s-H", "s-reak", "s-oxC", "s-oxMn", "s-koef", "s-ladning", "s-brint", "s-forvent", "s-glas"].forEach(trinMedFejl);
+    paastand("forkerte koefficienter forklares med stigning og fald", /samlede stigning/.test(fejlTekster["s-koef"]), fejlTekster["s-koef"]);
+    paastand("hvert rigtigt svar lyser grønt ved det, der blev sat ind, når eleven trykker Næste (uden tekst: forklaringen stod på kortet)", bobler.length > 10 && bobler.every(function (b) { return b; }));
+    paastand("skemaet bliver stående, mens den sekundære forventes", u.behold === true || u.trin() !== "s-forvent");
+    paastand("den sekundære er fundet og står ved sit glas", u.kendt[is0] === 1);
+    paastand("nu er den primære i fokus, og ingen venter", u.kortMaal(0).slags === "fokus" && [1, 2].every(function (n) { return u.kortMaal(n).slags === "glas"; }));
+    ["p-H", "p-reak", "p-oxC", "p-koef", "p-ladning", "p-brint"].forEach(trinMedFejl);
+    paastand("efter hvert rigtigt svar bliver kortet på spørgsmålet med forklaringen og Næste spørgsmål", blivFejl.length === 0, blivFejl.join(" | "));
+    paastand("forkert antal OH⁻ hos den primære nævner propanoat", /propanoat/.test(fejlTekster["p-ladning"]), fejlTekster["p-ladning"]);
+    paastand("teorien huskes", u.status.afstemt);
+    paastand("til sidst spørges om, hvad man forventer af den primære", u.trin() === "p-forvent");
+    u.svarValg(1); u.indsendKlik();
+    husk("u fejl p-forvent", besked(u));
+    paastand("mindre bundfald hos den primære forklares med skemaerne", /4 MnO/.test(besked(u)), besked(u));
+    u.svarValg(0); u.indsendKlik();
+    husk("u slut", u.groen && u.groen.tekst);
+    paastand("rigtigt: den primære glider op i det sidste glas, og kortet er grønt", !!u.groen && u.kendt.every(function (k, i) { return k === u.glas[i]; }));
+    paastand("fejl koster stjernen", !u.status.stjerne && u.status.runder === 1);
+    u.klikScene({ x: 10, y: 10 });
+    paastand("scenen er låst, når kortet er grønt", !!u.groen);
+    var foer = u.glas.join();
+    u.videreKlik();
+    paastand("ny runde: forsøget, forventningerne og glassene, uden teorien", u.trin() === "forsoeg" && u.liste.length === 6);
+    u.visSvar();
+    tid(u, 8);
+    paastand("Vis svaret på forsøget udfører det uden at koste noget", u.trin() === "t-forvent" && !u.sv);
+    ["t-forvent", "t-glas", "s-forvent", "s-glas", "p-forvent"].forEach(function () { u.svarValg(u.spm().rigtig); u.indsendKlik(); if (u.groen && u.groen.naeste) u.videreKlik(); });
+    paastand("anden runde uden fejl giver stjerne", u.status.runder === 2 && u.status.stjerne);
+    u.nyRunde();
+    paastand("pH er den samme i en ny runde", u.phV.primaer === 8 && u.phV.sekundaer === 10 && u.phV.tertiaer === 7);
+    note("glassene i de to første runder: " + foer + " og videre");
+
+    /* ================================================================= */
+    overskrift("5. Teksterne");
     o.vaelg(0); o.knap(); o.knap();
     husk("hint", besked(o));
     var html = d.body.innerText;
@@ -299,14 +448,14 @@ function koerTest(W) {
     paastand("ingen Kemichael", !d.querySelector('script[src*="kemichael"]'));
 
     /* ================================================================= */
-    overskrift("5. Kortet dækker aldrig whiteboardet");
+    overskrift("6. Kortet dækker aldrig whiteboardet");
     var daekker = [], raekke = [];
     [[1100, 620], [1300, 800], [1600, 950]].forEach(function (str) {
         ramme.style.width = str[0] + "px";
         ramme.style.height = str[1] + "px";
-        [o, p].forEach(function (sim) {
-            NK.visFane(sim === o ? "fane-o" : "fane-p");
-            sim.vaelg(0);
+        [o, p, u].forEach(function (sim) {
+            NK.visFane("fane-" + sim.navn);
+            if (sim === u) { sim.forfra(); sim.udfoer(); tid(sim, 8); } else sim.vaelg(0);
             sim.lay = null; sim.tilpas(); sim.layout();
             sim.svarValg(1);
             var kortR = el(sim.navn + "-skort").getBoundingClientRect(), c = sim.L.canvas.getBoundingClientRect();

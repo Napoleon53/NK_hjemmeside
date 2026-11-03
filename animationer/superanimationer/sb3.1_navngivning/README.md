@@ -203,3 +203,20 @@ menuen følger bogen; de tre andre rykkede ét nummer ned. Koden er `navngivning
 fordi koder, der begynder med `b3`, går til B6 Syre/Base. Navnet står også i
 `FEEDBACK_EMNER`. Kemibogen B linker til den fra boksen Prøv selv i afsnit B3.1,
 og Kemibogen C fra afsnit 4.5.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`. Kortets tekst
+går gennem `NK.Papir.tekst` (`visKort` i `js/fane.js`).
+
+* Animationen har ingen svarknapper, så der er ingen Indsend svar. Tjek (fane 2) og
+  Test (fane 1) er stadig det, der bedømmer, og logikken er den samme. Tjek er nu
+  kortets blå hovedknap, og feltet er hvidt med en stille kant.
+* Et rigtigt svar lægger ikke et nyt spørgsmål på kortet: kortet viser navnet i
+  dele, forklaringen i en grøn boks og Næste opgave, og den næste opgave kommer
+  først, når eleven trykker. Det, eleven skrev, står stadig grønt i kassen Dit navn
+  tegnet. Derfor er det grønne kort beholdt (som de andre grønne kort i `sb3.3`).
+* Navnets dele har blækfarven på papiret (`--delblaek`, sat af `navnHTML`), ingen
+  versaler og intet puls; reglerne står nederst i `css/stil.css`.
+* Selvtesten har fire nye påstande om papirkortet (189 påstande).

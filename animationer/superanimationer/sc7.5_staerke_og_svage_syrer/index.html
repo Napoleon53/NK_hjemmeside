@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stærke og svage syrer</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">H⁺</span> Stærke og svage syrer</h1>
@@ -38,6 +39,7 @@
             <div class="sk-bund" id="g-status">
                 <p class="st-tekst" id="g-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="g-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="g-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="g-anker-lup"></div>
@@ -73,6 +75,7 @@
             <div class="sk-bund" id="s-status">
                 <p class="st-tekst" id="s-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="s-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="s-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="s-anker-lup"></div>
@@ -114,6 +117,7 @@
             <div class="sk-bund" id="f-status">
                 <p class="st-tekst" id="f-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="f-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="f-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="f-anker-lup"></div>
@@ -194,6 +198,7 @@
 <script src="js/lup.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/glas.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_glas.js"></script>
 <script src="js/sim_styrke.js"></script>

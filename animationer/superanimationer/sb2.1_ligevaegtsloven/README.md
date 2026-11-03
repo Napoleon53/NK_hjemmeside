@@ -170,7 +170,11 @@ andre dele er rigtige, quizzen, sproget og layoutet fra 1100 × 700 til
 1600 × 950.
 Sidst kørt: ALT OK (83 påstande), 9. oktober 2026.
 
-## Til menuen
+## I menuen
+
+I menuen fra 3. nov. 2026 som nr. 1 i `kemi-b-filer/samling_b2.html` (koden `b2.1`). Den gamle ligger i `kemi-c-filer/arkiv/b2.1_ligevaegtsloven_oldversion.html`.
+
+### Sådan kom den i menuen
 
 Når brugeren siger til:
 

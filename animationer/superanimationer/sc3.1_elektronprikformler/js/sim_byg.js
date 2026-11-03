@@ -115,9 +115,13 @@
         return {
             chip: "Tæl efter",
             tekst: "Hvor mange elektroner har " + D.omNavn(mol) + " omkring sig i " + mol.f + "?",
-            ekstra: this.talHTML()
+            ekstra: this.talHTML(),
+            spm: "tal"          /* papirkortet: kortet bliver paa spoergsmaalet */
         };
     };
+
+    /* Det rigtige tal i optaellingen (tallene tegnes laast efter svaret) */
+    P_.talFacit = function () { return P.status(this.M, this.omAtom()).nu; };
 
     P_.kanIndsende = function () {
         if (this.trin === "atom") return P.sum(this.tegning) > 0;

@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Navne på organiske stoffer</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">-ol</span> Navne på organiske stoffer</h1>
@@ -37,6 +38,7 @@
             <div class="sk-bund" id="n-status">
                 <p class="st-tekst" id="n-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="n-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="n-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="n-anker-tavle"></div>
@@ -105,6 +107,7 @@
             <div class="sk-bund" id="g-status">
                 <p class="st-tekst" id="g-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="g-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="g-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="g-anker-tavle"></div>
@@ -193,6 +196,7 @@
 <script src="../../molekylemotor/js/tegnebraet.js"></script>
 <script src="js/data.js"></script>
 <script src="js/kemi.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_navn.js"></script>
 <script src="js/sim_tegn.js"></script>

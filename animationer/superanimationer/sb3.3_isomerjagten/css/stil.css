@@ -2376,3 +2376,67 @@ sub { font-size: 0.74em; line-height: 0; vertical-align: -0.24em; }
     .maal-formel { font-size: 1.7rem; }
     .maal-atomer i { font-size: 0.76rem; padding: 0 6px; }
 }
+
+/* ----- C, O og visningen paa tavlen (3. nov. 2026) --------------------------
+   C og O er grundstoffer som paa tegnebraettet: det valgte bliver staaende.
+   Visningen (Zigzag eller Alle atomer) er en lille, stille kontakt til hoejre. */
+.tegnevaerktoej .vtknap.vt-el { min-width: 44px; padding-left: 0; padding-right: 0; text-align: center; font-size: 1.08rem; }
+
+.vt-skifter {
+    display: inline-flex;
+    align-self: center;
+    margin-right: 8px;
+    padding: 2px;
+    border: 1.5px solid #c3cad4;
+    border-radius: 9px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.vt-skifter button {
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #4a5363;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.vt-skifter button:hover { color: #1d2433; }
+.vt-skifter button.aktiv { background-color: #e3eef8; color: #1d4f7a; }
+.tegnevaerktoej.laast .vt-skifter { opacity: 0.45; pointer-events: none; }
+
+@media (max-width: 1250px) {
+    .vt-skifter { margin-right: 4px; }
+    .vt-skifter button { padding: 4px 7px; font-size: 0.8rem; }
+}
+
+/* ----- Isomeri-quizzen til og fra (3. nov. 2026) -----------------------------
+   Under jagterne i panelet. Til fra start i de tre foerste jagter. */
+.quizkontakt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 8px;
+    padding: 7px 10px;
+    border: 1px solid #4a4a58;
+    border-radius: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.quizkontakt:hover { background-color: var(--panel-3); }
+.quizkontakt .qk-tekst { display: flex; flex-direction: column; min-width: 0; }
+.quizkontakt b { font-size: 0.92rem; font-weight: 700; }
+.quizkontakt small { margin-top: 1px; color: var(--tekst-mat); font-size: 0.78rem; font-weight: 600; line-height: 1.25; }
+.quizkontakt.til { border-color: var(--blaa); background-color: rgba(61, 158, 224, 0.1); color: #ffffff; }
+.quizkontakt.til .kk-kontakt { background-color: var(--blaa); }
+.quizkontakt.til .kk-kontakt i { left: 20px; background-color: #ffffff; }

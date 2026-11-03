@@ -145,3 +145,23 @@ højde. Sidst kørt: ALT OK (64), 25. oktober 2026.
 Animationen er i menuen (`samling_c3.html` og `samling_NV.html`) og linkes fra
 Kemibogen 3.1, T1.7 og T3.1 og slides til kapitel 3. Fanen Find fejlen åbnes direkte
 med `index.html#fejl`.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`. Det, der kun
+gælder her (tallene 1 til 12 og boksen ved Ingen fejl på papiret), står sidst i
+`css/stil.css`. Indsend svar fandtes i forvejen og virker som før: et tal eller Ingen
+fejl vælger kun.
+
+Et rigtigt svar på et spørgsmål på kortet (Tæl efter og Find fejlen) lægger ikke kortet
+om: spørgsmålet bliver stående, det rigtige tal eller Ingen fejl er grønt (gult med Vis
+svaret), de andre er tonet ned og låst, forklaringen står under, og knappen videre
+(Tæl efter, Næste molekyle, Næste tegning) står, hvor Indsend svar stod. Delen har
+`spm` i `delNu`, og `blivHTML` i `js/fane.js` tegner kortet; `talHTML` og knappen Ingen
+fejl tegnes låst, når svaret er rigtigt. Byg atomet og Byg molekylet er opgaver i
+scenen og får som før forklaringen alene med knappen videre.
+
+Kortets knap går altid fremad: når alle tegninger er løst, hedder den Næste tegning, ikke
+Start forfra (`videreTekst`). Selvtesten: ALT OK (77), 3. nov. 2026, med påstande om
+Indsend svar, kortet, der bliver på spørgsmålet, og kortets højde i de nye tilstande.

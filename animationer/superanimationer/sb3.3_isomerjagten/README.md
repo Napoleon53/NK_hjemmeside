@@ -73,10 +73,10 @@ isomererne i rækkefølge efter kogepunkt, så B3.2 og B3.3 hænger sammen.
   (fem til fjorten isomerer) findes den med det højeste kogepunkt, fordi
   rækkefølgen mellem fx butan-2-ol og 2-methylpropan-1-ol ikke kan afgøres ud fra
   bogen.
-* Værktøjet C → O: et klik gør et carbonatom til et oxygenatom (og tilbage). Det
-  er den enkleste måde at tegne en ether på ("et oxygenatom midt i
-  carbonkæden", bogens ord). En ether kan også tegnes ved at bygge videre fra
-  OH-gruppens oxygenatom med Kæde.
+* C og O (se "C, O og visningen" nedenfor): med O valgt gør et klik et
+  carbonatom til et oxygenatom (og tilbage). Det er den enkleste måde at tegne
+  en ether på ("et oxygenatom midt i carbonkæden", bogens ord). En ether kan
+  også tegnes ved at trække fra OH-gruppens oxygenatom med C.
 * Knappen Indsend svar viser tegningens molekylformel, mens eleven tegner
   (Indsend svar: C₄H₁₀O), men ikke navnet: navnet ville afsløre, om stoffet
   allerede er på hylden.
@@ -99,7 +99,8 @@ isomererne i rækkefølge efter kogepunkt, så B3.2 og B3.3 hænger sammen.
    * det samme stof igen: "Det er butan-1-ol igen ...", og kortet på hylden ryster
    * en ether i jagten med kun alkoholer: den afvises med en forklaring
    * en ny isomer: den kommer på hylden
-2. **Hvilken slags?** Har den nye en partner på hylden (se ovenfor), står de to
+2. **Hvilken slags?** (kun når isomeri-quizzen er slået til, se nedenfor) Har
+   den nye en partner på hylden (se ovenfor), står de to
    på whiteboardet, og kortet spørger: kædeisomerer, stillingsisomerer eller
    funktionsisomerer? Svaret vælges og sendes ind. Et forkert svar giver en
    forklaring og kan ikke vælges igen. Det rigtige giver et grønt kort.
@@ -202,17 +203,19 @@ ikke ændret.
 
 ## Genveje og links
 
-`Enter` indsend svar (eller kortets grønne knap), `R` ryd tavlen, `Ctrl+Z` og
+`Enter` indsend svar (eller kortets grønne knap), `C` og `O` vælger grundstoffet,
+`R` ryd tavlen, `Ctrl+Z` og
 `Ctrl+Y` fortryd og gentag, `H` eller `?` rundvisning, `T` teori, `Esc` luk.
 En jagt vælges med `#`: `index.html#4`, `index.html#c4h10o` eller
 `index.html#c5h12o-alle` (Mesterjagten). Uden `#`
 begynder siden ved den første jagt, der ikke er klaret. Det fundne huskes i
 browseren (`nk-sb3.3-jagter`), og "Begynd jagten forfra" under hylden tømmer
-hylden.
+hylden. Visningen huskes i `nk-sb3.3-stil`, og elevens valg af isomeri-quiz
+huskes pr. jagt (`q` i `nk-sb3.3-jagter`).
 
 ## Selvtest
 
-`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 127
+`_selvtest.html` åbnes gennem en lokal server med `animationer/` som rod. 154
 påstande: hver jagt har præcis de isomerer, der findes (alle træer med jagtens
 atomer bygges og navngives af motoren); motoren giver hver isomer navnet fra
 data; slags isomeri passer med bogens facit til B3.3.3; kortet spørger kun om
@@ -232,3 +235,57 @@ koden `isomerjagten` (`?emne=isomerjagten`). Koden begynder ikke med `b3`, for
 den sender til B6 Syre/Base; `findSideFraEmne` i `samling_alt_b.html` kender
 den. Navnet står i `FEEDBACK_EMNER`. Kemibogen B kan linke til den fra boksen Prøv selv
 i afsnit B3.3 (i stedet for eller ud over tegnebrættet).
+
+## C, O og visningen (3. nov. 2026)
+
+Brugeren: "Det er virkelig svært at sætte et oxygen på. Jeg synes, at man enten
+kan vælge Carbon eller oxygen. Og når man har valgt oxygen, så virker det uanset
+om man trækker eller om man klikker (konverterer i stedet for pådutter), ligesom
+det gør på tegnebrættet. Desuden savner jeg også indstillingen zigzag eller
+alle-atomer". Fejlen var, at −OH og C → O kun virkede ved et klik: et træk med
+dem byggede en carbonkæde.
+
+* Værktøjerne Kæde, −OH og C → O er erstattet af **C** og **O** (O kun i
+  jagterne med oxygen), som grundstofferne på tegnebrættet. Valget bliver
+  stående, til eleven vælger andet; Ryd og en ny jagt går tilbage til C.
+* Med **C**: et træk tegner en kæde, et klik på et C sætter et carbonatom på, og
+  et klik på et O gør det til C.
+* Med **O**: et træk fra et carbonatom sætter et oxygenatom på (en OH-gruppe for
+  enden), og et klik på et C gør det til O (et klik på et O gør det til C igen).
+  To oxygenatomer må ikke sidde sammen, hverken ved træk eller klik.
+* Kontakten **Zigzag | Alle atomer** står til højre i værktøjslinjen. Den gælder
+  tavlen og de to kort på whiteboardet ved spørgsmålet og kogepunkterne. Hylden
+  bliver i zigzag, fordi kortene der er for små til alle H-atomerne.
+* Trækket er nyt i molekylemotoren og gælder alle tavler: kæden står gråt med
+  antallet af C-atomer, til musen slippes, er altid en lige zigzag og har højst
+  20 C-atomer (se "Trækket" i molekylemotorens README).
+
+## Isomeri-quizzen til og fra (3. nov. 2026)
+
+Brugeren: "der skal være en toggle, hvorfra man kan slå isomeri-quiz til og fra.
+Jeg synes at den default skal være slået til ved det 3 første molekyler. Men ved
+4-8 skal den default være slået fra. Det bliver lidt trættende, når man bare
+gerne vil kværne isomere, at man så hele tiden bliver afbrudt."
+
+* Kontakten **Isomeri-quiz** står under jagterne i panelet og gælder den valgte
+  jagt. Fra start er den slået til i jagt 1 til 3 (`quiz: true` i `js/data.js`)
+  og fra i jagt 4 til 8.
+* Slået fra: en ny isomer kommer på hylden, og eleven tegner videre uden
+  spørgsmålet "Hvilken slags isomerer er X og Y?". Kogepunkterne til sidst er
+  der stadig.
+* Slås den fra, mens et spørgsmål venter på svar, springes spørgsmålet over
+  uden straf, og jagten går videre, som om der ikke var spurgt.
+* Elevens valg huskes for hver jagt, også efter "Begynd jagten forfra".
+* Stjernen kræver stadig, at jagten er klaret uden Vis svaret og uden forkerte
+  svar. Med quizzen slået fra er der færre spørgsmål at svare forkert på; det
+  er mit valg ikke at gøre stjernen sværere at få af den grund.
+
+## Papirkortet (3. nov. 2026)
+
+Prøve på det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`. Et rigtigt
+svar på spørgsmålet om isomertypen lægger ikke kortet om: spørgsmålet bliver
+stående, svaret er grønt, forklaringen står under svarene, og Find den næste
+isomer står, hvor Indsend svar stod (`groen.spm` i `js/sim_jagt.js`, første
+gren i `visKort` i `js/fane.js`). De andre grønne kort (alle isomerer fundet,
+jagten klaret) er som før, men på papir.

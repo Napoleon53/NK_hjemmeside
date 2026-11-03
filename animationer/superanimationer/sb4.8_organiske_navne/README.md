@@ -222,3 +222,34 @@ Fra 3. nov. 2026 som nr. 1 "Organiske navne" i
 omnummereringen 9. okt. 2026); en kode med `b4` sender til B3. Navnet står i
 `FEEDBACK_EMNER` i `samling_alt_b.html`. Kemibogen B kan linke til den fra boksen Prøv selv
 i afsnit B3.1 (med `?med=alkohol,aldehyd,keton,syre`) og fra B4.5 og B4.6.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`.
+
+* **Indsend svar** (fane 1 og 3): et klik på en brik vælger den kun (blå). Svaret
+  bedømmes med knappen Indsend svar i kortets nederste række (`vaelgSvar`,
+  `indsendKlik` og `visIndsend` i `js/fane.js`, knapperne `n-indsend` og
+  `g-indsend`). Et klik i formlen (nummer 1, estergruppen, en gruppe på fane 3)
+  virker stadig med det samme. Fane 2 har ingen svarknapper.
+* **Kortet bliver på trinnet:** et rigtigt trin lægger ikke kortet om. Trinnet
+  bliver stående med svaret grønt (gult ved Vis svaret), "Rigtigt" og en kort
+  forklaring står i en grøn boks under svarene, og Næste trin står, hvor Indsend
+  svar stod. Næste trins spørgsmål kommer først, når eleven trykker (`blivPaa` og
+  `blivHTML` i `js/fane.js`, `trinKlaret` i `js/sim_navn.js`). Forklaringen er
+  trinnets `godt` i `js/kemi.js` (fx "Pentan er fem carbonatomer."). Det sidste trin
+  bliver også stående, med forklaringen til hele navnet og Næste opgave. Mens kortet
+  venter, er det, trinnet spurgte om, stadig gult i formlen, og scenen er låst.
+* **Fane 3:** et rigtigt svar på stofklassen lader spørgsmålet stå med den gule
+  ring, svaret grønt og forklaringen ("C=O og OH på samme carbonatom er en
+  carboxylsyre.") og knappen Find den næste gruppe (`gruppeFundet` i
+  `js/sim_grupper.js`). Prikkerne på stofklasserne har blækfarven.
+* **Navnets dele** har blækfarven på papiret (`--delblaek`, sat af `navnHTML`), ingen
+  versaler og intet puls; reglerne står nederst i `css/stil.css`. Navnet er lidt
+  mindre end før, og i vinduer smallere end 1250 px står svarene og forklaringen lidt
+  tættere, når kortet bliver på trinnet, så kortet kan være i sin plads (244 px), også
+  med forklaringen til hele navnet og "Du har givet alle stofferne navn."
+* Knappen, der fører videre, siger aldrig Start forfra: når alt på fane 3 er løst,
+  hedder den Næste opgave (den gjorde det samme før, men hed Start forfra ↺).
+* Rundvisningen på fane 1 og 3 nævner Indsend svar. Selvtesten har 194 påstande.

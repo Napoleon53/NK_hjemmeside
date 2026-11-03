@@ -897,3 +897,51 @@ kbd {
     .tal-knap { min-width: 38px; padding: 4px 0; font-size: 0.98rem; }
     .sk-ingen { margin-top: 6px; }
 }
+
+/* =====================================================================
+   PAPIRKORTET (brugerens valg 3. nov. 2026). ../faelles/papirkort.css
+   goer kortet til et lyst ark med Lexend, naar <body class="papirkort">.
+   Her kun det, der er saerligt for sc3.1: tallene i optaellingen og
+   afkrydsningsboksen ved Ingen fejl. Som i den faelles fil har kun det
+   valgte svar farve, og efter et rigtigt svar er det rigtige tal groent
+   (gult med Vis svaret) og de andre toned ned.
+   ===================================================================== */
+html body.papirkort.papirkort .scenekort .tal-knap {
+    border: 1.5px solid var(--pk-knapkant);
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-weight: 600;
+    box-shadow: none;
+    opacity: 1;
+    transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.2s ease;
+}
+
+html body.papirkort.papirkort .scenekort .tal-knap:hover:not(:disabled) { border-color: #8f8873; background-color: #fffdf6; }
+html body.papirkort.papirkort .scenekort .tal-knap.valgt,
+html body.papirkort.papirkort .scenekort .tal-knap.valgt:hover:not(:disabled) {
+    border-color: var(--pk-blaa);
+    background-color: var(--pk-blaa-lys);
+    box-shadow: inset 0 0 0 1px var(--pk-blaa);
+}
+html body.papirkort.papirkort .scenekort .tal-knap.forkert { border-color: #e0a59d; background-color: #fbf1ef; color: #9a3a2e; opacity: 1; }
+html body.papirkort.papirkort .scenekort .tal-knap.rigtig {
+    border-color: var(--pk-groen);
+    background-color: var(--pk-groen-lys);
+    color: #1d5a3a;
+    box-shadow: inset 0 0 0 1px var(--pk-groen);
+}
+html body.papirkort.papirkort .scenekort .tal-knap.svar-vist {
+    border-color: #c9a640;
+    background-color: var(--pk-gul-lys);
+    color: var(--pk-gul-tekst);
+    box-shadow: inset 0 0 0 1px #c9a640;
+}
+html body.papirkort.papirkort .scenekort .tal-knap.dim { opacity: 0.4; }
+
+/* Afkrydsningsboksen ved Ingen fejl: hvid, blaa naar valgt, groen naar rigtig */
+html body.papirkort.papirkort .scenekort .v-boks { border: 1.5px solid #b5ae9c; background-color: #ffffff; color: #ffffff; }
+html body.papirkort.papirkort .scenekort .sk-knap.valgt .v-boks { border-color: var(--pk-blaa); background-color: var(--pk-blaa); }
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig .v-boks { border-color: var(--pk-groen); background-color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .sk-knap.svar-vist .v-boks { border-color: #c9a640; background-color: #c9a640; }
+html body.papirkort.papirkort .scenekort .sk-knap.forkert .v-boks { border-color: #d98b82; }
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig:has(.v-boks)::before { content: none; }

@@ -66,7 +66,21 @@
 
         P.visKort = function () {
             var e = this.el.skort, html, kl;
-            if (this.groen) {
+            if (this.groen && this.groen.spm && NK.Papir) {
+                /* Papirkortet (brugerens valg 3. nov. 2026): kortet bliver paa
+                   spoergsmaalet. Svaret er groent dér, hvor eleven klikkede,
+                   forklaringen staar under svarene, og knappen, der foerer
+                   videre, staar dér, hvor Indsend svar stod. */
+                var gb = this.groen, kb = this.kortData(), vist = gb.maade === "svar";
+                kl = "scenekort loest bliv" + (vist ? " svar" : "");
+                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(kb.chip) + "</span>" + NK.Papir.tekst(NK.html(kb.tekst)) + "</p>";
+                html += '<div class="sk-svar brikker" style="grid-template-columns: repeat(' + kb.svar.length + ', minmax(0, 1fr));">';
+                kb.svar.forEach(function (sv, j) {
+                    html += '<button type="button" class="sk-knap brik ' + (sv.valgt ? (vist ? "svar-vist" : "rigtig") : "dim") + '" data-valg="' + j + '" disabled><span>' +
+                        NK.html(sv.t) + "</span></button>";
+                });
+                html += "</div>" + NK.Papir.bliv(NK.html(gb.tekst || ""), vist ? "Svaret" : "Rigtigt", NK.html(gb.knap), vist);
+            } else if (this.groen) {
                 var g = this.groen;
                 kl = "scenekort loest" + (g.maade === "svar" ? " svar" : "");
                 html = '<div class="sk-slut"><p class="sk-tekst"><span class="sk-chip">' + NK.html(g.chip || (g.maade === "svar" ? "Svaret" : "Rigtigt ✓")) + "</span>" +
@@ -75,7 +89,7 @@
             } else {
                 var k = this.kortData();
                 kl = "scenekort " + (k.slags === "spm" ? "spm" : "opgave") + (k.maal ? " medmaal" : "");
-                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(k.chip) + "</span>" + NK.html(k.tekst) + "</p>" + (k.ekstra || "");
+                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(k.chip) + "</span>" + (NK.Papir ? NK.Papir.tekst(NK.html(k.tekst)) : NK.html(k.tekst)) + "</p>" + (k.ekstra || "");
                 /* Den gule ramme med det, eleven jagter, staar til venstre for teksten */
                 if (k.maal) html = '<div class="sk-maalrad">' + k.maal + '<div class="sk-maaltekst">' + html + "</div></div>";
                 if (k.svar && k.svar.length) {
@@ -207,7 +221,7 @@
         P.beskedTekst = function () { return this.el.besked.hidden ? "" : this.el.besked.textContent; };
 
         P.godLinje = function (tekst) {
-            this.besked('<span class="b-maerke">Ny isomer ✓</span> ' + NK.html(tekst), "god");
+            this.besked('<span class="b-maerke">Ny isomer</span> ' + NK.html(tekst), "god");
         };
 
         P.ryst = function () {
@@ -314,7 +328,7 @@
         v = v || {};
         function med(s, ox, oy) {
             return NK.Struktur.geometri(mol, {
-                skala: s, ox: ox, oy: oy, stil: "zigzag", farve: v.farve || "#1d2433",
+                skala: s, ox: ox, oy: oy, stil: v.stil || "zigzag", farve: v.farve || "#1d2433",
                 skrift: NK.klamp(s * 0.4, 13, 28), linje: NK.klamp(s * 0.055, 2, 3.6),
                 atomFarve: v.atomFarve
             });

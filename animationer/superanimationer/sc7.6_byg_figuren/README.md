@@ -75,3 +75,9 @@ og `fig_titrering.js`. Titrerkurven regnes med samme formel som `titrer_ph` i bo
 1. nov. 2026. Kortet med ordene dækker ingen plads eller gult felt i den svære udgave
 ved 1920 × 1080, 1500 × 950, 1366 × 768 og 1280 × 720 (mindst 44 px, 7.1 ved
 1280 × 720).
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

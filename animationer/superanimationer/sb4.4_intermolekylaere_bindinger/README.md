@@ -276,3 +276,22 @@ knap 1 i B3 (`data-emne="b4"`, teksten stadig "Intermolekylært", da det lange n
 kan stå i panelet). Den gamle ligger i
 `kemi-c-filer/arkiv/b4.1_intermolekylaert_ethanol_oldversion.html`.
 
+
+## Papirkortet (3. nov. 2026)
+
+Scenekortet er det lyse papirkort (se Fælles krav i `../README.md`):
+`../faelles/papirkort.css` og `../faelles/papirkort.js` er indlæst, og
+`<body class="papirkort">`. Indsend svar virker som før: svarene vælger kun.
+
+Et rigtigt svar lægger ikke kortet om. Delen, eleven lige har klaret, bliver
+stående (`slut.del` og `mellem.del`, `blivHTML` i `js/fane.js`): på et spørgsmål er
+de rigtige svar grønne (gule ved Vis svaret), de andre tonet ned og låst; på en
+opgave i scenen (termometeret, H'et i luppen, kortene i Rangér) bliver
+opgaveteksten stående. Forklaringen står under, og knappen, der fører videre,
+står, hvor Indsend svar stod. På Sammenlign bliver kortet også på målingen af det
+første kogepunkt med knappen Næste kogepunkt (`fundetKp` i `js/sim_sammenlign.js`),
+så "Rigtigt" ikke længere står under det næste kogepunkt. Kun når begge
+kogepunkter var kendt før gættet, står dommen over gættet alene på kortet.
+Kortets knap siger aldrig Start forfra; det gør knappen i panelet.
+Afkrydsningsboksene i Hvad brydes? har egne regler sidst i `css/stil.css`.
+Selvtesten: ALT OK (88 påstande).

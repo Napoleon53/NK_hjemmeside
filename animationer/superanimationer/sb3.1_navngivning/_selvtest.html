@@ -601,6 +601,19 @@ function koerTest(W) {
         return el(f + "-knap").classList.contains("hjaelp") && !!el(f + "-knap").closest(".scenekort");
     }));
     paastand("feltet til navnet står på kortet", !!el("s-input").closest(".scenekort"));
+    /* Papirkortet (3. nov. 2026) */
+    visFane("fane-s");
+    paastand("papirkortet er slået til, og kortets tekst står med Lexend", d.body.classList.contains("papirkort") &&
+        /Lexend/.test(W.getComputedStyle(el("s-skort")).fontFamily) && W.getComputedStyle(el("s-skort")).backgroundColor === "rgb(251, 250, 246)");
+    paastand("Tjek er kortets blå hovedknap, og hintknappen er en stille knap uden fyld", W.getComputedStyle(el("s-tjek")).backgroundColor === "rgb(42, 118, 172)" &&
+        W.getComputedStyle(el("s-knap")).backgroundColor === "rgba(0, 0, 0, 0)");
+    S.vaelg(S.idx("3-methylbutan-2-ol"));
+    skrivNavn("3-methylbutan-2-ol");
+    var blaek = W.getComputedStyle(el("s-ind").querySelector(".nl-tekst")).color;
+    paastand("navnets dele står med blækfarven på papiret (som i formlen), ikke med de lyse farver fra det mørke kort",
+        S.faerdig && /^rgb\(194, 87, 12\)$/.test(blaek), blaek);
+    paastand("et rigtigt navn: kortet venter på Næste opgave, der står ingen ny opgave og ingen ros under en ny opgave",
+        S.faerdig && !!videre("s") && el("s-feltrad").hidden && el("s-status").hidden && /^Løst/.test(el("s-ind").querySelector(".sk-chip").textContent), kortTekst("s"));
     el("teoriknap").click();
     paastand("Teori åbner kun, når eleven trykker, og har navnets tre dele som i B3.1", el("teori").classList.contains("vis") && /forled/.test(el("teori").textContent) && /4-methyl/.test(el("teori").textContent));
     d.querySelector("#teori [data-luk]").click();

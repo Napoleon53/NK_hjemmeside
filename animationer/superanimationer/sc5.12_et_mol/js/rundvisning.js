@@ -15,7 +15,7 @@
 
     var TURE = {
         "fane-g": [
-            { sel: "#g-skort", titel: "Gættet", tekst: "Kortet øverst stiller spørgsmålet. Vælg et af de fire svar. Det rigtige svar er ikke altid det største." },
+            { sel: "#g-skort", titel: "Gættet", tekst: "Kortet øverst stiller spørgsmålet. Vælg et af de fire svar, og tryk på Indsend svar. Det rigtige svar er ikke altid det største." },
             { sel: "#g-anker-stige", titel: "Stigen", tekst: "En tallinje i tierpotenser: hvert trin er 10 gange større end trinet under. Når du har gættet, vokser søjlen fra ét stk. til 1 mol." },
             { sel: "#g-anker-ting", titel: "Kendte ting", tekst: "Ting, du kender, på deres plads på stigen. De lyser op, når søjlen kommer forbi dem." },
             { sel: "#g-anker-flag", titel: "De fire svar", tekst: "Svarene A til D står som flag ved deres plads på stigen. Bagefter zoomer stigen ud, så du kan se, hvor langt dit gæt var fra 1 mol." },
@@ -24,7 +24,7 @@
             { sel: "#g-opgaver", titel: "Gættene", tekst: "Otte gæt. Et rigtigt gæt får ✓. Du kan klikke på et gæt, du allerede har lavet, og se svaret igen." }
         ],
         "fane-t": [
-            { sel: "#t-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven. Vælg et af de fire svar. Svarer du forkert, står forklaringen på kortet." },
+            { sel: "#t-skort", titel: "Opgaven", tekst: "Kortet øverst stiller opgaven. Vælg et af de fire svar, og tryk på Indsend svar. Svarer du forkert, står forklaringen på kortet." },
             { sel: "#t-anker-scene", titel: "Sækkene", tekst: "Hver sæk har plads til 1 mol, ligesom en æggebakke har plads til 1 dusin. Når svaret er rigtigt, bliver sækkene fyldt." },
             { sel: "#t-status", titel: "Hjælpen", tekst: "Den gule knap giver ét hint ad gangen og til sidst svaret." },
             { sel: "#t-formelkort", titel: "Fra mol til antal", tekst: "Gang stofmængden med 6,02 · 10²³ for at få antallet. Divider antallet med 6,02 · 10²³ for at få stofmængden." },

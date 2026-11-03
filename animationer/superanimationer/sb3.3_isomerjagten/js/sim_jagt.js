@@ -27,14 +27,17 @@
    paa et spoergsmaal eller et kogepunkt. En forkert tegning koster intet:
    det er at proeve sig frem.
 
-   Tavlen er motorens (som i sb3.1). Det, der er anderledes, staar i klik:
-     * Kaede: et klik paa et atom saetter et carbonatom paa (ogsaa paa et
-       oxygenatom, saa en ether kan tegnes ud fra en OH-gruppe)
-     * −OH saetter en OH-gruppe paa et carbonatom
-     * C → O goer carbonatomet til et oxygenatom (og O tilbage til C). Et
-       carbonatom midt i kaeden giver en ether, ét for enden en alkohol
-     * ingen dobbeltbindinger og ingen ringe
-   Efter −OH og C → O gaar vaerktoejet tilbage til Kaede.
+   Tavlen er motorens (som i sb3.1). Eleven vaelger C eller O, som paa
+   tegnebraettet (brugeren 3. nov. 2026), og valget bliver staaende:
+     * C: traek fra et atom tegner en kaede (den staar svagt, til musen
+       slippes). Et klik paa et C saetter et carbonatom paa, et klik paa
+       et O goer det til C
+     * O: traek fra et carbonatom saetter et oxygenatom paa (en OH-gruppe
+       for enden). Et klik paa et C goer det til O, og et klik paa et O goer
+       det til C igen. Et carbonatom midt i kaeden giver en ether
+     * to oxygenatomer maa ikke sidde sammen (regler.forbudt og skiftO)
+     * ingen ringe; dobbeltbindinger kun i jagten med alkener
+   Visningen (zigzag eller alle atomer) huskes i nk-sb3.3-stil.
    ===================================================================== */
 (function () {
     "use strict";
@@ -44,6 +47,7 @@
     var K = NK.Kemi;
     var F = NK.Fane;
     var NOEGLE = "nk-sb3.3-jagter";
+    var STIL_NOEGLE = "nk-sb3.3-stil";
 
     function SimJagt() {
         var mig = this;
@@ -54,7 +58,8 @@
             regler: {
                 kunC: false, dobbelt: false, tripel: false, knaek: true, sletAlt: false, ringe: false,
                 maks: function () { var n = mig.jagt ? D.antal(mig.jagt) : { C: 8, O: 1 }; return n.C + n.O + 4; },
-                maksTekst: function () { return "Der er ikke plads til flere atomer. Slet et atom med højreklik, eller tryk Fortryd."; }
+                maksTekst: function () { return "Der er ikke plads til flere atomer. Slet et atom med højreklik, eller tryk Fortryd."; },
+                forbudt: function (a, el) { return el === "O" && a.el === "O" ? "To oxygenatomer må ikke sidde sammen her." : null; }
             },
             aendret: function (hvad) { mig.aendret(hvad); },
             toast: function (t) { if (t && !mig.groen && mig.fase === "tegn") mig.kortBesked(t, 3.5); }
@@ -71,12 +76,9 @@
             if (u.slags !== "atom") return;
             var a = u.atom;
             if (v === "binding") { this.toast("Klik på stregen mellem to carbonatomer."); return; }
-            if (v === "gruppe:OH") {
-                if (a.el !== "C") { this.toast("Klik på et carbonatom."); return; }
-                this.saetGruppe(a.id, "OH");
-                return;
-            }
-            if (v === "skiftO") { mig.skiftO(a); return; }
+            /* Som paa tegnebraettet: et klik goer atomet til det valgte grundstof */
+            if (this.grundstof === "O") { mig.skiftO(a); return; }
+            if (a.el === "O") { this.skiftGrundstof(a, "C"); return; }
             this.nytFra(a.id, "C");
         };
         NK.el("j-fortryd").addEventListener("click", function () { mig.fortryd(); });
@@ -84,12 +86,17 @@
         this.vaerktoejEl.addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-vt]") : null;
             if (k) mig.vaelgVaerktoej(k.getAttribute("data-vt"));
+            var st = e.target.closest ? e.target.closest("[data-stil]") : null;
+            if (st) mig.vaelgStil(st.getAttribute("data-stil"));
         });
+        this.stil = NK.hent(STIL_NOEGLE, "zigzag") === "alle" ? "alle" : "zigzag";
+        this.braet.stil = this.stil;
         NK.el("j-jagtliste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-jagt]") : null;
             if (k) mig.vaelg(parseInt(k.getAttribute("data-jagt"), 10));
         });
         NK.el("j-igen").addEventListener("click", function () { mig.jagIgen(mig.nr); });
+        NK.el("j-quiz").addEventListener("click", function () { mig.saetQuiz(!mig.quizTil()); });
         this.sejrEl = NK.el("j-sejr");
         NK.el("j-sejr-luk").addEventListener("click", function () { mig.lukSejr(); });
         NK.el("j-sejr-igen").addEventListener("click", function () {
@@ -109,13 +116,16 @@
     /* ----- Hukommelsen ---------------------------------------------------------
        f: de fundne navne, k: kogepunkterne er klaret i denne runde, l: jagten
        er klaret mindst én gang, s: stjerne (den bedste runde), sv og fe: Vis
-       svaret og et forkert svar i denne runde, sp: spoergsmaal pr. slags. */
+       svaret og et forkert svar i denne runde, sp: spoergsmaal pr. slags,
+       q: isomeri-quizzen slaaet til (1) eller fra (0) af eleven; mangler q,
+       gaelder jagtens quiz i js/data.js. */
     P.hentStatus = function () {
         var gemt = NK.hent(NOEGLE, {}) || {};
         this.status = D.JAGTER.map(function (j) {
             var s = gemt[j.id] || {};
             var f = (s.f || []).filter(function (n, i, a) { return !!D.isomer(j, n) && a.indexOf(n) === i; });
-            return { fundet: f, kog: !!s.k && f.length === j.isomerer.length, loest: !!s.l, stjerne: !!s.s, sv: !!s.sv, fe: !!s.fe, spurgt: s.sp || {} };
+            return { fundet: f, kog: !!s.k && f.length === j.isomerer.length, loest: !!s.l, stjerne: !!s.s, sv: !!s.sv, fe: !!s.fe, spurgt: s.sp || {},
+                quiz: s.q === 1 || s.q === 0 ? s.q === 1 : null };
         });
     };
 
@@ -123,6 +133,7 @@
         var ud = {};
         this.status.forEach(function (s, i) {
             ud[D.JAGTER[i].id] = { f: s.fundet, k: s.kog ? 1 : 0, l: s.loest ? 1 : 0, s: s.stjerne ? 1 : 0, sv: s.sv ? 1 : 0, fe: s.fe ? 1 : 0, sp: s.spurgt };
+            if (s.quiz !== null) ud[D.JAGTER[i].id].q = s.quiz ? 1 : 0;
         });
         NK.gem(NOEGLE, ud);
     };
@@ -170,7 +181,7 @@
         b.nulstil(true, true);
         this.saetter = false;
         this.bygVaerktoej();
-        this.vaelgVaerktoej("tegn");
+        this.vaelgVaerktoej("C");
         if (this.st.kog) {
             this.fase = "kog";
             this.kog = { navne: this.jagt.kog ? K.kogFacit(this.jagt, this.st.fundet) : this.jagt.isomerer.map(function (x) { return x.navn; }), orden: [], valgt: null, forkert: {}, loest: true };
@@ -184,6 +195,7 @@
         this.visKort();
         this.visListe();
         this.visHylde();
+        this.visQuiz();
     };
 
     /* Hylden toemmes, og jagten begynder forfra. Det, der er klaret foer
@@ -206,30 +218,77 @@
         this.braet.r.dobbelt = dbl;
         this.braet.r.enDobbelt = true;
         this.vaerktoejer.forEach(function (v) {
-            html += '<button type="button" class="vtknap" data-vt="' + v.id + '" title="' + NK.html(v.titel) + '">' + NK.html(v.tekst) + "</button>";
+            html += '<button type="button" class="vtknap' + (v.el ? " vt-el" : "") + '" data-vt="' + v.id + '" title="' + NK.html(v.titel) + '">' + NK.html(v.tekst) + "</button>";
         });
         NK.saetHTML("j-vt", html);
+        html = "";
+        D.STIL.forEach(function (s) {
+            html += '<button type="button" data-stil="' + s.id + '" title="' + NK.html(s.titel) + '">' + NK.html(s.tekst) + "</button>";
+        });
+        NK.saetHTML("j-stil", html);
         this.visVaerktoej();
     };
 
+    /* C og O er grundstoffer (vaerktoejet "tegn"), = Binding og Slet er vaerktoejer */
     P.vaelgVaerktoej = function (id) {
         if (this.groen || this.fase !== "tegn") { this.kortBlink(); return; }
-        if (id !== "slet" && !this.vaerktoejer.some(function (v) { return v.id === id; })) id = "tegn";
-        this.braet.vaerktoej = id;
-        this.braet.grundstof = "C";
+        var v = this.vaerktoejer.filter(function (x) { return x.id === id; })[0];
+        if (!v && id !== "slet") v = this.vaerktoejer[0];
+        this.braet.vaerktoej = v && v.el ? "tegn" : id;
+        this.braet.grundstof = v && v.el ? v.el : "C";
         this.visVaerktoej();
     };
 
     P.visVaerktoej = function () {
-        var nu = this.braet.vaerktoej;
+        var b = this.braet, nu = b.vaerktoej === "tegn" ? b.grundstof : b.vaerktoej, stil = this.stil;
         Array.prototype.forEach.call(this.vaerktoejEl.querySelectorAll("[data-vt]"), function (k) {
             k.classList.toggle("aktiv", k.getAttribute("data-vt") === nu);
+        });
+        Array.prototype.forEach.call(this.vaerktoejEl.querySelectorAll("[data-stil]"), function (k) {
+            k.classList.toggle("aktiv", k.getAttribute("data-stil") === stil);
         });
         this.vaerktoejEl.classList.toggle("laast", !!this.groen || this.fase !== "tegn");
     };
 
-    /* C → O: carbonatomet bliver til et oxygenatom, og et oxygenatom bliver
-       til carbon igen. Oxygen har kun to bindinger, og to oxygenatomer maa
+    /* Zigzag eller alle atomer: tavlen og kortene paa whiteboardet. Hylden
+       bliver i zigzag, for med alle H-atomer er kortene der for smaa. */
+    P.vaelgStil = function (stil) {
+        if (stil !== "alle") stil = "zigzag";
+        if (this.groen || this.fase !== "tegn") { this.kortBlink(); return; }
+        this.stil = stil;
+        this.braet.stil = stil;
+        NK.gem(STIL_NOEGLE, stil);
+        this.visVaerktoej();
+    };
+
+    /* ----- Isomeri-quizzen: til eller fra for hver jagt ------------------------- */
+    P.quizTil = function () {
+        return this.st.quiz !== null ? this.st.quiz : !!this.jagt.quiz;
+    };
+
+    /* Slaas quizzen fra, mens et spoergsmaal venter paa svar, springes det
+       over uden straf, og jagten gaar videre, som om der ikke var spurgt */
+    P.saetQuiz = function (til) {
+        this.st.quiz = !!til;
+        this.gem();
+        this.visQuiz();
+        if (!til && this.fase === "spm" && !this.groen && this.spm) {
+            var s = this.spm;
+            if (this.st.spurgt[s.rel]) this.st.spurgt[s.rel]--;
+            this.nulstilHjaelp();
+            this.efterFundet(s.ny, s.svar);
+        }
+    };
+
+    P.visQuiz = function () {
+        var k = NK.el("j-quiz"), til = this.quizTil();
+        k.classList.toggle("til", til);
+        k.setAttribute("aria-checked", til ? "true" : "false");
+        NK.saetTekst("j-quiz-note", til ? "Efter hver ny isomer: hvilken slags isomerer?" : "Slået fra: du kan tegne isomerer uden afbrydelser.");
+    };
+
+    /* Et klik med O valgt: carbonatomet bliver til et oxygenatom, og et
+       oxygenatom bliver til carbon igen. Oxygen har kun to bindinger, og to oxygenatomer maa
        ikke sidde sammen (et peroxid er ikke en isomer i kemi B). */
     P.skiftO = function (a) {
         var b = this.braet, mol = b.mol;
@@ -243,8 +302,8 @@
     P.slet = function (u) {
         var b = this.braet;
         if (!u || u.slags !== "atom") { b.toast("Klik på et atom for enden af kæden."); return; }
-        if (b.antal() <= 1) { b.toast("Startatomet bliver stående. Vælg Kæde for at tegne."); return; }
-        if (b.sletAtom(u.atom) && b.antal() <= 1) this.vaelgVaerktoej("tegn");
+        if (b.antal() <= 1) { b.toast("Startatomet bliver stående. Vælg C for at tegne."); return; }
+        if (b.sletAtom(u.atom) && b.antal() <= 1) this.vaelgVaerktoej("C");
     };
 
     P.fortryd = function () {
@@ -256,14 +315,12 @@
     P.nulstil = function () {
         if (this.groen || this.fase !== "tegn") { this.kortBlink(); return; }
         this.braet.nulstil(true);
-        this.vaelgVaerktoej("tegn");
+        this.vaelgVaerktoej("C");
         this.besked("", "");
     };
 
     P.aendret = function (hvad) {
         if (this.saetter) return;
-        var b = this.braet;
-        if ((hvad === "atom" || hvad === "grundstof") && /^(gruppe:|skiftO)/.test(b.vaerktoej)) b.vaerktoej = "tegn";
         this.visVaerktoej();
         if (hvad === "vaerktoej" || hvad === "valg") return;
         this.visIndsend();
@@ -366,15 +423,31 @@
         this.sejrT = 0;
         this.hjaelp = 0;
         this.pegKnap = false;
-        var alle = this.alleFundet();
-        var p = st.fundet.length > 1 ? K.partner(navn, st.fundet, st.spurgt) : null;
+        var p = st.fundet.length > 1 && this.quizTil() ? K.partner(navn, st.fundet, st.spurgt) : null;
         if (p) {
             st.spurgt[p.rel] = (st.spurgt[p.rel] || 0) + 1;
             this.fase = "spm";
-            this.spm = { ny: navn, partner: p.navn, rel: p.rel, valgt: null, forkert: {} };
+            this.spm = { ny: navn, partner: p.navn, rel: p.rel, valgt: null, forkert: {}, svar: !!svar };
             this.besked("", "");
             this.braet.laast = true;
-        } else if (alle && !j.kog) {
+            this.gem();
+            this.layout();
+            this.visKort();
+            this.visHylde();
+            this.visListe();
+            return;
+        }
+        this.efterFundet(navn, svar);
+    };
+
+    /* Efter en ny isomer uden spoergsmaal (eller naar quizzen slaas fra
+       under et spoergsmaal): naeste isomer, kogepunkterne eller slut */
+    P.efterFundet = function (navn, svar) {
+        var j = this.jagt, alle = this.alleFundet();
+        this.fase = "tegn";
+        this.spm = null;
+        this.braet.laast = false;
+        if (alle && !j.kog) {
             this.gem();
             this.afslut(svar ? "svar" : "selv", j.isomerer.map(function (x) { return x.navn; }));
             return;
@@ -418,8 +491,9 @@
         this.pegKnap = false;
         this.besked("", "");
         var kog = !!this.jagt.kog;
+        /* spm: kortet bliver paa spoergsmaalet med svaret groent (papirkortet) */
         this.groen = {
-            maade: maade, fed: slags + ".", tekst: K.relForklaring(s.ny, s.partner),
+            spm: true, maade: maade, fed: slags + ".", tekst: K.relForklaring(s.ny, s.partner),
             knap: !alle ? "Find den næste isomer →" : (kog ? "Videre til kogepunkterne →" : "Afslut jagten →"),
             til: !alle ? "naeste" : (kog ? "kog" : "klaret")
         };
@@ -821,7 +895,7 @@
             }
             var navnH = 30, kpH = kp !== null ? 30 : 0;
             var kasse = { x: c.x + 8, y: c.y + 8 + top, b: c.b - 16, h: c.h - 16 - top - navnH - kpH };
-            var g = F.iKasse(K.isomer(c.navn).mol, kasse, { maks: spm ? 80 : 58 });
+            var g = F.iKasse(K.isomer(c.navn).mol, kasse, { maks: spm ? 80 : 58, stil: mig.stil });
             NK.Struktur.tegnGeo(ctx, g.geo);
             var fs = NK.passendeSkrift(ctx, c.navn, c.b - 16, 17, 11, 700);
             NK.tekst(ctx, c.navn, c.x + c.b / 2, c.y + c.h - 12 - kpH, { font: "700 " + fs + "px 'Segoe UI', sans-serif", justering: "center", farve: "#1d2433" });

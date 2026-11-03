@@ -104,7 +104,13 @@ function knapTekst() { sim.opdater(1 / 60); var b = W.document.getElementById("h
 function kortTekst() { return W.document.getElementById("ind").textContent; }
 function besked() { return W.document.getElementById("besked").textContent; }
 function videre() { var b = W.document.querySelector("[data-videre]"); if (b) b.click(); faerdig(); tik(0.05); }
-function svar(j) { var b = W.document.querySelectorAll("#ind [data-valg]")[j]; if (b) b.click(); sim.opdater(1 / 60); }
+/* Et klik paa et svar vaelger kun; svar(j) vaelger og trykker Indsend svar (et gaet virker med det samme) */
+function vaelg(j) { var b = W.document.querySelectorAll("#ind [data-valg]")[j]; if (b) b.click(); sim.opdater(1 / 60); }
+function svar(j) { var spm = sim.fase === "spm"; vaelg(j); if (spm) W.document.getElementById("indsend").click(); sim.opdater(1 / 60); }
+function kort() { return W.document.getElementById("skort"); }
+function indsendKnap() { return W.document.getElementById("indsend"); }
+/* Papirkortet: forklaringen i raekken under svarene, naar kortet bliver paa spoergsmaalet */
+function blivTekst() { var e = kort().querySelector(".sk-bund.bliv .st-tekst"); return e ? e.textContent : ""; }
 
 async function koer() {
     var S, K;
@@ -204,17 +210,43 @@ async function koer() {
     ur0 = S.ur; T0 = K.T;
     tik(4);
     paastand("tiden står stille, mens spørgsmålet står der", S.ur === ur0 && K.T === T0 && K.kog === 0);
-    svar(0);
-    paastand("forkert svar: forklaringen står på kortet", /samme højde/.test(besked()));
+    paastand("Indsend svar står på kortet, grå, til et svar er valgt", !indsendKnap().hidden && indsendKnap().classList.contains("ikke-klar"));
+    kort().classList.remove("blink");
+    indsendKnap().click();
+    paastand("Indsend svar uden et valgt svar: kortet blinker og siger, hvad der mangler", kort().classList.contains("blink") && /Vælg et af svarene/.test(besked()) && sim.fase === "spm");
+    vaelg(0);
+    paastand("et klik på et svar vælger det kun: blåt, intet bedømt, og Indsend svar er klar",
+        sim.spm.valgt === 0 && kort().querySelectorAll(".sk-knap.valgt").length === 1 && !kort().querySelector(".sk-knap.forkert") &&
+        !/Ikke endnu/.test(besked()) && indsendKnap().classList.contains("klar"));
+    indsendKnap().click(); sim.opdater(1 / 60);
+    paastand("forkert svar: forklaringen står på kortet", /samme højde/.test(besked()) && !!kort().querySelector('.sk-knap.forkert[data-valg="0"]:disabled'));
     svar(1);
     paastand("rigtigt svar: Vent 10 minutter", sim.fase === "mellem" && /Vent 10 minutter/.test(kortTekst()));
+    var kk = kort();
+    paastand("papirkortet: spørgsmålet bliver stående, svaret er grønt, A er stadig rødt, C er tonet ned, og alt er låst",
+        / bliv/.test(kk.className) && /Er reaktionen færdig\?/.test(kk.querySelector(".sk-tekst").textContent) &&
+        !!kk.querySelector('.sk-knap.rigtig[data-valg="1"]') && !!kk.querySelector('.sk-knap.forkert[data-valg="0"]') && !!kk.querySelector('.sk-knap.dim[data-valg="2"]') &&
+        kk.querySelectorAll("#ind .sk-knap:not(:disabled)").length === 0, kk.className);
+    paastand("forklaringen står under svarene, og Vent 10 minutter står, hvor Indsend svar stod",
+        /^Rigtigt Der er stadig salicylaldehyd/.test(blivTekst()) && kk.querySelector(".sk-bund.bliv .sk-videre").textContent === "Vent 10 minutter →" &&
+        indsendKnap().hidden && W.document.getElementById("status").hidden && kk.getBoundingClientRect().height <= sim.kortZone() + 1, blivTekst() + " " + Math.round(kk.getBoundingClientRect().height));
+    paastand("kortet bruger papirkortet og Lexend, og mærket har intet ✓",
+        W.document.body.classList.contains("papirkort") && /Lexend/.test(W.getComputedStyle(kk).fontFamily) && W.getComputedStyle(kk).backgroundColor === "rgb(251, 250, 246)" &&
+        !/✓/.test(kk.querySelector(".sk-bund.bliv .b-maerke").textContent));
+    ur0 = S.ur;
+    tik(4);
+    paastand("tiden står stille, mens kortet bliver på spørgsmålet", S.ur === ur0 && K.kog === 0);
     videre();
     paastand("ti minutter er gået, og der er en ny plade", sim.fase === "forsoeg" && Math.abs(S.ur - ur0 - 10) < 0.2 && !S.tlc.P, (S.ur - ur0).toFixed(2));
+    paastand("rosen til første plade står ikke under det næste skridt", !kort().querySelector(".sk-bund.bliv") && !/stadig salicylaldehyd/.test(kortTekst()) && !/Rigtigt/.test(kortTekst()));
     knap(); knap(); knap(); knap();
     var v2 = sim.tlcVurdering();
     paastand("anden plade: reaktionen er færdig", v2.faerdig && v2.rigtig === 0, JSON.stringify(v2));
+    paastand("det nye spørgsmål har intet valgt og ingen ros fra før", sim.fase === "spm" && !kort().querySelector(".sk-knap.valgt, .sk-knap.forkert, .sk-knap.rigtig") && !/Rigtigt/.test(kortTekst()));
     svar(0);
     paastand("trin 6 er løst med to plader", sim.fase === "loest" && S.plader.length === 2);
+    paastand("efter TLC: kortet bliver på spørgsmålet med Næste trin", / bliv/.test(kort().className) && kort().querySelector(".sk-bund.bliv .sk-videre").textContent === "Næste trin →" &&
+        /^Rigtigt Salicylaldehyden er brugt op/.test(blivTekst()), blivTekst());
     paastand("opløsningen kogte aldrig", K.kog === 0 && Math.abs(K.tilsat.ethanol - K.vEth) < 0.5);
     videre();
 
@@ -227,7 +259,8 @@ async function koer() {
     paastand("der er gule krystaller i kolben", K.mKryst > 1.3, K.mKryst.toFixed(2));
     paastand("spørgsmålet om hvorfor der køles", sim.fase === "spm");
     svar(1); svar(0);
-    paastand("trin 7 er løst", sim.fase === "loest");
+    paastand("trin 7 er løst", sim.fase === "loest" && / bliv/.test(kort().className) && /Hvorfor skal opløsningen køles/.test(kort().querySelector(".sk-tekst").textContent) &&
+        /^Rigtigt Jo koldere ethanolen er/.test(blivTekst()), blivTekst());
     videre();
 
     /* Trin 8 */
@@ -261,10 +294,17 @@ async function koer() {
     paastand("feltet til udbyttet", sim.fase === "felt");
     var t = sim.tal();
     var f = W.document.getElementById("felt");
-    f.value = NK.Data.komma(t.mFuld, 2); W.document.querySelector("[data-tjek]").click();
+    paastand("feltet sendes ind med Indsend svar, der er grå, til der står noget i feltet", !indsendKnap().hidden && indsendKnap().classList.contains("ikke-klar") && !kort().querySelector("[data-tjek]"));
+    f.value = NK.Data.komma(t.mFuld, 2); f.dispatchEvent(new W.Event("input", { bubbles: true }));
+    paastand("med et tal i feltet er Indsend svar klar", indsendKnap().classList.contains("klar"));
+    indsendKnap().click();
     paastand("massen med urglasset er forkert, og forklaringen siger det", sim.fase === "felt" && /urglassets egen masse/.test(besked()));
-    f.value = NK.Data.komma(t.svar, 2); W.document.querySelector("[data-tjek]").click();
+    f.value = NK.Data.komma(t.svar, 2); indsendKnap().click();
     paastand("det praktiske udbytte er rigtigt", sim.fase === "loest" && S.feltSvar === t.svar, t.svar);
+    var fb = W.document.getElementById("felt");
+    paastand("papirkortet: spørgsmålet og feltet med det rigtige tal bliver stående, forklaringen står under, og Næste trin står, hvor Indsend svar stod",
+        / bliv/.test(kort().className) && /praktiske udbytte/.test(kort().querySelector(".sk-tekst").textContent) && fb && fb.disabled && fb.classList.contains("rigtig") &&
+        fb.value === NK.Data.komma(t.svar, 2) && /^Rigtigt Du fik/.test(blivTekst()) && kort().querySelector(".sk-bund.bliv .sk-videre").textContent === "Næste trin →" && indsendKnap().hidden, blivTekst());
     paastand("udbyttet er 80-95 % af det teoretiske", t.svar / teo > 0.8 && t.svar / teo < 0.95, (100 * t.svar / teo).toFixed(1) + " %");
     videre();
 
@@ -285,6 +325,11 @@ async function koer() {
     paastand("spørgsmålet om renhed: stoffet er rent", sim.fase === "spm" && sim.spm.rigtig === 0);
     svar(0);
     paastand("syntesen er færdig", sim.fase === "loest" && /færdig/.test(kortTekst()));
+    paastand("sidste trin: kortet bliver på spørgsmålet uden en knap videre, og Start forfra står kun i panelet",
+        / bliv/.test(kort().className) && /Hvad viser det\?/.test(kort().querySelector(".sk-tekst").textContent) && !!kort().querySelector('.sk-knap.rigtig[data-valg="0"]') &&
+        !kort().querySelector("[data-videre]") && !/forfra/i.test(kort().textContent) && /Syntesen er færdig\./.test(blivTekst()) && !!W.document.querySelector(".panel #forfra"), blivTekst());
+    sim.videre(); sim.knap(); sim.opdater(1 / 60);
+    paastand("efter sidste trin begynder intet forfra af sig selv", sim.trinNr === 9 && sim.fase === "loest" && S.app.slut !== null);
 
     /* ===================================================================
        3. Klik og træk på tingene
@@ -412,14 +457,30 @@ async function koer() {
                 if (d) { sim.goer(d); sim.tjekTrin(); }
                 n++;
             }
+            /* Smeltepunktet: vent, til krystallerne smelter, saa spoergsmaalet kommer */
+            if (ti === 9 && sim.delNu() === "smp-start") {
+                tikTil(function () { return sim.smeltet() > 0.02; }, 60); knap();
+                tikTil(function () { return sim.smeltet() >= 1; }, 60); tik(0.2); knap();
+            }
             if (sim.fase === "spm") {
                 svar(sim.spm.rigtig === 0 ? 1 : 0);
                 var h2 = W.document.getElementById("skort").getBoundingClientRect().height;
                 if (h2 > hoejst) { hoejst = h2; hvor = "trin " + (ti + 1) + " spørgsmål"; }
+                /* Papirkortet: kortet bliver paa spoergsmaalet med forklaringen og knappen */
+                svar(sim.spm.rigtig);
+                var h3 = W.document.getElementById("skort").getBoundingClientRect().height;
+                if (!W.document.querySelector("#skort .sk-bund.bliv")) knapFejl.push("trin " + (ti + 1) + " bliver ikke på spørgsmålet");
+                if (h3 > hoejst) { hoejst = h3; hvor = "trin " + (ti + 1) + " rigtigt svar"; }
+            }
+            if (sim.fase === "felt") {
+                var ff = W.document.getElementById("felt");
+                ff.value = NK.Data.komma(sim.tal().svar, 2); indsendKnap().click();
+                var h4 = W.document.getElementById("skort").getBoundingClientRect().height;
+                if (h4 > hoejst) { hoejst = h4; hvor = "trin " + (ti + 1) + " feltet rigtigt"; }
             }
         }
         paastand(STR[si][0] + " × " + STR[si][1] + ": kortet holder sig inden for " + sim.kortZone() + " px", hoejst <= sim.kortZone() + 1, Math.round(hoejst) + " px ved " + hvor);
-        paastand(STR[si][0] + " × " + STR[si][1] + ": den grønne knap er i scenen og under kortet", knapFejl.length === 0, knapFejl.join(", "));
+        paastand(STR[si][0] + " × " + STR[si][1] + ": den grønne knap er i scenen og under kortet, og kortet bliver på hvert spørgsmål", knapFejl.length === 0, knapFejl.join(", "));
     }
     ramme.style.width = "1400px"; ramme.style.height = "820px";
 
@@ -428,6 +489,8 @@ async function koer() {
        =================================================================== */
     overskrift("7. Sprites");
     paastand("alle sprites er indlæst", NK.Sprites.alleKlar());
+    paastand("mappen henter kun sine egne filer og det fælles papirkort", Array.prototype.every.call(W.document.querySelectorAll("script[src], link[href], img[src]"), function (e) {
+        var u = e.getAttribute("src") || e.getAttribute("href"); return /^\.\.\/faelles\//.test(u) || !/^(\.\.|\/|https?:)/.test(u); }));
 }
 </script>
 </body>

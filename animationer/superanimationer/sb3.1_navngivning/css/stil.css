@@ -2083,3 +2083,75 @@ kbd {
     .sk-felt input { padding: 5px 12px; font-size: 1.2rem; }
     .sk-felt .tjekknap { padding: 6px 14px; font-size: 0.98rem; }
 }
+
+/* =====================================================================
+   Papirkortet (3. nov. 2026, ../faelles/papirkort.css): navnets dele,
+   feltet og Tjek paa det lyse kort. Delene har blaekfarven (--delblaek,
+   den samme som i formlen paa whiteboardet), fordi de lyse farver var
+   lavet til det moerke kort. Ingen versaler. Feltet er hvidt med en
+   stille kant, og Tjek er kortets hovedknap ligesom Indsend svar.
+   Reglerne har samme prefiks som den faelles fil.
+   ===================================================================== */
+html body.papirkort.papirkort .scenekort .nl-foran {
+    margin-top: 6px;
+    color: var(--pk-tekst-svag);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+html body.papirkort.papirkort .scenekort .nl-tekst {
+    border-bottom-color: var(--delblaek, var(--pk-tekst));
+    color: var(--delblaek, var(--pk-tekst));
+    font-weight: 600;
+}
+
+html body.papirkort.papirkort .scenekort .nl-etiket {
+    color: var(--delblaek, var(--pk-mat));
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 1;
+}
+
+html body.papirkort.papirkort .scenekort .nl-del.tom .nl-tekst {
+    border: 1.5px dashed #c9c3b3;
+    background-color: transparent;
+    color: var(--pk-mat);
+    font-weight: 500;
+}
+
+html body.papirkort.papirkort .scenekort .nl-del.tom .nl-etiket { color: var(--pk-mat); }
+html body.papirkort.papirkort .scenekort .nl-del.tom.aktiv .nl-tekst { border-color: #d4a72c; background-color: var(--pk-gul-lys); color: #8a6d12; animation: none; }
+html body.papirkort.papirkort .scenekort .nl-del.vist .nl-tekst { border-bottom-color: #c9a640; color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .nl-del.vist .nl-etiket { color: #8a6d12; }
+
+/* Feltet paa kortet (fane 2) */
+html body.papirkort.papirkort .scenekort .sk-felt input {
+    border: 1.5px solid var(--pk-knapkant);
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+html body.papirkort.papirkort .scenekort .sk-felt input:focus { border-color: var(--pk-blaa); box-shadow: 0 0 0 3px rgba(42, 118, 172, 0.18); }
+html body.papirkort.papirkort .scenekort .sk-felt input::placeholder { color: #a9a393; font-weight: 400; }
+html body.papirkort.papirkort .scenekort .sk-felt input.forkert { border-color: var(--pk-roed); background-color: #fffafa; }
+
+html body.papirkort.papirkort .scenekort .sk-felt .tjekknap {
+    border: 0;
+    border-radius: 8px;
+    background-color: var(--pk-blaa);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+html body.papirkort.papirkort .scenekort .sk-felt .tjekknap:hover { background-color: #3389c4; }
+
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort .sk-felt input { font-size: 1.15rem; }
+}

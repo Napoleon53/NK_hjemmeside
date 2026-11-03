@@ -152,3 +152,26 @@ kommer flere til medicin senere"): ny `kemi-b-filer/samling_b8.html` (kopi af
 `samling_alt_b.html` (knap, `findSideFraEmne` med `^b8`, `FEEDBACK_EMNER`) og i listen på
 `animationer.html`. Kemibogen B8.6 kan linke til
 `animationer/samling_alt_b.html?emne=b8.6` i "Prøv selv" ved siden af Salenvir.
+
+## Papirkortet (3. nov. 2026)
+
+Scenekortet er det lyse papirkort (se Fælles krav i `../README.md`):
+`../faelles/papirkort.css` og `../faelles/papirkort.js` er indlæst, og
+`<body class="papirkort">`. Indsend svar virker som før: svarene vælger kun, og
+et gæt går videre med det samme.
+
+En klaret del lægger ikke kortet om. Delen bliver stående (`slut.del` og
+`mellem.del`, `blivHTML` i `js/fane.js`): på et spørgsmål er de rigtige svar
+grønne (gule ved Vis svaret), et forkert svar rødt og de andre tonet ned, alle
+låst; på fane 2 står felterne låst med tallene (`feltHTML(del, laas)` i
+`js/sim_rf.js`); efter et forsøg eller en opgave i scenen bliver teksten stående.
+Forklaringen står under, og knappen, der fører videre, står, hvor Indsend svar
+stod. De små dele med `stille: true` (et aflæst tal i et felt på fane 2) går
+derimod direkte videre uden ros og uden knap (brugeren 3. nov. 2026): tallet står
+allerede under Dine tal, og før stod "Rigtigt" under den næste del, hvad rosen
+ikke må. Spørgsmålet om formlen har også `stille: true`, men bliver stående som
+de andre spørgsmål. Kortets knap siger aldrig Start
+forfra (sidste sag på fane 3: Næste opgave); det gør knappen i panelet.
+Felterne, regnestykket og afkrydsningsboksene har egne regler sidst i
+`css/stil.css`. Med papirkortet kan kortet nu være på sin plads i alle dele ved
+1100 × 700 (før var to dele for høje). Selvtesten: ALT OK (206 påstande).

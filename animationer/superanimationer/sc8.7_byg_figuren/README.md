@@ -62,3 +62,9 @@ lavet med et lille script) og `js/fig_redox.js`, `fig_spaending.js`, `fig_ot.js`
 `fig_mangan.js`. `_selvtest.html` åbnes direkte fra disken; ALT OK (453) 1. nov. 2026.
 Skærmbilleder af hvert lag, den svære udgave og de færdige figurer ved 1500 × 950 er set
 igennem.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

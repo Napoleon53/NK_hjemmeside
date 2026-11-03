@@ -355,3 +355,28 @@ I menuen fra 26. sept. 2026 som c6.1 i `kemi-c-filer/samling_c6.html`. De gamle
 ligger i
 `kemi-c-filer/arkiv/c6.1_animation_stofmængdekoncentration_oldversion.html` og
 `kemi-c-filer/arkiv/c6.2_opgaver_stofmængdekoncentration1_oldversion.html`.
+
+## Papirkortet (3. nov. 2026)
+
+Scenekortet på fane 1 og 2 er det lyse papirkort (se Fælles krav i
+`../README.md`): `../faelles/papirkort.css` og `../faelles/papirkort.js` er
+indlæst, og `<body class="papirkort">`. Kortets elementer har både de gamle
+`kt-`-klasser og de fælles (`sk-tekst`, `sk-chip`, `sk-svar`, `sk-knap`,
+`sk-bund`, `st-tekst`, `sk-slut`, `sk-videre`) i `kortHTML` i `js/fane.js`.
+Skabelonernes regler på fane 3 og 4 gælder nu kun i `.skabeloner`, så de ikke
+rammer kortet. Det, der er særligt her (gættet under opgaven, regnestykket i
+Enhederne og den gule forklaring, når karret har vist svaret), står sidst i
+`css/stil.css`. Indledningen står i samme linje som spørgsmålet.
+
+På fane 2 vælger et svar kun, også et klik på et glas (det valgte glas lyser
+stille i scenen), og knappen Indsend svar i kortets nederste række bedømmer
+det (`vaelgKortSvar`, `indsendKlik` og `visIndsend` i `js/fane.js`, `kortValg`,
+`spmAaben` og `sendSvar` i `js/sim_glas.js`). Et rigtigt svar lægger ikke
+kortet om: spørgsmålet bliver stående med svaret grønt (gult, når det blev
+vist), forklaringen står under svarene, og Næste spørgsmål står, hvor Indsend
+svar stod (`bliv` i `kortData`). Gættet på fane 1 er gratis og virker med det
+samme. Teksten "på det gule kort" i `D.GAET_LINJE` og rundvisningen er rettet
+til "på kortet", og rundvisningen nævner Indsend svar. Lexend er bredere end
+den gamle skrift, så forklaringen på fane 1 står lidt mindre på lave skærme for
+at kunne være i karrets plads. Selvtesten (ALT OK, 181 påstande) svarer med
+Indsend svar og tjekker, at kortet bliver på spørgsmålet.

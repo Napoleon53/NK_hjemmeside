@@ -106,3 +106,9 @@ dækker ingen plads, mens der spørges, og forklaringskortet dækker ikke figure
 
 - makromolekyle (se "Valg og forenklinger").
 - Træk og klik med en rigtig mus er ikke prøvet.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

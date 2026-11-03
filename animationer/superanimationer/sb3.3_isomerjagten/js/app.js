@@ -62,6 +62,12 @@
         if (e.key === "?" || e.key === "h" || e.key === "H") { lukAlle(); NK.Rundvisning.start("fane-j"); return; }
         if (e.key === "t" || e.key === "T") { aabnTeori(); return; }
         if (e.key === "r" || e.key === "R") { sim.nulstil(); return; }
+        /* C og O som paa tegnebraettet (O kun i jagterne med oxygen) */
+        if ((e.key === "c" || e.key === "C" || e.key === "o" || e.key === "O") && sim.fase === "tegn" && !sim.groen) {
+            var el = e.key.toUpperCase();
+            if (sim.vaerktoejer.some(function (v) { return v.id === el; })) sim.vaelgVaerktoej(el);
+            return;
+        }
         /* Enter: Indsend svar (eller kortets groenne knap), men ikke paa de
            andre knapper og links */
         if (e.key === "Enter") {

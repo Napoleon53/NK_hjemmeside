@@ -62,3 +62,9 @@ og skal holdes ens. Kapitlets egne filer er `js/data.js` (forklaringerne fra
 `js/org.js` og `js/fig_alkan.js`, `fig_zigzag.js`, `fig_reak.js`, `fig_alken.js`,
 `fig_alkohol.js` og `fig_fedt.js`. `_selvtest.html` åbnes direkte fra disken; ALT OK
 (1224) 1. nov. 2026.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

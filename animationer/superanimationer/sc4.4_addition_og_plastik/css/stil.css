@@ -1720,3 +1720,14 @@ kbd {
     .gk-figurramme { padding: 4px 8px; }
     .gk-figur { height: 62px; }
 }
+
+/* ---------------------------------------------------------------------
+   Papirkortet (3. nov. 2026, ../faelles/papirkort.css): kun det, denne
+   animation har brug for ud over det faelles. Paa lave skaerme er Indsend
+   svar ikke bredere end teksten, saa et hint paa to linjer kan staa ved
+   siden af de to knapper, og kortet bliver i sin plads (kortZone).
+   --------------------------------------------------------------------- */
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort .sk-bund .knap.indsend { min-width: 0; padding-left: 12px; padding-right: 12px; }
+    html body.papirkort.papirkort .scenekort .sk-bund .knap.hjaelp { padding-left: 12px; padding-right: 12px; }
+}

@@ -11,9 +11,11 @@
    modellen (K.produkt i kemi.js), og selvtesten tjekker, at det er det
    samme som svaret i data.js.
 
-   Glasset over pilen er kaliumdichromat i sur opløsning. Sker der en
-   oxidation, skifter det fra orange til groent (bogens afsnit B4.3);
-   ved en tertiaer alkohol forbliver det orange.
+   Glasset over pilen er oxidationsmidlet i sur opløsning: dichromat
+   (orange til groent) eller permanganat (violet til farveloest), som i
+   bogens afsnit B4.3. Mild oxidation er med dichromat, kraftig med
+   permanganat. Ved en tertiaer alkohol skifter glasset ikke farve.
+   Svarene nederst paa tavlen kommer foerst frem, naar typen er fundet.
 
    Panelet viser opgaverne og en tabel, der fyldes ud, efterhaanden som
    eleven loeser en opgave af hver slags.
@@ -32,9 +34,11 @@
     var GROEN = "#2b9a5e", ROED = "#c8402f";
 
     /* Glassene tegnes som billeder (sprites/) */
-    var GLAS = { orange: new Image(), groen: new Image() };
-    GLAS.orange.src = "sprites/reagensglas_orange.svg";
-    GLAS.groen.src = "sprites/reagensglas_groen.svg";
+    var GLAS = {};
+    ["orange", "groen", "violet", "farveloes"].forEach(function (f) {
+        GLAS[f] = new Image();
+        GLAS[f].src = "sprites/reagensglas_" + f + ".svg";
+    });
 
     /* Raekkerne i tabellen "Det har du fundet" */
     var RAEKKER = [
@@ -60,6 +64,7 @@
         this.glasT = 0;
         this.startFane();
         this.bygListe();
+        NK.el("p-forfra").addEventListener("click", function () { mig.forfra(); });
         NK.el("p-liste").addEventListener("click", function (e) {
             var k = e.target.closest ? e.target.closest("[data-opg]") : null;
             if (k) mig.vaelg(parseInt(k.getAttribute("data-opg"), 10));
@@ -179,8 +184,8 @@
             };
         }
         var m = this.opg.o.maade, tekst;
-        if (m) tekst = D.MAADE[m].navn + ": " + D.MAADE[m].tekst.charAt(0).toLowerCase() + D.MAADE[m].tekst.slice(1) + " Hvad bliver " + navn + " til?";
-        else tekst = navn.charAt(0).toUpperCase() + navn.slice(1) + " oxideres med dichromat. Hvad dannes?";
+        if (m) tekst = D.MAADE[m].tekst + " Hvad bliver " + navn + " til?";
+        else tekst = navn.charAt(0).toUpperCase() + navn.slice(1) + " oxideres med " + D.MIDLER[this.opg.o.middel].navn + ". Hvad dannes?";
         return {
             slags: "opgave", chip: "Opgave " + (this.nr + 1),
             tekst: tekst + " Klik på svaret på tavlen, og tryk Indsend svar."
@@ -212,7 +217,7 @@
     };
 
     P.indsendType = function (vist) {
-        var rigtig = D.TYPE_ORDEN.indexOf(this.alk.type), n = K.cNaboer(this.alk.mol, this.alk.c).length;
+        var nr = this.valgt, rigtig = D.TYPE_ORDEN.indexOf(this.alk.type), n = K.cNaboer(this.alk.mol, this.alk.c).length;
         if (this.valgt !== rigtig) {
             var forkertType = D.TYPE_ORDEN[this.valgt];
             this.forkert[this.valgt] = true;
@@ -226,16 +231,19 @@
             this.fejlLinje(tekst);
             return;
         }
-        this.fase = "produkt";
-        this.valgt = null;
-        this.forkert = {};
         this.visNaboer = true;
+        this.valgt = null;
         this.sejrT = 0;
-        this.nulstilHjaelp();
-        this.visKort();
         var t = D.TYPER[this.alk.type];
-        this.godLinje("Carbonatomet med OH-gruppen er bundet til " + (n === 0 ? "ingen andre carbonatomer (methanol regnes som primær)" : t.antal) + ". " + this.alkNavn() + " er en " + t.navn + " alkohol.",
-            vist ? "Svaret" : "Rigtigt ✓");
+        /* Papirkortet: kortet bliver paa spoergsmaalet om typen, til eleven
+           trykker Naeste spoergsmaal. Svarene om produktet kommer foerst da. */
+        this.groen = {
+            spm: true, svarNr: nr, maade: vist ? "svar" : "selv", knap: "Næste spørgsmål →",
+            tekst: "Carbonatomet med OH-gruppen er bundet til " + (n === 0 ? "ingen andre carbonatomer (methanol regnes som primær)" : t.antal) + ". " + this.alkNavn() + " er en " + t.navn + " alkohol.",
+            naeste: function () { this.fase = "produkt"; this.valgt = null; this.forkert = {}; this.nulstilHjaelp(); this.visKort(); }
+        };
+        this.besked("", "");
+        this.visKort();
     };
 
     P.indsendProdukt = function (vist) {
@@ -253,19 +261,19 @@
         s.stjerne = s.stjerne || (!this.fejl && !this.sv && !vist);
         this.gem();
         this.glasT = 0.0001;
-        var t = D.TYPER[this.alk.type], tekst;
+        var t = D.TYPER[this.alk.type], tekst, mid = D.MIDLER[o.o.middel];
         if (o.produkt) {
             var kl = D.KLASSER[K.stof(o.produkt).klasse];
             tekst = this.alkNavn() + " er en " + t.navn + " alkohol. " +
                 (o.o.maade === "mild" ? "Ved en mild oxidation" : (o.o.maade === "kraftig" ? "Ved en kraftig oxidation" : "Den")) +
-                " bliver den til " + o.produkt + ", " + (kl ? kl.ental : "") + ". Dichromatet skifter fra orange til grønt.";
+                " bliver den til " + o.produkt + ", " + (kl ? kl.ental : "") + ". " + D.stor(mid.navn) + "et skifter fra " + mid.fra + " til " + mid.til + ".";
         } else {
-            tekst = this.alkNavn() + " er en tertiær alkohol. Carbonatomet med OH-gruppen har intet hydrogenatom, så der sker ingen oxidation. Dichromatet forbliver orange.";
+            tekst = this.alkNavn() + " er en tertiær alkohol. Carbonatomet med OH-gruppen har intet hydrogenatom, så der sker ingen oxidation. " + D.stor(mid.navn) + "et forbliver " + mid.fra + ".";
         }
         var alle = this.antalLoest() === this.opgaver.length;
         if (alle && foerste) tekst += " " + D.FAERDIG.p;
         var naeste = this.naesteUloeste();
-        this.groen = { maade: vist || this.sv ? "svar" : "selv", tekst: tekst, knap: naeste >= 0 ? "Næste opgave →" : "Start forfra ↺", chip: vist ? "Svaret" : "Rigtigt ✓" };
+        this.groen = { spm: true, maade: vist || this.sv ? "svar" : "selv", tekst: tekst, knap: naeste >= 0 ? "Næste opgave →" : "Videre til Ukendte alkoholer →", chip: vist ? "Svaret" : "Rigtigt ✓" };
         this.sejrT = 0;
         this.besked("", "");
         this.visKort();
@@ -284,15 +292,25 @@
         if (type === "primaer") {
             if (klasse === "keton") return "En keton har C=O inde i kæden. Her sidder OH-gruppen for enden af kæden, og der kommer C=O også til at sidde.";
             if (klasse === "carboxylsyre") return "Ved en mild oxidation destilleres aldehydet fra, så snart det er dannet. Det når ikke at blive oxideret videre.";
-            return "Med overskud af dichromat og lang tid bliver aldehydet oxideret videre, fordi carbonatomet stadig har et hydrogenatom.";
+            return "Med permanganat i overskud bliver aldehydet oxideret videre, fordi carbonatomet stadig har et hydrogenatom.";
         }
         if (klasse === "aldehyd") return "Et aldehyd har C=O for enden af kæden. Her sidder OH-gruppen inde i kæden, og der kommer C=O også til at sidde.";
         return "Carbonatomet med OH-gruppen har kun ét hydrogenatom. Det kan kun oxideres én gang, så der dannes ingen carboxylsyre.";
     };
 
+    /* Kortets knap gaar altid fremad. Start forfra staar et andet sted (knappen
+       under opgaverne i panelet), saa ingen kommer til at nulstille ved at
+       trykke videre (brugerens regel 3. nov. 2026) */
     P.videre = function () {
         var naeste = this.naesteUloeste();
-        this.vaelg(naeste >= 0 ? naeste : (this.nr + 1) % this.opgaver.length);
+        if (naeste >= 0) { this.vaelg(naeste); return; }
+        if (NK.visFane) NK.visFane("fane-u");
+    };
+
+    P.forfra = function () {
+        this.status = this.opgaver.map(function () { return { loest: false, stjerne: false }; });
+        this.gem();
+        this.vaelg(0);
     };
 
     /* ----- Hjaelpen ------------------------------------------------------------- */
@@ -346,7 +364,7 @@
         if (this.spaer()) return;
         var i = this.valgVed(pt);
         if (i < 0) return;
-        if (this.fase === "type") { this.kortBlink(); return; }
+        if (this.fase === "type") return;
         if (this.forkert[i]) { this.kortBesked("Det svar har du prøvet. Vælg et andet.", 3); return; }
         this.valgt = this.valgt === i ? null : i;
         this.visKort();
@@ -431,18 +449,19 @@
         ctx.fill();
         ctx.restore();
         var gh = Math.min(k.pil.h * 0.56, 120), gb = gh * 0.3, gx = (x0 + x1) / 2 - gb / 2, gy = py - 10 - gh;
-        var skift = this.opg.produkt ? this.glasT : 0;
-        if (GLAS.orange.complete && GLAS.orange.naturalWidth) {
-            ctx.drawImage(GLAS.orange, gx, gy, gb, gh);
-            if (skift > 0 && GLAS.groen.complete) {
+        var skift = this.opg.produkt ? this.glasT : 0, mid = D.MIDLER[this.opg.o.middel];
+        var gFra = GLAS[mid.glasFra], gTil = GLAS[mid.glasTil];
+        if (gFra.complete && gFra.naturalWidth) {
+            ctx.drawImage(gFra, gx, gy, gb, gh);
+            if (skift > 0 && gTil.complete) {
                 ctx.save();
                 ctx.globalAlpha = skift;
-                ctx.drawImage(GLAS.groen, gx, gy, gb, gh);
+                ctx.drawImage(gTil, gx, gy, gb, gh);
                 ctx.restore();
             }
         }
         var m = this.opg.o.maade;
-        NK.tekst(ctx, "dichromat", (x0 + x1) / 2, py + 18, { font: "700 14px 'Segoe UI', sans-serif", farve: "#5d6878", justering: "center", linje: "middle" });
+        NK.tekst(ctx, mid.formel, (x0 + x1) / 2, py + 18, { font: "700 15px 'Segoe UI', sans-serif", farve: "#5d6878", justering: "center", linje: "middle" });
         if (m) NK.tekst(ctx, m === "mild" ? "mild" : "kraftig", (x0 + x1) / 2, py + 36, { font: "700 14px 'Segoe UI', sans-serif", farve: "#b4321f", justering: "center", linje: "middle" });
 
         /* Produktet: et spoergsmaalstegn, til opgaven er loest */
@@ -476,8 +495,8 @@
         ctx.lineTo(tv.x + tv.b - 16, this.skilY);
         ctx.stroke();
         ctx.restore();
-        var laast = this.fase === "type" && !this.groen;
-        this.opg.o.valg.forEach(function (navn, i) { mig.tegnValg(ctx, navn, i, k.valg[i], laast, puls); });
+        /* Svarene kommer foerst frem, naar typen er fundet */
+        if (this.fase !== "type" || this.groen) this.opg.o.valg.forEach(function (navn, i) { mig.tegnValg(ctx, navn, i, k.valg[i], false, puls); });
 
         this.tegnSejr(ctx, tv);
     };

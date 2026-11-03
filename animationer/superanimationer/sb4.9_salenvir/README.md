@@ -137,3 +137,32 @@ knaps plads på fire skærmstørrelser.
 Når brugeren siger til: en knap i `kemi-b-filer/samling_b4,5,6.html` (B4
 Funktionelle grupper) eller en kommende B8 Medicin, `FEEDBACK_EMNER`, og
 kolonnen "I menuen" i superanimationernes README.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`. Det, der kun
+gælder her (prikkerne for trinnets dele, feltet til udbyttet, info-linjen og skriften på
+den grønne knap ved tingen), står sidst i `css/stil.css`. Den grønne knap ved tingen,
+tiden, der står stille, og gættet er som før.
+
+**Indsend svar** er ny: et klik på et svar til spørgsmålene i trin 6, 7 og 10 vælger
+kun (blåt), og knappen Indsend svar i kortets nederste række bedømmer det
+(`svarValg`, `indsendKlik` og `visIndsend` i `js/trin.js`). Feltet i trin 9 sendes også
+ind med Indsend svar (eller Enter); knappen Tjek ved feltet er fjernet. Gættet i trin 5
+er gratis og virker med det samme.
+
+Et rigtigt svar lægger ikke kortet om: spørgsmålet bliver stående, svaret er grønt (gult
+med Vis svaret), et forkert svar, der er sendt ind, er stadig rødt, og de andre er tonet
+ned og låst. Forklaringen står under svarene, og Næste trin (efter den første TLC-plade
+Vent 10 minutter) står, hvor Indsend svar stod (`this.bliv` og `blivHTML`). I feltet står
+det rigtige tal låst. Rosen står aldrig under det næste skridt. Skridt, der er en
+handling med den grønne knap, har som før ingen ekstra knap.
+
+Efter det sidste trin har kortet ingen knap: før stod Start forfra dér, hvor Næste trin
+står (brugeren 3. nov. 2026: aldrig samme sted). Start forfra står i panelet.
+
+Selvtesten: ALT OK (118), 3. nov. 2026. Hjælperen `svar(j)` vælger og trykker Indsend
+svar; nye påstande om Indsend svar, kortet, der bliver på spørgsmålet (også i feltet og
+på det sidste trin), at rosen ikke står under det næste skridt, at tiden står stille imens,
+og kortets højde, når det bliver på hvert spørgsmål, på fire skærmstørrelser.

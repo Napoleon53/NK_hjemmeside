@@ -1173,3 +1173,82 @@ select:focus-visible {
 .formelknap.forkert { border-color: var(--roed); background-color: rgba(224, 84, 70, 0.14); color: #f0a59d; opacity: 0.65; cursor: default; }
 
 .felt-ok { font-size: 0.92rem; font-weight: 700; }
+
+/* ---------------------------------------------------------------------
+   Papirkortet (brugerens valg 3. nov. 2026). ../faelles/papirkort.css
+   goer kortet til et lyst ark med skriften Lexend. Her staar kun det,
+   kortet i denne animation har ud over det faelles: oeverste raekke med
+   etiketten, de fire skridt og Start forfra, linjen .besked (det faelles
+   stilark kender den som .st-tekst), knappen, der foerer videre (knap
+   blaa), og kortet, naar maalingen er loest (.sejr). Intet pulserer.
+   --------------------------------------------------------------------- */
+html body.papirkort.papirkort .scenekort .sk-hoved { gap: 6px 10px; margin-bottom: 5px; }
+html body.papirkort.papirkort .scenekort .sk-hoved .sk-chip { margin: 0; font-size: 1.02rem; }
+html body.papirkort.papirkort .scenekort.sejr .sk-hoved .sk-chip { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort.sejr.svar .sk-hoved .sk-chip { color: #8a6d12; }
+html body.papirkort.papirkort .scenekort .sk-nr { color: var(--pk-mat); }
+html body.papirkort.papirkort .scenekort .sk-nr b { color: var(--pk-tekst-svag); }
+
+/* De fire skridt: klaret i groent, det, der er nu, i en bloed gul ramme */
+html body.papirkort.papirkort .scenekort .sk-skridt li {
+    background-color: #f0ede4;
+    color: var(--pk-mat);
+    font-weight: 500;
+}
+html body.papirkort.papirkort .scenekort .sk-skridt .ss-nr { background-color: #e2ddd0; color: #4b5363; font-weight: 600; }
+html body.papirkort.papirkort .scenekort .sk-skridt li.nu {
+    background-color: var(--pk-gul-lys);
+    box-shadow: inset 0 0 0 1.5px #d8bd6a;
+    color: var(--pk-gul-tekst);
+    font-weight: 600;
+}
+html body.papirkort.papirkort .scenekort .sk-skridt li.nu .ss-nr { background-color: #c9a640; color: #ffffff; }
+html body.papirkort.papirkort .scenekort .sk-skridt li.klaret { background-color: transparent; color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .sk-skridt li.klaret .ss-nr { background-color: var(--pk-groen); color: #ffffff; }
+
+/* Start forfra og Koer igen: en stille knap yderst til hoejre i oeverste raekke */
+html body.papirkort.papirkort .scenekort .sk-hoved .forfraknap {
+    border: 1px solid var(--pk-knapkant);
+    background-color: transparent;
+    color: var(--pk-tekst-svag);
+    font-weight: 500;
+}
+html body.papirkort.papirkort .scenekort .sk-hoved .forfraknap:hover { border-color: #8f8873; background-color: #fffdf6; color: var(--pk-tekst); }
+
+/* Linjen i kortets nederste raekke: hint, fejl, ros og forklaringen i en bloed boks */
+html body.papirkort.papirkort .scenekort .sk-bund .besked {
+    padding: 6px 10px;
+    border-left: 3px solid transparent;
+    border-radius: 8px;
+    background-color: transparent;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--pk-tekst-svag);
+}
+html body.papirkort.papirkort .scenekort .sk-bund .besked.god { background-color: #e6f4ec; border-left-color: var(--pk-groen); color: var(--pk-groen-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund .besked.skidt { background-color: var(--pk-roed-lys); border-left-color: var(--pk-roed); color: var(--pk-roed-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund .besked.gul { background-color: var(--pk-gul-lys); border-left-color: #d4a72c; color: var(--pk-gul-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund .besked b { color: inherit; }
+
+/* Knappen, der foerer videre, naar maalingen er loest: groen, uden puls */
+html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa,
+html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa.banker {
+    min-width: 0;
+    padding: 9px 18px;
+    border: 0;
+    border-radius: 8px;
+    background-color: var(--pk-groen);
+    color: #ffffff;
+    font-size: 0.98rem;
+    font-weight: 600;
+    box-shadow: none;
+    animation: none;
+}
+html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa:hover:not(:disabled) { background-color: #33925f; }
+
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort .sk-hoved { margin-bottom: 3px; }
+    html body.papirkort.papirkort .scenekort .sk-hoved .sk-chip { font-size: 0.94rem; }
+    html body.papirkort.papirkort .scenekort .sk-bund .besked { padding: 4px 9px; font-size: 0.88rem; line-height: 1.32; }
+    html body.papirkort.papirkort .scenekort .sk-bund .knap.blaa { padding: 7px 14px; font-size: 0.92rem; }
+}

@@ -27,7 +27,9 @@
    knap, at opgaven på fane 1 og 2 står på kortet øverst i scenen og
    ikke i panelet, at kortet holder sig inden for den plads, det har
    fået, i alle opgavernes tilstande, at sproget holder reglerne, og at
-   layoutet holder fra 520 × 380 til 1500 × 900.
+   layoutet holder fra 520 × 380 til 1500 × 900. Papirkortet (3. nov. 2026):
+   et svar på fane 2 vælger kun, Indsend svar bedømmer det, og efter et
+   rigtigt svar bliver kortet på spørgsmålet.
 
    Kræver en lokal server eller Chrome med --allow-file-access-from-files.
    Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
@@ -121,6 +123,13 @@ function koerTest(W) {
         !!d.querySelector("#fane-kar .scene #kar-skort #kar-knap") && !!d.querySelector("#fane-glas .scene #glas-skort #glas-knap") &&
         !d.querySelector("#fane-kar .panel .opgavekort") && !d.querySelector("#fane-glas .panel .opgavekort") &&
         !!d.querySelector("#fane-kolbe .panel .opgavekort") && !!d.querySelector("#fane-fortynd .panel .opgavekort"));
+    paastand("papirkortet er slået til: klassen på body, NK.Papir og et lyst kort med Lexend",
+        d.body.classList.contains("papirkort") && !!NK.Papir && W.getComputedStyle(d.getElementById("glas-skort")).backgroundColor === "rgb(251, 250, 246)" &&
+        /Lexend/.test(W.getComputedStyle(d.getElementById("glas-skort")).fontFamily), W.getComputedStyle(d.getElementById("glas-skort")).backgroundColor);
+    paastand("fane 2 har knappen Indsend svar i kortets nederste række, fane 1 har den ikke (et gæt virker med det samme)",
+        !!d.querySelector("#glas-status #glas-indsend") && !d.getElementById("kar-indsend"));
+    paastand("Start forfra står ikke på kortet, hvor knappen videre står", !d.getElementById("kar-skort").contains(d.getElementById("kar-forfra")) &&
+        !d.getElementById("glas-skort").contains(d.getElementById("glas-forfra")));
     var fk = [].map.call(d.querySelectorAll(".faneknap"), function (b) { return b.textContent.replace(/^\d/, ""); });
     paastand("fanerne hedder Karret, c eller n?, Målekolben og Fortynding", fk.join("|") === "Karret|c eller n?|Målekolben|Fortynding", fk.join("|"));
 
@@ -279,7 +288,7 @@ function koerTest(W) {
     function skilte() { A.tegn(); return A.skiltFelt.map(function (f) { return f.id; }).sort().join("+"); }
     function skiltMidt(id) { A.tegn(); var f = A.skiltFelt.filter(function (x) { return x.id === id; })[0]; return f ? { x: f.x + f.b / 2, y: f.y + f.h / 2 } : null; }
     function gaetKnap(tekst) { return [].filter.call(skort.querySelectorAll(".gk-knap"), function (b) { return b.textContent === tekst; })[0]; }
-    function videreA() { return skort.querySelector(".kt-videre"); }
+    function videreA() { return skort.querySelector(".sk-videre"); }
     vaelgA(0);
     paastand("opgave 1 står på kortet øverst i scenen: Opgave 1, Gør opløsningen 0,40 M.", /opgave/.test(skort.className) &&
         ren(skort.querySelector(".kt-chip")) === "Opgave 1" && /Gør opløsningen 0,40 M\./.test(ren(skort.querySelector(".kt-tekst"))), ren(skort));
@@ -395,14 +404,18 @@ function koerTest(W) {
     G.tilpas(); G.layout();
     var gkort = d.getElementById("glas-skort");
     function knapper() { return [].slice.call(gkort.querySelectorAll(".kt-knap")); }
-    function videreG() { return gkort.querySelector(".kt-videre"); }
+    function videreG() { return gkort.querySelector(".sk-videre"); }
+    /* Et svar paa kortet vaelger kun; Indsend svar bedoemmer det */
     function klikSvar(tekst) {
         var b = knapper().filter(function (x) { return ren(x) === tekst; })[0];
         if (!b) return false;
         b.click();
+        G.el.indsend.click();
         tik(G, 1.2);
         return true;
     }
+    /* Forklaringen under svarene, naar kortet er blevet paa spoergsmaalet */
+    function blivT() { return ren(gkort.querySelector(".sk-bund.bliv .st-tekst")); }
     function midtGlas(i) { var gg = G.lay.glas[i]; return { x: gg.cx, y: gg.y0 + gg.h * 0.6 }; }
     function prikkerPasser() {
         return G.glas.every(function (gl) { return gl.prikker.length === Math.round(gl.n / D.PRIK_GLAS + 1e-9); });
@@ -439,17 +452,36 @@ function koerTest(W) {
         kn0[0].getBoundingClientRect().right <= kn0[1].getBoundingClientRect().left + 1);
     paastand("begge glas har 20 prikker (0,20 mol) og lupperne 10 og 5 Cu²⁺", G.glas[0].prikker.length === 20 && G.glas[1].prikker.length === 20 &&
         G.glas[0].part.antal(0) === 10 && G.glas[1].part.antal(0) === 5, G.glas.map(function (x) { return x.prikker.length + "/" + x.part.antal(0); }).join(" "));
+    paastand("Indsend svar står grå i kortets nederste række, til et svar er valgt", !G.el.indsend.hidden && G.el.indsend.classList.contains("ikke-klar") &&
+        G.el.status.contains(G.el.indsend));
+    gkort.classList.remove("blink");
+    G.el.indsend.click();
+    paastand("Indsend svar uden et valgt svar: kortet blinker og siger, hvad der mangler", gkort.classList.contains("blink") && /Vælg et af svarene/.test(besked(G)) &&
+        G.forkerte.length === 0 && G.rigtig === null, besked(G));
+    tik(G, 4);
     var pA = midtGlas(0);
     tryk(G, pA.x, pA.y);
-    paastand("klik på glas A (forkert): forklaringen står på kortet under svarene, og svaret er rødt", /^Ikke endnu A har mindre vand.*Tæl prikkerne/.test(besked(G)) &&
+    paastand("et klik på glas A vælger det som svar: Glas A er blåt på kortet, intet er bedømt, og Indsend svar er blå",
+        G.valgtSvar !== null && knapper().filter(function (b) { return b.classList.contains("valgt"); }).map(ren).join() === "Glas A" &&
+        G.forkerte.length === 0 && !/skidt/.test(G.el.status.className) && G.el.indsend.classList.contains("klar") && G.valgtGlas() === 0, besked(G));
+    klikSvar("Glas B");
+    paastand("et nyt valg flytter markeringen, og Indsend svar bedømmer det valgte", G.forkerte.length === 1 &&
+        knapper().filter(function (b) { return b.textContent === "Glas B"; })[0].classList.contains("forkert") && G.valgtSvar === null, besked(G));
+    G.vaelg(0, false);
+    tryk(G, pA.x, pA.y);
+    G.el.indsend.click();
+    paastand("klik på glas A (forkert) og Indsend svar: forklaringen står på kortet under svarene, og svaret er rødt", /^Ikke endnu A har mindre vand.*Tæl prikkerne/.test(besked(G)) &&
         knapper().filter(function (b) { return b.textContent === "Glas A"; })[0].classList.contains("forkert") && /skidt/.test(G.el.status.className), besked(G));
     paastand("et forkert svar giver intet hint af sig selv, men den gule knap lyser op", !/Hint/.test(besked(G)) && G.el.knap.classList.contains("peg"), G.el.knap.className);
     klikSvar("De har lige meget");
     tik(G, 3);
-    paastand("rigtigt: kortet bliver grønt med svaret og forklaringen, og det næste spørgsmål venter", G.spmNr === 0 && /loest/.test(gkort.className) &&
-        ren(gkort.querySelector(".kt-chip")) === "Rigtigt ✓" && ren(gkort.querySelector(".kt-svaret")) === "De har lige meget." &&
-        /Begge har 0,20 mol/.test(ren(gkort)) && knapper().length === 0 && besked(G) === "", G.spmNr + " " + ren(gkort));
-    paastand("kortets grønne knap hedder Næste spørgsmål, og den gule knap er væk", !!videreG() && /^Næste spørgsmål/.test(videreG().textContent) && G.el.knap.hidden,
+    paastand("rigtigt: spørgsmålet bliver stående, svaret er grønt, og forklaringen står under svarene", G.spmNr === 0 && /loest/.test(gkort.className) &&
+        /bliv/.test(gkort.className) && /største stofmængde/.test(ren(gkort.querySelector(".kt-tekst"))) && ren(gkort.querySelector(".kt-chip")) === "Spørgsmål 1 af 2" &&
+        ren(gkort.querySelector(".kt-knap.rigtig")) === "De har lige meget" && knapper().length === 3 && knapper().every(function (b) { return b.disabled; }) &&
+        gkort.querySelectorAll(".kt-knap.dim").length === 1 && gkort.querySelectorAll(".kt-knap.forkert").length === 1 &&
+        /^Rigtigt Begge har 0,20 mol/.test(blivT()) && besked(G) === "" && gkort.offsetHeight <= G.kortZone(), G.spmNr + " " + ren(gkort));
+    paastand("kortets grønne knap hedder Næste spørgsmål og står, hvor Indsend svar stod, og den gule knap og Indsend svar er væk", !!videreG() &&
+        /^Næste spørgsmål/.test(videreG().textContent) && gkort.querySelector(".sk-bund.bliv").contains(videreG()) && G.el.knap.hidden && G.el.indsend.hidden,
         videreG() && videreG().textContent);
     tryk(G, pA.x, pA.y);
     paastand("mens fanen venter, svarer et klik på et glas ikke på det næste spørgsmål", G.spmNr === 0 && !G.faerdig);
@@ -457,8 +489,12 @@ function koerTest(W) {
     videreG().click();
     paastand("Næste spørgsmål: det nye spørgsmål står samme sted, og den gule knap er tilbage", G.spmNr === 1 && /spm/.test(gkort.className) &&
         /største koncentration/.test(ren(gkort.querySelector(".kt-tekst"))) && besked(G) === "" && G.el.knap.textContent === "Giv hint" && !G.el.knap.hidden, ren(gkort));
+    paastand("rosen til det forrige svar står ikke under det nye spørgsmål, og intet svar er valgt", !gkort.querySelector(".sk-bund.bliv") && !/Rigtigt|Begge har/.test(ren(gkort)) &&
+        !gkort.querySelector(".kt-knap.valgt") && G.el.indsend.classList.contains("ikke-klar"), ren(gkort));
     var pB = midtGlas(0);
     tryk(G, pB.x, pB.y);
+    paastand("et klik på glas A bedømmer ikke af sig selv", !G.faerdig && G.valgtSvar !== null);
+    G.el.indsend.click();
     tik(G, 3);
     paastand("klik på glas A svarer rigtigt: opgaven er løst uden stjerne (der var et forkert svar)", G.faerdig && !G.status[0].stjerne, besked(G));
     paastand("tabellen viser c i begge glas", /0,50 M/.test(d.getElementById("glas-tabel").textContent) && /0,25 M/.test(d.getElementById("glas-tabel").textContent));
@@ -468,9 +504,9 @@ function koerTest(W) {
         G.el.knap.textContent === "Vis svaret" && G.el.knap.classList.contains("svar"), besked(G));
     G.knap();
     tik(G, 2);
-    paastand("Vis svaret: kortet bliver gult med svaret og forklaringen, og knappen hedder Næste spørgsmål", G.spmNr === 0 && /loest svar/.test(gkort.className) &&
-        ren(gkort.querySelector(".kt-chip")) === "Svaret" && ren(gkort.querySelector(".kt-svaret")) === "De har lige meget." &&
-        /^Næste spørgsmål/.test(videreG().textContent), ren(gkort));
+    paastand("Vis svaret: spørgsmålet bliver stående med svaret gult, forklaringen står under svarene, og knappen hedder Næste spørgsmål", G.spmNr === 0 &&
+        /loest svar/.test(gkort.className) && ren(gkort.querySelector(".kt-knap.svar-vist")) === "De har lige meget" && !gkort.querySelector(".kt-knap.rigtig") &&
+        /^Svaret Begge har 0,20 mol/.test(blivT()) && /^Næste spørgsmål/.test(videreG().textContent), ren(gkort));
     d.dispatchEvent(new W.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     paastand("Enter går videre: svaret er væk, og det næste spørgsmål kommer", G.spmNr === 1 && /spm/.test(gkort.className) && !/Svaret/.test(ren(gkort)), G.spmNr);
     paastand("0,50 M betyder 0,50 mol pr. liter vand", D.GLAS[1].spm[1].svar.filter(function (x) { return x.ok; })[0].t === "0,50 mol pr. liter vand");
@@ -752,8 +788,9 @@ function koerTest(W) {
                 }
                 maal(G, nv, zG);
                 G.knap(); maal(G, nv + " hint", zG);
-                sp.svar.forEach(function (x, j) { if (!x.ok) { G.vaelgSvar(j, "ok"); maal(G, nv + " forkert " + x.t, zG); } });
-                G.vaelgSvar(sp.svar.map(function (x) { return !!x.ok; }).indexOf(true), "ok");
+                sp.svar.forEach(function (x, j) { if (!x.ok) { G.kortValg(j); maal(G, nv + " valgt " + x.t, zG); G.indsendKlik(); maal(G, nv + " forkert " + x.t, zG); } });
+                G.kortValg(sp.svar.map(function (x) { return !!x.ok; }).indexOf(true));
+                G.indsendKlik();
                 tik(G, 2);
                 maal(G, nv + " rigtigt", zG);
                 if (G.venter) G.knap();

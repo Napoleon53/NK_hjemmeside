@@ -64,19 +64,33 @@
     P_.delNu = function () {
         if (this.del === "find") {
             var kl = "sk-knap ingen" + (this.valgt === "ingen" ? " valgt" : "") + (this.forkerteValg.ingen ? " forkert" : "");
+            var laast = !!this.forkerteValg.ingen, boks = this.valgt === "ingen" ? "✓" : "";
+            /* Papirkortet: efter et rigtigt svar er knappen laast; groen, hvis
+               tegningen var rigtig (gul med Vis svaret), ellers toned ned */
+            var slut = this.slutNu();
+            if (slut) {
+                laast = true;
+                boks = this.forkert ? "" : "✓";
+                kl = "sk-knap ingen " + (!this.forkert ? (slut.maade === "svar" ? "svar-vist" : "rigtig") : (this.forkerteValg.ingen ? "forkert" : "dim"));
+            }
             return {
                 chip: "Find fejlen",
                 tekst: "En elev har tegnet prikformlen for " + this.o.f + ". Klik på det atom, der er tegnet forkert. Er tegningen rigtig, så vælg Ingen fejl.",
-                ekstra: '<div class="sk-ingen"><button type="button" class="' + kl + '" data-ingen="1"' + (this.forkerteValg.ingen ? " disabled" : "") +
-                    '><span class="v-boks" aria-hidden="true">' + (this.valgt === "ingen" ? "✓" : "") + "</span><span>Ingen fejl</span></button></div>"
+                ekstra: '<div class="sk-ingen"><button type="button" class="' + kl + '" data-ingen="1"' + (laast ? " disabled" : "") +
+                    '><span class="v-boks" aria-hidden="true">' + boks + "</span><span>Ingen fejl</span></button></div>",
+                spm: "find"
             };
         }
         return {
             chip: "Tæl efter",
             tekst: "Hvor mange elektroner har " + this.atomNavn(this.forkert) + " omkring sig på elevens tegning?",
-            ekstra: this.talHTML()
+            ekstra: this.talHTML(),
+            spm: "tal"
         };
     };
+
+    /* Det rigtige tal i optaellingen (tallene tegnes laast efter svaret) */
+    P_.talFacit = function () { return this.forkert ? P.status(this.M, this.forkert).nu : null; };
 
     P_.kanIndsende = function () {
         if (this.del === "find") return this.valgt !== null;

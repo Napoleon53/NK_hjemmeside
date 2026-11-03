@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <title>Selvtest: Byg figuren</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 <style>
     /* Animationen bygges uden for skaermen, saa tekst kan maales */
     #proeve { position: absolute; left: -6000px; top: 0; width: 1400px; height: 860px; display: flex; flex-direction: column; }
     #ud { position: fixed; inset: 0; margin: 0; padding: 16px; overflow: auto; background: #111; color: #ddd; font: 13px/1.45 monospace; white-space: pre-wrap; z-index: 999; }
 </style>
 </head>
-<body>
+<body class="papirkort">
 <div id="proeve">
     <div class="faneknapper" id="faneknapper"></div>
     <main id="hoved" style="position:relative;flex:1"></main>

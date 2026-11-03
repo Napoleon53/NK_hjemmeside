@@ -102,7 +102,7 @@
             var dx = h.x - c.x, dy = h.y - c.y, l = Math.hypot(dx, dy) || 1;
             dx /= l; dy /= l;
             return { slags: "aldehyd", h: hId, fra: { x: h.x, y: h.y },
-                nytO: { x: c.x + dx, y: c.y + dy }, nytH: { x: c.x + dx * 1.62, y: c.y + dy * 1.62 } };
+                nytO: { x: c.x + dx, y: c.y + dy }, nytH: { x: c.x + dx * 2, y: c.y + dy * 2 } };
         }
         return null;
     };
@@ -123,6 +123,16 @@
         mol.bind(cId, o.id, 1);
         mol.bind(o.id, plan.h, 1);
         return o.id;
+    };
+
+    /* Den plads, en serie kan komme til at fylde: startmolekylet og det H, der
+       ender en binding laengere ude, naar et aldehyd bliver til en syre */
+    K.graenser = function (b) {
+        var mol = b.mol, c = mol.atom(b.c), g = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+        function med(x, y) { g.x0 = Math.min(g.x0, x); g.y0 = Math.min(g.y0, y); g.x1 = Math.max(g.x1, x); g.y1 = Math.max(g.y1, y); }
+        mol.atomer.forEach(function (a) { med(a.x, a.y); });
+        K.hPaa(mol, b.c).forEach(function (h) { var a = mol.atom(h); med(c.x + 2 * (a.x - c.x), c.y + 2 * (a.y - c.y)); });
+        return g;
     };
 
     /* Molekylet uden H-atomer, saa motoren kan navngive det */
@@ -196,6 +206,141 @@
             cache[navn] = { navn: navn, mol: mol, klasse: res.stofklasse };
         }
         return cache[navn];
+    };
+
+    /* ----- Fane 3: forsoeget med permanganat ----------------------------------- */
+
+    /* Et skema som tekst. mangler: vis "?" i stedet for antallet af OH⁻ */
+    K.skemaDele = function (type) {
+        var sk = D.FORSOEG.skemaer[type];
+        function side(l) { return l.map(function (x) { return { n: x[0], stof: x[1] }; }); }
+        return { venstre: side(sk.venstre), hoejre: side(sk.hoejre) };
+    };
+
+    /* Er skemaet afstemt? Giver { atomer: {..}, ladning: [v, h], ok } */
+    K.afstemt = function (type) {
+        var sk = D.FORSOEG.skemaer[type], S = D.FORSOEG.STOFFER, t = {}, q = [0, 0];
+        [sk.venstre, sk.hoejre].forEach(function (l, i) {
+            l.forEach(function (x) {
+                var st = S[x[1]];
+                Object.keys(st).forEach(function (e) {
+                    if (e === "q") { q[i] += x[0] * st.q; return; }
+                    t[e] = (t[e] || 0) + (i === 0 ? 1 : -1) * x[0] * st[e];
+                });
+            });
+        });
+        var ok = q[0] === q[1] && Object.keys(t).every(function (e) { return t[e] === 0; });
+        return { atomer: t, ladning: q, ok: ok };
+    };
+
+    K.ohPrMnO4 = function (type) {
+        if (type === "tertiaer") return 0;
+        var sk = D.FORSOEG.skemaer[type], oh = 0, mn = 0;
+        sk.hoejre.forEach(function (x) { if (x[1] === "OH⁻") oh = x[0]; });
+        sk.venstre.forEach(function (x) { if (x[1] === "MnO₄⁻") mn = x[0]; });
+        return oh / mn;
+    };
+
+    /* ----- Afstemningen trin for trin (bogens fem trin, C-bogens afsnit 8.4) -----
+       Alt regnes af molekylerne: oxidationstallet for carbonatomet med den
+       funktionelle gruppe, mangans oxidationstal, koefficienterne,
+       ladningen, hydrogen og oxygen. Selvtesten tjekker, at resultatet er
+       skemaerne i D.FORSOEG. */
+
+    /* Oxidationstallet for et carbonatom i et molekyle uden H-atomer */
+    K.oxtalTung = function (mol, cId) {
+        var t = -mol.implicitH(cId);
+        mol.naboer(cId).forEach(function (n) {
+            var e = mol.atom(n).el;
+            if (e === "O") t += mol.binding(cId, n).orden;
+        });
+        return t;
+    };
+
+    /* Carbonatomet med den funktionelle gruppe: med OH (alkoholen) eller C=O */
+    K.cGruppe = function (mol) {
+        var oh = K.cMedOH(mol);
+        if (oh) return oh.c;
+        var ud = null;
+        mol.atomer.forEach(function (a) {
+            if (ud !== null || a.el !== "C") return;
+            mol.naboer(a.id).forEach(function (n) { if (mol.atom(n).el === "O" && mol.binding(a.id, n).orden === 2) ud = a.id; });
+        });
+        return ud;
+    };
+
+    function taelling(mol) {
+        var t = { C: 0, H: 0, O: 0, q: 0 };
+        mol.atomer.forEach(function (a) {
+            t[a.el] = (t[a.el] || 0) + 1;
+            t.H += mol.implicitH(a.id);
+            t.q += a.q || 0;
+        });
+        return t;
+    }
+
+    function sfd(a, b) { return b ? sfd(b, a % b) : a; }
+
+    K.afstem = function (type) {
+        var navne = { primaer: ["propan-1-ol", "propanoat"], sekundaer: ["propan-2-ol", "propanon"] }[type];
+        var alk = K.stof(navne[0]), prod = K.stof(navne[1]);
+        var cA = K.cGruppe(alk.mol), cP = K.cGruppe(prod.mol);
+        var a = { type: type, alkohol: navne[0], produkt: navne[1], alk: alk, prod: prod, cA: cA, cP: cP };
+        a.cFra = K.oxtalTung(alk.mol, cA);
+        a.cTil = K.oxtalTung(prod.mol, cP);
+        a.stigning = a.cTil - a.cFra;
+        /* Mangan: MnO₄⁻ og MnO₂, oxygen er −II */
+        a.mnFra = -1 + 2 * 4;
+        a.mnTil = 0 + 2 * 2;
+        a.fald = a.mnFra - a.mnTil;
+        var m = a.stigning * a.fald / sfd(a.stigning, a.fald);
+        a.kAlk = m / a.stigning;
+        a.kMn = m / a.fald;
+        a.samlet = m;
+        var tA = taelling(alk.mol), tP = taelling(prod.mol);
+        a.hAlk = tA.H; a.hProd = tP.H; a.oAlk = tA.O; a.oProd = tP.O; a.qProd = tP.q;
+        /* Trin 3: ladningen afstemmes med OH⁻ til hoejre */
+        a.ladV = -a.kMn;
+        a.ladH = a.kAlk * tP.q;
+        a.oh = a.ladH - a.ladV;
+        /* Trin 4: hydrogen afstemmes med H₂O til hoejre */
+        a.hV = a.kAlk * tA.H;
+        a.hH = a.kAlk * tP.H + a.oh;
+        a.h2o = (a.hV - a.hH) / 2;
+        /* Trin 5: oxygen som tjek */
+        a.oV = a.kAlk * tA.O + 4 * a.kMn;
+        a.oH = a.kAlk * tP.O + 2 * a.kMn + a.oh + a.h2o;
+        return a;
+    };
+
+    /* Bundfaldet af MnO₂ paa fane 3: lige saa meget, som skemaet siger, at
+       alkoholen bruger MnO₄⁻ (4 for 3 propan-1-ol, 2 for 3 propan-2-ol). Giver
+       en brøkdel af vaeskens hoejde */
+    K.bundfald = function (type) {
+        if (type === "tertiaer") return 0;
+        var a = K.afstem(type);
+        return 0.2 * a.kMn / a.kAlk;
+    };
+
+    /* Den fulde strukturformel med alle H til fane 3: motorens struktur90, og
+       carbonatomet med OH-gruppen og dets hydrogenatomer */
+    K.fuldStruktur = function (navn) {
+        var tung = NK.NavnLaeser.laes(navn).mol, res = NK.Navn.analyser(tung);
+        var mol = NK.Layout.struktur90(tung, res), c = null;
+        mol.atomer.forEach(function (at) {
+            if (c !== null || at.el !== "C") return;
+            mol.naboer(at.id).forEach(function (n) {
+                if (mol.atom(n).el === "O" && mol.binding(at.id, n).orden === 1 && K.hPaa(mol, n).length) c = at.id;
+            });
+        });
+        return { mol: mol, c: c, h: K.hPaa(mol, c) };
+    };
+
+    /* pH efter forsoeget: al permanganaten reagerer, og OH⁻ kommer fra skemaet */
+    K.forsoegPH = function (type) {
+        var f = D.FORSOEG, n = f.nMnO4 * K.ohPrMnO4(type);
+        if (n <= 0) return 7;
+        return 14 + Math.log(n / f.volumen) / Math.LN10;
     };
 
     /* ----- Forklaringerne ------------------------------------------------------ */

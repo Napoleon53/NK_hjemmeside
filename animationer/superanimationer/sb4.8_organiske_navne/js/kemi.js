@@ -150,7 +150,10 @@
 
     /* ----- Fane 1: trinene i et navn ---------------------------------------------
        Et trin: { slags: "valg" | "klik", del (den del af navnet, trinnet udfylder),
-                  tekst, valg, rigtig, fejl(valgt), hint: [..], vis, om }
+                  tekst, valg, rigtig, fejl(valgt), hint: [..], vis, om, godt }
+       godt: den korte forklaring, der staar i den groenne boks under trinnet,
+            naar det er klaret, og kortet bliver paa trinnet (papirkortet,
+            3. nov. 2026). Det sidste trin bruger forklaringen til hele navnet.
        vis: det, der faar sin farve i formlen, naar trinnet er klaret
             ("kaede", "numre", "gruppe", "side", "esterdele")
        om:  det i formlen, trinnets spoergsmaal handler om. Det er gult i
@@ -222,6 +225,7 @@
             tekst: k === "alkohol" ? "Tæl carbonatomerne i den længste kæde, som OH-gruppen sidder på. Hvad er stammen?"
                 : "Tæl carbonatomerne i den længste kæde." + medC + " Hvad er stammen?",
             valg: D.STAMMER.slice(), rigtig: stof.stamme,
+            godt: K.stor(stof.stamme) + " er " + K.antalC(n) + ".",
             fejl: function (v) {
                 var m = D.STAMMER.indexOf(v) + 1;
                 if (m === stof.antalC && stof.antalC !== n) return "Sidegruppen tæller ikke med i stammen. Tæl kun den længste kæde.";
@@ -242,6 +246,9 @@
                 tekst: fast ? "Klik på carbonatom nummer 1 i formlen."
                     : "Klik på carbonatom nummer 1 i formlen. " + G + " skal have det laveste tal, den kan få.",
                 ok: stof.etter,
+                godt: k === "aldehyd" ? "I et aldehyd er carbonatomet i C=O altid nummer 1."
+                    : (k === "carboxylsyre" ? "I en carboxylsyre er carbonatomet i COOH altid nummer 1."
+                        : "Kæden har fået numre. " + G + " har det laveste tal, den kan få."),
                 fejl: function (id) {
                     var a = stof.mol.atom(id), i = stof.kaede.indexOf(id);
                     if (a.el !== "C") return "Det er et " + (a.el === "O" ? "oxygenatom" : "nitrogenatom") + ". Kæden nummereres kun på carbonatomerne.";
@@ -265,6 +272,7 @@
             slags: "valg", del: "endelse", vis: "gruppe", om: "gruppe",
             tekst: "Vælg endelsen. Den viser stofklassen" + hvorTekst,
             valg: K.endelseValg(stof, aktive), rigtig: stof.endelse, somEndelse: true,
+            godt: K.stor(K.klasse(k).har) + " er " + K.klasse(k).ental + "." + (stof.pos ? " " + G + " sidder på carbonatom nummer " + stof.pos + "." : ""),
             fejl: function (v) {
                 var kv = klasseAfEndelse(v), q = tal(v), kl = K.klasse(kv), egen = K.klasse(k);
                 if (kv !== k) return "Endelsen " + K.medStreg(v).replace(/^-\d+-/, "-") + " hører til " + kl.ental + ". Molekylet har " + egen.har + ".";
@@ -282,6 +290,7 @@
                 slags: "valg", del: "forled", vis: "side", om: "side",
                 tekst: "Vælg forleddet. Det viser sidegruppen og nummeret på det carbonatom, den sidder på.",
                 valg: K.forledValg(stof), rigtig: stof.forled,
+                godt: "Sidegruppen sidder på carbonatom nummer " + stof.spos + ".",
                 fejl: function (v) {
                     var q = tal(v);
                     if (q === n + 1 - stof.spos) return "Tallet " + q + " fås ved at tælle fra den forkerte ende. Sidegruppen sidder på nummer " + stof.spos + ".";
@@ -303,6 +312,7 @@
                 slags: "klik", del: null, vis: "esterdele",
                 tekst: "Klik på carbonatomet i estergruppen. Det har en dobbeltbinding til oxygen.",
                 ok: ok,
+                godt: "Syrens del er nu grøn, og alkoholens del er orange i formlen.",
                 fejl: function (id) {
                     var at = stof.mol.atom(id);
                     if (at.el !== "C") return "Det er et oxygenatom. Klik på det carbonatom, der har dobbeltbindingen til oxygen.";
@@ -316,6 +326,7 @@
                 slags: "valg", del: "alkohol", vis: "esterdele", om: "alkohol",
                 tekst: "Den orange del sidder på det enkeltbundne oxygenatom og kommer fra alkoholen. Hvad hedder den?",
                 valg: D.ALKYL.slice(), rigtig: stof.dele[0].tekst,
+                godt: "Den orange del har " + K.antalC(a) + ".",
                 fejl: function (v) {
                     var m = D.ALKYL.indexOf(v) + 1;
                     if (m === sy && m !== a) return "Det er syrens del, der har " + K.antalC(m) + ". Tæl kun carbonatomerne i den orange del.";
@@ -329,6 +340,7 @@
                 slags: "valg", del: "syre", vis: "esterdele", om: "syre",
                 tekst: "Den grønne del har C=O og kommer fra syren. Carbonatomet i C=O tæller med. Hvad hedder den?",
                 valg: D.OATER.slice(), rigtig: stof.dele[1].tekst,
+                godt: "Den grønne del har " + K.antalC(sy) + ", når carbonatomet i C=O tælles med.",
                 fejl: function (v) {
                     var m = D.OATER.indexOf(v) + 1;
                     if (m === a && m !== sy) return "Det er alkoholens del, der har " + K.antalC(m) + ". Tæl carbonatomerne i den grønne del.";
@@ -348,6 +360,7 @@
             slags: "valg", del: "kaeder", vis: "gruppe", fyldOgsaa: "endelse", om: "kvaelstof",
             tekst: "Tæl carbonatomerne i hver kæde på nitrogenatomet. Hvad hedder kæderne?",
             valg: (stof.o.valg || [egen]).slice(), rigtig: egen,
+            godt: "Nitrogenatomet har " + D.KAEDER[egen] + ".",
             fejl: function (v) { return K.stor(v) + " er " + D.KAEDER[v] + ". Se på kæderne på nitrogenatomet igen."; },
             hint: ["Ét carbonatom hedder methyl, to ethyl, tre propyl og fire butyl. To ens kæder får di foran.",
                 "Nitrogenatomet har " + D.KAEDER[egen] + "."],

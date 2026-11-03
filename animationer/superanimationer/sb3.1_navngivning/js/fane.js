@@ -230,7 +230,8 @@
             } else {
                 var k = this.kortData();
                 kl = "scenekort " + (k.slags === "spm" ? "spm" : "opgave");
-                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(k.chip) + "</span>" + NK.html(k.tekst) + "</p>" + (k.ekstra || "");
+                /* Papirkortet (3. nov. 2026): spoergsmaalet i teksten staar halvfedt (../faelles/papirkort.js) */
+                html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(k.chip) + "</span>" + (NK.Papir ? NK.Papir.tekst(NK.html(k.tekst)) : NK.html(k.tekst)) + "</p>" + (k.ekstra || "");
                 if (k.svar && k.svar.length) {
                     html += '<div class="sk-svar brikker" style="grid-template-columns: repeat(' + (k.kolonner || k.svar.length) + ', minmax(0, 1fr));">';
                     k.svar.forEach(function (sv, j) {
@@ -549,7 +550,8 @@
 
     /* Navnets dele som farvede brikker paa kortet.
        dele: [{ type, tekst, fyldt, aktiv, vist }]. En tom plads er stiplet,
-       den plads, eleven er ved, er gul. etiketter: skriv delens navn under. */
+       den plads, eleven er ved, er gul. etiketter: skriv delens navn under.
+       --delfarve er farven paa det moerke kort, --delblaek paa papirkortet. */
     function navnHTML(dele, valg) {
         valg = valg || {};
         var html = '<div class="navnelinje' + (valg.stor ? " stor" : "") + (valg.klasse ? " " + valg.klasse : "") + '">';
@@ -557,7 +559,7 @@
         dele.forEach(function (d) {
             var info = D.DELE[d.type];
             var kl = "nl-del" + (d.fyldt ? " fyldt" : " tom") + (d.aktiv ? " aktiv" : "") + (d.vist ? " vist" : "");
-            html += '<span class="' + kl + '" style="--delfarve:' + info.farve + '">' +
+            html += '<span class="' + kl + '" style="--delfarve:' + info.farve + ";--delblaek:" + info.blaek + '">' +
                 '<span class="nl-tekst">' + (d.fyldt ? NK.html(d.tekst) : "?") + "</span>" +
                 '<span class="nl-etiket">' + NK.html(info.navn) + "</span></span>";
         });

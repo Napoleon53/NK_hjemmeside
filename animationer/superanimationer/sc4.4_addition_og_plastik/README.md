@@ -289,3 +289,22 @@ i Kemibogen):
 * Rækken i `../README.md` og punktet om link-koderne under Fælles opbygning.
 * Kemibogen: boksen Prøv selv i `kapitler/6-4-alkener.qmd` linker til
   animationen.
+
+## Papirkortet (3. nov. 2026)
+
+Det lyse papirkort (se Fælles krav i `../README.md`) er slået til: `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`. Et svar på
+et spørgsmål vælger kun; det bedømmes med knappen Indsend svar (`indsendKlik` og
+`visIndsend` i `js/fane.js`, knappen `x-indsend` i hver fanes nederste række på
+kortet). Gættet er stadig gratis og virker med det samme. Et rigtigt svar lægger
+ikke kortet om: spørgsmålet bliver stående med svaret grønt, forklaringen står
+under svarene, og Næste står, hvor Indsend svar stod (`blivHTML`, som i sc7.5).
+På lave skærme er Indsend svar ikke bredere end teksten (sidst i `css/stil.css`),
+så kortet bliver i sin plads. Selvtesten svarer med `svar(X, j)`, der vælger og
+trykker Indsend svar, måler kortet også med et valgt svar og tillader filerne i
+`../faelles/`.
+
+Start forfra står aldrig, hvor Næste står (brugeren 3. nov. 2026): når alle fem
+opgaver på fanen Plastik er løst, har kortet ingen knap videre (før stod der
+Start forfra ↺ på den grønne knap). Opgaverne kan åbnes igen i panelet
+(`videreTekst` i `js/fane.js`). Kørt 3. nov. 2026: ALT OK (167 påstande).

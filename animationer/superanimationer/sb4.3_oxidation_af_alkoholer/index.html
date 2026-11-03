@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Oxidation af alkoholer</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1>Oxidation af alkoholer</h1>
@@ -14,6 +15,7 @@
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-o" role="tab" aria-selected="true"><span class="nr">1</span>Oxidationstallet</button>
         <button class="faneknap" data-fane="fane-p" role="tab" aria-selected="false"><span class="nr">2</span>Hvad dannes?</button>
+        <button class="faneknap" data-fane="fane-u" role="tab" aria-selected="false"><span class="nr">3</span>Ukendte alkoholer</button>
     </div>
 
     <button class="ikonknap tekstknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -55,13 +57,13 @@
             <h2>Elektronerne</h2>
             <div class="klasser" id="o-kontakter">
                 <button type="button" class="klasseknap" data-vis="par" role="switch" aria-checked="false" style="--klassefarve:#3d9ee0">
-                    <span class="kk-kontakt"><i></i></span><span class="kk-navn">Elektronparrene</span></button>
+                    <span class="kk-kontakt"><i></i></span><span class="kk-navn">Vis elektronparrene i bindingerne</span></button>
                 <button type="button" class="klasseknap" data-vis="en" role="switch" aria-checked="false" style="--klassefarve:#9b6bd6">
-                    <span class="kk-kontakt"><i></i></span><span class="kk-navn">Elektronegativitet</span></button>
+                    <span class="kk-kontakt"><i></i></span><span class="kk-navn">Vis elektronegativiteten ved atomerne</span></button>
             </div>
             <p class="prikforklaring" id="o-forklaring" hidden>
                 Elektronen kom fra:
-                <span><i style="background-color:#4b5563"></i>C</span>
+                <span><i style="background-color:#1d2433"></i>C</span>
                 <span><i style="background-color:#2563eb"></i>H</span>
                 <span><i style="background-color:#d23b2c"></i>O</span>
             </p>
@@ -91,11 +93,45 @@
         <div class="kort" id="p-opgaver">
             <h2>Opgaverne <span class="taeller">løst <b id="p-loest">0</b>/<span id="p-ialt">0</span></span></h2>
             <div class="opg-liste" id="p-liste"></div>
+            <button class="knap igenknap" id="p-forfra" type="button">↺ Begynd forfra med alle ti</button>
         </div>
 
         <div class="kort" id="p-fundkort">
             <h2>Det har du fundet</h2>
             <div class="fundtabel" id="p-fundet"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: UKENDTE ALKOHOLER (Basiskemi B, Xperiment 24)              -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-u" role="tabpanel" aria-label="Ukendte alkoholer">
+    <div class="scene">
+        <canvas id="u-laerred"></canvas>
+        <div class="scenekort" id="u-skort">
+            <div class="sk-ind" id="u-ind"></div>
+            <div class="sk-bund" id="u-status">
+                <p class="st-tekst" id="u-besked" aria-live="polite"></p>
+                <button class="knap hjaelp" id="u-knap" type="button">Giv et hint</button>
+                <button class="knap indsend" id="u-indsend" type="button">Indsend svar</button>
+            </div>
+        </div>
+        <div class="anker" id="u-anker-tavle"></div>
+        <div class="anker" id="u-anker-glas"></div>
+        <div class="anker" id="u-anker-skema"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="u-trin">
+            <h2>Forsøget <span class="taeller">runder løst <b id="u-runder">0</b></span></h2>
+            <div class="opg-chips lodret" id="u-trinliste"></div>
+            <button class="knap igenknap" id="u-forfra" type="button">↺ Begynd forfra med teorien</button>
+        </div>
+
+        <div class="kort" id="u-om">
+            <h2>Om forsøget</h2>
+            <p class="note-tekst">0,5 mL alkohol og 0,5 mL 0,020 M KMnO₄ i et reagensglas. Glasset varmes i et vandbad i et par minutter, og pH måles med universalindikatorpapir, når det er kølet af. Opløsningen er neutral fra start. Målingen med pH-papir er noget usikker.</p>
         </div>
     </aside>
 </section>
@@ -125,8 +161,16 @@
             <tr><td>Tertiær</td><td>tre andre carbonatomer</td><td>oxideres ikke</td></tr>
         </table>
         <h3 class="teori-hoved">Mild eller kraftig oxidation</h3>
-        <p>Ved en mild oxidation destilleres aldehydet fra, så snart det er dannet. Ved en kraftig oxidation er der overskud af oxidationsmiddel, og aldehydet bliver oxideret videre til carboxylsyren. Kaliumdichromat skifter fra orange til grønt, når det oxiderer alkoholen.</p>
-        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
+        <p>Ved en mild oxidation bruges dichromat, og aldehydet destilleres fra, så snart det er dannet. Ved en kraftig oxidation bruges permanganat i overskud, og aldehydet bliver oxideret videre til carboxylsyren.</p>
+        <table class="teoritabel">
+            <tr><th>Oxidationsmiddel</th><th>Farveskift i sur opløsning</th></tr>
+            <tr><td>Dichromat, Cr₂O₇²⁻</td><td>orange til grønt (Cr³⁺)</td></tr>
+            <tr><td>Permanganat, MnO₄⁻</td><td>violet til farveløst (Mn²⁺)</td></tr>
+        </table>
+        <h3 class="teori-hoved">Forsøget med permanganat i neutral opløsning</h3>
+        <p>I neutral opløsning bliver violet MnO₄⁻ til brunsort MnO₂, og der dannes OH⁻, så pH stiger. En primær alkohol bliver til en carboxylsyre, som afgiver en hydron til noget af OH⁻. Derfor stiger pH mest ved den sekundære alkohol. Den tertiære reagerer ikke: glasset forbliver violet, og pH er ca. 7. MnO₂ falder til bunds som et brunsort bundfald, og den primære giver mest, fordi den bruger flest MnO₄⁻.</p>
+        <p>Reaktionerne afstemmes i fem trin som i bogen til C-niveau: 1. oxidationstal, 2. stigning og fald, 3. ladning med OH⁻ i basisk opløsning, 4. hydrogen med H₂O, 5. oxygen som tjek.</p>
+        <p class="genveje"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> fane &nbsp;·&nbsp; <kbd>Enter</kbd> indsend svar &nbsp;·&nbsp; <kbd>R</kbd> forfra &nbsp;·&nbsp; <kbd>H</kbd> rundvisning &nbsp;·&nbsp; <kbd>T</kbd> teori &nbsp;·&nbsp; <kbd>Esc</kbd> luk</p>
         <div class="knapper" style="margin-top:14px;">
             <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
         </div>
@@ -164,9 +208,11 @@
 <script src="../../molekylemotor/js/tavle.js"></script>
 <script src="js/data.js"></script>
 <script src="js/kemi.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_oxtal.js"></script>
 <script src="js/sim_produkt.js"></script>
+<script src="js/sim_forsoeg.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>
 </body>

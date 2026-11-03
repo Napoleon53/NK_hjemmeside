@@ -72,23 +72,25 @@
         return "";
     };
 
-    /* ----- Felterne paa kortet ------------------------------------------------------- */
-    function input(id, v, kl) {
-        return '<input class="sk-input' + (kl ? " " + kl : "") + '" data-felt="' + id + '" value="' + NK.html(v || "") +
-            '" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="' + id + '">';
+    /* ----- Felterne paa kortet -------------------------------------------------------
+       laas: "rigtig" eller "svar-vist", naar delen er klaret, og kortet bliver
+       paa den (papirkortet): felterne staar med tallene, laast. */
+    function input(id, v, kl, laas) {
+        return '<input class="sk-input' + (kl ? " " + kl : "") + (laas ? " " + laas : "") + '" data-felt="' + id + '" value="' + NK.html(v || "") +
+            '" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="' + id + '"' + (laas ? " disabled" : "") + ">";
     }
 
-    P.feltHTML = function (del) {
+    P.feltHTML = function (del, laas) {
         var v = this.feltV, html;
         if (del.regn) {
             return '<div class="sk-regn"><span class="sr-v"><i>R</i><sub>f</sub> =</span>' +
-                '<span class="brk"><span>' + input("t", v.t, "kort") + ' cm</span><span>' + input("n", v.n, "kort") + " cm</span></span>" +
-                '<span class="sr-v">=</span>' + input("r", v.r, "kort") + "</div>";
+                '<span class="brk"><span>' + input("t", v.t, "kort", laas) + ' cm</span><span>' + input("n", v.n, "kort", laas) + " cm</span></span>" +
+                '<span class="sr-v">=</span>' + input("r", v.r, "kort", laas) + "</div>";
         }
         html = '<div class="sk-felter">';
         del.felter.forEach(function (f) {
             html += '<label class="sk-felt"><span class="sf-foer">' + NK.rfHTML(f.foer || "") + "</span>" +
-                input(f.id, v[f.id], f.rf ? "kort" : "") + (f.efter ? '<span class="sf-efter">' + NK.html(f.efter) + "</span>" : "") + "</label>";
+                input(f.id, v[f.id], f.rf ? "kort" : "", laas) + (f.efter ? '<span class="sf-efter">' + NK.html(f.efter) + "</span>" : "") + "</label>";
         });
         return html + "</div>";
     };

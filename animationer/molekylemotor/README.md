@@ -19,10 +19,11 @@ Fælles kode til at tegne og navngive molekyler. Den bruges af ni sider:
   og Ring), eller skriver navnet, og navnelæseren tegner det ved siden af formlen.
   Animationen lægger sin egen `klik` på sin tavle; motoren er ikke ændret
 * `../superanimationer/sb3.3_isomerjagten/`: isomerjagten til afsnit B3.3. Eleven tegner
-  isomerer af en molekylformel på tavlen (Kæde, −OH og C → O, som gør et carbonatom til
-  oxygen, og = Binding i jagten med alkener), og navngivningen (uden cis og trans) afgør, om tegningen er en ny isomer eller det samme stof igen.
-  Hylden og whiteboardet tegnes af struktur ud fra navnelæserens molekyler. Animationen
-  lægger sin egen `klik` på sin tavle; motoren er ikke ændret
+  isomerer af en molekylformel på tavlen (C og O som på tegnebrættet, og = Binding i
+  jagten med alkener), og navngivningen (uden cis og trans) afgør, om tegningen er en
+  ny isomer eller det samme stof igen. Hylden og whiteboardet tegnes af struktur ud fra
+  navnelæserens molekyler. Animationen lægger sin egen `klik` på sin tavle og bruger
+  `regler.forbudt` (to oxygenatomer må ikke sidde sammen)
 * `../superanimationer/sb4.3_oxidation_af_alkoholer/`: oxidation af alkoholer. Fane 1
   tegner sine egne strukturformler med alle H (stilen "alle") og navngiver dem uden H;
   fane 2 bygger alkoholerne og de fire svar af navnet og navngiver modellens produkt
@@ -78,7 +79,8 @@ js/layout.js         zigzag som i bogen (prøver alle måder at vende sidegruppe
                      90°-gitter, H-atomernes retninger
 js/struktur.js       tegningen: stregerne og bogstaverne i pixels, til canvas, SVG og
                      PNG. Skærm og gemt billede er altid ens
-js/tegnebraet.js     tavlen: træk bygger kæden (120° i hvert knæk), klik, højreklik,
+js/tegnebraet.js     tavlen: træk viser kæden som forslag og tegner den ved slip
+                     (se Trækket nedenfor), klik, højreklik,
                      langt tryk, flyt, ringe, grundstoffer, pile og plus, fortryd;
                      på tegnebrættet også zoom, udsnit (regler.udsnit), Markér,
                      grupper med ét klik, ladning, Pæn tegning, Spejlvend, Kopiér
@@ -88,6 +90,29 @@ js/tavle.js          scenen: væggen, whiteboardet, bakken, papiret (prikkerne k
 js/klistermaerker.js Kemichaels skuffe: de ti klistermærker, hvad der låser dem op
                      (quizzerne i sc4.2), og hvad der er låst op (nk-skuffe)
 ```
+
+## Trækket
+
+Brugerens ønske 3. nov. 2026 (kæden var "lidt aggressiv i forhold til MarvinSketch",
+og et skævt træk kunne give en carbonspiral):
+
+* Mens man trækker fra et atom, står kæden svagt grå med antallet af C-atomer ved
+  musen ("5 C"). Først når musen slippes, kommer den på tavlen, i ét skridt i
+  Fortryd. Slippes den uden for tavlen, tegnes forslaget, som det stod.
+* Kæden er altid en lige zigzag langs en akse på 30-graders-gitteret mod musen
+  (`kaedeAkse`). Den første binding giver pæne vinkler ved atomet, der trækkes fra
+  (120 grader for enden af en kæde), og blandt de akser, det tillader, vinder den,
+  der ligger nærmest musen. Længden følger, hvor langt musen er kommet langs aksen.
+  Peger musen bagud, kommer der intet.
+* Højst 20 C-atomer ad gangen; et enligt startatom tæller med. Tavlens eget loft
+  (`regler.maks`) gælder stadig og giver en rød streg og beskeden fra `maksTekst`.
+* Det næste skridt, der ikke må tages (et atom i vejen, bindinger, der krydser),
+  er rødt, og kæden stopper før det.
+* Med et andet grundstof end C er forslaget ét atom med symbolet.
+* `regler.forbudt(atom, el)` kan nægte en ny binding (isomerjagten: to
+  oxygenatomer må ikke sidde sammen). Den bruges også ved klik (`nytFra`).
+
+Klik er uændret: et klik på et atom sætter ét C på.
 
 ## Navngivningens regler
 

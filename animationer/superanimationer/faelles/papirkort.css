@@ -1,0 +1,440 @@
+/* =====================================================================
+   faelles/papirkort.css - scenekortet som lyst papirkort med Lexend
+
+   Brugerens valg 3. nov. 2026 efter en proeveside: det gamle kort (gul
+   kant, gule svarknapper, versaler, fed skrift og puls) var "aggressivt og
+   svaert at laese". Det nye kort er et lyst ark med moerk tekst ligesom
+   tavlen, kun det valgte svar har farve, Indsend svar er hovedknappen, og
+   Giv et hint er en stille knap med kant. Intet pulserer.
+
+   Saadan slaas det til i en animation:
+     <link rel="stylesheet" href="../faelles/papirkort.css">  (efter stil.css)
+     <body class="papirkort">
+     <script src="../faelles/papirkort.js"></script>           (foer fane.js)
+
+   Filen retter kun udseendet. At kortet bliver paa spoergsmaalet efter et
+   rigtigt svar (svaret groent dér, hvor eleven klikkede, forklaringen under
+   svarene og Naeste samme sted som Indsend svar), goeres i animationens
+   egen fane.js.
+
+   Hvorfor body.papirkort.papirkort: animationernes egne stilark har regler
+   som .scenekort.loest.svar .sk-chip (fire klasser). Klassen gentages, saa
+   reglerne her altid vinder, uanset hvor mange klasser de gamle har.
+   Omvendt: en animation, der vil aendre noget her, skriver reglen sidst i
+   sit eget stilark med samme prefiks og mindst én klasse mere (fx .loest),
+   for denne fil indlaeses efter stil.css og vinder ved lige mange klasser.
+   Alle 27 animationer med scenekortet bruger filen (3. nov. 2026).
+   Decimaltal skrives med PUNKTUM i CSS.
+   ===================================================================== */
+
+@font-face {
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("lexend/lexend-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("lexend/lexend-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+html body.papirkort.papirkort {
+    --pk-papir: #fbfaf6;
+    --pk-kant: #d9d4c6;
+    --pk-tekst: #1d2433;
+    --pk-tekst-svag: #3a4150;
+    --pk-mat: #8a8578;
+    --pk-knapkant: #c9c3b3;
+    --pk-blaa: #2a76ac;
+    --pk-blaa-lys: #e7f1fa;
+    --pk-groen: #2b7d51;
+    --pk-groen-lys: #e3f3ea;
+    --pk-groen-tekst: #1f4d35;
+    --pk-roed: #c4493c;
+    --pk-roed-lys: #fbeceb;
+    --pk-roed-tekst: #7a2a21;
+    --pk-gul: #e0b22e;
+    --pk-gul-lys: #fdf5dc;
+    --pk-gul-tekst: #5a4510;
+}
+
+/* ----- Selve kortet: samme papir i alle tilstande ------------------------ */
+html body.papirkort.papirkort .scenekort,
+html body.papirkort.papirkort .scenekort.spm,
+html body.papirkort.papirkort .scenekort.opgave,
+html body.papirkort.papirkort .scenekort.loest,
+html body.papirkort.papirkort .scenekort.loest.svar,
+html body.papirkort.papirkort .scenekort.mester,
+html body.papirkort.papirkort .scenekort.gaet {
+    padding: 9px 14px 10px;
+    border: 1px solid var(--pk-kant);
+    border-radius: 12px;
+    background-color: var(--pk-papir);
+    color: var(--pk-tekst);
+    font-family: "Lexend", "Segoe UI", Tahoma, sans-serif;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+    animation: none;
+}
+
+html body.papirkort.papirkort .scenekort button { font-family: inherit; }
+
+/* Et klik paa tavlen, foer kortet er klaret: ét blødt gult blink om kortet */
+html body.papirkort.papirkort .scenekort.blink { animation: pk-blink 0.9s ease-out 1; outline-offset: 2px; }
+
+@keyframes pk-blink {
+    0%   { outline: 0 solid rgba(224, 178, 46, 0); }
+    30%  { outline: 5px solid rgba(224, 178, 46, 0.65); }
+    100% { outline: 5px solid rgba(224, 178, 46, 0); }
+}
+
+/* ----- Etiketten (det gamle maerke i versaler) er en indlejret overskrift:
+   samme stoerrelse som teksten, halvfed og moerkegul, som "Opgave 2.3" i en
+   laerebog (brugerens valg 3. nov. 2026: en lille etiket med streg under
+   lignede en overskrift over en stoerre overskrift, som ikke fandtes). Den
+   staar paa samme linje som teksten, saa kortet kan vaere i kortZone. */
+html body.papirkort.papirkort .scenekort .sk-chip,
+html body.papirkort.papirkort .scenekort.spm .sk-chip,
+html body.papirkort.papirkort .scenekort.loest .sk-chip,
+html body.papirkort.papirkort .scenekort.mester .sk-chip {
+    display: inline;
+    margin: 0 8px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: #8a6d12;
+    font-size: inherit;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    vertical-align: baseline;
+}
+
+html body.papirkort.papirkort .scenekort.loest .sk-chip { color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort.loest.svar .sk-chip { color: #8a6d12; }
+
+/* ----- Teksten: indledningen i almindelig skrift, spoergsmaalet halvfedt,
+   i samme stoerrelse (papirkort.js saetter .sk-spm om spoergsmaalet) */
+html body.papirkort.papirkort .scenekort .sk-tekst,
+html body.papirkort.papirkort .scenekort.opgave .sk-tekst,
+html body.papirkort.papirkort .scenekort.loest .sk-tekst,
+html body.papirkort.papirkort .scenekort.loest.svar .sk-tekst {
+    max-width: 76ch;
+    font-size: 1.06rem;
+    line-height: 1.42;
+    font-weight: 400;
+    color: var(--pk-tekst);
+}
+
+html body.papirkort.papirkort .scenekort .sk-spm { font-weight: 600; color: #0f1522; }
+html body.papirkort.papirkort .scenekort .nw { white-space: nowrap; }
+
+/* ----- Svarknapperne: hvide og neutrale. Kun det valgte har farve. ------- */
+html body.papirkort.papirkort .scenekort .sk-svar { gap: 8px; margin-top: 9px; }
+
+html body.papirkort.papirkort .scenekort .sk-knap {
+    border: 1.5px solid var(--pk-knapkant);
+    border-radius: 9px;
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-weight: 500;
+    box-shadow: none;
+    opacity: 1;
+    transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.2s ease;
+}
+
+html body.papirkort.papirkort .scenekort .sk-knap:hover:not(:disabled) { border-color: #8f8873; background-color: #fffdf6; }
+html body.papirkort.papirkort .scenekort .sk-knap.valgt,
+html body.papirkort.papirkort .scenekort .sk-knap.valgt:hover:not(:disabled) {
+    border-color: var(--pk-blaa);
+    background-color: var(--pk-blaa-lys);
+    box-shadow: inset 0 0 0 1px var(--pk-blaa);
+}
+html body.papirkort.papirkort .scenekort .sk-knap.forkert {
+    border-color: #e0a59d;
+    background-color: #fbf1ef;
+    color: #9a3a2e;
+    opacity: 1;
+}
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig {
+    border-color: var(--pk-groen);
+    background-color: var(--pk-groen-lys);
+    color: #1d5a3a;
+    box-shadow: inset 0 0 0 1px var(--pk-groen);
+    opacity: 1;
+}
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig::before { content: "✓"; margin-right: 2px; font-weight: 700; }
+html body.papirkort.papirkort .scenekort .sk-knap.svar-vist {
+    border-color: #c9a640;
+    background-color: var(--pk-gul-lys);
+    color: var(--pk-gul-tekst);
+    box-shadow: inset 0 0 0 1px #c9a640;
+}
+html body.papirkort.papirkort .scenekort .sk-knap.dim,
+html body.papirkort.papirkort .scenekort .sk-knap:disabled:not(.rigtig):not(.forkert):not(.svar-vist):not(.valgt) { opacity: 0.4; }
+
+/* Bogstaverne A, B, C foran svarene: neutrale, farvet som knappen */
+html body.papirkort.papirkort .scenekort .v-bogstav { background-color: #ece8de; color: #4b5363; }
+html body.papirkort.papirkort .scenekort .valgt .v-bogstav { background-color: var(--pk-blaa); color: #ffffff; }
+html body.papirkort.papirkort .scenekort .rigtig .v-bogstav { background-color: var(--pk-groen); color: #ffffff; }
+html body.papirkort.papirkort .scenekort .forkert .v-bogstav { background-color: #d98b82; color: #ffffff; }
+html body.papirkort.papirkort .scenekort .svar-vist .v-bogstav { background-color: #c9a640; color: #ffffff; }
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig:has(.v-bogstav)::before { content: none; }
+
+/* ----- Kortets nederste raekke: beskeden i en blød boks, knapperne til hoejre */
+html body.papirkort.papirkort .scenekort .sk-bund,
+html body.papirkort.papirkort .scenekort .sk-bund.skidt,
+html body.papirkort.papirkort .scenekort .sk-bund.hint,
+html body.papirkort.papirkort .scenekort .sk-bund.gul {
+    gap: 10px;
+    margin-top: 9px;
+    padding-top: 0;
+    border-top: 0;
+}
+
+html body.papirkort.papirkort .scenekort .sk-bund.tom { margin-top: 9px; }
+
+html body.papirkort.papirkort .scenekort .sk-bund .st-tekst {
+    padding: 6px 10px;
+    border-left: 3px solid transparent;
+    border-radius: 2px 8px 8px 2px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--pk-tekst-svag);
+}
+
+html body.papirkort.papirkort .scenekort .sk-bund .st-tekst:empty { padding: 0; border: 0; }
+
+html body.papirkort.papirkort .scenekort .sk-bund.skidt .st-tekst { background-color: var(--pk-roed-lys); border-left-color: var(--pk-roed); color: var(--pk-roed-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund.god .st-tekst { background-color: #e6f4ec; border-left-color: var(--pk-groen); color: var(--pk-groen-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund.hint .st-tekst,
+html body.papirkort.papirkort .scenekort .sk-bund.gul .st-tekst { background-color: var(--pk-gul-lys); border-left-color: #d4a72c; color: var(--pk-gul-tekst); }
+html body.papirkort.papirkort .scenekort .sk-bund.peger .st-tekst { background-color: #f0eee8; border-left-color: #a8a293; color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .sk-bund.ryster { animation: none; }
+html body.papirkort.papirkort .scenekort .sk-bund.ryster .st-tekst { animation: pk-ind 0.25s ease-out 1; }
+
+@keyframes pk-ind { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Maerket foran beskeden (Ikke endnu, Hint 1 af 2) er et fedt ord, ikke et stempel */
+html body.papirkort.papirkort .scenekort .b-maerke,
+html body.papirkort.papirkort .scenekort .b-maerke.stor,
+html body.papirkort.papirkort .scenekort .sk-bund.skidt .b-maerke,
+html body.papirkort.papirkort .scenekort .sk-bund.god .b-maerke,
+html body.papirkort.papirkort .scenekort .sk-bund.hint .b-maerke,
+html body.papirkort.papirkort .scenekort .sk-bund.gul .b-maerke {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    vertical-align: baseline;
+}
+
+html body.papirkort.papirkort .scenekort .b-maerke::after { content: ". "; }
+html body.papirkort.papirkort .scenekort .sk-bund.hint .b-maerke::after,
+html body.papirkort.papirkort .scenekort .sk-bund.gul .b-maerke::after { content: ": "; }
+/* Fede ord i beskeden har beskedens farve (de var hvide paa det moerke kort) */
+html body.papirkort.papirkort .scenekort .sk-bund .st-tekst b,
+html body.papirkort.papirkort .scenekort .sk-bund .st-tekst .fo { color: inherit; }
+
+/* ----- Knapperne: Indsend svar er hovedknappen, hintet er en stille knap --- */
+html body.papirkort.papirkort .scenekort .knap.hjaelp,
+html body.papirkort.papirkort .scenekort .knap.hjaelp.svar {
+    min-width: 0;
+    padding: 8px 15px;
+    border: 1.5px solid #d8bd6a;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #6b5310;
+    font-weight: 500;
+    box-shadow: none;
+    animation: none;
+}
+
+html body.papirkort.papirkort .scenekort .knap.hjaelp:hover:not(:disabled) { border-color: #c9a640; background-color: var(--pk-gul-lys); color: #5a4510; }
+/* Efter et forkert svar lyser hintknappen stille op to gange */
+html body.papirkort.papirkort .scenekort .knap.hjaelp.peg { animation: pk-peg 1.6s ease-in-out 2; }
+
+@keyframes pk-peg {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(224, 178, 46, 0); }
+    50%      { box-shadow: 0 0 0 5px rgba(224, 178, 46, 0.35); }
+}
+
+html body.papirkort.papirkort .scenekort .knap.indsend,
+html body.papirkort.papirkort .scenekort .knap.indsend.klar {
+    min-width: 150px;
+    padding: 8px 18px;
+    border: 0;
+    border-radius: 8px;
+    background-color: var(--pk-blaa);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: none;
+    animation: none;
+}
+
+html body.papirkort.papirkort .scenekort .knap.indsend:hover { background-color: #3389c4; }
+html body.papirkort.papirkort .scenekort .sk-bund .knap.indsend { flex: 0 0 auto; margin-left: 0; white-space: nowrap; }
+html body.papirkort.papirkort .scenekort .knap.indsend.ikke-klar,
+html body.papirkort.papirkort .scenekort .knap.indsend.ikke-klar:hover { background-color: #e9e6de; color: var(--pk-mat); }
+
+/* Den groenne knap, der foerer videre (Naeste spoergsmaal, Naeste opgave) */
+html body.papirkort.papirkort .scenekort .sk-videre {
+    padding: 9px 18px;
+    border: 0;
+    border-radius: 8px;
+    background-color: var(--pk-groen);
+    color: #ffffff;
+    font-size: 0.98rem;
+    font-weight: 600;
+    box-shadow: none;
+    animation: none;
+}
+
+html body.papirkort.papirkort .scenekort .sk-videre:hover { background-color: #33925f; }
+html body.papirkort.papirkort .scenekort.blink .sk-videre,
+html body.papirkort.papirkort .scenekort.loest.blink .sk-videre { animation: pk-knap-blink 0.9s ease-out 1; }
+html body.papirkort.papirkort .scenekort.blink:has(.sk-videre) { animation: none; }
+
+@keyframes pk-knap-blink {
+    0%   { box-shadow: 0 0 0 0 rgba(43, 125, 81, 0); }
+    30%  { box-shadow: 0 0 0 6px rgba(43, 125, 81, 0.45); }
+    100% { box-shadow: 0 0 0 6px rgba(43, 125, 81, 0); }
+}
+
+/* ----- Loest uden spoergsmaal: forklaringen i en groen boks og knappen ved siden af */
+html body.papirkort.papirkort .scenekort .sk-slut { gap: 12px; }
+html body.papirkort.papirkort .scenekort .sk-slut > .sk-tekst,
+html body.papirkort.papirkort .scenekort.loest .sk-slut > .sk-tekst {
+    max-width: none;
+    padding: 7px 11px;
+    border-left: 3px solid var(--pk-groen);
+    border-radius: 2px 8px 8px 2px;
+    background-color: #e6f4ec;
+    color: var(--pk-groen-tekst);
+    font-size: 1rem;
+    font-weight: 400;
+}
+html body.papirkort.papirkort .scenekort.loest.svar .sk-slut > .sk-tekst {
+    border-left-color: #d4a72c;
+    background-color: var(--pk-gul-lys);
+    color: var(--pk-gul-tekst);
+}
+html body.papirkort.papirkort .scenekort .sk-svaret,
+html body.papirkort.papirkort .scenekort.loest.svar .sk-svaret { color: inherit; font-weight: 700; }
+
+/* ----- Kortet bliver paa spoergsmaalet efter et rigtigt svar ----------------
+   fane.js tegner spoergsmaalet med svarene laast og en raekke .sk-bund.bliv
+   med forklaringen og knappen, der foerer videre, dér hvor Indsend svar stod. */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv { display: flex; align-items: center; }
+html body.papirkort.papirkort .scenekort .sk-bund.bliv .st-tekst { flex: 1; margin: 0; padding: 5px 10px; line-height: 1.32; }
+html body.papirkort.papirkort .scenekort .sk-bund.bliv .sk-videre { flex: 0 0 auto; min-width: 190px; }
+html body.papirkort.papirkort .scenekort .sk-bund.bliv.svar .st-tekst { background-color: var(--pk-gul-lys); border-left-color: #d4a72c; color: var(--pk-gul-tekst); }
+
+/* ----- Gaettet foer forsoeget (sc7.5 m.fl.): samme papir, lidt stoerre ----- */
+html body.papirkort.papirkort .scenekort.gaet { padding: 13px 18px 15px; }
+html body.papirkort.papirkort .scenekort .gk-maerke {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: #8a6d12;
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+html body.papirkort.papirkort .scenekort .gk-intro { margin-top: 8px; font-size: 1.02rem; line-height: 1.42; color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .gk-tekst { margin: 5px 0 12px; font-size: 1.22rem; line-height: 1.3; font-weight: 600; color: #0f1522; }
+html body.papirkort.papirkort .scenekort .gk-knap {
+    border: 1.5px solid var(--pk-knapkant);
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-weight: 500;
+}
+html body.papirkort.papirkort .scenekort .gk-knap:hover { border-color: #8f8873; background-color: #fffdf6; }
+html body.papirkort.papirkort .scenekort .gk-knap:active { background-color: var(--pk-blaa-lys); }
+html body.papirkort.papirkort .scenekort .gk-figurramme { background-color: #f0ede4; }
+html body.papirkort.papirkort .scenekort .gk-figur line { stroke: var(--pk-tekst); }
+
+/* ----- Smaating paa kortet i de enkelte animationer ------------------------- */
+html body.papirkort.papirkort .scenekort .sk-gaet { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .sk-gaet b { color: var(--pk-tekst); }
+html body.papirkort.papirkort .scenekort .sk-skema { color: var(--pk-tekst); font-weight: 600; }
+html body.papirkort.papirkort .scenekort .sk-pil { border-color: var(--pk-gul); background-color: var(--pk-gul-lys); color: #8a6d12; }
+
+/* sb3.3: den gule ramme med formlen, eleven jagter */
+html body.papirkort.papirkort .scenekort .maal { border: 2px solid var(--pk-gul); background-color: var(--pk-gul-lys); box-shadow: none; }
+html body.papirkort.papirkort .scenekort .maal-titel { color: #8a6d12; font-weight: 600; letter-spacing: 0.02em; text-transform: none; font-size: 0.74rem; }
+html body.papirkort.papirkort .scenekort .maal-formel { color: var(--pk-tekst); font-weight: 600; }
+html body.papirkort.papirkort .scenekort .maal-atomer i { border: 1px solid #d6cfbd; font-weight: 600; }
+
+/* Byg figuren: bakken med fagord og listen, naar laget er loest */
+html body.papirkort.papirkort .scenekort .bakke { border: 1px dashed #cfc8b6; background-color: #f3f0e8; }
+html body.papirkort.papirkort .scenekort .bakke.over { border-color: var(--pk-blaa); background-color: var(--pk-blaa-lys); }
+html body.papirkort.papirkort .scenekort .bakke-tom { color: var(--pk-mat); }
+html body.papirkort.papirkort .scenekort .ord {
+    border: 1.5px solid #bfa96a;
+    background: #ffffff;
+    color: var(--pk-tekst);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(60, 50, 20, 0.18);
+}
+html body.papirkort.papirkort .scenekort .sk-slut-tekst { flex: 1; min-width: 0; }
+html body.papirkort.papirkort .scenekort .sk-slut-tekst > .sk-tekst {
+    display: block;
+    padding: 7px 11px;
+    border-left: 3px solid var(--pk-groen);
+    border-radius: 2px 8px 8px 2px;
+    background-color: #e6f4ec;
+    color: var(--pk-groen-tekst);
+    font-size: 1rem;
+}
+html body.papirkort.papirkort .scenekort.loest.svar .sk-slut-tekst > .sk-tekst {
+    border-left-color: #d4a72c;
+    background-color: var(--pk-gul-lys);
+    color: var(--pk-gul-tekst);
+}
+html body.papirkort.papirkort .scenekort .fl-liste li { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .fl-liste li b { color: #1d5a3a; }
+html body.papirkort.papirkort .scenekort .sk-alle { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .sk-alle b { color: #8a6d12; }
+html body.papirkort.papirkort .scenekort.mester .sk-chip { color: #8a6d12; }
+
+/* ----- Lave skaerme (rammen i menuen paa en baerbar) ------------------------ */
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort,
+    html body.papirkort.papirkort .scenekort.spm,
+    html body.papirkort.papirkort .scenekort.opgave,
+    html body.papirkort.papirkort .scenekort.loest,
+    html body.papirkort.papirkort .scenekort.loest.svar,
+    html body.papirkort.papirkort .scenekort.mester { padding: 7px 12px 8px; }
+    html body.papirkort.papirkort .scenekort .sk-tekst,
+    html body.papirkort.papirkort .scenekort.opgave .sk-tekst,
+    html body.papirkort.papirkort .scenekort.loest .sk-tekst { font-size: 0.96rem; line-height: 1.34; }
+    html body.papirkort.papirkort .scenekort .sk-svar { gap: 6px; margin-top: 6px; }
+    html body.papirkort.papirkort .scenekort .sk-bund,
+    html body.papirkort.papirkort .scenekort .sk-bund.tom { margin-top: 6px; }
+    html body.papirkort.papirkort .scenekort .sk-bund .st-tekst { padding: 4px 9px; font-size: 0.88rem; line-height: 1.32; }
+    html body.papirkort.papirkort .scenekort .knap.hjaelp,
+    html body.papirkort.papirkort .scenekort .knap.indsend { padding: 6px 13px; }
+    html body.papirkort.papirkort .scenekort .sk-videre { padding: 7px 14px; font-size: 0.92rem; }
+    html body.papirkort.papirkort .scenekort .gk-tekst { font-size: 1.1rem; margin-bottom: 9px; }
+    /* Naar kortet bliver paa spoergsmaalet, skal der ogsaa vaere plads til forklaringen */
+    html body.papirkort.papirkort .scenekort.loest .sk-svar .sk-knap { padding-top: 3px; padding-bottom: 3px; font-size: 0.84rem; line-height: 1.15; }
+    html body.papirkort.papirkort .scenekort .sk-bund.bliv .st-tekst { padding: 2px 8px; font-size: 0.85rem; line-height: 1.22; }
+    html body.papirkort.papirkort .scenekort .sk-bund.bliv .sk-videre { min-width: 0; padding: 7px 12px; }
+}

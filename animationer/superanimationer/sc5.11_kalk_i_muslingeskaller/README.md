@@ -269,3 +269,25 @@ Skal den alligevel i menuen en dag:
   "I menuen" i superanimationernes README.
 
 Den afløser ingen gammel animation, så intet skal i `arkiv/`.
+
+## Papirkortet (3. nov. 2026)
+
+Det lyse papirkort (se Fælles krav i `../README.md`) er slået til: `../faelles/papirkort.css`
+og `../faelles/papirkort.js` er indlæst, og `<body class="papirkort">`. Kortet på
+fane 1 og 3 er bygget som i sc5.5 (øverste række med etiket, skridt og Start
+forfra, linjen `.besked` og knappen videre), så det, det fælles stilark ikke kender,
+står sidst i `css/stil.css`: skridtene, Start forfra som stille knap, linjen
+`.besked` som blød boks (grøn, rød eller gul), den grønne knap videre uden puls og
+etiketten på det løste kort. Kortets tekst går gennem `papirTekst()` i `js/fane.js`.
+
+Der er ingen spørgsmål med svarknapper på kortet, kun gæt, og et gæt er gratis og
+virker med det samme. Derfor er der intet Indsend svar her. Efter et gæt på fane 3
+kører forsøget, og resultatet og forklaringen står på kortet; Næste fejlkilde giver
+et nyt gæt uden rosen til det forrige. Formelvalget på fane 2 står i panelet og
+er ikke ændret. Selvtesten tjekker papirkortet, at intet pulserer, at Start forfra
+står et andet sted end Næste måling, og at kun egne filer og `../faelles/` hentes.
+
+Start forfra står aldrig, hvor Næste står (brugeren 3. nov. 2026): når alle seks
+fejlkilder er løst, er knappen nederst på kortet væk (før stod der Forfra ↺).
+Kør igen står i kortets øverste række, og fejlkilderne kan åbnes igen i panelet
+(`intetVidere` i `js/fane.js`). Kørt 3. nov. 2026: ALT OK (159 påstande).

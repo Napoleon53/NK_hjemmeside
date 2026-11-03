@@ -70,6 +70,9 @@
         if (!this.stof || this.faerdig) return;
         this.trin = K.trin(this.stof, this.aktive);
         this.forkert = {};
+        /* Venter kortet paa Naeste trin, flytter det groenne svar med i den nye liste */
+        var t = this.trinNu();
+        if (this.bliv && t.slags === "valg") this.bliv.rigtig = t.valg.indexOf(t.rigtig);
     };
 
     P.trinNu = function () { return this.trin[this.ti]; };
@@ -105,7 +108,9 @@
         return F.navnHTML(this.dele(), { stor: true });
     };
 
-    /* ----- Svarene -------------------------------------------------------------------- */
+    /* ----- Svarene --------------------------------------------------------------------
+       svarValg bedoemmer et svar. Det kaldes af Indsend svar (js/fane.js): et klik
+       paa en brik vaelger den kun. */
     P.svarValg = function (j) {
         var t = this.trinNu();
         if (!t || t.slags !== "valg" || this.forkert[j]) return;
@@ -116,8 +121,12 @@
         this.fejlLinje(t.fejl(v));
     };
 
-    /* Trinnet er klaret: svaret bliver staaende i navnet, formlen faar farve, og
-       det naeste trin kommer. vist: hjaelpeknappen gjorde det. */
+    /* Trinnet er klaret: svaret bliver staaende i navnet, og formlen faar farve.
+       vist: hjaelpeknappen gjorde det.
+       Papirkortet (brugerens valg 3. nov. 2026): kortet bliver paa trinnet med
+       svaret groent og den korte forklaring (t.godt) under svarene, og det
+       naeste trin kommer foerst, naar eleven trykker Naeste trin. Rosen staar
+       aldrig under det naeste trins spoergsmaal. */
     P.trinKlaret = function (vist, klikId) {
         var t = this.trinNu();
         if (t.del) this.fyldt[t.del] = vist ? "vist" : true;
@@ -125,18 +134,26 @@
         if (t.vis) this.vis[t.vis] = true;
         if (t.vis === "numre") this.lok = K.lokanter(this.stof, klikId);
         this.hintVis = {};
-        this.forkert = {};
         this.fejlAtom = null;
-        this.ti++;
-        this.bygTegning();
-        if (this.ti >= this.trin.length) {
+        var b = { rigtig: t.slags === "valg" ? t.valg.indexOf(t.rigtig) : -1, maade: vist ? "svar" : "selv" };
+        if (this.ti >= this.trin.length - 1) {
+            /* Det sidste trin: kortet bliver paa det med forklaringen til hele navnet */
+            this.bliv = b;
             this.afslut();
             return;
         }
-        this.nulstilHjaelp();
-        if (vist) this.besked("", "");
-        else this.godLinje("");
-        this.visKort();
+        this.bygTegning();
+        b.tekst = t.godt || "";
+        b.knap = "Næste trin →";
+        b.videre = function () {
+            this.ti++;
+            this.forkert = {};
+            this.bygTegning();
+            this.nulstilHjaelp();
+            this.besked("", "");
+            this.visKort();
+        };
+        this.blivPaa(b);
     };
 
     P.afslut = function () {
@@ -275,7 +292,7 @@
         return F.atomVed(this.stof.mol, this.geo, this.s, pt);
     };
 
-    P.iKlik = function () { return !this.faerdig && this.trinNu().slags === "klik"; };
+    P.iKlik = function () { return !this.faerdig && !this.bliv && this.trinNu().slags === "klik"; };
 
     P.overScene = function (pt) {
         this.over = pt && this.iKlik() ? this.atomVed(pt) : null;

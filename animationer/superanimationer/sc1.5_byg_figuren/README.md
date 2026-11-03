@@ -254,3 +254,10 @@ pladsen igen). Selvtesten tjekker det nu.
 - Udskrift af figuren som noteark (tom og med facit).
 - B-bogens kapitel B6 til B8. Motoren kan bruges igen: en ny figur er en ny `fig_*.js`.
 - Den svære udgave kan ikke vælges med et link.
+
+## Papirkortet (3. nov. 2026)
+
+Prøve på det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i de andre byg figuren-mapper,
+så de kan få kortet med de samme to linjer.

@@ -220,6 +220,14 @@ function koerTest(W) {
     }
     var forloebFejl = [];
     var stjerneFejl = [];
+    var blivFejl = [];
+    /* Papirkortet: efter et rigtigt svar paa kortet staar spoergsmaalet der stadig */
+    function bliver(F, navn, tekst) {
+        var k = F.el.skort, h = k.getBoundingClientRect().height;
+        if (!k.querySelector(".sk-bund.bliv .sk-videre") || tekst && !tekst.test(k.querySelector(".sk-tekst").textContent) ||
+            k.querySelectorAll(".sk-ind button:not([data-videre]):not(:disabled)").length || !F.el.indsend.hidden || !F.el.status.hidden) blivFejl.push(navn);
+        if (h > F.kortZone()) blivFejl.push(navn + " " + Math.round(h) + " px");
+    }
     B.tegnede = {};
     D.MOLEKYLER.forEach(function (mol, i) {
         B.vaelg(i);
@@ -249,6 +257,8 @@ function koerTest(W) {
         B.talValg = st.nu;
         B.indsendKlik();
         noter();
+        bliver(B, mol.id, /^Tæl efter\s*Hvor mange elektroner/);
+        if (!B.el.skort.querySelector('.tal-knap.rigtig[data-tal="' + st.nu + '"]')) blivFejl.push(mol.id + " tallet er ikke grønt");
         koerF(B, 2.5);
         if (!B.faerdig) forloebFejl.push(mol.id + ": ikke løst");
         if (!B.status[i].stjerne) stjerneFejl.push(mol.id);
@@ -256,6 +266,8 @@ function koerTest(W) {
     });
     paastand("alle ti molekyler kan bygges, indsendes og tælles", forloebFejl.length === 0, forloebFejl.slice(0, 4).join("; "));
     paastand("rigtigt i første forsøg giver en stjerne", stjerneFejl.length === 0, stjerneFejl.join(", "));
+    paastand("papirkortet: efter det rigtige tal bliver spørgsmålet stående med tallet grønt og knappen videre, også med teksten om alle ti molekyler",
+        blivFejl.length === 0 && /alle ti molekyler/.test(B.kortTekst()), blivFejl.slice(0, 4).join(", "));
     paastand("optællingen tæller lige så mange prikker, som status siger", (function () {
         var ok = true;
         D.MOLEKYLER.forEach(function (mol) {
@@ -301,6 +313,40 @@ function koerTest(W) {
     B.indsendKlik(); B.knap();
     B.talValg = 8; B.indsendKlik();
     paastand("løst efter fejl: ingen stjerne, men løst", B.faerdig && B.status[1].loest && !B.status[1].stjerne);
+
+    /* Papirkortet og Indsend svar: H₂ med hydrogen tegnet */
+    B.tegnede = { 1: [0, 1, 0, 0] };
+    B.vaelg(0);
+    bygFacit(D.MOLEKYLER[0]);
+    B.indsendKlik();
+    paastand("byg molekylet er en opgave i scenen: forklaringen står alene på kortet med knappen Tæl efter",
+        B.venter && !!B.el.skort.querySelector(".sk-slut") && !B.el.skort.querySelector(".sk-bund.bliv") && /Alle elektroner er parret/.test(B.kortTekst()) &&
+        B.el.skort.querySelector(".sk-videre").textContent === "Tæl efter →");
+    B.knap();
+    var kB = B.el.skort;
+    kB.querySelector('[data-tal="3"]').click();
+    paastand("et klik på et tal vælger det kun: blåt, intet bedømt, og Indsend svar er klar",
+        B.talValg === 3 && !!kB.querySelector('.tal-knap.valgt[data-tal="3"]') && !B.faerdig && !B.fejlet && !/Ikke rigtigt/.test(B.beskedTekst()) &&
+        !B.el.indsend.hidden && B.el.indsend.classList.contains("klar") && B.el.indsend.textContent === "Indsend svar: 3");
+    B.el.indsend.click();
+    paastand("Indsend svar med et forkert tal: rødt tal, forklaringen på kortet, og spørgsmålet står der stadig",
+        !B.faerdig && /^Ikke rigtigt/.test(B.beskedTekst()) && !!kB.querySelector('.tal-knap.forkert[data-tal="3"]:disabled') && /Hvor mange elektroner/.test(B.kortTekst()));
+    kB.querySelector('[data-tal="2"]').click();
+    B.el.indsend.click();
+    paastand("det rigtige tal: kortet bliver på spørgsmålet, 2 er grønt, 3 er stadig rødt, de andre er tonet ned og låst",
+        B.faerdig && / bliv/.test(kB.className) && /Hvor mange elektroner har hvert hydrogenatom/.test(kB.querySelector(".sk-tekst").textContent) &&
+        !!kB.querySelector('.tal-knap.rigtig[data-tal="2"]') && !!kB.querySelector('.tal-knap.forkert[data-tal="3"]') &&
+        kB.querySelectorAll(".tal-knap.dim").length === 10 && kB.querySelectorAll(".tal-knap:not(:disabled)").length === 0, kB.className + " | " + kB.querySelector(".sk-tekst").textContent);
+    paastand("forklaringen står under tallene, og Næste molekyle står, hvor Indsend svar stod",
+        /^Rigtigt /.test(kB.querySelector(".sk-bund.bliv .st-tekst").textContent) && /2 elektroner omkring sig/.test(kB.querySelector(".sk-bund.bliv .st-tekst").textContent) &&
+        kB.querySelector(".sk-bund.bliv .sk-videre").textContent === "Næste molekyle →" && B.el.indsend.hidden && B.el.status.hidden &&
+        kB.getBoundingClientRect().height <= B.kortZone(), kB.getBoundingClientRect().height);
+    paastand("kortet bruger papirkortet og Lexend", d.body.classList.contains("papirkort") && /Lexend/.test(W.getComputedStyle(kB).fontFamily) &&
+        W.getComputedStyle(kB).backgroundColor === "rgb(251, 250, 246)");
+    paastand("ingen ✓ i mærket foran forklaringen", !/✓/.test(kB.querySelector(".sk-bund.bliv .b-maerke").textContent));
+    var naesteB = B.naesteUloeste();
+    kB.querySelector(".sk-videre").click();
+    paastand("knappen på kortet går videre til næste molekyle", naesteB > 0 && B.nr === naesteB && !B.faerdig && !kB.querySelector(".sk-bund.bliv"), B.nr);
 
     /* Byg atomet med musen: klik paa en plads saetter, klik paa en elektron
        fjerner, hoejreklik fjerner én */
@@ -388,6 +434,8 @@ function koerTest(W) {
         if (Fj.forkert && Fj.retAlfa < 0.99) fFejl.push((i + 1) + ": den rettede kom ikke frem");
     });
     paastand("alle tolv tegninger kan løses", fFejl.length === 0, fFejl.join("; "));
+    paastand("kortets knap går altid fremad: Næste tegning, også når alle tegninger er løst, aldrig Start forfra",
+        Fj.faerdig && Fj.videreTekst() === "Næste tegning →" && !/forfra/i.test(Fj.el.skort.textContent), Fj.videreTekst());
     paastand("rigtigt i første forsøg giver en stjerne", fStjerne.length === 0, fStjerne.join(","));
     try { W.localStorage.removeItem("nk-sc3.1-f"); } catch (e) { /* ingen hukommelse */ }
     Fj.status.forEach(function (s) { s.loest = false; s.stjerne = false; });
@@ -413,10 +461,25 @@ function koerTest(W) {
     paastand("Vis svaret: gult kort med svaret og den rettede tegning", Fj.faerdig && /svar/.test(Fj.el.skort.className) && /midten/.test(Fj.kortTekst()) && Fj.retAlfa > 0.99);
     Fj.vaelg(4);
     Fj.valgt = Fj.forkert.id; Fj.indsendKlik();
+    var kF = Fj.el.skort;
+    paastand("papirkortet: det rigtige atom, og spørgsmålet Find fejlen bliver stående med Ingen fejl tonet ned og Tæl efter dér, hvor Indsend svar stod",
+        Fj.venter && / bliv/.test(kF.className) && /Klik på det atom, der er tegnet forkert/.test(kF.querySelector(".sk-tekst").textContent) &&
+        !!kF.querySelector(".sk-knap.ingen.dim:disabled") && /^Rigtigt Det er /.test(kF.querySelector(".sk-bund.bliv .st-tekst").textContent) &&
+        kF.querySelector(".sk-bund.bliv .sk-videre").textContent === "Tæl efter →" && Fj.el.indsend.hidden && kF.getBoundingClientRect().height <= Fj.kortZone(),
+        kF.querySelector(".sk-bund.bliv .st-tekst") ? kF.querySelector(".sk-bund.bliv .st-tekst").textContent : kF.className);
     var foerV = Fj.valgt;
     koerF(Fj, 0.1);
     Fj.nedScene(Fj.pos[0]);
     paastand("låst på det grønne kort: et klik på et andet atom ændrer intet", Fj.venter && Fj.valgt === foerV);
+    var iRigtig = -1;
+    D.FEJL.forEach(function (o, i) { if (iRigtig < 0 && !P.fejlAtomer(P.elevTegning(o)).length) iRigtig = i; });
+    Fj.vaelg(iRigtig);
+    kF.querySelector("[data-ingen]").click();
+    paastand("Ingen fejl på kortet vælger kun: blå boks, intet bedømt", Fj.valgt === "ingen" && !!kF.querySelector(".sk-knap.ingen.valgt") && !Fj.faerdig && Fj.el.indsend.classList.contains("klar"));
+    Fj.el.indsend.click();
+    paastand("Indsend svar: Ingen fejl er rigtigt og bliver grønt, og forklaringen står under knappen",
+        Fj.faerdig && / bliv/.test(kF.className) && !!kF.querySelector(".sk-knap.ingen.rigtig:disabled") && /Klik på det atom/.test(kF.querySelector(".sk-tekst").textContent) &&
+        /^Rigtigt /.test(kF.querySelector(".sk-bund.bliv .st-tekst").textContent) && kF.getBoundingClientRect().height <= Fj.kortZone(), kF.getBoundingClientRect().height);
 
     /* ------------------------------------------------------------------ */
     overskrift("6. Sproget");
@@ -479,7 +542,16 @@ function koerTest(W) {
         Fj.knap(); Fj.knap(); Fj.knap();
         maalKort(Fj, "tegning " + (i + 1) + " løst");
     });
-    paastand("kortet kan være på sin plads i alle dele med det længste hint", hoejFejl.length === 0, hoejFejl.slice(0, 4).join(", "));
+    D.FEJL.forEach(function (o, i) {
+        Fj.vaelg(i);
+        if (!Fj.forkert) return;
+        Fj.valgt = Fj.forkert.id; Fj.indsendKlik();
+        maalKort(Fj, "tegning " + (i + 1) + " rigtigt atom");
+        Fj.knap();
+        Fj.talValg = P.status(Fj.M, Fj.forkert).nu; Fj.indsendKlik();
+        maalKort(Fj, "tegning " + (i + 1) + " rigtigt tal");
+    });
+    paastand("kortet kan være på sin plads i alle dele med det længste hint, og når det bliver på spørgsmålet", hoejFejl.length === 0, hoejFejl.slice(0, 4).join(", "));
     var scene = d.querySelector("#fane-f .scene").getBoundingClientRect();
     var nederst = Array.prototype.filter.call(d.querySelectorAll("#fane-b .scene *, #fane-f .scene *"), function (e) {
         if (e.tagName === "CANVAS" || !e.textContent.trim() || e.closest(".scenekort")) return false;
@@ -487,8 +559,8 @@ function koerTest(W) {
         return r.height > 0 && r.top > scene.top + scene.height * 0.5;
     });
     paastand("ingen tekst nederst i scenen", nederst.length === 0, nederst.length);
-    paastand("ingen Kemichael og ingen filer uden for mappen", !/kemichael/i.test(d.documentElement.innerHTML) &&
-        Array.prototype.every.call(d.scripts, function (s) { return !/\.\.\//.test(s.getAttribute("src") || ""); }));
+    paastand("ingen Kemichael og ingen filer uden for mappen ud over det fælles papirkort", !/kemichael/i.test(d.documentElement.innerHTML) &&
+        Array.prototype.every.call(d.querySelectorAll("script[src], link[href]"), function (s) { var u = s.getAttribute("src") || s.getAttribute("href") || ""; return /^\.\.\/faelles\//.test(u) || !/\.\.\//.test(u); }));
 }
 </script>
 </body>

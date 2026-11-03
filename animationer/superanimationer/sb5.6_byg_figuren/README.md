@@ -100,3 +100,9 @@ er grønne.
 ## Ikke lavet
 
 - Prøvet med en rigtig mus. Træk og klik er motorens og er de samme som i sb1.5.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

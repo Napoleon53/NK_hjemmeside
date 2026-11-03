@@ -93,7 +93,18 @@ function koerTest(W) {
     /* statuslinje er beskeden i kortets nederste raekke (hint, fejl, klik); kortT er
        kortets hovedtekst (opgaven, spoergsmaalet eller forklaringen) */
     function statuslinje(X) { return X.el.besked.hidden ? "" : X.beskedTekst(); }
-    function kortT(X) { var e = X.el.skort.querySelector(".sk-tekst"); return e ? e.textContent : ""; }
+    function kortT(X) {
+        /* Papirkortet: efter et rigtigt svar bliver spoergsmaalet staaende, og
+           forklaringen staar i raekken under svarene (.sk-bund.bliv) */
+        var e = X.el.skort.querySelector(".sk-bund.bliv .st-tekst") || X.el.skort.querySelector(".sk-tekst");
+        return e ? e.textContent : "";
+    }
+    /* Et svar paa et spoergsmaal vaelger kun; Indsend svar bedoemmer det */
+    function svar(X, j) {
+        var g = X.opg, spm = !!g && (g.fase === "spm" || g.fase === "spm2") && !X.venter && !X.faerdig;
+        X["svarValg"](j);
+        if (spm) X.indsendKlik();
+    }
     function linje(X) { return X.faerdig || X.venter ? kortT(X) : statuslinje(X); }
     function videre(X) { return X.el.skort.querySelector(".sk-videre"); }
     function klasse(X) { return X.el.status.className; }
@@ -293,14 +304,24 @@ function koerTest(W) {
     klik(G, p1.x, p1.y);
     paastand("mens spørgsmålet om saltsyren står på kortet, kan luppen over eddikesyren ikke åbnes", !G.aaben[1] && G.opg.fase === "spm" && gkG.classList.contains("blink"));
     gkG.querySelector('.sk-knap[data-valg="' + forkert(G) + '"]').click();
+    paastand("et svar på kortet vælger kun: intet er bedømt, og Indsend svar er blå",
+        G.opg.valgt === forkert(G) && !roed(G) && !G.el.indsend.hidden && G.el.indsend.classList.contains("klar") &&
+        gkG.querySelectorAll(".sk-knap.valgt").length === 1 && gkG.querySelectorAll(".sk-knap.forkert").length === 0);
+    G.el.indsend.click();
     paastand("et forkert svar: forklaringen står i rødt på kortet under svarene, svaret bliver rødt, og hintknappen lyser op",
         roed(G) && /^Ikke endnu/.test(statuslinje(G)) && /gråt med en orange hydron/.test(statuslinje(G)) && /peg/.test(G.el.knap.className) &&
         gkG.querySelectorAll(".sk-knap.forkert:disabled").length === 1 && gkG.offsetHeight <= G.kortZone() &&
         G.el.status.getBoundingClientRect().top >= gkG.querySelector(".sk-svar").getBoundingClientRect().bottom, statuslinje(G));
+    paastand("Indsend svar uden et valgt svar: kortet blinker og siger, hvad der mangler", (function () {
+        gkG.classList.remove("blink"); G.el.indsend.click();
+        return gkG.classList.contains("blink") && /Vælg et af svarene/.test(statuslinje(G)) && G.opg.rigtig === undefined;
+    }()), statuslinje(G));
     gkG.querySelector('.sk-knap[data-valg="' + rigtigt(G) + '"]').click();
-    paastand("det rigtige svar: kortet bliver grønt med svaret, forklaringen og knappen Næste opgave",
-        gkG.classList.contains("loest") && !gkG.classList.contains("svar") && /^Rigtigt ✓/.test(kortT(G)) && gkG.querySelector(".sk-svaret").textContent === "Ingen er hele." &&
-        /100 oxoniumioner/.test(kortT(G)) && gkG.querySelectorAll(".sk-knap").length === 0 && videre(G).textContent === "Næste opgave →" && G.el.status.hidden, kortT(G));
+    G.el.indsend.click();
+    paastand("det rigtige svar: spørgsmålet bliver stående, svaret er grønt, forklaringen står under svarene, og Næste opgave står, hvor Indsend svar stod",
+        gkG.classList.contains("loest") && !gkG.classList.contains("svar") && /^Rigtigt /.test(kortT(G)) && /stadig hele/.test(gkG.querySelector(".sk-tekst").textContent) &&
+        /Ingen er hele/.test(gkG.querySelector(".sk-knap.rigtig").textContent) && gkG.querySelectorAll(".sk-knap:not(:disabled)").length === 0 &&
+        /100 oxoniumioner/.test(kortT(G)) && videre(G).textContent === "Næste opgave →" && G.el.status.hidden && G.el.indsend.hidden && gkG.offsetHeight <= G.kortZone(), kortT(G) + " " + gkG.offsetHeight);
     paastand("mål 2: løst, og panelet husker tallene", G.faerdig && !d.getElementById("g-regnkort").hidden && /0 af 100/.test(d.getElementById("g-regnskab").textContent));
     videre(G).click();
     paastand("mål 3: luppen over saltsyren er blevet, og eddikesyrens antal står stille", G.opg.o.id === "lup-eddike" && G.aaben[0] && !G.aaben[1] && G.lup[1].bytter === false);
@@ -310,9 +331,9 @@ function koerTest(W) {
     paastand("ingen ring om oxoniumionen før hintet", G.ringI(1) === null);
     G.el.knap.click(); G.el.knap.click();
     paastand("andet hint står på kortet og sætter en gul ring om den røde oxoniumion",
-        G.hjaelp === 2 && G.ringI(1) === G.lup[1].ox[0] && /^Hint 2 af 3/.test(statuslinje(G)) && /gul ring/.test(statuslinje(G)) && /hint/.test(klasse(G)) && gkG.offsetHeight <= G.kortZone(), statuslinje(G));
+        G.hjaelp === 2 && G.ringI(1) === G.lup[1].ox[0] && /^Hint 2 af 3/.test(statuslinje(G)) && /gul ring/.test(statuslinje(G)) && /hint/.test(klasse(G)) && gkG.offsetHeight <= G.kortZone(), statuslinje(G) + " (kortet " + gkG.offsetHeight + " px)");
     paastand("knappen tæller hintene", knaptekst(G) === "Næste hint (3 af 3)", knaptekst(G));
-    G.svarValg(rigtigt(G));
+    svar(G, rigtigt(G));
     paastand("mål 3: løst", G.faerdig && /1 ud af 100/.test(kortT(G)) && /99 af 100/.test(d.getElementById("g-regnskab").textContent));
     videre(G).click();
     paastand("mål 4: nu bytter eddikesyren hydroner", G.opg.o.id === "balance" && G.lup[1].bytter === true && G.opg.fase === "forsoeg");
@@ -325,14 +346,14 @@ function koerTest(W) {
         videre(G).textContent === "Næste spørgsmål →" && G.peger() === null, kortT(G));
     videre(G).click();
     paastand("så kommer spørgsmålet om hydronerne", G.opg.fase === "spm" && gkG.classList.contains("spm") && /altid omkring 1 oxoniumion i luppen over eddikesyren\?/.test(kortT(G)), kortT(G));
-    G.svarValg(forkert(G));
+    svar(G, forkert(G));
     var roed4 = roed(G);
-    G.svarValg(rigtigt(G));
+    svar(G, rigtigt(G));
     paastand("mål 4: løst, med dobbeltpilen i forklaringen", roed4 && G.faerdig && kortT(G).indexOf(K.skema("eddike")) >= 0, kortT(G));
     videre(G).click();
-    G.svarValg(1);
+    svar(G, 1);
     var roed5 = roed(G) && /ingen hele HCl-molekyler/.test(statuslinje(G));
-    G.svarValg(rigtigt(G));
+    svar(G, rigtigt(G));
     paastand("mål 5: løst, og ordene stærk og svag er sat på", roed5 && G.faerdig && /stærk syre/.test(kortT(G)) && /svag syre/.test(kortT(G)) && /Alle fem opgaver om de to glas er løst\./.test(kortT(G)), kortT(G));
     paastand("kortets knap går videre til fane 2", videre(G).textContent === "Videre til Stærk eller svag? →", videre(G).textContent);
     paastand("alle fem mål er grønne i listen", d.querySelectorAll("#g-liste .opg-chip.loest").length === 5 && d.getElementById("g-loest").textContent === "5");
@@ -373,38 +394,38 @@ function koerTest(W) {
     klik(S, gp[1].x, gp[1].y);
     paastand("mens spørgsmålet om glas A står på kortet, kan luppen ikke flyttes til et andet glas", S.valgt === 0 && S.lup.syre === "HNO3" && gkS.classList.contains("blink"));
     gkS.classList.remove("blink");
-    S.svarValg(forkert(S));
+    svar(S, forkert(S));
     paastand("forkert: forklaringen på kortet peger på de grå molekyler", roed(S) && /grå molekyler/.test(statuslinje(S)), statuslinje(S));
-    S.svarValg(rigtigt(S));
-    paastand("rigtigt: forklaringen står alene på det grønne kort, glasset får sit navn, og kortets knap er Næste spørgsmål",
-        S.venter && !S.faerdig && gkS.classList.contains("loest") && /^Rigtigt ✓En stærk syre\. /.test(kortT(S)) && /salpetersyre, HNO₃\.$/.test(kortT(S)) && videre(S).textContent === "Næste spørgsmål →" &&
-        S.el.knap.hidden && S.el.status.hidden && gkS.querySelectorAll(".sk-knap").length === 0 && S.navngivet[0] && /Salpetersyre/.test(d.getElementById("s-glassene").textContent), kortT(S));
-    S.svarValg(1);
+    svar(S, rigtigt(S));
+    paastand("rigtigt: svaret er grønt på kortet, forklaringen står under det, glasset får sit navn, og kortets knap er Næste spørgsmål",
+        S.venter && !S.faerdig && gkS.classList.contains("loest") && /^Rigtigt /.test(kortT(S)) && /En stærk syre/.test(gkS.querySelector(".sk-knap.rigtig").textContent) && /salpetersyre, HNO₃\.$/.test(kortT(S)) && videre(S).textContent === "Næste spørgsmål →" &&
+        S.el.knap.hidden && S.el.status.hidden && gkS.querySelectorAll(".sk-knap:not(:disabled)").length === 0 && S.navngivet[0] && /Salpetersyre/.test(d.getElementById("s-glassene").textContent), kortT(S));
+    svar(S, 1);
     klik(S, gp[2].x, gp[2].y);
     paastand("mens forklaringen står der, kan der ikke svares igen, og et klik på et glas får knappen Næste spørgsmål til at blinke", S.venter && S.opg.fase === "spm" && S.valgt === 0 && gkS.classList.contains("blink"));
     videre(S).click();
     paastand("så kommer pilen: skemaet står på kortet med et spørgsmålstegn",
         S.opg.fase === "spm2" && S.skemaNu() === "?" && gkS.querySelectorAll(".sk-knap").length === 2 && /→/.test(gkS.textContent) && /⇌/.test(gkS.textContent) &&
         !!gkS.querySelector(".sk-skema") && gkS.querySelector(".sk-pil").textContent === "?" && /HNO₃ \+ H₂O/.test(gkS.querySelector(".sk-skema").textContent) && gkS.offsetHeight <= S.kortZone(), gkS.offsetHeight);
-    S.svarValg(forkert(S));
+    svar(S, forkert(S));
     var roedPil = roed(S) && /hele molekyler/.test(statuslinje(S));
-    S.svarValg(rigtigt(S));
+    svar(S, rigtigt(S));
     paastand("mål 1: løst med enkeltpil, og hele skemaet står i forklaringen på kortet", roedPil && S.faerdig && S.skemaNu() === "→" && !gkS.querySelector(".sk-skema") &&
-        /^Rigtigt ✓→ enkeltpil\. /.test(kortT(S)) && kortT(S).indexOf(K.skema("HNO3")) >= 0 && /stærk →/.test(d.getElementById("s-glassene").textContent), kortT(S));
+        /^Rigtigt /.test(kortT(S)) && /enkeltpil/.test(gkS.querySelector(".sk-knap.rigtig").textContent) && kortT(S).indexOf(K.skema("HNO3")) >= 0 && /stærk →/.test(d.getElementById("s-glassene").textContent), kortT(S));
     videre(S).click();
     paastand("mål 2 begynder med lukket lup", S.opg.o.id === "b" && S.valgt === -1 && S.peger() === 1);
     klik(S, gp[1].x, gp[1].y); koerF(S, 1.5);
-    S.svarValg(rigtigt(S)); videre(S).click();
-    S.svarValg(0);
+    svar(S, rigtigt(S)); videre(S).click();
+    svar(S, 0);
     var roedB = roed(S);
-    S.svarValg(rigtigt(S));
+    svar(S, rigtigt(S));
     paastand("mål 2: eddikesyre er svag og skrives med dobbeltpil", roedB && S.faerdig && S.skemaNu() === "⇌" && kortT(S).indexOf(K.skema("eddike")) >= 0, kortT(S));
     videre(S).click();
     klik(S, gp[2].x, gp[2].y); koerF(S, 1.5);
     paastand("mål 3 har tre svar, og Midt imellem er forkert", S.opg.o.spm.svar.length === 3 && S.lup.antal().delte >= 8 && S.lup.antal().delte <= 9);
-    S.svarValg(2);
+    svar(S, 2);
     var roedC = roed(S) && /kun stærk, når alle/.test(statuslinje(S));
-    S.svarValg(rigtigt(S)); videre(S).click(); S.svarValg(rigtigt(S));
+    svar(S, rigtigt(S)); videre(S).click(); svar(S, rigtigt(S));
     paastand("mål 3: citronsyre er svag", roedC && S.faerdig && /Citronsyre er en svag syre/.test(kortT(S)), kortT(S));
     videre(S).click();
     paastand("mål 4: glas D har fået sin etiket, og gættet står på det gule kort, hvor luppen ellers er",
@@ -419,15 +440,15 @@ function koerTest(W) {
     klik(S, gp[3].x, gp[3].y); koerF(S, 1.5);
     paastand("mål 4: løst, gættet holdt", vaekS && S.faerdig && /Dit gæt holdt\./.test(kortT(S)) && S.lup.antal().hele === 0, kortT(S));
     videre(S).click();
-    S.svarValg(0);
+    svar(S, 0);
     klik(S, gp[4].x, gp[4].y); koerF(S, 1.5);
     paastand("mål 5: gættet holdt ikke; dommen og det, luppen viser, står alene på kortet, før spørgsmålet kommer",
         S.venter && S.opg.fase === "forsoeg" && /^Forsøget ✓Dit gæt holdt ikke\. I luppen for glas E/.test(kortT(S)) && S.lup.antal().delte >= 4 && S.lup.antal().delte <= 5 && videre(S).textContent === "Næste spørgsmål →", kortT(S));
     videre(S).click();
     paastand("spørgsmålet om glas B og glas E: begge glas har navn og ring", S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4] && /Glas E, myresyre/.test(kortT(S)) && /Glas B, eddikesyre/.test(kortT(S)), kortT(S));
-    S.svarValg(1);
+    svar(S, 1);
     var roedE = roed(S) && /ikke lige svage/.test(statuslinje(S));
-    S.svarValg(rigtigt(S));
+    svar(S, rigtigt(S));
     paastand("mål 5: løst, og alle fem glas har navn", roedE && S.faerdig && S.navngivet.every(function (n) { return n; }) && /Alle fem glas/.test(kortT(S)) && videre(S).textContent === "Videre til Fortyndet? →", kortT(S));
     paastand("kalken bruser mest i de stærke syrer og mere i myresyre end i eddikesyre",
         S.glas[0].bobler.length > 20 && S.glas[3].bobler.length > 20 && S.glas[0].brus() === 1 && S.glas[4].brus() > S.glas[1].brus() && S.glas[2].brus() > S.glas[4].brus());
@@ -495,9 +516,9 @@ function koerTest(W) {
     gkF.classList.remove("blink");
     F.fortynd(); koerF(F, 0.3);
     paastand("under spørgsmålet kan der ikke fortyndes: glasset bliver på 0,0010 M, og kortet blinker", F.trin === 2 && !F.fort && F.glas[1].c === 0.0010 && gkF.classList.contains("blink"));
-    F.svarValg(0);
+    svar(F, 0);
     var roedF = roed(F) && /ganges/.test(statuslinje(F));
-    F.svarValg(rigtigt(F));
+    svar(F, rigtigt(F));
     paastand("mål 2: løst, 100 gange", roedF && F.faerdig && /100 gange/.test(kortT(F)) && /100 gange/.test(d.getElementById("f-toglas").textContent), kortT(F));
     videre(F).click();
     paastand("mål 3 stiller saltsyren på 0,0010 M", F.opg.o.id === "svag" && F.trin === 2);
@@ -506,14 +527,14 @@ function koerTest(W) {
     paastand("i et mål med kun et spørgsmål er knapperne væk, og saltsyren kan ikke fortyndes videre", F.trin === 2 && !F.fort && F.vaerktoej.hidden && gkF.classList.contains("blink") && statuslinje(F) === "", statuslinje(F));
     F.forfra();
     paastand("tasten R ændrer heller ikke saltsyren under et spørgsmål", F.trin === 2 && F.lup[1].antal().ox === 1 && F.opg.fase === "spm");
-    F.svarValg(0);
+    svar(F, 0);
     var roed3 = roed(F) && /hele HCl-molekyler/.test(statuslinje(F));
-    F.svarValg(rigtigt(F));
+    svar(F, rigtigt(F));
     paastand("mål 3: saltsyren er fortyndet, ikke svag", roed3 && F.faerdig && /fortyndet, ikke svag/.test(kortT(F)), kortT(F));
     videre(F).click();
-    F.svarValg(1);
+    svar(F, 1);
     var roed4f = roed(F) && /hele eddikesyremolekyler/.test(statuslinje(F));
-    F.svarValg(rigtigt(F));
+    svar(F, rigtigt(F));
     paastand("mål 4: eddikesyren er mest koncentreret", roed4f && F.faerdig && /mest koncentreret, selv om eddikesyre er en svag syre/.test(kortT(F)), kortT(F));
     videre(F).click();
     paastand("mål 5: tavlen med fire flasker er fremme under kortet, og lupperne, glassene og knapperne er væk", F.opg.o.id === "ord" && !F.tavle.hidden && F.vaerktoej.hidden && d.getElementById("f-anker-glas").hidden &&
@@ -532,7 +553,8 @@ function koerTest(W) {
     D.ORD.forEach(function (o, r) { ord(r, "k", o.konc); });
     var tavleTop = F.tavle.getBoundingClientRect().top;
     F.enter();
-    paastand("mål 5: løst med Enter, tavlen får sit stempel", F.faerdig && /RIGTIGT/.test(F.tavle.textContent) && F.tavle.querySelectorAll(".ordknap.valgt").length === 8 && /Alle fem opgaver om fortynding er løst/.test(kortT(F)) && videre(F).textContent === "Start forfra ↺", kortT(F));
+    paastand("mål 5: løst med Enter, tavlen får sit stempel", F.faerdig && /RIGTIGT/.test(F.tavle.textContent) && F.tavle.querySelectorAll(".ordknap.valgt").length === 8 && /Alle fem opgaver om fortynding er løst/.test(kortT(F)) && !videre(F), kortT(F));
+    paastand("efter den sidste opgave står Start forfra ikke på kortets knap", !/forfra/i.test(F.el.skort.textContent), F.el.skort.textContent);
     paastand("tavlen blev stående, da kortet fik forklaringen, og kortet leder videre", F.tavle.getBoundingClientRect().top === tavleTop && /^Løst ✓/.test(kortT(F)) && gkF.offsetHeight <= F.kortZone(), gkF.offsetHeight);
     var svarF = [0, 1, 2, 3, 4].every(function (i) { return visSvaret(F, i) && F.el.skort.classList.contains("svar"); });
     paastand("alle fem mål kan også løses med Vis svaret", svarF);
@@ -603,10 +625,10 @@ function koerTest(W) {
     var om1 = G.opg.fase === "spm" && G.omNu().join() === "0";
     G.vaelg(2); G.aabn(1, true); koerF(G, 0.2);
     var om2 = G.opg.fase === "spm" && G.omNu().join() === "1";
-    G.svarValg(rigtigt(G));
+    svar(G, rigtigt(G));
     var om3 = G.omNu().length === 0;
     S.vaelg(4);
-    S.svarValg(1); S.vaelgGlas(4); koerF(S, 1.5);
+    svar(S, 1); S.vaelgGlas(4); koerF(S, 1.5);
     S.knap();
     var om4 = S.opg.fase === "spm" && S.omNu().join() === "1,4" && S.navngivet[1] && S.navngivet[4];
     F.vaelg(2);
@@ -635,7 +657,7 @@ function koerTest(W) {
     paastand("æ, ø og å er skrevet rigtigt i teksterne", !m, m ? m[0] : "");
     paastand("bogens ord: hydron og oxoniumion, ingen natronlud, proton eller hydroniumion", /hydron/.test(alt2) && /oxoniumion/.test(alt2) && !/natronlud|proton|hydronium|H\+-ion/i.test(alt2));
     paastand("ingen lærer i animationen", !/kemichael/i.test(alt2) && !d.querySelector('script[src*="kemichael"]') && !NK.Laerer);
-    paastand("mappen henter kun sine egne filer", Array.prototype.every.call(d.querySelectorAll("script[src], link[href], img[src]"), function (e) { var u = e.getAttribute("src") || e.getAttribute("href"); return !/^(\.\.|\/|https?:)/.test(u); }));
+    paastand("mappen henter kun sine egne filer og det fælles papirkort", Array.prototype.every.call(d.querySelectorAll("script[src], link[href], img[src]"), function (e) { var u = e.getAttribute("src") || e.getAttribute("href"); return /^\.\.\/faelles\//.test(u) || !/^(\.\.|\/|https?:)/.test(u); }));
     paastand("de tre sprites er indlæst", NK.Sprites.klar("baegerglas") && NK.Sprites.klar("kalk") && NK.Sprites.klar("kalkskaal"));
     paastand("rundvisningen har trin til alle tre faner", ["fane-g", "fane-s", "fane-f"].every(function (id) { NK.visFane(id); NK.Rundvisning.start(id); var ok = NK.Rundvisning.aktiv(); NK.Rundvisning.luk(); return ok; }));
 
@@ -738,7 +760,7 @@ function koerTest(W) {
                     var fn = X.opg.fase + X.opg.fi;
                     if (!X.venter && !set[fn] && (X.opg.fase === "spm" || X.opg.fase === "spm2")) {
                         set[fn] = true;
-                        X.opg.o[X.opg.fase].svar.forEach(function (sv, j) { if (!sv.ok) { X.svarValg(j); maal("forkert svar " + (j + 1)); } });
+                        X.opg.o[X.opg.fase].svar.forEach(function (sv, j) { if (!sv.ok) { svar(X, j); maal("forkert svar " + (j + 1)); } });
                     }
                     X.knap();
                     koerF(X, 0.05);

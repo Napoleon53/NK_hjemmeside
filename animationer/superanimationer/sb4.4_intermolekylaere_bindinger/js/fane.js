@@ -16,13 +16,15 @@
        forsoeg uden Vis svaret: et forkert svar, der er sendt ind,
        koster stjernen, saa det ikke betaler sig at gaette loes.
      * scenekortet (visKort): fanens del lige nu (delNu) er et gaet
-       (stort og gult, svarene virker med det samme, for et gaet er
+       (stort, svarene virker med det samme, for et gaet er
        gratis), en opgave i scenen eller et spoergsmaal med svarene som
        knapper. Svarene paa et spoergsmaal vaelges og sendes foerst ind
        med Indsend svar; er spoergsmaalet multi, kan flere vaelges.
-       Loest: kortet er groent med forklaringen og knappen Naeste
-       opgave. Et rigtigt svar, der har en del mere, faar et groent
-       kort med knappen Naeste (mellemsvar).
+       Loest: kortet bliver paa delen, eleven lige har klaret (papirkortet,
+       brugerens valg 3. nov. 2026). Svarene bliver staaende, de rigtige
+       er groenne, forklaringen staar under dem, og knappen Naeste opgave
+       staar, hvor Indsend svar stod. Et rigtigt svar, der har en del
+       mere, faar det samme med knappen Naeste (mellemsvar).
      * kortets nederste raekke (x-status): det, fanen har at tilfoeje
        (sceneLinje), hint, forklaringen til et forkert svar og svaret
        paa et klik i scenen, hjaelpeknappen (Giv et hint > Naeste hint >
@@ -215,7 +217,8 @@
             var egen = this.videreFane && this.videreFane();
             if (egen) return egen;
             if (this.naesteUloeste() >= 0) return "Næste opgave →";
-            return valg.naesteFane ? "Videre til " + valg.naesteNavn + " →" : "Start forfra ↺";
+            /* Kortets knap gaar altid fremad; forfra ligger i panelet (brugeren 3. nov. 2026) */
+            return valg.naesteFane ? "Videre til " + valg.naesteNavn + " →" : "Næste opgave →";
         };
 
         /* Den hoejde, kortet har faaet sat af oeverst i scenen (uden for et gaet).
@@ -232,15 +235,21 @@
         P.visKort = function () {
             var e = this.el.skort;
             var slut = this.slutNu(), d = slut ? null : this.delNu();
-            var kl = "scenekort " + (slut ? "loest" + (slut.maade === "svar" ? " svar" : "") :
+            var kl = "scenekort " + (slut ? "loest" + (this.bliver(slut) ? " bliv" : "") + (slut.maade === "svar" ? " svar" : "") :
                 (d.slags === "gaet" ? "gaet" : (d.slags === "spm" ? "spm" : "opgave")));
             if (e.className.replace(" blink", "") !== kl) e.className = kl;
             NK.saetHTML(navn + "-ind", this.kortHTML(slut, d));
             this.visKnap();
         };
 
+        /* Kortet bliver paa delen, eleven lige har klaret (papirkortet) */
+        P.bliver = function (slut) {
+            return !!(NK.Papir && slut && slut.del && slut.del.slags !== "gaet");
+        };
+
         P.kortHTML = function (slut, d) {
             var mig = this, html;
+            if (this.bliver(slut)) return this.blivHTML(slut);
             if (slut) {
                 var maerke = slut.maade === "svar" ? "Svaret" : (slut.maerke || (this.faerdig ? "Rigtigt ✓" : "Godt ✓"));
                 var svaret = slut.svaret ? '<b class="sk-svaret">' + NK.html(slut.svaret) + "</b> " : "";
@@ -259,7 +268,7 @@
                 return html + "</div>";
             }
             var chip = d.chip || (d.slags === "spm" ? "Spørgsmål" : "Opgave");
-            html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(chip) + "</span>" + NK.html(d.tekst) + "</p>";
+            html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(chip) + "</span>" + (NK.Papir ? NK.Papir.tekst(NK.html(d.tekst)) : NK.html(d.tekst)) + "</p>";
             if (d.ekstra) html += d.ekstra;
             if (d.slags === "spm") {
                 html += '<div class="sk-svar n' + d.svar.length + (d.multi ? " multi" : "") + '">';
@@ -276,6 +285,34 @@
                 html += "</div>";
             }
             return html;
+        };
+
+        /* Papirkortet (brugerens valg 3. nov. 2026): et rigtigt svar laegger ikke
+           kortet om. Delen bliver staaende. Paa et spoergsmaal er de rigtige svar
+           groenne dér, hvor eleven klikkede (gule ved Vis svaret), et forkert
+           svar bliver roedt, de andre er tonet ned, og alle er laast. Var svaret en indstilling i scenen
+           (termometeret, et H i luppen, kortene paa tavlen), bliver opgaven
+           staaende. Forklaringen staar under, og knappen, der foerer videre,
+           staar, hvor Indsend svar stod. */
+        P.blivHTML = function (slut) {
+            var d = slut.del, vist = slut.maade === "svar";
+            var chip = d.chip || (d.slags === "spm" ? "Spørgsmål" : "Opgave");
+            var html = '<p class="sk-tekst"><span class="sk-chip">' + NK.html(chip) + "</span>" + NK.Papir.tekst(NK.html(d.tekst)) + "</p>";
+            var svaret = "";
+            if (d.slags === "spm") {
+                html += '<div class="sk-svar n' + d.svar.length + (d.multi ? " multi" : "") + '">';
+                d.svar.forEach(function (sv, j) {
+                    var kl = "sk-knap " + (sv.ok ? (vist ? "svar-vist" : "rigtig") : (d.forkert && d.forkert[j] ? "forkert" : "dim"));
+                    var tegn = d.multi ? '<span class="v-boks" aria-hidden="true">' + (sv.ok ? "✓" : "") + "</span>" :
+                        '<span class="v-bogstav">' + "ABCD".charAt(j) + "</span>";
+                    html += '<button type="button" class="' + kl + '" data-valg="' + j + '" disabled>' + tegn + "<span>" + NK.html(sv.t) + "</span></button>";
+                });
+                html += "</div>";
+            } else if (slut.svaret) {
+                /* Svaret fra scenen (fx 78 °C) staar med fed skrift foerst i forklaringen */
+                svaret = '<b class="sk-svaret">' + NK.html(slut.svaret) + "</b> ";
+            }
+            return html + NK.Papir.bliv(svaret + NK.html(slut.tekst || ""), vist ? "Svaret" : "Rigtigt", NK.html(this.videreTekst()), vist);
         };
 
         /* Kortet blinker: eleven greb ud efter forsoeget, men skal foerst goere
@@ -484,7 +521,8 @@
             this.gem();
             this.sejrT = 0;
             var alle = this.antalLoest() === this.opgaver.length;
-            this.slut = { maade: maade, svaret: svaret || "", tekst: (tekst || "") + (alle && foerste && D.FAERDIG[navn] ? " " + D.FAERDIG[navn] : "") };
+            this.slut = { maade: maade, svaret: svaret || "", tekst: (tekst || "") + (alle && foerste && D.FAERDIG[navn] ? " " + D.FAERDIG[navn] : ""),
+                del: this.delNu() };
             this.besked("", "");
             this.visKort();
             this.visListe();
@@ -493,13 +531,14 @@
             if (this.efterOpgave) this.efterOpgave();
         };
 
-        /* Et rigtigt svar, og opgaven har en del mere: forklaringen staar alene
-           paa det groenne kort, og eleven gaar selv videre med knappen */
-        P.mellemsvar = function (maade, tekst, maerke, knap) {
+        /* Et rigtigt svar, og opgaven har en del mere: eleven gaar selv videre
+           med knappen. del: delen, kortet bliver paa (papirkortet). Uden del
+           (fx lige efter et gaet) staar forklaringen alene paa kortet. */
+        P.mellemsvar = function (maade, tekst, maerke, knap, del) {
             this.venter = true;
             this.hjaelp = 0;
             this.pegKnap = false;
-            this.mellem = { maade: maade, tekst: tekst || "", maerke: maerke, knap: knap };
+            this.mellem = { maade: maade, tekst: tekst || "", maerke: maerke, knap: knap, del: del || null };
             this.besked("", "");
             this.visKort();
         };

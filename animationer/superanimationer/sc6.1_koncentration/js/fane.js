@@ -32,6 +32,19 @@
        gaetKl, html (forklaringen), videre (knappens tekst) }
    Svarene har ingen bogstaver foran: paa fane 2 hedder glassene A, B og C.
 
+   Papirkortet (brugerens valg 3. nov. 2026, faelles/papirkort.css og
+   papirkort.js): kortet er et lyst ark, og elementerne har ogsaa de
+   faelles klasser (sk-tekst, sk-chip, sk-svar, sk-knap, sk-bund,
+   st-tekst, sk-slut, sk-videre), saa det faelles udseende gaelder. Et svar
+   paa et spoergsmaal vaelger kun (valgt); det bedoemmes med knappen
+   Indsend svar (x-indsend i kortets nederste raekke). Fanen siger med
+   spmAaben(), om der er et spoergsmaal at svare paa, og bedoemmer med
+   sendSvar(j). Efter et rigtigt svar bliver kortet paa spoergsmaalet:
+     { slags: "loest", bliv: true, gul, chip, intro, foer, tekst,
+       svar: [{ j, t, rigtig, svarVist, forkert, dim }], html, videre }
+   Svaret er groent (gult, naar det blev vist), forklaringen staar under
+   svarene, og knappen videre staar, hvor Indsend svar stod.
+
    I index.html har en fane med scenekort i scenen: kortet
    <div class="scenekort" id="x-skort"> med <div id="x-ind"> (indholdet)
    og raekken <div class="kt-bund" id="x-status"> med x-besked og x-knap.
@@ -51,6 +64,9 @@
             .replace(/ ([=\/·+−]) /g, "\u00a0$1\u00a0");
     }
 
+    /* Paa papirkortet staar spoergsmaalet (saetningen med ?) halvfedt */
+    function papir(html) { return NK.Papir ? NK.Papir.tekst(html) : html; }
+
     function punktum(t) {
         t = String(t).replace(/\s+/g, " ");
         return t + (/[.?!]$/.test(t) ? "" : ".");
@@ -69,23 +85,30 @@
             return html + "</div>";
         }
         var gaet = k.gaet ? '<p class="kt-gaet' + (k.gaetKl ? " " + k.gaetKl : "") + '">' + k.gaet + "</p>" : "";
-        if (k.slags === "loest") {
+        if (k.slags === "loest" && !k.bliv) {
             /* Forklaringen til venstre og knappen, der foerer videre, til hoejre */
-            return '<div class="kt-slut"><div class="kt-slut-t">' + gaet + (k.foer || "") +
-                '<p class="kt-tekst"><span class="kt-chip">' + NK.html(k.chip) + "</span>" +
-                (k.svaret ? '<b class="kt-svaret">' + NK.html(punktum(k.svaret)) + "</b> " : "") + (k.html || "") + "</p></div>" +
-                '<button type="button" class="kt-videre" data-videre="1">' + NK.html(k.videre) + "</button></div>";
+            return '<div class="kt-slut sk-slut"><div class="kt-slut-t sk-slut-tekst">' + gaet + (k.foer || "") +
+                '<p class="kt-tekst sk-tekst"><span class="kt-chip sk-chip">' + NK.html(k.chip) + "</span>" +
+                (k.svaret ? '<b class="kt-svaret sk-svaret">' + NK.html(punktum(k.svaret)) + "</b> " : "") + (k.html || "") + "</p></div>" +
+                '<button type="button" class="kt-videre sk-videre" data-videre="1">' + NK.html(k.videre) + "</button></div>";
         }
-        if (k.intro) html += '<p class="kt-intro">' + NK.html(k.intro) + "</p>";
-        html += (k.foer || "") + '<p class="kt-tekst"><span class="kt-chip">' + NK.html(k.chip) + "</span>" + NK.html(k.tekst) + "</p>" + gaet;
+        /* Paa papirkortet staar indledningen foran spoergsmaalet i samme linje */
+        var intro = "";
+        if (k.intro && NK.Papir) intro = '<span class="kt-intro">' + papir(NK.html(k.intro)) + "</span> ";
+        else if (k.intro) html += '<p class="kt-intro">' + NK.html(k.intro) + "</p>";
+        html += (k.foer || "") + '<p class="kt-tekst sk-tekst"><span class="kt-chip sk-chip">' + NK.html(k.chip) + "</span>" + intro + papir(NK.html(k.tekst)) + "</p>" + gaet;
         if (k.svar) {
-            html += '<div class="kt-svar n' + k.svar.length + '">';
+            html += '<div class="kt-svar sk-svar n' + k.svar.length + '">';
             k.svar.forEach(function (s) {
-                html += '<button type="button" class="kt-knap' + (s.forkert ? " forkert" : "") + (s.rigtig ? " rigtig" : "") +
+                var kl = (s.forkert ? " forkert" : "") + (s.rigtig ? " rigtig" : "") + (s.svarVist ? " svar-vist" : "") +
+                    (s.valgt ? " valgt" : "") + (s.dim ? " dim" : "");
+                html += '<button type="button" class="kt-knap sk-knap' + kl +
                     '" data-valg="' + s.j + '"' + (s.laast ? " disabled" : "") + ">" + NK.html(s.t) + "</button>";
             });
             html += "</div>";
         }
+        /* Kortet bliver paa spoergsmaalet: forklaringen og knappen videre under svarene */
+        if (k.bliv) html += NK.Papir.bliv(k.html || "", k.gul ? "Svaret" : "Rigtigt", NK.html(k.videre), k.gul);
         return html;
     }
 
@@ -113,11 +136,12 @@
             this.pegKnap = false;
             this.slutEkstra = "";
             this.el = { knap: el("knap"), liste: el("liste"), nye: el("nye"), kort: el("kort"), besked: el("besked"),
-                forfra: el("forfra"), skort: el("skort"), ind: el("ind"), status: el("status") };
+                forfra: el("forfra"), skort: el("skort"), ind: el("ind"), status: el("status"), indsend: el("indsend") };
             this.fast = { html: "", klasse: "" };
             this.nuB = this.fast;
             this.kortT = 0;
             this.el.knap.addEventListener("click", function () { mig.knap(); });
+            if (this.el.indsend) this.el.indsend.addEventListener("click", function () { mig.indsendKlik(); });
             if (this.el.nye) this.el.nye.addEventListener("click", function () { mig.nyeTal(); });
             if (this.el.forfra) this.el.forfra.addEventListener("click", function () { mig.forfra(); mig.fokus(); });
             /* Svarene og den groenne knap paa scenekortet */
@@ -181,6 +205,7 @@
             this.faerdig = false;
             this.venter = false;
             this.slutEkstra = "";
+            this.valgtSvar = null;
             this.lavOpgave(i, nyeTal);
             this.layout();
             this.visKort();
@@ -221,7 +246,7 @@
            rigtigt, forklaringen og knappen videre paa et groent kort. */
         P.visSceneKort = function () {
             var k = this.kortData(), e = this.el.skort;
-            var kl = "scenekort " + k.slags + (k.gul ? " svar" : "");
+            var kl = "scenekort " + k.slags + (k.gul ? " svar" : "") + (k.bliv ? " bliv" : "");
             if (e.className.replace(" blink", "") !== kl) e.className = kl;
             var html = fast(kortHTML(k));
             if (html !== this.kortSidst) {
@@ -237,13 +262,55 @@
             return valg.naesteFane ? "Videre til " + valg.naesteNavn + " →" : "Forfra med nye tal ↺";
         };
 
-        /* Eleven klikkede i scenen, foer der var gaettet: kortet blinker */
-        P.gaetBlink = function () {
+        /* Kortet blinker (paa papirkortet ét bloedt gult blink) */
+        P.blinkKort = function () {
             var e = this.el.skort;
             e.classList.remove("blink");
             void e.offsetWidth;
             e.classList.add("blink");
+        };
+
+        /* Eleven klikkede i scenen, foer der var gaettet: kortet blinker */
+        P.gaetBlink = function () {
+            this.blinkKort();
             this.kortBesked(NK.html(D.GAET_LINJE), 5, "gul");
+        };
+
+        /* ----- Indsend svar (brugeren 24. okt. 2026: "der skal som minimum vaere
+           et indsend svar") ------------------------------------------------------
+           Et svar paa et spoergsmaal vaelger kun; det bedoemmes foerst, naar
+           eleven trykker Indsend svar. Et gaet er gratis og virker med det samme. */
+        P.vaelgKortSvar = function (j) {
+            if (!this.spmAaben || !this.spmAaben()) return false;
+            this.valgtSvar = j;
+            this.visKort();
+            return true;
+        };
+
+        P.indsendKlik = function () {
+            if (this.auto) return;
+            if (!this.spmAaben || !this.spmAaben()) { this.blinkKort(); return; }
+            if (this.valgtSvar === null || this.valgtSvar === undefined) {
+                this.blinkKort();
+                this.kortBesked("Vælg et af svarene på kortet først.", 3.5);
+                return;
+            }
+            var j = this.valgtSvar;
+            this.valgtSvar = null;
+            this.sendSvar(j);
+            this.fokus();
+        };
+
+        /* Indsend svar staar kun fremme under et spoergsmaal; graa, til et svar er valgt */
+        P.visIndsend = function () {
+            var e = this.el.indsend;
+            if (!e) return;
+            var aaben = !!(this.spmAaben && this.spmAaben());
+            e.hidden = !aaben;
+            var klar = aaben && this.valgtSvar !== null && this.valgtSvar !== undefined;
+            e.classList.toggle("klar", klar);
+            e.classList.toggle("ikke-klar", !klar);
+            e.setAttribute("aria-disabled", klar ? "false" : "true");
         };
 
         /* Den hoejde, kortet har faaet sat af oeverst i scenen (valg.zone:
@@ -283,6 +350,7 @@
             /* Paa scenekortet foerer den groenne knap videre; den gule er vaek imens */
             if (this.el.skort) {
                 this.el.knap.hidden = videre;
+                this.visIndsend();
                 this.visBund();
             }
         };
@@ -399,7 +467,7 @@
             var st = this.el.status, b = this.nuB || this.fast, harTekst = !!b.html;
             this.el.besked.hidden = !harTekst;
             st.hidden = (this.faerdig || this.venter) && !harTekst;
-            var kl = "kt-bund" + (b.klasse ? " " + b.klasse : "") + (harTekst ? "" : " tom");
+            var kl = "kt-bund sk-bund" + (b.klasse ? " " + b.klasse : "") + (harTekst ? "" : " tom");
             if (st.className.replace(" ryster", "") !== kl) st.className = kl;
             this.tjekZone();
         };

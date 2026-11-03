@@ -78,7 +78,12 @@
 
     P.nyFase = function () { this.byg(); };
     P.efterOpgave = function () { this.loebT = 0; this.byg(); };
-    P.nulstilScene = function () { this.nyOpgave(this.opg.o); };
+    /* R begynder maalet forfra. Venter kortet paa Naeste (et rigtigt svar bliver
+       staaende paa kortet), blinker kortet i stedet, saa regnestykket bliver */
+    P.nulstilScene = function () {
+        if (this.venter) { this.kortBlink(); return; }
+        this.nyOpgave(this.opg.o);
+    };
 
     /* ----- Tavlen -------------------------------------------------------------------- */
     function broekHTML(r) {
@@ -239,7 +244,7 @@
         this.regnetRigtigt("selv");
     };
 
-    P.regnetRigtigt = function () {
+    P.regnetRigtigt = function (maade) {
         var r = this.r;
         this.regnet = true;
         this.yVis = this.opg.o.Y;
@@ -248,8 +253,10 @@
         /* Tallene staar bagefter med dansk komma, som i en pæn beregning */
         r.over.concat(r.under).forEach(function (d) { mig.felt(d.s).value = tal(mig.c[d.s]); });
         Array.prototype.forEach.call(NK.el("r-regn").querySelectorAll("input"), function (f) { f.classList.remove("forkert"); f.classList.add("rigtig"); });
-        this.naesteFase();
-        this.godLinje("Y = " + res.value + ". Nu skal Y sammenlignes med K.");
+        /* Papirkortet (3. nov. 2026): opgaven bliver staaende med Rigtigt og Y under
+           den, og spoergsmaalet om Y og K kommer foerst, naar eleven trykker Naeste
+           spoergsmaal. Rosen staar aldrig under det naeste spoergsmaal. */
+        this.mellemsvar(maade === "svar" ? "svar" : "selv", "Y = " + res.value + ". Nu skal Y sammenlignes med K.");
         this.byg();
     };
 

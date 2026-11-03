@@ -85,8 +85,9 @@
             slags: "spm", chip: "Spørgsmål",
             tekst: "Atomet med den gule ring sidder i en funktionel gruppe. Hvilken stofklasse giver gruppen?",
             kolonner: 6,
+            /* Prikkerne har blaekfarven: kortet er lyst papir (3. nov. 2026) */
             svar: D.KLASSER.map(function (k) {
-                return { t: k.navn, prik: k.farve, klasse: mig.forkert[k.id] ? "forkert" : "", laast: !!mig.forkert[k.id] };
+                return { t: k.navn, prik: k.blaek, klasse: mig.forkert[k.id] ? "forkert" : "", laast: !!mig.forkert[k.id] };
             })
         };
     };
@@ -131,8 +132,10 @@
         this.visKort();
     };
 
+    /* Bedoemmer et svar. Det kaldes af Indsend svar (js/fane.js): et klik paa en
+       stofklasse vaelger den kun. */
     P.svarValg = function (j) {
-        if (this.valgt === null) return;
+        if (this.valgt === null || this.bliv) return;
         var k = D.KLASSER[j].id, g = this.b.grupper[this.valgt];
         if (this.forkert[k]) return;
         if (k === g.klasse) { this.gruppeFundet(false); return; }
@@ -143,25 +146,38 @@
         this.fejlLinje(K.gruppeFejl(this.b, g, k));
     };
 
+    /* Gruppen er fundet: den faar stofklassens farve paa stregerne og sit navn.
+       Papirkortet (brugerens valg 3. nov. 2026): spoergsmaalet bliver staaende
+       med svaret groent (gult, naar hjaelpeknappen viste det) og forklaringen
+       under svarene, og den gule ring bliver, saa laenge spoergsmaalet staar der.
+       Eleven gaar selv videre til den naeste gruppe. */
     P.gruppeFundet = function (vist) {
         var g = this.b.grupper[this.valgt], kl = K.klasse(g.klasse);
         this.fundet[this.valgt] = true;
         this.kendte[g.klasse] = true;
-        this.valgt = null;
-        this.valgtAtom = null;
-        this.forkert = {};
         this.bygTegning();
-        if (this.erFaerdig()) { this.afslut(); return; }
-        this.nulstilHjaelp();
-        if (vist) this.besked('<span class="b-maerke">Svaret</span> ' + NK.html(K.stor(kl.har) + " er " + kl.ental + "."), "gul");
-        else this.godLinje(K.stor(kl.har) + " er " + kl.ental + ".");
-        this.visKort();
+        var b = { rigtig: D.KLASSER.map(function (k) { return k.id; }).indexOf(g.klasse), maade: vist ? "svar" : "selv" };
+        if (this.erFaerdig()) { this.bliv = b; this.afslut(); return; }
+        b.tekst = K.stor(kl.har) + " er " + kl.ental + ".";
+        b.knap = "Find den næste gruppe →";
+        b.videre = function () {
+            this.valgt = null;
+            this.valgtAtom = null;
+            this.heleGruppen = false;
+            this.forkert = {};
+            this.nulstilHjaelp();
+            this.besked("", "");
+            this.visKort();
+        };
+        this.blivPaa(b);
     };
 
     P.erFaerdig = function () { return this.antalFundet() === this.b.grupper.length; };
 
+    /* Alle grupper er fundet. Blev den sidste fundet med et svar, bliver kortet
+       paa spoergsmaalet (this.bliv), saa valgt bliver staaende til naeste opgave. */
     P.afslut = function () {
-        this.valgt = null;
+        if (!this.bliv) this.valgt = null;
         this.loest("selv", K.blandetForklaring(this.b));
     };
 
@@ -276,7 +292,7 @@
             F.glorie(ctx, mol, g, s, mig.maengde(i), K.klasse(mig.b.grupper[i].klasse).blaek, 0.2);
         });
         /* Det valgte atom, eller hele gruppen efter et forkert svar eller et hint */
-        if (this.valgt !== null) {
+        if (this.valgt !== null && !this.faerdig) {
             var puls = 0.5 + 0.5 * Math.sin(this.tid * 4);
             if (this.heleGruppen) F.glorie(ctx, mol, g, s, this.maengde(this.valgt), "#f2c53d", 0.55);
             F.ring(ctx, g.P[this.valgtAtom !== null ? this.valgtAtom : this.b.grupper[this.valgt].atomer[0]],

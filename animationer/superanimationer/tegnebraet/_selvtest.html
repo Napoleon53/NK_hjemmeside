@@ -316,6 +316,58 @@ function koerTest(W) {
     paastand("fortryd tager teksten af igen", F.objekter.length === 1 && !F.objekter[0].over);
     F.ned(F.px({ x: pil.x, y: pil.y }), { button: 2 });
     paastand("højreklik på pilen sletter den", F.objekter.length === 0);
+    /* Traek: kaeden staar som forslag og kommer foerst paa tavlen ved slip (3. nov. 2026) */
+    F.nulstil(true, true);
+    F.grundstof = "C";
+    q = F.px(F.mol.atomer[0]);
+    var histFoer = F.hist.length;
+    F.ned(q, { button: 0 });
+    for (i = 1; i <= 20; i++) F.flyt({ x: q.x + i * 10, y: q.y });
+    var forslagNu = F.forslag;
+    paastand("mens der trækkes, er tavlen uændret, og kæden er et forslag", F.mol.atomer.length === 1 && forslagNu && forslagNu.punkter.length >= 3);
+    paastand("forslaget tæller startatomet med (4 bindingslængder vandret: 5 eller 6 C)", forslagNu.antalC === forslagNu.punkter.length + 1 && forslagNu.antalC >= 5 && forslagNu.antalC <= 6, forslagNu.antalC);
+    F.op({ x: q.x + 200, y: q.y });
+    paastand("ved slip kommer kæden på tavlen, ét skridt i fortryd", F.mol.atomer.length === forslagNu.antalC && F.hist.length === histFoer + 1 && NK.Navn.analyser(F.mol).sub.length === 0, F.mol.atomer.length + " / " + (F.hist.length - histFoer));
+    F.fortryd();
+    paastand("fortryd tager hele kæden af", F.mol.atomer.length === 1);
+    /* Lille skala, saa tavlen har plads til mere end 20 */
+    var G = new NK.Tegnebraet({
+        felt: function () { return { x: 0, y: 0, b: 2000, h: 2000 }; }, skala: function () { return 20; },
+        regler: { kunC: true, knaek: true, maks: function () { return 80; } }, aendret: function () {}, toast: function () {}
+    });
+    G.nulstil(true, true);
+    var qg = G.px(G.mol.atomer[0]);
+    G.ned(qg, { button: 0 });
+    for (i = 1; i <= 40; i++) G.flyt({ x: qg.x + i * 11, y: qg.y + i });
+    var gTal = G.forslag && G.forslag.antalC;
+    G.op({ x: qg.x + 440, y: qg.y + 40 });
+    paastand("et langt træk fra startpunktet giver højst 20 C-atomer, og tallet siger 20 C", G.mol.atomer.length === 20 && gTal === 20, G.mol.atomer.length + " / " + gTal);
+    var gEnde = G.mol.atomer[G.mol.atomer.length - 1], pg = G.px(gEnde);
+    G.ned(pg, { button: 0 });
+    for (i = 1; i <= 40; i++) G.flyt({ x: pg.x + i * 3, y: pg.y + i * 10 });
+    gTal = G.forslag && G.forslag.antalC;
+    G.op({ x: pg.x + 120, y: pg.y + 400 });
+    paastand("fra en kædes ende: højst 20 nye C-atomer", G.mol.atomer.length === 40 && gTal === 20, G.mol.atomer.length + " / " + gTal);
+    /* Traek tilbage forbi kaedens ende: ingen U-vending eller spiral */
+    var endeA = F.mol.atomer[F.mol.atomer.length - 1], foerAntal = F.mol.atomer.length;
+    var pe = F.px(endeA);
+    F.ned(pe, { button: 0 });
+    for (i = 1; i <= 12; i++) F.flyt({ x: pe.x + i * 6, y: pe.y - i * 9 });
+    for (i = 1; i <= 12; i++) F.flyt({ x: pe.x + 72 - i * 14, y: pe.y - 108 + i * 2 });
+    var bagud = F.forslag;
+    F.op({ x: pe.x + 72 - 168, y: pe.y - 84 });
+    var tilbage = F.mol.atomer.slice(foerAntal).every(function (a) { return Math.hypot(a.x - endeA.x, a.y - endeA.y) < 4.5; });
+    paastand("et træk, der slutter tæt på kæden, bøjer ikke kæden rundt", (!bagud || bagud.punkter.length <= 4) && tilbage, bagud && bagud.punkter.length);
+    /* Et andet grundstof: ét atom ved slip */
+    F.nulstil(true, true);
+    F.grundstof = "O";
+    q = F.px(F.mol.atomer[0]);
+    F.ned(q, { button: 0 });
+    for (i = 1; i <= 20; i++) F.flyt({ x: q.x + i * 10, y: q.y });
+    paastand("med O valgt er forslaget ét O, også ved et langt træk", F.forslag && F.forslag.punkter.length === 1 && F.forslag.el === "O" && F.mol.atomer.length === 1);
+    F.op({ x: q.x + 200, y: q.y });
+    paastand("ved slip: methanol", NK.Navn.analyser(F.mol).navn === "methanol", NK.Navn.analyser(F.mol).navn);
+    F.grundstof = "C";
 
     overskrift("6. Navn til tegning");
     var NL = NK.NavnLaeser;

@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Isomerjagten</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⌬</span> Isomerjagten</h1>
@@ -34,6 +35,7 @@
         <div class="tegnevaerktoej" id="j-vaerktoej">
             <span class="vt-gruppe" id="j-vt"></span>
             <span class="vt-gruppe vt-hoejre">
+                <span class="vt-skifter" id="j-stil" role="group" aria-label="Visning"></span>
                 <button type="button" class="vtknap let" id="j-slet" data-vt="slet" title="Klik på et atom for enden af kæden for at slette det (højreklik gør det samme)">✕ Slet</button>
                 <button type="button" class="vtknap let" id="j-fortryd" title="Fortryd det sidste (Ctrl+Z)">↶ Fortryd</button>
                 <button type="button" class="vtknap let" id="j-ryd" title="Ryd tavlen og begynd forfra (R)">Ryd</button>
@@ -61,6 +63,12 @@
         <div class="kort" id="j-jagter">
             <h2>Jagterne <span class="taeller">klaret <b id="j-klaret">0</b>/<span id="j-ialt">8</span></span></h2>
             <div class="jagtliste" id="j-jagtliste"></div>
+            <!-- Isomeri-quizzen til og fra for den valgte jagt (js/sim_jagt.js, saetQuiz) -->
+            <button type="button" class="quizkontakt" id="j-quiz" role="switch" aria-checked="true"
+                title="Slå spørgsmålet om slags isomeri til eller fra i denne jagt">
+                <span class="kk-kontakt"><i></i></span>
+                <span class="qk-tekst"><b>Isomeri-quiz</b><small id="j-quiz-note"></small></span>
+            </button>
         </div>
 
         <div class="kort" id="j-hylde">
@@ -137,6 +145,7 @@
 <script src="../../molekylemotor/js/tegnebraet.js"></script>
 <script src="js/data.js"></script>
 <script src="js/kemi.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_jagt.js"></script>
 <script src="js/rundvisning.js"></script>

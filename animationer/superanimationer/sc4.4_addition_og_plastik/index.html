@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Addition og plastik</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">C=C</span> Addition og plastik</h1>
@@ -37,6 +38,7 @@
             <div class="sk-bund" id="a-status">
                 <p class="st-tekst" id="a-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="a-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="a-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <button class="forfraknap hjoerne" id="a-forfra" type="button" title="Læg et nyt molekyle klar (R)">Nyt molekyle ↺</button>
@@ -69,6 +71,7 @@
             <div class="sk-bund" id="b-status">
                 <p class="st-tekst" id="b-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="b-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="b-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="b-anker-lup"></div>
@@ -104,6 +107,7 @@
             <div class="sk-bund" id="p-status">
                 <p class="st-tekst" id="p-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="p-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="p-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="p-anker-kaede"></div>
@@ -187,6 +191,7 @@
 <script src="js/tegning.js"></script>
 <script src="js/glas.js"></script>
 <script src="js/lup.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_addition.js"></script>
 <script src="js/sim_bromvand.js"></script>

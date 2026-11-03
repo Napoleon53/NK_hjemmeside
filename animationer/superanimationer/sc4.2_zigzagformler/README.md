@@ -19,7 +19,8 @@ tælle atomerne, give molekylet navn og se, om to tegninger er det samme stof.
 
 1. **Pointen:** som ovenfor.
 2. **Afløser:** 6.2, 6.3 og 6.4. Alle seks øvelser fra de gamle er med (se
-   nedenfor). Det gode fra de gamle: kæden bygges, mens man trækker; hovedkæden
+   nedenfor). Det gode fra de gamle: kæden bygges, når man trækker (fra 3. nov. 2026 står
+   den som gråt forslag og tegnes ved slip, se molekylemotorens README); hovedkæden
    bliver grøn og sidegrupperne blå, når svaret er rigtigt; listen over løste og
    fundne molekyler med små tegninger.
 3. **Naboer, der ikke røres:** c4.1 (kogepunkt), c4.6-c4.7

@@ -16,11 +16,13 @@
     var TURE = {
         "fane-j": [
             { sel: "#j-skort", titel: "Kortet øverst", tekst: "Den gule ramme viser den molekylformel, du jagter, og hvor mange atomer af hver slags den har. Teksten siger, hvor mange isomerer der er. Den gule knap giver ét hint ad gangen og til sidst svaret." },
-            { sel: "#j-vt", titel: "Værktøjerne", tekst: "Kæde: træk fra et atom, eller klik på et, så vokser kæden. I jagterne med oxygen sætter −OH en OH-gruppe på et carbonatom, og C → O gør et carbonatom til et oxygenatom, fx midt i kæden i en ether." },
+            { sel: "#j-vt", titel: "C og O", tekst: "Med C valgt tegner et træk fra et atom en kæde. Den står svagt med antallet af carbonatomer og kommer på tavlen, når du slipper musen. Med O valgt sætter et træk et oxygenatom på, og et klik gør et carbonatom til O, fx midt i kæden i en ether." },
+            { sel: "#j-stil", titel: "Visningen", tekst: "Zigzag tegner molekylerne som i bogen. Alle atomer viser også carbon- og hydrogenatomerne." },
             { sel: "#j-anker-tavle", titel: "Tavlen", tekst: "Tegn én isomer ad gangen her. Et højreklik på et atom for enden af kæden sletter det." },
             { sel: "#j-indsend", titel: "Indsend svar", tekst: "Knappen viser tegningens molekylformel. Tryk på den, når tegningen er færdig. Er stoffet nyt, kommer det på hylden, og tegningen bliver stående, så du kan ændre den til den næste." },
             { sel: "#j-slet, #j-fortryd, #j-ryd", titel: "Slet, Fortryd og Ryd", tekst: "Med Slet forsvinder det atom for enden af kæden, du klikker på. Fortryd tager det sidste skridt tilbage. Ryd fjerner hele tegningen." },
             { sel: "#j-hylde", titel: "Hylden", tekst: "De isomerer, du har fundet, står her sorteret efter stofklasse. Hver tom plads er en isomer, der mangler. Tegner du et stof igen, ryster det på hylden." },
+            { sel: "#j-quiz", titel: "Isomeri-quiz", tekst: "Med quizzen slået til spørger kortet efter hver ny isomer: hvilken slags isomerer er den og en isomer fra hylden? Den er slået til i de tre første jagter og fra i resten. Du kan selv slå den til og fra i hver jagt." },
             { sel: "#j-jagter", titel: "Jagterne", tekst: "Otte jagter fra let til mester. Klik på en for at vælge den. En jagt er klaret, når alle isomerer er fundet, og kogepunkterne er sat på plads. Uden fejl og uden at se svaret giver den en stjerne." }
         ]
     };

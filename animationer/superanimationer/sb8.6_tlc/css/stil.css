@@ -1783,3 +1783,34 @@ kbd {
     .sk-regn { margin-top: 3px; font-size: 1.02rem; }
     .sk-regn .brk > span { padding: 2px 7px; }
 }
+
+/* =====================================================================
+   Papirkortet (3. nov. 2026): kortet er et lyst ark (../faelles/papirkort.css).
+   Her kun det, der er saerligt for denne animation og var hvidt eller moerkt
+   paa det moerke kort: felterne og regnestykket paa fane 2 og
+   afkrydsningsboksene (vaelg alle, der passer).
+   ===================================================================== */
+html body.papirkort.papirkort .scenekort .sk-felt,
+html body.papirkort.papirkort .scenekort .sk-regn { color: var(--pk-tekst); font-weight: 600; }
+html body.papirkort.papirkort .scenekort .sf-efter { color: var(--pk-tekst-svag); font-weight: 500; }
+html body.papirkort.papirkort .scenekort .sk-regn .brk > span { color: var(--pk-tekst-svag); }
+html body.papirkort.papirkort .scenekort .sk-regn .brk > span:first-child { border-bottom-color: var(--pk-tekst); }
+html body.papirkort.papirkort .scenekort .sk-input {
+    border: 1.5px solid #a8a293;
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-weight: 600;
+}
+html body.papirkort.papirkort .scenekort .sk-input:focus { border-color: var(--pk-blaa); box-shadow: 0 0 0 3px rgba(42, 118, 172, 0.22); }
+html body.papirkort.papirkort .scenekort .sk-input.forkert { border-color: var(--pk-roed); background-color: var(--pk-roed-lys); color: var(--pk-roed-tekst); }
+/* Delen er klaret, og kortet bliver paa den: tallene staar laast, groenne
+   (gule ved Vis svaret) som et rigtigt svar */
+html body.papirkort.papirkort .scenekort .sk-input.rigtig:disabled { border-color: var(--pk-groen); background-color: var(--pk-groen-lys); color: #1d5a3a; opacity: 1; -webkit-text-fill-color: #1d5a3a; }
+html body.papirkort.papirkort .scenekort .sk-input.svar-vist:disabled { border-color: #c9a640; background-color: var(--pk-gul-lys); color: var(--pk-gul-tekst); opacity: 1; -webkit-text-fill-color: var(--pk-gul-tekst); }
+
+html body.papirkort.papirkort .scenekort .v-boks { border: 1.5px solid #a8a293; background-color: #ffffff; color: #ffffff; }
+html body.papirkort.papirkort .scenekort .sk-knap.valgt .v-boks { border-color: var(--pk-blaa); background-color: var(--pk-blaa); }
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig .v-boks { border-color: var(--pk-groen); background-color: var(--pk-groen); }
+html body.papirkort.papirkort .scenekort .sk-knap.svar-vist .v-boks { border-color: #c9a640; background-color: #c9a640; }
+/* Boksen har selv fluebenet, saa knappen faar ikke et ekstra foran */
+html body.papirkort.papirkort .scenekort .sk-knap.rigtig:has(.v-boks)::before { content: none; }

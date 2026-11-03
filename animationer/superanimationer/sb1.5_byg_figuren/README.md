@@ -100,3 +100,9 @@ ordene dækker ingen plads.
 - Kapitel B5 til B8 (B2, B3 og B4 er lavet 2. nov. 2026 som `sb2.9_byg_figuren`, `sb3.5_byg_figuren` og `sb4.10_byg_figuren`). Panelet `samling_b_bygfiguren.html` er klar til flere knapper
   (`data-emne="b2.byg"` osv.), og `FEEDBACK_EMNER` i `samling_alt_b.html` skal have en
   linje mere pr. kapitel.
+
+## Papirkortet (3. nov. 2026)
+
+Kortet er det lyse papirkort (se Fælles krav i `../README.md`): `../faelles/papirkort.css`
+er indlæst i `index.html` og selvtesten, og `<body class="papirkort">`. Kun
+udseendet er ændret; motoren er den samme som i `sc1.5_byg_figuren`, som var prøven.

@@ -23,7 +23,10 @@
 
    Efter et rigtigt svar bliver kortet groent med svaret og forklaringen,
    og kortets knap hedder Naeste spoergsmaal: det naeste kommer foerst, naar
-   eleven selv gaar videre. Det, tabellen viste, foer der blev haeldt, staar som
+   eleven selv gaar videre. Paa papirkortet (3. nov. 2026) bliver kortet paa
+   spoergsmaalet: svaret er groent, dér hvor eleven klikkede, forklaringen
+   staar under svarene, og knappen staar, hvor Indsend svar stod. Et svar
+   (ogsaa et klik paa et glas) vaelger kun; Indsend svar bedoemmer det. Det, tabellen viste, foer der blev haeldt, staar som
    en lille linje under de tal, der har aendret sig, og etiketten bliver
    paa et glas, der er haeldt tomt (brugerens oenske 3. okt. 2026).
    ===================================================================== */
@@ -116,6 +119,7 @@
         this.forkerte = [];
         this.rigtig = null;
         this.rigtigMaade = "ok";
+        this.valgtSvar = null;
         if (s.foer) this.overLinje = s.foer.linje;
         /* Svarene blandes, saa det rigtige ikke altid staar samme sted; glassene
            staar i orden (A, B, C) */
@@ -157,6 +161,20 @@
        paa. Rigtigt svar: svaret, forklaringen og knappen videre. */
     P.kortData = function () {
         var s = this.spm(), mig = this, n = this.opg.spm.length;
+        var chip = n > 1 ? "Spørgsmål " + (this.spmNr + 1) + " af " + n : "Spørgsmål";
+        if ((this.faerdig || this.venter) && NK.Papir) {
+            /* Papirkortet: spoergsmaalet bliver staaende med svaret groent (gult,
+               naar det blev vist), og forklaringen staar under svarene */
+            var vist = this.rigtigMaade === "svar";
+            return { slags: "loest", bliv: true, gul: vist, chip: chip, intro: s.regn ? "" : this.overLinje,
+                     foer: this.regnHTML(s, true), tekst: s.tekst, videre: this.videreTekst(),
+                     html: NK.html(s.efter) + (this.faerdig && this.slutEkstra ? " " + NK.html(this.slutEkstra) : ""),
+                     svar: this.orden.map(function (j) {
+                         var r = mig.rigtig === j;
+                         return { j: j, t: s.svar[j].t, rigtig: r && !vist, svarVist: r && vist, forkert: mig.forkerte.indexOf(j) >= 0,
+                                  dim: !r && mig.forkerte.indexOf(j) < 0, laast: true };
+                     }) };
+        }
         if (this.faerdig || this.venter) {
             var gul = this.rigtigMaade === "svar";
             return { slags: "loest", gul: gul, chip: gul ? "Svaret" : "Rigtigt ✓", svaret: s.regn ? "" : s.svar[this.rigtig].t,
@@ -164,15 +182,32 @@
                      html: NK.html(s.efter) + (this.faerdig && this.slutEkstra ? " " + NK.html(this.slutEkstra) : "") };
         }
         if (this.fase === "handling") return { slags: "opgave", chip: "Opgave " + (this.nr + 1), tekst: s.foer.linje };
-        return { slags: "spm", chip: n > 1 ? "Spørgsmål " + (this.spmNr + 1) + " af " + n : "Spørgsmål",
+        return { slags: "spm", chip: chip,
                  intro: s.regn ? "" : this.overLinje, foer: this.regnHTML(s, false), tekst: s.tekst,
                  svar: this.orden.map(function (j) {
                      var forkert = mig.forkerte.indexOf(j) >= 0;
-                     return { j: j, t: s.svar[j].t, forkert: forkert, rigtig: mig.rigtig === j, laast: forkert || mig.rigtig !== null };
+                     return { j: j, t: s.svar[j].t, forkert: forkert, rigtig: mig.rigtig === j, valgt: mig.valgtSvar === j && !forkert,
+                              laast: forkert || mig.rigtig !== null };
                  }) };
     };
 
-    P.kortValg = function (j) { this.vaelgSvar(j, "ok"); };
+    /* Et svar paa kortet (eller et klik paa et glas) vaelger kun; Indsend svar
+       bedoemmer det (js/fane.js: vaelgKortSvar, indsendKlik) */
+    P.kortValg = function (j) {
+        if (this.forkerte.indexOf(j) >= 0) return;
+        this.vaelgKortSvar(j);
+    };
+
+    P.spmAaben = function () { return this.fase === "spm" && !this.faerdig && !this.venter && !this.travl() && this.rigtig === null; };
+
+    P.sendSvar = function (j) { this.vaelgSvar(j, "ok"); };
+
+    /* Det glas, det valgte svar handler om (det lyser stille i scenen) */
+    P.valgtGlas = function () {
+        if (this.valgtSvar === null || this.valgtSvar === undefined || !this.spmAaben()) return -1;
+        var x = this.spm().svar[this.valgtSvar];
+        return x && x.glas !== undefined ? x.glas : -1;
+    };
 
     /* Regnestykket i opgaven Enhederne: enheden er et gult ?, til svaret er
        rigtigt. Saa staar enheden der, og linjen under viser, hvad der gaar ud. */
@@ -238,6 +273,7 @@
     P.rigtigSvar = function (j, maade) {
         var s = this.spm(), mig = this, vis = s.vis || {};
         this.rigtig = j;
+        this.valgtSvar = null;
         this.rigtigMaade = maade;
         this.hjaelp = 0;
         if (maade === "svar") { this.brugtSvar = true; this.maade = "svar"; }
@@ -551,10 +587,11 @@
             else this.goerHandling(false);
             return false;
         }
-        /* Mens fanen venter paa Naeste spoergsmaal, svarer et klik paa et glas ikke */
+        /* Mens fanen venter paa Naeste spoergsmaal, svarer et klik paa et glas ikke.
+           Et klik paa et glas vaelger det som svar; Indsend svar bedoemmer det. */
         if (this.fase === "spm" && s.hvem && u.slags === "glas" && !this.venter) {
             var j = s.svar.map(function (x) { return x.glas; }).indexOf(u.i);
-            if (j >= 0) this.vaelgSvar(j, "ok");
+            if (j >= 0) this.kortValg(j);
             return false;
         }
         if (u.slags === "lup") {
@@ -680,7 +717,7 @@
             var prikker = g.prikVis > 0.01 ? g.prikker.map(function (p) {
                 return { u: p.u, v: p.v, a: p.a * g.prikVis, lys: p.lys, fra: p.fra, ny: p.ny };
             }) : null;
-            var lys = mig.over && mig.over.slags === "glas" && mig.over.i === i ? 1 : 0;
+            var lys = (mig.over && mig.over.slags === "glas" && mig.over.i === i) || mig.valgtGlas() === i ? 1 : 0;
             if (g.blink > 0) lys = 0;
             /* Et glas, der er haeldt tomt, beholder sin etiket */
             var paaEtiket = !g.etiket ? null : (g.V > 0 ? K.to(cAf(g)) + " M" : (g.foerTal && g.foerTal.c) || null);

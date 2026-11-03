@@ -16,6 +16,14 @@
    blinker. Efter svaret maa eleven klikke paa stigen for at zoome ind og
    ud og traekke den op og ned (se naermere paa det, der er fremme).
 
+   Papirkortet (3. nov. 2026): et klik paa et gaet vaelger det kun (blaat,
+   og valget kan flyttes), og foerst Indsend svar laaser det og saetter
+   soejlen i gang (brugeren samme dag: et fejlklik maa ikke koste noget,
+   for gaettet taeller med i resultatet). Efter turen bliver kortet paa
+   spoergsmaalet:
+   det rigtige svar er groent (gult, naar gaettet var forkert, og gaettet
+   roedt), forklaringen staar under svarene, og Naeste gaet staar nederst.
+
    Elevens gaet huskes i browseren (nk-sc5.12-gaet). R starter forfra.
    ===================================================================== */
 (function () {
@@ -60,9 +68,11 @@
         this.kort = new NK.Kort("g", {
             valg: function (i) { mig.svarValg(i); },
             videre: function () { mig.videre(); },
-            knap: function () { mig.knap(); }
+            knap: function () { mig.knap(); },
+            indsend: function () { mig.indsendKlik(); }
         });
         this.tid = 0;
+        this.valgt = null;
         this.svar = NK.hent(NOEGLE, {}) || {};
         this.bygListe();
         this.koblMus();
@@ -134,6 +144,7 @@
         this.kort.vis("info intro", NK.Kort.slut("Et mol",
             NK.htmlPotens("Et dusin er 12 stk. Et mol er også et antal, bare meget større: 1 mol er 6,02 · 10²³ stk. " +
             "Gæt, hvor meget 1 mol er af " + TAL[D.GAET.length] + " forskellige ting."), "Start →"));
+        this.kort.indsend(false);
         this.kort.knap(null);
         this.kort.bund("");
         this.visListe();
@@ -142,6 +153,7 @@
     P.vaelg = function (i) {
         this.nr = i;
         this.hintVist = false;
+        this.valgt = null;
         this.stige.blink = {};
         var q = this.q();
         this.fra = log10(q.en);
@@ -164,12 +176,10 @@
     };
 
     P.spmKort = function () {
-        var q = this.q();
-        var html = NK.Kort.chip("Gæt " + (this.nr + 1) + " af " + D.GAET.length) +
-            '<span class="sk-intro">' + NK.htmlPotens(q.intro) + "</span>" +
-            '<p class="sk-tekst">' + NK.htmlPotens(q.spm) + "</p>" +
-            NK.Kort.svarknapper(q.svar, null, false);
+        var q = this.q(), mig = this;
+        var html = this.spmTekst() + NK.Kort.svarknapper(q.svar, function (i) { return i === mig.valgt ? "valgt" : ""; }, false);
         this.kort.vis("spm", html);
+        this.kort.indsend(true, this.valgt !== null);
         if (this.hintVist) {
             this.kort.knap(null);
             this.kort.bund("Hint: " + q.hint, "hint");
@@ -179,39 +189,71 @@
         }
     };
 
+    /* Et klik paa et gaet vaelger det kun; valget kan flyttes */
     P.svarValg = function (j) {
         if (this.fase !== "spm") return;
-        var q = this.q();
         this.valgt = j;
+        this.spmKort();
+    };
+
+    /* Indsend svar: gaettet laases, og soejlen vokser */
+    P.indsendKlik = function () {
+        if (this.fase !== "spm") { this.kort.blink(); return; }
+        if (this.valgt === null) {
+            this.kort.blink();
+            this.kort.kortBesked("Vælg et af gættene på kortet først.", 3.5);
+            return;
+        }
+        var q = this.q(), j = this.valgt;
         this.svar[q.id] = j;
         NK.gem(NOEGLE, this.svar);
         this.fase = "koer";
         this.turT = 0;
         this.kam = null;
-        var html = NK.Kort.chip("Gæt " + (this.nr + 1) + " af " + D.GAET.length) +
-            '<span class="sk-intro">' + NK.htmlPotens(q.intro) + "</span>" +
-            '<p class="sk-tekst">' + NK.htmlPotens(q.spm) + "</p>" +
+        var html = this.spmTekst() +
             NK.Kort.svarknapper(q.svar, function (i) { return i === j ? "valgt" : ""; }, true);
         this.kort.vis("spm koer", html);
+        this.kort.indsend(false);
         this.kort.knap(null);
         this.kort.bund("Antal " + q.ting + ": 1", "peger");
         this.visListe();
+    };
+
+    /* Etiketten, indledningen og spoergsmaalet */
+    P.spmTekst = function () {
+        var q = this.q();
+        return NK.Kort.tekst("Gæt " + (this.nr + 1) + " af " + D.GAET.length, q.spm, q.intro);
     };
 
     P.facitKort = function () {
         var q = this.q(), dit = this.svar[q.id];
         var ret = dit === q.ret;
         var B = NK.Kort.BOGST;
-        var tekst = '<span class="sk-svaret">' + (ret ? "" : "Svaret er " + B[q.ret] + ": ") + NK.htmlPotens(q.svar[q.ret].t) + ".</span> " + NK.htmlPotens(q.forkl);
+        var gaet = "";
         if (!ret) {
             var k = Math.round(log10(vaerdi(q) / q.svar[dit].v));
             var om = k === 0 ? "tæt på, men " + B[q.ret] + " passer bedre." :
                 "ca. " + gangeTekst(k) + " gange for " + (k > 0 ? "lille." : "stort.");
-            tekst += '<span class="sk-gaet">Dit gæt, ' + B[dit] + " " + NK.htmlPotens(q.svar[dit].t) + ", var " + NK.htmlPotens(om) + "</span>";
+            gaet = '<span class="sk-gaet">Dit gæt, ' + B[dit] + " " + NK.htmlPotens(q.svar[dit].t) + ", var " + NK.htmlPotens(om) + "</span>";
         }
         var sidste = this.foersteUbesvarede() < 0;
         var knap = sidste ? "Se resultatet →" : "Næste gæt →";
+        if (NK.Papir) {
+            /* Papirkortet: spoergsmaalet bliver staaende. Det rigtige svar er
+               groent, eller gult med gaettet roedt, naar gaettet ikke holdt. */
+            var html = this.spmTekst() + NK.Kort.svarknapper(q.svar, function (i) {
+                if (i === q.ret) return ret ? "rigtig" : "svar-vist";
+                return i === dit ? "forkert" : "dim";
+            }, true) + NK.Kort.bliv(NK.htmlPotens(q.forkl) + (gaet ? " " + gaet : ""), !ret, knap);
+            this.kort.vis(ret ? "loest bliv" : "loest facit svar bliv", html);
+            this.kort.indsend(false);
+            this.kort.knap(null);
+            this.kort.bund("");
+            return;
+        }
+        var tekst = '<span class="sk-svaret">' + (ret ? "" : "Svaret er " + B[q.ret] + ": ") + NK.htmlPotens(q.svar[q.ret].t) + ".</span> " + NK.htmlPotens(q.forkl) + gaet;
         this.kort.vis(ret ? "loest" : "loest facit", NK.Kort.slut(ret ? "Rigtigt ✓" : "Svaret", tekst, knap));
+        this.kort.indsend(false);
         this.kort.knap(null);
         this.kort.bund("");
     };
@@ -224,6 +266,7 @@
         this.kort.vis("loest", NK.Kort.slut("Færdig",
             "Du gættede <b>" + r + " af " + D.GAET.length + "</b> rigtigt. Din titel: <b>" + titel + "</b>. " + NK.htmlPotens(D.FAERDIG.g),
             "Videre til fane 2 →"));
+        this.kort.indsend(false);
         this.kort.knap("Gæt forfra", "almindelig");
         this.kort.bund("");
         this.visListe();
@@ -336,6 +379,7 @@
 
     P.opdater = function (dt) {
         this.tid += dt;
+        this.kort.tik(dt);
         if (this.fase === "koer") {
             var q = this.q();
             this.turT += dt;

@@ -12,6 +12,12 @@
    knap lyser stille op. Knappen giver ét hint ad gangen og til sidst
    svaret.
 
+   Papirkortet (3. nov. 2026): et svar vaelger kun (valgt), og Indsend svar
+   bedoemmer det (brugeren 24. okt. 2026: "der skal som minimum vaere et
+   indsend svar"). Efter et rigtigt svar bliver kortet paa spoergsmaalet med
+   svaret groent, forklaringen under svarene og Naeste opgave dér, hvor
+   Indsend svar stod.
+
    Loeste opgaver huskes i browseren (nk-sc5.12-tael). R starter forfra.
    ===================================================================== */
 (function () {
@@ -28,7 +34,8 @@
         this.kort = new NK.Kort("t", {
             valg: function (i) { mig.svarValg(i); },
             videre: function () { mig.videre(); },
-            knap: function () { mig.knap(); }
+            knap: function () { mig.knap(); },
+            indsend: function () { mig.indsendKlik(); }
         });
         this.tid = 0;
         var gemt = NK.hent(NOEGLE, {}) || {};
@@ -104,6 +111,7 @@
         this.nr = i;
         this.hjaelp = 0;
         this.forkerte = [];
+        this.valgt = null;
         this.brugtSvar = false;
         this.visT = 0;
         if (this.status[i].loest) {
@@ -121,14 +129,14 @@
 
     P.spmKort = function () {
         var o = this.o(), mig = this;
-        var html = NK.Kort.chip("Opgave " + (this.nr + 1) + " af " + D.OPGAVER.length) +
-            '<p class="sk-tekst">' + NK.htmlPotens(o.spm) + "</p>" +
-            NK.Kort.svarknapper(o.svar, function (i) { return mig.forkerte.indexOf(i) >= 0 ? "forkert" : ""; }, false);
+        var html = NK.Kort.tekst("Opgave " + (this.nr + 1) + " af " + D.OPGAVER.length, o.spm) +
+            NK.Kort.svarknapper(o.svar, function (i) { return mig.forkerte.indexOf(i) >= 0 ? "forkert" : (mig.valgt === i ? "valgt" : ""); }, false);
         this.kort.vis("spm", html);
     };
 
     P.saetKnap = function () {
         var o = this.o();
+        this.kort.indsend(this.fase === "spm", this.valgt !== null);
         if (this.fase !== "spm") { this.kort.knap(null); return; }
         var tekst = this.hjaelp === 0 ? "Giv et hint" : (this.hjaelp < o.hint.length ? "Næste hint" : "Vis svaret");
         var klasse = this.hjaelp >= o.hint.length ? "svar" : "";
@@ -136,9 +144,23 @@
         this.kort.knap(tekst, klasse);
     };
 
+    /* Et svar paa kortet vaelger kun; Indsend svar bedoemmer det */
     P.svarValg = function (j) {
-        if (this.fase !== "spm") return;
-        var o = this.o(), s = o.svar[j];
+        if (this.fase !== "spm" || this.forkerte.indexOf(j) >= 0) return;
+        this.valgt = j;
+        this.spmKort();
+        this.saetKnap();
+    };
+
+    P.indsendKlik = function () {
+        if (this.fase !== "spm") { this.kort.blink(); return; }
+        if (this.valgt === null) {
+            this.kort.blink();
+            this.kort.kortBesked("Vælg et af de fire svar på kortet først.", 3.5);
+            return;
+        }
+        var j = this.valgt, o = this.o(), s = o.svar[j];
+        this.valgt = null;
         if (s.ok) {
             this.loest(this.forkerte.length === 0 && this.hjaelp === 0, false);
             return;
@@ -167,6 +189,7 @@
 
     P.loest = function (stjerne, medSvar) {
         var s = this.status[this.nr];
+        this.valgt = null;
         s.loest = true;
         if (stjerne) s.stjerne = true;
         this.gem();
@@ -179,12 +202,25 @@
     };
 
     P.loestKort = function (medSvar) {
-        var o = this.o(), ret = "";
+        var o = this.o(), ret = "", mig = this;
         o.svar.forEach(function (s) { if (s.ok) ret = s.t; });
-        var sidste = this.foersteUloeste() < 0;
-        var tekst = '<span class="sk-svaret">' + NK.htmlPotens(ret) + ".</span> " + NK.htmlPotens(o.forkl);
-        this.kort.vis(medSvar ? "loest svar" : "loest", NK.Kort.slut(medSvar ? "Svaret" : "Rigtigt ✓", tekst, sidste ? "Færdig →" : "Næste opgave →"));
+        var sidste = this.foersteUloeste() < 0, knap = sidste ? "Færdig →" : "Næste opgave →";
+        if (NK.Papir) {
+            /* Papirkortet: opgaven bliver staaende med svaret groent (gult, naar
+               det blev vist), forklaringen staar under svarene, og knappen videre
+               staar, hvor Indsend svar stod */
+            var html = NK.Kort.tekst("Opgave " + (this.nr + 1) + " af " + D.OPGAVER.length, o.spm) +
+                NK.Kort.svarknapper(o.svar, function (i) {
+                    if (o.svar[i].ok) return medSvar ? "svar-vist" : "rigtig";
+                    return mig.forkerte.indexOf(i) >= 0 ? "forkert" : "dim";
+                }, true) + NK.Kort.bliv(NK.htmlPotens(o.forkl), medSvar, knap);
+            this.kort.vis(medSvar ? "loest svar bliv" : "loest bliv", html);
+        } else {
+            var tekst = '<span class="sk-svaret">' + NK.htmlPotens(ret) + ".</span> " + NK.htmlPotens(o.forkl);
+            this.kort.vis(medSvar ? "loest svar" : "loest", NK.Kort.slut(medSvar ? "Svaret" : "Rigtigt ✓", tekst, knap));
+        }
         this.kort.knap(null);
+        this.kort.indsend(false);
         this.kort.bund("");
     };
 
@@ -203,6 +239,7 @@
     P.slut = function () {
         this.fase = "slut";
         this.kort.vis("loest", NK.Kort.slut("Færdig", NK.htmlPotens(D.FAERDIG.t), null));
+        this.kort.indsend(false);
         this.kort.knap("Start forfra", "almindelig");
         this.kort.bund("");
         this.visListe();
@@ -238,6 +275,7 @@
 
     P.opdater = function (dt) {
         this.tid += dt;
+        this.kort.tik(dt);
         if (this.fase === "loest" && this.visT < VISTID) this.visT = Math.min(VISTID, this.visT + dt);
     };
 

@@ -57,7 +57,10 @@
        Et par har fire dele: gaettet, kogepunktet for a, kogepunktet for b og
        spoergsmaalet om hvorfor. Et kogepunkt, eleven har fundet i et andet
        par, skal ikke findes igen. Naar begge kogepunkter er kendt, staar de
-       paa et groent kort med dommen over gaettet, foer spoergsmaalet kommer. */
+       paa kortet med dommen over gaettet, foer spoergsmaalet kommer.
+       Papirkortet (3. nov. 2026): et rigtigt kogepunkt laegger ikke kortet
+       om. Opgaven bliver staaende med kogepunktet under, og eleven gaar selv
+       videre til det naeste kogepunkt eller spoergsmaalet. */
     P.lavOpgave = function (i) {
         var o = this.opgaver[i];
         var sa = D.STOF[o.a], sb = D.STOF[o.b];
@@ -113,7 +116,9 @@
         this.naesteMaal();
     };
 
-    P.naesteMaal = function () {
+    /* del og maade: maalingen, eleven lige har klaret, og hvordan (kortet
+       bliver paa den, groent eller gult ved Vis svaret) */
+    P.naesteMaal = function (del, maade) {
         var g = this.opg;
         this.roertTermo = false;
         var k = !this.kendt("a") ? "a" : (!this.kendt("b") ? "b" : null);
@@ -130,12 +135,13 @@
         var h = this.hoejest(), l = h === "a" ? "b" : "a";
         var t = D.Stort(this.st[l].navn) + " koger ved " + D.kpTekst(this.st[l]) + ", og " + this.st[h].navn + " koger ved " + D.kpTekst(this.st[h]) + ".";
         var holdt = g.gaet === h;
-        this.mellemsvar("selv", (holdt ? "Dit gæt holdt. " : "Dit gæt holdt ikke. ") + t, holdt ? "Godt gættet ✓" : "Målt ✓", "Næste spørgsmål →");
+        this.mellemsvar(maade || "selv", (holdt ? "Dit gæt holdt. " : "Dit gæt holdt ikke. ") + t, holdt ? "Godt gættet ✓" : "Målt ✓", "Næste spørgsmål →", del);
         this.layout();
     };
 
-    /* Naeste paa det groenne kort: spoergsmaalet om hvorfor */
+    /* Naeste paa kortet: det naeste kogepunkt eller spoergsmaalet om hvorfor */
     P.videre = function () {
+        if (this.opg.fase === "maal") { this.naesteMaal(); return; }
         this.opg.fase = "spm";
         this.nyDel();
         this.layout();
@@ -153,19 +159,20 @@
         this.fejlLinje(D.tempFejl(st.navn, T, this.Pr[k]));
     };
 
-    /* Et kogepunkt er fundet (eller vist med Vis svaret) */
+    /* Et kogepunkt er fundet (eller vist med Vis svaret). Kortet bliver paa
+       maalingen med kogepunktet under, og eleven gaar selv videre (rosen maa
+       ikke staa under det naeste kogepunkt). */
     P.fundetKp = function (k, svar) {
-        var st = this.st[k];
+        var st = this.st[k], del = this.delNu();
         this.maalt[st.id] = true;
         this.grafNoegle = "";
         var andet = k === "a" ? "b" : "a";
         if (!this.kendt(andet)) {
-            this.naesteMaal();
-            this.besked('<span class="b-maerke">' + (svar ? "Svaret" : "Rigtigt") + "</span> " +
-                NK.html(D.Stort(st.navn) + " koger ved " + D.kpTekst(st) + "."), svar ? "gul" : "god");
+            this.mellemsvar(svar ? "svar" : "selv", D.Stort(st.navn) + " koger ved " + D.kpTekst(st) + ".", svar ? "Svaret" : "Rigtigt",
+                "Næste kogepunkt →", del);
             return;
         }
-        this.naesteMaal();
+        this.naesteMaal(del, svar ? "svar" : "selv");
     };
 
     P.spmLoest = function (d) {

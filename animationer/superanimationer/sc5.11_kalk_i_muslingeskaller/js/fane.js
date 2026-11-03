@@ -18,6 +18,14 @@
    det til at blinke, hvis eleven klikker paa forsoeget foerst. Pladsen
    til kortet er sat af oeverst i scenen (kortZone()).
 
+   Papirkortet (brugerens valg 3. nov. 2026): ../faelles/papirkort.css og
+   .js goer kortet til et lyst ark med skriften Lexend; det, der kun findes
+   i denne animation (skridtene, linjen .besked, knappen videre og Start
+   forfra), staar sidst i css/stil.css. Kortets tekst gaar gennem
+   papirTekst(). Der er ingen spoergsmaal med svarknapper paa kortet, kun
+   gaet, der er gratis og virker med det samme, saa der er intet Indsend
+   svar her.
+
    Fanen selv har: lavOpgave(nr, nyeTal), promptHTML(), trinInfo()
    ({ hint, svar }), trinLinje(), layout(), tegn(), opdaterScene(dt) og
    musen i scenen: overScene, nedScene, flytScene, opScene.
@@ -129,6 +137,10 @@
 
         P.nyeTal = function () { this.vaelg(this.nr, true); };
 
+        /* Kortets hovedtekst (allerede HTML): paa papirkortet bliver et
+           spoergsmaal halvfedt, og ord med bindestreg deles ikke */
+        P.papirTekst = function (html) { return NK.Papir ? NK.Papir.tekst(html) : html; };
+
         /* Et element fra listen, helst et andet end sidst */
         P.traek = function (liste, sidst) {
             var andre = liste.filter(function (x) { return x !== sidst; });
@@ -179,6 +191,14 @@
             this.visKnap();
         };
 
+        /* Paa kortet i scenen er der intet at gaa videre til, naar alt paa den
+           sidste fane er loest: saa er knappen vaek, for Start forfra staar aldrig,
+           hvor Naeste staar (brugeren 3. nov. 2026). Koer igen staar i kortets
+           oeverste raekke, og opgaverne kan aabnes igen i panelet. */
+        P.intetVidere = function () {
+            return this.scene && this.faerdig && this.naesteUloeste() < 0 && !valg.naesteFane;
+        };
+
         P.visKnap = function () {
             var tekst, klasse = "knap hjaelp";
             if (this.faerdig) {
@@ -186,7 +206,7 @@
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) tekst = valg.naesteTekst || "Næste opgave →";
                 else if (valg.naesteFane) tekst = "Videre til " + valg.naesteNavn + " →";
-                else tekst = valg.forfraTekst || "Forfra med nye tal ↺";
+                else tekst = this.scene ? "" : (valg.forfraTekst || "Forfra med nye tal ↺");
             } else {
                 tekst = this.hjaelp === 0 ? "Giv hint" : "Vis svaret";
                 if (this.hjaelp > 0) klasse += " svar";
@@ -197,7 +217,7 @@
             this.el.knap.className = klasse;
             this.el.knap.disabled = !!this.auto;
             /* Paa kortet i scenen er knappen vaek, mens forsoeget koerer af sig selv */
-            this.el.knap.hidden = this.scene && !!this.auto && !this.faerdig;
+            this.el.knap.hidden = (this.scene && !!this.auto && !this.faerdig) || this.intetVidere();
         };
 
         P.naesteUloeste = function () {
@@ -216,7 +236,7 @@
                 var naeste = this.naesteUloeste();
                 if (naeste >= 0) this.vaelg(naeste, false);
                 else if (valg.naesteFane && NK.visFane) NK.visFane(valg.naesteFane);
-                else this.vaelg(0, true);
+                else if (!this.intetVidere()) this.vaelg(0, true);
                 return;
             }
             var info = this.trinInfo();

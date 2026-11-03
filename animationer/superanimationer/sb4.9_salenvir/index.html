@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Syntese af Salenvir</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⚗</span> Syntese af Salenvir</h1>
@@ -25,6 +26,7 @@
             <div class="sk-bund" id="status">
                 <p class="st-tekst" id="besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <!-- Den groenne knap ved den ting, kortet beder om (js/trin.js visHandling) -->
@@ -96,6 +98,7 @@
 <script src="js/sprites.js"></script>
 <script src="js/tegning.js"></script>
 <script src="js/sim.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/trin.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>

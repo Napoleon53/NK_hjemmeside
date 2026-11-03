@@ -6,8 +6,12 @@
    tegnebraettet alle grundstoffer, ringe og tripelbindinger.
 
    Saadan tegner man (som i de gamle 6.2-6.4):
-     traek fra et atom      kaeden bygges, mens man traekker, og knaekker
-                            af sig selv (120 grader), saa den aldrig er lige
+     traek fra et atom      kaeden staar svagt med antallet af C-atomer,
+                            mens man traekker, og tegnes foerst, naar musen
+                            slippes (som i MarvinSketch). Den knaekker af sig
+                            selv (120 grader), saa den aldrig er lige, gaar
+                            lige mod musen og har hoejst 20 C-atomer.
+                            Med et andet grundstof end C: én binding
      klik paa et atom       et nyt C-atom: for enden fortsaetter zigzaggen,
                             saa man ogsaa kan bygge en kaede med klik. Er et
                             andet grundstof valgt (tegnebraettet), bliver
@@ -52,7 +56,9 @@
      felt()        { x, y, b, h } i pixels: hvor man maa tegne
      skala()       pixels pr. bindingslaengde (ved zoom 1)
      regler        { kunC, ringe, tripel, dobbelt, enDobbelt, knaek,
-                     sletAlt, flyt, udsnit, maks() }
+                     sletAlt, flyt, udsnit, maks(), forbudt(atom, el) }
+                   forbudt kan nægte en ny binding fra atomet til et nyt
+                   atom med grundstoffet el (en tekst er grunden, null: ok)
      aendret(hvad) kaldes efter hver aendring
      toast(tekst, slags)  en kort besked oeverst paa scenen, null skjuler
    ===================================================================== */
@@ -73,7 +79,7 @@
         this.mus = null;
         this.over = null;
         this.traek = null;
-        this.spoegelse = null;
+        this.forslag = null;
         this.grundstof = "C";
         this.vaerktoej = "tegn";
         this.stil = "zigzag";
@@ -402,7 +408,7 @@
         this.valgtObj = null;
         if (medStart) this.mol.tilfoej("C", -0.43, 0).start = true;
         this.traek = null;
-        this.spoegelse = null;
+        this.forslag = null;
         this.efter("nulstil");
     };
 
@@ -649,6 +655,8 @@
         if (this.antal() >= this.maks()) { this.toast(this.maksTekst(), "advar"); return null; }
         var a = this.mol.atom(fra), mig = this;
         if (!this.mol.ledig(fra, 1)) { this.toast(this.fuld(fra)); return null; }
+        var nej = this.r.forbudt ? this.r.forbudt(a, el || "C") : null;
+        if (nej) { this.toast(nej, "advar"); return null; }
         var valgt = null;
         this.retninger(fra).some(function (v) {
             var kand = { x: a.x + Math.cos(v), y: a.y + Math.sin(v) };
@@ -1047,46 +1055,156 @@
             return;
         }
         if (t.fra === undefined) return;
-        if (this.grundstof !== "C" && !this.r.kunC) {
-            /* Et andet grundstof: kun én binding ad gangen */
-            this.spoegelse = this.spoegelseFor(t.fra, pt);
-            return;
-        }
-        /* Kaeden bygges, mens man traekker */
-        var fra = t.aktiv !== undefined ? t.aktiv : t.fra, vaern = 0;
-        while (this.antal() < this.maks() && vaern++ < 40) {
-            var p = this.px(fra);
-            if (Math.hypot(pt.x - p.x, pt.y - p.y) < s) break;
-            if (this.ringMaal(fra, pt)) break;
-            var trin = this.naesteTrin(fra, pt);
-            if (!trin.ok) break;
-            if (!t.gemt) { this.gem(); t.gemt = true; }
-            fra = this.tilfoejFra(fra, trin.kand, "C").id;
-            t.aktiv = fra;
-            this.efter("atom");
-        }
-        t.aktiv = fra;
-        this.spoegelse = this.spoegelseFor(fra, pt);
+        /* Kaeden staar svagt, til musen slippes */
+        this.forslag = this.lavForslag(t.fra, pt);
+        if (this.forslag.toast) this.toast(this.forslag.toast, this.forslag.slags); else this.toast(null);
     };
 
-    P.spoegelseFor = function (fra, pt) {
-        var p = this.px(fra);
-        if (Math.hypot(pt.x - p.x, pt.y - p.y) < this.s() * 0.35) { this.toast(null); return null; }
-        var r = this.ringMaal(fra, pt);
-        if (!r) {
-            if (this.antal() >= this.maks()) { this.toast(this.maksTekst(), "advar"); return { fra: fra, kand: this.naesteTrin(fra, pt).kand, ok: false }; }
-            r = this.naesteTrin(fra, pt);
+    /* ----- Kaeden, mens man traekker ---------------------------------------------
+       Kaeden tegnes foerst, naar musen slippes (som i MarvinSketch). Indtil da
+       er den et forslag, der laegges forfra ved hver bevaegelse og regnes paa
+       en kopi af molekylet (op bruger det).
+
+       Kaeden er altid en lige zigzag langs en akse paa 30-graders-gitteret
+       mod musen: bindingerne ligger skiftevis 30 grader til hver side af
+       aksen, saa den aldrig boejer rundt eller bliver en spiral. Den foerste
+       binding vaelges, saa vinklerne ved atomet, der traekkes fra, er paene
+       (120 grader for enden af en kaede), og aksen er saa den af de mulige,
+       der ligger naermest musen. Antallet af atomer foelger, hvor langt musen
+       er kommet langs aksen, og der er hoejst MAKS_KAEDE C-atomer (et enligt
+       startatom taeller med). Med et andet grundstof end C er det kun ét atom.
+
+       { fra, el, punkter: [{x, y}] (de nye atomer i bindingslaengder),
+         til (ringslutning til et atom), blok: { fra, kand } (det naeste
+         skridt, der ikke maa tages, tegnes roedt), antalC, toast, slags } */
+    var MAKS_KAEDE = 20;
+    var ZIGZAG_SKRIDT = Math.cos(TRIN);   /* hvor langt hvert atom naar ud langs aksen */
+
+    P.lavForslag = function (fra, pt) {
+        var aegte = this.mol, s = this.s();
+        var el = this.r.kunC ? "C" : this.grundstof;
+        var start = aegte.atom(fra);
+        var enligt = el === "C" && start && start.el === "C" && !aegte.grad(fra);
+        var loft = el === "C" ? MAKS_KAEDE - (enligt ? 1 : 0) : 1;
+        var plads = Math.min(loft, this.maks() - aegte.atomer.length);
+        var ud = { fra: fra, el: el, punkter: [], til: undefined, blok: null, toast: null, slags: null, antalC: 0 };
+        function blok(a, kand, toast, slags) {
+            ud.blok = { fra: { x: a.x, y: a.y }, kand: kand };
+            ud.toast = toast || null;
+            ud.slags = slags || null;
         }
-        if (r.toast) this.toast(r.toast, r.slags); else this.toast(null);
-        return { fra: fra, kand: r.kand, ok: r.ok, til: r.til };
+        this.mol = aegte.kopi();
+        try {
+            var a0 = this.mol.atom(fra), p0 = this.px(a0);
+            var d = Math.hypot(pt.x - p0.x, pt.y - p0.y);
+            if (d < s * 0.35) return ud;
+            /* Slippes musen over et andet atom taet paa: en binding dertil (ring) */
+            var ring = this.ringMaal(fra, pt);
+            if (ring) {
+                if (ring.ok) ud.til = ring.til; else blok(a0, ring.kand, ring.toast, ring.slags);
+                return ud;
+            }
+            var nej = this.r.forbudt ? this.r.forbudt(a0, el) : null;
+            if (plads <= 0 || nej) {
+                var t0 = this.naesteTrin(fra, pt);
+                if (nej) blok(a0, t0.kand, nej, "advar");
+                else if (plads < loft) blok(a0, t0.kand, this.maksTekst(), "advar");
+                return ud;
+            }
+            /* Et andet grundstof: én binding, som foer */
+            if (el !== "C") {
+                var t1 = this.naesteTrin(fra, pt);
+                if (!t1.ok) { blok(a0, t1.kand, t1.toast, t1.slags); return ud; }
+                ud.punkter.push({ x: t1.kand.x, y: t1.kand.y });
+                return ud;
+            }
+            var valg = this.kaedeAkse(fra, pt);
+            if (!valg) {
+                var t2 = this.naesteTrin(fra, pt);
+                blok(a0, t2.kand, t2.toast || (t2.ok ? null : "Der er ikke plads til en kæde her."), t2.slags);
+                return ud;
+            }
+            /* Hvor langt musen er kommet langs aksen, i bindingslaengder */
+            var langs = d / s * Math.cos(vinkelForskel(Math.atan2(pt.y - p0.y, pt.x - p0.x), valg.akse));
+            var n = langs < 0.35 ? 0 : Math.max(1, Math.round(langs / ZIGZAG_SKRIDT));
+            var cur = fra, side = vinkelForskel(valg.foerste, valg.akse);
+            for (var i = 0; i < n; i++) {
+                var a = this.mol.atom(cur);
+                if (ud.punkter.length >= plads) {
+                    /* Tavlen er fuld (loftet paa 20 siger intet: kaeden vokser bare ikke mere) */
+                    if (plads < loft) blok(a, { x: a.x + Math.cos(valg.akse), y: a.y + Math.sin(valg.akse) }, this.maksTekst(), "advar");
+                    break;
+                }
+                var v = valg.akse + (i % 2 === 0 ? side : -side);
+                var kand = { x: a.x + Math.cos(v), y: a.y + Math.sin(v) };
+                var r = this.vurder(cur, kand, v, null);
+                if (!r.ok) { blok(a, kand, r.toast, r.slags); break; }
+                cur = this.tilfoejFra(cur, kand, "C").id;
+                ud.punkter.push(kand);
+            }
+            /* Kaeden ender ved et atom, der var der i forvejen: en binding dertil (ring) */
+            if (ud.punkter.length) {
+                var slut = this.ringMaal(cur, pt);
+                if (slut && slut.ok && slut.til < aegte.naesteId) { ud.til = slut.til; ud.blok = null; ud.toast = null; }
+            }
+        } finally {
+            this.mol = aegte;
+            ud.antalC = el === "C" ? ud.punkter.length + (enligt && ud.punkter.length ? 1 : 0) : 0;
+        }
+        return ud;
+    };
+
+    /* Kaedens foerste binding og akse fra atomet mod punktet pt (pixels).
+       Den foerste binding skal kunne laves (vurder), og vinklerne til
+       atomets naboer skal vaere saa store som muligt (hoejst 120 grader
+       taeller). Blandt dem vinder den akse, der ligger naermest musen. Efter
+       en tripelbinding gaar kaeden lige ud. null: ingen plads. */
+    P.kaedeAkse = function (fra, pt) {
+        var mol = this.mol, a = mol.atom(fra), u = this.enheder(pt);
+        var raa = Math.atan2(u.y - a.y, u.x - a.x);
+        var nb = mol.naboer(fra).map(function (n) { var b = mol.atom(n); return Math.atan2(b.y - a.y, b.x - a.x); });
+        var lineaer = mol.bindingerTil(fra).some(function (bd) { return bd.orden === 3; });
+        var kand = [];
+        for (var i = 0; i < 12; i++) {
+            var f = i * TRIN;
+            if (lineaer && nb.length === 1 && Math.abs(vinkelForskel(f, nb[0] + Math.PI)) > 0.01) continue;
+            var k = { x: a.x + Math.cos(f), y: a.y + Math.sin(f) };
+            if (!this.vurder(fra, k, f, null).ok) continue;
+            var mind = nb.reduce(function (m, w) { return Math.min(m, Math.abs(vinkelForskel(f, w))); }, Math.PI);
+            kand.push({ f: f, god: Math.min(mind, 4 * TRIN) });
+        }
+        if (!kand.length) return null;
+        var bedst = kand.reduce(function (m, k) { return Math.max(m, k.god); }, 0);
+        var valgt = null, score = Infinity;
+        kand.forEach(function (k) {
+            [k.f + TRIN, k.f - TRIN].forEach(function (akse) {
+                /* Aksen naer musen; daarlige vinkler ved atomet koster meget;
+                   ved lige valg den foerste binding naer musen og saa opad */
+                var sc = Math.abs(vinkelForskel(akse, raa)) + 2 * (bedst - k.god) +
+                    0.1 * Math.abs(vinkelForskel(k.f, raa)) + 0.001 * Math.sin(k.f);
+                if (sc < score - 1e-9) { score = sc; valgt = { foerste: k.f, akse: akse }; }
+            });
+        });
+        return valgt;
+    };
+
+    /* Forslaget kommer paa tavlen (naar musen slippes) */
+    P.brugForslag = function (f) {
+        if (!f || (!f.punkter.length && f.til === undefined)) return false;
+        this.gem();
+        var cur = f.fra, mig = this;
+        f.punkter.forEach(function (k) { cur = mig.tilfoejFra(cur, k, f.el).id; });
+        if (f.til !== undefined) this.mol.bind(cur, f.til, 1);
+        this.efter("atom");
+        return true;
     };
 
     P.op = function (pt) {
         clearTimeout(this.langtTryk);
         var t = this.traek;
         this.traek = null;
-        var g = this.spoegelse;
-        this.spoegelse = null;
+        var g = this.forslag;
+        this.forslag = null;
         this.toast(null);
         if (!t) return;
         if (t.udsnit && (t.bevaeget || t.udsnit !== "klik")) return;
@@ -1104,12 +1222,9 @@
         if (t.obj && t.bevaeget) { this.valgtObj = t.obj.type === "plus" ? this.valgtObj : t.obj; this.efter("flyt"); return; }
         if (t.flyt || t.panorer) { if (t.bevaeget) this.efter("flyt"); return; }
         if (t.bevaeget) {
-            if (g && g.ok) {
-                if (!t.gemt) this.gem();
-                if (g.til !== undefined) this.mol.bind(g.fra, g.til, 1);
-                else this.tilfoejFra(g.fra, g.kand, this.r.kunC ? "C" : this.grundstof);
-                this.efter("atom");
-            }
+            /* Kaeden kommer paa tavlen, som den stod, da musen blev sluppet */
+            if (pt && t.fra !== undefined && this.mol.atom(t.fra)) g = this.lavForslag(t.fra, pt);
+            if (t.fra !== undefined) this.brugForslag(g);
             return;
         }
         this.klik(t.u, pt);
@@ -1299,26 +1414,7 @@
                 if (enlige[a.id]) mig.tegnDemo(ctx, mig.px(a), s, tid);
             });
         }
-        /* Spoegelset: den naeste binding, blaa hvis den maa laves, roed hvis ikke */
-        var sp = this.spoegelse;
-        if (sp && sp.kand) {
-            var a0 = this.px(sp.fra), k = this.px(sp.kand);
-            ctx.save();
-            ctx.strokeStyle = sp.ok ? "#3d9ee0" : "#e05446";
-            ctx.lineWidth = Math.max(3, s * 0.1);
-            ctx.lineCap = "round";
-            ctx.setLineDash([5, 8]);
-            ctx.beginPath();
-            ctx.moveTo(a0.x, a0.y);
-            ctx.lineTo(k.x, k.y);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.beginPath();
-            ctx.arc(k.x, k.y, Math.max(5, s * 0.12), 0, Math.PI * 2);
-            ctx.fillStyle = sp.ok ? "#3d9ee0" : "#e05446";
-            ctx.fill();
-            ctx.restore();
-        }
+        if (this.forslag && this.traek) this.tegnForslag(ctx, this.forslag);
         /* Rammen, der traekkes om det, der skal markeres */
         var ra = this.ramme;
         if (ra) {
@@ -1332,6 +1428,85 @@
             ctx.restore();
         }
         return g;
+    };
+
+    /* Kaeden, mens man traekker: svagt graa streger, et graat punkt for hvert
+       nyt C, og antallet af C-atomer ved musen. Et andet grundstof staar med
+       sit symbol. Det naeste skridt, der ikke maa tages, er roedt. */
+    P.tegnForslag = function (ctx, f) {
+        var s = this.s(), mig = this;
+        var GRAA = "rgba(29, 36, 51, 0.34)";
+        var lw = NK.klamp(s * 0.05, 1.6, 3.4);
+        var p0 = this.px(f.fra), sidst = p0;
+        ctx.save();
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        if (f.punkter.length || f.til !== undefined) {
+            ctx.strokeStyle = GRAA;
+            ctx.lineWidth = lw;
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            f.punkter.forEach(function (k) { sidst = mig.px(k); ctx.lineTo(sidst.x, sidst.y); });
+            if (f.til !== undefined) { var pt = this.px(f.til); ctx.lineTo(pt.x, pt.y); }
+            ctx.stroke();
+            f.punkter.forEach(function (k, i) {
+                var q = mig.px(k);
+                if (f.el !== "C") {
+                    ctx.beginPath();
+                    ctx.arc(q.x, q.y, Math.max(10, s * 0.3), 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
+                    ctx.fill();
+                    ctx.font = "700 " + Math.round(NK.klamp(s * 0.42, 14, 26)) + "px 'Segoe UI', sans-serif";
+                    ctx.fillStyle = "rgba(29, 36, 51, 0.5)";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(f.el, q.x, q.y + 1);
+                    return;
+                }
+                ctx.beginPath();
+                ctx.arc(q.x, q.y, i === f.punkter.length - 1 ? Math.max(4, s * 0.09) : Math.max(2.5, s * 0.06), 0, Math.PI * 2);
+                ctx.fillStyle = GRAA;
+                ctx.fill();
+            });
+        }
+        if (f.blok && f.blok.kand) {
+            var b0 = this.px(f.blok.fra), b1 = this.px(f.blok.kand);
+            ctx.strokeStyle = "#e05446";
+            ctx.lineWidth = Math.max(3, s * 0.08);
+            ctx.setLineDash([5, 8]);
+            ctx.beginPath();
+            ctx.moveTo(b0.x, b0.y);
+            ctx.lineTo(b1.x, b1.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.arc(b1.x, b1.y, Math.max(5, s * 0.11), 0, Math.PI * 2);
+            ctx.fillStyle = "#e05446";
+            ctx.fill();
+        }
+        /* Antallet af C-atomer, kaeden faar, ved musen */
+        if (f.antalC) {
+            var m = this.mus || sidst;
+            var fs = Math.round(NK.klamp(s * 0.3, 13, 18));
+            var tekst = f.antalC + " C";
+            ctx.font = "700 " + fs + "px 'Segoe UI', sans-serif";
+            var bb = ctx.measureText(tekst).width + 14, hh = fs + 10;
+            var x = m.x + 16, y = m.y - 16 - hh, fe = this.v.felt();
+            /* Inde paa tavlen: ved kanten staar tallet paa den anden side af musen */
+            if (x + bb > fe.x + fe.b - 4) x = m.x - 16 - bb;
+            if (y < fe.y + 4) y = m.y + 22;
+            NK.rundtRekt(ctx, x, y, bb, hh, hh / 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.fill();
+            ctx.lineWidth = 1.2;
+            ctx.strokeStyle = GRAA;
+            ctx.stroke();
+            ctx.fillStyle = "rgba(29, 36, 51, 0.62)";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(tekst, x + bb / 2, y + hh / 2 + 1);
+        }
+        ctx.restore();
     };
 
     /* Blå, gennemsigtig markering af atomerne i ids og bindingerne mellem dem */

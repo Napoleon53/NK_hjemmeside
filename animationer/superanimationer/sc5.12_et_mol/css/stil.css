@@ -894,3 +894,60 @@ kbd {
    ²³, der har forskellig hoejde i skriften (brugeren 23. okt. 2026).
    line-height 0, saa linjen ikke bliver hoejere. */
 sup { font-size: 0.68em; line-height: 0; position: relative; top: -0.48em; vertical-align: baseline; }
+
+/* ---------------------------------------------------------------------
+   Papirkortet (brugerens valg 3. nov. 2026). Udseendet ligger i
+   ../faelles/papirkort.css, som indlaeses efter denne fil; reglerne her
+   har derfor mindst lige saa mange klasser som de faelles. Her er kun det,
+   der er saerligt for kortet her: indledningen foran spoergsmaalet,
+   introduktionen (intet groent felt), gaettet, mens soejlen vokser, og
+   saetningen om, hvor langt gaettet var fra.
+   --------------------------------------------------------------------- */
+html body.papirkort.papirkort .scenekort .sk-intro { font-size: inherit; line-height: inherit; color: inherit; }
+/* Etiketten staar nu inde i forklaringen (js/kort.js: NK.Kort.slut) */
+html body.papirkort.papirkort .scenekort .sk-slut-tekst > .sk-tekst { display: block; }
+html body.papirkort.papirkort .scenekort.info .sk-slut-tekst > .sk-tekst {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--pk-tekst);
+    font-size: 1.06rem;
+}
+/* Gaettet, mens soejlen vokser, og det viste svar: knapperne er laast, men
+   de er tydelige (den gamle regel for laaste knapper har fem klasser) */
+html body.papirkort.papirkort .scenekort .sk-knap.valgt:disabled:not(.rigtig):not(.forkert):not(.svar-vist),
+html body.papirkort.papirkort .scenekort .sk-knap.svar-vist:disabled { opacity: 1; }
+/* "Dit gaet, A ..., var ca. 10 gange for lille." staar i forklaringen */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv .sk-gaet { display: inline; margin: 0; font-size: inherit; font-weight: 600; color: inherit; }
+html body.papirkort.papirkort .scenekort .sk-bund.peger .st-tekst,
+html body.papirkort.papirkort .scenekort .sk-bund.god .st-tekst { font-weight: 600; }
+/* Forklaringen under svarene staar i almindelig skrift (den gamle .sk-bund.god var fed) */
+html body.papirkort.papirkort .scenekort .sk-bund.bliv .st-tekst { font-weight: 400; }
+/* Kortet bliver paa spoergsmaalet: de laaste svar og afstandene er lidt
+   tættere, saa forklaringen ogsaa kan vaere i kortZone (214 px, 192 px paa
+   lave scener) */
+html body.papirkort.papirkort .scenekort.loest.bliv .sk-svar { margin-top: 6px; }
+html body.papirkort.papirkort .scenekort.loest.bliv .sk-svar .sk-knap { min-height: 0; padding-top: 4px; padding-bottom: 4px; font-size: 0.9rem; line-height: 1.18; }
+html body.papirkort.papirkort .scenekort.loest.bliv .sk-bund.bliv { margin-top: 6px; }
+html body.papirkort.papirkort .scenekort.loest.bliv .sk-bund.bliv .st-tekst { padding-top: 4px; padding-bottom: 4px; line-height: 1.28; }
+
+@media (max-height: 720px) {
+    html body.papirkort.papirkort .scenekort.loest.bliv .sk-svar .sk-knap { padding-top: 3px; padding-bottom: 3px; font-size: 0.84rem; line-height: 1.15; }
+    html body.papirkort.papirkort .scenekort.loest.bliv .sk-bund.bliv .st-tekst { padding-top: 2px; padding-bottom: 2px; line-height: 1.22; }
+}
+/* Gaet forfra og Start forfra staar til venstre i kortets nederste raekke,
+   ikke dér, hvor Naeste gaet og Faerdig stod (brugeren 3. nov. 2026: Start
+   forfra staar aldrig samme sted som Naeste) */
+.sk-bund .knap.forfra { order: -1; margin-left: 0; margin-right: auto; }
+/* Paa papirkortet er den en stille hvid knap, ikke en moerk */
+html body.papirkort.papirkort .scenekort .sk-bund .knap.forfra {
+    min-width: 0;
+    padding: 8px 15px;
+    border: 1.5px solid var(--pk-knapkant);
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: var(--pk-tekst);
+    font-weight: 500;
+    box-shadow: none;
+}
+html body.papirkort.papirkort .scenekort .sk-bund .knap.forfra:hover { border-color: #8f8873; background-color: #fffdf6; }

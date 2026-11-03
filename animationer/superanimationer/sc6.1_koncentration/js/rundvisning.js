@@ -16,7 +16,7 @@
 
     var TURE = {
         "fane-kar": [
-            { sel: "#kar-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst. Linjen under den siger, hvor langt karret er fra målet. To opgaver starter med et gæt på et gult kort." },
+            { sel: "#kar-skort", titel: "Opgaven", tekst: "Opgaven står på kortet øverst. Linjen under den siger, hvor langt karret er fra målet. To opgaver starter med et gæt på kortet." },
             { sel: "#kar-anker-krukke", titel: "Krukken", tekst: "Træk en skefuld kobber(II)sulfat ned i karret, eller klik på krukken. En skefuld er 0,10 mol." },
             { sel: "#kar-anker-haner", titel: "Hanerne", tekst: "Hold musen nede på den blå knap for at hælde vand i, og på den røde hane for at tappe ud. Hvert tryk er 0,05 L. Et gult skilt viser, hvad der mangler." },
             { sel: "#kar-anker-zoom", titel: "Luppen", tekst: "Luppen viser altid lige meget væske. Antallet af ioner i den følger koncentrationen." },
@@ -26,7 +26,7 @@
             { sel: ".faneknapper", titel: "De andre faner", tekst: "c eller n?: forskellen på stofmængde og koncentration. Målekolben: regn en opløsning ud, før den laves. Fortynding: der kommer vand til, men ikke stof." }
         ],
         "fane-glas": [
-            { sel: "#glas-skort", titel: "Spørgsmålet", tekst: "Spørgsmålet står på kortet øverst. Klik på et svar. Handler spørgsmålet om et glas, kan du også klikke på glasset. Et forkert svar bliver forklaret." },
+            { sel: "#glas-skort", titel: "Spørgsmålet", tekst: "Spørgsmålet står på kortet øverst. Vælg et svar, og tryk på Indsend svar. Handler spørgsmålet om et glas, kan du også klikke på glasset. Et forkert svar bliver forklaret." },
             { sel: "#glas-anker-glassene", titel: "Glassene", tekst: "Hver prik i et glas er 0,01 mol kobber(II)sulfat. Tæl prikkerne, så har du stofmængden n." },
             { sel: "#glas-anker-lupper", titel: "Lupperne", tekst: "En lup viser altid lige meget væske. Flere ioner i luppen betyder en højere koncentration c." },
             { sel: "#glas-knap", titel: "Giv hint", tekst: "Sidder du fast, så tryk på den gule knap på kortet. Først får du et hint, og et tryk mere viser svaret." },

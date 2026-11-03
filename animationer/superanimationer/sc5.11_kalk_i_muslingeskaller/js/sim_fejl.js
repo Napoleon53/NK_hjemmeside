@@ -31,7 +31,7 @@
     }
 
     var P = SimFejl.prototype;
-    NK.Fane.paa(P, { navn: "fejl", scene: true, naesteTekst: "Næste fejlkilde →", forfraTekst: "Forfra ↺" });
+    NK.Fane.paa(P, { navn: "fejl", scene: true, naesteTekst: "Næste fejlkilde →" });
 
     /* ----- Opgaven -------------------------------------------------------------- */
     P.lavOpgave = function (i) {
@@ -81,10 +81,10 @@
             return '<p class="gk-intro">' + NK.html(o.tekst) + '</p><p class="gk-tekst">' + NK.html(D.FEJL_SPM) + "</p>";
         }
         if (this.res) {
-            return '<p class="sk-tekst">' + NK.html("Gruppe A får " + K.pct1(this.res.A.pct) + " % kalk. Gruppe B får " +
-                K.pct1(this.res.B.pct) + " % kalk.") + "</p>";
+            return '<p class="sk-tekst">' + this.papirTekst(NK.html("Gruppe A får " + K.pct1(this.res.A.pct) + " % kalk. Gruppe B får " +
+                K.pct1(this.res.B.pct) + " % kalk.")) + "</p>";
         }
-        return '<p class="sk-tekst">' + NK.html(D.FEJL_KOERER) + "</p>";
+        return '<p class="sk-tekst">' + this.papirTekst(NK.html(D.FEJL_KOERER)) + "</p>";
     };
 
     /* Svarene til gaettet: tre store knapper side om side, kun mens der gaettes */

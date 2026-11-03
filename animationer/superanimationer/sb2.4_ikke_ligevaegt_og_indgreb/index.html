@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ikke-ligevægt og indgreb</title>
 <link rel="stylesheet" href="css/stil.css">
+<link rel="stylesheet" href="../faelles/papirkort.css">
 </head>
-<body>
+<body class="papirkort">
 
 <header class="top">
     <h1><span class="ikon">⇌</span> Ikke-ligevægt og indgreb</h1>
@@ -35,6 +36,7 @@
             <div class="sk-bund" id="i-status">
                 <p class="st-tekst" id="i-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="i-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="i-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="i-anker-beholder"></div>
@@ -66,6 +68,7 @@
             <div class="sk-bund" id="b-status">
                 <p class="st-tekst" id="b-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="b-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="b-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="b-anker-lunge"></div>
@@ -105,6 +108,7 @@
             <div class="sk-bund" id="r-status">
                 <p class="st-tekst" id="r-besked" aria-live="polite"></p>
                 <button class="knap hjaelp" id="r-knap" type="button">Giv et hint</button>
+                <button class="knap indsend ikke-klar" id="r-indsend" type="button" hidden>Indsend svar</button>
             </div>
         </div>
         <div class="anker" id="r-anker-tavle"></div>
@@ -178,6 +182,7 @@
 <script src="js/model.js"></script>
 <script src="js/data.js"></script>
 <script src="js/tegning.js"></script>
+<script src="../faelles/papirkort.js"></script>
 <script src="js/fane.js"></script>
 <script src="js/sim_indgreb.js"></script>
 <script src="js/sim_blod.js"></script>
